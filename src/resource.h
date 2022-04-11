@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by dgdm.rc
+// Used by Raidcore-AddonHost.rc
 
 // Next default values for new objects
 // 

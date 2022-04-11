@@ -68,12 +68,11 @@ BEGIN
         BLOCK "080904b0"
         BEGIN
             VALUE "CompanyName", "Raidcore"
-            VALUE "FileDescription", "A Guild Wars 2 Addon Framework."
+            VALUE "FileDescription", "A Guild Wars 2 Addon Host."
             VALUE "FileVersion", "1.0.0.1"
-            VALUE "InternalName", "droknar.dll"
-            VALUE "LegalCopyright", "Copyright (C) 2021"
-            VALUE "OriginalFilename", "droknar.dll"
-            VALUE "ProductName", "Droknar"
+            VALUE "InternalName", "Raidcore.dll"
+            VALUE "LegalCopyright", "Copyright (C) 2022"
+            VALUE "ProductName", "Raidcore Addon Host"
             VALUE "ProductVersion", "1.0.0.1"
         END
     END
