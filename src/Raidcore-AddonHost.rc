@@ -70,8 +70,8 @@ BEGIN
             VALUE "CompanyName", "Raidcore"
             VALUE "FileDescription", "A Guild Wars 2 Addon Host."
             VALUE "FileVersion", "1.0.0.1"
-            VALUE "InternalName", "Raidcore.dll"
-            VALUE "LegalCopyright", "Copyright (C) 2022"
+            VALUE "InternalName", "host.dll"
+            VALUE "LegalCopyright", "Copyright (C) 2022 Raidcore"
             VALUE "ProductName", "Raidcore Addon Host"
             VALUE "ProductVersion", "1.0.0.1"
         END
