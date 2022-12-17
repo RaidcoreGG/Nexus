@@ -10,6 +10,9 @@
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx11.h"
 
+//#include "loader_hook.h"
+#include "detours.h"
+
 #define CHAINLOAD_HACK
 
 FILE* iobuf;
@@ -27,6 +30,24 @@ static HMODULE g_GW2;
 static HMODULE g_Self;
 static HMODULE g_D3D11;
 static HMODULE g_Sys11;
+
+/* meme */
+typedef HRESULT(__fastcall* IDXGISwapChainPresent)(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
+IDXGISwapChainPresent fnIdxgiSwapChainPresent;
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+bool initialized = false;
+bool delay = false;
+ID3D11Device* pDevice = nullptr;
+ID3D11DeviceContext* pDeviceContext = nullptr;
+IDXGISwapChain* pSwapChain = nullptr;
+ID3D11RenderTargetView* mainRenderTargetView;
+
+WNDPROC origWndProc = nullptr;
+HWND window;
+
+HRESULT __fastcall Present(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags);
+/* meme */
 
 static BOOL FindFunction(HMODULE mod, LPVOID func, LPCSTR name)
 {
@@ -147,7 +168,25 @@ extern "C" HRESULT WINAPI D3D11CreateDevice(IDXGIAdapter * pAdapter, D3D_DRIVER_
 		}
 	}
 
-	return func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
+	HRESULT createDeviceRet = func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, &pDevice, pFeatureLevel, ppImmediateContext);
+	*ppDevice = pDevice;
+
+	auto dxgiHandle = (DWORD_PTR)GetModuleHandleA("dxgi.dll");
+	// offset get with `x64dbg` in the `Symbols` tab
+	// The offset points to `DXGISwapChain::Present()`
+	fnIdxgiSwapChainPresent = (IDXGISwapChainPresent)(dxgiHandle + 0x5270);
+
+	// detour the swapchain::present call
+	DetourTransactionBegin();
+	// DetourUpdateThread(GetCurrentThread());
+	DetourAttach(&(LPVOID&)fnIdxgiSwapChainPresent, (PBYTE)Present);
+	DetourTransactionCommit();
+
+	std::thread([]() { Sleep(10000); delay = true; }).detach();
+
+	return createDeviceRet;
+
+	//return func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
 }
 extern "C" HRESULT WINAPI D3D11CreateDeviceAndSwapChain(IDXGIAdapter * pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL * pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, const DXGI_SWAP_CHAIN_DESC * pSwapChainDesc, IDXGISwapChain * *ppSwapChain, ID3D11Device * *ppDevice, D3D_FEATURE_LEVEL * pFeatureLevel, ID3D11DeviceContext * *ppImmediateContext)
 {
@@ -226,4 +265,79 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		break;
 	}
 	return true;
+}
+
+
+LRESULT CALLBACK hWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	/*ImGuiIO& io = ImGui::GetIO();
+	POINT mousePosition;
+	GetCursorPos(&mousePosition);
+	ScreenToClient(window, &mousePosition);
+	io.MousePos.x = mousePosition.x;
+	io.MousePos.y = mousePosition.y;*/
+
+	//ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
+
+	return CallWindowProc(origWndProc, hWnd, uMsg, wParam, lParam);
+}
+
+HRESULT __fastcall Present(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
+{
+	std::cout << "present" << std::endl;
+	if (delay)
+	{
+		if (!initialized)
+		{
+			pDevice->GetImmediateContext(&pDeviceContext);
+			pSwapChain = pChain;
+
+			DXGI_SWAP_CHAIN_DESC swapChainDesc;
+			pChain->GetDesc(&swapChainDesc);
+
+			// create imgui context
+			ImGui::CreateContext();
+			ImGuiIO& io = ImGui::GetIO();
+			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+			io.Fonts->AddFontDefault();
+			io.Fonts->Build();
+
+			window = swapChainDesc.OutputWindow;
+
+			origWndProc = (WNDPROC)SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)hWndProc);
+
+			// Init imgui
+			ImGui_ImplWin32_Init(window);
+			ImGui_ImplDX11_Init(pDevice, pDeviceContext);
+			ImGui::GetIO().ImeWindowHandle = window;
+
+			// create buffers
+			ID3D11Texture2D* pBackBuffer;
+			pChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBackBuffer);
+			pDevice->CreateRenderTargetView(pBackBuffer, NULL, &mainRenderTargetView);
+			pBackBuffer->Release();
+
+			initialized = true;
+		}
+
+		// imgui define new frame
+		ImGui_ImplWin32_NewFrame();
+		ImGui_ImplDX11_NewFrame();
+		ImGui::NewFrame();
+
+		// Draw ImGui here!
+		ImGui::ShowDemoWindow();
+
+		// imgui end frame
+		ImGui::EndFrame();
+
+		// render
+		ImGui::Render();
+
+		// finish drawing
+		pDeviceContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	}
+
+	return fnIdxgiSwapChainPresent(pChain, SyncInterval, Flags);
 }
