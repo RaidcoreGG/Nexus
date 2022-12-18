@@ -10,8 +10,7 @@
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx11.h"
 
-//#include "loader_hook.h"
-#include "detours.h"
+#include "loader_hook.h"
 
 #define CHAINLOAD_HACK
 
@@ -32,21 +31,20 @@ static HMODULE g_D3D11;
 static HMODULE g_Sys11;
 
 /* meme */
-typedef HRESULT(__fastcall* IDXGISwapChainPresent)(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
-IDXGISwapChainPresent fnIdxgiSwapChainPresent;
+static HRESULT(*dxgi_present)(IDXGISwapChain* This, UINT SyncInterval, UINT Flags);
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 bool initialized = false;
 bool delay = false;
-ID3D11Device* pDevice = nullptr;
-ID3D11DeviceContext* pDeviceContext = nullptr;
-IDXGISwapChain* pSwapChain = nullptr;
-ID3D11RenderTargetView* mainRenderTargetView;
+ID3D11Device* g_pDevice = nullptr;
+ID3D11DeviceContext* g_pDeviceContext = nullptr;
+IDXGISwapChain* g_pSwapChain = nullptr;
+ID3D11RenderTargetView* g_mainRenderTargetView;
 
 WNDPROC origWndProc = nullptr;
 HWND window;
 
-HRESULT __fastcall Present(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags);
+HRESULT __stdcall dxgi_present_hook(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags);
 /* meme */
 
 static BOOL FindFunction(HMODULE mod, LPVOID func, LPCSTR name)
@@ -168,25 +166,54 @@ extern "C" HRESULT WINAPI D3D11CreateDevice(IDXGIAdapter * pAdapter, D3D_DRIVER_
 		}
 	}
 
-	HRESULT createDeviceRet = func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, &pDevice, pFeatureLevel, ppImmediateContext);
-	*ppDevice = pDevice;
+	WNDCLASSEXW wc;
+	memset(&wc, 0, sizeof(wc));
 
-	auto dxgiHandle = (DWORD_PTR)GetModuleHandleA("dxgi.dll");
-	// offset get with `x64dbg` in the `Symbols` tab
-	// The offset points to `DXGISwapChain::Present()`
-	fnIdxgiSwapChainPresent = (IDXGISwapChainPresent)(dxgiHandle + 0x5270);
+	wc.cbSize = sizeof(wc);
+	wc.lpfnWndProc = DefWindowProcW;
+	wc.hInstance = GetModuleHandleW(0);
+	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW);
+	wc.lpszClassName = L"TempDxWndClass";
+	RegisterClassExW(&wc);
 
-	// detour the swapchain::present call
-	DetourTransactionBegin();
-	// DetourUpdateThread(GetCurrentThread());
-	DetourAttach(&(LPVOID&)fnIdxgiSwapChainPresent, (PBYTE)Present);
-	DetourTransactionCommit();
+	HWND wnd = CreateWindowExW(0, wc.lpszClassName, 0, WS_OVERLAPPEDWINDOW, 0, 0, 128, 128, 0, 0, wc.hInstance, 0);
+	if (wnd) {
+		DXGI_SWAP_CHAIN_DESC swap_desc = {};
+		swap_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		swap_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		swap_desc.BufferCount = 1;
+		swap_desc.SampleDesc.Count = 1;
+		swap_desc.OutputWindow = wnd;
+		swap_desc.Windowed = TRUE;
+
+		ID3D11Device* device;
+		ID3D11DeviceContext* context;
+		IDXGISwapChain* swap;
+
+		if (SUCCEEDED(D3D11CreateDeviceAndSwapChain(0, D3D_DRIVER_TYPE_HARDWARE, 0, 0, 0, 0, D3D11_SDK_VERSION, &swap_desc, &swap, &device, 0, &context))) {
+			LPVOID* vtbl;
+
+			vtbl = *(LPVOID**)swap;
+			//dxgi_release = hook_vtbl_fn(vtbl, 2, dxgi_release_hook);
+			//dxgi_present = hook_vtbl_fn(vtbl, 8, dxgi_present_hook);
+			//dxgi_resize_buffers = hook_vtbl_fn(vtbl, 13, dxgi_resize_buffers_hook);
+
+			MH_CreateHook(vtbl[8], (LPVOID)&dxgi_present_hook, (LPVOID *)&dxgi_present);
+			MH_EnableHook(MH_ALL_HOOKS);
+
+			context->Release();
+			device->Release();
+			swap->Release();
+		}
+
+		DestroyWindow(wnd);
+	}
+
+	UnregisterClassW(wc.lpszClassName, wc.hInstance);
 
 	std::thread([]() { Sleep(10000); delay = true; }).detach();
 
-	return createDeviceRet;
-
-	//return func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
+	return func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
 }
 extern "C" HRESULT WINAPI D3D11CreateDeviceAndSwapChain(IDXGIAdapter * pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL * pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, const DXGI_SWAP_CHAIN_DESC * pSwapChainDesc, IDXGISwapChain * *ppSwapChain, ID3D11Device * *ppDevice, D3D_FEATURE_LEVEL * pFeatureLevel, ID3D11DeviceContext * *ppImmediateContext)
 {
@@ -226,6 +253,24 @@ extern "C" HRESULT WINAPI D3D11CreateDeviceAndSwapChain(IDXGIAdapter * pAdapter,
 }
 #pragma endregion
 
+void GetPaths()
+{
+	/* get self dll path */
+	GetModuleFileNameW(g_Self, g_Path_HostDll, sizeof(g_Path_HostDll));
+
+	/* get current directory */
+	memcpy(g_Path_HostDirectory, g_Path_HostDll, sizeof(g_Path_HostDirectory));
+	PathCchRemoveFileSpec(g_Path_HostDirectory, sizeof(g_Path_HostDirectory));
+
+	/* get temp dll path */
+	memcpy(g_Path_TempDll, g_Path_HostDirectory, sizeof(g_Path_TempDll));
+	PathCchAppend(g_Path_TempDll, sizeof(g_Path_TempDll), L"d3d11.tmp");
+
+	/* get chainload dll path */
+	memcpy(g_Path_ChainloadDll, g_Path_HostDirectory, sizeof(g_Path_ChainloadDll));
+	PathCchAppend(g_Path_ChainloadDll, sizeof(g_Path_ChainloadDll), L"d3d11_chainload.dll");
+}
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
 	switch (ul_reason_for_call)
@@ -238,26 +283,19 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		freopen_s(&iobuf, "CONIN$", "r", stdin);
 		freopen_s(&iobuf, "CONOUT$", "w", stderr);
 		freopen_s(&iobuf, "CONOUT$", "w", stdout);
+		
+		GetPaths();
 
-		/* get self dll path */
-		GetModuleFileNameW(hModule, g_Path_HostDll, sizeof(g_Path_HostDll));
-
-		/* get current directory */
-		memcpy(g_Path_HostDirectory, g_Path_HostDll, sizeof(g_Path_HostDirectory));
-		PathCchRemoveFileSpec(g_Path_HostDirectory, sizeof(g_Path_HostDirectory));
-
-		/* get temp dll path */
-		memcpy(g_Path_TempDll, g_Path_HostDirectory, sizeof(g_Path_TempDll));
-		PathCchAppend(g_Path_TempDll, sizeof(g_Path_TempDll), L"d3d11.tmp");
-
-		/* get chainload dll path */
-		memcpy(g_Path_ChainloadDll, g_Path_HostDirectory, sizeof(g_Path_ChainloadDll));
-		PathCchAppend(g_Path_ChainloadDll, sizeof(g_Path_ChainloadDll), L"d3d11_chainload.dll");
+		if (MH_Initialize() != MH_OK) {
+			return FALSE;
+		}
 
 		std::wcout << L"[ATTACH] " << g_Path_HostDll << std::endl;
 		break;
 	case DLL_PROCESS_DETACH:
 		std::wcout << L"[DETACH] " << g_Path_HostDll << std::endl;
+
+		MH_Uninitialize();
 
 		FreeConsole();
 
@@ -282,15 +320,16 @@ LRESULT CALLBACK hWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return CallWindowProc(origWndProc, hWnd, uMsg, wParam, lParam);
 }
 
-HRESULT __fastcall Present(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
+HRESULT __stdcall dxgi_present_hook(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
 {
 	std::cout << "present" << std::endl;
 	if (delay)
 	{
 		if (!initialized)
 		{
-			pDevice->GetImmediateContext(&pDeviceContext);
-			pSwapChain = pChain;
+			pChain->GetDevice(__uuidof(ID3D11Device), (void**)&g_pDevice);
+			g_pDevice->GetImmediateContext(&g_pDeviceContext);
+			g_pSwapChain = pChain;
 
 			DXGI_SWAP_CHAIN_DESC swapChainDesc;
 			pChain->GetDesc(&swapChainDesc);
@@ -308,13 +347,13 @@ HRESULT __fastcall Present(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags
 
 			// Init imgui
 			ImGui_ImplWin32_Init(window);
-			ImGui_ImplDX11_Init(pDevice, pDeviceContext);
+			ImGui_ImplDX11_Init(g_pDevice, g_pDeviceContext);
 			ImGui::GetIO().ImeWindowHandle = window;
 
 			// create buffers
 			ID3D11Texture2D* pBackBuffer;
 			pChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBackBuffer);
-			pDevice->CreateRenderTargetView(pBackBuffer, NULL, &mainRenderTargetView);
+			g_pDevice->CreateRenderTargetView(pBackBuffer, NULL, &g_mainRenderTargetView);
 			pBackBuffer->Release();
 
 			initialized = true;
@@ -335,9 +374,9 @@ HRESULT __fastcall Present(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags
 		ImGui::Render();
 
 		// finish drawing
-		pDeviceContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
+		g_pDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, NULL);
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	}
 
-	return fnIdxgiSwapChainPresent(pChain, SyncInterval, Flags);
+	return dxgi_present(pChain, SyncInterval, Flags);
 }

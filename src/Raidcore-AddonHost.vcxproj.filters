@@ -97,9 +97,6 @@
     <ClInclude Include="loader_trampoline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="detours.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Raidcore-AddonHost.rc">

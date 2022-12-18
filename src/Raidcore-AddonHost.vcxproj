@@ -36,7 +36,6 @@
     <None Include="exports.def" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="detours.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_dx11.h" />
@@ -135,7 +134,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Shlwapi.lib;PathCch.lib</AdditionalDependencies>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
@@ -157,7 +156,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Shlwapi.lib;PathCch.lib</AdditionalDependencies>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
@@ -176,7 +175,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
-      <AdditionalDependencies>Shlwapi.lib;PathCch.lib;detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Shlwapi.lib;PathCch.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -198,7 +197,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
-      <AdditionalDependencies>Shlwapi.lib;PathCch.lib;detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Shlwapi.lib;PathCch.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
