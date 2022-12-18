@@ -16,6 +16,12 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{9cf5a43b-f25a-40a9-985c-dc3e2c93acbb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="minhook">
+      <UniqueIdentifier>{f68f9811-c527-445e-80e6-4195e50dfa70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Logging">
+      <UniqueIdentifier>{72f71e79-5933-4318-b293-5087228d8bf4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="entry.cpp">
@@ -42,17 +48,32 @@
     <ClCompile Include="imgui\imgui_impl_dx11.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="loader_buffer.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="minhook\mh_buffer.cpp">
+      <Filter>minhook</Filter>
     </ClCompile>
-    <ClCompile Include="loader_disasm.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="minhook\mh_disasm.cpp">
+      <Filter>minhook</Filter>
     </ClCompile>
-    <ClCompile Include="loader_hook.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="minhook\mh_hook.cpp">
+      <Filter>minhook</Filter>
     </ClCompile>
-    <ClCompile Include="loader_trampoline.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="minhook\mh_trampoline.cpp">
+      <Filter>minhook</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\FileLogger.cpp">
+      <Filter>Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\ILogger.cpp">
+      <Filter>Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\LogEntry.cpp">
+      <Filter>Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\LogHandler.cpp">
+      <Filter>Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\ConsoleLogger.cpp">
+      <Filter>Logging</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -85,17 +106,35 @@
     <ClInclude Include="imgui\imgui_impl_dx11.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="loader_buffer.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="minhook\mh_hook.h">
+      <Filter>minhook</Filter>
     </ClInclude>
-    <ClInclude Include="loader_disasm.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="minhook\mh_trampoline.h">
+      <Filter>minhook</Filter>
     </ClInclude>
-    <ClInclude Include="loader_hook.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="minhook\mh_disasm.h">
+      <Filter>minhook</Filter>
     </ClInclude>
-    <ClInclude Include="loader_trampoline.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="minhook\mh_buffer.h">
+      <Filter>minhook</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\FileLogger.h">
+      <Filter>Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\ILogger.h">
+      <Filter>Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\LogEntry.h">
+      <Filter>Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\LogHandler.h">
+      <Filter>Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\LogLevel.h">
+      <Filter>Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\ConsoleLogger.h">
+      <Filter>Logging</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -29,7 +29,7 @@
 #define STRICT
 #define _WIN32_WINNT 0x0501
 #include <windows.h>
-#include "loader_buffer.h"
+#include "mh_buffer.h"
 
  // Size of each memory block. (= page size of VirtualAlloc)
 #define MEMORY_BLOCK_SIZE 0x1000

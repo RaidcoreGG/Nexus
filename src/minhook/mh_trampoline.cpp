@@ -31,12 +31,12 @@
 #define ARRAYSIZE(A) (sizeof(A) / sizeof((A)[0]))
 #endif
 
-#include "loader_disasm.h"
+#include "mh_disasm.h"
 typedef hde64s HDE;
 #define HDE_DISASM(code, hs) hde64_disasm(code, hs)
 
-#include "loader_trampoline.h"
-#include "loader_buffer.h"
+#include "mh_trampoline.h"
+#include "mh_buffer.h"
 
 // Maximum size of a trampoline function.
 #define TRAMPOLINE_MAX_SIZE (MEMORY_SLOT_SIZE - sizeof(JMP_ABS))

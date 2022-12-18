@@ -35,9 +35,9 @@
 #include <tlhelp32.h>
 #include <limits.h>
 
-#include "loader_hook.h"
-#include "loader_buffer.h"
-#include "loader_trampoline.h"
+#include "mh_hook.h"
+#include "mh_buffer.h"
+#include "mh_trampoline.h"
 
 #ifndef ARRAYSIZE
 #define ARRAYSIZE(A) (sizeof(A)/sizeof((A)[0]))

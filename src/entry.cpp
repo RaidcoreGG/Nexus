@@ -6,47 +6,51 @@
 #include <cassert>
 #include <thread>
 
+#include "minhook/mh_hook.h"
+
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx11.h"
 
-#include "loader_hook.h"
+#include "Logging/LogHandler.h"
+#include "Logging/ConsoleLogger.h"
+#include "Logging/FileLogger.h"
 
-#define CHAINLOAD_HACK
+#define IMPL_CHAINLOAD
 
-FILE* iobuf;
+static WCHAR g_Path_HostDirectory[MAX_PATH];
+static WCHAR g_Path_HostDll[MAX_PATH];
+static WCHAR g_Path_TempDll[MAX_PATH];
+static WCHAR g_Path_ChainloadDll[MAX_PATH];
 
-static WCHAR g_Path_HostDirectory[512];
-static WCHAR g_Path_HostDll[512];
-static WCHAR g_Path_TempDll[512];
-static WCHAR g_Path_ChainloadDll[512];
-
+static bool g_IsDxLoaded = false;
 static bool g_IsChainloading = false;
-static bool g_IsLoaded = false;
-static bool g_IsCreated = false;
+static bool g_IsDxCreated = false;
+static bool g_IsImGuiInitialized = false;
 
 static HMODULE g_GW2;
 static HMODULE g_Self;
 static HMODULE g_D3D11;
 static HMODULE g_Sys11;
 
-/* meme */
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-void InitializeImGui();
-bool g_ImGui_Initialized = false;
-ID3D11Device* g_pDevice = nullptr;
-ID3D11DeviceContext* g_pDeviceContext = nullptr;
-IDXGISwapChain* g_pSwapChain = nullptr;
-ID3D11RenderTargetView* g_mainRenderTargetView;
+LogHandler* logger = nullptr;
 
-WNDPROC origWndProc = nullptr;
-HWND window;
+/* meme */
+void InitializeImGui();
+static WNDPROC g_GW2_WndProc = nullptr;
+static HWND g_GW2_HWND = nullptr;
+static ID3D11Device* g_pDevice = nullptr;
+static ID3D11DeviceContext* g_pDeviceContext = nullptr;
+static IDXGISwapChain* g_pSwapChain = nullptr;
+static ID3D11RenderTargetView* g_mainRenderTargetView = nullptr;
 
 static HRESULT(*dxgi_present)(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags);
 static HRESULT(*dxgi_resize_buffers)(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
 
-HRESULT __stdcall dxgi_present_hook(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags);
-HRESULT __stdcall dxgi_resize_buffers_hook(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
+HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags);
+HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 /* meme */
 
 static BOOL FindFunction(HMODULE mod, LPVOID func, LPCSTR name)
@@ -58,11 +62,11 @@ static BOOL FindFunction(HMODULE mod, LPVOID func, LPCSTR name)
 
 BOOL DxLoad()
 {
-	if (!g_IsLoaded)
+	if (!g_IsDxLoaded)
 	{
-		g_IsLoaded = true;
+		g_IsDxLoaded = true;
 
-#ifdef CHAINLOAD_HACK
+#ifdef IMPL_CHAINLOAD
 		/* attempt to chainload */
 		/* sanity check that the current dll isn't the chainload */
 		if (g_Path_HostDll != g_Path_ChainloadDll)
@@ -71,42 +75,45 @@ BOOL DxLoad()
 
 			g_D3D11 = LoadLibraryW(g_Path_ChainloadDll);
 
-			std::cout << "Attempting to chainload: ";
-			std::wcout << g_Path_ChainloadDll << std::endl;
+			logger->Log("Attempting to chainload.");
+			//std::wcout << g_Path_ChainloadDll << std::endl;
 		}
 #endif
 
 		/* ifn chainload, load system dll */
 		if (!g_D3D11)
 		{
+#ifdef IMPL_CHAINLOAD
+			if (g_IsChainloading)
+			{
+				logger->Log("No chainload found or failed to load.");
+			}
+#endif
 			g_IsChainloading = false;
-
-			std::cout << "No chainload found or invalid." << std::endl;
 
 			WCHAR path[512];
 			GetSystemDirectoryW(path, sizeof(path));
 			PathCchAppend(path, sizeof(path), L"d3d11.dll");
 			g_D3D11 = LoadLibraryW(path);
 
-			assert(g_D3D11 && "Could neither chainload, nor load system DLL.");
+			assert(g_D3D11 && "Could not load system d3d11.dll");
 
-			std::cout << "Loaded System DLL." << std::endl;
+			logger->Log("Loaded System DLL.");
 		}
 	}
 
 	return (g_D3D11 != NULL);
 }
-
 #pragma region dx11
-extern "C" HRESULT WINAPI D3D11CoreCreateDevice(IDXGIFactory * pFactory, IDXGIAdapter * pAdapter, UINT Flags, const D3D_FEATURE_LEVEL * pFeatureLevels, UINT FeatureLevels, ID3D11Device & ppDevice)
+HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory * pFactory, IDXGIAdapter * pAdapter, UINT Flags, const D3D_FEATURE_LEVEL * pFeatureLevels, UINT FeatureLevels, ID3D11Device & ppDevice)
 {
 	static decltype(&D3D11CoreCreateDevice) func;
 	static const char* func_name = "D3D11CoreCreateDevice";
 
-	std::cout << func_name << std::endl;
+	logger->Log(func_name);
 
-#ifdef CHAINLOAD_HACK
-	if (g_IsCreated)
+#ifdef IMPL_CHAINLOAD
+	if (g_IsDxCreated)
 	{
 		WCHAR system[MAX_PATH];
 		GetSystemDirectoryW(system, ARRAYSIZE(system));
@@ -119,7 +126,7 @@ extern "C" HRESULT WINAPI D3D11CoreCreateDevice(IDXGIFactory * pFactory, IDXGIAd
 		}
 	}
 
-	g_IsCreated = true;
+	g_IsDxCreated = true;
 #endif
 
 	if (DxLoad() == false) { return 0; }
@@ -134,19 +141,19 @@ extern "C" HRESULT WINAPI D3D11CoreCreateDevice(IDXGIFactory * pFactory, IDXGIAd
 
 	return func(pFactory, pAdapter, Flags, pFeatureLevels, FeatureLevels, ppDevice);
 }
-extern "C" HRESULT WINAPI D3D11CreateDevice(IDXGIAdapter * pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL * pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, ID3D11Device * *ppDevice, D3D_FEATURE_LEVEL * pFeatureLevel, ID3D11DeviceContext * *ppImmediateContext)
+HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter * pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL * pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, ID3D11Device * *ppDevice, D3D_FEATURE_LEVEL * pFeatureLevel, ID3D11DeviceContext * *ppImmediateContext)
 {
 	static decltype(&D3D11CreateDevice) func;
 	static const char* func_name = "D3D11CreateDevice";
 
-	std::cout << func_name << std::endl;
+	logger->Log(func_name);
 
-#ifdef CHAINLOAD_HACK
-	if (g_IsCreated)
+#ifdef IMPL_CHAINLOAD
+	if (g_IsDxCreated)
 	{
 		WCHAR system[MAX_PATH];
 		GetSystemDirectoryW(system, ARRAYSIZE(system));
-		PathCchAppend(system, sizeof(system), L"d3d11.dll");
+		PathCchAppend(system, MAX_PATH, L"d3d11.dll");
 		g_Sys11 = LoadLibraryW(system);
 
 		if (FindFunction(g_Sys11, &func, func_name) == false)
@@ -155,7 +162,7 @@ extern "C" HRESULT WINAPI D3D11CreateDevice(IDXGIAdapter * pAdapter, D3D_DRIVER_
 		}
 	}
 
-	g_IsCreated = true;
+	g_IsDxCreated = true;
 #endif
 
 	if (DxLoad() == false) { return 0; }
@@ -200,8 +207,8 @@ extern "C" HRESULT WINAPI D3D11CreateDevice(IDXGIAdapter * pAdapter, D3D_DRIVER_
 			//dxgi_present = hook_vtbl_fn(vtbl, 8, dxgi_present_hook);
 			//dxgi_resize_buffers = hook_vtbl_fn(vtbl, 13, dxgi_resize_buffers_hook);
 
-			MH_CreateHook(vtbl[8], (LPVOID)&dxgi_present_hook, (LPVOID*)&dxgi_present);
-			MH_CreateHook(vtbl[13], (LPVOID)&dxgi_resize_buffers_hook, (LPVOID*)&dxgi_resize_buffers);
+			MH_CreateHook(vtbl[8], (LPVOID)&hkDXGIPresent, (LPVOID*)&dxgi_present);
+			MH_CreateHook(vtbl[13], (LPVOID)&hkDXGIResizeBuffers, (LPVOID*)&dxgi_resize_buffers);
 			MH_EnableHook(MH_ALL_HOOKS);
 
 			context->Release();
@@ -218,15 +225,15 @@ extern "C" HRESULT WINAPI D3D11CreateDevice(IDXGIAdapter * pAdapter, D3D_DRIVER_
 
 	return func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
 }
-extern "C" HRESULT WINAPI D3D11CreateDeviceAndSwapChain(IDXGIAdapter * pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL * pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, const DXGI_SWAP_CHAIN_DESC * pSwapChainDesc, IDXGISwapChain * *ppSwapChain, ID3D11Device * *ppDevice, D3D_FEATURE_LEVEL * pFeatureLevel, ID3D11DeviceContext * *ppImmediateContext)
+HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter * pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL * pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, const DXGI_SWAP_CHAIN_DESC * pSwapChainDesc, IDXGISwapChain * *ppSwapChain, ID3D11Device * *ppDevice, D3D_FEATURE_LEVEL * pFeatureLevel, ID3D11DeviceContext * *ppImmediateContext)
 {
 	static decltype(&D3D11CreateDeviceAndSwapChain) func;
 	static const char* func_name = "D3D11CreateDeviceAndSwapChain";
 
-	std::cout << func_name << std::endl;
+	logger->Log(func_name);
 
-#ifdef CHAINLOAD_HACK
-	if (g_IsCreated)
+#ifdef IMPL_CHAINLOAD
+	if (g_IsDxCreated)
 	{
 		WCHAR system[MAX_PATH];
 		GetSystemDirectoryW(system, ARRAYSIZE(system));
@@ -239,7 +246,7 @@ extern "C" HRESULT WINAPI D3D11CreateDeviceAndSwapChain(IDXGIAdapter * pAdapter,
 		}
 	}
 
-	g_IsCreated = true;
+	g_IsDxCreated = true;
 #endif
 
 	if (DxLoad() == false) { return 0; }
@@ -256,22 +263,34 @@ extern "C" HRESULT WINAPI D3D11CreateDeviceAndSwapChain(IDXGIAdapter * pAdapter,
 }
 #pragma endregion
 
-void GetPaths()
+void InitializePaths()
 {
 	/* get self dll path */
-	GetModuleFileNameW(g_Self, g_Path_HostDll, sizeof(g_Path_HostDll));
+	GetModuleFileNameW(g_Self, g_Path_HostDll, MAX_PATH);
 
 	/* get current directory */
-	memcpy(g_Path_HostDirectory, g_Path_HostDll, sizeof(g_Path_HostDirectory));
-	PathCchRemoveFileSpec(g_Path_HostDirectory, sizeof(g_Path_HostDirectory));
+	memcpy(g_Path_HostDirectory, g_Path_HostDll, MAX_PATH);
+	PathCchRemoveFileSpec(g_Path_HostDirectory, MAX_PATH);
 
 	/* get temp dll path */
-	memcpy(g_Path_TempDll, g_Path_HostDirectory, sizeof(g_Path_TempDll));
-	PathCchAppend(g_Path_TempDll, sizeof(g_Path_TempDll), L"d3d11.tmp");
+	memcpy(g_Path_TempDll, g_Path_HostDirectory, MAX_PATH);
+	PathCchAppend(g_Path_TempDll, MAX_PATH, L"d3d11.tmp");
 
 	/* get chainload dll path */
-	memcpy(g_Path_ChainloadDll, g_Path_HostDirectory, sizeof(g_Path_ChainloadDll));
-	PathCchAppend(g_Path_ChainloadDll, sizeof(g_Path_ChainloadDll), L"d3d11_chainload.dll");
+	memcpy(g_Path_ChainloadDll, g_Path_HostDirectory, MAX_PATH);
+	PathCchAppend(g_Path_ChainloadDll, MAX_PATH, L"d3d11_chainload.dll");
+}
+void InitializeLogging()
+{
+	logger = LogHandler::GetInstance();
+
+	ConsoleLogger* cLog = new ConsoleLogger();
+	cLog->SetLogLevel(LogLevel::ALL);
+	logger->Register(cLog);
+
+	FileLogger* fLog = new FileLogger("rcAddonHost.log");
+	fLog->SetLogLevel(LogLevel::ALL);
+	logger->Register(fLog);
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
@@ -282,25 +301,19 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		g_Self = hModule;
 		g_GW2 = GetModuleHandle(NULL);
 
-		AllocConsole();
-		freopen_s(&iobuf, "CONIN$", "r", stdin);
-		freopen_s(&iobuf, "CONOUT$", "w", stderr);
-		freopen_s(&iobuf, "CONOUT$", "w", stdout);
-
-		GetPaths();
+		InitializePaths();
+		InitializeLogging();
 
 		if (MH_Initialize() != MH_OK) {
 			return FALSE;
 		}
 
-		std::wcout << L"[ATTACH] " << g_Path_HostDll << std::endl;
+		//std::wcout << L"[ATTACH] " << g_Path_HostDll << std::endl;
 		break;
 	case DLL_PROCESS_DETACH:
-		std::wcout << L"[DETACH] " << g_Path_HostDll << std::endl;
+		//std::wcout << L"[DETACH] " << g_Path_HostDll << std::endl;
 
 		MH_Uninitialize();
-
-		FreeConsole();
 
 		if (g_D3D11) { FreeLibrary(g_D3D11); }
 		break;
@@ -308,19 +321,18 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	return true;
 }
 
-
-LRESULT CALLBACK hWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	ImGuiIO& io = ImGui::GetIO();
-	POINT mousePosition;
-	GetCursorPos(&mousePosition);
-	ScreenToClient(window, &mousePosition);
-	io.MousePos.x = mousePosition.x;
-	io.MousePos.y = mousePosition.y;
+	//ImGuiIO& io = ImGui::GetIO();
 
-	ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
+	//ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 
-	return CallWindowProc(origWndProc, hWnd, uMsg, wParam, lParam);
+	if (uMsg == WM_DESTROY)
+	{
+		logger->LogCritical("fuck me");
+	}
+
+	return CallWindowProc(g_GW2_WndProc, hWnd, uMsg, wParam, lParam);
 }
 
 void InitializeImGui()
@@ -338,14 +350,13 @@ void InitializeImGui()
 	io.Fonts->AddFontDefault();
 	io.Fonts->Build();
 
-	window = swapChainDesc.OutputWindow;
-
-	origWndProc = (WNDPROC)SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)hWndProc);
+	g_GW2_HWND = swapChainDesc.OutputWindow;
+	g_GW2_WndProc = (WNDPROC)SetWindowLongPtr(g_GW2_HWND, GWLP_WNDPROC, (LONG_PTR)hkWndProc);
 
 	// Init imgui
-	ImGui_ImplWin32_Init(window);
+	ImGui_ImplWin32_Init(g_GW2_HWND);
 	ImGui_ImplDX11_Init(g_pDevice, g_pDeviceContext);
-	ImGui::GetIO().ImeWindowHandle = window;
+	ImGui::GetIO().ImeWindowHandle = g_GW2_HWND;
 
 	// create buffers
 	ID3D11Texture2D* pBackBuffer;
@@ -353,10 +364,10 @@ void InitializeImGui()
 	g_pDevice->CreateRenderTargetView(pBackBuffer, NULL, &g_mainRenderTargetView);
 	pBackBuffer->Release();
 
-	g_ImGui_Initialized = true;
+	g_IsImGuiInitialized = true;
 }
 
-HRESULT __stdcall dxgi_present_hook(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
+HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
 {
 	if (g_pSwapChain != pChain)
 	{
@@ -371,7 +382,7 @@ HRESULT __stdcall dxgi_present_hook(IDXGISwapChain* pChain, UINT SyncInterval, U
 		g_pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&g_pDevice);
 	}
 
-	if (g_ImGui_Initialized)
+	if (g_IsImGuiInitialized)
 	{
 		// imgui define new frame
 		ImGui_ImplWin32_NewFrame();
@@ -379,7 +390,7 @@ HRESULT __stdcall dxgi_present_hook(IDXGISwapChain* pChain, UINT SyncInterval, U
 		ImGui::NewFrame();
 
 		// Draw ImGui here!
-		ImGui::ShowDemoWindow();
+		//ImGui::ShowDemoWindow();
 
 		// imgui end frame
 		ImGui::EndFrame();
@@ -395,7 +406,7 @@ HRESULT __stdcall dxgi_present_hook(IDXGISwapChain* pChain, UINT SyncInterval, U
 	return dxgi_present(pChain, SyncInterval, Flags);
 }
 
-HRESULT __stdcall dxgi_resize_buffers_hook(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
+HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
 {
 	// TODO:
 	// the game cannot handle resizing anymore for some reason
@@ -404,10 +415,10 @@ HRESULT __stdcall dxgi_resize_buffers_hook(IDXGISwapChain* pChain, UINT BufferCo
 
 	/*if (g_ImGui_Initialized)
 	{
-		if (g_mainRenderTargetView) { g_mainRenderTargetView->Release(); g_mainRenderTargetView = NULL; }
 		ImGui_ImplDX11_Shutdown();
 		ImGui_ImplWin32_Shutdown();
 		ImGui::DestroyContext();
+		if (g_mainRenderTargetView) { g_mainRenderTargetView->Release(); g_mainRenderTargetView = NULL; }
 
 		g_ImGui_Initialized = false;
 
