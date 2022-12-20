@@ -3,27 +3,27 @@
 
 #include "LogEntry.h"
 
-std::string LogEntry::ToString()
+std::wstring LogEntry::ToString()
 {
-    const char* level;
+    const wchar_t* level;
 
-    switch (mLogLevel)
+    switch (LogLevel)
     {
-        case LogLevel::CRITICAL:    level = " [CRITICAL] ";     break;
-        case LogLevel::WARNING:     level = " [WARNING] ";      break;
-        case LogLevel::INFO:        level = " [INFO] ";         break;
-        case LogLevel::DEBUG:       level = " [DEBUG] ";        break;
+        case LogLevel::CRITICAL:    level = L" [CRITICAL] ";     break;
+        case LogLevel::WARNING:     level = L" [WARNING] ";      break;
+        case LogLevel::INFO:        level = L" [INFO] ";         break;
+        case LogLevel::DEBUG:       level = L" [DEBUG] ";        break;
 
-        default:                    level = " [TRACE] ";        break;
+        default:                    level = L" [TRACE] ";        break;
     }
 
     struct tm timeinfo;
-    localtime_s(&timeinfo, (time_t*)&mTimestamp);
+    localtime_s(&timeinfo, (time_t*)&Timestamp);
 
-    std::ostringstream oss;
-    oss << std::put_time(&timeinfo, "%Y-%m-%d %H:%M:%S");
+    std::wstringstream oss;
+    oss << std::put_time(&timeinfo, L"%Y-%m-%d %H:%M:%S");
     oss << std::setw(12) << level;
-    std::string str = oss.str() + mMessage + "\n";
+    std::wstring str = oss.str() + std::wstring{Message} + L"\n";
 
     return str;
 }

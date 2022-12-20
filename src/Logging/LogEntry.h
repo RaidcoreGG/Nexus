@@ -7,11 +7,11 @@
 
 typedef struct LogEntry
 {
-    LogLevel mLogLevel;
-    unsigned long long mTimestamp;
-    const char* mMessage;
+    LogLevel LogLevel;
+    unsigned long long Timestamp;
+    std::wstring Message;
 
-    std::string ToString();
+    std::wstring ToString();
 } LogEntry_t;
 
 #endif

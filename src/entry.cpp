@@ -22,6 +22,7 @@ static WCHAR g_Path_HostDirectory[MAX_PATH];
 static WCHAR g_Path_HostDll[MAX_PATH];
 static WCHAR g_Path_TempDll[MAX_PATH];
 static WCHAR g_Path_ChainloadDll[MAX_PATH];
+static WCHAR g_Path_SystemDll[MAX_PATH];
 
 static bool g_IsDxLoaded = false;
 static bool g_IsChainloading = false;
@@ -33,7 +34,7 @@ static HMODULE g_Self;
 static HMODULE g_D3D11;
 static HMODULE g_Sys11;
 
-LogHandler* logger = nullptr;
+LogHandler* logger = LogHandler::GetInstance();;
 
 /* meme */
 void InitializeImGui();
@@ -75,7 +76,7 @@ BOOL DxLoad()
 
 			g_D3D11 = LoadLibraryW(g_Path_ChainloadDll);
 
-			logger->Log("Attempting to chainload.");
+			logger->Log(L"Attempting to chainload.");
 			//std::wcout << g_Path_ChainloadDll << std::endl;
 		}
 #endif
@@ -86,7 +87,7 @@ BOOL DxLoad()
 #ifdef IMPL_CHAINLOAD
 			if (g_IsChainloading)
 			{
-				logger->Log("No chainload found or failed to load.");
+				logger->Log(L"No chainload found or failed to load.");
 			}
 #endif
 			g_IsChainloading = false;
@@ -98,7 +99,7 @@ BOOL DxLoad()
 
 			assert(g_D3D11 && "Could not load system d3d11.dll");
 
-			logger->Log("Loaded System DLL.");
+			logger->Log(L"Loaded System DLL.");
 		}
 	}
 
@@ -115,10 +116,9 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory * pFactory, IDXGIAdapter * 
 #ifdef IMPL_CHAINLOAD
 	if (g_IsDxCreated)
 	{
-		WCHAR system[MAX_PATH];
-		GetSystemDirectoryW(system, ARRAYSIZE(system));
-		PathCchAppend(system, sizeof(system), L"d3d11.dll");
-		g_Sys11 = LoadLibraryW(system);
+		logger->LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
+
+		g_Sys11 = LoadLibraryW(g_Path_SystemDll);
 
 		if (FindFunction(g_Sys11, &func, func_name) == false)
 		{
@@ -151,10 +151,9 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter * pAdapter, D3D_DRIVER_TYPE Dri
 #ifdef IMPL_CHAINLOAD
 	if (g_IsDxCreated)
 	{
-		WCHAR system[MAX_PATH];
-		GetSystemDirectoryW(system, ARRAYSIZE(system));
-		PathCchAppend(system, MAX_PATH, L"d3d11.dll");
-		g_Sys11 = LoadLibraryW(system);
+		logger->LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
+
+		g_Sys11 = LoadLibraryW(g_Path_SystemDll);
 
 		if (FindFunction(g_Sys11, &func, func_name) == false)
 		{
@@ -235,10 +234,9 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter * pAdapter, D3D_DRI
 #ifdef IMPL_CHAINLOAD
 	if (g_IsDxCreated)
 	{
-		WCHAR system[MAX_PATH];
-		GetSystemDirectoryW(system, ARRAYSIZE(system));
-		PathCchAppend(system, sizeof(system), L"d3d11.dll");
-		g_Sys11 = LoadLibraryW(system);
+		logger->LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
+
+		g_Sys11 = LoadLibraryW(g_Path_SystemDll);
 
 		if (FindFunction(g_Sys11, &func, func_name) == false)
 		{
@@ -279,11 +277,13 @@ void InitializePaths()
 	/* get chainload dll path */
 	memcpy(g_Path_ChainloadDll, g_Path_HostDirectory, MAX_PATH);
 	PathCchAppend(g_Path_ChainloadDll, MAX_PATH, L"d3d11_chainload.dll");
+
+	/* get system dll path */
+	GetSystemDirectoryW(g_Path_SystemDll, MAX_PATH);
+	PathCchAppend(g_Path_SystemDll, MAX_PATH, L"d3d11.dll");
 }
 void InitializeLogging()
 {
-	logger = LogHandler::GetInstance();
-
 	ConsoleLogger* cLog = new ConsoleLogger();
 	cLog->SetLogLevel(LogLevel::ALL);
 	logger->Register(cLog);
@@ -308,10 +308,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 			return FALSE;
 		}
 
-		//std::wcout << L"[ATTACH] " << g_Path_HostDll << std::endl;
+		logger->LogDebug(L"%s %s", L"ATTACH", g_Path_HostDll);
 		break;
 	case DLL_PROCESS_DETACH:
-		//std::wcout << L"[DETACH] " << g_Path_HostDll << std::endl;
+		logger->LogDebug(L"%s %s", L"DETACH", g_Path_HostDll);
 
 		MH_Uninitialize();
 
@@ -329,7 +329,7 @@ LRESULT CALLBACK hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	if (uMsg == WM_DESTROY)
 	{
-		logger->LogCritical("fuck me");
+		logger->LogCritical(L"::Destroy()");
 	}
 
 	return CallWindowProc(g_GW2_WndProc, hWnd, uMsg, wParam, lParam);

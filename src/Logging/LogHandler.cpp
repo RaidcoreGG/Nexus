@@ -2,91 +2,69 @@
 
 #include "LogHandler.h"
 #include <thread>
+#include <cstdarg>
 
-LogHandler* LogHandler::mLogHandler = nullptr;
+LogHandler* LogHandler::Instance = nullptr;
 
 LogHandler* LogHandler::GetInstance()
 {
-    if(mLogHandler == nullptr)
+    if(Instance == nullptr)
     {
-        mLogHandler = new LogHandler();
+        Instance = new LogHandler();
     }
     
-    return mLogHandler;
+    return Instance;
 }
 
 void LogHandler::Register(ILogger* aLogger)
 {
-    mLoggersMutex.lock();
+    LoggersMutex.lock();
 
-    mLoggers.push_back(aLogger);
+    Loggers.push_back(aLogger);
 
-    mLoggersMutex.unlock();
-}
-void LogHandler::WriteEntries()
-{
-    mLoggersMutex.lock();
-    mLogEntriesMutex.lock();
-
-    /* iterate over the subscribed loggers */
-    for (size_t i = 0; i < mLoggers.size(); i++)
-    {
-        LogLevel level = mLoggers[i]->GetLogLevel();
-
-        /* iterate over the logged messages */
-        for (size_t j = 0; j < mLogEntries.size(); j++)
-        {
-            /* send logged message to logger if message log level is lower than logger level */
-            if(mLogEntries[j].mLogLevel <= level)
-            {
-                mLoggers[i]->LogMessage(mLogEntries[j]);
-            }
-        }
-        
-    }
-    mLogEntries.clear();
-
-    mLogEntriesMutex.unlock();
-    mLoggersMutex.unlock();
+    LoggersMutex.unlock();
 }
 
 /* Logging functions */
-void LogHandler::Log(const char* aMessage)
-{
-    LogMessage(LogLevel::TRACE, aMessage);
-}
-void LogHandler::LogCritical(const char* aMessage)
-{
-    LogMessage(LogLevel::CRITICAL, aMessage);
-}
-void LogHandler::LogWarning(const char* aMessage)
-{
-    LogMessage(LogLevel::WARNING, aMessage);
-}
-void LogHandler::LogInfo(const char* aMessage)
-{
-    LogMessage(LogLevel::INFO, aMessage);
-}
-void LogHandler::LogDebug(const char* aMessage)
-{
-    LogMessage(LogLevel::DEBUG, aMessage);
-}
+void LogHandler::Log(           const wchar_t* fmt, ...)    { va_list args; va_start(args, fmt); LogMessage(LogLevel::TRACE,    fmt, args); va_end(args); }
+void LogHandler::LogCritical(   const wchar_t* fmt, ...)    { va_list args; va_start(args, fmt); LogMessage(LogLevel::CRITICAL, fmt, args); va_end(args); }
+void LogHandler::LogWarning(    const wchar_t* fmt, ...)    { va_list args; va_start(args, fmt); LogMessage(LogLevel::WARNING,  fmt, args); va_end(args); }
+void LogHandler::LogInfo(       const wchar_t* fmt, ...)    { va_list args; va_start(args, fmt); LogMessage(LogLevel::INFO,     fmt, args); va_end(args); }
+void LogHandler::LogDebug(      const wchar_t* fmt, ...)    { va_list args; va_start(args, fmt); LogMessage(LogLevel::DEBUG,    fmt, args); va_end(args); }
 
-void LogHandler::LogMessage(LogLevel aLogLevel, const char* aMessage)
+void LogHandler::Log(           const char* fmt, ...)       { va_list args; va_start(args, fmt); LogMessage(LogLevel::TRACE,    fmt, args); va_end(args); }
+void LogHandler::LogCritical(   const char* fmt, ...)       { va_list args; va_start(args, fmt); LogMessage(LogLevel::CRITICAL, fmt, args); va_end(args); }
+void LogHandler::LogWarning(    const char* fmt, ...)       { va_list args; va_start(args, fmt); LogMessage(LogLevel::WARNING,  fmt, args); va_end(args); }
+void LogHandler::LogInfo(       const char* fmt, ...)       { va_list args; va_start(args, fmt); LogMessage(LogLevel::INFO,     fmt, args); va_end(args); }
+void LogHandler::LogDebug(      const char* fmt, ...)       { va_list args; va_start(args, fmt); LogMessage(LogLevel::DEBUG,    fmt, args); va_end(args); }
+
+void LogHandler::LogMessage(LogLevel aLogLevel, const wchar_t* fmt, va_list args)
 {
-    std::thread([this, aLogLevel, aMessage]()
+    LogEntry entry;
+    entry.LogLevel = aLogLevel;
+    entry.Timestamp = time(NULL);
+
+    wchar_t buffer[400];
+    vswprintf_s(buffer, 400, fmt, args);
+
+    entry.Message = buffer;
+
+    for (size_t i = 0; i < Loggers.size(); i++)
+    {
+        LogLevel level = Loggers[i]->GetLogLevel();
+
+        /* send logged message to logger if message log level is lower than logger level */
+        if (entry.LogLevel <= level)
         {
-            mLogEntriesMutex.lock();
+            Loggers[i]->LogMessage(entry);
+        }
+    }
+}
 
-            LogEntry entry;
-            entry.mLogLevel = aLogLevel;
-            entry.mTimestamp = time(NULL);
-            entry.mMessage = aMessage;
-
-            mLogEntries.push_back(entry);
-
-            mLogEntriesMutex.unlock();
-
-            WriteEntries();
-        }).detach();
+void LogHandler::LogMessage(LogLevel aLogLevel, const char* aMessage, va_list args)
+{
+    size_t sz = strlen(aMessage) + 1;
+    wchar_t* wc = new wchar_t[sz];
+    mbstowcs_s(nullptr, wc, sz, aMessage, sz);
+    LogMessage(aLogLevel, wc, args);
 }

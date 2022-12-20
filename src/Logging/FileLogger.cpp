@@ -11,8 +11,8 @@ FileLogger::FileLogger(const char* aPath)
     struct tm timeinfo;
     localtime_s(&timeinfo, (time_t*)&timestmap);
 
-    std::ostringstream oss;
-    oss << std::put_time(&timeinfo, "%Y-%m-%d %H:%M:%S");
+    std::wstringstream oss;
+    oss << std::put_time(&timeinfo, L"%Y-%m-%d %H:%M:%S");
 
     mFile << oss.str() << " : Log session start." << std::endl;
 }
@@ -24,8 +24,8 @@ FileLogger::~FileLogger()
     struct tm timeinfo;
     localtime_s(&timeinfo, (time_t*)&timestmap);
 
-    std::ostringstream oss;
-    oss << std::put_time(&timeinfo, "%Y-%m-%d %H:%M:%S");
+    std::wstringstream oss;
+    oss << std::put_time(&timeinfo, L"%Y-%m-%d %H:%M:%S");
 
     mFile << oss.str() << " : Log session end." << std::endl;
     mFile << std::endl;

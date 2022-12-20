@@ -14,29 +14,35 @@ class LogHandler
         LogHandler& operator=(const LogHandler&) = delete;  // assign operator
         static LogHandler* GetInstance();
 
-        void Register(ILogger* aLogger);
-        void WriteEntries(); /* Synonymous with a flush */
+        void Register(ILogger*);
 
         /* Logging functions */
-        void Log(           const char* aMessage   );
-        void LogCritical(   const char* aMessage   );
-        void LogWarning(    const char* aMessage   );
-        void LogInfo(       const char* aMessage   );
-        void LogDebug(      const char* aMessage   );
+        void Log(           const wchar_t*, ...);
+        void LogCritical(   const wchar_t*, ...);
+        void LogWarning(    const wchar_t*, ...);
+        void LogInfo(       const wchar_t*, ...);
+        void LogDebug(      const wchar_t*, ...);
+
+        void Log(           const char*, ...);
+        void LogCritical(   const char*, ...);
+        void LogWarning(    const char*, ...);
+        void LogInfo(       const char*, ...);
+        void LogDebug(      const char*, ...);
 
     private:
         LogHandler() = default;
 
         /* internal logging function */
-        void LogMessage(LogLevel aLogLevel, const char* aMessage);
+        void LogMessage(LogLevel, const wchar_t*, va_list);
+        void LogMessage(LogLevel, const char*, va_list);
 
-        static LogHandler* mLogHandler;
+        static LogHandler* Instance;
 
-        std::vector<ILogger*> mLoggers;
-        std::vector<LogEntry> mLogEntries;
+        std::vector<ILogger*> Loggers;
+        std::vector<LogEntry> LogEntries;
 
-        std::mutex mLoggersMutex;
-        std::mutex mLogEntriesMutex;
+        std::mutex LoggersMutex;
+        std::mutex LogEntriesMutex;
 };
 
 #endif

@@ -23,7 +23,7 @@ ConsoleLogger::~ConsoleLogger()
 
 void ConsoleLogger::LogMessage(LogEntry aLogEntry)
 {
-    switch (aLogEntry.mLogLevel)
+    switch (aLogEntry.LogLevel)
     {
         case LogLevel::CRITICAL:    SetConsoleTextAttribute(hConsole, 12); break;
         case LogLevel::WARNING:     SetConsoleTextAttribute(hConsole, 14); break;
@@ -32,5 +32,5 @@ void ConsoleLogger::LogMessage(LogEntry aLogEntry)
         default:                    SetConsoleTextAttribute(hConsole, 7); break;
     }
     
-    std::cout << aLogEntry.ToString();
+    std::wcout << aLogEntry.ToString();
 }
