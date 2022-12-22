@@ -3,8 +3,15 @@
 HANDLE Mumble::Handle = nullptr;
 LinkedMem* Mumble::Data = nullptr;
 
+LinkedMem* MumbleGet()
+{
+	return Mumble::Create();
+}
+
 LinkedMem* Mumble::Create()
 {
+	if (Handle && Data) { return Data; }
+
 	std::wstring mumble_name = GetMumbleName();
 
 	Handle = OpenFileMappingW(FILE_MAP_ALL_ACCESS, FALSE, mumble_name.c_str());
@@ -26,13 +33,13 @@ void Mumble::Destroy()
 	if (Data)
 	{
 		UnmapViewOfFile((LPVOID)Data);
-		Data = NULL;
+		Data = nullptr;
 	}
 
 	if (Handle)
 	{
 		CloseHandle(Handle);
-		Handle = NULL;
+		Handle = nullptr;
 	}
 }
 
