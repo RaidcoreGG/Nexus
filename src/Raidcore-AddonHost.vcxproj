@@ -37,6 +37,7 @@
     <ClCompile Include="minhook\mh_disasm.cpp" />
     <ClCompile Include="minhook\mh_hook.cpp" />
     <ClCompile Include="minhook\mh_trampoline.cpp" />
+    <ClCompile Include="Mumble.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
@@ -61,6 +62,7 @@
     <ClInclude Include="minhook\mh_disasm.h" />
     <ClInclude Include="minhook\mh_hook.h" />
     <ClInclude Include="minhook\mh_trampoline.h" />
+    <ClInclude Include="Mumble.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Raidcore-AddonHost.rc" />

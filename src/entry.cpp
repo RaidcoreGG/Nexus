@@ -18,6 +18,8 @@
 #include "Logging/ConsoleLogger.h"
 #include "Logging/FileLogger.h"
 
+#include "Mumble.h"
+
 #define IMPL_CHAINLOAD
 
 /* proto */
@@ -47,8 +49,6 @@ static HMODULE g_Self;
 static HMODULE g_D3D11;
 static HMODULE g_Sys11;
 
-LogHandler* logger = LogHandler::GetInstance();
-
 static WNDPROC g_GW2_WndProc = nullptr;
 static HWND g_GW2_HWND = nullptr;
 
@@ -59,6 +59,9 @@ static ID3D11RenderTargetView* g_mainRenderTargetView = nullptr;
 
 static HRESULT(*dxgi_present)(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags);
 static HRESULT(*dxgi_resize_buffers)(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
+
+static LogHandler* Logger = LogHandler::GetInstance();
+static LinkedMem* MumbleLink = nullptr;
 
 /* dx */
 BOOL DxLoad()
@@ -72,7 +75,7 @@ BOOL DxLoad()
 		/* sanity check that the current dll isn't the chainload */
 		if (g_Path_HostDll != g_Path_ChainloadDll)
 		{
-			logger->Log(L"Attempting to chainload.");
+			Logger->Log(L"Attempting to chainload.");
 
 			g_IsChainloading = true;
 
@@ -86,7 +89,7 @@ BOOL DxLoad()
 #ifdef IMPL_CHAINLOAD
 			if (g_IsChainloading)
 			{
-				logger->Log(L"No chainload found or failed to load.");
+				Logger->Log(L"No chainload found or failed to load.");
 			}
 #endif
 			g_IsChainloading = false;
@@ -95,7 +98,7 @@ BOOL DxLoad()
 
 			assert(g_D3D11 && "Could not load system d3d11.dll");
 
-			logger->Log(L"Loaded System DLL: %s", g_Path_SystemDll);
+			Logger->Log(L"Loaded System DLL: %s", g_Path_SystemDll);
 		}
 	}
 
@@ -107,12 +110,12 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 	static decltype(&D3D11CoreCreateDevice) func;
 	static const char* func_name = "D3D11CoreCreateDevice";
 
-	logger->Log(func_name);
+	Logger->Log(func_name);
 
 #ifdef IMPL_CHAINLOAD
 	if (g_IsDxCreated)
 	{
-		logger->LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
+		Logger->LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
 
 		g_Sys11 = LoadLibraryW(g_Path_SystemDll);
 
@@ -142,12 +145,12 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 	static decltype(&D3D11CreateDevice) func;
 	static const char* func_name = "D3D11CreateDevice";
 
-	logger->Log(func_name);
+	Logger->Log(func_name);
 
 #ifdef IMPL_CHAINLOAD
 	if (g_IsDxCreated)
 	{
-		logger->LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
+		Logger->LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
 
 		g_Sys11 = LoadLibraryW(g_Path_SystemDll);
 
@@ -225,12 +228,12 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 	static decltype(&D3D11CreateDeviceAndSwapChain) func;
 	static const char* func_name = "D3D11CreateDeviceAndSwapChain";
 
-	logger->Log(func_name);
+	Logger->Log(func_name);
 
 #ifdef IMPL_CHAINLOAD
 	if (g_IsDxCreated)
 	{
-		logger->LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
+		Logger->LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
 
 		g_Sys11 = LoadLibraryW(g_Path_SystemDll);
 
@@ -283,11 +286,11 @@ void InitializeLogging()
 {
 	ConsoleLogger* cLog = new ConsoleLogger();
 	cLog->SetLogLevel(LogLevel::ALL);
-	logger->Register(cLog);
+	Logger->Register(cLog);
 
 	FileLogger* fLog = new FileLogger("rcAddonHost.log");
 	fLog->SetLogLevel(LogLevel::ALL);
-	logger->Register(fLog);
+	Logger->Register(fLog);
 }
 void InitializeImGui()
 {
@@ -333,14 +336,16 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		InitializePaths();
 		InitializeLogging();
 
-		if (MH_Initialize() != MH_OK) {
-			return FALSE;
-		}
+		if (MH_Initialize() != MH_OK) { return false; }
 
-		logger->LogDebug(L"%s %s", L"[ATTACH]", g_Path_HostDll);
+		MumbleLink = Mumble::Create();
+
+		Logger->LogDebug(L"%s %s", L"[ATTACH]", g_Path_HostDll);
 		break;
 	case DLL_PROCESS_DETACH:
-		logger->LogDebug(L"%s %s", L"[DETACH]", g_Path_HostDll);
+		Logger->LogDebug(L"%s %s", L"[DETACH]", g_Path_HostDll);
+
+		Mumble::Destroy();
 
 		MH_Uninitialize();
 
@@ -359,7 +364,7 @@ LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	if (uMsg == WM_DESTROY)
 	{
-		logger->LogCritical(L"::Destroy()");
+		Logger->LogCritical(L"::Destroy()");
 	}
 
 	return CallWindowProc(g_GW2_WndProc, hWnd, uMsg, wParam, lParam);
