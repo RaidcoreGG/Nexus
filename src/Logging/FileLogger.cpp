@@ -34,6 +34,10 @@ FileLogger::~FileLogger()
 
 void FileLogger::LogMessage(LogEntry aLogEntry)
 {
+    MessageMutex.lock();
+
     mFile << aLogEntry.ToString();
     mFile.flush();
+
+    MessageMutex.unlock();
 }

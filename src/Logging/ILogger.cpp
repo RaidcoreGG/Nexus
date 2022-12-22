@@ -2,9 +2,10 @@
 
 LogLevel ILogger::GetLogLevel()
 {
-    return mLogLevel;
+    return Level;
 }
+
 void ILogger::SetLogLevel(LogLevel aLogLevel)
 {
-    mLogLevel = aLogLevel;
+    Level = aLogLevel;
 }

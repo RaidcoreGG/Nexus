@@ -75,6 +75,9 @@
     <ClCompile Include="Logging\ConsoleLogger.cpp">
       <Filter>Logging</Filter>
     </ClCompile>
+    <ClCompile Include="core.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def">
@@ -135,6 +138,9 @@
     </ClInclude>
     <ClInclude Include="Logging\ConsoleLogger.h">
       <Filter>Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="core.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

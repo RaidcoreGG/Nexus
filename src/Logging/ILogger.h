@@ -4,6 +4,8 @@
 #include "LogLevel.h"
 #include "LogEntry.h"
 
+#include <mutex>
+
 class ILogger
 {
     public:
@@ -11,12 +13,13 @@ class ILogger
         virtual ~ILogger() = default;
 
         LogLevel GetLogLevel();
-        void SetLogLevel(LogLevel aLogLevel);
+        void SetLogLevel(LogLevel);
 
-        virtual void LogMessage(LogEntry aLogEntry) = 0;
+        virtual void LogMessage(LogEntry) = 0;
 
     protected:
-        LogLevel mLogLevel;
+        LogLevel Level;
+        std::mutex MessageMutex;
 };
 
 #endif

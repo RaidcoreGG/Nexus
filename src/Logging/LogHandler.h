@@ -15,6 +15,7 @@ class LogHandler
         static LogHandler* GetInstance();
 
         void Register(ILogger*);
+        void Unregister(ILogger*);
 
         /* Logging functions */
         void Log(           const wchar_t*, ...);
@@ -42,7 +43,6 @@ class LogHandler
         std::vector<LogEntry> LogEntries;
 
         std::mutex LoggersMutex;
-        std::mutex LogEntriesMutex;
 };
 
 #endif

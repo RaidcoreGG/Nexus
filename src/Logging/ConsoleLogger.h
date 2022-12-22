@@ -9,7 +9,7 @@ class ConsoleLogger : public virtual ILogger
         ConsoleLogger();
         ~ConsoleLogger();
 
-        void LogMessage(LogEntry aLogEntry);
+        void LogMessage(LogEntry);
 };
 
 #endif

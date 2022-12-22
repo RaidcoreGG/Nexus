@@ -3,6 +3,7 @@
 #include "LogHandler.h"
 #include <thread>
 #include <cstdarg>
+#include <algorithm>
 
 LogHandler* LogHandler::Instance = nullptr;
 
@@ -21,6 +22,15 @@ void LogHandler::Register(ILogger* aLogger)
     LoggersMutex.lock();
 
     Loggers.push_back(aLogger);
+
+    LoggersMutex.unlock();
+}
+
+void LogHandler::Unregister(ILogger* aLogger)
+{
+    LoggersMutex.lock();
+
+    Loggers.erase(std::remove(Loggers.begin(), Loggers.end(), aLogger), Loggers.end());
 
     LoggersMutex.unlock();
 }
@@ -49,14 +59,14 @@ void LogHandler::LogMessage(LogLevel aLogLevel, const wchar_t* fmt, va_list args
 
     entry.Message = buffer;
 
-    for (size_t i = 0; i < Loggers.size(); i++)
+    for (ILogger* logger : Loggers)
     {
-        LogLevel level = Loggers[i]->GetLogLevel();
+        LogLevel level = logger->GetLogLevel();
 
         /* send logged message to logger if message log level is lower than logger level */
         if (entry.LogLevel <= level)
         {
-            Loggers[i]->LogMessage(entry);
+            std::thread([logger, entry]() { logger->LogMessage(entry); }).detach();
         }
     }
 }

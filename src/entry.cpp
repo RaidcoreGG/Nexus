@@ -6,6 +6,8 @@
 #include <cassert>
 #include <thread>
 
+#include "core.h"
+
 #include "minhook/mh_hook.h"
 
 #include "imgui/imgui.h"
@@ -18,6 +20,17 @@
 
 #define IMPL_CHAINLOAD
 
+/* proto */
+void InitializePaths();
+void InitializeImGui();
+
+LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags);
+HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+/* vars */
 static WCHAR g_Path_HostDirectory[MAX_PATH];
 static WCHAR g_Path_HostDll[MAX_PATH];
 static WCHAR g_Path_TempDll[MAX_PATH];
@@ -34,12 +47,11 @@ static HMODULE g_Self;
 static HMODULE g_D3D11;
 static HMODULE g_Sys11;
 
-LogHandler* logger = LogHandler::GetInstance();;
+LogHandler* logger = LogHandler::GetInstance();
 
-/* meme */
-void InitializeImGui();
 static WNDPROC g_GW2_WndProc = nullptr;
 static HWND g_GW2_HWND = nullptr;
+
 static ID3D11Device* g_pDevice = nullptr;
 static ID3D11DeviceContext* g_pDeviceContext = nullptr;
 static IDXGISwapChain* g_pSwapChain = nullptr;
@@ -48,19 +60,7 @@ static ID3D11RenderTargetView* g_mainRenderTargetView = nullptr;
 static HRESULT(*dxgi_present)(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags);
 static HRESULT(*dxgi_resize_buffers)(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
 
-HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags);
-HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
-
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-/* meme */
-
-static BOOL FindFunction(HMODULE mod, LPVOID func, LPCSTR name)
-{
-	FARPROC* fp = (FARPROC*)func;
-	*fp = mod ? GetProcAddress(mod, name) : 0;
-	return (fp != 0);
-}
-
+/* dx */
 BOOL DxLoad()
 {
 	if (!g_IsDxLoaded)
@@ -72,12 +72,11 @@ BOOL DxLoad()
 		/* sanity check that the current dll isn't the chainload */
 		if (g_Path_HostDll != g_Path_ChainloadDll)
 		{
+			logger->Log(L"Attempting to chainload.");
+
 			g_IsChainloading = true;
 
 			g_D3D11 = LoadLibraryW(g_Path_ChainloadDll);
-
-			logger->Log(L"Attempting to chainload.");
-			//std::wcout << g_Path_ChainloadDll << std::endl;
 		}
 #endif
 
@@ -92,21 +91,18 @@ BOOL DxLoad()
 #endif
 			g_IsChainloading = false;
 
-			WCHAR path[512];
-			GetSystemDirectoryW(path, sizeof(path));
-			PathCchAppend(path, sizeof(path), L"d3d11.dll");
-			g_D3D11 = LoadLibraryW(path);
+			g_D3D11 = LoadLibraryW(g_Path_SystemDll);
 
 			assert(g_D3D11 && "Could not load system d3d11.dll");
 
-			logger->Log(L"Loaded System DLL.");
+			logger->Log(L"Loaded System DLL: %s", g_Path_SystemDll);
 		}
 	}
 
 	return (g_D3D11 != NULL);
 }
 #pragma region dx11
-HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory * pFactory, IDXGIAdapter * pAdapter, UINT Flags, const D3D_FEATURE_LEVEL * pFeatureLevels, UINT FeatureLevels, ID3D11Device & ppDevice)
+HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pAdapter, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, ID3D11Device& ppDevice)
 {
 	static decltype(&D3D11CoreCreateDevice) func;
 	static const char* func_name = "D3D11CoreCreateDevice";
@@ -141,7 +137,7 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory * pFactory, IDXGIAdapter * 
 
 	return func(pFactory, pAdapter, Flags, pFeatureLevels, FeatureLevels, ppDevice);
 }
-HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter * pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL * pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, ID3D11Device * *ppDevice, D3D_FEATURE_LEVEL * pFeatureLevel, ID3D11DeviceContext * *ppImmediateContext)
+HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext)
 {
 	static decltype(&D3D11CreateDevice) func;
 	static const char* func_name = "D3D11CreateDevice";
@@ -224,7 +220,7 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter * pAdapter, D3D_DRIVER_TYPE Dri
 
 	return func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
 }
-HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter * pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL * pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, const DXGI_SWAP_CHAIN_DESC * pSwapChainDesc, IDXGISwapChain * *ppSwapChain, ID3D11Device * *ppDevice, D3D_FEATURE_LEVEL * pFeatureLevel, ID3D11DeviceContext * *ppImmediateContext)
+HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, const DXGI_SWAP_CHAIN_DESC* pSwapChainDesc, IDXGISwapChain** ppSwapChain, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext)
 {
 	static decltype(&D3D11CreateDeviceAndSwapChain) func;
 	static const char* func_name = "D3D11CreateDeviceAndSwapChain";
@@ -261,6 +257,7 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter * pAdapter, D3D_DRI
 }
 #pragma endregion
 
+/* init */
 void InitializePaths()
 {
 	/* get self dll path */
@@ -292,49 +289,6 @@ void InitializeLogging()
 	fLog->SetLogLevel(LogLevel::ALL);
 	logger->Register(fLog);
 }
-
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
-{
-	switch (ul_reason_for_call)
-	{
-	case DLL_PROCESS_ATTACH:
-		g_Self = hModule;
-		g_GW2 = GetModuleHandle(NULL);
-
-		InitializePaths();
-		InitializeLogging();
-
-		if (MH_Initialize() != MH_OK) {
-			return FALSE;
-		}
-
-		logger->LogDebug(L"%s %s", L"ATTACH", g_Path_HostDll);
-		break;
-	case DLL_PROCESS_DETACH:
-		logger->LogDebug(L"%s %s", L"DETACH", g_Path_HostDll);
-
-		MH_Uninitialize();
-
-		if (g_D3D11) { FreeLibrary(g_D3D11); }
-		break;
-	}
-	return true;
-}
-
-LRESULT CALLBACK hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	//ImGuiIO& io = ImGui::GetIO();
-
-	//ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
-
-	if (uMsg == WM_DESTROY)
-	{
-		logger->LogCritical(L"::Destroy()");
-	}
-
-	return CallWindowProc(g_GW2_WndProc, hWnd, uMsg, wParam, lParam);
-}
-
 void InitializeImGui()
 {
 	g_pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&g_pDevice);
@@ -367,6 +321,49 @@ void InitializeImGui()
 	g_IsImGuiInitialized = true;
 }
 
+/* entry */
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
+{
+	switch (ul_reason_for_call)
+	{
+	case DLL_PROCESS_ATTACH:
+		g_Self = hModule;
+		g_GW2 = GetModuleHandle(NULL);
+
+		InitializePaths();
+		InitializeLogging();
+
+		if (MH_Initialize() != MH_OK) {
+			return FALSE;
+		}
+
+		logger->LogDebug(L"%s %s", L"[ATTACH]", g_Path_HostDll);
+		break;
+	case DLL_PROCESS_DETACH:
+		logger->LogDebug(L"%s %s", L"[DETACH]", g_Path_HostDll);
+
+		MH_Uninitialize();
+
+		if (g_D3D11) { FreeLibrary(g_D3D11); }
+		break;
+	}
+	return true;
+}
+
+/* hk */
+LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	//ImGuiIO& io = ImGui::GetIO();
+
+	//ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
+
+	if (uMsg == WM_DESTROY)
+	{
+		logger->LogCritical(L"::Destroy()");
+	}
+
+	return CallWindowProc(g_GW2_WndProc, hWnd, uMsg, wParam, lParam);
+}
 HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
 {
 	if (g_pSwapChain != pChain)
@@ -405,7 +402,6 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 
 	return dxgi_present(pChain, SyncInterval, Flags);
 }
-
 HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
 {
 	// TODO:

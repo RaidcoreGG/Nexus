@@ -23,6 +23,8 @@ ConsoleLogger::~ConsoleLogger()
 
 void ConsoleLogger::LogMessage(LogEntry aLogEntry)
 {
+    MessageMutex.lock();
+
     switch (aLogEntry.LogLevel)
     {
         case LogLevel::CRITICAL:    SetConsoleTextAttribute(hConsole, 12); break;
@@ -33,4 +35,6 @@ void ConsoleLogger::LogMessage(LogEntry aLogEntry)
     }
     
     std::wcout << aLogEntry.ToString();
+
+    MessageMutex.unlock();
 }
