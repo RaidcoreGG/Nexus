@@ -18,7 +18,7 @@
 #include "Logging/ConsoleLogger.h"
 #include "Logging/FileLogger.h"
 
-#include "Mumble.h"
+#include "Mumble/Mumble.h"
 
 #define IMPL_CHAINLOAD
 
@@ -285,11 +285,11 @@ void InitializePaths()
 void InitializeLogging()
 {
 	ConsoleLogger* cLog = new ConsoleLogger();
-	cLog->SetLogLevel(LogLevel::ALL);
+	cLog->SetLogLevel(ELogLevel::ALL);
 	Logger->Register(cLog);
 
 	FileLogger* fLog = new FileLogger("rcAddonHost.log");
-	fLog->SetLogLevel(LogLevel::ALL);
+	fLog->SetLogLevel(ELogLevel::ALL);
 	Logger->Register(fLog);
 }
 void InitializeImGui()

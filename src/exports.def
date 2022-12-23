@@ -5,4 +5,8 @@ EXPORTS
 	D3D11CreateDeviceAndSwapChain
 
 ; Mumble
-	MumbleGet
+	GetMumble
+
+; Events
+	RaiseEvent
+	SubscribeEvent

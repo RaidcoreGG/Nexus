@@ -7,6 +7,9 @@
 #include "ILogger.h"
 #include "LogEntry.h"
 
+typedef void (*LogASig)(const char*, ...);
+typedef void (*LogWSig)(const wchar_t*, ...);
+
 class LogHandler
 {
     public:
@@ -33,9 +36,8 @@ class LogHandler
     private:
         LogHandler() = default;
 
-        /* internal logging function */
-        void LogMessage(LogLevel, const wchar_t*, va_list);
-        void LogMessage(LogLevel, const char*, va_list);
+        void LogMessage(ELogLevel, const wchar_t*, va_list);
+        void LogMessage(ELogLevel, const char*, va_list);
 
         static LogHandler* Instance;
 

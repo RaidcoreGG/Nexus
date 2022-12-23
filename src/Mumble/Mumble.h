@@ -26,7 +26,7 @@ struct Compass
 	float			Scale;
 };
 
-enum class MapType : unsigned
+enum class EMapType : unsigned
 {
 	AutoRedirect,
 	CharacterCreation,
@@ -49,7 +49,7 @@ enum class MapType : unsigned
 	WvW_Lounge,
 	WvW
 };
-enum class MountIndex : unsigned char
+enum class EMountIndex : unsigned char
 {
 	None,
 	Jackal,
@@ -63,7 +63,7 @@ enum class MountIndex : unsigned char
 	Skiff,
 	SiegeTurtle
 };
-enum class Profession : int
+enum class EProfession : int
 {
 	Guardian		= 1,
 	Warrior			= 2,
@@ -75,7 +75,7 @@ enum class Profession : int
 	Necromancer		= 8,
 	Revenant		= 9
 };
-enum class Specialization : int
+enum class ESpecialization : int
 {
 	None			= 0,
 
@@ -112,7 +112,7 @@ enum class Specialization : int
 	Harbinger		= 64,
 	Vindicator		= 69
 };
-enum class Race : unsigned char
+enum class ERace : unsigned char
 {
 	Asura,
 	Charr,
@@ -120,7 +120,7 @@ enum class Race : unsigned char
 	Norn,
 	Sylvari
 };
-enum class UIScale
+enum class EUIScale
 {
 	Small,
 	Normal,
@@ -132,7 +132,7 @@ struct Context
 {
 	unsigned char ServerAddress[28]; // contains sockaddr_in or sockaddr_in6
 	unsigned MapID;
-	MapType MapType;
+	EMapType MapType;
 	unsigned ShardID;
 	unsigned InstanceID;
 	unsigned BuildID;
@@ -148,7 +148,7 @@ struct Context
 	// unsigned UNUSED1			: 1;
 	Compass Compass;
 	unsigned ProcessID;
-	MountIndex MountIndex;
+	EMountIndex MountIndex;
 };
 
 struct LinkedMem
@@ -168,7 +168,7 @@ struct LinkedMem
 	wchar_t Description[2048];
 };
 
-extern "C" LinkedMem* MumbleGet();
+extern "C" LinkedMem* GetMumble();
 
 class Mumble
 {

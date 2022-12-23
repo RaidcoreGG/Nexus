@@ -27,10 +27,10 @@ void ConsoleLogger::LogMessage(LogEntry aLogEntry)
 
     switch (aLogEntry.LogLevel)
     {
-        case LogLevel::CRITICAL:    SetConsoleTextAttribute(hConsole, 12); break;
-        case LogLevel::WARNING:     SetConsoleTextAttribute(hConsole, 14); break;
-        case LogLevel::INFO:        SetConsoleTextAttribute(hConsole, 10); break;
-        case LogLevel::DEBUG:       SetConsoleTextAttribute(hConsole, 11); break;
+        case ELogLevel::CRITICAL:    SetConsoleTextAttribute(hConsole, 12); break;
+        case ELogLevel::WARNING:     SetConsoleTextAttribute(hConsole, 14); break;
+        case ELogLevel::INFO:        SetConsoleTextAttribute(hConsole, 10); break;
+        case ELogLevel::DEBUG:       SetConsoleTextAttribute(hConsole, 11); break;
         default:                    SetConsoleTextAttribute(hConsole, 7); break;
     }
     

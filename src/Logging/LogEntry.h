@@ -3,11 +3,11 @@
 
 #include <string>
 
-#include "LogLevel.h"
+#include "ELogLevel.h"
 
 typedef struct LogEntry
 {
-    LogLevel LogLevel;
+    ELogLevel LogLevel;
     unsigned long long Timestamp;
     std::wstring Message;
 

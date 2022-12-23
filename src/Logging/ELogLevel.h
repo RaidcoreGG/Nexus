@@ -1,7 +1,7 @@
-#ifndef LOGLEVEL_H
-#define LOGLEVEL_H
+#ifndef ELOGLEVEL_H
+#define ELOGLEVEL_H
 
-typedef enum class LogLevel : unsigned char
+enum class ELogLevel : unsigned char
 {
     OFF         = 0x00,
     CRITICAL    = 0x01,
@@ -10,6 +10,6 @@ typedef enum class LogLevel : unsigned char
     DEBUG       = 0x08,
     TRACE       = 0x10,
     ALL
-} LogLevel_t;
+};
 
 #endif

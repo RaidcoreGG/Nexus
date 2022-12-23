@@ -1,7 +1,7 @@
 #ifndef ILOGGER_H
 #define ILOGGER_H
 
-#include "LogLevel.h"
+#include "ELogLevel.h"
 #include "LogEntry.h"
 
 #include <mutex>
@@ -12,13 +12,13 @@ class ILogger
         ILogger() = default;
         virtual ~ILogger() = default;
 
-        LogLevel GetLogLevel();
-        void SetLogLevel(LogLevel);
+        ELogLevel GetLogLevel();
+        void SetLogLevel(ELogLevel);
 
         virtual void LogMessage(LogEntry) = 0;
 
     protected:
-        LogLevel Level;
+        ELogLevel LogLevel;
         std::mutex MessageMutex;
 };
 

@@ -9,10 +9,10 @@ std::wstring LogEntry::ToString()
 
     switch (LogLevel)
     {
-        case LogLevel::CRITICAL:    level = L" [CRITICAL] ";     break;
-        case LogLevel::WARNING:     level = L" [WARNING] ";      break;
-        case LogLevel::INFO:        level = L" [INFO] ";         break;
-        case LogLevel::DEBUG:       level = L" [DEBUG] ";        break;
+        case ELogLevel::CRITICAL:    level = L" [CRITICAL] ";     break;
+        case ELogLevel::WARNING:     level = L" [WARNING] ";      break;
+        case ELogLevel::INFO:        level = L" [INFO] ";         break;
+        case ELogLevel::DEBUG:       level = L" [DEBUG] ";        break;
 
         default:                    level = L" [TRACE] ";        break;
     }

@@ -36,19 +36,19 @@ void LogHandler::Unregister(ILogger* aLogger)
 }
 
 /* Logging functions */
-void LogHandler::Log(           const wchar_t* fmt, ...)    { va_list args; va_start(args, fmt); LogMessage(LogLevel::TRACE,    fmt, args); va_end(args); }
-void LogHandler::LogCritical(   const wchar_t* fmt, ...)    { va_list args; va_start(args, fmt); LogMessage(LogLevel::CRITICAL, fmt, args); va_end(args); }
-void LogHandler::LogWarning(    const wchar_t* fmt, ...)    { va_list args; va_start(args, fmt); LogMessage(LogLevel::WARNING,  fmt, args); va_end(args); }
-void LogHandler::LogInfo(       const wchar_t* fmt, ...)    { va_list args; va_start(args, fmt); LogMessage(LogLevel::INFO,     fmt, args); va_end(args); }
-void LogHandler::LogDebug(      const wchar_t* fmt, ...)    { va_list args; va_start(args, fmt); LogMessage(LogLevel::DEBUG,    fmt, args); va_end(args); }
+void LogHandler::Log(           const wchar_t* fmt, ...)    { va_list args; va_start(args, fmt); LogMessage(ELogLevel::TRACE,    fmt, args); va_end(args); }
+void LogHandler::LogCritical(   const wchar_t* fmt, ...)    { va_list args; va_start(args, fmt); LogMessage(ELogLevel::CRITICAL, fmt, args); va_end(args); }
+void LogHandler::LogWarning(    const wchar_t* fmt, ...)    { va_list args; va_start(args, fmt); LogMessage(ELogLevel::WARNING,  fmt, args); va_end(args); }
+void LogHandler::LogInfo(       const wchar_t* fmt, ...)    { va_list args; va_start(args, fmt); LogMessage(ELogLevel::INFO,     fmt, args); va_end(args); }
+void LogHandler::LogDebug(      const wchar_t* fmt, ...)    { va_list args; va_start(args, fmt); LogMessage(ELogLevel::DEBUG,    fmt, args); va_end(args); }
 
-void LogHandler::Log(           const char* fmt, ...)       { va_list args; va_start(args, fmt); LogMessage(LogLevel::TRACE,    fmt, args); va_end(args); }
-void LogHandler::LogCritical(   const char* fmt, ...)       { va_list args; va_start(args, fmt); LogMessage(LogLevel::CRITICAL, fmt, args); va_end(args); }
-void LogHandler::LogWarning(    const char* fmt, ...)       { va_list args; va_start(args, fmt); LogMessage(LogLevel::WARNING,  fmt, args); va_end(args); }
-void LogHandler::LogInfo(       const char* fmt, ...)       { va_list args; va_start(args, fmt); LogMessage(LogLevel::INFO,     fmt, args); va_end(args); }
-void LogHandler::LogDebug(      const char* fmt, ...)       { va_list args; va_start(args, fmt); LogMessage(LogLevel::DEBUG,    fmt, args); va_end(args); }
+void LogHandler::Log(           const char* fmt, ...)       { va_list args; va_start(args, fmt); LogMessage(ELogLevel::TRACE,    fmt, args); va_end(args); }
+void LogHandler::LogCritical(   const char* fmt, ...)       { va_list args; va_start(args, fmt); LogMessage(ELogLevel::CRITICAL, fmt, args); va_end(args); }
+void LogHandler::LogWarning(    const char* fmt, ...)       { va_list args; va_start(args, fmt); LogMessage(ELogLevel::WARNING,  fmt, args); va_end(args); }
+void LogHandler::LogInfo(       const char* fmt, ...)       { va_list args; va_start(args, fmt); LogMessage(ELogLevel::INFO,     fmt, args); va_end(args); }
+void LogHandler::LogDebug(      const char* fmt, ...)       { va_list args; va_start(args, fmt); LogMessage(ELogLevel::DEBUG,    fmt, args); va_end(args); }
 
-void LogHandler::LogMessage(LogLevel aLogLevel, const wchar_t* fmt, va_list args)
+void LogHandler::LogMessage(ELogLevel aLogLevel, const wchar_t* fmt, va_list args)
 {
     LogEntry entry;
     entry.LogLevel = aLogLevel;
@@ -61,7 +61,7 @@ void LogHandler::LogMessage(LogLevel aLogLevel, const wchar_t* fmt, va_list args
 
     for (ILogger* logger : Loggers)
     {
-        LogLevel level = logger->GetLogLevel();
+        ELogLevel level = logger->GetLogLevel();
 
         /* send logged message to logger if message log level is lower than logger level */
         if (entry.LogLevel <= level)
@@ -71,7 +71,7 @@ void LogHandler::LogMessage(LogLevel aLogLevel, const wchar_t* fmt, va_list args
     }
 }
 
-void LogHandler::LogMessage(LogLevel aLogLevel, const char* aMessage, va_list args)
+void LogHandler::LogMessage(ELogLevel aLogLevel, const char* aMessage, va_list args)
 {
     size_t sz = strlen(aMessage) + 1;
     wchar_t* wc = new wchar_t[sz];

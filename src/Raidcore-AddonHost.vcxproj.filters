@@ -22,6 +22,15 @@
     <Filter Include="Logging">
       <UniqueIdentifier>{72f71e79-5933-4318-b293-5087228d8bf4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Mumble">
+      <UniqueIdentifier>{63ff3d3b-f85c-4e99-8c66-7638fa8d524f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Loader">
+      <UniqueIdentifier>{ef159aa7-0ceb-4ef5-a926-097dfc64a130}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Events">
+      <UniqueIdentifier>{062ec4b8-2804-4978-b3c4-381b0cdd4b35}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="entry.cpp">
@@ -78,8 +87,11 @@
     <ClCompile Include="core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mumble.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Mumble\Mumble.cpp">
+      <Filter>Mumble</Filter>
+    </ClCompile>
+    <ClCompile Include="Events\EventHandler.cpp">
+      <Filter>Events</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -136,7 +148,7 @@
     <ClInclude Include="Logging\LogHandler.h">
       <Filter>Logging</Filter>
     </ClInclude>
-    <ClInclude Include="Logging\LogLevel.h">
+    <ClInclude Include="Logging\ELogLevel.h">
       <Filter>Logging</Filter>
     </ClInclude>
     <ClInclude Include="Logging\ConsoleLogger.h">
@@ -145,8 +157,20 @@
     <ClInclude Include="core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Mumble.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Mumble\Mumble.h">
+      <Filter>Mumble</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\AddonDef.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\EUpdateProvider.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="Events\EventHandler.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\HostFunctionTable.h">
+      <Filter>Loader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

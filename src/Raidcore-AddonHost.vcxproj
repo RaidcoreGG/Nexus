@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="core.cpp" />
     <ClCompile Include="entry.cpp" />
+    <ClCompile Include="Events\EventHandler.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
@@ -37,13 +38,14 @@
     <ClCompile Include="minhook\mh_disasm.cpp" />
     <ClCompile Include="minhook\mh_hook.cpp" />
     <ClCompile Include="minhook\mh_trampoline.cpp" />
-    <ClCompile Include="Mumble.cpp" />
+    <ClCompile Include="Mumble\Mumble.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h" />
+    <ClInclude Include="Events\EventHandler.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_dx11.h" />
@@ -52,17 +54,20 @@
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
+    <ClInclude Include="Loader\AddonDef.h" />
+    <ClInclude Include="Loader\EUpdateProvider.h" />
+    <ClInclude Include="Loader\HostFunctionTable.h" />
     <ClInclude Include="Logging\FileLogger.h" />
     <ClInclude Include="Logging\ILogger.h" />
     <ClInclude Include="Logging\LogEntry.h" />
     <ClInclude Include="Logging\LogHandler.h" />
-    <ClInclude Include="Logging\LogLevel.h" />
+    <ClInclude Include="Logging\ELogLevel.h" />
     <ClInclude Include="Logging\ConsoleLogger.h" />
     <ClInclude Include="minhook\mh_buffer.h" />
     <ClInclude Include="minhook\mh_disasm.h" />
     <ClInclude Include="minhook\mh_hook.h" />
     <ClInclude Include="minhook\mh_trampoline.h" />
-    <ClInclude Include="Mumble.h" />
+    <ClInclude Include="Mumble\Mumble.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Raidcore-AddonHost.rc" />

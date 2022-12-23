@@ -1,11 +1,11 @@
 #include "ILogger.h"
 
-LogLevel ILogger::GetLogLevel()
+ELogLevel ILogger::GetLogLevel()
 {
-    return Level;
+    return LogLevel;
 }
 
-void ILogger::SetLogLevel(LogLevel aLogLevel)
+void ILogger::SetLogLevel(ELogLevel aLogLevel)
 {
-    Level = aLogLevel;
+    LogLevel = aLogLevel;
 }

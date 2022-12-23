@@ -3,7 +3,7 @@
 HANDLE Mumble::Handle = nullptr;
 LinkedMem* Mumble::Data = nullptr;
 
-LinkedMem* MumbleGet()
+LinkedMem* GetMumble()
 {
 	return Mumble::Create();
 }
