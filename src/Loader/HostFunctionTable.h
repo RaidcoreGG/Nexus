@@ -3,6 +3,8 @@
 
 #include "../Logging/LogHandler.h"
 #include "../Events/EventHandler.h"
+#include "../Keybinds/KeybindHandler.h"
+#include "../Mumble/Mumble.h"
 
 typedef struct HostFunctionTable
 {
@@ -25,6 +27,13 @@ typedef struct HostFunctionTable
 	SubscribeEventSig SubscribeEvent;
 
 	/* Keybinds */
+		// RegisterKeybindSig RegisterKeybind;
+
+	/* API */
+	GetMumbleSig GetMumble;
+		// GW2 API FUNCS
+		// LOGITECH API FUNCS
+		// RESOURCE SHARING FUNCS
 };
 
 #endif

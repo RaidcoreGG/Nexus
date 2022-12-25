@@ -24,7 +24,9 @@
 
 /* proto */
 void InitializePaths();
+void InitializeLogging();
 void InitializeImGui();
+void Cleanup();
 
 LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags);
@@ -39,6 +41,7 @@ static WCHAR g_Path_TempDll[MAX_PATH];
 static WCHAR g_Path_ChainloadDll[MAX_PATH];
 static WCHAR g_Path_SystemDll[MAX_PATH];
 
+static bool g_IsCleanedUp = false;
 static bool g_IsDxLoaded = false;
 static bool g_IsChainloading = false;
 static bool g_IsDxCreated = false;
@@ -294,21 +297,12 @@ void InitializeLogging()
 }
 void InitializeImGui()
 {
-	g_pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&g_pDevice);
-	g_pDevice->GetImmediateContext(&g_pDeviceContext);
-
-	DXGI_SWAP_CHAIN_DESC swapChainDesc;
-	g_pSwapChain->GetDesc(&swapChainDesc);
-
 	// create imgui context
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	io.Fonts->AddFontDefault();
 	io.Fonts->Build();
-
-	g_GW2_HWND = swapChainDesc.OutputWindow;
-	g_GW2_WndProc = (WNDPROC)SetWindowLongPtr(g_GW2_HWND, GWLP_WNDPROC, (LONG_PTR)hkWndProc);
 
 	// Init imgui
 	ImGui_ImplWin32_Init(g_GW2_HWND);
@@ -322,6 +316,19 @@ void InitializeImGui()
 	pBackBuffer->Release();
 
 	g_IsImGuiInitialized = true;
+}
+void Cleanup()
+{
+	if (!g_IsCleanedUp)
+	{
+		g_IsCleanedUp = true;
+
+		Mumble::Destroy();
+
+		MH_Uninitialize();
+
+		if (g_D3D11) { FreeLibrary(g_D3D11); }
+	}
 }
 
 /* entry */
@@ -343,13 +350,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		Logger->LogDebug(L"%s %s", L"[ATTACH]", g_Path_HostDll);
 		break;
 	case DLL_PROCESS_DETACH:
-		Logger->LogDebug(L"%s %s", L"[DETACH]", g_Path_HostDll);
+		//Logger->LogDebug(L"%s %s", L"[DETACH]", g_Path_HostDll);
 
-		Mumble::Destroy();
+		Cleanup();
 
-		MH_Uninitialize();
-
-		if (g_D3D11) { FreeLibrary(g_D3D11); }
 		break;
 	}
 	return true;
@@ -360,7 +364,7 @@ LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	//ImGuiIO& io = ImGui::GetIO();
 
-	//ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
+	ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 
 	if (uMsg == WM_DESTROY)
 	{
@@ -377,11 +381,20 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 
 		if (g_pDevice)
 		{
+			g_pDeviceContext->Release();
+			g_pDeviceContext = 0;
 			g_pDevice->Release();
 			g_pDevice = 0;
 		}
 
 		g_pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&g_pDevice);
+		g_pDevice->GetImmediateContext(&g_pDeviceContext);
+
+		DXGI_SWAP_CHAIN_DESC swapChainDesc;
+		g_pSwapChain->GetDesc(&swapChainDesc);
+
+		g_GW2_HWND = swapChainDesc.OutputWindow;
+		g_GW2_WndProc = (WNDPROC)SetWindowLongPtr(g_GW2_HWND, GWLP_WNDPROC, (LONG_PTR)hkWndProc);
 	}
 
 	if (g_IsImGuiInitialized)
@@ -392,7 +405,7 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 		ImGui::NewFrame();
 
 		// Draw ImGui here!
-		//ImGui::ShowDemoWindow();
+		ImGui::ShowDemoWindow();
 
 		// imgui end frame
 		ImGui::EndFrame();
@@ -409,22 +422,25 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 }
 HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
 {
-	// TODO:
-	// the game cannot handle resizing anymore for some reason
-	// probably related to imgui
-	// fuck imgui
+	static const char* func_name = "hkDXGIResizeBuffers";
 
-	/*if (g_ImGui_Initialized)
+	Logger->Log(func_name);
+
+	bool previouslyInitialized = false;
+	if (g_IsImGuiInitialized)
 	{
+		previouslyInitialized = true;
+		g_IsImGuiInitialized = false;
+
 		ImGui_ImplDX11_Shutdown();
 		ImGui_ImplWin32_Shutdown();
 		ImGui::DestroyContext();
 		if (g_mainRenderTargetView) { g_mainRenderTargetView->Release(); g_mainRenderTargetView = NULL; }
+	}
 
-		g_ImGui_Initialized = false;
+	HRESULT code = dxgi_resize_buffers(pChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
 
-		InitializeImGui();
-	}*/
+	if (previouslyInitialized) { InitializeImGui(); }
 
-	return dxgi_resize_buffers(pChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
+	return code;
 }

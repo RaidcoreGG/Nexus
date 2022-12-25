@@ -31,6 +31,9 @@
     <Filter Include="Events">
       <UniqueIdentifier>{062ec4b8-2804-4978-b3c4-381b0cdd4b35}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Keybinds">
+      <UniqueIdentifier>{f0552fcd-0842-4914-bd35-54f18d11b0cd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="entry.cpp">
@@ -171,6 +174,9 @@
     </ClInclude>
     <ClInclude Include="Loader\HostFunctionTable.h">
       <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="Keybinds\KeybindHandler.h">
+      <Filter>Keybinds</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

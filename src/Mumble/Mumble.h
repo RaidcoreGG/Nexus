@@ -168,6 +168,8 @@ struct LinkedMem
 	wchar_t Description[2048];
 };
 
+
+typedef LinkedMem* (*GetMumbleSig)();
 extern "C" LinkedMem* GetMumble();
 
 class Mumble
