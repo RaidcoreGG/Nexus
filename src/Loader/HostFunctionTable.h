@@ -30,7 +30,6 @@ typedef struct HostFunctionTable
 		// RegisterKeybindSig RegisterKeybind;
 
 	/* API */
-	GetMumbleSig GetMumble;
 		// GW2 API FUNCS
 		// LOGITECH API FUNCS
 		// RESOURCE SHARING FUNCS

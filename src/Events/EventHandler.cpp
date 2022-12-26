@@ -2,23 +2,26 @@
 
 #include "EventHandler.h"
 
-void EventHandler::RaiseEvent(const wchar_t* aEventName, void* aEventData)
+namespace EventHandler
 {
-	EventRegistryMutex.lock();
-
-	for (ConsumeEventCallback callback : EventRegistry[aEventName])
+	void RaiseEvent(const wchar_t* aEventName, void* aEventData)
 	{
-		std::thread([callback, aEventData]() { callback(aEventData); }).detach();
+		EventRegistryMutex.lock();
+
+		for (ConsumeEventCallback callback : EventRegistry[aEventName])
+		{
+			std::thread([callback, aEventData]() { callback(aEventData); }).detach();
+		}
+
+		EventRegistryMutex.unlock();
 	}
 
-	EventRegistryMutex.unlock();
-}
+	void SubscribeEvent(const wchar_t* aEventName, ConsumeEventCallback aConsumeEventCallback)
+	{
+		EventRegistryMutex.lock();
 
-void EventHandler::SubscribeEvent(const wchar_t* aEventName, ConsumeEventCallback aConsumeEventCallback)
-{
-	EventRegistryMutex.lock();
+		EventRegistry[aEventName].push_back(aConsumeEventCallback);
 
-	EventRegistry[aEventName].push_back(aConsumeEventCallback);
-
-	EventRegistryMutex.unlock();
+		EventRegistryMutex.unlock();
+	}
 }

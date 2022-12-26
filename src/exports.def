@@ -3,10 +3,3 @@ EXPORTS
 	D3D11CoreCreateDevice
 	D3D11CreateDevice
 	D3D11CreateDeviceAndSwapChain
-
-; Mumble
-	GetMumble
-
-; Events
-	RaiseEvent
-	SubscribeEvent

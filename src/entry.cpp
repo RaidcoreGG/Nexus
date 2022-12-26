@@ -20,19 +20,20 @@
 
 #include "Mumble/Mumble.h"
 
-#define IMPL_CHAINLOAD
+#include "Keybinds/KeybindHandler.h"
+
+#define IMPL_CHAINLOAD // arcdps workaround
 
 /* proto */
 void InitializePaths();
 void InitializeLogging();
 void InitializeImGui();
+void ShutdownImGui();
 void Cleanup();
 
 LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags);
 HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
-
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 /* vars */
 static WCHAR g_Path_HostDirectory[MAX_PATH];
@@ -41,30 +42,31 @@ static WCHAR g_Path_TempDll[MAX_PATH];
 static WCHAR g_Path_ChainloadDll[MAX_PATH];
 static WCHAR g_Path_SystemDll[MAX_PATH];
 
-static bool g_IsCleanedUp = false;
-static bool g_IsDxLoaded = false;
-static bool g_IsChainloading = false;
-static bool g_IsDxCreated = false;
-static bool g_IsImGuiInitialized = false;
+static bool g_IsCleanedUp								= false;
+static bool g_IsDxLoaded								= false;
+static bool g_IsChainloading							= false;
+static bool g_IsDxCreated								= false;
+static bool g_IsImGuiInitialized						= false;
+static bool g_IsImGuiInitializable						= false;
 
 static HMODULE g_GW2;
 static HMODULE g_Self;
 static HMODULE g_D3D11;
 static HMODULE g_Sys11;
 
-static WNDPROC g_GW2_WndProc = nullptr;
-static HWND g_GW2_HWND = nullptr;
+static WNDPROC g_GW2_WndProc							= nullptr;
+static HWND g_GW2_HWND									= nullptr;
 
-static ID3D11Device* g_pDevice = nullptr;
-static ID3D11DeviceContext* g_pDeviceContext = nullptr;
-static IDXGISwapChain* g_pSwapChain = nullptr;
-static ID3D11RenderTargetView* g_mainRenderTargetView = nullptr;
+static ID3D11Device* g_pDevice							= nullptr;
+static ID3D11DeviceContext* g_pDeviceContext			= nullptr;
+static IDXGISwapChain* g_pSwapChain						= nullptr;
+static ID3D11RenderTargetView* g_mainRenderTargetView	= nullptr;
 
 static HRESULT(*dxgi_present)(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags);
 static HRESULT(*dxgi_resize_buffers)(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
 
-static LogHandler* Logger = LogHandler::GetInstance();
-static LinkedMem* MumbleLink = nullptr;
+static LogHandler* Logger								= LogHandler::GetInstance();
+static LinkedMem* MumbleLink							= nullptr;
 
 /* dx */
 BOOL DxLoad()
@@ -112,7 +114,6 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 {
 	static decltype(&D3D11CoreCreateDevice) func;
 	static const char* func_name = "D3D11CoreCreateDevice";
-
 	Logger->Log(func_name);
 
 #ifdef IMPL_CHAINLOAD
@@ -147,7 +148,6 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 {
 	static decltype(&D3D11CreateDevice) func;
 	static const char* func_name = "D3D11CreateDevice";
-
 	Logger->Log(func_name);
 
 #ifdef IMPL_CHAINLOAD
@@ -222,7 +222,7 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 
 	UnregisterClassW(wc.lpszClassName, wc.hInstance);
 
-	std::thread([]() { Sleep(10000); InitializeImGui(); }).detach();
+	std::thread([]() { Sleep(10000); g_IsImGuiInitializable = true; }).detach();
 
 	return func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
 }
@@ -230,7 +230,6 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 {
 	static decltype(&D3D11CreateDeviceAndSwapChain) func;
 	static const char* func_name = "D3D11CreateDeviceAndSwapChain";
-
 	Logger->Log(func_name);
 
 #ifdef IMPL_CHAINLOAD
@@ -292,7 +291,7 @@ void InitializeLogging()
 	Logger->Register(cLog);
 
 	FileLogger* fLog = new FileLogger("rcAddonHost.log");
-	fLog->SetLogLevel(ELogLevel::ALL);
+	fLog->SetLogLevel(ELogLevel::INFO);
 	Logger->Register(fLog);
 }
 void InitializeImGui()
@@ -317,11 +316,25 @@ void InitializeImGui()
 
 	g_IsImGuiInitialized = true;
 }
+void ShutdownImGui()
+{
+	if (g_IsImGuiInitialized)
+	{
+		g_IsImGuiInitialized = false;
+
+		ImGui_ImplDX11_Shutdown();
+		ImGui_ImplWin32_Shutdown();
+		ImGui::DestroyContext();
+		if (g_mainRenderTargetView) { g_mainRenderTargetView->Release(); g_mainRenderTargetView = NULL; }
+	}
+}
 void Cleanup()
 {
 	if (!g_IsCleanedUp)
 	{
 		g_IsCleanedUp = true;
+
+		ShutdownImGui();
 
 		Mumble::Destroy();
 
@@ -347,6 +360,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
 		MumbleLink = Mumble::Create();
 
+		KeybindHandler::LoadKeybinds();
+
 		Logger->LogDebug(L"%s %s", L"[ATTACH]", g_Path_HostDll);
 		break;
 	case DLL_PROCESS_DETACH:
@@ -362,9 +377,50 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 /* hk */
 LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	//ImGuiIO& io = ImGui::GetIO();
+	// don't pass to game if keybind
+	if (KeybindHandler::WndProc(hWnd, uMsg, wParam, lParam)) { return 0; }
 
-	ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
+	// don't pass to game if imgui
+	if (g_IsImGuiInitialized)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		if (io.WantCaptureMouse)
+		{
+			switch (uMsg)
+			{
+			case WM_LBUTTONDOWN:	io.MouseDown[0] = true;															return 0;
+			case WM_RBUTTONDOWN:	io.MouseDown[1] = true;															return 0;
+			
+			case WM_LBUTTONUP:		io.MouseDown[0] = false;														break;
+			case WM_RBUTTONUP:		io.MouseDown[1] = false;														break;
+
+			case WM_MOUSEWHEEL:		io.MouseWheel += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;	return 0;
+			case WM_MOUSEHWHEEL:	io.MouseWheelH += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;	return 0;
+			}
+		}
+
+		if (io.WantTextInput)
+		{
+			switch (uMsg)
+			{
+			case WM_KEYDOWN:
+			case WM_SYSKEYDOWN:
+				if (wParam < 256)
+					io.KeysDown[wParam] = 1;
+				return 0;
+			case WM_KEYUP:
+			case WM_SYSKEYUP:
+				if (wParam < 256)
+					io.KeysDown[wParam] = 0;
+				return 0;
+			case WM_CHAR:
+				// You can also use ToAscii()+GetKeyboardState() to retrieve characters.
+				if (wParam > 0 && wParam < 0x10000)
+					io.AddInputCharacterUTF16((unsigned short)wParam);
+				return 0;
+			}
+		}
+	}
 
 	if (uMsg == WM_DESTROY)
 	{
@@ -397,6 +453,11 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 		g_GW2_WndProc = (WNDPROC)SetWindowLongPtr(g_GW2_HWND, GWLP_WNDPROC, (LONG_PTR)hkWndProc);
 	}
 
+	if (g_IsImGuiInitializable && !g_IsImGuiInitialized)
+	{
+		InitializeImGui();
+	}
+
 	if (g_IsImGuiInitialized)
 	{
 		// imgui define new frame
@@ -423,24 +484,9 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
 {
 	static const char* func_name = "hkDXGIResizeBuffers";
-
 	Logger->Log(func_name);
 
-	bool previouslyInitialized = false;
-	if (g_IsImGuiInitialized)
-	{
-		previouslyInitialized = true;
-		g_IsImGuiInitialized = false;
+	ShutdownImGui();
 
-		ImGui_ImplDX11_Shutdown();
-		ImGui_ImplWin32_Shutdown();
-		ImGui::DestroyContext();
-		if (g_mainRenderTargetView) { g_mainRenderTargetView->Release(); g_mainRenderTargetView = NULL; }
-	}
-
-	HRESULT code = dxgi_resize_buffers(pChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
-
-	if (previouslyInitialized) { InitializeImGui(); }
-
-	return code;
+	return dxgi_resize_buffers(pChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
 }

@@ -96,6 +96,9 @@
     <ClCompile Include="Events\EventHandler.cpp">
       <Filter>Events</Filter>
     </ClCompile>
+    <ClCompile Include="Keybinds\KeybindHandler.cpp">
+      <Filter>Keybinds</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def">
