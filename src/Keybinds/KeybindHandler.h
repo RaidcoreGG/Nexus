@@ -14,6 +14,8 @@ struct Keybind
 	bool Shift;
 };
 
+bool operator==(const Keybind&, const Keybind&);
+
 typedef void (*KeybindHandlerSig)(const wchar_t*);
 typedef void (*RegisterKeybindSig)(const wchar_t*, KeybindHandlerSig, Keybind);
 
@@ -24,8 +26,8 @@ namespace KeybindHandler
 	void LoadKeybinds();
 	void SaveKeybinds();
 
-	void RegisterKeybind(const wchar_t*, KeybindHandlerSig, Keybind);			/* Raises an event of provided name, passing a pointer to an eventArgs struct */
-	void InvokeKeybind(const wchar_t*);											/* Passes the action to the corresponding addon to handle it */
+	void RegisterKeybind(const wchar_t*, KeybindHandlerSig, Keybind);			/* Registers a kb with the given identifier, it will be passed to the given handler, if no bind was previously stored the given one will be used */
+	void InvokeKeybind(const wchar_t*);											/* Invokes the action on the corresponding keybind handler */
 	
 	static std::mutex KeybindRegistryMutex;
 	static std::map<const wchar_t*, Keybind> KeybindRegistry;					/* Contains the active keybinds with their identifiers */
