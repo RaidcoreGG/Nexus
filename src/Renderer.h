@@ -3,6 +3,7 @@
 
 #include <d3d11.h>
 
+/* Namespace for renderer variables */
 namespace Renderer
 {
 	extern ID3D11Device*			Device;

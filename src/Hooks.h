@@ -7,6 +7,7 @@
 typedef HRESULT(__stdcall* DXPRESENT)		(IDXGISwapChain*, UINT, UINT);
 typedef HRESULT(__stdcall* DXRESIZEBUFFERS)	(IDXGISwapChain*, UINT, UINT, UINT, DXGI_FORMAT, UINT);
 
+/* Namespace for hooked functions */
 namespace Hooks
 {
 	extern DXPRESENT		DXGI_Present;

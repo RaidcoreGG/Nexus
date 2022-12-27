@@ -1,6 +1,3 @@
-#include <iostream>
-#include <Shlwapi.h>
-#include <string>
 #include <d3d11.h>
 #include <PathCch.h>
 #include <cassert>
@@ -181,7 +178,7 @@ LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		Logger->LogCritical(L"::Destroy()");
 	}
 
-	return CallWindowProc(Hooks::GW2_WndProc, hWnd, uMsg, wParam, lParam);
+	return Hooks::GW2_WndProc(hWnd, uMsg, wParam, lParam);
 }
 HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
 {
