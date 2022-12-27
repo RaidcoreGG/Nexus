@@ -27,7 +27,7 @@ typedef struct HostFunctionTable
 	SubscribeEventSig SubscribeEvent;
 
 	/* Keybinds */
-		// RegisterKeybindSig RegisterKeybind;
+	RegisterKeybindSig RegisterKeybind;
 
 	/* API */
 		// GW2 API FUNCS

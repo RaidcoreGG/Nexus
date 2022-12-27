@@ -1,8 +1,5 @@
 #include "KeybindHandler.h"
 
-#include "../Logging/LogHandler.h"
-#include "../core.h"
-
 namespace KeybindHandler
 {
 	bool WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -38,7 +35,7 @@ namespace KeybindHandler
 
 	void LoadKeybinds()
 	{
-
+		
 	}
 
 	void SaveKeybinds()

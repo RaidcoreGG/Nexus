@@ -24,49 +24,256 @@
 
 #define IMPL_CHAINLOAD // arcdps workaround
 
-/* proto */
-void InitializePaths();
-void InitializeLogging();
-void InitializeImGui();
-void ShutdownImGui();
-void Cleanup();
+typedef HRESULT(__stdcall *DXPRESENT)		(IDXGISwapChain*, UINT, UINT);
+typedef HRESULT(__stdcall *DXRESIZEBUFFERS)	(IDXGISwapChain*, UINT, UINT, UINT, DXGI_FORMAT, UINT);
 
-LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags);
-HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
+/* path vars*/
+static wchar_t					g_Path_HostDirectory	[MAX_PATH];
+static wchar_t					g_Path_HostDll			[MAX_PATH];
+static wchar_t					g_Path_TempDll			[MAX_PATH];
+static wchar_t					g_Path_ChainloadDll		[MAX_PATH];
+static wchar_t					g_Path_SystemDll		[MAX_PATH];
 
-/* vars */
-static WCHAR g_Path_HostDirectory[MAX_PATH];
-static WCHAR g_Path_HostDll[MAX_PATH];
-static WCHAR g_Path_TempDll[MAX_PATH];
-static WCHAR g_Path_ChainloadDll[MAX_PATH];
-static WCHAR g_Path_SystemDll[MAX_PATH];
+/* state vars */
+static bool						g_IsCleanedUp			= false;
+static bool						g_IsDxLoaded			= false;
+static bool						g_IsChainloading		= false;
+static bool						g_IsDxCreated			= false;
+static bool						g_IsImGuiInitialized	= false;
+static bool						g_IsImGuiInitializable	= false;
 
-static bool g_IsCleanedUp								= false;
-static bool g_IsDxLoaded								= false;
-static bool g_IsChainloading							= false;
-static bool g_IsDxCreated								= false;
-static bool g_IsImGuiInitialized						= false;
-static bool g_IsImGuiInitializable						= false;
+/* handle vars */
+static HMODULE					g_GW2					= nullptr;
+static HMODULE					g_Self					= nullptr;
+static HMODULE					g_D3D11					= nullptr;
+static HMODULE					g_Sys11					= nullptr;
 
-static HMODULE g_GW2;
-static HMODULE g_Self;
-static HMODULE g_D3D11;
-static HMODULE g_Sys11;
+static HWND						g_GW2_HWND = nullptr;
 
-static WNDPROC g_GW2_WndProc							= nullptr;
-static HWND g_GW2_HWND									= nullptr;
+/* hooked funcs */
+static DXPRESENT				g_DXGI_Present			= nullptr;
+static DXRESIZEBUFFERS			g_DXGI_ResizeBuffers	= nullptr;
 
-static ID3D11Device* g_pDevice							= nullptr;
-static ID3D11DeviceContext* g_pDeviceContext			= nullptr;
-static IDXGISwapChain* g_pSwapChain						= nullptr;
-static ID3D11RenderTargetView* g_mainRenderTargetView	= nullptr;
+static WNDPROC					g_GW2_WndProc			= nullptr;
 
-static HRESULT(*dxgi_present)(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags);
-static HRESULT(*dxgi_resize_buffers)(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
+/* renderer vars */
+static ID3D11Device*			g_pDevice				= nullptr;
+static ID3D11DeviceContext*		g_pDeviceContext		= nullptr;
+static IDXGISwapChain*			g_pSwapChain			= nullptr;
+static ID3D11RenderTargetView*	g_mainRenderTargetView	= nullptr;
 
-static LogHandler* Logger								= LogHandler::GetInstance();
-static LinkedMem* MumbleLink							= nullptr;
+/* internal vars */
+static LogHandler*				Logger					= LogHandler::GetInstance();
+static LinkedMem*				MumbleLink				= nullptr;
+
+/* init */
+void InitializePaths()
+{
+	/* get self dll path */
+	GetModuleFileNameW(g_Self, g_Path_HostDll, MAX_PATH);
+
+	/* get current directory */
+	memcpy(g_Path_HostDirectory, g_Path_HostDll, MAX_PATH);
+	PathCchRemoveFileSpec(g_Path_HostDirectory, MAX_PATH);
+
+	/* get temp dll path */
+	memcpy(g_Path_TempDll, g_Path_HostDirectory, MAX_PATH);
+	PathCchAppend(g_Path_TempDll, MAX_PATH, L"d3d11.tmp");
+
+	/* get chainload dll path */
+	memcpy(g_Path_ChainloadDll, g_Path_HostDirectory, MAX_PATH);
+	PathCchAppend(g_Path_ChainloadDll, MAX_PATH, L"d3d11_chainload.dll");
+
+	/* get system dll path */
+	GetSystemDirectoryW(g_Path_SystemDll, MAX_PATH);
+	PathCchAppend(g_Path_SystemDll, MAX_PATH, L"d3d11.dll");
+}
+void InitializeLogging()
+{
+	ConsoleLogger* cLog = new ConsoleLogger();
+	cLog->SetLogLevel(ELogLevel::ALL);
+	Logger->Register(cLog);
+
+	FileLogger* fLog = new FileLogger("rcAddonHost.log");
+	fLog->SetLogLevel(ELogLevel::INFO);
+	Logger->Register(fLog);
+}
+void InitializeImGui()
+{
+	// create imgui context
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	io.Fonts->AddFontDefault();
+	io.Fonts->Build();
+
+	// Init imgui
+	ImGui_ImplWin32_Init(g_GW2_HWND);
+	ImGui_ImplDX11_Init(g_pDevice, g_pDeviceContext);
+	ImGui::GetIO().ImeWindowHandle = g_GW2_HWND;
+
+	// create buffers
+	ID3D11Texture2D* pBackBuffer;
+	g_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBackBuffer);
+	g_pDevice->CreateRenderTargetView(pBackBuffer, NULL, &g_mainRenderTargetView);
+	pBackBuffer->Release();
+
+	g_IsImGuiInitialized = true;
+}
+void Initialize()
+{
+	InitializePaths();
+	InitializeLogging();
+
+	MH_Initialize();
+
+	MumbleLink = Mumble::Create();
+	KeybindHandler::LoadKeybinds();
+}
+void ShutdownImGui()
+{
+	if (g_IsImGuiInitialized)
+	{
+		g_IsImGuiInitialized = false;
+
+		ImGui_ImplDX11_Shutdown();
+		ImGui_ImplWin32_Shutdown();
+		ImGui::DestroyContext();
+		if (g_mainRenderTargetView) { g_mainRenderTargetView->Release(); g_mainRenderTargetView = NULL; }
+	}
+}
+void Shutdown()
+{
+	if (!g_IsCleanedUp)
+	{
+		g_IsCleanedUp = true;
+
+		ShutdownImGui();
+
+		Mumble::Destroy();
+
+		MH_Uninitialize();
+
+		if (g_D3D11) { FreeLibrary(g_D3D11); }
+	}
+}
+
+/* hk */
+LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	// don't pass to game if keybind
+	if (KeybindHandler::WndProc(hWnd, uMsg, wParam, lParam)) { return 0; }
+
+	// don't pass to game if imgui
+	if (g_IsImGuiInitialized)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		if (io.WantCaptureMouse)
+		{
+			switch (uMsg)
+			{
+			case WM_LBUTTONDOWN:	io.MouseDown[0] = true;															return 0;
+			case WM_RBUTTONDOWN:	io.MouseDown[1] = true;															return 0;
+
+			case WM_LBUTTONUP:		io.MouseDown[0] = false;														break;
+			case WM_RBUTTONUP:		io.MouseDown[1] = false;														break;
+
+			case WM_MOUSEWHEEL:		io.MouseWheel += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;	return 0;
+			case WM_MOUSEHWHEEL:	io.MouseWheelH += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;	return 0;
+			}
+		}
+
+		if (io.WantTextInput)
+		{
+			switch (uMsg)
+			{
+			case WM_KEYDOWN:
+			case WM_SYSKEYDOWN:
+				if (wParam < 256)
+					io.KeysDown[wParam] = 1;
+				return 0;
+			case WM_KEYUP:
+			case WM_SYSKEYUP:
+				if (wParam < 256)
+					io.KeysDown[wParam] = 0;
+				return 0;
+			case WM_CHAR:
+				// You can also use ToAscii()+GetKeyboardState() to retrieve characters.
+				if (wParam > 0 && wParam < 0x10000)
+					io.AddInputCharacterUTF16((unsigned short)wParam);
+				return 0;
+			}
+		}
+	}
+
+	if (uMsg == WM_DESTROY)
+	{
+		Logger->LogCritical(L"::Destroy()");
+	}
+
+	return CallWindowProc(g_GW2_WndProc, hWnd, uMsg, wParam, lParam);
+}
+HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
+{
+	if (g_pSwapChain != pChain)
+	{
+		g_pSwapChain = pChain;
+
+		if (g_pDevice)
+		{
+			g_pDeviceContext->Release();
+			g_pDeviceContext = 0;
+			g_pDevice->Release();
+			g_pDevice = 0;
+		}
+
+		g_pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&g_pDevice);
+		g_pDevice->GetImmediateContext(&g_pDeviceContext);
+
+		DXGI_SWAP_CHAIN_DESC swapChainDesc;
+		g_pSwapChain->GetDesc(&swapChainDesc);
+
+		g_GW2_HWND = swapChainDesc.OutputWindow;
+		g_GW2_WndProc = (WNDPROC)SetWindowLongPtr(g_GW2_HWND, GWLP_WNDPROC, (LONG_PTR)hkWndProc);
+	}
+
+	if (g_IsImGuiInitializable && !g_IsImGuiInitialized)
+	{
+		InitializeImGui();
+	}
+
+	if (g_IsImGuiInitialized)
+	{
+		// imgui define new frame
+		ImGui_ImplWin32_NewFrame();
+		ImGui_ImplDX11_NewFrame();
+		ImGui::NewFrame();
+
+		// Draw ImGui here!
+		ImGui::ShowDemoWindow();
+
+		// imgui end frame
+		ImGui::EndFrame();
+
+		// render
+		ImGui::Render();
+
+		// finish drawing
+		g_pDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, NULL);
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	}
+
+	return g_DXGI_Present(pChain, SyncInterval, Flags);
+}
+HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
+{
+	static const char* func_name = "hkDXGIResizeBuffers";
+	Logger->Log(func_name);
+
+	ShutdownImGui();
+
+	return g_DXGI_ResizeBuffers(pChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
+}
 
 /* dx */
 BOOL DxLoad()
@@ -109,7 +316,7 @@ BOOL DxLoad()
 
 	return (g_D3D11 != NULL);
 }
-#pragma region dx11
+
 HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pAdapter, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, ID3D11Device& ppDevice)
 {
 	static decltype(&D3D11CoreCreateDevice) func;
@@ -208,8 +415,8 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 			//dxgi_present = hook_vtbl_fn(vtbl, 8, dxgi_present_hook);
 			//dxgi_resize_buffers = hook_vtbl_fn(vtbl, 13, dxgi_resize_buffers_hook);
 
-			MH_CreateHook(vtbl[8], (LPVOID)&hkDXGIPresent, (LPVOID*)&dxgi_present);
-			MH_CreateHook(vtbl[13], (LPVOID)&hkDXGIResizeBuffers, (LPVOID*)&dxgi_resize_buffers);
+			MH_CreateHook(vtbl[8], (LPVOID)&hkDXGIPresent, (LPVOID*)&g_DXGI_Present);
+			MH_CreateHook(vtbl[13], (LPVOID)&hkDXGIResizeBuffers, (LPVOID*)&g_DXGI_ResizeBuffers);
 			MH_EnableHook(MH_ALL_HOOKS);
 
 			context->Release();
@@ -222,7 +429,8 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 
 	UnregisterClassW(wc.lpszClassName, wc.hInstance);
 
-	std::thread([]() { Sleep(10000); g_IsImGuiInitializable = true; }).detach();
+	//std::thread([]() { Sleep(10000); g_IsImGuiInitializable = true; }).detach();
+	g_IsImGuiInitializable = true;
 
 	return func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
 }
@@ -260,89 +468,6 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 
 	return func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice, pFeatureLevel, ppImmediateContext);
 }
-#pragma endregion
-
-/* init */
-void InitializePaths()
-{
-	/* get self dll path */
-	GetModuleFileNameW(g_Self, g_Path_HostDll, MAX_PATH);
-
-	/* get current directory */
-	memcpy(g_Path_HostDirectory, g_Path_HostDll, MAX_PATH);
-	PathCchRemoveFileSpec(g_Path_HostDirectory, MAX_PATH);
-
-	/* get temp dll path */
-	memcpy(g_Path_TempDll, g_Path_HostDirectory, MAX_PATH);
-	PathCchAppend(g_Path_TempDll, MAX_PATH, L"d3d11.tmp");
-
-	/* get chainload dll path */
-	memcpy(g_Path_ChainloadDll, g_Path_HostDirectory, MAX_PATH);
-	PathCchAppend(g_Path_ChainloadDll, MAX_PATH, L"d3d11_chainload.dll");
-
-	/* get system dll path */
-	GetSystemDirectoryW(g_Path_SystemDll, MAX_PATH);
-	PathCchAppend(g_Path_SystemDll, MAX_PATH, L"d3d11.dll");
-}
-void InitializeLogging()
-{
-	ConsoleLogger* cLog = new ConsoleLogger();
-	cLog->SetLogLevel(ELogLevel::ALL);
-	Logger->Register(cLog);
-
-	FileLogger* fLog = new FileLogger("rcAddonHost.log");
-	fLog->SetLogLevel(ELogLevel::INFO);
-	Logger->Register(fLog);
-}
-void InitializeImGui()
-{
-	// create imgui context
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-	io.Fonts->AddFontDefault();
-	io.Fonts->Build();
-
-	// Init imgui
-	ImGui_ImplWin32_Init(g_GW2_HWND);
-	ImGui_ImplDX11_Init(g_pDevice, g_pDeviceContext);
-	ImGui::GetIO().ImeWindowHandle = g_GW2_HWND;
-
-	// create buffers
-	ID3D11Texture2D* pBackBuffer;
-	g_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBackBuffer);
-	g_pDevice->CreateRenderTargetView(pBackBuffer, NULL, &g_mainRenderTargetView);
-	pBackBuffer->Release();
-
-	g_IsImGuiInitialized = true;
-}
-void ShutdownImGui()
-{
-	if (g_IsImGuiInitialized)
-	{
-		g_IsImGuiInitialized = false;
-
-		ImGui_ImplDX11_Shutdown();
-		ImGui_ImplWin32_Shutdown();
-		ImGui::DestroyContext();
-		if (g_mainRenderTargetView) { g_mainRenderTargetView->Release(); g_mainRenderTargetView = NULL; }
-	}
-}
-void Cleanup()
-{
-	if (!g_IsCleanedUp)
-	{
-		g_IsCleanedUp = true;
-
-		ShutdownImGui();
-
-		Mumble::Destroy();
-
-		MH_Uninitialize();
-
-		if (g_D3D11) { FreeLibrary(g_D3D11); }
-	}
-}
 
 /* entry */
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
@@ -353,140 +478,17 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		g_Self = hModule;
 		g_GW2 = GetModuleHandle(NULL);
 
-		InitializePaths();
-		InitializeLogging();
-
-		if (MH_Initialize() != MH_OK) { return false; }
-
-		MumbleLink = Mumble::Create();
-
-		KeybindHandler::LoadKeybinds();
+		Initialize();
 
 		Logger->LogDebug(L"%s %s", L"[ATTACH]", g_Path_HostDll);
+		Logger->LogInfo(L"Version: " __DATE__ " " __TIME__);
 		break;
 	case DLL_PROCESS_DETACH:
 		//Logger->LogDebug(L"%s %s", L"[DETACH]", g_Path_HostDll);
 
-		Cleanup();
+		Shutdown();
 
 		break;
 	}
 	return true;
-}
-
-/* hk */
-LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	// don't pass to game if keybind
-	if (KeybindHandler::WndProc(hWnd, uMsg, wParam, lParam)) { return 0; }
-
-	// don't pass to game if imgui
-	if (g_IsImGuiInitialized)
-	{
-		ImGuiIO& io = ImGui::GetIO();
-		if (io.WantCaptureMouse)
-		{
-			switch (uMsg)
-			{
-			case WM_LBUTTONDOWN:	io.MouseDown[0] = true;															return 0;
-			case WM_RBUTTONDOWN:	io.MouseDown[1] = true;															return 0;
-			
-			case WM_LBUTTONUP:		io.MouseDown[0] = false;														break;
-			case WM_RBUTTONUP:		io.MouseDown[1] = false;														break;
-
-			case WM_MOUSEWHEEL:		io.MouseWheel += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;	return 0;
-			case WM_MOUSEHWHEEL:	io.MouseWheelH += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;	return 0;
-			}
-		}
-
-		if (io.WantTextInput)
-		{
-			switch (uMsg)
-			{
-			case WM_KEYDOWN:
-			case WM_SYSKEYDOWN:
-				if (wParam < 256)
-					io.KeysDown[wParam] = 1;
-				return 0;
-			case WM_KEYUP:
-			case WM_SYSKEYUP:
-				if (wParam < 256)
-					io.KeysDown[wParam] = 0;
-				return 0;
-			case WM_CHAR:
-				// You can also use ToAscii()+GetKeyboardState() to retrieve characters.
-				if (wParam > 0 && wParam < 0x10000)
-					io.AddInputCharacterUTF16((unsigned short)wParam);
-				return 0;
-			}
-		}
-	}
-
-	if (uMsg == WM_DESTROY)
-	{
-		Logger->LogCritical(L"::Destroy()");
-	}
-
-	return CallWindowProc(g_GW2_WndProc, hWnd, uMsg, wParam, lParam);
-}
-HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
-{
-	if (g_pSwapChain != pChain)
-	{
-		g_pSwapChain = pChain;
-
-		if (g_pDevice)
-		{
-			g_pDeviceContext->Release();
-			g_pDeviceContext = 0;
-			g_pDevice->Release();
-			g_pDevice = 0;
-		}
-
-		g_pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&g_pDevice);
-		g_pDevice->GetImmediateContext(&g_pDeviceContext);
-
-		DXGI_SWAP_CHAIN_DESC swapChainDesc;
-		g_pSwapChain->GetDesc(&swapChainDesc);
-
-		g_GW2_HWND = swapChainDesc.OutputWindow;
-		g_GW2_WndProc = (WNDPROC)SetWindowLongPtr(g_GW2_HWND, GWLP_WNDPROC, (LONG_PTR)hkWndProc);
-	}
-
-	if (g_IsImGuiInitializable && !g_IsImGuiInitialized)
-	{
-		InitializeImGui();
-	}
-
-	if (g_IsImGuiInitialized)
-	{
-		// imgui define new frame
-		ImGui_ImplWin32_NewFrame();
-		ImGui_ImplDX11_NewFrame();
-		ImGui::NewFrame();
-
-		// Draw ImGui here!
-		ImGui::ShowDemoWindow();
-
-		// imgui end frame
-		ImGui::EndFrame();
-
-		// render
-		ImGui::Render();
-
-		// finish drawing
-		g_pDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, NULL);
-		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-	}
-
-	return dxgi_present(pChain, SyncInterval, Flags);
-}
-HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
-{
-	static const char* func_name = "hkDXGIResizeBuffers";
-	Logger->Log(func_name);
-
-	ShutdownImGui();
-
-	return dxgi_resize_buffers(pChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
 }

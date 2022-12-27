@@ -6,8 +6,6 @@
 #include <vector>
 #include <mutex>
 
-typedef void (*KeybindHandlerSig)(const wchar_t*);
-
 struct Keybind
 {
 	WORD Key;
@@ -15,6 +13,9 @@ struct Keybind
 	bool Ctrl;
 	bool Shift;
 };
+
+typedef void (*KeybindHandlerSig)(const wchar_t*);
+typedef void (*RegisterKeybindSig)(const wchar_t*, KeybindHandlerSig, Keybind);
 
 namespace KeybindHandler
 {
