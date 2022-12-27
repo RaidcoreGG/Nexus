@@ -34,6 +34,9 @@
     <Filter Include="Keybinds">
       <UniqueIdentifier>{f0552fcd-0842-4914-bd35-54f18d11b0cd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Globals">
+      <UniqueIdentifier>{8e43094f-c05b-4eb0-9c90-afd74f653c5b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="entry.cpp">
@@ -98,6 +101,21 @@
     </ClCompile>
     <ClCompile Include="Keybinds\KeybindHandler.cpp">
       <Filter>Keybinds</Filter>
+    </ClCompile>
+    <ClCompile Include="Paths.cpp">
+      <Filter>Globals</Filter>
+    </ClCompile>
+    <ClCompile Include="State.cpp">
+      <Filter>Globals</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks.cpp">
+      <Filter>Globals</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Globals</Filter>
+    </ClCompile>
+    <ClCompile Include="Shared.cpp">
+      <Filter>Globals</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -180,6 +198,21 @@
     </ClInclude>
     <ClInclude Include="Keybinds\KeybindHandler.h">
       <Filter>Keybinds</Filter>
+    </ClInclude>
+    <ClInclude Include="State.h">
+      <Filter>Globals</Filter>
+    </ClInclude>
+    <ClInclude Include="Paths.h">
+      <Filter>Globals</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks.h">
+      <Filter>Globals</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Globals</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared.h">
+      <Filter>Globals</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

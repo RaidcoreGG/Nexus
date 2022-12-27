@@ -22,6 +22,7 @@
     <ClCompile Include="core.cpp" />
     <ClCompile Include="entry.cpp" />
     <ClCompile Include="Events\EventHandler.cpp" />
+    <ClCompile Include="Hooks.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
@@ -40,6 +41,10 @@
     <ClCompile Include="minhook\mh_hook.cpp" />
     <ClCompile Include="minhook\mh_trampoline.cpp" />
     <ClCompile Include="Mumble\Mumble.cpp" />
+    <ClCompile Include="Paths.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="Shared.cpp" />
+    <ClCompile Include="State.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
@@ -47,6 +52,7 @@
   <ItemGroup>
     <ClInclude Include="core.h" />
     <ClInclude Include="Events\EventHandler.h" />
+    <ClInclude Include="Hooks.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_dx11.h" />
@@ -56,6 +62,7 @@
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="Keybinds\KeybindHandler.h" />
+    <ClInclude Include="Paths.h" />
     <ClInclude Include="Loader\AddonDef.h" />
     <ClInclude Include="Loader\EUpdateProvider.h" />
     <ClInclude Include="Loader\HostFunctionTable.h" />
@@ -70,6 +77,9 @@
     <ClInclude Include="minhook\mh_hook.h" />
     <ClInclude Include="minhook\mh_trampoline.h" />
     <ClInclude Include="Mumble\Mumble.h" />
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="Shared.h" />
+    <ClInclude Include="State.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Raidcore-AddonHost.rc" />
