@@ -2,6 +2,7 @@
 #include <PathCch.h>
 #include <cassert>
 #include <thread>
+#include <algorithm>
 
 #include "core.h"
 #include "Paths.h"
@@ -86,6 +87,20 @@ void InitializeImGui()
 	pBackBuffer->Release();
 
 	State::IsImGuiInitialized = true;
+}
+void InitializeState()
+{
+	CommandLine = GetCommandLineW();
+	Logger->LogInfo(CommandLine);
+
+	std::wstring cLine = CommandLine;
+	std::transform(cLine.begin(), cLine.end(), cLine.begin(), ::tolower);
+
+	State::IsDeveloperMode	= cLine.find(L"-ggdev", 0)		!= std::wstring::npos;
+	State::IsVanilla		= cLine.find(L"-ggvanilla", 0)	!= std::wstring::npos;
+
+	Logger->LogDebug("%d", State::IsDeveloperMode);
+	Logger->LogDebug("%d", State::IsVanilla);
 }
 void Initialize()
 {
@@ -254,7 +269,7 @@ BOOL DxLoad()
 		/* sanity check that the current dll isn't the chainload */
 		if (Path::F_HOST_DLL != Path::F_CHAINLOAD_DLL)
 		{
-			Logger->Log(L"Attempting to chainload.");
+			Logger->LogInfo(L"Attempting to chainload.");
 
 			State::IsChainloading = true;
 
@@ -268,7 +283,7 @@ BOOL DxLoad()
 #ifdef IMPL_CHAINLOAD
 			if (State::IsChainloading)
 			{
-				Logger->Log(L"No chainload found or failed to load.");
+				Logger->LogWarning(L"No chainload found or failed to load.");
 			}
 #endif
 			State::IsChainloading = false;
@@ -277,7 +292,7 @@ BOOL DxLoad()
 
 			assert(hD3D11 && "Could not load system d3d11.dll");
 
-			Logger->Log(L"Loaded System DLL: %s", Path::F_SYSTEM_DLL);
+			Logger->LogInfo(L"Loaded System DLL: %s", Path::F_SYSTEM_DLL);
 		}
 	}
 
@@ -446,6 +461,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		hGW2 = GetModuleHandle(NULL);
 
 		Initialize();
+		InitializeState();
 
 		Logger->LogDebug(L"%s %s", L"[ATTACH]", Path::F_HOST_DLL);
 		Logger->LogInfo(L"Version: " __DATE__ " " __TIME__);

@@ -193,7 +193,7 @@
     <ClInclude Include="Events\EventHandler.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\HostFunctionTable.h">
+    <ClInclude Include="Loader\HostAPI.h">
       <Filter>Loader</Filter>
     </ClInclude>
     <ClInclude Include="Keybinds\KeybindHandler.h">

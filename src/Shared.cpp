@@ -1,4 +1,6 @@
 #include "Shared.h"
 
-LogHandler* Logger = LogHandler::GetInstance();
-LinkedMem* MumbleLink = nullptr;
+wchar_t*	CommandLine;
+
+LogHandler* Logger			= LogHandler::GetInstance();
+LinkedMem*	MumbleLink		= nullptr;

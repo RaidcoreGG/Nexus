@@ -4,7 +4,9 @@
 #include "Logging/LogHandler.h"
 #include "Mumble/Mumble.h"
 
-extern LogHandler* Logger;
-extern LinkedMem* MumbleLink;
+extern wchar_t*		CommandLine;
+
+extern LogHandler*	Logger;
+extern LinkedMem*	MumbleLink;
 
 #endif

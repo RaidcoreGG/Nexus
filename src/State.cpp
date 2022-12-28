@@ -8,4 +8,7 @@ namespace State
 	bool IsChainloading			= false;
 	bool IsImGuiInitialized		= false;
 	bool IsImGuiInitializable	= false;
+
+	bool IsDeveloperMode		= false;
+	bool IsVanilla				= false;
 }

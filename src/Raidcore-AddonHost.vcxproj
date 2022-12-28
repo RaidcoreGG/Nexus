@@ -65,7 +65,7 @@
     <ClInclude Include="Paths.h" />
     <ClInclude Include="Loader\AddonDef.h" />
     <ClInclude Include="Loader\EUpdateProvider.h" />
-    <ClInclude Include="Loader\HostFunctionTable.h" />
+    <ClInclude Include="Loader\HostAPI.h" />
     <ClInclude Include="Logging\FileLogger.h" />
     <ClInclude Include="Logging\ILogger.h" />
     <ClInclude Include="Logging\LogEntry.h" />

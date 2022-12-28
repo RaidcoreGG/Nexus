@@ -6,7 +6,7 @@
 #include "../Keybinds/KeybindHandler.h"
 #include "../Mumble/Mumble.h"
 
-typedef struct HostFunctionTable
+typedef struct HostAPI
 {
 	/* LoggingA */
 	LogASig LogTrace;
