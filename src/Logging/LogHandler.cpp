@@ -50,6 +50,8 @@ void LogHandler::LogDebug(      const char* fmt, ...)       { va_list args; va_s
 
 void LogHandler::LogMessage(ELogLevel aLogLevel, const wchar_t* fmt, va_list args)
 {
+    LoggersMutex.lock();
+
     LogEntry entry;
     entry.LogLevel = aLogLevel;
     entry.Timestamp = time(NULL);
@@ -69,6 +71,8 @@ void LogHandler::LogMessage(ELogLevel aLogLevel, const wchar_t* fmt, va_list arg
             std::thread([logger, entry]() { logger->LogMessage(entry); }).detach();
         }
     }
+
+    LoggersMutex.unlock();
 }
 
 void LogHandler::LogMessage(ELogLevel aLogLevel, const char* aMessage, va_list args)

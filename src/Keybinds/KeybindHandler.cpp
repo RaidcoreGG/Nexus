@@ -5,6 +5,7 @@
 #include "../core.h"
 #include "../Paths.h"
 #include "../Shared.h"
+#include "../State.h"
 
 using json = nlohmann::json;
 
@@ -75,6 +76,25 @@ namespace KeybindHandler
 		}
 
 		KeybindRegistryMutex.unlock();
+
+		std::thread([]()
+			{
+				int i = 0;
+				while (!State::IsAddonLibraryInitialized)
+				{
+					// check every 100ms, abort after 1 minute
+					if (i == 600)
+					{
+						Logger->LogWarning(L"Addons not initialized after 60 seconds cancelling stale keybind validation.");
+						return;
+					}
+					Sleep(100);
+					i++;
+				}
+
+				ValidateKeybinds();
+
+			}).detach();
 	}
 
 	void SaveKeybinds()
@@ -104,7 +124,7 @@ namespace KeybindHandler
 
 		// copy fuckery because nlohmann::json only supports utf8 obviously
 		char str[MAX_PATH]{};
-		memcpy(str, keybinds.dump(4).c_str(), MAX_PATH);
+		memcpy(str, keybinds.dump(1, '\t').c_str(), MAX_PATH);
 		size_t sz = strlen(str) + 1;
 		wchar_t* wc = new wchar_t[sz];
 		mbstowcs_s(nullptr, wc, sz, str, sz);
@@ -112,6 +132,19 @@ namespace KeybindHandler
 		File << wc << std::endl;
 		File.close();
 
+		KeybindRegistryMutex.unlock();
+	}
+
+	void ValidateKeybinds()
+	{
+		KeybindRegistryMutex.lock();
+		for (std::map<const wchar_t*, Keybind>::iterator it = KeybindRegistry.begin(); it != KeybindRegistry.end(); ++it)
+		{
+			if (!KeybindHandlerRegistry[it->first])
+			{
+				Logger->LogInfo(L"Stale keybind: %s", it->first);
+			}
+		}
 		KeybindRegistryMutex.unlock();
 	}
 
@@ -150,10 +183,6 @@ namespace KeybindHandler
 		if (KeybindHandlerRegistry[aIdentifier])
 		{
 			KeybindHandlerRegistry[aIdentifier](aIdentifier);
-		}
-		else
-		{
-			Logger->LogInfo(L"Stale keybind: %s", aIdentifier);
 		}
 
 		KeybindRegistryMutex.unlock();

@@ -73,11 +73,18 @@ void InitializePaths()
 }
 void InitializeLogging()
 {
-	ConsoleLogger* cLog = new ConsoleLogger();
-	cLog->SetLogLevel(ELogLevel::ALL);
-	Logger->Register(cLog);
+#ifndef _DEBUG
+	if (State::IsConsoleEnabled)
+	{
+#endif
+		ConsoleLogger* cLog = new ConsoleLogger();
+		cLog->SetLogLevel(ELogLevel::ALL);
+		Logger->Register(cLog);
+#ifndef _DEBUG
+	}
+#endif
 
-	FileLogger* fLog = new FileLogger("rcAddonHost.log");
+	FileLogger* fLog = new FileLogger("ggAddonHost.log");
 	fLog->SetLogLevel(ELogLevel::INFO);
 	Logger->Register(fLog);
 }
@@ -106,21 +113,23 @@ void InitializeImGui()
 void InitializeState()
 {
 	CommandLine = GetCommandLineW();
-	Logger->LogInfo(CommandLine);
 
 	std::wstring cLine = CommandLine;
 	std::transform(cLine.begin(), cLine.end(), cLine.begin(), ::tolower);
 
 	State::IsDeveloperMode	= cLine.find(L"-ggdev",		0)	!= std::wstring::npos;
 	State::IsVanilla		= cLine.find(L"-ggvanilla", 0)	!= std::wstring::npos;
+	State::IsConsoleEnabled	= cLine.find(L"-ggconsole", 0)	!= std::wstring::npos;
 }
 void Initialize()
 {
+	InitializeState();
 	InitializePaths();
 	InitializeLogging();
-	InitializeState();
 
 	MH_Initialize();
+
+	Logger->LogInfo(CommandLine);
 
 	MumbleLink = Mumble::Create();
 	std::thread([]() { KeybindHandler::LoadKeybinds(); }).detach();

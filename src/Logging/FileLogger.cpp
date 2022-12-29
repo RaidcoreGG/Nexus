@@ -4,7 +4,7 @@
 
 FileLogger::FileLogger(const char* aPath)
 {
-    File.open(aPath, std::ios_base::app);
+    File.open(aPath);
 
     unsigned long long timestmap = time(0);
 
