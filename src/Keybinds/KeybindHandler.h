@@ -5,6 +5,10 @@
 #include <map>
 #include <vector>
 #include <mutex>
+#include <iostream>
+#include <fstream>
+
+#include "../nlohmann/json.hpp"
 
 struct Keybind
 {
@@ -32,6 +36,8 @@ namespace KeybindHandler
 	static std::mutex KeybindRegistryMutex;
 	static std::map<const wchar_t*, Keybind> KeybindRegistry;					/* Contains the active keybinds with their identifiers */
 	static std::map<const wchar_t*, KeybindHandlerSig> KeybindHandlerRegistry;	/* Contains the owners of the keybind identifiers and their handler functions */
+
+	static std::wfstream File;
 };
 
 #endif

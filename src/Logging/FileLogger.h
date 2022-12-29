@@ -15,7 +15,7 @@ class FileLogger : public virtual ILogger
         void LogMessage(LogEntry);
 
     private:
-        std::wofstream mFile;
+        std::wofstream File;
 };
 
 #endif

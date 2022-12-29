@@ -214,6 +214,9 @@
     <ClInclude Include="Shared.h">
       <Filter>Globals</Filter>
     </ClInclude>
+    <ClInclude Include="nlohmann\json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Raidcore-AddonHost.rc">

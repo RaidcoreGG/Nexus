@@ -62,6 +62,7 @@
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="Keybinds\KeybindHandler.h" />
+    <ClInclude Include="nlohmann\json.hpp" />
     <ClInclude Include="Paths.h" />
     <ClInclude Include="Loader\AddonDef.h" />
     <ClInclude Include="Loader\EUpdateProvider.h" />

@@ -4,7 +4,7 @@
 
 FileLogger::FileLogger(const char* aPath)
 {
-    mFile.open(aPath, std::ios_base::app);
+    File.open(aPath, std::ios_base::app);
 
     unsigned long long timestmap = time(0);
 
@@ -14,7 +14,7 @@ FileLogger::FileLogger(const char* aPath)
     std::wstringstream oss;
     oss << std::put_time(&timeinfo, L"%Y-%m-%d %H:%M:%S");
 
-    mFile << oss.str() << " : Log session start." << std::endl;
+    File << oss.str() << " : Log session start." << std::endl;
 }
 
 FileLogger::~FileLogger()
@@ -27,17 +27,17 @@ FileLogger::~FileLogger()
     std::wstringstream oss;
     oss << std::put_time(&timeinfo, L"%Y-%m-%d %H:%M:%S");
 
-    mFile << oss.str() << " : Log session end." << std::endl;
-    mFile << std::endl;
-    mFile.close();
+    File << oss.str() << " : Log session end." << std::endl;
+    File << std::endl;
+    File.close();
 }
 
 void FileLogger::LogMessage(LogEntry aLogEntry)
 {
     MessageMutex.lock();
 
-    mFile << aLogEntry.ToString();
-    mFile.flush();
+    File << aLogEntry.ToString();
+    File.flush();
 
     MessageMutex.unlock();
 }

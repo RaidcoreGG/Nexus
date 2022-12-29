@@ -44,6 +44,21 @@ void InitializePaths()
 	memcpy(Path::D_GW2, Path::F_HOST_DLL, MAX_PATH);
 	PathCchRemoveFileSpec(Path::D_GW2, MAX_PATH);
 
+	/* get addons path */
+	memcpy(Path::D_GW2_ADDONS, Path::D_GW2, MAX_PATH);
+	PathCchAppend(Path::D_GW2_ADDONS, MAX_PATH, L"addons");
+
+	/* get addons Raidcore path */
+	memcpy(Path::D_GW2_ADDONS_RAIDCORE, Path::D_GW2_ADDONS, MAX_PATH);
+	PathCchAppend(Path::D_GW2_ADDONS_RAIDCORE, MAX_PATH, L"Raidcore");
+
+	/* ensure Raidcore dir */
+	CreateDirectoryW(Path::D_GW2_ADDONS_RAIDCORE, nullptr);
+
+	/* get keybinds path */
+	memcpy(Path::F_KEYBINDS_JSON, Path::D_GW2_ADDONS_RAIDCORE, MAX_PATH);
+	PathCchAppend(Path::F_KEYBINDS_JSON, MAX_PATH, L"keybinds.json");
+
 	/* get temp dll path */
 	memcpy(Path::F_TEMP_DLL, Path::D_GW2, MAX_PATH);
 	PathCchAppend(Path::F_TEMP_DLL, MAX_PATH, L"d3d11.tmp");
@@ -96,21 +111,19 @@ void InitializeState()
 	std::wstring cLine = CommandLine;
 	std::transform(cLine.begin(), cLine.end(), cLine.begin(), ::tolower);
 
-	State::IsDeveloperMode	= cLine.find(L"-ggdev", 0)		!= std::wstring::npos;
+	State::IsDeveloperMode	= cLine.find(L"-ggdev",		0)	!= std::wstring::npos;
 	State::IsVanilla		= cLine.find(L"-ggvanilla", 0)	!= std::wstring::npos;
-
-	Logger->LogDebug("%d", State::IsDeveloperMode);
-	Logger->LogDebug("%d", State::IsVanilla);
 }
 void Initialize()
 {
 	InitializePaths();
 	InitializeLogging();
+	InitializeState();
 
 	MH_Initialize();
 
 	MumbleLink = Mumble::Create();
-	KeybindHandler::LoadKeybinds();
+	std::thread([]() { KeybindHandler::LoadKeybinds(); }).detach();
 }
 void ShutdownImGui()
 {
@@ -461,7 +474,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		hGW2 = GetModuleHandle(NULL);
 
 		Initialize();
-		InitializeState();
 
 		Logger->LogDebug(L"%s %s", L"[ATTACH]", Path::F_HOST_DLL);
 		Logger->LogInfo(L"Version: " __DATE__ " " __TIME__);
