@@ -10,7 +10,7 @@ void PathCopyAndAppend(wchar_t* aSource, wchar_t* aDestination, const wchar_t* a
 
 void PathSystemAppend(wchar_t* aDestination, const wchar_t* aAppend);
 
-void PathCopyAndRemoveFileSpec(wchar_t* aSource, wchar_t* aDestination);
+void PathGetDirectoryName(wchar_t* aSource, wchar_t* aDestination);
 
 bool FindFunction(HMODULE aModule, LPVOID aFunction, LPCSTR aName);
 

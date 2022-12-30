@@ -12,7 +12,7 @@ void PathSystemAppend(wchar_t* aDestination, const wchar_t* aAppend)
 	PathCchAppend(aDestination, MAX_PATH, aAppend);
 }
 
-void PathCopyAndRemoveFileSpec(wchar_t* aSource, wchar_t* aDestination)
+void PathGetDirectoryName(wchar_t* aSource, wchar_t* aDestination)
 {
 	memcpy(aDestination, aSource, MAX_PATH);
 	PathCchRemoveFileSpec(aDestination, MAX_PATH);

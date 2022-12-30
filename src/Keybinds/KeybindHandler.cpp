@@ -80,7 +80,7 @@ namespace KeybindHandler
 		std::thread([]()
 			{
 				int i = 0;
-				while (!State::IsAddonLibraryInitialized)
+				while (State::AddonHost < ggState::ADDONS_READY)
 				{
 					// check every 100ms, abort after 1 minute
 					if (i == 600)

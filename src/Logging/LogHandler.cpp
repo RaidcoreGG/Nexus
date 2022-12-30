@@ -4,6 +4,7 @@
 #include <thread>
 #include <cstdarg>
 #include <algorithm>
+#include <chrono>
 
 LogHandler* LogHandler::Instance = nullptr;
 
@@ -50,8 +51,6 @@ void LogHandler::LogDebug(      const char* aFmt, ...)       { va_list args; va_
 
 void LogHandler::LogMessage(ELogLevel aLogLevel, const wchar_t* aFmt, va_list aArgs)
 {
-    LoggersMutex.lock();
-
     LogEntry entry;
     entry.LogLevel = aLogLevel;
     entry.Timestamp = time(NULL);
@@ -68,11 +67,9 @@ void LogHandler::LogMessage(ELogLevel aLogLevel, const wchar_t* aFmt, va_list aA
         /* send logged message to logger if message log level is lower than logger level */
         if (entry.LogLevel <= level)
         {
-            std::thread([logger, entry]() { logger->LogMessage(entry); }).detach();
+            std::thread([logger, entry, this]() { LoggersMutex.lock(); logger->LogMessage(entry); LoggersMutex.unlock(); }).detach();
         }
     }
-
-    LoggersMutex.unlock();
 }
 
 void LogHandler::LogMessage(ELogLevel aLogLevel, const char* aFmt, va_list aArgs)

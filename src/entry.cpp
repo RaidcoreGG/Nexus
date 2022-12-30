@@ -24,7 +24,8 @@
 
 #include "Keybinds/KeybindHandler.h"
 
-#define IMPL_CHAINLOAD // arcdps workaround
+#define IMPL_CHAINLOAD			/* enable chainloading */
+//#define IMPL_ARBIRTARY_DELAY	/* wait for arcdps to do its things */
 
 /* handles */
 HWND	hGW2_HWND	= nullptr;
@@ -34,6 +35,17 @@ HMODULE	hD3D11		= nullptr;
 HMODULE	hSys11		= nullptr;
 
 /* init/shutdown */
+void InitializeState()
+{
+	CommandLine = GetCommandLineW();
+
+	std::wstring cLine = CommandLine;
+	std::transform(cLine.begin(), cLine.end(), cLine.begin(), ::tolower);
+
+	State::IsDeveloperMode = cLine.find(L"-ggdev", 0) != std::wstring::npos;
+	State::IsVanilla = cLine.find(L"-ggvanilla", 0) != std::wstring::npos;
+	State::IsConsoleEnabled = cLine.find(L"-ggconsole", 0) != std::wstring::npos;
+}
 void InitializePaths()
 {
 	GetModuleFileNameW(hAddonHost, Path::F_HOST_DLL, MAX_PATH);									/* get self dll path */
@@ -71,6 +83,50 @@ void InitializeLogging()
 #endif
 	Logger->Register(fLog);
 }
+void Initialize()
+{
+	State::AddonHost = ggState::LOAD;
+
+	InitializeState();
+	InitializePaths();
+	InitializeLogging();
+
+	MH_Initialize();
+
+	Logger->LogInfo(CommandLine);
+
+	MumbleLink = Mumble::Create();
+	std::thread([]() { KeybindHandler::LoadKeybinds(); }).detach();
+}
+
+void ShutdownImGui()
+{
+	if (State::IsImGuiInitialized)
+	{
+		State::IsImGuiInitialized = false;
+
+		ImGui_ImplDX11_Shutdown();
+		ImGui_ImplWin32_Shutdown();
+		ImGui::DestroyContext();
+		if (Renderer::RenderTargetView) { Renderer::RenderTargetView->Release(); Renderer::RenderTargetView = NULL; }
+	}
+}
+void Shutdown()
+{
+	if (State::AddonHost < ggState::SHUTDOWN)
+	{
+		State::AddonHost = ggState::SHUTDOWN;
+
+		ShutdownImGui();
+
+		Mumble::Destroy();
+
+		MH_Uninitialize();
+
+		if (hD3D11) { FreeLibrary(hD3D11); }
+	}
+}
+
 void InitializeImGui()
 {
 	// create imgui context
@@ -92,57 +148,6 @@ void InitializeImGui()
 	pBackBuffer->Release();
 
 	State::IsImGuiInitialized = true;
-}
-void InitializeState()
-{
-	CommandLine = GetCommandLineW();
-
-	std::wstring cLine = CommandLine;
-	std::transform(cLine.begin(), cLine.end(), cLine.begin(), ::tolower);
-
-	State::IsDeveloperMode	= cLine.find(L"-ggdev",		0)	!= std::wstring::npos;
-	State::IsVanilla		= cLine.find(L"-ggvanilla", 0)	!= std::wstring::npos;
-	State::IsConsoleEnabled	= cLine.find(L"-ggconsole", 0)	!= std::wstring::npos;
-}
-void Initialize()
-{
-	InitializeState();
-	InitializePaths();
-	InitializeLogging();
-
-	MH_Initialize();
-
-	Logger->LogInfo(CommandLine);
-
-	MumbleLink = Mumble::Create();
-	std::thread([]() { KeybindHandler::LoadKeybinds(); }).detach();
-}
-void ShutdownImGui()
-{
-	if (State::IsImGuiInitialized)
-	{
-		State::IsImGuiInitialized = false;
-
-		ImGui_ImplDX11_Shutdown();
-		ImGui_ImplWin32_Shutdown();
-		ImGui::DestroyContext();
-		if (Renderer::RenderTargetView) { Renderer::RenderTargetView->Release(); Renderer::RenderTargetView = NULL; }
-	}
-}
-void Shutdown()
-{
-	if (!State::IsShutdown)
-	{
-		State::IsShutdown = true;
-
-		ShutdownImGui();
-
-		Mumble::Destroy();
-
-		MH_Uninitialize();
-
-		if (hD3D11) { FreeLibrary(hD3D11); }
-	}
 }
 
 /* hk */
@@ -227,7 +232,7 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 		Hooks::GW2_WndProc = (WNDPROC)SetWindowLongPtr(hGW2_HWND, GWLP_WNDPROC, (LONG_PTR)hkWndProc);
 	}
 
-	if (State::IsImGuiInitializable && !State::IsImGuiInitialized)
+	if (State::AddonHost >= ggState::READY && !State::IsImGuiInitialized)
 	{
 		InitializeImGui();
 	}
@@ -268,9 +273,9 @@ HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, 
 /* dx */
 bool DxLoad()
 {
-	if (!State::IsDxLoaded)
+	if (State::Directx < DxState::DIRECTX_READY)
 	{
-		State::IsDxLoaded = true;
+		State::Directx = DxState::DIRECTX_LOAD;
 
 #ifdef IMPL_CHAINLOAD
 		/* attempt to chainload */
@@ -302,6 +307,8 @@ bool DxLoad()
 
 			Logger->LogInfo(L"Loaded System DLL: %s", Path::F_SYSTEM_DLL);
 		}
+
+		State::Directx = DxState::DIRECTX_READY;
 	}
 
 	return (hD3D11 != NULL);
@@ -314,7 +321,7 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 	Logger->Log(func_name);
 
 #ifdef IMPL_CHAINLOAD
-	if (State::IsDxCreated)
+	if (State::Directx >= DxState::DIRECTX_READY)
 	{
 		Logger->LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
 
@@ -326,8 +333,6 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 		}
 	}
 #endif
-
-	State::IsDxCreated = true;
 
 	if (DxLoad() == false) { return 0; }
 
@@ -348,7 +353,7 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 	Logger->Log(func_name);
 
 #ifdef IMPL_CHAINLOAD
-	if (State::IsDxCreated)
+	if (State::Directx >= DxState::DIRECTX_READY)
 	{
 		Logger->LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
 
@@ -360,8 +365,6 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 		}
 	}
 #endif
-
-	State::IsDxCreated = true;
 
 	if (DxLoad() == false) { return 0; }
 
@@ -373,54 +376,66 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 		}
 	}
 
-	WNDCLASSEXW wc;
-	memset(&wc, 0, sizeof(wc));
+	if (State::Directx < DxState::DIRECTX_HOOKED)
+	{
+		WNDCLASSEXW wc;
+		memset(&wc, 0, sizeof(wc));
 
-	wc.cbSize = sizeof(wc);
-	wc.lpfnWndProc = DefWindowProcW;
-	wc.hInstance = GetModuleHandleW(0);
-	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW);
-	wc.lpszClassName = L"TempDxWndClass";
-	RegisterClassExW(&wc);
+		wc.cbSize = sizeof(wc);
+		wc.lpfnWndProc = DefWindowProcW;
+		wc.hInstance = GetModuleHandleW(0);
+		wc.hbrBackground = (HBRUSH)(COLOR_WINDOW);
+		wc.lpszClassName = L"TempDxWndClass";
+		RegisterClassExW(&wc);
 
-	HWND wnd = CreateWindowExW(0, wc.lpszClassName, 0, WS_OVERLAPPEDWINDOW, 0, 0, 128, 128, 0, 0, wc.hInstance, 0);
-	if (wnd) {
-		DXGI_SWAP_CHAIN_DESC swap_desc = {};
-		swap_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		swap_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		swap_desc.BufferCount = 1;
-		swap_desc.SampleDesc.Count = 1;
-		swap_desc.OutputWindow = wnd;
-		swap_desc.Windowed = TRUE;
+		HWND wnd = CreateWindowExW(0, wc.lpszClassName, 0, WS_OVERLAPPEDWINDOW, 0, 0, 128, 128, 0, 0, wc.hInstance, 0);
+		if (wnd) {
+			DXGI_SWAP_CHAIN_DESC swap_desc = {};
+			swap_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			swap_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+			swap_desc.BufferCount = 1;
+			swap_desc.SampleDesc.Count = 1;
+			swap_desc.OutputWindow = wnd;
+			swap_desc.Windowed = TRUE;
 
-		ID3D11Device* device;
-		ID3D11DeviceContext* context;
-		IDXGISwapChain* swap;
+			ID3D11Device* device;
+			ID3D11DeviceContext* context;
+			IDXGISwapChain* swap;
 
-		if (SUCCEEDED(D3D11CreateDeviceAndSwapChain(0, D3D_DRIVER_TYPE_HARDWARE, 0, 0, 0, 0, D3D11_SDK_VERSION, &swap_desc, &swap, &device, 0, &context))) {
-			LPVOID* vtbl;
+			if (SUCCEEDED(D3D11CreateDeviceAndSwapChain(0, D3D_DRIVER_TYPE_HARDWARE, 0, 0, 0, 0, D3D11_SDK_VERSION, &swap_desc, &swap, &device, 0, &context))) {
+				LPVOID* vtbl;
 
-			vtbl = *(LPVOID**)swap;
-			//dxgi_release = hook_vtbl_fn(vtbl, 2, dxgi_release_hook);
-			//dxgi_present = hook_vtbl_fn(vtbl, 8, dxgi_present_hook);
-			//dxgi_resize_buffers = hook_vtbl_fn(vtbl, 13, dxgi_resize_buffers_hook);
+				vtbl = *(LPVOID**)swap;
+				//dxgi_release = hook_vtbl_fn(vtbl, 2, dxgi_release_hook);
+				//dxgi_present = hook_vtbl_fn(vtbl, 8, dxgi_present_hook);
+				//dxgi_resize_buffers = hook_vtbl_fn(vtbl, 13, dxgi_resize_buffers_hook);
 
-			MH_CreateHook(vtbl[8], (LPVOID)&hkDXGIPresent, (LPVOID*)&Hooks::DXGI_Present);
-			MH_CreateHook(vtbl[13], (LPVOID)&hkDXGIResizeBuffers, (LPVOID*)&Hooks::DXGI_ResizeBuffers);
-			MH_EnableHook(MH_ALL_HOOKS);
+				MH_CreateHook(vtbl[8], (LPVOID)&hkDXGIPresent, (LPVOID*)&Hooks::DXGI_Present);
+				MH_CreateHook(vtbl[13], (LPVOID)&hkDXGIResizeBuffers, (LPVOID*)&Hooks::DXGI_ResizeBuffers);
+				MH_EnableHook(MH_ALL_HOOKS);
 
-			context->Release();
-			device->Release();
-			swap->Release();
+				context->Release();
+				device->Release();
+				swap->Release();
+			}
+
+			DestroyWindow(wnd);
 		}
 
-		DestroyWindow(wnd);
+		UnregisterClassW(wc.lpszClassName, wc.hInstance);
+
+#ifdef IMPL_ARBIRTARY_DELAY
+		std::thread([]()
+			{
+				Sleep(10000);
+#endif
+				State::AddonHost = ggState::READY;
+#ifdef IMPL_ARBIRTARY_DELAY
+			}).detach();
+#endif
+
+		State::Directx = DxState::DIRECTX_HOOKED;
 	}
-
-	UnregisterClassW(wc.lpszClassName, wc.hInstance);
-
-	//std::thread([]() { Sleep(10000); State::IsImGuiInitializable = true; }).detach();
-	State::IsImGuiInitializable = true;
 
 	return func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
 }
@@ -431,7 +446,7 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 	Logger->Log(func_name);
 
 #ifdef IMPL_CHAINLOAD
-	if (State::IsDxCreated)
+	if (State::Directx >= DxState::DIRECTX_READY)
 	{
 		Logger->LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
 
@@ -443,8 +458,6 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 		}
 	}
 #endif
-
-	State::IsDxCreated = true;
 
 	if (DxLoad() == false) { return 0; }
 
