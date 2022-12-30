@@ -13,6 +13,7 @@ namespace Path
 	extern wchar_t F_CHAINLOAD_DLL			[];
 	extern wchar_t F_SYSTEM_DLL				[];
 
+	extern wchar_t F_LOG					[];
 	extern wchar_t F_KEYBINDS_JSON			[];
 }
 

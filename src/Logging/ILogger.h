@@ -13,9 +13,9 @@ class ILogger
         virtual ~ILogger() = default;
 
         ELogLevel GetLogLevel();
-        void SetLogLevel(ELogLevel);
+        void SetLogLevel(ELogLevel aLogLevel);
 
-        virtual void LogMessage(LogEntry) = 0;
+        virtual void LogMessage(LogEntry aLogEntry) = 0;
 
     protected:
         ELogLevel LogLevel;

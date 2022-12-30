@@ -36,19 +36,19 @@ void LogHandler::Unregister(ILogger* aLogger)
 }
 
 /* Logging functions */
-void LogHandler::Log(           const wchar_t* fmt, ...)    { va_list args; va_start(args, fmt); LogMessage(ELogLevel::TRACE,    fmt, args); va_end(args); }
-void LogHandler::LogCritical(   const wchar_t* fmt, ...)    { va_list args; va_start(args, fmt); LogMessage(ELogLevel::CRITICAL, fmt, args); va_end(args); }
-void LogHandler::LogWarning(    const wchar_t* fmt, ...)    { va_list args; va_start(args, fmt); LogMessage(ELogLevel::WARNING,  fmt, args); va_end(args); }
-void LogHandler::LogInfo(       const wchar_t* fmt, ...)    { va_list args; va_start(args, fmt); LogMessage(ELogLevel::INFO,     fmt, args); va_end(args); }
-void LogHandler::LogDebug(      const wchar_t* fmt, ...)    { va_list args; va_start(args, fmt); LogMessage(ELogLevel::DEBUG,    fmt, args); va_end(args); }
+void LogHandler::Log(           const wchar_t* aFmt, ...)    { va_list args; va_start(args, aFmt); LogMessage(ELogLevel::TRACE,    aFmt, args); va_end(args); }
+void LogHandler::LogCritical(   const wchar_t* aFmt, ...)    { va_list args; va_start(args, aFmt); LogMessage(ELogLevel::CRITICAL, aFmt, args); va_end(args); }
+void LogHandler::LogWarning(    const wchar_t* aFmt, ...)    { va_list args; va_start(args, aFmt); LogMessage(ELogLevel::WARNING,  aFmt, args); va_end(args); }
+void LogHandler::LogInfo(       const wchar_t* aFmt, ...)    { va_list args; va_start(args, aFmt); LogMessage(ELogLevel::INFO,     aFmt, args); va_end(args); }
+void LogHandler::LogDebug(      const wchar_t* aFmt, ...)    { va_list args; va_start(args, aFmt); LogMessage(ELogLevel::DEBUG,    aFmt, args); va_end(args); }
 
-void LogHandler::Log(           const char* fmt, ...)       { va_list args; va_start(args, fmt); LogMessage(ELogLevel::TRACE,    fmt, args); va_end(args); }
-void LogHandler::LogCritical(   const char* fmt, ...)       { va_list args; va_start(args, fmt); LogMessage(ELogLevel::CRITICAL, fmt, args); va_end(args); }
-void LogHandler::LogWarning(    const char* fmt, ...)       { va_list args; va_start(args, fmt); LogMessage(ELogLevel::WARNING,  fmt, args); va_end(args); }
-void LogHandler::LogInfo(       const char* fmt, ...)       { va_list args; va_start(args, fmt); LogMessage(ELogLevel::INFO,     fmt, args); va_end(args); }
-void LogHandler::LogDebug(      const char* fmt, ...)       { va_list args; va_start(args, fmt); LogMessage(ELogLevel::DEBUG,    fmt, args); va_end(args); }
+void LogHandler::Log(           const char* aFmt, ...)       { va_list args; va_start(args, aFmt); LogMessage(ELogLevel::TRACE,    aFmt, args); va_end(args); }
+void LogHandler::LogCritical(   const char* aFmt, ...)       { va_list args; va_start(args, aFmt); LogMessage(ELogLevel::CRITICAL, aFmt, args); va_end(args); }
+void LogHandler::LogWarning(    const char* aFmt, ...)       { va_list args; va_start(args, aFmt); LogMessage(ELogLevel::WARNING,  aFmt, args); va_end(args); }
+void LogHandler::LogInfo(       const char* aFmt, ...)       { va_list args; va_start(args, aFmt); LogMessage(ELogLevel::INFO,     aFmt, args); va_end(args); }
+void LogHandler::LogDebug(      const char* aFmt, ...)       { va_list args; va_start(args, aFmt); LogMessage(ELogLevel::DEBUG,    aFmt, args); va_end(args); }
 
-void LogHandler::LogMessage(ELogLevel aLogLevel, const wchar_t* fmt, va_list args)
+void LogHandler::LogMessage(ELogLevel aLogLevel, const wchar_t* aFmt, va_list aArgs)
 {
     LoggersMutex.lock();
 
@@ -57,7 +57,7 @@ void LogHandler::LogMessage(ELogLevel aLogLevel, const wchar_t* fmt, va_list arg
     entry.Timestamp = time(NULL);
 
     wchar_t buffer[400];
-    vswprintf_s(buffer, 400, fmt, args);
+    vswprintf_s(buffer, 400, aFmt, aArgs);
 
     entry.Message = buffer;
 
@@ -75,10 +75,10 @@ void LogHandler::LogMessage(ELogLevel aLogLevel, const wchar_t* fmt, va_list arg
     LoggersMutex.unlock();
 }
 
-void LogHandler::LogMessage(ELogLevel aLogLevel, const char* aMessage, va_list args)
+void LogHandler::LogMessage(ELogLevel aLogLevel, const char* aFmt, va_list aArgs)
 {
-    size_t sz = strlen(aMessage) + 1;
+    size_t sz = strlen(aFmt) + 1;
     wchar_t* wc = new wchar_t[sz];
-    mbstowcs_s(nullptr, wc, sz, aMessage, sz);
-    LogMessage(aLogLevel, wc, args);
+    mbstowcs_s(nullptr, wc, sz, aFmt, sz);
+    LogMessage(aLogLevel, wc, aArgs);
 }

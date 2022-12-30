@@ -13,5 +13,6 @@ namespace Path
 	wchar_t F_CHAINLOAD_DLL			[MAX_PATH]{};
 	wchar_t F_SYSTEM_DLL			[MAX_PATH]{};
 
+	wchar_t F_LOG					[MAX_PATH]{};
 	wchar_t F_KEYBINDS_JSON			[MAX_PATH]{};
 }

@@ -1,5 +1,4 @@
 #include <d3d11.h>
-#include <PathCch.h>
 #include <cassert>
 #include <thread>
 #include <algorithm>
@@ -37,39 +36,19 @@ HMODULE	hSys11		= nullptr;
 /* init/shutdown */
 void InitializePaths()
 {
-	/* get self dll path */
-	GetModuleFileNameW(hAddonHost, Path::F_HOST_DLL, MAX_PATH);
+	GetModuleFileNameW(hAddonHost, Path::F_HOST_DLL, MAX_PATH);									/* get self dll path */
 
-	/* get current directory */
-	memcpy(Path::D_GW2, Path::F_HOST_DLL, MAX_PATH);
-	PathCchRemoveFileSpec(Path::D_GW2, MAX_PATH);
+	PathCopyAndRemoveFileSpec(Path::F_HOST_DLL, Path::D_GW2);									/* get current directory */
+	PathCopyAndAppend(Path::D_GW2, Path::D_GW2_ADDONS, L"addons");								/* get addons path */
+	PathCopyAndAppend(Path::D_GW2_ADDONS, Path::D_GW2_ADDONS_RAIDCORE, L"Raidcore");			/* get addons Raidcore path */
+	CreateDirectoryW(Path::D_GW2_ADDONS_RAIDCORE, nullptr);										/* ensure Raidcore dir */
 
-	/* get addons path */
-	memcpy(Path::D_GW2_ADDONS, Path::D_GW2, MAX_PATH);
-	PathCchAppend(Path::D_GW2_ADDONS, MAX_PATH, L"addons");
-
-	/* get addons Raidcore path */
-	memcpy(Path::D_GW2_ADDONS_RAIDCORE, Path::D_GW2_ADDONS, MAX_PATH);
-	PathCchAppend(Path::D_GW2_ADDONS_RAIDCORE, MAX_PATH, L"Raidcore");
-
-	/* ensure Raidcore dir */
-	CreateDirectoryW(Path::D_GW2_ADDONS_RAIDCORE, nullptr);
-
-	/* get keybinds path */
-	memcpy(Path::F_KEYBINDS_JSON, Path::D_GW2_ADDONS_RAIDCORE, MAX_PATH);
-	PathCchAppend(Path::F_KEYBINDS_JSON, MAX_PATH, L"keybinds.json");
-
-	/* get temp dll path */
-	memcpy(Path::F_TEMP_DLL, Path::D_GW2, MAX_PATH);
-	PathCchAppend(Path::F_TEMP_DLL, MAX_PATH, L"d3d11.tmp");
-
-	/* get chainload dll path */
-	memcpy(Path::F_CHAINLOAD_DLL, Path::D_GW2, MAX_PATH);
-	PathCchAppend(Path::F_CHAINLOAD_DLL, MAX_PATH, L"d3d11_chainload.dll");
-
-	/* get system dll path */
-	GetSystemDirectoryW(Path::F_SYSTEM_DLL, MAX_PATH);
-	PathCchAppend(Path::F_SYSTEM_DLL, MAX_PATH, L"d3d11.dll");
+	PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_LOG, L"AddonHost.log");				/* get log path */
+	PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_KEYBINDS_JSON, L"keybinds.json");	/* get keybinds path */
+	
+	PathCopyAndAppend(Path::D_GW2, Path::F_TEMP_DLL, L"d3d11.tmp");								/* get temp dll path */
+	PathCopyAndAppend(Path::D_GW2, Path::F_CHAINLOAD_DLL, L"d3d11_chainload.dll");				/* get chainload dll path */
+	PathSystemAppend(Path::F_SYSTEM_DLL, L"d3d11.dll");											/* get system dll path */
 }
 void InitializeLogging()
 {
@@ -84,7 +63,7 @@ void InitializeLogging()
 	}
 #endif
 
-	FileLogger* fLog = new FileLogger("ggAddonHost.log");
+	FileLogger* fLog = new FileLogger(Path::F_LOG);
 	fLog->SetLogLevel(ELogLevel::INFO);
 	Logger->Register(fLog);
 }

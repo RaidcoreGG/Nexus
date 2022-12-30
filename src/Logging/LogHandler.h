@@ -7,8 +7,8 @@
 #include "ILogger.h"
 #include "LogEntry.h"
 
-typedef void (*LogASig)(const char*, ...);
-typedef void (*LogWSig)(const wchar_t*, ...);
+typedef void (*LogASig)(const char* aFmt, ...);
+typedef void (*LogWSig)(const wchar_t* aFmt, ...);
 
 class LogHandler
 {
@@ -17,27 +17,27 @@ class LogHandler
         LogHandler& operator=(const LogHandler&) = delete;  // assign operator
         static LogHandler* GetInstance();
 
-        void Register(ILogger*);
-        void Unregister(ILogger*);
+        void Register(ILogger* aLogger);
+        void Unregister(ILogger* aLogger);
 
         /* Logging functions */
-        void Log(           const wchar_t*, ...);
-        void LogCritical(   const wchar_t*, ...);
-        void LogWarning(    const wchar_t*, ...);
-        void LogInfo(       const wchar_t*, ...);
-        void LogDebug(      const wchar_t*, ...);
+        void Log(           const wchar_t* aFmt, ...);
+        void LogCritical(   const wchar_t* aFmt, ...);
+        void LogWarning(    const wchar_t* aFmt, ...);
+        void LogInfo(       const wchar_t* aFmt, ...);
+        void LogDebug(      const wchar_t* aFmt, ...);
 
-        void Log(           const char*, ...);
-        void LogCritical(   const char*, ...);
-        void LogWarning(    const char*, ...);
-        void LogInfo(       const char*, ...);
-        void LogDebug(      const char*, ...);
+        void Log(           const char* aFmt, ...);
+        void LogCritical(   const char* aFmt, ...);
+        void LogWarning(    const char* aFmt, ...);
+        void LogInfo(       const char* aFmt, ...);
+        void LogDebug(      const char* aFmt, ...);
 
     private:
         LogHandler() = default;
 
-        void LogMessage(ELogLevel, const wchar_t*, va_list);
-        void LogMessage(ELogLevel, const char*, va_list);
+        void LogMessage(ELogLevel aLogLevel, const wchar_t* aFmt, va_list aArgs);
+        void LogMessage(ELogLevel aLogLevel, const char* aFmt, va_list aArgs);
 
         static LogHandler* Instance;
 

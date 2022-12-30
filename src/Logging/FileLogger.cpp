@@ -2,7 +2,7 @@
 #include <sstream>
 #include <iomanip>
 
-FileLogger::FileLogger(const char* aPath)
+FileLogger::FileLogger(const wchar_t* aPath)
 {
     File.open(aPath);
 

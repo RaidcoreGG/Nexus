@@ -4,10 +4,16 @@
 #include <Windows.h>
 #include <codecvt>
 #include <locale>
+#include <PathCch.h>
 
-BOOL FindFunction(HMODULE, LPVOID, LPCSTR);
+void PathCopyAndAppend(wchar_t* aSource, wchar_t* aDestination, const wchar_t* aAppend);
 
-std::string WStrToStr(std::wstring& wide_string);
-std::wstring StrToWstr(std::string& string);
+void PathSystemAppend(wchar_t* aDestination, const wchar_t* aAppend);
+
+void PathCopyAndRemoveFileSpec(wchar_t* aSource, wchar_t* aDestination);
+
+bool FindFunction(HMODULE aModule, LPVOID aFunction, LPCSTR aName);
+
+std::string WStrToStr(std::wstring& aWstring);
 
 #endif
