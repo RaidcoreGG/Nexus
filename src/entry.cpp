@@ -38,7 +38,7 @@ void InitializePaths()
 {
 	GetModuleFileNameW(hAddonHost, Path::F_HOST_DLL, MAX_PATH);									/* get self dll path */
 
-	PathCopyAndRemoveFileSpec(Path::F_HOST_DLL, Path::D_GW2);									/* get current directory */
+	PathGetDirectoryName(Path::F_HOST_DLL, Path::D_GW2);										/* get current directory */
 	PathCopyAndAppend(Path::D_GW2, Path::D_GW2_ADDONS, L"addons");								/* get addons path */
 	PathCopyAndAppend(Path::D_GW2_ADDONS, Path::D_GW2_ADDONS_RAIDCORE, L"Raidcore");			/* get addons Raidcore path */
 	CreateDirectoryW(Path::D_GW2_ADDONS_RAIDCORE, nullptr);										/* ensure Raidcore dir */
@@ -67,7 +67,7 @@ void InitializeLogging()
 #ifdef _DEBUG
 	fLog->SetLogLevel(ELogLevel::ALL);
 #else
-	fLog->SetLogLevel(ELogLevel::INFO);
+	fLog->SetLogLevel(State::IsDeveloperMode ? ELogLevel::ALL : ELogLevel::INFO);
 #endif
 	Logger->Register(fLog);
 }
@@ -201,7 +201,7 @@ LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	// TODO: Consider subclassing instead of CallWindowProcA
 	// subclassing thingy: https://devblogs.microsoft.com/oldnewthing/?p=41883
 	// CallWindowProcA is necessary btw, else a memory access violation will occur if directly called
-	CallWindowProcA(Hooks::GW2_WndProc, hWnd, uMsg, wParam, lParam);
+	return CallWindowProcA(Hooks::GW2_WndProc, hWnd, uMsg, wParam, lParam);
 }
 HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
 {
