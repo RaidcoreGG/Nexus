@@ -64,7 +64,11 @@ void InitializeLogging()
 #endif
 
 	FileLogger* fLog = new FileLogger(Path::F_LOG);
+#ifdef _DEBUG
+	fLog->SetLogLevel(ELogLevel::ALL);
+#else
 	fLog->SetLogLevel(ELogLevel::INFO);
+#endif
 	Logger->Register(fLog);
 }
 void InitializeImGui()
@@ -194,7 +198,10 @@ LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		Logger->LogCritical(L"::Destroy()");
 	}
 
-	return Hooks::GW2_WndProc(hWnd, uMsg, wParam, lParam);
+	// TODO: Consider subclassing instead of CallWindowProcA
+	// subclassing thingy: https://devblogs.microsoft.com/oldnewthing/?p=41883
+	// CallWindowProcA is necessary btw, else a memory access violation will occur if directly called
+	CallWindowProcA(Hooks::GW2_WndProc, hWnd, uMsg, wParam, lParam);
 }
 HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
 {
@@ -259,7 +266,7 @@ HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, 
 }
 
 /* dx */
-BOOL DxLoad()
+bool DxLoad()
 {
 	if (!State::IsDxLoaded)
 	{
@@ -318,9 +325,9 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 			return 0;
 		}
 	}
+#endif
 
 	State::IsDxCreated = true;
-#endif
 
 	if (DxLoad() == false) { return 0; }
 
@@ -352,9 +359,9 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 			return 0;
 		}
 	}
+#endif
 
 	State::IsDxCreated = true;
-#endif
 
 	if (DxLoad() == false) { return 0; }
 
@@ -412,7 +419,7 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 
 	UnregisterClassW(wc.lpszClassName, wc.hInstance);
 
-	//std::thread([]() { Sleep(10000); g_IsImGuiInitializable = true; }).detach();
+	//std::thread([]() { Sleep(10000); State::IsImGuiInitializable = true; }).detach();
 	State::IsImGuiInitializable = true;
 
 	return func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
@@ -435,9 +442,9 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 			return 0;
 		}
 	}
+#endif
 
 	State::IsDxCreated = true;
-#endif
 
 	if (DxLoad() == false) { return 0; }
 
