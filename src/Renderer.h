@@ -11,6 +11,8 @@ namespace Renderer
 	extern IDXGISwapChain*			SwapChain;
 	extern ID3D11RenderTargetView*	RenderTargetView;
 
+	extern HWND						WindowHandle; /* GW2's window handle*/
+
 	extern unsigned int				Width;
 	extern unsigned int				Height;
 }

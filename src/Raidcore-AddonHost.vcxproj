@@ -22,7 +22,8 @@
     <ClCompile Include="core.cpp" />
     <ClCompile Include="entry.cpp" />
     <ClCompile Include="Events\EventHandler.cpp" />
-    <ClCompile Include="GUI\Menu.cpp" />
+    <ClCompile Include="GUI\About.cpp" />
+    <ClCompile Include="GUI\GUI.cpp" />
     <ClCompile Include="Hooks.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -54,6 +55,9 @@
   <ItemGroup>
     <ClInclude Include="core.h" />
     <ClInclude Include="Events\EventHandler.h" />
+    <ClInclude Include="GUI\About.h" />
+    <ClInclude Include="GUI\GUI.h" />
+    <ClInclude Include="GUI\IWindow.h" />
     <ClInclude Include="Hooks.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
@@ -67,7 +71,6 @@
     <ClInclude Include="Keybinds\Keybind.h" />
     <ClInclude Include="Keybinds\KeybindHandler.h" />
     <ClInclude Include="Localization\Localization.h" />
-    <ClInclude Include="GUI\Menu.h" />
     <ClInclude Include="nlohmann\json.hpp" />
     <ClInclude Include="Paths.h" />
     <ClInclude Include="Loader\AddonDef.h" />
@@ -103,27 +106,27 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">

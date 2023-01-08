@@ -42,8 +42,8 @@ namespace State
 
 	/* start parameters */
 	extern bool		IsDeveloperMode;		/* Is the AddonHost running in developer mode */
-	extern bool		IsVanilla;				/* Is the AddonHost running in vanilla mode and should not load any mods */
 	extern bool		IsConsoleEnabled;		/* Is the console window enabled */
+	extern bool		IsVanilla;				/* Is the AddonHost running in vanilla mode and should not load any mods */
 }
 
 #endif

@@ -13,10 +13,6 @@
 
 #include "minhook/mh_hook.h"
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_win32.h"
-#include "imgui/imgui_impl_dx11.h"
-
 #include "Logging/LogHandler.h"
 #include "Logging/ConsoleLogger.h"
 #include "Logging/FileLogger.h"
@@ -25,13 +21,12 @@
 
 #include "Keybinds/KeybindHandler.h"
 
-#include "GUI/Menu.h"
+#include "GUI/GUI.h"
 
 #define IMPL_CHAINLOAD			/* enable chainloading */
 //#define IMPL_ARBIRTARY_DELAY	/* wait for arcdps to do its things */
 
 /* handles */
-HWND	hGW2_HWND	= nullptr;
 HMODULE	hGW2		= nullptr;
 HMODULE	hAddonHost	= nullptr;
 HMODULE	hD3D11		= nullptr;
@@ -46,10 +41,14 @@ void InitializeState()
 	std::wstring cLine = CommandLine;
 	std::transform(cLine.begin(), cLine.end(), cLine.begin(), ::tolower);
 
+#ifdef _DEBUG
+	State::IsDeveloperMode = true;
+	State::IsConsoleEnabled = true;
+#else
 	State::IsDeveloperMode = cLine.find(L"-ggdev", 0) != std::wstring::npos;
-	State::IsVanilla = cLine.find(L"-ggvanilla", 0) != std::wstring::npos;
 	State::IsConsoleEnabled = cLine.find(L"-ggconsole", 0) != std::wstring::npos;
-
+#endif
+	State::IsVanilla = cLine.find(L"-ggvanilla", 0) != std::wstring::npos;
 	/* arg list */
 	int argc;
 	LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
@@ -65,39 +64,40 @@ void InitializeState()
 }
 void InitializePaths()
 {
-	GetModuleFileNameW(hAddonHost, Path::F_HOST_DLL, MAX_PATH);									/* get self dll path */
+	GetModuleFileNameW(hAddonHost, Path::F_HOST_DLL, MAX_PATH);											/* get self dll path */
 
-	PathGetDirectoryName(Path::F_HOST_DLL, Path::D_GW2);										/* get current directory */
-	PathCopyAndAppend(Path::D_GW2, Path::D_GW2_ADDONS, L"addons");								/* get addons path */
-	PathCopyAndAppend(Path::D_GW2_ADDONS, Path::D_GW2_ADDONS_RAIDCORE, L"Raidcore");			/* get addons Raidcore path */
-	CreateDirectoryW(Path::D_GW2_ADDONS_RAIDCORE, nullptr);										/* ensure Raidcore dir */
+	/* directories */
+	PathGetDirectoryName(Path::F_HOST_DLL, Path::D_GW2);												/* get current directory */
+	PathCopyAndAppend(Path::D_GW2, Path::D_GW2_ADDONS, L"addons");										/* get addons path */
+	PathCopyAndAppend(Path::D_GW2_ADDONS, Path::D_GW2_ADDONS_RAIDCORE, L"Raidcore");					/* get addons Raidcore path */
+	PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::D_GW2_ADDONS_RAIDCORE_FONTS, L"Fonts");		/* get addons Raidcore path */
+	PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::D_GW2_ADDONS_RAIDCORE_LOCALES, L"Locales");	/* get addons Raidcore path */
 
-	PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_LOG, L"AddonHost.log");				/* get log path */
-	PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_KEYBINDS_JSON, L"keybinds.json");	/* get keybinds path */
+	/* ensure folder tree*/
+	CreateDirectoryW(Path::D_GW2_ADDONS_RAIDCORE, nullptr);												/* ensure Raidcore dir */
+	CreateDirectoryW(Path::D_GW2_ADDONS_RAIDCORE_FONTS, nullptr);										/* ensure Raidcore/Fonts dir */
+	CreateDirectoryW(Path::D_GW2_ADDONS_RAIDCORE_LOCALES, nullptr);										/* ensure Raidcore/Locales dir */
+
+	/* ensure files */
+	PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_LOG, L"AddonHost.log");						/* get log path */
+	PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_KEYBINDS_JSON, L"keybinds.json");			/* get keybinds path */
 	
-	PathCopyAndAppend(Path::D_GW2, Path::F_TEMP_DLL, L"d3d11.tmp");								/* get temp dll path */
-	PathCopyAndAppend(Path::D_GW2, Path::F_CHAINLOAD_DLL, L"d3d11_chainload.dll");				/* get chainload dll path */
-	PathSystemAppend(Path::F_SYSTEM_DLL, L"d3d11.dll");											/* get system dll path */
+	/* static paths */
+	PathCopyAndAppend(Path::D_GW2, Path::F_TEMP_DLL, L"d3d11.tmp");										/* get temp dll path */
+	PathCopyAndAppend(Path::D_GW2, Path::F_CHAINLOAD_DLL, L"d3d11_chainload.dll");						/* get chainload dll path */
+	PathSystemAppend(Path::F_SYSTEM_DLL, L"d3d11.dll");													/* get system dll path */
 }
 void InitializeLogging()
 {
-#ifndef _DEBUG
 	if (State::IsConsoleEnabled)
 	{
-#endif
 		ConsoleLogger* cLog = new ConsoleLogger();
 		cLog->SetLogLevel(ELogLevel::ALL);
 		Logger->Register(cLog);
-#ifndef _DEBUG
 	}
-#endif
 
 	FileLogger* fLog = new FileLogger(Path::F_LOG);
-#ifdef _DEBUG
-	fLog->SetLogLevel(ELogLevel::ALL);
-#else
 	fLog->SetLogLevel(State::IsDeveloperMode ? ELogLevel::ALL : ELogLevel::INFO);
-#endif
 	Logger->Register(fLog);
 }
 void Initialize()
@@ -116,25 +116,13 @@ void Initialize()
 	std::thread([]() { KeybindHandler::LoadKeybinds(); }).detach();
 }
 
-void ShutdownImGui()
-{
-	if (State::IsImGuiInitialized)
-	{
-		State::IsImGuiInitialized = false;
-
-		ImGui_ImplDX11_Shutdown();
-		ImGui_ImplWin32_Shutdown();
-		ImGui::DestroyContext();
-		if (Renderer::RenderTargetView) { Renderer::RenderTargetView->Release(); Renderer::RenderTargetView = NULL; }
-	}
-}
 void Shutdown()
 {
 	if (State::AddonHost < ggState::SHUTDOWN)
 	{
 		State::AddonHost = ggState::SHUTDOWN;
 
-		ShutdownImGui();
+		GUI::Shutdown();
 
 		Mumble::Destroy();
 
@@ -142,53 +130,6 @@ void Shutdown()
 
 		if (hD3D11) { FreeLibrary(hD3D11); }
 	}
-}
-
-void InitializeImGui()
-{
-	// create imgui context
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-
-	// Load Fonts
-	// - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
-	// - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-	// - If the file cannot be loaded, the function will return NULL. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-	// - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-	// - Read 'docs/FONTS.md' for more instructions and details.
-	// - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-	//io.Fonts->AddFontDefault();
-	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
-	//ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
-	//IM_ASSERT(font != NULL);
-
-	//io.Fonts->AddFontDefault();
-	wchar_t font[MAX_PATH];
-	PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, font, L"raidcore_font.ttf");
-
-	std::wstring wstr = font;
-	std::string str = WStrToStr(wstr);
-	const char* cp = str.c_str();
-
-	io.Fonts->AddFontFromFileTTF(cp, 16.0f);
-	io.Fonts->Build();
-
-	// Init imgui
-	ImGui_ImplWin32_Init(hGW2_HWND);
-	ImGui_ImplDX11_Init(Renderer::Device, Renderer::DeviceContext);
-	ImGui::GetIO().ImeWindowHandle = hGW2_HWND;
-
-	// create buffers
-	ID3D11Texture2D* pBackBuffer;
-	Renderer::SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBackBuffer);
-	Renderer::Device->CreateRenderTargetView(pBackBuffer, NULL, &Renderer::RenderTargetView);
-	pBackBuffer->Release();
-
-	State::IsImGuiInitialized = true;
 }
 
 /* hk */
@@ -269,36 +210,11 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 		DXGI_SWAP_CHAIN_DESC swapChainDesc;
 		Renderer::SwapChain->GetDesc(&swapChainDesc);
 
-		hGW2_HWND = swapChainDesc.OutputWindow;
-		Hooks::GW2_WndProc = (WNDPROC)SetWindowLongPtr(hGW2_HWND, GWLP_WNDPROC, (LONG_PTR)hkWndProc);
+		Renderer::WindowHandle = swapChainDesc.OutputWindow;
+		Hooks::GW2_WndProc = (WNDPROC)SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)hkWndProc);
 	}
 
-	if (State::AddonHost >= ggState::READY && !State::IsImGuiInitialized)
-	{
-		InitializeImGui();
-	}
-
-	if (State::IsImGuiInitialized)
-	{
-		// imgui define new frame
-		ImGui_ImplWin32_NewFrame();
-		ImGui_ImplDX11_NewFrame();
-		ImGui::NewFrame();
-
-		// Draw ImGui here!
-		//ImGui::ShowDemoWindow();
-		GUI::Menu::Show();
-
-		// imgui end frame
-		ImGui::EndFrame();
-
-		// render
-		ImGui::Render();
-
-		// finish drawing
-		Renderer::DeviceContext->OMSetRenderTargets(1, &Renderer::RenderTargetView, NULL);
-		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-	}
+	GUI::Render();
 
 	return Hooks::DXGI_Present(pChain, SyncInterval, Flags);
 }
@@ -307,7 +223,7 @@ HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, 
 	static const char* func_name = "hkDXGIResizeBuffers";
 	Logger->Log(func_name);
 
-	ShutdownImGui();
+	GUI::Shutdown();
 
 	/* Cache window dimensions */
 	Renderer::Width = Width;
@@ -529,10 +445,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
 		Initialize();
 
-		Logger->LogInfo(Version);
+		Logger->LogInfo(L"Version: %s", Version);
 		break;
 	case DLL_PROCESS_DETACH:
-		//Logger->LogDebug(L"%s %s", L"[DETACH]", g_Path_HostDll);
 
 		Shutdown();
 

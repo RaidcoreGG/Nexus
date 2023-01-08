@@ -126,7 +126,10 @@
     <ClCompile Include="Keybinds\Keybind.cpp">
       <Filter>Keybinds</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Menu.cpp">
+    <ClCompile Include="GUI\GUI.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\About.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
   </ItemGroup>
@@ -235,11 +238,17 @@
     <ClInclude Include="Keybinds\Keybind.h">
       <Filter>Keybinds</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Menu.h">
+    <ClInclude Include="GUI\GUI.h">
       <Filter>GUI</Filter>
     </ClInclude>
     <ClInclude Include="imgui\imgui_extensions.h">
       <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\About.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\IWindow.h">
+      <Filter>GUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

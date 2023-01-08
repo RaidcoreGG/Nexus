@@ -18,7 +18,7 @@ typedef struct AddonDef
 {
     signed int      Signature;      /* Raidcore Addon ID, set to -1 if not on Raidcore */
     const wchar_t*  Name;           /* Name of the addon as shown in the library */
-    const wchar_t*  Build;          /* Leave as `L"" __DATE__ " " __TIME__` to maintain consistency */
+    const wchar_t*  Build;          /* Leave as `__DATE__ L" " __TIME__` to maintain consistency */
     LoadSig         Load;           /* Pointer to Load Function of the addon */
     UnloadSig       Unload;         /* Pointer to Unload Function of the addon */
     PresentSig      Present;        /* Present callback to render imgui */

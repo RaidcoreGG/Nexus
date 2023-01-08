@@ -8,6 +8,6 @@ namespace State
 	bool	IsImGuiInitialized			= false;
 
 	bool	IsDeveloperMode				= false;
-	bool	IsVanilla					= false;
 	bool	IsConsoleEnabled			= false;
+	bool	IsVanilla					= false;
 }
