@@ -10,6 +10,9 @@ namespace Renderer
 	extern ID3D11DeviceContext*		DeviceContext;
 	extern IDXGISwapChain*			SwapChain;
 	extern ID3D11RenderTargetView*	RenderTargetView;
+
+	extern unsigned int				Width;
+	extern unsigned int				Height;
 }
 
 #endif

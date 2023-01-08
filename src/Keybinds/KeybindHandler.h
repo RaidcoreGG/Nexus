@@ -1,24 +1,14 @@
 #ifndef KEYBINDHANDLER_H
 #define KEYBINDHANDLER_H
 
-#include <Windows.h>
 #include <map>
 #include <vector>
 #include <mutex>
 #include <iostream>
 #include <fstream>
 
+#include "Keybind.h"
 #include "../nlohmann/json.hpp"
-
-struct Keybind
-{
-	WORD Key;
-	bool Alt;
-	bool Ctrl;
-	bool Shift;
-};
-
-bool operator==(const Keybind& lhs, const Keybind& rhs);
 
 typedef void (*KeybindHandlerSig)(const wchar_t* aIdentifier);
 typedef void (*RegisterKeybindSig)(const wchar_t* aIdentifier, KeybindHandlerSig aKeybindHandler, Keybind aKeybind);

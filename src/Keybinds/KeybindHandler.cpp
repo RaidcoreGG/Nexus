@@ -9,14 +9,6 @@
 
 using json = nlohmann::json;
 
-bool operator==(const Keybind& lhs, const Keybind& rhs)
-{
-	return	lhs.Key		== rhs.Key &&
-			lhs.Alt		== rhs.Alt &&
-			lhs.Ctrl	== rhs.Ctrl &&
-			lhs.Shift	== rhs.Shift;
-}
-
 namespace KeybindHandler
 {
 	bool WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

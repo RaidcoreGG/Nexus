@@ -2,6 +2,7 @@
 #include <cassert>
 #include <thread>
 #include <algorithm>
+#include <shellapi.h>
 
 #include "core.h"
 #include "Paths.h"
@@ -24,6 +25,8 @@
 
 #include "Keybinds/KeybindHandler.h"
 
+#include "GUI/Menu.h"
+
 #define IMPL_CHAINLOAD			/* enable chainloading */
 //#define IMPL_ARBIRTARY_DELAY	/* wait for arcdps to do its things */
 
@@ -37,6 +40,7 @@ HMODULE	hSys11		= nullptr;
 /* init/shutdown */
 void InitializeState()
 {
+	/* arg parsing */
 	CommandLine = GetCommandLineW();
 
 	std::wstring cLine = CommandLine;
@@ -45,6 +49,19 @@ void InitializeState()
 	State::IsDeveloperMode = cLine.find(L"-ggdev", 0) != std::wstring::npos;
 	State::IsVanilla = cLine.find(L"-ggvanilla", 0) != std::wstring::npos;
 	State::IsConsoleEnabled = cLine.find(L"-ggconsole", 0) != std::wstring::npos;
+
+	/* arg list */
+	int argc;
+	LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+	std::wstring str;
+
+	for (int i = 1; i < argc; ++i)
+	{
+		str.append(argv[i]);
+		str.append(L" ");
+	}
+
+	memcpy(Parameters, str.c_str(), MAX_PATH);
 }
 void InitializePaths()
 {
@@ -133,7 +150,31 @@ void InitializeImGui()
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-	io.Fonts->AddFontDefault();
+
+	// Load Fonts
+	// - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
+	// - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
+	// - If the file cannot be loaded, the function will return NULL. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
+	// - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
+	// - Read 'docs/FONTS.md' for more instructions and details.
+	// - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
+	//io.Fonts->AddFontDefault();
+	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
+	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
+	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
+	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
+	//ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
+	//IM_ASSERT(font != NULL);
+
+	//io.Fonts->AddFontDefault();
+	wchar_t font[MAX_PATH];
+	PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, font, L"raidcore_font.ttf");
+
+	std::wstring wstr = font;
+	std::string str = WStrToStr(wstr);
+	const char* cp = str.c_str();
+
+	io.Fonts->AddFontFromFileTTF(cp, 16.0f);
 	io.Fonts->Build();
 
 	// Init imgui
@@ -245,7 +286,8 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 		ImGui::NewFrame();
 
 		// Draw ImGui here!
-		ImGui::ShowDemoWindow();
+		//ImGui::ShowDemoWindow();
+		GUI::Menu::Show();
 
 		// imgui end frame
 		ImGui::EndFrame();
@@ -267,6 +309,10 @@ HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, 
 
 	ShutdownImGui();
 
+	/* Cache window dimensions */
+	Renderer::Width = Width;
+	Renderer::Height = Height;
+	
 	return Hooks::DXGI_ResizeBuffers(pChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
 }
 
@@ -483,8 +529,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
 		Initialize();
 
-		Logger->LogDebug(L"%s %s", L"[ATTACH]", Path::F_HOST_DLL);
-		Logger->LogInfo(L"Version: " __DATE__ " " __TIME__);
+		Logger->LogInfo(Version);
 		break;
 	case DLL_PROCESS_DETACH:
 		//Logger->LogDebug(L"%s %s", L"[DETACH]", g_Path_HostDll);

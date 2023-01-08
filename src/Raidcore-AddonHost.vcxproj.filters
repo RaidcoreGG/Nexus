@@ -34,7 +34,13 @@
     <Filter Include="Keybinds">
       <UniqueIdentifier>{f0552fcd-0842-4914-bd35-54f18d11b0cd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Globals">
+    <Filter Include="Localization">
+      <UniqueIdentifier>{7943e0f9-3a02-4820-bc47-49d1198f39b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI">
+      <UniqueIdentifier>{8e3da8bf-b792-4844-a919-647f2d4786f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_GLOBAL">
       <UniqueIdentifier>{8e43094f-c05b-4eb0-9c90-afd74f653c5b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -103,19 +109,25 @@
       <Filter>Keybinds</Filter>
     </ClCompile>
     <ClCompile Include="Paths.cpp">
-      <Filter>Globals</Filter>
+      <Filter>_GLOBAL</Filter>
     </ClCompile>
     <ClCompile Include="State.cpp">
-      <Filter>Globals</Filter>
+      <Filter>_GLOBAL</Filter>
     </ClCompile>
     <ClCompile Include="Hooks.cpp">
-      <Filter>Globals</Filter>
+      <Filter>_GLOBAL</Filter>
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
-      <Filter>Globals</Filter>
+      <Filter>_GLOBAL</Filter>
     </ClCompile>
     <ClCompile Include="Shared.cpp">
-      <Filter>Globals</Filter>
+      <Filter>_GLOBAL</Filter>
+    </ClCompile>
+    <ClCompile Include="Keybinds\Keybind.cpp">
+      <Filter>Keybinds</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Menu.cpp">
+      <Filter>GUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -200,22 +212,34 @@
       <Filter>Keybinds</Filter>
     </ClInclude>
     <ClInclude Include="State.h">
-      <Filter>Globals</Filter>
+      <Filter>_GLOBAL</Filter>
     </ClInclude>
     <ClInclude Include="Paths.h">
-      <Filter>Globals</Filter>
+      <Filter>_GLOBAL</Filter>
     </ClInclude>
     <ClInclude Include="Hooks.h">
-      <Filter>Globals</Filter>
+      <Filter>_GLOBAL</Filter>
     </ClInclude>
     <ClInclude Include="Renderer.h">
-      <Filter>Globals</Filter>
+      <Filter>_GLOBAL</Filter>
     </ClInclude>
     <ClInclude Include="Shared.h">
-      <Filter>Globals</Filter>
+      <Filter>_GLOBAL</Filter>
     </ClInclude>
     <ClInclude Include="nlohmann\json.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Localization\Localization.h">
+      <Filter>Localization</Filter>
+    </ClInclude>
+    <ClInclude Include="Keybinds\Keybind.h">
+      <Filter>Keybinds</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Menu.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_extensions.h">
+      <Filter>imgui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
