@@ -22,8 +22,11 @@
     <ClCompile Include="core.cpp" />
     <ClCompile Include="entry.cpp" />
     <ClCompile Include="Events\EventHandler.cpp" />
-    <ClCompile Include="GUI\About.cpp" />
     <ClCompile Include="GUI\GUI.cpp" />
+    <ClCompile Include="GUI\Widgets\About\AboutBox.cpp" />
+    <ClCompile Include="GUI\Widgets\Addons\AddonsWindow.cpp" />
+    <ClCompile Include="GUI\Widgets\Log\LogWindow.cpp" />
+    <ClCompile Include="GUI\Widgets\Overlay\MumbleOverlay.cpp" />
     <ClCompile Include="Hooks.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -55,9 +58,12 @@
   <ItemGroup>
     <ClInclude Include="core.h" />
     <ClInclude Include="Events\EventHandler.h" />
-    <ClInclude Include="GUI\About.h" />
     <ClInclude Include="GUI\GUI.h" />
     <ClInclude Include="GUI\IWindow.h" />
+    <ClInclude Include="GUI\Widgets\About\AboutBox.h" />
+    <ClInclude Include="GUI\Widgets\Addons\AddonsWindow.h" />
+    <ClInclude Include="GUI\Widgets\Log\LogWindow.h" />
+    <ClInclude Include="GUI\Widgets\Overlay\MumbleOverlay.h" />
     <ClInclude Include="Hooks.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
@@ -71,6 +77,15 @@
     <ClInclude Include="Keybinds\Keybind.h" />
     <ClInclude Include="Keybinds\KeybindHandler.h" />
     <ClInclude Include="Localization\Localization.h" />
+    <ClInclude Include="Mumble\Compass.h" />
+    <ClInclude Include="Mumble\Context.h" />
+    <ClInclude Include="Mumble\EMapType.h" />
+    <ClInclude Include="Mumble\EMountIndex.h" />
+    <ClInclude Include="Mumble\EProfession.h" />
+    <ClInclude Include="Mumble\ERace.h" />
+    <ClInclude Include="Mumble\ESpecialization.h" />
+    <ClInclude Include="Mumble\EUIScale.h" />
+    <ClInclude Include="Mumble\LinkedMem.h" />
     <ClInclude Include="nlohmann\json.hpp" />
     <ClInclude Include="Paths.h" />
     <ClInclude Include="Loader\AddonDef.h" />
@@ -90,6 +105,7 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shared.h" />
     <ClInclude Include="State.h" />
+    <ClInclude Include="types.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Raidcore-AddonHost.rc" />

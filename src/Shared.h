@@ -18,12 +18,12 @@ struct Minhook
     MHDisableSig DisableHook;
 };
 
-extern const wchar_t*   Version;
-extern wchar_t*		    CommandLine;
-extern wchar_t          Parameters[];
+extern const wchar_t*       Version;
+extern wchar_t*		        CommandLine;
+extern wchar_t              Parameters[];
 
-extern LogHandler*	    Logger;
-extern LinkedMem*	    MumbleLink;
-extern Minhook          MinhookTable;
+extern LogHandler*	        Logger;
+extern Mumble::LinkedMem*	MumbleLink;
+extern Minhook              MinhookTable;
 
 #endif

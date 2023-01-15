@@ -9,21 +9,21 @@
 #include "../Paths.h"
 #include "../Shared.h"
 
+#include "../Keybinds/KeybindHandler.h"
+
 namespace GUI
 {
-	bool		MenuVisible = true;
+	bool		IsMenuVisible = true;
+	bool		IsSetup = false;
 
-	//Addons	AddonsWindow;
-	//Keybinds	KeybindsWindow;
-	//Log		LogWindow;
-	About		AboutWindow;
+	std::mutex WindowsMutex;
+	std::vector<IWindow*> Windows;
 
 	void Initialize()
 	{
 		// create imgui context
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
 		// Load Fonts
 		// - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
@@ -62,6 +62,8 @@ namespace GUI
 		Renderer::Device->CreateRenderTargetView(pBackBuffer, NULL, &Renderer::RenderTargetView);
 		pBackBuffer->Release();
 
+		if (!IsSetup) { InitialSetup(); }
+
 		State::IsImGuiInitialized = true;
 	}
 
@@ -75,6 +77,51 @@ namespace GUI
 			ImGui_ImplWin32_Shutdown();
 			ImGui::DestroyContext();
 			if (Renderer::RenderTargetView) { Renderer::RenderTargetView->Release(); Renderer::RenderTargetView = NULL; }
+		}
+	}
+
+	void InitialSetup()
+	{
+		LogWindow* logWnd = new LogWindow();
+
+		Logger->Register(logWnd);
+		logWnd->SetLogLevel(ELogLevel::ALL);
+
+		AddWindow(logWnd);
+		AddWindow(new AddonsWindow());
+		//AddWindow(new Keybinds());
+		AddWindow(new MumbleOverlay());
+		AddWindow(new AboutBox());
+
+		Keybind options{};
+		options.Ctrl = true;
+		options.Key = 79;
+		KeybindHandler::RegisterKeybind(L"RAIDCORE_OPTIONS", ProcessKeybind, options);
+
+		IsSetup = true;
+	}
+
+	void ProcessKeybind(const wchar_t* aIdentifier)
+	{
+		Logger->LogDebug(aIdentifier);
+		if (wcscmp(aIdentifier, L"RAIDCORE_OPTIONS") == 0)
+		{
+			IsMenuVisible = !IsMenuVisible;
+			return;
+		}
+	}
+
+	void SetScale(unsigned aScale)
+	{
+		if (State::IsImGuiInitialized)
+		{
+			switch (aScale)
+			{
+			case 0: Renderer::Scaling = 0.90f; break; // Small
+			case 1: Renderer::Scaling = 1.00f; break; // Normal
+			case 2: Renderer::Scaling = 1.10f; break; // Large
+			case 3: Renderer::Scaling = 1.20f; break; // Larger
+			}
 		}
 	}
 
@@ -92,13 +139,15 @@ namespace GUI
 			ImGui_ImplDX11_NewFrame();
 			ImGui::NewFrame();
 
-			/* draw */
-			/* TODO: CLEAN THIS UP SO IT'S NOT HARDCODED? */
-			ShowMenu();
-			//Addons.Show();
-			//Keybinds.Show();
-			//Log.Show();
-			AboutWindow.Show();
+			/* draw overlay */
+			RenderMenu();
+			WindowsMutex.lock();
+			for (IWindow* wnd : Windows)
+			{
+				wnd->Render();
+			}
+			WindowsMutex.unlock();
+
 			/* TODO: ADDONS->RENDER() */
 			/* TODO: RENDER UNDER UI */
 			/* TODO: RENDER OVER UI */
@@ -113,24 +162,38 @@ namespace GUI
 		}
 	}
 
-	void ShowMenu()
+	void RenderMenu()
 	{
-		if (ImGui::Begin("Raidcore", &MenuVisible, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize))
+		if (!IsMenuVisible) { return; }
+
+		if (ImGui::Begin("Menu", &IsMenuVisible, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize))
 		{
+			WindowsMutex.lock();
 
-			ImGui::Button("Addons", ImVec2(ImGui::GetFontSize() * 13.75f, ImGui::GetFontSize() * 1.25f));
-			ImGui::Button("Keybinds", ImVec2(ImGui::GetFontSize() * 13.75f, ImGui::GetFontSize() * 1.25f));
-			ImGui::Button("Layout", ImVec2(ImGui::GetFontSize() * 13.75f, ImGui::GetFontSize() * 1.25f));
-
-			ImGui::Separator();
-
-			ImGui::Button("Log", ImVec2(ImGui::GetFontSize() * 13.75f, ImGui::GetFontSize() * 1.25f));
-			ImGui::Button("Memory Editor", ImVec2(ImGui::GetFontSize() * 13.75f, ImGui::GetFontSize() * 1.25f));
+			for (IWindow* wnd : Windows) { wnd->MenuOption(L"Main"); }
+			ImGui::Button("Keybinds", ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
+			ImGui::Button("Layout", ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
+			ImGui::Button("Options", ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
 
 			ImGui::Separator();
 
-			if (ImGui::Button("About", ImVec2(ImGui::GetFontSize() * 13.75f, ImGui::GetFontSize() * 1.25f))) { AboutWindow.Visible = !AboutWindow.Visible; }
+			for (IWindow* wnd : Windows) { wnd->MenuOption(L"Debug"); }
+
+			ImGui::Separator();
+
+			for (IWindow* wnd : Windows) { wnd->MenuOption(L"Info"); }
+
+			WindowsMutex.unlock();
 		}
 		ImGui::End();
+	}
+
+	void AddWindow(IWindow* aWindowPtr)
+	{
+		WindowsMutex.lock();
+
+		Windows.push_back(aWindowPtr);
+
+		WindowsMutex.unlock();
 	}
 }

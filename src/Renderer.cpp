@@ -11,4 +11,5 @@ namespace Renderer
 
 	unsigned int			Width				= 0;
 	unsigned int			Height				= 0;
+	float					Scaling				= 0.0f;
 }

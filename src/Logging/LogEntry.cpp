@@ -3,6 +3,24 @@
 
 #include "LogEntry.h"
 
+std::wstring LogEntry::TimestampString(bool aIncludeDate)
+{
+    struct tm timeinfo;
+    localtime_s(&timeinfo, (time_t*)&Timestamp);
+
+    std::wstringstream oss;
+    if (aIncludeDate)
+    {
+        oss << std::put_time(&timeinfo, L"%Y-%m-%d %H:%M:%S");
+    }
+    else
+    {
+        oss << std::put_time(&timeinfo, L"%H:%M:%S");
+    }
+    std::wstring str = oss.str();
+    return str;
+}
+
 std::wstring LogEntry::ToString()
 {
     const wchar_t* level;
@@ -17,11 +35,8 @@ std::wstring LogEntry::ToString()
         default:                    level = L" [TRACE] ";        break;
     }
 
-    struct tm timeinfo;
-    localtime_s(&timeinfo, (time_t*)&Timestamp);
-
     std::wstringstream oss;
-    oss << std::put_time(&timeinfo, L"%Y-%m-%d %H:%M:%S");
+    oss << TimestampString();
     oss << std::setw(12) << level;
     std::wstring str = oss.str() + std::wstring{Message} + L"\n";
 

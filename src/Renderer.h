@@ -15,6 +15,7 @@ namespace Renderer
 
 	extern unsigned int				Width;
 	extern unsigned int				Height;
+	extern float					Scaling;
 }
 
 #endif

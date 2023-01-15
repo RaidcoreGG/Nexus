@@ -11,6 +11,7 @@ typedef struct LogEntry
     unsigned long long Timestamp;
     std::wstring Message;
 
+    std::wstring TimestampString(bool aIncludeDate = true);
     std::wstring ToString();
 } LogEntry_t;
 

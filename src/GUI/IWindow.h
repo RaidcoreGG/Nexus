@@ -6,12 +6,13 @@ namespace GUI
 	class IWindow
 	{
 	public:
-		static bool Visible;
+		bool Visible = false;
 
 		IWindow() = default;
 		~IWindow() = default;
 
-		virtual void Show() = 0;
+		virtual void Render() = 0;
+		virtual void MenuOption(const wchar_t* aCategory) = 0;
 	};
 }
 

@@ -4,23 +4,26 @@
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_extensions.h"
 
-//#include "Addons.h"
+#include "Widgets/Addons/AddonsWindow.h"
 //#include "Keybinds.h"
-//#include "Log.h"
-#include "About.h"
+#include "Widgets/Log/LogWindow.h"
+#include "Widgets/About/AboutBox.h"
+#include "Widgets/Overlay/MumbleOverlay.h"
 
 namespace GUI
 {
-	//extern Addons		AddonsWindow;
-	//extern Keybinds	KeybindsWindow;
-	//extern Log		LogWindow;
-	extern About		AboutWindow;
-
 	void Initialize();
 	void Shutdown();
 
+	void InitialSetup();
+
+	void ProcessKeybind(const wchar_t* aIdentifier);
+
+	void SetScale(unsigned aScale);
+
 	void Render();
-	void ShowMenu();
+	void RenderMenu();
+	void AddWindow(IWindow* aWindowPtr);
 }
 
 #endif

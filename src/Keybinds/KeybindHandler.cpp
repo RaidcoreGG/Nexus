@@ -11,6 +11,15 @@ using json = nlohmann::json;
 
 namespace KeybindHandler
 {
+	std::mutex KeybindRegistryMutex;
+	std::map<const wchar_t*, Keybind> KeybindRegistry;
+	std::map<const wchar_t*, KeybindHandlerSig> KeybindHandlerRegistry;
+
+	std::mutex HeldKeysMutex;
+	std::vector<WPARAM> HeldKeys;
+
+	std::wfstream File;
+
 	bool WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		Keybind kb{};
@@ -24,6 +33,17 @@ namespace KeybindHandler
 			if (wParam > 255) break;
 			kb.Key = wParam;
 			
+			HeldKeysMutex.lock();
+
+			if (std::find(HeldKeys.begin(), HeldKeys.end(), wParam) != HeldKeys.end())
+			{
+				HeldKeysMutex.unlock();
+				return false;
+			}
+			HeldKeys.push_back(wParam);
+
+			HeldKeysMutex.unlock();
+			
 			for (std::map<const wchar_t*, Keybind>::iterator it = KeybindRegistry.begin(); it != KeybindRegistry.end(); ++it)
 			{
 				Keybind stored = it->second;
@@ -34,6 +54,13 @@ namespace KeybindHandler
 					return true;
 				}
 			}
+		case WM_SYSKEYUP: case WM_KEYUP:
+			HeldKeysMutex.lock();
+
+			HeldKeys.erase(std::remove(HeldKeys.begin(), HeldKeys.end(), wParam), HeldKeys.end());
+
+			HeldKeysMutex.unlock();
+			break;
 		}
 
 		return false;
@@ -148,7 +175,7 @@ namespace KeybindHandler
 		KeybindHandlerRegistry[aIdentifier] = aKeybindHandler;
 
 		/* check if keybind already registered (disk/previous init) ? ignore, use saved one : attempt to register */
-		if (KeybindRegistry[aIdentifier].Key == 0)
+		if (KeybindRegistry.find(aIdentifier) != KeybindRegistry.end() && KeybindRegistry[aIdentifier].Key == 0)
 		{
 			/* check if another identifier, already uses the keybind */
 			for (std::map<const wchar_t*, Keybind>::iterator it = KeybindRegistry.begin(); it != KeybindRegistry.end(); ++it)
@@ -161,9 +188,9 @@ namespace KeybindHandler
 					return;
 				}
 			}
-
-			KeybindRegistry[aIdentifier] = aKeybind;
 		}
+
+		KeybindRegistry[aIdentifier] = aKeybind;
 
 		KeybindRegistryMutex.unlock();
 	}

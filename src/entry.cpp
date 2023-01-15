@@ -23,6 +23,10 @@
 
 #include "GUI/GUI.h"
 
+#include "nlohmann/json.hpp"
+
+using json = nlohmann::json;
+
 #define IMPL_CHAINLOAD			/* enable chainloading */
 //#define IMPL_ARBIRTARY_DELAY	/* wait for arcdps to do its things */
 
@@ -43,7 +47,6 @@ void InitializeState()
 
 #ifdef _DEBUG
 	State::IsDeveloperMode = true;
-	State::IsConsoleEnabled = true;
 #else
 	State::IsDeveloperMode = cLine.find(L"-ggdev", 0) != std::wstring::npos;
 	State::IsConsoleEnabled = cLine.find(L"-ggconsole", 0) != std::wstring::npos;
@@ -113,7 +116,7 @@ void Initialize()
 	Logger->LogInfo(CommandLine);
 
 	MumbleLink = Mumble::Create();
-	std::thread([]() { KeybindHandler::LoadKeybinds(); }).detach();
+	//std::thread([]() { KeybindHandler::LoadKeybinds(); }).detach();
 }
 
 void Shutdown()
@@ -133,7 +136,7 @@ void Shutdown()
 }
 
 /* hk */
-LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT __fastcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	// don't pass to game if keybind
 	if (KeybindHandler::WndProc(hWnd, uMsg, wParam, lParam)) { return 0; }
@@ -183,6 +186,7 @@ LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	if (uMsg == WM_DESTROY)
 	{
 		Logger->LogCritical(L"::Destroy()");
+		Shutdown();
 	}
 
 	// TODO: Consider subclassing instead of CallWindowProcA
@@ -448,8 +452,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		Logger->LogInfo(L"Version: %s", Version);
 		break;
 	case DLL_PROCESS_DETACH:
-
-		Shutdown();
 
 		break;
 	}

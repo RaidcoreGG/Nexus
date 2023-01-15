@@ -43,6 +43,21 @@
     <Filter Include="_GLOBAL">
       <UniqueIdentifier>{8e43094f-c05b-4eb0-9c90-afd74f653c5b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Widgets">
+      <UniqueIdentifier>{911cde00-7b9a-4d41-9272-bc884666c983}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Widgets\Log">
+      <UniqueIdentifier>{18181f26-b91b-4aa3-b369-8ad04300c752}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Widgets\Addons">
+      <UniqueIdentifier>{c991172a-2d10-4648-a529-d49c1325f759}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Widgets\About">
+      <UniqueIdentifier>{f4d01667-1986-4ab9-96e8-a783ecd77243}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Widgets\Overlay">
+      <UniqueIdentifier>{f86218d1-7120-4b72-9d7e-c97dbee918c7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="entry.cpp">
@@ -129,8 +144,17 @@
     <ClCompile Include="GUI\GUI.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\About.cpp">
-      <Filter>GUI</Filter>
+    <ClCompile Include="GUI\Widgets\About\AboutBox.cpp">
+      <Filter>GUI\Widgets\About</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Widgets\Addons\AddonsWindow.cpp">
+      <Filter>GUI\Widgets\Addons</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Widgets\Log\LogWindow.cpp">
+      <Filter>GUI\Widgets\Log</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Widgets\Overlay\MumbleOverlay.cpp">
+      <Filter>GUI\Widgets\Overlay</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -244,11 +268,50 @@
     <ClInclude Include="imgui\imgui_extensions.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\About.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
     <ClInclude Include="GUI\IWindow.h">
       <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Widgets\About\AboutBox.h">
+      <Filter>GUI\Widgets\About</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Widgets\Addons\AddonsWindow.h">
+      <Filter>GUI\Widgets\Addons</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Widgets\Log\LogWindow.h">
+      <Filter>GUI\Widgets\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Widgets\Overlay\MumbleOverlay.h">
+      <Filter>GUI\Widgets\Overlay</Filter>
+    </ClInclude>
+    <ClInclude Include="Mumble\EMapType.h">
+      <Filter>Mumble</Filter>
+    </ClInclude>
+    <ClInclude Include="Mumble\EMountIndex.h">
+      <Filter>Mumble</Filter>
+    </ClInclude>
+    <ClInclude Include="Mumble\EProfession.h">
+      <Filter>Mumble</Filter>
+    </ClInclude>
+    <ClInclude Include="Mumble\ESpecialization.h">
+      <Filter>Mumble</Filter>
+    </ClInclude>
+    <ClInclude Include="Mumble\ERace.h">
+      <Filter>Mumble</Filter>
+    </ClInclude>
+    <ClInclude Include="Mumble\EUIScale.h">
+      <Filter>Mumble</Filter>
+    </ClInclude>
+    <ClInclude Include="Mumble\Compass.h">
+      <Filter>Mumble</Filter>
+    </ClInclude>
+    <ClInclude Include="Mumble\Context.h">
+      <Filter>Mumble</Filter>
+    </ClInclude>
+    <ClInclude Include="Mumble\LinkedMem.h">
+      <Filter>Mumble</Filter>
+    </ClInclude>
+    <ClInclude Include="types.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

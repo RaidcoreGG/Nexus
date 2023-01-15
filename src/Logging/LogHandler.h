@@ -33,6 +33,8 @@ class LogHandler
         void LogInfo(       const char* aFmt, ...);
         void LogDebug(      const char* aFmt, ...);
 
+        std::vector<LogEntry> LogEntries;
+
     private:
         LogHandler() = default;
 
@@ -40,10 +42,7 @@ class LogHandler
         void LogMessage(ELogLevel aLogLevel, const char* aFmt, va_list aArgs);
 
         static LogHandler* Instance;
-
         std::vector<ILogger*> Loggers;
-        std::vector<LogEntry> LogEntries;
-
         std::mutex LoggersMutex;
 };
 

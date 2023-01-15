@@ -24,11 +24,11 @@ namespace KeybindHandler
 	void RegisterKeybind(const wchar_t* aIdentifier, KeybindHandlerSig aKeybindHandler, Keybind aKeybind);	/* Registers a kb with the given identifier, it will be passed to the given handler, if no bind was previously stored the given one will be used */
 	void InvokeKeybind(const wchar_t* aIdentifier);															/* Invokes the action on the corresponding keybind handler */
 	
-	static std::mutex KeybindRegistryMutex;
-	static std::map<const wchar_t*, Keybind> KeybindRegistry;												/* Contains the active keybinds with their identifiers */
-	static std::map<const wchar_t*, KeybindHandlerSig> KeybindHandlerRegistry;								/* Contains the owners of the keybind identifiers and their handler functions */
+	extern std::mutex KeybindRegistryMutex;
+	extern std::map<const wchar_t*, Keybind> KeybindRegistry;												/* Contains the active keybinds with their identifiers */
+	extern std::map<const wchar_t*, KeybindHandlerSig> KeybindHandlerRegistry;								/* Contains the owners of the keybind identifiers and their handler functions */
 
-	static std::wfstream File;
+	extern std::wfstream File;
 };
 
 #endif
