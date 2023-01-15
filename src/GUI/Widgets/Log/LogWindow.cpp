@@ -86,9 +86,9 @@ namespace GUI
         ImGui::End();
     }
 
-    void LogWindow::MenuOption(const wchar_t* aCategory)
+    void LogWindow::MenuOption(int aCategory)
     {
-        if (wcscmp(aCategory, L"Debug") == 0)
+        if (aCategory == 1)
         {
             ImGui::ToggleButton("Log", &Visible, ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
         }

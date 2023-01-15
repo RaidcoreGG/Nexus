@@ -1,11 +1,14 @@
 #include <thread>
 
 #include "EventHandler.h"
+#include "../Shared.h"
 
 namespace EventHandler
 {
 	void RaiseEvent(const wchar_t* aEventName, void* aEventData)
 	{
+		Logger->Log(aEventName);
+
 		EventRegistryMutex.lock();
 
 		for (ConsumeEventCallback callback : EventRegistry[aEventName])

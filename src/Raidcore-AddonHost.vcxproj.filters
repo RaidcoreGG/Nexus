@@ -156,6 +156,9 @@
     <ClCompile Include="GUI\Widgets\Overlay\MumbleOverlay.cpp">
       <Filter>GUI\Widgets\Overlay</Filter>
     </ClCompile>
+    <ClCompile Include="Mumble\Identity.cpp">
+      <Filter>Mumble</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def">
@@ -312,6 +315,9 @@
     </ClInclude>
     <ClInclude Include="types.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Mumble\Identity.h">
+      <Filter>Mumble</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

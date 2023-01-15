@@ -170,18 +170,18 @@ namespace GUI
 		{
 			WindowsMutex.lock();
 
-			for (IWindow* wnd : Windows) { wnd->MenuOption(L"Main"); }
+			for (IWindow* wnd : Windows) { wnd->MenuOption(0); }
 			ImGui::Button("Keybinds", ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
 			ImGui::Button("Layout", ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
 			ImGui::Button("Options", ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
 
 			ImGui::Separator();
 
-			for (IWindow* wnd : Windows) { wnd->MenuOption(L"Debug"); }
+			for (IWindow* wnd : Windows) { wnd->MenuOption(1); }
 
 			ImGui::Separator();
 
-			for (IWindow* wnd : Windows) { wnd->MenuOption(L"Info"); }
+			for (IWindow* wnd : Windows) { wnd->MenuOption(2); }
 
 			WindowsMutex.unlock();
 		}

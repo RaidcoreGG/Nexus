@@ -198,39 +198,37 @@ namespace GUI
 		ImGui::SetNextWindowSize(size);
 		if (ImGui::Begin("MumbleIdentity", &Visible, flags))
 		{
-			if (MumbleLink->Identity[0])
+			if (MumbleIdentity != nullptr)
 			{
-				json j = json::parse(MumbleLink->Identity);
-
 				if (ImGui::BeginTable("table_identity", 2))
 				{
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0); ImGui::Text("cmdr");
-					ImGui::TableSetColumnIndex(1); ImGui::Text("%s", j["commander"].get<bool>() ? "true" : "false");
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%s", MumbleIdentity->IsCommander ? "true" : "false");
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0); ImGui::Text("fov");
-					ImGui::TableSetColumnIndex(1); ImGui::Text("%1.4f", j["fov"].get<float>());
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%1.4f", MumbleIdentity->FOV);
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0); ImGui::Text("name");
-					ImGui::TableSetColumnIndex(1); ImGui::Text(j["name"].get<std::string>().c_str());
+					ImGui::TableSetColumnIndex(1); ImGui::Text(MumbleIdentity->Name.c_str());
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0); ImGui::Text("prof");
-					ImGui::TableSetColumnIndex(1); ImGui::Text("%d", j["profession"].get<unsigned>());
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%d", MumbleIdentity->Profession);
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0); ImGui::Text("race");
-					ImGui::TableSetColumnIndex(1); ImGui::Text("%d", j["race"].get<unsigned>());
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%d", MumbleIdentity->Race);
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0); ImGui::Text("spec");
-					ImGui::TableSetColumnIndex(1); ImGui::Text("%d", j["spec"].get<unsigned>());
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%d", MumbleIdentity->Specialization);
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0); ImGui::Text("team");
-					ImGui::TableSetColumnIndex(1); ImGui::Text("%u", j["team_color_id"].get<unsigned>());
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%u", MumbleIdentity->TeamColorID);
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0); ImGui::Text("uisz");
-					ImGui::TableSetColumnIndex(1); ImGui::Text("%d", j["uisz"].get<unsigned>());
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%d", MumbleIdentity->UISize);
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0); ImGui::Text("world");
-					ImGui::TableSetColumnIndex(1); ImGui::Text("%u", j["world_id"].get<unsigned>());
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%u", MumbleIdentity->WorldID);
 
 					ImGui::EndTable();
 				}
@@ -243,9 +241,9 @@ namespace GUI
 		ImGui::End();
 	}
 
-	void MumbleOverlay::MenuOption(const wchar_t* aCategory)
+	void MumbleOverlay::MenuOption(int aCategory)
 	{
-		if (wcscmp(aCategory, L"Debug") == 0)
+		if (aCategory == 1)
 		{
 			ImGui::ToggleButton("Mumble Data", &Visible, ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
 		}

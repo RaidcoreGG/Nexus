@@ -46,6 +46,7 @@
     <ClCompile Include="minhook\mh_disasm.cpp" />
     <ClCompile Include="minhook\mh_hook.cpp" />
     <ClCompile Include="minhook\mh_trampoline.cpp" />
+    <ClCompile Include="Mumble\Identity.cpp" />
     <ClCompile Include="Mumble\Mumble.cpp" />
     <ClCompile Include="Paths.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -85,6 +86,7 @@
     <ClInclude Include="Mumble\ERace.h" />
     <ClInclude Include="Mumble\ESpecialization.h" />
     <ClInclude Include="Mumble\EUIScale.h" />
+    <ClInclude Include="Mumble\Identity.h" />
     <ClInclude Include="Mumble\LinkedMem.h" />
     <ClInclude Include="nlohmann\json.hpp" />
     <ClInclude Include="Paths.h" />

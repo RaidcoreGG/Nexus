@@ -4,6 +4,9 @@
 #include <algorithm>
 #include <shellapi.h>
 
+#include "nlohmann/json.hpp"
+#include "minhook/mh_hook.h"
+
 #include "core.h"
 #include "Paths.h"
 #include "State.h"
@@ -11,24 +14,22 @@
 #include "Renderer.h"
 #include "Shared.h"
 
-#include "minhook/mh_hook.h"
-
 #include "Logging/LogHandler.h"
 #include "Logging/ConsoleLogger.h"
 #include "Logging/FileLogger.h"
 
 #include "Mumble/Mumble.h"
-
 #include "Keybinds/KeybindHandler.h"
-
+#include "Events/EventHandler.h"
 #include "GUI/GUI.h"
-
-#include "nlohmann/json.hpp"
 
 using json = nlohmann::json;
 
 #define IMPL_CHAINLOAD			/* enable chainloading */
 //#define IMPL_ARBIRTARY_DELAY	/* wait for arcdps to do its things */
+
+#define UPDATE_INTERVAL	30;
+unsigned Frames = 30;
 
 /* handles */
 HMODULE	hGW2		= nullptr;
@@ -149,7 +150,7 @@ LRESULT __fastcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			switch (uMsg)
 			{
-			case WM_LBUTTONDOWN:	io.MouseDown[0] = true;															return 0;
+			case WM_LBUTTONDOWN:	if (!GetAsyncKeyState(VK_RBUTTON)) { io.MouseDown[0] = true; }					return 0;
 			case WM_RBUTTONDOWN:	io.MouseDown[1] = true;															return 0;
 
 			case WM_LBUTTONUP:		io.MouseDown[0] = false;														break;
@@ -196,6 +197,37 @@ LRESULT __fastcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
 {
+	if (MumbleLink != nullptr)
+	{
+		if (MumbleLink->Identity[0] && Frames == 30)
+		{
+			Identity prev;
+
+			if (MumbleIdentity == nullptr) { prev = Identity{}; MumbleIdentity = new Identity{}; }
+			else { prev = *MumbleIdentity; }
+
+			json j = json::parse(MumbleLink->Identity);
+
+			MumbleIdentity->Name			= j["name"].get<std::string>();
+			MumbleIdentity->Profession		= j["profession"].get<unsigned>();
+			MumbleIdentity->Specialization	= j["spec"].get<unsigned>();
+			MumbleIdentity->Race			= j["race"].get<unsigned>();
+			MumbleIdentity->MapID			= j["map_id"].get<unsigned>();
+			MumbleIdentity->WorldID			= j["world_id"].get<unsigned>();
+			MumbleIdentity->TeamColorID		= j["team_color_id"].get<unsigned>();
+			MumbleIdentity->IsCommander		= j["commander"].get<bool>();
+			MumbleIdentity->FOV				= j["fov"].get<float>();
+			MumbleIdentity->UISize			= j["uisz"].get<unsigned>();
+			
+			if (*MumbleIdentity != prev)
+			{
+				EventHandler::RaiseEvent(L"MUMBLE_IDENTITY_UPDATE", MumbleIdentity);
+			}
+		}
+	}
+
+	if (Frames > 30) { Frames = 0; }
+
 	if (Renderer::SwapChain != pChain)
 	{
 		Renderer::SwapChain = pChain;
@@ -219,6 +251,8 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 	}
 
 	GUI::Render();
+
+	Frames++;
 
 	return Hooks::DXGI_Present(pChain, SyncInterval, Flags);
 }

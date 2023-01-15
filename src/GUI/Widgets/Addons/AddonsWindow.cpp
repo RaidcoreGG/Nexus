@@ -40,9 +40,9 @@ namespace GUI
 		ImGui::End();
 	}
 
-    void AddonsWindow::MenuOption(const wchar_t* aCategory)
+    void AddonsWindow::MenuOption(int aCategory)
     {
-        if (wcscmp(aCategory, L"Main") == 0)
+        if (aCategory == 0)
         {
             ImGui::ToggleButton("Addons", &Visible, ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
         }

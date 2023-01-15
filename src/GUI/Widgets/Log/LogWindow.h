@@ -15,7 +15,7 @@ namespace GUI
 	{
 	public:
 		void Render();
-		void MenuOption(const wchar_t* aCategory);
+		void MenuOption(int aCategory);
 		void LogMessage(LogEntry aLogEntry);
 	};
 }
