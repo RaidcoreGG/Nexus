@@ -92,7 +92,7 @@ namespace GUI
 				switch (uMsg)
 				{
 				case WM_LBUTTONDBLCLK:
-				case WM_LBUTTONDOWN:	if (!GetAsyncKeyState(VK_RBUTTON)) { io.MouseDown[0] = true; }					return true;
+				case WM_LBUTTONDOWN:	if (!GetAsyncKeyState(VK_RBUTTON)) { io.MouseDown[0] = true; return true; }		break;
 				case WM_RBUTTONDBLCLK:
 				case WM_RBUTTONDOWN:	io.MouseDown[1] = true;															return true;
 

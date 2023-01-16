@@ -1,5 +1,6 @@
 #include "Loader.h"
 
+#include "../State.h"
 #include "../Shared.h"
 #include "../Paths.h"
 
@@ -12,12 +13,14 @@ namespace Loader
 {
 	void Initialize()
 	{
-
+        State::AddonHost = ggState::ADDONS_LOAD;
+        State::AddonHost = ggState::ADDONS_READY;
 	}
 
 	void Update()
 	{
-        std::vector<std::filesystem::path> dirDLLs = {};
+        static std::vector<std::filesystem::path> prevDirDLLs;
+        std::vector<std::filesystem::path> dirDLLs;
 
         for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Path::D_GW2_ADDONS))
         {
@@ -44,7 +47,18 @@ namespace Loader
         }
 
         AddonsMutex.lock();
-        for (std::map<std::filesystem::path, int>::reverse_iterator it = AddonDefs.rbegin(); it != AddonDefs.rend(); ++it)
+        if (dirDLLs != prevDirDLLs)
+        {
+            for (std::filesystem::path dllPath : prevDirDLLs)
+            {
+                if (std::find(dirDLLs.begin(), dirDLLs.end(), dllPath) == dirDLLs.end())
+                {
+                    Logger->LogInfo("Unloaded addon: %s", dllPath.string().c_str());
+                    AddonDefs.erase(dllPath.string().c_str());
+                }
+            }
+        }
+        /*for (std::map<std::filesystem::path, int>::reverse_iterator it = AddonDefs.rbegin(); it != AddonDefs.rend(); ++it)
         {
             bool stillInDir = false;
             for (std::filesystem::path dllPath : dirDLLs)
@@ -61,7 +75,9 @@ namespace Loader
                 Logger->LogInfo("Unloaded addon: %s", it->first.string().c_str());
                 AddonDefs.erase(it->first);
             }
-        }
+        }*/
         AddonsMutex.unlock();
+
+        prevDirDLLs = dirDLLs;
 	}
 }
