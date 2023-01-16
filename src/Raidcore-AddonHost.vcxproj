@@ -37,6 +37,7 @@
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="Keybinds\Keybind.cpp" />
     <ClCompile Include="Keybinds\KeybindHandler.cpp" />
+    <ClCompile Include="Loader\Loader.cpp" />
     <ClCompile Include="Logging\FileLogger.cpp" />
     <ClCompile Include="Logging\ILogger.cpp" />
     <ClCompile Include="Logging\LogEntry.cpp" />
@@ -77,6 +78,7 @@
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="Keybinds\Keybind.h" />
     <ClInclude Include="Keybinds\KeybindHandler.h" />
+    <ClInclude Include="Loader\Loader.h" />
     <ClInclude Include="Localization\Localization.h" />
     <ClInclude Include="Mumble\Compass.h" />
     <ClInclude Include="Mumble\Context.h" />
@@ -189,6 +191,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -209,6 +212,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -229,6 +233,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -249,6 +254,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

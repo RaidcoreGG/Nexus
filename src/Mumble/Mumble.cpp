@@ -1,26 +1,34 @@
 #include "Mumble.h"
+#include "../Shared.h"
+#include "../State.h"
+#include "../Renderer.h"
+#include "../Events/EventHandler.h"
+
+#include "../nlohmann/json.hpp"
+
+using json = nlohmann::json;
 
 namespace Mumble
 {
-	static HANDLE		Handle;
-	static LinkedMem*	Data;
+	static HANDLE Handle;
 
-	LinkedMem* Create()
+	LinkedMem* Create(const wchar_t* aMumbleName)
 	{
-		if (Handle && Data) { return Data; }
+		if (Handle && MumbleLink) { return MumbleLink; }
 
-		std::wstring mumble_name = GetMumbleName();
+		//std::wstring mumble_name = GetMumbleName();
 
-		Handle = OpenFileMappingW(FILE_MAP_ALL_ACCESS, FALSE, mumble_name.c_str());
+		//Handle = OpenFileMappingW(FILE_MAP_ALL_ACCESS, FALSE, mumble_name.c_str());
+		Handle = OpenFileMappingW(FILE_MAP_ALL_ACCESS, FALSE, aMumbleName);
 		if (Handle == 0)
 		{
-			Handle = CreateFileMappingW(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, sizeof(LinkedMem), mumble_name.c_str());
+			Handle = CreateFileMappingW(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, sizeof(LinkedMem), aMumbleName);
 		}
 
 		if (Handle)
 		{
-			Data = (LinkedMem*)MapViewOfFile(Handle, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(LinkedMem));
-			return Data;
+			MumbleLink = (LinkedMem*)MapViewOfFile(Handle, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(LinkedMem));
+			return MumbleLink;
 		}
 
 		return nullptr;
@@ -28,10 +36,10 @@ namespace Mumble
 
 	void Destroy()
 	{
-		if (Data)
+		if (MumbleLink)
 		{
-			UnmapViewOfFile((LPVOID)Data);
-			Data = nullptr;
+			UnmapViewOfFile((LPVOID)MumbleLink);
+			MumbleLink = nullptr;
 		}
 
 		if (Handle)
@@ -41,25 +49,46 @@ namespace Mumble
 		}
 	}
 
-	std::wstring GetMumbleName()
+	void UpdateIdentity()
 	{
-		static std::wstring const command = L"-mumble";
-		std::wstring commandLine = GetCommandLineW();
-
-		size_t index = commandLine.find(command, 0);
-
-		if (index != std::wstring::npos)
+		if (MumbleLink != nullptr)
 		{
-			if (index + command.length() < commandLine.length())
+			if (MumbleLink->Identity[0])
 			{
-				auto const start = index + command.length() + 1;
-				auto const end = commandLine.find(' ', start);
-				std::wstring mumble = commandLine.substr(start, (end != std::wstring::npos ? end : commandLine.length()) - start);
+				Identity prev;
 
-				return mumble;
+				if (MumbleIdentity == nullptr) { prev = Identity{}; MumbleIdentity = new Identity{}; }
+				else { prev = *MumbleIdentity; }
+
+				json j = json::parse(MumbleLink->Identity);
+
+				MumbleIdentity->Name = j["name"].get<std::string>();
+				MumbleIdentity->Profession = j["profession"].get<unsigned>();
+				MumbleIdentity->Specialization = j["spec"].get<unsigned>();
+				MumbleIdentity->Race = j["race"].get<unsigned>();
+				MumbleIdentity->MapID = j["map_id"].get<unsigned>();
+				MumbleIdentity->WorldID = j["world_id"].get<unsigned>();
+				MumbleIdentity->TeamColorID = j["team_color_id"].get<unsigned>();
+				MumbleIdentity->IsCommander = j["commander"].get<bool>();
+				MumbleIdentity->FOV = j["fov"].get<float>();
+				MumbleIdentity->UISize = j["uisz"].get<unsigned>();
+
+				if (State::IsImGuiInitialized)
+				{
+					switch (MumbleIdentity->UISize)
+					{
+					case 0: Renderer::Scaling = 0.90f; break; // Small
+					case 1: Renderer::Scaling = 1.00f; break; // Normal
+					case 2: Renderer::Scaling = 1.10f; break; // Large
+					case 3: Renderer::Scaling = 1.20f; break; // Larger
+					}
+				}
+
+				if (*MumbleIdentity != prev)
+				{
+					EventHandler::RaiseEvent(L"MUMBLE_IDENTITY_UPDATE", MumbleIdentity);
+				}
 			}
 		}
-
-		return L"MumbleLink";
 	}
 }

@@ -1,6 +1,9 @@
 #ifndef SHARED_H
 #define SHARED_H
 
+#include <vector>
+#include <string>
+
 #include "Logging/LogHandler.h"
 #include "Mumble/Mumble.h"
 #include "Mumble/Identity.h"
@@ -21,13 +24,12 @@ struct Minhook
     MHDisableSig    DisableHook;
 };
 
-extern const wchar_t*   Version;
-extern wchar_t*         CommandLine;
-extern wchar_t          Parameters[];
+extern const wchar_t*               Version;
+extern std::vector<std::wstring>    Parameters;
 
-extern LogHandler*	    Logger;
-extern LinkedMem*       MumbleLink;
-extern Identity*        MumbleIdentity;
-extern Minhook          MinhookTable;
+extern LogHandler*	                Logger;
+extern LinkedMem*                   MumbleLink;
+extern Identity*                    MumbleIdentity;
+extern Minhook                      MinhookTable;
 
 #endif

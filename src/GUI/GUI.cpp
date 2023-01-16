@@ -13,6 +13,8 @@
 
 namespace GUI
 {
+	void SetupWindowsAndKeybinds(); // forward declare
+
 	bool		IsMenuVisible = true;
 	bool		IsSetup = false;
 
@@ -62,7 +64,7 @@ namespace GUI
 		Renderer::Device->CreateRenderTargetView(pBackBuffer, NULL, &Renderer::RenderTargetView);
 		pBackBuffer->Release();
 
-		if (!IsSetup) { InitialSetup(); }
+		if (!IsSetup) { SetupWindowsAndKeybinds(); }
 
 		State::IsImGuiInitialized = true;
 	}
@@ -80,7 +82,55 @@ namespace GUI
 		}
 	}
 
-	void InitialSetup()
+	bool WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		if (State::IsImGuiInitialized)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			if (io.WantCaptureMouse)
+			{
+				switch (uMsg)
+				{
+				case WM_LBUTTONDBLCLK:
+				case WM_LBUTTONDOWN:	if (!GetAsyncKeyState(VK_RBUTTON)) { io.MouseDown[0] = true; }					return true;
+				case WM_RBUTTONDBLCLK:
+				case WM_RBUTTONDOWN:	io.MouseDown[1] = true;															return true;
+
+				case WM_LBUTTONUP:		io.MouseDown[0] = false;														break;
+				case WM_RBUTTONUP:		io.MouseDown[1] = false;														break;
+
+				case WM_MOUSEWHEEL:		io.MouseWheel += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;	return true;
+				case WM_MOUSEHWHEEL:	io.MouseWheelH += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;	return true;
+				}
+			}
+
+			if (io.WantTextInput)
+			{
+				switch (uMsg)
+				{
+				case WM_KEYDOWN:
+				case WM_SYSKEYDOWN:
+					if (wParam < 256)
+						io.KeysDown[wParam] = 1;
+					return true;
+				case WM_KEYUP:
+				case WM_SYSKEYUP:
+					if (wParam < 256)
+						io.KeysDown[wParam] = 0;
+					return true;
+				case WM_CHAR:
+					// You can also use ToAscii()+GetKeyboardState() to retrieve characters.
+					if (wParam > 0 && wParam < 0x10000)
+						io.AddInputCharacterUTF16((unsigned short)wParam);
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	void SetupWindowsAndKeybinds()
 	{
 		LogWindow* logWnd = new LogWindow();
 
@@ -108,20 +158,6 @@ namespace GUI
 		{
 			IsMenuVisible = !IsMenuVisible;
 			return;
-		}
-	}
-
-	void SetScale(unsigned aScale)
-	{
-		if (State::IsImGuiInitialized)
-		{
-			switch (aScale)
-			{
-			case 0: Renderer::Scaling = 0.90f; break; // Small
-			case 1: Renderer::Scaling = 1.00f; break; // Normal
-			case 2: Renderer::Scaling = 1.10f; break; // Large
-			case 3: Renderer::Scaling = 1.20f; break; // Larger
-			}
 		}
 	}
 

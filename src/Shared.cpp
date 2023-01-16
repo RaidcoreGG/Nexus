@@ -1,10 +1,9 @@
 #include "Shared.h"
 
-const wchar_t*	Version			= __DATE__ L" " __TIME__;
-wchar_t*		CommandLine		= nullptr;
-wchar_t			Parameters		[MAX_PATH]{};
+const wchar_t*				Version			= __DATE__ L" " __TIME__;
+std::vector<std::wstring>	Parameters		= {};
 
-LogHandler*		Logger			= LogHandler::GetInstance();
-LinkedMem*		MumbleLink		= nullptr;
-Identity*		MumbleIdentity  = nullptr;
-Minhook			MinhookTable	= {};
+LogHandler*					Logger			= LogHandler::GetInstance();
+LinkedMem*					MumbleLink		= nullptr;
+Identity*					MumbleIdentity  = nullptr;
+Minhook						MinhookTable	= {};

@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <shellapi.h>
 
-#include "nlohmann/json.hpp"
 #include "minhook/mh_hook.h"
 
 #include "core.h"
@@ -22,11 +21,9 @@
 #include "Keybinds/KeybindHandler.h"
 #include "Events/EventHandler.h"
 #include "GUI/GUI.h"
-
-using json = nlohmann::json;
+#include "Loader/Loader.h"
 
 #define IMPL_CHAINLOAD			/* enable chainloading */
-//#define IMPL_ARBIRTARY_DELAY	/* wait for arcdps to do its things */
 
 #define UPDATE_INTERVAL	30;
 unsigned Frames = 30;
@@ -40,31 +37,51 @@ HMODULE	hSys11		= nullptr;
 /* init/shutdown */
 void InitializeState()
 {
-	/* arg parsing */
-	CommandLine = GetCommandLineW();
-
-	std::wstring cLine = CommandLine;
-	std::transform(cLine.begin(), cLine.end(), cLine.begin(), ::tolower);
-
-#ifdef _DEBUG
-	State::IsDeveloperMode = true;
-#else
-	State::IsDeveloperMode = cLine.find(L"-ggdev", 0) != std::wstring::npos;
-	State::IsConsoleEnabled = cLine.find(L"-ggconsole", 0) != std::wstring::npos;
-#endif
-	State::IsVanilla = cLine.find(L"-ggvanilla", 0) != std::wstring::npos;
 	/* arg list */
 	int argc;
 	LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-	std::wstring str;
+	
+	bool customMumble = false;
 
+	/* skip first, that's the file path */
 	for (int i = 1; i < argc; ++i)
 	{
-		str.append(argv[i]);
-		str.append(L" ");
-	}
+		std::wstring str;
+		std::wstring cmp = argv[i];
+		std::transform(cmp.begin(), cmp.end(), cmp.begin(), ::tolower);
 
-	memcpy(Parameters, str.c_str(), MAX_PATH);
+		/* peek at the next argument, if it starts with - */
+		if (i + 1 < argc && argv[i + 1][0] != L'-')
+		{
+			/* next argument belongs to this one */
+			if (wcscmp(cmp.c_str(), L"-mumble") == 0)
+			{
+				bool customMumble = true;
+				MumbleLink = Mumble::Create(argv[i + 1]);
+			}
+
+			str.append(argv[i]);
+			str.append(L" ");
+			str.append(argv[i + 1]);
+			i++;
+		}
+		else
+		{
+			/* single argument */
+			str.append(argv[i]);
+
+#ifdef _DEBUG
+			State::IsDeveloperMode = true;
+#else
+			State::IsDeveloperMode = wcscmp(cmp.c_str(), L"-ggdev") == 0;
+			State::IsConsoleEnabled = wcscmp(cmp.c_str(), L"-ggconsole") == 0;
+#endif
+			State::IsVanilla = wcscmp(cmp.c_str(), L"-ggvanilla") == 0;
+		}
+
+		Parameters.push_back(str);
+	}
+	if (!customMumble) { MumbleLink = Mumble::Create(L"MumbleLink"); }
 }
 void InitializePaths()
 {
@@ -114,9 +131,13 @@ void Initialize()
 
 	MH_Initialize();
 
-	Logger->LogInfo(CommandLine);
+	MinhookTable.CreateHook		= MH_CreateHook;
+	MinhookTable.RemoveHook		= MH_RemoveHook;
+	MinhookTable.EnableHook		= MH_EnableHook;
+	MinhookTable.DisableHook	= MH_DisableHook;
 
-	MumbleLink = Mumble::Create();
+	Logger->LogInfo(GetCommandLineW());
+
 	//std::thread([]() { KeybindHandler::LoadKeybinds(); }).detach();
 }
 
@@ -139,50 +160,16 @@ void Shutdown()
 /* hk */
 LRESULT __fastcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	//static const char* func_name = "hkWndProc";
+	//Logger->Log(func_name);
+
+	//if (uMsg == WM_PAINT && State::AddonHost <= ggState::ADDONS_LOAD) { Loader::Initialize(); }
+
 	// don't pass to game if keybind
 	if (KeybindHandler::WndProc(hWnd, uMsg, wParam, lParam)) { return 0; }
 
-	// don't pass to game if imgui
-	if (State::IsImGuiInitialized)
-	{
-		ImGuiIO& io = ImGui::GetIO();
-		if (io.WantCaptureMouse)
-		{
-			switch (uMsg)
-			{
-			case WM_LBUTTONDOWN:	if (!GetAsyncKeyState(VK_RBUTTON)) { io.MouseDown[0] = true; }					return 0;
-			case WM_RBUTTONDOWN:	io.MouseDown[1] = true;															return 0;
-
-			case WM_LBUTTONUP:		io.MouseDown[0] = false;														break;
-			case WM_RBUTTONUP:		io.MouseDown[1] = false;														break;
-
-			case WM_MOUSEWHEEL:		io.MouseWheel += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;	return 0;
-			case WM_MOUSEHWHEEL:	io.MouseWheelH += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;	return 0;
-			}
-		}
-
-		if (io.WantTextInput)
-		{
-			switch (uMsg)
-			{
-			case WM_KEYDOWN:
-			case WM_SYSKEYDOWN:
-				if (wParam < 256)
-					io.KeysDown[wParam] = 1;
-				return 0;
-			case WM_KEYUP:
-			case WM_SYSKEYUP:
-				if (wParam < 256)
-					io.KeysDown[wParam] = 0;
-				return 0;
-			case WM_CHAR:
-				// You can also use ToAscii()+GetKeyboardState() to retrieve characters.
-				if (wParam > 0 && wParam < 0x10000)
-					io.AddInputCharacterUTF16((unsigned short)wParam);
-				return 0;
-			}
-		}
-	}
+	// don't pass to game if gui
+	if (GUI::WndProc(hWnd, uMsg, wParam, lParam)) { return 0; }
 
 	if (uMsg == WM_DESTROY)
 	{
@@ -197,36 +184,11 @@ LRESULT __fastcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
 {
-	if (MumbleLink != nullptr)
-	{
-		if (MumbleLink->Identity[0] && Frames == 30)
-		{
-			Identity prev;
+	//static const char* func_name = "hkDXGIPresent";
+	//Logger->Log(func_name);
 
-			if (MumbleIdentity == nullptr) { prev = Identity{}; MumbleIdentity = new Identity{}; }
-			else { prev = *MumbleIdentity; }
-
-			json j = json::parse(MumbleLink->Identity);
-
-			MumbleIdentity->Name			= j["name"].get<std::string>();
-			MumbleIdentity->Profession		= j["profession"].get<unsigned>();
-			MumbleIdentity->Specialization	= j["spec"].get<unsigned>();
-			MumbleIdentity->Race			= j["race"].get<unsigned>();
-			MumbleIdentity->MapID			= j["map_id"].get<unsigned>();
-			MumbleIdentity->WorldID			= j["world_id"].get<unsigned>();
-			MumbleIdentity->TeamColorID		= j["team_color_id"].get<unsigned>();
-			MumbleIdentity->IsCommander		= j["commander"].get<bool>();
-			MumbleIdentity->FOV				= j["fov"].get<float>();
-			MumbleIdentity->UISize			= j["uisz"].get<unsigned>();
-			
-			if (*MumbleIdentity != prev)
-			{
-				EventHandler::RaiseEvent(L"MUMBLE_IDENTITY_UPDATE", MumbleIdentity);
-			}
-		}
-	}
-
-	if (Frames > 30) { Frames = 0; }
+	/* every 30 frames, update identity*/
+	if (Frames == 30) { Mumble::UpdateIdentity(); Loader::Update(); }
 
 	if (Renderer::SwapChain != pChain)
 	{
@@ -253,6 +215,9 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 	GUI::Render();
 
 	Frames++;
+
+	/* always reset frames back to 0 above 30*/
+	if (Frames > 30) { Frames = 0; }
 
 	return Hooks::DXGI_Present(pChain, SyncInterval, Flags);
 }
@@ -424,17 +389,8 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 
 		UnregisterClassW(wc.lpszClassName, wc.hInstance);
 
-#ifdef IMPL_ARBIRTARY_DELAY
-		std::thread([]()
-			{
-				Sleep(10000);
-#endif
-				State::AddonHost = ggState::READY;
-#ifdef IMPL_ARBIRTARY_DELAY
-			}).detach();
-#endif
-
-		State::Directx = DxState::DIRECTX_HOOKED;
+		State::AddonHost	= ggState::READY;
+		State::Directx		= DxState::DIRECTX_HOOKED;
 	}
 
 	return func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);

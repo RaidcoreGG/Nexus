@@ -21,6 +21,7 @@ namespace ImGui
         va_end(args);
     }
 
+    /* Limitations: DO NOT USE in combination with printf style formating, use only single wide char arguments. */
     static void TextWrappedW(const wchar_t* fmt, ...)
     {
         std::wstring fmtStrW = fmt;

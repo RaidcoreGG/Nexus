@@ -55,8 +55,8 @@ void LogHandler::LogMessage(ELogLevel aLogLevel, const wchar_t* aFmt, va_list aA
     entry.LogLevel = aLogLevel;
     entry.Timestamp = time(NULL);
 
-    wchar_t buffer[400];
-    vswprintf_s(buffer, 400, aFmt, aArgs);
+    wchar_t buffer[4096];
+    vswprintf_s(buffer, 4096, aFmt, aArgs);
 
     entry.Message = buffer;
 
@@ -82,8 +82,31 @@ void LogHandler::LogMessage(ELogLevel aLogLevel, const wchar_t* aFmt, va_list aA
 
 void LogHandler::LogMessage(ELogLevel aLogLevel, const char* aFmt, va_list aArgs)
 {
-    size_t sz = strlen(aFmt) + 1;
-    wchar_t* wc = new wchar_t[sz];
-    mbstowcs_s(nullptr, wc, sz, aFmt, sz);
-    LogMessage(aLogLevel, wc, aArgs);
+    LogEntry entry;
+    entry.LogLevel = aLogLevel;
+    entry.Timestamp = time(NULL);
+
+    char buffer[4096];
+    vsprintf_s(buffer, 4096, aFmt, aArgs);
+
+    entry.Message = std::wstring(&buffer[0], &buffer[strlen(buffer)]);
+
+    LoggersMutex.lock();
+    LogEntries.push_back(entry);
+
+    for (ILogger* logger : Loggers)
+    {
+        ELogLevel level = logger->GetLogLevel();
+
+        /* send logged message to logger if message log level is lower than logger level */
+        if (entry.LogLevel <= level)
+        {
+            std::thread([logger, entry, this]()
+                {
+                    logger->LogMessage(entry);
+                }
+            ).detach();
+        }
+    }
+    LoggersMutex.unlock();
 }

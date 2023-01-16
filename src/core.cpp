@@ -27,6 +27,9 @@ bool FindFunction(HMODULE aModule, LPVOID aFunction, LPCSTR aName)
 
 std::string WStrToStr(std::wstring& aWstring)
 {
-	static std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
-	return utf8_conv.to_bytes(aWstring);
+	std::string str;
+	int sz = WideCharToMultiByte(CP_ACP, 0, &aWstring[0], (int)aWstring.size(), 0, 0, 0, 0);
+	str = std::string(sz, 0);
+	WideCharToMultiByte(CP_ACP, 0, &aWstring[0], (int)aWstring.size(), &str[0], sz, 0, 0);
+	return str;
 }

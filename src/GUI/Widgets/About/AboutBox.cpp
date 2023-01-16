@@ -16,8 +16,15 @@ namespace GUI
 			ImGui::SameLine(); ImGui::TextDisabledW(L"[DEBUG BUILD]");
 #endif
 			ImGui::Text("Location:");	ImGui::Text(""); ImGui::SameLine(); ImGui::TextDisabledW(Path::F_HOST_DLL);
-			ImGui::Text("Parameters:"); ImGui::Text(""); ImGui::SameLine(); ImGui::TextDisabledW(Parameters);
-
+			if (ImGui::TreeNode("Parameters:"))
+			{
+				for (std::wstring param : Parameters)
+				{
+					ImGui::Text(""); ImGui::SameLine(); ImGui::TextDisabledW(param.c_str());
+				}
+				ImGui::TreePop();
+			}
+			
 			ImGui::Separator();
 
 			ImVec2 windowSize = ImGui::GetWindowSize();

@@ -15,11 +15,9 @@ namespace GUI
 	void Initialize();
 	void Shutdown();
 
-	void InitialSetup();
+	bool WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	void ProcessKeybind(const wchar_t* aIdentifier);
-
-	void SetScale(unsigned aScale);
 
 	void Render();
 	void RenderMenu();

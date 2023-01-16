@@ -159,6 +159,9 @@
     <ClCompile Include="Mumble\Identity.cpp">
       <Filter>Mumble</Filter>
     </ClCompile>
+    <ClCompile Include="Loader\Loader.cpp">
+      <Filter>Loader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def">
@@ -318,6 +321,9 @@
     </ClInclude>
     <ClInclude Include="Mumble\Identity.h">
       <Filter>Mumble</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\Loader.h">
+      <Filter>Loader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
