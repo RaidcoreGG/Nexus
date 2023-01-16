@@ -11,12 +11,12 @@ namespace GUI
 
 		if (ImGui::Begin("About", &Visible, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
 		{
-			ImGui::Text("Version:");	ImGui::Text(""); ImGui::SameLine(); ImGui::TextDisabledW(Version);
+			ImGui::TextDisabled("Version:");	ImGui::Text("     "); ImGui::SameLine(); ImGui::TextW(Version);
 #ifdef _DEBUG
 			ImGui::SameLine(); ImGui::TextDisabledW(L"[DEBUG BUILD]");
 #endif
-			ImGui::Text("Location:");	ImGui::Text(""); ImGui::SameLine(); ImGui::TextDisabledW(Path::F_HOST_DLL);
-			if (ImGui::TreeNode("Parameters:"))
+			ImGui::TextDisabled("Location:");
+			if (ImGui::TreeNodeW(Path::F_HOST_DLL))
 			{
 				for (std::wstring param : Parameters)
 				{

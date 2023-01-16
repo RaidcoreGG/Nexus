@@ -47,6 +47,15 @@ namespace ImGui
         va_end(args);
     }
 
+    static bool TreeNodeW(const wchar_t* label)
+    {
+        std::wstring fmtStrW = label;
+        std::string fmtStr = WStrToStr(fmtStrW);
+        const char* str = fmtStr.c_str();
+
+        return TreeNode(str);
+    }
+
     static void TextCenteredColumn(const char* fmt, ...)
     {
         va_list args;
