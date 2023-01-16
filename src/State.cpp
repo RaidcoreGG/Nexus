@@ -10,4 +10,5 @@ namespace State
 	bool	IsDeveloperMode				= false;
 	bool	IsConsoleEnabled			= false;
 	bool	IsVanilla					= false;
+	bool	IsMumbleDisabled			= false;
 }

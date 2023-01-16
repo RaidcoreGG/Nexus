@@ -14,6 +14,8 @@ namespace Mumble
 
 	LinkedMem* Create(const wchar_t* aMumbleName)
 	{
+		if (wcscmp(aMumbleName, L"0") == 0) { State::IsMumbleDisabled = true; return nullptr; }
+
 		if (Handle && MumbleLink) { return MumbleLink; }
 
 		//std::wstring mumble_name = GetMumbleName();
