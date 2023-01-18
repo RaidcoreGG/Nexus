@@ -10,16 +10,17 @@
 #include "../Shared.h"
 
 #include "../Keybinds/KeybindHandler.h"
+#include "../Loader/Loader.h"
 
 namespace GUI
 {
 	void SetupWindowsAndKeybinds(); // forward declare
 
-	bool		IsMenuVisible = true;
-	bool		IsSetup = false;
+	bool					IsMenuVisible = true;
+	bool					IsSetup = false;
 
-	std::mutex WindowsMutex;
-	std::vector<IWindow*> Windows;
+	std::mutex				WindowsMutex;
+	std::vector<IWindow*>	Windows;
 
 	void Initialize()
 	{
@@ -176,7 +177,10 @@ namespace GUI
 			ImGui::NewFrame();
 
 			/* draw overlay */
+			/* draw menu */
 			RenderMenu();
+
+			/* draw windows */
 			WindowsMutex.lock();
 			for (IWindow* wnd : Windows)
 			{
@@ -184,7 +188,14 @@ namespace GUI
 			}
 			WindowsMutex.unlock();
 
-			/* TODO: ADDONS->RENDER() */
+			/* draw addons*/
+			Loader::AddonsMutex.lock();
+			for (const auto& [path, addon] : Loader::AddonDefs)
+			{
+				if (addon.Render) { addon.Render(); }
+			}
+			Loader::AddonsMutex.unlock();
+
 			/* TODO: RENDER UNDER UI */
 			/* TODO: RENDER OVER UI */
 

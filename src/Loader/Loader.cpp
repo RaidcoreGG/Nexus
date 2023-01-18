@@ -11,6 +11,9 @@
 
 namespace Loader
 {
+    std::mutex AddonsMutex;
+    std::map<std::filesystem::path, AddonDef> AddonDefs;
+
 	void Initialize()
 	{
         State::AddonHost = ggState::ADDONS_LOAD;
@@ -38,7 +41,15 @@ namespace Loader
                     if (AddonDefs.find(fsPath) == AddonDefs.end())
                     {
                         Logger->LogInfo("Loaded addon: %s", path);
-                        AddonDefs[path] = 1;
+                        AddonDef addon = AddonDef{};
+                        addon.Author = L"[[AUTHOR]]";
+                        addon.Description = L"[[DESCRIPTION]]";
+                        addon.Name = L"[[NAME]]";
+                        addon.Signature = rand() % 0xFFFFFFFF;
+                        addon.Version = L"[[VERSION]]";
+                        AddonDefs.insert({ path, addon });
+
+                        Logger->LogDebug(L"%d", addon.Signature);
                     }
                     AddonsMutex.unlock();
                     dirDLLs.push_back(fsPath);
@@ -58,24 +69,6 @@ namespace Loader
                 }
             }
         }
-        /*for (std::map<std::filesystem::path, int>::reverse_iterator it = AddonDefs.rbegin(); it != AddonDefs.rend(); ++it)
-        {
-            bool stillInDir = false;
-            for (std::filesystem::path dllPath : dirDLLs)
-            {
-                if (it->first == dllPath)
-                {
-                    stillInDir = true;
-                    break;
-                }
-            }
-
-            if (!stillInDir)
-            {
-                Logger->LogInfo("Unloaded addon: %s", it->first.string().c_str());
-                AddonDefs.erase(it->first);
-            }
-        }*/
         AddonsMutex.unlock();
 
         prevDirDLLs = dirDLLs;

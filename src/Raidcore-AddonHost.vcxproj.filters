@@ -280,9 +280,6 @@
     <ClInclude Include="GUI\Widgets\About\AboutBox.h">
       <Filter>GUI\Widgets\About</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\Addons\AddonsWindow.h">
-      <Filter>GUI\Widgets\Addons</Filter>
-    </ClInclude>
     <ClInclude Include="GUI\Widgets\Log\LogWindow.h">
       <Filter>GUI\Widgets\Log</Filter>
     </ClInclude>
@@ -324,6 +321,12 @@
     </ClInclude>
     <ClInclude Include="Loader\Loader.h">
       <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Widgets\Addons\AddonsWindow.h">
+      <Filter>GUI\Widgets\Addons</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Widgets\Addons\AddonListing.h">
+      <Filter>GUI\Widgets\Addons</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

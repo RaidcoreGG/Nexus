@@ -1,8 +1,11 @@
 #include "AddonsWindow.h"
+#include "AddonListing.h"
 
 #include "../../../Shared.h"
 #include "../../../Paths.h"
 #include "../../../State.h"
+
+#include "../../../Loader/Loader.h"
 
 namespace GUI
 {
@@ -18,11 +21,31 @@ namespace GUI
                 ImGui::GetItemRectSize();
                 if (ImGui::BeginTabItem("Installed"))
                 {
-                    ImVec2 windowSize = ImGui::GetWindowSize();
-                    ImVec2 textSize = ImGui::CalcTextSize("No addons installed.");
-                    ImVec2 position = ImGui::GetCursorPos();
-                    ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-                    ImGui::TextDisabled("No addons installed.");
+                    {
+                        ImGui::BeginChild("##AddonTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+
+                        if (Loader::AddonDefs.size() == 0)
+                        {
+                            ImVec2 windowSize = ImGui::GetWindowSize();
+                            ImVec2 textSize = ImGui::CalcTextSize("No addons installed.");
+                            ImVec2 position = ImGui::GetCursorPos();
+                            ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
+                            ImGui::TextDisabled("No addons installed.");
+                        }
+                        else
+                        {
+                            Loader::AddonsMutex.lock();
+                            for (const auto& [path, addon] : Loader::AddonDefs)
+                            {
+                                GUI::AddonListing(addon);
+                            }
+                            Loader::AddonsMutex.unlock();
+                        }
+
+                        ImGui::EndChild();
+                    }
+                    
+
                     ImGui::EndTabItem();
                 }
                 if (ImGui::BeginTabItem("Library"))

@@ -9,18 +9,18 @@
 typedef struct HostAPI
 {
 	/* LoggingA */
-	LogASig LogTrace;
-	LogASig LogCritical;
-	LogASig LogWarning;
-	LogASig LogInfo;
-	LogASig LogDebug;
+	LogASig LogTraceA;
+	LogASig LogCriticalA;
+	LogASig LogWarningA;
+	LogASig LogInfoA;
+	LogASig LogDebugA;
 
 	/* LoggingW */
-	LogWSig LogTrace;
-	LogWSig LogCritical;
-	LogWSig LogWarning;
-	LogWSig LogInfo;
-	LogWSig LogDebug;
+	LogWSig LogTraceW;
+	LogWSig LogCriticalW;
+	LogWSig LogWarningW;
+	LogWSig LogInfoW;
+	LogWSig LogDebugW;
 
 	/* Events */
 	RaiseEventSig RaiseEvent;

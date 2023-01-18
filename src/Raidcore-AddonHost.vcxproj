@@ -63,6 +63,7 @@
     <ClInclude Include="GUI\GUI.h" />
     <ClInclude Include="GUI\IWindow.h" />
     <ClInclude Include="GUI\Widgets\About\AboutBox.h" />
+    <ClInclude Include="GUI\Widgets\Addons\AddonListing.h" />
     <ClInclude Include="GUI\Widgets\Addons\AddonsWindow.h" />
     <ClInclude Include="GUI\Widgets\Log\LogWindow.h" />
     <ClInclude Include="GUI\Widgets\Overlay\MumbleOverlay.h" />
