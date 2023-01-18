@@ -12,6 +12,10 @@ namespace Loader
 	extern std::map<std::filesystem::path, AddonDef> AddonDefs;
 
 	void Initialize();
+	void Shutdown();
+
+	void LoadAddon(const char* aPath);
+	void UnloadAddon(const char* aPath);
 
 	void Update();
 }

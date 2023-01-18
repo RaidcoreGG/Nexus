@@ -9,10 +9,10 @@
 
 namespace Mumble
 {
-	LinkedMem* Create(const wchar_t* aMumbleName);
-	void Destroy();
+	LinkedMem* Initialize(const wchar_t* aMumbleName);
+	void Shutdown();
 
-	void UpdateIdentity();
+	void Update();
 };
 
 #endif

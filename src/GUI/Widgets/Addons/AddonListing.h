@@ -12,41 +12,32 @@ namespace GUI
 	{
 		std::string sig = std::to_string(aAddonDef.Signature); // helper for unique chkbxIds
 		
-		int width = ImGui::CalcTextSize("Options").x * 1.5f;
-
+		if (ImGui::BeginTable(("component_addon_" + sig).c_str(), 2, ImGuiTableFlags_BordersOuter, ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
 		{
-			ImGui::BeginGroup();
-			
+			ImGui::TableNextRow();
+			ImGui::TableSetColumnIndex(0);
 			{
 				ImGui::BeginGroup();
-				
+
 				ImGui::TextW(aAddonDef.Name); ImGui::SameLine(); ImGui::Text("by"); ImGui::SameLine(); ImGui::TextW(aAddonDef.Author);
-				ImGui::TextW(aAddonDef.Description);
-				ImGui::TextW(aAddonDef.Version);
+				ImGui::TextWrappedW(aAddonDef.Description);
 
 				ImGui::EndGroup();
 			}
 
-			ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - (width + 4.0f));
-
+			ImGui::TableSetColumnIndex(1);
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetColumnWidth() - 120.0f);
 			{
 				ImGui::BeginGroup();
-				
-				ImVec2 pos = ImGui::GetCursorPos();
-				pos.y += 4.0f;
-				ImGui::SetCursorPos(pos);
-				if (ImGui::Button("Options", ImVec2(width, 0.0f))) { if (aAddonDef.Options) { aAddonDef.Options(); } }
-				pos = ImGui::GetCursorPos();
-				pos.y += 4.0f;
-				ImGui::SetCursorPos(pos);
-				if (ImGui::Button("Unload", ImVec2(width, 0.0f))) { if (aAddonDef.Unload) { aAddonDef.Unload(); } }
+
+				if (ImGui::Button("Options", ImVec2(120.0f, 24.0f))) { if (aAddonDef.Options) { aAddonDef.Options(); } }
+				if (ImGui::Button("Unload", ImVec2(120.0f, 24.0f))) { if (aAddonDef.Unload) { aAddonDef.Unload(); } }
+				ImGui::TextCenteredColumnW(aAddonDef.Version);
 
 				ImGui::EndGroup();
 			}
 
-			ImGui::Separator();
-
-			ImGui::EndGroup();
+			ImGui::EndTable();
 		}
 	}
 }

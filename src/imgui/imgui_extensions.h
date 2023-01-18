@@ -74,6 +74,14 @@ namespace ImGui
         const char* text_end = g.TempBuffer + ImFormatStringV(g.TempBuffer, IM_ARRAYSIZE(g.TempBuffer), fmt, args);
         TextEx(g.TempBuffer, text_end, ImGuiTextFlags_NoWidthForLargeClippedText);
     }
+    static void TextCenteredColumnW(const wchar_t* label)
+    {
+        std::wstring fmtStrW = label;
+        std::string fmtStr = WStrToStr(fmtStrW);
+        const char* str = fmtStr.c_str();
+
+        TextCenteredColumn(str);
+    }
 
     static bool CheckboxCenteredColumn(const char* label, bool* v)
     {

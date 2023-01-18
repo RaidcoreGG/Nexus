@@ -57,7 +57,7 @@ void InitializeState()
 			if (wcscmp(cmp.c_str(), L"-mumble") == 0)
 			{
 				bool customMumble = true;
-				MumbleLink = Mumble::Create(argv[i + 1]);
+				MumbleLink = Mumble::Initialize(argv[i + 1]);
 			}
 
 			str.append(argv[i]);
@@ -81,7 +81,7 @@ void InitializeState()
 
 		Parameters.push_back(str);
 	}
-	if (!customMumble) { MumbleLink = Mumble::Create(L"MumbleLink"); }
+	if (!customMumble) { MumbleLink = Mumble::Initialize(L"MumbleLink"); }
 }
 void InitializePaths()
 {
@@ -149,9 +149,11 @@ void Shutdown()
 
 		GUI::Shutdown();
 
-		Mumble::Destroy();
+		Mumble::Shutdown();
 
 		MH_Uninitialize();
+
+		Loader::Shutdown();
 
 		if (hD3D11) { FreeLibrary(hD3D11); }
 	}
@@ -179,7 +181,7 @@ LRESULT __fastcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	if (uMsg == WM_DESTROY)
 	{
 		Logger->LogCritical(L"::Destroy()");
-		Shutdown();
+		::Shutdown();
 	}
 
 	// TODO: Consider subclassing instead of CallWindowProcA
@@ -191,9 +193,6 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 {
 	//static const char* func_name = "hkDXGIPresent";
 	//Logger->Log(func_name);
-
-	/* every 30 frames, update identity*/
-	if (Frames == 30) { Mumble::UpdateIdentity(); Loader::Update(); }
 
 	if (Renderer::SwapChain != pChain)
 	{
