@@ -4,8 +4,8 @@
 #include <Windows.h>
 #include <d3d11.h>
 
-typedef HRESULT(__stdcall* DXPRESENT)		(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags);
-typedef HRESULT(__stdcall* DXRESIZEBUFFERS)	(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
+typedef HRESULT (__stdcall*DXPRESENT)		(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags);
+typedef HRESULT (__stdcall*DXRESIZEBUFFERS)	(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
 
 /* Namespace for hooked functions */
 namespace Hooks

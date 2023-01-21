@@ -164,7 +164,7 @@ namespace GUI
 
 	void Render()
 	{
-		if (State::AddonHost >= ggState::READY && !State::IsImGuiInitialized)
+		if (State::AddonHost >= ggState::UI_READY && !State::IsImGuiInitialized)
 		{
 			GUI::Initialize();
 		}
@@ -192,7 +192,7 @@ namespace GUI
 			Loader::AddonsMutex.lock();
 			for (const auto& [path, addon] : Loader::AddonDefs)
 			{
-				if (addon.Render) { addon.Render(); }
+				if (addon->Render) { addon->Render(); }
 			}
 			Loader::AddonsMutex.unlock();
 

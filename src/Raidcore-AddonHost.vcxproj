@@ -37,6 +37,7 @@
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="Keybinds\Keybind.cpp" />
     <ClCompile Include="Keybinds\KeybindHandler.cpp" />
+    <ClCompile Include="Loader\AddonDefinition.cpp" />
     <ClCompile Include="Loader\Loader.cpp" />
     <ClCompile Include="Logging\FileLogger.cpp" />
     <ClCompile Include="Logging\ILogger.cpp" />
@@ -93,9 +94,9 @@
     <ClInclude Include="Mumble\LinkedMem.h" />
     <ClInclude Include="nlohmann\json.hpp" />
     <ClInclude Include="Paths.h" />
-    <ClInclude Include="Loader\AddonDef.h" />
+    <ClInclude Include="Loader\AddonDefinition.h" />
     <ClInclude Include="Loader\EUpdateProvider.h" />
-    <ClInclude Include="Loader\HostAPI.h" />
+    <ClInclude Include="Loader\AddonAPI.h" />
     <ClInclude Include="Logging\FileLogger.h" />
     <ClInclude Include="Logging\ILogger.h" />
     <ClInclude Include="Logging\LogEntry.h" />

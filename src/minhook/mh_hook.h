@@ -82,6 +82,11 @@ typedef enum MH_STATUS {
 }
 MH_STATUS;
 
+typedef MH_STATUS(__stdcall* MINHOOK_CREATE)(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOriginal);
+typedef MH_STATUS(__stdcall* MINHOOK_REMOVE)(LPVOID pTarget);
+typedef MH_STATUS(__stdcall* MINHOOK_ENABLE)(LPVOID pTarget);
+typedef MH_STATUS(__stdcall* MINHOOK_DISABLE)(LPVOID pTarget);
+
 // Can be passed as a parameter to MH_EnableHook, MH_DisableHook,
 // MH_QueueEnableHook or MH_QueueDisableHook.
 #define MH_ALL_HOOKS NULL

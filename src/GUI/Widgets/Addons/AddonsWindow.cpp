@@ -18,7 +18,6 @@ namespace GUI
 		{
             if (ImGui::BeginTabBar("AddonTabBar", ImGuiTabBarFlags_None))
             {
-                ImGui::GetItemRectSize();
                 if (ImGui::BeginTabItem("Installed"))
                 {
                     {
@@ -37,7 +36,7 @@ namespace GUI
                             Loader::AddonsMutex.lock();
                             for (const auto& [path, addon] : Loader::AddonDefs)
                             {
-                                GUI::AddonListing(addon);
+                                GUI::AddonListing(*addon);
                             }
                             Loader::AddonsMutex.unlock();
                         }
@@ -45,7 +44,6 @@ namespace GUI
                         ImGui::EndChild();
                     }
                     
-
                     ImGui::EndTabItem();
                 }
                 if (ImGui::BeginTabItem("Library"))
@@ -55,6 +53,7 @@ namespace GUI
                     ImVec2 position = ImGui::GetCursorPos();
                     ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
                     ImGui::TextDisabled("Unable to fetch addons.");
+
                     ImGui::EndTabItem();
                 }
                 ImGui::EndTabBar();

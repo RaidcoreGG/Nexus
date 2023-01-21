@@ -7,8 +7,9 @@
 #include "ILogger.h"
 #include "LogEntry.h"
 
-typedef void (*LogASig)(const char* aFmt, ...);
-typedef void (*LogWSig)(const wchar_t* aFmt, ...);
+typedef void (*LOGGER_LOGA)(const char* aFmt, ...);
+typedef void (*LOGGER_LOGW)(const wchar_t* aFmt, ...);
+typedef void (*LOGGER_ADDREM)(ILogger* aLogger);
 
 class LogHandler
 {

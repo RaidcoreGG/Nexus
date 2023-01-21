@@ -57,8 +57,8 @@ namespace GUI
                         default:                    level = "[TRACE]";      ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(220, 220, 220, 255)); break;
                         }
 
-                        int off1 = ImGui::CalcTextSize("XXXXXXXXX").x;
-                        int off2 = ImGui::CalcTextSize("XXXXXXXXXX").x;
+                        float off1 = ImGui::CalcTextSize("XXXXXXXXX").x;
+                        float off2 = ImGui::CalcTextSize("XXXXXXXXXX").x;
 
                         /* time */
                         ImGui::TextW(entry.TimestampString(false).c_str()); ImGui::SameLine(off1);

@@ -13,7 +13,7 @@ namespace KeybindHandler
 {
 	std::mutex KeybindRegistryMutex;
 	std::map<const wchar_t*, Keybind> KeybindRegistry;
-	std::map<const wchar_t*, KeybindHandlerSig> KeybindHandlerRegistry;
+	std::map<const wchar_t*, KEYBINDS_PROCESS> KeybindHandlerRegistry;
 
 	std::mutex HeldKeysMutex;
 	std::vector<WPARAM> HeldKeys;
@@ -167,7 +167,7 @@ namespace KeybindHandler
 		KeybindRegistryMutex.unlock();
 	}
 
-	void RegisterKeybind(const wchar_t* aIdentifier, KeybindHandlerSig aKeybindHandler, Keybind aKeybind)
+	void RegisterKeybind(const wchar_t* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, Keybind aKeybind)
 	{
 		KeybindRegistryMutex.lock();
 

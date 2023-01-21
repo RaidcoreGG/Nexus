@@ -162,6 +162,9 @@
     <ClCompile Include="Loader\Loader.cpp">
       <Filter>Loader</Filter>
     </ClCompile>
+    <ClCompile Include="Loader\AddonDefinition.cpp">
+      <Filter>Loader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def">
@@ -229,7 +232,7 @@
     <ClInclude Include="Mumble\Mumble.h">
       <Filter>Mumble</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\AddonDef.h">
+    <ClInclude Include="Loader\AddonDefinition.h">
       <Filter>Loader</Filter>
     </ClInclude>
     <ClInclude Include="Loader\EUpdateProvider.h">
@@ -238,7 +241,7 @@
     <ClInclude Include="Events\EventHandler.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\HostAPI.h">
+    <ClInclude Include="Loader\AddonAPI.h">
       <Filter>Loader</Filter>
     </ClInclude>
     <ClInclude Include="Keybinds\KeybindHandler.h">

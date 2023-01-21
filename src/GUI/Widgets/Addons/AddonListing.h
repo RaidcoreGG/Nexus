@@ -4,11 +4,11 @@
 #include "../../../imgui/imgui.h"
 #include "../../../imgui/imgui_extensions.h"
 
-#include "../../../Loader/AddonDef.h"
+#include "../../../Loader/AddonDefinition.h"
 
 namespace GUI
 {
-	static void AddonListing(const AddonDef& aAddonDef)
+	static void AddonListing(const AddonDefinition& aAddonDef)
 	{
 		std::string sig = std::to_string(aAddonDef.Signature); // helper for unique chkbxIds
 		

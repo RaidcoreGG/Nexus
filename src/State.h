@@ -1,15 +1,14 @@
 #ifndef STATE_H
 #define STATE_H
 
-/* Namespace for global state variables */
-
 enum class ggState
 {
 	NONE,
 	LOAD,									/* AddonHost is loading */
-	READY,									/* AddonHost is ready to initialise UI */
+	UI_READY,								/* AddonHost is ready to initialise UI */
 	ADDONS_LOAD,							/* AddonHost is loading addons*/
 	ADDONS_READY,							/* AddonHost has loaded the addons */
+	ADDONS_SHUTDOWN,						/* AddonHost has loaded the addons */
 	SHUTDOWN								/* AddonHost has been shut down */
 };
 
@@ -21,17 +20,7 @@ enum class DxState
 	DIRECTX_HOOKED,							/* Has installed directx hooks */
 };
 
-enum class LoadType
-{
-	NONE,
-	DX9_PROXY,
-	DX9_CHAINLOAD,
-	DX11_PROXY,
-	DX11_CHAINLOAD,
-	DXGI_PROXY,
-	DXGI_CHAINLOAD
-};
-
+/* Namespace for global state variables */
 namespace State
 {
 	/* internal states */

@@ -11,7 +11,7 @@ namespace EventHandler
 
 		EventRegistryMutex.lock();
 
-		for (ConsumeEventCallback callback : EventRegistry[aEventName])
+		for (EVENTS_CONSUME callback : EventRegistry[aEventName])
 		{
 			std::thread([callback, aEventData]() { callback(aEventData); }).detach();
 		}
@@ -19,7 +19,7 @@ namespace EventHandler
 		EventRegistryMutex.unlock();
 	}
 
-	void SubscribeEvent(const wchar_t* aEventName, ConsumeEventCallback aConsumeEventCallback)
+	void SubscribeEvent(const wchar_t* aEventName, EVENTS_CONSUME aConsumeEventCallback)
 	{
 		EventRegistryMutex.lock();
 

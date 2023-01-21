@@ -6,4 +6,3 @@ std::vector<std::wstring>	Parameters		= {};
 LogHandler*					Logger			= LogHandler::GetInstance();
 LinkedMem*					MumbleLink		= nullptr;
 Identity*					MumbleIdentity  = nullptr;
-Minhook						MinhookTable	= {};

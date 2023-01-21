@@ -1,17 +1,19 @@
 #include "Loader.h"
 
+#include "../core.h"
 #include "../State.h"
 #include "../Shared.h"
 #include "../Paths.h"
 
-#include <vector>
-#include <thread>
-
 namespace Loader
 {
     std::mutex AddonsMutex;
-    std::map<std::filesystem::path, AddonDef> AddonDefs;
+    std::map<std::filesystem::path, AddonDefinition*> AddonDefs;
+
     std::thread UpdateThread;
+
+    std::set<std::filesystem::path> ExistingLibs;
+    std::set<std::filesystem::path> Blacklist;
 
 	void Initialize()
 	{
@@ -24,35 +26,68 @@ namespace Loader
 
     void Shutdown()
     {
-        State::AddonHost = ggState::SHUTDOWN;
+        State::AddonHost = ggState::ADDONS_SHUTDOWN;
     }
 
-    void LoadAddon(const char* aPath)
+    void LoadAddon(std::filesystem::path aPath, bool manual)
     {
-        Logger->LogInfo("Loaded addon: %s", aPath);
-        AddonDef addon = AddonDef{};
-        addon.Author = L"[[AUTHOR]]";
-        addon.Description = L"[[DESCRIPTION]]";
-        addon.Name = L"[[NAME]]";
-        addon.Signature = rand() % 0xFFFFFFFF;
-        addon.Version = L"[[VERSION]]";
+        std::string pathStr = aPath.string();
+        const char* path = pathStr.c_str();
+        GETADDONDEF getAddonDef = 0;
+        HMODULE hMod = LoadLibraryA(path);
+
+        /* lib load failed */
+        if (!hMod)
+        {
+            Blacklist.insert(aPath);
+            return;
+        }
+
+        getAddonDef = (GETADDONDEF)GetProcAddress(hMod, "GetAddonDef");
+        if (getAddonDef == 0)
+        {
+            ARC_GETINITADDR getInitAddr = (ARC_GETINITADDR)GetProcAddress(hMod, "get_init_addr"); /* load arc mod instead */
+
+            Logger->LogWarning("%s: %s", getInitAddr ? "ArcDPS extension found in directory" : "Unknown library found in directory", path);
+
+            Blacklist.insert(aPath);
+            FreeLibrary(hMod);
+            return;
+        }
+
+        AddonDefinition* addon = getAddonDef();
+        if (hMod && !addon->HasMinimumRequirements())
+        {
+            Logger->LogWarning("Addon loading cancelled. %s does not fulfill minimum requirements. At least define Name, Version, Author, Description as well as Load and Unload functions.", path);
+
+            Blacklist.insert(aPath);
+            FreeLibrary(hMod);
+            return;
+        }
+
         AddonDefs.insert({ aPath, addon });
+
+        Logger->LogInfo("Loaded addon: %s", path);
     }
 
-    void UnloadAddon(const char* aPath)
+    void UnloadAddon(std::filesystem::path aPath)
     {
-        Logger->LogInfo("Unloaded addon: %s", aPath);
+        std::string pathStr = aPath.string();
+        const char* path = pathStr.c_str();
+
         AddonDefs.erase(aPath);
+
+        Logger->LogInfo("Unloaded addon: %s", path);
     }
 
 	void Update()
 	{
+        Sleep(10000);
         for (;;)
         {
-            if (State::AddonHost == ggState::SHUTDOWN) { return; }
+            if (State::AddonHost == ggState::ADDONS_SHUTDOWN) { return; }
 
-            static std::vector<std::filesystem::path> prevDirDLLs;
-            std::vector<std::filesystem::path> dirDLLs;
+            std::set<std::filesystem::path> currentLibs;
 
             for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Path::D_GW2_ADDONS))
             {
@@ -61,7 +96,6 @@ namespace Loader
                     std::filesystem::path fsPath = entry.path();
                     std::string pathStr = fsPath.string();
                     std::string dll = ".dll";
-                    const char* path = pathStr.c_str();
 
                     /* ends with .dll */
                     if (pathStr.size() >= dll.size() && 0 == pathStr.compare(pathStr.size() - dll.size(), dll.size(), dll))
@@ -69,30 +103,34 @@ namespace Loader
                         AddonsMutex.lock();
                         if (AddonDefs.find(fsPath) == AddonDefs.end())
                         {
-                            LoadAddon(path);
+                            /* reload if not blacklisted */
+                            if (Blacklist.find(fsPath) == Blacklist.end())
+                            {
+                                LoadAddon(fsPath);
+                            }
                         }
                         AddonsMutex.unlock();
-                        dirDLLs.push_back(fsPath);
+                        currentLibs.insert(fsPath);
                     }
                 }
             }
 
             AddonsMutex.lock();
-            if (dirDLLs != prevDirDLLs)
+            if (currentLibs != ExistingLibs)
             {
-                for (std::filesystem::path dllPath : prevDirDLLs)
+                for (std::filesystem::path dllPath : ExistingLibs)
                 {
-                    if (std::find(dirDLLs.begin(), dirDLLs.end(), dllPath) == dirDLLs.end())
+                    if (currentLibs.find(dllPath) == currentLibs.end())
                     {
-                        UnloadAddon(dllPath.string().c_str());
+                        UnloadAddon(dllPath);
                     }
                 }
             }
             AddonsMutex.unlock();
 
-            prevDirDLLs = dirDLLs;
+            ExistingLibs = currentLibs;
 
-            Sleep(1000);
+            Sleep(5000);
         }
 	}
 }

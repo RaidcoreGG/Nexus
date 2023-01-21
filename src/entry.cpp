@@ -23,10 +23,7 @@
 #include "GUI/GUI.h"
 #include "Loader/Loader.h"
 
-#define IMPL_CHAINLOAD			/* enable chainloading */
-
-#define UPDATE_INTERVAL	30;
-unsigned Frames = 30;
+#define IMPL_CHAINLOAD /* enable chainloading */
 
 /* handles */
 HMODULE	hGW2		= nullptr;
@@ -50,6 +47,8 @@ void InitializeState()
 		std::wstring cmp = argv[i];
 		std::transform(cmp.begin(), cmp.end(), cmp.begin(), ::tolower);
 
+		str.append(argv[i]);
+
 		/* peek at the next argument, if it starts with - */
 		if (i + 1 < argc && argv[i + 1][0] != L'-')
 		{
@@ -60,7 +59,6 @@ void InitializeState()
 				MumbleLink = Mumble::Initialize(argv[i + 1]);
 			}
 
-			str.append(argv[i]);
 			str.append(L" ");
 			str.append(argv[i + 1]);
 			i++;
@@ -68,8 +66,6 @@ void InitializeState()
 		else
 		{
 			/* single argument */
-			str.append(argv[i]);
-
 #ifdef _DEBUG
 			State::IsDeveloperMode = true;
 #else
@@ -131,11 +127,6 @@ void Initialize()
 
 	MH_Initialize();
 
-	MinhookTable.CreateHook		= MH_CreateHook;
-	MinhookTable.RemoveHook		= MH_RemoveHook;
-	MinhookTable.EnableHook		= MH_EnableHook;
-	MinhookTable.DisableHook	= MH_DisableHook;
-
 	Logger->LogInfo(GetCommandLineW());
 
 	//std::thread([]() { KeybindHandler::LoadKeybinds(); }).detach();
@@ -156,6 +147,7 @@ void Shutdown()
 		Loader::Shutdown();
 
 		if (hD3D11) { FreeLibrary(hD3D11); }
+		if (hSys11) { FreeLibrary(hSys11); }
 	}
 }
 
@@ -217,11 +209,6 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 	}
 
 	GUI::Render();
-
-	Frames++;
-
-	/* always reset frames back to 0 above 30*/
-	if (Frames > 30) { Frames = 0; }
 
 	return Hooks::DXGI_Present(pChain, SyncInterval, Flags);
 }
@@ -393,7 +380,7 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 
 		UnregisterClassW(wc.lpszClassName, wc.hInstance);
 
-		State::AddonHost	= ggState::READY;
+		State::AddonHost	= ggState::UI_READY;
 		State::Directx		= DxState::DIRECTX_HOOKED;
 	}
 
