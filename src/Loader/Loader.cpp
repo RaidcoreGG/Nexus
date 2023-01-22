@@ -34,10 +34,10 @@ namespace Loader
         APIDef.MinhookFunctions = minhook;
 
         VTableLogging logging{};
-        logging.LogA = LogA;
-        logging.LogW = LogW;
-        logging.RegisterLogger = Register;
-        logging.UnregisterLogger = Unregister;
+        logging.LogA = LogMessageA;
+        logging.LogW = LogMessageW;
+        logging.RegisterLogger = RegisterLogger;
+        logging.UnregisterLogger = UnregisterLogger;
         APIDef.LoggingFunctions = logging;
 
         APIDef.RaiseEvent = EventHandler::RaiseEvent;
@@ -75,7 +75,7 @@ namespace Loader
         {
             ARC_GETINITADDR getInitAddr = (ARC_GETINITADDR)GetProcAddress(hMod, "get_init_addr"); /* load arc mod instead */
 
-            Logger->LogWarning("%s: %s", getInitAddr ? "ArcDPS extension found in directory" : "Unknown library found in directory", path);
+            LogWarning("%s: %s", getInitAddr ? "ArcDPS extension found in directory" : "Unknown library found in directory", path);
 
             Blacklist.insert(aPath);
             FreeLibrary(hMod);
@@ -85,7 +85,7 @@ namespace Loader
         AddonDefinition* addon = getAddonDef();
         if (hMod && !addon->HasMinimumRequirements())
         {
-            Logger->LogWarning("Addon loading cancelled. %s does not fulfill minimum requirements. At least define Name, Version, Author, Description as well as Load and Unload functions.", path);
+            LogWarning("Addon loading cancelled. %s does not fulfill minimum requirements. At least define Name, Version, Author, Description as well as Load and Unload functions.", path);
 
             Blacklist.insert(aPath);
             FreeLibrary(hMod);
@@ -95,7 +95,7 @@ namespace Loader
         AddonDefs.insert({ aPath, addon });
         addon->Load(APIDef);
 
-        Logger->LogInfo("Loaded addon: %s", path);
+        LogInfo("Loaded addon: %s", path);
     }
 
     void UnloadAddon(std::filesystem::path aPath, bool manual)
@@ -106,7 +106,7 @@ namespace Loader
         AddonDefs[aPath]->Unload();
         AddonDefs.erase(aPath);
 
-        Logger->LogInfo("Unloaded addon: %s", path);
+        LogInfo("Unloaded addon: %s", path);
     }
 
 	void Update()
@@ -164,10 +164,4 @@ namespace Loader
             Sleep(5000);
         }
 	}
-
-    /* Proxy logging functions for API, make LogHandler static, so I don't have to do this shit, fuck singletons */
-    void LogA(ELogLevel aLogLevel, const char* aFmt, ...)       { if (Logger) { va_list args; va_start(args, aFmt);   Logger->LogMessage(aLogLevel, aFmt, args); va_end(args); } }
-    void LogW(ELogLevel aLogLevel, const wchar_t* aFmt, ...)    { if (Logger) { va_list args; va_start(args, aFmt);   Logger->LogMessage(aLogLevel, aFmt, args); va_end(args); } }
-    void Register(ILogger* aLogger)                             { if (Logger) { Logger->Register(aLogger); } }
-    void Unregister(ILogger* aLogger)                           { if (Logger) { Logger->Unregister(aLogger); } }
 }

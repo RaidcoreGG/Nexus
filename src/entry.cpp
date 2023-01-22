@@ -43,16 +43,16 @@ void Initialize()
 	{
 		ConsoleLogger* cLog = new ConsoleLogger();
 		cLog->SetLogLevel(ELogLevel::ALL);
-		Logger->Register(cLog);
+		RegisterLogger(cLog);
 	}
 
 	FileLogger* fLog = new FileLogger(Path::F_LOG);
 	fLog->SetLogLevel(State::IsDeveloperMode ? ELogLevel::ALL : ELogLevel::INFO);
-	Logger->Register(fLog);
+	RegisterLogger(fLog);
 
 	MH_Initialize();
 
-	Logger->LogInfo(GetCommandLineW());
+	LogInfo(GetCommandLineW());
 
 	//std::thread([]() { KeybindHandler::LoadKeybinds(); }).detach();
 }
@@ -96,7 +96,7 @@ LRESULT __fastcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	if (uMsg == WM_DESTROY)
 	{
-		Logger->LogCritical(L"::Destroy()");
+		LogCritical(L"::Destroy()");
 		::Shutdown();
 	}
 
@@ -139,7 +139,7 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
 {
 	static const char* func_name = "hkDXGIResizeBuffers";
-	Logger->Log(func_name);
+	Log(func_name);
 
 	GUI::Shutdown();
 
@@ -162,7 +162,7 @@ bool DxLoad()
 		/* sanity check that the current dll isn't the chainload */
 		if (Path::F_HOST_DLL != Path::F_CHAINLOAD_DLL)
 		{
-			Logger->LogInfo(L"Attempting to chainload.");
+			LogInfo(L"Attempting to chainload.");
 
 			State::IsChainloading = true;
 
@@ -176,7 +176,7 @@ bool DxLoad()
 #ifdef IMPL_CHAINLOAD
 			if (State::IsChainloading)
 			{
-				Logger->LogWarning(L"No chainload found or failed to load.");
+				LogWarning(L"No chainload found or failed to load.");
 			}
 #endif
 			State::IsChainloading = false;
@@ -185,7 +185,7 @@ bool DxLoad()
 
 			assert(hD3D11 && "Could not load system d3d11.dll");
 
-			Logger->LogInfo(L"Loaded System DLL: %s", Path::F_SYSTEM_DLL);
+			LogInfo(L"Loaded System DLL: %s", Path::F_SYSTEM_DLL);
 		}
 
 		State::Directx = DxState::DIRECTX_READY;
@@ -198,12 +198,12 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 {
 	static decltype(&D3D11CoreCreateDevice) func;
 	static const char* func_name = "D3D11CoreCreateDevice";
-	Logger->Log(func_name);
+	Log(func_name);
 
 #ifdef IMPL_CHAINLOAD
 	if (State::Directx >= DxState::DIRECTX_READY)
 	{
-		Logger->LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
+		LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
 
 		hSys11 = LoadLibraryW(Path::F_SYSTEM_DLL);
 
@@ -230,12 +230,12 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 {
 	static decltype(&D3D11CreateDevice) func;
 	static const char* func_name = "D3D11CreateDevice";
-	Logger->Log(func_name);
+	Log(func_name);
 
 #ifdef IMPL_CHAINLOAD
 	if (State::Directx >= DxState::DIRECTX_READY)
 	{
-		Logger->LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
+		LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
 
 		hSys11 = LoadLibraryW(Path::F_SYSTEM_DLL);
 
@@ -314,12 +314,12 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 {
 	static decltype(&D3D11CreateDeviceAndSwapChain) func;
 	static const char* func_name = "D3D11CreateDeviceAndSwapChain";
-	Logger->Log(func_name);
+	Log(func_name);
 
 #ifdef IMPL_CHAINLOAD
 	if (State::Directx >= DxState::DIRECTX_READY)
 	{
-		Logger->LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
+		LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
 
 		hSys11 = LoadLibraryW(Path::F_SYSTEM_DLL);
 
@@ -354,7 +354,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
 		Initialize();
 
-		Logger->LogInfo(L"Version: %s", Version);
+		LogInfo(L"Version: %s", Version);
 		break;
 	case DLL_PROCESS_DETACH:
 

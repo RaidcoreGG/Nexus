@@ -7,7 +7,7 @@ namespace EventHandler
 {
 	void RaiseEvent(const wchar_t* aEventName, void* aEventData)
 	{
-		Logger->Log(aEventName);
+		Log(aEventName);
 
 		EventRegistryMutex.lock();
 

@@ -10,11 +10,11 @@
 #include "minhook/mh_hook.h"
 
 using namespace Mumble;
+using namespace LogHandler;
 
 extern const wchar_t*               Version;
 extern std::vector<std::wstring>    Parameters;
 
-extern LogHandler*	                Logger;
 extern LinkedMem*                   MumbleLink;
 extern Identity*                    MumbleIdentity;
 

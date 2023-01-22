@@ -47,12 +47,6 @@ namespace Loader
 	void UnloadAddon(std::filesystem::path aPath, bool manual = false);
 
 	void Update();
-
-    /* Proxy logging functions for API */
-    void LogA(ELogLevel aLogLevel, const char* aFmt, ...);
-    void LogW(ELogLevel aLogLevel, const wchar_t* aFmt, ...);
-    void Register(ILogger* aLogger);
-    void Unregister(ILogger* aLogger);
 }
 
 #endif

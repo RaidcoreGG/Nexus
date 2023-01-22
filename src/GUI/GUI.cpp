@@ -135,7 +135,7 @@ namespace GUI
 	{
 		LogWindow* logWnd = new LogWindow();
 
-		Logger->Register(logWnd);
+		RegisterLogger(logWnd);
 		logWnd->SetLogLevel(ELogLevel::ALL);
 
 		AddWindow(logWnd);
@@ -154,7 +154,7 @@ namespace GUI
 
 	void ProcessKeybind(const wchar_t* aIdentifier)
 	{
-		Logger->LogDebug(aIdentifier);
+		LogDebug(aIdentifier);
 		if (wcscmp(aIdentifier, L"RAIDCORE_OPTIONS") == 0)
 		{
 			IsMenuVisible = !IsMenuVisible;

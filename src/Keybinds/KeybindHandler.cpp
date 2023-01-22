@@ -104,7 +104,7 @@ namespace KeybindHandler
 					// check every 100ms, abort after 1 minute
 					if (i == 600)
 					{
-						Logger->LogWarning(L"Addons not initialized after 60 seconds cancelling stale keybind validation.");
+						LogWarning(L"Addons not initialized after 60 seconds cancelling stale keybind validation.");
 						return;
 					}
 					Sleep(100);
@@ -161,7 +161,7 @@ namespace KeybindHandler
 		{
 			if (!KeybindHandlerRegistry[it->first])
 			{
-				Logger->LogInfo(L"Stale keybind: %s", it->first);
+				LogInfo(L"Stale keybind: %s", it->first);
 			}
 		}
 		KeybindRegistryMutex.unlock();

@@ -36,11 +36,11 @@ namespace GUI
                 MessageMutex.lock();
                 /* Show last 200 log messages */
                 size_t start = 0;
-                if (Logger->LogEntries.size() > 200) { start = Logger->LogEntries.size() - 200; }
+                if (LogEntries.size() > 200) { start = LogEntries.size() - 200; }
 
-                for (size_t i = start; i < Logger->LogEntries.size(); i++)
+                for (size_t i = start; i < LogEntries.size(); i++)
                 {
-                    LogEntry entry = Logger->LogEntries[i];
+                    LogEntry entry = LogEntries[i];
 
                     if ((filterLevel == ELogLevel::ALL) ||
                         (SelectedOnly && entry.LogLevel == filterLevel) ||
