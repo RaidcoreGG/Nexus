@@ -7,8 +7,8 @@
 #include "ILogger.h"
 #include "LogEntry.h"
 
-typedef void (*LOGGER_LOGA)(const char* aFmt, ...);
-typedef void (*LOGGER_LOGW)(const wchar_t* aFmt, ...);
+typedef void (*LOGGER_LOGA)(ELogLevel aLogLevel, const char* aFmt, ...);
+typedef void (*LOGGER_LOGW)(ELogLevel aLogLevel, const wchar_t* aFmt, ...);
 typedef void (*LOGGER_ADDREM)(ILogger* aLogger);
 
 class LogHandler
@@ -34,13 +34,13 @@ class LogHandler
         void LogInfo(       const char* aFmt, ...);
         void LogDebug(      const char* aFmt, ...);
 
+        void LogMessage(ELogLevel aLogLevel, const wchar_t* aFmt, va_list aArgs);
+        void LogMessage(ELogLevel aLogLevel, const char* aFmt, va_list aArgs);
+
         std::vector<LogEntry> LogEntries;
 
     private:
         LogHandler() = default;
-
-        void LogMessage(ELogLevel aLogLevel, const wchar_t* aFmt, va_list aArgs);
-        void LogMessage(ELogLevel aLogLevel, const char* aFmt, va_list aArgs);
 
         static LogHandler* Instance;
         std::vector<ILogger*> Loggers;

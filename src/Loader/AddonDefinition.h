@@ -18,8 +18,10 @@ struct AddonDefinition
     const wchar_t*  Description;    /* Short description */
     ADDON_LOAD      Load;           /* Pointer to Load Function of the addon */
     ADDON_UNLOAD    Unload;         /* Pointer to Unload Function of the addon */
+
     ADDON_RENDER    Render;         /* Present callback to render imgui */
     ADDON_OPTIONS   Options;        /* Options window callback, called when opening options for this addon */
+
     EUpdateProvider Provider;       /* What platform is the the addon hosted on */
     const wchar_t*  UpdateLink;     /* Link to the update resource */
 

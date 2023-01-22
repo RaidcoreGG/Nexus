@@ -4,11 +4,13 @@
 #include "../State.h"
 #include "../Shared.h"
 #include "../Paths.h"
+#include "../Renderer.h"
 
 namespace Loader
 {
     std::mutex AddonsMutex;
     std::map<std::filesystem::path, AddonDefinition*> AddonDefs;
+    AddonAPI APIDef{};
 
     std::thread UpdateThread;
 
@@ -18,8 +20,33 @@ namespace Loader
 	void Initialize()
 	{
         State::AddonHost = ggState::ADDONS_LOAD;
-        /* load some addons */
+
+        /* setup APIDefs */
+        APIDef.SwapChain = Renderer::SwapChain;
+        APIDef.ImguiContext = ImGui::GetCurrentContext();
+        APIDef.MumbleLink = MumbleLink;
+
+        VTableMinhook minhook{};
+        minhook.CreateHook = MH_CreateHook;
+        minhook.RemoveHook = MH_RemoveHook;
+        minhook.EnableHook = MH_EnableHook;
+        minhook.DisableHook = MH_DisableHook;
+        APIDef.MinhookFunctions = minhook;
+
+        VTableLogging logging{};
+        logging.LogA = LogA;
+        logging.LogW = LogW;
+        logging.RegisterLogger = Register;
+        logging.UnregisterLogger = Unregister;
+        APIDef.LoggingFunctions = logging;
+
+        APIDef.RaiseEvent = EventHandler::RaiseEvent;
+        APIDef.SubscribeEvent = EventHandler::SubscribeEvent;
+
+        APIDef.RegisterKeybind = KeybindHandler::RegisterKeybind;
+
         State::AddonHost = ggState::ADDONS_READY;
+
         UpdateThread = std::thread(Update);
         UpdateThread.detach();
 	}
@@ -29,7 +56,7 @@ namespace Loader
         State::AddonHost = ggState::ADDONS_SHUTDOWN;
     }
 
-    void LoadAddon(std::filesystem::path aPath, bool manual)
+    void LoadAddon(std::filesystem::path aPath)
     {
         std::string pathStr = aPath.string();
         const char* path = pathStr.c_str();
@@ -66,15 +93,17 @@ namespace Loader
         }
 
         AddonDefs.insert({ aPath, addon });
+        addon->Load(APIDef);
 
         Logger->LogInfo("Loaded addon: %s", path);
     }
 
-    void UnloadAddon(std::filesystem::path aPath)
+    void UnloadAddon(std::filesystem::path aPath, bool manual)
     {
         std::string pathStr = aPath.string();
         const char* path = pathStr.c_str();
-
+        
+        AddonDefs[aPath]->Unload();
         AddonDefs.erase(aPath);
 
         Logger->LogInfo("Unloaded addon: %s", path);
@@ -121,7 +150,10 @@ namespace Loader
                 {
                     if (currentLibs.find(dllPath) == currentLibs.end())
                     {
-                        UnloadAddon(dllPath);
+                        if (AddonDefs.find(dllPath) != AddonDefs.end())
+                        {
+                            UnloadAddon(dllPath);
+                        }
                     }
                 }
             }
@@ -132,4 +164,10 @@ namespace Loader
             Sleep(5000);
         }
 	}
+
+    /* Proxy logging functions for API, make LogHandler static, so I don't have to do this shit, fuck singletons */
+    void LogA(ELogLevel aLogLevel, const char* aFmt, ...)       { if (Logger) { va_list args; va_start(args, aFmt);   Logger->LogMessage(aLogLevel, aFmt, args); va_end(args); } }
+    void LogW(ELogLevel aLogLevel, const wchar_t* aFmt, ...)    { if (Logger) { va_list args; va_start(args, aFmt);   Logger->LogMessage(aLogLevel, aFmt, args); va_end(args); } }
+    void Register(ILogger* aLogger)                             { if (Logger) { Logger->Register(aLogger); } }
+    void Unregister(ILogger* aLogger)                           { if (Logger) { Logger->Unregister(aLogger); } }
 }

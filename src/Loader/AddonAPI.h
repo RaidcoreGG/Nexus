@@ -21,21 +21,8 @@ struct VTableMinhook
 
 struct VTableLogging
 {
-	/* LoggingA */
-	LOGGER_LOGA			LogTraceA;
-	LOGGER_LOGA			LogCriticalA;
-	LOGGER_LOGA			LogWarningA;
-	LOGGER_LOGA			LogInfoA;
-	LOGGER_LOGA			LogDebugA;
-
-	/* LoggingW */
-	LOGGER_LOGW			LogTraceW;
-	LOGGER_LOGW			LogCriticalW;
-	LOGGER_LOGW			LogWarningW;
-	LOGGER_LOGW			LogInfoW;
-	LOGGER_LOGW			LogDebugW;
-
-	/* Logging API */
+	LOGGER_LOGA			LogA;
+	LOGGER_LOGW			LogW;
 	LOGGER_ADDREM		RegisterLogger;
 	LOGGER_ADDREM		UnregisterLogger;
 };

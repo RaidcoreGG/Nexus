@@ -33,6 +33,7 @@ namespace Loader
 {
 	extern std::mutex AddonsMutex;
 	extern std::map<std::filesystem::path, AddonDefinition*> AddonDefs;
+    extern AddonAPI APIDef;
 
 	extern std::thread UpdateThread;
 
@@ -42,10 +43,16 @@ namespace Loader
 	void Initialize();
 	void Shutdown();
 
-	void LoadAddon(std::filesystem::path aPath, bool manual = false);
-	void UnloadAddon(std::filesystem::path aPath);
+	void LoadAddon(std::filesystem::path aPath);
+	void UnloadAddon(std::filesystem::path aPath, bool manual = false);
 
 	void Update();
+
+    /* Proxy logging functions for API */
+    void LogA(ELogLevel aLogLevel, const char* aFmt, ...);
+    void LogW(ELogLevel aLogLevel, const wchar_t* aFmt, ...);
+    void Register(ILogger* aLogger);
+    void Unregister(ILogger* aLogger);
 }
 
 #endif

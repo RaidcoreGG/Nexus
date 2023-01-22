@@ -26,7 +26,6 @@ void LogHandler::Register(ILogger* aLogger)
 
     LoggersMutex.unlock();
 }
-
 void LogHandler::Unregister(ILogger* aLogger)
 {
     LoggersMutex.lock();
@@ -37,17 +36,17 @@ void LogHandler::Unregister(ILogger* aLogger)
 }
 
 /* Logging functions */
-void LogHandler::Log(           const wchar_t* aFmt, ...)    { va_list args; va_start(args, aFmt); LogMessage(ELogLevel::TRACE,    aFmt, args); va_end(args); }
-void LogHandler::LogCritical(   const wchar_t* aFmt, ...)    { va_list args; va_start(args, aFmt); LogMessage(ELogLevel::CRITICAL, aFmt, args); va_end(args); }
-void LogHandler::LogWarning(    const wchar_t* aFmt, ...)    { va_list args; va_start(args, aFmt); LogMessage(ELogLevel::WARNING,  aFmt, args); va_end(args); }
-void LogHandler::LogInfo(       const wchar_t* aFmt, ...)    { va_list args; va_start(args, aFmt); LogMessage(ELogLevel::INFO,     aFmt, args); va_end(args); }
-void LogHandler::LogDebug(      const wchar_t* aFmt, ...)    { va_list args; va_start(args, aFmt); LogMessage(ELogLevel::DEBUG,    aFmt, args); va_end(args); }
+void LogHandler::Log(           const wchar_t* aFmt, ...)                   { va_list args; va_start(args, aFmt);   LogMessage(ELogLevel::TRACE,    aFmt, args); va_end(args); }
+void LogHandler::LogCritical(   const wchar_t* aFmt, ...)                   { va_list args; va_start(args, aFmt);   LogMessage(ELogLevel::CRITICAL, aFmt, args); va_end(args); }
+void LogHandler::LogWarning(    const wchar_t* aFmt, ...)                   { va_list args; va_start(args, aFmt);   LogMessage(ELogLevel::WARNING,  aFmt, args); va_end(args); }
+void LogHandler::LogInfo(       const wchar_t* aFmt, ...)                   { va_list args; va_start(args, aFmt);   LogMessage(ELogLevel::INFO,     aFmt, args); va_end(args); }
+void LogHandler::LogDebug(      const wchar_t* aFmt, ...)                   { va_list args; va_start(args, aFmt);   LogMessage(ELogLevel::DEBUG,    aFmt, args); va_end(args); }
 
-void LogHandler::Log(           const char* aFmt, ...)       { va_list args; va_start(args, aFmt); LogMessage(ELogLevel::TRACE,    aFmt, args); va_end(args); }
-void LogHandler::LogCritical(   const char* aFmt, ...)       { va_list args; va_start(args, aFmt); LogMessage(ELogLevel::CRITICAL, aFmt, args); va_end(args); }
-void LogHandler::LogWarning(    const char* aFmt, ...)       { va_list args; va_start(args, aFmt); LogMessage(ELogLevel::WARNING,  aFmt, args); va_end(args); }
-void LogHandler::LogInfo(       const char* aFmt, ...)       { va_list args; va_start(args, aFmt); LogMessage(ELogLevel::INFO,     aFmt, args); va_end(args); }
-void LogHandler::LogDebug(      const char* aFmt, ...)       { va_list args; va_start(args, aFmt); LogMessage(ELogLevel::DEBUG,    aFmt, args); va_end(args); }
+void LogHandler::Log(           const char* aFmt, ...)                      { va_list args; va_start(args, aFmt);   LogMessage(ELogLevel::TRACE,    aFmt, args); va_end(args); }
+void LogHandler::LogCritical(   const char* aFmt, ...)                      { va_list args; va_start(args, aFmt);   LogMessage(ELogLevel::CRITICAL, aFmt, args); va_end(args); }
+void LogHandler::LogWarning(    const char* aFmt, ...)                      { va_list args; va_start(args, aFmt);   LogMessage(ELogLevel::WARNING,  aFmt, args); va_end(args); }
+void LogHandler::LogInfo(       const char* aFmt, ...)                      { va_list args; va_start(args, aFmt);   LogMessage(ELogLevel::INFO,     aFmt, args); va_end(args); }
+void LogHandler::LogDebug(      const char* aFmt, ...)                      { va_list args; va_start(args, aFmt);   LogMessage(ELogLevel::DEBUG,    aFmt, args); va_end(args); }
 
 void LogHandler::LogMessage(ELogLevel aLogLevel, const wchar_t* aFmt, va_list aArgs)
 {
@@ -79,7 +78,6 @@ void LogHandler::LogMessage(ELogLevel aLogLevel, const wchar_t* aFmt, va_list aA
     }
     LoggersMutex.unlock();
 }
-
 void LogHandler::LogMessage(ELogLevel aLogLevel, const char* aFmt, va_list aArgs)
 {
     LogEntry entry;
