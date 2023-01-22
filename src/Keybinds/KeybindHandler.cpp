@@ -195,6 +195,16 @@ namespace KeybindHandler
 		KeybindRegistryMutex.unlock();
 	}
 
+	void UnregisterKeybind(const wchar_t* aIdentifier)
+	{
+		KeybindRegistryMutex.lock();
+
+		KeybindRegistry.erase(aIdentifier);
+		KeybindHandlerRegistry.erase(aIdentifier);
+
+		KeybindRegistryMutex.unlock();
+	}
+
 	void InvokeKeybind(const wchar_t* aIdentifier)
 	{
 		KeybindRegistryMutex.lock();

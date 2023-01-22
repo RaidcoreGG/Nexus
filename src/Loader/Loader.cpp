@@ -10,6 +10,7 @@ namespace Loader
 {
     std::mutex AddonsMutex;
     std::map<std::filesystem::path, AddonDefinition*> AddonDefs;
+    std::map<std::filesystem::path, HMODULE> AddonModules;
     AddonAPI APIDef{};
 
     std::thread UpdateThread;
@@ -23,7 +24,7 @@ namespace Loader
 
         /* setup APIDefs */
         APIDef.SwapChain = Renderer::SwapChain;
-        APIDef.ImguiContext = ImGui::GetCurrentContext();
+        APIDef.ImguiContext = Renderer::GuiContext;
         APIDef.MumbleLink = MumbleLink;
 
         VTableMinhook minhook{};
@@ -44,6 +45,7 @@ namespace Loader
         APIDef.SubscribeEvent = EventHandler::SubscribeEvent;
 
         APIDef.RegisterKeybind = KeybindHandler::RegisterKeybind;
+        APIDef.UnregisterKeybind = KeybindHandler::UnregisterKeybind;
 
         State::AddonHost = ggState::ADDONS_READY;
 
@@ -93,6 +95,7 @@ namespace Loader
         }
 
         AddonDefs.insert({ aPath, addon });
+        AddonModules.insert({ aPath, hMod });
         addon->Load(APIDef);
 
         LogInfo("Loaded addon: %s", path);
@@ -104,6 +107,7 @@ namespace Loader
         const char* path = pathStr.c_str();
         
         AddonDefs[aPath]->Unload();
+        FreeLibrary(AddonModules[aPath]);
         AddonDefs.erase(aPath);
 
         LogInfo("Unloaded addon: %s", path);

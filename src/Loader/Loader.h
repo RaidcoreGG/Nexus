@@ -33,6 +33,7 @@ namespace Loader
 {
 	extern std::mutex AddonsMutex;
 	extern std::map<std::filesystem::path, AddonDefinition*> AddonDefs;
+	extern std::map<std::filesystem::path, HMODULE> AddonModules;
     extern AddonAPI APIDef;
 
 	extern std::thread UpdateThread;

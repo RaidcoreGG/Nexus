@@ -31,7 +31,7 @@ void ConsoleLogger::LogMessage(LogEntry aLogEntry)
         case ELogLevel::WARNING:     SetConsoleTextAttribute(hConsole, 14); break;
         case ELogLevel::INFO:        SetConsoleTextAttribute(hConsole, 10); break;
         case ELogLevel::DEBUG:       SetConsoleTextAttribute(hConsole, 11); break;
-        default:                    SetConsoleTextAttribute(hConsole, 7); break;
+        default:                     SetConsoleTextAttribute(hConsole, 7); break;
     }
     
     std::wcout << aLogEntry.ToString();

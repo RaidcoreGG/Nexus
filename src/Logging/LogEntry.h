@@ -5,7 +5,7 @@
 
 #include "ELogLevel.h"
 
-typedef struct LogEntry
+struct LogEntry
 {
     ELogLevel LogLevel;
     unsigned long long Timestamp;
@@ -13,6 +13,6 @@ typedef struct LogEntry
 
     std::wstring TimestampString(bool aIncludeDate = true);
     std::wstring ToString();
-} LogEntry_t;
+};
 
 #endif

@@ -42,6 +42,7 @@ struct AddonAPI
 
 	/* Keybinds */
 	KEYBINDS_REGISTER	RegisterKeybind;
+	KEYBINDS_UNREGISTER	UnregisterKeybind;
 
 	/* API */
 		// GW2 API FUNCS

@@ -25,7 +25,7 @@ namespace GUI
 	void Initialize()
 	{
 		// create imgui context
-		ImGui::CreateContext();
+		if (!Renderer::GuiContext) { Renderer::GuiContext = ImGui::CreateContext(); }
 		ImGuiIO& io = ImGui::GetIO();
 
 		// Load Fonts
@@ -78,7 +78,6 @@ namespace GUI
 
 			ImGui_ImplDX11_Shutdown();
 			ImGui_ImplWin32_Shutdown();
-			ImGui::DestroyContext();
 			if (Renderer::RenderTargetView) { Renderer::RenderTargetView->Release(); Renderer::RenderTargetView = NULL; }
 		}
 	}
