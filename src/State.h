@@ -34,6 +34,8 @@ namespace State
 	extern bool		IsConsoleEnabled;		/* Is the console window enabled */
 	extern bool		IsVanilla;				/* Is the AddonHost running in vanilla mode and should not load any mods */
 	extern bool		IsMumbleDisabled;		/* Is Mumble intentionally disabled */
+
+	void Initialize();
 }
 
 #endif

@@ -17,6 +17,8 @@ namespace Path
 
 	extern wchar_t F_LOG							[];
 	extern wchar_t F_KEYBINDS_JSON					[];
+
+	void Initialize(HMODULE aBaseModule);
 }
 
 #endif

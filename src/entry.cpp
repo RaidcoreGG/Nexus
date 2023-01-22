@@ -31,81 +31,14 @@ HMODULE	hAddonHost	= nullptr;
 HMODULE	hD3D11		= nullptr;
 HMODULE	hSys11		= nullptr;
 
-/* init/shutdown */
-void InitializeState()
+void Initialize()
 {
-	/* arg list */
-	int argc;
-	LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-	
-	bool customMumble = false;
+	State::AddonHost = ggState::LOAD;
 
-	/* skip first, that's the file path */
-	for (int i = 1; i < argc; ++i)
-	{
-		std::wstring str;
-		std::wstring cmp = argv[i];
-		std::transform(cmp.begin(), cmp.end(), cmp.begin(), ::tolower);
+	State::Initialize();
+	Path::Initialize(hAddonHost);
 
-		str.append(argv[i]);
-
-		/* peek at the next argument, if it starts with - */
-		if (i + 1 < argc && argv[i + 1][0] != L'-')
-		{
-			/* next argument belongs to this one */
-			if (wcscmp(cmp.c_str(), L"-mumble") == 0)
-			{
-				bool customMumble = true;
-				MumbleLink = Mumble::Initialize(argv[i + 1]);
-			}
-
-			str.append(L" ");
-			str.append(argv[i + 1]);
-			i++;
-		}
-		else
-		{
-			/* single argument */
-#ifdef _DEBUG
-			State::IsDeveloperMode = true;
-#else
-			State::IsDeveloperMode = wcscmp(cmp.c_str(), L"-ggdev") == 0;
-			State::IsConsoleEnabled = wcscmp(cmp.c_str(), L"-ggconsole") == 0;
-#endif
-			State::IsVanilla = wcscmp(cmp.c_str(), L"-ggvanilla") == 0;
-		}
-
-		Parameters.push_back(str);
-	}
-	if (!customMumble) { MumbleLink = Mumble::Initialize(L"MumbleLink"); }
-}
-void InitializePaths()
-{
-	GetModuleFileNameW(hAddonHost, Path::F_HOST_DLL, MAX_PATH);											/* get self dll path */
-
-	/* directories */
-	PathGetDirectoryName(Path::F_HOST_DLL, Path::D_GW2);												/* get current directory */
-	PathCopyAndAppend(Path::D_GW2, Path::D_GW2_ADDONS, L"addons");										/* get addons path */
-	PathCopyAndAppend(Path::D_GW2_ADDONS, Path::D_GW2_ADDONS_RAIDCORE, L"Raidcore");					/* get addons Raidcore path */
-	PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::D_GW2_ADDONS_RAIDCORE_FONTS, L"Fonts");		/* get addons Raidcore path */
-	PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::D_GW2_ADDONS_RAIDCORE_LOCALES, L"Locales");	/* get addons Raidcore path */
-
-	/* ensure folder tree*/
-	CreateDirectoryW(Path::D_GW2_ADDONS_RAIDCORE, nullptr);												/* ensure Raidcore dir */
-	CreateDirectoryW(Path::D_GW2_ADDONS_RAIDCORE_FONTS, nullptr);										/* ensure Raidcore/Fonts dir */
-	CreateDirectoryW(Path::D_GW2_ADDONS_RAIDCORE_LOCALES, nullptr);										/* ensure Raidcore/Locales dir */
-
-	/* ensure files */
-	PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_LOG, L"AddonHost.log");						/* get log path */
-	PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_KEYBINDS_JSON, L"keybinds.json");			/* get keybinds path */
-	
-	/* static paths */
-	PathCopyAndAppend(Path::D_GW2, Path::F_TEMP_DLL, L"d3d11.tmp");										/* get temp dll path */
-	PathCopyAndAppend(Path::D_GW2, Path::F_CHAINLOAD_DLL, L"d3d11_chainload.dll");						/* get chainload dll path */
-	PathSystemAppend(Path::F_SYSTEM_DLL, L"d3d11.dll");													/* get system dll path */
-}
-void InitializeLogging()
-{
+	/* setup loggers */
 	if (State::IsConsoleEnabled)
 	{
 		ConsoleLogger* cLog = new ConsoleLogger();
@@ -116,14 +49,6 @@ void InitializeLogging()
 	FileLogger* fLog = new FileLogger(Path::F_LOG);
 	fLog->SetLogLevel(State::IsDeveloperMode ? ELogLevel::ALL : ELogLevel::INFO);
 	Logger->Register(fLog);
-}
-void Initialize()
-{
-	State::AddonHost = ggState::LOAD;
-
-	InitializeState();
-	InitializePaths();
-	InitializeLogging();
 
 	MH_Initialize();
 
@@ -131,7 +56,6 @@ void Initialize()
 
 	//std::thread([]() { KeybindHandler::LoadKeybinds(); }).detach();
 }
-
 void Shutdown()
 {
 	if (State::AddonHost < ggState::SHUTDOWN)

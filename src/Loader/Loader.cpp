@@ -82,7 +82,6 @@ namespace Loader
 
 	void Update()
 	{
-        Sleep(10000);
         for (;;)
         {
             if (State::AddonHost == ggState::ADDONS_SHUTDOWN) { return; }
