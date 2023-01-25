@@ -45,7 +45,7 @@ namespace Loader
 	void Shutdown();
 
 	void LoadAddon(std::filesystem::path aPath);
-	void UnloadAddon(std::filesystem::path aPath, bool manual = false);
+	void UnloadAddon(std::filesystem::path aPath);
 
 	void Update();
 }

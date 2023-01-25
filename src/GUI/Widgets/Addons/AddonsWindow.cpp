@@ -34,9 +34,9 @@ namespace GUI
                         else
                         {
                             Loader::AddonsMutex.lock();
-                            for (const auto& [path, addon] : Loader::AddonDefs)
+                            for (auto& [path, addon] : Loader::AddonDefs)
                             {
-                                GUI::AddonListing(*addon);
+                                GUI::AddonListing(addon);
                             }
                             Loader::AddonsMutex.unlock();
                         }

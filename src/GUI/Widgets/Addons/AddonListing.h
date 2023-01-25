@@ -4,13 +4,14 @@
 #include "../../../imgui/imgui.h"
 #include "../../../imgui/imgui_extensions.h"
 
+#include "../../../Loader/Loader.h"
 #include "../../../Loader/AddonDefinition.h"
 
 namespace GUI
 {
-	static void AddonListing(const AddonDefinition& aAddonDef)
+	static void AddonListing(AddonDefinition* aAddonDef)
 	{
-		std::string sig = std::to_string(aAddonDef.Signature); // helper for unique chkbxIds
+		std::string sig = std::to_string(aAddonDef->Signature); // helper for unique chkbxIds
 		
 		if (ImGui::BeginTable(("component_addon_" + sig).c_str(), 2, ImGuiTableFlags_BordersOuter, ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
 		{
@@ -19,8 +20,8 @@ namespace GUI
 			{
 				ImGui::BeginGroup();
 
-				ImGui::TextW(aAddonDef.Name); ImGui::SameLine(); ImGui::Text("by"); ImGui::SameLine(); ImGui::TextW(aAddonDef.Author);
-				ImGui::TextWrappedW(aAddonDef.Description);
+				ImGui::TextW(aAddonDef->Name); ImGui::SameLine(); ImGui::Text("by"); ImGui::SameLine(); ImGui::TextW(aAddonDef->Author);
+				ImGui::TextWrappedW(aAddonDef->Description);
 
 				ImGui::EndGroup();
 			}
@@ -30,9 +31,9 @@ namespace GUI
 			{
 				ImGui::BeginGroup();
 
-				if (ImGui::Button("Options", ImVec2(120.0f, 24.0f))) { if (aAddonDef.Options) { aAddonDef.Options(); } }
-				if (ImGui::Button("Unload", ImVec2(120.0f, 24.0f))) { if (aAddonDef.Unload) { aAddonDef.Unload(); } }
-				ImGui::TextCenteredColumnW(aAddonDef.Version);
+				if (ImGui::Button("Options", ImVec2(120.0f, 24.0f))) { if (aAddonDef->Options) { aAddonDef->Options(); } }
+				//if (ImGui::Button("Remove", ImVec2(120.0f, 24.0f))) {}
+				ImGui::TextCenteredColumnW(aAddonDef->Version);
 
 				ImGui::EndGroup();
 			}

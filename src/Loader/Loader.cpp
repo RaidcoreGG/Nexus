@@ -69,6 +69,7 @@ namespace Loader
         if (!hMod)
         {
             Blacklist.insert(aPath);
+            AddonsMutex.unlock();
             return;
         }
 
@@ -101,14 +102,29 @@ namespace Loader
         LogInfo("Loaded addon: %s", path);
     }
 
-    void UnloadAddon(std::filesystem::path aPath, bool manual)
+    void UnloadAddon(std::filesystem::path aPath)
     {
         std::string pathStr = aPath.string();
         const char* path = pathStr.c_str();
-        
+
         AddonDefs[aPath]->Unload();
-        FreeLibrary(AddonModules[aPath]);
+        AddonDefs[aPath] = {};
+
+        HMODULE hMod = AddonModules[aPath];
+        if (hMod)
+        {
+            if (!FreeLibrary(hMod))
+            {
+                LogWarning("Couldn't unload %s ", path);
+            }
+        }
+
+        hMod = nullptr;
+
         AddonDefs.erase(aPath);
+        AddonModules.erase(aPath);
+
+        if (remove) { std::remove(path); }
 
         LogInfo("Unloaded addon: %s", path);
     }
