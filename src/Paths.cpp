@@ -18,7 +18,7 @@ namespace Path
 	wchar_t F_SYSTEM_DLL					[MAX_PATH]{};
 
 	wchar_t F_LOG							[MAX_PATH]{};
-	wchar_t F_KEYBINDS_JSON					[MAX_PATH]{};
+	wchar_t F_KEYBINDS						[MAX_PATH]{};
 
 	void Initialize(HMODULE aBaseModule)
 	{
@@ -38,7 +38,7 @@ namespace Path
 
 		/* ensure files */
 		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_LOG, L"AddonHost.log");						/* get log path */
-		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_KEYBINDS_JSON, L"keybinds.json");			/* get keybinds path */
+		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_KEYBINDS, L"Keybinds.dat");					/* get keybinds path */
 
 		/* static paths */
 		PathCopyAndAppend(Path::D_GW2, Path::F_TEMP_DLL, L"d3d11.tmp");										/* get temp dll path */

@@ -16,4 +16,6 @@ bool FindFunction(HMODULE aModule, LPVOID aFunction, LPCSTR aName);
 
 std::string WStrToStr(std::wstring& aWstring);
 
+std::wstring StrToWStr(std::string& aString);
+
 #endif

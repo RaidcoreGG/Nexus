@@ -16,7 +16,7 @@ namespace Path
 	extern wchar_t F_SYSTEM_DLL						[];
 
 	extern wchar_t F_LOG							[];
-	extern wchar_t F_KEYBINDS_JSON					[];
+	extern wchar_t F_KEYBINDS						[];
 
 	void Initialize(HMODULE aBaseModule);
 }

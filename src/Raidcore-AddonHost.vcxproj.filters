@@ -58,6 +58,9 @@
     <Filter Include="GUI\Widgets\Overlay">
       <UniqueIdentifier>{f86218d1-7120-4b72-9d7e-c97dbee918c7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Widgets\Keybinds">
+      <UniqueIdentifier>{b211fbda-c7b4-4d75-b2c9-6801eab1bc0a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="entry.cpp">
@@ -164,6 +167,9 @@
     </ClCompile>
     <ClCompile Include="Loader\AddonDefinition.cpp">
       <Filter>Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Widgets\Keybinds\KeybindsWindow.cpp">
+      <Filter>GUI\Widgets\Keybinds</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -330,6 +336,9 @@
     </ClInclude>
     <ClInclude Include="GUI\Widgets\Addons\AddonListing.h">
       <Filter>GUI\Widgets\Addons</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Widgets\Keybinds\KeybindsWindow.h">
+      <Filter>GUI\Widgets\Keybinds</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

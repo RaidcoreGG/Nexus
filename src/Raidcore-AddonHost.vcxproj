@@ -25,6 +25,7 @@
     <ClCompile Include="GUI\GUI.cpp" />
     <ClCompile Include="GUI\Widgets\About\AboutBox.cpp" />
     <ClCompile Include="GUI\Widgets\Addons\AddonsWindow.cpp" />
+    <ClCompile Include="GUI\Widgets\Keybinds\KeybindsWindow.cpp" />
     <ClCompile Include="GUI\Widgets\Log\LogWindow.cpp" />
     <ClCompile Include="GUI\Widgets\Overlay\MumbleOverlay.cpp" />
     <ClCompile Include="Hooks.cpp" />
@@ -66,6 +67,7 @@
     <ClInclude Include="GUI\Widgets\About\AboutBox.h" />
     <ClInclude Include="GUI\Widgets\Addons\AddonListing.h" />
     <ClInclude Include="GUI\Widgets\Addons\AddonsWindow.h" />
+    <ClInclude Include="GUI\Widgets\Keybinds\KeybindsWindow.h" />
     <ClInclude Include="GUI\Widgets\Log\LogWindow.h" />
     <ClInclude Include="GUI\Widgets\Overlay\MumbleOverlay.h" />
     <ClInclude Include="Hooks.h" />

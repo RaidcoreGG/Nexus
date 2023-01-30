@@ -139,21 +139,17 @@ namespace GUI
 
 		AddWindow(logWnd);
 		AddWindow(new AddonsWindow());
-		//AddWindow(new Keybinds());
+		AddWindow(new KeybindsWindow());
 		AddWindow(new MumbleOverlay());
 		AddWindow(new AboutBox());
 
-		Keybind options{};
-		options.Ctrl = true;
-		options.Key = 79;
-		KeybindHandler::RegisterKeybind(L"RAIDCORE_OPTIONS", ProcessKeybind, options);
+		KeybindHandler::RegisterKeybind(L"RAIDCORE_OPTIONS", ProcessKeybind, L"CTRL+O");
 
 		IsSetup = true;
 	}
 
 	void ProcessKeybind(const wchar_t* aIdentifier)
 	{
-		LogDebug(aIdentifier);
 		if (wcscmp(aIdentifier, L"RAIDCORE_OPTIONS") == 0)
 		{
 			IsMenuVisible = !IsMenuVisible;
@@ -174,8 +170,10 @@ namespace GUI
 			ImGui_ImplWin32_NewFrame();
 			ImGui_ImplDX11_NewFrame();
 			ImGui::NewFrame();
+			/* new frame end */
 
 			/* draw overlay */
+
 			/* draw menu */
 			RenderMenu();
 
@@ -198,13 +196,14 @@ namespace GUI
 			/* TODO: RENDER UNDER UI */
 			/* TODO: RENDER OVER UI */
 
+			/* draw overlay end */
+
 			/* end frame */
 			ImGui::EndFrame();
-
-			/* render frame */
 			ImGui::Render();
 			Renderer::DeviceContext->OMSetRenderTargets(1, &Renderer::RenderTargetView, NULL);
 			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+			/* end frame end*/
 		}
 	}
 
@@ -217,9 +216,8 @@ namespace GUI
 			WindowsMutex.lock();
 
 			for (IWindow* wnd : Windows) { wnd->MenuOption(0); }
-			ImGui::Button("Keybinds", ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
-			ImGui::Button("Layout", ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
-			ImGui::Button("Options", ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
+			//ImGui::Button("Layout", ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
+			//ImGui::Button("Options", ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
 
 			ImGui::Separator();
 

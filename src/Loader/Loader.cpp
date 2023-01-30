@@ -69,16 +69,22 @@ namespace Loader
         if (!hMod)
         {
             Blacklist.insert(aPath);
-            AddonsMutex.unlock();
             return;
         }
 
         getAddonDef = (GETADDONDEF)GetProcAddress(hMod, "GetAddonDef");
         if (getAddonDef == 0)
         {
-            ARC_GETINITADDR getInitAddr = (ARC_GETINITADDR)GetProcAddress(hMod, "get_init_addr"); /* load arc mod instead */
+            ARC_GETINITADDR getInitAddr = (ARC_GETINITADDR)GetProcAddress(hMod, "get_init_addr");   /* load arc mod instead */
 
-            LogWarning("%s: %s", getInitAddr ? "ArcDPS extension found in directory" : "Unknown library found in directory", path);
+            if (getInitAddr)
+            {
+                LogWarning("Attempting to load ArcDPS extension. (%s)", path);
+            }
+            else
+            {
+                LogWarning("Unknown library found in directory. (%s)", path);
+            }
 
             Blacklist.insert(aPath);
             FreeLibrary(hMod);
@@ -123,8 +129,6 @@ namespace Loader
 
         AddonDefs.erase(aPath);
         AddonModules.erase(aPath);
-
-        if (remove) { std::remove(path); }
 
         LogInfo("Unloaded addon: %s", path);
     }

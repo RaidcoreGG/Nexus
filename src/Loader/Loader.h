@@ -8,26 +8,26 @@
 #include <thread>
 #include <filesystem>
 
-typedef struct arcdps_exports
+struct ArcDPSDefs
 {
-    uint64_t size; // [required]
-    uint32_t sig; // [required]
-    uint32_t imguivers; // [required]
-    const char* out_name; // [required]
-    const char* out_build; // [required]
-    void* wnd_nofilter;
-    void* combat;
-    void* imgui;
-    void* options_tab;
-    void* combat_local;
-    void* wnd_filter;
-    void* options_windows;
-} arcdps_exports;
+    uint64_t Size; // [required]
+    uint32_t Signature; // [required]
+    uint32_t ImGuiVersion; // [required]
+    const char* Name; // [required]
+    const char* Build; // [required]
+    void* WndProc;
+    void* Combat;
+    void* Present;
+    void* OptionsTab;
+    void* CombatLocal;
+    void* WndProcFiltered;
+    void* Windows;
+};
 
 typedef AddonDefinition*	(*GETADDONDEF)();
 typedef void*				(*ARC_GETINITADDR)(char* aArcVersion, ImGuiContext* aImguiContext, void* aID3DPTR, HANDLE aArcDLL, void* aMallocFn, void* aFreeFn, uint32_t aD3DVersion);
-typedef unsigned			(*ARC_ADDEXTENSION)(arcdps_exports* aArcExports, unsigned aArcExportsSize, HINSTANCE aModule);
-typedef arcdps_exports*     (*ARC_MODINIT)();
+typedef unsigned			(*ARC_ADDEXTENSION)(ArcDPSDefs* aArcExports, unsigned aArcExportsSize, HINSTANCE aModule);
+typedef ArcDPSDefs*         (*ARC_MODINIT)();
 
 namespace Loader
 {

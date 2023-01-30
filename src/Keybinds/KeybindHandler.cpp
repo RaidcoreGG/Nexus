@@ -1,4 +1,5 @@
 #include <cstdarg>
+#include <string>
 
 #include "KeybindHandler.h"
 
@@ -17,8 +18,6 @@ namespace KeybindHandler
 
 	std::mutex HeldKeysMutex;
 	std::vector<WPARAM> HeldKeys;
-
-	std::wfstream File;
 
 	bool WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
@@ -68,131 +67,153 @@ namespace KeybindHandler
 
 	void LoadKeybinds()
 	{
+		if (!std::filesystem::exists(Path::F_KEYBINDS)) { return; }
+
 		KeybindRegistryMutex.lock();
 
-		std::ifstream file(Path::F_KEYBINDS_JSON);
+		std::wifstream file(Path::F_KEYBINDS);
 
-		json keybinds = json::parse(file);
+		//json keybinds = json::parse(file);
 
-		File.close();
-
-		for (json binding : keybinds)
+		std::wstring line;
+		while (std::getline(file, line))
 		{
-			Keybind kb{};
-			kb.Key = binding["Key"].get<WORD>();
-			kb.Alt = binding["Alt"].get<bool>();
-			kb.Ctrl = binding["Ctrl"].get<bool>();
-			kb.Shift = binding["Shift"].get<bool>();
+			std::transform(line.begin(), line.end(), line.begin(), ::toupper);
+			std::wstring delimiter = L"=";
 
-			char str[MAX_PATH]{};
-			memcpy(str, binding["Identifier"].get<std::string>().c_str(), MAX_PATH);
+			size_t pos = 0;
+			std::wstring token;
+			while ((pos = line.find(delimiter)) != std::wstring::npos)
+			{
+				token = line.substr(0, pos);
+				line.erase(0, pos + delimiter.length());
+			}
 
-			size_t sz = strlen(str) + 1;
-			wchar_t* wc = new wchar_t[sz];
-			mbstowcs_s(nullptr, wc, sz, str, sz);
+			wchar_t* id = new wchar_t[64];
+			wchar_t* kb = new wchar_t[64];
+			wmemcpy(id, token.c_str(), token.size() + 1);
+			wmemcpy(kb, line.c_str(), line.size() + 1);
 
-			KeybindRegistry[wc] = kb;
+			KeybindRegistry[id] = KBFromString(kb);
+			LogDebug(L"%s | %s", id, kb);
 		}
 
+		/*while (file)
+		{
+			wchar_t* id = new wchar_t[64];
+			wchar_t* kb = new wchar_t[64];
+
+			file.read(id, 64);
+			file.read(kb, 64);
+		}*/
+
+		file.close();
+
+		/*for (json bind : keybinds)
+		{
+			std::string idStr = bind["Identifier"].get<std::string>();
+			std::string kbStr = bind["Binding"].get<std::string>();
+
+			std::wstring idStrW = StrToWStr(idStr);
+			std::wstring kbStrW = StrToWStr(kbStr);
+
+			const wchar_t* idW = idStrW.c_str();
+			const wchar_t* kbW = kbStrW.c_str();
+
+			int idSz = wcslen(idW) + 2;
+			int kbSz = wcslen(kbW) + 2;
+
+			wchar_t* id = new wchar_t[idSz];
+			wchar_t* kb = new wchar_t[kbSz];
+
+			wmemcpy(id, idW, idSz);
+			wmemcpy(kb, kbW, kbSz);
+
+			KeybindRegistry[id] = KBFromString(kb);
+			LogDebug(L"%s | %s", id, kb);
+		}*/
+
 		KeybindRegistryMutex.unlock();
-
-		std::thread([]()
-			{
-				int i = 0;
-				while (State::AddonHost < ggState::ADDONS_READY)
-				{
-					// check every 100ms, abort after 1 minute
-					if (i == 600)
-					{
-						LogWarning(L"Addons not initialized after 60 seconds cancelling stale keybind validation.");
-						return;
-					}
-					Sleep(100);
-					i++;
-				}
-
-				ValidateKeybinds();
-
-			}).detach();
 	}
 
 	void SaveKeybinds()
 	{
 		KeybindRegistryMutex.lock();
 
-		json keybinds = json::array();
+		//json keybinds = json::array();
+
+		std::wofstream file(Path::F_KEYBINDS);
 
 		for (std::map<const wchar_t*, Keybind>::iterator it = KeybindRegistry.begin(); it != KeybindRegistry.end(); ++it)
 		{
-			Keybind kb = it->second;
 			std::wstring id = it->first;
+			std::wstring kb = it->second.ToString();
 
-			json binding =
+			/*json binding =
 			{
 				{"Identifier",	WStrToStr(id)},
-				{"Key",			kb.Key},
-				{"Alt",			kb.Alt},
-				{"Ctrl",		kb.Ctrl},
-				{"Shift",		kb.Shift}
+				{"Binding",		WStrToStr(kb)},
 			};
 
-			keybinds.push_back(binding);
+			keybinds.push_back(binding);*/
+
+			file.write(id.c_str(), id.size());
+			file.write(L"=", 1);
+			file.write(kb.c_str(), kb.size());
+			file.write(L"\n", 1);
 		}
 
-		File.open(Path::F_KEYBINDS_JSON);
 
-		// copy fuckery because nlohmann::json only supports utf8 obviously
-		char str[MAX_PATH]{};
-		memcpy(str, keybinds.dump(1, '\t').c_str(), MAX_PATH);
-		size_t sz = strlen(str) + 1;
-		wchar_t* wc = new wchar_t[sz];
-		mbstowcs_s(nullptr, wc, sz, str, sz);
-
-		File << wc << std::endl;
-		File.close();
+		//file << keybinds.dump(1, '\t').c_str() << std::endl;
+		file.close();
 
 		KeybindRegistryMutex.unlock();
 	}
 
-	void ValidateKeybinds()
+	void RegisterKeybind(const wchar_t* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const wchar_t* aKeybind)
 	{
+		Keybind requestedBind = KBFromString(aKeybind);
+
 		KeybindRegistryMutex.lock();
-		for (std::map<const wchar_t*, Keybind>::iterator it = KeybindRegistry.begin(); it != KeybindRegistry.end(); ++it)
+
+		/* check if another identifier, already uses the keybind */
+		for (auto& [identifier, keybind] : KeybindRegistry)
 		{
-			if (!KeybindHandlerRegistry[it->first])
+			LogDebug(L"%s | %s", identifier, keybind.ToString().c_str());
+
+			if (keybind == requestedBind)
 			{
-				LogInfo(L"Stale keybind: %s", it->first);
+				Log("same combo found");
+
+				if (wcscmp(identifier, aIdentifier) != 0)
+				{
+					/* another identifier uses the same combination */
+					requestedBind = {};
+					Log("diff identifier");
+				}
+
+				break;
 			}
 		}
-		KeybindRegistryMutex.unlock();
-	}
 
-	void RegisterKeybind(const wchar_t* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, Keybind aKeybind)
-	{
-		KeybindRegistryMutex.lock();
+		/* check if this keybind is not already set */
+		if (KeybindRegistry.find(aIdentifier) == KeybindRegistry.end())
+		{
+			Log(aIdentifier);
+			KeybindRegistry[aIdentifier] = requestedBind;
+			Log("identifier not mapped");
+		}
+		else
+		{
+			Log(aIdentifier);
+			Log("identifier already mapped");
+		}
 
-		/* set keybind handler for given identifier */
 		KeybindHandlerRegistry[aIdentifier] = aKeybindHandler;
 
-		/* check if keybind already registered (disk/previous init) ? ignore, use saved one : attempt to register */
-		if (KeybindRegistry.find(aIdentifier) != KeybindRegistry.end() && KeybindRegistry[aIdentifier].Key == 0)
-		{
-			/* check if another identifier, already uses the keybind */
-			for (std::map<const wchar_t*, Keybind>::iterator it = KeybindRegistry.begin(); it != KeybindRegistry.end(); ++it)
-			{
-				if (it->second == aKeybind)
-				{
-					/* Keybind already exists, don't overwrite, initialise empty keybind instead, so it can be set from the menu */
-					KeybindRegistry[aIdentifier] = {};
-					KeybindRegistryMutex.unlock();
-					return;
-				}
-			}
-		}
-
-		KeybindRegistry[aIdentifier] = aKeybind;
-
 		KeybindRegistryMutex.unlock();
+
+		SaveKeybinds();
 	}
 
 	void UnregisterKeybind(const wchar_t* aIdentifier)

@@ -5,7 +5,7 @@
 #include "../imgui/imgui_extensions.h"
 
 #include "Widgets/Addons/AddonsWindow.h"
-//#include "Keybinds.h"
+#include "Widgets/Keybinds/KeybindsWindow.h"
 #include "Widgets/Log/LogWindow.h"
 #include "Widgets/About/AboutBox.h"
 #include "Widgets/Overlay/MumbleOverlay.h"

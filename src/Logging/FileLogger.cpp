@@ -5,30 +5,11 @@
 FileLogger::FileLogger(const wchar_t* aPath)
 {
     File.open(aPath);
-
-    unsigned long long timestmap = time(0);
-
-    struct tm timeinfo;
-    localtime_s(&timeinfo, (time_t*)&timestmap);
-
-    std::wstringstream oss;
-    oss << std::put_time(&timeinfo, L"%Y-%m-%d %H:%M:%S");
-
-    File << oss.str() << " : Log session start." << std::endl;
 }
 
 FileLogger::~FileLogger()
 {
-    unsigned long long timestmap = time(0);
-
-    struct tm timeinfo;
-    localtime_s(&timeinfo, (time_t*)&timestmap);
-
-    std::wstringstream oss;
-    oss << std::put_time(&timeinfo, L"%Y-%m-%d %H:%M:%S");
-
-    File << oss.str() << " : Log session end." << std::endl;
-    File << std::endl;
+    File.flush();
     File.close();
 }
 

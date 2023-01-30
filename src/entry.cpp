@@ -50,11 +50,11 @@ void Initialize()
 	fLog->SetLogLevel(State::IsDeveloperMode ? ELogLevel::ALL : ELogLevel::INFO);
 	RegisterLogger(fLog);
 
-	MH_Initialize();
-
 	LogInfo(GetCommandLineW());
+	LogInfo(L"Version: %s", Version);
 
-	//std::thread([]() { KeybindHandler::LoadKeybinds(); }).detach();
+	MH_Initialize();
+	KeybindHandler::LoadKeybinds();
 }
 void Shutdown()
 {
@@ -69,6 +69,8 @@ void Shutdown()
 		MH_Uninitialize();
 
 		Loader::Shutdown();
+
+		KeybindHandler::SaveKeybinds();
 
 		if (hD3D11) { FreeLibrary(hD3D11); }
 		if (hSys11) { FreeLibrary(hSys11); }
@@ -194,38 +196,6 @@ bool DxLoad()
 	return (hD3D11 != NULL);
 }
 
-HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pAdapter, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, ID3D11Device& ppDevice)
-{
-	static decltype(&D3D11CoreCreateDevice) func;
-	static const char* func_name = "D3D11CoreCreateDevice";
-	Log(func_name);
-
-#ifdef IMPL_CHAINLOAD
-	if (State::Directx >= DxState::DIRECTX_READY)
-	{
-		LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
-
-		hSys11 = LoadLibraryW(Path::F_SYSTEM_DLL);
-
-		if (FindFunction(hSys11, &func, func_name) == false)
-		{
-			return 0;
-		}
-	}
-#endif
-
-	if (DxLoad() == false) { return 0; }
-
-	if (func == 0)
-	{
-		if (FindFunction(hD3D11, &func, func_name) == false)
-		{
-			return 0;
-		}
-	}
-
-	return func(pFactory, pAdapter, Flags, pFeatureLevels, FeatureLevels, ppDevice);
-}
 HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext)
 {
 	static decltype(&D3D11CreateDevice) func;
@@ -342,6 +312,38 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 
 	return func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice, pFeatureLevel, ppImmediateContext);
 }
+HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pAdapter, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, ID3D11Device& ppDevice)
+{
+	static decltype(&D3D11CoreCreateDevice) func;
+	static const char* func_name = "D3D11CoreCreateDevice";
+	Log(func_name);
+
+#ifdef IMPL_CHAINLOAD
+	if (State::Directx >= DxState::DIRECTX_READY)
+	{
+		LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
+
+		hSys11 = LoadLibraryW(Path::F_SYSTEM_DLL);
+
+		if (FindFunction(hSys11, &func, func_name) == false)
+		{
+			return 0;
+		}
+	}
+#endif
+
+	if (DxLoad() == false) { return 0; }
+
+	if (func == 0)
+	{
+		if (FindFunction(hD3D11, &func, func_name) == false)
+		{
+			return 0;
+		}
+	}
+
+	return func(pFactory, pAdapter, Flags, pFeatureLevels, FeatureLevels, ppDevice);
+}
 
 /* entry */
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
@@ -353,8 +355,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		hGW2 = GetModuleHandle(NULL);
 
 		Initialize();
-
-		LogInfo(L"Version: %s", Version);
 		break;
 	case DLL_PROCESS_DETACH:
 
