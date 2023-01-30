@@ -8,7 +8,6 @@
 #include <filesystem>
 
 #include "Keybind.h"
-#include "../nlohmann/json.hpp"
 
 typedef void (*KEYBINDS_PROCESS)(const wchar_t* aIdentifier);
 typedef void (*KEYBINDS_REGISTER)(const wchar_t* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const wchar_t* aKeybind);

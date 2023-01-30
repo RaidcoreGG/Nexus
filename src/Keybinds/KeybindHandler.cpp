@@ -8,8 +8,6 @@
 #include "../Shared.h"
 #include "../State.h"
 
-using json = nlohmann::json;
-
 namespace KeybindHandler
 {
 	std::mutex KeybindRegistryMutex;
@@ -73,8 +71,6 @@ namespace KeybindHandler
 
 		std::wifstream file(Path::F_KEYBINDS);
 
-		//json keybinds = json::parse(file);
-
 		std::wstring line;
 		while (std::getline(file, line))
 		{
@@ -98,40 +94,7 @@ namespace KeybindHandler
 			LogDebug(L"%s | %s", id, kb);
 		}
 
-		/*while (file)
-		{
-			wchar_t* id = new wchar_t[64];
-			wchar_t* kb = new wchar_t[64];
-
-			file.read(id, 64);
-			file.read(kb, 64);
-		}*/
-
 		file.close();
-
-		/*for (json bind : keybinds)
-		{
-			std::string idStr = bind["Identifier"].get<std::string>();
-			std::string kbStr = bind["Binding"].get<std::string>();
-
-			std::wstring idStrW = StrToWStr(idStr);
-			std::wstring kbStrW = StrToWStr(kbStr);
-
-			const wchar_t* idW = idStrW.c_str();
-			const wchar_t* kbW = kbStrW.c_str();
-
-			int idSz = wcslen(idW) + 2;
-			int kbSz = wcslen(kbW) + 2;
-
-			wchar_t* id = new wchar_t[idSz];
-			wchar_t* kb = new wchar_t[kbSz];
-
-			wmemcpy(id, idW, idSz);
-			wmemcpy(kb, kbW, kbSz);
-
-			KeybindRegistry[id] = KBFromString(kb);
-			LogDebug(L"%s | %s", id, kb);
-		}*/
 
 		KeybindRegistryMutex.unlock();
 	}
@@ -140,8 +103,6 @@ namespace KeybindHandler
 	{
 		KeybindRegistryMutex.lock();
 
-		//json keybinds = json::array();
-
 		std::wofstream file(Path::F_KEYBINDS);
 
 		for (std::map<const wchar_t*, Keybind>::iterator it = KeybindRegistry.begin(); it != KeybindRegistry.end(); ++it)
@@ -149,22 +110,12 @@ namespace KeybindHandler
 			std::wstring id = it->first;
 			std::wstring kb = it->second.ToString();
 
-			/*json binding =
-			{
-				{"Identifier",	WStrToStr(id)},
-				{"Binding",		WStrToStr(kb)},
-			};
-
-			keybinds.push_back(binding);*/
-
 			file.write(id.c_str(), id.size());
 			file.write(L"=", 1);
 			file.write(kb.c_str(), kb.size());
 			file.write(L"\n", 1);
 		}
 
-
-		//file << keybinds.dump(1, '\t').c_str() << std::endl;
 		file.close();
 
 		KeybindRegistryMutex.unlock();
