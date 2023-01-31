@@ -38,6 +38,8 @@ void Initialize()
 	State::Initialize();
 	Path::Initialize(hAddonHost);
 
+	if (State::IsVanilla) { State::AddonHost = ggState::SHUTDOWN; return; }
+
 	/* setup loggers */
 	if (State::IsConsoleEnabled)
 	{
@@ -226,7 +228,7 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 		}
 	}
 
-	if (State::Directx < DxState::DIRECTX_HOOKED)
+	if (State::Directx < DxState::DIRECTX_HOOKED && !State::IsVanilla)
 	{
 		WNDCLASSEXW wc;
 		memset(&wc, 0, sizeof(wc));
