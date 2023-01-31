@@ -1,5 +1,4 @@
 #include <cstdarg>
-#include <string>
 
 #include "KeybindHandler.h"
 
@@ -11,8 +10,8 @@
 namespace KeybindHandler
 {
 	std::mutex KeybindRegistryMutex;
-	std::map<const wchar_t*, Keybind> KeybindRegistry;
-	std::map<const wchar_t*, KEYBINDS_PROCESS> KeybindHandlerRegistry;
+	std::map<std::wstring, Keybind> KeybindRegistry;
+	std::map<std::wstring, KEYBINDS_PROCESS> KeybindHandlerRegistry;
 
 	std::mutex HeldKeysMutex;
 	std::vector<WPARAM> HeldKeys;
@@ -41,7 +40,7 @@ namespace KeybindHandler
 
 			HeldKeysMutex.unlock();
 			
-			for (std::map<const wchar_t*, Keybind>::iterator it = KeybindRegistry.begin(); it != KeybindRegistry.end(); ++it)
+			for (std::map<std::wstring, Keybind>::iterator it = KeybindRegistry.begin(); it != KeybindRegistry.end(); ++it)
 			{
 				Keybind stored = it->second;
 
@@ -85,13 +84,8 @@ namespace KeybindHandler
 				line.erase(0, pos + delimiter.length());
 			}
 
-			wchar_t* id = new wchar_t[64];
-			wchar_t* kb = new wchar_t[64];
-			wmemcpy(id, token.c_str(), token.size() + 1);
-			wmemcpy(kb, line.c_str(), line.size() + 1);
-
-			KeybindRegistry[id] = KBFromString(kb);
-			LogDebug(L"%s | %s", id, kb);
+			KeybindRegistry[token] = KBFromString(line);
+			LogDebug(L"%s | %s", token.c_str(), line.c_str());
 		}
 
 		file.close();
@@ -105,7 +99,7 @@ namespace KeybindHandler
 
 		std::wofstream file(Path::F_KEYBINDS);
 
-		for (std::map<const wchar_t*, Keybind>::iterator it = KeybindRegistry.begin(); it != KeybindRegistry.end(); ++it)
+		for (std::map<std::wstring, Keybind>::iterator it = KeybindRegistry.begin(); it != KeybindRegistry.end(); ++it)
 		{
 			std::wstring id = it->first;
 			std::wstring kb = it->second.ToString();
@@ -121,7 +115,7 @@ namespace KeybindHandler
 		KeybindRegistryMutex.unlock();
 	}
 
-	void RegisterKeybind(const wchar_t* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const wchar_t* aKeybind)
+	void RegisterKeybind(std::wstring aIdentifier, KEYBINDS_PROCESS aKeybindHandler, std::wstring aKeybind)
 	{
 		Keybind requestedBind = KBFromString(aKeybind);
 
@@ -130,17 +124,12 @@ namespace KeybindHandler
 		/* check if another identifier, already uses the keybind */
 		for (auto& [identifier, keybind] : KeybindRegistry)
 		{
-			LogDebug(L"%s | %s", identifier, keybind.ToString().c_str());
-
 			if (keybind == requestedBind)
 			{
-				Log("same combo found");
-
-				if (wcscmp(identifier, aIdentifier) != 0)
+				if (identifier != aIdentifier)
 				{
 					/* another identifier uses the same combination */
 					requestedBind = {};
-					Log("diff identifier");
 				}
 
 				break;
@@ -150,14 +139,7 @@ namespace KeybindHandler
 		/* check if this keybind is not already set */
 		if (KeybindRegistry.find(aIdentifier) == KeybindRegistry.end())
 		{
-			Log(aIdentifier);
 			KeybindRegistry[aIdentifier] = requestedBind;
-			Log("identifier not mapped");
-		}
-		else
-		{
-			Log(aIdentifier);
-			Log("identifier already mapped");
 		}
 
 		KeybindHandlerRegistry[aIdentifier] = aKeybindHandler;
@@ -167,7 +149,7 @@ namespace KeybindHandler
 		SaveKeybinds();
 	}
 
-	void UnregisterKeybind(const wchar_t* aIdentifier)
+	void UnregisterKeybind(std::wstring aIdentifier)
 	{
 		KeybindRegistryMutex.lock();
 
@@ -177,7 +159,7 @@ namespace KeybindHandler
 		KeybindRegistryMutex.unlock();
 	}
 
-	void InvokeKeybind(const wchar_t* aIdentifier)
+	void InvokeKeybind(std::wstring aIdentifier)
 	{
 		KeybindRegistryMutex.lock();
 

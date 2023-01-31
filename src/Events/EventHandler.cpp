@@ -5,9 +5,9 @@
 
 namespace EventHandler
 {
-	void RaiseEvent(const wchar_t* aEventName, void* aEventData)
+	void RaiseEvent(std::wstring aEventName, void* aEventData)
 	{
-		Log(aEventName);
+		Log(aEventName.c_str());
 
 		EventRegistryMutex.lock();
 
@@ -19,7 +19,7 @@ namespace EventHandler
 		EventRegistryMutex.unlock();
 	}
 
-	void SubscribeEvent(const wchar_t* aEventName, EVENTS_CONSUME aConsumeEventCallback)
+	void SubscribeEvent(std::wstring aEventName, EVENTS_CONSUME aConsumeEventCallback)
 	{
 		EventRegistryMutex.lock();
 

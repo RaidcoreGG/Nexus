@@ -18,6 +18,6 @@ struct Keybind
 bool operator==(const Keybind& lhs, const Keybind& rhs);
 bool operator!=(const Keybind& lhs, const Keybind& rhs);
 
-Keybind KBFromString(const wchar_t* aKeybind);
+Keybind KBFromString(std::wstring aKeybind);
 
 #endif

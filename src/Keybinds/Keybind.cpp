@@ -2,6 +2,8 @@
 
 std::wstring Keybind::ToString()
 {
+	if (!Key) { return L"(null)"; }
+
 	std::wstring str;
 
 	str.append(Alt ? L"ALT+" : L"");
@@ -28,20 +30,21 @@ bool operator!=(const Keybind& lhs, const Keybind& rhs)
 	return	!(lhs == rhs);
 }
 
-Keybind KBFromString(const wchar_t* aKeybind)
+Keybind KBFromString(std::wstring aKeybind)
 {
 	Keybind kb{};
 
-	std::wstring str = aKeybind;
-	std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+	if (wcscmp(aKeybind.c_str(), L"(null)") == 0 || wcscmp(aKeybind.c_str(), L"(NULL)") == 0) { return kb; }
+
+	std::transform(aKeybind.begin(), aKeybind.end(), aKeybind.begin(), ::toupper);
 	std::wstring delimiter = L"+";
 
 	size_t pos = 0;
 	std::wstring token;
-	while ((pos = str.find(delimiter)) != std::wstring::npos)
+	while ((pos = aKeybind.find(delimiter)) != std::string::npos)
 	{
-		token = str.substr(0, pos);
-		str.erase(0, pos + delimiter.length());
+		token = aKeybind.substr(0, pos);
+		aKeybind.erase(0, pos + delimiter.length());
 		
 		if (wcscmp(token.c_str(), L"ALT") == 0)
 		{
@@ -57,7 +60,7 @@ Keybind KBFromString(const wchar_t* aKeybind)
 		}
 	}
 
-	kb.Key = (char)VkKeyScanW(str.c_str()[0]);
+	kb.Key = (char)VkKeyScanW(aKeybind.c_str()[0]);
 
 	return kb;
 }

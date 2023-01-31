@@ -18,7 +18,7 @@ namespace GUI
             KeybindHandler::KeybindRegistryMutex.lock();
             for (auto& [identifier, keybind] : KeybindHandler::KeybindRegistry)
             {
-                ImGui::TextW(identifier);
+                ImGui::TextW(identifier.c_str());
                 ImGui::SameLine();
                 ImGui::TextW(keybind.ToString().c_str());
                 ImGui::Text("%p", &identifier);
@@ -30,7 +30,7 @@ namespace GUI
             KeybindHandler::KeybindRegistryMutex.lock();
             for (auto& [identifier, handler] : KeybindHandler::KeybindHandlerRegistry)
             {
-                ImGui::TextW(identifier);
+                ImGui::TextW(identifier.c_str());
                 ImGui::SameLine();
                 ImGui::Text("Handler: %p", handler);
                 ImGui::Text("%p", &identifier);

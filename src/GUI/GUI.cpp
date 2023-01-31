@@ -148,9 +148,9 @@ namespace GUI
 		IsSetup = true;
 	}
 
-	void ProcessKeybind(const wchar_t* aIdentifier)
+	void ProcessKeybind(std::wstring aIdentifier)
 	{
-		if (wcscmp(aIdentifier, L"RAIDCORE_OPTIONS") == 0)
+		if (aIdentifier == L"RAIDCORE_OPTIONS")
 		{
 			IsMenuVisible = !IsMenuVisible;
 			return;
