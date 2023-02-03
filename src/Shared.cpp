@@ -1,6 +1,6 @@
 #include "Shared.h"
 
-const wchar_t*				Version			= __DATE__ L" " __TIME__;
+const char*					Version			= __DATE__ " " __TIME__;
 std::vector<std::wstring>	Parameters		= {};
 
 LinkedMem*					MumbleLink		= nullptr;

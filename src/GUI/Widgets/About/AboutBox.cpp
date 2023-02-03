@@ -11,9 +11,10 @@ namespace GUI
 
 		if (ImGui::Begin("About", &Visible, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
 		{
-			ImGui::TextDisabled("Version:"); ImGui::SameLine(); ImGui::TextW(Version);
+			ImGui::TextDisabled("Version:");
+			ImGui::Text(Version);
 #ifdef _DEBUG
-			ImGui::SameLine(); ImGui::TextDisabledW(L"[DEBUG BUILD]");
+			ImGui::SameLine(); ImGui::TextDisabled("[DEBUG BUILD]");
 #endif
 			ImGui::TextDisabled("Location:");
 			if (ImGui::TreeNodeW(Path::F_HOST_DLL))

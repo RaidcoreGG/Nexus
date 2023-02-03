@@ -12,7 +12,7 @@
 using namespace Mumble;
 using namespace LogHandler;
 
-extern const wchar_t*               Version;
+extern const char*					Version;
 extern std::vector<std::wstring>    Parameters;
 
 extern LinkedMem*                   MumbleLink;

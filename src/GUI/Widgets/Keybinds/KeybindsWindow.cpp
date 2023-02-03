@@ -4,8 +4,6 @@
 #include "../../../Paths.h"
 #include "../../../State.h"
 
-#include "../../../Loader/Loader.h"
-
 namespace GUI
 {
     void KeybindsWindow::Render()
@@ -18,9 +16,9 @@ namespace GUI
             KeybindHandler::KeybindRegistryMutex.lock();
             for (auto& [identifier, keybind] : KeybindHandler::KeybindRegistry)
             {
-                ImGui::TextW(identifier.c_str());
+                ImGui::Text(identifier.c_str());
                 ImGui::SameLine();
-                ImGui::TextW(keybind.ToString().c_str());
+                ImGui::Text(keybind.ToString().c_str());
             }
             KeybindHandler::KeybindRegistryMutex.unlock();
         }

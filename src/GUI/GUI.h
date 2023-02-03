@@ -17,7 +17,7 @@ namespace GUI
 
 	bool WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	void ProcessKeybind(std::wstring aIdentifier);
+	void ProcessKeybind(std::string aIdentifier);
 
 	void Render();
 	void RenderMenu();

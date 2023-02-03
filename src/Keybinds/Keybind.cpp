@@ -1,17 +1,29 @@
 #include "Keybind.h"
 
-std::wstring Keybind::ToString()
+#include "KeybindHandler.h"
+
+std::string Keybind::ToString(bool padded)
 {
-	if (!Key) { return L"(null)"; }
+	if (!Key) { return "(null)"; }
 
-	std::wstring str;
+	std::string str;
 
-	str.append(Alt ? L"ALT+" : L"");
-	str.append(Ctrl ? L"CTRL+" : L"");
-	str.append(Shift ? L"SHIFT+" : L"");
+	if (padded)
+	{
 
-	wchar_t* buff = new wchar_t[10];
-	GetKeyNameTextW(MapVirtualKeyW(Key, MAPVK_VK_TO_VSC) << 16, buff, 10);
+		str.append(Alt ? "ALT + " : "");
+		str.append(Ctrl ? "CTRL + " : "");
+		str.append(Shift ? "SHIFT + " : "");
+	}
+	else
+	{
+		str.append(Alt ? "ALT+" : "");
+		str.append(Ctrl ? "CTRL+" : "");
+		str.append(Shift ? "SHIFT+" : "");
+	}
+
+	char* buff = new char[10];
+	GetKeyNameTextA(MapVirtualKeyA(Key, MAPVK_VK_TO_VSC) << 16, buff, 10);
 	str.append(buff);
 
 	return str;
@@ -30,37 +42,37 @@ bool operator!=(const Keybind& lhs, const Keybind& rhs)
 	return	!(lhs == rhs);
 }
 
-Keybind KBFromString(std::wstring aKeybind)
+Keybind KBFromString(std::string aKeybind)
 {
 	Keybind kb{};
 
-	if (wcscmp(aKeybind.c_str(), L"(null)") == 0 || wcscmp(aKeybind.c_str(), L"(NULL)") == 0) { return kb; }
+	if (strcmp(aKeybind.c_str(), "(null)") == 0 || strcmp(aKeybind.c_str(), "(NULL)") == 0) { return kb; }
 
 	std::transform(aKeybind.begin(), aKeybind.end(), aKeybind.begin(), ::toupper);
-	std::wstring delimiter = L"+";
+	std::string delimiter = "+";
 
 	size_t pos = 0;
-	std::wstring token;
+	std::string token;
 	while ((pos = aKeybind.find(delimiter)) != std::string::npos)
 	{
 		token = aKeybind.substr(0, pos);
 		aKeybind.erase(0, pos + delimiter.length());
 		
-		if (wcscmp(token.c_str(), L"ALT") == 0)
+		if (strcmp(token.c_str(), "ALT") == 0)
 		{
 			kb.Alt = true;
 		}
-		else if (wcscmp(token.c_str(), L"CTRL") == 0)
+		else if (strcmp(token.c_str(), "CTRL") == 0)
 		{
 			kb.Ctrl = true;
 		}
-		else if (wcscmp(token.c_str(), L"SHIFT") == 0)
+		else if (strcmp(token.c_str(), "SHIFT") == 0)
 		{
 			kb.Shift = true;
 		}
 	}
 
-	kb.Key = (char)VkKeyScanW(aKeybind.c_str()[0]);
+	kb.Key = (char)VkKeyScanA(aKeybind.c_str()[0]);
 
 	return kb;
 }

@@ -5,6 +5,9 @@
 #include <string>
 #include <algorithm>
 
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_extensions.h"
+
 struct Keybind
 {
 	WORD Key;
@@ -12,12 +15,12 @@ struct Keybind
 	bool Ctrl;
 	bool Shift;
 
-	std::wstring ToString();
+	std::string ToString(bool padded = false);
 };
 
 bool operator==(const Keybind& lhs, const Keybind& rhs);
 bool operator!=(const Keybind& lhs, const Keybind& rhs);
 
-Keybind KBFromString(std::wstring aKeybind);
+Keybind KBFromString(std::string aKeybind);
 
 #endif

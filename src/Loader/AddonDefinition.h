@@ -4,6 +4,9 @@
 #include "AddonAPI.h"
 #include "EUpdateProvider.h"
 
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_extensions.h"
+
 typedef void (*ADDON_LOAD)(AddonAPI aHostApi);
 typedef void (*ADDON_UNLOAD)();
 typedef void (*ADDON_RENDER)();
@@ -29,6 +32,7 @@ struct AddonDefinition
     const wchar_t*  UpdateLink;     /* Link to the update resource */
 
     bool HasMinimumRequirements();
+    void RenderItem();
 };
 
 #endif

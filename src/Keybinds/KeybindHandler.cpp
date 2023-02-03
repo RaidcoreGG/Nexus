@@ -10,8 +10,8 @@
 namespace KeybindHandler
 {
 	std::mutex KeybindRegistryMutex;
-	std::map<std::wstring, Keybind> KeybindRegistry;
-	std::map<std::wstring, KEYBINDS_PROCESS> KeybindHandlerRegistry;
+	std::map<std::string, Keybind> KeybindRegistry;
+	std::map<std::string, KEYBINDS_PROCESS> KeybindHandlerRegistry;
 
 	std::mutex HeldKeysMutex;
 	std::vector<WPARAM> HeldKeys;
@@ -40,7 +40,7 @@ namespace KeybindHandler
 
 			HeldKeysMutex.unlock();
 			
-			for (std::map<std::wstring, Keybind>::iterator it = KeybindRegistry.begin(); it != KeybindRegistry.end(); ++it)
+			for (std::map<std::string, Keybind>::iterator it = KeybindRegistry.begin(); it != KeybindRegistry.end(); ++it)
 			{
 				Keybind stored = it->second;
 
@@ -68,24 +68,24 @@ namespace KeybindHandler
 
 		KeybindRegistryMutex.lock();
 
-		std::wifstream file(Path::F_KEYBINDS);
+		std::ifstream file(Path::F_KEYBINDS);
 
-		std::wstring line;
+		std::string line;
 		while (std::getline(file, line))
 		{
 			std::transform(line.begin(), line.end(), line.begin(), ::toupper);
-			std::wstring delimiter = L"=";
+			std::string delimiter = "=";
 
 			size_t pos = 0;
-			std::wstring token;
-			while ((pos = line.find(delimiter)) != std::wstring::npos)
+			std::string token;
+			while ((pos = line.find(delimiter)) != std::string::npos)
 			{
 				token = line.substr(0, pos);
 				line.erase(0, pos + delimiter.length());
 			}
 
 			KeybindRegistry[token] = KBFromString(line);
-			LogDebug(L"%s | %s", token.c_str(), line.c_str());
+			LogDebug("%s | %s", token.c_str(), line.c_str());
 		}
 
 		file.close();
@@ -97,17 +97,17 @@ namespace KeybindHandler
 	{
 		KeybindRegistryMutex.lock();
 
-		std::wofstream file(Path::F_KEYBINDS);
+		std::ofstream file(Path::F_KEYBINDS);
 
-		for (std::map<std::wstring, Keybind>::iterator it = KeybindRegistry.begin(); it != KeybindRegistry.end(); ++it)
+		for (std::map<std::string, Keybind>::iterator it = KeybindRegistry.begin(); it != KeybindRegistry.end(); ++it)
 		{
-			std::wstring id = it->first;
-			std::wstring kb = it->second.ToString();
+			std::string id = it->first;
+			std::string kb = it->second.ToString();
 
 			file.write(id.c_str(), id.size());
-			file.write(L"=", 1);
+			file.write("=", 1);
 			file.write(kb.c_str(), kb.size());
-			file.write(L"\n", 1);
+			file.write("\n", 1);
 		}
 
 		file.close();
@@ -115,7 +115,7 @@ namespace KeybindHandler
 		KeybindRegistryMutex.unlock();
 	}
 
-	void RegisterKeybind(std::wstring aIdentifier, KEYBINDS_PROCESS aKeybindHandler, std::wstring aKeybind)
+	void RegisterKeybind(std::string aIdentifier, KEYBINDS_PROCESS aKeybindHandler, std::string aKeybind)
 	{
 		Keybind requestedBind = KBFromString(aKeybind);
 
@@ -156,7 +156,7 @@ namespace KeybindHandler
 		SaveKeybinds();
 	}
 
-	void UnregisterKeybind(std::wstring aIdentifier)
+	void UnregisterKeybind(std::string aIdentifier)
 	{
 		KeybindRegistryMutex.lock();
 
@@ -166,7 +166,7 @@ namespace KeybindHandler
 		KeybindRegistryMutex.unlock();
 	}
 
-	void SetKeybind(std::wstring aIdentifier, std::wstring aKeybind)
+	void SetKeybind(std::string aIdentifier, std::string aKeybind)
 	{
 		Keybind requestedBind = KBFromString(aKeybind);
 
@@ -177,7 +177,7 @@ namespace KeybindHandler
 		KeybindRegistryMutex.unlock();
 	}
 
-	void InvokeKeybind(std::wstring aIdentifier)
+	void InvokeKeybind(std::string aIdentifier)
 	{
 		KeybindRegistryMutex.lock();
 

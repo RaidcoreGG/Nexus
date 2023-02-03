@@ -6,6 +6,8 @@
 
 #include "../../IWindow.h"
 
+#include "../../../Keybinds/KeybindHandler.h"
+
 namespace GUI
 {
 	class KeybindsWindow : public IWindow

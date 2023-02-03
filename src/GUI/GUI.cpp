@@ -143,14 +143,14 @@ namespace GUI
 		AddWindow(new MumbleOverlay());
 		AddWindow(new AboutBox());
 
-		KeybindHandler::RegisterKeybind(L"RAIDCORE_OPTIONS", ProcessKeybind, L"CTRL+O");
+		KeybindHandler::RegisterKeybind("RAIDCORE_OPTIONS", ProcessKeybind, "CTRL+O");
 
 		IsSetup = true;
 	}
 
-	void ProcessKeybind(std::wstring aIdentifier)
+	void ProcessKeybind(std::string aIdentifier)
 	{
-		if (aIdentifier == L"RAIDCORE_OPTIONS")
+		if (aIdentifier == "RAIDCORE_OPTIONS")
 		{
 			IsMenuVisible = !IsMenuVisible;
 			return;
