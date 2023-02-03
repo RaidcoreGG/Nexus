@@ -1,5 +1,5 @@
 #include "AddonsWindow.h"
-#include "AddonListing.h"
+#include "AddonItem.h"
 
 #include "../../../Shared.h"
 #include "../../../Paths.h"
@@ -36,7 +36,7 @@ namespace GUI
                             Loader::AddonsMutex.lock();
                             for (auto& [path, addon] : Loader::AddonDefs)
                             {
-                                GUI::AddonListing(addon);
+                                GUI::AddonItem(addon);
                             }
                             Loader::AddonsMutex.unlock();
                         }

@@ -141,6 +141,13 @@ namespace KeybindHandler
 		{
 			KeybindRegistry[aIdentifier] = requestedBind;
 		}
+		else
+		{
+			if (KeybindRegistry[aIdentifier] == Keybind{})
+			{
+				KeybindRegistry[aIdentifier] = requestedBind;
+			}
+		}
 
 		KeybindHandlerRegistry[aIdentifier] = aKeybindHandler;
 
@@ -155,6 +162,17 @@ namespace KeybindHandler
 
 		KeybindRegistry.erase(aIdentifier);
 		KeybindHandlerRegistry.erase(aIdentifier);
+
+		KeybindRegistryMutex.unlock();
+	}
+
+	void SetKeybind(std::wstring aIdentifier, std::wstring aKeybind)
+	{
+		Keybind requestedBind = KBFromString(aKeybind);
+
+		KeybindRegistryMutex.lock();
+
+		KeybindRegistry[aIdentifier] = requestedBind;
 
 		KeybindRegistryMutex.unlock();
 	}

@@ -171,6 +171,12 @@
     <ClCompile Include="GUI\Widgets\Keybinds\KeybindsWindow.cpp">
       <Filter>GUI\Widgets\Keybinds</Filter>
     </ClCompile>
+    <ClCompile Include="GUI\Widgets\Keybinds\KeybindItem.cpp">
+      <Filter>GUI\Widgets\Keybinds</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Widgets\Addons\AddonItem.cpp">
+      <Filter>GUI\Widgets\Addons</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def">
@@ -334,10 +340,13 @@
     <ClInclude Include="GUI\Widgets\Addons\AddonsWindow.h">
       <Filter>GUI\Widgets\Addons</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\Addons\AddonListing.h">
+    <ClInclude Include="GUI\Widgets\Addons\AddonItem.h">
       <Filter>GUI\Widgets\Addons</Filter>
     </ClInclude>
     <ClInclude Include="GUI\Widgets\Keybinds\KeybindsWindow.h">
+      <Filter>GUI\Widgets\Keybinds</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Widgets\Keybinds\KeybindItem.h">
       <Filter>GUI\Widgets\Keybinds</Filter>
     </ClInclude>
   </ItemGroup>

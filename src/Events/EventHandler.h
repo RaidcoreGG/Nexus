@@ -12,11 +12,11 @@ typedef void (*EVENTS_SUBSCRIBE)(std::wstring aEventName, EVENTS_CONSUME aConsum
 
 namespace EventHandler
 {
-	void RaiseEvent(std::wstring aEventName, void* aEventData);										/* Raises an event of provided name, passing a pointer to an eventArgs struct */
-	void SubscribeEvent(std::wstring aEventName, EVENTS_CONSUME aConsumeEventCallback);				/* Subscribes the provided ConsumeEventCallback function, to the provided event name */
-
 	static std::mutex EventRegistryMutex;
 	static std::map<std::wstring, std::vector<EVENTS_CONSUME>> EventRegistry;
+
+	void RaiseEvent(std::wstring aEventName, void* aEventData);										/* Raises an event of provided name, passing a pointer to an eventArgs struct */
+	void SubscribeEvent(std::wstring aEventName, EVENTS_CONSUME aConsumeEventCallback);				/* Subscribes the provided ConsumeEventCallback function, to the provided event name */
 };
 
 #endif
