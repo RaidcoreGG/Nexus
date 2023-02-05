@@ -16,10 +16,10 @@ struct AddonDefinition
 {
     /* required */
     signed int      Signature;      /* Raidcore Addon ID, set to random negative integer if not on Raidcore */
-    const wchar_t*  Name;           /* Name of the addon as shown in the library */
-    const wchar_t*  Version;        /* Leave as `__DATE__ L" " __TIME__` to maintain consistency */
-    const wchar_t*  Author;         /* Author of the addon */
-    const wchar_t*  Description;    /* Short description */
+    const char*     Name;           /* Name of the addon as shown in the library */
+    const char*     Version;        /* Leave as `__DATE__ L" " __TIME__` to maintain consistency */
+    const char*     Author;         /* Author of the addon */
+    const char*     Description;    /* Short description */
     ADDON_LOAD      Load;           /* Pointer to Load Function of the addon */
     ADDON_UNLOAD    Unload;         /* Pointer to Unload Function of the addon */
 
@@ -29,7 +29,7 @@ struct AddonDefinition
 
     /* update fallback */
     EUpdateProvider Provider;       /* What platform is the the addon hosted on */
-    const wchar_t*  UpdateLink;     /* Link to the update resource */
+    const char*     UpdateLink;     /* Link to the update resource */
 
     bool HasMinimumRequirements();
     void RenderItem();

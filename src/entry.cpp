@@ -2,7 +2,6 @@
 #include <cassert>
 #include <thread>
 #include <algorithm>
-#include <shellapi.h>
 
 #include "minhook/mh_hook.h"
 
@@ -23,13 +22,13 @@
 #include "GUI/GUI.h"
 #include "Loader/Loader.h"
 
-#define IMPL_CHAINLOAD /* enable chainloading */
+#define ENABLE_CHAINLOAD
 
 /* handles */
-HMODULE	hGW2		= nullptr;
-HMODULE	hAddonHost	= nullptr;
-HMODULE	hD3D11		= nullptr;
-HMODULE	hSys11		= nullptr;
+HMODULE hGW2		= nullptr;
+HMODULE hAddonHost	= nullptr;
+HMODULE hD3D11		= nullptr;
+HMODULE hSysD3D11	= nullptr;
 
 void Initialize()
 {
@@ -52,8 +51,8 @@ void Initialize()
 	fLog->SetLogLevel(State::IsDeveloperMode ? ELogLevel::ALL : ELogLevel::INFO);
 	RegisterLogger(fLog);
 
-	LogInfo(GetCommandLineW());
-	LogInfo(L"Version: %s", Version);
+	LogInfo(GetCommandLineA());
+	LogInfo("Version: %s", Version);
 
 	MH_Initialize();
 	KeybindHandler::LoadKeybinds();
@@ -74,13 +73,13 @@ void Shutdown()
 
 		KeybindHandler::SaveKeybinds();
 
-		if (hD3D11) { FreeLibrary(hD3D11); }
-		if (hSys11) { FreeLibrary(hSys11); }
+		if (hD3D11)		{ FreeLibrary(hD3D11); }
+		if (hSysD3D11)	{ FreeLibrary(hSysD3D11); }
 	}
 }
 
 /* hk */
-LRESULT __fastcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	//static const char* func_name = "hkWndProc";
 	//Logger->Log(func_name);
@@ -100,7 +99,7 @@ LRESULT __fastcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	if (uMsg == WM_DESTROY)
 	{
-		LogCritical(L"::Destroy()");
+		LogCritical("::Destroy()");
 		::Shutdown();
 	}
 
@@ -142,14 +141,16 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 }
 HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
 {
-	static const char* func_name = "hkDXGIResizeBuffers";
-	Log(func_name);
+	//static const char* func_name = "hkDXGIResizeBuffers";
+	//Log(func_name);
 
 	GUI::Shutdown();
 
 	/* Cache window dimensions */
 	Renderer::Width = Width;
 	Renderer::Height = Height;
+
+	EventHandler::RaiseEvent("WINDOW_RESIZED", nullptr);
 	
 	return Hooks::DXGI_ResizeBuffers(pChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
 }
@@ -157,42 +158,97 @@ HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, 
 /* dx */
 bool DxLoad()
 {
-	if (State::Directx < DxState::DIRECTX_READY)
+	if (State::Directx < EDxState::DIRECTX_READY)
 	{
-		State::Directx = DxState::DIRECTX_LOAD;
+		State::Directx = EDxState::DIRECTX_LOAD;
 
-#ifdef IMPL_CHAINLOAD
+#ifdef ENABLE_CHAINLOAD
 		/* attempt to chainload */
 		/* sanity check that the current dll isn't the chainload */
 		if (Path::F_HOST_DLL != Path::F_CHAINLOAD_DLL)
 		{
-			LogInfo(L"Attempting to chainload.");
+			LogInfo("Attempting to chainload.");
 
 			State::IsChainloading = true;
 
-			hD3D11 = LoadLibraryW(Path::F_CHAINLOAD_DLL);
+			hD3D11 = LoadLibraryA(Path::F_CHAINLOAD_DLL);
 		}
 #endif
 
-		/* ifn chainload, load system dll */
 		if (!hD3D11)
 		{
-#ifdef IMPL_CHAINLOAD
+#ifdef ENABLE_CHAINLOAD
 			if (State::IsChainloading)
 			{
-				LogWarning(L"No chainload found or failed to load.");
+				LogWarning("No chainload found or failed to load.");
 			}
 #endif
 			State::IsChainloading = false;
 
-			hD3D11 = LoadLibraryW(Path::F_SYSTEM_DLL);
+			hD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
+
+			LogDebug(Path::F_SYSTEM_DLL);
 
 			assert(hD3D11 && "Could not load system d3d11.dll");
 
-			LogInfo(L"Loaded System DLL: %s", Path::F_SYSTEM_DLL);
+			LogInfo("Loaded System DLL: %s", Path::F_SYSTEM_DLL);
 		}
 
-		State::Directx = DxState::DIRECTX_READY;
+		State::Directx = EDxState::DIRECTX_READY;
+
+		if (State::Directx < EDxState::DIRECTX_HOOKED && !State::IsVanilla)
+		{
+			WNDCLASSEXW wc;
+			memset(&wc, 0, sizeof(wc));
+
+			wc.cbSize = sizeof(wc);
+			wc.lpfnWndProc = DefWindowProcW;
+			wc.hInstance = GetModuleHandleW(0);
+			wc.hbrBackground = (HBRUSH)(COLOR_WINDOW);
+			wc.lpszClassName = L"TempDxWndClass";
+			RegisterClassExW(&wc);
+
+			HWND wnd = CreateWindowExW(0, wc.lpszClassName, 0, WS_OVERLAPPEDWINDOW, 0, 0, 128, 128, 0, 0, wc.hInstance, 0);
+			if (wnd)
+			{
+				DXGI_SWAP_CHAIN_DESC swap_desc = {};
+				swap_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				swap_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+				swap_desc.BufferCount = 1;
+				swap_desc.SampleDesc.Count = 1;
+				swap_desc.OutputWindow = wnd;
+				swap_desc.Windowed = TRUE;
+
+				ID3D11Device* device;
+				ID3D11DeviceContext* context;
+				IDXGISwapChain* swap;
+
+				if (SUCCEEDED(D3D11CreateDeviceAndSwapChain(0, D3D_DRIVER_TYPE_HARDWARE, 0, 0, 0, 0, D3D11_SDK_VERSION, &swap_desc, &swap, &device, 0, &context)))
+				{
+					LPVOID* vtbl;
+
+					vtbl = *(LPVOID**)swap;
+					//dxgi_release = hook_vtbl_fn(vtbl, 2, dxgi_release_hook);
+					//dxgi_present = hook_vtbl_fn(vtbl, 8, dxgi_present_hook);
+					//dxgi_resize_buffers = hook_vtbl_fn(vtbl, 13, dxgi_resize_buffers_hook);
+
+					MH_CreateHook(vtbl[8], (LPVOID)&hkDXGIPresent, (LPVOID*)&Hooks::DXGI_Present);
+					MH_CreateHook(vtbl[13], (LPVOID)&hkDXGIResizeBuffers, (LPVOID*)&Hooks::DXGI_ResizeBuffers);
+					MH_EnableHook(MH_ALL_HOOKS);
+
+					context->Release();
+					device->Release();
+					swap->Release();
+				}
+
+				DestroyWindow(wnd);
+			}
+
+			UnregisterClassW(wc.lpszClassName, wc.hInstance);
+
+			State::AddonHost = ggState::UI_READY;
+			State::Directx = EDxState::DIRECTX_HOOKED;
+		}
 	}
 
 	return (hD3D11 != NULL);
@@ -200,18 +256,20 @@ bool DxLoad()
 
 HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext)
 {
+	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CREATEDEVICE; }
+
 	static decltype(&D3D11CreateDevice) func;
 	static const char* func_name = "D3D11CreateDevice";
 	Log(func_name);
 
-#ifdef IMPL_CHAINLOAD
-	if (State::Directx >= DxState::DIRECTX_READY)
+#ifdef ENABLE_CHAINLOAD
+	if (State::Directx >= EDxState::DIRECTX_READY)
 	{
-		LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
+		LogWarning("DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-		hSys11 = LoadLibraryW(Path::F_SYSTEM_DLL);
+		hSysD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
 
-		if (FindFunction(hSys11, &func, func_name) == false)
+		if (FindFunction(hSysD3D11, &func, func_name) == false)
 		{
 			return 0;
 		}
@@ -228,74 +286,24 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 		}
 	}
 
-	if (State::Directx < DxState::DIRECTX_HOOKED && !State::IsVanilla)
-	{
-		WNDCLASSEXW wc;
-		memset(&wc, 0, sizeof(wc));
-
-		wc.cbSize = sizeof(wc);
-		wc.lpfnWndProc = DefWindowProcW;
-		wc.hInstance = GetModuleHandleW(0);
-		wc.hbrBackground = (HBRUSH)(COLOR_WINDOW);
-		wc.lpszClassName = L"TempDxWndClass";
-		RegisterClassExW(&wc);
-
-		HWND wnd = CreateWindowExW(0, wc.lpszClassName, 0, WS_OVERLAPPEDWINDOW, 0, 0, 128, 128, 0, 0, wc.hInstance, 0);
-		if (wnd) {
-			DXGI_SWAP_CHAIN_DESC swap_desc = {};
-			swap_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-			swap_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-			swap_desc.BufferCount = 1;
-			swap_desc.SampleDesc.Count = 1;
-			swap_desc.OutputWindow = wnd;
-			swap_desc.Windowed = TRUE;
-
-			ID3D11Device* device;
-			ID3D11DeviceContext* context;
-			IDXGISwapChain* swap;
-
-			if (SUCCEEDED(D3D11CreateDeviceAndSwapChain(0, D3D_DRIVER_TYPE_HARDWARE, 0, 0, 0, 0, D3D11_SDK_VERSION, &swap_desc, &swap, &device, 0, &context))) {
-				LPVOID* vtbl;
-
-				vtbl = *(LPVOID**)swap;
-				//dxgi_release = hook_vtbl_fn(vtbl, 2, dxgi_release_hook);
-				//dxgi_present = hook_vtbl_fn(vtbl, 8, dxgi_present_hook);
-				//dxgi_resize_buffers = hook_vtbl_fn(vtbl, 13, dxgi_resize_buffers_hook);
-
-				MH_CreateHook(vtbl[8], (LPVOID)&hkDXGIPresent, (LPVOID*)&Hooks::DXGI_Present);
-				MH_CreateHook(vtbl[13], (LPVOID)&hkDXGIResizeBuffers, (LPVOID*)&Hooks::DXGI_ResizeBuffers);
-				MH_EnableHook(MH_ALL_HOOKS);
-
-				context->Release();
-				device->Release();
-				swap->Release();
-			}
-
-			DestroyWindow(wnd);
-		}
-
-		UnregisterClassW(wc.lpszClassName, wc.hInstance);
-
-		State::AddonHost	= ggState::UI_READY;
-		State::Directx		= DxState::DIRECTX_HOOKED;
-	}
-
 	return func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
 }
 HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, const DXGI_SWAP_CHAIN_DESC* pSwapChainDesc, IDXGISwapChain** ppSwapChain, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext)
 {
+	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CREATEDEVICEANDSWAPCHAIN; }
+
 	static decltype(&D3D11CreateDeviceAndSwapChain) func;
 	static const char* func_name = "D3D11CreateDeviceAndSwapChain";
 	Log(func_name);
 
-#ifdef IMPL_CHAINLOAD
-	if (State::Directx >= DxState::DIRECTX_READY)
+#ifdef ENABLE_CHAINLOAD
+	if (State::Directx >= EDxState::DIRECTX_READY)
 	{
-		LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
+		LogWarning("DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-		hSys11 = LoadLibraryW(Path::F_SYSTEM_DLL);
+		hSysD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
 
-		if (FindFunction(hSys11, &func, func_name) == false)
+		if (FindFunction(hSysD3D11, &func, func_name) == false)
 		{
 			return 0;
 		}
@@ -313,21 +321,26 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 	}
 
 	return func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice, pFeatureLevel, ppImmediateContext);
+
+	//return DxLoad() ? func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice, pFeatureLevel, ppImmediateContext)
+	//				: 0;
 }
-HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pAdapter, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, ID3D11Device& ppDevice)
+HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pAdapter, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, ID3D11Device** ppDevice)
 {
+	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_CREATEDEVICE; }
+
 	static decltype(&D3D11CoreCreateDevice) func;
 	static const char* func_name = "D3D11CoreCreateDevice";
 	Log(func_name);
 
-#ifdef IMPL_CHAINLOAD
-	if (State::Directx >= DxState::DIRECTX_READY)
+#ifdef ENABLE_CHAINLOAD
+	if (State::Directx >= EDxState::DIRECTX_READY)
 	{
-		LogWarning(L"DirectX Create already called. Chainload bounced back. Loading System d3d11.dll");
+		LogWarning("DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-		hSys11 = LoadLibraryW(Path::F_SYSTEM_DLL);
+		hSysD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
 
-		if (FindFunction(hSys11, &func, func_name) == false)
+		if (FindFunction(hSysD3D11, &func, func_name) == false)
 		{
 			return 0;
 		}
@@ -345,6 +358,108 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 	}
 
 	return func(pFactory, pAdapter, Flags, pFeatureLevels, FeatureLevels, ppDevice);
+}
+HRESULT __stdcall D3D11CoreCreateLayeredDevice(const void* unknown0, DWORD unknown1, const void* unknown2, REFIID riid, void** ppvObj)
+{
+	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_CREATELAYEREDDEVICE; }
+
+	static decltype(&D3D11CoreCreateLayeredDevice) func;
+	static const char* func_name = "D3D11CoreCreateLayeredDevice";
+	Log(func_name);
+
+#ifdef ENABLE_CHAINLOAD
+	if (State::Directx >= EDxState::DIRECTX_READY)
+	{
+		LogWarning("DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
+
+		hSysD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
+
+		if (FindFunction(hSysD3D11, &func, func_name) == false)
+		{
+			return 0;
+		}
+	}
+#endif
+
+	if (DxLoad() == false) { return 0; }
+
+	if (func == 0)
+	{
+		if (FindFunction(hD3D11, &func, func_name) == false)
+		{
+			return 0;
+		}
+	}
+
+	return func(unknown0, unknown1, unknown2, riid, ppvObj);
+}
+SIZE_T	__stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unknown1)
+{
+	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_GETLAYEREDDEVICESIZE; }
+
+	static decltype(&D3D11CoreGetLayeredDeviceSize) func;
+	static const char* func_name = "D3D11CoreGetLayeredDeviceSize";
+	Log(func_name);
+
+#ifdef ENABLE_CHAINLOAD
+	if (State::Directx >= EDxState::DIRECTX_READY)
+	{
+		LogWarning("DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
+
+		hSysD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
+
+		if (FindFunction(hSysD3D11, &func, func_name) == false)
+		{
+			return 0;
+		}
+	}
+#endif
+
+	if (DxLoad() == false) { return 0; }
+
+	if (func == 0)
+	{
+		if (FindFunction(hD3D11, &func, func_name) == false)
+		{
+			return 0;
+		}
+	}
+
+	return func(unknown0, unknown1);
+}
+HRESULT __stdcall D3D11CoreRegisterLayers(const void* unknown0, DWORD unknown1)
+{
+	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_REGISTERLAYERS; }
+
+	static decltype(&D3D11CoreRegisterLayers) func;
+	static const char* func_name = "D3D11CoreRegisterLayers";
+	Log(func_name);
+
+#ifdef ENABLE_CHAINLOAD
+	if (State::Directx >= EDxState::DIRECTX_READY)
+	{
+		LogWarning("DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
+
+		hSysD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
+
+		if (FindFunction(hSysD3D11, &func, func_name) == false)
+		{
+			return 0;
+		}
+	}
+#endif
+
+	if (DxLoad() == false) { return 0; }
+
+	if (func == 0)
+	{
+		if (FindFunction(hD3D11, &func, func_name) == false)
+		{
+			return 0;
+		}
+	}
+
+	return func(unknown0, unknown1);
 }
 
 /* entry */

@@ -6,17 +6,18 @@
 #include <mutex>
 #include <string>
 
-typedef void (*EVENTS_CONSUME)(void* aEventArgs);
-typedef void (*EVENTS_RAISE)(std::wstring aEventName, void* aEventData);
-typedef void (*EVENTS_SUBSCRIBE)(std::wstring aEventName, EVENTS_CONSUME aConsumeEventCallback);
+typedef void (*EVENT_CONSUME)(void* aEventArgs);
+typedef void (*EVENTS_RAISE)(std::string aEventName, void* aEventData);
+typedef void (*EVENTS_SUBSCRIBE)(std::string aEventName, EVENT_CONSUME aConsumeEventCallback);
 
 namespace EventHandler
 {
-	static std::mutex EventRegistryMutex;
-	static std::map<std::wstring, std::vector<EVENTS_CONSUME>> EventRegistry;
+	extern std::mutex EventRegistryMutex;
+	extern std::map<std::string, std::vector<EVENT_CONSUME>> EventRegistry;
 
-	void RaiseEvent(std::wstring aEventName, void* aEventData);										/* Raises an event of provided name, passing a pointer to an eventArgs struct */
-	void SubscribeEvent(std::wstring aEventName, EVENTS_CONSUME aConsumeEventCallback);				/* Subscribes the provided ConsumeEventCallback function, to the provided event name */
+	void RaiseEvent(std::string aEventName, void* aEventData);										/* Raises an event of provided name, passing a pointer to an eventArgs struct */
+	void SubscribeEvent(std::string aEventName, EVENT_CONSUME aConsumeEventCallback);				/* Subscribes the provided ConsumeEventCallback function, to the provided event name */
+	void UnsubscribeEvent(std::string aEventName, EVENT_CONSUME aConsumeEventCallback);			/* Unsubscribes the provided ConsumeEventCallback function from the provided event name */
 };
 
 #endif

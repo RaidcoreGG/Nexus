@@ -34,7 +34,7 @@ void ConsoleLogger::LogMessage(LogEntry aLogEntry)
         default:                     SetConsoleTextAttribute(hConsole, 7); break;
     }
     
-    std::wcout << aLogEntry.ToString();
+    std::cout << aLogEntry.ToString();
 
     MessageMutex.unlock();
 }

@@ -55,11 +55,14 @@
     <Filter Include="GUI\Widgets\About">
       <UniqueIdentifier>{f4d01667-1986-4ab9-96e8-a783ecd77243}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Widgets\Keybinds">
+      <UniqueIdentifier>{b211fbda-c7b4-4d75-b2c9-6801eab1bc0a}</UniqueIdentifier>
+    </Filter>
     <Filter Include="GUI\Widgets\Overlay">
       <UniqueIdentifier>{f86218d1-7120-4b72-9d7e-c97dbee918c7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GUI\Widgets\Keybinds">
-      <UniqueIdentifier>{b211fbda-c7b4-4d75-b2c9-6801eab1bc0a}</UniqueIdentifier>
+    <Filter Include="GUI\Widgets\Debug">
+      <UniqueIdentifier>{c9b428d0-6faf-4a6c-90d5-d8264bb96899}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -171,11 +174,9 @@
     <ClCompile Include="GUI\Widgets\Keybinds\KeybindsWindow.cpp">
       <Filter>GUI\Widgets\Keybinds</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="exports.def">
-      <Filter>Resource Files</Filter>
-    </None>
+    <ClCompile Include="GUI\Widgets\Debug\DebugWindow.cpp">
+      <Filter>GUI\Widgets\Debug</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imstb_truetype.h">
@@ -337,10 +338,18 @@
     <ClInclude Include="GUI\Widgets\Keybinds\KeybindsWindow.h">
       <Filter>GUI\Widgets\Keybinds</Filter>
     </ClInclude>
+    <ClInclude Include="GUI\Widgets\Debug\DebugWindow.h">
+      <Filter>GUI\Widgets\Debug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Raidcore-AddonHost.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="exports.def">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

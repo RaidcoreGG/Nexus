@@ -61,13 +61,13 @@ namespace GUI
                         float off2 = ImGui::CalcTextSize("XXXXXXXXXX").x;
 
                         /* time */
-                        ImGui::TextW(entry.TimestampString(false).c_str()); ImGui::SameLine(off1);
+                        ImGui::Text(entry.TimestampString(false).c_str()); ImGui::SameLine(off1);
 
                         /* level */
                         ImGui::Text(level); ImGui::SameLine(off1 + off2);
 
                         /* message */
-                        ImGui::TextWrappedW(entry.Message.c_str());
+                        ImGui::TextWrapped(entry.Message.c_str());
 
                         ImGui::PopStyleColor();
                     }

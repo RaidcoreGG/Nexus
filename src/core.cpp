@@ -1,21 +1,25 @@
 #include "core.h"
+#include "Shlwapi.h"
 
-void PathCopyAndAppend(wchar_t* aSource, wchar_t* aDestination, const wchar_t* aAppend)
+#pragma warning( push )
+#pragma warning( disable : 4995)
+void PathCopyAndAppend(char* aSource, char* aDestination, const char* aAppend)
 {
 	memcpy(aDestination, aSource, MAX_PATH);
-	PathCchAppend(aDestination, MAX_PATH, aAppend);
+	PathAppendA(aDestination, aAppend);
 }
 
-void PathSystemAppend(wchar_t* aDestination, const wchar_t* aAppend)
+void PathSystemAppend(char* aDestination, const char* aAppend)
 {
-	GetSystemDirectoryW(aDestination, MAX_PATH);
-	PathCchAppend(aDestination, MAX_PATH, aAppend);
+	GetSystemDirectoryA(aDestination, MAX_PATH);
+	PathAppendA(aDestination, aAppend);
 }
+#pragma warning( pop ) 
 
-void PathGetDirectoryName(wchar_t* aSource, wchar_t* aDestination)
+void PathGetDirectoryName(char* aSource, char* aDestination)
 {
 	memcpy(aDestination, aSource, MAX_PATH);
-	PathCchRemoveFileSpec(aDestination, MAX_PATH);
+	PathRemoveFileSpecA(aDestination);
 }
 
 bool FindFunction(HMODULE aModule, LPVOID aFunction, LPCSTR aName)

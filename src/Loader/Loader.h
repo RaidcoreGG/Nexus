@@ -8,26 +8,7 @@
 #include <thread>
 #include <filesystem>
 
-struct ArcDPSDefs
-{
-    uint64_t Size; // [required]
-    uint32_t Signature; // [required]
-    uint32_t ImGuiVersion; // [required]
-    const char* Name; // [required]
-    const char* Build; // [required]
-    void* WndProc;
-    void* Combat;
-    void* Present;
-    void* OptionsTab;
-    void* CombatLocal;
-    void* WndProcFiltered;
-    void* Windows;
-};
-
 typedef AddonDefinition*	(*GETADDONDEF)();
-typedef void*				(*ARC_GETINITADDR)(char* aArcVersion, ImGuiContext* aImguiContext, void* aID3DPTR, HANDLE aArcDLL, void* aMallocFn, void* aFreeFn, uint32_t aD3DVersion);
-typedef unsigned			(*ARC_ADDEXTENSION)(ArcDPSDefs* aArcExports, unsigned aArcExportsSize, HINSTANCE aModule);
-typedef ArcDPSDefs*         (*ARC_MODINIT)();
 
 namespace Loader
 {

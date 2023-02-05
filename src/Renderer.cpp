@@ -10,7 +10,7 @@ namespace Renderer
 
 	HWND					WindowHandle		= nullptr;
 
-	unsigned int			Width				= 0;
-	unsigned int			Height				= 0;
+	unsigned				Width				= 0;
+	unsigned				Height				= 0;
 	float					Scaling				= 0.0f;
 }

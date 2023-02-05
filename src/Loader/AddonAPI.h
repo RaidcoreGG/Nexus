@@ -21,8 +21,7 @@ struct VTableMinhook
 
 struct VTableLogging
 {
-	LOGGER_LOGA			LogA;
-	LOGGER_LOGW			LogW;
+	LOGGER_LOGA			Log;
 	LOGGER_ADDREM		RegisterLogger;
 	LOGGER_ADDREM		UnregisterLogger;
 };
@@ -32,6 +31,8 @@ struct AddonAPI
 	IDXGISwapChain*		SwapChain;
 	ImGuiContext*		ImguiContext;
 	LinkedMem*			MumbleLink;
+	unsigned*			WindowWidth;
+	unsigned*			WindowHeight;
 
 	VTableMinhook		MinhookFunctions;
 	VTableLogging		LoggingFunctions;
@@ -39,6 +40,7 @@ struct AddonAPI
 	/* Events */
 	EVENTS_RAISE		RaiseEvent;
 	EVENTS_SUBSCRIBE	SubscribeEvent;
+	EVENTS_SUBSCRIBE	UnsubscribeEvent;
 
 	/* Keybinds */
 	KEYBINDS_REGISTER	RegisterKeybind;

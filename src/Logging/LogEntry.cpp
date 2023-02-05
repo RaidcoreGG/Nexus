@@ -3,42 +3,42 @@
 
 #include "LogEntry.h"
 
-std::wstring LogEntry::TimestampString(bool aIncludeDate)
+std::string LogEntry::TimestampString(bool aIncludeDate)
 {
     struct tm timeinfo;
     localtime_s(&timeinfo, (time_t*)&Timestamp);
 
-    std::wstringstream oss;
+    std::stringstream oss;
     if (aIncludeDate)
     {
-        oss << std::put_time(&timeinfo, L"%Y-%m-%d %H:%M:%S");
+        oss << std::put_time(&timeinfo, "%Y-%m-%d %H:%M:%S");
     }
     else
     {
-        oss << std::put_time(&timeinfo, L"%H:%M:%S");
+        oss << std::put_time(&timeinfo, "%H:%M:%S");
     }
-    std::wstring str = oss.str();
+    std::string str = oss.str();
     return str;
 }
 
-std::wstring LogEntry::ToString()
+std::string LogEntry::ToString()
 {
-    const wchar_t* level;
+    const char* level;
 
     switch (LogLevel)
     {
-        case ELogLevel::CRITICAL:    level = L" [CRITICAL] ";     break;
-        case ELogLevel::WARNING:     level = L" [WARNING] ";      break;
-        case ELogLevel::INFO:        level = L" [INFO] ";         break;
-        case ELogLevel::DEBUG:       level = L" [DEBUG] ";        break;
+        case ELogLevel::CRITICAL:    level = " [CRITICAL] ";     break;
+        case ELogLevel::WARNING:     level = " [WARNING] ";      break;
+        case ELogLevel::INFO:        level = " [INFO] ";         break;
+        case ELogLevel::DEBUG:       level = " [DEBUG] ";        break;
 
-        default:                    level = L" [TRACE] ";        break;
+        default:                    level = " [TRACE] ";        break;
     }
 
-    std::wstringstream oss;
+    std::stringstream oss;
     oss << TimestampString();
     oss << std::setw(12) << level;
-    std::wstring str = oss.str() + std::wstring{Message} + L"\n";
+    std::string str = oss.str() + std::string{Message} + "\n";
 
     return str;
 }

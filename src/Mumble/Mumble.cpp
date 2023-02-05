@@ -102,7 +102,7 @@ namespace Mumble
 
 					if (*MumbleIdentity != prev)
 					{
-						EventHandler::RaiseEvent(L"MUMBLE_IDENTITY_UPDATE", MumbleIdentity);
+						EventHandler::RaiseEvent("MUMBLE_IDENTITY_UPDATE", MumbleIdentity);
 					}
 				}
 			}

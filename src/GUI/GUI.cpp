@@ -44,14 +44,14 @@ namespace GUI
 		//IM_ASSERT(font != NULL);
 
 		//io.Fonts->AddFontDefault();
-		wchar_t font[MAX_PATH];
-		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, font, L"raidcore_font.ttf");
+		char font[MAX_PATH];
+		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, font, "raidcore_font.ttf");
+		char gw2uifont[MAX_PATH];
+		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, gw2uifont, "gw2_ui.ttf");
 
-		std::wstring wstr = font;
-		std::string str = WStrToStr(wstr);
-		const char* cp = str.c_str();
-
-		io.Fonts->AddFontFromFileTTF(cp, 16.0f);
+		io.Fonts->AddFontFromFileTTF(font, 16.0f);
+		io.Fonts->AddFontFromFileTTF(gw2uifont, 16.0f);
+		io.Fonts->AddFontFromFileTTF(gw2uifont, 22.0f);
 		io.Fonts->Build();
 
 		// Init imgui
@@ -141,20 +141,22 @@ namespace GUI
 		AddWindow(new AddonsWindow());
 		AddWindow(new KeybindsWindow());
 		AddWindow(new MumbleOverlay());
+		AddWindow(new DebugWindow());
 		AddWindow(new AboutBox());
 
-		KeybindHandler::RegisterKeybind("RAIDCORE_OPTIONS", ProcessKeybind, "CTRL+O");
+		KeybindHandler::RegisterKeybind("ADDONHOST_MENU", ProcessKeybind, "CTRL+O");
 
 		IsSetup = true;
 	}
 
 	void ProcessKeybind(std::string aIdentifier)
 	{
-		if (aIdentifier == "RAIDCORE_OPTIONS")
+		if (aIdentifier == "ADDONHOST_MENU")
 		{
 			IsMenuVisible = !IsMenuVisible;
 			return;
 		}
+
 	}
 
 	void Render()

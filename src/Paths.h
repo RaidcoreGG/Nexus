@@ -4,19 +4,19 @@
 /* Namespace for global path variables */
 namespace Path
 {
-	extern wchar_t D_GW2							[];
-	extern wchar_t D_GW2_ADDONS						[];
-	extern wchar_t D_GW2_ADDONS_RAIDCORE			[];
-	extern wchar_t D_GW2_ADDONS_RAIDCORE_FONTS		[];
-	extern wchar_t D_GW2_ADDONS_RAIDCORE_LOCALES	[];
+	extern char D_GW2							[];
+	extern char D_GW2_ADDONS					[];
+	extern char D_GW2_ADDONS_RAIDCORE			[];
+	extern char D_GW2_ADDONS_RAIDCORE_FONTS		[];
+	extern char D_GW2_ADDONS_RAIDCORE_LOCALES	[];
 
-	extern wchar_t F_HOST_DLL						[];
-	extern wchar_t F_TEMP_DLL						[];
-	extern wchar_t F_CHAINLOAD_DLL					[];
-	extern wchar_t F_SYSTEM_DLL						[];
+	extern char F_HOST_DLL						[];
+	extern char F_TEMP_DLL						[];
+	extern char F_SYSTEM_DLL					[];
+	extern char F_CHAINLOAD_DLL					[];
 
-	extern wchar_t F_LOG							[];
-	extern wchar_t F_KEYBINDS						[];
+	extern char F_LOG							[];
+	extern char F_KEYBINDS						[];
 
 	void Initialize(HMODULE aBaseModule);
 }

@@ -2,6 +2,7 @@
 
 #include "../../../Shared.h"
 #include "../../../Paths.h"
+#include "../../../State.h"
 
 namespace GUI
 {
@@ -12,12 +13,12 @@ namespace GUI
 		if (ImGui::Begin("About", &Visible, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
 		{
 			ImGui::TextDisabled("Version:");
-			ImGui::Text(Version);
+			ImGui::Text(""); ImGui::SameLine(); ImGui::Text(Version);
 #ifdef _DEBUG
 			ImGui::SameLine(); ImGui::TextDisabled("[DEBUG BUILD]");
 #endif
 			ImGui::TextDisabled("Location:");
-			if (ImGui::TreeNodeW(Path::F_HOST_DLL))
+			if (ImGui::TreeNode(Path::F_HOST_DLL))
 			{
 				for (std::wstring param : Parameters)
 				{
@@ -25,7 +26,12 @@ namespace GUI
 				}
 				ImGui::TreePop();
 			}
+
+			ImGui::TextDisabled("Mode:");
+			ImGui::Text(""); ImGui::SameLine(); ImGui::Text("Method %d %s", State::EntryMethod, State::IsChainloading ? "Chainloading" : "");
 			
+			ImGui::Checkbox("Developer Mode", &State::IsDeveloperMode);
+
 			ImGui::Separator();
 
 			ImVec2 windowSize = ImGui::GetWindowSize();

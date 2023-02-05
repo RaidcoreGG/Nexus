@@ -8,15 +8,16 @@
 
 namespace State
 {
-	ggState	AddonHost					= ggState::NONE;
-	DxState	Directx						= DxState::NONE;
-	bool	IsChainloading				= false;
-	bool	IsImGuiInitialized			= false;
+	ggState			AddonHost					= ggState::NONE;
+	EDxState		Directx						= EDxState::NONE;
+	EEntryMethod	EntryMethod					= EEntryMethod::NONE;
+	bool			IsChainloading				= false;
+	bool			IsImGuiInitialized			= false;
 
-	bool	IsDeveloperMode				= false;
-	bool	IsConsoleEnabled			= false;
-	bool	IsVanilla					= false;
-	bool	IsMumbleDisabled			= false;
+	bool			IsDeveloperMode				= false;
+	bool			IsConsoleEnabled = false;
+	bool			IsVanilla					= false;
+	bool			IsMumbleDisabled			= false;
 
 	void Initialize()
 	{

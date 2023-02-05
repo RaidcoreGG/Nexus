@@ -27,8 +27,8 @@ void AddonDefinition::RenderItem()
 		{
 			ImGui::BeginGroup();
 
-			ImGui::TextW(Name); ImGui::SameLine(); ImGui::Text("by"); ImGui::SameLine(); ImGui::TextW(Author);
-			ImGui::TextWrappedW(Description);
+			ImGui::Text(Name); ImGui::SameLine(); ImGui::Text("by"); ImGui::SameLine(); ImGui::Text(Author);
+			ImGui::TextWrapped(Description);
 
 			ImGui::EndGroup();
 		}
@@ -39,7 +39,7 @@ void AddonDefinition::RenderItem()
 			ImGui::BeginGroup();
 			if (Options) { if (ImGui::Button("Options", ImVec2(120.0f, 24.0f))) { Options(); } }
 			//if (ImGui::Button("Remove", ImVec2(120.0f, 24.0f))) {}
-			ImGui::TextCenteredColumnW(Version);
+			ImGui::TextCenteredColumn(Version);
 
 			ImGui::EndGroup();
 		}

@@ -9,13 +9,13 @@
 class FileLogger : public virtual ILogger
 {
     public:
-        FileLogger(const wchar_t* aPath);
+        FileLogger(const char* aPath);
         ~FileLogger();
 
         void LogMessage(LogEntry aLogEntry);
 
     private:
-        std::wofstream File;
+        std::ofstream File;
 };
 
 #endif

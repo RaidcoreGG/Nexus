@@ -26,6 +26,8 @@ namespace Loader
         APIDef.SwapChain = Renderer::SwapChain;
         APIDef.ImguiContext = Renderer::GuiContext;
         APIDef.MumbleLink = MumbleLink;
+        APIDef.WindowWidth = &Renderer::Width;
+        APIDef.WindowHeight = &Renderer::Height;
 
         VTableMinhook minhook{};
         minhook.CreateHook = MH_CreateHook;
@@ -35,14 +37,14 @@ namespace Loader
         APIDef.MinhookFunctions = minhook;
 
         VTableLogging logging{};
-        logging.LogA = LogMessageA;
-        logging.LogW = LogMessageW;
+        logging.Log = LogMessageA;
         logging.RegisterLogger = RegisterLogger;
         logging.UnregisterLogger = UnregisterLogger;
         APIDef.LoggingFunctions = logging;
 
         APIDef.RaiseEvent = EventHandler::RaiseEvent;
         APIDef.SubscribeEvent = EventHandler::SubscribeEvent;
+        APIDef.UnsubscribeEvent = EventHandler::UnsubscribeEvent;
 
         APIDef.RegisterKeybind = KeybindHandler::RegisterKeybind;
         APIDef.UnregisterKeybind = KeybindHandler::UnregisterKeybind;
@@ -75,17 +77,6 @@ namespace Loader
         getAddonDef = (GETADDONDEF)GetProcAddress(hMod, "GetAddonDef");
         if (getAddonDef == 0)
         {
-            ARC_GETINITADDR getInitAddr = (ARC_GETINITADDR)GetProcAddress(hMod, "get_init_addr");   /* load arc mod instead */
-
-            if (getInitAddr)
-            {
-                LogWarning("Attempting to load ArcDPS extension. (%s)", path);
-            }
-            else
-            {
-                LogWarning("Unknown library found in directory. (%s)", path);
-            }
-
             Blacklist.insert(aPath);
             FreeLibrary(hMod);
             return;

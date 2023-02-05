@@ -6,11 +6,11 @@
 #include <locale>
 #include <PathCch.h>
 
-void PathCopyAndAppend(wchar_t* aSource, wchar_t* aDestination, const wchar_t* aAppend);
+void PathCopyAndAppend(char* aSource, char* aDestination, const char* aAppend);
 
-void PathSystemAppend(wchar_t* aDestination, const wchar_t* aAppend);
+void PathSystemAppend(char* aDestination, const char* aAppend);
 
-void PathGetDirectoryName(wchar_t* aSource, wchar_t* aDestination);
+void PathGetDirectoryName(char* aSource, char* aDestination);
 
 bool FindFunction(HMODULE aModule, LPVOID aFunction, LPCSTR aName);
 

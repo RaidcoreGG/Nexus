@@ -28,9 +28,9 @@ namespace KeybindHandler
 	void LoadKeybinds();																						/* Loads the keybinds from disk */
 	void SaveKeybinds();																						/* Saves the keybinds */
 
-	void RegisterKeybind(std::string aIdentifier, KEYBINDS_PROCESS aKeybindHandler, std::string aKeybind);	/* Registers a kb with the given identifier, it will be passed to the given handler, if no bind was previously stored the given one will be used */
+	void RegisterKeybind(std::string aIdentifier, KEYBINDS_PROCESS aKeybindHandler, std::string aKeybind);		/* Registers a kb with the given identifier, it will be passed to the given handler, if no bind was previously stored the given one will be used */
 	void UnregisterKeybind(std::string aIdentifier);															/* This will free up the registered keybind event handler, should be called on addon shutdown */
-	void SetKeybind(std::string aIdentifier, std::string aKeybind);											/* This will force set the keybind, invoked via menu/ui */
+	void SetKeybind(std::string aIdentifier, std::string aKeybind);												/* This will force set the keybind, invoked via menu/ui */
 	void InvokeKeybind(std::string aIdentifier);																/* Invokes the action on the corresponding keybind handler */
 };
 
