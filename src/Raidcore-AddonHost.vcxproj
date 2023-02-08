@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core.cpp" />
+    <ClCompile Include="DataLink\DataLink.cpp" />
     <ClCompile Include="entry.cpp" />
     <ClCompile Include="Events\EventHandler.cpp" />
     <ClCompile Include="GUI\GUI.cpp" />
@@ -51,6 +52,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h" />
+    <ClInclude Include="DataLink\DataLink.h" />
+    <ClInclude Include="DataLink\LinkedResource.h" />
     <ClInclude Include="Events\EventHandler.h" />
     <ClInclude Include="GUI\GUI.h" />
     <ClInclude Include="GUI\IWindow.h" />

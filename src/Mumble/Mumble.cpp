@@ -21,9 +21,6 @@ namespace Mumble
 
 		if (Handle && MumbleLink) { return MumbleLink; }
 
-		//std::wstring mumble_name = GetMumbleName();
-
-		//Handle = OpenFileMappingW(FILE_MAP_ALL_ACCESS, FALSE, mumble_name.c_str());
 		Handle = OpenFileMappingW(FILE_MAP_ALL_ACCESS, FALSE, aMumbleName);
 		if (Handle == 0)
 		{

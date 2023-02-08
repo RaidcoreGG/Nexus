@@ -8,43 +8,48 @@
 #include "../Keybinds/KeybindHandler.h"
 #include "../imgui/imgui.h"
 #include "../minhook/mh_hook.h"
+#include "../DataLink/DataLink.h"
 
 using namespace Mumble;
 
 struct VTableMinhook
 {
-	MINHOOK_CREATE		CreateHook;
-	MINHOOK_REMOVE		RemoveHook;
-	MINHOOK_ENABLE		EnableHook;
-	MINHOOK_DISABLE		DisableHook;
+	MINHOOK_CREATE			CreateHook;
+	MINHOOK_REMOVE			RemoveHook;
+	MINHOOK_ENABLE			EnableHook;
+	MINHOOK_DISABLE			DisableHook;
 };
 
 struct VTableLogging
 {
-	LOGGER_LOGA			Log;
-	LOGGER_ADDREM		RegisterLogger;
-	LOGGER_ADDREM		UnregisterLogger;
+	LOGGER_LOGA				Log;
+	LOGGER_ADDREM			RegisterLogger;
+	LOGGER_ADDREM			UnregisterLogger;
 };
 
 struct AddonAPI
 {
-	IDXGISwapChain*		SwapChain;
-	ImGuiContext*		ImguiContext;
-	LinkedMem*			MumbleLink;
-	unsigned*			WindowWidth;
-	unsigned*			WindowHeight;
+	IDXGISwapChain*			SwapChain;
+	ImGuiContext*			ImguiContext;
+	LinkedMem*				MumbleLink;
+	unsigned*				WindowWidth;
+	unsigned*				WindowHeight;
 
-	VTableMinhook		MinhookFunctions;
-	VTableLogging		LoggingFunctions;
+	VTableMinhook			MinhookFunctions;
+	VTableLogging			LoggingFunctions;
 
 	/* Events */
-	EVENTS_RAISE		RaiseEvent;
-	EVENTS_SUBSCRIBE	SubscribeEvent;
-	EVENTS_SUBSCRIBE	UnsubscribeEvent;
+	EVENTS_RAISE			RaiseEvent;
+	EVENTS_SUBSCRIBE		SubscribeEvent;
+	EVENTS_SUBSCRIBE		UnsubscribeEvent;
 
 	/* Keybinds */
-	KEYBINDS_REGISTER	RegisterKeybind;
-	KEYBINDS_UNREGISTER	UnregisterKeybind;
+	KEYBINDS_REGISTER		RegisterKeybind;
+	KEYBINDS_UNREGISTER		UnregisterKeybind;
+
+	/* DataLink */
+	DATALINK_GETRESOURCE	GetResource;
+	DATALINK_SHARERESOURCE	ShareResource;
 
 	/* API */
 		// GW2 API FUNCS

@@ -221,9 +221,12 @@ namespace GUI
 			//ImGui::Button("Layout", ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
 			//ImGui::Button("Options", ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
 
-			ImGui::Separator();
+			if (State::IsDeveloperMode)
+			{
+				ImGui::Separator();
 
-			for (IWindow* wnd : Windows) { wnd->MenuOption(1); }
+				for (IWindow* wnd : Windows) { wnd->MenuOption(1); }
+			}
 
 			ImGui::Separator();
 

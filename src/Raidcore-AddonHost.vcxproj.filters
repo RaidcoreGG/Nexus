@@ -64,6 +64,9 @@
     <Filter Include="GUI\Widgets\Debug">
       <UniqueIdentifier>{c9b428d0-6faf-4a6c-90d5-d8264bb96899}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DataLink">
+      <UniqueIdentifier>{bc75dd17-819f-48c8-a82d-b3b2dd12becb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="entry.cpp">
@@ -176,6 +179,9 @@
     </ClCompile>
     <ClCompile Include="GUI\Widgets\Debug\DebugWindow.cpp">
       <Filter>GUI\Widgets\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="DataLink\DataLink.cpp">
+      <Filter>DataLink</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -340,6 +346,12 @@
     </ClInclude>
     <ClInclude Include="GUI\Widgets\Debug\DebugWindow.h">
       <Filter>GUI\Widgets\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="DataLink\DataLink.h">
+      <Filter>DataLink</Filter>
+    </ClInclude>
+    <ClInclude Include="DataLink\LinkedResource.h">
+      <Filter>DataLink</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

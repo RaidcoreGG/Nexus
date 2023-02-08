@@ -4,6 +4,7 @@
 #include "../../../State.h"
 
 #include "../../../Events/EventHandler.h"
+#include "../../../DataLink/DataLink.h"
 
 namespace GUI
 {
@@ -40,13 +41,32 @@ namespace GUI
 
                     ImGui::EndTabItem();
                 }
-                /*if (ImGui::BeginTabItem("Library"))
+                if (ImGui::BeginTabItem("DataLink"))
                 {
-                    ImVec2 windowSize = ImGui::GetWindowSize();
-                    ImVec2 textSize = ImGui::CalcTextSize("Unable to fetch addons.");
-                    ImVec2 position = ImGui::GetCursorPos();
-                    ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-                    ImGui::TextDisabled("Unable to fetch addons.");
+                    {
+                        ImGui::BeginChild("##DataLinkTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+
+                        DataLink::DataLinkMutex.lock();
+                        for (auto& [identifier, resource] : DataLink::DataLinkRegistry)
+                        {
+                            ImGui::Text(identifier.c_str()); ImGui::SameLine(); ImGui::TextDisabled("%p", resource.Pointer);
+                        }
+                        DataLink::DataLinkMutex.unlock();
+
+                        ImGui::EndChild();
+                    }
+
+                    ImGui::EndTabItem();
+                }
+                /*if (ImGui::BeginTabItem("Meme"))
+                {
+                    {
+                        ImGui::BeginChild("##MemeTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+
+                        // new item
+
+                        ImGui::EndChild();
+                    }
 
                     ImGui::EndTabItem();
                 }*/

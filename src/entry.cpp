@@ -21,6 +21,7 @@
 #include "Events/EventHandler.h"
 #include "GUI/GUI.h"
 #include "Loader/Loader.h"
+#include "DataLink/DataLink.h"
 
 #define ENABLE_CHAINLOAD
 
@@ -56,6 +57,13 @@ void Initialize()
 
 	MH_Initialize();
 	KeybindHandler::LoadKeybinds();
+
+	LinkedResource resMumble{};
+	resMumble.Handle = nullptr;
+	resMumble.Pointer = MumbleLink;
+	resMumble.Size = sizeof(LinkedMem);
+
+	DataLink::DataLinkRegistry["MUMBLE_LINK"] = resMumble;
 }
 void Shutdown()
 {
@@ -70,6 +78,8 @@ void Shutdown()
 		MH_Uninitialize();
 
 		Loader::Shutdown();
+
+		DataLink::Shutdown();
 
 		KeybindHandler::SaveKeybinds();
 
