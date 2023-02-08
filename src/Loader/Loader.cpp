@@ -25,7 +25,6 @@ namespace Loader
         /* setup APIDefs */
         APIDef.SwapChain = Renderer::SwapChain;
         APIDef.ImguiContext = Renderer::GuiContext;
-        APIDef.MumbleLink = MumbleLink;
         APIDef.WindowWidth = &Renderer::Width;
         APIDef.WindowHeight = &Renderer::Height;
 
@@ -48,6 +47,9 @@ namespace Loader
 
         APIDef.RegisterKeybind = KeybindHandler::RegisterKeybind;
         APIDef.UnregisterKeybind = KeybindHandler::UnregisterKeybind;
+
+        APIDef.GetResource = DataLink::GetResource;
+        APIDef.ShareResource = DataLink::ShareResource;
 
         State::AddonHost = ggState::ADDONS_READY;
 

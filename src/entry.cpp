@@ -58,12 +58,11 @@ void Initialize()
 	MH_Initialize();
 	KeybindHandler::LoadKeybinds();
 
-	LinkedResource resMumble{};
-	resMumble.Handle = nullptr;
-	resMumble.Pointer = MumbleLink;
-	resMumble.Size = sizeof(LinkedMem);
-
+	/* add mumble to datalink */
+	LinkedResource resMumble{ nullptr, MumbleLink, sizeof(LinkedMem) };
+	DataLink::DataLinkMutex.lock();
 	DataLink::DataLinkRegistry["MUMBLE_LINK"] = resMumble;
+	DataLink::DataLinkMutex.unlock();
 }
 void Shutdown()
 {

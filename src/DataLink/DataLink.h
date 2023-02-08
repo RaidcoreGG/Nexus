@@ -7,8 +7,8 @@
 
 #include "LinkedResource.h"
 
-typedef void (*DATALINK_GETRESOURCE)(std::string aIdentifier);
-typedef void (*DATALINK_SHARERESOURCE)(std::string aIdentifier, int aResourceSize);
+typedef void* (*DATALINK_GETRESOURCE)(std::string aIdentifier);
+typedef void* (*DATALINK_SHARERESOURCE)(std::string aIdentifier, size_t aResourceSize);
 
 namespace DataLink
 {

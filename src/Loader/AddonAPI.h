@@ -31,7 +31,6 @@ struct AddonAPI
 {
 	IDXGISwapChain*			SwapChain;
 	ImGuiContext*			ImguiContext;
-	LinkedMem*				MumbleLink;
 	unsigned*				WindowWidth;
 	unsigned*				WindowHeight;
 
@@ -54,7 +53,6 @@ struct AddonAPI
 	/* API */
 		// GW2 API FUNCS
 		// LOGITECH API FUNCS
-		// RESOURCE SHARING FUNCS
 };
 
 #endif
