@@ -13,14 +13,14 @@ namespace GUI
         ImGui::SetNextWindowSize(ImVec2(480.0f, 380.0f));
         if (ImGui::Begin("Keybinds", &Visible, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
         {
-            KeybindHandler::KeybindRegistryMutex.lock();
-            for (auto& [identifier, keybind] : KeybindHandler::KeybindRegistry)
+            Keybinds::Mutex.lock();
+            for (auto& [identifier, keybind] : Keybinds::Registry)
             {
                 ImGui::Text(identifier.c_str());
                 ImGui::SameLine();
                 ImGui::Text(keybind.ToString().c_str());
             }
-            KeybindHandler::KeybindRegistryMutex.unlock();
+            Keybinds::Mutex.unlock();
         }
         ImGui::End();
     }

@@ -4,6 +4,7 @@
 #include "../../../State.h"
 
 #include "../../../Events/EventHandler.h"
+#include "../../../Keybinds/KeybindHandler.h"
 #include "../../../DataLink/DataLink.h"
 
 namespace GUI
@@ -22,8 +23,8 @@ namespace GUI
                     {
                         ImGui::BeginChild("##EventsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-                        EventHandler::EventRegistryMutex.lock();
-                        for (auto& [identifier, subscribers] : EventHandler::EventRegistry)
+                        Events::Mutex.lock();
+                        for (auto& [identifier, subscribers] : Events::Registry)
                         {
                             if (ImGui::TreeNode(identifier.c_str()))
                             {
@@ -34,7 +35,24 @@ namespace GUI
                                 ImGui::TreePop();
                             }
                         }
-                        EventHandler::EventRegistryMutex.unlock();
+                        Events::Mutex.unlock();
+
+                        ImGui::EndChild();
+                    }
+
+                    ImGui::EndTabItem();
+                }
+                if (ImGui::BeginTabItem("Keybinds"))
+                {
+                    {
+                        ImGui::BeginChild("##KeybindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+
+                        Keybinds::Mutex.lock();
+                        for (auto& [identifier, handler] : Keybinds::HandlerRegistry)
+                        {
+                            ImGui::Text(identifier.c_str()); ImGui::SameLine(); ImGui::TextDisabled("%p", handler);
+                        }
+                        Keybinds::Mutex.unlock();
 
                         ImGui::EndChild();
                     }
@@ -46,12 +64,12 @@ namespace GUI
                     {
                         ImGui::BeginChild("##DataLinkTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-                        DataLink::DataLinkMutex.lock();
-                        for (auto& [identifier, resource] : DataLink::DataLinkRegistry)
+                        DataLink::Mutex.lock();
+                        for (auto& [identifier, resource] : DataLink::Registry)
                         {
                             ImGui::Text(identifier.c_str()); ImGui::SameLine(); ImGui::TextDisabled("%p", resource.Pointer);
                         }
-                        DataLink::DataLinkMutex.unlock();
+                        DataLink::Mutex.unlock();
 
                         ImGui::EndChild();
                     }

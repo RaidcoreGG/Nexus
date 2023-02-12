@@ -27,25 +27,21 @@ namespace Loader
         APIDef.WindowWidth = &Renderer::Width;
         APIDef.WindowHeight = &Renderer::Height;
 
-        VTableMinhook minhook{};
-        minhook.CreateHook = MH_CreateHook;
-        minhook.RemoveHook = MH_RemoveHook;
-        minhook.EnableHook = MH_EnableHook;
-        minhook.DisableHook = MH_DisableHook;
-        APIDef.MinhookFunctions = minhook;
+        APIDef.CreateHook = MH_CreateHook;
+        APIDef.RemoveHook = MH_RemoveHook;
+        APIDef.EnableHook = MH_EnableHook;
+        APIDef.DisableHook = MH_DisableHook;
 
-        VTableLogging logging{};
-        logging.Log = LogMessageA;
-        logging.RegisterLogger = RegisterLogger;
-        logging.UnregisterLogger = UnregisterLogger;
-        APIDef.LoggingFunctions = logging;
+        APIDef.Log = LogMessageA;
+        APIDef.RegisterLogger = RegisterLogger;
+        APIDef.UnregisterLogger = UnregisterLogger;
 
-        APIDef.RaiseEvent = EventHandler::RaiseEvent;
-        APIDef.SubscribeEvent = EventHandler::SubscribeEvent;
-        APIDef.UnsubscribeEvent = EventHandler::UnsubscribeEvent;
+        APIDef.RaiseEvent = Events::Raise;
+        APIDef.SubscribeEvent = Events::Subscribe;
+        APIDef.UnsubscribeEvent = Events::Unsubscribe;
 
-        APIDef.RegisterKeybind = KeybindHandler::RegisterKeybind;
-        APIDef.UnregisterKeybind = KeybindHandler::UnregisterKeybind;
+        APIDef.RegisterKeybind = Keybinds::Register;
+        APIDef.UnregisterKeybind = Keybinds::Unregister;
 
         APIDef.GetResource = DataLink::GetResource;
         APIDef.ShareResource = DataLink::ShareResource;

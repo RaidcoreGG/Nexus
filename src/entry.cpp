@@ -56,13 +56,13 @@ void Initialize()
 	LogInfo("Version: %s", Version);
 
 	MH_Initialize();
-	KeybindHandler::LoadKeybinds();
+	Keybinds::Load();
 
 	/* add mumble to datalink */
 	LinkedResource resMumble{ nullptr, MumbleLink, sizeof(LinkedMem) };
-	DataLink::DataLinkMutex.lock();
-	DataLink::DataLinkRegistry["MUMBLE_LINK"] = resMumble;
-	DataLink::DataLinkMutex.unlock();
+	DataLink::Mutex.lock();
+	DataLink::Registry["MUMBLE_LINK"] = resMumble;
+	DataLink::Mutex.unlock();
 }
 void Shutdown()
 {
@@ -80,7 +80,7 @@ void Shutdown()
 
 		DataLink::Shutdown();
 
-		KeybindHandler::SaveKeybinds();
+		Keybinds::Save();
 
 		if (hD3D11)		{ FreeLibrary(hD3D11); }
 		if (hSysD3D11)	{ FreeLibrary(hSysD3D11); }
@@ -101,7 +101,7 @@ LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 
 	// don't pass to game if keybind
-	if (KeybindHandler::WndProc(hWnd, uMsg, wParam, lParam)) { return 0; }
+	if (Keybinds::WndProc(hWnd, uMsg, wParam, lParam)) { return 0; }
 
 	// don't pass to game if gui
 	if (GUI::WndProc(hWnd, uMsg, wParam, lParam)) { return 0; }
@@ -159,7 +159,7 @@ HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, 
 	Renderer::Width = Width;
 	Renderer::Height = Height;
 
-	EventHandler::RaiseEvent("WINDOW_RESIZED", nullptr);
+	Events::Raise("WINDOW_RESIZED", nullptr);
 	
 	return Hooks::DXGI_ResizeBuffers(pChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
 }

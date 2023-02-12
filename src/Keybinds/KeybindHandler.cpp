@@ -7,11 +7,11 @@
 #include "../Shared.h"
 #include "../State.h"
 
-namespace KeybindHandler
+namespace Keybinds
 {
-	std::mutex KeybindRegistryMutex;
-	std::map<std::string, Keybind> KeybindRegistry;
-	std::map<std::string, KEYBINDS_PROCESS> KeybindHandlerRegistry;
+	std::mutex Mutex;
+	std::map<std::string, Keybind> Registry;
+	std::map<std::string, KEYBINDS_PROCESS> HandlerRegistry;
 
 	std::mutex HeldKeysMutex;
 	std::vector<WPARAM> HeldKeys;
@@ -40,13 +40,13 @@ namespace KeybindHandler
 
 			HeldKeysMutex.unlock();
 			
-			for (std::map<std::string, Keybind>::iterator it = KeybindRegistry.begin(); it != KeybindRegistry.end(); ++it)
+			for (std::map<std::string, Keybind>::iterator it = Registry.begin(); it != Registry.end(); ++it)
 			{
 				Keybind stored = it->second;
 
 				if (kb == stored)
 				{
-					InvokeKeybind(it->first);
+					Invoke(it->first);
 					return true;
 				}
 			}
@@ -62,11 +62,11 @@ namespace KeybindHandler
 		return false;
 	}
 
-	void LoadKeybinds()
+	void Load()
 	{
 		if (!std::filesystem::exists(Path::F_KEYBINDS)) { return; }
 
-		KeybindRegistryMutex.lock();
+		Mutex.lock();
 
 		std::ifstream file(Path::F_KEYBINDS);
 
@@ -84,22 +84,22 @@ namespace KeybindHandler
 				line.erase(0, pos + delimiter.length());
 			}
 
-			KeybindRegistry[token] = KBFromString(line);
+			Registry[token] = KBFromString(line);
 			LogDebug("%s | %s", token.c_str(), line.c_str());
 		}
 
 		file.close();
 
-		KeybindRegistryMutex.unlock();
+		Mutex.unlock();
 	}
 
-	void SaveKeybinds()
+	void Save()
 	{
-		KeybindRegistryMutex.lock();
+		Mutex.lock();
 
 		std::ofstream file(Path::F_KEYBINDS);
 
-		for (std::map<std::string, Keybind>::iterator it = KeybindRegistry.begin(); it != KeybindRegistry.end(); ++it)
+		for (std::map<std::string, Keybind>::iterator it = Registry.begin(); it != Registry.end(); ++it)
 		{
 			std::string id = it->first;
 			std::string kb = it->second.ToString();
@@ -112,17 +112,17 @@ namespace KeybindHandler
 
 		file.close();
 
-		KeybindRegistryMutex.unlock();
+		Mutex.unlock();
 	}
 
-	void RegisterKeybind(std::string aIdentifier, KEYBINDS_PROCESS aKeybindHandler, std::string aKeybind)
+	void Register(std::string aIdentifier, KEYBINDS_PROCESS aKeybindHandler, std::string aKeybind)
 	{
 		Keybind requestedBind = KBFromString(aKeybind);
 
-		KeybindRegistryMutex.lock();
+		Mutex.lock();
 
 		/* check if another identifier, already uses the keybind */
-		for (auto& [identifier, keybind] : KeybindRegistry)
+		for (auto& [identifier, keybind] : Registry)
 		{
 			if (keybind == requestedBind)
 			{
@@ -137,55 +137,55 @@ namespace KeybindHandler
 		}
 
 		/* check if this keybind is not already set */
-		if (KeybindRegistry.find(aIdentifier) == KeybindRegistry.end())
+		if (Registry.find(aIdentifier) == Registry.end())
 		{
-			KeybindRegistry[aIdentifier] = requestedBind;
+			Registry[aIdentifier] = requestedBind;
 		}
 		else
 		{
-			if (KeybindRegistry[aIdentifier] == Keybind{})
+			if (Registry[aIdentifier] == Keybind{})
 			{
-				KeybindRegistry[aIdentifier] = requestedBind;
+				Registry[aIdentifier] = requestedBind;
 			}
 		}
 
-		KeybindHandlerRegistry[aIdentifier] = aKeybindHandler;
+		HandlerRegistry[aIdentifier] = aKeybindHandler;
 
-		KeybindRegistryMutex.unlock();
+		Mutex.unlock();
 
-		SaveKeybinds();
+		Save();
 	}
 
-	void UnregisterKeybind(std::string aIdentifier)
+	void Unregister(std::string aIdentifier)
 	{
-		KeybindRegistryMutex.lock();
+		Mutex.lock();
 
-		KeybindRegistry.erase(aIdentifier);
-		KeybindHandlerRegistry.erase(aIdentifier);
+		Registry.erase(aIdentifier);
+		HandlerRegistry.erase(aIdentifier);
 
-		KeybindRegistryMutex.unlock();
+		Mutex.unlock();
 	}
 
-	void SetKeybind(std::string aIdentifier, std::string aKeybind)
+	void Set(std::string aIdentifier, std::string aKeybind)
 	{
 		Keybind requestedBind = KBFromString(aKeybind);
 
-		KeybindRegistryMutex.lock();
+		Mutex.lock();
 
-		KeybindRegistry[aIdentifier] = requestedBind;
+		Registry[aIdentifier] = requestedBind;
 
-		KeybindRegistryMutex.unlock();
+		Mutex.unlock();
 	}
 
-	void InvokeKeybind(std::string aIdentifier)
+	void Invoke(std::string aIdentifier)
 	{
-		KeybindRegistryMutex.lock();
+		Mutex.lock();
 
-		if (KeybindHandlerRegistry[aIdentifier])
+		if (HandlerRegistry[aIdentifier])
 		{
-			KeybindHandlerRegistry[aIdentifier](aIdentifier);
+			HandlerRegistry[aIdentifier](aIdentifier);
 		}
 
-		KeybindRegistryMutex.unlock();
+		Mutex.unlock();
 	}
 }

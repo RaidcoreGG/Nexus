@@ -1,5 +1,5 @@
-#ifndef HOSTFUNCTIONTABLE_H
-#define HOSTFUNCTIONTABLE_H
+#ifndef ADDONAPI_H
+#define ADDONAPI_H
 
 #include <dxgi.h>
 #include "../Mumble/LinkedMem.h"
@@ -12,30 +12,24 @@
 
 using namespace Mumble;
 
-struct VTableMinhook
-{
-	MINHOOK_CREATE			CreateHook;
-	MINHOOK_REMOVE			RemoveHook;
-	MINHOOK_ENABLE			EnableHook;
-	MINHOOK_DISABLE			DisableHook;
-};
-
-struct VTableLogging
-{
-	LOGGER_LOGA				Log;
-	LOGGER_ADDREM			RegisterLogger;
-	LOGGER_ADDREM			UnregisterLogger;
-};
-
 struct AddonAPI
 {
+	/* Renderer */
 	IDXGISwapChain*			SwapChain;
 	ImGuiContext*			ImguiContext;
 	unsigned*				WindowWidth;
 	unsigned*				WindowHeight;
 
-	VTableMinhook			MinhookFunctions;
-	VTableLogging			LoggingFunctions;
+	/* Minhook */
+	MINHOOK_CREATE			CreateHook;
+	MINHOOK_REMOVE			RemoveHook;
+	MINHOOK_ENABLE			EnableHook;
+	MINHOOK_DISABLE			DisableHook;
+
+	/* Logging */
+	LOGGER_LOGA				Log;
+	LOGGER_ADDREM			RegisterLogger;
+	LOGGER_ADDREM			UnregisterLogger;
 
 	/* Events */
 	EVENTS_RAISE			RaiseEvent;

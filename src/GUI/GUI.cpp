@@ -144,7 +144,7 @@ namespace GUI
 		AddWindow(new DebugWindow());
 		AddWindow(new AboutBox());
 
-		KeybindHandler::RegisterKeybind("ADDONHOST_MENU", ProcessKeybind, "CTRL+O");
+		Keybinds::Register("ADDONHOST_MENU", ProcessKeybind, "CTRL+O");
 
 		IsSetup = true;
 	}

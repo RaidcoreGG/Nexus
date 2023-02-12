@@ -4,16 +4,16 @@
 
 namespace DataLink
 {
-	std::mutex DataLinkMutex;
-	std::map<std::string, LinkedResource> DataLinkRegistry;
+	std::mutex Mutex;
+	std::map<std::string, LinkedResource> Registry;
 
 	void Shutdown()
 	{
-		DataLinkMutex.lock();
+		Mutex.lock();
 		
-		while (DataLinkRegistry.size() > 0)
+		while (Registry.size() > 0)
 		{
-			const auto& it = DataLinkRegistry.begin();
+			const auto& it = Registry.begin();
 
 			if (it->second.Pointer)
 			{
@@ -29,36 +29,36 @@ namespace DataLink
 
 			LogDebug("Freed shared resource: %s", it->first.c_str());
 
-			DataLinkRegistry.erase(it);
+			Registry.erase(it);
 		}
-		DataLinkMutex.unlock();
+		Mutex.unlock();
 	}
 
 	void* GetResource(std::string aIdentifier)
 	{
-		DataLinkMutex.lock();
+		Mutex.lock();
 
 		void* result = nullptr;
 
-		if (DataLinkRegistry.find(aIdentifier) != DataLinkRegistry.end())
+		if (Registry.find(aIdentifier) != Registry.end())
 		{
-			result = DataLinkRegistry[aIdentifier].Pointer;
+			result = Registry[aIdentifier].Pointer;
 		}
 
-		DataLinkMutex.unlock();
+		Mutex.unlock();
 
 		return result;
 	}
 
 	void* ShareResource(std::string aIdentifier, size_t aResourceSize)
 	{
-		DataLinkMutex.lock();
+		Mutex.lock();
 
 		/* resource already exists */
-		if (DataLinkRegistry.find(aIdentifier) != DataLinkRegistry.end())
+		if (Registry.find(aIdentifier) != Registry.end())
 		{
-			DataLinkMutex.unlock();
-			return DataLinkRegistry[aIdentifier].Pointer;
+			Mutex.unlock();
+			return Registry[aIdentifier].Pointer;
 		}
 
 		/* allocate new resource */
@@ -71,13 +71,13 @@ namespace DataLink
 		{
 			resource.Pointer = MapViewOfFile(resource.Handle, FILE_MAP_ALL_ACCESS, 0, 0, aResourceSize);
 
-			DataLinkRegistry[aIdentifier] = resource;
+			Registry[aIdentifier] = resource;
 
-			DataLinkMutex.unlock();
+			Mutex.unlock();
 			return resource.Pointer;
 		}
 
-		DataLinkMutex.unlock();
+		Mutex.unlock();
 
 		return nullptr;
 	}

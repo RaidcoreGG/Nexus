@@ -12,8 +12,8 @@ typedef void* (*DATALINK_SHARERESOURCE)(std::string aIdentifier, size_t aResourc
 
 namespace DataLink
 {
-	extern std::mutex DataLinkMutex;
-	extern std::map<std::string, LinkedResource> DataLinkRegistry;
+	extern std::mutex Mutex;
+	extern std::map<std::string, LinkedResource> Registry;
 
 	void	Shutdown();														/* Frees all remaining resources */
 

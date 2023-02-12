@@ -4,43 +4,43 @@
 #include "EventHandler.h"
 #include "../Shared.h"
 
-namespace EventHandler
+namespace Events
 {
-	std::mutex EventRegistryMutex;
-	std::map<std::string, std::vector<EVENT_CONSUME>> EventRegistry;
+	std::mutex Mutex;
+	std::map<std::string, std::vector<EVENT_CONSUME>> Registry;
 
-	void RaiseEvent(std::string aIdentifier, void* aEventData)
+	void Raise(std::string aIdentifier, void* aEventData)
 	{
 		Log(aIdentifier.c_str());
 
-		EventRegistryMutex.lock();
+		Mutex.lock();
 
-		for (EVENT_CONSUME callback : EventRegistry[aIdentifier])
+		for (EVENT_CONSUME callback : Registry[aIdentifier])
 		{
 			std::thread([callback, aEventData]() { callback(aEventData); }).detach();
 		}
 
-		EventRegistryMutex.unlock();
+		Mutex.unlock();
 	}
 
-	void SubscribeEvent(std::string aIdentifier, EVENT_CONSUME aConsumeEventCallback)
+	void Subscribe(std::string aIdentifier, EVENT_CONSUME aConsumeEventCallback)
 	{
-		EventRegistryMutex.lock();
+		Mutex.lock();
 
-		EventRegistry[aIdentifier].push_back(aConsumeEventCallback);
+		Registry[aIdentifier].push_back(aConsumeEventCallback);
 
-		EventRegistryMutex.unlock();
+		Mutex.unlock();
 	}
 
-	void UnsubscribeEvent(std::string aIdentifier, EVENT_CONSUME aConsumeEventCallback)
+	void Unsubscribe(std::string aIdentifier, EVENT_CONSUME aConsumeEventCallback)
 	{
-		EventRegistryMutex.lock();
+		Mutex.lock();
 
-		if (EventRegistry.find(aIdentifier) != EventRegistry.end())
+		if (Registry.find(aIdentifier) != Registry.end())
 		{
-			EventRegistry[aIdentifier].erase(std::remove(EventRegistry[aIdentifier].begin(), EventRegistry[aIdentifier].end(), aConsumeEventCallback), EventRegistry[aIdentifier].end());
+			Registry[aIdentifier].erase(std::remove(Registry[aIdentifier].begin(), Registry[aIdentifier].end(), aConsumeEventCallback), Registry[aIdentifier].end());
 		}
 
-		EventRegistryMutex.unlock();
+		Mutex.unlock();
 	}
 }
