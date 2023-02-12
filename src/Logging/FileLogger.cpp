@@ -1,6 +1,4 @@
 #include "FileLogger.h"
-#include <sstream>
-#include <iomanip>
 
 FileLogger::FileLogger(const char* aPath)
 {
