@@ -9,8 +9,7 @@
 namespace Loader
 {
     std::mutex AddonsMutex;
-    std::map<std::filesystem::path, AddonDefinition*> AddonDefs;
-    std::map<std::filesystem::path, HMODULE> AddonModules;
+    std::map<std::filesystem::path, LoadedAddon> AddonDefs;
     AddonAPI APIDef{};
 
     std::thread UpdateThread;
@@ -84,8 +83,8 @@ namespace Loader
             return;
         }
 
-        AddonDefinition* addon = getAddonDef();
-        if (hMod && !addon->HasMinimumRequirements())
+        AddonDefinition* defs = getAddonDef();
+        if (hMod && !defs->HasMinimumRequirements())
         {
             LogWarning("Addon loading cancelled. %s does not fulfill minimum requirements. At least define Name, Version, Author, Description as well as Load and Unload functions.", path);
 
@@ -94,9 +93,11 @@ namespace Loader
             return;
         }
 
+        LoadedAddon addon{ hMod, defs };
+
         AddonDefs.insert({ aPath, addon });
-        AddonModules.insert({ aPath, hMod });
-        addon->Load(APIDef);
+
+        addon.Definitions->Load(APIDef);
 
         LogInfo("Loaded addon: %s", path);
     }
@@ -106,10 +107,10 @@ namespace Loader
         std::string pathStr = aPath.string();
         const char* path = pathStr.c_str();
 
-        AddonDefs[aPath]->Unload();
+        AddonDefs[aPath].Definitions->Unload();
         AddonDefs[aPath] = {};
 
-        HMODULE hMod = AddonModules[aPath];
+        HMODULE hMod = AddonDefs[aPath].Module;
         if (hMod)
         {
             if (!FreeLibrary(hMod))
@@ -121,7 +122,6 @@ namespace Loader
         hMod = nullptr;
 
         AddonDefs.erase(aPath);
-        AddonModules.erase(aPath);
 
         LogInfo("Unloaded addon: %s", path);
     }

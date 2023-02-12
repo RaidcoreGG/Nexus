@@ -1,20 +1,26 @@
 #ifndef LOADER_H
 #define LOADER_H
 
-#include "AddonDefinition.h"
 #include <mutex>
 #include <map>
 #include <set>
 #include <thread>
 #include <filesystem>
 
+#include "AddonDefinition.h"
+
 typedef AddonDefinition*	(*GETADDONDEF)();
+
+struct LoadedAddon
+{
+	HMODULE Module;
+	AddonDefinition* Definitions;
+};
 
 namespace Loader
 {
 	extern std::mutex AddonsMutex;
-	extern std::map<std::filesystem::path, AddonDefinition*> AddonDefs;
-	extern std::map<std::filesystem::path, HMODULE> AddonModules;
+	extern std::map<std::filesystem::path, LoadedAddon> AddonDefs;
     extern AddonAPI APIDef;
 
 	extern std::thread UpdateThread;

@@ -191,7 +191,7 @@ namespace GUI
 			Loader::AddonsMutex.lock();
 			for (const auto& [path, addon] : Loader::AddonDefs)
 			{
-				if (addon->Render) { addon->Render(); }
+				if (addon.Definitions->Render) { addon.Definitions->Render(); }
 			}
 			Loader::AddonsMutex.unlock();
 
