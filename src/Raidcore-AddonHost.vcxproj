@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -49,6 +49,7 @@
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Shared.cpp" />
     <ClCompile Include="State.cpp" />
+    <ClCompile Include="Textures\TextureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h" />
@@ -106,6 +107,8 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shared.h" />
     <ClInclude Include="State.h" />
+    <ClInclude Include="stb\stb_image.h" />
+    <ClInclude Include="Textures\TextureLoader.h" />
     <ClInclude Include="types.h" />
   </ItemGroup>
   <ItemGroup>

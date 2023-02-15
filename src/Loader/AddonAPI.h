@@ -9,40 +9,46 @@
 #include "../imgui/imgui.h"
 #include "../minhook/mh_hook.h"
 #include "../DataLink/DataLink.h"
+#include "../Textures/TextureLoader.h"
 
 using namespace Mumble;
 
 struct AddonAPI
 {
 	/* Renderer */
-	IDXGISwapChain*			SwapChain;
-	ImGuiContext*			ImguiContext;
-	unsigned*				WindowWidth;
-	unsigned*				WindowHeight;
+	IDXGISwapChain*				SwapChain;
+	ImGuiContext*				ImguiContext;
+	unsigned*					WindowWidth;
+	unsigned*					WindowHeight;
 
 	/* Minhook */
-	MINHOOK_CREATE			CreateHook;
-	MINHOOK_REMOVE			RemoveHook;
-	MINHOOK_ENABLE			EnableHook;
-	MINHOOK_DISABLE			DisableHook;
+	MINHOOK_CREATE				CreateHook;
+	MINHOOK_REMOVE				RemoveHook;
+	MINHOOK_ENABLE				EnableHook;
+	MINHOOK_DISABLE				DisableHook;
 
 	/* Logging */
-	LOGGER_LOGA				Log;
-	LOGGER_ADDREM			RegisterLogger;
-	LOGGER_ADDREM			UnregisterLogger;
+	LOGGER_LOGA					Log;
+	LOGGER_ADDREM				RegisterLogger;
+	LOGGER_ADDREM				UnregisterLogger;
 
 	/* Events */
-	EVENTS_RAISE			RaiseEvent;
-	EVENTS_SUBSCRIBE		SubscribeEvent;
-	EVENTS_SUBSCRIBE		UnsubscribeEvent;
+	EVENTS_RAISE				RaiseEvent;
+	EVENTS_SUBSCRIBE			SubscribeEvent;
+	EVENTS_SUBSCRIBE			UnsubscribeEvent;
 
 	/* Keybinds */
-	KEYBINDS_REGISTER		RegisterKeybind;
-	KEYBINDS_UNREGISTER		UnregisterKeybind;
+	KEYBINDS_REGISTER			RegisterKeybind;
+	KEYBINDS_UNREGISTER			UnregisterKeybind;
 
 	/* DataLink */
-	DATALINK_GETRESOURCE	GetResource;
-	DATALINK_SHARERESOURCE	ShareResource;
+	DATALINK_GETRESOURCE		GetResource;
+	DATALINK_SHARERESOURCE		ShareResource;
+
+	/* Textures */
+	TEXTURES_GET				GetTexture;
+	TEXTURES_LOADFROMFILE		LoadTextureFromFile;
+	TEXTURES_LOADFROMRESOURCE	LoadTextureFromResource;
 
 	/* API */
 		// GW2 API FUNCS

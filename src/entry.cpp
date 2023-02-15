@@ -22,6 +22,7 @@
 #include "GUI/GUI.h"
 #include "Loader/Loader.h"
 #include "DataLink/DataLink.h"
+#include "Textures/TextureLoader.h"
 
 #define ENABLE_CHAINLOAD
 

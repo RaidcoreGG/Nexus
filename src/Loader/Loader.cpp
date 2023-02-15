@@ -46,6 +46,10 @@ namespace Loader
         APIDef.GetResource = DataLink::GetResource;
         APIDef.ShareResource = DataLink::ShareResource;
 
+        APIDef.GetTexture = TextureLoader::Get;
+        APIDef.LoadTextureFromFile = TextureLoader::LoadFromFile;
+        APIDef.LoadTextureFromResource = TextureLoader::LoadFromResource;
+
         State::AddonHost = ggState::ADDONS_READY;
 
         UpdateThread = std::thread(Update);
@@ -104,18 +108,19 @@ namespace Loader
         const char* path = pathStr.c_str();
 
         AddonDefs[aPath].Definitions->Unload();
-        AddonDefs[aPath] = {};
 
-        HMODULE hMod = AddonDefs[aPath].Module;
-        if (hMod)
+        if (AddonDefs[aPath].Module)
         {
-            if (!FreeLibrary(hMod))
+            if (!FreeLibrary(AddonDefs[aPath].Module))
             {
                 LogWarning("Couldn't unload %s ", path);
+                return;
             }
         }
 
-        hMod = nullptr;
+        AddonDefs[aPath].Definitions = nullptr;
+        AddonDefs[aPath].Module = nullptr;
+        AddonDefs[aPath] = {};
 
         AddonDefs.erase(aPath);
 
