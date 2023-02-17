@@ -13,6 +13,8 @@ namespace TextureLoader
     std::mutex Mutex;
     std::map<std::string, Texture> Registry;
 
+    std::vector<QueuedTexture> QueuedTextures;
+
     //void Shutdown();
 
     Texture Get(std::string aIdentifier)
@@ -28,50 +30,46 @@ namespace TextureLoader
         return Texture{};
     }
 
-    Texture LoadFromFile(std::string aIdentifier, std::string aFilename)
+    void LoadFromFile(std::string aIdentifier, std::string aFilename, TEXTURES_RECEIVECALLBACK aCallback)
     {
         Texture tex = Get(aIdentifier);
-        if (tex.Resource != nullptr) { return tex; }
+        if (tex.Resource != nullptr) { aCallback(aIdentifier, tex); }
 
         // Load from disk into a raw RGBA buffer
         int image_width = 0;
         int image_height = 0;
         unsigned char* image_data = stbi_load(aFilename.c_str(), &image_width, &image_height, NULL, 4);
 
-        tex = CreateTexture(aIdentifier, image_data, image_width, image_height);
-
-        stbi_image_free(image_data);
-
-        return tex;
+        QueueTexture(aIdentifier, image_data, image_width, image_height, aCallback);
     }
 
-    Texture LoadFromResource(std::string aIdentifier, std::string aName, HMODULE aModule)
+    void LoadFromResource(std::string aIdentifier, std::string aName, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback)
     {
         Texture tex = Get(aIdentifier);
-        if (tex.Resource != nullptr) { return tex; }
+        if (tex.Resource != nullptr) { aCallback(aIdentifier, tex); }
 
         HRSRC imageResHandle = FindResourceA(aModule, MAKEINTRESOURCEA(aName.c_str()), "PNG");
         if (!imageResHandle)
         {
-            return tex;
+            return;
         }
 
         HGLOBAL imageResDataHandle = LoadResource(aModule, imageResHandle);
         if (!imageResDataHandle)
         {
-            return tex;
+            return;
         }
 
         LPVOID imageFile = LockResource(imageResDataHandle);
         if (!imageFile)
         {
-            return tex;
+            return;
         }
 
         DWORD imageFileSize = SizeofResource(aModule, imageResHandle);
         if (!imageFileSize)
         {
-            return tex;
+            return;
         }
 
         int image_width = 0;
@@ -79,24 +77,37 @@ namespace TextureLoader
         int image_components = 0;
         unsigned char* image_data = stbi_load_from_memory((const stbi_uc*)imageFile, imageFileSize, &image_width, &image_height, &image_components, 0);
 
-        tex = CreateTexture(aIdentifier, image_data, image_width, image_height);
-
-        stbi_image_free(image_data);
-
-        return tex;
+        QueueTexture(aIdentifier, image_data, image_width, image_height, aCallback);
     }
 
-    Texture CreateTexture(std::string aIdentifier, unsigned char* aImageData, unsigned aWidth, unsigned aHeight)
+    void QueueTexture(std::string aIdentifier, unsigned char* aImageData, unsigned aWidth, unsigned aHeight, TEXTURES_RECEIVECALLBACK aCallback)
     {
+        LogDebug("Queued %s", aIdentifier.c_str());
+        Mutex.lock();
+
+        QueuedTexture raw{};
+        raw.Identifier = aIdentifier;
+        raw.Data = aImageData;
+        raw.Width = aWidth;
+        raw.Height = aHeight;
+        raw.Callback = aCallback;
+        QueuedTextures.push_back(raw);
+
+        Mutex.unlock();
+    }
+
+    void CreateTexture(QueuedTexture aQueuedTexture)
+    {
+        LogDebug("Create %s", aQueuedTexture.Identifier.c_str());
         Texture tex{};
-        tex.Width = aWidth;
-        tex.Height = aHeight;
+        tex.Width = aQueuedTexture.Width;
+        tex.Height = aQueuedTexture.Height;
 
         // Create texture
         D3D11_TEXTURE2D_DESC desc;
         ZeroMemory(&desc, sizeof(desc));
-        desc.Width = aWidth;
-        desc.Height = aHeight;
+        desc.Width = aQueuedTexture.Width;
+        desc.Height = aQueuedTexture.Height;
         desc.MipLevels = 1;
         desc.ArraySize = 1;
         desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -106,8 +117,8 @@ namespace TextureLoader
         desc.CPUAccessFlags = 0;
 
         ID3D11Texture2D* pTexture = NULL;
-        D3D11_SUBRESOURCE_DATA subResource;
-        subResource.pSysMem = aImageData;
+        D3D11_SUBRESOURCE_DATA subResource{};
+        subResource.pSysMem = aQueuedTexture.Data;
         subResource.SysMemPitch = desc.Width * 4;
         subResource.SysMemSlicePitch = 0;
         Renderer::Device->CreateTexture2D(&desc, &subResource, &pTexture);
@@ -123,8 +134,10 @@ namespace TextureLoader
         Renderer::Device->CreateShaderResourceView(pTexture, &srvDesc, &tex.Resource);
         pTexture->Release();
 
-        Registry[aIdentifier] = tex;
+        Registry[aQueuedTexture.Identifier] = tex;
+        aQueuedTexture.Callback(aQueuedTexture.Identifier, tex);
 
-        return tex;
+        stbi_image_free(aQueuedTexture.Data);
+        aQueuedTexture.Data = {};
     }
 }

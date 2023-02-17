@@ -145,6 +145,13 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 		Hooks::GW2_WndProc = (WNDPROC)SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)hkWndProc);
 	}
 
+	while (TextureLoader::QueuedTextures.size() > 0)
+	{
+		LogDebug("Queued textures: %d", TextureLoader::QueuedTextures.size());
+		TextureLoader::CreateTexture(TextureLoader::QueuedTextures[TextureLoader::QueuedTextures.size() - 1]);
+		TextureLoader::QueuedTextures.pop_back();
+	}
+
 	GUI::Render();
 
 	return Hooks::DXGI_Present(pChain, SyncInterval, Flags);

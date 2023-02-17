@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include <mutex>
+#include <vector>
 
 #include "../Renderer.h"
 
@@ -15,23 +16,36 @@ struct Texture
     ID3D11ShaderResourceView* Resource;
 };
 
+typedef void    (*TEXTURES_RECEIVECALLBACK)(std::string aIdentifier, Texture aTexture);
 typedef Texture (*TEXTURES_GET)(std::string aIdentifier);
-typedef Texture (*TEXTURES_LOADFROMFILE)(std::string aIdentifier, std::string aFilename);
-typedef Texture (*TEXTURES_LOADFROMRESOURCE)(std::string aIdentifier, std::string aName, HMODULE aModule);
+typedef void    (*TEXTURES_LOADFROMFILE)(std::string aIdentifier, std::string aFilename, TEXTURES_RECEIVECALLBACK aCallback);
+typedef void    (*TEXTURES_LOADFROMRESOURCE)(std::string aIdentifier, std::string aName, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback);
+
+struct QueuedTexture
+{
+    unsigned Width;
+    unsigned Height;
+    std::string Identifier;
+    unsigned char* Data;
+    TEXTURES_RECEIVECALLBACK Callback;
+};
 
 namespace TextureLoader
 {
 	extern std::mutex Mutex;
 	extern std::map<std::string, Texture> Registry;
 
+    extern std::vector<QueuedTexture> QueuedTextures;
+
     //void Shutdown();
 
     Texture Get(std::string aIdentifier);
 
-    Texture LoadFromFile(std::string aIdentifier, std::string aFilename);
-    Texture LoadFromResource(std::string aIdentifier, std::string aName, HMODULE aModule);
+    void LoadFromFile(std::string aIdentifier, std::string aFilename, TEXTURES_RECEIVECALLBACK aCallback);
+    void LoadFromResource(std::string aIdentifier, std::string aName, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback);
 
-    Texture CreateTexture(std::string aIdentifier, unsigned char* aImageData, unsigned aWidth, unsigned aHeight);
+    void QueueTexture(std::string aIdentifier, unsigned char* aImageData, unsigned aWidth, unsigned aHeight, TEXTURES_RECEIVECALLBACK aCallback);
+    void CreateTexture(QueuedTexture aQueuedTexture);
 }
 
 #endif

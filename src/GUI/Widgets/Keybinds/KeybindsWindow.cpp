@@ -18,7 +18,22 @@ namespace GUI
             {
                 ImGui::Text(identifier.c_str());
                 ImGui::SameLine();
-                ImGui::Text(keybind.ToString().c_str());
+                if (ImGui::SmallButton(keybind.ToString().c_str()))
+                {
+                    ImGui::OpenPopup("Set Keybind");
+                }
+
+                ImVec2 center(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
+                ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+                if (ImGui::BeginPopupModal("Set Keybind", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+                {
+                    /* somehow take input, idk */
+
+                    if (ImGui::Button("Accept")) {}
+                    if (ImGui::Button("Cancel")) { ImGui::CloseCurrentPopup(); }
+
+                    ImGui::EndPopup();
+                }
             }
             Keybinds::Mutex.unlock();
         }
