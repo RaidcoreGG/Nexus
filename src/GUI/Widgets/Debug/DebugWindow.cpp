@@ -6,6 +6,7 @@
 #include "../../../Events/EventHandler.h"
 #include "../../../Keybinds/KeybindHandler.h"
 #include "../../../DataLink/DataLink.h"
+#include "../../../Textures/TextureLoader.h"
 
 namespace GUI
 {
@@ -70,6 +71,40 @@ namespace GUI
                             ImGui::Text(identifier.c_str()); ImGui::SameLine(); ImGui::TextDisabled("%p", resource.Pointer);
                         }
                         DataLink::Mutex.unlock();
+
+                        ImGui::EndChild();
+                    }
+
+                    ImGui::EndTabItem();
+                }
+                if (ImGui::BeginTabItem("Textures"))
+                {
+                    {
+                        ImGui::BeginChild("##TexturesTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+
+                        TextureLoader::Mutex.lock();
+                        ImGui::Text("Loaded Textures:");
+                        for (auto& [identifier, texture] : TextureLoader::Registry)
+                        {
+                            ImGui::Text(identifier.c_str()); ImGui::SameLine(); ImGui::Text("(%dx%d)", texture.Width, texture.Height);
+                            ImGui::TextDisabled("%p", texture.Resource);
+                        }
+                        if (TextureLoader::Registry.size() == 0)
+                        {
+                            ImGui::TextDisabled("No textures loaded.");
+                        }
+                        ImGui::Separator();
+                        ImGui::Text("Queued Textures:");
+                        for (auto& qtexture : TextureLoader::QueuedTextures)
+                        {
+                            ImGui::Text(qtexture.Identifier.c_str()); ImGui::SameLine(); ImGui::Text("(%dx%d)", qtexture.Width, qtexture.Height);
+                            ImGui::TextDisabled("%p", qtexture.Callback);
+                        }
+                        if (TextureLoader::QueuedTextures.size() == 0)
+                        {
+                            ImGui::TextDisabled("No textures queued for loading.");
+                        }
+                        TextureLoader::Mutex.unlock();
 
                         ImGui::EndChild();
                     }
