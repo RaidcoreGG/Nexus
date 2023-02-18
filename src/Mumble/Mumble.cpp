@@ -58,6 +58,11 @@ namespace Mumble
 		}
 	}
 
+	HANDLE GetHandle()
+	{
+		return Handle ? Handle : nullptr;
+	}
+
 	void Update()
 	{
 		for (;;)

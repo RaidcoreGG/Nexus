@@ -29,9 +29,17 @@ namespace GUI
                         {
                             if (ImGui::TreeNode(identifier.c_str()))
                             {
-                                for (EVENT_CONSUME callback : subscribers)
+                                if (subscribers.size() == 0)
                                 {
-                                    ImGui::Text(""); ImGui::SameLine(); ImGui::TextDisabled("%p", callback);
+                                    ImGui::TextDisabled("No addon is subscribed to this event.");
+                                }
+                                else
+                                {
+                                    ImGui::TextDisabled("Subscribers:");
+                                    for (EVENT_CONSUME callback : subscribers)
+                                    {
+                                        ImGui::Text(""); ImGui::SameLine(); ImGui::TextDisabled("%p", callback);
+                                    }
                                 }
                                 ImGui::TreePop();
                             }
@@ -68,7 +76,14 @@ namespace GUI
                         DataLink::Mutex.lock();
                         for (auto& [identifier, resource] : DataLink::Registry)
                         {
-                            ImGui::Text(identifier.c_str()); ImGui::SameLine(); ImGui::TextDisabled("%p", resource.Pointer);
+                            if (ImGui::TreeNode(identifier.c_str()))
+                            {
+                                ImGui::TextDisabled("Handle: %p", resource.Handle);
+                                ImGui::TextDisabled("Pointer: %p", resource.Pointer);
+                                ImGui::TextDisabled("Size: %d", resource.Size);
+
+                                ImGui::TreePop();
+                            }
                         }
                         DataLink::Mutex.unlock();
 
@@ -86,8 +101,13 @@ namespace GUI
                         ImGui::Text("Loaded Textures:");
                         for (auto& [identifier, texture] : TextureLoader::Registry)
                         {
-                            ImGui::Text(identifier.c_str()); ImGui::SameLine(); ImGui::Text("(%dx%d)", texture.Width, texture.Height);
-                            ImGui::TextDisabled("%p", texture.Resource);
+                            if (ImGui::TreeNode(identifier.c_str()))
+                            {
+                                ImGui::TextDisabled("Dimensions: %dx%d", texture.Width, texture.Height);
+                                ImGui::TextDisabled("Pointer: %p", texture.Resource);
+
+                                ImGui::TreePop();
+                            }
                         }
                         if (TextureLoader::Registry.size() == 0)
                         {
@@ -97,8 +117,14 @@ namespace GUI
                         ImGui::Text("Queued Textures:");
                         for (auto& qtexture : TextureLoader::QueuedTextures)
                         {
-                            ImGui::Text(qtexture.Identifier.c_str()); ImGui::SameLine(); ImGui::Text("(%dx%d)", qtexture.Width, qtexture.Height);
-                            ImGui::TextDisabled("%p", qtexture.Callback);
+                            if (ImGui::TreeNode(qtexture.Identifier.c_str()))
+                            {
+                                ImGui::TextDisabled("Dimensions: %dx%d", qtexture.Width, qtexture.Height);
+                                ImGui::TextDisabled("ReceiveCallback: %p", qtexture.Callback);
+                                ImGui::TextDisabled("Data: ", qtexture.Data);
+
+                                ImGui::TreePop();
+                            }
                         }
                         if (TextureLoader::QueuedTextures.size() == 0)
                         {

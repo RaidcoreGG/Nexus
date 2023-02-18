@@ -48,7 +48,9 @@ namespace TextureLoader
         Texture tex = Get(aIdentifier);
         if (tex.Resource != nullptr) { aCallback(aIdentifier, tex); }
 
-        HRSRC imageResHandle = FindResourceA(aModule, MAKEINTRESOURCEA(aName.c_str()), "PNG");
+        const char* name = aName.c_str();
+
+        HRSRC imageResHandle = FindResourceA(aModule, MAKEINTRESOURCEA(name), "PNG");
         if (!imageResHandle)
         {
             return;

@@ -31,7 +31,7 @@ namespace GUI
             ImGui::Separator();
 
             {
-                ImGui::BeginChild("logmessages", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), ImGuiWindowFlags_AlwaysVerticalScrollbar);
+                ImGui::BeginChild("logmessages", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), (ImGuiWindowFlags)ImGuiWindowFlags_AlwaysVerticalScrollbar);
                 
                 MessageMutex.lock();
                 /* Show last 200 log messages */

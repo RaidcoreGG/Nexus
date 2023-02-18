@@ -60,7 +60,7 @@ void Initialize()
 	Keybinds::Load();
 
 	/* add mumble to datalink */
-	LinkedResource resMumble{ nullptr, MumbleLink, sizeof(LinkedMem) };
+	LinkedResource resMumble{ Mumble::GetHandle(), MumbleLink, sizeof(LinkedMem) };
 	DataLink::Mutex.lock();
 	DataLink::Registry["MUMBLE_LINK"] = resMumble;
 	DataLink::Mutex.unlock();
@@ -275,7 +275,7 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CREATEDEVICE; }
 
-	static decltype(&D3D11CreateDevice) func;
+	static decltype(&D3D11CreateDevice) func = nullptr;
 	static const char* func_name = "D3D11CreateDevice";
 	Log(func_name);
 
@@ -309,7 +309,7 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CREATEDEVICEANDSWAPCHAIN; }
 
-	static decltype(&D3D11CreateDeviceAndSwapChain) func;
+	static decltype(&D3D11CreateDeviceAndSwapChain) func = nullptr;
 	static const char* func_name = "D3D11CreateDeviceAndSwapChain";
 	Log(func_name);
 
@@ -346,7 +346,7 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_CREATEDEVICE; }
 
-	static decltype(&D3D11CoreCreateDevice) func;
+	static decltype(&D3D11CoreCreateDevice) func = nullptr;
 	static const char* func_name = "D3D11CoreCreateDevice";
 	Log(func_name);
 
@@ -380,7 +380,7 @@ HRESULT __stdcall D3D11CoreCreateLayeredDevice(const void* unknown0, DWORD unkno
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_CREATELAYEREDDEVICE; }
 
-	static decltype(&D3D11CoreCreateLayeredDevice) func;
+	static decltype(&D3D11CoreCreateLayeredDevice) func = nullptr;
 	static const char* func_name = "D3D11CoreCreateLayeredDevice";
 	Log(func_name);
 
@@ -414,7 +414,7 @@ SIZE_T	__stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unkno
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_GETLAYEREDDEVICESIZE; }
 
-	static decltype(&D3D11CoreGetLayeredDeviceSize) func;
+	static decltype(&D3D11CoreGetLayeredDeviceSize) func = nullptr;
 	static const char* func_name = "D3D11CoreGetLayeredDeviceSize";
 	Log(func_name);
 
@@ -448,7 +448,7 @@ HRESULT __stdcall D3D11CoreRegisterLayers(const void* unknown0, DWORD unknown1)
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_REGISTERLAYERS; }
 
-	static decltype(&D3D11CoreRegisterLayers) func;
+	static decltype(&D3D11CoreRegisterLayers) func = nullptr;
 	static const char* func_name = "D3D11CoreRegisterLayers";
 	Log(func_name);
 

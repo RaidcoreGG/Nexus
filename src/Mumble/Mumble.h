@@ -12,6 +12,8 @@ namespace Mumble
 	LinkedMem* Initialize(const wchar_t* aMumbleName);
 	void Shutdown();
 
+	HANDLE GetHandle();
+
 	void Update();
 };
 
