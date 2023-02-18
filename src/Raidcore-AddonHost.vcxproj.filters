@@ -365,6 +365,27 @@
     <ClInclude Include="Textures\TextureLoader.h">
       <Filter>Textures</Filter>
     </ClInclude>
+    <ClInclude Include="DataLink\FuncDefs.h">
+      <Filter>DataLink</Filter>
+    </ClInclude>
+    <ClInclude Include="Events\FuncDefs.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Keybinds\FuncDefs.h">
+      <Filter>Keybinds</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\FuncDefs.h">
+      <Filter>Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="Textures\FuncDefs.h">
+      <Filter>Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="Textures\Texture.h">
+      <Filter>Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="Textures\QueuedTexture.h">
+      <Filter>Textures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Raidcore-AddonHost.rc">

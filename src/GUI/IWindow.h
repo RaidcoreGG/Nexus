@@ -12,8 +12,7 @@ namespace GUI
 		~IWindow() = default;
 
 		virtual void Render() = 0;
-		/* aCategory: 0 = Main ; 1 = Debug ; 2 = Info */
-		virtual void MenuOption(int aCategory) = 0;
+		virtual void MenuOption(int aCategory) = 0; /* aCategory: 0 = Main ; 1 = Debug ; 2 = Info */
 	};
 }
 

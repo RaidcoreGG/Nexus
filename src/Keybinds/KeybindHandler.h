@@ -7,12 +7,15 @@
 #include <fstream>
 #include <filesystem>
 #include <string>
+#include <cstdarg>
+
+#include "../core.h"
+#include "../Paths.h"
+#include "../Shared.h"
+#include "../State.h"
 
 #include "Keybind.h"
-
-typedef void (*KEYBINDS_PROCESS)(std::string aIdentifier);
-typedef void (*KEYBINDS_REGISTER)(std::string aIdentifier, KEYBINDS_PROCESS aKeybindHandler, std::string aKeybind);
-typedef void (*KEYBINDS_UNREGISTER)(std::string aIdentifier);
+#include "FuncDefs.h"
 
 namespace Keybinds
 {

@@ -5,10 +5,9 @@
 #include <mutex>
 #include <map>
 
-#include "LinkedResource.h"
+#include "../Shared.h"
 
-typedef void* (*DATALINK_GETRESOURCE)(std::string aIdentifier);
-typedef void* (*DATALINK_SHARERESOURCE)(std::string aIdentifier, size_t aResourceSize);
+#include "LinkedResource.h"
 
 namespace DataLink
 {

@@ -1,7 +1,5 @@
 #include "DataLink.h"
 
-#include "../Shared.h"
-
 namespace DataLink
 {
 	std::mutex Mutex;

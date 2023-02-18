@@ -1,8 +1,4 @@
-#include <iostream>
-#include <iomanip>
-
 #include "ConsoleLogger.h"
-#include "windows.h"
 
 HANDLE hConsole;
 FILE* iobuf;

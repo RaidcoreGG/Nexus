@@ -1,6 +1,14 @@
 #ifndef STATE_H
 #define STATE_H
 
+#include <Windows.h>
+#include <string>
+#include <algorithm>
+
+#include "Shared.h"
+
+#include "Mumble/Mumble.h"
+
 enum class ggState
 {
 	NONE,

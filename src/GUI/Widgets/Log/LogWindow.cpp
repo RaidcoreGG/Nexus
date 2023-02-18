@@ -1,11 +1,5 @@
 #include "LogWindow.h"
 
-#include "../../../Shared.h"
-#include "../../../Paths.h"
-#include "../../../State.h"
-
-#include "../../../Logging/LogHandler.h"
-
 namespace GUI
 {
     bool SelectedOnly = false;

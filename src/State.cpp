@@ -1,11 +1,5 @@
 #include "State.h"
 
-#include "Shared.h"
-
-#include <Windows.h>
-#include <string>
-#include <algorithm>
-
 namespace State
 {
 	ggState			AddonHost					= ggState::NONE;

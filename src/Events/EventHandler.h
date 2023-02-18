@@ -5,10 +5,12 @@
 #include <vector>
 #include <mutex>
 #include <string>
+#include <thread>
+#include <algorithm>
 
-typedef void (*EVENT_CONSUME)(void* aEventArgs);
-typedef void (*EVENTS_RAISE)(std::string aIdentifier, void* aEventData);
-typedef void (*EVENTS_SUBSCRIBE)(std::string aIdentifier, EVENT_CONSUME aConsumeEventCallback);
+#include "../Shared.h"
+
+#include "FuncDefs.h"
 
 namespace Events
 {

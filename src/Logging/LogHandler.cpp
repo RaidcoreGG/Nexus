@@ -1,10 +1,4 @@
-#include <ctime>
-
 #include "LogHandler.h"
-#include <thread>
-#include <cstdarg>
-#include <algorithm>
-#include <chrono>
 
 namespace LogHandler
 {

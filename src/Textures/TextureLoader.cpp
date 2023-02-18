@@ -1,12 +1,8 @@
 #include "TextureLoader.h"
 
+/* For some reason this has to be defined AND included here. */
 #define STB_IMAGE_IMPLEMENTATION
 #include "../stb/stb_image.h"
-#include <wincodec.h>
-
-#include "../Shared.h"
-#include "../Paths.h"
-#include "../core.h"
 
 namespace TextureLoader
 {

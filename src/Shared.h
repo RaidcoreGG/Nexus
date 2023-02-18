@@ -4,10 +4,9 @@
 #include <vector>
 #include <string>
 
-#include "Logging/LogHandler.h"
-#include "Mumble/Mumble.h"
+#include "Mumble/LinkedMem.h"
 #include "Mumble/Identity.h"
-#include "minhook/mh_hook.h"
+#include "Logging/LogHandler.h"
 
 using namespace Mumble;
 using namespace LogHandler;

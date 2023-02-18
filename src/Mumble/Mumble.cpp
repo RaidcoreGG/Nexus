@@ -1,11 +1,4 @@
 #include "Mumble.h"
-#include "../Shared.h"
-#include "../State.h"
-#include "../Renderer.h"
-#include "../Events/EventHandler.h"
-
-#include "../nlohmann/json.hpp"
-#include <thread>
 
 using json = nlohmann::json;
 

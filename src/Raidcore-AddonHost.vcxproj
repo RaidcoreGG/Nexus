@@ -54,8 +54,10 @@
   <ItemGroup>
     <ClInclude Include="core.h" />
     <ClInclude Include="DataLink\DataLink.h" />
+    <ClInclude Include="DataLink\FuncDefs.h" />
     <ClInclude Include="DataLink\LinkedResource.h" />
     <ClInclude Include="Events\EventHandler.h" />
+    <ClInclude Include="Events\FuncDefs.h" />
     <ClInclude Include="GUI\GUI.h" />
     <ClInclude Include="GUI\IWindow.h" />
     <ClInclude Include="GUI\Widgets\About\AboutBox.h" />
@@ -74,10 +76,12 @@
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
+    <ClInclude Include="Keybinds\FuncDefs.h" />
     <ClInclude Include="Keybinds\Keybind.h" />
     <ClInclude Include="Keybinds\KeybindHandler.h" />
     <ClInclude Include="Loader\Loader.h" />
     <ClInclude Include="Localization\Localization.h" />
+    <ClInclude Include="Logging\FuncDefs.h" />
     <ClInclude Include="Mumble\Compass.h" />
     <ClInclude Include="Mumble\Context.h" />
     <ClInclude Include="Mumble\EMapType.h" />
@@ -108,6 +112,9 @@
     <ClInclude Include="Shared.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="stb\stb_image.h" />
+    <ClInclude Include="Textures\FuncDefs.h" />
+    <ClInclude Include="Textures\QueuedTexture.h" />
+    <ClInclude Include="Textures\Texture.h" />
     <ClInclude Include="Textures\TextureLoader.h" />
     <ClInclude Include="types.h" />
   </ItemGroup>

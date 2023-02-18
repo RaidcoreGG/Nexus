@@ -5,6 +5,7 @@
 #include <codecvt>
 #include <locale>
 #include <PathCch.h>
+#include <Shlwapi.h>
 
 void PathCopyAndAppend(char* aSource, char* aDestination, const char* aAppend);
 

@@ -3,12 +3,14 @@
 
 #include <vector>
 #include <mutex>
+#include <ctime>
+#include <thread>
+#include <cstdarg>
+#include <algorithm>
+#include <chrono>
 
 #include "ILogger.h"
 #include "LogEntry.h"
-
-typedef void (*LOGGER_LOGA)(ELogLevel aLogLevel, const char* aFmt, ...);
-typedef void (*LOGGER_ADDREM)(ILogger* aLogger);
 
 namespace LogHandler
 {

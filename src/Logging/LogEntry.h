@@ -2,6 +2,8 @@
 #define LOGENTRY_H
 
 #include <string>
+#include <iomanip>
+#include <sstream>
 
 #include "ELogLevel.h"
 

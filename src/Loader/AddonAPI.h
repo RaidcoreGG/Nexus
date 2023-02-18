@@ -3,13 +3,13 @@
 
 #include <dxgi.h>
 #include "../Mumble/LinkedMem.h"
-#include "../Logging/LogHandler.h"
-#include "../Events/EventHandler.h"
-#include "../Keybinds/KeybindHandler.h"
+#include "../Logging/FuncDefs.h"
+#include "../Events/FuncDefs.h"
+#include "../Keybinds/FuncDefs.h"
 #include "../imgui/imgui.h"
 #include "../minhook/mh_hook.h"
-#include "../DataLink/DataLink.h"
-#include "../Textures/TextureLoader.h"
+#include "../DataLink/FuncDefs.h"
+#include "../Textures/FuncDefs.h"
 
 using namespace Mumble;
 

@@ -1,11 +1,4 @@
-#include <cstdarg>
-
 #include "KeybindHandler.h"
-
-#include "../core.h"
-#include "../Paths.h"
-#include "../Shared.h"
-#include "../State.h"
 
 namespace Keybinds
 {

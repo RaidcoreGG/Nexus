@@ -1,8 +1,4 @@
-#include <thread>
-#include <algorithm>
-
 #include "EventHandler.h"
-#include "../Shared.h"
 
 namespace Events
 {

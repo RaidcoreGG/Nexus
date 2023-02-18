@@ -1,11 +1,5 @@
 #include "AddonsWindow.h"
 
-#include "../../../Shared.h"
-#include "../../../Paths.h"
-#include "../../../State.h"
-
-#include "../../../Loader/Loader.h"
-
 namespace GUI
 {
 	void AddonsWindow::Render()

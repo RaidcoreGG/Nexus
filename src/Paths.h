@@ -1,6 +1,10 @@
 #ifndef PATHS_H
 #define PATHS_H
 
+#include <Windows.h>
+
+#include "core.h"
+
 /* Namespace for global path variables */
 namespace Path
 {

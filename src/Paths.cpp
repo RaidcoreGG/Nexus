@@ -1,8 +1,4 @@
-#include <Windows.h>
-
 #include "Paths.h"
-
-#include "core.h"
 
 namespace Path
 {

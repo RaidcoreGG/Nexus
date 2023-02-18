@@ -1,9 +1,5 @@
 #include "AboutBox.h"
 
-#include "../../../Shared.h"
-#include "../../../Paths.h"
-#include "../../../State.h"
-
 namespace GUI
 {
 	void AboutBox::Render()

@@ -1,13 +1,5 @@
 #include "DebugWindow.h"
 
-#include "../../../Shared.h"
-#include "../../../State.h"
-
-#include "../../../Events/EventHandler.h"
-#include "../../../Keybinds/KeybindHandler.h"
-#include "../../../DataLink/DataLink.h"
-#include "../../../Textures/TextureLoader.h"
-
 namespace GUI
 {
 	void DebugWindow::Render()

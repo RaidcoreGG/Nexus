@@ -1,7 +1,5 @@
 #include "Keybind.h"
 
-#include "KeybindHandler.h"
-
 std::string Keybind::ToString(bool padded)
 {
 	if (!Key) { return "(null)"; }

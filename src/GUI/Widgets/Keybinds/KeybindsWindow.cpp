@@ -1,9 +1,5 @@
 #include "KeybindsWindow.h"
 
-#include "../../../Shared.h"
-#include "../../../Paths.h"
-#include "../../../State.h"
-
 namespace GUI
 {
     void KeybindsWindow::Render()

@@ -1,6 +1,3 @@
-#include <iomanip>
-#include <sstream>
-
 #include "LogEntry.h"
 
 std::string LogEntry::TimestampString(bool aIncludeDate)

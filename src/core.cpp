@@ -1,5 +1,4 @@
 #include "core.h"
-#include "Shlwapi.h"
 
 #pragma warning( push )
 #pragma warning( disable : 4995)

@@ -1,6 +1,10 @@
 #ifndef GUI_ABOUTBOX_H
 #define GUI_ABOUTBOX_H
 
+#include "../../../Shared.h"
+#include "../../../Paths.h"
+#include "../../../State.h"
+
 #include "../../../imgui/imgui.h"
 #include "../../../imgui/imgui_extensions.h"
 

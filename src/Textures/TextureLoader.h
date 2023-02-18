@@ -6,29 +6,16 @@
 #include <map>
 #include <mutex>
 #include <vector>
+#include <wincodec.h>
 
+#include "../Shared.h"
+#include "../Paths.h"
+#include "../core.h"
 #include "../Renderer.h"
 
-struct Texture
-{
-    unsigned Width;
-    unsigned Height;
-    ID3D11ShaderResourceView* Resource;
-};
-
-typedef void    (*TEXTURES_RECEIVECALLBACK)(std::string aIdentifier, Texture aTexture);
-typedef Texture (*TEXTURES_GET)(std::string aIdentifier);
-typedef void    (*TEXTURES_LOADFROMFILE)(std::string aIdentifier, std::string aFilename, TEXTURES_RECEIVECALLBACK aCallback);
-typedef void    (*TEXTURES_LOADFROMRESOURCE)(std::string aIdentifier, std::string aName, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback);
-
-struct QueuedTexture
-{
-    unsigned Width;
-    unsigned Height;
-    std::string Identifier;
-    unsigned char* Data;
-    TEXTURES_RECEIVECALLBACK Callback;
-};
+#include "FuncDefs.h"
+#include "Texture.h"
+#include "QueuedTexture.h"
 
 namespace TextureLoader
 {

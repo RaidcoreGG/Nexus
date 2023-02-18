@@ -2,6 +2,7 @@
 #define RENDERER_H
 
 #include <d3d11.h>
+
 #include "imgui/imgui.h"
 
 /* Namespace for renderer variables */
