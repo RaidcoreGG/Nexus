@@ -34,8 +34,11 @@
 
 #include <windows.h>
 
+#ifndef MH_STATUS
+#define MH_STATUS
+
  // MinHook Error Codes.
-typedef enum MH_STATUS {
+enum class EMHStatus {
 	// Unknown error. Should not be returned.
 	MH_UNKNOWN = -1,
 
@@ -79,13 +82,14 @@ typedef enum MH_STATUS {
 
 	// The specified function is not found.
 	MH_ERROR_FUNCTION_NOT_FOUND
-}
-MH_STATUS;
+};
 
-typedef MH_STATUS(__stdcall* MINHOOK_CREATE)(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOriginal);
-typedef MH_STATUS(__stdcall* MINHOOK_REMOVE)(LPVOID pTarget);
-typedef MH_STATUS(__stdcall* MINHOOK_ENABLE)(LPVOID pTarget);
-typedef MH_STATUS(__stdcall* MINHOOK_DISABLE)(LPVOID pTarget);
+#endif
+
+typedef EMHStatus(__stdcall* MINHOOK_CREATE)(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOriginal);
+typedef EMHStatus(__stdcall* MINHOOK_REMOVE)(LPVOID pTarget);
+typedef EMHStatus(__stdcall* MINHOOK_ENABLE)(LPVOID pTarget);
+typedef EMHStatus(__stdcall* MINHOOK_DISABLE)(LPVOID pTarget);
 
 // Can be passed as a parameter to MH_EnableHook, MH_DisableHook,
 // MH_QueueEnableHook or MH_QueueDisableHook.
@@ -97,11 +101,11 @@ extern "C" {;
 
 // Initialize the MinHook library. You must call this function EXACTLY ONCE
 // at the beginning of your program.
-MH_STATUS WINAPI MH_Initialize(VOID);
+EMHStatus WINAPI MH_Initialize(VOID);
 
 // Uninitialize the MinHook library. You must call this function EXACTLY
 // ONCE at the end of your program.
-MH_STATUS WINAPI MH_Uninitialize(VOID);
+EMHStatus WINAPI MH_Uninitialize(VOID);
 
 // Creates a Hook for the specified target function, in disabled state.
 // Parameters:
@@ -112,26 +116,26 @@ MH_STATUS WINAPI MH_Uninitialize(VOID);
 //   ppOriginal [out] A pointer to the trampoline function, which will be
 //                    used to call the original target function.
 //                    This parameter can be NULL.
-MH_STATUS WINAPI MH_CreateHook(LPVOID pTarget, LPVOID pDetour, LPVOID *ppOriginal);
+EMHStatus WINAPI MH_CreateHook(LPVOID pTarget, LPVOID pDetour, LPVOID *ppOriginal);
 
 // Removes an already created hook.
 // Parameters:
 //   pTarget [in] A pointer to the target function.
-MH_STATUS WINAPI MH_RemoveHook(LPVOID pTarget);
+EMHStatus WINAPI MH_RemoveHook(LPVOID pTarget);
 
 // Enables an already created hook.
 // Parameters:
 //   pTarget [in] A pointer to the target function.
 //                If this parameter is MH_ALL_HOOKS, all created hooks are
 //                enabled in one go.
-MH_STATUS WINAPI MH_EnableHook(LPVOID pTarget);
+EMHStatus WINAPI MH_EnableHook(LPVOID pTarget);
 
 // Disables an already created hook.
 // Parameters:
 //   pTarget [in] A pointer to the target function.
 //                If this parameter is MH_ALL_HOOKS, all created hooks are
 //                disabled in one go.
-MH_STATUS WINAPI MH_DisableHook(LPVOID pTarget);
+EMHStatus WINAPI MH_DisableHook(LPVOID pTarget);
 
 #ifdef __cplusplus
 }

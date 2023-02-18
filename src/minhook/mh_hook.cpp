@@ -309,7 +309,7 @@ static VOID Unfreeze(PFROZEN_THREADS pThreads) {
 }
 
 //-------------------------------------------------------------------------
-static MH_STATUS EnableHookLL(UINT pos, BOOL enable) {
+static EMHStatus EnableHookLL(UINT pos, BOOL enable) {
 	PHOOK_ENTRY pHook = &g_hooks.pItems[pos];
 	DWORD  oldProtect;
 	SIZE_T patchSize = sizeof(JMP_REL);
@@ -321,7 +321,7 @@ static MH_STATUS EnableHookLL(UINT pos, BOOL enable) {
 	}
 
 	if (!VirtualProtect(pPatchTarget, patchSize, PAGE_EXECUTE_READWRITE, &oldProtect))
-		return MH_ERROR_MEMORY_PROTECT;
+		return EMHStatus::MH_ERROR_MEMORY_PROTECT;
 
 	if (enable) {
 		PJMP_REL pJmp = (PJMP_REL)pPatchTarget;
@@ -348,12 +348,12 @@ static MH_STATUS EnableHookLL(UINT pos, BOOL enable) {
 	pHook->isEnabled = enable;
 	pHook->queueEnable = enable;
 
-	return MH_OK;
+	return EMHStatus::MH_OK;
 }
 
 //-------------------------------------------------------------------------
-static MH_STATUS EnableAllHooksLL(BOOL enable) {
-	MH_STATUS status = MH_OK;
+static EMHStatus EnableAllHooksLL(BOOL enable) {
+	EMHStatus status = EMHStatus::MH_OK;
 	UINT i, first = INVALID_HOOK_POS;
 
 	for (i = 0; i < g_hooks.size; ++i) {
@@ -370,7 +370,7 @@ static MH_STATUS EnableAllHooksLL(BOOL enable) {
 		for (i = first; i < g_hooks.size; ++i) {
 			if (g_hooks.pItems[i].isEnabled != enable) {
 				status = EnableHookLL(i, enable);
-				if (status != MH_OK)
+				if (status != EMHStatus::MH_OK)
 					break;
 			}
 		}
@@ -409,8 +409,8 @@ static VOID LeaveSpinLock(VOID) {
 }
 
 //-------------------------------------------------------------------------
-MH_STATUS WINAPI MH_Initialize(VOID) {
-	MH_STATUS status = MH_OK;
+EMHStatus WINAPI MH_Initialize(VOID) {
+	EMHStatus status = EMHStatus::MH_OK;
 
 	EnterSpinLock();
 
@@ -420,10 +420,10 @@ MH_STATUS WINAPI MH_Initialize(VOID) {
 			// Initialize the internal function buffer.
 			InitializeBuffer();
 		} else {
-			status = MH_ERROR_MEMORY_ALLOC;
+			status = EMHStatus::MH_ERROR_MEMORY_ALLOC;
 		}
 	} else {
-		status = MH_ERROR_ALREADY_INITIALIZED;
+		status = EMHStatus::MH_ERROR_ALREADY_INITIALIZED;
 	}
 
 	LeaveSpinLock();
@@ -432,14 +432,14 @@ MH_STATUS WINAPI MH_Initialize(VOID) {
 }
 
 //-------------------------------------------------------------------------
-MH_STATUS WINAPI MH_Uninitialize(VOID) {
-	MH_STATUS status = MH_OK;
+EMHStatus WINAPI MH_Uninitialize(VOID) {
+	EMHStatus status = EMHStatus::MH_OK;
 
 	EnterSpinLock();
 
 	if (g_hHeap != NULL) {
 		status = EnableAllHooksLL(FALSE);
-		if (status == MH_OK) {
+		if (status == EMHStatus::MH_OK) {
 			// Free the internal function buffer.
 
 			// HeapFree is actually not required, but some tools detect a false
@@ -457,7 +457,7 @@ MH_STATUS WINAPI MH_Uninitialize(VOID) {
 			g_hooks.size = 0;
 		}
 	} else {
-		status = MH_ERROR_NOT_INITIALIZED;
+		status = EMHStatus::MH_ERROR_NOT_INITIALIZED;
 	}
 
 	LeaveSpinLock();
@@ -466,8 +466,8 @@ MH_STATUS WINAPI MH_Uninitialize(VOID) {
 }
 
 //-------------------------------------------------------------------------
-MH_STATUS WINAPI MH_CreateHook(LPVOID pTarget, LPVOID pDetour, LPVOID *ppOriginal) {
-	MH_STATUS status = MH_OK;
+EMHStatus WINAPI MH_CreateHook(LPVOID pTarget, LPVOID pDetour, LPVOID *ppOriginal) {
+	EMHStatus status = EMHStatus::MH_OK;
 
 	EnterSpinLock();
 
@@ -509,26 +509,26 @@ MH_STATUS WINAPI MH_CreateHook(LPVOID pTarget, LPVOID pDetour, LPVOID *ppOrigina
 							if (ppOriginal != NULL)
 								*ppOriginal = pHook->pTrampoline;
 						} else {
-							status = MH_ERROR_MEMORY_ALLOC;
+							status = EMHStatus::MH_ERROR_MEMORY_ALLOC;
 						}
 					} else {
-						status = MH_ERROR_UNSUPPORTED_FUNCTION;
+						status = EMHStatus::MH_ERROR_UNSUPPORTED_FUNCTION;
 					}
 
-					if (status != MH_OK) {
+					if (status != EMHStatus::MH_OK) {
 						FreeBuffer(pBuffer);
 					}
 				} else {
-					status = MH_ERROR_MEMORY_ALLOC;
+					status = EMHStatus::MH_ERROR_MEMORY_ALLOC;
 				}
 			} else {
-				status = MH_ERROR_ALREADY_CREATED;
+				status = EMHStatus::MH_ERROR_ALREADY_CREATED;
 			}
 		} else {
-			status = MH_ERROR_NOT_EXECUTABLE;
+			status = EMHStatus::MH_ERROR_NOT_EXECUTABLE;
 		}
 	} else {
-		status = MH_ERROR_NOT_INITIALIZED;
+		status = EMHStatus::MH_ERROR_NOT_INITIALIZED;
 	}
 
 	LeaveSpinLock();
@@ -537,8 +537,8 @@ MH_STATUS WINAPI MH_CreateHook(LPVOID pTarget, LPVOID pDetour, LPVOID *ppOrigina
 }
 
 //-------------------------------------------------------------------------
-MH_STATUS WINAPI MH_RemoveHook(LPVOID pTarget) {
-	MH_STATUS status = MH_OK;
+EMHStatus WINAPI MH_RemoveHook(LPVOID pTarget) {
+	EMHStatus status = EMHStatus::MH_OK;
 
 	EnterSpinLock();
 
@@ -554,15 +554,15 @@ MH_STATUS WINAPI MH_RemoveHook(LPVOID pTarget) {
 				Unfreeze(&threads);
 			}
 
-			if (status == MH_OK) {
+			if (status == EMHStatus::MH_OK) {
 				FreeBuffer(g_hooks.pItems[pos].pTrampoline);
 				DeleteHookEntry(pos);
 			}
 		} else {
-			status = MH_ERROR_NOT_CREATED;
+			status = EMHStatus::MH_ERROR_NOT_CREATED;
 		}
 	} else {
-		status = MH_ERROR_NOT_INITIALIZED;
+		status = EMHStatus::MH_ERROR_NOT_INITIALIZED;
 	}
 
 	LeaveSpinLock();
@@ -571,8 +571,8 @@ MH_STATUS WINAPI MH_RemoveHook(LPVOID pTarget) {
 }
 
 //-------------------------------------------------------------------------
-static MH_STATUS EnableHook(LPVOID pTarget, BOOL enable) {
-	MH_STATUS status = MH_OK;
+static EMHStatus EnableHook(LPVOID pTarget, BOOL enable) {
+	EMHStatus status = EMHStatus::MH_OK;
 
 	EnterSpinLock();
 
@@ -590,14 +590,14 @@ static MH_STATUS EnableHook(LPVOID pTarget, BOOL enable) {
 
 					Unfreeze(&threads);
 				} else {
-					status = enable ? MH_ERROR_ENABLED : MH_ERROR_DISABLED;
+					status = enable ? EMHStatus::MH_ERROR_ENABLED : EMHStatus::MH_ERROR_DISABLED;
 				}
 			} else {
-				status = MH_ERROR_NOT_CREATED;
+				status = EMHStatus::MH_ERROR_NOT_CREATED;
 			}
 		}
 	} else {
-		status = MH_ERROR_NOT_INITIALIZED;
+		status = EMHStatus::MH_ERROR_NOT_INITIALIZED;
 	}
 
 	LeaveSpinLock();
@@ -606,12 +606,12 @@ static MH_STATUS EnableHook(LPVOID pTarget, BOOL enable) {
 }
 
 //-------------------------------------------------------------------------
-MH_STATUS WINAPI MH_EnableHook(LPVOID pTarget) {
+EMHStatus WINAPI MH_EnableHook(LPVOID pTarget) {
 	return EnableHook(pTarget, TRUE);
 }
 
 //-------------------------------------------------------------------------
-MH_STATUS WINAPI MH_DisableHook(LPVOID pTarget) {
+EMHStatus WINAPI MH_DisableHook(LPVOID pTarget) {
 	return EnableHook(pTarget, FALSE);
 }
 
