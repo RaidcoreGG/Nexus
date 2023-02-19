@@ -5,11 +5,12 @@ namespace State
 	ggState			AddonHost					= ggState::NONE;
 	EDxState		Directx						= EDxState::NONE;
 	EEntryMethod	EntryMethod					= EEntryMethod::NONE;
+	EMultiboxState	MultiboxState				= EMultiboxState::NONE;
 	bool			IsChainloading				= false;
 	bool			IsImGuiInitialized			= false;
 
 	bool			IsDeveloperMode				= false;
-	bool			IsConsoleEnabled = false;
+	bool			IsConsoleEnabled			= false;
 	bool			IsVanilla					= false;
 	bool			IsMumbleDisabled			= false;
 
@@ -48,12 +49,12 @@ namespace State
 			{
 				/* single argument */
 #ifdef _DEBUG
-				State::IsDeveloperMode = true;
+				IsDeveloperMode = true;
 #else
-				State::IsDeveloperMode = wcscmp(cmp.c_str(), L"-ggdev") == 0;
-				State::IsConsoleEnabled = wcscmp(cmp.c_str(), L"-ggconsole") == 0;
+				IsDeveloperMode = wcscmp(cmp.c_str(), L"-ggdev") == 0;
+				IsConsoleEnabled = wcscmp(cmp.c_str(), L"-ggconsole") == 0;
 #endif
-				State::IsVanilla = wcscmp(cmp.c_str(), L"-ggvanilla") == 0;
+				IsVanilla = wcscmp(cmp.c_str(), L"-ggvanilla") == 0;
 			}
 
 			Parameters.push_back(str);
