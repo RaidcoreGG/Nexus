@@ -1,6 +1,8 @@
 #ifndef GUI_H
 #define GUI_H
 
+#include <filesystem>
+
 #include "../State.h"
 #include "../Renderer.h"
 #include "../Paths.h"

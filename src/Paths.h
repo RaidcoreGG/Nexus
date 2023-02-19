@@ -21,6 +21,7 @@ namespace Path
 
 	extern char F_LOG							[];
 	extern char F_KEYBINDS						[];
+	extern char F_FONT							[];
 
 	void Initialize(HMODULE aBaseModule);
 }

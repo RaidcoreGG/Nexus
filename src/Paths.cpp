@@ -15,6 +15,7 @@ namespace Path
 
 	char F_LOG							[MAX_PATH]{};
 	char F_KEYBINDS						[MAX_PATH]{};
+	char F_FONT							[MAX_PATH]{};
 
 	void Initialize(HMODULE aBaseModule)
 	{
@@ -35,6 +36,7 @@ namespace Path
 		/* ensure files */
 		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_LOG, "AddonHost.log");						/* get log path */
 		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_KEYBINDS, "Keybinds.dat");					/* get keybinds path */
+		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_FONT, "font.ttf");							/* get keybinds path */
 
 		/* static paths */
 		PathCopyAndAppend(Path::D_GW2, Path::F_TEMP_DLL, "d3d11.tmp");										/* get temp dll path */

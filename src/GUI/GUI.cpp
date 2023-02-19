@@ -16,28 +16,16 @@ namespace GUI
 		if (!Renderer::GuiContext) { Renderer::GuiContext = ImGui::CreateContext(); }
 		ImGuiIO& io = ImGui::GetIO();
 
-		// Load Fonts
-		// - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
-		// - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-		// - If the file cannot be loaded, the function will return NULL. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-		// - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-		// - Read 'docs/FONTS.md' for more instructions and details.
-		// - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-		//io.Fonts->AddFontDefault();
-		//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-		//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-		//io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-		//io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
-		//ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
-		//IM_ASSERT(font != NULL);
+		std::filesystem::path userFont = std::filesystem::path(Path::F_FONT);
 
-		//io.Fonts->AddFontDefault();
-		char font[MAX_PATH];
-		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, font, "raidcore_font.ttf");
-		//char gw2uifont[MAX_PATH];
-		//PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, gw2uifont, "gw2_ui.ttf");
-
-		io.Fonts->AddFontFromFileTTF(font, 16.0f);
+		if (std::filesystem::exists(userFont))
+		{
+			io.Fonts->AddFontFromFileTTF(Path::F_FONT, 16.0f);
+		}
+		else
+		{
+			io.Fonts->AddFontDefault();
+		}
 
 		bool initializedFonts = false;
 		HRSRC hResource = FindResourceA(AddonHostModule, MAKEINTRESOURCE(IDR_FONT1), RT_FONT);
