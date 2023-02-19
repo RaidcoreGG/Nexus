@@ -29,7 +29,7 @@ namespace TextureLoader
     Texture Get(std::string aIdentifier);
 
     void LoadFromFile(std::string aIdentifier, std::string aFilename, TEXTURES_RECEIVECALLBACK aCallback);
-    void LoadFromResource(std::string aIdentifier, std::string aName, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback);
+    void LoadFromResource(std::string aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback);
 
     void QueueTexture(std::string aIdentifier, unsigned char* aImageData, unsigned aWidth, unsigned aHeight, TEXTURES_RECEIVECALLBACK aCallback);
     void CreateTexture(QueuedTexture aQueuedTexture);

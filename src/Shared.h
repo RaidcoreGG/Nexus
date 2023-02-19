@@ -1,6 +1,7 @@
 #ifndef SHARED_H
 #define SHARED_H
 
+#include <Windows.h>
 #include <vector>
 #include <string>
 
@@ -10,6 +11,8 @@
 
 using namespace Mumble;
 using namespace LogHandler;
+
+extern HMODULE						AddonHostModule;
 
 extern const char*					Version;
 extern std::vector<std::wstring>    Parameters;

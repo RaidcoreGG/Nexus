@@ -112,6 +112,7 @@
     <ClInclude Include="minhook\mh_trampoline.h" />
     <ClInclude Include="Mumble\Mumble.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Shared.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="stb\stb_image.h" />
@@ -126,6 +127,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Menomonia.ttf" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

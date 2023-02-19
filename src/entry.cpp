@@ -28,7 +28,6 @@
 
 /* handles */
 HMODULE hGW2		= nullptr;
-HMODULE hAddonHost	= nullptr;
 HMODULE hD3D11		= nullptr;
 HMODULE hSysD3D11	= nullptr;
 
@@ -37,7 +36,7 @@ void Initialize()
 	State::AddonHost = ggState::LOAD;
 
 	State::Initialize();
-	Path::Initialize(hAddonHost);
+	Path::Initialize(AddonHostModule);
 
 	if (State::IsVanilla) { State::AddonHost = ggState::SHUTDOWN; return; }
 
@@ -147,7 +146,6 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 
 	while (TextureLoader::QueuedTextures.size() > 0)
 	{
-		LogDebug("Queued textures: %d", TextureLoader::QueuedTextures.size());
 		TextureLoader::CreateTexture(TextureLoader::QueuedTextures[TextureLoader::QueuedTextures.size() - 1]);
 		TextureLoader::QueuedTextures.pop_back();
 	}
@@ -485,7 +483,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
-		hAddonHost = hModule;
+		AddonHostModule = hModule;
 		hGW2 = GetModuleHandle(NULL);
 
 		Initialize();

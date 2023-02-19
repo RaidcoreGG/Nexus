@@ -21,6 +21,8 @@
 #include "Widgets/Debug/DebugWindow.h"
 #include "Widgets/About/AboutBox.h"
 
+#include "../resource.h"
+
 namespace GUI
 {
 	void Initialize();

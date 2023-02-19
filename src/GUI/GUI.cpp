@@ -34,12 +34,43 @@ namespace GUI
 		//io.Fonts->AddFontDefault();
 		char font[MAX_PATH];
 		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, font, "raidcore_font.ttf");
-		char gw2uifont[MAX_PATH];
-		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, gw2uifont, "gw2_ui.ttf");
+		//char gw2uifont[MAX_PATH];
+		//PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, gw2uifont, "gw2_ui.ttf");
 
 		io.Fonts->AddFontFromFileTTF(font, 16.0f);
-		io.Fonts->AddFontFromFileTTF(gw2uifont, 16.0f);
-		io.Fonts->AddFontFromFileTTF(gw2uifont, 22.0f);
+
+		bool initializedFonts = false;
+		HRSRC hResource = FindResourceA(AddonHostModule, MAKEINTRESOURCE(IDR_FONT1), RT_FONT);
+		if (hResource)
+		{
+			HGLOBAL hLoadedResource = LoadResource(AddonHostModule, hResource);
+
+			if (hLoadedResource)
+			{
+				LPVOID pLockedResource = LockResource(hLoadedResource);
+
+				if (pLockedResource)
+				{
+					DWORD dwResourceSize = SizeofResource(AddonHostModule, hResource);
+
+					if (0 != dwResourceSize)
+					{
+						io.Fonts->AddFontFromMemoryTTF(pLockedResource, dwResourceSize, 16.0f);
+						io.Fonts->AddFontFromMemoryTTF(pLockedResource, dwResourceSize, 22.0f);
+						initializedFonts = true;
+					}
+				}
+			}
+		}
+
+		if (!initializedFonts)
+		{
+			io.Fonts->AddFontDefault();
+			io.Fonts->AddFontDefault();
+		}
+
+		//io.Fonts->AddFontFromFileTTF(gw2uifont, 16.0f);
+		//io.Fonts->AddFontFromFileTTF(gw2uifont, 22.0f);
 		io.Fonts->Build();
 
 		// Init imgui

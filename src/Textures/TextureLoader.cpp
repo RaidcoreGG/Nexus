@@ -39,14 +39,12 @@ namespace TextureLoader
         QueueTexture(aIdentifier, image_data, image_width, image_height, aCallback);
     }
 
-    void LoadFromResource(std::string aIdentifier, std::string aName, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback)
+    void LoadFromResource(std::string aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback)
     {
         Texture tex = Get(aIdentifier);
         if (tex.Resource != nullptr) { aCallback(aIdentifier, tex); }
 
-        const char* name = aName.c_str();
-
-        HRSRC imageResHandle = FindResourceA(aModule, MAKEINTRESOURCEA(name), "PNG");
+        HRSRC imageResHandle = FindResourceA(aModule, MAKEINTRESOURCEA(aResourceID), "PNG");
         if (!imageResHandle)
         {
             return;
