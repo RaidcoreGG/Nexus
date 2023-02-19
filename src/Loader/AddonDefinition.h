@@ -31,6 +31,7 @@ struct AddonDefinition
     EUpdateProvider Provider;       /* What platform is the the addon hosted on */
     const char*     UpdateLink;     /* Link to the update resource */
 
+    /* internal */
     bool HasMinimumRequirements();
     void RenderItem();
 };

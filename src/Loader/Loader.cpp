@@ -1,11 +1,5 @@
 #include "Loader.h"
 
-#include "../core.h"
-#include "../State.h"
-#include "../Shared.h"
-#include "../Paths.h"
-#include "../Renderer.h"
-
 namespace Loader
 {
     std::mutex AddonsMutex;

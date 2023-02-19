@@ -79,6 +79,8 @@
     <ClInclude Include="Keybinds\FuncDefs.h" />
     <ClInclude Include="Keybinds\Keybind.h" />
     <ClInclude Include="Keybinds\KeybindHandler.h" />
+    <ClInclude Include="Loader\FuncDefs.h" />
+    <ClInclude Include="Loader\LoadedAddon.h" />
     <ClInclude Include="Loader\Loader.h" />
     <ClInclude Include="Localization\Localization.h" />
     <ClInclude Include="Logging\FuncDefs.h" />

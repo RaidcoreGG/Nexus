@@ -7,7 +7,15 @@
 #include <thread>
 #include <filesystem>
 
+#include "../core.h"
+#include "../State.h"
+#include "../Shared.h"
+#include "../Paths.h"
+#include "../Renderer.h"
+
 #include "AddonDefinition.h"
+#include "LoadedAddon.h"
+#include "FuncDefs.h"
 
 #include "../Mumble/LinkedMem.h"
 #include "../Logging/LogHandler.h"
@@ -17,14 +25,6 @@
 #include "../minhook/mh_hook.h"
 #include "../DataLink/DataLink.h"
 #include "../Textures/TextureLoader.h"
-
-typedef AddonDefinition*	(*GETADDONDEF)();
-
-struct LoadedAddon
-{
-	HMODULE Module;
-	AddonDefinition* Definitions;
-};
 
 namespace Loader
 {

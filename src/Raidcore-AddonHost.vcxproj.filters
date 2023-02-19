@@ -386,6 +386,12 @@
     <ClInclude Include="Textures\QueuedTexture.h">
       <Filter>Textures</Filter>
     </ClInclude>
+    <ClInclude Include="Loader\FuncDefs.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\LoadedAddon.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Raidcore-AddonHost.rc">
