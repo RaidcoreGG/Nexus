@@ -29,7 +29,7 @@ namespace GUI
                             Loader::AddonsMutex.lock();
                             for (auto& [path, addon] : Loader::AddonDefs)
                             {
-                                addon.Definitions->RenderItem();
+                                addon.RenderItem();
                             }
                             Loader::AddonsMutex.unlock();
                         }

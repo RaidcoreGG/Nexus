@@ -33,6 +33,7 @@
     <ClCompile Include="Keybinds\Keybind.cpp" />
     <ClCompile Include="Keybinds\KeybindHandler.cpp" />
     <ClCompile Include="Loader\AddonDefinition.cpp" />
+    <ClCompile Include="Loader\LoadedAddon.cpp" />
     <ClCompile Include="Loader\Loader.cpp" />
     <ClCompile Include="Logging\FileLogger.cpp" />
     <ClCompile Include="Logging\ILogger.cpp" />

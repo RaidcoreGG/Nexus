@@ -9,6 +9,8 @@ struct LoadedAddon
 {
 	HMODULE Module;
 	AddonDefinition* Definitions;
+
+	void RenderItem();
 };
 
 #endif

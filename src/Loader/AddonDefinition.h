@@ -33,7 +33,6 @@ struct AddonDefinition
 
     /* internal */
     bool HasMinimumRequirements();
-    void RenderItem();
 };
 
 #endif
