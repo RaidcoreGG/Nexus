@@ -25,6 +25,7 @@
 #include "../minhook/mh_hook.h"
 #include "../DataLink/DataLink.h"
 #include "../Textures/TextureLoader.h"
+#include "../GUI/Widgets/QuickAccess/QuickAccess.h"
 
 namespace Loader
 {

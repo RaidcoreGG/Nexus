@@ -10,6 +10,7 @@
 #include "../minhook/mh_hook.h"
 #include "../DataLink/FuncDefs.h"
 #include "../Textures/FuncDefs.h"
+#include "../GUI/Widgets/QuickAccess/FuncDefs.h"
 
 using namespace Mumble;
 

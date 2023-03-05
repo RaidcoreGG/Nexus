@@ -44,6 +44,11 @@ namespace Loader
         APIDef.LoadTextureFromFile = TextureLoader::LoadFromFile;
         APIDef.LoadTextureFromResource = TextureLoader::LoadFromResource;
 
+        APIDef.AddShortcut = GUI::QuickAccess::AddShortcut;
+        APIDef.RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
+        APIDef.AddSimpleShortcut = GUI::QuickAccess::AddSimpleShortcut;
+        APIDef.RemoveSimpleShortcut = GUI::QuickAccess::RemoveSimpleShortcut;
+
         State::AddonHost = ggState::ADDONS_READY;
 
         UpdateThread = std::thread(Update);
