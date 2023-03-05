@@ -2,12 +2,15 @@
 
 namespace Keybinds
 {
-	std::mutex Mutex;
-	std::map<std::string, Keybind> Registry;
-	std::map<std::string, KEYBINDS_PROCESS> HandlerRegistry;
+	std::mutex								Mutex;
+	std::map<std::string, ActiveKeybind>	Registry;
 
-	std::mutex HeldKeysMutex;
-	std::vector<WPARAM> HeldKeys;
+	std::mutex								HeldKeysMutex;
+	std::vector<WPARAM>						HeldKeys;
+
+	bool									IsSettingKeybind = false;
+	Keybind									CurrentKeybind;
+	std::string								CurrentKeybindUsedBy;
 
 	bool WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
@@ -18,40 +21,56 @@ namespace Keybinds
 
 		switch (uMsg)
 		{
-		case WM_SYSKEYDOWN: case WM_KEYDOWN:
+		case WM_SYSKEYDOWN:
+		case WM_KEYDOWN:
 			if (wParam > 255) break;
 			kb.Key = wParam;
 			
-			HeldKeysMutex.lock();
+			// if shift, ctrl or alt set key to 0
+			if (wParam == 16 || wParam == 17 || wParam == 18)
+			{
+				kb.Key = 0;
+			}
 
+			HeldKeysMutex.lock();
 			if (std::find(HeldKeys.begin(), HeldKeys.end(), wParam) != HeldKeys.end())
 			{
 				HeldKeysMutex.unlock();
 				return false;
 			}
 			HeldKeys.push_back(wParam);
-
 			HeldKeysMutex.unlock();
 			
-			for (std::map<std::string, Keybind>::iterator it = Registry.begin(); it != Registry.end(); ++it)
+			/* only check if not currently setting keybind */
+			if (!IsSettingKeybind)
 			{
-				Keybind stored = it->second;
-
-				if (kb == stored)
+				for (std::map<std::string, ActiveKeybind>::iterator it = Registry.begin(); it != Registry.end(); ++it)
 				{
-					Invoke(it->first);
-					return true;
+					if (kb == it->second.Bind)
+					{
+						Invoke(it->first);
+						return true;
+					}
 				}
 			}
-		case WM_SYSKEYUP: case WM_KEYUP:
+			else
+			{
+				CurrentKeybind = kb;
+				CurrentKeybindUsedBy = Keybinds::IsInUse(kb.ToString());
+			}
+			
+			break;
+		case WM_SYSKEYUP:
+		case WM_KEYUP:
 			HeldKeysMutex.lock();
-
 			HeldKeys.erase(std::remove(HeldKeys.begin(), HeldKeys.end(), wParam), HeldKeys.end());
-
 			HeldKeysMutex.unlock();
 			break;
 		}
 
+		/* let's see how many bugs this will cause */
+		/* logic is, if not currently editing keybinds, this is false */
+		/* if it is editing keybinds, return true, so that the game and other windows won't get to process the input */
 		return false;
 	}
 
@@ -77,7 +96,7 @@ namespace Keybinds
 				line.erase(0, pos + delimiter.length());
 			}
 
-			Registry[token] = KBFromString(line);
+			Registry[token].Bind = KBFromString(line);
 			LogDebug("%s | %s", token.c_str(), line.c_str());
 		}
 
@@ -92,10 +111,10 @@ namespace Keybinds
 
 		std::ofstream file(Path::F_KEYBINDS);
 
-		for (std::map<std::string, Keybind>::iterator it = Registry.begin(); it != Registry.end(); ++it)
+		for (std::map<std::string, ActiveKeybind>::iterator it = Registry.begin(); it != Registry.end(); ++it)
 		{
 			std::string id = it->first;
-			std::string kb = it->second.ToString();
+			std::string kb = it->second.Bind.ToString();
 
 			file.write(id.c_str(), id.size());
 			file.write("=", 1);
@@ -112,38 +131,30 @@ namespace Keybinds
 	{
 		Keybind requestedBind = KBFromString(aKeybind);
 
-		Mutex.lock();
-
 		/* check if another identifier, already uses the keybind */
-		for (auto& [identifier, keybind] : Registry)
-		{
-			if (keybind == requestedBind)
-			{
-				if (identifier != aIdentifier)
-				{
-					/* another identifier uses the same combination */
-					requestedBind = {};
-				}
+		std::string res = IsInUse(aKeybind);
 
-				break;
-			}
+		if (res != aIdentifier && res != "")
+		{
+			/* another identifier uses the same combination */
+			requestedBind = {};
 		}
 
+		Mutex.lock();
 		/* check if this keybind is not already set */
 		if (Registry.find(aIdentifier) == Registry.end())
 		{
-			Registry[aIdentifier] = requestedBind;
+			Registry[aIdentifier].Bind = requestedBind;
 		}
 		else
 		{
-			if (Registry[aIdentifier] == Keybind{})
+			if (Registry[aIdentifier].Bind == Keybind{})
 			{
-				Registry[aIdentifier] = requestedBind;
+				Registry[aIdentifier].Bind = requestedBind;
 			}
 		}
 
-		HandlerRegistry[aIdentifier] = aKeybindHandler;
-
+		Registry[aIdentifier].Handler = aKeybindHandler;
 		Mutex.unlock();
 
 		Save();
@@ -154,31 +165,50 @@ namespace Keybinds
 		Mutex.lock();
 
 		Registry.erase(aIdentifier);
-		HandlerRegistry.erase(aIdentifier);
 
 		Mutex.unlock();
 	}
 
-	void Set(std::string aIdentifier, std::string aKeybind)
+	std::string IsInUse(std::string aKeybind)
 	{
 		Keybind requestedBind = KBFromString(aKeybind);
 
+		/* sanity check */
+		if (requestedBind == Keybind{}) { return ""; }
+
 		Mutex.lock();
+		/* check if another identifier, already uses the keybind */
+		for (auto& [identifier, keybind] : Registry)
+		{
+			if (keybind.Bind == requestedBind)
+			{
+				Mutex.unlock();
+				return identifier;
+			}
+		}
+		Mutex.unlock();
 
-		Registry[aIdentifier] = requestedBind;
+		return "";
+	}
 
+	void Set(std::string aIdentifier, std::string aKeybind)
+	{
+		std::string res = IsInUse(aKeybind);
+
+		if (res != aIdentifier && res != "") { return; }
+
+		Mutex.lock();
+		Registry[aIdentifier].Bind = KBFromString(aKeybind);
 		Mutex.unlock();
 	}
 
 	void Invoke(std::string aIdentifier)
 	{
 		Mutex.lock();
-
-		if (HandlerRegistry[aIdentifier])
+		if (Registry[aIdentifier].Handler)
 		{
-			HandlerRegistry[aIdentifier](aIdentifier);
+			Registry[aIdentifier].Handler(aIdentifier);
 		}
-
 		Mutex.unlock();
 	}
 }

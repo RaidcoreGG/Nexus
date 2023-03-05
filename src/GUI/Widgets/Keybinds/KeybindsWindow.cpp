@@ -2,6 +2,8 @@
 
 namespace GUI
 {
+    std::string CurrentlyEditing;
+
     void KeybindsWindow::Render()
     {
         if (!Visible) { return; }
@@ -14,24 +16,70 @@ namespace GUI
             {
                 ImGui::Text(identifier.c_str());
                 ImGui::SameLine();
-                if (ImGui::SmallButton(keybind.ToString().c_str()))
+                if (ImGui::SmallButton(keybind.Bind.ToString().c_str()))
                 {
+                    CurrentlyEditing = identifier;
                     ImGui::OpenPopup("Set Keybind");
-                }
-
-                ImVec2 center(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f);
-                ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-                if (ImGui::BeginPopupModal("Set Keybind", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-                {
-                    /* somehow take input, idk */
-
-                    if (ImGui::Button("Accept")) {}
-                    if (ImGui::Button("Cancel")) { ImGui::CloseCurrentPopup(); }
-
-                    ImGui::EndPopup();
                 }
             }
             Keybinds::Mutex.unlock();
+
+            ImVec2 center(Renderer::Width * 0.5f, Renderer::Height * 0.5f);
+            ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+            if (ImGui::BeginPopupModal("Set Keybind", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+            {
+                Keybinds::IsSettingKeybind = true;
+                if (Keybinds::CurrentKeybind == Keybind{})
+                {
+                    ImGui::Text(Keybinds::Registry[CurrentlyEditing].Bind.ToString().c_str());
+                }
+                else
+                {
+                    ImGui::Text(Keybinds::CurrentKeybind.ToString().c_str());
+                }
+                
+                bool overwriting = false;
+
+                if (Keybinds::CurrentKeybindUsedBy != CurrentlyEditing && Keybinds::CurrentKeybindUsedBy != "")
+                {
+                    ImGui::TextColored(ImVec4(255, 0, 0, 255), "You will overwrite %s.", Keybinds::CurrentKeybindUsedBy.c_str());
+                    overwriting = true;
+                }
+
+                if (ImGui::Button("Unbind"))
+                {
+                    Keybinds::Set(CurrentlyEditing, "(null)");
+                    CurrentlyEditing = "";
+                    Keybinds::CurrentKeybindUsedBy = "";
+                    Keybinds::IsSettingKeybind = false;
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::SameLine();
+                ImGui::Spacing();
+                ImGui::SameLine();
+                if (ImGui::Button("Accept"))
+                {
+                    if (overwriting)
+                    {
+                        Keybinds::Set(Keybinds::CurrentKeybindUsedBy, "(null)");
+                    }
+                    Keybinds::Set(CurrentlyEditing, Keybinds::CurrentKeybind.ToString());
+                    CurrentlyEditing = "";
+                    Keybinds::CurrentKeybindUsedBy = "";
+                    Keybinds::IsSettingKeybind = false;
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Cancel"))
+                {
+                    CurrentlyEditing = "";
+                    Keybinds::CurrentKeybindUsedBy = "";
+                    Keybinds::IsSettingKeybind = false;
+                    ImGui::CloseCurrentPopup();
+                }
+
+                ImGui::EndPopup();
+            }
         }
         ImGui::End();
     }

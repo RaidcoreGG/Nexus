@@ -49,9 +49,9 @@ namespace GUI
                         ImGui::BeginChild("##KeybindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
                         Keybinds::Mutex.lock();
-                        for (auto& [identifier, handler] : Keybinds::HandlerRegistry)
+                        for (auto& [identifier, keybind] : Keybinds::Registry)
                         {
-                            ImGui::Text(identifier.c_str()); ImGui::SameLine(); ImGui::TextDisabled("Handler: %p", handler);
+                            ImGui::Text(identifier.c_str()); ImGui::SameLine(); ImGui::TextDisabled("Handler: %p", keybind.Handler);
                         }
                         Keybinds::Mutex.unlock();
 

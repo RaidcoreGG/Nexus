@@ -44,7 +44,7 @@ Keybind KBFromString(std::string aKeybind)
 {
 	Keybind kb{};
 
-	if (strcmp(aKeybind.c_str(), "(null)") == 0 || strcmp(aKeybind.c_str(), "(NULL)") == 0) { return kb; }
+	if (aKeybind == "(null)" || aKeybind == "(NULL)") { return kb; }
 
 	std::transform(aKeybind.begin(), aKeybind.end(), aKeybind.begin(), ::toupper);
 	std::string delimiter = "+";
@@ -56,15 +56,15 @@ Keybind KBFromString(std::string aKeybind)
 		token = aKeybind.substr(0, pos);
 		aKeybind.erase(0, pos + delimiter.length());
 		
-		if (strcmp(token.c_str(), "ALT") == 0)
+		if (token == "ALT")
 		{
 			kb.Alt = true;
 		}
-		else if (strcmp(token.c_str(), "CTRL") == 0)
+		else if (token == "CTRL")
 		{
 			kb.Ctrl = true;
 		}
-		else if (strcmp(token.c_str(), "SHIFT") == 0)
+		else if (token == "SHIFT")
 		{
 			kb.Shift = true;
 		}

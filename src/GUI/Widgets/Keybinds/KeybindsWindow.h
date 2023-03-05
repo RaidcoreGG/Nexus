@@ -4,6 +4,7 @@
 #include "../../../Shared.h"
 #include "../../../Paths.h"
 #include "../../../State.h"
+#include "../../../Renderer.h"
 
 #include "../../../Keybinds/KeybindHandler.h"
 

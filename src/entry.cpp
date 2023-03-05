@@ -114,6 +114,15 @@ LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		::Shutdown();
 	}
 
+	// don't pass keys to game if currently editing keybinds
+	if (Keybinds::IsSettingKeybind)
+	{
+		if (uMsg == WM_SYSKEYDOWN || uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYUP || uMsg == WM_KEYUP)
+		{
+			return 0;
+		}
+	}
+
 	// TODO: Consider subclassing instead of CallWindowProcA
 	// subclassing thingy: https://devblogs.microsoft.com/oldnewthing/?p=41883
 	// CallWindowProcA is necessary btw, else a memory access violation will occur if directly called

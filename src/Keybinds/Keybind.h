@@ -10,10 +10,10 @@
 
 struct Keybind
 {
-	WORD Key;
-	bool Alt;
-	bool Ctrl;
-	bool Shift;
+	WPARAM	Key;
+	bool	Alt;
+	bool	Ctrl;
+	bool	Shift;
 
 	std::string ToString(bool padded = false);
 };

@@ -422,6 +422,9 @@
     <ClInclude Include="Consts.h">
       <Filter>_GLOBAL</Filter>
     </ClInclude>
+    <ClInclude Include="Keybinds\ActiveKeybind.h">
+      <Filter>Keybinds</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Raidcore-AddonHost.rc">

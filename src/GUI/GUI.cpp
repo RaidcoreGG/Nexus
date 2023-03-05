@@ -4,14 +4,14 @@ namespace GUI
 {
 	void Setup(); // forward declare
 
-	bool					IsMenuVisible = true;
-	bool					IsSetup = false;
+	bool					IsMenuVisible		= true;
+	bool					IsSetup				= false;
 
 	std::mutex				Mutex;
 	std::vector<IWindow*>	Windows;
 
-	bool IsRightClickHeld = false;
-	bool IsLeftClickHeld = false;
+	bool					IsRightClickHeld	= false;
+	bool					IsLeftClickHeld		= false;
 
 	void Initialize()
 	{
