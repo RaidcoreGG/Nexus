@@ -131,7 +131,10 @@ namespace TextureLoader
         pTexture->Release();
 
         Registry[aQueuedTexture.Identifier] = tex;
-        aQueuedTexture.Callback(aQueuedTexture.Identifier, tex);
+        if (aQueuedTexture.Callback)
+        {
+            aQueuedTexture.Callback(aQueuedTexture.Identifier, tex);
+        }
 
         stbi_image_free(aQueuedTexture.Data);
         aQueuedTexture.Data = {};

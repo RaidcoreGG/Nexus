@@ -7,6 +7,7 @@
 #include "../Renderer.h"
 #include "../Paths.h"
 #include "../Shared.h"
+#include "../Consts.h"
 
 #include "../Keybinds/KeybindHandler.h"
 #include "../Loader/Loader.h"
@@ -22,6 +23,7 @@
 #include "Widgets/Overlay/MumbleOverlay.h"
 #include "Widgets/Debug/DebugWindow.h"
 #include "Widgets/About/AboutBox.h"
+#include "Widgets/QuickAccess/QuickAccess.h"
 
 #include "../resource.h"
 
@@ -36,6 +38,7 @@ namespace GUI
 
 	void Render();
 	void RenderMenu();
+
 	void AddWindow(IWindow* aWindowPtr);
 }
 

@@ -50,6 +50,12 @@ struct AddonAPI
 	TEXTURES_LOADFROMFILE		LoadTextureFromFile;
 	TEXTURES_LOADFROMRESOURCE	LoadTextureFromResource;
 
+	/* Shortcuts */
+	QUICKACCESS_ADDSHORTCUT		AddShortcut;
+	QUICKACCESS_REMOVESHORTCUT  RemoveShortcut;
+	QUICKACCESS_ADDSIMPLE		AddSimpleShortcut;
+	QUICKACCESS_REMOVESIMPLE	RemoveSimpleShortcut;
+
 	/* API */
 		// GW2 API FUNCS
 		// LOGITECH API FUNCS

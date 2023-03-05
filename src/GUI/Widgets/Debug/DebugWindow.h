@@ -8,6 +8,7 @@
 #include "../../../Keybinds/KeybindHandler.h"
 #include "../../../DataLink/DataLink.h"
 #include "../../../Textures/TextureLoader.h"
+#include "../../../GUI/Widgets/QuickAccess/QuickAccess.h"
 
 #include "../../../imgui/imgui.h"
 #include "../../../imgui/imgui_extensions.h"

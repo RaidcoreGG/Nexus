@@ -70,6 +70,9 @@
     <Filter Include="Textures">
       <UniqueIdentifier>{6389b79a-d0aa-4b99-97d2-74a74d8ec33b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Widgets\QuickAccess">
+      <UniqueIdentifier>{4c9af9fd-e1d8-4b1c-8a86-b5d5c91c500f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="entry.cpp">
@@ -191,6 +194,15 @@
     </ClCompile>
     <ClCompile Include="Loader\LoadedAddon.cpp">
       <Filter>Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Widgets\QuickAccess\QuickAccess.cpp">
+      <Filter>GUI\Widgets\QuickAccess</Filter>
+    </ClCompile>
+    <ClCompile Include="types.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Consts.cpp">
+      <Filter>_GLOBAL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -398,6 +410,18 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GUI\Widgets\QuickAccess\QuickAccess.h">
+      <Filter>GUI\Widgets\QuickAccess</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Widgets\QuickAccess\FuncDefs.h">
+      <Filter>GUI\Widgets\QuickAccess</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Widgets\QuickAccess\Shortcut.h">
+      <Filter>GUI\Widgets\QuickAccess</Filter>
+    </ClInclude>
+    <ClInclude Include="Consts.h">
+      <Filter>_GLOBAL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Raidcore-AddonHost.rc">
@@ -405,13 +429,27 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="exports.def">
-      <Filter>Source Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Font Include="Menomonia.ttf">
       <Filter>Resource Files</Filter>
     </Font>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="exports.def">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\ICON_GENERIC.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\ICON_GENERIC_HOVER.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\ICON_NEXUS.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\ICON_NEXUS_HOVER.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

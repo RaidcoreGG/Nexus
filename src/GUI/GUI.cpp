@@ -2,13 +2,16 @@
 
 namespace GUI
 {
-	void SetupWindowsAndKeybinds(); // forward declare
+	void Setup(); // forward declare
 
 	bool					IsMenuVisible = true;
 	bool					IsSetup = false;
 
-	std::mutex				WindowsMutex;
+	std::mutex				Mutex;
 	std::vector<IWindow*>	Windows;
+
+	bool IsRightClickHeld = false;
+	bool IsLeftClickHeld = false;
 
 	void Initialize()
 	{
@@ -28,7 +31,7 @@ namespace GUI
 		}
 
 		bool initializedFonts = false;
-		HRSRC hResource = FindResourceA(AddonHostModule, MAKEINTRESOURCE(IDR_FONT1), RT_FONT);
+		HRSRC hResource = FindResourceA(AddonHostModule, MAKEINTRESOURCE(RES_FONT_MENOMONIA), RT_FONT);
 		if (hResource)
 		{
 			HGLOBAL hLoadedResource = LoadResource(AddonHostModule, hResource);
@@ -51,20 +54,19 @@ namespace GUI
 			}
 		}
 
+		/* add the default font twice more, to replace the missing gw2 ui font for dependant addons */
 		if (!initializedFonts)
 		{
 			io.Fonts->AddFontDefault();
 			io.Fonts->AddFontDefault();
 		}
 
-		//io.Fonts->AddFontFromFileTTF(gw2uifont, 16.0f);
-		//io.Fonts->AddFontFromFileTTF(gw2uifont, 22.0f);
 		io.Fonts->Build();
 
 		// Init imgui
 		ImGui_ImplWin32_Init(Renderer::WindowHandle);
 		ImGui_ImplDX11_Init(Renderer::Device, Renderer::DeviceContext);
-		ImGui::GetIO().ImeWindowHandle = Renderer::WindowHandle;
+		//ImGui::GetIO().ImeWindowHandle = Renderer::WindowHandle;
 
 		// create buffers
 		ID3D11Texture2D* pBackBuffer;
@@ -72,7 +74,7 @@ namespace GUI
 		Renderer::Device->CreateRenderTargetView(pBackBuffer, NULL, &Renderer::RenderTargetView);
 		pBackBuffer->Release();
 
-		if (!IsSetup) { SetupWindowsAndKeybinds(); }
+		if (!IsSetup) { Setup(); }
 
 		State::IsImGuiInitialized = true;
 	}
@@ -94,20 +96,44 @@ namespace GUI
 		if (State::IsImGuiInitialized)
 		{
 			ImGuiIO& io = ImGui::GetIO();
-			if (io.WantCaptureMouse)
+
+			// Set mouse position
+			if (uMsg == WM_MOUSEMOVE)
+			{
+				io.MousePos = ImVec2((float)(LOWORD(lParam)), (float)(HIWORD(lParam)));
+			}
+
+			if (!io.WantCaptureMouse)
 			{
 				switch (uMsg)
 				{
-				case WM_LBUTTONDBLCLK:
-				case WM_LBUTTONDOWN:	if (!GetAsyncKeyState(VK_RBUTTON)) { io.MouseDown[0] = true; return true; }		break;
-				case WM_RBUTTONDBLCLK:
-				case WM_RBUTTONDOWN:	io.MouseDown[1] = true;															return true;
+					case WM_LBUTTONDBLCLK:
+					case WM_LBUTTONDOWN:	IsLeftClickHeld = true;															break;
+					case WM_RBUTTONDBLCLK:
+					case WM_RBUTTONDOWN:	IsRightClickHeld = true;														break;
 
-				case WM_LBUTTONUP:		io.MouseDown[0] = false;														break;
-				case WM_RBUTTONUP:		io.MouseDown[1] = false;														break;
+					case WM_LBUTTONUP:		IsLeftClickHeld = false;														break;
+					case WM_RBUTTONUP:		IsRightClickHeld = false;														break;
+				}
 
-				case WM_MOUSEWHEEL:		io.MouseWheel += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;	return true;
-				case WM_MOUSEHWHEEL:	io.MouseWheelH += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;	return true;
+				if (IsLeftClickHeld || IsRightClickHeld) { io.MousePos = ImVec2(-FLT_MAX, -FLT_MAX); }
+			}
+
+			if (io.WantCaptureMouse && !IsLeftClickHeld && !IsRightClickHeld)
+			{
+				switch (uMsg)
+				{
+					case WM_LBUTTONDBLCLK:
+					case WM_LBUTTONDOWN:	io.MouseDown[0] = true;															return true;
+					case WM_RBUTTONDBLCLK:
+					case WM_RBUTTONDOWN:	io.MouseDown[1] = true;															return true;
+
+					case WM_LBUTTONUP:		io.MouseDown[0] = false;														break;
+					case WM_RBUTTONUP:		io.MouseDown[1] = false;														break;
+
+					case WM_MOUSEWHEEL:		io.MouseWheel += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;	return true;
+					case WM_MOUSEHWHEEL:	io.MouseWheelH += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;	return true;
+					case WM_MOUSEMOVE:		return true;
 				}
 			}
 
@@ -115,21 +141,21 @@ namespace GUI
 			{
 				switch (uMsg)
 				{
-				case WM_KEYDOWN:
-				case WM_SYSKEYDOWN:
-					if (wParam < 256)
-						io.KeysDown[wParam] = 1;
-					return true;
-				case WM_KEYUP:
-				case WM_SYSKEYUP:
-					if (wParam < 256)
-						io.KeysDown[wParam] = 0;
-					return true;
-				case WM_CHAR:
-					// You can also use ToAscii()+GetKeyboardState() to retrieve characters.
-					if (wParam > 0 && wParam < 0x10000)
-						io.AddInputCharacterUTF16((unsigned short)wParam);
-					return true;
+					case WM_KEYDOWN:
+					case WM_SYSKEYDOWN:
+						if (wParam < 256)
+							io.KeysDown[wParam] = 1;
+						return true;
+					case WM_KEYUP:
+					case WM_SYSKEYUP:
+						if (wParam < 256)
+							io.KeysDown[wParam] = 0;
+						return true;
+					case WM_CHAR:
+						// You can also use ToAscii()+GetKeyboardState() to retrieve characters.
+						if (wParam > 0 && wParam < 0x10000)
+							io.AddInputCharacterUTF16((unsigned short)wParam);
+						return true;
 				}
 			}
 		}
@@ -137,13 +163,14 @@ namespace GUI
 		return false;
 	}
 
-	void SetupWindowsAndKeybinds()
+	void Setup()
 	{
+		/* setup logging window */
 		LogWindow* logWnd = new LogWindow();
-
 		RegisterLogger(logWnd);
 		logWnd->SetLogLevel(ELogLevel::ALL);
 
+		/* add windows */
 		AddWindow(logWnd);
 		AddWindow(new AddonsWindow());
 		AddWindow(new KeybindsWindow());
@@ -151,19 +178,29 @@ namespace GUI
 		AddWindow(new DebugWindow());
 		AddWindow(new AboutBox());
 
-		Keybinds::Register("ADDONHOST_MENU", ProcessKeybind, "CTRL+O");
+		/* register keybinds */
+		Keybinds::Register(KB_MENU, ProcessKeybind, "CTRL+O");
+
+		/* load icons */
+		TextureLoader::LoadFromResource(ICON_NEXUS,			RES_ICON_NEXUS,			AddonHostModule, nullptr);
+		TextureLoader::LoadFromResource(ICON_NEXUS_HOVER,	RES_ICON_NEXUS_HOVER,	AddonHostModule, nullptr);
+
+		TextureLoader::LoadFromResource(ICON_GENERIC,		RES_ICON_GENERIC,		AddonHostModule, nullptr);
+		TextureLoader::LoadFromResource(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, AddonHostModule, nullptr);
+
+		/* add shortcut */
+		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "Nexus Menu");
 
 		IsSetup = true;
 	}
 
 	void ProcessKeybind(std::string aIdentifier)
 	{
-		if (aIdentifier == "ADDONHOST_MENU")
+		if (aIdentifier == KB_MENU)
 		{
 			IsMenuVisible = !IsMenuVisible;
 			return;
 		}
-
 	}
 
 	void Render()
@@ -184,23 +221,24 @@ namespace GUI
 			/* draw overlay */
 
 			/* draw menu */
+			QuickAccess::Render();
 			RenderMenu();
 
 			/* draw windows */
-			WindowsMutex.lock();
+			Mutex.lock();
 			for (IWindow* wnd : Windows)
 			{
 				wnd->Render();
 			}
-			WindowsMutex.unlock();
+			Mutex.unlock();
 
 			/* draw addons*/
-			Loader::AddonsMutex.lock();
+			Loader::Mutex.lock();
 			for (const auto& [path, addon] : Loader::AddonDefs)
 			{
 				if (addon.Definitions->Render) { addon.Definitions->Render(); }
 			}
-			Loader::AddonsMutex.unlock();
+			Loader::Mutex.unlock();
 
 			/* TODO: RENDER UNDER UI */
 			/* TODO: RENDER OVER UI */
@@ -222,7 +260,7 @@ namespace GUI
 
 		if (ImGui::Begin("Menu", &IsMenuVisible, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize))
 		{
-			WindowsMutex.lock();
+			Mutex.lock();
 
 			for (IWindow* wnd : Windows) { wnd->MenuOption(0); }
 			//ImGui::Button("Layout", ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
@@ -239,17 +277,17 @@ namespace GUI
 
 			for (IWindow* wnd : Windows) { wnd->MenuOption(2); }
 
-			WindowsMutex.unlock();
+			Mutex.unlock();
 		}
 		ImGui::End();
 	}
 
 	void AddWindow(IWindow* aWindowPtr)
 	{
-		WindowsMutex.lock();
+		Mutex.lock();
 
 		Windows.push_back(aWindowPtr);
 
-		WindowsMutex.unlock();
+		Mutex.unlock();
 	}
 }

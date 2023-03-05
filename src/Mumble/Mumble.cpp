@@ -4,9 +4,17 @@ using json = nlohmann::json;
 
 namespace Mumble
 {
-	static HANDLE Handle;
-	std::thread UpdateThread;
+	HANDLE Handle;
+	std::thread UpdateIdentityThread;
+	std::thread UpdateStateThread;
 	bool IsRunning = false;
+	unsigned Tick = 0;
+
+	/* Helpers for state vars */
+	static unsigned prevTick = 0;
+	static Vector3 prevAvPos{};
+	static Vector3 prevCamFront{};
+	static Identity prevIdentity{};
 
 	LinkedMem* Initialize(const wchar_t* aMumbleName)
 	{
@@ -25,8 +33,10 @@ namespace Mumble
 			MumbleLink = (LinkedMem*)MapViewOfFile(Handle, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(LinkedMem));
 
 			IsRunning = true;
-			UpdateThread = std::thread(Update);
-			UpdateThread.detach();
+			UpdateIdentityThread = std::thread(UpdateIdentity);
+			UpdateIdentityThread.detach();
+			UpdateStateThread = std::thread(UpdateState);
+			UpdateStateThread.detach();
 
 			return MumbleLink;
 		}
@@ -56,7 +66,7 @@ namespace Mumble
 		return Handle ? Handle : nullptr;
 	}
 
-	void Update()
+	void UpdateIdentity()
 	{
 		for (;;)
 		{
@@ -66,43 +76,62 @@ namespace Mumble
 			{
 				if (MumbleLink->Identity[0])
 				{
-					Identity prev;
+					/* cache identity */
+					prevIdentity = *MumbleIdentity;
 
-					if (MumbleIdentity == nullptr) { prev = Identity{}; MumbleIdentity = new Identity{}; }
-					else { prev = *MumbleIdentity; }
-
+					/* parse and assign current identity */
 					json j = json::parse(MumbleLink->Identity);
+					MumbleIdentity->Name			= j["name"].get<std::string>();
+					MumbleIdentity->Profession		= j["profession"].get<unsigned>();
+					MumbleIdentity->Specialization	= j["spec"].get<unsigned>();
+					MumbleIdentity->Race			= j["race"].get<unsigned>();
+					MumbleIdentity->MapID			= j["map_id"].get<unsigned>();
+					MumbleIdentity->WorldID			= j["world_id"].get<unsigned>();
+					MumbleIdentity->TeamColorID		= j["team_color_id"].get<unsigned>();
+					MumbleIdentity->IsCommander		= j["commander"].get<bool>();
+					MumbleIdentity->FOV				= j["fov"].get<float>();
+					MumbleIdentity->UISize			= j["uisz"].get<unsigned>();
 
-					MumbleIdentity->Name = j["name"].get<std::string>();
-					MumbleIdentity->Profession = j["profession"].get<unsigned>();
-					MumbleIdentity->Specialization = j["spec"].get<unsigned>();
-					MumbleIdentity->Race = j["race"].get<unsigned>();
-					MumbleIdentity->MapID = j["map_id"].get<unsigned>();
-					MumbleIdentity->WorldID = j["world_id"].get<unsigned>();
-					MumbleIdentity->TeamColorID = j["team_color_id"].get<unsigned>();
-					MumbleIdentity->IsCommander = j["commander"].get<bool>();
-					MumbleIdentity->FOV = j["fov"].get<float>();
-					MumbleIdentity->UISize = j["uisz"].get<unsigned>();
-
-					if (State::IsImGuiInitialized)
+					/* update ui scaling factor */
+					switch (MumbleIdentity->UISize)
 					{
-						switch (MumbleIdentity->UISize)
-						{
-							case 0: Renderer::Scaling = 0.90f; break; // Small
-							case 1: Renderer::Scaling = 1.00f; break; // Normal
-							case 2: Renderer::Scaling = 1.10f; break; // Large
-							case 3: Renderer::Scaling = 1.20f; break; // Larger
-						}
+						case 0: Renderer::Scaling = 0.90f; break; // Small
+						default:
+						case 1: Renderer::Scaling = 1.00f; break; // Normal
+						case 2: Renderer::Scaling = 1.11f; break; // Large
+						case 3: Renderer::Scaling = 1.22f; break; // Larger
 					}
 
-					if (*MumbleIdentity != prev)
+					/* notify */
+					if (*MumbleIdentity != prevIdentity)
 					{
-						Events::Raise("MUMBLE_IDENTITY_UPDATE", MumbleIdentity);
+						Events::Raise("MUMBLE_IDENTITY_UPDATED", MumbleIdentity);
 					}
 				}
 			}
 
 			Sleep(1000);
+		}
+	}
+
+	void UpdateState()
+	{
+		for (;;)
+		{
+			if (!IsRunning) { return; }
+
+			if (MumbleLink != nullptr)
+			{
+				IsGameplay = prevTick != MumbleLink->UITick;
+				IsMoving = prevAvPos != MumbleLink->AvatarPosition;
+				IsCameraMoving = prevCamFront != MumbleLink->CameraFront;
+
+				prevTick = MumbleLink->UITick;
+				prevAvPos = MumbleLink->AvatarPosition;
+				prevCamFront = MumbleLink->CameraFront;
+			}
+
+			Sleep(50);
 		}
 	}
 }

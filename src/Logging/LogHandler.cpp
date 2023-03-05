@@ -2,25 +2,36 @@
 
 namespace LogHandler
 {
-    std::mutex LoggersMutex;
+    std::mutex Mutex;
     std::vector<ILogger*> Loggers;
     std::vector<LogEntry> LogEntries;
 
+    bool IsRunning = false;
+    std::thread LoggingThread;
+    std::vector<LogEntry> QueuedMessages;
+
+    void Initialize()
+    {
+        IsRunning = true;
+        LoggingThread = std::thread(ProcessQueue);
+        LoggingThread.detach();
+    }
+
     void RegisterLogger(ILogger* aLogger)
     {
-        LoggersMutex.lock();
+        Mutex.lock();
 
         Loggers.push_back(aLogger);
 
-        LoggersMutex.unlock();
+        Mutex.unlock();
     }
     void UnregisterLogger(ILogger* aLogger)
     {
-        LoggersMutex.lock();
+        Mutex.lock();
 
         Loggers.erase(std::remove(Loggers.begin(), Loggers.end(), aLogger), Loggers.end());
 
-        LoggersMutex.unlock();
+        Mutex.unlock();
     }
 
     /* Logging helper functions */
@@ -44,23 +55,36 @@ namespace LogHandler
 
         entry.Message = std::string(&buffer[0], &buffer[strlen(buffer)]);
 
-        LoggersMutex.lock();
-        LogEntries.push_back(entry);
-
-        for (ILogger* logger : Loggers)
+        Mutex.lock();
+        QueuedMessages.push_back(entry);
+        Mutex.unlock();
+    }
+    void ProcessQueue()
+    {
+        for (;;)
         {
-            ELogLevel level = logger->GetLogLevel();
+            if (!IsRunning) { return; }
 
-            /* send logged message to logger if message log level is lower than logger level */
-            if (entry.LogLevel <= level)
+            while (QueuedMessages.size() > 0)
             {
-                std::thread([logger, entry]()
+                Mutex.lock();
+                LogEntry& entry = QueuedMessages.front();
+
+                for (ILogger* logger : Loggers)
                 {
-                    logger->LogMessage(entry);
+                    ELogLevel level = logger->GetLogLevel();
+
+                    /* send logged message to logger if message log level is lower than logger level */
+                    if (entry.LogLevel <= level)
+                    {
+                        logger->LogMessage(entry);
+                    }
                 }
-                ).detach();
+
+                LogEntries.push_back(entry);
+                QueuedMessages.erase(QueuedMessages.begin());
+                Mutex.unlock();
             }
         }
-        LoggersMutex.unlock();
     }
 }

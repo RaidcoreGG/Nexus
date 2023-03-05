@@ -14,9 +14,15 @@
 
 namespace LogHandler
 {
-    extern std::mutex LoggersMutex;
+    extern std::mutex Mutex;
     extern std::vector<ILogger*> Loggers;
     extern std::vector<LogEntry> LogEntries;
+
+    extern bool IsRunning;
+    extern std::thread LoggingThread;
+    extern std::vector<LogEntry> QueuedMessages;
+
+    void Initialize();
 
     void RegisterLogger(ILogger* aLogger);
     void UnregisterLogger(ILogger* aLogger);
@@ -33,6 +39,7 @@ namespace LogHandler
 
     /* Logging internal functions */
     void LogMessage(ELogLevel aLogLevel, const char* aFmt, va_list aArgs);
+    void ProcessQueue();
 }
 
 #endif

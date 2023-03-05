@@ -2,7 +2,7 @@
 
 namespace Loader
 {
-    std::mutex AddonsMutex;
+    std::mutex Mutex;
     std::map<std::filesystem::path, LoadedAddon> AddonDefs;
     AddonAPI APIDef{};
 
@@ -140,7 +140,7 @@ namespace Loader
                     /* ends with .dll */
                     if (pathStr.size() >= dll.size() && 0 == pathStr.compare(pathStr.size() - dll.size(), dll.size(), dll))
                     {
-                        AddonsMutex.lock();
+                        Mutex.lock();
                         if (AddonDefs.find(fsPath) == AddonDefs.end())
                         {
                             /* reload if not blacklisted */
@@ -149,13 +149,13 @@ namespace Loader
                                 LoadAddon(fsPath);
                             }
                         }
-                        AddonsMutex.unlock();
+                        Mutex.unlock();
                         currentLibs.insert(fsPath);
                     }
                 }
             }
 
-            AddonsMutex.lock();
+            Mutex.lock();
             if (currentLibs != ExistingLibs)
             {
                 for (std::filesystem::path dllPath : ExistingLibs)
@@ -169,7 +169,7 @@ namespace Loader
                     }
                 }
             }
-            AddonsMutex.unlock();
+            Mutex.unlock();
 
             ExistingLibs = currentLibs;
 

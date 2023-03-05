@@ -19,5 +19,8 @@ extern std::vector<std::wstring>    Parameters;
 
 extern LinkedMem*                   MumbleLink;
 extern Identity*                    MumbleIdentity;
+extern bool							IsMoving;
+extern bool							IsCameraMoving;
+extern bool							IsGameplay;
 
 #endif

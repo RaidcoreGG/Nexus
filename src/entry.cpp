@@ -52,6 +52,8 @@ void Initialize()
 	fLog->SetLogLevel(State::IsDeveloperMode ? ELogLevel::ALL : ELogLevel::INFO);
 	RegisterLogger(fLog);
 
+	LogHandler::Initialize();
+
 	LogInfo(GetCommandLineA());
 	LogInfo("Version: %s", Version);
 
@@ -146,8 +148,8 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 
 	while (TextureLoader::QueuedTextures.size() > 0)
 	{
-		TextureLoader::CreateTexture(TextureLoader::QueuedTextures[TextureLoader::QueuedTextures.size() - 1]);
-		TextureLoader::QueuedTextures.pop_back();
+		TextureLoader::CreateTexture(TextureLoader::QueuedTextures.front());
+		TextureLoader::QueuedTextures.erase(TextureLoader::QueuedTextures.begin());
 	}
 
 	GUI::Render();
@@ -273,7 +275,7 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CREATEDEVICE; }
 
-	static decltype(&D3D11CreateDevice) func = nullptr;
+	static decltype(&D3D11CreateDevice) func;
 	static const char* func_name = "D3D11CreateDevice";
 	Log(func_name);
 
@@ -307,7 +309,7 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CREATEDEVICEANDSWAPCHAIN; }
 
-	static decltype(&D3D11CreateDeviceAndSwapChain) func = nullptr;
+	static decltype(&D3D11CreateDeviceAndSwapChain) func;
 	static const char* func_name = "D3D11CreateDeviceAndSwapChain";
 	Log(func_name);
 
@@ -344,7 +346,7 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_CREATEDEVICE; }
 
-	static decltype(&D3D11CoreCreateDevice) func = nullptr;
+	static decltype(&D3D11CoreCreateDevice) func;
 	static const char* func_name = "D3D11CoreCreateDevice";
 	Log(func_name);
 
@@ -378,7 +380,7 @@ HRESULT __stdcall D3D11CoreCreateLayeredDevice(const void* unknown0, DWORD unkno
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_CREATELAYEREDDEVICE; }
 
-	static decltype(&D3D11CoreCreateLayeredDevice) func = nullptr;
+	static decltype(&D3D11CoreCreateLayeredDevice) func;
 	static const char* func_name = "D3D11CoreCreateLayeredDevice";
 	Log(func_name);
 
@@ -412,7 +414,7 @@ SIZE_T	__stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unkno
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_GETLAYEREDDEVICESIZE; }
 
-	static decltype(&D3D11CoreGetLayeredDeviceSize) func = nullptr;
+	static decltype(&D3D11CoreGetLayeredDeviceSize) func;
 	static const char* func_name = "D3D11CoreGetLayeredDeviceSize";
 	Log(func_name);
 
@@ -446,7 +448,7 @@ HRESULT __stdcall D3D11CoreRegisterLayers(const void* unknown0, DWORD unknown1)
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_REGISTERLAYERS; }
 
-	static decltype(&D3D11CoreRegisterLayers) func = nullptr;
+	static decltype(&D3D11CoreRegisterLayers) func;
 	static const char* func_name = "D3D11CoreRegisterLayers";
 	Log(func_name);
 
@@ -486,7 +488,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		AddonHostModule = hModule;
 		hGW2 = GetModuleHandle(NULL);
 
-		Initialize();
+		::Initialize();
 		break;
 	case DLL_PROCESS_DETACH:
 

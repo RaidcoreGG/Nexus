@@ -26,12 +26,12 @@ namespace GUI
                         }
                         else
                         {
-                            Loader::AddonsMutex.lock();
+                            Loader::Mutex.lock();
                             for (auto& [path, addon] : Loader::AddonDefs)
                             {
                                 addon.RenderItem();
                             }
-                            Loader::AddonsMutex.unlock();
+                            Loader::Mutex.unlock();
                         }
 
                         ImGui::EndChild();

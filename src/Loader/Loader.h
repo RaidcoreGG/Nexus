@@ -28,7 +28,7 @@
 
 namespace Loader
 {
-	extern std::mutex AddonsMutex;
+	extern std::mutex Mutex;
 	extern std::map<std::filesystem::path, LoadedAddon> AddonDefs;
     extern AddonAPI APIDef;
 

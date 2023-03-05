@@ -23,10 +23,9 @@ namespace GUI
 				ImGui::TreePop();
 			}
 
-			ImGui::TextDisabled("Mode:");
-			ImGui::Text(""); ImGui::SameLine(); ImGui::Text("Method %d %s", State::EntryMethod, State::IsChainloading ? "Chainloading" : "");
+			ImGui::TextDisabled("Renderer:");
+			ImGui::Text(""); ImGui::SameLine(); ImGui::Text("DirectX 11"); ImGui::SameLine(); ImGui::TextDisabled("Method %d %s", State::EntryMethod, State::IsChainloading ? "Chainloading" : "");
 			
-
 			ImGui::TextDisabled("Extras:");
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f }); // smol checkbox
 			ImGui::Checkbox("Developer Mode", &State::IsDeveloperMode);

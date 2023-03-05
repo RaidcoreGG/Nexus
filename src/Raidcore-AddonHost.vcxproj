@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Consts.cpp" />
     <ClCompile Include="core.cpp" />
     <ClCompile Include="DataLink\DataLink.cpp" />
     <ClCompile Include="entry.cpp" />
@@ -22,6 +23,7 @@
     <ClCompile Include="GUI\Widgets\Keybinds\KeybindsWindow.cpp" />
     <ClCompile Include="GUI\Widgets\Log\LogWindow.cpp" />
     <ClCompile Include="GUI\Widgets\Overlay\MumbleOverlay.cpp" />
+    <ClCompile Include="GUI\Widgets\QuickAccess\QuickAccess.cpp" />
     <ClCompile Include="Hooks.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -51,8 +53,10 @@
     <ClCompile Include="Shared.cpp" />
     <ClCompile Include="State.cpp" />
     <ClCompile Include="Textures\TextureLoader.cpp" />
+    <ClCompile Include="types.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Consts.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="DataLink\DataLink.h" />
     <ClInclude Include="DataLink\FuncDefs.h" />
@@ -67,6 +71,9 @@
     <ClInclude Include="GUI\Widgets\Keybinds\KeybindsWindow.h" />
     <ClInclude Include="GUI\Widgets\Log\LogWindow.h" />
     <ClInclude Include="GUI\Widgets\Overlay\MumbleOverlay.h" />
+    <ClInclude Include="GUI\Widgets\QuickAccess\FuncDefs.h" />
+    <ClInclude Include="GUI\Widgets\QuickAccess\QuickAccess.h" />
+    <ClInclude Include="GUI\Widgets\QuickAccess\Shortcut.h" />
     <ClInclude Include="Hooks.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
@@ -130,6 +137,12 @@
   </ItemGroup>
   <ItemGroup>
     <Font Include="Menomonia.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\ICON_GENERIC.png" />
+    <Image Include="Resources\ICON_GENERIC_HOVER.png" />
+    <Image Include="Resources\ICON_NEXUS.png" />
+    <Image Include="Resources\ICON_NEXUS_HOVER.png" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

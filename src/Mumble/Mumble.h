@@ -21,7 +21,8 @@ namespace Mumble
 
 	HANDLE GetHandle();
 
-	void Update();
+	void UpdateIdentity();
+	void UpdateState();
 };
 
 #endif

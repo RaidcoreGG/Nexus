@@ -23,7 +23,7 @@ namespace GUI
                             {
                                 if (subscribers.size() == 0)
                                 {
-                                    ImGui::TextDisabled("No addon is subscribed to this event.");
+                                    ImGui::TextDisabled("This event has no subscribers.");
                                 }
                                 else
                                 {
@@ -51,7 +51,7 @@ namespace GUI
                         Keybinds::Mutex.lock();
                         for (auto& [identifier, handler] : Keybinds::HandlerRegistry)
                         {
-                            ImGui::Text(identifier.c_str()); ImGui::SameLine(); ImGui::TextDisabled("%p", handler);
+                            ImGui::Text(identifier.c_str()); ImGui::SameLine(); ImGui::TextDisabled("Handler: %p", handler);
                         }
                         Keybinds::Mutex.unlock();
 
@@ -123,6 +123,32 @@ namespace GUI
                             ImGui::TextDisabled("No textures queued for loading.");
                         }
                         TextureLoader::Mutex.unlock();
+
+                        ImGui::EndChild();
+                    }
+
+                    ImGui::EndTabItem();
+                }
+                if (ImGui::BeginTabItem("Shortcuts"))
+                {
+                    {
+                        ImGui::BeginChild("##ShortcutsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+
+                        QuickAccess::Mutex.lock();
+                        for (auto& [identifier, shortcut] : QuickAccess::Registry)
+                        {
+                            if (ImGui::TreeNode(identifier.c_str()))
+                            {
+                                ImGui::TextDisabled("Texture: %p", shortcut.TextureNormal.Resource);
+                                ImGui::TextDisabled("Texture (Hover): %p", shortcut.TextureHover.Resource);
+                                ImGui::TextDisabled("OnClick (Keybind): %s", shortcut.Keybind.length() != 0 ? shortcut.Keybind.c_str() : "(null)");
+                                ImGui::TextDisabled("Tooltip: %s", shortcut.TooltipText.length() != 0 ? shortcut.TooltipText.c_str() : "(null)");
+                                ImGui::TextDisabled("IsHovering: %s", shortcut.IsHovering ? "true" : "false");
+
+                                ImGui::TreePop();
+                            }
+                        }
+                        QuickAccess::Mutex.unlock();
 
                         ImGui::EndChild();
                     }
