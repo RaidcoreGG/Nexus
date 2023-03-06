@@ -21,7 +21,7 @@ namespace GUI
                     ImGui::Text(identifier.c_str());
 
                     ImGui::TableSetColumnIndex(1);
-                    if (ImGui::SmallButton(keybind.Bind.ToString().c_str()))
+                    if (ImGui::SmallButton(keybind.Bind.ToString(true).c_str()))
                     {
                         CurrentlyEditing = identifier;
                         ImGui::OpenPopup(("Set Keybind: " + CurrentlyEditing).c_str(), ImGuiPopupFlags_AnyPopupLevel);
@@ -36,11 +36,11 @@ namespace GUI
                     Keybinds::IsSettingKeybind = true;
                     if (Keybinds::CurrentKeybind == Keybind{})
                     {
-                        ImGui::Text(Keybinds::Registry[CurrentlyEditing].Bind.ToString().c_str());
+                        ImGui::Text(Keybinds::Registry[CurrentlyEditing].Bind.ToString(true).c_str());
                     }
                     else
                     {
-                        ImGui::Text(Keybinds::CurrentKeybind.ToString().c_str());
+                        ImGui::Text(Keybinds::CurrentKeybind.ToString(true).c_str());
                     }
 
                     bool overwriting = false;
@@ -55,7 +55,7 @@ namespace GUI
 
                     if (ImGui::Button("Unbind"))
                     {
-                        Keybinds::Set(CurrentlyEditing, "(null)");
+                        Keybinds::Set(CurrentlyEditing, Keybind{});
                         close = true;
                     }
 
@@ -73,9 +73,9 @@ namespace GUI
                     {
                         if (overwriting)
                         {
-                            Keybinds::Set(Keybinds::CurrentKeybindUsedBy, "(null)");
+                            Keybinds::Set(Keybinds::CurrentKeybindUsedBy, Keybind{});
                         }
-                        Keybinds::Set(CurrentlyEditing, Keybinds::CurrentKeybind.ToString());
+                        Keybinds::Set(CurrentlyEditing, Keybinds::CurrentKeybind);
                         close = true;
                     }
                     ImGui::SameLine();

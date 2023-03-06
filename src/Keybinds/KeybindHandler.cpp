@@ -56,7 +56,7 @@ namespace Keybinds
 			else
 			{
 				CurrentKeybind = kb;
-				CurrentKeybindUsedBy = Keybinds::IsInUse(kb.ToString());
+				CurrentKeybindUsedBy = Keybinds::IsInUse(kb);
 			}
 			
 			break;
@@ -82,7 +82,22 @@ namespace Keybinds
 
 		std::ifstream file(Path::F_KEYBINDS);
 
-		std::string line;
+		json keybinds = json::parse(file);
+
+		for (json binding : keybinds)
+		{
+			Keybind kb{};
+			kb.Key = binding["Key"].get<WPARAM>();
+			kb.Alt = binding["Alt"].get<bool>();
+			kb.Ctrl = binding["Ctrl"].get<bool>();
+			kb.Shift = binding["Shift"].get<bool>();
+
+			std::string identifier = binding["Identifier"].get<std::string>();
+
+			Registry[identifier].Bind = kb;
+		}
+
+		/*std::string line;
 		while (std::getline(file, line))
 		{
 			std::transform(line.begin(), line.end(), line.begin(), ::toupper);
@@ -98,7 +113,7 @@ namespace Keybinds
 
 			Registry[token].Bind = KBFromString(line);
 			LogDebug("%s | %s", token.c_str(), line.c_str());
-		}
+		}*/
 
 		file.close();
 
@@ -109,9 +124,29 @@ namespace Keybinds
 	{
 		Mutex.lock();
 
-		std::ofstream file(Path::F_KEYBINDS);
+
+		json keybinds = json::array();
 
 		for (std::map<std::string, ActiveKeybind>::iterator it = Registry.begin(); it != Registry.end(); ++it)
+		{
+			Keybind kb = it->second.Bind;
+			std::string id = it->first;
+
+			json binding =
+			{
+				{"Identifier",	id},
+				{"Key",			kb.Key},
+				{"Alt",			kb.Alt},
+				{"Ctrl",		kb.Ctrl},
+				{"Shift",		kb.Shift}
+			};
+
+			keybinds.push_back(binding);
+		}
+
+		std::ofstream file(Path::F_KEYBINDS);
+
+		/*for (std::map<std::string, ActiveKeybind>::iterator it = Registry.begin(); it != Registry.end(); ++it)
 		{
 			std::string id = it->first;
 			std::string kb = it->second.Bind.ToString();
@@ -120,7 +155,9 @@ namespace Keybinds
 			file.write("=", 1);
 			file.write(kb.c_str(), kb.size());
 			file.write("\n", 1);
-		}
+		}*/
+
+		file << keybinds.dump(1, '\t') << std::endl;
 
 		file.close();
 
@@ -132,7 +169,7 @@ namespace Keybinds
 		Keybind requestedBind = KBFromString(aKeybind);
 
 		/* check if another identifier, already uses the keybind */
-		std::string res = IsInUse(aKeybind);
+		std::string res = IsInUse(requestedBind);
 
 		if (res != aIdentifier && res != "")
 		{
@@ -145,13 +182,6 @@ namespace Keybinds
 		if (Registry.find(aIdentifier) == Registry.end())
 		{
 			Registry[aIdentifier].Bind = requestedBind;
-		}
-		else
-		{
-			if (Registry[aIdentifier].Bind == Keybind{})
-			{
-				Registry[aIdentifier].Bind = requestedBind;
-			}
 		}
 
 		Registry[aIdentifier].Handler = aKeybindHandler;
@@ -167,20 +197,20 @@ namespace Keybinds
 		Registry.erase(aIdentifier);
 
 		Mutex.unlock();
+
+		Save();
 	}
 
-	std::string IsInUse(std::string aKeybind)
+	std::string IsInUse(Keybind aKeybind)
 	{
-		Keybind requestedBind = KBFromString(aKeybind);
-
 		/* sanity check */
-		if (requestedBind == Keybind{}) { return ""; }
+		if (aKeybind == Keybind{}) { return ""; }
 
 		Mutex.lock();
 		/* check if another identifier, already uses the keybind */
 		for (auto& [identifier, keybind] : Registry)
 		{
-			if (keybind.Bind == requestedBind)
+			if (keybind.Bind == aKeybind)
 			{
 				Mutex.unlock();
 				return identifier;
@@ -191,15 +221,17 @@ namespace Keybinds
 		return "";
 	}
 
-	void Set(std::string aIdentifier, std::string aKeybind)
+	void Set(std::string aIdentifier, Keybind aKeybind)
 	{
 		std::string res = IsInUse(aKeybind);
 
 		if (res != aIdentifier && res != "") { return; }
 
 		Mutex.lock();
-		Registry[aIdentifier].Bind = KBFromString(aKeybind);
+		Registry[aIdentifier].Bind = aKeybind;
 		Mutex.unlock();
+
+		Save();
 	}
 
 	void Invoke(std::string aIdentifier)

@@ -35,7 +35,7 @@ namespace Path
 
 		/* ensure files */
 		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_LOG, "AddonHost.log");						/* get log path */
-		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_KEYBINDS, "Keybinds.dat");					/* get keybinds path */
+		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_KEYBINDS, "Keybinds.json");					/* get keybinds path */
 		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_FONT, "font.ttf");							/* get keybinds path */
 
 		/* static paths */
