@@ -20,8 +20,8 @@ std::string Keybind::ToString(bool padded)
 		str.append(Shift ? "SHIFT+" : "");
 	}
 
-	char* buff = new char[10];
-	GetKeyNameTextA(MapVirtualKeyA(Key, MAPVK_VK_TO_VSC) << 16, buff, 10);
+	char* buff = new char[16];
+	GetKeyNameTextA(MapVirtualKeyA(Key, MAPVK_VK_TO_VSC) << 16, buff, 16);
 	str.append(buff);
 
 	return str;
