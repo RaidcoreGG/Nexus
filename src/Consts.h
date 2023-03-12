@@ -13,4 +13,9 @@ extern const char* ICON_GENERIC_HOVER;
 /* Quick Access*/
 extern const char* QA_MENU;
 
+/* Events */
+extern const char* EV_WINDOW_RESIZED;
+extern const char* EV_MUMBLE_IDENTITY_UPDATED;
+extern const char* EV_OPTIONS_CALLED;
+
 #endif

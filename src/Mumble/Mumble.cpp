@@ -105,7 +105,7 @@ namespace Mumble
 					/* notify */
 					if (*MumbleIdentity != prevIdentity)
 					{
-						Events::Raise("MUMBLE_IDENTITY_UPDATED", MumbleIdentity);
+						Events::Raise(EV_MUMBLE_IDENTITY_UPDATED, MumbleIdentity);
 					}
 				}
 			}

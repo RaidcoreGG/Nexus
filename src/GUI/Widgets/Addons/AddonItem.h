@@ -1,6 +1,8 @@
 #ifndef GUI_ADDONITEM_H
 #define GUI_ADDONITEM_H
 
+#include "../../../Consts.h"
+
 #include "../../../Loader/AddonDefinition.h"
 #include "../../../Loader/EAddonFlags.h"
 #include "../../../Loader/Loader.h"

@@ -11,6 +11,7 @@
 #include "Hooks.h"
 #include "Renderer.h"
 #include "Shared.h"
+#include "Consts.h"
 
 #include "Logging/LogHandler.h"
 #include "Logging/ConsoleLogger.h"
@@ -185,7 +186,7 @@ HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, 
 	Renderer::Width = Width;
 	Renderer::Height = Height;
 
-	Events::Raise("WINDOW_RESIZED", nullptr);
+	Events::Raise(EV_WINDOW_RESIZED, nullptr);
 	
 	return Hooks::DXGI_ResizeBuffers(pChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
 }

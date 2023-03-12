@@ -9,6 +9,7 @@
 #include "../Shared.h"
 #include "../State.h"
 #include "../Renderer.h"
+#include "../Consts.h"
 
 #include "LinkedMem.h"
 #include "../nlohmann/json.hpp"

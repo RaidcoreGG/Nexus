@@ -27,7 +27,7 @@ namespace GUI
 				{
 					if (ImGui::Button("Options", ImVec2(120.0f, 24.0f)))
 					{
-						Events::Raise("OPTIONS_CALLED", (void*)aDefinitions->Signature);
+						Events::Raise(EV_OPTIONS_CALLED, (void*)aDefinitions->Signature);
 					}
 				}
 				if (ImGui::Button("Uninstall", ImVec2(120.0f, 24.0f)))
