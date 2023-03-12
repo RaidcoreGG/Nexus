@@ -5,9 +5,9 @@
 
 struct Texture
 {
-    unsigned Width;
-    unsigned Height;
-    ID3D11ShaderResourceView* Resource;
+	unsigned Width;
+	unsigned Height;
+	ID3D11ShaderResourceView* Resource;
 };
 
 #endif

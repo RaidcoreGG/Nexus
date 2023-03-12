@@ -14,32 +14,34 @@
 
 namespace LogHandler
 {
-    extern std::mutex Mutex;
-    extern std::vector<ILogger*> Loggers;
-    extern std::vector<LogEntry> LogEntries;
+	extern std::mutex Mutex;
+	extern std::vector<ILogger*> Registry;
+	extern std::vector<LogEntry> LogEntries;
 
-    extern bool IsRunning;
-    extern std::thread LoggingThread;
-    extern std::vector<LogEntry> QueuedMessages;
+	extern bool IsRunning;
+	extern std::thread LoggingThread;
+	extern std::vector<LogEntry> QueuedMessages;
 
-    void Initialize();
+	void Initialize();
 
-    void RegisterLogger(ILogger* aLogger);
-    void UnregisterLogger(ILogger* aLogger);
+	void RegisterLogger(ILogger* aLogger);
+	void UnregisterLogger(ILogger* aLogger);
 
-    /* Logging helper functions */
-    void Log(const char* aFmt, ...);
-    void LogCritical(const char* aFmt, ...);
-    void LogWarning(const char* aFmt, ...);
-    void LogInfo(const char* aFmt, ...);
-    void LogDebug(const char* aFmt, ...);
-    
-    /* Basic logging functions */
-    void LogMessageA(ELogLevel aLogLevel, const char* aFmt, ...);
+	/* Logging helper functions */
+	void Log(const char* aFmt, ...);
+	void LogCritical(const char* aFmt, ...);
+	void LogWarning(const char* aFmt, ...);
+	void LogInfo(const char* aFmt, ...);
+	void LogDebug(const char* aFmt, ...);
+	
+	/* Basic logging functions */
+	void LogMessageA(ELogLevel aLogLevel, const char* aFmt, ...);
 
-    /* Logging internal functions */
-    void LogMessage(ELogLevel aLogLevel, const char* aFmt, va_list aArgs);
-    void ProcessQueue();
+	/* Logging internal functions */
+	void LogMessage(ELogLevel aLogLevel, const char* aFmt, va_list aArgs);
+	void ProcessQueue();
+
+	int Verify(void* aStartAddress, void* aEndAddress);
 }
 
 #endif

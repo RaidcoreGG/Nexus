@@ -8,18 +8,18 @@
 
 class ILogger
 {
-    public:
-        ILogger() = default;
-        virtual ~ILogger() = default;
+	public:
+		ILogger() = default;
+		virtual ~ILogger() = default;
 
-        ELogLevel GetLogLevel();
-        void SetLogLevel(ELogLevel aLogLevel);
+		ELogLevel GetLogLevel();
+		void SetLogLevel(ELogLevel aLogLevel);
 
-        virtual void LogMessage(LogEntry aLogEntry) = 0;
+		virtual void LogMessage(LogEntry aLogEntry) = 0;
 
-    protected:
-        ELogLevel LogLevel;
-        std::mutex MessageMutex;
+	protected:
+		ELogLevel LogLevel;
+		std::mutex MessageMutex;
 };
 
 #endif

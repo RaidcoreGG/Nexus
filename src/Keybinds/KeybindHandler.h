@@ -47,7 +47,9 @@ namespace Keybinds
 	std::string IsInUse(Keybind aKeybind);																/* Returns an empty string if keybind is unused or the identifier that uses this keybind */
 	
 	void Set(std::string aIdentifier, Keybind aKeybind);												/* This will force set the keybind, invoked via menu/ui */
-	void Invoke(std::string aIdentifier);																/* Invokes the action on the corresponding keybind handler */
+	bool Invoke(std::string aIdentifier);																/* Invokes the action on the corresponding keybind handler */
+
+	int Verify(void* aStartAddress, void* aEndAddress);
 };
 
 #endif

@@ -11,6 +11,7 @@
 #include "../../../imgui/imgui_extensions.h"
 
 #include "../../IWindow.h"
+#include "AddonItem.h"
 
 namespace GUI
 {

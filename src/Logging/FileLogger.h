@@ -7,14 +7,14 @@
 
 class FileLogger : public virtual ILogger
 {
-    public:
-        FileLogger(const char* aPath);
-        ~FileLogger();
+	public:
+		FileLogger(const char* aPath);
+		~FileLogger();
 
-        void LogMessage(LogEntry aLogEntry);
+		void LogMessage(LogEntry aLogEntry);
 
-    private:
-        std::ofstream File;
+	private:
+		std::ofstream File;
 };
 
 #endif

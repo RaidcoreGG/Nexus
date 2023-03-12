@@ -18,7 +18,8 @@ namespace GUI
 			ImGuiWindowFlags_NoFocusOnAppearing |
 			ImGuiWindowFlags_NoNav |
 			ImGuiWindowFlags_NoMove |
-			ImGuiWindowFlags_NoInputs;
+			ImGuiWindowFlags_NoInputs |
+			ImGuiWindowFlags_NoBringToFrontOnFocus;
 
 		ImGui::SetNextWindowBgAlpha(0.35f);
 		ImGui::SetNextWindowPos(pos);
@@ -27,6 +28,8 @@ namespace GUI
 		{
 			if (ImGui::Begin("MumbleUI", &Visible, flags))
 			{
+				ImGui::Text("Interface");
+				ImGui::Separator();
 				if (ImGui::BeginTable("table_ui", 2))
 				{
 					ImGui::TableNextRow();
@@ -84,6 +87,8 @@ namespace GUI
 			ImGui::SetNextWindowSize(size);
 			if (ImGui::Begin("MumblePlayer", &Visible, flags))
 			{
+				ImGui::Text("Player");
+				ImGui::Separator();
 				if (ImGui::BeginTable("table_player", 2))
 				{
 					ImGui::TableNextRow();
@@ -125,6 +130,8 @@ namespace GUI
 			ImGui::SetNextWindowSize(size);
 			if (ImGui::Begin("MumbleCamera", &Visible, flags))
 			{
+				ImGui::Text("Camera");
+				ImGui::Separator();
 				if (ImGui::BeginTable("table_camera", 2))
 				{
 					ImGui::TableNextRow();
@@ -157,6 +164,8 @@ namespace GUI
 			ImGui::SetNextWindowSize(size);
 			if (ImGui::Begin("MumbleGame", &Visible, flags))
 			{
+				ImGui::Text("Game State");
+				ImGui::Separator();
 				if (ImGui::BeginTable("table_game", 2))
 				{
 					ImGui::TableNextRow();
@@ -196,6 +205,8 @@ namespace GUI
 			ImGui::SetNextWindowSize(size);
 			if (ImGui::Begin("MumbleIdentity", &Visible, flags))
 			{
+				ImGui::Text("Identity");
+				ImGui::Separator();
 				if (MumbleIdentity != nullptr)
 				{
 					if (ImGui::BeginTable("table_identity", 2))

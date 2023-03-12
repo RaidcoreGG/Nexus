@@ -102,6 +102,15 @@ LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		CallWindowProcA(Hooks::GW2_WndProc, hWnd, WM_SETTEXT, 0, (LPARAM)"Guild Wars 2");
 	}
 
+	// don't pass to game if addon wndproc
+	for (auto& [path, addon] : Loader::AddonDefs)
+	{
+		if (addon.Definitions->WndProc)
+		{
+			if (addon.Definitions->WndProc(hWnd, uMsg, wParam, lParam)) { return 0; }
+		}
+	}
+
 	// don't pass to game if keybind
 	if (Keybinds::WndProc(hWnd, uMsg, wParam, lParam)) { return 0; }
 

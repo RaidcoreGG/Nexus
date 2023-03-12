@@ -9,12 +9,12 @@
 
 struct LogEntry
 {
-    ELogLevel LogLevel;
-    unsigned long long Timestamp;
-    std::string Message;
+	ELogLevel LogLevel;
+	unsigned long long Timestamp;
+	std::string Message;
 
-    std::string TimestampString(bool aIncludeDate = true);
-    std::string ToString();
+	std::string TimestampString(bool aIncludeDate = true);
+	std::string ToString();
 };
 
 #endif

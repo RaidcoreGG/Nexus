@@ -2,21 +2,21 @@
 
 FileLogger::FileLogger(const char* aPath)
 {
-    File.open(aPath);
+	File.open(aPath);
 }
 
 FileLogger::~FileLogger()
 {
-    File.flush();
-    File.close();
+	File.flush();
+	File.close();
 }
 
 void FileLogger::LogMessage(LogEntry aLogEntry)
 {
-    MessageMutex.lock();
+	MessageMutex.lock();
 
-    File << aLogEntry.ToString();
-    File.flush();
+	File << aLogEntry.ToString();
+	File.flush();
 
-    MessageMutex.unlock();
+	MessageMutex.unlock();
 }

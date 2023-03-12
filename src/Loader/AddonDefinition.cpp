@@ -15,3 +15,8 @@ bool AddonDefinition::HasMinimumRequirements()
 
 	return false;
 }
+
+bool AddonDefinition::HasFlag(EAddonFlags aAddonFlag)
+{
+	return (bool)(Flags & aAddonFlag);
+}

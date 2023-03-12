@@ -44,6 +44,8 @@ namespace GUI
 
 		void AddSimpleShortcut(std::string aIdentifier, QUICKACCESS_SHORTCUTRENDERCALLBACK aShortcutRenderCallback);
 		void RemoveSimpleShortcut(std::string aIdentifier);
+
+		int Verify(void* aStartAddress, void* aEndAddress);
 	}
 }
 

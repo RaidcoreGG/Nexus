@@ -9,11 +9,11 @@
 
 class ConsoleLogger : public virtual ILogger
 {
-    public:
-        ConsoleLogger();
-        ~ConsoleLogger();
+	public:
+		ConsoleLogger();
+		~ConsoleLogger();
 
-        void LogMessage(LogEntry aLogEntry);
+		void LogMessage(LogEntry aLogEntry);
 };
 
 #endif

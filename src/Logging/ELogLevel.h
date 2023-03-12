@@ -3,13 +3,13 @@
 
 enum class ELogLevel : unsigned char
 {
-    OFF         = 0,
-    CRITICAL    = 1,
-    WARNING     = 2,
-    INFO        = 3,
-    DEBUG       = 4,
-    TRACE       = 5,
-    ALL
+	OFF         = 0,
+	CRITICAL    = 1,
+	WARNING     = 2,
+	INFO        = 3,
+	DEBUG       = 4,
+	TRACE       = 5,
+	ALL
 };
 
 #endif

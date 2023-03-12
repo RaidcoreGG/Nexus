@@ -221,5 +221,29 @@ namespace GUI
 
 			Mutex.unlock();
 		}
+
+		int Verify(void* aStartAddress, void* aEndAddress)
+		{
+			int refCounter = 0;
+
+			Mutex.lock();
+			std::vector<std::string> remove;
+
+			for (auto& [identifier, shortcutcb] : RegistrySimple)
+			{
+				if (shortcutcb >= aStartAddress && shortcutcb <= aEndAddress)
+				{
+					remove.push_back(identifier);
+					refCounter++;
+				}
+			}
+			for (std::string identifier : remove)
+			{
+				RegistrySimple.erase(identifier);
+			}
+			Mutex.unlock();
+
+			return refCounter;
+		}
 	}
 }

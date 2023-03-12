@@ -7,11 +7,11 @@
 
 struct QueuedTexture
 {
-    unsigned Width;
-    unsigned Height;
-    std::string Identifier;
-    unsigned char* Data;
-    TEXTURES_RECEIVECALLBACK Callback;
+	unsigned Width;
+	unsigned Height;
+	std::string Identifier;
+	unsigned char* Data;
+	TEXTURES_RECEIVECALLBACK Callback;
 };
 
 #endif

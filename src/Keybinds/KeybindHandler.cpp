@@ -48,8 +48,7 @@ namespace Keybinds
 				{
 					if (kb == it->second.Bind)
 					{
-						Invoke(it->first);
-						return true;
+						return Invoke(it->first);
 					}
 				}
 			}
@@ -68,9 +67,6 @@ namespace Keybinds
 			break;
 		}
 
-		/* let's see how many bugs this will cause */
-		/* logic is, if not currently editing keybinds, this is false */
-		/* if it is editing keybinds, return true, so that the game and other windows won't get to process the input */
 		return false;
 	}
 
@@ -234,13 +230,36 @@ namespace Keybinds
 		Save();
 	}
 
-	void Invoke(std::string aIdentifier)
+	bool Invoke(std::string aIdentifier)
 	{
+		bool called = false;
+
 		Mutex.lock();
 		if (Registry[aIdentifier].Handler)
 		{
 			Registry[aIdentifier].Handler(aIdentifier);
+			called = true;
 		}
 		Mutex.unlock();
+
+		return called;
+	}
+
+	int Verify(void* aStartAddress, void* aEndAddress)
+	{
+		int refCounter = 0;
+
+		Mutex.lock();
+		for (auto& [identifier, activekb] : Registry)
+		{
+			if (activekb.Handler >= aStartAddress && activekb.Handler <= aEndAddress)
+			{
+				activekb.Handler = nullptr;
+				refCounter++;
+			}
+		}
+		Mutex.unlock();
+
+		return refCounter;
 	}
 }

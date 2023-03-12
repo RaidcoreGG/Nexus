@@ -18,6 +18,7 @@
     <ClCompile Include="Events\EventHandler.cpp" />
     <ClCompile Include="GUI\GUI.cpp" />
     <ClCompile Include="GUI\Widgets\About\AboutBox.cpp" />
+    <ClCompile Include="GUI\Widgets\Addons\AddonItem.cpp" />
     <ClCompile Include="GUI\Widgets\Addons\AddonsWindow.cpp" />
     <ClCompile Include="GUI\Widgets\Debug\DebugWindow.cpp" />
     <ClCompile Include="GUI\Widgets\Keybinds\KeybindsWindow.cpp" />
@@ -35,7 +36,7 @@
     <ClCompile Include="Keybinds\Keybind.cpp" />
     <ClCompile Include="Keybinds\KeybindHandler.cpp" />
     <ClCompile Include="Loader\AddonDefinition.cpp" />
-    <ClCompile Include="Loader\LoadedAddon.cpp" />
+    <ClCompile Include="Loader\EAddonFlags.cpp" />
     <ClCompile Include="Loader\Loader.cpp" />
     <ClCompile Include="Logging\FileLogger.cpp" />
     <ClCompile Include="Logging\ILogger.cpp" />
@@ -66,6 +67,7 @@
     <ClInclude Include="GUI\GUI.h" />
     <ClInclude Include="GUI\IWindow.h" />
     <ClInclude Include="GUI\Widgets\About\AboutBox.h" />
+    <ClInclude Include="GUI\Widgets\Addons\AddonItem.h" />
     <ClInclude Include="GUI\Widgets\Addons\AddonsWindow.h" />
     <ClInclude Include="GUI\Widgets\Debug\DebugWindow.h" />
     <ClInclude Include="GUI\Widgets\Keybinds\KeybindsWindow.h" />
@@ -88,6 +90,7 @@
     <ClInclude Include="Keybinds\FuncDefs.h" />
     <ClInclude Include="Keybinds\Keybind.h" />
     <ClInclude Include="Keybinds\KeybindHandler.h" />
+    <ClInclude Include="Loader\EAddonFlags.h" />
     <ClInclude Include="Loader\FuncDefs.h" />
     <ClInclude Include="Loader\LoadedAddon.h" />
     <ClInclude Include="Loader\Loader.h" />
@@ -202,7 +205,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
-      <AdditionalDependencies>Shlwapi.lib;PathCch.lib;Shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Shlwapi.lib;PathCch.lib;Shell32.lib;Psapi.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -225,7 +228,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
-      <AdditionalDependencies>Shlwapi.lib;PathCch.lib;Shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Shlwapi.lib;PathCch.lib;Shell32.lib;Psapi.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -192,9 +192,6 @@
     <ClCompile Include="Textures\TextureLoader.cpp">
       <Filter>Textures</Filter>
     </ClCompile>
-    <ClCompile Include="Loader\LoadedAddon.cpp">
-      <Filter>Loader</Filter>
-    </ClCompile>
     <ClCompile Include="GUI\Widgets\QuickAccess\QuickAccess.cpp">
       <Filter>GUI\Widgets\QuickAccess</Filter>
     </ClCompile>
@@ -203,6 +200,12 @@
     </ClCompile>
     <ClCompile Include="Consts.cpp">
       <Filter>_GLOBAL</Filter>
+    </ClCompile>
+    <ClCompile Include="Loader\EAddonFlags.cpp">
+      <Filter>Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Widgets\Addons\AddonItem.cpp">
+      <Filter>GUI\Widgets\Addons</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -424,6 +427,12 @@
     </ClInclude>
     <ClInclude Include="Keybinds\ActiveKeybind.h">
       <Filter>Keybinds</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\EAddonFlags.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Widgets\Addons\AddonItem.h">
+      <Filter>GUI\Widgets\Addons</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

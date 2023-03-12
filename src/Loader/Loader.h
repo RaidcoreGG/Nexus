@@ -6,6 +6,8 @@
 #include <set>
 #include <thread>
 #include <filesystem>
+#include <Windows.h>
+#include <Psapi.h>
 
 #include "../core.h"
 #include "../State.h"
@@ -30,13 +32,12 @@
 namespace Loader
 {
 	extern std::mutex Mutex;
-	extern std::map<std::filesystem::path, LoadedAddon> AddonDefs;
-    extern AddonAPI APIDef;
+	extern std::map<std::filesystem::path, LoadedAddon> AddonDefs;		/* Loaded Addons and their corresponding paths */
+	extern AddonAPI APIDef;
 
 	extern std::thread UpdateThread;
 
-	extern std::set<std::filesystem::path> ExistingLibs;
-	extern std::set<std::filesystem::path> Blacklist;
+	extern std::set<std::filesystem::path> Blacklist;					/* Blacklisted files which won't be reloaded */
 
 	void Initialize();
 	void Shutdown();
@@ -44,7 +45,9 @@ namespace Loader
 	void LoadAddon(std::filesystem::path aPath);
 	void UnloadAddon(std::filesystem::path aPath);
 
-	void Update();
+	void VerifyCallbacks(void* aStartAddress, void* aEndAddress);
+
+	void DetectAddons();
 }
 
 #endif
