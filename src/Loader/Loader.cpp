@@ -71,7 +71,7 @@ namespace Loader
 		/* lib load failed */
 		if (!hMod)
 		{
-			LogDebug("Failed LoadLibrary on \"%s\". Added to blacklist.", path);
+			LogDebug("Loader", "Failed LoadLibrary on \"%s\". Added to blacklist.", path);
 			Blacklist.insert(aPath);
 			return;
 		}
@@ -79,7 +79,7 @@ namespace Loader
 		getAddonDef = (GETADDONDEF)GetProcAddress(hMod, "GetAddonDef");
 		if (getAddonDef == 0)
 		{
-			LogDebug("\"%s\" is not a Nexus-compatible library. Added to blacklist.", path);
+			LogDebug("Loader", "\"%s\" is not a Nexus-compatible library. Added to blacklist.", path);
 			Blacklist.insert(aPath);
 			FreeLibrary(hMod);
 			return;
@@ -88,7 +88,7 @@ namespace Loader
 		AddonDefinition* defs = getAddonDef();
 		if (hMod && !defs->HasMinimumRequirements())
 		{
-			LogWarning("\"%s\" does not fulfill minimum requirements. At least define Name, Version, Author, Description as well as Load and Unload functions. Added to blacklist.", path);
+			LogWarning("Loader", "\"%s\" does not fulfill minimum requirements. At least define Name, Version, Author, Description as well as Load and Unload functions. Added to blacklist.", path);
 			Blacklist.insert(aPath);
 			FreeLibrary(hMod);
 			return;
@@ -103,7 +103,7 @@ namespace Loader
 
 		addon.Definitions->Load(APIDef);
 
-		LogInfo("Loaded addon: %s", path);
+		LogInfo("Loader", "Loaded addon: %s", path);
 	}
 
 	void UnloadAddon(std::filesystem::path aPath)
@@ -119,7 +119,7 @@ namespace Loader
 		{
 			if (!FreeLibrary(AddonDefs[aPath].Module))
 			{
-				LogWarning("Couldn't unload \"%s\". FreeLibrary() call failed. (%s)", name.c_str(), path.c_str());
+				LogWarning("Loader", "Couldn't unload \"%s\". FreeLibrary() call failed. (%s)", name.c_str(), path.c_str());
 				return;
 			}
 		}
@@ -134,7 +134,7 @@ namespace Loader
 
 		if (leftoverRefs > 0)
 		{
-			LogWarning("Removed %d unreleased references from \"%s\".", leftoverRefs, name.c_str());
+			LogWarning("Loader", "Removed %d unreleased references from \"%s\".", leftoverRefs, name.c_str());
 		}
 
 		AddonDefs[aPath].Module = nullptr;
@@ -142,7 +142,7 @@ namespace Loader
 
 		AddonDefs.erase(aPath);
 
-		LogInfo("Unloaded addon: %s", path.c_str());
+		LogInfo("Loader", "Unloaded addon: %s", path.c_str());
 	}
 
 	void DetectAddons()

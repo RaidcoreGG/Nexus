@@ -5,6 +5,7 @@ namespace LogHandler
 	std::mutex Mutex;
 	std::vector<ILogger*> Registry;
 	std::vector<LogEntry> LogEntries;
+	std::vector<std::string> Channels;
 
 	bool IsRunning = false;
 	std::thread LoggingThread;
@@ -35,20 +36,29 @@ namespace LogHandler
 	}
 
 	/* Logging helper functions */
-	void Log(const char* aFmt, ...)             { va_list args; va_start(args, aFmt);   LogMessage(ELogLevel::TRACE,    aFmt, args); va_end(args); }
-	void LogCritical(const char* aFmt, ...)     { va_list args; va_start(args, aFmt);   LogMessage(ELogLevel::CRITICAL, aFmt, args); va_end(args); }
-	void LogWarning(const char* aFmt, ...)      { va_list args; va_start(args, aFmt);   LogMessage(ELogLevel::WARNING,  aFmt, args); va_end(args); }
-	void LogInfo(const char* aFmt, ...)         { va_list args; va_start(args, aFmt);   LogMessage(ELogLevel::INFO,     aFmt, args); va_end(args); }
-	void LogDebug(const char* aFmt, ...)        { va_list args; va_start(args, aFmt);   LogMessage(ELogLevel::DEBUG,    aFmt, args); va_end(args); }
+	void Log(std::string aChannel, const char* aFmt, ...)             { va_list args; va_start(args, aFmt);   LogMessage(ELogLevel::TRACE,    aChannel, aFmt, args); va_end(args); }
+	void LogCritical(std::string aChannel, const char* aFmt, ...)     { va_list args; va_start(args, aFmt);   LogMessage(ELogLevel::CRITICAL, aChannel, aFmt, args); va_end(args); }
+	void LogWarning(std::string aChannel, const char* aFmt, ...)      { va_list args; va_start(args, aFmt);   LogMessage(ELogLevel::WARNING,  aChannel, aFmt, args); va_end(args); }
+	void LogInfo(std::string aChannel, const char* aFmt, ...)         { va_list args; va_start(args, aFmt);   LogMessage(ELogLevel::INFO,     aChannel, aFmt, args); va_end(args); }
+	void LogDebug(std::string aChannel, const char* aFmt, ...)        { va_list args; va_start(args, aFmt);   LogMessage(ELogLevel::DEBUG,    aChannel, aFmt, args); va_end(args); }
 
 	/* Basic logging functions */
-	void LogMessageA(ELogLevel aLogLevel, const char* aFmt, ...)    { va_list args; va_start(args, aFmt); LogMessage(aLogLevel, aFmt, args); va_end(args); }
-	
-	void LogMessage(ELogLevel aLogLevel, const char* aFmt, va_list aArgs)
+	void LogMessageA(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, ...)    { va_list args; va_start(args, aFmt); LogMessage(aLogLevel, aChannel, aFmt, args); va_end(args); }
+
+	/* Logging internal functions */
+	void LogMessage(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, va_list aArgs)
 	{
 		LogEntry entry;
 		entry.LogLevel = aLogLevel;
 		entry.Timestamp = time(NULL);
+		entry.Channel = aChannel;
+
+		Mutex.lock();
+		if (std::find(Channels.begin(), Channels.end(), aChannel) == Channels.end())
+		{
+			Channels.push_back(aChannel);
+		}
+		Mutex.unlock();
 
 		char buffer[4096];
 		vsprintf_s(buffer, 4096, aFmt, aArgs);

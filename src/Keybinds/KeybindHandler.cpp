@@ -93,24 +93,6 @@ namespace Keybinds
 			Registry[identifier].Bind = kb;
 		}
 
-		/*std::string line;
-		while (std::getline(file, line))
-		{
-			std::transform(line.begin(), line.end(), line.begin(), ::toupper);
-			std::string delimiter = "=";
-
-			size_t pos = 0;
-			std::string token;
-			while ((pos = line.find(delimiter)) != std::string::npos)
-			{
-				token = line.substr(0, pos);
-				line.erase(0, pos + delimiter.length());
-			}
-
-			Registry[token].Bind = KBFromString(line);
-			LogDebug("%s | %s", token.c_str(), line.c_str());
-		}*/
-
 		file.close();
 
 		Mutex.unlock();
@@ -141,17 +123,6 @@ namespace Keybinds
 		}
 
 		std::ofstream file(Path::F_KEYBINDS);
-
-		/*for (std::map<std::string, ActiveKeybind>::iterator it = Registry.begin(); it != Registry.end(); ++it)
-		{
-			std::string id = it->first;
-			std::string kb = it->second.Bind.ToString();
-
-			file.write(id.c_str(), id.size());
-			file.write("=", 1);
-			file.write(kb.c_str(), kb.size());
-			file.write("\n", 1);
-		}*/
 
 		file << keybinds.dump(1, '\t') << std::endl;
 

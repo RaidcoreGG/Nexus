@@ -148,18 +148,18 @@ namespace GUI
 						if (Registry[aIdentifier].TextureNormal.Resource != nullptr) { amt++; }
 						if (Registry[aIdentifier].TextureHover.Resource != nullptr) { amt++; }
 
-						LogDebug("Shortcut \"%s\" was promised 2 textures, but received %d.", aIdentifier.c_str(), amt);
+						LogDebug("QuickAccess", "Shortcut \"%s\" was promised 2 textures, but received %d.", aIdentifier.c_str(), amt);
 						Sleep(1000); // first retry after 1s
 
 						while (Registry[aIdentifier].TextureNormal.Resource == nullptr || Registry[aIdentifier].TextureHover.Resource == nullptr)
 						{
 							if (tries > 10)
 							{
-								LogWarning("Cancelled getting textures for shortcut \"%s\" after 10 failed attempts.", aIdentifier.c_str());
+								LogWarning("QuickAccess", "Cancelled getting textures for shortcut \"%s\" after 10 failed attempts.", aIdentifier.c_str());
 								break;
 							}
 
-							//LogDebug("Trying to get textures for shortcut \"%s\".", aIdentifier.c_str());
+							//LogDebug("QuickAccess", "Trying to get textures for shortcut \"%s\".", aIdentifier.c_str());
 
 							if (Registry[aIdentifier].TextureNormal.Resource == nullptr) { Registry[aIdentifier].TextureNormal = TextureLoader::Get(aTextureIdentifier); }
 							if (Registry[aIdentifier].TextureHover.Resource == nullptr) { Registry[aIdentifier].TextureHover = TextureLoader::Get(aTextureHoverIdentifier); }
@@ -171,8 +171,8 @@ namespace GUI
 						/* if not all tries were used, then the texture was loaded */
 						if (tries <= 10)
 						{
-							LogDebug("Shortcut \"%s\" received promised textures after %d attempt(s).", aIdentifier.c_str(), tries);
-							return; // gtfo here
+							LogDebug("QuickAccess", "Shortcut \"%s\" received promised textures after %d attempt(s).", aIdentifier.c_str(), tries);
+							return;
 						}
 
 						/* fallback icons */
@@ -182,7 +182,7 @@ namespace GUI
 						/* absolute sanity check */
 						if (Registry[aIdentifier].TextureNormal.Resource == nullptr || Registry[aIdentifier].TextureHover.Resource == nullptr)
 						{
-							LogWarning("Neither promised textures nor fallback textures could be loaded, removing shortcut \"%s\".", aIdentifier.c_str());
+							LogWarning("QuickAccess", "Neither promised textures nor fallback textures could be loaded, removing shortcut \"%s\".", aIdentifier.c_str());
 							RemoveShortcut(aIdentifier);
 						}
 					}).detach();

@@ -103,6 +103,12 @@ namespace GUI
 				io.MousePos = ImVec2((float)(LOWORD(lParam)), (float)(HIWORD(lParam)));
 			}
 
+			if (uMsg == WM_ACTIVATEAPP && !wParam)
+			{
+				IsLeftClickHeld = false;
+				IsRightClickHeld = false;
+			}
+
 			if (!io.WantCaptureMouse)
 			{
 				switch (uMsg)

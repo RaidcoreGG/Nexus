@@ -3,29 +3,66 @@
 namespace GUI
 {
 	bool SelectedOnly = false;
+	std::string ChannelFilter;
+
+	const char* filterLevels[] = { "Critical", "Warning", "Info", "Debug", "Trace", "All" };
 
 	void LogWindow::Render()
 	{
 		if (!Visible) { return; }
 
-		ImGui::SetNextWindowSize(ImVec2(480.0f, 380.0f));
+		ImGui::SetNextWindowSize(ImVec2(600.0f, 380.0f));
 		if (ImGui::Begin("Log", &Visible, ImGuiWindowFlags_AlwaysAutoResize))
 		{
-
-			const char* items[] = { "Critical", "Warning", "Info", "Debug", "Trace", "All" };
 			static int selectedLevel = (int)(ELogLevel::ALL)-1;
 			ImGui::Text("Filter: "); ImGui::SameLine();
-			ImGui::Combo("", &selectedLevel, items, IM_ARRAYSIZE(items));
+			ImGui::Combo("##filterLogLevel", &selectedLevel, filterLevels, IM_ARRAYSIZE(filterLevels));
 
 			ELogLevel filterLevel = (ELogLevel)(selectedLevel + 1);
 
 			ImGui::SameLine();
 			ImGui::Checkbox("Selected level only", &SelectedOnly);
 
-			ImGui::Separator();
+			float windowWidthQuarter = ImGui::GetWindowContentRegionWidth() / 4.0f;
 
+			ImGui::Separator();
 			{
-				ImGui::BeginChild("logmessages", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), ImGuiWindowFlags_AlwaysVerticalScrollbar);
+				ImGui::BeginChild("logchannels", ImVec2(windowWidthQuarter, 0.0f));
+
+				ImGui::Text("Channel:");
+
+				LogHandler::Mutex.lock();
+				for (std::string ch : Channels)
+				{
+					float opacity = 0.8f;
+					if (ch == ChannelFilter)
+					{
+						opacity = 1.0f;
+					}
+					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, opacity);
+					if (ImGui::Button(ch.c_str(), ImVec2(windowWidthQuarter, 0.0f)))
+					{
+						/* if the selected channel is already the set filter, reset filter */
+						if (ChannelFilter == ch)
+						{
+							ChannelFilter = "";
+						}
+						else
+						{
+							ChannelFilter = ch.c_str();
+						}
+					}
+					ImGui::PopStyleVar();
+				}
+
+				ImGui::EndChild();
+			}
+
+			ImGui::SameLine();
+			
+			LogHandler::Mutex.unlock();
+			{
+				ImGui::BeginChild("logmessages", ImVec2(windowWidthQuarter * 3 - 1, 0.0f));
 				
 				MessageMutex.lock();
 				/* Show last 200 log messages */
@@ -36,9 +73,10 @@ namespace GUI
 				{
 					LogEntry entry = LogEntries[i];
 
-					if ((filterLevel == ELogLevel::ALL) ||
+					if (((filterLevel == ELogLevel::ALL) ||
 						(SelectedOnly && entry.LogLevel == filterLevel) ||
-						(!SelectedOnly && entry.LogLevel <= filterLevel))
+						(!SelectedOnly && entry.LogLevel <= filterLevel)) &&
+						((ChannelFilter == "") || ChannelFilter == entry.Channel))
 					{
 						const char* level;
 						switch (entry.LogLevel)
@@ -52,7 +90,7 @@ namespace GUI
 						}
 
 						float off1 = ImGui::CalcTextSize("XXXXXXXXX").x;
-						float off2 = ImGui::CalcTextSize("XXXXXXXXXX").x;
+						float off2 = ImGui::CalcTextSize("XXXXXXXXXXX").x;
 
 						/* time */
 						ImGui::Text(entry.TimestampString(false).c_str()); ImGui::SameLine(off1);

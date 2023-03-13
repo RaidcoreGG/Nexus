@@ -78,7 +78,7 @@ namespace TextureLoader
 
 	void QueueTexture(std::string aIdentifier, unsigned char* aImageData, unsigned aWidth, unsigned aHeight, TEXTURES_RECEIVECALLBACK aCallback)
 	{
-		LogDebug("Queued %s", aIdentifier.c_str());
+		LogDebug("Textures", "Queued %s", aIdentifier.c_str());
 		Mutex.lock();
 
 		QueuedTexture raw{};
@@ -94,7 +94,7 @@ namespace TextureLoader
 
 	void CreateTexture(QueuedTexture aQueuedTexture)
 	{
-		LogDebug("Create %s", aQueuedTexture.Identifier.c_str());
+		LogDebug("Textures", "Create %s", aQueuedTexture.Identifier.c_str());
 		Texture tex{};
 		tex.Width = aQueuedTexture.Width;
 		tex.Height = aQueuedTexture.Height;

@@ -25,7 +25,7 @@ namespace DataLink
 				it->second.Handle = nullptr;
 			}
 
-			LogDebug("Freed shared resource: %s", it->first.c_str());
+			LogDebug("DataLink", "Freed shared resource: %s", it->first.c_str());
 
 			Registry.erase(it);
 		}

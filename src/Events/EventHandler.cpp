@@ -7,7 +7,7 @@ namespace Events
 
 	void Raise(std::string aIdentifier, void* aEventData)
 	{
-		Log(aIdentifier.c_str());
+		Log("Events", aIdentifier.c_str());
 
 		Mutex.lock();
 		for (EVENT_CONSUME callback : Registry[aIdentifier])

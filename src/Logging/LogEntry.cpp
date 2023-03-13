@@ -18,22 +18,23 @@ std::string LogEntry::TimestampString(bool aIncludeDate)
 	return str;
 }
 
-std::string LogEntry::ToString()
+std::string LogEntry::ToString(bool aIncludeChannel)
 {
 	const char* level;
 
 	switch (LogLevel)
 	{
-		case ELogLevel::CRITICAL:    level = " [CRITICAL] ";     break;
-		case ELogLevel::WARNING:     level = " [WARNING] ";      break;
-		case ELogLevel::INFO:        level = " [INFO] ";         break;
-		case ELogLevel::DEBUG:       level = " [DEBUG] ";        break;
+		case ELogLevel::CRITICAL:	level = " [CRITICAL] ";     break;
+		case ELogLevel::WARNING:	level = " [WARNING] ";      break;
+		case ELogLevel::INFO:		level = " [INFO] ";         break;
+		case ELogLevel::DEBUG:		level = " [DEBUG] ";        break;
 
-		default:                    level = " [TRACE] ";        break;
+		default:					level = " [TRACE] ";        break;
 	}
 
 	std::stringstream oss;
-	oss << TimestampString();
+	oss << std::setw(10) << TimestampString();
+	if (aIncludeChannel) { oss << std::setw(20) << + "[" + Channel + "]"; }
 	oss << std::setw(12) << level;
 	std::string str = oss.str() + std::string{Message} + "\n";
 
