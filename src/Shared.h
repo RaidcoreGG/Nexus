@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 
+#include "imgui/imgui.h"
 #include "Mumble/LinkedMem.h"
 #include "Mumble/Identity.h"
 #include "Logging/LogHandler.h"
@@ -22,5 +23,9 @@ extern Identity*                    MumbleIdentity;
 extern bool							IsMoving;
 extern bool							IsCameraMoving;
 extern bool							IsGameplay;
+
+extern ImFont*						Font;
+extern ImFont*						FontBig;
+extern ImFont*						FontUI;
 
 #endif

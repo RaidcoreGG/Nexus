@@ -21,7 +21,6 @@ namespace GUI
 	{
 	public:
 		void Render();
-		void MenuOption(int aCategory);
 		void LogMessage(LogEntry aLogEntry);
 	};
 }

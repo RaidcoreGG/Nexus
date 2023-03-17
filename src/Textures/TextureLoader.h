@@ -20,13 +20,13 @@
 namespace TextureLoader
 {
 	extern std::mutex Mutex;
-	extern std::map<std::string, Texture> Registry;
+	extern std::map<std::string, Texture*> Registry;
 
 	extern std::vector<QueuedTexture> QueuedTextures;
 
 	//void Shutdown();
 
-	Texture Get(std::string aIdentifier);
+	Texture* Get(std::string aIdentifier);
 
 	void LoadFromFile(std::string aIdentifier, std::string aFilename, TEXTURES_RECEIVECALLBACK aCallback);
 	void LoadFromResource(std::string aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback);

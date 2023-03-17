@@ -19,8 +19,6 @@ namespace Loader
 		/* setup APIDefs */
 		APIDef.SwapChain = Renderer::SwapChain;
 		APIDef.ImguiContext = Renderer::GuiContext;
-		APIDef.WindowWidth = &Renderer::Width;
-		APIDef.WindowHeight = &Renderer::Height;
 
 		APIDef.CreateHook = MH_CreateHook;
 		APIDef.RemoveHook = MH_RemoveHook;

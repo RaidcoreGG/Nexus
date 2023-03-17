@@ -54,12 +54,4 @@ namespace GUI
 		}
 		ImGui::End();
 	}
-
-	void AddonsWindow::MenuOption(int aCategory)
-	{
-		if (aCategory == 0)
-		{
-			ImGui::ToggleButton("Addons", &Visible, ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
-		}
-	}
 }

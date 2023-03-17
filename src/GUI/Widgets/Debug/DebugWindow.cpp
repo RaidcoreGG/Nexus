@@ -103,8 +103,8 @@ namespace GUI
 						{
 							if (ImGui::TreeNode(identifier.c_str()))
 							{
-								ImGui::TextDisabled("Dimensions: %dx%d", texture.Width, texture.Height);
-								ImGui::TextDisabled("Pointer: %p", texture.Resource);
+								ImGui::TextDisabled("Dimensions: %dx%d", texture->Width, texture->Height);
+								ImGui::TextDisabled("Pointer: %p", texture->Resource);
 
 								ImGui::TreePop();
 							}
@@ -148,8 +148,8 @@ namespace GUI
 						{
 							if (ImGui::TreeNode(identifier.c_str()))
 							{
-								ImGui::TextDisabled("Texture: %p", shortcut.TextureNormal.Resource);
-								ImGui::TextDisabled("Texture (Hover): %p", shortcut.TextureHover.Resource);
+								ImGui::TextDisabled("Texture: %p", shortcut.TextureNormal->Resource);
+								ImGui::TextDisabled("Texture (Hover): %p", shortcut.TextureHover->Resource);
 								ImGui::TextDisabled("OnClick (Keybind): %s", shortcut.Keybind.length() != 0 ? shortcut.Keybind.c_str() : "(null)");
 								ImGui::TextDisabled("Tooltip: %s", shortcut.TooltipText.length() != 0 ? shortcut.TooltipText.c_str() : "(null)");
 								ImGui::TextDisabled("IsHovering: %s", shortcut.IsHovering ? "true" : "false");
@@ -222,13 +222,5 @@ namespace GUI
 			}
 		}
 		ImGui::End();
-	}
-
-	void DebugWindow::MenuOption(int aCategory)
-	{
-		if (aCategory == 1)
-		{
-			ImGui::ToggleButton("Debug Info", &Visible, ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
-		}
 	}
 }

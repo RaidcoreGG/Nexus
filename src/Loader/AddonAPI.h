@@ -11,6 +11,7 @@
 #include "../DataLink/FuncDefs.h"
 #include "../Textures/FuncDefs.h"
 #include "../GUI/Widgets/QuickAccess/FuncDefs.h"
+#include "NexusLinkData.h"
 
 using namespace Mumble;
 
@@ -19,8 +20,6 @@ struct AddonAPI
 	/* Renderer */
 	IDXGISwapChain*				SwapChain;
 	ImGuiContext*				ImguiContext;
-	unsigned*					WindowWidth;
-	unsigned*					WindowHeight;
 
 	/* Minhook */
 	MINHOOK_CREATE				CreateHook;

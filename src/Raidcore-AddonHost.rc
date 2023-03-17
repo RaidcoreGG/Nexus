@@ -90,6 +90,8 @@ END
 
 RES_FONT_MENOMONIA      FONT                    "Resources\\Menomonia.ttf"
 
+RES_FONT_TREBUCHET      FONT                    "Resources\\TrebuchetMS.ttf"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -103,6 +105,12 @@ RES_ICON_NEXUS_HOVER    PNG                     "Resources\\ICON_NEXUS_HOVER.png
 RES_ICON_GENERIC        PNG                     "Resources\\ICON_GENERIC.png"
 
 RES_ICON_GENERIC_HOVER  PNG                     "Resources\\ICON_GENERIC_HOVER.png"
+
+RES_TEX_MENU_BACKGROUND PNG                     "Resources\\TEX_MENU_BACKGROUND.png"
+
+RES_TEX_MENU_BUTTON     PNG                     "Resources\\TEX_MENU_BUTTON.png"
+
+RES_TEX_MENU_BUTTON_HOVER PNG                     "Resources\\TEX_MENU_BUTTON_HOVER.png"
 
 #endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////

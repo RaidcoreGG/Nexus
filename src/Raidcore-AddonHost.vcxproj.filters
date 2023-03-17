@@ -73,6 +73,9 @@
     <Filter Include="GUI\Widgets\QuickAccess">
       <UniqueIdentifier>{4c9af9fd-e1d8-4b1c-8a86-b5d5c91c500f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Widgets\Menu">
+      <UniqueIdentifier>{eeef4dfb-cf8e-4d2e-a1e7-657fe0b03f13}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="entry.cpp">
@@ -206,6 +209,12 @@
     </ClCompile>
     <ClCompile Include="GUI\Widgets\Addons\AddonItem.cpp">
       <Filter>GUI\Widgets\Addons</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Widgets\Menu\MenuItem.cpp">
+      <Filter>GUI\Widgets\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Widgets\Menu\Menu.cpp">
+      <Filter>GUI\Widgets\Menu</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -434,6 +443,18 @@
     <ClInclude Include="GUI\Widgets\Addons\AddonItem.h">
       <Filter>GUI\Widgets\Addons</Filter>
     </ClInclude>
+    <ClInclude Include="GUI\Widgets\Menu\MenuItem.h">
+      <Filter>GUI\Widgets\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\EFontIdentifier.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\NexusLinkData.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Widgets\Menu\Menu.h">
+      <Filter>GUI\Widgets\Menu</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Raidcore-AddonHost.rc">
@@ -444,6 +465,8 @@
     <Font Include="Menomonia.ttf">
       <Filter>Resource Files</Filter>
     </Font>
+    <Font Include="Resources\Menomonia.ttf" />
+    <Font Include="Resources\TrebuchetMS.ttf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def">
@@ -461,6 +484,15 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="Resources\ICON_NEXUS_HOVER.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\TEX_MENU_BACKGROUND.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\TEX_MENU_BUTTON.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\TEX_MENU_BUTTON_HOVER.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -9,6 +9,9 @@ extern const char* ICON_NEXUS;
 extern const char* ICON_NEXUS_HOVER;
 extern const char* ICON_GENERIC;
 extern const char* ICON_GENERIC_HOVER;
+extern const char* TEX_MENU_BACKGROUND;
+extern const char* TEX_MENU_BUTTON;
+extern const char* TEX_MENU_BUTTON_HOVER;
 
 /* Quick Access*/
 extern const char* QA_MENU;
@@ -17,5 +20,9 @@ extern const char* QA_MENU;
 extern const char* EV_WINDOW_RESIZED;
 extern const char* EV_MUMBLE_IDENTITY_UPDATED;
 extern const char* EV_OPTIONS_CALLED;
+
+/* DataLink */
+extern const char* DL_MUMBLE_LINK;
+extern const char* DL_NEXUS_LINK;
 
 #endif

@@ -118,13 +118,5 @@ namespace GUI
 		ImGui::End();
 	}
 
-	void LogWindow::MenuOption(int aCategory)
-	{
-		if (aCategory == 1)
-		{
-			ImGui::ToggleButton("Log", &Visible, ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
-		}
-	}
-
 	void LogWindow::LogMessage(LogEntry aLogEntry) {}
 }

@@ -46,7 +46,7 @@ namespace GUI
 				Mutex.lock();
 				for (auto& [identifier, shortcut] : Registry)
 				{
-					if (shortcut.TextureNormal.Resource && shortcut.TextureHover.Resource)
+					if (shortcut.TextureNormal && shortcut.TextureHover)
 					{
 						ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
 						ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
@@ -54,7 +54,7 @@ namespace GUI
 
 						ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f }); // smol checkbox
 						ImGui::SetCursorPos(ImVec2(((size * c) + 1) * Renderer::Scaling, 0));
-						if (ImGui::ImageButton(!shortcut.IsHovering ? shortcut.TextureNormal.Resource : shortcut.TextureHover.Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
+						if (ImGui::ImageButton(!shortcut.IsHovering ? shortcut.TextureNormal->Resource : shortcut.TextureHover->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
 						{
 							isActive = true;
 							if (shortcut.Keybind.length() > 0)
@@ -129,8 +129,8 @@ namespace GUI
 
 			if (Registry.find(aIdentifier) == Registry.end())
 			{
-				Texture normal = TextureLoader::Get(aTextureIdentifier);
-				Texture hover = TextureLoader::Get(aTextureHoverIdentifier);
+				Texture* normal = TextureLoader::Get(aTextureIdentifier);
+				Texture* hover = TextureLoader::Get(aTextureHoverIdentifier);
 				Shortcut sh{};
 				sh.TextureNormal = normal;
 				sh.TextureHover = hover;
@@ -139,19 +139,19 @@ namespace GUI
 				Registry[aIdentifier] = sh;
 
 				// keep trying to get the texture for a little bit
-				if (normal.Resource == nullptr || hover.Resource == nullptr)
+				if (normal == nullptr || hover == nullptr)
 				{
 					std::thread([aIdentifier, aTextureIdentifier, aTextureHoverIdentifier]()
 					{
 						int tries = 0;
 						int amt = 0;
-						if (Registry[aIdentifier].TextureNormal.Resource != nullptr) { amt++; }
-						if (Registry[aIdentifier].TextureHover.Resource != nullptr) { amt++; }
+						if (Registry[aIdentifier].TextureNormal != nullptr) { amt++; }
+						if (Registry[aIdentifier].TextureHover != nullptr) { amt++; }
 
 						LogDebug("QuickAccess", "Shortcut \"%s\" was promised 2 textures, but received %d.", aIdentifier.c_str(), amt);
 						Sleep(1000); // first retry after 1s
 
-						while (Registry[aIdentifier].TextureNormal.Resource == nullptr || Registry[aIdentifier].TextureHover.Resource == nullptr)
+						while (Registry[aIdentifier].TextureNormal == nullptr || Registry[aIdentifier].TextureHover == nullptr)
 						{
 							if (tries > 10)
 							{
@@ -161,8 +161,8 @@ namespace GUI
 
 							//LogDebug("QuickAccess", "Trying to get textures for shortcut \"%s\".", aIdentifier.c_str());
 
-							if (Registry[aIdentifier].TextureNormal.Resource == nullptr) { Registry[aIdentifier].TextureNormal = TextureLoader::Get(aTextureIdentifier); }
-							if (Registry[aIdentifier].TextureHover.Resource == nullptr) { Registry[aIdentifier].TextureHover = TextureLoader::Get(aTextureHoverIdentifier); }
+							if (Registry[aIdentifier].TextureNormal == nullptr) { Registry[aIdentifier].TextureNormal = TextureLoader::Get(aTextureIdentifier); }
+							if (Registry[aIdentifier].TextureHover == nullptr) { Registry[aIdentifier].TextureHover = TextureLoader::Get(aTextureHoverIdentifier); }
 
 							tries++;
 							Sleep(5000);
@@ -180,7 +180,7 @@ namespace GUI
 						Registry[aIdentifier].TextureHover = TextureLoader::Get(ICON_GENERIC_HOVER);
 
 						/* absolute sanity check */
-						if (Registry[aIdentifier].TextureNormal.Resource == nullptr || Registry[aIdentifier].TextureHover.Resource == nullptr)
+						if (Registry[aIdentifier].TextureNormal == nullptr || Registry[aIdentifier].TextureHover == nullptr)
 						{
 							LogWarning("QuickAccess", "Neither promised textures nor fallback textures could be loaded, removing shortcut \"%s\".", aIdentifier.c_str());
 							RemoveShortcut(aIdentifier);

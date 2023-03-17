@@ -258,12 +258,4 @@ namespace GUI
 			ImGui::End();
 		}
 	}
-
-	void MumbleOverlay::MenuOption(int aCategory)
-	{
-		if (aCategory == 1)
-		{
-			ImGui::ToggleButton("Mumble Data", &Visible, ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
-		}
-	}
 }

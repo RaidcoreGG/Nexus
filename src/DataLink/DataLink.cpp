@@ -63,7 +63,7 @@ namespace DataLink
 		LinkedResource resource{};
 		resource.Size = aResourceSize;
 
-		resource.Handle = CreateFileMappingA(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, aResourceSize, ("ADDONHOST_" + aIdentifier).c_str());
+		resource.Handle = CreateFileMappingA(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, aResourceSize, aIdentifier.c_str());
 
 		if (resource.Handle)
 		{
@@ -76,7 +76,6 @@ namespace DataLink
 		}
 
 		Mutex.unlock();
-
 		return nullptr;
 	}
 }

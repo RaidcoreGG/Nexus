@@ -2,67 +2,31 @@
 
 namespace GUI
 {
-	void Setup(); // forward declare
+	/* internal forward declarations */
+	void ReceiveTextures(std::string aIdentifier, Texture* aTexture);
+	void OnMumbleIdentityChanged(void* aEventArgs);
+	void ConfigureFonts();
+	void Setup();
 
-	bool					IsMenuVisible		= true;
-	bool					IsSetup				= false;
+	std::mutex					Mutex;
+	std::vector<IWindow*>		Windows;
+	std::map<EFont, ImFont*>	FontIndex;
 
-	std::mutex				Mutex;
-	std::vector<IWindow*>	Windows;
+	Texture*					MenuBG{};
+	Texture*					MenuButton{};
+	Texture*					MenuButtonHover{};
 
-	bool					IsRightClickHeld	= false;
-	bool					IsLeftClickHeld		= false;
+	bool						IsRightClickHeld	= false;
+	bool						IsLeftClickHeld		= false;
+	bool						IsSetup				= false;
+	int							LastScaling;
+	MenuWindow*					Menu;
 
 	void Initialize()
 	{
 		// create imgui context
 		if (!Renderer::GuiContext) { Renderer::GuiContext = ImGui::CreateContext(); }
-		ImGuiIO& io = ImGui::GetIO();
-
-		std::filesystem::path userFont = std::filesystem::path(Path::F_FONT);
-
-		if (std::filesystem::exists(userFont))
-		{
-			io.Fonts->AddFontFromFileTTF(Path::F_FONT, 16.0f);
-		}
-		else
-		{
-			io.Fonts->AddFontDefault();
-		}
-
-		bool initializedFonts = false;
-		HRSRC hResource = FindResourceA(AddonHostModule, MAKEINTRESOURCE(RES_FONT_MENOMONIA), RT_FONT);
-		if (hResource)
-		{
-			HGLOBAL hLoadedResource = LoadResource(AddonHostModule, hResource);
-
-			if (hLoadedResource)
-			{
-				LPVOID pLockedResource = LockResource(hLoadedResource);
-
-				if (pLockedResource)
-				{
-					DWORD dwResourceSize = SizeofResource(AddonHostModule, hResource);
-
-					if (0 != dwResourceSize)
-					{
-						io.Fonts->AddFontFromMemoryTTF(pLockedResource, dwResourceSize, 16.0f);
-						io.Fonts->AddFontFromMemoryTTF(pLockedResource, dwResourceSize, 22.0f);
-						initializedFonts = true;
-					}
-				}
-			}
-		}
-
-		/* add the default font twice more, to replace the missing gw2 ui font for dependant addons */
-		if (!initializedFonts)
-		{
-			io.Fonts->AddFontDefault();
-			io.Fonts->AddFontDefault();
-		}
-
-		io.Fonts->Build();
-
+		
 		// Init imgui
 		ImGui_ImplWin32_Init(Renderer::WindowHandle);
 		ImGui_ImplDX11_Init(Renderer::Device, Renderer::DeviceContext);
@@ -78,7 +42,6 @@ namespace GUI
 
 		State::IsImGuiInitialized = true;
 	}
-
 	void Shutdown()
 	{
 		if (State::IsImGuiInitialized)
@@ -169,46 +132,6 @@ namespace GUI
 		return false;
 	}
 
-	void Setup()
-	{
-		/* setup logging window */
-		LogWindow* logWnd = new LogWindow();
-		RegisterLogger(logWnd);
-		logWnd->SetLogLevel(ELogLevel::ALL);
-
-		/* add windows */
-		AddWindow(logWnd);
-		AddWindow(new AddonsWindow());
-		AddWindow(new KeybindsWindow());
-		AddWindow(new MumbleOverlay());
-		AddWindow(new DebugWindow());
-		AddWindow(new AboutBox());
-
-		/* register keybinds */
-		Keybinds::Register(KB_MENU, ProcessKeybind, "CTRL+O");
-
-		/* load icons */
-		TextureLoader::LoadFromResource(ICON_NEXUS,			RES_ICON_NEXUS,			AddonHostModule, nullptr);
-		TextureLoader::LoadFromResource(ICON_NEXUS_HOVER,	RES_ICON_NEXUS_HOVER,	AddonHostModule, nullptr);
-
-		TextureLoader::LoadFromResource(ICON_GENERIC,		RES_ICON_GENERIC,		AddonHostModule, nullptr);
-		TextureLoader::LoadFromResource(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, AddonHostModule, nullptr);
-
-		/* add shortcut */
-		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "Nexus Menu");
-
-		IsSetup = true;
-	}
-
-	void ProcessKeybind(std::string aIdentifier)
-	{
-		if (aIdentifier == KB_MENU)
-		{
-			IsMenuVisible = !IsMenuVisible;
-			return;
-		}
-	}
-
 	void Render()
 	{
 		if (State::AddonHost >= ggState::UI_READY && !State::IsImGuiInitialized)
@@ -228,7 +151,6 @@ namespace GUI
 
 			/* draw menu */
 			QuickAccess::Render();
-			RenderMenu();
 
 			/* draw windows */
 			Mutex.lock();
@@ -260,40 +182,216 @@ namespace GUI
 		}
 	}
 
-	void RenderMenu()
-	{
-		if (!IsMenuVisible) { return; }
-
-		if (ImGui::Begin("Menu", &IsMenuVisible, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize))
-		{
-			Mutex.lock();
-
-			for (IWindow* wnd : Windows) { wnd->MenuOption(0); }
-			//ImGui::Button("Layout", ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
-			//ImGui::Button("Options", ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
-
-			if (State::IsDeveloperMode)
-			{
-				ImGui::Separator();
-
-				for (IWindow* wnd : Windows) { wnd->MenuOption(1); }
-			}
-
-			ImGui::Separator();
-
-			for (IWindow* wnd : Windows) { wnd->MenuOption(2); }
-
-			Mutex.unlock();
-		}
-		ImGui::End();
-	}
-
 	void AddWindow(IWindow* aWindowPtr)
 	{
 		Mutex.lock();
-
 		Windows.push_back(aWindowPtr);
-
 		Mutex.unlock();
+	}
+
+	void ResizeFonts()
+	{
+		ImGuiIO& io = ImGui::GetIO();
+
+		switch (MumbleIdentity->UISize)
+		{
+			case 0:
+				Font	= FontIndex[EFont::Menomonia_Small];
+				FontBig	= FontIndex[EFont::MenomoniaBig_Small];
+				FontUI	= FontIndex[EFont::Trebuchet_Small];
+				break;
+			default:
+			case 1:
+				Font	= FontIndex[EFont::Menomonia_Normal];
+				FontBig	= FontIndex[EFont::MenomoniaBig_Normal];
+				FontUI	= FontIndex[EFont::Trebuchet_Normal];
+				break;
+			case 2:
+				Font	= FontIndex[EFont::Menomonia_Large];
+				FontBig	= FontIndex[EFont::MenomoniaBig_Large];
+				FontUI	= FontIndex[EFont::Trebuchet_Large];
+				break;
+			case 3:
+				Font	= FontIndex[EFont::Menomonia_Larger];
+				FontBig	= FontIndex[EFont::MenomoniaBig_Larger];
+				FontUI	= FontIndex[EFont::Trebuchet_Larger];
+				break;
+		}
+
+		LastScaling = MumbleIdentity->UISize;
+	}
+
+	void ProcessKeybind(std::string aIdentifier)
+	{
+		if (aIdentifier == KB_MENU)
+		{
+			Menu->Visible = !Menu->Visible;
+			return;
+		}
+	}
+	void ReceiveTextures(std::string aIdentifier, Texture* aTexture)
+	{
+		if (aIdentifier == TEX_MENU_BACKGROUND)
+		{
+			MenuBG = aTexture;
+		}
+		else if (aIdentifier == TEX_MENU_BUTTON)
+		{
+			MenuButton = aTexture;
+		}
+		else if (aIdentifier == TEX_MENU_BUTTON_HOVER)
+		{
+			MenuButtonHover = aTexture;
+		}
+	}
+	void OnMumbleIdentityChanged(void* aEventArgs)
+	{
+		if (MumbleIdentity->UISize != LastScaling)
+		{
+			ResizeFonts();
+		}
+	}
+
+	void ConfigureFonts()
+	{
+		ImGuiIO& io = ImGui::GetIO();
+
+		/* add user font, or fallback to default */
+		if (std::filesystem::exists(Path::F_FONT))
+		{
+			io.Fonts->AddFontFromFileTTF(Path::F_FONT, 16.0f);
+		}
+		else
+		{
+			io.Fonts->AddFontDefault();
+		}
+
+		/* load gw2 fonts */
+
+		LPVOID resM{}; DWORD szM{};
+		HRSRC hResM = FindResourceA(AddonHostModule, MAKEINTRESOURCE(RES_FONT_MENOMONIA), RT_FONT);
+		if (hResM)
+		{
+			HGLOBAL hLResM = LoadResource(AddonHostModule, hResM);
+
+			if (hLResM)
+			{
+				LPVOID pLResM = LockResource(hLResM);
+
+				if (pLResM)
+				{
+					DWORD dwResSzM = SizeofResource(AddonHostModule, hResM);
+
+					if (0 != dwResSzM)
+					{
+						resM = pLResM;
+						szM = dwResSzM;
+					}
+				}
+			}
+		}
+
+		LPVOID resT{}; DWORD szT{};
+		HRSRC hResT = FindResourceA(AddonHostModule, MAKEINTRESOURCE(RES_FONT_TREBUCHET), RT_FONT);
+		if (hResT)
+		{
+			HGLOBAL hLResT = LoadResource(AddonHostModule, hResT);
+
+			if (hLResT)
+			{
+				LPVOID pLResT = LockResource(hLResT);
+
+				if (pLResT)
+				{
+					DWORD dwResSzT = SizeofResource(AddonHostModule, hResT);
+
+					if (0 != dwResSzT)
+					{
+						resT = pLResT;
+						szT = dwResSzT;
+					}
+				}
+			}
+		}
+
+		Mutex.lock();
+		{
+			/* small UI*/
+			FontIndex.emplace(EFont::Menomonia_Small, io.Fonts->AddFontFromMemoryTTF(resM, szM, 16.0f));
+			FontIndex.emplace(EFont::MenomoniaBig_Small, io.Fonts->AddFontFromMemoryTTF(resM, szM, 22.0f));
+			FontIndex.emplace(EFont::Trebuchet_Small, io.Fonts->AddFontFromMemoryTTF(resT, szT, 16.0f));
+
+			/* normal UI*/
+			FontIndex.emplace(EFont::Menomonia_Normal, io.Fonts->AddFontFromMemoryTTF(resM, szM, 18.0f));
+			FontIndex.emplace(EFont::MenomoniaBig_Normal, io.Fonts->AddFontFromMemoryTTF(resM, szM, 24.0f));
+			FontIndex.emplace(EFont::Trebuchet_Normal, io.Fonts->AddFontFromMemoryTTF(resT, szT, 18.0f));
+
+			/* large UI*/
+			FontIndex.emplace(EFont::Menomonia_Large, io.Fonts->AddFontFromMemoryTTF(resM, szM, 20.0f));
+			FontIndex.emplace(EFont::MenomoniaBig_Large, io.Fonts->AddFontFromMemoryTTF(resM, szM, 26.0f));
+			FontIndex.emplace(EFont::Trebuchet_Large, io.Fonts->AddFontFromMemoryTTF(resT, szT, 20.0f));
+
+			/* larger UI*/
+			FontIndex.emplace(EFont::Menomonia_Larger, io.Fonts->AddFontFromMemoryTTF(resM, szM, 22.0f));
+			FontIndex.emplace(EFont::MenomoniaBig_Larger, io.Fonts->AddFontFromMemoryTTF(resM, szM, 28.0f));
+			FontIndex.emplace(EFont::Trebuchet_Larger, io.Fonts->AddFontFromMemoryTTF(resT, szT, 22.0f));
+		}
+		Mutex.unlock();
+
+		ResizeFonts();
+
+		io.Fonts->Build();
+	}
+	void Setup()
+	{
+		LastScaling = Renderer::Scaling;
+
+		ConfigureFonts();
+
+		Events::Subscribe(EV_MUMBLE_IDENTITY_UPDATED, OnMumbleIdentityChanged);
+
+		/* set up and add windows */
+		Menu = new MenuWindow();
+		AddonsWindow* addonsWnd = new AddonsWindow();
+		LogWindow* logWnd = new LogWindow(); RegisterLogger(logWnd); logWnd->SetLogLevel(ELogLevel::ALL);
+		KeybindsWindow* kbWnd = new KeybindsWindow();
+		MumbleOverlay* mumbleWnd = new MumbleOverlay();
+		DebugWindow* dbgWnd = new DebugWindow();
+		AboutBox* aboutWnd = new AboutBox();
+
+		AddWindow(Menu);
+		AddWindow(addonsWnd);
+		AddWindow(kbWnd);
+		AddWindow(logWnd);
+		AddWindow(mumbleWnd);
+		AddWindow(dbgWnd);
+		AddWindow(aboutWnd);
+
+		/* add categories ; aCategory: 0 = Main ; 1 = Debug ; 2 = Info */
+		Menu->AddMenuItem("Addons", &addonsWnd->Visible);
+		Menu->AddMenuItem("Keybinds", &kbWnd->Visible);
+		Menu->AddMenuItem("Log", &logWnd->Visible);
+		Menu->AddMenuItem("Mumble Data", &mumbleWnd->Visible);
+		Menu->AddMenuItem("Debug Info", &dbgWnd->Visible);
+		Menu->AddMenuItem("About", &aboutWnd->Visible);
+
+		/* register keybinds */
+		Keybinds::Register(KB_MENU, ProcessKeybind, "CTRL+O");
+
+		/* load icons */
+		TextureLoader::LoadFromResource(ICON_NEXUS, RES_ICON_NEXUS, AddonHostModule, nullptr);
+		TextureLoader::LoadFromResource(ICON_NEXUS_HOVER, RES_ICON_NEXUS_HOVER, AddonHostModule, nullptr);
+
+		TextureLoader::LoadFromResource(ICON_GENERIC, RES_ICON_GENERIC, AddonHostModule, nullptr);
+		TextureLoader::LoadFromResource(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, AddonHostModule, nullptr);
+
+		TextureLoader::LoadFromResource(TEX_MENU_BACKGROUND, RES_TEX_MENU_BACKGROUND, AddonHostModule, ReceiveTextures);
+		TextureLoader::LoadFromResource(TEX_MENU_BUTTON, RES_TEX_MENU_BUTTON, AddonHostModule, ReceiveTextures);
+		TextureLoader::LoadFromResource(TEX_MENU_BUTTON_HOVER, RES_TEX_MENU_BUTTON_HOVER, AddonHostModule, ReceiveTextures);
+
+		/* add shortcut */
+		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "Nexus Menu");
+
+		IsSetup = true;
 	}
 }

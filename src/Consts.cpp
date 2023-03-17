@@ -8,6 +8,9 @@ const char* ICON_NEXUS					= "ICON_NEXUS";
 const char* ICON_NEXUS_HOVER			= "ICON_NEXUS_HOVER";
 const char* ICON_GENERIC				= "ICON_GENERIC";
 const char* ICON_GENERIC_HOVER			= "ICON_GENERIC_HOVER";
+const char* TEX_MENU_BACKGROUND			= "TEX_MENU_BACKGROUND";
+const char* TEX_MENU_BUTTON				= "TEX_MENU_BUTTON";
+const char* TEX_MENU_BUTTON_HOVER		= "TEX_MENU_BUTTON_HOVER";
 
 /* Quick Access*/
 const char* QA_MENU						= "QA_MENU";
@@ -16,3 +19,7 @@ const char* QA_MENU						= "QA_MENU";
 const char* EV_WINDOW_RESIZED			= "EV_WINDOW_RESIZED";
 const char* EV_MUMBLE_IDENTITY_UPDATED	= "EV_MUMBLE_IDENTITY_UPDATED";
 const char* EV_OPTIONS_CALLED			= "EV_OPTIONS_CALLED";
+
+/* DataLink */
+extern const char* DL_MUMBLE_LINK		= "DL_MUMBLE_LINK";
+extern const char* DL_NEXUS_LINK		= "DL_NEXUS_LINK";

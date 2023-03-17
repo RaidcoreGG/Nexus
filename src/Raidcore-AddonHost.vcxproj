@@ -23,6 +23,8 @@
     <ClCompile Include="GUI\Widgets\Debug\DebugWindow.cpp" />
     <ClCompile Include="GUI\Widgets\Keybinds\KeybindsWindow.cpp" />
     <ClCompile Include="GUI\Widgets\Log\LogWindow.cpp" />
+    <ClCompile Include="GUI\Widgets\Menu\Menu.cpp" />
+    <ClCompile Include="GUI\Widgets\Menu\MenuItem.cpp" />
     <ClCompile Include="GUI\Widgets\Overlay\MumbleOverlay.cpp" />
     <ClCompile Include="GUI\Widgets\QuickAccess\QuickAccess.cpp" />
     <ClCompile Include="Hooks.cpp" />
@@ -64,6 +66,7 @@
     <ClInclude Include="DataLink\LinkedResource.h" />
     <ClInclude Include="Events\EventHandler.h" />
     <ClInclude Include="Events\FuncDefs.h" />
+    <ClInclude Include="GUI\EFontIdentifier.h" />
     <ClInclude Include="GUI\GUI.h" />
     <ClInclude Include="GUI\IWindow.h" />
     <ClInclude Include="GUI\Widgets\About\AboutBox.h" />
@@ -72,6 +75,8 @@
     <ClInclude Include="GUI\Widgets\Debug\DebugWindow.h" />
     <ClInclude Include="GUI\Widgets\Keybinds\KeybindsWindow.h" />
     <ClInclude Include="GUI\Widgets\Log\LogWindow.h" />
+    <ClInclude Include="GUI\Widgets\Menu\Menu.h" />
+    <ClInclude Include="GUI\Widgets\Menu\MenuItem.h" />
     <ClInclude Include="GUI\Widgets\Overlay\MumbleOverlay.h" />
     <ClInclude Include="GUI\Widgets\QuickAccess\FuncDefs.h" />
     <ClInclude Include="GUI\Widgets\QuickAccess\QuickAccess.h" />
@@ -94,6 +99,7 @@
     <ClInclude Include="Loader\FuncDefs.h" />
     <ClInclude Include="Loader\LoadedAddon.h" />
     <ClInclude Include="Loader\Loader.h" />
+    <ClInclude Include="Loader\NexusLinkData.h" />
     <ClInclude Include="Localization\Localization.h" />
     <ClInclude Include="Logging\FuncDefs.h" />
     <ClInclude Include="Mumble\Compass.h" />
@@ -141,12 +147,17 @@
   </ItemGroup>
   <ItemGroup>
     <Font Include="Menomonia.ttf" />
+    <Font Include="Resources\Menomonia.ttf" />
+    <Font Include="Resources\TrebuchetMS.ttf" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\ICON_GENERIC.png" />
     <Image Include="Resources\ICON_GENERIC_HOVER.png" />
     <Image Include="Resources\ICON_NEXUS.png" />
     <Image Include="Resources\ICON_NEXUS_HOVER.png" />
+    <Image Include="Resources\TEX_MENU_BUTTON.png" />
+    <Image Include="Resources\TEX_MENU_BUTTON_HOVER.png" />
+    <Image Include="Resources\TEX_MENU_BACKGROUND.png" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

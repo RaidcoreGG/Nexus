@@ -24,13 +24,31 @@
 #include "Loader/Loader.h"
 #include "DataLink/DataLink.h"
 #include "Textures/TextureLoader.h"
+#include "Loader/NexusLinkData.h"
 
 #define ENABLE_CHAINLOAD
 
 /* handles */
-HMODULE hGW2		= nullptr;
-HMODULE hD3D11		= nullptr;
-HMODULE hSysD3D11	= nullptr;
+HMODULE			hGW2		= nullptr;
+HMODULE			hD3D11		= nullptr;
+HMODULE			hSysD3D11	= nullptr;
+
+NexusLinkData*	NexusLink;
+
+void UpdateNexusLink()
+{
+	NexusLink->Width			= Renderer::Width;
+	NexusLink->Height			= Renderer::Height;
+	NexusLink->Scaling			= Renderer::Scaling;
+
+	NexusLink->IsMoving			= IsMoving;
+	NexusLink->IsCameraMoving	= IsCameraMoving;
+	NexusLink->IsGameplay		= IsGameplay;
+
+	NexusLink->Font				= Font;
+	NexusLink->FontBig			= FontBig;
+	NexusLink->FontUI			= FontUI;
+}
 
 void Initialize()
 {
@@ -50,7 +68,7 @@ void Initialize()
 	}
 
 	FileLogger* fLog = new FileLogger(Path::F_LOG);
-	fLog->SetLogLevel(State::IsDeveloperMode ? ELogLevel::ALL : ELogLevel::INFO);
+	fLog->SetLogLevel(ELogLevel::ALL);
 	RegisterLogger(fLog);
 
 	LogHandler::Initialize();
@@ -64,8 +82,9 @@ void Initialize()
 	/* add mumble to datalink */
 	LinkedResource resMumble{ Mumble::GetHandle(), MumbleLink, sizeof(LinkedMem) };
 	DataLink::Mutex.lock();
-	DataLink::Registry["MUMBLE_LINK"] = resMumble;
+	DataLink::Registry[DL_MUMBLE_LINK] = resMumble;
 	DataLink::Mutex.unlock();
+	NexusLink = (NexusLinkData*)DataLink::ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData));
 }
 void Shutdown()
 {
@@ -170,6 +189,8 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 		TextureLoader::CreateTexture(TextureLoader::QueuedTextures.front());
 		TextureLoader::QueuedTextures.erase(TextureLoader::QueuedTextures.begin());
 	}
+
+	UpdateNexusLink();
 
 	GUI::Render();
 

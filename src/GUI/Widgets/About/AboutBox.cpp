@@ -42,12 +42,4 @@ namespace GUI
 		}
 		ImGui::End();
 	}
-
-	void AboutBox::MenuOption(int aCategory)
-	{
-		if (aCategory == 2)
-		{
-			ImGui::ToggleButton("About", &Visible, ImVec2(ImGui::GetFontSize() * 13.75f, 0.0f));
-		}
-	}
 }

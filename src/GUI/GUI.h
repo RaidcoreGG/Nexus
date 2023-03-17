@@ -2,6 +2,9 @@
 #define GUI_H
 
 #include <filesystem>
+#include <map>
+#include <mutex>
+#include <vector>
 
 #include "../State.h"
 #include "../Renderer.h"
@@ -17,6 +20,7 @@
 #include "../imgui/imgui_impl_win32.h"
 #include "../imgui/imgui_impl_dx11.h"
 
+#include "Widgets/Menu/Menu.h"
 #include "Widgets/Addons/AddonsWindow.h"
 #include "Widgets/Keybinds/KeybindsWindow.h"
 #include "Widgets/Log/LogWindow.h"
@@ -24,22 +28,32 @@
 #include "Widgets/Debug/DebugWindow.h"
 #include "Widgets/About/AboutBox.h"
 #include "Widgets/QuickAccess/QuickAccess.h"
+#include "Widgets/Menu/MenuItem.h"
 
 #include "../resource.h"
+#include "../Textures/Texture.h"
+#include "EFontIdentifier.h"
 
 namespace GUI
 {
+	extern std::mutex					Mutex;
+	extern std::vector<IWindow*>		Windows;
+	extern std::map<EFont, ImFont*>		FontIndex;
+
+	extern Texture*						MenuBG;
+	extern Texture*						MenuButton;
+	extern Texture*						MenuButtonHover;
+
 	void Initialize();
 	void Shutdown();
 
 	bool WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	void ProcessKeybind(std::string aIdentifier);
-
 	void Render();
-	void RenderMenu();
 
 	void AddWindow(IWindow* aWindowPtr);
+
+	void ResizeFonts();
 }
 
 #endif

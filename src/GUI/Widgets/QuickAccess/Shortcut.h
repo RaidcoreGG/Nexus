@@ -9,8 +9,8 @@ namespace GUI
 {
 	struct Shortcut
 	{
-		Texture					TextureNormal;
-		Texture					TextureHover;
+		Texture*				TextureNormal;
+		Texture*				TextureHover;
 		std::string				Keybind;
 		std::string				TooltipText;
 		bool					IsHovering;

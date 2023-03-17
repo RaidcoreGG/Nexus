@@ -7,13 +7,13 @@
 namespace TextureLoader
 {
 	std::mutex Mutex;
-	std::map<std::string, Texture> Registry;
+	std::map<std::string, Texture*> Registry;
 
 	std::vector<QueuedTexture> QueuedTextures;
 
 	//void Shutdown();
 
-	Texture Get(std::string aIdentifier)
+	Texture* Get(std::string aIdentifier)
 	{
 		Mutex.lock();
 		if (Registry.find(aIdentifier) != Registry.end())
@@ -23,13 +23,13 @@ namespace TextureLoader
 		}
 
 		Mutex.unlock();
-		return Texture{};
+		return nullptr;
 	}
 
 	void LoadFromFile(std::string aIdentifier, std::string aFilename, TEXTURES_RECEIVECALLBACK aCallback)
 	{
-		Texture tex = Get(aIdentifier);
-		if (tex.Resource != nullptr) { aCallback(aIdentifier, tex); }
+		Texture* tex = Get(aIdentifier);
+		if (tex != nullptr) { aCallback(aIdentifier, tex); }
 
 		// Load from disk into a raw RGBA buffer
 		int image_width = 0;
@@ -41,8 +41,8 @@ namespace TextureLoader
 
 	void LoadFromResource(std::string aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback)
 	{
-		Texture tex = Get(aIdentifier);
-		if (tex.Resource != nullptr) { aCallback(aIdentifier, tex); }
+		Texture* tex = Get(aIdentifier);
+		if (tex != nullptr) { aCallback(aIdentifier, tex); }
 
 		HRSRC imageResHandle = FindResourceA(aModule, MAKEINTRESOURCEA(aResourceID), "PNG");
 		if (!imageResHandle)
@@ -95,9 +95,9 @@ namespace TextureLoader
 	void CreateTexture(QueuedTexture aQueuedTexture)
 	{
 		LogDebug("Textures", "Create %s", aQueuedTexture.Identifier.c_str());
-		Texture tex{};
-		tex.Width = aQueuedTexture.Width;
-		tex.Height = aQueuedTexture.Height;
+		Texture* tex = new Texture{};
+		tex->Width = aQueuedTexture.Width;
+		tex->Height = aQueuedTexture.Height;
 
 		// Create texture
 		D3D11_TEXTURE2D_DESC desc;
@@ -127,7 +127,7 @@ namespace TextureLoader
 		srvDesc.Texture2D.MipLevels = desc.MipLevels;
 		srvDesc.Texture2D.MostDetailedMip = 0;
 
-		Renderer::Device->CreateShaderResourceView(pTexture, &srvDesc, &tex.Resource);
+		Renderer::Device->CreateShaderResourceView(pTexture, &srvDesc, &tex->Resource);
 		pTexture->Release();
 
 		Registry[aQueuedTexture.Identifier] = tex;
