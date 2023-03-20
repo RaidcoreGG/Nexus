@@ -115,6 +115,27 @@ namespace GUI
 
 									ImGui::TreePop();
 								}
+								if (ImGui::IsItemHovered())
+								{
+									if (ImGui::Tooltip())
+									{
+										if (texture->Resource)
+										{
+											float scale = 1.0f;
+											if (texture->Width > 400.0f || texture->Height > 400.0f)
+											{
+												scale = (texture->Width > texture->Height ? texture->Width : texture->Height) / 400.0f;
+											}
+											float previewWidth = texture->Width / scale;
+											float previewHeight = texture->Height / scale;
+
+											ImGui::Image(texture->Resource, ImVec2(previewWidth, previewHeight));
+										}
+
+										ImGui::EndTooltip();
+									}
+
+								}
 							}
 							if (TextureLoader::Registry.size() == 0)
 							{
