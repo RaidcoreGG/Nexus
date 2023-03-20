@@ -27,9 +27,11 @@ namespace GUI
 						else
 						{
 							Loader::Mutex.lock();
-							for (auto& [path, addon] : Loader::AddonDefs)
 							{
-								AddonItem(addon.Definitions);
+								for (auto& [path, addon] : Loader::AddonDefs)
+								{
+									AddonItem(addon.Definitions);
+								}
 							}
 							Loader::Mutex.unlock();
 						}

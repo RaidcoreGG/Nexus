@@ -18,14 +18,14 @@ namespace GUI
 				ImGui::Image(MenuBG->Resource, ImVec2(bgSz, bgSz));
 			}
 
-			Mutex.lock();
-
 			ImGui::PushFont(FontUI);
 			ImGui::SetCursorPos(ImVec2(0, 8.0f));
-			for (MenuItem* mItem : MenuItems) { if (mItem->Render()) { Visible = false; } }
-			ImGui::PopFont();
-
+			Mutex.lock();
+			{
+				for (MenuItem* mItem : MenuItems) { if (mItem->Render()) { Visible = false; } }
+			}
 			Mutex.unlock();
+			ImGui::PopFont();
 		}
 		ImGui::End();
 	}
@@ -33,7 +33,9 @@ namespace GUI
 	void MenuWindow::AddMenuItem(const char* aLabel, bool* aToggle)
 	{
 		Mutex.lock();
-		MenuItems.push_back(new MenuItem{ aLabel, aToggle, false });
+		{
+			MenuItems.push_back(new MenuItem{ aLabel, aToggle, false });
+		}
 		Mutex.unlock();
 	}
 }

@@ -8,6 +8,7 @@
 #include <vector>
 #include <wincodec.h>
 
+#include "../Consts.h"
 #include "../Shared.h"
 #include "../Paths.h"
 #include "../core.h"

@@ -8,6 +8,7 @@
 #include <thread>
 #include <algorithm>
 
+#include "../Consts.h"
 #include "../Shared.h"
 
 #include "FuncDefs.h"

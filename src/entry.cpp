@@ -73,16 +73,18 @@ void Initialize()
 
 	LogHandler::Initialize();
 
-	LogInfo("Core", GetCommandLineA());
-	LogInfo("Core", "Version: %s", Version);
+	LogInfo(CH_CORE, GetCommandLineA());
+	LogInfo(CH_CORE, "Version: %s", Version);
 
 	MH_Initialize();
 	Keybinds::Load();
 
-	/* add mumble to datalink */
+	/* manually add mumble to datalink */
 	LinkedResource resMumble{ Mumble::GetHandle(), MumbleLink, sizeof(LinkedMem) };
 	DataLink::Mutex.lock();
-	DataLink::Registry[DL_MUMBLE_LINK] = resMumble;
+	{
+		DataLink::Registry[DL_MUMBLE_LINK] = resMumble;
+	}
 	DataLink::Mutex.unlock();
 	NexusLink = (NexusLinkData*)DataLink::ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData));
 }
@@ -139,7 +141,7 @@ LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	if (uMsg == WM_DESTROY)
 	{
-		LogCritical("Core", "::Destroy()");
+		LogCritical(CH_CORE, "::Destroy()");
 		::Shutdown();
 	}
 
@@ -224,7 +226,7 @@ bool DxLoad()
 		/* sanity check that the current dll isn't the chainload */
 		if (Path::F_HOST_DLL != Path::F_CHAINLOAD_DLL)
 		{
-			LogInfo("Core", "Attempting to chainload.");
+			LogInfo(CH_CORE, "Attempting to chainload.");
 
 			State::IsChainloading = true;
 
@@ -237,18 +239,18 @@ bool DxLoad()
 #ifdef ENABLE_CHAINLOAD
 			if (State::IsChainloading)
 			{
-				LogWarning("Core", "No chainload found or failed to load.");
+				LogWarning(CH_CORE, "No chainload found or failed to load.");
 			}
 #endif
 			State::IsChainloading = false;
 
 			hD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
 
-			LogDebug("Core", Path::F_SYSTEM_DLL);
+			LogDebug(CH_CORE, Path::F_SYSTEM_DLL);
 
 			assert(hD3D11 && "Could not load system d3d11.dll");
 
-			LogInfo("Core", "Loaded System DLL: %s", Path::F_SYSTEM_DLL);
+			LogInfo(CH_CORE, "Loaded System DLL: %s", Path::F_SYSTEM_DLL);
 		}
 
 		State::Directx = EDxState::DIRECTX_READY;
@@ -317,12 +319,12 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 
 	static decltype(&D3D11CreateDevice) func;
 	static const char* func_name = "D3D11CreateDevice";
-	Log("Core", func_name);
+	Log(CH_CORE, func_name);
 
 #ifdef ENABLE_CHAINLOAD
 	if (State::Directx >= EDxState::DIRECTX_READY)
 	{
-		LogWarning("Core", "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
+		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
 		hSysD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
 
@@ -351,12 +353,12 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 
 	static decltype(&D3D11CreateDeviceAndSwapChain) func;
 	static const char* func_name = "D3D11CreateDeviceAndSwapChain";
-	Log("Core", func_name);
+	Log(CH_CORE, func_name);
 
 #ifdef ENABLE_CHAINLOAD
 	if (State::Directx >= EDxState::DIRECTX_READY)
 	{
-		LogWarning("Core", "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
+		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
 		hSysD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
 
@@ -388,12 +390,12 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 
 	static decltype(&D3D11CoreCreateDevice) func;
 	static const char* func_name = "D3D11CoreCreateDevice";
-	Log("Core", func_name);
+	Log(CH_CORE, func_name);
 
 #ifdef ENABLE_CHAINLOAD
 	if (State::Directx >= EDxState::DIRECTX_READY)
 	{
-		LogWarning("Core", "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
+		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
 		hSysD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
 
@@ -422,12 +424,12 @@ HRESULT __stdcall D3D11CoreCreateLayeredDevice(const void* unknown0, DWORD unkno
 
 	static decltype(&D3D11CoreCreateLayeredDevice) func;
 	static const char* func_name = "D3D11CoreCreateLayeredDevice";
-	Log("Core", func_name);
+	Log(CH_CORE, func_name);
 
 #ifdef ENABLE_CHAINLOAD
 	if (State::Directx >= EDxState::DIRECTX_READY)
 	{
-		LogWarning("Core", "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
+		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
 		hSysD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
 
@@ -456,12 +458,12 @@ SIZE_T	__stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unkno
 
 	static decltype(&D3D11CoreGetLayeredDeviceSize) func;
 	static const char* func_name = "D3D11CoreGetLayeredDeviceSize";
-	Log("Core", func_name);
+	Log(CH_CORE, func_name);
 
 #ifdef ENABLE_CHAINLOAD
 	if (State::Directx >= EDxState::DIRECTX_READY)
 	{
-		LogWarning("Core", "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
+		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
 		hSysD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
 
@@ -490,12 +492,12 @@ HRESULT __stdcall D3D11CoreRegisterLayers(const void* unknown0, DWORD unknown1)
 
 	static decltype(&D3D11CoreRegisterLayers) func;
 	static const char* func_name = "D3D11CoreRegisterLayers";
-	Log("Core", func_name);
+	Log(CH_CORE, func_name);
 
 #ifdef ENABLE_CHAINLOAD
 	if (State::Directx >= EDxState::DIRECTX_READY)
 	{
-		LogWarning("Core", "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
+		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
 		hSysD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
 

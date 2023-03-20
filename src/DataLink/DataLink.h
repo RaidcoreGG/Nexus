@@ -5,6 +5,7 @@
 #include <mutex>
 #include <map>
 
+#include "../Consts.h"
 #include "../Shared.h"
 
 #include "LinkedResource.h"

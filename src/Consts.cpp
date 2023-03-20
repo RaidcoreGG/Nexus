@@ -1,5 +1,15 @@
 #include "Consts.h"
 
+/* Channels */
+const char* CH_CORE						= "Core";
+const char* CH_EVENTS					= "Events";
+const char* CH_TEXTURES					= "Textures";
+const char* CH_QUICKACCESS				= "QuickAccess";
+const char* CH_LOADER					= "Loader";
+const char* CH_DATALINK					= "DataLink";
+const char* CH_KEYBINDS					= "Keybinds";
+const char* CH_GUI						= "GUI";
+
 /* Keybinds */
 const char* KB_MENU						= "KB_MENU";
 

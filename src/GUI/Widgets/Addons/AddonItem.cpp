@@ -32,7 +32,7 @@ namespace GUI
 				}
 				if (ImGui::Button("Uninstall", ImVec2(120.0f, 24.0f)))
 				{
-					LogDebug("GUI", "Uninstall called: %s", aDefinitions->Name);
+					LogDebug(CH_GUI, "Uninstall called: %s", aDefinitions->Name);
 				}
 				ImGui::TextCenteredColumn(aDefinitions->Version);
 

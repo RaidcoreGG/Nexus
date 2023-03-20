@@ -53,7 +53,6 @@ namespace Loader
 		UpdateThread = std::thread(DetectAddons);
 		UpdateThread.detach();
 	}
-
 	void Shutdown()
 	{
 		State::AddonHost = ggState::ADDONS_SHUTDOWN;
@@ -69,7 +68,7 @@ namespace Loader
 		/* lib load failed */
 		if (!hMod)
 		{
-			LogDebug("Loader", "Failed LoadLibrary on \"%s\". Added to blacklist.", path);
+			LogDebug(CH_LOADER, "Failed LoadLibrary on \"%s\". Added to blacklist.", path);
 			Blacklist.insert(aPath);
 			return;
 		}
@@ -77,7 +76,7 @@ namespace Loader
 		getAddonDef = (GETADDONDEF)GetProcAddress(hMod, "GetAddonDef");
 		if (getAddonDef == 0)
 		{
-			LogDebug("Loader", "\"%s\" is not a Nexus-compatible library. Added to blacklist.", path);
+			LogDebug(CH_LOADER, "\"%s\" is not a Nexus-compatible library. Added to blacklist.", path);
 			Blacklist.insert(aPath);
 			FreeLibrary(hMod);
 			return;
@@ -86,7 +85,7 @@ namespace Loader
 		AddonDefinition* defs = getAddonDef();
 		if (hMod && !defs->HasMinimumRequirements())
 		{
-			LogWarning("Loader", "\"%s\" does not fulfill minimum requirements. At least define Name, Version, Author, Description as well as Load and Unload functions. Added to blacklist.", path);
+			LogWarning(CH_LOADER, "\"%s\" does not fulfill minimum requirements. At least define Name, Version, Author, Description as well as Load and Unload functions. Added to blacklist.", path);
 			Blacklist.insert(aPath);
 			FreeLibrary(hMod);
 			return;
@@ -101,15 +100,15 @@ namespace Loader
 
 		addon.Definitions->Load(APIDef);
 
-		LogInfo("Loader", "Loaded addon: %s", path);
+		LogInfo(CH_LOADER, "Loaded addon: %s [%p - %p]", path, hMod, ((PBYTE)hMod) + moduleInfo.SizeOfImage);
 	}
-
 	void UnloadAddon(std::filesystem::path aPath)
 	{
 		std::string path = aPath.string();
 
 		/* cache name for warning message and already release defs */
 		std::string name = AddonDefs[aPath].Definitions->Name;
+		int signature = AddonDefs[aPath].Definitions->Signature;
 
 		AddonDefs[aPath].Definitions->Unload();
 
@@ -117,7 +116,7 @@ namespace Loader
 		{
 			if (!FreeLibrary(AddonDefs[aPath].Module))
 			{
-				LogWarning("Loader", "Couldn't unload \"%s\". FreeLibrary() call failed. (%s)", name.c_str(), path.c_str());
+				LogWarning(CH_LOADER, "Couldn't unload \"%s\". FreeLibrary() call failed. (%s)", name.c_str(), path.c_str());
 				return;
 			}
 		}
@@ -125,14 +124,18 @@ namespace Loader
 		AddonDefs[aPath].Definitions = nullptr;
 
 		/* Verify all APIs don't have any unreleased references to the addons address space */
+		void* startAddress = AddonDefs[aPath].Module;
+		void* endAddress = ((PBYTE)AddonDefs[aPath].Module) + AddonDefs[aPath].ModuleSize;
+
 		int leftoverRefs = 0;
-		leftoverRefs += Events::Verify(AddonDefs[aPath].Module, AddonDefs[aPath].Module + AddonDefs[aPath].ModuleSize);
-		leftoverRefs += GUI::QuickAccess::Verify(AddonDefs[aPath].Module, AddonDefs[aPath].Module + AddonDefs[aPath].ModuleSize);
-		leftoverRefs += Keybinds::Verify(AddonDefs[aPath].Module, AddonDefs[aPath].Module + AddonDefs[aPath].ModuleSize);
+		leftoverRefs += Events::Verify(startAddress, endAddress);
+		leftoverRefs += GUI::QuickAccess::Verify(startAddress, endAddress);
+		leftoverRefs += Keybinds::Verify(startAddress, endAddress);
+		leftoverRefs += LogHandler::Verify(startAddress, endAddress);
 
 		if (leftoverRefs > 0)
 		{
-			LogWarning("Loader", "Removed %d unreleased references from \"%s\".", leftoverRefs, name.c_str());
+			LogWarning(CH_LOADER, "Removed %d unreleased references from \"%s\".", leftoverRefs, name.c_str());
 		}
 
 		AddonDefs[aPath].Module = nullptr;
@@ -140,9 +143,8 @@ namespace Loader
 
 		AddonDefs.erase(aPath);
 
-		LogInfo("Loader", "Unloaded addon: %s", path.c_str());
+		LogInfo(CH_LOADER, "Unloaded addon: %s", path.c_str());
 	}
-
 	void DetectAddons()
 	{
 		for (;;)
@@ -166,22 +168,24 @@ namespace Loader
 				std::set <std::filesystem::path> unload;
 
 				Mutex.lock();
-				for (const auto& [path, addon] : Loader::AddonDefs)
 				{
-					if (onDiskLeft.find(path) != onDiskLeft.end())
+					for (const auto& [path, addon] : Loader::AddonDefs)
 					{
-						/* addon is still present on disk, remove from the items that need to be checked */
-						onDiskLeft.erase(path);
+						if (onDiskLeft.find(path) != onDiskLeft.end())
+						{
+							/* addon is still present on disk, remove from the items that need to be checked */
+							onDiskLeft.erase(path);
+						}
+						else
+						{
+							/* addon is no longer on disk -> unload afterwards, we can't modify this array */
+							unload.insert(path);
+						}
 					}
-					else
+					for (std::filesystem::path path : unload)
 					{
-						/* addon is no longer on disk -> unload afterwards, we can't modify this array */
-						unload.insert(path);
+						UnloadAddon(path);
 					}
-				}
-				for (std::filesystem::path path : unload)
-				{
-					UnloadAddon(path);
 				}
 				Mutex.unlock();
 
@@ -189,22 +193,24 @@ namespace Loader
 				std::set <std::filesystem::path> unblacklist;
 
 				Mutex.lock();
-				for (std::filesystem::path path : Blacklist)
 				{
-					if (onDiskLeft.find(path) != onDiskLeft.end())
+					for (std::filesystem::path path : Blacklist)
 					{
-						/* path is present on blacklist, remove from the items that need to be checked */
-						onDiskLeft.erase(path);
+						if (onDiskLeft.find(path) != onDiskLeft.end())
+						{
+							/* path is present on blacklist, remove from the items that need to be checked */
+							onDiskLeft.erase(path);
+						}
+						else
+						{
+							/* no longer exists, remove from blacklist */
+							unblacklist.insert(path);
+						}
 					}
-					else
+					for (std::filesystem::path path : unblacklist)
 					{
-						/* no longer exists, remove from blacklist */
-						unblacklist.insert(path);
+						Blacklist.erase(path);
 					}
-				}
-				for (std::filesystem::path path : unblacklist)
-				{
-					Blacklist.erase(path);
 				}
 				Mutex.unlock();
 
@@ -218,7 +224,9 @@ namespace Loader
 					if (pathStr.size() >= dll.size() && 0 == pathStr.compare(pathStr.size() - dll.size(), dll.size(), dll))
 					{
 						Mutex.lock();
-						LoadAddon(path);
+						{
+							LoadAddon(path);
+						}
 						Mutex.unlock();
 					}
 				}

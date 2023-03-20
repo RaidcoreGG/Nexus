@@ -15,21 +15,28 @@ namespace TextureLoader
 
 	Texture* Get(std::string aIdentifier)
 	{
-		Mutex.lock();
-		if (Registry.find(aIdentifier) != Registry.end())
-		{
-			Mutex.unlock();
-			return Registry[aIdentifier];
-		}
+		Texture* result = nullptr;
 
+		Mutex.lock();
+		{
+			if (Registry.find(aIdentifier) != Registry.end())
+			{
+				result = Registry[aIdentifier];
+			}
+		}
 		Mutex.unlock();
-		return nullptr;
+
+		return result;
 	}
 
 	void LoadFromFile(std::string aIdentifier, std::string aFilename, TEXTURES_RECEIVECALLBACK aCallback)
 	{
 		Texture* tex = Get(aIdentifier);
-		if (tex != nullptr) { aCallback(aIdentifier, tex); }
+		if (tex != nullptr)
+		{
+			aCallback(aIdentifier, tex);
+			return;
+		}
 
 		// Load from disk into a raw RGBA buffer
 		int image_width = 0;
@@ -42,7 +49,11 @@ namespace TextureLoader
 	void LoadFromResource(std::string aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback)
 	{
 		Texture* tex = Get(aIdentifier);
-		if (tex != nullptr) { aCallback(aIdentifier, tex); }
+		if (tex != nullptr)
+		{
+			aCallback(aIdentifier, tex);
+			return;
+		}
 
 		HRSRC imageResHandle = FindResourceA(aModule, MAKEINTRESOURCEA(aResourceID), "PNG");
 		if (!imageResHandle)
@@ -78,8 +89,7 @@ namespace TextureLoader
 
 	void QueueTexture(std::string aIdentifier, unsigned char* aImageData, unsigned aWidth, unsigned aHeight, TEXTURES_RECEIVECALLBACK aCallback)
 	{
-		LogDebug("Textures", "Queued %s", aIdentifier.c_str());
-		Mutex.lock();
+		LogDebug(CH_TEXTURES, "Queued %s", aIdentifier.c_str());
 
 		QueuedTexture raw{};
 		raw.Identifier = aIdentifier;
@@ -87,14 +97,17 @@ namespace TextureLoader
 		raw.Width = aWidth;
 		raw.Height = aHeight;
 		raw.Callback = aCallback;
-		QueuedTextures.push_back(raw);
 
+		Mutex.lock();
+		{
+			QueuedTextures.push_back(raw);
+		}
 		Mutex.unlock();
 	}
 
 	void CreateTexture(QueuedTexture aQueuedTexture)
 	{
-		LogDebug("Textures", "Create %s", aQueuedTexture.Identifier.c_str());
+		LogDebug(CH_TEXTURES, "Create %s", aQueuedTexture.Identifier.c_str());
 		Texture* tex = new Texture{};
 		tex->Width = aQueuedTexture.Width;
 		tex->Height = aQueuedTexture.Height;

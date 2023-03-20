@@ -17,23 +17,25 @@ namespace GUI
 						ImGui::BeginChild("##EventsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
 						Events::Mutex.lock();
-						for (auto& [identifier, subscribers] : Events::Registry)
 						{
-							if (ImGui::TreeNode(identifier.c_str()))
+							for (auto& [identifier, subscribers] : Events::Registry)
 							{
-								if (subscribers.size() == 0)
+								if (ImGui::TreeNode(identifier.c_str()))
 								{
-									ImGui::TextDisabled("This event has no subscribers.");
-								}
-								else
-								{
-									ImGui::TextDisabled("Subscribers:");
-									for (EVENT_CONSUME callback : subscribers)
+									if (subscribers.size() == 0)
 									{
-										ImGui::Text(""); ImGui::SameLine(); ImGui::TextDisabled("%p", callback);
+										ImGui::TextDisabled("This event has no subscribers.");
 									}
+									else
+									{
+										ImGui::TextDisabled("Subscribers:");
+										for (EVENT_CONSUME callback : subscribers)
+										{
+											ImGui::Text(""); ImGui::SameLine(); ImGui::TextDisabled("%p", callback);
+										}
+									}
+									ImGui::TreePop();
 								}
-								ImGui::TreePop();
 							}
 						}
 						Events::Mutex.unlock();
@@ -49,16 +51,18 @@ namespace GUI
 						ImGui::BeginChild("##KeybindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
 						Keybinds::Mutex.lock();
-						for (auto& [identifier, keybind] : Keybinds::Registry)
 						{
-							ImGui::Text(identifier.c_str()); ImGui::SameLine(); 
-							if (keybind.Handler)
+							for (auto& [identifier, keybind] : Keybinds::Registry)
 							{
-								ImGui::TextDisabled("Handler: %p", keybind.Handler);
-							}
-							else
-							{
-								ImGui::TextDisabled("Handler: (null)");
+								ImGui::Text(identifier.c_str()); ImGui::SameLine();
+								if (keybind.Handler)
+								{
+									ImGui::TextDisabled("Handler: %p", keybind.Handler);
+								}
+								else
+								{
+									ImGui::TextDisabled("Handler: (null)");
+								}
 							}
 						}
 						Keybinds::Mutex.unlock();
@@ -74,15 +78,17 @@ namespace GUI
 						ImGui::BeginChild("##DataLinkTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
 						DataLink::Mutex.lock();
-						for (auto& [identifier, resource] : DataLink::Registry)
 						{
-							if (ImGui::TreeNode(identifier.c_str()))
+							for (auto& [identifier, resource] : DataLink::Registry)
 							{
-								ImGui::TextDisabled("Handle: %p", resource.Handle);
-								ImGui::TextDisabled("Pointer: %p", resource.Pointer);
-								ImGui::TextDisabled("Size: %d", resource.Size);
+								if (ImGui::TreeNode(identifier.c_str()))
+								{
+									ImGui::TextDisabled("Handle: %p", resource.Handle);
+									ImGui::TextDisabled("Pointer: %p", resource.Pointer);
+									ImGui::TextDisabled("Size: %d", resource.Size);
 
-								ImGui::TreePop();
+									ImGui::TreePop();
+								}
 							}
 						}
 						DataLink::Mutex.unlock();
@@ -98,37 +104,39 @@ namespace GUI
 						ImGui::BeginChild("##TexturesTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
 						TextureLoader::Mutex.lock();
-						ImGui::Text("Loaded Textures:");
-						for (auto& [identifier, texture] : TextureLoader::Registry)
 						{
-							if (ImGui::TreeNode(identifier.c_str()))
+							ImGui::Text("Loaded Textures:");
+							for (auto& [identifier, texture] : TextureLoader::Registry)
 							{
-								ImGui::TextDisabled("Dimensions: %dx%d", texture->Width, texture->Height);
-								ImGui::TextDisabled("Pointer: %p", texture->Resource);
+								if (ImGui::TreeNode(identifier.c_str()))
+								{
+									ImGui::TextDisabled("Dimensions: %dx%d", texture->Width, texture->Height);
+									ImGui::TextDisabled("Pointer: %p", texture->Resource);
 
-								ImGui::TreePop();
+									ImGui::TreePop();
+								}
 							}
-						}
-						if (TextureLoader::Registry.size() == 0)
-						{
-							ImGui::TextDisabled("No textures loaded.");
-						}
-						ImGui::Separator();
-						ImGui::Text("Queued Textures:");
-						for (auto& qtexture : TextureLoader::QueuedTextures)
-						{
-							if (ImGui::TreeNode(qtexture.Identifier.c_str()))
+							if (TextureLoader::Registry.size() == 0)
 							{
-								ImGui::TextDisabled("Dimensions: %dx%d", qtexture.Width, qtexture.Height);
-								ImGui::TextDisabled("ReceiveCallback: %p", qtexture.Callback);
-								ImGui::TextDisabled("Data: ", qtexture.Data);
-
-								ImGui::TreePop();
+								ImGui::TextDisabled("No textures loaded.");
 							}
-						}
-						if (TextureLoader::QueuedTextures.size() == 0)
-						{
-							ImGui::TextDisabled("No textures queued for loading.");
+							ImGui::Separator();
+							ImGui::Text("Queued Textures:");
+							for (auto& qtexture : TextureLoader::QueuedTextures)
+							{
+								if (ImGui::TreeNode(qtexture.Identifier.c_str()))
+								{
+									ImGui::TextDisabled("Dimensions: %dx%d", qtexture.Width, qtexture.Height);
+									ImGui::TextDisabled("ReceiveCallback: %p", qtexture.Callback);
+									ImGui::TextDisabled("Data: ", qtexture.Data);
+
+									ImGui::TreePop();
+								}
+							}
+							if (TextureLoader::QueuedTextures.size() == 0)
+							{
+								ImGui::TextDisabled("No textures queued for loading.");
+							}
 						}
 						TextureLoader::Mutex.unlock();
 
@@ -142,30 +150,33 @@ namespace GUI
 					{
 						ImGui::BeginChild("##ShortcutsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-						QuickAccess::Mutex.lock();
 						ImGui::Text("Shortcuts:");
-						for (auto& [identifier, shortcut] : QuickAccess::Registry)
-						{
-							if (ImGui::TreeNode(identifier.c_str()))
-							{
-								ImGui::TextDisabled("Texture: %p", shortcut.TextureNormal->Resource);
-								ImGui::TextDisabled("Texture (Hover): %p", shortcut.TextureHover->Resource);
-								ImGui::TextDisabled("OnClick (Keybind): %s", shortcut.Keybind.length() != 0 ? shortcut.Keybind.c_str() : "(null)");
-								ImGui::TextDisabled("Tooltip: %s", shortcut.TooltipText.length() != 0 ? shortcut.TooltipText.c_str() : "(null)");
-								ImGui::TextDisabled("IsHovering: %s", shortcut.IsHovering ? "true" : "false");
 
-								ImGui::TreePop();
+						QuickAccess::Mutex.lock();
+						{
+							for (auto& [identifier, shortcut] : QuickAccess::Registry)
+							{
+								if (ImGui::TreeNode(identifier.c_str()))
+								{
+									ImGui::TextDisabled("Texture: %p", shortcut.TextureNormal->Resource);
+									ImGui::TextDisabled("Texture (Hover): %p", shortcut.TextureHover->Resource);
+									ImGui::TextDisabled("OnClick (Keybind): %s", shortcut.Keybind.length() != 0 ? shortcut.Keybind.c_str() : "(null)");
+									ImGui::TextDisabled("Tooltip: %s", shortcut.TooltipText.length() != 0 ? shortcut.TooltipText.c_str() : "(null)");
+									ImGui::TextDisabled("IsHovering: %s", shortcut.IsHovering ? "true" : "false");
+
+									ImGui::TreePop();
+								}
 							}
-						}
-						ImGui::Separator();
-						ImGui::Text("Simple shortcuts:");
-						for (auto& [identifier, shortcut] : QuickAccess::RegistrySimple)
-						{
-							if (ImGui::TreeNode(identifier.c_str()))
+							ImGui::Separator();
+							ImGui::Text("Simple shortcuts:");
+							for (auto& [identifier, shortcut] : QuickAccess::RegistrySimple)
 							{
-								ImGui::TextDisabled("Callback: %p", shortcut);
+								if (ImGui::TreeNode(identifier.c_str()))
+								{
+									ImGui::TextDisabled("Callback: %p", shortcut);
 
-								ImGui::TreePop();
+									ImGui::TreePop();
+								}
 							}
 						}
 						QuickAccess::Mutex.unlock();
@@ -181,24 +192,25 @@ namespace GUI
 						ImGui::BeginChild("##LoaderTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
 						Loader::Mutex.lock();
-						if (ImGui::TreeNode("Loaded"))
 						{
-							for (const auto& [path, addon] : Loader::AddonDefs)
+							if (ImGui::TreeNode("Loaded"))
 							{
-								ImGui::TextDisabled("%s", path.string().c_str());
+								for (const auto& [path, addon] : Loader::AddonDefs)
+								{
+									ImGui::TextDisabled("%s", path.string().c_str());
+								}
+								ImGui::TreePop();
 							}
-							ImGui::TreePop();
-						}
-						if (ImGui::TreeNode("Blacklisted"))
-						{
-							for (auto& path : Loader::Blacklist)
+							if (ImGui::TreeNode("Blacklisted"))
 							{
-								ImGui::TextDisabled("%s", path.string().c_str());
+								for (auto& path : Loader::Blacklist)
+								{
+									ImGui::TextDisabled("%s", path.string().c_str());
+								}
+								ImGui::TreePop();
 							}
-							ImGui::TreePop();
+							ImGui::TooltipGeneric("These files will not be checked during the next wave of addon loading.");
 						}
-						ImGui::TooltipGeneric("These files will not be checked during the next wave of addon loading.");
-						
 						Loader::Mutex.unlock();
 
 						ImGui::EndChild();

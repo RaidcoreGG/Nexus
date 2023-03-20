@@ -44,8 +44,8 @@ namespace GUI
 
 			// advance cursor pos
 			ImGui::SetCursorPosY(pos.y + height + 6.0f);
-
-			return result;
 		}
+
+		return result;
 	}
 }

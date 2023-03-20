@@ -2,6 +2,7 @@
 #define LOADEDADDON_H
 
 #include <Windows.h>
+#include <vector>
 
 #include "AddonDefinition.h"
 

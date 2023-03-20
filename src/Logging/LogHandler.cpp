@@ -21,17 +21,17 @@ namespace LogHandler
 	void RegisterLogger(ILogger* aLogger)
 	{
 		Mutex.lock();
-
-		Registry.push_back(aLogger);
-
+		{
+			Registry.push_back(aLogger);
+		}
 		Mutex.unlock();
 	}
 	void UnregisterLogger(ILogger* aLogger)
 	{
 		Mutex.lock();
-
-		Registry.erase(std::remove(Registry.begin(), Registry.end(), aLogger), Registry.end());
-
+		{
+			Registry.erase(std::remove(Registry.begin(), Registry.end(), aLogger), Registry.end());
+		}
 		Mutex.unlock();
 	}
 
@@ -54,9 +54,11 @@ namespace LogHandler
 		entry.Channel = aChannel;
 
 		Mutex.lock();
-		if (std::find(Channels.begin(), Channels.end(), aChannel) == Channels.end())
 		{
-			Channels.push_back(aChannel);
+			if (std::find(Channels.begin(), Channels.end(), aChannel) == Channels.end())
+			{
+				Channels.push_back(aChannel);
+			}
 		}
 		Mutex.unlock();
 
@@ -66,7 +68,9 @@ namespace LogHandler
 		entry.Message = std::string(&buffer[0], &buffer[strlen(buffer)]);
 
 		Mutex.lock();
-		QueuedMessages.push_back(entry);
+		{
+			QueuedMessages.push_back(entry);
+		}
 		Mutex.unlock();
 	}
 	void ProcessQueue()
@@ -78,21 +82,23 @@ namespace LogHandler
 			while (QueuedMessages.size() > 0)
 			{
 				Mutex.lock();
-				LogEntry& entry = QueuedMessages.front();
-
-				for (ILogger* logger : Registry)
 				{
-					ELogLevel level = logger->GetLogLevel();
+					LogEntry& entry = QueuedMessages.front();
 
-					/* send logged message to logger if message log level is lower than logger level */
-					if (entry.LogLevel <= level)
+					for (ILogger* logger : Registry)
 					{
-						logger->LogMessage(entry);
-					}
-				}
+						ELogLevel level = logger->GetLogLevel();
 
-				LogEntries.push_back(entry);
-				QueuedMessages.erase(QueuedMessages.begin());
+						/* send logged message to logger if message log level is lower than logger level */
+						if (entry.LogLevel <= level)
+						{
+							logger->LogMessage(entry);
+						}
+					}
+
+					LogEntries.push_back(entry);
+					QueuedMessages.erase(QueuedMessages.begin());
+				}
 				Mutex.unlock();
 			}
 		}
@@ -103,12 +109,14 @@ namespace LogHandler
 		int refCounter = 0;
 
 		Mutex.lock();
-		for (ILogger* logger : Registry)
 		{
-			if (logger >= aStartAddress && logger <= aEndAddress)
+			for (ILogger* logger : Registry)
 			{
-				UnregisterLogger(logger);
-				refCounter++;
+				if (logger >= aStartAddress && logger <= aEndAddress)
+				{
+					Registry.erase(std::remove(Registry.begin(), Registry.end(), logger), Registry.end());
+					refCounter++;
+				}
 			}
 		}
 		Mutex.unlock();

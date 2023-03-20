@@ -44,9 +44,6 @@ namespace Loader
 
 	void LoadAddon(std::filesystem::path aPath);
 	void UnloadAddon(std::filesystem::path aPath);
-
-	void VerifyCallbacks(void* aStartAddress, void* aEndAddress);
-
 	void DetectAddons();
 }
 

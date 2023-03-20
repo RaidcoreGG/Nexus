@@ -154,17 +154,21 @@ namespace GUI
 
 			/* draw windows */
 			Mutex.lock();
-			for (IWindow* wnd : Windows)
 			{
-				wnd->Render();
+				for (IWindow* wnd : Windows)
+				{
+					wnd->Render();
+				}
 			}
 			Mutex.unlock();
 
 			/* draw addons*/
 			Loader::Mutex.lock();
-			for (const auto& [path, addon] : Loader::AddonDefs)
 			{
-				if (addon.Definitions->Render) { addon.Definitions->Render(); }
+				for (const auto& [path, addon] : Loader::AddonDefs)
+				{
+					if (addon.Definitions->Render) { addon.Definitions->Render(); }
+				}
 			}
 			Loader::Mutex.unlock();
 
@@ -185,7 +189,9 @@ namespace GUI
 	void AddWindow(IWindow* aWindowPtr)
 	{
 		Mutex.lock();
-		Windows.push_back(aWindowPtr);
+		{
+			Windows.push_back(aWindowPtr);
+		}
 		Mutex.unlock();
 	}
 
@@ -319,22 +325,22 @@ namespace GUI
 			/* small UI*/
 			FontIndex.emplace(EFont::Menomonia_Small, io.Fonts->AddFontFromMemoryTTF(resM, szM, 16.0f));
 			FontIndex.emplace(EFont::MenomoniaBig_Small, io.Fonts->AddFontFromMemoryTTF(resM, szM, 22.0f));
-			FontIndex.emplace(EFont::Trebuchet_Small, io.Fonts->AddFontFromMemoryTTF(resT, szT, 16.0f));
+			FontIndex.emplace(EFont::Trebuchet_Small, io.Fonts->AddFontFromMemoryTTF(resT, szT, 15.5f));
 
 			/* normal UI*/
 			FontIndex.emplace(EFont::Menomonia_Normal, io.Fonts->AddFontFromMemoryTTF(resM, szM, 18.0f));
 			FontIndex.emplace(EFont::MenomoniaBig_Normal, io.Fonts->AddFontFromMemoryTTF(resM, szM, 24.0f));
-			FontIndex.emplace(EFont::Trebuchet_Normal, io.Fonts->AddFontFromMemoryTTF(resT, szT, 18.0f));
+			FontIndex.emplace(EFont::Trebuchet_Normal, io.Fonts->AddFontFromMemoryTTF(resT, szT, 16.0f));
 
 			/* large UI*/
 			FontIndex.emplace(EFont::Menomonia_Large, io.Fonts->AddFontFromMemoryTTF(resM, szM, 20.0f));
 			FontIndex.emplace(EFont::MenomoniaBig_Large, io.Fonts->AddFontFromMemoryTTF(resM, szM, 26.0f));
-			FontIndex.emplace(EFont::Trebuchet_Large, io.Fonts->AddFontFromMemoryTTF(resT, szT, 20.0f));
+			FontIndex.emplace(EFont::Trebuchet_Large, io.Fonts->AddFontFromMemoryTTF(resT, szT, 17.5f));
 
 			/* larger UI*/
 			FontIndex.emplace(EFont::Menomonia_Larger, io.Fonts->AddFontFromMemoryTTF(resM, szM, 22.0f));
 			FontIndex.emplace(EFont::MenomoniaBig_Larger, io.Fonts->AddFontFromMemoryTTF(resM, szM, 28.0f));
-			FontIndex.emplace(EFont::Trebuchet_Larger, io.Fonts->AddFontFromMemoryTTF(resT, szT, 22.0f));
+			FontIndex.emplace(EFont::Trebuchet_Larger, io.Fonts->AddFontFromMemoryTTF(resT, szT, 19.5f));
 		}
 		Mutex.unlock();
 

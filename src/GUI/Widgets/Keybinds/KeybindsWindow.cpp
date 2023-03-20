@@ -14,17 +14,19 @@ namespace GUI
 			if (ImGui::BeginTable("table_keybinds", 2))
 			{
 				Keybinds::Mutex.lock();
-				for (auto& [identifier, keybind] : Keybinds::Registry)
 				{
-					ImGui::TableNextRow();
-					ImGui::TableSetColumnIndex(0);
-					ImGui::Text(identifier.c_str());
-
-					ImGui::TableSetColumnIndex(1);
-					if (ImGui::SmallButton(keybind.Bind.ToString(true).c_str()))
+					for (auto& [identifier, keybind] : Keybinds::Registry)
 					{
-						CurrentlyEditing = identifier;
-						ImGui::OpenPopup(("Set Keybind: " + CurrentlyEditing).c_str(), ImGuiPopupFlags_AnyPopupLevel);
+						ImGui::TableNextRow();
+						ImGui::TableSetColumnIndex(0);
+						ImGui::Text(identifier.c_str());
+
+						ImGui::TableSetColumnIndex(1);
+						if (ImGui::SmallButton(keybind.Bind.ToString(true).c_str()))
+						{
+							CurrentlyEditing = identifier;
+							ImGui::OpenPopup(("Set Keybind: " + CurrentlyEditing).c_str(), ImGuiPopupFlags_AnyPopupLevel);
+						}
 					}
 				}
 				Keybinds::Mutex.unlock();

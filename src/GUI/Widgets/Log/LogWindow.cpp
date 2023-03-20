@@ -32,76 +32,80 @@ namespace GUI
 				ImGui::Text("Channel:");
 
 				LogHandler::Mutex.lock();
-				for (std::string ch : Channels)
 				{
-					float opacity = 0.8f;
-					if (ch == ChannelFilter)
+					for (std::string ch : Channels)
 					{
-						opacity = 1.0f;
-					}
-					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, opacity);
-					if (ImGui::Button(ch.c_str(), ImVec2(windowWidthQuarter, 0.0f)))
-					{
-						/* if the selected channel is already the set filter, reset filter */
-						if (ChannelFilter == ch)
+						float opacity = 0.8f;
+						if (ch == ChannelFilter)
 						{
-							ChannelFilter = "";
+							opacity = 1.0f;
 						}
-						else
+						ImGui::PushStyleVar(ImGuiStyleVar_Alpha, opacity);
+						if (ImGui::Button(ch.c_str(), ImVec2(windowWidthQuarter, 0.0f)))
 						{
-							ChannelFilter = ch.c_str();
+							/* if the selected channel is already the set filter, reset filter */
+							if (ChannelFilter == ch)
+							{
+								ChannelFilter = "";
+							}
+							else
+							{
+								ChannelFilter = ch.c_str();
+							}
 						}
+						ImGui::PopStyleVar();
 					}
-					ImGui::PopStyleVar();
 				}
+				LogHandler::Mutex.unlock();
 
 				ImGui::EndChild();
 			}
 
 			ImGui::SameLine();
 			
-			LogHandler::Mutex.unlock();
 			{
 				ImGui::BeginChild("logmessages", ImVec2(windowWidthQuarter * 3 - 1, 0.0f));
 				
 				MessageMutex.lock();
-				/* Show last 200 log messages */
-				size_t start = 0;
-				if (LogEntries.size() > 200) { start = LogEntries.size() - 200; }
-
-				for (size_t i = start; i < LogEntries.size(); i++)
 				{
-					LogEntry entry = LogEntries[i];
+					/* Show last 200 log messages */
+					size_t start = 0;
+					if (LogEntries.size() > 200) { start = LogEntries.size() - 200; }
 
-					if (((filterLevel == ELogLevel::ALL) ||
-						(SelectedOnly && entry.LogLevel == filterLevel) ||
-						(!SelectedOnly && entry.LogLevel <= filterLevel)) &&
-						((ChannelFilter == "") || ChannelFilter == entry.Channel))
+					for (size_t i = start; i < LogEntries.size(); i++)
 					{
-						const char* level;
-						switch (entry.LogLevel)
+						LogEntry entry = LogEntries[i];
+
+						if (((filterLevel == ELogLevel::ALL) ||
+							(SelectedOnly && entry.LogLevel == filterLevel) ||
+							(!SelectedOnly && entry.LogLevel <= filterLevel)) &&
+							((ChannelFilter == "") || ChannelFilter == entry.Channel))
 						{
-						case ELogLevel::CRITICAL:   level = "[CRITICAL]";   ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));     break;
-						case ELogLevel::WARNING:    level = "[WARNING]";    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 0, 255));   break;
-						case ELogLevel::INFO:       level = "[INFO]";       ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255));     break;
-						case ELogLevel::DEBUG:      level = "[DEBUG]";      ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 148, 255, 255));   break;
+							const char* level;
+							switch (entry.LogLevel)
+							{
+								case ELogLevel::CRITICAL:   level = "[CRITICAL]";   ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));     break;
+								case ELogLevel::WARNING:    level = "[WARNING]";    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 0, 255));   break;
+								case ELogLevel::INFO:       level = "[INFO]";       ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255));     break;
+								case ELogLevel::DEBUG:      level = "[DEBUG]";      ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 148, 255, 255));   break;
 
-						default:                    level = "[TRACE]";      ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(220, 220, 220, 255)); break;
+								default:                    level = "[TRACE]";      ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(220, 220, 220, 255)); break;
+							}
+
+							float off1 = ImGui::CalcTextSize("XXXXXXXXX").x;
+							float off2 = ImGui::CalcTextSize("XXXXXXXXXXX").x;
+
+							/* time */
+							ImGui::Text(entry.TimestampString(false).c_str()); ImGui::SameLine(off1);
+
+							/* level */
+							ImGui::Text(level); ImGui::SameLine(off1 + off2);
+
+							/* message */
+							ImGui::TextWrapped(entry.Message.c_str());
+
+							ImGui::PopStyleColor();
 						}
-
-						float off1 = ImGui::CalcTextSize("XXXXXXXXX").x;
-						float off2 = ImGui::CalcTextSize("XXXXXXXXXXX").x;
-
-						/* time */
-						ImGui::Text(entry.TimestampString(false).c_str()); ImGui::SameLine(off1);
-
-						/* level */
-						ImGui::Text(level); ImGui::SameLine(off1 + off2);
-
-						/* message */
-						ImGui::TextWrapped(entry.Message.c_str());
-
-						ImGui::PopStyleColor();
 					}
 				}
 				MessageMutex.unlock();
