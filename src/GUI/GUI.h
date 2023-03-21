@@ -24,7 +24,6 @@
 #include "Widgets/Addons/AddonsWindow.h"
 #include "Widgets/Keybinds/KeybindsWindow.h"
 #include "Widgets/Log/LogWindow.h"
-#include "Widgets/Overlay/MumbleOverlay.h"
 #include "Widgets/Debug/DebugWindow.h"
 #include "Widgets/About/AboutBox.h"
 #include "Widgets/QuickAccess/QuickAccess.h"

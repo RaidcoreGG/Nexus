@@ -10,6 +10,7 @@
 #include "../../../Textures/TextureLoader.h"
 #include "../../../GUI/Widgets/QuickAccess/QuickAccess.h"
 #include "../../../Loader/Loader.h"
+#include "../Overlay/MumbleOverlay.h"
 
 #include "../../../imgui/imgui.h"
 #include "../../../imgui/imgui_extensions.h"
@@ -21,7 +22,13 @@ namespace GUI
 	class DebugWindow : public IWindow
 	{
 		public:
+		DebugWindow();
+		~DebugWindow() = default;
+
 		void Render();
+
+		private:
+		MumbleOverlay* MumbleWindow;
 	};
 }
 

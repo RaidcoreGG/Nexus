@@ -2,13 +2,24 @@
 
 namespace GUI
 {
+	DebugWindow::DebugWindow()
+	{
+		MumbleWindow = new MumbleOverlay();
+	}
+
 	void DebugWindow::Render()
 	{
+		MumbleWindow->Render();
+
 		if (!Visible) { return; }
 
 		ImGui::SetNextWindowSize(ImVec2(480.0f, 380.0f));
 		if (ImGui::Begin("Debug", &Visible, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
 		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f });
+			ImGui::Checkbox("Show Mumble overlay", &MumbleWindow->Visible);
+			ImGui::PopStyleVar();
+
 			if (ImGui::BeginTabBar("DebugTabBar", ImGuiTabBarFlags_None))
 			{
 				if (ImGui::BeginTabItem("Events"))

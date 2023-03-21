@@ -361,7 +361,6 @@ namespace GUI
 		AddonsWindow* addonsWnd = new AddonsWindow();
 		LogWindow* logWnd = new LogWindow(); RegisterLogger(logWnd); logWnd->SetLogLevel(ELogLevel::ALL);
 		KeybindsWindow* kbWnd = new KeybindsWindow();
-		MumbleOverlay* mumbleWnd = new MumbleOverlay();
 		DebugWindow* dbgWnd = new DebugWindow();
 		AboutBox* aboutWnd = new AboutBox();
 
@@ -369,7 +368,6 @@ namespace GUI
 		AddWindow(addonsWnd);
 		AddWindow(kbWnd);
 		AddWindow(logWnd);
-		AddWindow(mumbleWnd);
 		AddWindow(dbgWnd);
 		AddWindow(aboutWnd);
 
@@ -377,8 +375,7 @@ namespace GUI
 		Menu->AddMenuItem("Addons", &addonsWnd->Visible);
 		Menu->AddMenuItem("Keybinds", &kbWnd->Visible);
 		Menu->AddMenuItem("Log", &logWnd->Visible);
-		Menu->AddMenuItem("Mumble Data", &mumbleWnd->Visible);
-		Menu->AddMenuItem("Debug Info", &dbgWnd->Visible);
+		Menu->AddMenuItem("Debug", &dbgWnd->Visible);
 		Menu->AddMenuItem("About", &aboutWnd->Visible);
 
 		/* register keybinds */
