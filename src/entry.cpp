@@ -86,7 +86,12 @@ void Initialize()
 		DataLink::Registry[DL_MUMBLE_LINK] = resMumble;
 	}
 	DataLink::Mutex.unlock();
-	NexusLink = (NexusLinkData*)DataLink::ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData));
+
+	std::string nxs;
+	nxs.append(DL_NEXUS_LINK);
+	nxs.append("_");
+	nxs.append(std::to_string(GetCurrentProcessId()));
+	NexusLink = (NexusLinkData*)DataLink::ShareResource(nxs.c_str(), sizeof(NexusLinkData));
 }
 void Shutdown()
 {
