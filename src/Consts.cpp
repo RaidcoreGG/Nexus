@@ -12,6 +12,7 @@ const char* CH_GUI						= "GUI";
 
 /* Keybinds */
 const char* KB_MENU						= "KB_MENU";
+const char* KB_TOGGLEHIDEUI				= "KB_TOGGLEHIDEUI";
 
 /* Textures & Icons */
 const char* ICON_NEXUS					= "ICON_NEXUS";

@@ -43,6 +43,8 @@ namespace GUI
 	extern Texture*						MenuButton;
 	extern Texture*						MenuButtonHover;
 
+	extern bool							IsUIVisible;
+
 	void Initialize();
 	void Shutdown();
 

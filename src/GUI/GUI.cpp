@@ -16,6 +16,8 @@ namespace GUI
 	Texture*					MenuButton{};
 	Texture*					MenuButtonHover{};
 
+	bool						IsUIVisible			= true;
+
 	bool						IsRightClickHeld	= false;
 	bool						IsLeftClickHeld		= false;
 	bool						IsSetup				= false;
@@ -148,33 +150,34 @@ namespace GUI
 			/* new frame end */
 
 			/* draw overlay */
-
-			/* draw menu */
-			QuickAccess::Render();
-
-			/* draw windows */
-			Mutex.lock();
+			if (IsUIVisible)
 			{
-				for (IWindow* wnd : Windows)
+				/* draw menu */
+				QuickAccess::Render();
+
+				/* draw windows */
+				Mutex.lock();
 				{
-					wnd->Render();
+					for (IWindow* wnd : Windows)
+					{
+						wnd->Render();
+					}
 				}
-			}
-			Mutex.unlock();
+				Mutex.unlock();
 
-			/* draw addons*/
-			Loader::Mutex.lock();
-			{
-				for (const auto& [path, addon] : Loader::AddonDefs)
+				/* draw addons*/
+				Loader::Mutex.lock();
 				{
-					if (addon.Definitions->Render) { addon.Definitions->Render(); }
+					for (const auto& [path, addon] : Loader::AddonDefs)
+					{
+						if (addon.Definitions->Render) { addon.Definitions->Render(); }
+					}
 				}
+				Loader::Mutex.unlock();
+
+				/* TODO: RENDER UNDER UI */
+				/* TODO: RENDER OVER UI */
 			}
-			Loader::Mutex.unlock();
-
-			/* TODO: RENDER UNDER UI */
-			/* TODO: RENDER OVER UI */
-
 			/* draw overlay end */
 
 			/* end frame */
@@ -233,6 +236,10 @@ namespace GUI
 		{
 			Menu->Visible = !Menu->Visible;
 			return;
+		}
+		else if (aIdentifier == KB_TOGGLEHIDEUI)
+		{
+			IsUIVisible = !IsUIVisible;
 		}
 	}
 	void ReceiveTextures(std::string aIdentifier, Texture* aTexture)
@@ -380,6 +387,7 @@ namespace GUI
 
 		/* register keybinds */
 		Keybinds::Register(KB_MENU, ProcessKeybind, "CTRL+O");
+		Keybinds::Register(KB_TOGGLEHIDEUI, ProcessKeybind, "CTRL+H");
 
 		/* load icons */
 		TextureLoader::LoadFromResource(ICON_NEXUS, RES_ICON_NEXUS, AddonHostModule, nullptr);

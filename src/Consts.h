@@ -13,6 +13,7 @@ extern const char* CH_GUI;
 
 /* Keybinds */
 extern const char* KB_MENU;
+extern const char* KB_TOGGLEHIDEUI;
 
 /* Textures & Icons */
 extern const char* ICON_NEXUS;
