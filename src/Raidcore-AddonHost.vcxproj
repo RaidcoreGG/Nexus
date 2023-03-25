@@ -146,7 +146,6 @@
     <None Include="exports.def" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="Menomonia.ttf" />
     <Font Include="Resources\Menomonia.ttf" />
     <Font Include="Resources\TrebuchetMS.ttf" />
   </ItemGroup>

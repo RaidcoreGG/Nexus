@@ -76,6 +76,18 @@
     <Filter Include="GUI\Widgets\Menu">
       <UniqueIdentifier>{eeef4dfb-cf8e-4d2e-a1e7-657fe0b03f13}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Fonts">
+      <UniqueIdentifier>{1893bf7b-bd45-42e7-ad87-1a27b5dd5c62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Images">
+      <UniqueIdentifier>{df3c3a30-d02f-4c04-a27c-cfaafff031bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Images\Menu">
+      <UniqueIdentifier>{ba4ee355-8394-4c12-b6c5-e9b9dcfda39d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Images\Shortcuts">
+      <UniqueIdentifier>{c46e3486-9b1a-4bf8-bc57-adcaf1023e47}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="entry.cpp">
@@ -462,11 +474,12 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Font Include="Menomonia.ttf">
-      <Filter>Resource Files</Filter>
+    <Font Include="Resources\Menomonia.ttf">
+      <Filter>Resource Files\Fonts</Filter>
     </Font>
-    <Font Include="Resources\Menomonia.ttf" />
-    <Font Include="Resources\TrebuchetMS.ttf" />
+    <Font Include="Resources\TrebuchetMS.ttf">
+      <Filter>Resource Files\Fonts</Filter>
+    </Font>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def">
@@ -474,26 +487,26 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Resources\ICON_GENERIC.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Resources\ICON_GENERIC_HOVER.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Resources\ICON_NEXUS.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Resources\ICON_NEXUS_HOVER.png">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="Resources\TEX_MENU_BACKGROUND.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Images\Menu</Filter>
     </Image>
     <Image Include="Resources\TEX_MENU_BUTTON.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Images\Menu</Filter>
     </Image>
     <Image Include="Resources\TEX_MENU_BUTTON_HOVER.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Images\Menu</Filter>
+    </Image>
+    <Image Include="Resources\ICON_GENERIC.png">
+      <Filter>Resource Files\Images\Shortcuts</Filter>
+    </Image>
+    <Image Include="Resources\ICON_GENERIC_HOVER.png">
+      <Filter>Resource Files\Images\Shortcuts</Filter>
+    </Image>
+    <Image Include="Resources\ICON_NEXUS.png">
+      <Filter>Resource Files\Images\Shortcuts</Filter>
+    </Image>
+    <Image Include="Resources\ICON_NEXUS_HOVER.png">
+      <Filter>Resource Files\Images\Shortcuts</Filter>
     </Image>
   </ItemGroup>
 </Project>
