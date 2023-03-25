@@ -21,10 +21,10 @@
     <ClCompile Include="GUI\Widgets\Addons\AddonItem.cpp" />
     <ClCompile Include="GUI\Widgets\Addons\AddonsWindow.cpp" />
     <ClCompile Include="GUI\Widgets\Debug\DebugWindow.cpp" />
-    <ClCompile Include="GUI\Widgets\Keybinds\KeybindsWindow.cpp" />
     <ClCompile Include="GUI\Widgets\Log\LogWindow.cpp" />
     <ClCompile Include="GUI\Widgets\Menu\Menu.cpp" />
     <ClCompile Include="GUI\Widgets\Menu\MenuItem.cpp" />
+    <ClCompile Include="GUI\Widgets\Options\OptionsWindow.cpp" />
     <ClCompile Include="GUI\Widgets\Overlay\MumbleOverlay.cpp" />
     <ClCompile Include="GUI\Widgets\QuickAccess\QuickAccess.cpp" />
     <ClCompile Include="Hooks.cpp" />
@@ -73,10 +73,10 @@
     <ClInclude Include="GUI\Widgets\Addons\AddonItem.h" />
     <ClInclude Include="GUI\Widgets\Addons\AddonsWindow.h" />
     <ClInclude Include="GUI\Widgets\Debug\DebugWindow.h" />
-    <ClInclude Include="GUI\Widgets\Keybinds\KeybindsWindow.h" />
     <ClInclude Include="GUI\Widgets\Log\LogWindow.h" />
     <ClInclude Include="GUI\Widgets\Menu\Menu.h" />
     <ClInclude Include="GUI\Widgets\Menu\MenuItem.h" />
+    <ClInclude Include="GUI\Widgets\Options\OptionsWindow.h" />
     <ClInclude Include="GUI\Widgets\Overlay\MumbleOverlay.h" />
     <ClInclude Include="GUI\Widgets\QuickAccess\FuncDefs.h" />
     <ClInclude Include="GUI\Widgets\QuickAccess\QuickAccess.h" />

@@ -22,7 +22,7 @@
 
 #include "Widgets/Menu/Menu.h"
 #include "Widgets/Addons/AddonsWindow.h"
-#include "Widgets/Keybinds/KeybindsWindow.h"
+#include "Widgets/Options/OptionsWindow.h"
 #include "Widgets/Log/LogWindow.h"
 #include "Widgets/Debug/DebugWindow.h"
 #include "Widgets/About/AboutBox.h"

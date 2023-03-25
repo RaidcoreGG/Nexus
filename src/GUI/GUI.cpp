@@ -367,20 +367,20 @@ namespace GUI
 		Menu = new MenuWindow();
 		AddonsWindow* addonsWnd = new AddonsWindow();
 		LogWindow* logWnd = new LogWindow(); RegisterLogger(logWnd); logWnd->SetLogLevel(ELogLevel::ALL);
-		KeybindsWindow* kbWnd = new KeybindsWindow();
+		OptionsWindow* opsWnd = new OptionsWindow();
 		DebugWindow* dbgWnd = new DebugWindow();
 		AboutBox* aboutWnd = new AboutBox();
 
 		AddWindow(Menu);
 		AddWindow(addonsWnd);
-		AddWindow(kbWnd);
+		AddWindow(opsWnd);
 		AddWindow(logWnd);
 		AddWindow(dbgWnd);
 		AddWindow(aboutWnd);
 
 		/* add categories ; aCategory: 0 = Main ; 1 = Debug ; 2 = Info */
 		Menu->AddMenuItem("Addons", &addonsWnd->Visible);
-		Menu->AddMenuItem("Keybinds", &kbWnd->Visible);
+		Menu->AddMenuItem("Options", &opsWnd->Visible);
 		Menu->AddMenuItem("Log", &logWnd->Visible);
 		Menu->AddMenuItem("Debug", &dbgWnd->Visible);
 		Menu->AddMenuItem("About", &aboutWnd->Visible);

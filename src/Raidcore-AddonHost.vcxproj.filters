@@ -55,9 +55,6 @@
     <Filter Include="GUI\Widgets\About">
       <UniqueIdentifier>{f4d01667-1986-4ab9-96e8-a783ecd77243}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GUI\Widgets\Keybinds">
-      <UniqueIdentifier>{b211fbda-c7b4-4d75-b2c9-6801eab1bc0a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GUI\Widgets\Overlay">
       <UniqueIdentifier>{f86218d1-7120-4b72-9d7e-c97dbee918c7}</UniqueIdentifier>
     </Filter>
@@ -87,6 +84,9 @@
     </Filter>
     <Filter Include="Resource Files\Images\Shortcuts">
       <UniqueIdentifier>{c46e3486-9b1a-4bf8-bc57-adcaf1023e47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Widgets\Options">
+      <UniqueIdentifier>{b211fbda-c7b4-4d75-b2c9-6801eab1bc0a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -195,9 +195,6 @@
     <ClCompile Include="Loader\AddonDefinition.cpp">
       <Filter>Loader</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\Keybinds\KeybindsWindow.cpp">
-      <Filter>GUI\Widgets\Keybinds</Filter>
-    </ClCompile>
     <ClCompile Include="GUI\Widgets\Debug\DebugWindow.cpp">
       <Filter>GUI\Widgets\Debug</Filter>
     </ClCompile>
@@ -227,6 +224,9 @@
     </ClCompile>
     <ClCompile Include="GUI\Widgets\Menu\Menu.cpp">
       <Filter>GUI\Widgets\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Widgets\Options\OptionsWindow.cpp">
+      <Filter>GUI\Widgets\Options</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -386,9 +386,6 @@
     <ClInclude Include="GUI\Widgets\Addons\AddonsWindow.h">
       <Filter>GUI\Widgets\Addons</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\Keybinds\KeybindsWindow.h">
-      <Filter>GUI\Widgets\Keybinds</Filter>
-    </ClInclude>
     <ClInclude Include="GUI\Widgets\Debug\DebugWindow.h">
       <Filter>GUI\Widgets\Debug</Filter>
     </ClInclude>
@@ -466,6 +463,9 @@
     </ClInclude>
     <ClInclude Include="GUI\Widgets\Menu\Menu.h">
       <Filter>GUI\Widgets\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Widgets\Options\OptionsWindow.h">
+      <Filter>GUI\Widgets\Options</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

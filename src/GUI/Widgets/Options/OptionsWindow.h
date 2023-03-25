@@ -15,7 +15,7 @@
 
 namespace GUI
 {
-	class KeybindsWindow : public IWindow
+	class OptionsWindow : public IWindow
 	{
 		public:
 		void Render();
