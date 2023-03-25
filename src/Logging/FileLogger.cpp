@@ -2,7 +2,7 @@
 
 FileLogger::FileLogger(const char* aPath)
 {
-	File.open(aPath);
+	File.open(aPath, std::ios_base::out, SH_DENYWR);
 }
 
 FileLogger::~FileLogger()
