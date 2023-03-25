@@ -11,7 +11,6 @@ namespace Path
 	extern char D_GW2							[];
 	extern char D_GW2_ADDONS					[];
 	extern char D_GW2_ADDONS_RAIDCORE			[];
-	extern char D_GW2_ADDONS_RAIDCORE_FONTS		[];
 	extern char D_GW2_ADDONS_RAIDCORE_LOCALES	[];
 
 	extern char F_HOST_DLL						[];

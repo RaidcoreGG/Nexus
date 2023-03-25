@@ -5,7 +5,6 @@ namespace Path
 	char D_GW2							[MAX_PATH]{};
 	char D_GW2_ADDONS					[MAX_PATH]{};
 	char D_GW2_ADDONS_RAIDCORE			[MAX_PATH]{};
-	char D_GW2_ADDONS_RAIDCORE_FONTS	[MAX_PATH]{};
 	char D_GW2_ADDONS_RAIDCORE_LOCALES	[MAX_PATH]{};
 
 	char F_HOST_DLL						[MAX_PATH]{};
@@ -25,12 +24,10 @@ namespace Path
 		PathGetDirectoryName(Path::F_HOST_DLL, Path::D_GW2);												/* get current directory */
 		PathCopyAndAppend(Path::D_GW2, Path::D_GW2_ADDONS, "addons");										/* get addons path */
 		PathCopyAndAppend(Path::D_GW2_ADDONS, Path::D_GW2_ADDONS_RAIDCORE, "Raidcore");						/* get addons Raidcore path */
-		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::D_GW2_ADDONS_RAIDCORE_FONTS, "Fonts");			/* get addons Raidcore path */
 		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::D_GW2_ADDONS_RAIDCORE_LOCALES, "Locales");		/* get addons Raidcore path */
 
 		/* ensure folder tree*/
 		CreateDirectoryA(Path::D_GW2_ADDONS_RAIDCORE, nullptr);												/* ensure Raidcore dir */
-		CreateDirectoryA(Path::D_GW2_ADDONS_RAIDCORE_FONTS, nullptr);										/* ensure Raidcore/Fonts dir */
 		CreateDirectoryA(Path::D_GW2_ADDONS_RAIDCORE_LOCALES, nullptr);										/* ensure Raidcore/Locales dir */
 
 		/* ensure files */
