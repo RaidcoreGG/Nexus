@@ -14,6 +14,7 @@
 
 #include "../Keybinds/KeybindHandler.h"
 #include "../Loader/Loader.h"
+#include "../Settings/Settings.h"
 
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_extensions.h"
@@ -38,6 +39,7 @@ namespace GUI
 	extern std::mutex					Mutex;
 	extern std::vector<IWindow*>		Windows;
 	extern std::map<EFont, ImFont*>		FontIndex;
+	extern float						FontSize;
 
 	extern Texture*						MenuBG;
 	extern Texture*						MenuButton;

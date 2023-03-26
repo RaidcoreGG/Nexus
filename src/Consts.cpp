@@ -1,5 +1,11 @@
 #include "Consts.h"
 
+/* UI Scale */
+const float SC_SMALL					= 0.90f;
+const float SC_NORMAL					= 1.00f;
+const float SC_LARGE					= 1.11f;
+const float SC_LARGER					= 1.22f;
+
 /* Channels */
 const char* CH_CORE						= "Core";
 const char* CH_EVENTS					= "Events";

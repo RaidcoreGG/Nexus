@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="API\APIController.cpp" />
     <ClCompile Include="Consts.cpp" />
     <ClCompile Include="core.cpp" />
     <ClCompile Include="DataLink\DataLink.cpp" />
@@ -53,12 +54,14 @@
     <ClCompile Include="Mumble\Mumble.cpp" />
     <ClCompile Include="Paths.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="Settings\Settings.cpp" />
     <ClCompile Include="Shared.cpp" />
     <ClCompile Include="State.cpp" />
     <ClCompile Include="Textures\TextureLoader.cpp" />
     <ClCompile Include="types.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="API\APIController.h" />
     <ClInclude Include="Consts.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="DataLink\DataLink.h" />
@@ -130,6 +133,7 @@
     <ClInclude Include="Mumble\Mumble.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Settings\Settings.h" />
     <ClInclude Include="Shared.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="stb\stb_image.h" />

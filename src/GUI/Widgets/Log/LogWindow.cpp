@@ -7,6 +7,11 @@ namespace GUI
 
 	const char* filterLevels[] = { "Critical", "Warning", "Info", "Debug", "Trace", "All" };
 
+	LogWindow::LogWindow(ELogLevel aLogLevel)
+	{
+		LogLevel = aLogLevel;
+	}
+
 	void LogWindow::Render()
 	{
 		if (!Visible) { return; }

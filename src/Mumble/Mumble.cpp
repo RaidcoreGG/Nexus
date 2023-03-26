@@ -93,14 +93,7 @@ namespace Mumble
 					MumbleIdentity->UISize			= j["uisz"].get<unsigned>();
 
 					/* update ui scaling factor */
-					switch (MumbleIdentity->UISize)
-					{
-						case 0: Renderer::Scaling = 0.90f; break; // Small
-						default:
-						case 1: Renderer::Scaling = 1.00f; break; // Normal
-						case 2: Renderer::Scaling = 1.11f; break; // Large
-						case 3: Renderer::Scaling = 1.22f; break; // Larger
-					}
+					Renderer::Scaling = GetScalingFactor(MumbleIdentity->UISize);
 
 					/* notify */
 					if (*MumbleIdentity != prevIdentity)
@@ -132,6 +125,18 @@ namespace Mumble
 			}
 
 			Sleep(50);
+		}
+	}
+
+	float GetScalingFactor(unsigned aSize)
+	{
+		switch (aSize)
+		{
+			case 0: return Renderer::Scaling = SC_SMALL;;	// Small
+			default:
+			case 1: return Renderer::Scaling = SC_NORMAL;	// Normal
+			case 2: return Renderer::Scaling = SC_LARGE;	// Large
+			case 3: return Renderer::Scaling = SC_LARGER;	// Larger
 		}
 	}
 }

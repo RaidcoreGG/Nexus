@@ -14,7 +14,7 @@ namespace Renderer
 	extern ID3D11RenderTargetView*	RenderTargetView;
 	extern ImGuiContext*			GuiContext;
 
-	extern HWND						WindowHandle; /* GW2's window handle*/
+	extern HWND						WindowHandle;		/* GW2's window handle*/
 
 	extern unsigned					Width;
 	extern unsigned					Height;

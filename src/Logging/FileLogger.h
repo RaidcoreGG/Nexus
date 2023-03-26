@@ -8,7 +8,7 @@
 class FileLogger : public virtual ILogger
 {
 	public:
-		FileLogger(const char* aPath);
+		FileLogger(ELogLevel aLogLevel, const char* aPath);
 		~FileLogger();
 
 		void LogMessage(LogEntry aLogEntry);

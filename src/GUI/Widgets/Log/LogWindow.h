@@ -20,6 +20,8 @@ namespace GUI
 	class LogWindow : public IWindow, public virtual ILogger
 	{
 	public:
+		LogWindow(ELogLevel aLogLevel);
+
 		void Render();
 		void LogMessage(LogEntry aLogEntry);
 	};

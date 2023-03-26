@@ -3,8 +3,9 @@
 HANDLE hConsole;
 FILE* iobuf;
 
-ConsoleLogger::ConsoleLogger()
+ConsoleLogger::ConsoleLogger(ELogLevel aLogLevel)
 {
+	LogLevel = aLogLevel;
 	AllocConsole();
 	freopen_s(&iobuf, "CONIN$", "r", stdin);
 	freopen_s(&iobuf, "CONOUT$", "w", stderr);

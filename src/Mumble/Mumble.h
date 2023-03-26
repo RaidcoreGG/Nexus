@@ -24,6 +24,8 @@ namespace Mumble
 
 	void UpdateIdentity();
 	void UpdateState();
+
+	float GetScalingFactor(unsigned aSize);
 };
 
 #endif

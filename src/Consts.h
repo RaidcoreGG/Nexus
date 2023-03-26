@@ -1,6 +1,12 @@
 #ifndef CONSTS_H
 #define CONSTS_H
 
+/* UI Scale */
+extern const float SC_SMALL;
+extern const float SC_NORMAL;
+extern const float SC_LARGE;
+extern const float SC_LARGER;
+
 /* Channels */
 extern const char* CH_CORE;
 extern const char* CH_EVENTS;

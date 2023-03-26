@@ -10,6 +10,8 @@ namespace Path
 {
 	extern char D_GW2							[];
 	extern char D_GW2_ADDONS					[];
+	extern char D_GW2_ADDONS_COMMON				[];
+	extern char D_GW2_ADDONS_COMMON_API_V2		[];
 	extern char D_GW2_ADDONS_RAIDCORE			[];
 	extern char D_GW2_ADDONS_RAIDCORE_LOCALES	[];
 
@@ -21,6 +23,8 @@ namespace Path
 	extern char F_LOG							[];
 	extern char F_KEYBINDS						[];
 	extern char F_FONT							[];
+	extern char F_SETTINGS						[];
+	extern char F_APIKEYS						[];
 
 	void Initialize(HMODULE aBaseModule);
 }

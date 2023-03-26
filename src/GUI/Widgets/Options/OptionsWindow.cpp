@@ -1,8 +1,11 @@
 #include "OptionsWindow.h"
 
+#include "../../GUI.h"
+
 namespace GUI
 {
 	std::string CurrentlyEditing;
+	char CurrentAPIKey[73]{};
 
 	void OptionsWindow::Render()
 	{
@@ -13,6 +16,33 @@ namespace GUI
 		{
 			if (ImGui::BeginTabBar("OptionsTabBar", ImGuiTabBarFlags_None))
 			{
+				if (ImGui::BeginTabItem("General"))
+				{
+					{
+						ImGui::BeginChild("##GeneralTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+
+						// new item
+
+						ImGui::EndChild();
+					}
+
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem("Style"))
+				{
+					{
+						ImGui::BeginChild("##StyleTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+
+						ImGui::Text("Font Size: ");
+						ImGui::SameLine();
+						ImGui::InputFloat("##fontsize", &GUI::FontSize);
+						ImGui::TooltipGeneric("Changing font size requires a restart. You can preview different fonts and sizes with the \"Preview\" button.");
+
+						ImGui::EndChild();
+					}
+
+					ImGui::EndTabItem();
+				}
 				if (ImGui::BeginTabItem("Keybinds"))
 				{
 					{
@@ -115,18 +145,54 @@ namespace GUI
 
 					ImGui::EndTabItem();
 				}
-				/*if (ImGui::BeginTabItem("Meme"))
+				if (ImGui::BeginTabItem("API"))
 				{
 					{
-						ImGui::BeginChild("##MemeTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+						ImGui::BeginChild("##APITabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-						// new item
+						ImGui::InputText("##currentapikey", CurrentAPIKey, 73);
+						ImGui::SameLine();
+						if (ImGui::Button("Add"))
+						{
+							std::string str = CurrentAPIKey;
+
+							if (std::regex_match(str, std::regex("[A-F\\d]{8}-([A-F\\d]{4}-){3}[A-F\\d]{20}(-[A-F\\d]{4}){3}-[A-F\\d]{12}")))
+							{
+								API::AddKey(str);
+							}
+						}
+
+						bool shouldSave = false;
+
+						if (ImGui::BeginTable("table_apikeys", 2, ImGuiTableFlags_BordersInnerH))
+						{
+							API::Mutex.lock();
+							{
+								for (std::string key : API::APIKeys)
+								{
+									ImGui::TableNextRow();
+									ImGui::TableSetColumnIndex(0);
+									ImGui::Text("%.18s", key.c_str());
+
+									ImGui::TableSetColumnIndex(1);
+									if (ImGui::Button(("Remove##"+key).c_str())) // ##+key for unique id
+									{
+										// copy paste of the API::Save() code because of mutex shenanigans
+										API::APIKeys.erase(std::find(API::APIKeys.begin(), API::APIKeys.end(), key));
+										shouldSave = true;
+									}
+								}
+							}
+							API::Mutex.unlock();
+
+							ImGui::EndTable();
+						}
 
 						ImGui::EndChild();
 					}
 
 					ImGui::EndTabItem();
-				}*/
+				}
 				ImGui::EndTabBar();
 			}
 		}

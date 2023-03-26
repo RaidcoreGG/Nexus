@@ -11,6 +11,7 @@ namespace GUI
 	std::mutex					Mutex;
 	std::vector<IWindow*>		Windows;
 	std::map<EFont, ImFont*>	FontIndex;
+	float						FontSize;
 
 	Texture*					MenuBG{};
 	Texture*					MenuButton{};
@@ -21,7 +22,7 @@ namespace GUI
 	bool						IsRightClickHeld	= false;
 	bool						IsLeftClickHeld		= false;
 	bool						IsSetup				= false;
-	int							LastScaling;
+	float						LastScaling;
 	MenuWindow*					Menu;
 
 	void Initialize()
@@ -53,6 +54,8 @@ namespace GUI
 			ImGui_ImplDX11_Shutdown();
 			ImGui_ImplWin32_Shutdown();
 			if (Renderer::RenderTargetView) { Renderer::RenderTargetView->Release(); Renderer::RenderTargetView = NULL; }
+
+			Settings::Settings[OPT_FONTSIZE] = FontSize;
 		}
 	}
 
@@ -226,8 +229,6 @@ namespace GUI
 				FontUI	= FontIndex[EFont::Trebuchet_Larger];
 				break;
 		}
-
-		LastScaling = MumbleIdentity->UISize;
 	}
 
 	void ProcessKeybind(std::string aIdentifier)
@@ -259,9 +260,13 @@ namespace GUI
 	}
 	void OnMumbleIdentityChanged(void* aEventArgs)
 	{
-		if (MumbleIdentity->UISize != LastScaling)
+		if (Renderer::Scaling != LastScaling && IsGameplay)
 		{
 			ResizeFonts();
+
+			LastScaling = Renderer::Scaling;
+			Settings::Settings[OPT_LASTUISCALE] = Renderer::Scaling;
+			Settings::Save();
 		}
 	}
 
@@ -272,7 +277,20 @@ namespace GUI
 		/* add user font, or fallback to default */
 		if (std::filesystem::exists(Path::F_FONT))
 		{
-			io.Fonts->AddFontFromFileTTF(Path::F_FONT, 16.0f);
+			FontSize = 16.0f;
+			if (!Settings::Settings.is_null())
+			{
+				if (!Settings::Settings[OPT_FONTSIZE].is_null())
+				{
+					FontSize = Settings::Settings[OPT_FONTSIZE].get<float>();
+				}
+				else
+				{
+					Settings::Settings[OPT_FONTSIZE] = FontSize;
+					Settings::Save();
+				}
+			}
+			io.Fonts->AddFontFromFileTTF(Path::F_FONT, FontSize);
 		}
 		else
 		{
@@ -357,8 +375,6 @@ namespace GUI
 	}
 	void Setup()
 	{
-		LastScaling = Renderer::Scaling;
-
 		ConfigureFonts();
 
 		Events::Subscribe(EV_MUMBLE_IDENTITY_UPDATED, OnMumbleIdentityChanged);
@@ -366,7 +382,8 @@ namespace GUI
 		/* set up and add windows */
 		Menu = new MenuWindow();
 		AddonsWindow* addonsWnd = new AddonsWindow();
-		LogWindow* logWnd = new LogWindow(); RegisterLogger(logWnd); logWnd->SetLogLevel(ELogLevel::ALL);
+		LogWindow* logWnd = new LogWindow(ELogLevel::ALL);
+		RegisterLogger(logWnd);
 		OptionsWindow* opsWnd = new OptionsWindow();
 		DebugWindow* dbgWnd = new DebugWindow();
 		AboutBox* aboutWnd = new AboutBox();
@@ -402,6 +419,18 @@ namespace GUI
 
 		/* add shortcut */
 		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "Nexus Menu");
+
+		if (Renderer::Scaling == 0)
+		{
+			if (!Settings::Settings.is_null())
+			{
+				if (!Settings::Settings[OPT_LASTUISCALE].is_null())
+				{
+					LastScaling = Settings::Settings[OPT_LASTUISCALE].get<float>();
+					Renderer::Scaling = Settings::Settings[OPT_LASTUISCALE].get<float>();
+				}
+			}
+		}
 
 		IsSetup = true;
 	}

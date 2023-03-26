@@ -4,6 +4,8 @@ namespace Path
 {
 	char D_GW2							[MAX_PATH]{};
 	char D_GW2_ADDONS					[MAX_PATH]{};
+	char D_GW2_ADDONS_COMMON			[MAX_PATH]{};
+	char D_GW2_ADDONS_COMMON_API_V2		[MAX_PATH]{};
 	char D_GW2_ADDONS_RAIDCORE			[MAX_PATH]{};
 	char D_GW2_ADDONS_RAIDCORE_LOCALES	[MAX_PATH]{};
 
@@ -15,6 +17,8 @@ namespace Path
 	char F_LOG							[MAX_PATH]{};
 	char F_KEYBINDS						[MAX_PATH]{};
 	char F_FONT							[MAX_PATH]{};
+	char F_SETTINGS						[MAX_PATH]{};
+	char F_APIKEYS						[MAX_PATH]{};
 
 	void Initialize(HMODULE aBaseModule)
 	{
@@ -23,17 +27,23 @@ namespace Path
 		/* directories */
 		PathGetDirectoryName(Path::F_HOST_DLL, Path::D_GW2);												/* get current directory */
 		PathCopyAndAppend(Path::D_GW2, Path::D_GW2_ADDONS, "addons");										/* get addons path */
-		PathCopyAndAppend(Path::D_GW2_ADDONS, Path::D_GW2_ADDONS_RAIDCORE, "Raidcore");						/* get addons Raidcore path */
-		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::D_GW2_ADDONS_RAIDCORE_LOCALES, "Locales");		/* get addons Raidcore path */
+		PathCopyAndAppend(Path::D_GW2_ADDONS, Path::D_GW2_ADDONS_COMMON, "common");							/* get addons/common path */
+		PathCopyAndAppend(Path::D_GW2_ADDONS_COMMON, Path::D_GW2_ADDONS_COMMON_API_V2, "api/v2");			/* get addons/common path */
+		PathCopyAndAppend(Path::D_GW2_ADDONS, Path::D_GW2_ADDONS_RAIDCORE, "Raidcore");						/* get addons/Raidcore path */
+		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::D_GW2_ADDONS_RAIDCORE_LOCALES, "Locales");		/* get addons/Raidcore/Locales path */
 
 		/* ensure folder tree*/
-		CreateDirectoryA(Path::D_GW2_ADDONS_RAIDCORE, nullptr);												/* ensure Raidcore dir */
-		CreateDirectoryA(Path::D_GW2_ADDONS_RAIDCORE_LOCALES, nullptr);										/* ensure Raidcore/Locales dir */
+		CreateDirectoryA(Path::D_GW2_ADDONS, nullptr);														/* ensure addons dir */
+		CreateDirectoryA(Path::D_GW2_ADDONS_COMMON, nullptr);												/* ensure addons/common dir */
+		CreateDirectoryA(Path::D_GW2_ADDONS_RAIDCORE, nullptr);												/* ensure addons/Raidcore dir */
+		CreateDirectoryA(Path::D_GW2_ADDONS_RAIDCORE_LOCALES, nullptr);										/* ensure addons/Raidcore/Locales dir */
 
-		/* ensure files */
+		/* files */
 		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_LOG, "AddonHost.log");						/* get log path */
 		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_KEYBINDS, "Keybinds.json");					/* get keybinds path */
-		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_FONT, "font.ttf");							/* get keybinds path */
+		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_FONT, "Font.ttf");							/* get font path */
+		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::F_SETTINGS, "Settings.json");					/* get settings path */
+		PathCopyAndAppend(Path::D_GW2_ADDONS_COMMON, Path::F_APIKEYS, "APIKeys.json");						/* get apikeys path */
 
 		/* static paths */
 		PathCopyAndAppend(Path::D_GW2, Path::F_TEMP_DLL, "d3d11.tmp");										/* get temp dll path */

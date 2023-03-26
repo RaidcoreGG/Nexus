@@ -12,5 +12,5 @@ namespace Renderer
 
 	unsigned				Width				= 0;
 	unsigned				Height				= 0;
-	float					Scaling				= 1.00f;
+	float					Scaling				= 0;
 }

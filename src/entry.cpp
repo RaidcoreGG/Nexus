@@ -25,13 +25,15 @@
 #include "DataLink/DataLink.h"
 #include "Textures/TextureLoader.h"
 #include "Loader/NexusLinkData.h"
+#include "Settings/Settings.h"
+#include "API/APIController.h"
 
 #define ENABLE_CHAINLOAD
 
 /* handles */
-HMODULE			hGW2		= nullptr;
-HMODULE			hD3D11		= nullptr;
-HMODULE			hSysD3D11	= nullptr;
+HMODULE			hGW2			= nullptr;
+HMODULE			hD3D11			= nullptr;
+HMODULE			hSysD3D11		= nullptr;
 
 NexusLinkData*	NexusLink;
 
@@ -62,13 +64,11 @@ void Initialize()
 	/* setup loggers */
 	if (State::IsConsoleEnabled)
 	{
-		ConsoleLogger* cLog = new ConsoleLogger();
-		cLog->SetLogLevel(ELogLevel::ALL);
+		ConsoleLogger* cLog = new ConsoleLogger(ELogLevel::ALL);
 		RegisterLogger(cLog);
 	}
 
-	FileLogger* fLog = new FileLogger(Path::F_LOG);
-	fLog->SetLogLevel(ELogLevel::ALL);
+	FileLogger* fLog = new FileLogger(ELogLevel::ALL, Path::F_LOG);
 	RegisterLogger(fLog);
 
 	LogHandler::Initialize();
@@ -78,6 +78,8 @@ void Initialize()
 
 	MH_Initialize();
 	Keybinds::Load();
+	Settings::Load();
+	API::Load();
 
 	/* manually add mumble to datalink */
 	LinkedResource resMumble{ Mumble::GetHandle(), MumbleLink, sizeof(LinkedMem) };
@@ -100,16 +102,13 @@ void Shutdown()
 		State::AddonHost = ggState::SHUTDOWN;
 
 		GUI::Shutdown();
-
 		Mumble::Shutdown();
-
 		MH_Uninitialize();
-
 		Loader::Shutdown();
-
 		DataLink::Shutdown();
-
 		Keybinds::Save();
+		Settings::Save();
+		API::Save();
 
 		if (hD3D11)		{ FreeLibrary(hD3D11); }
 		if (hSysD3D11)	{ FreeLibrary(hSysD3D11); }

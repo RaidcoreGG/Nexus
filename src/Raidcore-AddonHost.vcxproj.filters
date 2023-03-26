@@ -88,6 +88,12 @@
     <Filter Include="GUI\Widgets\Options">
       <UniqueIdentifier>{b211fbda-c7b4-4d75-b2c9-6801eab1bc0a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Settings">
+      <UniqueIdentifier>{6eacccbc-bce6-44c6-b183-963cda72c287}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API">
+      <UniqueIdentifier>{e65ccd89-40e0-4106-92d5-9e47ea8f3189}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="entry.cpp">
@@ -227,6 +233,12 @@
     </ClCompile>
     <ClCompile Include="GUI\Widgets\Options\OptionsWindow.cpp">
       <Filter>GUI\Widgets\Options</Filter>
+    </ClCompile>
+    <ClCompile Include="Settings\Settings.cpp">
+      <Filter>Settings</Filter>
+    </ClCompile>
+    <ClCompile Include="API\APIController.cpp">
+      <Filter>API</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -466,6 +478,12 @@
     </ClInclude>
     <ClInclude Include="GUI\Widgets\Options\OptionsWindow.h">
       <Filter>GUI\Widgets\Options</Filter>
+    </ClInclude>
+    <ClInclude Include="Settings\Settings.h">
+      <Filter>Settings</Filter>
+    </ClInclude>
+    <ClInclude Include="API\APIController.h">
+      <Filter>API</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -48,7 +48,7 @@ namespace Events
 		{
 			for (auto& [identifier, consumers] : Registry)
 			{
-				int i = consumers.size() - 1;
+				size_t i = consumers.size() - 1;
 				while (i >= 0)
 				{
 					if (consumers[i] >= aStartAddress && consumers[i] <= aEndAddress)

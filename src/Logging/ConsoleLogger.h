@@ -10,7 +10,7 @@
 class ConsoleLogger : public virtual ILogger
 {
 	public:
-		ConsoleLogger();
+		ConsoleLogger(ELogLevel aLogLevel);
 		~ConsoleLogger();
 
 		void LogMessage(LogEntry aLogEntry);
