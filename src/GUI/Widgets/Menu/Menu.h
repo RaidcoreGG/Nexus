@@ -9,6 +9,7 @@
 #include "../../../State.h"
 
 #include "../../../resource.h"
+#include "../../../Textures/Texture.h"
 
 #include "../../../imgui/imgui.h"
 #include "../../../imgui/imgui_extensions.h"
@@ -23,6 +24,10 @@ namespace GUI
 		public:
 		std::mutex Mutex;
 		std::vector<MenuItem*> MenuItems;
+
+		Texture* MenuBG;
+		Texture* MenuButton;
+		Texture* MenuButtonHover;
 
 		void Render();
 		void AddMenuItem(const char* aLabel, bool* aToggle);

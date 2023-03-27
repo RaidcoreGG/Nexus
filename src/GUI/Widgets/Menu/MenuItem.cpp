@@ -4,7 +4,7 @@
 
 namespace GUI
 {
-	bool MenuItem::Render()
+	bool MenuItem::Render(Texture* aBackground, Texture* aBackgroundHover)
 	{
 		bool result = false;
 
@@ -13,7 +13,7 @@ namespace GUI
 		float width = 190 * Renderer::Scaling;
 		float height = 26 * Renderer::Scaling;
 
-		if (MenuButton && MenuButtonHover)
+		if (aBackground && aBackgroundHover)
 		{
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
@@ -29,7 +29,7 @@ namespace GUI
 
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f }); // smol checkbox
 			ImGui::SetCursorPos(pos);
-			if (ImGui::ImageButton(!IsHovering ? MenuButton->Resource : MenuButtonHover->Resource, ImVec2(width, height)))
+			if (ImGui::ImageButton(!IsHovering ? aBackground->Resource : aBackgroundHover->Resource, ImVec2(width, height)))
 			{
 				*(Toggle) = !*(Toggle);
 				result = true;

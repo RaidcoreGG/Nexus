@@ -41,10 +41,6 @@ namespace GUI
 	extern std::map<EFont, ImFont*>		FontIndex;
 	extern float						FontSize;
 
-	extern Texture*						MenuBG;
-	extern Texture*						MenuButton;
-	extern Texture*						MenuButtonHover;
-
 	extern bool							IsUIVisible;
 
 	void Initialize();

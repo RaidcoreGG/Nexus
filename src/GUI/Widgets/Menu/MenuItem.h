@@ -18,7 +18,7 @@ namespace GUI
 		bool*			Toggle;
 		bool			IsHovering;
 
-		bool Render();
+		bool			Render(Texture* aBackground, Texture* aBackgroundHover);
 	};
 }
 

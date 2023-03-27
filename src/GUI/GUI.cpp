@@ -23,7 +23,6 @@ namespace GUI
 	bool						IsLeftClickHeld		= false;
 	bool						IsSetup				= false;
 	float						LastScaling;
-	MenuWindow*					Menu;
 
 	void Initialize()
 	{
@@ -118,12 +117,12 @@ namespace GUI
 					case WM_KEYDOWN:
 					case WM_SYSKEYDOWN:
 						if (wParam < 256)
-							io.KeysDown[wParam] = 1;
+							io.KeysDown[wParam] = true;
 						return true;
 					case WM_KEYUP:
 					case WM_SYSKEYUP:
 						if (wParam < 256)
-							io.KeysDown[wParam] = 0;
+							io.KeysDown[wParam] = false;
 						return true;
 					case WM_CHAR:
 						// You can also use ToAscii()+GetKeyboardState() to retrieve characters.
@@ -235,7 +234,7 @@ namespace GUI
 	{
 		if (aIdentifier == KB_MENU)
 		{
-			Menu->Visible = !Menu->Visible;
+			((MenuWindow*)Windows[0])->Visible = !((MenuWindow*)Windows[0])->Visible;
 			return;
 		}
 		else if (aIdentifier == KB_TOGGLEHIDEUI)
@@ -247,15 +246,15 @@ namespace GUI
 	{
 		if (aIdentifier == TEX_MENU_BACKGROUND)
 		{
-			MenuBG = aTexture;
+			((MenuWindow*)Windows[0])->MenuBG = aTexture;
 		}
 		else if (aIdentifier == TEX_MENU_BUTTON)
 		{
-			MenuButton = aTexture;
+			((MenuWindow*)Windows[0])->MenuButton = aTexture;
 		}
 		else if (aIdentifier == TEX_MENU_BUTTON_HOVER)
 		{
-			MenuButtonHover = aTexture;
+			((MenuWindow*)Windows[0])->MenuButtonHover = aTexture;
 		}
 	}
 	void OnMumbleIdentityChanged(void* aEventArgs)
@@ -380,7 +379,7 @@ namespace GUI
 		Events::Subscribe(EV_MUMBLE_IDENTITY_UPDATED, OnMumbleIdentityChanged);
 
 		/* set up and add windows */
-		Menu = new MenuWindow();
+		MenuWindow* menu = new MenuWindow();
 		AddonsWindow* addonsWnd = new AddonsWindow();
 		LogWindow* logWnd = new LogWindow(ELogLevel::ALL);
 		RegisterLogger(logWnd);
@@ -388,7 +387,7 @@ namespace GUI
 		DebugWindow* dbgWnd = new DebugWindow();
 		AboutBox* aboutWnd = new AboutBox();
 
-		AddWindow(Menu);
+		AddWindow(menu);
 		AddWindow(addonsWnd);
 		AddWindow(opsWnd);
 		AddWindow(logWnd);
@@ -396,11 +395,11 @@ namespace GUI
 		AddWindow(aboutWnd);
 
 		/* add categories ; aCategory: 0 = Main ; 1 = Debug ; 2 = Info */
-		Menu->AddMenuItem("Addons", &addonsWnd->Visible);
-		Menu->AddMenuItem("Options", &opsWnd->Visible);
-		Menu->AddMenuItem("Log", &logWnd->Visible);
-		Menu->AddMenuItem("Debug", &dbgWnd->Visible);
-		Menu->AddMenuItem("About", &aboutWnd->Visible);
+		menu->AddMenuItem("Addons", &addonsWnd->Visible);
+		menu->AddMenuItem("Options", &opsWnd->Visible);
+		menu->AddMenuItem("Log", &logWnd->Visible);
+		menu->AddMenuItem("Debug", &dbgWnd->Visible);
+		menu->AddMenuItem("About", &aboutWnd->Visible);
 
 		/* register keybinds */
 		Keybinds::Register(KB_MENU, ProcessKeybind, "CTRL+O");

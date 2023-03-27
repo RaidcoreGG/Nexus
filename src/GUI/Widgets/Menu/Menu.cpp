@@ -24,7 +24,7 @@ namespace GUI
 			{
 				for (MenuItem* mItem : MenuItems)
 				{
-					if (mItem->Render())
+					if (mItem->Render(MenuButton, MenuButtonHover))
 					{
 						/* if they return true, they were pressed -> hide the menu */
 						Visible = false;
