@@ -1,6 +1,7 @@
 #ifndef NEXUSLINKDATA_H
 #define NEXUSLINKDATA_H
 
+/* A structure containing various variables for other addons to use. */
 struct NexusLinkData
 {
 	unsigned	Width;

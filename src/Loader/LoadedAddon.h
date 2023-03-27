@@ -6,6 +6,7 @@
 
 #include "AddonDefinition.h"
 
+/* A structure that holds information about a loaded addon. */
 struct LoadedAddon
 {
 	HMODULE				Module;

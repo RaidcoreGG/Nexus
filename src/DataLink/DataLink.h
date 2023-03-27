@@ -15,10 +15,13 @@ namespace DataLink
 	extern std::mutex Mutex;
 	extern std::map<std::string, LinkedResource> Registry;
 
-	void	Shutdown();														/* Frees all remaining resources */
+	/* Frees all remaining resources */
+	void	Shutdown();
 
-	void*	GetResource(std::string aIdentifier);							/* Retrieves the resource with the given identifier */
-	void*	ShareResource(std::string aIdentifier, size_t aResourceSize);	/* Allocates new memory of the given size and returns a pointer to it and shares with the given identifier */
+	/* Retrieves the resource with the given identifier */
+	void*	GetResource(std::string aIdentifier);
+	/* Allocates new memory of the given size and returns a pointer to it and shares it via the given identifier */
+	void*	ShareResource(std::string aIdentifier, size_t aResourceSize);
 }
 
 #endif

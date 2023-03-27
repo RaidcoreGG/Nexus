@@ -5,6 +5,7 @@
 
 #include "FuncDefs.h"
 
+/* A structure holding information about a texture that is queued to load. */
 struct QueuedTexture
 {
 	unsigned Width;

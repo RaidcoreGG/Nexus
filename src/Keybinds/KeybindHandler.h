@@ -36,19 +36,28 @@ namespace Keybinds
 	extern Keybind								CurrentKeybind;
 	extern std::string							CurrentKeybindUsedBy;
 
-	bool WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);									/* Returns true if handled */
+	/* Returns true if it found a keybind matching the passed keys that also has a valid KeybindHandler associated. */
+	bool WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	void Load();																						/* Loads the keybinds from disk */
-	void Save();																						/* Saves the keybinds */
+	/* Loads the keybinds. */
+	void Load();
+	/* Saves the keybinds. */
+	void Save();
 
-	void Register(std::string aIdentifier, KEYBINDS_PROCESS aKeybindHandler, std::string aKeybind);		/* Registers a kb with the given identifier, it will be passed to the given handler, if no bind was previously stored the given one will be used */
-	void Unregister(std::string aIdentifier);															/* This will free up the registered keybind event handler, should be called on addon shutdown */
+	/* Registers a keybind with the given identifier and handler, if no bind was previously stored the given one will be used. */
+	void Register(std::string aIdentifier, KEYBINDS_PROCESS aKeybindHandler, std::string aKeybind);
+	/* Frees up the associated KeybindHandler. */
+	void Unregister(std::string aIdentifier);
 	
-	std::string IsInUse(Keybind aKeybind);																/* Returns an empty string if keybind is unused or the identifier that uses this keybind */
+	/* Returns an empty string if keybind is unused or the identifier that uses this keybind */
+	std::string IsInUse(Keybind aKeybind);
 	
-	void Set(std::string aIdentifier, Keybind aKeybind);												/* This will force set the keybind, invoked via menu/ui */
-	bool Invoke(std::string aIdentifier);																/* Invokes the action on the corresponding keybind handler */
+	/* This will force set the keybind. (Invoked via menu/ui) */
+	void Set(std::string aIdentifier, Keybind aKeybind);
+	/* Invokes the action on the corresponding keybind handler. */
+	bool Invoke(std::string aIdentifier);
 
+	/* Removes all KeybindHandlers that are within the provided address space. */
 	int Verify(void* aStartAddress, void* aEndAddress);
 };
 

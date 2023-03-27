@@ -14,7 +14,7 @@ namespace Loader
 
 	void Initialize()
 	{
-		State::AddonHost = ggState::ADDONS_LOAD;
+		State::AddonHost = ENexusState::ADDONS_LOAD;
 
 		/* setup APIDefs */
 		APIDef.SwapChain = Renderer::SwapChain;
@@ -48,14 +48,14 @@ namespace Loader
 		APIDef.AddSimpleShortcut = GUI::QuickAccess::AddSimpleShortcut;
 		APIDef.RemoveSimpleShortcut = GUI::QuickAccess::RemoveSimpleShortcut;
 
-		State::AddonHost = ggState::ADDONS_READY;
+		State::AddonHost = ENexusState::ADDONS_READY;
 
 		UpdateThread = std::thread(DetectAddons);
 		UpdateThread.detach();
 	}
 	void Shutdown()
 	{
-		State::AddonHost = ggState::ADDONS_SHUTDOWN;
+		State::AddonHost = ENexusState::ADDONS_SHUTDOWN;
 	}
 
 	void LoadAddon(std::filesystem::path aPath)
@@ -149,7 +149,7 @@ namespace Loader
 	{
 		for (;;)
 		{
-			if (State::AddonHost == ggState::ADDONS_SHUTDOWN) { return; }
+			if (State::AddonHost == ENexusState::ADDONS_SHUTDOWN) { return; }
 
 			std::set<std::filesystem::path> onDisk;
 			

@@ -9,7 +9,8 @@
 
 #include "Mumble/Mumble.h"
 
-enum class ggState
+/* State of Nexus */
+enum class ENexusState
 {
 	NONE,
 	LOAD,									/* AddonHost is loading */
@@ -20,6 +21,7 @@ enum class ggState
 	SHUTDOWN								/* AddonHost has been shut down */
 };
 
+/* State of DirectX */
 enum class EDxState
 {
 	NONE,
@@ -28,6 +30,7 @@ enum class EDxState
 	DIRECTX_HOOKED,							/* Has installed directx hooks */
 };
 
+/* DirectX entry methods */
 enum class EEntryMethod
 {
 	NONE,
@@ -39,6 +42,7 @@ enum class EEntryMethod
 	CORE_REGISTERLAYERS
 };
 
+/* Multibox state */
 enum class EMultiboxState
 {
 	NONE			= 0x00,
@@ -52,7 +56,7 @@ enum class EMultiboxState
 namespace State
 {
 	/* internal states */
-	extern ggState			AddonHost;				/* AddonHost state variable */
+	extern ENexusState		AddonHost;				/* AddonHost state variable */
 	extern EDxState			Directx;				/* DirectX state variable */
 	extern EEntryMethod		EntryMethod;			/* How was the host initialized */
 	extern EMultiboxState	MultiboxState;			/* Is this game instance occupying any resources */

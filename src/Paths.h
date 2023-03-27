@@ -26,6 +26,7 @@ namespace Path
 	extern char F_SETTINGS						[];
 	extern char F_APIKEYS						[];
 
+	/* Initialize all path variables relative to the base modules location */
 	void Initialize(HMODULE aBaseModule);
 }
 

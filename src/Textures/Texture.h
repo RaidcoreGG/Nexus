@@ -3,6 +3,7 @@
 
 #include <d3d11.h>
 
+/* A structure that holds information about a texture. */
 struct Texture
 {
 	unsigned Width;

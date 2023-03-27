@@ -17,14 +17,20 @@
 
 namespace Mumble
 {
+	/* Initializes the mumble link with the provided name and returns a pointer to it. */
 	LinkedMem* Initialize(const wchar_t* aMumbleName);
+	/* Frees the mumble link. */
 	void Shutdown();
 
+	/* Returns a handle to the mumble link. */
 	HANDLE GetHandle();
 
+	/* Loop that polls Mumble->Identity. */
 	void UpdateIdentity();
+	/* Loop that polls various derived states. */
 	void UpdateState();
 
+	/* Returns the scaling factor for the given the UISize enum. */
 	float GetScalingFactor(unsigned aSize);
 };
 

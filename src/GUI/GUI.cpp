@@ -138,7 +138,7 @@ namespace GUI
 
 	void Render()
 	{
-		if (State::AddonHost >= ggState::UI_READY && !State::IsImGuiInitialized)
+		if (State::AddonHost >= ENexusState::UI_READY && !State::IsImGuiInitialized)
 		{
 			GUI::Initialize();
 		}

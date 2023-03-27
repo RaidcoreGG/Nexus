@@ -19,7 +19,9 @@ namespace Settings
 	extern std::mutex	Mutex;
 	extern json			Settings;
 
+	/* Loads the settings. */
 	void Load();
+	/* Saves the settings. */
 	void Save();
 }
 

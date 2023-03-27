@@ -9,6 +9,7 @@
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_extensions.h"
 
+/* A structure holding information about a keybind. */
 struct Keybind
 {
 	WPARAM	Key;
@@ -16,12 +17,14 @@ struct Keybind
 	bool	Ctrl;
 	bool	Shift;
 
+	/* Prints the keybind to a string for display. Pass true if spacing/padding should be added. */
 	std::string ToString(bool padded = false);
 };
 
 bool operator==(const Keybind& lhs, const Keybind& rhs);
 bool operator!=(const Keybind& lhs, const Keybind& rhs);
 
-Keybind KBFromString(std::string aKeybind);				/* This function should only be used to register keybinds */
+/* Create a keybind from a string. */
+Keybind KBFromString(std::string aKeybind);
 
 #endif

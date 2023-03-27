@@ -21,12 +21,17 @@ namespace API
 	extern std::mutex				Mutex;
 	extern std::vector<std::string> APIKeys;
 
+	/* Initialize the APIController. */
 	void Initialize();
 
+	/* Load the API keys. */
 	void Load();
+	/* Save the API keys.*/
 	void Save();
 
+	/* Add a new API key & save. */
 	void AddKey(std::string aApiKey);
+	/* Remove an API key & save. */
 	void RemoveKey(std::string aApiKey);
 }
 

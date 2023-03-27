@@ -39,11 +39,16 @@ namespace Loader
 
 	extern std::set<std::filesystem::path> Blacklist;					/* Blacklisted files which won't be reloaded */
 
+	/* Initializes the Loader and the API. */
 	void Initialize();
+	/* Shuts the Loader down and frees all addons. */
 	void Shutdown();
 
+	/* Loads an addon from disk. */
 	void LoadAddon(std::filesystem::path aPath);
+	/* Unloads an addon. */
 	void UnloadAddon(std::filesystem::path aPath);
+	/* Detects if there are addons that are not currently loaded, or if loaded addons have been removed. */
 	void DetectAddons();
 }
 

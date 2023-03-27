@@ -54,12 +54,12 @@ void UpdateNexusLink()
 
 void Initialize()
 {
-	State::AddonHost = ggState::LOAD;
+	State::AddonHost = ENexusState::LOAD;
 
 	State::Initialize();
 	Path::Initialize(AddonHostModule);
 
-	if (State::IsVanilla) { State::AddonHost = ggState::SHUTDOWN; return; }
+	if (State::IsVanilla) { State::AddonHost = ENexusState::SHUTDOWN; return; }
 
 	/* setup loggers */
 	if (State::IsConsoleEnabled)
@@ -97,9 +97,9 @@ void Initialize()
 }
 void Shutdown()
 {
-	if (State::AddonHost < ggState::SHUTDOWN)
+	if (State::AddonHost < ENexusState::SHUTDOWN)
 	{
-		State::AddonHost = ggState::SHUTDOWN;
+		State::AddonHost = ENexusState::SHUTDOWN;
 
 		GUI::Shutdown();
 		Mumble::Shutdown();
@@ -121,7 +121,7 @@ LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	//static const char* func_name = "hkWndProc";
 	//Logger->Log(func_name);
 
-	if (uMsg == WM_PAINT && State::AddonHost <= ggState::ADDONS_LOAD)
+	if (uMsg == WM_PAINT && State::AddonHost <= ENexusState::ADDONS_LOAD)
 	{
 		Loader::Initialize();
 		/* rename the window because they will never fix the bug that it's called just "G" */
@@ -309,7 +309,7 @@ bool DxLoad()
 
 			UnregisterClassW(wc.lpszClassName, wc.hInstance);
 
-			State::AddonHost = ggState::UI_READY;
+			State::AddonHost = ENexusState::UI_READY;
 			State::Directx = EDxState::DIRECTX_HOOKED;
 		}
 	}

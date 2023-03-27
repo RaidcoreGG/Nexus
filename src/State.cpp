@@ -2,7 +2,7 @@
 
 namespace State
 {
-	ggState			AddonHost					= ggState::NONE;
+	ENexusState		AddonHost					= ENexusState::NONE;
 	EDxState		Directx						= EDxState::NONE;
 	EEntryMethod	EntryMethod					= EEntryMethod::NONE;
 	EMultiboxState	MultiboxState				= EMultiboxState::NONE;
