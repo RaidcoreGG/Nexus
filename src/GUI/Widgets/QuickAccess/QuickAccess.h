@@ -21,6 +21,7 @@
 
 #include "FuncDefs.h"
 #include "Shortcut.h"
+#include "EQAPosition.h"
 
 namespace GUI
 {
@@ -28,14 +29,18 @@ namespace GUI
 	{
 		extern float Opacity;
 
-		extern std::mutex Mutex;
-		extern std::map<std::string, Shortcut> Registry;
-		extern std::map<std::string, QUICKACCESS_SHORTCUTRENDERCALLBACK> RegistrySimple;
+		extern std::mutex													Mutex;
+		extern std::map<std::string, Shortcut>								Registry;
+		extern std::map<std::string, QUICKACCESS_SHORTCUTRENDERCALLBACK>	RegistrySimple;
 
-		extern std::thread AnimationThread;
-		extern bool IsAnimating;
-		extern bool IsFadingIn;
-		extern bool IsHovering;
+		extern std::thread		AnimationThread;
+		extern bool				IsAnimating;
+		extern bool				IsFadingIn;
+		extern bool				IsHovering;
+
+		extern bool				VerticalLayout;
+		extern EQAPosition		Location;
+		extern ImVec2			Offset;
 
 		void Render();
 

@@ -485,6 +485,9 @@
     <ClInclude Include="API\APIController.h">
       <Filter>API</Filter>
     </ClInclude>
+    <ClInclude Include="GUI\Widgets\QuickAccess\EQAPosition.h">
+      <Filter>GUI\Widgets\QuickAccess</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Raidcore-AddonHost.rc">

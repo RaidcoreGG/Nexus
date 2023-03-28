@@ -53,8 +53,6 @@ namespace GUI
 			ImGui_ImplDX11_Shutdown();
 			ImGui_ImplWin32_Shutdown();
 			if (Renderer::RenderTargetView) { Renderer::RenderTargetView->Release(); Renderer::RenderTargetView = NULL; }
-
-			Settings::Settings[OPT_FONTSIZE] = FontSize;
 		}
 	}
 
@@ -123,7 +121,7 @@ namespace GUI
 					case WM_SYSKEYUP:
 						if (wParam < 256)
 							io.KeysDown[wParam] = false;
-						return true;
+						break;
 					case WM_CHAR:
 						// You can also use ToAscii()+GetKeyboardState() to retrieve characters.
 						if (wParam > 0 && wParam < 0x10000)
@@ -419,15 +417,19 @@ namespace GUI
 		/* add shortcut */
 		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "Nexus Menu");
 
-		if (Renderer::Scaling == 0)
+		if (!Settings::Settings.is_null())
 		{
-			if (!Settings::Settings.is_null())
+			if (!Settings::Settings[OPT_LASTUISCALE].is_null() && Renderer::Scaling == 0)
 			{
-				if (!Settings::Settings[OPT_LASTUISCALE].is_null())
-				{
-					LastScaling = Settings::Settings[OPT_LASTUISCALE].get<float>();
-					Renderer::Scaling = Settings::Settings[OPT_LASTUISCALE].get<float>();
-				}
+				LastScaling = Settings::Settings[OPT_LASTUISCALE].get<float>();
+				Renderer::Scaling = Settings::Settings[OPT_LASTUISCALE].get<float>();
+			}
+
+			if (!Settings::Settings[OPT_QAVERTICAL].is_null()) { QuickAccess::VerticalLayout = Settings::Settings[OPT_QAVERTICAL].get<bool>(); }
+			if (!Settings::Settings[OPT_QALOCATION].is_null()) { QuickAccess::Location = (EQAPosition)Settings::Settings[OPT_QALOCATION].get<int>(); }
+			if (!Settings::Settings[OPT_QAOFFSETX].is_null() && !Settings::Settings[OPT_QAOFFSETY].is_null())
+			{
+				QuickAccess::Offset = ImVec2(Settings::Settings[OPT_QAOFFSETX].get<float>(), Settings::Settings[OPT_QAOFFSETY].get<float>());
 			}
 		}
 

@@ -1,11 +1,14 @@
 #include "OptionsWindow.h"
 
 #include "../../GUI.h"
+#include "../QuickAccess/QuickAccess.h"
 
 namespace GUI
 {
 	std::string CurrentlyEditing;
 	char CurrentAPIKey[73]{};
+
+	const char* qaLocations[] = { "Extend", "Under", "Bottom", "Custom" };
 
 	void OptionsWindow::Render()
 	{
@@ -33,10 +36,37 @@ namespace GUI
 					{
 						ImGui::BeginChild("##StyleTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-						ImGui::Text("Font Size: ");
+						ImGui::TextDisabled("Font");
+						ImGui::Text("Size: ");
 						ImGui::SameLine();
-						ImGui::InputFloat("##fontsize", &GUI::FontSize);
+						if (ImGui::InputFloat("##fontsize", &GUI::FontSize))
+						{
+							Settings::Settings[OPT_FONTSIZE] = FontSize;
+							Settings::Save();
+						}
 						ImGui::TooltipGeneric("Changing font size requires a restart. You can preview different fonts and sizes with the \"Preview\" button.");
+
+						ImGui::Separator();
+
+						ImGui::TextDisabled("Quick Access");
+						if (ImGui::Checkbox("Vertical Layout", &QuickAccess::VerticalLayout))
+						{
+							Settings::Settings[OPT_QAVERTICAL] = QuickAccess::VerticalLayout;
+							Settings::Save();
+						}
+						ImGui::Text("Location:");
+						if (ImGui::Combo("##qalocation", (int*)&QuickAccess::Location, qaLocations, IM_ARRAYSIZE(qaLocations)))
+						{
+							Settings::Settings[OPT_QALOCATION] = QuickAccess::Location;
+							Settings::Save();
+						}
+						ImGui::Text("Offset:");
+						if (ImGui::InputFloat2("##qaoffset", (float*)&QuickAccess::Offset))
+						{
+							Settings::Settings[OPT_QAOFFSETX] = QuickAccess::Offset.x;
+							Settings::Settings[OPT_QAOFFSETY] = QuickAccess::Offset.y;
+							Settings::Save();
+						}
 
 						ImGui::EndChild();
 					}

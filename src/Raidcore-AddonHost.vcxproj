@@ -81,6 +81,7 @@
     <ClInclude Include="GUI\Widgets\Menu\MenuItem.h" />
     <ClInclude Include="GUI\Widgets\Options\OptionsWindow.h" />
     <ClInclude Include="GUI\Widgets\Overlay\MumbleOverlay.h" />
+    <ClInclude Include="GUI\Widgets\QuickAccess\EQAPosition.h" />
     <ClInclude Include="GUI\Widgets\QuickAccess\FuncDefs.h" />
     <ClInclude Include="GUI\Widgets\QuickAccess\QuickAccess.h" />
     <ClInclude Include="GUI\Widgets\QuickAccess\Shortcut.h" />

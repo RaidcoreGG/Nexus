@@ -1,7 +1,11 @@
 #include "Settings.h"
 
-const char* OPT_LASTUISCALE = "LastUIScale";
-const char* OPT_FONTSIZE = "FontSize";
+const char* OPT_LASTUISCALE	= "LastUIScale";
+const char* OPT_FONTSIZE	= "FontSize";
+const char* OPT_QAVERTICAL	= "QAVertical";
+const char* OPT_QALOCATION	= "QALocation";
+const char* OPT_QAOFFSETX	= "QAOffsetX";
+const char* OPT_QAOFFSETY	= "QAOffsetY";
 
 namespace Settings
 {

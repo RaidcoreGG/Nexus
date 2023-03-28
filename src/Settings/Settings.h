@@ -13,6 +13,10 @@ using json = nlohmann::json;
 
 extern const char* OPT_LASTUISCALE;
 extern const char* OPT_FONTSIZE;
+extern const char* OPT_QAVERTICAL;
+extern const char* OPT_QALOCATION;
+extern const char* OPT_QAOFFSETX;
+extern const char* OPT_QAOFFSETY;
 
 namespace Settings
 {

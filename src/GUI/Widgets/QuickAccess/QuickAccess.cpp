@@ -4,16 +4,22 @@ namespace GUI
 {
 	namespace QuickAccess
 	{
+		float size = 32.0f;
+
 		float Opacity = 0.5f;
 
-		std::mutex Mutex;
-		std::map<std::string, Shortcut> Registry;
-		std::map<std::string, QUICKACCESS_SHORTCUTRENDERCALLBACK> RegistrySimple;
+		std::mutex													Mutex;
+		std::map<std::string, Shortcut>								Registry;
+		std::map<std::string, QUICKACCESS_SHORTCUTRENDERCALLBACK>	RegistrySimple;
 
-		std::thread AnimationThread;
-		bool IsAnimating = false;
-		bool IsFadingIn = false;
-		bool IsHovering = false;
+		std::thread		AnimationThread;
+		bool			IsAnimating			= false;
+		bool			IsFadingIn			= false;
+		bool			IsHovering			= false;
+
+		bool			VerticalLayout		= false;
+		EQAPosition		Location			= EQAPosition::Extend;
+		ImVec2			Offset				= ImVec2(((size + 1) * Renderer::Scaling) * 9, 0.0f);
 
 		void Fade()
 		{
@@ -30,14 +36,31 @@ namespace GUI
 			}
 		}
 
-		float size = 32.0f;
-
 		void Render()
 		{
 			bool isActive = false;
 
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, Opacity);
-			ImGui::SetNextWindowPos(ImVec2(0, size * Renderer::Scaling));
+
+			ImVec2 pos = ImVec2(0.0f, 0.0f);
+
+			switch (Location)
+			{
+				case EQAPosition::Extend:
+					pos.x += (size * Renderer::Scaling) * 9;
+					break;
+				case EQAPosition::Under:
+					pos.y += size * Renderer::Scaling;
+					break;
+				case EQAPosition::Bottom:
+					pos.y += Renderer::Height - (size * 2 * Renderer::Scaling);
+					break;
+			}
+
+			pos.x += Offset.x;
+			pos.y += Offset.y;
+
+			ImGui::SetNextWindowPos(pos);
 			if (ImGui::Begin("QuickAccessBar", (bool*)0, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar))
 			{
 				bool menuFound = false;
@@ -55,7 +78,14 @@ namespace GUI
 							ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
 
 							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f }); // smol checkbox
-							ImGui::SetCursorPos(ImVec2(((size * c) + 1) * Renderer::Scaling, 0));
+							if (VerticalLayout)
+							{
+								ImGui::SetCursorPos(ImVec2(0, ((size * c) + c ? 1 : 0) * Renderer::Scaling));
+							}
+							else
+							{
+								ImGui::SetCursorPos(ImVec2(((size * c) + c ? 1 : 0) * Renderer::Scaling, 0));
+							}
 							if (ImGui::ImageButton(!shortcut.IsHovering ? shortcut.TextureNormal->Resource : shortcut.TextureHover->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
 							{
 								isActive = true;
