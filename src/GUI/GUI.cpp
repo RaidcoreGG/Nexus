@@ -62,72 +62,106 @@ namespace GUI
 		{
 			ImGuiIO& io = ImGui::GetIO();
 
-			// Set mouse position
-			if (uMsg == WM_MOUSEMOVE)
+			switch (uMsg)
 			{
-				io.MousePos = ImVec2((float)(LOWORD(lParam)), (float)(HIWORD(lParam)));
-			}
+				// mouse input
+				case WM_MOUSEMOVE:
+					io.MousePos = ImVec2((float)(LOWORD(lParam)), (float)(HIWORD(lParam)));
 
-			if (uMsg == WM_ACTIVATEAPP && !wParam)
-			{
-				IsLeftClickHeld = false;
-				IsRightClickHeld = false;
-			}
+					if (IsLeftClickHeld || IsRightClickHeld)
+					{
+						io.MousePos = ImVec2(-FLT_MAX, -FLT_MAX);
+					}
+					else if (io.WantCaptureMouse)
+					{
+						return true;
+					}
+					break;
 
-			if (!io.WantCaptureMouse)
-			{
-				switch (uMsg)
-				{
-					case WM_LBUTTONDBLCLK:
-					case WM_LBUTTONDOWN:	IsLeftClickHeld = true;															break;
-					case WM_RBUTTONDBLCLK:
-					case WM_RBUTTONDOWN:	IsRightClickHeld = true;														break;
+				case WM_LBUTTONDBLCLK:
+				case WM_LBUTTONDOWN:
+					if (io.WantCaptureMouse && !IsLeftClickHeld && !IsRightClickHeld)
+					{
+						io.MouseDown[0] = true;
+						return true;
+					}
+					else //if (!io.WantCaptureMouse)
+					{
+						IsLeftClickHeld = true;
+						ImGui::ClearActiveID();
+					}
+					break;
+				case WM_RBUTTONDBLCLK:
+				case WM_RBUTTONDOWN:
+					if (io.WantCaptureMouse && !IsLeftClickHeld && !IsRightClickHeld)
+					{
+						io.MouseDown[1] = true;
+						return true;
+					}
+					else //if (!io.WantCaptureMouse)
+					{
+						IsRightClickHeld = true;
+					}
+					break;
 
-					case WM_LBUTTONUP:		IsLeftClickHeld = false;														break;
-					case WM_RBUTTONUP:		IsRightClickHeld = false;														break;
-				}
+				// doesn't hurt passing these through to the game
+				case WM_LBUTTONUP:
+					IsLeftClickHeld = false; io.MouseDown[0] = false;
+					break;
+				case WM_RBUTTONUP:
+					IsRightClickHeld = false; io.MouseDown[1] = false;
+					break;
 
-				if (IsLeftClickHeld || IsRightClickHeld) { io.MousePos = ImVec2(-FLT_MAX, -FLT_MAX); }
-			}
+				// scroll
+				case WM_MOUSEWHEEL:
+					if (io.WantCaptureMouse && !IsLeftClickHeld && !IsRightClickHeld)
+					{
+						io.MouseWheel += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;
+						return true;
+					}
+					break;
+				case WM_MOUSEHWHEEL:
+					if (io.WantCaptureMouse && !IsLeftClickHeld && !IsRightClickHeld)
+					{
+						io.MouseWheelH += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;
+						return true;
+					}
+					break;
 
-			if (io.WantCaptureMouse && !IsLeftClickHeld && !IsRightClickHeld)
-			{
-				switch (uMsg)
-				{
-					case WM_LBUTTONDBLCLK:
-					case WM_LBUTTONDOWN:	io.MouseDown[0] = true;															return true;
-					case WM_RBUTTONDBLCLK:
-					case WM_RBUTTONDOWN:	io.MouseDown[1] = true;															return true;
-
-					case WM_LBUTTONUP:		io.MouseDown[0] = false;														break;
-					case WM_RBUTTONUP:		io.MouseDown[1] = false;														break;
-
-					case WM_MOUSEWHEEL:		io.MouseWheel += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;	return true;
-					case WM_MOUSEHWHEEL:	io.MouseWheelH += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;	return true;
-					case WM_MOUSEMOVE:		return true;
-				}
-			}
-
-			if (io.WantTextInput)
-			{
-				switch (uMsg)
-				{
-					case WM_KEYDOWN:
-					case WM_SYSKEYDOWN:
+				// key input
+				case WM_KEYDOWN:
+				case WM_SYSKEYDOWN:
+					if (io.WantTextInput)
+					{
 						if (wParam < 256)
 							io.KeysDown[wParam] = true;
 						return true;
-					case WM_KEYUP:
-					case WM_SYSKEYUP:
-						if (wParam < 256)
-							io.KeysDown[wParam] = false;
-						break;
-					case WM_CHAR:
+					}
+					break;
+				case WM_KEYUP:
+				case WM_SYSKEYUP:
+					if (wParam < 256)
+						io.KeysDown[wParam] = false;
+					break;
+				case WM_CHAR:
+					if (io.WantTextInput)
+					{
 						// You can also use ToAscii()+GetKeyboardState() to retrieve characters.
 						if (wParam > 0 && wParam < 0x10000)
 							io.AddInputCharacterUTF16((unsigned short)wParam);
 						return true;
-				}
+					}
+					break;
+
+				// other
+				case WM_ACTIVATEAPP:
+					// alt tab should reset clickHeld state
+					if (!wParam)
+					{
+						IsLeftClickHeld = false;
+						IsRightClickHeld = false;
+					}
+					break;
 			}
 		}
 

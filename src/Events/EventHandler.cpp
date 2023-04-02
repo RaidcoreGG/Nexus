@@ -2,8 +2,8 @@
 
 namespace Events
 {
-	std::mutex Mutex;
-	std::map<std::string, std::vector<EVENT_CONSUME>> Registry;
+	std::mutex											Mutex;
+	std::map<std::string, std::vector<EVENT_CONSUME>>	Registry;
 
 	void Raise(std::string aIdentifier, void* aEventData)
 	{

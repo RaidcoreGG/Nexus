@@ -240,6 +240,9 @@
     <ClCompile Include="API\APIController.cpp">
       <Filter>API</Filter>
     </ClCompile>
+    <ClCompile Include="API\ActiveToken.cpp">
+      <Filter>API</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imstb_truetype.h">
@@ -437,7 +440,7 @@
     <ClInclude Include="Loader\FuncDefs.h">
       <Filter>Loader</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\LoadedAddon.h">
+    <ClInclude Include="Loader\ActiveAddon.h">
       <Filter>Loader</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
@@ -487,6 +490,12 @@
     </ClInclude>
     <ClInclude Include="GUI\Widgets\QuickAccess\EQAPosition.h">
       <Filter>GUI\Widgets\QuickAccess</Filter>
+    </ClInclude>
+    <ClInclude Include="API\ActiveToken.h">
+      <Filter>API</Filter>
+    </ClInclude>
+    <ClInclude Include="httplib\httplib.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

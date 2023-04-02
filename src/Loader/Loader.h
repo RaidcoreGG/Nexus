@@ -16,7 +16,7 @@
 #include "../Renderer.h"
 
 #include "AddonDefinition.h"
-#include "LoadedAddon.h"
+#include "ActiveAddon.h"
 #include "FuncDefs.h"
 
 #include "../Mumble/LinkedMem.h"
@@ -32,7 +32,7 @@
 namespace Loader
 {
 	extern std::mutex Mutex;
-	extern std::map<std::filesystem::path, LoadedAddon> AddonDefs;		/* Loaded Addons and their corresponding paths */
+	extern std::map<std::filesystem::path, ActiveAddon> AddonDefs;		/* Loaded Addons and their corresponding paths */
 	extern AddonAPI APIDef;
 
 	extern std::thread UpdateThread;
@@ -49,7 +49,7 @@ namespace Loader
 	/* Unloads an addon. */
 	void UnloadAddon(std::filesystem::path aPath);
 	/* Detects if there are addons that are not currently loaded, or if loaded addons have been removed. */
-	void DetectAddons();
+	void DetectAddonsLoop();
 }
 
 #endif

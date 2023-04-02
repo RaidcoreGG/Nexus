@@ -15,8 +15,8 @@
 
 namespace Events
 {
-	extern std::mutex Mutex;
-	extern std::map<std::string, std::vector<EVENT_CONSUME>> Registry;
+	extern std::mutex											Mutex;
+	extern std::map<std::string, std::vector<EVENT_CONSUME>>	Registry;
 
 	/* Raises an event of provided name, passing a pointer to an eventArgs struct. */
 	void Raise(std::string aIdentifier, void* aEventData);

@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <string>
 #include <algorithm>
+#include <shellapi.h>
 
 #include "Shared.h"
 

@@ -14,7 +14,7 @@ namespace LogHandler
 	void Initialize()
 	{
 		IsRunning = true;
-		LoggingThread = std::thread(ProcessQueue);
+		LoggingThread = std::thread(ProcessQueueLoop);
 		LoggingThread.detach();
 	}
 
@@ -73,7 +73,7 @@ namespace LogHandler
 		}
 		Mutex.unlock();
 	}
-	void ProcessQueue()
+	void ProcessQueueLoop()
 	{
 		for (;;)
 		{

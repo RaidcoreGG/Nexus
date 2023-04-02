@@ -24,17 +24,17 @@ using json = nlohmann::json;
 
 namespace Keybinds
 {
-	extern std::mutex							Mutex;
-	extern std::map<std::string, ActiveKeybind>	Registry;												/* Contains the active keybinds with their identifiers */
+	extern std::mutex								Mutex;
+	extern std::map<std::string, ActiveKeybind>		Registry;
 
 	/* Keybind Helpers */
-	extern std::mutex							HeldKeysMutex;
-	extern std::vector<WPARAM>					HeldKeys;
+	extern std::mutex								HeldKeysMutex;
+	extern std::vector<WPARAM>						HeldKeys;
 
 	/* Keybind setting helpers */
-	extern bool									IsSettingKeybind;
-	extern Keybind								CurrentKeybind;
-	extern std::string							CurrentKeybindUsedBy;
+	extern bool										IsSettingKeybind;
+	extern Keybind									CurrentKeybind;
+	extern std::string								CurrentKeybindUsedBy;
 
 	/* Returns true if it found a keybind matching the passed keys that also has a valid KeybindHandler associated. */
 	bool WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

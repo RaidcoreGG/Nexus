@@ -39,7 +39,7 @@ namespace GUI
 						ImGui::TextDisabled("Font");
 						ImGui::Text("Size: ");
 						ImGui::SameLine();
-						if (ImGui::InputFloat("##fontsize", &GUI::FontSize))
+						if (ImGui::InputFloat("##fontsize", &GUI::FontSize, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_EnterReturnsTrue))
 						{
 							Settings::Settings[OPT_FONTSIZE] = FontSize;
 							Settings::Save();
@@ -180,7 +180,7 @@ namespace GUI
 					{
 						ImGui::BeginChild("##APITabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-						ImGui::InputText("##currentapikey", CurrentAPIKey, 73);
+						ImGui::InputText("##currentapikey", CurrentAPIKey, 73, ImGuiInputTextFlags_EnterReturnsTrue);
 						ImGui::SameLine();
 						if (ImGui::Button("Add"))
 						{
@@ -189,6 +189,7 @@ namespace GUI
 							if (std::regex_match(str, std::regex("[A-F\\d]{8}-([A-F\\d]{4}-){3}[A-F\\d]{20}(-[A-F\\d]{4}){3}-[A-F\\d]{12}")))
 							{
 								API::AddKey(str);
+								memset(CurrentAPIKey, 0, 73);
 							}
 						}
 
@@ -198,17 +199,17 @@ namespace GUI
 						{
 							API::Mutex.lock();
 							{
-								for (std::string key : API::APIKeys)
+								for (ActiveToken key : API::Keys)
 								{
 									ImGui::TableNextRow();
 									ImGui::TableSetColumnIndex(0);
-									ImGui::Text("%.18s", key.c_str());
+									ImGui::Text("%.18s", key.Key.c_str());
 
 									ImGui::TableSetColumnIndex(1);
-									if (ImGui::Button(("Remove##"+key).c_str())) // ##+key for unique id
+									if (ImGui::Button(("Remove##"+key.Key).c_str())) // ##+key for unique id
 									{
 										// copy paste of the API::Save() code because of mutex shenanigans
-										API::APIKeys.erase(std::find(API::APIKeys.begin(), API::APIKeys.end(), key));
+										API::Keys.erase(std::find(API::Keys.begin(), API::Keys.end(), key));
 										shouldSave = true;
 									}
 								}

@@ -3,7 +3,7 @@
 namespace Loader
 {
 	std::mutex Mutex;
-	std::map<std::filesystem::path, LoadedAddon> AddonDefs;
+	std::map<std::filesystem::path, ActiveAddon> AddonDefs;
 	AddonAPI APIDef{};
 
 	std::thread UpdateThread;
@@ -50,7 +50,7 @@ namespace Loader
 
 		State::AddonHost = ENexusState::ADDONS_READY;
 
-		UpdateThread = std::thread(DetectAddons);
+		UpdateThread = std::thread(DetectAddonsLoop);
 		UpdateThread.detach();
 	}
 	void Shutdown()
@@ -94,7 +94,7 @@ namespace Loader
 		MODULEINFO moduleInfo;
 		GetModuleInformation(GetCurrentProcess(), hMod, &moduleInfo, sizeof(moduleInfo));
 
-		LoadedAddon addon{ hMod, moduleInfo.SizeOfImage, defs };
+		ActiveAddon addon{ hMod, moduleInfo.SizeOfImage, defs };
 
 		AddonDefs.insert({ aPath, addon });
 
@@ -145,7 +145,7 @@ namespace Loader
 
 		LogInfo(CH_LOADER, "Unloaded addon: %s", path.c_str());
 	}
-	void DetectAddons()
+	void DetectAddonsLoop()
 	{
 		for (;;)
 		{

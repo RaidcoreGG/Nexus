@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="API\ActiveToken.cpp" />
     <ClCompile Include="API\APIController.cpp" />
     <ClCompile Include="Consts.cpp" />
     <ClCompile Include="core.cpp" />
@@ -62,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="API\APIController.h" />
+    <ClInclude Include="API\ActiveToken.h" />
     <ClInclude Include="Consts.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="DataLink\DataLink.h" />
@@ -86,6 +88,7 @@
     <ClInclude Include="GUI\Widgets\QuickAccess\QuickAccess.h" />
     <ClInclude Include="GUI\Widgets\QuickAccess\Shortcut.h" />
     <ClInclude Include="Hooks.h" />
+    <ClInclude Include="httplib\httplib.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_extensions.h" />
@@ -101,7 +104,7 @@
     <ClInclude Include="Keybinds\KeybindHandler.h" />
     <ClInclude Include="Loader\EAddonFlags.h" />
     <ClInclude Include="Loader\FuncDefs.h" />
-    <ClInclude Include="Loader\LoadedAddon.h" />
+    <ClInclude Include="Loader\ActiveAddon.h" />
     <ClInclude Include="Loader\Loader.h" />
     <ClInclude Include="Loader\NexusLinkData.h" />
     <ClInclude Include="Localization\Localization.h" />
@@ -208,7 +211,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;RAIDCOREADDONHOST_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;RAIDCOREADDONHOST_EXPORTS;_WINDOWS;_USRDLL;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
@@ -229,7 +232,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;RAIDCOREADDONHOST_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;RAIDCOREADDONHOST_EXPORTS;_WINDOWS;_USRDLL;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>

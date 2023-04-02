@@ -5,11 +5,17 @@ namespace API
 	const char*					BaseURL = "https://api.guildwars2.com/v2/";
 
 	std::mutex					Mutex;
-	std::vector<std::string>	APIKeys;
+	std::vector<ActiveToken>	Keys;
+
+	std::thread					RequestThread;
+	std::vector<std::string>	QueuedRequests;
 
 	void Initialize()
 	{
 		Load();
+
+		RequestThread = std::thread(ProcessRequestsLoop);
+		RequestThread.detach();
 	}
 
 	void Load()
@@ -22,7 +28,9 @@ namespace API
 			json j = json::parse(file);
 			for (std::string key : j)
 			{
-				APIKeys.push_back(key);
+				ActiveToken token{};
+				token.Key = key;
+				Keys.push_back(token);
 			}
 			file.close();
 		}
@@ -34,9 +42,9 @@ namespace API
 		{
 			json keys = json::array();
 
-			for (std::string key : APIKeys)
+			for (ActiveToken token : Keys)
 			{
-				keys.push_back(key);
+				keys.push_back(token.Key);
 			}
 
 			std::ofstream file(Path::F_APIKEYS);
@@ -48,11 +56,14 @@ namespace API
 
 	void AddKey(std::string aApiKey)
 	{
+		ActiveToken token{};
+		token.Key = aApiKey;
+
 		Mutex.lock();
 		{
-			if (std::find(APIKeys.begin(), APIKeys.end(), aApiKey) == APIKeys.end())
+			if (std::find(Keys.begin(), Keys.end(), token) == Keys.end())
 			{
-				APIKeys.push_back(aApiKey);
+				Keys.push_back(token);
 			}
 		}
 		Mutex.unlock();
@@ -61,12 +72,108 @@ namespace API
 	}
 	void RemoveKey(std::string aApiKey)
 	{
+		ActiveToken token{};
+		token.Key = aApiKey;
+
 		Mutex.lock();
 		{
-			APIKeys.erase(std::find(APIKeys.begin(), APIKeys.end(), aApiKey));
+			Keys.erase(std::find(Keys.begin(), Keys.end(), token));
 		}
 		Mutex.unlock();
 
 		Save();
+	}
+
+	std::string Request(std::string aEndpoint, std::string aParameters)
+	{
+		LogDebug("Fetching %s/%s%s", BaseURL, aEndpoint, aParameters);
+
+		/* Check cache first */
+
+		/* If not cached, request from API */
+
+		/* Cache result */
+
+		return "";
+	}
+	std::string RequestAuthByToken(std::string aEndpoint, std::string aParameters, ActiveToken aApiKey)
+	{
+		/* append token to parameters */
+		std::string params = aParameters;
+		params.append(params.length() == 0 ? "?" : "&");
+		params.append("access_token=");
+		params.append(aApiKey.Key);
+
+		return Request(aEndpoint, params);
+	}
+	std::string RequestAuthByAccount(std::string aEndpoint, std::string aParameters, std::string aAccountName)
+	{
+		/* find token via account name */
+		ActiveToken key{};
+
+		Mutex.lock();
+		{
+			for (ActiveToken token : Keys)
+			{
+				if (token.AccountName == aAccountName)
+				{
+					key = token;
+					break;
+				}
+			}
+		}
+		Mutex.unlock();
+
+		if (key == ActiveToken{})
+		{
+			json j;
+			j["error"] = "No API-Key matches the provided account name.";
+
+			return j.dump();
+		}
+		
+		return RequestAuthByToken(aEndpoint, aParameters, key);
+	}
+	std::string RequestAuthByCharacter(std::string aEndpoint, std::string aParameters, std::string aCharacterName)
+	{
+		/* find token via character name */
+		ActiveToken key{};
+
+		Mutex.lock();
+		{
+			for (ActiveToken token : Keys)
+			{
+				if (std::find(token.Characters.begin(), token.Characters.end(), aCharacterName) != token.Characters.end())
+				{
+					key = token;
+					break;
+				}
+			}
+		}
+		Mutex.unlock();
+
+		if (key == ActiveToken{})
+		{
+			json j;
+			j["error"] = "No API-Key matches the provided character name.";
+
+			return j.dump();
+		}
+
+		return RequestAuthByToken(aEndpoint, aParameters, key);
+	}
+
+	void ProcessRequestsLoop()
+	{
+		for (;;)
+		{
+			/* Do some rate limiting */
+			while (QueuedRequests.size() > 0)
+			{
+				//DoHttpReq(QueuedRequests.front());
+				/* Callback ? */
+				QueuedRequests.erase(QueuedRequests.begin());
+			}
+		}
 	}
 }

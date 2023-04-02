@@ -26,9 +26,9 @@ namespace Mumble
 	HANDLE GetHandle();
 
 	/* Loop that polls Mumble->Identity. */
-	void UpdateIdentity();
+	void UpdateIdentityLoop();
 	/* Loop that polls various derived states. */
-	void UpdateState();
+	void UpdateStateLoop();
 
 	/* Returns the scaling factor for the given the UISize enum. */
 	float GetScalingFactor(unsigned aSize);

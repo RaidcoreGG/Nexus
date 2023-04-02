@@ -41,7 +41,7 @@ namespace LogHandler
 
 	/* Logging internal functions */
 	void LogMessage(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, va_list aArgs);
-	void ProcessQueue();
+	void ProcessQueueLoop();
 
 	int Verify(void* aStartAddress, void* aEndAddress);
 }

@@ -79,7 +79,7 @@ void Initialize()
 	MH_Initialize();
 	Keybinds::Load();
 	Settings::Load();
-	API::Load();
+	API::Initialize();
 
 	/* manually add mumble to datalink */
 	LinkedResource resMumble{ Mumble::GetHandle(), MumbleLink, sizeof(LinkedMem) };

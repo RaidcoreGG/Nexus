@@ -2,8 +2,8 @@
 
 namespace DataLink
 {
-	std::mutex Mutex;
-	std::map<std::string, LinkedResource> Registry;
+	std::mutex								Mutex;
+	std::map<std::string, LinkedResource>	Registry;
 
 	void Shutdown()
 	{

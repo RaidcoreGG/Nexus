@@ -33,9 +33,9 @@ namespace Mumble
 			MumbleLink = (LinkedMem*)MapViewOfFile(Handle, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(LinkedMem));
 
 			IsRunning = true;
-			UpdateIdentityThread = std::thread(UpdateIdentity);
+			UpdateIdentityThread = std::thread(UpdateIdentityLoop);
 			UpdateIdentityThread.detach();
-			UpdateStateThread = std::thread(UpdateState);
+			UpdateStateThread = std::thread(UpdateStateLoop);
 			UpdateStateThread.detach();
 
 			return MumbleLink;
@@ -66,7 +66,7 @@ namespace Mumble
 		return Handle ? Handle : nullptr;
 	}
 
-	void UpdateIdentity()
+	void UpdateIdentityLoop()
 	{
 		for (;;)
 		{
@@ -107,7 +107,7 @@ namespace Mumble
 		}
 	}
 
-	void UpdateState()
+	void UpdateStateLoop()
 	{
 		for (;;)
 		{
