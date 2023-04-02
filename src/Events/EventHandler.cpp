@@ -48,15 +48,13 @@ namespace Events
 		{
 			for (auto& [identifier, consumers] : Registry)
 			{
-				size_t i = consumers.size() - 1;
-				while (i >= 0)
+				for (EVENT_CONSUME evCb : consumers)
 				{
-					if (consumers[i] >= aStartAddress && consumers[i] <= aEndAddress)
+					if (evCb >= aStartAddress && evCb <= aEndAddress)
 					{
-						consumers.erase(consumers.begin() + i);
+						consumers.erase(std::remove(consumers.begin(), consumers.end(), evCb), consumers.end());
 						refCounter++;
 					}
-					i--;
 				}
 			}
 		}

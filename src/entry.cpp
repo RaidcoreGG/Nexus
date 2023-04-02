@@ -129,13 +129,21 @@ LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 
 	// don't pass to game if addon wndproc
-	for (auto& [path, addon] : Loader::AddonDefs)
+	Loader::Mutex.lock();
 	{
-		if (addon.Definitions->WndProc)
+		for (auto& [path, addon] : Loader::AddonDefs)
 		{
-			if (addon.Definitions->WndProc(hWnd, uMsg, wParam, lParam)) { return 0; }
+			if (addon.Definitions && addon.Definitions->WndProc)
+			{
+				if (addon.Definitions->WndProc(hWnd, uMsg, wParam, lParam))
+				{
+					Loader::Mutex.unlock();
+					return 0;
+				}
+			}
 		}
 	}
+	Loader::Mutex.unlock();
 
 	// don't pass to game if keybind
 	if (Keybinds::WndProc(hWnd, uMsg, wParam, lParam)) { return 0; }
