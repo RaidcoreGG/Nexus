@@ -3,7 +3,6 @@
 namespace GUI
 {
 	/* internal forward declarations */
-	void ReceiveTextures(std::string aIdentifier, Texture* aTexture);
 	void OnMumbleIdentityChanged(void* aEventArgs);
 	void ConfigureFonts();
 	void Setup();
@@ -12,10 +11,6 @@ namespace GUI
 	std::vector<IWindow*>		Windows;
 	std::map<EFont, ImFont*>	FontIndex;
 	float						FontSize;
-
-	Texture*					MenuBG{};
-	Texture*					MenuButton{};
-	Texture*					MenuButtonHover{};
 
 	bool						IsUIVisible			= true;
 
@@ -186,7 +181,8 @@ namespace GUI
 			/* draw overlay */
 			if (IsUIVisible)
 			{
-				/* draw menu */
+				/* draw menu & qa */
+				Menu::Render();
 				QuickAccess::Render();
 
 				/* draw windows */
@@ -266,7 +262,7 @@ namespace GUI
 	{
 		if (aIdentifier == KB_MENU)
 		{
-			((MenuWindow*)Windows[0])->Visible = !((MenuWindow*)Windows[0])->Visible;
+			Menu::Visible = !Menu::Visible;
 			return;
 		}
 		else if (aIdentifier == KB_TOGGLEHIDEUI)
@@ -274,21 +270,7 @@ namespace GUI
 			IsUIVisible = !IsUIVisible;
 		}
 	}
-	void ReceiveTextures(std::string aIdentifier, Texture* aTexture)
-	{
-		if (aIdentifier == TEX_MENU_BACKGROUND)
-		{
-			((MenuWindow*)Windows[0])->MenuBG = aTexture;
-		}
-		else if (aIdentifier == TEX_MENU_BUTTON)
-		{
-			((MenuWindow*)Windows[0])->MenuButton = aTexture;
-		}
-		else if (aIdentifier == TEX_MENU_BUTTON_HOVER)
-		{
-			((MenuWindow*)Windows[0])->MenuButtonHover = aTexture;
-		}
-	}
+	
 	void OnMumbleIdentityChanged(void* aEventArgs)
 	{
 		if (Renderer::Scaling != LastScaling && IsGameplay)
@@ -411,7 +393,6 @@ namespace GUI
 		Events::Subscribe(EV_MUMBLE_IDENTITY_UPDATED, OnMumbleIdentityChanged);
 
 		/* set up and add windows */
-		MenuWindow* menu = new MenuWindow();
 		AddonsWindow* addonsWnd = new AddonsWindow();
 		LogWindow* logWnd = new LogWindow(ELogLevel::ALL);
 		RegisterLogger(logWnd);
@@ -419,19 +400,17 @@ namespace GUI
 		DebugWindow* dbgWnd = new DebugWindow();
 		AboutBox* aboutWnd = new AboutBox();
 
-		AddWindow(menu);
 		AddWindow(addonsWnd);
 		AddWindow(opsWnd);
 		AddWindow(logWnd);
 		AddWindow(dbgWnd);
 		AddWindow(aboutWnd);
 
-		/* add categories ; aCategory: 0 = Main ; 1 = Debug ; 2 = Info */
-		menu->AddMenuItem("Addons", &addonsWnd->Visible);
-		menu->AddMenuItem("Options", &opsWnd->Visible);
-		menu->AddMenuItem("Log", &logWnd->Visible);
-		menu->AddMenuItem("Debug", &dbgWnd->Visible);
-		menu->AddMenuItem("About", &aboutWnd->Visible);
+		Menu::AddMenuItem("Addons",		&addonsWnd->Visible);
+		Menu::AddMenuItem("Options",	&opsWnd->Visible);
+		Menu::AddMenuItem("Log",		&logWnd->Visible);
+		Menu::AddMenuItem("Debug",		&dbgWnd->Visible);
+		Menu::AddMenuItem("About",		&aboutWnd->Visible);
 
 		/* register keybinds */
 		Keybinds::Register(KB_MENU, ProcessKeybind, "CTRL+O");
@@ -444,9 +423,9 @@ namespace GUI
 		TextureLoader::LoadFromResource(ICON_GENERIC, RES_ICON_GENERIC, AddonHostModule, nullptr);
 		TextureLoader::LoadFromResource(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, AddonHostModule, nullptr);
 
-		TextureLoader::LoadFromResource(TEX_MENU_BACKGROUND, RES_TEX_MENU_BACKGROUND, AddonHostModule, ReceiveTextures);
-		TextureLoader::LoadFromResource(TEX_MENU_BUTTON, RES_TEX_MENU_BUTTON, AddonHostModule, ReceiveTextures);
-		TextureLoader::LoadFromResource(TEX_MENU_BUTTON_HOVER, RES_TEX_MENU_BUTTON_HOVER, AddonHostModule, ReceiveTextures);
+		TextureLoader::LoadFromResource(TEX_MENU_BACKGROUND, RES_TEX_MENU_BACKGROUND, AddonHostModule, Menu::ReceiveTextures);
+		TextureLoader::LoadFromResource(TEX_MENU_BUTTON, RES_TEX_MENU_BUTTON, AddonHostModule, Menu::ReceiveTextures);
+		TextureLoader::LoadFromResource(TEX_MENU_BUTTON_HOVER, RES_TEX_MENU_BUTTON_HOVER, AddonHostModule, Menu::ReceiveTextures);
 
 		/* add shortcut */
 		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "Nexus Menu");

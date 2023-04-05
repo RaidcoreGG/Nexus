@@ -4,45 +4,76 @@
 
 namespace GUI
 {
-	void MenuWindow::Render()
+	namespace Menu
 	{
-		if (!Visible) { return; }
+		bool Visible						= false;
 
-		float bgSz = 220 * Renderer::Scaling;
-		;
-		if (ImGui::Begin("Menu", &Visible, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar))
+		std::mutex Mutex;
+		std::vector<MenuItem*> MenuItems;
+
+		Texture* MenuBG						= nullptr;
+		Texture* MenuButton					= nullptr;
+		Texture* MenuButtonHover			= nullptr;
+
+		void Render()
 		{
-			if (MenuBG)
-			{
-				ImGui::SetCursorPos(ImVec2(0, 0));
-				ImGui::Image(MenuBG->Resource, ImVec2(bgSz, bgSz));
-			}
+			if (!Visible) { return; }
 
-			ImGui::PushFont(FontUI);
-			ImGui::SetCursorPos(ImVec2(0, 8.0f));
-			Mutex.lock();
+			float bgSz = 220 * Renderer::Scaling;
+			;
+			if (ImGui::Begin("Menu", &Visible, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar))
 			{
-				for (MenuItem* mItem : MenuItems)
+				if (MenuBG)
 				{
-					if (mItem->Render(MenuButton, MenuButtonHover))
+					ImGui::SetCursorPos(ImVec2(0, 0));
+					ImGui::Image(MenuBG->Resource, ImVec2(bgSz, bgSz));
+				}
+
+				ImGui::PushFont(FontUI);
+				ImGui::SetCursorPos(ImVec2(0, 8.0f));
+				Mutex.lock();
+				{
+					for (MenuItem* mItem : MenuItems)
 					{
-						/* if they return true, they were pressed -> hide the menu */
-						Visible = false;
+						if (mItem->Label != "Debug" || State::IsDeveloperMode)
+						{
+							if (mItem->Render())
+							{
+								/* if they return true, they were pressed -> hide the menu */
+								Visible = false;
+							}
+						}
 					}
 				}
+				Mutex.unlock();
+				ImGui::PopFont();
+			}
+			ImGui::End();
+		}
+
+		void AddMenuItem(std::string aLabel, bool* aToggle)
+		{
+			Mutex.lock();
+			{
+				MenuItems.push_back(new MenuItem{ aLabel, aToggle, false });
 			}
 			Mutex.unlock();
-			ImGui::PopFont();
 		}
-		ImGui::End();
-	}
 
-	void MenuWindow::AddMenuItem(const char* aLabel, bool* aToggle)
-	{
-		Mutex.lock();
+		void ReceiveTextures(std::string aIdentifier, Texture* aTexture)
 		{
-			MenuItems.push_back(new MenuItem{ aLabel, aToggle, false });
+			if (aIdentifier == TEX_MENU_BACKGROUND)
+			{
+				MenuBG = aTexture;
+			}
+			else if (aIdentifier == TEX_MENU_BUTTON)
+			{
+				MenuButton = aTexture;
+			}
+			else if (aIdentifier == TEX_MENU_BUTTON_HOVER)
+			{
+				MenuButtonHover = aTexture;
+			}
 		}
-		Mutex.unlock();
 	}
 }

@@ -12,14 +12,17 @@
 
 namespace GUI
 {
-	struct MenuItem
+	namespace Menu
 	{
-		std::string		Label;
-		bool*			Toggle;
-		bool			IsHovering;
+		struct MenuItem
+		{
+			std::string		Label;
+			bool*			Toggle;
+			bool			IsHovering;
 
-		bool			Render(Texture* aBackground, Texture* aBackgroundHover);
-	};
+			bool			Render();
+		};
+	}
 }
 
 #endif

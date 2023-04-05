@@ -19,18 +19,21 @@
 
 namespace GUI
 {
-	class MenuWindow : public IWindow
+	namespace Menu
 	{
-		public:
-		std::mutex Mutex;
-		std::vector<MenuItem*> MenuItems;
+		extern bool Visible;
 
-		Texture* MenuBG;
-		Texture* MenuButton;
-		Texture* MenuButtonHover;
+		extern std::mutex Mutex;
+		extern std::vector<MenuItem*> MenuItems;
+
+		extern Texture* MenuBG;
+		extern Texture* MenuButton;
+		extern Texture* MenuButtonHover;
 
 		void Render();
-		void AddMenuItem(const char* aLabel, bool* aToggle);
+		void AddMenuItem(std::string aLabel, bool* aToggle);
+
+		void ReceiveTextures(std::string aIdentifier, Texture* aTexture);
 	};
 }
 
