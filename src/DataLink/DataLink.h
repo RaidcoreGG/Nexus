@@ -22,6 +22,7 @@ namespace DataLink
 	void* GetResource(std::string aIdentifier);
 	/* Allocates new memory of the given size and returns a pointer to it and shares it via the given identifier */
 	void* ShareResource(std::string aIdentifier, size_t aResourceSize);
+	void* ShareResource(std::string aIdentifier, size_t aResourceSize, std::string aResourceNameOverride);
 }
 
 #endif

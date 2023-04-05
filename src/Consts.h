@@ -40,6 +40,6 @@ extern const char* EV_OPTIONS_CALLED;
 
 /* DataLink */
 extern const char* DL_MUMBLE_LINK;
-extern const char* DL_NEXUS_LINK;
+extern const char* DL_NEXUS_LINK_;
 
 #endif

@@ -14,13 +14,15 @@ namespace GUI
 			ImGui::SameLine(); ImGui::TextDisabled("[DEBUG BUILD]");
 #endif
 			ImGui::TextDisabled("Location:");
-			if (ImGui::TreeNode(Path::F_HOST_DLL))
+			ImGui::Text(""); ImGui::SameLine(); ImGui::Text(Path::F_HOST_DLL);
+			if (ImGui::Tooltip())
 			{
-				for (std::wstring param : Parameters)
+				for (std::string param : Parameters)
 				{
-					ImGui::Text(""); ImGui::SameLine(); ImGui::TextDisabledW(param.c_str());
+					ImGui::TextDisabled(("-" + param).c_str());
 				}
-				ImGui::TreePop();
+
+				ImGui::EndTooltip();
 			}
 
 			ImGui::TextDisabled("Renderer:");

@@ -3,7 +3,7 @@
 HMODULE						AddonHostModule = nullptr;
 
 const char*					Version			= __DATE__ " " __TIME__;
-std::vector<std::wstring>	Parameters		= {};
+std::vector<std::string>	Parameters		= {};
 
 LinkedMem*					MumbleLink		= nullptr;
 Identity*					MumbleIdentity  = new Identity{};

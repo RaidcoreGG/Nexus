@@ -16,7 +16,7 @@ using namespace LogHandler;
 extern HMODULE						AddonHostModule;
 
 extern const char*					Version;
-extern std::vector<std::wstring>    Parameters;
+extern std::vector<std::string>		Parameters;
 
 extern LinkedMem*                   MumbleLink;
 extern Identity*                    MumbleIdentity;

@@ -59,6 +59,7 @@ void Initialize()
 	State::Initialize();
 	Path::Initialize(AddonHostModule);
 
+	/* Don't initialize anything */
 	if (State::IsVanilla) { State::AddonHost = ENexusState::SHUTDOWN; return; }
 
 	/* setup loggers */
@@ -81,19 +82,8 @@ void Initialize()
 	Settings::Load();
 	API::Initialize();
 
-	/* manually add mumble to datalink */
-	LinkedResource resMumble{ Mumble::GetHandle(), MumbleLink, sizeof(LinkedMem) };
-	DataLink::Mutex.lock();
-	{
-		DataLink::Registry[DL_MUMBLE_LINK] = resMumble;
-	}
-	DataLink::Mutex.unlock();
-
-	std::string nxs;
-	nxs.append(DL_NEXUS_LINK);
-	nxs.append("_");
-	nxs.append(std::to_string(GetCurrentProcessId()));
-	NexusLink = (NexusLinkData*)DataLink::ShareResource(nxs.c_str(), sizeof(NexusLinkData));
+	Mumble::Initialize();
+	NexusLink = (NexusLinkData*)DataLink::ShareResource((DL_NEXUS_LINK_ + std::to_string(GetCurrentProcessId())), sizeof(NexusLinkData));
 }
 void Shutdown()
 {

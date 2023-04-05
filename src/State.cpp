@@ -16,49 +16,51 @@ namespace State
 
 	void Initialize()
 	{
-		/* arg list */
-		int argc;
-		LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-
+		bool first = true;
 		bool customMumble = false;
 
-		/* skip first, that's the file path */
-		for (int i = 1; i < argc; ++i)
+		std::string cmdline = GetCommandLineA();
+		cmdline.append(" -;"); // append another space, so the last substring can be ignored
+		std::string delimiter = " -";
+
+		size_t pos = 0;
+		std::string token;
+		while ((pos = cmdline.find(delimiter)) != std::string::npos)
 		{
-			std::wstring str;
-			std::wstring cmp = argv[i];
+			token = cmdline.substr(0, pos);
+			std::string cmp = token;
+			cmdline.erase(0, pos + delimiter.length());
+
+			if (first) { first = false; continue; } // skip location param
+
+			Parameters.push_back(token);
 			std::transform(cmp.begin(), cmp.end(), cmp.begin(), ::tolower);
 
-			str.append(argv[i]);
+			//Log("dbg", "token: \"%s\" @ %d", token.c_str(), pos);
 
-			/* peek at the next argument, if it starts with - */
-			if (i + 1 < argc && argv[i + 1][0] != L'-')
-			{
-				/* next argument belongs to this one */
-				if (wcscmp(cmp.c_str(), L"-mumble") == 0)
-				{
-					bool customMumble = true;
-					MumbleLink = Mumble::Initialize(argv[i + 1]);
-				}
-
-				str.append(L" ");
-				str.append(argv[i + 1]);
-				i++;
-			}
-			else
-			{
-				/* single argument */
 #ifdef _DEBUG
-				IsDeveloperMode = true;
+			IsDeveloperMode		= true;
 #else
-				IsDeveloperMode = wcscmp(cmp.c_str(), L"-ggdev") == 0;
-				IsConsoleEnabled = wcscmp(cmp.c_str(), L"-ggconsole") == 0;
+			IsDeveloperMode		= token == "ggdev";
+			IsConsoleEnabled	= token == "ggconsole";
 #endif
-				IsVanilla = wcscmp(cmp.c_str(), L"-ggvanilla") == 0;
-			}
+			IsVanilla			= token == "ggvanilla";
 
-			Parameters.push_back(str);
+			size_t subpos = 0;
+			std::string subtoken;
+			if ((subpos = cmp.find("mumble ")) != std::string::npos)
+			{
+				subtoken = token.substr(7, token.length() - subpos);
+				//Log("dbg", "subtoken: \"%s\" @ %d", subtoken.c_str(), subpos);
+
+				customMumble = true;
+				MumbleLink = (LinkedMem*)DataLink::ShareResource(DL_MUMBLE_LINK, sizeof(LinkedMem), subtoken);
+			}
 		}
-		if (!customMumble) { MumbleLink = Mumble::Initialize(L"MumbleLink"); }
+
+		if (!customMumble)
+		{
+			MumbleLink = (LinkedMem*)DataLink::ShareResource(DL_MUMBLE_LINK, sizeof(LinkedMem), "MumbleLink");
+		}
 	}
 }

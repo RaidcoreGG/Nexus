@@ -17,13 +17,15 @@
 
 namespace Mumble
 {
-	/* Initializes the mumble link with the provided name and returns a pointer to it. */
-	LinkedMem* Initialize(const wchar_t* aMumbleName);
-	/* Frees the mumble link. */
-	void Shutdown();
+	extern bool IsRunning;
 
-	/* Returns a handle to the mumble link. */
-	HANDLE GetHandle();
+	extern std::thread UpdateIdentityThread;
+	extern std::thread UpdateStateThread;
+
+	/* Initializes the threads parsing the MumbleLink. */
+	void Initialize();
+	/* Stops the MumbleLink threads.. */
+	void Shutdown();
 
 	/* Loop that polls Mumble->Identity. */
 	void UpdateIdentityLoop();

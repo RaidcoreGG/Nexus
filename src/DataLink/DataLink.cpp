@@ -25,7 +25,7 @@ namespace DataLink
 					it->second.Handle = nullptr;
 				}
 
-				LogDebug(CH_DATALINK, "Freed shared resource: %s", it->first.c_str());
+				LogDebug(CH_DATALINK, "Freed shared resource: \"%s\"", it->first.c_str());
 
 				Registry.erase(it);
 			}
@@ -51,6 +51,10 @@ namespace DataLink
 
 	void* ShareResource(std::string aIdentifier, size_t aResourceSize)
 	{
+		return ShareResource(aIdentifier, aResourceSize, "");
+	}
+	void* ShareResource(std::string aIdentifier, size_t aResourceSize, std::string aResourceNameOverride)
+	{
 		void* result = nullptr;
 
 		Mutex.lock();
@@ -66,7 +70,11 @@ namespace DataLink
 				LinkedResource resource{};
 				resource.Size = aResourceSize;
 
-				resource.Handle = CreateFileMappingA(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, aResourceSize, aIdentifier.c_str());
+				resource.Handle = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, aResourceNameOverride != "" ? aResourceNameOverride.c_str() : aIdentifier.c_str());
+				if (resource.Handle == 0)
+				{
+					resource.Handle = CreateFileMappingA(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, aResourceSize, aResourceNameOverride != "" ? aResourceNameOverride.c_str() : aIdentifier.c_str());
+				}
 
 				if (resource.Handle)
 				{
@@ -78,6 +86,15 @@ namespace DataLink
 			}
 		}
 		Mutex.unlock();
+
+		if (aResourceNameOverride != "")
+		{
+			LogDebug(CH_DATALINK, "Created shared resource: \"%s\" (with underlying name \"%s\")", aIdentifier.c_str(), aResourceNameOverride.c_str());
+		}
+		else
+		{
+			LogDebug(CH_DATALINK, "Created shared resource: \"%s\"", aIdentifier.c_str());
+		}
 
 		return result;
 	}

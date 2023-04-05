@@ -4,11 +4,10 @@ using json = nlohmann::json;
 
 namespace Mumble
 {
-	HANDLE Handle;
+	bool IsRunning = false;
+
 	std::thread UpdateIdentityThread;
 	std::thread UpdateStateThread;
-	bool IsRunning = false;
-	unsigned Tick = 0;
 
 	/* Helpers for state vars */
 	static unsigned prevTick = 0;
@@ -16,54 +15,18 @@ namespace Mumble
 	static Vector3 prevCamFront{};
 	static Identity prevIdentity{};
 
-	LinkedMem* Initialize(const wchar_t* aMumbleName)
+	void Initialize()
 	{
-		if (wcscmp(aMumbleName, L"0") == 0) { State::IsMumbleDisabled = true; return nullptr; }
-
-		if (Handle && MumbleLink) { return MumbleLink; }
-
-		Handle = OpenFileMappingW(FILE_MAP_ALL_ACCESS, FALSE, aMumbleName);
-		if (Handle == 0)
-		{
-			Handle = CreateFileMappingW(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, sizeof(LinkedMem), aMumbleName);
-		}
-
-		if (Handle)
-		{
-			MumbleLink = (LinkedMem*)MapViewOfFile(Handle, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(LinkedMem));
-
-			IsRunning = true;
-			UpdateIdentityThread = std::thread(UpdateIdentityLoop);
-			UpdateIdentityThread.detach();
-			UpdateStateThread = std::thread(UpdateStateLoop);
-			UpdateStateThread.detach();
-
-			return MumbleLink;
-		}
-
-		return nullptr;
+		IsRunning = true;
+		UpdateIdentityThread = std::thread(UpdateIdentityLoop);
+		UpdateIdentityThread.detach();
+		UpdateStateThread = std::thread(UpdateStateLoop);
+		UpdateStateThread.detach();
 	}
 
 	void Shutdown()
 	{
 		IsRunning = false;
-
-		if (MumbleLink)
-		{
-			UnmapViewOfFile((LPVOID)MumbleLink);
-			MumbleLink = nullptr;
-		}
-
-		if (Handle)
-		{
-			CloseHandle(Handle);
-			Handle = nullptr;
-		}
-	}
-
-	HANDLE GetHandle()
-	{
-		return Handle ? Handle : nullptr;
 	}
 
 	void UpdateIdentityLoop()

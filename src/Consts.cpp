@@ -38,5 +38,5 @@ const char* EV_MUMBLE_IDENTITY_UPDATED	= "EV_MUMBLE_IDENTITY_UPDATED";
 const char* EV_OPTIONS_CALLED			= "EV_OPTIONS_CALLED";
 
 /* DataLink */
-extern const char* DL_MUMBLE_LINK		= "DL_MUMBLE_LINK";
-extern const char* DL_NEXUS_LINK		= "DL_NEXUS_LINK";
+const char* DL_MUMBLE_LINK				= "DL_MUMBLE_LINK";
+const char* DL_NEXUS_LINK_				= "DL_NEXUS_LINK_";
