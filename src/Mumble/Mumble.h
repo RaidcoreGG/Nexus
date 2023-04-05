@@ -24,7 +24,7 @@ namespace Mumble
 
 	/* Initializes the threads parsing the MumbleLink. */
 	void Initialize();
-	/* Stops the MumbleLink threads.. */
+	/* Stops the MumbleLink threads. */
 	void Shutdown();
 
 	/* Loop that polls Mumble->Identity. */

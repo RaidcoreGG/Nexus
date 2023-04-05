@@ -14,8 +14,6 @@
 #include "Consts.h"
 
 #include "Logging/LogHandler.h"
-#include "Logging/ConsoleLogger.h"
-#include "Logging/FileLogger.h"
 
 #include "Mumble/Mumble.h"
 #include "Keybinds/KeybindHandler.h"
@@ -59,18 +57,8 @@ void Initialize()
 	State::Initialize();
 	Path::Initialize(AddonHostModule);
 
-	/* Don't initialize anything */
+	/* Don't initialize anything if vanilla*/
 	if (State::IsVanilla) { State::AddonHost = ENexusState::SHUTDOWN; return; }
-
-	/* setup loggers */
-	if (State::IsConsoleEnabled)
-	{
-		ConsoleLogger* cLog = new ConsoleLogger(ELogLevel::ALL);
-		RegisterLogger(cLog);
-	}
-
-	FileLogger* fLog = new FileLogger(ELogLevel::ALL, Path::F_LOG);
-	RegisterLogger(fLog);
 
 	LogHandler::Initialize();
 
@@ -78,6 +66,7 @@ void Initialize()
 	LogInfo(CH_CORE, "Version: %s", Version);
 
 	MH_Initialize();
+
 	Keybinds::Load();
 	Settings::Load();
 	API::Initialize();
@@ -93,13 +82,21 @@ void Shutdown()
 
 		GUI::Shutdown();
 		Mumble::Shutdown();
-		MH_Uninitialize();
+
+		// free addons & shared mem
 		Loader::Shutdown();
-		DataLink::Shutdown();
+		DataLink::Free();
+
+		/* Save keybinds, settings, api keys & api cache */
 		Keybinds::Save();
 		Settings::Save();
 		API::Save();
 
+		MH_Uninitialize();
+
+		LogHandler::Shutdown();
+
+		// free libs
 		if (hD3D11)		{ FreeLibrary(hD3D11); }
 		if (hSysD3D11)	{ FreeLibrary(hSysD3D11); }
 	}
@@ -143,7 +140,7 @@ LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	if (uMsg == WM_DESTROY)
 	{
-		LogCritical(CH_CORE, "::Destroy()");
+		LogCritical(CH_CORE, "::Shutdown()");
 		::Shutdown();
 	}
 

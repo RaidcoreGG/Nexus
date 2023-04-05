@@ -56,6 +56,15 @@ namespace Loader
 	void Shutdown()
 	{
 		State::AddonHost = ENexusState::ADDONS_SHUTDOWN;
+
+		Mutex.lock();
+		{
+			while (AddonDefs.size() != 0)
+			{
+				UnloadAddon(AddonDefs.begin()->first);
+			}
+		}
+		Mutex.unlock();
 	}
 
 	void LoadAddon(std::filesystem::path aPath)
@@ -169,7 +178,7 @@ namespace Loader
 
 				Mutex.lock();
 				{
-					for (const auto& [path, addon] : Loader::AddonDefs)
+					for (const auto& [path, addon] : AddonDefs)
 					{
 						if (onDiskLeft.find(path) != onDiskLeft.end())
 						{

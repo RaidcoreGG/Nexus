@@ -16,7 +16,7 @@ namespace DataLink
 	extern std::map<std::string, LinkedResource>	Registry;
 
 	/* Frees all remaining resources */
-	void Shutdown();
+	void Free();
 
 	/* Retrieves the resource with the given identifier */
 	void* GetResource(std::string aIdentifier);

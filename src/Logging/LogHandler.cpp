@@ -1,5 +1,7 @@
 #include "LogHandler.h"
 
+#include "../State.h"
+
 namespace LogHandler
 {
 	std::mutex Mutex;
@@ -13,9 +15,23 @@ namespace LogHandler
 
 	void Initialize()
 	{
+		/* setup default loggers */
+		if (State::IsConsoleEnabled)
+		{
+			ConsoleLogger* cLog = new ConsoleLogger(ELogLevel::ALL);
+			RegisterLogger(cLog);
+		}
+
+		FileLogger* fLog = new FileLogger(ELogLevel::ALL, Path::F_LOG);
+		RegisterLogger(fLog);
+
 		IsRunning = true;
 		LoggingThread = std::thread(ProcessQueueLoop);
 		LoggingThread.detach();
+	}
+	void Shutdown()
+	{
+		IsRunning = false;
 	}
 
 	void RegisterLogger(ILogger* aLogger)

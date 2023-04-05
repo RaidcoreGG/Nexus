@@ -10,8 +10,13 @@
 #include <chrono>
 #include <string>
 
+#include "../Paths.h"
+
 #include "ILogger.h"
 #include "LogEntry.h"
+
+#include "ConsoleLogger.h"
+#include "FileLogger.h"
 
 namespace LogHandler
 {
@@ -25,6 +30,7 @@ namespace LogHandler
 	extern std::vector<LogEntry> QueuedMessages;
 
 	void Initialize();
+	void Shutdown();
 
 	void RegisterLogger(ILogger* aLogger);
 	void UnregisterLogger(ILogger* aLogger);
