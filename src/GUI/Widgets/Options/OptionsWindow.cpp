@@ -80,7 +80,7 @@ namespace GUI
 
 						float kbButtonWidth = ImGui::CalcTextSize("XXXXXXXXXXXXXXXX").x;
 
-						if (ImGui::BeginTable("table_keybinds", 2, ImGuiTableFlags_BordersInnerH))
+						if (ImGui::BeginTable("table_keybinds", 3, ImGuiTableFlags_BordersInnerH))
 						{
 							Keybinds::Mutex.lock();
 							{
@@ -95,6 +95,12 @@ namespace GUI
 									{
 										CurrentlyEditing = identifier;
 										ImGui::OpenPopup(("Set Keybind: " + CurrentlyEditing).c_str(), ImGuiPopupFlags_AnyPopupLevel);
+									}
+
+									ImGui::TableSetColumnIndex(2);
+									if (keybind.Handler == nullptr)
+									{
+										ImGui::TextDisabled("Keybind not in use.");
 									}
 								}
 							}
