@@ -1,8 +1,5 @@
 #include "OptionsWindow.h"
 
-#include "../../GUI.h"
-#include "../QuickAccess/QuickAccess.h"
-
 namespace GUI
 {
 	std::string CurrentlyEditing;
@@ -24,7 +21,12 @@ namespace GUI
 					{
 						ImGui::BeginChild("##GeneralTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-						// new item
+						ImGui::TextDisabled("General");
+						if (ImGui::Checkbox("Developer Mode", &State::IsDeveloperMode))
+						{
+							Settings::Settings[OPT_DEVMODE] = State::IsDeveloperMode;
+							Settings::Save();
+						}
 
 						ImGui::EndChild();
 					}

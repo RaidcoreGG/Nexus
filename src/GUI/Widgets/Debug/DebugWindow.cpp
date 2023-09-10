@@ -2,6 +2,10 @@
 
 namespace GUI
 {
+	static ImGui::MemoryEditor memEditor;
+	void* memPtr = nullptr;
+	size_t memSz = 0;
+
 	DebugWindow::DebugWindow()
 	{
 		MumbleWindow = new MumbleOverlay();
@@ -97,6 +101,13 @@ namespace GUI
 									ImGui::TextDisabled("Handle: %p", resource.Handle);
 									ImGui::TextDisabled("Pointer: %p", resource.Pointer);
 									ImGui::TextDisabled("Size: %d", resource.Size);
+
+									if (ImGui::SmallButton("Memory Editor"))
+									{
+										memEditor.Open = true;
+										memPtr = resource.Pointer;
+										memSz = resource.Size;
+									}
 
 									ImGui::TreePop();
 								}
@@ -266,5 +277,7 @@ namespace GUI
 			}
 		}
 		ImGui::End();
+
+		memEditor.DrawWindow("Memory Editor", memPtr, memSz);
 	}
 }

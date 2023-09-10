@@ -38,13 +38,9 @@ namespace State
 
 			//Log("dbg", "token: \"%s\" @ %d", token.c_str(), pos);
 
-#ifdef _DEBUG
-			IsDeveloperMode		= true;
-#else
-			IsDeveloperMode		= token == "ggdev";
-			IsConsoleEnabled	= token == "ggconsole";
-#endif
-			IsVanilla			= token == "ggvanilla";
+			if (token == "ggdev") { IsDeveloperMode = true; }
+			if (token == "ggconsole") { IsConsoleEnabled = true; }
+			if (token == "ggvanilla") { IsVanilla = true; }
 
 			size_t subpos = 0;
 			std::string subtoken;

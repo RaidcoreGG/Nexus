@@ -14,6 +14,7 @@
 
 #include "../../../imgui/imgui.h"
 #include "../../../imgui/imgui_extensions.h"
+#include "../../../imgui/imgui_memory_editor.h"
 
 #include "../../IWindow.h"
 

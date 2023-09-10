@@ -497,6 +497,9 @@
     <ClInclude Include="httplib\httplib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="imgui\imgui_memory_editor.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Raidcore-AddonHost.rc">

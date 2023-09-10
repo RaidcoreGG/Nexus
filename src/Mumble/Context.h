@@ -28,6 +28,7 @@ namespace Mumble
 		Compass Compass;
 		unsigned ProcessID;
 		EMountIndex MountIndex;
+		unsigned char UNUSED[168];
 	};
 }
 

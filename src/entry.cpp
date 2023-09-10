@@ -69,7 +69,13 @@ void Initialize()
 
 	Keybinds::Load();
 	Settings::Load();
-	API::Initialize();
+
+#ifdef _DEBUG
+	State::IsDeveloperMode = true;
+#else
+	State::IsDeveloperMode = Settings::Settings[OPT_DEVMODE].get<bool>();
+#endif
+	//API::Initialize();
 
 	Mumble::Initialize();
 	NexusLink = (NexusLinkData*)DataLink::ShareResource((DL_NEXUS_LINK_ + std::to_string(GetCurrentProcessId())), sizeof(NexusLinkData));
@@ -90,7 +96,7 @@ void Shutdown()
 		/* Save keybinds, settings, api keys & api cache */
 		Keybinds::Save();
 		Settings::Save();
-		API::Save();
+		//API::Save();
 
 		MH_Uninitialize();
 

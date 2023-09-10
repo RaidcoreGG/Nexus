@@ -14,7 +14,9 @@
 #include "../../../imgui/imgui.h"
 #include "../../../imgui/imgui_extensions.h"
 
+#include "../../GUI.h"
 #include "../../IWindow.h"
+#include "../QuickAccess/QuickAccess.h"
 
 namespace GUI
 {
