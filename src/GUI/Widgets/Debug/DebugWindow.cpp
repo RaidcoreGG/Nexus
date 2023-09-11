@@ -15,6 +15,8 @@ namespace GUI
 	{
 		MumbleWindow->Render();
 
+		memEditor.DrawWindow("Memory Editor", memPtr, memSz);
+
 		if (!Visible) { return; }
 
 		ImGui::SetNextWindowSize(ImVec2(480.0f, 380.0f));
@@ -277,7 +279,5 @@ namespace GUI
 			}
 		}
 		ImGui::End();
-
-		memEditor.DrawWindow("Memory Editor", memPtr, memSz);
 	}
 }

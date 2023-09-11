@@ -39,8 +39,11 @@ namespace GUI
 						{
 							if (mItem->Render())
 							{
-								/* if they return true, they were pressed -> hide the menu */
-								Visible = false;
+								if (GUI::CloseMenuAfterSelecting)
+								{
+									/* if they return true, they were pressed -> hide the menu */
+									Visible = false;
+								}
 							}
 						}
 					}

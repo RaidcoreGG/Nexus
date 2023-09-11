@@ -27,6 +27,14 @@ namespace GUI
 							Settings::Settings[OPT_DEVMODE] = State::IsDeveloperMode;
 							Settings::Save();
 						}
+						ImGui::TooltipGeneric("Enables the Debug menu and some other features.");
+
+						ImGui::TextDisabled("UI/UX");
+						if (ImGui::Checkbox("Close Menu after selecting item", &GUI::CloseMenuAfterSelecting))
+						{
+							Settings::Settings[OPT_CLOSEMENU] = GUI::CloseMenuAfterSelecting;
+							Settings::Save();
+						}
 
 						ImGui::EndChild();
 					}

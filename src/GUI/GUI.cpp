@@ -11,6 +11,7 @@ namespace GUI
 	std::vector<IWindow*>		Windows;
 	std::map<EFont, ImFont*>	FontIndex;
 	float						FontSize;
+	bool						CloseMenuAfterSelecting;
 
 	bool						IsUIVisible			= true;
 
@@ -444,6 +445,8 @@ namespace GUI
 			{
 				QuickAccess::Offset = ImVec2(Settings::Settings[OPT_QAOFFSETX].get<float>(), Settings::Settings[OPT_QAOFFSETY].get<float>());
 			}
+
+			if (!Settings::Settings[OPT_CLOSEMENU].is_null()) { CloseMenuAfterSelecting = Settings::Settings[OPT_CLOSEMENU].get<bool>(); }
 		}
 
 		IsSetup = true;

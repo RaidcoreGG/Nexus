@@ -40,6 +40,7 @@ namespace GUI
 	extern std::vector<IWindow*>		Windows;
 	extern std::map<EFont, ImFont*>		FontIndex;
 	extern float						FontSize;
+	extern bool							CloseMenuAfterSelecting;
 
 	extern bool							IsUIVisible;
 
