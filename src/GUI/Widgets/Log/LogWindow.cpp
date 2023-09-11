@@ -6,6 +6,7 @@ namespace GUI
 	std::string ChannelFilter;
 
 	const char* filterLevels[] = { "Critical", "Warning", "Info", "Debug", "Trace", "All" };
+	size_t amtShown = 0;
 
 	LogWindow::LogWindow(ELogLevel aLogLevel)
 	{
@@ -63,21 +64,21 @@ namespace GUI
 				}
 				LogHandler::Mutex.unlock();
 
+				ImGui::TextDisabled("Showing %d out of %d", amtShown, LogEntries.size());
+
 				ImGui::EndChild();
 			}
 
 			ImGui::SameLine();
-			
+
+			amtShown = 0;
+
 			{
 				ImGui::BeginChild("logmessages", ImVec2(windowWidthQuarter * 3 - 1, 0.0f));
 				
 				MessageMutex.lock();
 				{
-					/* Show last 200 log messages */
-					size_t start = 0;
-					if (LogEntries.size() > 200) { start = LogEntries.size() - 200; }
-
-					for (size_t i = start; i < LogEntries.size(); i++)
+					for (size_t i = 0; i < LogEntries.size(); i++)
 					{
 						LogEntry entry = LogEntries[i];
 
@@ -86,6 +87,8 @@ namespace GUI
 							(!SelectedOnly && entry.LogLevel <= filterLevel)) &&
 							((ChannelFilter == "") || ChannelFilter == entry.Channel))
 						{
+							amtShown++;
+
 							const char* level;
 							switch (entry.LogLevel)
 							{
@@ -122,7 +125,6 @@ namespace GUI
 
 				ImGui::EndChild();
 			}
-			
 		}
 		ImGui::End();
 	}
