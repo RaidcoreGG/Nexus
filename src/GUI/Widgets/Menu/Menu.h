@@ -33,7 +33,7 @@ namespace GUI
 		void Render();
 		void AddMenuItem(std::string aLabel, bool* aToggle);
 
-		void ReceiveTextures(std::string aIdentifier, Texture* aTexture);
+		void ReceiveTextures(const char* aIdentifier, Texture* aTexture);
 	};
 }
 

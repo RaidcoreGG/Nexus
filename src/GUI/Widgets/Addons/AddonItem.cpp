@@ -34,7 +34,7 @@ namespace GUI
 				{
 					LogDebug(CH_GUI, "Uninstall called: %s", aDefinitions->Name);
 				}
-				ImGui::TextCenteredColumn(aDefinitions->Version);
+				ImGui::TextCenteredColumn(aDefinitions->Version.ToString().c_str());
 
 				ImGui::EndGroup();
 			}

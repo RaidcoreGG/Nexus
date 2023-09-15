@@ -26,8 +26,6 @@
 #include "Settings/Settings.h"
 #include "API/APIController.h"
 
-#define ENABLE_CHAINLOAD
-
 /* handles */
 HMODULE			hGW2			= nullptr;
 HMODULE			hD3D11			= nullptr;
@@ -52,36 +50,49 @@ void UpdateNexusLink()
 
 void Initialize()
 {
+	Version->Major = 1;
+	Version->Minor = 0;
+	Version->Build = 0;
+	Version->Revision = 1;
+
 	State::AddonHost = ENexusState::LOAD;
 
 	State::Initialize();
 	Path::Initialize(AddonHostModule);
 
 	/* Don't initialize anything if vanilla*/
-	if (State::IsVanilla) { State::AddonHost = ENexusState::SHUTDOWN; return; }
+	if (!State::IsVanilla)
+	{
+		LogHandler::Initialize();
 
-	LogHandler::Initialize();
+		LogInfo(CH_CORE, GetCommandLineA());
+		LogInfo(CH_CORE, "Version: %s", Version->ToString().c_str());
 
-	LogInfo(CH_CORE, GetCommandLineA());
-	LogInfo(CH_CORE, "Version: %s", Version);
+		MH_Initialize();
 
-	MH_Initialize();
+		Keybinds::Load();
+		Settings::Load();
 
-	Keybinds::Load();
-	Settings::Load();
+		State::IsDeveloperMode = Settings::Settings[OPT_DEVMODE].get<bool>();
+		//API::Initialize();
 
-#ifdef _DEBUG
-	State::IsDeveloperMode = true;
-#else
-	State::IsDeveloperMode = Settings::Settings[OPT_DEVMODE].get<bool>();
-#endif
-	//API::Initialize();
+		Mumble::Initialize();
+		NexusLink = (NexusLinkData*)DataLink::ShareResource((DL_NEXUS_LINK_ + std::to_string(GetCurrentProcessId())).c_str(), sizeof(NexusLinkData));
 
-	Mumble::Initialize();
-	NexusLink = (NexusLinkData*)DataLink::ShareResource((DL_NEXUS_LINK_ + std::to_string(GetCurrentProcessId())), sizeof(NexusLinkData));
+		// create imgui context
+		if (!Renderer::GuiContext) { Renderer::GuiContext = ImGui::CreateContext(); }
+
+		Loader::Initialize();
+	}
+	else
+	{
+		State::AddonHost = ENexusState::SHUTDOWN;
+	}
 }
 void Shutdown()
 {
+	LogCritical(CH_CORE, "::Shutdown()");
+
 	if (State::AddonHost < ENexusState::SHUTDOWN)
 	{
 		State::AddonHost = ENexusState::SHUTDOWN;
@@ -101,54 +112,23 @@ void Shutdown()
 		MH_Uninitialize();
 
 		LogHandler::Shutdown();
-
-		// free libs
-		if (hD3D11)		{ FreeLibrary(hD3D11); }
-		if (hSysD3D11)	{ FreeLibrary(hSysD3D11); }
 	}
+
+	// free libs
+	if (hD3D11) { FreeLibrary(hD3D11); }
+	if (hSysD3D11) { FreeLibrary(hSysD3D11); }
 }
+
+std::vector<UINT> uMsgs;
 
 /* hk */
 LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	//static const char* func_name = "hkWndProc";
-	//Logger->Log(func_name);
-
-	if (uMsg == WM_PAINT && State::AddonHost <= ENexusState::ADDONS_LOAD)
-	{
-		Loader::Initialize();
-		/* rename the window because they will never fix the bug that it's called just "G" */
-		CallWindowProcA(Hooks::GW2_WndProc, hWnd, WM_SETTEXT, 0, (LPARAM)"Guild Wars 2");
-	}
-
-	// don't pass to game if addon wndproc
-	Loader::Mutex.lock();
-	{
-		for (auto& [path, addon] : Loader::AddonDefs)
-		{
-			if (addon.Definitions && addon.Definitions->WndProc)
-			{
-				if (addon.Definitions->WndProc(hWnd, uMsg, wParam, lParam))
-				{
-					Loader::Mutex.unlock();
-					return 0;
-				}
-			}
-		}
-	}
-	Loader::Mutex.unlock();
-
-	// don't pass to game if keybind
+	// don't pass to game if keybind (or custom addon wndproc)
 	if (Keybinds::WndProc(hWnd, uMsg, wParam, lParam)) { return 0; }
 
 	// don't pass to game if gui
 	if (GUI::WndProc(hWnd, uMsg, wParam, lParam)) { return 0; }
-
-	if (uMsg == WM_DESTROY)
-	{
-		LogCritical(CH_CORE, "::Shutdown()");
-		::Shutdown();
-	}
 
 	// don't pass keys to game if currently editing keybinds
 	if (Keybinds::IsSettingKeybind)
@@ -159,16 +139,12 @@ LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 	}
 
-	// TODO: Consider subclassing instead of CallWindowProcA
-	// subclassing thingy: https://devblogs.microsoft.com/oldnewthing/?p=41883
-	// CallWindowProcA is necessary btw, else a memory access violation will occur if directly called
+	if (uMsg == WM_DESTROY) { ::Shutdown(); }
+
 	return CallWindowProcA(Hooks::GW2_WndProc, hWnd, uMsg, wParam, lParam);
 }
 HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
 {
-	//static const char* func_name = "hkDXGIPresent";
-	//Log(func_name);
-
 	if (Renderer::SwapChain != pChain)
 	{
 		Renderer::SwapChain = pChain;
@@ -191,6 +167,18 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 		Hooks::GW2_WndProc = (WNDPROC)SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)hkWndProc);
 	}
 
+	while (Loader::QueuedUnload.size() > 0)
+	{
+		Loader::UnloadAddon(Loader::QueuedUnload.front());
+		Loader::QueuedUnload.erase(Loader::QueuedUnload.begin());
+	}
+
+	while (Loader::QueuedLoad.size() > 0)
+	{
+		Loader::LoadAddon(Loader::QueuedLoad.front());
+		Loader::QueuedLoad.erase(Loader::QueuedLoad.begin());
+	}
+
 	while (TextureLoader::QueuedTextures.size() > 0)
 	{
 		TextureLoader::CreateTexture(TextureLoader::QueuedTextures.front());
@@ -205,9 +193,6 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 }
 HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
 {
-	//static const char* func_name = "hkDXGIResizeBuffers";
-	//Log(func_name);
-
 	GUI::Shutdown();
 
 	/* Cache window dimensions */
@@ -226,7 +211,6 @@ bool DxLoad()
 	{
 		State::Directx = EDxState::DIRECTX_LOAD;
 
-#ifdef ENABLE_CHAINLOAD
 		/* attempt to chainload */
 		/* sanity check that the current dll isn't the chainload */
 		if (Path::F_HOST_DLL != Path::F_CHAINLOAD_DLL)
@@ -237,16 +221,13 @@ bool DxLoad()
 
 			hD3D11 = LoadLibraryA(Path::F_CHAINLOAD_DLL);
 		}
-#endif
 
 		if (!hD3D11)
 		{
-#ifdef ENABLE_CHAINLOAD
 			if (State::IsChainloading)
 			{
 				LogWarning(CH_CORE, "No chainload found or failed to load.");
 			}
-#endif
 			State::IsChainloading = false;
 
 			hD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
@@ -326,7 +307,6 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 	static const char* func_name = "D3D11CreateDevice";
 	Log(CH_CORE, func_name);
 
-#ifdef ENABLE_CHAINLOAD
 	if (State::Directx >= EDxState::DIRECTX_READY)
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
@@ -338,7 +318,6 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 			return 0;
 		}
 	}
-#endif
 
 	if (DxLoad() == false) { return 0; }
 
@@ -360,7 +339,6 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 	static const char* func_name = "D3D11CreateDeviceAndSwapChain";
 	Log(CH_CORE, func_name);
 
-#ifdef ENABLE_CHAINLOAD
 	if (State::Directx >= EDxState::DIRECTX_READY)
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
@@ -372,7 +350,6 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 			return 0;
 		}
 	}
-#endif
 
 	if (DxLoad() == false) { return 0; }
 
@@ -397,7 +374,6 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 	static const char* func_name = "D3D11CoreCreateDevice";
 	Log(CH_CORE, func_name);
 
-#ifdef ENABLE_CHAINLOAD
 	if (State::Directx >= EDxState::DIRECTX_READY)
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
@@ -409,7 +385,6 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 			return 0;
 		}
 	}
-#endif
 
 	if (DxLoad() == false) { return 0; }
 
@@ -431,7 +406,6 @@ HRESULT __stdcall D3D11CoreCreateLayeredDevice(const void* unknown0, DWORD unkno
 	static const char* func_name = "D3D11CoreCreateLayeredDevice";
 	Log(CH_CORE, func_name);
 
-#ifdef ENABLE_CHAINLOAD
 	if (State::Directx >= EDxState::DIRECTX_READY)
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
@@ -443,7 +417,6 @@ HRESULT __stdcall D3D11CoreCreateLayeredDevice(const void* unknown0, DWORD unkno
 			return 0;
 		}
 	}
-#endif
 
 	if (DxLoad() == false) { return 0; }
 
@@ -465,7 +438,6 @@ SIZE_T	__stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unkno
 	static const char* func_name = "D3D11CoreGetLayeredDeviceSize";
 	Log(CH_CORE, func_name);
 
-#ifdef ENABLE_CHAINLOAD
 	if (State::Directx >= EDxState::DIRECTX_READY)
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
@@ -477,7 +449,6 @@ SIZE_T	__stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unkno
 			return 0;
 		}
 	}
-#endif
 
 	if (DxLoad() == false) { return 0; }
 
@@ -499,7 +470,6 @@ HRESULT __stdcall D3D11CoreRegisterLayers(const void* unknown0, DWORD unknown1)
 	static const char* func_name = "D3D11CoreRegisterLayers";
 	Log(CH_CORE, func_name);
 
-#ifdef ENABLE_CHAINLOAD
 	if (State::Directx >= EDxState::DIRECTX_READY)
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
@@ -511,7 +481,6 @@ HRESULT __stdcall D3D11CoreRegisterLayers(const void* unknown0, DWORD unknown1)
 			return 0;
 		}
 	}
-#endif
 
 	if (DxLoad() == false) { return 0; }
 

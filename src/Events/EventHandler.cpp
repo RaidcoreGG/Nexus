@@ -5,13 +5,15 @@ namespace Events
 	std::mutex											Mutex;
 	std::map<std::string, std::vector<EVENT_CONSUME>>	Registry;
 
-	void Raise(std::string aIdentifier, void* aEventData)
+	void Raise(const char* aIdentifier, void* aEventData)
 	{
-		Log(CH_EVENTS, aIdentifier.c_str());
+		std::string str = aIdentifier;
+
+		Log(CH_EVENTS, str.c_str());
 
 		Mutex.lock();
 		{
-			for (EVENT_CONSUME callback : Registry[aIdentifier])
+			for (EVENT_CONSUME callback : Registry[str])
 			{
 				std::thread([callback, aEventData]() { callback(aEventData); }).detach();
 			}
@@ -19,22 +21,26 @@ namespace Events
 		Mutex.unlock();
 	}
 
-	void Subscribe(std::string aIdentifier, EVENT_CONSUME aConsumeEventCallback)
+	void Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback)
 	{
+		std::string str = aIdentifier;
+
 		Mutex.lock();
 		{
-			Registry[aIdentifier].push_back(aConsumeEventCallback);
+			Registry[str].push_back(aConsumeEventCallback);
 		}
 		Mutex.unlock();
 	}
 
-	void Unsubscribe(std::string aIdentifier, EVENT_CONSUME aConsumeEventCallback)
+	void Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback)
 	{
+		std::string str = aIdentifier;
+
 		Mutex.lock();
 		{
-			if (Registry.find(aIdentifier) != Registry.end())
+			if (Registry.find(str) != Registry.end())
 			{
-				Registry[aIdentifier].erase(std::remove(Registry[aIdentifier].begin(), Registry[aIdentifier].end(), aConsumeEventCallback), Registry[aIdentifier].end());
+				Registry[str].erase(std::remove(Registry[str].begin(), Registry[str].end(), aConsumeEventCallback), Registry[str].end());
 			}
 		}
 		Mutex.unlock();

@@ -156,44 +156,50 @@ namespace GUI
 			ImGui::PopStyleVar();
 		}
 
-		void AddShortcut(std::string aIdentifier, std::string aTextureIdentifier, std::string aTextureHoverIdentifier, std::string aKeybindIdentifier, std::string aTooltipText)
+		void AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aKeybindIdentifier, const char* aTooltipText)
 		{
+			std::string str = aIdentifier;
+			std::string strTexId = aTextureIdentifier;
+			std::string strTexHoverId = aTextureHoverIdentifier;
+			std::string strKbId = aKeybindIdentifier;
+			std::string strTT = aTooltipText;
+
 			Mutex.lock();
 			{
-				if (Registry.find(aIdentifier) == Registry.end())
+				if (Registry.find(str) == Registry.end())
 				{
-					Texture* normal = TextureLoader::Get(aTextureIdentifier);
-					Texture* hover = TextureLoader::Get(aTextureHoverIdentifier);
+					Texture* normal = TextureLoader::Get(strTexId.c_str());
+					Texture* hover = TextureLoader::Get(strTexHoverId.c_str());
 					Shortcut sh{};
 					sh.TextureNormal = normal;
 					sh.TextureHover = hover;
 					sh.Keybind = aKeybindIdentifier;
 					sh.TooltipText = aTooltipText;
-					Registry[aIdentifier] = sh;
+					Registry[str] = sh;
 
 					// keep trying to get the texture for a little bit
 					if (normal == nullptr || hover == nullptr)
 					{
-						std::thread([aIdentifier, aTextureIdentifier, aTextureHoverIdentifier]()
+						std::thread([str, strTexId, strTexHoverId]()
 						{
 							int tries = 0;
 							int amt = 0;
-							if (Registry[aIdentifier].TextureNormal != nullptr) { amt++; }
-							if (Registry[aIdentifier].TextureHover != nullptr) { amt++; }
+							if (Registry[str].TextureNormal != nullptr) { amt++; }
+							if (Registry[str].TextureHover != nullptr) { amt++; }
 
-							LogDebug(CH_QUICKACCESS, "Shortcut \"%s\" was promised 2 textures, but received %d.", aIdentifier.c_str(), amt);
+							LogDebug(CH_QUICKACCESS, "Shortcut \"%s\" was promised 2 textures, but received %d.", str.c_str(), amt);
 							Sleep(1000); // first retry after 1s
 
-							while (Registry[aIdentifier].TextureNormal == nullptr || Registry[aIdentifier].TextureHover == nullptr)
+							while (Registry[str].TextureNormal == nullptr || Registry[str].TextureHover == nullptr)
 							{
 								if (tries > 10)
 								{
-									LogWarning(CH_QUICKACCESS, "Cancelled getting textures for shortcut \"%s\" after 10 failed attempts.", aIdentifier.c_str());
+									LogWarning(CH_QUICKACCESS, "Cancelled getting textures for shortcut \"%s\" after 10 failed attempts.", str.c_str());
 									break;
 								}
 
-								if (Registry[aIdentifier].TextureNormal == nullptr) { Registry[aIdentifier].TextureNormal = TextureLoader::Get(aTextureIdentifier); }
-								if (Registry[aIdentifier].TextureHover == nullptr) { Registry[aIdentifier].TextureHover = TextureLoader::Get(aTextureHoverIdentifier); }
+								if (Registry[str].TextureNormal == nullptr) { Registry[str].TextureNormal = TextureLoader::Get(strTexId.c_str()); }
+								if (Registry[str].TextureHover == nullptr) { Registry[str].TextureHover = TextureLoader::Get(strTexHoverId.c_str()); }
 
 								tries++;
 								Sleep(5000);
@@ -202,19 +208,19 @@ namespace GUI
 							/* if not all tries were used, then the texture was loaded */
 							if (tries <= 10)
 							{
-								LogDebug(CH_QUICKACCESS, "Shortcut \"%s\" received promised textures after %d attempt(s).", aIdentifier.c_str(), tries);
+								LogDebug(CH_QUICKACCESS, "Shortcut \"%s\" received promised textures after %d attempt(s).", str.c_str(), tries);
 								return;
 							}
 
 							/* fallback icons */
-							Registry[aIdentifier].TextureNormal = TextureLoader::Get(ICON_GENERIC);
-							Registry[aIdentifier].TextureHover = TextureLoader::Get(ICON_GENERIC_HOVER);
+							Registry[str].TextureNormal = TextureLoader::Get(ICON_GENERIC);
+							Registry[str].TextureHover = TextureLoader::Get(ICON_GENERIC_HOVER);
 
 							/* absolute sanity check */
-							if (Registry[aIdentifier].TextureNormal == nullptr || Registry[aIdentifier].TextureHover == nullptr)
+							if (Registry[str].TextureNormal == nullptr || Registry[str].TextureHover == nullptr)
 							{
-								LogWarning(CH_QUICKACCESS, "Neither promised textures nor fallback textures could be loaded, removing shortcut \"%s\".", aIdentifier.c_str());
-								RemoveShortcut(aIdentifier);
+								LogWarning(CH_QUICKACCESS, "Neither promised textures nor fallback textures could be loaded, removing shortcut \"%s\".", str.c_str());
+								RemoveShortcut(str.c_str());
 							}
 						}).detach();
 					}
@@ -223,32 +229,38 @@ namespace GUI
 			Mutex.unlock();
 		}
 
-		void RemoveShortcut(std::string aIdentifier)
+		void RemoveShortcut(const char* aIdentifier)
 		{
+			std::string str = aIdentifier;
+
 			Mutex.lock();
 			{
-				Registry.erase(aIdentifier);
+				Registry.erase(str);
 			}
 			Mutex.unlock();
 		}
 
-		void AddSimpleShortcut(std::string aIdentifier, QUICKACCESS_SHORTCUTRENDERCALLBACK aShortcutRenderCallback)
+		void AddSimpleShortcut(const char* aIdentifier, QUICKACCESS_SHORTCUTRENDERCALLBACK aShortcutRenderCallback)
 		{
+			std::string str = aIdentifier;
+
 			Mutex.lock();
 			{
-				if (RegistrySimple.find(aIdentifier) == RegistrySimple.end())
+				if (RegistrySimple.find(str) == RegistrySimple.end())
 				{
-					RegistrySimple[aIdentifier] = aShortcutRenderCallback;
+					RegistrySimple[str] = aShortcutRenderCallback;
 				}
 			}
 			Mutex.unlock();
 		}
 
-		void RemoveSimpleShortcut(std::string aIdentifier)
+		void RemoveSimpleShortcut(const char* aIdentifier)
 		{
+			std::string str = aIdentifier;
+
 			Mutex.lock();
 			{
-				RegistrySimple.erase(aIdentifier);
+				RegistrySimple.erase(str);
 			}
 			Mutex.unlock();
 		}

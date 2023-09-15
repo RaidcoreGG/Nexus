@@ -3,7 +3,7 @@
 
 #include <string>
 
-typedef void* (*DATALINK_GETRESOURCE)(std::string aIdentifier);
-typedef void* (*DATALINK_SHARERESOURCE)(std::string aIdentifier, size_t aResourceSize);
+typedef void* (*DATALINK_GETRESOURCE)(const char* aIdentifier);
+typedef void* (*DATALINK_SHARERESOURCE)(const char* aIdentifier, size_t aResourceSize);
 
 #endif

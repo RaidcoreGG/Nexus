@@ -9,13 +9,14 @@
 #include "Mumble/LinkedMem.h"
 #include "Mumble/Identity.h"
 #include "Logging/LogHandler.h"
+#include "Loader/AddonDefinition.h"
 
 using namespace Mumble;
 using namespace LogHandler;
 
 extern HMODULE						AddonHostModule;
 
-extern const char*					Version;
+extern AddonVersion*				Version;
 extern std::vector<std::string>		Parameters;
 
 extern LinkedMem*                   MumbleLink;

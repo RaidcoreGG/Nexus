@@ -37,6 +37,7 @@
 namespace GUI
 {
 	extern std::mutex					Mutex;
+	extern std::vector<ADDON_RENDER>	Registry;
 	extern std::vector<IWindow*>		Windows;
 	extern std::map<EFont, ImFont*>		FontIndex;
 	extern float						FontSize;
@@ -54,6 +55,14 @@ namespace GUI
 	void AddWindow(IWindow* aWindowPtr);
 
 	void ResizeFonts();
+
+	/* Registers the provided RenderCallback. */
+	void Register(ADDON_RENDER aRenderCallback);
+	/* Unregisters the provided RenderCallback. */
+	void Unregister(ADDON_RENDER aRenderCallback);
+
+	/* Removes all subscribers that are within the provided address space. */
+	int Verify(void* aStartAddress, void* aEndAddress);
 }
 
 #endif

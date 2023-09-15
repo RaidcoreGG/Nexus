@@ -3,13 +3,14 @@
 namespace Loader
 {
 	std::mutex Mutex;
+	std::vector<std::filesystem::path> QueuedLoad;
+	std::vector<std::filesystem::path> QueuedUnload;
 	std::map<std::filesystem::path, ActiveAddon> AddonDefs;
 	AddonAPI APIDef{};
 
 	std::thread UpdateThread;
 
 	std::set<std::filesystem::path> Blacklist;
-
 	std::set<std::filesystem::path> PreviousFiles;
 
 	void Initialize()
@@ -19,13 +20,15 @@ namespace Loader
 		/* setup APIDefs */
 		APIDef.SwapChain = Renderer::SwapChain;
 		APIDef.ImguiContext = Renderer::GuiContext;
+		APIDef.RegisterRender = GUI::Register;
+		APIDef.UnregisterRender = GUI::Unregister;
 
 		APIDef.CreateHook = MH_CreateHook;
 		APIDef.RemoveHook = MH_RemoveHook;
 		APIDef.EnableHook = MH_EnableHook;
 		APIDef.DisableHook = MH_DisableHook;
 
-		APIDef.Log = LogMessageA;
+		APIDef.Log = LogMessageAddon;
 		APIDef.RegisterLogger = RegisterLogger;
 		APIDef.UnregisterLogger = UnregisterLogger;
 
@@ -35,6 +38,8 @@ namespace Loader
 
 		APIDef.RegisterKeybind = Keybinds::Register;
 		APIDef.UnregisterKeybind = Keybinds::Unregister;
+		APIDef.RegisterWndProc = Keybinds::RegisterWndProc;
+		APIDef.UnregisterWndProc = Keybinds::UnregisterWndProc;
 
 		APIDef.GetResource = DataLink::GetResource;
 		APIDef.ShareResource = DataLink::ShareResource;
@@ -105,9 +110,9 @@ namespace Loader
 
 		ActiveAddon addon{ hMod, moduleInfo.SizeOfImage, defs };
 
-		AddonDefs.insert({ aPath, addon });
+		addon.Definitions->Load(APIDef, (void*)ImGui::MemAlloc, (void*)ImGui::MemFree);
 
-		addon.Definitions->Load(APIDef);
+		AddonDefs.insert({ aPath, addon });
 
 		LogInfo(CH_LOADER, "Loaded addon: %s [%p - %p]", path, hMod, ((PBYTE)hMod) + moduleInfo.SizeOfImage);
 	}
@@ -138,13 +143,14 @@ namespace Loader
 
 		int leftoverRefs = 0;
 		leftoverRefs += Events::Verify(startAddress, endAddress);
+		leftoverRefs += GUI::Verify(startAddress, endAddress);
 		leftoverRefs += GUI::QuickAccess::Verify(startAddress, endAddress);
 		leftoverRefs += Keybinds::Verify(startAddress, endAddress);
 		leftoverRefs += LogHandler::Verify(startAddress, endAddress);
 
 		if (leftoverRefs > 0)
 		{
-			LogWarning(CH_LOADER, "Removed %d unreleased references from \"%s\".", leftoverRefs, name.c_str());
+			LogWarning(CH_LOADER, "Removed %d unreleased references from \"%s\". Make sure your addon releases all references during Addon::Unload().", leftoverRefs, name.c_str());
 		}
 
 		AddonDefs[aPath].Module = nullptr;
@@ -174,8 +180,7 @@ namespace Loader
 				std::set<std::filesystem::path> onDiskLeft = onDisk;
 
 				/* first check all the currently loaded addons, if they are still present */
-				std::set <std::filesystem::path> unload;
-
+				
 				Mutex.lock();
 				{
 					for (const auto& [path, addon] : AddonDefs)
@@ -188,12 +193,8 @@ namespace Loader
 						else
 						{
 							/* addon is no longer on disk -> unload afterwards, we can't modify this array */
-							unload.insert(path);
+							QueuedUnload.push_back(path);
 						}
-					}
-					for (std::filesystem::path path : unload)
-					{
-						UnloadAddon(path);
 					}
 				}
 				Mutex.unlock();
@@ -234,7 +235,7 @@ namespace Loader
 					{
 						Mutex.lock();
 						{
-							LoadAddon(path);
+							QueuedLoad.push_back(path);
 						}
 						Mutex.unlock();
 					}

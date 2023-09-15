@@ -6,9 +6,9 @@
 #include "../../../Textures/Texture.h"
 
 typedef void (*QUICKACCESS_SHORTCUTRENDERCALLBACK)	();
-typedef void (*QUICKACCESS_ADDSHORTCUT)				(std::string aIdentifier, std::string aTextureIdentifier, std::string aTextureHoverIdentifier, std::string aKeybindIdentifier, std::string aTooltipText);
-typedef void (*QUICKACCESS_REMOVESHORTCUT)			(std::string aIdentifier);
-typedef void (*QUICKACCESS_ADDSIMPLE)				(std::string aIdentifier, QUICKACCESS_SHORTCUTRENDERCALLBACK aShortcutRenderCallback);
-typedef void (*QUICKACCESS_REMOVESIMPLE)			(std::string aIdentifier);
+typedef void (*QUICKACCESS_ADDSHORTCUT)				(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aKeybindIdentifier, const char* aTooltipText);
+typedef void (*QUICKACCESS_REMOVESHORTCUT)			(const char* aIdentifier);
+typedef void (*QUICKACCESS_ADDSIMPLE)				(const char* aIdentifier, QUICKACCESS_SHORTCUTRENDERCALLBACK aShortcutRenderCallback);
+typedef void (*QUICKACCESS_REMOVESIMPLE)			(const char* aIdentifier);
 
 #endif

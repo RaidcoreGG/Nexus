@@ -33,15 +33,17 @@ namespace DataLink
 		Mutex.unlock();
 	}
 
-	void* GetResource(std::string aIdentifier)
+	void* GetResource(const char* aIdentifier)
 	{
+		std::string str = aIdentifier;
+
 		void* result = nullptr;
 
 		Mutex.lock();
 		{
-			if (Registry.find(aIdentifier) != Registry.end())
+			if (Registry.find(str) != Registry.end())
 			{
-				result = Registry[aIdentifier].Pointer;
+				result = Registry[str].Pointer;
 			}
 		}
 		Mutex.unlock();
@@ -49,20 +51,23 @@ namespace DataLink
 		return result;
 	}
 
-	void* ShareResource(std::string aIdentifier, size_t aResourceSize)
+	void* ShareResource(const char* aIdentifier, size_t aResourceSize)
 	{
 		return ShareResource(aIdentifier, aResourceSize, "");
 	}
-	void* ShareResource(std::string aIdentifier, size_t aResourceSize, std::string aResourceNameOverride)
+	void* ShareResource(const char* aIdentifier, size_t aResourceSize, const char* aResourceNameOverride)
 	{
+		std::string str = aIdentifier;
+		std::string strOverride = aResourceNameOverride;
+
 		void* result = nullptr;
 
 		Mutex.lock();
 		{
 			/* resource already exists */
-			if (Registry.find(aIdentifier) != Registry.end())
+			if (Registry.find(str) != Registry.end())
 			{
-				result = Registry[aIdentifier].Pointer;
+				result = Registry[str].Pointer;
 			}
 			else
 			{
@@ -70,10 +75,10 @@ namespace DataLink
 				LinkedResource resource{};
 				resource.Size = aResourceSize;
 
-				resource.Handle = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, aResourceNameOverride != "" ? aResourceNameOverride.c_str() : aIdentifier.c_str());
+				resource.Handle = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, strOverride != "" ? strOverride.c_str() : str.c_str());
 				if (resource.Handle == 0)
 				{
-					resource.Handle = CreateFileMappingA(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, aResourceSize, aResourceNameOverride != "" ? aResourceNameOverride.c_str() : aIdentifier.c_str());
+					resource.Handle = CreateFileMappingA(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, aResourceSize, strOverride != "" ? strOverride.c_str() : str.c_str());
 				}
 
 				if (resource.Handle)
@@ -87,13 +92,13 @@ namespace DataLink
 		}
 		Mutex.unlock();
 
-		if (aResourceNameOverride != "")
+		if (strOverride != "")
 		{
-			LogDebug(CH_DATALINK, "Created shared resource: \"%s\" (with underlying name \"%s\")", aIdentifier.c_str(), aResourceNameOverride.c_str());
+			LogDebug(CH_DATALINK, "Created shared resource: \"%s\" (with underlying name \"%s\")", str.c_str(), strOverride.c_str());
 		}
 		else
 		{
-			LogDebug(CH_DATALINK, "Created shared resource: \"%s\"", aIdentifier.c_str());
+			LogDebug(CH_DATALINK, "Created shared resource: \"%s\"", str.c_str());
 		}
 
 		return result;

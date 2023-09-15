@@ -11,17 +11,17 @@ namespace TextureLoader
 
 	std::vector<QueuedTexture> QueuedTextures;
 
-	//void Shutdown();
-
-	Texture* Get(std::string aIdentifier)
+	Texture* Get(const char* aIdentifier)
 	{
+		std::string str = aIdentifier;
+
 		Texture* result = nullptr;
 
 		Mutex.lock();
 		{
-			if (Registry.find(aIdentifier) != Registry.end())
+			if (Registry.find(str) != Registry.end())
 			{
-				result = Registry[aIdentifier];
+				result = Registry[str];
 			}
 		}
 		Mutex.unlock();
@@ -29,9 +29,11 @@ namespace TextureLoader
 		return result;
 	}
 
-	void LoadFromFile(std::string aIdentifier, std::string aFilename, TEXTURES_RECEIVECALLBACK aCallback)
+	void LoadFromFile(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback)
 	{
-		Texture* tex = Get(aIdentifier);
+		std::string str = aIdentifier;
+
+		Texture* tex = Get(str.c_str());
 		if (tex != nullptr)
 		{
 			aCallback(aIdentifier, tex);
@@ -41,17 +43,19 @@ namespace TextureLoader
 		// Load from disk into a raw RGBA buffer
 		int image_width = 0;
 		int image_height = 0;
-		unsigned char* image_data = stbi_load(aFilename.c_str(), &image_width, &image_height, NULL, 4);
+		unsigned char* image_data = stbi_load(aFilename, &image_width, &image_height, NULL, 4);
 
 		QueueTexture(aIdentifier, image_data, image_width, image_height, aCallback);
 	}
 
-	void LoadFromResource(std::string aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback)
+	void LoadFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback)
 	{
-		Texture* tex = Get(aIdentifier);
+		std::string str = aIdentifier;
+
+		Texture* tex = Get(str.c_str());
 		if (tex != nullptr)
 		{
-			aCallback(aIdentifier, tex);
+			aCallback(str.c_str(), tex);
 			return;
 		}
 
@@ -84,15 +88,17 @@ namespace TextureLoader
 		int image_components = 0;
 		unsigned char* image_data = stbi_load_from_memory((const stbi_uc*)imageFile, imageFileSize, &image_width, &image_height, &image_components, 0);
 
-		QueueTexture(aIdentifier, image_data, image_width, image_height, aCallback);
+		QueueTexture(str.c_str(), image_data, image_width, image_height, aCallback);
 	}
 
-	void QueueTexture(std::string aIdentifier, unsigned char* aImageData, unsigned aWidth, unsigned aHeight, TEXTURES_RECEIVECALLBACK aCallback)
+	void QueueTexture(const char* aIdentifier, unsigned char* aImageData, unsigned aWidth, unsigned aHeight, TEXTURES_RECEIVECALLBACK aCallback)
 	{
-		LogDebug(CH_TEXTURES, "Queued %s", aIdentifier.c_str());
+		std::string str = aIdentifier;
+
+		LogDebug(CH_TEXTURES, "Queued %s", str.c_str());
 
 		QueuedTexture raw{};
-		raw.Identifier = aIdentifier;
+		raw.Identifier = str;
 		raw.Data = aImageData;
 		raw.Width = aWidth;
 		raw.Height = aHeight;
@@ -146,7 +152,7 @@ namespace TextureLoader
 		Registry[aQueuedTexture.Identifier] = tex;
 		if (aQueuedTexture.Callback)
 		{
-			aQueuedTexture.Callback(aQueuedTexture.Identifier, tex);
+			aQueuedTexture.Callback(aQueuedTexture.Identifier.c_str(), tex);
 		}
 
 		stbi_image_free(aQueuedTexture.Data);

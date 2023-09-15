@@ -27,11 +27,14 @@
 #include "../minhook/mh_hook.h"
 #include "../DataLink/DataLink.h"
 #include "../Textures/TextureLoader.h"
+#include "../GUI/GUI.h"
 #include "../GUI/Widgets/QuickAccess/QuickAccess.h"
 
 namespace Loader
 {
 	extern std::mutex Mutex;
+	extern std::vector<std::filesystem::path> QueuedLoad;				/* To be loaded Addons (more specifically, their paths) */
+	extern std::vector<std::filesystem::path> QueuedUnload;				/* To be unloaded Addons (more specifically, their paths) */
 	extern std::map<std::filesystem::path, ActiveAddon> AddonDefs;		/* Loaded Addons and their corresponding paths */
 	extern AddonAPI APIDef;
 

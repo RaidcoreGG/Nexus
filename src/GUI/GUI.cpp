@@ -8,6 +8,7 @@ namespace GUI
 	void Setup();
 
 	std::mutex					Mutex;
+	std::vector<ADDON_RENDER>	Registry;
 	std::vector<IWindow*>		Windows;
 	std::map<EFont, ImFont*>	FontIndex;
 	float						FontSize;
@@ -22,9 +23,6 @@ namespace GUI
 
 	void Initialize()
 	{
-		// create imgui context
-		if (!Renderer::GuiContext) { Renderer::GuiContext = ImGui::CreateContext(); }
-		
 		// Init imgui
 		ImGui_ImplWin32_Init(Renderer::WindowHandle);
 		ImGui_ImplDX11_Init(Renderer::Device, Renderer::DeviceContext);
@@ -196,19 +194,19 @@ namespace GUI
 				}
 				Mutex.unlock();
 
-				/* draw addons*/
-				Loader::Mutex.lock();
-				{
-					for (const auto& [path, addon] : Loader::AddonDefs)
-					{
-						if (addon.Definitions->Render) { addon.Definitions->Render(); }
-					}
-				}
-				Loader::Mutex.unlock();
-
 				/* TODO: RENDER UNDER UI */
-				/* TODO: RENDER OVER UI */
 			}
+
+			/* draw addons*/
+			Mutex.lock();
+			{
+				for (ADDON_RENDER callback : Registry)
+				{
+					if (callback) { callback(IsUIVisible); }
+				}
+			}
+			Mutex.unlock();
+
 			/* draw overlay end */
 
 			/* end frame */
@@ -259,14 +257,16 @@ namespace GUI
 		}
 	}
 
-	void ProcessKeybind(std::string aIdentifier)
+	void ProcessKeybind(const char* aIdentifier)
 	{
-		if (aIdentifier == KB_MENU)
+		std::string str = aIdentifier;
+
+		if (str == KB_MENU)
 		{
 			Menu::Visible = !Menu::Visible;
 			return;
 		}
-		else if (aIdentifier == KB_TOGGLEHIDEUI)
+		else if (str == KB_TOGGLEHIDEUI)
 		{
 			IsUIVisible = !IsUIVisible;
 		}
@@ -450,5 +450,43 @@ namespace GUI
 		}
 
 		IsSetup = true;
+	}
+
+	void Register(ADDON_RENDER aRenderCallback)
+	{
+		Mutex.lock();
+		{
+			Registry.push_back(aRenderCallback);
+		}
+		Mutex.unlock();
+	}
+
+	void Unregister(ADDON_RENDER aRenderCallback)
+	{
+		Mutex.lock();
+		{
+			Registry.erase(std::remove(Registry.begin(), Registry.end(), aRenderCallback), Registry.end());
+		}
+		Mutex.unlock();
+	}
+
+	int Verify(void* aStartAddress, void* aEndAddress)
+	{
+		int refCounter = 0;
+
+		Mutex.lock();
+		{
+			for (ADDON_RENDER renderCb : Registry)
+			{
+				if (renderCb >= aStartAddress && renderCb <= aEndAddress)
+				{
+					Registry.erase(std::remove(Registry.begin(), Registry.end(), renderCb), Registry.end());
+					refCounter++;
+				}
+			}
+		}
+		Mutex.unlock();
+
+		return refCounter;
 	}
 }

@@ -500,6 +500,9 @@
     <ClInclude Include="imgui\imgui_memory_editor.h">
       <Filter>imgui</Filter>
     </ClInclude>
+    <ClInclude Include="GUI\FuncDefs.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Raidcore-AddonHost.rc">

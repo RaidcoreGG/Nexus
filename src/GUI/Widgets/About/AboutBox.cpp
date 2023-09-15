@@ -9,7 +9,7 @@ namespace GUI
 		if (ImGui::Begin("About", &Visible, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
 		{
 			ImGui::TextDisabled("Version:");
-			ImGui::Text(""); ImGui::SameLine(); ImGui::Text(Version);
+			ImGui::Text(""); ImGui::SameLine(); ImGui::Text(Version->ToString().c_str());
 #ifdef _DEBUG
 			ImGui::SameLine(); ImGui::TextDisabled("[DEBUG BUILD]");
 #endif

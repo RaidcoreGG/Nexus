@@ -4,6 +4,7 @@ namespace Keybinds
 {
 	std::mutex								Mutex;
 	std::map<std::string, ActiveKeybind>	Registry;
+	std::vector<ADDON_WNDPROC>				RegistryWndProc;
 
 	std::mutex								HeldKeysMutex;
 	std::vector<WPARAM>						HeldKeys;
@@ -14,6 +15,20 @@ namespace Keybinds
 
 	bool WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
+		// don't pass to game if addon wndproc
+		Mutex.lock();
+		{
+			for (ADDON_WNDPROC wndprocCb : RegistryWndProc)
+			{
+				if (wndprocCb(hWnd, uMsg, wParam, lParam))
+				{
+					Mutex.unlock();
+					return 0;
+				}
+			}
+		}
+		Mutex.unlock();
+
 		Keybind kb{};
 		kb.Alt		= GetKeyState(VK_MENU)		& 0x8000;
 		kb.Ctrl		= GetKeyState(VK_CONTROL)	& 0x8000;
@@ -134,14 +149,17 @@ namespace Keybinds
 		Mutex.unlock();
 	}
 
-	void Register(std::string aIdentifier, KEYBINDS_PROCESS aKeybindHandler, std::string aKeybind)
+	void Register(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const char* aKeybind)
 	{
-		Keybind requestedBind = KBFromString(aKeybind);
+		std::string str = aIdentifier;
+		std::string bind = aKeybind;
+
+		Keybind requestedBind = KBFromString(bind);
 
 		/* check if another identifier, already uses the keybind */
 		std::string res = IsInUse(requestedBind);
 
-		if (res != aIdentifier && res != "")
+		if (res != str && res != "")
 		{
 			/* another identifier uses the same combination */
 			requestedBind = {};
@@ -150,27 +168,47 @@ namespace Keybinds
 		Mutex.lock();
 		{
 			/* check if this keybind is not already set */
-			if (Registry.find(aIdentifier) == Registry.end())
+			if (Registry.find(str) == Registry.end())
 			{
-				Registry[aIdentifier].Bind = requestedBind;
+				Registry[str].Bind = requestedBind;
 			}
 
-			Registry[aIdentifier].Handler = aKeybindHandler;
+			Registry[str].Handler = aKeybindHandler;
 		}
 		Mutex.unlock();
 
 		Save();
 	}
 
-	void Unregister(std::string aIdentifier)
+	void Unregister(const char* aIdentifier)
 	{
+		std::string str = aIdentifier;
+
 		Mutex.lock();
 		{
-			Registry.erase(aIdentifier);
+			Registry.erase(str);
 		}
 		Mutex.unlock();
 
 		Save();
+	}
+
+	void RegisterWndProc(ADDON_WNDPROC aWndProcCallback)
+	{
+		Mutex.lock();
+		{
+			RegistryWndProc.push_back(aWndProcCallback);
+		}
+		Mutex.unlock();
+	}
+
+	void UnregisterWndProc(ADDON_WNDPROC aWndProcCallback)
+	{
+		Mutex.lock();
+		{
+			RegistryWndProc.erase(std::remove(RegistryWndProc.begin(), RegistryWndProc.end(), aWndProcCallback), RegistryWndProc.end());
+		}
+		Mutex.unlock();
 	}
 
 	std::string IsInUse(Keybind aKeybind)
@@ -218,7 +256,7 @@ namespace Keybinds
 		{
 			if (Registry[aIdentifier].Handler)
 			{
-				Registry[aIdentifier].Handler(aIdentifier);
+				Registry[aIdentifier].Handler(aIdentifier.c_str());
 				called = true;
 			}
 		}
@@ -238,6 +276,15 @@ namespace Keybinds
 				if (activekb.Handler >= aStartAddress && activekb.Handler <= aEndAddress)
 				{
 					activekb.Handler = nullptr;
+					refCounter++;
+				}
+			}
+
+			for (ADDON_WNDPROC wndprocCb : RegistryWndProc)
+			{
+				if (wndprocCb >= aStartAddress && wndprocCb <= aEndAddress)
+				{
+					RegistryWndProc.erase(std::remove(RegistryWndProc.begin(), RegistryWndProc.end(), wndprocCb), RegistryWndProc.end());
 					refCounter++;
 				}
 			}

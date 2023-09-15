@@ -44,11 +44,11 @@ namespace GUI
 
 		void Render();
 
-		void AddShortcut(std::string aIdentifier, std::string aTextureIdentifier, std::string aTextureHoverIdentifier, std::string aKeybindIdentifier, std::string aTooltipText);
-		void RemoveShortcut(std::string aIdentifier);
+		void AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aKeybindIdentifier, const char* aTooltipText);
+		void RemoveShortcut(const char* aIdentifier);
 
-		void AddSimpleShortcut(std::string aIdentifier, QUICKACCESS_SHORTCUTRENDERCALLBACK aShortcutRenderCallback);
-		void RemoveSimpleShortcut(std::string aIdentifier);
+		void AddSimpleShortcut(const char* aIdentifier, QUICKACCESS_SHORTCUTRENDERCALLBACK aShortcutRenderCallback);
+		void RemoveSimpleShortcut(const char* aIdentifier);
 
 		int Verify(void* aStartAddress, void* aEndAddress);
 	}

@@ -4,7 +4,6 @@ bool AddonDefinition::HasMinimumRequirements()
 {
 	if (Signature != 0 &&
 		Name &&
-		Version &&
 		Author &&
 		Description &&
 		Load &&

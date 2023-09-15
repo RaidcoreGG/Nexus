@@ -63,17 +63,19 @@ namespace GUI
 			Mutex.unlock();
 		}
 
-		void ReceiveTextures(std::string aIdentifier, Texture* aTexture)
+		void ReceiveTextures(const char* aIdentifier, Texture* aTexture)
 		{
-			if (aIdentifier == TEX_MENU_BACKGROUND)
+			std::string str = aIdentifier;
+
+			if (str == TEX_MENU_BACKGROUND)
 			{
 				MenuBG = aTexture;
 			}
-			else if (aIdentifier == TEX_MENU_BUTTON)
+			else if (str == TEX_MENU_BUTTON)
 			{
 				MenuButton = aTexture;
 			}
-			else if (aIdentifier == TEX_MENU_BUTTON_HOVER)
+			else if (str == TEX_MENU_BUTTON_HOVER)
 			{
 				MenuButtonHover = aTexture;
 			}

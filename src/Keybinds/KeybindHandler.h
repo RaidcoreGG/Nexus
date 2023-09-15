@@ -26,6 +26,7 @@ namespace Keybinds
 {
 	extern std::mutex								Mutex;
 	extern std::map<std::string, ActiveKeybind>		Registry;
+	extern std::vector<ADDON_WNDPROC>				RegistryWndProc;
 
 	/* Keybind Helpers */
 	extern std::mutex								HeldKeysMutex;
@@ -45,10 +46,15 @@ namespace Keybinds
 	void Save();
 
 	/* Registers a keybind with the given identifier and handler, if no bind was previously stored the given one will be used. */
-	void Register(std::string aIdentifier, KEYBINDS_PROCESS aKeybindHandler, std::string aKeybind);
+	void Register(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const char* aKeybind);
 	/* Frees up the associated KeybindHandler. */
-	void Unregister(std::string aIdentifier);
+	void Unregister(const char* aIdentifier);
 	
+	/* Registers the provided WndProcCallback. */
+	void RegisterWndProc(ADDON_WNDPROC aWndProcCallback);
+	/* Unregisters the provided WndProcCallback. */
+	void UnregisterWndProc(ADDON_WNDPROC aWndProcCallback);
+
 	/* Returns an empty string if keybind is unused or the identifier that uses this keybind */
 	std::string IsInUse(Keybind aKeybind);
 	

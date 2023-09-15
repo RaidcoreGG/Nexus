@@ -19,11 +19,11 @@ namespace Events
 	extern std::map<std::string, std::vector<EVENT_CONSUME>>	Registry;
 
 	/* Raises an event of provided name, passing a pointer to an eventArgs struct. */
-	void Raise(std::string aIdentifier, void* aEventData);
+	void Raise(const char* aIdentifier, void* aEventData);
 	/* Subscribes the provided ConsumeEventCallback function, to the provided event name. */
-	void Subscribe(std::string aIdentifier, EVENT_CONSUME aConsumeEventCallback);
+	void Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
 	/* Unsubscribes the provided ConsumeEventCallback function from the provided event name. */
-	void Unsubscribe(std::string aIdentifier, EVENT_CONSUME aConsumeEventCallback);
+	void Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
 
 	/* Removes all subscribers that are within the provided address space. */
 	int Verify(void* aStartAddress, void* aEndAddress);

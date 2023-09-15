@@ -50,7 +50,7 @@ namespace State
 				//Log("dbg", "subtoken: \"%s\" @ %d", subtoken.c_str(), subpos);
 
 				customMumble = true;
-				MumbleLink = (LinkedMem*)DataLink::ShareResource(DL_MUMBLE_LINK, sizeof(LinkedMem), subtoken);
+				MumbleLink = (LinkedMem*)DataLink::ShareResource(DL_MUMBLE_LINK, sizeof(LinkedMem), subtoken.c_str());
 			}
 		}
 

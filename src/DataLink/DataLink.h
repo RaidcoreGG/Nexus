@@ -19,10 +19,10 @@ namespace DataLink
 	void Free();
 
 	/* Retrieves the resource with the given identifier */
-	void* GetResource(std::string aIdentifier);
+	void* GetResource(const char* aIdentifier);
 	/* Allocates new memory of the given size and returns a pointer to it and shares it via the given identifier */
-	void* ShareResource(std::string aIdentifier, size_t aResourceSize);
-	void* ShareResource(std::string aIdentifier, size_t aResourceSize, std::string aResourceNameOverride);
+	void* ShareResource(const char* aIdentifier, size_t aResourceSize);
+	void* ShareResource(const char* aIdentifier, size_t aResourceSize, const char* aResourceNameOverride);
 }
 
 #endif

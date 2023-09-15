@@ -10,6 +10,7 @@
 #include "../minhook/mh_hook.h"
 #include "../DataLink/FuncDefs.h"
 #include "../Textures/FuncDefs.h"
+#include "../GUI/FuncDefs.h"
 #include "../GUI/Widgets/QuickAccess/FuncDefs.h"
 #include "NexusLinkData.h"
 
@@ -20,6 +21,8 @@ struct AddonAPI
 	/* Renderer */
 	IDXGISwapChain*				SwapChain;
 	ImGuiContext*				ImguiContext;
+	GUI_REGISTER				RegisterRender;
+	GUI_UNREGISTER				UnregisterRender;
 
 	/* Minhook */
 	MINHOOK_CREATE				CreateHook;
@@ -40,6 +43,8 @@ struct AddonAPI
 	/* Keybinds */
 	KEYBINDS_REGISTER			RegisterKeybind;
 	KEYBINDS_UNREGISTER			UnregisterKeybind;
+	KEYBINDS_REGISTERWNDPROC	RegisterWndProc;
+	KEYBINDS_UNREGISTERWNDPROC	UnregisterWndProc;
 
 	/* DataLink */
 	DATALINK_GETRESOURCE		GetResource;
