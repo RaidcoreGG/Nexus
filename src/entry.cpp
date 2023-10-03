@@ -245,7 +245,6 @@ bool DxLoad()
 		{
 			WNDCLASSEXW wc;
 			memset(&wc, 0, sizeof(wc));
-
 			wc.cbSize = sizeof(wc);
 			wc.lpfnWndProc = DefWindowProcW;
 			wc.hInstance = GetModuleHandleW(0);
@@ -501,6 +500,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
+		DisableThreadLibraryCalls(hModule);
 		AddonHostModule = hModule;
 		hGW2 = GetModuleHandle(NULL);
 

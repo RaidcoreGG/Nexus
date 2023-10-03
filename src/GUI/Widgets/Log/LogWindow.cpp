@@ -64,7 +64,7 @@ namespace GUI
 				}
 				LogHandler::Mutex.unlock();
 
-				ImGui::TextDisabled("Showing %d out of %d", amtShown, LogEntries.size());
+				ImGui::TextDisabled("Showing %d out of %d", amtShown, LogEntries.size() > 400 ? 400 : LogEntries.size());
 
 				ImGui::EndChild();
 			}
@@ -78,7 +78,11 @@ namespace GUI
 				
 				MessageMutex.lock();
 				{
-					for (size_t i = 0; i < LogEntries.size(); i++)
+					/* Show last 400 log messages */
+					size_t start = 0;
+					if (LogEntries.size() > 400) { start = LogEntries.size() - 400; }
+
+					for (size_t i = start; i < LogEntries.size(); i++)
 					{
 						LogEntry entry = LogEntries[i];
 

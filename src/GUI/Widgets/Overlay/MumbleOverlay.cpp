@@ -145,13 +145,13 @@ namespace GUI
 					ImGui::TableSetColumnIndex(1); ImGui::Text("%+09.4f", MumbleLink->CameraPosition.Z);
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0); ImGui::Text("frontx");
-					ImGui::TableSetColumnIndex(1); ImGui::Text("%+09.4f", MumbleLink->CameraPosition.X);
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%+09.4f", MumbleLink->CameraFront.X);
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0); ImGui::Text("fronty");
-					ImGui::TableSetColumnIndex(1); ImGui::Text("%+09.4f", MumbleLink->CameraPosition.Y);
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%+09.4f", MumbleLink->CameraFront.Y);
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0); ImGui::Text("frontz");
-					ImGui::TableSetColumnIndex(1); ImGui::Text("%+09.4f", MumbleLink->CameraPosition.Z);
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%+09.4f", MumbleLink->CameraFront.Z);
 
 					ImGui::EndTable();
 				}

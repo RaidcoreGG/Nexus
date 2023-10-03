@@ -11,6 +11,8 @@ namespace GUI
 	{
 		if (!Visible) { return; }
 
+		ImGui::ShowStyleEditor();
+
 		ImGui::SetNextWindowSize(ImVec2(480.0f, 380.0f));
 		if (ImGui::Begin("Options", &Visible, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
 		{

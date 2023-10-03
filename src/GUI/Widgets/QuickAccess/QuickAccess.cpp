@@ -68,7 +68,6 @@ namespace GUI
 				unsigned c = 0;
 				Mutex.lock();
 				{
-
 					for (auto& [identifier, shortcut] : Registry)
 					{
 						if (shortcut.TextureNormal && shortcut.TextureHover)
@@ -77,15 +76,18 @@ namespace GUI
 							ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
 							ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
 
+							//LogDebug(CH_QUICKACCESS, "size: %f | c: %d | scale: %f", size, c, Renderer::Scaling);
+
 							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f }); // smol checkbox
 							if (VerticalLayout)
 							{
-								ImGui::SetCursorPos(ImVec2(0, ((size * c) + c ? 1 : 0) * Renderer::Scaling));
+								ImGui::SetCursorPos(ImVec2(0, ((size * c) + (c ? 1 : 0)) * Renderer::Scaling));
 							}
 							else
 							{
-								ImGui::SetCursorPos(ImVec2(((size * c) + c ? 1 : 0) * Renderer::Scaling, 0));
+								ImGui::SetCursorPos(ImVec2(((size * c) + (c ? 1 : 0)) * Renderer::Scaling, 0));
 							}
+
 							if (ImGui::ImageButton(!shortcut.IsHovering ? shortcut.TextureNormal->Resource : shortcut.TextureHover->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
 							{
 								isActive = true;
