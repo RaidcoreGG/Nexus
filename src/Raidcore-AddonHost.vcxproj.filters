@@ -503,6 +503,12 @@
     <ClInclude Include="GUI\FuncDefs.h">
       <Filter>GUI</Filter>
     </ClInclude>
+    <ClInclude Include="Loader\ELoaderAction.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\QueuedAddon.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Raidcore-AddonHost.rc">

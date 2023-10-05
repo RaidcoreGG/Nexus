@@ -3,8 +3,7 @@
 namespace Loader
 {
 	std::mutex Mutex;
-	std::vector<std::filesystem::path> QueuedLoad;
-	std::vector<std::filesystem::path> QueuedUnload;
+	std::vector<QueuedAddon> QueuedAddons;
 	std::map<std::filesystem::path, ActiveAddon> AddonDefs;
 	AddonAPI APIDef{};
 
@@ -193,7 +192,10 @@ namespace Loader
 						else
 						{
 							/* addon is no longer on disk -> unload afterwards, we can't modify this array */
-							QueuedUnload.push_back(path);
+							QueuedAddon q{};
+							q.Action = ELoaderAction::Unload;
+							q.Path = path;
+							QueuedAddons.push_back(q);
 						}
 					}
 				}
@@ -235,7 +237,10 @@ namespace Loader
 					{
 						Mutex.lock();
 						{
-							QueuedLoad.push_back(path);
+							QueuedAddon q{};
+							q.Action = ELoaderAction::Load;
+							q.Path = path;
+							QueuedAddons.push_back(q);
 						}
 						Mutex.unlock();
 					}

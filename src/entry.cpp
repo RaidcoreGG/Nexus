@@ -167,16 +167,21 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 		Hooks::GW2_WndProc = (WNDPROC)SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)hkWndProc);
 	}
 
-	while (Loader::QueuedUnload.size() > 0)
+	while (Loader::QueuedAddons.size() > 0)
 	{
-		Loader::UnloadAddon(Loader::QueuedUnload.front());
-		Loader::QueuedUnload.erase(Loader::QueuedUnload.begin());
-	}
+		QueuedAddon q = Loader::QueuedAddons.front();
 
-	while (Loader::QueuedLoad.size() > 0)
-	{
-		Loader::LoadAddon(Loader::QueuedLoad.front());
-		Loader::QueuedLoad.erase(Loader::QueuedLoad.begin());
+		switch (q.Action)
+		{
+			case ELoaderAction::Load:
+				Loader::LoadAddon(q.Path);
+				break;
+			case ELoaderAction::Unload:
+				Loader::UnloadAddon(q.Path);
+				break;
+		}
+
+		Loader::QueuedAddons.erase(Loader::QueuedAddons.begin());
 	}
 
 	while (TextureLoader::QueuedTextures.size() > 0)

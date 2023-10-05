@@ -17,6 +17,7 @@
 
 #include "AddonDefinition.h"
 #include "ActiveAddon.h"
+#include "QueuedAddon.h"
 #include "FuncDefs.h"
 
 #include "../Mumble/LinkedMem.h"
@@ -33,8 +34,7 @@
 namespace Loader
 {
 	extern std::mutex Mutex;
-	extern std::vector<std::filesystem::path> QueuedLoad;				/* To be loaded Addons (more specifically, their paths) */
-	extern std::vector<std::filesystem::path> QueuedUnload;				/* To be unloaded Addons (more specifically, their paths) */
+	extern std::vector<QueuedAddon> QueuedAddons;						/* To be loaded or unloaded addons */
 	extern std::map<std::filesystem::path, ActiveAddon> AddonDefs;		/* Loaded Addons and their corresponding paths */
 	extern AddonAPI APIDef;
 
