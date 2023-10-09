@@ -7,7 +7,7 @@ namespace GUI
 		if (!Visible) { return; }
 
 		ImGui::SetNextWindowSize(ImVec2(480.0f, 380.0f));
-		if (ImGui::Begin("Addons", &Visible, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
+		if (ImGui::Begin("Addons", &Visible, WindowFlags_Default))
 		{
 			if (ImGui::BeginTabBar("AddonTabBar", ImGuiTabBarFlags_None))
 			{

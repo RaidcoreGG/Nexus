@@ -60,6 +60,7 @@
     <ClCompile Include="State.cpp" />
     <ClCompile Include="Textures\TextureLoader.cpp" />
     <ClCompile Include="types.cpp" />
+    <ClCompile Include="WndProc\WndProcHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="API\APIController.h" />
@@ -150,6 +151,8 @@
     <ClInclude Include="Textures\Texture.h" />
     <ClInclude Include="Textures\TextureLoader.h" />
     <ClInclude Include="types.h" />
+    <ClInclude Include="WndProc\FuncDefs.h" />
+    <ClInclude Include="WndProc\WndProcHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Raidcore-AddonHost.rc" />

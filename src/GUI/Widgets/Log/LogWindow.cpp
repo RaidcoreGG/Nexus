@@ -18,7 +18,7 @@ namespace GUI
 		if (!Visible) { return; }
 
 		ImGui::SetNextWindowSize(ImVec2(600.0f, 380.0f));
-		if (ImGui::Begin("Log", &Visible, ImGuiWindowFlags_AlwaysAutoResize))
+		if (ImGui::Begin("Log", &Visible, WindowFlags_Default))
 		{
 			static int selectedLevel = (int)(ELogLevel::ALL)-1;
 			ImGui::Text("Filter: "); ImGui::SameLine();

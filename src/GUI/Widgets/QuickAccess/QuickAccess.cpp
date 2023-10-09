@@ -61,7 +61,7 @@ namespace GUI
 			pos.y += Offset.y;
 
 			ImGui::SetNextWindowPos(pos);
-			if (ImGui::Begin("QuickAccessBar", (bool*)0, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar))
+			if (ImGui::Begin("QuickAccessBar", (bool*)0, WindowFlags_Custom))
 			{
 				bool menuFound = false;
 

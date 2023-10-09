@@ -14,7 +14,10 @@
 using namespace Mumble;
 using namespace LogHandler;
 
-extern HMODULE						AddonHostModule;
+extern HMODULE						NexusHandle;
+extern HMODULE						GameHandle;
+extern HMODULE						D3D11Handle;
+extern HMODULE						D3D11SystemHandle;
 
 extern AddonVersion*				Version;
 extern std::vector<std::string>		Parameters;
@@ -25,8 +28,14 @@ extern bool							IsMoving;
 extern bool							IsCameraMoving;
 extern bool							IsGameplay;
 
+extern NexusLinkData*				NexusLink;
+
 extern ImFont*						Font;
 extern ImFont*						FontBig;
 extern ImFont*						FontUI;
+
+extern ImGuiWindowFlags				WindowFlags_Default;
+extern ImGuiWindowFlags				WindowFlags_Overlay;
+extern ImGuiWindowFlags				WindowFlags_Custom;
 
 #endif

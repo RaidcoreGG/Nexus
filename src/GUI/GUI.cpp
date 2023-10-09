@@ -8,7 +8,7 @@ namespace GUI
 	void Setup();
 
 	std::mutex					Mutex;
-	std::vector<ADDON_RENDER>	Registry;
+	std::vector<GUI_RENDER>	Registry;
 	std::vector<IWindow*>		Windows;
 	std::map<EFont, ImFont*>	FontIndex;
 	float						FontSize;
@@ -50,7 +50,7 @@ namespace GUI
 		}
 	}
 
-	bool WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		if (State::IsImGuiInitialized)
 		{
@@ -68,7 +68,7 @@ namespace GUI
 					}
 					else if (io.WantCaptureMouse)
 					{
-						return true;
+						return 0;
 					}
 					break;
 
@@ -77,7 +77,7 @@ namespace GUI
 					if (io.WantCaptureMouse && !IsLeftClickHeld && !IsRightClickHeld)
 					{
 						io.MouseDown[0] = true;
-						return true;
+						return 0;
 					}
 					else //if (!io.WantCaptureMouse)
 					{
@@ -90,7 +90,7 @@ namespace GUI
 					if (io.WantCaptureMouse && !IsLeftClickHeld && !IsRightClickHeld)
 					{
 						io.MouseDown[1] = true;
-						return true;
+						return 0;
 					}
 					else //if (!io.WantCaptureMouse)
 					{
@@ -111,14 +111,14 @@ namespace GUI
 					if (io.WantCaptureMouse && !IsLeftClickHeld && !IsRightClickHeld)
 					{
 						io.MouseWheel += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;
-						return true;
+						return 0;
 					}
 					break;
 				case WM_MOUSEHWHEEL:
 					if (io.WantCaptureMouse && !IsLeftClickHeld && !IsRightClickHeld)
 					{
 						io.MouseWheelH += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;
-						return true;
+						return 0;
 					}
 					break;
 
@@ -129,7 +129,7 @@ namespace GUI
 					{
 						if (wParam < 256)
 							io.KeysDown[wParam] = true;
-						return true;
+						return 0;
 					}
 					break;
 				case WM_KEYUP:
@@ -143,7 +143,7 @@ namespace GUI
 						// You can also use ToAscii()+GetKeyboardState() to retrieve characters.
 						if (wParam > 0 && wParam < 0x10000)
 							io.AddInputCharacterUTF16((unsigned short)wParam);
-						return true;
+						return 0;
 					}
 					break;
 
@@ -159,7 +159,7 @@ namespace GUI
 			}
 		}
 
-		return false;
+		return 1;
 	}
 
 	void Render()
@@ -200,7 +200,7 @@ namespace GUI
 			/* draw addons*/
 			Mutex.lock();
 			{
-				for (ADDON_RENDER callback : Registry)
+				for (GUI_RENDER callback : Registry)
 				{
 					if (callback) { callback(IsUIVisible); }
 				}
@@ -314,10 +314,10 @@ namespace GUI
 		/* load gw2 fonts */
 
 		LPVOID resM{}; DWORD szM{};
-		HRSRC hResM = FindResourceA(AddonHostModule, MAKEINTRESOURCE(RES_FONT_MENOMONIA), RT_FONT);
+		HRSRC hResM = FindResourceA(NexusHandle, MAKEINTRESOURCE(RES_FONT_MENOMONIA), RT_FONT);
 		if (hResM)
 		{
-			HGLOBAL hLResM = LoadResource(AddonHostModule, hResM);
+			HGLOBAL hLResM = LoadResource(NexusHandle, hResM);
 
 			if (hLResM)
 			{
@@ -325,7 +325,7 @@ namespace GUI
 
 				if (pLResM)
 				{
-					DWORD dwResSzM = SizeofResource(AddonHostModule, hResM);
+					DWORD dwResSzM = SizeofResource(NexusHandle, hResM);
 
 					if (0 != dwResSzM)
 					{
@@ -337,10 +337,10 @@ namespace GUI
 		}
 
 		LPVOID resT{}; DWORD szT{};
-		HRSRC hResT = FindResourceA(AddonHostModule, MAKEINTRESOURCE(RES_FONT_TREBUCHET), RT_FONT);
+		HRSRC hResT = FindResourceA(NexusHandle, MAKEINTRESOURCE(RES_FONT_TREBUCHET), RT_FONT);
 		if (hResT)
 		{
-			HGLOBAL hLResT = LoadResource(AddonHostModule, hResT);
+			HGLOBAL hLResT = LoadResource(NexusHandle, hResT);
 
 			if (hLResT)
 			{
@@ -348,7 +348,7 @@ namespace GUI
 
 				if (pLResT)
 				{
-					DWORD dwResSzT = SizeofResource(AddonHostModule, hResT);
+					DWORD dwResSzT = SizeofResource(NexusHandle, hResT);
 
 					if (0 != dwResSzT)
 					{
@@ -418,15 +418,15 @@ namespace GUI
 		Keybinds::Register(KB_TOGGLEHIDEUI, ProcessKeybind, "CTRL+H");
 
 		/* load icons */
-		TextureLoader::LoadFromResource(ICON_NEXUS, RES_ICON_NEXUS, AddonHostModule, nullptr);
-		TextureLoader::LoadFromResource(ICON_NEXUS_HOVER, RES_ICON_NEXUS_HOVER, AddonHostModule, nullptr);
+		TextureLoader::LoadFromResource(ICON_NEXUS, RES_ICON_NEXUS, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource(ICON_NEXUS_HOVER, RES_ICON_NEXUS_HOVER, NexusHandle, nullptr);
 
-		TextureLoader::LoadFromResource(ICON_GENERIC, RES_ICON_GENERIC, AddonHostModule, nullptr);
-		TextureLoader::LoadFromResource(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, AddonHostModule, nullptr);
+		TextureLoader::LoadFromResource(ICON_GENERIC, RES_ICON_GENERIC, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, NexusHandle, nullptr);
 
-		TextureLoader::LoadFromResource(TEX_MENU_BACKGROUND, RES_TEX_MENU_BACKGROUND, AddonHostModule, Menu::ReceiveTextures);
-		TextureLoader::LoadFromResource(TEX_MENU_BUTTON, RES_TEX_MENU_BUTTON, AddonHostModule, Menu::ReceiveTextures);
-		TextureLoader::LoadFromResource(TEX_MENU_BUTTON_HOVER, RES_TEX_MENU_BUTTON_HOVER, AddonHostModule, Menu::ReceiveTextures);
+		TextureLoader::LoadFromResource(TEX_MENU_BACKGROUND, RES_TEX_MENU_BACKGROUND, NexusHandle, Menu::ReceiveTextures);
+		TextureLoader::LoadFromResource(TEX_MENU_BUTTON, RES_TEX_MENU_BUTTON, NexusHandle, Menu::ReceiveTextures);
+		TextureLoader::LoadFromResource(TEX_MENU_BUTTON_HOVER, RES_TEX_MENU_BUTTON_HOVER, NexusHandle, Menu::ReceiveTextures);
 
 		/* add shortcut */
 		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "Nexus Menu");
@@ -452,7 +452,7 @@ namespace GUI
 		IsSetup = true;
 	}
 
-	void Register(ADDON_RENDER aRenderCallback)
+	void Register(GUI_RENDER aRenderCallback)
 	{
 		Mutex.lock();
 		{
@@ -461,7 +461,7 @@ namespace GUI
 		Mutex.unlock();
 	}
 
-	void Unregister(ADDON_RENDER aRenderCallback)
+	void Unregister(GUI_RENDER aRenderCallback)
 	{
 		Mutex.lock();
 		{
@@ -476,7 +476,7 @@ namespace GUI
 
 		Mutex.lock();
 		{
-			for (ADDON_RENDER renderCb : Registry)
+			for (GUI_RENDER renderCb : Registry)
 			{
 				if (renderCb >= aStartAddress && renderCb <= aEndAddress)
 				{

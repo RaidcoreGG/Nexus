@@ -5,7 +5,7 @@ namespace Loader
 	std::mutex Mutex;
 	std::vector<QueuedAddon> QueuedAddons;
 	std::map<std::filesystem::path, ActiveAddon> AddonDefs;
-	AddonAPI APIDef{};
+	std::map<int, AddonAPI*> ApiDefs;
 
 	std::thread UpdateThread;
 
@@ -15,42 +15,6 @@ namespace Loader
 	void Initialize()
 	{
 		State::AddonHost = ENexusState::ADDONS_LOAD;
-
-		/* setup APIDefs */
-		APIDef.SwapChain = Renderer::SwapChain;
-		APIDef.ImguiContext = Renderer::GuiContext;
-		APIDef.RegisterRender = GUI::Register;
-		APIDef.UnregisterRender = GUI::Unregister;
-
-		APIDef.CreateHook = MH_CreateHook;
-		APIDef.RemoveHook = MH_RemoveHook;
-		APIDef.EnableHook = MH_EnableHook;
-		APIDef.DisableHook = MH_DisableHook;
-
-		APIDef.Log = LogMessageAddon;
-		APIDef.RegisterLogger = RegisterLogger;
-		APIDef.UnregisterLogger = UnregisterLogger;
-
-		APIDef.RaiseEvent = Events::Raise;
-		APIDef.SubscribeEvent = Events::Subscribe;
-		APIDef.UnsubscribeEvent = Events::Unsubscribe;
-
-		APIDef.RegisterKeybind = Keybinds::Register;
-		APIDef.UnregisterKeybind = Keybinds::Unregister;
-		APIDef.RegisterWndProc = Keybinds::RegisterWndProc;
-		APIDef.UnregisterWndProc = Keybinds::UnregisterWndProc;
-
-		APIDef.GetResource = DataLink::GetResource;
-		APIDef.ShareResource = DataLink::ShareResource;
-
-		APIDef.GetTexture = TextureLoader::Get;
-		APIDef.LoadTextureFromFile = TextureLoader::LoadFromFile;
-		APIDef.LoadTextureFromResource = TextureLoader::LoadFromResource;
-
-		APIDef.AddShortcut = GUI::QuickAccess::AddShortcut;
-		APIDef.RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
-		APIDef.AddSimpleShortcut = GUI::QuickAccess::AddSimpleShortcut;
-		APIDef.RemoveSimpleShortcut = GUI::QuickAccess::RemoveSimpleShortcut;
 
 		State::AddonHost = ENexusState::ADDONS_READY;
 
@@ -78,7 +42,7 @@ namespace Loader
 		GETADDONDEF getAddonDef = 0;
 		HMODULE hMod = LoadLibraryA(path);
 
-		/* lib load failed */
+		/* load lib failed */
 		if (!hMod)
 		{
 			LogDebug(CH_LOADER, "Failed LoadLibrary on \"%s\". Added to blacklist.", path);
@@ -86,8 +50,7 @@ namespace Loader
 			return;
 		}
 
-		getAddonDef = (GETADDONDEF)GetProcAddress(hMod, "GetAddonDef");
-		if (getAddonDef == 0)
+		if (FindFunction(hMod, &getAddonDef, "GetAddonDef") == false)
 		{
 			LogDebug(CH_LOADER, "\"%s\" is not a Nexus-compatible library. Added to blacklist.", path);
 			Blacklist.insert(aPath);
@@ -109,11 +72,29 @@ namespace Loader
 
 		ActiveAddon addon{ hMod, moduleInfo.SizeOfImage, defs };
 
-		addon.Definitions->Load(APIDef, (void*)ImGui::MemAlloc, (void*)ImGui::MemFree);
+		AddonAPI* api = GetAddonAPI(addon.Definitions->APIVersion);
 
-		AddonDefs.insert({ aPath, addon });
-
-		LogInfo(CH_LOADER, "Loaded addon: %s [%p - %p]", path, hMod, ((PBYTE)hMod) + moduleInfo.SizeOfImage);
+		// if no addon api was requested
+		// else if the requested addon api exists
+		// else invalid addon, don't load
+		if (addon.Definitions->APIVersion == 0)
+		{
+			LogInfo(CH_LOADER, "Loaded addon: %s [%p - %p]", path, hMod, ((PBYTE)hMod) + moduleInfo.SizeOfImage);
+			addon.Definitions->Load(nullptr);
+			AddonDefs.insert({ aPath, addon });
+		}
+		else if (api != nullptr)
+		{
+			LogInfo(CH_LOADER, "Loaded addon: %s [%p - %p]", path, hMod, ((PBYTE)hMod) + moduleInfo.SizeOfImage);
+			addon.Definitions->Load(api);
+			AddonDefs.insert({ aPath, addon });
+		}
+		else
+		{
+			LogWarning(CH_LOADER, "Loading was cancelled because \"%s\" requested an API of version %d and no such version exists. Added to blacklist.", path, addon.Definitions->APIVersion);
+			Blacklist.insert(aPath);
+			FreeLibrary(hMod);
+		}
 	}
 	void UnloadAddon(std::filesystem::path aPath)
 	{
@@ -251,5 +232,67 @@ namespace Loader
 
 			Sleep(5000);
 		}
+	}
+
+	AddonAPI* GetAddonAPI(int aVersion)
+	{
+		// API defs with that version already exist, just return them
+		if (ApiDefs.find(aVersion) != ApiDefs.end())
+		{
+			return ApiDefs[aVersion];
+		}
+
+		AddonAPI* api;
+
+		// create the requested version, add it to the map and return it
+		switch (aVersion)
+		{
+		case 1:
+			api = new AddonAPI1();
+
+			((AddonAPI1*)api)->SwapChain = Renderer::SwapChain;
+			((AddonAPI1*)api)->ImguiContext = Renderer::GuiContext;
+			((AddonAPI1*)api)->ImguiMalloc = ImGui::MemAlloc;
+			((AddonAPI1*)api)->ImguiFree = ImGui::MemFree;
+			((AddonAPI1*)api)->RegisterRender = GUI::Register;
+			((AddonAPI1*)api)->UnregisterRender = GUI::Unregister;
+
+			((AddonAPI1*)api)->CreateHook = MH_CreateHook;
+			((AddonAPI1*)api)->RemoveHook = MH_RemoveHook;
+			((AddonAPI1*)api)->EnableHook = MH_EnableHook;
+			((AddonAPI1*)api)->DisableHook = MH_DisableHook;
+
+			((AddonAPI1*)api)->Log = LogMessageAddon;
+			((AddonAPI1*)api)->RegisterLogger = RegisterLogger;
+			((AddonAPI1*)api)->UnregisterLogger = UnregisterLogger;
+
+			((AddonAPI1*)api)->RaiseEvent = Events::Raise;
+			((AddonAPI1*)api)->SubscribeEvent = Events::Subscribe;
+			((AddonAPI1*)api)->UnsubscribeEvent = Events::Unsubscribe;
+
+			((AddonAPI1*)api)->RegisterWndProc = WndProc::Register;
+			((AddonAPI1*)api)->UnregisterWndProc = WndProc::Unregister;
+
+			((AddonAPI1*)api)->RegisterKeybind = Keybinds::Register;
+			((AddonAPI1*)api)->UnregisterKeybind = Keybinds::Unregister;
+
+			((AddonAPI1*)api)->GetResource = DataLink::GetResource;
+			((AddonAPI1*)api)->ShareResource = DataLink::ShareResource;
+
+			((AddonAPI1*)api)->GetTexture = TextureLoader::Get;
+			((AddonAPI1*)api)->LoadTextureFromFile = TextureLoader::LoadFromFile;
+			((AddonAPI1*)api)->LoadTextureFromResource = TextureLoader::LoadFromResource;
+
+			((AddonAPI1*)api)->AddShortcut = GUI::QuickAccess::AddShortcut;
+			((AddonAPI1*)api)->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
+			((AddonAPI1*)api)->AddSimpleShortcut = GUI::QuickAccess::AddSimpleShortcut;
+			((AddonAPI1*)api)->RemoveSimpleShortcut = GUI::QuickAccess::RemoveSimpleShortcut;
+
+			ApiDefs.insert({ aVersion, api });
+			return api;
+		}
+
+		// there is no matching version
+		return nullptr;
 	}
 }

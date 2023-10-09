@@ -6,7 +6,7 @@ namespace GUI
 	{
 		if (!Visible) { return; }
 
-		if (ImGui::Begin("About", &Visible, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
+		if (ImGui::Begin("About", &Visible, WindowFlags_Default))
 		{
 			ImGui::TextDisabled("Version:");
 			ImGui::Text(""); ImGui::SameLine(); ImGui::Text(Version->ToString().c_str());
