@@ -28,7 +28,7 @@ namespace Path
 		PathGetDirectoryName(Path::F_HOST_DLL, Path::D_GW2);												/* get current directory */
 		PathCopyAndAppend(Path::D_GW2, Path::D_GW2_ADDONS, "addons");										/* get addons path */
 		PathCopyAndAppend(Path::D_GW2_ADDONS, Path::D_GW2_ADDONS_COMMON, "common");							/* get addons/common path */
-		PathCopyAndAppend(Path::D_GW2_ADDONS_COMMON, Path::D_GW2_ADDONS_COMMON_API_V2, "api/v2");			/* get addons/common path */
+		PathCopyAndAppend(Path::D_GW2_ADDONS_COMMON, Path::D_GW2_ADDONS_COMMON_API_V2, "api/v2");			/* get addons/common/api/v2 path */
 		PathCopyAndAppend(Path::D_GW2_ADDONS, Path::D_GW2_ADDONS_RAIDCORE, "Raidcore");						/* get addons/Raidcore path */
 		PathCopyAndAppend(Path::D_GW2_ADDONS_RAIDCORE, Path::D_GW2_ADDONS_RAIDCORE_LOCALES, "Locales");		/* get addons/Raidcore/Locales path */
 

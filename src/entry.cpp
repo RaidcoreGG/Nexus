@@ -44,10 +44,10 @@ void UpdateNexusLink()
 
 void Initialize()
 {
-	Version->Major = 1;
-	Version->Minor = 0;
-	Version->Build = 0;
-	Version->Revision = 1;
+	Version->Major = __TIME_YEARS__;
+	Version->Minor = __TIME_MONTH__;
+	Version->Build = __TIME_DAYS__;
+	Version->Revision = (__TIME_HOURS__ * 60) + (__TIME_MINUTES__);
 
 	State::AddonHost = ENexusState::LOAD;
 
@@ -361,9 +361,6 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 	}
 
 	return func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice, pFeatureLevel, ppImmediateContext);
-
-	//return DxLoad() ? func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice, pFeatureLevel, ppImmediateContext)
-	//				: 0;
 }
 HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pAdapter, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, ID3D11Device** ppDevice)
 {

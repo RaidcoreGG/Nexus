@@ -34,3 +34,12 @@ ImGuiWindowFlags			WindowFlags_Custom	=	ImGuiWindowFlags_AlwaysAutoResize |
 													ImGuiWindowFlags_NoCollapse |
 													ImGuiWindowFlags_NoBackground |
 													ImGuiWindowFlags_NoTitleBar;
+ImGuiWindowFlags			WindowFlags_Watermark = ImGuiWindowFlags_NoDecoration |
+													ImGuiWindowFlags_AlwaysAutoResize |
+													ImGuiWindowFlags_NoSavedSettings |
+													ImGuiWindowFlags_NoFocusOnAppearing |
+													ImGuiWindowFlags_NoNav |
+													ImGuiWindowFlags_NoMove |
+													ImGuiWindowFlags_NoInputs |
+													ImGuiWindowFlags_NoBringToFrontOnFocus |
+													ImGuiWindowFlags_NoBackground;

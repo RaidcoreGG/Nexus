@@ -33,7 +33,7 @@ namespace GUI
 			ImGui::Separator();
 
 			ImVec2 windowSize = ImGui::GetWindowSize();
-			ImVec2 textSize = ImGui::CalcTextSize(u8"Raidcore © 2023");
+			ImVec2 textSize = ImGui::CalcTextSize(u8"© 2023 Raidcore");
 			ImVec2 position = ImGui::GetCursorPos();
 			ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, position.y));
 			ImGui::Text(u8"Raidcore © 2023");

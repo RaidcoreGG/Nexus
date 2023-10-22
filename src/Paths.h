@@ -28,6 +28,9 @@ namespace Path
 
 	/* Initialize all path variables relative to the base modules location */
 	void Initialize(HMODULE aBaseModule);
+
+	const char* GetGameDirectory();
+	const char* GetAddonDirectory();
 }
 
 #endif

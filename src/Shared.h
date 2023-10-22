@@ -37,5 +37,6 @@ extern ImFont*						FontUI;
 extern ImGuiWindowFlags				WindowFlags_Default;
 extern ImGuiWindowFlags				WindowFlags_Overlay;
 extern ImGuiWindowFlags				WindowFlags_Custom;
+extern ImGuiWindowFlags				WindowFlags_Watermark;
 
 #endif

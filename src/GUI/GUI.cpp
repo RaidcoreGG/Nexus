@@ -195,6 +195,26 @@ namespace GUI
 				Mutex.unlock();
 
 				/* TODO: RENDER UNDER UI */
+#define WATERMARK
+#ifdef WATERMARK
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+				ImGui::SetNextWindowPos(ImVec2(16.0f, Renderer::Height != 0 ? Renderer::Height - ImGui::GetTextLineHeight() - 16.0f : 0));
+				if (ImGui::Begin("NEXUS_BUILDINFO", (bool*)0, WindowFlags_Watermark))
+				{
+					ImGui::SetCursorPos(ImVec2(0, 0));
+					ImGui::TextOutlined("Limited Test Build");
+					ImGui::SameLine();
+					ImGui::TextOutlined(__DATE__ " " __TIME__);
+					ImGui::SameLine();
+					ImGui::TextOutlined(("(v" + Version->ToString() + ")").c_str());
+#ifdef _DEBUG
+					ImGui::SameLine();
+					ImGui::TextOutlined("[DEBUG]");
+#endif
+				};
+				ImGui::End();
+				ImGui::PopStyleVar();
+#endif
 			}
 
 			/* draw addons*/

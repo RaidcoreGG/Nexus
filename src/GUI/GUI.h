@@ -37,7 +37,7 @@
 namespace GUI
 {
 	extern std::mutex					Mutex;
-	extern std::vector<GUI_RENDER>	Registry;
+	extern std::vector<GUI_RENDER>		Registry;
 	extern std::vector<IWindow*>		Windows;
 	extern std::map<EFont, ImFont*>		FontIndex;
 	extern float						FontSize;
