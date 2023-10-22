@@ -51,6 +51,9 @@ void Initialize()
 
 	State::AddonHost = ENexusState::LOAD;
 
+	LogInfo(CH_CORE, GetCommandLineA());
+	LogInfo(CH_CORE, "Version: %s", Version->ToString().c_str());
+
 	State::Initialize();
 	Path::Initialize(NexusHandle);
 
@@ -58,9 +61,6 @@ void Initialize()
 	if (!State::IsVanilla)
 	{
 		LogHandler::Initialize();
-
-		LogInfo(CH_CORE, GetCommandLineA());
-		LogInfo(CH_CORE, "Version: %s", Version->ToString().c_str());
 
 		MH_Initialize();
 
@@ -198,6 +198,10 @@ HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, 
 	/* Cache window dimensions */
 	Renderer::Width = Width;
 	Renderer::Height = Height;
+
+	/* Already write to nexus link, as addons depend on that and the next frame isn't called yet so no update to values*/
+	NexusLink->Width = Width;
+	NexusLink->Height = Height;
 
 	Events::Raise(EV_WINDOW_RESIZED, nullptr);
 	

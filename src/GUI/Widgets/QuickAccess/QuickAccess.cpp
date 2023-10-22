@@ -4,6 +4,8 @@ namespace GUI
 {
 	namespace QuickAccess
 	{
+#define GW2_QUICKACCESS_ITEMS 10;
+
 		float size = 32.0f;
 
 		float Opacity = 0.5f;
@@ -47,7 +49,7 @@ namespace GUI
 			switch (Location)
 			{
 				case EQAPosition::Extend:
-					pos.x += (size * Renderer::Scaling) * 9;
+					pos.x += (size * Renderer::Scaling) * GW2_QUICKACCESS_ITEMS;
 					break;
 				case EQAPosition::Under:
 					pos.y += size * Renderer::Scaling;
