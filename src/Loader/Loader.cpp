@@ -257,6 +257,10 @@ namespace Loader
 			((AddonAPI1*)api)->RegisterRender = GUI::Register;
 			((AddonAPI1*)api)->UnregisterRender = GUI::Unregister;
 
+			((AddonAPI1*)api)->GetGameDirectory	= Path::GetGameDirectory;
+			((AddonAPI1*)api)->GetAddonDirectory = Path::GetAddonDirectory;
+			((AddonAPI1*)api)->GetCommonDirectory = Path::GetCommonDirectory;
+
 			((AddonAPI1*)api)->CreateHook = MH_CreateHook;
 			((AddonAPI1*)api)->RemoveHook = MH_RemoveHook;
 			((AddonAPI1*)api)->EnableHook = MH_EnableHook;
