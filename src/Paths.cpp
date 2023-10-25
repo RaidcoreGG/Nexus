@@ -50,4 +50,32 @@ namespace Path
 		PathSystemAppend(Path::F_SYSTEM_DLL, "d3d11.dll");													/* get system dll path */
 		PathCopyAndAppend(Path::D_GW2, Path::F_CHAINLOAD_DLL, "d3d11_chainload.dll");						/* get chainload dll path */
 	}
+
+	const char* GetGameDirectory()
+	{
+		char* str = new char[MAX_PATH]{};
+		memcpy(&str[0], &D_GW2[0], strlen(D_GW2));
+		return str;
+	}
+
+	const char* GetAddonDirectory(const char* aName)
+	{
+		char* str = new char[MAX_PATH]{};
+		int idx = strlen(D_GW2_ADDONS);
+		memcpy(&str[0], &D_GW2_ADDONS[0], strlen(D_GW2_ADDONS));
+
+		if (strcmp(aName, "") != 0) {
+			str[idx] = '\\';
+			memcpy(&str[idx + 1], aName, strlen(aName));
+		}
+
+		return str;
+	}
+
+	const char* GetCommonDirectory()
+	{
+		char* str = new char[MAX_PATH]{};
+		memcpy(&str[0], &D_GW2_ADDONS_COMMON[0], strlen(D_GW2_ADDONS_COMMON));
+		return str;
+	}
 }

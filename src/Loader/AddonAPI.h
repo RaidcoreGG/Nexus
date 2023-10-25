@@ -1,6 +1,8 @@
 #ifndef ADDONAPI_H
 #define ADDONAPI_H
 
+#include "../Paths.h"
+
 #include <dxgi.h>
 #include "../Mumble/LinkedMem.h"
 #include "../Logging/FuncDefs.h"
@@ -30,6 +32,11 @@ struct AddonAPI1 : AddonAPI
 	void*						ImguiFree;
 	GUI_ADDREM					RegisterRender;
 	GUI_ADDREM					UnregisterRender;
+
+	/* Paths */
+	PATHS_GETGAMEDIR			GetGameDirectory;
+	PATHS_GETADDONDIR			GetAddonDirectory;
+	PATHS_GETCOMMONDIR			GetCommonDirectory;
 
 	/* Minhook */
 	MINHOOK_CREATE				CreateHook;
