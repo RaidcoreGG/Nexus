@@ -113,9 +113,14 @@ void Shutdown()
 	if (D3D11SystemHandle) { FreeLibrary(D3D11SystemHandle); }
 }
 
+
 /* hk */
 LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	if (uMsg == WM_KEYDOWN && wParam == 77) {
+		TextureLoader::LoadFromURL("plenga", "https://sognus.cz", "/guildwars2/plenga.png", nullptr);
+	}
+
 	// don't pass to game if custom wndproc
 	if (WndProc::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
