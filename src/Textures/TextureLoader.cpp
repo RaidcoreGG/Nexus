@@ -36,7 +36,10 @@ namespace TextureLoader
 		Texture* tex = Get(str.c_str());
 		if (tex != nullptr)
 		{
-			aCallback(aIdentifier, tex);
+			if (aCallback != nullptr)
+			{
+				aCallback(aIdentifier, tex);
+			}
 			return;
 		}
 
@@ -55,7 +58,10 @@ namespace TextureLoader
 		Texture* tex = Get(str.c_str());
 		if (tex != nullptr)
 		{
-			aCallback(str.c_str(), tex);
+			if (aCallback != nullptr)
+			{
+				aCallback(aIdentifier, tex);
+			}
 			return;
 		}
 
