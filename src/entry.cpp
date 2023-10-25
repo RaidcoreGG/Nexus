@@ -16,6 +16,7 @@
 #include "Logging/LogHandler.h"
 
 #include "Mumble/Mumble.h"
+#include "WndProc/WndProcHandler.h"
 #include "Keybinds/KeybindHandler.h"
 #include "Events/EventHandler.h"
 #include "GUI/GUI.h"
@@ -25,13 +26,6 @@
 #include "Loader/NexusLinkData.h"
 #include "Settings/Settings.h"
 #include "API/APIController.h"
-
-/* handles */
-HMODULE			hGW2			= nullptr;
-HMODULE			hD3D11			= nullptr;
-HMODULE			hSysD3D11		= nullptr;
-
-NexusLinkData*	NexusLink;
 
 void UpdateNexusLink()
 {
@@ -50,23 +44,23 @@ void UpdateNexusLink()
 
 void Initialize()
 {
-	Version->Major = 1;
-	Version->Minor = 0;
-	Version->Build = 0;
-	Version->Revision = 1;
+	Version->Major = __TIME_YEARS__;
+	Version->Minor = __TIME_MONTH__;
+	Version->Build = __TIME_DAYS__;
+	Version->Revision = (__TIME_HOURS__ * 60) + (__TIME_MINUTES__);
 
 	State::AddonHost = ENexusState::LOAD;
 
+	LogInfo(CH_CORE, GetCommandLineA());
+	LogInfo(CH_CORE, "Version: %s", Version->ToString().c_str());
+
 	State::Initialize();
-	Path::Initialize(AddonHostModule);
+	Path::Initialize(NexusHandle);
 
 	/* Don't initialize anything if vanilla*/
 	if (!State::IsVanilla)
 	{
 		LogHandler::Initialize();
-
-		LogInfo(CH_CORE, GetCommandLineA());
-		LogInfo(CH_CORE, "Version: %s", Version->ToString().c_str());
 
 		MH_Initialize();
 
@@ -115,20 +109,21 @@ void Shutdown()
 	}
 
 	// free libs
-	if (hD3D11) { FreeLibrary(hD3D11); }
-	if (hSysD3D11) { FreeLibrary(hSysD3D11); }
+	if (D3D11Handle) { FreeLibrary(D3D11Handle); }
+	if (D3D11SystemHandle) { FreeLibrary(D3D11SystemHandle); }
 }
-
-std::vector<UINT> uMsgs;
 
 /* hk */
 LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	// don't pass to game if keybind (or custom addon wndproc)
-	if (Keybinds::WndProc(hWnd, uMsg, wParam, lParam)) { return 0; }
+	// don't pass to game if custom wndproc
+	if (WndProc::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
+
+	// don't pass to game if keybind
+	if (Keybinds::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
 	// don't pass to game if gui
-	if (GUI::WndProc(hWnd, uMsg, wParam, lParam)) { return 0; }
+	if (GUI::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
 	// don't pass keys to game if currently editing keybinds
 	if (Keybinds::IsSettingKeybind)
@@ -167,16 +162,21 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 		Hooks::GW2_WndProc = (WNDPROC)SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)hkWndProc);
 	}
 
-	while (Loader::QueuedUnload.size() > 0)
+	while (Loader::QueuedAddons.size() > 0)
 	{
-		Loader::UnloadAddon(Loader::QueuedUnload.front());
-		Loader::QueuedUnload.erase(Loader::QueuedUnload.begin());
-	}
+		QueuedAddon q = Loader::QueuedAddons.front();
 
-	while (Loader::QueuedLoad.size() > 0)
-	{
-		Loader::LoadAddon(Loader::QueuedLoad.front());
-		Loader::QueuedLoad.erase(Loader::QueuedLoad.begin());
+		switch (q.Action)
+		{
+			case ELoaderAction::Load:
+				Loader::LoadAddon(q.Path);
+				break;
+			case ELoaderAction::Unload:
+				Loader::UnloadAddon(q.Path);
+				break;
+		}
+
+		Loader::QueuedAddons.erase(Loader::QueuedAddons.begin());
 	}
 
 	while (TextureLoader::QueuedTextures.size() > 0)
@@ -199,6 +199,10 @@ HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, 
 	Renderer::Width = Width;
 	Renderer::Height = Height;
 
+	/* Already write to nexus link, as addons depend on that and the next frame isn't called yet so no update to values*/
+	NexusLink->Width = Width;
+	NexusLink->Height = Height;
+
 	Events::Raise(EV_WINDOW_RESIZED, nullptr);
 	
 	return Hooks::DXGI_ResizeBuffers(pChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
@@ -219,10 +223,10 @@ bool DxLoad()
 
 			State::IsChainloading = true;
 
-			hD3D11 = LoadLibraryA(Path::F_CHAINLOAD_DLL);
+			D3D11Handle = LoadLibraryA(Path::F_CHAINLOAD_DLL);
 		}
 
-		if (!hD3D11)
+		if (!D3D11Handle)
 		{
 			if (State::IsChainloading)
 			{
@@ -230,11 +234,11 @@ bool DxLoad()
 			}
 			State::IsChainloading = false;
 
-			hD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
+			D3D11Handle = LoadLibraryA(Path::F_SYSTEM_DLL);
 
 			LogDebug(CH_CORE, Path::F_SYSTEM_DLL);
 
-			assert(hD3D11 && "Could not load system d3d11.dll");
+			assert(D3D11Handle && "Could not load system d3d11.dll");
 
 			LogInfo(CH_CORE, "Loaded System DLL: %s", Path::F_SYSTEM_DLL);
 		}
@@ -245,7 +249,6 @@ bool DxLoad()
 		{
 			WNDCLASSEXW wc;
 			memset(&wc, 0, sizeof(wc));
-
 			wc.cbSize = sizeof(wc);
 			wc.lpfnWndProc = DefWindowProcW;
 			wc.hInstance = GetModuleHandleW(0);
@@ -296,7 +299,7 @@ bool DxLoad()
 		}
 	}
 
-	return (hD3D11 != NULL);
+	return (D3D11Handle != NULL);
 }
 
 HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext)
@@ -311,9 +314,9 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-		hSysD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
+		D3D11SystemHandle = LoadLibraryA(Path::F_SYSTEM_DLL);
 
-		if (FindFunction(hSysD3D11, &func, func_name) == false)
+		if (FindFunction(D3D11SystemHandle, &func, func_name) == false)
 		{
 			return 0;
 		}
@@ -323,7 +326,7 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 
 	if (func == 0)
 	{
-		if (FindFunction(hD3D11, &func, func_name) == false)
+		if (FindFunction(D3D11Handle, &func, func_name) == false)
 		{
 			return 0;
 		}
@@ -343,9 +346,9 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-		hSysD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
+		D3D11SystemHandle = LoadLibraryA(Path::F_SYSTEM_DLL);
 
-		if (FindFunction(hSysD3D11, &func, func_name) == false)
+		if (FindFunction(D3D11SystemHandle, &func, func_name) == false)
 		{
 			return 0;
 		}
@@ -355,16 +358,13 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 
 	if (func == 0)
 	{
-		if (FindFunction(hD3D11, &func, func_name) == false)
+		if (FindFunction(D3D11Handle, &func, func_name) == false)
 		{
 			return 0;
 		}
 	}
 
 	return func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice, pFeatureLevel, ppImmediateContext);
-
-	//return DxLoad() ? func(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice, pFeatureLevel, ppImmediateContext)
-	//				: 0;
 }
 HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pAdapter, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, ID3D11Device** ppDevice)
 {
@@ -378,9 +378,9 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-		hSysD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
+		D3D11SystemHandle = LoadLibraryA(Path::F_SYSTEM_DLL);
 
-		if (FindFunction(hSysD3D11, &func, func_name) == false)
+		if (FindFunction(D3D11SystemHandle, &func, func_name) == false)
 		{
 			return 0;
 		}
@@ -390,7 +390,7 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 
 	if (func == 0)
 	{
-		if (FindFunction(hD3D11, &func, func_name) == false)
+		if (FindFunction(D3D11Handle, &func, func_name) == false)
 		{
 			return 0;
 		}
@@ -410,9 +410,9 @@ HRESULT __stdcall D3D11CoreCreateLayeredDevice(const void* unknown0, DWORD unkno
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-		hSysD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
+		D3D11SystemHandle = LoadLibraryA(Path::F_SYSTEM_DLL);
 
-		if (FindFunction(hSysD3D11, &func, func_name) == false)
+		if (FindFunction(D3D11SystemHandle, &func, func_name) == false)
 		{
 			return 0;
 		}
@@ -422,7 +422,7 @@ HRESULT __stdcall D3D11CoreCreateLayeredDevice(const void* unknown0, DWORD unkno
 
 	if (func == 0)
 	{
-		if (FindFunction(hD3D11, &func, func_name) == false)
+		if (FindFunction(D3D11Handle, &func, func_name) == false)
 		{
 			return 0;
 		}
@@ -442,9 +442,9 @@ SIZE_T	__stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unkno
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-		hSysD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
+		D3D11SystemHandle = LoadLibraryA(Path::F_SYSTEM_DLL);
 
-		if (FindFunction(hSysD3D11, &func, func_name) == false)
+		if (FindFunction(D3D11SystemHandle, &func, func_name) == false)
 		{
 			return 0;
 		}
@@ -454,7 +454,7 @@ SIZE_T	__stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unkno
 
 	if (func == 0)
 	{
-		if (FindFunction(hD3D11, &func, func_name) == false)
+		if (FindFunction(D3D11Handle, &func, func_name) == false)
 		{
 			return 0;
 		}
@@ -474,9 +474,9 @@ HRESULT __stdcall D3D11CoreRegisterLayers(const void* unknown0, DWORD unknown1)
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-		hSysD3D11 = LoadLibraryA(Path::F_SYSTEM_DLL);
+		D3D11SystemHandle = LoadLibraryA(Path::F_SYSTEM_DLL);
 
-		if (FindFunction(hSysD3D11, &func, func_name) == false)
+		if (FindFunction(D3D11SystemHandle, &func, func_name) == false)
 		{
 			return 0;
 		}
@@ -486,7 +486,7 @@ HRESULT __stdcall D3D11CoreRegisterLayers(const void* unknown0, DWORD unknown1)
 
 	if (func == 0)
 	{
-		if (FindFunction(hD3D11, &func, func_name) == false)
+		if (FindFunction(D3D11Handle, &func, func_name) == false)
 		{
 			return 0;
 		}
@@ -501,8 +501,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
-		AddonHostModule = hModule;
-		hGW2 = GetModuleHandle(NULL);
+		DisableThreadLibraryCalls(hModule);
+		NexusHandle = hModule;
+		GameHandle = GetModuleHandle(NULL);
 
 		::Initialize();
 		break;

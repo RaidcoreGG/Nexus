@@ -1,10 +1,13 @@
 #ifndef ADDONAPI_H
 #define ADDONAPI_H
 
+#include "../Paths.h"
+
 #include <dxgi.h>
 #include "../Mumble/LinkedMem.h"
 #include "../Logging/FuncDefs.h"
 #include "../Events/FuncDefs.h"
+#include "../WndProc/FuncDefs.h"
 #include "../Keybinds/FuncDefs.h"
 #include "../imgui/imgui.h"
 #include "../minhook/mh_hook.h"
@@ -16,13 +19,24 @@
 
 using namespace Mumble;
 
-struct AddonAPI
+// Base
+struct AddonAPI {};
+
+// Revision 1
+struct AddonAPI1 : AddonAPI
 {
 	/* Renderer */
 	IDXGISwapChain*				SwapChain;
 	ImGuiContext*				ImguiContext;
-	GUI_REGISTER				RegisterRender;
-	GUI_UNREGISTER				UnregisterRender;
+	void*						ImguiMalloc;
+	void*						ImguiFree;
+	GUI_ADDREM					RegisterRender;
+	GUI_ADDREM					UnregisterRender;
+
+	/* Paths */
+	PATHS_GETGAMEDIR			GetGameDirectory;
+	PATHS_GETADDONDIR			GetAddonDirectory;
+	PATHS_GETCOMMONDIR			GetCommonDirectory;
 
 	/* Minhook */
 	MINHOOK_CREATE				CreateHook;
@@ -40,11 +54,13 @@ struct AddonAPI
 	EVENTS_SUBSCRIBE			SubscribeEvent;
 	EVENTS_SUBSCRIBE			UnsubscribeEvent;
 
+	/* WndProc */
+	WNDPROC_ADDREM				RegisterWndProc;
+	WNDPROC_ADDREM				UnregisterWndProc;
+
 	/* Keybinds */
 	KEYBINDS_REGISTER			RegisterKeybind;
 	KEYBINDS_UNREGISTER			UnregisterKeybind;
-	KEYBINDS_REGISTERWNDPROC	RegisterWndProc;
-	KEYBINDS_UNREGISTERWNDPROC	UnregisterWndProc;
 
 	/* DataLink */
 	DATALINK_GETRESOURCE		GetResource;
@@ -57,9 +73,9 @@ struct AddonAPI
 
 	/* Shortcuts */
 	QUICKACCESS_ADDSHORTCUT		AddShortcut;
-	QUICKACCESS_REMOVESHORTCUT  RemoveShortcut;
+	QUICKACCESS_REMOVE			RemoveShortcut;
 	QUICKACCESS_ADDSIMPLE		AddSimpleShortcut;
-	QUICKACCESS_REMOVESIMPLE	RemoveSimpleShortcut;
+	QUICKACCESS_REMOVE			RemoveSimpleShortcut;
 
 	/* API */
 		// GW2 API FUNCS

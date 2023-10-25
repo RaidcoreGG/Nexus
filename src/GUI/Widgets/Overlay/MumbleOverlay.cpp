@@ -11,22 +11,12 @@ namespace GUI
 		ImVec2 pos = ImVec2(16.0f, 16.0f);
 		ImVec2 size = ImVec2(ImGui::GetFontSize() * 10.0f, 0.0f);
 
-		ImGuiWindowFlags flags =
-			ImGuiWindowFlags_NoDecoration |
-			ImGuiWindowFlags_AlwaysAutoResize |
-			ImGuiWindowFlags_NoSavedSettings |
-			ImGuiWindowFlags_NoFocusOnAppearing |
-			ImGuiWindowFlags_NoNav |
-			ImGuiWindowFlags_NoMove |
-			ImGuiWindowFlags_NoInputs |
-			ImGuiWindowFlags_NoBringToFrontOnFocus;
-
 		ImGui::SetNextWindowBgAlpha(0.35f);
 		ImGui::SetNextWindowPos(pos);
 		ImGui::SetNextWindowSize(size);
 		if (!State::IsMumbleDisabled)
 		{
-			if (ImGui::Begin("MumbleUI", &Visible, flags))
+			if (ImGui::Begin("MumbleUI", &Visible, WindowFlags_Overlay))
 			{
 				ImGui::Text("Interface");
 				ImGui::Separator();
@@ -85,7 +75,7 @@ namespace GUI
 			pos.x += size.x + 16.0f;
 			ImGui::SetNextWindowPos(pos);
 			ImGui::SetNextWindowSize(size);
-			if (ImGui::Begin("MumblePlayer", &Visible, flags))
+			if (ImGui::Begin("MumblePlayer", &Visible, WindowFlags_Overlay))
 			{
 				ImGui::Text("Player");
 				ImGui::Separator();
@@ -128,7 +118,7 @@ namespace GUI
 			pos.x += size.x + 16.0f;
 			ImGui::SetNextWindowPos(pos);
 			ImGui::SetNextWindowSize(size);
-			if (ImGui::Begin("MumbleCamera", &Visible, flags))
+			if (ImGui::Begin("MumbleCamera", &Visible, WindowFlags_Overlay))
 			{
 				ImGui::Text("Camera");
 				ImGui::Separator();
@@ -145,13 +135,13 @@ namespace GUI
 					ImGui::TableSetColumnIndex(1); ImGui::Text("%+09.4f", MumbleLink->CameraPosition.Z);
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0); ImGui::Text("frontx");
-					ImGui::TableSetColumnIndex(1); ImGui::Text("%+09.4f", MumbleLink->CameraPosition.X);
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%+09.4f", MumbleLink->CameraFront.X);
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0); ImGui::Text("fronty");
-					ImGui::TableSetColumnIndex(1); ImGui::Text("%+09.4f", MumbleLink->CameraPosition.Y);
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%+09.4f", MumbleLink->CameraFront.Y);
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0); ImGui::Text("frontz");
-					ImGui::TableSetColumnIndex(1); ImGui::Text("%+09.4f", MumbleLink->CameraPosition.Z);
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%+09.4f", MumbleLink->CameraFront.Z);
 
 					ImGui::EndTable();
 				}
@@ -162,7 +152,7 @@ namespace GUI
 			pos.x += size.x + 16.0f;
 			ImGui::SetNextWindowPos(pos);
 			ImGui::SetNextWindowSize(size);
-			if (ImGui::Begin("MumbleGame", &Visible, flags))
+			if (ImGui::Begin("MumbleGame", &Visible, WindowFlags_Overlay))
 			{
 				ImGui::Text("Game State");
 				ImGui::Separator();
@@ -203,7 +193,7 @@ namespace GUI
 			pos.x += size.x + 16.0f;
 			ImGui::SetNextWindowPos(pos);
 			ImGui::SetNextWindowSize(size);
-			if (ImGui::Begin("MumbleIdentity", &Visible, flags))
+			if (ImGui::Begin("MumbleIdentity", &Visible, WindowFlags_Overlay))
 			{
 				ImGui::Text("Identity");
 				ImGui::Separator();
@@ -251,7 +241,7 @@ namespace GUI
 		}
 		else
 		{
-			if (ImGui::Begin("MumbleDisabled", &Visible, flags))
+			if (ImGui::Begin("MumbleDisabled", &Visible, WindowFlags_Overlay))
 			{
 				ImGui::Text("Mumble API disabled.");
 			}

@@ -26,7 +26,6 @@ namespace Keybinds
 {
 	extern std::mutex								Mutex;
 	extern std::map<std::string, ActiveKeybind>		Registry;
-	extern std::vector<ADDON_WNDPROC>				RegistryWndProc;
 
 	/* Keybind Helpers */
 	extern std::mutex								HeldKeysMutex;
@@ -37,8 +36,8 @@ namespace Keybinds
 	extern Keybind									CurrentKeybind;
 	extern std::string								CurrentKeybindUsedBy;
 
-	/* Returns true if it found a keybind matching the passed keys that also has a valid KeybindHandler associated. */
-	bool WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	/* Returns 0 if message was processed. */
+	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	/* Loads the keybinds. */
 	void Load();
@@ -50,17 +49,12 @@ namespace Keybinds
 	/* Frees up the associated KeybindHandler. */
 	void Unregister(const char* aIdentifier);
 	
-	/* Registers the provided WndProcCallback. */
-	void RegisterWndProc(ADDON_WNDPROC aWndProcCallback);
-	/* Unregisters the provided WndProcCallback. */
-	void UnregisterWndProc(ADDON_WNDPROC aWndProcCallback);
-
 	/* Returns an empty string if keybind is unused or the identifier that uses this keybind */
 	std::string IsInUse(Keybind aKeybind);
 	
 	/* This will force set the keybind. (Invoked via menu/ui) */
 	void Set(std::string aIdentifier, Keybind aKeybind);
-	/* Invokes the action on the corresponding keybind handler. */
+	/* Invokes the action on the corresponding keybind handler. Returns true if the keybind was dispatched. */
 	bool Invoke(std::string aIdentifier);
 
 	/* Removes all KeybindHandlers that are within the provided address space. */

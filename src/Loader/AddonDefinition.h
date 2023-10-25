@@ -8,7 +8,7 @@
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_extensions.h"
 
-typedef void (*ADDON_LOAD)(AddonAPI aHostApi, void* mallocfn, void* freefn);
+typedef void (*ADDON_LOAD)(AddonAPI* aAPI);
 typedef void (*ADDON_UNLOAD)();
 
 struct AddonVersion

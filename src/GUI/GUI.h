@@ -37,7 +37,7 @@
 namespace GUI
 {
 	extern std::mutex					Mutex;
-	extern std::vector<ADDON_RENDER>	Registry;
+	extern std::vector<GUI_RENDER>		Registry;
 	extern std::vector<IWindow*>		Windows;
 	extern std::map<EFont, ImFont*>		FontIndex;
 	extern float						FontSize;
@@ -48,7 +48,8 @@ namespace GUI
 	void Initialize();
 	void Shutdown();
 
-	bool WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	/* Returns 0 if message was processed. */
+	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	void Render();
 
@@ -57,9 +58,9 @@ namespace GUI
 	void ResizeFonts();
 
 	/* Registers the provided RenderCallback. */
-	void Register(ADDON_RENDER aRenderCallback);
+	void Register(GUI_RENDER aRenderCallback);
 	/* Unregisters the provided RenderCallback. */
-	void Unregister(ADDON_RENDER aRenderCallback);
+	void Unregister(GUI_RENDER aRenderCallback);
 
 	/* Removes all subscribers that are within the provided address space. */
 	int Verify(void* aStartAddress, void* aEndAddress);

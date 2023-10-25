@@ -4,6 +4,8 @@ namespace GUI
 {
 	namespace QuickAccess
 	{
+#define GW2_QUICKACCESS_ITEMS 10;
+
 		float size = 32.0f;
 
 		float Opacity = 0.5f;
@@ -47,7 +49,7 @@ namespace GUI
 			switch (Location)
 			{
 				case EQAPosition::Extend:
-					pos.x += (size * Renderer::Scaling) * 9;
+					pos.x += (size * Renderer::Scaling) * GW2_QUICKACCESS_ITEMS;
 					break;
 				case EQAPosition::Under:
 					pos.y += size * Renderer::Scaling;
@@ -61,14 +63,13 @@ namespace GUI
 			pos.y += Offset.y;
 
 			ImGui::SetNextWindowPos(pos);
-			if (ImGui::Begin("QuickAccessBar", (bool*)0, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar))
+			if (ImGui::Begin("QuickAccessBar", (bool*)0, WindowFlags_Custom))
 			{
 				bool menuFound = false;
 
 				unsigned c = 0;
 				Mutex.lock();
 				{
-
 					for (auto& [identifier, shortcut] : Registry)
 					{
 						if (shortcut.TextureNormal && shortcut.TextureHover)
@@ -77,15 +78,18 @@ namespace GUI
 							ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
 							ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
 
+							//LogDebug(CH_QUICKACCESS, "size: %f | c: %d | scale: %f", size, c, Renderer::Scaling);
+
 							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f }); // smol checkbox
 							if (VerticalLayout)
 							{
-								ImGui::SetCursorPos(ImVec2(0, ((size * c) + c ? 1 : 0) * Renderer::Scaling));
+								ImGui::SetCursorPos(ImVec2(0, ((size * c) + (c ? 1 : 0)) * Renderer::Scaling));
 							}
 							else
 							{
-								ImGui::SetCursorPos(ImVec2(((size * c) + c ? 1 : 0) * Renderer::Scaling, 0));
+								ImGui::SetCursorPos(ImVec2(((size * c) + (c ? 1 : 0)) * Renderer::Scaling, 0));
 							}
+
 							if (ImGui::ImageButton(!shortcut.IsHovering ? shortcut.TextureNormal->Resource : shortcut.TextureHover->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
 							{
 								isActive = true;

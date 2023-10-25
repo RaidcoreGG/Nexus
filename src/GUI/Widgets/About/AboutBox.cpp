@@ -6,7 +6,7 @@ namespace GUI
 	{
 		if (!Visible) { return; }
 
-		if (ImGui::Begin("About", &Visible, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
+		if (ImGui::Begin("About", &Visible, WindowFlags_Default))
 		{
 			ImGui::TextDisabled("Version:");
 			ImGui::Text(""); ImGui::SameLine(); ImGui::Text(Version->ToString().c_str());
@@ -33,7 +33,7 @@ namespace GUI
 			ImGui::Separator();
 
 			ImVec2 windowSize = ImGui::GetWindowSize();
-			ImVec2 textSize = ImGui::CalcTextSize(u8"Raidcore © 2023");
+			ImVec2 textSize = ImGui::CalcTextSize(u8"© 2023 Raidcore");
 			ImVec2 position = ImGui::GetCursorPos();
 			ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, position.y));
 			ImGui::Text(u8"Raidcore © 2023");

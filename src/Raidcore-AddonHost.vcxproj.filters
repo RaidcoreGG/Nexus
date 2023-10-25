@@ -94,6 +94,9 @@
     <Filter Include="API">
       <UniqueIdentifier>{e65ccd89-40e0-4106-92d5-9e47ea8f3189}</UniqueIdentifier>
     </Filter>
+    <Filter Include="WndProc">
+      <UniqueIdentifier>{9bfe2e48-8bc4-40bd-a652-2237dd01af65}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="entry.cpp">
@@ -106,9 +109,6 @@
       <Filter>imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui\imgui_draw.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_demo.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui\imgui.cpp">
@@ -242,6 +242,9 @@
     </ClCompile>
     <ClCompile Include="API\ActiveToken.cpp">
       <Filter>API</Filter>
+    </ClCompile>
+    <ClCompile Include="WndProc\WndProcHandler.cpp">
+      <Filter>WndProc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -502,6 +505,18 @@
     </ClInclude>
     <ClInclude Include="GUI\FuncDefs.h">
       <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\ELoaderAction.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\QueuedAddon.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="WndProc\WndProcHandler.h">
+      <Filter>WndProc</Filter>
+    </ClInclude>
+    <ClInclude Include="WndProc\FuncDefs.h">
+      <Filter>WndProc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,10 @@
 
 #include "core.h"
 
+typedef const char* (*PATHS_GETGAMEDIR)();
+typedef const char* (*PATHS_GETADDONDIR)(const char* aName);
+typedef const char* (*PATHS_GETCOMMONDIR)();
+
 /* Namespace for global path variables */
 namespace Path
 {
@@ -28,6 +32,10 @@ namespace Path
 
 	/* Initialize all path variables relative to the base modules location */
 	void Initialize(HMODULE aBaseModule);
+
+	const char* GetGameDirectory();
+	const char* GetAddonDirectory(const char* aName);
+	const char* GetCommonDirectory();
 }
 
 #endif

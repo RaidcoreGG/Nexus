@@ -31,7 +31,6 @@
     <ClCompile Include="GUI\Widgets\QuickAccess\QuickAccess.cpp" />
     <ClCompile Include="Hooks.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
-    <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
     <ClCompile Include="imgui\imgui_impl_dx11.cpp" />
     <ClCompile Include="imgui\imgui_impl_win32.cpp" />
@@ -60,6 +59,7 @@
     <ClCompile Include="State.cpp" />
     <ClCompile Include="Textures\TextureLoader.cpp" />
     <ClCompile Include="types.cpp" />
+    <ClCompile Include="WndProc\WndProcHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="API\APIController.h" />
@@ -105,10 +105,12 @@
     <ClInclude Include="Keybinds\Keybind.h" />
     <ClInclude Include="Keybinds\KeybindHandler.h" />
     <ClInclude Include="Loader\EAddonFlags.h" />
+    <ClInclude Include="Loader\ELoaderAction.h" />
     <ClInclude Include="Loader\FuncDefs.h" />
     <ClInclude Include="Loader\ActiveAddon.h" />
     <ClInclude Include="Loader\Loader.h" />
     <ClInclude Include="Loader\NexusLinkData.h" />
+    <ClInclude Include="Loader\QueuedAddon.h" />
     <ClInclude Include="Localization\Localization.h" />
     <ClInclude Include="Logging\FuncDefs.h" />
     <ClInclude Include="Mumble\Compass.h" />
@@ -148,6 +150,8 @@
     <ClInclude Include="Textures\Texture.h" />
     <ClInclude Include="Textures\TextureLoader.h" />
     <ClInclude Include="types.h" />
+    <ClInclude Include="WndProc\FuncDefs.h" />
+    <ClInclude Include="WndProc\WndProcHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Raidcore-AddonHost.rc" />

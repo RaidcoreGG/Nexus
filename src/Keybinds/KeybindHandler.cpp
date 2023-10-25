@@ -4,7 +4,6 @@ namespace Keybinds
 {
 	std::mutex								Mutex;
 	std::map<std::string, ActiveKeybind>	Registry;
-	std::vector<ADDON_WNDPROC>				RegistryWndProc;
 
 	std::mutex								HeldKeysMutex;
 	std::vector<WPARAM>						HeldKeys;
@@ -13,22 +12,8 @@ namespace Keybinds
 	Keybind									CurrentKeybind;
 	std::string								CurrentKeybindUsedBy;
 
-	bool WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		// don't pass to game if addon wndproc
-		Mutex.lock();
-		{
-			for (ADDON_WNDPROC wndprocCb : RegistryWndProc)
-			{
-				if (wndprocCb(hWnd, uMsg, wParam, lParam))
-				{
-					Mutex.unlock();
-					return 0;
-				}
-			}
-		}
-		Mutex.unlock();
-
 		Keybind kb{};
 		kb.Alt		= GetKeyState(VK_MENU)		& 0x8000;
 		kb.Ctrl		= GetKeyState(VK_CONTROL)	& 0x8000;
@@ -52,7 +37,7 @@ namespace Keybinds
 				if (std::find(HeldKeys.begin(), HeldKeys.end(), wParam) != HeldKeys.end())
 				{
 					HeldKeysMutex.unlock();
-					return false;
+					return 1;
 				}
 				HeldKeys.push_back(wParam);
 			}
@@ -65,7 +50,8 @@ namespace Keybinds
 				{
 					if (kb == it->second.Bind)
 					{
-						return Invoke(it->first);
+						// if Invoke returns true, pass 0 to the wndproc to stop processing
+						return Invoke(it->first) ? 0 : 1;
 					}
 				}
 			}
@@ -86,7 +72,7 @@ namespace Keybinds
 			break;
 		}
 
-		return false;
+		return 1;
 	}
 
 	void Load()
@@ -193,24 +179,6 @@ namespace Keybinds
 		Save();
 	}
 
-	void RegisterWndProc(ADDON_WNDPROC aWndProcCallback)
-	{
-		Mutex.lock();
-		{
-			RegistryWndProc.push_back(aWndProcCallback);
-		}
-		Mutex.unlock();
-	}
-
-	void UnregisterWndProc(ADDON_WNDPROC aWndProcCallback)
-	{
-		Mutex.lock();
-		{
-			RegistryWndProc.erase(std::remove(RegistryWndProc.begin(), RegistryWndProc.end(), aWndProcCallback), RegistryWndProc.end());
-		}
-		Mutex.unlock();
-	}
-
 	std::string IsInUse(Keybind aKeybind)
 	{
 		/* sanity check */
@@ -276,15 +244,6 @@ namespace Keybinds
 				if (activekb.Handler >= aStartAddress && activekb.Handler <= aEndAddress)
 				{
 					activekb.Handler = nullptr;
-					refCounter++;
-				}
-			}
-
-			for (ADDON_WNDPROC wndprocCb : RegistryWndProc)
-			{
-				if (wndprocCb >= aStartAddress && wndprocCb <= aEndAddress)
-				{
-					RegistryWndProc.erase(std::remove(RegistryWndProc.begin(), RegistryWndProc.end(), wndprocCb), RegistryWndProc.end());
 					refCounter++;
 				}
 			}
