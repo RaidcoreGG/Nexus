@@ -3,6 +3,7 @@
 /* For some reason this has to be defined AND included here. */
 #define STB_IMAGE_IMPLEMENTATION
 #include "../stb/stb_image.h"
+#include "../httplib/httplib.h"
 
 namespace TextureLoader
 {
@@ -27,6 +28,48 @@ namespace TextureLoader
 		Mutex.unlock();
 
 		return result;
+	}
+
+
+	void DetermineImageDimensions(const unsigned char* image_data, size_t image_size, int& image_width, int& image_height) {
+		int comp;
+		stbi_uc* data = stbi_load_from_memory(image_data, static_cast<int>(image_size), &image_width, &image_height, &comp, 0);
+
+		if (data) {
+			stbi_image_free(data);
+		}
+		else {
+			image_width = 0;
+			image_height = 0;
+		}
+	}
+
+	void LoadFromURL(const char* aIdentifier, const char* aURL, TEXTURES_RECEIVECALLBACK aCallback) {
+		std::string str = aIdentifier;
+		httplib::Client client(aURL);
+		auto result = client.Get("/");
+
+		if (!result) {
+			// Log error
+			return;
+		}
+
+		// Status is not HTTP_OK
+		if (result->status != 200) {
+			// Log error
+			return;
+		}
+
+		size_t size = result->body.size();
+		unsigned char* data = new unsigned char[size];
+		// TODO: Handle memory
+		std::memcpy(data, result->body.c_str(), size);
+
+		int image_width = 0;
+		int image_height = 0;
+		DetermineImageDimensions(data, size, image_width, image_height);
+
+		QueueTexture(str.c_str(), data, image_width, image_height, aCallback);
 	}
 
 	void LoadFromFile(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback)
