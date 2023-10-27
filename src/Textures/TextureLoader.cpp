@@ -2,7 +2,11 @@
 
 /* For some reason this has to be defined AND included here. */
 #define STB_IMAGE_IMPLEMENTATION
+#define CPPHTTPLIB_OPENSSL_SUPPORT
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 #include "../stb/stb_image.h"
+#include "../httplib/httplib.h"
 
 namespace TextureLoader
 {
@@ -27,6 +31,39 @@ namespace TextureLoader
 		Mutex.unlock();
 
 		return result;
+	}
+
+
+	void LoadFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback) {
+		std::string str = aIdentifier;
+		httplib::Client client(aRemote);
+		client.enable_server_certificate_verification(false);
+		auto result = client.Get(aEndpoint);
+
+		if (!result) {
+			// TODO: Log error
+			return;
+		}
+
+		// Status is not HTTP_OK
+		if (result->status != 200) {
+			// TODO: Log error
+			return;
+		}
+
+		size_t size = result->body.size();
+		unsigned char* remote_data = new unsigned char[size];
+		std::memcpy(remote_data, result->body.c_str(), size);
+
+		int image_width = 0;
+		int image_height = 0;
+		int comp;
+		// TODO: free data
+		stbi_uc* data = stbi_load_from_memory(remote_data, static_cast<int>(size), &image_width, &image_height, &comp, 0);
+
+		free(remote_data);
+
+		QueueTexture(str.c_str(), data, image_width, image_height, aCallback);
 	}
 
 	void LoadFromFile(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback)
