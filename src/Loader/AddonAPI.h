@@ -30,8 +30,8 @@ struct AddonAPI1 : AddonAPI
 	ImGuiContext*				ImguiContext;
 	void*						ImguiMalloc;
 	void*						ImguiFree;
-	GUI_ADDREM					RegisterRender;
-	GUI_ADDREM					UnregisterRender;
+	GUI_ADDRENDER				RegisterRender;
+	GUI_REMRENDER				UnregisterRender;
 
 	/* Paths */
 	PATHS_GETGAMEDIR			GetGameDirectory;
@@ -70,6 +70,7 @@ struct AddonAPI1 : AddonAPI
 	TEXTURES_GET				GetTexture;
 	TEXTURES_LOADFROMFILE		LoadTextureFromFile;
 	TEXTURES_LOADFROMRESOURCE	LoadTextureFromResource;
+	TEXTURES_LOADFROMURL		LoadTextureFromURL;
 
 	/* Shortcuts */
 	QUICKACCESS_ADDSHORTCUT		AddShortcut;

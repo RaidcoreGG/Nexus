@@ -195,6 +195,7 @@ namespace GUI
 				Mutex.unlock();
 
 				/* TODO: RENDER UNDER UI */
+
 #define WATERMARK
 #ifdef WATERMARK
 				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -207,9 +208,11 @@ namespace GUI
 					ImGui::TextOutlined(__DATE__ " " __TIME__);
 					ImGui::SameLine();
 					ImGui::TextOutlined(("(v" + Version->ToString() + ")").c_str());
-#ifdef _DEBUG
 					ImGui::SameLine();
-					ImGui::TextOutlined("[DEBUG]");
+#ifdef _DEBUG
+					ImGui::TextOutlined("debug/" BRANCH_NAME);
+#else
+					ImGui::TextOutlined("release/" BRANCH_NAME);
 #endif
 				};
 				ImGui::End();
@@ -472,7 +475,7 @@ namespace GUI
 		IsSetup = true;
 	}
 
-	void Register(GUI_RENDER aRenderCallback)
+	void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback)
 	{
 		Mutex.lock();
 		{

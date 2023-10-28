@@ -11,6 +11,7 @@
 #include "../Paths.h"
 #include "../Shared.h"
 #include "../Consts.h"
+#include "../Branch.h"
 
 #include "../Keybinds/KeybindHandler.h"
 #include "../Loader/Loader.h"
@@ -58,7 +59,7 @@ namespace GUI
 	void ResizeFonts();
 
 	/* Registers the provided RenderCallback. */
-	void Register(GUI_RENDER aRenderCallback);
+	void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback);
 	/* Unregisters the provided RenderCallback. */
 	void Unregister(GUI_RENDER aRenderCallback);
 

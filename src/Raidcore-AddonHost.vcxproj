@@ -65,6 +65,7 @@
   <ItemGroup>
     <ClInclude Include="API\APIController.h" />
     <ClInclude Include="API\ActiveToken.h" />
+    <ClInclude Include="Branch.h" />
     <ClInclude Include="Consts.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="DataLink\DataLink.h" />
@@ -327,7 +328,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -377,6 +378,14 @@
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
       <AdditionalDependencies>Shlwapi.lib;PathCch.lib;Shell32.lib;Psapi.lib;libssl.lib;libcrypto.lib;ws2_32.lib;gdi32.lib;advapi32.lib;crypt32.lib;user32.lib</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>git branch --show-current &gt;&gt; temp_file.h
+set /p branchname=&lt;temp_file.h
+set branchmacro=#define BRANCH_NAME "%branchname%"
+echo #pragma once &gt; Branch.h
+echo %branchmacro% &gt;&gt; Branch.h
+del temp_file.h</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -402,6 +411,14 @@
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
       <AdditionalDependencies>Shlwapi.lib;PathCch.lib;Shell32.lib;Psapi.lib;libssl.lib;libcrypto.lib;ws2_32.lib;gdi32.lib;advapi32.lib;crypt32.lib;user32.lib</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>git branch --show-current &gt;&gt; temp_file.h
+set /p branchname=&lt;temp_file.h
+set branchmacro=#define BRANCH_NAME "%branchname%"
+echo #pragma once &gt; Branch.h
+echo %branchmacro% &gt;&gt; Branch.h
+del temp_file.h</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

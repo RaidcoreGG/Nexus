@@ -286,6 +286,7 @@ namespace Loader
 			((AddonAPI1*)api)->GetTexture = TextureLoader::Get;
 			((AddonAPI1*)api)->LoadTextureFromFile = TextureLoader::LoadFromFile;
 			((AddonAPI1*)api)->LoadTextureFromResource = TextureLoader::LoadFromResource;
+			((AddonAPI1*)api)->LoadTextureFromURL = TextureLoader::LoadFromURL;
 
 			((AddonAPI1*)api)->AddShortcut = GUI::QuickAccess::AddShortcut;
 			((AddonAPI1*)api)->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
