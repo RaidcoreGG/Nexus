@@ -44,12 +44,12 @@ void UpdateNexusLink()
 
 void Initialize()
 {
+	State::Nexus = ENexusState::LOAD;
+
 	Version->Major = __TIME_YEARS__;
 	Version->Minor = __TIME_MONTH__;
 	Version->Build = __TIME_DAYS__;
 	Version->Revision = (__TIME_HOURS__ * 60) + (__TIME_MINUTES__);
-
-	State::AddonHost = ENexusState::LOAD;
 
 	LogInfo(CH_CORE, GetCommandLineA());
 	LogInfo(CH_CORE, "Version: %s", Version->ToString().c_str());
@@ -77,19 +77,21 @@ void Initialize()
 		if (!Renderer::GuiContext) { Renderer::GuiContext = ImGui::CreateContext(); }
 
 		Loader::Initialize();
+
+		State::Nexus = ENexusState::LOADED;
 	}
 	else
 	{
-		State::AddonHost = ENexusState::SHUTDOWN;
+		State::Nexus = ENexusState::SHUTDOWN;
 	}
 }
 void Shutdown()
 {
 	LogCritical(CH_CORE, "::Shutdown()");
 
-	if (State::AddonHost < ENexusState::SHUTDOWN)
+	if (State::Nexus < ENexusState::SHUTDOWN)
 	{
-		State::AddonHost = ENexusState::SHUTDOWN;
+		State::Nexus = ENexusState::SHUTDOWN;
 
 		GUI::Shutdown();
 		Mumble::Shutdown();
@@ -142,6 +144,8 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 {
 	if (Renderer::SwapChain != pChain)
 	{
+		Log("meme", "swap: %p | swap (new): %p", Renderer::SwapChain, pChain);
+
 		Renderer::SwapChain = pChain;
 
 		if (Renderer::Device)
@@ -160,30 +164,12 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 
 		Renderer::WindowHandle = swapChainDesc.OutputWindow;
 		Hooks::GW2_WndProc = (WNDPROC)SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)hkWndProc);
+
+		State::Nexus = ENexusState::READY;
+		State::Directx = EDxState::READY; /* acquired swapchain */
 	}
 
-	while (Loader::QueuedAddons.size() > 0)
-	{
-		QueuedAddon q = Loader::QueuedAddons.front();
-
-		switch (q.Action)
-		{
-			case ELoaderAction::Load:
-				Loader::LoadAddon(q.Path);
-				break;
-			case ELoaderAction::Unload:
-				Loader::UnloadAddon(q.Path);
-				break;
-		}
-
-		Loader::QueuedAddons.erase(Loader::QueuedAddons.begin());
-	}
-
-	while (TextureLoader::QueuedTextures.size() > 0)
-	{
-		TextureLoader::CreateTexture(TextureLoader::QueuedTextures.front());
-		TextureLoader::QueuedTextures.erase(TextureLoader::QueuedTextures.begin());
-	}
+	TextureLoader::ProcessQueue();
 
 	UpdateNexusLink();
 
@@ -211,9 +197,9 @@ HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, 
 /* dx */
 bool DxLoad()
 {
-	if (State::Directx < EDxState::DIRECTX_READY)
+	if (State::Directx < EDxState::LOAD)
 	{
-		State::Directx = EDxState::DIRECTX_LOAD;
+		State::Directx = EDxState::LOAD;
 
 		/* attempt to chainload */
 		/* sanity check that the current dll isn't the chainload */
@@ -243,9 +229,9 @@ bool DxLoad()
 			LogInfo(CH_CORE, "Loaded System DLL: %s", Path::F_SYSTEM_DLL);
 		}
 
-		State::Directx = EDxState::DIRECTX_READY;
+		State::Directx = EDxState::LOADED;
 
-		if (State::Directx < EDxState::DIRECTX_HOOKED && !State::IsVanilla)
+		if (State::Directx < EDxState::HOOKED && !State::IsVanilla)
 		{
 			WNDCLASSEXW wc;
 			memset(&wc, 0, sizeof(wc));
@@ -294,8 +280,7 @@ bool DxLoad()
 
 			UnregisterClassW(wc.lpszClassName, wc.hInstance);
 
-			State::AddonHost = ENexusState::UI_READY;
-			State::Directx = EDxState::DIRECTX_HOOKED;
+			State::Directx = EDxState::HOOKED;
 		}
 	}
 
@@ -310,7 +295,7 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 	static const char* func_name = "D3D11CreateDevice";
 	Log(CH_CORE, func_name);
 
-	if (State::Directx >= EDxState::DIRECTX_READY)
+	if (State::Directx >= EDxState::LOADED)
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
@@ -342,7 +327,7 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 	static const char* func_name = "D3D11CreateDeviceAndSwapChain";
 	Log(CH_CORE, func_name);
 
-	if (State::Directx >= EDxState::DIRECTX_READY)
+	if (State::Directx >= EDxState::LOADED)
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
@@ -374,7 +359,7 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 	static const char* func_name = "D3D11CoreCreateDevice";
 	Log(CH_CORE, func_name);
 
-	if (State::Directx >= EDxState::DIRECTX_READY)
+	if (State::Directx >= EDxState::LOADED)
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
@@ -406,7 +391,7 @@ HRESULT __stdcall D3D11CoreCreateLayeredDevice(const void* unknown0, DWORD unkno
 	static const char* func_name = "D3D11CoreCreateLayeredDevice";
 	Log(CH_CORE, func_name);
 
-	if (State::Directx >= EDxState::DIRECTX_READY)
+	if (State::Directx >= EDxState::LOADED)
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
@@ -438,7 +423,7 @@ SIZE_T	__stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unkno
 	static const char* func_name = "D3D11CoreGetLayeredDeviceSize";
 	Log(CH_CORE, func_name);
 
-	if (State::Directx >= EDxState::DIRECTX_READY)
+	if (State::Directx >= EDxState::LOADED)
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
@@ -470,7 +455,7 @@ HRESULT __stdcall D3D11CoreRegisterLayers(const void* unknown0, DWORD unknown1)
 	static const char* func_name = "D3D11CoreRegisterLayers";
 	Log(CH_CORE, func_name);
 
-	if (State::Directx >= EDxState::DIRECTX_READY)
+	if (State::Directx >= EDxState::LOADED)
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 

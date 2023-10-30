@@ -29,9 +29,9 @@ namespace GUI
 	{
 		extern float Opacity;
 
-		extern std::mutex													Mutex;
-		extern std::map<std::string, Shortcut>								Registry;
-		extern std::map<std::string, QUICKACCESS_SHORTCUTRENDERCALLBACK>	RegistrySimple;
+		extern std::mutex							Mutex;
+		extern std::map<std::string, Shortcut>		Registry;
+		extern std::map<std::string, GUI_RENDER>	RegistrySimple;
 
 		extern std::thread		AnimationThread;
 		extern bool				IsAnimating;
@@ -47,7 +47,7 @@ namespace GUI
 		void AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aKeybindIdentifier, const char* aTooltipText);
 		void RemoveShortcut(const char* aIdentifier);
 
-		void AddSimpleShortcut(const char* aIdentifier, QUICKACCESS_SHORTCUTRENDERCALLBACK aShortcutRenderCallback);
+		void AddSimpleShortcut(const char* aIdentifier, GUI_RENDER aShortcutRenderCallback);
 		void RemoveSimpleShortcut(const char* aIdentifier);
 
 		int Verify(void* aStartAddress, void* aEndAddress);

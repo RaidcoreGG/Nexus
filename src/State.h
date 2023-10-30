@@ -17,10 +17,8 @@ enum class ENexusState
 {
 	NONE,
 	LOAD,									/* AddonHost is loading */
-	UI_READY,								/* AddonHost is ready to initialise UI */
-	ADDONS_LOAD,							/* AddonHost is loading addons*/
-	ADDONS_READY,							/* AddonHost has loaded the addons */
-	ADDONS_SHUTDOWN,						/* AddonHost has loaded the addons */
+	LOADED,									/* AddonHost has initialized all components */
+	READY,									/* AddonHost is ready to initialise UI */
 	SHUTDOWN								/* AddonHost has been shut down */
 };
 
@@ -28,9 +26,10 @@ enum class ENexusState
 enum class EDxState
 {
 	NONE,
-	DIRECTX_LOAD,							/* Is loading directx (system/chainload) */
-	DIRECTX_READY,							/* Has loaded directx */
-	DIRECTX_HOOKED,							/* Has installed directx hooks */
+	LOAD,							/* Is loading directx (system/chainload) */
+	LOADED,							/* Has loaded directx */
+	HOOKED,							/* Has installed directx hooks */
+	READY							/* Is fully ready (has acquired swapchain) */
 };
 
 /* DirectX entry methods */
@@ -59,7 +58,7 @@ enum class EMultiboxState
 namespace State
 {
 	/* internal states */
-	extern ENexusState		AddonHost;				/* AddonHost state variable */
+	extern ENexusState		Nexus;					/* AddonHost state variable */
 	extern EDxState			Directx;				/* DirectX state variable */
 	extern EEntryMethod		EntryMethod;			/* How was the host initialized */
 	extern EMultiboxState	MultiboxState;			/* Is this game instance occupying any resources */

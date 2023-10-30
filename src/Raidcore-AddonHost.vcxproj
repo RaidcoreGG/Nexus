@@ -74,6 +74,7 @@
     <ClInclude Include="Events\EventHandler.h" />
     <ClInclude Include="Events\FuncDefs.h" />
     <ClInclude Include="GUI\EFontIdentifier.h" />
+    <ClInclude Include="GUI\ERenderType.h" />
     <ClInclude Include="GUI\FuncDefs.h" />
     <ClInclude Include="GUI\GUI.h" />
     <ClInclude Include="GUI\IWindow.h" />

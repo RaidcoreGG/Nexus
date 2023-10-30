@@ -34,6 +34,9 @@ namespace TextureLoader
 	/* Requests to load a texture from URL. */
 	void LoadFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback);
 
+	/* Processes all currently queued textures. */
+	void ProcessQueue();
+
 	/* Pushes a texture into the queue to load during the next frame. */
 	void QueueTexture(const char* aIdentifier, unsigned char* aImageData, unsigned aWidth, unsigned aHeight, TEXTURES_RECEIVECALLBACK aCallback);
 	/* Creates a texture and adds it to the registry. */

@@ -54,7 +54,6 @@ namespace TextureLoader
 
 		QueueTexture(aIdentifier, image_data, image_width, image_height, aCallback);
 	}
-
 	void LoadFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback)
 	{
 		std::string str = aIdentifier;
@@ -100,7 +99,6 @@ namespace TextureLoader
 
 		QueueTexture(str.c_str(), image_data, image_width, image_height, aCallback);
 	}
-
 	void LoadFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback)
 	{
 		std::string str = aIdentifier;
@@ -147,6 +145,17 @@ namespace TextureLoader
 		QueueTexture(str.c_str(), data, image_width, image_height, aCallback);
 	}
 
+	void ProcessQueue()
+	{
+		Mutex.lock();
+		while (TextureLoader::QueuedTextures.size() > 0)
+		{
+			TextureLoader::CreateTexture(TextureLoader::QueuedTextures.front());
+			TextureLoader::QueuedTextures.erase(TextureLoader::QueuedTextures.begin());
+		}
+		Mutex.unlock();
+	}
+
 	void QueueTexture(const char* aIdentifier, unsigned char* aImageData, unsigned aWidth, unsigned aHeight, TEXTURES_RECEIVECALLBACK aCallback)
 	{
 		std::string str = aIdentifier;
@@ -166,7 +175,6 @@ namespace TextureLoader
 		}
 		Mutex.unlock();
 	}
-
 	void CreateTexture(QueuedTexture aQueuedTexture)
 	{
 		LogDebug(CH_TEXTURES, "Create %s", aQueuedTexture.Identifier.c_str());

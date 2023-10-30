@@ -10,6 +10,7 @@
 #include "Mumble/Identity.h"
 #include "Logging/LogHandler.h"
 #include "Loader/AddonDefinition.h"
+#include "Loader/NexusLinkData.h"
 
 using namespace Mumble;
 using namespace LogHandler;

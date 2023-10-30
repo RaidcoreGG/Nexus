@@ -4,7 +4,6 @@
 #include "../Paths.h"
 
 #include <dxgi.h>
-#include "../Mumble/LinkedMem.h"
 #include "../Logging/FuncDefs.h"
 #include "../Events/FuncDefs.h"
 #include "../WndProc/FuncDefs.h"
@@ -15,9 +14,6 @@
 #include "../Textures/FuncDefs.h"
 #include "../GUI/FuncDefs.h"
 #include "../GUI/Widgets/QuickAccess/FuncDefs.h"
-#include "NexusLinkData.h"
-
-using namespace Mumble;
 
 // Base
 struct AddonAPI {};

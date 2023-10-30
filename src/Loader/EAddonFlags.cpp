@@ -16,12 +16,12 @@ EAddonFlags operator&(EAddonFlags lhs, EAddonFlags rhs)
 		);
 }
 
-EAddonFlags operator==(EAddonFlags lhs, EAddonFlags rhs)
+bool operator==(EAddonFlags lhs, EAddonFlags rhs)
 {
-	return lhs == rhs;
+	return static_cast<int>(lhs) == static_cast<int>(rhs);
 }
 
-EAddonFlags operator!=(EAddonFlags lhs, EAddonFlags rhs)
+bool operator!=(EAddonFlags lhs, EAddonFlags rhs)
 {
-	return lhs != rhs;
+	return static_cast<int>(lhs) != static_cast<int>(rhs);
 }

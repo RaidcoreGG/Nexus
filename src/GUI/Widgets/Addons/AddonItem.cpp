@@ -23,13 +23,6 @@ namespace GUI
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetColumnWidth() - 120.0f);
 			{
 				ImGui::BeginGroup();
-				if (aDefinitions->HasFlag(EAddonFlags::HasOptions))
-				{
-					if (ImGui::Button("Options", ImVec2(120.0f, 24.0f)))
-					{
-						Events::Raise(EV_OPTIONS_CALLED, (void*)aDefinitions->Signature);
-					}
-				}
 				if (ImGui::Button("Uninstall", ImVec2(120.0f, 24.0f)))
 				{
 					LogDebug(CH_GUI, "Uninstall called: %s", aDefinitions->Name);
