@@ -24,7 +24,7 @@ namespace Keybinds
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
 			if (wParam > 255) break;
-			kb.Key = wParam;
+			kb.Key = static_cast<unsigned>(wParam);
 			
 			// if shift, ctrl or alt set key to 0
 			if (wParam == 16 || wParam == 17 || wParam == 18)
@@ -88,7 +88,7 @@ namespace Keybinds
 			for (json binding : keybinds)
 			{
 				Keybind kb{};
-				kb.Key = binding["Key"].get<WPARAM>();
+				kb.Key = binding["Key"].get<unsigned>();
 				kb.Alt = binding["Alt"].get<bool>();
 				kb.Ctrl = binding["Ctrl"].get<bool>();
 				kb.Shift = binding["Shift"].get<bool>();
@@ -137,10 +137,14 @@ namespace Keybinds
 
 	void Register(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const char* aKeybind)
 	{
+		Keybind requestedBind = KBFromString(aKeybind);
+		RegisterWithStruct(aIdentifier, aKeybindHandler, requestedBind);
+	}
+	void RegisterWithStruct(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, Keybind aKeybind)
+	{
 		std::string str = aIdentifier;
-		std::string bind = aKeybind;
 
-		Keybind requestedBind = KBFromString(bind);
+		Keybind requestedBind = aKeybind;
 
 		/* check if another identifier, already uses the keybind */
 		std::string res = IsInUse(requestedBind);
@@ -165,7 +169,6 @@ namespace Keybinds
 
 		Save();
 	}
-
 	void Unregister(const char* aIdentifier)
 	{
 		std::string str = aIdentifier;
@@ -215,7 +218,6 @@ namespace Keybinds
 
 		Save();
 	}
-
 	bool Invoke(std::string aIdentifier)
 	{
 		bool called = false;

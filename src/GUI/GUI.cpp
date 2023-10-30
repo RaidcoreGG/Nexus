@@ -197,7 +197,7 @@ namespace GUI
 			if (ImGui::Begin("NEXUS_BUILDINFO", (bool*)0, WindowFlags_Watermark))
 			{
 				ImGui::SetCursorPos(ImVec2(0, 0));
-				ImGui::TextOutlined("Limited Test Build");
+				ImGui::TextOutlined("Limited Test");
 				ImGui::SameLine();
 				ImGui::TextOutlined(__DATE__ " " __TIME__);
 				ImGui::SameLine();

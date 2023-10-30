@@ -44,8 +44,10 @@ namespace Keybinds
 	/* Saves the keybinds. */
 	void Save();
 
-	/* Registers a keybind with the given identifier and handler, if no bind was previously stored the given one will be used. */
+	/* Generates and registers a keybind from the given string with the given identifier and handler, if no bind was previously stored the given one will be used. */
 	void Register(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const char* aKeybind);
+	/* Registers a keybind from the given struct with the given identifier and handler, if no bind was previously stored the given one will be used.*/
+	void RegisterWithStruct(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, Keybind aKeybind);
 	/* Frees up the associated KeybindHandler. */
 	void Unregister(const char* aIdentifier);
 	

@@ -12,10 +12,10 @@
 /* A structure holding information about a keybind. */
 struct Keybind
 {
-	WPARAM	Key;
-	bool	Alt;
-	bool	Ctrl;
-	bool	Shift;
+	unsigned	Key;
+	bool		Alt;
+	bool		Ctrl;
+	bool		Shift;
 
 	/* Prints the keybind to a string for display. Pass true if spacing/padding should be added. */
 	std::string ToString(bool padded = false);

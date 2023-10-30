@@ -55,7 +55,8 @@ struct AddonAPI1 : AddonAPI
 	WNDPROC_ADDREM				UnregisterWndProc;
 
 	/* Keybinds */
-	KEYBINDS_REGISTER			RegisterKeybind;
+	KEYBINDS_REGISTERWITHSTRING	RegisterKeybindWithString;
+	KEYBINDS_REGISTERWITHSTRUCT	RegisterKeybindWithStruct;
 	KEYBINDS_UNREGISTER			UnregisterKeybind;
 
 	/* DataLink */

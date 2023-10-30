@@ -305,7 +305,8 @@ namespace Loader
 			((AddonAPI1*)api)->RegisterWndProc = WndProc::Register;
 			((AddonAPI1*)api)->UnregisterWndProc = WndProc::Unregister;
 
-			((AddonAPI1*)api)->RegisterKeybind = Keybinds::Register;
+			((AddonAPI1*)api)->RegisterKeybindWithString = Keybinds::Register;
+			((AddonAPI1*)api)->RegisterKeybindWithStruct = Keybinds::RegisterWithStruct;
 			((AddonAPI1*)api)->UnregisterKeybind = Keybinds::Unregister;
 
 			((AddonAPI1*)api)->GetResource = DataLink::GetResource;
