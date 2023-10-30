@@ -245,17 +245,6 @@ namespace GUI
 			}
 			/* draw overlay end */
 
-			/* post-render callbacks */
-			Mutex.lock();
-			{
-				for (GUI_RENDER callback : RegistryPostRender)
-				{
-					if (callback) { callback(); }
-				}
-			}
-			Mutex.unlock();
-			/* pre-render callbacks end*/
-
 			/* end frame */
 			ImGui::EndFrame();
 			ImGui::Render();
@@ -263,6 +252,17 @@ namespace GUI
 			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 			/* end frame end*/
 		}
+
+		/* post-render callbacks */
+		Mutex.lock();
+		{
+			for (GUI_RENDER callback : RegistryPostRender)
+			{
+				if (callback) { callback(); }
+			}
+		}
+		Mutex.unlock();
+		/* post-render callbacks end*/
 	}
 
 	void AddWindow(IWindow* aWindowPtr)
