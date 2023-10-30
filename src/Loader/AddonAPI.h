@@ -1,9 +1,8 @@
 #ifndef ADDONAPI_H
 #define ADDONAPI_H
 
-#include "../Paths.h"
-
 #include <dxgi.h>
+#include "../Paths/FuncDefs.h"
 #include "../Logging/FuncDefs.h"
 #include "../Events/FuncDefs.h"
 #include "../WndProc/FuncDefs.h"

@@ -1,9 +1,6 @@
 #ifndef TEXTURES_FUNCDEFS_H
 #define TEXTURES_FUNCDEFS_H
 
-#include <Windows.h>
-#include <string>
-
 #include "Texture.h"
 
 typedef void		(*TEXTURES_RECEIVECALLBACK)(const char* aIdentifier, Texture* aTexture);

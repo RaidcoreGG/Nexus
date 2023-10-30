@@ -6,16 +6,13 @@
 #include <algorithm>
 #include <map>
 
-#include "../imgui/imgui.h"
-#include "../imgui/imgui_extensions.h"
-
 /* A structure holding information about a keybind. */
 struct Keybind
 {
-	unsigned	Key;
-	bool		Alt;
-	bool		Ctrl;
-	bool		Shift;
+	char	Key;
+	bool	Alt;
+	bool	Ctrl;
+	bool	Shift;
 
 	/* Prints the keybind to a string for display. Pass true if spacing/padding should be added. */
 	std::string ToString(bool padded = false);

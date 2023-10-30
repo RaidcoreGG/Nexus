@@ -1,8 +1,6 @@
 #ifndef KEYBINDS_FUNCDEFS_H
 #define KEYBINDS_FUNCDEFS_H
 
-#include <string>
-
 #include "Keybind.h"
 
 typedef void (*KEYBINDS_PROCESS)(const char* aIdentifier);
