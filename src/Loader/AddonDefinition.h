@@ -5,9 +5,6 @@
 #include "EAddonFlags.h"
 #include "EUpdateProvider.h"
 
-#include "../imgui/imgui.h"
-#include "../imgui/imgui_extensions.h"
-
 typedef void (*ADDON_LOAD)(AddonAPI* aAPI);
 typedef void (*ADDON_UNLOAD)();
 
