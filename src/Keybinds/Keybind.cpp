@@ -3,6 +3,30 @@
 #include "KeybindHandler.h"
 #include "../core.h"
 
+const char* ConvertToUTF8(const char* multibyteStr)
+{
+	char* utf8Str = nullptr;
+
+	int wideCharCount = MultiByteToWideChar(CP_ACP, 0, multibyteStr, -1, NULL, 0);
+	if (wideCharCount > 0)
+	{
+		wchar_t* wideCharBuff = new wchar_t[wideCharCount];
+		MultiByteToWideChar(CP_ACP, 0, multibyteStr, -1, wideCharBuff, wideCharCount);
+
+		int utf8Count = WideCharToMultiByte(CP_UTF8, 0, wideCharBuff, -1, NULL, 0, NULL, NULL);
+		if (utf8Count > 0)
+		{
+			utf8Str = new char[utf8Count];
+			WideCharToMultiByte(CP_UTF8, 0, wideCharBuff, -1, utf8Str, utf8Count, NULL, NULL);
+		}
+
+		delete[] wideCharBuff;
+	}
+
+	return utf8Str;
+}
+
+
 std::string Keybind::ToString(bool padded)
 {
 	if (!Key) { return "(null)"; }
@@ -83,7 +107,11 @@ std::string Keybind::ToString(bool padded)
 
 	delete[] buff;
 
-	return str;
+	// Convert Multibyte encoding to UFT-8 bytes
+	const char* multibyte_pointer = str.c_str();
+	const char* utf8_bytes = ConvertToUTF8(multibyte_pointer);
+	
+	return std::string(utf8_bytes);
 }
 
 bool operator==(const Keybind& lhs, const Keybind& rhs)
