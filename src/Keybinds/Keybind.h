@@ -9,10 +9,10 @@
 /* A structure holding information about a keybind. */
 struct Keybind
 {
-	char	Key;
-	bool	Alt;
-	bool	Ctrl;
-	bool	Shift;
+	unsigned short	Key;
+	bool			Alt;
+	bool			Ctrl;
+	bool			Shift;
 
 	/* Prints the keybind to a string for display. Pass true if spacing/padding should be added. */
 	std::string ToString(bool padded = false);
@@ -20,8 +20,4 @@ struct Keybind
 
 bool operator==(const Keybind& lhs, const Keybind& rhs);
 bool operator!=(const Keybind& lhs, const Keybind& rhs);
-
-/* Create a keybind from a string. */
-Keybind KBFromString(std::string aKeybind);
-
 #endif

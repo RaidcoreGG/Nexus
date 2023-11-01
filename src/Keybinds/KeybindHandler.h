@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <string>
 #include <cstdarg>
+#include <Windows.h>
 
 #include "../core.h"
 #include "../Paths.h"
@@ -16,6 +17,7 @@
 
 #include "Keybind.h"
 #include "ActiveKeybind.h"
+#include "KeystrokeMessageFlags.h"
 #include "FuncDefs.h"
 
 #include "../nlohmann/json.hpp"
@@ -27,14 +29,15 @@ namespace Keybinds
 	extern std::mutex								Mutex;
 	extern std::map<std::string, ActiveKeybind>		Registry;
 
-	/* Keybind Helpers */
-	extern std::mutex								HeldKeysMutex;
-	extern std::vector<WPARAM>						HeldKeys;
-
 	/* Keybind setting helpers */
 	extern bool										IsSettingKeybind;
 	extern Keybind									CurrentKeybind;
 	extern std::string								CurrentKeybindUsedBy;
+
+	extern std::map<unsigned short, std::string>	ScancodeLookupTable;
+
+	/* Sets up the ScancodeLookupTable */
+	void Initialize();
 
 	/* Returns 0 if message was processed. */
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -53,6 +56,8 @@ namespace Keybinds
 	
 	/* Returns an empty string if keybind is unused or the identifier that uses this keybind */
 	std::string IsInUse(Keybind aKeybind);
+	/* Create a keybind from a string. */
+	Keybind KBFromString(std::string aKeybind);
 	
 	/* This will force set the keybind. (Invoked via menu/ui) */
 	void Set(std::string aIdentifier, Keybind aKeybind);

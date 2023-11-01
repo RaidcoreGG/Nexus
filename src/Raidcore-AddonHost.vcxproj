@@ -107,6 +107,7 @@
     <ClInclude Include="Keybinds\FuncDefs.h" />
     <ClInclude Include="Keybinds\Keybind.h" />
     <ClInclude Include="Keybinds\KeybindHandler.h" />
+    <ClInclude Include="Keybinds\KeystrokeMessageFlags.h" />
     <ClInclude Include="Loader\EAddonFlags.h" />
     <ClInclude Include="Loader\ELoaderAction.h" />
     <ClInclude Include="Loader\FuncDefs.h" />

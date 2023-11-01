@@ -64,6 +64,7 @@ void Initialize()
 
 		MH_Initialize();
 
+		Keybinds::Initialize();
 		Keybinds::Load();
 		Settings::Load();
 
@@ -144,8 +145,6 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 {
 	if (Renderer::SwapChain != pChain)
 	{
-		Log("meme", "swap: %p | swap (new): %p", Renderer::SwapChain, pChain);
-
 		Renderer::SwapChain = pChain;
 
 		if (Renderer::Device)

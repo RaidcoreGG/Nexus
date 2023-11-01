@@ -5,26 +5,52 @@ namespace Keybinds
 	std::mutex								Mutex;
 	std::map<std::string, ActiveKeybind>	Registry;
 
-	std::mutex								HeldKeysMutex;
-	std::vector<WPARAM>						HeldKeys;
-
 	bool									IsSettingKeybind = false;
 	Keybind									CurrentKeybind;
 	std::string								CurrentKeybindUsedBy;
 
+	std::map<unsigned short, std::string>	ScancodeLookupTable;
+
+	void Initialize()
+	{
+		for (long long i = 0; i < 255; i++)
+		{
+			KeyLParam key{};
+			key.ScanCode = i;
+			char* buff = new char[64];
+			std::string str;
+			GetKeyNameTextA(KMFToLParam(key), buff, 64);
+			str.append(buff);
+
+			ScancodeLookupTable[key.GetScanCode()] = str;
+
+			key.ExtendedFlag = 1;
+			buff = new char[64];
+			str = "";
+			GetKeyNameTextA(KMFToLParam(key), buff, 64);
+			str.append(buff);
+
+			ScancodeLookupTable[key.GetScanCode()] = str;
+
+			delete[] buff;
+		}
+	}
+
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		Keybind kb{};
-		kb.Alt		= GetKeyState(VK_MENU)		& 0x8000;
-		kb.Ctrl		= GetKeyState(VK_CONTROL)	& 0x8000;
-		kb.Shift	= GetKeyState(VK_SHIFT)		& 0x8000;
-
 		switch (uMsg)
 		{
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
 			if (wParam > 255) break;
-			kb.Key = static_cast<unsigned>(wParam);
+
+			KeyLParam keylp = LParamToKMF(lParam);
+
+			Keybind kb{};
+			kb.Alt = GetKeyState(VK_MENU) & 0x8000;
+			kb.Ctrl = GetKeyState(VK_CONTROL) & 0x8000;
+			kb.Shift = GetKeyState(VK_SHIFT) & 0x8000;
+			kb.Key = keylp.GetScanCode();
 			
 			// if shift, ctrl or alt set key to 0
 			if (wParam == 16 || wParam == 17 || wParam == 18)
@@ -32,16 +58,10 @@ namespace Keybinds
 				kb.Key = 0;
 			}
 
-			HeldKeysMutex.lock();
+			if (keylp.PreviousKeyState)
 			{
-				if (std::find(HeldKeys.begin(), HeldKeys.end(), wParam) != HeldKeys.end())
-				{
-					HeldKeysMutex.unlock();
-					return 1;
-				}
-				HeldKeys.push_back(wParam);
+				return uMsg;
 			}
-			HeldKeysMutex.unlock();
 			
 			/* only check if not currently setting keybind */
 			if (!IsSettingKeybind)
@@ -62,17 +82,9 @@ namespace Keybinds
 			}
 			
 			break;
-		case WM_SYSKEYUP:
-		case WM_KEYUP:
-			HeldKeysMutex.lock();
-			{
-				HeldKeys.erase(std::remove(HeldKeys.begin(), HeldKeys.end(), wParam), HeldKeys.end());
-			}
-			HeldKeysMutex.unlock();
-			break;
 		}
 
-		return 1;
+		return uMsg;
 	}
 
 	void Load()
@@ -203,6 +215,46 @@ namespace Keybinds
 
 		return "";
 	}
+	Keybind KBFromString(std::string aKeybind)
+	{
+		Keybind kb{};
+
+		if (aKeybind == "(null)" || aKeybind == "(NULL)") { return kb; }
+
+		std::transform(aKeybind.begin(), aKeybind.end(), aKeybind.begin(), ::toupper);
+		std::string delimiter = "+";
+
+		size_t pos = 0;
+		std::string token;
+		while ((pos = aKeybind.find(delimiter)) != std::string::npos)
+		{
+			token = aKeybind.substr(0, pos);
+			aKeybind.erase(0, pos + delimiter.length());
+
+			if (token == "ALT")
+			{
+				kb.Alt = true;
+			}
+			else if (token == "CTRL")
+			{
+				kb.Ctrl = true;
+			}
+			else if (token == "SHIFT")
+			{
+				kb.Shift = true;
+			}
+		}
+
+		for (auto it = ScancodeLookupTable.begin(); it != ScancodeLookupTable.end(); ++it)
+		{
+			if (it->second == aKeybind)
+			{
+				kb.Key = it->first;
+			}
+		}
+
+		return kb;
+	}
 
 	void Set(std::string aIdentifier, Keybind aKeybind)
 	{
@@ -226,7 +278,10 @@ namespace Keybinds
 		{
 			if (Registry[aIdentifier].Handler)
 			{
-				Registry[aIdentifier].Handler(aIdentifier.c_str());
+				std::thread([aIdentifier]()
+					{
+						Registry[aIdentifier].Handler(aIdentifier.c_str());
+					}).detach();
 				called = true;
 			}
 		}

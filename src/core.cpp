@@ -35,9 +35,9 @@ std::string WStrToStr(std::wstring& aWstring)
 		return std::string();
 	}
 
-	int sz = WideCharToMultiByte(CP_ACP, 0, &aWstring[0], (int)aWstring.size(), 0, 0, 0, 0);
+	int sz = WideCharToMultiByte(CP_ACP, 0, &aWstring[0], (int)aWstring.length(), 0, 0, 0, 0);
 	std::string str(sz, 0);
-	WideCharToMultiByte(CP_ACP, 0, &aWstring[0], (int)aWstring.size(), &str[0], sz, 0, 0);
+	WideCharToMultiByte(CP_ACP, 0, &aWstring[0], (int)aWstring.length(), &str[0], sz, 0, 0);
 	return str;
 }
 

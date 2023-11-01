@@ -1,35 +1,87 @@
 #include "Keybind.h"
 
+#include "KeybindHandler.h"
+#include "../core.h"
+
 std::string Keybind::ToString(bool padded)
 {
 	if (!Key) { return "(null)"; }
 
-	char* buff = new char[16];
+	char* buff = new char[100];
 	std::string str;
 
 	if (Alt)
 	{
-		GetKeyNameTextA(MapVirtualKeyA(VK_MENU, MAPVK_VK_TO_VSC) << 16, buff, 16);
+		GetKeyNameTextA(MapVirtualKeyA(VK_MENU, MAPVK_VK_TO_VSC) << 16, buff, 100);
 		str.append(buff);
 		str.append(padded ? " + " : "+");
 	}
 
 	if (Ctrl)
 	{
-		GetKeyNameTextA(MapVirtualKeyA(VK_CONTROL, MAPVK_VK_TO_VSC) << 16, buff, 16);
+		GetKeyNameTextA(MapVirtualKeyA(VK_CONTROL, MAPVK_VK_TO_VSC) << 16, buff, 100);
 		str.append(buff);
 		str.append(padded ? " + " : "+");
 	}
 
 	if (Shift)
 	{
-		GetKeyNameTextA(MapVirtualKeyA(VK_SHIFT, MAPVK_VK_TO_VSC) << 16, buff, 16);
+		GetKeyNameTextA(MapVirtualKeyA(VK_SHIFT, MAPVK_VK_TO_VSC) << 16, buff, 100);
 		str.append(buff);
 		str.append(padded ? " + " : "+");
 	}
 
-	GetKeyNameTextA(MapVirtualKeyA(Key, MAPVK_VK_TO_VSC) << 16, buff, 16);
-	str.append(buff);
+	HKL hkl = GetKeyboardLayout(0);
+	UINT vk = MapVirtualKeyA(Key, MAPVK_VSC_TO_VK);
+
+	if (vk >= 65 && vk <= 90 || vk >= 48 && vk <= 57)
+	{
+		//UINT keyExW = MapVirtualKeyExW(Key, MAPVK_VSC_TO_VK_EX, hkl);
+		//str.append(std::to_string(keyExW));
+		GetKeyNameTextA(Key << 16, buff, 100);
+		str.append(buff);
+	}
+	else
+	{
+		// TODO:
+		// this does not work for special utf8 characters
+		// basically ImGui::Text(u8"somestring") -> handles utf8 properly
+		// since this is a std::string, there is no prefixing, meaning it has to be converted somehow, no idea how
+		// characters like Ü or ß don't work. I give up
+		auto it = Keybinds::ScancodeLookupTable.find(Key);
+		if (it != Keybinds::ScancodeLookupTable.end())
+		{
+			str.append(it->second);
+		}
+
+		/*// get vkey from keycode based on the current keyboardlayout
+		UINT keyExW = MapVirtualKeyExW(Key, MAPVK_VSC_TO_VK_EX, hkl);
+		wchar_t shortCutRealNameWstr[32];
+		constexpr BYTE keyState[256]{};
+		// say windows to get the translation of the key (e.g. ä, ö, #)
+		int toUnicodeCount = ToUnicodeEx(keyExW, Key, keyState, shortCutRealNameWstr, 32, 1 << 2, hkl);
+		// some keys set two utf16 chars, i only care about the first one, so i set the second one to 0
+		if (toUnicodeCount == 2) {
+			shortCutRealNameWstr[2] = '\0';
+		}
+
+		int count = WideCharToMultiByte(CP_UTF8, 0, shortCutRealNameWstr, sizeof(shortCutRealNameWstr), NULL, 0, NULL, NULL);
+		std::string str2(count, 0);
+		WideCharToMultiByte(CP_UTF8, 0, shortCutRealNameWstr, -1, &str2[0], count, NULL, NULL);
+		std::transform(str2.begin(), str2.end(), str2.begin(), ::toupper);
+		str.append(std::to_string(toUnicodeCount));
+		if (toUnicodeCount == 0)
+		{
+			str.append("nt");
+		}
+		else if (toUnicodeCount < 0)
+		{
+			str.append("dk");
+		}
+		str.append(str2);*/
+	}
+
+	delete[] buff;
 
 	return str;
 }
@@ -45,71 +97,4 @@ bool operator==(const Keybind& lhs, const Keybind& rhs)
 bool operator!=(const Keybind& lhs, const Keybind& rhs)
 {
 	return	!(lhs == rhs);
-}
-
-std::map<std::string, char> LookupTable
-{
-	{"BACKSPACE", 8},
-	{"TAB", 9},
-	{"ENTER", 13},
-	{"CAPS LOCK", 20},
-	{"ESC", 27},
-	{"END", 35},
-	{"HOME", 36},
-	{"INSERT", 45},
-	{"DELETE", 46},
-	{"F1", 112},
-	{"F2", 113},
-	{"F3", 114},
-	{"F4", 115},
-	{"F5", 116},
-	{"F6", 117},
-	{"F7", 118},
-	{"F8", 119},
-	{"F9", 120},
-	{"F10", 121},
-	{"F11", 122},
-	{"F12", 123},
-};
-
-Keybind KBFromString(std::string aKeybind)
-{
-	Keybind kb{};
-
-	if (aKeybind == "(null)" || aKeybind == "(NULL)") { return kb; }
-
-	std::transform(aKeybind.begin(), aKeybind.end(), aKeybind.begin(), ::toupper);
-	std::string delimiter = "+";
-
-	size_t pos = 0;
-	std::string token;
-	while ((pos = aKeybind.find(delimiter)) != std::string::npos)
-	{
-		token = aKeybind.substr(0, pos);
-		aKeybind.erase(0, pos + delimiter.length());
-		
-		if (token == "ALT")
-		{
-			kb.Alt = true;
-		}
-		else if (token == "CTRL")
-		{
-			kb.Ctrl = true;
-		}
-		else if (token == "SHIFT")
-		{
-			kb.Shift = true;
-		}
-	}
-
-	if (LookupTable.find(aKeybind) != LookupTable.end())
-	{
-		kb.Key = LookupTable[aKeybind];
-	}
-	else
-	{
-		kb.Key = (char)VkKeyScanA(aKeybind.c_str()[0]);
-	}
-
-	return kb;
 }
