@@ -342,9 +342,11 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="GlobalPropertySheet.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="GlobalPropertySheet.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -389,6 +391,10 @@ echo #pragma once &gt; Branch.h
 echo %branchmacro% &gt;&gt; Branch.h
 del temp_file.h</Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>mkdir $(TargetDir)$(API_BUILDER_TARGET_DIR)
+"$(API_BUILDER)" "$(API_BUILDER_SOURCE)" --target_path "$(OutputPath)$(API_BUILDER_TARGET)" --blacklisted_includes "imgui"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -422,6 +428,10 @@ echo #pragma once &gt; Branch.h
 echo %branchmacro% &gt;&gt; Branch.h
 del temp_file.h</Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>mkdir $(TargetDir)$(API_BUILDER_TARGET_DIR)
+"$(API_BUILDER)" "$(API_BUILDER_SOURCE)" --target_path "$(OutputPath)$(API_BUILDER_TARGET)" --blacklisted_includes "imgui"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

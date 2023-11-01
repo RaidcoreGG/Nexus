@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <API_BUILDER>$(ProjectDir)build_nexus_api.exe</API_BUILDER>
+    <API_BUILDER_SOURCE>$(ProjectDir)Loader\AddonAPI.h</API_BUILDER_SOURCE>
+    <API_BUILDER_TARGET>$(TargetDir)API\Nexus.h</API_BUILDER_TARGET>
+    <API_BUILDER_TARGET_DIR>$(TargetDir)API</API_BUILDER_TARGET_DIR>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="API_BUILDER">
+      <Value>$(API_BUILDER)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="API_BUILDER_SOURCE">
+      <Value>$(API_BUILDER_SOURCE)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="API_BUILDER_TARGET">
+      <Value>$(API_BUILDER_TARGET)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="API_BUILDER_TARGET_DIR">
+      <Value>$(API_BUILDER_TARGET_DIR)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
