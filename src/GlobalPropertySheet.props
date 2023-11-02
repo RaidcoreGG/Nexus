@@ -6,6 +6,8 @@
     <API_BUILDER_SOURCE>$(ProjectDir)Loader\AddonAPI.h</API_BUILDER_SOURCE>
     <API_BUILDER_TARGET>$(TargetDir)API\Nexus.h</API_BUILDER_TARGET>
     <API_BUILDER_TARGET_DIR>$(TargetDir)API</API_BUILDER_TARGET_DIR>
+    <API_BUILDER_WRITE_MODE>write</API_BUILDER_WRITE_MODE>
+    <API_BUILDER_SOURCE_2>$(ProjectDir)Loader\AddonDefinition.h</API_BUILDER_SOURCE_2>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
@@ -24,6 +26,14 @@
     </BuildMacro>
     <BuildMacro Include="API_BUILDER_TARGET_DIR">
       <Value>$(API_BUILDER_TARGET_DIR)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="API_BUILDER_WRITE_MODE">
+      <Value>$(API_BUILDER_WRITE_MODE)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="API_BUILDER_SOURCE_2">
+      <Value>$(API_BUILDER_SOURCE_2)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
   </ItemGroup>

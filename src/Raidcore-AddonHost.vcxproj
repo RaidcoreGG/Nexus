@@ -393,7 +393,7 @@ del temp_file.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>mkdir $(TargetDir)$(API_BUILDER_TARGET_DIR)
-"$(API_BUILDER)" "$(API_BUILDER_SOURCE)" --target_path "$(OutputPath)$(API_BUILDER_TARGET)" --blacklisted_includes "imgui"</Command>
+"$(API_BUILDER)" "$(API_BUILDER_SOURCE)" "$(API_BUILDER_SOURCE_2)" --write_mode $(API_BUILDER_WRITE_MODE) --target_path "$(OutputPath)$(API_BUILDER_TARGET)" --blacklisted_includes "imgui"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -430,7 +430,7 @@ del temp_file.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>mkdir $(TargetDir)$(API_BUILDER_TARGET_DIR)
-"$(API_BUILDER)" "$(API_BUILDER_SOURCE)" --target_path "$(OutputPath)$(API_BUILDER_TARGET)" --blacklisted_includes "imgui"</Command>
+"$(API_BUILDER)" "$(API_BUILDER_SOURCE)" "$(API_BUILDER_SOURCE_2)" --write_mode $(API_BUILDER_WRITE_MODE) --target_path "$(OutputPath)$(API_BUILDER_TARGET)" --blacklisted_includes "imgui"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
