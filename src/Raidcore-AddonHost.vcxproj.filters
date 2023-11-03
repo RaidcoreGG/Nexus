@@ -938,6 +938,15 @@
     <ClInclude Include="Branch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GUI\ERenderType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Paths\FuncDefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Keybinds\KeystrokeMessageFlags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Raidcore-AddonHost.rc">
