@@ -1,10 +1,8 @@
 #ifndef ADDONAPI_H
 #define ADDONAPI_H
 
-#include "../Paths.h"
-
 #include <dxgi.h>
-#include "../Mumble/LinkedMem.h"
+#include "../Paths/FuncDefs.h"
 #include "../Logging/FuncDefs.h"
 #include "../Events/FuncDefs.h"
 #include "../WndProc/FuncDefs.h"
@@ -15,9 +13,6 @@
 #include "../Textures/FuncDefs.h"
 #include "../GUI/FuncDefs.h"
 #include "../GUI/Widgets/QuickAccess/FuncDefs.h"
-#include "NexusLinkData.h"
-
-using namespace Mumble;
 
 // Base
 struct AddonAPI {};
@@ -30,8 +25,8 @@ struct AddonAPI1 : AddonAPI
 	ImGuiContext*				ImguiContext;
 	void*						ImguiMalloc;
 	void*						ImguiFree;
-	GUI_ADDREM					RegisterRender;
-	GUI_ADDREM					UnregisterRender;
+	GUI_ADDRENDER				RegisterRender;
+	GUI_REMRENDER				UnregisterRender;
 
 	/* Paths */
 	PATHS_GETGAMEDIR			GetGameDirectory;
@@ -59,7 +54,8 @@ struct AddonAPI1 : AddonAPI
 	WNDPROC_ADDREM				UnregisterWndProc;
 
 	/* Keybinds */
-	KEYBINDS_REGISTER			RegisterKeybind;
+	KEYBINDS_REGISTERWITHSTRING	RegisterKeybindWithString;
+	KEYBINDS_REGISTERWITHSTRUCT	RegisterKeybindWithStruct;
 	KEYBINDS_UNREGISTER			UnregisterKeybind;
 
 	/* DataLink */
@@ -70,6 +66,7 @@ struct AddonAPI1 : AddonAPI
 	TEXTURES_GET				GetTexture;
 	TEXTURES_LOADFROMFILE		LoadTextureFromFile;
 	TEXTURES_LOADFROMRESOURCE	LoadTextureFromResource;
+	TEXTURES_LOADFROMURL		LoadTextureFromURL;
 
 	/* Shortcuts */
 	QUICKACCESS_ADDSHORTCUT		AddShortcut;

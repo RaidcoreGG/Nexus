@@ -48,6 +48,9 @@ namespace Loader
 	/* Shuts the Loader down and frees all addons. */
 	void Shutdown();
 
+	/* Processes all currently queued addons. */
+	void ProcessQueue();
+
 	/* Loads an addon from disk. */
 	void LoadAddon(std::filesystem::path aPath);
 	/* Unloads an addon. */

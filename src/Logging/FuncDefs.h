@@ -1,8 +1,6 @@
 #ifndef LOGGING_FUNCDEFS_H
 #define LOGGING_FUNCDEFS_H
 
-#include <string>
-
 #include "ELogLevel.h"
 #include "ILogger.h"
 

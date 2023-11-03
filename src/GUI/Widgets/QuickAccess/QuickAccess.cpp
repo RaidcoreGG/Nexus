@@ -10,9 +10,9 @@ namespace GUI
 
 		float Opacity = 0.5f;
 
-		std::mutex													Mutex;
-		std::map<std::string, Shortcut>								Registry;
-		std::map<std::string, QUICKACCESS_SHORTCUTRENDERCALLBACK>	RegistrySimple;
+		std::mutex							Mutex;
+		std::map<std::string, Shortcut>		Registry;
+		std::map<std::string, GUI_RENDER>	RegistrySimple;
 
 		std::thread		AnimationThread;
 		bool			IsAnimating			= false;
@@ -244,7 +244,7 @@ namespace GUI
 			Mutex.unlock();
 		}
 
-		void AddSimpleShortcut(const char* aIdentifier, QUICKACCESS_SHORTCUTRENDERCALLBACK aShortcutRenderCallback)
+		void AddSimpleShortcut(const char* aIdentifier, GUI_RENDER aShortcutRenderCallback)
 		{
 			std::string str = aIdentifier;
 

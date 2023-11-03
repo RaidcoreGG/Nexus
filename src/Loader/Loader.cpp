@@ -14,23 +14,45 @@ namespace Loader
 
 	void Initialize()
 	{
-		State::AddonHost = ENexusState::ADDONS_LOAD;
-
-		State::AddonHost = ENexusState::ADDONS_READY;
-
-		UpdateThread = std::thread(DetectAddonsLoop);
-		UpdateThread.detach();
+		if (State::Nexus < ENexusState::LOADED)
+		{
+			UpdateThread = std::thread(DetectAddonsLoop);
+			UpdateThread.detach();
+		}
 	}
 	void Shutdown()
 	{
-		State::AddonHost = ENexusState::ADDONS_SHUTDOWN;
-
-		Mutex.lock();
+		if (State::Nexus < ENexusState::SHUTDOWN)
 		{
-			while (AddonDefs.size() != 0)
+			Mutex.lock();
 			{
-				UnloadAddon(AddonDefs.begin()->first);
+				while (AddonDefs.size() != 0)
+				{
+					UnloadAddon(AddonDefs.begin()->first);
+				}
 			}
+			Mutex.unlock();
+		}
+	}
+
+	void ProcessQueue()
+	{
+		Mutex.lock();
+		while (Loader::QueuedAddons.size() > 0)
+		{
+			QueuedAddon q = Loader::QueuedAddons.front();
+
+			switch (q.Action)
+			{
+			case ELoaderAction::Load:
+				Loader::LoadAddon(q.Path);
+				break;
+			case ELoaderAction::Unload:
+				Loader::UnloadAddon(q.Path);
+				break;
+			}
+
+			Loader::QueuedAddons.erase(Loader::QueuedAddons.begin());
 		}
 		Mutex.unlock();
 	}
@@ -127,6 +149,7 @@ namespace Loader
 		leftoverRefs += GUI::QuickAccess::Verify(startAddress, endAddress);
 		leftoverRefs += Keybinds::Verify(startAddress, endAddress);
 		leftoverRefs += LogHandler::Verify(startAddress, endAddress);
+		leftoverRefs += WndProc::Verify(startAddress, endAddress);
 
 		if (leftoverRefs > 0)
 		{
@@ -144,92 +167,97 @@ namespace Loader
 	{
 		for (;;)
 		{
-			if (State::AddonHost == ENexusState::ADDONS_SHUTDOWN) { return; }
+			if (State::Nexus >= ENexusState::SHUTDOWN) { return; }
 
-			std::set<std::filesystem::path> onDisk;
+			if (State::Nexus == ENexusState::READY)
+			{
+				std::set<std::filesystem::path> onDisk;
+
+				/* get which files are currently on disk */
+				for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Path::D_GW2_ADDONS))
+				{
+					onDisk.insert(entry.path());
+				}
+
+				/* files have changed, check what needs to be loaded and what needs to be unloaded */
+				if (onDisk != PreviousFiles)
+				{
+					std::set<std::filesystem::path> onDiskLeft = onDisk;
+
+					/* first check all the currently loaded addons, if they are still present */
+
+					Mutex.lock();
+					{
+						for (const auto& [path, addon] : AddonDefs)
+						{
+							if (onDiskLeft.find(path) != onDiskLeft.end())
+							{
+								/* addon is still present on disk, remove from the items that need to be checked */
+								onDiskLeft.erase(path);
+							}
+							else
+							{
+								/* addon is no longer on disk -> unload afterwards, we can't modify this array */
+								QueuedAddon q{};
+								q.Action = ELoaderAction::Unload;
+								q.Path = path;
+								QueuedAddons.push_back(q);
+							}
+						}
+					}
+					Mutex.unlock();
+
+					/* next, check if these files are on the blacklist */
+					std::set <std::filesystem::path> unblacklist;
+
+					Mutex.lock();
+					{
+						for (std::filesystem::path path : Blacklist)
+						{
+							if (onDiskLeft.find(path) != onDiskLeft.end())
+							{
+								/* path is present on blacklist, remove from the items that need to be checked */
+								onDiskLeft.erase(path);
+							}
+							else
+							{
+								/* no longer exists, remove from blacklist */
+								unblacklist.insert(path);
+							}
+						}
+						for (std::filesystem::path path : unblacklist)
+						{
+							Blacklist.erase(path);
+						}
+					}
+					Mutex.unlock();
+
+					/* check if there are any files left on the disk that have not been checked, if yes try to load them */
+					std::string dll = ".dll";
+
+					for (std::filesystem::path path : onDiskLeft)
+					{
+						std::string pathStr = path.string();
+
+						if (pathStr.size() >= dll.size() && 0 == pathStr.compare(pathStr.size() - dll.size(), dll.size(), dll))
+						{
+							Mutex.lock();
+							{
+								QueuedAddon q{};
+								q.Action = ELoaderAction::Load;
+								q.Path = path;
+								QueuedAddons.push_back(q);
+							}
+							Mutex.unlock();
+						}
+					}
+				}
+
+				PreviousFiles = onDisk;
+
+				ProcessQueue();
+			}
 			
-			/* get which files are currently on disk */
-			for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Path::D_GW2_ADDONS))
-			{
-				onDisk.insert(entry.path());
-			}
-
-			/* files have changed, check what needs to be loaded and what needs to be unloaded */
-			if (onDisk != PreviousFiles)
-			{
-				std::set<std::filesystem::path> onDiskLeft = onDisk;
-
-				/* first check all the currently loaded addons, if they are still present */
-				
-				Mutex.lock();
-				{
-					for (const auto& [path, addon] : AddonDefs)
-					{
-						if (onDiskLeft.find(path) != onDiskLeft.end())
-						{
-							/* addon is still present on disk, remove from the items that need to be checked */
-							onDiskLeft.erase(path);
-						}
-						else
-						{
-							/* addon is no longer on disk -> unload afterwards, we can't modify this array */
-							QueuedAddon q{};
-							q.Action = ELoaderAction::Unload;
-							q.Path = path;
-							QueuedAddons.push_back(q);
-						}
-					}
-				}
-				Mutex.unlock();
-
-				/* next, check if these files are on the blacklist */
-				std::set <std::filesystem::path> unblacklist;
-
-				Mutex.lock();
-				{
-					for (std::filesystem::path path : Blacklist)
-					{
-						if (onDiskLeft.find(path) != onDiskLeft.end())
-						{
-							/* path is present on blacklist, remove from the items that need to be checked */
-							onDiskLeft.erase(path);
-						}
-						else
-						{
-							/* no longer exists, remove from blacklist */
-							unblacklist.insert(path);
-						}
-					}
-					for (std::filesystem::path path : unblacklist)
-					{
-						Blacklist.erase(path);
-					}
-				}
-				Mutex.unlock();
-
-				/* check if there are any files left on the disk that have not been checked, if yes try to load them */
-				std::string dll = ".dll";
-
-				for (std::filesystem::path path : onDiskLeft)
-				{
-					std::string pathStr = path.string();
-
-					if (pathStr.size() >= dll.size() && 0 == pathStr.compare(pathStr.size() - dll.size(), dll.size(), dll))
-					{
-						Mutex.lock();
-						{
-							QueuedAddon q{};
-							q.Action = ELoaderAction::Load;
-							q.Path = path;
-							QueuedAddons.push_back(q);
-						}
-						Mutex.unlock();
-					}
-				}
-			}
-
-			PreviousFiles = onDisk;
-
 			Sleep(5000);
 		}
 	}
@@ -277,7 +305,8 @@ namespace Loader
 			((AddonAPI1*)api)->RegisterWndProc = WndProc::Register;
 			((AddonAPI1*)api)->UnregisterWndProc = WndProc::Unregister;
 
-			((AddonAPI1*)api)->RegisterKeybind = Keybinds::Register;
+			((AddonAPI1*)api)->RegisterKeybindWithString = Keybinds::Register;
+			((AddonAPI1*)api)->RegisterKeybindWithStruct = Keybinds::RegisterWithStruct;
 			((AddonAPI1*)api)->UnregisterKeybind = Keybinds::Unregister;
 
 			((AddonAPI1*)api)->GetResource = DataLink::GetResource;
@@ -286,6 +315,7 @@ namespace Loader
 			((AddonAPI1*)api)->GetTexture = TextureLoader::Get;
 			((AddonAPI1*)api)->LoadTextureFromFile = TextureLoader::LoadFromFile;
 			((AddonAPI1*)api)->LoadTextureFromResource = TextureLoader::LoadFromResource;
+			((AddonAPI1*)api)->LoadTextureFromURL = TextureLoader::LoadFromURL;
 
 			((AddonAPI1*)api)->AddShortcut = GUI::QuickAccess::AddShortcut;
 			((AddonAPI1*)api)->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;

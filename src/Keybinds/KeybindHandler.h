@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <string>
 #include <cstdarg>
+#include <Windows.h>
 
 #include "../core.h"
 #include "../Paths.h"
@@ -16,6 +17,7 @@
 
 #include "Keybind.h"
 #include "ActiveKeybind.h"
+#include "KeystrokeMessageFlags.h"
 #include "FuncDefs.h"
 
 #include "../nlohmann/json.hpp"
@@ -27,14 +29,15 @@ namespace Keybinds
 	extern std::mutex								Mutex;
 	extern std::map<std::string, ActiveKeybind>		Registry;
 
-	/* Keybind Helpers */
-	extern std::mutex								HeldKeysMutex;
-	extern std::vector<WPARAM>						HeldKeys;
-
 	/* Keybind setting helpers */
 	extern bool										IsSettingKeybind;
 	extern Keybind									CurrentKeybind;
 	extern std::string								CurrentKeybindUsedBy;
+
+	extern std::map<unsigned short, std::string>	ScancodeLookupTable;
+
+	/* Sets up the ScancodeLookupTable */
+	void Initialize();
 
 	/* Returns 0 if message was processed. */
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -44,13 +47,17 @@ namespace Keybinds
 	/* Saves the keybinds. */
 	void Save();
 
-	/* Registers a keybind with the given identifier and handler, if no bind was previously stored the given one will be used. */
+	/* Generates and registers a keybind from the given string with the given identifier and handler, if no bind was previously stored the given one will be used. */
 	void Register(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const char* aKeybind);
+	/* Registers a keybind from the given struct with the given identifier and handler, if no bind was previously stored the given one will be used.*/
+	void RegisterWithStruct(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, Keybind aKeybind);
 	/* Frees up the associated KeybindHandler. */
 	void Unregister(const char* aIdentifier);
 	
 	/* Returns an empty string if keybind is unused or the identifier that uses this keybind */
 	std::string IsInUse(Keybind aKeybind);
+	/* Create a keybind from a string. */
+	Keybind KBFromString(std::string aKeybind);
 	
 	/* This will force set the keybind. (Invoked via menu/ui) */
 	void Set(std::string aIdentifier, Keybind aKeybind);

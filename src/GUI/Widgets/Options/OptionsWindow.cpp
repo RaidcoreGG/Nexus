@@ -1,5 +1,7 @@
 #include "OptionsWindow.h"
 
+#include "../../GUI.h"
+
 namespace GUI
 {
 	std::string CurrentlyEditing;
@@ -9,6 +11,7 @@ namespace GUI
 
 	/* proto tabs */
 	void GeneralTab();
+	void AddonsTab();
 	void StyleTab();
 	void KeybindsTab();
 	void APITab();
@@ -23,6 +26,7 @@ namespace GUI
 			if (ImGui::BeginTabBar("OptionsTabBar", ImGuiTabBarFlags_None))
 			{
 				GeneralTab();
+				AddonsTab();
 				StyleTab();
 				KeybindsTab();
 				APITab();
@@ -75,6 +79,28 @@ namespace GUI
 					Settings::Settings[OPT_QAOFFSETX] = QuickAccess::Offset.x;
 					Settings::Settings[OPT_QAOFFSETY] = QuickAccess::Offset.y;
 					Settings::Save();
+				}
+
+				ImGui::EndChild();
+			}
+
+			ImGui::EndTabItem();
+		}
+	}
+
+	void AddonsTab()
+	{
+		if (ImGui::BeginTabItem("Addons"))
+		{
+			{
+				ImGui::BeginChild("##AddonsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+
+				for (GUI_RENDER renderCb : RegistryOptionsRender)
+				{
+					if (renderCb)
+					{
+						renderCb();
+					}
 				}
 
 				ImGui::EndChild();

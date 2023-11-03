@@ -11,6 +11,7 @@
 #include "../Paths.h"
 #include "../Shared.h"
 #include "../Consts.h"
+#include "../Branch.h"
 
 #include "../Keybinds/KeybindHandler.h"
 #include "../Loader/Loader.h"
@@ -37,7 +38,10 @@
 namespace GUI
 {
 	extern std::mutex					Mutex;
-	extern std::vector<GUI_RENDER>		Registry;
+	extern std::vector<GUI_RENDER>		RegistryPreRender;
+	extern std::vector<GUI_RENDER>		RegistryRender;
+	extern std::vector<GUI_RENDER>		RegistryPostRender;
+	extern std::vector<GUI_RENDER>		RegistryOptionsRender;
 	extern std::vector<IWindow*>		Windows;
 	extern std::map<EFont, ImFont*>		FontIndex;
 	extern float						FontSize;
@@ -58,7 +62,7 @@ namespace GUI
 	void ResizeFonts();
 
 	/* Registers the provided RenderCallback. */
-	void Register(GUI_RENDER aRenderCallback);
+	void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback);
 	/* Unregisters the provided RenderCallback. */
 	void Unregister(GUI_RENDER aRenderCallback);
 

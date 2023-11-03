@@ -5,10 +5,6 @@
 
 #include "core.h"
 
-typedef const char* (*PATHS_GETGAMEDIR)();
-typedef const char* (*PATHS_GETADDONDIR)(const char* aName);
-typedef const char* (*PATHS_GETCOMMONDIR)();
-
 /* Namespace for global path variables */
 namespace Path
 {

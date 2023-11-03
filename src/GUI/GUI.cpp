@@ -4,11 +4,13 @@ namespace GUI
 {
 	/* internal forward declarations */
 	void OnMumbleIdentityChanged(void* aEventArgs);
-	void ConfigureFonts();
 	void Setup();
 
 	std::mutex					Mutex;
-	std::vector<GUI_RENDER>	Registry;
+	std::vector<GUI_RENDER>		RegistryPreRender;
+	std::vector<GUI_RENDER>		RegistryRender;
+	std::vector<GUI_RENDER>		RegistryPostRender;
+	std::vector<GUI_RENDER>		RegistryOptionsRender;
 	std::vector<IWindow*>		Windows;
 	std::map<EFont, ImFont*>	FontIndex;
 	float						FontSize;
@@ -164,10 +166,21 @@ namespace GUI
 
 	void Render()
 	{
-		if (State::AddonHost >= ENexusState::UI_READY && !State::IsImGuiInitialized)
+		if (State::Nexus == ENexusState::READY && !State::IsImGuiInitialized)
 		{
-			GUI::Initialize();
+			Initialize();
 		}
+
+		/* pre-render callbacks */
+		Mutex.lock();
+		{
+			for (GUI_RENDER callback : RegistryPreRender)
+			{
+				if (callback) { callback(); }
+			}
+		}
+		Mutex.unlock();
+		/* pre-render callbacks end*/
 
 		if (State::IsImGuiInitialized)
 		{
@@ -177,14 +190,38 @@ namespace GUI
 			ImGui::NewFrame();
 			/* new frame end */
 
+#define WATERMARK
+#ifdef WATERMARK
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+			ImGui::SetNextWindowPos(ImVec2(16.0f, Renderer::Height != 0 ? Renderer::Height - ImGui::GetTextLineHeight() - 16.0f : 0));
+			if (ImGui::Begin("NEXUS_BUILDINFO", (bool*)0, WindowFlags_Watermark))
+			{
+				ImGui::SetCursorPos(ImVec2(0, 0));
+				ImGui::TextOutlined("Limited Test");
+				ImGui::SameLine();
+				ImGui::TextOutlined(__DATE__ " " __TIME__);
+				ImGui::SameLine();
+				ImGui::TextOutlined(("(v" + Version->ToString() + ")").c_str());
+				ImGui::SameLine();
+#ifdef _DEBUG
+				ImGui::TextOutlined("debug/" BRANCH_NAME);
+#else
+				ImGui::TextOutlined("release/" BRANCH_NAME);
+#endif
+			};
+			ImGui::End();
+			ImGui::PopStyleVar();
+#endif
+
 			/* draw overlay */
 			if (IsUIVisible)
 			{
 				/* draw menu & qa */
 				Menu::Render();
 				QuickAccess::Render();
+				/* draw menu & qa end*/
 
-				/* draw windows */
+				/* draw nexus windows */
 				Mutex.lock();
 				{
 					for (IWindow* wnd : Windows)
@@ -193,40 +230,19 @@ namespace GUI
 					}
 				}
 				Mutex.unlock();
+				/* draw nexus windows end */
 
-				/* TODO: RENDER UNDER UI */
-#define WATERMARK
-#ifdef WATERMARK
-				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-				ImGui::SetNextWindowPos(ImVec2(16.0f, Renderer::Height != 0 ? Renderer::Height - ImGui::GetTextLineHeight() - 16.0f : 0));
-				if (ImGui::Begin("NEXUS_BUILDINFO", (bool*)0, WindowFlags_Watermark))
+				/* draw addons*/
+				Mutex.lock();
 				{
-					ImGui::SetCursorPos(ImVec2(0, 0));
-					ImGui::TextOutlined("Limited Test Build");
-					ImGui::SameLine();
-					ImGui::TextOutlined(__DATE__ " " __TIME__);
-					ImGui::SameLine();
-					ImGui::TextOutlined(("(v" + Version->ToString() + ")").c_str());
-#ifdef _DEBUG
-					ImGui::SameLine();
-					ImGui::TextOutlined("[DEBUG]");
-#endif
-				};
-				ImGui::End();
-				ImGui::PopStyleVar();
-#endif
-			}
-
-			/* draw addons*/
-			Mutex.lock();
-			{
-				for (GUI_RENDER callback : Registry)
-				{
-					if (callback) { callback(IsUIVisible); }
+					for (GUI_RENDER callback : RegistryRender)
+					{
+						if (callback) { callback(); }
+					}
 				}
+				Mutex.unlock();
+				/* draw addons end*/
 			}
-			Mutex.unlock();
-
 			/* draw overlay end */
 
 			/* end frame */
@@ -236,6 +252,17 @@ namespace GUI
 			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 			/* end frame end*/
 		}
+
+		/* post-render callbacks */
+		Mutex.lock();
+		{
+			for (GUI_RENDER callback : RegistryPostRender)
+			{
+				if (callback) { callback(); }
+			}
+		}
+		Mutex.unlock();
+		/* post-render callbacks end*/
 	}
 
 	void AddWindow(IWindow* aWindowPtr)
@@ -304,7 +331,7 @@ namespace GUI
 		}
 	}
 
-	void ConfigureFonts()
+	void Setup()
 	{
 		ImGuiIO& io = ImGui::GetIO();
 
@@ -406,10 +433,6 @@ namespace GUI
 		ResizeFonts();
 
 		io.Fonts->Build();
-	}
-	void Setup()
-	{
-		ConfigureFonts();
 
 		Events::Subscribe(EV_MUMBLE_IDENTITY_UPDATED, OnMumbleIdentityChanged);
 
@@ -472,20 +495,36 @@ namespace GUI
 		IsSetup = true;
 	}
 
-	void Register(GUI_RENDER aRenderCallback)
+	void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback)
 	{
 		Mutex.lock();
 		{
-			Registry.push_back(aRenderCallback);
+			switch (aRenderType)
+			{
+			case ERenderType::PreRender:
+				RegistryPreRender.push_back(aRenderCallback);
+				break;
+			case ERenderType::Render:
+				RegistryRender.push_back(aRenderCallback);
+				break;
+			case ERenderType::PostRender:
+				RegistryPostRender.push_back(aRenderCallback);
+				break;
+			case ERenderType::OptionsRender:
+				RegistryOptionsRender.push_back(aRenderCallback);
+				break;
+			}
 		}
 		Mutex.unlock();
 	}
-
 	void Unregister(GUI_RENDER aRenderCallback)
 	{
 		Mutex.lock();
 		{
-			Registry.erase(std::remove(Registry.begin(), Registry.end(), aRenderCallback), Registry.end());
+			RegistryPreRender.erase(std::remove(RegistryPreRender.begin(), RegistryPreRender.end(), aRenderCallback), RegistryPreRender.end());
+			RegistryRender.erase(std::remove(RegistryRender.begin(), RegistryRender.end(), aRenderCallback), RegistryRender.end());
+			RegistryPostRender.erase(std::remove(RegistryPostRender.begin(), RegistryPostRender.end(), aRenderCallback), RegistryPostRender.end());
+			RegistryOptionsRender.erase(std::remove(RegistryOptionsRender.begin(), RegistryOptionsRender.end(), aRenderCallback), RegistryOptionsRender.end());
 		}
 		Mutex.unlock();
 	}
@@ -496,11 +535,35 @@ namespace GUI
 
 		Mutex.lock();
 		{
-			for (GUI_RENDER renderCb : Registry)
+			for (GUI_RENDER renderCb : RegistryPreRender)
 			{
 				if (renderCb >= aStartAddress && renderCb <= aEndAddress)
 				{
-					Registry.erase(std::remove(Registry.begin(), Registry.end(), renderCb), Registry.end());
+					RegistryPreRender.erase(std::remove(RegistryPreRender.begin(), RegistryPreRender.end(), renderCb), RegistryPreRender.end());
+					refCounter++;
+				}
+			}
+			for (GUI_RENDER renderCb : RegistryRender)
+			{
+				if (renderCb >= aStartAddress && renderCb <= aEndAddress)
+				{
+					RegistryRender.erase(std::remove(RegistryRender.begin(), RegistryRender.end(), renderCb), RegistryRender.end());
+					refCounter++;
+				}
+			}
+			for (GUI_RENDER renderCb : RegistryPostRender)
+			{
+				if (renderCb >= aStartAddress && renderCb <= aEndAddress)
+				{
+					RegistryPostRender.erase(std::remove(RegistryPostRender.begin(), RegistryPostRender.end(), renderCb), RegistryPostRender.end());
+					refCounter++;
+				}
+			}
+			for (GUI_RENDER renderCb : RegistryOptionsRender)
+			{
+				if (renderCb >= aStartAddress && renderCb <= aEndAddress)
+				{
+					RegistryOptionsRender.erase(std::remove(RegistryOptionsRender.begin(), RegistryOptionsRender.end(), renderCb), RegistryOptionsRender.end());
 					refCounter++;
 				}
 			}

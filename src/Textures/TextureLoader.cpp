@@ -2,7 +2,11 @@
 
 /* For some reason this has to be defined AND included here. */
 #define STB_IMAGE_IMPLEMENTATION
+#define CPPHTTPLIB_OPENSSL_SUPPORT
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 #include "../stb/stb_image.h"
+#include "../httplib/httplib.h"
 
 namespace TextureLoader
 {
@@ -36,7 +40,10 @@ namespace TextureLoader
 		Texture* tex = Get(str.c_str());
 		if (tex != nullptr)
 		{
-			aCallback(aIdentifier, tex);
+			if (aCallback)
+			{
+				aCallback(aIdentifier, tex);
+			}
 			return;
 		}
 
@@ -47,7 +54,6 @@ namespace TextureLoader
 
 		QueueTexture(aIdentifier, image_data, image_width, image_height, aCallback);
 	}
-
 	void LoadFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback)
 	{
 		std::string str = aIdentifier;
@@ -55,7 +61,10 @@ namespace TextureLoader
 		Texture* tex = Get(str.c_str());
 		if (tex != nullptr)
 		{
-			aCallback(str.c_str(), tex);
+			if (aCallback)
+			{
+				aCallback(aIdentifier, tex);
+			}
 			return;
 		}
 
@@ -90,6 +99,62 @@ namespace TextureLoader
 
 		QueueTexture(str.c_str(), image_data, image_width, image_height, aCallback);
 	}
+	void LoadFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback)
+	{
+		std::string str = aIdentifier;
+
+		Texture* tex = Get(str.c_str());
+		if (tex != nullptr)
+		{
+			if (aCallback)
+			{
+				aCallback(aIdentifier, tex);
+			}
+			return;
+		}
+
+		httplib::Client client(aRemote);
+		client.enable_server_certificate_verification(false);
+		auto result = client.Get(aEndpoint);
+
+		if (!result)
+		{
+			LogDebug(CH_TEXTURES, "Error fetching %s%s (%s)", aRemote, aEndpoint, aIdentifier);
+			return;
+		}
+
+		// Status is not HTTP_OK
+		if (result->status != 200)
+		{
+			LogDebug(CH_TEXTURES, "Status %d when fetching %s%s (%s)", result->status, aRemote, aEndpoint, aIdentifier);
+			return;
+		}
+
+		size_t size = result->body.size();
+		unsigned char* remote_data = new unsigned char[size];
+		std::memcpy(remote_data, result->body.c_str(), size);
+
+		int image_width = 0;
+		int image_height = 0;
+		int comp;
+		// TODO: free data
+		stbi_uc* data = stbi_load_from_memory(remote_data, static_cast<int>(size), &image_width, &image_height, &comp, 0);
+
+		delete[] remote_data;
+
+		QueueTexture(str.c_str(), data, image_width, image_height, aCallback);
+	}
+
+	void ProcessQueue()
+	{
+		Mutex.lock();
+		while (TextureLoader::QueuedTextures.size() > 0)
+		{
+			TextureLoader::CreateTexture(TextureLoader::QueuedTextures.front());
+			TextureLoader::QueuedTextures.erase(TextureLoader::QueuedTextures.begin());
+		}
+		Mutex.unlock();
+	}
 
 	void QueueTexture(const char* aIdentifier, unsigned char* aImageData, unsigned aWidth, unsigned aHeight, TEXTURES_RECEIVECALLBACK aCallback)
 	{
@@ -110,7 +175,6 @@ namespace TextureLoader
 		}
 		Mutex.unlock();
 	}
-
 	void CreateTexture(QueuedTexture aQueuedTexture)
 	{
 		LogDebug(CH_TEXTURES, "Create %s", aQueuedTexture.Identifier.c_str());

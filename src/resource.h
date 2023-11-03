@@ -10,7 +10,6 @@
 #define RES_TEX_MENU_BACKGROUND         106
 #define RES_TEX_MENU_BUTTON             107
 #define RES_TEX_MENU_BUTTON_HOVER       108
-#define IDR_FONT1                       109
 #define RES_FONT_TREBUCHET              109
 
 // Next default values for new objects
