@@ -172,14 +172,14 @@ namespace GUI
 		}
 
 		/* pre-render callbacks */
-		Mutex.lock();
+		GUI::Mutex.lock();
 		{
 			for (GUI_RENDER callback : RegistryPreRender)
 			{
 				if (callback) { callback(); }
 			}
 		}
-		Mutex.unlock();
+		GUI::Mutex.unlock();
 		/* pre-render callbacks end*/
 
 		if (State::IsImGuiInitialized)
@@ -222,25 +222,25 @@ namespace GUI
 				/* draw menu & qa end*/
 
 				/* draw nexus windows */
-				Mutex.lock();
+				GUI::Mutex.lock();
 				{
 					for (IWindow* wnd : Windows)
 					{
 						wnd->Render();
 					}
 				}
-				Mutex.unlock();
+				GUI::Mutex.unlock();
 				/* draw nexus windows end */
 
 				/* draw addons*/
-				Mutex.lock();
+				GUI::Mutex.lock();
 				{
 					for (GUI_RENDER callback : RegistryRender)
 					{
 						if (callback) { callback(); }
 					}
 				}
-				Mutex.unlock();
+				GUI::Mutex.unlock();
 				/* draw addons end*/
 			}
 			/* draw overlay end */
@@ -254,24 +254,24 @@ namespace GUI
 		}
 
 		/* post-render callbacks */
-		Mutex.lock();
+		GUI::Mutex.lock();
 		{
 			for (GUI_RENDER callback : RegistryPostRender)
 			{
 				if (callback) { callback(); }
 			}
 		}
-		Mutex.unlock();
+		GUI::Mutex.unlock();
 		/* post-render callbacks end*/
 	}
 
 	void AddWindow(IWindow* aWindowPtr)
 	{
-		Mutex.lock();
+		GUI::Mutex.lock();
 		{
 			Windows.push_back(aWindowPtr);
 		}
-		Mutex.unlock();
+		GUI::Mutex.unlock();
 	}
 
 	void ResizeFonts()
@@ -406,7 +406,7 @@ namespace GUI
 			}
 		}
 
-		Mutex.lock();
+		GUI::Mutex.lock();
 		{
 			/* small UI*/
 			FontIndex.emplace(EFont::Menomonia_Small, io.Fonts->AddFontFromMemoryTTF(resM, szM, 16.0f));
@@ -428,7 +428,7 @@ namespace GUI
 			FontIndex.emplace(EFont::MenomoniaBig_Larger, io.Fonts->AddFontFromMemoryTTF(resM, szM, 28.0f));
 			FontIndex.emplace(EFont::Trebuchet_Larger, io.Fonts->AddFontFromMemoryTTF(resT, szT, 19.5f));
 		}
-		Mutex.unlock();
+		GUI::Mutex.unlock();
 
 		ResizeFonts();
 
@@ -497,7 +497,7 @@ namespace GUI
 
 	void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback)
 	{
-		Mutex.lock();
+		GUI::Mutex.lock();
 		{
 			switch (aRenderType)
 			{
@@ -515,25 +515,25 @@ namespace GUI
 				break;
 			}
 		}
-		Mutex.unlock();
+		GUI::Mutex.unlock();
 	}
 	void Unregister(GUI_RENDER aRenderCallback)
 	{
-		Mutex.lock();
+		GUI::Mutex.lock();
 		{
 			RegistryPreRender.erase(std::remove(RegistryPreRender.begin(), RegistryPreRender.end(), aRenderCallback), RegistryPreRender.end());
 			RegistryRender.erase(std::remove(RegistryRender.begin(), RegistryRender.end(), aRenderCallback), RegistryRender.end());
 			RegistryPostRender.erase(std::remove(RegistryPostRender.begin(), RegistryPostRender.end(), aRenderCallback), RegistryPostRender.end());
 			RegistryOptionsRender.erase(std::remove(RegistryOptionsRender.begin(), RegistryOptionsRender.end(), aRenderCallback), RegistryOptionsRender.end());
 		}
-		Mutex.unlock();
+		GUI::Mutex.unlock();
 	}
 
 	int Verify(void* aStartAddress, void* aEndAddress)
 	{
 		int refCounter = 0;
 
-		Mutex.lock();
+		GUI::Mutex.lock();
 		{
 			for (GUI_RENDER renderCb : RegistryPreRender)
 			{
@@ -568,7 +568,7 @@ namespace GUI
 				}
 			}
 		}
-		Mutex.unlock();
+		GUI::Mutex.unlock();
 
 		return refCounter;
 	}

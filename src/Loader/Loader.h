@@ -15,9 +15,9 @@
 #include "../Paths.h"
 #include "../Renderer.h"
 
+#include "ELoaderAction.h"
 #include "AddonDefinition.h"
-#include "ActiveAddon.h"
-#include "QueuedAddon.h"
+#include "Addon.h"
 #include "FuncDefs.h"
 
 #include "../Mumble/LinkedMem.h"
@@ -35,13 +35,11 @@
 namespace Loader
 {
 	extern std::mutex Mutex;
-	extern std::vector<QueuedAddon> QueuedAddons;						/* To be loaded or unloaded addons */
-	extern std::map<std::filesystem::path, ActiveAddon> AddonDefs;		/* Loaded Addons and their corresponding paths */
-	extern std::map<int, AddonAPI*> ApiDefs;							/* Addon API definitions, created on demand */
+	extern std::map<std::filesystem::path, ELoaderAction> QueuedAddons;		/* To be loaded or unloaded addons */
+	extern std::map<std::filesystem::path, Addon*> Addons;					/* Addons and their corresponding paths */
+	extern std::map<int, AddonAPI*> ApiDefs;								/* Addon API definitions, created on demand */
 
-	extern std::thread UpdateThread;
-
-	extern std::set<std::filesystem::path> Blacklist;					/* Blacklisted files which won't be reloaded */
+	extern std::thread LoaderThread;
 
 	/* Initializes the Loader and the API. */
 	void Initialize();
@@ -50,15 +48,20 @@ namespace Loader
 
 	/* Processes all currently queued addons. */
 	void ProcessQueue();
+	/* Pushes an item to the queue. */
+	void QueueAddon(ELoaderAction aAction, std::filesystem::path aPath);
 
-	/* Loads an addon from disk. */
+	/* Loads an addon. */
 	void LoadAddon(std::filesystem::path aPath);
 	/* Unloads an addon. */
 	void UnloadAddon(std::filesystem::path aPath);
+	/* Unloads, then uninstalls an addon. */
+	void UninstallAddon(std::filesystem::path aPath);
 	/* Detects if there are addons that are not currently loaded, or if loaded addons have been removed. */
 	void DetectAddonsLoop();
 
 	AddonAPI* GetAddonAPI(int aVersion);
+	long GetAddonAPISize(int aVersion);
 }
 
 #endif

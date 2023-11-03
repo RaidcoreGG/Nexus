@@ -7,7 +7,7 @@ namespace DataLink
 
 	void Free()
 	{
-		Mutex.lock();
+		DataLink::Mutex.lock();
 		{
 			while (Registry.size() > 0)
 			{
@@ -30,7 +30,7 @@ namespace DataLink
 				Registry.erase(it);
 			}
 		}
-		Mutex.unlock();
+		DataLink::Mutex.unlock();
 	}
 
 	void* GetResource(const char* aIdentifier)
@@ -39,14 +39,14 @@ namespace DataLink
 
 		void* result = nullptr;
 
-		Mutex.lock();
+		DataLink::Mutex.lock();
 		{
 			if (Registry.find(str) != Registry.end())
 			{
 				result = Registry[str].Pointer;
 			}
 		}
-		Mutex.unlock();
+		DataLink::Mutex.unlock();
 
 		return result;
 	}
@@ -62,7 +62,7 @@ namespace DataLink
 
 		void* result = nullptr;
 
-		Mutex.lock();
+		DataLink::Mutex.lock();
 		{
 			/* resource already exists */
 			if (Registry.find(str) != Registry.end())
@@ -90,7 +90,7 @@ namespace DataLink
 				}
 			}
 		}
-		Mutex.unlock();
+		DataLink::Mutex.unlock();
 
 		if (strOverride != "")
 		{

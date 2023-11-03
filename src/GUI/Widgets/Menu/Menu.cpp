@@ -31,7 +31,7 @@ namespace GUI
 
 				ImGui::PushFont(FontUI);
 				ImGui::SetCursorPos(ImVec2(0, 8.0f));
-				Mutex.lock();
+				Menu::Mutex.lock();
 				{
 					for (MenuItem* mItem : MenuItems)
 					{
@@ -48,7 +48,7 @@ namespace GUI
 						}
 					}
 				}
-				Mutex.unlock();
+				Menu::Mutex.unlock();
 				ImGui::PopFont();
 			}
 			ImGui::End();
@@ -56,11 +56,11 @@ namespace GUI
 
 		void AddMenuItem(std::string aLabel, bool* aToggle)
 		{
-			Mutex.lock();
+			Menu::Mutex.lock();
 			{
 				MenuItems.push_back(new MenuItem{ aLabel, aToggle, false });
 			}
-			Mutex.unlock();
+			Menu::Mutex.unlock();
 		}
 
 		void ReceiveTextures(const char* aIdentifier, Texture* aTexture)

@@ -238,19 +238,72 @@ namespace GUI
 
 						Loader::Mutex.lock();
 						{
-							if (ImGui::TreeNode("Loaded"))
+							if (ImGui::TreeNode("Tracked"))
 							{
-								for (const auto& [path, addon] : Loader::AddonDefs)
+								for (const auto& [path, addon] : Loader::Addons)
 								{
+									if (ImGui::TreeNode(path.string().c_str()))
+									{
+										std::string state = "State: ";
+										switch (addon->State)
+										{
+										case EAddonState::None:	state.append("None"); break;
+										case EAddonState::Loaded:	state.append("Loaded"); break;
+										case EAddonState::NotLoaded:	state.append("NotLoaded"); break;
+										case EAddonState::NotLoadedDuplicate:	state.append("NotLoadedDuplicate"); break;
+										case EAddonState::Incompatible:	state.append("Incompatible"); break;
+										case EAddonState::IncompatibleAPI:	state.append("IncompatibleAPI"); break;
+										}
+
+										ImGui::TextDisabled(state.c_str());
+										ImGui::TextDisabled("Module: %p", addon->Module);
+										ImGui::TextDisabled("Module Size: %u", addon->ModuleSize);
+										ImGui::TextDisabled("AddonDefs: %p", addon->Definitions);
+
+										ImGui::TreePop();
+									}
+								}
+								ImGui::TreePop();
+							}
+							if (ImGui::TreeNode("Queued"))
+							{
+								for (const auto& [path, action] : Loader::QueuedAddons)
+								{
+									switch (action)
+									{
+									case ELoaderAction::Load:
+										ImGui::Text("Load");
+										break;
+									case ELoaderAction::Unload:
+										ImGui::Text("Unload");
+										break;
+									case ELoaderAction::Uninstall:
+										ImGui::Text("Uninstall");
+										break;
+									}
+									ImGui::SameLine();
 									ImGui::TextDisabled("%s", path.string().c_str());
 								}
 								ImGui::TreePop();
 							}
-							if (ImGui::TreeNode("Blacklisted"))
+							if (ImGui::TreeNode("API Versions"))
 							{
-								for (auto& path : Loader::Blacklist)
+								for (auto& [version, api] : Loader::ApiDefs)
 								{
-									ImGui::TextDisabled("%s", path.string().c_str());
+									if (ImGui::TreeNode(("Version " + std::to_string(version)).c_str()))
+									{
+										ImGui::TextDisabled("Pointer: %p", api);
+										ImGui::TextDisabled("Size: %d", Loader::GetAddonAPISize(version));
+
+										if (ImGui::SmallButton("Memory Editor"))
+										{
+											memEditor.Open = true;
+											memPtr = api;
+											memSz = Loader::GetAddonAPISize(version);
+										}
+
+										ImGui::TreePop();
+									}
 								}
 								ImGui::TreePop();
 							}

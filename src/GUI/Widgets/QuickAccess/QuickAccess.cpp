@@ -68,7 +68,7 @@ namespace GUI
 				bool menuFound = false;
 
 				unsigned c = 0;
-				Mutex.lock();
+				QuickAccess::Mutex.lock();
 				{
 					for (auto& [identifier, shortcut] : Registry)
 					{
@@ -138,7 +138,7 @@ namespace GUI
 						}
 					}
 				}
-				Mutex.unlock();
+				QuickAccess::Mutex.unlock();
 
 				bool newHoverState = ImGui::IsWindowHovered() || isActive;
 				if (newHoverState != IsHovering)
@@ -168,7 +168,7 @@ namespace GUI
 			std::string strKbId = aKeybindIdentifier;
 			std::string strTT = aTooltipText;
 
-			Mutex.lock();
+			QuickAccess::Mutex.lock();
 			{
 				if (Registry.find(str) == Registry.end())
 				{
@@ -230,50 +230,50 @@ namespace GUI
 					}
 				}
 			}
-			Mutex.unlock();
+			QuickAccess::Mutex.unlock();
 		}
 
 		void RemoveShortcut(const char* aIdentifier)
 		{
 			std::string str = aIdentifier;
 
-			Mutex.lock();
+			QuickAccess::Mutex.lock();
 			{
 				Registry.erase(str);
 			}
-			Mutex.unlock();
+			QuickAccess::Mutex.unlock();
 		}
 
 		void AddSimpleShortcut(const char* aIdentifier, GUI_RENDER aShortcutRenderCallback)
 		{
 			std::string str = aIdentifier;
 
-			Mutex.lock();
+			QuickAccess::Mutex.lock();
 			{
 				if (RegistrySimple.find(str) == RegistrySimple.end())
 				{
 					RegistrySimple[str] = aShortcutRenderCallback;
 				}
 			}
-			Mutex.unlock();
+			QuickAccess::Mutex.unlock();
 		}
 
 		void RemoveSimpleShortcut(const char* aIdentifier)
 		{
 			std::string str = aIdentifier;
 
-			Mutex.lock();
+			QuickAccess::Mutex.lock();
 			{
 				RegistrySimple.erase(str);
 			}
-			Mutex.unlock();
+			QuickAccess::Mutex.unlock();
 		}
 
 		int Verify(void* aStartAddress, void* aEndAddress)
 		{
 			int refCounter = 0;
 
-			Mutex.lock();
+			QuickAccess::Mutex.lock();
 			{
 				std::vector<std::string> remove;
 
@@ -290,7 +290,7 @@ namespace GUI
 					RegistrySimple.erase(identifier);
 				}
 			}
-			Mutex.unlock();
+			QuickAccess::Mutex.unlock();
 
 			return refCounter;
 		}

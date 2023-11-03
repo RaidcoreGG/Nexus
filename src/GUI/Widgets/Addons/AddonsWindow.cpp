@@ -16,7 +16,7 @@ namespace GUI
 					{
 						ImGui::BeginChild("##AddonTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-						if (Loader::AddonDefs.size() == 0)
+						if (Loader::Addons.size() == 0)
 						{
 							ImVec2 windowSize = ImGui::GetWindowSize();
 							ImVec2 textSize = ImGui::CalcTextSize("No addons installed.");
@@ -28,9 +28,9 @@ namespace GUI
 						{
 							Loader::Mutex.lock();
 							{
-								for (auto& [path, addon] : Loader::AddonDefs)
+								for (auto& [path, addon] : Loader::Addons)
 								{
-									AddonItem(addon.Definitions);
+									AddonItem(addon);
 								}
 							}
 							Loader::Mutex.unlock();
