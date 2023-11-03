@@ -3,6 +3,7 @@
 
 #include "../../../Consts.h"
 
+#include "../../../Loader/Addon.h"
 #include "../../../Loader/AddonDefinition.h"
 #include "../../../Loader/EAddonFlags.h"
 #include "../../../Loader/Loader.h"
@@ -14,7 +15,7 @@
 
 namespace GUI
 {
-	void AddonItem(AddonDefinition* aDefinitions);
+	void AddonItem(Addon* aAddon);
 }
 
 #endif

@@ -11,46 +11,46 @@ namespace Events
 
 		Log(CH_EVENTS, str.c_str());
 
-		Mutex.lock();
+		Events::Mutex.lock();
 		{
 			for (EVENT_CONSUME callback : Registry[str])
 			{
 				std::thread([callback, aEventData]() { callback(aEventData); }).detach();
 			}
 		}
-		Mutex.unlock();
+		Events::Mutex.unlock();
 	}
 
 	void Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback)
 	{
 		std::string str = aIdentifier;
 
-		Mutex.lock();
+		Events::Mutex.lock();
 		{
 			Registry[str].push_back(aConsumeEventCallback);
 		}
-		Mutex.unlock();
+		Events::Mutex.unlock();
 	}
 
 	void Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback)
 	{
 		std::string str = aIdentifier;
 
-		Mutex.lock();
+		Events::Mutex.lock();
 		{
 			if (Registry.find(str) != Registry.end())
 			{
 				Registry[str].erase(std::remove(Registry[str].begin(), Registry[str].end(), aConsumeEventCallback), Registry[str].end());
 			}
 		}
-		Mutex.unlock();
+		Events::Mutex.unlock();
 	}
 
 	int Verify(void* aStartAddress, void* aEndAddress)
 	{
 		int refCounter = 0;
 
-		Mutex.lock();
+		Events::Mutex.lock();
 		{
 			for (auto& [identifier, consumers] : Registry)
 			{
@@ -64,7 +64,7 @@ namespace Events
 				}
 			}
 		}
-		Mutex.unlock();
+		Events::Mutex.unlock();
 
 		return refCounter;
 	}

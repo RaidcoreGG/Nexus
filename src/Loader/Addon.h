@@ -1,14 +1,15 @@
-#ifndef LOADEDADDON_H
-#define LOADEDADDON_H
+#ifndef ADDON_H
+#define ADDON_H
 
 #include <Windows.h>
-#include <vector>
 
+#include "EAddonState.h"
 #include "AddonDefinition.h"
 
 /* A structure that holds information about a loaded addon. */
-struct ActiveAddon
+struct Addon
 {
+	EAddonState			State;
 	HMODULE				Module;
 	DWORD				ModuleSize;
 	AddonDefinition*	Definitions;

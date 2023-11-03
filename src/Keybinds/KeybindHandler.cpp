@@ -91,7 +91,7 @@ namespace Keybinds
 	{
 		if (!std::filesystem::exists(Path::F_KEYBINDS)) { return; }
 
-		Mutex.lock();
+		Keybinds::Mutex.lock();
 		{
 			std::ifstream file(Path::F_KEYBINDS);
 
@@ -112,12 +112,12 @@ namespace Keybinds
 
 			file.close();
 		}
-		Mutex.unlock();
+		Keybinds::Mutex.unlock();
 	}
 
 	void Save()
 	{
-		Mutex.lock();
+		Keybinds::Mutex.lock();
 		{
 			json keybinds = json::array();
 
@@ -144,7 +144,7 @@ namespace Keybinds
 
 			file.close();
 		}
-		Mutex.unlock();
+		Keybinds::Mutex.unlock();
 	}
 
 	void Register(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const char* aKeybind)
@@ -167,7 +167,7 @@ namespace Keybinds
 			requestedBind = {};
 		}
 
-		Mutex.lock();
+		Keybinds::Mutex.lock();
 		{
 			/* check if this keybind is not already set */
 			if (Registry.find(str) == Registry.end())
@@ -177,7 +177,7 @@ namespace Keybinds
 
 			Registry[str].Handler = aKeybindHandler;
 		}
-		Mutex.unlock();
+		Keybinds::Mutex.unlock();
 
 		Save();
 	}
@@ -185,11 +185,11 @@ namespace Keybinds
 	{
 		std::string str = aIdentifier;
 
-		Mutex.lock();
+		Keybinds::Mutex.lock();
 		{
 			Registry.erase(str);
 		}
-		Mutex.unlock();
+		Keybinds::Mutex.unlock();
 
 		Save();
 	}
@@ -199,19 +199,19 @@ namespace Keybinds
 		/* sanity check */
 		if (aKeybind == Keybind{}) { return ""; }
 
-		Mutex.lock();
+		Keybinds::Mutex.lock();
 		{
 			/* check if another identifier, already uses the keybind */
 			for (auto& [identifier, keybind] : Registry)
 			{
 				if (keybind.Bind == aKeybind)
 				{
-					Mutex.unlock();
+					Keybinds::Mutex.unlock();
 					return identifier;
 				}
 			}
 		}
-		Mutex.unlock();
+		Keybinds::Mutex.unlock();
 
 		return "";
 	}
@@ -262,11 +262,11 @@ namespace Keybinds
 
 		if (res != aIdentifier && res != "") { return; }
 
-		Mutex.lock();
+		Keybinds::Mutex.lock();
 		{
 			Registry[aIdentifier].Bind = aKeybind;
 		}
-		Mutex.unlock();
+		Keybinds::Mutex.unlock();
 
 		Save();
 	}
@@ -274,7 +274,7 @@ namespace Keybinds
 	{
 		bool called = false;
 
-		Mutex.lock();
+		Keybinds::Mutex.lock();
 		{
 			if (Registry[aIdentifier].Handler)
 			{
@@ -285,7 +285,7 @@ namespace Keybinds
 				called = true;
 			}
 		}
-		Mutex.unlock();
+		Keybinds::Mutex.unlock();
 
 		return called;
 	}
@@ -294,7 +294,7 @@ namespace Keybinds
 	{
 		int refCounter = 0;
 
-		Mutex.lock();
+		Keybinds::Mutex.lock();
 		{
 			for (auto& [identifier, activekb] : Registry)
 			{
@@ -305,7 +305,7 @@ namespace Keybinds
 				}
 			}
 		}
-		Mutex.unlock();
+		Keybinds::Mutex.unlock();
 
 		return refCounter;
 	}

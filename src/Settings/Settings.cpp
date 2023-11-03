@@ -18,22 +18,22 @@ namespace Settings
 	{
 		if (!std::filesystem::exists(Path::F_SETTINGS)) { return; }
 
-		Mutex.lock();
+		Settings::Mutex.lock();
 		{
 			std::ifstream file(Path::F_SETTINGS);
 			Settings = json::parse(file);
 			file.close();
 		}
-		Mutex.unlock();
+		Settings::Mutex.unlock();
 	}
 	void Save()
 	{
-		Mutex.lock();
+		Settings::Mutex.lock();
 		{
 			std::ofstream file(Path::F_SETTINGS);
 			file << Settings.dump(1, '\t') << std::endl;
 			file.close();
 		}
-		Mutex.unlock();
+		Settings::Mutex.unlock();
 	}
 }

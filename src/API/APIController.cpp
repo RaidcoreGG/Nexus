@@ -22,7 +22,7 @@ namespace API
 	{
 		if (!std::filesystem::exists(Path::F_APIKEYS)) { return; }
 
-		Mutex.lock();
+		API::Mutex.lock();
 		{
 			std::ifstream file(Path::F_APIKEYS);
 			json j = json::parse(file);
@@ -34,11 +34,11 @@ namespace API
 			}
 			file.close();
 		}
-		Mutex.unlock();
+		API::Mutex.unlock();
 	}
 	void Save()
 	{
-		Mutex.lock();
+		API::Mutex.lock();
 		{
 			json keys = json::array();
 
@@ -51,7 +51,7 @@ namespace API
 			file << keys.dump(1, '\t') << std::endl;
 			file.close();
 		}
-		Mutex.unlock();
+		API::Mutex.unlock();
 	}
 
 	void AddKey(std::string aApiKey)
@@ -59,14 +59,14 @@ namespace API
 		ActiveToken token{};
 		token.Key = aApiKey;
 
-		Mutex.lock();
+		API::Mutex.lock();
 		{
 			if (std::find(Keys.begin(), Keys.end(), token) == Keys.end())
 			{
 				Keys.push_back(token);
 			}
 		}
-		Mutex.unlock();
+		API::Mutex.unlock();
 
 		Save();
 	}
@@ -75,11 +75,11 @@ namespace API
 		ActiveToken token{};
 		token.Key = aApiKey;
 
-		Mutex.lock();
+		API::Mutex.lock();
 		{
 			Keys.erase(std::find(Keys.begin(), Keys.end(), token));
 		}
-		Mutex.unlock();
+		API::Mutex.unlock();
 
 		Save();
 	}
@@ -111,7 +111,7 @@ namespace API
 		/* find token via account name */
 		ActiveToken key{};
 
-		Mutex.lock();
+		API::Mutex.lock();
 		{
 			for (ActiveToken token : Keys)
 			{
@@ -122,7 +122,7 @@ namespace API
 				}
 			}
 		}
-		Mutex.unlock();
+		API::Mutex.unlock();
 
 		if (key == ActiveToken{})
 		{
@@ -139,7 +139,7 @@ namespace API
 		/* find token via character name */
 		ActiveToken key{};
 
-		Mutex.lock();
+		API::Mutex.lock();
 		{
 			for (ActiveToken token : Keys)
 			{
@@ -150,7 +150,7 @@ namespace API
 				}
 			}
 		}
-		Mutex.unlock();
+		API::Mutex.unlock();
 
 		if (key == ActiveToken{})
 		{

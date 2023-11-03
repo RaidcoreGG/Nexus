@@ -168,6 +168,8 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 		State::Directx = EDxState::READY; /* acquired swapchain */
 	}
 
+	Loader::ProcessQueue();
+
 	TextureLoader::ProcessQueue();
 
 	UpdateNexusLink();

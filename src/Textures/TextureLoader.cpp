@@ -21,14 +21,14 @@ namespace TextureLoader
 
 		Texture* result = nullptr;
 
-		Mutex.lock();
+		TextureLoader::Mutex.lock();
 		{
 			if (Registry.find(str) != Registry.end())
 			{
 				result = Registry[str];
 			}
 		}
-		Mutex.unlock();
+		TextureLoader::Mutex.unlock();
 
 		return result;
 	}
@@ -147,13 +147,13 @@ namespace TextureLoader
 
 	void ProcessQueue()
 	{
-		Mutex.lock();
+		TextureLoader::Mutex.lock();
 		while (TextureLoader::QueuedTextures.size() > 0)
 		{
 			TextureLoader::CreateTexture(TextureLoader::QueuedTextures.front());
 			TextureLoader::QueuedTextures.erase(TextureLoader::QueuedTextures.begin());
 		}
-		Mutex.unlock();
+		TextureLoader::Mutex.unlock();
 	}
 
 	void QueueTexture(const char* aIdentifier, unsigned char* aImageData, unsigned aWidth, unsigned aHeight, TEXTURES_RECEIVECALLBACK aCallback)
@@ -169,11 +169,11 @@ namespace TextureLoader
 		raw.Height = aHeight;
 		raw.Callback = aCallback;
 
-		Mutex.lock();
+		TextureLoader::Mutex.lock();
 		{
 			QueuedTextures.push_back(raw);
 		}
-		Mutex.unlock();
+		TextureLoader::Mutex.unlock();
 	}
 	void CreateTexture(QueuedTexture aQueuedTexture)
 	{

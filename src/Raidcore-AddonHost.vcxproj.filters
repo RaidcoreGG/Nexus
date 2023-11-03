@@ -100,6 +100,9 @@
     <Filter Include="openssl">
       <UniqueIdentifier>{43ee48c6-177b-4331-a9ce-76dfffac0f31}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Paths">
+      <UniqueIdentifier>{b0fd71ca-41a2-4a72-a523-b30138c9dcef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="entry.cpp">
@@ -449,9 +452,6 @@
     <ClInclude Include="Loader\FuncDefs.h">
       <Filter>Loader</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\ActiveAddon.h">
-      <Filter>Loader</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -513,9 +513,6 @@
       <Filter>GUI</Filter>
     </ClInclude>
     <ClInclude Include="Loader\ELoaderAction.h">
-      <Filter>Loader</Filter>
-    </ClInclude>
-    <ClInclude Include="Loader\QueuedAddon.h">
       <Filter>Loader</Filter>
     </ClInclude>
     <ClInclude Include="WndProc\WndProcHandler.h">
@@ -938,11 +935,20 @@
     <ClInclude Include="Branch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\ERenderType.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Keybinds\KeystrokeMessageFlags.h">
+      <Filter>Keybinds</Filter>
     </ClInclude>
     <ClInclude Include="Paths\FuncDefs.h">
-      <Filter>Header Files</Filter>
+      <Filter>Paths</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\ERenderType.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\Addon.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\EAddonState.h">
+      <Filter>Loader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

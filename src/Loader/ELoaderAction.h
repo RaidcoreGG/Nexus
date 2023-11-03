@@ -5,7 +5,8 @@ enum class ELoaderAction
 {
 	None,
 	Load,
-	Unload
+	Unload,
+	Uninstall
 };
 
 #endif
