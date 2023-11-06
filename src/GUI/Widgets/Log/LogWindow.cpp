@@ -5,6 +5,8 @@ namespace GUI
 	bool SelectedOnly = false;
 	std::string ChannelFilter;
 
+	float off1 = 0.0f;
+	float off2 = 0.0f;
 	const char* filterLevels[] = { "Critical", "Warning", "Info", "Debug", "Trace", "All" };
 	size_t amtShown = 0;
 
@@ -16,6 +18,12 @@ namespace GUI
 	void LogWindow::Render()
 	{
 		if (!Visible) { return; }
+
+		if (!(off1 && off2))
+		{
+			off1 = ImGui::CalcTextSize("XXXXXXXXX").x;
+			off2 = ImGui::CalcTextSize("XXXXXXXXXXX").x;
+		}
 
 		ImGui::SetNextWindowSize(ImVec2(600.0f, 380.0f));
 		if (ImGui::Begin("Log", &Visible, WindowFlags_Default))
@@ -76,7 +84,7 @@ namespace GUI
 			{
 				ImGui::BeginChild("logmessages", ImVec2(windowWidthQuarter * 3 - 1, 0.0f));
 				
-				MessageMutex.lock();
+				LogHandler::Mutex.lock();
 				{
 					/* Show last 400 log messages */
 					size_t start = 0;
@@ -104,9 +112,6 @@ namespace GUI
 								default:                    level = "[TRACE]";      ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(220, 220, 220, 255)); break;
 							}
 
-							float off1 = ImGui::CalcTextSize("XXXXXXXXX").x;
-							float off2 = ImGui::CalcTextSize("XXXXXXXXXXX").x;
-
 							/* time */
 							ImGui::Text(entry.TimestampString(false).c_str()); ImGui::SameLine(off1);
 
@@ -120,7 +125,7 @@ namespace GUI
 						}
 					}
 				}
-				MessageMutex.unlock();
+				LogHandler::Mutex.unlock();
 
 				if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
 				{
