@@ -12,7 +12,7 @@ namespace Path
 	extern char D_GW2_ADDONS					[];
 	extern char D_GW2_ADDONS_COMMON				[];
 	extern char D_GW2_ADDONS_COMMON_API_V2		[];
-	extern char D_GW2_ADDONS_RAIDCORE			[];
+	extern char D_GW2_ADDONS_NEXUS				[];
 	extern char D_GW2_ADDONS_RAIDCORE_LOCALES	[];
 
 	extern char F_HOST_DLL						[];

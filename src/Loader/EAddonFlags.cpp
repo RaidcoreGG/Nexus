@@ -15,13 +15,3 @@ EAddonFlags operator&(EAddonFlags lhs, EAddonFlags rhs)
 		static_cast<int>(rhs)
 		);
 }
-
-bool operator==(EAddonFlags lhs, EAddonFlags rhs)
-{
-	return static_cast<int>(lhs) == static_cast<int>(rhs);
-}
-
-bool operator!=(EAddonFlags lhs, EAddonFlags rhs)
-{
-	return static_cast<int>(lhs) != static_cast<int>(rhs);
-}

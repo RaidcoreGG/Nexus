@@ -28,7 +28,20 @@ namespace GUI
 			ImGui::TextDisabled("Renderer:");
 			ImGui::Text(""); ImGui::SameLine(); ImGui::Text("DirectX 11"); ImGui::SameLine(); ImGui::TextDisabled("Method %d %s", State::EntryMethod, State::IsChainloading ? "Chainloading" : "");
 			
-			if (State::MultiboxState == EMultiboxState::READY) { ImGui::TextDisabled("Multibox ready."); }
+			if (State::MultiboxState == EMultiboxState::READY)
+			{
+				ImGui::TextDisabled("Multibox ready.");
+			}
+			else
+			{
+				if (State::MultiboxState != EMultiboxState::NONE)
+				{
+					ImGui::TextDisabled("Multibox State:");
+					if ((bool)(State::MultiboxState & EMultiboxState::ARCHIVE_SHARED)) { ImGui::Text(""); ImGui::SameLine(); ImGui::Text("Archive shared."); }
+					if ((bool)(State::MultiboxState & EMultiboxState::LOCAL_SHARED)) { ImGui::Text(""); ImGui::SameLine(); ImGui::Text("Local shared."); }
+					if ((bool)(State::MultiboxState & EMultiboxState::MUTEX_CLOSED)) { ImGui::Text(""); ImGui::SameLine(); ImGui::Text("Mutex closed."); }
+				}
+			}
 
 			ImGui::Separator();
 
