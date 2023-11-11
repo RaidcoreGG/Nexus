@@ -258,6 +258,9 @@
     <ClCompile Include="openssl\applink.c">
       <Filter>openssl</Filter>
     </ClCompile>
+    <ClCompile Include="Updater\Updater.cpp">
+      <Filter>Updater</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imstb_truetype.h">

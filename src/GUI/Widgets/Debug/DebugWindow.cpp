@@ -307,7 +307,6 @@ namespace GUI
 								}
 								ImGui::TreePop();
 							}
-							ImGui::TooltipGeneric("These files will not be checked during the next wave of addon loading.");
 						}
 						Loader::Mutex.unlock();
 

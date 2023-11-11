@@ -26,6 +26,9 @@ struct AddonVersion
 	}
 };
 
+bool operator>(AddonVersion lhs, AddonVersion rhs);
+bool operator<(AddonVersion lhs, AddonVersion rhs);
+
 struct AddonDefinition
 {
 	/* required */

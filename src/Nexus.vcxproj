@@ -60,6 +60,7 @@
     <ClCompile Include="State.cpp" />
     <ClCompile Include="Textures\TextureLoader.cpp" />
     <ClCompile Include="types.cpp" />
+    <ClCompile Include="Updater\Updater.cpp" />
     <ClCompile Include="WndProc\WndProcHandler.cpp" />
   </ItemGroup>
   <ItemGroup>

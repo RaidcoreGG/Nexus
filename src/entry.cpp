@@ -26,6 +26,7 @@
 #include "Loader/NexusLinkData.h"
 #include "Settings/Settings.h"
 #include "API/APIController.h"
+#include "Updater/Updater.h"
 
 void UpdateNexusLink()
 {
@@ -56,6 +57,8 @@ void Initialize()
 
 	State::Initialize();
 	Path::Initialize(NexusHandle);
+
+	Updater::Initialize();
 
 	/* Don't initialize anything if vanilla*/
 	if (!State::IsVanilla)

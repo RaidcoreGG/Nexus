@@ -16,7 +16,8 @@ namespace Path
 	extern char D_GW2_ADDONS_RAIDCORE_LOCALES	[];
 
 	extern char F_HOST_DLL						[];
-	extern char F_TEMP_DLL						[];
+	extern char F_UPDATE_DLL					[];
+	extern char F_OLD_DLL						[];
 	extern char F_SYSTEM_DLL					[];
 	extern char F_CHAINLOAD_DLL					[];
 

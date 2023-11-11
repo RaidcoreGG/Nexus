@@ -6,11 +6,12 @@ namespace Path
 	char D_GW2_ADDONS					[MAX_PATH]{};
 	char D_GW2_ADDONS_COMMON			[MAX_PATH]{};
 	char D_GW2_ADDONS_COMMON_API_V2		[MAX_PATH]{};
-	char D_GW2_ADDONS_NEXUS			[MAX_PATH]{};
+	char D_GW2_ADDONS_NEXUS				[MAX_PATH]{};
 	char D_GW2_ADDONS_RAIDCORE_LOCALES	[MAX_PATH]{};
 
 	char F_HOST_DLL						[MAX_PATH]{};
-	char F_TEMP_DLL						[MAX_PATH]{};
+	char F_UPDATE_DLL					[MAX_PATH]{};
+	char F_OLD_DLL						[MAX_PATH]{};
 	char F_SYSTEM_DLL					[MAX_PATH]{};
 	char F_CHAINLOAD_DLL				[MAX_PATH]{};
 
@@ -46,7 +47,8 @@ namespace Path
 		PathCopyAndAppend(Path::D_GW2_ADDONS_COMMON, Path::F_APIKEYS, "APIKeys.json");						/* get apikeys path */
 
 		/* static paths */
-		PathCopyAndAppend(Path::D_GW2, Path::F_TEMP_DLL, "d3d11.tmp");										/* get temp dll path */
+		PathCopyAndAppend(Path::D_GW2, Path::F_UPDATE_DLL, "d3d11.dll.update");								/* get update dll path */
+		PathCopyAndAppend(Path::D_GW2, Path::F_OLD_DLL, "d3d11.dll.old");									/* get old dll path */
 		PathSystemAppend(Path::F_SYSTEM_DLL, "d3d11.dll");													/* get system dll path */
 		PathCopyAndAppend(Path::D_GW2, Path::F_CHAINLOAD_DLL, "d3d11_chainload.dll");						/* get chainload dll path */
 	}
