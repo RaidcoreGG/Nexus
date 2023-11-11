@@ -116,9 +116,16 @@ void Shutdown()
 	if (D3D11SystemHandle) { FreeLibrary(D3D11SystemHandle); }
 }
 
+bool hook = false;
+
 /* hk */
 LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	if (uMsg == WM_KEYDOWN && wParam == 77)
+	{
+		hook = true;
+	}
+
 	// don't pass to game if custom wndproc
 	if (WndProc::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
@@ -173,6 +180,124 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 	TextureLoader::ProcessQueue();
 
 	UpdateNexusLink();
+
+	if (hook)
+	{
+		hook = false;
+
+		// both the commented out and the other variant work. just different approaches.
+
+		/*// Get the currently bound render targets
+		ID3D11RenderTargetView* pRTVs[8] = { nullptr }; // Adjust the array size based on your needs
+		ID3D11DepthStencilView* pDSV = nullptr; // Optional, depending on your setup
+		Renderer::DeviceContext->OMGetRenderTargets(8, pRTVs, &pDSV);
+
+		// Assuming you have one render target
+		ID3D11RenderTargetView* pCurrentRTV = pRTVs[0];
+
+		if (pCurrentRTV)
+		{
+			// Get the texture associated with the render target view
+			ID3D11Resource* pRenderTargetResource = nullptr;
+			pCurrentRTV->GetResource(&pRenderTargetResource);
+
+			ID3D11Texture2D* pTexture = nullptr;
+			HRESULT hr = pRenderTargetResource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&pTexture);
+			if (SUCCEEDED(hr))
+			{
+				D3D11_TEXTURE2D_DESC desc;
+				pTexture->GetDesc(&desc);
+
+				desc.Usage = D3D11_USAGE_DEFAULT;
+				desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+				desc.CPUAccessFlags = 0;
+
+				// Create a new texture to copy the data from the original texture
+				ID3D11Texture2D* pNewTexture = nullptr;
+				hr = Renderer::Device->CreateTexture2D(&desc, nullptr, &pNewTexture);
+				if (SUCCEEDED(hr) && pNewTexture) {
+					// Copy data from the original texture to the new texture
+					Renderer::DeviceContext->CopyResource(pNewTexture, pTexture);
+
+					Texture* tex = new Texture();
+					tex->Width = Renderer::Width;
+					tex->Height = Renderer::Height;
+
+					// Assuming you want to create a ShaderResourceView for the captured texture
+					D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+					srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; // Adjust based on your render target format
+					srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+					srvDesc.Texture2D.MipLevels = 1;
+					srvDesc.Texture2D.MostDetailedMip = 0;
+
+					if (SUCCEEDED(Renderer::Device->CreateShaderResourceView(pNewTexture, &srvDesc, &tex->Resource)))
+					{
+						TextureLoader::Mutex.lock();
+						TextureLoader::Registry["meme"] = tex;
+						TextureLoader::Mutex.unlock();
+					}
+
+					pNewTexture->Release();
+				}
+
+				pTexture->Release();
+			}
+
+			// Release the render target resource
+			pRenderTargetResource->Release();
+		}
+
+		// Release the retrieved render targets and depth stencil view
+		for (int i = 0; i < 8; ++i)
+		{
+			if (pRTVs[i])
+				pRTVs[i]->Release();
+		}
+
+		if (pDSV)
+			pDSV->Release();*/
+
+
+		ID3D11Texture2D* pBackBuffer = nullptr;
+		if (SUCCEEDED(Renderer::SwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer))))
+		{
+			D3D11_TEXTURE2D_DESC desc;
+			pBackBuffer->GetDesc(&desc);
+
+			desc.Usage = D3D11_USAGE_DEFAULT;
+			desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+			desc.CPUAccessFlags = 0;
+
+			ID3D11Texture2D* pStagingTexture;
+			if (SUCCEEDED(Renderer::Device->CreateTexture2D(&desc, nullptr, &pStagingTexture)))
+			{
+				Renderer::DeviceContext->CopyResource(pStagingTexture, pBackBuffer);
+
+				Texture* tex = new Texture();
+				tex->Width = Renderer::Width;
+				tex->Height = Renderer::Height;
+
+				D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+				ZeroMemory(&srvDesc, sizeof(srvDesc));
+				srvDesc.Format = desc.Format;
+				srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+				srvDesc.Texture2D.MipLevels = desc.MipLevels;
+				srvDesc.Texture2D.MostDetailedMip = 0;
+
+				HRESULT hr = Renderer::Device->CreateShaderResourceView(pStagingTexture, &srvDesc, &tex->Resource);
+				if (SUCCEEDED(hr))
+				{
+					TextureLoader::Mutex.lock();
+					TextureLoader::Registry["pre"] = tex;
+					TextureLoader::Mutex.unlock();
+				}
+
+				pStagingTexture->Release();
+			}
+
+			pBackBuffer->Release();
+		}
+	}
 
 	GUI::Render();
 
