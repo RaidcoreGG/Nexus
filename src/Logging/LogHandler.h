@@ -26,8 +26,8 @@ namespace LogHandler
 	extern std::vector<std::string> Channels;
 
 	extern bool IsRunning;
+	extern int IndexProcessed;
 	extern std::thread LoggingThread;
-	extern std::vector<LogEntry> QueuedMessages;
 
 	void Initialize();
 	void Shutdown();
