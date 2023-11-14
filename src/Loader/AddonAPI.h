@@ -41,8 +41,6 @@ struct AddonAPI1 : AddonAPI
 
 	/* Logging */
 	LOGGER_LOGA					Log;
-	LOGGER_ADDREM				RegisterLogger;
-	LOGGER_ADDREM				UnregisterLogger;
 
 	/* Events */
 	EVENTS_RAISE				RaiseEvent;

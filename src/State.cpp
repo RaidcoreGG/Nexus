@@ -38,9 +38,14 @@ namespace State
 
 			//Log("dbg", "token: \"%s\" @ %d", token.c_str(), pos);
 
-			if (token == "ggdev") { IsDeveloperMode = true; }
-			if (token == "ggconsole") { IsConsoleEnabled = true; }
-			if (token == "ggvanilla") { IsVanilla = true; }
+			// token -> is the unmodified string as from the commandline
+			// cmp -> same as token, except it's been normalised (aka written in lowercase)
+
+			if (cmp == "ggdev") { IsDeveloperMode = true; }
+			if (cmp == "ggconsole") { IsConsoleEnabled = true; }
+			if (cmp == "ggvanilla") { IsVanilla = true; }
+			if (cmp == "sharearchive") { MultiboxState = MultiboxState | EMultiboxState::ARCHIVE_SHARED; }
+			if (cmp == "multi") { MultiboxState = MultiboxState | EMultiboxState::LOCAL_SHARED; }
 
 			size_t subpos = 0;
 			std::string subtoken;
@@ -58,5 +63,17 @@ namespace State
 		{
 			MumbleLink = (LinkedMem*)DataLink::ShareResource(DL_MUMBLE_LINK, sizeof(LinkedMem), "MumbleLink");
 		}
+
+		// TODO:
+		// close "AN-Mutex-Window-Guild Wars 2"
 	}
+}
+
+EMultiboxState operator|(EMultiboxState lhs, EMultiboxState rhs)
+{
+	return static_cast<EMultiboxState>(static_cast<int>(lhs) | static_cast<int>(rhs));
+}
+EMultiboxState operator&(EMultiboxState lhs, EMultiboxState rhs)
+{
+	return static_cast<EMultiboxState>( static_cast<int>(lhs) & static_cast<int>(rhs) );
 }

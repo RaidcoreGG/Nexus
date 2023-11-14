@@ -10,8 +10,8 @@ namespace LogHandler
 	std::vector<std::string> Channels;
 
 	bool IsRunning = false;
+	int IndexProcessed = 0;
 	std::thread LoggingThread;
-	std::vector<LogEntry> QueuedMessages;
 
 	void Initialize()
 	{
@@ -86,7 +86,7 @@ namespace LogHandler
 
 		Mutex.lock();
 		{
-			QueuedMessages.push_back(entry);
+			LogEntries.push_back(entry);
 		}
 		Mutex.unlock();
 	}
@@ -96,11 +96,11 @@ namespace LogHandler
 		{
 			if (!IsRunning) { return; }
 
-			while (QueuedMessages.size() > 0)
+			while (LogEntries.size() > IndexProcessed + 1)
 			{
 				Mutex.lock();
 				{
-					LogEntry& entry = QueuedMessages.front();
+					LogEntry& entry = LogEntries[IndexProcessed + 1];
 
 					for (ILogger* logger : Registry)
 					{
@@ -113,8 +113,7 @@ namespace LogHandler
 						}
 					}
 
-					LogEntries.push_back(entry);
-					QueuedMessages.erase(QueuedMessages.begin());
+					IndexProcessed++;
 				}
 				Mutex.unlock();
 			}

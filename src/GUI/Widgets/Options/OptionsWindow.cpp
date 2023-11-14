@@ -27,9 +27,9 @@ namespace GUI
 			{
 				GeneralTab();
 				AddonsTab();
-				StyleTab();
+				//StyleTab();
 				KeybindsTab();
-				APITab();
+				//APITab();
 
 				ImGui::EndTabBar();
 			}
