@@ -1,7 +1,7 @@
 #ifndef ELOGLEVEL_H
 #define ELOGLEVEL_H
 
-enum class ELogLevel : unsigned char
+enum class ELogLevel
 {
 	OFF         = 0,
 	CRITICAL    = 1,
