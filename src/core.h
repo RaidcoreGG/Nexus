@@ -19,6 +19,8 @@ std::string WStrToStr(std::wstring& aWstring);
 
 std::wstring StrToWStr(std::string& aString);
 
+const char* ConvertToUTF8(const char* multibyteStr);
+
 /*
  *
  * Created: 29.03.2018

@@ -53,3 +53,26 @@ std::wstring StrToWStr(std::string& aString)
 	MultiByteToWideChar(CP_ACP, 0, aString.c_str(), (int)aString.length(), &str[0], (int)str.length());
 	return str;
 }
+
+const char* ConvertToUTF8(const char* multibyteStr)
+{
+	char* utf8Str = nullptr;
+
+	int wideCharCount = MultiByteToWideChar(CP_ACP, 0, multibyteStr, -1, NULL, 0);
+	if (wideCharCount > 0)
+	{
+		wchar_t* wideCharBuff = new wchar_t[wideCharCount];
+		MultiByteToWideChar(CP_ACP, 0, multibyteStr, -1, wideCharBuff, wideCharCount);
+
+		int utf8Count = WideCharToMultiByte(CP_UTF8, 0, wideCharBuff, -1, NULL, 0, NULL, NULL);
+		if (utf8Count > 0)
+		{
+			utf8Str = new char[utf8Count];
+			WideCharToMultiByte(CP_UTF8, 0, wideCharBuff, -1, utf8Str, utf8Count, NULL, NULL);
+		}
+
+		delete[] wideCharBuff;
+	}
+
+	return utf8Str;
+}

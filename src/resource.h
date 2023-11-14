@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by Raidcore-AddonHost.rc
+// Used by Nexus.rc
 //
 #define RES_FONT_MENOMONIA              101
 #define RES_ICON_NEXUS                  102

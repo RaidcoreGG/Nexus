@@ -160,26 +160,36 @@ namespace Loader
 		MODULEINFO moduleInfo;
 		GetModuleInformation(GetCurrentProcess(), hMod, &moduleInfo, sizeof(moduleInfo));
 
-		AddonAPI* api = GetAddonAPI(defs->APIVersion);
+		AddonAPI* api = GetAddonAPI(defs->APIVersion); // will be nullptr if doesn't exist or APIVersion = 0
 
-		// if no addon api was requested
-		// else if the requested addon api exists
+		// if no addon api was requested or if the requested addon api exists
 		// else invalid addon, don't load
-		if (defs->APIVersion == 0)
+		if (defs->APIVersion == 0 || api != nullptr)
 		{
-			LogInfo(CH_LOADER, "Loaded addon: %s [%p - %p] (No API was requested.)", path, hMod, ((PBYTE)hMod) + moduleInfo.SizeOfImage);
 			addon->Module = hMod;
 			addon->ModuleSize = moduleInfo.SizeOfImage;
+
+			// free the old stuff
+			if (addon->Definitions != nullptr)
+			{
+				// is this necessary?
+				delete[] addon->Definitions->Name;
+				delete[] addon->Definitions->Author;
+				delete[] addon->Definitions->Description;
+				delete[] addon->Definitions->UpdateLink;
+				delete addon->Definitions;
+			}
+
 			addon->Definitions = defs;
-			addon->Definitions->Load(nullptr);
-			addon->State = EAddonState::Loaded;
-		}
-		else if (api != nullptr)
-		{
-			LogInfo(CH_LOADER, "Loaded addon: %s [%p - %p] (API Version %d was requested.)", path, hMod, ((PBYTE)hMod) + moduleInfo.SizeOfImage, defs->APIVersion);
-			addon->Module = hMod;
-			addon->ModuleSize = moduleInfo.SizeOfImage;
-			addon->Definitions = defs;
+
+			if (defs->APIVersion == 0)
+			{
+				LogInfo(CH_LOADER, "Loaded addon: %s [%p - %p] (No API was requested.)", path, hMod, ((PBYTE)hMod) + moduleInfo.SizeOfImage);
+			}
+			else
+			{
+				LogInfo(CH_LOADER, "Loaded addon: %s [%p - %p] (API Version %d was requested.)", path, hMod, ((PBYTE)hMod) + moduleInfo.SizeOfImage, defs->APIVersion);
+			}
 			addon->Definitions->Load(api);
 			addon->State = EAddonState::Loaded;
 		}
@@ -230,6 +240,12 @@ namespace Loader
 			/* cache name for warning message and already release defs */
 			std::string name = Addons[aPath]->Definitions->Name;
 
+			if (!Addons[aPath]->Definitions->Unload ||
+				Addons[aPath]->Definitions->HasFlag(EAddonFlags::DisableHotloading))
+			{
+				LogWarning(CH_LOADER, "Prevented unloading \"%s\" because either no Unload function is defined or Hotloading is explicitly disabled. (%s)", name.c_str(), path);
+				return;
+			}
 			Addons[aPath]->Definitions->Unload();
 
 			if (Addons[aPath]->Module)
@@ -388,8 +404,6 @@ namespace Loader
 			((AddonAPI1*)api)->DisableHook = MH_DisableHook;
 
 			((AddonAPI1*)api)->Log = LogMessageAddon;
-			((AddonAPI1*)api)->RegisterLogger = RegisterLogger;
-			((AddonAPI1*)api)->UnregisterLogger = UnregisterLogger;
 
 			((AddonAPI1*)api)->RaiseEvent = Events::Raise;
 			((AddonAPI1*)api)->SubscribeEvent = Events::Subscribe;

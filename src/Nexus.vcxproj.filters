@@ -103,6 +103,9 @@
     <Filter Include="Paths">
       <UniqueIdentifier>{b0fd71ca-41a2-4a72-a523-b30138c9dcef}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Updater">
+      <UniqueIdentifier>{d7e1b86c-b1ce-4e7b-be11-861622cc8c67}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="entry.cpp">
@@ -254,6 +257,9 @@
     </ClCompile>
     <ClCompile Include="openssl\applink.c">
       <Filter>openssl</Filter>
+    </ClCompile>
+    <ClCompile Include="Updater\Updater.cpp">
+      <Filter>Updater</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -953,9 +959,12 @@
     <ClInclude Include="Keybinds\KeystrokeMessageFlags.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Updater\Updater.h">
+      <Filter>Updater</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Raidcore-AddonHost.rc">
+    <ResourceCompile Include="Nexus.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
