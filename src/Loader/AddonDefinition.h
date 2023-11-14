@@ -1,6 +1,9 @@
 #ifndef ADDONDEF_H
 #define ADDONDEF_H
 
+#include <iomanip>
+#include <sstream>
+
 #include "AddonAPI.h"
 #include "EAddonFlags.h"
 #include "EUpdateProvider.h"
@@ -39,7 +42,7 @@ struct AddonDefinition
 	const char*     Author;         /* Author of the addon */
 	const char*     Description;    /* Short description */
 	ADDON_LOAD      Load;           /* Pointer to Load Function of the addon */
-	ADDON_UNLOAD    Unload;         /* Pointer to Unload Function of the addon */
+	ADDON_UNLOAD    Unload;         /* Pointer to Unload Function of the addon. Not required if EAddonFlags::DisableHotloading is set. */
 	EAddonFlags     Flags;          /* Information about the addon */
 
 	/* update fallback */

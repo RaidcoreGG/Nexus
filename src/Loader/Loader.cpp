@@ -240,6 +240,12 @@ namespace Loader
 			/* cache name for warning message and already release defs */
 			std::string name = Addons[aPath]->Definitions->Name;
 
+			if (!Addons[aPath]->Definitions->Unload ||
+				Addons[aPath]->Definitions->HasFlag(EAddonFlags::DisableHotloading))
+			{
+				LogWarning(CH_LOADER, "Prevented unloading \"%s\" because either no Unload function is defined or Hotloading is explicitly disabled. (%s)", name.c_str(), path);
+				return;
+			}
 			Addons[aPath]->Definitions->Unload();
 
 			if (Addons[aPath]->Module)
@@ -398,8 +404,6 @@ namespace Loader
 			((AddonAPI1*)api)->DisableHook = MH_DisableHook;
 
 			((AddonAPI1*)api)->Log = LogMessageAddon;
-			((AddonAPI1*)api)->RegisterLogger = RegisterLogger;
-			((AddonAPI1*)api)->UnregisterLogger = UnregisterLogger;
 
 			((AddonAPI1*)api)->RaiseEvent = Events::Raise;
 			((AddonAPI1*)api)->SubscribeEvent = Events::Subscribe;

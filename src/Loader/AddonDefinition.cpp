@@ -2,27 +2,15 @@
 
 bool operator>(AddonVersion lhs, AddonVersion rhs)
 {
-	unsigned long long lLong;
-	unsigned long long rLong;
+	if ((lhs.Major > rhs.Major) ||
+		(lhs.Major == rhs.Major && lhs.Minor > rhs.Minor) ||
+		(lhs.Major == rhs.Major && lhs.Minor == rhs.Minor && lhs.Build > rhs.Build) ||
+		(lhs.Major == rhs.Major && lhs.Minor == rhs.Minor && lhs.Build == rhs.Build && lhs.Revision > rhs.Revision))
+	{
+		return true;
+	}
 
-	std::stringstream oss;
-	oss << std::left << std::setfill('0') << std::setw(4) << lhs.Major;
-	oss << std::left << std::setfill('0') << std::setw(2) << lhs.Minor;
-	oss << std::left << std::setfill('0') << std::setw(2) << lhs.Build;
-	oss << std::left << std::setfill('0') << std::setw(4) << lhs.Revision;
-	std::string lStr = oss.str();
-
-	oss.str("");
-	oss << std::left << std::setfill('0') << std::setw(4) << rhs.Major;
-	oss << std::left << std::setfill('0') << std::setw(2) << rhs.Minor;
-	oss << std::left << std::setfill('0') << std::setw(2) << rhs.Build;
-	oss << std::left << std::setfill('0') << std::setw(4) << rhs.Revision;
-	std::string rStr = oss.str();
-
-	lLong = std::stoull(lStr);
-	rLong = std::stoull(rStr);
-
-	return lLong > rLong;
+	return false;
 }
 bool operator<(AddonVersion lhs, AddonVersion rhs)
 {
@@ -36,7 +24,7 @@ bool AddonDefinition::HasMinimumRequirements()
 		Author &&
 		Description &&
 		Load &&
-		Unload)
+		(HasFlag(EAddonFlags::DisableHotloading) || Unload))
 	{
 		return true;
 	}

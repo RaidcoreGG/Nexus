@@ -81,6 +81,10 @@ namespace Updater
 								LogInfo(CH_UPDATER, "Successfully updated Nexus. Restart required to take effect.");
 							}
 						}
+						else if (remoteVersion < *Version)
+						{
+							LogInfo(CH_UPDATER, "Installed Build of Nexus is more up-to-date than remote. (Installed: %s) (Remote: %s)", Version->ToString().c_str(), remoteVersion.ToString().c_str());
+						}
 						else
 						{
 							LogInfo(CH_UPDATER, "Installed Build of Nexus is up-to-date.");
