@@ -75,7 +75,7 @@ void Initialize()
 		//API::Initialize();
 
 		Mumble::Initialize();
-		NexusLink = (NexusLinkData*)DataLink::ShareResource((DL_NEXUS_LINK_ + std::to_string(GetCurrentProcessId())).c_str(), sizeof(NexusLinkData));
+		NexusLink = (NexusLinkData*)DataLink::ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData));
 
 		// create imgui context
 		if (!Renderer::GuiContext) { Renderer::GuiContext = ImGui::CreateContext(); }

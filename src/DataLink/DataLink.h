@@ -22,7 +22,7 @@ namespace DataLink
 	void* GetResource(const char* aIdentifier);
 	/* Allocates new memory of the given size and returns a pointer to it and shares it via the given identifier */
 	void* ShareResource(const char* aIdentifier, size_t aResourceSize);
-	void* ShareResource(const char* aIdentifier, size_t aResourceSize, const char* aResourceNameOverride);
+	void* ShareResource(const char* aIdentifier, size_t aResourceSize, const char* aUnderlyingName);
 }
 
 #endif

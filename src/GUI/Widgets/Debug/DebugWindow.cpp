@@ -103,6 +103,8 @@ namespace GUI
 									ImGui::TextDisabled("Handle: %p", resource.Handle);
 									ImGui::TextDisabled("Pointer: %p", resource.Pointer);
 									ImGui::TextDisabled("Size: %d", resource.Size);
+									ImGui::TextDisabled("Name: %s", resource.UnderlyingName.c_str());
+									ImGui::TooltipGeneric("The real underlying name of the file.");
 
 									if (ImGui::SmallButton("Memory Editor"))
 									{

@@ -40,4 +40,4 @@ const char* EV_OPTIONS_CALLED			= "EV_OPTIONS_CALLED";
 
 /* DataLink */
 const char* DL_MUMBLE_LINK				= "DL_MUMBLE_LINK";
-const char* DL_NEXUS_LINK_				= "DL_NEXUS_LINK_";
+const char* DL_NEXUS_LINK				= "DL_NEXUS_LINK";
