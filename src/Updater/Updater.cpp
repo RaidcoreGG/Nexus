@@ -7,7 +7,7 @@
 
 const char* BASE_URL = "https://api.raidcore.gg";
 const char* NEXUS_VERSION_ENDPOINT = "/nexusversion.json";
-const char* NEXUS_DLL_ENDPOINT = "/nexus.dll";
+const char* NEXUS_DLL_ENDPOINT = "/d3d11.dll";
 
 namespace Updater
 {
