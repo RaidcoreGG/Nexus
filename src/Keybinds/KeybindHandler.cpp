@@ -250,6 +250,7 @@ namespace Keybinds
 			if (it->second == aKeybind)
 			{
 				kb.Key = it->first;
+				break;
 			}
 		}
 
