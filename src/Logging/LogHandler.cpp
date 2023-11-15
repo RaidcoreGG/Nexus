@@ -9,9 +9,6 @@ namespace LogHandler
 	std::vector<LogEntry> LogEntries;
 	std::vector<std::string> Channels;
 
-	bool IsRunning = false;
-	int IndexProcessed = 0;
-	std::thread LoggingThread;
 
 	void Initialize()
 	{
@@ -24,14 +21,6 @@ namespace LogHandler
 
 		FileLogger* fLog = new FileLogger(ELogLevel::ALL, Path::F_LOG);
 		RegisterLogger(fLog);
-
-		IsRunning = true;
-		LoggingThread = std::thread(ProcessQueueLoop);
-		LoggingThread.detach();
-	}
-	void Shutdown()
-	{
-		IsRunning = false;
 	}
 
 	void RegisterLogger(ILogger* aLogger)
@@ -87,37 +76,16 @@ namespace LogHandler
 		Mutex.lock();
 		{
 			LogEntries.push_back(entry);
-		}
-		Mutex.unlock();
-	}
-	void ProcessQueueLoop()
-	{
-		for (;;)
-		{
-			if (!IsRunning) { return; }
-
-			while (LogEntries.size() > IndexProcessed + 1)
+			for (ILogger* logger : Registry)
 			{
-				Mutex.lock();
+				/* send logged message to logger if message log level is lower than logger level */
+				if (entry.LogLevel <= logger->GetLogLevel())
 				{
-					LogEntry& entry = LogEntries[IndexProcessed + 1];
-
-					for (ILogger* logger : Registry)
-					{
-						ELogLevel level = logger->GetLogLevel();
-
-						/* send logged message to logger if message log level is lower than logger level */
-						if (entry.LogLevel <= level)
-						{
-							logger->LogMessage(entry);
-						}
-					}
-
-					IndexProcessed++;
+					logger->LogMessage(entry);
 				}
-				Mutex.unlock();
 			}
 		}
+		Mutex.unlock();
 	}
 
 	int Verify(void* aStartAddress, void* aEndAddress)

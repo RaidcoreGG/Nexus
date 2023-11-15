@@ -25,12 +25,7 @@ namespace LogHandler
 	extern std::vector<LogEntry> LogEntries;
 	extern std::vector<std::string> Channels;
 
-	extern bool IsRunning;
-	extern int IndexProcessed;
-	extern std::thread LoggingThread;
-
 	void Initialize();
-	void Shutdown();
 
 	void RegisterLogger(ILogger* aLogger);
 	void UnregisterLogger(ILogger* aLogger);

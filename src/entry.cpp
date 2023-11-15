@@ -110,8 +110,6 @@ void Shutdown()
 		//API::Save();
 
 		MH_Uninitialize();
-
-		LogHandler::Shutdown();
 	}
 
 	// free libs
