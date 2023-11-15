@@ -132,8 +132,11 @@ namespace Loader
 		strcpy((char*)defs->Author, tmpDefs->Author);
 		defs->Description = new char[strlen(tmpDefs->Description) + 1];
 		strcpy((char*)defs->Description, tmpDefs->Description);
-		defs->UpdateLink = new char[strlen(tmpDefs->UpdateLink) + 1];
-		strcpy((char*)defs->UpdateLink, tmpDefs->UpdateLink);
+		if (tmpDefs->UpdateLink)
+		{
+			defs->UpdateLink = new char[strlen(tmpDefs->UpdateLink) + 1];
+			strcpy((char*)defs->UpdateLink, tmpDefs->UpdateLink);
+		}
 
 		/* doesn't full fill min reqs */
 		if (hMod && !defs->HasMinimumRequirements())
@@ -176,7 +179,10 @@ namespace Loader
 				delete[] addon->Definitions->Name;
 				delete[] addon->Definitions->Author;
 				delete[] addon->Definitions->Description;
-				delete[] addon->Definitions->UpdateLink;
+				if (addon->Definitions->UpdateLink)
+				{
+					delete[] addon->Definitions->UpdateLink;
+				}
 				delete addon->Definitions;
 			}
 
