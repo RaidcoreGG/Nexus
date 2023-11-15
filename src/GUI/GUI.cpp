@@ -190,7 +190,7 @@ namespace GUI
 			ImGui::NewFrame();
 			/* new frame end */
 
-#define WATERMARK
+//#define WATERMARK
 #ifdef WATERMARK
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 			ImGui::SetNextWindowPos(ImVec2(16.0f, Renderer::Height != 0 ? Renderer::Height - ImGui::GetTextLineHeight() - 16.0f : 0));
