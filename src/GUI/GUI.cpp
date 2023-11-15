@@ -481,15 +481,57 @@ namespace GUI
 				LastScaling = Settings::Settings[OPT_LASTUISCALE].get<float>();
 				Renderer::Scaling = Settings::Settings[OPT_LASTUISCALE].get<float>();
 			}
+			else
+			{
+				LastScaling = SC_NORMAL;
+				Renderer::Scaling = SC_NORMAL;
+				Settings::Settings[OPT_LASTUISCALE] = SC_NORMAL;
+			}
 
-			if (!Settings::Settings[OPT_QAVERTICAL].is_null()) { QuickAccess::VerticalLayout = Settings::Settings[OPT_QAVERTICAL].get<bool>(); }
-			if (!Settings::Settings[OPT_QALOCATION].is_null()) { QuickAccess::Location = (EQAPosition)Settings::Settings[OPT_QALOCATION].get<int>(); }
+			if (!Settings::Settings[OPT_QAVERTICAL].is_null())
+			{
+				QuickAccess::VerticalLayout = Settings::Settings[OPT_QAVERTICAL].get<bool>();
+			}
+			else
+			{
+				QuickAccess::VerticalLayout = false;
+				Settings::Settings[OPT_QAVERTICAL] = false;
+			}
+
+			if (!Settings::Settings[OPT_QALOCATION].is_null())
+			{
+				QuickAccess::Location = (EQAPosition)Settings::Settings[OPT_QALOCATION].get<int>();
+			}
+			else
+			{
+				QuickAccess::Location = EQAPosition::Extend;
+				Settings::Settings[OPT_QALOCATION] = 0;
+			}
+
 			if (!Settings::Settings[OPT_QAOFFSETX].is_null() && !Settings::Settings[OPT_QAOFFSETY].is_null())
 			{
 				QuickAccess::Offset = ImVec2(Settings::Settings[OPT_QAOFFSETX].get<float>(), Settings::Settings[OPT_QAOFFSETY].get<float>());
 			}
+			else
+			{
+				QuickAccess::Offset = ImVec2(0.0f, 0.0f);
+				Settings::Settings[OPT_QAOFFSETX] = 0.0f;
+				Settings::Settings[OPT_QAOFFSETY] = 0.0f;
+			}
 
-			if (!Settings::Settings[OPT_CLOSEMENU].is_null()) { CloseMenuAfterSelecting = Settings::Settings[OPT_CLOSEMENU].get<bool>(); }
+			if (!Settings::Settings[OPT_CLOSEMENU].is_null())
+			{
+				CloseMenuAfterSelecting = Settings::Settings[OPT_CLOSEMENU].get<bool>();
+			}
+			else
+			{
+				CloseMenuAfterSelecting = true;
+				Settings::Settings[OPT_CLOSEMENU] = true;
+			}
+		}
+		else
+		{
+			LogDebug("meme", "settings initially null");
 		}
 
 		IsSetup = true;

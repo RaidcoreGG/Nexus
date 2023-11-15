@@ -71,7 +71,15 @@ void Initialize()
 		Keybinds::Load();
 		Settings::Load();
 
-		if (!Settings::Settings[OPT_DEVMODE].is_null()) { State::IsDeveloperMode = Settings::Settings[OPT_DEVMODE].get<bool>(); }
+		if (!Settings::Settings[OPT_DEVMODE].is_null())
+		{
+			State::IsDeveloperMode = Settings::Settings[OPT_DEVMODE].get<bool>();
+		}
+		else
+		{
+			State::IsDeveloperMode = false;
+			Settings::Settings[OPT_DEVMODE] = false;
+		}
 		//API::Initialize();
 
 		Mumble::Initialize();
