@@ -93,5 +93,10 @@ namespace Updater
 				}
 			}
 		}
+
+		if (std::filesystem::exists(Path::F_UPDATE_DLL))
+		{
+			std::filesystem::remove(Path::F_UPDATE_DLL);
+		}
 	}
 }

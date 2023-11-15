@@ -52,6 +52,10 @@ namespace State
 			if ((subpos = cmp.find("mumble ")) != std::string::npos)
 			{
 				subtoken = token.substr(7, token.length() - subpos);
+				if (std::regex_match(subtoken, std::regex("\"(.*?)\"")))
+				{
+					subtoken = subtoken.substr(1, subtoken.length() - 2);
+				}
 				//Log("dbg", "subtoken: \"%s\" @ %d", subtoken.c_str(), subpos);
 
 				customMumble = true;

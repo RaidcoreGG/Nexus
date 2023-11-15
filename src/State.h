@@ -5,6 +5,7 @@
 #include <string>
 #include <algorithm>
 #include <shellapi.h>
+#include <regex>
 
 #include "Consts.h"
 #include "Shared.h"
