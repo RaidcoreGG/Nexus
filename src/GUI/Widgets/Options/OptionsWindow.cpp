@@ -52,6 +52,15 @@ namespace GUI
 				}
 				ImGui::TooltipGeneric("Enables the Debug menu and some other features.");
 
+				ImGui::TextDisabled("Font Size");
+				if (ImGui::InputFloat("##fontsize", &GUI::FontSize, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_EnterReturnsTrue))
+				{
+					Settings::Settings[OPT_FONTSIZE] = FontSize;
+					Settings::Save();
+				}
+				ImGui::TooltipGeneric("Changing font size requires a restart.");
+
+
 				ImGui::TextDisabled("UI/UX");
 				if (ImGui::Checkbox("Close Menu after selecting item", &GUI::CloseMenuAfterSelecting))
 				{
