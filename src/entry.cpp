@@ -59,6 +59,7 @@ void Initialize()
 
 	State::Initialize();
 	Path::Initialize(NexusHandle);
+	//Paradigm::Initialize();
 
 	Updater::Initialize();
 
@@ -72,16 +73,21 @@ void Initialize()
 		Keybinds::Initialize();
 		Keybinds::Load();
 		Settings::Load();
-
-		if (!Settings::Settings[OPT_DEVMODE].is_null())
+		
+		// if it's not already been explicitly set via command line, check settings
+		if (!State::IsDeveloperMode)
 		{
-			State::IsDeveloperMode = Settings::Settings[OPT_DEVMODE].get<bool>();
+			if (!Settings::Settings[OPT_DEVMODE].is_null())
+			{
+				State::IsDeveloperMode = Settings::Settings[OPT_DEVMODE].get<bool>();
+			}
+			else
+			{
+				State::IsDeveloperMode = false;
+				Settings::Settings[OPT_DEVMODE] = false;
+			}
 		}
-		else
-		{
-			State::IsDeveloperMode = false;
-			Settings::Settings[OPT_DEVMODE] = false;
-		}
+		
 		//API::Initialize();
 
 		Mumble::Initialize();
