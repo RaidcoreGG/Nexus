@@ -7,6 +7,7 @@
 #include <shellapi.h>
 #include <regex>
 
+#include "core.h"
 #include "Consts.h"
 #include "Shared.h"
 

@@ -19,49 +19,49 @@ namespace State
 		bool first = true;
 		bool customMumble = false;
 
-		std::string cmdline = GetCommandLineA();
-		cmdline.append(" -;"); // append another space, so the last substring can be ignored
-		std::string delimiter = " -";
+		int argc;
+		LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
 
-		size_t pos = 0;
-		std::string token;
-		while ((pos = cmdline.find(delimiter)) != std::string::npos)
+		for (int i = 0; i < argc; i++)
 		{
-			token = cmdline.substr(0, pos);
+			std::wstring paramW = argv[i];
+			std::string token = WStrToStr(paramW);
+			
 			std::string cmp = token;
-			cmdline.erase(0, pos + delimiter.length());
 
 			if (first) { first = false; continue; } // skip location param
 
-			Parameters.push_back(token);
 			std::transform(cmp.begin(), cmp.end(), cmp.begin(), ::tolower);
-
-			//Log("dbg", "token: \"%s\" @ %d", token.c_str(), pos);
 
 			// token -> is the unmodified string as from the commandline
 			// cmp -> same as token, except it's been normalised (aka written in lowercase)
 
-			if (cmp == "ggdev") { IsDeveloperMode = true; }
-			if (cmp == "ggconsole") { IsConsoleEnabled = true; }
-			if (cmp == "ggvanilla") { IsVanilla = true; }
-			if (cmp == "sharearchive") { MultiboxState = MultiboxState | EMultiboxState::ARCHIVE_SHARED; }
-			if (cmp == "multi") { MultiboxState = MultiboxState | EMultiboxState::LOCAL_SHARED; }
+			if (cmp == "-ggdev") { IsDeveloperMode = true; }
+			if (cmp == "-ggconsole") { IsConsoleEnabled = true; }
+			if (cmp == "-ggvanilla") { IsVanilla = true; }
+			if (cmp == "-sharearchive") { MultiboxState = MultiboxState | EMultiboxState::ARCHIVE_SHARED; }
+			if (cmp == "-multi") { MultiboxState = MultiboxState | EMultiboxState::LOCAL_SHARED; }
 
-			size_t subpos = 0;
-			std::string subtoken;
-			if ((subpos = cmp.find("mumble ")) != std::string::npos)
+			if (cmp == "-mumble" && i + 1 <= argc)
 			{
-				subtoken = token.substr(7, token.length() - subpos);
-				if (std::regex_match(subtoken, std::regex("\"(.*?)\"")))
-				{
-					subtoken = subtoken.substr(1, subtoken.length() - 2);
-				}
-				//Log("dbg", "subtoken: \"%s\" @ %d", subtoken.c_str(), subpos);
+				std::wstring mumbleNameW = argv[i + 1];
+				std::string mumbleName = WStrToStr(mumbleNameW);
 
 				customMumble = true;
-				MumbleLink = (LinkedMem*)DataLink::ShareResource(DL_MUMBLE_LINK, sizeof(LinkedMem), subtoken.c_str());
+				MumbleLink = (LinkedMem*)DataLink::ShareResource(DL_MUMBLE_LINK, sizeof(LinkedMem), mumbleName.c_str());
+
+				token.append(" ");
+				token.append(mumbleName);
+				Parameters.push_back(token);
+				i++; // manual increment to skip
+			}
+			else
+			{
+				Parameters.push_back(token);
 			}
 		}
+
+		///////////////////////////////////
 
 		if (!customMumble)
 		{

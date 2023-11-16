@@ -21,7 +21,7 @@ namespace GUI
 			{
 				for (std::string param : Parameters)
 				{
-					ImGui::TextDisabled(("-" + param).c_str());
+					ImGui::TextDisabled(param.c_str());
 				}
 
 				ImGui::EndTooltip();
