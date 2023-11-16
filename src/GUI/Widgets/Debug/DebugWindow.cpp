@@ -262,11 +262,14 @@ namespace GUI
 										ImGui::TextDisabled("Module Size: %u", addon->ModuleSize);
 										ImGui::TextDisabled("AddonDefs: %p", addon->Definitions);
 
-										if (ImGui::SmallButton("Memory Editor"))
+										if (addon->Definitions != nullptr)
 										{
-											memEditor.Open = true;
-											memPtr = addon->Definitions;
-											memSz = sizeof(AddonDefinition);
+											if (ImGui::SmallButton("Memory Editor"))
+											{
+												memEditor.Open = true;
+												memPtr = addon->Definitions;
+												memSz = sizeof(AddonDefinition);
+											}
 										}
 
 										ImGui::TreePop();

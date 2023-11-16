@@ -31,8 +31,7 @@ bool AddonDefinition::HasMinimumRequirements()
 		Name &&
 		Author &&
 		Description &&
-		Load &&
-		(HasFlag(EAddonFlags::DisableHotloading) || Unload))
+		Load)
 	{
 		return true;
 	}
