@@ -249,18 +249,28 @@ namespace GUI
 										std::string state = "State: ";
 										switch (addon->State)
 										{
-										case EAddonState::None:	state.append("None"); break;
-										case EAddonState::Loaded:	state.append("Loaded"); break;
-										case EAddonState::NotLoaded:	state.append("NotLoaded"); break;
+										case EAddonState::None:					state.append("None"); break;
+										case EAddonState::Loaded:				state.append("Loaded"); break;
+										case EAddonState::NotLoaded:			state.append("NotLoaded"); break;
 										case EAddonState::NotLoadedDuplicate:	state.append("NotLoadedDuplicate"); break;
-										case EAddonState::Incompatible:	state.append("Incompatible"); break;
-										case EAddonState::IncompatibleAPI:	state.append("IncompatibleAPI"); break;
+										case EAddonState::Incompatible:			state.append("Incompatible"); break;
+										case EAddonState::IncompatibleAPI:		state.append("IncompatibleAPI"); break;
 										}
 
 										ImGui::TextDisabled(state.c_str());
 										ImGui::TextDisabled("Module: %p", addon->Module);
 										ImGui::TextDisabled("Module Size: %u", addon->ModuleSize);
 										ImGui::TextDisabled("AddonDefs: %p", addon->Definitions);
+
+										if (addon->Definitions != nullptr)
+										{
+											if (ImGui::SmallButton("Memory Editor"))
+											{
+												memEditor.Open = true;
+												memPtr = addon->Definitions;
+												memSz = sizeof(AddonDefinition);
+											}
+										}
 
 										ImGui::TreePop();
 									}
