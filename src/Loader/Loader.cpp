@@ -124,6 +124,15 @@ namespace Loader
 		
 		/* why has god forsaken me */
 		AddonDefinition* tmpDefs = getAddonDef();
+
+		if (tmpDefs == nullptr)
+		{
+			LogDebug(CH_LOADER, "\"%s\" is Nexus-compatible but returned a nullptr. Incompatible I guess?", path);
+			addon->State = EAddonState::Incompatible;
+			FreeLibrary(hMod);
+			return;
+		}
+
 		AddonDefinition* defs = new AddonDefinition();
 		memcpy(defs, tmpDefs, sizeof(AddonDefinition));
 		defs->Name = new char[strlen(tmpDefs->Name) + 1];

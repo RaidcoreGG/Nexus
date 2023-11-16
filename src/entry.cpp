@@ -5,6 +5,8 @@
 
 #include "minhook/mh_hook.h"
 
+#include "Version.h"
+
 #include "core.h"
 #include "Paths.h"
 #include "State.h"
@@ -47,16 +49,17 @@ void Initialize()
 {
 	State::Nexus = ENexusState::LOAD;
 
-	Version->Major = __TIME_YEARS__;
-	Version->Minor = __TIME_MONTH__;
-	Version->Build = __TIME_DAYS__;
-	Version->Revision = (__TIME_HOURS__ * 60) + (__TIME_MINUTES__);
+	Version->Major = V_MAJOR;
+	Version->Minor = V_MINOR;
+	Version->Build = V_BUILD;
+	Version->Revision = V_REVISION;
 
 	LogInfo(CH_CORE, GetCommandLineA());
 	LogInfo(CH_CORE, "Version: %s", Version->ToString().c_str());
 
 	State::Initialize();
 	Path::Initialize(NexusHandle);
+	//Paradigm::Initialize();
 
 	Updater::Initialize();
 
@@ -70,16 +73,21 @@ void Initialize()
 		Keybinds::Initialize();
 		Keybinds::Load();
 		Settings::Load();
-
-		if (!Settings::Settings[OPT_DEVMODE].is_null())
+		
+		// if it's not already been explicitly set via command line, check settings
+		if (!State::IsDeveloperMode)
 		{
-			State::IsDeveloperMode = Settings::Settings[OPT_DEVMODE].get<bool>();
+			if (!Settings::Settings[OPT_DEVMODE].is_null())
+			{
+				State::IsDeveloperMode = Settings::Settings[OPT_DEVMODE].get<bool>();
+			}
+			else
+			{
+				State::IsDeveloperMode = false;
+				Settings::Settings[OPT_DEVMODE] = false;
+			}
 		}
-		else
-		{
-			State::IsDeveloperMode = false;
-			Settings::Settings[OPT_DEVMODE] = false;
-		}
+		
 		//API::Initialize();
 
 		Mumble::Initialize();

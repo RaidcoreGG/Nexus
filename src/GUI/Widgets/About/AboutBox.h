@@ -4,6 +4,7 @@
 #include "../../../Shared.h"
 #include "../../../Paths.h"
 #include "../../../State.h"
+#include "../../../Branch.h"
 
 #include "../../../imgui/imgui.h"
 #include "../../../imgui/imgui_extensions.h"

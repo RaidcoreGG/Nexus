@@ -11,7 +11,9 @@ namespace GUI
 			ImGui::TextDisabled("Version:");
 			ImGui::Text(""); ImGui::SameLine(); ImGui::Text(Version->ToString().c_str());
 #ifdef _DEBUG
-			ImGui::SameLine(); ImGui::TextDisabled("[DEBUG BUILD]");
+			ImGui::SameLine(); ImGui::TextDisabled("debug/" BRANCH_NAME);
+#else
+			ImGui::SameLine(); ImGui::TextDisabled("release/" BRANCH_NAME);
 #endif
 			ImGui::TextDisabled("Location:");
 			ImGui::Text(""); ImGui::SameLine(); ImGui::Text(Path::F_HOST_DLL);
@@ -19,7 +21,7 @@ namespace GUI
 			{
 				for (std::string param : Parameters)
 				{
-					ImGui::TextDisabled(("-" + param).c_str());
+					ImGui::TextDisabled(param.c_str());
 				}
 
 				ImGui::EndTooltip();
