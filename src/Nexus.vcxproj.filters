@@ -962,6 +962,9 @@
     <ClInclude Include="Updater\Updater.h">
       <Filter>Updater</Filter>
     </ClInclude>
+    <ClInclude Include="Version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Nexus.rc">

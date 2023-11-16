@@ -5,6 +5,8 @@
 
 #include "minhook/mh_hook.h"
 
+#include "Version.h"
+
 #include "core.h"
 #include "Paths.h"
 #include "State.h"
@@ -47,10 +49,10 @@ void Initialize()
 {
 	State::Nexus = ENexusState::LOAD;
 
-	Version->Major = __TIME_YEARS__;
-	Version->Minor = __TIME_MONTH__;
-	Version->Build = __TIME_DAYS__;
-	Version->Revision = (__TIME_HOURS__ * 60) + (__TIME_MINUTES__);
+	Version->Major = V_MAJOR;
+	Version->Minor = V_MINOR;
+	Version->Build = V_BUILD;
+	Version->Revision = V_REVISION;
 
 	LogInfo(CH_CORE, GetCommandLineA());
 	LogInfo(CH_CORE, "Version: %s", Version->ToString().c_str());

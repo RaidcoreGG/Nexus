@@ -1,6 +1,9 @@
 // Microsoft Visual C++ generated resource script.
 //
+#include "Version.h"
 #include "resource.h"
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -51,8 +54,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION V_MAJOR,V_MINOR,V_BUILD,V_REVISION
+ PRODUCTVERSION V_MAJOR,V_MINOR,V_BUILD,V_REVISION
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -69,11 +72,11 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Raidcore"
             VALUE "FileDescription", "Unofficial Guild Wars 2 Addon Host"
-            VALUE "FileVersion", "1.0.0.1"
+            VALUE "FileVersion", TOSTRING(V_MAJOR) "." TOSTRING(V_MINOR) "." TOSTRING(V_BUILD) "." TOSTRING(V_REVISION)
             VALUE "InternalName", "nexus.dll"
             VALUE "LegalCopyright", "© 2023 Raidcore"
             VALUE "ProductName", "Nexus"
-            VALUE "ProductVersion", "1.0.0.1"
+            VALUE "ProductVersion", TOSTRING(V_MAJOR) "." TOSTRING(V_MINOR) "." TOSTRING(V_BUILD) "." TOSTRING(V_REVISION)
         END
     END
     BLOCK "VarFileInfo"
