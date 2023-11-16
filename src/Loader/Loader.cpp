@@ -150,7 +150,7 @@ namespace Loader
 		/* doesn't full fill min reqs */
 		if (hMod && !defs->HasMinimumRequirements())
 		{
-			LogWarning(CH_LOADER, "\"%s\" does not fulfill minimum requirements. At least define Name, Version, Author, Description as well as Load and Unload functions. Incompatible.", path);
+			LogWarning(CH_LOADER, "\"%s\" does not fulfill minimum requirements. At least define Name, Version, Author, Description as well as the Load function. Incompatible.", path);
 			addon->State = EAddonState::Incompatible;
 			FreeLibrary(hMod);
 			return;
@@ -162,7 +162,7 @@ namespace Loader
 			// if defs defined && not the same path && signature the same though
 			if (it.second->Definitions != nullptr && it.first != aPath && it.second->Definitions->Signature == defs->Signature)
 			{
-				LogWarning(CH_LOADER, "\"%s\" or another addon with sig%d is already loaded. Added to blacklist.", path, defs->Signature);
+				LogWarning(CH_LOADER, "\"%s\" or another addon with this signature (%d) is already loaded. Added to blacklist.", path, defs->Signature);
 				addon->State = EAddonState::NotLoadedDuplicate;
 				FreeLibrary(hMod);
 				return;

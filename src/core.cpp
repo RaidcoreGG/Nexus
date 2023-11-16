@@ -25,7 +25,7 @@ bool FindFunction(HMODULE aModule, LPVOID aFunction, LPCSTR aName)
 {
 	FARPROC* fp = (FARPROC*)aFunction;
 	*fp = aModule ? GetProcAddress(aModule, aName) : 0;
-	return (fp != 0);
+	return (*fp != 0);
 }
 
 std::string WStrToStr(std::wstring& aWstring)

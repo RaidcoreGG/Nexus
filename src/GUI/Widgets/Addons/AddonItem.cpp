@@ -5,7 +5,8 @@ namespace GUI
 	void AddonItem(Addon* aAddon)
 	{
 		if (aAddon->State == EAddonState::NotLoadedDuplicate ||
-			aAddon->State == EAddonState::Incompatible)
+			aAddon->State == EAddonState::Incompatible ||
+			aAddon->Definitions == nullptr)
 		{
 			return;
 		}
@@ -34,7 +35,8 @@ namespace GUI
 			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetColumnWidth() - 120.0f);
 			{
 				ImGui::BeginGroup();
-				if (aAddon->State == EAddonState::Loaded)
+				if (aAddon->State == EAddonState::Loaded &&
+					!(aAddon->Definitions->Unload == nullptr || aAddon->Definitions->HasFlag(EAddonFlags::DisableHotloading)))
 				{
 					if (ImGui::Button(("Disable##" + sig).c_str(), ImVec2(120.0f, 24.0f)))
 					{
@@ -62,14 +64,17 @@ namespace GUI
 						}
 					}
 				}
-				if (ImGui::Button(("Uninstall##" + sig).c_str(), ImVec2(120.0f, 24.0f)))
+				if (!(aAddon->Definitions->Unload == nullptr || aAddon->Definitions->HasFlag(EAddonFlags::DisableHotloading)))
 				{
-					for (auto& it : Loader::Addons)
+					if (ImGui::Button(("Uninstall##" + sig).c_str(), ImVec2(120.0f, 24.0f)))
 					{
-						if (it.second->Definitions == aAddon->Definitions)
+						for (auto& it : Loader::Addons)
 						{
-							LogDebug(CH_GUI, "Uninstall called: %s", it.second->Definitions->Name);
-							Loader::QueueAddon(ELoaderAction::Uninstall, it.first);
+							if (it.second->Definitions == aAddon->Definitions)
+							{
+								LogDebug(CH_GUI, "Uninstall called: %s", it.second->Definitions->Name);
+								Loader::QueueAddon(ELoaderAction::Uninstall, it.first);
+							}
 						}
 					}
 				}
