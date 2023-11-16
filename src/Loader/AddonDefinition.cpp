@@ -14,7 +14,15 @@ bool operator>(AddonVersion lhs, AddonVersion rhs)
 }
 bool operator<(AddonVersion lhs, AddonVersion rhs)
 {
-	return !(lhs > rhs);
+	if ((lhs.Major < rhs.Major) ||
+		(lhs.Major == rhs.Major && lhs.Minor < rhs.Minor) ||
+		(lhs.Major == rhs.Major && lhs.Minor == rhs.Minor && lhs.Build < rhs.Build) ||
+		(lhs.Major == rhs.Major && lhs.Minor == rhs.Minor && lhs.Build == rhs.Build && lhs.Revision < rhs.Revision))
+	{
+		return true;
+	}
+
+	return false;
 }
 
 bool AddonDefinition::HasMinimumRequirements()
