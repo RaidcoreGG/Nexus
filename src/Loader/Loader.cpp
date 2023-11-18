@@ -133,22 +133,8 @@ namespace Loader
 			return;
 		}
 
-		AddonDefinition* defs = new AddonDefinition();
-		memcpy(defs, tmpDefs, sizeof(AddonDefinition));
-		defs->Name = new char[strlen(tmpDefs->Name) + 1];
-		strcpy((char*)defs->Name, tmpDefs->Name);
-		defs->Author = new char[strlen(tmpDefs->Author) + 1];
-		strcpy((char*)defs->Author, tmpDefs->Author);
-		defs->Description = new char[strlen(tmpDefs->Description) + 1];
-		strcpy((char*)defs->Description, tmpDefs->Description);
-		if (tmpDefs->UpdateLink)
-		{
-			defs->UpdateLink = new char[strlen(tmpDefs->UpdateLink) + 1];
-			strcpy((char*)defs->UpdateLink, tmpDefs->UpdateLink);
-		}
-
 		/* doesn't full fill min reqs */
-		if (hMod && !defs->HasMinimumRequirements())
+		if (hMod && !tmpDefs->HasMinimumRequirements())
 		{
 			LogWarning(CH_LOADER, "\"%s\" does not fulfill minimum requirements. At least define Name, Version, Author, Description as well as the Load function. Incompatible.", path);
 			addon->State = EAddonState::Incompatible;
@@ -160,9 +146,9 @@ namespace Loader
 		for (auto& it : Addons)
 		{
 			// if defs defined && not the same path && signature the same though
-			if (it.second->Definitions != nullptr && it.first != aPath && it.second->Definitions->Signature == defs->Signature)
+			if (it.second->Definitions != nullptr && it.first != aPath && it.second->Definitions->Signature == tmpDefs->Signature)
 			{
-				LogWarning(CH_LOADER, "\"%s\" or another addon with this signature (%d) is already loaded. Added to blacklist.", path, defs->Signature);
+				LogWarning(CH_LOADER, "\"%s\" or another addon with this signature (%d) is already loaded. Added to blacklist.", path, tmpDefs->Signature);
 				addon->State = EAddonState::NotLoadedDuplicate;
 				FreeLibrary(hMod);
 				return;
@@ -172,45 +158,48 @@ namespace Loader
 		MODULEINFO moduleInfo;
 		GetModuleInformation(GetCurrentProcess(), hMod, &moduleInfo, sizeof(moduleInfo));
 
-		AddonAPI* api = GetAddonAPI(defs->APIVersion); // will be nullptr if doesn't exist or APIVersion = 0
+		AddonAPI* api = GetAddonAPI(tmpDefs->APIVersion); // will be nullptr if doesn't exist or APIVersion = 0
+
+		// Free the old stuff
+		if (addon->Definitions != nullptr) {
+			delete[] addon->Definitions->Name;
+			delete[] addon->Definitions->Author;
+			delete[] addon->Definitions->Description;
+			delete[] addon->Definitions->UpdateLink;
+			delete addon->Definitions;
+			addon->Definitions = nullptr;
+		}
+
+		// Allocate new memory and copy data
+		addon->Definitions = new AddonDefinition(*tmpDefs);
+
+		// Allocate and copy strings, considering possible null pointers
+		addon->Definitions->Name = _strdup(tmpDefs->Name);
+		addon->Definitions->Author = _strdup(tmpDefs->Author);
+		addon->Definitions->Description = _strdup(tmpDefs->Description);
+		addon->Definitions->UpdateLink = (tmpDefs->UpdateLink) ? _strdup(tmpDefs->UpdateLink) : nullptr;
 
 		// if no addon api was requested or if the requested addon api exists
 		// else invalid addon, don't load
-		if (defs->APIVersion == 0 || api != nullptr)
+		if (addon->Definitions->APIVersion == 0 || api != nullptr)
 		{
 			addon->Module = hMod;
 			addon->ModuleSize = moduleInfo.SizeOfImage;
 
-			// free the old stuff
-			if (addon->Definitions != nullptr)
+			if (addon->Definitions->APIVersion == 0)
 			{
-				// is this necessary?
-				delete[] addon->Definitions->Name;
-				delete[] addon->Definitions->Author;
-				delete[] addon->Definitions->Description;
-				if (addon->Definitions->UpdateLink)
-				{
-					delete[] addon->Definitions->UpdateLink;
-				}
-				delete addon->Definitions;
-			}
-
-			addon->Definitions = defs;
-
-			if (defs->APIVersion == 0)
-			{
-				LogInfo(CH_LOADER, "Loaded addon: %s [%p - %p] (No API was requested.)", path, hMod, ((PBYTE)hMod) + moduleInfo.SizeOfImage);
+				LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (No API was requested.)", path, addon->Definitions->Signature, hMod, ((PBYTE)hMod) + moduleInfo.SizeOfImage);
 			}
 			else
 			{
-				LogInfo(CH_LOADER, "Loaded addon: %s [%p - %p] (API Version %d was requested.)", path, hMod, ((PBYTE)hMod) + moduleInfo.SizeOfImage, defs->APIVersion);
+				LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.)", path, addon->Definitions->Signature, hMod, ((PBYTE)hMod) + moduleInfo.SizeOfImage, addon->Definitions->APIVersion);
 			}
 			addon->Definitions->Load(api);
 			addon->State = EAddonState::Loaded;
 		}
 		else
 		{
-			LogWarning(CH_LOADER, "Loading was cancelled because \"%s\" requested an API of version %d and no such version exists. Added to blacklist.", path, defs->APIVersion);
+			LogWarning(CH_LOADER, "Loading was cancelled because \"%s\" requested an API of version %d and no such version exists. Added to blacklist.", path, addon->Definitions->APIVersion);
 			addon->State = EAddonState::IncompatibleAPI;
 			FreeLibrary(hMod);
 		}
