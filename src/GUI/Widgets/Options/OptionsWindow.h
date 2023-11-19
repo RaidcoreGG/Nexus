@@ -23,7 +23,8 @@ namespace GUI
 	class OptionsWindow : public IWindow
 	{
 		public:
-		void Render();
+			OptionsWindow(std::string aName);
+			void Render();
 	};
 }
 

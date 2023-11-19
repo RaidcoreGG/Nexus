@@ -23,7 +23,7 @@ namespace GUI
 	class DebugWindow : public IWindow
 	{
 		public:
-		DebugWindow();
+		DebugWindow(std::string aName);
 		~DebugWindow() = default;
 
 		void Render();

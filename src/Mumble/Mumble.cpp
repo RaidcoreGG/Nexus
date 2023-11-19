@@ -87,7 +87,7 @@ namespace Mumble
 				prevCamFront = MumbleLink->CameraFront;
 			}
 
-			Sleep(50);
+			Sleep(100);
 		}
 	}
 

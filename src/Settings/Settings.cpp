@@ -2,6 +2,7 @@
 
 const char* OPT_DEVMODE		= "DevMode";
 const char* OPT_CLOSEMENU	= "CloseMenuAfterSelecting";
+const char* OPT_CLOSEESCAPE	= "CloseOnEscape";
 const char* OPT_LASTUISCALE	= "LastUIScale";
 const char* OPT_FONTSIZE	= "FontSize";
 const char* OPT_QAVERTICAL	= "QAVertical";

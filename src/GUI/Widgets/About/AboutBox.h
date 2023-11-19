@@ -16,6 +16,7 @@ namespace GUI
 	class AboutBox : public IWindow
 	{
 	public:
+		AboutBox(std::string aName);
 		void Render();
 	};
 }

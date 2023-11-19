@@ -18,6 +18,7 @@ namespace GUI
 	class AddonsWindow : public IWindow
 	{
 	public:
+		AddonsWindow(std::string aName);
 		void Render();
 	};
 }

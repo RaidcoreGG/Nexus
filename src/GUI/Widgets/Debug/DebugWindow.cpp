@@ -6,8 +6,9 @@ namespace GUI
 	void* memPtr = nullptr;
 	size_t memSz = 0;
 
-	DebugWindow::DebugWindow()
+	DebugWindow::DebugWindow(std::string aName)
 	{
+		Name = aName;
 		MumbleWindow = new MumbleOverlay();
 	}
 
@@ -20,7 +21,7 @@ namespace GUI
 		if (!Visible) { return; }
 
 		ImGui::SetNextWindowSize(ImVec2(480.0f, 380.0f));
-		if (ImGui::Begin("Debug", &Visible, WindowFlags_Default))
+		if (ImGui::Begin(Name.c_str(), &Visible, WindowFlags_Default))
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f });
 			ImGui::Checkbox("Show Mumble overlay", &MumbleWindow->Visible);

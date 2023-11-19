@@ -2,12 +2,17 @@
 
 namespace GUI
 {
+	AddonsWindow::AddonsWindow(std::string aName)
+	{
+		Name = aName;
+	}
+
 	void AddonsWindow::Render()
 	{
 		if (!Visible) { return; }
 
 		ImGui::SetNextWindowSize(ImVec2(480.0f, 380.0f));
-		if (ImGui::Begin("Addons", &Visible, WindowFlags_Default))
+		if (ImGui::Begin(Name.c_str(), &Visible, WindowFlags_Default))
 		{
 			if (ImGui::BeginTabBar("AddonTabBar", ImGuiTabBarFlags_None))
 			{

@@ -2,11 +2,16 @@
 
 namespace GUI
 {
+	AboutBox::AboutBox(std::string aName)
+	{
+		Name = aName;
+	}
+
 	void AboutBox::Render()
 	{
 		if (!Visible) { return; }
 
-		if (ImGui::Begin("About", &Visible, WindowFlags_Default))
+		if (ImGui::Begin(Name.c_str(), &Visible, WindowFlags_Default))
 		{
 			ImGui::TextDisabled("Version:");
 			ImGui::Text(""); ImGui::SameLine(); ImGui::Text(Version->ToString().c_str());

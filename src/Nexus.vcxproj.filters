@@ -186,7 +186,7 @@
     <ClCompile Include="Keybinds\Keybind.cpp">
       <Filter>Keybinds</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\GUI.cpp">
+	<ClCompile Include="GUI\GUI.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
     <ClCompile Include="GUI\Widgets\About\AboutBox.cpp">
@@ -260,6 +260,9 @@
     </ClCompile>
     <ClCompile Include="Updater\Updater.cpp">
       <Filter>Updater</Filter>
+    </ClCompile>
+    <ClCompile Include="CrashHandler.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -963,6 +966,9 @@
       <Filter>Updater</Filter>
     </ClInclude>
     <ClInclude Include="Version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CrashHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

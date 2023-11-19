@@ -7,6 +7,8 @@
 
 #include "Version.h"
 
+#include "CrashHandler.h"
+
 #include "core.h"
 #include "Paths.h"
 #include "State.h"
@@ -16,7 +18,6 @@
 #include "Consts.h"
 
 #include "Logging/LogHandler.h"
-
 #include "Mumble/Mumble.h"
 #include "WndProc/WndProcHandler.h"
 #include "Keybinds/KeybindHandler.h"
@@ -505,6 +506,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	{
 	case DLL_PROCESS_ATTACH:
 		DisableThreadLibraryCalls(hModule);
+		SetUnhandledExceptionFilter(UnhandledExcHandler);
+
 		NexusHandle = hModule;
 		GameHandle = GetModuleHandle(NULL);
 

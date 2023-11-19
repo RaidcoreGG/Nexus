@@ -20,7 +20,7 @@ namespace GUI
 	class LogWindow : public IWindow, public virtual ILogger
 	{
 	public:
-		LogWindow(ELogLevel aLogLevel);
+		LogWindow(std::string aName, ELogLevel aLogLevel);
 
 		void Render();
 		void LogMessage(LogEntry aLogEntry);

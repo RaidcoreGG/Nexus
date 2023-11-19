@@ -10,8 +10,9 @@ namespace GUI
 	const char* filterLevels[] = { "Critical", "Warning", "Info", "Debug", "Trace", "All" };
 	size_t amtShown = 0;
 
-	LogWindow::LogWindow(ELogLevel aLogLevel)
+	LogWindow::LogWindow(std::string aName, ELogLevel aLogLevel)
 	{
+		Name = aName;
 		LogLevel = aLogLevel;
 	}
 
@@ -26,7 +27,7 @@ namespace GUI
 		}
 
 		ImGui::SetNextWindowSize(ImVec2(600.0f, 380.0f));
-		if (ImGui::Begin("Log", &Visible, WindowFlags_Default))
+		if (ImGui::Begin(Name.c_str(), &Visible, WindowFlags_Default))
 		{
 			static int selectedLevel = (int)(ELogLevel::ALL)-1;
 			ImGui::Text("Filter: "); ImGui::SameLine();

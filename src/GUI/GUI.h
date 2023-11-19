@@ -46,6 +46,7 @@ namespace GUI
 	extern std::map<EFont, ImFont*>		FontIndex;
 	extern float						FontSize;
 	extern bool							CloseMenuAfterSelecting;
+	extern bool							CloseOnEscape;
 
 	extern bool							IsUIVisible;
 

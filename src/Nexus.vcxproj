@@ -15,6 +15,7 @@
     <ClCompile Include="API\APIController.cpp" />
     <ClCompile Include="Consts.cpp" />
     <ClCompile Include="core.cpp" />
+    <ClCompile Include="CrashHandler.cpp" />
     <ClCompile Include="DataLink\DataLink.cpp" />
     <ClCompile Include="entry.cpp" />
     <ClCompile Include="Events\EventHandler.cpp" />
@@ -69,6 +70,7 @@
     <ClInclude Include="Branch.h" />
     <ClInclude Include="Consts.h" />
     <ClInclude Include="core.h" />
+    <ClInclude Include="CrashHandler.h" />
     <ClInclude Include="DataLink\DataLink.h" />
     <ClInclude Include="DataLink\FuncDefs.h" />
     <ClInclude Include="DataLink\LinkedResource.h" />

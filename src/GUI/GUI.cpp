@@ -15,6 +15,7 @@ namespace GUI
 	std::map<EFont, ImFont*>	FontIndex;
 	float						FontSize;
 	bool						CloseMenuAfterSelecting;
+	bool						CloseOnEscape;
 
 	bool						IsUIVisible			= true;
 
@@ -57,6 +58,32 @@ namespace GUI
 		if (State::IsImGuiInitialized)
 		{
 			ImGuiIO& io = ImGui::GetIO();
+
+			if (CloseOnEscape)
+			{
+				if (uMsg == WM_KEYDOWN && wParam == VK_ESCAPE)
+				{
+					ImVector<ImGuiWindow*> windows = Renderer::GuiContext->Windows;
+
+					for (size_t i = windows.Size - 1; i > 0; i--)
+					{
+						if (strcmp(windows[i]->Name, "Menu") == 0 && Menu::Visible)
+						{
+							Menu::Visible = false;
+							return 0;
+						}
+
+						for (IWindow* wnd : Windows)
+						{
+							if (wnd->Name == windows[i]->Name && wnd->Visible)
+							{
+								wnd->Visible = false;
+								return 0;
+							}
+						}
+					}
+				}
+			}
 
 			switch (uMsg)
 			{
@@ -414,12 +441,12 @@ namespace GUI
 		Events::Subscribe(EV_MUMBLE_IDENTITY_UPDATED, OnMumbleIdentityChanged);
 
 		/* set up and add windows */
-		AddonsWindow* addonsWnd = new AddonsWindow();
-		LogWindow* logWnd = new LogWindow(ELogLevel::ALL);
+		AddonsWindow* addonsWnd = new AddonsWindow("Addons");
+		LogWindow* logWnd = new LogWindow("Log", ELogLevel::ALL);
 		RegisterLogger(logWnd);
-		OptionsWindow* opsWnd = new OptionsWindow();
-		DebugWindow* dbgWnd = new DebugWindow();
-		AboutBox* aboutWnd = new AboutBox();
+		OptionsWindow* opsWnd = new OptionsWindow("Options");
+		DebugWindow* dbgWnd = new DebugWindow("Debug");
+		AboutBox* aboutWnd = new AboutBox("About");
 
 		AddWindow(addonsWnd);
 		AddWindow(opsWnd);
@@ -504,6 +531,16 @@ namespace GUI
 			{
 				CloseMenuAfterSelecting = true;
 				Settings::Settings[OPT_CLOSEMENU] = true;
+			}
+
+			if (!Settings::Settings[OPT_CLOSEESCAPE].is_null())
+			{
+				CloseOnEscape = Settings::Settings[OPT_CLOSEESCAPE].get<bool>();
+			}
+			else
+			{
+				CloseOnEscape = true;
+				Settings::Settings[OPT_CLOSEESCAPE] = true;
 			}
 		}
 		else

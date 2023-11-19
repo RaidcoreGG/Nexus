@@ -16,12 +16,17 @@ namespace GUI
 	void KeybindsTab();
 	void APITab();
 
+	OptionsWindow::OptionsWindow(std::string aName)
+	{
+		Name = aName;
+	}
+
 	void OptionsWindow::Render()
 	{
 		if (!Visible) { return; }
 
 		ImGui::SetNextWindowSize(ImVec2(480.0f, 380.0f));
-		if (ImGui::Begin("Options", &Visible, WindowFlags_Default))
+		if (ImGui::Begin(Name.c_str(), &Visible, WindowFlags_Default))
 		{
 			if (ImGui::BeginTabBar("OptionsTabBar", ImGuiTabBarFlags_None))
 			{
@@ -65,6 +70,11 @@ namespace GUI
 				if (ImGui::Checkbox("Close Menu after selecting item", &GUI::CloseMenuAfterSelecting))
 				{
 					Settings::Settings[OPT_CLOSEMENU] = GUI::CloseMenuAfterSelecting;
+					Settings::Save();
+				}
+				if (ImGui::Checkbox("Closing Windows with Escape", &GUI::CloseOnEscape))
+				{
+					Settings::Settings[OPT_CLOSEESCAPE] = GUI::CloseOnEscape;
 					Settings::Save();
 				}
 
