@@ -2,6 +2,9 @@
 
 namespace GUI
 {
+	float lwWidth = 38.0f;
+	float lwHeight = 24.0f;
+
 	bool SelectedOnly = false;
 	std::string ChannelFilter;
 
@@ -26,7 +29,7 @@ namespace GUI
 			off2 = ImGui::CalcTextSize("XXXXXXXXXXX").x;
 		}
 
-		ImGui::SetNextWindowSize(ImVec2(600.0f, 380.0f));
+		ImGui::SetNextWindowSize(ImVec2(lwWidth * ImGui::GetFontSize(), lwHeight * ImGui::GetFontSize()));
 		if (ImGui::Begin(Name.c_str(), &Visible, WindowFlags_Default))
 		{
 			static int selectedLevel = (int)(ELogLevel::ALL)-1;

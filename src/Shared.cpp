@@ -20,7 +20,9 @@ ImFont*						Font				= nullptr;
 ImFont*						FontBig				= nullptr;
 ImFont*						FontUI				= nullptr;
 
-ImGuiWindowFlags			WindowFlags_Default =	ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse;
+ImGuiWindowFlags			WindowFlags_Default =	ImGuiWindowFlags_AlwaysAutoResize |
+													ImGuiWindowFlags_NoResize |
+													ImGuiWindowFlags_NoCollapse;
 ImGuiWindowFlags			WindowFlags_Overlay =	ImGuiWindowFlags_NoDecoration |
 													ImGuiWindowFlags_AlwaysAutoResize |
 													ImGuiWindowFlags_NoSavedSettings |

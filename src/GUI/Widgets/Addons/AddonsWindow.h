@@ -1,6 +1,9 @@
 #ifndef GUI_ADDONSWINDOW_H
 #define GUI_ADDONSWINDOW_H
 
+#include <Windows.h>
+#include <shellapi.h>
+
 #include "../../../Shared.h"
 #include "../../../Paths.h"
 #include "../../../State.h"

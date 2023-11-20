@@ -2,6 +2,9 @@
 
 namespace GUI
 {
+	float awWidth = 30.0f;
+	float awHeight = 24.0f;
+
 	AddonsWindow::AddonsWindow(std::string aName)
 	{
 		Name = aName;
@@ -11,15 +14,18 @@ namespace GUI
 	{
 		if (!Visible) { return; }
 
-		ImGui::SetNextWindowSize(ImVec2(480.0f, 380.0f));
+		ImGui::SetNextWindowSize(ImVec2(awWidth * ImGui::GetFontSize(), awHeight * ImGui::GetFontSize()));
 		if (ImGui::Begin(Name.c_str(), &Visible, WindowFlags_Default))
 		{
+			float width = 7.5f * ImGui::GetFontSize();
+			float height = 1.5f * ImGui::GetFontSize();
+
 			if (ImGui::BeginTabBar("AddonTabBar", ImGuiTabBarFlags_None))
 			{
 				if (ImGui::BeginTabItem("Installed"))
 				{
 					{
-						ImGui::BeginChild("##AddonTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+						ImGui::BeginChild("##AddonTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), (height * 1.5) * -1));
 
 						if (Loader::Addons.size() == 0)
 						{
@@ -57,6 +63,11 @@ namespace GUI
 					ImGui::EndTabItem();
 				}
 				ImGui::EndTabBar();
+			}
+			
+			if (ImGui::Button("Open Addons Folder", ImVec2(width, height)))
+			{
+				ShellExecuteA(NULL, "explore", Path::D_GW2_ADDONS, NULL, NULL, SW_SHOW);
 			}
 		}
 		ImGui::End();

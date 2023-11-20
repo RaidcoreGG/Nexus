@@ -2,6 +2,9 @@
 
 namespace GUI
 {
+	float dwWidth = 30.0f;
+	float dwHeight = 24.0f;
+
 	static ImGui::MemoryEditor memEditor;
 	void* memPtr = nullptr;
 	size_t memSz = 0;
@@ -20,7 +23,7 @@ namespace GUI
 
 		if (!Visible) { return; }
 
-		ImGui::SetNextWindowSize(ImVec2(480.0f, 380.0f));
+		ImGui::SetNextWindowSize(ImVec2(dwWidth * ImGui::GetFontSize(), dwHeight * ImGui::GetFontSize()));
 		if (ImGui::Begin(Name.c_str(), &Visible, WindowFlags_Default))
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f });

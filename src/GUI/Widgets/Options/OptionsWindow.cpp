@@ -4,6 +4,9 @@
 
 namespace GUI
 {
+	float owWidth = 30.0f;
+	float owHeight = 24.0f;
+
 	std::string CurrentlyEditing;
 	char CurrentAPIKey[73]{};
 
@@ -25,7 +28,7 @@ namespace GUI
 	{
 		if (!Visible) { return; }
 
-		ImGui::SetNextWindowSize(ImVec2(480.0f, 380.0f));
+		ImGui::SetNextWindowSize(ImVec2(owWidth * ImGui::GetFontSize(), owHeight * ImGui::GetFontSize()));
 		if (ImGui::Begin(Name.c_str(), &Visible, WindowFlags_Default))
 		{
 			if (ImGui::BeginTabBar("OptionsTabBar", ImGuiTabBarFlags_None))
