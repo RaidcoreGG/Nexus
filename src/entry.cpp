@@ -155,7 +155,10 @@ LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 	}
 
-	if (uMsg == WM_DESTROY) { ::Shutdown(); }
+	if (uMsg == WM_DESTROY || uMsg == WM_QUIT)
+	{
+		::Shutdown();
+	}
 
 	return CallWindowProcA(Hooks::GW2_WndProc, hWnd, uMsg, wParam, lParam);
 }
@@ -514,7 +517,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		::Initialize();
 		break;
 	case DLL_PROCESS_DETACH:
-
+		::Shutdown();
 		break;
 	}
 	return true;

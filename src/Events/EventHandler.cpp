@@ -9,7 +9,7 @@ namespace Events
 	{
 		std::string str = aIdentifier;
 
-		Log(CH_EVENTS, str.c_str());
+		//Log(CH_EVENTS, str.c_str());
 
 		Events::Mutex.lock();
 		{

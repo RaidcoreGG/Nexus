@@ -321,6 +321,50 @@ namespace GUI
 		{
 			IsUIVisible = !IsUIVisible;
 		}
+		else if (KB_ADDONS)
+		{
+			for (IWindow* wnd : Windows)
+			{
+				if (wnd->Name == "Addons")
+				{
+					wnd->Visible = !wnd->Visible;
+					return;
+				}
+			}
+		}
+		else if (KB_DEBUG)
+		{
+			for (IWindow* wnd : Windows)
+			{
+				if (wnd->Name == "Debug")
+				{
+					wnd->Visible = !wnd->Visible;
+					return;
+				}
+			}
+		}
+		else if (KB_LOG)
+		{
+			for (IWindow* wnd : Windows)
+			{
+				if (wnd->Name == "Log")
+				{
+					wnd->Visible = !wnd->Visible;
+					return;
+				}
+			}
+		}
+		else if (KB_OPTIONS)
+		{
+			for (IWindow* wnd : Windows)
+			{
+				if (wnd->Name == "Options")
+				{
+					wnd->Visible = !wnd->Visible;
+					return;
+				}
+			}
+		}
 	}
 	
 	void OnMumbleIdentityChanged(void* aEventArgs)
@@ -447,6 +491,11 @@ namespace GUI
 		OptionsWindow* opsWnd = new OptionsWindow("Options");
 		DebugWindow* dbgWnd = new DebugWindow("Debug");
 		AboutBox* aboutWnd = new AboutBox("About");
+
+		Keybinds::Register(KB_ADDONS, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_LOG, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_OPTIONS, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_DEBUG, ProcessKeybind, "(null)");
 
 		AddWindow(addonsWnd);
 		AddWindow(opsWnd);

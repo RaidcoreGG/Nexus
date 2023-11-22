@@ -308,7 +308,7 @@ namespace GUI
 							ImGui::Text(identifier.c_str());
 
 							ImGui::TableSetColumnIndex(1);
-							if (ImGui::Button(keybind.Bind.ToString(true).c_str(), ImVec2(kbButtonWidth, 0.0f)))
+							if (ImGui::Button((keybind.Bind.ToString(true) + "##" + identifier).c_str(), ImVec2(kbButtonWidth, 0.0f)))
 							{
 								CurrentlyEditing = identifier;
 								ImGui::OpenPopup(("Set Keybind: " + CurrentlyEditing).c_str(), ImGuiPopupFlags_AnyPopupLevel);
