@@ -321,7 +321,7 @@ namespace GUI
 		{
 			IsUIVisible = !IsUIVisible;
 		}
-		else if (KB_ADDONS)
+		else if (str == KB_ADDONS)
 		{
 			for (IWindow* wnd : Windows)
 			{
@@ -332,7 +332,7 @@ namespace GUI
 				}
 			}
 		}
-		else if (KB_DEBUG)
+		else if (str == KB_DEBUG)
 		{
 			for (IWindow* wnd : Windows)
 			{
@@ -343,7 +343,7 @@ namespace GUI
 				}
 			}
 		}
-		else if (KB_LOG)
+		else if (str == KB_LOG)
 		{
 			for (IWindow* wnd : Windows)
 			{
@@ -354,7 +354,7 @@ namespace GUI
 				}
 			}
 		}
-		else if (KB_OPTIONS)
+		else if (str == KB_OPTIONS)
 		{
 			for (IWindow* wnd : Windows)
 			{
