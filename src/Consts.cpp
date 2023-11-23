@@ -23,6 +23,7 @@ const char* KB_ADDONS					= "KB_ADDONS";
 const char* KB_OPTIONS					= "KB_OPTIONS";
 const char* KB_LOG						= "KB_LOG";
 const char* KB_DEBUG					= "KB_DEBUG";
+const char* KB_MUMBLEOVERLAY			= "KB_MUMBLEOVERLAY";
 const char* KB_TOGGLEHIDEUI				= "KB_TOGGLEHIDEUI";
 
 /* Textures & Icons */

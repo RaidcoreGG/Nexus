@@ -28,7 +28,6 @@ namespace GUI
 
 		void Render();
 
-		private:
 		MumbleOverlay* MumbleWindow;
 	};
 }

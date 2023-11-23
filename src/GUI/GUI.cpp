@@ -365,6 +365,17 @@ namespace GUI
 				}
 			}
 		}
+		else if (str == KB_MUMBLEOVERLAY)
+		{
+			for (IWindow* wnd : Windows)
+			{
+				if (wnd->Name == "Debug")
+				{
+					((DebugWindow*)wnd)->MumbleWindow->Visible = !((DebugWindow*)wnd)->MumbleWindow->Visible;
+					return;
+				}
+			}
+		}
 	}
 	
 	void OnMumbleIdentityChanged(void* aEventArgs)
@@ -496,6 +507,7 @@ namespace GUI
 		Keybinds::Register(KB_LOG, ProcessKeybind, "(null)");
 		Keybinds::Register(KB_OPTIONS, ProcessKeybind, "(null)");
 		Keybinds::Register(KB_DEBUG, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_MUMBLEOVERLAY, ProcessKeybind, "(null)");
 
 		AddWindow(addonsWnd);
 		AddWindow(opsWnd);
