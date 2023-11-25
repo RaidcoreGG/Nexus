@@ -16,14 +16,16 @@ namespace GUI
 
 		std::string sig = std::to_string(aAddon->Definitions->Signature); // helper for unique chkbxIds
 
-		if (ImGui::BeginTable(("#AddonItem" + sig).c_str(), 2, ImGuiTableFlags_BordersOuter, ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
+		if (ImGui::BeginTable(("#AddonItem" + sig).c_str(), 1, ImGuiTableFlags_BordersOuter, ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
 		{
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
 			{
 				ImGui::BeginGroup();
 
-				ImGui::Text(aAddon->Definitions->Name); ImGui::SameLine(); ImGui::Text("by %s", aAddon->Definitions->Author);
+				ImGui::Text(aAddon->Definitions->Name); ImGui::SameLine();
+				ImGui::TextDisabled("(%s)", aAddon->Definitions->Version.ToString().c_str()); ImGui::SameLine();
+				ImGui::TextDisabled("by %s", aAddon->Definitions->Author);
 				ImGui::TextWrapped(aAddon->Definitions->Description);
 
 				if (aAddon->State == EAddonState::IncompatibleAPI)
@@ -34,13 +36,14 @@ namespace GUI
 				ImGui::EndGroup();
 			}
 
-			ImGui::TableSetColumnIndex(1);
-			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetColumnWidth() - btnWidth * ImGui::GetFontSize());
 			{
+				int amtBtns = 0;
+
 				ImGui::BeginGroup();
 				if (aAddon->State == EAddonState::Loaded &&
 					!(aAddon->Definitions->Unload == nullptr || aAddon->Definitions->HasFlag(EAddonFlags::DisableHotloading)))
 				{
+					amtBtns++;
 					if (ImGui::Button(("Disable##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight * ImGui::GetFontSize())))
 					{
 						for (auto& it : Loader::Addons)
@@ -55,6 +58,7 @@ namespace GUI
 				}
 				else if (aAddon->State == EAddonState::NotLoaded)
 				{
+					amtBtns++;
 					if (ImGui::Button(("Load##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight * ImGui::GetFontSize())))
 					{
 						for (auto& it : Loader::Addons)
@@ -69,6 +73,10 @@ namespace GUI
 				}
 				if (!(aAddon->Definitions->Unload == nullptr || aAddon->Definitions->HasFlag(EAddonFlags::DisableHotloading)))
 				{
+					if (amtBtns > 0)
+					{
+						ImGui::SameLine();
+					}
 					if (ImGui::Button(("Uninstall##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight * ImGui::GetFontSize())))
 					{
 						for (auto& it : Loader::Addons)
@@ -81,8 +89,6 @@ namespace GUI
 						}
 					}
 				}
-				
-				ImGui::TextCenteredColumn(aAddon->Definitions->Version.ToString().c_str());
 
 				ImGui::EndGroup();
 			}

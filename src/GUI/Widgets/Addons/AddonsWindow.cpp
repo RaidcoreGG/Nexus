@@ -49,6 +49,11 @@ namespace GUI
 
 						ImGui::EndChild();
 					}
+
+					if (ImGui::Button("Open Addons Folder", ImVec2(width, height)))
+					{
+						ShellExecuteA(NULL, "explore", Path::D_GW2_ADDONS, NULL, NULL, SW_SHOW);
+					}
 					
 					ImGui::EndTabItem();
 				}
@@ -63,11 +68,6 @@ namespace GUI
 					ImGui::EndTabItem();
 				}
 				ImGui::EndTabBar();
-			}
-			
-			if (ImGui::Button("Open Addons Folder", ImVec2(width, height)))
-			{
-				ShellExecuteA(NULL, "explore", Path::D_GW2_ADDONS, NULL, NULL, SW_SHOW);
 			}
 		}
 		ImGui::End();

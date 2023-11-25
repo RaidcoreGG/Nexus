@@ -7,7 +7,7 @@ void create_minidump(struct _EXCEPTION_POINTERS* apExceptionInfo)
     HMODULE mhLib = ::LoadLibrary(_T("dbghelp.dll"));
     MINIDUMPWRITEDUMP pDump = (MINIDUMPWRITEDUMP)::GetProcAddress(mhLib, "MiniDumpWriteDump");
 
-    HANDLE hFile = ::CreateFile(_T("addons/Nexus/crash.dmp"), GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS,
+    HANDLE hFile = ::CreateFile(_T("nxscrash.dmp"), GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS,
         FILE_ATTRIBUTE_NORMAL, NULL);
 
     _MINIDUMP_EXCEPTION_INFORMATION ExInfo;
