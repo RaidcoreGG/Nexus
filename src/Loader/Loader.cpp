@@ -435,6 +435,55 @@ namespace Loader
 
 			ApiDefs.insert({ aVersion, api });
 			return api;
+
+		case 2:
+			api = new AddonAPI2();
+
+			((AddonAPI2*)api)->SwapChain = Renderer::SwapChain;
+			((AddonAPI2*)api)->ImguiContext = Renderer::GuiContext;
+			((AddonAPI2*)api)->ImguiMalloc = ImGui::MemAlloc;
+			((AddonAPI2*)api)->ImguiFree = ImGui::MemFree;
+			((AddonAPI2*)api)->RegisterRender = GUI::Register;
+			((AddonAPI2*)api)->UnregisterRender = GUI::Unregister;
+
+			((AddonAPI2*)api)->GetGameDirectory = Path::GetGameDirectory;
+			((AddonAPI2*)api)->GetAddonDirectory = Path::GetAddonDirectory;
+			((AddonAPI2*)api)->GetCommonDirectory = Path::GetCommonDirectory;
+
+			((AddonAPI2*)api)->CreateHook = MH_CreateHook;
+			((AddonAPI2*)api)->RemoveHook = MH_RemoveHook;
+			((AddonAPI2*)api)->EnableHook = MH_EnableHook;
+			((AddonAPI2*)api)->DisableHook = MH_DisableHook;
+
+			((AddonAPI2*)api)->Log = LogMessageAddon;
+
+			((AddonAPI2*)api)->RaiseEvent = Events::Raise;
+			((AddonAPI2*)api)->SubscribeEvent = Events::Subscribe;
+			((AddonAPI2*)api)->UnsubscribeEvent = Events::Unsubscribe;
+
+			((AddonAPI2*)api)->RegisterWndProc = WndProc::Register;
+			((AddonAPI2*)api)->UnregisterWndProc = WndProc::Unregister;
+
+			((AddonAPI2*)api)->RegisterKeybindWithString = Keybinds::Register;
+			((AddonAPI2*)api)->RegisterKeybindWithStruct = Keybinds::RegisterWithStruct;
+			((AddonAPI2*)api)->UnregisterKeybind = Keybinds::Unregister;
+
+			((AddonAPI2*)api)->GetResource = DataLink::GetResource;
+			((AddonAPI2*)api)->ShareResource = DataLink::ShareResource;
+
+			((AddonAPI2*)api)->GetTexture = TextureLoader::Get;
+			((AddonAPI2*)api)->LoadTextureFromFile = TextureLoader::LoadFromFile;
+			((AddonAPI2*)api)->LoadTextureFromResource = TextureLoader::LoadFromResource;
+			((AddonAPI2*)api)->LoadTextureFromURL = TextureLoader::LoadFromURL;
+			((AddonAPI2*)api)->LoadTextureFromMemory = TextureLoader::LoadFromMemory;
+
+			((AddonAPI2*)api)->AddShortcut = GUI::QuickAccess::AddShortcut;
+			((AddonAPI2*)api)->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
+			((AddonAPI2*)api)->AddSimpleShortcut = GUI::QuickAccess::AddSimpleShortcut;
+			((AddonAPI2*)api)->RemoveSimpleShortcut = GUI::QuickAccess::RemoveSimpleShortcut;
+
+			ApiDefs.insert({ aVersion, api });
+			return api;
 		}
 
 		// there is no matching version
@@ -446,6 +495,8 @@ namespace Loader
 		{
 		case 1:
 			return sizeof(AddonAPI1);
+		case 2:
+			return sizeof(AddonAPI2);
 		}
 
 		return 0;
