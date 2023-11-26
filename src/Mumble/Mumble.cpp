@@ -18,10 +18,13 @@ namespace Mumble
 	void Initialize()
 	{
 		IsRunning = true;
+
 		UpdateIdentityThread = std::thread(UpdateIdentityLoop);
 		UpdateIdentityThread.detach();
 		UpdateStateThread = std::thread(UpdateStateLoop);
 		UpdateStateThread.detach();
+
+		NexusLink = (NexusLinkData*)DataLink::ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData));
 	}
 
 	void Shutdown()

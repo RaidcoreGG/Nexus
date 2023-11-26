@@ -47,6 +47,12 @@ namespace TextureLoader
 			return;
 		}
 
+		if (!std::filesystem::exists(aFilename))
+		{
+			Log(CH_TEXTURES, "File provided does not exist: %s (%s)", aFilename, str.c_str());
+			return;
+		}
+
 		// Load from disk into a raw RGBA buffer
 		int image_width = 0;
 		int image_height = 0;
@@ -71,24 +77,28 @@ namespace TextureLoader
 		HRSRC imageResHandle = FindResourceA(aModule, MAKEINTRESOURCEA(aResourceID), "PNG");
 		if (!imageResHandle)
 		{
+			LogDebug(CH_TEXTURES, "Resource not found ResID: %u (%s)", aResourceID, str.c_str());
 			return;
 		}
 
 		HGLOBAL imageResDataHandle = LoadResource(aModule, imageResHandle);
 		if (!imageResDataHandle)
 		{
+			LogDebug(CH_TEXTURES, "Failed loading resource: %u (%s)", aResourceID, str.c_str());
 			return;
 		}
 
 		LPVOID imageFile = LockResource(imageResDataHandle);
 		if (!imageFile)
 		{
+			LogDebug(CH_TEXTURES, "Failed locking resource: %u (%s)", aResourceID, str.c_str());
 			return;
 		}
 
 		DWORD imageFileSize = SizeofResource(aModule, imageResHandle);
 		if (!imageFileSize)
 		{
+			LogDebug(CH_TEXTURES, "Failed getting size of resource: %u (%s)", aResourceID, str.c_str());
 			return;
 		}
 
@@ -143,6 +153,27 @@ namespace TextureLoader
 		delete[] remote_data;
 
 		QueueTexture(str.c_str(), data, image_width, image_height, aCallback);
+	}
+	void LoadFromMemory(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback)
+	{
+		std::string str = aIdentifier;
+
+		Texture* tex = Get(str.c_str());
+		if (tex != nullptr)
+		{
+			if (aCallback)
+			{
+				aCallback(aIdentifier, tex);
+			}
+			return;
+		}
+
+		int image_width = 0;
+		int image_height = 0;
+		int image_components = 0;
+		unsigned char* image_data = stbi_load_from_memory((const stbi_uc*)aData, aSize, &image_width, &image_height, &image_components, 0);
+
+		QueueTexture(str.c_str(), image_data, image_width, image_height, aCallback);
 	}
 
 	void ProcessQueue()

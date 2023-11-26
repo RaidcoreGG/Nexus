@@ -61,10 +61,9 @@ void Initialize()
 	State::Initialize();
 	Path::Initialize(NexusHandle);
 	//Paradigm::Initialize();
-
 	Updater::Initialize();
 
-	/* Don't initialize anything if vanilla*/
+	/* Don't initialize anything if vanilla */
 	if (!State::IsVanilla)
 	{
 		LogHandler::Initialize();
@@ -72,7 +71,6 @@ void Initialize()
 		MH_Initialize();
 
 		Keybinds::Initialize();
-		Keybinds::Load();
 		Settings::Load();
 		
 		// if it's not already been explicitly set via command line, check settings
@@ -92,7 +90,6 @@ void Initialize()
 		//API::Initialize();
 
 		Mumble::Initialize();
-		NexusLink = (NexusLinkData*)DataLink::ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData));
 
 		// create imgui context
 		if (!Renderer::GuiContext) { Renderer::GuiContext = ImGui::CreateContext(); }
@@ -114,11 +111,13 @@ void Shutdown()
 	{
 		State::Nexus = ENexusState::SHUTDOWN;
 
+		// free addons
+		Loader::Shutdown();
+
 		GUI::Shutdown();
 		Mumble::Shutdown();
 
-		// free addons & shared mem
-		Loader::Shutdown();
+		// shared mem
 		DataLink::Free();
 
 		/* Save keybinds, settings, api keys & api cache */
