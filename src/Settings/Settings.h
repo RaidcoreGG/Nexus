@@ -11,6 +11,7 @@
 
 using json = nlohmann::json;
 
+extern const char* OPT_ACCEPTEULA;
 extern const char* OPT_DEVMODE;
 extern const char* OPT_CLOSEMENU;
 extern const char* OPT_CLOSEESCAPE;

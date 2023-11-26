@@ -50,6 +50,8 @@ namespace GUI
 
 	extern bool							IsUIVisible;
 
+	extern bool							AcceptedEULA;
+
 	void Initialize();
 	void Shutdown();
 

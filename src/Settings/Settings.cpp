@@ -1,5 +1,6 @@
 #include "Settings.h"
 
+const char* OPT_ACCEPTEULA	= "AcceptEULA";
 const char* OPT_DEVMODE		= "DevMode";
 const char* OPT_CLOSEMENU	= "CloseMenuAfterSelecting";
 const char* OPT_CLOSEESCAPE	= "CloseOnEscape";
