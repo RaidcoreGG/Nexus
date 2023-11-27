@@ -14,10 +14,7 @@
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
-#define CPPHTTPLIB_OPENSSL_SUPPORT
-#include <openssl/ssl.h>
-#include <openssl/err.h>
-#include "httplib/httplib.h"
+#include "httpslib.h"
 
 const char* BASE_URL = "https://api.raidcore.gg";
 const char* NEXUS_VERSION_ENDPOINT = "/nexusversion.json";

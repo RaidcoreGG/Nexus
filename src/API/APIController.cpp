@@ -7,7 +7,7 @@
 #include "Paths.h"
 #include "Shared.h"
 
-#include "httplib/httplib.h"
+#include "httpslib.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
