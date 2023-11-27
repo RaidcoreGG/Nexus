@@ -43,7 +43,10 @@ namespace Mumble
 
 	void Shutdown()
 	{
-		IsRunning = false;
+		if (State::Nexus == ENexusState::SHUTTING_DOWN)
+		{
+			IsRunning = false;
+		}
 	}
 
 	void UpdateIdentityLoop()

@@ -8,6 +8,7 @@ enum class ENexusState
 	LOAD,									/* Nexus is loading */
 	LOADED,									/* Nexus has initialized all components */
 	READY,									/* Nexus is ready to initialise UI */
+	SHUTTING_DOWN,							/* Nexus is shutting down */
 	SHUTDOWN								/* Nexus has been shut down */
 };
 

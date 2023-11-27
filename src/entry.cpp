@@ -107,9 +107,9 @@ void Shutdown()
 {
 	LogCritical(CH_CORE, "::Shutdown()");
 
-	if (State::Nexus < ENexusState::SHUTDOWN)
+	if (State::Nexus < ENexusState::SHUTTING_DOWN)
 	{
-		State::Nexus = ENexusState::SHUTDOWN;
+		State::Nexus = ENexusState::SHUTTING_DOWN;
 
 		// free addons
 		Loader::Shutdown();
@@ -126,6 +126,8 @@ void Shutdown()
 		//API::Save();
 
 		MH_Uninitialize();
+
+		State::Nexus = ENexusState::SHUTDOWN;
 	}
 
 	// free libs

@@ -246,6 +246,8 @@ namespace GUI
 
 			ImGui::Text("If you do not agree to these terms, do not use the software.");
 
+			ImGui::TextDisabled("By clicking \"I do NOT agree\" your game will close and Nexus will uninstall.");
+
 			if (ImGui::Button("I agree"))
 			{
 				AcceptedEULA = true;

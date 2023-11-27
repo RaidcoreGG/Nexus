@@ -2,6 +2,7 @@
 
 #include "Consts.h"
 #include "Shared.h"
+#include "State.h"
 
 namespace DataLink
 {
@@ -10,30 +11,34 @@ namespace DataLink
 
 	void Free()
 	{
-		DataLink::Mutex.lock();
+		if (State::Nexus == ENexusState::SHUTTING_DOWN)
 		{
-			while (Registry.size() > 0)
+			DataLink::Mutex.lock();
 			{
-				const auto& it = Registry.begin();
-
-				if (it->second.Pointer)
+				while (Registry.size() > 0)
 				{
-					UnmapViewOfFile((LPVOID)it->second.Pointer);
-					it->second.Pointer = nullptr;
+					const auto& it = Registry.begin();
+
+					if (it->second.Pointer)
+					{
+						UnmapViewOfFile((LPVOID)it->second.Pointer);
+						it->second.Pointer = nullptr;
+					}
+
+					if (it->second.Handle)
+					{
+						CloseHandle(it->second.Handle);
+						it->second.Handle = nullptr;
+					}
+
+					LogDebug(CH_DATALINK, "Freed shared resource: \"%s\"", it->first.c_str());
+
+					Registry.erase(it);
 				}
-
-				if (it->second.Handle)
-				{
-					CloseHandle(it->second.Handle);
-					it->second.Handle = nullptr;
-				}
-
-				LogDebug(CH_DATALINK, "Freed shared resource: \"%s\"", it->first.c_str());
-
-				Registry.erase(it);
 			}
+			DataLink::Mutex.unlock();
 		}
-		DataLink::Mutex.unlock();
+		
 	}
 
 	void* GetResource(const char* aIdentifier)

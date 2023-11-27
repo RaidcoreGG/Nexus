@@ -47,13 +47,14 @@ namespace Loader
 	}
 	void Shutdown()
 	{
-		if (State::Nexus < ENexusState::SHUTDOWN)
+		if (State::Nexus == ENexusState::SHUTTING_DOWN)
 		{
 			Loader::Mutex.lock();
 			{
 				while (Addons.size() != 0)
 				{
 					UnloadAddon(Addons.begin()->first);
+					Addons.erase(Addons.begin());
 				}
 			}
 			Loader::Mutex.unlock();
@@ -345,7 +346,7 @@ namespace Loader
 	{
 		for (;;)
 		{
-			if (State::Nexus >= ENexusState::SHUTDOWN) { return; }
+			if (State::Nexus == ENexusState::SHUTDOWN) { return; }
 
 			if (State::Nexus == ENexusState::READY)
 			{
