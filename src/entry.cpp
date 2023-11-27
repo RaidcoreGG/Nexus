@@ -127,6 +127,8 @@ void Shutdown()
 
 		MH_Uninitialize();
 
+		LogInfo(CH_CORE, "Shutdown performed.");
+
 		State::Nexus = ENexusState::SHUTDOWN;
 	}
 
