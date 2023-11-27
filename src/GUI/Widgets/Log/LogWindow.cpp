@@ -1,5 +1,14 @@
 #include "LogWindow.h"
 
+#include "Shared.h"
+#include "Paths.h"
+#include "State.h"
+
+#include "Logging/LogHandler.h"
+
+#include "imgui.h"
+#include "imgui_extensions.h"
+
 namespace GUI
 {
 	float lwWidth = 38.0f;

@@ -1,19 +1,6 @@
 #ifndef STATE_H
 #define STATE_H
 
-#include <Windows.h>
-#include <string>
-#include <algorithm>
-#include <shellapi.h>
-#include <regex>
-
-#include "core.h"
-#include "Consts.h"
-#include "Shared.h"
-
-#include "Mumble/Mumble.h"
-#include "DataLink/DataLink.h"
-
 /* State of Nexus */
 enum class ENexusState
 {

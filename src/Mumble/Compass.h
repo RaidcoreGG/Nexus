@@ -1,7 +1,7 @@
 #ifndef MUMBLE_COMPASS_H
 #define MUMBLE_COMPASS_H
 
-#include "../types.h"
+#include "types.h"
 
 namespace Mumble
 {

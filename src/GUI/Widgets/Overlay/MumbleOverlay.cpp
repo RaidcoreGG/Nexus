@@ -1,6 +1,13 @@
 #include "MumbleOverlay.h"
 
+#include "Shared.h"
+#include "State.h"
+
+#include "nlohmann/json.hpp"
 using json = nlohmann::json;
+
+#include "imgui.h"
+#include "imgui_extensions.h"
 
 namespace GUI
 {

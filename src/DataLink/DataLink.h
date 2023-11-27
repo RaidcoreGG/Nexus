@@ -1,12 +1,9 @@
 #ifndef DATALINK_H
 #define DATALINK_H
 
-#include <string>
 #include <mutex>
 #include <map>
-
-#include "../Consts.h"
-#include "../Shared.h"
+#include <string>
 
 #include "LinkedResource.h"
 

@@ -1,12 +1,20 @@
 #include "TextureLoader.h"
 
+#include <d3d11.h>
+#include <vector>
+#include <wincodec.h>
+#include <filesystem>
+
+#include "Consts.h"
+#include "Shared.h"
+#include "Paths.h"
+#include "core.h"
+#include "Renderer.h"
+
 /* For some reason this has to be defined AND included here. */
 #define STB_IMAGE_IMPLEMENTATION
-#define CPPHTTPLIB_OPENSSL_SUPPORT
-#include <openssl/ssl.h>
-#include <openssl/err.h>
-#include "../stb/stb_image.h"
-#include "../httplib/httplib.h"
+#include "stb/stb_image.h"
+#include "httpslib.h"
 
 namespace TextureLoader
 {

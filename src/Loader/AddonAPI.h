@@ -2,17 +2,17 @@
 #define ADDONAPI_H
 
 #include <dxgi.h>
-#include "../Paths/FuncDefs.h"
-#include "../Logging/FuncDefs.h"
-#include "../Events/FuncDefs.h"
-#include "../WndProc/FuncDefs.h"
-#include "../Keybinds/FuncDefs.h"
-#include "../imgui/imgui.h"
-#include "../minhook/mh_hook.h"
-#include "../DataLink/FuncDefs.h"
-#include "../Textures/FuncDefs.h"
-#include "../GUI/FuncDefs.h"
-#include "../GUI/Widgets/QuickAccess/FuncDefs.h"
+#include "Paths/FuncDefs.h"
+#include "Logging/FuncDefs.h"
+#include "Events/FuncDefs.h"
+#include "WndProc/FuncDefs.h"
+#include "Keybinds/FuncDefs.h"
+#include "imgui/imgui.h"
+#include "minhook/mh_hook.h"
+#include "DataLink/FuncDefs.h"
+#include "Textures/FuncDefs.h"
+#include "GUI/FuncDefs.h"
+#include "GUI/Widgets/QuickAccess/FuncDefs.h"
 
 // Base
 struct AddonAPI {};

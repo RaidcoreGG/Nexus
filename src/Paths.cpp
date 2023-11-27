@@ -1,5 +1,7 @@
 #include "Paths.h"
 
+#include "core.h"
+
 namespace Path
 {
 	char D_GW2							[MAX_PATH]{};

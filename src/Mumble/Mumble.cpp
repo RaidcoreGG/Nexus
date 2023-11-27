@@ -1,5 +1,19 @@
 #include "Mumble.h"
 
+#include <map>
+#include <string>
+#include <Windows.h>
+
+#include "Shared.h"
+#include "State.h"
+#include "Renderer.h"
+#include "Consts.h"
+
+#include "LinkedMem.h"
+#include "Events/EventHandler.h"
+#include "DataLink/DataLink.h"
+
+#include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
 namespace Mumble

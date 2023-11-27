@@ -3,34 +3,12 @@
 
 #include <mutex>
 #include <map>
-#include <set>
 #include <thread>
 #include <filesystem>
-#include <Windows.h>
-#include <Psapi.h>
-
-#include "../core.h"
-#include "../State.h"
-#include "../Shared.h"
-#include "../Paths.h"
-#include "../Renderer.h"
 
 #include "ELoaderAction.h"
-#include "AddonDefinition.h"
 #include "Addon.h"
-#include "FuncDefs.h"
-
-#include "../Mumble/LinkedMem.h"
-#include "../Logging/LogHandler.h"
-#include "../Events/EventHandler.h"
-#include "../WndProc/WndProcHandler.h"
-#include "../Keybinds/KeybindHandler.h"
-#include "../imgui/imgui.h"
-#include "../minhook/mh_hook.h"
-#include "../DataLink/DataLink.h"
-#include "../Textures/TextureLoader.h"
-#include "../GUI/GUI.h"
-#include "../GUI/Widgets/QuickAccess/QuickAccess.h"
+#include "AddonAPI.h"
 
 namespace Loader
 {

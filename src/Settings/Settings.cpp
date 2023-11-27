@@ -1,5 +1,10 @@
 #include "Settings.h"
 
+#include <filesystem>
+#include <fstream>
+
+#include "Paths.h"
+
 const char* OPT_ACCEPTEULA	= "AcceptEULA";
 const char* OPT_DEVMODE		= "DevMode";
 const char* OPT_CLOSEMENU	= "CloseMenuAfterSelecting";

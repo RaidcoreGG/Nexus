@@ -1,5 +1,20 @@
 #include "KeybindHandler.h"
 
+#include <fstream>
+#include <filesystem>
+#include <string>
+#include <cstdarg>
+
+#include "core.h"
+#include "Paths.h"
+#include "Shared.h"
+#include "State.h"
+
+#include "KeystrokeMessageFlags.h"
+
+#include "nlohmann/json.hpp"
+using json = nlohmann::json;
+
 namespace Keybinds
 {
 	std::mutex								Mutex;

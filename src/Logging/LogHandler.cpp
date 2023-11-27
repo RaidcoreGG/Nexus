@@ -1,6 +1,16 @@
 #include "LogHandler.h"
 
-#include "../State.h"
+#include <ctime>
+#include <thread>
+#include <cstdarg>
+#include <algorithm>
+#include <chrono>
+
+#include "State.h"
+#include "Paths.h"
+
+#include "ConsoleLogger.h"
+#include "FileLogger.h"
 
 namespace LogHandler
 {

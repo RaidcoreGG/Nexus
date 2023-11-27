@@ -3,13 +3,6 @@
 
 #include <string>
 
-#include "../../../Renderer.h"
-
-#include "../../../Textures/Texture.h"
-
-#include "../../../imgui/imgui.h"
-#include "../../../imgui/imgui_extensions.h"
-
 namespace GUI
 {
 	namespace Menu

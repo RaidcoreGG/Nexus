@@ -1,19 +1,7 @@
 #ifndef MUMBLE_H
 #define MUMBLE_H
 
-#include <map>
-#include <string>
-#include <Windows.h>
 #include <thread>
-
-#include "../Shared.h"
-#include "../State.h"
-#include "../Renderer.h"
-#include "../Consts.h"
-
-#include "LinkedMem.h"
-#include "../nlohmann/json.hpp"
-#include "../Events/EventHandler.h"
 
 namespace Mumble
 {

@@ -1,5 +1,19 @@
 #include "DebugWindow.h"
 
+#include "Shared.h"
+#include "State.h"
+
+#include "Events/EventHandler.h"
+#include "Keybinds/KeybindHandler.h"
+#include "DataLink/DataLink.h"
+#include "Textures/TextureLoader.h"
+#include "GUI/Widgets/QuickAccess/QuickAccess.h"
+#include "Loader/Loader.h"
+
+#include "imgui.h"
+#include "imgui_extensions.h"
+#include "imgui_memory_editor.h"
+
 namespace GUI
 {
 	float dwWidth = 30.0f;

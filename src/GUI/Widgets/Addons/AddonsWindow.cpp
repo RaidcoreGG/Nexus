@@ -1,5 +1,18 @@
 #include "AddonsWindow.h"
 
+#include <Windows.h>
+#include <shellapi.h>
+
+#include "Shared.h"
+#include "Paths.h"
+#include "State.h"
+
+#include "Loader/Loader.h"
+#include "AddonItem.h"
+
+#include "imgui.h"
+#include "imgui_extensions.h"
+
 namespace GUI
 {
 	float awWidth = 30.0f;

@@ -1,27 +1,17 @@
 #ifndef GUI_QUICKACCESS_H
 #define GUI_QUICKACCESS_H
 
-#include <thread>
+#include <mutex>
 #include <map>
 #include <string>
-#include <mutex>
 
-#include "../../../Shared.h"
-#include "../../../Paths.h"
-#include "../../../State.h"
-#include "../../../Renderer.h"
-#include "../../../Consts.h"
+#include "GUI/FuncDefs.h"
 
-#include "../../../imgui/imgui.h"
-#include "../../../imgui/imgui_extensions.h"
-
-#include "../../../Textures/Texture.h"
-#include "../../../Textures/TextureLoader.h"
-#include "../../../Keybinds/KeybindHandler.h"
-
-#include "FuncDefs.h"
 #include "Shortcut.h"
 #include "EQAPosition.h"
+
+#include "imgui.h"
+#include "imgui_extensions.h"
 
 namespace GUI
 {

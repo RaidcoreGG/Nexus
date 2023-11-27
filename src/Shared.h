@@ -5,12 +5,13 @@
 #include <vector>
 #include <string>
 
-#include "imgui/imgui.h"
+#include "Loader/AddonDefinition.h"
+#include "Loader/NexusLinkData.h"
 #include "Mumble/LinkedMem.h"
 #include "Mumble/Identity.h"
 #include "Logging/LogHandler.h"
-#include "Loader/AddonDefinition.h"
-#include "Loader/NexusLinkData.h"
+
+#include "imgui.h"
 
 using namespace Mumble;
 using namespace LogHandler;

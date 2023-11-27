@@ -186,7 +186,7 @@
     <ClCompile Include="Keybinds\Keybind.cpp">
       <Filter>Keybinds</Filter>
     </ClCompile>
-	<ClCompile Include="GUI\GUI.cpp">
+    <ClCompile Include="GUI\GUI.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
     <ClCompile Include="GUI\Widgets\About\AboutBox.cpp">
@@ -969,6 +969,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CrashHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="httpslib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

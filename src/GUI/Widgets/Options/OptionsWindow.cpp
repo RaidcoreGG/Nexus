@@ -1,6 +1,22 @@
 #include "OptionsWindow.h"
 
-#include "../../GUI.h"
+#include <regex>
+
+#include "Shared.h"
+#include "Paths.h"
+#include "State.h"
+#include "Renderer.h"
+
+#include "Keybinds/KeybindHandler.h"
+#include "API/APIController.h"
+#include "Settings/Settings.h"
+
+#include "GUI/GUI.h"
+#include "GUI/IWindow.h"
+#include "GUI/Widgets/QuickAccess/QuickAccess.h"
+
+#include "imgui.h"
+#include "imgui_extensions.h"
 
 namespace GUI
 {

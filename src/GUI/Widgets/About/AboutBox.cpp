@@ -1,5 +1,13 @@
 #include "AboutBox.h"
 
+#include "Shared.h"
+#include "Paths.h"
+#include "State.h"
+#include "Branch.h"
+
+#include "imgui.h"
+#include "imgui_extensions.h"
+
 namespace GUI
 {
 	AboutBox::AboutBox(std::string aName)

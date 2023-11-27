@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "../../../Textures/Texture.h"
+#include "Textures/Texture.h"
 
 namespace GUI
 {

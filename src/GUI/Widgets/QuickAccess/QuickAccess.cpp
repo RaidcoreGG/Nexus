@@ -1,5 +1,15 @@
 #include "QuickAccess.h"
 
+#include "Shared.h"
+#include "Paths.h"
+#include "State.h"
+#include "Renderer.h"
+#include "Consts.h"
+
+#include "Textures/Texture.h"
+#include "Textures/TextureLoader.h"
+#include "Keybinds/KeybindHandler.h"
+
 namespace GUI
 {
 	namespace QuickAccess

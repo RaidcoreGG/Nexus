@@ -1,5 +1,18 @@
 #include "State.h"
 
+#include <Windows.h>
+#include <string>
+#include <algorithm>
+#include <shellapi.h>
+#include <regex>
+
+#include "core.h"
+#include "Consts.h"
+#include "Shared.h"
+
+#include "Mumble/Mumble.h"
+#include "DataLink/DataLink.h"
+
 namespace State
 {
 	ENexusState		Nexus						= ENexusState::NONE;
@@ -60,8 +73,6 @@ namespace State
 				Parameters.push_back(token);
 			}
 		}
-
-		///////////////////////////////////
 
 		if (!customMumble)
 		{

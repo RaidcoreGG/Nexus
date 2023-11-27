@@ -1,5 +1,38 @@
 #include "GUI.h"
 
+#include <filesystem>
+#include <shellapi.h>
+
+#include "State.h"
+#include "Renderer.h"
+#include "Paths.h"
+#include "Shared.h"
+#include "Consts.h"
+#include "Branch.h"
+
+#include "Events/EventHandler.h"
+#include "Keybinds/KeybindHandler.h"
+#include "Loader/Loader.h"
+#include "Settings/Settings.h"
+#include "Textures/TextureLoader.h"
+
+#include "imgui.h"
+#include "imgui_extensions.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_dx11.h"
+
+#include "Widgets/Menu/Menu.h"
+#include "Widgets/Addons/AddonsWindow.h"
+#include "Widgets/Options/OptionsWindow.h"
+#include "Widgets/Log/LogWindow.h"
+#include "Widgets/Debug/DebugWindow.h"
+#include "Widgets/About/AboutBox.h"
+#include "Widgets/QuickAccess/QuickAccess.h"
+#include "Widgets/Menu/MenuItem.h"
+
+#include "resource.h"
+#include "Textures/Texture.h"
+
 namespace GUI
 {
 	/* internal forward declarations */

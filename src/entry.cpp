@@ -517,6 +517,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		break;
 	case DLL_PROCESS_DETACH:
 		::Shutdown();
+		exit(0);
 		break;
 	}
 	return true;

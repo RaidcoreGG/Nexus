@@ -1,7 +1,7 @@
 #ifndef MUMBLE_LINKEDMEM_H
 #define MUMBLE_LINKEDMEM_H
 
-#include "../types.h"
+#include "types.h"
 #include "Context.h"
 
 namespace Mumble

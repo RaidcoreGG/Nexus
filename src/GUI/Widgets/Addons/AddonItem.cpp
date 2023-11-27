@@ -1,5 +1,17 @@
 #include "AddonItem.h"
 
+#include "Shared.h"
+#include "Consts.h"
+
+#include "Loader/AddonDefinition.h"
+#include "Loader/EAddonFlags.h"
+#include "Loader/Loader.h"
+
+#include "Events/EventHandler.h"
+
+#include "imgui.h"
+#include "imgui_extensions.h"
+
 namespace GUI
 {
 	float btnWidth = 7.5f;

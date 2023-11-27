@@ -4,7 +4,7 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 
-#include "../core.h"
+#include "core.h"
 
 namespace ImGui
 {

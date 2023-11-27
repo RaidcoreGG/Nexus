@@ -1,24 +1,12 @@
 #ifndef APICONTROLLER_H
 #define APICONTROLLER_H
 
-#include <filesystem>
 #include <mutex>
-#include <fstream>
 #include <vector>
 #include <string>
-#include <algorithm>
 #include <thread>
 
-#include "../Paths.h"
-#include "../Shared.h"
-
 #include "ActiveToken.h"
-
-#include "../httplib/httplib.h"
-
-#include "../nlohmann/json.hpp"
-
-using json = nlohmann::json;
 
 namespace API
 {

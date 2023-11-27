@@ -1,9 +1,23 @@
 #include "Updater.h"
 
+#include <mutex>
+#include <map>
+#include <set>
+#include <thread>
+#include <filesystem>
+#include <fstream>
+
+#include "Consts.h"
+#include "Shared.h"
+#include "Paths.h"
+
+#include "nlohmann/json.hpp"
+using json = nlohmann::json;
+
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #include <openssl/ssl.h>
 #include <openssl/err.h>
-#include "../httplib/httplib.h"
+#include "httplib/httplib.h"
 
 const char* BASE_URL = "https://api.raidcore.gg";
 const char* NEXUS_VERSION_ENDPOINT = "/nexusversion.json";

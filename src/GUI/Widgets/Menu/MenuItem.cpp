@@ -1,6 +1,12 @@
 #include "MenuItem.h"
 
+#include "Renderer.h"
+
 #include "Menu.h"
+#include "Textures/Texture.h"
+
+#include "imgui.h"
+#include "imgui_extensions.h"
 
 namespace GUI
 {

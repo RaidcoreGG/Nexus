@@ -1,6 +1,17 @@
 #include "Menu.h"
 
-#include "../../GUI.h"
+#include "Shared.h"
+#include "Paths.h"
+#include "State.h"
+#include "Renderer.h"
+#include "resource.h"
+#include "Consts.h"
+
+#include "GUI/GUI.h"
+#include "GUI/IWindow.h"
+
+#include "imgui.h"
+#include "imgui_extensions.h"
 
 namespace GUI
 {

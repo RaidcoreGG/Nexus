@@ -1,7 +1,12 @@
 #include "Keybind.h"
 
+#include <Windows.h>
+#include <algorithm>
+#include <map>
+
+#include "core.h"
+
 #include "KeybindHandler.h"
-#include "../core.h"
 
 std::string Keybind::ToString(bool padded)
 {

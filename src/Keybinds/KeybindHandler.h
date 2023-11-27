@@ -1,28 +1,15 @@
 #ifndef KEYBINDHANDLER_H
 #define KEYBINDHANDLER_H
 
-#include <map>
-#include <vector>
-#include <mutex>
-#include <fstream>
-#include <filesystem>
-#include <string>
-#include <cstdarg>
 #include <Windows.h>
+#include <mutex>
+#include <map>
+#include <string>
 
-#include "../core.h"
-#include "../Paths.h"
-#include "../Shared.h"
-#include "../State.h"
-
-#include "Keybind.h"
-#include "ActiveKeybind.h"
-#include "KeystrokeMessageFlags.h"
 #include "FuncDefs.h"
 
-#include "../nlohmann/json.hpp"
-
-using json = nlohmann::json;
+#include "ActiveKeybind.h"
+#include "Keybind.h"
 
 namespace Keybinds
 {
