@@ -87,12 +87,12 @@ namespace DataLink
 				resource.Handle = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, strOverride.c_str());
 				if (resource.Handle == 0)
 				{
-					resource.Handle = CreateFileMappingA(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, aResourceSize, strOverride.c_str());
+					resource.Handle = CreateFileMappingA(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, static_cast<DWORD>(aResourceSize), strOverride.c_str());
 				}
 
 				if (resource.Handle)
 				{
-					resource.Pointer = MapViewOfFile(resource.Handle, FILE_MAP_ALL_ACCESS, 0, 0, aResourceSize);
+					resource.Pointer = MapViewOfFile(resource.Handle, FILE_MAP_ALL_ACCESS, 0, 0, static_cast<DWORD>(aResourceSize));
 
 					Registry[str] = resource;
 					result = resource.Pointer;

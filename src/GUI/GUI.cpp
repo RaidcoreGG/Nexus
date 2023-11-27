@@ -67,7 +67,7 @@ namespace GUI
 				{
 					ImVector<ImGuiWindow*> windows = Renderer::GuiContext->Windows;
 
-					for (size_t i = windows.Size - 1; i > 0; i--)
+					for (int i = windows.Size - 1; i > 0; i--)
 					{
 						if (strcmp(windows[i]->Name, "Menu") == 0 && Menu::Visible)
 						{

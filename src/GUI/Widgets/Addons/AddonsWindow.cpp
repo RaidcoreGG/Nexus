@@ -25,7 +25,7 @@ namespace GUI
 				if (ImGui::BeginTabItem("Installed"))
 				{
 					{
-						ImGui::BeginChild("##AddonTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), (height * 1.5) * -1));
+						ImGui::BeginChild("##AddonTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), (height * 1.5f) * -1));
 
 						if (Loader::Addons.size() == 0)
 						{

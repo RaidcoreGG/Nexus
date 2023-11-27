@@ -171,7 +171,7 @@ namespace TextureLoader
 		int image_width = 0;
 		int image_height = 0;
 		int image_components = 0;
-		unsigned char* image_data = stbi_load_from_memory((const stbi_uc*)aData, aSize, &image_width, &image_height, &image_components, 0);
+		unsigned char* image_data = stbi_load_from_memory((const stbi_uc*)aData, static_cast<int>(aSize), &image_width, &image_height, &image_components, 0);
 
 		QueueTexture(str.c_str(), image_data, image_width, image_height, aCallback);
 	}
@@ -232,6 +232,13 @@ namespace TextureLoader
 		subResource.SysMemPitch = desc.Width * 4;
 		subResource.SysMemSlicePitch = 0;
 		Renderer::Device->CreateTexture2D(&desc, &subResource, &pTexture);
+
+		if (!pTexture)
+		{
+			LogDebug(CH_TEXTURES, "pTexture was null");
+			stbi_image_free(aQueuedTexture.Data);
+			return;
+		}
 
 		// Create texture view
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;

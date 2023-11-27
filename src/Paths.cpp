@@ -63,7 +63,7 @@ namespace Path
 	const char* GetAddonDirectory(const char* aName)
 	{
 		char* str = new char[MAX_PATH]{};
-		int idx = strlen(D_GW2_ADDONS);
+		size_t idx = strlen(D_GW2_ADDONS);
 		memcpy(&str[0], &D_GW2_ADDONS[0], strlen(D_GW2_ADDONS));
 
 		if (strcmp(aName, "") != 0) {

@@ -19,7 +19,7 @@ namespace Keybinds
 			key.ScanCode = i;
 			char* buff = new char[64];
 			std::string str;
-			GetKeyNameTextA(KMFToLParam(key), buff, 64);
+			GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, 64);
 			str.append(buff);
 
 			ScancodeLookupTable[key.GetScanCode()] = str;
@@ -27,7 +27,7 @@ namespace Keybinds
 			key.ExtendedFlag = 1;
 			buff = new char[64];
 			str = "";
-			GetKeyNameTextA(KMFToLParam(key), buff, 64);
+			GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, 64);
 			str.append(buff);
 
 			ScancodeLookupTable[key.GetScanCode()] = str;
