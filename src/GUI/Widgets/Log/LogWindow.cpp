@@ -38,8 +38,8 @@ namespace GUI
 			off2 = ImGui::CalcTextSize("XXXXXXXXXXX").x;
 		}
 
-		ImGui::SetNextWindowSize(ImVec2(lwWidth * ImGui::GetFontSize(), lwHeight * ImGui::GetFontSize()));
-		if (ImGui::Begin(Name.c_str(), &Visible, WindowFlags_Default))
+		ImGui::SetNextWindowSize(ImVec2(lwWidth * ImGui::GetFontSize(), lwHeight * ImGui::GetFontSize()), ImGuiCond_FirstUseEver);
+		if (ImGui::Begin(Name.c_str(), &Visible, ImGuiWindowFlags_NoCollapse))
 		{
 			static int selectedLevel = (int)(ELogLevel::ALL)-1;
 			ImGui::Text("Filter: "); ImGui::SameLine();

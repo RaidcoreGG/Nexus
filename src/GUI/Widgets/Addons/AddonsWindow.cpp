@@ -27,8 +27,8 @@ namespace GUI
 	{
 		if (!Visible) { return; }
 
-		ImGui::SetNextWindowSize(ImVec2(awWidth * ImGui::GetFontSize(), awHeight * ImGui::GetFontSize()));
-		if (ImGui::Begin(Name.c_str(), &Visible, WindowFlags_Default))
+		ImGui::SetNextWindowSize(ImVec2(awWidth * ImGui::GetFontSize(), awHeight * ImGui::GetFontSize()), ImGuiCond_FirstUseEver);
+		if (ImGui::Begin(Name.c_str(), &Visible, ImGuiWindowFlags_NoCollapse))
 		{
 			float width = 7.5f * ImGui::GetFontSize();
 			float height = 1.5f * ImGui::GetFontSize();

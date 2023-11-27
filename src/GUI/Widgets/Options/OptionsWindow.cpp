@@ -44,8 +44,8 @@ namespace GUI
 	{
 		if (!Visible) { return; }
 
-		ImGui::SetNextWindowSize(ImVec2(owWidth * ImGui::GetFontSize(), owHeight * ImGui::GetFontSize()));
-		if (ImGui::Begin(Name.c_str(), &Visible, WindowFlags_Default))
+		ImGui::SetNextWindowSize(ImVec2(owWidth * ImGui::GetFontSize(), owHeight * ImGui::GetFontSize()), ImGuiCond_FirstUseEver);
+		if (ImGui::Begin(Name.c_str(), &Visible, ImGuiWindowFlags_NoCollapse))
 		{
 			if (ImGui::BeginTabBar("OptionsTabBar", ImGuiTabBarFlags_None))
 			{
