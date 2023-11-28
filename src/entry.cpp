@@ -61,7 +61,7 @@ void Initialize()
 	State::Initialize();
 	Path::Initialize(NexusHandle);
 	//Paradigm::Initialize();
-	Updater::Initialize();
+	Updater::SelfUpdate();
 
 	/* Don't initialize anything if vanilla */
 	if (!State::IsVanilla)
