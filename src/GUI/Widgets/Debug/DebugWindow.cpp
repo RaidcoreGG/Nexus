@@ -297,9 +297,9 @@ namespace GUI
 							}
 							if (ImGui::TreeNode("Queued"))
 							{
-								for (const auto& [path, action] : Loader::QueuedAddons)
+								for (const auto& qAddon : Loader::QueuedAddons)
 								{
-									switch (action)
+									switch (qAddon.Action)
 									{
 									case ELoaderAction::Load:
 										ImGui::Text("Load");
@@ -312,7 +312,7 @@ namespace GUI
 										break;
 									}
 									ImGui::SameLine();
-									ImGui::TextDisabled("%s", path.string().c_str());
+									ImGui::TextDisabled("%s", qAddon.Path.string().c_str());
 								}
 								ImGui::TreePop();
 							}

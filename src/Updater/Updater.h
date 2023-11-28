@@ -8,7 +8,7 @@
 namespace Updater
 {
 	void SelfUpdate();
-	void CheckForUpdate(std::filesystem::path aPath, AddonDefinition* aDefinitions);
+	bool CheckForUpdate(std::filesystem::path aPath, AddonDefinition* aDefinitions);
 }
 
 #endif

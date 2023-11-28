@@ -25,11 +25,12 @@
 #include "Textures/TextureLoader.h"
 #include "GUI/GUI.h"
 #include "GUI/Widgets/QuickAccess/QuickAccess.h"
+#include "Updater/Updater.h"
 
 namespace Loader
 {
 	std::mutex Mutex;
-	std::map<std::filesystem::path, ELoaderAction> QueuedAddons;
+	std::vector<QAddon> QueuedAddons;
 	std::map<std::filesystem::path, Addon*> Addons;
 	std::map<int, AddonAPI*> ApiDefs;
 
@@ -74,26 +75,29 @@ namespace Loader
 		{
 			auto it = QueuedAddons.begin();
 
-			switch (it->second)
+			switch (it->Action)
 			{
 			case ELoaderAction::Load:
-				LoadAddon(it->first);
+				LoadAddon(it->Path);
 				break;
 			case ELoaderAction::Unload:
-				UnloadAddon(it->first);
+				UnloadAddon(it->Path);
 				break;
 			case ELoaderAction::Uninstall:
-				UninstallAddon(it->first);
+				UninstallAddon(it->Path);
 				break;
 			}
-
 			QueuedAddons.erase(it);
 		}
 		Loader::Mutex.unlock();
 	}
 	void QueueAddon(ELoaderAction aAction, std::filesystem::path aPath)
 	{
-		QueuedAddons.insert({ aPath, aAction });
+		QAddon qa{};
+		qa.Action = aAction;
+		qa.Path = aPath;
+
+		QueuedAddons.push_back(qa);
 	}
 
 	void LoadAddon(std::filesystem::path aPath)
@@ -162,6 +166,13 @@ namespace Loader
 		{
 			LogDebug(CH_LOADER, "\"%s\" is Nexus-compatible but returned a nullptr. Incompatible I guess?", path);
 			addon->State = EAddonState::Incompatible;
+			FreeLibrary(hMod);
+			return;
+		}
+
+		if (Updater::CheckForUpdate(aPath, tmpDefs))
+		{
+			QueueAddon(ELoaderAction::Load, aPath);
 			FreeLibrary(hMod);
 			return;
 		}

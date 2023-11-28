@@ -112,17 +112,21 @@ namespace Updater
 		}
 	}
 
-	void CheckForUpdate(std::filesystem::path aPath, AddonDefinition* aDefinitions)
+	bool CheckForUpdate(std::filesystem::path aPath, AddonDefinition* aDefinitions)
 	{
-		std::string baseUrl;
-		std::string endpoint = aDefinitions->UpdateLink;
+		assert(aDefinitions && "AddonDefinition* aDefinitions == nullptr");
+
+		bool wasUpdated = false;
+
+		std::string baseUrl = "";
+		std::string endpoint = "";
 
 		size_t idx = 0;
 
 		/* setup baseUrl and endpoint */
 		switch (aDefinitions->Provider)
 		{
-		case EUpdateProvider::None: return;
+		case EUpdateProvider::None: return false;
 
 		case EUpdateProvider::Raidcore:
 			baseUrl = "https://api.raidcore.gg";
@@ -131,23 +135,48 @@ namespace Updater
 			break;
 
 		case EUpdateProvider::GitHub:
-			baseUrl = "https://api.github.com/repos";
+			baseUrl = "https://api.github.com";
+			if (aDefinitions->UpdateLink == nullptr)
+			{
+				LogWarning(CH_UPDATER, "Addon %s declares EUpdateProvider::GitHub but has no UpdateLink set.", aDefinitions->Name);
+				return false;
+			}
+			endpoint = aDefinitions->UpdateLink;
 
 			idx = endpoint.find("github.com");
 			if (idx != std::string::npos)
 			{
 				// substr because user could've provided https:// or even www prefix as well
-				endpoint = endpoint.substr(idx + 10) + "/releases/latest"; // 10 is length of "github.com"
+				endpoint = "/repos" + endpoint.substr(idx + 10) + "/releases/latest"; // 10 is length of "github.com"
 			}
 
 			break;
 
 		case EUpdateProvider::Direct:
-			idx = endpoint.find_last_of("/");
+			if (aDefinitions->UpdateLink == nullptr)
+			{
+				LogWarning(CH_UPDATER, "Addon %s declares EUpdateProvider::Direct but has no UpdateLink set.", aDefinitions->Name);
+				return false;
+			}
+			
+			size_t httpIdx = endpoint.find("http://");
+			size_t httpsIdx = endpoint.find("https://");
+
+			size_t off = 0;
+			if (httpIdx != std::string::npos)
+			{
+				off = httpIdx;
+			}
+			if (httpsIdx != std::string::npos)
+			{
+				off = httpsIdx;
+			}
+
+			idx = endpoint.find("/", off);
 			if (idx == std::string::npos)
 			{
 				LogWarning("Abort update check, malformed URL (%s) on %s. (EUpdateProvider::Direct)", aDefinitions->UpdateLink, aDefinitions->Name);
-				return;
+				return false;
 			}
 
 			baseUrl = endpoint.substr(0, idx);
@@ -159,6 +188,10 @@ namespace Updater
 		/* setup paths */
 		std::filesystem::path pathOld = aPath.string() + ".old";
 		std::filesystem::path pathUpdate = aPath.string() + ".update";
+
+		/* cleanup old files */
+		if (std::filesystem::exists(pathOld)) { std::filesystem::remove(pathOld); }
+		if (std::filesystem::exists(pathUpdate)) { std::filesystem::remove(pathUpdate); }
 
 		/* get request */
 		httplib::Client client(baseUrl);
@@ -203,9 +236,9 @@ namespace Updater
 						}
 						else
 						{
-							if (remoteVersion > *Version)
+							if (remoteVersion > aDefinitions->Version)
 							{
-								LogInfo(CH_UPDATER, "%s is outdated: API replied with Version %s but installed is Version %s", aDefinitions->Name, remoteVersion.ToString().c_str(), Version->ToString().c_str());
+								LogInfo(CH_UPDATER, "%s is outdated: API replied with Version %s but installed is Version %s", aDefinitions->Name, remoteVersion.ToString().c_str(), aDefinitions->Version.ToString().c_str());
 
 								std::string endpointDownload = endpoint + "/download"; // e.g. api.raidcore.gg/addons/17/download
 
@@ -227,7 +260,8 @@ namespace Updater
 									std::filesystem::rename(aPath, pathOld);
 									std::filesystem::rename(pathUpdate, aPath);
 
-									LogInfo(CH_UPDATER, "Successfully updated Nexus. Restart required to take effect.");
+									LogInfo(CH_UPDATER, "Successfully updated %s.", aDefinitions->Name);
+									wasUpdated = true;
 								}
 							}
 						}
@@ -261,7 +295,7 @@ namespace Updater
 						if (response["tag_name"].is_null())
 						{
 							LogWarning("No tag_name set on %s%s", baseUrl.c_str(), endpoint.c_str());
-							return;
+							return false;
 						}
 
 						std::string tagName = response["tag_name"].get<std::string>();
@@ -269,7 +303,7 @@ namespace Updater
 						if (!std::regex_match(tagName, std::regex("v?\\d+[.]\\d+[.]\\d+[.]\\d+")))
 						{
 							LogWarning("tag_name on %s%s does not match convention e.g. \"1.0.0.1\" or \"v1.0.0.1\". Cannot check against version.", baseUrl.c_str(), endpoint.c_str());
-							return;
+							return false;
 						}
 
 						if (tagName._Starts_with("v"))
@@ -293,9 +327,9 @@ namespace Updater
 						remoteVersion.Build = versionBits[2];
 						remoteVersion.Revision = versionBits[3];
 
-						if (remoteVersion > *Version)
+						if (remoteVersion > aDefinitions->Version)
 						{
-							LogInfo(CH_UPDATER, "%s is outdated: API replied with Version %s but installed is Version %s", aDefinitions->Name, remoteVersion.ToString().c_str(), Version->ToString().c_str());
+							LogInfo(CH_UPDATER, "%s is outdated: API replied with Version %s but installed is Version %s", aDefinitions->Name, remoteVersion.ToString().c_str(), aDefinitions->Version.ToString().c_str());
 
 							std::string endpointDownload; // e.g. github.com/RaidcoreGG/GW2-CommandersToolkit/releases/download/20220918-135925/squadmanager.dll
 
@@ -317,9 +351,38 @@ namespace Updater
 								}
 							}
 
+							std::string downloadBaseUrl;
+
+							size_t downloadHttpIdx = endpointDownload.find("http://");
+							size_t downloadHttpsIdx = endpointDownload.find("https://");
+
+							size_t downloadOff = 0;
+							if (downloadHttpIdx != std::string::npos)
+							{
+								downloadOff = downloadHttpIdx + 7; // 7 is length of "http://"
+							}
+							if (downloadHttpsIdx != std::string::npos)
+							{
+								downloadOff = downloadHttpsIdx + 8; // 8 is length of "https://"
+							}
+							
+							idx = endpointDownload.find("/", downloadOff);
+							if (idx == std::string::npos)
+							{
+								LogWarning("Abort update download, malformed URL (%s) on %s. (EUpdateProvider::GitHub)", endpointDownload.c_str(), aDefinitions->Name);
+								return false;
+							}
+
+							downloadBaseUrl = endpointDownload.substr(0, idx);
+							endpointDownload = endpointDownload.substr(idx);
+
+							httplib::Client downloadClient(downloadBaseUrl);
+							downloadClient.enable_server_certificate_verification(false);
+							downloadClient.set_follow_location(true);
+
 							size_t bytesWritten = 0;
 							std::ofstream file(pathUpdate, std::ofstream::binary);
-							auto downloadResult = client.Get(endpointDownload, [&](const char* data, size_t data_length) {
+							auto downloadResult = downloadClient.Get(endpointDownload, [&](const char* data, size_t data_length) {
 								file.write(data, data_length);
 								bytesWritten += data_length;
 								return true;
@@ -328,14 +391,15 @@ namespace Updater
 
 							if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
 							{
-								LogWarning(CH_UPDATER, "Error fetching %s%s", baseUrl.c_str(), endpointDownload.c_str());
+								LogWarning(CH_UPDATER, "Error fetching %s%s", downloadBaseUrl.c_str(), endpointDownload.c_str());
 							}
 							else
 							{
 								std::filesystem::rename(aPath, pathOld);
 								std::filesystem::rename(pathUpdate, aPath);
 
-								LogInfo(CH_UPDATER, "Successfully updated Nexus. Restart required to take effect.");
+								LogInfo(CH_UPDATER, "Successfully updated %s.", aDefinitions->Name);
+								wasUpdated = true;
 							}
 						}
 					}
@@ -345,11 +409,9 @@ namespace Updater
 		else if (EUpdateProvider::Direct == aDefinitions->Provider)
 		{
 			LogDebug(CH_UPDATER, "EUpdateProvider::Direct not implemented.");
-			return; // not implemented: need a way to check for update. md5? extra file? filename?
+			return false; // not implemented: need a way to check for update. md5? extra file? filename?
 		}
 
-		/* cleanup files */
-		if (std::filesystem::exists(pathOld)) { std::filesystem::remove(pathOld); }
-		if (std::filesystem::exists(pathUpdate)) { std::filesystem::remove(pathUpdate); }
+		return wasUpdated;
 	}
 }
