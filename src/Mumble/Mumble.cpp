@@ -34,9 +34,7 @@ namespace Mumble
 		IsRunning = true;
 
 		UpdateIdentityThread = std::thread(UpdateIdentityLoop);
-		UpdateIdentityThread.detach();
 		UpdateStateThread = std::thread(UpdateStateLoop);
-		UpdateStateThread.detach();
 
 		NexusLink = (NexusLinkData*)DataLink::ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData));
 	}
@@ -46,6 +44,8 @@ namespace Mumble
 		if (State::Nexus == ENexusState::SHUTTING_DOWN)
 		{
 			IsRunning = false;
+			UpdateIdentityThread.join();
+			UpdateStateThread.join();
 		}
 	}
 

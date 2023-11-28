@@ -42,18 +42,24 @@ namespace Loader
 		if (State::Nexus < ENexusState::LOADED)
 		{
 			LoaderThread = std::thread(DetectAddonsLoop);
-			LoaderThread.detach();
 		}
 	}
 	void Shutdown()
 	{
 		if (State::Nexus == ENexusState::SHUTTING_DOWN)
 		{
+			LoaderThread.join();
+
 			Loader::Mutex.lock();
 			{
 				while (Addons.size() != 0)
 				{
 					UnloadAddon(Addons.begin()->first);
+					if (Addons.begin()->second->Module)
+					{
+						Log(CH_LOADER, "Despite being unloaded \"%s\" still has an HMODULE defined, calling FreeLibrary().", Addons.begin()->first.string().c_str());
+						FreeLibrary(Addons.begin()->second->Module);
+					}
 					Addons.erase(Addons.begin());
 				}
 			}
@@ -242,28 +248,29 @@ namespace Loader
 		{
 			addon = Addons[aPath];
 
-			switch (addon->State)
+			if (!addon->Module)
 			{
-			case EAddonState::NotLoaded:
-				LogWarning(CH_LOADER, "Cancelled unloading \"%s\". Already unloaded.", path);
-				return;
-			case EAddonState::NotLoadedDuplicate:
-				LogWarning(CH_LOADER, "Cancelled unloading \"%s\". EAddonState::NotLoadedDuplicate. This should never happen.", path);
-				return;
+				switch (addon->State)
+				{
+				case EAddonState::NotLoaded:
+					LogWarning(CH_LOADER, "Cancelled shutdown of \"%s\". Already shut down.", path);
+					return;
+				case EAddonState::NotLoadedDuplicate:
+					LogWarning(CH_LOADER, "Cancelled shutdown of \"%s\". EAddonState::NotLoadedDuplicate. This should never happen.", path);
+					return;
 
-			case EAddonState::Incompatible:
-				LogWarning(CH_LOADER, "Cancelled unloading \"%s\". EAddonState::Incompatible. This should never happen.", path);
-				return;
-			case EAddonState::IncompatibleAPI:
-				LogWarning(CH_LOADER, "Cancelled unloading \"%s\". EAddonState::IncompatibleAPI. This should never happen.", path);
-				return;
+				case EAddonState::Incompatible:
+					LogWarning(CH_LOADER, "Cancelled shutdown of \"%s\". EAddonState::Incompatible. This should never happen.", path);
+					return;
+				case EAddonState::IncompatibleAPI:
+					LogWarning(CH_LOADER, "Cancelled shutdown of \"%s\". EAddonState::IncompatibleAPI. This should never happen.", path);
+					return;
+				}
 			}
 		}
 		else
 		{
-			addon = new Addon{};
-			addon->State = EAddonState::None;
-			Addons.insert({ aPath, addon });
+			return;
 		}
 
 		if (Addons[aPath]->Definitions != nullptr)
@@ -275,22 +282,24 @@ namespace Loader
 				Addons[aPath]->Definitions->HasFlag(EAddonFlags::DisableHotloading))
 			{
 				LogWarning(CH_LOADER, "Prevented unloading \"%s\" because either no Unload function is defined or Hotloading is explicitly disabled. (%s)", name.c_str(), path);
-				return;
 			}
-			Addons[aPath]->Definitions->Unload();
-
-			if (Addons[aPath]->Module)
+			else
 			{
-				if (!FreeLibrary(Addons[aPath]->Module))
-				{
-					LogWarning(CH_LOADER, "Couldn't unload \"%s\". FreeLibrary() call failed. (%s)", name.c_str(), path);
-					return;
-				}
+				Addons[aPath]->Definitions->Unload();
 			}
 		}
 		else
 		{
 			LogCritical(CH_LOADER, "Fatal Error. \"%s\" : Definitions == nullptr", path);
+		}
+
+		if (Addons[aPath]->Module)
+		{
+			if (!FreeLibrary(Addons[aPath]->Module))
+			{
+				LogWarning(CH_LOADER, "Couldn't unload \"%s\". FreeLibrary() call failed.", path);
+				return;
+			}
 		}
 
 		if (Addons[aPath]->Module != nullptr && Addons[aPath]->ModuleSize > 0)
@@ -346,7 +355,7 @@ namespace Loader
 	{
 		for (;;)
 		{
-			if (State::Nexus == ENexusState::SHUTDOWN) { return; }
+			if (State::Nexus >= ENexusState::SHUTTING_DOWN) { return; }
 
 			if (State::Nexus == ENexusState::READY)
 			{
