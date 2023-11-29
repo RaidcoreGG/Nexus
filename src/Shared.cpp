@@ -5,7 +5,7 @@ HMODULE						GameHandle			= nullptr;
 HMODULE						D3D11Handle			= nullptr;
 HMODULE						D3D11SystemHandle	= nullptr;
 
-AddonVersion*				Version				= new AddonVersion{};
+AddonVersion				Version				= {};
 std::vector<std::string>	Parameters			= {};
 
 LinkedMem*					MumbleLink			= nullptr;
@@ -20,7 +20,9 @@ ImFont*						Font				= nullptr;
 ImFont*						FontBig				= nullptr;
 ImFont*						FontUI				= nullptr;
 
-ImGuiWindowFlags			WindowFlags_Default =	ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse;
+ImGuiWindowFlags			WindowFlags_Default =	ImGuiWindowFlags_AlwaysAutoResize |
+													ImGuiWindowFlags_NoResize |
+													ImGuiWindowFlags_NoCollapse;
 ImGuiWindowFlags			WindowFlags_Overlay =	ImGuiWindowFlags_NoDecoration |
 													ImGuiWindowFlags_AlwaysAutoResize |
 													ImGuiWindowFlags_NoSavedSettings |

@@ -1,22 +1,13 @@
 #ifndef LOGHANDLER_H
 #define LOGHANDLER_H
 
-#include <vector>
 #include <mutex>
-#include <ctime>
-#include <thread>
-#include <cstdarg>
-#include <algorithm>
-#include <chrono>
+#include <vector>
 #include <string>
-
-#include "../Paths.h"
 
 #include "ILogger.h"
 #include "LogEntry.h"
-
-#include "ConsoleLogger.h"
-#include "FileLogger.h"
+#include "ELogLevel.h"
 
 namespace LogHandler
 {
@@ -43,7 +34,6 @@ namespace LogHandler
 
 	/* Logging internal functions */
 	void LogMessage(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, va_list aArgs);
-	void ProcessQueueLoop();
 
 	int Verify(void* aStartAddress, void* aEndAddress);
 }

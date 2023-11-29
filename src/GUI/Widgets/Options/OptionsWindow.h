@@ -1,29 +1,17 @@
 #ifndef GUI_KEYBINDSWINDOW_H
 #define GUI_KEYBINDSWINDOW_H
 
-#include <regex>
+#include <string>
 
-#include "../../../Shared.h"
-#include "../../../Paths.h"
-#include "../../../State.h"
-#include "../../../Renderer.h"
-
-#include "../../../Keybinds/KeybindHandler.h"
-#include "../../../API/APIController.h"
-
-#include "../../../imgui/imgui.h"
-#include "../../../imgui/imgui_extensions.h"
-
-#include "../../GUI.h"
-#include "../../IWindow.h"
-#include "../QuickAccess/QuickAccess.h"
+#include "GUI/IWindow.h"
 
 namespace GUI
 {
 	class OptionsWindow : public IWindow
 	{
 		public:
-		void Render();
+			OptionsWindow(std::string aName);
+			void Render();
 	};
 }
 

@@ -1,12 +1,20 @@
 #include "TextureLoader.h"
 
+#include <d3d11.h>
+#include <vector>
+#include <wincodec.h>
+#include <filesystem>
+
+#include "Consts.h"
+#include "Shared.h"
+#include "Paths.h"
+#include "core.h"
+#include "Renderer.h"
+
 /* For some reason this has to be defined AND included here. */
 #define STB_IMAGE_IMPLEMENTATION
-#define CPPHTTPLIB_OPENSSL_SUPPORT
-#include <openssl/ssl.h>
-#include <openssl/err.h>
-#include "../stb/stb_image.h"
-#include "../httplib/httplib.h"
+#include "stb/stb_image.h"
+#include "httpslib.h"
 
 namespace TextureLoader
 {
@@ -47,6 +55,12 @@ namespace TextureLoader
 			return;
 		}
 
+		if (!std::filesystem::exists(aFilename))
+		{
+			Log(CH_TEXTURES, "File provided does not exist: %s (%s)", aFilename, str.c_str());
+			return;
+		}
+
 		// Load from disk into a raw RGBA buffer
 		int image_width = 0;
 		int image_height = 0;
@@ -71,24 +85,28 @@ namespace TextureLoader
 		HRSRC imageResHandle = FindResourceA(aModule, MAKEINTRESOURCEA(aResourceID), "PNG");
 		if (!imageResHandle)
 		{
+			LogDebug(CH_TEXTURES, "Resource not found ResID: %u (%s)", aResourceID, str.c_str());
 			return;
 		}
 
 		HGLOBAL imageResDataHandle = LoadResource(aModule, imageResHandle);
 		if (!imageResDataHandle)
 		{
+			LogDebug(CH_TEXTURES, "Failed loading resource: %u (%s)", aResourceID, str.c_str());
 			return;
 		}
 
 		LPVOID imageFile = LockResource(imageResDataHandle);
 		if (!imageFile)
 		{
+			LogDebug(CH_TEXTURES, "Failed locking resource: %u (%s)", aResourceID, str.c_str());
 			return;
 		}
 
 		DWORD imageFileSize = SizeofResource(aModule, imageResHandle);
 		if (!imageFileSize)
 		{
+			LogDebug(CH_TEXTURES, "Failed getting size of resource: %u (%s)", aResourceID, str.c_str());
 			return;
 		}
 
@@ -143,6 +161,27 @@ namespace TextureLoader
 		delete[] remote_data;
 
 		QueueTexture(str.c_str(), data, image_width, image_height, aCallback);
+	}
+	void LoadFromMemory(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback)
+	{
+		std::string str = aIdentifier;
+
+		Texture* tex = Get(str.c_str());
+		if (tex != nullptr)
+		{
+			if (aCallback)
+			{
+				aCallback(aIdentifier, tex);
+			}
+			return;
+		}
+
+		int image_width = 0;
+		int image_height = 0;
+		int image_components = 0;
+		unsigned char* image_data = stbi_load_from_memory((const stbi_uc*)aData, static_cast<int>(aSize), &image_width, &image_height, &image_components, 0);
+
+		QueueTexture(str.c_str(), image_data, image_width, image_height, aCallback);
 	}
 
 	void ProcessQueue()
@@ -201,6 +240,13 @@ namespace TextureLoader
 		subResource.SysMemPitch = desc.Width * 4;
 		subResource.SysMemSlicePitch = 0;
 		Renderer::Device->CreateTexture2D(&desc, &subResource, &pTexture);
+
+		if (!pTexture)
+		{
+			LogDebug(CH_TEXTURES, "pTexture was null");
+			stbi_image_free(aQueuedTexture.Data);
+			return;
+		}
 
 		// Create texture view
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;

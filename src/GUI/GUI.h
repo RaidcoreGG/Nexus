@@ -1,39 +1,17 @@
 #ifndef GUI_H
 #define GUI_H
 
-#include <filesystem>
-#include <map>
+#include <Windows.h>
 #include <mutex>
 #include <vector>
+#include <map>
 
-#include "../State.h"
-#include "../Renderer.h"
-#include "../Paths.h"
-#include "../Shared.h"
-#include "../Consts.h"
-#include "../Branch.h"
+#include "FuncDefs.h"
 
-#include "../Keybinds/KeybindHandler.h"
-#include "../Loader/Loader.h"
-#include "../Settings/Settings.h"
-
-#include "../imgui/imgui.h"
-#include "../imgui/imgui_extensions.h"
-#include "../imgui/imgui_impl_win32.h"
-#include "../imgui/imgui_impl_dx11.h"
-
-#include "Widgets/Menu/Menu.h"
-#include "Widgets/Addons/AddonsWindow.h"
-#include "Widgets/Options/OptionsWindow.h"
-#include "Widgets/Log/LogWindow.h"
-#include "Widgets/Debug/DebugWindow.h"
-#include "Widgets/About/AboutBox.h"
-#include "Widgets/QuickAccess/QuickAccess.h"
-#include "Widgets/Menu/MenuItem.h"
-
-#include "../resource.h"
-#include "../Textures/Texture.h"
+#include "IWindow.h"
 #include "EFontIdentifier.h"
+
+#include "imgui/imgui.h"
 
 namespace GUI
 {
@@ -46,8 +24,11 @@ namespace GUI
 	extern std::map<EFont, ImFont*>		FontIndex;
 	extern float						FontSize;
 	extern bool							CloseMenuAfterSelecting;
+	extern bool							CloseOnEscape;
 
 	extern bool							IsUIVisible;
+
+	extern bool							AcceptedEULA;
 
 	void Initialize();
 	void Shutdown();

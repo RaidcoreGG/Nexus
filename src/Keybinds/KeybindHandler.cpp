@@ -1,5 +1,20 @@
 #include "KeybindHandler.h"
 
+#include <fstream>
+#include <filesystem>
+#include <string>
+#include <cstdarg>
+
+#include "core.h"
+#include "Paths.h"
+#include "Shared.h"
+#include "State.h"
+
+#include "KeystrokeMessageFlags.h"
+
+#include "nlohmann/json.hpp"
+using json = nlohmann::json;
+
 namespace Keybinds
 {
 	std::mutex								Mutex;
@@ -19,7 +34,7 @@ namespace Keybinds
 			key.ScanCode = i;
 			char* buff = new char[64];
 			std::string str;
-			GetKeyNameTextA(KMFToLParam(key), buff, 64);
+			GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, 64);
 			str.append(buff);
 
 			ScancodeLookupTable[key.GetScanCode()] = str;
@@ -27,13 +42,15 @@ namespace Keybinds
 			key.ExtendedFlag = 1;
 			buff = new char[64];
 			str = "";
-			GetKeyNameTextA(KMFToLParam(key), buff, 64);
+			GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, 64);
 			str.append(buff);
 
 			ScancodeLookupTable[key.GetScanCode()] = str;
 
 			delete[] buff;
 		}
+
+		Load();
 	}
 
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

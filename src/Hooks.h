@@ -2,7 +2,7 @@
 #define HOOKS_H
 
 #include <Windows.h>
-#include <d3d11.h>
+#include <dxgi.h>
 
 typedef HRESULT (__stdcall*DXPRESENT)		(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags);
 typedef HRESULT (__stdcall*DXRESIZEBUFFERS)	(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);

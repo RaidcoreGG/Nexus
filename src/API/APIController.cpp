@@ -1,5 +1,17 @@
 #include "APIController.h"
 
+#include <filesystem>
+#include <fstream>
+#include <algorithm>
+
+#include "Paths.h"
+#include "Shared.h"
+
+#include "httpslib.h"
+
+#include "nlohmann/json.hpp"
+using json = nlohmann::json;
+
 namespace API
 {
 	const char*					BaseURL = "https://api.guildwars2.com/v2/";

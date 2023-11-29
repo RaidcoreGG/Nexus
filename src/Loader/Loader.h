@@ -2,42 +2,27 @@
 #define LOADER_H
 
 #include <mutex>
+#include <vector>
 #include <map>
-#include <set>
 #include <thread>
 #include <filesystem>
-#include <Windows.h>
-#include <Psapi.h>
-
-#include "../core.h"
-#include "../State.h"
-#include "../Shared.h"
-#include "../Paths.h"
-#include "../Renderer.h"
 
 #include "ELoaderAction.h"
-#include "AddonDefinition.h"
 #include "Addon.h"
-#include "FuncDefs.h"
+#include "AddonAPI.h"
 
-#include "../Mumble/LinkedMem.h"
-#include "../Logging/LogHandler.h"
-#include "../Events/EventHandler.h"
-#include "../WndProc/WndProcHandler.h"
-#include "../Keybinds/KeybindHandler.h"
-#include "../imgui/imgui.h"
-#include "../minhook/mh_hook.h"
-#include "../DataLink/DataLink.h"
-#include "../Textures/TextureLoader.h"
-#include "../GUI/GUI.h"
-#include "../GUI/Widgets/QuickAccess/QuickAccess.h"
+struct QAddon
+{
+	ELoaderAction Action;
+	std::filesystem::path Path;
+};
 
 namespace Loader
 {
 	extern std::mutex Mutex;
-	extern std::map<std::filesystem::path, ELoaderAction> QueuedAddons;		/* To be loaded or unloaded addons */
-	extern std::map<std::filesystem::path, Addon*> Addons;					/* Addons and their corresponding paths */
-	extern std::map<int, AddonAPI*> ApiDefs;								/* Addon API definitions, created on demand */
+	extern std::vector<QAddon> QueuedAddons;					/* To be loaded or unloaded addons */
+	extern std::map<std::filesystem::path, Addon*> Addons;		/* Addons and their corresponding paths */
+	extern std::map<int, AddonAPI*> ApiDefs;					/* Addon API definitions, created on demand */
 
 	extern std::thread LoaderThread;
 

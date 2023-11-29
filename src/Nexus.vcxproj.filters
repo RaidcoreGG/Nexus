@@ -261,6 +261,9 @@
     <ClCompile Include="Updater\Updater.cpp">
       <Filter>Updater</Filter>
     </ClCompile>
+    <ClCompile Include="CrashHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imstb_truetype.h">
@@ -963,6 +966,12 @@
       <Filter>Updater</Filter>
     </ClInclude>
     <ClInclude Include="Version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CrashHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="httpslib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

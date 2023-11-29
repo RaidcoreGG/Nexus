@@ -1,15 +1,10 @@
 #ifndef EVENTHANDLER_H
 #define EVENTHANDLER_H
 
+#include <mutex>
 #include <map>
 #include <vector>
-#include <mutex>
 #include <string>
-#include <thread>
-#include <algorithm>
-
-#include "../Consts.h"
-#include "../Shared.h"
 
 #include "FuncDefs.h"
 

@@ -1,19 +1,6 @@
 #ifndef STATE_H
 #define STATE_H
 
-#include <Windows.h>
-#include <string>
-#include <algorithm>
-#include <shellapi.h>
-#include <regex>
-
-#include "core.h"
-#include "Consts.h"
-#include "Shared.h"
-
-#include "Mumble/Mumble.h"
-#include "DataLink/DataLink.h"
-
 /* State of Nexus */
 enum class ENexusState
 {
@@ -21,6 +8,7 @@ enum class ENexusState
 	LOAD,									/* Nexus is loading */
 	LOADED,									/* Nexus has initialized all components */
 	READY,									/* Nexus is ready to initialise UI */
+	SHUTTING_DOWN,							/* Nexus is shutting down */
 	SHUTDOWN								/* Nexus has been shut down */
 };
 

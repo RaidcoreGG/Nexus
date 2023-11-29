@@ -1,7 +1,19 @@
 #include "LogWindow.h"
 
+#include "Shared.h"
+#include "Paths.h"
+#include "State.h"
+
+#include "Logging/LogHandler.h"
+
+#include "imgui.h"
+#include "imgui_extensions.h"
+
 namespace GUI
 {
+	float lwWidth = 38.0f;
+	float lwHeight = 24.0f;
+
 	bool SelectedOnly = false;
 	std::string ChannelFilter;
 
@@ -10,8 +22,9 @@ namespace GUI
 	const char* filterLevels[] = { "Critical", "Warning", "Info", "Debug", "Trace", "All" };
 	size_t amtShown = 0;
 
-	LogWindow::LogWindow(ELogLevel aLogLevel)
+	LogWindow::LogWindow(std::string aName, ELogLevel aLogLevel)
 	{
+		Name = aName;
 		LogLevel = aLogLevel;
 	}
 
@@ -25,8 +38,8 @@ namespace GUI
 			off2 = ImGui::CalcTextSize("XXXXXXXXXXX").x;
 		}
 
-		ImGui::SetNextWindowSize(ImVec2(600.0f, 380.0f));
-		if (ImGui::Begin("Log", &Visible, WindowFlags_Default))
+		ImGui::SetNextWindowSize(ImVec2(lwWidth * ImGui::GetFontSize(), lwHeight * ImGui::GetFontSize()), ImGuiCond_FirstUseEver);
+		if (ImGui::Begin(Name.c_str(), &Visible, ImGuiWindowFlags_NoCollapse))
 		{
 			static int selectedLevel = (int)(ELogLevel::ALL)-1;
 			ImGui::Text("Filter: "); ImGui::SameLine();

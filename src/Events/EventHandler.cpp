@@ -1,5 +1,11 @@
 #include "EventHandler.h"
 
+#include <thread>
+#include <algorithm>
+
+#include "Consts.h"
+#include "Shared.h"
+
 namespace Events
 {
 	std::mutex											Mutex;
@@ -9,7 +15,7 @@ namespace Events
 	{
 		std::string str = aIdentifier;
 
-		Log(CH_EVENTS, str.c_str());
+		//Log(CH_EVENTS, str.c_str());
 
 		Events::Mutex.lock();
 		{

@@ -1,5 +1,8 @@
 #include "LogEntry.h"
 
+#include <iomanip>
+#include <sstream>
+
 std::string LogEntry::TimestampString(bool aIncludeDate)
 {
 	struct tm timeinfo;

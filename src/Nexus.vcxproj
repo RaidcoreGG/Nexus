@@ -15,6 +15,7 @@
     <ClCompile Include="API\APIController.cpp" />
     <ClCompile Include="Consts.cpp" />
     <ClCompile Include="core.cpp" />
+    <ClCompile Include="CrashHandler.cpp" />
     <ClCompile Include="DataLink\DataLink.cpp" />
     <ClCompile Include="entry.cpp" />
     <ClCompile Include="Events\EventHandler.cpp" />
@@ -69,6 +70,7 @@
     <ClInclude Include="Branch.h" />
     <ClInclude Include="Consts.h" />
     <ClInclude Include="core.h" />
+    <ClInclude Include="CrashHandler.h" />
     <ClInclude Include="DataLink\DataLink.h" />
     <ClInclude Include="DataLink\FuncDefs.h" />
     <ClInclude Include="DataLink\LinkedResource.h" />
@@ -94,6 +96,7 @@
     <ClInclude Include="GUI\Widgets\QuickAccess\Shortcut.h" />
     <ClInclude Include="Hooks.h" />
     <ClInclude Include="httplib\httplib.h" />
+    <ClInclude Include="httpslib.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_extensions.h" />
@@ -358,7 +361,7 @@
     <TargetName>d3d11</TargetName>
     <OutDir>$(SolutionDir)$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)$(Platform)\</IntDir>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir);$(ProjectDir)imgui;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)openssl\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -366,7 +369,7 @@
     <TargetName>d3d11</TargetName>
     <OutDir>$(SolutionDir)$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)$(Platform)\</IntDir>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir);$(ProjectDir)imgui;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)openssl\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

@@ -1,8 +1,7 @@
 #ifndef ADDONDEF_H
 #define ADDONDEF_H
 
-#include <iomanip>
-#include <sstream>
+#include <string>
 
 #include "AddonAPI.h"
 #include "EAddonFlags.h"

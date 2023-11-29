@@ -1,9 +1,10 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include <Windows.h>
 #include <d3d11.h>
 
-#include "imgui/imgui.h"
+#include "imgui.h"
 
 /* Namespace for renderer variables */
 namespace Renderer

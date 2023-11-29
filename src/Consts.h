@@ -20,6 +20,11 @@ extern const char* CH_UPDATER;
 
 /* Keybinds */
 extern const char* KB_MENU;
+extern const char* KB_ADDONS;
+extern const char* KB_OPTIONS;
+extern const char* KB_LOG;
+extern const char* KB_DEBUG;
+extern const char* KB_MUMBLEOVERLAY;
 extern const char* KB_TOGGLEHIDEUI;
 
 /* Textures & Icons */

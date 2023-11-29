@@ -3,8 +3,6 @@
 
 #include <Windows.h>
 
-#include "core.h"
-
 /* Namespace for global path variables */
 namespace Path
 {

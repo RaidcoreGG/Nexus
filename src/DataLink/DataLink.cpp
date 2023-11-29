@@ -1,5 +1,9 @@
 #include "DataLink.h"
 
+#include "Consts.h"
+#include "Shared.h"
+#include "State.h"
+
 namespace DataLink
 {
 	std::mutex								Mutex;
@@ -7,30 +11,34 @@ namespace DataLink
 
 	void Free()
 	{
-		DataLink::Mutex.lock();
+		if (State::Nexus == ENexusState::SHUTTING_DOWN)
 		{
-			while (Registry.size() > 0)
+			DataLink::Mutex.lock();
 			{
-				const auto& it = Registry.begin();
-
-				if (it->second.Pointer)
+				while (Registry.size() > 0)
 				{
-					UnmapViewOfFile((LPVOID)it->second.Pointer);
-					it->second.Pointer = nullptr;
+					const auto& it = Registry.begin();
+
+					if (it->second.Pointer)
+					{
+						UnmapViewOfFile((LPVOID)it->second.Pointer);
+						it->second.Pointer = nullptr;
+					}
+
+					if (it->second.Handle)
+					{
+						CloseHandle(it->second.Handle);
+						it->second.Handle = nullptr;
+					}
+
+					LogDebug(CH_DATALINK, "Freed shared resource: \"%s\"", it->first.c_str());
+
+					Registry.erase(it);
 				}
-
-				if (it->second.Handle)
-				{
-					CloseHandle(it->second.Handle);
-					it->second.Handle = nullptr;
-				}
-
-				LogDebug(CH_DATALINK, "Freed shared resource: \"%s\"", it->first.c_str());
-
-				Registry.erase(it);
 			}
+			DataLink::Mutex.unlock();
 		}
-		DataLink::Mutex.unlock();
+		
 	}
 
 	void* GetResource(const char* aIdentifier)
@@ -87,12 +95,12 @@ namespace DataLink
 				resource.Handle = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, strOverride.c_str());
 				if (resource.Handle == 0)
 				{
-					resource.Handle = CreateFileMappingA(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, aResourceSize, strOverride.c_str());
+					resource.Handle = CreateFileMappingA(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, static_cast<DWORD>(aResourceSize), strOverride.c_str());
 				}
 
 				if (resource.Handle)
 				{
-					resource.Pointer = MapViewOfFile(resource.Handle, FILE_MAP_ALL_ACCESS, 0, 0, aResourceSize);
+					resource.Pointer = MapViewOfFile(resource.Handle, FILE_MAP_ALL_ACCESS, 0, 0, static_cast<DWORD>(aResourceSize));
 
 					Registry[str] = resource;
 					result = resource.Pointer;

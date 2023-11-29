@@ -1,13 +1,31 @@
 #include "DebugWindow.h"
 
+#include "Shared.h"
+#include "State.h"
+
+#include "Events/EventHandler.h"
+#include "Keybinds/KeybindHandler.h"
+#include "DataLink/DataLink.h"
+#include "Textures/TextureLoader.h"
+#include "GUI/Widgets/QuickAccess/QuickAccess.h"
+#include "Loader/Loader.h"
+
+#include "imgui.h"
+#include "imgui_extensions.h"
+#include "imgui_memory_editor.h"
+
 namespace GUI
 {
+	float dwWidth = 30.0f;
+	float dwHeight = 24.0f;
+
 	static ImGui::MemoryEditor memEditor;
 	void* memPtr = nullptr;
 	size_t memSz = 0;
 
-	DebugWindow::DebugWindow()
+	DebugWindow::DebugWindow(std::string aName)
 	{
+		Name = aName;
 		MumbleWindow = new MumbleOverlay();
 	}
 
@@ -19,8 +37,8 @@ namespace GUI
 
 		if (!Visible) { return; }
 
-		ImGui::SetNextWindowSize(ImVec2(480.0f, 380.0f));
-		if (ImGui::Begin("Debug", &Visible, WindowFlags_Default))
+		ImGui::SetNextWindowSize(ImVec2(dwWidth * ImGui::GetFontSize(), dwHeight * ImGui::GetFontSize()), ImGuiCond_FirstUseEver);
+		if (ImGui::Begin(Name.c_str(), &Visible, ImGuiWindowFlags_NoCollapse))
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f });
 			ImGui::Checkbox("Show Mumble overlay", &MumbleWindow->Visible);
@@ -262,12 +280,12 @@ namespace GUI
 										ImGui::TextDisabled("Module Size: %u", addon->ModuleSize);
 										ImGui::TextDisabled("AddonDefs: %p", addon->Definitions);
 
-										if (addon->Definitions != nullptr)
+										if (addon->Definitions.Signature != 0)
 										{
 											if (ImGui::SmallButton("Memory Editor"))
 											{
 												memEditor.Open = true;
-												memPtr = addon->Definitions;
+												memPtr = &addon->Definitions;
 												memSz = sizeof(AddonDefinition);
 											}
 										}
@@ -279,9 +297,9 @@ namespace GUI
 							}
 							if (ImGui::TreeNode("Queued"))
 							{
-								for (const auto& [path, action] : Loader::QueuedAddons)
+								for (const auto& qAddon : Loader::QueuedAddons)
 								{
-									switch (action)
+									switch (qAddon.Action)
 									{
 									case ELoaderAction::Load:
 										ImGui::Text("Load");
@@ -294,7 +312,7 @@ namespace GUI
 										break;
 									}
 									ImGui::SameLine();
-									ImGui::TextDisabled("%s", path.string().c_str());
+									ImGui::TextDisabled("%s", qAddon.Path.string().c_str());
 								}
 								ImGui::TreePop();
 							}

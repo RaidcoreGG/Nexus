@@ -7,6 +7,8 @@
 
 #include "Version.h"
 
+#include "CrashHandler.h"
+
 #include "core.h"
 #include "Paths.h"
 #include "State.h"
@@ -16,7 +18,6 @@
 #include "Consts.h"
 
 #include "Logging/LogHandler.h"
-
 #include "Mumble/Mumble.h"
 #include "WndProc/WndProcHandler.h"
 #include "Keybinds/KeybindHandler.h"
@@ -47,31 +48,35 @@ void UpdateNexusLink()
 
 void Initialize()
 {
+	if (State::Nexus >= ENexusState::LOAD) { return; }
+
 	State::Nexus = ENexusState::LOAD;
 
-	Version->Major = V_MAJOR;
-	Version->Minor = V_MINOR;
-	Version->Build = V_BUILD;
-	Version->Revision = V_REVISION;
+	Version.Major = V_MAJOR;
+	Version.Minor = V_MINOR;
+	Version.Build = V_BUILD;
+	Version.Revision = V_REVISION;
 
-	LogInfo(CH_CORE, GetCommandLineA());
-	LogInfo(CH_CORE, "Version: %s", Version->ToString().c_str());
+	SetUnhandledExceptionFilter(UnhandledExcHandler);
+	GameHandle = GetModuleHandle(NULL);
 
 	State::Initialize();
 	Path::Initialize(NexusHandle);
+	LogHandler::Initialize();
+
+	LogInfo(CH_CORE, GetCommandLineA());
+	LogInfo(CH_CORE, "Version: %s", Version.ToString().c_str());
+	LogInfo(CH_CORE, "::Initialize() called. Entry method: %d", State::EntryMethod);
+
 	//Paradigm::Initialize();
+	Updater::SelfUpdate();
 
-	Updater::Initialize();
-
-	/* Don't initialize anything if vanilla*/
+	/* Don't initialize anything if vanilla */
 	if (!State::IsVanilla)
 	{
-		LogHandler::Initialize();
-
 		MH_Initialize();
 
 		Keybinds::Initialize();
-		Keybinds::Load();
 		Settings::Load();
 		
 		// if it's not already been explicitly set via command line, check settings
@@ -91,7 +96,6 @@ void Initialize()
 		//API::Initialize();
 
 		Mumble::Initialize();
-		NexusLink = (NexusLinkData*)DataLink::ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData));
 
 		// create imgui context
 		if (!Renderer::GuiContext) { Renderer::GuiContext = ImGui::CreateContext(); }
@@ -109,15 +113,17 @@ void Shutdown()
 {
 	LogCritical(CH_CORE, "::Shutdown()");
 
-	if (State::Nexus < ENexusState::SHUTDOWN)
+	if (State::Nexus < ENexusState::SHUTTING_DOWN)
 	{
-		State::Nexus = ENexusState::SHUTDOWN;
+		State::Nexus = ENexusState::SHUTTING_DOWN;
+
+		// free addons
+		Loader::Shutdown();
 
 		GUI::Shutdown();
 		Mumble::Shutdown();
 
-		// free addons & shared mem
-		Loader::Shutdown();
+		// shared mem
 		DataLink::Free();
 
 		/* Save keybinds, settings, api keys & api cache */
@@ -126,6 +132,10 @@ void Shutdown()
 		//API::Save();
 
 		MH_Uninitialize();
+
+		LogInfo(CH_CORE, "Shutdown performed.");
+
+		State::Nexus = ENexusState::SHUTDOWN;
 	}
 
 	// free libs
@@ -154,7 +164,10 @@ LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 	}
 
-	if (uMsg == WM_DESTROY) { ::Shutdown(); }
+	if (uMsg == WM_DESTROY || uMsg == WM_QUIT)
+	{
+		::Shutdown();
+	}
 
 	return CallWindowProcA(Hooks::GW2_WndProc, hWnd, uMsg, wParam, lParam);
 }
@@ -309,6 +322,8 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CREATEDEVICE; }
 
+	::Initialize();
+
 	static decltype(&D3D11CreateDevice) func;
 	static const char* func_name = "D3D11CreateDevice";
 	Log(CH_CORE, func_name);
@@ -340,6 +355,8 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, const DXGI_SWAP_CHAIN_DESC* pSwapChainDesc, IDXGISwapChain** ppSwapChain, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext)
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CREATEDEVICEANDSWAPCHAIN; }
+
+	::Initialize();
 
 	static decltype(&D3D11CreateDeviceAndSwapChain) func;
 	static const char* func_name = "D3D11CreateDeviceAndSwapChain";
@@ -373,6 +390,8 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_CREATEDEVICE; }
 
+	::Initialize();
+
 	static decltype(&D3D11CoreCreateDevice) func;
 	static const char* func_name = "D3D11CoreCreateDevice";
 	Log(CH_CORE, func_name);
@@ -404,6 +423,8 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 HRESULT __stdcall D3D11CoreCreateLayeredDevice(const void* unknown0, DWORD unknown1, const void* unknown2, REFIID riid, void** ppvObj)
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_CREATELAYEREDDEVICE; }
+
+	::Initialize();
 
 	static decltype(&D3D11CoreCreateLayeredDevice) func;
 	static const char* func_name = "D3D11CoreCreateLayeredDevice";
@@ -437,6 +458,8 @@ SIZE_T	__stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unkno
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_GETLAYEREDDEVICESIZE; }
 
+	::Initialize();
+
 	static decltype(&D3D11CoreGetLayeredDeviceSize) func;
 	static const char* func_name = "D3D11CoreGetLayeredDeviceSize";
 	Log(CH_CORE, func_name);
@@ -468,6 +491,8 @@ SIZE_T	__stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unkno
 HRESULT __stdcall D3D11CoreRegisterLayers(const void* unknown0, DWORD unknown1)
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_REGISTERLAYERS; }
+
+	::Initialize();
 
 	static decltype(&D3D11CoreRegisterLayers) func;
 	static const char* func_name = "D3D11CoreRegisterLayers";
@@ -506,12 +531,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	case DLL_PROCESS_ATTACH:
 		DisableThreadLibraryCalls(hModule);
 		NexusHandle = hModule;
-		GameHandle = GetModuleHandle(NULL);
-
-		::Initialize();
 		break;
 	case DLL_PROCESS_DETACH:
-
+		::Shutdown();
 		break;
 	}
 	return true;

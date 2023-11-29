@@ -4,18 +4,8 @@
 #include <mutex>
 #include <vector>
 
-#include "../../../Shared.h"
-#include "../../../Paths.h"
-#include "../../../State.h"
-
-#include "../../../resource.h"
-#include "../../../Textures/Texture.h"
-
-#include "../../../imgui/imgui.h"
-#include "../../../imgui/imgui_extensions.h"
-
-#include "../../IWindow.h"
 #include "MenuItem.h"
+#include "Textures/Texture.h"
 
 namespace GUI
 {

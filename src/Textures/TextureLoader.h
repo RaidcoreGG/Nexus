@@ -1,20 +1,14 @@
 #ifndef TEXTURELOADER_H
 #define TEXTURELOADER_H
 
-#include <d3d11.h>
-#include <string>
-#include <map>
+#include <Windows.h>
 #include <mutex>
+#include <map>
+#include <string>
 #include <vector>
-#include <wincodec.h>
-
-#include "../Consts.h"
-#include "../Shared.h"
-#include "../Paths.h"
-#include "../core.h"
-#include "../Renderer.h"
 
 #include "FuncDefs.h"
+
 #include "Texture.h"
 #include "QueuedTexture.h"
 
@@ -33,6 +27,8 @@ namespace TextureLoader
 	void LoadFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback);
 	/* Requests to load a texture from URL. */
 	void LoadFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback);
+	/* Requests to load a texture from memory. */
+	void LoadFromMemory(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback);
 
 	/* Processes all currently queued textures. */
 	void ProcessQueue();

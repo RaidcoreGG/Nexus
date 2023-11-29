@@ -12,7 +12,7 @@ struct Addon
 	EAddonState			State;
 	HMODULE				Module;
 	DWORD				ModuleSize;
-	AddonDefinition*	Definitions;
+	AddonDefinition		Definitions;
 };
 
 #endif

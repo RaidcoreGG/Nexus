@@ -1,5 +1,10 @@
 #include "AddonDefinition.h"
 
+#include <iomanip>
+#include <sstream>
+
+#include "AddonAPI.h"
+
 bool operator>(AddonVersion lhs, AddonVersion rhs)
 {
 	if ((lhs.Major > rhs.Major) ||
@@ -31,7 +36,8 @@ bool AddonDefinition::HasMinimumRequirements()
 		Name &&
 		Author &&
 		Description &&
-		Load)
+		Load &&
+		(HasFlag(EAddonFlags::DisableHotloading) || Unload))
 	{
 		return true;
 	}

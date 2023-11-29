@@ -4,7 +4,7 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 
-#include "../core.h"
+#include "core.h"
 
 namespace ImGui
 {
@@ -141,6 +141,39 @@ namespace ImGui
 			ImGui::PopTextWrapPos();
 			ImGui::EndTooltip();
 		}
+	}
+
+	static void AddUnderLine(ImColor col_)
+	{
+		ImVec2 min = ImGui::GetItemRectMin();
+		ImVec2 max = ImGui::GetItemRectMax();
+		min.y = max.y;
+		ImGui::GetWindowDrawList()->AddLine(min, max, col_, 1.0f);
+	}
+
+	static bool TextURL(const char* name_, bool SameLineBefore_, bool SameLineAfter_)
+	{
+		bool clicked = false;
+
+		if (true == SameLineBefore_) { ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x); }
+		ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_ButtonHovered]);
+		ImGui::Text(name_);
+		ImGui::PopStyleColor();
+		if (ImGui::IsItemHovered())
+		{
+			if (ImGui::IsMouseClicked(0))
+			{
+				clicked = true;
+			}
+			AddUnderLine(ImGui::GetStyle().Colors[ImGuiCol_ButtonHovered]);
+		}
+		else
+		{
+			AddUnderLine(ImGui::GetStyle().Colors[ImGuiCol_Button]);
+		}
+		if (true == SameLineAfter_) { ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x); }
+
+		return clicked;
 	}
 }
 

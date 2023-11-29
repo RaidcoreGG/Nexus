@@ -1,5 +1,19 @@
 #include "Mumble.h"
 
+#include <map>
+#include <string>
+#include <Windows.h>
+
+#include "Shared.h"
+#include "State.h"
+#include "Renderer.h"
+#include "Consts.h"
+
+#include "LinkedMem.h"
+#include "Events/EventHandler.h"
+#include "DataLink/DataLink.h"
+
+#include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
 namespace Mumble
@@ -18,15 +32,21 @@ namespace Mumble
 	void Initialize()
 	{
 		IsRunning = true;
+
 		UpdateIdentityThread = std::thread(UpdateIdentityLoop);
-		UpdateIdentityThread.detach();
 		UpdateStateThread = std::thread(UpdateStateLoop);
-		UpdateStateThread.detach();
+
+		NexusLink = (NexusLinkData*)DataLink::ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData));
 	}
 
 	void Shutdown()
 	{
-		IsRunning = false;
+		if (State::Nexus == ENexusState::SHUTTING_DOWN)
+		{
+			IsRunning = false;
+			UpdateIdentityThread.join();
+			UpdateStateThread.join();
+		}
 	}
 
 	void UpdateIdentityLoop()
@@ -44,7 +64,7 @@ namespace Mumble
 
 					/* parse and assign current identity */
 					json j = json::parse(MumbleLink->Identity);
-					MumbleIdentity->Name			= j["name"].get<std::string>();
+					strcpy(MumbleIdentity->Name, j["name"].get<std::string>().c_str());
 					MumbleIdentity->Profession		= j["profession"].get<unsigned>();
 					MumbleIdentity->Specialization	= j["spec"].get<unsigned>();
 					MumbleIdentity->Race			= j["race"].get<unsigned>();
@@ -87,7 +107,7 @@ namespace Mumble
 				prevCamFront = MumbleLink->CameraFront;
 			}
 
-			Sleep(50);
+			Sleep(100);
 		}
 	}
 

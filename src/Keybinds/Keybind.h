@@ -1,10 +1,7 @@
 #ifndef KEYBIND_H
 #define KEYBIND_H
 
-#include <Windows.h>
 #include <string>
-#include <algorithm>
-#include <map>
 
 /* A structure holding information about a keybind. */
 struct Keybind

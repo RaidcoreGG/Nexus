@@ -1,34 +1,21 @@
 #ifndef GUI_DEBUGWINDOW_H
 #define GUI_DEBUGWINDOW_H
 
-#include "../../../Shared.h"
-#include "../../../State.h"
+#include <string>
 
-#include "../../../Events/EventHandler.h"
-#include "../../../Keybinds/KeybindHandler.h"
-#include "../../../DataLink/DataLink.h"
-#include "../../../Textures/TextureLoader.h"
-#include "../../../GUI/Widgets/QuickAccess/QuickAccess.h"
-#include "../../../Loader/Loader.h"
-#include "../Overlay/MumbleOverlay.h"
-
-#include "../../../imgui/imgui.h"
-#include "../../../imgui/imgui_extensions.h"
-#include "../../../imgui/imgui_memory_editor.h"
-
-#include "../../IWindow.h"
+#include "GUI/IWindow.h"
+#include "GUI/Widgets/Overlay/MumbleOverlay.h"
 
 namespace GUI
 {
 	class DebugWindow : public IWindow
 	{
 		public:
-		DebugWindow();
+		DebugWindow(std::string aName);
 		~DebugWindow() = default;
 
 		void Render();
 
-		private:
 		MumbleOverlay* MumbleWindow;
 	};
 }

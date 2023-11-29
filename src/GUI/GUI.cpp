@@ -1,5 +1,38 @@
 #include "GUI.h"
 
+#include <filesystem>
+#include <shellapi.h>
+
+#include "State.h"
+#include "Renderer.h"
+#include "Paths.h"
+#include "Shared.h"
+#include "Consts.h"
+#include "Branch.h"
+
+#include "Events/EventHandler.h"
+#include "Keybinds/KeybindHandler.h"
+#include "Loader/Loader.h"
+#include "Settings/Settings.h"
+#include "Textures/TextureLoader.h"
+
+#include "imgui.h"
+#include "imgui_extensions.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_dx11.h"
+
+#include "Widgets/Menu/Menu.h"
+#include "Widgets/Addons/AddonsWindow.h"
+#include "Widgets/Options/OptionsWindow.h"
+#include "Widgets/Log/LogWindow.h"
+#include "Widgets/Debug/DebugWindow.h"
+#include "Widgets/About/AboutBox.h"
+#include "Widgets/QuickAccess/QuickAccess.h"
+#include "Widgets/Menu/MenuItem.h"
+
+#include "resource.h"
+#include "Textures/Texture.h"
+
 namespace GUI
 {
 	/* internal forward declarations */
@@ -15,6 +48,7 @@ namespace GUI
 	std::map<EFont, ImFont*>	FontIndex;
 	float						FontSize;
 	bool						CloseMenuAfterSelecting;
+	bool						CloseOnEscape;
 
 	bool						IsUIVisible			= true;
 
@@ -22,6 +56,8 @@ namespace GUI
 	bool						IsLeftClickHeld		= false;
 	bool						IsSetup				= false;
 	float						LastScaling;
+
+	bool						AcceptedEULA		= false;
 
 	void Initialize()
 	{
@@ -57,6 +93,32 @@ namespace GUI
 		if (State::IsImGuiInitialized)
 		{
 			ImGuiIO& io = ImGui::GetIO();
+
+			if (CloseOnEscape)
+			{
+				if (uMsg == WM_KEYDOWN && wParam == VK_ESCAPE)
+				{
+					ImVector<ImGuiWindow*> windows = Renderer::GuiContext->Windows;
+
+					for (int i = windows.Size - 1; i > 0; i--)
+					{
+						if (strcmp(windows[i]->Name, "Menu") == 0 && Menu::Visible)
+						{
+							Menu::Visible = false;
+							return 0;
+						}
+
+						for (IWindow* wnd : Windows)
+						{
+							if (wnd->Name == windows[i]->Name && wnd->Visible)
+							{
+								wnd->Visible = false;
+								return 0;
+							}
+						}
+					}
+				}
+			}
 
 			switch (uMsg)
 			{
@@ -164,6 +226,60 @@ namespace GUI
 		return 1;
 	}
 
+	void UserAgreementPopup()
+	{
+		ImGui::OpenPopup("Legal Agreement", ImGuiPopupFlags_AnyPopupLevel);
+		ImVec2 center(Renderer::Width * 0.5f, Renderer::Height * 0.5f);
+		ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+		if (ImGui::BeginPopupModal("Legal Agreement", NULL, WindowFlags_Default))
+		{
+			bool close = false;
+
+			ImGui::TextWrapped("This is an unofficial library and Raidcore is in no way associated with ArenaNet nor with any of its partners. Modifying Guild Wars 2 through any third party software is not supported by ArenaNet nor by any of its partners.");
+
+			ImGui::Text("By using this software you are agreeing to the terms and conditions as laid out on:");
+
+			if (ImGui::TextURL("https://raidcore.gg/Legal", true, false))
+			{
+				ShellExecuteA(0, 0, "https://raidcore.gg/Legal", 0, 0, SW_SHOW);
+			}
+
+			ImGui::Text("If you do not agree to these terms, do not use the software.");
+
+			ImGui::TextDisabled("By clicking \"I do NOT agree\" your game will close and Nexus will uninstall.");
+
+			if (ImGui::Button("I agree"))
+			{
+				AcceptedEULA = true;
+				Settings::Settings[OPT_ACCEPTEULA] = true;
+				Settings::Save();
+				close = true;
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("I do NOT agree"))
+			{
+				SHFILEOPSTRUCT fileOp;
+				fileOp.hwnd = NULL;
+				fileOp.wFunc = FO_DELETE;
+				fileOp.pFrom = Path::F_HOST_DLL;
+				fileOp.pTo = NULL;
+				fileOp.fFlags = FOF_ALLOWUNDO | FOF_NOERRORUI | FOF_NOCONFIRMATION | FOF_SILENT;
+				int result = SHFileOperationA(&fileOp);
+
+				close = true;
+
+				exit(0);
+			}
+
+			if (close)
+			{
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
 	void Render()
 	{
 		if (State::Nexus == ENexusState::READY && !State::IsImGuiInitialized)
@@ -189,6 +305,11 @@ namespace GUI
 			ImGui_ImplDX11_NewFrame();
 			ImGui::NewFrame();
 			/* new frame end */
+
+			if (!AcceptedEULA)
+			{
+				UserAgreementPopup();
+			}
 
 			/* draw overlay */
 			if (IsUIVisible)
@@ -293,6 +414,61 @@ namespace GUI
 		else if (str == KB_TOGGLEHIDEUI)
 		{
 			IsUIVisible = !IsUIVisible;
+		}
+		else if (str == KB_ADDONS)
+		{
+			for (IWindow* wnd : Windows)
+			{
+				if (wnd->Name == "Addons")
+				{
+					wnd->Visible = !wnd->Visible;
+					return;
+				}
+			}
+		}
+		else if (str == KB_DEBUG)
+		{
+			for (IWindow* wnd : Windows)
+			{
+				if (wnd->Name == "Debug")
+				{
+					wnd->Visible = !wnd->Visible;
+					return;
+				}
+			}
+		}
+		else if (str == KB_LOG)
+		{
+			for (IWindow* wnd : Windows)
+			{
+				if (wnd->Name == "Log")
+				{
+					wnd->Visible = !wnd->Visible;
+					return;
+				}
+			}
+		}
+		else if (str == KB_OPTIONS)
+		{
+			for (IWindow* wnd : Windows)
+			{
+				if (wnd->Name == "Options")
+				{
+					wnd->Visible = !wnd->Visible;
+					return;
+				}
+			}
+		}
+		else if (str == KB_MUMBLEOVERLAY)
+		{
+			for (IWindow* wnd : Windows)
+			{
+				if (wnd->Name == "Debug")
+				{
+					((DebugWindow*)wnd)->MumbleWindow->Visible = !((DebugWindow*)wnd)->MumbleWindow->Visible;
+					return;
+				}
+			}
 		}
 	}
 	
@@ -414,12 +590,18 @@ namespace GUI
 		Events::Subscribe(EV_MUMBLE_IDENTITY_UPDATED, OnMumbleIdentityChanged);
 
 		/* set up and add windows */
-		AddonsWindow* addonsWnd = new AddonsWindow();
-		LogWindow* logWnd = new LogWindow(ELogLevel::ALL);
+		AddonsWindow* addonsWnd = new AddonsWindow("Addons");
+		LogWindow* logWnd = new LogWindow("Log", ELogLevel::ALL);
 		RegisterLogger(logWnd);
-		OptionsWindow* opsWnd = new OptionsWindow();
-		DebugWindow* dbgWnd = new DebugWindow();
-		AboutBox* aboutWnd = new AboutBox();
+		OptionsWindow* opsWnd = new OptionsWindow("Options");
+		DebugWindow* dbgWnd = new DebugWindow("Debug");
+		AboutBox* aboutWnd = new AboutBox("About");
+
+		Keybinds::Register(KB_ADDONS, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_LOG, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_OPTIONS, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_DEBUG, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_MUMBLEOVERLAY, ProcessKeybind, "(null)");
 
 		AddWindow(addonsWnd);
 		AddWindow(opsWnd);
@@ -453,6 +635,15 @@ namespace GUI
 
 		if (!Settings::Settings.is_null())
 		{
+			if (!Settings::Settings[OPT_ACCEPTEULA].is_null())
+			{
+				AcceptedEULA = Settings::Settings[OPT_ACCEPTEULA].get<bool>();
+			}
+			else
+			{
+				AcceptedEULA = false;
+			}
+
 			if (!Settings::Settings[OPT_LASTUISCALE].is_null() && Renderer::Scaling == 0)
 			{
 				LastScaling = Settings::Settings[OPT_LASTUISCALE].get<float>();
@@ -504,6 +695,16 @@ namespace GUI
 			{
 				CloseMenuAfterSelecting = true;
 				Settings::Settings[OPT_CLOSEMENU] = true;
+			}
+
+			if (!Settings::Settings[OPT_CLOSEESCAPE].is_null())
+			{
+				CloseOnEscape = Settings::Settings[OPT_CLOSEESCAPE].get<bool>();
+			}
+			else
+			{
+				CloseOnEscape = true;
+				Settings::Settings[OPT_CLOSEESCAPE] = true;
 			}
 		}
 		else

@@ -1,9 +1,28 @@
 #include "OptionsWindow.h"
 
-#include "../../GUI.h"
+#include <regex>
+
+#include "Shared.h"
+#include "Paths.h"
+#include "State.h"
+#include "Renderer.h"
+
+#include "Keybinds/KeybindHandler.h"
+#include "API/APIController.h"
+#include "Settings/Settings.h"
+
+#include "GUI/GUI.h"
+#include "GUI/IWindow.h"
+#include "GUI/Widgets/QuickAccess/QuickAccess.h"
+
+#include "imgui.h"
+#include "imgui_extensions.h"
 
 namespace GUI
 {
+	float owWidth = 30.0f;
+	float owHeight = 24.0f;
+
 	std::string CurrentlyEditing;
 	char CurrentAPIKey[73]{};
 
@@ -16,12 +35,17 @@ namespace GUI
 	void KeybindsTab();
 	void APITab();
 
+	OptionsWindow::OptionsWindow(std::string aName)
+	{
+		Name = aName;
+	}
+
 	void OptionsWindow::Render()
 	{
 		if (!Visible) { return; }
 
-		ImGui::SetNextWindowSize(ImVec2(480.0f, 380.0f));
-		if (ImGui::Begin("Options", &Visible, WindowFlags_Default))
+		ImGui::SetNextWindowSize(ImVec2(owWidth * ImGui::GetFontSize(), owHeight * ImGui::GetFontSize()), ImGuiCond_FirstUseEver);
+		if (ImGui::Begin(Name.c_str(), &Visible, ImGuiWindowFlags_NoCollapse))
 		{
 			if (ImGui::BeginTabBar("OptionsTabBar", ImGuiTabBarFlags_None))
 			{
@@ -65,6 +89,11 @@ namespace GUI
 				if (ImGui::Checkbox("Close Menu after selecting item", &GUI::CloseMenuAfterSelecting))
 				{
 					Settings::Settings[OPT_CLOSEMENU] = GUI::CloseMenuAfterSelecting;
+					Settings::Save();
+				}
+				if (ImGui::Checkbox("Closing Windows with Escape", &GUI::CloseOnEscape))
+				{
+					Settings::Settings[OPT_CLOSEESCAPE] = GUI::CloseOnEscape;
 					Settings::Save();
 				}
 
@@ -295,7 +324,7 @@ namespace GUI
 							ImGui::Text(identifier.c_str());
 
 							ImGui::TableSetColumnIndex(1);
-							if (ImGui::Button(keybind.Bind.ToString(true).c_str(), ImVec2(kbButtonWidth, 0.0f)))
+							if (ImGui::Button((keybind.Bind.ToString(true) + "##" + identifier).c_str(), ImVec2(kbButtonWidth, 0.0f)))
 							{
 								CurrentlyEditing = identifier;
 								ImGui::OpenPopup(("Set Keybind: " + CurrentlyEditing).c_str(), ImGuiPopupFlags_AnyPopupLevel);
