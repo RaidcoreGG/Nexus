@@ -22,7 +22,7 @@ namespace GUI
 		if (ImGui::Begin(Name.c_str(), &Visible, WindowFlags_Default))
 		{
 			ImGui::TextDisabled("Version:");
-			ImGui::Text(""); ImGui::SameLine(); ImGui::Text(Version->ToString().c_str());
+			ImGui::Text(""); ImGui::SameLine(); ImGui::Text(Version.ToString().c_str());
 #ifdef _DEBUG
 			ImGui::SameLine(); ImGui::TextDisabled("debug/" BRANCH_NAME);
 #else

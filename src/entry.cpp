@@ -52,10 +52,10 @@ void Initialize()
 
 	State::Nexus = ENexusState::LOAD;
 
-	Version->Major = V_MAJOR;
-	Version->Minor = V_MINOR;
-	Version->Build = V_BUILD;
-	Version->Revision = V_REVISION;
+	Version.Major = V_MAJOR;
+	Version.Minor = V_MINOR;
+	Version.Build = V_BUILD;
+	Version.Revision = V_REVISION;
 
 	SetUnhandledExceptionFilter(UnhandledExcHandler);
 	GameHandle = GetModuleHandle(NULL);
@@ -65,7 +65,7 @@ void Initialize()
 	LogHandler::Initialize();
 
 	LogInfo(CH_CORE, GetCommandLineA());
-	LogInfo(CH_CORE, "Version: %s", Version->ToString().c_str());
+	LogInfo(CH_CORE, "Version: %s", Version.ToString().c_str());
 	LogInfo(CH_CORE, "::Initialize() called. Entry method: %d", State::EntryMethod);
 
 	//Paradigm::Initialize();

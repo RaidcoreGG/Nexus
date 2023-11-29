@@ -5,7 +5,7 @@ HMODULE						GameHandle			= nullptr;
 HMODULE						D3D11Handle			= nullptr;
 HMODULE						D3D11SystemHandle	= nullptr;
 
-AddonVersion*				Version				= new AddonVersion{};
+AddonVersion				Version				= {};
 std::vector<std::string>	Parameters			= {};
 
 LinkedMem*					MumbleLink			= nullptr;

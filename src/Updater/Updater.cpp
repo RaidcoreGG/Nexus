@@ -67,9 +67,9 @@ namespace Updater
 					}
 					else
 					{
-						if (remoteVersion > *Version)
+						if (remoteVersion > Version)
 						{
-							LogInfo(CH_UPDATER, "Outdated: API replied with Version %s but installed is Version %s", remoteVersion.ToString().c_str(), Version->ToString().c_str());
+							LogInfo(CH_UPDATER, "Outdated: API replied with Version %s but installed is Version %s", remoteVersion.ToString().c_str(), Version.ToString().c_str());
 
 							size_t bytesWritten = 0;
 
@@ -93,9 +93,9 @@ namespace Updater
 								LogInfo(CH_UPDATER, "Successfully updated Nexus. Restart required to take effect.");
 							}
 						}
-						else if (remoteVersion < *Version)
+						else if (remoteVersion < Version)
 						{
-							LogInfo(CH_UPDATER, "Installed Build of Nexus is more up-to-date than remote. (Installed: %s) (Remote: %s)", Version->ToString().c_str(), remoteVersion.ToString().c_str());
+							LogInfo(CH_UPDATER, "Installed Build of Nexus is more up-to-date than remote. (Installed: %s) (Remote: %s)", Version.ToString().c_str(), remoteVersion.ToString().c_str());
 						}
 						else
 						{
