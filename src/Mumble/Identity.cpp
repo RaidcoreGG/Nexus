@@ -4,7 +4,7 @@ namespace Mumble
 {
 	bool operator==(const Identity& lhs, const Identity& rhs)
 	{
-		if (lhs.Name == rhs.Name &&
+		if (strcmp(lhs.Name, rhs.Name) == 0 &&
 			lhs.Profession == rhs.Profession &&
 			lhs.Specialization == rhs.Specialization &&
 			lhs.Race == rhs.Race &&

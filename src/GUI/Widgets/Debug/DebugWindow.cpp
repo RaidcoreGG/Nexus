@@ -280,12 +280,12 @@ namespace GUI
 										ImGui::TextDisabled("Module Size: %u", addon->ModuleSize);
 										ImGui::TextDisabled("AddonDefs: %p", addon->Definitions);
 
-										if (addon->Definitions != nullptr)
+										if (addon->Definitions.Signature != 0)
 										{
 											if (ImGui::SmallButton("Memory Editor"))
 											{
 												memEditor.Open = true;
-												memPtr = addon->Definitions;
+												memPtr = &addon->Definitions;
 												memSz = sizeof(AddonDefinition);
 											}
 										}

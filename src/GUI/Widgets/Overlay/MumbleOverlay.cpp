@@ -216,7 +216,7 @@ namespace GUI
 						ImGui::TableSetColumnIndex(1); ImGui::Text("%1.4f", MumbleIdentity->FOV);
 						ImGui::TableNextRow();
 						ImGui::TableSetColumnIndex(0); ImGui::Text("name");
-						ImGui::TableSetColumnIndex(1); ImGui::Text(MumbleIdentity->Name.c_str());
+						ImGui::TableSetColumnIndex(1); ImGui::Text(&MumbleIdentity->Name[0]);
 						ImGui::TableNextRow();
 						ImGui::TableSetColumnIndex(0); ImGui::Text("prof");
 						ImGui::TableSetColumnIndex(1); ImGui::Text("%d", MumbleIdentity->Profession);

@@ -158,6 +158,7 @@ namespace Updater
 				LogWarning(CH_UPDATER, "Addon %s declares EUpdateProvider::Direct but has no UpdateLink set.", aDefinitions->Name);
 				return false;
 			}
+			endpoint = aDefinitions->UpdateLink;
 			
 			size_t httpIdx = endpoint.find("http://");
 			size_t httpsIdx = endpoint.find("https://");
@@ -165,17 +166,17 @@ namespace Updater
 			size_t off = 0;
 			if (httpIdx != std::string::npos)
 			{
-				off = httpIdx;
+				off = httpIdx + 7;
 			}
 			if (httpsIdx != std::string::npos)
 			{
-				off = httpsIdx;
+				off = httpsIdx + 8;
 			}
 
 			idx = endpoint.find("/", off);
 			if (idx == std::string::npos)
 			{
-				LogWarning("Abort update check, malformed URL (%s) on %s. (EUpdateProvider::Direct)", aDefinitions->UpdateLink, aDefinitions->Name);
+				LogWarning(CH_UPDATER, "Abort update check, malformed URL (%s) on %s. (EUpdateProvider::Direct)", aDefinitions->UpdateLink, aDefinitions->Name);
 				return false;
 			}
 
@@ -369,7 +370,7 @@ namespace Updater
 							idx = endpointDownload.find("/", downloadOff);
 							if (idx == std::string::npos)
 							{
-								LogWarning("Abort update download, malformed URL (%s) on %s. (EUpdateProvider::GitHub)", endpointDownload.c_str(), aDefinitions->Name);
+								LogWarning(CH_UPDATER, "Abort update download, malformed URL (%s) on %s. (EUpdateProvider::GitHub)", endpointDownload.c_str(), aDefinitions->Name);
 								return false;
 							}
 

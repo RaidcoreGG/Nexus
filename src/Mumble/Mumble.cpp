@@ -64,7 +64,7 @@ namespace Mumble
 
 					/* parse and assign current identity */
 					json j = json::parse(MumbleLink->Identity);
-					MumbleIdentity->Name			= j["name"].get<std::string>();
+					strcpy(MumbleIdentity->Name, j["name"].get<std::string>().c_str());
 					MumbleIdentity->Profession		= j["profession"].get<unsigned>();
 					MumbleIdentity->Specialization	= j["spec"].get<unsigned>();
 					MumbleIdentity->Race			= j["race"].get<unsigned>();

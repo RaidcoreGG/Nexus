@@ -12,6 +12,8 @@ enum class EAddonState
 
 	Incompatible,			/* The file is incompatible with Nexus. */
 	IncompatibleAPI,		/* Addon requested an API that doesn't exist. */
+
+	Reload,					/* Addon is being reloaded due to an update. */
 };
 
 #endif
