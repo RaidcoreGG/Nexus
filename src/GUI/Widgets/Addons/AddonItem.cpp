@@ -21,12 +21,12 @@ namespace GUI
 	{
 		if (aAddon->State == EAddonState::NotLoadedDuplicate ||
 			aAddon->State == EAddonState::Incompatible ||
-			aAddon->Definitions == nullptr)
+			aAddon->Definitions.Signature == 0)
 		{
 			return;
 		}
 
-		std::string sig = std::to_string(aAddon->Definitions->Signature); // helper for unique chkbxIds
+		std::string sig = std::to_string(aAddon->Definitions.Signature); // helper for unique chkbxIds
 
 		if (ImGui::BeginTable(("#AddonItem" + sig).c_str(), 1, ImGuiTableFlags_BordersOuter, ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
 		{
@@ -35,14 +35,14 @@ namespace GUI
 			{
 				ImGui::BeginGroup();
 
-				ImGui::Text(aAddon->Definitions->Name); ImGui::SameLine();
-				ImGui::TextDisabled("(%s)", aAddon->Definitions->Version.ToString().c_str()); ImGui::SameLine();
-				ImGui::TextDisabled("by %s", aAddon->Definitions->Author);
-				ImGui::TextWrapped(aAddon->Definitions->Description);
+				ImGui::Text(aAddon->Definitions.Name); ImGui::SameLine();
+				ImGui::TextDisabled("(%s)", aAddon->Definitions.Version.ToString().c_str()); ImGui::SameLine();
+				ImGui::TextDisabled("by %s", aAddon->Definitions.Author);
+				ImGui::TextWrapped(aAddon->Definitions.Description);
 
 				if (aAddon->State == EAddonState::IncompatibleAPI)
 				{
-					ImGui::TextColored(ImVec4(255, 255, 0, 255), "Addon requested incompatible API Version: %d", aAddon->Definitions->APIVersion);
+					ImGui::TextColored(ImVec4(255, 255, 0, 255), "Addon requested incompatible API Version: %d", aAddon->Definitions.APIVersion);
 				}
 
 				ImGui::EndGroup();
@@ -53,16 +53,16 @@ namespace GUI
 
 				ImGui::BeginGroup();
 				if (aAddon->State == EAddonState::Loaded &&
-					!(aAddon->Definitions->Unload == nullptr || aAddon->Definitions->HasFlag(EAddonFlags::DisableHotloading)))
+					!(aAddon->Definitions.Unload == nullptr || aAddon->Definitions.HasFlag(EAddonFlags::DisableHotloading)))
 				{
 					amtBtns++;
 					if (ImGui::Button(("Disable##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight * ImGui::GetFontSize())))
 					{
 						for (auto& it : Loader::Addons)
 						{
-							if (it.second->Definitions == aAddon->Definitions)
+							if (it.second->Definitions.Signature == aAddon->Definitions.Signature)
 							{
-								LogDebug(CH_GUI, "Unload called: %s", it.second->Definitions->Name);
+								LogDebug(CH_GUI, "Unload called: %s", it.second->Definitions.Name);
 								Loader::QueueAddon(ELoaderAction::Unload, it.first);
 							}
 						}
@@ -75,15 +75,15 @@ namespace GUI
 					{
 						for (auto& it : Loader::Addons)
 						{
-							if (it.second->Definitions == aAddon->Definitions)
+							if (it.second->Definitions.Signature == aAddon->Definitions.Signature)
 							{
-								LogDebug(CH_GUI, "Load called: %s", it.second->Definitions->Name);
+								LogDebug(CH_GUI, "Load called: %s", it.second->Definitions.Name);
 								Loader::QueueAddon(ELoaderAction::Load, it.first);
 							}
 						}
 					}
 				}
-				if (!(aAddon->Definitions->Unload == nullptr || aAddon->Definitions->HasFlag(EAddonFlags::DisableHotloading)))
+				if (!(aAddon->Definitions.Unload == nullptr || aAddon->Definitions.HasFlag(EAddonFlags::DisableHotloading)))
 				{
 					if (amtBtns > 0)
 					{
@@ -93,9 +93,9 @@ namespace GUI
 					{
 						for (auto& it : Loader::Addons)
 						{
-							if (it.second->Definitions == aAddon->Definitions)
+							if (it.second->Definitions.Signature == aAddon->Definitions.Signature)
 							{
-								LogDebug(CH_GUI, "Uninstall called: %s", it.second->Definitions->Name);
+								LogDebug(CH_GUI, "Uninstall called: %s", it.second->Definitions.Name);
 								Loader::QueueAddon(ELoaderAction::Uninstall, it.first);
 							}
 						}

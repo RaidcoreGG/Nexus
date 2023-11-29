@@ -48,26 +48,32 @@ void UpdateNexusLink()
 
 void Initialize()
 {
+	if (State::Nexus >= ENexusState::LOAD) { return; }
+
 	State::Nexus = ENexusState::LOAD;
 
-	Version->Major = V_MAJOR;
-	Version->Minor = V_MINOR;
-	Version->Build = V_BUILD;
-	Version->Revision = V_REVISION;
+	Version.Major = V_MAJOR;
+	Version.Minor = V_MINOR;
+	Version.Build = V_BUILD;
+	Version.Revision = V_REVISION;
 
-	LogInfo(CH_CORE, GetCommandLineA());
-	LogInfo(CH_CORE, "Version: %s", Version->ToString().c_str());
+	SetUnhandledExceptionFilter(UnhandledExcHandler);
+	GameHandle = GetModuleHandle(NULL);
 
 	State::Initialize();
 	Path::Initialize(NexusHandle);
+	LogHandler::Initialize();
+
+	LogInfo(CH_CORE, GetCommandLineA());
+	LogInfo(CH_CORE, "Version: %s", Version.ToString().c_str());
+	LogInfo(CH_CORE, "::Initialize() called. Entry method: %d", State::EntryMethod);
+
 	//Paradigm::Initialize();
-	Updater::Initialize();
+	Updater::SelfUpdate();
 
 	/* Don't initialize anything if vanilla */
 	if (!State::IsVanilla)
 	{
-		LogHandler::Initialize();
-
 		MH_Initialize();
 
 		Keybinds::Initialize();
@@ -126,6 +132,8 @@ void Shutdown()
 		//API::Save();
 
 		MH_Uninitialize();
+
+		LogInfo(CH_CORE, "Shutdown performed.");
 
 		State::Nexus = ENexusState::SHUTDOWN;
 	}
@@ -314,6 +322,8 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CREATEDEVICE; }
 
+	::Initialize();
+
 	static decltype(&D3D11CreateDevice) func;
 	static const char* func_name = "D3D11CreateDevice";
 	Log(CH_CORE, func_name);
@@ -345,6 +355,8 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, const DXGI_SWAP_CHAIN_DESC* pSwapChainDesc, IDXGISwapChain** ppSwapChain, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext)
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CREATEDEVICEANDSWAPCHAIN; }
+
+	::Initialize();
 
 	static decltype(&D3D11CreateDeviceAndSwapChain) func;
 	static const char* func_name = "D3D11CreateDeviceAndSwapChain";
@@ -378,6 +390,8 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_CREATEDEVICE; }
 
+	::Initialize();
+
 	static decltype(&D3D11CoreCreateDevice) func;
 	static const char* func_name = "D3D11CoreCreateDevice";
 	Log(CH_CORE, func_name);
@@ -409,6 +423,8 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 HRESULT __stdcall D3D11CoreCreateLayeredDevice(const void* unknown0, DWORD unknown1, const void* unknown2, REFIID riid, void** ppvObj)
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_CREATELAYEREDDEVICE; }
+
+	::Initialize();
 
 	static decltype(&D3D11CoreCreateLayeredDevice) func;
 	static const char* func_name = "D3D11CoreCreateLayeredDevice";
@@ -442,6 +458,8 @@ SIZE_T	__stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unkno
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_GETLAYEREDDEVICESIZE; }
 
+	::Initialize();
+
 	static decltype(&D3D11CoreGetLayeredDeviceSize) func;
 	static const char* func_name = "D3D11CoreGetLayeredDeviceSize";
 	Log(CH_CORE, func_name);
@@ -473,6 +491,8 @@ SIZE_T	__stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unkno
 HRESULT __stdcall D3D11CoreRegisterLayers(const void* unknown0, DWORD unknown1)
 {
 	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_REGISTERLAYERS; }
+
+	::Initialize();
 
 	static decltype(&D3D11CoreRegisterLayers) func;
 	static const char* func_name = "D3D11CoreRegisterLayers";
@@ -510,16 +530,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	{
 	case DLL_PROCESS_ATTACH:
 		DisableThreadLibraryCalls(hModule);
-		SetUnhandledExceptionFilter(UnhandledExcHandler);
-
 		NexusHandle = hModule;
-		GameHandle = GetModuleHandle(NULL);
-
-		::Initialize();
 		break;
 	case DLL_PROCESS_DETACH:
 		::Shutdown();
-		exit(0);
 		break;
 	}
 	return true;

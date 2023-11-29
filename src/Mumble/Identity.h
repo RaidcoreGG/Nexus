@@ -7,7 +7,7 @@ namespace Mumble
 {
 	struct Identity
 	{
-		std::string	Name;
+		char		Name[20];
 		unsigned	Profession;
 		unsigned	Specialization;
 		unsigned	Race;

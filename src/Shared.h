@@ -21,7 +21,7 @@ extern HMODULE						GameHandle;
 extern HMODULE						D3D11Handle;
 extern HMODULE						D3D11SystemHandle;
 
-extern AddonVersion*				Version;
+extern AddonVersion					Version;
 extern std::vector<std::string>		Parameters;
 
 extern LinkedMem*                   MumbleLink;

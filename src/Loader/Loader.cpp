@@ -25,11 +25,12 @@
 #include "Textures/TextureLoader.h"
 #include "GUI/GUI.h"
 #include "GUI/Widgets/QuickAccess/QuickAccess.h"
+#include "Updater/Updater.h"
 
 namespace Loader
 {
 	std::mutex Mutex;
-	std::map<std::filesystem::path, ELoaderAction> QueuedAddons;
+	std::vector<QAddon> QueuedAddons;
 	std::map<std::filesystem::path, Addon*> Addons;
 	std::map<int, AddonAPI*> ApiDefs;
 
@@ -42,18 +43,24 @@ namespace Loader
 		if (State::Nexus < ENexusState::LOADED)
 		{
 			LoaderThread = std::thread(DetectAddonsLoop);
-			LoaderThread.detach();
 		}
 	}
 	void Shutdown()
 	{
 		if (State::Nexus == ENexusState::SHUTTING_DOWN)
 		{
+			LoaderThread.join();
+
 			Loader::Mutex.lock();
 			{
 				while (Addons.size() != 0)
 				{
 					UnloadAddon(Addons.begin()->first);
+					if (Addons.begin()->second->Module)
+					{
+						Log(CH_LOADER, "Despite being unloaded \"%s\" still has an HMODULE defined, calling FreeLibrary().", Addons.begin()->first.string().c_str());
+						FreeLibrary(Addons.begin()->second->Module);
+					}
 					Addons.erase(Addons.begin());
 				}
 			}
@@ -68,33 +75,33 @@ namespace Loader
 		{
 			auto it = QueuedAddons.begin();
 
-			switch (it->second)
+			switch (it->Action)
 			{
 			case ELoaderAction::Load:
-				LoadAddon(it->first);
+				LoadAddon(it->Path);
 				break;
 			case ELoaderAction::Unload:
-				UnloadAddon(it->first);
+				UnloadAddon(it->Path);
 				break;
 			case ELoaderAction::Uninstall:
-				UninstallAddon(it->first);
+				UninstallAddon(it->Path);
 				break;
 			}
-
 			QueuedAddons.erase(it);
 		}
 		Loader::Mutex.unlock();
 	}
 	void QueueAddon(ELoaderAction aAction, std::filesystem::path aPath)
 	{
-		QueuedAddons.insert({ aPath, aAction });
+		QAddon qa{};
+		qa.Action = aAction;
+		qa.Path = aPath;
+
+		QueuedAddons.push_back(qa);
 	}
 
 	void LoadAddon(std::filesystem::path aPath)
 	{
-		std::string pathStr = aPath.string();
-		const char* path = pathStr.c_str();
-
 		Addon* addon;
 
 		if (Addons.find(aPath) != Addons.end())
@@ -104,21 +111,18 @@ namespace Loader
 			switch (addon->State)
 			{
 			case EAddonState::Loaded:
-				LogWarning(CH_LOADER, "Cancelled loading \"%s\". Already loaded.", path);
+				LogWarning(CH_LOADER, "Cancelled loading \"%s\". Already loaded.", aPath.string().c_str());
 				return;
 
-			case EAddonState::NotLoaded:
-				LogWarning(CH_LOADER, "Reloading \"%s\" from an explicitly unloaded state.", path);
-				break;
 			case EAddonState::NotLoadedDuplicate:
-				LogWarning(CH_LOADER, "Cancelled loading \"%s\". Another addon with the same signature already loaded.", path);
+				LogWarning(CH_LOADER, "Cancelled loading \"%s\". Another addon with the same signature already loaded.", aPath.string().c_str());
 				return;
 
 			case EAddonState::Incompatible:
-				LogWarning(CH_LOADER, "Cancelled loading \"%s\". Incompatible.", path);
+				LogWarning(CH_LOADER, "Cancelled loading \"%s\". Incompatible.", aPath.string().c_str());
 				return;
 			case EAddonState::IncompatibleAPI:
-				LogWarning(CH_LOADER, "Cancelled loading \"%s\". API that doesn't exist was requested.", path);
+				LogWarning(CH_LOADER, "Cancelled loading \"%s\". API that doesn't exist was requested.", aPath.string().c_str());
 				return;
 			}
 		}
@@ -130,22 +134,23 @@ namespace Loader
 		}
 
 		GETADDONDEF getAddonDef = 0;
-		HMODULE hMod = LoadLibraryA(path);
+		addon->Module = LoadLibraryA(aPath.string().c_str());
 
 		/* load lib failed */
-		if (!hMod)
+		if (!addon->Module)
 		{
-			LogDebug(CH_LOADER, "Failed LoadLibrary on \"%s\". Incompatible.", path);
+			LogDebug(CH_LOADER, "Failed LoadLibrary on \"%s\". Incompatible.", aPath.string().c_str());
 			addon->State = EAddonState::Incompatible;
 			return;
 		}
 
 		/* doesn't have GetAddonDef */
-		if (FindFunction(hMod, &getAddonDef, "GetAddonDef") == false)
+		if (FindFunction(addon->Module, &getAddonDef, "GetAddonDef") == false)
 		{
-			LogDebug(CH_LOADER, "\"%s\" is not a Nexus-compatible library. Incompatible.", path);
+			LogDebug(CH_LOADER, "\"%s\" is not a Nexus-compatible library. Incompatible.", aPath.string().c_str());
 			addon->State = EAddonState::Incompatible;
-			FreeLibrary(hMod);
+			FreeLibrary(addon->Module);
+			addon->Module = nullptr;
 			return;
 		}
 		
@@ -154,18 +159,29 @@ namespace Loader
 
 		if (tmpDefs == nullptr)
 		{
-			LogDebug(CH_LOADER, "\"%s\" is Nexus-compatible but returned a nullptr. Incompatible I guess?", path);
+			LogDebug(CH_LOADER, "\"%s\" is Nexus-compatible but returned a nullptr. Incompatible I guess?", aPath.string().c_str());
 			addon->State = EAddonState::Incompatible;
-			FreeLibrary(hMod);
+			FreeLibrary(addon->Module);
+			addon->Module = nullptr;
+			return;
+		}
+
+		if (addon->State != EAddonState::Reload && Updater::CheckForUpdate(aPath, tmpDefs))
+		{
+			addon->State = EAddonState::Reload;
+			QueueAddon(ELoaderAction::Load, aPath);
+			FreeLibrary(addon->Module);
+			addon->Module = nullptr;
 			return;
 		}
 
 		/* doesn't full fill min reqs */
-		if (hMod && !tmpDefs->HasMinimumRequirements())
+		if (!tmpDefs->HasMinimumRequirements())
 		{
-			LogWarning(CH_LOADER, "\"%s\" does not fulfill minimum requirements. At least define Name, Version, Author, Description as well as the Load function. Incompatible.", path);
+			LogWarning(CH_LOADER, "\"%s\" does not fulfill minimum requirements. At least define Name, Version, Author, Description as well as the Load function. Incompatible.", aPath.string().c_str());
 			addon->State = EAddonState::Incompatible;
-			FreeLibrary(hMod);
+			FreeLibrary(addon->Module);
+			addon->Module = nullptr;
 			return;
 		}
 
@@ -173,124 +189,114 @@ namespace Loader
 		for (auto& it : Addons)
 		{
 			// if defs defined && not the same path && signature the same though
-			if (it.second->Definitions != nullptr && it.first != aPath && it.second->Definitions->Signature == tmpDefs->Signature)
+			if (it.first != aPath && it.second->Definitions.Signature == tmpDefs->Signature)
 			{
-				LogWarning(CH_LOADER, "\"%s\" or another addon with this signature (%d) is already loaded. Added to blacklist.", path, tmpDefs->Signature);
+				LogWarning(CH_LOADER, "\"%s\" or another addon with this signature (%d) is already loaded. Added to blacklist.", aPath.string().c_str(), tmpDefs->Signature);
 				addon->State = EAddonState::NotLoadedDuplicate;
-				FreeLibrary(hMod);
+				FreeLibrary(addon->Module);
+				addon->Module = nullptr;
 				return;
 			}
 		}
 
 		MODULEINFO moduleInfo;
-		GetModuleInformation(GetCurrentProcess(), hMod, &moduleInfo, sizeof(moduleInfo));
+		GetModuleInformation(GetCurrentProcess(), addon->Module, &moduleInfo, sizeof(moduleInfo));
 
 		AddonAPI* api = GetAddonAPI(tmpDefs->APIVersion); // will be nullptr if doesn't exist or APIVersion = 0
 
 		// Free the old stuff
-		if (addon->Definitions != nullptr) {
-			delete[] addon->Definitions->Name;
-			delete[] addon->Definitions->Author;
-			delete[] addon->Definitions->Description;
-			delete[] addon->Definitions->UpdateLink;
-			delete addon->Definitions;
-			addon->Definitions = nullptr;
-		}
-
+		if (addon->Definitions.Name) { delete[] addon->Definitions.Name; }
+		if (addon->Definitions.Author) { delete[] addon->Definitions.Name; }
+		if (addon->Definitions.Description) { delete[] addon->Definitions.Description; }
+		if (addon->Definitions.UpdateLink) { delete[] addon->Definitions.UpdateLink; }
+		
 		// Allocate new memory and copy data
-		addon->Definitions = new AddonDefinition(*tmpDefs);
+		addon->Definitions = {};
 
 		// Allocate and copy strings, considering possible null pointers
-		addon->Definitions->Name = _strdup(tmpDefs->Name);
-		addon->Definitions->Author = _strdup(tmpDefs->Author);
-		addon->Definitions->Description = _strdup(tmpDefs->Description);
-		addon->Definitions->UpdateLink = (tmpDefs->UpdateLink) ? _strdup(tmpDefs->UpdateLink) : nullptr;
+		addon->Definitions.Signature = tmpDefs->Signature;
+		addon->Definitions.APIVersion = tmpDefs->APIVersion;
+		addon->Definitions.Name = _strdup(tmpDefs->Name);
+		addon->Definitions.Version = tmpDefs->Version;
+		addon->Definitions.Author = _strdup(tmpDefs->Author);
+		addon->Definitions.Description = _strdup(tmpDefs->Description);
+		addon->Definitions.Load = tmpDefs->Load;
+		addon->Definitions.Unload = tmpDefs->Unload;
+		addon->Definitions.Provider = tmpDefs->Provider;
+		addon->Definitions.UpdateLink = (tmpDefs->UpdateLink) ? _strdup(tmpDefs->UpdateLink) : nullptr;
 
 		// if no addon api was requested or if the requested addon api exists
 		// else invalid addon, don't load
-		if (addon->Definitions->APIVersion == 0 || api != nullptr)
+		if (addon->Definitions.APIVersion == 0 || api != nullptr)
 		{
-			addon->Module = hMod;
 			addon->ModuleSize = moduleInfo.SizeOfImage;
 
-			if (addon->Definitions->APIVersion == 0)
+			if (addon->Definitions.APIVersion == 0)
 			{
-				LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (No API was requested.)", path, addon->Definitions->Signature, hMod, ((PBYTE)hMod) + moduleInfo.SizeOfImage);
+				LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (No API was requested.)", aPath.string().c_str(), addon->Definitions.Signature, addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage);
 			}
 			else
 			{
-				LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.)", path, addon->Definitions->Signature, hMod, ((PBYTE)hMod) + moduleInfo.SizeOfImage, addon->Definitions->APIVersion);
+				LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.)", aPath.string().c_str(), addon->Definitions.Signature, addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage, addon->Definitions.APIVersion);
 			}
-			addon->Definitions->Load(api);
+			addon->Definitions.Load(api);
 			addon->State = EAddonState::Loaded;
 		}
 		else
 		{
-			LogWarning(CH_LOADER, "Loading was cancelled because \"%s\" requested an API of version %d and no such version exists. Added to blacklist.", path, addon->Definitions->APIVersion);
+			LogWarning(CH_LOADER, "Loading was cancelled because \"%s\" requested an API of version %d and no such version exists. Incompatible.", aPath.string().c_str(), addon->Definitions.APIVersion);
 			addon->State = EAddonState::IncompatibleAPI;
-			FreeLibrary(hMod);
+			FreeLibrary(addon->Module);
+			addon->Module = nullptr;
 		}
 	}
 	void UnloadAddon(std::filesystem::path aPath)
 	{
-		std::string pathStr = aPath.string();
-		const char* path = pathStr.c_str();
-
 		Addon* addon;
 
 		if (Addons.find(aPath) != Addons.end())
 		{
 			addon = Addons[aPath];
 
-			switch (addon->State)
+			if (!addon->Module)
 			{
-			case EAddonState::NotLoaded:
-				LogWarning(CH_LOADER, "Cancelled unloading \"%s\". Already unloaded.", path);
-				return;
-			case EAddonState::NotLoadedDuplicate:
-				LogWarning(CH_LOADER, "Cancelled unloading \"%s\". EAddonState::NotLoadedDuplicate. This should never happen.", path);
-				return;
-
-			case EAddonState::Incompatible:
-				LogWarning(CH_LOADER, "Cancelled unloading \"%s\". EAddonState::Incompatible. This should never happen.", path);
-				return;
-			case EAddonState::IncompatibleAPI:
-				LogWarning(CH_LOADER, "Cancelled unloading \"%s\". EAddonState::IncompatibleAPI. This should never happen.", path);
-				return;
-			}
-		}
-		else
-		{
-			addon = new Addon{};
-			addon->State = EAddonState::None;
-			Addons.insert({ aPath, addon });
-		}
-
-		if (Addons[aPath]->Definitions != nullptr)
-		{
-			/* cache name for warning message and already release defs */
-			std::string name = Addons[aPath]->Definitions->Name;
-
-			if (!Addons[aPath]->Definitions->Unload ||
-				Addons[aPath]->Definitions->HasFlag(EAddonFlags::DisableHotloading))
-			{
-				LogWarning(CH_LOADER, "Prevented unloading \"%s\" because either no Unload function is defined or Hotloading is explicitly disabled. (%s)", name.c_str(), path);
-				return;
-			}
-			Addons[aPath]->Definitions->Unload();
-
-			if (Addons[aPath]->Module)
-			{
-				if (!FreeLibrary(Addons[aPath]->Module))
+				switch (addon->State)
 				{
-					LogWarning(CH_LOADER, "Couldn't unload \"%s\". FreeLibrary() call failed. (%s)", name.c_str(), path);
+				case EAddonState::NotLoaded:
+					LogWarning(CH_LOADER, "Cancelled unload of \"%s\". Already unloaded.", aPath.string().c_str());
+					return;
+				case EAddonState::NotLoadedDuplicate:
+					LogWarning(CH_LOADER, "Cancelled unload of \"%s\". EAddonState::NotLoadedDuplicate. This should never happen.", aPath.string().c_str());
+					return;
+
+				case EAddonState::Incompatible:
+					LogWarning(CH_LOADER, "Cancelled unload of \"%s\". EAddonState::Incompatible. This should never happen.", aPath.string().c_str());
+					return;
+				case EAddonState::IncompatibleAPI:
+					LogWarning(CH_LOADER, "Cancelled unload of \"%s\". EAddonState::IncompatibleAPI. This should never happen.", aPath.string().c_str());
 					return;
 				}
 			}
 		}
 		else
 		{
-			LogCritical(CH_LOADER, "Fatal Error. \"%s\" : Definitions == nullptr", path);
+			return;
+		}
+
+		if (Addons[aPath]->Definitions.Signature != 0)
+		{
+			/* cache name for warning message and already release defs */
+			std::string name = Addons[aPath]->Definitions.Name;
+
+			if (!Addons[aPath]->Definitions.Unload ||
+				Addons[aPath]->Definitions.HasFlag(EAddonFlags::DisableHotloading))
+			{
+				LogWarning(CH_LOADER, "Prevented unloading \"%s\" because either no Unload function is defined or Hotloading is explicitly disabled. (%s)", name.c_str(), aPath.string().c_str());
+			}
+			else
+			{
+				Addons[aPath]->Definitions.Unload();
+			}
 		}
 
 		if (Addons[aPath]->Module != nullptr && Addons[aPath]->ModuleSize > 0)
@@ -309,17 +315,37 @@ namespace Loader
 
 			if (leftoverRefs > 0)
 			{
-				LogWarning(CH_LOADER, "Removed %d unreleased references from \"%s\". Make sure your addon releases all references during Addon::Unload().", leftoverRefs, path);
+				LogWarning(CH_LOADER, "Removed %d unreleased references from \"%s\". Make sure your addon releases all references during Addon::Unload().", leftoverRefs, aPath.string().c_str());
 			}
-
-			Addons[aPath]->Module = nullptr;
-			Addons[aPath]->ModuleSize = 0;
 		}
 		else
 		{
-			LogCritical(CH_LOADER, "Fatal Error. \"%s\" : Addons[aPath].Module == nullptr || Addons[aPath].ModuleSize <= 0", path);
+			LogCritical(CH_LOADER, "Fatal Error. \"%s\" : Addons[aPath].Module == nullptr || Addons[aPath].ModuleSize <= 0", aPath.string().c_str());
 		}
 		
+		if (Addons[aPath]->Module)
+		{
+			int freeCalls = 0;
+
+			while (FreeLibrary(Addons[aPath]->Module))
+			{
+				freeCalls++;
+			}
+
+			if (freeCalls == 0)
+			{
+				LogWarning(CH_LOADER, "Couldn't unload \"%s\". FreeLibrary() call failed.", aPath.string().c_str());
+				return;
+			}
+			else
+			{
+				LogDebug(CH_LOADER, "Called FreeLibrary() %d times on \"%s\".", freeCalls, aPath.string().c_str());
+			}
+		}
+
+		Addons[aPath]->Module = nullptr;
+		Addons[aPath]->ModuleSize = 0;
+
 		Addons[aPath]->State = EAddonState::NotLoaded;
 
 		if (!std::filesystem::exists(aPath))
@@ -327,26 +353,24 @@ namespace Loader
 			Addons.erase(aPath);
 		}
 
-		LogInfo(CH_LOADER, "Unloaded addon: %s", path);
+		LogInfo(CH_LOADER, "Unloaded addon: %s", aPath.string().c_str());
 	}
 	void UninstallAddon(std::filesystem::path aPath)
 	{
-		std::string path = aPath.string();
-
 		// if file exists, delete it
 		if (std::filesystem::exists(aPath))
 		{
 			UnloadAddon(aPath);
-			std::remove(aPath.string().c_str());
+			std::filesystem::remove(aPath.string().c_str());
 			Addons.erase(aPath);
-			LogInfo(CH_LOADER, "Uninstalled addon: %s", path.c_str());
+			LogInfo(CH_LOADER, "Uninstalled addon: %s", aPath.string().c_str());
 		}
 	}
 	void DetectAddonsLoop()
 	{
 		for (;;)
 		{
-			if (State::Nexus == ENexusState::SHUTDOWN) { return; }
+			if (State::Nexus >= ENexusState::SHUTTING_DOWN) { return; }
 
 			if (State::Nexus == ENexusState::READY)
 			{
