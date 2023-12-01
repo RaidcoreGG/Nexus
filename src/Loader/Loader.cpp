@@ -30,7 +30,7 @@
 namespace Loader
 {
 	std::mutex Mutex;
-	std::vector<QAddon> QueuedAddons;
+	std::map<std::filesystem::path, ELoaderAction> QueuedAddons;
 	std::map<std::filesystem::path, Addon*> Addons;
 	std::map<int, AddonAPI*> ApiDefs;
 
@@ -43,14 +43,13 @@ namespace Loader
 		if (State::Nexus < ENexusState::LOADED)
 		{
 			LoaderThread = std::thread(DetectAddonsLoop);
+			LoaderThread.detach();
 		}
 	}
 	void Shutdown()
 	{
 		if (State::Nexus == ENexusState::SHUTTING_DOWN)
 		{
-			LoaderThread.join();
-
 			Loader::Mutex.lock();
 			{
 				while (Addons.size() != 0)
@@ -75,16 +74,16 @@ namespace Loader
 		{
 			auto it = QueuedAddons.begin();
 
-			switch (it->Action)
+			switch (it->second)
 			{
 			case ELoaderAction::Load:
-				LoadAddon(it->Path);
+				LoadAddon(it->first);
 				break;
 			case ELoaderAction::Unload:
-				UnloadAddon(it->Path);
+				UnloadAddon(it->first);
 				break;
 			case ELoaderAction::Uninstall:
-				UninstallAddon(it->Path);
+				UninstallAddon(it->first);
 				break;
 			}
 			QueuedAddons.erase(it);
@@ -93,11 +92,7 @@ namespace Loader
 	}
 	void QueueAddon(ELoaderAction aAction, std::filesystem::path aPath)
 	{
-		QAddon qa{};
-		qa.Action = aAction;
-		qa.Path = aPath;
-
-		QueuedAddons.push_back(qa);
+		QueuedAddons.insert({ aPath, aAction });
 	}
 
 	void LoadAddon(std::filesystem::path aPath)
@@ -175,7 +170,7 @@ namespace Loader
 			return;
 		}
 
-		/* doesn't full fill min reqs */
+		/* doesn't fulfill min reqs */
 		if (!tmpDefs->HasMinimumRequirements())
 		{
 			LogWarning(CH_LOADER, "\"%s\" does not fulfill minimum requirements. At least define Name, Version, Author, Description as well as the Load function. Incompatible.", aPath.string().c_str());
@@ -189,7 +184,7 @@ namespace Loader
 		for (auto& it : Addons)
 		{
 			// if defs defined && not the same path && signature the same though
-			if (it.first != aPath && it.second->Definitions.Signature == tmpDefs->Signature)
+			if (it.first != aPath && it.second->Definitions->Signature == tmpDefs->Signature)
 			{
 				LogWarning(CH_LOADER, "\"%s\" or another addon with this signature (%d) is already loaded. Added to blacklist.", aPath.string().c_str(), tmpDefs->Signature);
 				addon->State = EAddonState::NotLoadedDuplicate;
@@ -204,47 +199,49 @@ namespace Loader
 
 		AddonAPI* api = GetAddonAPI(tmpDefs->APIVersion); // will be nullptr if doesn't exist or APIVersion = 0
 
-		// Free the old stuff
-		if (addon->Definitions.Name) { delete[] addon->Definitions.Name; }
-		if (addon->Definitions.Author) { delete[] addon->Definitions.Name; }
-		if (addon->Definitions.Description) { delete[] addon->Definitions.Description; }
-		if (addon->Definitions.UpdateLink) { delete[] addon->Definitions.UpdateLink; }
+		// free the old stuff
+		if (addon->Definitions != nullptr)
+		{
+			// is this necessary?
+			free((char*)addon->Definitions->Name);
+			free((char*)addon->Definitions->Author);
+			free((char*)addon->Definitions->Description);
+			if (addon->Definitions->UpdateLink)
+			{
+				free((char*)addon->Definitions->UpdateLink);
+			}
+			delete addon->Definitions;
+		}
 		
 		// Allocate new memory and copy data
-		addon->Definitions = {};
+		addon->Definitions = new AddonDefinition(*tmpDefs);
 
 		// Allocate and copy strings, considering possible null pointers
-		addon->Definitions.Signature = tmpDefs->Signature;
-		addon->Definitions.APIVersion = tmpDefs->APIVersion;
-		addon->Definitions.Name = _strdup(tmpDefs->Name);
-		addon->Definitions.Version = tmpDefs->Version;
-		addon->Definitions.Author = _strdup(tmpDefs->Author);
-		addon->Definitions.Description = _strdup(tmpDefs->Description);
-		addon->Definitions.Load = tmpDefs->Load;
-		addon->Definitions.Unload = tmpDefs->Unload;
-		addon->Definitions.Provider = tmpDefs->Provider;
-		addon->Definitions.UpdateLink = (tmpDefs->UpdateLink) ? _strdup(tmpDefs->UpdateLink) : nullptr;
+		addon->Definitions->Name = _strdup(tmpDefs->Name);
+		addon->Definitions->Author = _strdup(tmpDefs->Author);
+		addon->Definitions->Description = _strdup(tmpDefs->Description);
+		addon->Definitions->UpdateLink = (tmpDefs->UpdateLink) ? _strdup(tmpDefs->UpdateLink) : nullptr;
 
 		// if no addon api was requested or if the requested addon api exists
 		// else invalid addon, don't load
-		if (addon->Definitions.APIVersion == 0 || api != nullptr)
+		if (addon->Definitions->APIVersion == 0 || api != nullptr)
 		{
 			addon->ModuleSize = moduleInfo.SizeOfImage;
 
-			if (addon->Definitions.APIVersion == 0)
+			if (addon->Definitions->APIVersion == 0)
 			{
-				LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (No API was requested.)", aPath.string().c_str(), addon->Definitions.Signature, addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage);
+				LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (No API was requested.)", aPath.string().c_str(), addon->Definitions->Signature, addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage);
 			}
 			else
 			{
-				LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.)", aPath.string().c_str(), addon->Definitions.Signature, addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage, addon->Definitions.APIVersion);
+				LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.)", aPath.string().c_str(), addon->Definitions->Signature, addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage, addon->Definitions->APIVersion);
 			}
-			addon->Definitions.Load(api);
+			addon->Definitions->Load(api);
 			addon->State = EAddonState::Loaded;
 		}
 		else
 		{
-			LogWarning(CH_LOADER, "Loading was cancelled because \"%s\" requested an API of version %d and no such version exists. Incompatible.", aPath.string().c_str(), addon->Definitions.APIVersion);
+			LogWarning(CH_LOADER, "Loading was cancelled because \"%s\" requested an API of version %d and no such version exists. Incompatible.", aPath.string().c_str(), addon->Definitions->APIVersion);
 			addon->State = EAddonState::IncompatibleAPI;
 			FreeLibrary(addon->Module);
 			addon->Module = nullptr;
@@ -283,19 +280,19 @@ namespace Loader
 			return;
 		}
 
-		if (Addons[aPath]->Definitions.Signature != 0)
+		if (Addons[aPath]->Definitions)
 		{
 			/* cache name for warning message and already release defs */
-			std::string name = Addons[aPath]->Definitions.Name;
+			std::string name = Addons[aPath]->Definitions->Name;
 
-			if (!Addons[aPath]->Definitions.Unload ||
-				Addons[aPath]->Definitions.HasFlag(EAddonFlags::DisableHotloading))
+			if (!Addons[aPath]->Definitions->Unload ||
+				Addons[aPath]->Definitions->HasFlag(EAddonFlags::DisableHotloading))
 			{
 				LogWarning(CH_LOADER, "Prevented unloading \"%s\" because either no Unload function is defined or Hotloading is explicitly disabled. (%s)", name.c_str(), aPath.string().c_str());
 			}
 			else
 			{
-				Addons[aPath]->Definitions.Unload();
+				Addons[aPath]->Definitions->Unload();
 			}
 		}
 
@@ -310,7 +307,6 @@ namespace Loader
 			leftoverRefs += GUI::Verify(startAddress, endAddress);
 			leftoverRefs += GUI::QuickAccess::Verify(startAddress, endAddress);
 			leftoverRefs += Keybinds::Verify(startAddress, endAddress);
-			leftoverRefs += LogHandler::Verify(startAddress, endAddress);
 			leftoverRefs += WndProc::Verify(startAddress, endAddress);
 
 			if (leftoverRefs > 0)
@@ -422,7 +418,7 @@ namespace Loader
 				//ProcessQueue();
 			}
 			
-			Sleep(5000);
+			Sleep(3000);
 		}
 	}
 	

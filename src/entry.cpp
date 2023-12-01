@@ -135,6 +135,9 @@ void Shutdown()
 
 		LogInfo(CH_CORE, "Shutdown performed.");
 
+		// reset wndproc
+		SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)Hooks::GW2_WndProc);
+
 		State::Nexus = ENexusState::SHUTDOWN;
 	}
 
@@ -164,7 +167,7 @@ LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 	}
 
-	if (uMsg == WM_DESTROY || uMsg == WM_QUIT)
+	if (uMsg == WM_DESTROY || uMsg == WM_QUIT || uMsg == WM_CLOSE)
 	{
 		::Shutdown();
 	}
@@ -320,9 +323,7 @@ bool DxLoad()
 
 HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext)
 {
-	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CREATEDEVICE; }
-
-	::Initialize();
+	if (State::EntryMethod == EEntryMethod::NONE) { ::Initialize(); State::EntryMethod = EEntryMethod::CREATEDEVICE; }
 
 	static decltype(&D3D11CreateDevice) func;
 	static const char* func_name = "D3D11CreateDevice";
@@ -354,9 +355,7 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 }
 HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, const DXGI_SWAP_CHAIN_DESC* pSwapChainDesc, IDXGISwapChain** ppSwapChain, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext)
 {
-	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CREATEDEVICEANDSWAPCHAIN; }
-
-	::Initialize();
+	if (State::EntryMethod == EEntryMethod::NONE) { ::Initialize(); State::EntryMethod = EEntryMethod::CREATEDEVICEANDSWAPCHAIN; }
 
 	static decltype(&D3D11CreateDeviceAndSwapChain) func;
 	static const char* func_name = "D3D11CreateDeviceAndSwapChain";
@@ -388,9 +387,7 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 }
 HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pAdapter, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, ID3D11Device** ppDevice)
 {
-	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_CREATEDEVICE; }
-
-	::Initialize();
+	if (State::EntryMethod == EEntryMethod::NONE) { ::Initialize(); State::EntryMethod = EEntryMethod::CORE_CREATEDEVICE; }
 
 	static decltype(&D3D11CoreCreateDevice) func;
 	static const char* func_name = "D3D11CoreCreateDevice";
@@ -422,9 +419,7 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 }
 HRESULT __stdcall D3D11CoreCreateLayeredDevice(const void* unknown0, DWORD unknown1, const void* unknown2, REFIID riid, void** ppvObj)
 {
-	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_CREATELAYEREDDEVICE; }
-
-	::Initialize();
+	if (State::EntryMethod == EEntryMethod::NONE) { ::Initialize(); State::EntryMethod = EEntryMethod::CORE_CREATELAYEREDDEVICE; }
 
 	static decltype(&D3D11CoreCreateLayeredDevice) func;
 	static const char* func_name = "D3D11CoreCreateLayeredDevice";
@@ -456,9 +451,7 @@ HRESULT __stdcall D3D11CoreCreateLayeredDevice(const void* unknown0, DWORD unkno
 }
 SIZE_T	__stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unknown1)
 {
-	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_GETLAYEREDDEVICESIZE; }
-
-	::Initialize();
+	if (State::EntryMethod == EEntryMethod::NONE) { ::Initialize(); State::EntryMethod = EEntryMethod::CORE_GETLAYEREDDEVICESIZE; }
 
 	static decltype(&D3D11CoreGetLayeredDeviceSize) func;
 	static const char* func_name = "D3D11CoreGetLayeredDeviceSize";
@@ -490,9 +483,7 @@ SIZE_T	__stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unkno
 }
 HRESULT __stdcall D3D11CoreRegisterLayers(const void* unknown0, DWORD unknown1)
 {
-	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_REGISTERLAYERS; }
-
-	::Initialize();
+	if (State::EntryMethod == EEntryMethod::NONE) { ::Initialize(); State::EntryMethod = EEntryMethod::CORE_REGISTERLAYERS; }
 
 	static decltype(&D3D11CoreRegisterLayers) func;
 	static const char* func_name = "D3D11CoreRegisterLayers";
