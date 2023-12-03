@@ -243,7 +243,8 @@ bool DxLoad()
 
 			State::IsChainloading = true;
 
-			D3D11Handle = LoadLibraryA(Path::F_CHAINLOAD_DLL);
+			std::string strChainload = Path::F_CHAINLOAD_DLL.string();
+			D3D11Handle = LoadLibraryA(strChainload.c_str());
 		}
 
 		if (!D3D11Handle)
@@ -254,13 +255,14 @@ bool DxLoad()
 			}
 			State::IsChainloading = false;
 
-			D3D11Handle = LoadLibraryA(Path::F_SYSTEM_DLL);
+			std::string strSystem = Path::F_SYSTEM_DLL.string();
+			D3D11Handle = LoadLibraryA(strSystem.c_str());
 
-			LogDebug(CH_CORE, Path::F_SYSTEM_DLL);
+			LogDebug(CH_CORE, strSystem.c_str());
 
 			assert(D3D11Handle && "Could not load system d3d11.dll");
 
-			LogInfo(CH_CORE, "Loaded System DLL: %s", Path::F_SYSTEM_DLL);
+			LogInfo(CH_CORE, "Loaded System DLL: %s", strSystem.c_str());
 		}
 
 		State::Directx = EDxState::LOADED;
@@ -333,7 +335,8 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-		D3D11SystemHandle = LoadLibraryA(Path::F_SYSTEM_DLL);
+		std::string strSystem = Path::F_SYSTEM_DLL.string();
+		D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
 
 		if (FindFunction(D3D11SystemHandle, &func, func_name) == false)
 		{
@@ -365,7 +368,8 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-		D3D11SystemHandle = LoadLibraryA(Path::F_SYSTEM_DLL);
+		std::string strSystem = Path::F_SYSTEM_DLL.string();
+		D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
 
 		if (FindFunction(D3D11SystemHandle, &func, func_name) == false)
 		{
@@ -397,7 +401,8 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-		D3D11SystemHandle = LoadLibraryA(Path::F_SYSTEM_DLL);
+		std::string strSystem = Path::F_SYSTEM_DLL.string();
+		D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
 
 		if (FindFunction(D3D11SystemHandle, &func, func_name) == false)
 		{
@@ -429,7 +434,8 @@ HRESULT __stdcall D3D11CoreCreateLayeredDevice(const void* unknown0, DWORD unkno
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-		D3D11SystemHandle = LoadLibraryA(Path::F_SYSTEM_DLL);
+		std::string strSystem = Path::F_SYSTEM_DLL.string();
+		D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
 
 		if (FindFunction(D3D11SystemHandle, &func, func_name) == false)
 		{
@@ -461,7 +467,8 @@ SIZE_T	__stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unkno
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-		D3D11SystemHandle = LoadLibraryA(Path::F_SYSTEM_DLL);
+		std::string strSystem = Path::F_SYSTEM_DLL.string();
+		D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
 
 		if (FindFunction(D3D11SystemHandle, &func, func_name) == false)
 		{
@@ -493,7 +500,8 @@ HRESULT __stdcall D3D11CoreRegisterLayers(const void* unknown0, DWORD unknown1)
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-		D3D11SystemHandle = LoadLibraryA(Path::F_SYSTEM_DLL);
+		std::string strSystem = Path::F_SYSTEM_DLL.string();
+		D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
 
 		if (FindFunction(D3D11SystemHandle, &func, func_name) == false)
 		{

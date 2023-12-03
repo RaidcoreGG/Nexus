@@ -6,12 +6,9 @@
 #include <locale>
 #include <PathCch.h>
 #include <Shlwapi.h>
+#include <filesystem>
 
-void PathCopyAndAppend(char* aSource, char* aDestination, const char* aAppend);
-
-void PathSystemAppend(char* aDestination, const char* aAppend);
-
-void PathGetDirectoryName(char* aSource, char* aDestination);
+void PathSystemAppend(std::filesystem::path& aDestination, const char* aAppend);
 
 bool FindFunction(HMODULE aModule, LPVOID aFunction, LPCSTR aName);
 

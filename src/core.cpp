@@ -1,24 +1,12 @@
 #include "core.h"
 
-#pragma warning( push )
-#pragma warning( disable : 4995)
-void PathCopyAndAppend(char* aSource, char* aDestination, const char* aAppend)
+void PathSystemAppend(std::filesystem::path& aDestination, const char* aAppend)
 {
-	memcpy(aDestination, aSource, MAX_PATH);
-	PathAppendA(aDestination, aAppend);
-}
-
-void PathSystemAppend(char* aDestination, const char* aAppend)
-{
-	GetSystemDirectoryA(aDestination, MAX_PATH);
-	PathAppendA(aDestination, aAppend);
-}
-#pragma warning( pop ) 
-
-void PathGetDirectoryName(char* aSource, char* aDestination)
-{
-	memcpy(aDestination, aSource, MAX_PATH);
-	PathRemoveFileSpecA(aDestination);
+	char* buff = new char[MAX_PATH];
+	GetSystemDirectoryA(buff, MAX_PATH);
+	aDestination = buff;
+	aDestination.append(aAppend);
+	delete[] buff;
 }
 
 bool FindFunction(HMODULE aModule, LPVOID aFunction, LPCSTR aName)

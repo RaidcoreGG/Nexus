@@ -258,10 +258,12 @@ namespace GUI
 			ImGui::SameLine();
 			if (ImGui::Button("I do NOT agree"))
 			{
+				std::string strHost = Path::F_HOST_DLL.string();
+
 				SHFILEOPSTRUCT fileOp;
 				fileOp.hwnd = NULL;
 				fileOp.wFunc = FO_DELETE;
-				fileOp.pFrom = Path::F_HOST_DLL;
+				fileOp.pFrom = strHost.c_str();
 				fileOp.pTo = NULL;
 				fileOp.fFlags = FOF_ALLOWUNDO | FOF_NOERRORUI | FOF_NOCONFIRMATION | FOF_SILENT;
 				int result = SHFileOperationA(&fileOp);
@@ -504,7 +506,9 @@ namespace GUI
 					Settings::Save();
 				}
 			}
-			io.Fonts->AddFontFromFileTTF(Path::F_FONT, FontSize);
+			std::string strFont = Path::F_FONT.string();
+
+			io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize);
 		}
 		else
 		{
