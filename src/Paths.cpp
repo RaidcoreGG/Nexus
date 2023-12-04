@@ -88,7 +88,7 @@ namespace Path
 		if (it == ExistingPaths.end())
 		{
 			ExistingPaths.push_back(str);
-			it = std::find(ExistingPaths.begin(), ExistingPaths.end(), str);
+			return ExistingPaths.back().c_str();
 		}
 
 		return it->c_str();
