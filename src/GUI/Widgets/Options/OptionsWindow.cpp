@@ -138,6 +138,7 @@ namespace GUI
 					if (renderCb)
 					{
 						renderCb();
+						ImGui::Separator();
 					}
 				}
 

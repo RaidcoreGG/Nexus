@@ -1,7 +1,7 @@
 #include "GUI.h"
 
 #include <filesystem>
-#include <shellapi.h>
+#include <algorithm>
 
 #include "State.h"
 #include "Renderer.h"
@@ -22,13 +22,14 @@
 #include "imgui_impl_dx11.h"
 
 #include "Widgets/Menu/Menu.h"
+#include "Widgets/Menu/MenuItem.h"
 #include "Widgets/Addons/AddonsWindow.h"
 #include "Widgets/Options/OptionsWindow.h"
 #include "Widgets/Log/LogWindow.h"
 #include "Widgets/Debug/DebugWindow.h"
 #include "Widgets/About/AboutBox.h"
 #include "Widgets/QuickAccess/QuickAccess.h"
-#include "Widgets/Menu/MenuItem.h"
+#include "Widgets/EULA/EULAModal.h"
 
 #include "resource.h"
 #include "Textures/Texture.h"
@@ -226,62 +227,6 @@ namespace GUI
 		return 1;
 	}
 
-	void UserAgreementPopup()
-	{
-		ImGui::OpenPopup("Legal Agreement", ImGuiPopupFlags_AnyPopupLevel);
-		ImVec2 center(Renderer::Width * 0.5f, Renderer::Height * 0.5f);
-		ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-		if (ImGui::BeginPopupModal("Legal Agreement", NULL, WindowFlags_Default))
-		{
-			bool close = false;
-
-			ImGui::TextWrapped("This is an unofficial library and Raidcore is in no way associated with ArenaNet nor with any of its partners. Modifying Guild Wars 2 through any third party software is not supported by ArenaNet nor by any of its partners.");
-
-			ImGui::Text("By using this software you are agreeing to the terms and conditions as laid out on:");
-
-			if (ImGui::TextURL("https://raidcore.gg/Legal", true, false))
-			{
-				ShellExecuteA(0, 0, "https://raidcore.gg/Legal", 0, 0, SW_SHOW);
-			}
-
-			ImGui::Text("If you do not agree to these terms, do not use the software.");
-
-			ImGui::TextDisabled("By clicking \"I do NOT agree\" your game will close and Nexus will uninstall.");
-
-			if (ImGui::Button("I agree"))
-			{
-				AcceptedEULA = true;
-				Settings::Settings[OPT_ACCEPTEULA] = true;
-				Settings::Save();
-				close = true;
-			}
-			ImGui::SameLine();
-			if (ImGui::Button("I do NOT agree"))
-			{
-				std::string strHost = Path::F_HOST_DLL.string();
-
-				SHFILEOPSTRUCT fileOp;
-				fileOp.hwnd = NULL;
-				fileOp.wFunc = FO_DELETE;
-				fileOp.pFrom = strHost.c_str();
-				fileOp.pTo = NULL;
-				fileOp.fFlags = FOF_ALLOWUNDO | FOF_NOERRORUI | FOF_NOCONFIRMATION | FOF_SILENT;
-				int result = SHFileOperationA(&fileOp);
-
-				close = true;
-
-				exit(0);
-			}
-
-			if (close)
-			{
-				ImGui::CloseCurrentPopup();
-			}
-
-			ImGui::EndPopup();
-		}
-	}
-
 	void Render()
 	{
 		if (State::Nexus == ENexusState::READY && !State::IsImGuiInitialized)
@@ -307,11 +252,6 @@ namespace GUI
 			ImGui_ImplDX11_NewFrame();
 			ImGui::NewFrame();
 			/* new frame end */
-
-			if (!AcceptedEULA)
-			{
-				UserAgreementPopup();
-			}
 
 			/* draw overlay */
 			if (IsUIVisible)
@@ -484,6 +424,22 @@ namespace GUI
 			Settings::Settings[OPT_LASTUISCALE] = Renderer::Scaling;
 			Settings::Save();
 		}
+	}
+	void OnEULAAccepted(void* aEventArgs)
+	{
+		Mutex.lock();
+		auto it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd)
+			{
+				return wnd->Name == "EULAModal";
+			});
+
+		if (it != Windows.end())
+		{
+			delete (*it);
+			Windows.erase(it);
+		}
+		Mutex.unlock();
+		Events::Unsubscribe(EV_EULA_ACCEPTED, OnEULAAccepted);
 	}
 
 	void Setup()
@@ -714,6 +670,13 @@ namespace GUI
 		else
 		{
 			LogDebug("meme", "settings initially null");
+		}
+
+		if (!AcceptedEULA)
+		{
+			EULAModal* eulaModal = new EULAModal();
+			AddWindow(eulaModal);
+			Events::Subscribe(EV_EULA_ACCEPTED, OnEULAAccepted);
 		}
 
 		IsSetup = true;

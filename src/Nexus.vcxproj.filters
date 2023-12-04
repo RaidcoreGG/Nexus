@@ -106,6 +106,9 @@
     <Filter Include="Updater">
       <UniqueIdentifier>{d7e1b86c-b1ce-4e7b-be11-861622cc8c67}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Widgets\EULA">
+      <UniqueIdentifier>{fdc50f5d-b3a6-4446-89c4-7450b69cb75d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="entry.cpp">
@@ -263,6 +266,9 @@
     </ClCompile>
     <ClCompile Include="CrashHandler.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Widgets\EULA\EULAModal.cpp">
+      <Filter>GUI\Widgets\EULA</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -973,6 +979,9 @@
     </ClInclude>
     <ClInclude Include="httpslib.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Widgets\EULA\EULAModal.h">
+      <Filter>GUI\Widgets\EULA</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
