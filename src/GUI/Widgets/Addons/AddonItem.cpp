@@ -23,7 +23,8 @@ namespace GUI
 	{
 		if (aAddon->State == EAddonState::NotLoadedDuplicate ||
 			aAddon->State == EAddonState::Incompatible ||
-			aAddon->Definitions->Signature == 0)
+			aAddon->State == EAddonState::Reload ||
+			aAddon->Definitions == nullptr)
 		{
 			return;
 		}

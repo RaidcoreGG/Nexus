@@ -86,7 +86,11 @@ namespace Loader
 				UninstallAddon(it->first);
 				break;
 			}
-			QueuedAddons.erase(it);
+			
+			if (Addons[it->first]->State != EAddonState::Reload)
+			{
+				QueuedAddons.erase(it);
+			}
 		}
 		Loader::Mutex.unlock();
 	}
@@ -183,8 +187,8 @@ namespace Loader
 		/* check if duplicate signature */
 		for (auto& it : Addons)
 		{
-			// if defs defined && not the same path && signature the same though
-			if (it.first != aPath && it.second->Definitions->Signature == tmpDefs->Signature)
+			// if defs defined && not the same path && signature the same though (another && it.second->Definitions in the mix because could still be null during load)
+			if (it.first != aPath && it.second->Definitions && it.second->Definitions->Signature == tmpDefs->Signature)
 			{
 				LogWarning(CH_LOADER, "\"%s\" or another addon with this signature (%d) is already loaded. Added to blacklist.", aPath.string().c_str(), tmpDefs->Signature);
 				addon->State = EAddonState::NotLoadedDuplicate;

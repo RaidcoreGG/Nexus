@@ -280,7 +280,7 @@ namespace GUI
 										ImGui::TextDisabled("Module Size: %u", addon->ModuleSize);
 										ImGui::TextDisabled("AddonDefs: %p", addon->Definitions);
 
-										if (addon->Definitions->Signature != 0)
+										if (addon->Definitions != nullptr)
 										{
 											if (ImGui::SmallButton("Memory Editor"))
 											{
