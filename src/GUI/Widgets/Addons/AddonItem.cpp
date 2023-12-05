@@ -1,5 +1,7 @@
 #include "AddonItem.h"
 
+#include <shellapi.h>
+
 #include "Shared.h"
 #include "Consts.h"
 
@@ -89,6 +91,7 @@ namespace GUI
 					{
 						ImGui::SameLine();
 					}
+					amtBtns++;
 					if (ImGui::Button(("Uninstall##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight * ImGui::GetFontSize())))
 					{
 						for (auto& it : Loader::Addons)
@@ -99,6 +102,18 @@ namespace GUI
 								Loader::QueueAddon(ELoaderAction::Uninstall, it.first);
 							}
 						}
+					}
+				}
+				if (aAddon->Definitions->Provider == EUpdateProvider::GitHub && aAddon->Definitions->UpdateLink)
+				{
+					if (amtBtns > 0)
+					{
+						ImGui::SameLine();
+					}
+					amtBtns++;
+					if (ImGui::Button(("GitHub##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight * ImGui::GetFontSize())))
+					{
+						ShellExecuteA(0, 0, aAddon->Definitions->UpdateLink, 0, 0, SW_SHOW);
 					}
 				}
 
