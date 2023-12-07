@@ -55,6 +55,8 @@ namespace Path
 		F_APIKEYS = D_GW2_ADDONS_COMMON / "APIKeys.json";					/* get apikeys path */
 
 		/* static paths */
+		F_OLD_DLL = F_HOST_DLL.string() + ".old";							/* get chainload dll path */
+		F_UPDATE_DLL = F_HOST_DLL.string() + ".update";						/* get chainload dll path */
 		PathSystemAppend(F_SYSTEM_DLL, "d3d11.dll");						/* get system dll path */
 		F_CHAINLOAD_DLL = D_GW2 / "d3d11_chainload.dll";					/* get chainload dll path */
 
