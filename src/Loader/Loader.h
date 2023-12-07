@@ -2,7 +2,6 @@
 #define LOADER_H
 
 #include <mutex>
-#include <vector>
 #include <map>
 #include <thread>
 #include <filesystem>
@@ -11,18 +10,12 @@
 #include "Addon.h"
 #include "AddonAPI.h"
 
-struct QAddon
-{
-	ELoaderAction Action;
-	std::filesystem::path Path;
-};
-
 namespace Loader
 {
 	extern std::mutex Mutex;
-	extern std::vector<QAddon> QueuedAddons;					/* To be loaded or unloaded addons */
-	extern std::map<std::filesystem::path, Addon*> Addons;		/* Addons and their corresponding paths */
-	extern std::map<int, AddonAPI*> ApiDefs;					/* Addon API definitions, created on demand */
+	extern std::map<std::filesystem::path, ELoaderAction> QueuedAddons;		/* To be loaded or unloaded addons */
+	extern std::map<std::filesystem::path, Addon*> Addons;					/* Addons and their corresponding paths */
+	extern std::map<int, AddonAPI*> ApiDefs;								/* Addon API definitions, created on demand */
 
 	extern std::thread LoaderThread;
 

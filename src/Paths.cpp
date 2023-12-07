@@ -1,85 +1,103 @@
 #include "Paths.h"
 
+#include <algorithm>
+
 #include "core.h"
 
 namespace Path
 {
-	char D_GW2							[MAX_PATH]{};
-	char D_GW2_ADDONS					[MAX_PATH]{};
-	char D_GW2_ADDONS_COMMON			[MAX_PATH]{};
-	char D_GW2_ADDONS_COMMON_API_V2		[MAX_PATH]{};
-	char D_GW2_ADDONS_NEXUS				[MAX_PATH]{};
-	char D_GW2_ADDONS_RAIDCORE_LOCALES	[MAX_PATH]{};
+	std::filesystem::path D_GW2{};
+	std::filesystem::path D_GW2_ADDONS{};
+	std::filesystem::path D_GW2_ADDONS_COMMON{};
+	std::filesystem::path D_GW2_ADDONS_COMMON_API_V2{};
+	std::filesystem::path D_GW2_ADDONS_NEXUS{};
+	std::filesystem::path D_GW2_ADDONS_RAIDCORE_LOCALES{};
 
-	char F_HOST_DLL						[MAX_PATH]{};
-	char F_UPDATE_DLL					[MAX_PATH]{};
-	char F_OLD_DLL						[MAX_PATH]{};
-	char F_SYSTEM_DLL					[MAX_PATH]{};
-	char F_CHAINLOAD_DLL				[MAX_PATH]{};
+	std::filesystem::path F_HOST_DLL{};
+	std::filesystem::path F_UPDATE_DLL{};
+	std::filesystem::path F_OLD_DLL{};
+	std::filesystem::path F_SYSTEM_DLL{};
+	std::filesystem::path F_CHAINLOAD_DLL{};
 
-	char F_LOG							[MAX_PATH]{};
-	char F_KEYBINDS						[MAX_PATH]{};
-	char F_FONT							[MAX_PATH]{};
-	char F_SETTINGS						[MAX_PATH]{};
-	char F_APIKEYS						[MAX_PATH]{};
+	std::filesystem::path F_LOG{};
+	std::filesystem::path F_KEYBINDS{};
+	std::filesystem::path F_FONT{};
+	std::filesystem::path F_SETTINGS{};
+	std::filesystem::path F_APIKEYS{};
+
+	std::vector<std::string> ExistingPaths;
 
 	void Initialize(HMODULE aBaseModule)
 	{
-		GetModuleFileNameA(aBaseModule, Path::F_HOST_DLL, MAX_PATH);										/* get self dll path */
+		char buff[MAX_PATH]{};
+		GetModuleFileNameA(aBaseModule, buff, MAX_PATH);					/* get self dll path */
+		F_HOST_DLL = buff;
 
 		/* directories */
-		PathGetDirectoryName(Path::F_HOST_DLL, Path::D_GW2);												/* get current directory */
-		PathCopyAndAppend(Path::D_GW2, Path::D_GW2_ADDONS, "addons");										/* get addons path */
-		PathCopyAndAppend(Path::D_GW2_ADDONS, Path::D_GW2_ADDONS_COMMON, "common");							/* get addons/common path */
-		PathCopyAndAppend(Path::D_GW2_ADDONS_COMMON, Path::D_GW2_ADDONS_COMMON_API_V2, "api/v2");			/* get addons/common/api/v2 path */
-		PathCopyAndAppend(Path::D_GW2_ADDONS, Path::D_GW2_ADDONS_NEXUS, "Nexus");							/* get addons/Nexus path */
-		PathCopyAndAppend(Path::D_GW2_ADDONS_NEXUS, Path::D_GW2_ADDONS_RAIDCORE_LOCALES, "Locales");		/* get addons/Nexus/Locales path */
+		D_GW2 = F_HOST_DLL.parent_path();									/* get current directory */
+		D_GW2_ADDONS = D_GW2 / "addons";									/* get addons path */
+		D_GW2_ADDONS_COMMON = D_GW2_ADDONS / "common";						/* get addons/common path */
+		D_GW2_ADDONS_COMMON_API_V2 = D_GW2_ADDONS_COMMON / "api/v2";		/* get addons/common/api/v2 path */
+		D_GW2_ADDONS_NEXUS = D_GW2_ADDONS / "Nexus";						/* get addons/Nexus path */
+		D_GW2_ADDONS_RAIDCORE_LOCALES = D_GW2_ADDONS_NEXUS / "Locales";		/* get addons/Nexus/Locales path */
 
 		/* ensure folder tree*/
-		CreateDirectoryA(Path::D_GW2_ADDONS, nullptr);														/* ensure addons dir */
-		CreateDirectoryA(Path::D_GW2_ADDONS_COMMON, nullptr);												/* ensure addons/common dir */
-		CreateDirectoryA(Path::D_GW2_ADDONS_NEXUS, nullptr);												/* ensure addons/Nexus dir */
-		CreateDirectoryA(Path::D_GW2_ADDONS_RAIDCORE_LOCALES, nullptr);										/* ensure addons/Nexus/Locales dir */
+		std::filesystem::create_directory(D_GW2_ADDONS);					/* ensure addons dir */
+		std::filesystem::create_directory(D_GW2_ADDONS_COMMON);				/* ensure addons/common dir */
+		std::filesystem::create_directory(D_GW2_ADDONS_NEXUS);				/* ensure addons/Nexus dir */
+		std::filesystem::create_directory(D_GW2_ADDONS_RAIDCORE_LOCALES);	/* ensure addons/Nexus/Locales dir */	
 
 		/* files */
-		PathCopyAndAppend(Path::D_GW2_ADDONS_NEXUS, Path::F_LOG, "Nexus.log");								/* get log path */
-		PathCopyAndAppend(Path::D_GW2_ADDONS_NEXUS, Path::F_KEYBINDS, "Keybinds.json");						/* get keybinds path */
-		PathCopyAndAppend(Path::D_GW2_ADDONS_NEXUS, Path::F_FONT, "Font.ttf");								/* get font path */
-		PathCopyAndAppend(Path::D_GW2_ADDONS_NEXUS, Path::F_SETTINGS, "Settings.json");						/* get settings path */
-		PathCopyAndAppend(Path::D_GW2_ADDONS_COMMON, Path::F_APIKEYS, "APIKeys.json");						/* get apikeys path */
+		F_LOG = D_GW2_ADDONS_NEXUS / "Nexus.log";							/* get log path */
+		F_KEYBINDS = D_GW2_ADDONS_NEXUS / "Keybinds.json";					/* get keybinds path */
+		F_FONT = D_GW2_ADDONS_NEXUS / "Font.ttf";							/* get font path */
+		F_SETTINGS = D_GW2_ADDONS_NEXUS / "Settings.json";					/* get settings path */
+		F_APIKEYS = D_GW2_ADDONS_COMMON / "APIKeys.json";					/* get apikeys path */
 
 		/* static paths */
-		PathCopyAndAppend(Path::D_GW2, Path::F_UPDATE_DLL, "d3d11.dll.update");								/* get update dll path */
-		PathCopyAndAppend(Path::D_GW2, Path::F_OLD_DLL, "d3d11.dll.old");									/* get old dll path */
-		PathSystemAppend(Path::F_SYSTEM_DLL, "d3d11.dll");													/* get system dll path */
-		PathCopyAndAppend(Path::D_GW2, Path::F_CHAINLOAD_DLL, "d3d11_chainload.dll");						/* get chainload dll path */
+		PathSystemAppend(F_SYSTEM_DLL, "d3d11.dll");						/* get system dll path */
+		F_CHAINLOAD_DLL = D_GW2 / "d3d11_chainload.dll";					/* get chainload dll path */
+
+		/* push to paths */
+		ExistingPaths.push_back(D_GW2.string());
+		ExistingPaths.push_back(D_GW2_ADDONS_COMMON.string());
 	}
 
 	const char* GetGameDirectory()
 	{
-		char* str = new char[MAX_PATH]{};
-		memcpy(&str[0], &D_GW2[0], strlen(D_GW2));
-		return str;
+		// guaranteed to exist from init func
+		auto it = std::find(ExistingPaths.begin(), ExistingPaths.end(), D_GW2.string());
+		return it->c_str();
 	}
 
 	const char* GetAddonDirectory(const char* aName)
 	{
-		char* str = new char[MAX_PATH]{};
-		size_t idx = strlen(D_GW2_ADDONS);
-		memcpy(&str[0], &D_GW2_ADDONS[0], strlen(D_GW2_ADDONS));
+		std::string str;
 
-		if (strcmp(aName, "") != 0) {
-			str[idx] = '\\';
-			memcpy(&str[idx + 1], aName, strlen(aName));
+		if (strcmp(aName, "") != 0)
+		{
+			str = (D_GW2_ADDONS / aName).string();
+		}
+		else
+		{
+			str = D_GW2_ADDONS.string();
 		}
 
-		return str;
+		auto it = std::find(ExistingPaths.begin(), ExistingPaths.end(), str);
+
+		if (it == ExistingPaths.end())
+		{
+			ExistingPaths.push_back(str);
+			return ExistingPaths.back().c_str();
+		}
+
+		return it->c_str();
 	}
 
 	const char* GetCommonDirectory()
 	{
-		char* str = new char[MAX_PATH]{};
-		memcpy(&str[0], &D_GW2_ADDONS_COMMON[0], strlen(D_GW2_ADDONS_COMMON));
-		return str;
+		// guaranteed to exist from init func
+		auto it = std::find(ExistingPaths.begin(), ExistingPaths.end(), D_GW2_ADDONS_COMMON.string());
+		return it->c_str();
 	}
 }

@@ -135,6 +135,9 @@ void Shutdown()
 
 		LogInfo(CH_CORE, "Shutdown performed.");
 
+		// reset wndproc
+		SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)Hooks::GW2_WndProc);
+
 		State::Nexus = ENexusState::SHUTDOWN;
 	}
 
@@ -164,7 +167,7 @@ LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 	}
 
-	if (uMsg == WM_DESTROY || uMsg == WM_QUIT)
+	if (uMsg == WM_DESTROY || uMsg == WM_QUIT || uMsg == WM_CLOSE)
 	{
 		::Shutdown();
 	}
@@ -240,7 +243,8 @@ bool DxLoad()
 
 			State::IsChainloading = true;
 
-			D3D11Handle = LoadLibraryA(Path::F_CHAINLOAD_DLL);
+			std::string strChainload = Path::F_CHAINLOAD_DLL.string();
+			D3D11Handle = LoadLibraryA(strChainload.c_str());
 		}
 
 		if (!D3D11Handle)
@@ -251,13 +255,14 @@ bool DxLoad()
 			}
 			State::IsChainloading = false;
 
-			D3D11Handle = LoadLibraryA(Path::F_SYSTEM_DLL);
+			std::string strSystem = Path::F_SYSTEM_DLL.string();
+			D3D11Handle = LoadLibraryA(strSystem.c_str());
 
-			LogDebug(CH_CORE, Path::F_SYSTEM_DLL);
+			LogDebug(CH_CORE, strSystem.c_str());
 
 			assert(D3D11Handle && "Could not load system d3d11.dll");
 
-			LogInfo(CH_CORE, "Loaded System DLL: %s", Path::F_SYSTEM_DLL);
+			LogInfo(CH_CORE, "Loaded System DLL: %s", strSystem.c_str());
 		}
 
 		State::Directx = EDxState::LOADED;
@@ -320,9 +325,7 @@ bool DxLoad()
 
 HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext)
 {
-	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CREATEDEVICE; }
-
-	::Initialize();
+	if (State::EntryMethod == EEntryMethod::NONE) { ::Initialize(); State::EntryMethod = EEntryMethod::CREATEDEVICE; }
 
 	static decltype(&D3D11CreateDevice) func;
 	static const char* func_name = "D3D11CreateDevice";
@@ -332,7 +335,8 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-		D3D11SystemHandle = LoadLibraryA(Path::F_SYSTEM_DLL);
+		std::string strSystem = Path::F_SYSTEM_DLL.string();
+		D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
 
 		if (FindFunction(D3D11SystemHandle, &func, func_name) == false)
 		{
@@ -354,9 +358,7 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 }
 HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, const DXGI_SWAP_CHAIN_DESC* pSwapChainDesc, IDXGISwapChain** ppSwapChain, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext)
 {
-	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CREATEDEVICEANDSWAPCHAIN; }
-
-	::Initialize();
+	if (State::EntryMethod == EEntryMethod::NONE) { ::Initialize(); State::EntryMethod = EEntryMethod::CREATEDEVICEANDSWAPCHAIN; }
 
 	static decltype(&D3D11CreateDeviceAndSwapChain) func;
 	static const char* func_name = "D3D11CreateDeviceAndSwapChain";
@@ -366,7 +368,8 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-		D3D11SystemHandle = LoadLibraryA(Path::F_SYSTEM_DLL);
+		std::string strSystem = Path::F_SYSTEM_DLL.string();
+		D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
 
 		if (FindFunction(D3D11SystemHandle, &func, func_name) == false)
 		{
@@ -388,9 +391,7 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 }
 HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pAdapter, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, ID3D11Device** ppDevice)
 {
-	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_CREATEDEVICE; }
-
-	::Initialize();
+	if (State::EntryMethod == EEntryMethod::NONE) { ::Initialize(); State::EntryMethod = EEntryMethod::CORE_CREATEDEVICE; }
 
 	static decltype(&D3D11CoreCreateDevice) func;
 	static const char* func_name = "D3D11CoreCreateDevice";
@@ -400,7 +401,8 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-		D3D11SystemHandle = LoadLibraryA(Path::F_SYSTEM_DLL);
+		std::string strSystem = Path::F_SYSTEM_DLL.string();
+		D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
 
 		if (FindFunction(D3D11SystemHandle, &func, func_name) == false)
 		{
@@ -422,9 +424,7 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 }
 HRESULT __stdcall D3D11CoreCreateLayeredDevice(const void* unknown0, DWORD unknown1, const void* unknown2, REFIID riid, void** ppvObj)
 {
-	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_CREATELAYEREDDEVICE; }
-
-	::Initialize();
+	if (State::EntryMethod == EEntryMethod::NONE) { ::Initialize(); State::EntryMethod = EEntryMethod::CORE_CREATELAYEREDDEVICE; }
 
 	static decltype(&D3D11CoreCreateLayeredDevice) func;
 	static const char* func_name = "D3D11CoreCreateLayeredDevice";
@@ -434,7 +434,8 @@ HRESULT __stdcall D3D11CoreCreateLayeredDevice(const void* unknown0, DWORD unkno
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-		D3D11SystemHandle = LoadLibraryA(Path::F_SYSTEM_DLL);
+		std::string strSystem = Path::F_SYSTEM_DLL.string();
+		D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
 
 		if (FindFunction(D3D11SystemHandle, &func, func_name) == false)
 		{
@@ -456,9 +457,7 @@ HRESULT __stdcall D3D11CoreCreateLayeredDevice(const void* unknown0, DWORD unkno
 }
 SIZE_T	__stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unknown1)
 {
-	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_GETLAYEREDDEVICESIZE; }
-
-	::Initialize();
+	if (State::EntryMethod == EEntryMethod::NONE) { ::Initialize(); State::EntryMethod = EEntryMethod::CORE_GETLAYEREDDEVICESIZE; }
 
 	static decltype(&D3D11CoreGetLayeredDeviceSize) func;
 	static const char* func_name = "D3D11CoreGetLayeredDeviceSize";
@@ -468,7 +467,8 @@ SIZE_T	__stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unkno
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-		D3D11SystemHandle = LoadLibraryA(Path::F_SYSTEM_DLL);
+		std::string strSystem = Path::F_SYSTEM_DLL.string();
+		D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
 
 		if (FindFunction(D3D11SystemHandle, &func, func_name) == false)
 		{
@@ -490,9 +490,7 @@ SIZE_T	__stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unkno
 }
 HRESULT __stdcall D3D11CoreRegisterLayers(const void* unknown0, DWORD unknown1)
 {
-	if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_REGISTERLAYERS; }
-
-	::Initialize();
+	if (State::EntryMethod == EEntryMethod::NONE) { ::Initialize(); State::EntryMethod = EEntryMethod::CORE_REGISTERLAYERS; }
 
 	static decltype(&D3D11CoreRegisterLayers) func;
 	static const char* func_name = "D3D11CoreRegisterLayers";
@@ -502,7 +500,8 @@ HRESULT __stdcall D3D11CoreRegisterLayers(const void* unknown0, DWORD unknown1)
 	{
 		LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-		D3D11SystemHandle = LoadLibraryA(Path::F_SYSTEM_DLL);
+		std::string strSystem = Path::F_SYSTEM_DLL.string();
+		D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
 
 		if (FindFunction(D3D11SystemHandle, &func, func_name) == false)
 		{

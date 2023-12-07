@@ -42,6 +42,7 @@ const char* QA_MENU						= "0_QA_MENU";
 const char* EV_WINDOW_RESIZED			= "EV_WINDOW_RESIZED";
 const char* EV_MUMBLE_IDENTITY_UPDATED	= "EV_MUMBLE_IDENTITY_UPDATED";
 const char* EV_OPTIONS_CALLED			= "EV_OPTIONS_CALLED";
+const char* EV_EULA_ACCEPTED			= "EV_EULA_ACCEPTED";
 
 /* DataLink */
 const char* DL_MUMBLE_LINK				= "DL_MUMBLE_LINK";

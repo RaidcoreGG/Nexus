@@ -136,7 +136,11 @@ namespace GUI
 											ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f }); // smol checkbox
 											for (auto& [identifier, shortcut] : RegistrySimple)
 											{
-												if (shortcut) { shortcut(); }
+												if (shortcut)
+												{
+													shortcut();
+													ImGui::Separator();
+												}
 											}
 											ImGui::PopStyleVar();
 										}

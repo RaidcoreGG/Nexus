@@ -1,6 +1,6 @@
 #include "FileLogger.h"
 
-FileLogger::FileLogger(ELogLevel aLogLevel, const char* aPath)
+FileLogger::FileLogger(ELogLevel aLogLevel, std::filesystem::path aPath)
 {
 	LogLevel = aLogLevel;
 	File.open(aPath, std::ios_base::out, SH_DENYWR);

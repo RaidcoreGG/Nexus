@@ -97,24 +97,4 @@ namespace LogHandler
 		}
 		Mutex.unlock();
 	}
-
-	int Verify(void* aStartAddress, void* aEndAddress)
-	{
-		int refCounter = 0;
-
-		Mutex.lock();
-		{
-			for (ILogger* logger : Registry)
-			{
-				if (logger >= aStartAddress && logger <= aEndAddress)
-				{
-					Registry.erase(std::remove(Registry.begin(), Registry.end(), logger), Registry.end());
-					refCounter++;
-				}
-			}
-		}
-		Mutex.unlock();
-
-		return refCounter;
-	}
 }

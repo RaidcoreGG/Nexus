@@ -280,12 +280,12 @@ namespace GUI
 										ImGui::TextDisabled("Module Size: %u", addon->ModuleSize);
 										ImGui::TextDisabled("AddonDefs: %p", addon->Definitions);
 
-										if (addon->Definitions.Signature != 0)
+										if (addon->Definitions != nullptr)
 										{
 											if (ImGui::SmallButton("Memory Editor"))
 											{
 												memEditor.Open = true;
-												memPtr = &addon->Definitions;
+												memPtr = addon->Definitions;
 												memSz = sizeof(AddonDefinition);
 											}
 										}
@@ -297,9 +297,9 @@ namespace GUI
 							}
 							if (ImGui::TreeNode("Queued"))
 							{
-								for (const auto& qAddon : Loader::QueuedAddons)
+								for (const auto& [path, action] : Loader::QueuedAddons)
 								{
-									switch (qAddon.Action)
+									switch (action)
 									{
 									case ELoaderAction::Load:
 										ImGui::Text("Load");
@@ -312,7 +312,7 @@ namespace GUI
 										break;
 									}
 									ImGui::SameLine();
-									ImGui::TextDisabled("%s", qAddon.Path.string().c_str());
+									ImGui::TextDisabled("%s", path.string().c_str());
 								}
 								ImGui::TreePop();
 							}

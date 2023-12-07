@@ -43,6 +43,7 @@ extern const char* QA_MENU;
 extern const char* EV_WINDOW_RESIZED;
 extern const char* EV_MUMBLE_IDENTITY_UPDATED;
 extern const char* EV_OPTIONS_CALLED;
+extern const char* EV_EULA_ACCEPTED;
 
 /* DataLink */
 extern const char* DL_MUMBLE_LINK;
