@@ -1,5 +1,6 @@
 #include "Multibox.h"
 
+#define UMDF_USING_NTSTATUS
 #include <Windows.h>
 #include <winternl.h>
 #include <ntstatus.h>
