@@ -69,12 +69,6 @@ namespace GUI
 				ImGui::BeginChild("##GeneralTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
 				ImGui::TextDisabled("General");
-				if (ImGui::Checkbox("Developer Mode", &State::IsDeveloperMode))
-				{
-					Settings::Settings[OPT_DEVMODE] = State::IsDeveloperMode;
-					Settings::Save();
-				}
-				ImGui::TooltipGeneric("Enables the Debug menu and some other features.");
 
 				ImGui::TextDisabled("Font Size");
 				if (ImGui::InputFloat("##fontsize", &GUI::FontSize, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_EnterReturnsTrue))

@@ -298,6 +298,7 @@ namespace Loader
 				Addons[aPath]->Definitions->HasFlag(EAddonFlags::DisableHotloading))
 			{
 				LogWarning(CH_LOADER, "Prevented unloading \"%s\" because either no Unload function is defined or Hotloading is explicitly disabled. (%s)", name.c_str(), strPath);
+				Addons[aPath]->Module = nullptr;
 			}
 			else
 			{
@@ -430,7 +431,7 @@ namespace Loader
 				//ProcessQueue();
 			}
 			
-			Sleep(3000);
+			Sleep(5000);
 		}
 	}
 	

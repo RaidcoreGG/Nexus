@@ -109,6 +109,9 @@
     <Filter Include="GUI\Widgets\EULA">
       <UniqueIdentifier>{fdc50f5d-b3a6-4446-89c4-7450b69cb75d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Multiboxer">
+      <UniqueIdentifier>{a1bb18bc-73ac-4f45-bea0-8e830d61c56f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="entry.cpp">
@@ -269,6 +272,9 @@
     </ClCompile>
     <ClCompile Include="GUI\Widgets\EULA\EULAModal.cpp">
       <Filter>GUI\Widgets\EULA</Filter>
+    </ClCompile>
+    <ClCompile Include="Multibox\Multibox.cpp">
+      <Filter>Multiboxer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -982,6 +988,9 @@
     </ClInclude>
     <ClInclude Include="GUI\Widgets\EULA\EULAModal.h">
       <Filter>GUI\Widgets\EULA</Filter>
+    </ClInclude>
+    <ClInclude Include="Multibox\Multibox.h">
+      <Filter>Multiboxer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

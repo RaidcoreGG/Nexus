@@ -30,6 +30,7 @@
 #include "Settings/Settings.h"
 #include "API/APIController.h"
 #include "Updater/Updater.h"
+#include "Multibox/Multibox.h"
 
 void UpdateNexusLink()
 {
@@ -57,7 +58,7 @@ void Initialize()
 	Version.Build = V_BUILD;
 	Version.Revision = V_REVISION;
 
-	SetUnhandledExceptionFilter(UnhandledExcHandler);
+	//SetUnhandledExceptionFilter(UnhandledExcHandler);
 	GameHandle = GetModuleHandle(NULL);
 
 	State::Initialize();
@@ -67,6 +68,8 @@ void Initialize()
 	LogInfo(CH_CORE, GetCommandLineA());
 	LogInfo(CH_CORE, "Version: %s", Version.ToString().c_str());
 	LogInfo(CH_CORE, "::Initialize() called. Entry method: %d", State::EntryMethod);
+
+	Multibox::KillMutex();
 
 	//Paradigm::Initialize();
 	Updater::SelfUpdate();
@@ -135,15 +138,15 @@ void Shutdown()
 
 		LogInfo(CH_CORE, "Shutdown performed.");
 
-		// reset wndproc
 		SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)Hooks::GW2_WndProc);
 
 		State::Nexus = ENexusState::SHUTDOWN;
 	}
 
 	// free libs
-	if (D3D11Handle) { FreeLibrary(D3D11Handle); }
-	if (D3D11SystemHandle) { FreeLibrary(D3D11SystemHandle); }
+	// FIXME: make arc not shit itself when the game shuts down, for now let windows handle the rest
+	//if (D3D11Handle) { FreeLibrary(D3D11Handle); }
+	//if (D3D11SystemHandle) { FreeLibrary(D3D11SystemHandle); }
 }
 
 /* hk */

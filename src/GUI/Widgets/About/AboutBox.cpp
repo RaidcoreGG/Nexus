@@ -44,7 +44,7 @@ namespace GUI
 			ImGui::TextDisabled("Renderer:");
 			ImGui::Text(""); ImGui::SameLine(); ImGui::Text("DirectX 11"); ImGui::SameLine(); ImGui::TextDisabled("Method %d %s", State::EntryMethod, State::IsChainloading ? "Chainloading" : "");
 			
-			if (State::MultiboxState == EMultiboxState::READY)
+			if ((bool)(State::MultiboxState & EMultiboxState::READY))
 			{
 				ImGui::TextDisabled("Multibox ready.");
 			}

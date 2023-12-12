@@ -46,6 +46,7 @@ enum class EMultiboxState
 
 EMultiboxState operator|(EMultiboxState lhs, EMultiboxState rhs);
 EMultiboxState operator&(EMultiboxState lhs, EMultiboxState rhs);
+EMultiboxState operator|=(EMultiboxState& lhs, EMultiboxState rhs);
 
 /* Namespace for global state variables */
 namespace State

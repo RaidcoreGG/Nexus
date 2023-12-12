@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <shellapi.h>
 #include <regex>
+#include <type_traits>
 
 #include "core.h"
 #include "Consts.h"
@@ -52,8 +53,8 @@ namespace State
 			if (cmp == "-ggdev") { IsDeveloperMode = true; }
 			if (cmp == "-ggconsole") { IsConsoleEnabled = true; }
 			if (cmp == "-ggvanilla") { IsVanilla = true; }
-			if (cmp == "-sharearchive") { MultiboxState = MultiboxState | EMultiboxState::ARCHIVE_SHARED; }
-			if (cmp == "-multi") { MultiboxState = MultiboxState | EMultiboxState::LOCAL_SHARED; }
+			if (cmp == "-sharearchive") { MultiboxState |= EMultiboxState::ARCHIVE_SHARED; }
+			if (cmp == "-multi") { MultiboxState |= EMultiboxState::LOCAL_SHARED; }
 
 			if (cmp == "-mumble" && i + 1 <= argc)
 			{
@@ -86,9 +87,13 @@ namespace State
 
 EMultiboxState operator|(EMultiboxState lhs, EMultiboxState rhs)
 {
-	return static_cast<EMultiboxState>(static_cast<int>(lhs) | static_cast<int>(rhs));
+	return static_cast<EMultiboxState>(std::underlying_type_t<EMultiboxState>(lhs) | std::underlying_type_t<EMultiboxState>(rhs));
 }
 EMultiboxState operator&(EMultiboxState lhs, EMultiboxState rhs)
 {
-	return static_cast<EMultiboxState>( static_cast<int>(lhs) & static_cast<int>(rhs) );
+	return static_cast<EMultiboxState>(std::underlying_type_t<EMultiboxState>(lhs) & std::underlying_type_t<EMultiboxState>(rhs));
+}
+EMultiboxState operator|=(EMultiboxState& lhs, EMultiboxState rhs)
+{
+	return lhs = lhs | rhs;
 }
