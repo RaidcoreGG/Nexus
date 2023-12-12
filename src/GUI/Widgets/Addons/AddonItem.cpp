@@ -63,7 +63,7 @@ namespace GUI
 					{
 						for (auto& it : Loader::Addons)
 						{
-							if (it.second->Definitions->Signature == aAddon->Definitions->Signature)
+							if (it.second->Definitions == aAddon->Definitions)
 							{
 								LogDebug(CH_GUI, "Unload called: %s", it.second->Definitions->Name);
 								Loader::QueueAddon(ELoaderAction::Unload, it.first);
@@ -78,7 +78,7 @@ namespace GUI
 					{
 						for (auto& it : Loader::Addons)
 						{
-							if (it.second->Definitions->Signature == aAddon->Definitions->Signature)
+							if (it.second->Definitions == aAddon->Definitions)
 							{
 								LogDebug(CH_GUI, "Load called: %s", it.second->Definitions->Name);
 								Loader::QueueAddon(ELoaderAction::Load, it.first);
@@ -97,7 +97,7 @@ namespace GUI
 					{
 						for (auto& it : Loader::Addons)
 						{
-							if (it.second->Definitions->Signature == aAddon->Definitions->Signature)
+							if (it.second->Definitions == aAddon->Definitions)
 							{
 								LogDebug(CH_GUI, "Uninstall called: %s", it.second->Definitions->Name);
 								Loader::QueueAddon(ELoaderAction::Uninstall, it.first);
