@@ -141,7 +141,7 @@ namespace Loader
 		/* load lib failed */
 		if (!addon->Module)
 		{
-			LogDebug(CH_LOADER, "Failed LoadLibrary on \"%s\". Incompatible.", strPath);
+			LogDebug(CH_LOADER, "Failed LoadLibrary on \"%s\". Incompatible. Last Error: %u", strPath, GetLastError());
 			addon->State = EAddonState::Incompatible;
 			return;
 		}
