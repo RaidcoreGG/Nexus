@@ -30,8 +30,8 @@
 namespace Loader
 {
 	std::mutex Mutex;
-	std::map<std::filesystem::path, ELoaderAction> QueuedAddons;
-	std::map<std::filesystem::path, Addon*> Addons;
+	std::unordered_map<std::filesystem::path, ELoaderAction> QueuedAddons;
+	std::unordered_map<std::filesystem::path, Addon*> Addons;
 	std::map<int, AddonAPI*> ApiDefs;
 
 	std::thread LoaderThread;
@@ -173,6 +173,25 @@ namespace Loader
 			addon->State = EAddonState::Reload;
 			FreeLibrary(addon->Module);
 			addon->Module = nullptr;
+
+			/* setup paths */
+			std::filesystem::path pathOld = aPath.string() + ".old";
+			std::filesystem::path pathUpdate = aPath.string() + ".update";
+
+			try
+			{
+				std::filesystem::rename(aPath, pathOld);
+				std::filesystem::rename(pathUpdate, aPath);
+
+			}
+			catch (std::filesystem::filesystem_error fErr)
+			{
+				Log(CH_UPDATER, "%s", fErr.what());
+				return;
+			}
+
+			LogInfo(CH_UPDATER, "Successfully updated %s.", aPath.string().c_str());
+
 			return;
 		}
 
@@ -272,14 +291,14 @@ namespace Loader
 					LogWarning(CH_LOADER, "Cancelled unload of \"%s\". Already unloaded.", strPath);
 					return;
 				case EAddonState::NotLoadedDuplicate:
-					LogWarning(CH_LOADER, "Cancelled unload of \"%s\". EAddonState::NotLoadedDuplicate. This should never happen.", strPath);
+					LogWarning(CH_LOADER, "Cancelled unload of \"%s\". EAddonState::NotLoadedDuplicate.", strPath);
 					return;
 
 				case EAddonState::Incompatible:
-					LogWarning(CH_LOADER, "Cancelled unload of \"%s\". EAddonState::Incompatible. This should never happen.", strPath);
+					LogWarning(CH_LOADER, "Cancelled unload of \"%s\". EAddonState::Incompatible.", strPath);
 					return;
 				case EAddonState::IncompatibleAPI:
-					LogWarning(CH_LOADER, "Cancelled unload of \"%s\". EAddonState::IncompatibleAPI. This should never happen.", strPath);
+					LogWarning(CH_LOADER, "Cancelled unload of \"%s\". EAddonState::IncompatibleAPI.", strPath);
 					return;
 				}
 			}
@@ -326,10 +345,6 @@ namespace Loader
 			{
 				LogWarning(CH_LOADER, "Removed %d unreleased references from \"%s\". Make sure your addon releases all references during Addon::Unload().", leftoverRefs, strPath);
 			}
-		}
-		else
-		{
-			LogCritical(CH_LOADER, "Fatal Error. \"%s\" : Addons[aPath].Module == nullptr || Addons[aPath].ModuleSize <= 0", strPath);
 		}
 		
 		if (Addons[aPath]->Module)

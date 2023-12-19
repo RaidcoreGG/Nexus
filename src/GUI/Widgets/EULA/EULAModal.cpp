@@ -50,7 +50,7 @@ namespace GUI
 			ImGui::Text("If you do not agree to these terms, do not use the software.");
 
 			ImGui::TextDisabled("By clicking \"I do NOT agree\" your game will close and Nexus will attempt to uninstall.");
-			ImGui::TextDisabled("If you see this prompt again after restarting, you will have to manually remove \"%s\" while the game is closed.", Path::F_HOST_DLL);
+			ImGui::TextDisabled("If you see this prompt again after restarting, you will have to manually remove \"%s\" while the game is closed.", Path::F_HOST_DLL.string().c_str());
 
 			if (ImGui::Button("I agree"))
 			{

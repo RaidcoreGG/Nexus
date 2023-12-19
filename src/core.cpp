@@ -1,5 +1,8 @@
 #include "core.h"
 
+#include "openssl/evp.h"
+#include "openssl/md5.h"
+
 void PathSystemAppend(std::filesystem::path& aDestination, const char* aAppend)
 {
 	char* buff = new char[MAX_PATH];
@@ -63,4 +66,18 @@ const char* ConvertToUTF8(const char* multibyteStr)
 	}
 
 	return utf8Str;
+}
+
+std::vector<unsigned char> MD5(const unsigned char* data, size_t sz)
+{
+	std::vector<unsigned char> md(MD5_DIGEST_LENGTH, 0);
+
+	EVP_MD_CTX* ctx = EVP_MD_CTX_create();
+	EVP_MD_CTX_init(ctx);
+	EVP_DigestInit_ex(ctx, EVP_md5(), NULL);
+	EVP_DigestUpdate(ctx, data, sz);
+	EVP_DigestFinal_ex(ctx, md.data(), NULL);
+	EVP_MD_CTX_destroy(ctx);
+
+	return md;
 }

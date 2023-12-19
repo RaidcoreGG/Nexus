@@ -65,15 +65,15 @@ namespace Mumble
 					/* parse and assign current identity */
 					json j = json::parse(MumbleLink->Identity);
 					strcpy(MumbleIdentity->Name, j["name"].get<std::string>().c_str());
-					MumbleIdentity->Profession		= j["profession"].get<unsigned>();
-					MumbleIdentity->Specialization	= j["spec"].get<unsigned>();
-					MumbleIdentity->Race			= j["race"].get<unsigned>();
-					MumbleIdentity->MapID			= j["map_id"].get<unsigned>();
-					MumbleIdentity->WorldID			= j["world_id"].get<unsigned>();
-					MumbleIdentity->TeamColorID		= j["team_color_id"].get<unsigned>();
-					MumbleIdentity->IsCommander		= j["commander"].get<bool>();
-					MumbleIdentity->FOV				= j["fov"].get<float>();
-					MumbleIdentity->UISize			= j["uisz"].get<unsigned>();
+					j["profession"].get_to(MumbleIdentity->Profession);
+					j["spec"].get_to(MumbleIdentity->Specialization);
+					j["race"].get_to(MumbleIdentity->Race);
+					j["map_id"].get_to(MumbleIdentity->MapID);
+					j["world_id"].get_to(MumbleIdentity->WorldID);
+					j["team_color_id"].get_to(MumbleIdentity->TeamColorID);
+					j["commander"].get_to(MumbleIdentity->IsCommander);
+					j["fov"].get_to(MumbleIdentity->FOV);
+					j["uisz"].get_to(MumbleIdentity->UISize);
 
 					/* update ui scaling factor */
 					Renderer::Scaling = GetScalingFactor(MumbleIdentity->UISize);

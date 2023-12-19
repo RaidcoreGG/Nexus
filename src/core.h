@@ -18,4 +18,6 @@ std::wstring StrToWStr(std::string& aString);
 
 const char* ConvertToUTF8(const char* multibyteStr);
 
+std::vector<unsigned char> MD5(const unsigned char* data, size_t sz);
+
 #endif

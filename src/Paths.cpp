@@ -68,7 +68,7 @@ namespace Path
 	const char* GetGameDirectory()
 	{
 		// guaranteed to exist from init func
-		auto it = std::find(ExistingPaths.begin(), ExistingPaths.end(), D_GW2.string());
+		const auto& it = std::find(ExistingPaths.begin(), ExistingPaths.end(), D_GW2.string());
 		return it->c_str();
 	}
 
@@ -76,16 +76,16 @@ namespace Path
 	{
 		std::string str;
 
-		if (strcmp(aName, "") != 0)
-		{
-			str = (D_GW2_ADDONS / aName).string();
-		}
-		else
+		if (aName == nullptr || strcmp(aName, "") == 0)
 		{
 			str = D_GW2_ADDONS.string();
 		}
+		else
+		{
+			str = (D_GW2_ADDONS / aName).string();
+		}
 
-		auto it = std::find(ExistingPaths.begin(), ExistingPaths.end(), str);
+		const auto& it = std::find(ExistingPaths.begin(), ExistingPaths.end(), str);
 
 		if (it == ExistingPaths.end())
 		{
@@ -99,7 +99,7 @@ namespace Path
 	const char* GetCommonDirectory()
 	{
 		// guaranteed to exist from init func
-		auto it = std::find(ExistingPaths.begin(), ExistingPaths.end(), D_GW2_ADDONS_COMMON.string());
+		const auto& it = std::find(ExistingPaths.begin(), ExistingPaths.end(), D_GW2_ADDONS_COMMON.string());
 		return it->c_str();
 	}
 }

@@ -454,7 +454,7 @@ namespace GUI
 			{
 				if (!Settings::Settings[OPT_FONTSIZE].is_null())
 				{
-					FontSize = Settings::Settings[OPT_FONTSIZE].get<float>();
+					Settings::Settings[OPT_FONTSIZE].get_to(FontSize);
 				}
 				else
 				{
@@ -597,7 +597,7 @@ namespace GUI
 		{
 			if (!Settings::Settings[OPT_ACCEPTEULA].is_null())
 			{
-				AcceptedEULA = Settings::Settings[OPT_ACCEPTEULA].get<bool>();
+				 Settings::Settings[OPT_ACCEPTEULA].get_to(AcceptedEULA);
 			}
 			else
 			{
@@ -606,8 +606,8 @@ namespace GUI
 
 			if (!Settings::Settings[OPT_LASTUISCALE].is_null() && Renderer::Scaling == 0)
 			{
-				LastScaling = Settings::Settings[OPT_LASTUISCALE].get<float>();
-				Renderer::Scaling = Settings::Settings[OPT_LASTUISCALE].get<float>();
+				Settings::Settings[OPT_LASTUISCALE].get_to(LastScaling);
+				Settings::Settings[OPT_LASTUISCALE].get_to(Renderer::Scaling);
 			}
 			else
 			{
@@ -618,7 +618,7 @@ namespace GUI
 
 			if (!Settings::Settings[OPT_QAVERTICAL].is_null())
 			{
-				QuickAccess::VerticalLayout = Settings::Settings[OPT_QAVERTICAL].get<bool>();
+				Settings::Settings[OPT_QAVERTICAL].get_to(QuickAccess::VerticalLayout);
 			}
 			else
 			{
@@ -628,7 +628,7 @@ namespace GUI
 
 			if (!Settings::Settings[OPT_QALOCATION].is_null())
 			{
-				QuickAccess::Location = (EQAPosition)Settings::Settings[OPT_QALOCATION].get<int>();
+				Settings::Settings[OPT_QALOCATION].get_to(QuickAccess::Location);
 			}
 			else
 			{
@@ -638,7 +638,8 @@ namespace GUI
 
 			if (!Settings::Settings[OPT_QAOFFSETX].is_null() && !Settings::Settings[OPT_QAOFFSETY].is_null())
 			{
-				QuickAccess::Offset = ImVec2(Settings::Settings[OPT_QAOFFSETX].get<float>(), Settings::Settings[OPT_QAOFFSETY].get<float>());
+				Settings::Settings[OPT_QAOFFSETX].get_to(QuickAccess::Offset.x);
+				Settings::Settings[OPT_QAOFFSETY].get_to(QuickAccess::Offset.y);
 			}
 			else
 			{
@@ -649,7 +650,7 @@ namespace GUI
 
 			if (!Settings::Settings[OPT_CLOSEMENU].is_null())
 			{
-				CloseMenuAfterSelecting = Settings::Settings[OPT_CLOSEMENU].get<bool>();
+				Settings::Settings[OPT_CLOSEMENU].get_to(CloseMenuAfterSelecting);
 			}
 			else
 			{
@@ -659,7 +660,7 @@ namespace GUI
 
 			if (!Settings::Settings[OPT_CLOSEESCAPE].is_null())
 			{
-				CloseOnEscape = Settings::Settings[OPT_CLOSEESCAPE].get<bool>();
+				Settings::Settings[OPT_CLOSEESCAPE].get_to(CloseOnEscape);
 			}
 			else
 			{

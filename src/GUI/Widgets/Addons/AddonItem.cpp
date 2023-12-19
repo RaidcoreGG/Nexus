@@ -86,7 +86,7 @@ namespace GUI
 						}
 					}
 				}
-				if (!(aAddon->Definitions->Unload == nullptr || aAddon->Definitions->HasFlag(EAddonFlags::DisableHotloading)))
+				if (!((aAddon->Definitions->Unload == nullptr && aAddon->State == EAddonState::Loaded) || aAddon->Definitions->HasFlag(EAddonFlags::DisableHotloading)))
 				{
 					if (amtBtns > 0)
 					{

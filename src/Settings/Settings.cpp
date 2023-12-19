@@ -4,6 +4,8 @@
 #include <fstream>
 
 #include "Paths.h"
+#include "Consts.h"
+#include "Shared.h"
 
 const char* OPT_ACCEPTEULA	= "AcceptEULA";
 const char* OPT_DEVMODE		= "DevMode";
@@ -27,9 +29,16 @@ namespace Settings
 
 		Settings::Mutex.lock();
 		{
-			std::ifstream file(Path::F_SETTINGS);
-			Settings = json::parse(file);
-			file.close();
+			try
+			{
+				std::ifstream file(Path::F_SETTINGS);
+				Settings = json::parse(file);
+				file.close();
+			}
+			catch (json::parse_error& ex)
+			{
+				LogWarning(CH_CORE, "Settings.json could not be parsed. Error: %s", ex.what());
+			}
 		}
 		Settings::Mutex.unlock();
 	}

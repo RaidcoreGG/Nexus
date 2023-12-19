@@ -3,6 +3,7 @@
 
 #include <mutex>
 #include <map>
+#include <unordered_map>
 #include <thread>
 #include <filesystem>
 
@@ -13,8 +14,8 @@
 namespace Loader
 {
 	extern std::mutex Mutex;
-	extern std::map<std::filesystem::path, ELoaderAction> QueuedAddons;		/* To be loaded or unloaded addons */
-	extern std::map<std::filesystem::path, Addon*> Addons;					/* Addons and their corresponding paths */
+	extern std::unordered_map<std::filesystem::path, ELoaderAction> QueuedAddons;		/* To be loaded or unloaded addons */
+	extern std::unordered_map<std::filesystem::path, Addon*> Addons;					/* Addons and their corresponding paths */
 	extern std::map<int, AddonAPI*> ApiDefs;								/* Addon API definitions, created on demand */
 
 	extern std::thread LoaderThread;

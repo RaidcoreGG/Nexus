@@ -2,15 +2,15 @@
 #define DATALINK_H
 
 #include <mutex>
-#include <map>
+#include <unordered_map>
 #include <string>
 
 #include "LinkedResource.h"
 
 namespace DataLink
 {
-	extern std::mutex								Mutex;
-	extern std::map<std::string, LinkedResource>	Registry;
+	extern std::mutex										Mutex;
+	extern std::unordered_map<std::string, LinkedResource>	Registry;
 
 	/* Frees all remaining resources */
 	void Free();
