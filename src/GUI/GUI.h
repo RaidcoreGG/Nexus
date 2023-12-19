@@ -40,8 +40,6 @@ namespace GUI
 
 	void AddWindow(IWindow* aWindowPtr);
 
-	void ResizeFonts();
-
 	/* Registers the provided RenderCallback. */
 	void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback);
 	/* Unregisters the provided RenderCallback. */

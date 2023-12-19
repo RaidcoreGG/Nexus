@@ -314,36 +314,6 @@ namespace GUI
 		GUI::Mutex.unlock();
 	}
 
-	void ResizeFonts()
-	{
-		ImGuiIO& io = ImGui::GetIO();
-
-		switch (MumbleIdentity->UISize)
-		{
-			case 0:
-				Font	= FontIndex[EFont::Menomonia_Small];
-				FontBig	= FontIndex[EFont::MenomoniaBig_Small];
-				FontUI	= FontIndex[EFont::Trebuchet_Small];
-				break;
-			default:
-			case 1:
-				Font	= FontIndex[EFont::Menomonia_Normal];
-				FontBig	= FontIndex[EFont::MenomoniaBig_Normal];
-				FontUI	= FontIndex[EFont::Trebuchet_Normal];
-				break;
-			case 2:
-				Font	= FontIndex[EFont::Menomonia_Large];
-				FontBig	= FontIndex[EFont::MenomoniaBig_Large];
-				FontUI	= FontIndex[EFont::Trebuchet_Large];
-				break;
-			case 3:
-				Font	= FontIndex[EFont::Menomonia_Larger];
-				FontBig	= FontIndex[EFont::MenomoniaBig_Larger];
-				FontUI	= FontIndex[EFont::Trebuchet_Larger];
-				break;
-		}
-	}
-
 	void ProcessKeybind(const char* aIdentifier)
 	{
 		std::string str = aIdentifier;
@@ -351,7 +321,6 @@ namespace GUI
 		if (str == KB_MENU)
 		{
 			Menu::Visible = !Menu::Visible;
-			return;
 		}
 		else if (str == KB_TOGGLEHIDEUI)
 		{
@@ -359,58 +328,33 @@ namespace GUI
 		}
 		else if (str == KB_ADDONS)
 		{
-			for (IWindow* wnd : Windows)
-			{
-				if (wnd->Name == "Addons")
-				{
-					wnd->Visible = !wnd->Visible;
-					return;
-				}
-			}
+			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Addons"; });
+			if (it == Windows.end()) { return; }
+			(*it)->Visible = !(*it)->Visible;
 		}
 		else if (str == KB_DEBUG)
 		{
-			for (IWindow* wnd : Windows)
-			{
-				if (wnd->Name == "Debug")
-				{
-					wnd->Visible = !wnd->Visible;
-					return;
-				}
-			}
+			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Debug"; });
+			if (it == Windows.end()) { return; }
+			(*it)->Visible = !(*it)->Visible;
 		}
 		else if (str == KB_LOG)
 		{
-			for (IWindow* wnd : Windows)
-			{
-				if (wnd->Name == "Log")
-				{
-					wnd->Visible = !wnd->Visible;
-					return;
-				}
-			}
+			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Log"; });
+			if (it == Windows.end()) { return; }
+			(*it)->Visible = !(*it)->Visible;
 		}
 		else if (str == KB_OPTIONS)
 		{
-			for (IWindow* wnd : Windows)
-			{
-				if (wnd->Name == "Options")
-				{
-					wnd->Visible = !wnd->Visible;
-					return;
-				}
-			}
+			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Options"; });
+			if (it == Windows.end()) { return; }
+			(*it)->Visible = !(*it)->Visible;
 		}
 		else if (str == KB_MUMBLEOVERLAY)
 		{
-			for (IWindow* wnd : Windows)
-			{
-				if (wnd->Name == "Debug")
-				{
-					((DebugWindow*)wnd)->MumbleWindow->Visible = !((DebugWindow*)wnd)->MumbleWindow->Visible;
-					return;
-				}
-			}
+			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Debug"; });
+			if (it == Windows.end()) { return; }
+			((DebugWindow*)(*it))->MumbleWindow->Visible = !((DebugWindow*)(*it))->MumbleWindow->Visible;
 		}
 	}
 	
@@ -418,7 +362,32 @@ namespace GUI
 	{
 		if (Renderer::Scaling != LastScaling && IsGameplay)
 		{
-			ResizeFonts();
+			ImGuiIO& io = ImGui::GetIO();
+
+			switch (MumbleIdentity->UISize)
+			{
+			case 0:
+				Font = FontIndex[EFont::Menomonia_Small];
+				FontBig = FontIndex[EFont::MenomoniaBig_Small];
+				FontUI = FontIndex[EFont::Trebuchet_Small];
+				break;
+			default:
+			case 1:
+				Font = FontIndex[EFont::Menomonia_Normal];
+				FontBig = FontIndex[EFont::MenomoniaBig_Normal];
+				FontUI = FontIndex[EFont::Trebuchet_Normal];
+				break;
+			case 2:
+				Font = FontIndex[EFont::Menomonia_Large];
+				FontBig = FontIndex[EFont::MenomoniaBig_Large];
+				FontUI = FontIndex[EFont::Trebuchet_Large];
+				break;
+			case 3:
+				Font = FontIndex[EFont::Menomonia_Larger];
+				FontBig = FontIndex[EFont::MenomoniaBig_Larger];
+				FontUI = FontIndex[EFont::Trebuchet_Larger];
+				break;
+			}
 
 			LastScaling = Renderer::Scaling;
 			Settings::Settings[OPT_LASTUISCALE] = Renderer::Scaling;
@@ -543,7 +512,7 @@ namespace GUI
 		}
 		GUI::Mutex.unlock();
 
-		ResizeFonts();
+		OnMumbleIdentityChanged(nullptr);
 
 		io.Fonts->Build();
 
@@ -552,7 +521,7 @@ namespace GUI
 		/* set up and add windows */
 		AddonsWindow* addonsWnd = new AddonsWindow("Addons");
 		LogWindow* logWnd = new LogWindow("Log", ELogLevel::ALL);
-		RegisterLogger(logWnd);
+		LogHandler::RegisterLogger(logWnd);
 		OptionsWindow* opsWnd = new OptionsWindow("Options");
 		DebugWindow* dbgWnd = new DebugWindow("Debug");
 		AboutBox* aboutWnd = new AboutBox("About");
