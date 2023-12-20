@@ -94,12 +94,60 @@ namespace Loader
 		}
 		Loader::Mutex.unlock();
 	}
-	void QueueAddon(ELoaderAction aAction, std::filesystem::path aPath)
+	void QueueAddon(ELoaderAction aAction, const std::filesystem::path& aPath)
 	{
 		QueuedAddons.insert({ aPath, aAction });
 	}
 
-	void LoadAddon(std::filesystem::path aPath)
+	void PerformUpdateSwap(const std::filesystem::path& aPath)
+	{
+		/* setup paths */
+		std::filesystem::path pathOld = aPath.string() + ".old";
+		std::filesystem::path pathUpdate = aPath.string() + ".update";
+
+		try
+		{
+			std::filesystem::rename(aPath, pathOld);
+			std::filesystem::rename(pathUpdate, aPath);
+		}
+		catch (std::filesystem::filesystem_error fErr)
+		{
+			Log(CH_LOADER, "%s", fErr.what());
+			return;
+		}
+
+		LogInfo(CH_LOADER, "Successfully updated %s.", aPath.string().c_str());
+	}
+	void CheckForUpdates()
+	{
+		Loader::Mutex.lock();
+		{
+			for (auto& [path, addon] : Addons)
+			{
+				if (!addon->Definitions) { continue; }
+
+				if (Updater::CheckForUpdate(path, addon->Definitions))
+				{
+					bool wasLoaded = false;
+					if (addon->State == EAddonState::Loaded)
+					{
+						wasLoaded = true;
+						UnloadAddon(path);
+					}
+
+					PerformUpdateSwap(path);
+
+					if (wasLoaded)
+					{
+						addon->State = EAddonState::Reload;
+					}
+				}
+			}
+		}
+		Loader::Mutex.unlock();
+	}
+
+	void LoadAddon(const std::filesystem::path& aPath)
 	{
 		std::string path = aPath.string();
 		const char* strPath = path.c_str();
@@ -174,23 +222,7 @@ namespace Loader
 			FreeLibrary(addon->Module);
 			addon->Module = nullptr;
 
-			/* setup paths */
-			std::filesystem::path pathOld = aPath.string() + ".old";
-			std::filesystem::path pathUpdate = aPath.string() + ".update";
-
-			try
-			{
-				std::filesystem::rename(aPath, pathOld);
-				std::filesystem::rename(pathUpdate, aPath);
-
-			}
-			catch (std::filesystem::filesystem_error fErr)
-			{
-				Log(CH_UPDATER, "%s", fErr.what());
-				return;
-			}
-
-			LogInfo(CH_UPDATER, "Successfully updated %s.", aPath.string().c_str());
+			PerformUpdateSwap(aPath);
 
 			return;
 		}
@@ -272,7 +304,7 @@ namespace Loader
 			addon->Module = nullptr;
 		}
 	}
-	void UnloadAddon(std::filesystem::path aPath)
+	void UnloadAddon(const std::filesystem::path& aPath)
 	{
 		std::string path = aPath.string();
 		const char* strPath = path.c_str();
@@ -308,50 +340,41 @@ namespace Loader
 			return;
 		}
 
-		if (Addons[aPath]->Definitions)
+		if (addon->Definitions)
 		{
-			/* cache name for warning message and already release defs */
-			std::string name = Addons[aPath]->Definitions->Name;
-
-			if (!Addons[aPath]->Definitions->Unload ||
-				Addons[aPath]->Definitions->HasFlag(EAddonFlags::DisableHotloading))
+			if (!addon->Definitions->Unload || addon->Definitions->HasFlag(EAddonFlags::DisableHotloading))
 			{
-				LogWarning(CH_LOADER, "Prevented unloading \"%s\" because either no Unload function is defined or Hotloading is explicitly disabled. (%s)", name.c_str(), strPath);
-				Addons[aPath]->Module = nullptr;
-			}
-			else
-			{
-				Addons[aPath]->Definitions->Unload();
+				LogWarning(CH_LOADER, "Prevented unloading \"%s\" because either no Unload function is defined or Hotloading is explicitly disabled. (%s)", addon->Definitions->Name, strPath);
+				return;
 			}
 
-			Addons[aPath]->Definitions->Load = 0;
-			Addons[aPath]->Definitions->Unload = 0;
+			addon->Definitions->Unload();
 		}
 
-		if (Addons[aPath]->Module != nullptr && Addons[aPath]->ModuleSize > 0)
+		if (addon->Module)
 		{
-			/* Verify all APIs don't have any unreleased references to the addons address space */
-			void* startAddress = Addons[aPath]->Module;
-			void* endAddress = ((PBYTE)Addons[aPath]->Module) + Addons[aPath]->ModuleSize;
-
-			int leftoverRefs = 0;
-			leftoverRefs += Events::Verify(startAddress, endAddress);
-			leftoverRefs += GUI::Verify(startAddress, endAddress);
-			leftoverRefs += GUI::QuickAccess::Verify(startAddress, endAddress);
-			leftoverRefs += Keybinds::Verify(startAddress, endAddress);
-			leftoverRefs += WndProc::Verify(startAddress, endAddress);
-
-			if (leftoverRefs > 0)
+			if (addon->ModuleSize > 0)
 			{
-				LogWarning(CH_LOADER, "Removed %d unreleased references from \"%s\". Make sure your addon releases all references during Addon::Unload().", leftoverRefs, strPath);
+				/* Verify all APIs don't have any unreleased references to the addons address space */
+				void* startAddress = addon->Module;
+				void* endAddress = ((PBYTE)addon->Module) + addon->ModuleSize;
+
+				int leftoverRefs = 0;
+				leftoverRefs += Events::Verify(startAddress, endAddress);
+				leftoverRefs += GUI::Verify(startAddress, endAddress);
+				leftoverRefs += GUI::QuickAccess::Verify(startAddress, endAddress);
+				leftoverRefs += Keybinds::Verify(startAddress, endAddress);
+				leftoverRefs += WndProc::Verify(startAddress, endAddress);
+
+				if (leftoverRefs > 0)
+				{
+					LogWarning(CH_LOADER, "Removed %d unreleased references from \"%s\". Make sure your addon releases all references during Addon::Unload().", leftoverRefs, strPath);
+				}
 			}
-		}
-		
-		if (Addons[aPath]->Module)
-		{
+
 			int freeCalls = 0;
 
-			while (FreeLibrary(Addons[aPath]->Module))
+			while (FreeLibrary(addon->Module))
 			{
 				freeCalls++;
 			}
@@ -367,10 +390,10 @@ namespace Loader
 			}
 		}
 
-		Addons[aPath]->Module = nullptr;
-		Addons[aPath]->ModuleSize = 0;
+		addon->Module = nullptr;
+		addon->ModuleSize = 0;
 
-		Addons[aPath]->State = EAddonState::NotLoaded;
+		addon->State = EAddonState::NotLoaded;
 
 		if (!std::filesystem::exists(aPath))
 		{
@@ -379,7 +402,7 @@ namespace Loader
 
 		LogInfo(CH_LOADER, "Unloaded addon: %s", strPath);
 	}
-	void UninstallAddon(std::filesystem::path aPath)
+	void UninstallAddon(const std::filesystem::path& aPath)
 	{
 		// if file exists, delete it
 		if (std::filesystem::exists(aPath))

@@ -362,8 +362,15 @@ namespace GUI
 	{
 		if (Renderer::Scaling != LastScaling && IsGameplay)
 		{
-			ImGuiIO& io = ImGui::GetIO();
+			LastScaling = Renderer::Scaling;
+			Settings::Settings[OPT_LASTUISCALE] = Renderer::Scaling;
+			Settings::Save();
+		}
 
+		ImGuiIO& io = ImGui::GetIO();
+
+		if (MumbleIdentity)
+		{
 			switch (MumbleIdentity->UISize)
 			{
 			case 0:
@@ -388,10 +395,6 @@ namespace GUI
 				FontUI = FontIndex[EFont::Trebuchet_Larger];
 				break;
 			}
-
-			LastScaling = Renderer::Scaling;
-			Settings::Settings[OPT_LASTUISCALE] = Renderer::Scaling;
-			Settings::Save();
 		}
 	}
 	void OnEULAAccepted(void* aEventArgs)
@@ -512,11 +515,10 @@ namespace GUI
 		}
 		GUI::Mutex.unlock();
 
-		OnMumbleIdentityChanged(nullptr);
-
 		io.Fonts->Build();
 
 		Events::Subscribe(EV_MUMBLE_IDENTITY_UPDATED, OnMumbleIdentityChanged);
+		OnMumbleIdentityChanged(nullptr);
 
 		/* set up and add windows */
 		AddonsWindow* addonsWnd = new AddonsWindow("Addons");

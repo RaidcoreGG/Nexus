@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <shellapi.h>
 
+#include "Consts.h"
 #include "Shared.h"
 #include "Paths.h"
 #include "State.h"
@@ -63,10 +64,16 @@ namespace GUI
 						ImGui::EndChild();
 					}
 
-					if (ImGui::Button("Open Addons Folder", ImVec2(width, height)))
+					if (ImGui::Button("Open Addons Folder", ImVec2(ImGui::CalcTextSize("Open Addons Folder").x + 16.0f, height)))
 					{
 						std::string strAddons = Path::D_GW2_ADDONS.string();
 						ShellExecuteA(NULL, "explore", strAddons.c_str(), NULL, NULL, SW_SHOW);
+					}
+					ImGui::SameLine();
+					if (ImGui::Button("Check for Updates", ImVec2(ImGui::CalcTextSize("Check for Updates").x + 16.0f, height)))
+					{
+						LogDebug(CH_GUI, "Loader::CheckForUpdates() called.");
+						Loader::CheckForUpdates();
 					}
 					
 					ImGui::EndTabItem();

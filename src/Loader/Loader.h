@@ -28,14 +28,19 @@ namespace Loader
 	/* Processes all currently queued addons. */
 	void ProcessQueue();
 	/* Pushes an item to the queue. */
-	void QueueAddon(ELoaderAction aAction, std::filesystem::path aPath);
+	void QueueAddon(ELoaderAction aAction, const std::filesystem::path& aPath);
+
+	/* Swaps addon.dll with addon.dll.update. */
+	void PerformUpdateSwap(const std::filesystem::path& aPath);
+	/* Updates all addons if available. */
+	void CheckForUpdates();
 
 	/* Loads an addon. */
-	void LoadAddon(std::filesystem::path aPath);
+	void LoadAddon(const std::filesystem::path& aPath);
 	/* Unloads an addon. */
-	void UnloadAddon(std::filesystem::path aPath);
+	void UnloadAddon(const std::filesystem::path& aPath);
 	/* Unloads, then uninstalls an addon. */
-	void UninstallAddon(std::filesystem::path aPath);
+	void UninstallAddon(const std::filesystem::path& aPath);
 	/* Detects if there are addons that are not currently loaded, or if loaded addons have been removed. */
 	void DetectAddonsLoop();
 
