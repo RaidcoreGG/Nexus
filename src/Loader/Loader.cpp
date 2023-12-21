@@ -34,6 +34,8 @@ namespace Loader
 	std::unordered_map<std::filesystem::path, Addon*> Addons;
 	std::map<int, AddonAPI*> ApiDefs;
 
+	std::filesystem::file_time_type LastDirectoryChange;
+
 	std::thread LoaderThread;
 
 	std::string dll = ".dll";
@@ -87,7 +89,7 @@ namespace Loader
 				break;
 			}
 			
-			if (Addons[it->first]->State != EAddonState::Reload)
+			if (!Addons[it->first] || Addons[it->first]->State != EAddonState::Reload)
 			{
 				QueuedAddons.erase(it);
 			}
@@ -241,7 +243,7 @@ namespace Loader
 		for (auto& it : Addons)
 		{
 			// if defs defined && not the same path && signature the same though (another && it.second->Definitions in the mix because could still be null during load)
-			if (it.first != aPath && it.second->Definitions && it.second->Definitions->Signature == tmpDefs->Signature)
+			if (it.first != aPath && it.second->Definitions && it.second->Definitions->Signature == tmpDefs->Signature && it.second->State == EAddonState::Loaded)
 			{
 				LogWarning(CH_LOADER, "\"%s\" or another addon with this signature (%d) is already loaded. Added to blacklist.", strPath, tmpDefs->Signature);
 				addon->State = EAddonState::NotLoadedDuplicate;
@@ -344,6 +346,7 @@ namespace Loader
 		{
 			if (!addon->Definitions->Unload || addon->Definitions->HasFlag(EAddonFlags::DisableHotloading))
 			{
+				addon->Module = 0;
 				LogWarning(CH_LOADER, "Prevented unloading \"%s\" because either no Unload function is defined or Hotloading is explicitly disabled. (%s)", addon->Definitions->Name, strPath);
 				return;
 			}
@@ -413,6 +416,7 @@ namespace Loader
 			LogInfo(CH_LOADER, "Uninstalled addon: %s", aPath.string().c_str());
 		}
 	}
+	
 	void DetectAddonsLoop()
 	{
 		for (;;)
@@ -421,52 +425,60 @@ namespace Loader
 
 			if (State::Nexus == ENexusState::READY)
 			{
-				std::set<std::filesystem::path> onDisk;
+				std::filesystem::file_time_type lastModified = std::filesystem::last_write_time(Path::D_GW2_ADDONS);
 
-				/* iterate over each file on disk and check if it's currently tracked */
-				for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Path::D_GW2_ADDONS))
+				if (lastModified != LastDirectoryChange)
 				{
-					std::filesystem::path path = entry.path();
-					if (!entry.is_directory() && path.extension() == dll)
+					LastDirectoryChange = lastModified;
+					Log(CH_LOADER, "Addon directory changes detected.");
+
+					std::set<std::filesystem::path> onDisk;
+
+					/* iterate over each file on disk and check if it's currently tracked */
+					for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Path::D_GW2_ADDONS))
 					{
-						onDisk.insert(path);
-
-						Loader::Mutex.lock();
-						if (Addons.find(path) == Addons.end())
+						std::filesystem::path path = entry.path();
+						if (!entry.is_directory() && path.extension() == dll)
 						{
-							// this file does not exist yet in the tracked addons/files
-							QueueAddon(ELoaderAction::Load, path);
-						}
-						Loader::Mutex.unlock();
-					}
-				}
+							onDisk.insert(path);
 
-				std::vector<std::filesystem::path> rem;
-
-				Loader::Mutex.lock();
-				for (const auto& [path, addon] : Addons)
-				{
-					if (std::find(onDisk.begin(), onDisk.end(), path) == onDisk.end())
-					{
-						// the addon no longer exists on disk, unload it
-						if (addon->State == EAddonState::Loaded)
-						{
-							QueueAddon(ELoaderAction::Unload, path);
-						}
-						else
-						{
-							// sanity fallback
-							rem.push_back(path);
+							Loader::Mutex.lock();
+							if (Addons.find(path) == Addons.end())
+							{
+								// this file does not exist yet in the tracked addons/files
+								QueueAddon(ELoaderAction::Load, path);
+							}
+							Loader::Mutex.unlock();
 						}
 					}
-				}
-				for (std::filesystem::path p : rem)
-				{
-					Addons.erase(p);
-				}
-				Loader::Mutex.unlock();
 
-				//ProcessQueue();
+					std::vector<std::filesystem::path> rem;
+
+					Loader::Mutex.lock();
+					for (const auto& [path, addon] : Addons)
+					{
+						if (std::find(onDisk.begin(), onDisk.end(), path) == onDisk.end())
+						{
+							// the addon no longer exists on disk, unload it
+							if (addon && addon->State == EAddonState::Loaded)
+							{
+								QueueAddon(ELoaderAction::Unload, path);
+							}
+							else
+							{
+								// sanity fallback
+								rem.push_back(path);
+							}
+						}
+					}
+					for (std::filesystem::path p : rem)
+					{
+						Addons.erase(p);
+					}
+					Loader::Mutex.unlock();
+
+					//ProcessQueue();
+				}
 			}
 			
 			Sleep(5000);

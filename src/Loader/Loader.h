@@ -16,7 +16,9 @@ namespace Loader
 	extern std::mutex Mutex;
 	extern std::unordered_map<std::filesystem::path, ELoaderAction> QueuedAddons;		/* To be loaded or unloaded addons */
 	extern std::unordered_map<std::filesystem::path, Addon*> Addons;					/* Addons and their corresponding paths */
-	extern std::map<int, AddonAPI*> ApiDefs;								/* Addon API definitions, created on demand */
+	extern std::map<int, AddonAPI*> ApiDefs;											/* Addon API definitions, created on demand */
+
+	extern std::filesystem::file_time_type LastDirectoryChange;							/* Last time the Addons directory was modified */
 
 	extern std::thread LoaderThread;
 
