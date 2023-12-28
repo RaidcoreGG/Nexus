@@ -1,5 +1,11 @@
 #include "core.h"
 
+#include <codecvt>
+#include <locale>
+#include <PathCch.h>
+#include <Shlwapi.h>
+#include <fstream>
+
 #include "openssl/evp.h"
 #include "openssl/md5.h"
 
@@ -80,4 +86,22 @@ std::vector<unsigned char> MD5(const unsigned char* data, size_t sz)
 	EVP_MD_CTX_destroy(ctx);
 
 	return md;
+}
+
+std::vector<unsigned char> MD5FromFile(const std::filesystem::path& aPath)
+{
+	std::ifstream file(aPath, std::ios::binary);
+	file.seekg(0, std::ios::end);
+	size_t length = file.tellg();
+	file.seekg(0, std::ios::beg);
+	char* buffer = new char[length];
+	file.read(buffer, length);
+
+	std::vector<unsigned char> md5 = MD5((const unsigned char*)buffer, length);
+
+	delete[] buffer;
+
+	file.close();
+
+	return md5;
 }

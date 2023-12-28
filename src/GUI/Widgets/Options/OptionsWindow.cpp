@@ -68,8 +68,6 @@ namespace GUI
 			{
 				ImGui::BeginChild("##GeneralTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-				ImGui::TextDisabled("General");
-
 				ImGui::TextDisabled("Font Size");
 				if (ImGui::InputFloat("##fontsize", &GUI::FontSize, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_EnterReturnsTrue))
 				{
@@ -77,8 +75,7 @@ namespace GUI
 					Settings::Save();
 				}
 				ImGui::TooltipGeneric("Changing font size requires a restart.");
-
-
+				
 				ImGui::TextDisabled("UI/UX");
 				if (ImGui::Checkbox("Close Menu after selecting item", &GUI::CloseMenuAfterSelecting))
 				{
@@ -99,6 +96,12 @@ namespace GUI
 					Settings::Settings[OPT_QAVERTICAL] = QuickAccess::VerticalLayout;
 					Settings::Save();
 				}
+				if (ImGui::Checkbox("Show notification icon when Nexus updates", &GUI::NotifyChangelog))
+				{
+					Settings::Settings[OPT_NOTIFYCHANGELOG] = GUI::NotifyChangelog;
+					Settings::Save();
+				}
+
 				ImGui::Text("Location:");
 				if (ImGui::Combo("##qalocation", (int*)&QuickAccess::Location, qaLocations, IM_ARRAYSIZE(qaLocations)))
 				{

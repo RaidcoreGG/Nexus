@@ -33,6 +33,8 @@ namespace GUI
 		EQAPosition		Location			= EQAPosition::Extend;
 		ImVec2			Offset				= ImVec2(((size + 1) * Renderer::Scaling) * 9, 0.0f);
 
+		Texture*		IconNotification	= nullptr;
+
 		void Fade()
 		{
 			IsAnimating = true;
@@ -45,6 +47,16 @@ namespace GUI
 				else if (Opacity < 0.5f)	{ Opacity = 0.5f; IsAnimating = false; }
 
 				Sleep(35);
+			}
+		}
+
+		void ReceiveTextures(const char* aIdentifier, Texture* aTexture)
+		{
+			std::string str = aIdentifier;
+
+			if (str == ICON_NOTIFICATION)
+			{
+				IconNotification = aTexture;
 			}
 		}
 
@@ -100,14 +112,31 @@ namespace GUI
 								ImGui::SetCursorPos(ImVec2(((size * c) + (c ? 1 : 0)) * Renderer::Scaling, 0));
 							}
 
+							ImVec2 posIconTL = ImGui::GetCursorPos();
+
 							if (ImGui::ImageButton(!shortcut.IsHovering ? shortcut.TextureNormal->Resource : shortcut.TextureHover->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
 							{
 								isActive = true;
 								if (shortcut.Keybind.length() > 0)
 								{
+									shortcut.HasNotification = false;
 									Keybinds::Invoke(shortcut.Keybind);
 								}
 							}
+
+							if (shortcut.HasNotification && IconNotification && IconNotification->Resource)
+							{
+								float offIcon = (size * Renderer::Scaling) / 2.0f;
+								posIconTL.x += pos.x + offIcon;
+								posIconTL.y += pos.y + offIcon;
+
+								ImVec2 posIconBR = posIconTL;
+								posIconBR.x += offIcon;
+								posIconBR.y += offIcon;
+
+								ImGui::GetForegroundDrawList(ImGui::GetCurrentWindow())->AddImage(IconNotification->Resource, posIconTL, posIconBR, ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), ImColor(1.0f, 1.0f, 1.0f, Opacity));
+							}
+
 							ImGui::PopStyleVar();
 							shortcut.IsHovering = ImGui::IsItemHovered();
 							if (shortcut.TooltipText.length() > 0)
@@ -124,15 +153,13 @@ namespace GUI
 								if (identifier == QA_MENU)
 								{
 									menuFound = true; // simple optimization
-									if (ImGui::BeginPopupContextItem("ShortcutsCtxMenu"))
+
+									if (RegistrySimple.size() > 0)
 									{
-										isActive = true;
-										if (RegistrySimple.size() == 0)
+										if (ImGui::BeginPopupContextItem("ShortcutsCtxMenu"))
 										{
-											ImGui::TextDisabled("No shortcuts added.");
-										}
-										else
-										{
+											isActive = true;
+
 											ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f }); // smol checkbox
 											for (auto& [identifier, shortcut] : RegistrySimple)
 											{
@@ -143,10 +170,11 @@ namespace GUI
 												}
 											}
 											ImGui::PopStyleVar();
+
+											ImGui::EndPopup();
 										}
-										ImGui::EndPopup();
+										ImGui::OpenPopupOnItemClick("ShortcutsCtxMenu", 1);
 									}
-									ImGui::OpenPopupOnItemClick("ShortcutsCtxMenu", 1);
 								}
 							}
 						}
@@ -246,7 +274,6 @@ namespace GUI
 			}
 			QuickAccess::Mutex.unlock();
 		}
-
 		void RemoveShortcut(const char* aIdentifier)
 		{
 			std::string str = aIdentifier;
@@ -254,6 +281,21 @@ namespace GUI
 			QuickAccess::Mutex.lock();
 			{
 				Registry.erase(str);
+			}
+			QuickAccess::Mutex.unlock();
+		}
+		void NotifyShortcut(const char* aIdentifier)
+		{
+			std::string str = aIdentifier;
+
+			QuickAccess::Mutex.lock();
+			{
+				auto it = Registry.find(str);
+
+				if (it != Registry.end())
+				{
+					it->second.HasNotification = true;
+				}
 			}
 			QuickAccess::Mutex.unlock();
 		}
@@ -271,7 +313,6 @@ namespace GUI
 			}
 			QuickAccess::Mutex.unlock();
 		}
-
 		void RemoveSimpleShortcut(const char* aIdentifier)
 		{
 			std::string str = aIdentifier;

@@ -41,4 +41,7 @@ extern ImGuiWindowFlags				WindowFlags_Overlay;
 extern ImGuiWindowFlags				WindowFlags_Custom;
 extern ImGuiWindowFlags				WindowFlags_Watermark;
 
+extern std::string					ChangelogText;
+extern bool							IsUpdateAvailable;
+
 #endif

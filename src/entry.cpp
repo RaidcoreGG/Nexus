@@ -103,8 +103,6 @@ void Initialize()
 		// create imgui context
 		if (!Renderer::GuiContext) { Renderer::GuiContext = ImGui::CreateContext(); }
 
-		Loader::Initialize();
-
 		State::Nexus = ENexusState::LOADED;
 	}
 	else
@@ -152,6 +150,9 @@ void Shutdown()
 /* hk */
 LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	// don't pass to game if loader
+	if (Loader::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
+
 	// don't pass to game if custom wndproc
 	if (WndProc::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
@@ -199,6 +200,8 @@ HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT 
 
 		Renderer::WindowHandle = swapChainDesc.OutputWindow;
 		Hooks::GW2_WndProc = (WNDPROC)SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)hkWndProc);
+
+		Loader::Initialize();
 
 		State::Nexus = ENexusState::READY;
 		State::Directx = EDxState::READY; /* acquired swapchain */

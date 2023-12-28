@@ -54,7 +54,7 @@ namespace GUI
 
 			if (ImGui::Button("I agree"))
 			{
-				AcceptedEULA = true;
+				HasAcceptedEULA = true;
 				Settings::Settings[OPT_ACCEPTEULA] = true;
 				Settings::Save();
 				close = true;

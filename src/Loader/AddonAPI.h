@@ -68,9 +68,9 @@ struct AddonAPI1 : AddonAPI
 
 	/* Shortcuts */
 	QUICKACCESS_ADDSHORTCUT		AddShortcut;
-	QUICKACCESS_REMOVE			RemoveShortcut;
+	QUICKACCESS_GENERIC			RemoveShortcut;
 	QUICKACCESS_ADDSIMPLE		AddSimpleShortcut;
-	QUICKACCESS_REMOVE			RemoveSimpleShortcut;
+	QUICKACCESS_GENERIC			RemoveSimpleShortcut;
 };
 
 struct AddonAPI2 : AddonAPI
@@ -124,9 +124,10 @@ struct AddonAPI2 : AddonAPI
 
 	/* Shortcuts */
 	QUICKACCESS_ADDSHORTCUT		AddShortcut;
-	QUICKACCESS_REMOVE			RemoveShortcut;
+	QUICKACCESS_GENERIC			RemoveShortcut;
+	QUICKACCESS_GENERIC			NotifyShortcut;
 	QUICKACCESS_ADDSIMPLE		AddSimpleShortcut;
-	QUICKACCESS_REMOVE			RemoveSimpleShortcut;
+	QUICKACCESS_GENERIC			RemoveSimpleShortcut;
 
 	/* API */
 		// GW2 API FUNCS

@@ -2,6 +2,8 @@
 
 #include <filesystem>
 #include <algorithm>
+#include <chrono>
+#include <ctime>
 
 #include "State.h"
 #include "Renderer.h"
@@ -25,6 +27,7 @@
 #include "Widgets/Menu/MenuItem.h"
 #include "Widgets/Addons/AddonsWindow.h"
 #include "Widgets/Options/OptionsWindow.h"
+#include "Widgets/Changelog/ChangelogWindow.h"
 #include "Widgets/Log/LogWindow.h"
 #include "Widgets/Debug/DebugWindow.h"
 #include "Widgets/About/AboutBox.h"
@@ -58,7 +61,8 @@ namespace GUI
 	bool						IsSetup				= false;
 	float						LastScaling;
 
-	bool						AcceptedEULA		= false;
+	bool						HasAcceptedEULA		= false;
+	bool						NotifyChangelog		= false;
 
 	void Initialize()
 	{
@@ -321,14 +325,22 @@ namespace GUI
 		if (str == KB_MENU)
 		{
 			Menu::Visible = !Menu::Visible;
+			return;
 		}
 		else if (str == KB_TOGGLEHIDEUI)
 		{
 			IsUIVisible = !IsUIVisible;
+			return;
 		}
 		else if (str == KB_ADDONS)
 		{
 			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Addons"; });
+			if (it == Windows.end()) { return; }
+			(*it)->Visible = !(*it)->Visible;
+		}
+		else if (str == KB_CHANGELOG)
+		{
+			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Changelog"; });
 			if (it == Windows.end()) { return; }
 			(*it)->Visible = !(*it)->Visible;
 		}
@@ -352,7 +364,7 @@ namespace GUI
 		}
 		else if (str == KB_MUMBLEOVERLAY)
 		{
-			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Debug"; });
+			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Addons"; });
 			if (it == Windows.end()) { return; }
 			((DebugWindow*)(*it))->MumbleWindow->Visible = !((DebugWindow*)(*it))->MumbleWindow->Visible;
 		}
@@ -400,10 +412,9 @@ namespace GUI
 	void OnEULAAccepted(void* aEventArgs)
 	{
 		Mutex.lock();
-		auto it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd)
-			{
-				return wnd->Name == "EULAModal";
-			});
+		auto it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) {
+			return wnd->Name == "EULAModal";
+		});
 
 		if (it != Windows.end())
 		{
@@ -522,26 +533,30 @@ namespace GUI
 
 		/* set up and add windows */
 		AddonsWindow* addonsWnd = new AddonsWindow("Addons");
+		OptionsWindow* opsWnd = new OptionsWindow("Options");
+		ChangelogWindow* chlWnd = new ChangelogWindow("Changelog");
 		LogWindow* logWnd = new LogWindow("Log", ELogLevel::ALL);
 		LogHandler::RegisterLogger(logWnd);
-		OptionsWindow* opsWnd = new OptionsWindow("Options");
 		DebugWindow* dbgWnd = new DebugWindow("Debug");
 		AboutBox* aboutWnd = new AboutBox("About");
 
 		Keybinds::Register(KB_ADDONS, ProcessKeybind, "(null)");
-		Keybinds::Register(KB_LOG, ProcessKeybind, "(null)");
 		Keybinds::Register(KB_OPTIONS, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_CHANGELOG, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_LOG, ProcessKeybind, "(null)");
 		Keybinds::Register(KB_DEBUG, ProcessKeybind, "(null)");
 		Keybinds::Register(KB_MUMBLEOVERLAY, ProcessKeybind, "(null)");
 
 		AddWindow(addonsWnd);
 		AddWindow(opsWnd);
+		AddWindow(chlWnd);
 		AddWindow(logWnd);
 		AddWindow(dbgWnd);
 		AddWindow(aboutWnd);
 
 		Menu::AddMenuItem("Addons",		&addonsWnd->Visible);
 		Menu::AddMenuItem("Options",	&opsWnd->Visible);
+		Menu::AddMenuItem("Changelog",	&chlWnd->Visible);
 		Menu::AddMenuItem("Log",		&logWnd->Visible);
 		Menu::AddMenuItem("Debug",		&dbgWnd->Visible);
 		Menu::AddMenuItem("About",		&aboutWnd->Visible);
@@ -551,11 +566,30 @@ namespace GUI
 		Keybinds::Register(KB_TOGGLEHIDEUI, ProcessKeybind, "CTRL+H");
 
 		/* load icons */
-		TextureLoader::LoadFromResource(ICON_NEXUS, RES_ICON_NEXUS, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource(ICON_NEXUS_HOVER, RES_ICON_NEXUS_HOVER, NexusHandle, nullptr);
+		std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+		tm local_tm = *localtime(&t);
+		int month = local_tm.tm_mon + 1;
+
+		switch (month)
+		{
+		case 10:
+			TextureLoader::LoadFromResource(ICON_NEXUS, RES_ICON_NEXUS_HALLOWEEN, NexusHandle, nullptr);
+			TextureLoader::LoadFromResource(ICON_NEXUS_HOVER, RES_ICON_NEXUS_HALLOWEEN_HOVER, NexusHandle, nullptr);
+			break;
+		case 12:
+			TextureLoader::LoadFromResource(ICON_NEXUS, RES_ICON_NEXUS_XMAS, NexusHandle, nullptr);
+			TextureLoader::LoadFromResource(ICON_NEXUS_HOVER, RES_ICON_NEXUS_XMAS_HOVER, NexusHandle, nullptr);
+			break;
+		default:
+			TextureLoader::LoadFromResource(ICON_NEXUS, RES_ICON_NEXUS, NexusHandle, nullptr);
+			TextureLoader::LoadFromResource(ICON_NEXUS_HOVER, RES_ICON_NEXUS_HOVER, NexusHandle, nullptr);
+			break;
+		}
 
 		TextureLoader::LoadFromResource(ICON_GENERIC, RES_ICON_GENERIC, NexusHandle, nullptr);
 		TextureLoader::LoadFromResource(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, NexusHandle, nullptr);
+
+		TextureLoader::LoadFromResource(ICON_NOTIFICATION, RES_ICON_NOTIFICATION, NexusHandle, QuickAccess::ReceiveTextures);
 
 		TextureLoader::LoadFromResource(TEX_MENU_BACKGROUND, RES_TEX_MENU_BACKGROUND, NexusHandle, Menu::ReceiveTextures);
 		TextureLoader::LoadFromResource(TEX_MENU_BUTTON, RES_TEX_MENU_BUTTON, NexusHandle, Menu::ReceiveTextures);
@@ -563,16 +597,29 @@ namespace GUI
 
 		/* add shortcut */
 		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "Nexus Menu");
+		if (IsUpdateAvailable && NotifyChangelog)
+		{
+			QuickAccess::NotifyShortcut(QA_MENU);
+		}
 
 		if (!Settings::Settings.is_null())
 		{
 			if (!Settings::Settings[OPT_ACCEPTEULA].is_null())
 			{
-				 Settings::Settings[OPT_ACCEPTEULA].get_to(AcceptedEULA);
+				Settings::Settings[OPT_ACCEPTEULA].get_to(HasAcceptedEULA);
 			}
 			else
 			{
-				AcceptedEULA = false;
+				HasAcceptedEULA = false;
+			}
+
+			if (!Settings::Settings[OPT_NOTIFYCHANGELOG].is_null())
+			{
+				Settings::Settings[OPT_NOTIFYCHANGELOG].get_to(NotifyChangelog);
+			}
+			else
+			{
+				NotifyChangelog = false;
 			}
 
 			if (!Settings::Settings[OPT_LASTUISCALE].is_null() && Renderer::Scaling == 0)
@@ -644,7 +691,7 @@ namespace GUI
 			LogDebug("meme", "settings initially null");
 		}
 
-		if (!AcceptedEULA)
+		if (!HasAcceptedEULA)
 		{
 			EULAModal* eulaModal = new EULAModal();
 			AddWindow(eulaModal);

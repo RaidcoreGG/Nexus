@@ -28,7 +28,8 @@ namespace GUI
 
 	extern bool							IsUIVisible;
 
-	extern bool							AcceptedEULA;
+	extern bool							HasAcceptedEULA;
+	extern bool							NotifyChangelog;
 
 	void Initialize();
 	void Shutdown();

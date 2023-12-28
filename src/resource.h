@@ -3,14 +3,23 @@
 // Used by Nexus.rc
 //
 #define RES_FONT_MENOMONIA              101
-#define RES_ICON_NEXUS                  102
-#define RES_ICON_NEXUS_HOVER            103
-#define RES_ICON_GENERIC                104
-#define RES_ICON_GENERIC_HOVER          105
-#define RES_TEX_MENU_BACKGROUND         106
-#define RES_TEX_MENU_BUTTON             107
-#define RES_TEX_MENU_BUTTON_HOVER       108
-#define RES_FONT_TREBUCHET              109
+#define RES_FONT_TREBUCHET              102
+
+#define RES_ICON_NEXUS                  201
+#define RES_ICON_NEXUS_HOVER            202
+#define RES_ICON_NEXUS_HALLOWEEN        203
+#define RES_ICON_NEXUS_HALLOWEEN_HOVER  204
+#define RES_ICON_NEXUS_XMAS             205
+#define RES_ICON_NEXUS_XMAS_HOVER       206
+
+#define RES_ICON_GENERIC                207
+#define RES_ICON_GENERIC_HOVER          208
+
+#define RES_ICON_NOTIFICATION			209
+
+#define RES_TEX_MENU_BACKGROUND         301
+#define RES_TEX_MENU_BUTTON             302
+#define RES_TEX_MENU_BUTTON_HOVER       303
 
 // Next default values for new objects
 // 

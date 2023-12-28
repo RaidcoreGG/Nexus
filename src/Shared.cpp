@@ -20,7 +20,7 @@ ImFont*						Font				= nullptr;
 ImFont*						FontBig				= nullptr;
 ImFont*						FontUI				= nullptr;
 
-ImGuiWindowFlags			WindowFlags_Default =	ImGuiWindowFlags_AlwaysAutoResize |
+ImGuiWindowFlags			WindowFlags_Default	=	ImGuiWindowFlags_AlwaysAutoResize |
 													ImGuiWindowFlags_NoResize |
 													ImGuiWindowFlags_NoCollapse;
 ImGuiWindowFlags			WindowFlags_Overlay =	ImGuiWindowFlags_NoDecoration |
@@ -45,3 +45,6 @@ ImGuiWindowFlags			WindowFlags_Watermark = ImGuiWindowFlags_NoDecoration |
 													ImGuiWindowFlags_NoInputs |
 													ImGuiWindowFlags_NoBringToFrontOnFocus |
 													ImGuiWindowFlags_NoBackground;
+
+std::string					ChangelogText;
+bool						IsUpdateAvailable = false;

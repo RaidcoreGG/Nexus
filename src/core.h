@@ -2,10 +2,6 @@
 #define CORE_H
 
 #include <Windows.h>
-#include <codecvt>
-#include <locale>
-#include <PathCch.h>
-#include <Shlwapi.h>
 #include <filesystem>
 
 void PathSystemAppend(std::filesystem::path& aDestination, const char* aAppend);
@@ -19,5 +15,5 @@ std::wstring StrToWStr(std::string& aString);
 const char* ConvertToUTF8(const char* multibyteStr);
 
 std::vector<unsigned char> MD5(const unsigned char* data, size_t sz);
-
+std::vector<unsigned char> MD5FromFile(const std::filesystem::path& aPath);
 #endif

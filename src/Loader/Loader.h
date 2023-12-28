@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <thread>
 #include <filesystem>
+#include <Shlobj.h>
 
 #include "ELoaderAction.h"
 #include "Addon.h"
@@ -18,19 +19,23 @@ namespace Loader
 	extern std::unordered_map<std::filesystem::path, Addon*> Addons;					/* Addons and their corresponding paths */
 	extern std::map<int, AddonAPI*> ApiDefs;											/* Addon API definitions, created on demand */
 
-	extern std::filesystem::file_time_type LastDirectoryChange;							/* Last time the Addons directory was modified */
-
-	extern std::thread LoaderThread;
+	extern PIDLIST_ABSOLUTE FSItemList;
+	extern ULONG FSNotifierID;
 
 	/* Initializes the Loader and the API. */
 	void Initialize();
 	/* Shuts the Loader down and frees all addons. */
 	void Shutdown();
 
+	/* Returns 0 if message was processed. */
+	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
 	/* Processes all currently queued addons. */
 	void ProcessQueue();
 	/* Pushes an item to the queue. */
 	void QueueAddon(ELoaderAction aAction, const std::filesystem::path& aPath);
+
+	void DetectAddonChanges();
 
 	/* Swaps addon.dll with addon.dll.update. */
 	void PerformUpdateSwap(const std::filesystem::path& aPath);
@@ -43,9 +48,7 @@ namespace Loader
 	void UnloadAddon(const std::filesystem::path& aPath);
 	/* Unloads, then uninstalls an addon. */
 	void UninstallAddon(const std::filesystem::path& aPath);
-	/* Detects if there are addons that are not currently loaded, or if loaded addons have been removed. */
-	void DetectAddonsLoop();
-
+	
 	AddonAPI* GetAddonAPI(int aVersion);
 	long GetAddonAPISize(int aVersion);
 }

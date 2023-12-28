@@ -127,9 +127,12 @@ namespace Updater
 			return;
 		}
 
+		if (!resVersion["Changelog"].is_null()) { resVersion["Changelog"].get_to(ChangelogText); }
+
 		if (remoteVersion > Version)
 		{
 			LogInfo(CH_UPDATER, "Outdated: API replied with Version %s but installed is Version %s", remoteVersion.ToString().c_str(), Version.ToString().c_str());
+			IsUpdateAvailable = true;
 
 			size_t bytesWritten = 0;
 			std::ofstream file(Path::F_UPDATE_DLL, std::ofstream::binary);

@@ -34,25 +34,61 @@ namespace Loader
 	std::unordered_map<std::filesystem::path, Addon*> Addons;
 	std::map<int, AddonAPI*> ApiDefs;
 
-	std::filesystem::file_time_type LastDirectoryChange;
-
-	std::thread LoaderThread;
+	PIDLIST_ABSOLUTE FSItemList;
+	ULONG FSNotifierID;
 
 	std::string dll = ".dll";
 
 	void Initialize()
 	{
-		if (State::Nexus < ENexusState::LOADED)
+		if (State::Nexus == ENexusState::LOADED)
 		{
-			LoaderThread = std::thread(DetectAddonsLoop);
-			LoaderThread.detach();
+			FSItemList = ILCreateFromPathA(Path::GetAddonDirectory(nullptr));
+			if (FSItemList == 0) {
+				LogCritical(CH_LOADER, "Loader disabled. Reason: ILCreateFromPathA(Path::D_GW2_ADDONS) returned 0.");
+			}
+			else
+			{
+				SHChangeNotifyEntry changeentry{};
+				changeentry.pidl = FSItemList;
+				changeentry.fRecursive = false;
+				FSNotifierID = SHChangeNotifyRegister(
+					Renderer::WindowHandle,
+					SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
+					SHCNE_UPDATEITEM,
+					WM_ADDONDIRUPDATE,
+					1,
+					&changeentry
+				);
+
+				if (FSNotifierID <= 0)
+				{
+					LogCritical(CH_LOADER, "Loader disabled. Reason: SHChangeNotifyRegister(...) returned 0.");
+				}
+				else
+				{
+					DetectAddonChanges(); // Invoke once because addon dir doesn't change on init
+				}
+			}
 		}
 	}
 	void Shutdown()
 	{
 		if (State::Nexus == ENexusState::SHUTTING_DOWN)
 		{
-			Loader::Mutex.lock();
+			if (FSNotifierID != 0)
+			{
+				SHChangeNotifyDeregister(FSNotifierID);
+				FSNotifierID = 0;
+			}
+
+			if (FSItemList != 0)
+			{
+				ILFree(FSItemList);
+				FSItemList = 0;
+			}
+
+			const std::lock_guard<std::mutex> lock(Mutex);
 			{
 				while (Addons.size() != 0)
 				{
@@ -65,13 +101,43 @@ namespace Loader
 					Addons.erase(Addons.begin());
 				}
 			}
-			Loader::Mutex.unlock();
 		}
+	}
+
+	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		if (uMsg == WM_ADDONDIRUPDATE)
+		{
+			PIDLIST_ABSOLUTE* ppidl;
+			LONG event;
+			HANDLE notificationLock = SHChangeNotification_Lock((HANDLE)wParam, lParam, &ppidl, &event);
+
+			if (notificationLock != 0)
+			{
+				if (event == SHCNE_UPDATEITEM)
+				{
+					char path[MAX_PATH];
+					if (SHGetPathFromIDList(ppidl[0], path))
+					{
+						if (Path::D_GW2_ADDONS == std::string(path))
+						{
+							
+						}
+					}
+				}
+
+				SHChangeNotification_Unlock(notificationLock);
+			}
+
+			return 0;
+		}
+
+		return uMsg;
 	}
 
 	void ProcessQueue()
 	{
-		Loader::Mutex.lock();
+		const std::lock_guard<std::mutex> lock(Mutex);
 		while (QueuedAddons.size() > 0)
 		{
 			auto it = QueuedAddons.begin();
@@ -94,11 +160,58 @@ namespace Loader
 				QueuedAddons.erase(it);
 			}
 		}
-		Loader::Mutex.unlock();
 	}
 	void QueueAddon(ELoaderAction aAction, const std::filesystem::path& aPath)
 	{
 		QueuedAddons.insert({ aPath, aAction });
+	}
+
+	void DetectAddonChanges()
+	{
+		Log(CH_LOADER, "Addon directory changes detected.");
+
+		std::set<std::filesystem::path> onDisk;
+
+		/* iterate over each file on disk and check if it's currently tracked */
+		for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Path::D_GW2_ADDONS))
+		{
+			std::filesystem::path path = entry.path();
+			if (!entry.is_directory() && path.extension() == dll)
+			{
+				onDisk.insert(path);
+
+				const std::lock_guard<std::mutex> lock(Mutex);
+				if (Addons.find(path) == Addons.end())
+				{
+					// this file does not exist yet in the tracked addons/files
+					QueueAddon(ELoaderAction::Load, path);
+				}
+			}
+		}
+
+		std::vector<std::filesystem::path> rem;
+
+		const std::lock_guard<std::mutex> lock(Mutex);
+		for (const auto& [path, addon] : Addons)
+		{
+			if (std::find(onDisk.begin(), onDisk.end(), path) == onDisk.end())
+			{
+				// the addon no longer exists on disk, unload it
+				if (addon && addon->State == EAddonState::Loaded)
+				{
+					QueueAddon(ELoaderAction::Unload, path);
+				}
+				else
+				{
+					// sanity fallback
+					rem.push_back(path);
+				}
+			}
+		}
+		for (std::filesystem::path p : rem)
+		{
+			Addons.erase(p);
+		}
 	}
 
 	void PerformUpdateSwap(const std::filesystem::path& aPath)
@@ -122,7 +235,7 @@ namespace Loader
 	}
 	void CheckForUpdates()
 	{
-		Loader::Mutex.lock();
+		const std::lock_guard<std::mutex> lock(Mutex);
 		{
 			for (auto& [path, addon] : Addons)
 			{
@@ -146,7 +259,6 @@ namespace Loader
 				}
 			}
 		}
-		Loader::Mutex.unlock();
 	}
 
 	void LoadAddon(const std::filesystem::path& aPath)
@@ -417,74 +529,6 @@ namespace Loader
 		}
 	}
 	
-	void DetectAddonsLoop()
-	{
-		for (;;)
-		{
-			if (State::Nexus >= ENexusState::SHUTTING_DOWN) { return; }
-
-			if (State::Nexus == ENexusState::READY)
-			{
-				std::filesystem::file_time_type lastModified = std::filesystem::last_write_time(Path::D_GW2_ADDONS);
-
-				if (lastModified != LastDirectoryChange)
-				{
-					LastDirectoryChange = lastModified;
-					Log(CH_LOADER, "Addon directory changes detected.");
-
-					std::set<std::filesystem::path> onDisk;
-
-					/* iterate over each file on disk and check if it's currently tracked */
-					for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Path::D_GW2_ADDONS))
-					{
-						std::filesystem::path path = entry.path();
-						if (!entry.is_directory() && path.extension() == dll)
-						{
-							onDisk.insert(path);
-
-							Loader::Mutex.lock();
-							if (Addons.find(path) == Addons.end())
-							{
-								// this file does not exist yet in the tracked addons/files
-								QueueAddon(ELoaderAction::Load, path);
-							}
-							Loader::Mutex.unlock();
-						}
-					}
-
-					std::vector<std::filesystem::path> rem;
-
-					Loader::Mutex.lock();
-					for (const auto& [path, addon] : Addons)
-					{
-						if (std::find(onDisk.begin(), onDisk.end(), path) == onDisk.end())
-						{
-							// the addon no longer exists on disk, unload it
-							if (addon && addon->State == EAddonState::Loaded)
-							{
-								QueueAddon(ELoaderAction::Unload, path);
-							}
-							else
-							{
-								// sanity fallback
-								rem.push_back(path);
-							}
-						}
-					}
-					for (std::filesystem::path p : rem)
-					{
-						Addons.erase(p);
-					}
-					Loader::Mutex.unlock();
-
-					//ProcessQueue();
-				}
-			}
-			
-			Sleep(5000);
-		}
-	}
-	
 	AddonAPI* GetAddonAPI(int aVersion)
 	{
 		// API defs with that version already exist, just return them
@@ -589,6 +633,7 @@ namespace Loader
 
 			((AddonAPI2*)api)->AddShortcut = GUI::QuickAccess::AddShortcut;
 			((AddonAPI2*)api)->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
+			((AddonAPI2*)api)->NotifyShortcut = GUI::QuickAccess::NotifyShortcut;
 			((AddonAPI2*)api)->AddSimpleShortcut = GUI::QuickAccess::AddSimpleShortcut;
 			((AddonAPI2*)api)->RemoveSimpleShortcut = GUI::QuickAccess::RemoveSimpleShortcut;
 
