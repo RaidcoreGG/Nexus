@@ -364,7 +364,7 @@ namespace GUI
 		}
 		else if (str == KB_MUMBLEOVERLAY)
 		{
-			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Addons"; });
+			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Debug"; });
 			if (it == Windows.end()) { return; }
 			((DebugWindow*)(*it))->MumbleWindow->Visible = !((DebugWindow*)(*it))->MumbleWindow->Visible;
 		}
@@ -597,6 +597,7 @@ namespace GUI
 
 		/* add shortcut */
 		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "Nexus Menu");
+
 		if (IsUpdateAvailable && NotifyChangelog)
 		{
 			QuickAccess::NotifyShortcut(QA_MENU);

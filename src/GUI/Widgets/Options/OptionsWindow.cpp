@@ -69,51 +69,63 @@ namespace GUI
 				ImGui::BeginChild("##GeneralTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
 				ImGui::TextDisabled("Font Size");
-				if (ImGui::InputFloat("##fontsize", &GUI::FontSize, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_EnterReturnsTrue))
 				{
-					Settings::Settings[OPT_FONTSIZE] = FontSize;
-					Settings::Save();
+					if (ImGui::InputFloat("##fontsize", &FontSize, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_EnterReturnsTrue))
+					{
+						if (FontSize < 1.0f)
+						{
+							FontSize = 1.0f;
+						}
+						Settings::Settings[OPT_FONTSIZE] = FontSize;
+						Settings::Save();
+					}
+					ImGui::TooltipGeneric("Changing font size requires a restart.");
 				}
-				ImGui::TooltipGeneric("Changing font size requires a restart.");
+
+				ImGui::Separator();
 				
 				ImGui::TextDisabled("UI/UX");
-				if (ImGui::Checkbox("Close Menu after selecting item", &GUI::CloseMenuAfterSelecting))
 				{
-					Settings::Settings[OPT_CLOSEMENU] = GUI::CloseMenuAfterSelecting;
-					Settings::Save();
-				}
-				if (ImGui::Checkbox("Closing Windows with Escape", &GUI::CloseOnEscape))
-				{
-					Settings::Settings[OPT_CLOSEESCAPE] = GUI::CloseOnEscape;
-					Settings::Save();
+					if (ImGui::Checkbox("Close Menu after selecting item", &GUI::CloseMenuAfterSelecting))
+					{
+						Settings::Settings[OPT_CLOSEMENU] = GUI::CloseMenuAfterSelecting;
+						Settings::Save();
+					}
+					if (ImGui::Checkbox("Closing Windows with Escape", &GUI::CloseOnEscape))
+					{
+						Settings::Settings[OPT_CLOSEESCAPE] = GUI::CloseOnEscape;
+						Settings::Save();
+					}
 				}
 
 				ImGui::Separator();
 
 				ImGui::TextDisabled("Quick Access");
-				if (ImGui::Checkbox("Vertical Layout", &QuickAccess::VerticalLayout))
 				{
-					Settings::Settings[OPT_QAVERTICAL] = QuickAccess::VerticalLayout;
-					Settings::Save();
-				}
-				if (ImGui::Checkbox("Show notification icon when Nexus updates", &GUI::NotifyChangelog))
-				{
-					Settings::Settings[OPT_NOTIFYCHANGELOG] = GUI::NotifyChangelog;
-					Settings::Save();
-				}
+					if (ImGui::Checkbox("Vertical Layout", &QuickAccess::VerticalLayout))
+					{
+						Settings::Settings[OPT_QAVERTICAL] = QuickAccess::VerticalLayout;
+						Settings::Save();
+					}
+					if (ImGui::Checkbox("Show notification icon when Nexus updates", &GUI::NotifyChangelog))
+					{
+						Settings::Settings[OPT_NOTIFYCHANGELOG] = GUI::NotifyChangelog;
+						Settings::Save();
+					}
 
-				ImGui::Text("Location:");
-				if (ImGui::Combo("##qalocation", (int*)&QuickAccess::Location, qaLocations, IM_ARRAYSIZE(qaLocations)))
-				{
-					Settings::Settings[OPT_QALOCATION] = QuickAccess::Location;
-					Settings::Save();
-				}
-				ImGui::Text("Offset:");
-				if (ImGui::InputFloat2("##qaoffset", (float*)&QuickAccess::Offset))
-				{
-					Settings::Settings[OPT_QAOFFSETX] = QuickAccess::Offset.x;
-					Settings::Settings[OPT_QAOFFSETY] = QuickAccess::Offset.y;
-					Settings::Save();
+					ImGui::Text("Location:");
+					if (ImGui::Combo("##qalocation", (int*)&QuickAccess::Location, qaLocations, IM_ARRAYSIZE(qaLocations)))
+					{
+						Settings::Settings[OPT_QALOCATION] = QuickAccess::Location;
+						Settings::Save();
+					}
+					ImGui::Text("Offset:");
+					if (ImGui::InputFloat2("##qaoffset", (float*)&QuickAccess::Offset))
+					{
+						Settings::Settings[OPT_QAOFFSETX] = QuickAccess::Offset.x;
+						Settings::Settings[OPT_QAOFFSETY] = QuickAccess::Offset.y;
+						Settings::Save();
+					}
 				}
 
 				ImGui::EndChild();
