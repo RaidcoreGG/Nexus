@@ -57,7 +57,7 @@ namespace TextureLoader
 
 		if (!std::filesystem::exists(aFilename))
 		{
-			Log(CH_TEXTURES, "File provided does not exist: %s (%s)", aFilename, str.c_str());
+			LogWarning(CH_TEXTURES, "File provided does not exist: %s (%s)", aFilename, str.c_str());
 			return;
 		}
 

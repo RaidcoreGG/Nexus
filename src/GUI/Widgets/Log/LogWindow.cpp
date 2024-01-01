@@ -133,6 +133,8 @@ namespace GUI
 
 							/* message */
 							ImGui::TextWrapped(entry.Message.c_str());
+							
+							ImGui::Separator();
 
 							ImGui::PopStyleColor();
 						}

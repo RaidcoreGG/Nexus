@@ -79,21 +79,21 @@ namespace Multibox
 {
 	void ShareArchive()
 	{
-		Log(CH_CORE, "Multibox::ShareArchive() not implemented.");
+		LogCritical(CH_CORE, "Multibox::ShareArchive() not implemented.");
 		return;
 	}
 
 	void ShareLocal()
 	{
 
-		Log(CH_CORE, "Multibox::ShareLocal() not implemented.");
+		LogCritical(CH_CORE, "Multibox::ShareLocal() not implemented.");
 		return;
 	}
 
 	void KillMutex()
 	{
 		bool wasClosed = false;
-		Log(CH_CORE, "Attempting to destroy \"AN-Mutex-Window-Guild Wars 2\".");
+
 		auto start_time = std::chrono::high_resolution_clock::now();
 
 		ULONG handleNameSize = 2048;
@@ -123,11 +123,11 @@ namespace Multibox
 		if (wasClosed)
 		{
 			State::MultiboxState |= EMultiboxState::MUTEX_CLOSED;
-			Log(CH_CORE, "Destroyed \"AN-Mutex-Window-Guild Wars 2\" in %ums.", time / std::chrono::milliseconds(1));
+			LogInfo(CH_CORE, "Destroyed \"AN-Mutex-Window-Guild Wars 2\" in %ums.", time / std::chrono::milliseconds(1));
 		}
 		else
 		{
-			Log(CH_CORE, "No mutex was closed.");
+			LogWarning(CH_CORE, "No mutex was closed.");
 		}
 	}
 }

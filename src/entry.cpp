@@ -59,21 +59,21 @@ void SelfUpdate()
 
 	if (!result)
 	{
-		LogWarning(CH_UPDATER, "Error fetching %s%s", API_RAIDCORE, "/nexusversion.json");
+		LogWarning(CH_CORE, "Error fetching %s%s", API_RAIDCORE, "/nexusversion.json");
 		return;
 	}
 
 	if (result->status != 200) // not HTTP_OK
 	{
-		LogWarning(CH_UPDATER, "Status %d when fetching %s%s", result->status, API_RAIDCORE, "/nexusversion.json");
+		LogWarning(CH_CORE, "Status %d when fetching %s%s", result->status, API_RAIDCORE, "/nexusversion.json");
 		return;
 	}
 
-	//LogDebug(CH_UPDATER, "Body: %s", result->body.c_str());
+	//LogDebug(CH_CORE, "Body: %s", result->body.c_str());
 	json resVersion = json::parse(result->body);
 	if (resVersion.is_null())
 	{
-		LogWarning(CH_UPDATER, "Error parsing API response.");
+		LogWarning(CH_CORE, "Error parsing API response.");
 		return;
 	}
 
@@ -90,7 +90,7 @@ void SelfUpdate()
 
 	if (anyNull)
 	{
-		LogWarning(CH_UPDATER, "One or more fields in the API response were null.");
+		LogWarning(CH_CORE, "One or more fields in the API response were null.");
 		return;
 	}
 
@@ -98,7 +98,7 @@ void SelfUpdate()
 
 	if (remoteVersion > Version)
 	{
-		LogInfo(CH_UPDATER, "Outdated: API replied with Version %s but installed is Version %s", remoteVersion.ToString().c_str(), Version.ToString().c_str());
+		LogInfo(CH_CORE, "Outdated: API replied with Version %s but installed is Version %s", remoteVersion.ToString().c_str(), Version.ToString().c_str());
 		IsUpdateAvailable = true;
 
 		size_t bytesWritten = 0;
@@ -112,22 +112,22 @@ void SelfUpdate()
 
 		if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
 		{
-			LogWarning(CH_UPDATER, "Error fetching %s%s", API_RAIDCORE, "/d3d11.dll");
+			LogWarning(CH_CORE, "Error fetching %s%s", API_RAIDCORE, "/d3d11.dll");
 			return;
 		}
 
 		std::filesystem::rename(Path::F_HOST_DLL, Path::F_OLD_DLL);
 		std::filesystem::rename(Path::F_UPDATE_DLL, Path::F_HOST_DLL);
 
-		LogInfo(CH_UPDATER, "Successfully updated Nexus. Restart required to take effect.");
+		LogInfo(CH_CORE, "Successfully updated Nexus. Restart required to take effect.");
 	}
 	else if (remoteVersion < Version)
 	{
-		LogInfo(CH_UPDATER, "Installed Build of Nexus is more up-to-date than remote. (Installed: %s) (Remote: %s)", Version.ToString().c_str(), remoteVersion.ToString().c_str());
+		LogInfo(CH_CORE, "Installed Build of Nexus is more up-to-date than remote. (Installed: %s) (Remote: %s)", Version.ToString().c_str(), remoteVersion.ToString().c_str());
 	}
 	else
 	{
-		LogInfo(CH_UPDATER, "Installed Build of Nexus is up-to-date.");
+		LogInfo(CH_CORE, "Installed Build of Nexus is up-to-date.");
 	}
 
 	if (std::filesystem::exists(Path::F_UPDATE_DLL))
@@ -193,9 +193,20 @@ void Initialize()
 		State::Nexus = ENexusState::SHUTDOWN;
 	}
 }
-void Shutdown()
+void Shutdown(unsigned int aReason)
 {
-	LogCritical(CH_CORE, "::Shutdown()");
+	switch (aReason)
+	{
+	case WM_DESTROY:
+		LogCritical(CH_CORE, "::Shutdown() | Reason: WM_DESTROY");
+		break;
+	case WM_CLOSE:
+		LogCritical(CH_CORE, "::Shutdown() | Reason: WM_CLOSE");
+		break;
+	case WM_QUIT:
+		LogCritical(CH_CORE, "::Shutdown() | Reason: WM_QUIT");
+		break;
+	}
 
 	if (State::Nexus < ENexusState::SHUTTING_DOWN)
 	{
@@ -256,7 +267,7 @@ LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	if (uMsg == WM_DESTROY || uMsg == WM_QUIT || uMsg == WM_CLOSE)
 	{
-		::Shutdown();
+		::Shutdown(uMsg);
 	}
 
 	return CallWindowProcA(Hooks::GW2_WndProc, hWnd, uMsg, wParam, lParam);
@@ -436,7 +447,7 @@ HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE Driv
 
 	static decltype(&D3D11CreateDevice) func;
 	static const char* func_name = "D3D11CreateDevice";
-	Log(CH_CORE, func_name);
+	//Log(CH_CORE, func_name);
 
 	if (State::Directx >= EDxState::LOADED)
 	{
@@ -469,7 +480,7 @@ HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIV
 
 	static decltype(&D3D11CreateDeviceAndSwapChain) func;
 	static const char* func_name = "D3D11CreateDeviceAndSwapChain";
-	Log(CH_CORE, func_name);
+	//Log(CH_CORE, func_name);
 
 	if (State::Directx >= EDxState::LOADED)
 	{
@@ -502,7 +513,7 @@ HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pA
 
 	static decltype(&D3D11CoreCreateDevice) func;
 	static const char* func_name = "D3D11CoreCreateDevice";
-	Log(CH_CORE, func_name);
+	//Log(CH_CORE, func_name);
 
 	if (State::Directx >= EDxState::LOADED)
 	{
@@ -535,7 +546,7 @@ HRESULT __stdcall D3D11CoreCreateLayeredDevice(const void* unknown0, DWORD unkno
 
 	static decltype(&D3D11CoreCreateLayeredDevice) func;
 	static const char* func_name = "D3D11CoreCreateLayeredDevice";
-	Log(CH_CORE, func_name);
+	//Log(CH_CORE, func_name);
 
 	if (State::Directx >= EDxState::LOADED)
 	{
@@ -568,7 +579,7 @@ SIZE_T	__stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unkno
 
 	static decltype(&D3D11CoreGetLayeredDeviceSize) func;
 	static const char* func_name = "D3D11CoreGetLayeredDeviceSize";
-	Log(CH_CORE, func_name);
+	//Log(CH_CORE, func_name);
 
 	if (State::Directx >= EDxState::LOADED)
 	{
@@ -601,7 +612,7 @@ HRESULT __stdcall D3D11CoreRegisterLayers(const void* unknown0, DWORD unknown1)
 
 	static decltype(&D3D11CoreRegisterLayers) func;
 	static const char* func_name = "D3D11CoreRegisterLayers";
-	Log(CH_CORE, func_name);
+	//Log(CH_CORE, func_name);
 
 	if (State::Directx >= EDxState::LOADED)
 	{

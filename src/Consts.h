@@ -17,8 +17,6 @@ extern const char* CH_QUICKACCESS;
 extern const char* CH_LOADER;
 extern const char* CH_DATALINK;
 extern const char* CH_KEYBINDS;
-extern const char* CH_GUI;
-extern const char* CH_UPDATER;
 
 /* Keybinds */
 extern const char* KB_MENU;

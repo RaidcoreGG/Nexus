@@ -686,10 +686,6 @@ namespace GUI
 				Settings::Settings[OPT_CLOSEESCAPE] = true;
 			}
 		}
-		else
-		{
-			LogDebug("meme", "settings initially null");
-		}
 
 		if (!HasAcceptedEULA)
 		{

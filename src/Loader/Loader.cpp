@@ -33,7 +33,7 @@ using json = nlohmann::json;
 
 #include "httpslib.h"
 
-#define LOADER_WAITTIME 3
+#define LOADER_WAITTIME 1
 
 namespace Loader
 {
@@ -79,7 +79,7 @@ namespace Loader
 				return;
 			}
 
-			ProcessChanges(); // Invoke once because addon dir doesn't change on init
+			NotifyChanges(); // Invoke once because addon dir doesn't change on init
 		}
 	}
 	void Shutdown()
@@ -105,7 +105,7 @@ namespace Loader
 					UnloadAddon(Addons.begin()->first);
 					if (Addons.begin()->second->Module)
 					{
-						Log(CH_LOADER, "Despite being unloaded \"%s\" still has an HMODULE defined, calling FreeLibrary().", Addons.begin()->first.string().c_str());
+						LogWarning(CH_LOADER, "Despite being unloaded \"%s\" still has an HMODULE defined, calling FreeLibrary().", Addons.begin()->first.string().c_str());
 						FreeLibrary(Addons.begin()->second->Module);
 					}
 					Addons.erase(Addons.begin());
@@ -182,8 +182,6 @@ namespace Loader
 
 	void NotifyChanges()
 	{
-		LogDebug(CH_LOADER, "NotifyChanges();");
-
 		if (DirectoryChangeCountdown == 0)
 		{
 			LoaderThread = std::thread(AwaitChanges);
@@ -194,7 +192,6 @@ namespace Loader
 	}
 	void AwaitChanges()
 	{
-		LogDebug(CH_LOADER, "AwaitChanges();");
 		while (DirectoryChangeCountdown > 0)
 		{
 			Sleep(1000);
@@ -205,7 +202,6 @@ namespace Loader
 	}
 	void ProcessChanges()
 	{
-		LogDebug(CH_LOADER, "ProcessChanges();");
 		const std::lock_guard<std::mutex> lock(Mutex);
 
 		// check all tracked addons
@@ -225,7 +221,9 @@ namespace Loader
 			// if addon changed
 			if (it.second->MD5.empty() || it.second->MD5 != md5)
 			{
-				QueueAddon(ELoaderAction::Reload, it.first);
+				//QueueAddon(ELoaderAction::Reload, it.first);
+				UnloadAddon(it.first);
+				LoadAddon(it.first);
 			}
 		}
 
@@ -245,12 +243,15 @@ namespace Loader
 
 			if (path.extension() == dll)
 			{
-				QueueAddon(ELoaderAction::Load, path);
+				//QueueAddon(ELoaderAction::Load, path);
+				LoadAddon(path);
 			}
 			else if (path.extension() == dllUpdate)
 			{
 				path = path.replace_extension("");
-				QueueAddon(ELoaderAction::Reload, path);
+				//QueueAddon(ELoaderAction::Reload, path);
+				UnloadAddon(path);
+				LoadAddon(path);
 			}
 		}
 	}
@@ -314,7 +315,7 @@ namespace Loader
 		/* load lib failed */
 		if (!addon->Module)
 		{
-			LogDebug(CH_LOADER, "Failed LoadLibrary on \"%s\". Incompatible. Last Error: %u", strPath, GetLastError());
+			LogWarning(CH_LOADER, "Failed LoadLibrary on \"%s\". Incompatible. Last Error: %u", strPath, GetLastError());
 			addon->State = EAddonState::Incompatible;
 			return;
 		}
@@ -322,7 +323,7 @@ namespace Loader
 		/* doesn't have GetAddonDef */
 		if (FindFunction(addon->Module, &getAddonDef, "GetAddonDef") == false)
 		{
-			LogDebug(CH_LOADER, "\"%s\" is not a Nexus-compatible library. Incompatible.", strPath);
+			LogWarning(CH_LOADER, "\"%s\" is not a Nexus-compatible library. Incompatible.", strPath);
 			addon->State = EAddonState::Incompatible;
 			FreeLibrary(addon->Module);
 			addon->Module = nullptr;
@@ -333,7 +334,7 @@ namespace Loader
 
 		if (tmpDefs == nullptr)
 		{
-			LogDebug(CH_LOADER, "\"%s\" is Nexus-compatible but returned a nullptr. Incompatible I guess?", strPath);
+			LogWarning(CH_LOADER, "\"%s\" is Nexus-compatible but returned a nullptr. Incompatible.", strPath);
 			addon->State = EAddonState::Incompatible;
 			FreeLibrary(addon->Module);
 			addon->Module = nullptr;
@@ -545,7 +546,7 @@ namespace Loader
 		}
 		catch (std::filesystem::filesystem_error fErr)
 		{
-			Log(CH_LOADER, "%s", fErr.what());
+			LogDebug(CH_LOADER, "%s", fErr.what());
 			return;
 		}
 
@@ -601,7 +602,7 @@ namespace Loader
 			baseUrl = API_GITHUB;
 			if (addon->Definitions->UpdateLink == nullptr)
 			{
-				LogWarning(CH_UPDATER, "Addon %s declares EUpdateProvider::GitHub but has no UpdateLink set.", addon->Definitions->Name);
+				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::GitHub but has no UpdateLink set.", addon->Definitions->Name);
 				return false;
 			}
 
@@ -612,7 +613,7 @@ namespace Loader
 		case EUpdateProvider::Direct:
 			if (addon->Definitions->UpdateLink == nullptr)
 			{
-				LogWarning(CH_UPDATER, "Addon %s declares EUpdateProvider::Direct but has no UpdateLink set.", addon->Definitions->Name);
+				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::Direct but has no UpdateLink set.", addon->Definitions->Name);
 				return false;
 			}
 
@@ -636,13 +637,13 @@ namespace Loader
 
 			if (!result)
 			{
-				LogWarning(CH_UPDATER, "Error fetching %s%s", baseUrl.c_str(), endpoint.c_str());
+				LogWarning(CH_LOADER, "Error fetching %s%s", baseUrl.c_str(), endpoint.c_str());
 				return false;
 			}
 
 			if (result->status != 200) // not HTTP_OK
 			{
-				LogWarning(CH_UPDATER, "Status %d when fetching %s%s", result->status, baseUrl.c_str(), endpoint.c_str());
+				LogWarning(CH_LOADER, "Status %d when fetching %s%s", result->status, baseUrl.c_str(), endpoint.c_str());
 				return false;
 			}
 
@@ -653,13 +654,13 @@ namespace Loader
 			}
 			catch (json::parse_error& ex)
 			{
-				LogWarning(CH_UPDATER, "Response from %s%s could not be parsed. Error: %s", baseUrl.c_str(), endpoint.c_str(), ex.what());
+				LogWarning(CH_LOADER, "Response from %s%s could not be parsed. Error: %s", baseUrl.c_str(), endpoint.c_str(), ex.what());
 				return false;
 			}
 
 			if (resVersion.is_null())
 			{
-				LogWarning(CH_UPDATER, "Error parsing API response.");
+				LogWarning(CH_LOADER, "Error parsing API response.");
 				return false;
 			}
 
@@ -676,13 +677,13 @@ namespace Loader
 
 			if (anyNull)
 			{
-				LogWarning(CH_UPDATER, "One or more fields in the API response were null.");
+				LogWarning(CH_LOADER, "One or more fields in the API response were null.");
 				return false;
 			}
 
 			if (remoteVersion > addon->Definitions->Version)
 			{
-				LogInfo(CH_UPDATER, "%s is outdated: API replied with Version %s but installed is Version %s", addon->Definitions->Name, remoteVersion.ToString().c_str(), addon->Definitions->Version.ToString().c_str());
+				LogInfo(CH_LOADER, "%s is outdated: API replied with Version %s but installed is Version %s", addon->Definitions->Name, remoteVersion.ToString().c_str(), addon->Definitions->Version.ToString().c_str());
 
 				std::string endpointDownload = endpoint + "/download"; // e.g. api.raidcore.gg/addons/17/download
 
@@ -697,11 +698,11 @@ namespace Loader
 
 				if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
 				{
-					LogWarning(CH_UPDATER, "Error fetching %s%s", baseUrl.c_str(), endpointDownload.c_str());
+					LogWarning(CH_LOADER, "Error fetching %s%s", baseUrl.c_str(), endpointDownload.c_str());
 					return false;
 				}
 
-				LogInfo(CH_UPDATER, "Successfully updated %s.", addon->Definitions->Name);
+				LogInfo(CH_LOADER, "Successfully updated %s.", addon->Definitions->Name);
 				wasUpdated = true;
 			}
 		}
@@ -711,13 +712,13 @@ namespace Loader
 
 			if (!result)
 			{
-				LogWarning(CH_UPDATER, "Error fetching %s%s", baseUrl.c_str(), endpoint.c_str());
+				LogWarning(CH_LOADER, "Error fetching %s%s", baseUrl.c_str(), endpoint.c_str());
 				return false;
 			}
 
 			if (result->status != 200) // not HTTP_OK
 			{
-				LogWarning(CH_UPDATER, "Status %d when fetching %s%s", result->status, baseUrl.c_str(), endpoint.c_str());
+				LogWarning(CH_LOADER, "Status %d when fetching %s%s", result->status, baseUrl.c_str(), endpoint.c_str());
 				return false;
 			}
 
@@ -728,19 +729,19 @@ namespace Loader
 			}
 			catch (json::parse_error& ex)
 			{
-				LogWarning(CH_UPDATER, "Response from %s%s could not be parsed. Error: %s", baseUrl.c_str(), endpoint.c_str(), ex.what());
+				LogWarning(CH_LOADER, "Response from %s%s could not be parsed. Error: %s", baseUrl.c_str(), endpoint.c_str(), ex.what());
 				return false;
 			}
 
 			if (response.is_null())
 			{
-				LogWarning(CH_UPDATER, "Error parsing API response.");
+				LogWarning(CH_LOADER, "Error parsing API response.");
 				return false;
 			}
 
 			if (response["tag_name"].is_null())
 			{
-				LogWarning(CH_UPDATER, "No tag_name set on %s%s", baseUrl.c_str(), endpoint.c_str());
+				LogWarning(CH_LOADER, "No tag_name set on %s%s", baseUrl.c_str(), endpoint.c_str());
 				return false;
 			}
 
@@ -748,7 +749,7 @@ namespace Loader
 
 			if (!std::regex_match(tagName, std::regex("v?\\d+[.]\\d+[.]\\d+[.]\\d+")))
 			{
-				LogWarning(CH_UPDATER, "tag_name on %s%s does not match convention e.g. \"1.0.0.1\" or \"v1.0.0.1\". Cannot check against version.", baseUrl.c_str(), endpoint.c_str());
+				LogWarning(CH_LOADER, "tag_name on %s%s does not match convention e.g. \"1.0.0.1\" or \"v1.0.0.1\". Cannot check against version.", baseUrl.c_str(), endpoint.c_str());
 				return false;
 			}
 
@@ -776,13 +777,13 @@ namespace Loader
 
 			if (remoteVersion > addon->Definitions->Version)
 			{
-				LogInfo(CH_UPDATER, "%s is outdated: API replied with Version %s but installed is Version %s", addon->Definitions->Name, remoteVersion.ToString().c_str(), addon->Definitions->Version.ToString().c_str());
+				LogInfo(CH_LOADER, "%s is outdated: API replied with Version %s but installed is Version %s", addon->Definitions->Name, remoteVersion.ToString().c_str(), addon->Definitions->Version.ToString().c_str());
 
 				std::string endpointDownload; // e.g. github.com/RaidcoreGG/GW2-CommandersToolkit/releases/download/20220918-135925/squadmanager.dll
 
 				if (response["assets"].is_null())
 				{
-					LogWarning(CH_UPDATER, "Release has no assets. Cannot check against version. (%s%s)", baseUrl.c_str(), endpoint.c_str());
+					LogWarning(CH_LOADER, "Release has no assets. Cannot check against version. (%s%s)", baseUrl.c_str(), endpoint.c_str());
 					return false;
 				}
 
@@ -819,11 +820,11 @@ namespace Loader
 
 				if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
 				{
-					LogWarning(CH_UPDATER, "Error fetching %s%s", downloadBaseUrl.c_str(), endpointDownload.c_str());
+					LogWarning(CH_LOADER, "Error fetching %s%s", downloadBaseUrl.c_str(), endpointDownload.c_str());
 					return false;
 				}
 
-				LogInfo(CH_UPDATER, "Successfully updated %s.", addon->Definitions->Name);
+				LogInfo(CH_LOADER, "Successfully updated %s.", addon->Definitions->Name);
 				wasUpdated = true;
 			}
 		}
@@ -880,7 +881,7 @@ namespace Loader
 
 			if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
 			{
-				LogWarning(CH_UPDATER, "Error fetching %s%s", baseUrl.c_str(), endpoint.c_str());
+				LogWarning(CH_LOADER, "Error fetching %s%s", baseUrl.c_str(), endpoint.c_str());
 				return false;
 			}
 

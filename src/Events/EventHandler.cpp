@@ -15,8 +15,6 @@ namespace Events
 	{
 		std::string str = aIdentifier;
 
-		//Log(CH_EVENTS, str.c_str());
-
 		Events::Mutex.lock();
 		{
 			for (EVENT_CONSUME callback : Registry[str])
