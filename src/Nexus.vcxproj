@@ -64,7 +64,6 @@
     <ClCompile Include="State.cpp" />
     <ClCompile Include="Textures\TextureLoader.cpp" />
     <ClCompile Include="types.cpp" />
-    <ClCompile Include="Updater\Updater.cpp" />
     <ClCompile Include="WndProc\WndProcHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -302,7 +301,6 @@
     <ClInclude Include="Textures\Texture.h" />
     <ClInclude Include="Textures\TextureLoader.h" />
     <ClInclude Include="types.h" />
-    <ClInclude Include="Updater\Updater.h" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="WndProc\FuncDefs.h" />
     <ClInclude Include="WndProc\WndProcHandler.h" />

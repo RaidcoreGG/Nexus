@@ -19,7 +19,6 @@ namespace LogHandler
 	std::vector<LogEntry> LogEntries;
 	std::vector<std::string> Channels;
 
-
 	void Initialize()
 	{
 		/* setup default loggers */

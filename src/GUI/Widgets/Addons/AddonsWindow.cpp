@@ -72,8 +72,8 @@ namespace GUI
 					ImGui::SameLine();
 					if (ImGui::Button("Check for Updates", ImVec2(ImGui::CalcTextSize("Check for Updates").x + 16.0f, height)))
 					{
-						LogDebug(CH_GUI, "Loader::CheckForUpdates() called.");
-						Loader::CheckForUpdates();
+						LogDebug(CH_GUI, "Loader::UpdateAll() called.");
+						Loader::UpdateAll();
 					}
 					
 					ImGui::EndTabItem();

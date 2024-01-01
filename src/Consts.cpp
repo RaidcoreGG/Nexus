@@ -52,3 +52,8 @@ const char* DL_NEXUS_LINK				= "DL_NEXUS_LINK";
 
 /* Loader */
 const UINT WM_ADDONDIRUPDATE			= WM_USER + 101;
+
+/* API */
+extern const char* API_RAIDCORE			= "https://api.raidcore.gg";
+extern const char* API_GITHUB			= "https://api.github.com";
+extern const char* API_GW2				= "https://api.guildwars2.com";

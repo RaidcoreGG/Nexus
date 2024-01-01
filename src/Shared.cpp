@@ -1,11 +1,13 @@
 #include "Shared.h"
 
+#include "Version.h"
+
 HMODULE						NexusHandle			= nullptr;
 HMODULE						GameHandle			= nullptr;
 HMODULE						D3D11Handle			= nullptr;
 HMODULE						D3D11SystemHandle	= nullptr;
 
-AddonVersion				Version				= {};
+AddonVersion				Version				= { V_MAJOR, V_MINOR, V_BUILD, V_REVISION };
 std::vector<std::string>	Parameters			= {};
 
 LinkedMem*					MumbleLink			= nullptr;

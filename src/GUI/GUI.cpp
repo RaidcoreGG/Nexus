@@ -89,7 +89,11 @@ namespace GUI
 
 			ImGui_ImplDX11_Shutdown();
 			ImGui_ImplWin32_Shutdown();
-			if (Renderer::RenderTargetView) { Renderer::RenderTargetView->Release(); Renderer::RenderTargetView = NULL; }
+			if (Renderer::RenderTargetView)
+			{
+				Renderer::RenderTargetView->Release();
+				Renderer::RenderTargetView = 0;
+			}
 		}
 	}
 
@@ -233,11 +237,6 @@ namespace GUI
 
 	void Render()
 	{
-		if (State::Nexus == ENexusState::READY && !State::IsImGuiInitialized)
-		{
-			Initialize();
-		}
-
 		/* pre-render callbacks */
 		GUI::Mutex.lock();
 		{

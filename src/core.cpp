@@ -25,7 +25,7 @@ bool FindFunction(HMODULE aModule, LPVOID aFunction, LPCSTR aName)
 	return (*fp != 0);
 }
 
-std::string WStrToStr(std::wstring& aWstring)
+std::string WStrToStr(const std::wstring& aWstring)
 {
 	if (aWstring.empty())
 	{
@@ -37,8 +37,7 @@ std::string WStrToStr(std::wstring& aWstring)
 	WideCharToMultiByte(CP_ACP, 0, &aWstring[0], (int)aWstring.length(), &str[0], sz, 0, 0);
 	return str;
 }
-
-std::wstring StrToWStr(std::string& aString)
+std::wstring StrToWStr(const std::string& aString)
 {
 	if (aString.empty())
 	{
@@ -87,7 +86,6 @@ std::vector<unsigned char> MD5(const unsigned char* data, size_t sz)
 
 	return md;
 }
-
 std::vector<unsigned char> MD5FromFile(const std::filesystem::path& aPath)
 {
 	std::ifstream file(aPath, std::ios::binary);
@@ -104,4 +102,51 @@ std::vector<unsigned char> MD5FromFile(const std::filesystem::path& aPath)
 	file.close();
 
 	return md5;
+}
+
+std::string GetBaseURL(const std::string& aUrl)
+{
+	size_t httpIdx = aUrl.find("http://");
+	size_t httpsIdx = aUrl.find("https://");
+
+	size_t off = 0;
+	if (httpIdx != std::string::npos)
+	{
+		off = httpIdx + 7; // 7 is length of "http://"
+	}
+	if (httpsIdx != std::string::npos)
+	{
+		off = httpsIdx + 8; // 8 is length of "https://"
+	}
+
+	size_t idx = aUrl.find('/', off);
+	if (idx == std::string::npos)
+	{
+		return aUrl;
+	}
+
+	return aUrl.substr(0, idx);
+}
+std::string GetEndpoint(const std::string& aUrl)
+{
+	size_t httpIdx = aUrl.find("http://");
+	size_t httpsIdx = aUrl.find("https://");
+
+	size_t off = 0;
+	if (httpIdx != std::string::npos)
+	{
+		off = httpIdx + 7; // 7 is length of "http://"
+	}
+	if (httpsIdx != std::string::npos)
+	{
+		off = httpsIdx + 8; // 8 is length of "https://"
+	}
+
+	size_t idx = aUrl.find('/', off);
+	if (idx == std::string::npos)
+	{
+		return aUrl;
+	}
+
+	return aUrl.substr(idx);
 }

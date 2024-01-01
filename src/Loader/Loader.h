@@ -19,6 +19,9 @@ namespace Loader
 	extern std::unordered_map<std::filesystem::path, Addon*> Addons;					/* Addons and their corresponding paths */
 	extern std::map<int, AddonAPI*> ApiDefs;											/* Addon API definitions, created on demand */
 
+	extern int DirectoryChangeCountdown;
+	extern std::thread LoaderThread;
+
 	extern PIDLIST_ABSOLUTE FSItemList;
 	extern ULONG FSNotifierID;
 
@@ -35,12 +38,15 @@ namespace Loader
 	/* Pushes an item to the queue. */
 	void QueueAddon(ELoaderAction aAction, const std::filesystem::path& aPath);
 
-	void DetectAddonChanges();
+	/* Notifies that something in the addon directory changed. */
+	void NotifyChanges();
+	/* Stalls until no more new notification comes in, then processes the changes. */
+	void AwaitChanges();
+	/* Detects and processes any changes to addons. */
+	void ProcessChanges();
 
-	/* Swaps addon.dll with addon.dll.update. */
-	void PerformUpdateSwap(const std::filesystem::path& aPath);
 	/* Updates all addons if available. */
-	void CheckForUpdates();
+	void UpdateAll();
 
 	/* Loads an addon. */
 	void LoadAddon(const std::filesystem::path& aPath);
@@ -48,8 +54,14 @@ namespace Loader
 	void UnloadAddon(const std::filesystem::path& aPath);
 	/* Unloads, then uninstalls an addon. */
 	void UninstallAddon(const std::filesystem::path& aPath);
-	
+	/* Swaps addon.dll with addon.dll.update. */
+	void UpdateSwapAddon(const std::filesystem::path& aPath);
+	/* Updates an addon. */
+	bool UpdateAddon(const std::filesystem::path& aPath);
+
+	/* Gets or creates a pointer to the provided version, or nullptr if no such version exists. */
 	AddonAPI* GetAddonAPI(int aVersion);
+	/* Returns the size of the provided version. */
 	long GetAddonAPISize(int aVersion);
 }
 

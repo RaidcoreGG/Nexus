@@ -56,4 +56,9 @@ extern const char* DL_NEXUS_LINK;
 /* Loader */
 extern const UINT WM_ADDONDIRUPDATE;
 
+/* API */
+extern const char* API_RAIDCORE;
+extern const char* API_GITHUB;
+extern const char* API_GW2;
+
 #endif
