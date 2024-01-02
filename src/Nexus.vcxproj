@@ -17,7 +17,7 @@
     <ClCompile Include="core.cpp" />
     <ClCompile Include="CrashHandler.cpp" />
     <ClCompile Include="DataLink\DataLink.cpp" />
-    <ClCompile Include="entry.cpp" />
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="Events\EventHandler.cpp" />
     <ClCompile Include="GUI\GUI.cpp" />
     <ClCompile Include="GUI\Widgets\About\AboutBox.cpp" />
@@ -58,6 +58,7 @@
     <ClCompile Include="Mumble\Mumble.cpp" />
     <ClCompile Include="openssl\applink.c" />
     <ClCompile Include="Paths.cpp" />
+    <ClCompile Include="Proxy.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Settings\Settings.cpp" />
     <ClCompile Include="Shared.cpp" />
@@ -125,6 +126,7 @@
     <ClInclude Include="Loader\NexusLinkData.h" />
     <ClInclude Include="Localization\Localization.h" />
     <ClInclude Include="Logging\FuncDefs.h" />
+    <ClInclude Include="Main.h" />
     <ClInclude Include="Multibox\Multibox.h" />
     <ClInclude Include="Mumble\Compass.h" />
     <ClInclude Include="Mumble\Context.h" />
@@ -290,6 +292,7 @@
     <ClInclude Include="minhook\mh_trampoline.h" />
     <ClInclude Include="Mumble\Mumble.h" />
     <ClInclude Include="Paths\FuncDefs.h" />
+    <ClInclude Include="Proxy.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Settings\Settings.h" />

@@ -117,7 +117,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="entry.cpp">
+    <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="imgui\imgui_widgets.cpp">
@@ -278,6 +278,9 @@
     </ClCompile>
     <ClCompile Include="Multibox\Multibox.cpp">
       <Filter>Multibox</Filter>
+    </ClCompile>
+    <ClCompile Include="Proxy.cpp">
+      <Filter>_GLOBAL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -994,6 +997,12 @@
     </ClInclude>
     <ClInclude Include="Multibox\Multibox.h">
       <Filter>Multibox</Filter>
+    </ClInclude>
+    <ClInclude Include="Proxy.h">
+      <Filter>_GLOBAL</Filter>
+    </ClInclude>
+    <ClInclude Include="Main.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
