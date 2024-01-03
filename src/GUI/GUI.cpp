@@ -719,7 +719,7 @@ namespace GUI
 		}
 		GUI::Mutex.unlock();
 	}
-	void Unregister(GUI_RENDER aRenderCallback)
+	void Deregister(GUI_RENDER aRenderCallback)
 	{
 		GUI::Mutex.lock();
 		{

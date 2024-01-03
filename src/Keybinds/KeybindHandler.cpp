@@ -205,7 +205,7 @@ namespace Keybinds
 
 		Save();
 	}
-	void Unregister(const char* aIdentifier)
+	void Deregister(const char* aIdentifier)
 	{
 		std::string str = aIdentifier;
 

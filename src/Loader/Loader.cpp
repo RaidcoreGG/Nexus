@@ -184,11 +184,15 @@ namespace Loader
 	{
 		if (DirectoryChangeCountdown == 0)
 		{
+			DirectoryChangeCountdown = LOADER_WAITTIME;
+
 			LoaderThread = std::thread(AwaitChanges);
 			LoaderThread.detach();
 		}
-
-		DirectoryChangeCountdown = LOADER_WAITTIME;
+		else
+		{
+			DirectoryChangeCountdown = LOADER_WAITTIME;
+		}
 	}
 	void AwaitChanges()
 	{
@@ -211,8 +215,7 @@ namespace Loader
 			if (!std::filesystem::exists(it.first))
 			{
 				LogDebug(CH_LOADER, "%s no longer exists. Attempting to unload.", it.first.string().c_str());
-				UnloadAddon(it.first);
-				Addons.erase(it.first); // sanity check
+				QueueAddon(ELoaderAction::Unload, it.first);
 				continue;
 			}
 
@@ -221,20 +224,16 @@ namespace Loader
 			// if addon changed
 			if (it.second->MD5.empty() || it.second->MD5 != md5)
 			{
-				//QueueAddon(ELoaderAction::Reload, it.first);
-				UnloadAddon(it.first);
-				LoadAddon(it.first);
+				QueueAddon(ELoaderAction::Reload, it.first);
 			}
 		}
 
-		// check all files in the directory
+		// check all other files in the directory
 		for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Path::D_GW2_ADDONS))
 		{
 			std::filesystem::path path = entry.path();
 
-			// if not a file ||
-			// already tracked
-			// -> skip
+			// if (not a file || already tracked) -> skip
 			if (std::filesystem::is_directory(path) ||
 				Addons.find(path) != Addons.end())
 			{
@@ -243,15 +242,12 @@ namespace Loader
 
 			if (path.extension() == dll)
 			{
-				//QueueAddon(ELoaderAction::Load, path);
-				LoadAddon(path);
+				QueueAddon(ELoaderAction::Load, path);
 			}
 			else if (path.extension() == dllUpdate)
 			{
 				path = path.replace_extension("");
-				//QueueAddon(ELoaderAction::Reload, path);
-				UnloadAddon(path);
-				LoadAddon(path);
+				QueueAddon(ELoaderAction::Reload, path);
 			}
 		}
 	}
@@ -264,7 +260,7 @@ namespace Loader
 			{
 				if (!addon->Definitions) { continue; }
 
-				if (UpdateAddon(path))
+				if (UpdateAddon(path, addon->Definitions))
 				{
 					bool wasLoaded = false;
 					if (addon->State == EAddonState::Loaded)
@@ -286,6 +282,8 @@ namespace Loader
 
 	void LoadAddon(const std::filesystem::path& aPath)
 	{
+		UpdateSwapAddon(aPath);
+
 		std::string path = aPath.string();
 		const char* strPath = path.c_str();
 
@@ -341,7 +339,7 @@ namespace Loader
 			return;
 		}
 
-		if (addon->State != EAddonState::Reload && UpdateAddon(aPath))
+		if (addon->State != EAddonState::Reload && UpdateAddon(aPath, tmpDefs))
 		{
 			addon->State = EAddonState::Reload;
 			FreeLibrary(addon->Module);
@@ -428,35 +426,38 @@ namespace Loader
 		std::string path = aPath.string();
 		const char* strPath = path.c_str();
 
-		Addon* addon;
+		auto it = Addons.find(aPath);
 
-		if (Addons.find(aPath) != Addons.end())
-		{
-			addon = Addons[aPath];
-
-			if (!addon->Module)
-			{
-				switch (addon->State)
-				{
-				case EAddonState::NotLoaded:
-					LogWarning(CH_LOADER, "Cancelled unload of \"%s\". Already unloaded.", strPath);
-					return;
-				case EAddonState::NotLoadedDuplicate:
-					LogWarning(CH_LOADER, "Cancelled unload of \"%s\". EAddonState::NotLoadedDuplicate.", strPath);
-					return;
-
-				case EAddonState::Incompatible:
-					LogWarning(CH_LOADER, "Cancelled unload of \"%s\". EAddonState::Incompatible.", strPath);
-					return;
-				case EAddonState::IncompatibleAPI:
-					LogWarning(CH_LOADER, "Cancelled unload of \"%s\". EAddonState::IncompatibleAPI.", strPath);
-					return;
-				}
-			}
-		}
-		else
+		if (it == Addons.end())
 		{
 			return;
+		}
+
+		if (!std::filesystem::exists(aPath))
+		{
+			Addons.erase(aPath);
+		}
+
+		Addon* addon = (*it).second;
+
+		if (!addon->Module)
+		{
+			switch (addon->State)
+			{
+			case EAddonState::NotLoaded:
+				LogWarning(CH_LOADER, "Cancelled unload of \"%s\". Already unloaded.", strPath);
+				return;
+			case EAddonState::NotLoadedDuplicate:
+				LogWarning(CH_LOADER, "Cancelled unload of \"%s\". EAddonState::NotLoadedDuplicate.", strPath);
+				return;
+
+			case EAddonState::Incompatible:
+				LogWarning(CH_LOADER, "Cancelled unload of \"%s\". EAddonState::Incompatible.", strPath);
+				return;
+			case EAddonState::IncompatibleAPI:
+				LogWarning(CH_LOADER, "Cancelled unload of \"%s\". EAddonState::IncompatibleAPI.", strPath);
+				return;
+			}
 		}
 
 		if (addon->Definitions)
@@ -515,11 +516,6 @@ namespace Loader
 
 		addon->State = EAddonState::NotLoaded;
 
-		if (!std::filesystem::exists(aPath))
-		{
-			Addons.erase(aPath);
-		}
-
 		LogInfo(CH_LOADER, "Unloaded addon: %s", strPath);
 	}
 	void UninstallAddon(const std::filesystem::path& aPath)
@@ -539,31 +535,39 @@ namespace Loader
 		std::filesystem::path pathOld = aPath.string() + ".old";
 		std::filesystem::path pathUpdate = aPath.string() + ".update";
 
-		try
+		if (std::filesystem::exists(pathUpdate))
 		{
-			std::filesystem::rename(aPath, pathOld);
-			std::filesystem::rename(pathUpdate, aPath);
-		}
-		catch (std::filesystem::filesystem_error fErr)
-		{
-			LogDebug(CH_LOADER, "%s", fErr.what());
-			return;
-		}
+			try
+			{
+				if (std::filesystem::exists(pathOld))
+				{
+					std::filesystem::remove(pathOld);
+				}
 
-		LogInfo(CH_LOADER, "Successfully updated %s.", aPath.string().c_str());
+				std::filesystem::rename(aPath, pathOld);
+				std::filesystem::rename(pathUpdate, aPath);
+			}
+			catch (std::filesystem::filesystem_error fErr)
+			{
+				LogDebug(CH_LOADER, "%s", fErr.what());
+				return;
+			}
+		}
 	}
-	bool UpdateAddon(const std::filesystem::path& aPath)
+	bool UpdateAddon(const std::filesystem::path& aPath, AddonDefinition* aDefinitions)
 	{
 		/* setup paths */
 		std::filesystem::path pathOld = aPath.string() + ".old";
 		std::filesystem::path pathUpdate = aPath.string() + ".update";
 
-		if (Addons.find(aPath) == Addons.end())
+		auto it = Addons.find(aPath);
+
+		if (it == Addons.end())
 		{
 			return false;
 		}
 
-		Addon* addon = Addons[aPath];
+		Addon* addon = (*it).second;
 
 		/* cleanup old files */
 		if (std::filesystem::exists(pathOld)) { std::filesystem::remove(pathOld); }
@@ -577,7 +581,7 @@ namespace Loader
 			std::filesystem::remove(pathUpdate);
 		}
 
-		if (!addon->Definitions)
+		if (!aDefinitions)
 		{
 			return false;
 		}
@@ -587,38 +591,44 @@ namespace Loader
 		std::string baseUrl;
 		std::string endpoint;
 
+		// override provider if none set, but a Raidcore ID is used
+		if (aDefinitions->Provider == EUpdateProvider::None && aDefinitions->Signature > 0)
+		{
+			aDefinitions->Provider = EUpdateProvider::Raidcore;
+		}
+
 		/* setup baseUrl and endpoint */
-		switch (addon->Definitions->Provider)
+		switch (aDefinitions->Provider)
 		{
 		case EUpdateProvider::None: return false;
 
 		case EUpdateProvider::Raidcore:
 			baseUrl = API_RAIDCORE;
-			endpoint = "/addons/" + std::to_string(addon->Definitions->Signature);
+			endpoint = "/addons/" + std::to_string(aDefinitions->Signature);
 
 			break;
 
 		case EUpdateProvider::GitHub:
 			baseUrl = API_GITHUB;
-			if (addon->Definitions->UpdateLink == nullptr)
+			if (aDefinitions->UpdateLink == nullptr)
 			{
-				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::GitHub but has no UpdateLink set.", addon->Definitions->Name);
+				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::GitHub but has no UpdateLink set.", aDefinitions->Name);
 				return false;
 			}
 
-			endpoint = "/repos" + GetEndpoint(addon->Definitions->UpdateLink) + "/releases/latest";
+			endpoint = "/repos" + GetEndpoint(aDefinitions->UpdateLink) + "/releases/latest";
 
 			break;
 
 		case EUpdateProvider::Direct:
-			if (addon->Definitions->UpdateLink == nullptr)
+			if (aDefinitions->UpdateLink == nullptr)
 			{
-				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::Direct but has no UpdateLink set.", addon->Definitions->Name);
+				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::Direct but has no UpdateLink set.", aDefinitions->Name);
 				return false;
 			}
 
-			baseUrl = GetBaseURL(addon->Definitions->UpdateLink);
-			endpoint = GetEndpoint(addon->Definitions->UpdateLink);
+			baseUrl = GetBaseURL(aDefinitions->UpdateLink);
+			endpoint = GetEndpoint(aDefinitions->UpdateLink);
 
 			if (baseUrl.empty() || endpoint.empty())
 			{
@@ -631,7 +641,7 @@ namespace Loader
 		/* prepare client request */
 		httplib::Client client(baseUrl);
 
-		if (EUpdateProvider::Raidcore == addon->Definitions->Provider)
+		if (EUpdateProvider::Raidcore == aDefinitions->Provider)
 		{
 			auto result = client.Get(endpoint);
 
@@ -681,9 +691,9 @@ namespace Loader
 				return false;
 			}
 
-			if (remoteVersion > addon->Definitions->Version)
+			if (remoteVersion > aDefinitions->Version)
 			{
-				LogInfo(CH_LOADER, "%s is outdated: API replied with Version %s but installed is Version %s", addon->Definitions->Name, remoteVersion.ToString().c_str(), addon->Definitions->Version.ToString().c_str());
+				LogInfo(CH_LOADER, "%s is outdated: API replied with Version %s but installed is Version %s", aDefinitions->Name, remoteVersion.ToString().c_str(), aDefinitions->Version.ToString().c_str());
 
 				std::string endpointDownload = endpoint + "/download"; // e.g. api.raidcore.gg/addons/17/download
 
@@ -702,11 +712,11 @@ namespace Loader
 					return false;
 				}
 
-				LogInfo(CH_LOADER, "Successfully updated %s.", addon->Definitions->Name);
+				LogInfo(CH_LOADER, "Successfully updated %s.", aDefinitions->Name);
 				wasUpdated = true;
 			}
 		}
-		else if (EUpdateProvider::GitHub == addon->Definitions->Provider)
+		else if (EUpdateProvider::GitHub == aDefinitions->Provider)
 		{
 			auto result = client.Get(endpoint);
 
@@ -775,9 +785,9 @@ namespace Loader
 			}
 			remoteVersion.Revision = static_cast<unsigned short>(std::stoi(tagName));
 
-			if (remoteVersion > addon->Definitions->Version)
+			if (remoteVersion > aDefinitions->Version)
 			{
-				LogInfo(CH_LOADER, "%s is outdated: API replied with Version %s but installed is Version %s", addon->Definitions->Name, remoteVersion.ToString().c_str(), addon->Definitions->Version.ToString().c_str());
+				LogInfo(CH_LOADER, "%s is outdated: API replied with Version %s but installed is Version %s", aDefinitions->Name, remoteVersion.ToString().c_str(), aDefinitions->Version.ToString().c_str());
 
 				std::string endpointDownload; // e.g. github.com/RaidcoreGG/GW2-CommandersToolkit/releases/download/20220918-135925/squadmanager.dll
 
@@ -824,11 +834,11 @@ namespace Loader
 					return false;
 				}
 
-				LogInfo(CH_LOADER, "Successfully updated %s.", addon->Definitions->Name);
+				LogInfo(CH_LOADER, "Successfully updated %s.", aDefinitions->Name);
 				wasUpdated = true;
 			}
 		}
-		else if (EUpdateProvider::Direct == addon->Definitions->Provider)
+		else if (EUpdateProvider::Direct == aDefinitions->Provider)
 		{
 			client.enable_server_certificate_verification(false);
 
@@ -912,7 +922,7 @@ namespace Loader
 			((AddonAPI1*)api)->ImguiMalloc = ImGui::MemAlloc;
 			((AddonAPI1*)api)->ImguiFree = ImGui::MemFree;
 			((AddonAPI1*)api)->RegisterRender = GUI::Register;
-			((AddonAPI1*)api)->UnregisterRender = GUI::Unregister;
+			((AddonAPI1*)api)->DeregisterRender = GUI::Deregister;
 
 			((AddonAPI1*)api)->GetGameDirectory	= Path::GetGameDirectory;
 			((AddonAPI1*)api)->GetAddonDirectory = Path::GetAddonDirectory;
@@ -930,11 +940,11 @@ namespace Loader
 			((AddonAPI1*)api)->UnsubscribeEvent = Events::Unsubscribe;
 
 			((AddonAPI1*)api)->RegisterWndProc = WndProc::Register;
-			((AddonAPI1*)api)->UnregisterWndProc = WndProc::Unregister;
+			((AddonAPI1*)api)->DeregisterWndProc = WndProc::Deregister;
 
 			((AddonAPI1*)api)->RegisterKeybindWithString = Keybinds::Register;
 			((AddonAPI1*)api)->RegisterKeybindWithStruct = Keybinds::RegisterWithStruct;
-			((AddonAPI1*)api)->UnregisterKeybind = Keybinds::Unregister;
+			((AddonAPI1*)api)->DeregisterKeybind = Keybinds::Deregister;
 
 			((AddonAPI1*)api)->GetResource = DataLink::GetResource;
 			((AddonAPI1*)api)->ShareResource = DataLink::ShareResource;
@@ -960,7 +970,7 @@ namespace Loader
 			((AddonAPI2*)api)->ImguiMalloc = ImGui::MemAlloc;
 			((AddonAPI2*)api)->ImguiFree = ImGui::MemFree;
 			((AddonAPI2*)api)->RegisterRender = GUI::Register;
-			((AddonAPI2*)api)->UnregisterRender = GUI::Unregister;
+			((AddonAPI2*)api)->DeregisterRender = GUI::Deregister;
 
 			((AddonAPI2*)api)->GetGameDirectory = Path::GetGameDirectory;
 			((AddonAPI2*)api)->GetAddonDirectory = Path::GetAddonDirectory;
@@ -978,11 +988,11 @@ namespace Loader
 			((AddonAPI2*)api)->UnsubscribeEvent = Events::Unsubscribe;
 
 			((AddonAPI2*)api)->RegisterWndProc = WndProc::Register;
-			((AddonAPI2*)api)->UnregisterWndProc = WndProc::Unregister;
+			((AddonAPI2*)api)->DeregisterWndProc = WndProc::Deregister;
 
 			((AddonAPI2*)api)->RegisterKeybindWithString = Keybinds::Register;
 			((AddonAPI2*)api)->RegisterKeybindWithStruct = Keybinds::RegisterWithStruct;
-			((AddonAPI2*)api)->UnregisterKeybind = Keybinds::Unregister;
+			((AddonAPI2*)api)->DeregisterKeybind = Keybinds::Deregister;
 
 			((AddonAPI2*)api)->GetResource = DataLink::GetResource;
 			((AddonAPI2*)api)->ShareResource = DataLink::ShareResource;

@@ -38,7 +38,7 @@ namespace LogHandler
 		}
 
 	}
-	void UnregisterLogger(ILogger* aLogger)
+	void DeregisterLogger(ILogger* aLogger)
 	{
 		const std::lock_guard<std::mutex> lock(Mutex);
 		{

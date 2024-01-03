@@ -43,8 +43,8 @@ namespace GUI
 
 	/* Registers the provided RenderCallback. */
 	void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback);
-	/* Unregisters the provided RenderCallback. */
-	void Unregister(GUI_RENDER aRenderCallback);
+	/* Deregisters the provided RenderCallback. */
+	void Deregister(GUI_RENDER aRenderCallback);
 
 	/* Removes all subscribers that are within the provided address space. */
 	int Verify(void* aStartAddress, void* aEndAddress);

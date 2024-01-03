@@ -25,9 +25,9 @@ namespace Loader
 	extern PIDLIST_ABSOLUTE FSItemList;
 	extern ULONG FSNotifierID;
 
-	/* Initializes the Loader and the API. */
+	/* Registers the addon directory update notifications and loads all addons. */
 	void Initialize();
-	/* Shuts the Loader down and frees all addons. */
+	/* Deregisters the directory updates and unloads all addons. */
 	void Shutdown();
 
 	/* Returns 0 if message was processed. */
@@ -57,7 +57,7 @@ namespace Loader
 	/* Swaps addon.dll with addon.dll.update. */
 	void UpdateSwapAddon(const std::filesystem::path& aPath);
 	/* Updates an addon. */
-	bool UpdateAddon(const std::filesystem::path& aPath);
+	bool UpdateAddon(const std::filesystem::path& aPath, AddonDefinition* aDefinitions);
 
 	/* Gets or creates a pointer to the provided version, or nullptr if no such version exists. */
 	AddonAPI* GetAddonAPI(int aVersion);
