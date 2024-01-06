@@ -32,7 +32,7 @@ namespace GUI
 
 				if (Icon != nullptr && Icon->Resource != nullptr)
 				{
-					float iconSize = offset.y * 2.0f;
+					float iconSize = 32 * Renderer::Scaling;
 					if (IsHovering)
 					{
 						iconSize *= 1.1f;
