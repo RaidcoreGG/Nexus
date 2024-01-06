@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <algorithm>
 #include <chrono>
-#include <ctime>
+#include <fstream>
 
 #include "State.h"
 #include "Renderer.h"
@@ -50,19 +50,20 @@ namespace GUI
 	std::vector<GUI_RENDER>		RegistryOptionsRender;
 	std::vector<IWindow*>		Windows;
 	std::map<EFont, ImFont*>	FontIndex;
-	float						FontSize;
-	bool						CloseMenuAfterSelecting;
-	bool						CloseOnEscape;
+	float						FontSize					= 16.0f;
+	bool						CloseMenuAfterSelecting		= true;
+	bool						CloseOnEscape				= true;
+	bool						LinkArcDPSStyle				= true;
 
-	bool						IsUIVisible			= true;
+	bool						IsUIVisible					= true;
 
-	bool						IsRightClickHeld	= false;
-	bool						IsLeftClickHeld		= false;
-	bool						IsSetup				= false;
+	bool						IsRightClickHeld			= false;
+	bool						IsLeftClickHeld				= false;
+	bool						IsSetup						= false;
 	float						LastScaling;
 
-	bool						HasAcceptedEULA		= false;
-	bool						NotifyChangelog		= false;
+	bool						HasAcceptedEULA				= false;
+	bool						NotifyChangelog				= false;
 
 	void Initialize()
 	{
@@ -317,6 +318,51 @@ namespace GUI
 		GUI::Mutex.unlock();
 	}
 
+	void ImportArcDPSStyle()
+	{
+		if (LinkArcDPSStyle)
+		{
+			std::filesystem::path arcIniPath = Path::D_GW2_ADDONS / "arcdps/arcdps.ini";
+
+			if (std::filesystem::exists(arcIniPath))
+			{
+				std::ifstream arcIni(arcIniPath);
+
+				if (arcIni.is_open())
+				{
+					std::string line;
+					std::string style = "appearance_imgui_style180=";
+					std::string colours = "appearance_imgui_colours180=";
+
+					while (std::getline(arcIni, line))
+					{
+						if (line.find(style, 0) != line.npos)
+						{
+							line = line.substr(style.length());
+
+							ImGuiStyle* style = &ImGui::GetStyle();
+
+							std::string decode = Base64::Decode(&line[0], line.length());
+
+							memcpy(style, &decode[0], decode.length());
+						}
+						else if (line.find(colours, 0) != line.npos)
+						{
+							line = line.substr(colours.length());
+
+							ImGuiStyle* style = &ImGui::GetStyle();
+
+							std::string decode = Base64::Decode(&line[0], line.length());
+
+							memcpy(&style->Colors[0], &decode[0], decode.length());
+						}
+					}
+					arcIni.close();
+				}
+			}
+		}
+	}
+
 	void ProcessKeybind(const char* aIdentifier)
 	{
 		std::string str = aIdentifier;
@@ -553,12 +599,12 @@ namespace GUI
 		AddWindow(dbgWnd);
 		AddWindow(aboutWnd);
 
-		Menu::AddMenuItem("Addons",		&addonsWnd->Visible);
-		Menu::AddMenuItem("Options",	&opsWnd->Visible);
-		Menu::AddMenuItem("Changelog",	&chlWnd->Visible);
-		Menu::AddMenuItem("Log",		&logWnd->Visible);
-		Menu::AddMenuItem("Debug",		&dbgWnd->Visible);
-		Menu::AddMenuItem("About",		&aboutWnd->Visible);
+		Menu::AddMenuItem("Addons",		ICON_ADDONS,	&addonsWnd->Visible);
+		Menu::AddMenuItem("Options",	ICON_OPTIONS,	&opsWnd->Visible);
+		Menu::AddMenuItem("Changelog",	ICON_CHANGELOG, &chlWnd->Visible);
+		Menu::AddMenuItem("Log",		ICON_LOG,		&logWnd->Visible);
+		Menu::AddMenuItem("Debug",		ICON_DEBUG,		&dbgWnd->Visible);
+		Menu::AddMenuItem("About",		ICON_ABOUT,		&aboutWnd->Visible);
 
 		/* register keybinds */
 		Keybinds::Register(KB_MENU, ProcessKeybind, "CTRL+O");
@@ -589,6 +635,13 @@ namespace GUI
 		TextureLoader::LoadFromResource(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, NexusHandle, nullptr);
 
 		TextureLoader::LoadFromResource(ICON_NOTIFICATION, RES_ICON_NOTIFICATION, NexusHandle, QuickAccess::ReceiveTextures);
+
+		TextureLoader::LoadFromResource(ICON_ADDONS, RES_ICON_ADDONS, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource(ICON_OPTIONS, RES_ICON_OPTIONS, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource(ICON_CHANGELOG, RES_ICON_CHANGELOG, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource(ICON_LOG, RES_ICON_LOG, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource(ICON_DEBUG, RES_ICON_DEBUG, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource(ICON_ABOUT, RES_ICON_ABOUT, NexusHandle, nullptr);
 
 		TextureLoader::LoadFromResource(TEX_MENU_BACKGROUND, RES_TEX_MENU_BACKGROUND, NexusHandle, Menu::ReceiveTextures);
 		TextureLoader::LoadFromResource(TEX_MENU_BUTTON, RES_TEX_MENU_BUTTON, NexusHandle, Menu::ReceiveTextures);
@@ -685,6 +738,16 @@ namespace GUI
 				CloseOnEscape = true;
 				Settings::Settings[OPT_CLOSEESCAPE] = true;
 			}
+
+			if (!Settings::Settings[OPT_LINKARCSTYLE].is_null())
+			{
+				Settings::Settings[OPT_LINKARCSTYLE].get_to(LinkArcDPSStyle);
+			}
+			else
+			{
+				LinkArcDPSStyle = true;
+				Settings::Settings[OPT_LINKARCSTYLE] = true;
+			}
 		}
 
 		if (!HasAcceptedEULA)
@@ -693,6 +756,8 @@ namespace GUI
 			AddWindow(eulaModal);
 			Events::Subscribe(EV_EULA_ACCEPTED, OnEULAAccepted);
 		}
+
+		ImportArcDPSStyle();
 
 		IsSetup = true;
 	}

@@ -1,9 +1,14 @@
 #include "AddonDefinition.h"
 
-#include <iomanip>
-#include <sstream>
-
-#include "AddonAPI.h"
+std::string AddonVersion::ToString()
+{
+	std::string str;
+	str.append(std::to_string(Major) + ".");
+	str.append(std::to_string(Minor) + ".");
+	str.append(std::to_string(Build) + ".");
+	str.append(std::to_string(Revision));
+	return str;
+}
 
 bool operator>(AddonVersion lhs, AddonVersion rhs)
 {

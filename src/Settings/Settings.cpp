@@ -18,6 +18,7 @@ const char* OPT_QAVERTICAL		= "QAVertical";
 const char* OPT_QALOCATION		= "QALocation";
 const char* OPT_QAOFFSETX		= "QAOffsetX";
 const char* OPT_QAOFFSETY		= "QAOffsetY";
+const char* OPT_LINKARCSTYLE	= "LinkWithArcDPSStyle";
 
 namespace Settings
 {

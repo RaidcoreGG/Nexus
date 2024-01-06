@@ -21,11 +21,10 @@ namespace GUI
 
 	void AddonItem(Addon* aAddon)
 	{
-		if (!aAddon ||
+		if (aAddon == nullptr ||
+			aAddon->Definitions == nullptr ||
 			aAddon->State == EAddonState::NotLoadedDuplicate ||
-			aAddon->State == EAddonState::Incompatible ||
-			aAddon->State == EAddonState::Reload ||
-			!aAddon->Definitions)
+			aAddon->State == EAddonState::Incompatible)
 		{
 			return;
 		}

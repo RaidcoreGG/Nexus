@@ -17,15 +17,7 @@ struct AddonVersion
 	signed short	Build;
 	signed short	Revision;
 
-	std::string ToString()
-	{
-		std::string str;
-		str.append(std::to_string(Major) + ".");
-		str.append(std::to_string(Minor) + ".");
-		str.append(std::to_string(Build) + ".");
-		str.append(std::to_string(Revision));
-		return str;
-	}
+	std::string ToString();
 };
 
 bool operator>(AddonVersion lhs, AddonVersion rhs);

@@ -11,9 +11,7 @@ enum class EAddonState
 	NotLoadedDuplicate,		/* Addon is not loaded, because it has the same signature as another addon. */
 
 	Incompatible,			/* The file is incompatible with Nexus. */
-	IncompatibleAPI,		/* Addon requested an API that doesn't exist. */
-
-	Reload,					/* Addon is being reloaded due to an update. */
+	IncompatibleAPI			/* Addon requested an API that doesn't exist. */
 };
 
 #endif

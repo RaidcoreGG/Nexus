@@ -17,6 +17,13 @@
 
 #define RES_ICON_NOTIFICATION			209
 
+#define RES_ICON_ADDONS					210
+#define RES_ICON_OPTIONS				211
+#define RES_ICON_CHANGELOG				212
+#define RES_ICON_LOG					213
+#define RES_ICON_DEBUG					214
+#define RES_ICON_ABOUT					215
+
 #define RES_TEX_MENU_BACKGROUND         301
 #define RES_TEX_MENU_BUTTON             302
 #define RES_TEX_MENU_BUTTON_HOVER       303

@@ -319,6 +319,8 @@
     <Font Include="Resources\TrebuchetMS.ttf" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Resources\anvilhammer.png" />
+    <Image Include="Resources\cog.png" />
     <Image Include="Resources\ICON_GENERIC.png" />
     <Image Include="Resources\ICON_GENERIC_HOVER.png" />
     <Image Include="Resources\ICON_NEXUS.png" />
@@ -328,9 +330,13 @@
     <Image Include="Resources\ICON_NEXUS_XMAS.png" />
     <Image Include="Resources\ICON_NEXUS_XMAS_HOVER.png" />
     <Image Include="Resources\ICON_NOTIFICATION.png" />
+    <Image Include="Resources\log.png" />
+    <Image Include="Resources\question.png" />
+    <Image Include="Resources\star.png" />
     <Image Include="Resources\TEX_MENU_BUTTON.png" />
     <Image Include="Resources\TEX_MENU_BUTTON_HOVER.png" />
     <Image Include="Resources\TEX_MENU_BACKGROUND.png" />
+    <Image Include="Resources\wrench.png" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

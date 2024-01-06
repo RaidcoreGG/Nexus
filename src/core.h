@@ -1,8 +1,10 @@
 #ifndef CORE_H
 #define CORE_H
 
-#include <Windows.h>
 #include <filesystem>
+#include <string>
+#include <vector>
+#include <Windows.h>
 
 void PathSystemAppend(std::filesystem::path& aDestination, const char* aAppend);
 
@@ -18,4 +20,10 @@ std::vector<unsigned char> MD5FromFile(const std::filesystem::path& aPath);
 
 std::string GetBaseURL(const std::string& aUrl);
 std::string GetEndpoint(const std::string& aUrl);
+
+namespace Base64
+{
+	std::string Encode(const unsigned char* src, size_t len);
+	std::string Decode(const void* data, const size_t len);
+}
 #endif

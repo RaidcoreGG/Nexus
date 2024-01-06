@@ -17,6 +17,7 @@ extern const char* OPT_QAVERTICAL;
 extern const char* OPT_QALOCATION;
 extern const char* OPT_QAOFFSETX;
 extern const char* OPT_QAOFFSETY;
+extern const char* OPT_LINKARCSTYLE;
 
 namespace Settings
 {

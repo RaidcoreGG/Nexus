@@ -45,15 +45,14 @@ namespace Loader
 	/* Detects and processes any changes to addons. */
 	void ProcessChanges();
 
-	/* Updates all addons if available. */
-	void UpdateAll();
-
 	/* Loads an addon. */
-	void LoadAddon(const std::filesystem::path& aPath);
+	void LoadAddon(const std::filesystem::path& aPath, bool aIsReload = false);
 	/* Unloads an addon. */
-	void UnloadAddon(const std::filesystem::path& aPath);
+	void UnloadAddon(const std::filesystem::path& aPath, bool aIsShutdown = false);
 	/* Unloads, then uninstalls an addon. */
 	void UninstallAddon(const std::filesystem::path& aPath);
+	/* Unloads, then loads an addon. */
+	void ReloadAddon(const std::filesystem::path& aPath);
 	/* Swaps addon.dll with addon.dll.update. */
 	void UpdateSwapAddon(const std::filesystem::path& aPath);
 	/* Updates an addon. */
@@ -63,6 +62,11 @@ namespace Loader
 	AddonAPI* GetAddonAPI(int aVersion);
 	/* Returns the size of the provided version. */
 	long GetAddonAPISize(int aVersion);
+
+	/* HELPER: Copies the addon definitions. */
+	void CopyAddonDefs(AddonDefinition* aDefinitions, AddonDefinition** aOutDefinitions);
+	/* HELPER: Frees the addon definitions. */
+	void FreeAddonDefs(AddonDefinition** aDefinitions);
 }
 
 #endif

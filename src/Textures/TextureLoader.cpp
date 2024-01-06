@@ -199,7 +199,7 @@ namespace TextureLoader
 	{
 		std::string str = aIdentifier;
 
-		LogDebug(CH_TEXTURES, "Queued %s", str.c_str());
+		//LogDebug(CH_TEXTURES, "Queued %s", str.c_str());
 
 		QueuedTexture raw{};
 		raw.Identifier = str;
@@ -216,7 +216,8 @@ namespace TextureLoader
 	}
 	void CreateTexture(QueuedTexture aQueuedTexture)
 	{
-		LogDebug(CH_TEXTURES, "Create %s", aQueuedTexture.Identifier.c_str());
+		//LogDebug(CH_TEXTURES, "Create %s", aQueuedTexture.Identifier.c_str());
+
 		Texture* tex = new Texture{};
 		tex->Width = aQueuedTexture.Width;
 		tex->Height = aQueuedTexture.Height;
@@ -243,7 +244,7 @@ namespace TextureLoader
 
 		if (!pTexture)
 		{
-			LogDebug(CH_TEXTURES, "pTexture was null");
+			//LogDebug(CH_TEXTURES, "pTexture was null");
 			stbi_image_free(aQueuedTexture.Data);
 			return;
 		}

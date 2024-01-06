@@ -10,6 +10,8 @@
 #include "GUI/GUI.h"
 #include "GUI/IWindow.h"
 
+#include "Textures/TextureLoader.h"
+
 #include "imgui.h"
 #include "imgui_extensions.h"
 
@@ -41,7 +43,7 @@ namespace GUI
 				}
 
 				ImGui::PushFont(FontUI);
-				ImGui::SetCursorPos(ImVec2(0, 8.0f));
+				ImGui::SetCursorPos(ImVec2(8.0f, 8.0f));
 				Menu::Mutex.lock();
 				{
 					for (MenuItem* mItem : MenuItems)
@@ -65,13 +67,61 @@ namespace GUI
 			ImGui::End();
 		}
 
-		void AddMenuItem(std::string aLabel, bool* aToggle)
+		void AddMenuItem(std::string aLabel, std::string aTextureIdentifier, bool* aToggle)
 		{
-			Menu::Mutex.lock();
+			Texture* icon = TextureLoader::Get(aTextureIdentifier.c_str());
+			MenuItem* mItem = new MenuItem{ aLabel, aToggle, icon, false };
+
 			{
-				MenuItems.push_back(new MenuItem{ aLabel, aToggle, false });
+				const std::lock_guard<std::mutex> lock(Menu::Mutex);
+				MenuItems.push_back(mItem);
 			}
-			Menu::Mutex.unlock();
+
+			if (icon == nullptr)
+			{
+				std::thread([mItem, aLabel, aTextureIdentifier, aToggle]()
+					{
+						const std::lock_guard<std::mutex> lock(Menu::Mutex);
+						{
+							// This code is copy pasted from quick access, bit of a clownfiesta not gonna lie
+							int tries = 0;
+
+							//LogDebug(CH_QUICKACCESS, "Menu Item \"%s\" was promised 1 textures, but received 0.", aLabel.c_str());
+							Sleep(100); // first retry after 100ms
+
+							while (mItem->Icon == nullptr)
+							{
+								if (tries > 10)
+								{
+									//LogWarning(CH_QUICKACCESS, "Cancelled getting textures for menu item \"%s\" after 10 failed attempts.", aLabel.c_str());
+									break;
+								}
+
+								if (mItem->Icon == nullptr) { mItem->Icon = TextureLoader::Get(aTextureIdentifier.c_str()); }
+
+								tries++;
+								Sleep(10);
+							}
+
+							/* if not all tries were used, then the texture was loaded */
+							if (tries <= 10)
+							{
+								//LogDebug(CH_QUICKACCESS, "Menu Item \"%s\" received promised texture after %d attempt(s).", aLabel.c_str(), tries);
+								return;
+							}
+
+							/* fallback icons */
+							mItem->Icon = TextureLoader::Get(ICON_GENERIC);
+
+							/* absolute sanity check */
+							if (mItem->Icon == nullptr)
+							{
+								//LogWarning(CH_QUICKACCESS, "Neither promised textures nor fallback textures could be loaded, removing menu item \"%s\".", aLabel.c_str());
+								return;
+							}
+						}
+					}).detach();
+			}
 		}
 
 		void ReceiveTextures(const char* aIdentifier, Texture* aTexture)

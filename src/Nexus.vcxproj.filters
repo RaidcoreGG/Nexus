@@ -115,6 +115,9 @@
     <Filter Include="Multibox">
       <UniqueIdentifier>{a1bb18bc-73ac-4f45-bea0-8e830d61c56f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Images\Menu\Icons">
+      <UniqueIdentifier>{ce8e3a18-149b-4782-9b14-b3b5674b347e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -1059,6 +1062,24 @@
     </Image>
     <Image Include="Resources\ICON_NOTIFICATION.png">
       <Filter>Resource Files\Images\Shortcuts</Filter>
+    </Image>
+    <Image Include="Resources\question.png">
+      <Filter>Resource Files\Images\Menu\Icons</Filter>
+    </Image>
+    <Image Include="Resources\star.png">
+      <Filter>Resource Files\Images\Menu\Icons</Filter>
+    </Image>
+    <Image Include="Resources\wrench.png">
+      <Filter>Resource Files\Images\Menu\Icons</Filter>
+    </Image>
+    <Image Include="Resources\anvilhammer.png">
+      <Filter>Resource Files\Images\Menu\Icons</Filter>
+    </Image>
+    <Image Include="Resources\cog.png">
+      <Filter>Resource Files\Images\Menu\Icons</Filter>
+    </Image>
+    <Image Include="Resources\log.png">
+      <Filter>Resource Files\Images\Menu\Icons</Filter>
     </Image>
   </ItemGroup>
 </Project>

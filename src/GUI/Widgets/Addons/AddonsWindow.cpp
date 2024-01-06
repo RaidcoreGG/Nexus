@@ -69,13 +69,7 @@ namespace GUI
 						std::string strAddons = Path::D_GW2_ADDONS.string();
 						ShellExecuteA(NULL, "explore", strAddons.c_str(), NULL, NULL, SW_SHOW);
 					}
-					ImGui::SameLine();
-					if (ImGui::Button("Check for Updates", ImVec2(ImGui::CalcTextSize("Check for Updates").x + 16.0f, height)))
-					{
-						//LogDebug(CH_GUI, "Loader::UpdateAll() called.");
-						Loader::UpdateAll();
-					}
-					
+
 					ImGui::EndTabItem();
 				}
 				if (ImGui::BeginTabItem("Library"))

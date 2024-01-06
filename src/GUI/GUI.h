@@ -25,6 +25,7 @@ namespace GUI
 	extern float						FontSize;
 	extern bool							CloseMenuAfterSelecting;
 	extern bool							CloseOnEscape;
+	extern bool							LinkArcDPSStyle;
 
 	extern bool							IsUIVisible;
 
@@ -40,6 +41,8 @@ namespace GUI
 	void Render();
 
 	void AddWindow(IWindow* aWindowPtr);
+
+	void ImportArcDPSStyle();
 
 	/* Registers the provided RenderCallback. */
 	void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback);
