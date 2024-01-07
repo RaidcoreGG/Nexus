@@ -112,7 +112,7 @@ namespace GUI
 								ImGui::SetCursorPos(ImVec2(((size * c) + (c ? 1 : 0)) * Renderer::Scaling, 0));
 							}
 
-							ImVec2 posIconTL = ImGui::GetCursorPos();
+							ImVec2 pos = ImGui::GetCursorPos();
 
 							if (ImGui::ImageButton(!shortcut.IsHovering ? shortcut.TextureNormal->Resource : shortcut.TextureHover->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
 							{
@@ -123,22 +123,24 @@ namespace GUI
 									Keybinds::Invoke(shortcut.Keybind);
 								}
 							}
+							bool iconHovered = ImGui::IsItemHovered();
 
 							if (shortcut.HasNotification && IconNotification && IconNotification->Resource)
 							{
 								float offIcon = (size * Renderer::Scaling) / 2.0f;
-								posIconTL.x += pos.x + offIcon;
-								posIconTL.y += pos.y + offIcon;
+								
+								pos.x += offIcon;
+								pos.y += offIcon;
 
-								ImVec2 posIconBR = posIconTL;
-								posIconBR.x += offIcon;
-								posIconBR.y += offIcon;
-
-								ImGui::GetForegroundDrawList(ImGui::GetCurrentWindow())->AddImage(IconNotification->Resource, posIconTL, posIconBR, ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), ImColor(1.0f, 1.0f, 1.0f, Opacity));
+								ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+								ImGui::SetCursorPos(pos);
+								ImGui::Image(IconNotification->Resource, ImVec2(offIcon, offIcon));
+								ImGui::PopItemFlag();
 							}
+							bool notifHovered = ImGui::IsItemHovered();
 
 							ImGui::PopStyleVar();
-							shortcut.IsHovering = ImGui::IsItemHovered();
+							shortcut.IsHovering = iconHovered || notifHovered;
 							if (shortcut.TooltipText.length() > 0)
 							{
 								ImGui::TooltipGeneric(shortcut.TooltipText.c_str());

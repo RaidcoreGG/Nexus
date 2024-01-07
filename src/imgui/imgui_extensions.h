@@ -175,6 +175,22 @@ namespace ImGui
 
 		return clicked;
 	}
+
+	static bool GW2Button(const char* label, const ImVec2& size_arg = ImVec2(0,0))
+	{
+		ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 0, 0, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.839f, 0.807f, 0.741f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0, 0, 0, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_BorderShadow, ImVec4(0, 0, 0, 0));
+		bool ret = ButtonEx(label, size_arg, ImGuiButtonFlags_None);
+		ImGui::PopStyleColor(6);
+		ImGui::PopStyleVar(1);
+
+		return ret;
+	}
 }
 
 #endif

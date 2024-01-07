@@ -33,7 +33,9 @@ namespace GUI
 			if (!Visible) { return; }
 
 			float bgSz = 220 * Renderer::Scaling;
-			;
+			
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+
 			if (ImGui::Begin("Menu", &Visible, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar))
 			{
 				if (MenuBG)
@@ -65,6 +67,8 @@ namespace GUI
 				ImGui::PopFont();
 			}
 			ImGui::End();
+
+			ImGui::PopStyleVar();
 		}
 
 		void AddMenuItem(std::string aLabel, std::string aTextureIdentifier, bool* aToggle)
@@ -86,27 +90,27 @@ namespace GUI
 							// This code is copy pasted from quick access, bit of a clownfiesta not gonna lie
 							int tries = 0;
 
-							//LogDebug(CH_QUICKACCESS, "Menu Item \"%s\" was promised 1 textures, but received 0.", aLabel.c_str());
+							LogDebug("CH_MENU", "Menu Item \"%s\" was promised 1 textures, but received 0.", aLabel.c_str());
 							Sleep(100); // first retry after 100ms
 
 							while (mItem->Icon == nullptr)
 							{
 								if (tries > 10)
 								{
-									//LogWarning(CH_QUICKACCESS, "Cancelled getting textures for menu item \"%s\" after 10 failed attempts.", aLabel.c_str());
+									LogWarning("CH_MENU", "Cancelled getting textures for menu item \"%s\" after 10 failed attempts.", aLabel.c_str());
 									break;
 								}
 
 								if (mItem->Icon == nullptr) { mItem->Icon = TextureLoader::Get(aTextureIdentifier.c_str()); }
 
 								tries++;
-								Sleep(10);
+								Sleep(tries * 500);
 							}
 
 							/* if not all tries were used, then the texture was loaded */
 							if (tries <= 10)
 							{
-								//LogDebug(CH_QUICKACCESS, "Menu Item \"%s\" received promised texture after %d attempt(s).", aLabel.c_str(), tries);
+								LogDebug("CH_MENU", "Menu Item \"%s\" received promised texture after %d attempt(s).", aLabel.c_str(), tries);
 								return;
 							}
 
@@ -116,7 +120,7 @@ namespace GUI
 							/* absolute sanity check */
 							if (mItem->Icon == nullptr)
 							{
-								//LogWarning(CH_QUICKACCESS, "Neither promised textures nor fallback textures could be loaded, removing menu item \"%s\".", aLabel.c_str());
+								LogWarning("CH_MENU", "Neither promised textures nor fallback textures could be loaded, removing menu item \"%s\".", aLabel.c_str());
 								return;
 							}
 						}

@@ -4,6 +4,7 @@
 
 #include "Shared.h"
 #include "Consts.h"
+#include "Renderer.h"
 
 #include "Loader/AddonDefinition.h"
 #include "Loader/EAddonFlags.h"
@@ -17,7 +18,6 @@
 namespace GUI
 {
 	float btnWidth = 7.5f;
-	float btnHeight = 1.5f;
 
 	void AddonItem(Addon* aAddon)
 	{
@@ -28,6 +28,8 @@ namespace GUI
 		{
 			return;
 		}
+
+		float btnHeight = 22.0f * Renderer::Scaling;
 
 		std::string sig = std::to_string(aAddon->Definitions->Signature); // helper for unique chkbxIds
 
@@ -59,7 +61,7 @@ namespace GUI
 					!(aAddon->Definitions->Unload == nullptr || aAddon->Definitions->HasFlag(EAddonFlags::DisableHotloading)))
 				{
 					amtBtns++;
-					if (ImGui::Button(("Disable##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight * ImGui::GetFontSize())))
+					if (ImGui::GW2Button(("Disable##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						for (auto& it : Loader::Addons)
 						{
@@ -74,7 +76,7 @@ namespace GUI
 				else if (aAddon->State == EAddonState::NotLoaded)
 				{
 					amtBtns++;
-					if (ImGui::Button(("Load##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight * ImGui::GetFontSize())))
+					if (ImGui::GW2Button(("Load##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						for (auto& it : Loader::Addons)
 						{
@@ -93,7 +95,7 @@ namespace GUI
 						ImGui::SameLine();
 					}
 					amtBtns++;
-					if (ImGui::Button(("Uninstall##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight * ImGui::GetFontSize())))
+					if (ImGui::GW2Button(("Uninstall##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						for (auto& it : Loader::Addons)
 						{
@@ -112,7 +114,7 @@ namespace GUI
 						ImGui::SameLine();
 					}
 					amtBtns++;
-					if (ImGui::Button(("GitHub##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight * ImGui::GetFontSize())))
+					if (ImGui::GW2Button(("GitHub##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						ShellExecuteA(0, 0, aAddon->Definitions->UpdateLink, 0, 0, SW_SHOW);
 					}

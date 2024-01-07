@@ -26,30 +26,11 @@ namespace GUI
 				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
 				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
 				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
+				ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.f, 0.f, 0.f, 0.f));
 
 				ImVec2 pos = ImGui::GetCursorPos();
 				ImVec2 offset = ImGui::CalcTextSize(Label.c_str());
 
-				if (Icon != nullptr && Icon->Resource != nullptr)
-				{
-					float iconSize = 32 * Renderer::Scaling;
-					if (IsHovering)
-					{
-						iconSize *= 1.1f;
-					}
-
-					ImVec2 wndPos = ImGui::GetWindowPos();
-					ImVec2 posIconTL = pos;
-					posIconTL.x += wndPos.x + (width * 0.1f);
-					posIconTL.y += wndPos.y + ((height - iconSize) / 2.0f);
-					ImVec2 posIconBR = posIconTL;
-					// offset.y is text height, use as a reference
-					posIconBR.x += iconSize;
-					posIconBR.y += iconSize;
-
-					ImGui::GetForegroundDrawList(ImGui::GetCurrentWindow())->AddImage(Icon->Resource, posIconTL, posIconBR, ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f));
-				}
-				
 				pos.x = (wndWidth - width) / 2.0f + 8.0f;
 
 				ImVec2 txtPos = pos;
@@ -66,10 +47,24 @@ namespace GUI
 				ImGui::PopStyleVar();
 				IsHovering = ImGui::IsItemHovered();
 
+				if (Icon != nullptr && Icon->Resource != nullptr)
+				{
+					float iconSize = 32.0f * Renderer::Scaling;
+					if (IsHovering)
+					{
+						iconSize *= 1.1f;
+					}
+
+					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+					ImGui::SetCursorPos(ImVec2(pos.x, pos.y - 4.0f));
+					ImGui::Image(Icon->Resource, ImVec2(iconSize, iconSize));
+					ImGui::PopItemFlag();
+				}
+
 				ImGui::SetCursorPos(txtPos);
 				ImGui::Text(Label.c_str());
 
-				ImGui::PopStyleColor(3);
+				ImGui::PopStyleColor(4);
 
 				// advance cursor pos
 				ImGui::SetCursorPosY(pos.y + height + 6.0f);

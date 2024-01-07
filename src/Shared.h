@@ -32,9 +32,9 @@ extern bool							IsGameplay;
 
 extern NexusLinkData*				NexusLink;
 
-extern ImFont*						Font;
-extern ImFont*						FontBig;
-extern ImFont*						FontUI;
+extern ImFont*						Font;			/* Menomonia */
+extern ImFont*						FontBig;		/* Menomonia, but slightly bigger */
+extern ImFont*						FontUI;			/* Trebuchet */
 
 extern ImGuiWindowFlags				WindowFlags_Default;
 extern ImGuiWindowFlags				WindowFlags_Overlay;

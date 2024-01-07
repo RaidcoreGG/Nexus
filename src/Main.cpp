@@ -166,7 +166,18 @@ namespace Main
 		}
 
 		//LogDebug(CH_CORE, "Body: %s", result->body.c_str());
-		json resVersion = json::parse(result->body);
+		json resVersion{};
+
+		try
+		{
+			resVersion = json::parse(result->body);
+		}
+		catch (json::parse_error& ex)
+		{
+			LogWarning(CH_LOADER, "Response from %s%s could not be parsed. Error: %s", API_RAIDCORE, "/nexusversion.json", ex.what());
+			return;
+		}
+
 		if (resVersion.is_null())
 		{
 			LogWarning(CH_CORE, "Error parsing API response.");

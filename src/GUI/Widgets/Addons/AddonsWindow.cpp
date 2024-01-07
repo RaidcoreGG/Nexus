@@ -7,6 +7,7 @@
 #include "Shared.h"
 #include "Paths.h"
 #include "State.h"
+#include "Renderer.h"
 
 #include "Loader/Loader.h"
 #include "AddonItem.h"
@@ -28,11 +29,13 @@ namespace GUI
 	{
 		if (!Visible) { return; }
 
+		ImGui::PushFont(FontUI);
+
 		ImGui::SetNextWindowSize(ImVec2(awWidth * ImGui::GetFontSize(), awHeight * ImGui::GetFontSize()), ImGuiCond_FirstUseEver);
 		if (ImGui::Begin(Name.c_str(), &Visible, ImGuiWindowFlags_NoCollapse))
 		{
 			float width = 7.5f * ImGui::GetFontSize();
-			float height = 1.5f * ImGui::GetFontSize();
+			float height = 22.0f * Renderer::Scaling;
 
 			if (ImGui::BeginTabBar("AddonTabBar", ImGuiTabBarFlags_None))
 			{
@@ -64,7 +67,7 @@ namespace GUI
 						ImGui::EndChild();
 					}
 
-					if (ImGui::Button("Open Addons Folder", ImVec2(ImGui::CalcTextSize("Open Addons Folder").x + 16.0f, height)))
+					if (ImGui::GW2Button("Open Addons Folder", ImVec2(ImGui::CalcTextSize("Open Addons Folder").x + 16.0f, height)))
 					{
 						std::string strAddons = Path::D_GW2_ADDONS.string();
 						ShellExecuteA(NULL, "explore", strAddons.c_str(), NULL, NULL, SW_SHOW);
@@ -86,5 +89,7 @@ namespace GUI
 			}
 		}
 		ImGui::End();
+
+		ImGui::PopFont();
 	}
 }

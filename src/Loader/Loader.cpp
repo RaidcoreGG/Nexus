@@ -33,7 +33,7 @@ using json = nlohmann::json;
 
 #include "httpslib.h"
 
-#define LOADER_WAITTIME 1
+#define LOADER_WAITTIME_MS 1000
 
 namespace Loader
 {
@@ -79,7 +79,7 @@ namespace Loader
 				return;
 			}
 
-			NotifyChanges(); // Invoke once because addon dir doesn't change on init
+			ProcessChanges(); // Invoke once because addon dir doesn't change on init
 		}
 	}
 	void Shutdown()
@@ -194,28 +194,24 @@ namespace Loader
 	{
 		if (DirectoryChangeCountdown == 0)
 		{
-			DirectoryChangeCountdown = LOADER_WAITTIME;
+			DirectoryChangeCountdown = LOADER_WAITTIME_MS;
 
-			LoaderThread = std::thread(AwaitChanges);
+			LoaderThread = std::thread(ProcessChanges);
 			LoaderThread.detach();
 		}
 		else
 		{
-			DirectoryChangeCountdown = LOADER_WAITTIME;
+			DirectoryChangeCountdown = LOADER_WAITTIME_MS;
 		}
-	}
-	void AwaitChanges()
-	{
-		while (DirectoryChangeCountdown > 0)
-		{
-			Sleep(1000);
-			DirectoryChangeCountdown--;
-		}
-
-		ProcessChanges();
 	}
 	void ProcessChanges()
 	{
+		while (DirectoryChangeCountdown > 0)
+		{
+			Sleep(100);
+			DirectoryChangeCountdown -= 100;
+		}
+
 		const std::lock_guard<std::mutex> lock(Mutex);
 
 		// check all tracked addons
@@ -231,7 +227,6 @@ namespace Loader
 
 			std::vector<unsigned char> md5 = MD5FromFile(it.first);
 
-			// if addon changed (the nullptr is sanity)
 			if (it.second->MD5.empty() || it.second->MD5 != md5)
 			{
 				QueueAddon(ELoaderAction::Reload, it.first);

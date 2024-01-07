@@ -40,8 +40,6 @@ namespace Loader
 
 	/* Notifies that something in the addon directory changed. */
 	void NotifyChanges();
-	/* Stalls until no more new notification comes in, then processes the changes. */
-	void AwaitChanges();
 	/* Detects and processes any changes to addons. */
 	void ProcessChanges();
 
