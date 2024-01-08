@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="API\ActiveToken.cpp" />
     <ClCompile Include="API\APIController.cpp" />
+    <ClCompile Include="API\APIHandler.cpp" />
     <ClCompile Include="Consts.cpp" />
     <ClCompile Include="core.cpp" />
     <ClCompile Include="CrashHandler.cpp" />
@@ -70,6 +71,8 @@
   <ItemGroup>
     <ClInclude Include="API\APIController.h" />
     <ClInclude Include="API\ActiveToken.h" />
+    <ClInclude Include="API\APIHandler.h" />
+    <ClInclude Include="API\CachedResponse.h" />
     <ClInclude Include="Branch.h" />
     <ClInclude Include="Consts.h" />
     <ClInclude Include="core.h" />

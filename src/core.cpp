@@ -50,6 +50,27 @@ std::wstring StrToWStr(const std::string& aString)
 	return str;
 }
 
+namespace String
+{
+	std::string Replace(const std::string& aString, const std::string& aOld, const std::string& aNew)
+	{
+		std::string retStr = aString;
+		if (aOld.empty())
+		{
+			return retStr;
+		}
+
+		size_t pos = 0;
+		while ((pos = retStr.find(aOld, pos)) != std::string::npos)
+		{
+			retStr.replace(pos, aOld.length(), aNew);
+			pos += aNew.length();
+		}
+
+		return retStr;
+	}
+}
+
 const char* ConvertToUTF8(const char* multibyteStr)
 {
 	char* utf8Str = nullptr;
@@ -235,4 +256,9 @@ namespace Base64
 		}
 		return str;
 	}
+}
+
+long long Timestamp()
+{
+	return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }

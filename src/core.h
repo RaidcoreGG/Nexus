@@ -13,6 +13,11 @@ bool FindFunction(HMODULE aModule, LPVOID aFunction, LPCSTR aName);
 std::string WStrToStr(const std::wstring& aWstring);
 std::wstring StrToWStr(const std::string& aString);
 
+namespace String
+{
+	std::string Replace(const std::string& aString, const std::string& aOld, const std::string& aNew);
+}
+
 const char* ConvertToUTF8(const char* multibyteStr);
 
 std::vector<unsigned char> MD5(const unsigned char* data, size_t sz);
@@ -27,3 +32,5 @@ namespace Base64
 	std::string Decode(const void* data, const size_t len);
 }
 #endif
+
+long long Timestamp();
