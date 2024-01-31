@@ -4,12 +4,30 @@
 #include <string>
 
 #include "GUI/IWindow.h"
+#include "Textures/Texture.h"
 
 namespace GUI
 {
 	class AddonsWindow : public IWindow
 	{
 	public:
+		Texture* Background;
+		Texture* TitleBar;
+		Texture* TitleBarHover;
+		Texture* TitleBarEnd;
+		Texture* TitleBarEndHover;
+		Texture* BtnClose;
+		Texture* BtnCloseHover;
+		Texture* TabBtn;
+		Texture* TabBtnHover;
+
+		bool TitleBarControlled;
+		bool CloseHovered;
+
+		int TabIndex;
+		bool Tab1Hovered;
+		bool Tab2Hovered;
+
 		AddonsWindow(std::string aName);
 		void Render();
 	};

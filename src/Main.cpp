@@ -1,6 +1,7 @@
 #include "Main.h"
 
 #include <filesystem>
+#include <string>
 
 #include "Consts.h"
 #include "Hooks.h"
@@ -16,11 +17,10 @@
 #include "Logging/LogHandler.h"
 #include "Mumble/Mumble.h"
 #include "Settings/Settings.h"
+#include "API/APIClient.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
-
-#include "httpslib.h"
 
 /* entry */
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
@@ -38,6 +38,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
 namespace Main
 {
+	APIClient* RaidcoreAPI = nullptr;
+
 	void Initialize()
 	{
 		if (State::Nexus >= ENexusState::LOAD) { return; }
@@ -56,8 +58,14 @@ namespace Main
 
 		State::Initialize();
 
+		RaidcoreAPI = new APIClient("https://api.raidcore.gg", true, Path::D_GW2_ADDONS_COMMON_API_RAIDCORE, 30 * 60, 300, 5, 1);
+
 		//Paradigm::Initialize();
-		SelfUpdate();
+		std::thread([]()
+			{
+				SelfUpdate();
+			})
+			.detach();
 
 		/* Don't initialize anything if vanilla */
 		if (!State::IsVanilla)
@@ -150,33 +158,7 @@ namespace Main
 			std::filesystem::remove(Path::F_OLD_DLL);
 		}
 
-		httplib::Client client(API_RAIDCORE);
-		auto result = client.Get("/nexusversion.json");
-
-		if (!result)
-		{
-			LogWarning(CH_CORE, "Error fetching %s%s", API_RAIDCORE, "/nexusversion.json");
-			return;
-		}
-
-		if (result->status != 200) // not HTTP_OK
-		{
-			LogWarning(CH_CORE, "Status %d when fetching %s%s", result->status, API_RAIDCORE, "/nexusversion.json");
-			return;
-		}
-
-		//LogDebug(CH_CORE, "Body: %s", result->body.c_str());
-		json resVersion{};
-
-		try
-		{
-			resVersion = json::parse(result->body);
-		}
-		catch (json::parse_error& ex)
-		{
-			LogWarning(CH_LOADER, "Response from %s%s could not be parsed. Error: %s", API_RAIDCORE, "/nexusversion.json", ex.what());
-			return;
-		}
+		json resVersion = RaidcoreAPI->Get("/nexusversion");;
 
 		if (resVersion.is_null())
 		{
@@ -210,6 +192,7 @@ namespace Main
 
 			size_t bytesWritten = 0;
 			std::ofstream file(Path::F_UPDATE_DLL, std::ofstream::binary);
+			httplib::Client client(API_RAIDCORE);
 			auto downloadResult = client.Get("/d3d11.dll", [&](const char* data, size_t data_length) {
 				file.write(data, data_length);
 				bytesWritten += data_length;

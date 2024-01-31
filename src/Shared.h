@@ -10,6 +10,7 @@
 #include "Mumble/LinkedMem.h"
 #include "Mumble/Identity.h"
 #include "Logging/LogHandler.h"
+#include "API/APIClient.h"
 
 #include "imgui.h"
 

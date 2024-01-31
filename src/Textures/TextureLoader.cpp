@@ -14,7 +14,7 @@
 /* For some reason this has to be defined AND included here. */
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
-#include "httpslib.h"
+#include "httplib/httplib.h"
 
 namespace TextureLoader
 {

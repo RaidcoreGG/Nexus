@@ -211,7 +211,12 @@ namespace Keybinds
 
 		Keybinds::Mutex.lock();
 		{
-			Registry.erase(str);
+			auto it = Registry.find(str);
+
+			if (it != Registry.end())
+			{
+				it->second.Handler = nullptr;
+			}
 		}
 		Keybinds::Mutex.unlock();
 

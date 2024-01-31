@@ -10,6 +10,8 @@ namespace Path
 	std::filesystem::path D_GW2_ADDONS{};
 	std::filesystem::path D_GW2_ADDONS_COMMON{};
 	std::filesystem::path D_GW2_ADDONS_COMMON_API_V2{};
+	std::filesystem::path D_GW2_ADDONS_COMMON_API_RAIDCORE;
+	std::filesystem::path D_GW2_ADDONS_COMMON_API_GITHUB;
 	std::filesystem::path D_GW2_ADDONS_NEXUS{};
 	std::filesystem::path D_GW2_ADDONS_RAIDCORE_LOCALES{};
 
@@ -30,39 +32,43 @@ namespace Path
 	void Initialize(HMODULE aBaseModule)
 	{
 		char buff[MAX_PATH]{};
-		GetModuleFileNameA(aBaseModule, buff, MAX_PATH);					/* get self dll path */
+		GetModuleFileNameA(aBaseModule, buff, MAX_PATH);								/* get self dll path */
 		F_HOST_DLL = buff;
 
 		/* directories */
-		D_GW2 = F_HOST_DLL.parent_path();									/* get current directory */
-		D_GW2_ADDONS = D_GW2 / "addons";									/* get addons path */
-		D_GW2_ADDONS_COMMON = D_GW2_ADDONS / "common";						/* get addons/common path */
-		D_GW2_ADDONS_COMMON_API_V2 = D_GW2_ADDONS_COMMON / "api/v2";		/* get addons/common/api/v2 path */
-		D_GW2_ADDONS_NEXUS = D_GW2_ADDONS / "Nexus";						/* get addons/Nexus path */
-		D_GW2_ADDONS_RAIDCORE_LOCALES = D_GW2_ADDONS_NEXUS / "Locales";		/* get addons/Nexus/Locales path */
+		D_GW2 = F_HOST_DLL.parent_path();												/* get current directory */
+		D_GW2_ADDONS = D_GW2 / "addons";												/* get addons path */
+		D_GW2_ADDONS_COMMON = D_GW2_ADDONS / "common";									/* get addons/common path */
+		D_GW2_ADDONS_COMMON_API_V2 = D_GW2_ADDONS_COMMON / "api.guildwars2.com";		/* get addons/common/api.guildwars2.com path */
+		D_GW2_ADDONS_COMMON_API_RAIDCORE = D_GW2_ADDONS_COMMON / "api.raidcore.gg";		/* get addons/common/api.raidcore.gg path */
+		D_GW2_ADDONS_COMMON_API_GITHUB = D_GW2_ADDONS_COMMON / "api.github.com";		/* get addons/common/api.github.com path */
+		D_GW2_ADDONS_NEXUS = D_GW2_ADDONS / "Nexus";									/* get addons/Nexus path */
+		D_GW2_ADDONS_RAIDCORE_LOCALES = D_GW2_ADDONS_NEXUS / "Locales";					/* get addons/Nexus/Locales path */
 
 		/* ensure folder tree*/
-		std::filesystem::create_directory(D_GW2_ADDONS);					/* ensure addons dir */
-		std::filesystem::create_directory(D_GW2_ADDONS_COMMON);				/* ensure addons/common dir */
-		std::filesystem::create_directory(D_GW2_ADDONS_NEXUS);				/* ensure addons/Nexus dir */
-		std::filesystem::create_directory(D_GW2_ADDONS_RAIDCORE_LOCALES);	/* ensure addons/Nexus/Locales dir */	
+		std::filesystem::create_directory(D_GW2_ADDONS);								/* ensure addons dir */
+		std::filesystem::create_directory(D_GW2_ADDONS_COMMON);							/* ensure addons/common dir */
+		std::filesystem::create_directory(D_GW2_ADDONS_NEXUS);							/* ensure addons/Nexus dir */
+		std::filesystem::create_directory(D_GW2_ADDONS_RAIDCORE_LOCALES);				/* ensure addons/Nexus/Locales dir */	
 
 		/* files */
-		F_LOG = D_GW2_ADDONS_NEXUS / "Nexus.log";							/* get log path */
-		F_KEYBINDS = D_GW2_ADDONS_NEXUS / "Keybinds.json";					/* get keybinds path */
-		F_FONT = D_GW2_ADDONS_NEXUS / "Font.ttf";							/* get font path */
-		F_SETTINGS = D_GW2_ADDONS_NEXUS / "Settings.json";					/* get settings path */
-		F_APIKEYS = D_GW2_ADDONS_COMMON / "APIKeys.json";					/* get apikeys path */
-
+		F_LOG = D_GW2_ADDONS_NEXUS / "Nexus.log";										/* get log path */
+		F_KEYBINDS = D_GW2_ADDONS_NEXUS / "Keybinds.json";								/* get keybinds path */
+		F_FONT = D_GW2_ADDONS_NEXUS / "Font.ttf";										/* get font path */
+		F_SETTINGS = D_GW2_ADDONS_NEXUS / "Settings.json";								/* get settings path */
+		F_APIKEYS = D_GW2_ADDONS_COMMON / "APIKeys.json";								/* get apikeys path */
+			
 		/* static paths */
-		F_OLD_DLL = F_HOST_DLL.string() + ".old";							/* get old dll path */
-		F_UPDATE_DLL = F_HOST_DLL.string() + ".update";						/* get update dll path */
-		PathSystemAppend(F_SYSTEM_DLL, "d3d11.dll");						/* get system dll path */
-		F_CHAINLOAD_DLL = D_GW2 / "d3d11_chainload.dll";					/* get chainload dll path */
+		F_OLD_DLL = F_HOST_DLL.string() + ".old";										/* get old dll path */
+		F_UPDATE_DLL = F_HOST_DLL.string() + ".update";									/* get update dll path */
+		PathSystemAppend(F_SYSTEM_DLL, "d3d11.dll");									/* get system dll path */
+		F_CHAINLOAD_DLL = D_GW2 / "d3d11_chainload.dll";								/* get chainload dll path */
 
 		/* push to paths */
 		ExistingPaths.push_back(D_GW2.string());
 		ExistingPaths.push_back(D_GW2_ADDONS_COMMON.string());
+		ExistingPaths.push_back(D_GW2_ADDONS_COMMON_API_V2.string());
+		ExistingPaths.push_back(D_GW2_ADDONS_COMMON_API_RAIDCORE.string());
 	}
 
 	const char* GetGameDirectory()

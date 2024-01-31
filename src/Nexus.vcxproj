@@ -12,8 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="API\ActiveToken.cpp" />
+    <ClCompile Include="API\APIClient.cpp" />
     <ClCompile Include="API\APIController.cpp" />
-    <ClCompile Include="API\APIHandler.cpp" />
     <ClCompile Include="Consts.cpp" />
     <ClCompile Include="core.cpp" />
     <ClCompile Include="CrashHandler.cpp" />
@@ -69,9 +69,11 @@
     <ClCompile Include="WndProc\WndProcHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="API\APIClient.h" />
     <ClInclude Include="API\APIController.h" />
     <ClInclude Include="API\ActiveToken.h" />
-    <ClInclude Include="API\APIHandler.h" />
+    <ClInclude Include="API\APIRequest.h" />
+    <ClInclude Include="API\APIResponse.h" />
     <ClInclude Include="API\CachedResponse.h" />
     <ClInclude Include="Branch.h" />
     <ClInclude Include="Consts.h" />
@@ -104,7 +106,6 @@
     <ClInclude Include="GUI\Widgets\QuickAccess\Shortcut.h" />
     <ClInclude Include="Hooks.h" />
     <ClInclude Include="httplib\httplib.h" />
-    <ClInclude Include="httpslib.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_extensions.h" />
@@ -318,28 +319,39 @@
     <None Include="exports.def" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="Resources\Menomonia.ttf" />
-    <Font Include="Resources\TrebuchetMS.ttf" />
+    <Font Include="Resources\Fonts\Menomonia.ttf" />
+    <Font Include="Resources\Fonts\TrebuchetMS.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Resources\anvilhammer.png" />
-    <Image Include="Resources\cog.png" />
-    <Image Include="Resources\ICON_GENERIC.png" />
-    <Image Include="Resources\ICON_GENERIC_HOVER.png" />
-    <Image Include="Resources\ICON_NEXUS.png" />
-    <Image Include="Resources\ICON_NEXUS_HALLOWEEN.png" />
-    <Image Include="Resources\ICON_NEXUS_HALLOWEEN_HOVER.png" />
-    <Image Include="Resources\ICON_NEXUS_HOVER.png" />
-    <Image Include="Resources\ICON_NEXUS_XMAS.png" />
-    <Image Include="Resources\ICON_NEXUS_XMAS_HOVER.png" />
-    <Image Include="Resources\ICON_NOTIFICATION.png" />
-    <Image Include="Resources\log.png" />
-    <Image Include="Resources\question.png" />
-    <Image Include="Resources\star.png" />
-    <Image Include="Resources\TEX_MENU_BUTTON.png" />
-    <Image Include="Resources\TEX_MENU_BUTTON_HOVER.png" />
-    <Image Include="Resources\TEX_MENU_BACKGROUND.png" />
-    <Image Include="Resources\wrench.png" />
+    <Image Include="Resources\AddonsWindow\AddonItem.png" />
+    <Image Include="Resources\AddonsWindow\Background.png" />
+    <Image Include="Resources\AddonsWindow\Background_blue.png" />
+    <Image Include="Resources\AddonsWindow\TitleBar.png" />
+    <Image Include="Resources\AddonsWindow\TitleBar_Hover.png" />
+    <Image Include="Resources\BtnClose.png" />
+    <Image Include="Resources\BtnClose_Hover.png" />
+    <Image Include="Resources\Menu\Background.png" />
+    <Image Include="Resources\Menu\BtnAbout.png" />
+    <Image Include="Resources\Menu\BtnAddons.png" />
+    <Image Include="Resources\Menu\BtnChangelog.png" />
+    <Image Include="Resources\Menu\BtnDebug.png" />
+    <Image Include="Resources\Menu\BtnLog.png" />
+    <Image Include="Resources\Menu\BtnOptions.png" />
+    <Image Include="Resources\Menu\MenuItem.png" />
+    <Image Include="Resources\Menu\MenuItem_Hover.png" />
+    <Image Include="Resources\Notification.png" />
+    <Image Include="Resources\QuickAccess\Generic.png" />
+    <Image Include="Resources\QuickAccess\Generic_Hover.png" />
+    <Image Include="Resources\QuickAccess\Nexus.png" />
+    <Image Include="Resources\QuickAccess\NexusHalloween.png" />
+    <Image Include="Resources\QuickAccess\NexusHalloween_Hover.png" />
+    <Image Include="Resources\QuickAccess\NexusXmas.png" />
+    <Image Include="Resources\QuickAccess\NexusXmas_Hover.png" />
+    <Image Include="Resources\QuickAccess\Nexus_Hover.png" />
+    <Image Include="Resources\TabBtn.png" />
+    <Image Include="Resources\TabBtn_Hover.png" />
+    <Image Include="Resources\TitleBarEnd.png" />
+    <Image Include="Resources\TitleBarEnd_Hover.png" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

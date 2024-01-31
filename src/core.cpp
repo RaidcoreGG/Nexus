@@ -52,7 +52,7 @@ std::wstring StrToWStr(const std::string& aString)
 
 namespace String
 {
-	std::string Replace(const std::string& aString, const std::string& aOld, const std::string& aNew)
+	std::string Replace(const std::string& aString, const std::string& aOld, const std::string& aNew, size_t aPosition)
 	{
 		std::string retStr = aString;
 		if (aOld.empty())
@@ -60,7 +60,7 @@ namespace String
 			return retStr;
 		}
 
-		size_t pos = 0;
+		size_t pos = aPosition;
 		while ((pos = retStr.find(aOld, pos)) != std::string::npos)
 		{
 			retStr.replace(pos, aOld.length(), aNew);
@@ -170,6 +170,27 @@ std::string GetEndpoint(const std::string& aUrl)
 	}
 
 	return aUrl.substr(idx);
+}
+std::string GetQuery(const std::string& aEndpoint, const std::string& aParameters)
+{
+	std::string rQuery;
+
+	if (!aEndpoint.find("/", 0) == 0)
+	{
+		rQuery.append("/");
+	}
+	rQuery.append(aEndpoint);
+
+	if (!aParameters.find("?", 0) == 0 && aParameters.length() > 0)
+	{
+		rQuery.append("?");
+	}
+	if (!aParameters.empty())
+	{
+		rQuery.append(aParameters);
+	}
+
+	return rQuery;
 }
 
 namespace Base64

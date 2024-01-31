@@ -9,6 +9,7 @@
 #include "Consts.h"
 #include "Shared.h"
 #include "State.h"
+#include "core.h"
 
 typedef struct _SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX
 {
@@ -29,6 +30,13 @@ typedef struct _SYSTEM_HANDLE_INFORMATION_EX
 	SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX Handles[1];
 } SYSTEM_HANDLE_INFORMATION_EX, * PSYSTEM_HANDLE_INFORMATION_EX;
 
+typedef NTSTATUS(* PFN_NTQUERYSYSTEMINFORMATION)(
+	SYSTEM_INFORMATION_CLASS SystemInformationClass,
+	PVOID                    SystemInformation,
+	ULONG                    SystemInformationLength,
+	PULONG                   ReturnLength
+);
+
 NTSTATUS GetProcessHandles(std::vector<HANDLE>& handles)
 {
 	NTSTATUS result;
@@ -38,7 +46,10 @@ NTSTATUS GetProcessHandles(std::vector<HANDLE>& handles)
 	{
 		delete[] info;
 		info = (SYSTEM_HANDLE_INFORMATION_EX*) new BYTE[bufferSize];
-		result = NtQuerySystemInformation((SYSTEM_INFORMATION_CLASS)0x40, info, bufferSize, &bufferSize);
+
+		static PFN_NTQUERYSYSTEMINFORMATION func;
+		FindFunction(GetModuleHandle("ntdll.dll"), &func, "NtQuerySystemInformation");
+		result = func((SYSTEM_INFORMATION_CLASS)0x40, info, bufferSize, &bufferSize);
 	}
 	while (result == STATUS_INFO_LENGTH_MISMATCH);
 
@@ -56,9 +67,20 @@ NTSTATUS GetProcessHandles(std::vector<HANDLE>& handles)
 	return result;
 }
 
+typedef NTSTATUS(* PFN_NTQUERYOBJECT)(
+	HANDLE                   Handle,
+	OBJECT_INFORMATION_CLASS ObjectInformationClass,
+	PVOID                    ObjectInformation,
+	ULONG                    ObjectInformationLength,
+	PULONG                   ReturnLength
+);
+
 bool GetHandleName(HANDLE handle, PUNICODE_STRING name, ULONG nameSize)
 {
-	NTSTATUS result = NtQueryObject(handle, (OBJECT_INFORMATION_CLASS)0x01, name, nameSize,	&nameSize);
+	static PFN_NTQUERYOBJECT func;
+	FindFunction(GetModuleHandle("ntdll.dll"), &func, "NtQueryObject");
+
+	NTSTATUS result = func(handle, (OBJECT_INFORMATION_CLASS)0x01, name, nameSize,	&nameSize);
 	return NT_SUCCESS(result) ? true : false;
 }
 
@@ -75,6 +97,11 @@ bool UnicodeStringContains(PCUNICODE_STRING String1, PCUNICODE_STRING String2)
 	return false;
 }
 
+typedef NTSTATUS(*PFN_RTLINITUNICODESTRING)(
+	PUNICODE_STRING DestinationString,
+	PCWSTR          SourceString
+);
+
 namespace Multibox
 {
 	void ShareArchive()
@@ -85,7 +112,6 @@ namespace Multibox
 
 	void ShareLocal()
 	{
-
 		LogCritical(CH_CORE, "Multibox::ShareLocal() not implemented.");
 		return;
 	}
@@ -100,7 +126,9 @@ namespace Multibox
 		UNICODE_STRING* handleName = (UNICODE_STRING*) new unsigned char[handleNameSize];
 
 		UNICODE_STRING mutexName;
-		RtlInitUnicodeString(&mutexName, L"AN-Mutex-Window-Guild Wars 2");
+		static PFN_RTLINITUNICODESTRING func;
+		FindFunction(GetModuleHandle("ntdll.dll"), &func, "RtlInitUnicodeString");
+		func(&mutexName, L"AN-Mutex-Window-Guild Wars 2");
 
 		std::vector<HANDLE> handles;
 		GetProcessHandles(handles);

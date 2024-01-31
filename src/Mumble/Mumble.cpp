@@ -86,7 +86,7 @@ namespace Mumble
 				}
 			}
 
-			Sleep(1000);
+			Sleep(50);
 		}
 	}
 

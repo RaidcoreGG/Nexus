@@ -578,6 +578,17 @@ namespace GUI
 
 		/* set up and add windows */
 		AddonsWindow* addonsWnd = new AddonsWindow("Addons");
+		TextureLoader::LoadFromResource("TEX_ADDONS_BACKGROUND", RES_TEX_ADDONS_BACKGROUND, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource("TEX_ADDONITEM_BACKGROUND", RES_TEX_ADDONITEM, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource("TEX_ADDONS_TITLEBAR", RES_TEX_ADDONS_TITLEBAR, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource("TEX_ADDONS_TITLEBAR_HOVER", RES_TEX_ADDONS_TITLEBAR_HOVER, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource("TEX_TABBTN", RES_TEX_TABBTN, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource("TEX_TABBTN_HOVER", RES_TEX_TABBTN_HOVER, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource("TEX_BTNCLOSE", RES_TEX_BTNCLOSE, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource("TEX_BTNCLOSE_HOVER", RES_TEX_BTNCLOSE_HOVER, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource("TEX_TITLEBAREND", RES_TEX_TITLEBAREND, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource("TEX_TITLEBAREND_HOVER", RES_TEX_TITLEBAREND_HOVER, NexusHandle, nullptr);
+
 		OptionsWindow* opsWnd = new OptionsWindow("Options");
 		ChangelogWindow* chlWnd = new ChangelogWindow("Changelog");
 		LogWindow* logWnd = new LogWindow("Log", ELogLevel::ALL);

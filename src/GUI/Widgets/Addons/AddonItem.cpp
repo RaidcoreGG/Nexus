@@ -9,6 +9,8 @@
 #include "Loader/AddonDefinition.h"
 #include "Loader/EAddonFlags.h"
 #include "Loader/Loader.h"
+#include "Textures/TextureLoader.h"
+#include "Textures/Texture.h"
 
 #include "Events/EventHandler.h"
 
@@ -17,7 +19,12 @@
 
 namespace GUI
 {
+	float itemWidth = 520.0f;
+	float itemHeight = 104.0f;
+
 	float btnWidth = 7.5f;
+
+	Texture* Background = nullptr;
 
 	void AddonItem(Addon* aAddon)
 	{
@@ -30,17 +37,40 @@ namespace GUI
 		}
 
 		float btnHeight = 22.0f * Renderer::Scaling;
+		float itemWidthScaled = itemWidth * Renderer::Scaling;
+		float itemHeightScaled = itemHeight * Renderer::Scaling;
 
 		std::string sig = std::to_string(aAddon->Definitions->Signature); // helper for unique chkbxIds
 
-		if (ImGui::BeginTable(("#AddonItem" + sig).c_str(), 1, ImGuiTableFlags_BordersOuter, ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
-		{
-			ImGui::TableNextRow();
-			ImGui::TableSetColumnIndex(0);
-			{
-				ImGui::BeginGroup();
+		// initial is explicitly set within the window, therefore all positions should be relative to it
+		ImVec2 initial = ImGui::GetCursorPos();
 
+		if (Background)
+		{
+			ImGui::SetCursorPos(initial);
+			ImGui::Image(Background->Resource, ImVec2(itemWidthScaled, itemHeightScaled));
+		}
+		else
+		{
+			Background = TextureLoader::Get("TEX_ADDONITEM_BACKGROUND");
+		}
+
+		{
+			ImGui::SetCursorPos(initial);
+			ImGui::BeginChild(("##AddonItemContent" + sig).c_str(), ImVec2(itemWidthScaled, itemHeightScaled));
+
+			float actionsWidth = btnWidth * ImGui::GetFontSize();
+			float descWidth = itemWidthScaled - actionsWidth - 12.0f - 12.0f - 12.0f; // padding left, right and in between
+
+			{
+				ImGui::SetCursorPos(ImVec2(12.0f, 12.0f));
+				ImGui::BeginChild("##AddonItemDescription", ImVec2(descWidth, itemHeightScaled - 12.0f - 12.0f));
+
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.933f, 0.733f, 1.0f));
+				ImGui::PushFont(Font);
 				ImGui::Text(aAddon->Definitions->Name); ImGui::SameLine();
+				ImGui::PopFont();
+				ImGui::PopStyleColor();
 				ImGui::TextDisabled("(%s)", aAddon->Definitions->Version.ToString().c_str()); ImGui::SameLine();
 				ImGui::TextDisabled("by %s", aAddon->Definitions->Author);
 				ImGui::TextWrapped(aAddon->Definitions->Description);
@@ -50,13 +80,15 @@ namespace GUI
 					ImGui::TextColored(ImVec4(255, 255, 0, 255), "Addon requested incompatible API Version: %d", aAddon->Definitions->APIVersion);
 				}
 
-				ImGui::EndGroup();
+				ImGui::EndChild();
 			}
 
 			{
+				ImGui::SetCursorPos(ImVec2(descWidth + 12.0f + 12.0f, 12.0f));
+				ImGui::BeginChild("##AddonItemActions", ImVec2(actionsWidth, itemHeightScaled - 12.0f - 12.0f));
+
 				int amtBtns = 0;
 
-				ImGui::BeginGroup();
 				if (aAddon->State == EAddonState::Loaded &&
 					!(aAddon->Definitions->Unload == nullptr || aAddon->Definitions->HasFlag(EAddonFlags::DisableHotloading)))
 				{
@@ -90,10 +122,6 @@ namespace GUI
 				}
 				if (!((aAddon->Definitions->Unload == nullptr && aAddon->State == EAddonState::Loaded) || aAddon->Definitions->HasFlag(EAddonFlags::DisableHotloading)))
 				{
-					if (amtBtns > 0)
-					{
-						ImGui::SameLine();
-					}
 					amtBtns++;
 					if (ImGui::GW2Button(("Uninstall##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
@@ -109,10 +137,6 @@ namespace GUI
 				}
 				if (aAddon->Definitions->Provider == EUpdateProvider::GitHub && aAddon->Definitions->UpdateLink)
 				{
-					if (amtBtns > 0)
-					{
-						ImGui::SameLine();
-					}
 					amtBtns++;
 					if (ImGui::GW2Button(("GitHub##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
@@ -120,10 +144,12 @@ namespace GUI
 					}
 				}
 
-				ImGui::EndGroup();
+				ImGui::EndChild();
 			}
 
-			ImGui::EndTable();
+			ImGui::EndChild();
+
+			ImGui::SetCursorPos(ImVec2(0, initial.y + itemHeightScaled + 4.0f));
 		}
 	}
 }

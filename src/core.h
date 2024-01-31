@@ -15,7 +15,7 @@ std::wstring StrToWStr(const std::string& aString);
 
 namespace String
 {
-	std::string Replace(const std::string& aString, const std::string& aOld, const std::string& aNew);
+	std::string Replace(const std::string& aString, const std::string& aOld, const std::string& aNew, size_t aPosition = 0);
 }
 
 const char* ConvertToUTF8(const char* multibyteStr);
@@ -25,6 +25,7 @@ std::vector<unsigned char> MD5FromFile(const std::filesystem::path& aPath);
 
 std::string GetBaseURL(const std::string& aUrl);
 std::string GetEndpoint(const std::string& aUrl);
+std::string GetQuery(const std::string& aEndpoint, const std::string& aParameters);
 
 namespace Base64
 {

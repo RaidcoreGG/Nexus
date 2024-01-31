@@ -76,9 +76,6 @@
     <Filter Include="Resource Files\Images\Menu">
       <UniqueIdentifier>{ba4ee355-8394-4c12-b6c5-e9b9dcfda39d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Images\Shortcuts">
-      <UniqueIdentifier>{c46e3486-9b1a-4bf8-bc57-adcaf1023e47}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GUI\Widgets\Options">
       <UniqueIdentifier>{b211fbda-c7b4-4d75-b2c9-6801eab1bc0a}</UniqueIdentifier>
     </Filter>
@@ -115,8 +112,14 @@
     <Filter Include="Multibox">
       <UniqueIdentifier>{a1bb18bc-73ac-4f45-bea0-8e830d61c56f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Images\Menu\Icons">
-      <UniqueIdentifier>{ce8e3a18-149b-4782-9b14-b3b5674b347e}</UniqueIdentifier>
+    <Filter Include="Resource Files\Images\Backgrounds">
+      <UniqueIdentifier>{938be6e2-4197-4fb0-a513-f396feecfc9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Images\AddonsWindow">
+      <UniqueIdentifier>{83d6e4ae-4b45-4149-aad4-475bff0bc918}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Images\QuickAccess">
+      <UniqueIdentifier>{c46e3486-9b1a-4bf8-bc57-adcaf1023e47}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -285,7 +288,7 @@
     <ClCompile Include="Proxy.cpp">
       <Filter>_GLOBAL</Filter>
     </ClCompile>
-    <ClCompile Include="API\APIHandler.cpp">
+    <ClCompile Include="API\APIClient.cpp">
       <Filter>API</Filter>
     </ClCompile>
   </ItemGroup>
@@ -995,9 +998,6 @@
     <ClInclude Include="nlohmann\json.hpp">
       <Filter>_EXTERNAL</Filter>
     </ClInclude>
-    <ClInclude Include="httpslib.h">
-      <Filter>_EXTERNAL</Filter>
-    </ClInclude>
     <ClInclude Include="httplib\httplib.h">
       <Filter>_EXTERNAL</Filter>
     </ClInclude>
@@ -1010,10 +1010,16 @@
     <ClInclude Include="Main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="API\APIHandler.h">
+    <ClInclude Include="API\APIRequest.h">
+      <Filter>API</Filter>
+    </ClInclude>
+    <ClInclude Include="API\APIClient.h">
       <Filter>API</Filter>
     </ClInclude>
     <ClInclude Include="API\CachedResponse.h">
+      <Filter>API</Filter>
+    </ClInclude>
+    <ClInclude Include="API\APIResponse.h">
       <Filter>API</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1023,72 +1029,105 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Font Include="Resources\Menomonia.ttf">
-      <Filter>Resource Files\Fonts</Filter>
-    </Font>
-    <Font Include="Resources\TrebuchetMS.ttf">
-      <Filter>Resource Files\Fonts</Filter>
-    </Font>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="exports.def">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Resources\TEX_MENU_BACKGROUND.png">
+    <Font Include="Resources\Fonts\Menomonia.ttf">
+      <Filter>Resource Files\Fonts</Filter>
+    </Font>
+    <Font Include="Resources\Fonts\TrebuchetMS.ttf">
+      <Filter>Resource Files\Fonts</Filter>
+    </Font>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\AddonsWindow\AddonItem.png">
+      <Filter>Resource Files\Images\AddonsWindow</Filter>
+    </Image>
+    <Image Include="Resources\AddonsWindow\Background.png">
+      <Filter>Resource Files\Images\AddonsWindow</Filter>
+    </Image>
+    <Image Include="Resources\AddonsWindow\Background_blue.png">
+      <Filter>Resource Files\Images\AddonsWindow</Filter>
+    </Image>
+    <Image Include="Resources\AddonsWindow\TitleBar.png">
+      <Filter>Resource Files\Images\AddonsWindow</Filter>
+    </Image>
+    <Image Include="Resources\AddonsWindow\TitleBar_Hover.png">
+      <Filter>Resource Files\Images\AddonsWindow</Filter>
+    </Image>
+    <Image Include="Resources\Menu\Background.png">
       <Filter>Resource Files\Images\Menu</Filter>
     </Image>
-    <Image Include="Resources\TEX_MENU_BUTTON.png">
+    <Image Include="Resources\Menu\BtnAbout.png">
       <Filter>Resource Files\Images\Menu</Filter>
     </Image>
-    <Image Include="Resources\TEX_MENU_BUTTON_HOVER.png">
+    <Image Include="Resources\Menu\BtnAddons.png">
       <Filter>Resource Files\Images\Menu</Filter>
     </Image>
-    <Image Include="Resources\ICON_GENERIC.png">
-      <Filter>Resource Files\Images\Shortcuts</Filter>
+    <Image Include="Resources\Menu\BtnChangelog.png">
+      <Filter>Resource Files\Images\Menu</Filter>
     </Image>
-    <Image Include="Resources\ICON_GENERIC_HOVER.png">
-      <Filter>Resource Files\Images\Shortcuts</Filter>
+    <Image Include="Resources\Menu\BtnDebug.png">
+      <Filter>Resource Files\Images\Menu</Filter>
     </Image>
-    <Image Include="Resources\ICON_NEXUS.png">
-      <Filter>Resource Files\Images\Shortcuts</Filter>
+    <Image Include="Resources\Menu\BtnLog.png">
+      <Filter>Resource Files\Images\Menu</Filter>
     </Image>
-    <Image Include="Resources\ICON_NEXUS_HOVER.png">
-      <Filter>Resource Files\Images\Shortcuts</Filter>
+    <Image Include="Resources\Menu\BtnOptions.png">
+      <Filter>Resource Files\Images\Menu</Filter>
     </Image>
-    <Image Include="Resources\ICON_NEXUS_HALLOWEEN.png">
-      <Filter>Resource Files\Images\Shortcuts</Filter>
+    <Image Include="Resources\Menu\MenuItem.png">
+      <Filter>Resource Files\Images\Menu</Filter>
     </Image>
-    <Image Include="Resources\ICON_NEXUS_HALLOWEEN_HOVER.png">
-      <Filter>Resource Files\Images\Shortcuts</Filter>
+    <Image Include="Resources\Menu\MenuItem_Hover.png">
+      <Filter>Resource Files\Images\Menu</Filter>
     </Image>
-    <Image Include="Resources\ICON_NEXUS_XMAS.png">
-      <Filter>Resource Files\Images\Shortcuts</Filter>
+    <Image Include="Resources\QuickAccess\Generic.png">
+      <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
-    <Image Include="Resources\ICON_NEXUS_XMAS_HOVER.png">
-      <Filter>Resource Files\Images\Shortcuts</Filter>
+    <Image Include="Resources\QuickAccess\Generic_Hover.png">
+      <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
-    <Image Include="Resources\ICON_NOTIFICATION.png">
-      <Filter>Resource Files\Images\Shortcuts</Filter>
+    <Image Include="Resources\QuickAccess\Nexus.png">
+      <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
-    <Image Include="Resources\question.png">
-      <Filter>Resource Files\Images\Menu\Icons</Filter>
+    <Image Include="Resources\QuickAccess\Nexus_Hover.png">
+      <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
-    <Image Include="Resources\star.png">
-      <Filter>Resource Files\Images\Menu\Icons</Filter>
+    <Image Include="Resources\QuickAccess\NexusHalloween.png">
+      <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
-    <Image Include="Resources\wrench.png">
-      <Filter>Resource Files\Images\Menu\Icons</Filter>
+    <Image Include="Resources\QuickAccess\NexusHalloween_Hover.png">
+      <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
-    <Image Include="Resources\anvilhammer.png">
-      <Filter>Resource Files\Images\Menu\Icons</Filter>
+    <Image Include="Resources\QuickAccess\NexusXmas.png">
+      <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
-    <Image Include="Resources\cog.png">
-      <Filter>Resource Files\Images\Menu\Icons</Filter>
+    <Image Include="Resources\QuickAccess\NexusXmas_Hover.png">
+      <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
-    <Image Include="Resources\log.png">
-      <Filter>Resource Files\Images\Menu\Icons</Filter>
+    <Image Include="Resources\BtnClose.png">
+      <Filter>Resource Files\Images</Filter>
+    </Image>
+    <Image Include="Resources\BtnClose_Hover.png">
+      <Filter>Resource Files\Images</Filter>
+    </Image>
+    <Image Include="Resources\TitleBarEnd.png">
+      <Filter>Resource Files\Images</Filter>
+    </Image>
+    <Image Include="Resources\TitleBarEnd_Hover.png">
+      <Filter>Resource Files\Images</Filter>
+    </Image>
+    <Image Include="Resources\TabBtn.png">
+      <Filter>Resource Files\Images\QuickAccess</Filter>
+    </Image>
+    <Image Include="Resources\TabBtn_Hover.png">
+      <Filter>Resource Files\Images\QuickAccess</Filter>
+    </Image>
+    <Image Include="Resources\Notification.png">
+      <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
   </ItemGroup>
 </Project>
