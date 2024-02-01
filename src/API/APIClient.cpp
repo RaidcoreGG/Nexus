@@ -151,7 +151,8 @@ void APIClient::GetAsync(API_RESPONSE_CALLBACK aCallback, std::string aEndpoint,
 
 	const std::lock_guard<std::mutex> lock(Mutex);
 	QueuedRequests.push_back(req);
-	ConVar.notify_one();
+	IsSuspended = false;
+	ConVar.notify_all();
 }
 
 CachedResponse* APIClient::GetCachedResponse(const std::string& aQuery)
@@ -238,13 +239,10 @@ void APIClient::ProcessRequests()
 {
 	for (;;)
 	{
-		/* FIXME: Apply this same logic in the loader. */
-		std::unique_lock<std::mutex> lockThread(ThreadMutex);
-		while (IsSuspended)
 		{
-			ConVar.wait(lockThread);
+			std::unique_lock<std::mutex> lockThread(ThreadMutex);
+			ConVar.wait(lockThread, [this] { return !IsSuspended; });
 		}
-		lockThread.unlock();
 
 		const std::lock_guard<std::mutex> lock(Mutex);
 		/* Do some rate limiting */

@@ -37,16 +37,25 @@ using json = nlohmann::json;
 
 namespace Loader
 {
-	std::mutex Mutex;
-	std::unordered_map<std::filesystem::path, ELoaderAction> QueuedAddons;
-	std::unordered_map<std::filesystem::path, Addon*> Addons;
-	std::map<int, AddonAPI*> ApiDefs;
+	std::mutex					Mutex;
+	std::unordered_map<
+		std::filesystem::path,
+		ELoaderAction
+	>							QueuedAddons;
+	std::unordered_map<
+		std::filesystem::path,
+		Addon*
+	>							Addons;
+	std::map<int, AddonAPI*>	ApiDefs;
 
-	int DirectoryChangeCountdown = 0;
-	std::thread LoaderThread;
+	int							DirectoryChangeCountdown = 0;
+	std::condition_variable		ConVar;
+	std::mutex					ThreadMutex;
+	std::thread					LoaderThread;
+	bool						IsSuspended = false;
 
-	PIDLIST_ABSOLUTE FSItemList;
-	ULONG FSNotifierID;
+	PIDLIST_ABSOLUTE			FSItemList;
+	ULONG						FSNotifierID;
 
 	std::string dll = ".dll";
 	std::string dllUpdate = ".update";
@@ -79,7 +88,8 @@ namespace Loader
 				return;
 			}
 
-			ProcessChanges(); // Invoke once because addon dir doesn't change on init
+			LoaderThread = std::thread(ProcessChanges);
+			LoaderThread.detach();
 		}
 	}
 	void Shutdown()
@@ -192,67 +202,73 @@ namespace Loader
 
 	void NotifyChanges()
 	{
-		if (DirectoryChangeCountdown == 0)
-		{
-			DirectoryChangeCountdown = LOADER_WAITTIME_MS;
-
-			LoaderThread = std::thread(ProcessChanges);
-			LoaderThread.detach();
-		}
-		else
-		{
-			DirectoryChangeCountdown = LOADER_WAITTIME_MS;
-		}
+		DirectoryChangeCountdown = LOADER_WAITTIME_MS;
+		IsSuspended = false;
+		ConVar.notify_all();
 	}
 	void ProcessChanges()
 	{
-		while (DirectoryChangeCountdown > 0)
+		for (;;)
 		{
-			Sleep(100);
-			DirectoryChangeCountdown -= 100;
-		}
-
-		const std::lock_guard<std::mutex> lock(Mutex);
-
-		// check all tracked addons
-		for (auto& it : Addons)
-		{
-			// if addon no longer on disk
-			if (!std::filesystem::exists(it.first))
 			{
-				LogDebug(CH_LOADER, "%s no longer exists. Attempting to unload.", it.first.string().c_str());
-				QueueAddon(ELoaderAction::Unload, it.first);
-				continue;
+				std::unique_lock<std::mutex> lockThread(ThreadMutex);
+				ConVar.wait(lockThread, [] { return !IsSuspended; });
+
+				auto start_time = std::chrono::high_resolution_clock::now();
+				while (DirectoryChangeCountdown > 0)
+				{
+					Sleep(1);
+					DirectoryChangeCountdown -= 1;
+				}
+				auto end_time = std::chrono::high_resolution_clock::now();
+				auto time = end_time - start_time;
+				Log(CH_LOADER, "Processing changes after waiting for %ums.", time / std::chrono::milliseconds(1));
 			}
 
-			std::vector<unsigned char> md5 = MD5FromFile(it.first);
+			const std::lock_guard<std::mutex> lock(Mutex);
 
-			if (it.second->MD5.empty() || it.second->MD5 != md5)
+			// check all tracked addons
+			for (auto& it : Addons)
 			{
-				QueueAddon(ELoaderAction::Reload, it.first);
-			}
-		}
+				// if addon no longer on disk
+				if (!std::filesystem::exists(it.first))
+				{
+					LogDebug(CH_LOADER, "%s no longer exists. Attempting to unload.", it.first.string().c_str());
+					QueueAddon(ELoaderAction::Unload, it.first);
+					continue;
+				}
 
-		// check all other files in the directory
-		for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Path::D_GW2_ADDONS))
-		{
-			std::filesystem::path path = entry.path();
+				std::vector<unsigned char> md5 = MD5FromFile(it.first);
 
-			// if (not a file || already tracked) -> skip
-			if (std::filesystem::is_directory(path) || Addons.find(path) != Addons.end())
-			{
-				continue;
+				if (it.second->MD5.empty() || it.second->MD5 != md5)
+				{
+					QueueAddon(ELoaderAction::Reload, it.first);
+				}
 			}
 
-			if (path.extension() == dll)
+			// check all other files in the directory
+			for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Path::D_GW2_ADDONS))
 			{
-				QueueAddon(ELoaderAction::Load, path);
+				std::filesystem::path path = entry.path();
+
+				// if (not a file || already tracked) -> skip
+				if (std::filesystem::is_directory(path) || Addons.find(path) != Addons.end())
+				{
+					continue;
+				}
+
+				if (path.extension() == dll)
+				{
+					QueueAddon(ELoaderAction::Load, path);
+				}
+				else if (path.extension() == dllUpdate)
+				{
+					path = path.replace_extension("");
+					QueueAddon(ELoaderAction::Reload, path);
+				}
 			}
-			else if (path.extension() == dllUpdate)
-			{
-				path = path.replace_extension("");
-				QueueAddon(ELoaderAction::Reload, path);
-			}
+
+			IsSuspended = true;
 		}
 	}
 	

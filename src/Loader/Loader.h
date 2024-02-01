@@ -7,6 +7,7 @@
 #include <thread>
 #include <filesystem>
 #include <Shlobj.h>
+#include <condition_variable>
 
 #include "ELoaderAction.h"
 #include "Addon.h"
@@ -14,16 +15,25 @@
 
 namespace Loader
 {
-	extern std::mutex Mutex;
-	extern std::unordered_map<std::filesystem::path, ELoaderAction> QueuedAddons;		/* To be loaded or unloaded addons */
-	extern std::unordered_map<std::filesystem::path, Addon*> Addons;					/* Addons and their corresponding paths */
-	extern std::map<int, AddonAPI*> ApiDefs;											/* Addon API definitions, created on demand */
+	extern std::mutex					Mutex;
+	extern std::unordered_map<
+		std::filesystem::path,
+		ELoaderAction
+	>									QueuedAddons;					/* To be loaded or unloaded addons */
+	extern std::unordered_map<
+		std::filesystem::path,
+		Addon*
+	>									Addons;							/* Addons and their corresponding paths */
+	extern std::map<int, AddonAPI*>		ApiDefs;						/* Addon API definitions, created on demand */
 
-	extern int DirectoryChangeCountdown;
-	extern std::thread LoaderThread;
+	extern int							DirectoryChangeCountdown;
+	extern std::condition_variable		ConVar;
+	extern std::mutex					ThreadMutex;
+	extern std::thread					LoaderThread;
+	extern bool							IsSuspended;
 
-	extern PIDLIST_ABSOLUTE FSItemList;
-	extern ULONG FSNotifierID;
+	extern PIDLIST_ABSOLUTE				FSItemList;
+	extern ULONG						FSNotifierID;
 
 	/* Registers the addon directory update notifications and loads all addons. */
 	void Initialize();
