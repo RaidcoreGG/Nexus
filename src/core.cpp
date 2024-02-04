@@ -5,6 +5,8 @@
 #include <PathCch.h>
 #include <Shlwapi.h>
 #include <fstream>
+#include <iomanip>
+#include <sstream>
 
 #include "openssl/evp.h"
 #include "openssl/md5.h"
@@ -109,10 +111,28 @@ std::vector<unsigned char> MD5(const unsigned char* data, size_t sz)
 }
 std::vector<unsigned char> MD5FromFile(const std::filesystem::path& aPath)
 {
-	std::ifstream file(aPath, std::ios::binary);
+	std::filesystem::path path = aPath;
+	if (std::filesystem::is_symlink(aPath))
+	{
+		path = std::filesystem::read_symlink(aPath);
+	}
+
+	std::ifstream file(path, std::ios::binary);
+
+	if (!file || !file.is_open())
+	{
+		return std::vector<unsigned char>();
+	}
+
 	file.seekg(0, std::ios::end);
 	size_t length = file.tellg();
 	file.seekg(0, std::ios::beg);
+
+	if (length == 0)
+	{
+		return std::vector<unsigned char>();
+	}
+
 	char* buffer = new char[length];
 	file.read(buffer, length);
 
@@ -123,6 +143,16 @@ std::vector<unsigned char> MD5FromFile(const std::filesystem::path& aPath)
 	file.close();
 
 	return md5;
+}
+std::string MD5ToString(const std::vector<unsigned char>& aBytes)
+{
+	std::stringstream oss;
+	for (size_t i = 0; i < aBytes.size(); i++)
+	{
+		oss << std::uppercase << std::setfill('0') << std::setw(2) << std::hex << (int)aBytes[i];
+	}
+	std::string str = oss.str();
+	return str;
 }
 
 std::string GetBaseURL(const std::string& aUrl)

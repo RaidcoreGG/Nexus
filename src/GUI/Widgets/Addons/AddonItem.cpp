@@ -66,18 +66,19 @@ namespace GUI
 				ImGui::SetCursorPos(ImVec2(12.0f, 12.0f));
 				ImGui::BeginChild("##AddonItemDescription", ImVec2(descWidth, itemHeightScaled - 12.0f - 12.0f));
 
-				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.933f, 0.733f, 1.0f));
 				ImGui::PushFont(Font);
-				ImGui::Text(aAddon->Definitions->Name); ImGui::SameLine();
+				ImGui::TextColored(ImVec4(1.0f, 0.933f, 0.733f, 1.0f), aAddon->Definitions->Name); ImGui::SameLine();
 				ImGui::PopFont();
-				ImGui::PopStyleColor();
 				ImGui::TextDisabled("(%s)", aAddon->Definitions->Version.ToString().c_str()); ImGui::SameLine();
 				ImGui::TextDisabled("by %s", aAddon->Definitions->Author);
-				ImGui::TextWrapped(aAddon->Definitions->Description);
 
 				if (aAddon->State == EAddonState::IncompatibleAPI)
 				{
 					ImGui::TextColored(ImVec4(255, 255, 0, 255), "Addon requested incompatible API Version: %d", aAddon->Definitions->APIVersion);
+				}
+				else
+				{
+					ImGui::TextWrapped(aAddon->Definitions->Description);
 				}
 
 				ImGui::EndChild();
@@ -89,8 +90,8 @@ namespace GUI
 
 				int amtBtns = 0;
 
-				if (aAddon->State == EAddonState::Loaded &&
-					!(aAddon->Definitions->Unload == nullptr || aAddon->Definitions->HasFlag(EAddonFlags::DisableHotloading)))
+				// just check if loaded, if it was not hot-reloadable it would be EAddonState::LoadedLOCKED
+				if (aAddon->State == EAddonState::Loaded)
 				{
 					amtBtns++;
 					if (ImGui::GW2Button(("Disable##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))

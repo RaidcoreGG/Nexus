@@ -22,6 +22,7 @@ const char* ConvertToUTF8(const char* multibyteStr);
 
 std::vector<unsigned char> MD5(const unsigned char* data, size_t sz);
 std::vector<unsigned char> MD5FromFile(const std::filesystem::path& aPath);
+std::string MD5ToString(const std::vector<unsigned char>& aBytes);
 
 std::string GetBaseURL(const std::string& aUrl);
 std::string GetEndpoint(const std::string& aUrl);

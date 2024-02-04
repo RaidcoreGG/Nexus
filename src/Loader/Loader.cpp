@@ -57,8 +57,9 @@ namespace Loader
 	PIDLIST_ABSOLUTE			FSItemList;
 	ULONG						FSNotifierID;
 
-	std::string dll = ".dll";
-	std::string dllUpdate = ".update";
+	std::string extDll			= ".dll";
+	std::string extUpdate		= ".update";
+	std::string extOld			= ".old";
 
 	void Initialize()
 	{
@@ -112,12 +113,7 @@ namespace Loader
 			{
 				while (Addons.size() != 0)
 				{
-					UnloadAddon(Addons.begin()->first);
-					if (Addons.begin()->second->Module)
-					{
-						LogWarning(CH_LOADER, "Despite being unloaded \"%s\" still has an HMODULE defined, calling FreeLibrary().", Addons.begin()->first.string().c_str());
-						FreeLibrary(Addons.begin()->second->Module);
-					}
+					UnloadAddon(Addons.begin()->first, true);
 					Addons.erase(Addons.begin());
 				}
 			}
@@ -178,9 +174,26 @@ namespace Loader
 				break;
 			}
 			
-			if (!Addons[it->first] || it->second != ELoaderAction::Reload)
+			/*
+				if the action is not reload, then remove it after it was performed
+				else check if the addon exists and if it does check, if it is anything but NotLoaded
+				if it is, it was processed
+			*/
+			if (it->second != ELoaderAction::Reload)
 			{
 				QueuedAddons.erase(it);
+			}
+			else
+			{
+				auto addon = Addons.find(it->first);
+
+				if (addon != Addons.end())
+				{
+					if (addon->second->State != EAddonState::NotLoaded)
+					{
+						QueuedAddons.erase(it);
+					}
+				}
 			}
 		}
 	}
@@ -225,49 +238,47 @@ namespace Loader
 				Log(CH_LOADER, "Processing changes after waiting for %ums.", time / std::chrono::milliseconds(1));
 			}
 
-			const std::lock_guard<std::mutex> lock(Mutex);
-
-			// check all tracked addons
-			for (auto& it : Addons)
 			{
-				// if addon no longer on disk
-				if (!std::filesystem::exists(it.first))
+				const std::lock_guard<std::mutex> lock(Mutex);
+
+				// check all tracked addons
+				for (auto& it : Addons)
 				{
-					LogDebug(CH_LOADER, "%s no longer exists. Attempting to unload.", it.first.string().c_str());
-					QueueAddon(ELoaderAction::Unload, it.first);
-					continue;
+					// if addon no longer on disk
+					if (!std::filesystem::exists(it.first))
+					{
+						QueueAddon(ELoaderAction::Unload, it.first);
+						continue;
+					}
+
+					// get md5 of each file currently on disk and compare to tracked md5
+					// also check if an update is available (e.g. "addon.dll" + ".update" -> "addon.dll.update" exists)
+					std::vector<unsigned char> md5 = MD5FromFile(it.first);
+					std::filesystem::path updatePath = it.first.string() + extUpdate;
+					if ((it.second->MD5.empty() || it.second->MD5 != md5) || std::filesystem::exists(updatePath))
+					{
+						QueueAddon(ELoaderAction::Reload, it.first);
+					}
 				}
 
-				std::vector<unsigned char> md5 = MD5FromFile(it.first);
-
-				if (it.second->MD5.empty() || it.second->MD5 != md5)
+				// check all other files in the directory
+				for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Path::D_GW2_ADDONS))
 				{
-					QueueAddon(ELoaderAction::Reload, it.first);
+					std::filesystem::path path = entry.path();
+
+					// if (not a file || already tracked) -> skip
+					if (std::filesystem::is_directory(path) || Addons.find(path) != Addons.end())
+					{
+						continue;
+					}
+
+					if (path.extension() == extDll)
+					{
+						QueueAddon(ELoaderAction::Load, path);
+					}
 				}
 			}
-
-			// check all other files in the directory
-			for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Path::D_GW2_ADDONS))
-			{
-				std::filesystem::path path = entry.path();
-
-				// if (not a file || already tracked) -> skip
-				if (std::filesystem::is_directory(path) || Addons.find(path) != Addons.end())
-				{
-					continue;
-				}
-
-				if (path.extension() == dll)
-				{
-					QueueAddon(ELoaderAction::Load, path);
-				}
-				else if (path.extension() == dllUpdate)
-				{
-					path = path.replace_extension("");
-					QueueAddon(ELoaderAction::Reload, path);
-				}
-			}
-
+			
 			IsSuspended = true;
 		}
 	}
@@ -285,9 +296,9 @@ namespace Loader
 		{
 			addon = it->second;
 
-			if (addon->State == EAddonState::Loaded)
+			if (addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED)
 			{
-				LogWarning(CH_LOADER, "Cancelled loading \"%s\". Already loaded.", strPath);
+				//LogWarning(CH_LOADER, "Cancelled loading \"%s\". Already loaded.", strPath);
 				return;
 			}
 		}
@@ -335,11 +346,11 @@ namespace Loader
 
 		if (!aIsReload && UpdateAddon(aPath, tmpDefs))
 		{
-			QueueAddon(ELoaderAction::Reload, aPath);
+			LogInfo(CH_LOADER, "Update available for \"%s\". Reloading.", strPath);
 			FreeLibrary(addon->Module);
 			addon->State = EAddonState::NotLoaded;
 			addon->Module = nullptr;
-			UpdateSwapAddon(aPath);
+			QueueAddon(ELoaderAction::Reload, aPath);
 			return;
 		}
 
@@ -357,7 +368,10 @@ namespace Loader
 		for (auto& it : Addons)
 		{
 			// if defs defined && not the same path && signature the same though (another && it.second->Definitions in the mix because could still be null during load)
-			if (it.first != aPath && it.second->Definitions && it.second->Definitions->Signature == tmpDefs->Signature && it.second->State == EAddonState::Loaded)
+			if (it.first != aPath && 
+				it.second->Definitions && 
+				it.second->Definitions->Signature == tmpDefs->Signature && 
+				(it.second->State == EAddonState::Loaded || it.second->State == EAddonState::LoadedLOCKED))
 			{
 				LogWarning(CH_LOADER, "\"%s\" or another addon with this signature (%d) is already loaded. Added to blacklist.", strPath, tmpDefs->Signature);
 				FreeLibrary(addon->Module);
@@ -397,7 +411,9 @@ namespace Loader
 			LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.)", strPath, addon->Definitions->Signature, addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage, addon->Definitions->APIVersion);
 		}
 		addon->Definitions->Load(api);
-		addon->State = EAddonState::Loaded;
+
+		bool locked = addon->Definitions->Unload == nullptr || addon->Definitions->HasFlag(EAddonFlags::DisableHotloading);
+		addon->State = locked ? EAddonState::LoadedLOCKED : EAddonState::Loaded;
 	}
 	void UnloadAddon(const std::filesystem::path& aPath, bool aIsShutdown)
 	{
@@ -424,79 +440,128 @@ namespace Loader
 
 		if (addon->Definitions)
 		{
-			if (!addon->Definitions->Unload || addon->Definitions->HasFlag(EAddonFlags::DisableHotloading))
+			if (addon->State == EAddonState::Loaded)
 			{
-				addon->Module = 0;
-				LogWarning(CH_LOADER, "Prevented unloading \"%s\". Unload = %p | EAddonFlags::DisableHotloading = %s (%s)",
-					addon->Definitions->Name,
-					addon->Definitions->Unload,
-					addon->Definitions->HasFlag(EAddonFlags::DisableHotloading) ? "true" : "false",
-					strPath);
-				return;
+				addon->Definitions->Unload();
 			}
-
-			addon->Definitions->Unload();
+			else if (addon->State == EAddonState::LoadedLOCKED && aIsShutdown)
+			{
+				if (addon->Definitions->Unload)
+				{
+					/* If it's a shutdown and Unload is defined, let the addon run its shutdown routine to save settings etc, but do not freelib */
+					addon->Definitions->Unload();
+				}
+			}
 		}
 
 		if (addon->Module)
 		{
-			if (addon->ModuleSize > 0)
+			if (addon->State == EAddonState::Loaded ||
+				(addon->State == EAddonState::LoadedLOCKED && aIsShutdown))
 			{
-				/* Verify all APIs don't have any unreleased references to the addons address space */
-				void* startAddress = addon->Module;
-				void* endAddress = ((PBYTE)addon->Module) + addon->ModuleSize;
-
-				int leftoverRefs = 0;
-				leftoverRefs += Events::Verify(startAddress, endAddress);
-				leftoverRefs += GUI::Verify(startAddress, endAddress);
-				leftoverRefs += GUI::QuickAccess::Verify(startAddress, endAddress);
-				leftoverRefs += Keybinds::Verify(startAddress, endAddress);
-				leftoverRefs += WndProc::Verify(startAddress, endAddress);
-
-				if (leftoverRefs > 0)
+				if (addon->ModuleSize > 0)
 				{
-					LogWarning(CH_LOADER, "Removed %d unreleased references from \"%s\". Make sure your addon releases all references during Addon::Unload().", leftoverRefs, strPath);
+					/* Verify all APIs don't have any unreleased references to the addons address space */
+					void* startAddress = addon->Module;
+					void* endAddress = ((PBYTE)addon->Module) + addon->ModuleSize;
+
+					int leftoverRefs = 0;
+					leftoverRefs += Events::Verify(startAddress, endAddress);
+					leftoverRefs += GUI::Verify(startAddress, endAddress);
+					leftoverRefs += GUI::QuickAccess::Verify(startAddress, endAddress);
+					leftoverRefs += Keybinds::Verify(startAddress, endAddress);
+					leftoverRefs += WndProc::Verify(startAddress, endAddress);
+
+					if (leftoverRefs > 0)
+					{
+						LogWarning(CH_LOADER, "Removed %d unreleased references from \"%s\". Make sure your addon releases all references during Addon::Unload().", leftoverRefs, strPath);
+					}
 				}
 			}
 
-			int freeCalls = 0;
-
-			while (FreeLibrary(addon->Module))
+			if (addon->State == EAddonState::Loaded)
 			{
-				freeCalls++;
-			}
+				int freeCalls = 0;
 
-			if (freeCalls == 0)
-			{
-				LogWarning(CH_LOADER, "Couldn't unload \"%s\". FreeLibrary() call failed.", strPath);
-				return;
-			}
+				while (FreeLibrary(addon->Module))
+				{
+					freeCalls++;
+				}
 
-			//LogDebug(CH_LOADER, "Called FreeLibrary() %d times on \"%s\".", freeCalls, strPath);
+				if (freeCalls == 0)
+				{
+					LogWarning(CH_LOADER, "Couldn't unload \"%s\". FreeLibrary() call failed.", strPath);
+					return;
+				}
+
+				//LogDebug(CH_LOADER, "Called FreeLibrary() %d times on \"%s\".", freeCalls, strPath);
+			}
 		}
 
-		addon->Module = nullptr;
-		addon->ModuleSize = 0;
-
-		addon->State = EAddonState::NotLoaded;
-
-		if (!std::filesystem::exists(aPath))
+		if (addon->State == EAddonState::Loaded)
 		{
-			Addons.erase(aPath);
-		}
+			addon->Module = nullptr;
+			addon->ModuleSize = 0;
 
-		LogInfo(CH_LOADER, "Unloaded addon: %s", strPath);
+			addon->State = EAddonState::NotLoaded;
+
+			if (!std::filesystem::exists(aPath))
+			{
+				Addons.erase(aPath);
+			}
+
+			LogInfo(CH_LOADER, "Unloaded addon: %s", strPath);
+		}
+		else if (addon->State == EAddonState::LoadedLOCKED && aIsShutdown)
+		{
+			LogInfo(CH_LOADER, "Unloaded addon on shutdown without freeing module due to locked state: %s", strPath);
+		}
 	}
 	void UninstallAddon(const std::filesystem::path& aPath)
 	{
 		UnloadAddon(aPath);
 
+		/* check both LoadedLOCKED, but also Loaded as a sanity check */
+		auto it = Addons.find(aPath);
+
+		/*
+		if it's still loaded due to being locked (or for some obscure other reason)
+		try to move addon.dll to addon.dll.old, so it will be deleted on next restart
+		*/
+		if (it != Addons.end())
+		{
+			if (it->second->State == EAddonState::Loaded || it->second->State == EAddonState::LoadedLOCKED)
+			{
+				try
+				{
+					std::filesystem::rename(aPath, aPath.string() + extOld);
+					Addons.erase(aPath); // remove from addons list anyway
+					LogWarning(CH_LOADER, "Addon is stilled loaded, it will be uninstalled the next time the game is restarted: %s", aPath.string().c_str());
+				}
+				catch (std::filesystem::filesystem_error fErr)
+				{
+					LogDebug(CH_LOADER, "%s", fErr.what());
+					return;
+				}
+
+				return;
+			}
+		}
+
 		// if file exists, delete it
 		if (std::filesystem::exists(aPath))
 		{
-			std::filesystem::remove(aPath.string().c_str());
-			Addons.erase(aPath);
-			LogInfo(CH_LOADER, "Uninstalled addon: %s", aPath.string().c_str());
+			try
+			{
+				std::filesystem::remove(aPath.string().c_str());
+				Addons.erase(aPath);
+				LogInfo(CH_LOADER, "Uninstalled addon: %s", aPath.string().c_str());
+			}
+			catch (std::filesystem::filesystem_error fErr)
+			{
+				LogDebug(CH_LOADER, "%s", fErr.what());
+				return;
+			}
 		}
 	}
 	void ReloadAddon(const std::filesystem::path& aPath)
@@ -507,8 +572,8 @@ namespace Loader
 	void UpdateSwapAddon(const std::filesystem::path& aPath)
 	{
 		/* setup paths */
-		std::filesystem::path pathOld = aPath.string() + ".old";
-		std::filesystem::path pathUpdate = aPath.string() + ".update";
+		std::filesystem::path pathOld = aPath.string() + extOld;
+		std::filesystem::path pathUpdate = aPath.string() + extUpdate;
 
 		if (std::filesystem::exists(pathUpdate))
 		{
@@ -521,6 +586,11 @@ namespace Loader
 
 				std::filesystem::rename(aPath, pathOld);
 				std::filesystem::rename(pathUpdate, aPath);
+
+				if (std::filesystem::exists(pathOld))
+				{
+					std::filesystem::remove(pathOld);
+				}
 			}
 			catch (std::filesystem::filesystem_error fErr)
 			{
@@ -532,8 +602,8 @@ namespace Loader
 	bool UpdateAddon(const std::filesystem::path& aPath, AddonDefinition* aDefinitions)
 	{
 		/* setup paths */
-		std::filesystem::path pathOld = aPath.string() + ".old";
-		std::filesystem::path pathUpdate = aPath.string() + ".update";
+		std::filesystem::path pathOld = aPath.string() + extOld;
+		std::filesystem::path pathUpdate = aPath.string() + extUpdate;
 
 		auto it = Addons.find(aPath);
 
