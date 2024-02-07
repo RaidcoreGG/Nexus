@@ -53,14 +53,22 @@ namespace Loader
 	/* Detects and processes any changes to addons. */
 	void ProcessChanges();
 
-	/* Loads an addon. */
-	void LoadAddon(const std::filesystem::path& aPath, bool aIsReload = false);
-	/* Unloads an addon. */
+	/* Loads an addon into the process. */
+	void AllocAddon(const std::filesystem::path& aPath, bool aIsReload = false);
+	/* Unloads/frees an addon. */
+	void FreeAddon(const std::filesystem::path& aPath);
+
+	/* Calls Addon::Load(). */
+	void LoadAddon(const std::filesystem::path& aPath);
+	/* Calls Addon::Unload(). */
 	void UnloadAddon(const std::filesystem::path& aPath, bool aIsShutdown = false);
-	/* Unloads, then uninstalls an addon. */
-	void UninstallAddon(const std::filesystem::path& aPath);
+
 	/* Unloads, then loads an addon. */
 	void ReloadAddon(const std::filesystem::path& aPath);
+
+	/* Unloads, then uninstalls an addon. */
+	void UninstallAddon(const std::filesystem::path& aPath);
+
 	/* Swaps addon.dll with addon.dll.update. */
 	void UpdateSwapAddon(const std::filesystem::path& aPath);
 	/* Updates an addon. */

@@ -109,11 +109,15 @@ namespace Loader
 				FSItemList = 0;
 			}
 
+			NotifyChanges();
+			LoaderThread.join();
+
 			const std::lock_guard<std::mutex> lock(Mutex);
 			{
 				while (Addons.size() != 0)
 				{
 					UnloadAddon(Addons.begin()->first, true);
+					FreeAddon(Addons.begin()->first);
 					Addons.erase(Addons.begin());
 				}
 			}
@@ -165,6 +169,7 @@ namespace Loader
 				break;
 			case ELoaderAction::Unload:
 				UnloadAddon(it->first);
+				NotifyChanges(); /* Signal that it can be FreeLib'd. */
 				break;
 			case ELoaderAction::Uninstall:
 				UninstallAddon(it->first);
@@ -175,9 +180,9 @@ namespace Loader
 			}
 			
 			/*
-				if the action is not reload, then remove it after it was performed
-				else check if the addon exists and if it does check, if it is anything but NotLoaded
-				if it is, it was processed
+			if the action is not reload, then remove it after it was performed
+			else check if the addon exists and if it does check, if it is anything but NotLoaded
+			if it is, it was processed
 			*/
 			if (it->second != ELoaderAction::Reload)
 			{
@@ -244,13 +249,23 @@ namespace Loader
 				// check all tracked addons
 				for (auto& it : Addons)
 				{
-					// if addon no longer on disk
+					// if addon no longer on disk and not active
+					// else if not on disk and it's loaded
 					if (!std::filesystem::exists(it.first))
 					{
-						QueueAddon(ELoaderAction::Unload, it.first);
-						continue;
-					}
+						if (it.second->State == EAddonState::Ready)
+						{
+							FreeAddon(it.first);
+							continue;
+						}
 
+						if (it.second->State == EAddonState::Loaded)
+						{
+							QueueAddon(ELoaderAction::Unload, it.first);
+							continue;
+						}
+					}
+					
 					// get md5 of each file currently on disk and compare to tracked md5
 					// also check if an update is available (e.g. "addon.dll" + ".update" -> "addon.dll.update" exists)
 					std::vector<unsigned char> md5 = MD5FromFile(it.first);
@@ -274,6 +289,7 @@ namespace Loader
 
 					if (path.extension() == extDll)
 					{
+						AllocAddon(path);
 						QueueAddon(ELoaderAction::Load, path);
 					}
 				}
@@ -283,7 +299,7 @@ namespace Loader
 		}
 	}
 	
-	void LoadAddon(const std::filesystem::path& aPath, bool aIsReload)
+	void AllocAddon(const std::filesystem::path& aPath, bool aIsReload)
 	{
 		std::string path = aPath.string();
 		const char* strPath = path.c_str();
@@ -291,14 +307,24 @@ namespace Loader
 		Addon* addon;
 
 		auto it = Addons.find(aPath);
-		
+
 		if (it != Addons.end())
 		{
 			addon = it->second;
 
-			if (addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED)
+			switch (addon->State)
 			{
-				//LogWarning(CH_LOADER, "Cancelled loading \"%s\". Already loaded.", strPath);
+			case EAddonState::None:
+			case EAddonState::NotLoaded:
+			case EAddonState::NotLoadedIncompatible:
+			case EAddonState::NotLoadedIncompatibleAPI:
+			case EAddonState::NotLoadedDuplicate:
+				break;
+
+			case EAddonState::Ready:
+			case EAddonState::Loaded:
+			case EAddonState::LoadedLOCKED:
+				LogWarning(CH_LOADER, "Addon already loaded into process: %s", strPath);
 				return;
 			}
 		}
@@ -319,7 +345,7 @@ namespace Loader
 		if (!addon->Module)
 		{
 			LogWarning(CH_LOADER, "Failed LoadLibrary on \"%s\". Incompatible. Last Error: %u", strPath, GetLastError());
-			addon->State = EAddonState::Incompatible;
+			addon->State = EAddonState::NotLoadedIncompatible;
 			return;
 		}
 
@@ -328,18 +354,18 @@ namespace Loader
 		{
 			LogWarning(CH_LOADER, "\"%s\" is not a Nexus-compatible library. Incompatible.", strPath);
 			FreeLibrary(addon->Module);
-			addon->State = EAddonState::Incompatible;
+			addon->State = EAddonState::NotLoadedIncompatible;
 			addon->Module = nullptr;
 			return;
 		}
-		
+
 		AddonDefinition* tmpDefs = getAddonDef();
 
 		if (tmpDefs == nullptr)
 		{
 			LogWarning(CH_LOADER, "\"%s\" is Nexus-compatible but returned a nullptr. Incompatible.", strPath);
 			FreeLibrary(addon->Module);
-			addon->State = EAddonState::Incompatible;
+			addon->State = EAddonState::NotLoadedIncompatible;
 			addon->Module = nullptr;
 			return;
 		}
@@ -359,7 +385,7 @@ namespace Loader
 		{
 			LogWarning(CH_LOADER, "\"%s\" does not fulfill minimum requirements. At least define Name, Version, Author, Description as well as the Load function. Incompatible.", strPath);
 			FreeLibrary(addon->Module);
-			addon->State = EAddonState::Incompatible;
+			addon->State = EAddonState::NotLoadedIncompatible;
 			addon->Module = nullptr;
 			return;
 		}
@@ -368,10 +394,10 @@ namespace Loader
 		for (auto& it : Addons)
 		{
 			// if defs defined && not the same path && signature the same though (another && it.second->Definitions in the mix because could still be null during load)
-			if (it.first != aPath && 
-				it.second->Definitions && 
-				it.second->Definitions->Signature == tmpDefs->Signature && 
-				(it.second->State == EAddonState::Loaded || it.second->State == EAddonState::LoadedLOCKED))
+			if (it.first != aPath &&
+				it.second->Definitions &&
+				it.second->Definitions->Signature == tmpDefs->Signature &&
+				(it.second->State == EAddonState::Ready || it.second->State == EAddonState::Loaded || it.second->State == EAddonState::LoadedLOCKED))
 			{
 				LogWarning(CH_LOADER, "\"%s\" or another addon with this signature (%d) is already loaded. Added to blacklist.", strPath, tmpDefs->Signature);
 				FreeLibrary(addon->Module);
@@ -381,26 +407,115 @@ namespace Loader
 			}
 		}
 
-		AddonAPI* api = GetAddonAPI(tmpDefs->APIVersion); // will be nullptr if doesn't exist or APIVersion = 0
-
 		// free old and clone new
 		FreeAddonDefs(&addon->Definitions);
 		CopyAddonDefs(tmpDefs, &addon->Definitions);
+
+		MODULEINFO moduleInfo{};
+		GetModuleInformation(GetCurrentProcess(), addon->Module, &moduleInfo, sizeof(moduleInfo));
+
+		addon->ModuleSize = moduleInfo.SizeOfImage;
+
+		addon->State = EAddonState::Ready;
+	}
+	void FreeAddon(const std::filesystem::path& aPath)
+	{
+		std::string path = aPath.string();
+		const char* strPath = path.c_str();
+
+		Addon* addon;
+
+		auto it = Addons.find(aPath);
+
+		if (it == Addons.end())
+		{
+			/* There's nothing to free here. */
+			return;
+		}
+
+		addon = it->second;
+
+		switch (addon->State)
+		{
+		case EAddonState::None:
+			LogWarning(CH_LOADER, "Tried freeing addon with invalid state: %s", strPath);
+			return;
+
+		case EAddonState::NotLoaded:
+		case EAddonState::NotLoadedIncompatible:
+		case EAddonState::NotLoadedIncompatibleAPI:
+		case EAddonState::NotLoadedDuplicate:
+			return;
+		
+		case EAddonState::Ready: /* In process but either load was never called, or unload was called. */ break;
+
+		case EAddonState::Loaded:
+			LogWarning(CH_LOADER, "Tried freeing addon with loaded state: %s", strPath);
+			return;
+		case EAddonState::LoadedLOCKED:
+			LogWarning(CH_LOADER, "Tried freeing addon with locked state: %s", strPath);
+			return;
+		}
+
+		if (addon->Module)
+		{
+			int freeCalls = 0;
+
+			while (FreeLibrary(addon->Module))
+			{
+				freeCalls++;
+			}
+
+			if (freeCalls == 0)
+			{
+				LogWarning(CH_LOADER, "Couldn't unload \"%s\". FreeLibrary() call failed.", strPath);
+				return;
+			}
+
+			//LogDebug(CH_LOADER, "Called FreeLibrary() %d times on \"%s\".", freeCalls, strPath);
+		}
+
+		addon->Module = nullptr;
+		addon->ModuleSize = 0;
+
+		addon->State = EAddonState::NotLoaded;
+
+		if (!std::filesystem::exists(aPath))
+		{
+			Addons.erase(aPath);
+		}
+	}
+
+	void LoadAddon(const std::filesystem::path& aPath)
+	{
+		std::string path = aPath.string();
+		const char* strPath = path.c_str();
+
+		auto it = Addons.find(aPath);
+
+		if (it == Addons.end())
+		{
+			return;
+		}
+
+		Addon* addon = it->second;
+
+		if (addon->State != EAddonState::Ready)
+		{
+			return;
+		}
+
+		AddonAPI* api = GetAddonAPI(addon->Definitions->APIVersion); // will be nullptr if doesn't exist or APIVersion = 0
 
 		// if the api doesn't exist and there was one requested
 		if (api == nullptr && addon->Definitions->APIVersion != 0)
 		{
 			LogWarning(CH_LOADER, "Loading was cancelled because \"%s\" requested an API of version %d and no such version exists. Incompatible.", strPath, addon->Definitions->APIVersion);
 			FreeLibrary(addon->Module);
-			addon->State = EAddonState::IncompatibleAPI;
+			addon->State = EAddonState::NotLoadedIncompatibleAPI;
 			addon->Module = nullptr;
 			return;
 		}
-
-		MODULEINFO moduleInfo{};
-		GetModuleInformation(GetCurrentProcess(), addon->Module, &moduleInfo, sizeof(moduleInfo));
-
-		addon->ModuleSize = moduleInfo.SizeOfImage;
 
 		if (addon->Definitions->APIVersion == 0)
 		{
@@ -429,12 +544,8 @@ namespace Loader
 
 		Addon* addon = it->second;
 
-		if (addon->State == EAddonState::NotLoaded ||
-			addon->State == EAddonState::NotLoadedDuplicate ||
-			addon->State == EAddonState::Incompatible ||
-			addon->State == EAddonState::IncompatibleAPI)
+		if (!(addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED))
 		{
-			//LogWarning(CH_LOADER, "Cancelled unload of \"%s\". EAddonState = %d.", strPath, addon->State);
 			return;
 		}
 
@@ -478,45 +589,29 @@ namespace Loader
 					}
 				}
 			}
-
-			if (addon->State == EAddonState::Loaded)
-			{
-				int freeCalls = 0;
-
-				while (FreeLibrary(addon->Module))
-				{
-					freeCalls++;
-				}
-
-				if (freeCalls == 0)
-				{
-					LogWarning(CH_LOADER, "Couldn't unload \"%s\". FreeLibrary() call failed.", strPath);
-					return;
-				}
-
-				//LogDebug(CH_LOADER, "Called FreeLibrary() %d times on \"%s\".", freeCalls, strPath);
-			}
 		}
 
 		if (addon->State == EAddonState::Loaded)
 		{
-			addon->Module = nullptr;
-			addon->ModuleSize = 0;
-
-			addon->State = EAddonState::NotLoaded;
-
-			if (!std::filesystem::exists(aPath))
-			{
-				Addons.erase(aPath);
-			}
-
+			addon->State = EAddonState::Ready;
 			LogInfo(CH_LOADER, "Unloaded addon: %s", strPath);
 		}
 		else if (addon->State == EAddonState::LoadedLOCKED && aIsShutdown)
 		{
+			addon->State = EAddonState::Ready;
 			LogInfo(CH_LOADER, "Unloaded addon on shutdown without freeing module due to locked state: %s", strPath);
 		}
 	}
+
+	void ReloadAddon(const std::filesystem::path& aPath)
+	{
+		UnloadAddon(aPath);
+		FreeAddon(aPath);
+
+		AllocAddon(aPath, true);
+		QueueAddon(ELoaderAction::Load, aPath);
+	}
+
 	void UninstallAddon(const std::filesystem::path& aPath)
 	{
 		UnloadAddon(aPath);
@@ -564,11 +659,7 @@ namespace Loader
 			}
 		}
 	}
-	void ReloadAddon(const std::filesystem::path& aPath)
-	{
-		UnloadAddon(aPath);
-		LoadAddon(aPath, true);
-	}
+
 	void UpdateSwapAddon(const std::filesystem::path& aPath)
 	{
 		/* setup paths */

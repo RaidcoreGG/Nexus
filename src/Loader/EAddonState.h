@@ -4,15 +4,16 @@
 enum class EAddonState
 {
 	None,
-	
-	Loaded,					/* Addon is loaded. */
-	LoadedLOCKED,			/* Addon is loaded, but locked and mustn't be unloaded. */
 
-	NotLoaded,				/* Addon is not loaded. */
-	NotLoadedDuplicate,		/* Addon is not loaded, because it has the same signature as another addon. */
+	NotLoaded,					/* Addon is not loaded into process. */
+	NotLoadedIncompatible,		/* The file is incompatible with Nexus. */
+	NotLoadedIncompatibleAPI,	/* Addon requested an API that doesn't exist. */
+	NotLoadedDuplicate,			/* Another addon with that signature is already loaded. */
 
-	Incompatible,			/* The file is incompatible with Nexus. */
-	IncompatibleAPI			/* Addon requested an API that doesn't exist. */
+	Ready,						/* Addon is loaded into process, ready to call Addon::Load(). */
+
+	Loaded,						/* Addon is loaded into process and Addon::Load was called. */
+	LoadedLOCKED				/* Addon is loaded, but locked and mustn't be unloaded. */
 };
 
 #endif
