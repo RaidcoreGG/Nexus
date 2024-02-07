@@ -31,7 +31,7 @@ namespace GUI
 		if (aAddon == nullptr ||
 			aAddon->Definitions == nullptr ||
 			aAddon->State == EAddonState::NotLoadedDuplicate ||
-			aAddon->State == EAddonState::Incompatible)
+			aAddon->State == EAddonState::NotLoadedIncompatible)
 		{
 			return;
 		}
@@ -72,7 +72,7 @@ namespace GUI
 				ImGui::TextDisabled("(%s)", aAddon->Definitions->Version.ToString().c_str()); ImGui::SameLine();
 				ImGui::TextDisabled("by %s", aAddon->Definitions->Author);
 
-				if (aAddon->State == EAddonState::IncompatibleAPI)
+				if (aAddon->State == EAddonState::NotLoadedIncompatibleAPI)
 				{
 					ImGui::TextColored(ImVec4(255, 255, 0, 255), "Addon requested incompatible API Version: %d", aAddon->Definitions->APIVersion);
 				}

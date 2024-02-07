@@ -33,7 +33,7 @@ using json = nlohmann::json;
 
 #include "httplib/httplib.h"
 
-#define LOADER_WAITTIME_MS 1000
+#define LOADER_WAITTIME_MS 1
 
 namespace Loader
 {
@@ -319,7 +319,7 @@ namespace Loader
 		if (!addon->Module)
 		{
 			LogWarning(CH_LOADER, "Failed LoadLibrary on \"%s\". Incompatible. Last Error: %u", strPath, GetLastError());
-			addon->State = EAddonState::Incompatible;
+			addon->State = EAddonState::NotLoadedIncompatible;
 			return;
 		}
 
@@ -328,7 +328,7 @@ namespace Loader
 		{
 			LogWarning(CH_LOADER, "\"%s\" is not a Nexus-compatible library. Incompatible.", strPath);
 			FreeLibrary(addon->Module);
-			addon->State = EAddonState::Incompatible;
+			addon->State = EAddonState::NotLoadedIncompatible;
 			addon->Module = nullptr;
 			return;
 		}
@@ -339,7 +339,7 @@ namespace Loader
 		{
 			LogWarning(CH_LOADER, "\"%s\" is Nexus-compatible but returned a nullptr. Incompatible.", strPath);
 			FreeLibrary(addon->Module);
-			addon->State = EAddonState::Incompatible;
+			addon->State = EAddonState::NotLoadedIncompatible;
 			addon->Module = nullptr;
 			return;
 		}
@@ -359,7 +359,7 @@ namespace Loader
 		{
 			LogWarning(CH_LOADER, "\"%s\" does not fulfill minimum requirements. At least define Name, Version, Author, Description as well as the Load function. Incompatible.", strPath);
 			FreeLibrary(addon->Module);
-			addon->State = EAddonState::Incompatible;
+			addon->State = EAddonState::NotLoadedIncompatible;
 			addon->Module = nullptr;
 			return;
 		}
@@ -392,7 +392,7 @@ namespace Loader
 		{
 			LogWarning(CH_LOADER, "Loading was cancelled because \"%s\" requested an API of version %d and no such version exists. Incompatible.", strPath, addon->Definitions->APIVersion);
 			FreeLibrary(addon->Module);
-			addon->State = EAddonState::IncompatibleAPI;
+			addon->State = EAddonState::NotLoadedIncompatibleAPI;
 			addon->Module = nullptr;
 			return;
 		}
@@ -431,8 +431,8 @@ namespace Loader
 
 		if (addon->State == EAddonState::NotLoaded ||
 			addon->State == EAddonState::NotLoadedDuplicate ||
-			addon->State == EAddonState::Incompatible ||
-			addon->State == EAddonState::IncompatibleAPI)
+			addon->State == EAddonState::NotLoadedIncompatible ||
+			addon->State == EAddonState::NotLoadedIncompatibleAPI)
 		{
 			//LogWarning(CH_LOADER, "Cancelled unload of \"%s\". EAddonState = %d.", strPath, addon->State);
 			return;

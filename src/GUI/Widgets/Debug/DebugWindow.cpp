@@ -272,8 +272,8 @@ namespace GUI
 										case EAddonState::LoadedLOCKED:			state.append("LoadedLOCKED"); break;
 										case EAddonState::NotLoaded:			state.append("NotLoaded"); break;
 										case EAddonState::NotLoadedDuplicate:	state.append("NotLoadedDuplicate"); break;
-										case EAddonState::Incompatible:			state.append("Incompatible"); break;
-										case EAddonState::IncompatibleAPI:		state.append("IncompatibleAPI"); break;
+										case EAddonState::NotLoadedIncompatible:			state.append("NotLoadedIncompatible"); break;
+										case EAddonState::NotLoadedIncompatibleAPI:		state.append("NotLoadedIncompatibleAPI"); break;
 										}
 
 										ImGui::TextDisabled(state.c_str());
