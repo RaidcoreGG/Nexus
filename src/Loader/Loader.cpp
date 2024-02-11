@@ -346,17 +346,30 @@ namespace Loader
 
 		if (!aIsReload)
 		{
-			std::thread([aPath, tmpDefs, path]()
+			std::filesystem::path tmpPath = aPath.string();
+			signed int tmpSig = tmpDefs->Signature;
+			std::string tmpName = tmpDefs->Name;
+			AddonVersion tmpVers = tmpDefs->Version;
+			EUpdateProvider tmpProv = tmpDefs->Provider;
+			std::string tmpLink = tmpDefs->UpdateLink != nullptr ? tmpDefs->UpdateLink : "";
+
+			std::thread([tmpPath, tmpSig, tmpName, tmpVers, tmpProv, tmpLink]()
 				{
-					AddonDefinition* tmpDefsForUpdater = nullptr;
-					CopyAddonDefs(tmpDefs, &tmpDefsForUpdater);
-					if (UpdateAddon(aPath, tmpDefsForUpdater))
+					if (UpdateAddon(tmpPath, tmpSig, tmpName, tmpVers, tmpProv, tmpLink))
 					{
-						LogInfo(CH_LOADER, "Update available for \"%s\".", path.c_str());
+						LogInfo(CH_LOADER, "Update available for \"%s\".", tmpPath.string().c_str());
+						QueueAddon(ELoaderAction::Reload, tmpPath);
 					}
-					FreeAddonDefs(&tmpDefsForUpdater);
 				})
 				.detach();
+
+			if (tmpDefs->Unload == nullptr || tmpDefs->HasFlag(EAddonFlags::DisableHotloading))
+			{
+				FreeLibrary(addon->Module);
+				addon->State = EAddonState::NotLoaded;
+				addon->Module = nullptr;
+				return;
+			}
 		}
 
 		/* doesn't fulfill min reqs */
@@ -604,7 +617,7 @@ namespace Loader
 			}
 		}
 	}
-	bool UpdateAddon(const std::filesystem::path& aPath, AddonDefinition* aDefinitions)
+	bool UpdateAddon(const std::filesystem::path& aPath, signed int aSignature, std::string aName, AddonVersion aVersion, EUpdateProvider aProvider, std::string aUpdateLink)
 	{
 		/* setup paths */
 		std::filesystem::path pathOld = aPath.string() + extOld;
@@ -631,54 +644,49 @@ namespace Loader
 			std::filesystem::remove(pathUpdate);
 		}
 
-		if (!aDefinitions)
-		{
-			return false;
-		}
-
 		bool wasUpdated = false;
 
 		std::string baseUrl;
 		std::string endpoint;
 
 		// override provider if none set, but a Raidcore ID is used
-		if (aDefinitions->Provider == EUpdateProvider::None && aDefinitions->Signature > 0)
+		if (aProvider == EUpdateProvider::None && aSignature > 0)
 		{
-			aDefinitions->Provider = EUpdateProvider::Raidcore;
+			aProvider = EUpdateProvider::Raidcore;
 		}
 
 		/* setup baseUrl and endpoint */
-		switch (aDefinitions->Provider)
+		switch (aProvider)
 		{
 		case EUpdateProvider::None: return false;
 
 		case EUpdateProvider::Raidcore:
 			baseUrl = API_RAIDCORE;
-			endpoint = "/addons/" + std::to_string(aDefinitions->Signature);
+			endpoint = "/addons/" + std::to_string(aSignature);
 
 			break;
 
 		case EUpdateProvider::GitHub:
 			baseUrl = API_GITHUB;
-			if (aDefinitions->UpdateLink == nullptr)
+			if (aUpdateLink.empty())
 			{
-				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::GitHub but has no UpdateLink set.", aDefinitions->Name);
+				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::GitHub but has no UpdateLink set.", aName);
 				return false;
 			}
 
-			endpoint = "/repos" + GetEndpoint(aDefinitions->UpdateLink) + "/releases/latest";
+			endpoint = "/repos" + GetEndpoint(aUpdateLink) + "/releases/latest";
 
 			break;
 
 		case EUpdateProvider::Direct:
-			if (aDefinitions->UpdateLink == nullptr)
+			if (aUpdateLink.empty())
 			{
-				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::Direct but has no UpdateLink set.", aDefinitions->Name);
+				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::Direct but has no UpdateLink set.", aName);
 				return false;
 			}
 
-			baseUrl = GetBaseURL(aDefinitions->UpdateLink);
-			endpoint = GetEndpoint(aDefinitions->UpdateLink);
+			baseUrl = GetBaseURL(aUpdateLink);
+			endpoint = GetEndpoint(aUpdateLink);
 
 			if (baseUrl.empty() || endpoint.empty())
 			{
@@ -688,7 +696,7 @@ namespace Loader
 			break;
 		}
 
-		if (EUpdateProvider::Raidcore == aDefinitions->Provider)
+		if (EUpdateProvider::Raidcore == aProvider)
 		{
 			json resVersion = RaidcoreAPI->Get(endpoint);
 
@@ -700,17 +708,17 @@ namespace Loader
 
 			AddonVersion remoteVersion = VersionFromJson(resVersion);
 
-			if (remoteVersion > aDefinitions->Version)
+			if (remoteVersion > aVersion)
 			{
-				LogInfo(CH_LOADER, "%s is outdated: API replied with Version %s but installed is Version %s", aDefinitions->Name, remoteVersion.ToString().c_str(), aDefinitions->Version.ToString().c_str());
+				LogInfo(CH_LOADER, "%s is outdated: API replied with Version %s but installed is Version %s", aName, remoteVersion.ToString().c_str(), aVersion.ToString().c_str());
 
 				RaidcoreAPI->Download(pathUpdate, endpoint + "/download"); // e.g. api.raidcore.gg/addons/17/download
 				
-				LogInfo(CH_LOADER, "Successfully updated %s.", aDefinitions->Name);
+				LogInfo(CH_LOADER, "Successfully updated %s.", aName);
 				wasUpdated = true;
 			}
 		}
-		else if (EUpdateProvider::GitHub == aDefinitions->Provider)
+		else if (EUpdateProvider::GitHub == aProvider)
 		{
 			json response = GitHubAPI->Get(endpoint);
 
@@ -756,9 +764,9 @@ namespace Loader
 			}
 			remoteVersion.Revision = static_cast<unsigned short>(std::stoi(tagName));
 
-			if (remoteVersion > aDefinitions->Version)
+			if (remoteVersion > aVersion)
 			{
-				LogInfo(CH_LOADER, "%s is outdated: API replied with Version %s but installed is Version %s", aDefinitions->Name, remoteVersion.ToString().c_str(), aDefinitions->Version.ToString().c_str());
+				LogInfo(CH_LOADER, "%s is outdated: API replied with Version %s but installed is Version %s", aName, remoteVersion.ToString().c_str(), aVersion.ToString().c_str());
 
 				std::string endpointDownload; // e.g. github.com/RaidcoreGG/GW2-CommandersToolkit/releases/download/20220918-135925/squadmanager.dll
 
@@ -805,11 +813,11 @@ namespace Loader
 					return false;
 				}
 
-				LogInfo(CH_LOADER, "Successfully updated %s.", aDefinitions->Name);
+				LogInfo(CH_LOADER, "Successfully updated %s.", aName);
 				wasUpdated = true;
 			}
 		}
-		else if (EUpdateProvider::Direct == aDefinitions->Provider)
+		else if (EUpdateProvider::Direct == aProvider)
 		{
 			/* prepare client request */
 			httplib::Client client(baseUrl);

@@ -64,7 +64,14 @@ namespace Loader
 	/* Swaps addon.dll with addon.dll.update. */
 	void UpdateSwapAddon(const std::filesystem::path& aPath);
 	/* Updates an addon. */
-	bool UpdateAddon(const std::filesystem::path& aPath, AddonDefinition* aDefinitions);
+	bool UpdateAddon(
+		const std::filesystem::path& aPath,
+		signed int aSignature,
+		std::string aName,
+		AddonVersion aVersion,
+		EUpdateProvider aProvider,
+		std::string aUpdateLink
+	);
 
 	/* Gets or creates a pointer to the provided version, or nullptr if no such version exists. */
 	AddonAPI* GetAddonAPI(int aVersion);
