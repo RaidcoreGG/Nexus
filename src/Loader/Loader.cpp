@@ -350,14 +350,19 @@ namespace Loader
 			signed int tmpSig = tmpDefs->Signature;
 			std::string tmpName = tmpDefs->Name;
 			AddonVersion tmpVers = tmpDefs->Version;
+			bool tmpLocked = tmpDefs->Unload == nullptr || tmpDefs->HasFlag(EAddonFlags::DisableHotloading);
 			EUpdateProvider tmpProv = tmpDefs->Provider;
 			std::string tmpLink = tmpDefs->UpdateLink != nullptr ? tmpDefs->UpdateLink : "";
 
-			std::thread([tmpPath, tmpSig, tmpName, tmpVers, tmpProv, tmpLink]()
+			std::thread([tmpPath, tmpSig, tmpName, tmpVers, tmpLocked, tmpProv, tmpLink]()
 				{
 					if (UpdateAddon(tmpPath, tmpSig, tmpName, tmpVers, tmpProv, tmpLink))
 					{
 						LogInfo(CH_LOADER, "Update available for \"%s\".", tmpPath.string().c_str());
+						QueueAddon(ELoaderAction::Reload, tmpPath);
+					}
+					else if (tmpLocked)
+					{
 						QueueAddon(ELoaderAction::Reload, tmpPath);
 					}
 				})
