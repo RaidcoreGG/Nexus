@@ -60,7 +60,11 @@ namespace Main
 		GitHubAPI = new APIClient("https://api.github.com", true, Path::D_GW2_ADDONS_COMMON_API_GITHUB, 30 * 60, 60, 60, 60 * 60);
 
 		//Paradigm::Initialize();
-		SelfUpdate();
+		std::thread([]()
+			{
+				SelfUpdate();
+			})
+			.detach();
 
 		/* Don't initialize anything if vanilla */
 		if (!State::IsVanilla)
