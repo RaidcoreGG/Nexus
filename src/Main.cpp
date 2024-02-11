@@ -61,11 +61,7 @@ namespace Main
 		RaidcoreAPI = new APIClient("https://api.raidcore.gg", true, Path::D_GW2_ADDONS_COMMON_API_RAIDCORE, 30 * 60, 300, 5, 1);
 
 		//Paradigm::Initialize();
-		std::thread([]()
-			{
-				SelfUpdate();
-			})
-			.detach();
+		SelfUpdate();
 
 		/* Don't initialize anything if vanilla */
 		if (!State::IsVanilla)
@@ -158,7 +154,7 @@ namespace Main
 			std::filesystem::remove(Path::F_OLD_DLL);
 		}
 
-		json resVersion = RaidcoreAPI->Get("/nexusversion");;
+		json resVersion = RaidcoreAPI->Get("nexusversion");;
 
 		if (resVersion.is_null())
 		{
@@ -166,22 +162,7 @@ namespace Main
 			return;
 		}
 
-		bool anyNull = false;
-		AddonVersion remoteVersion{};
-		if (!resVersion["Major"].is_null()) { resVersion["Major"].get_to(remoteVersion.Major); }
-		else { anyNull = true; }
-		if (!resVersion["Minor"].is_null()) { resVersion["Minor"].get_to(remoteVersion.Minor); }
-		else { anyNull = true; }
-		if (!resVersion["Build"].is_null()) { resVersion["Build"].get_to(remoteVersion.Build); }
-		else { anyNull = true; }
-		if (!resVersion["Revision"].is_null()) { resVersion["Revision"].get_to(remoteVersion.Revision); }
-		else { anyNull = true; }
-
-		if (anyNull)
-		{
-			LogWarning(CH_CORE, "One or more fields in the API response were null.");
-			return;
-		}
+		AddonVersion remoteVersion = VersionFromJson(resVersion);
 
 		if (!resVersion["Changelog"].is_null()) { resVersion["Changelog"].get_to(ChangelogText); }
 
@@ -190,21 +171,7 @@ namespace Main
 			LogInfo(CH_CORE, "Outdated: API replied with Version %s but installed is Version %s", remoteVersion.ToString().c_str(), Version.ToString().c_str());
 			IsUpdateAvailable = true;
 
-			size_t bytesWritten = 0;
-			std::ofstream file(Path::F_UPDATE_DLL, std::ofstream::binary);
-			httplib::Client client(API_RAIDCORE);
-			auto downloadResult = client.Get("/d3d11.dll", [&](const char* data, size_t data_length) {
-				file.write(data, data_length);
-				bytesWritten += data_length;
-				return true;
-				});
-			file.close();
-
-			if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
-			{
-				LogWarning(CH_CORE, "Error fetching %s%s", API_RAIDCORE, "/d3d11.dll");
-				return;
-			}
+			RaidcoreAPI->Download(Path::F_UPDATE_DLL, "/d3d11.dll");
 
 			std::filesystem::rename(Path::F_HOST_DLL, Path::F_OLD_DLL);
 			std::filesystem::rename(Path::F_UPDATE_DLL, Path::F_HOST_DLL);

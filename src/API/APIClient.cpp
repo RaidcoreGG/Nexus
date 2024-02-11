@@ -16,8 +16,8 @@ APIClient::APIClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::pat
 	std::filesystem::create_directories(CacheDirectory);
 	CacheLifetime = aCacheLifetime;
 
-	TimeSinceLastRefill = 0;
-	Bucket = 0;
+	TimeSinceLastRefill = Timestamp();
+	Bucket = BucketCapacity;
 	BucketCapacity = aBucketCapacity;
 	RefillAmount = aRefillAmount;
 	RefillInterval = aRefillInterval;
@@ -27,6 +27,9 @@ APIClient::APIClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::pat
 		aEnableSSL ? "true" : "false",
 		CacheDirectory.string().c_str(),
 		CacheLifetime, BucketCapacity, RefillAmount, RefillInterval);
+
+	WorkerThread = std::thread(&APIClient::ProcessRequests, this);
+	WorkerThread.detach();
 }
 APIClient::~APIClient()
 {
@@ -62,97 +65,56 @@ json APIClient::Get(std::string aEndpoint, std::string aParameters)
 		}
 	}
 
-	APIRequest request{
-		nullptr,
-		0,
-		query
-	};
-
-	// DoHttpReq should set last request timestamp
-	APIResponse response = DoHttpReq(request);
-
-	// does the bucket get reduced on unsuccessful requests? we assume it does
-	Bucket--;
-
-	bool retry = false;
-
-	/* Refer to: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes */
-	if (response.Status >= 200 && response.Status <= 299)
-	{
-		/* success */
-	}
-	else if (response.Status >= 300 && response.Status <= 399)
-	{
-		/* redirect */
-	}
-	else if (response.Status >= 400 && response.Status <= 499)
-	{
-		/* client error */
-		switch (response.Status)
-		{
-		case 429: // Rate Limited: explicitly set Bucket to 0 and set TimeSinceLastRefill to now and start over
-			Bucket = 0;
-			TimeSinceLastRefill = Timestamp();
-			retry = true;
-			break;
-		}
-	}
-	else if (response.Status >= 500 && response.Status <= 599)
-	{
-		/* server error */
-	}
-
-	/* no retry is considered successful */
-	if (!retry)
-	{
-		return response.Content;
-	}
-	else
-	{
-		/* push request to end of queue */
-		request.Attempts++;
-
-		/* retry up to 5 times */
-		if (request.Attempts < 5)
-		{
-			QueuedRequests.push_back(request);
-		}
-		else
-		{
-			return nullptr;
-		}
-	}
-}
-void APIClient::GetAsync(API_RESPONSE_CALLBACK aCallback, std::string aEndpoint, std::string aParameters)
-{
-	std::string query = GetQuery(aEndpoint, aParameters);
-
-	CachedResponse* cachedResponse = GetCachedResponse(query);
-
-	if (cachedResponse != nullptr)
-	{
-		int diff = Timestamp() - cachedResponse->Timestamp;
-		if (diff < CacheLifetime && cachedResponse->Content != nullptr)
-		{
-			if (aCallback != nullptr)
-			{
-				aCallback(cachedResponse->Content);
-			}
-			return;
-		}
-	}
+	// Variables for synchronization
+	std::mutex mtx;
+	bool done = false;
+	std::condition_variable cv;
 
 	// if not cached, push it into requests queue, so it can be done async
 	APIRequest req{
-		aCallback,
+		&done,
+		&cv,
 		0,
 		query
 	};
 
-	const std::lock_guard<std::mutex> lock(Mutex);
-	QueuedRequests.push_back(req);
-	IsSuspended = false;
-	ConVar.notify_all();
+	// Trigger the worker thread
+	{
+		const std::lock_guard<std::mutex> lock(Mutex);
+		QueuedRequests.push_back(req);
+		IsSuspended = false;
+		ConVar.notify_all();
+	}
+
+	// Wait for the response
+	{
+		std::unique_lock<std::mutex> lock(mtx);
+		cv.wait(lock, [&]{ return done; });
+	}
+
+	cachedResponse = nullptr; // sanity
+	cachedResponse = GetCachedResponse(query);
+
+	return cachedResponse != nullptr ? cachedResponse->Content : json{};
+}
+void APIClient::Download(std::filesystem::path aOutPath, std::string aEndpoint, std::string aParameters)
+{
+	std::string query = GetQuery(aEndpoint, aParameters);
+
+	size_t bytesWritten = 0;
+	std::ofstream file(aOutPath, std::ofstream::binary);
+	auto downloadResult = Client->Get(query, [&](const char* data, size_t data_length) {
+		file.write(data, data_length);
+		bytesWritten += data_length;
+		return true;
+		});
+	file.close();
+
+	if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
+	{
+		LogWarning("APIClient", "Error fetching %s", query.c_str());
+		return;
+	}
 }
 
 CachedResponse* APIClient::GetCachedResponse(const std::string& aQuery)
@@ -249,8 +211,8 @@ void APIClient::ProcessRequests()
 		while (QueuedRequests.size() > 0)
 		{
 			/* Calculate current bucket */
-			int deltaRefill = Timestamp() - TimeSinceLastRefill;
-			if (deltaRefill > RefillInterval)
+			long long deltaRefill = Timestamp() - TimeSinceLastRefill;
+			if (deltaRefill >= RefillInterval)
 			{
 				/* time difference divided by interval gives how many "ticks" happened (rounded down)
 				 * multiplied with how many tokens are regenerated
@@ -270,7 +232,9 @@ void APIClient::ProcessRequests()
 			/* if bucket empty wait until refill, then start over */
 			if (Bucket <= 0)
 			{
-				Sleep((RefillInterval - deltaRefill) * 1000);
+				Bucket = 0;
+
+				Sleep(RefillInterval - deltaRefill * 1000);
 				continue;
 			}
 
@@ -313,7 +277,20 @@ void APIClient::ProcessRequests()
 			/* no retry is considered successful */
 			if (!retry)
 			{
-				request.Callback(response.Content);
+				CachedResponse* cached = new CachedResponse{};
+				cached->Content = response.Content;
+				cached->Timestamp = Timestamp();
+
+				std::filesystem::path normalizedPath = GetNormalizedPath(request.Query);
+
+				ResponseCache.insert({ normalizedPath, cached });
+
+				std::ofstream file(normalizedPath);
+				file << response.Content.dump(1, '\t') << std::endl;
+				file.close();
+
+				*(request.IsComplete) = true;
+				request.CV->notify_all();
 			}
 			else
 			{
@@ -327,7 +304,8 @@ void APIClient::ProcessRequests()
 				}
 				else
 				{
-					request.Callback(nullptr);
+					*(request.IsComplete) = true;
+					request.CV->notify_all();
 				}
 			}
 
@@ -379,19 +357,6 @@ APIResponse APIClient::DoHttpReq(APIRequest aRequest)
 		LogWarning("APIClient", "Error parsing API response from %s.", aRequest.Query.c_str());
 		return response;
 	}
-
-	CachedResponse* cached = new CachedResponse{};
-	cached->Content = jsonResult;
-	cached->Timestamp = Timestamp();
-
-	const std::lock_guard<std::mutex> lock(Mutex);
-	std::filesystem::path normalizedPath = GetNormalizedPath(aRequest.Query);
-
-	ResponseCache.insert({ normalizedPath, cached});
-
-	std::ofstream file(normalizedPath);
-	file << jsonResult.dump(1, '\t') << std::endl;
-	file.close();
 
 	response.Content = jsonResult;
 	return response;

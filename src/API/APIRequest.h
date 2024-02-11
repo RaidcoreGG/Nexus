@@ -2,15 +2,17 @@
 #define APIREQUEST_H
 
 #include <string>
+#include <condition_variable>
+
+#include "CachedResponse.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
-typedef void (*API_RESPONSE_CALLBACK)(json aResponse);
-
 struct APIRequest
 {
-	API_RESPONSE_CALLBACK Callback;
+	bool* IsComplete;
+	std::condition_variable* CV;
 	int Attempts;
 	std::string Query;
 };

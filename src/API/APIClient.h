@@ -2,6 +2,7 @@
 #define APIHANDLER_H
 
 #include <string>
+#include <thread>
 #include <mutex>
 #include <vector>
 #include <unordered_map>
@@ -38,11 +39,10 @@ public:
 	*/
 	json Get(std::string aEndpoint, std::string aParameters = "");
 	/*
-	GetAsync:
-	- aCallback will receive the response string.
+	Download:
+	Downloads the remote resource to disk.
 	*/
-	void GetAsync(API_RESPONSE_CALLBACK aCallback, std::string aEndpoint, std::string aParameters = "");
-	//void Download(std::filesystem::path aOutPath, std::string aEndpoint, std::string aParameters = "");
+	void Download(std::filesystem::path aOutPath, std::string aEndpoint, std::string aParameters = "");
 
 protected:
 	std::string					BaseURL;
@@ -63,6 +63,7 @@ protected:
 	int							RefillInterval;
 
 	std::mutex					ThreadMutex;
+	std::thread					WorkerThread;
 	std::condition_variable		ConVar;
 	bool						IsSuspended = false;
 

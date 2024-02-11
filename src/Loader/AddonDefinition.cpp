@@ -10,6 +10,30 @@ std::string AddonVersion::ToString()
 	return str;
 }
 
+AddonVersion VersionFromJson(json aJson)
+{
+	AddonVersion version{};
+
+	if (!aJson["Major"].is_null())
+	{
+		aJson["Major"].get_to(version.Major);
+	}
+	if (!aJson["Minor"].is_null())
+	{
+		aJson["Minor"].get_to(version.Minor);
+	}
+	if (!aJson["Build"].is_null())
+	{
+		aJson["Build"].get_to(version.Build);
+	}
+	if (!aJson["Revision"].is_null())
+	{
+		aJson["Revision"].get_to(version.Revision);
+	}
+
+	return version;
+}
+
 bool operator>(AddonVersion lhs, AddonVersion rhs)
 {
 	if ((lhs.Major > rhs.Major) ||

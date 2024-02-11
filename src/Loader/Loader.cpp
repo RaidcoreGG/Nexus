@@ -719,22 +719,7 @@ namespace Loader
 				return false;
 			}
 
-			bool anyNull = false;
-			AddonVersion remoteVersion{};
-			if (!resVersion["Major"].is_null()) { resVersion["Major"].get_to(remoteVersion.Major); }
-			else { anyNull = true; }
-			if (!resVersion["Minor"].is_null()) { resVersion["Minor"].get_to(remoteVersion.Minor); }
-			else { anyNull = true; }
-			if (!resVersion["Build"].is_null()) { resVersion["Build"].get_to(remoteVersion.Build); }
-			else { anyNull = true; }
-			if (!resVersion["Revision"].is_null()) { resVersion["Revision"].get_to(remoteVersion.Revision); }
-			else { anyNull = true; }
-
-			if (anyNull)
-			{
-				LogWarning(CH_LOADER, "One or more fields in the API response were null.");
-				return false;
-			}
+			AddonVersion remoteVersion = VersionFromJson(resVersion);
 
 			if (remoteVersion > aDefinitions->Version)
 			{

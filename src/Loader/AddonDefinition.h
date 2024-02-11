@@ -7,6 +7,9 @@
 #include "EAddonFlags.h"
 #include "EUpdateProvider.h"
 
+#include "nlohmann/json.hpp"
+using json = nlohmann::json;
+
 typedef void (*ADDON_LOAD)(AddonAPI* aAPI);
 typedef void (*ADDON_UNLOAD)();
 
@@ -19,6 +22,8 @@ struct AddonVersion
 
 	std::string ToString();
 };
+
+AddonVersion VersionFromJson(json aJson);
 
 bool operator>(AddonVersion lhs, AddonVersion rhs);
 bool operator<(AddonVersion lhs, AddonVersion rhs);
