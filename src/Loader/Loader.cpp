@@ -344,14 +344,19 @@ namespace Loader
 			return;
 		}
 
-		if (!aIsReload && UpdateAddon(aPath, tmpDefs))
+		if (!aIsReload)
 		{
-			LogInfo(CH_LOADER, "Update available for \"%s\". Reloading.", strPath);
-			FreeLibrary(addon->Module);
-			addon->State = EAddonState::NotLoaded;
-			addon->Module = nullptr;
-			QueueAddon(ELoaderAction::Reload, aPath);
-			return;
+			std::thread([aPath, tmpDefs, path]()
+				{
+					AddonDefinition* tmpDefsForUpdater = nullptr;
+					CopyAddonDefs(tmpDefs, &tmpDefsForUpdater);
+					if (UpdateAddon(aPath, tmpDefsForUpdater))
+					{
+						LogInfo(CH_LOADER, "Update available for \"%s\".", path.c_str());
+					}
+					FreeAddonDefs(&tmpDefsForUpdater);
+				})
+				.detach();
 		}
 
 		/* doesn't fulfill min reqs */
