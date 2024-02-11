@@ -84,6 +84,8 @@ protected:
 	std::filesystem::path GetNormalizedPath(const std::string& aQuery) const;
 
 private:
+	long long FileTimeOffset;
+
 	void ProcessRequests();
 	APIResponse DoHttpReq(APIRequest aRequest);
 };

@@ -683,35 +683,9 @@ namespace Loader
 			break;
 		}
 
-		/* prepare client request */
-		httplib::Client client(baseUrl);
-
 		if (EUpdateProvider::Raidcore == aDefinitions->Provider)
 		{
-			auto result = client.Get(endpoint);
-
-			if (!result)
-			{
-				LogWarning(CH_LOADER, "Error fetching %s%s", baseUrl.c_str(), endpoint.c_str());
-				return false;
-			}
-
-			if (result->status != 200) // not HTTP_OK
-			{
-				LogWarning(CH_LOADER, "Status %d when fetching %s%s", result->status, baseUrl.c_str(), endpoint.c_str());
-				return false;
-			}
-
-			json resVersion;
-			try
-			{
-				resVersion = json::parse(result->body);
-			}
-			catch (json::parse_error& ex)
-			{
-				LogWarning(CH_LOADER, "Response from %s%s could not be parsed. Error: %s", baseUrl.c_str(), endpoint.c_str(), ex.what());
-				return false;
-			}
+			json resVersion = RaidcoreAPI->Get(endpoint);
 
 			if (resVersion.is_null())
 			{
@@ -725,53 +699,15 @@ namespace Loader
 			{
 				LogInfo(CH_LOADER, "%s is outdated: API replied with Version %s but installed is Version %s", aDefinitions->Name, remoteVersion.ToString().c_str(), aDefinitions->Version.ToString().c_str());
 
-				std::string endpointDownload = endpoint + "/download"; // e.g. api.raidcore.gg/addons/17/download
-
-				size_t bytesWritten = 0;
-				std::ofstream file(pathUpdate, std::ofstream::binary);
-				auto downloadResult = client.Get(endpointDownload, [&](const char* data, size_t data_length) {
-					file.write(data, data_length);
-					bytesWritten += data_length;
-					return true;
-					});
-				file.close();
-
-				if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
-				{
-					LogWarning(CH_LOADER, "Error fetching %s%s", baseUrl.c_str(), endpointDownload.c_str());
-					return false;
-				}
-
+				RaidcoreAPI->Download(pathUpdate, endpoint + "/download"); // e.g. api.raidcore.gg/addons/17/download
+				
 				LogInfo(CH_LOADER, "Successfully updated %s.", aDefinitions->Name);
 				wasUpdated = true;
 			}
 		}
 		else if (EUpdateProvider::GitHub == aDefinitions->Provider)
 		{
-			auto result = client.Get(endpoint);
-
-			if (!result)
-			{
-				LogWarning(CH_LOADER, "Error fetching %s%s", baseUrl.c_str(), endpoint.c_str());
-				return false;
-			}
-
-			if (result->status != 200) // not HTTP_OK
-			{
-				LogWarning(CH_LOADER, "Status %d when fetching %s%s", result->status, baseUrl.c_str(), endpoint.c_str());
-				return false;
-			}
-
-			json response;
-			try
-			{
-				response = json::parse(result->body);
-			}
-			catch (json::parse_error& ex)
-			{
-				LogWarning(CH_LOADER, "Response from %s%s could not be parsed. Error: %s", baseUrl.c_str(), endpoint.c_str(), ex.what());
-				return false;
-			}
+			json response = GitHubAPI->Get(endpoint);
 
 			if (response.is_null())
 			{
@@ -870,6 +806,8 @@ namespace Loader
 		}
 		else if (EUpdateProvider::Direct == aDefinitions->Provider)
 		{
+			/* prepare client request */
+			httplib::Client client(baseUrl);
 			client.enable_server_certificate_verification(false);
 
 			std::string endpointMD5 = endpoint + ".md5sum";

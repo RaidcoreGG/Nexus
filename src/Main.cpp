@@ -38,8 +38,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
 namespace Main
 {
-	APIClient* RaidcoreAPI = nullptr;
-
 	void Initialize()
 	{
 		if (State::Nexus >= ENexusState::LOAD) { return; }
@@ -59,6 +57,7 @@ namespace Main
 		State::Initialize();
 
 		RaidcoreAPI = new APIClient("https://api.raidcore.gg", true, Path::D_GW2_ADDONS_COMMON_API_RAIDCORE, 30 * 60, 300, 5, 1);
+		GitHubAPI = new APIClient("https://api.github.com", true, Path::D_GW2_ADDONS_COMMON_API_GITHUB, 30 * 60, 60, 60, 60 * 60);
 
 		//Paradigm::Initialize();
 		SelfUpdate();

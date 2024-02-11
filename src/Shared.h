@@ -42,6 +42,9 @@ extern ImGuiWindowFlags				WindowFlags_Overlay;
 extern ImGuiWindowFlags				WindowFlags_Custom;
 extern ImGuiWindowFlags				WindowFlags_Watermark;
 
+extern APIClient*					RaidcoreAPI;
+extern APIClient*					GitHubAPI;
+
 extern std::string					ChangelogText;
 extern bool							IsUpdateAvailable;
 

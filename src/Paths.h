@@ -12,7 +12,7 @@ namespace Path
 	extern std::filesystem::path D_GW2;
 	extern std::filesystem::path D_GW2_ADDONS;
 	extern std::filesystem::path D_GW2_ADDONS_COMMON;
-	extern std::filesystem::path D_GW2_ADDONS_COMMON_API_V2;
+	extern std::filesystem::path D_GW2_ADDONS_COMMON_API_GW2;
 	extern std::filesystem::path D_GW2_ADDONS_COMMON_API_RAIDCORE;
 	extern std::filesystem::path D_GW2_ADDONS_COMMON_API_GITHUB;
 	extern std::filesystem::path D_GW2_ADDONS_NEXUS;

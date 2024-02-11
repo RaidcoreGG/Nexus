@@ -48,5 +48,8 @@ ImGuiWindowFlags			WindowFlags_Watermark = ImGuiWindowFlags_NoDecoration |
 													ImGuiWindowFlags_NoBringToFrontOnFocus |
 													ImGuiWindowFlags_NoBackground;
 
+APIClient*					RaidcoreAPI			= nullptr;
+APIClient*					GitHubAPI			= nullptr;
+
 std::string					ChangelogText;
-bool						IsUpdateAvailable = false;
+bool						IsUpdateAvailable	= false;

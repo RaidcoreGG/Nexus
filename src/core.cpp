@@ -313,3 +313,21 @@ long long Timestamp()
 {
 	return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
+// Returns:
+//   true upon success.
+//   false upon failure, and set the std::error_code & err accordingly.
+bool CreateDirectoryRecursive(std::string const& dirName, std::error_code& err)
+{
+	err.clear();
+	if (!std::filesystem::create_directories(dirName, err))
+	{
+		if (std::filesystem::exists(dirName))
+		{
+			// The folder already exists:
+			err.clear();
+			return true;
+		}
+		return false;
+	}
+	return true;
+}

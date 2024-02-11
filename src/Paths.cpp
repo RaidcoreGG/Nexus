@@ -9,9 +9,9 @@ namespace Path
 	std::filesystem::path D_GW2{};
 	std::filesystem::path D_GW2_ADDONS{};
 	std::filesystem::path D_GW2_ADDONS_COMMON{};
-	std::filesystem::path D_GW2_ADDONS_COMMON_API_V2{};
-	std::filesystem::path D_GW2_ADDONS_COMMON_API_RAIDCORE;
-	std::filesystem::path D_GW2_ADDONS_COMMON_API_GITHUB;
+	std::filesystem::path D_GW2_ADDONS_COMMON_API_GW2{};
+	std::filesystem::path D_GW2_ADDONS_COMMON_API_RAIDCORE{};
+	std::filesystem::path D_GW2_ADDONS_COMMON_API_GITHUB{};
 	std::filesystem::path D_GW2_ADDONS_NEXUS{};
 	std::filesystem::path D_GW2_ADDONS_RAIDCORE_LOCALES{};
 
@@ -39,7 +39,7 @@ namespace Path
 		D_GW2 = F_HOST_DLL.parent_path();												/* get current directory */
 		D_GW2_ADDONS = D_GW2 / "addons";												/* get addons path */
 		D_GW2_ADDONS_COMMON = D_GW2_ADDONS / "common";									/* get addons/common path */
-		D_GW2_ADDONS_COMMON_API_V2 = D_GW2_ADDONS_COMMON / "api.guildwars2.com";		/* get addons/common/api.guildwars2.com path */
+		D_GW2_ADDONS_COMMON_API_GW2 = D_GW2_ADDONS_COMMON / "api.guildwars2.com";		/* get addons/common/api.guildwars2.com path */
 		D_GW2_ADDONS_COMMON_API_RAIDCORE = D_GW2_ADDONS_COMMON / "api.raidcore.gg";		/* get addons/common/api.raidcore.gg path */
 		D_GW2_ADDONS_COMMON_API_GITHUB = D_GW2_ADDONS_COMMON / "api.github.com";		/* get addons/common/api.github.com path */
 		D_GW2_ADDONS_NEXUS = D_GW2_ADDONS / "Nexus";									/* get addons/Nexus path */
@@ -67,7 +67,7 @@ namespace Path
 		/* push to paths */
 		ExistingPaths.push_back(D_GW2.string());
 		ExistingPaths.push_back(D_GW2_ADDONS_COMMON.string());
-		ExistingPaths.push_back(D_GW2_ADDONS_COMMON_API_V2.string());
+		ExistingPaths.push_back(D_GW2_ADDONS_COMMON_API_GW2.string());
 		ExistingPaths.push_back(D_GW2_ADDONS_COMMON_API_RAIDCORE.string());
 	}
 

@@ -17,7 +17,7 @@ APIClient::APIClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::pat
 	CacheLifetime = aCacheLifetime;
 
 	TimeSinceLastRefill = Timestamp();
-	Bucket = BucketCapacity;
+	Bucket = aBucketCapacity;
 	BucketCapacity = aBucketCapacity;
 	RefillAmount = aRefillAmount;
 	RefillInterval = aRefillInterval;
@@ -30,6 +30,13 @@ APIClient::APIClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::pat
 
 	WorkerThread = std::thread(&APIClient::ProcessRequests, this);
 	WorkerThread.detach();
+
+	std::filesystem::path timeOffset = aCacheDirectory / "0";
+	std::ofstream file(timeOffset);
+	file << "0" << std::endl;
+	file.close();
+
+	FileTimeOffset = Timestamp() - std::chrono::duration_cast<std::chrono::seconds>(std::filesystem::last_write_time(timeOffset).time_since_epoch()).count();
 }
 APIClient::~APIClient()
 {
@@ -139,7 +146,7 @@ CachedResponse* APIClient::GetCachedResponse(const std::string& aQuery)
 
 			CachedResponse* rResponse = new CachedResponse{};
 			rResponse->Content = content;
-			rResponse->Timestamp = std::chrono::duration_cast<std::chrono::seconds>(std::filesystem::last_write_time(path).time_since_epoch()).count();
+			rResponse->Timestamp = std::chrono::duration_cast<std::chrono::seconds>(std::filesystem::last_write_time(path).time_since_epoch()).count() + FileTimeOffset;
 
 			ResponseCache.insert({ path, rResponse });
 			return rResponse;
@@ -282,15 +289,23 @@ void APIClient::ProcessRequests()
 				cached->Timestamp = Timestamp();
 
 				std::filesystem::path normalizedPath = GetNormalizedPath(request.Query);
-
+				
 				ResponseCache.insert({ normalizedPath, cached });
+				
+				// notify caller
+				*(request.IsComplete) = true;
+				request.CV->notify_all();
+
+				// write to disk after having notified the caller
+				std::error_code err;
+				if (!CreateDirectoryRecursive(normalizedPath.parent_path().string(), err))
+				{
+					LogWarning("APIClient", "CreateDirectoryRecursive FAILED, err: % s", err.message());
+				}
 
 				std::ofstream file(normalizedPath);
 				file << response.Content.dump(1, '\t') << std::endl;
 				file.close();
-
-				*(request.IsComplete) = true;
-				request.CV->notify_all();
 			}
 			else
 			{
