@@ -69,8 +69,8 @@ namespace GUI
 				ImGui::PushFont(Font);
 				ImGui::TextColored(ImVec4(1.0f, 0.933f, 0.733f, 1.0f), aAddon->Definitions->Name); ImGui::SameLine();
 				ImGui::PopFont();
-				ImGui::TextDisabled("(%s)", aAddon->Definitions->Version.ToString().c_str()); ImGui::SameLine();
-				ImGui::TextDisabled("by %s", aAddon->Definitions->Author);
+				ImGui::TextColored(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "(%s)", aAddon->Definitions->Version.ToString().c_str()); ImGui::SameLine();
+				ImGui::TextColored(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "by %s", aAddon->Definitions->Author);
 
 				if (aAddon->State == EAddonState::NotLoadedIncompatibleAPI)
 				{

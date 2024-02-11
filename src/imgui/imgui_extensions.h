@@ -91,6 +91,23 @@ namespace ImGui
 		va_end(args);
 	}
 
+	static void TextColoredOutlined(const ImVec4& col, const char* fmt, ...)
+	{
+		ImVec2 pos = GetCursorPos();
+
+		va_list args;
+		va_start(args, fmt);
+		pos.x += 1;
+		pos.y += 1;
+		SetCursorPos(pos);
+		TextColoredV(ImVec4(0, 0, 0, 255), fmt, args);
+		pos.x -= 1;
+		pos.y -= 1;
+		SetCursorPos(pos);
+		TextColoredV(col, fmt, args);
+		va_end(args);
+	}
+
 	static void TextWrappedOutlined(const char* fmt, ...)
 	{
 		ImVec2 pos = GetCursorPos();

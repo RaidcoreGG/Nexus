@@ -72,6 +72,11 @@ namespace GUI
 
 		ImGui::PushFont(FontUI);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 2));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(6, 4));
+		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f, 0.5f));
+		ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0);
+		ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
 
 		ImGui::SetNextWindowSize(ImVec2(windowWidth * Renderer::Scaling, windowHeight * Renderer::Scaling));
 		if (ImGui::Begin(Name.c_str(), &Visible, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | 
@@ -123,10 +128,10 @@ namespace GUI
 			ImGui::PopStyleVar();
 
 			ImGui::SetCursorPos(ImVec2(tab1origin.x + text1offset.x, tab1origin.y + text1offset.y));
-			ImGui::TextDisabled("Installed");
+			ImGui::TextColored(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "Installed");
 
 			ImGui::SetCursorPos(ImVec2(tab2origin.x + text2offset.x, tab2origin.y + text2offset.y));
-			ImGui::TextDisabled("Library");
+			ImGui::TextColored(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "Library");
 
 			ImGui::SetCursorPos(ImVec2(28.0f, 32.0f + (64.0f * Renderer::Scaling)));
 			{
@@ -143,7 +148,7 @@ namespace GUI
 							ImVec2 textSize = ImGui::CalcTextSize("No addons installed.");
 							ImVec2 position = ImGui::GetCursorPos();
 							ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-							ImGui::TextDisabledOutlined("No addons installed.");
+							ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "No addons installed.");
 						}
 						else
 						{
@@ -172,7 +177,7 @@ namespace GUI
 					ImVec2 textSize = ImGui::CalcTextSize("Unable to fetch addons.");
 					ImVec2 position = ImGui::GetCursorPos();
 					ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-					ImGui::TextDisabledOutlined("Unable to fetch addons.");
+					ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "Unable to fetch addons.");
 				}
 
 				ImGui::EndChild();
@@ -211,7 +216,7 @@ namespace GUI
 		}
 		ImGui::End();
 
-		ImGui::PopStyleVar();
+		ImGui::PopStyleVar(6);
 		ImGui::PopFont();
 	}
 }
