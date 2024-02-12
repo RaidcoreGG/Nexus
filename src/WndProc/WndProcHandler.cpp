@@ -33,7 +33,7 @@ namespace WndProc
 		WndProc::Mutex.unlock();
 	}
 
-	void Unregister(WNDPROC_CALLBACK aWndProcCallback)
+	void Deregister(WNDPROC_CALLBACK aWndProcCallback)
 	{
 		WndProc::Mutex.lock();
 		{

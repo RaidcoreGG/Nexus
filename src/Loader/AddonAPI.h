@@ -26,7 +26,7 @@ struct AddonAPI1 : AddonAPI
 	void*						ImguiMalloc;
 	void*						ImguiFree;
 	GUI_ADDRENDER				RegisterRender;
-	GUI_REMRENDER				UnregisterRender;
+	GUI_REMRENDER				DeregisterRender;
 
 	/* Paths */
 	PATHS_GETGAMEDIR			GetGameDirectory;
@@ -49,12 +49,12 @@ struct AddonAPI1 : AddonAPI
 
 	/* WndProc */
 	WNDPROC_ADDREM				RegisterWndProc;
-	WNDPROC_ADDREM				UnregisterWndProc;
+	WNDPROC_ADDREM				DeregisterWndProc;
 
 	/* Keybinds */
 	KEYBINDS_REGISTERWITHSTRING	RegisterKeybindWithString;
 	KEYBINDS_REGISTERWITHSTRUCT	RegisterKeybindWithStruct;
-	KEYBINDS_UNREGISTER			UnregisterKeybind;
+	KEYBINDS_DEREGISTER			DeregisterKeybind;
 
 	/* DataLink */
 	DATALINK_GETRESOURCE		GetResource;
@@ -68,9 +68,9 @@ struct AddonAPI1 : AddonAPI
 
 	/* Shortcuts */
 	QUICKACCESS_ADDSHORTCUT		AddShortcut;
-	QUICKACCESS_REMOVE			RemoveShortcut;
+	QUICKACCESS_GENERIC			RemoveShortcut;
 	QUICKACCESS_ADDSIMPLE		AddSimpleShortcut;
-	QUICKACCESS_REMOVE			RemoveSimpleShortcut;
+	QUICKACCESS_GENERIC			RemoveSimpleShortcut;
 };
 
 struct AddonAPI2 : AddonAPI
@@ -81,7 +81,7 @@ struct AddonAPI2 : AddonAPI
 	void*						ImguiMalloc;
 	void*						ImguiFree;
 	GUI_ADDRENDER				RegisterRender;
-	GUI_REMRENDER				UnregisterRender;
+	GUI_REMRENDER				DeregisterRender;
 
 	/* Paths */
 	PATHS_GETGAMEDIR			GetGameDirectory;
@@ -104,12 +104,12 @@ struct AddonAPI2 : AddonAPI
 
 	/* WndProc */
 	WNDPROC_ADDREM				RegisterWndProc;
-	WNDPROC_ADDREM				UnregisterWndProc;
+	WNDPROC_ADDREM				DeregisterWndProc;
 
 	/* Keybinds */
 	KEYBINDS_REGISTERWITHSTRING	RegisterKeybindWithString;
 	KEYBINDS_REGISTERWITHSTRUCT	RegisterKeybindWithStruct;
-	KEYBINDS_UNREGISTER			UnregisterKeybind;
+	KEYBINDS_DEREGISTER			DeregisterKeybind;
 
 	/* DataLink */
 	DATALINK_GETRESOURCE		GetResource;
@@ -124,9 +124,10 @@ struct AddonAPI2 : AddonAPI
 
 	/* Shortcuts */
 	QUICKACCESS_ADDSHORTCUT		AddShortcut;
-	QUICKACCESS_REMOVE			RemoveShortcut;
+	QUICKACCESS_GENERIC			RemoveShortcut;
+	QUICKACCESS_GENERIC			NotifyShortcut;
 	QUICKACCESS_ADDSIMPLE		AddSimpleShortcut;
-	QUICKACCESS_REMOVE			RemoveSimpleShortcut;
+	QUICKACCESS_GENERIC			RemoveSimpleShortcut;
 
 	/* API */
 		// GW2 API FUNCS

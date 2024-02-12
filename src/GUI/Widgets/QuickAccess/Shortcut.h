@@ -14,6 +14,7 @@ namespace GUI
 		std::string				Keybind;
 		std::string				TooltipText;
 		bool					IsHovering;
+		bool					HasNotification;
 	};
 }
 

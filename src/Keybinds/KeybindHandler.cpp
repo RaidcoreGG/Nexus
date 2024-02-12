@@ -205,13 +205,18 @@ namespace Keybinds
 
 		Save();
 	}
-	void Unregister(const char* aIdentifier)
+	void Deregister(const char* aIdentifier)
 	{
 		std::string str = aIdentifier;
 
 		Keybinds::Mutex.lock();
 		{
-			Registry.erase(str);
+			auto it = Registry.find(str);
+
+			if (it != Registry.end())
+			{
+				it->second.Handler = nullptr;
+			}
 		}
 		Keybinds::Mutex.unlock();
 

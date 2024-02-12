@@ -32,10 +32,15 @@ namespace GUI
 		extern EQAPosition		Location;
 		extern ImVec2			Offset;
 
+		extern Texture*			IconNotification;
+
+		void ReceiveTextures(const char* aIdentifier, Texture* aTexture);
+
 		void Render();
 
 		void AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aKeybindIdentifier, const char* aTooltipText);
 		void RemoveShortcut(const char* aIdentifier);
+		void NotifyShortcut(const char* aIdentifier);
 
 		void AddSimpleShortcut(const char* aIdentifier, GUI_RENDER aShortcutRenderCallback);
 		void RemoveSimpleShortcut(const char* aIdentifier);

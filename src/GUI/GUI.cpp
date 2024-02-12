@@ -2,6 +2,8 @@
 
 #include <filesystem>
 #include <algorithm>
+#include <chrono>
+#include <fstream>
 
 #include "State.h"
 #include "Renderer.h"
@@ -25,6 +27,7 @@
 #include "Widgets/Menu/MenuItem.h"
 #include "Widgets/Addons/AddonsWindow.h"
 #include "Widgets/Options/OptionsWindow.h"
+#include "Widgets/Changelog/ChangelogWindow.h"
 #include "Widgets/Log/LogWindow.h"
 #include "Widgets/Debug/DebugWindow.h"
 #include "Widgets/About/AboutBox.h"
@@ -47,18 +50,20 @@ namespace GUI
 	std::vector<GUI_RENDER>		RegistryOptionsRender;
 	std::vector<IWindow*>		Windows;
 	std::map<EFont, ImFont*>	FontIndex;
-	float						FontSize;
-	bool						CloseMenuAfterSelecting;
-	bool						CloseOnEscape;
+	float						FontSize					= 16.0f;
+	bool						CloseMenuAfterSelecting		= true;
+	bool						CloseOnEscape				= true;
+	bool						LinkArcDPSStyle				= true;
 
-	bool						IsUIVisible			= true;
+	bool						IsUIVisible					= true;
 
-	bool						IsRightClickHeld	= false;
-	bool						IsLeftClickHeld		= false;
-	bool						IsSetup				= false;
+	bool						IsRightClickHeld			= false;
+	bool						IsLeftClickHeld				= false;
+	bool						IsSetup						= false;
 	float						LastScaling;
 
-	bool						AcceptedEULA		= false;
+	bool						HasAcceptedEULA				= false;
+	bool						NotifyChangelog				= false;
 
 	void Initialize()
 	{
@@ -85,7 +90,11 @@ namespace GUI
 
 			ImGui_ImplDX11_Shutdown();
 			ImGui_ImplWin32_Shutdown();
-			if (Renderer::RenderTargetView) { Renderer::RenderTargetView->Release(); Renderer::RenderTargetView = NULL; }
+			if (Renderer::RenderTargetView)
+			{
+				Renderer::RenderTargetView->Release();
+				Renderer::RenderTargetView = 0;
+			}
 		}
 	}
 
@@ -229,11 +238,6 @@ namespace GUI
 
 	void Render()
 	{
-		if (State::Nexus == ENexusState::READY && !State::IsImGuiInitialized)
-		{
-			Initialize();
-		}
-
 		/* pre-render callbacks */
 		GUI::Mutex.lock();
 		{
@@ -314,6 +318,51 @@ namespace GUI
 		GUI::Mutex.unlock();
 	}
 
+	void ImportArcDPSStyle()
+	{
+		if (LinkArcDPSStyle)
+		{
+			std::filesystem::path arcIniPath = Path::D_GW2_ADDONS / "arcdps/arcdps.ini";
+
+			if (std::filesystem::exists(arcIniPath))
+			{
+				std::ifstream arcIni(arcIniPath);
+
+				if (arcIni.is_open())
+				{
+					std::string line;
+					std::string style = "appearance_imgui_style180=";
+					std::string colours = "appearance_imgui_colours180=";
+
+					while (std::getline(arcIni, line))
+					{
+						if (line.find(style, 0) != line.npos)
+						{
+							line = line.substr(style.length());
+
+							ImGuiStyle* style = &ImGui::GetStyle();
+
+							std::string decode = Base64::Decode(&line[0], line.length());
+
+							memcpy(style, &decode[0], decode.length());
+						}
+						else if (line.find(colours, 0) != line.npos)
+						{
+							line = line.substr(colours.length());
+
+							ImGuiStyle* style = &ImGui::GetStyle();
+
+							std::string decode = Base64::Decode(&line[0], line.length());
+
+							memcpy(&style->Colors[0], &decode[0], decode.length());
+						}
+					}
+					arcIni.close();
+				}
+			}
+		}
+	}
+
 	void ProcessKeybind(const char* aIdentifier)
 	{
 		std::string str = aIdentifier;
@@ -321,14 +370,22 @@ namespace GUI
 		if (str == KB_MENU)
 		{
 			Menu::Visible = !Menu::Visible;
+			return;
 		}
 		else if (str == KB_TOGGLEHIDEUI)
 		{
 			IsUIVisible = !IsUIVisible;
+			return;
 		}
 		else if (str == KB_ADDONS)
 		{
 			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Addons"; });
+			if (it == Windows.end()) { return; }
+			(*it)->Visible = !(*it)->Visible;
+		}
+		else if (str == KB_CHANGELOG)
+		{
+			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Changelog"; });
 			if (it == Windows.end()) { return; }
 			(*it)->Visible = !(*it)->Visible;
 		}
@@ -400,10 +457,9 @@ namespace GUI
 	void OnEULAAccepted(void* aEventArgs)
 	{
 		Mutex.lock();
-		auto it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd)
-			{
-				return wnd->Name == "EULAModal";
-			});
+		auto it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) {
+			return wnd->Name == "EULAModal";
+		});
 
 		if (it != Windows.end())
 		{
@@ -496,7 +552,7 @@ namespace GUI
 			/* small UI*/
 			FontIndex.emplace(EFont::Menomonia_Small, io.Fonts->AddFontFromMemoryTTF(resM, szM, 16.0f));
 			FontIndex.emplace(EFont::MenomoniaBig_Small, io.Fonts->AddFontFromMemoryTTF(resM, szM, 22.0f));
-			FontIndex.emplace(EFont::Trebuchet_Small, io.Fonts->AddFontFromMemoryTTF(resT, szT, 15.5f));
+			FontIndex.emplace(EFont::Trebuchet_Small, io.Fonts->AddFontFromMemoryTTF(resT, szT, 15.0f));
 
 			/* normal UI*/
 			FontIndex.emplace(EFont::Menomonia_Normal, io.Fonts->AddFontFromMemoryTTF(resM, szM, 18.0f));
@@ -522,40 +578,81 @@ namespace GUI
 
 		/* set up and add windows */
 		AddonsWindow* addonsWnd = new AddonsWindow("Addons");
+		TextureLoader::LoadFromResource("TEX_ADDONS_BACKGROUND", RES_TEX_ADDONS_BACKGROUND, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource("TEX_ADDONITEM_BACKGROUND", RES_TEX_ADDONITEM, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource("TEX_ADDONS_TITLEBAR", RES_TEX_ADDONS_TITLEBAR, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource("TEX_ADDONS_TITLEBAR_HOVER", RES_TEX_ADDONS_TITLEBAR_HOVER, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource("TEX_TABBTN", RES_TEX_TABBTN, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource("TEX_TABBTN_HOVER", RES_TEX_TABBTN_HOVER, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource("TEX_BTNCLOSE", RES_TEX_BTNCLOSE, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource("TEX_BTNCLOSE_HOVER", RES_TEX_BTNCLOSE_HOVER, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource("TEX_TITLEBAREND", RES_TEX_TITLEBAREND, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource("TEX_TITLEBAREND_HOVER", RES_TEX_TITLEBAREND_HOVER, NexusHandle, nullptr);
+
+		OptionsWindow* opsWnd = new OptionsWindow("Options");
+		ChangelogWindow* chlWnd = new ChangelogWindow("Changelog");
 		LogWindow* logWnd = new LogWindow("Log", ELogLevel::ALL);
 		LogHandler::RegisterLogger(logWnd);
-		OptionsWindow* opsWnd = new OptionsWindow("Options");
 		DebugWindow* dbgWnd = new DebugWindow("Debug");
 		AboutBox* aboutWnd = new AboutBox("About");
 
 		Keybinds::Register(KB_ADDONS, ProcessKeybind, "(null)");
-		Keybinds::Register(KB_LOG, ProcessKeybind, "(null)");
 		Keybinds::Register(KB_OPTIONS, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_CHANGELOG, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_LOG, ProcessKeybind, "(null)");
 		Keybinds::Register(KB_DEBUG, ProcessKeybind, "(null)");
 		Keybinds::Register(KB_MUMBLEOVERLAY, ProcessKeybind, "(null)");
 
 		AddWindow(addonsWnd);
 		AddWindow(opsWnd);
+		AddWindow(chlWnd);
 		AddWindow(logWnd);
 		AddWindow(dbgWnd);
 		AddWindow(aboutWnd);
 
-		Menu::AddMenuItem("Addons",		&addonsWnd->Visible);
-		Menu::AddMenuItem("Options",	&opsWnd->Visible);
-		Menu::AddMenuItem("Log",		&logWnd->Visible);
-		Menu::AddMenuItem("Debug",		&dbgWnd->Visible);
-		Menu::AddMenuItem("About",		&aboutWnd->Visible);
+		Menu::AddMenuItem("Addons",		ICON_ADDONS,	&addonsWnd->Visible);
+		Menu::AddMenuItem("Options",	ICON_OPTIONS,	&opsWnd->Visible);
+		Menu::AddMenuItem("Changelog",	ICON_CHANGELOG, &chlWnd->Visible);
+		Menu::AddMenuItem("Log",		ICON_LOG,		&logWnd->Visible);
+		Menu::AddMenuItem("Debug",		ICON_DEBUG,		&dbgWnd->Visible);
+		Menu::AddMenuItem("About",		ICON_ABOUT,		&aboutWnd->Visible);
 
 		/* register keybinds */
 		Keybinds::Register(KB_MENU, ProcessKeybind, "CTRL+O");
 		Keybinds::Register(KB_TOGGLEHIDEUI, ProcessKeybind, "CTRL+H");
 
 		/* load icons */
-		TextureLoader::LoadFromResource(ICON_NEXUS, RES_ICON_NEXUS, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource(ICON_NEXUS_HOVER, RES_ICON_NEXUS_HOVER, NexusHandle, nullptr);
+		std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+		tm local_tm = *localtime(&t);
+		int month = local_tm.tm_mon + 1;
+
+		switch (month)
+		{
+		case 10:
+			TextureLoader::LoadFromResource(ICON_NEXUS, RES_ICON_NEXUS_HALLOWEEN, NexusHandle, nullptr);
+			TextureLoader::LoadFromResource(ICON_NEXUS_HOVER, RES_ICON_NEXUS_HALLOWEEN_HOVER, NexusHandle, nullptr);
+			break;
+		case 12:
+			TextureLoader::LoadFromResource(ICON_NEXUS, RES_ICON_NEXUS_XMAS, NexusHandle, nullptr);
+			TextureLoader::LoadFromResource(ICON_NEXUS_HOVER, RES_ICON_NEXUS_XMAS_HOVER, NexusHandle, nullptr);
+			break;
+		default:
+			TextureLoader::LoadFromResource(ICON_NEXUS, RES_ICON_NEXUS, NexusHandle, nullptr);
+			TextureLoader::LoadFromResource(ICON_NEXUS_HOVER, RES_ICON_NEXUS_HOVER, NexusHandle, nullptr);
+			break;
+		}
 
 		TextureLoader::LoadFromResource(ICON_GENERIC, RES_ICON_GENERIC, NexusHandle, nullptr);
 		TextureLoader::LoadFromResource(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, NexusHandle, nullptr);
+
+		TextureLoader::LoadFromResource(ICON_NOTIFICATION, RES_ICON_NOTIFICATION, NexusHandle, QuickAccess::ReceiveTextures);
+
+		TextureLoader::LoadFromResource(ICON_ADDONS, RES_ICON_ADDONS, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource(ICON_OPTIONS, RES_ICON_OPTIONS, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource(ICON_CHANGELOG, RES_ICON_CHANGELOG, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource(ICON_LOG, RES_ICON_LOG, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource(ICON_DEBUG, RES_ICON_DEBUG, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource(ICON_ABOUT, RES_ICON_ABOUT, NexusHandle, nullptr);
 
 		TextureLoader::LoadFromResource(TEX_MENU_BACKGROUND, RES_TEX_MENU_BACKGROUND, NexusHandle, Menu::ReceiveTextures);
 		TextureLoader::LoadFromResource(TEX_MENU_BUTTON, RES_TEX_MENU_BUTTON, NexusHandle, Menu::ReceiveTextures);
@@ -564,15 +661,29 @@ namespace GUI
 		/* add shortcut */
 		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "Nexus Menu");
 
+		if (IsUpdateAvailable && NotifyChangelog)
+		{
+			QuickAccess::NotifyShortcut(QA_MENU);
+		}
+
 		if (!Settings::Settings.is_null())
 		{
 			if (!Settings::Settings[OPT_ACCEPTEULA].is_null())
 			{
-				 Settings::Settings[OPT_ACCEPTEULA].get_to(AcceptedEULA);
+				Settings::Settings[OPT_ACCEPTEULA].get_to(HasAcceptedEULA);
 			}
 			else
 			{
-				AcceptedEULA = false;
+				HasAcceptedEULA = false;
+			}
+
+			if (!Settings::Settings[OPT_NOTIFYCHANGELOG].is_null())
+			{
+				Settings::Settings[OPT_NOTIFYCHANGELOG].get_to(NotifyChangelog);
+			}
+			else
+			{
+				NotifyChangelog = false;
 			}
 
 			if (!Settings::Settings[OPT_LASTUISCALE].is_null() && Renderer::Scaling == 0)
@@ -638,18 +749,26 @@ namespace GUI
 				CloseOnEscape = true;
 				Settings::Settings[OPT_CLOSEESCAPE] = true;
 			}
-		}
-		else
-		{
-			LogDebug("meme", "settings initially null");
+
+			if (!Settings::Settings[OPT_LINKARCSTYLE].is_null())
+			{
+				Settings::Settings[OPT_LINKARCSTYLE].get_to(LinkArcDPSStyle);
+			}
+			else
+			{
+				LinkArcDPSStyle = true;
+				Settings::Settings[OPT_LINKARCSTYLE] = true;
+			}
 		}
 
-		if (!AcceptedEULA)
+		if (!HasAcceptedEULA)
 		{
 			EULAModal* eulaModal = new EULAModal();
 			AddWindow(eulaModal);
 			Events::Subscribe(EV_EULA_ACCEPTED, OnEULAAccepted);
 		}
+
+		ImportArcDPSStyle();
 
 		IsSetup = true;
 	}
@@ -676,7 +795,7 @@ namespace GUI
 		}
 		GUI::Mutex.unlock();
 	}
-	void Unregister(GUI_RENDER aRenderCallback)
+	void Deregister(GUI_RENDER aRenderCallback)
 	{
 		GUI::Mutex.lock();
 		{

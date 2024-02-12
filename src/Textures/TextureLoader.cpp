@@ -14,7 +14,7 @@
 /* For some reason this has to be defined AND included here. */
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
-#include "httpslib.h"
+#include "httplib/httplib.h"
 
 namespace TextureLoader
 {
@@ -57,7 +57,7 @@ namespace TextureLoader
 
 		if (!std::filesystem::exists(aFilename))
 		{
-			Log(CH_TEXTURES, "File provided does not exist: %s (%s)", aFilename, str.c_str());
+			LogWarning(CH_TEXTURES, "File provided does not exist: %s (%s)", aFilename, str.c_str());
 			return;
 		}
 
@@ -199,7 +199,7 @@ namespace TextureLoader
 	{
 		std::string str = aIdentifier;
 
-		LogDebug(CH_TEXTURES, "Queued %s", str.c_str());
+		//LogDebug(CH_TEXTURES, "Queued %s", str.c_str());
 
 		QueuedTexture raw{};
 		raw.Identifier = str;
@@ -216,7 +216,8 @@ namespace TextureLoader
 	}
 	void CreateTexture(QueuedTexture aQueuedTexture)
 	{
-		LogDebug(CH_TEXTURES, "Create %s", aQueuedTexture.Identifier.c_str());
+		//LogDebug(CH_TEXTURES, "Create %s", aQueuedTexture.Identifier.c_str());
+
 		Texture* tex = new Texture{};
 		tex->Width = aQueuedTexture.Width;
 		tex->Height = aQueuedTexture.Height;
@@ -243,7 +244,7 @@ namespace TextureLoader
 
 		if (!pTexture)
 		{
-			LogDebug(CH_TEXTURES, "pTexture was null");
+			//LogDebug(CH_TEXTURES, "pTexture was null");
 			stbi_image_free(aQueuedTexture.Data);
 			return;
 		}

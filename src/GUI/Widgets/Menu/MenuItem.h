@@ -2,6 +2,7 @@
 #define GUI_MENUITEM_H
 
 #include <string>
+#include "Textures/Texture.h"
 
 namespace GUI
 {
@@ -11,6 +12,7 @@ namespace GUI
 		{
 			std::string		Label;
 			bool*			Toggle;
+			Texture*		Icon;
 			bool			IsHovering;
 
 			bool			Render();

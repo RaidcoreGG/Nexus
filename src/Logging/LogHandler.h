@@ -19,7 +19,7 @@ namespace LogHandler
 	void Initialize();
 
 	void RegisterLogger(ILogger* aLogger);
-	void UnregisterLogger(ILogger* aLogger);
+	void DeregisterLogger(ILogger* aLogger);
 
 	/* Logging helper functions */
 	void Log(const std::string& aChannel, const char* aFmt, ...);

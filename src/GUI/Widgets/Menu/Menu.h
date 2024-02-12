@@ -21,7 +21,7 @@ namespace GUI
 		extern Texture* MenuButtonHover;
 
 		void Render();
-		void AddMenuItem(std::string aLabel, bool* aToggle);
+		void AddMenuItem(std::string aLabel, std::string aTextureIdentifier, bool* aToggle);
 
 		void ReceiveTextures(const char* aIdentifier, Texture* aTexture);
 	};

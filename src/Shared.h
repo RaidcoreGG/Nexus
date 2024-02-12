@@ -10,6 +10,7 @@
 #include "Mumble/LinkedMem.h"
 #include "Mumble/Identity.h"
 #include "Logging/LogHandler.h"
+#include "API/APIClient.h"
 
 #include "imgui.h"
 
@@ -32,13 +33,19 @@ extern bool							IsGameplay;
 
 extern NexusLinkData*				NexusLink;
 
-extern ImFont*						Font;
-extern ImFont*						FontBig;
-extern ImFont*						FontUI;
+extern ImFont*						Font;			/* Menomonia */
+extern ImFont*						FontBig;		/* Menomonia, but slightly bigger */
+extern ImFont*						FontUI;			/* Trebuchet */
 
 extern ImGuiWindowFlags				WindowFlags_Default;
 extern ImGuiWindowFlags				WindowFlags_Overlay;
 extern ImGuiWindowFlags				WindowFlags_Custom;
 extern ImGuiWindowFlags				WindowFlags_Watermark;
+
+extern APIClient*					RaidcoreAPI;
+extern APIClient*					GitHubAPI;
+
+extern std::string					ChangelogText;
+extern bool							IsUpdateAvailable;
 
 #endif
