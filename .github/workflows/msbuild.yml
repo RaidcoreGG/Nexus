@@ -44,7 +44,6 @@ jobs:
     - name: Archive files
       uses: actions/upload-artifact@v4
       with:
-        name: d3d11
         path: |
-          ${{env.SOLUTION_FILE_PATH}}/x64/d3d11.dll
-          ${{env.SOLUTION_FILE_PATH}}/x64/d3d11.pdb
+          x64/d3d11.dll
+          x64/d3d11.pdb
