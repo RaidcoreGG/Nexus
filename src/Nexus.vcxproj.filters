@@ -1022,6 +1022,9 @@
     <ClInclude Include="API\APIResponse.h">
       <Filter>API</Filter>
     </ClInclude>
+    <ClInclude Include="Loader\LibraryAddon.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Nexus.rc">

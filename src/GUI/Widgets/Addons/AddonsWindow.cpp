@@ -43,6 +43,30 @@ namespace GUI
 		TabIndex = 0;
 		Tab1Hovered = false;
 		Tab2Hovered = false;
+
+		json response = RaidcoreAPI->Get("/addonlibrary");
+
+		if (!response.is_null())
+		{
+			for (const auto& addon : response)
+			{
+				LibraryAddon newAddon;
+				newAddon.Signature = addon["id"];
+				newAddon.Name = addon["name"];
+				newAddon.Description = addon["description"];
+				newAddon.Provider = GetProvider(addon["download"]);
+				newAddon.DownloadURL = addon["download"];
+				AddonLibrary.push_back(newAddon);
+			}
+
+			std::sort(AddonLibrary.begin(), AddonLibrary.end(), [](const LibraryAddon& a, const LibraryAddon& b) {
+				return a.Name < b.Name;
+				});
+		}
+		else
+		{
+			LogWarning(CH_CORE, "Error parsing API response for /addonlibrary.");
+		}
 	}
 
 	void AddonsWindow::Render()
@@ -128,10 +152,10 @@ namespace GUI
 			ImGui::PopStyleVar();
 
 			ImGui::SetCursorPos(ImVec2(tab1origin.x + text1offset.x, tab1origin.y + text1offset.y));
-			ImGui::TextColored(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "Installed");
+			ImGui::TextColored(TabIndex == 0 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "Installed");
 
 			ImGui::SetCursorPos(ImVec2(tab2origin.x + text2offset.x, tab2origin.y + text2offset.y));
-			ImGui::TextColored(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "Library");
+			ImGui::TextColored(TabIndex == 1 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "Library");
 
 			ImGui::SetCursorPos(ImVec2(28.0f, 32.0f + (64.0f * Renderer::Scaling)));
 			{
@@ -152,14 +176,13 @@ namespace GUI
 						}
 						else
 						{
-							Loader::Mutex.lock();
+							const std::lock_guard<std::mutex> lock(Loader::Mutex);
 							{
 								for (auto& [path, addon] : Loader::Addons)
 								{
 									AddonItem(addon);
 								}
 							}
-							Loader::Mutex.unlock();
 						}
 
 						ImGui::EndChild();
@@ -173,11 +196,47 @@ namespace GUI
 				}
 				else if (TabIndex == 1)
 				{
-					ImVec2 windowSize = ImGui::GetWindowSize();
-					ImVec2 textSize = ImGui::CalcTextSize("Unable to fetch addons.");
-					ImVec2 position = ImGui::GetCursorPos();
-					ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-					ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "Unable to fetch addons.");
+					{
+						ImGui::BeginChild("##AddonTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), (btnHeight * 1.5f) * -1));
+
+						int downloadable = 0;
+						if (AddonLibrary.size() != 0)
+						{
+							const std::lock_guard<std::mutex> lockLibrary(LibraryMutex); // complete overkill, but why not
+							const std::lock_guard<std::mutex> lockLoader(Loader::Mutex);
+							
+							for (auto& libAddon : AddonLibrary)
+							{
+								bool exists = false;
+								{
+									for (auto& [path, addon] : Loader::Addons)
+									{
+										if (addon->Definitions != nullptr && addon->Definitions->Signature == libAddon.Signature)
+										{
+											exists = true;
+											break;
+										}
+									}
+								}
+								if (!exists)
+								{
+									AddonItem(libAddon);
+									downloadable++;
+								}
+							}
+						}
+						
+						if (AddonLibrary.size() == 0 || downloadable == 0)
+						{
+							ImVec2 windowSize = ImGui::GetWindowSize();
+							ImVec2 textSize = ImGui::CalcTextSize("There's nothing here.\nMaybe ask your favourite developer to support Nexus!");
+							ImVec2 position = ImGui::GetCursorPos();
+							ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
+							ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "There's nothing here.\nMaybe ask your favourite developer to support Nexus!");
+						}
+
+						ImGui::EndChild();
+					}
 				}
 
 				ImGui::EndChild();

@@ -42,7 +42,7 @@ namespace Loader
 		std::filesystem::path,
 		ELoaderAction
 	>							QueuedAddons;
-	std::unordered_map<
+	std::map<
 		std::filesystem::path,
 		Addon*
 	>							Addons;
@@ -679,7 +679,7 @@ namespace Loader
 				return false;
 			}
 
-			endpoint = "/repos" + GetEndpoint(aUpdateLink) + "/releases/latest";
+			endpoint = "/repos" + GetEndpoint(aUpdateLink) + "/releases"; // "/releases/latest"; // fuck you Sognus
 
 			break;
 
@@ -732,6 +732,8 @@ namespace Loader
 				LogWarning(CH_LOADER, "Error parsing API response.");
 				return false;
 			}
+			
+			response = response[0]; // filthy hack to get "latest"
 
 			if (response["tag_name"].is_null())
 			{
@@ -885,6 +887,193 @@ namespace Loader
 		}
 
 		return wasUpdated;
+	}
+	void InstallAddon(LibraryAddon aAddon)
+	{
+		/*std::string outName = "addon_" + std::to_string(aAddon.Signature);
+		std::filesystem::path addonPath = Path::D_GW2_ADDONS / outName;
+
+		int i = 0;
+		while(std::filesystem::exists(addonPath.string() + extDll))
+		{
+			addonPath = addonPath.string() + "_" + std::to_string(i);
+			i++;
+		}
+
+		addonPath = addonPath.string() + extDll;*/
+		// FIXME: look into the .append func of path and check if adds with a / or just appends the string to maybe simplify this
+
+		/* this is all modified duplicate code from update */
+		std::string baseUrl;
+		std::string endpoint;
+
+		// override provider if none set, but a Raidcore ID is used
+		if (aAddon.Provider == EUpdateProvider::None && aAddon.Signature > 0)
+		{
+			aAddon.Provider = EUpdateProvider::Raidcore;
+		}
+
+		/* setup baseUrl and endpoint */
+		switch (aAddon.Provider)
+		{
+		case EUpdateProvider::None: return;
+
+		case EUpdateProvider::Raidcore:
+			baseUrl = API_RAIDCORE;
+			endpoint = "/addons/" + std::to_string(aAddon.Signature);
+
+			break;
+
+		case EUpdateProvider::GitHub:
+			baseUrl = API_GITHUB;
+			if (aAddon.DownloadURL.empty())
+			{
+				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::GitHub but has no UpdateLink set.", aAddon.Name);
+				return;
+			}
+
+			endpoint = "/repos" + GetEndpoint(aAddon.DownloadURL) + "/releases"; // "/releases/latest"; // fuck you Sognus
+
+			break;
+
+		case EUpdateProvider::Direct:
+			if (aAddon.DownloadURL.empty())
+			{
+				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::Direct but has no UpdateLink set.", aAddon.Name);
+				return;
+			}
+
+			baseUrl = GetBaseURL(aAddon.DownloadURL);
+			endpoint = GetEndpoint(aAddon.DownloadURL);
+
+			if (baseUrl.empty() || endpoint.empty())
+			{
+				return;
+			}
+
+			break;
+		}
+
+		if (EUpdateProvider::Raidcore == aAddon.Provider)
+		{
+			LogWarning(CH_LOADER, "Downloading via Raidcore is not implemented yet, due to user-friendly names requiring an API request. If you see this tell the developers about it! Thank you!");
+			return;
+			//RaidcoreAPI->Download(addonPath, endpoint + "/download"); // e.g. api.raidcore.gg/addons/17/download
+		}
+		else if (EUpdateProvider::GitHub == aAddon.Provider)
+		{
+			json response = GitHubAPI->Get(endpoint);
+
+			if (response.is_null())
+			{
+				LogWarning(CH_LOADER, "Error parsing API response.");
+				return;
+			}
+
+			response = response[0]; // filthy hack to get "latest"
+
+			if (response["tag_name"].is_null())
+			{
+				LogWarning(CH_LOADER, "No tag_name set on %s%s", baseUrl.c_str(), endpoint.c_str());
+				return;
+			}
+
+			std::string endpointDownload; // e.g. github.com/RaidcoreGG/GW2-CommandersToolkit/releases/download/20220918-135925/squadmanager.dll
+
+			if (response["assets"].is_null())
+			{
+				LogWarning(CH_LOADER, "Release has no assets. Cannot check against version. (%s%s)", baseUrl.c_str(), endpoint.c_str());
+				return;
+			}
+
+			for (auto& asset : response["assets"])
+			{
+				std::string assetName = asset["name"].get<std::string>();
+
+				if (assetName.size() < 4)
+				{
+					continue;
+				}
+
+				if (std::string_view(assetName).substr(assetName.size() - 4) == ".dll")
+				{
+					asset["browser_download_url"].get_to(endpointDownload);
+				}
+			}
+
+			std::string downloadBaseUrl = GetBaseURL(endpointDownload);
+			endpointDownload = GetEndpoint(endpointDownload);
+
+			httplib::Client downloadClient(downloadBaseUrl);
+			downloadClient.enable_server_certificate_verification(false);
+			downloadClient.set_follow_location(true);
+
+			size_t lastSlashPos = endpointDownload.find_last_of('/');
+			std::string filename = endpointDownload.substr(lastSlashPos + 1);
+			size_t dotDllPos = filename.find(extDll);
+			filename = filename.substr(0, filename.length() - extDll.length());
+
+			std::filesystem::path probe = Path::D_GW2_ADDONS / (filename + extDll);
+
+			int i = 0;
+			while (std::filesystem::exists(probe))
+			{
+				probe = Path::D_GW2_ADDONS / (filename + "_" + std::to_string(i) + extDll);
+				i++;
+			}
+
+			size_t bytesWritten = 0;
+			std::ofstream file(probe, std::ofstream::binary);
+			auto downloadResult = downloadClient.Get(endpointDownload, [&](const char* data, size_t data_length) {
+				file.write(data, data_length);
+				bytesWritten += data_length;
+				return true;
+				});
+			file.close();
+
+			if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
+			{
+				LogWarning(CH_LOADER, "Error fetching %s%s", downloadBaseUrl.c_str(), endpointDownload.c_str());
+				return;
+			}
+		}
+		else if (EUpdateProvider::Direct == aAddon.Provider)
+		{
+			/* prepare client request */
+			httplib::Client client(baseUrl);
+			client.enable_server_certificate_verification(false);
+
+			size_t lastSlashPos = endpoint.find_last_of('/');
+			std::string filename = endpoint.substr(lastSlashPos + 1);
+			size_t dotDllPos = filename.find(extDll);
+			filename = filename.substr(0, filename.length() - extDll.length());
+
+			std::filesystem::path probe = Path::D_GW2_ADDONS / (filename + extDll);
+
+			int i = 0;
+			while (std::filesystem::exists(probe))
+			{
+				probe = Path::D_GW2_ADDONS / (filename + "_" + std::to_string(i) + extDll);
+				i++;
+			}
+
+			size_t bytesWritten = 0;
+			std::ofstream fileUpdate(probe, std::ofstream::binary);
+			auto downloadResult = client.Get(endpoint, [&](const char* data, size_t data_length) {
+				fileUpdate.write(data, data_length);
+				bytesWritten += data_length;
+				return true;
+				});
+			fileUpdate.close();
+
+			if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
+			{
+				LogWarning(CH_LOADER, "Error fetching %s%s", baseUrl.c_str(), endpoint.c_str());
+				return;
+			}
+		}
+
+		LogInfo(CH_LOADER, "Successfully installed %s.", aAddon.Name);
 	}
 
 	AddonAPI* GetAddonAPI(int aVersion)

@@ -10,6 +10,7 @@
 #include <condition_variable>
 
 #include "ELoaderAction.h"
+#include "LibraryAddon.h"
 #include "Addon.h"
 #include "AddonAPI.h"
 
@@ -20,7 +21,7 @@ namespace Loader
 		std::filesystem::path,
 		ELoaderAction
 	>									QueuedAddons;					/* To be loaded or unloaded addons */
-	extern std::unordered_map<
+	extern std::map<
 		std::filesystem::path,
 		Addon*
 	>									Addons;							/* Addons and their corresponding paths */
@@ -72,6 +73,8 @@ namespace Loader
 		EUpdateProvider aProvider,
 		std::string aUpdateLink
 	);
+	/* Installs an addon. */
+	void InstallAddon(LibraryAddon aAddon);
 
 	/* Gets or creates a pointer to the provided version, or nullptr if no such version exists. */
 	AddonAPI* GetAddonAPI(int aVersion);

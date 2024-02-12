@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <Windows.h>
+#include "Loader/EUpdateProvider.h"
 
 void PathSystemAppend(std::filesystem::path& aDestination, const char* aAppend);
 
@@ -16,6 +17,7 @@ std::wstring StrToWStr(const std::string& aString);
 namespace String
 {
 	std::string Replace(const std::string& aString, const std::string& aOld, const std::string& aNew, size_t aPosition = 0);
+	bool Contains(const std::string& aString, const std::string& aStringFind);
 }
 
 const char* ConvertToUTF8(const char* multibyteStr);
@@ -24,6 +26,7 @@ std::vector<unsigned char> MD5(const unsigned char* data, size_t sz);
 std::vector<unsigned char> MD5FromFile(const std::filesystem::path& aPath);
 std::string MD5ToString(const std::vector<unsigned char>& aBytes);
 
+EUpdateProvider GetProvider(const std::string& aUrl);
 std::string GetBaseURL(const std::string& aUrl);
 std::string GetEndpoint(const std::string& aUrl);
 std::string GetQuery(const std::string& aEndpoint, const std::string& aParameters);

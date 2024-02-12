@@ -130,11 +130,6 @@ namespace Main
 			// shared mem
 			DataLink::Free();
 
-			/* Save keybinds, settings, api keys & api cache */
-			Keybinds::Save();
-			Settings::Save();
-			//API::Save();
-
 			MH_Uninitialize();
 
 			LogInfo(CH_CORE, "Shutdown performed.");
@@ -157,11 +152,11 @@ namespace Main
 			std::filesystem::remove(Path::F_OLD_DLL);
 		}
 
-		json resVersion = RaidcoreAPI->Get("nexusversion");;
+		json resVersion = RaidcoreAPI->Get("/nexusversion");;
 
 		if (resVersion.is_null())
 		{
-			LogWarning(CH_CORE, "Error parsing API response.");
+			LogWarning(CH_CORE, "Error parsing API response /nexusversion.");
 			return;
 		}
 

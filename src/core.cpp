@@ -71,6 +71,10 @@ namespace String
 
 		return retStr;
 	}
+	bool Contains(const std::string& aString, const std::string& aStringFind)
+	{
+		return aString.find(aStringFind) != std::string::npos;
+	}
 }
 
 const char* ConvertToUTF8(const char* multibyteStr)
@@ -155,6 +159,19 @@ std::string MD5ToString(const std::vector<unsigned char>& aBytes)
 	return str;
 }
 
+EUpdateProvider GetProvider(const std::string& aUrl)
+{
+	if (String::Contains(aUrl, "raidcore.gg"))
+	{
+		return EUpdateProvider::Raidcore;
+	}
+	if (String::Contains(aUrl, "github.com"))
+	{
+		return EUpdateProvider::GitHub;
+	}
+
+	return EUpdateProvider::Direct;
+}
 std::string GetBaseURL(const std::string& aUrl)
 {
 	size_t httpIdx = aUrl.find("http://");

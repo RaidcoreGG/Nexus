@@ -126,6 +126,7 @@
     <ClInclude Include="Loader\EAddonState.h" />
     <ClInclude Include="Loader\ELoaderAction.h" />
     <ClInclude Include="Loader\FuncDefs.h" />
+    <ClInclude Include="Loader\LibraryAddon.h" />
     <ClInclude Include="Loader\Loader.h" />
     <ClInclude Include="Loader\NexusLinkData.h" />
     <ClInclude Include="Localization\Localization.h" />

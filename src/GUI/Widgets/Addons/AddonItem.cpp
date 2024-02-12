@@ -153,4 +153,71 @@ namespace GUI
 			ImGui::SetCursorPos(ImVec2(0, initial.y + itemHeightScaled + 4.0f));
 		}
 	}
+
+	void AddonItem(LibraryAddon aAddon)
+	{
+		float btnHeight = 22.0f * Renderer::Scaling;
+		float itemWidthScaled = itemWidth * Renderer::Scaling;
+		float itemHeightScaled = itemHeight * Renderer::Scaling;
+
+		std::string sig = std::to_string(aAddon.Signature); // helper for unique chkbxIds
+
+		// initial is explicitly set within the window, therefore all positions should be relative to it
+		ImVec2 initial = ImGui::GetCursorPos();
+
+		if (Background)
+		{
+			ImGui::SetCursorPos(initial);
+			ImGui::Image(Background->Resource, ImVec2(itemWidthScaled, itemHeightScaled));
+		}
+		else
+		{
+			Background = TextureLoader::Get("TEX_ADDONITEM_BACKGROUND");
+		}
+
+		{
+			ImGui::SetCursorPos(initial);
+			ImGui::BeginChild(("##AddonItemContent" + sig).c_str(), ImVec2(itemWidthScaled, itemHeightScaled));
+
+			float actionsWidth = btnWidth * ImGui::GetFontSize();
+			float descWidth = itemWidthScaled - actionsWidth - 12.0f - 12.0f - 12.0f; // padding left, right and in between
+
+			{
+				ImGui::SetCursorPos(ImVec2(12.0f, 12.0f));
+				ImGui::BeginChild("##AddonItemDescription", ImVec2(descWidth, itemHeightScaled - 12.0f - 12.0f));
+
+				ImGui::PushFont(Font);
+				ImGui::TextColored(ImVec4(1.0f, 0.933f, 0.733f, 1.0f), aAddon.Name.c_str());
+				ImGui::PopFont();
+
+				ImGui::TextWrapped(aAddon.Description.c_str());
+
+				ImGui::EndChild();
+			}
+
+			{
+				ImGui::SetCursorPos(ImVec2(descWidth + 12.0f + 12.0f, 12.0f));
+				ImGui::BeginChild("##AddonItemActions", ImVec2(actionsWidth, itemHeightScaled - 12.0f - 12.0f));
+
+				// just check if loaded, if it was not hot-reloadable it would be EAddonState::LoadedLOCKED
+				if (ImGui::GW2Button(("Install##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+				{
+					Loader::InstallAddon(aAddon);
+				}
+				if (aAddon.Provider == EUpdateProvider::GitHub && !aAddon.DownloadURL.empty())
+				{
+					if (ImGui::GW2Button(("GitHub##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					{
+						ShellExecuteA(0, 0, aAddon.DownloadURL.c_str(), 0, 0, SW_SHOW);
+					}
+				}
+
+				ImGui::EndChild();
+			}
+
+			ImGui::EndChild();
+
+			ImGui::SetCursorPos(ImVec2(0, initial.y + itemHeightScaled + 4.0f));
+		}
+	}
 }
