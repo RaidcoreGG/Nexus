@@ -1,11 +1,13 @@
 #include "Shared.h"
 
+#include "Version.h"
+
 HMODULE						NexusHandle			= nullptr;
 HMODULE						GameHandle			= nullptr;
 HMODULE						D3D11Handle			= nullptr;
 HMODULE						D3D11SystemHandle	= nullptr;
 
-AddonVersion				Version				= {};
+AddonVersion				Version				= { V_MAJOR, V_MINOR, V_BUILD, V_REVISION };
 std::vector<std::string>	Parameters			= {};
 
 LinkedMem*					MumbleLink			= nullptr;
@@ -20,7 +22,7 @@ ImFont*						Font				= nullptr;
 ImFont*						FontBig				= nullptr;
 ImFont*						FontUI				= nullptr;
 
-ImGuiWindowFlags			WindowFlags_Default =	ImGuiWindowFlags_AlwaysAutoResize |
+ImGuiWindowFlags			WindowFlags_Default	=	ImGuiWindowFlags_AlwaysAutoResize |
 													ImGuiWindowFlags_NoResize |
 													ImGuiWindowFlags_NoCollapse;
 ImGuiWindowFlags			WindowFlags_Overlay =	ImGuiWindowFlags_NoDecoration |
@@ -45,3 +47,9 @@ ImGuiWindowFlags			WindowFlags_Watermark = ImGuiWindowFlags_NoDecoration |
 													ImGuiWindowFlags_NoInputs |
 													ImGuiWindowFlags_NoBringToFrontOnFocus |
 													ImGuiWindowFlags_NoBackground;
+
+APIClient*					RaidcoreAPI			= nullptr;
+APIClient*					GitHubAPI			= nullptr;
+
+std::string					ChangelogText;
+bool						IsUpdateAvailable	= false;

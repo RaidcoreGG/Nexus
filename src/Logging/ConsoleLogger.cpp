@@ -24,7 +24,7 @@ ConsoleLogger::~ConsoleLogger()
 
 void ConsoleLogger::LogMessage(LogEntry aLogEntry)
 {
-	MessageMutex.lock();
+	const std::lock_guard<std::mutex> lock(MessageMutex);
 	{
 		switch (aLogEntry.LogLevel)
 		{
@@ -37,5 +37,4 @@ void ConsoleLogger::LogMessage(LogEntry aLogEntry)
 
 		std::cout << aLogEntry.ToString();
 	}
-	MessageMutex.unlock();
 }

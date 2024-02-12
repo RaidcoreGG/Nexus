@@ -16,8 +16,8 @@ namespace WndProc
 
 	/* Registers the provided WndProcCallback. */
 	void Register(WNDPROC_CALLBACK aWndProcCallback);
-	/* Unregisters the provided WndProcCallback. */
-	void Unregister(WNDPROC_CALLBACK aWndProcCallback);
+	/* Deregisters the provided WndProcCallback. */
+	void Deregister(WNDPROC_CALLBACK aWndProcCallback);
 
 	/* Removes all WndProc Callbacks that are within the provided address space. */
 	int Verify(void* aStartAddress, void* aEndAddress);

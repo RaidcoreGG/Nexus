@@ -25,10 +25,12 @@ namespace GUI
 	extern float						FontSize;
 	extern bool							CloseMenuAfterSelecting;
 	extern bool							CloseOnEscape;
+	extern bool							LinkArcDPSStyle;
 
 	extern bool							IsUIVisible;
 
-	extern bool							AcceptedEULA;
+	extern bool							HasAcceptedEULA;
+	extern bool							NotifyChangelog;
 
 	void Initialize();
 	void Shutdown();
@@ -40,12 +42,12 @@ namespace GUI
 
 	void AddWindow(IWindow* aWindowPtr);
 
-	void ResizeFonts();
+	void ImportArcDPSStyle();
 
 	/* Registers the provided RenderCallback. */
 	void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback);
-	/* Unregisters the provided RenderCallback. */
-	void Unregister(GUI_RENDER aRenderCallback);
+	/* Deregisters the provided RenderCallback. */
+	void Deregister(GUI_RENDER aRenderCallback);
 
 	/* Removes all subscribers that are within the provided address space. */
 	int Verify(void* aStartAddress, void* aEndAddress);

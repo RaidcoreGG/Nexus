@@ -7,6 +7,7 @@
 using json = nlohmann::json;
 
 extern const char* OPT_ACCEPTEULA;
+extern const char* OPT_NOTIFYCHANGELOG;
 extern const char* OPT_DEVMODE;
 extern const char* OPT_CLOSEMENU;
 extern const char* OPT_CLOSEESCAPE;
@@ -16,6 +17,7 @@ extern const char* OPT_QAVERTICAL;
 extern const char* OPT_QALOCATION;
 extern const char* OPT_QAOFFSETX;
 extern const char* OPT_QAOFFSETY;
+extern const char* OPT_LINKARCSTYLE;
 
 namespace Settings
 {

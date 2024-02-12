@@ -6,14 +6,14 @@
 
 namespace DataLink
 {
-	std::mutex								Mutex;
-	std::map<std::string, LinkedResource>	Registry;
+	std::mutex										Mutex;
+	std::unordered_map<std::string, LinkedResource>	Registry;
 
 	void Free()
 	{
 		if (State::Nexus == ENexusState::SHUTTING_DOWN)
 		{
-			DataLink::Mutex.lock();
+			const std::lock_guard<std::mutex> lock(Mutex);
 			{
 				while (Registry.size() > 0)
 				{
@@ -31,12 +31,11 @@ namespace DataLink
 						it->second.Handle = nullptr;
 					}
 
-					LogDebug(CH_DATALINK, "Freed shared resource: \"%s\"", it->first.c_str());
+					LogInfo(CH_DATALINK, "Freed shared resource: \"%s\"", it->first.c_str());
 
 					Registry.erase(it);
 				}
 			}
-			DataLink::Mutex.unlock();
 		}
 		
 	}
@@ -47,14 +46,14 @@ namespace DataLink
 
 		void* result = nullptr;
 
-		DataLink::Mutex.lock();
+		const std::lock_guard<std::mutex> lock(Mutex);
 		{
-			if (Registry.find(str) != Registry.end())
+			const auto& it = Registry.find(str);
+			if (it != Registry.end())
 			{
-				result = Registry[str].Pointer;
+				result = it->second.Pointer;
 			}
 		}
-		DataLink::Mutex.unlock();
 
 		return result;
 	}
@@ -70,52 +69,49 @@ namespace DataLink
 
 		void* result = nullptr;
 
-		DataLink::Mutex.lock();
+		const std::lock_guard<std::mutex> lock(Mutex);
 		{
 			/* resource already exists */
-			if (Registry.find(str) != Registry.end())
+			const auto& it = Registry.find(str);
+			if (it != Registry.end())
 			{
-				result = Registry[str].Pointer;
-			}
-			else
-			{
-				/* allocate new resource */
-				LinkedResource resource{};
-				resource.Size = aResourceSize;
-
-				if (strOverride == "")
+				if (it->second.Size == aResourceSize)
 				{
-					strOverride = str.c_str();
-					strOverride.append("_");
-					strOverride.append(std::to_string(GetCurrentProcessId()));
+					return it->second.Pointer;
 				}
-
-				resource.UnderlyingName = strOverride;
-
-				resource.Handle = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, strOverride.c_str());
-				if (resource.Handle == 0)
+				else
 				{
-					resource.Handle = CreateFileMappingA(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, static_cast<DWORD>(aResourceSize), strOverride.c_str());
-				}
-
-				if (resource.Handle)
-				{
-					resource.Pointer = MapViewOfFile(resource.Handle, FILE_MAP_ALL_ACCESS, 0, 0, static_cast<DWORD>(aResourceSize));
-
-					Registry[str] = resource;
-					result = resource.Pointer;
+					LogWarning(CH_DATALINK, "Resource with name \"%s\" already exists with size %u but size %u was requested.", str.c_str(), it->second.Size, aResourceSize);
+					return nullptr;
 				}
 			}
-		}
-		DataLink::Mutex.unlock();
 
-		if (strOverride != "")
-		{
-			LogDebug(CH_DATALINK, "Created shared resource: \"%s\" (with underlying name \"%s\")", str.c_str(), strOverride.c_str());
-		}
-		else
-		{
-			LogDebug(CH_DATALINK, "Created shared resource: \"%s\"", str.c_str());
+			/* allocate new resource */
+			LinkedResource resource{};
+			resource.Size = aResourceSize;
+
+			if (strOverride.empty())
+			{
+				strOverride = str + "_" + std::to_string(GetCurrentProcessId());
+			}
+
+			resource.UnderlyingName = strOverride;
+
+			resource.Handle = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, strOverride.c_str());
+			if (!resource.Handle)
+			{
+				resource.Handle = CreateFileMappingA(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, static_cast<DWORD>(aResourceSize), strOverride.c_str());
+			}
+
+			if (resource.Handle)
+			{
+				resource.Pointer = MapViewOfFile(resource.Handle, FILE_MAP_ALL_ACCESS, 0, 0, static_cast<DWORD>(aResourceSize));
+
+				Registry[str] = resource;
+				result = resource.Pointer;
+			}
+
+			LogInfo(CH_DATALINK, "Created shared resource: \"%s\" (with underlying name \"%s\")", str.c_str(), strOverride.c_str());
 		}
 
 		return result;

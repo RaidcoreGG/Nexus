@@ -4,17 +4,21 @@
 #include <fstream>
 
 #include "Paths.h"
+#include "Consts.h"
+#include "Shared.h"
 
-const char* OPT_ACCEPTEULA	= "AcceptEULA";
-const char* OPT_DEVMODE		= "DevMode";
-const char* OPT_CLOSEMENU	= "CloseMenuAfterSelecting";
-const char* OPT_CLOSEESCAPE	= "CloseOnEscape";
-const char* OPT_LASTUISCALE	= "LastUIScale";
-const char* OPT_FONTSIZE	= "FontSize";
-const char* OPT_QAVERTICAL	= "QAVertical";
-const char* OPT_QALOCATION	= "QALocation";
-const char* OPT_QAOFFSETX	= "QAOffsetX";
-const char* OPT_QAOFFSETY	= "QAOffsetY";
+const char* OPT_ACCEPTEULA		= "AcceptEULA";
+const char* OPT_NOTIFYCHANGELOG	= "NotifyChangelog";
+const char* OPT_DEVMODE			= "DevMode";
+const char* OPT_CLOSEMENU		= "CloseMenuAfterSelecting";
+const char* OPT_CLOSEESCAPE		= "CloseOnEscape";
+const char* OPT_LASTUISCALE		= "LastUIScale";
+const char* OPT_FONTSIZE		= "FontSize";
+const char* OPT_QAVERTICAL		= "QAVertical";
+const char* OPT_QALOCATION		= "QALocation";
+const char* OPT_QAOFFSETX		= "QAOffsetX";
+const char* OPT_QAOFFSETY		= "QAOffsetY";
+const char* OPT_LINKARCSTYLE	= "LinkWithArcDPSStyle";
 
 namespace Settings
 {
@@ -27,9 +31,16 @@ namespace Settings
 
 		Settings::Mutex.lock();
 		{
-			std::ifstream file(Path::F_SETTINGS);
-			Settings = json::parse(file);
-			file.close();
+			try
+			{
+				std::ifstream file(Path::F_SETTINGS);
+				Settings = json::parse(file);
+				file.close();
+			}
+			catch (json::parse_error& ex)
+			{
+				LogWarning(CH_CORE, "Settings.json could not be parsed. Error: %s", ex.what());
+			}
 		}
 		Settings::Mutex.unlock();
 	}

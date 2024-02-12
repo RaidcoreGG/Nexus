@@ -8,54 +8,6 @@
 
 namespace ImGui
 {
-	/* Limitations: DO NOT USE in combination with printf style formating, use only single wide char arguments. */
-	static void TextW(const wchar_t* fmt, ...)
-	{
-		std::wstring fmtStrW = fmt;
-		std::string fmtStr = WStrToStr(fmtStrW);
-		const char* str = fmtStr.c_str();
-
-		va_list args;
-		va_start(args, str);
-		TextV(str, args);
-		va_end(args);
-	}
-
-	/* Limitations: DO NOT USE in combination with printf style formating, use only single wide char arguments. */
-	static void TextWrappedW(const wchar_t* fmt, ...)
-	{
-		std::wstring fmtStrW = fmt;
-		std::string fmtStr = WStrToStr(fmtStrW);
-		const char* str = fmtStr.c_str();
-
-		va_list args;
-		va_start(args, str);
-		TextWrappedV(str, args);
-		va_end(args);
-	}
-
-	/* Limitations: DO NOT USE in combination with printf style formating, use only single wide char arguments. */
-	static void TextDisabledW(const wchar_t* fmt, ...)
-	{
-		std::wstring fmtStrW = fmt;
-		std::string fmtStr = WStrToStr(fmtStrW);
-		const char* str = fmtStr.c_str();
-
-		va_list args;
-		va_start(args, str);
-		TextDisabledV(str, args);
-		va_end(args);
-	}
-
-	static bool TreeNodeW(const wchar_t* label)
-	{
-		std::wstring fmtStrW = label;
-		std::string fmtStr = WStrToStr(fmtStrW);
-		const char* str = fmtStr.c_str();
-
-		return TreeNode(str);
-	}
-
 	static void TextCenteredColumn(const char* fmt, ...)
 	{
 		va_list args;
@@ -73,14 +25,6 @@ namespace ImGui
 		ImGuiContext& g = *GImGui;
 		const char* text_end = g.TempBuffer + ImFormatStringV(g.TempBuffer, IM_ARRAYSIZE(g.TempBuffer), fmt, args);
 		TextEx(g.TempBuffer, text_end, ImGuiTextFlags_NoWidthForLargeClippedText);
-	}
-	static void TextCenteredColumnW(const wchar_t* label)
-	{
-		std::wstring fmtStrW = label;
-		std::string fmtStr = WStrToStr(fmtStrW);
-		const char* str = fmtStr.c_str();
-
-		TextCenteredColumn(str);
 	}
 
 	static bool CheckboxCenteredColumn(const char* label, bool* v)
@@ -130,6 +74,59 @@ namespace ImGui
 		va_end(args);
 	}
 
+	static void TextDisabledOutlined(const char* fmt, ...)
+	{
+		ImVec2 pos = GetCursorPos();
+
+		va_list args;
+		va_start(args, fmt);
+		pos.x += 1;
+		pos.y += 1;
+		SetCursorPos(pos);
+		TextColoredV(ImVec4(0, 0, 0, 255), fmt, args);
+		pos.x -= 1;
+		pos.y -= 1;
+		SetCursorPos(pos);
+		TextDisabledV(fmt, args);
+		va_end(args);
+	}
+
+	static void TextColoredOutlined(const ImVec4& col, const char* fmt, ...)
+	{
+		ImVec2 pos = GetCursorPos();
+
+		va_list args;
+		va_start(args, fmt);
+		pos.x += 1;
+		pos.y += 1;
+		SetCursorPos(pos);
+		TextColoredV(ImVec4(0, 0, 0, 255), fmt, args);
+		pos.x -= 1;
+		pos.y -= 1;
+		SetCursorPos(pos);
+		TextColoredV(col, fmt, args);
+		va_end(args);
+	}
+
+	static void TextWrappedOutlined(const char* fmt, ...)
+	{
+		ImVec2 pos = GetCursorPos();
+
+		va_list args;
+		va_start(args, fmt);
+		pos.x += 1;
+		pos.y += 1;
+		SetCursorPos(pos);
+		PushStyleColor(ImGuiCol_Text, ImVec4(0, 0, 0, 255));
+		TextWrappedV(fmt, args);
+		ImGui::PopStyleColor();
+		pos.x -= 1;
+		pos.y -= 1;
+		SetCursorPos(pos);
+		TextWrappedV(fmt, args);
+		va_end(args);
+	}
+
 	static void HelpMarker(const char* desc)
 	{
 		ImGui::TextDisabled("(?)");
@@ -174,6 +171,22 @@ namespace ImGui
 		if (true == SameLineAfter_) { ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x); }
 
 		return clicked;
+	}
+
+	static bool GW2Button(const char* label, const ImVec2& size_arg = ImVec2(0,0))
+	{
+		ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 0, 0, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.839f, 0.807f, 0.741f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0, 0, 0, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_BorderShadow, ImVec4(0, 0, 0, 0));
+		bool ret = ButtonEx(label, size_arg, ImGuiButtonFlags_None);
+		ImGui::PopStyleColor(6);
+		ImGui::PopStyleVar(1);
+
+		return ret;
 	}
 }
 

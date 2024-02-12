@@ -30,19 +30,19 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
 
 1 TEXTINCLUDE 
 BEGIN
-    "resource.h\0"
+	"resource.h\0"
 END
 
 2 TEXTINCLUDE 
 BEGIN
-    "#include ""winres.h""\r\n"
-    "\0"
+	"#include ""winres.h""\r\n"
+	"\0"
 END
 
 3 TEXTINCLUDE 
 BEGIN
-    "\r\n"
-    "\0"
+	"\r\n"
+	"\0"
 END
 
 #endif    // APSTUDIO_INVOKED
@@ -66,23 +66,23 @@ VS_VERSION_INFO VERSIONINFO
  FILETYPE 0x2L
  FILESUBTYPE 0x0L
 BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "080904b0"
-        BEGIN
-            VALUE "CompanyName", "Raidcore"
-            VALUE "FileDescription", "Unofficial Guild Wars 2 Addon Host"
-            VALUE "FileVersion", TOSTRING(V_MAJOR) "." TOSTRING(V_MINOR) "." TOSTRING(V_BUILD) "." TOSTRING(V_REVISION)
-            VALUE "InternalName", "nexus.dll"
-            VALUE "LegalCopyright", "© 2023 Raidcore"
-            VALUE "ProductName", "Nexus"
-            VALUE "ProductVersion", TOSTRING(V_MAJOR) "." TOSTRING(V_MINOR) "." TOSTRING(V_BUILD) "." TOSTRING(V_REVISION)
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x809, 1200
-    END
+	BLOCK "StringFileInfo"
+	BEGIN
+		BLOCK "080904b0"
+		BEGIN
+			VALUE "CompanyName", "Raidcore"
+			VALUE "FileDescription", "Unofficial Guild Wars 2 Addon Host"
+			VALUE "FileVersion", TOSTRING(V_MAJOR) "." TOSTRING(V_MINOR) "." TOSTRING(V_BUILD) "." TOSTRING(V_REVISION)
+			VALUE "InternalName", "nexus.dll"
+			VALUE "LegalCopyright", "© 2023 Raidcore"
+			VALUE "ProductName", "Nexus"
+			VALUE "ProductVersion", TOSTRING(V_MAJOR) "." TOSTRING(V_MINOR) "." TOSTRING(V_BUILD) "." TOSTRING(V_REVISION)
+		END
+	END
+	BLOCK "VarFileInfo"
+	BEGIN
+		VALUE "Translation", 0x809, 1200
+	END
 END
 
 
@@ -91,29 +91,53 @@ END
 // Font
 //
 
-RES_FONT_MENOMONIA      FONT                    "Resources\\Menomonia.ttf"
+RES_FONT_MENOMONIA      FONT                    "Resources\\Fonts\\Menomonia.ttf"
 
-RES_FONT_TREBUCHET      FONT                    "Resources\\TrebuchetMS.ttf"
-
-
+RES_FONT_TREBUCHET      FONT                    "Resources\\Fonts\\TrebuchetMS.ttf"
 /////////////////////////////////////////////////////////////////////////////
 //
 // PNG
 //
 
-RES_ICON_NEXUS          PNG                     "Resources\\ICON_NEXUS.png"
+/* QuickAccess */
+RES_ICON_NEXUS                  PNG             "Resources\\QuickAccess\\Nexus.png"
+RES_ICON_NEXUS_HOVER            PNG             "Resources\\QuickAccess\\Nexus_Hover.png"
+RES_ICON_NEXUS_HALLOWEEN        PNG             "Resources\\QuickAccess\\NexusHalloween.png"
+RES_ICON_NEXUS_HALLOWEEN_HOVER  PNG             "Resources\\QuickAccess\\NexusHalloween_Hover.png"
+RES_ICON_NEXUS_XMAS             PNG             "Resources\\QuickAccess\\NexusXmas.png"
+RES_ICON_NEXUS_XMAS_HOVER       PNG             "Resources\\QuickAccess\\NexusXmas_Hover.png"
 
-RES_ICON_NEXUS_HOVER    PNG                     "Resources\\ICON_NEXUS_HOVER.png"
+RES_ICON_GENERIC				PNG             "Resources\\QuickAccess\\Generic.png"
+RES_ICON_GENERIC_HOVER			PNG             "Resources\\QuickAccess\\Generic_Hover.png"
 
-RES_ICON_GENERIC        PNG                     "Resources\\ICON_GENERIC.png"
+RES_ICON_NOTIFICATION			PNG             "Resources\\QuickAccess\\Notification.png"
 
-RES_ICON_GENERIC_HOVER  PNG                     "Resources\\ICON_GENERIC_HOVER.png"
+/* Menu*/
+RES_ICON_ADDONS					PNG             "Resources\\Menu\\BtnAddons.png"
+RES_ICON_OPTIONS				PNG             "Resources\\Menu\\BtnOptions.png"
+RES_ICON_CHANGELOG				PNG             "Resources\\Menu\\BtnChangelog.png"
+RES_ICON_LOG					PNG             "Resources\\Menu\\BtnLog.png"
+RES_ICON_DEBUG					PNG             "Resources\\Menu\\BtnDebug.png"
+RES_ICON_ABOUT					PNG             "Resources\\Menu\\BtnAbout.png"
 
-RES_TEX_MENU_BACKGROUND PNG                     "Resources\\TEX_MENU_BACKGROUND.png"
+RES_TEX_MENU_BACKGROUND			PNG             "Resources\\Menu\\Background.png"
+RES_TEX_MENU_BUTTON				PNG             "Resources\\Menu\\MenuItem.png"
+RES_TEX_MENU_BUTTON_HOVER		PNG             "Resources\\Menu\\MenuItem_Hover.png"
 
-RES_TEX_MENU_BUTTON     PNG                     "Resources\\TEX_MENU_BUTTON.png"
+/* AddonsWindow */
+RES_TEX_ADDONS_BACKGROUND		PNG             "Resources\\AddonsWindow\\Background.png"
+RES_TEX_ADDONITEM				PNG             "Resources\\AddonsWindow\\AddonItem.png"
 
-RES_TEX_MENU_BUTTON_HOVER PNG                     "Resources\\TEX_MENU_BUTTON_HOVER.png"
+RES_TEX_ADDONS_TITLEBAR			PNG             "Resources\\AddonsWindow\\TitleBar.png"
+RES_TEX_ADDONS_TITLEBAR_HOVER	PNG             "Resources\\AddonsWindow\\TitleBar_Hover.png"
+
+/* Generic */
+RES_TEX_TABBTN					PNG             "Resources\\TabBtn.png"
+RES_TEX_TABBTN_HOVER			PNG             "Resources\\TabBtn_Hover.png"
+RES_TEX_BTNCLOSE				PNG             "Resources\\BtnClose.png"
+RES_TEX_BTNCLOSE_HOVER			PNG             "Resources\\BtnClose_Hover.png"
+RES_TEX_TITLEBAREND				PNG             "Resources\\TitleBarEnd.png"
+RES_TEX_TITLEBAREND_HOVER		PNG             "Resources\\TitleBarEnd_Hover.png"
 
 #endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////

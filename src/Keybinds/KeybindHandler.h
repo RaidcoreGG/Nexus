@@ -39,7 +39,7 @@ namespace Keybinds
 	/* Registers a keybind from the given struct with the given identifier and handler, if no bind was previously stored the given one will be used.*/
 	void RegisterWithStruct(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, Keybind aKeybind);
 	/* Frees up the associated KeybindHandler. */
-	void Unregister(const char* aIdentifier);
+	void Deregister(const char* aIdentifier);
 	
 	/* Returns an empty string if keybind is unused or the identifier that uses this keybind */
 	std::string IsInUse(Keybind aKeybind);

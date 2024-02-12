@@ -269,16 +269,18 @@ namespace GUI
 										{
 										case EAddonState::None:					state.append("None"); break;
 										case EAddonState::Loaded:				state.append("Loaded"); break;
+										case EAddonState::LoadedLOCKED:			state.append("LoadedLOCKED"); break;
 										case EAddonState::NotLoaded:			state.append("NotLoaded"); break;
 										case EAddonState::NotLoadedDuplicate:	state.append("NotLoadedDuplicate"); break;
-										case EAddonState::Incompatible:			state.append("Incompatible"); break;
-										case EAddonState::IncompatibleAPI:		state.append("IncompatibleAPI"); break;
+										case EAddonState::NotLoadedIncompatible:			state.append("NotLoadedIncompatible"); break;
+										case EAddonState::NotLoadedIncompatibleAPI:		state.append("NotLoadedIncompatibleAPI"); break;
 										}
 
 										ImGui::TextDisabled(state.c_str());
 										ImGui::TextDisabled("Module: %p", addon->Module);
 										ImGui::TextDisabled("Module Size: %u", addon->ModuleSize);
-										ImGui::TextDisabled("AddonDefs: %p", addon->Definitions);
+										ImGui::TextDisabled("MD5: %s", MD5ToString(addon->MD5).c_str());
+										ImGui::TextDisabled("Definitions: %p", addon->Definitions);
 
 										if (addon->Definitions != nullptr)
 										{

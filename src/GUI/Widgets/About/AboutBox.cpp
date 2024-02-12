@@ -44,7 +44,7 @@ namespace GUI
 			ImGui::TextDisabled("Renderer:");
 			ImGui::Text(""); ImGui::SameLine(); ImGui::Text("DirectX 11"); ImGui::SameLine(); ImGui::TextDisabled("Method %d %s", State::EntryMethod, State::IsChainloading ? "Chainloading" : "");
 			
-			if (State::MultiboxState == EMultiboxState::READY)
+			if ((bool)(State::MultiboxState & EMultiboxState::READY))
 			{
 				ImGui::TextDisabled("Multibox ready.");
 			}
@@ -62,10 +62,10 @@ namespace GUI
 			ImGui::Separator();
 
 			ImVec2 windowSize = ImGui::GetWindowSize();
-			ImVec2 textSize = ImGui::CalcTextSize(u8"© 2023 Raidcore");
+			ImVec2 textSize = ImGui::CalcTextSize(u8"Raidcore © 2023 - 2024");
 			ImVec2 position = ImGui::GetCursorPos();
 			ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, position.y));
-			ImGui::Text(u8"Raidcore © 2023");
+			ImGui::Text(u8"Raidcore © 2023 - 2024");
 		}
 		ImGui::End();
 	}

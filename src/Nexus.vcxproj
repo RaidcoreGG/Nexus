@@ -12,17 +12,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="API\ActiveToken.cpp" />
+    <ClCompile Include="API\APIClient.cpp" />
     <ClCompile Include="API\APIController.cpp" />
     <ClCompile Include="Consts.cpp" />
     <ClCompile Include="core.cpp" />
     <ClCompile Include="CrashHandler.cpp" />
     <ClCompile Include="DataLink\DataLink.cpp" />
-    <ClCompile Include="entry.cpp" />
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="Events\EventHandler.cpp" />
     <ClCompile Include="GUI\GUI.cpp" />
     <ClCompile Include="GUI\Widgets\About\AboutBox.cpp" />
     <ClCompile Include="GUI\Widgets\Addons\AddonItem.cpp" />
     <ClCompile Include="GUI\Widgets\Addons\AddonsWindow.cpp" />
+    <ClCompile Include="GUI\Widgets\Changelog\ChangelogWindow.cpp" />
     <ClCompile Include="GUI\Widgets\Debug\DebugWindow.cpp" />
     <ClCompile Include="GUI\Widgets\EULA\EULAModal.cpp" />
     <ClCompile Include="GUI\Widgets\Log\LogWindow.cpp" />
@@ -52,22 +54,27 @@
     <ClCompile Include="minhook\mh_disasm.cpp" />
     <ClCompile Include="minhook\mh_hook.cpp" />
     <ClCompile Include="minhook\mh_trampoline.cpp" />
+    <ClCompile Include="Multibox\Multibox.cpp" />
     <ClCompile Include="Mumble\Identity.cpp" />
     <ClCompile Include="Mumble\Mumble.cpp" />
     <ClCompile Include="openssl\applink.c" />
     <ClCompile Include="Paths.cpp" />
+    <ClCompile Include="Proxy.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Settings\Settings.cpp" />
     <ClCompile Include="Shared.cpp" />
     <ClCompile Include="State.cpp" />
     <ClCompile Include="Textures\TextureLoader.cpp" />
     <ClCompile Include="types.cpp" />
-    <ClCompile Include="Updater\Updater.cpp" />
     <ClCompile Include="WndProc\WndProcHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="API\APIClient.h" />
     <ClInclude Include="API\APIController.h" />
     <ClInclude Include="API\ActiveToken.h" />
+    <ClInclude Include="API\APIRequest.h" />
+    <ClInclude Include="API\APIResponse.h" />
+    <ClInclude Include="API\CachedResponse.h" />
     <ClInclude Include="Branch.h" />
     <ClInclude Include="Consts.h" />
     <ClInclude Include="core.h" />
@@ -85,6 +92,7 @@
     <ClInclude Include="GUI\Widgets\About\AboutBox.h" />
     <ClInclude Include="GUI\Widgets\Addons\AddonItem.h" />
     <ClInclude Include="GUI\Widgets\Addons\AddonsWindow.h" />
+    <ClInclude Include="GUI\Widgets\Changelog\ChangelogWindow.h" />
     <ClInclude Include="GUI\Widgets\Debug\DebugWindow.h" />
     <ClInclude Include="GUI\Widgets\EULA\EULAModal.h" />
     <ClInclude Include="GUI\Widgets\Log\LogWindow.h" />
@@ -98,7 +106,6 @@
     <ClInclude Include="GUI\Widgets\QuickAccess\Shortcut.h" />
     <ClInclude Include="Hooks.h" />
     <ClInclude Include="httplib\httplib.h" />
-    <ClInclude Include="httpslib.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_extensions.h" />
@@ -119,10 +126,13 @@
     <ClInclude Include="Loader\EAddonState.h" />
     <ClInclude Include="Loader\ELoaderAction.h" />
     <ClInclude Include="Loader\FuncDefs.h" />
+    <ClInclude Include="Loader\LibraryAddon.h" />
     <ClInclude Include="Loader\Loader.h" />
     <ClInclude Include="Loader\NexusLinkData.h" />
     <ClInclude Include="Localization\Localization.h" />
     <ClInclude Include="Logging\FuncDefs.h" />
+    <ClInclude Include="Main.h" />
+    <ClInclude Include="Multibox\Multibox.h" />
     <ClInclude Include="Mumble\Compass.h" />
     <ClInclude Include="Mumble\Context.h" />
     <ClInclude Include="Mumble\EMapType.h" />
@@ -287,6 +297,7 @@
     <ClInclude Include="minhook\mh_trampoline.h" />
     <ClInclude Include="Mumble\Mumble.h" />
     <ClInclude Include="Paths\FuncDefs.h" />
+    <ClInclude Include="Proxy.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Settings\Settings.h" />
@@ -298,7 +309,6 @@
     <ClInclude Include="Textures\Texture.h" />
     <ClInclude Include="Textures\TextureLoader.h" />
     <ClInclude Include="types.h" />
-    <ClInclude Include="Updater\Updater.h" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="WndProc\FuncDefs.h" />
     <ClInclude Include="WndProc\WndProcHandler.h" />
@@ -310,17 +320,39 @@
     <None Include="exports.def" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="Resources\Menomonia.ttf" />
-    <Font Include="Resources\TrebuchetMS.ttf" />
+    <Font Include="Resources\Fonts\Menomonia.ttf" />
+    <Font Include="Resources\Fonts\TrebuchetMS.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Resources\ICON_GENERIC.png" />
-    <Image Include="Resources\ICON_GENERIC_HOVER.png" />
-    <Image Include="Resources\ICON_NEXUS.png" />
-    <Image Include="Resources\ICON_NEXUS_HOVER.png" />
-    <Image Include="Resources\TEX_MENU_BUTTON.png" />
-    <Image Include="Resources\TEX_MENU_BUTTON_HOVER.png" />
-    <Image Include="Resources\TEX_MENU_BACKGROUND.png" />
+    <Image Include="Resources\AddonsWindow\AddonItem.png" />
+    <Image Include="Resources\AddonsWindow\Background.png" />
+    <Image Include="Resources\AddonsWindow\Background_blue.png" />
+    <Image Include="Resources\AddonsWindow\TitleBar.png" />
+    <Image Include="Resources\AddonsWindow\TitleBar_Hover.png" />
+    <Image Include="Resources\BtnClose.png" />
+    <Image Include="Resources\BtnClose_Hover.png" />
+    <Image Include="Resources\Menu\Background.png" />
+    <Image Include="Resources\Menu\BtnAbout.png" />
+    <Image Include="Resources\Menu\BtnAddons.png" />
+    <Image Include="Resources\Menu\BtnChangelog.png" />
+    <Image Include="Resources\Menu\BtnDebug.png" />
+    <Image Include="Resources\Menu\BtnLog.png" />
+    <Image Include="Resources\Menu\BtnOptions.png" />
+    <Image Include="Resources\Menu\MenuItem.png" />
+    <Image Include="Resources\Menu\MenuItem_Hover.png" />
+    <Image Include="Resources\Notification.png" />
+    <Image Include="Resources\QuickAccess\Generic.png" />
+    <Image Include="Resources\QuickAccess\Generic_Hover.png" />
+    <Image Include="Resources\QuickAccess\Nexus.png" />
+    <Image Include="Resources\QuickAccess\NexusHalloween.png" />
+    <Image Include="Resources\QuickAccess\NexusHalloween_Hover.png" />
+    <Image Include="Resources\QuickAccess\NexusXmas.png" />
+    <Image Include="Resources\QuickAccess\NexusXmas_Hover.png" />
+    <Image Include="Resources\QuickAccess\Nexus_Hover.png" />
+    <Image Include="Resources\TabBtn.png" />
+    <Image Include="Resources\TabBtn_Hover.png" />
+    <Image Include="Resources\TitleBarEnd.png" />
+    <Image Include="Resources\TitleBarEnd_Hover.png" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -407,30 +439,18 @@ WMIC.EXE Alias /? &gt;NUL 2&gt;&amp;1 || GOTO s_error
 FOR /F "skip=1 tokens=1-6" %%G IN ('WMIC Path Win32_LocalTime Get Day^,Hour^,Minute^,Month^,Second^,Year /Format:table') DO (
    IF "%%~L"=="" goto s_done
       Set _yyyy=%%L
-      Set _mm=00%%J
-      Set _dd=00%%G
-      Set _hour=00%%H
-      SET _minute=00%%I
+      Set _mm=%%J
+      Set _dd=%%G
+      Set _hour=%%H
+      SET _minute=%%I
 )
 :s_done
 
-:: Pad digits with leading zeros
-      Set _mm=%_mm:~-2%
-      Set _dd=%_dd:~-2%
-      Set _hour=%_hour:~-2%
-      Set _minute=%_minute:~-2%
-
-:: Display the date/time in ISO 8601 format:
-Set _isodate=%_yyyy%-%_mm%-%_dd% %_hour%:%_minute%
-Echo %_isodate%
-
 echo #pragma once &gt; Version.h
-echo #define V_MAJOR %_isodate:~0,4% &gt;&gt; Version.h
-echo #define V_MINOR %_isodate:~5,2% &gt;&gt; Version.h
-echo #define V_BUILD %_isodate:~8,2% &gt;&gt; Version.h
-SET /A var_hours = %_isodate:~11,2%
-SET /A var_minutes = %_isodate:~14,2%
-SET /A var_res = %var_hours% * 60 + %var_minutes%
+echo #define V_MAJOR %_yyyy% &gt;&gt; Version.h
+echo #define V_MINOR %_mm% &gt;&gt; Version.h
+echo #define V_BUILD %_dd% &gt;&gt; Version.h
+SET /A var_res = %_hour% * 60 + %_minute%
 echo #define V_REVISION %var_res% &gt;&gt; Version.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
@@ -460,7 +480,7 @@ echo #define V_REVISION %var_res% &gt;&gt; Version.h</Command>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
-      <AdditionalDependencies>Shlwapi.lib;PathCch.lib;Shell32.lib;Psapi.lib;libssl.lib;libcrypto.lib;ws2_32.lib;gdi32.lib;advapi32.lib;crypt32.lib;user32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Shlwapi.lib;PathCch.lib;Shell32.lib;Psapi.lib;libssl.lib;libcrypto.lib;ws2_32.lib;gdi32.lib;advapi32.lib;crypt32.lib;user32.lib;ntdll.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>git branch --show-current &gt;&gt; temp_file.h
@@ -477,30 +497,18 @@ WMIC.EXE Alias /? &gt;NUL 2&gt;&amp;1 || GOTO s_error
 FOR /F "skip=1 tokens=1-6" %%G IN ('WMIC Path Win32_LocalTime Get Day^,Hour^,Minute^,Month^,Second^,Year /Format:table') DO (
    IF "%%~L"=="" goto s_done
       Set _yyyy=%%L
-      Set _mm=00%%J
-      Set _dd=00%%G
-      Set _hour=00%%H
-      SET _minute=00%%I
+      Set _mm=%%J
+      Set _dd=%%G
+      Set _hour=%%H
+      SET _minute=%%I
 )
 :s_done
 
-:: Pad digits with leading zeros
-      Set _mm=%_mm:~-2%
-      Set _dd=%_dd:~-2%
-      Set _hour=%_hour:~-2%
-      Set _minute=%_minute:~-2%
-
-:: Display the date/time in ISO 8601 format:
-Set _isodate=%_yyyy%-%_mm%-%_dd% %_hour%:%_minute%
-Echo %_isodate%
-
 echo #pragma once &gt; Version.h
-echo #define V_MAJOR %_isodate:~0,4% &gt;&gt; Version.h
-echo #define V_MINOR %_isodate:~5,2% &gt;&gt; Version.h
-echo #define V_BUILD %_isodate:~8,2% &gt;&gt; Version.h
-SET /A var_hours = %_isodate:~11,2%
-SET /A var_minutes = %_isodate:~14,2%
-SET /A var_res = %var_hours% * 60 + %var_minutes%
+echo #define V_MAJOR %_yyyy% &gt;&gt; Version.h
+echo #define V_MINOR %_mm% &gt;&gt; Version.h
+echo #define V_BUILD %_dd% &gt;&gt; Version.h
+SET /A var_res = %_hour% * 60 + %_minute%
 echo #define V_REVISION %var_res% &gt;&gt; Version.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>

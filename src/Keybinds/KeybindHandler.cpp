@@ -6,6 +6,7 @@
 #include <cstdarg>
 
 #include "core.h"
+#include "Consts.h"
 #include "Paths.h"
 #include "Shared.h"
 #include "State.h"
@@ -110,24 +111,30 @@ namespace Keybinds
 
 		Keybinds::Mutex.lock();
 		{
-			std::ifstream file(Path::F_KEYBINDS);
-
-			json keybinds = json::parse(file);
-
-			for (json binding : keybinds)
+			try
 			{
-				Keybind kb{};
-				kb.Key = binding["Key"].get<unsigned>();
-				kb.Alt = binding["Alt"].get<bool>();
-				kb.Ctrl = binding["Ctrl"].get<bool>();
-				kb.Shift = binding["Shift"].get<bool>();
+				std::ifstream file(Path::F_KEYBINDS);
 
-				std::string identifier = binding["Identifier"].get<std::string>();
+				json keybinds = json::parse(file);
+				for (json binding : keybinds)
+				{
+					Keybind kb{};
+					binding["Key"].get_to(kb.Key);
+					binding["Alt"].get_to(kb.Alt);
+					binding["Ctrl"].get_to(kb.Ctrl);
+					binding["Shift"].get_to(kb.Shift);
 
-				Registry[identifier].Bind = kb;
+					std::string identifier = binding["Identifier"].get<std::string>();
+
+					Registry[identifier].Bind = kb;
+				}
+
+				file.close();
 			}
-
-			file.close();
+			catch (json::parse_error& ex)
+			{
+				LogWarning(CH_KEYBINDS, "Keybinds.json could not be parsed. Error: %s", ex.what());
+			}
 		}
 		Keybinds::Mutex.unlock();
 	}
@@ -198,13 +205,18 @@ namespace Keybinds
 
 		Save();
 	}
-	void Unregister(const char* aIdentifier)
+	void Deregister(const char* aIdentifier)
 	{
 		std::string str = aIdentifier;
 
 		Keybinds::Mutex.lock();
 		{
-			Registry.erase(str);
+			auto it = Registry.find(str);
+
+			if (it != Registry.end())
+			{
+				it->second.Handler = nullptr;
+			}
 		}
 		Keybinds::Mutex.unlock();
 

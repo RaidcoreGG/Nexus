@@ -19,14 +19,14 @@ namespace LogHandler
 	void Initialize();
 
 	void RegisterLogger(ILogger* aLogger);
-	void UnregisterLogger(ILogger* aLogger);
+	void DeregisterLogger(ILogger* aLogger);
 
 	/* Logging helper functions */
-	void Log(std::string aChannel, const char* aFmt, ...);
-	void LogCritical(std::string aChannel, const char* aFmt, ...);
-	void LogWarning(std::string aChannel, const char* aFmt, ...);
-	void LogInfo(std::string aChannel, const char* aFmt, ...);
-	void LogDebug(std::string aChannel, const char* aFmt, ...);
+	void Log(const std::string& aChannel, const char* aFmt, ...);
+	void LogCritical(const std::string& aChannel, const char* aFmt, ...);
+	void LogWarning(const std::string& aChannel, const char* aFmt, ...);
+	void LogInfo(const std::string& aChannel, const char* aFmt, ...);
+	void LogDebug(const std::string& aChannel, const char* aFmt, ...);
 	
 	/* Basic logging functions */
 	void LogMessageA(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, ...);
