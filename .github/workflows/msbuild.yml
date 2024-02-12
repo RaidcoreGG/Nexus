@@ -19,7 +19,7 @@ env:
   BUILD_CONFIGURATION: Release
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -41,10 +41,10 @@ jobs:
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
       run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
 
-    - name: Archive files
-      uses: actions/upload-artifact@v3
+    - name: Create release
+      uses: actions/upload-artifact@v4
       with:
-        name: d3d11
+        name: d3d11.dll
         path: |
           x64/d3d11.dll
           x64/d3d11.pdb
