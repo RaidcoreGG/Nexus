@@ -154,13 +154,13 @@ namespace GUI
 		}
 	}
 
-	void AddonItem(LibraryAddon aAddon)
+	void AddonItem(LibraryAddon* aAddon)
 	{
 		float btnHeight = 22.0f * Renderer::Scaling;
 		float itemWidthScaled = itemWidth * Renderer::Scaling;
 		float itemHeightScaled = itemHeight * Renderer::Scaling;
 
-		std::string sig = std::to_string(aAddon.Signature); // helper for unique chkbxIds
+		std::string sig = std::to_string(aAddon->Signature); // helper for unique chkbxIds
 
 		// initial is explicitly set within the window, therefore all positions should be relative to it
 		ImVec2 initial = ImGui::GetCursorPos();
@@ -187,10 +187,10 @@ namespace GUI
 				ImGui::BeginChild("##AddonItemDescription", ImVec2(descWidth, itemHeightScaled - 12.0f - 12.0f));
 
 				ImGui::PushFont(Font);
-				ImGui::TextColored(ImVec4(1.0f, 0.933f, 0.733f, 1.0f), aAddon.Name.c_str());
+				ImGui::TextColored(ImVec4(1.0f, 0.933f, 0.733f, 1.0f), aAddon->Name.c_str());
 				ImGui::PopFont();
 
-				ImGui::TextWrapped(aAddon.Description.c_str());
+				ImGui::TextWrapped(aAddon->Description.c_str());
 
 				ImGui::EndChild();
 			}
@@ -200,15 +200,24 @@ namespace GUI
 				ImGui::BeginChild("##AddonItemActions", ImVec2(actionsWidth, itemHeightScaled - 12.0f - 12.0f));
 
 				// just check if loaded, if it was not hot-reloadable it would be EAddonState::LoadedLOCKED
-				if (ImGui::GW2Button(("Install##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+				if (ImGui::GW2Button(aAddon->IsInstalling ? ("Installing...##" + sig).c_str()  : ("Install##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 				{
-					Loader::InstallAddon(aAddon);
+					if (!aAddon->IsInstalling)
+					{
+						std::thread([aAddon]()
+							{
+								Loader::InstallAddon(aAddon);
+								aAddon->IsInstalling = false;
+								Loader::NotifyChanges();
+							})
+							.detach();
+					}
 				}
-				if (aAddon.Provider == EUpdateProvider::GitHub && !aAddon.DownloadURL.empty())
+				if (aAddon->Provider == EUpdateProvider::GitHub && !aAddon->DownloadURL.empty())
 				{
 					if (ImGui::GW2Button(("GitHub##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
-						ShellExecuteA(0, 0, aAddon.DownloadURL.c_str(), 0, 0, SW_SHOW);
+						ShellExecuteA(0, 0, aAddon->DownloadURL.c_str(), 0, 0, SW_SHOW);
 					}
 				}
 

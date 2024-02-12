@@ -31,9 +31,6 @@ namespace GUI
 		bool Tab1Hovered;
 		bool Tab2Hovered;
 
-		std::mutex LibraryMutex;
-		std::vector<LibraryAddon> AddonLibrary;
-
 		AddonsWindow(std::string aName);
 		void Render();
 	};
