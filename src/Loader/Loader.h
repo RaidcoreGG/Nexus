@@ -17,6 +17,7 @@
 namespace Loader
 {
 	extern std::mutex					Mutex;
+	extern std::vector<LibraryAddon*>	AddonLibrary;
 	extern std::unordered_map<
 		std::filesystem::path,
 		ELoaderAction
@@ -74,7 +75,7 @@ namespace Loader
 		std::string aUpdateLink
 	);
 	/* Installs an addon. */
-	void InstallAddon(LibraryAddon aAddon);
+	void InstallAddon(LibraryAddon* aAddon);
 
 	/* Gets or creates a pointer to the provided version, or nullptr if no such version exists. */
 	AddonAPI* GetAddonAPI(int aVersion);

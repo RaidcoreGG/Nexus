@@ -7,6 +7,7 @@
 
 struct LibraryAddon
 {
+	bool			IsInstalling = false;
 	signed int      Signature;
 	std::string		Name;
 	std::string		Description;

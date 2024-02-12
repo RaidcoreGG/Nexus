@@ -38,6 +38,7 @@ using json = nlohmann::json;
 namespace Loader
 {
 	std::mutex					Mutex;
+	std::vector<LibraryAddon*>	AddonLibrary;
 	std::unordered_map<
 		std::filesystem::path,
 		ELoaderAction
@@ -87,6 +88,30 @@ namespace Loader
 			{
 				LogCritical(CH_LOADER, "Loader disabled. Reason: SHChangeNotifyRegister(...) returned 0.");
 				return;
+			}
+
+			json response = RaidcoreAPI->Get("/addonlibrary");
+
+			if (!response.is_null())
+			{
+				for (const auto& addon : response)
+				{
+					LibraryAddon* newAddon = new LibraryAddon{};
+					newAddon->Signature = addon["id"];
+					newAddon->Name = addon["name"];
+					newAddon->Description = addon["description"];
+					newAddon->Provider = GetProvider(addon["download"]);
+					newAddon->DownloadURL = addon["download"];
+					AddonLibrary.push_back(newAddon);
+				}
+
+				std::sort(AddonLibrary.begin(), AddonLibrary.end(), [](LibraryAddon* a, LibraryAddon* b) {
+					return a->Name < b->Name;
+					});
+			}
+			else
+			{
+				LogWarning(CH_CORE, "Error parsing API response for /addonlibrary.");
 			}
 
 			LoaderThread = std::thread(ProcessChanges);
@@ -888,63 +913,52 @@ namespace Loader
 
 		return wasUpdated;
 	}
-	void InstallAddon(LibraryAddon aAddon)
+	void InstallAddon(LibraryAddon* aAddon)
 	{
-		/*std::string outName = "addon_" + std::to_string(aAddon.Signature);
-		std::filesystem::path addonPath = Path::D_GW2_ADDONS / outName;
-
-		int i = 0;
-		while(std::filesystem::exists(addonPath.string() + extDll))
-		{
-			addonPath = addonPath.string() + "_" + std::to_string(i);
-			i++;
-		}
-
-		addonPath = addonPath.string() + extDll;*/
-		// FIXME: look into the .append func of path and check if adds with a / or just appends the string to maybe simplify this
+		aAddon->IsInstalling = true;
 
 		/* this is all modified duplicate code from update */
 		std::string baseUrl;
 		std::string endpoint;
 
 		// override provider if none set, but a Raidcore ID is used
-		if (aAddon.Provider == EUpdateProvider::None && aAddon.Signature > 0)
+		if (aAddon->Provider == EUpdateProvider::None && aAddon->Signature > 0)
 		{
-			aAddon.Provider = EUpdateProvider::Raidcore;
+			aAddon->Provider = EUpdateProvider::Raidcore;
 		}
 
 		/* setup baseUrl and endpoint */
-		switch (aAddon.Provider)
+		switch (aAddon->Provider)
 		{
 		case EUpdateProvider::None: return;
 
 		case EUpdateProvider::Raidcore:
 			baseUrl = API_RAIDCORE;
-			endpoint = "/addons/" + std::to_string(aAddon.Signature);
+			endpoint = "/addons/" + std::to_string(aAddon->Signature);
 
 			break;
 
 		case EUpdateProvider::GitHub:
 			baseUrl = API_GITHUB;
-			if (aAddon.DownloadURL.empty())
+			if (aAddon->DownloadURL.empty())
 			{
-				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::GitHub but has no UpdateLink set.", aAddon.Name);
+				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::GitHub but has no UpdateLink set.", aAddon->Name);
 				return;
 			}
 
-			endpoint = "/repos" + GetEndpoint(aAddon.DownloadURL) + "/releases"; // "/releases/latest"; // fuck you Sognus
+			endpoint = "/repos" + GetEndpoint(aAddon->DownloadURL) + "/releases"; // "/releases/latest"; // fuck you Sognus
 
 			break;
 
 		case EUpdateProvider::Direct:
-			if (aAddon.DownloadURL.empty())
+			if (aAddon->DownloadURL.empty())
 			{
-				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::Direct but has no UpdateLink set.", aAddon.Name);
+				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::Direct but has no UpdateLink set.", aAddon->Name);
 				return;
 			}
 
-			baseUrl = GetBaseURL(aAddon.DownloadURL);
-			endpoint = GetEndpoint(aAddon.DownloadURL);
+			baseUrl = GetBaseURL(aAddon->DownloadURL);
+			endpoint = GetEndpoint(aAddon->DownloadURL);
 
 			if (baseUrl.empty() || endpoint.empty())
 			{
@@ -954,13 +968,13 @@ namespace Loader
 			break;
 		}
 
-		if (EUpdateProvider::Raidcore == aAddon.Provider)
+		if (EUpdateProvider::Raidcore == aAddon->Provider)
 		{
 			LogWarning(CH_LOADER, "Downloading via Raidcore is not implemented yet, due to user-friendly names requiring an API request. If you see this tell the developers about it! Thank you!");
 			return;
 			//RaidcoreAPI->Download(addonPath, endpoint + "/download"); // e.g. api.raidcore.gg/addons/17/download
 		}
-		else if (EUpdateProvider::GitHub == aAddon.Provider)
+		else if (EUpdateProvider::GitHub == aAddon->Provider)
 		{
 			json response = GitHubAPI->Get(endpoint);
 
@@ -1037,7 +1051,7 @@ namespace Loader
 				return;
 			}
 		}
-		else if (EUpdateProvider::Direct == aAddon.Provider)
+		else if (EUpdateProvider::Direct == aAddon->Provider)
 		{
 			/* prepare client request */
 			httplib::Client client(baseUrl);
@@ -1073,7 +1087,7 @@ namespace Loader
 			}
 		}
 
-		LogInfo(CH_LOADER, "Successfully installed %s.", aAddon.Name);
+		LogInfo(CH_LOADER, "Successfully installed %s.", aAddon->Name);
 	}
 
 	AddonAPI* GetAddonAPI(int aVersion)

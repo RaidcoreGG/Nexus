@@ -43,30 +43,6 @@ namespace GUI
 		TabIndex = 0;
 		Tab1Hovered = false;
 		Tab2Hovered = false;
-
-		json response = RaidcoreAPI->Get("/addonlibrary");
-
-		if (!response.is_null())
-		{
-			for (const auto& addon : response)
-			{
-				LibraryAddon newAddon;
-				newAddon.Signature = addon["id"];
-				newAddon.Name = addon["name"];
-				newAddon.Description = addon["description"];
-				newAddon.Provider = GetProvider(addon["download"]);
-				newAddon.DownloadURL = addon["download"];
-				AddonLibrary.push_back(newAddon);
-			}
-
-			std::sort(AddonLibrary.begin(), AddonLibrary.end(), [](const LibraryAddon& a, const LibraryAddon& b) {
-				return a.Name < b.Name;
-				});
-		}
-		else
-		{
-			LogWarning(CH_CORE, "Error parsing API response for /addonlibrary.");
-		}
 	}
 
 	void AddonsWindow::Render()
@@ -200,18 +176,16 @@ namespace GUI
 						ImGui::BeginChild("##AddonTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), (btnHeight * 1.5f) * -1));
 
 						int downloadable = 0;
-						if (AddonLibrary.size() != 0)
+						const std::lock_guard<std::mutex> lockLoader(Loader::Mutex);
+						if (Loader::AddonLibrary.size() != 0)
 						{
-							const std::lock_guard<std::mutex> lockLibrary(LibraryMutex); // complete overkill, but why not
-							const std::lock_guard<std::mutex> lockLoader(Loader::Mutex);
-							
-							for (auto& libAddon : AddonLibrary)
+							for (auto& libAddon : Loader::AddonLibrary)
 							{
 								bool exists = false;
 								{
 									for (auto& [path, addon] : Loader::Addons)
 									{
-										if (addon->Definitions != nullptr && addon->Definitions->Signature == libAddon.Signature)
+										if (addon->Definitions != nullptr && addon->Definitions->Signature == libAddon->Signature)
 										{
 											exists = true;
 											break;
@@ -226,7 +200,7 @@ namespace GUI
 							}
 						}
 						
-						if (AddonLibrary.size() == 0 || downloadable == 0)
+						if (Loader::AddonLibrary.size() == 0 || downloadable == 0)
 						{
 							ImVec2 windowSize = ImGui::GetWindowSize();
 							ImVec2 textSize = ImGui::CalcTextSize("There's nothing here.\nMaybe ask your favourite developer to support Nexus!");
