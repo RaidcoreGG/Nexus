@@ -74,57 +74,11 @@ namespace GUI
 		void AddMenuItem(std::string aLabel, std::string aTextureIdentifier, bool* aToggle)
 		{
 			Texture* icon = TextureLoader::Get(aTextureIdentifier.c_str());
-			MenuItem* mItem = new MenuItem{ aLabel, aToggle, icon, false };
+			MenuItem* mItem = new MenuItem{ aLabel, aTextureIdentifier, aToggle, icon, false };
 
 			{
 				const std::lock_guard<std::mutex> lock(Menu::Mutex);
 				MenuItems.push_back(mItem);
-			}
-
-			if (icon == nullptr)
-			{
-				std::thread([mItem, aLabel, aTextureIdentifier, aToggle]()
-					{
-						const std::lock_guard<std::mutex> lock(Menu::Mutex);
-						{
-							// This code is copy pasted from quick access, bit of a clownfiesta not gonna lie
-							int tries = 0;
-
-							LogDebug("CH_MENU", "Menu Item \"%s\" was promised 1 textures, but received 0.", aLabel.c_str());
-							Sleep(100); // first retry after 100ms
-
-							while (mItem->Icon == nullptr)
-							{
-								if (tries > 10)
-								{
-									LogWarning("CH_MENU", "Cancelled getting textures for menu item \"%s\" after 10 failed attempts.", aLabel.c_str());
-									break;
-								}
-
-								if (mItem->Icon == nullptr) { mItem->Icon = TextureLoader::Get(aTextureIdentifier.c_str()); }
-
-								tries++;
-								Sleep(tries * 500);
-							}
-
-							/* if not all tries were used, then the texture was loaded */
-							if (tries <= 10)
-							{
-								LogDebug("CH_MENU", "Menu Item \"%s\" received promised texture after %d attempt(s).", aLabel.c_str(), tries);
-								return;
-							}
-
-							/* fallback icons */
-							mItem->Icon = TextureLoader::Get(ICON_GENERIC);
-
-							/* absolute sanity check */
-							if (mItem->Icon == nullptr)
-							{
-								LogWarning("CH_MENU", "Neither promised textures nor fallback textures could be loaded, removing menu item \"%s\".", aLabel.c_str());
-								return;
-							}
-						}
-					}).detach();
 			}
 		}
 

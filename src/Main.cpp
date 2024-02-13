@@ -134,7 +134,7 @@ namespace Main
 
 			LogInfo(CH_CORE, "Shutdown performed.");
 
-			SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)Hooks::GW2::WndProc);
+			//SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)Hooks::GW2::WndProc);
 
 			State::Nexus = ENexusState::SHUTDOWN;
 		}

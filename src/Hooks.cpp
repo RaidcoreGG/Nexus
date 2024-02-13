@@ -30,32 +30,35 @@ namespace Hooks
 
 	LRESULT __stdcall WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		// don't pass to game if loader
-		if (Loader::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
-
-		// don't pass to game if custom wndproc
-		if (WndProc::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
-
-		// don't pass to game if keybind
-		if (Keybinds::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
-
-		// don't pass to game if gui
-		if (GUI::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
-
-		// don't pass keys to game if currently editing keybinds
-		if (Keybinds::IsSettingKeybind)
+		if (State::Nexus != ENexusState::SHUTDOWN)
 		{
-			if (uMsg == WM_SYSKEYDOWN || uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYUP || uMsg == WM_KEYUP)
+			// don't pass to game if loader
+			if (Loader::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
+
+			// don't pass to game if custom wndproc
+			if (WndProc::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
+
+			// don't pass to game if keybind
+			if (Keybinds::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
+
+			// don't pass to game if gui
+			if (GUI::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
+
+			// don't pass keys to game if currently editing keybinds
+			if (Keybinds::IsSettingKeybind)
 			{
-				return 0;
+				if (uMsg == WM_SYSKEYDOWN || uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYUP || uMsg == WM_KEYUP)
+				{
+					return 0;
+				}
+			}
+
+			if (uMsg == WM_DESTROY || uMsg == WM_QUIT || uMsg == WM_CLOSE)
+			{
+				Main::Shutdown(uMsg);
 			}
 		}
-
-		if (uMsg == WM_DESTROY || uMsg == WM_QUIT || uMsg == WM_CLOSE)
-		{
-			Main::Shutdown(uMsg);
-		}
-
+		
 		return CallWindowProcA(Hooks::GW2::WndProc, hWnd, uMsg, wParam, lParam);
 	}
 	HRESULT __stdcall DXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)

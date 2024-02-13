@@ -11,6 +11,7 @@ namespace GUI
 		struct MenuItem
 		{
 			std::string		Label;
+			std::string		TextureIdentifier;
 			bool*			Toggle;
 			Texture*		Icon;
 			bool			IsHovering;

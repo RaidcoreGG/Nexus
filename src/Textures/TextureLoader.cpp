@@ -43,6 +43,8 @@ namespace TextureLoader
 
 	void LoadFromFile(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback)
 	{
+		LogInfo(CH_TEXTURES, "TextureLoader::LoadFromFile(aIdentifier: %s, aFilename: %s, aCallback: %p)", aIdentifier, aFilename, aCallback);
+
 		std::string str = aIdentifier;
 
 		Texture* tex = Get(str.c_str());
@@ -70,6 +72,8 @@ namespace TextureLoader
 	}
 	void LoadFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback)
 	{
+		LogInfo(CH_TEXTURES, "TextureLoader::LoadFromResource(aIdentifier: %s, aResourceID: %u, aModule: %p, aCallback: %p)", aIdentifier, aResourceID, aModule, aCallback);
+
 		std::string str = aIdentifier;
 
 		Texture* tex = Get(str.c_str());
@@ -119,6 +123,8 @@ namespace TextureLoader
 	}
 	void LoadFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback)
 	{
+		LogInfo(CH_TEXTURES, "TextureLoader::LoadFromURL(aIdentifier: %s, aRemote: %s, aEndpoint: %s, aCallback: %p)", aIdentifier, aRemote, aEndpoint, aCallback);
+
 		std::string str = aIdentifier;
 
 		Texture* tex = Get(str.c_str());
@@ -164,6 +170,8 @@ namespace TextureLoader
 	}
 	void LoadFromMemory(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback)
 	{
+		LogInfo(CH_TEXTURES, "TextureLoader::LoadFromMemory(aIdentifier: %s, aData: %p, aSize: %u, aCallback: %p)", aIdentifier, aData, aSize, aCallback);
+
 		std::string str = aIdentifier;
 
 		Texture* tex = Get(str.c_str());
@@ -199,7 +207,7 @@ namespace TextureLoader
 	{
 		std::string str = aIdentifier;
 
-		//LogDebug(CH_TEXTURES, "Queued %s", str.c_str());
+		LogDebug(CH_TEXTURES, "Queued %s", str.c_str());
 
 		QueuedTexture raw{};
 		raw.Identifier = str;
@@ -216,7 +224,7 @@ namespace TextureLoader
 	}
 	void CreateTexture(QueuedTexture aQueuedTexture)
 	{
-		//LogDebug(CH_TEXTURES, "Create %s", aQueuedTexture.Identifier.c_str());
+		LogDebug(CH_TEXTURES, "Create %s", aQueuedTexture.Identifier.c_str());
 
 		Texture* tex = new Texture{};
 		tex->Width = aQueuedTexture.Width;
@@ -244,7 +252,7 @@ namespace TextureLoader
 
 		if (!pTexture)
 		{
-			//LogDebug(CH_TEXTURES, "pTexture was null");
+			LogDebug(CH_TEXTURES, "pTexture was null");
 			stbi_image_free(aQueuedTexture.Data);
 			return;
 		}
