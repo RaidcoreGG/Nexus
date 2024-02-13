@@ -76,6 +76,11 @@ namespace Keybinds
 				kb.Key = 0;
 			}
 
+			if (!kb.Alt && !kb.Ctrl && !kb.Shift && kb.Key == 0)
+			{
+				return uMsg;
+			}
+
 			if (keylp.PreviousKeyState)
 			{
 				return uMsg;
