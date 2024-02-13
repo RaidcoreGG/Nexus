@@ -77,6 +77,8 @@ namespace GUI
 		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f, 0.5f));
 		ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0);
 		ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 1, 1));
+		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0, 0, 0, 0));
 
 		ImGui::SetNextWindowSize(ImVec2(windowWidth * Renderer::Scaling, windowHeight * Renderer::Scaling));
 		if (ImGui::Begin(Name.c_str(), &Visible, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | 
@@ -249,6 +251,7 @@ namespace GUI
 		}
 		ImGui::End();
 
+		ImGui::PopStyleColor(2);
 		ImGui::PopStyleVar(6);
 		ImGui::PopFont();
 	}
