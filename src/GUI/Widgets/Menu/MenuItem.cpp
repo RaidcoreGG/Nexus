@@ -3,6 +3,7 @@
 #include "Renderer.h"
 
 #include "Menu.h"
+#include "Textures/TextureLoader.h"
 #include "Textures/Texture.h"
 
 #include "imgui.h"
@@ -59,6 +60,10 @@ namespace GUI
 					ImGui::SetCursorPos(ImVec2(pos.x, pos.y - 4.0f));
 					ImGui::Image(Icon->Resource, ImVec2(iconSize, iconSize));
 					ImGui::PopItemFlag();
+				}
+				else
+				{
+					Icon = TextureLoader::Get(TextureIdentifier.c_str());
 				}
 
 				ImGui::SetCursorPos(txtPos);
