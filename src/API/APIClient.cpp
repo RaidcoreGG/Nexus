@@ -295,8 +295,16 @@ void APIClient::ProcessRequests()
 
 				std::filesystem::path normalizedPath = GetNormalizedPath(request.Query);
 				
+				auto it = ResponseCache.find(normalizedPath);
+
+				if (it != ResponseCache.end())
+				{
+					delete it->second;
+					ResponseCache.erase(normalizedPath);
+				}
+
 				ResponseCache.insert({ normalizedPath, cached });
-				
+
 				// notify caller
 				*(request.IsComplete) = true;
 				request.CV->notify_all();

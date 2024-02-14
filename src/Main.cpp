@@ -12,7 +12,6 @@
 
 #include "DataLink/DataLink.h"
 #include "GUI/GUI.h"
-#include "GUI/Widgets/QuickAccess/QuickAccess.h"
 #include "Keybinds/KeybindHandler.h"
 #include "Loader/Loader.h"
 #include "Logging/LogHandler.h"
