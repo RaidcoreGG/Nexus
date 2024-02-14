@@ -43,7 +43,7 @@ namespace TextureLoader
 
 	void LoadFromFile(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback)
 	{
-		LogInfo(CH_TEXTURES, "TextureLoader::LoadFromFile(aIdentifier: %s, aFilename: %s, aCallback: %p)", aIdentifier, aFilename, aCallback);
+		//LogInfo(CH_TEXTURES, "TextureLoader::LoadFromFile(aIdentifier: %s, aFilename: %s, aCallback: %p)", aIdentifier, aFilename, aCallback);
 
 		std::string str = aIdentifier;
 
@@ -72,7 +72,7 @@ namespace TextureLoader
 	}
 	void LoadFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback)
 	{
-		LogInfo(CH_TEXTURES, "TextureLoader::LoadFromResource(aIdentifier: %s, aResourceID: %u, aModule: %p, aCallback: %p)", aIdentifier, aResourceID, aModule, aCallback);
+		//LogInfo(CH_TEXTURES, "TextureLoader::LoadFromResource(aIdentifier: %s, aResourceID: %u, aModule: %p, aCallback: %p)", aIdentifier, aResourceID, aModule, aCallback);
 
 		std::string str = aIdentifier;
 
@@ -123,7 +123,7 @@ namespace TextureLoader
 	}
 	void LoadFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback)
 	{
-		LogInfo(CH_TEXTURES, "TextureLoader::LoadFromURL(aIdentifier: %s, aRemote: %s, aEndpoint: %s, aCallback: %p)", aIdentifier, aRemote, aEndpoint, aCallback);
+		//LogInfo(CH_TEXTURES, "TextureLoader::LoadFromURL(aIdentifier: %s, aRemote: %s, aEndpoint: %s, aCallback: %p)", aIdentifier, aRemote, aEndpoint, aCallback);
 
 		std::string str = aIdentifier;
 
@@ -170,7 +170,7 @@ namespace TextureLoader
 	}
 	void LoadFromMemory(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback)
 	{
-		LogInfo(CH_TEXTURES, "TextureLoader::LoadFromMemory(aIdentifier: %s, aData: %p, aSize: %u, aCallback: %p)", aIdentifier, aData, aSize, aCallback);
+		//LogInfo(CH_TEXTURES, "TextureLoader::LoadFromMemory(aIdentifier: %s, aData: %p, aSize: %u, aCallback: %p)", aIdentifier, aData, aSize, aCallback);
 
 		std::string str = aIdentifier;
 
@@ -207,7 +207,7 @@ namespace TextureLoader
 	{
 		std::string str = aIdentifier;
 
-		LogDebug(CH_TEXTURES, "Queued %s", str.c_str());
+		//LogDebug(CH_TEXTURES, "Queued %s", str.c_str());
 
 		QueuedTexture raw{};
 		raw.Identifier = str;

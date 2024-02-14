@@ -301,6 +301,21 @@ namespace GUI
 			}
 			QuickAccess::Mutex.unlock();
 		}
+		void SetNotificationShortcut(const char* aIdentifier, bool aState)
+		{
+			std::string str = aIdentifier;
+
+			QuickAccess::Mutex.lock();
+			{
+				auto it = Registry.find(str);
+
+				if (it != Registry.end())
+				{
+					it->second.HasNotification = aState;
+				}
+			}
+			QuickAccess::Mutex.unlock();
+		}
 
 		void AddSimpleShortcut(const char* aIdentifier, GUI_RENDER aShortcutRenderCallback)
 		{

@@ -64,16 +64,15 @@ json APIClient::Get(std::string aEndpoint, std::string aParameters)
 	if (cachedResponse != nullptr)
 	{
 		long long diff = Timestamp() - cachedResponse->Timestamp;
-		Log(("APIClient::" + BaseURL).c_str(), "diff: %d | curr: %d | cache: %d", diff, Timestamp(), cachedResponse->Timestamp);
 
 		if (diff < CacheLifetime && cachedResponse->Content != nullptr)
 		{
-			LogDebug(("APIClient::" + BaseURL).c_str(), "Cached message %d seconds old. Reading from cache.", diff);
+			//LogDebug(("APIClient::" + BaseURL).c_str(), "Cached message %d seconds old. Reading from cache.", diff);
 			return cachedResponse->Content;
 		}
 		else
 		{
-			LogDebug(("APIClient::" + BaseURL).c_str(), "Cached message %d seconds old. CacheLifetime %d. Queueing request.", diff, CacheLifetime);
+			//LogDebug(("APIClient::" + BaseURL).c_str(), "Cached message %d seconds old. CacheLifetime %d. Queueing request.", diff, CacheLifetime);
 		}
 	}
 
@@ -295,8 +294,16 @@ void APIClient::ProcessRequests()
 
 				std::filesystem::path normalizedPath = GetNormalizedPath(request.Query);
 				
+				auto it = ResponseCache.find(normalizedPath);
+
+				if (it != ResponseCache.end())
+				{
+					delete it->second;
+					ResponseCache.erase(normalizedPath);
+				}
+
 				ResponseCache.insert({ normalizedPath, cached });
-				
+
 				// notify caller
 				*(request.IsComplete) = true;
 				request.CV->notify_all();

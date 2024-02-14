@@ -661,11 +661,6 @@ namespace GUI
 		/* add shortcut */
 		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "Nexus Menu");
 
-		if (IsUpdateAvailable && NotifyChangelog)
-		{
-			QuickAccess::NotifyShortcut(QA_MENU);
-		}
-
 		if (!Settings::Settings.is_null())
 		{
 			if (!Settings::Settings[OPT_ACCEPTEULA].is_null())
@@ -759,6 +754,11 @@ namespace GUI
 				LinkArcDPSStyle = true;
 				Settings::Settings[OPT_LINKARCSTYLE] = true;
 			}
+		}
+
+		if (IsUpdateAvailable && NotifyChangelog)
+		{
+			QuickAccess::NotifyShortcut(QA_MENU);
 		}
 
 		if (!HasAcceptedEULA)

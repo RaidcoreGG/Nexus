@@ -8,6 +8,8 @@
 #include "Paths.h"
 #include "State.h"
 
+#include "GUI/Widgets/QuickAccess/QuickAccess.h"
+
 #include "imgui.h"
 #include "imgui_extensions.h"
 
@@ -25,6 +27,8 @@ namespace GUI
 	{
 		if (!Visible) { return; }
 
+		QuickAccess::SetNotificationShortcut(QA_MENU, false);
+
 		ImGui::SetNextWindowSize(ImVec2(chlWidth * ImGui::GetFontSize(), chlHeight * ImGui::GetFontSize()), ImGuiCond_FirstUseEver);
 		if (ImGui::Begin(Name.c_str(), &Visible, ImGuiWindowFlags_NoCollapse))
 		{
@@ -33,11 +37,11 @@ namespace GUI
 
 			if (IsUpdateAvailable)
 			{
-				ImGui::TextDisabled("These changes take effect the next time you start the game:");
+				ImGui::TextColored(ImVec4(0, 0.580f, 1, 1), "These changes take effect the next time you start the game:");
 			}
 			else
 			{
-				ImGui::TextDisabled("Last changes:");
+				ImGui::Text("Last changes:");
 			}
 
 			if (!ChangelogText.empty())
