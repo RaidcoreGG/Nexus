@@ -1087,7 +1087,7 @@ namespace Loader
 			}
 		}
 
-		LogInfo(CH_LOADER, "Successfully installed %s.", aAddon->Name);
+		LogInfo(CH_LOADER, "Successfully installed %s.", aAddon->Name.c_str());
 	}
 
 	AddonAPI* GetAddonAPI(int aVersion)
