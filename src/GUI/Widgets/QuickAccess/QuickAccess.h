@@ -41,6 +41,7 @@ namespace GUI
 		void AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aKeybindIdentifier, const char* aTooltipText);
 		void RemoveShortcut(const char* aIdentifier);
 		void NotifyShortcut(const char* aIdentifier);
+		void SetNotificationShortcut(const char* aIdentifier, bool aState);
 
 		void AddSimpleShortcut(const char* aIdentifier, GUI_RENDER aShortcutRenderCallback);
 		void RemoveSimpleShortcut(const char* aIdentifier);
