@@ -459,6 +459,7 @@ namespace Loader
 			LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.)", strPath, addon->Definitions->Signature, addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage, addon->Definitions->APIVersion);
 		}
 		addon->Definitions->Load(api);
+		Events::Raise(EV_MUMBLE_IDENTITY_UPDATED, MumbleIdentity);
 
 		bool locked = addon->Definitions->Unload == nullptr || addon->Definitions->HasFlag(EAddonFlags::DisableHotloading);
 		addon->State = locked ? EAddonState::LoadedLOCKED : EAddonState::Loaded;
