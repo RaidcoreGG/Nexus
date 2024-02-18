@@ -80,7 +80,7 @@ namespace GUI
 			if (close)
 			{
 				ImGui::CloseCurrentPopup();
-				Events::Raise(EV_EULA_ACCEPTED, nullptr);
+				Events::RaiseNotification(EV_EULA_ACCEPTED);
 			}
 
 			ImGui::EndPopup();

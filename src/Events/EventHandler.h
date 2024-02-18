@@ -15,6 +15,8 @@ namespace Events
 
 	/* Raises an event of provided name, passing a pointer to an eventArgs struct. */
 	void Raise(const char* aIdentifier, void* aEventData);
+	/* Raises an event without payload, a notification. */
+	void RaiseNotification(const char* aIdentifier);
 	/* Subscribes the provided ConsumeEventCallback function, to the provided event name. */
 	void Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
 	/* Unsubscribes the provided ConsumeEventCallback function from the provided event name. */

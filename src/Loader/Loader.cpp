@@ -1175,6 +1175,7 @@ namespace Loader
 			((AddonAPI2*)api)->Log = LogMessageAddon;
 
 			((AddonAPI2*)api)->RaiseEvent = Events::Raise;
+			((AddonAPI2*)api)->RaiseEventNotification = Events::RaiseNotification;
 			((AddonAPI2*)api)->SubscribeEvent = Events::Subscribe;
 			((AddonAPI2*)api)->UnsubscribeEvent = Events::Unsubscribe;
 

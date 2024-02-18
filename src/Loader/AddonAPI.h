@@ -99,6 +99,7 @@ struct AddonAPI2 : AddonAPI
 
 	/* Events */
 	EVENTS_RAISE				RaiseEvent;
+	EVENTS_RAISENOTIFICATION	RaiseEventNotification;
 	EVENTS_SUBSCRIBE			SubscribeEvent;
 	EVENTS_SUBSCRIBE			UnsubscribeEvent;
 
