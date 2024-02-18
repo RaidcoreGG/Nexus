@@ -459,6 +459,7 @@ namespace Loader
 			LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.)", strPath, addon->Definitions->Signature, addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage, addon->Definitions->APIVersion);
 		}
 		addon->Definitions->Load(api);
+		Events::Raise(EV_ADDON_LOADED, (void*)addon->Definitions->Signature);
 		Events::Raise(EV_MUMBLE_IDENTITY_UPDATED, MumbleIdentity);
 
 		bool locked = addon->Definitions->Unload == nullptr || addon->Definitions->HasFlag(EAddonFlags::DisableHotloading);
@@ -492,6 +493,7 @@ namespace Loader
 			if (addon->State == EAddonState::Loaded)
 			{
 				addon->Definitions->Unload();
+				Events::Raise(EV_ADDON_UNLOADED, (void*)addon->Definitions->Signature);
 			}
 			else if (addon->State == EAddonState::LoadedLOCKED && aIsShutdown)
 			{
@@ -499,6 +501,7 @@ namespace Loader
 				{
 					/* If it's a shutdown and Unload is defined, let the addon run its shutdown routine to save settings etc, but do not freelib */
 					addon->Definitions->Unload();
+					Events::Raise(EV_ADDON_UNLOADED, (void*)addon->Definitions->Signature);
 				}
 			}
 		}
