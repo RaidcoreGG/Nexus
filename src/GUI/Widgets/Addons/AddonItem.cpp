@@ -208,7 +208,6 @@ namespace GUI
 							{
 								Loader::InstallAddon(aAddon);
 								aAddon->IsInstalling = false;
-								Loader::NotifyChanges();
 							})
 							.detach();
 					}
