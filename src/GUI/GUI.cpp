@@ -474,24 +474,121 @@ namespace GUI
 	{
 		ImGuiIO& io = ImGui::GetIO();
 
-		/* add user font, or fallback to default */
-		if (std::filesystem::exists(Path::F_FONT))
+		if (!Settings::Settings.is_null())
 		{
-			FontSize = 16.0f;
-			if (!Settings::Settings.is_null())
+			if (!Settings::Settings[OPT_ACCEPTEULA].is_null())
 			{
-				if (!Settings::Settings[OPT_FONTSIZE].is_null())
-				{
-					Settings::Settings[OPT_FONTSIZE].get_to(FontSize);
-				}
-				else
-				{
-					Settings::Settings[OPT_FONTSIZE] = FontSize;
-					Settings::Save();
-				}
+				Settings::Settings[OPT_ACCEPTEULA].get_to(HasAcceptedEULA);
 			}
-			std::string strFont = Path::F_FONT.string();
+			else
+			{
+				HasAcceptedEULA = false;
+			}
 
+			if (!Settings::Settings[OPT_NOTIFYCHANGELOG].is_null())
+			{
+				Settings::Settings[OPT_NOTIFYCHANGELOG].get_to(NotifyChangelog);
+			}
+			else
+			{
+				NotifyChangelog = false;
+			}
+
+			if (!Settings::Settings[OPT_FONTSIZE].is_null())
+			{
+				Settings::Settings[OPT_FONTSIZE].get_to(FontSize);
+			}
+			else
+			{
+				FontSize = 16.0f;
+			}
+
+			if (!Settings::Settings[OPT_LASTUISCALE].is_null() && Renderer::Scaling == 0)
+			{
+				Settings::Settings[OPT_LASTUISCALE].get_to(LastScaling);
+				Settings::Settings[OPT_LASTUISCALE].get_to(Renderer::Scaling);
+			}
+			else
+			{
+				LastScaling = SC_NORMAL;
+				Renderer::Scaling = SC_NORMAL;
+				Settings::Settings[OPT_LASTUISCALE] = SC_NORMAL;
+			}
+
+			if (!Settings::Settings[OPT_QAVERTICAL].is_null())
+			{
+				Settings::Settings[OPT_QAVERTICAL].get_to(QuickAccess::VerticalLayout);
+			}
+			else
+			{
+				QuickAccess::VerticalLayout = false;
+				Settings::Settings[OPT_QAVERTICAL] = false;
+			}
+
+			if (!Settings::Settings[OPT_QALOCATION].is_null())
+			{
+				Settings::Settings[OPT_QALOCATION].get_to(QuickAccess::Location);
+			}
+			else
+			{
+				QuickAccess::Location = EQAPosition::Extend;
+				Settings::Settings[OPT_QALOCATION] = 0;
+			}
+
+			if (!Settings::Settings[OPT_QAOFFSETX].is_null() && !Settings::Settings[OPT_QAOFFSETY].is_null())
+			{
+				Settings::Settings[OPT_QAOFFSETX].get_to(QuickAccess::Offset.x);
+				Settings::Settings[OPT_QAOFFSETY].get_to(QuickAccess::Offset.y);
+			}
+			else
+			{
+				QuickAccess::Offset = ImVec2(0.0f, 0.0f);
+				Settings::Settings[OPT_QAOFFSETX] = 0.0f;
+				Settings::Settings[OPT_QAOFFSETY] = 0.0f;
+			}
+
+			if (!Settings::Settings[OPT_CLOSEMENU].is_null())
+			{
+				Settings::Settings[OPT_CLOSEMENU].get_to(CloseMenuAfterSelecting);
+			}
+			else
+			{
+				CloseMenuAfterSelecting = true;
+				Settings::Settings[OPT_CLOSEMENU] = true;
+			}
+
+			if (!Settings::Settings[OPT_CLOSEESCAPE].is_null())
+			{
+				Settings::Settings[OPT_CLOSEESCAPE].get_to(CloseOnEscape);
+			}
+			else
+			{
+				CloseOnEscape = true;
+				Settings::Settings[OPT_CLOSEESCAPE] = true;
+			}
+
+			if (!Settings::Settings[OPT_LINKARCSTYLE].is_null())
+			{
+				Settings::Settings[OPT_LINKARCSTYLE].get_to(LinkArcDPSStyle);
+			}
+			else
+			{
+				LinkArcDPSStyle = true;
+				Settings::Settings[OPT_LINKARCSTYLE] = true;
+			}
+		}
+
+		ImportArcDPSStyle();
+
+		/* add user font, or fallback to default */
+		if (!LinkArcDPSStyle && std::filesystem::exists(Path::F_FONT))
+		{
+			std::string strFont = Path::F_FONT.string();
+			io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize);
+		}
+		else if (LinkArcDPSStyle && std::filesystem::exists(Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf"))
+		{
+			std::string strFont = (Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf").string();
 			io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize);
 		}
 		else
@@ -500,52 +597,11 @@ namespace GUI
 		}
 
 		/* load gw2 fonts */
-
 		LPVOID resM{}; DWORD szM{};
-		HRSRC hResM = FindResourceA(NexusHandle, MAKEINTRESOURCE(RES_FONT_MENOMONIA), RT_FONT);
-		if (hResM)
-		{
-			HGLOBAL hLResM = LoadResource(NexusHandle, hResM);
-
-			if (hLResM)
-			{
-				LPVOID pLResM = LockResource(hLResM);
-
-				if (pLResM)
-				{
-					DWORD dwResSzM = SizeofResource(NexusHandle, hResM);
-
-					if (0 != dwResSzM)
-					{
-						resM = pLResM;
-						szM = dwResSzM;
-					}
-				}
-			}
-		}
+		GetResource(NexusHandle, MAKEINTRESOURCE(RES_FONT_MENOMONIA), RT_FONT, &resM, &szM);
 
 		LPVOID resT{}; DWORD szT{};
-		HRSRC hResT = FindResourceA(NexusHandle, MAKEINTRESOURCE(RES_FONT_TREBUCHET), RT_FONT);
-		if (hResT)
-		{
-			HGLOBAL hLResT = LoadResource(NexusHandle, hResT);
-
-			if (hLResT)
-			{
-				LPVOID pLResT = LockResource(hLResT);
-
-				if (pLResT)
-				{
-					DWORD dwResSzT = SizeofResource(NexusHandle, hResT);
-
-					if (0 != dwResSzT)
-					{
-						resT = pLResT;
-						szT = dwResSzT;
-					}
-				}
-			}
-		}
+		GetResource(NexusHandle, MAKEINTRESOURCE(RES_FONT_TREBUCHET), RT_FONT, &resT, &szT);
 
 		GUI::Mutex.lock();
 		{
@@ -661,101 +717,6 @@ namespace GUI
 		/* add shortcut */
 		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "Nexus Menu");
 
-		if (!Settings::Settings.is_null())
-		{
-			if (!Settings::Settings[OPT_ACCEPTEULA].is_null())
-			{
-				Settings::Settings[OPT_ACCEPTEULA].get_to(HasAcceptedEULA);
-			}
-			else
-			{
-				HasAcceptedEULA = false;
-			}
-
-			if (!Settings::Settings[OPT_NOTIFYCHANGELOG].is_null())
-			{
-				Settings::Settings[OPT_NOTIFYCHANGELOG].get_to(NotifyChangelog);
-			}
-			else
-			{
-				NotifyChangelog = false;
-			}
-
-			if (!Settings::Settings[OPT_LASTUISCALE].is_null() && Renderer::Scaling == 0)
-			{
-				Settings::Settings[OPT_LASTUISCALE].get_to(LastScaling);
-				Settings::Settings[OPT_LASTUISCALE].get_to(Renderer::Scaling);
-			}
-			else
-			{
-				LastScaling = SC_NORMAL;
-				Renderer::Scaling = SC_NORMAL;
-				Settings::Settings[OPT_LASTUISCALE] = SC_NORMAL;
-			}
-
-			if (!Settings::Settings[OPT_QAVERTICAL].is_null())
-			{
-				Settings::Settings[OPT_QAVERTICAL].get_to(QuickAccess::VerticalLayout);
-			}
-			else
-			{
-				QuickAccess::VerticalLayout = false;
-				Settings::Settings[OPT_QAVERTICAL] = false;
-			}
-
-			if (!Settings::Settings[OPT_QALOCATION].is_null())
-			{
-				Settings::Settings[OPT_QALOCATION].get_to(QuickAccess::Location);
-			}
-			else
-			{
-				QuickAccess::Location = EQAPosition::Extend;
-				Settings::Settings[OPT_QALOCATION] = 0;
-			}
-
-			if (!Settings::Settings[OPT_QAOFFSETX].is_null() && !Settings::Settings[OPT_QAOFFSETY].is_null())
-			{
-				Settings::Settings[OPT_QAOFFSETX].get_to(QuickAccess::Offset.x);
-				Settings::Settings[OPT_QAOFFSETY].get_to(QuickAccess::Offset.y);
-			}
-			else
-			{
-				QuickAccess::Offset = ImVec2(0.0f, 0.0f);
-				Settings::Settings[OPT_QAOFFSETX] = 0.0f;
-				Settings::Settings[OPT_QAOFFSETY] = 0.0f;
-			}
-
-			if (!Settings::Settings[OPT_CLOSEMENU].is_null())
-			{
-				Settings::Settings[OPT_CLOSEMENU].get_to(CloseMenuAfterSelecting);
-			}
-			else
-			{
-				CloseMenuAfterSelecting = true;
-				Settings::Settings[OPT_CLOSEMENU] = true;
-			}
-
-			if (!Settings::Settings[OPT_CLOSEESCAPE].is_null())
-			{
-				Settings::Settings[OPT_CLOSEESCAPE].get_to(CloseOnEscape);
-			}
-			else
-			{
-				CloseOnEscape = true;
-				Settings::Settings[OPT_CLOSEESCAPE] = true;
-			}
-
-			if (!Settings::Settings[OPT_LINKARCSTYLE].is_null())
-			{
-				Settings::Settings[OPT_LINKARCSTYLE].get_to(LinkArcDPSStyle);
-			}
-			else
-			{
-				LinkArcDPSStyle = true;
-				Settings::Settings[OPT_LINKARCSTYLE] = true;
-			}
-		}
-
 		if (IsUpdateAvailable && NotifyChangelog)
 		{
 			QuickAccess::NotifyShortcut(QA_MENU);
@@ -767,8 +728,6 @@ namespace GUI
 			AddWindow(eulaModal);
 			Events::Subscribe(EV_EULA_ACCEPTED, OnEULAAccepted);
 		}
-
-		ImportArcDPSStyle();
 
 		IsSetup = true;
 	}

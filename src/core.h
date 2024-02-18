@@ -41,3 +41,5 @@ namespace Base64
 long long Timestamp();
 
 bool CreateDirectoryRecursive(std::string const& dirName, std::error_code& err);
+
+bool GetResource(HMODULE aModule, LPCSTR aResourceName, LPCSTR aResourceType, LPVOID* aOutLockedResource, DWORD* aOutResourceSize);

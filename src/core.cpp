@@ -348,3 +348,35 @@ bool CreateDirectoryRecursive(std::string const& dirName, std::error_code& err)
 	}
 	return true;
 }
+
+bool GetResource(HMODULE aModule, LPCSTR aResourceName, LPCSTR aResourceType, LPVOID* aOutLockedResource, DWORD* aOutResourceSize)
+{
+	HRSRC hRes = FindResourceA(aModule, aResourceName, aResourceType);
+	if (!hRes)
+	{
+		return false;
+	}
+
+	HGLOBAL hLRes = LoadResource(aModule, hRes);
+	if (!hLRes)
+	{
+		return false;
+	}
+
+	LPVOID pLRes = LockResource(hLRes);
+	if (!pLRes)
+	{
+		return false;
+	}
+
+	DWORD dwResSz = SizeofResource(aModule, hRes);
+	if (!dwResSz)
+	{
+		return false;
+	}
+
+	*aOutLockedResource = pLRes;
+	*aOutResourceSize = dwResSz;
+
+	return true;
+}
