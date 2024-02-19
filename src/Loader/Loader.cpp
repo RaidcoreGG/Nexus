@@ -78,7 +78,7 @@ namespace Loader
 			FSNotifierID = SHChangeNotifyRegister(
 				Renderer::WindowHandle,
 				SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
-				SHCNE_UPDATEITEM,
+				SHCNE_UPDATEITEM | SHCNE_UPDATEDIR,
 				WM_ADDONDIRUPDATE,
 				1,
 				&changeentry
@@ -155,7 +155,7 @@ namespace Loader
 
 			if (notificationLock != 0)
 			{
-				if (event == SHCNE_UPDATEITEM)
+				if (event == SHCNE_UPDATEITEM || event == SHCNE_UPDATEDIR)
 				{
 					char path[MAX_PATH];
 					if (SHGetPathFromIDList(ppidl[0], path))
