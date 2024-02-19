@@ -454,21 +454,6 @@ namespace GUI
 			}
 		}
 	}
-	void OnEULAAccepted(void* aEventArgs)
-	{
-		Mutex.lock();
-		auto it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) {
-			return wnd->Name == "EULAModal";
-		});
-
-		if (it != Windows.end())
-		{
-			delete (*it);
-			Windows.erase(it);
-		}
-		Mutex.unlock();
-		Events::Unsubscribe(EV_EULA_ACCEPTED, OnEULAAccepted);
-	}
 
 	void Setup()
 	{
@@ -741,7 +726,6 @@ namespace GUI
 		{
 			EULAModal* eulaModal = new EULAModal();
 			AddWindow(eulaModal);
-			Events::Subscribe(EV_EULA_ACCEPTED, OnEULAAccepted);
 		}
 
 		IsSetup = true;

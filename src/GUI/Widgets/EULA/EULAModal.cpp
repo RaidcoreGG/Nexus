@@ -80,7 +80,15 @@ namespace GUI
 			if (close)
 			{
 				ImGui::CloseCurrentPopup();
-				Events::RaiseNotification(EV_EULA_ACCEPTED);
+				auto it = std::find_if(GUI::Windows.begin(), GUI::Windows.end(), [](const IWindow* wnd) {
+					return wnd->Name == "EULAModal";
+					});
+
+				if (it != GUI::Windows.end())
+				{
+					delete (*it);
+					GUI::Windows.erase(it);
+				}
 			}
 
 			ImGui::EndPopup();
