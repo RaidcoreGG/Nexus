@@ -139,6 +139,8 @@ RES_TEX_BTNCLOSE_HOVER			PNG             "Resources\\BtnClose_Hover.png"
 RES_TEX_TITLEBAREND				PNG             "Resources\\TitleBarEnd.png"
 RES_TEX_TITLEBAREND_HOVER		PNG             "Resources\\TitleBarEnd_Hover.png"
 
+RES_ARCDPS_INTEGRATION			DLL				"Resources\\bin64\\arcdps_integration64.dll"
+
 #endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
 

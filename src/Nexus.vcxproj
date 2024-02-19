@@ -318,6 +318,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
+    <None Include="Resources\bin64\arcdps_integration64.dll" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Resources\Fonts\Menomonia.ttf" />

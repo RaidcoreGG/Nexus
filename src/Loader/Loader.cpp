@@ -7,6 +7,8 @@
 #include <malloc.h>
 #include <vector>
 
+#include "resource.h"
+
 #include "core.h"
 #include "State.h"
 #include "Shared.h"
@@ -464,6 +466,48 @@ namespace Loader
 
 		bool locked = addon->Definitions->Unload == nullptr || addon->Definitions->HasFlag(EAddonFlags::DisableHotloading);
 		addon->State = locked ? EAddonState::LoadedLOCKED : EAddonState::Loaded;
+
+		if (addon->Definitions->Signature == 0xFFF694D1)
+		{
+			typedef int (*addextension2)(HINSTANCE);
+			addextension2 exp_addextension2;
+
+			if (true == FindFunction(addon->Module, &exp_addextension2, "addextension2"))
+			{
+				LPVOID res{}; DWORD sz{};
+				GetResource(NexusHandle, MAKEINTRESOURCE(RES_ARCDPS_INTEGRATION), "DLL", &res, &sz);
+
+				try
+				{
+					if (std::filesystem::exists(Path::F_ARCDPSINTEGRATION))
+					{
+						std::filesystem::remove(Path::F_ARCDPSINTEGRATION);
+					}
+
+					std::ofstream file(Path::F_ARCDPSINTEGRATION, std::ios::binary);
+					file.write((const char*)res, sz);
+					file.close();
+
+					HMODULE arcInt64 = LoadLibraryA(Path::F_ARCDPSINTEGRATION.string().c_str());
+					int result = exp_addextension2(arcInt64);
+
+					LogInfo(CH_LOADER, "Deployed ArcDPS Integration. Result: %d", result);
+					if (result == 0)
+					{
+						QueueAddon(ELoaderAction::Load, Path::F_ARCDPSINTEGRATION);
+					}
+				}
+				catch (std::filesystem::filesystem_error fErr)
+				{
+					LogDebug(CH_LOADER, "%s", fErr.what());
+					return;
+				}
+			}
+			else
+			{
+				LogWarning(CH_LOADER, "Addon with signature \"0xFFF694D1\" found but \"addextension2\" is not exported. ArcDPS combat events won't be relayed.");
+			}
+		}
 	}
 	void UnloadAddon(const std::filesystem::path& aPath, bool aIsShutdown)
 	{
