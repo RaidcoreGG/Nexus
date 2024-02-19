@@ -18,6 +18,8 @@ extern const char* OPT_QALOCATION;
 extern const char* OPT_QAOFFSETX;
 extern const char* OPT_QAOFFSETY;
 extern const char* OPT_LINKARCSTYLE;
+extern const char* OPT_IMGUISTYLE;
+extern const char* OPT_IMGUICOLORS;
 
 namespace Settings
 {

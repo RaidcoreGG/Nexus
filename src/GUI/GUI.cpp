@@ -576,6 +576,21 @@ namespace GUI
 				LinkArcDPSStyle = true;
 				Settings::Settings[OPT_LINKARCSTYLE] = true;
 			}
+
+			ImGuiStyle* style = &ImGui::GetStyle();
+			if (!Settings::Settings[OPT_IMGUISTYLE].is_null())
+			{
+				std::string style64 = Settings::Settings[OPT_IMGUISTYLE].get<std::string>();
+				std::string decode = Base64::Decode(&style64[0], style64.length());
+				memcpy(style, &decode[0], decode.length());
+			}
+
+			if (!Settings::Settings[OPT_IMGUICOLORS].is_null())
+			{
+				std::string colors64 = Settings::Settings[OPT_IMGUICOLORS].get<std::string>();
+				std::string decode = Base64::Decode(&colors64[0], colors64.length());
+				memcpy(&style->Colors[0], &decode[0], decode.length());
+			}
 		}
 
 		ImportArcDPSStyle();
