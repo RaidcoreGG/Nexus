@@ -171,6 +171,7 @@ namespace GUI
 					ImportArcDPSStyle();
 					Settings::Save();
 				}
+				ImGui::TooltipGeneric("This will read out the ImGui style settings from ArcDPS and apply them to Nexus.\nChanging ArcDPS style at runtime is not reflected by Nexus as ArcDPS does only save on shutdown.\nRestart required.");
 
 				if (!GUI::LinkArcDPSStyle)
 				{
