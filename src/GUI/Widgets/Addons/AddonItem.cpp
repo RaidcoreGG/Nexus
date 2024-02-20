@@ -121,7 +121,7 @@ namespace GUI
 						}
 					}
 				}
-				if (!((aAddon->Definitions->Unload == nullptr && aAddon->State == EAddonState::Loaded) || aAddon->Definitions->HasFlag(EAddonFlags::DisableHotloading)))
+				if (aAddon->State == EAddonState::Loaded || aAddon->State == EAddonState::LoadedLOCKED)
 				{
 					amtBtns++;
 					if (ImGui::GW2Button(("Uninstall##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
@@ -134,6 +134,10 @@ namespace GUI
 								Loader::QueueAddon(ELoaderAction::Uninstall, it.first);
 							}
 						}
+					}
+					if (aAddon->State == EAddonState::LoadedLOCKED)
+					{
+						ImGui::TooltipGeneric("This addon is currently locked and requires a restart to be removed.");
 					}
 				}
 				if (aAddon->Definitions->Provider == EUpdateProvider::GitHub && aAddon->Definitions->UpdateLink)

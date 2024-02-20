@@ -61,6 +61,7 @@ namespace Loader
 	std::string extDll			= ".dll";
 	std::string extUpdate		= ".update";
 	std::string extOld			= ".old";
+	std::string extUninstall	= ".uninstall";
 
 	void Initialize()
 	{
@@ -300,6 +301,19 @@ namespace Loader
 					if (path.extension() == extDll)
 					{
 						QueueAddon(ELoaderAction::Load, path);
+					}
+
+					if (path.extension() == extUninstall)
+					{
+						try
+						{
+							std::filesystem::remove(path);
+						}
+						catch (std::filesystem::filesystem_error fErr)
+						{
+							LogDebug(CH_LOADER, "%s", fErr.what());
+							return;
+						}
 					}
 				}
 			}
@@ -586,7 +600,7 @@ namespace Loader
 			{
 				try
 				{
-					std::filesystem::rename(aPath, aPath.string() + extOld);
+					std::filesystem::rename(aPath, aPath.string() + extUninstall);
 					Addons.erase(aPath); // remove from addons list anyway
 					LogWarning(CH_LOADER, "Addon is stilled loaded, it will be uninstalled the next time the game is restarted: %s", aPath.string().c_str());
 				}
