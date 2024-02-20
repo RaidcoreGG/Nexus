@@ -681,7 +681,15 @@ namespace Loader
 		Addon* addon = (*it).second;
 
 		/* cleanup old files */
-		if (std::filesystem::exists(pathOld)) { std::filesystem::remove(pathOld); }
+		try
+		{
+			if (std::filesystem::exists(pathOld)) { std::filesystem::remove(pathOld); }
+		}
+		catch (std::filesystem::filesystem_error fErr)
+		{
+			LogDebug(CH_LOADER, "%s", fErr.what());
+			return true; // report as update here, as it was probably moved here during runtime but the dll is locked
+		}
 		if (std::filesystem::exists(pathUpdate))
 		{
 			if (addon->MD5 != MD5FromFile(pathUpdate))
@@ -689,7 +697,15 @@ namespace Loader
 				return true;
 			}
 
-			std::filesystem::remove(pathUpdate);
+			try
+			{
+				std::filesystem::remove(pathUpdate);
+			}
+			catch (std::filesystem::filesystem_error fErr)
+			{
+				LogDebug(CH_LOADER, "%s", fErr.what());
+				return false;
+			}
 		}
 
 		bool wasUpdated = false;
