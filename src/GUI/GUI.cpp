@@ -331,30 +331,30 @@ namespace GUI
 				if (arcIni.is_open())
 				{
 					std::string line;
-					std::string style = "appearance_imgui_style180=";
-					std::string colours = "appearance_imgui_colours180=";
+					std::string styleKey = "appearance_imgui_style180=";
+					std::string coloursKey = "appearance_imgui_colours180=";
+					std::string fontSizeKey = "font_size=";
+
+					ImGuiStyle* style = &ImGui::GetStyle();
 
 					while (std::getline(arcIni, line))
 					{
-						if (line.find(style, 0) != line.npos)
+						if (line.find(styleKey, 0) != line.npos)
 						{
-							line = line.substr(style.length());
-
-							ImGuiStyle* style = &ImGui::GetStyle();
-
+							line = line.substr(styleKey.length());
 							std::string decode = Base64::Decode(&line[0], line.length());
-
 							memcpy(style, &decode[0], decode.length());
 						}
-						else if (line.find(colours, 0) != line.npos)
+						else if (line.find(coloursKey, 0) != line.npos)
 						{
-							line = line.substr(colours.length());
-
-							ImGuiStyle* style = &ImGui::GetStyle();
-
+							line = line.substr(coloursKey.length());
 							std::string decode = Base64::Decode(&line[0], line.length());
-
 							memcpy(&style->Colors[0], &decode[0], decode.length());
+						}
+						else if (line.find(fontSizeKey, 0) != line.npos)
+						{
+							line = line.substr(fontSizeKey.length());
+							FontSize = std::stof(line);
 						}
 					}
 					arcIni.close();
