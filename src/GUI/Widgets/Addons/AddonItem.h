@@ -7,7 +7,7 @@
 namespace GUI
 {
 	void AddonItem(Addon* aAddon);
-	void AddonItem(LibraryAddon* aAddon);
+	void AddonItem(LibraryAddon* aAddon, bool aInstalled = false);
 }
 
 #endif

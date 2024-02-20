@@ -158,7 +158,7 @@ namespace GUI
 		}
 	}
 
-	void AddonItem(LibraryAddon* aAddon)
+	void AddonItem(LibraryAddon* aAddon, bool aInstalled)
 	{
 		float btnHeight = 22.0f * Renderer::Scaling;
 		float itemWidthScaled = itemWidth * Renderer::Scaling;
@@ -204,17 +204,25 @@ namespace GUI
 				ImGui::BeginChild("##AddonItemActions", ImVec2(actionsWidth, itemHeightScaled - 12.0f - 12.0f));
 
 				// just check if loaded, if it was not hot-reloadable it would be EAddonState::LoadedLOCKED
-				if (ImGui::GW2Button(aAddon->IsInstalling ? ("Installing...##" + sig).c_str()  : ("Install##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+				if (!aInstalled)
 				{
-					if (!aAddon->IsInstalling)
+
+					if (ImGui::GW2Button(aAddon->IsInstalling ? ("Installing...##" + sig).c_str() : ("Install##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
-						std::thread([aAddon]()
-							{
-								Loader::InstallAddon(aAddon);
-								aAddon->IsInstalling = false;
-							})
-							.detach();
+						if (!aAddon->IsInstalling)
+						{
+							std::thread([aAddon]()
+								{
+									Loader::InstallAddon(aAddon);
+									aAddon->IsInstalling = false;
+								})
+								.detach();
+						}
 					}
+				}
+				else
+				{
+					ImGui::Text("Already installed.");
 				}
 				if (aAddon->Provider == EUpdateProvider::GitHub && !aAddon->DownloadURL.empty())
 				{

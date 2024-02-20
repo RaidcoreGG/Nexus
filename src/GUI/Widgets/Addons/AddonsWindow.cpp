@@ -23,6 +23,8 @@ namespace GUI
 	float contentWidth = 540.0f;
 	float contentHeight = 410.0f;
 
+	bool showInstalled = false;
+
 	AddonsWindow::AddonsWindow(std::string aName)
 	{
 		Name = aName;
@@ -194,9 +196,9 @@ namespace GUI
 										}
 									}
 								}
-								if (!exists)
+								if (false == exists || true == showInstalled)
 								{
-									AddonItem(libAddon);
+									AddonItem(libAddon, exists);
 									downloadable++;
 								}
 							}
@@ -213,6 +215,8 @@ namespace GUI
 
 						ImGui::EndChild();
 					}
+
+					ImGui::Checkbox("Show already installed", &showInstalled);
 				}
 
 				ImGui::EndChild();
