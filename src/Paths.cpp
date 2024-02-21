@@ -64,7 +64,7 @@ namespace Path
 		F_UPDATE_DLL = F_HOST_DLL.string() + ".update";									/* get update dll path */
 		PathSystemAppend(F_SYSTEM_DLL, "d3d11.dll");									/* get system dll path */
 		F_CHAINLOAD_DLL = D_GW2 / "d3d11_chainload.dll";								/* get chainload dll path */
-		F_ARCDPSINTEGRATION = D_GW2_ADDONS_NEXUS / "arcdps_intergration64.dll";			/* get arcdps integration dll path */
+		F_ARCDPSINTEGRATION = D_GW2_ADDONS_NEXUS / "arcdps_integration64.dll";			/* get arcdps integration dll path */
 
 		/* push to paths */
 		ExistingPaths.push_back(D_GW2.string());
