@@ -23,6 +23,7 @@ namespace Path
 	extern std::filesystem::path F_OLD_DLL;
 	extern std::filesystem::path F_SYSTEM_DLL;
 	extern std::filesystem::path F_CHAINLOAD_DLL;
+	extern std::filesystem::path F_ARCDPSINTEGRATION;
 
 	extern std::filesystem::path F_LOG;
 	extern std::filesystem::path F_KEYBINDS;
