@@ -23,6 +23,8 @@ namespace GUI
 	float contentWidth = 540.0f;
 	float contentHeight = 410.0f;
 
+	bool showInstalled = false;
+
 	AddonsWindow::AddonsWindow(std::string aName)
 	{
 		Name = aName;
@@ -158,6 +160,7 @@ namespace GUI
 							{
 								for (auto& [path, addon] : Loader::Addons)
 								{
+									if (path.filename() == "arcdps_integration64.dll") { continue; }
 									AddonItem(addon);
 								}
 							}
@@ -171,6 +174,34 @@ namespace GUI
 						std::string strAddons = Path::D_GW2_ADDONS.string();
 						ShellExecuteA(NULL, "explore", strAddons.c_str(), NULL, NULL, SW_SHOW);
 					}
+					ImGui::SameLine();
+					if (ImGui::GW2Button("Check for Updates", ImVec2(ImGui::CalcTextSize("Check for Updates").x + 16.0f, btnHeight)))
+					{
+						const std::lock_guard<std::mutex> lock(Loader::Mutex);
+						{
+							for (auto& [path, addon] : Loader::Addons)
+							{
+								if (nullptr == addon->Definitions) { continue; }
+
+								std::filesystem::path tmpPath = path.string();
+								signed int tmpSig = addon->Definitions->Signature;
+								std::string tmpName = addon->Definitions->Name;
+								AddonVersion tmpVers = addon->Definitions->Version;
+								EUpdateProvider tmpProv = addon->Definitions->Provider;
+								std::string tmpLink = addon->Definitions->UpdateLink != nullptr ? addon->Definitions->UpdateLink : "";
+
+								std::thread([tmpPath, tmpSig, tmpName, tmpVers, tmpProv, tmpLink]()
+									{
+										if (Loader::UpdateAddon(tmpPath, tmpSig, tmpName, tmpVers, tmpProv, tmpLink))
+										{
+											Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
+										}
+									})
+									.detach();
+							}
+						}
+					}
+					ImGui::TooltipGeneric("Checks each addon and updates it, if available.\nSome addons require a restart to apply the update and won't take effect immediately.");
 				}
 				else if (TabIndex == 1)
 				{
@@ -194,9 +225,9 @@ namespace GUI
 										}
 									}
 								}
-								if (!exists)
+								if (false == exists || true == showInstalled)
 								{
-									AddonItem(libAddon);
+									AddonItem(libAddon, exists);
 									downloadable++;
 								}
 							}
@@ -213,6 +244,8 @@ namespace GUI
 
 						ImGui::EndChild();
 					}
+
+					ImGui::Checkbox("Show already installed", &showInstalled);
 				}
 
 				ImGui::EndChild();

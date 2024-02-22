@@ -7,6 +7,8 @@
 #include <malloc.h>
 #include <vector>
 
+#include "resource.h"
+
 #include "core.h"
 #include "State.h"
 #include "Shared.h"
@@ -61,6 +63,7 @@ namespace Loader
 	std::string extDll			= ".dll";
 	std::string extUpdate		= ".update";
 	std::string extOld			= ".old";
+	std::string extUninstall	= ".uninstall";
 
 	void Initialize()
 	{
@@ -78,7 +81,7 @@ namespace Loader
 			FSNotifierID = SHChangeNotifyRegister(
 				Renderer::WindowHandle,
 				SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
-				SHCNE_UPDATEITEM,
+				SHCNE_UPDATEITEM | SHCNE_UPDATEDIR,
 				WM_ADDONDIRUPDATE,
 				1,
 				&changeentry
@@ -155,7 +158,7 @@ namespace Loader
 
 			if (notificationLock != 0)
 			{
-				if (event == SHCNE_UPDATEITEM)
+				if (event == SHCNE_UPDATEITEM || event == SHCNE_UPDATEDIR)
 				{
 					char path[MAX_PATH];
 					if (SHGetPathFromIDList(ppidl[0], path))
@@ -300,6 +303,19 @@ namespace Loader
 					if (path.extension() == extDll)
 					{
 						QueueAddon(ELoaderAction::Load, path);
+					}
+
+					if (path.extension() == extUninstall)
+					{
+						try
+						{
+							std::filesystem::remove(path);
+						}
+						catch (std::filesystem::filesystem_error fErr)
+						{
+							LogDebug(CH_LOADER, "%s", fErr.what());
+							return;
+						}
 					}
 				}
 			}
@@ -459,9 +475,53 @@ namespace Loader
 			LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.)", strPath, addon->Definitions->Signature, addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage, addon->Definitions->APIVersion);
 		}
 		addon->Definitions->Load(api);
+		Events::Raise(EV_ADDON_LOADED, &addon->Definitions->Signature);
+		Events::Raise(EV_MUMBLE_IDENTITY_UPDATED, MumbleIdentity);
 
 		bool locked = addon->Definitions->Unload == nullptr || addon->Definitions->HasFlag(EAddonFlags::DisableHotloading);
 		addon->State = locked ? EAddonState::LoadedLOCKED : EAddonState::Loaded;
+
+		if (addon->Definitions->Signature == 0xFFF694D1)
+		{
+			typedef int (*addextension2)(HINSTANCE);
+			addextension2 exp_addextension2;
+
+			if (true == FindFunction(addon->Module, &exp_addextension2, "addextension2"))
+			{
+				LPVOID res{}; DWORD sz{};
+				GetResource(NexusHandle, MAKEINTRESOURCE(RES_ARCDPS_INTEGRATION), "DLL", &res, &sz);
+
+				try
+				{
+					if (std::filesystem::exists(Path::F_ARCDPSINTEGRATION))
+					{
+						std::filesystem::remove(Path::F_ARCDPSINTEGRATION);
+					}
+
+					std::ofstream file(Path::F_ARCDPSINTEGRATION, std::ios::binary);
+					file.write((const char*)res, sz);
+					file.close();
+
+					HMODULE arcInt64 = LoadLibraryA(Path::F_ARCDPSINTEGRATION.string().c_str());
+					int result = exp_addextension2(arcInt64);
+
+					LogInfo(CH_LOADER, "Deployed ArcDPS Integration. Result: %d", result);
+					if (result == 0)
+					{
+						QueueAddon(ELoaderAction::Load, Path::F_ARCDPSINTEGRATION);
+					}
+				}
+				catch (std::filesystem::filesystem_error fErr)
+				{
+					LogDebug(CH_LOADER, "%s", fErr.what());
+					return;
+				}
+			}
+			else
+			{
+				LogWarning(CH_LOADER, "Addon with signature \"0xFFF694D1\" found but \"addextension2\" is not exported. ArcDPS combat events won't be relayed.");
+			}
+		}
 	}
 	void UnloadAddon(const std::filesystem::path& aPath, bool aIsShutdown)
 	{
@@ -491,6 +551,7 @@ namespace Loader
 			if (addon->State == EAddonState::Loaded)
 			{
 				addon->Definitions->Unload();
+				Events::Raise(EV_ADDON_UNLOADED, &addon->Definitions->Signature);
 			}
 			else if (addon->State == EAddonState::LoadedLOCKED && aIsShutdown)
 			{
@@ -498,6 +559,7 @@ namespace Loader
 				{
 					/* If it's a shutdown and Unload is defined, let the addon run its shutdown routine to save settings etc, but do not freelib */
 					addon->Definitions->Unload();
+					Events::Raise(EV_ADDON_UNLOADED, &addon->Definitions->Signature);
 				}
 			}
 		}
@@ -582,7 +644,7 @@ namespace Loader
 			{
 				try
 				{
-					std::filesystem::rename(aPath, aPath.string() + extOld);
+					std::filesystem::rename(aPath, aPath.string() + extUninstall);
 					Addons.erase(aPath); // remove from addons list anyway
 					LogWarning(CH_LOADER, "Addon is stilled loaded, it will be uninstalled the next time the game is restarted: %s", aPath.string().c_str());
 				}
@@ -663,7 +725,15 @@ namespace Loader
 		Addon* addon = (*it).second;
 
 		/* cleanup old files */
-		if (std::filesystem::exists(pathOld)) { std::filesystem::remove(pathOld); }
+		try
+		{
+			if (std::filesystem::exists(pathOld)) { std::filesystem::remove(pathOld); }
+		}
+		catch (std::filesystem::filesystem_error fErr)
+		{
+			LogDebug(CH_LOADER, "%s", fErr.what());
+			return true; // report as update here, as it was probably moved here during runtime but the dll is locked
+		}
 		if (std::filesystem::exists(pathUpdate))
 		{
 			if (addon->MD5 != MD5FromFile(pathUpdate))
@@ -671,7 +741,15 @@ namespace Loader
 				return true;
 			}
 
-			std::filesystem::remove(pathUpdate);
+			try
+			{
+				std::filesystem::remove(pathUpdate);
+			}
+			catch (std::filesystem::filesystem_error fErr)
+			{
+				LogDebug(CH_LOADER, "%s", fErr.what());
+				return false;
+			}
 		}
 
 		bool wasUpdated = false;
@@ -1088,6 +1166,7 @@ namespace Loader
 		}
 
 		LogInfo(CH_LOADER, "Successfully installed %s.", aAddon->Name.c_str());
+		NotifyChanges();
 	}
 
 	AddonAPI* GetAddonAPI(int aVersion)
@@ -1173,6 +1252,7 @@ namespace Loader
 			((AddonAPI2*)api)->Log = LogMessageAddon;
 
 			((AddonAPI2*)api)->RaiseEvent = Events::Raise;
+			((AddonAPI2*)api)->RaiseEventNotification = Events::RaiseNotification;
 			((AddonAPI2*)api)->SubscribeEvent = Events::Subscribe;
 			((AddonAPI2*)api)->UnsubscribeEvent = Events::Unsubscribe;
 

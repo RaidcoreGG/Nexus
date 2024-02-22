@@ -48,6 +48,8 @@
 #define RES_TEX_TITLEBAREND				510
 #define RES_TEX_TITLEBAREND_HOVER		511
 
+#define RES_ARCDPS_INTEGRATION			601
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

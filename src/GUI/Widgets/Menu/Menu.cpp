@@ -35,6 +35,7 @@ namespace GUI
 			float bgSz = 220 * Renderer::Scaling;
 			
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 1, 1));
 
 			if (ImGui::Begin("Menu", &Visible, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar))
 			{
@@ -68,6 +69,7 @@ namespace GUI
 			}
 			ImGui::End();
 
+			ImGui::PopStyleColor();
 			ImGui::PopStyleVar();
 		}
 

@@ -19,6 +19,8 @@ const char* OPT_QALOCATION		= "QALocation";
 const char* OPT_QAOFFSETX		= "QAOffsetX";
 const char* OPT_QAOFFSETY		= "QAOffsetY";
 const char* OPT_LINKARCSTYLE	= "LinkWithArcDPSStyle";
+const char* OPT_IMGUISTYLE		= "ImGuiStyle";
+const char* OPT_IMGUICOLORS		= "ImGuiColors";
 
 namespace Settings
 {

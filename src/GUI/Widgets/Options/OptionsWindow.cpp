@@ -171,12 +171,39 @@ namespace GUI
 					ImportArcDPSStyle();
 					Settings::Save();
 				}
+				ImGui::TooltipGeneric("This will read out the ImGui style settings from ArcDPS and apply them to Nexus.\nChanging ArcDPS style at runtime is not reflected by Nexus as ArcDPS does only save on shutdown.\nRestart required.");
 
 				if (!GUI::LinkArcDPSStyle)
 				{
 					ImGuiStyle& style = ImGui::GetStyle();
-					ImGuiStyle ref_saved_style = style;
-					ImGuiStyle* ref = &ref_saved_style;
+
+					if (ImGui::SmallButton("Save Style"))
+					{
+						std::string encode = Base64::Encode((unsigned char*)&style, sizeof(ImGuiStyle));
+						Settings::Settings[OPT_IMGUISTYLE] = encode;
+						Settings::Save();
+
+						encode = Base64::Encode((unsigned char*)&style.Colors[0], sizeof(ImVec4) * ImGuiCol_COUNT);
+						Settings::Settings[OPT_IMGUICOLORS] = encode;
+						Settings::Save();
+					}
+					ImGui::SameLine();
+					if (ImGui::SmallButton("Revert Changes"))
+					{
+						if (!Settings::Settings[OPT_IMGUISTYLE].is_null())
+						{
+							std::string style64 = Settings::Settings[OPT_IMGUISTYLE].get<std::string>();
+							std::string decode = Base64::Decode(&style64[0], style64.length());
+							memcpy(&style, &decode[0], decode.length());
+						}
+
+						if (!Settings::Settings[OPT_IMGUICOLORS].is_null())
+						{
+							std::string colors64 = Settings::Settings[OPT_IMGUICOLORS].get<std::string>();
+							std::string decode = Base64::Decode(&colors64[0], colors64.length());
+							memcpy(&style.Colors[0], &decode[0], decode.length());
+						}
+					}
 
 					if (ImGui::BeginTabBar("##tabs", ImGuiTabBarFlags_None))
 					{
@@ -237,14 +264,6 @@ namespace GUI
 									continue;
 								ImGui::PushID(i);
 								ImGui::ColorEdit4("##color", (float*)&style.Colors[i], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
-								if (memcmp(&style.Colors[i], &ref->Colors[i], sizeof(ImVec4)) != 0)
-								{
-									// Tips: in a real user application, you may want to merge and use an icon font into the main font,
-									// so instead of "Save"/"Revert" you'd use icons!
-									// Read the FAQ and docs/FONTS.md about using icon fonts. It's really easy and super convenient!
-									ImGui::SameLine(0.0f, style.ItemInnerSpacing.x); if (ImGui::Button("Save")) { ref->Colors[i] = style.Colors[i]; }
-									ImGui::SameLine(0.0f, style.ItemInnerSpacing.x); if (ImGui::Button("Revert")) { style.Colors[i] = ref->Colors[i]; }
-								}
 								ImGui::SameLine(0.0f, style.ItemInnerSpacing.x);
 								ImGui::TextUnformatted(name);
 								ImGui::PopID();

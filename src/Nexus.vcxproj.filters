@@ -121,6 +121,9 @@
     <Filter Include="Resource Files\Images\QuickAccess">
       <UniqueIdentifier>{c46e3486-9b1a-4bf8-bc57-adcaf1023e47}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\bin64">
+      <UniqueIdentifier>{86b26924-5f68-4789-a455-7a9aadb24c45}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -1034,6 +1037,9 @@
   <ItemGroup>
     <None Include="exports.def">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Resources\bin64\arcdps_integration64.dll">
+      <Filter>Resource Files\bin64</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -20,6 +20,7 @@ namespace Path
 	std::filesystem::path F_OLD_DLL{};
 	std::filesystem::path F_SYSTEM_DLL{};
 	std::filesystem::path F_CHAINLOAD_DLL{};
+	std::filesystem::path F_ARCDPSINTEGRATION{};
 
 	std::filesystem::path F_LOG{};
 	std::filesystem::path F_KEYBINDS{};
@@ -63,6 +64,7 @@ namespace Path
 		F_UPDATE_DLL = F_HOST_DLL.string() + ".update";									/* get update dll path */
 		PathSystemAppend(F_SYSTEM_DLL, "d3d11.dll");									/* get system dll path */
 		F_CHAINLOAD_DLL = D_GW2 / "d3d11_chainload.dll";								/* get chainload dll path */
+		F_ARCDPSINTEGRATION = D_GW2_ADDONS_NEXUS / "arcdps_integration64.dll";			/* get arcdps integration dll path */
 
 		/* push to paths */
 		ExistingPaths.push_back(D_GW2.string());
