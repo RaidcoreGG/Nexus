@@ -121,7 +121,6 @@ namespace GUI
 						}
 					}
 				}
-				if (aAddon->State == EAddonState::Loaded || aAddon->State == EAddonState::LoadedLOCKED)
 				{
 					amtBtns++;
 					if (ImGui::GW2Button(("Uninstall##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
