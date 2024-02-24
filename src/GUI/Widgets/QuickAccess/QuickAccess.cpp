@@ -9,6 +9,7 @@
 #include "Textures/Texture.h"
 #include "Textures/TextureLoader.h"
 #include "Keybinds/KeybindHandler.h"
+#include "Loader/Loader.h"
 
 namespace GUI
 {
@@ -167,6 +168,7 @@ namespace GUI
 											{
 												if (shortcut)
 												{
+													ImGui::TextDisabled(Loader::GetOwner(shortcut).c_str());
 													shortcut();
 													ImGui::Separator();
 												}

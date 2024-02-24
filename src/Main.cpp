@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <string>
+#include <Psapi.h>
 
 #include "Consts.h"
 #include "Hooks.h"
@@ -46,6 +47,9 @@ namespace Main
 
 		//SetUnhandledExceptionFilter(UnhandledExcHandler);
 		GameHandle = GetModuleHandle(NULL);
+		MODULEINFO moduleInfo{};
+		GetModuleInformation(GetCurrentProcess(), NexusHandle, &moduleInfo, sizeof(moduleInfo));
+		NexusModuleSize = moduleInfo.SizeOfImage;
 
 		Path::Initialize(NexusHandle);
 		LogHandler::Initialize();

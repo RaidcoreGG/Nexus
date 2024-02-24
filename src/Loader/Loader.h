@@ -66,14 +66,7 @@ namespace Loader
 	/* Swaps addon.dll with addon.dll.update. */
 	void UpdateSwapAddon(const std::filesystem::path& aPath);
 	/* Updates an addon. */
-	bool UpdateAddon(
-		const std::filesystem::path& aPath,
-		signed int aSignature,
-		std::string aName,
-		AddonVersion aVersion,
-		EUpdateProvider aProvider,
-		std::string aUpdateLink
-	);
+	bool UpdateAddon(const std::filesystem::path& aPath, signed int aSignature, std::string aName, AddonVersion aVersion, EUpdateProvider aProvider, std::string aUpdateLink);
 	/* Installs an addon. */
 	void InstallAddon(LibraryAddon* aAddon);
 
@@ -86,6 +79,9 @@ namespace Loader
 	void CopyAddonDefs(AddonDefinition* aDefinitions, AddonDefinition** aOutDefinitions);
 	/* HELPER: Frees the addon definitions. */
 	void FreeAddonDefs(AddonDefinition** aDefinitions);
+
+	/* HELPER: Returns the name of the owning addon. Similar to ::Verify. */
+	std::string GetOwner(void* aAddress);
 }
 
 #endif

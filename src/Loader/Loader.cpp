@@ -778,7 +778,7 @@ namespace Loader
 			baseUrl = API_GITHUB;
 			if (aUpdateLink.empty())
 			{
-				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::GitHub but has no UpdateLink set.", aName);
+				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::GitHub but has no UpdateLink set.", aName.c_str());
 				return false;
 			}
 
@@ -789,7 +789,7 @@ namespace Loader
 		case EUpdateProvider::Direct:
 			if (aUpdateLink.empty())
 			{
-				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::Direct but has no UpdateLink set.", aName);
+				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::Direct but has no UpdateLink set.", aName.c_str());
 				return false;
 			}
 
@@ -818,11 +818,11 @@ namespace Loader
 
 			if (remoteVersion > aVersion)
 			{
-				LogInfo(CH_LOADER, "%s is outdated: API replied with Version %s but installed is Version %s", aName, remoteVersion.ToString().c_str(), aVersion.ToString().c_str());
+				LogInfo(CH_LOADER, "%s is outdated: API replied with Version %s but installed is Version %s", aName.c_str(), remoteVersion.ToString().c_str(), aVersion.ToString().c_str());
 
 				RaidcoreAPI->Download(pathUpdate, endpoint + "/download"); // e.g. api.raidcore.gg/addons/17/download
 				
-				LogInfo(CH_LOADER, "Successfully updated %s.", aName);
+				LogInfo(CH_LOADER, "Successfully updated %s.", aName.c_str());
 				wasUpdated = true;
 			}
 		}
@@ -876,7 +876,7 @@ namespace Loader
 
 			if (remoteVersion > aVersion)
 			{
-				LogInfo(CH_LOADER, "%s is outdated: API replied with Version %s but installed is Version %s", aName, remoteVersion.ToString().c_str(), aVersion.ToString().c_str());
+				LogInfo(CH_LOADER, "%s is outdated: API replied with Version %s but installed is Version %s", aName.c_str(), remoteVersion.ToString().c_str(), aVersion.ToString().c_str());
 
 				std::string endpointDownload; // e.g. github.com/RaidcoreGG/GW2-CommandersToolkit/releases/download/20220918-135925/squadmanager.dll
 
@@ -890,14 +890,10 @@ namespace Loader
 				{
 					std::string assetName = asset["name"].get<std::string>();
 
-					if (assetName.size() < 4)
-					{
-						continue;
-					}
-
-					if (std::string_view(assetName).substr(assetName.size() - 4) == ".dll")
+					if (String::Contains(assetName, ".dll"))
 					{
 						asset["browser_download_url"].get_to(endpointDownload);
+						break;
 					}
 				}
 
@@ -923,7 +919,7 @@ namespace Loader
 					return false;
 				}
 
-				LogInfo(CH_LOADER, "Successfully updated %s.", aName);
+				LogInfo(CH_LOADER, "Successfully updated %s.", aName.c_str());
 				wasUpdated = true;
 			}
 		}
@@ -1249,7 +1245,7 @@ namespace Loader
 			((AddonAPI2*)api)->EnableHook = MH_EnableHook;
 			((AddonAPI2*)api)->DisableHook = MH_DisableHook;
 
-			((AddonAPI2*)api)->Log = LogMessageAddon;
+			((AddonAPI2*)api)->Log = LogMessageAddon2;
 
 			((AddonAPI2*)api)->RaiseEvent = Events::Raise;
 			((AddonAPI2*)api)->RaiseEventNotification = Events::RaiseNotification;
@@ -1327,5 +1323,39 @@ namespace Loader
 		delete *aDefinitions;
 
 		*aDefinitions = nullptr;
+	}
+
+	std::string GetOwner(void* aAddress)
+	{
+		if (aAddress == nullptr)
+		{
+			return "(null)";
+		}
+
+		//const std::lock_guard<std::mutex> lock(Mutex);
+		{
+			for (auto& [path, addon] : Addons)
+			{
+				if (!addon->Module) { continue; }
+
+				void* startAddress = addon->Module;
+				void* endAddress = ((PBYTE)addon->Module) + addon->ModuleSize;
+
+				if (aAddress >= startAddress && aAddress <= endAddress)
+				{
+					return addon->Definitions ? addon->Definitions->Name : "(null)";
+				}
+			}
+
+			void* startAddress = NexusHandle;
+			void* endAddress = ((PBYTE)NexusHandle) + NexusModuleSize;
+
+			if (aAddress >= startAddress && aAddress <= endAddress)
+			{
+				return "Nexus";
+			}
+		}
+
+		return "(null)";
 	}
 }

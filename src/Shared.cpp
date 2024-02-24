@@ -2,6 +2,7 @@
 
 #include "Version.h"
 
+DWORD						NexusModuleSize		= 0;
 HMODULE						NexusHandle			= nullptr;
 HMODULE						GameHandle			= nullptr;
 HMODULE						D3D11Handle			= nullptr;

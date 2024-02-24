@@ -40,7 +40,7 @@ struct AddonAPI1 : AddonAPI
 	MINHOOK_DISABLE				DisableHook;
 
 	/* Logging */
-	LOGGER_LOGA					Log;
+	LOGGER_LOG					Log;
 
 	/* Events */
 	EVENTS_RAISE				RaiseEvent;
@@ -95,7 +95,7 @@ struct AddonAPI2 : AddonAPI
 	MINHOOK_DISABLE				DisableHook;
 
 	/* Logging */
-	LOGGER_LOGA					Log;
+	LOGGER_LOG2					Log;
 
 	/* Events */
 	EVENTS_RAISE				RaiseEvent;

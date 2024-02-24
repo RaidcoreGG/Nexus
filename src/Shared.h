@@ -17,6 +17,7 @@
 using namespace Mumble;
 using namespace LogHandler;
 
+extern DWORD						NexusModuleSize;
 extern HMODULE						NexusHandle;
 extern HMODULE						GameHandle;
 extern HMODULE						D3D11Handle;

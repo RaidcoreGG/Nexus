@@ -1,6 +1,7 @@
 #include "OptionsWindow.h"
 
 #include <regex>
+#include <algorithm>
 
 #include "Shared.h"
 #include "Paths.h"
@@ -10,6 +11,7 @@
 #include "Keybinds/KeybindHandler.h"
 #include "API/APIController.h"
 #include "Settings/Settings.h"
+#include "Loader/Loader.h"
 
 #include "GUI/GUI.h"
 #include "GUI/IWindow.h"
@@ -126,15 +128,23 @@ namespace GUI
 			{
 				ImGui::BeginChild("##AddonsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-				for (GUI_RENDER renderCb : RegistryOptionsRender)
+				if (ImGui::BeginTabBar("AddonOptionsTabBar", ImGuiTabBarFlags_None))
 				{
-					if (renderCb)
+					for (GUI_RENDER renderCb : RegistryOptionsRender)
 					{
-						renderCb();
-						ImGui::Separator();
+						if (renderCb)
+						{
+							if (ImGui::BeginTabItem((Loader::GetOwner(renderCb) + "##AddonOptions").c_str()))
+							{
+								renderCb();
+								ImGui::EndTabItem();
+							}
+						}
 					}
-				}
 
+					ImGui::EndTabBar();
+				}
+				
 				ImGui::EndChild();
 			}
 
@@ -335,102 +345,122 @@ namespace GUI
 			{
 				ImGui::BeginChild("##KeybindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-				float kbButtonWidth = ImGui::CalcTextSize("XXXXXXXXXXXXXXXX").x;
+				float kbButtonWidth = ImGui::CalcTextSize("XXXXXXXXXXXXXXXXXXXXXXXX").x;
 
-				if (ImGui::BeginTable("table_keybinds", 3, ImGuiTableFlags_BordersInnerH))
+				Keybinds::Mutex.lock();
 				{
-					Keybinds::Mutex.lock();
+					// I'm gonna regret writing this code in a moment
+					// so the idea is to iterate over all keybinds, get their owners in a list
+					// then iterate over all keybinds again, for every single category and this time checking if they belong to the current category
+					// there's probably a smart/clean way of doing this but it's 4:29AM
+					std::vector<std::string> categories;
+					for (auto& [identifier, keybind] : Keybinds::Registry)
 					{
-						for (auto& [identifier, keybind] : Keybinds::Registry)
+						std::string owner = Loader::GetOwner(keybind.Handler);
+
+						if (std::find(categories.begin(), categories.end(), owner) == categories.end())
 						{
-							ImGui::TableNextRow();
-							ImGui::TableSetColumnIndex(0);
-							ImGui::Text(identifier.c_str());
-
-							ImGui::TableSetColumnIndex(1);
-							if (ImGui::Button((keybind.Bind.ToString(true) + "##" + identifier).c_str(), ImVec2(kbButtonWidth, 0.0f)))
-							{
-								CurrentlyEditing = identifier;
-								ImGui::OpenPopup(("Set Keybind: " + CurrentlyEditing).c_str(), ImGuiPopupFlags_AnyPopupLevel);
-							}
-
-							ImGui::TableSetColumnIndex(2);
-							if (keybind.Handler == nullptr)
-							{
-								ImGui::TextDisabled("Keybind not in use.");
-							}
+							categories.push_back(owner);
 						}
 					}
-					Keybinds::Mutex.unlock();
-
-					ImVec2 center(Renderer::Width * 0.5f, Renderer::Height * 0.5f);
-					ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-					if (ImGui::BeginPopupModal(("Set Keybind: " + CurrentlyEditing).c_str(), NULL, WindowFlags_Default))
+					for (std::string cat : categories)
 					{
-						Keybinds::IsSettingKeybind = true;
-						if (Keybinds::CurrentKeybind == Keybind{})
+						ImGui::TextDisabled(cat.c_str());
+						if (ImGui::BeginTable(("table_keybinds##" + cat).c_str(), 3, ImGuiTableFlags_BordersInnerH))
 						{
-							ImGui::Text(Keybinds::Registry[CurrentlyEditing].Bind.ToString(true).c_str());
-						}
-						else
-						{
-							ImGui::Text(Keybinds::CurrentKeybind.ToString(true).c_str());
-						}
-
-						bool overwriting = false;
-
-						if (Keybinds::CurrentKeybindUsedBy != CurrentlyEditing && Keybinds::CurrentKeybindUsedBy != "")
-						{
-							ImGui::TextColored(ImVec4(255, 0, 0, 255), "You will overwrite \"%s\".", Keybinds::CurrentKeybindUsedBy.c_str());
-							overwriting = true;
-						}
-
-						bool close = false;
-
-						if (ImGui::Button("Unbind"))
-						{
-							Keybinds::Set(CurrentlyEditing, Keybind{});
-							close = true;
-						}
-
-						/* i love imgui */
-						ImGui::SameLine();
-						ImGui::Spacing();
-						ImGui::SameLine();
-						ImGui::Spacing();
-						ImGui::SameLine();
-						ImGui::Spacing();
-						ImGui::SameLine();
-						/* i love imgui end*/
-
-						if (ImGui::Button("Accept"))
-						{
-							if (overwriting)
+							for (auto& [identifier, keybind] : Keybinds::Registry)
 							{
-								Keybinds::Set(Keybinds::CurrentKeybindUsedBy, Keybind{});
+								if (Loader::GetOwner(keybind.Handler) != cat) { continue; }
+
+								ImGui::TableNextRow();
+								ImGui::TableSetColumnIndex(0);
+								ImGui::Text(identifier.c_str());
+
+								ImGui::TableSetColumnIndex(1);
+								if (ImGui::Button((keybind.Bind.ToString(true) + "##" + identifier).c_str(), ImVec2(kbButtonWidth, 0.0f)))
+								{
+									CurrentlyEditing = identifier;
+									ImGui::OpenPopup(("Set Keybind: " + CurrentlyEditing).c_str(), ImGuiPopupFlags_AnyPopupLevel);
+								}
+
+								ImGui::TableSetColumnIndex(2);
+								if (keybind.Handler == nullptr)
+								{
+									ImGui::TextDisabled("Keybind not in use.");
+								}
 							}
-							Keybinds::Set(CurrentlyEditing, Keybinds::CurrentKeybind);
-							close = true;
-						}
-						ImGui::SameLine();
-						if (ImGui::Button("Cancel"))
-						{
-							close = true;
-						}
 
-						if (close)
-						{
-							CurrentlyEditing = "";
-							Keybinds::CurrentKeybind = Keybind{};
-							Keybinds::CurrentKeybindUsedBy = "";
-							Keybinds::IsSettingKeybind = false;
-							ImGui::CloseCurrentPopup();
+							ImGui::EndTable();
 						}
+					}
+				}
+				Keybinds::Mutex.unlock();
 
-						ImGui::EndPopup();
+				ImVec2 center(Renderer::Width * 0.5f, Renderer::Height * 0.5f);
+				ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+				if (ImGui::BeginPopupModal(("Set Keybind: " + CurrentlyEditing).c_str(), NULL, WindowFlags_Default))
+				{
+					Keybinds::IsSettingKeybind = true;
+					if (Keybinds::CurrentKeybind == Keybind{})
+					{
+						ImGui::Text(Keybinds::Registry[CurrentlyEditing].Bind.ToString(true).c_str());
+					}
+					else
+					{
+						ImGui::Text(Keybinds::CurrentKeybind.ToString(true).c_str());
 					}
 
-					ImGui::EndTable();
+					bool overwriting = false;
+
+					if (Keybinds::CurrentKeybindUsedBy != CurrentlyEditing && Keybinds::CurrentKeybindUsedBy != "")
+					{
+						ImGui::TextColored(ImVec4(255, 0, 0, 255), "You will overwrite \"%s\".", Keybinds::CurrentKeybindUsedBy.c_str());
+						overwriting = true;
+					}
+
+					bool close = false;
+
+					if (ImGui::Button("Unbind"))
+					{
+						Keybinds::Set(CurrentlyEditing, Keybind{});
+						close = true;
+					}
+
+					/* i love imgui */
+					ImGui::SameLine();
+					ImGui::Spacing();
+					ImGui::SameLine();
+					ImGui::Spacing();
+					ImGui::SameLine();
+					ImGui::Spacing();
+					ImGui::SameLine();
+					/* i love imgui end*/
+
+					if (ImGui::Button("Accept"))
+					{
+						if (overwriting)
+						{
+							Keybinds::Set(Keybinds::CurrentKeybindUsedBy, Keybind{});
+						}
+						Keybinds::Set(CurrentlyEditing, Keybinds::CurrentKeybind);
+						close = true;
+					}
+					ImGui::SameLine();
+					if (ImGui::Button("Cancel"))
+					{
+						close = true;
+					}
+
+					if (close)
+					{
+						CurrentlyEditing = "";
+						Keybinds::CurrentKeybind = Keybind{};
+						Keybinds::CurrentKeybindUsedBy = "";
+						Keybinds::IsSettingKeybind = false;
+						ImGui::CloseCurrentPopup();
+					}
+
+					ImGui::EndPopup();
 				}
 
 				ImGui::EndChild();
