@@ -1,5 +1,7 @@
 #include "LogWindow.h"
 
+#include <regex>
+
 #include "Shared.h"
 #include "Paths.h"
 #include "State.h"
@@ -97,7 +99,7 @@ namespace GUI
 			{
 				ImGui::BeginChild("logmessages", ImVec2(windowWidthQuarter * 3 - 1, 0.0f));
 				
-				float wrapWidth = ImGui::GetContentRegionAvailWidth() - off1 - off2;
+				float wrapWidth = ImGui::GetContentRegionAvailWidth() - off1 - off2 - 1;
 
 				LogHandler::Mutex.lock();
 				{
@@ -134,7 +136,7 @@ namespace GUI
 							/* level */
 							ImGui::TextColored(levelColor, level); ImGui::SameLine(off1 + off2);
 
-							float msgHeight = ImGui::CalcTextSize(entry.Message.c_str(), (const char*)0, false, wrapWidth - 1).y;
+							float msgHeight = ImGui::CalcTextSize(entry.Message.c_str(), (const char*)0, false, wrapWidth).y;
 
 							/* message divider */
 							ImGui::PushStyleColor(ImGuiCol_TableBorderStrong, (ImVec4)levelColor);
@@ -149,7 +151,102 @@ namespace GUI
 							ImGui::PopStyleColor();
 
 							/* message */
-							ImGui::TextWrapped(entry.Message.c_str());
+							if (String::Contains(entry.Message, "<c=#"))
+							{
+								struct ColString
+								{
+									std::string String;
+									ImVec4 Color;
+								};
+
+								float lineHeight = ImGui::GetTextLineHeight();
+								ImVec2 posInitial = ImGui::GetCursorPos();
+								std::vector<ColString> colMsgs;
+
+								std::string msg = entry.Message;
+
+								size_t strIdx = 0;
+								bool open = false;
+								while ((strIdx = msg.find("<c=#", strIdx)) != std::string::npos)
+								{
+									if (strIdx != 0)
+									{
+										ColString colString{
+											msg.substr(0, strIdx),
+											ImVec4(0, 0, 0, 0)
+										};
+
+										colMsgs.push_back(colString);
+									}
+
+									size_t closeIdx = msg.find("</c>", strIdx);
+
+									if (closeIdx != std::string::npos)
+									{
+										std::string hexCol = msg.substr(strIdx + 4, 6);
+
+										if (std::regex_match(hexCol, std::regex("[0-9a-fA-F]{6}")))
+										{
+											ImVec4 col = ImGui::HEXtoIV4(hexCol.c_str());
+											ColString colString{
+												msg.substr(strIdx + 11, closeIdx - strIdx - 11),
+												col
+											};
+
+											colMsgs.push_back(colString);
+											
+											msg = msg.substr(closeIdx + 4, msg.size() - (closeIdx + 4));
+										}
+										else
+										{
+											// if it's not a valid hex move to end of current tag
+											strIdx = closeIdx;
+										}
+									}
+									else
+									{
+										// move the index to the end so that no more tags are parsed
+										strIdx = msg.size() - 1;
+									}
+								}
+
+								if (msg.size() != 0)
+								{
+									ColString colString{
+											msg,
+											ImVec4(0, 0, 0, 0)
+									};
+
+									colMsgs.push_back(colString);
+								}
+
+								ImVec2 pos = posInitial;
+								for (ColString c : colMsgs)
+								{
+									float currWidth = ImGui::CalcTextSize(c.String.c_str()).x;
+									if (pos.x - posInitial.x + currWidth > wrapWidth)
+									{
+										pos.x = posInitial.x;
+										pos.y += lineHeight;
+									}
+									ImGui::SetCursorPos(pos);
+									if (c.Color.w)
+									{
+										ImGui::PushStyleColor(ImGuiCol_Text, c.Color);
+										ImGui::TextWrapped(c.String.c_str());
+										ImGui::PopStyleColor();
+									}
+									else
+									{
+										ImGui::TextWrapped(c.String.c_str());
+									}
+									pos.x += currWidth;
+								}
+							}
+							else
+							{
+								ImGui::TextWrapped(entry.Message.c_str());
+							}
 							
 							ImGui::Separator();
 						}
