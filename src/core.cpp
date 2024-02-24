@@ -75,6 +75,26 @@ namespace String
 	{
 		return aString.find(aStringFind) != std::string::npos;
 	}
+	std::vector<std::string> Split(std::string aString, const std::string& aDelimiter, bool aKeepDelimiters)
+	{
+		std::vector<std::string> parts;
+
+		size_t pos = aString.find(aDelimiter);
+		size_t initialPos = 0;
+
+		while (pos != std::string::npos)
+		{
+			parts.push_back(aString.substr(initialPos, pos - initialPos));
+			parts.push_back(aDelimiter);
+			initialPos = pos + 1;
+
+			pos = aString.find(aDelimiter, initialPos);
+		}
+
+		parts.push_back(aString.substr(initialPos, aString.length() - initialPos));
+
+		return parts;
+	}
 }
 
 const char* ConvertToUTF8(const char* multibyteStr)

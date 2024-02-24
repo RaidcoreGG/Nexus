@@ -99,7 +99,8 @@ namespace GUI
 			{
 				ImGui::BeginChild("logmessages", ImVec2(windowWidthQuarter * 3 - 1, 0.0f));
 				
-				float wrapWidth = ImGui::GetContentRegionAvailWidth() - off1 - off2 - 1;
+				ImGuiStyle& style = ImGui::GetStyle();
+				float wrapWidth = ImGui::GetContentRegionAvailWidth() - off1 - off2 - style.ScrollbarSize;
 
 				LogHandler::Mutex.lock();
 				{
@@ -151,103 +152,62 @@ namespace GUI
 							ImGui::PopStyleColor();
 
 							/* message */
-							if (String::Contains(entry.Message, "<c=#"))
+							float lineHeight = ImGui::GetTextLineHeight();
+							ImVec2 posInitial = ImGui::GetCursorPos();
+							ImVec2 pos = posInitial;
+							std::vector<std::string> msgParts = String::Split(entry.Message, " ", true);
+							std::vector<ImVec4> colStack;
+							for (std::string msgPart : msgParts)
 							{
-								struct ColString
+								if (msgPart.find("<c=#") != std::string::npos)
 								{
-									std::string String;
-									ImVec4 Color;
-								};
+									std::string hexCol = msgPart.substr(4, 6);
 
-								float lineHeight = ImGui::GetTextLineHeight();
-								ImVec2 posInitial = ImGui::GetCursorPos();
-								std::vector<ColString> colMsgs;
-
-								std::string msg = entry.Message;
-
-								size_t strIdx = 0;
-								bool open = false;
-								while ((strIdx = msg.find("<c=#", strIdx)) != std::string::npos)
-								{
-									if (strIdx != 0)
+									if (std::regex_match(hexCol, std::regex("[0-9a-fA-F]{6}")))
 									{
-										ColString colString{
-											msg.substr(0, strIdx),
-											ImVec4(0, 0, 0, 0)
-										};
+										ImVec4 col = ImGui::HEXtoIV4(hexCol.c_str());
 
-										colMsgs.push_back(colString);
-									}
+										ImGui::PushStyleColor(ImGuiCol_Text, col);
+										colStack.push_back(col);
 
-									size_t closeIdx = msg.find("</c>", strIdx);
-
-									if (closeIdx != std::string::npos)
-									{
-										std::string hexCol = msg.substr(strIdx + 4, 6);
-
-										if (std::regex_match(hexCol, std::regex("[0-9a-fA-F]{6}")))
-										{
-											ImVec4 col = ImGui::HEXtoIV4(hexCol.c_str());
-											ColString colString{
-												msg.substr(strIdx + 11, closeIdx - strIdx - 11),
-												col
-											};
-
-											colMsgs.push_back(colString);
-											
-											msg = msg.substr(closeIdx + 4, msg.size() - (closeIdx + 4));
-										}
-										else
-										{
-											// if it's not a valid hex move to end of current tag
-											strIdx = closeIdx;
-										}
-									}
-									else
-									{
-										// move the index to the end so that no more tags are parsed
-										strIdx = msg.size() - 1;
+										msgPart = msgPart.substr(11, msgPart.size() - 11);
 									}
 								}
 
-								if (msg.size() != 0)
+								bool popAfter = false;
+								// check if the string also contains the end tag, if so pop after string print
+								if (msgPart.find("</c>") != std::string::npos)
 								{
-									ColString colString{
-											msg,
-											ImVec4(0, 0, 0, 0)
-									};
-
-									colMsgs.push_back(colString);
+									popAfter = true;
+									
+									msgPart = msgPart.substr(0, msgPart.size() - 4);
 								}
 
-								ImVec2 pos = posInitial;
-								for (ColString c : colMsgs)
+								float currWidth = ImGui::CalcTextSize(msgPart.c_str()).x;
+								if (pos.x - posInitial.x + currWidth > wrapWidth)
 								{
-									float currWidth = ImGui::CalcTextSize(c.String.c_str()).x;
-									if (pos.x - posInitial.x + currWidth > wrapWidth)
-									{
-										pos.x = posInitial.x;
-										pos.y += lineHeight;
-									}
-									ImGui::SetCursorPos(pos);
-									if (c.Color.w)
-									{
-										ImGui::PushStyleColor(ImGuiCol_Text, c.Color);
-										ImGui::TextWrapped(c.String.c_str());
-										ImGui::PopStyleColor();
-									}
-									else
-									{
-										ImGui::TextWrapped(c.String.c_str());
-									}
-									pos.x += currWidth;
+									pos.x = posInitial.x;
+									pos.y += lineHeight;
+								}
+
+								ImGui::SetCursorPos(pos);
+								ImGui::Text(msgPart.c_str());
+								pos.x += currWidth;
+
+								if (popAfter && colStack.size() > 0)
+								{
+									ImGui::PopStyleColor();
+									colStack.pop_back();
 								}
 							}
-							else
+
+							// cleanup
+							while (colStack.size() > 0)
 							{
-								ImGui::TextWrapped(entry.Message.c_str());
+								ImGui::PopStyleColor();
+								colStack.pop_back();
 							}
-							
+
 							ImGui::Separator();
 						}
 					}

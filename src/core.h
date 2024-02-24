@@ -18,6 +18,7 @@ namespace String
 {
 	std::string Replace(const std::string& aString, const std::string& aOld, const std::string& aNew, size_t aPosition = 0);
 	bool Contains(const std::string& aString, const std::string& aStringFind);
+	std::vector<std::string> Split(std::string aString, const std::string& aDelimiter, bool aKeepDelimiters = false);
 }
 
 const char* ConvertToUTF8(const char* multibyteStr);
