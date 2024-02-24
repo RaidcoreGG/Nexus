@@ -300,6 +300,11 @@ namespace Loader
 						continue;
 					}
 
+					if (std::filesystem::file_size(path) == 0)
+					{
+						continue;
+					}
+
 					if (path.extension() == extDll)
 					{
 						QueueAddon(ELoaderAction::Load, path);
