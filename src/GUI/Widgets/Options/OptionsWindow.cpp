@@ -163,9 +163,9 @@ namespace GUI
 				{
 					if (ImGui::InputFloat("##fontsize", &FontSize, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_EnterReturnsTrue))
 					{
-						if (FontSize < 1.0f)
+						if (FontSize < 8.0f)
 						{
-							FontSize = 1.0f;
+							FontSize = 8.0f;
 						}
 						Settings::Settings[OPT_FONTSIZE] = FontSize;
 						Settings::Save();

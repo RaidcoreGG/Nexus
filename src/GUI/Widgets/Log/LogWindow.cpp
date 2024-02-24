@@ -97,6 +97,8 @@ namespace GUI
 			{
 				ImGui::BeginChild("logmessages", ImVec2(windowWidthQuarter * 3 - 1, 0.0f));
 				
+				float wrapWidth = ImGui::GetContentRegionAvailWidth() - off1 - off2;
+
 				LogHandler::Mutex.lock();
 				{
 					/* Show last 400 log messages */
@@ -115,28 +117,41 @@ namespace GUI
 							amtShown++;
 
 							const char* level;
+							ImColor levelColor;
 							switch (entry.LogLevel)
 							{
-								case ELogLevel::CRITICAL:   level = "[CRITICAL]";   ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));     break;
-								case ELogLevel::WARNING:    level = "[WARNING]";    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 0, 255));   break;
-								case ELogLevel::INFO:       level = "[INFO]";       ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255));     break;
-								case ELogLevel::DEBUG:      level = "[DEBUG]";      ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 148, 255, 255));   break;
+								case ELogLevel::CRITICAL:   level = "[CRITICAL]";   levelColor = IM_COL32(255, 0, 0, 255);     break;
+								case ELogLevel::WARNING:    level = "[WARNING]";    levelColor = IM_COL32(255, 255, 0, 255);   break;
+								case ELogLevel::INFO:       level = "[INFO]";       levelColor = IM_COL32(0, 255, 0, 255);     break;
+								case ELogLevel::DEBUG:      level = "[DEBUG]";      levelColor = IM_COL32(0, 148, 255, 255);   break;
 
-								default:                    level = "[TRACE]";      ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(220, 220, 220, 255)); break;
+								default:                    level = "[TRACE]";      levelColor = IM_COL32(220, 220, 220, 255); break;
 							}
 
 							/* time */
-							ImGui::Text(entry.TimestampString(false).c_str()); ImGui::SameLine(off1);
+							ImGui::TextColored(levelColor, entry.TimestampString(false).c_str()); ImGui::SameLine(off1);
 
 							/* level */
-							ImGui::Text(level); ImGui::SameLine(off1 + off2);
+							ImGui::TextColored(levelColor, level); ImGui::SameLine(off1 + off2);
+
+							float msgHeight = ImGui::CalcTextSize(entry.Message.c_str(), (const char*)0, false, wrapWidth - 1).y;
+
+							/* message divider */
+							ImGui::PushStyleColor(ImGuiCol_TableBorderStrong, (ImVec4)levelColor);
+							if (ImGui::BeginTable(("##" + entry.Message).c_str(), 1, ImGuiTableFlags_Borders, ImVec2(1.0f, msgHeight)))
+							{
+								ImGui::TableNextRow();
+								ImGui::TableSetColumnIndex(0);
+								ImGui::Text("");
+								ImGui::EndTable();
+							}
+							ImGui::SameLine();
+							ImGui::PopStyleColor();
 
 							/* message */
 							ImGui::TextWrapped(entry.Message.c_str());
 							
 							ImGui::Separator();
-
-							ImGui::PopStyleColor();
 						}
 					}
 				}
