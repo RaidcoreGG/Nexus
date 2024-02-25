@@ -47,7 +47,10 @@ namespace ImGui
 	{
 		if (ImGui::Tooltip())
 		{
-			ImGui::Text(fmt);
+			va_list args;
+			va_start(args, fmt);
+			ImGui::TextV(fmt, args);
+			va_end(args);
 			ImGui::EndTooltip();
 		}
 	}
