@@ -471,26 +471,11 @@ namespace Loader
 
 		addon->ModuleSize = moduleInfo.SizeOfImage;
 
-		if (addon->Definitions->APIVersion == 0)
-		{
-			LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (No API was requested.)", strPath, addon->Definitions->Signature, addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage);
-		}
-		else
-		{
-			LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.)", strPath, addon->Definitions->Signature, addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage, addon->Definitions->APIVersion);
-		}
-		addon->Definitions->Load(api);
-		Events::Raise(EV_ADDON_LOADED, &addon->Definitions->Signature);
-		Events::Raise(EV_MUMBLE_IDENTITY_UPDATED, MumbleIdentity);
-
-		bool locked = addon->Definitions->Unload == nullptr || addon->Definitions->HasFlag(EAddonFlags::DisableHotloading);
-		addon->State = locked ? EAddonState::LoadedLOCKED : EAddonState::Loaded;
+		typedef int (*addextension2)(HINSTANCE);
+		addextension2 exp_addextension2 = nullptr;
 
 		if (addon->Definitions->Signature == 0xFFF694D1)
 		{
-			typedef int (*addextension2)(HINSTANCE);
-			addextension2 exp_addextension2;
-
 			if (true == FindFunction(addon->Module, &exp_addextension2, "addextension2"))
 			{
 				LPVOID res{}; DWORD sz{};
@@ -507,14 +492,9 @@ namespace Loader
 					file.write((const char*)res, sz);
 					file.close();
 
-					HMODULE arcInt64 = LoadLibraryA(Path::F_ARCDPSINTEGRATION.string().c_str());
-					int result = exp_addextension2(arcInt64);
-
-					LogInfo(CH_LOADER, "Deployed ArcDPS Integration. Result: %d", result);
-					if (result == 0)
-					{
-						QueueAddon(ELoaderAction::Load, Path::F_ARCDPSINTEGRATION);
-					}
+					// reload is set to true because the dll is always deployed from resource
+					// and since it's locked it would not load here directly but instead after checking for updates (which does not apply to it)
+					LoadAddon(Path::F_ARCDPSINTEGRATION, true);
 				}
 				catch (std::filesystem::filesystem_error fErr)
 				{
@@ -525,6 +505,40 @@ namespace Loader
 			else
 			{
 				LogWarning(CH_LOADER, "Addon with signature \"0xFFF694D1\" found but \"addextension2\" is not exported. ArcDPS combat events won't be relayed.");
+			}
+		}
+		
+		addon->Definitions->Load(api);
+		Events::Raise(EV_ADDON_LOADED, &addon->Definitions->Signature);
+		Events::Raise(EV_MUMBLE_IDENTITY_UPDATED, MumbleIdentity);
+
+		bool locked = addon->Definitions->Unload == nullptr || addon->Definitions->HasFlag(EAddonFlags::DisableHotloading);
+		addon->State = locked ? EAddonState::LoadedLOCKED : EAddonState::Loaded;
+
+		if (addon->Definitions->APIVersion == 0)
+		{
+			LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (No API was requested.)", strPath, addon->Definitions->Signature, addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage);
+		}
+		else
+		{
+			LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.)", strPath, addon->Definitions->Signature, addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage, addon->Definitions->APIVersion);
+		}
+
+		if (exp_addextension2)
+		{
+			auto it = Addons.find(Path::F_ARCDPSINTEGRATION);
+
+			if (it != Addons.end())
+			{
+				if (it->second->Module)
+				{
+					int result = exp_addextension2(it->second->Module);
+					LogInfo(CH_LOADER, "Deployed ArcDPS Integration. Result: %d", result);
+				}
+				else
+				{
+					LogWarning(CH_LOADER, "ArcDPS Integration module was null.");
+				}
 			}
 		}
 	}
