@@ -967,6 +967,12 @@ namespace Loader
 
 			delete[] buffer;
 
+			if (!resultMd5Req || resultMd5Req->status != 200)
+			{
+				LogWarning(CH_LOADER, "Error fetching %s%s", baseUrl.c_str(), endpoint.c_str());
+				return false;
+			}
+
 			if (md5current == md5remote)
 			{
 				return false;
