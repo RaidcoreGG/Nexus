@@ -946,7 +946,7 @@ namespace Loader
 			std::vector<unsigned char> md5current = MD5((const unsigned char*)buffer, length);
 			std::vector<unsigned char> md5remote;
 
-			client.Get(endpointMD5, [&](const char* data, size_t data_length) {
+			auto resultMd5Req = client.Get(endpointMD5, [&](const char* data, size_t data_length) {
 				for (size_t i = 0; i < data_length; i += 2)
 				{
 					if (md5current.size() == md5remote.size())
@@ -970,6 +970,27 @@ namespace Loader
 			if (md5current == md5remote)
 			{
 				return false;
+			}
+
+			auto lmHeader = resultMd5Req->headers.find("Last-Modified");
+
+			if (lmHeader != resultMd5Req->headers.end())
+			{
+				long long remoteTimestamp = LastModifiedToTimestamp(lmHeader->second);
+
+				std::filesystem::path timeOffsetFile = aPath.parent_path() / (aPath.stem().string() + ".0");
+				std::ofstream file(timeOffsetFile);
+				file << "0" << std::endl;
+				file.close();
+
+				long long timeOffset = Timestamp() - std::chrono::duration_cast<std::chrono::seconds>(std::filesystem::last_write_time(timeOffsetFile).time_since_epoch()).count();
+				std::filesystem::remove(timeOffsetFile);
+
+				long long lastWriteTime = std::chrono::duration_cast<std::chrono::seconds>(std::filesystem::last_write_time(aPath).time_since_epoch()).count();
+				if (lastWriteTime + timeOffset > remoteTimestamp)
+				{
+					return false;
+				}
 			}
 
 			size_t bytesWritten = 0;

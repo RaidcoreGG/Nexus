@@ -385,6 +385,16 @@ APIResponse APIClient::DoHttpReq(APIRequest aRequest)
 		return response;
 	}
 
+	//response.Headers = result->headers;
+	/*Log(("APIClient::" + BaseURL).c_str(), "%s", aRequest.Query.c_str());
+	for (auto it = result->headers.begin(); it != result->headers.end(); ++it)
+	{
+		if (it->first == "Last-Modified")
+		{
+			Log("meme", "Last-Modified: %d", LastModifiedToTimestamp(it->second));
+		}
+		Log(("APIClient::" + BaseURL).c_str(), "%s : %s", it->first.c_str(), it->second.c_str());
+	}*/
 	response.Content = jsonResult;
 	return response;
 }

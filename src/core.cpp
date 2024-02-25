@@ -350,6 +350,24 @@ long long Timestamp()
 {
 	return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
+long long LastModifiedToTimestamp(const std::string& aLastModified)
+{
+	std::tm tm = {};
+	std::istringstream ss(aLastModified);
+	ss >> std::get_time(&tm, "%a, %d %b %Y %H:%M:%S GMT");
+	if (ss.fail())
+	{
+		return -1;
+	}
+	tm.tm_isdst = 0;
+	std::time_t t = std::mktime(&tm);
+	if (t == -1)
+	{
+		return -1;
+	}
+
+	return t;
+}
 // Returns:
 //   true upon success.
 //   false upon failure, and set the std::error_code & err accordingly.

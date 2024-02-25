@@ -40,6 +40,7 @@ namespace Base64
 #endif
 
 long long Timestamp();
+long long LastModifiedToTimestamp(const std::string& aLastModified);
 
 bool CreateDirectoryRecursive(std::string const& dirName, std::error_code& err);
 
