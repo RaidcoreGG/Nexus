@@ -1,11 +1,11 @@
 #include "Loader.h"
 
-#include <set>
 #include <Windows.h>
 #include <Psapi.h>
 #include <regex>
 #include <malloc.h>
 #include <vector>
+#include <fstream>
 
 #include "resource.h"
 
@@ -46,6 +46,10 @@ namespace Loader
 		ELoaderAction
 	>							QueuedAddons;
 	std::map<
+		signed int,
+		StoredAddon
+	>							AddonConfig;
+	std::map<
 		std::filesystem::path,
 		Addon*
 	>							Addons;
@@ -69,6 +73,37 @@ namespace Loader
 	{
 		if (State::Nexus == ENexusState::LOADED)
 		{
+			if (std::filesystem::exists(Path::F_ADDONCONFIG))
+			{
+				{
+					try
+					{
+						std::ifstream file(Path::F_ADDONCONFIG);
+
+						json cfg = json::parse(file);
+						for (json addonInfo : cfg)
+						{
+							signed int signature = 0;
+							StoredAddon storedAddonInfo{};
+							if (!addonInfo["Signature"].is_null()) { addonInfo["Signature"].get_to(signature); }
+							if (!addonInfo["IsPausingUpdates"].is_null()) { addonInfo["IsPausingUpdates"].get_to(storedAddonInfo.IsPausingUpdates); }
+							if (!addonInfo["IsLoaded"].is_null()) { addonInfo["IsLoaded"].get_to(storedAddonInfo.IsLoaded); }
+							if (!addonInfo["IsDisabledUntilUpdate"].is_null()) { addonInfo["IsDisabledUntilUpdate"].get_to(storedAddonInfo.IsDisabledUntilUpdate); }
+
+							if (signature == 0) { continue; }
+
+							AddonConfig[signature] = storedAddonInfo;
+						}
+
+						file.close();
+					}
+					catch (json::parse_error& ex)
+					{
+						LogWarning(CH_KEYBINDS, "AddonConfig.json could not be parsed. Error: %s", ex.what());
+					}
+				}
+			}
+
 			FSItemList = ILCreateFromPathA(Path::GetAddonDirectory(nullptr));
 			if (FSItemList == 0) {
 				LogCritical(CH_LOADER, "Loader disabled. Reason: ILCreateFromPathA(Path::D_GW2_ADDONS) returned 0.");
@@ -138,6 +173,37 @@ namespace Loader
 			}
 
 			const std::lock_guard<std::mutex> lock(Mutex);
+			{
+				json cfg = json::array();
+
+				for (auto it : Addons)
+				{
+					Addon* addon = it.second;
+
+					if (!addon->Definitions) { continue; }
+					if (addon->Definitions->Signature == -19392669) { continue; } // skip bridge
+
+					json addonInfo =
+					{
+						{"Signature", addon->Definitions->Signature},
+						{"IsLoaded", addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED ? true : false},
+					};
+
+					auto cfgIt = AddonConfig.find(addon->Definitions->Signature);
+					if (cfgIt != AddonConfig.end())
+					{
+						addonInfo["IsPausingUpdates"] = cfgIt->second.IsPausingUpdates;
+						addonInfo["IsDisabledUntilUpdate"] = cfgIt->second.IsDisabledUntilUpdate;
+					}
+
+					cfg.push_back(addonInfo);
+				}
+
+				std::ofstream file(Path::F_ADDONCONFIG);
+				file << cfg.dump(1, '\t') << std::endl;
+				file.close();
+			}
+
 			{
 				while (Addons.size() != 0)
 				{
@@ -334,12 +400,15 @@ namespace Loader
 		std::string path = aPath.string();
 		const char* strPath = path.c_str();
 
+		bool firstLoad;
+
 		Addon* addon;
 
 		auto it = Addons.find(aPath);
 		
 		if (it != Addons.end())
 		{
+			firstLoad = false;
 			addon = it->second;
 
 			if (addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED)
@@ -350,6 +419,7 @@ namespace Loader
 		}
 		else
 		{
+			firstLoad = true;
 			addon = new Addon{};
 			addon->State = EAddonState::None;
 			Addons.insert({ aPath, addon });
@@ -390,7 +460,54 @@ namespace Loader
 			return;
 		}
 
-		if (!aIsReload)
+		StoredAddon* addonInfo = nullptr;
+		auto cfgIt = AddonConfig.find(tmpDefs->Signature);
+
+		if (cfgIt != AddonConfig.end())
+		{
+			addonInfo = &cfgIt->second;
+		}
+
+		/* check if on load list && first load and also make sure this isn't the arc integration */
+		if (!aIsReload && firstLoad && tmpDefs->Signature != -19392669)
+		{
+			// reload is thrown in the mix here because not only does a reload imply not first load
+			// but also this is necessary to skip this segment for arcdps integration
+			bool wasRequested = false;
+			if (RequestedAddons.size() > 0)
+			{
+				for (signed int id : RequestedAddons)
+				{
+					if (id == tmpDefs->Signature)
+					{
+						wasRequested = true;
+						break;
+					}
+				}
+			}
+			else if (addonInfo != nullptr && addonInfo->IsLoaded)
+			{
+				wasRequested = true;
+			}
+
+			if (!wasRequested)
+			{
+				LogInfo(CH_LOADER, "\"%s\" was not requested via start parameter and/or last state was disabled. Skipped.", strPath, tmpDefs->Signature);
+
+				// free old and clone new anyway so the addon can be listed
+				FreeAddonDefs(&addon->Definitions);
+				CopyAddonDefs(tmpDefs, &addon->Definitions);
+
+				FreeLibrary(addon->Module);
+				addon->State = EAddonState::NotLoaded;
+				addon->Module = nullptr;
+				return;
+			}
+		}
+
+		// if not already being reloaded check for update
+		// also either addons must be enabled or there's no info on that yet
+		if (!aIsReload && (addonInfo == nullptr || !addonInfo->IsPausingUpdates))
 		{
 			std::filesystem::path tmpPath = aPath.string();
 			signed int tmpSig = tmpDefs->Signature;

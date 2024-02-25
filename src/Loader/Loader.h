@@ -10,6 +10,7 @@
 #include <condition_variable>
 
 #include "ELoaderAction.h"
+#include "StoredAddon.h"
 #include "LibraryAddon.h"
 #include "Addon.h"
 #include "AddonAPI.h"
@@ -22,6 +23,10 @@ namespace Loader
 		std::filesystem::path,
 		ELoaderAction
 	>									QueuedAddons;					/* To be loaded or unloaded addons */
+	extern std::map<
+		signed int,
+		StoredAddon
+	>									AddonConfig;
 	extern std::map<
 		std::filesystem::path,
 		Addon*

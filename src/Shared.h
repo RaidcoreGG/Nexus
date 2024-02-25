@@ -25,6 +25,7 @@ extern HMODULE						D3D11SystemHandle;
 
 extern AddonVersion					Version;
 extern std::vector<std::string>		Parameters;
+extern std::vector<signed int>		RequestedAddons;
 
 extern LinkedMem*                   MumbleLink;
 extern Identity*                    MumbleIdentity;

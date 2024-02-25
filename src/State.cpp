@@ -69,6 +69,35 @@ namespace State
 				Parameters.push_back(token);
 				i++; // manual increment to skip
 			}
+			else if (cmp == "-ggaddons" && i + 1 <= argc)
+			{
+				std::wstring addonIdsW = argv[i + 1];
+				std::string addonIds = WStrToStr(addonIdsW);
+
+				std::vector<std::string> idList = String::Split(addonIds, ",");
+
+				for (std::string addonId : idList)
+				{
+					try
+					{
+						signed int i = std::stoi(addonId);
+						RequestedAddons.push_back(i);
+					}
+					catch (const std::invalid_argument& e)
+					{
+						Log(CH_CORE, "Invalid argument (-ggaddons): %s", addonId.c_str());
+					}
+					catch (const std::out_of_range& e)
+					{
+						Log(CH_CORE, "Out of range (-ggaddons): %s", addonId.c_str());
+					}
+				}
+
+				token.append(" ");
+				token.append(addonIds);
+				Parameters.push_back(token);
+				i++; // manual increment to skip
+			}
 			else
 			{
 				Parameters.push_back(token);

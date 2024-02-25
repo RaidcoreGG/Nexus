@@ -10,6 +10,7 @@ HMODULE						D3D11SystemHandle	= nullptr;
 
 AddonVersion				Version				= { V_MAJOR, V_MINOR, V_BUILD, V_REVISION };
 std::vector<std::string>	Parameters			= {};
+std::vector<signed int>		RequestedAddons		= {};
 
 LinkedMem*					MumbleLink			= nullptr;
 Identity*					MumbleIdentity		= new Identity{};

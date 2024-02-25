@@ -124,6 +124,12 @@
     <Filter Include="Resource Files\bin64">
       <UniqueIdentifier>{86b26924-5f68-4789-a455-7a9aadb24c45}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Loader\Structs">
+      <UniqueIdentifier>{68742126-4d19-4b9e-a4cc-594a8e22a51d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Loader\Enums">
+      <UniqueIdentifier>{29b4df1b-599d-49f1-adc5-17961c6073b2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -225,9 +231,6 @@
     <ClCompile Include="Loader\Loader.cpp">
       <Filter>Loader</Filter>
     </ClCompile>
-    <ClCompile Include="Loader\AddonDefinition.cpp">
-      <Filter>Loader</Filter>
-    </ClCompile>
     <ClCompile Include="GUI\Widgets\Debug\DebugWindow.cpp">
       <Filter>GUI\Widgets\Debug</Filter>
     </ClCompile>
@@ -245,9 +248,6 @@
     </ClCompile>
     <ClCompile Include="Consts.cpp">
       <Filter>_GLOBAL</Filter>
-    </ClCompile>
-    <ClCompile Include="Loader\EAddonFlags.cpp">
-      <Filter>Loader</Filter>
     </ClCompile>
     <ClCompile Include="GUI\Widgets\Addons\AddonItem.cpp">
       <Filter>GUI\Widgets\Addons</Filter>
@@ -293,6 +293,12 @@
     </ClCompile>
     <ClCompile Include="API\APIClient.cpp">
       <Filter>API</Filter>
+    </ClCompile>
+    <ClCompile Include="Loader\EAddonFlags.cpp">
+      <Filter>Loader\Enums</Filter>
+    </ClCompile>
+    <ClCompile Include="Loader\AddonDefinition.cpp">
+      <Filter>Loader\Structs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -356,17 +362,8 @@
     <ClInclude Include="Mumble\Mumble.h">
       <Filter>Mumble</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\AddonDefinition.h">
-      <Filter>Loader</Filter>
-    </ClInclude>
-    <ClInclude Include="Loader\EUpdateProvider.h">
-      <Filter>Loader</Filter>
-    </ClInclude>
     <ClInclude Include="Events\EventHandler.h">
       <Filter>Events</Filter>
-    </ClInclude>
-    <ClInclude Include="Loader\AddonAPI.h">
-      <Filter>Loader</Filter>
     </ClInclude>
     <ClInclude Include="Keybinds\KeybindHandler.h">
       <Filter>Keybinds</Filter>
@@ -500,9 +497,6 @@
     <ClInclude Include="Keybinds\ActiveKeybind.h">
       <Filter>Keybinds</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\EAddonFlags.h">
-      <Filter>Loader</Filter>
-    </ClInclude>
     <ClInclude Include="GUI\Widgets\Addons\AddonItem.h">
       <Filter>GUI\Widgets\Addons</Filter>
     </ClInclude>
@@ -511,9 +505,6 @@
     </ClInclude>
     <ClInclude Include="GUI\EFontIdentifier.h">
       <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="Loader\NexusLinkData.h">
-      <Filter>Loader</Filter>
     </ClInclude>
     <ClInclude Include="GUI\Widgets\Menu\Menu.h">
       <Filter>GUI\Widgets\Menu</Filter>
@@ -538,9 +529,6 @@
     </ClInclude>
     <ClInclude Include="GUI\FuncDefs.h">
       <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="Loader\ELoaderAction.h">
-      <Filter>Loader</Filter>
     </ClInclude>
     <ClInclude Include="WndProc\WndProcHandler.h">
       <Filter>WndProc</Filter>
@@ -971,12 +959,6 @@
     <ClInclude Include="GUI\ERenderType.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\Addon.h">
-      <Filter>Loader</Filter>
-    </ClInclude>
-    <ClInclude Include="Loader\EAddonState.h">
-      <Filter>Loader</Filter>
-    </ClInclude>
     <ClInclude Include="Keybinds\KeystrokeMessageFlags.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1025,8 +1007,35 @@
     <ClInclude Include="API\APIResponse.h">
       <Filter>API</Filter>
     </ClInclude>
+    <ClInclude Include="Loader\Addon.h">
+      <Filter>Loader\Structs</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\EUpdateProvider.h">
+      <Filter>Loader\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\ELoaderAction.h">
+      <Filter>Loader\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\EAddonState.h">
+      <Filter>Loader\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\EAddonFlags.h">
+      <Filter>Loader\Enums</Filter>
+    </ClInclude>
     <ClInclude Include="Loader\LibraryAddon.h">
-      <Filter>Loader</Filter>
+      <Filter>Loader\Structs</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\AddonDefinition.h">
+      <Filter>Loader\Structs</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\AddonAPI.h">
+      <Filter>Loader\Structs</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\NexusLinkData.h">
+      <Filter>Loader\Structs</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\StoredAddon.h">
+      <Filter>Loader\Structs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -85,7 +85,10 @@ namespace String
 		while (pos != std::string::npos)
 		{
 			parts.push_back(aString.substr(initialPos, pos - initialPos));
-			parts.push_back(aDelimiter);
+			if (aKeepDelimiters)
+			{
+				parts.push_back(aDelimiter);
+			}
 			initialPos = pos + 1;
 
 			pos = aString.find(aDelimiter, initialPos);
