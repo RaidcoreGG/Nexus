@@ -10,7 +10,7 @@
 #include "Mumble/LinkedMem.h"
 #include "Mumble/Identity.h"
 #include "Logging/LogHandler.h"
-#include "API/APIClient.h"
+#include "API/CAPIClient.h"
 
 #include "imgui.h"
 
@@ -44,8 +44,8 @@ extern ImGuiWindowFlags				WindowFlags_Overlay;
 extern ImGuiWindowFlags				WindowFlags_Custom;
 extern ImGuiWindowFlags				WindowFlags_Watermark;
 
-extern APIClient*					RaidcoreAPI;
-extern APIClient*					GitHubAPI;
+extern CAPIClient*					RaidcoreAPI;
+extern CAPIClient*					GitHubAPI;
 
 extern std::string					ChangelogText;
 extern bool							IsUpdateAvailable;

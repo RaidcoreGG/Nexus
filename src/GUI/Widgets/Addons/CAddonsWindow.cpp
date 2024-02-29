@@ -1,4 +1,4 @@
-#include "AddonsWindow.h"
+#include "CAddonsWindow.h"
 
 #include <Windows.h>
 #include <shellapi.h>
@@ -25,7 +25,7 @@ namespace GUI
 
 	bool showInstalled = false;
 
-	AddonsWindow::AddonsWindow(std::string aName)
+	CAddonsWindow::CAddonsWindow(std::string aName)
 	{
 		Name = aName;
 
@@ -47,7 +47,7 @@ namespace GUI
 		Tab2Hovered = false;
 	}
 
-	void AddonsWindow::Render()
+	void CAddonsWindow::Render()
 	{
 		if (!Visible) { return; }
 

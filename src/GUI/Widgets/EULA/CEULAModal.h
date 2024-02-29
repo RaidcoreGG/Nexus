@@ -5,10 +5,10 @@
 
 namespace GUI
 {
-	class EULAModal : public IWindow
+	class CEULAModal : public IWindow
 	{
 	public:
-		EULAModal();
+		CEULAModal();
 		void Render();
 	};
 }

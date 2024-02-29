@@ -25,14 +25,14 @@
 
 #include "Widgets/Menu/Menu.h"
 #include "Widgets/Menu/MenuItem.h"
-#include "Widgets/Addons/AddonsWindow.h"
-#include "Widgets/Options/OptionsWindow.h"
-#include "Widgets/Changelog/ChangelogWindow.h"
-#include "Widgets/Log/LogWindow.h"
-#include "Widgets/Debug/DebugWindow.h"
-#include "Widgets/About/AboutBox.h"
+#include "Widgets/Addons/CAddonsWindow.h"
+#include "Widgets/Options/COptionsWindow.h"
+#include "Widgets/Changelog/CChangelogWindow.h"
+#include "Widgets/Log/CLogWindow.h"
+#include "Widgets/Debug/CDebugWindow.h"
+#include "Widgets/About/CAboutBox.h"
 #include "Widgets/QuickAccess/QuickAccess.h"
-#include "Widgets/EULA/EULAModal.h"
+#include "Widgets/EULA/CEULAModal.h"
 
 #include "resource.h"
 #include "Textures/Texture.h"
@@ -411,7 +411,7 @@ namespace GUI
 		{
 			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Debug"; });
 			if (it == Windows.end()) { return; }
-			((DebugWindow*)(*it))->MumbleWindow->Visible = !((DebugWindow*)(*it))->MumbleWindow->Visible;
+			((CDebugWindow*)(*it))->MumbleWindow->Visible = !((CDebugWindow*)(*it))->MumbleWindow->Visible;
 		}
 	}
 	
@@ -633,7 +633,7 @@ namespace GUI
 		OnMumbleIdentityChanged(nullptr);
 
 		/* set up and add windows */
-		AddonsWindow* addonsWnd = new AddonsWindow("Addons");
+		CAddonsWindow* addonsWnd = new CAddonsWindow("Addons");
 		TextureLoader::LoadFromResource("TEX_ADDONS_BACKGROUND", RES_TEX_ADDONS_BACKGROUND, NexusHandle, nullptr);
 		TextureLoader::LoadFromResource("TEX_ADDONITEM_BACKGROUND", RES_TEX_ADDONITEM, NexusHandle, nullptr);
 		TextureLoader::LoadFromResource("TEX_ADDONS_TITLEBAR", RES_TEX_ADDONS_TITLEBAR, NexusHandle, nullptr);
@@ -645,12 +645,12 @@ namespace GUI
 		TextureLoader::LoadFromResource("TEX_TITLEBAREND", RES_TEX_TITLEBAREND, NexusHandle, nullptr);
 		TextureLoader::LoadFromResource("TEX_TITLEBAREND_HOVER", RES_TEX_TITLEBAREND_HOVER, NexusHandle, nullptr);
 
-		OptionsWindow* opsWnd = new OptionsWindow("Options");
-		ChangelogWindow* chlWnd = new ChangelogWindow("Changelog");
-		LogWindow* logWnd = new LogWindow("Log", ELogLevel::ALL);
+		COptionsWindow* opsWnd = new COptionsWindow("Options");
+		CChangelogWindow* chlWnd = new CChangelogWindow("Changelog");
+		CLogWindow* logWnd = new CLogWindow("Log", ELogLevel::ALL);
 		LogHandler::RegisterLogger(logWnd);
-		DebugWindow* dbgWnd = new DebugWindow("Debug");
-		AboutBox* aboutWnd = new AboutBox("About");
+		CDebugWindow* dbgWnd = new CDebugWindow("Debug");
+		CAboutBox* aboutWnd = new CAboutBox("About");
 
 		Keybinds::Register(KB_ADDONS, ProcessKeybind, "(null)");
 		Keybinds::Register(KB_OPTIONS, ProcessKeybind, "(null)");
@@ -724,7 +724,7 @@ namespace GUI
 
 		if (!HasAcceptedEULA)
 		{
-			EULAModal* eulaModal = new EULAModal();
+			CEULAModal* eulaModal = new CEULAModal();
 			AddWindow(eulaModal);
 		}
 

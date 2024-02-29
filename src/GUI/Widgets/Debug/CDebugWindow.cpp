@@ -1,4 +1,4 @@
-#include "DebugWindow.h"
+#include "CDebugWindow.h"
 
 #include "Shared.h"
 #include "State.h"
@@ -23,13 +23,13 @@ namespace GUI
 	void* memPtr = nullptr;
 	size_t memSz = 0;
 
-	DebugWindow::DebugWindow(std::string aName)
+	CDebugWindow::CDebugWindow(std::string aName)
 	{
 		Name = aName;
-		MumbleWindow = new MumbleOverlay();
+		MumbleWindow = new CMumbleOverlay();
 	}
 
-	void DebugWindow::Render()
+	void CDebugWindow::Render()
 	{
 		MumbleWindow->Render();
 

@@ -165,7 +165,7 @@
     <ClCompile Include="minhook\mh_trampoline.cpp">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClCompile>
-    <ClCompile Include="Logging\FileLogger.cpp">
+    <ClCompile Include="Logging\CFileLogger.cpp">
       <Filter>Logging</Filter>
     </ClCompile>
     <ClCompile Include="Logging\ILogger.cpp">
@@ -177,7 +177,7 @@
     <ClCompile Include="Logging\LogHandler.cpp">
       <Filter>Logging</Filter>
     </ClCompile>
-    <ClCompile Include="Logging\ConsoleLogger.cpp">
+    <ClCompile Include="Logging\CConsoleLogger.cpp">
       <Filter>Logging</Filter>
     </ClCompile>
     <ClCompile Include="core.cpp">
@@ -213,16 +213,16 @@
     <ClCompile Include="GUI\GUI.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\About\AboutBox.cpp">
+    <ClCompile Include="GUI\Widgets\About\CAboutBox.cpp">
       <Filter>GUI\Widgets\About</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\Addons\AddonsWindow.cpp">
+    <ClCompile Include="GUI\Widgets\Addons\CAddonsWindow.cpp">
       <Filter>GUI\Widgets\Addons</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\Log\LogWindow.cpp">
+    <ClCompile Include="GUI\Widgets\Log\CLogWindow.cpp">
       <Filter>GUI\Widgets\Log</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\Overlay\MumbleOverlay.cpp">
+    <ClCompile Include="GUI\Widgets\Overlay\CMumbleOverlay.cpp">
       <Filter>GUI\Widgets\Overlay</Filter>
     </ClCompile>
     <ClCompile Include="Mumble\Identity.cpp">
@@ -231,7 +231,7 @@
     <ClCompile Include="Loader\Loader.cpp">
       <Filter>Loader</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\Debug\DebugWindow.cpp">
+    <ClCompile Include="GUI\Widgets\Debug\CDebugWindow.cpp">
       <Filter>GUI\Widgets\Debug</Filter>
     </ClCompile>
     <ClCompile Include="DataLink\DataLink.cpp">
@@ -258,7 +258,7 @@
     <ClCompile Include="GUI\Widgets\Menu\Menu.cpp">
       <Filter>GUI\Widgets\Menu</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\Options\OptionsWindow.cpp">
+    <ClCompile Include="GUI\Widgets\Options\COptionsWindow.cpp">
       <Filter>GUI\Widgets\Options</Filter>
     </ClCompile>
     <ClCompile Include="Settings\Settings.cpp">
@@ -279,10 +279,10 @@
     <ClCompile Include="CrashHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\EULA\EULAModal.cpp">
+    <ClCompile Include="GUI\Widgets\EULA\CEULAModal.cpp">
       <Filter>GUI\Widgets\EULA</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\Changelog\ChangelogWindow.cpp">
+    <ClCompile Include="GUI\Widgets\Changelog\CChangelogWindow.cpp">
       <Filter>GUI\Widgets\Changelog</Filter>
     </ClCompile>
     <ClCompile Include="Multibox\Multibox.cpp">
@@ -291,7 +291,7 @@
     <ClCompile Include="Proxy.cpp">
       <Filter>_GLOBAL</Filter>
     </ClCompile>
-    <ClCompile Include="API\APIClient.cpp">
+    <ClCompile Include="API\CAPIClient.cpp">
       <Filter>API</Filter>
     </ClCompile>
     <ClCompile Include="Loader\EAddonFlags.cpp">
@@ -338,7 +338,7 @@
     <ClInclude Include="minhook\mh_buffer.h">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClInclude>
-    <ClInclude Include="Logging\FileLogger.h">
+    <ClInclude Include="Logging\CFileLogger.h">
       <Filter>Logging</Filter>
     </ClInclude>
     <ClInclude Include="Logging\ILogger.h">
@@ -353,7 +353,7 @@
     <ClInclude Include="Logging\ELogLevel.h">
       <Filter>Logging</Filter>
     </ClInclude>
-    <ClInclude Include="Logging\ConsoleLogger.h">
+    <ClInclude Include="Logging\CConsoleLogger.h">
       <Filter>Logging</Filter>
     </ClInclude>
     <ClInclude Include="core.h">
@@ -398,13 +398,13 @@
     <ClInclude Include="GUI\IWindow.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\About\AboutBox.h">
+    <ClInclude Include="GUI\Widgets\About\CAboutBox.h">
       <Filter>GUI\Widgets\About</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\Log\LogWindow.h">
+    <ClInclude Include="GUI\Widgets\Log\CLogWindow.h">
       <Filter>GUI\Widgets\Log</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\Overlay\MumbleOverlay.h">
+    <ClInclude Include="GUI\Widgets\Overlay\CMumbleOverlay.h">
       <Filter>GUI\Widgets\Overlay</Filter>
     </ClInclude>
     <ClInclude Include="Mumble\EMapType.h">
@@ -443,10 +443,10 @@
     <ClInclude Include="Loader\Loader.h">
       <Filter>Loader</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\Addons\AddonsWindow.h">
+    <ClInclude Include="GUI\Widgets\Addons\CAddonsWindow.h">
       <Filter>GUI\Widgets\Addons</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\Debug\DebugWindow.h">
+    <ClInclude Include="GUI\Widgets\Debug\CDebugWindow.h">
       <Filter>GUI\Widgets\Debug</Filter>
     </ClInclude>
     <ClInclude Include="DataLink\DataLink.h">
@@ -509,7 +509,7 @@
     <ClInclude Include="GUI\Widgets\Menu\Menu.h">
       <Filter>GUI\Widgets\Menu</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\Options\OptionsWindow.h">
+    <ClInclude Include="GUI\Widgets\Options\COptionsWindow.h">
       <Filter>GUI\Widgets\Options</Filter>
     </ClInclude>
     <ClInclude Include="Settings\Settings.h">
@@ -968,13 +968,13 @@
     <ClInclude Include="CrashHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\EULA\EULAModal.h">
+    <ClInclude Include="GUI\Widgets\EULA\CEULAModal.h">
       <Filter>GUI\Widgets\EULA</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\Changelog\ChangelogWindow.h">
+    <ClInclude Include="GUI\Widgets\Changelog\CChangelogWindow.h">
       <Filter>GUI\Widgets\Changelog</Filter>
     </ClInclude>
     <ClInclude Include="stb\stb_image.h">
@@ -998,7 +998,7 @@
     <ClInclude Include="API\APIRequest.h">
       <Filter>API</Filter>
     </ClInclude>
-    <ClInclude Include="API\APIClient.h">
+    <ClInclude Include="API\CAPIClient.h">
       <Filter>API</Filter>
     </ClInclude>
     <ClInclude Include="API\CachedResponse.h">

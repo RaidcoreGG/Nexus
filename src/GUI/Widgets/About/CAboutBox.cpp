@@ -1,4 +1,4 @@
-#include "AboutBox.h"
+#include "CAboutBox.h"
 
 #include "Shared.h"
 #include "Paths.h"
@@ -10,12 +10,12 @@
 
 namespace GUI
 {
-	AboutBox::AboutBox(std::string aName)
+	CAboutBox::CAboutBox(std::string aName)
 	{
 		Name = aName;
 	}
 
-	void AboutBox::Render()
+	void CAboutBox::Render()
 	{
 		if (!Visible) { return; }
 

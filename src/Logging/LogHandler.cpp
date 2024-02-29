@@ -9,8 +9,8 @@
 #include "State.h"
 #include "Paths.h"
 
-#include "ConsoleLogger.h"
-#include "FileLogger.h"
+#include "CConsoleLogger.h"
+#include "CFileLogger.h"
 
 namespace LogHandler
 {
@@ -24,10 +24,10 @@ namespace LogHandler
 		/* setup default loggers */
 		if (State::IsConsoleEnabled)
 		{
-			RegisterLogger(new ConsoleLogger(ELogLevel::ALL));
+			RegisterLogger(new CConsoleLogger(ELogLevel::ALL));
 		}
 
-		RegisterLogger(new FileLogger(ELogLevel::ALL, Path::F_LOG));
+		RegisterLogger(new CFileLogger(ELogLevel::ALL, Path::F_LOG));
 	}
 
 	void RegisterLogger(ILogger* aLogger)

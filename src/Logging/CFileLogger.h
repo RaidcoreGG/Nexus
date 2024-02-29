@@ -6,11 +6,11 @@
 
 #include "ILogger.h"
 
-class FileLogger : public virtual ILogger
+class CFileLogger : public virtual ILogger
 {
 	public:
-		FileLogger(ELogLevel aLogLevel, std::filesystem::path aPath);
-		~FileLogger();
+		CFileLogger(ELogLevel aLogLevel, std::filesystem::path aPath);
+		~CFileLogger();
 
 		void LogMessage(LogEntry aLogEntry);
 

@@ -7,10 +7,10 @@
 
 namespace GUI
 {
-	class AboutBox : public IWindow
+	class CAboutBox : public IWindow
 	{
 	public:
-		AboutBox(std::string aName);
+		CAboutBox(std::string aName);
 		void Render();
 	};
 }

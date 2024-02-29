@@ -1,4 +1,4 @@
-#include "OptionsWindow.h"
+#include "COptionsWindow.h"
 
 #include <regex>
 #include <algorithm>
@@ -37,12 +37,12 @@ namespace GUI
 	void KeybindsTab();
 	void APITab();
 
-	OptionsWindow::OptionsWindow(std::string aName)
+	COptionsWindow::COptionsWindow(std::string aName)
 	{
 		Name = aName;
 	}
 
-	void OptionsWindow::Render()
+	void COptionsWindow::Render()
 	{
 		if (!Visible) { return; }
 

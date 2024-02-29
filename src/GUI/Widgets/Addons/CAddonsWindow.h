@@ -11,7 +11,7 @@
 
 namespace GUI
 {
-	class AddonsWindow : public IWindow
+	class CAddonsWindow : public IWindow
 	{
 	public:
 		Texture* Background;
@@ -31,7 +31,7 @@ namespace GUI
 		bool Tab1Hovered;
 		bool Tab2Hovered;
 
-		AddonsWindow(std::string aName);
+		CAddonsWindow(std::string aName);
 		void Render();
 	};
 }

@@ -1,4 +1,4 @@
-#include "ChangelogWindow.h"
+#include "CChangelogWindow.h"
 
 #include <Windows.h>
 #include <shellapi.h>
@@ -18,12 +18,12 @@ namespace GUI
 	float chlWidth = 30.0f;
 	float chlHeight = 24.0f;
 
-	ChangelogWindow::ChangelogWindow(std::string aName)
+	CChangelogWindow::CChangelogWindow(std::string aName)
 	{
 		Name = aName;
 	}
 
-	void ChangelogWindow::Render()
+	void CChangelogWindow::Render()
 	{
 		if (!Visible) { return; }
 

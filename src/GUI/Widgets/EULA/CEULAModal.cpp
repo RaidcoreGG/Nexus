@@ -1,4 +1,4 @@
-#include "EULAModal.h"
+#include "CEULAModal.h"
 
 #include <Windows.h>
 #include <shellapi.h>
@@ -24,12 +24,12 @@ namespace GUI
 	void KeybindsTab();
 	void APITab();
 
-	EULAModal::EULAModal()
+	CEULAModal::CEULAModal()
 	{
-		Name = "EULAModal";
+		Name = "CEULAModal";
 	}
 
-	void EULAModal::Render()
+	void CEULAModal::Render()
 	{
 		ImGui::OpenPopup("Legal Agreement", ImGuiPopupFlags_AnyPopupLevel);
 		ImVec2 center(Renderer::Width * 0.5f, Renderer::Height * 0.5f);
@@ -81,7 +81,7 @@ namespace GUI
 			{
 				ImGui::CloseCurrentPopup();
 				auto it = std::find_if(GUI::Windows.begin(), GUI::Windows.end(), [](const IWindow* wnd) {
-					return wnd->Name == "EULAModal";
+					return wnd->Name == "CEULAModal";
 					});
 
 				if (it != GUI::Windows.end())

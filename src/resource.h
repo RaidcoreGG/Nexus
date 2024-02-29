@@ -32,7 +32,7 @@
 #define RES_TEX_MENU_BUTTON             308
 #define RES_TEX_MENU_BUTTON_HOVER       309
 
-/* AddonsWindow */
+/* CAddonsWindow */
 
 #define RES_TEX_ADDONS_BACKGROUND       401
 #define RES_TEX_ADDONITEM				402

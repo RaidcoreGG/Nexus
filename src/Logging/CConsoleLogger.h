@@ -3,11 +3,11 @@
 
 #include "ILogger.h"
 
-class ConsoleLogger : public virtual ILogger
+class CConsoleLogger : public virtual ILogger
 {
 	public:
-		ConsoleLogger(ELogLevel aLogLevel);
-		~ConsoleLogger();
+		CConsoleLogger(ELogLevel aLogLevel);
+		~CConsoleLogger();
 
 		void LogMessage(LogEntry aLogEntry);
 };

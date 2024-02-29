@@ -5,7 +5,7 @@
 
 namespace GUI
 {
-	class MumbleOverlay : public IWindow
+	class CMumbleOverlay : public IWindow
 	{
 	public:
 		void Render();

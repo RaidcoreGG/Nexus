@@ -1,11 +1,11 @@
-#include "APIClient.h"
+#include "CAPIClient.h"
 
 #include <fstream>
 
 #include "core.h"
 #include "Shared.h"
 
-APIClient::APIClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::path aCacheDirectory, int aCacheLifetime, int aBucketCapacity, int aRefillAmount, int aRefillInterval)
+CAPIClient::CAPIClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::path aCacheDirectory, int aCacheLifetime, int aBucketCapacity, int aRefillAmount, int aRefillInterval)
 {
 	BaseURL = GetBaseURL(aBaseURL); // sanitize url just to be sure
 	Client = new httplib::Client(BaseURL);
@@ -22,13 +22,13 @@ APIClient::APIClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::pat
 	RefillAmount = aRefillAmount;
 	RefillInterval = aRefillInterval;
 
-	LogDebug(("APIClient::" + BaseURL).c_str(), "APIClient(BaseURL: %s, EnableSSL: %s, CacheDirectory: %s, CacheLifetime: %d, BucketCapacity: %d, RefillAmount: %d, RefillInterval: %d)",
+	LogDebug(("CAPIClient::" + BaseURL).c_str(), "CAPIClient(BaseURL: %s, EnableSSL: %s, CacheDirectory: %s, CacheLifetime: %d, BucketCapacity: %d, RefillAmount: %d, RefillInterval: %d)",
 		BaseURL.c_str(),
 		aEnableSSL ? "true" : "false",
 		CacheDirectory.string().c_str(),
 		CacheLifetime, BucketCapacity, RefillAmount, RefillInterval);
 
-	WorkerThread = std::thread(&APIClient::ProcessRequests, this);
+	WorkerThread = std::thread(&CAPIClient::ProcessRequests, this);
 	WorkerThread.detach();
 
 	std::filesystem::path timeOffset = aCacheDirectory / "0";
@@ -38,7 +38,7 @@ APIClient::APIClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::pat
 
 	FileTimeOffset = Timestamp() - std::chrono::duration_cast<std::chrono::seconds>(std::filesystem::last_write_time(timeOffset).time_since_epoch()).count();
 }
-APIClient::~APIClient()
+CAPIClient::~CAPIClient()
 {
 	const std::lock_guard<std::mutex> lock(Mutex);
 	while (ResponseCache.size() > 0)
@@ -52,10 +52,10 @@ APIClient::~APIClient()
 
 	delete Client;
 
-	LogDebug(("APIClient::" + BaseURL).c_str(), "~APIClient(%s)", BaseURL.c_str());
+	LogDebug(("CAPIClient::" + BaseURL).c_str(), "~CAPIClient(%s)", BaseURL.c_str());
 }
 
-json APIClient::Get(std::string aEndpoint, std::string aParameters)
+json CAPIClient::Get(std::string aEndpoint, std::string aParameters)
 {
 	std::string query = GetQuery(aEndpoint, aParameters);
 
@@ -67,12 +67,12 @@ json APIClient::Get(std::string aEndpoint, std::string aParameters)
 
 		if (diff < CacheLifetime && cachedResponse->Content != nullptr)
 		{
-			//LogDebug(("APIClient::" + BaseURL).c_str(), "Cached message %d seconds old. Reading from cache.", diff);
+			//LogDebug(("CAPIClient::" + BaseURL).c_str(), "Cached message %d seconds old. Reading from cache.", diff);
 			return cachedResponse->Content;
 		}
 		else
 		{
-			//LogDebug(("APIClient::" + BaseURL).c_str(), "Cached message %d seconds old. CacheLifetime %d. Queueing request.", diff, CacheLifetime);
+			//LogDebug(("CAPIClient::" + BaseURL).c_str(), "Cached message %d seconds old. CacheLifetime %d. Queueing request.", diff, CacheLifetime);
 		}
 	}
 
@@ -108,7 +108,7 @@ json APIClient::Get(std::string aEndpoint, std::string aParameters)
 
 	return cachedResponse != nullptr ? cachedResponse->Content : json{};
 }
-void APIClient::Download(std::filesystem::path aOutPath, std::string aEndpoint, std::string aParameters)
+void CAPIClient::Download(std::filesystem::path aOutPath, std::string aEndpoint, std::string aParameters)
 {
 	std::string query = GetQuery(aEndpoint, aParameters);
 
@@ -123,12 +123,12 @@ void APIClient::Download(std::filesystem::path aOutPath, std::string aEndpoint, 
 
 	if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
 	{
-		LogWarning(("APIClient::" + BaseURL).c_str(), "Error fetching %s", query.c_str());
+		LogWarning(("CAPIClient::" + BaseURL).c_str(), "Error fetching %s", query.c_str());
 		return;
 	}
 }
 
-CachedResponse* APIClient::GetCachedResponse(const std::string& aQuery)
+CachedResponse* CAPIClient::GetCachedResponse(const std::string& aQuery)
 {
 	std::filesystem::path path = GetNormalizedPath(aQuery);
 
@@ -157,13 +157,13 @@ CachedResponse* APIClient::GetCachedResponse(const std::string& aQuery)
 		}
 		catch (json::parse_error& ex)
 		{
-			Log(("APIClient::" + BaseURL).c_str(), "%s could not be parsed. Error: %s", path.string().c_str(), ex.what());
+			Log(("CAPIClient::" + BaseURL).c_str(), "%s could not be parsed. Error: %s", path.string().c_str(), ex.what());
 		}
 	}
 
 	return nullptr;
 }
-std::filesystem::path APIClient::GetNormalizedPath(const std::string& aQuery) const
+std::filesystem::path CAPIClient::GetNormalizedPath(const std::string& aQuery) const
 {
 	std::string pathStr = aQuery;
 
@@ -208,7 +208,7 @@ std::filesystem::path APIClient::GetNormalizedPath(const std::string& aQuery) co
 	return CacheDirectory.string() + pathStr.c_str();
 }
 
-void APIClient::ProcessRequests()
+void CAPIClient::ProcessRequests()
 {
 	for (;;)
 	{
@@ -312,7 +312,7 @@ void APIClient::ProcessRequests()
 				std::error_code err;
 				if (!CreateDirectoryRecursive(normalizedPath.parent_path().string(), err))
 				{
-					LogWarning(("APIClient::" + BaseURL).c_str(), "CreateDirectoryRecursive FAILED, err: % s", err.message());
+					LogWarning(("CAPIClient::" + BaseURL).c_str(), "CreateDirectoryRecursive FAILED, err: % s", err.message());
 				}
 
 				std::ofstream file(normalizedPath);
@@ -344,7 +344,7 @@ void APIClient::ProcessRequests()
 		IsSuspended = true;
 	}
 }
-APIResponse APIClient::DoHttpReq(APIRequest aRequest)
+APIResponse CAPIClient::DoHttpReq(APIRequest aRequest)
 {
 	APIResponse response{
 		0,
@@ -355,14 +355,14 @@ APIResponse APIClient::DoHttpReq(APIRequest aRequest)
 
 	if (!result)
 	{
-		LogWarning(("APIClient::" + BaseURL).c_str(), "Error fetching %s", aRequest.Query.c_str());
+		LogWarning(("CAPIClient::" + BaseURL).c_str(), "Error fetching %s", aRequest.Query.c_str());
 		response.Status = 1;
 		return response;
 	}
 
 	if (result->status != 200) // not HTTP_OK
 	{
-		LogWarning(("APIClient::" + BaseURL).c_str(), "Status %d when fetching %s", result->status, aRequest.Query.c_str());
+		LogWarning(("CAPIClient::" + BaseURL).c_str(), "Status %d when fetching %s", result->status, aRequest.Query.c_str());
 		response.Status = result->status;
 		return response;
 	}
@@ -375,25 +375,25 @@ APIResponse APIClient::DoHttpReq(APIRequest aRequest)
 	}
 	catch (json::parse_error& ex)
 	{
-		LogWarning(("APIClient::" + BaseURL).c_str(), "Response from %s could not be parsed. Error: %s", aRequest.Query.c_str(), ex.what());
+		LogWarning(("CAPIClient::" + BaseURL).c_str(), "Response from %s could not be parsed. Error: %s", aRequest.Query.c_str(), ex.what());
 		return response;
 	}
 
 	if (jsonResult.is_null())
 	{
-		LogWarning(("APIClient::" + BaseURL).c_str(), "Error parsing API response from %s.", aRequest.Query.c_str());
+		LogWarning(("CAPIClient::" + BaseURL).c_str(), "Error parsing API response from %s.", aRequest.Query.c_str());
 		return response;
 	}
 
 	//response.Headers = result->headers;
-	/*Log(("APIClient::" + BaseURL).c_str(), "%s", aRequest.Query.c_str());
+	/*Log(("CAPIClient::" + BaseURL).c_str(), "%s", aRequest.Query.c_str());
 	for (auto it = result->headers.begin(); it != result->headers.end(); ++it)
 	{
 		if (it->first == "Last-Modified")
 		{
 			Log("meme", "Last-Modified: %d", LastModifiedToTimestamp(it->second));
 		}
-		Log(("APIClient::" + BaseURL).c_str(), "%s : %s", it->first.c_str(), it->second.c_str());
+		Log(("CAPIClient::" + BaseURL).c_str(), "%s : %s", it->first.c_str(), it->second.c_str());
 	}*/
 	response.Content = jsonResult;
 	return response;
