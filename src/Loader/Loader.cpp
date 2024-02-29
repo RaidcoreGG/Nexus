@@ -104,6 +104,23 @@ namespace Loader
 				}
 			}
 
+			// if addons were specified via start parameter
+			// iterate over all addons now in config
+			// check if they were specified
+			// if yes, set them to loaded
+			// if no, set them to unloaded
+			if (RequestedAddons.size() > 0)
+			{
+				for (auto& cfgIt : AddonConfig)
+				{
+					cfgIt.second.IsLoaded = false;
+				}
+				for (signed int sig : RequestedAddons)
+				{
+					AddonConfig[sig].IsLoaded = true;
+				}
+			}
+
 			FSItemList = ILCreateFromPathA(Path::GetAddonDirectory(nullptr));
 			if (FSItemList == 0) {
 				LogCritical(CH_LOADER, "Loader disabled. Reason: ILCreateFromPathA(Path::D_GW2_ADDONS) returned 0.");
@@ -145,7 +162,7 @@ namespace Loader
 
 				std::sort(AddonLibrary.begin(), AddonLibrary.end(), [](LibraryAddon* a, LibraryAddon* b) {
 					return a->Name < b->Name;
-					});
+				});
 			}
 			else
 			{
@@ -173,6 +190,7 @@ namespace Loader
 			}
 
 			const std::lock_guard<std::mutex> lock(Mutex);
+			if (RequestedAddons.size() == 0) // don't save state if state was overridden via start param
 			{
 				json cfg = json::array();
 
@@ -474,25 +492,14 @@ namespace Loader
 			// reload is thrown in the mix here because not only does a reload imply not first load
 			// but also this is necessary to skip this segment for arcdps integration
 			bool wasRequested = false;
-			if (RequestedAddons.size() > 0)
-			{
-				for (signed int id : RequestedAddons)
-				{
-					if (id == tmpDefs->Signature)
-					{
-						wasRequested = true;
-						break;
-					}
-				}
-			}
-			else if (addonInfo != nullptr && addonInfo->IsLoaded)
+			if (addonInfo != nullptr && addonInfo->IsLoaded)
 			{
 				wasRequested = true;
 			}
 
 			if (!wasRequested)
 			{
-				LogInfo(CH_LOADER, "\"%s\" was not requested via start parameter and/or last state was disabled. Skipped.", strPath, tmpDefs->Signature);
+				LogInfo(CH_LOADER, "\"%s\" was not requested via start parameter or last state was disabled. Skipped.", strPath, tmpDefs->Signature);
 
 				// free old and clone new anyway so the addon can be listed
 				FreeAddonDefs(&addon->Definitions);
