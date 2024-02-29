@@ -105,6 +105,7 @@ namespace GUI
 							}
 						}
 					}
+					ImGui::TooltipGeneric("Addon state won't be saved. Game was started with addons via start parameters.");
 				}
 				else if (aAddon->State == EAddonState::NotLoaded)
 				{
@@ -120,6 +121,7 @@ namespace GUI
 							}
 						}
 					}
+					ImGui::TooltipGeneric("Addon state won't be saved. Game was started with addons via start parameter.");
 				}
 				{
 					amtBtns++;
