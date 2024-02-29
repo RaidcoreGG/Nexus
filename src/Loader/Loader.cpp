@@ -210,6 +210,10 @@ namespace Loader
 					auto cfgIt = AddonConfig.find(addon->Definitions->Signature);
 					if (cfgIt != AddonConfig.end())
 					{
+						if (addon->State == EAddonState::LoadedLOCKED && addon->ShouldDisableNextLaunch)
+						{
+							addonInfo["IsLoaded"] = false;
+						}
 						addonInfo["IsPausingUpdates"] = cfgIt->second.IsPausingUpdates;
 						addonInfo["IsDisabledUntilUpdate"] = cfgIt->second.IsDisabledUntilUpdate;
 					}

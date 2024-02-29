@@ -102,10 +102,48 @@ namespace GUI
 							{
 								//LogDebug(CH_GUI, "Unload called: %s", it.second->Definitions->Name);
 								Loader::QueueAddon(ELoaderAction::Unload, it.first);
+								break;
 							}
 						}
 					}
-					ImGui::TooltipGeneric("Addon state won't be saved. Game was started with addons via start parameters.");
+					if (RequestedAddons.size() > 0)
+					{
+						ImGui::TooltipGeneric("Addon state won't be saved. Game was started with addons via start parameters.");
+					}
+				}
+				else if (aAddon->State == EAddonState::LoadedLOCKED && aAddon->ShouldDisableNextLaunch == false)
+				{
+					amtBtns++;
+
+					std::string additionalInfo;
+
+					if (RequestedAddons.size() > 0)
+					{
+						additionalInfo = "\nAddon state won't be saved. Game was started with addons via start parameters.";
+					}
+
+					if (ImGui::GW2Button(("Disable*##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					{
+						aAddon->ShouldDisableNextLaunch = true;
+					}
+					ImGui::TooltipGeneric("* Disabling won't take effect until next game start.%s", additionalInfo.c_str());
+				}
+				else if (aAddon->State == EAddonState::LoadedLOCKED && aAddon->ShouldDisableNextLaunch == true)
+				{
+					amtBtns++;
+
+					std::string additionalInfo;
+
+					if (RequestedAddons.size() > 0)
+					{
+						additionalInfo = "\nAddon state won't be saved. Game was started with addons via start parameters.";
+					}
+
+					if (ImGui::GW2Button(("Load*##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					{
+						aAddon->ShouldDisableNextLaunch = false;
+					}
+					ImGui::TooltipGeneric("* Load addon next game start.%s", additionalInfo.c_str());
 				}
 				else if (aAddon->State == EAddonState::NotLoaded)
 				{
@@ -118,10 +156,14 @@ namespace GUI
 							{
 								//LogDebug(CH_GUI, "Load called: %s", it.second->Definitions->Name);
 								Loader::QueueAddon(ELoaderAction::Load, it.first);
+								break;
 							}
 						}
 					}
-					ImGui::TooltipGeneric("Addon state won't be saved. Game was started with addons via start parameter.");
+					if (RequestedAddons.size() > 0)
+					{
+						ImGui::TooltipGeneric("Addon state won't be saved. Game was started with addons via start parameters.");
+					}
 				}
 				{
 					amtBtns++;
@@ -133,6 +175,7 @@ namespace GUI
 							{
 								//LogDebug(CH_GUI, "Uninstall called: %s", it.second->Definitions->Name);
 								Loader::QueueAddon(ELoaderAction::Uninstall, it.first);
+								break;
 							}
 						}
 					}

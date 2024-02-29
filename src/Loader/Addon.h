@@ -15,6 +15,7 @@ struct Addon
 	DWORD						ModuleSize;
 	std::vector<unsigned char>	MD5;
 	AddonDefinition*			Definitions;
+	bool						ShouldDisableNextLaunch;
 };
 
 #endif
