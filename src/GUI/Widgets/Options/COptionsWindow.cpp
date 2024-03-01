@@ -347,6 +347,8 @@ namespace GUI
 
 				float kbButtonWidth = ImGui::CalcTextSize("XXXXXXXXXXXXXXXXXXXXXXXX").x;
 
+				bool openEditor = false;
+
 				Keybinds::Mutex.lock();
 				{
 					// I'm gonna regret writing this code in a moment
@@ -380,7 +382,7 @@ namespace GUI
 								if (ImGui::Button((keybind.Bind.ToString(true) + "##" + identifier).c_str(), ImVec2(kbButtonWidth, 0.0f)))
 								{
 									CurrentlyEditing = identifier;
-									ImGui::OpenPopup(("Set Keybind: " + CurrentlyEditing).c_str(), ImGuiPopupFlags_AnyPopupLevel);
+									openEditor = true;
 								}
 
 								ImGui::TableSetColumnIndex(2);
@@ -395,6 +397,12 @@ namespace GUI
 					}
 				}
 				Keybinds::Mutex.unlock();
+
+				if (openEditor)
+				{
+					openEditor = false;
+					ImGui::OpenPopup(("Set Keybind: " + CurrentlyEditing).c_str(), ImGuiPopupFlags_AnyPopupLevel);
+				}
 
 				ImVec2 center(Renderer::Width * 0.5f, Renderer::Height * 0.5f);
 				ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
