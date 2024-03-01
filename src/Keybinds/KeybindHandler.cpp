@@ -123,6 +123,16 @@ namespace Keybinds
 				json keybinds = json::parse(file);
 				for (json binding : keybinds)
 				{
+					if (binding.is_null() ||
+						binding["Key"].is_null() ||
+						binding["Alt"].is_null() ||
+						binding["Ctrl"].is_null() ||
+						binding["Shift"].is_null())
+					{
+						LogDebug(CH_KEYBINDS, "One or more fields of keybind were null.");
+						continue;
+					}
+
 					Keybind kb{};
 					binding["Key"].get_to(kb.Key);
 					binding["Alt"].get_to(kb.Alt);
