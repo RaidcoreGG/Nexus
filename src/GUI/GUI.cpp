@@ -666,12 +666,12 @@ namespace GUI
 		AddWindow(dbgWnd);
 		AddWindow(aboutWnd);
 
-		Menu::AddMenuItem("Addons",		ICON_ADDONS,	&addonsWnd->Visible);
-		Menu::AddMenuItem("Options",	ICON_OPTIONS,	&opsWnd->Visible);
-		Menu::AddMenuItem("Changelog",	ICON_CHANGELOG, &chlWnd->Visible);
-		Menu::AddMenuItem("Log",		ICON_LOG,		&logWnd->Visible);
-		Menu::AddMenuItem("Debug",		ICON_DEBUG,		&dbgWnd->Visible);
-		Menu::AddMenuItem("About",		ICON_ABOUT,		&aboutWnd->Visible);
+		Menu::AddMenuItem("Addons",		ICON_ADDONS,	RES_ICON_ADDONS,	&addonsWnd->Visible);
+		Menu::AddMenuItem("Options",	ICON_OPTIONS,	RES_ICON_OPTIONS,	&opsWnd->Visible);
+		Menu::AddMenuItem("Changelog",	ICON_CHANGELOG, RES_ICON_CHANGELOG,	&chlWnd->Visible);
+		Menu::AddMenuItem("Log",		ICON_LOG,		RES_ICON_LOG,		&logWnd->Visible);
+		Menu::AddMenuItem("Debug",		ICON_DEBUG,		RES_ICON_DEBUG,		&dbgWnd->Visible);
+		Menu::AddMenuItem("About",		ICON_ABOUT,		RES_ICON_ABOUT,		&aboutWnd->Visible);
 
 		/* register keybinds */
 		Keybinds::Register(KB_MENU, ProcessKeybind, "CTRL+O");
@@ -702,18 +702,6 @@ namespace GUI
 		TextureLoader::LoadFromResource(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, NexusHandle, nullptr);
 
 		TextureLoader::LoadFromResource(ICON_NOTIFICATION, RES_ICON_NOTIFICATION, NexusHandle, QuickAccess::ReceiveTextures);
-
-		TextureLoader::LoadFromResource(ICON_ADDONS, RES_ICON_ADDONS, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource(ICON_OPTIONS, RES_ICON_OPTIONS, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource(ICON_OPTIONS_HOVER, RES_ICON_OPTIONS_HOVER, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource(ICON_CHANGELOG, RES_ICON_CHANGELOG, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource(ICON_LOG, RES_ICON_LOG, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource(ICON_DEBUG, RES_ICON_DEBUG, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource(ICON_ABOUT, RES_ICON_ABOUT, NexusHandle, nullptr);
-
-		TextureLoader::LoadFromResource(TEX_MENU_BACKGROUND, RES_TEX_MENU_BACKGROUND, NexusHandle, Menu::ReceiveTextures);
-		TextureLoader::LoadFromResource(TEX_MENU_BUTTON, RES_TEX_MENU_BUTTON, NexusHandle, Menu::ReceiveTextures);
-		TextureLoader::LoadFromResource(TEX_MENU_BUTTON_HOVER, RES_TEX_MENU_BUTTON_HOVER, NexusHandle, Menu::ReceiveTextures);
 
 		/* add shortcut */
 		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "Nexus Menu");

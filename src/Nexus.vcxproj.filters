@@ -1159,5 +1159,11 @@
     <Image Include="Resources\ContextMenu\ContextMenu_Highlight.png">
       <Filter>Resource Files\Images\ContextMenu</Filter>
     </Image>
+    <Image Include="Resources\BtnRefresh_Hover.png">
+      <Filter>Resource Files\Images</Filter>
+    </Image>
+    <Image Include="Resources\BtnRefresh.png">
+      <Filter>Resource Files\Images</Filter>
+    </Image>
   </ItemGroup>
 </Project>

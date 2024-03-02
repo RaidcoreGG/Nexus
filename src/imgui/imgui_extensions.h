@@ -215,7 +215,7 @@ namespace ImGui
 			if (hov)
 			{
 				ImGui::SetCursorPos(initialPos);
-				if (highlight_texture_id) { ImGui::Image(highlight_texture_id, ImVec2(itemWidth, height * 1.2)); }
+				if (highlight_texture_id) { ImGui::Image(highlight_texture_id, ImVec2(itemWidth, height * 1.2f)); }
 			}
 			ImGui::PopItemFlag();
 

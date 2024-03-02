@@ -139,6 +139,8 @@ RES_TEX_BTNCLOSE				PNG             "Resources\\BtnClose.png"
 RES_TEX_BTNCLOSE_HOVER			PNG             "Resources\\BtnClose_Hover.png"
 RES_TEX_TITLEBAREND				PNG             "Resources\\TitleBarEnd.png"
 RES_TEX_TITLEBAREND_HOVER		PNG             "Resources\\TitleBarEnd_Hover.png"
+RES_TEX_BTNREFRESH				PNG				"Resources\\BtnRefresh.png"
+RES_TEX_BTNREFRESH_HOVER		PNG				"Resources\\BtnRefresh_Hover.png"
 
 RES_ARCDPS_INTEGRATION			DLL				"Resources\\bin64\\arcdps_integration64.dll"
 
