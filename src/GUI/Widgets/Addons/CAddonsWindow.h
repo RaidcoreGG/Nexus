@@ -23,6 +23,8 @@ namespace GUI
 		Texture* BtnCloseHover;
 		Texture* TabBtn;
 		Texture* TabBtnHover;
+		Texture* BtnRefresh;
+		Texture* BtnRefreshHover;
 
 		bool TitleBarControlled;
 		bool CloseHovered;

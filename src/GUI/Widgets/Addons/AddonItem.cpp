@@ -59,7 +59,7 @@ namespace GUI
 		}
 		else
 		{
-			Background = TextureLoader::Get("TEX_ADDONITEM_BACKGROUND");
+			Background = TextureLoader::GetOrCreate("TEX_ADDONITEM_BACKGROUND", RES_TEX_ADDONITEM, NexusHandle);
 		}
 
 		if (!BtnOptions) { BtnOptions = TextureLoader::GetOrCreate("ICON_OPTIONS", RES_ICON_OPTIONS, NexusHandle); }
