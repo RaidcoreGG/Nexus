@@ -23,14 +23,15 @@
 
 #define RES_ICON_ADDONS					301
 #define RES_ICON_OPTIONS				302
-#define RES_ICON_CHANGELOG				303
-#define RES_ICON_LOG					304
-#define RES_ICON_DEBUG					305
-#define RES_ICON_ABOUT					306
+#define RES_ICON_OPTIONS_HOVER			303
+#define RES_ICON_CHANGELOG				304
+#define RES_ICON_LOG					305
+#define RES_ICON_DEBUG					306
+#define RES_ICON_ABOUT					307
 
-#define RES_TEX_MENU_BACKGROUND         307
-#define RES_TEX_MENU_BUTTON             308
-#define RES_TEX_MENU_BUTTON_HOVER       309
+#define RES_TEX_MENU_BACKGROUND         308
+#define RES_TEX_MENU_BUTTON             309
+#define RES_TEX_MENU_BUTTON_HOVER       310
 
 /* CAddonsWindow */
 

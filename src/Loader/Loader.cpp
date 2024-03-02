@@ -214,7 +214,7 @@ namespace Loader
 						{
 							addonInfo["IsLoaded"] = false;
 						}
-						addonInfo["IsPausingUpdates"] = cfgIt->second.IsPausingUpdates;
+						addonInfo["IsPausingUpdates"] = addon->IsPausingUpdates;
 						addonInfo["IsDisabledUntilUpdate"] = cfgIt->second.IsDisabledUntilUpdate;
 					}
 
@@ -496,9 +496,14 @@ namespace Loader
 			// reload is thrown in the mix here because not only does a reload imply not first load
 			// but also this is necessary to skip this segment for arcdps integration
 			bool wasRequested = false;
-			if (addonInfo != nullptr && addonInfo->IsLoaded)
+			if (addonInfo != nullptr)
 			{
-				wasRequested = true;
+				addon->IsPausingUpdates = addonInfo->IsPausingUpdates;
+
+				if (addonInfo->IsLoaded)
+				{
+					wasRequested = true;
+				}
 			}
 
 			if (!wasRequested)
@@ -518,7 +523,7 @@ namespace Loader
 
 		// if not already being reloaded check for update
 		// also either addons must be enabled or there's no info on that yet
-		if (!aIsReload && (addonInfo == nullptr || !addonInfo->IsPausingUpdates))
+		if (!aIsReload && (addonInfo == nullptr || !addon->IsPausingUpdates))
 		{
 			std::filesystem::path tmpPath = aPath.string();
 			signed int tmpSig = tmpDefs->Signature;

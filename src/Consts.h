@@ -36,6 +36,7 @@ extern const char* ICON_GENERIC_HOVER;
 extern const char* ICON_NOTIFICATION;
 extern const char* ICON_ADDONS;
 extern const char* ICON_OPTIONS;
+extern const char* ICON_OPTIONS_HOVER;
 extern const char* ICON_CHANGELOG;
 extern const char* ICON_LOG;
 extern const char* ICON_DEBUG;

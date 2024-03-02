@@ -35,6 +35,7 @@ const char* ICON_GENERIC_HOVER			= "ICON_GENERIC_HOVER";
 const char* ICON_NOTIFICATION			= "ICON_NOTIFICATION";
 const char* ICON_ADDONS					= "ICON_ADDONS";
 const char* ICON_OPTIONS				= "ICON_OPTIONS";
+const char* ICON_OPTIONS_HOVER			= "ICON_OPTIONS_HOVER";
 const char* ICON_CHANGELOG				= "ICON_CHANGELOG";
 const char* ICON_LOG					= "ICON_LOG";
 const char* ICON_DEBUG					= "ICON_NOTIFICATION";

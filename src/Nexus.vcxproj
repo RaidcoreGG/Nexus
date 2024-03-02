@@ -340,6 +340,7 @@
     <Image Include="Resources\Menu\BtnDebug.png" />
     <Image Include="Resources\Menu\BtnLog.png" />
     <Image Include="Resources\Menu\BtnOptions.png" />
+    <Image Include="Resources\Menu\BtnOptions_Hover.png" />
     <Image Include="Resources\Menu\MenuItem.png" />
     <Image Include="Resources\Menu\MenuItem_Hover.png" />
     <Image Include="Resources\Notification.png" />

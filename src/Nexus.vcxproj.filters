@@ -1147,5 +1147,8 @@
     <Image Include="Resources\Notification.png">
       <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
+    <Image Include="Resources\Menu\BtnOptions_Hover.png">
+      <Filter>Resource Files\Images\Menu</Filter>
+    </Image>
   </ItemGroup>
 </Project>

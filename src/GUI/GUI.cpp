@@ -705,6 +705,7 @@ namespace GUI
 
 		TextureLoader::LoadFromResource(ICON_ADDONS, RES_ICON_ADDONS, NexusHandle, nullptr);
 		TextureLoader::LoadFromResource(ICON_OPTIONS, RES_ICON_OPTIONS, NexusHandle, nullptr);
+		TextureLoader::LoadFromResource(ICON_OPTIONS_HOVER, RES_ICON_OPTIONS_HOVER, NexusHandle, nullptr);
 		TextureLoader::LoadFromResource(ICON_CHANGELOG, RES_ICON_CHANGELOG, NexusHandle, nullptr);
 		TextureLoader::LoadFromResource(ICON_LOG, RES_ICON_LOG, NexusHandle, nullptr);
 		TextureLoader::LoadFromResource(ICON_DEBUG, RES_ICON_DEBUG, NexusHandle, nullptr);
