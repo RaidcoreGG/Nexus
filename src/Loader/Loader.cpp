@@ -441,7 +441,14 @@ namespace Loader
 		}
 		else
 		{
-			firstLoad = true;
+			if (std::filesystem::exists(Path::F_ADDONCONFIG)) // migration
+			{
+				firstLoad = true;
+			}
+			else
+			{
+				firstLoad = false;
+			}
 			addon = new Addon{};
 			addon->State = EAddonState::None;
 			Addons.insert({ aPath, addon });
