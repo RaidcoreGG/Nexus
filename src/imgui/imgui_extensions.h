@@ -223,6 +223,27 @@ namespace ImGui
 
 			return btn;
 		}
+
+		static void TooltipGeneric(const char* fmt, ...)
+		{
+			/* FIXME: this style is obviously not gw2, just a simplified standard style */
+
+			ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0, 0, 0, 1));
+			ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0.141f, 0.180f, 0.196f, 0.784f));
+			ImGui::PushStyleVar(ImGuiStyleVar_PopupBorderSize, 1.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(4.0f, 4.0f));
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::BeginTooltip();
+				va_list args;
+				va_start(args, fmt);
+				ImGui::TextV(fmt, args);
+				va_end(args);
+				ImGui::EndTooltip();
+			}
+			ImGui::PopStyleVar(2);
+			ImGui::PopStyleColor(2);
+		}
 	}
 
 	static ImVec4 HEXtoIV4(const char* hex)

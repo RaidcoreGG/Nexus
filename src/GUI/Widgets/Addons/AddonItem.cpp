@@ -80,7 +80,7 @@ namespace GUI
 				ImGui::PushFont(Font);
 				ImGui::TextColored(ImVec4(1.0f, 0.933f, 0.733f, 1.0f), aAddon->Definitions->Name); ImGui::SameLine();
 				ImGui::PopFont();
-				ImGui::TooltipGeneric("Version: %s", aAddon->Definitions->Version.ToString().c_str());
+				ImGui::GW2::TooltipGeneric("Version: %s", aAddon->Definitions->Version.ToString().c_str());
 				ImGui::TextColored(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "by %s", aAddon->Definitions->Author);
 
 				if (aAddon->State == EAddonState::NotLoadedIncompatibleAPI)
@@ -114,23 +114,6 @@ namespace GUI
 					ImGui::ImageButton(BtnOptions->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling));
 					if (ImGui::BeginPopupContextItem("##AddonItemActionsMore"))
 					{
-						if (ImGui::GW2::ContextMenuItem(("Uninstall##" + sig).c_str(), "Uninstall", CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
-						{
-							for (auto& it : Loader::Addons)
-							{
-								if (it.second->Definitions == aAddon->Definitions)
-								{
-									//LogDebug(CH_GUI, "Uninstall called: %s", it.second->Definitions->Name);
-									Loader::QueueAddon(ELoaderAction::Uninstall, it.first);
-									break;
-								}
-							}
-						}
-						if (aAddon->State == EAddonState::LoadedLOCKED)
-						{
-							ImGui::TooltipGeneric("This addon is currently locked and requires a restart to be removed.");
-						}
-
 						if (ImGui::GW2::ContextMenuItem(("Update##" + sig).c_str(), "Update", CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 						{
 							for (auto& it : Loader::Addons)
@@ -160,7 +143,7 @@ namespace GUI
 						}
 						if (aAddon->State == EAddonState::LoadedLOCKED)
 						{
-							ImGui::TooltipGeneric("This addon is currently locked and requires a restart for the update to take effect.");
+							ImGui::GW2::TooltipGeneric("This addon is currently locked and requires a restart for the update to take effect.");
 						}
 
 						if (ImGui::GW2::ContextMenuItem((aAddon->IsPausingUpdates ? "Resume Updates##" : "Pause Updates##" + sig).c_str(),
@@ -168,6 +151,25 @@ namespace GUI
 							CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 						{
 							aAddon->IsPausingUpdates = !aAddon->IsPausingUpdates;
+						}
+
+						ImGui::Separator();
+
+						if (ImGui::GW2::ContextMenuItem(("Uninstall##" + sig).c_str(), "Uninstall", CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+						{
+							for (auto& it : Loader::Addons)
+							{
+								if (it.second->Definitions == aAddon->Definitions)
+								{
+									//LogDebug(CH_GUI, "Uninstall called: %s", it.second->Definitions->Name);
+									Loader::QueueAddon(ELoaderAction::Uninstall, it.first);
+									break;
+								}
+							}
+						}
+						if (aAddon->State == EAddonState::LoadedLOCKED)
+						{
+							ImGui::GW2::TooltipGeneric("This addon is currently locked and requires a restart to be removed.");
 						}
 
 						ImGui::EndPopup();
@@ -195,7 +197,7 @@ namespace GUI
 					}
 					if (RequestedAddons.size() > 0)
 					{
-						ImGui::TooltipGeneric("Addon state won't be saved. Game was started with addons via start parameters.");
+						ImGui::GW2::TooltipGeneric("Addon state won't be saved. Game was started with addons via start parameters.");
 					}
 				}
 				else if (aAddon->State == EAddonState::LoadedLOCKED && aAddon->ShouldDisableNextLaunch == false)
@@ -211,7 +213,7 @@ namespace GUI
 					{
 						aAddon->ShouldDisableNextLaunch = true;
 					}
-					ImGui::TooltipGeneric("* Disabling won't take effect until next game start.%s", additionalInfo.c_str());
+					ImGui::GW2::TooltipGeneric("* Disabling won't take effect until next game start.%s", additionalInfo.c_str());
 				}
 				else if (aAddon->State == EAddonState::LoadedLOCKED && aAddon->ShouldDisableNextLaunch == true)
 				{
@@ -226,7 +228,7 @@ namespace GUI
 					{
 						aAddon->ShouldDisableNextLaunch = false;
 					}
-					ImGui::TooltipGeneric("* Load addon next game start.%s", additionalInfo.c_str());
+					ImGui::GW2::TooltipGeneric("* Load addon next game start.%s", additionalInfo.c_str());
 				}
 				else if (aAddon->State == EAddonState::NotLoaded)
 				{
@@ -244,7 +246,7 @@ namespace GUI
 					}
 					if (RequestedAddons.size() > 0)
 					{
-						ImGui::TooltipGeneric("Addon state won't be saved. Game was started with addons via start parameters.");
+						ImGui::GW2::TooltipGeneric("Addon state won't be saved. Game was started with addons via start parameters.");
 					}
 				}
 				if (aAddon->Definitions->Provider == EUpdateProvider::GitHub && aAddon->Definitions->UpdateLink)

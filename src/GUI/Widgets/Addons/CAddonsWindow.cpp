@@ -215,7 +215,7 @@ namespace GUI
 							}
 						}
 					}
-					ImGui::TooltipGeneric("Checks each addon and updates it, if available.\nSome addons require a restart to apply the update and won't take effect immediately.");
+					ImGui::GW2::TooltipGeneric("Checks each addon and updates it, if available.\nSome addons require a restart to apply the update and won't take effect immediately.");
 				}
 				else if (TabIndex == 1)
 				{
