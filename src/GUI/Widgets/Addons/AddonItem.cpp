@@ -17,6 +17,8 @@
 #include "imgui.h"
 #include "imgui_extensions.h"
 
+#include "resource.h"
+
 namespace GUI
 {
 	float itemWidth = 520.0f;
@@ -28,7 +30,8 @@ namespace GUI
 
 	Texture* Background = nullptr;
 	Texture* BtnOptions = nullptr;
-	Texture* BtnOptionsHover = nullptr;
+	Texture* CtxMenuBullet = nullptr;
+	Texture* CtxMenuHighlight = nullptr;
 
 	void AddonItem(Addon* aAddon)
 	{
@@ -59,8 +62,9 @@ namespace GUI
 			Background = TextureLoader::Get("TEX_ADDONITEM_BACKGROUND");
 		}
 
-		if (!BtnOptions) { BtnOptions = TextureLoader::Get("ICON_OPTIONS"); }
-		if (!BtnOptionsHover) { BtnOptionsHover = TextureLoader::Get("ICON_OPTIONS_HOVER"); }
+		if (!BtnOptions) { BtnOptions = TextureLoader::GetOrCreate("ICON_OPTIONS", RES_ICON_OPTIONS, NexusHandle); }
+		if (!CtxMenuBullet) { CtxMenuBullet = TextureLoader::GetOrCreate("TEX_CTXMENU_BULLET", RES_TEX_CONTEXTMENU_BULLET, NexusHandle); }
+		if (!CtxMenuHighlight) { CtxMenuHighlight = TextureLoader::GetOrCreate("TEX_CTXMENU_HIGHLIGHT", RES_TEX_CONTEXTMENU_HIGHLIGHT, NexusHandle); }
 
 		{
 			ImGui::SetCursorPos(initial);
@@ -95,18 +99,22 @@ namespace GUI
 				ImGui::SetCursorPos(ImVec2(descWidth + 12.0f + 12.0f, 12.0f));
 				ImGui::BeginChild("##AddonItemActions", ImVec2(actionsWidth, itemHeightScaled - 12.0f - 12.0f));
 
-				if (BtnOptions && BtnOptionsHover && BtnOptions->Resource && BtnOptionsHover->Resource)
+				if (BtnOptions && BtnOptions->Resource)
 				{
 					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
 					ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
 					ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
+					ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.863f, 0.863f, 0.863f, 1));
+					ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0.13f, 0.13f, 0.13f, 1));
 					ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f });
+					ImGui::PushStyleVar(ImGuiStyleVar_PopupBorderSize, 1.0f);
+					ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 0);
 
 					ImGui::SetCursorPos(ImVec2(actionsWidth - (size * Renderer::Scaling), ImGui::GetCursorPosY()));
 					ImGui::ImageButton(BtnOptions->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling));
 					if (ImGui::BeginPopupContextItem("##AddonItemActionsMore"))
 					{
-						if (ImGui::GW2Button(("Uninstall##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+						if (ImGui::GW2::ContextMenuItem(("Uninstall##" + sig).c_str(), "Uninstall", CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 						{
 							for (auto& it : Loader::Addons)
 							{
@@ -123,7 +131,7 @@ namespace GUI
 							ImGui::TooltipGeneric("This addon is currently locked and requires a restart to be removed.");
 						}
 
-						if (ImGui::GW2Button(("Update##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+						if (ImGui::GW2::ContextMenuItem(("Update##" + sig).c_str(), "Update", CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 						{
 							for (auto& it : Loader::Addons)
 							{
@@ -155,7 +163,9 @@ namespace GUI
 							ImGui::TooltipGeneric("This addon is currently locked and requires a restart for the update to take effect.");
 						}
 
-						if (ImGui::GW2Button((aAddon->IsPausingUpdates ? "Resume Updates##" : "Pause Updates##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+						if (ImGui::GW2::ContextMenuItem((aAddon->IsPausingUpdates ? "Resume Updates##" : "Pause Updates##" + sig).c_str(),
+							aAddon->IsPausingUpdates ? "Resume Updates" : "Pause Updates",
+							CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 						{
 							aAddon->IsPausingUpdates = !aAddon->IsPausingUpdates;
 						}
@@ -164,14 +174,14 @@ namespace GUI
 					}
 					ImGui::OpenPopupOnItemClick("##AddonItemActionsMore", 0);
 
-					ImGui::PopStyleVar();
-					ImGui::PopStyleColor(3);
+					ImGui::PopStyleVar(3);
+					ImGui::PopStyleColor(5);
 				}
 
 				// just check if loaded, if it was not hot-reloadable it would be EAddonState::LoadedLOCKED
 				if (aAddon->State == EAddonState::Loaded)
 				{
-					if (ImGui::GW2Button(("Disable##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button(("Disable##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						for (auto& it : Loader::Addons)
 						{
@@ -197,7 +207,7 @@ namespace GUI
 						additionalInfo = "\nAddon state won't be saved. Game was started with addons via start parameters.";
 					}
 
-					if (ImGui::GW2Button(("Disable*##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button(("Disable*##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						aAddon->ShouldDisableNextLaunch = true;
 					}
@@ -212,7 +222,7 @@ namespace GUI
 						additionalInfo = "\nAddon state won't be saved. Game was started with addons via start parameters.";
 					}
 
-					if (ImGui::GW2Button(("Load*##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button(("Load*##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						aAddon->ShouldDisableNextLaunch = false;
 					}
@@ -220,7 +230,7 @@ namespace GUI
 				}
 				else if (aAddon->State == EAddonState::NotLoaded)
 				{
-					if (ImGui::GW2Button(("Load##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button(("Load##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						for (auto& it : Loader::Addons)
 						{
@@ -239,7 +249,7 @@ namespace GUI
 				}
 				if (aAddon->Definitions->Provider == EUpdateProvider::GitHub && aAddon->Definitions->UpdateLink)
 				{
-					if (ImGui::GW2Button(("GitHub##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button(("GitHub##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						ShellExecuteA(0, 0, aAddon->Definitions->UpdateLink, 0, 0, SW_SHOW);
 					}
@@ -302,7 +312,7 @@ namespace GUI
 				// just check if loaded, if it was not hot-reloadable it would be EAddonState::LoadedLOCKED
 				if (!aInstalled)
 				{
-					if (ImGui::GW2Button(aAddon->IsInstalling ? ("Installing...##" + sig).c_str() : ("Install##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button(aAddon->IsInstalling ? ("Installing...##" + sig).c_str() : ("Install##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						if (!aAddon->IsInstalling)
 						{
@@ -323,7 +333,7 @@ namespace GUI
 				}
 				if (aAddon->Provider == EUpdateProvider::GitHub && !aAddon->DownloadURL.empty())
 				{
-					if (ImGui::GW2Button(("GitHub##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button(("GitHub##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						ShellExecuteA(0, 0, aAddon->DownloadURL.c_str(), 0, 0, SW_SHOW);
 					}

@@ -333,6 +333,8 @@
     <Image Include="Resources\AddonsWindow\TitleBar_Hover.png" />
     <Image Include="Resources\BtnClose.png" />
     <Image Include="Resources\BtnClose_Hover.png" />
+    <Image Include="Resources\ContextMenu\ContextMenu_Bullet.png" />
+    <Image Include="Resources\ContextMenu\ContextMenu_Highlight.png" />
     <Image Include="Resources\Menu\Background.png" />
     <Image Include="Resources\Menu\BtnAbout.png" />
     <Image Include="Resources\Menu\BtnAddons.png" />

@@ -142,6 +142,10 @@ RES_TEX_TITLEBAREND_HOVER		PNG             "Resources\\TitleBarEnd_Hover.png"
 
 RES_ARCDPS_INTEGRATION			DLL				"Resources\\bin64\\arcdps_integration64.dll"
 
+/* ContextMenu */
+RES_TEX_CONTEXTMENU_BULLET		PNG				"Resources\\ContextMenu\\ContextMenu_Bullet.png"
+RES_TEX_CONTEXTMENU_HIGHLIGHT	PNG				"Resources\\ContextMenu\\ContextMenu_Highlight.png"
+
 #endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
 

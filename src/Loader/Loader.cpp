@@ -35,7 +35,7 @@ using json = nlohmann::json;
 
 #include "httplib/httplib.h"
 
-#define LOADER_WAITTIME_MS 1
+#define LOADER_WAITTIME_MS 100
 
 namespace Loader
 {
@@ -998,7 +998,7 @@ namespace Loader
 
 			std::string tagName = response["tag_name"].get<std::string>();
 
-			if (!std::regex_match(tagName, std::regex("v?\\d+[.]\\d+[.]\\d+[.]\\d+")))
+			if (!std::regex_match(tagName, std::regex(R"(v?\d+[.]\d+[.]\d+[.]\d+)")))
 			{
 				LogWarning(CH_LOADER, "tag_name on %s%s does not match convention e.g. \"1.0.0.1\" or \"v1.0.0.1\". Cannot check against version.", baseUrl.c_str(), endpoint.c_str());
 				return false;

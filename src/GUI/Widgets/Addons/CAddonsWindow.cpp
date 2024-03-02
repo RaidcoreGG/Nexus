@@ -169,13 +169,13 @@ namespace GUI
 						ImGui::EndChild();
 					}
 
-					if (ImGui::GW2Button("Open Addons Folder", ImVec2(ImGui::CalcTextSize("Open Addons Folder").x + 16.0f, btnHeight)))
+					if (ImGui::GW2::Button("Open Addons Folder", ImVec2(ImGui::CalcTextSize("Open Addons Folder").x + 16.0f, btnHeight)))
 					{
 						std::string strAddons = Path::D_GW2_ADDONS.string();
 						ShellExecuteA(NULL, "explore", strAddons.c_str(), NULL, NULL, SW_SHOW);
 					}
 					ImGui::SameLine();
-					if (ImGui::GW2Button("Check for Updates", ImVec2(ImGui::CalcTextSize("Check for Updates").x + 16.0f, btnHeight)))
+					if (ImGui::GW2::Button("Check for Updates", ImVec2(ImGui::CalcTextSize("Check for Updates").x + 16.0f, btnHeight)))
 					{
 						const std::lock_guard<std::mutex> lock(Loader::Mutex);
 						{

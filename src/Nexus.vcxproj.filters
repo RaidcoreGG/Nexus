@@ -130,6 +130,9 @@
     <Filter Include="Loader\Enums">
       <UniqueIdentifier>{29b4df1b-599d-49f1-adc5-17961c6073b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Images\ContextMenu">
+      <UniqueIdentifier>{70632a7c-1799-446b-9390-ea6d16d18e9c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -1149,6 +1152,12 @@
     </Image>
     <Image Include="Resources\Menu\BtnOptions_Hover.png">
       <Filter>Resource Files\Images\Menu</Filter>
+    </Image>
+    <Image Include="Resources\ContextMenu\ContextMenu_Bullet.png">
+      <Filter>Resource Files\Images\ContextMenu</Filter>
+    </Image>
+    <Image Include="Resources\ContextMenu\ContextMenu_Highlight.png">
+      <Filter>Resource Files\Images\ContextMenu</Filter>
     </Image>
   </ItemGroup>
 </Project>

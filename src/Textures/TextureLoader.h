@@ -20,6 +20,10 @@ namespace TextureLoader
 
 	/* Returns a Texture* with the given identifier or nullptr. */
 	Texture* Get(const char* aIdentifier);
+	Texture* GetOrCreate(const char* aIdentifier, const char* aFilename);
+	Texture* GetOrCreate(const char* aIdentifier, unsigned aResourceID, HMODULE aModule);
+	Texture* GetOrCreate(const char* aIdentifier, const char* aRemote, const char* aEndpoint);
+	Texture* GetOrCreate(const char* aIdentifier, void* aData, size_t aSize);
 
 	/* Requests to load a texture from file. */
 	void LoadFromFile(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback);

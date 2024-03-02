@@ -29,14 +29,57 @@ namespace TextureLoader
 
 		Texture* result = nullptr;
 
-		TextureLoader::Mutex.lock();
 		{
+			const std::lock_guard<std::mutex> lock(Mutex);
 			if (Registry.find(str) != Registry.end())
 			{
 				result = Registry[str];
 			}
 		}
-		TextureLoader::Mutex.unlock();
+
+		return result;
+	}
+	Texture* GetOrCreate(const char* aIdentifier, const char* aFilename)
+	{
+		Texture* result = Get(aIdentifier);
+
+		if (!result)
+		{
+			LoadFromFile(aIdentifier, aFilename, nullptr);
+		}
+
+		return result;
+	}
+	Texture* GetOrCreate(const char* aIdentifier, unsigned aResourceID, HMODULE aModule)
+	{
+		Texture* result = Get(aIdentifier);
+
+		if (!result)
+		{
+			LoadFromResource(aIdentifier, aResourceID, aModule, nullptr);
+		}
+
+		return result;
+	}
+	Texture* GetOrCreate(const char* aIdentifier, const char* aRemote, const char* aEndpoint)
+	{
+		Texture* result = Get(aIdentifier);
+
+		if (!result)
+		{
+			LoadFromURL(aIdentifier, aRemote, aEndpoint, nullptr);
+		}
+
+		return result;
+	}
+	Texture* GetOrCreate(const char* aIdentifier, void* aData, size_t aSize)
+	{
+		Texture* result = Get(aIdentifier);
+
+		if (!result)
+		{
+			LoadFromMemory(aIdentifier, aData, aSize, nullptr);
+		}
 
 		return result;
 	}
@@ -194,18 +237,28 @@ namespace TextureLoader
 
 	void ProcessQueue()
 	{
-		TextureLoader::Mutex.lock();
+		const std::lock_guard<std::mutex> lock(Mutex);
 		while (TextureLoader::QueuedTextures.size() > 0)
 		{
 			TextureLoader::CreateTexture(TextureLoader::QueuedTextures.front());
 			TextureLoader::QueuedTextures.erase(TextureLoader::QueuedTextures.begin());
 		}
-		TextureLoader::Mutex.unlock();
 	}
 
 	void QueueTexture(const char* aIdentifier, unsigned char* aImageData, unsigned aWidth, unsigned aHeight, TEXTURES_RECEIVECALLBACK aCallback)
 	{
 		std::string str = aIdentifier;
+
+		{
+			const std::lock_guard<std::mutex> lock(Mutex);
+			for (QueuedTexture& tex : QueuedTextures)
+			{
+				if (tex.Identifier == str)
+				{
+					return;
+				}
+			}
+		}
 
 		//LogDebug(CH_TEXTURES, "Queued %s", str.c_str());
 
@@ -216,11 +269,10 @@ namespace TextureLoader
 		raw.Height = aHeight;
 		raw.Callback = aCallback;
 
-		TextureLoader::Mutex.lock();
 		{
+			const std::lock_guard<std::mutex> lock(Mutex);
 			QueuedTextures.push_back(raw);
 		}
-		TextureLoader::Mutex.unlock();
 	}
 	void CreateTexture(QueuedTexture aQueuedTexture)
 	{
