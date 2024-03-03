@@ -1449,6 +1449,10 @@ namespace Loader
 			((AddonAPI2*)api)->ShareResource = DataLink::ShareResource;
 
 			((AddonAPI2*)api)->GetTexture = TextureLoader::Get;
+			((AddonAPI2*)api)->GetTextureOrCreateFromFile = TextureLoader::GetOrCreateFromFile;
+			((AddonAPI2*)api)->GetTextureOrCreateFromResource = TextureLoader::GetOrCreateFromResource;
+			((AddonAPI2*)api)->GetTextureOrCreateFromURL = TextureLoader::GetOrCreateFromURL;
+			((AddonAPI2*)api)->GetTextureOrCreateFromMemory = TextureLoader::GetOrCreateFromMemory;
 			((AddonAPI2*)api)->LoadTextureFromFile = TextureLoader::LoadFromFile;
 			((AddonAPI2*)api)->LoadTextureFromResource = TextureLoader::LoadFromResource;
 			((AddonAPI2*)api)->LoadTextureFromURL = TextureLoader::LoadFromURL;

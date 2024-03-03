@@ -39,6 +39,7 @@ namespace TextureLoader
 
 		return result;
 	}
+
 	Texture* GetOrCreate(const char* aIdentifier, const char* aFilename)
 	{
 		Texture* result = Get(aIdentifier);
@@ -82,6 +83,23 @@ namespace TextureLoader
 		}
 
 		return result;
+	}
+
+	Texture* GetOrCreateFromFile(const char* aIdentifier, const char* aFilename)
+	{
+		return GetOrCreate(aIdentifier, aFilename);
+	}
+	Texture* GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule)
+	{
+		return GetOrCreate(aIdentifier, aResourceID, aModule);;
+	}
+	Texture* GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint)
+	{
+		return GetOrCreate(aIdentifier, aRemote, aEndpoint);
+	}
+	Texture* GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize)
+	{
+		return GetOrCreate(aIdentifier, aData, aSize);
 	}
 
 	void LoadFromFile(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback)
