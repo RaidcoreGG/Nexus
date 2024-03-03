@@ -804,7 +804,7 @@ namespace Loader
 				try
 				{
 					std::filesystem::rename(aPath, aPath.string() + extUninstall);
-					Addons.erase(aPath); // remove from addons list anyway
+					it->second->WillBeUninstalled = true;
 					LogWarning(CH_LOADER, "Addon is stilled loaded, it will be uninstalled the next time the game is restarted: %s", aPath.string().c_str());
 				}
 				catch (std::filesystem::filesystem_error fErr)

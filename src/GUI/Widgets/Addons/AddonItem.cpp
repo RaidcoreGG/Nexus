@@ -38,7 +38,8 @@ namespace GUI
 		if (aAddon == nullptr ||
 			aAddon->Definitions == nullptr ||
 			aAddon->State == EAddonState::NotLoadedDuplicate ||
-			aAddon->State == EAddonState::NotLoadedIncompatible)
+			aAddon->State == EAddonState::NotLoadedIncompatible ||
+			aAddon->WillBeUninstalled)
 		{
 			return;
 		}

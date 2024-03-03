@@ -17,6 +17,7 @@ struct Addon
 	AddonDefinition*			Definitions;
 	bool						ShouldDisableNextLaunch;
 	bool						IsPausingUpdates;
+	bool						WillBeUninstalled;
 };
 
 #endif
