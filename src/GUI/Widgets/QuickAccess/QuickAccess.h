@@ -34,8 +34,6 @@ namespace GUI
 
 		extern Texture*			IconNotification;
 
-		void ReceiveTextures(const char* aIdentifier, Texture* aTexture);
-
 		void Render();
 
 		void AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aKeybindIdentifier, const char* aTooltipText);

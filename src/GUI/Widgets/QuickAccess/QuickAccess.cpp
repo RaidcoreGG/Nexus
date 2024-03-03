@@ -11,6 +11,8 @@
 #include "Keybinds/KeybindHandler.h"
 #include "Loader/Loader.h"
 
+#include "resource.h"
+
 namespace GUI
 {
 	namespace QuickAccess
@@ -48,16 +50,6 @@ namespace GUI
 				else if (Opacity < 0.5f)	{ Opacity = 0.5f; IsAnimating = false; }
 
 				Sleep(35);
-			}
-		}
-
-		void ReceiveTextures(const char* aIdentifier, Texture* aTexture)
-		{
-			std::string str = aIdentifier;
-
-			if (str == ICON_NOTIFICATION)
-			{
-				IconNotification = aTexture;
 			}
 		}
 
@@ -126,19 +118,28 @@ namespace GUI
 							}
 							bool iconHovered = ImGui::IsItemHovered();
 
-							if (shortcut.HasNotification && IconNotification && IconNotification->Resource)
-							{
-								float offIcon = (size * Renderer::Scaling) / 2.0f;
-								
-								pos.x += offIcon;
-								pos.y += offIcon;
+							bool notifHovered = false;
 
-								ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-								ImGui::SetCursorPos(pos);
-								ImGui::Image(IconNotification->Resource, ImVec2(offIcon, offIcon));
-								ImGui::PopItemFlag();
+							if (IconNotification && IconNotification->Resource)
+							{
+								if (shortcut.HasNotification)
+								{
+									float offIcon = (size * Renderer::Scaling) / 2.0f;
+
+									pos.x += offIcon;
+									pos.y += offIcon;
+
+									ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+									ImGui::SetCursorPos(pos);
+									ImGui::Image(IconNotification->Resource, ImVec2(offIcon, offIcon));
+									ImGui::PopItemFlag();
+								}
+								notifHovered = ImGui::IsItemHovered();
 							}
-							bool notifHovered = ImGui::IsItemHovered();
+							else
+							{
+								IconNotification =  TextureLoader::GetOrCreate(ICON_NOTIFICATION, RES_ICON_NOTIFICATION, NexusHandle);
+							}
 
 							ImGui::PopStyleVar();
 							shortcut.IsHovering = iconHovered || notifHovered;

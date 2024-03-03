@@ -691,8 +691,6 @@ namespace GUI
 		TextureLoader::LoadFromResource(ICON_GENERIC, RES_ICON_GENERIC, NexusHandle, nullptr);
 		TextureLoader::LoadFromResource(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, NexusHandle, nullptr);
 
-		TextureLoader::LoadFromResource(ICON_NOTIFICATION, RES_ICON_NOTIFICATION, NexusHandle, QuickAccess::ReceiveTextures);
-
 		/* add shortcut */
 		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "Nexus Menu");
 
