@@ -36,6 +36,7 @@ extern const char* ICON_GENERIC_HOVER;
 extern const char* ICON_NOTIFICATION;
 extern const char* ICON_ADDONS;
 extern const char* ICON_OPTIONS;
+extern const char* ICON_OPTIONS_HOVER;
 extern const char* ICON_CHANGELOG;
 extern const char* ICON_LOG;
 extern const char* ICON_DEBUG;
@@ -50,10 +51,9 @@ extern const char* QA_MENU;
 /* Events */
 extern const char* EV_WINDOW_RESIZED;
 extern const char* EV_MUMBLE_IDENTITY_UPDATED;
-extern const char* EV_OPTIONS_CALLED;
-extern const char* EV_EULA_ACCEPTED;
 extern const char* EV_ADDON_LOADED;
 extern const char* EV_ADDON_UNLOADED;
+extern const char* EV_VOLATILE_ADDONS_DISABLED;
 
 /* DataLink */
 extern const char* DL_MUMBLE_LINK;

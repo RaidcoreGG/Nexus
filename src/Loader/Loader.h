@@ -10,6 +10,7 @@
 #include <condition_variable>
 
 #include "ELoaderAction.h"
+#include "StoredAddon.h"
 #include "LibraryAddon.h"
 #include "Addon.h"
 #include "AddonAPI.h"
@@ -22,6 +23,10 @@ namespace Loader
 		std::filesystem::path,
 		ELoaderAction
 	>									QueuedAddons;					/* To be loaded or unloaded addons */
+	extern std::map<
+		signed int,
+		StoredAddon
+	>									AddonConfig;
 	extern std::map<
 		std::filesystem::path,
 		Addon*
@@ -41,6 +46,14 @@ namespace Loader
 	void Initialize();
 	/* Deregisters the directory updates and unloads all addons. */
 	void Shutdown();
+
+	/* Load AddonConfig. */
+	void LoadAddonConfig();
+	/* Save AddonConfig. */
+	void SaveAddonConfig();
+
+	/* Fetch AddonLibrary. */
+	void GetAddonLibrary();
 
 	/* Returns 0 if message was processed. */
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -66,14 +79,7 @@ namespace Loader
 	/* Swaps addon.dll with addon.dll.update. */
 	void UpdateSwapAddon(const std::filesystem::path& aPath);
 	/* Updates an addon. */
-	bool UpdateAddon(
-		const std::filesystem::path& aPath,
-		signed int aSignature,
-		std::string aName,
-		AddonVersion aVersion,
-		EUpdateProvider aProvider,
-		std::string aUpdateLink
-	);
+	bool UpdateAddon(const std::filesystem::path& aPath, signed int aSignature, std::string aName, AddonVersion aVersion, EUpdateProvider aProvider, std::string aUpdateLink);
 	/* Installs an addon. */
 	void InstallAddon(LibraryAddon* aAddon);
 
@@ -86,6 +92,9 @@ namespace Loader
 	void CopyAddonDefs(AddonDefinition* aDefinitions, AddonDefinition** aOutDefinitions);
 	/* HELPER: Frees the addon definitions. */
 	void FreeAddonDefs(AddonDefinition** aDefinitions);
+
+	/* HELPER: Returns the name of the owning addon. Similar to ::Verify. */
+	std::string GetOwner(void* aAddress);
 }
 
 #endif

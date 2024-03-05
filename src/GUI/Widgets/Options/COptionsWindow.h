@@ -7,10 +7,10 @@
 
 namespace GUI
 {
-	class OptionsWindow : public IWindow
+	class COptionsWindow : public IWindow
 	{
 		public:
-			OptionsWindow(std::string aName);
+			COptionsWindow(std::string aName);
 			void Render();
 	};
 }

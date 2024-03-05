@@ -10,13 +10,14 @@
 #include "Mumble/LinkedMem.h"
 #include "Mumble/Identity.h"
 #include "Logging/LogHandler.h"
-#include "API/APIClient.h"
+#include "API/CAPIClient.h"
 
 #include "imgui.h"
 
 using namespace Mumble;
 using namespace LogHandler;
 
+extern DWORD						NexusModuleSize;
 extern HMODULE						NexusHandle;
 extern HMODULE						GameHandle;
 extern HMODULE						D3D11Handle;
@@ -24,6 +25,7 @@ extern HMODULE						D3D11SystemHandle;
 
 extern AddonVersion					Version;
 extern std::vector<std::string>		Parameters;
+extern std::vector<signed int>		RequestedAddons;
 
 extern LinkedMem*                   MumbleLink;
 extern Identity*                    MumbleIdentity;
@@ -42,8 +44,8 @@ extern ImGuiWindowFlags				WindowFlags_Overlay;
 extern ImGuiWindowFlags				WindowFlags_Custom;
 extern ImGuiWindowFlags				WindowFlags_Watermark;
 
-extern APIClient*					RaidcoreAPI;
-extern APIClient*					GitHubAPI;
+extern CAPIClient*					RaidcoreAPI;
+extern CAPIClient*					GitHubAPI;
 
 extern std::string					ChangelogText;
 extern bool							IsUpdateAvailable;

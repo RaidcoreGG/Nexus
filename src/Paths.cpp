@@ -26,6 +26,7 @@ namespace Path
 	std::filesystem::path F_KEYBINDS{};
 	std::filesystem::path F_FONT{};
 	std::filesystem::path F_SETTINGS{};
+	std::filesystem::path F_ADDONCONFIG{};
 	std::filesystem::path F_APIKEYS{};
 
 	std::vector<std::string> ExistingPaths;
@@ -57,6 +58,7 @@ namespace Path
 		F_KEYBINDS = D_GW2_ADDONS_NEXUS / "Keybinds.json";								/* get keybinds path */
 		F_FONT = D_GW2_ADDONS_NEXUS / "Font.ttf";										/* get font path */
 		F_SETTINGS = D_GW2_ADDONS_NEXUS / "Settings.json";								/* get settings path */
+		F_ADDONCONFIG = D_GW2_ADDONS_NEXUS / "AddonConfig.json";						/* get addon config path */
 		F_APIKEYS = D_GW2_ADDONS_COMMON / "APIKeys.json";								/* get apikeys path */
 			
 		/* static paths */

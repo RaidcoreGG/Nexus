@@ -1,6 +1,7 @@
 #include "MenuItem.h"
 
 #include "Renderer.h"
+#include "Shared.h"
 
 #include "Menu.h"
 #include "Textures/TextureLoader.h"
@@ -63,7 +64,7 @@ namespace GUI
 				}
 				else
 				{
-					Icon = TextureLoader::Get(TextureIdentifier.c_str());
+					Icon = TextureLoader::GetOrCreate(TextureIdentifier.c_str(), ResourceID, NexusHandle);
 				}
 
 				ImGui::SetCursorPos(txtPos);

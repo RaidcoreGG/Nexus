@@ -44,6 +44,20 @@ namespace GUI
 					ImGui::SetCursorPos(ImVec2(0, 0));
 					ImGui::Image(MenuBG->Resource, ImVec2(bgSz, bgSz));
 				}
+				else
+				{
+					MenuBG = TextureLoader::GetOrCreate(TEX_MENU_BACKGROUND, RES_TEX_MENU_BACKGROUND, NexusHandle);
+				}
+
+				if (!MenuButton)
+				{
+					MenuButton = TextureLoader::GetOrCreate(TEX_MENU_BUTTON, RES_TEX_MENU_BUTTON, NexusHandle);
+				}
+
+				if (!MenuButtonHover)
+				{
+					MenuButtonHover = TextureLoader::GetOrCreate(TEX_MENU_BUTTON_HOVER, RES_TEX_MENU_BUTTON_HOVER, NexusHandle);
+				}
 
 				ImGui::PushFont(FontUI);
 				ImGui::SetCursorPos(ImVec2(8.0f, 8.0f));
@@ -73,32 +87,14 @@ namespace GUI
 			ImGui::PopStyleVar();
 		}
 
-		void AddMenuItem(std::string aLabel, std::string aTextureIdentifier, bool* aToggle)
+		void AddMenuItem(std::string aLabel, std::string aTextureIdentifier, unsigned int aResourceID, bool* aToggle)
 		{
 			Texture* icon = TextureLoader::Get(aTextureIdentifier.c_str());
-			MenuItem* mItem = new MenuItem{ aLabel, aTextureIdentifier, aToggle, icon, false };
+			MenuItem* mItem = new MenuItem{ aLabel, aTextureIdentifier, aResourceID, aToggle, icon, false };
 
 			{
 				const std::lock_guard<std::mutex> lock(Menu::Mutex);
 				MenuItems.push_back(mItem);
-			}
-		}
-
-		void ReceiveTextures(const char* aIdentifier, Texture* aTexture)
-		{
-			std::string str = aIdentifier;
-
-			if (str == TEX_MENU_BACKGROUND)
-			{
-				MenuBG = aTexture;
-			}
-			else if (str == TEX_MENU_BUTTON)
-			{
-				MenuButton = aTexture;
-			}
-			else if (str == TEX_MENU_BUTTON_HOVER)
-			{
-				MenuButtonHover = aTexture;
 			}
 		}
 	}

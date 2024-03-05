@@ -47,7 +47,10 @@ namespace ImGui
 	{
 		if (ImGui::Tooltip())
 		{
-			ImGui::Text(fmt);
+			va_list args;
+			va_start(args, fmt);
+			ImGui::TextV(fmt, args);
+			va_end(args);
 			ImGui::EndTooltip();
 		}
 	}
@@ -173,20 +176,81 @@ namespace ImGui
 		return clicked;
 	}
 
-	static bool GW2Button(const char* label, const ImVec2& size_arg = ImVec2(0,0))
+	namespace GW2
 	{
-		ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
-		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 0, 0, 1.0f));
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.839f, 0.807f, 0.741f, 1.0f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-		ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0, 0, 0, 1.0f));
-		ImGui::PushStyleColor(ImGuiCol_BorderShadow, ImVec4(0, 0, 0, 0));
-		bool ret = ButtonEx(label, size_arg, ImGuiButtonFlags_None);
-		ImGui::PopStyleColor(6);
-		ImGui::PopStyleVar(1);
+		static bool Button(const char* label, const ImVec2& size_arg = ImVec2(0, 0))
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 0, 0, 1.0f));
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.839f, 0.807f, 0.741f, 1.0f));
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+			ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0, 0, 0, 1.0f));
+			ImGui::PushStyleColor(ImGuiCol_BorderShadow, ImVec4(0, 0, 0, 0));
+			bool ret = ButtonEx(label, size_arg, ImGuiButtonFlags_None);
+			ImGui::PopStyleColor(6);
+			ImGui::PopStyleVar(1);
 
-		return ret;
+			return ret;
+		}
+
+		static bool ContextMenuItem(const char* id, const char* label, ImTextureID bullet_texture_id, ImTextureID highlight_texture_id, const ImVec2& size_arg = ImVec2(0, 0))
+		{
+			float itemWidth = ImGui::GetWindowContentRegionWidth();
+
+			float height = ImGui::GetTextLineHeight();
+			ImVec2 initialPos = ImGui::GetCursorPos();
+
+			PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+			bool btn = ImGui::Button((std::string{"##Button_"} + label).c_str(), size_arg);
+			bool hov = ImGui::IsItemHovered();
+			ImGui::PopStyleVar();
+
+			ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+			ImGui::SetCursorPos(ImVec2(initialPos.x + height, initialPos.y));
+			ImGui::TextOutlined(label);
+
+			ImGui::SetCursorPos(initialPos);
+			if (bullet_texture_id) { ImGui::Image(bullet_texture_id, ImVec2(height, height)); }
+			if (hov)
+			{
+				ImGui::SetCursorPos(initialPos);
+				if (highlight_texture_id) { ImGui::Image(highlight_texture_id, ImVec2(itemWidth, height * 1.2f)); }
+			}
+			ImGui::PopItemFlag();
+
+			ImGui::SetCursorPos(ImVec2(initialPos.x, initialPos.y + (height * 1.4f)));
+
+			return btn;
+		}
+
+		static void TooltipGeneric(const char* fmt, ...)
+		{
+			/* FIXME: this style is obviously not gw2, just a simplified standard style */
+
+			ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0, 0, 0, 1));
+			ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0.141f, 0.180f, 0.196f, 0.784f));
+			ImGui::PushStyleVar(ImGuiStyleVar_PopupBorderSize, 1.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(4.0f, 4.0f));
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::BeginTooltip();
+				va_list args;
+				va_start(args, fmt);
+				ImGui::TextV(fmt, args);
+				va_end(args);
+				ImGui::EndTooltip();
+			}
+			ImGui::PopStyleVar(2);
+			ImGui::PopStyleColor(2);
+		}
+	}
+
+	static ImVec4 HEXtoIV4(const char* hex)
+	{
+		int r, g, b;
+		std::sscanf(hex, "%02x%02x%02x", &r, &g, &b);
+		return ImVec4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
 	}
 }
 

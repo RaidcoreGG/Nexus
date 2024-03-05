@@ -12,6 +12,7 @@ namespace GUI
 		{
 			std::string		Label;
 			std::string		TextureIdentifier;
+			unsigned int	ResourceID;
 			bool*			Toggle;
 			Texture*		Icon;
 			bool			IsHovering;

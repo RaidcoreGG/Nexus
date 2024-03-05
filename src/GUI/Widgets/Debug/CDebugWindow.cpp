@@ -1,4 +1,4 @@
-#include "DebugWindow.h"
+#include "CDebugWindow.h"
 
 #include "Shared.h"
 #include "State.h"
@@ -23,13 +23,13 @@ namespace GUI
 	void* memPtr = nullptr;
 	size_t memSz = 0;
 
-	DebugWindow::DebugWindow(std::string aName)
+	CDebugWindow::CDebugWindow(std::string aName)
 	{
 		Name = aName;
-		MumbleWindow = new MumbleOverlay();
+		MumbleWindow = new CMumbleOverlay();
 	}
 
-	void DebugWindow::Render()
+	void CDebugWindow::Render()
 	{
 		MumbleWindow->Render();
 
@@ -267,12 +267,12 @@ namespace GUI
 										std::string state = "State: ";
 										switch (addon->State)
 										{
-										case EAddonState::None:					state.append("None"); break;
-										case EAddonState::Loaded:				state.append("Loaded"); break;
-										case EAddonState::LoadedLOCKED:			state.append("LoadedLOCKED"); break;
-										case EAddonState::NotLoaded:			state.append("NotLoaded"); break;
-										case EAddonState::NotLoadedDuplicate:	state.append("NotLoadedDuplicate"); break;
-										case EAddonState::NotLoadedIncompatible:			state.append("NotLoadedIncompatible"); break;
+										case EAddonState::None:							state.append("None"); break;
+										case EAddonState::Loaded:						state.append("Loaded"); break;
+										case EAddonState::LoadedLOCKED:					state.append("LoadedLOCKED"); break;
+										case EAddonState::NotLoaded:					state.append("NotLoaded"); break;
+										case EAddonState::NotLoadedDuplicate:			state.append("NotLoadedDuplicate"); break;
+										case EAddonState::NotLoadedIncompatible:		state.append("NotLoadedIncompatible"); break;
 										case EAddonState::NotLoadedIncompatibleAPI:		state.append("NotLoadedIncompatibleAPI"); break;
 										}
 
@@ -281,6 +281,11 @@ namespace GUI
 										ImGui::TextDisabled("Module Size: %u", addon->ModuleSize);
 										ImGui::TextDisabled("MD5: %s", MD5ToString(addon->MD5).c_str());
 										ImGui::TextDisabled("Definitions: %p", addon->Definitions);
+										ImGui::Separator();
+										ImGui::TextDisabled("ShouldDisableNextLaunch: %s", addon->ShouldDisableNextLaunch ? "true" : "false");
+										ImGui::TextDisabled("IsPausingUpdates: %s", addon->IsPausingUpdates ? "true" : "false");
+										ImGui::TextDisabled("WillBeUninstalled: %s", addon->WillBeUninstalled ? "true" : "false");
+										ImGui::TextDisabled("IsDisabledUntilUpdate: %s", addon->IsDisabledUntilUpdate ? "true" : "false");
 
 										if (addon->Definitions != nullptr)
 										{

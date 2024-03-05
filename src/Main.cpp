@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <string>
+#include <Psapi.h>
 
 #include "Consts.h"
 #include "Hooks.h"
@@ -17,7 +18,7 @@
 #include "Logging/LogHandler.h"
 #include "Mumble/Mumble.h"
 #include "Settings/Settings.h"
-#include "API/APIClient.h"
+#include "API/CAPIClient.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -46,6 +47,9 @@ namespace Main
 
 		//SetUnhandledExceptionFilter(UnhandledExcHandler);
 		GameHandle = GetModuleHandle(NULL);
+		MODULEINFO moduleInfo{};
+		GetModuleInformation(GetCurrentProcess(), NexusHandle, &moduleInfo, sizeof(moduleInfo));
+		NexusModuleSize = moduleInfo.SizeOfImage;
 
 		Path::Initialize(NexusHandle);
 		LogHandler::Initialize();
@@ -56,8 +60,8 @@ namespace Main
 
 		State::Initialize();
 
-		RaidcoreAPI = new APIClient("https://api.raidcore.gg", true, Path::D_GW2_ADDONS_COMMON_API_RAIDCORE, 30 * 60, 300, 5, 1);
-		GitHubAPI = new APIClient("https://api.github.com", true, Path::D_GW2_ADDONS_COMMON_API_GITHUB, 30 * 60, 60, 60, 60 * 60);
+		RaidcoreAPI = new CAPIClient("https://api.raidcore.gg", true, Path::D_GW2_ADDONS_COMMON_API_RAIDCORE, 30 * 60, 300, 5, 1);
+		GitHubAPI = new CAPIClient("https://api.github.com", true, Path::D_GW2_ADDONS_COMMON_API_GITHUB, 30 * 60, 60, 60, 60 * 60);
 
 		//Paradigm::Initialize();
 		std::thread([]()

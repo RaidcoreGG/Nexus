@@ -9,6 +9,10 @@ namespace GUI
 {
 	struct Shortcut
 	{
+		int						TextureGetAttempts;
+		std::string				TextureNormalIdentifier;
+		std::string				TextureHoverIdentifier;
+
 		Texture*				TextureNormal;
 		Texture*				TextureHover;
 		std::string				Keybind;

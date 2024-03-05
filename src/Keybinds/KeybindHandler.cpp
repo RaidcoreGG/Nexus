@@ -89,12 +89,12 @@ namespace Keybinds
 			/* only check if not currently setting keybind */
 			if (!IsSettingKeybind)
 			{
-				for (std::map<std::string, ActiveKeybind>::iterator it = Registry.begin(); it != Registry.end(); ++it)
+				for (auto& it : Registry)
 				{
-					if (kb == it->second.Bind)
+					if (kb == it.second.Bind)
 					{
 						// if Invoke returns true, pass 0 to the wndproc to stop processing
-						return Invoke(it->first) ? 0 : 1;
+						return Invoke(it.first) ? 0 : 1;
 					}
 				}
 			}
@@ -114,7 +114,7 @@ namespace Keybinds
 	{
 		if (!std::filesystem::exists(Path::F_KEYBINDS)) { return; }
 
-		Keybinds::Mutex.lock();
+		const std::lock_guard<std::mutex> lock(Mutex);
 		{
 			try
 			{
@@ -123,6 +123,16 @@ namespace Keybinds
 				json keybinds = json::parse(file);
 				for (json binding : keybinds)
 				{
+					if (binding.is_null() ||
+						binding["Key"].is_null() ||
+						binding["Alt"].is_null() ||
+						binding["Ctrl"].is_null() ||
+						binding["Shift"].is_null())
+					{
+						LogDebug(CH_KEYBINDS, "One or more fields of keybind were null.");
+						continue;
+					}
+
 					Keybind kb{};
 					binding["Key"].get_to(kb.Key);
 					binding["Alt"].get_to(kb.Alt);
@@ -141,19 +151,18 @@ namespace Keybinds
 				LogWarning(CH_KEYBINDS, "Keybinds.json could not be parsed. Error: %s", ex.what());
 			}
 		}
-		Keybinds::Mutex.unlock();
 	}
 
 	void Save()
 	{
-		Keybinds::Mutex.lock();
+		const std::lock_guard<std::mutex> lock(Mutex);
 		{
 			json keybinds = json::array();
 
-			for (std::map<std::string, ActiveKeybind>::iterator it = Registry.begin(); it != Registry.end(); ++it)
+			for (auto& it : Registry)
 			{
-				Keybind kb = it->second.Bind;
-				std::string id = it->first;
+				Keybind kb = it.second.Bind;
+				std::string id = it.first;
 
 				json binding =
 				{
@@ -173,7 +182,6 @@ namespace Keybinds
 
 			file.close();
 		}
-		Keybinds::Mutex.unlock();
 	}
 
 	void Register(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const char* aKeybind)
@@ -196,8 +204,8 @@ namespace Keybinds
 			requestedBind = {};
 		}
 
-		Keybinds::Mutex.lock();
 		{
+			const std::lock_guard<std::mutex> lock(Mutex);
 			/* check if this keybind is not already set */
 			if (Registry.find(str) == Registry.end())
 			{
@@ -206,7 +214,6 @@ namespace Keybinds
 
 			Registry[str].Handler = aKeybindHandler;
 		}
-		Keybinds::Mutex.unlock();
 
 		Save();
 	}
@@ -214,8 +221,8 @@ namespace Keybinds
 	{
 		std::string str = aIdentifier;
 
-		Keybinds::Mutex.lock();
 		{
+			const std::lock_guard<std::mutex> lock(Mutex);
 			auto it = Registry.find(str);
 
 			if (it != Registry.end())
@@ -223,7 +230,6 @@ namespace Keybinds
 				it->second.Handler = nullptr;
 			}
 		}
-		Keybinds::Mutex.unlock();
 
 		Save();
 	}
@@ -297,11 +303,10 @@ namespace Keybinds
 
 		if (res != aIdentifier && res != "") { return; }
 
-		Keybinds::Mutex.lock();
 		{
+			const std::lock_guard<std::mutex> lock(Mutex);
 			Registry[aIdentifier].Bind = aKeybind;
 		}
-		Keybinds::Mutex.unlock();
 
 		Save();
 	}
@@ -309,8 +314,8 @@ namespace Keybinds
 	{
 		bool called = false;
 
-		Keybinds::Mutex.lock();
 		{
+			const std::lock_guard<std::mutex> lock(Mutex);
 			if (Registry[aIdentifier].Handler)
 			{
 				std::thread([aIdentifier]()
@@ -320,7 +325,6 @@ namespace Keybinds
 				called = true;
 			}
 		}
-		Keybinds::Mutex.unlock();
 
 		return called;
 	}
@@ -329,8 +333,8 @@ namespace Keybinds
 	{
 		int refCounter = 0;
 
-		Keybinds::Mutex.lock();
 		{
+			const std::lock_guard<std::mutex> lock(Mutex);
 			for (auto& [identifier, activekb] : Registry)
 			{
 				if (activekb.Handler >= aStartAddress && activekb.Handler <= aEndAddress)
@@ -340,7 +344,6 @@ namespace Keybinds
 				}
 			}
 		}
-		Keybinds::Mutex.unlock();
 
 		return refCounter;
 	}

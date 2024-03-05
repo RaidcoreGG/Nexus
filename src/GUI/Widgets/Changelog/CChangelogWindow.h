@@ -7,10 +7,10 @@
 
 namespace GUI
 {
-	class ChangelogWindow : public IWindow
+	class CChangelogWindow : public IWindow
 	{
 	public:
-		ChangelogWindow(std::string aName);
+		CChangelogWindow(std::string aName);
 		void Render();
 	};
 }

@@ -12,7 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="API\ActiveToken.cpp" />
-    <ClCompile Include="API\APIClient.cpp" />
+    <ClCompile Include="API\CAPIClient.cpp" />
     <ClCompile Include="API\APIController.cpp" />
     <ClCompile Include="Consts.cpp" />
     <ClCompile Include="core.cpp" />
@@ -21,17 +21,17 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Events\EventHandler.cpp" />
     <ClCompile Include="GUI\GUI.cpp" />
-    <ClCompile Include="GUI\Widgets\About\AboutBox.cpp" />
+    <ClCompile Include="GUI\Widgets\About\CAboutBox.cpp" />
     <ClCompile Include="GUI\Widgets\Addons\AddonItem.cpp" />
-    <ClCompile Include="GUI\Widgets\Addons\AddonsWindow.cpp" />
-    <ClCompile Include="GUI\Widgets\Changelog\ChangelogWindow.cpp" />
-    <ClCompile Include="GUI\Widgets\Debug\DebugWindow.cpp" />
-    <ClCompile Include="GUI\Widgets\EULA\EULAModal.cpp" />
-    <ClCompile Include="GUI\Widgets\Log\LogWindow.cpp" />
+    <ClCompile Include="GUI\Widgets\Addons\CAddonsWindow.cpp" />
+    <ClCompile Include="GUI\Widgets\Changelog\CChangelogWindow.cpp" />
+    <ClCompile Include="GUI\Widgets\Debug\CDebugWindow.cpp" />
+    <ClCompile Include="GUI\Widgets\EULA\CEULAModal.cpp" />
+    <ClCompile Include="GUI\Widgets\Log\CLogWindow.cpp" />
     <ClCompile Include="GUI\Widgets\Menu\Menu.cpp" />
     <ClCompile Include="GUI\Widgets\Menu\MenuItem.cpp" />
-    <ClCompile Include="GUI\Widgets\Options\OptionsWindow.cpp" />
-    <ClCompile Include="GUI\Widgets\Overlay\MumbleOverlay.cpp" />
+    <ClCompile Include="GUI\Widgets\Options\COptionsWindow.cpp" />
+    <ClCompile Include="GUI\Widgets\Overlay\CMumbleOverlay.cpp" />
     <ClCompile Include="GUI\Widgets\QuickAccess\QuickAccess.cpp" />
     <ClCompile Include="Hooks.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
@@ -45,11 +45,11 @@
     <ClCompile Include="Loader\AddonDefinition.cpp" />
     <ClCompile Include="Loader\EAddonFlags.cpp" />
     <ClCompile Include="Loader\Loader.cpp" />
-    <ClCompile Include="Logging\FileLogger.cpp" />
+    <ClCompile Include="Logging\CFileLogger.cpp" />
     <ClCompile Include="Logging\ILogger.cpp" />
     <ClCompile Include="Logging\LogEntry.cpp" />
     <ClCompile Include="Logging\LogHandler.cpp" />
-    <ClCompile Include="Logging\ConsoleLogger.cpp" />
+    <ClCompile Include="Logging\CConsoleLogger.cpp" />
     <ClCompile Include="minhook\mh_buffer.cpp" />
     <ClCompile Include="minhook\mh_disasm.cpp" />
     <ClCompile Include="minhook\mh_hook.cpp" />
@@ -69,7 +69,7 @@
     <ClCompile Include="WndProc\WndProcHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="API\APIClient.h" />
+    <ClInclude Include="API\CAPIClient.h" />
     <ClInclude Include="API\APIController.h" />
     <ClInclude Include="API\ActiveToken.h" />
     <ClInclude Include="API\APIRequest.h" />
@@ -89,17 +89,17 @@
     <ClInclude Include="GUI\FuncDefs.h" />
     <ClInclude Include="GUI\GUI.h" />
     <ClInclude Include="GUI\IWindow.h" />
-    <ClInclude Include="GUI\Widgets\About\AboutBox.h" />
+    <ClInclude Include="GUI\Widgets\About\CAboutBox.h" />
     <ClInclude Include="GUI\Widgets\Addons\AddonItem.h" />
-    <ClInclude Include="GUI\Widgets\Addons\AddonsWindow.h" />
-    <ClInclude Include="GUI\Widgets\Changelog\ChangelogWindow.h" />
-    <ClInclude Include="GUI\Widgets\Debug\DebugWindow.h" />
-    <ClInclude Include="GUI\Widgets\EULA\EULAModal.h" />
-    <ClInclude Include="GUI\Widgets\Log\LogWindow.h" />
+    <ClInclude Include="GUI\Widgets\Addons\CAddonsWindow.h" />
+    <ClInclude Include="GUI\Widgets\Changelog\CChangelogWindow.h" />
+    <ClInclude Include="GUI\Widgets\Debug\CDebugWindow.h" />
+    <ClInclude Include="GUI\Widgets\EULA\CEULAModal.h" />
+    <ClInclude Include="GUI\Widgets\Log\CLogWindow.h" />
     <ClInclude Include="GUI\Widgets\Menu\Menu.h" />
     <ClInclude Include="GUI\Widgets\Menu\MenuItem.h" />
-    <ClInclude Include="GUI\Widgets\Options\OptionsWindow.h" />
-    <ClInclude Include="GUI\Widgets\Overlay\MumbleOverlay.h" />
+    <ClInclude Include="GUI\Widgets\Options\COptionsWindow.h" />
+    <ClInclude Include="GUI\Widgets\Overlay\CMumbleOverlay.h" />
     <ClInclude Include="GUI\Widgets\QuickAccess\EQAPosition.h" />
     <ClInclude Include="GUI\Widgets\QuickAccess\FuncDefs.h" />
     <ClInclude Include="GUI\Widgets\QuickAccess\QuickAccess.h" />
@@ -129,6 +129,7 @@
     <ClInclude Include="Loader\LibraryAddon.h" />
     <ClInclude Include="Loader\Loader.h" />
     <ClInclude Include="Loader\NexusLinkData.h" />
+    <ClInclude Include="Loader\StoredAddon.h" />
     <ClInclude Include="Localization\Localization.h" />
     <ClInclude Include="Logging\FuncDefs.h" />
     <ClInclude Include="Main.h" />
@@ -285,12 +286,12 @@
     <ClInclude Include="Loader\AddonDefinition.h" />
     <ClInclude Include="Loader\EUpdateProvider.h" />
     <ClInclude Include="Loader\AddonAPI.h" />
-    <ClInclude Include="Logging\FileLogger.h" />
+    <ClInclude Include="Logging\CFileLogger.h" />
     <ClInclude Include="Logging\ILogger.h" />
     <ClInclude Include="Logging\LogEntry.h" />
     <ClInclude Include="Logging\LogHandler.h" />
     <ClInclude Include="Logging\ELogLevel.h" />
-    <ClInclude Include="Logging\ConsoleLogger.h" />
+    <ClInclude Include="Logging\CConsoleLogger.h" />
     <ClInclude Include="minhook\mh_buffer.h" />
     <ClInclude Include="minhook\mh_disasm.h" />
     <ClInclude Include="minhook\mh_hook.h" />
@@ -332,6 +333,10 @@
     <Image Include="Resources\AddonsWindow\TitleBar_Hover.png" />
     <Image Include="Resources\BtnClose.png" />
     <Image Include="Resources\BtnClose_Hover.png" />
+    <Image Include="Resources\BtnRefresh.png" />
+    <Image Include="Resources\BtnRefresh_Hover.png" />
+    <Image Include="Resources\ContextMenu\ContextMenu_Bullet.png" />
+    <Image Include="Resources\ContextMenu\ContextMenu_Highlight.png" />
     <Image Include="Resources\Menu\Background.png" />
     <Image Include="Resources\Menu\BtnAbout.png" />
     <Image Include="Resources\Menu\BtnAddons.png" />
@@ -339,6 +344,7 @@
     <Image Include="Resources\Menu\BtnDebug.png" />
     <Image Include="Resources\Menu\BtnLog.png" />
     <Image Include="Resources\Menu\BtnOptions.png" />
+    <Image Include="Resources\Menu\BtnOptions_Hover.png" />
     <Image Include="Resources\Menu\MenuItem.png" />
     <Image Include="Resources\Menu\MenuItem_Hover.png" />
     <Image Include="Resources\Notification.png" />

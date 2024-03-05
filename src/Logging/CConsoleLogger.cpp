@@ -1,4 +1,4 @@
-#include "ConsoleLogger.h"
+#include "CConsoleLogger.h"
 
 #include <Windows.h>
 #include <iostream>
@@ -7,7 +7,7 @@
 HANDLE hConsole;
 FILE* iobuf;
 
-ConsoleLogger::ConsoleLogger(ELogLevel aLogLevel)
+CConsoleLogger::CConsoleLogger(ELogLevel aLogLevel)
 {
 	LogLevel = aLogLevel;
 	AllocConsole();
@@ -17,12 +17,12 @@ ConsoleLogger::ConsoleLogger(ELogLevel aLogLevel)
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 }
 
-ConsoleLogger::~ConsoleLogger()
+CConsoleLogger::~CConsoleLogger()
 {
 	FreeConsole();
 }
 
-void ConsoleLogger::LogMessage(LogEntry aLogEntry)
+void CConsoleLogger::LogMessage(LogEntry aLogEntry)
 {
 	const std::lock_guard<std::mutex> lock(MessageMutex);
 	{

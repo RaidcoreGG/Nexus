@@ -8,6 +8,7 @@ struct APIResponse
 {
 	int Status;
 	json Content;
+	//void Headers;
 };
 
 #endif

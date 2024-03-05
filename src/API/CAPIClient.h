@@ -18,11 +18,11 @@
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
-class APIClient
+class CAPIClient
 {
 public:
 	/*
-	APIClient:
+	CAPIClient:
 	- aBaseUrl is the API base
 	- aCacheDirectory is the directory to where the requests will be cached on disk
 	- aCacheLifetime (seconds) refers to how long a response should still be considered valid, if it's a cached one, before refetching it
@@ -30,8 +30,8 @@ public:
 	- aRefillAmount refers to how many tokens you get back after each interval
 	- aRefillInterval (seconds) refers to when the bucket gets refilled
 	*/
-	APIClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::path aCacheDirectory, int aCacheLifetime, int aBucketCapacity, int aRefillAmount, int aRefillInterval);
-	~APIClient();
+	CAPIClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::path aCacheDirectory, int aCacheLifetime, int aBucketCapacity, int aRefillAmount, int aRefillInterval);
+	~CAPIClient();
 
 	/*
 	Get:

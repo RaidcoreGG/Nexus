@@ -1,18 +1,18 @@
-#include "FileLogger.h"
+#include "CFileLogger.h"
 
-FileLogger::FileLogger(ELogLevel aLogLevel, std::filesystem::path aPath)
+CFileLogger::CFileLogger(ELogLevel aLogLevel, std::filesystem::path aPath)
 {
 	LogLevel = aLogLevel;
 	File.open(aPath, std::ios_base::out, SH_DENYWR);
 }
 
-FileLogger::~FileLogger()
+CFileLogger::~CFileLogger()
 {
 	File.flush();
 	File.close();
 }
 
-void FileLogger::LogMessage(LogEntry aLogEntry)
+void CFileLogger::LogMessage(LogEntry aLogEntry)
 {
 	MessageMutex.lock();
 	{

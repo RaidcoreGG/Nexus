@@ -2,6 +2,7 @@
 
 #include "Version.h"
 
+DWORD						NexusModuleSize		= 0;
 HMODULE						NexusHandle			= nullptr;
 HMODULE						GameHandle			= nullptr;
 HMODULE						D3D11Handle			= nullptr;
@@ -9,6 +10,7 @@ HMODULE						D3D11SystemHandle	= nullptr;
 
 AddonVersion				Version				= { V_MAJOR, V_MINOR, V_BUILD, V_REVISION };
 std::vector<std::string>	Parameters			= {};
+std::vector<signed int>		RequestedAddons		= {};
 
 LinkedMem*					MumbleLink			= nullptr;
 Identity*					MumbleIdentity		= new Identity{};
@@ -48,8 +50,8 @@ ImGuiWindowFlags			WindowFlags_Watermark = ImGuiWindowFlags_NoDecoration |
 													ImGuiWindowFlags_NoBringToFrontOnFocus |
 													ImGuiWindowFlags_NoBackground;
 
-APIClient*					RaidcoreAPI			= nullptr;
-APIClient*					GitHubAPI			= nullptr;
+CAPIClient*					RaidcoreAPI			= nullptr;
+CAPIClient*					GitHubAPI			= nullptr;
 
 std::string					ChangelogText;
 bool						IsUpdateAvailable	= false;

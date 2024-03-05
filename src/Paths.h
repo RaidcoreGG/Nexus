@@ -29,6 +29,7 @@ namespace Path
 	extern std::filesystem::path F_KEYBINDS;
 	extern std::filesystem::path F_FONT;
 	extern std::filesystem::path F_SETTINGS;
+	extern std::filesystem::path F_ADDONCONFIG;
 	extern std::filesystem::path F_APIKEYS;
 
 	extern std::vector<std::string>	ExistingPaths;

@@ -75,6 +75,29 @@ namespace String
 	{
 		return aString.find(aStringFind) != std::string::npos;
 	}
+	std::vector<std::string> Split(std::string aString, const std::string& aDelimiter, bool aKeepDelimiters)
+	{
+		std::vector<std::string> parts;
+
+		size_t pos = aString.find(aDelimiter);
+		size_t initialPos = 0;
+
+		while (pos != std::string::npos)
+		{
+			parts.push_back(aString.substr(initialPos, pos - initialPos));
+			if (aKeepDelimiters)
+			{
+				parts.push_back(aDelimiter);
+			}
+			initialPos = pos + 1;
+
+			pos = aString.find(aDelimiter, initialPos);
+		}
+
+		parts.push_back(aString.substr(initialPos, aString.length() - initialPos));
+
+		return parts;
+	}
 }
 
 const char* ConvertToUTF8(const char* multibyteStr)
@@ -329,6 +352,24 @@ namespace Base64
 long long Timestamp()
 {
 	return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+}
+long long LastModifiedToTimestamp(const std::string& aLastModified)
+{
+	std::tm tm = {};
+	std::istringstream ss(aLastModified);
+	ss >> std::get_time(&tm, "%a, %d %b %Y %H:%M:%S GMT");
+	if (ss.fail())
+	{
+		return -1;
+	}
+	tm.tm_isdst = 0;
+	std::time_t t = std::mktime(&tm);
+	if (t == -1)
+	{
+		return -1;
+	}
+
+	return t;
 }
 // Returns:
 //   true upon success.

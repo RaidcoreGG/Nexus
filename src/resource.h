@@ -23,16 +23,17 @@
 
 #define RES_ICON_ADDONS					301
 #define RES_ICON_OPTIONS				302
-#define RES_ICON_CHANGELOG				303
-#define RES_ICON_LOG					304
-#define RES_ICON_DEBUG					305
-#define RES_ICON_ABOUT					306
+#define RES_ICON_OPTIONS_HOVER			303
+#define RES_ICON_CHANGELOG				304
+#define RES_ICON_LOG					305
+#define RES_ICON_DEBUG					306
+#define RES_ICON_ABOUT					307
 
-#define RES_TEX_MENU_BACKGROUND         307
-#define RES_TEX_MENU_BUTTON             308
-#define RES_TEX_MENU_BUTTON_HOVER       309
+#define RES_TEX_MENU_BACKGROUND         308
+#define RES_TEX_MENU_BUTTON             309
+#define RES_TEX_MENU_BUTTON_HOVER       310
 
-/* AddonsWindow */
+/* CAddonsWindow */
 
 #define RES_TEX_ADDONS_BACKGROUND       401
 #define RES_TEX_ADDONITEM				402
@@ -47,8 +48,14 @@
 #define RES_TEX_BTNCLOSE_HOVER			509
 #define RES_TEX_TITLEBAREND				510
 #define RES_TEX_TITLEBAREND_HOVER		511
+#define RES_TEX_BTNREFRESH				512
+#define RES_TEX_BTNREFRESH_HOVER		513
 
 #define RES_ARCDPS_INTEGRATION			601
+
+/* ContextMenu */
+#define RES_TEX_CONTEXTMENU_BULLET		701
+#define RES_TEX_CONTEXTMENU_HIGHLIGHT	702
 
 // Next default values for new objects
 // 

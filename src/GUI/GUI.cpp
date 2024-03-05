@@ -25,14 +25,14 @@
 
 #include "Widgets/Menu/Menu.h"
 #include "Widgets/Menu/MenuItem.h"
-#include "Widgets/Addons/AddonsWindow.h"
-#include "Widgets/Options/OptionsWindow.h"
-#include "Widgets/Changelog/ChangelogWindow.h"
-#include "Widgets/Log/LogWindow.h"
-#include "Widgets/Debug/DebugWindow.h"
-#include "Widgets/About/AboutBox.h"
+#include "Widgets/Addons/CAddonsWindow.h"
+#include "Widgets/Options/COptionsWindow.h"
+#include "Widgets/Changelog/CChangelogWindow.h"
+#include "Widgets/Log/CLogWindow.h"
+#include "Widgets/Debug/CDebugWindow.h"
+#include "Widgets/About/CAboutBox.h"
 #include "Widgets/QuickAccess/QuickAccess.h"
-#include "Widgets/EULA/EULAModal.h"
+#include "Widgets/EULA/CEULAModal.h"
 
 #include "resource.h"
 #include "Textures/Texture.h"
@@ -411,7 +411,7 @@ namespace GUI
 		{
 			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Debug"; });
 			if (it == Windows.end()) { return; }
-			((DebugWindow*)(*it))->MumbleWindow->Visible = !((DebugWindow*)(*it))->MumbleWindow->Visible;
+			((CDebugWindow*)(*it))->MumbleWindow->Visible = !((CDebugWindow*)(*it))->MumbleWindow->Visible;
 		}
 	}
 	
@@ -454,6 +454,63 @@ namespace GUI
 			}
 		}
 	}
+
+	/* FIXME: quick and dirty hack for now */
+	class CVolatileAddonsDisabledNotification : public IWindow
+	{
+	public:
+		float Opacity = 1.0f;
+
+		CVolatileAddonsDisabledNotification()
+		{
+			Name = "CVolatileAddonsDisabledNotification";
+		}
+		void Render()
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, Opacity);
+
+			ImVec2 center(Renderer::Width * 0.5f, Renderer::Height * 0.5f);
+			ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+			if (ImGui::Begin("##CVolatileAddonsDisabledNotification", (bool*)0, (ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoTitleBar)))
+			{
+				ImGui::PushFont(FontBig);
+				ImGui::TextColoredOutlined(ImVec4(1, 0, 0, 1), "Some addons were disabled due to a game update.");
+				ImGui::TextColoredOutlined(ImVec4(1, 0, 0, 1), "Manually re-enable them or wait for them to update.");
+				ImGui::PopFont();
+
+				ImGui::End();
+			}
+
+			ImGui::PopStyleVar();
+		}
+	};
+
+	void OnVolatileAddonsDisabled(void* aEventArgs)
+	{
+		CVolatileAddonsDisabledNotification* notif = new CVolatileAddonsDisabledNotification();
+		AddWindow(notif);
+		std::thread([notif]()
+			{
+				Sleep(10000);
+				while (notif->Opacity > 0)
+				{
+					notif->Opacity -= 0.1f;
+					Sleep(35);
+				}
+
+				GUI::Mutex.lock();
+				auto it = std::find(GUI::Windows.begin(), GUI::Windows.end(), notif);
+
+				if (it != GUI::Windows.end())
+				{
+					delete (*it);
+					GUI::Windows.erase(it);
+				}
+				GUI::Mutex.unlock();
+			})
+			.detach();
+	}
+	/* FIXME: end */
 
 	void Setup()
 	{
@@ -630,27 +687,18 @@ namespace GUI
 		io.Fonts->Build();
 
 		Events::Subscribe(EV_MUMBLE_IDENTITY_UPDATED, OnMumbleIdentityChanged);
+		Events::Subscribe(EV_VOLATILE_ADDONS_DISABLED, OnVolatileAddonsDisabled);
 		OnMumbleIdentityChanged(nullptr);
 
 		/* set up and add windows */
-		AddonsWindow* addonsWnd = new AddonsWindow("Addons");
-		TextureLoader::LoadFromResource("TEX_ADDONS_BACKGROUND", RES_TEX_ADDONS_BACKGROUND, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource("TEX_ADDONITEM_BACKGROUND", RES_TEX_ADDONITEM, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource("TEX_ADDONS_TITLEBAR", RES_TEX_ADDONS_TITLEBAR, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource("TEX_ADDONS_TITLEBAR_HOVER", RES_TEX_ADDONS_TITLEBAR_HOVER, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource("TEX_TABBTN", RES_TEX_TABBTN, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource("TEX_TABBTN_HOVER", RES_TEX_TABBTN_HOVER, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource("TEX_BTNCLOSE", RES_TEX_BTNCLOSE, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource("TEX_BTNCLOSE_HOVER", RES_TEX_BTNCLOSE_HOVER, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource("TEX_TITLEBAREND", RES_TEX_TITLEBAREND, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource("TEX_TITLEBAREND_HOVER", RES_TEX_TITLEBAREND_HOVER, NexusHandle, nullptr);
+		CAddonsWindow* addonsWnd = new CAddonsWindow("Addons");
 
-		OptionsWindow* opsWnd = new OptionsWindow("Options");
-		ChangelogWindow* chlWnd = new ChangelogWindow("Changelog");
-		LogWindow* logWnd = new LogWindow("Log", ELogLevel::ALL);
+		COptionsWindow* opsWnd = new COptionsWindow("Options");
+		CChangelogWindow* chlWnd = new CChangelogWindow("Changelog");
+		CLogWindow* logWnd = new CLogWindow("Log", ELogLevel::ALL);
 		LogHandler::RegisterLogger(logWnd);
-		DebugWindow* dbgWnd = new DebugWindow("Debug");
-		AboutBox* aboutWnd = new AboutBox("About");
+		CDebugWindow* dbgWnd = new CDebugWindow("Debug");
+		CAboutBox* aboutWnd = new CAboutBox("About");
 
 		Keybinds::Register(KB_ADDONS, ProcessKeybind, "(null)");
 		Keybinds::Register(KB_OPTIONS, ProcessKeybind, "(null)");
@@ -666,12 +714,12 @@ namespace GUI
 		AddWindow(dbgWnd);
 		AddWindow(aboutWnd);
 
-		Menu::AddMenuItem("Addons",		ICON_ADDONS,	&addonsWnd->Visible);
-		Menu::AddMenuItem("Options",	ICON_OPTIONS,	&opsWnd->Visible);
-		Menu::AddMenuItem("Changelog",	ICON_CHANGELOG, &chlWnd->Visible);
-		Menu::AddMenuItem("Log",		ICON_LOG,		&logWnd->Visible);
-		Menu::AddMenuItem("Debug",		ICON_DEBUG,		&dbgWnd->Visible);
-		Menu::AddMenuItem("About",		ICON_ABOUT,		&aboutWnd->Visible);
+		Menu::AddMenuItem("Addons",		ICON_ADDONS,	RES_ICON_ADDONS,	&addonsWnd->Visible);
+		Menu::AddMenuItem("Options",	ICON_OPTIONS,	RES_ICON_OPTIONS,	&opsWnd->Visible);
+		Menu::AddMenuItem("Changelog",	ICON_CHANGELOG, RES_ICON_CHANGELOG,	&chlWnd->Visible);
+		Menu::AddMenuItem("Log",		ICON_LOG,		RES_ICON_LOG,		&logWnd->Visible);
+		Menu::AddMenuItem("Debug",		ICON_DEBUG,		RES_ICON_DEBUG,		&dbgWnd->Visible);
+		Menu::AddMenuItem("About",		ICON_ABOUT,		RES_ICON_ABOUT,		&aboutWnd->Visible);
 
 		/* register keybinds */
 		Keybinds::Register(KB_MENU, ProcessKeybind, "CTRL+O");
@@ -701,19 +749,6 @@ namespace GUI
 		TextureLoader::LoadFromResource(ICON_GENERIC, RES_ICON_GENERIC, NexusHandle, nullptr);
 		TextureLoader::LoadFromResource(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, NexusHandle, nullptr);
 
-		TextureLoader::LoadFromResource(ICON_NOTIFICATION, RES_ICON_NOTIFICATION, NexusHandle, QuickAccess::ReceiveTextures);
-
-		TextureLoader::LoadFromResource(ICON_ADDONS, RES_ICON_ADDONS, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource(ICON_OPTIONS, RES_ICON_OPTIONS, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource(ICON_CHANGELOG, RES_ICON_CHANGELOG, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource(ICON_LOG, RES_ICON_LOG, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource(ICON_DEBUG, RES_ICON_DEBUG, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource(ICON_ABOUT, RES_ICON_ABOUT, NexusHandle, nullptr);
-
-		TextureLoader::LoadFromResource(TEX_MENU_BACKGROUND, RES_TEX_MENU_BACKGROUND, NexusHandle, Menu::ReceiveTextures);
-		TextureLoader::LoadFromResource(TEX_MENU_BUTTON, RES_TEX_MENU_BUTTON, NexusHandle, Menu::ReceiveTextures);
-		TextureLoader::LoadFromResource(TEX_MENU_BUTTON_HOVER, RES_TEX_MENU_BUTTON_HOVER, NexusHandle, Menu::ReceiveTextures);
-
 		/* add shortcut */
 		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "Nexus Menu");
 
@@ -724,7 +759,7 @@ namespace GUI
 
 		if (!HasAcceptedEULA)
 		{
-			EULAModal* eulaModal = new EULAModal();
+			CEULAModal* eulaModal = new CEULAModal();
 			AddWindow(eulaModal);
 		}
 

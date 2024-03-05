@@ -1,4 +1,4 @@
-#include "MumbleOverlay.h"
+#include "CMumbleOverlay.h"
 
 #include "Shared.h"
 #include "State.h"
@@ -11,7 +11,7 @@ using json = nlohmann::json;
 
 namespace GUI
 {
-	void MumbleOverlay::Render()
+	void CMumbleOverlay::Render()
 	{
 		if (!Visible) { return; }
 

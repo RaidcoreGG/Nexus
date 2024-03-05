@@ -1,4 +1,4 @@
-#include "AddonsWindow.h"
+#include "CAddonsWindow.h"
 
 #include <Windows.h>
 #include <shellapi.h>
@@ -16,6 +16,8 @@
 #include "imgui.h"
 #include "imgui_extensions.h"
 
+#include "resource.h"
+
 namespace GUI
 {
 	float windowWidth = 620.0f;
@@ -24,8 +26,9 @@ namespace GUI
 	float contentHeight = 410.0f;
 
 	bool showInstalled = false;
+	bool refreshHovered = false;
 
-	AddonsWindow::AddonsWindow(std::string aName)
+	CAddonsWindow::CAddonsWindow(std::string aName)
 	{
 		Name = aName;
 
@@ -38,6 +41,8 @@ namespace GUI
 		BtnCloseHover = nullptr;
 		TabBtn = nullptr;
 		TabBtnHover = nullptr;
+		BtnRefresh = nullptr;
+		BtnRefreshHover = nullptr;
 
 		TitleBarControlled = false;
 		CloseHovered = false;
@@ -47,26 +52,29 @@ namespace GUI
 		Tab2Hovered = false;
 	}
 
-	void AddonsWindow::Render()
+	void CAddonsWindow::Render()
 	{
 		if (!Visible) { return; }
 
-		if (!Background) { Background = TextureLoader::Get("TEX_ADDONS_BACKGROUND"); }
-		if (!TitleBar) { TitleBar = TextureLoader::Get("TEX_ADDONS_TITLEBAR"); }
-		if (!TitleBarHover) { TitleBarHover = TextureLoader::Get("TEX_ADDONS_TITLEBAR_HOVER"); }
-		if (!TitleBarEnd) { TitleBarEnd = TextureLoader::Get("TEX_TITLEBAREND"); }
-		if (!TitleBarEndHover) { TitleBarEndHover = TextureLoader::Get("TEX_TITLEBAREND_HOVER"); }
-		if (!BtnClose) { BtnClose = TextureLoader::Get("TEX_BTNCLOSE"); }
-		if (!BtnCloseHover) { BtnCloseHover = TextureLoader::Get("TEX_BTNCLOSE_HOVER"); }
-		if (!TabBtn) { TabBtn = TextureLoader::Get("TEX_TABBTN"); }
-		if (!TabBtnHover) { TabBtnHover = TextureLoader::Get("TEX_TABBTN_HOVER"); }
+		if (!Background) { Background = TextureLoader::GetOrCreate("TEX_ADDONS_BACKGROUND", RES_TEX_ADDONS_BACKGROUND, NexusHandle); }
+		if (!TitleBar) { TitleBar = TextureLoader::GetOrCreate("TEX_ADDONS_TITLEBAR", RES_TEX_ADDONS_TITLEBAR, NexusHandle); }
+		if (!TitleBarHover) { TitleBarHover = TextureLoader::GetOrCreate("TEX_ADDONS_TITLEBAR_HOVER", RES_TEX_ADDONS_TITLEBAR_HOVER, NexusHandle); }
+		if (!TitleBarEnd) { TitleBarEnd = TextureLoader::GetOrCreate("TEX_TITLEBAREND", RES_TEX_TITLEBAREND, NexusHandle); }
+		if (!TitleBarEndHover) { TitleBarEndHover = TextureLoader::GetOrCreate("TEX_TITLEBAREND_HOVER", RES_TEX_TITLEBAREND_HOVER, NexusHandle); }
+		if (!BtnClose) { BtnClose = TextureLoader::GetOrCreate("TEX_BTNCLOSE", RES_TEX_BTNCLOSE, NexusHandle); }
+		if (!BtnCloseHover) { BtnCloseHover = TextureLoader::GetOrCreate("TEX_BTNCLOSE_HOVER", RES_TEX_BTNCLOSE_HOVER, NexusHandle); }
+		if (!TabBtn) { TabBtn = TextureLoader::GetOrCreate("TEX_TABBTN", RES_TEX_TABBTN, NexusHandle); }
+		if (!TabBtnHover) { TabBtnHover = TextureLoader::GetOrCreate("TEX_TABBTN_HOVER", RES_TEX_TABBTN_HOVER, NexusHandle); }
+		if (!BtnRefresh) { BtnRefresh = TextureLoader::GetOrCreate("TEX_BTNREFRESH", RES_TEX_BTNREFRESH, NexusHandle); }
+		if (!BtnRefreshHover) { BtnRefreshHover = TextureLoader::GetOrCreate("TEX_BTNREFRESH_HOVER", RES_TEX_BTNREFRESH_HOVER, NexusHandle); }
 
 		if (!(
 			Background &&
 			TitleBar && TitleBarHover &&
 			TitleBarEnd && TitleBarEndHover &&
 			BtnClose && BtnCloseHover &&
-			TabBtn && TabBtnHover
+			TabBtn && TabBtnHover &&
+			BtnRefresh && BtnRefreshHover
 			))
 		{
 			return;
@@ -88,15 +96,8 @@ namespace GUI
 		{
 			float btnHeight = 22.0f * Renderer::Scaling;
 
-			if (Background)
-			{
-				ImGui::SetCursorPos(ImVec2(0, 0));
-				ImGui::Image(Background->Resource, ImVec2(windowWidth * Renderer::Scaling, windowHeight * Renderer::Scaling));
-			}
-			else
-			{
-				Background = TextureLoader::Get("TEX_ADDONS_BACKGROUND");
-			}
+			ImGui::SetCursorPos(ImVec2(0, 0));
+			ImGui::Image(Background->Resource, ImVec2(windowWidth * Renderer::Scaling, windowHeight * Renderer::Scaling));
 
 			ImGui::SetCursorPos(ImVec2(28.0f, 8.0f + (64.0f * Renderer::Scaling)));
 
@@ -137,6 +138,19 @@ namespace GUI
 			ImGui::SetCursorPos(ImVec2(tab2origin.x + text2offset.x, tab2origin.y + text2offset.y));
 			ImGui::TextColored(TabIndex == 1 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "Library");
 
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f }); // smol checkbox
+			ImGui::SetCursorPos(ImVec2(contentWidth * Renderer::Scaling - Renderer::Scaling * 24.0f, tab1origin.y));
+			if (ImGui::ImageButton(!refreshHovered ? BtnRefresh->Resource : BtnRefreshHover->Resource, ImVec2(Renderer::Scaling * 24.0f, Renderer::Scaling * 24.0f)))
+			{
+				Loader::NotifyChanges();
+			}
+			refreshHovered = ImGui::IsItemHovered();
+			ImGui::PopStyleVar();
+			ImGui::PopStyleColor(3);
+
 			ImGui::SetCursorPos(ImVec2(28.0f, 32.0f + (64.0f * Renderer::Scaling)));
 			{
 				ImGui::BeginChild("##AddonsWindowContent", ImVec2(contentWidth * Renderer::Scaling, (contentHeight * Renderer::Scaling) - (64.0f * Renderer::Scaling)));
@@ -161,7 +175,7 @@ namespace GUI
 								for (auto& [path, addon] : Loader::Addons)
 								{
 									if (path.filename() == "arcdps_integration64.dll") { continue; }
-									AddonItem(addon);
+									AddonItem(path, addon);
 								}
 							}
 						}
@@ -169,13 +183,13 @@ namespace GUI
 						ImGui::EndChild();
 					}
 
-					if (ImGui::GW2Button("Open Addons Folder", ImVec2(ImGui::CalcTextSize("Open Addons Folder").x + 16.0f, btnHeight)))
+					if (ImGui::GW2::Button("Open Addons Folder", ImVec2(ImGui::CalcTextSize("Open Addons Folder").x + 16.0f, btnHeight)))
 					{
 						std::string strAddons = Path::D_GW2_ADDONS.string();
 						ShellExecuteA(NULL, "explore", strAddons.c_str(), NULL, NULL, SW_SHOW);
 					}
 					ImGui::SameLine();
-					if (ImGui::GW2Button("Check for Updates", ImVec2(ImGui::CalcTextSize("Check for Updates").x + 16.0f, btnHeight)))
+					if (ImGui::GW2::Button("Check for Updates", ImVec2(ImGui::CalcTextSize("Check for Updates").x + 16.0f, btnHeight)))
 					{
 						const std::lock_guard<std::mutex> lock(Loader::Mutex);
 						{
@@ -201,7 +215,7 @@ namespace GUI
 							}
 						}
 					}
-					ImGui::TooltipGeneric("Checks each addon and updates it, if available.\nSome addons require a restart to apply the update and won't take effect immediately.");
+					ImGui::GW2::TooltipGeneric("Checks each addon and updates it, if available.\nSome addons require a restart to apply the update and won't take effect immediately.");
 				}
 				else if (TabIndex == 1)
 				{
