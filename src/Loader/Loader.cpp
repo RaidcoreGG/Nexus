@@ -29,6 +29,7 @@
 #include "Textures/TextureLoader.h"
 #include "GUI/GUI.h"
 #include "GUI/Widgets/QuickAccess/QuickAccess.h"
+#include "Settings/Settings.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -69,46 +70,15 @@ namespace Loader
 	std::string extOld			= ".old";
 	std::string extUninstall	= ".uninstall";
 
+	bool						DisableVolatileUntilUpdate = false;
+
 	void Initialize()
 	{
 		if (State::Nexus == ENexusState::LOADED)
 		{
-			if (std::filesystem::exists(Path::F_ADDONCONFIG))
-			{
-				{
-					try
-					{
-						std::ifstream file(Path::F_ADDONCONFIG);
+			LoadAddonConfig();
 
-						json cfg = json::parse(file);
-						for (json addonInfo : cfg)
-						{
-							signed int signature = 0;
-							StoredAddon storedAddonInfo{};
-							if (!addonInfo["Signature"].is_null()) { addonInfo["Signature"].get_to(signature); }
-							if (!addonInfo["IsPausingUpdates"].is_null()) { addonInfo["IsPausingUpdates"].get_to(storedAddonInfo.IsPausingUpdates); }
-							if (!addonInfo["IsLoaded"].is_null()) { addonInfo["IsLoaded"].get_to(storedAddonInfo.IsLoaded); }
-							if (!addonInfo["IsDisabledUntilUpdate"].is_null()) { addonInfo["IsDisabledUntilUpdate"].get_to(storedAddonInfo.IsDisabledUntilUpdate); }
-
-							if (signature == 0) { continue; }
-
-							AddonConfig[signature] = storedAddonInfo;
-						}
-
-						file.close();
-					}
-					catch (json::parse_error& ex)
-					{
-						LogWarning(CH_KEYBINDS, "AddonConfig.json could not be parsed. Error: %s", ex.what());
-					}
-				}
-			}
-
-			// if addons were specified via start parameter
-			// iterate over all addons now in config
-			// check if they were specified
-			// if yes, set them to loaded
-			// if no, set them to unloaded
+			/* if addons were specified via param, only load those */
 			if (RequestedAddons.size() > 0)
 			{
 				for (auto& cfgIt : AddonConfig)
@@ -145,29 +115,7 @@ namespace Loader
 				return;
 			}
 
-			json response = RaidcoreAPI->Get("/addonlibrary");
-
-			if (!response.is_null())
-			{
-				for (const auto& addon : response)
-				{
-					LibraryAddon* newAddon = new LibraryAddon{};
-					newAddon->Signature = addon["id"];
-					newAddon->Name = addon["name"];
-					newAddon->Description = addon["description"];
-					newAddon->Provider = GetProvider(addon["download"]);
-					newAddon->DownloadURL = addon["download"];
-					AddonLibrary.push_back(newAddon);
-				}
-
-				std::sort(AddonLibrary.begin(), AddonLibrary.end(), [](LibraryAddon* a, LibraryAddon* b) {
-					return a->Name < b->Name;
-				});
-			}
-			else
-			{
-				LogWarning(CH_CORE, "Error parsing API response for /addonlibrary.");
-			}
+			GetAddonLibrary();
 
 			LoaderThread = std::thread(ProcessChanges);
 			LoaderThread.detach();
@@ -190,41 +138,7 @@ namespace Loader
 			}
 
 			const std::lock_guard<std::mutex> lock(Mutex);
-			if (RequestedAddons.size() == 0) // don't save state if state was overridden via start param
-			{
-				json cfg = json::array();
-
-				for (auto it : Addons)
-				{
-					Addon* addon = it.second;
-
-					if (!addon->Definitions) { continue; }
-					if (addon->Definitions->Signature == -19392669) { continue; } // skip bridge
-
-					json addonInfo =
-					{
-						{"Signature", addon->Definitions->Signature},
-						{"IsLoaded", addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED ? true : false},
-					};
-
-					auto cfgIt = AddonConfig.find(addon->Definitions->Signature);
-					if (cfgIt != AddonConfig.end())
-					{
-						if (addon->State == EAddonState::LoadedLOCKED && addon->ShouldDisableNextLaunch)
-						{
-							addonInfo["IsLoaded"] = false;
-						}
-						addonInfo["IsPausingUpdates"] = addon->IsPausingUpdates;
-						addonInfo["IsDisabledUntilUpdate"] = cfgIt->second.IsDisabledUntilUpdate;
-					}
-
-					cfg.push_back(addonInfo);
-				}
-
-				std::ofstream file(Path::F_ADDONCONFIG);
-				file << cfg.dump(1, '\t') << std::endl;
-				file.close();
-			}
+			SaveAddonConfig();
 
 			{
 				while (Addons.size() != 0)
@@ -233,6 +147,136 @@ namespace Loader
 					Addons.erase(Addons.begin());
 				}
 			}
+		}
+	}
+
+	void LoadAddonConfig()
+	{
+		if (std::filesystem::exists(Path::F_ADDONCONFIG))
+		{
+			{
+				try
+				{
+					std::ifstream file(Path::F_ADDONCONFIG);
+
+					json cfg = json::parse(file);
+					for (json addonInfo : cfg)
+					{
+						signed int signature = 0;
+						StoredAddon storedAddonInfo{};
+						if (!addonInfo["Signature"].is_null()) { addonInfo["Signature"].get_to(signature); }
+						if (!addonInfo["IsPausingUpdates"].is_null()) { addonInfo["IsPausingUpdates"].get_to(storedAddonInfo.IsPausingUpdates); }
+						if (!addonInfo["IsLoaded"].is_null()) { addonInfo["IsLoaded"].get_to(storedAddonInfo.IsLoaded); }
+						if (!addonInfo["IsDisabledUntilUpdate"].is_null()) { addonInfo["IsDisabledUntilUpdate"].get_to(storedAddonInfo.IsDisabledUntilUpdate); }
+
+						if (signature == 0) { continue; }
+
+						AddonConfig[signature] = storedAddonInfo;
+					}
+
+					file.close();
+				}
+				catch (json::parse_error& ex)
+				{
+					LogWarning(CH_KEYBINDS, "AddonConfig.json could not be parsed. Error: %s", ex.what());
+				}
+			}
+		}
+	}
+	void SaveAddonConfig()
+	{
+		if (RequestedAddons.size() == 0) // don't save state if state was overridden via start param
+		{
+			json cfg = json::array();
+
+			std::vector<signed int> foundAddons;
+
+			for (auto it : Addons)
+			{
+				Addon* addon = it.second;
+
+				if (!addon->Definitions) { continue; }
+				if (addon->Definitions->Signature == -19392669) { continue; } // skip bridge
+
+				json addonInfo =
+				{
+					{"Signature", addon->Definitions->Signature},
+					{"IsLoaded", addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED ? true : false},
+					{"IsPausingUpdates", addon->IsPausingUpdates},
+					{"IsDisabledUntilUpdate", addon->IsDisabledUntilUpdate}
+				};
+
+				/* override loaded state, if it's supposed to disable next launch */
+				if (addon->State == EAddonState::LoadedLOCKED && addon->ShouldDisableNextLaunch)
+				{
+					addonInfo["IsLoaded"] = false;
+				}
+
+				foundAddons.push_back(addon->Definitions->Signature);
+				cfg.push_back(addonInfo);
+			}
+
+			/* also keep tracking addons that are no longer there */
+			for (auto& cfgIt : AddonConfig)
+			{
+				if (cfgIt.first == -19392669) { continue; } // skip bridge
+
+				bool tracked = false;
+				for (size_t i = 0; i < foundAddons.size(); i++)
+				{
+					if (foundAddons[i] == cfgIt.first)
+					{
+						tracked = true;
+						break;
+					}
+				}
+
+				if (!tracked)
+				{
+					json addonInfo =
+					{
+						{"Signature", cfgIt.first},
+						{"IsLoaded", cfgIt.second.IsLoaded},
+						{"IsPausingUpdates", cfgIt.second.IsPausingUpdates},
+						{"IsDisabledUntilUpdate", cfgIt.second.IsDisabledUntilUpdate}
+					};
+
+					cfg.push_back(addonInfo);
+				}
+			}
+
+			std::ofstream file(Path::F_ADDONCONFIG);
+			file << cfg.dump(1, '\t') << std::endl;
+			file.close();
+		}
+	}
+
+	void GetAddonLibrary()
+	{
+		json response = RaidcoreAPI->Get("/addonlibrary");
+
+		if (!response.is_null())
+		{
+			AddonLibrary.clear();
+
+			for (const auto& addon : response)
+			{
+				LibraryAddon* newAddon = new LibraryAddon{};
+				newAddon->Signature = addon["id"];
+				newAddon->Name = addon["name"];
+				newAddon->Description = addon["description"];
+				newAddon->Provider = GetProvider(addon["download"]);
+				newAddon->DownloadURL = addon["download"];
+				AddonLibrary.push_back(newAddon);
+			}
+
+			std::sort(AddonLibrary.begin(), AddonLibrary.end(), [](LibraryAddon* a, LibraryAddon* b) {
+				return a->Name < b->Name;
+				});
+		}
+		else
+		{
+			LogWarning(CH_CORE, "Error parsing API response for /addonlibrary.");
 		}
 	}
 
@@ -337,6 +381,86 @@ namespace Loader
 	}
 	void ProcessChanges()
 	{
+		/* fetch game version before loading addons */
+		/* prepare client request */
+		httplib::Client client("http://assetcdn.101.arenanetworks.com");
+		client.enable_server_certificate_verification(false);
+
+		std::string buildStr;
+
+		size_t bytesWritten = 0;
+		auto result = client.Get("/latest64/101", [&](const char* data, size_t data_length) {
+			buildStr += data;
+			bytesWritten += data_length;
+			return true;
+			});
+
+		if (!result || result->status != 200)
+		{
+			LogWarning(CH_LOADER, "Error fetching \"http://assetcdn.101.arenanetworks.com/latest64/101\"");
+		}
+		else
+		{
+			int gameBuild = std::stoi(buildStr);
+
+			int lastGameBuild = 0;
+			long long lastChecked = 0;
+
+			if (!Settings::Settings.is_null())
+			{
+				if (!Settings::Settings[OPT_LASTGAMEBUILD].is_null())
+				{
+					Settings::Settings[OPT_LASTGAMEBUILD].get_to(lastGameBuild);
+				}
+
+				//if (!Settings::Settings[OPT_LASTCHECKEDGAMEBUILD].is_null())
+				//{
+				//	Settings::Settings[OPT_LASTCHECKEDGAMEBUILD].get_to(lastChecked);
+				//}
+			}
+
+			if (gameBuild > lastGameBuild && lastGameBuild != 0)
+			{
+				/* game updated */
+				
+				/* check if today is tuesday (usually breaking patch) */
+				/*std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+				tm local_tm = *localtime(&t);
+				int wday = local_tm.tm_wday;
+
+				long long deltaTime = Timestamp() - lastChecked;
+
+				long long secondsSinceMidnight = (local_tm.tm_hour * 60 * 60) + (local_tm.tm_min * 60) + (local_tm.tm_sec);
+				long long secondsSinceMidnightYesterday = (24 * 60 * 60) + secondsSinceMidnight;
+				long long aWholeEntireWeekInSeconds = 7 * 24 * 60 * 60;
+
+				if (wday == 2 && deltaTime > secondsSinceMidnightYesterday)
+				{
+					DisableVolatileUntilUpdate = true;
+					LogWarning(CH_LOADER, "Game updated. Current Build %d. Old Build: %d. Disabling volatile addons until they update.", gameBuild, lastGameBuild);
+				}
+				else if (deltaTime > aWholeEntireWeekInSeconds)
+				{
+					DisableVolatileUntilUpdate = true;
+					LogWarning(CH_LOADER, "Game updated. Current Build %d. Old Build: %d. Disabling volatile addons until they update.", gameBuild, lastGameBuild);
+				}
+				else
+				{
+					DisableVolatileUntilUpdate = false;
+					LogWarning(CH_LOADER, "Game updated. But it's not a tuesday, so surely nothing broke.");
+				}*/
+
+				DisableVolatileUntilUpdate = true;
+				LogWarning(CH_LOADER, "Game updated. Current Build %d. Old Build: %d. Disabling volatile addons until they update.", gameBuild, lastGameBuild);
+
+				Events::RaiseNotification(EV_VOLATILE_ADDONS_DISABLED);
+			}
+
+			Settings::Settings[OPT_LASTGAMEBUILD] = gameBuild;
+			//Settings::Settings[OPT_LASTCHECKEDGAMEBUILD] = Timestamp();
+			Settings::Save();
+		}
+
 		for (;;)
 		{
 			{
@@ -441,12 +565,13 @@ namespace Loader
 		}
 		else
 		{
-			if (std::filesystem::exists(Path::F_ADDONCONFIG)) // migration
+			if (std::filesystem::exists(Path::F_ADDONCONFIG) && !aIsReload)
 			{
 				firstLoad = true;
 			}
 			else
 			{
+				// migration
 				firstLoad = false;
 			}
 			addon = new Addon{};
@@ -480,6 +605,7 @@ namespace Loader
 		
 		AddonDefinition* tmpDefs = getAddonDef();
 
+		/* addon defs are nullptr */
 		if (tmpDefs == nullptr)
 		{
 			LogWarning(CH_LOADER, "\"%s\" is Nexus-compatible but returned a nullptr. Incompatible.", strPath);
@@ -489,48 +615,40 @@ namespace Loader
 			return;
 		}
 
-		StoredAddon* addonInfo = nullptr;
-		auto cfgIt = AddonConfig.find(tmpDefs->Signature);
+		// free old and clone new
+		FreeAddonDefs(&addon->Definitions);
+		CopyAddonDefs(tmpDefs, &addon->Definitions);
 
-		if (cfgIt != AddonConfig.end())
-		{
-			addonInfo = &cfgIt->second;
-		}
+		// should load
+		bool shouldLoad = false;
 
-		/* check if on load list && first load and also make sure this isn't the arc integration */
-		if (!aIsReload && firstLoad && tmpDefs->Signature != -19392669)
+		/* get stored info about addon and apply to addon */
+		if (firstLoad)
 		{
-			// reload is thrown in the mix here because not only does a reload imply not first load
-			// but also this is necessary to skip this segment for arcdps integration
-			bool wasRequested = false;
-			if (addonInfo != nullptr)
+			StoredAddon* addonInfo = nullptr;
+			auto cfgIt = AddonConfig.find(tmpDefs->Signature);
+			if (cfgIt != AddonConfig.end())
 			{
+				addonInfo = &cfgIt->second;
+				addon->IsDisabledUntilUpdate = addonInfo->IsDisabledUntilUpdate;
 				addon->IsPausingUpdates = addonInfo->IsPausingUpdates;
-
 				if (addonInfo->IsLoaded)
 				{
-					wasRequested = true;
+					shouldLoad = true;
 				}
-			}
-
-			if (!wasRequested)
-			{
-				LogInfo(CH_LOADER, "\"%s\" was not requested via start parameter or last state was disabled. Skipped.", strPath, tmpDefs->Signature);
-
-				// free old and clone new anyway so the addon can be listed
-				FreeAddonDefs(&addon->Definitions);
-				CopyAddonDefs(tmpDefs, &addon->Definitions);
-
-				FreeLibrary(addon->Module);
-				addon->State = EAddonState::NotLoaded;
-				addon->Module = nullptr;
-				return;
 			}
 		}
 
-		// if not already being reloaded check for update
-		// also either addons must be enabled or there's no info on that yet
-		if (!aIsReload && (addonInfo == nullptr || !addon->IsPausingUpdates))
+		/* set disabled until update state if game has updated and addon is volatile and this is the intial load,
+		 * subsequent (user-invoked) loads are on them */
+		if (!aIsReload && DisableVolatileUntilUpdate && firstLoad && tmpDefs->HasFlag(EAddonFlags::IsVolatile))
+		{
+			addon->IsDisabledUntilUpdate = true;
+			SaveAddonConfig(); // save the DUU state
+		}
+
+		/* don't update when reloading; check when: it's waiting to re-enable but wasn't manually invoked, it's not pausing updates atm */
+		if (!aIsReload && ((addon->IsDisabledUntilUpdate && firstLoad) || !addon->IsPausingUpdates))
 		{
 			std::filesystem::path tmpPath = aPath.string();
 			signed int tmpSig = tmpDefs->Signature;
@@ -540,20 +658,28 @@ namespace Loader
 			EUpdateProvider tmpProv = tmpDefs->Provider;
 			std::string tmpLink = tmpDefs->UpdateLink != nullptr ? tmpDefs->UpdateLink : "";
 
-			std::thread([tmpPath, tmpSig, tmpName, tmpVers, tmpLocked, tmpProv, tmpLink]()
+			std::thread([tmpPath, tmpSig, tmpName, tmpVers, tmpLocked, tmpProv, tmpLink, addon]()
 				{
 					if (UpdateAddon(tmpPath, tmpSig, tmpName, tmpVers, tmpProv, tmpLink))
 					{
 						LogInfo(CH_LOADER, "Update available for \"%s\".", tmpPath.string().c_str());
+						if (addon->IsDisabledUntilUpdate)
+						{
+							addon->IsDisabledUntilUpdate = false; // reset state, because it updated
+							const std::lock_guard<std::mutex> lock(Mutex); // mutex because we're async/threading
+							SaveAddonConfig(); // save the DUU state
+						}
 						QueueAddon(ELoaderAction::Reload, tmpPath);
 					}
-					else if (tmpLocked)
+					else if (tmpLocked && !addon->IsDisabledUntilUpdate) // if addon is locked and not DUU
 					{
 						QueueAddon(ELoaderAction::Reload, tmpPath);
 					}
 				})
 				.detach();
 
+			/* if it will be locked, explicitly set it to NotLoaded, this prevents it from being loaded, so it can check for an update
+			 * other addons continue and will be loaded. */
 			if (tmpDefs->Unload == nullptr || tmpDefs->HasFlag(EAddonFlags::DisableHotloading))
 			{
 				FreeLibrary(addon->Module);
@@ -561,6 +687,16 @@ namespace Loader
 				addon->Module = nullptr;
 				return;
 			}
+		}
+
+		/* don't load addons that weren't requested or loaded last time (ignore arcdps integration) */
+		if (firstLoad && !shouldLoad && tmpDefs->Signature != -19392669)
+		{
+			LogInfo(CH_LOADER, "\"%s\" was not requested via start parameter or last state was disabled. Skipped.", strPath, tmpDefs->Signature);
+			FreeLibrary(addon->Module);
+			addon->State = EAddonState::NotLoaded;
+			addon->Module = nullptr;
+			return;
 		}
 
 		/* doesn't fulfill min reqs */
@@ -592,10 +728,6 @@ namespace Loader
 
 		AddonAPI* api = GetAddonAPI(tmpDefs->APIVersion); // will be nullptr if doesn't exist or APIVersion = 0
 
-		// free old and clone new
-		FreeAddonDefs(&addon->Definitions);
-		CopyAddonDefs(tmpDefs, &addon->Definitions);
-
 		// if the api doesn't exist and there was one requested
 		if (api == nullptr && addon->Definitions->APIVersion != 0)
 		{
@@ -608,12 +740,11 @@ namespace Loader
 
 		MODULEINFO moduleInfo{};
 		GetModuleInformation(GetCurrentProcess(), addon->Module, &moduleInfo, sizeof(moduleInfo));
-
 		addon->ModuleSize = moduleInfo.SizeOfImage;
 
+		/* arcdps integration detection & deploy */
 		typedef int (*addextension2)(HINSTANCE);
 		addextension2 exp_addextension2 = nullptr;
-
 		if (addon->Definitions->Signature == 0xFFF694D1)
 		{
 			if (true == FindFunction(addon->Module, &exp_addextension2, "addextension2"))
@@ -654,6 +785,7 @@ namespace Loader
 
 		bool locked = addon->Definitions->Unload == nullptr || addon->Definitions->HasFlag(EAddonFlags::DisableHotloading);
 		addon->State = locked ? EAddonState::LoadedLOCKED : EAddonState::Loaded;
+		SaveAddonConfig();
 
 		if (addon->Definitions->APIVersion == 0)
 		{
@@ -664,6 +796,7 @@ namespace Loader
 			LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.)", strPath, addon->Definitions->Signature, addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage, addon->Definitions->APIVersion);
 		}
 
+		/* arcdps integration initialisation */
 		if (exp_addextension2)
 		{
 			auto it = Addons.find(Path::F_ARCDPSINTEGRATION);
@@ -785,6 +918,11 @@ namespace Loader
 		{
 			LogInfo(CH_LOADER, "Unloaded addon on shutdown without freeing module due to locked state: %s", strPath);
 		}
+
+		if (!aIsShutdown)
+		{
+			SaveAddonConfig();
+		}
 	}
 	void UninstallAddon(const std::filesystem::path& aPath)
 	{
@@ -793,10 +931,8 @@ namespace Loader
 		/* check both LoadedLOCKED, but also Loaded as a sanity check */
 		auto it = Addons.find(aPath);
 
-		/*
-		if it's still loaded due to being locked (or for some obscure other reason)
-		try to move addon.dll to addon.dll.old, so it will be deleted on next restart
-		*/
+		/* if it's still loaded due to being locked (or for some obscure other reason)
+		try to move addon.dll to addon.dll.uninstall, so it will be deleted on next restart */
 		if (it != Addons.end())
 		{
 			if (it->second->State == EAddonState::Loaded || it->second->State == EAddonState::LoadedLOCKED)

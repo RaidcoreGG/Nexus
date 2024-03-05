@@ -175,7 +175,7 @@ namespace GUI
 								for (auto& [path, addon] : Loader::Addons)
 								{
 									if (path.filename() == "arcdps_integration64.dll") { continue; }
-									AddonItem(addon);
+									AddonItem(path, addon);
 								}
 							}
 						}

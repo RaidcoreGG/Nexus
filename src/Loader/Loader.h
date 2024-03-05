@@ -47,6 +47,14 @@ namespace Loader
 	/* Deregisters the directory updates and unloads all addons. */
 	void Shutdown();
 
+	/* Load AddonConfig. */
+	void LoadAddonConfig();
+	/* Save AddonConfig. */
+	void SaveAddonConfig();
+
+	/* Fetch AddonLibrary. */
+	void GetAddonLibrary();
+
 	/* Returns 0 if message was processed. */
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 

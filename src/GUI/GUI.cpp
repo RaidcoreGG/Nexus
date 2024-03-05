@@ -455,6 +455,63 @@ namespace GUI
 		}
 	}
 
+	/* FIXME: quick and dirty hack for now */
+	class CVolatileAddonsDisabledNotification : public IWindow
+	{
+	public:
+		float Opacity = 1.0f;
+
+		CVolatileAddonsDisabledNotification()
+		{
+			Name = "CVolatileAddonsDisabledNotification";
+		}
+		void Render()
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, Opacity);
+
+			ImVec2 center(Renderer::Width * 0.5f, Renderer::Height * 0.5f);
+			ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+			if (ImGui::Begin("##CVolatileAddonsDisabledNotification", (bool*)0, (ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoTitleBar)))
+			{
+				ImGui::PushFont(FontBig);
+				ImGui::TextColoredOutlined(ImVec4(1, 0, 0, 1), "Some addons were disabled due to a game update.");
+				ImGui::TextColoredOutlined(ImVec4(1, 0, 0, 1), "Manually re-enable them or wait for them to update.");
+				ImGui::PopFont();
+
+				ImGui::End();
+			}
+
+			ImGui::PopStyleVar();
+		}
+	};
+
+	void OnVolatileAddonsDisabled(void* aEventArgs)
+	{
+		CVolatileAddonsDisabledNotification* notif = new CVolatileAddonsDisabledNotification();
+		AddWindow(notif);
+		std::thread([notif]()
+			{
+				Sleep(10000);
+				while (notif->Opacity > 0)
+				{
+					notif->Opacity -= 0.1f;
+					Sleep(35);
+				}
+
+				GUI::Mutex.lock();
+				auto it = std::find(GUI::Windows.begin(), GUI::Windows.end(), notif);
+
+				if (it != GUI::Windows.end())
+				{
+					delete (*it);
+					GUI::Windows.erase(it);
+				}
+				GUI::Mutex.unlock();
+			})
+			.detach();
+	}
+	/* FIXME: end */
+
 	void Setup()
 	{
 		ImGuiIO& io = ImGui::GetIO();
@@ -630,6 +687,7 @@ namespace GUI
 		io.Fonts->Build();
 
 		Events::Subscribe(EV_MUMBLE_IDENTITY_UPDATED, OnMumbleIdentityChanged);
+		Events::Subscribe(EV_VOLATILE_ADDONS_DISABLED, OnVolatileAddonsDisabled);
 		OnMumbleIdentityChanged(nullptr);
 
 		/* set up and add windows */

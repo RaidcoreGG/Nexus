@@ -33,7 +33,7 @@ namespace GUI
 	Texture* CtxMenuBullet = nullptr;
 	Texture* CtxMenuHighlight = nullptr;
 
-	void AddonItem(Addon* aAddon)
+	void AddonItem(std::filesystem::path aPath, Addon* aAddon)
 	{
 		if (aAddon == nullptr ||
 			aAddon->Definitions == nullptr ||
@@ -156,17 +156,28 @@ namespace GUI
 
 						ImGui::Separator();
 
+						if (ImGui::GW2::ContextMenuItem(("ToggleDUU##" + sig).c_str(), aAddon->IsDisabledUntilUpdate ? "Re-Enable" : "Disable until Update", CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+						{
+							//LogDebug(CH_GUI, "ToggleDUU called: %s", it.second->Definitions->Name);
+							aAddon->IsDisabledUntilUpdate = !aAddon->IsDisabledUntilUpdate;
+							Loader::SaveAddonConfig();
+
+							if (aAddon->State == EAddonState::Loaded)
+							{
+								Loader::QueueAddon(ELoaderAction::Unload, aPath);
+							}
+						}
+						if (aAddon->State == EAddonState::LoadedLOCKED)
+						{
+							ImGui::GW2::TooltipGeneric("This addon is currently locked disabling won't take effect until next game start.");
+						}
+
+						ImGui::Separator();
+
 						if (ImGui::GW2::ContextMenuItem(("Uninstall##" + sig).c_str(), "Uninstall", CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 						{
-							for (auto& it : Loader::Addons)
-							{
-								if (it.second->Definitions == aAddon->Definitions)
-								{
-									//LogDebug(CH_GUI, "Uninstall called: %s", it.second->Definitions->Name);
-									Loader::QueueAddon(ELoaderAction::Uninstall, it.first);
-									break;
-								}
-							}
+							//LogDebug(CH_GUI, "Uninstall called: %s", it.second->Definitions->Name);
+							Loader::QueueAddon(ELoaderAction::Uninstall, aPath);
 						}
 						if (aAddon->State == EAddonState::LoadedLOCKED)
 						{
@@ -186,15 +197,8 @@ namespace GUI
 				{
 					if (ImGui::GW2::Button(("Disable##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
-						for (auto& it : Loader::Addons)
-						{
-							if (it.second->Definitions == aAddon->Definitions)
-							{
-								//LogDebug(CH_GUI, "Unload called: %s", it.second->Definitions->Name);
-								Loader::QueueAddon(ELoaderAction::Unload, it.first);
-								break;
-							}
-						}
+						//LogDebug(CH_GUI, "Unload called: %s", it.second->Definitions->Name);
+						Loader::QueueAddon(ELoaderAction::Unload, aPath);
 					}
 					if (RequestedAddons.size() > 0)
 					{
@@ -235,15 +239,9 @@ namespace GUI
 				{
 					if (ImGui::GW2::Button(("Load##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
-						for (auto& it : Loader::Addons)
-						{
-							if (it.second->Definitions == aAddon->Definitions)
-							{
-								//LogDebug(CH_GUI, "Load called: %s", it.second->Definitions->Name);
-								Loader::QueueAddon(ELoaderAction::Load, it.first);
-								break;
-							}
-						}
+						//LogDebug(CH_GUI, "Load called: %s", it.second->Definitions->Name);
+						aAddon->IsDisabledUntilUpdate = false; // explicitly loaded
+						Loader::QueueAddon(ELoaderAction::Load, aPath);
 					}
 					if (RequestedAddons.size() > 0)
 					{

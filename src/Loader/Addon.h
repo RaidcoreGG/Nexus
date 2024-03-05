@@ -18,6 +18,7 @@ struct Addon
 	bool						ShouldDisableNextLaunch;
 	bool						IsPausingUpdates;
 	bool						WillBeUninstalled;
+	bool						IsDisabledUntilUpdate;
 };
 
 #endif
