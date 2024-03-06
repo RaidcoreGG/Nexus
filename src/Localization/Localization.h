@@ -12,13 +12,13 @@ namespace Localization
 	/// ADDONAPI_Translate:
 	/// 	Addon API wrapper function for Translate. Translates into the currently set language.
 	///----------------------------------------------------------------------------------------------------
-	static const char* ADDONAPI_Translate(const char* aIdentifier);
+	const char* ADDONAPI_Translate(const char* aIdentifier);
 
 	///----------------------------------------------------------------------------------------------------
 	/// ADDONAPI_TranslateTo:
 	/// 	Addon API wrapper function for Translate. Translates into a specific language.
 	///----------------------------------------------------------------------------------------------------
-	static const char* ADDONAPI_TranslateTo(const char* aIdentifier, const char* aLanguageIdentifier);
+	const char* ADDONAPI_TranslateTo(const char* aIdentifier, const char* aLanguageIdentifier);
 
 	///----------------------------------------------------------------------------------------------------
 	/// ADDONAPI_Set:

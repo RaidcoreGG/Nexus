@@ -8,13 +8,13 @@ using json = nlohmann::json;
 
 namespace Localization
 {
-	static const char* ADDONAPI_Translate(const char* aIdentifier)
+	const char* ADDONAPI_Translate(const char* aIdentifier)
 	{
 		CLocalization& inst = CLocalization::GetInstance();
 		return inst.Translate(aIdentifier);
 	}
 
-	static const char* ADDONAPI_TranslateTo(const char* aIdentifier, const char* aLanguageIdentifier)
+	const char* ADDONAPI_TranslateTo(const char* aIdentifier, const char* aLanguageIdentifier)
 	{
 		CLocalization& inst = CLocalization::GetInstance();
 		return inst.Translate(aIdentifier, aLanguageIdentifier);
