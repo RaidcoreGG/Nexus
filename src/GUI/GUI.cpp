@@ -641,12 +641,12 @@ namespace GUI
 		if (!LinkArcDPSStyle && std::filesystem::exists(Path::F_FONT))
 		{
 			std::string strFont = Path::F_FONT.string();
-			io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize);
+			io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize, nullptr, io.Fonts->GetGlyphRangesChineseFull());
 		}
 		else if (LinkArcDPSStyle && std::filesystem::exists(Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf"))
 		{
 			std::string strFont = (Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf").string();
-			io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize);
+			io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize, nullptr, io.Fonts->GetGlyphRangesChineseFull());
 		}
 		else
 		{

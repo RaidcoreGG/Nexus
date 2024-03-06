@@ -16,6 +16,7 @@ const char* CH_DATALINK					= "DataLink";
 const char* CH_KEYBINDS					= "Keybinds";
 const char* CH_GUI						= "GUI";
 const char* CH_UPDATER					= "Updater";
+const char* CH_LOCALIZATION				= "Localization";
 
 /* Keybinds */
 const char* KB_MENU						= "KB_MENU";
