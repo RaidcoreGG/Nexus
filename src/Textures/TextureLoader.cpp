@@ -85,19 +85,19 @@ namespace TextureLoader
 		return result;
 	}
 
-	Texture* GetOrCreateFromFile(const char* aIdentifier, const char* aFilename)
+	Texture* ADDONAPI_GetOrCreateFromFile(const char* aIdentifier, const char* aFilename)
 	{
 		return GetOrCreate(aIdentifier, aFilename);
 	}
-	Texture* GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule)
+	Texture* ADDONAPI_GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule)
 	{
 		return GetOrCreate(aIdentifier, aResourceID, aModule);;
 	}
-	Texture* GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint)
+	Texture* ADDONAPI_GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint)
 	{
 		return GetOrCreate(aIdentifier, aRemote, aEndpoint);
 	}
-	Texture* GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize)
+	Texture* ADDONAPI_GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize)
 	{
 		return GetOrCreate(aIdentifier, aData, aSize);
 	}

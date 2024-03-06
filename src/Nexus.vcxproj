@@ -131,6 +131,7 @@
     <ClInclude Include="Loader\Loader.h" />
     <ClInclude Include="Loader\NexusLinkData.h" />
     <ClInclude Include="Loader\StoredAddon.h" />
+    <ClInclude Include="Localization\FuncDefs.h" />
     <ClInclude Include="Localization\Localization.h" />
     <ClInclude Include="Logging\FuncDefs.h" />
     <ClInclude Include="Main.h" />

@@ -30,6 +30,7 @@
 #include "GUI/GUI.h"
 #include "GUI/Widgets/QuickAccess/QuickAccess.h"
 #include "Settings/Settings.h"
+#include "Localization/Localization.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -1584,7 +1585,7 @@ namespace Loader
 			((AddonAPI2*)api)->EnableHook = MH_EnableHook;
 			((AddonAPI2*)api)->DisableHook = MH_DisableHook;
 
-			((AddonAPI2*)api)->Log = LogMessageAddon2;
+			((AddonAPI2*)api)->Log = ADDONAPI_LogMessageAddon2;
 
 			((AddonAPI2*)api)->RaiseEvent = Events::Raise;
 			((AddonAPI2*)api)->RaiseEventNotification = Events::RaiseNotification;
@@ -1602,10 +1603,10 @@ namespace Loader
 			((AddonAPI2*)api)->ShareResource = DataLink::ShareResource;
 
 			((AddonAPI2*)api)->GetTexture = TextureLoader::Get;
-			((AddonAPI2*)api)->GetTextureOrCreateFromFile = TextureLoader::GetOrCreateFromFile;
-			((AddonAPI2*)api)->GetTextureOrCreateFromResource = TextureLoader::GetOrCreateFromResource;
-			((AddonAPI2*)api)->GetTextureOrCreateFromURL = TextureLoader::GetOrCreateFromURL;
-			((AddonAPI2*)api)->GetTextureOrCreateFromMemory = TextureLoader::GetOrCreateFromMemory;
+			((AddonAPI2*)api)->GetTextureOrCreateFromFile = TextureLoader::ADDONAPI_GetOrCreateFromFile;
+			((AddonAPI2*)api)->GetTextureOrCreateFromResource = TextureLoader::ADDONAPI_GetOrCreateFromResource;
+			((AddonAPI2*)api)->GetTextureOrCreateFromURL = TextureLoader::ADDONAPI_GetOrCreateFromURL;
+			((AddonAPI2*)api)->GetTextureOrCreateFromMemory = TextureLoader::ADDONAPI_GetOrCreateFromMemory;
 			((AddonAPI2*)api)->LoadTextureFromFile = TextureLoader::LoadFromFile;
 			((AddonAPI2*)api)->LoadTextureFromResource = TextureLoader::LoadFromResource;
 			((AddonAPI2*)api)->LoadTextureFromURL = TextureLoader::LoadFromURL;
@@ -1616,6 +1617,9 @@ namespace Loader
 			((AddonAPI2*)api)->NotifyShortcut = GUI::QuickAccess::NotifyShortcut;
 			((AddonAPI2*)api)->AddSimpleShortcut = GUI::QuickAccess::AddSimpleShortcut;
 			((AddonAPI2*)api)->RemoveSimpleShortcut = GUI::QuickAccess::RemoveSimpleShortcut;
+
+			((AddonAPI2*)api)->Translate = Localization::ADDONAPI_Translate;
+			((AddonAPI2*)api)->TranslateTo = Localization::ADDONAPI_TranslateTo;
 
 			ApiDefs.insert({ aVersion, api });
 			return api;

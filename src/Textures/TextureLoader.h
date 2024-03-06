@@ -26,10 +26,10 @@ namespace TextureLoader
 	Texture* GetOrCreate(const char* aIdentifier, const char* aRemote, const char* aEndpoint);
 	Texture* GetOrCreate(const char* aIdentifier, void* aData, size_t aSize);
 
-	Texture* GetOrCreateFromFile(const char* aIdentifier, const char* aFilename);
-	Texture* GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule);
-	Texture* GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint);
-	Texture* GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize);
+	Texture* ADDONAPI_GetOrCreateFromFile(const char* aIdentifier, const char* aFilename);
+	Texture* ADDONAPI_GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule);
+	Texture* ADDONAPI_GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint);
+	Texture* ADDONAPI_GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize);
 
 	/* Requests to load a texture from file. */
 	void LoadFromFile(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback);
