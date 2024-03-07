@@ -238,15 +238,13 @@ namespace GUI
 
 	void Render()
 	{
+		const std::lock_guard<std::mutex> lock(GUI::Mutex);
+
 		/* pre-render callbacks */
-		GUI::Mutex.lock();
+		for (GUI_RENDER callback : RegistryPreRender)
 		{
-			for (GUI_RENDER callback : RegistryPreRender)
-			{
-				if (callback) { callback(); }
-			}
+			if (callback) { callback(); }
 		}
-		GUI::Mutex.unlock();
 		/* pre-render callbacks end*/
 
 		if (State::IsImGuiInitialized)
@@ -266,25 +264,17 @@ namespace GUI
 				/* draw menu & qa end*/
 
 				/* draw nexus windows */
-				GUI::Mutex.lock();
+				for (IWindow* wnd : Windows)
 				{
-					for (IWindow* wnd : Windows)
-					{
-						wnd->Render();
-					}
+					wnd->Render();
 				}
-				GUI::Mutex.unlock();
 				/* draw nexus windows end */
 
 				/* draw addons*/
-				GUI::Mutex.lock();
+				for (GUI_RENDER callback : RegistryRender)
 				{
-					for (GUI_RENDER callback : RegistryRender)
-					{
-						if (callback) { callback(); }
-					}
+					if (callback) { callback(); }
 				}
-				GUI::Mutex.unlock();
 				/* draw addons end*/
 			}
 			/* draw overlay end */
@@ -298,24 +288,18 @@ namespace GUI
 		}
 
 		/* post-render callbacks */
-		GUI::Mutex.lock();
+		for (GUI_RENDER callback : RegistryPostRender)
 		{
-			for (GUI_RENDER callback : RegistryPostRender)
-			{
-				if (callback) { callback(); }
-			}
+			if (callback) { callback(); }
 		}
-		GUI::Mutex.unlock();
 		/* post-render callbacks end*/
 	}
 
 	void AddWindow(IWindow* aWindowPtr)
 	{
-		GUI::Mutex.lock();
-		{
-			Windows.push_back(aWindowPtr);
-		}
-		GUI::Mutex.unlock();
+		const std::lock_guard<std::mutex> lock(Mutex);
+		
+		Windows.push_back(aWindowPtr);
 	}
 
 	void ImportArcDPSStyle()
@@ -498,7 +482,7 @@ namespace GUI
 					Sleep(35);
 				}
 
-				GUI::Mutex.lock();
+				const std::lock_guard<std::mutex> lock(Mutex);
 				auto it = std::find(GUI::Windows.begin(), GUI::Windows.end(), notif);
 
 				if (it != GUI::Windows.end())
@@ -506,7 +490,6 @@ namespace GUI
 					delete (*it);
 					GUI::Windows.erase(it);
 				}
-				GUI::Mutex.unlock();
 			})
 			.detach();
 	}
@@ -664,8 +647,9 @@ namespace GUI
 		LPVOID resT{}; DWORD szT{};
 		GetResource(NexusHandle, MAKEINTRESOURCE(RES_FONT_TREBUCHET), RT_FONT, &resT, &szT);
 
-		GUI::Mutex.lock();
 		{
+			const std::lock_guard<std::mutex> lock(Mutex);
+
 			ImFontConfig config;
 			config.MergeMode = true;
 
@@ -701,7 +685,6 @@ namespace GUI
 			FontIndex.emplace(EFont::Trebuchet_Larger, io.Fonts->AddFontFromMemoryTTF(resT, szT, 19.5f));
 			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 19.5f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 		}
-		GUI::Mutex.unlock();
 
 		io.Fonts->Build();
 
@@ -787,78 +770,71 @@ namespace GUI
 
 	void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback)
 	{
-		GUI::Mutex.lock();
+		const std::lock_guard<std::mutex> lock(Mutex);
+
+		switch (aRenderType)
 		{
-			switch (aRenderType)
-			{
-			case ERenderType::PreRender:
-				RegistryPreRender.push_back(aRenderCallback);
-				break;
-			case ERenderType::Render:
-				RegistryRender.push_back(aRenderCallback);
-				break;
-			case ERenderType::PostRender:
-				RegistryPostRender.push_back(aRenderCallback);
-				break;
-			case ERenderType::OptionsRender:
-				RegistryOptionsRender.push_back(aRenderCallback);
-				break;
-			}
+		case ERenderType::PreRender:
+			RegistryPreRender.push_back(aRenderCallback);
+			break;
+		case ERenderType::Render:
+			RegistryRender.push_back(aRenderCallback);
+			break;
+		case ERenderType::PostRender:
+			RegistryPostRender.push_back(aRenderCallback);
+			break;
+		case ERenderType::OptionsRender:
+			RegistryOptionsRender.push_back(aRenderCallback);
+			break;
 		}
-		GUI::Mutex.unlock();
 	}
 	void Deregister(GUI_RENDER aRenderCallback)
 	{
-		GUI::Mutex.lock();
-		{
-			RegistryPreRender.erase(std::remove(RegistryPreRender.begin(), RegistryPreRender.end(), aRenderCallback), RegistryPreRender.end());
-			RegistryRender.erase(std::remove(RegistryRender.begin(), RegistryRender.end(), aRenderCallback), RegistryRender.end());
-			RegistryPostRender.erase(std::remove(RegistryPostRender.begin(), RegistryPostRender.end(), aRenderCallback), RegistryPostRender.end());
-			RegistryOptionsRender.erase(std::remove(RegistryOptionsRender.begin(), RegistryOptionsRender.end(), aRenderCallback), RegistryOptionsRender.end());
-		}
-		GUI::Mutex.unlock();
+		const std::lock_guard<std::mutex> lock(Mutex);
+
+		RegistryPreRender.erase(std::remove(RegistryPreRender.begin(), RegistryPreRender.end(), aRenderCallback), RegistryPreRender.end());
+		RegistryRender.erase(std::remove(RegistryRender.begin(), RegistryRender.end(), aRenderCallback), RegistryRender.end());
+		RegistryPostRender.erase(std::remove(RegistryPostRender.begin(), RegistryPostRender.end(), aRenderCallback), RegistryPostRender.end());
+		RegistryOptionsRender.erase(std::remove(RegistryOptionsRender.begin(), RegistryOptionsRender.end(), aRenderCallback), RegistryOptionsRender.end());
 	}
 
 	int Verify(void* aStartAddress, void* aEndAddress)
 	{
 		int refCounter = 0;
 
-		GUI::Mutex.lock();
+		const std::lock_guard<std::mutex> lock(Mutex);
+		for (GUI_RENDER renderCb : RegistryPreRender)
 		{
-			for (GUI_RENDER renderCb : RegistryPreRender)
+			if (renderCb >= aStartAddress && renderCb <= aEndAddress)
 			{
-				if (renderCb >= aStartAddress && renderCb <= aEndAddress)
-				{
-					RegistryPreRender.erase(std::remove(RegistryPreRender.begin(), RegistryPreRender.end(), renderCb), RegistryPreRender.end());
-					refCounter++;
-				}
-			}
-			for (GUI_RENDER renderCb : RegistryRender)
-			{
-				if (renderCb >= aStartAddress && renderCb <= aEndAddress)
-				{
-					RegistryRender.erase(std::remove(RegistryRender.begin(), RegistryRender.end(), renderCb), RegistryRender.end());
-					refCounter++;
-				}
-			}
-			for (GUI_RENDER renderCb : RegistryPostRender)
-			{
-				if (renderCb >= aStartAddress && renderCb <= aEndAddress)
-				{
-					RegistryPostRender.erase(std::remove(RegistryPostRender.begin(), RegistryPostRender.end(), renderCb), RegistryPostRender.end());
-					refCounter++;
-				}
-			}
-			for (GUI_RENDER renderCb : RegistryOptionsRender)
-			{
-				if (renderCb >= aStartAddress && renderCb <= aEndAddress)
-				{
-					RegistryOptionsRender.erase(std::remove(RegistryOptionsRender.begin(), RegistryOptionsRender.end(), renderCb), RegistryOptionsRender.end());
-					refCounter++;
-				}
+				RegistryPreRender.erase(std::remove(RegistryPreRender.begin(), RegistryPreRender.end(), renderCb), RegistryPreRender.end());
+				refCounter++;
 			}
 		}
-		GUI::Mutex.unlock();
+		for (GUI_RENDER renderCb : RegistryRender)
+		{
+			if (renderCb >= aStartAddress && renderCb <= aEndAddress)
+			{
+				RegistryRender.erase(std::remove(RegistryRender.begin(), RegistryRender.end(), renderCb), RegistryRender.end());
+				refCounter++;
+			}
+		}
+		for (GUI_RENDER renderCb : RegistryPostRender)
+		{
+			if (renderCb >= aStartAddress && renderCb <= aEndAddress)
+			{
+				RegistryPostRender.erase(std::remove(RegistryPostRender.begin(), RegistryPostRender.end(), renderCb), RegistryPostRender.end());
+				refCounter++;
+			}
+		}
+		for (GUI_RENDER renderCb : RegistryOptionsRender)
+		{
+			if (renderCb >= aStartAddress && renderCb <= aEndAddress)
+				{
+				RegistryOptionsRender.erase(std::remove(RegistryOptionsRender.begin(), RegistryOptionsRender.end(), renderCb), RegistryOptionsRender.end());
+				refCounter++;
+			}
+		}
 
 		return refCounter;
 	}

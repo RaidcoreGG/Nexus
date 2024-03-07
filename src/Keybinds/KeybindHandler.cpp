@@ -239,19 +239,17 @@ namespace Keybinds
 		/* sanity check */
 		if (aKeybind == Keybind{}) { return ""; }
 
-		Keybinds::Mutex.lock();
+		const std::lock_guard<std::mutex> lock(Mutex);
 		{
 			/* check if another identifier, already uses the keybind */
 			for (auto& [identifier, keybind] : Registry)
 			{
 				if (keybind.Bind == aKeybind)
 				{
-					Keybinds::Mutex.unlock();
 					return identifier;
 				}
 			}
 		}
-		Keybinds::Mutex.unlock();
 
 		return "";
 	}

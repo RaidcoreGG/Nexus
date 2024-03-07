@@ -33,29 +33,24 @@ namespace Settings
 	{
 		if (!std::filesystem::exists(Path::F_SETTINGS)) { return; }
 
-		Settings::Mutex.lock();
+		const std::lock_guard<std::mutex> lock(Mutex);
+		try
 		{
-			try
-			{
-				std::ifstream file(Path::F_SETTINGS);
-				Settings = json::parse(file);
-				file.close();
-			}
-			catch (json::parse_error& ex)
-			{
-				LogWarning(CH_CORE, "Settings.json could not be parsed. Error: %s", ex.what());
-			}
+			std::ifstream file(Path::F_SETTINGS);
+			Settings = json::parse(file);
+			file.close();
 		}
-		Settings::Mutex.unlock();
+		catch (json::parse_error& ex)
+		{
+			LogWarning(CH_CORE, "Settings.json could not be parsed. Error: %s", ex.what());
+		}
 	}
 	void Save()
 	{
-		Settings::Mutex.lock();
-		{
-			std::ofstream file(Path::F_SETTINGS);
-			file << Settings.dump(1, '\t') << std::endl;
-			file.close();
-		}
-		Settings::Mutex.unlock();
+		const std::lock_guard<std::mutex> lock(Mutex);
+
+		std::ofstream file(Path::F_SETTINGS);
+		file << Settings.dump(1, '\t') << std::endl;
+		file.close();
 	}
 }
