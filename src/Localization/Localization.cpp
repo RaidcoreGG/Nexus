@@ -199,7 +199,7 @@ void CLocalization::BuildLocaleAtlas()
 				continue;
 			}
 
-			std::string locId;
+			std::string locId = localeJson["Identifier"].get<std::string>();;
 
 			auto atlasIt = LocaleAtlas.find(locId);
 
@@ -207,10 +207,6 @@ void CLocalization::BuildLocaleAtlas()
 			if (atlasIt != LocaleAtlas.end())
 			{
 				loc = atlasIt->second;
-			}
-			else
-			{
-				localeJson["Identifier"].get_to(locId);
 			}
 
 			/* DisplayName can be null, hopefully *any* of the files have it set, if not fallback to identifier */

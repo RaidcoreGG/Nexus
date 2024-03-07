@@ -403,7 +403,7 @@ namespace GUI
 
 								ImGui::TableNextRow();
 								ImGui::TableSetColumnIndex(0);
-								ImGui::Text(identifier.c_str());
+								ImGui::Text(Language.Translate(identifier.c_str()));
 
 								ImGui::TableSetColumnIndex(1);
 								if (ImGui::Button((keybind.Bind.ToString(true) + "##" + identifier).c_str(), ImVec2(kbButtonWidth, 0.0f)))
