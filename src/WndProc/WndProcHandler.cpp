@@ -13,7 +13,6 @@ namespace WndProc
 		{
 			if (wndprocCb(hWnd, uMsg, wParam, lParam) == 0)
 			{
-				WndProc::Mutex.unlock();
 				return 0;
 			}
 		}
