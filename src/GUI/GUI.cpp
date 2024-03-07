@@ -637,16 +637,20 @@ namespace GUI
 
 		ImportArcDPSStyle();
 
+		std::filesystem::path fontPath{};
+
 		/* add user font, or fallback to default */
 		if (!LinkArcDPSStyle && std::filesystem::exists(Path::F_FONT))
 		{
+			fontPath = Path::F_FONT;
 			std::string strFont = Path::F_FONT.string();
-			io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize, nullptr, io.Fonts->GetGlyphRangesChineseFull());
+			io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize, nullptr, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
 		}
 		else if (LinkArcDPSStyle && std::filesystem::exists(Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf"))
 		{
+			fontPath = Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf";
 			std::string strFont = (Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf").string();
-			io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize, nullptr, io.Fonts->GetGlyphRangesChineseFull());
+			io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize, nullptr, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
 		}
 		else
 		{
@@ -662,25 +666,40 @@ namespace GUI
 
 		GUI::Mutex.lock();
 		{
+			ImFontConfig config;
+			config.MergeMode = true;
+
 			/* small UI*/
 			FontIndex.emplace(EFont::Menomonia_Small, io.Fonts->AddFontFromMemoryTTF(resM, szM, 16.0f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 16.0f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 			FontIndex.emplace(EFont::MenomoniaBig_Small, io.Fonts->AddFontFromMemoryTTF(resM, szM, 22.0f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 22.0f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 			FontIndex.emplace(EFont::Trebuchet_Small, io.Fonts->AddFontFromMemoryTTF(resT, szT, 15.0f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 15.0f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 
 			/* normal UI*/
 			FontIndex.emplace(EFont::Menomonia_Normal, io.Fonts->AddFontFromMemoryTTF(resM, szM, 18.0f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 18.0f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 			FontIndex.emplace(EFont::MenomoniaBig_Normal, io.Fonts->AddFontFromMemoryTTF(resM, szM, 24.0f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 24.0f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 			FontIndex.emplace(EFont::Trebuchet_Normal, io.Fonts->AddFontFromMemoryTTF(resT, szT, 16.0f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 16.0f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 
 			/* large UI*/
 			FontIndex.emplace(EFont::Menomonia_Large, io.Fonts->AddFontFromMemoryTTF(resM, szM, 20.0f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 20.0f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 			FontIndex.emplace(EFont::MenomoniaBig_Large, io.Fonts->AddFontFromMemoryTTF(resM, szM, 26.0f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 26.0f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 			FontIndex.emplace(EFont::Trebuchet_Large, io.Fonts->AddFontFromMemoryTTF(resT, szT, 17.5f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 17.5f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 
 			/* larger UI*/
 			FontIndex.emplace(EFont::Menomonia_Larger, io.Fonts->AddFontFromMemoryTTF(resM, szM, 22.0f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 22.0f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 			FontIndex.emplace(EFont::MenomoniaBig_Larger, io.Fonts->AddFontFromMemoryTTF(resM, szM, 28.0f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 28.0f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 			FontIndex.emplace(EFont::Trebuchet_Larger, io.Fonts->AddFontFromMemoryTTF(resT, szT, 19.5f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 19.5f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 		}
 		GUI::Mutex.unlock();
 

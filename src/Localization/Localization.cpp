@@ -104,13 +104,46 @@ void CLocalization::SetLanguage(const std::string& aIdentifier)
 {
 	auto atlasIt = LocaleAtlas.find(aIdentifier);
 
+	/* find via identifier */
 	if (atlasIt != LocaleAtlas.end())
 	{
 		ActiveLocale = &atlasIt->second;
 		return;
 	}
 
+	/* find via display name */
+	for (auto& it : LocaleAtlas)
+	{
+		if (it.second.DisplayName == aIdentifier)
+		{
+			ActiveLocale = &it.second;
+			return;
+		}
+	}
+
 	ActiveLocale = nullptr;
+}
+
+std::vector<std::string> CLocalization::GetLanguages()
+{
+	std::vector<std::string> langs;
+
+	for (auto& it : LocaleAtlas)
+	{
+		langs.push_back(it.second.DisplayName);
+	}
+
+	return langs;
+}
+
+const std::string& CLocalization::GetActiveLanguage()
+{
+	if (ActiveLocale)
+	{
+		return ActiveLocale->DisplayName;
+	}
+
+	return "(null)";
 }
 
 void CLocalization::SetLocaleDirectory(std::filesystem::path aPath)

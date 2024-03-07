@@ -633,7 +633,7 @@ namespace Loader
 			return;
 		}
 
-		// free old and clone new
+		// free old and clone new to show in list
 		FreeAddonDefs(&addon->Definitions);
 		CopyAddonDefs(tmpDefs, &addon->Definitions);
 
@@ -655,6 +655,10 @@ namespace Loader
 					shouldLoad = true;
 				}
 			}
+		}
+		else
+		{
+			shouldLoad = true;
 		}
 
 		/* set disabled until update state if game has updated and addon is volatile and this is the intial load,
