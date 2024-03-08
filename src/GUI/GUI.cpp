@@ -625,6 +625,15 @@ namespace GUI
 			{
 				Language.SetLanguage("en");
 			}
+
+			if (!Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS].is_null())
+			{
+				Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS].get_to(QuickAccess::AlwaysShow);
+			}
+			else
+			{
+				Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS] = false;
+			}
 		}
 
 		ImportArcDPSStyle();

@@ -32,6 +32,7 @@ namespace GUI
 		bool			IsFadingIn			= false;
 		bool			IsHovering			= false;
 
+		bool			AlwaysShow			= false;
 		bool			VerticalLayout		= false;
 		EQAPosition		Location			= EQAPosition::Extend;
 		ImVec2			Offset				= ImVec2(((size + 1) * Renderer::Scaling) * 9, 0.0f);
@@ -58,6 +59,11 @@ namespace GUI
 
 		void Render()
 		{
+			if (!(AlwaysShow || IsGameplay))
+			{
+				return;
+			}
+
 			bool isActive = false;
 
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, Opacity);

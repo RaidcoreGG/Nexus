@@ -122,6 +122,13 @@ namespace GUI
 						Settings::Settings[OPT_QAVERTICAL] = QuickAccess::VerticalLayout;
 						Settings::Save();
 					}
+					if (ImGui::Checkbox("Always Show", &QuickAccess::AlwaysShow))
+					{
+						Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS] = QuickAccess::AlwaysShow;
+						Settings::Save();
+					}
+					ImGui::TooltipGeneric("If this setting is enabled the Quick Access menu will also show during loading screens and character select.");
+
 					if (ImGui::Checkbox("Show notification icon when Nexus updates", &GUI::NotifyChangelog))
 					{
 						Settings::Settings[OPT_NOTIFYCHANGELOG] = GUI::NotifyChangelog;
