@@ -24,13 +24,13 @@ namespace GUI
 	size_t memSz = 0;
 
 	/* proto tabs */
-	void EventsTab();
-	void KeybindsTab();
-	void DataLinkTab();
-	void TexturesTab();
-	void ShortcutsTab();
-	void LoaderTab();
-	void APITab();
+	void DbgEventsTab();
+	void DbgKeybindsTab();
+	void DbgDataLinkTab();
+	void DbgTexturesTab();
+	void DbgShortcutsTab();
+	void DbgLoaderTab();
+	void DbgAPITab();
 
 	CDebugWindow::CDebugWindow(std::string aName)
 	{
@@ -55,13 +55,13 @@ namespace GUI
 
 			if (ImGui::BeginTabBar("DebugTabBar", ImGuiTabBarFlags_None))
 			{
-				EventsTab();
-				KeybindsTab();
-				DataLinkTab();
-				TexturesTab();
-				ShortcutsTab();
-				LoaderTab();
-				APITab();
+				DbgEventsTab();
+				DbgKeybindsTab();
+				DbgDataLinkTab();
+				DbgTexturesTab();
+				DbgShortcutsTab();
+				DbgLoaderTab();
+				DbgAPITab();
 				/*if (ImGui::BeginTabItem("Meme"))
 				{
 					{
@@ -80,7 +80,7 @@ namespace GUI
 		ImGui::End();
 	}
 
-	void EventsTab()
+	void DbgEventsTab()
 	{
 		if (ImGui::BeginTabItem("Events"))
 		{
@@ -117,7 +117,7 @@ namespace GUI
 			ImGui::EndTabItem();
 		}
 	}
-	void KeybindsTab()
+	void DbgKeybindsTab()
 	{
 		if (ImGui::BeginTabItem("Keybinds"))
 		{
@@ -147,7 +147,7 @@ namespace GUI
 			ImGui::EndTabItem();
 		}
 	}
-	void DataLinkTab()
+	void DbgDataLinkTab()
 	{
 		if (ImGui::BeginTabItem("DataLink"))
 		{
@@ -185,7 +185,7 @@ namespace GUI
 			ImGui::EndTabItem();
 		}
 	}
-	void TexturesTab()
+	void DbgTexturesTab()
 	{
 		if (ImGui::BeginTabItem("Textures"))
 		{
@@ -256,7 +256,7 @@ namespace GUI
 			ImGui::EndTabItem();
 		}
 	}
-	void ShortcutsTab()
+	void DbgShortcutsTab()
 	{
 		if (ImGui::BeginTabItem("Shortcuts"))
 		{
@@ -300,7 +300,7 @@ namespace GUI
 			ImGui::EndTabItem();
 		}
 	}
-	void LoaderTab()
+	void DbgLoaderTab()
 	{
 		if (ImGui::BeginTabItem("Loader"))
 		{
@@ -404,7 +404,7 @@ namespace GUI
 			ImGui::EndTabItem();
 		}
 	}
-	void APITab()
+	void DbgAPITab()
 	{
 
 	}

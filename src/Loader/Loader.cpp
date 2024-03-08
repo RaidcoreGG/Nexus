@@ -1598,6 +1598,7 @@ namespace Loader
 
 			((AddonAPI2*)api)->RegisterWndProc = WndProc::Register;
 			((AddonAPI2*)api)->DeregisterWndProc = WndProc::Deregister;
+			((AddonAPI2*)api)->SendWndProcToGameOnly = WndProc::SendWndProcToGame;
 
 			((AddonAPI2*)api)->RegisterKeybindWithString = Keybinds::Register;
 			((AddonAPI2*)api)->RegisterKeybindWithStruct = Keybinds::RegisterWithStruct;

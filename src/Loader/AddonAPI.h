@@ -74,6 +74,7 @@ struct AddonAPI1 : AddonAPI
 	QUICKACCESS_GENERIC			RemoveSimpleShortcut;
 };
 
+// Revision 2
 struct AddonAPI2 : AddonAPI
 {
 	/* Renderer */
@@ -107,6 +108,7 @@ struct AddonAPI2 : AddonAPI
 	/* WndProc */
 	WNDPROC_ADDREM						RegisterWndProc;
 	WNDPROC_ADDREM						DeregisterWndProc;
+	WNDPROC_SENDTOGAME					SendWndProcToGameOnly;
 
 	/* Keybinds */
 	KEYBINDS_REGISTERWITHSTRING			RegisterKeybindWithString;

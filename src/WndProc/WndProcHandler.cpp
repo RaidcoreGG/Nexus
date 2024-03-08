@@ -1,5 +1,7 @@
 #include "WndProcHandler.h"
 
+#include "Hooks.h"
+
 namespace WndProc
 {
 	std::mutex						Mutex;
@@ -18,6 +20,11 @@ namespace WndProc
 		}
 
 		return 1;
+	}
+
+	LRESULT SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		return CallWindowProcA(Hooks::GW2::WndProc, hWnd, uMsg, wParam, lParam);
 	}
 
 	void Register(WNDPROC_CALLBACK aWndProcCallback)
