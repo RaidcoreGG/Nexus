@@ -65,7 +65,6 @@ namespace Main
 
 		Language.SetLocaleDirectory(Path::D_GW2_ADDONS_RAIDCORE_LOCALES);
 		Language.BuildLocaleAtlas();
-		Language.SetLanguage("en");
 
 		//Paradigm::Initialize();
 		std::thread([]()

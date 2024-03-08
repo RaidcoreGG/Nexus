@@ -616,6 +616,15 @@ namespace GUI
 				std::string decode = Base64::Decode(&colors64[0], colors64.length());
 				memcpy(&style->Colors[0], &decode[0], decode.length());
 			}
+
+			if (!Settings::Settings[OPT_LANGUAGE].is_null())
+			{
+				Language.SetLanguage(Settings::Settings[OPT_LANGUAGE].get<std::string>());
+			}
+			else
+			{
+				Language.SetLanguage("en");
+			}
 		}
 
 		ImportArcDPSStyle();

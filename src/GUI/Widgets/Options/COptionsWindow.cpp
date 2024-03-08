@@ -95,6 +95,8 @@ namespace GUI
 				if (ImGui::Combo("##language", (int*)&languagesIndex, languages, languagesSize))
 				{
 					Language.SetLanguage(languages[languagesIndex]);
+					Settings::Settings[OPT_LANGUAGE] = languages[languagesIndex];
+					Settings::Save();
 				}
 
 				ImGui::TextDisabled("UI/UX");

@@ -22,6 +22,7 @@ extern const char* OPT_QAOFFSETY;
 extern const char* OPT_LINKARCSTYLE;
 extern const char* OPT_IMGUISTYLE;
 extern const char* OPT_IMGUICOLORS;
+extern const char* OPT_LANGUAGE;
 
 namespace Settings
 {

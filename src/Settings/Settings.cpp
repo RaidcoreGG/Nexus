@@ -23,6 +23,7 @@ const char* OPT_QAOFFSETY				= "QAOffsetY";
 const char* OPT_LINKARCSTYLE			= "LinkWithArcDPSStyle";
 const char* OPT_IMGUISTYLE				= "ImGuiStyle";
 const char* OPT_IMGUICOLORS				= "ImGuiColors";
+const char* OPT_LANGUAGE				= "Language";
 
 namespace Settings
 {
