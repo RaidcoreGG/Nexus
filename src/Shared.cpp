@@ -20,6 +20,8 @@ bool						IsGameplay			= false;
 
 NexusLinkData*				NexusLink			= nullptr;
 
+CLocalization&				Language			= CLocalization::GetInstance();
+
 ImFont*						Font				= nullptr;
 ImFont*						FontBig				= nullptr;
 ImFont*						FontUI				= nullptr;

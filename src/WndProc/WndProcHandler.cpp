@@ -1,5 +1,7 @@
 #include "WndProcHandler.h"
 
+#include "Hooks.h"
+
 namespace WndProc
 {
 	std::mutex						Mutex;
@@ -8,56 +10,50 @@ namespace WndProc
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		// don't pass to game if addon wndproc
-		WndProc::Mutex.lock();
+		const std::lock_guard<std::mutex> lock(Mutex);
+		for (WNDPROC_CALLBACK wndprocCb : Registry)
 		{
-			for (WNDPROC_CALLBACK wndprocCb : Registry)
+			if (wndprocCb(hWnd, uMsg, wParam, lParam) == 0)
 			{
-				if (wndprocCb(hWnd, uMsg, wParam, lParam) == 0)
-				{
-					WndProc::Mutex.unlock();
-					return 0;
-				}
+				return 0;
 			}
 		}
-		WndProc::Mutex.unlock();
 
 		return 1;
 	}
 
+	LRESULT SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		return CallWindowProcA(Hooks::GW2::WndProc, hWnd, uMsg, wParam, lParam);
+	}
+
 	void Register(WNDPROC_CALLBACK aWndProcCallback)
 	{
-		WndProc::Mutex.lock();
-		{
-			Registry.push_back(aWndProcCallback);
-		}
-		WndProc::Mutex.unlock();
+		const std::lock_guard<std::mutex> lock(Mutex);
+
+		Registry.push_back(aWndProcCallback);
 	}
 
 	void Deregister(WNDPROC_CALLBACK aWndProcCallback)
 	{
-		WndProc::Mutex.lock();
-		{
-			Registry.erase(std::remove(Registry.begin(), Registry.end(), aWndProcCallback), Registry.end());
-		}
-		WndProc::Mutex.unlock();
+		const std::lock_guard<std::mutex> lock(Mutex);
+
+		Registry.erase(std::remove(Registry.begin(), Registry.end(), aWndProcCallback), Registry.end());
 	}
 
 	int Verify(void* aStartAddress, void* aEndAddress)
 	{
 		int refCounter = 0;
 
-		WndProc::Mutex.lock();
+		const std::lock_guard<std::mutex> lock(Mutex);
+		for (WNDPROC_CALLBACK wndprocCb : Registry)
 		{
-			for (WNDPROC_CALLBACK wndprocCb : Registry)
+			if (wndprocCb >= aStartAddress && wndprocCb <= aEndAddress)
 			{
-				if (wndprocCb >= aStartAddress && wndprocCb <= aEndAddress)
-				{
-					Registry.erase(std::remove(Registry.begin(), Registry.end(), wndprocCb), Registry.end());
-					refCounter++;
-				}
+				Registry.erase(std::remove(Registry.begin(), Registry.end(), wndprocCb), Registry.end());
+				refCounter++;
 			}
 		}
-		WndProc::Mutex.unlock();
 
 		return refCounter;
 	}

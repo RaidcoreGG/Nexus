@@ -28,6 +28,7 @@ namespace GUI
 		extern bool				IsFadingIn;
 		extern bool				IsHovering;
 
+		extern bool				AlwaysShow;
 		extern bool				VerticalLayout;
 		extern EQAPosition		Location;
 		extern ImVec2			Offset;

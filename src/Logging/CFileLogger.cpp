@@ -14,10 +14,8 @@ CFileLogger::~CFileLogger()
 
 void CFileLogger::LogMessage(LogEntry aLogEntry)
 {
-	MessageMutex.lock();
-	{
-		File << aLogEntry.ToString();
-		File.flush();
-	}
-	MessageMutex.unlock();
+	const std::lock_guard<std::mutex> lock(MessageMutex);
+
+	File << aLogEntry.ToString();
+	File.flush();
 }

@@ -2,6 +2,7 @@
 
 #include <regex>
 #include <algorithm>
+#include <vector>
 
 #include "Shared.h"
 #include "Paths.h"
@@ -12,6 +13,7 @@
 #include "API/APIController.h"
 #include "Settings/Settings.h"
 #include "Loader/Loader.h"
+#include "Localization/Localization.h"
 
 #include "GUI/GUI.h"
 #include "GUI/IWindow.h"
@@ -29,6 +31,9 @@ namespace GUI
 	char CurrentAPIKey[73]{};
 
 	const char* qaLocations[] = { "Extend", "Under", "Bottom", "Custom" };
+	const char** languages;
+	int languagesIndex;
+	int languagesSize;
 
 	/* proto tabs */
 	void GeneralTab();
@@ -40,6 +45,22 @@ namespace GUI
 	COptionsWindow::COptionsWindow(std::string aName)
 	{
 		Name = aName;
+
+		const std::string& activeLang = Language.GetActiveLanguage();
+
+		std::vector<std::string> langs = Language.GetLanguages();
+		languagesSize = langs.size();
+		languages = new const char*[langs.size()];
+		for (size_t i = 0; i < langs.size(); i++)
+		{
+			languages[i] = new char[langs[i].size() + 1];
+			strcpy((char*)languages[i], langs[i].c_str());
+
+			if (languages[i] == activeLang)
+			{
+				languagesIndex = i;
+			}
+		}
 	}
 
 	void COptionsWindow::Render()
@@ -70,6 +91,14 @@ namespace GUI
 			{
 				ImGui::BeginChild("##GeneralTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
+				ImGui::TextDisabled("Language");
+				if (ImGui::Combo("##language", (int*)&languagesIndex, languages, languagesSize))
+				{
+					Language.SetLanguage(languages[languagesIndex]);
+					Settings::Settings[OPT_LANGUAGE] = languages[languagesIndex];
+					Settings::Save();
+				}
+
 				ImGui::TextDisabled("UI/UX");
 				{
 					if (ImGui::Checkbox("Close Menu after selecting item", &GUI::CloseMenuAfterSelecting))
@@ -93,6 +122,13 @@ namespace GUI
 						Settings::Settings[OPT_QAVERTICAL] = QuickAccess::VerticalLayout;
 						Settings::Save();
 					}
+					if (ImGui::Checkbox("Always Show", &QuickAccess::AlwaysShow))
+					{
+						Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS] = QuickAccess::AlwaysShow;
+						Settings::Save();
+					}
+					ImGui::TooltipGeneric("If this setting is enabled the Quick Access menu will also show during loading screens and character select.");
+
 					if (ImGui::Checkbox("Show notification icon when Nexus updates", &GUI::NotifyChangelog))
 					{
 						Settings::Settings[OPT_NOTIFYCHANGELOG] = GUI::NotifyChangelog;
@@ -376,7 +412,7 @@ namespace GUI
 
 								ImGui::TableNextRow();
 								ImGui::TableSetColumnIndex(0);
-								ImGui::Text(identifier.c_str());
+								ImGui::Text(Language.Translate(identifier.c_str()));
 
 								ImGui::TableSetColumnIndex(1);
 								if (ImGui::Button((keybind.Bind.ToString(true) + "##" + identifier).c_str(), ImVec2(kbButtonWidth, 0.0f)))

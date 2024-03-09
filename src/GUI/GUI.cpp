@@ -238,15 +238,13 @@ namespace GUI
 
 	void Render()
 	{
+		const std::lock_guard<std::mutex> lock(GUI::Mutex);
+
 		/* pre-render callbacks */
-		GUI::Mutex.lock();
+		for (GUI_RENDER callback : RegistryPreRender)
 		{
-			for (GUI_RENDER callback : RegistryPreRender)
-			{
-				if (callback) { callback(); }
-			}
+			if (callback) { callback(); }
 		}
-		GUI::Mutex.unlock();
 		/* pre-render callbacks end*/
 
 		if (State::IsImGuiInitialized)
@@ -266,25 +264,17 @@ namespace GUI
 				/* draw menu & qa end*/
 
 				/* draw nexus windows */
-				GUI::Mutex.lock();
+				for (IWindow* wnd : Windows)
 				{
-					for (IWindow* wnd : Windows)
-					{
-						wnd->Render();
-					}
+					wnd->Render();
 				}
-				GUI::Mutex.unlock();
 				/* draw nexus windows end */
 
 				/* draw addons*/
-				GUI::Mutex.lock();
+				for (GUI_RENDER callback : RegistryRender)
 				{
-					for (GUI_RENDER callback : RegistryRender)
-					{
-						if (callback) { callback(); }
-					}
+					if (callback) { callback(); }
 				}
-				GUI::Mutex.unlock();
 				/* draw addons end*/
 			}
 			/* draw overlay end */
@@ -298,24 +288,18 @@ namespace GUI
 		}
 
 		/* post-render callbacks */
-		GUI::Mutex.lock();
+		for (GUI_RENDER callback : RegistryPostRender)
 		{
-			for (GUI_RENDER callback : RegistryPostRender)
-			{
-				if (callback) { callback(); }
-			}
+			if (callback) { callback(); }
 		}
-		GUI::Mutex.unlock();
 		/* post-render callbacks end*/
 	}
 
 	void AddWindow(IWindow* aWindowPtr)
 	{
-		GUI::Mutex.lock();
-		{
-			Windows.push_back(aWindowPtr);
-		}
-		GUI::Mutex.unlock();
+		const std::lock_guard<std::mutex> lock(Mutex);
+		
+		Windows.push_back(aWindowPtr);
 	}
 
 	void ImportArcDPSStyle()
@@ -498,7 +482,7 @@ namespace GUI
 					Sleep(35);
 				}
 
-				GUI::Mutex.lock();
+				const std::lock_guard<std::mutex> lock(Mutex);
 				auto it = std::find(GUI::Windows.begin(), GUI::Windows.end(), notif);
 
 				if (it != GUI::Windows.end())
@@ -506,7 +490,6 @@ namespace GUI
 					delete (*it);
 					GUI::Windows.erase(it);
 				}
-				GUI::Mutex.unlock();
 			})
 			.detach();
 	}
@@ -633,20 +616,42 @@ namespace GUI
 				std::string decode = Base64::Decode(&colors64[0], colors64.length());
 				memcpy(&style->Colors[0], &decode[0], decode.length());
 			}
+
+			if (!Settings::Settings[OPT_LANGUAGE].is_null())
+			{
+				Language.SetLanguage(Settings::Settings[OPT_LANGUAGE].get<std::string>());
+			}
+			else
+			{
+				Language.SetLanguage("en");
+			}
+
+			if (!Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS].is_null())
+			{
+				Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS].get_to(QuickAccess::AlwaysShow);
+			}
+			else
+			{
+				Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS] = false;
+			}
 		}
 
 		ImportArcDPSStyle();
 
+		std::filesystem::path fontPath{};
+
 		/* add user font, or fallback to default */
 		if (!LinkArcDPSStyle && std::filesystem::exists(Path::F_FONT))
 		{
+			fontPath = Path::F_FONT;
 			std::string strFont = Path::F_FONT.string();
-			io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize);
+			io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize, nullptr, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
 		}
 		else if (LinkArcDPSStyle && std::filesystem::exists(Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf"))
 		{
+			fontPath = Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf";
 			std::string strFont = (Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf").string();
-			io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize);
+			io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize, nullptr, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
 		}
 		else
 		{
@@ -660,29 +665,44 @@ namespace GUI
 		LPVOID resT{}; DWORD szT{};
 		GetResource(NexusHandle, MAKEINTRESOURCE(RES_FONT_TREBUCHET), RT_FONT, &resT, &szT);
 
-		GUI::Mutex.lock();
 		{
+			const std::lock_guard<std::mutex> lock(Mutex);
+
+			ImFontConfig config;
+			config.MergeMode = true;
+
 			/* small UI*/
 			FontIndex.emplace(EFont::Menomonia_Small, io.Fonts->AddFontFromMemoryTTF(resM, szM, 16.0f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 16.0f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 			FontIndex.emplace(EFont::MenomoniaBig_Small, io.Fonts->AddFontFromMemoryTTF(resM, szM, 22.0f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 22.0f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 			FontIndex.emplace(EFont::Trebuchet_Small, io.Fonts->AddFontFromMemoryTTF(resT, szT, 15.0f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 15.0f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 
 			/* normal UI*/
 			FontIndex.emplace(EFont::Menomonia_Normal, io.Fonts->AddFontFromMemoryTTF(resM, szM, 18.0f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 18.0f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 			FontIndex.emplace(EFont::MenomoniaBig_Normal, io.Fonts->AddFontFromMemoryTTF(resM, szM, 24.0f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 24.0f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 			FontIndex.emplace(EFont::Trebuchet_Normal, io.Fonts->AddFontFromMemoryTTF(resT, szT, 16.0f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 16.0f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 
 			/* large UI*/
 			FontIndex.emplace(EFont::Menomonia_Large, io.Fonts->AddFontFromMemoryTTF(resM, szM, 20.0f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 20.0f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 			FontIndex.emplace(EFont::MenomoniaBig_Large, io.Fonts->AddFontFromMemoryTTF(resM, szM, 26.0f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 26.0f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 			FontIndex.emplace(EFont::Trebuchet_Large, io.Fonts->AddFontFromMemoryTTF(resT, szT, 17.5f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 17.5f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 
 			/* larger UI*/
 			FontIndex.emplace(EFont::Menomonia_Larger, io.Fonts->AddFontFromMemoryTTF(resM, szM, 22.0f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 22.0f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 			FontIndex.emplace(EFont::MenomoniaBig_Larger, io.Fonts->AddFontFromMemoryTTF(resM, szM, 28.0f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 28.0f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 			FontIndex.emplace(EFont::Trebuchet_Larger, io.Fonts->AddFontFromMemoryTTF(resT, szT, 19.5f));
+			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 19.5f, &config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon()); }
 		}
-		GUI::Mutex.unlock();
 
 		io.Fonts->Build();
 
@@ -768,78 +788,71 @@ namespace GUI
 
 	void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback)
 	{
-		GUI::Mutex.lock();
+		const std::lock_guard<std::mutex> lock(Mutex);
+
+		switch (aRenderType)
 		{
-			switch (aRenderType)
-			{
-			case ERenderType::PreRender:
-				RegistryPreRender.push_back(aRenderCallback);
-				break;
-			case ERenderType::Render:
-				RegistryRender.push_back(aRenderCallback);
-				break;
-			case ERenderType::PostRender:
-				RegistryPostRender.push_back(aRenderCallback);
-				break;
-			case ERenderType::OptionsRender:
-				RegistryOptionsRender.push_back(aRenderCallback);
-				break;
-			}
+		case ERenderType::PreRender:
+			RegistryPreRender.push_back(aRenderCallback);
+			break;
+		case ERenderType::Render:
+			RegistryRender.push_back(aRenderCallback);
+			break;
+		case ERenderType::PostRender:
+			RegistryPostRender.push_back(aRenderCallback);
+			break;
+		case ERenderType::OptionsRender:
+			RegistryOptionsRender.push_back(aRenderCallback);
+			break;
 		}
-		GUI::Mutex.unlock();
 	}
 	void Deregister(GUI_RENDER aRenderCallback)
 	{
-		GUI::Mutex.lock();
-		{
-			RegistryPreRender.erase(std::remove(RegistryPreRender.begin(), RegistryPreRender.end(), aRenderCallback), RegistryPreRender.end());
-			RegistryRender.erase(std::remove(RegistryRender.begin(), RegistryRender.end(), aRenderCallback), RegistryRender.end());
-			RegistryPostRender.erase(std::remove(RegistryPostRender.begin(), RegistryPostRender.end(), aRenderCallback), RegistryPostRender.end());
-			RegistryOptionsRender.erase(std::remove(RegistryOptionsRender.begin(), RegistryOptionsRender.end(), aRenderCallback), RegistryOptionsRender.end());
-		}
-		GUI::Mutex.unlock();
+		const std::lock_guard<std::mutex> lock(Mutex);
+
+		RegistryPreRender.erase(std::remove(RegistryPreRender.begin(), RegistryPreRender.end(), aRenderCallback), RegistryPreRender.end());
+		RegistryRender.erase(std::remove(RegistryRender.begin(), RegistryRender.end(), aRenderCallback), RegistryRender.end());
+		RegistryPostRender.erase(std::remove(RegistryPostRender.begin(), RegistryPostRender.end(), aRenderCallback), RegistryPostRender.end());
+		RegistryOptionsRender.erase(std::remove(RegistryOptionsRender.begin(), RegistryOptionsRender.end(), aRenderCallback), RegistryOptionsRender.end());
 	}
 
 	int Verify(void* aStartAddress, void* aEndAddress)
 	{
 		int refCounter = 0;
 
-		GUI::Mutex.lock();
+		const std::lock_guard<std::mutex> lock(Mutex);
+		for (GUI_RENDER renderCb : RegistryPreRender)
 		{
-			for (GUI_RENDER renderCb : RegistryPreRender)
+			if (renderCb >= aStartAddress && renderCb <= aEndAddress)
 			{
-				if (renderCb >= aStartAddress && renderCb <= aEndAddress)
-				{
-					RegistryPreRender.erase(std::remove(RegistryPreRender.begin(), RegistryPreRender.end(), renderCb), RegistryPreRender.end());
-					refCounter++;
-				}
-			}
-			for (GUI_RENDER renderCb : RegistryRender)
-			{
-				if (renderCb >= aStartAddress && renderCb <= aEndAddress)
-				{
-					RegistryRender.erase(std::remove(RegistryRender.begin(), RegistryRender.end(), renderCb), RegistryRender.end());
-					refCounter++;
-				}
-			}
-			for (GUI_RENDER renderCb : RegistryPostRender)
-			{
-				if (renderCb >= aStartAddress && renderCb <= aEndAddress)
-				{
-					RegistryPostRender.erase(std::remove(RegistryPostRender.begin(), RegistryPostRender.end(), renderCb), RegistryPostRender.end());
-					refCounter++;
-				}
-			}
-			for (GUI_RENDER renderCb : RegistryOptionsRender)
-			{
-				if (renderCb >= aStartAddress && renderCb <= aEndAddress)
-				{
-					RegistryOptionsRender.erase(std::remove(RegistryOptionsRender.begin(), RegistryOptionsRender.end(), renderCb), RegistryOptionsRender.end());
-					refCounter++;
-				}
+				RegistryPreRender.erase(std::remove(RegistryPreRender.begin(), RegistryPreRender.end(), renderCb), RegistryPreRender.end());
+				refCounter++;
 			}
 		}
-		GUI::Mutex.unlock();
+		for (GUI_RENDER renderCb : RegistryRender)
+		{
+			if (renderCb >= aStartAddress && renderCb <= aEndAddress)
+			{
+				RegistryRender.erase(std::remove(RegistryRender.begin(), RegistryRender.end(), renderCb), RegistryRender.end());
+				refCounter++;
+			}
+		}
+		for (GUI_RENDER renderCb : RegistryPostRender)
+		{
+			if (renderCb >= aStartAddress && renderCb <= aEndAddress)
+			{
+				RegistryPostRender.erase(std::remove(RegistryPostRender.begin(), RegistryPostRender.end(), renderCb), RegistryPostRender.end());
+				refCounter++;
+			}
+		}
+		for (GUI_RENDER renderCb : RegistryOptionsRender)
+		{
+			if (renderCb >= aStartAddress && renderCb <= aEndAddress)
+				{
+				RegistryOptionsRender.erase(std::remove(RegistryOptionsRender.begin(), RegistryOptionsRender.end(), renderCb), RegistryOptionsRender.end());
+				refCounter++;
+			}
+		}
 
 		return refCounter;
 	}

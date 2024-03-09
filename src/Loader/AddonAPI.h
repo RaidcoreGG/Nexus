@@ -13,6 +13,7 @@
 #include "Textures/FuncDefs.h"
 #include "GUI/FuncDefs.h"
 #include "GUI/Widgets/QuickAccess/FuncDefs.h"
+#include "Localization/FuncDefs.h"
 
 // Base
 struct AddonAPI {};
@@ -73,6 +74,7 @@ struct AddonAPI1 : AddonAPI
 	QUICKACCESS_GENERIC			RemoveSimpleShortcut;
 };
 
+// Revision 2
 struct AddonAPI2 : AddonAPI
 {
 	/* Renderer */
@@ -106,6 +108,7 @@ struct AddonAPI2 : AddonAPI
 	/* WndProc */
 	WNDPROC_ADDREM						RegisterWndProc;
 	WNDPROC_ADDREM						DeregisterWndProc;
+	WNDPROC_SENDTOGAME					SendWndProcToGameOnly;
 
 	/* Keybinds */
 	KEYBINDS_REGISTERWITHSTRING			RegisterKeybindWithString;
@@ -133,6 +136,9 @@ struct AddonAPI2 : AddonAPI
 	QUICKACCESS_GENERIC					NotifyShortcut;
 	QUICKACCESS_ADDSIMPLE				AddSimpleShortcut;
 	QUICKACCESS_GENERIC					RemoveSimpleShortcut;
+
+	LOCALIZATION_TRANSLATE				Translate;
+	LOCALIZATION_TRANSLATETO			TranslateTo;
 
 	/* API */
 		// GW2 API FUNCS

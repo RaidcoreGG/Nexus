@@ -14,6 +14,9 @@ namespace WndProc
 	/* Returns 0 if message was processed. */
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+	/* Skips all wndproc hooks and sends to game only. */
+	LRESULT SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
 	/* Registers the provided WndProcCallback. */
 	void Register(WNDPROC_CALLBACK aWndProcCallback);
 	/* Deregisters the provided WndProcCallback. */

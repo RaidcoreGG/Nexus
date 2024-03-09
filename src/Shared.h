@@ -11,6 +11,7 @@
 #include "Mumble/Identity.h"
 #include "Logging/LogHandler.h"
 #include "API/CAPIClient.h"
+#include "Localization/Localization.h"
 
 #include "imgui.h"
 
@@ -34,6 +35,8 @@ extern bool							IsCameraMoving;
 extern bool							IsGameplay;
 
 extern NexusLinkData*				NexusLink;
+
+extern CLocalization&				Language;
 
 extern ImFont*						Font;			/* Menomonia */
 extern ImFont*						FontBig;		/* Menomonia, but slightly bigger */
