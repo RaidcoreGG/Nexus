@@ -1043,6 +1043,9 @@
     <ClInclude Include="Loader\StoredAddon.h">
       <Filter>Loader\Structs</Filter>
     </ClInclude>
+    <ClInclude Include="Localization\FuncDefs.h">
+      <Filter>Localization</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Nexus.rc">
