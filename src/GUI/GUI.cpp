@@ -458,8 +458,8 @@ namespace GUI
 			if (ImGui::Begin("##CVolatileAddonsDisabledNotification", (bool*)0, (ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoTitleBar)))
 			{
 				ImGui::PushFont(FontBig);
-				ImGui::TextColoredOutlined(ImVec4(1, 0, 0, 1), "Some addons were disabled due to a game update.");
-				ImGui::TextColoredOutlined(ImVec4(1, 0, 0, 1), "Manually re-enable them or wait for them to update.");
+				ImGui::TextColoredOutlined(ImVec4(1, 0, 0, 1), Language.Translate("((000001))"));
+				ImGui::TextColoredOutlined(ImVec4(1, 0, 0, 1), Language.Translate("((000002))"));
 				ImGui::PopFont();
 
 				ImGui::End();
@@ -734,12 +734,12 @@ namespace GUI
 		AddWindow(dbgWnd);
 		AddWindow(aboutWnd);
 
-		Menu::AddMenuItem("Addons",		ICON_ADDONS,	RES_ICON_ADDONS,	&addonsWnd->Visible);
-		Menu::AddMenuItem("Options",	ICON_OPTIONS,	RES_ICON_OPTIONS,	&opsWnd->Visible);
-		Menu::AddMenuItem("Changelog",	ICON_CHANGELOG, RES_ICON_CHANGELOG,	&chlWnd->Visible);
-		Menu::AddMenuItem("Log",		ICON_LOG,		RES_ICON_LOG,		&logWnd->Visible);
-		Menu::AddMenuItem("Debug",		ICON_DEBUG,		RES_ICON_DEBUG,		&dbgWnd->Visible);
-		Menu::AddMenuItem("About",		ICON_ABOUT,		RES_ICON_ABOUT,		&aboutWnd->Visible);
+		Menu::AddMenuItem(Language.Translate("((000003))"),		ICON_ADDONS,	RES_ICON_ADDONS,	&addonsWnd->Visible);
+		Menu::AddMenuItem(Language.Translate("((000004))"),		ICON_OPTIONS,	RES_ICON_OPTIONS,	&opsWnd->Visible);
+		Menu::AddMenuItem(Language.Translate("((000005))"),		ICON_CHANGELOG, RES_ICON_CHANGELOG,	&chlWnd->Visible);
+		Menu::AddMenuItem(Language.Translate("((000006))"),		ICON_LOG,		RES_ICON_LOG,		&logWnd->Visible);
+		Menu::AddMenuItem(Language.Translate("((000007))"),		ICON_DEBUG,		RES_ICON_DEBUG,		&dbgWnd->Visible);
+		Menu::AddMenuItem(Language.Translate("((000008))"),		ICON_ABOUT,		RES_ICON_ABOUT,		&aboutWnd->Visible);
 
 		/* register keybinds */
 		Keybinds::Register(KB_MENU, ProcessKeybind, "CTRL+O");
@@ -770,7 +770,7 @@ namespace GUI
 		TextureLoader::LoadFromResource(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, NexusHandle, nullptr);
 
 		/* add shortcut */
-		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "Nexus Menu");
+		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, Language.Translate("((000009))"));
 
 		if (IsUpdateAvailable && NotifyChangelog)
 		{

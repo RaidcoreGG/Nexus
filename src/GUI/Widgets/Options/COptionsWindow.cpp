@@ -86,12 +86,12 @@ namespace GUI
 
 	void GeneralTab()
 	{
-		if (ImGui::BeginTabItem("General"))
+		if (ImGui::BeginTabItem(Language.Translate("((000052))")))
 		{
 			{
 				ImGui::BeginChild("##GeneralTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-				ImGui::TextDisabled("Language");
+				ImGui::TextDisabled(Language.Translate("((000041))"));
 				if (ImGui::Combo("##language", (int*)&languagesIndex, languages, languagesSize))
 				{
 					Language.SetLanguage(languages[languagesIndex]);
@@ -99,14 +99,14 @@ namespace GUI
 					Settings::Save();
 				}
 
-				ImGui::TextDisabled("UI/UX");
+				ImGui::TextDisabled(Language.Translate("((000042))"));
 				{
-					if (ImGui::Checkbox("Close Menu after selecting item", &GUI::CloseMenuAfterSelecting))
+					if (ImGui::Checkbox(Language.Translate("((000043))"), &GUI::CloseMenuAfterSelecting))
 					{
 						Settings::Settings[OPT_CLOSEMENU] = GUI::CloseMenuAfterSelecting;
 						Settings::Save();
 					}
-					if (ImGui::Checkbox("Closing Windows with Escape", &GUI::CloseOnEscape))
+					if (ImGui::Checkbox(Language.Translate("((000044))"), &GUI::CloseOnEscape))
 					{
 						Settings::Settings[OPT_CLOSEESCAPE] = GUI::CloseOnEscape;
 						Settings::Save();
@@ -115,33 +115,33 @@ namespace GUI
 
 				ImGui::Separator();
 
-				ImGui::TextDisabled("Quick Access");
+				ImGui::TextDisabled(Language.Translate("((000045))"));
 				{
-					if (ImGui::Checkbox("Vertical Layout", &QuickAccess::VerticalLayout))
+					if (ImGui::Checkbox(Language.Translate("((000046))"), &QuickAccess::VerticalLayout))
 					{
 						Settings::Settings[OPT_QAVERTICAL] = QuickAccess::VerticalLayout;
 						Settings::Save();
 					}
-					if (ImGui::Checkbox("Always Show", &QuickAccess::AlwaysShow))
+					if (ImGui::Checkbox(Language.Translate("((000047))"), &QuickAccess::AlwaysShow))
 					{
 						Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS] = QuickAccess::AlwaysShow;
 						Settings::Save();
 					}
-					ImGui::TooltipGeneric("If this setting is enabled the Quick Access menu will also show during loading screens and character select.");
+					ImGui::TooltipGeneric(Language.Translate("((000048))"));
 
-					if (ImGui::Checkbox("Show notification icon when Nexus updates", &GUI::NotifyChangelog))
+					if (ImGui::Checkbox(Language.Translate("((000049))"), &GUI::NotifyChangelog))
 					{
 						Settings::Settings[OPT_NOTIFYCHANGELOG] = GUI::NotifyChangelog;
 						Settings::Save();
 					}
 
-					ImGui::Text("Location:");
+					ImGui::Text(Language.Translate("((000050))"));
 					if (ImGui::Combo("##qalocation", (int*)&QuickAccess::Location, qaLocations, IM_ARRAYSIZE(qaLocations)))
 					{
 						Settings::Settings[OPT_QALOCATION] = QuickAccess::Location;
 						Settings::Save();
 					}
-					ImGui::Text("Offset:");
+					ImGui::Text(Language.Translate("((000051))"));
 					if (ImGui::InputFloat2("##qaoffset", (float*)&QuickAccess::Offset))
 					{
 						Settings::Settings[OPT_QAOFFSETX] = QuickAccess::Offset.x;
@@ -159,7 +159,7 @@ namespace GUI
 
 	void AddonsTab()
 	{
-		if (ImGui::BeginTabItem("Addons"))
+		if (ImGui::BeginTabItem(Language.Translate("((000003))")))
 		{
 			{
 				ImGui::BeginChild("##AddonsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
@@ -190,12 +190,12 @@ namespace GUI
 
 	void StyleTab()
 	{
-		if (ImGui::BeginTabItem("Style"))
+		if (ImGui::BeginTabItem(Language.Translate("((000053))")))
 		{
 			{
 				ImGui::BeginChild("##StyleTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-				ImGui::TextDisabled("Font Size");
+				ImGui::TextDisabled(Language.Translate("((000054))"));
 				{
 					if (ImGui::InputFloat("##fontsize", &FontSize, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_EnterReturnsTrue))
 					{
@@ -206,24 +206,24 @@ namespace GUI
 						Settings::Settings[OPT_FONTSIZE] = FontSize;
 						Settings::Save();
 					}
-					ImGui::TooltipGeneric("Changing font size requires a restart.");
+					ImGui::TooltipGeneric(Language.Translate("((000055))"));
 				}
 
 				ImGui::Separator();
 
-				if (ImGui::Checkbox("Link to ArcDPS style", &GUI::LinkArcDPSStyle))
+				if (ImGui::Checkbox(Language.Translate("((000056))"), &GUI::LinkArcDPSStyle))
 				{
 					Settings::Settings[OPT_LINKARCSTYLE] = GUI::LinkArcDPSStyle;
 					ImportArcDPSStyle();
 					Settings::Save();
 				}
-				ImGui::TooltipGeneric("This will read out the ImGui style settings from ArcDPS and apply them to Nexus.\nChanging ArcDPS style at runtime is not reflected by Nexus as ArcDPS does only save on shutdown.\nRestart required.");
+				ImGui::TooltipGeneric(Language.Translate("((000057))"));
 
 				if (!GUI::LinkArcDPSStyle)
 				{
 					ImGuiStyle& style = ImGui::GetStyle();
 
-					if (ImGui::SmallButton("Save Style"))
+					if (ImGui::SmallButton(Language.Translate("((000058))")))
 					{
 						std::string encode = Base64::Encode((unsigned char*)&style, sizeof(ImGuiStyle));
 						Settings::Settings[OPT_IMGUISTYLE] = encode;
@@ -234,7 +234,7 @@ namespace GUI
 						Settings::Save();
 					}
 					ImGui::SameLine();
-					if (ImGui::SmallButton("Revert Changes"))
+					if (ImGui::SmallButton(Language.Translate("((000059))")))
 					{
 						if (!Settings::Settings[OPT_IMGUISTYLE].is_null())
 						{
@@ -376,7 +376,7 @@ namespace GUI
 
 	void KeybindsTab()
 	{
-		if (ImGui::BeginTabItem("Keybinds"))
+		if (ImGui::BeginTabItem(Language.Translate("((000060))")))
 		{
 			{
 				ImGui::BeginChild("##KeybindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
@@ -424,7 +424,7 @@ namespace GUI
 								ImGui::TableSetColumnIndex(2);
 								if (keybind.Handler == nullptr)
 								{
-									ImGui::TextDisabled("Keybind not in use.");
+									ImGui::TextDisabled(Language.Translate("((000061))"));
 								}
 							}
 
@@ -437,12 +437,12 @@ namespace GUI
 				if (openEditor)
 				{
 					openEditor = false;
-					ImGui::OpenPopup(("Set Keybind: " + CurrentlyEditing).c_str(), ImGuiPopupFlags_AnyPopupLevel);
+					ImGui::OpenPopup((Language.Translate("((000062))") + CurrentlyEditing).c_str(), ImGuiPopupFlags_AnyPopupLevel);
 				}
 
 				ImVec2 center(Renderer::Width * 0.5f, Renderer::Height * 0.5f);
 				ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-				if (ImGui::BeginPopupModal(("Set Keybind: " + CurrentlyEditing).c_str(), NULL, WindowFlags_Default))
+				if (ImGui::BeginPopupModal((Language.Translate("((000062))") + CurrentlyEditing).c_str(), NULL, WindowFlags_Default))
 				{
 					Keybinds::IsSettingKeybind = true;
 					if (Keybinds::CurrentKeybind == Keybind{})
@@ -458,13 +458,13 @@ namespace GUI
 
 					if (Keybinds::CurrentKeybindUsedBy != CurrentlyEditing && Keybinds::CurrentKeybindUsedBy != "")
 					{
-						ImGui::TextColored(ImVec4(255, 0, 0, 255), "You will overwrite \"%s\".", Keybinds::CurrentKeybindUsedBy.c_str());
+						ImGui::TextColored(ImVec4(255, 0, 0, 255), (Language.Translate("((000063))") + Keybinds::CurrentKeybindUsedBy + ".").c_str());
 						overwriting = true;
 					}
 
 					bool close = false;
 
-					if (ImGui::Button("Unbind"))
+					if (ImGui::Button(Language.Translate("((000064))")))
 					{
 						Keybinds::Set(CurrentlyEditing, Keybind{});
 						close = true;
@@ -480,7 +480,7 @@ namespace GUI
 					ImGui::SameLine();
 					/* i love imgui end*/
 
-					if (ImGui::Button("Accept"))
+					if (ImGui::Button(Language.Translate("((000065))")))
 					{
 						if (overwriting)
 						{
@@ -490,7 +490,7 @@ namespace GUI
 						close = true;
 					}
 					ImGui::SameLine();
-					if (ImGui::Button("Cancel"))
+					if (ImGui::Button(Language.Translate("((000066))")))
 					{
 						close = true;
 					}

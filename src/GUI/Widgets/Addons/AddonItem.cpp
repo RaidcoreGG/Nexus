@@ -86,7 +86,7 @@ namespace GUI
 
 				if (aAddon->State == EAddonState::NotLoadedIncompatibleAPI)
 				{
-					ImGui::TextColored(ImVec4(255, 255, 0, 255), "Addon requested incompatible API Version: %d", aAddon->Definitions->APIVersion);
+					ImGui::TextColored(ImVec4(255, 255, 0, 255), Language.Translate("((000010))"), aAddon->Definitions->APIVersion);
 				}
 				else
 				{
@@ -115,7 +115,7 @@ namespace GUI
 					ImGui::ImageButton(BtnOptions->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling));
 					if (ImGui::BeginPopupContextItem("##AddonItemActionsMore"))
 					{
-						if (ImGui::GW2::ContextMenuItem(("Update##" + sig).c_str(), "Update", CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+						if (ImGui::GW2::ContextMenuItem(("Update##" + sig).c_str(), Language.Translate("((000011))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 						{
 							for (auto& it : Loader::Addons)
 							{
@@ -144,11 +144,11 @@ namespace GUI
 						}
 						if (aAddon->State == EAddonState::LoadedLOCKED)
 						{
-							ImGui::GW2::TooltipGeneric("This addon is currently locked and requires a restart for the update to take effect.");
+							ImGui::GW2::TooltipGeneric(Language.Translate("((000012))"));
 						}
 
 						if (ImGui::GW2::ContextMenuItem((aAddon->IsPausingUpdates ? "Resume Updates##" : "Pause Updates##" + sig).c_str(),
-							aAddon->IsPausingUpdates ? "Resume Updates" : "Pause Updates",
+							aAddon->IsPausingUpdates ? Language.Translate("((000013))") : Language.Translate("((000014))"),
 							CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 						{
 							aAddon->IsPausingUpdates = !aAddon->IsPausingUpdates;
@@ -156,7 +156,7 @@ namespace GUI
 
 						ImGui::Separator();
 
-						if (ImGui::GW2::ContextMenuItem(("ToggleDUU##" + sig).c_str(), aAddon->IsDisabledUntilUpdate ? "Re-Enable" : "Disable until Update", CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+						if (ImGui::GW2::ContextMenuItem(("ToggleDUU##" + sig).c_str(), aAddon->IsDisabledUntilUpdate ? Language.Translate("((000015))") : Language.Translate("((000016))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 						{
 							//LogDebug(CH_GUI, "ToggleDUU called: %s", it.second->Definitions->Name);
 							aAddon->IsDisabledUntilUpdate = !aAddon->IsDisabledUntilUpdate;
@@ -169,19 +169,19 @@ namespace GUI
 						}
 						if (aAddon->State == EAddonState::LoadedLOCKED)
 						{
-							ImGui::GW2::TooltipGeneric("This addon is currently locked disabling won't take effect until next game start.");
+							ImGui::GW2::TooltipGeneric(Language.Translate("((000017))"));
 						}
 
 						ImGui::Separator();
 
-						if (ImGui::GW2::ContextMenuItem(("Uninstall##" + sig).c_str(), "Uninstall", CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+						if (ImGui::GW2::ContextMenuItem(("Uninstall##" + sig).c_str(), Language.Translate("((000018))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 						{
 							//LogDebug(CH_GUI, "Uninstall called: %s", it.second->Definitions->Name);
 							Loader::QueueAddon(ELoaderAction::Uninstall, aPath);
 						}
 						if (aAddon->State == EAddonState::LoadedLOCKED)
 						{
-							ImGui::GW2::TooltipGeneric("This addon is currently locked and requires a restart to be removed.");
+							ImGui::GW2::TooltipGeneric(Language.Translate("((000019))"));
 						}
 
 						ImGui::EndPopup();
@@ -195,14 +195,14 @@ namespace GUI
 				// just check if loaded, if it was not hot-reloadable it would be EAddonState::LoadedLOCKED
 				if (aAddon->State == EAddonState::Loaded)
 				{
-					if (ImGui::GW2::Button(("Disable##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button((Language.Translate("((000020))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						//LogDebug(CH_GUI, "Unload called: %s", it.second->Definitions->Name);
 						Loader::QueueAddon(ELoaderAction::Unload, aPath);
 					}
 					if (RequestedAddons.size() > 0)
 					{
-						ImGui::GW2::TooltipGeneric("Addon state won't be saved. Game was started with addons via start parameters.");
+						ImGui::GW2::TooltipGeneric(Language.Translate("((000021))"));
 					}
 				}
 				else if (aAddon->State == EAddonState::LoadedLOCKED && aAddon->ShouldDisableNextLaunch == false)
@@ -211,14 +211,15 @@ namespace GUI
 
 					if (RequestedAddons.size() > 0)
 					{
-						additionalInfo = "\nAddon state won't be saved. Game was started with addons via start parameters.";
+						additionalInfo.append("\n");
+						additionalInfo.append(Language.Translate("((000021))"));
 					}
 
-					if (ImGui::GW2::Button(("Disable*##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button((Language.Translate("((000022))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						aAddon->ShouldDisableNextLaunch = true;
 					}
-					ImGui::GW2::TooltipGeneric("* Disabling won't take effect until next game start.%s", additionalInfo.c_str());
+					ImGui::GW2::TooltipGeneric(Language.Translate("((000023))"), additionalInfo.c_str());
 				}
 				else if (aAddon->State == EAddonState::LoadedLOCKED && aAddon->ShouldDisableNextLaunch == true)
 				{
@@ -226,18 +227,19 @@ namespace GUI
 
 					if (RequestedAddons.size() > 0)
 					{
-						additionalInfo = "\nAddon state won't be saved. Game was started with addons via start parameters.";
+						additionalInfo.append("\n");
+						additionalInfo.append(Language.Translate("((000021))"));
 					}
 
-					if (ImGui::GW2::Button(("Load*##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button((Language.Translate("((000024))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						aAddon->ShouldDisableNextLaunch = false;
 					}
-					ImGui::GW2::TooltipGeneric("* Load addon next game start.%s", additionalInfo.c_str());
+					ImGui::GW2::TooltipGeneric(Language.Translate("((000025))"), additionalInfo.c_str());
 				}
 				else if (aAddon->State == EAddonState::NotLoaded)
 				{
-					if (ImGui::GW2::Button(("Load##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button((Language.Translate("((000026))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						//LogDebug(CH_GUI, "Load called: %s", it.second->Definitions->Name);
 						aAddon->IsDisabledUntilUpdate = false; // explicitly loaded
@@ -245,7 +247,7 @@ namespace GUI
 					}
 					if (RequestedAddons.size() > 0)
 					{
-						ImGui::GW2::TooltipGeneric("Addon state won't be saved. Game was started with addons via start parameters.");
+						ImGui::GW2::TooltipGeneric(Language.Translate("((000021))"));
 					}
 				}
 				if (aAddon->Definitions->Provider == EUpdateProvider::GitHub && aAddon->Definitions->UpdateLink)
@@ -313,7 +315,7 @@ namespace GUI
 				// just check if loaded, if it was not hot-reloadable it would be EAddonState::LoadedLOCKED
 				if (!aInstalled)
 				{
-					if (ImGui::GW2::Button(aAddon->IsInstalling ? ("Installing...##" + sig).c_str() : ("Install##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button(aAddon->IsInstalling ? (Language.Translate("((000027))") + sig).c_str() : (Language.Translate("((000028))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						if (!aAddon->IsInstalling)
 						{
@@ -330,11 +332,11 @@ namespace GUI
 				}
 				else
 				{
-					ImGui::Text("Already installed.");
+					ImGui::Text(Language.Translate("((000029))"));
 				}
 				if (aAddon->Provider == EUpdateProvider::GitHub && !aAddon->DownloadURL.empty())
 				{
-					if (ImGui::GW2::Button(("GitHub##" + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button((Language.Translate("((000030))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						ShellExecuteA(0, 0, aAddon->DownloadURL.c_str(), 0, 0, SW_SHOW);
 					}

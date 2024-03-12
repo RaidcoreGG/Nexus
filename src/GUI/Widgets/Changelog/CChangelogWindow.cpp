@@ -37,11 +37,11 @@ namespace GUI
 
 			if (IsUpdateAvailable)
 			{
-				ImGui::TextColored(ImVec4(0, 0.580f, 1, 1), "These changes take effect the next time you start the game:");
+				ImGui::TextColored(ImVec4(0, 0.580f, 1, 1), Language.Translate("((000039))"));
 			}
 			else
 			{
-				ImGui::Text("Last changes:");
+				ImGui::Text(Language.Translate("((000040))"));
 			}
 
 			if (!ChangelogText.empty())
@@ -50,7 +50,7 @@ namespace GUI
 			}
 			else
 			{
-				ImGui::Text("There's nothing here.");
+				ImGui::Text(Language.Translate("((000037))"));
 			}
 		}
 		ImGui::End();
