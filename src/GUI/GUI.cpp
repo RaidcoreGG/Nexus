@@ -734,12 +734,12 @@ namespace GUI
 		AddWindow(dbgWnd);
 		AddWindow(aboutWnd);
 
-		Menu::AddMenuItem(Language.Translate("((000003))"),		ICON_ADDONS,	RES_ICON_ADDONS,	&addonsWnd->Visible);
-		Menu::AddMenuItem(Language.Translate("((000004))"),		ICON_OPTIONS,	RES_ICON_OPTIONS,	&opsWnd->Visible);
-		Menu::AddMenuItem(Language.Translate("((000005))"),		ICON_CHANGELOG, RES_ICON_CHANGELOG,	&chlWnd->Visible);
-		Menu::AddMenuItem(Language.Translate("((000006))"),		ICON_LOG,		RES_ICON_LOG,		&logWnd->Visible);
-		Menu::AddMenuItem(Language.Translate("((000007))"),		ICON_DEBUG,		RES_ICON_DEBUG,		&dbgWnd->Visible);
-		Menu::AddMenuItem(Language.Translate("((000008))"),		ICON_ABOUT,		RES_ICON_ABOUT,		&aboutWnd->Visible);
+		Menu::AddMenuItem("((000003))",		ICON_ADDONS,	RES_ICON_ADDONS,	&addonsWnd->Visible);
+		Menu::AddMenuItem("((000004))",		ICON_OPTIONS,	RES_ICON_OPTIONS,	&opsWnd->Visible);
+		Menu::AddMenuItem("((000005))",		ICON_CHANGELOG, RES_ICON_CHANGELOG,	&chlWnd->Visible);
+		Menu::AddMenuItem("((000006))",		ICON_LOG,		RES_ICON_LOG,		&logWnd->Visible);
+		Menu::AddMenuItem("((000007))",		ICON_DEBUG,		RES_ICON_DEBUG,		&dbgWnd->Visible);
+		Menu::AddMenuItem("((000008))",		ICON_ABOUT,		RES_ICON_ABOUT,		&aboutWnd->Visible);
 
 		/* register keybinds */
 		Keybinds::Register(KB_MENU, ProcessKeybind, "CTRL+O");
