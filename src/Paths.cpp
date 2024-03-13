@@ -29,6 +29,11 @@ namespace Path
 	std::filesystem::path F_ADDONCONFIG{};
 	std::filesystem::path F_APIKEYS{};
 
+	std::filesystem::path F_LOCALE_EN{};
+	std::filesystem::path F_LOCALE_DE{};
+	std::filesystem::path F_LOCALE_FR{};
+	std::filesystem::path F_LOCALE_ES{};
+
 	std::vector<std::string> ExistingPaths;
 
 	void Initialize(HMODULE aBaseModule)
@@ -67,6 +72,11 @@ namespace Path
 		PathSystemAppend(F_SYSTEM_DLL, "d3d11.dll");									/* get system dll path */
 		F_CHAINLOAD_DLL = D_GW2 / "d3d11_chainload.dll";								/* get chainload dll path */
 		F_ARCDPSINTEGRATION = D_GW2_ADDONS_NEXUS / "arcdps_integration64.dll";			/* get arcdps integration dll path */
+
+		F_LOCALE_EN = D_GW2_ADDONS_RAIDCORE_LOCALES / "en_Main.json";
+		F_LOCALE_DE = D_GW2_ADDONS_RAIDCORE_LOCALES / "de_Main.json";
+		F_LOCALE_FR = D_GW2_ADDONS_RAIDCORE_LOCALES / "fr_Main.json";
+		F_LOCALE_ES = D_GW2_ADDONS_RAIDCORE_LOCALES / "es_Main.json";
 
 		/* push to paths */
 		ExistingPaths.push_back(D_GW2.string());

@@ -57,6 +57,8 @@
 #define RES_TEX_CONTEXTMENU_BULLET		701
 #define RES_TEX_CONTEXTMENU_HIGHLIGHT	702
 
+#define RES_LOCALE_EN					801
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

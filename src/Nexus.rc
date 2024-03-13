@@ -148,6 +148,8 @@ RES_ARCDPS_INTEGRATION			DLL				"Resources\\bin64\\arcdps_integration64.dll"
 RES_TEX_CONTEXTMENU_BULLET		PNG				"Resources\\ContextMenu\\ContextMenu_Bullet.png"
 RES_TEX_CONTEXTMENU_HIGHLIGHT	PNG				"Resources\\ContextMenu\\ContextMenu_Highlight.png"
 
+RES_LOCALE_EN					JSON			"Resources\\Locales\\en_Main.json"
+
 #endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
 

@@ -4,6 +4,8 @@
 #include <string>
 #include <Psapi.h>
 
+#include "resource.h"
+#include "core.h"
 #include "Consts.h"
 #include "Hooks.h"
 #include "Paths.h"
@@ -63,6 +65,7 @@ namespace Main
 		RaidcoreAPI = new CAPIClient("https://api.raidcore.gg", true, Path::D_GW2_ADDONS_COMMON_API_RAIDCORE, 30 * 60, 300, 5, 1);
 		GitHubAPI = new CAPIClient("https://api.github.com", true, Path::D_GW2_ADDONS_COMMON_API_GITHUB, 30 * 60, 60, 60, 60 * 60);
 
+		UnpackLocales();
 		Language.SetLocaleDirectory(Path::D_GW2_ADDONS_RAIDCORE_LOCALES);
 		Language.BuildLocaleAtlas();
 
@@ -195,6 +198,29 @@ namespace Main
 		if (std::filesystem::exists(Path::F_UPDATE_DLL))
 		{
 			std::filesystem::remove(Path::F_UPDATE_DLL);
+		}
+	}
+
+	void UnpackLocales()
+	{
+		LPVOID res{}; DWORD sz{};
+		GetResource(NexusHandle, MAKEINTRESOURCE(RES_LOCALE_EN), "JSON", &res, &sz);
+
+		try
+		{
+			if (std::filesystem::exists(Path::F_LOCALE_EN))
+			{
+				std::filesystem::remove(Path::F_LOCALE_EN);
+			}
+
+			std::ofstream file(Path::F_LOCALE_EN);
+			file.write((const char*)res, sz);
+			file.close();
+		}
+		catch (std::filesystem::filesystem_error fErr)
+		{
+			LogDebug(CH_LOADER, "%s", fErr.what());
+			return;
 		}
 	}
 }
