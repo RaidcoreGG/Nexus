@@ -263,7 +263,7 @@ namespace GUI
 
 			ImGui::EndChild();
 
-			ImGui::SetCursorPos(ImVec2(0, initial.y + itemHeightScaled + 4.0f));
+			ImGui::SetCursorPos(ImVec2(0, initial.y + itemHeightScaled + 3.0f));
 		}
 	}
 
