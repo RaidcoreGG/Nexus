@@ -101,8 +101,8 @@ namespace GUI
 
 			ImGui::SetCursorPos(ImVec2(28.0f, 8.0f + (64.0f * Renderer::Scaling)));
 
-			ImVec2 text1sz = ImGui::CalcTextSize("Installed");
-			ImVec2 text2sz = ImGui::CalcTextSize("Library");
+			ImVec2 text1sz = ImGui::CalcTextSize(Language.Translate("((000031))"));
+			ImVec2 text2sz = ImGui::CalcTextSize(Language.Translate("((000032))"));
 			ImVec2 text1offset = ImVec2(((92.0f * Renderer::Scaling) - text1sz.x) / 2, ((24.0f * Renderer::Scaling) - text1sz.y) / 2);
 			ImVec2 text2offset = ImVec2(((92.0f * Renderer::Scaling) - text2sz.x) / 2, ((24.0f * Renderer::Scaling) - text2sz.y) / 2);
 			
@@ -133,10 +133,10 @@ namespace GUI
 			ImGui::PopStyleVar();
 
 			ImGui::SetCursorPos(ImVec2(tab1origin.x + text1offset.x, tab1origin.y + text1offset.y));
-			ImGui::TextColored(TabIndex == 0 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "Installed");
+			ImGui::TextColored(TabIndex == 0 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000031))"));
 
 			ImGui::SetCursorPos(ImVec2(tab2origin.x + text2offset.x, tab2origin.y + text2offset.y));
-			ImGui::TextColored(TabIndex == 1 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "Library");
+			ImGui::TextColored(TabIndex == 1 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000032))"));
 
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
@@ -163,10 +163,10 @@ namespace GUI
 						if (Loader::Addons.size() == 0)
 						{
 							ImVec2 windowSize = ImGui::GetWindowSize();
-							ImVec2 textSize = ImGui::CalcTextSize("No addons installed.");
+							ImVec2 textSize = ImGui::CalcTextSize(Language.Translate("((000033))"));
 							ImVec2 position = ImGui::GetCursorPos();
 							ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-							ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "No addons installed.");
+							ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000033))"));
 						}
 						else
 						{
@@ -183,13 +183,13 @@ namespace GUI
 						ImGui::EndChild();
 					}
 
-					if (ImGui::GW2::Button("Open Addons Folder", ImVec2(ImGui::CalcTextSize("Open Addons Folder").x + 16.0f, btnHeight)))
+					if (ImGui::GW2::Button(Language.Translate("((000034))"), ImVec2(ImGui::CalcTextSize(Language.Translate("((000034))")).x + 16.0f, btnHeight)))
 					{
 						std::string strAddons = Path::D_GW2_ADDONS.string();
 						ShellExecuteA(NULL, "explore", strAddons.c_str(), NULL, NULL, SW_SHOW);
 					}
 					ImGui::SameLine();
-					if (ImGui::GW2::Button("Check for Updates", ImVec2(ImGui::CalcTextSize("Check for Updates").x + 16.0f, btnHeight)))
+					if (ImGui::GW2::Button(Language.Translate("((000035))"), ImVec2(ImGui::CalcTextSize(Language.Translate("((000035))")).x + 16.0f, btnHeight)))
 					{
 						const std::lock_guard<std::mutex> lock(Loader::Mutex);
 						{
@@ -215,7 +215,7 @@ namespace GUI
 							}
 						}
 					}
-					ImGui::GW2::TooltipGeneric("Checks each addon and updates it, if available.\nSome addons require a restart to apply the update and won't take effect immediately.");
+					ImGui::GW2::TooltipGeneric(Language.Translate("((000036))"));
 				}
 				else if (TabIndex == 1)
 				{
@@ -250,16 +250,16 @@ namespace GUI
 						if (Loader::AddonLibrary.size() == 0 || downloadable == 0)
 						{
 							ImVec2 windowSize = ImGui::GetWindowSize();
-							ImVec2 textSize = ImGui::CalcTextSize("There's nothing here.\nMaybe ask your favourite developer to support Nexus!");
+							ImVec2 textSize = ImGui::CalcTextSize(Language.Translate("((000037))"));
 							ImVec2 position = ImGui::GetCursorPos();
 							ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-							ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "There's nothing here.\nMaybe ask your favourite developer to support Nexus!");
+							ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000037))"));
 						}
 
 						ImGui::EndChild();
 					}
 
-					ImGui::Checkbox("Show already installed", &showInstalled);
+					ImGui::Checkbox(Language.Translate("((000038))"), &showInstalled);
 				}
 
 				ImGui::EndChild();
@@ -293,7 +293,7 @@ namespace GUI
 
 			ImGui::PushFont(FontBig);
 			ImGui::SetCursorPos(ImVec2(28.0f, 20.0f * Renderer::Scaling));
-			ImGui::TextColored(ImVec4(1.0f, .933f, .733f, 1.0f), Name.c_str());
+			ImGui::TextColored(ImVec4(1.0f, .933f, .733f, 1.0f), Language.Translate("((000003))"));
 			ImGui::PopFont();
 		}
 		ImGui::End();

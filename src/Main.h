@@ -11,6 +11,8 @@ namespace Main
 	void Shutdown(unsigned int aReason);
 
 	void SelfUpdate();
+
+	void UnpackLocales();
 }
 
 #endif

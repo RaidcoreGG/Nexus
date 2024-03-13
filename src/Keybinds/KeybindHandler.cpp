@@ -93,8 +93,16 @@ namespace Keybinds
 				{
 					if (kb == it.second.Bind)
 					{
-						// if Invoke returns true, pass 0 to the wndproc to stop processing
-						return Invoke(it.first) ? 0 : 1;
+						if (it.first == KB_TOGGLEHIDEUI)
+						{
+							// invoke but do not return, pass through to game (multi hide)
+							Invoke(it.first);
+						}
+						else
+						{
+							// if Invoke returns true, pass 0 to the wndproc to stop processing
+							return Invoke(it.first) ? 0 : 1;
+						}
 					}
 				}
 			}

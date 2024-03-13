@@ -133,6 +133,9 @@
     <Filter Include="Resource Files\Images\ContextMenu">
       <UniqueIdentifier>{70632a7c-1799-446b-9390-ea6d16d18e9c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Locales">
+      <UniqueIdentifier>{3e8eab0f-abb6-49e7-9b6e-4347fe84f0b9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -1043,6 +1046,9 @@
     <ClInclude Include="Loader\StoredAddon.h">
       <Filter>Loader\Structs</Filter>
     </ClInclude>
+    <ClInclude Include="Localization\FuncDefs.h">
+      <Filter>Localization</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Nexus.rc">
@@ -1055,6 +1061,9 @@
     </None>
     <None Include="Resources\bin64\arcdps_integration64.dll">
       <Filter>Resource Files\bin64</Filter>
+    </None>
+    <None Include="Resources\Locales\en_Main.json">
+      <Filter>Resource Files\Locales</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
