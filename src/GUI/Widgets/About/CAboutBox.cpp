@@ -29,8 +29,7 @@ namespace GUI
 			ImGui::SameLine(); ImGui::TextDisabled("release/" BRANCH_NAME);
 #endif
 			ImGui::TextDisabled("Location:");
-			std::string strHost = Path::F_HOST_DLL.string();
-			ImGui::Text(""); ImGui::SameLine(); ImGui::Text(strHost.c_str());
+			ImGui::Text(""); ImGui::SameLine(); ImGui::Text(Path::F_HOST_DLL.string().c_str());
 			if (ImGui::Tooltip())
 			{
 				for (std::string param : Parameters)

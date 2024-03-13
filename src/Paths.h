@@ -32,6 +32,11 @@ namespace Path
 	extern std::filesystem::path F_ADDONCONFIG;
 	extern std::filesystem::path F_APIKEYS;
 
+	extern std::filesystem::path F_LOCALE_EN;
+	extern std::filesystem::path F_LOCALE_DE;
+	extern std::filesystem::path F_LOCALE_FR;
+	extern std::filesystem::path F_LOCALE_ES;
+
 	extern std::vector<std::string>	ExistingPaths;
 
 	/* Initialize all path variables relative to the base modules location */
