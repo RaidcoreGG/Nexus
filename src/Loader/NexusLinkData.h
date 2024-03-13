@@ -15,6 +15,10 @@ struct NexusLinkData
 	ImFont*		Font;
 	ImFont*		FontBig;
 	ImFont*		FontUI;
+
+	signed int	QuickAccessIconsCount;
+	signed int	QuickAccessMode;
+	bool		QuickAccessIsVertical;
 };
 
 #endif

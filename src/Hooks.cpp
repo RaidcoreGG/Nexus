@@ -9,6 +9,7 @@
 
 #include "Events/EventHandler.h"
 #include "GUI/GUI.h"
+#include "GUI/Widgets/QuickAccess/QuickAccess.h"
 #include "Keybinds/KeybindHandler.h"
 #include "Loader/Loader.h"
 #include "Loader/NexusLinkData.h"
@@ -114,6 +115,10 @@ namespace Hooks
 				NexusLink->Font = Font;
 				NexusLink->FontBig = FontBig;
 				NexusLink->FontUI = FontUI;
+
+				//NexusLink->QuickAccessIconsCount = GUI::QuickAccess::Registry.size(); // write this only when adding/removing icons
+				NexusLink->QuickAccessMode = (int)GUI::QuickAccess::Location;
+				NexusLink->QuickAccessIsVertical = GUI::QuickAccess::VerticalLayout;
 			}
 
 			GUI::Render();
