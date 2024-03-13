@@ -116,7 +116,11 @@ namespace Loader
 				return;
 			}
 
-			GetAddonLibrary();
+			std::thread([]()
+				{
+					GetAddonLibrary();
+				})
+				.detach();
 
 			LoaderThread = std::thread(ProcessChanges);
 			LoaderThread.detach();
