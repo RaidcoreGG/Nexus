@@ -197,7 +197,17 @@ namespace GUI
 					}
 				}
 
-				bool newHoverState = ImGui::IsWindowHovered() || isActive;
+				bool isHoveringNative = false;
+				if (Location == EQAPosition::Extend)
+				{
+					ImVec2 mPos = ImGui::GetMousePos();
+					if (mPos.x < pos.x - Offset.x && mPos.y < Renderer::Scaling * size)
+					{
+						isHoveringNative = true;
+					}
+				}
+
+				bool newHoverState = ImGui::IsWindowHovered() || isActive || isHoveringNative;
 				if (newHoverState != IsHovering)
 				{
 					if (newHoverState) { IsFadingIn = true; }
