@@ -44,7 +44,11 @@ namespace TextureLoader
 	{
 		Texture* result = Get(aIdentifier);
 
-		if (!result)
+		if (OverrideTexture(aIdentifier, nullptr))
+		{
+			return result;
+		}
+		else if (!result)
 		{
 			LoadFromFile(aIdentifier, aFilename, nullptr);
 		}
@@ -55,7 +59,11 @@ namespace TextureLoader
 	{
 		Texture* result = Get(aIdentifier);
 
-		if (!result)
+		if (OverrideTexture(aIdentifier, nullptr))
+		{
+			return result;
+		}
+		else if (!result)
 		{
 			LoadFromResource(aIdentifier, aResourceID, aModule, nullptr);
 		}
@@ -66,7 +74,11 @@ namespace TextureLoader
 	{
 		Texture* result = Get(aIdentifier);
 
-		if (!result)
+		if (OverrideTexture(aIdentifier, nullptr))
+		{
+			return result;
+		}
+		else if (!result)
 		{
 			LoadFromURL(aIdentifier, aRemote, aEndpoint, nullptr);
 		}
@@ -77,7 +89,11 @@ namespace TextureLoader
 	{
 		Texture* result = Get(aIdentifier);
 
-		if (!result)
+		if (OverrideTexture(aIdentifier, nullptr))
+		{
+			return result;
+		}
+		else if (!result)
 		{
 			LoadFromMemory(aIdentifier, aData, aSize, nullptr);
 		}
@@ -117,6 +133,10 @@ namespace TextureLoader
 			}
 			return;
 		}
+		else if (OverrideTexture(aIdentifier, aCallback))
+		{
+			return;
+		}
 
 		if (!std::filesystem::exists(aFilename))
 		{
@@ -144,6 +164,10 @@ namespace TextureLoader
 			{
 				aCallback(aIdentifier, tex);
 			}
+			return;
+		}
+		else if (OverrideTexture(aIdentifier, aCallback))
+		{
 			return;
 		}
 
@@ -197,6 +221,10 @@ namespace TextureLoader
 			}
 			return;
 		}
+		else if (OverrideTexture(aIdentifier, aCallback))
+		{
+			return;
+		}
 
 		httplib::Client client(aRemote);
 		client.enable_server_certificate_verification(false);
@@ -244,6 +272,10 @@ namespace TextureLoader
 			}
 			return;
 		}
+		else if (OverrideTexture(aIdentifier, aCallback))
+		{
+			return;
+		}
 
 		int image_width = 0;
 		int image_height = 0;
@@ -251,6 +283,25 @@ namespace TextureLoader
 		unsigned char* image_data = stbi_load_from_memory((const stbi_uc*)aData, static_cast<int>(aSize), &image_width, &image_height, &image_components, 0);
 
 		QueueTexture(str.c_str(), image_data, image_width, image_height, aCallback);
+	}
+
+	bool OverrideTexture(const char* aIdentifier, TEXTURES_RECEIVECALLBACK aCallback)
+	{
+		std::string file = aIdentifier;
+		file.append(".png");
+		std::filesystem::path customPath = Path::D_GW2_ADDONS_NEXUS / "Textures" / file.c_str();
+
+		if (std::filesystem::exists(customPath))
+		{
+			// Load from disk into a raw RGBA buffer
+			int image_width = 0;
+			int image_height = 0;
+			unsigned char* image_data = stbi_load(customPath.string().c_str(), &image_width, &image_height, NULL, 4);
+
+			QueueTexture(aIdentifier, image_data, image_width, image_height, aCallback);
+			return true;
+		}
+		return false;
 	}
 
 	void ProcessQueue()

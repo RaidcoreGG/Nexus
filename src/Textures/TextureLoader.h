@@ -40,6 +40,9 @@ namespace TextureLoader
 	/* Requests to load a texture from memory. */
 	void LoadFromMemory(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback);
 
+	/* Loads a custom user texture from disk if it exists, rather than the provided method. */
+	bool OverrideTexture(const char* aIdentifier, TEXTURES_RECEIVECALLBACK aCallback);
+
 	/* Processes all currently queued textures. */
 	void ProcessQueue();
 

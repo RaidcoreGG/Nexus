@@ -245,6 +245,34 @@ namespace GUI
 				}
 			}
 			ImGui::End();
+
+			ImGui::SetNextWindowBgAlpha(0.35f);
+			pos.x += size.x + 16.0f;
+			ImGui::SetNextWindowPos(pos);
+			ImGui::SetNextWindowSize(size);
+			if (ImGui::Begin("NexusLinkData", &Visible, WindowFlags_Overlay))
+			{
+				ImGui::Text("Nexus Mumble Extensions");
+				ImGui::Separator();
+				if (ImGui::BeginTable("table_nexus", 2))
+				{
+					ImGui::TableNextRow();
+					ImGui::TableSetColumnIndex(0); ImGui::Text("frame");
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%d", FrameCounter);
+					ImGui::TableNextRow();
+					ImGui::TableSetColumnIndex(0); ImGui::Text("isMoving");
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%s", IsMoving ? "true" : "false");
+					ImGui::TableNextRow();
+					ImGui::TableSetColumnIndex(0); ImGui::Text("isCameraMoving");
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%s", IsCameraMoving ? "true" : "false");
+					ImGui::TableNextRow();
+					ImGui::TableSetColumnIndex(0); ImGui::Text("isGameplay");
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%s", IsGameplay ? "true" : "false");
+
+					ImGui::EndTable();
+				}
+			}
+			ImGui::End();
 		}
 		else
 		{

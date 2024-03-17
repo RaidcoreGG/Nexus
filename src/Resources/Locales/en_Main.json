@@ -22,8 +22,8 @@
 		"((000010))": "Addon requested incompatible API Version: %d",
 		"((000011))": "Update",
 		"((000012))": "This addon is currently locked and requires a restart for the update to take effect.",
-		"((000013))": "Resume Updates",
-		"((000014))": "Pause Updates",
+		"((000013))": "Enable Auto-Updates",
+		"((000014))": "Disable Auto-Updates",
 		"((000015))": "Re-Enable",
 		"((000016))": "Disable until Update",
 		"((000017))": "This addon is currently locked disabling won't take effect until next game start.",
@@ -75,6 +75,11 @@
 		"((000063))": "You will overwrite ",
 		"((000064))": "Unbind",
 		"((000065))": "Accept",
-		"((000066))": "Cancel"
+		"((000066))": "Cancel",
+		"((000067))": "Extend",
+		"((000068))": "Under",
+		"((000069))": "Bottom",
+		"((000070))": "Custom",
+		"((000071))": "Checking for Updates..."
 	}
 }

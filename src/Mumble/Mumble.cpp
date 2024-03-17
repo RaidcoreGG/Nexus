@@ -28,6 +28,7 @@ namespace Mumble
 	static Vector3 prevAvPos{};
 	static Vector3 prevCamFront{};
 	static Identity prevIdentity{};
+	static long long prevFrameCounter = 0;
 
 	void Initialize()
 	{
@@ -98,10 +99,11 @@ namespace Mumble
 
 			if (MumbleLink != nullptr)
 			{
-				IsGameplay = prevTick != MumbleLink->UITick;
+				IsGameplay = prevTick != MumbleLink->UITick || (prevFrameCounter == FrameCounter && IsGameplay);
 				IsMoving = prevAvPos != MumbleLink->AvatarPosition;
 				IsCameraMoving = prevCamFront != MumbleLink->CameraFront;
 
+				prevFrameCounter = FrameCounter;
 				prevTick = MumbleLink->UITick;
 				prevAvPos = MumbleLink->AvatarPosition;
 				prevCamFront = MumbleLink->CameraFront;

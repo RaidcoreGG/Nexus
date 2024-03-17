@@ -8,6 +8,8 @@
 #include "Consts.h"
 #include "Shared.h"
 
+#include "Loader/Loader.h"
+
 namespace Events
 {
 	std::mutex											Mutex;
@@ -43,6 +45,12 @@ namespace Events
 		const std::lock_guard<std::mutex> lock(Mutex);
 		{
 			Registry[str].push_back(aConsumeEventCallback);
+
+			/* dirty hack for arcdps (I hate my life) */
+			if ((str == "EV_ARCDPS_COMBATEVENT_LOCAL_RAW" || str == "EV_ARCDPS_COMBATEVENT_SQUAD_RAW") && !Loader::IsArcdpsLoaded)
+			{
+				Loader::DetectArcdps();
+			}
 		}
 	}
 
