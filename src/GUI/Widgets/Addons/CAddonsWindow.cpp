@@ -106,8 +106,12 @@ namespace GUI
 
 			ImVec2 text1sz = ImGui::CalcTextSize(Language.Translate("((000031))"));
 			ImVec2 text2sz = ImGui::CalcTextSize(Language.Translate("((000032))"));
-			ImVec2 text1offset = ImVec2(((92.0f * Renderer::Scaling) - text1sz.x) / 2, ((24.0f * Renderer::Scaling) - text1sz.y) / 2);
-			ImVec2 text2offset = ImVec2(((92.0f * Renderer::Scaling) - text2sz.x) / 2, ((24.0f * Renderer::Scaling) - text2sz.y) / 2);
+
+			float tab1width = 92.0f > text1sz.x ? 92.0f : text1sz.x + 50.0f;
+			float tab2width = 92.0f > text2sz.x ? 92.0f : text2sz.x + 50.0f;
+
+			ImVec2 text1offset = ImVec2(((tab1width * Renderer::Scaling) - text1sz.x) / 2, ((24.0f * Renderer::Scaling) - text1sz.y) / 2);
+			ImVec2 text2offset = ImVec2(((tab2width * Renderer::Scaling) - text2sz.x) / 2, ((24.0f * Renderer::Scaling) - text2sz.y) / 2);
 			
 			ImVec2 tab1origin = ImGui::GetCursorPos(); // 28.0f, 28.0f
 
@@ -116,7 +120,7 @@ namespace GUI
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
 
-			if (ImGui::ImageButton(!Tab1Hovered ? TabBtn->Resource : TabBtnHover->Resource, ImVec2(92.0f * Renderer::Scaling, 24.0f * Renderer::Scaling)))
+			if (ImGui::ImageButton(!Tab1Hovered ? TabBtn->Resource : TabBtnHover->Resource, ImVec2(tab1width * Renderer::Scaling, 24.0f * Renderer::Scaling)))
 			{
 				TabIndex = 0;
 			}
@@ -126,7 +130,7 @@ namespace GUI
 
 			ImVec2 tab2origin = ImGui::GetCursorPos();
 
-			if (ImGui::ImageButton(!Tab2Hovered ? TabBtn->Resource : TabBtnHover->Resource, ImVec2(92.0f * Renderer::Scaling, 24.0f * Renderer::Scaling)))
+			if (ImGui::ImageButton(!Tab2Hovered ? TabBtn->Resource : TabBtnHover->Resource, ImVec2(tab2width * Renderer::Scaling, 24.0f * Renderer::Scaling)))
 			{
 				TabIndex = 1;
 			}
