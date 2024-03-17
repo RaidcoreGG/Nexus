@@ -201,7 +201,7 @@ namespace GUI
 				if (Location == EQAPosition::Extend)
 				{
 					ImVec2 mPos = ImGui::GetMousePos();
-					if (mPos.x < pos.x - Offset.x && mPos.y < Renderer::Scaling * size)
+					if (mPos.x != -FLT_MAX && mPos.y != -FLT_MAX && mPos.x < pos.x - Offset.x && mPos.y < Renderer::Scaling * size)
 					{
 						isHoveringNative = true;
 					}

@@ -258,7 +258,10 @@ namespace GUI
 								{
 									for (auto& [path, addon] : Loader::Addons)
 									{
-										if (addon->Definitions != nullptr && addon->Definitions->Signature == libAddon->Signature)
+										// if libAddon already exist in installed addons
+										// or if arcdps is loaded another way and the libAddon is arc
+										if ((addon->Definitions != nullptr && addon->Definitions->Signature == libAddon->Signature) ||
+											(Loader::IsArcdpsLoaded && libAddon->Signature == 0xFFF694D1))
 										{
 											exists = true;
 											break;
