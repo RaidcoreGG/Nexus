@@ -28,6 +28,9 @@ namespace GUI
 	bool showInstalled = false;
 	bool refreshHovered = false;
 
+	int queuedForCheck = 0;
+	int checkedForUpdates = -1;
+
 	CAddonsWindow::CAddonsWindow(std::string aName)
 	{
 		Name = aName;
@@ -189,29 +192,52 @@ namespace GUI
 						ShellExecuteA(NULL, "explore", strAddons.c_str(), NULL, NULL, SW_SHOW);
 					}
 					ImGui::SameLine();
-					if (ImGui::GW2::Button(Language.Translate("((000035))"), ImVec2(ImGui::CalcTextSize(Language.Translate("((000035))")).x + 16.0f, btnHeight)))
+					float btnUpdateCheckWidth = ImGui::CalcTextSize(Language.Translate("((000035))")).x;
+					float btnUpdateCheckingWidth = ImGui::CalcTextSize(Language.Translate("((000071))")).x;
+					float btnUCWidth = btnUpdateCheckingWidth > btnUpdateCheckWidth ? btnUpdateCheckingWidth : btnUpdateCheckWidth;
+
+					if (ImGui::GW2::Button(checkedForUpdates == -1 ? Language.Translate("((000035))") : Language.Translate("((000071))"), ImVec2(btnUCWidth + 16.0f, btnHeight)))
 					{
-						const std::lock_guard<std::mutex> lock(Loader::Mutex);
+						if (checkedForUpdates == -1)
 						{
-							for (auto& [path, addon] : Loader::Addons)
+							const std::lock_guard<std::mutex> lock(Loader::Mutex);
 							{
-								if (nullptr == addon->Definitions) { continue; }
+								checkedForUpdates = 0;
+								queuedForCheck = 0;
+								/* pre-iterate to get the count of how many need to be checked, else one call might finish before the count can be incremented */
+								for (auto& [path, addon] : Loader::Addons)
+								{
+									if (nullptr == addon->Definitions) { continue; }
+									queuedForCheck++;
+								}
 
-								std::filesystem::path tmpPath = path.string();
-								signed int tmpSig = addon->Definitions->Signature;
-								std::string tmpName = addon->Definitions->Name;
-								AddonVersion tmpVers = addon->Definitions->Version;
-								EUpdateProvider tmpProv = addon->Definitions->Provider;
-								std::string tmpLink = addon->Definitions->UpdateLink != nullptr ? addon->Definitions->UpdateLink : "";
+								for (auto& [path, addon] : Loader::Addons)
+								{
+									if (nullptr == addon->Definitions) { continue; }
 
-								std::thread([tmpPath, tmpSig, tmpName, tmpVers, tmpProv, tmpLink]()
-									{
-										if (Loader::UpdateAddon(tmpPath, tmpSig, tmpName, tmpVers, tmpProv, tmpLink))
+									std::filesystem::path tmpPath = path.string();
+									signed int tmpSig = addon->Definitions->Signature;
+									std::string tmpName = addon->Definitions->Name;
+									AddonVersion tmpVers = addon->Definitions->Version;
+									EUpdateProvider tmpProv = addon->Definitions->Provider;
+									std::string tmpLink = addon->Definitions->UpdateLink != nullptr ? addon->Definitions->UpdateLink : "";
+
+									std::thread([tmpPath, tmpSig, tmpName, tmpVers, tmpProv, tmpLink]()
 										{
-											Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
-										}
-									})
-									.detach();
+											if (Loader::UpdateAddon(tmpPath, tmpSig, tmpName, tmpVers, tmpProv, tmpLink))
+											{
+												Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
+											}
+											checkedForUpdates++;
+
+											if (checkedForUpdates == queuedForCheck)
+											{
+												checkedForUpdates = -1;
+												queuedForCheck = 0;
+											}
+										})
+										.detach();
+								}
 							}
 						}
 					}

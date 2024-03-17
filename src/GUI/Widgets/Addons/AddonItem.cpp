@@ -115,30 +115,37 @@ namespace GUI
 					ImGui::ImageButton(BtnOptions->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling));
 					if (ImGui::BeginPopupContextItem("##AddonItemActionsMore"))
 					{
-						if (ImGui::GW2::ContextMenuItem(("Update##" + sig).c_str(), Language.Translate("((000011))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+						if (ImGui::GW2::ContextMenuItem(("Update##" + sig).c_str(), !aAddon->IsCheckingForUpdates ? Language.Translate("((000011))") : Language.Translate("((000071))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 						{
-							for (auto& it : Loader::Addons)
+							if (!aAddon->IsCheckingForUpdates)
 							{
-								if (it.second->Definitions == aAddon->Definitions)
+								for (auto& it : Loader::Addons)
 								{
-									std::filesystem::path tmpPath = it.first.string();
-									signed int tmpSig = aAddon->Definitions->Signature;
-									std::string tmpName = aAddon->Definitions->Name;
-									AddonVersion tmpVers = aAddon->Definitions->Version;
-									EUpdateProvider tmpProv = aAddon->Definitions->Provider;
-									std::string tmpLink = aAddon->Definitions->UpdateLink != nullptr ? aAddon->Definitions->UpdateLink : "";
+									if (it.second->Definitions == aAddon->Definitions)
+									{
+										aAddon->IsCheckingForUpdates = true;
 
-									std::thread([tmpPath, tmpSig, tmpName, tmpVers, tmpProv, tmpLink]()
-										{
-											if (Loader::UpdateAddon(tmpPath, tmpSig, tmpName, tmpVers, tmpProv, tmpLink))
+										std::filesystem::path tmpPath = it.first.string();
+										signed int tmpSig = aAddon->Definitions->Signature;
+										std::string tmpName = aAddon->Definitions->Name;
+										AddonVersion tmpVers = aAddon->Definitions->Version;
+										EUpdateProvider tmpProv = aAddon->Definitions->Provider;
+										std::string tmpLink = aAddon->Definitions->UpdateLink != nullptr ? aAddon->Definitions->UpdateLink : "";
+
+										std::thread([aAddon, tmpPath, tmpSig, tmpName, tmpVers, tmpProv, tmpLink]()
 											{
-												Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
-											}
-										})
-										.detach();
+												if (Loader::UpdateAddon(tmpPath, tmpSig, tmpName, tmpVers, tmpProv, tmpLink))
+												{
+													Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
+												}
+												Sleep(1000); // arbitrary sleep otherwise the user never even sees "is checking..."
+												aAddon->IsCheckingForUpdates = false;
+											})
+											.detach();
 
-										//LogDebug(CH_GUI, "Update called: %s", it.second->Definitions->Name);
-										break;
+											//LogDebug(CH_GUI, "Update called: %s", it.second->Definitions->Name);
+											break;
+									}
 								}
 							}
 						}
