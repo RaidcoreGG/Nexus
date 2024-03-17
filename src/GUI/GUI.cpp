@@ -687,35 +687,35 @@ namespace GUI
 			config.MergeMode = true;
 
 			/* small UI*/
-			FontIndex.emplace(EFont::Menomonia_Small, io.Fonts->AddFontFromMemoryTTF(resM, szM, 16.0f));
+			FontIndex.emplace(EFont::Menomonia_Small, io.Fonts->AddFontFromMemoryTTF(resM, szM, 16.0f, 0, ranges.Data));
 			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 16.0f, &config, ranges.Data); }
-			FontIndex.emplace(EFont::MenomoniaBig_Small, io.Fonts->AddFontFromMemoryTTF(resM, szM, 22.0f));
+			FontIndex.emplace(EFont::MenomoniaBig_Small, io.Fonts->AddFontFromMemoryTTF(resM, szM, 22.0f, 0, ranges.Data));
 			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 22.0f, &config, ranges.Data); }
-			FontIndex.emplace(EFont::Trebuchet_Small, io.Fonts->AddFontFromMemoryTTF(resT, szT, 15.0f));
+			FontIndex.emplace(EFont::Trebuchet_Small, io.Fonts->AddFontFromMemoryTTF(resT, szT, 15.0f, 0, ranges.Data));
 			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 15.0f, &config, ranges.Data); }
 
 			/* normal UI*/
-			FontIndex.emplace(EFont::Menomonia_Normal, io.Fonts->AddFontFromMemoryTTF(resM, szM, 18.0f));
+			FontIndex.emplace(EFont::Menomonia_Normal, io.Fonts->AddFontFromMemoryTTF(resM, szM, 18.0f, 0, ranges.Data));
 			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 18.0f, &config, ranges.Data); }
-			FontIndex.emplace(EFont::MenomoniaBig_Normal, io.Fonts->AddFontFromMemoryTTF(resM, szM, 24.0f));
+			FontIndex.emplace(EFont::MenomoniaBig_Normal, io.Fonts->AddFontFromMemoryTTF(resM, szM, 24.0f, 0, ranges.Data));
 			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 24.0f, &config, ranges.Data); }
-			FontIndex.emplace(EFont::Trebuchet_Normal, io.Fonts->AddFontFromMemoryTTF(resT, szT, 16.0f));
+			FontIndex.emplace(EFont::Trebuchet_Normal, io.Fonts->AddFontFromMemoryTTF(resT, szT, 16.0f, 0, ranges.Data));
 			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 16.0f, &config, ranges.Data); }
 
 			/* large UI*/
-			FontIndex.emplace(EFont::Menomonia_Large, io.Fonts->AddFontFromMemoryTTF(resM, szM, 20.0f));
+			FontIndex.emplace(EFont::Menomonia_Large, io.Fonts->AddFontFromMemoryTTF(resM, szM, 20.0f, 0, ranges.Data));
 			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 20.0f, &config, ranges.Data); }
-			FontIndex.emplace(EFont::MenomoniaBig_Large, io.Fonts->AddFontFromMemoryTTF(resM, szM, 26.0f));
+			FontIndex.emplace(EFont::MenomoniaBig_Large, io.Fonts->AddFontFromMemoryTTF(resM, szM, 26.0f, 0, ranges.Data));
 			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 26.0f, &config, ranges.Data); }
-			FontIndex.emplace(EFont::Trebuchet_Large, io.Fonts->AddFontFromMemoryTTF(resT, szT, 17.5f));
+			FontIndex.emplace(EFont::Trebuchet_Large, io.Fonts->AddFontFromMemoryTTF(resT, szT, 17.5f, 0, ranges.Data));
 			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 17.5f, &config, ranges.Data); }
 
 			/* larger UI*/
-			FontIndex.emplace(EFont::Menomonia_Larger, io.Fonts->AddFontFromMemoryTTF(resM, szM, 22.0f));
+			FontIndex.emplace(EFont::Menomonia_Larger, io.Fonts->AddFontFromMemoryTTF(resM, szM, 22.0f, 0, ranges.Data));
 			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 22.0f, &config, ranges.Data); }
-			FontIndex.emplace(EFont::MenomoniaBig_Larger, io.Fonts->AddFontFromMemoryTTF(resM, szM, 28.0f));
+			FontIndex.emplace(EFont::MenomoniaBig_Larger, io.Fonts->AddFontFromMemoryTTF(resM, szM, 28.0f, 0, ranges.Data));
 			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 28.0f, &config, ranges.Data); }
-			FontIndex.emplace(EFont::Trebuchet_Larger, io.Fonts->AddFontFromMemoryTTF(resT, szT, 19.5f));
+			FontIndex.emplace(EFont::Trebuchet_Larger, io.Fonts->AddFontFromMemoryTTF(resT, szT, 19.5f, 0, ranges.Data));
 			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 19.5f, &config, ranges.Data); }
 		}
 
