@@ -30,7 +30,7 @@ namespace GUI
 	std::string CurrentlyEditing;
 	char CurrentAPIKey[73]{};
 
-	const char* qaLocations[] = { "Extend", "Under", "Bottom", "Custom" };
+	const char* qaLocations[] = { "((000067))", "((000068))", "((000069))", "((000070))" };
 	const char** languages;
 	int languagesIndex;
 	int languagesSize;
@@ -42,6 +42,14 @@ namespace GUI
 	void KeybindsTab();
 	void APITab();
 
+	static bool LocalizedItemsGetter(void* data, int idx, const char** out_text)
+	{
+		const char* const* items = (const char* const*)data;
+		if (out_text)
+			*out_text = items[idx];
+		return true;
+	}
+	
 	COptionsWindow::COptionsWindow(std::string aName)
 	{
 		Name = aName;
@@ -136,10 +144,24 @@ namespace GUI
 					}
 
 					ImGui::Text(Language.Translate("((000050))"));
-					if (ImGui::Combo("##qalocation", (int*)&QuickAccess::Location, qaLocations, IM_ARRAYSIZE(qaLocations)))
+					if (ImGui::BeginCombo("##qalocation", Language.Translate(qaLocations[(int)QuickAccess::Location])))
 					{
-						Settings::Settings[OPT_QALOCATION] = QuickAccess::Location;
-						Settings::Save();
+						for (int n = 0; n < IM_ARRAYSIZE(qaLocations); n++)
+						{
+							bool is_selected = ((int)QuickAccess::Location == n); // You can store your selection however you want, outside or inside your objects
+							if (ImGui::Selectable(Language.Translate(qaLocations[n]), is_selected))
+							{
+								QuickAccess::Location = (EQAPosition)n;
+								Settings::Settings[OPT_QALOCATION] = QuickAccess::Location;
+								Settings::Save();
+							}
+							if (is_selected)
+							{
+								ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+							}
+						}
+
+						ImGui::EndCombo();
 					}
 					ImGui::Text(Language.Translate("((000051))"));
 					if (ImGui::InputFloat2("##qaoffset", (float*)&QuickAccess::Offset))
