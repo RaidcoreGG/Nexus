@@ -99,11 +99,11 @@ namespace Mumble
 
 			if (MumbleLink != nullptr)
 			{
-				//IsGameplay = UI Tick changed               and  FrameCounter changed            or it was gameplay
-				IsGameplay = (prevTick != MumbleLink->UITick && prevFrameCounter != FrameCounter) || IsGameplay;
+				IsGameplay = prevTick != MumbleLink->UITick || (prevFrameCounter == FrameCounter && IsGameplay);
 				IsMoving = prevAvPos != MumbleLink->AvatarPosition;
 				IsCameraMoving = prevCamFront != MumbleLink->CameraFront;
 
+				prevFrameCounter = FrameCounter;
 				prevTick = MumbleLink->UITick;
 				prevAvPos = MumbleLink->AvatarPosition;
 				prevCamFront = MumbleLink->CameraFront;
