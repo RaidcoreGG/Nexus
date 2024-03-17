@@ -28,6 +28,8 @@ extern AddonVersion					Version;
 extern std::vector<std::string>		Parameters;
 extern std::vector<signed int>		RequestedAddons;
 
+extern long long					FrameCounter;
+
 extern LinkedMem*                   MumbleLink;
 extern Identity*                    MumbleIdentity;
 extern bool							IsMoving;

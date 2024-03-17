@@ -124,6 +124,8 @@ namespace Hooks
 			GUI::Render();
 		}
 		
+		FrameCounter++;
+
 		return Hooks::DXGI::Present(pChain, SyncInterval, Flags);
 	}
 	HRESULT __stdcall DXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
