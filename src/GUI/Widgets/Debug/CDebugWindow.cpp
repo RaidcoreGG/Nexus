@@ -271,8 +271,8 @@ namespace GUI
 					{
 						if (ImGui::TreeNode(identifier.c_str()))
 						{
-							ImGui::TextDisabled("Texture: %p", shortcut.TextureNormal->Resource);
-							ImGui::TextDisabled("Texture (Hover): %p", shortcut.TextureHover->Resource);
+							ImGui::TextDisabled("Texture: %p", shortcut.TextureNormal != nullptr ? shortcut.TextureNormal->Resource : nullptr);
+							ImGui::TextDisabled("Texture (Hover): %p", shortcut.TextureHover != nullptr ? shortcut.TextureHover->Resource : nullptr);
 							ImGui::TextDisabled("OnClick (Keybind): %s", shortcut.Keybind.length() != 0 ? shortcut.Keybind.c_str() : "(null)");
 							ImGui::TextDisabled("Tooltip: %s", shortcut.TooltipText.length() != 0 ? shortcut.TooltipText.c_str() : "(null)");
 							ImGui::TextDisabled("IsHovering: %s", shortcut.IsHovering ? "true" : "false");
