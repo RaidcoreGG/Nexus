@@ -462,8 +462,8 @@ namespace GUI
 				ImGui::TextColoredOutlined(ImVec4(1, 0, 0, 1), Language.Translate("((000002))"));
 				ImGui::PopFont();
 
-				ImGui::End();
 			}
+			ImGui::End();
 
 			ImGui::PopStyleVar();
 		}
