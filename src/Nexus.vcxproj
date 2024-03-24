@@ -18,6 +18,7 @@
     <ClCompile Include="core.cpp" />
     <ClCompile Include="CrashHandler.cpp" />
     <ClCompile Include="DataLink\DataLink.cpp" />
+    <ClCompile Include="Events\EventSubscriber.cpp" />
     <ClCompile Include="Localization\Localization.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Events\EventHandler.cpp" />
@@ -84,6 +85,7 @@
     <ClInclude Include="DataLink\FuncDefs.h" />
     <ClInclude Include="DataLink\LinkedResource.h" />
     <ClInclude Include="Events\EventHandler.h" />
+    <ClInclude Include="Events\EventSubscriber.h" />
     <ClInclude Include="Events\FuncDefs.h" />
     <ClInclude Include="GUI\EFontIdentifier.h" />
     <ClInclude Include="GUI\ERenderType.h" />

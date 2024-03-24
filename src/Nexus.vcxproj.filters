@@ -309,6 +309,9 @@
     <ClCompile Include="Localization\Localization.cpp">
       <Filter>Localization</Filter>
     </ClCompile>
+    <ClCompile Include="Events\EventSubscriber.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imstb_truetype.h">
@@ -1048,6 +1051,9 @@
     </ClInclude>
     <ClInclude Include="Localization\FuncDefs.h">
       <Filter>Localization</Filter>
+    </ClInclude>
+    <ClInclude Include="Events\EventSubscriber.h">
+      <Filter>Events</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

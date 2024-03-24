@@ -100,9 +100,9 @@ namespace GUI
 							else
 							{
 								ImGui::TextDisabled("Subscribers:");
-								for (EVENT_CONSUME callback : subscribers)
+								for (EventSubscriber sub : subscribers)
 								{
-									ImGui::Text(""); ImGui::SameLine(); ImGui::TextDisabled("%p", callback);
+									ImGui::Text(""); ImGui::SameLine(); ImGui::TextDisabled("Owner: %d | Callback: %p", sub.Signature, sub.Callback);
 								}
 							}
 							ImGui::TreePop();
