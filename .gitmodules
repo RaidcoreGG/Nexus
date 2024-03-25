@@ -1,0 +1,3 @@
+[submodule "src/Resources/Locales"]
+	path = src/Resources/Locales
+	url = https://github.com/RaidcoreGG/Nexus-Translations
