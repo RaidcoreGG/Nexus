@@ -202,7 +202,7 @@ namespace TextureLoader
 		int image_width = 0;
 		int image_height = 0;
 		int image_components = 0;
-		unsigned char* image_data = stbi_load_from_memory((const stbi_uc*)imageFile, imageFileSize, &image_width, &image_height, &image_components, 0);
+		unsigned char* image_data = stbi_load_from_memory((const stbi_uc*)imageFile, imageFileSize, &image_width, &image_height, &image_components, 4);
 
 		QueueTexture(str.c_str(), image_data, image_width, image_height, aCallback);
 	}
@@ -249,9 +249,9 @@ namespace TextureLoader
 
 		int image_width = 0;
 		int image_height = 0;
-		int comp;
+		int image_components;
 
-		stbi_uc* data = stbi_load_from_memory(remote_data, static_cast<int>(size), &image_width, &image_height, &comp, 0);
+		stbi_uc* data = stbi_load_from_memory(remote_data, static_cast<int>(size), &image_width, &image_height, &image_components, 4);
 
 		delete[] remote_data;
 
@@ -280,7 +280,7 @@ namespace TextureLoader
 		int image_width = 0;
 		int image_height = 0;
 		int image_components = 0;
-		unsigned char* image_data = stbi_load_from_memory((const stbi_uc*)aData, static_cast<int>(aSize), &image_width, &image_height, &image_components, 0);
+		unsigned char* image_data = stbi_load_from_memory((const stbi_uc*)aData, static_cast<int>(aSize), &image_width, &image_height, &image_components, 4);
 
 		QueueTexture(str.c_str(), image_data, image_width, image_height, aCallback);
 	}
