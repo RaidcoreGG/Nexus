@@ -54,9 +54,9 @@ namespace LogHandler
 	void LogDebug(const std::string& aChannel, const char* aFmt, ...)        { va_list args; va_start(args, aFmt);   LogMessage(ELogLevel::DEBUG,    aChannel, aFmt, args); va_end(args); }
 
 	/* Basic logging functions */
-	void LogMessageA(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, ...)			{ va_list args; va_start(args, aFmt); LogMessage(aLogLevel, aChannel, aFmt, args); va_end(args); }
-	void LogMessageAddon(ELogLevel aLogLevel, const char* aStr)									{ LogMessageA(aLogLevel, "Addon", aStr); }
-	void ADDONAPI_LogMessageAddon2(ELogLevel aLogLevel, const char* aChannel, const char* aStr)	{ LogMessageA(aLogLevel, aChannel, aStr); }
+	void LogMessageV(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, ...)			{ va_list args; va_start(args, aFmt); LogMessage(aLogLevel, aChannel, aFmt, args); va_end(args); }
+	void ADDONAPI_LogMessage(ELogLevel aLogLevel, const char* aStr)								{ LogMessage(aLogLevel, "Addon", aStr); }
+	void ADDONAPI_LogMessage2(ELogLevel aLogLevel, const char* aChannel, const char* aStr)		{ LogMessage(aLogLevel, aChannel, aStr); }
 
 	/* Logging internal functions */
 	void LogMessage(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, va_list aArgs)
@@ -78,6 +78,35 @@ namespace LogHandler
 		vsprintf_s(buffer, 4096, aFmt, aArgs);
 
 		entry.Message = std::string(&buffer[0], &buffer[strlen(buffer)]);
+
+		{
+			LogEntries.push_back(entry);
+			for (ILogger* logger : Registry)
+			{
+				/* send logged message to logger if message log level is lower than logger level */
+				if (entry.LogLevel <= logger->GetLogLevel())
+				{
+					logger->LogMessage(entry);
+				}
+			}
+		}
+	}
+	void LogMessage(ELogLevel aLogLevel, std::string aChannel, const char* aMsg)
+	{
+		LogEntry entry;
+		entry.LogLevel = aLogLevel;
+		entry.Timestamp = time(NULL);
+		entry.Channel = aChannel;
+
+		const std::lock_guard<std::mutex> lock(Mutex);
+		{
+			if (std::find(Channels.begin(), Channels.end(), aChannel) == Channels.end())
+			{
+				Channels.push_back(aChannel);
+			}
+		}
+
+		entry.Message = aMsg;
 
 		{
 			LogEntries.push_back(entry);

@@ -1515,7 +1515,7 @@ namespace Loader
 			((AddonAPI1*)api)->EnableHook = MH_EnableHook;
 			((AddonAPI1*)api)->DisableHook = MH_DisableHook;
 
-			((AddonAPI1*)api)->Log = LogMessageAddon;
+			((AddonAPI1*)api)->Log = ADDONAPI_LogMessage;
 
 			((AddonAPI1*)api)->RaiseEvent = Events::Raise;
 			((AddonAPI1*)api)->SubscribeEvent = Events::Subscribe;
@@ -1563,7 +1563,7 @@ namespace Loader
 			((AddonAPI2*)api)->EnableHook = MH_EnableHook;
 			((AddonAPI2*)api)->DisableHook = MH_DisableHook;
 
-			((AddonAPI2*)api)->Log = ADDONAPI_LogMessageAddon2;
+			((AddonAPI2*)api)->Log = ADDONAPI_LogMessage2;
 
 			((AddonAPI2*)api)->RaiseEvent = Events::Raise;
 			((AddonAPI2*)api)->RaiseEventNotification = Events::RaiseNotification;

@@ -29,12 +29,13 @@ namespace LogHandler
 	void LogDebug(const std::string& aChannel, const char* aFmt, ...);
 	
 	/* Basic logging functions */
-	void LogMessageA(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, ...);
-	void LogMessageAddon(ELogLevel aLogLevel, const char* aStr);
-	void ADDONAPI_LogMessageAddon2(ELogLevel aLogLevel, const char* aChannel, const char* aStr);
+	void LogMessageV(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, ...);
+	void ADDONAPI_LogMessage(ELogLevel aLogLevel, const char* aStr);
+	void ADDONAPI_LogMessage2(ELogLevel aLogLevel, const char* aChannel, const char* aStr);
 
 	/* Logging internal functions */
 	void LogMessage(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, va_list aArgs);
+	void LogMessage(ELogLevel aLogLevel, std::string aChannel, const char* aMsg);
 }
 
 #endif

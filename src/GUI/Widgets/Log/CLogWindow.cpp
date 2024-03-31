@@ -191,7 +191,7 @@ namespace GUI
 								}
 
 								ImGui::SetCursorPos(pos);
-								ImGui::Text(msgPart.c_str());
+								ImGui::TextUnformatted(msgPart.c_str());
 								pos.x += currWidth;
 
 								if (popAfter && colStack.size() > 0)
