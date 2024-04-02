@@ -231,6 +231,11 @@ namespace GUI
 					ImGui::TooltipGeneric(Language.Translate("((000055))"));
 				}
 
+				const float MIN_SCALE = 0.3f;
+				const float MAX_SCALE = 2.0f;
+				ImGuiIO& io = ImGui::GetIO();
+				ImGui::DragFloat("global scale", &io.FontGlobalScale, 0.005f, MIN_SCALE, MAX_SCALE, "%.2f", ImGuiSliderFlags_AlwaysClamp);
+
 				ImGui::Separator();
 
 				if (ImGui::Checkbox(Language.Translate("((000056))"), &GUI::LinkArcDPSStyle))

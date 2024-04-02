@@ -12,7 +12,6 @@ enum class EAddonState
 
 	Loaded,							/* Addon is loaded. */
 	LoadedLOCKED					/* Addon is loaded, but locked and mustn't be unloaded. */
-
 };
 
 #endif

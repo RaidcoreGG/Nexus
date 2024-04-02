@@ -53,6 +53,7 @@ namespace GUI
 		TabIndex = 0;
 		Tab1Hovered = false;
 		Tab2Hovered = false;
+		Tab3Hovered = false;
 	}
 
 	void CAddonsWindow::Render()
@@ -106,20 +107,22 @@ namespace GUI
 
 			ImVec2 text1sz = ImGui::CalcTextSize(Language.Translate("((000031))"));
 			ImVec2 text2sz = ImGui::CalcTextSize(Language.Translate("((000032))"));
+			ImVec2 text3sz = ImGui::CalcTextSize(Language.Translate("ArcDPS Plugins"));
 
-			float tab1width = 92.0f > text1sz.x ? 92.0f : text1sz.x + 50.0f;
-			float tab2width = 92.0f > text2sz.x ? 92.0f : text2sz.x + 50.0f;
+			float tab1width = 96.0f > text1sz.x + 16.0f ? 96.0f : text1sz.x + 32.0f;
+			float tab2width = 96.0f > text2sz.x + 16.0f ? 96.0f : text2sz.x + 32.0f;
+			float tab3width = 96.0f > text3sz.x + 16.0f ? 96.0f : text3sz.x + 32.0f;
 
 			ImVec2 text1offset = ImVec2(((tab1width * Renderer::Scaling) - text1sz.x) / 2, ((24.0f * Renderer::Scaling) - text1sz.y) / 2);
 			ImVec2 text2offset = ImVec2(((tab2width * Renderer::Scaling) - text2sz.x) / 2, ((24.0f * Renderer::Scaling) - text2sz.y) / 2);
+			ImVec2 text3offset = ImVec2(((tab3width * Renderer::Scaling) - text3sz.x) / 2, ((24.0f * Renderer::Scaling) - text3sz.y) / 2);
 			
-			ImVec2 tab1origin = ImGui::GetCursorPos(); // 28.0f, 28.0f
-
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
 
+			ImVec2 tab1origin = ImGui::GetCursorPos(); // 28.0f, 28.0f
 			if (ImGui::ImageButton(!Tab1Hovered ? TabBtn->Resource : TabBtnHover->Resource, ImVec2(tab1width * Renderer::Scaling, 24.0f * Renderer::Scaling)))
 			{
 				TabIndex = 0;
@@ -129,12 +132,20 @@ namespace GUI
 			ImGui::SameLine();
 
 			ImVec2 tab2origin = ImGui::GetCursorPos();
-
 			if (ImGui::ImageButton(!Tab2Hovered ? TabBtn->Resource : TabBtnHover->Resource, ImVec2(tab2width * Renderer::Scaling, 24.0f * Renderer::Scaling)))
 			{
 				TabIndex = 1;
 			}
 			Tab2Hovered = ImGui::IsItemHovered();
+
+			ImGui::SameLine();
+
+			ImVec2 tab3origin = ImGui::GetCursorPos();
+			if (ImGui::ImageButton(!Tab3Hovered ? TabBtn->Resource : TabBtnHover->Resource, ImVec2(tab3width * Renderer::Scaling, 24.0f * Renderer::Scaling)))
+			{
+				TabIndex = 2;
+			}
+			Tab3Hovered = ImGui::IsItemHovered();
 
 			ImGui::PopStyleColor(3);
 			ImGui::PopStyleVar();
@@ -145,6 +156,9 @@ namespace GUI
 			ImGui::SetCursorPos(ImVec2(tab2origin.x + text2offset.x, tab2origin.y + text2offset.y));
 			ImGui::TextColored(TabIndex == 1 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000032))"));
 
+			ImGui::SetCursorPos(ImVec2(tab3origin.x + text3offset.x, tab3origin.y + text3offset.y));
+			ImGui::TextColored(TabIndex == 2 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("ArcDPS Plugins"));
+			
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
@@ -293,6 +307,21 @@ namespace GUI
 					}
 
 					ImGui::Checkbox(Language.Translate("((000038))"), &showInstalled);
+				}
+				else if (TabIndex == 2)
+				{
+					ImGui::Text("text1sz: %f", text1sz.x);
+					ImGui::Text("text2sz: %f", text2sz.x);
+					ImGui::Text("text3sz: %f", text3sz.x);
+					ImGui::Text("tab1width: %f", tab1width);
+					ImGui::Text("tab2width: %f", tab2width);
+					ImGui::Text("tab2width: %f", tab3width);
+					ImGui::Text("text1offset: %f", text1offset.x);
+					ImGui::Text("text2offset: %f", text2offset.x);
+					ImGui::Text("text3offset: %f", text3offset.x);
+					ImGui::Text("tab1origin: %f", tab1origin.x);
+					ImGui::Text("tab2origin: %f", tab2origin.x);
+					ImGui::Text("tab3origin: %f", tab3origin.x);
 				}
 
 				ImGui::EndChild();
