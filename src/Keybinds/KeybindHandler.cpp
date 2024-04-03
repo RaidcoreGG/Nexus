@@ -250,12 +250,15 @@ namespace Keybinds
 	{
 		std::string str = aIdentifier;
 
-		const std::lock_guard<std::mutex> lock(Mutex);
-
-		auto it = Registry.find(str);
-		if (it != Registry.end())
 		{
-			it->second.Handler = nullptr;
+			/* explicitly scoping here because the subsequent Save call will also lock the mutex */
+			const std::lock_guard<std::mutex> lock(Mutex);
+
+			auto it = Registry.find(str);
+			if (it != Registry.end())
+			{
+				it->second.Handler = nullptr;
+			}
 		}
 
 		Save();
