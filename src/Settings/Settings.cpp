@@ -1,3 +1,11 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  Settings.cpp
+/// Description  :  Provides functions to load and save settings.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #include "Settings.h"
 
 #include <filesystem>
@@ -47,6 +55,7 @@ namespace Settings
 			LogWarning(CH_CORE, "Settings.json could not be parsed. Error: %s", ex.what());
 		}
 	}
+
 	void Save()
 	{
 		const std::lock_guard<std::mutex> lock(Mutex);

@@ -1,3 +1,11 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  Multibox.cpp
+/// Description  :  Provides functions to enable multiboxing.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #include "Multibox.h"
 
 #define UMDF_USING_NTSTATUS

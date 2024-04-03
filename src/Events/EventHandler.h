@@ -1,3 +1,11 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  EventHandler.h
+/// Description  :  Provides functions raise and receive events.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #ifndef EVENTHANDLER_H
 #define EVENTHANDLER_H
 

@@ -1,3 +1,11 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  WndProcHandler.h
+/// Description  :  Proxy for WndProc callbacks/hooks.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #ifndef WNDPROCHANDLER_H
 #define WNDPROCHANDLER_H
 
@@ -6,23 +14,42 @@
 
 #include "FuncDefs.h"
 
+///----------------------------------------------------------------------------------------------------
+/// WndProc Namespace
+///----------------------------------------------------------------------------------------------------
 namespace WndProc
 {
 	extern std::mutex						Mutex;
 	extern std::vector<WNDPROC_CALLBACK>	Registry;
 
-	/* Returns 0 if message was processed. */
+	///----------------------------------------------------------------------------------------------------
+	/// WndProc:
+	/// 	Returns 0 if message was processed or non-zero, if it should be passed to the next callback.
+	///----------------------------------------------------------------------------------------------------
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	/* Skips all wndproc hooks and sends to game only. */
+	///----------------------------------------------------------------------------------------------------
+	/// SendWndProcToGame:
+	/// 	Skips all WndProc callbacks and sends to game only.
+	///----------------------------------------------------------------------------------------------------
 	LRESULT SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	/* Registers the provided WndProcCallback. */
+	///----------------------------------------------------------------------------------------------------
+	/// Register:
+	/// 	Registers the provided WndProcCallback.
+	///----------------------------------------------------------------------------------------------------
 	void Register(WNDPROC_CALLBACK aWndProcCallback);
-	/* Deregisters the provided WndProcCallback. */
+
+	///----------------------------------------------------------------------------------------------------
+	/// Deregister:
+	/// 	Deregisters the provided WndProcCallback.
+	///----------------------------------------------------------------------------------------------------
 	void Deregister(WNDPROC_CALLBACK aWndProcCallback);
 
-	/* Removes all WndProc Callbacks that are within the provided address space. */
+	///----------------------------------------------------------------------------------------------------
+	/// Verify:
+	/// 	Removes all WndProc Callbacks that are within the provided address space.
+	///----------------------------------------------------------------------------------------------------
 	int Verify(void* aStartAddress, void* aEndAddress);
 }
 

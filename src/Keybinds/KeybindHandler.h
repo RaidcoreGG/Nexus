@@ -1,3 +1,11 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  KeybindHandler.h
+/// Description  :  Provides functions for keybinds.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #ifndef KEYBINDHANDLER_H
 #define KEYBINDHANDLER_H
 
@@ -11,47 +19,110 @@
 #include "ActiveKeybind.h"
 #include "Keybind.h"
 
+///----------------------------------------------------------------------------------------------------
+/// Keybinds Namespace
+///----------------------------------------------------------------------------------------------------
+namespace Keybinds
+{
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_RegisterWithString:
+	/// 	Addon API wrapper function for Register from string.
+	///----------------------------------------------------------------------------------------------------
+	void ADDONAPI_RegisterWithString(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const char* aKeybind);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_RegisterWithStruct:
+	/// 	Addon API wrapper function for Register from struct.
+	///----------------------------------------------------------------------------------------------------
+	void ADDONAPI_RegisterWithStruct(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, Keybind aKeybind);
+}
+
+///----------------------------------------------------------------------------------------------------
+/// Keybinds Namespace
+///----------------------------------------------------------------------------------------------------
 namespace Keybinds
 {
 	extern std::mutex								Mutex;
 	extern std::map<std::string, ActiveKeybind>		Registry;
 
-	/* Keybind setting helpers */
 	extern bool										IsSettingKeybind;
 	extern Keybind									CurrentKeybind;
 	extern std::string								CurrentKeybindUsedBy;
 
 	extern std::map<unsigned short, std::string>	ScancodeLookupTable;
 
-	/* Sets up the ScancodeLookupTable */
+	///----------------------------------------------------------------------------------------------------
+	/// Initialize:
+	/// 	Sets up the ScancodeLookupTable and loads the keybinds.
+	///----------------------------------------------------------------------------------------------------
 	void Initialize();
 
-	/* Returns 0 if message was processed. */
+	///----------------------------------------------------------------------------------------------------
+	/// WndProc:
+	/// 	Returns 0 if a keybind was invoked.
+	///----------------------------------------------------------------------------------------------------
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	/* Loads the keybinds. */
+	///----------------------------------------------------------------------------------------------------
+	/// Load:
+	/// 	Loads the keybinds.
+	///----------------------------------------------------------------------------------------------------
 	void Load();
-	/* Saves the keybinds. */
+
+	///----------------------------------------------------------------------------------------------------
+	/// Save:
+	/// 	Saves the keybinds.
+	///----------------------------------------------------------------------------------------------------
 	void Save();
 
-	/* Generates and registers a keybind from the given string with the given identifier and handler, if no bind was previously stored the given one will be used. */
+	///----------------------------------------------------------------------------------------------------
+	/// Register:
+	/// 	Generates and registers a keybind from the given string with the given identifier and handler,
+	/// 	if no bind was previously stored the given one will be used.
+	///----------------------------------------------------------------------------------------------------
 	void Register(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const char* aKeybind);
-	/* Registers a keybind from the given struct with the given identifier and handler, if no bind was previously stored the given one will be used.*/
-	void RegisterWithStruct(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, Keybind aKeybind);
-	/* Frees up the associated KeybindHandler. */
+
+	///----------------------------------------------------------------------------------------------------
+	/// Register:
+	/// 	Registers a keybind from the given struct with the given identifier and handler,
+	/// 	if no bind was previously stored the given one will be used.
+	///----------------------------------------------------------------------------------------------------
+	void Register(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, Keybind aKeybind);
+
+	///----------------------------------------------------------------------------------------------------
+	/// Deregister:
+	/// 	Deregisters a KeybindHandler from an identifier.
+	///----------------------------------------------------------------------------------------------------
 	void Deregister(const char* aIdentifier);
 	
-	/* Returns an empty string if keybind is unused or the identifier that uses this keybind */
+	///----------------------------------------------------------------------------------------------------
+	/// IsInUse:
+	/// 	Returns an empty string if keybind is unused or the identifier that uses this keybind.
+	///----------------------------------------------------------------------------------------------------
 	std::string IsInUse(Keybind aKeybind);
-	/* Create a keybind from a string. */
+
+	///----------------------------------------------------------------------------------------------------
+	/// KBFromString:
+	/// 	Helper function to create a keybind from a string.
+	///----------------------------------------------------------------------------------------------------
 	Keybind KBFromString(std::string aKeybind);
 	
-	/* This will force set the keybind. (Invoked via menu/ui) */
+	///----------------------------------------------------------------------------------------------------
+	/// Set:
+	/// 	Sets a keybind.
+	///----------------------------------------------------------------------------------------------------
 	void Set(std::string aIdentifier, Keybind aKeybind);
-	/* Invokes the action on the corresponding keybind handler. Returns true if the keybind was dispatched. */
+
+	///----------------------------------------------------------------------------------------------------
+	/// Invoke:
+	/// 	Invokes the action on the corresponding keybind handler. Returns true if the keybind was dispatched.
+	///----------------------------------------------------------------------------------------------------
 	bool Invoke(std::string aIdentifier);
 
-	/* Removes all KeybindHandlers that are within the provided address space. */
+	///----------------------------------------------------------------------------------------------------
+	/// Verify:
+	/// 	Removes all KeybindHandlers that are within the provided address space.
+	///----------------------------------------------------------------------------------------------------
 	int Verify(void* aStartAddress, void* aEndAddress);
 };
 

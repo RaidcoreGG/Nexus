@@ -295,7 +295,7 @@ namespace Loader
 		{
 			PIDLIST_ABSOLUTE* ppidl;
 			LONG event;
-			HANDLE notificationLock = SHChangeNotification_Lock((HANDLE)wParam, lParam, &ppidl, &event);
+			HANDLE notificationLock = SHChangeNotification_Lock((HANDLE)wParam, static_cast<DWORD>(lParam), &ppidl, &event);
 
 			if (notificationLock != 0)
 			{
@@ -1524,8 +1524,8 @@ namespace Loader
 			((AddonAPI1*)api)->RegisterWndProc = WndProc::Register;
 			((AddonAPI1*)api)->DeregisterWndProc = WndProc::Deregister;
 
-			((AddonAPI1*)api)->RegisterKeybindWithString = Keybinds::Register;
-			((AddonAPI1*)api)->RegisterKeybindWithStruct = Keybinds::RegisterWithStruct;
+			((AddonAPI1*)api)->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString;
+			((AddonAPI1*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct;
 			((AddonAPI1*)api)->DeregisterKeybind = Keybinds::Deregister;
 
 			((AddonAPI1*)api)->GetResource = DataLink::GetResource;
@@ -1574,8 +1574,8 @@ namespace Loader
 			((AddonAPI2*)api)->DeregisterWndProc = WndProc::Deregister;
 			((AddonAPI2*)api)->SendWndProcToGameOnly = WndProc::SendWndProcToGame;
 
-			((AddonAPI2*)api)->RegisterKeybindWithString = Keybinds::Register;
-			((AddonAPI2*)api)->RegisterKeybindWithStruct = Keybinds::RegisterWithStruct;
+			((AddonAPI2*)api)->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString;
+			((AddonAPI2*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct;
 			((AddonAPI2*)api)->DeregisterKeybind = Keybinds::Deregister;
 
 			((AddonAPI2*)api)->GetResource = DataLink::GetResource;

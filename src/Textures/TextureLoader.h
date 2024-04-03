@@ -1,3 +1,11 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  TextureLoader.h
+/// Description  :  Provides functions to load textures and fetch created textures.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #ifndef TEXTURELOADER_H
 #define TEXTURELOADER_H
 
@@ -12,43 +20,121 @@
 #include "Texture.h"
 #include "QueuedTexture.h"
 
+///----------------------------------------------------------------------------------------------------
+/// TextureLoader Namespace
+///----------------------------------------------------------------------------------------------------
+namespace TextureLoader
+{
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_GetOrCreateFromFile:
+	/// 	Addon API wrapper function for GetOrCreate from file.
+	///----------------------------------------------------------------------------------------------------
+	Texture* ADDONAPI_GetOrCreateFromFile(const char* aIdentifier, const char* aFilename);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_GetOrCreateFromResource:
+	/// 	Addon API wrapper function for GetOrCreate from embedded resource.
+	///----------------------------------------------------------------------------------------------------
+	Texture* ADDONAPI_GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_GetOrCreateFromURL:
+	/// 	Addon API wrapper function for GetOrCreate from remote URL.
+	///----------------------------------------------------------------------------------------------------
+	Texture* ADDONAPI_GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_GetOrCreateFromMemory:
+	/// 	Addon API wrapper function for GetOrCreate from memory.
+	///----------------------------------------------------------------------------------------------------
+	Texture* ADDONAPI_GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize);
+}
+
+///----------------------------------------------------------------------------------------------------
+/// TextureLoader Namespace
+///----------------------------------------------------------------------------------------------------
 namespace TextureLoader
 {
 	extern std::mutex						Mutex;
 	extern std::map<std::string, Texture*>	Registry;
 	extern std::vector<QueuedTexture>		QueuedTextures;
 
-	/* Returns a Texture* with the given identifier or nullptr. */
+	///----------------------------------------------------------------------------------------------------
+	/// Get:
+	/// 	Returns a Texture* with the given identifier or nullptr.
+	///----------------------------------------------------------------------------------------------------
 	Texture* Get(const char* aIdentifier);
 
+	///----------------------------------------------------------------------------------------------------
+	/// GetOrCreate:
+	/// 	Returns a Texture* with the given identifier or creates it from file path.
+	///----------------------------------------------------------------------------------------------------
 	Texture* GetOrCreate(const char* aIdentifier, const char* aFilename);
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetOrCreate:
+	/// 	Returns a Texture* with the given identifier or creates it from embedded resource.
+	///----------------------------------------------------------------------------------------------------
 	Texture* GetOrCreate(const char* aIdentifier, unsigned aResourceID, HMODULE aModule);
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetOrCreate:
+	/// 	Returns a Texture* with the given identifier or creates it from remote URL.
+	///----------------------------------------------------------------------------------------------------
 	Texture* GetOrCreate(const char* aIdentifier, const char* aRemote, const char* aEndpoint);
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetOrCreate:
+	/// 	Returns a Texture* with the given identifier or creates it from memory.
+	///----------------------------------------------------------------------------------------------------
 	Texture* GetOrCreate(const char* aIdentifier, void* aData, size_t aSize);
 
-	Texture* ADDONAPI_GetOrCreateFromFile(const char* aIdentifier, const char* aFilename);
-	Texture* ADDONAPI_GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule);
-	Texture* ADDONAPI_GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint);
-	Texture* ADDONAPI_GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize);
-
-	/* Requests to load a texture from file. */
+	///----------------------------------------------------------------------------------------------------
+	/// LoadFromFile:
+	/// 	Requests to load a texture from file and returns to the given callback.
+	///----------------------------------------------------------------------------------------------------
 	void LoadFromFile(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback);
-	/* Requests to load a texture from an embedded resource. */
+
+	///----------------------------------------------------------------------------------------------------
+	/// LoadFromResource:
+	/// 	Requests to load a texture from an embedded resource and returns to the given callback.
+	///----------------------------------------------------------------------------------------------------
 	void LoadFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback);
-	/* Requests to load a texture from URL. */
+
+	///----------------------------------------------------------------------------------------------------
+	/// LoadFromURL:
+	/// 	Requests to load a texture from remote URL and returns to the given callback.
+	///----------------------------------------------------------------------------------------------------
 	void LoadFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback);
-	/* Requests to load a texture from memory. */
+
+	///----------------------------------------------------------------------------------------------------
+	/// LoadFromMemory:
+	/// 	Requests to load a texture from memory and returns to the given callback.
+	///----------------------------------------------------------------------------------------------------
 	void LoadFromMemory(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback);
 
-	/* Loads a custom user texture from disk if it exists, rather than the provided method. */
+	///----------------------------------------------------------------------------------------------------
+	/// OverrideTexture:
+	/// 	Internal function to override texture load with custom user texture on disk.
+	///----------------------------------------------------------------------------------------------------
 	bool OverrideTexture(const char* aIdentifier, TEXTURES_RECEIVECALLBACK aCallback);
 
-	/* Processes all currently queued textures. */
+	///----------------------------------------------------------------------------------------------------
+	/// ProcessQueue:
+	/// 	Processes all currently queued textures.
+	///----------------------------------------------------------------------------------------------------
 	void ProcessQueue();
 
-	/* Pushes a texture into the queue to load during the next frame. */
+	///----------------------------------------------------------------------------------------------------
+	/// QueueTexture:
+	/// 	Pushes a texture into the queue to load during the next frame.
+	///----------------------------------------------------------------------------------------------------
 	void QueueTexture(const char* aIdentifier, unsigned char* aImageData, unsigned aWidth, unsigned aHeight, TEXTURES_RECEIVECALLBACK aCallback);
-	/* Creates a texture and adds it to the registry. */
+
+	///----------------------------------------------------------------------------------------------------
+	/// CreateTexture:
+	/// 	Creates a texture and adds it to the registry.
+	///----------------------------------------------------------------------------------------------------
 	void CreateTexture(QueuedTexture aQueuedTexture);
 }
 

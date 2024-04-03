@@ -1,3 +1,11 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  KeybindHandler.cpp
+/// Description  :  Provides functions for keybinds.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+/// 
 #include "KeybindHandler.h"
 
 #include <fstream>
@@ -15,6 +23,19 @@
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
+
+namespace Keybinds
+{
+	void ADDONAPI_RegisterWithString(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const char* aKeybind)
+	{
+		Register(aIdentifier, aKeybindHandler, aKeybind);
+	}
+
+	void ADDONAPI_RegisterWithStruct(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, Keybind aKeybind)
+	{
+		Register(aIdentifier, aKeybindHandler, aKeybind);
+	}
+}
 
 namespace Keybinds
 {
@@ -123,81 +144,79 @@ namespace Keybinds
 		if (!std::filesystem::exists(Path::F_KEYBINDS)) { return; }
 
 		const std::lock_guard<std::mutex> lock(Mutex);
+		
+		try
 		{
-			try
+			std::ifstream file(Path::F_KEYBINDS);
+
+			json keybinds = json::parse(file);
+			for (json binding : keybinds)
 			{
-				std::ifstream file(Path::F_KEYBINDS);
-
-				json keybinds = json::parse(file);
-				for (json binding : keybinds)
+				if (binding.is_null() ||
+					binding["Key"].is_null() ||
+					binding["Alt"].is_null() ||
+					binding["Ctrl"].is_null() ||
+					binding["Shift"].is_null())
 				{
-					if (binding.is_null() ||
-						binding["Key"].is_null() ||
-						binding["Alt"].is_null() ||
-						binding["Ctrl"].is_null() ||
-						binding["Shift"].is_null())
-					{
-						LogDebug(CH_KEYBINDS, "One or more fields of keybind were null.");
-						continue;
-					}
-
-					Keybind kb{};
-					binding["Key"].get_to(kb.Key);
-					binding["Alt"].get_to(kb.Alt);
-					binding["Ctrl"].get_to(kb.Ctrl);
-					binding["Shift"].get_to(kb.Shift);
-
-					std::string identifier = binding["Identifier"].get<std::string>();
-
-					Registry[identifier].Bind = kb;
+					LogDebug(CH_KEYBINDS, "One or more fields of keybind were null.");
+					continue;
 				}
 
-				file.close();
+				Keybind kb{};
+				binding["Key"].get_to(kb.Key);
+				binding["Alt"].get_to(kb.Alt);
+				binding["Ctrl"].get_to(kb.Ctrl);
+				binding["Shift"].get_to(kb.Shift);
+
+				std::string identifier = binding["Identifier"].get<std::string>();
+
+				Registry[identifier].Bind = kb;
 			}
-			catch (json::parse_error& ex)
-			{
-				LogWarning(CH_KEYBINDS, "Keybinds.json could not be parsed. Error: %s", ex.what());
-			}
+
+			file.close();
+		}
+		catch (json::parse_error& ex)
+		{
+			LogWarning(CH_KEYBINDS, "Keybinds.json could not be parsed. Error: %s", ex.what());
 		}
 	}
 
 	void Save()
 	{
 		const std::lock_guard<std::mutex> lock(Mutex);
+		
+		json keybinds = json::array();
+
+		for (auto& it : Registry)
 		{
-			json keybinds = json::array();
+			Keybind kb = it.second.Bind;
+			std::string id = it.first;
 
-			for (auto& it : Registry)
+			json binding =
 			{
-				Keybind kb = it.second.Bind;
-				std::string id = it.first;
+				{"Identifier",	id},
+				{"Key",			kb.Key},
+				{"Alt",			kb.Alt},
+				{"Ctrl",		kb.Ctrl},
+				{"Shift",		kb.Shift}
+			};
 
-				json binding =
-				{
-					{"Identifier",	id},
-					{"Key",			kb.Key},
-					{"Alt",			kb.Alt},
-					{"Ctrl",		kb.Ctrl},
-					{"Shift",		kb.Shift}
-				};
-
-				keybinds.push_back(binding);
-			}
-
-			std::ofstream file(Path::F_KEYBINDS);
-
-			file << keybinds.dump(1, '\t') << std::endl;
-
-			file.close();
+			keybinds.push_back(binding);
 		}
+
+		std::ofstream file(Path::F_KEYBINDS);
+
+		file << keybinds.dump(1, '\t') << std::endl;
+
+		file.close();
 	}
 
 	void Register(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const char* aKeybind)
 	{
 		Keybind requestedBind = KBFromString(aKeybind);
-		RegisterWithStruct(aIdentifier, aKeybindHandler, requestedBind);
+		Register(aIdentifier, aKeybindHandler, requestedBind);
 	}
-	void RegisterWithStruct(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, Keybind aKeybind)
+	void Register(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, Keybind aKeybind)
 	{
 		std::string str = aIdentifier;
 
@@ -213,7 +232,9 @@ namespace Keybinds
 		}
 
 		{
+			/* explicitly scoping here because the subsequent Save call will also lock the mutex */
 			const std::lock_guard<std::mutex> lock(Mutex);
+
 			/* check if this keybind is not already set */
 			if (Registry.find(str) == Registry.end())
 			{
@@ -229,14 +250,12 @@ namespace Keybinds
 	{
 		std::string str = aIdentifier;
 
-		{
-			const std::lock_guard<std::mutex> lock(Mutex);
-			auto it = Registry.find(str);
+		const std::lock_guard<std::mutex> lock(Mutex);
 
-			if (it != Registry.end())
-			{
-				it->second.Handler = nullptr;
-			}
+		auto it = Registry.find(str);
+		if (it != Registry.end())
+		{
+			it->second.Handler = nullptr;
 		}
 
 		Save();
@@ -309,27 +328,26 @@ namespace Keybinds
 
 		if (res != aIdentifier && res != "") { return; }
 
-		{
-			const std::lock_guard<std::mutex> lock(Mutex);
-			Registry[aIdentifier].Bind = aKeybind;
-		}
+		const std::lock_guard<std::mutex> lock(Mutex);
+
+		Registry[aIdentifier].Bind = aKeybind;
 
 		Save();
 	}
+
 	bool Invoke(std::string aIdentifier)
 	{
 		bool called = false;
 
+		const std::lock_guard<std::mutex> lock(Mutex);
+
+		if (Registry[aIdentifier].Handler)
 		{
-			const std::lock_guard<std::mutex> lock(Mutex);
-			if (Registry[aIdentifier].Handler)
-			{
-				std::thread([aIdentifier]()
-					{
-						Registry[aIdentifier].Handler(aIdentifier.c_str());
-					}).detach();
+			std::thread([aIdentifier]()
+				{
+					Registry[aIdentifier].Handler(aIdentifier.c_str());
+				}).detach();
 				called = true;
-			}
 		}
 
 		return called;
@@ -339,15 +357,14 @@ namespace Keybinds
 	{
 		int refCounter = 0;
 
+		const std::lock_guard<std::mutex> lock(Mutex);
+
+		for (auto& [identifier, activekb] : Registry)
 		{
-			const std::lock_guard<std::mutex> lock(Mutex);
-			for (auto& [identifier, activekb] : Registry)
+			if (activekb.Handler >= aStartAddress && activekb.Handler <= aEndAddress)
 			{
-				if (activekb.Handler >= aStartAddress && activekb.Handler <= aEndAddress)
-				{
-					activekb.Handler = nullptr;
-					refCounter++;
-				}
+				activekb.Handler = nullptr;
+				refCounter++;
 			}
 		}
 

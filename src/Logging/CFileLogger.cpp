@@ -1,3 +1,11 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  CFileLogger.cpp
+/// Description  :  Custom logger to print to a log file.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #include "CFileLogger.h"
 
 CFileLogger::CFileLogger(ELogLevel aLogLevel, std::filesystem::path aPath)

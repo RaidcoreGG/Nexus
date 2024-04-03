@@ -1,3 +1,11 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  TextureLoader.cpp
+/// Description  :  Provides functions to load textures and fetch created textures.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #include "TextureLoader.h"
 
 #include <d3d11.h>
@@ -15,6 +23,26 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 #include "httplib/httplib.h"
+
+namespace TextureLoader
+{
+	Texture* ADDONAPI_GetOrCreateFromFile(const char* aIdentifier, const char* aFilename)
+	{
+		return GetOrCreate(aIdentifier, aFilename);
+	}
+	Texture* ADDONAPI_GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule)
+	{
+		return GetOrCreate(aIdentifier, aResourceID, aModule);;
+	}
+	Texture* ADDONAPI_GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint)
+	{
+		return GetOrCreate(aIdentifier, aRemote, aEndpoint);
+	}
+	Texture* ADDONAPI_GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize)
+	{
+		return GetOrCreate(aIdentifier, aData, aSize);
+	}
+}
 
 namespace TextureLoader
 {
@@ -99,23 +127,6 @@ namespace TextureLoader
 		}
 
 		return result;
-	}
-
-	Texture* ADDONAPI_GetOrCreateFromFile(const char* aIdentifier, const char* aFilename)
-	{
-		return GetOrCreate(aIdentifier, aFilename);
-	}
-	Texture* ADDONAPI_GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule)
-	{
-		return GetOrCreate(aIdentifier, aResourceID, aModule);;
-	}
-	Texture* ADDONAPI_GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint)
-	{
-		return GetOrCreate(aIdentifier, aRemote, aEndpoint);
-	}
-	Texture* ADDONAPI_GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize)
-	{
-		return GetOrCreate(aIdentifier, aData, aSize);
 	}
 
 	void LoadFromFile(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback)

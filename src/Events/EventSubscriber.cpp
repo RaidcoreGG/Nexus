@@ -1,4 +1,12 @@
-#include "EventHandler.h"
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  EventSubscriber.cpp
+/// Description  :  Contains the EventSubscriber data struct definition.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
+#include "EventSubscriber.h"
 
 bool operator==(const EventSubscriber& lhs, const EventSubscriber& rhs)
 {

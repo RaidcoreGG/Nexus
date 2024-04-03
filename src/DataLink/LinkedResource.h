@@ -1,10 +1,20 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  LinkedResource.h
+/// Description  :  Contains the Texture data struct definition.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #ifndef LINKEDRESOURCE_H
 #define LINKEDRESOURCE_H
 
 #include <Windows.h>
 #include <string>
 
-/* A structure holding information about an allocated resource. */
+///----------------------------------------------------------------------------------------------------
+/// LinkedResource data struct
+///----------------------------------------------------------------------------------------------------
 struct LinkedResource
 {
 	HANDLE		Handle;				/* The handle of the resource. */

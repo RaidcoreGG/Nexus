@@ -18,6 +18,8 @@
 #include "Keybinds/KeybindHandler.h"
 #include "Loader/Loader.h"
 #include "Logging/LogHandler.h"
+#include "Logging/CConsoleLogger.h"
+#include "Logging/CFileLogger.h"
 #include "Mumble/Mumble.h"
 #include "Settings/Settings.h"
 #include "API/CAPIClient.h"
@@ -54,7 +56,14 @@ namespace Main
 		NexusModuleSize = moduleInfo.SizeOfImage;
 
 		Path::Initialize(NexusHandle);
-		LogHandler::Initialize();
+		
+		/* setup default loggers */
+		RegisterLogger(
+			true == State::IsConsoleEnabled
+			? new CConsoleLogger(ELogLevel::ALL)
+			: nullptr
+		);
+		RegisterLogger(new CFileLogger(ELogLevel::ALL, Path::F_LOG));
 
 		LogInfo(CH_CORE, GetCommandLineA());
 		LogInfo(CH_CORE, "Version: %s", Version.ToString().c_str());

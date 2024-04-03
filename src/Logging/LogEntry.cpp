@@ -1,3 +1,11 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  LogEntry.cpp
+/// Description  :  Contains the LogEntry data struct definition.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #include "LogEntry.h"
 
 #include <iomanip>

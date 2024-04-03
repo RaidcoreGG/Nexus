@@ -1,3 +1,11 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  QueuedTexture.h
+/// Description  :  Contains the QueudTexture data struct definition.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #ifndef QUEUEDTEXTURE_H
 #define QUEUEDTEXTURE_H
 
@@ -5,7 +13,9 @@
 
 #include "FuncDefs.h"
 
-/* A structure holding information about a texture that is queued to load. */
+///----------------------------------------------------------------------------------------------------
+/// QueuedTexture data struct
+///----------------------------------------------------------------------------------------------------
 struct QueuedTexture
 {
 	unsigned Width;
