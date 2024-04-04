@@ -151,61 +151,140 @@ namespace GUI
 							ImGui::SameLine();
 							ImGui::PopStyleColor();
 
+							enum class EMessagePartType {
+								NONE,
+								Text,
+								ColorPush,
+								ColorPop
+							};
+
+							struct MessagePart
+							{
+								EMessagePartType Type;
+								std::string Text;
+								ImVec4 Color;
+							};
+
 							/* message */
 							float lineHeight = ImGui::GetTextLineHeight();
 							ImVec2 posInitial = ImGui::GetCursorPos();
 							ImVec2 pos = posInitial;
-							std::vector<std::string> msgParts = String::Split(entry.Message, " ", true);
-							std::vector<ImVec4> colStack;
-							for (std::string msgPart : msgParts)
+							std::vector<MessagePart> msgParts; // = String::Split(entry.Message, " ", true);
+
+							size_t idxLastWordStart = 0;
+							for (size_t i = 0; i < entry.Message.size(); i++)
 							{
-								if (msgPart.find("<c=#") != std::string::npos)
+								size_t remainingLength = entry.Message.size() - i - 1; // helper to quickly check against possibility of a tag existing
+
+								if (entry.Message[i] == ' ')
 								{
-									std::string hexCol = msgPart.substr(4, 6);
+									MessagePart msgPart{};
+									msgPart.Type = EMessagePartType::Text;
+									msgPart.Text = entry.Message.substr(idxLastWordStart, i - idxLastWordStart);
+									msgParts.push_back(msgPart);
+
+									MessagePart msgSpace{};
+									msgSpace.Type = EMessagePartType::Text;
+									msgSpace.Text = " ";
+									msgParts.push_back(msgSpace);
+
+									idxLastWordStart = i + 1;
+								}
+								// magic number 10 because a string like "<c=#123456>" is 11 chars long
+								else if (remainingLength >= 10 &&
+									entry.Message[i] == '<' &&
+									entry.Message[i + 1] == 'c' &&
+									entry.Message[i + 2] == '=' &&
+									entry.Message[i + 3] == '#' &&
+									entry.Message[i + 10] == '>')
+								{
+									std::string hexCol = entry.Message.substr(i + 4, 6);
 
 									if (std::regex_match(hexCol, std::regex("[0-9a-fA-F]{6}")))
 									{
 										ImVec4 col = ImGui::HEXtoIV4(hexCol.c_str());
 
-										ImGui::PushStyleColor(ImGuiCol_Text, col);
-										colStack.push_back(col);
+										MessagePart msgPartPre{};
+										msgPartPre.Type = EMessagePartType::Text;
+										msgPartPre.Text = entry.Message.substr(idxLastWordStart, i - idxLastWordStart);
+										msgParts.push_back(msgPartPre);
 
-										msgPart = msgPart.substr(11, msgPart.size() - 11);
+										MessagePart msgPart{};
+										msgPart.Type = EMessagePartType::ColorPush;
+										msgPart.Color = col;
+										msgParts.push_back(msgPart);
+
+										i += 10; // 10, because 1 will be auto-incremented -> 11 skipped
+										idxLastWordStart = i + 1;
 									}
 								}
-
-								bool popAfter = false;
-								// check if the string also contains the end tag, if so pop after string print
-								if (msgPart.find("</c>") != std::string::npos)
+								// magic number 3 because a string like "</c>" is 4 chars long
+								else if (remainingLength >= 3 &&
+									entry.Message[i] == '<' &&
+									entry.Message[i + 1] == '/' &&
+									entry.Message[i + 2] == 'c' &&
+									entry.Message[i + 3] == '>')
 								{
-									popAfter = true;
-									
-									msgPart = msgPart.substr(0, msgPart.size() - 4);
+									MessagePart msgPartPre{};
+									msgPartPre.Type = EMessagePartType::Text;
+									msgPartPre.Text = entry.Message.substr(idxLastWordStart, i - idxLastWordStart);
+									msgParts.push_back(msgPartPre);
+
+									MessagePart msgPart{};
+									msgPart.Type = EMessagePartType::ColorPop;
+									msgParts.push_back(msgPart);
+
+									i += 3; // 3, because 1 will be auto-incremented -> 4 skipped
+									idxLastWordStart = i + 1;
 								}
-
-								float currWidth = ImGui::CalcTextSize(msgPart.c_str()).x;
-								if (pos.x - posInitial.x + currWidth > wrapWidth)
+								else if (i == entry.Message.size() - 1)
 								{
-									pos.x = posInitial.x;
-									pos.y += lineHeight;
+									MessagePart msgPart{};
+									msgPart.Type = EMessagePartType::Text;
+									msgPart.Text = entry.Message.substr(idxLastWordStart, i - idxLastWordStart + 1); // +1 because this char is included
+									msgParts.push_back(msgPart);
 								}
+							}
 
-								ImGui::SetCursorPos(pos);
-								ImGui::TextUnformatted(msgPart.c_str());
-								pos.x += currWidth;
+							int colStack = 0;
+							float currWidth = 0.0f; // thanks to C2360 this has to be up here, despite being a local
 
-								if (popAfter && colStack.size() > 0)
+							for (MessagePart msgPart : msgParts)
+							{
+								switch (msgPart.Type)
 								{
-									ImGui::PopStyleColor();
-									colStack.pop_back();
+								case EMessagePartType::Text:
+									currWidth = ImGui::CalcTextSize(msgPart.Text.c_str()).x;
+
+									if (pos.x - posInitial.x + currWidth > wrapWidth)
+									{
+										pos.x = posInitial.x;
+										pos.y += lineHeight;
+									}
+
+									ImGui::SetCursorPos(pos);
+									ImGui::TextUnformatted(msgPart.Text.c_str());
+									pos.x += currWidth;
+									break;
+								case EMessagePartType::ColorPush:
+									ImGui::PushStyleColor(ImGuiCol_Text, msgPart.Color);
+									colStack++;
+									break;
+								case EMessagePartType::ColorPop:
+									if (colStack > 0)
+									{
+										ImGui::PopStyleColor();
+										colStack--;
+									}
+									break;
 								}
 							}
 
 							// cleanup
-							while (colStack.size() > 0)
+							while (colStack > 0)
 							{
 								ImGui::PopStyleColor();
-								colStack.pop_back();
+								colStack--;
 							}
 
 							ImGui::Separator();

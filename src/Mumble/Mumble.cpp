@@ -125,15 +125,28 @@ namespace Mumble
 	{
 		const float MIN_SCALE = 0.3f;
 		const float MAX_SCALE = 2.0f;
-		ImGuiIO& io = ImGui::GetIO();
 
-		switch (aSize)
+		if (Renderer::GuiContext)
 		{
+			ImGuiIO& io = ImGui::GetIO();
+
+			switch (aSize)
+			{
 			case 0: return Renderer::Scaling = SC_SMALL * io.FontGlobalScale;	// Small
 			default:
 			case 1: return Renderer::Scaling = SC_NORMAL * io.FontGlobalScale;	// Normal
 			case 2: return Renderer::Scaling = SC_LARGE * io.FontGlobalScale;	// Large
 			case 3: return Renderer::Scaling = SC_LARGER * io.FontGlobalScale;	// Larger
+			}
+		}
+
+		switch (aSize)
+		{
+		case 0: return Renderer::Scaling = SC_SMALL;	// Small
+		default:
+		case 1: return Renderer::Scaling = SC_NORMAL;	// Normal
+		case 2: return Renderer::Scaling = SC_LARGE;	// Large
+		case 3: return Renderer::Scaling = SC_LARGER;	// Larger
 		}
 	}
 }
