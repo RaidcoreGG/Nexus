@@ -6,6 +6,7 @@
 #include <malloc.h>
 #include <vector>
 #include <fstream>
+#include <chrono>
 
 #include "resource.h"
 
@@ -781,7 +782,11 @@ namespace Loader
 		GetModuleInformation(GetCurrentProcess(), addon->Module, &moduleInfo, sizeof(moduleInfo));
 		addon->ModuleSize = moduleInfo.SizeOfImage;
 
+		auto start_time = std::chrono::high_resolution_clock::now();
 		addon->Definitions->Load(api);
+		auto end_time = std::chrono::high_resolution_clock::now();
+		auto time = end_time - start_time;
+
 		Events::Raise(EV_ADDON_LOADED, &addon->Definitions->Signature);
 		Events::Raise(EV_MUMBLE_IDENTITY_UPDATED, MumbleIdentity);
 
@@ -789,14 +794,22 @@ namespace Loader
 		addon->State = locked ? EAddonState::LoadedLOCKED : EAddonState::Loaded;
 		SaveAddonConfig();
 
+		std::string apiVerStr;
 		if (addon->Definitions->APIVersion == 0)
 		{
-			LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (No API was requested.)", strFile.c_str(), addon->Definitions->Signature, addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage);
+			apiVerStr = "(No API was requested.)";
 		}
 		else
 		{
-			LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.)", strFile.c_str(), addon->Definitions->Signature, addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage, addon->Definitions->APIVersion);
+			apiVerStr.append("(API Version ");
+			apiVerStr.append(std::to_string(addon->Definitions->APIVersion));
+			apiVerStr.append(" was requested.)");
 		}
+		LogInfo(CH_LOADER, u8"Loaded addon: %s (Signature %d) [%p - %p] %s Took %uµs.", 
+			strFile.c_str(), addon->Definitions->Signature, addon->Module,
+			((PBYTE)addon->Module) + moduleInfo.SizeOfImage,
+			apiVerStr.c_str(), time / std::chrono::microseconds(1)
+		);
 
 		/* if arcdps */
 		if (addon->Definitions->Signature == 0xFFF694D1)
@@ -834,11 +847,18 @@ namespace Loader
 			return;
 		}
 
+		std::chrono::steady_clock::time_point start_time;
+		std::chrono::steady_clock::time_point end_time;
+		std::chrono::steady_clock::duration time;
+
 		if (addon->Definitions)
 		{
 			if (addon->State == EAddonState::Loaded)
 			{
+				start_time = std::chrono::high_resolution_clock::now();
 				addon->Definitions->Unload();
+				end_time = std::chrono::high_resolution_clock::now();
+				time = end_time - start_time;
 				Events::Raise(EV_ADDON_UNLOADED, &addon->Definitions->Signature);
 			}
 			else if (addon->State == EAddonState::LoadedLOCKED && aIsShutdown)
@@ -846,7 +866,10 @@ namespace Loader
 				if (addon->Definitions->Unload)
 				{
 					/* If it's a shutdown and Unload is defined, let the addon run its shutdown routine to save settings etc, but do not freelib */
+					start_time = std::chrono::high_resolution_clock::now();
 					addon->Definitions->Unload();
+					end_time = std::chrono::high_resolution_clock::now();
+					time = end_time - start_time;
 					Events::Raise(EV_ADDON_UNLOADED, &addon->Definitions->Signature);
 				}
 			}
@@ -908,11 +931,11 @@ namespace Loader
 				Addons.erase(aPath);
 			}
 
-			LogInfo(CH_LOADER, "Unloaded addon: %s", strFile.c_str());
+			LogInfo(CH_LOADER, u8"Unloaded addon: %s (Took %uµs.)", strFile.c_str(), time / std::chrono::microseconds(1));
 		}
 		else if (addon->State == EAddonState::LoadedLOCKED && aIsShutdown)
 		{
-			LogInfo(CH_LOADER, "Unloaded addon on shutdown without freeing module due to locked state: %s", strFile.c_str());
+			LogInfo(CH_LOADER, u8"Unloaded addon on shutdown without freeing module due to locked state: %s (Took %uµs.)", strFile.c_str(), time / std::chrono::microseconds(1));
 		}
 
 		if (!aIsShutdown)
