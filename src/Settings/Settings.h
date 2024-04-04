@@ -32,6 +32,7 @@ extern const char* OPT_IMGUISTYLE;
 extern const char* OPT_IMGUICOLORS;
 extern const char* OPT_LANGUAGE;
 extern const char* OPT_ALWAYSSHOWQUICKACCESS;
+extern const char* OPT_GLOBALSCALE;
 
 ///----------------------------------------------------------------------------------------------------
 /// Settings Namespace

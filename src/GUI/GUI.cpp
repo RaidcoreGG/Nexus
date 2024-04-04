@@ -634,6 +634,16 @@ namespace GUI
 			{
 				Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS] = false;
 			}
+
+			if (!Settings::Settings[OPT_GLOBALSCALE].is_null())
+			{
+				ImGuiIO& io = ImGui::GetIO();
+				Settings::Settings[OPT_GLOBALSCALE].get_to(io.FontGlobalScale);
+			}
+			else
+			{
+				Settings::Settings[OPT_GLOBALSCALE] = false;
+			}
 		}
 
 		ImportArcDPSStyle();

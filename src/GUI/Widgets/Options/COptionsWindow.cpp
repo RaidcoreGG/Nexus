@@ -231,10 +231,13 @@ namespace GUI
 					ImGui::TooltipGeneric(Language.Translate("((000055))"));
 				}
 
-				const float MIN_SCALE = 0.3f;
-				const float MAX_SCALE = 2.0f;
 				ImGuiIO& io = ImGui::GetIO();
-				ImGui::DragFloat("global scale", &io.FontGlobalScale, 0.005f, MIN_SCALE, MAX_SCALE, "%.2f", ImGuiSliderFlags_AlwaysClamp);
+				ImGui::TextDisabled(Language.Translate("((000072))"));
+				if (ImGui::DragFloat("##globalscale", &io.FontGlobalScale, 0.005f, 0.3f, 3.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp))
+				{
+					Settings::Settings[OPT_GLOBALSCALE] = io.FontGlobalScale;
+					Settings::Save();
+				}
 
 				ImGui::Separator();
 
