@@ -88,15 +88,15 @@ namespace Mumble
 					}
 					catch (json::parse_error& ex)
 					{
-						LogWarning(CH_CORE, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
+						Log(CH_CORE, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
 					}
 					catch (json::type_error& ex)
 					{
-						LogWarning(CH_CORE, "MumbleLink could not be parsed. Type Error: %s", ex.what());
+						Log(CH_CORE, "MumbleLink could not be parsed. Type Error: %s", ex.what());
 					}
 					catch (...)
 					{
-						LogWarning(CH_CORE, "MumbleLink could not be parsed. Unknown Error.");
+						Log(CH_CORE, "MumbleLink could not be parsed. Unknown Error.");
 					}
 					
 					/* update ui scaling factor */
