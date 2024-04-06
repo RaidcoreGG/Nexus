@@ -429,7 +429,7 @@ namespace Loader
 				//}
 			}
 
-			if (gameBuild > lastGameBuild && lastGameBuild != 0)
+			if (gameBuild - lastGameBuild > 350 && lastGameBuild != 0)
 			{
 				/* game updated */
 				
