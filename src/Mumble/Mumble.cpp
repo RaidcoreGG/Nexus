@@ -71,19 +71,34 @@ namespace Mumble
 					/* cache identity */
 					prevIdentity = *MumbleIdentity;
 
-					/* parse and assign current identity */
-					json j = json::parse(MumbleLink->Identity);
-					strcpy(MumbleIdentity->Name, j["name"].get<std::string>().c_str());
-					j["profession"].get_to(MumbleIdentity->Profession);
-					j["spec"].get_to(MumbleIdentity->Specialization);
-					j["race"].get_to(MumbleIdentity->Race);
-					j["map_id"].get_to(MumbleIdentity->MapID);
-					j["world_id"].get_to(MumbleIdentity->WorldID);
-					j["team_color_id"].get_to(MumbleIdentity->TeamColorID);
-					j["commander"].get_to(MumbleIdentity->IsCommander);
-					j["fov"].get_to(MumbleIdentity->FOV);
-					j["uisz"].get_to(MumbleIdentity->UISize);
-
+					try
+					{
+						/* parse and assign current identity */
+						json j = json::parse(MumbleLink->Identity);
+						strcpy(MumbleIdentity->Name, j["name"].get<std::string>().c_str());
+						j["profession"].get_to(MumbleIdentity->Profession);
+						j["spec"].get_to(MumbleIdentity->Specialization);
+						j["race"].get_to(MumbleIdentity->Race);
+						j["map_id"].get_to(MumbleIdentity->MapID);
+						j["world_id"].get_to(MumbleIdentity->WorldID);
+						j["team_color_id"].get_to(MumbleIdentity->TeamColorID);
+						j["commander"].get_to(MumbleIdentity->IsCommander);
+						j["fov"].get_to(MumbleIdentity->FOV);
+						j["uisz"].get_to(MumbleIdentity->UISize);
+					}
+					catch (json::parse_error& ex)
+					{
+						LogWarning(CH_CORE, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
+					}
+					catch (json::type_error& ex)
+					{
+						LogWarning(CH_CORE, "MumbleLink could not be parsed. Type Error: %s", ex.what());
+					}
+					catch (...)
+					{
+						LogWarning(CH_CORE, "MumbleLink could not be parsed. Unknown Error.");
+					}
+					
 					/* update ui scaling factor */
 					Renderer::Scaling = GetScalingFactor(MumbleIdentity->UISize);
 
