@@ -108,7 +108,7 @@ namespace GUI
 
 			ImVec2 text1sz = ImGui::CalcTextSize(Language.Translate("((000031))"));
 			ImVec2 text2sz = ImGui::CalcTextSize(Language.Translate("((000032))"));
-			ImVec2 text3sz = ImGui::CalcTextSize(Language.Translate("ArcDPS Plugins"));
+			ImVec2 text3sz = ImGui::CalcTextSize(Language.Translate("((000075))"));
 
 			float tab1width = 96.0f > text1sz.x + 16.0f ? 96.0f : text1sz.x + 32.0f;
 			float tab2width = 96.0f > text2sz.x + 16.0f ? 96.0f : text2sz.x + 32.0f;
@@ -144,12 +144,17 @@ namespace GUI
 			{
 				ImGui::SameLine();
 
+				std::string legacyNotice = Language.Translate("((000076))");
+				legacyNotice.append("\n");
+				legacyNotice.append(Language.Translate("((000077))"));
+
 				tab3origin = ImGui::GetCursorPos();
 				if (ImGui::ImageButton(!Tab3Hovered ? TabBtn->Resource : TabBtnHover->Resource, ImVec2(tab3width * Renderer::Scaling, 24.0f * Renderer::Scaling)))
 				{
 					TabIndex = 2;
 				}
 				Tab3Hovered = ImGui::IsItemHovered();
+				ImGui::GW2::TooltipGeneric(legacyNotice.c_str());
 			}
 
 			ImGui::PopStyleColor(3);
@@ -164,7 +169,7 @@ namespace GUI
 			if (ArcDPS::IsLoaded)
 			{
 				ImGui::SetCursorPos(ImVec2(tab3origin.x + text3offset.x, tab3origin.y + text3offset.y));
-				ImGui::TextColored(TabIndex == 2 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("ArcDPS Plugins"));
+				ImGui::TextColored(TabIndex == 2 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000075))"));
 			}
 			
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
