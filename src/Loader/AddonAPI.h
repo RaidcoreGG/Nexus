@@ -13,6 +13,7 @@
 #include "Textures/FuncDefs.h"
 #include "GUI/FuncDefs.h"
 #include "GUI/Widgets/QuickAccess/FuncDefs.h"
+#include "GUI/Widgets/Alerts/FuncDefs.h"
 #include "Localization/FuncDefs.h"
 
 // Base
@@ -165,6 +166,9 @@ struct AddonAPI3 : AddonAPI
 
 	/* Logging */
 	LOGGER_LOG2							Log;
+
+	/* GUI Alerts */
+	ALERTS_NOTIFY						SendAlert;
 
 	/* Events */
 	EVENTS_RAISE						RaiseEvent;

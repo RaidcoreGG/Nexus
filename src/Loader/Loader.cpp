@@ -30,6 +30,7 @@
 #include "Textures/TextureLoader.h"
 #include "GUI/GUI.h"
 #include "GUI/Widgets/QuickAccess/QuickAccess.h"
+#include "GUI/Widgets/Alerts/Alerts.h"
 #include "Settings/Settings.h"
 #include "Localization/Localization.h"
 
@@ -463,7 +464,11 @@ namespace Loader
 				DisableVolatileUntilUpdate = true;
 				LogWarning(CH_LOADER, "Game updated. Current Build %d. Old Build: %d. Disabling volatile addons until they update.", gameBuild, lastGameBuild);
 
-				Events::RaiseNotification(EV_VOLATILE_ADDONS_DISABLED);
+				Events::Raise(EV_VOLATILE_ADDONS_DISABLED);
+				std::string msg = Language.Translate("((000001))");
+				msg.append("\n");
+				msg.append(Language.Translate("((000002))"));
+				GUI::Alerts::Notify(msg.c_str());
 			}
 
 			Settings::Settings[OPT_LASTGAMEBUILD] = gameBuild;
@@ -705,6 +710,12 @@ namespace Loader
 					else if (tmpLocked && shouldLoad && !addon->IsDisabledUntilUpdate) // if addon is locked and not DUU
 					{
 						QueueAddon(ELoaderAction::Reload, tmpPath);
+					}
+					else if (addon->IsDisabledUntilUpdate && DisableVolatileUntilUpdate) // if addon is DUP and the global state is too
+					{
+						std::string msg = tmpName + " ";
+						msg.append(Language.Translate("((000073))"));
+						GUI::Alerts::Notify(msg.c_str());
 					}
 				})
 				.detach();
@@ -1540,7 +1551,7 @@ namespace Loader
 
 			((AddonAPI1*)api)->Log = ADDONAPI_LogMessage;
 
-			((AddonAPI1*)api)->RaiseEvent = Events::Raise;
+			((AddonAPI1*)api)->RaiseEvent = Events::ADDONAPI_RaiseEvent;
 			((AddonAPI1*)api)->SubscribeEvent = Events::Subscribe;
 			((AddonAPI1*)api)->UnsubscribeEvent = Events::Unsubscribe;
 
@@ -1588,8 +1599,8 @@ namespace Loader
 
 			((AddonAPI2*)api)->Log = ADDONAPI_LogMessage2;
 
-			((AddonAPI2*)api)->RaiseEvent = Events::Raise;
-			((AddonAPI2*)api)->RaiseEventNotification = Events::RaiseNotification;
+			((AddonAPI2*)api)->RaiseEvent = Events::ADDONAPI_RaiseEvent;
+			((AddonAPI2*)api)->RaiseEventNotification = Events::ADDONAPI_RaiseNotification;
 			((AddonAPI2*)api)->SubscribeEvent = Events::Subscribe;
 			((AddonAPI2*)api)->UnsubscribeEvent = Events::Unsubscribe;
 
@@ -1622,6 +1633,69 @@ namespace Loader
 
 			((AddonAPI2*)api)->Translate = Localization::ADDONAPI_Translate;
 			((AddonAPI2*)api)->TranslateTo = Localization::ADDONAPI_TranslateTo;
+
+			ApiDefs.insert({ aVersion, api });
+			return api;
+
+		case 3:
+			api = new AddonAPI3();
+
+			((AddonAPI3*)api)->SwapChain = Renderer::SwapChain;
+			((AddonAPI3*)api)->ImguiContext = Renderer::GuiContext;
+			((AddonAPI3*)api)->ImguiMalloc = ImGui::MemAlloc;
+			((AddonAPI3*)api)->ImguiFree = ImGui::MemFree;
+			((AddonAPI3*)api)->RegisterRender = GUI::Register;
+			((AddonAPI3*)api)->DeregisterRender = GUI::Deregister;
+
+			((AddonAPI3*)api)->GetGameDirectory = Path::GetGameDirectory;
+			((AddonAPI3*)api)->GetAddonDirectory = Path::GetAddonDirectory;
+			((AddonAPI3*)api)->GetCommonDirectory = Path::GetCommonDirectory;
+
+			((AddonAPI3*)api)->CreateHook = MH_CreateHook;
+			((AddonAPI3*)api)->RemoveHook = MH_RemoveHook;
+			((AddonAPI3*)api)->EnableHook = MH_EnableHook;
+			((AddonAPI3*)api)->DisableHook = MH_DisableHook;
+
+			((AddonAPI3*)api)->Log = ADDONAPI_LogMessage2;
+
+			((AddonAPI3*)api)->SendAlert = GUI::Alerts::Notify;
+
+			((AddonAPI3*)api)->RaiseEvent = Events::ADDONAPI_RaiseEvent;
+			((AddonAPI3*)api)->RaiseEventNotification = Events::ADDONAPI_RaiseNotification;
+			((AddonAPI3*)api)->RaiseEventTargeted = Events::ADDONAPI_RaiseEventTargeted;
+			((AddonAPI3*)api)->RaiseEventNotificationTargeted = Events::ADDONAPI_RaiseNotificationTargeted;
+			((AddonAPI3*)api)->SubscribeEvent = Events::Subscribe;
+			((AddonAPI3*)api)->UnsubscribeEvent = Events::Unsubscribe;
+
+			((AddonAPI3*)api)->RegisterWndProc = WndProc::Register;
+			((AddonAPI3*)api)->DeregisterWndProc = WndProc::Deregister;
+			((AddonAPI3*)api)->SendWndProcToGameOnly = WndProc::SendWndProcToGame;
+
+			((AddonAPI3*)api)->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString;
+			((AddonAPI3*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct;
+			((AddonAPI3*)api)->DeregisterKeybind = Keybinds::Deregister;
+
+			((AddonAPI3*)api)->GetResource = DataLink::GetResource;
+			((AddonAPI3*)api)->ShareResource = DataLink::ShareResource;
+
+			((AddonAPI3*)api)->GetTexture = TextureLoader::Get;
+			((AddonAPI3*)api)->GetTextureOrCreateFromFile = TextureLoader::ADDONAPI_GetOrCreateFromFile;
+			((AddonAPI3*)api)->GetTextureOrCreateFromResource = TextureLoader::ADDONAPI_GetOrCreateFromResource;
+			((AddonAPI3*)api)->GetTextureOrCreateFromURL = TextureLoader::ADDONAPI_GetOrCreateFromURL;
+			((AddonAPI3*)api)->GetTextureOrCreateFromMemory = TextureLoader::ADDONAPI_GetOrCreateFromMemory;
+			((AddonAPI3*)api)->LoadTextureFromFile = TextureLoader::LoadFromFile;
+			((AddonAPI3*)api)->LoadTextureFromResource = TextureLoader::LoadFromResource;
+			((AddonAPI3*)api)->LoadTextureFromURL = TextureLoader::LoadFromURL;
+			((AddonAPI3*)api)->LoadTextureFromMemory = TextureLoader::LoadFromMemory;
+
+			((AddonAPI3*)api)->AddShortcut = GUI::QuickAccess::AddShortcut;
+			((AddonAPI3*)api)->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
+			((AddonAPI3*)api)->NotifyShortcut = GUI::QuickAccess::NotifyShortcut;
+			((AddonAPI3*)api)->AddSimpleShortcut = GUI::QuickAccess::AddSimpleShortcut;
+			((AddonAPI3*)api)->RemoveSimpleShortcut = GUI::QuickAccess::RemoveSimpleShortcut;
+
+			((AddonAPI3*)api)->Translate = Localization::ADDONAPI_Translate;
+			((AddonAPI3*)api)->TranslateTo = Localization::ADDONAPI_TranslateTo;
 
 			ApiDefs.insert({ aVersion, api });
 			return api;

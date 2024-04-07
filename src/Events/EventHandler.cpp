@@ -20,6 +20,29 @@
 
 namespace Events
 {
+	void ADDONAPI_RaiseEvent(const char* aIdentifier, void* aEventData)
+	{
+		Raise(aIdentifier, aEventData);
+	}
+
+	void ADDONAPI_RaiseNotification(const char* aIdentifier)
+	{
+		Raise(aIdentifier, nullptr);
+	}
+
+	void ADDONAPI_RaiseEventTargeted(signed int aSignature, const char* aIdentifier, void* aEventData)
+	{
+		Raise(aSignature, aIdentifier, aEventData);
+	}
+
+	void ADDONAPI_RaiseNotificationTargeted(signed int aSignature, const char* aIdentifier)
+	{
+		Raise(aSignature, aIdentifier, nullptr);
+	}
+}
+
+namespace Events
+{
 	std::mutex											Mutex;
 	std::map<std::string, std::vector<EventSubscriber>>	Registry;
 
@@ -41,12 +64,8 @@ namespace Events
 		//auto time = end_time - start_time;
 		//LogDebug(CH_EVENTS, u8"Executed event (%s) in %uµs.", aIdentifier, time / std::chrono::microseconds(1));
 	}
-	void RaiseNotification(const char* aIdentifier)
-	{
-		Raise(aIdentifier, nullptr);
-	}
 
-	void RaiseTargeted(signed int aSignature, const char* aIdentifier, void* aEventData)
+	void Raise(signed int aSignature, const char* aIdentifier, void* aEventData)
 	{
 		std::string str = aIdentifier;
 
@@ -63,9 +82,14 @@ namespace Events
 		}
 	}
 
-	void RaiseNotificationTargeted(signed int aSignature, const char* aIdentifier)
+	void Raise(const char* aIdentifier)
 	{
-		RaiseTargeted(aSignature, aIdentifier, nullptr);
+		Raise(aIdentifier, nullptr);
+	}
+
+	void Raise(signed int aSignature, const char* aIdentifier)
+	{
+		Raise(aSignature, aIdentifier, nullptr);
 	}
 
 	void Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback)
