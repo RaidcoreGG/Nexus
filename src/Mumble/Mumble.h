@@ -1,8 +1,19 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  Mumble.h
+/// Description  :  Provides Mumble API events and extended data.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #ifndef MUMBLE_H
 #define MUMBLE_H
 
 #include <thread>
 
+///----------------------------------------------------------------------------------------------------
+/// Mumble Namespace
+///----------------------------------------------------------------------------------------------------
 namespace Mumble
 {
 	extern bool IsRunning;
@@ -10,17 +21,34 @@ namespace Mumble
 	extern std::thread UpdateIdentityThread;
 	extern std::thread UpdateStateThread;
 
-	/* Initializes the threads parsing the MumbleLink. */
+	///----------------------------------------------------------------------------------------------------
+	/// Initialize:
+	/// 	Initializes the threads parsing the MumbleLink.
+	///----------------------------------------------------------------------------------------------------
 	void Initialize();
-	/* Stops the MumbleLink threads. */
+
+	///----------------------------------------------------------------------------------------------------
+	/// Shutdown:
+	/// 	Stops the MumbleLink threads.
+	///----------------------------------------------------------------------------------------------------
 	void Shutdown();
 
-	/* Loop that polls Mumble->Identity. */
+	///----------------------------------------------------------------------------------------------------
+	/// UpdateIdentityLoop:
+	/// 	Loop that polls Mumble->Identity.
+	///----------------------------------------------------------------------------------------------------
 	void UpdateIdentityLoop();
-	/* Loop that polls various derived states. */
+
+	///----------------------------------------------------------------------------------------------------
+	/// UpdateStateLoop:
+	/// 	Loop that polls various derived states.
+	///----------------------------------------------------------------------------------------------------
 	void UpdateStateLoop();
 
-	/* Returns the scaling factor for the given the UISize enum. */
+	///----------------------------------------------------------------------------------------------------
+	/// GetScalingFactor:
+	/// 	Returns the scaling factor for the given the UISize enum.
+	///----------------------------------------------------------------------------------------------------
 	float GetScalingFactor(unsigned aSize);
 };
 

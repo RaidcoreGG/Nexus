@@ -10,6 +10,7 @@
 #include "Renderer.h"
 
 #include "Loader/Loader.h"
+#include "Loader/ArcDPS.h"
 #include "AddonItem.h"
 #include "Textures/TextureLoader.h"
 
@@ -53,6 +54,7 @@ namespace GUI
 		TabIndex = 0;
 		Tab1Hovered = false;
 		Tab2Hovered = false;
+		Tab3Hovered = false;
 	}
 
 	void CAddonsWindow::Render()
@@ -106,20 +108,22 @@ namespace GUI
 
 			ImVec2 text1sz = ImGui::CalcTextSize(Language.Translate("((000031))"));
 			ImVec2 text2sz = ImGui::CalcTextSize(Language.Translate("((000032))"));
+			ImVec2 text3sz = ImGui::CalcTextSize(Language.Translate("((000075))"));
 
-			float tab1width = 92.0f > text1sz.x ? 92.0f : text1sz.x + 50.0f;
-			float tab2width = 92.0f > text2sz.x ? 92.0f : text2sz.x + 50.0f;
+			float tab1width = 96.0f > text1sz.x + 16.0f ? 96.0f : text1sz.x + 32.0f;
+			float tab2width = 96.0f > text2sz.x + 16.0f ? 96.0f : text2sz.x + 32.0f;
+			float tab3width = 96.0f > text3sz.x + 16.0f ? 96.0f : text3sz.x + 32.0f;
 
 			ImVec2 text1offset = ImVec2(((tab1width * Renderer::Scaling) - text1sz.x) / 2, ((24.0f * Renderer::Scaling) - text1sz.y) / 2);
 			ImVec2 text2offset = ImVec2(((tab2width * Renderer::Scaling) - text2sz.x) / 2, ((24.0f * Renderer::Scaling) - text2sz.y) / 2);
+			ImVec2 text3offset = ImVec2(((tab3width * Renderer::Scaling) - text3sz.x) / 2, ((24.0f * Renderer::Scaling) - text3sz.y) / 2);
 			
-			ImVec2 tab1origin = ImGui::GetCursorPos(); // 28.0f, 28.0f
-
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
 
+			ImVec2 tab1origin = ImGui::GetCursorPos(); // 28.0f, 28.0f
 			if (ImGui::ImageButton(!Tab1Hovered ? TabBtn->Resource : TabBtnHover->Resource, ImVec2(tab1width * Renderer::Scaling, 24.0f * Renderer::Scaling)))
 			{
 				TabIndex = 0;
@@ -129,12 +133,29 @@ namespace GUI
 			ImGui::SameLine();
 
 			ImVec2 tab2origin = ImGui::GetCursorPos();
-
 			if (ImGui::ImageButton(!Tab2Hovered ? TabBtn->Resource : TabBtnHover->Resource, ImVec2(tab2width * Renderer::Scaling, 24.0f * Renderer::Scaling)))
 			{
 				TabIndex = 1;
 			}
 			Tab2Hovered = ImGui::IsItemHovered();
+
+			ImVec2 tab3origin; // predeclare here because of conditional
+			if (ArcDPS::IsLoaded)
+			{
+				ImGui::SameLine();
+
+				std::string legacyNotice = Language.Translate("((000076))");
+				legacyNotice.append("\n");
+				legacyNotice.append(Language.Translate("((000077))"));
+
+				tab3origin = ImGui::GetCursorPos();
+				if (ImGui::ImageButton(!Tab3Hovered ? TabBtn->Resource : TabBtnHover->Resource, ImVec2(tab3width * Renderer::Scaling, 24.0f * Renderer::Scaling)))
+				{
+					TabIndex = 2;
+				}
+				Tab3Hovered = ImGui::IsItemHovered();
+				ImGui::GW2::TooltipGeneric(legacyNotice.c_str());
+			}
 
 			ImGui::PopStyleColor(3);
 			ImGui::PopStyleVar();
@@ -145,6 +166,12 @@ namespace GUI
 			ImGui::SetCursorPos(ImVec2(tab2origin.x + text2offset.x, tab2origin.y + text2offset.y));
 			ImGui::TextColored(TabIndex == 1 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000032))"));
 
+			if (ArcDPS::IsLoaded)
+			{
+				ImGui::SetCursorPos(ImVec2(tab3origin.x + text3offset.x, tab3origin.y + text3offset.y));
+				ImGui::TextColored(TabIndex == 2 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000075))"));
+			}
+			
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
@@ -265,7 +292,7 @@ namespace GUI
 										// if libAddon already exist in installed addons
 										// or if arcdps is loaded another way and the libAddon is arc
 										if ((addon->Definitions != nullptr && addon->Definitions->Signature == libAddon->Signature) ||
-											(Loader::IsArcdpsLoaded && libAddon->Signature == 0xFFF694D1))
+											(ArcDPS::IsLoaded && libAddon->Signature == 0xFFF694D1))
 										{
 											exists = true;
 											break;
@@ -290,6 +317,61 @@ namespace GUI
 						}
 
 						ImGui::EndChild();
+					}
+
+					ImGui::Checkbox(Language.Translate("((000038))"), &showInstalled);
+				}
+				else if (TabIndex == 2)
+				{
+					if (ArcDPS::IsPluginAtlasBuilt)
+					{
+						ImGui::BeginChild("##AddonTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), (btnHeight * 1.5f) * -1));
+
+						int downloadable = 0;
+						const std::lock_guard<std::mutex> lockLoader(ArcDPS::Mutex);
+						if (ArcDPS::PluginLibrary.size() != 0)
+						{
+							for (auto& arclibAddon : ArcDPS::PluginLibrary)
+							{
+								bool exists = false;
+								{
+									for (auto& arcAddonSig : ArcDPS::Plugins)
+									{
+										// if arclibAddon already exist in installed addons
+										// or if arcdps is loaded another way and the arclibAddon is arc
+										if (arclibAddon->Signature == arcAddonSig)
+										{
+											exists = true;
+											break;
+										}
+									}
+								}
+								if (false == exists || true == showInstalled)
+								{
+									AddonItem(arclibAddon, exists);
+									downloadable++;
+								}
+							}
+						}
+
+						if (ArcDPS::PluginLibrary.size() == 0 || downloadable == 0)
+						{
+							ImVec2 windowSize = ImGui::GetWindowSize();
+							ImVec2 textSize = ImGui::CalcTextSize(Language.Translate("((000037))"));
+							ImVec2 position = ImGui::GetCursorPos();
+							ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
+							ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000037))"));
+						}
+
+						ImGui::EndChild();
+					}
+					else
+					{
+						ImVec2 windowSize = ImGui::GetWindowSize();
+						ImVec2 textSize = ImGui::CalcTextSize(Language.Translate("((000071))"));
+						ImVec2 position = ImGui::GetCursorPos();
+						ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
+						ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000071))"));
 					}
 
 					ImGui::Checkbox(Language.Translate("((000038))"), &showInstalled);

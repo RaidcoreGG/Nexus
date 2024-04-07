@@ -231,6 +231,14 @@ namespace GUI
 					ImGui::TooltipGeneric(Language.Translate("((000055))"));
 				}
 
+				ImGuiIO& io = ImGui::GetIO();
+				ImGui::TextDisabled(Language.Translate("((000072))"));
+				if (ImGui::DragFloat("##globalscale", &io.FontGlobalScale, 0.005f, 0.3f, 3.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp))
+				{
+					Settings::Settings[OPT_GLOBALSCALE] = io.FontGlobalScale;
+					Settings::Save();
+				}
+
 				ImGui::Separator();
 
 				if (ImGui::Checkbox(Language.Translate("((000056))"), &GUI::LinkArcDPSStyle))

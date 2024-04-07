@@ -32,6 +32,7 @@ namespace GUI
 		int TabIndex;
 		bool Tab1Hovered;
 		bool Tab2Hovered;
+		bool Tab3Hovered;
 
 		CAddonsWindow(std::string aName);
 		void Render();

@@ -1,3 +1,11 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  TextureLoader.cpp
+/// Description  :  Provides functions to load textures and fetch created textures.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #include "TextureLoader.h"
 
 #include <d3d11.h>
@@ -15,6 +23,26 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 #include "httplib/httplib.h"
+
+namespace TextureLoader
+{
+	Texture* ADDONAPI_GetOrCreateFromFile(const char* aIdentifier, const char* aFilename)
+	{
+		return GetOrCreate(aIdentifier, aFilename);
+	}
+	Texture* ADDONAPI_GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule)
+	{
+		return GetOrCreate(aIdentifier, aResourceID, aModule);;
+	}
+	Texture* ADDONAPI_GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint)
+	{
+		return GetOrCreate(aIdentifier, aRemote, aEndpoint);
+	}
+	Texture* ADDONAPI_GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize)
+	{
+		return GetOrCreate(aIdentifier, aData, aSize);
+	}
+}
 
 namespace TextureLoader
 {
@@ -101,23 +129,6 @@ namespace TextureLoader
 		return result;
 	}
 
-	Texture* ADDONAPI_GetOrCreateFromFile(const char* aIdentifier, const char* aFilename)
-	{
-		return GetOrCreate(aIdentifier, aFilename);
-	}
-	Texture* ADDONAPI_GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule)
-	{
-		return GetOrCreate(aIdentifier, aResourceID, aModule);;
-	}
-	Texture* ADDONAPI_GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint)
-	{
-		return GetOrCreate(aIdentifier, aRemote, aEndpoint);
-	}
-	Texture* ADDONAPI_GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize)
-	{
-		return GetOrCreate(aIdentifier, aData, aSize);
-	}
-
 	void LoadFromFile(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback)
 	{
 		//LogInfo(CH_TEXTURES, "TextureLoader::LoadFromFile(aIdentifier: %s, aFilename: %s, aCallback: %p)", aIdentifier, aFilename, aCallback);
@@ -202,7 +213,7 @@ namespace TextureLoader
 		int image_width = 0;
 		int image_height = 0;
 		int image_components = 0;
-		unsigned char* image_data = stbi_load_from_memory((const stbi_uc*)imageFile, imageFileSize, &image_width, &image_height, &image_components, 0);
+		unsigned char* image_data = stbi_load_from_memory((const stbi_uc*)imageFile, imageFileSize, &image_width, &image_height, &image_components, 4);
 
 		QueueTexture(str.c_str(), image_data, image_width, image_height, aCallback);
 	}
@@ -249,9 +260,9 @@ namespace TextureLoader
 
 		int image_width = 0;
 		int image_height = 0;
-		int comp;
+		int image_components;
 
-		stbi_uc* data = stbi_load_from_memory(remote_data, static_cast<int>(size), &image_width, &image_height, &comp, 0);
+		stbi_uc* data = stbi_load_from_memory(remote_data, static_cast<int>(size), &image_width, &image_height, &image_components, 4);
 
 		delete[] remote_data;
 
@@ -280,7 +291,7 @@ namespace TextureLoader
 		int image_width = 0;
 		int image_height = 0;
 		int image_components = 0;
-		unsigned char* image_data = stbi_load_from_memory((const stbi_uc*)aData, static_cast<int>(aSize), &image_width, &image_height, &image_components, 0);
+		unsigned char* image_data = stbi_load_from_memory((const stbi_uc*)aData, static_cast<int>(aSize), &image_width, &image_height, &image_components, 4);
 
 		QueueTexture(str.c_str(), image_data, image_width, image_height, aCallback);
 	}

@@ -33,6 +33,7 @@
 #include "Widgets/About/CAboutBox.h"
 #include "Widgets/QuickAccess/QuickAccess.h"
 #include "Widgets/EULA/CEULAModal.h"
+#include "Widgets/Alerts/Alerts.h"
 
 #include "resource.h"
 #include "Textures/Texture.h"
@@ -261,6 +262,7 @@ namespace GUI
 				/* draw menu & qa */
 				Menu::Render();
 				QuickAccess::Render();
+				Alerts::Render();
 				/* draw menu & qa end*/
 
 				/* draw nexus windows */
@@ -439,62 +441,6 @@ namespace GUI
 		}
 	}
 
-	/* FIXME: quick and dirty hack for now */
-	class CVolatileAddonsDisabledNotification : public IWindow
-	{
-	public:
-		float Opacity = 1.0f;
-
-		CVolatileAddonsDisabledNotification()
-		{
-			Name = "CVolatileAddonsDisabledNotification";
-		}
-		void Render()
-		{
-			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, Opacity);
-
-			ImVec2 center(Renderer::Width * 0.5f, Renderer::Height * 0.5f);
-			ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-			if (ImGui::Begin("##CVolatileAddonsDisabledNotification", (bool*)0, (ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoTitleBar)))
-			{
-				ImGui::PushFont(FontBig);
-				ImGui::TextColoredOutlined(ImVec4(1, 0, 0, 1), Language.Translate("((000001))"));
-				ImGui::TextColoredOutlined(ImVec4(1, 0, 0, 1), Language.Translate("((000002))"));
-				ImGui::PopFont();
-
-			}
-			ImGui::End();
-
-			ImGui::PopStyleVar();
-		}
-	};
-
-	void OnVolatileAddonsDisabled(void* aEventArgs)
-	{
-		CVolatileAddonsDisabledNotification* notif = new CVolatileAddonsDisabledNotification();
-		AddWindow(notif);
-		std::thread([notif]()
-			{
-				Sleep(10000);
-				while (notif->Opacity > 0)
-				{
-					notif->Opacity -= 0.1f;
-					Sleep(35);
-				}
-
-				const std::lock_guard<std::mutex> lock(Mutex);
-				auto it = std::find(GUI::Windows.begin(), GUI::Windows.end(), notif);
-
-				if (it != GUI::Windows.end())
-				{
-					delete (*it);
-					GUI::Windows.erase(it);
-				}
-			})
-			.detach();
-	}
-	/* FIXME: end */
-
 	void Setup()
 	{
 		ImGuiIO& io = ImGui::GetIO();
@@ -634,6 +580,16 @@ namespace GUI
 			{
 				Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS] = false;
 			}
+
+			if (!Settings::Settings[OPT_GLOBALSCALE].is_null())
+			{
+				ImGuiIO& io = ImGui::GetIO();
+				Settings::Settings[OPT_GLOBALSCALE].get_to(io.FontGlobalScale);
+			}
+			else
+			{
+				Settings::Settings[OPT_GLOBALSCALE] = false;
+			}
 		}
 
 		ImportArcDPSStyle();
@@ -722,7 +678,6 @@ namespace GUI
 		io.Fonts->Build();
 
 		Events::Subscribe(EV_MUMBLE_IDENTITY_UPDATED, OnMumbleIdentityChanged);
-		Events::Subscribe(EV_VOLATILE_ADDONS_DISABLED, OnVolatileAddonsDisabled);
 		OnMumbleIdentityChanged(nullptr);
 
 		/* set up and add windows */

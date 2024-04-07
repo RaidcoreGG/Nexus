@@ -1,3 +1,11 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  Mumble.cpp
+/// Description  :  Provides Mumble API events and extended data.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #include "Mumble.h"
 
 #include <map>
@@ -63,19 +71,34 @@ namespace Mumble
 					/* cache identity */
 					prevIdentity = *MumbleIdentity;
 
-					/* parse and assign current identity */
-					json j = json::parse(MumbleLink->Identity);
-					strcpy(MumbleIdentity->Name, j["name"].get<std::string>().c_str());
-					j["profession"].get_to(MumbleIdentity->Profession);
-					j["spec"].get_to(MumbleIdentity->Specialization);
-					j["race"].get_to(MumbleIdentity->Race);
-					j["map_id"].get_to(MumbleIdentity->MapID);
-					j["world_id"].get_to(MumbleIdentity->WorldID);
-					j["team_color_id"].get_to(MumbleIdentity->TeamColorID);
-					j["commander"].get_to(MumbleIdentity->IsCommander);
-					j["fov"].get_to(MumbleIdentity->FOV);
-					j["uisz"].get_to(MumbleIdentity->UISize);
-
+					try
+					{
+						/* parse and assign current identity */
+						json j = json::parse(MumbleLink->Identity);
+						strcpy(MumbleIdentity->Name, j["name"].get<std::string>().c_str());
+						j["profession"].get_to(MumbleIdentity->Profession);
+						j["spec"].get_to(MumbleIdentity->Specialization);
+						j["race"].get_to(MumbleIdentity->Race);
+						j["map_id"].get_to(MumbleIdentity->MapID);
+						j["world_id"].get_to(MumbleIdentity->WorldID);
+						j["team_color_id"].get_to(MumbleIdentity->TeamColorID);
+						j["commander"].get_to(MumbleIdentity->IsCommander);
+						j["fov"].get_to(MumbleIdentity->FOV);
+						j["uisz"].get_to(MumbleIdentity->UISize);
+					}
+					catch (json::parse_error& ex)
+					{
+						Log(CH_CORE, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
+					}
+					catch (json::type_error& ex)
+					{
+						Log(CH_CORE, "MumbleLink could not be parsed. Type Error: %s", ex.what());
+					}
+					catch (...)
+					{
+						Log(CH_CORE, "MumbleLink could not be parsed. Unknown Error.");
+					}
+					
 					/* update ui scaling factor */
 					Renderer::Scaling = GetScalingFactor(MumbleIdentity->UISize);
 
@@ -115,13 +138,30 @@ namespace Mumble
 
 	float GetScalingFactor(unsigned aSize)
 	{
+		const float MIN_SCALE = 0.3f;
+		const float MAX_SCALE = 2.0f;
+
+		if (Renderer::GuiContext)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+
+			switch (aSize)
+			{
+			case 0: return Renderer::Scaling = SC_SMALL * io.FontGlobalScale;	// Small
+			default:
+			case 1: return Renderer::Scaling = SC_NORMAL * io.FontGlobalScale;	// Normal
+			case 2: return Renderer::Scaling = SC_LARGE * io.FontGlobalScale;	// Large
+			case 3: return Renderer::Scaling = SC_LARGER * io.FontGlobalScale;	// Larger
+			}
+		}
+
 		switch (aSize)
 		{
-			case 0: return Renderer::Scaling = SC_SMALL;;	// Small
-			default:
-			case 1: return Renderer::Scaling = SC_NORMAL;	// Normal
-			case 2: return Renderer::Scaling = SC_LARGE;	// Large
-			case 3: return Renderer::Scaling = SC_LARGER;	// Larger
+		case 0: return Renderer::Scaling = SC_SMALL;	// Small
+		default:
+		case 1: return Renderer::Scaling = SC_NORMAL;	// Normal
+		case 2: return Renderer::Scaling = SC_LARGE;	// Large
+		case 3: return Renderer::Scaling = SC_LARGER;	// Larger
 		}
 	}
 }

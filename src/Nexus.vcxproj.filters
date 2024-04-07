@@ -136,6 +136,9 @@
     <Filter Include="Resource Files\Locales">
       <UniqueIdentifier>{3e8eab0f-abb6-49e7-9b6e-4347fe84f0b9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Widgets\Alerts">
+      <UniqueIdentifier>{442c3943-23d3-443c-bbd4-c0dc42250d4c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -308,6 +311,15 @@
     </ClCompile>
     <ClCompile Include="Localization\Localization.cpp">
       <Filter>Localization</Filter>
+    </ClCompile>
+    <ClCompile Include="Events\EventSubscriber.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Widgets\Alerts\Alerts.cpp">
+      <Filter>GUI\Widgets\Alerts</Filter>
+    </ClCompile>
+    <ClCompile Include="Loader\ArcDPS.cpp">
+      <Filter>Loader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1048,6 +1060,18 @@
     </ClInclude>
     <ClInclude Include="Localization\FuncDefs.h">
       <Filter>Localization</Filter>
+    </ClInclude>
+    <ClInclude Include="Events\EventSubscriber.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Widgets\Alerts\Alerts.h">
+      <Filter>GUI\Widgets\Alerts</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Widgets\Alerts\FuncDefs.h">
+      <Filter>GUI\Widgets\Alerts</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\ArcDPS.h">
+      <Filter>Loader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

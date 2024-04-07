@@ -1,3 +1,11 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  Localization.cpp
+/// Description  :  Handles localization of strings.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #include "Localization.h"
 
 #include "Consts.h"
@@ -58,9 +66,6 @@ const char* CLocalization::Translate(const char* aIdentifier, const char* aLangu
 				return it->second;
 			}
 		}
-
-		/* specified language doesn't exist or text is not localized */
-		return aIdentifier;
 	}
 
 	if (ActiveLocale)
@@ -70,6 +75,21 @@ const char* CLocalization::Translate(const char* aIdentifier, const char* aLangu
 		if (it != ActiveLocale->Texts.end())
 		{
 			return it->second;
+		}
+	}
+
+	if (!ActiveLocale || ActiveLocale->DisplayName != "English")
+	{
+		auto atlasIt = LocaleAtlas.find("en");
+
+		if (atlasIt != LocaleAtlas.end())
+		{
+			auto it = atlasIt->second.Texts.find(identifier);
+
+			if (it != atlasIt->second.Texts.end())
+			{
+				return it->second;
+			}
 		}
 	}
 

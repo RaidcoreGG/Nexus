@@ -1,3 +1,11 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  Localization.h
+/// Description  :  Handles localization of strings.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #ifndef LOCALIZATION_H
 #define LOCALIZATION_H
 
@@ -27,6 +35,9 @@ namespace Localization
 	/*static void ADDONAPI_Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aString);*/
 }
 
+///----------------------------------------------------------------------------------------------------
+/// Locale data struct
+///----------------------------------------------------------------------------------------------------
 struct Locale
 {
 	std::string DisplayName;
@@ -48,7 +59,7 @@ public:
 	///----------------------------------------------------------------------------------------------------
 	/// Translate:
 	/// 	Returns the translated string with the given identifier and language.
-	///		If no language is specified, the currently set one will be used.
+	/// 	If no language is specified, the currently set one will be used.
 	///----------------------------------------------------------------------------------------------------
 	const char* Translate(const char* aIdentifier, const char* aLanguageIdentifier = nullptr);
 
@@ -103,7 +114,7 @@ private:
 	///----------------------------------------------------------------------------------------------------
 	CLocalization() {}
 	///----------------------------------------------------------------------------------------------------
-	/// ctor
+	/// dtor
 	///----------------------------------------------------------------------------------------------------
 	~CLocalization() { ClearLocaleAtlas(); }
 

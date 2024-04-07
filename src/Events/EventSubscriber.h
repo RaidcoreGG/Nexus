@@ -1,28 +1,26 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  QueuedTexture.h
-/// Description  :  Contains the QueudTexture data struct definition.
+/// Name         :  EventSubscriber.h
+/// Description  :  Contains the EventSubscriber data struct definition.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef QUEUEDTEXTURE_H
-#define QUEUEDTEXTURE_H
-
-#include <string>
+#ifndef EVENTSUBSCRIBER_H
+#define EVENTSUBSCRIBER_H
 
 #include "FuncDefs.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// QueuedTexture data struct
+/// EventSubscriber data struct
 ///----------------------------------------------------------------------------------------------------
-struct QueuedTexture
+struct EventSubscriber
 {
-	unsigned Width;
-	unsigned Height;
-	std::string Identifier;
-	unsigned char* Data;
-	TEXTURES_RECEIVECALLBACK Callback;
+	signed int Signature;
+	EVENT_CONSUME Callback;
 };
+
+bool operator==(const EventSubscriber& lhs, const EventSubscriber& rhs);
+bool operator!=(const EventSubscriber& lhs, const EventSubscriber& rhs);
 
 #endif

@@ -1,3 +1,11 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  LogEntry.h
+/// Description  :  Contains the LogEntry data struct definition.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #ifndef LOGENTRY_H
 #define LOGENTRY_H
 
@@ -5,6 +13,9 @@
 
 #include "ELogLevel.h"
 
+///----------------------------------------------------------------------------------------------------
+/// LogEntry data struct
+///----------------------------------------------------------------------------------------------------
 struct LogEntry
 {
 	ELogLevel LogLevel;
@@ -12,7 +23,16 @@ struct LogEntry
 	std::string Channel;
 	std::string Message;
 
+	///----------------------------------------------------------------------------------------------------
+	/// TimestampString:
+	/// 	Converts the timestamp of the log message to a string.
+	///----------------------------------------------------------------------------------------------------
 	std::string TimestampString(bool aIncludeDate = true);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ToString:
+	/// 	Converts the log message to a printable string.
+	///----------------------------------------------------------------------------------------------------
 	std::string ToString(bool aIncludeChannel = true);
 };
 

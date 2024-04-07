@@ -6,6 +6,7 @@
 #include <malloc.h>
 #include <vector>
 #include <fstream>
+#include <chrono>
 
 #include "resource.h"
 
@@ -29,8 +30,11 @@
 #include "Textures/TextureLoader.h"
 #include "GUI/GUI.h"
 #include "GUI/Widgets/QuickAccess/QuickAccess.h"
+#include "GUI/Widgets/Alerts/Alerts.h"
 #include "Settings/Settings.h"
 #include "Localization/Localization.h"
+
+#include "ArcDPS.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -65,10 +69,6 @@ namespace Loader
 
 	PIDLIST_ABSOLUTE			FSItemList;
 	ULONG						FSNotifierID;
-
-	HMODULE						ArcdpsHandle = nullptr;
-	bool						IsArcdpsLoaded = false;
-	bool						IsArcdpsBridgeDeployed = false;
 
 	std::string extDll			= ".dll";
 	std::string extUpdate		= ".update";
@@ -123,6 +123,11 @@ namespace Loader
 			std::thread([]()
 				{
 					GetAddonLibrary();
+				})
+				.detach();
+			std::thread([]()
+				{
+					ArcDPS::GetPluginLibrary();
 				})
 				.detach();
 
@@ -266,6 +271,7 @@ namespace Loader
 
 		if (!response.is_null())
 		{
+			const std::lock_guard<std::mutex> lock(Mutex);
 			AddonLibrary.clear();
 
 			for (const auto& addon : response)
@@ -276,6 +282,11 @@ namespace Loader
 				newAddon->Description = addon["description"];
 				newAddon->Provider = GetProvider(addon["download"]);
 				newAddon->DownloadURL = addon["download"];
+				if (addon.contains("tos_compliance") && !addon["tos_compliance"].is_null())
+				{
+					newAddon->ToSComplianceNotice = addon["tos_compliance"];
+				}
+
 				AddonLibrary.push_back(newAddon);
 			}
 
@@ -288,14 +299,14 @@ namespace Loader
 			LogWarning(CH_CORE, "Error parsing API response for /addonlibrary.");
 		}
 	}
-
+	
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		if (uMsg == WM_ADDONDIRUPDATE)
 		{
 			PIDLIST_ABSOLUTE* ppidl;
 			LONG event;
-			HANDLE notificationLock = SHChangeNotification_Lock((HANDLE)wParam, lParam, &ppidl, &event);
+			HANDLE notificationLock = SHChangeNotification_Lock((HANDLE)wParam, static_cast<DWORD>(lParam), &ppidl, &event);
 
 			if (notificationLock != 0)
 			{
@@ -365,6 +376,8 @@ namespace Loader
 				}
 			}
 		}
+
+		ArcDPS::GetPlugins();
 	}
 	void QueueAddon(ELoaderAction aAction, const std::filesystem::path& aPath)
 	{
@@ -428,7 +441,7 @@ namespace Loader
 				//}
 			}
 
-			if (gameBuild > lastGameBuild && lastGameBuild != 0)
+			if (gameBuild - lastGameBuild > 350 && lastGameBuild != 0)
 			{
 				/* game updated */
 				
@@ -462,7 +475,11 @@ namespace Loader
 				DisableVolatileUntilUpdate = true;
 				LogWarning(CH_LOADER, "Game updated. Current Build %d. Old Build: %d. Disabling volatile addons until they update.", gameBuild, lastGameBuild);
 
-				Events::RaiseNotification(EV_VOLATILE_ADDONS_DISABLED);
+				Events::Raise(EV_VOLATILE_ADDONS_DISABLED);
+				std::string msg = Language.Translate("((000001))");
+				msg.append("\n");
+				msg.append(Language.Translate("((000002))"));
+				GUI::Alerts::Notify(msg.c_str());
 			}
 
 			Settings::Settings[OPT_LASTGAMEBUILD] = gameBuild;
@@ -622,6 +639,13 @@ namespace Loader
 		/* doesn't have GetAddonDef */
 		if (FindFunction(addon->Module, &getAddonDef, "GetAddonDef") == false)
 		{
+			//typedef void* (*get_init_addr)(char*, ImGuiContext*, void*, HMODULE, void*, void*);
+			void* exp_get_init_addr = nullptr;
+			if (FindFunction(addon->Module, &exp_get_init_addr, "get_init_addr") == true)
+			{
+				ArcDPS::Add(addon->Module);
+			}
+
 			LogWarning(CH_LOADER, "\"%s\" is not a Nexus-compatible library. Incompatible.", strFile.c_str());
 			FreeLibrary(addon->Module);
 			addon->State = EAddonState::NotLoadedIncompatible;
@@ -705,6 +729,12 @@ namespace Loader
 					{
 						QueueAddon(ELoaderAction::Reload, tmpPath);
 					}
+					else if (addon->IsDisabledUntilUpdate && DisableVolatileUntilUpdate) // if addon is DUP and the global state is too
+					{
+						std::string msg = tmpName + " ";
+						msg.append(Language.Translate("((000073))"));
+						GUI::Alerts::Notify(msg.c_str());
+					}
 				})
 				.detach();
 
@@ -781,7 +811,11 @@ namespace Loader
 		GetModuleInformation(GetCurrentProcess(), addon->Module, &moduleInfo, sizeof(moduleInfo));
 		addon->ModuleSize = moduleInfo.SizeOfImage;
 
+		auto start_time = std::chrono::high_resolution_clock::now();
 		addon->Definitions->Load(api);
+		auto end_time = std::chrono::high_resolution_clock::now();
+		auto time = end_time - start_time;
+
 		Events::Raise(EV_ADDON_LOADED, &addon->Definitions->Signature);
 		Events::Raise(EV_MUMBLE_IDENTITY_UPDATED, MumbleIdentity);
 
@@ -789,26 +823,34 @@ namespace Loader
 		addon->State = locked ? EAddonState::LoadedLOCKED : EAddonState::Loaded;
 		SaveAddonConfig();
 
+		std::string apiVerStr;
 		if (addon->Definitions->APIVersion == 0)
 		{
-			LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (No API was requested.)", strFile.c_str(), addon->Definitions->Signature, addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage);
+			apiVerStr = "(No API was requested.)";
 		}
 		else
 		{
-			LogInfo(CH_LOADER, "Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.)", strFile.c_str(), addon->Definitions->Signature, addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage, addon->Definitions->APIVersion);
+			apiVerStr.append("(API Version ");
+			apiVerStr.append(std::to_string(addon->Definitions->APIVersion));
+			apiVerStr.append(" was requested.)");
 		}
+		LogInfo(CH_LOADER, u8"Loaded addon: %s (Signature %d) [%p - %p] %s Took %uµs.", 
+			strFile.c_str(), addon->Definitions->Signature, addon->Module,
+			((PBYTE)addon->Module) + moduleInfo.SizeOfImage,
+			apiVerStr.c_str(), time / std::chrono::microseconds(1)
+		);
 
 		/* if arcdps */
 		if (addon->Definitions->Signature == 0xFFF694D1)
 		{
-			ArcdpsHandle = addon->Module;
-			IsArcdpsLoaded = true;
+			ArcDPS::ModuleHandle = addon->Module;
+			ArcDPS::IsLoaded = true;
 
-			DeployArcdpsBridge();
+			ArcDPS::DeployBridge();
 		}
-		else if (addon->Definitions->Signature == 0xFED81763 && ArcdpsHandle) /* if arcdps bridge */
+		else if (addon->Definitions->Signature == 0xFED81763 && ArcDPS::ModuleHandle) /* if arcdps bridge */
 		{
-			InitializeArcdpsBridge(addon->Module);
+			ArcDPS::InitializeBridge(addon->Module);
 		}
 	}
 	void UnloadAddon(const std::filesystem::path& aPath, bool aIsShutdown)
@@ -834,11 +876,18 @@ namespace Loader
 			return;
 		}
 
+		std::chrono::steady_clock::time_point start_time;
+		std::chrono::steady_clock::time_point end_time;
+		std::chrono::steady_clock::duration time;
+
 		if (addon->Definitions)
 		{
 			if (addon->State == EAddonState::Loaded)
 			{
+				start_time = std::chrono::high_resolution_clock::now();
 				addon->Definitions->Unload();
+				end_time = std::chrono::high_resolution_clock::now();
+				time = end_time - start_time;
 				Events::Raise(EV_ADDON_UNLOADED, &addon->Definitions->Signature);
 			}
 			else if (addon->State == EAddonState::LoadedLOCKED && aIsShutdown)
@@ -846,7 +895,10 @@ namespace Loader
 				if (addon->Definitions->Unload)
 				{
 					/* If it's a shutdown and Unload is defined, let the addon run its shutdown routine to save settings etc, but do not freelib */
+					start_time = std::chrono::high_resolution_clock::now();
 					addon->Definitions->Unload();
+					end_time = std::chrono::high_resolution_clock::now();
+					time = end_time - start_time;
 					Events::Raise(EV_ADDON_UNLOADED, &addon->Definitions->Signature);
 				}
 			}
@@ -908,11 +960,11 @@ namespace Loader
 				Addons.erase(aPath);
 			}
 
-			LogInfo(CH_LOADER, "Unloaded addon: %s", strFile.c_str());
+			LogInfo(CH_LOADER, u8"Unloaded addon: %s (Took %uµs.)", strFile.c_str(), time / std::chrono::microseconds(1));
 		}
 		else if (addon->State == EAddonState::LoadedLOCKED && aIsShutdown)
 		{
-			LogInfo(CH_LOADER, "Unloaded addon on shutdown without freeing module due to locked state: %s", strFile.c_str());
+			LogInfo(CH_LOADER, u8"Unloaded addon on shutdown without freeing module due to locked state: %s (Took %uµs.)", strFile.c_str(), time / std::chrono::microseconds(1));
 		}
 
 		if (!aIsShutdown)
@@ -1515,17 +1567,17 @@ namespace Loader
 			((AddonAPI1*)api)->EnableHook = MH_EnableHook;
 			((AddonAPI1*)api)->DisableHook = MH_DisableHook;
 
-			((AddonAPI1*)api)->Log = LogMessageAddon;
+			((AddonAPI1*)api)->Log = ADDONAPI_LogMessage;
 
-			((AddonAPI1*)api)->RaiseEvent = Events::Raise;
+			((AddonAPI1*)api)->RaiseEvent = Events::ADDONAPI_RaiseEvent;
 			((AddonAPI1*)api)->SubscribeEvent = Events::Subscribe;
 			((AddonAPI1*)api)->UnsubscribeEvent = Events::Unsubscribe;
 
 			((AddonAPI1*)api)->RegisterWndProc = WndProc::Register;
 			((AddonAPI1*)api)->DeregisterWndProc = WndProc::Deregister;
 
-			((AddonAPI1*)api)->RegisterKeybindWithString = Keybinds::Register;
-			((AddonAPI1*)api)->RegisterKeybindWithStruct = Keybinds::RegisterWithStruct;
+			((AddonAPI1*)api)->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString;
+			((AddonAPI1*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct;
 			((AddonAPI1*)api)->DeregisterKeybind = Keybinds::Deregister;
 
 			((AddonAPI1*)api)->GetResource = DataLink::GetResource;
@@ -1563,10 +1615,10 @@ namespace Loader
 			((AddonAPI2*)api)->EnableHook = MH_EnableHook;
 			((AddonAPI2*)api)->DisableHook = MH_DisableHook;
 
-			((AddonAPI2*)api)->Log = ADDONAPI_LogMessageAddon2;
+			((AddonAPI2*)api)->Log = ADDONAPI_LogMessage2;
 
-			((AddonAPI2*)api)->RaiseEvent = Events::Raise;
-			((AddonAPI2*)api)->RaiseEventNotification = Events::RaiseNotification;
+			((AddonAPI2*)api)->RaiseEvent = Events::ADDONAPI_RaiseEvent;
+			((AddonAPI2*)api)->RaiseEventNotification = Events::ADDONAPI_RaiseNotification;
 			((AddonAPI2*)api)->SubscribeEvent = Events::Subscribe;
 			((AddonAPI2*)api)->UnsubscribeEvent = Events::Unsubscribe;
 
@@ -1574,8 +1626,8 @@ namespace Loader
 			((AddonAPI2*)api)->DeregisterWndProc = WndProc::Deregister;
 			((AddonAPI2*)api)->SendWndProcToGameOnly = WndProc::SendWndProcToGame;
 
-			((AddonAPI2*)api)->RegisterKeybindWithString = Keybinds::Register;
-			((AddonAPI2*)api)->RegisterKeybindWithStruct = Keybinds::RegisterWithStruct;
+			((AddonAPI2*)api)->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString;
+			((AddonAPI2*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct;
 			((AddonAPI2*)api)->DeregisterKeybind = Keybinds::Deregister;
 
 			((AddonAPI2*)api)->GetResource = DataLink::GetResource;
@@ -1599,6 +1651,69 @@ namespace Loader
 
 			((AddonAPI2*)api)->Translate = Localization::ADDONAPI_Translate;
 			((AddonAPI2*)api)->TranslateTo = Localization::ADDONAPI_TranslateTo;
+
+			ApiDefs.insert({ aVersion, api });
+			return api;
+
+		case 3:
+			api = new AddonAPI3();
+
+			((AddonAPI3*)api)->SwapChain = Renderer::SwapChain;
+			((AddonAPI3*)api)->ImguiContext = Renderer::GuiContext;
+			((AddonAPI3*)api)->ImguiMalloc = ImGui::MemAlloc;
+			((AddonAPI3*)api)->ImguiFree = ImGui::MemFree;
+			((AddonAPI3*)api)->RegisterRender = GUI::Register;
+			((AddonAPI3*)api)->DeregisterRender = GUI::Deregister;
+
+			((AddonAPI3*)api)->GetGameDirectory = Path::GetGameDirectory;
+			((AddonAPI3*)api)->GetAddonDirectory = Path::GetAddonDirectory;
+			((AddonAPI3*)api)->GetCommonDirectory = Path::GetCommonDirectory;
+
+			((AddonAPI3*)api)->CreateHook = MH_CreateHook;
+			((AddonAPI3*)api)->RemoveHook = MH_RemoveHook;
+			((AddonAPI3*)api)->EnableHook = MH_EnableHook;
+			((AddonAPI3*)api)->DisableHook = MH_DisableHook;
+
+			((AddonAPI3*)api)->Log = ADDONAPI_LogMessage2;
+
+			((AddonAPI3*)api)->SendAlert = GUI::Alerts::Notify;
+
+			((AddonAPI3*)api)->RaiseEvent = Events::ADDONAPI_RaiseEvent;
+			((AddonAPI3*)api)->RaiseEventNotification = Events::ADDONAPI_RaiseNotification;
+			((AddonAPI3*)api)->RaiseEventTargeted = Events::ADDONAPI_RaiseEventTargeted;
+			((AddonAPI3*)api)->RaiseEventNotificationTargeted = Events::ADDONAPI_RaiseNotificationTargeted;
+			((AddonAPI3*)api)->SubscribeEvent = Events::Subscribe;
+			((AddonAPI3*)api)->UnsubscribeEvent = Events::Unsubscribe;
+
+			((AddonAPI3*)api)->RegisterWndProc = WndProc::Register;
+			((AddonAPI3*)api)->DeregisterWndProc = WndProc::Deregister;
+			((AddonAPI3*)api)->SendWndProcToGameOnly = WndProc::SendWndProcToGame;
+
+			((AddonAPI3*)api)->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString;
+			((AddonAPI3*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct;
+			((AddonAPI3*)api)->DeregisterKeybind = Keybinds::Deregister;
+
+			((AddonAPI3*)api)->GetResource = DataLink::GetResource;
+			((AddonAPI3*)api)->ShareResource = DataLink::ShareResource;
+
+			((AddonAPI3*)api)->GetTexture = TextureLoader::Get;
+			((AddonAPI3*)api)->GetTextureOrCreateFromFile = TextureLoader::ADDONAPI_GetOrCreateFromFile;
+			((AddonAPI3*)api)->GetTextureOrCreateFromResource = TextureLoader::ADDONAPI_GetOrCreateFromResource;
+			((AddonAPI3*)api)->GetTextureOrCreateFromURL = TextureLoader::ADDONAPI_GetOrCreateFromURL;
+			((AddonAPI3*)api)->GetTextureOrCreateFromMemory = TextureLoader::ADDONAPI_GetOrCreateFromMemory;
+			((AddonAPI3*)api)->LoadTextureFromFile = TextureLoader::LoadFromFile;
+			((AddonAPI3*)api)->LoadTextureFromResource = TextureLoader::LoadFromResource;
+			((AddonAPI3*)api)->LoadTextureFromURL = TextureLoader::LoadFromURL;
+			((AddonAPI3*)api)->LoadTextureFromMemory = TextureLoader::LoadFromMemory;
+
+			((AddonAPI3*)api)->AddShortcut = GUI::QuickAccess::AddShortcut;
+			((AddonAPI3*)api)->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
+			((AddonAPI3*)api)->NotifyShortcut = GUI::QuickAccess::NotifyShortcut;
+			((AddonAPI3*)api)->AddSimpleShortcut = GUI::QuickAccess::AddSimpleShortcut;
+			((AddonAPI3*)api)->RemoveSimpleShortcut = GUI::QuickAccess::RemoveSimpleShortcut;
+
+			((AddonAPI3*)api)->Translate = Localization::ADDONAPI_Translate;
+			((AddonAPI3*)api)->TranslateTo = Localization::ADDONAPI_TranslateTo;
 
 			ApiDefs.insert({ aVersion, api });
 			return api;
@@ -1683,130 +1798,5 @@ namespace Loader
 		}
 
 		return "(null)";
-	}
-
-	void DetectArcdps()
-	{
-		if (IsArcdpsLoaded)
-		{
-			return;
-		}
-
-		// The following code is a bit ugly and repetitive, but this is because for each of these dlls you need to check whether it is arcdps
-
-		if (State::IsChainloading && std::filesystem::exists(Path::F_CHAINLOAD_DLL))
-		{
-			HMODULE hModule = GetModuleHandle(Path::F_CHAINLOAD_DLL.string().c_str());
-
-			void* func = nullptr;
-
-			if (hModule)
-			{
-				if (true == FindFunction(hModule, &func, "addextension2"))
-				{
-					ArcdpsHandle = hModule;
-					IsArcdpsLoaded = true;
-
-					LogInfo(CH_LOADER, "ArcDPS is not loaded as Nexus addon but was detected as Chainload.");
-
-					DeployArcdpsBridge();
-					return;
-				}
-			}
-		}
-
-		std::filesystem::path alArc = Path::D_GW2_ADDONS / "arcdps" / "gw2addon_arcdps.dll";
-		if (std::filesystem::exists(alArc))
-		{
-			HMODULE hModule = GetModuleHandle(alArc.string().c_str());
-
-			void* func = nullptr;
-
-			if (hModule)
-			{
-				if (true == FindFunction(hModule, &func, "addextension2"))
-				{
-					ArcdpsHandle = hModule;
-					IsArcdpsLoaded = true;
-
-					LogInfo(CH_LOADER, "ArcDPS is not loaded as Nexus addon but was detected as Addon-Loader addon.");
-
-					DeployArcdpsBridge();
-					return;
-				}
-			}
-		}
-
-		std::filesystem::path proxyArc = Path::D_GW2 / "d3d11.dll";
-		if (std::filesystem::exists(proxyArc))
-		{
-			HMODULE hModule = GetModuleHandle(proxyArc.string().c_str());
-
-			void* func = nullptr;
-
-			if (hModule)
-			{
-				if (true == FindFunction(hModule, &func, "addextension2"))
-				{
-					ArcdpsHandle = hModule;
-					IsArcdpsLoaded = true;
-
-					LogInfo(CH_LOADER, "ArcDPS is not loaded as Nexus addon but was detected as Proxy.");
-
-					DeployArcdpsBridge();
-					return;
-				}
-			}
-		}
-	}
-	void DeployArcdpsBridge()
-	{
-		/* write bridge to disk and queue load */
-		LPVOID res{}; DWORD sz{};
-		GetResource(NexusHandle, MAKEINTRESOURCE(RES_ARCDPS_INTEGRATION), "DLL", &res, &sz);
-
-		try
-		{
-			if (std::filesystem::exists(Path::F_ARCDPSINTEGRATION))
-			{
-				std::filesystem::remove(Path::F_ARCDPSINTEGRATION);
-			}
-
-			std::ofstream file(Path::F_ARCDPSINTEGRATION, std::ios::binary);
-			file.write((const char*)res, sz);
-			file.close();
-
-			// reload is set to true because the dll is always deployed from resource
-			// and since it's locked it would not load here directly but instead after checking for updates (which does not apply to it)
-			QueueAddon(ELoaderAction::Reload, Path::F_ARCDPSINTEGRATION);
-		}
-		catch (std::filesystem::filesystem_error fErr)
-		{
-			LogDebug(CH_LOADER, "%s", fErr.what());
-			return;
-		}
-	}
-	void InitializeArcdpsBridge(HMODULE aBridgeModule)
-	{
-		if (IsArcdpsBridgeDeployed || !aBridgeModule || !IsArcdpsLoaded)
-		{
-			return;
-		}
-
-		/* arcdps integration detection & deploy */
-		typedef int (*addextension2)(HINSTANCE);
-		addextension2 exp_addextension2 = nullptr;
-
-		if (true == FindFunction(ArcdpsHandle, &exp_addextension2, "addextension2"))
-		{
-			int result = exp_addextension2(aBridgeModule);
-			LogInfo(CH_LOADER, "Deployed ArcDPS Integration. Result: %d", result);
-		}
-		else
-		{
-			LogWarning(CH_LOADER, "Addon with signature \"0xFFF694D1\" found but \"addextension2\" is not exported. ArcDPS combat events won't be relayed.");
-		}
-
-		IsArcdpsBridgeDeployed = true;
 	}
 }

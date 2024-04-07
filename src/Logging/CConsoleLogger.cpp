@@ -1,3 +1,11 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  CConsoleLogger.cpp
+/// Description  :  Custom logger to print to a console window.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #include "CConsoleLogger.h"
 
 #include <Windows.h>
