@@ -155,7 +155,8 @@ namespace GUI
 								NONE,
 								Text,
 								ColorPush,
-								ColorPop
+								ColorPop,
+								LineBreak
 							};
 
 							struct MessagePart
@@ -187,6 +188,19 @@ namespace GUI
 									msgSpace.Type = EMessagePartType::Text;
 									msgSpace.Text = " ";
 									msgParts.push_back(msgSpace);
+
+									idxLastWordStart = i + 1;
+								}
+								else if (entry.Message[i] == '\n')
+								{
+									MessagePart msgPartPre{};
+									msgPartPre.Type = EMessagePartType::Text;
+									msgPartPre.Text = entry.Message.substr(idxLastWordStart, i - idxLastWordStart);
+									msgParts.push_back(msgPartPre);
+
+									MessagePart msgPart{};
+									msgPart.Type = EMessagePartType::LineBreak;
+									msgParts.push_back(msgPart);
 
 									idxLastWordStart = i + 1;
 								}
@@ -276,6 +290,10 @@ namespace GUI
 										ImGui::PopStyleColor();
 										colStack--;
 									}
+									break;
+								case EMessagePartType::LineBreak:
+									pos.x = posInitial.x;
+									pos.y += lineHeight;
 									break;
 								}
 							}
