@@ -32,6 +32,7 @@ namespace GUI
 	Texture* BtnOptions = nullptr;
 	Texture* CtxMenuBullet = nullptr;
 	Texture* CtxMenuHighlight = nullptr;
+	Texture* ToSComplianceWarning = nullptr;
 
 	void AddonItem(std::filesystem::path aPath, Addon* aAddon)
 	{
@@ -318,6 +319,36 @@ namespace GUI
 			{
 				ImGui::SetCursorPos(ImVec2(descWidth + 12.0f + 12.0f, 12.0f));
 				ImGui::BeginChild("##AddonItemActions", ImVec2(actionsWidth, itemHeightScaled - 12.0f - 12.0f));
+
+				if (!aAddon->ToSComplianceNotice.empty())
+				{
+					if (ToSComplianceWarning)
+					{
+						std::string tosNotice = Language.Translate("((000074))");
+						tosNotice.append("\n");
+						tosNotice.append(aAddon->ToSComplianceNotice);
+
+						ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
+						ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
+						ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
+						ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.863f, 0.863f, 0.863f, 1));
+						ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f });
+
+						ImGui::SetCursorPos(ImVec2(actionsWidth - (size * Renderer::Scaling), ImGui::GetCursorPosY()));
+						if (ImGui::ImageButton(ToSComplianceWarning->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
+						{
+							ShellExecuteA(0, 0, "https://help.guildwars2.com/hc/en-us/articles/360013625034-Policy-Third-Party-Programs", 0, 0, SW_SHOW);
+						}
+						ImGui::PopStyleColor(4);
+						ImGui::PopStyleVar();
+
+						ImGui::GW2::TooltipGeneric(tosNotice.c_str());
+					}
+					else
+					{
+						ToSComplianceWarning = TextureLoader::GetOrCreate(ICON_NOTIFICATION, RES_ICON_NOTIFICATION, NexusHandle);
+					}
+				}
 
 				// just check if loaded, if it was not hot-reloadable it would be EAddonState::LoadedLOCKED
 				if (!aInstalled)

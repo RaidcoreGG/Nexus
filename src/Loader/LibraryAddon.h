@@ -13,6 +13,7 @@ struct LibraryAddon
 	std::string		Description;
 	EUpdateProvider Provider;
 	std::string		DownloadURL;
+	std::string		ToSComplianceNotice;
 };
 
 #endif

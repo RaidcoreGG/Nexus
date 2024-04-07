@@ -318,6 +318,9 @@
     <ClCompile Include="GUI\Widgets\Alerts\Alerts.cpp">
       <Filter>GUI\Widgets\Alerts</Filter>
     </ClCompile>
+    <ClCompile Include="Loader\ArcDPS.cpp">
+      <Filter>Loader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imstb_truetype.h">
@@ -1066,6 +1069,9 @@
     </ClInclude>
     <ClInclude Include="GUI\Widgets\Alerts\FuncDefs.h">
       <Filter>GUI\Widgets\Alerts</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\ArcDPS.h">
+      <Filter>Loader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

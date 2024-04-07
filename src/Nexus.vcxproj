@@ -20,6 +20,7 @@
     <ClCompile Include="DataLink\DataLink.cpp" />
     <ClCompile Include="Events\EventSubscriber.cpp" />
     <ClCompile Include="GUI\Widgets\Alerts\Alerts.cpp" />
+    <ClCompile Include="Loader\ArcDPS.cpp" />
     <ClCompile Include="Localization\Localization.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Events\EventHandler.cpp" />
@@ -128,6 +129,7 @@
     <ClInclude Include="Keybinds\KeybindHandler.h" />
     <ClInclude Include="Keybinds\KeystrokeMessageFlags.h" />
     <ClInclude Include="Loader\Addon.h" />
+    <ClInclude Include="Loader\ArcDPS.h" />
     <ClInclude Include="Loader\EAddonFlags.h" />
     <ClInclude Include="Loader\EAddonState.h" />
     <ClInclude Include="Loader\ELoaderAction.h" />

@@ -17,6 +17,7 @@
 #include "Shared.h"
 
 #include "Loader/Loader.h"
+#include "Loader/ArcDPS.h"
 
 namespace Events
 {
@@ -133,9 +134,9 @@ namespace Events
 			}
 
 			/* dirty hack for arcdps (I hate my life) */
-			if ((str == "EV_ARCDPS_COMBATEVENT_LOCAL_RAW" || str == "EV_ARCDPS_COMBATEVENT_SQUAD_RAW") && !Loader::IsArcdpsLoaded)
+			if ((str == "EV_ARCDPS_COMBATEVENT_LOCAL_RAW" || str == "EV_ARCDPS_COMBATEVENT_SQUAD_RAW") && !ArcDPS::IsLoaded)
 			{
-				Loader::DetectArcdps();
+				ArcDPS::Detect();
 			}
 		}
 	}

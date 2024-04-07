@@ -42,10 +42,6 @@ namespace Loader
 	extern PIDLIST_ABSOLUTE				FSItemList;
 	extern ULONG						FSNotifierID;
 
-	extern HMODULE						ArcdpsHandle;
-	extern bool							IsArcdpsLoaded;
-	extern bool							IsArcdpsBridgeDeployed;
-
 	/* Registers the addon directory update notifications and loads all addons. */
 	void Initialize();
 	/* Deregisters the directory updates and unloads all addons. */
@@ -99,13 +95,6 @@ namespace Loader
 
 	/* HELPER: Returns the name of the owning addon. Similar to ::Verify. */
 	std::string GetOwner(void* aAddress);
-
-	/* Detect if ArcDPS is not loaded as Nexus addon and deploy bridge if found. */
-	void DetectArcdps();
-	/* Write ArcDPS Bridge to disk and queue load. */
-	void DeployArcdpsBridge();
-	/* Initialize ArcDPS Bridge. */
-	void InitializeArcdpsBridge(HMODULE aBridgeModule);
 }
 
 #endif

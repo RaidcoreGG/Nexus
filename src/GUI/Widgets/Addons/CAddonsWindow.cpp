@@ -10,6 +10,7 @@
 #include "Renderer.h"
 
 #include "Loader/Loader.h"
+#include "Loader/ArcDPS.h"
 #include "AddonItem.h"
 #include "Textures/TextureLoader.h"
 
@@ -138,14 +139,18 @@ namespace GUI
 			}
 			Tab2Hovered = ImGui::IsItemHovered();
 
-			ImGui::SameLine();
-
-			ImVec2 tab3origin = ImGui::GetCursorPos();
-			if (ImGui::ImageButton(!Tab3Hovered ? TabBtn->Resource : TabBtnHover->Resource, ImVec2(tab3width * Renderer::Scaling, 24.0f * Renderer::Scaling)))
+			ImVec2 tab3origin; // predeclare here because of conditional
+			if (ArcDPS::IsLoaded)
 			{
-				TabIndex = 2;
+				ImGui::SameLine();
+
+				tab3origin = ImGui::GetCursorPos();
+				if (ImGui::ImageButton(!Tab3Hovered ? TabBtn->Resource : TabBtnHover->Resource, ImVec2(tab3width * Renderer::Scaling, 24.0f * Renderer::Scaling)))
+				{
+					TabIndex = 2;
+				}
+				Tab3Hovered = ImGui::IsItemHovered();
 			}
-			Tab3Hovered = ImGui::IsItemHovered();
 
 			ImGui::PopStyleColor(3);
 			ImGui::PopStyleVar();
@@ -156,8 +161,11 @@ namespace GUI
 			ImGui::SetCursorPos(ImVec2(tab2origin.x + text2offset.x, tab2origin.y + text2offset.y));
 			ImGui::TextColored(TabIndex == 1 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000032))"));
 
-			ImGui::SetCursorPos(ImVec2(tab3origin.x + text3offset.x, tab3origin.y + text3offset.y));
-			ImGui::TextColored(TabIndex == 2 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("ArcDPS Plugins"));
+			if (ArcDPS::IsLoaded)
+			{
+				ImGui::SetCursorPos(ImVec2(tab3origin.x + text3offset.x, tab3origin.y + text3offset.y));
+				ImGui::TextColored(TabIndex == 2 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("ArcDPS Plugins"));
+			}
 			
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
@@ -279,7 +287,7 @@ namespace GUI
 										// if libAddon already exist in installed addons
 										// or if arcdps is loaded another way and the libAddon is arc
 										if ((addon->Definitions != nullptr && addon->Definitions->Signature == libAddon->Signature) ||
-											(Loader::IsArcdpsLoaded && libAddon->Signature == 0xFFF694D1))
+											(ArcDPS::IsLoaded && libAddon->Signature == 0xFFF694D1))
 										{
 											exists = true;
 											break;
@@ -310,18 +318,58 @@ namespace GUI
 				}
 				else if (TabIndex == 2)
 				{
-					ImGui::Text("text1sz: %f", text1sz.x);
-					ImGui::Text("text2sz: %f", text2sz.x);
-					ImGui::Text("text3sz: %f", text3sz.x);
-					ImGui::Text("tab1width: %f", tab1width);
-					ImGui::Text("tab2width: %f", tab2width);
-					ImGui::Text("tab2width: %f", tab3width);
-					ImGui::Text("text1offset: %f", text1offset.x);
-					ImGui::Text("text2offset: %f", text2offset.x);
-					ImGui::Text("text3offset: %f", text3offset.x);
-					ImGui::Text("tab1origin: %f", tab1origin.x);
-					ImGui::Text("tab2origin: %f", tab2origin.x);
-					ImGui::Text("tab3origin: %f", tab3origin.x);
+					if (ArcDPS::IsPluginAtlasBuilt)
+					{
+						ImGui::BeginChild("##AddonTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), (btnHeight * 1.5f) * -1));
+
+						int downloadable = 0;
+						const std::lock_guard<std::mutex> lockLoader(ArcDPS::Mutex);
+						if (ArcDPS::PluginLibrary.size() != 0)
+						{
+							for (auto& arclibAddon : ArcDPS::PluginLibrary)
+							{
+								bool exists = false;
+								{
+									for (auto& arcAddonSig : ArcDPS::Plugins)
+									{
+										// if arclibAddon already exist in installed addons
+										// or if arcdps is loaded another way and the arclibAddon is arc
+										if (arclibAddon->Signature == arcAddonSig)
+										{
+											exists = true;
+											break;
+										}
+									}
+								}
+								if (false == exists || true == showInstalled)
+								{
+									AddonItem(arclibAddon, exists);
+									downloadable++;
+								}
+							}
+						}
+
+						if (ArcDPS::PluginLibrary.size() == 0 || downloadable == 0)
+						{
+							ImVec2 windowSize = ImGui::GetWindowSize();
+							ImVec2 textSize = ImGui::CalcTextSize(Language.Translate("((000037))"));
+							ImVec2 position = ImGui::GetCursorPos();
+							ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
+							ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000037))"));
+						}
+
+						ImGui::EndChild();
+					}
+					else
+					{
+						ImVec2 windowSize = ImGui::GetWindowSize();
+						ImVec2 textSize = ImGui::CalcTextSize(Language.Translate("((000071))"));
+						ImVec2 position = ImGui::GetCursorPos();
+						ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
+						ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000071))"));
+					}
+
+					ImGui::Checkbox(Language.Translate("((000038))"), &showInstalled);
 				}
 
 				ImGui::EndChild();
