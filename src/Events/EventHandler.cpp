@@ -43,18 +43,20 @@ namespace Events
 
 namespace Events
 {
-	std::mutex											Mutex;
-	std::map<std::string, std::vector<EventSubscriber>>	Registry;
+	std::mutex							Mutex;
+	std::map<std::string, EventData>	Registry;
 
 	void Raise(const char* aIdentifier, void* aEventData)
 	{
+		Registry[aIdentifier].AmountRaises++;
+
 		//auto start_time = std::chrono::high_resolution_clock::now();
 
 		std::string str = aIdentifier;
 
 		const std::lock_guard<std::mutex> lock(Mutex);
 		{
-			for (EventSubscriber sub : Registry[str])
+			for (EventSubscriber sub : Registry[str].Subscribers)
 			{
 				sub.Callback(aEventData);
 			}
@@ -67,11 +69,13 @@ namespace Events
 
 	void Raise(signed int aSignature, const char* aIdentifier, void* aEventData)
 	{
+		Registry[aIdentifier].AmountRaises++;
+
 		std::string str = aIdentifier;
 
 		const std::lock_guard<std::mutex> lock(Mutex);
 		{
-			for (EventSubscriber sub : Registry[str])
+			for (EventSubscriber sub : Registry[str].Subscribers)
 			{
 				if (sub.Signature == aSignature)
 				{
@@ -121,7 +125,7 @@ namespace Events
 				}
 			}
 
-			Registry[str].push_back(sub);
+			Registry[str].Subscribers.push_back(sub);
 
 			if (sub.Signature == 0)
 			{
@@ -144,11 +148,11 @@ namespace Events
 		{
 			if (Registry.find(str) != Registry.end())
 			{
-				for (EventSubscriber evSub : Registry[str])
+				for (EventSubscriber evSub : Registry[str].Subscribers)
 				{
 					if (evSub.Callback == aConsumeEventCallback)
 					{
-						Registry[str].erase(std::remove(Registry[str].begin(), Registry[str].end(), evSub), Registry[str].end());
+						Registry[str].Subscribers.erase(std::remove(Registry[str].Subscribers.begin(), Registry[str].Subscribers.end(), evSub), Registry[str].Subscribers.end());
 						break;
 					}
 				}
@@ -162,13 +166,13 @@ namespace Events
 
 		const std::lock_guard<std::mutex> lock(Mutex);
 		{
-			for (auto& [identifier, consumers] : Registry)
+			for (auto& [identifier, ev] : Registry)
 			{
-				for (EventSubscriber evSub : consumers)
+				for (EventSubscriber evSub : ev.Subscribers)
 				{
 					if (evSub.Callback >= aStartAddress && evSub.Callback <= aEndAddress)
 					{
-						consumers.erase(std::remove(consumers.begin(), consumers.end(), evSub), consumers.end());
+						ev.Subscribers.erase(std::remove(ev.Subscribers.begin(), ev.Subscribers.end(), evSub), ev.Subscribers.end());
 						refCounter++;
 					}
 				}

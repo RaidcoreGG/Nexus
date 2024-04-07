@@ -47,13 +47,19 @@ namespace Events
 	void ADDONAPI_RaiseNotificationTargeted(signed int aSignature, const char* aIdentifier);
 }
 
+struct EventData
+{
+	std::vector<EventSubscriber>	Subscribers;
+	unsigned long long				AmountRaises;
+};
+
 ///----------------------------------------------------------------------------------------------------
 /// Events Namespace
 ///----------------------------------------------------------------------------------------------------
 namespace Events
 {
-	extern std::mutex											Mutex;
-	extern std::map<std::string, std::vector<EventSubscriber>>	Registry;
+	extern std::mutex						Mutex;
+	extern std::map<std::string, EventData>	Registry;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Raise:

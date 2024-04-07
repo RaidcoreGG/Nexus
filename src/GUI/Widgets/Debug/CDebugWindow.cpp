@@ -89,18 +89,23 @@ namespace GUI
 
 				Events::Mutex.lock();
 				{
-					for (auto& [identifier, subscribers] : Events::Registry)
+					for (auto& [identifier, ev] : Events::Registry)
 					{
-						if (ImGui::TreeNode(identifier.c_str()))
+						std::string header = identifier + " ";
+						header.append("(");
+						header.append(std::to_string(ev.AmountRaises));
+						header.append(")");
+
+						if (ImGui::TreeNode(header.c_str()))
 						{
-							if (subscribers.size() == 0)
+							if (ev.Subscribers.size() == 0)
 							{
 								ImGui::TextDisabled("This event has no subscribers.");
 							}
 							else
 							{
 								ImGui::TextDisabled("Subscribers:");
-								for (EventSubscriber sub : subscribers)
+								for (EventSubscriber sub : ev.Subscribers)
 								{
 									ImGui::Text(""); ImGui::SameLine(); ImGui::TextDisabled("Owner: %d | Callback: %p", sub.Signature, sub.Callback);
 								}
