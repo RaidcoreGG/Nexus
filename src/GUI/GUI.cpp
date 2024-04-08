@@ -585,6 +585,11 @@ namespace GUI
 			{
 				ImGuiIO& io = ImGui::GetIO();
 				Settings::Settings[OPT_GLOBALSCALE].get_to(io.FontGlobalScale);
+
+				if (io.FontGlobalScale < 0.3f)
+				{
+					io.FontGlobalScale = 0.3f;
+				}
 			}
 			else
 			{
