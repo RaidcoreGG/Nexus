@@ -588,7 +588,7 @@ namespace GUI
 			}
 			else
 			{
-				Settings::Settings[OPT_GLOBALSCALE] = false;
+				Settings::Settings[OPT_GLOBALSCALE] = 1.0f;
 			}
 		}
 
