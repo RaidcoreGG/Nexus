@@ -12,6 +12,8 @@
 #include "Consts.h"
 #include "Branch.h"
 
+#include "Mumble/Mumble.h"
+
 #include "Events/EventHandler.h"
 #include "Keybinds/KeybindHandler.h"
 #include "Loader/Loader.h"
@@ -61,7 +63,7 @@ namespace GUI
 	bool						IsRightClickHeld			= false;
 	bool						IsLeftClickHeld				= false;
 	bool						IsSetup						= false;
-	float						LastScaling;
+	float						LastScaling					= 1.0f;
 
 	bool						HasAcceptedEULA				= false;
 	bool						NotifyChangelog				= false;
@@ -400,20 +402,30 @@ namespace GUI
 			((CDebugWindow*)(*it))->MumbleWindow->Visible = !((CDebugWindow*)(*it))->MumbleWindow->Visible;
 		}
 	}
+
+	void Rescale()
+	{
+		float currScaling = MumbleIdentity
+			? Mumble::GetScalingFactor(MumbleIdentity->UISize)
+			: 1.0f;
+
+		ImGuiIO& io = ImGui::GetIO();
+		Renderer::Scaling = currScaling * io.FontGlobalScale;
+	}
 	
 	void OnMumbleIdentityChanged(void* aEventArgs)
 	{
-		if (Renderer::Scaling != LastScaling && IsGameplay)
-		{
-			LastScaling = Renderer::Scaling;
-			Settings::Settings[OPT_LASTUISCALE] = Renderer::Scaling;
-			Settings::Save();
-		}
-
-		ImGuiIO& io = ImGui::GetIO();
-
 		if (MumbleIdentity)
 		{
+			float currScaling = Mumble::GetScalingFactor(MumbleIdentity->UISize);
+			if (currScaling != LastScaling && IsGameplay)
+			{
+				Rescale();
+				LastScaling = currScaling;
+				Settings::Settings[OPT_LASTUISCALE] = currScaling;
+				Settings::Save();
+			}
+
 			switch (MumbleIdentity->UISize)
 			{
 			case 0:
@@ -474,15 +486,13 @@ namespace GUI
 				FontSize = 16.0f;
 			}
 
-			if (!Settings::Settings[OPT_LASTUISCALE].is_null() && Renderer::Scaling == 0)
+			if (!Settings::Settings[OPT_LASTUISCALE].is_null())
 			{
 				Settings::Settings[OPT_LASTUISCALE].get_to(LastScaling);
-				Settings::Settings[OPT_LASTUISCALE].get_to(Renderer::Scaling);
 			}
 			else
 			{
 				LastScaling = SC_NORMAL;
-				Renderer::Scaling = SC_NORMAL;
 				Settings::Settings[OPT_LASTUISCALE] = SC_NORMAL;
 			}
 
@@ -581,9 +591,10 @@ namespace GUI
 				Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS] = false;
 			}
 
+			ImGuiIO& io = ImGui::GetIO();
+
 			if (!Settings::Settings[OPT_GLOBALSCALE].is_null())
 			{
-				ImGuiIO& io = ImGui::GetIO();
 				Settings::Settings[OPT_GLOBALSCALE].get_to(io.FontGlobalScale);
 				
 				if (io.FontGlobalScale < 0.75f)
@@ -595,6 +606,8 @@ namespace GUI
 			{
 				Settings::Settings[OPT_GLOBALSCALE] = 1.0f;
 			}
+
+			Renderer::Scaling = LastScaling * io.FontGlobalScale;
 		}
 
 		ImportArcDPSStyle();

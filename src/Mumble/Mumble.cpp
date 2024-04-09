@@ -99,10 +99,7 @@ namespace Mumble
 						Log(CH_CORE, "MumbleLink could not be parsed. Unknown Error.");
 					}
 					
-					/* update ui scaling factor */
-					Renderer::Scaling = GetScalingFactor(MumbleIdentity->UISize);
-
-					/* notify */
+					/* notify (also notifies the GUI to update its scaling factor) */
 					if (*MumbleIdentity != prevIdentity)
 					{
 						Events::Raise(EV_MUMBLE_IDENTITY_UPDATED, MumbleIdentity);
@@ -138,30 +135,13 @@ namespace Mumble
 
 	float GetScalingFactor(unsigned aSize)
 	{
-		const float MIN_SCALE = 0.3f;
-		const float MAX_SCALE = 2.0f;
-
-		if (Renderer::GuiContext)
-		{
-			ImGuiIO& io = ImGui::GetIO();
-
-			switch (aSize)
-			{
-			case 0: return Renderer::Scaling = SC_SMALL * io.FontGlobalScale;	// Small
-			default:
-			case 1: return Renderer::Scaling = SC_NORMAL * io.FontGlobalScale;	// Normal
-			case 2: return Renderer::Scaling = SC_LARGE * io.FontGlobalScale;	// Large
-			case 3: return Renderer::Scaling = SC_LARGER * io.FontGlobalScale;	// Larger
-			}
-		}
-
 		switch (aSize)
 		{
-		case 0: return Renderer::Scaling = SC_SMALL;	// Small
+		case 0: return SC_SMALL;	// Small
 		default:
-		case 1: return Renderer::Scaling = SC_NORMAL;	// Normal
-		case 2: return Renderer::Scaling = SC_LARGE;	// Large
-		case 3: return Renderer::Scaling = SC_LARGER;	// Larger
+		case 1: return SC_NORMAL;	// Normal
+		case 2: return SC_LARGE;	// Large
+		case 3: return SC_LARGER;	// Larger
 		}
 	}
 }
