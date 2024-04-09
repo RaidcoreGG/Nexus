@@ -259,11 +259,12 @@ namespace GUI
 			/* draw overlay */
 			if (IsUIVisible)
 			{
-				/* draw menu & qa */
-				Menu::Render();
-				QuickAccess::Render();
-				Alerts::Render();
-				/* draw menu & qa end*/
+				/* draw addons*/
+				for (GUI_RENDER callback : RegistryRender)
+				{
+					if (callback) { callback(); }
+				}
+				/* draw addons end*/
 
 				/* draw nexus windows */
 				for (IWindow* wnd : Windows)
@@ -272,12 +273,11 @@ namespace GUI
 				}
 				/* draw nexus windows end */
 
-				/* draw addons*/
-				for (GUI_RENDER callback : RegistryRender)
-				{
-					if (callback) { callback(); }
-				}
-				/* draw addons end*/
+				/* draw menu & qa */
+				Menu::Render();
+				QuickAccess::Render();
+				Alerts::Render();
+				/* draw menu & qa end*/
 			}
 			/* draw overlay end */
 
