@@ -233,10 +233,12 @@ namespace GUI
 
 				ImGuiIO& io = ImGui::GetIO();
 				ImGui::TextDisabled(Language.Translate("((000072))"));
-				if (ImGui::DragFloat("##globalscale", &io.FontGlobalScale, 0.005f, 0.3f, 3.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp))
+				if (ImGui::DragFloat("##globalscale", &io.FontGlobalScale, 0.005f, 0.75f, 3.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp))
 				{
 					Settings::Settings[OPT_GLOBALSCALE] = io.FontGlobalScale;
 					Settings::Save();
+
+					GUI::Rescale();
 				}
 
 				ImGui::Separator();

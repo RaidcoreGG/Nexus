@@ -23,6 +23,8 @@ namespace GUI
 	void* memPtr = nullptr;
 	size_t memSz = 0;
 
+	bool showMetricsDebugger = false;
+
 	/* proto tabs */
 	void DbgEventsTab();
 	void DbgKeybindsTab();
@@ -46,11 +48,17 @@ namespace GUI
 
 		if (!Visible) { return; }
 
+		if (showMetricsDebugger)
+		{
+			ImGui::ShowMetricsWindow();
+		}
+
 		ImGui::SetNextWindowSize(ImVec2(dwWidth * ImGui::GetFontSize(), dwHeight * ImGui::GetFontSize()), ImGuiCond_FirstUseEver);
 		if (ImGui::Begin(Name.c_str(), &Visible, ImGuiWindowFlags_NoCollapse))
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f });
 			ImGui::Checkbox("Show Mumble overlay", &MumbleWindow->Visible);
+			ImGui::Checkbox("Show Metrics / Debugger", &showMetricsDebugger);
 			ImGui::PopStyleVar();
 
 			if (ImGui::BeginTabBar("DebugTabBar", ImGuiTabBarFlags_None))

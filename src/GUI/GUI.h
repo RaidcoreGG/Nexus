@@ -44,6 +44,8 @@ namespace GUI
 
 	void ImportArcDPSStyle();
 
+	void Rescale();
+
 	/* Registers the provided RenderCallback. */
 	void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback);
 	/* Deregisters the provided RenderCallback. */
