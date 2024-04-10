@@ -331,9 +331,11 @@ namespace Keybinds
 
 		if (res != aIdentifier && res != "") { return; }
 
-		const std::lock_guard<std::mutex> lock(Mutex);
+		{
+			const std::lock_guard<std::mutex> lock(Mutex);
 
-		Registry[aIdentifier].Bind = aKeybind;
+			Registry[aIdentifier].Bind = aKeybind;
+		}
 
 		Save();
 	}
