@@ -358,6 +358,12 @@ namespace Keybinds
 		return called;
 	}
 
+	void Delete(std::string aIdentifier)
+	{
+		const std::lock_guard<std::mutex> lock(Mutex);
+		Registry.erase(aIdentifier);
+	}
+
 	int Verify(void* aStartAddress, void* aEndAddress)
 	{
 		int refCounter = 0;

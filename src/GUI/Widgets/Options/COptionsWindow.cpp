@@ -416,6 +416,8 @@ namespace GUI
 				float kbButtonWidth = ImGui::CalcTextSize("XXXXXXXXXXXXXXXXXXXXXXXX").x;
 
 				bool openEditor = false;
+				bool deleteStaleBind = false;
+				std::string staleBindIdentifier;
 
 				Keybinds::Mutex.lock();
 				{
@@ -457,6 +459,12 @@ namespace GUI
 									ImGui::TableSetColumnIndex(2);
 									if (keybind.Handler == nullptr)
 									{
+										if (ImGui::SmallButton(("X##" + identifier).c_str()))
+										{
+											deleteStaleBind = true;
+											staleBindIdentifier = identifier;
+										}
+										ImGui::SameLine();
 										ImGui::TextDisabled(Language.Translate("((000061))"));
 									}
 								}
@@ -467,6 +475,13 @@ namespace GUI
 					}
 				}
 				Keybinds::Mutex.unlock();
+
+				if (deleteStaleBind && !staleBindIdentifier.empty())
+				{
+					Keybinds::Delete(staleBindIdentifier);
+					deleteStaleBind = false;
+					staleBindIdentifier.clear();
+				}
 
 				std::string kbModalTitle = Language.Translate("((000062))");
 				kbModalTitle.append(Language.Translate(CurrentlyEditing.c_str()));
