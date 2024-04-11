@@ -210,7 +210,7 @@ namespace Loader
 				Addon* addon = it.second;
 
 				if (!addon->Definitions) { continue; }
-				if (addon->Definitions->Signature == -19392669) { continue; } // skip bridge
+				if (addon->Definitions->Signature == 0xFED81763) { continue; } // skip bridge
 
 				json addonInfo =
 				{
@@ -221,7 +221,7 @@ namespace Loader
 				};
 
 				/* override loaded state, if it's supposed to disable next launch */
-				if (addon->State == EAddonState::LoadedLOCKED && addon->ShouldDisableNextLaunch)
+				if (addon->State == EAddonState::LoadedLOCKED && addon->IsFlaggedForDisable)
 				{
 					addonInfo["IsLoaded"] = false;
 				}
@@ -233,7 +233,7 @@ namespace Loader
 			/* also keep tracking addons that are no longer there */
 			for (auto& cfgIt : AddonConfig)
 			{
-				if (cfgIt.first == -19392669) { continue; } // skip bridge
+				if (cfgIt.first == 0xFED81763) { continue; } // skip bridge
 
 				bool tracked = false;
 				for (size_t i = 0; i < foundAddons.size(); i++)
@@ -988,7 +988,7 @@ namespace Loader
 				try
 				{
 					std::filesystem::rename(aPath, aPath.string() + extUninstall);
-					it->second->WillBeUninstalled = true;
+					it->second->IsFlaggedForUninstall = true;
 					LogWarning(CH_LOADER, "Addon is stilled loaded, it will be uninstalled the next time the game is restarted: %s", aPath.string().c_str());
 				}
 				catch (std::filesystem::filesystem_error fErr)
@@ -1500,11 +1500,19 @@ namespace Loader
 			/* prepare client request */
 			httplib::Client client(baseUrl);
 			client.enable_server_certificate_verification(false);
+			client.set_follow_location(true);
 
 			size_t lastSlashPos = endpoint.find_last_of('/');
 			std::string filename = endpoint.substr(lastSlashPos + 1);
 			size_t dotDllPos = filename.find(extDll);
-			filename = filename.substr(0, filename.length() - extDll.length());
+			if (dotDllPos != std::string::npos)
+			{
+				filename = filename.substr(0, filename.length() - extDll.length());
+			}
+			else
+			{
+				filename = Normalize(aAddon->Name);
+			}
 
 			std::filesystem::path probe = Path::D_GW2_ADDONS / (filename + extDll);
 

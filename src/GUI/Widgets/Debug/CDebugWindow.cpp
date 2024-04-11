@@ -346,9 +346,9 @@ namespace GUI
 								ImGui::TextDisabled("MD5: %s", MD5ToString(addon->MD5).c_str());
 								ImGui::TextDisabled("Definitions: %p", addon->Definitions);
 								ImGui::Separator();
-								ImGui::TextDisabled("ShouldDisableNextLaunch: %s", addon->ShouldDisableNextLaunch ? "true" : "false");
+								ImGui::TextDisabled("IsFlaggedForDisable: %s", addon->IsFlaggedForDisable ? "true" : "false");
 								ImGui::TextDisabled("IsPausingUpdates: %s", addon->IsPausingUpdates ? "true" : "false");
-								ImGui::TextDisabled("WillBeUninstalled: %s", addon->WillBeUninstalled ? "true" : "false");
+								ImGui::TextDisabled("IsFlaggedForUninstall: %s", addon->IsFlaggedForUninstall ? "true" : "false");
 								ImGui::TextDisabled("IsDisabledUntilUpdate: %s", addon->IsDisabledUntilUpdate ? "true" : "false");
 
 								if (addon->Definitions != nullptr)

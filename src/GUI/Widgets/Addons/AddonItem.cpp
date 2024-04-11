@@ -40,7 +40,7 @@ namespace GUI
 			aAddon->Definitions == nullptr ||
 			aAddon->State == EAddonState::NotLoadedDuplicate ||
 			aAddon->State == EAddonState::NotLoadedIncompatible ||
-			aAddon->WillBeUninstalled)
+			aAddon->IsFlaggedForUninstall)
 		{
 			return;
 		}
@@ -213,7 +213,7 @@ namespace GUI
 						ImGui::GW2::TooltipGeneric(Language.Translate("((000021))"));
 					}
 				}
-				else if (aAddon->State == EAddonState::LoadedLOCKED && aAddon->ShouldDisableNextLaunch == false)
+				else if (aAddon->State == EAddonState::LoadedLOCKED && aAddon->IsFlaggedForDisable == false)
 				{
 					std::string additionalInfo;
 
@@ -225,11 +225,11 @@ namespace GUI
 
 					if (ImGui::GW2::Button((Language.Translate("((000022))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
-						aAddon->ShouldDisableNextLaunch = true;
+						aAddon->IsFlaggedForDisable = true;
 					}
 					ImGui::GW2::TooltipGeneric(Language.Translate("((000023))"), additionalInfo.c_str());
 				}
-				else if (aAddon->State == EAddonState::LoadedLOCKED && aAddon->ShouldDisableNextLaunch == true)
+				else if (aAddon->State == EAddonState::LoadedLOCKED && aAddon->IsFlaggedForDisable == true)
 				{
 					std::string additionalInfo;
 
@@ -241,7 +241,7 @@ namespace GUI
 
 					if (ImGui::GW2::Button((Language.Translate("((000024))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
-						aAddon->ShouldDisableNextLaunch = false;
+						aAddon->IsFlaggedForDisable = false;
 					}
 					ImGui::GW2::TooltipGeneric(Language.Translate("((000025))"), additionalInfo.c_str());
 				}

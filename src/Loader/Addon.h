@@ -16,11 +16,12 @@ struct Addon
 	std::vector<unsigned char>	MD5;
 	AddonDefinition*			Definitions;
 
-	bool						ShouldDisableNextLaunch;
+	bool						IsFlaggedForDisable;
 	bool						IsPausingUpdates;
-	bool						WillBeUninstalled;
+	bool						IsFlaggedForUninstall;
 	bool						IsDisabledUntilUpdate;
 	bool						IsCheckingForUpdates;
+	bool						IsWaitingForUnload;
 };
 
 #endif
