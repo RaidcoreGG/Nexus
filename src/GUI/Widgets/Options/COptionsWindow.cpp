@@ -416,6 +416,8 @@ namespace GUI
 				float kbButtonWidth = ImGui::CalcTextSize("XXXXXXXXXXXXXXXXXXXXXXXX").x;
 
 				bool openEditor = false;
+				bool deleteStaleBind = false;
+				std::string staleBindIdentifier;
 
 				Keybinds::Mutex.lock();
 				{
@@ -435,46 +437,64 @@ namespace GUI
 					}
 					for (std::string cat : categories)
 					{
-						ImGui::TextDisabled(cat.c_str());
-						if (ImGui::BeginTable(("table_keybinds##" + cat).c_str(), 3, ImGuiTableFlags_BordersInnerH))
+						if (ImGui::CollapsingHeader(cat != "(null)" ? cat.c_str() : "Inactive", ImGuiTreeNodeFlags_DefaultOpen))
 						{
-							for (auto& [identifier, keybind] : Keybinds::Registry)
+							if (ImGui::BeginTable(("table_keybinds##" + cat).c_str(), 3, ImGuiTableFlags_BordersInnerH))
 							{
-								if (Loader::GetOwner(keybind.Handler) != cat) { continue; }
-
-								ImGui::TableNextRow();
-								ImGui::TableSetColumnIndex(0);
-								ImGui::Text(Language.Translate(identifier.c_str()));
-
-								ImGui::TableSetColumnIndex(1);
-								if (ImGui::Button((keybind.Bind.ToString(true) + "##" + identifier).c_str(), ImVec2(kbButtonWidth, 0.0f)))
+								for (auto& [identifier, keybind] : Keybinds::Registry)
 								{
-									CurrentlyEditing = identifier;
-									openEditor = true;
+									if (Loader::GetOwner(keybind.Handler) != cat) { continue; }
+
+									ImGui::TableNextRow();
+									ImGui::TableSetColumnIndex(0);
+									ImGui::Text(Language.Translate(identifier.c_str()));
+
+									ImGui::TableSetColumnIndex(1);
+									if (ImGui::Button((keybind.Bind.ToString(true) + "##" + identifier).c_str(), ImVec2(kbButtonWidth, 0.0f)))
+									{
+										CurrentlyEditing = identifier;
+										openEditor = true;
+									}
+
+									ImGui::TableSetColumnIndex(2);
+									if (keybind.Handler == nullptr)
+									{
+										if (ImGui::SmallButton(("X##" + identifier).c_str()))
+										{
+											deleteStaleBind = true;
+											staleBindIdentifier = identifier;
+										}
+										ImGui::SameLine();
+										ImGui::TextDisabled(Language.Translate("((000061))"));
+									}
 								}
 
-								ImGui::TableSetColumnIndex(2);
-								if (keybind.Handler == nullptr)
-								{
-									ImGui::TextDisabled(Language.Translate("((000061))"));
-								}
+								ImGui::EndTable();
 							}
-
-							ImGui::EndTable();
 						}
 					}
 				}
 				Keybinds::Mutex.unlock();
 
+				if (deleteStaleBind && !staleBindIdentifier.empty())
+				{
+					Keybinds::Delete(staleBindIdentifier);
+					deleteStaleBind = false;
+					staleBindIdentifier.clear();
+				}
+
+				std::string kbModalTitle = Language.Translate("((000062))");
+				kbModalTitle.append(Language.Translate(CurrentlyEditing.c_str()));
+
 				if (openEditor)
 				{
 					openEditor = false;
-					ImGui::OpenPopup((Language.Translate("((000062))") + CurrentlyEditing).c_str(), ImGuiPopupFlags_AnyPopupLevel);
+					ImGui::OpenPopup(kbModalTitle.c_str(), ImGuiPopupFlags_AnyPopupLevel);
 				}
 
 				ImVec2 center(Renderer::Width * 0.5f, Renderer::Height * 0.5f);
 				ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-				if (ImGui::BeginPopupModal((Language.Translate("((000062))") + CurrentlyEditing).c_str(), NULL, WindowFlags_Default))
+				if (ImGui::BeginPopupModal(kbModalTitle.c_str(), NULL, WindowFlags_Default))
 				{
 					Keybinds::IsSettingKeybind = true;
 					if (Keybinds::CurrentKeybind == Keybind{})

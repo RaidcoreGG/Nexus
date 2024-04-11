@@ -115,9 +115,16 @@ namespace Keybinds
 
 	///----------------------------------------------------------------------------------------------------
 	/// Invoke:
-	/// 	Invokes the action on the corresponding keybind handler. Returns true if the keybind was dispatched.
+	/// 	Invokes the action on the corresponding keybind handler.
+	/// 	Returns true if the keybind was dispatched.
 	///----------------------------------------------------------------------------------------------------
 	bool Invoke(std::string aIdentifier);
+
+	///----------------------------------------------------------------------------------------------------
+	/// Deletes:
+	/// 	Deletes a keybind entirely.
+	///----------------------------------------------------------------------------------------------------
+	void Delete(std::string aIdentifier);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Verify:

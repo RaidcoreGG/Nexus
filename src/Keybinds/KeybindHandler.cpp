@@ -331,9 +331,11 @@ namespace Keybinds
 
 		if (res != aIdentifier && res != "") { return; }
 
-		const std::lock_guard<std::mutex> lock(Mutex);
+		{
+			const std::lock_guard<std::mutex> lock(Mutex);
 
-		Registry[aIdentifier].Bind = aKeybind;
+			Registry[aIdentifier].Bind = aKeybind;
+		}
 
 		Save();
 	}
@@ -354,6 +356,12 @@ namespace Keybinds
 		}
 
 		return called;
+	}
+
+	void Delete(std::string aIdentifier)
+	{
+		const std::lock_guard<std::mutex> lock(Mutex);
+		Registry.erase(aIdentifier);
 	}
 
 	int Verify(void* aStartAddress, void* aEndAddress)
