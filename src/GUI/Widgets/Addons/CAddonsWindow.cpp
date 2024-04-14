@@ -10,6 +10,7 @@
 #include "Renderer.h"
 
 #include "Loader/Loader.h"
+#include "Loader/Library.h"
 #include "Loader/ArcDPS.h"
 #include "AddonItem.h"
 #include "Textures/TextureLoader.h"
@@ -206,10 +207,10 @@ namespace GUI
 						{
 							const std::lock_guard<std::mutex> lock(Loader::Mutex);
 							{
-								for (auto& [path, addon] : Loader::Addons)
+								for (auto addon : Loader::Addons)
 								{
-									if (path.filename() == "arcdps_integration64.dll") { continue; }
-									AddonItem(path, addon);
+									if (addon->Path.filename() == "arcdps_integration64.dll") { continue; }
+									AddonItem(addon->Path, addon);
 								}
 							}
 						}
@@ -236,26 +237,23 @@ namespace GUI
 								checkedForUpdates = 0;
 								queuedForCheck = 0;
 								/* pre-iterate to get the count of how many need to be checked, else one call might finish before the count can be incremented */
-								for (auto& [path, addon] : Loader::Addons)
+								for (auto addon : Loader::Addons)
 								{
 									if (nullptr == addon->Definitions) { continue; }
 									queuedForCheck++;
 								}
 
-								for (auto& [path, addon] : Loader::Addons)
+								for (auto addon : Loader::Addons)
 								{
 									if (nullptr == addon->Definitions) { continue; }
 
-									std::filesystem::path tmpPath = path.string();
-									signed int tmpSig = addon->Definitions->Signature;
-									std::string tmpName = addon->Definitions->Name;
-									AddonVersion tmpVers = addon->Definitions->Version;
-									EUpdateProvider tmpProv = addon->Definitions->Provider;
-									std::string tmpLink = addon->Definitions->UpdateLink != nullptr ? addon->Definitions->UpdateLink : "";
+									std::filesystem::path tmpPath = addon->Path.string();
 
-									std::thread([tmpPath, tmpSig, tmpName, tmpVers, tmpProv, tmpLink]()
+									std::thread([tmpPath, addon]()
 										{
-											if (Loader::UpdateAddon(tmpPath, tmpSig, tmpName, tmpVers, tmpProv, tmpLink))
+											if (Loader::UpdateAddon(tmpPath, addon->Definitions->Signature, addon->Definitions->Name,
+												addon->Definitions->Version, addon->Definitions->Provider,
+												addon->Definitions->UpdateLink != nullptr ? addon->Definitions->UpdateLink : ""))
 											{
 												Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
 											}
@@ -281,13 +279,13 @@ namespace GUI
 
 						int downloadable = 0;
 						const std::lock_guard<std::mutex> lockLoader(Loader::Mutex);
-						if (Loader::AddonLibrary.size() != 0)
+						if (Loader::Library::Addons.size() != 0)
 						{
-							for (auto& libAddon : Loader::AddonLibrary)
+							for (auto& libAddon : Loader::Library::Addons)
 							{
 								bool exists = false;
 								{
-									for (auto& [path, addon] : Loader::Addons)
+									for (auto addon : Loader::Addons)
 									{
 										// if libAddon already exist in installed addons
 										// or if arcdps is loaded another way and the libAddon is arc
@@ -307,7 +305,7 @@ namespace GUI
 							}
 						}
 						
-						if (Loader::AddonLibrary.size() == 0 || downloadable == 0)
+						if (Loader::Library::Addons.size() == 0 || downloadable == 0)
 						{
 							ImVec2 windowSize = ImGui::GetWindowSize();
 							ImVec2 textSize = ImGui::CalcTextSize(Language.Translate("((000037))"));

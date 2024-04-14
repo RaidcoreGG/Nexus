@@ -7,13 +7,14 @@
 
 struct LibraryAddon
 {
-	bool			IsInstalling = false;
-	signed int      Signature;
+	signed int		Signature;
 	std::string		Name;
 	std::string		Description;
-	EUpdateProvider Provider;
+	EUpdateProvider	Provider;
 	std::string		DownloadURL;
 	std::string		ToSComplianceNotice;
+
+	bool			IsInstalling = false;
 };
 
 #endif

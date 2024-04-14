@@ -321,6 +321,9 @@
     <ClCompile Include="Loader\ArcDPS.cpp">
       <Filter>Loader</Filter>
     </ClCompile>
+    <ClCompile Include="Loader\Library.cpp">
+      <Filter>Loader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imstb_truetype.h">
@@ -1055,9 +1058,6 @@
     <ClInclude Include="Loader\NexusLinkData.h">
       <Filter>Loader\Structs</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\StoredAddon.h">
-      <Filter>Loader\Structs</Filter>
-    </ClInclude>
     <ClInclude Include="Localization\FuncDefs.h">
       <Filter>Localization</Filter>
     </ClInclude>
@@ -1071,6 +1071,9 @@
       <Filter>GUI\Widgets\Alerts</Filter>
     </ClInclude>
     <ClInclude Include="Loader\ArcDPS.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader\Library.h">
       <Filter>Loader</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1087,6 +1090,21 @@
       <Filter>Resource Files\bin64</Filter>
     </None>
     <None Include="Resources\Locales\en_Main.json">
+      <Filter>Resource Files\Locales</Filter>
+    </None>
+    <None Include="Resources\Locales\br_Main.json">
+      <Filter>Resource Files\Locales</Filter>
+    </None>
+    <None Include="Resources\Locales\de_Main.json">
+      <Filter>Resource Files\Locales</Filter>
+    </None>
+    <None Include="Resources\Locales\es_Main.json">
+      <Filter>Resource Files\Locales</Filter>
+    </None>
+    <None Include="Resources\Locales\it_Main.json">
+      <Filter>Resource Files\Locales</Filter>
+    </None>
+    <None Include="Resources\Locales\ru_Main.json">
       <Filter>Resource Files\Locales</Filter>
     </None>
   </ItemGroup>

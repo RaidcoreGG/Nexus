@@ -79,11 +79,8 @@ namespace Main
 		Language.BuildLocaleAtlas();
 
 		//Paradigm::Initialize();
-		std::thread([]()
-			{
-				SelfUpdate();
-			})
-			.detach();
+		std::thread update(SelfUpdate);
+		update.detach();
 
 		/* Don't initialize anything if vanilla */
 		if (!State::IsVanilla)

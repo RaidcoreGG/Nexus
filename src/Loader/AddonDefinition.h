@@ -48,6 +48,9 @@ struct AddonDefinition
 	/* internal */
 	bool HasMinimumRequirements();
 	bool HasFlag(EAddonFlags aAddonFlag);
+
+	static void Copy(AddonDefinition* aSrc, AddonDefinition** aDst);
+	static void Free(AddonDefinition** aDefinitions);
 };
 
 #endif

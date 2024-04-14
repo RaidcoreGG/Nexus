@@ -324,10 +324,13 @@ namespace GUI
 				{
 					if (ImGui::TreeNode("Tracked"))
 					{
-						for (const auto& [path, addon] : Loader::Addons)
+						for (auto addon : Loader::Addons)
 						{
-							if (ImGui::TreeNode(path.string().c_str()))
+							std::string cached = "Currently not installed: ";
+							if (ImGui::TreeNode(addon->Path.empty() ? (cached + std::to_string(addon->MatchSignature)).c_str() : addon->Path.string().c_str()))
 							{
+								ImGui::Text("MatchSignature: %d", addon->MatchSignature);
+
 								std::string state = "State: ";
 								switch (addon->State)
 								{

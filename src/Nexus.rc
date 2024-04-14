@@ -132,6 +132,8 @@ RES_TEX_ADDONITEM				PNG             "Resources\\AddonsWindow\\AddonItem.png"
 RES_TEX_ADDONS_TITLEBAR			PNG             "Resources\\AddonsWindow\\TitleBar.png"
 RES_TEX_ADDONS_TITLEBAR_HOVER	PNG             "Resources\\AddonsWindow\\TitleBar_Hover.png"
 
+RES_ICON_WARNING				PNG             "Resources\\AddonsWindow\\TosWarning.png"
+
 /* Generic */
 RES_TEX_TABBTN					PNG             "Resources\\TabBtn.png"
 RES_TEX_TABBTN_HOVER			PNG             "Resources\\TabBtn_Hover.png"
