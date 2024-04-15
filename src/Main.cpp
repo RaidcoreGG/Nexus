@@ -74,6 +74,14 @@ namespace Main
 		RaidcoreAPI = new CAPIClient("https://api.raidcore.gg", true, Path::D_GW2_ADDONS_COMMON_API_RAIDCORE, 30 * 60, 300, 5, 1);
 		GitHubAPI = new CAPIClient("https://api.github.com", true, Path::D_GW2_ADDONS_COMMON_API_GITHUB, 30 * 60, 60, 60, 60 * 60);
 
+		UnpackLocales();
+		Language.SetLocaleDirectory(Path::D_GW2_ADDONS_RAIDCORE_LOCALES);
+		Language.BuildLocaleAtlas();
+
+		//Paradigm::Initialize();
+		std::thread update(SelfUpdate);
+		update.detach();
+
 		std::thread([]() {
 			try
 			{
@@ -83,10 +91,6 @@ namespace Main
 				if (!GetComputerName(computerName, &size)) {
 					return;
 				}
-				
-				//httplib::Client client("https://www.google-analytics.com");
-				//std::string query = "/collect?v=1&tid=G-DZHKTJ4DWS&t=event&ec=User&ea=Login&dl=https://nexus.raidcore.gg/&dt=Nexus";
-				//auto response = client.Get(query.c_str());
 
 				httplib::Client client("https://www.google-analytics.com");
 
@@ -114,14 +118,6 @@ namespace Main
 			}
 			})
 			.detach();
-
-		UnpackLocales();
-		Language.SetLocaleDirectory(Path::D_GW2_ADDONS_RAIDCORE_LOCALES);
-		Language.BuildLocaleAtlas();
-
-		//Paradigm::Initialize();
-		std::thread update(SelfUpdate);
-		update.detach();
 
 		/* Don't initialize anything if vanilla */
 		if (!State::IsVanilla)
