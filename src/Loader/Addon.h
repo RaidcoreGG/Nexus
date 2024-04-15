@@ -3,6 +3,7 @@
 
 #include <Windows.h>
 #include <vector>
+#include <filesystem>
 
 #include "EAddonState.h"
 #include "AddonDefinition.h"
@@ -11,16 +12,23 @@
 struct Addon
 {
 	EAddonState					State;
+	std::filesystem::path		Path;
+	std::vector<unsigned char>	MD5;
 	HMODULE						Module;
 	DWORD						ModuleSize;
-	std::vector<unsigned char>	MD5;
 	AddonDefinition*			Definitions;
 
-	bool						ShouldDisableNextLaunch;
+	/* Saved states */
 	bool						IsPausingUpdates;
-	bool						WillBeUninstalled;
 	bool						IsDisabledUntilUpdate;
+
+	/* Runtime states */
+	signed int					MatchSignature;
+	//bool						IsInitialLoad = true;
 	bool						IsCheckingForUpdates;
+	bool						IsWaitingForUnload;
+	bool						IsFlaggedForUninstall;
+	bool						IsFlaggedForDisable;
 };
 
 #endif

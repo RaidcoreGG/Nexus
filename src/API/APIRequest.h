@@ -9,12 +9,20 @@
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
+enum class ERequestType
+{
+	None,
+	Get,
+	Post
+};
+
 struct APIRequest
 {
-	bool* IsComplete;
-	std::condition_variable* CV;
-	int Attempts;
-	std::string Query;
+	ERequestType				Type;
+	bool*						IsComplete;
+	std::condition_variable*	CV;
+	int							Attempts;
+	std::string					Query;
 };
 
 #endif

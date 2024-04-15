@@ -21,6 +21,7 @@
     <ClCompile Include="Events\EventSubscriber.cpp" />
     <ClCompile Include="GUI\Widgets\Alerts\Alerts.cpp" />
     <ClCompile Include="Loader\ArcDPS.cpp" />
+    <ClCompile Include="Loader\Library.cpp" />
     <ClCompile Include="Localization\Localization.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Events\EventHandler.cpp" />
@@ -134,10 +135,10 @@
     <ClInclude Include="Loader\EAddonState.h" />
     <ClInclude Include="Loader\ELoaderAction.h" />
     <ClInclude Include="Loader\FuncDefs.h" />
+    <ClInclude Include="Loader\Library.h" />
     <ClInclude Include="Loader\LibraryAddon.h" />
     <ClInclude Include="Loader\Loader.h" />
     <ClInclude Include="Loader\NexusLinkData.h" />
-    <ClInclude Include="Loader\StoredAddon.h" />
     <ClInclude Include="Localization\FuncDefs.h" />
     <ClInclude Include="Localization\Localization.h" />
     <ClInclude Include="Logging\FuncDefs.h" />
@@ -329,7 +330,12 @@
   <ItemGroup>
     <None Include="exports.def" />
     <None Include="Resources\bin64\arcdps_integration64.dll" />
+    <None Include="Resources\Locales\br_Main.json" />
+    <None Include="Resources\Locales\de_Main.json" />
     <None Include="Resources\Locales\en_Main.json" />
+    <None Include="Resources\Locales\es_Main.json" />
+    <None Include="Resources\Locales\it_Main.json" />
+    <None Include="Resources\Locales\ru_Main.json" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Resources\Fonts\Menomonia.ttf" />

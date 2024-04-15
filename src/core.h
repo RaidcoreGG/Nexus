@@ -31,6 +31,7 @@ EUpdateProvider GetProvider(const std::string& aUrl);
 std::string GetBaseURL(const std::string& aUrl);
 std::string GetEndpoint(const std::string& aUrl);
 std::string GetQuery(const std::string& aEndpoint, const std::string& aParameters);
+std::string Normalize(const std::string& aString);
 
 namespace Base64
 {

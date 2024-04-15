@@ -41,6 +41,8 @@
 #define RES_TEX_ADDONS_TITLEBAR			403
 #define RES_TEX_ADDONS_TITLEBAR_HOVER	404
 
+#define RES_ICON_WARNING				405
+
 /* Generic */
 #define RES_TEX_TABBTN					506
 #define RES_TEX_TABBTN_HOVER			507

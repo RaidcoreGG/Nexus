@@ -1,3 +1,11 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  Loader.h
+/// Description  :  Handles addon hot-loading, updates etc.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #ifndef LOADER_H
 #define LOADER_H
 
@@ -10,27 +18,17 @@
 #include <condition_variable>
 
 #include "ELoaderAction.h"
-#include "StoredAddon.h"
-#include "LibraryAddon.h"
 #include "Addon.h"
 #include "AddonAPI.h"
 
 namespace Loader
 {
 	extern std::mutex					Mutex;
-	extern std::vector<LibraryAddon*>	AddonLibrary;
 	extern std::unordered_map<
 		std::filesystem::path,
 		ELoaderAction
 	>									QueuedAddons;					/* To be loaded or unloaded addons */
-	extern std::map<
-		signed int,
-		StoredAddon
-	>									AddonConfig;
-	extern std::map<
-		std::filesystem::path,
-		Addon*
-	>									Addons;							/* Addons and their corresponding paths */
+	extern std::vector<Addon*>			Addons;
 	extern std::map<int, AddonAPI*>		ApiDefs;						/* Addon API definitions, created on demand */
 
 	extern int							DirectoryChangeCountdown;
@@ -42,59 +40,140 @@ namespace Loader
 	extern PIDLIST_ABSOLUTE				FSItemList;
 	extern ULONG						FSNotifierID;
 
-	/* Registers the addon directory update notifications and loads all addons. */
+	///----------------------------------------------------------------------------------------------------
+	/// Initialize:
+	/// 	Registers the addon directory update notifications and loads all addons.
+	///----------------------------------------------------------------------------------------------------
 	void Initialize();
-	/* Deregisters the directory updates and unloads all addons. */
+
+	///----------------------------------------------------------------------------------------------------
+	/// Shutdown:
+	/// 	Deregisters the directory updates and calls unload on all addons.
+	///----------------------------------------------------------------------------------------------------
 	void Shutdown();
 
-	/* Load AddonConfig. */
+	///----------------------------------------------------------------------------------------------------
+	/// LoadAddonConfig:
+	/// 	Load AddonConfig.
+	///----------------------------------------------------------------------------------------------------
 	void LoadAddonConfig();
-	/* Save AddonConfig. */
+
+	///----------------------------------------------------------------------------------------------------
+	/// SaveAddonConfig:
+	/// 	Save AddonConfig.
+	///----------------------------------------------------------------------------------------------------
 	void SaveAddonConfig();
 
-	/* Fetch AddonLibrary. */
-	void GetAddonLibrary();
-
-	/* Returns 0 if message was processed. */
+	///----------------------------------------------------------------------------------------------------
+	/// WndProc:
+	/// 	Returns 0 if message was processed.
+	///----------------------------------------------------------------------------------------------------
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	/* Processes all currently queued addons. */
+	///----------------------------------------------------------------------------------------------------
+	/// ProcessQueue:
+	/// 	Processes all currently queued addons.
+	///----------------------------------------------------------------------------------------------------
 	void ProcessQueue();
-	/* Pushes an item to the queue. */
+
+	///----------------------------------------------------------------------------------------------------
+	/// QueueAddon:
+	/// 	Pushes an item to the queue.
+	///----------------------------------------------------------------------------------------------------
 	void QueueAddon(ELoaderAction aAction, const std::filesystem::path& aPath);
 
-	/* Notifies that something in the addon directory changed. */
+	///----------------------------------------------------------------------------------------------------
+	/// NotifyChanges:
+	/// 	Notifies that something in the addon directory changed.
+	///----------------------------------------------------------------------------------------------------
 	void NotifyChanges();
-	/* Detects and processes any changes to addons. */
+
+	///----------------------------------------------------------------------------------------------------
+	/// ProcessChanges:
+	/// 	Detects and processes any changes to addons.
+	///----------------------------------------------------------------------------------------------------
 	void ProcessChanges();
 
-	/* Loads an addon. */
+	///----------------------------------------------------------------------------------------------------
+	/// LoadAddon:
+	/// 	Loads an addon.
+	///----------------------------------------------------------------------------------------------------
 	void LoadAddon(const std::filesystem::path& aPath, bool aIsReload = false);
-	/* Unloads an addon. */
-	void UnloadAddon(const std::filesystem::path& aPath, bool aIsShutdown = false);
-	/* Unloads, then uninstalls an addon. */
-	void UninstallAddon(const std::filesystem::path& aPath);
-	/* Unloads, then loads an addon. */
-	void ReloadAddon(const std::filesystem::path& aPath);
-	/* Swaps addon.dll with addon.dll.update. */
-	void UpdateSwapAddon(const std::filesystem::path& aPath);
-	/* Updates an addon. */
-	bool UpdateAddon(const std::filesystem::path& aPath, signed int aSignature, std::string aName, AddonVersion aVersion, EUpdateProvider aProvider, std::string aUpdateLink);
-	/* Installs an addon. */
-	void InstallAddon(LibraryAddon* aAddon);
+	
+	///----------------------------------------------------------------------------------------------------
+	/// UnloadAddon:
+	/// 	Unloads an addon and performs a reload as soon as the addon returns, if requested.
+	///----------------------------------------------------------------------------------------------------
+	void UnloadAddon(const std::filesystem::path& aPath, bool aDoReload = false);
 
-	/* Gets or creates a pointer to the provided version, or nullptr if no such version exists. */
+	///----------------------------------------------------------------------------------------------------
+	/// FreeAddon:
+	/// 	Calls FreeLibrary on the specified addon.
+	/// 	This function should not be invoked manually, but through Addon::Unload + Queue(Free).
+	///----------------------------------------------------------------------------------------------------
+	void FreeAddon(const std::filesystem::path& aPath);
+
+	///----------------------------------------------------------------------------------------------------
+	/// UninstallAddon:
+	/// 	Uninstalls an addon, or moves it to addon.dll.uninstall to be cleaned up by the loader later.
+	/// 	This function should not be invoked manually, but through Unload + FollowUpAction::Uninstall.
+	///----------------------------------------------------------------------------------------------------
+	void UninstallAddon(const std::filesystem::path& aPath);
+
+	///----------------------------------------------------------------------------------------------------
+	/// UpdateAddon:
+	/// 	Returns true if the addon updated.
+	///----------------------------------------------------------------------------------------------------
+	bool UpdateAddon(const std::filesystem::path& aPath, signed int aSignature, std::string aName, AddonVersion aVersion, EUpdateProvider aProvider, std::string aUpdateLink);
+
+	///----------------------------------------------------------------------------------------------------
+	/// UpdateSwapAddon:
+	/// 	Swaps addon.dll with addon.dll.update.
+	/// 	Returns true if there was an update dll.
+	///----------------------------------------------------------------------------------------------------
+	bool UpdateSwapAddon(const std::filesystem::path& aPath);
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetAddonAPI:
+	/// 	Gets or creates a pointer to the provided version, or nullptr if no such version exists.
+	///----------------------------------------------------------------------------------------------------
 	AddonAPI* GetAddonAPI(int aVersion);
-	/* Returns the size of the provided version. */
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetAddonAPISize:
+	/// 	Returns the size of the provided API version.
+	///----------------------------------------------------------------------------------------------------
 	long GetAddonAPISize(int aVersion);
 
-	/* HELPER: Copies the addon definitions. */
-	void CopyAddonDefs(AddonDefinition* aDefinitions, AddonDefinition** aOutDefinitions);
-	/* HELPER: Frees the addon definitions. */
-	void FreeAddonDefs(AddonDefinition** aDefinitions);
-
-	/* HELPER: Returns the name of the owning addon. Similar to ::Verify. */
+	///----------------------------------------------------------------------------------------------------
+	/// GetOwner:
+	/// 	Returns the name of the addon owning the provided address.
+	///----------------------------------------------------------------------------------------------------
 	std::string GetOwner(void* aAddress);
+
+	///----------------------------------------------------------------------------------------------------
+	/// FindAddonBySig:
+	/// 	Returns the addon with a matching signature or nullptr.
+	///----------------------------------------------------------------------------------------------------
+	Addon* FindAddonBySig(signed int aSignature);
+
+	///----------------------------------------------------------------------------------------------------
+	/// FindAddonByPath:
+	/// 	Returns the addon with a matching path or nullptr.
+	///----------------------------------------------------------------------------------------------------
+	Addon* FindAddonByPath(const std::filesystem::path& aPath);
+
+	///----------------------------------------------------------------------------------------------------
+	/// FindAddonByMatchSig:
+	/// 	Returns the addon with a matching mock signature or nullptr.
+	///----------------------------------------------------------------------------------------------------
+	Addon* FindAddonByMatchSig(signed int aMatchSignature);
+
+	///----------------------------------------------------------------------------------------------------
+	/// SortAddons:
+	/// 	Sorts addons by name but prioritizes DUU state.
+	///----------------------------------------------------------------------------------------------------
+	void SortAddons();
 }
 
 #endif

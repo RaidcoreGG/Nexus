@@ -38,6 +38,8 @@ public:
 	Returns the response string.
 	*/
 	json Get(std::string aEndpoint, std::string aParameters = "");
+
+	json Post(std::string aEndpoint, std::string aParameters = "");
 	/*
 	Download:
 	Downloads the remote resource to disk.
@@ -87,7 +89,7 @@ private:
 	long long FileTimeOffset;
 
 	void ProcessRequests();
-	APIResponse DoHttpReq(APIRequest aRequest);
+	APIResponse HttpGet(APIRequest aRequest);
 };
 
 #endif

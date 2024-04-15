@@ -9,6 +9,7 @@
 #include "Loader/AddonDefinition.h"
 #include "Loader/EAddonFlags.h"
 #include "Loader/Loader.h"
+#include "Loader/Library.h"
 #include "Textures/TextureLoader.h"
 #include "Textures/Texture.h"
 
@@ -40,7 +41,7 @@ namespace GUI
 			aAddon->Definitions == nullptr ||
 			aAddon->State == EAddonState::NotLoadedDuplicate ||
 			aAddon->State == EAddonState::NotLoadedIncompatible ||
-			aAddon->WillBeUninstalled)
+			aAddon->IsFlaggedForUninstall)
 		{
 			return;
 		}
@@ -120,22 +121,18 @@ namespace GUI
 						{
 							if (!aAddon->IsCheckingForUpdates)
 							{
-								for (auto& it : Loader::Addons)
+								for (auto addon : Loader::Addons)
 								{
-									if (it.second->Definitions == aAddon->Definitions)
+									if (addon->Definitions == aAddon->Definitions)
 									{
 										aAddon->IsCheckingForUpdates = true;
 
-										std::filesystem::path tmpPath = it.first.string();
-										signed int tmpSig = aAddon->Definitions->Signature;
-										std::string tmpName = aAddon->Definitions->Name;
-										AddonVersion tmpVers = aAddon->Definitions->Version;
-										EUpdateProvider tmpProv = aAddon->Definitions->Provider;
-										std::string tmpLink = aAddon->Definitions->UpdateLink != nullptr ? aAddon->Definitions->UpdateLink : "";
-
-										std::thread([aAddon, tmpPath, tmpSig, tmpName, tmpVers, tmpProv, tmpLink]()
+										std::filesystem::path tmpPath = addon->Path.string();
+										std::thread([aAddon, tmpPath]()
 											{
-												if (Loader::UpdateAddon(tmpPath, tmpSig, tmpName, tmpVers, tmpProv, tmpLink))
+												if (Loader::UpdateAddon(tmpPath, aAddon->Definitions->Signature, aAddon->Definitions->Name,
+																		aAddon->Definitions->Version, aAddon->Definitions->Provider,
+																		aAddon->Definitions->UpdateLink != nullptr ? aAddon->Definitions->UpdateLink : ""))
 												{
 													Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
 												}
@@ -203,17 +200,20 @@ namespace GUI
 				// just check if loaded, if it was not hot-reloadable it would be EAddonState::LoadedLOCKED
 				if (aAddon->State == EAddonState::Loaded)
 				{
-					if (ImGui::GW2::Button((Language.Translate("((000020))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button((aAddon->IsWaitingForUnload ? Language.Translate("((000078))") : Language.Translate("((000020))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
-						//LogDebug(CH_GUI, "Unload called: %s", it.second->Definitions->Name);
-						Loader::QueueAddon(ELoaderAction::Unload, aPath);
+						if (!aAddon->IsWaitingForUnload)
+						{
+							//LogDebug(CH_GUI, "Unload called: %s", it.second->Definitions->Name);
+							Loader::QueueAddon(ELoaderAction::Unload, aPath);
+						}
 					}
 					if (RequestedAddons.size() > 0)
 					{
 						ImGui::GW2::TooltipGeneric(Language.Translate("((000021))"));
 					}
 				}
-				else if (aAddon->State == EAddonState::LoadedLOCKED && aAddon->ShouldDisableNextLaunch == false)
+				else if (aAddon->State == EAddonState::LoadedLOCKED && aAddon->IsFlaggedForDisable == false)
 				{
 					std::string additionalInfo;
 
@@ -225,11 +225,11 @@ namespace GUI
 
 					if (ImGui::GW2::Button((Language.Translate("((000022))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
-						aAddon->ShouldDisableNextLaunch = true;
+						aAddon->IsFlaggedForDisable = true;
 					}
 					ImGui::GW2::TooltipGeneric(Language.Translate("((000023))"), additionalInfo.c_str());
 				}
-				else if (aAddon->State == EAddonState::LoadedLOCKED && aAddon->ShouldDisableNextLaunch == true)
+				else if (aAddon->State == EAddonState::LoadedLOCKED && aAddon->IsFlaggedForDisable == true)
 				{
 					std::string additionalInfo;
 
@@ -241,7 +241,7 @@ namespace GUI
 
 					if (ImGui::GW2::Button((Language.Translate("((000024))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
-						aAddon->ShouldDisableNextLaunch = false;
+						aAddon->IsFlaggedForDisable = false;
 					}
 					ImGui::GW2::TooltipGeneric(Language.Translate("((000025))"), additionalInfo.c_str());
 				}
@@ -346,7 +346,7 @@ namespace GUI
 					}
 					else
 					{
-						ToSComplianceWarning = TextureLoader::GetOrCreate(ICON_NOTIFICATION, RES_ICON_NOTIFICATION, NexusHandle);
+						ToSComplianceWarning = TextureLoader::GetOrCreate(ICON_WARNING, RES_ICON_WARNING, NexusHandle);
 					}
 				}
 
@@ -359,12 +359,12 @@ namespace GUI
 						{
 							std::thread([aAddon]()
 								{
-									Loader::InstallAddon(aAddon);
+									Loader::Library::InstallAddon(aAddon);
 									aAddon->IsInstalling = false;
 								})
 								.detach();
 
-							Loader::AddonConfig[aAddon->Signature].IsLoaded = true;
+							//Loader::AddonConfig[aAddon->Signature].IsLoaded = true;
 						}
 					}
 				}

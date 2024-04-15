@@ -7,7 +7,9 @@ enum class ELoaderAction
 	Load,
 	Unload,
 	Uninstall,
-	Reload
+	Reload,
+	FreeLibrary,
+	FreeLibraryThenLoad
 };
 
 #endif

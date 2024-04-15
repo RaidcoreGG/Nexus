@@ -262,6 +262,27 @@ std::string GetQuery(const std::string& aEndpoint, const std::string& aParameter
 
 	return rQuery;
 }
+std::string Normalize(const std::string& aString)
+{
+	std::string ret;
+
+	for (size_t i = 0; i < aString.length(); i++)
+	{
+		// alphanumeric
+		if ((aString[i] >= 48 && aString[i] <= 57) ||
+			(aString[i] >= 65 && aString[i] <= 90) ||
+			(aString[i] >= 97 && aString[i] <= 122))
+		{
+			ret += aString[i];
+		}
+		else if (aString[i] == 32)
+		{
+			ret.append("_");
+		}
+	}
+
+	return ret;
+}
 
 namespace Base64
 {

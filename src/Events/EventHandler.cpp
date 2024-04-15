@@ -106,7 +106,7 @@ namespace Events
 			EventSubscriber sub{};
 			sub.Callback = aConsumeEventCallback;
 
-			for (auto& [path, addon] : Loader::Addons)
+			for (auto addon : Loader::Addons)
 			{
 				if (addon->Module == nullptr || 
 					addon->ModuleSize == 0 ||

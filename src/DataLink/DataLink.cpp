@@ -16,7 +16,7 @@ namespace DataLink
 {
 	void* ADDONAPI_ShareResource(const char* aIdentifier, size_t aResourceSize)
 	{
-		ShareResource(aIdentifier, aResourceSize);
+		return ShareResource(aIdentifier, aResourceSize);
 	}
 }
 

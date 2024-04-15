@@ -290,8 +290,6 @@ namespace GUI
 				}
 			}
 			QuickAccess::Mutex.unlock();
-
-			NexusLink->QuickAccessIconsCount = GUI::QuickAccess::Registry.size();
 		}
 		void RemoveShortcut(const char* aIdentifier)
 		{
@@ -302,8 +300,6 @@ namespace GUI
 				Registry.erase(str);
 			}
 			QuickAccess::Mutex.unlock();
-
-			NexusLink->QuickAccessIconsCount = GUI::QuickAccess::Registry.size();
 		}
 		void NotifyShortcut(const char* aIdentifier)
 		{
@@ -382,8 +378,6 @@ namespace GUI
 				}
 			}
 			QuickAccess::Mutex.unlock();
-
-			NexusLink->QuickAccessIconsCount = GUI::QuickAccess::Registry.size();
 
 			return refCounter;
 		}

@@ -83,6 +83,7 @@ json CAPIClient::Get(std::string aEndpoint, std::string aParameters)
 
 	// if not cached, push it into requests queue, so it can be done async
 	APIRequest req{
+		ERequestType::Get,
 		&done,
 		&cv,
 		0,
@@ -101,6 +102,60 @@ json CAPIClient::Get(std::string aEndpoint, std::string aParameters)
 	{
 		std::unique_lock<std::mutex> lock(mtx);
 		cv.wait(lock, [&]{ return done; });
+	}
+
+	cachedResponse = nullptr; // sanity
+	cachedResponse = GetCachedResponse(query);
+
+	return cachedResponse != nullptr ? cachedResponse->Content : json{};
+}
+json CAPIClient::Post(std::string aEndpoint, std::string aParameters)
+{
+	std::string query = GetQuery(aEndpoint, aParameters);
+
+	CachedResponse* cachedResponse = GetCachedResponse(query);
+
+	if (cachedResponse != nullptr)
+	{
+		long long diff = Timestamp() - cachedResponse->Timestamp;
+
+		if (diff < CacheLifetime && cachedResponse->Content != nullptr)
+		{
+			//LogDebug(("CAPIClient::" + BaseURL).c_str(), "Cached message %d seconds old. Reading from cache.", diff);
+			return cachedResponse->Content;
+		}
+		else
+		{
+			//LogDebug(("CAPIClient::" + BaseURL).c_str(), "Cached message %d seconds old. CacheLifetime %d. Queueing request.", diff, CacheLifetime);
+		}
+	}
+
+	// Variables for synchronization
+	std::mutex mtx;
+	bool done = false;
+	std::condition_variable cv;
+
+	// if not cached, push it into requests queue, so it can be done async
+	APIRequest req{
+		ERequestType::Post,
+		&done,
+		&cv,
+		0,
+		query
+	};
+
+	// Trigger the worker thread
+	{
+		const std::lock_guard<std::mutex> lock(Mutex);
+		QueuedRequests.push_back(req);
+		IsSuspended = false;
+		ConVar.notify_all();
+	}
+
+	// Wait for the response
+	{
+		std::unique_lock<std::mutex> lock(mtx);
+		cv.wait(lock, [&] { return done; });
 	}
 
 	cachedResponse = nullptr; // sanity
@@ -251,8 +306,8 @@ void CAPIClient::ProcessRequests()
 
 			APIRequest request = QueuedRequests.front();
 
-			// DoHttpReq should set last request timestamp
-			APIResponse response = DoHttpReq(request);
+			// HttpGet should set last request timestamp
+			APIResponse response = HttpGet(request);
 
 			// does the bucket get reduced on unsuccessful requests? we assume it does
 			Bucket--;
@@ -344,14 +399,23 @@ void CAPIClient::ProcessRequests()
 		IsSuspended = true;
 	}
 }
-APIResponse CAPIClient::DoHttpReq(APIRequest aRequest)
+APIResponse CAPIClient::HttpGet(APIRequest aRequest)
 {
 	APIResponse response{
 		0,
 		nullptr
 	};
 
-	auto result = Client->Get(aRequest.Query);
+	httplib::Result result{};
+	switch (aRequest.Type)
+	{
+	case ERequestType::Get:
+		result = Client->Get(aRequest.Query);
+		break;
+	case ERequestType::Post:
+		result = Client->Post(aRequest.Query);
+		break;
+	}
 
 	if (!result)
 	{
