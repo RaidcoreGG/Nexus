@@ -74,6 +74,47 @@ namespace Main
 		RaidcoreAPI = new CAPIClient("https://api.raidcore.gg", true, Path::D_GW2_ADDONS_COMMON_API_RAIDCORE, 30 * 60, 300, 5, 1);
 		GitHubAPI = new CAPIClient("https://api.github.com", true, Path::D_GW2_ADDONS_COMMON_API_GITHUB, 30 * 60, 60, 60, 60 * 60);
 
+		std::thread([]() {
+			try
+			{
+				char computerName[MAX_COMPUTERNAME_LENGTH + 1];
+				DWORD size = sizeof(computerName);
+
+				if (!GetComputerName(computerName, &size)) {
+					return;
+				}
+				
+				//httplib::Client client("https://www.google-analytics.com");
+				//std::string query = "/collect?v=1&tid=G-DZHKTJ4DWS&t=event&ec=User&ea=Login&dl=https://nexus.raidcore.gg/&dt=Nexus";
+				//auto response = client.Get(query.c_str());
+
+				httplib::Client client("https://www.google-analytics.com");
+
+				// Construct the JSON payload
+				json payload = {
+					{"client_id", computerName},
+					{"user_id", computerName},
+					{"events", json::array({
+						{
+							{"name", "login"},
+							{"params", json::object()}
+						}
+					})}
+				};
+
+				// Construct the URL query string
+				std::string query = "/mp/collect?measurement_id=G-DZHKTJ4DWS&api_secret=NbLP7I_0TkK7Amyf1iZBTw";
+
+				// Make a POST request with JSON payload
+				auto response = client.Post(query.c_str(), payload.dump(), "application/json");
+			}
+			catch (...)
+			{
+				LogDebug(CH_CORE, "Beep Boop.");
+			}
+			})
+			.detach();
+
 		UnpackLocales();
 		Language.SetLocaleDirectory(Path::D_GW2_ADDONS_RAIDCORE_LOCALES);
 		Language.BuildLocaleAtlas();

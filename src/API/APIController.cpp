@@ -182,7 +182,7 @@ namespace API
 			/* Do some rate limiting */
 			while (QueuedRequests.size() > 0)
 			{
-				//DoHttpReq(QueuedRequests.front());
+				//HttpGet(QueuedRequests.front());
 				/* Callback ? */
 				QueuedRequests.erase(QueuedRequests.begin());
 			}
