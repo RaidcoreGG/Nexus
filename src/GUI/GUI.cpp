@@ -44,6 +44,7 @@ namespace GUI
 {
 	/* internal forward declarations */
 	void OnMumbleIdentityChanged(void* aEventArgs);
+	void OnLanguageChanged(void* aEventArgs);
 	void Setup();
 
 	std::mutex					Mutex;
@@ -453,6 +454,30 @@ namespace GUI
 		}
 	}
 
+	void OnLanguageChanged(void* aEventArgs)
+	{
+		int langId = *(int*)aEventArgs;
+
+		switch (langId)
+		{
+		case 0:
+			Language.SetLanguage("English");
+			break;
+		case 2:
+			Language.SetLanguage("Français");
+			break;
+		case 3:
+			Language.SetLanguage("Deutsch");
+			break;
+		case 4:
+			Language.SetLanguage(u8"Español");
+			break;
+		/*case 5:
+			Language.SetLanguage(u8"Chinese");
+			break;*/
+		}
+	}
+
 	void Setup()
 	{
 		ImGuiIO& io = ImGui::GetIO();
@@ -696,6 +721,7 @@ namespace GUI
 		io.Fonts->Build();
 
 		Events::Subscribe(EV_MUMBLE_IDENTITY_UPDATED, OnMumbleIdentityChanged);
+		Events::Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", OnLanguageChanged);
 		OnMumbleIdentityChanged(nullptr);
 
 		/* set up and add windows */
