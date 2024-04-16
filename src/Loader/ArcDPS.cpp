@@ -190,6 +190,13 @@ namespace ArcDPS
 		}
 
 		IsBridgeDeployed = true;
+
+		std::thread checkPlugins([]()
+			{
+				Sleep(5000);
+				ArcDPS::GetPlugins();
+			});
+		checkPlugins.detach();
 	}
 
 	void GetPlugins()
