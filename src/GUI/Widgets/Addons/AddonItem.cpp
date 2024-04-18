@@ -226,6 +226,7 @@ namespace GUI
 					if (ImGui::GW2::Button((Language.Translate("((000022))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						aAddon->IsFlaggedForDisable = true;
+						Loader::SaveAddonConfig();
 					}
 					ImGui::GW2::TooltipGeneric(Language.Translate("((000023))"), additionalInfo.c_str());
 				}
@@ -242,6 +243,7 @@ namespace GUI
 					if (ImGui::GW2::Button((Language.Translate("((000024))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						aAddon->IsFlaggedForDisable = false;
+						Loader::SaveAddonConfig();
 					}
 					ImGui::GW2::TooltipGeneric(Language.Translate("((000025))"), additionalInfo.c_str());
 				}

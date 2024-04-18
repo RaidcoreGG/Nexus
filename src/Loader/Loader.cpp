@@ -238,7 +238,7 @@ namespace Loader
 				};
 
 				/* override loaded state, if it's supposed to disable next launch */
-				if (addon->State == EAddonState::LoadedLOCKED && addon->IsFlaggedForDisable)
+				if (addon->IsFlaggedForDisable)
 				{
 					addonInfo["IsLoaded"] = false;
 				}
@@ -836,6 +836,16 @@ namespace Loader
 				addon->IsWaitingForUnload = true;
 				std::thread unloadTask([addon, aPath, isShutdown, aDoReload]()
 					{
+						if (!isShutdown)
+						{
+							/* cache the flag, save that the addon will disable, then restore it */
+							bool flagDisable = addon->IsFlaggedForDisable;
+							addon->IsFlaggedForDisable = true;
+							const std::lock_guard<std::mutex> lock(Mutex);
+							SaveAddonConfig();
+							addon->IsFlaggedForDisable = flagDisable;
+						}
+
 						std::chrono::steady_clock::time_point start_time = std::chrono::high_resolution_clock::now();
 						if (addon->Definitions->Unload)
 						{
@@ -884,11 +894,6 @@ namespace Loader
 				unloadTask.detach();
 			}
 		}
-
-		if (!isShutdown)
-		{
-			SaveAddonConfig();
-		}
 	}
 	
 	void FreeAddon(const std::filesystem::path& aPath)
@@ -926,6 +931,8 @@ namespace Loader
 		addon->ModuleSize = 0;
 
 		addon->State = EAddonState::NotLoaded;
+
+		SaveAddonConfig();
 
 		if (!std::filesystem::exists(aPath))
 		{
