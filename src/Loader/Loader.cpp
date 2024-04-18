@@ -387,7 +387,6 @@ namespace Loader
 				DisableVolatileUntilUpdate = true;
 				LogWarning(CH_LOADER, "Game updated. Current Build %d. Old Build: %d. Disabling volatile addons until they update.", gameBuild, lastGameBuild);
 
-				Events::Raise(EV_VOLATILE_ADDONS_DISABLED);
 				std::string msg = Language.Translate("((000001))");
 				msg.append("\n");
 				msg.append(Language.Translate("((000002))"));
@@ -707,6 +706,7 @@ namespace Loader
 						std::string msg = addon->Definitions->Name;
 						msg.append(" ");
 						msg.append(Language.Translate("((000073))"));
+						Events::Raise(EV_VOLATILE_ADDON_DISABLED, &addon->Definitions->Signature);
 						GUI::Alerts::Notify(msg.c_str());
 					}
 				})

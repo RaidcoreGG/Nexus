@@ -55,7 +55,7 @@ extern const char* EV_WINDOW_RESIZED;
 extern const char* EV_MUMBLE_IDENTITY_UPDATED;
 extern const char* EV_ADDON_LOADED;
 extern const char* EV_ADDON_UNLOADED;
-extern const char* EV_VOLATILE_ADDONS_DISABLED;
+extern const char* EV_VOLATILE_ADDON_DISABLED;
 
 /* DataLink */
 extern const char* DL_MUMBLE_LINK;
