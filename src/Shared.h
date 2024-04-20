@@ -55,4 +55,6 @@ extern CAPIClient*					GitHubAPI;
 extern std::string					ChangelogText;
 extern bool							IsUpdateAvailable;
 
+extern bool							IsGameLaunchSequence;
+
 #endif

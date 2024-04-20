@@ -15,6 +15,8 @@
 
 #include "Events/EventHandler.h"
 
+#include "GUI/Widgets/Alerts/Alerts.h"
+
 #include "imgui.h"
 #include "imgui_extensions.h"
 
@@ -213,7 +215,7 @@ namespace GUI
 						ImGui::GW2::TooltipGeneric(Language.Translate("((000021))"));
 					}
 				}
-				else if (aAddon->State == EAddonState::LoadedLOCKED && aAddon->IsFlaggedForDisable == false)
+				else if (aAddon->State == EAddonState::LoadedLOCKED)
 				{
 					std::string additionalInfo;
 
@@ -223,29 +225,31 @@ namespace GUI
 						additionalInfo.append(Language.Translate("((000021))"));
 					}
 
-					if (ImGui::GW2::Button((Language.Translate("((000022))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button((Language.Translate(aAddon->IsFlaggedForDisable ? "((000024))" : "((000022))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
-						aAddon->IsFlaggedForDisable = true;
+						aAddon->IsFlaggedForDisable = !aAddon->IsFlaggedForDisable;
 						Loader::SaveAddonConfig();
 					}
-					ImGui::GW2::TooltipGeneric(Language.Translate("((000023))"), additionalInfo.c_str());
+					ImGui::GW2::TooltipGeneric(Language.Translate(aAddon->IsFlaggedForDisable ? "((000025))" : "((000023))"), additionalInfo.c_str());
 				}
-				else if (aAddon->State == EAddonState::LoadedLOCKED && aAddon->IsFlaggedForDisable == true)
+				else if (aAddon->State == EAddonState::NotLoaded && (aAddon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || aAddon->Definitions->Signature == 0xFFF694D1) && !IsGameLaunchSequence)
 				{
-					std::string additionalInfo;
-
-					if (RequestedAddons.size() > 0)
+					/* if it's too late to load this addon */
+					if (ImGui::GW2::Button((Language.Translate(aAddon->IsFlaggedForEnable ? "((000020))" : "((000024))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
-						additionalInfo.append("\n");
-						additionalInfo.append(Language.Translate("((000021))"));
+						aAddon->IsFlaggedForEnable = !aAddon->IsFlaggedForEnable;
+						if (aAddon->IsFlaggedForEnable)
+						{
+							std::string msg = aAddon->Definitions->Name;
+							msg.append(" ");
+							msg.append(Language.Translate("((000080))"));
+							GUI::Alerts::Notify(msg.c_str());
+						}
 					}
-
-					if (ImGui::GW2::Button((Language.Translate("((000024))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (aAddon->IsFlaggedForEnable)
 					{
-						aAddon->IsFlaggedForDisable = false;
-						Loader::SaveAddonConfig();
+						ImGui::GW2::TooltipGeneric(Language.Translate("((000025))"), "");
 					}
-					ImGui::GW2::TooltipGeneric(Language.Translate("((000025))"), additionalInfo.c_str());
 				}
 				else if (aAddon->State == EAddonState::NotLoaded)
 				{
@@ -260,6 +264,7 @@ namespace GUI
 						ImGui::GW2::TooltipGeneric(Language.Translate("((000021))"));
 					}
 				}
+
 				if (aAddon->Definitions->Provider == EUpdateProvider::GitHub && aAddon->Definitions->UpdateLink)
 				{
 					if (ImGui::GW2::Button((Language.Translate("((000030))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))

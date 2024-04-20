@@ -74,7 +74,7 @@ namespace Loader
 
 	std::vector<signed int>		WhitelistedAddons;				/* List of addons that should be loaded on initial startup. */
 
-	bool						DisableVolatileUntilUpdate = false;
+	bool						DisableVolatileUntilUpdate	= false;
 
 	void Initialize()
 	{
@@ -111,6 +111,25 @@ namespace Loader
 			lib.detach();
 			std::thread arclib(ArcDPS::GetPluginLibrary);
 			arclib.detach();
+
+			std::thread checkLaunchSequence([]()
+				{
+					Sleep(5000);
+					int nothingCounter = 0;
+					while (!IsGameplay)
+					{
+						/* do nothing */
+						Sleep(1);
+						nothingCounter++;
+
+						if (nothingCounter > 10000)
+						{
+							break;
+						}
+					}
+					IsGameLaunchSequence = false;
+				});
+			checkLaunchSequence.detach();
 
 			LoaderThread = std::thread(ProcessChanges);
 			LoaderThread.detach();
@@ -232,7 +251,7 @@ namespace Loader
 				json addonInfo =
 				{
 					{"Signature", addon->Definitions ? addon->Definitions->Signature : addon->MatchSignature},
-					{"IsLoaded", addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED ? true : false},
+					{"IsLoaded", addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED || addon->IsFlaggedForEnable},
 					{"IsPausingUpdates", addon->IsPausingUpdates},
 					{"IsDisabledUntilUpdate", addon->IsDisabledUntilUpdate}
 				};
@@ -670,13 +689,22 @@ namespace Loader
 
 		/* predeclare locked helper for later */
 		bool locked = addon->Definitions->Unload == nullptr || addon->Definitions->HasFlag(EAddonFlags::DisableHotloading);
+		bool onlyInitialLaunch = addon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || addon->Definitions->Signature == 0xFFF694D1;
+		// FIXME: remove the arcdps check as soon as it adds the flag
+
+		/* override shoudLoad */
+		if (!IsGameLaunchSequence && onlyInitialLaunch)
+		{
+			shouldLoad = false;
+		}
 
 		/* don't update when reloading; check when: it's waiting to re-enable but wasn't manually invoked, it's not pausing updates atm */
 		if (!aIsReload && ((addon->IsDisabledUntilUpdate && isInitialLoad) || !addon->IsPausingUpdates))
 		{
 			std::filesystem::path tmpPath = aPath.string();
-			std::thread([tmpPath, addon, locked, shouldLoad]()
+			std::thread([tmpPath, addon, locked, shouldLoad, onlyInitialLaunch]()
 				{
+					Sleep(5000);
 					if (UpdateAddon(tmpPath, addon->Definitions->Signature, addon->Definitions->Name,
 									addon->Definitions->Version, addon->Definitions->Provider,
 									addon->Definitions->UpdateLink != nullptr ? addon->Definitions->UpdateLink : ""))
@@ -693,12 +721,29 @@ namespace Loader
 								SaveAddonConfig(); // save the DUU state
 							}
 						}
-						QueueAddon(ELoaderAction::Reload, tmpPath);
+
+						/* only call reload if it wasn't unloaded */
+						if (!onlyInitialLaunch)
+						{
+							QueueAddon(ELoaderAction::Reload, tmpPath);
+						}
+						else
+						{
+							std::string msg = addon->Definitions->Name;
+							msg.append(" ");
+							msg.append(Language.Translate("((000079))"));
+							GUI::Alerts::Notify(msg.c_str());
+						}
 					}
 					else if (locked && shouldLoad && !addon->IsDisabledUntilUpdate) // if addon is locked and not DUU
 					{
 						// the lock state is checked because if it will be locked it means it was unloaded, prior to checking for an update
-						QueueAddon(ELoaderAction::Reload, tmpPath);
+
+						/* only call reload if it wasn't unloaded */
+						if (!onlyInitialLaunch)
+						{
+							QueueAddon(ELoaderAction::Reload, tmpPath);
+						}
 					}
 					else if (addon->IsDisabledUntilUpdate && DisableVolatileUntilUpdate) // if addon is DUP and the global state is too
 					{
@@ -713,7 +758,7 @@ namespace Loader
 				.detach();
 
 			/* if will be locked, explicitly unload so the update can invoke a reload */
-			if (locked)
+			if (locked && !onlyInitialLaunch)
 			{
 				FreeLibrary(addon->Module);
 				addon->State = EAddonState::NotLoaded;

@@ -29,6 +29,7 @@ struct Addon
 	bool						IsWaitingForUnload;
 	bool						IsFlaggedForUninstall;
 	bool						IsFlaggedForDisable;
+	bool						IsFlaggedForEnable;
 };
 
 #endif

@@ -59,3 +59,5 @@ CAPIClient*					GitHubAPI			= nullptr;
 
 std::string					ChangelogText;
 bool						IsUpdateAvailable	= false;
+
+bool						IsGameLaunchSequence = true;
