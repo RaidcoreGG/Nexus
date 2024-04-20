@@ -453,7 +453,12 @@ namespace Loader
 					if ((addon->MD5.empty() || addon->MD5 != md5) || std::filesystem::exists(updatePath))
 					{
 						UpdateSwapAddon(addon->Path);
-						QueueAddon(ELoaderAction::Reload, addon->Path);
+
+						// only reload if it already is loadedw
+						if (addon->State == EAddonState::Loaded)
+						{
+							QueueAddon(ELoaderAction::Reload, addon->Path);
+						}
 					}
 				}
 
@@ -704,7 +709,7 @@ namespace Loader
 			std::filesystem::path tmpPath = aPath.string();
 			std::thread([tmpPath, addon, locked, shouldLoad, onlyInitialLaunch]()
 				{
-					Sleep(5000);
+					bool lShouldLoad = shouldLoad;
 					if (UpdateAddon(tmpPath, addon->Definitions->Signature, addon->Definitions->Name,
 									addon->Definitions->Version, addon->Definitions->Provider,
 									addon->Definitions->UpdateLink != nullptr ? addon->Definitions->UpdateLink : ""))
@@ -714,6 +719,7 @@ namespace Loader
 						{
 							// reset state, because it updated
 							addon->IsDisabledUntilUpdate = false;
+							lShouldLoad = true;
 
 							// mutex because we're async/threading
 							{
@@ -723,19 +729,22 @@ namespace Loader
 						}
 
 						/* only call reload if it wasn't unloaded */
-						if (!onlyInitialLaunch)
+						if (lShouldLoad)
 						{
-							QueueAddon(ELoaderAction::Reload, tmpPath);
-						}
-						else
-						{
-							std::string msg = addon->Definitions->Name;
-							msg.append(" ");
-							msg.append(Language.Translate("((000079))"));
-							GUI::Alerts::Notify(msg.c_str());
+							if (!onlyInitialLaunch)
+							{
+								QueueAddon(ELoaderAction::Reload, tmpPath);
+							}
+							else
+							{
+								std::string msg = addon->Definitions->Name;
+								msg.append(" ");
+								msg.append(Language.Translate("((000079))"));
+								GUI::Alerts::Notify(msg.c_str());
+							}
 						}
 					}
-					else if (locked && shouldLoad && !addon->IsDisabledUntilUpdate) // if addon is locked and not DUU
+					else if (locked && lShouldLoad && !addon->IsDisabledUntilUpdate) // if addon is locked and not DUU
 					{
 						// the lock state is checked because if it will be locked it means it was unloaded, prior to checking for an update
 
