@@ -194,6 +194,22 @@ namespace ImGui
 			return ret;
 		}
 
+		static bool ButtonDisabled(const char* label, const ImVec2& size_arg = ImVec2(0, 0))
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 0, 0, 1.0f));
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+			ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0, 0, 0, 1.0f));
+			ImGui::PushStyleColor(ImGuiCol_BorderShadow, ImVec4(0, 0, 0, 0));
+			bool ret = ButtonEx(label, size_arg, ImGuiButtonFlags_None);
+			ImGui::PopStyleColor(6);
+			ImGui::PopStyleVar(1);
+
+			return ret;
+		}
+
 		static bool ContextMenuItem(const char* id, const char* label, ImTextureID bullet_texture_id, ImTextureID highlight_texture_id, const ImVec2& size_arg = ImVec2(0, 0))
 		{
 			float itemWidth = ImGui::GetWindowContentRegionWidth();
