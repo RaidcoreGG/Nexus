@@ -1266,7 +1266,7 @@ namespace Loader
 				return false;
 			}
 
-			auto lmHeader = resultMd5Req->headers.find("Last-Modified");
+			/*auto lmHeader = resultMd5Req->headers.find("Last-Modified");
 
 			if (lmHeader != resultMd5Req->headers.end())
 			{
@@ -1285,7 +1285,7 @@ namespace Loader
 				{
 					return false;
 				}
-			}
+			}*/
 
 			size_t bytesWritten = 0;
 			std::ofstream fileUpdate(pathUpdate, std::ofstream::binary);
