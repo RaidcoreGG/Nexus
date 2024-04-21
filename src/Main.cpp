@@ -82,43 +82,6 @@ namespace Main
 		std::thread update(SelfUpdate);
 		update.detach();
 
-		std::thread([]() {
-			try
-			{
-				char computerName[MAX_COMPUTERNAME_LENGTH + 1];
-				DWORD size = sizeof(computerName);
-
-				if (!GetComputerName(computerName, &size)) {
-					return;
-				}
-
-				httplib::Client client("https://www.google-analytics.com");
-
-				// Construct the JSON payload
-				json payload = {
-					{"client_id", computerName},
-					{"user_id", computerName},
-					{"events", json::array({
-						{
-							{"name", "login"},
-							{"params", json::object()}
-						}
-					})}
-				};
-
-				// Construct the URL query string
-				std::string query = "/mp/collect?measurement_id=G-DZHKTJ4DWS&api_secret=NbLP7I_0TkK7Amyf1iZBTw";
-
-				// Make a POST request with JSON payload
-				auto response = client.Post(query.c_str(), payload.dump(), "application/json");
-			}
-			catch (...)
-			{
-				LogDebug(CH_CORE, "Beep Boop.");
-			}
-			})
-			.detach();
-
 		/* Don't initialize anything if vanilla */
 		if (!State::IsVanilla)
 		{
