@@ -216,6 +216,16 @@ namespace ArcDPS
 
 		IsPluginAtlasBuilt = true;
 	}
+	void AddToAtlasBySig(unsigned int aArcSignature)
+	{
+		const std::lock_guard<std::mutex> lock(Mutex);
+		if (std::find(Plugins.begin(), Plugins.end(), aArcSignature) == Plugins.end())
+		{
+			Plugins.push_back(aArcSignature);
+		}
+
+		IsPluginAtlasBuilt = true;
+	}
 	void Add(HMODULE aModule)
 	{
 		if (exp_addextension2)

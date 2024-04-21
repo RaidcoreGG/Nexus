@@ -9,7 +9,7 @@
 namespace GUI
 {
 	void AddonItem(std::filesystem::path aPath, Addon* aAddon);
-	void AddonItem(LibraryAddon* aAddon, bool aInstalled = false);
+	void AddonItem(LibraryAddon* aAddon, bool aInstalled = false, bool aIsArcPlugin = false);
 }
 
 #endif
