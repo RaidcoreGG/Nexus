@@ -9,6 +9,7 @@
 #include "Library.h"
 
 #include "Loader.h"
+#include "ArcDPS.h"
 
 #include "core.h"
 #include "Consts.h"
@@ -62,7 +63,7 @@ namespace Loader
 			}
 		}
 
-		void InstallAddon(LibraryAddon* aAddon)
+		void InstallAddon(LibraryAddon* aAddon, bool aIsArcPlugin)
 		{
 			aAddon->IsInstalling = true;
 
@@ -251,7 +252,14 @@ namespace Loader
 			}
 
 			LogInfo(CH_LOADER, "Successfully installed %s.", aAddon->Name.c_str());
-			Loader::QueueAddon(ELoaderAction::Reload, installPath);
+			if (aIsArcPlugin)
+			{
+				ArcDPS::AddToAtlasBySig(aAddon->Signature);
+			}
+			else
+			{
+				Loader::QueueAddon(ELoaderAction::Reload, installPath);
+			}
 		}
 	}
 }

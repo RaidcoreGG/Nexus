@@ -37,7 +37,7 @@ namespace Loader
 		/// InstallAddon:
 		/// 	Installs an addon and notifies the Loader.
 		///----------------------------------------------------------------------------------------------------
-		void InstallAddon(LibraryAddon* aAddon);
+		void InstallAddon(LibraryAddon* aAddon, bool aIsArcPlugin = false);
 	}
 }
 

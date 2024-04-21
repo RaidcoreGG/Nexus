@@ -238,6 +238,8 @@ namespace GUI
 					if (ImGui::GW2::Button((Language.Translate(aAddon->IsFlaggedForEnable ? "((000020))" : "((000024))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						aAddon->IsFlaggedForEnable = !aAddon->IsFlaggedForEnable;
+						Loader::SaveAddonConfig();
+
 						if (aAddon->IsFlaggedForEnable)
 						{
 							std::string msg = aAddon->Definitions->Name;
@@ -282,7 +284,7 @@ namespace GUI
 		}
 	}
 
-	void AddonItem(LibraryAddon* aAddon, bool aInstalled)
+	void AddonItem(LibraryAddon* aAddon, bool aInstalled, bool aIsArcPlugin)
 	{
 		float btnHeight = 22.0f * Renderer::Scaling;
 		float itemWidthScaled = itemWidth * Renderer::Scaling;
@@ -364,9 +366,9 @@ namespace GUI
 					{
 						if (!aAddon->IsInstalling)
 						{
-							std::thread([aAddon]()
+							std::thread([aAddon, aIsArcPlugin]()
 								{
-									Loader::Library::InstallAddon(aAddon);
+									Loader::Library::InstallAddon(aAddon, aIsArcPlugin);
 									aAddon->IsInstalling = false;
 								})
 								.detach();

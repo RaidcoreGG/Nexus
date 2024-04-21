@@ -346,7 +346,7 @@ namespace GUI
 								}
 								if (false == exists || true == showInstalled)
 								{
-									AddonItem(arclibAddon, exists);
+									AddonItem(arclibAddon, exists, true);
 									downloadable++;
 								}
 							}

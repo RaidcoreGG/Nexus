@@ -51,6 +51,8 @@ namespace ArcDPS
 	void GetPlugins();
 	/* Callback to receive arcdps plugins. */
 	void AddToAtlas(arcdps_exports* aArcdpsExports);
+	/* Callback to receive arcdps plugins. */
+	void AddToAtlasBySig(unsigned int aArcSignature);
 	/* Add extension to arcdps. */
 	void Add(HMODULE aModule);
 }

@@ -582,16 +582,7 @@ namespace Loader
 		/* doesn't have GetAddonDef */
 		if (FindFunction(addon->Module, &getAddonDef, "GetAddonDef") == false)
 		{
-			/* if it is an arc plugin, tell arc to load it */
-			void* exp_get_init_addr = nullptr;
-			if (FindFunction(addon->Module, &exp_get_init_addr, "get_init_addr") == true)
-			{
-				ArcDPS::Add(addon->Module);
-			}
-			else
-			{
-				LogWarning(CH_LOADER, "\"%s\" is not a Nexus-compatible library. Incompatible.", strFile.c_str());
-			}
+			LogWarning(CH_LOADER, "\"%s\" is not a Nexus-compatible library. Incompatible.", strFile.c_str());
 			FreeLibrary(addon->Module);
 			addon->State = EAddonState::NotLoadedIncompatible;
 			addon->Module = nullptr;
@@ -962,23 +953,10 @@ namespace Loader
 			return;
 		}
 
-		int freeCalls = 0;
-
-		while (FreeLibrary(addon->Module))
+		/* sanity check */
+		if (addon->Module)
 		{
-			freeCalls++;
-
-			if (freeCalls >= 10)
-			{
-				LogWarning(CH_LOADER, "Aborting unload of \"%s\". Called FreeLibrary() 10 times.", strFile.c_str());
-				break;
-			}
-		}
-
-		if (freeCalls == 0)
-		{
-			LogWarning(CH_LOADER, "Couldn't unload \"%s\". FreeLibrary() call failed.", strFile.c_str());
-			return;
+			FreeLibrary(addon->Module);
 		}
 
 		addon->Module = nullptr;
