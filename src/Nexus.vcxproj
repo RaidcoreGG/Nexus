@@ -62,7 +62,6 @@
     <ClCompile Include="Multibox\Multibox.cpp" />
     <ClCompile Include="Mumble\Identity.cpp" />
     <ClCompile Include="Mumble\Mumble.cpp" />
-    <ClCompile Include="openssl\applink.c" />
     <ClCompile Include="Paths.cpp" />
     <ClCompile Include="Proxy.cpp" />
     <ClCompile Include="Renderer.cpp" />
