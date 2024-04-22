@@ -266,9 +266,9 @@ using socket_t = int;
 #include <openssl/ssl.h>
 #include <openssl/x509v3.h>
 
-#if defined(_WIN32) && defined(OPENSSL_USE_APPLINK)
-#include <openssl/applink.c>
-#endif
+//#if defined(_WIN32) && defined(OPENSSL_USE_APPLINK)
+//#include <openssl/applink.c>
+//#endif
 
 #include <iostream>
 #include <sstream>

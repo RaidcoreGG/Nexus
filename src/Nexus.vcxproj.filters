@@ -282,9 +282,6 @@
     <ClCompile Include="WndProc\WndProcHandler.cpp">
       <Filter>WndProc</Filter>
     </ClCompile>
-    <ClCompile Include="openssl\applink.c">
-      <Filter>_EXTERNAL\openssl</Filter>
-    </ClCompile>
     <ClCompile Include="CrashHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
