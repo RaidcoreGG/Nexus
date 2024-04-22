@@ -35,7 +35,7 @@ namespace GUI
 		bool			AlwaysShow			= false;
 		bool			VerticalLayout		= false;
 		EQAPosition		Location			= EQAPosition::Extend;
-		ImVec2			Offset				= ImVec2(((size + 1) * Renderer::Scaling) * 9, 0.0f);
+		ImVec2			Offset				= ImVec2(0, 0);
 
 		Texture*		IconNotification	= nullptr;
 
