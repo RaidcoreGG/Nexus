@@ -745,19 +745,10 @@ namespace Loader
 							QueueAddon(ELoaderAction::Reload, tmpPath);
 						}
 					}
-					else if (addon->IsDisabledUntilUpdate && DisableVolatileUntilUpdate) // if addon is DUP and the global state is too
-					{
-						// show message that addon was disabled due to game update
-						std::string msg = addon->Definitions->Name;
-						msg.append(" ");
-						msg.append(Language.Translate("((000073))"));
-						Events::Raise(EV_VOLATILE_ADDON_DISABLED, &addon->Definitions->Signature);
-						GUI::Alerts::Notify(msg.c_str());
-					}
 				})
 				.detach();
 
-			/* if will be locked, explicitly unload so the update can invoke a reload */
+			/* if will be locked, but this addon must NOT only be loaded at startup, explicitly unload so the update can invoke a reload */
 			if (locked && !onlyInitialLaunch)
 			{
 				FreeLibrary(addon->Module);
@@ -771,6 +762,21 @@ namespace Loader
 		if (!shouldLoad)
 		{
 			//LogInfo(CH_LOADER, "\"%s\" was not requested via start parameter or last state was disabled. Skipped.", strFile.c_str(), addon->Definitions->Signature);
+			FreeLibrary(addon->Module);
+			addon->State = EAddonState::NotLoaded;
+			addon->Module = nullptr;
+			return;
+		}
+
+		if (addon->IsDisabledUntilUpdate && DisableVolatileUntilUpdate)
+		{
+			// show message that addon was disabled due to game update
+			std::string msg = addon->Definitions->Name;
+			msg.append(" ");
+			msg.append(Language.Translate("((000073))"));
+			Events::Raise(EV_VOLATILE_ADDON_DISABLED, &addon->Definitions->Signature);
+			GUI::Alerts::Notify(msg.c_str());
+
 			FreeLibrary(addon->Module);
 			addon->State = EAddonState::NotLoaded;
 			addon->Module = nullptr;
