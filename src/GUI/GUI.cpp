@@ -326,29 +326,34 @@ namespace GUI
 
 					ImGuiStyle* style = &ImGui::GetStyle();
 
-					while (std::getline(arcIni, line))
+					try
 					{
-						if (size_t idx = line.find(styleKey, 0) != line.npos &&
-							line.c_str()[0] != ';')
+						while (std::getline(arcIni, line))
 						{
-							line = line.substr(idx + styleKey.length());
-							std::string decode = Base64::Decode(&line[0], line.length());
-							memcpy(style, &decode[0], decode.length());
-						}
-						else if (size_t idx = line.find(coloursKey, 0) != line.npos &&
-							line.c_str()[0] != ';')
-						{
-							line = line.substr(idx + coloursKey.length());
-							std::string decode = Base64::Decode(&line[0], line.length());
-							memcpy(&style->Colors[0], &decode[0], decode.length());
-						}
-						else if (size_t idx = line.find(fontSizeKey, 0) != line.npos &&
-							line.c_str()[0] != ';')
-						{
-							line = line.substr(idx + fontSizeKey.length());
-							FontSize = std::stof(line);
+							if (line.find(styleKey, 0) != line.npos)
+							{
+								line = line.substr(styleKey.length());
+								std::string decode = Base64::Decode(&line[0], line.length());
+								memcpy(style, &decode[0], decode.length());
+							}
+							else if (line.find(coloursKey, 0) != line.npos)
+							{
+								line = line.substr(coloursKey.length());
+								std::string decode = Base64::Decode(&line[0], line.length());
+								memcpy(&style->Colors[0], &decode[0], decode.length());
+							}
+							else if (line.find(fontSizeKey, 0) != line.npos)
+							{
+								line = line.substr(fontSizeKey.length());
+								FontSize = std::stof(line);
+							}
 						}
 					}
+					catch (...)
+					{
+						LogDebug(CH_CORE, "Couldn't parse ArcDPS style.");
+					}
+					
 					arcIni.close();
 				}
 			}
