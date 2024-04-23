@@ -328,21 +328,24 @@ namespace GUI
 
 					while (std::getline(arcIni, line))
 					{
-						if (line.find(styleKey, 0) != line.npos)
+						if (size_t idx = line.find(styleKey, 0) != line.npos &&
+							line.c_str()[0] != ';')
 						{
-							line = line.substr(styleKey.length());
+							line = line.substr(idx + styleKey.length());
 							std::string decode = Base64::Decode(&line[0], line.length());
 							memcpy(style, &decode[0], decode.length());
 						}
-						else if (line.find(coloursKey, 0) != line.npos)
+						else if (size_t idx = line.find(coloursKey, 0) != line.npos &&
+							line.c_str()[0] != ';')
 						{
-							line = line.substr(coloursKey.length());
+							line = line.substr(idx + coloursKey.length());
 							std::string decode = Base64::Decode(&line[0], line.length());
 							memcpy(&style->Colors[0], &decode[0], decode.length());
 						}
-						else if (line.find(fontSizeKey, 0) != line.npos)
+						else if (size_t idx = line.find(fontSizeKey, 0) != line.npos &&
+							line.c_str()[0] != ';')
 						{
-							line = line.substr(fontSizeKey.length());
+							line = line.substr(idx + fontSizeKey.length());
 							FontSize = std::stof(line);
 						}
 					}
