@@ -159,6 +159,7 @@ namespace GUI
 							CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 						{
 							aAddon->IsPausingUpdates = !aAddon->IsPausingUpdates;
+							Loader::SaveAddonConfig();
 						}
 
 						ImGui::Separator();
