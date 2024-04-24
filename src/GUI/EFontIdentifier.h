@@ -9,6 +9,8 @@ namespace GUI
 
 		User,
 
+		Monospace,
+
 		Menomonia_Small,
 		MenomoniaBig_Small,
 		Trebuchet_Small,

@@ -15,8 +15,10 @@ namespace GUI
 	{
 		if (!Visible) { return; }
 
+		ImGui::PushFont(MonospaceFont);
+
 		ImVec2 pos = ImVec2(16.0f, 16.0f);
-		ImVec2 size = ImVec2(ImGui::GetFontSize() * 10.0f, 0.0f);
+		ImVec2 size = ImVec2(ImGui::CalcTextSize("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx").x, 0.0f);
 
 		ImGui::SetNextWindowBgAlpha(0.35f);
 		ImGui::SetNextWindowPos(pos);
@@ -282,5 +284,7 @@ namespace GUI
 			}
 			ImGui::End();
 		}
+
+		ImGui::PopFont();
 	}
 }

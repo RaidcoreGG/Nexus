@@ -284,6 +284,33 @@ namespace GUI
 			}
 			/* draw overlay end */
 
+#ifdef _DEBUG
+			std::string watermark = "Debug Build ";
+			watermark.append(__DATE__);
+			watermark.append(" ");
+			watermark.append(__TIME__);
+			watermark.append(" (v");
+			watermark.append(Version.ToString());
+			watermark.append(")");
+			watermark.append(" [");
+			watermark.append(BRANCH_NAME);
+			watermark.append("]");
+
+			ImGui::PushFont(MonospaceFont);
+			ImVec2 sz = ImGui::CalcTextSize(watermark.c_str());
+
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+			ImGui::SetNextWindowPos(ImVec2((Renderer::Width - sz.x) / 2, 0));
+			if (ImGui::Begin("NEXUS_BUILDINFO", (bool*)0, WindowFlags_Watermark))
+			{
+				ImGui::SetCursorPos(ImVec2(0, 0));
+				ImGui::TextOutlined(watermark.c_str());
+			};
+			ImGui::End();
+			ImGui::PopStyleVar();
+			ImGui::PopFont();
+#endif
+
 			/* end frame */
 			ImGui::EndFrame();
 			ImGui::Render();
@@ -662,23 +689,22 @@ namespace GUI
 		rb.AddRanges(io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
 		rb.BuildRanges(&ranges);
 
-		/* add user font, or fallback to default */
+		/* add user font */
 		if (!LinkArcDPSStyle && std::filesystem::exists(Path::F_FONT))
 		{
 			fontPath = Path::F_FONT;
 			std::string strFont = Path::F_FONT.string();
-			io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize, nullptr, ranges.Data);
+			UserFont = io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize, nullptr, ranges.Data);
 		}
 		else if (LinkArcDPSStyle && std::filesystem::exists(Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf"))
 		{
 			fontPath = Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf";
 			std::string strFont = (Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf").string();
-			io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize, nullptr, ranges.Data);
+			UserFont = io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize, nullptr, ranges.Data);
 		}
-		else
-		{
-			io.Fonts->AddFontDefault();
-		}
+
+		/* add default font */
+		MonospaceFont = io.Fonts->AddFontDefault();
 
 		/* load gw2 fonts */
 		LPVOID resM{}; DWORD szM{};
