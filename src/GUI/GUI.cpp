@@ -11,6 +11,7 @@
 #include "Shared.h"
 #include "Consts.h"
 #include "Branch.h"
+#include "Version.h"
 
 #include "Mumble/Mumble.h"
 
@@ -39,6 +40,17 @@
 
 #include "resource.h"
 #include "Textures/Texture.h"
+
+#ifndef STRINGIFY
+#define STRINGIFY(x) #x
+#endif
+#ifndef TOSTRING
+#define TOSTRING(x) STRINGIFY(x)
+#endif
+
+#ifndef WATERMARK
+#define WATERMARK __DATE__ " " __TIME__ " (v" TOSTRING(V_MAJOR) "." TOSTRING(V_MINOR) "." TOSTRING(V_BUILD) "." TOSTRING(V_REVISION) ") [" BRANCH_NAME "]"
+#endif
 
 namespace GUI
 {
@@ -285,26 +297,14 @@ namespace GUI
 			/* draw overlay end */
 
 #ifdef _DEBUG
-			std::string watermark = "Debug Build ";
-			watermark.append(__DATE__);
-			watermark.append(" ");
-			watermark.append(__TIME__);
-			watermark.append(" (v");
-			watermark.append(Version.ToString());
-			watermark.append(")");
-			watermark.append(" [");
-			watermark.append(BRANCH_NAME);
-			watermark.append("]");
-
 			ImGui::PushFont(MonospaceFont);
-			ImVec2 sz = ImGui::CalcTextSize(watermark.c_str());
+			ImVec2 sz = ImGui::CalcTextSize(WATERMARK);
 
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 			ImGui::SetNextWindowPos(ImVec2((Renderer::Width - sz.x) / 2, 0));
 			if (ImGui::Begin("NEXUS_BUILDINFO", (bool*)0, WindowFlags_Watermark))
 			{
-				ImGui::SetCursorPos(ImVec2(0, 0));
-				ImGui::TextOutlined(watermark.c_str());
+				ImGui::TextOutlined(WATERMARK);
 			};
 			ImGui::End();
 			ImGui::PopStyleVar();
