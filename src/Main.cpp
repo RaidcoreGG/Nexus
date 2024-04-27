@@ -27,8 +27,6 @@
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
-HWND wndHandle = nullptr;
-
 /* entry */
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
@@ -43,54 +41,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	return true;
 }
 
-BOOL CALLBACK EnumWindowsCallback(HWND hwnd, LPARAM lParam)
-{
-	DWORD lpdwProcessId;
-	GetWindowThreadProcessId(hwnd, &lpdwProcessId);
-	if (lpdwProcessId == lParam)
-	{
-		wndHandle = hwnd;
-		return FALSE;
-	}
-	return TRUE;
-}
-
 namespace Main
 {
 	void Initialize()
 	{
-		DWORD pID = GetCurrentProcessId();
-		HANDLE processHandle = GetCurrentProcess();
-		
-		EnumWindows(EnumWindowsCallback, pID);
-
-		if (!wndHandle)
-		{
-			exit(-1);
-		}
-		else
-		{
-			char buffer[MAX_PATH]{};
-			GetClassNameA(wndHandle, buffer, MAX_PATH);
-
-			std::string windowClass = buffer;
-
-			if (windowClass == "ArenaNet_Dialog_Class" ||
-				windowClass == "ArenaNet_Gr_Window_Class" ||
-				windowClass == "ArenaNet_Dx_Window_Class" ||
-				windowClass == "ArenaNet_Layered_Window_Class" ||
-				windowClass == "ArenaNet_TexDbg_Class" ||
-				windowClass == "ArenaNet_TexDbg_Popup" ||
-				windowClass == "ArenaNet_TexView_Class")
-			{
-				/* do nothing */
-			}
-			else
-			{
-				exit(-2);
-			}
-		}
-
 		if (State::Nexus >= ENexusState::LOAD) { return; }
 
 		State::Nexus = ENexusState::LOAD;
@@ -98,7 +52,7 @@ namespace Main
 		//SetUnhandledExceptionFilter(UnhandledExcHandler);
 		GameHandle = GetModuleHandle(NULL);
 		MODULEINFO moduleInfo{};
-		GetModuleInformation(processHandle, NexusHandle, &moduleInfo, sizeof(moduleInfo));
+		GetModuleInformation(GetCurrentProcess(), NexusHandle, &moduleInfo, sizeof(moduleInfo));
 		NexusModuleSize = moduleInfo.SizeOfImage;
 
 		Path::Initialize(NexusHandle);
