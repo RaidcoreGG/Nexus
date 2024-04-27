@@ -30,7 +30,7 @@ void create_minidump(struct _EXCEPTION_POINTERS* apExceptionInfo)
 
 LONG WINAPI UnhandledExcHandler(struct _EXCEPTION_POINTERS* aExceptionInfoPtr)
 {
-    MessageBoxA(NULL, "I'M CRASHING BROOOO.", "Unhandled Exception", 0);
+    MessageBoxA(NULL, "Unhandled Exception", "Unhandled Exception", 0);
     create_minidump(aExceptionInfoPtr);
     return EXCEPTION_CONTINUE_SEARCH;
 }

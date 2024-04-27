@@ -24,6 +24,8 @@ NexusLinkData*				NexusLink			= nullptr;
 
 CLocalization&				Language			= CLocalization::GetInstance();
 
+ImFont*						MonospaceFont		= nullptr;
+ImFont*						UserFont			= nullptr;
 ImFont*						Font				= nullptr;
 ImFont*						FontBig				= nullptr;
 ImFont*						FontUI				= nullptr;

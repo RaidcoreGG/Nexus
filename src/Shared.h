@@ -40,6 +40,8 @@ extern NexusLinkData*				NexusLink;
 
 extern CLocalization&				Language;
 
+extern ImFont*						MonospaceFont;	/* default/monospace/console font */
+extern ImFont*						UserFont;		/* custom user font */
 extern ImFont*						Font;			/* Menomonia */
 extern ImFont*						FontBig;		/* Menomonia, but slightly bigger */
 extern ImFont*						FontUI;			/* Trebuchet */

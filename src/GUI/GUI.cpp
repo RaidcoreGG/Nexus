@@ -11,6 +11,7 @@
 #include "Shared.h"
 #include "Consts.h"
 #include "Branch.h"
+#include "Version.h"
 
 #include "Mumble/Mumble.h"
 
@@ -39,6 +40,17 @@
 
 #include "resource.h"
 #include "Textures/Texture.h"
+
+#ifndef STRINGIFY
+#define STRINGIFY(x) #x
+#endif
+#ifndef TOSTRING
+#define TOSTRING(x) STRINGIFY(x)
+#endif
+
+#ifndef WATERMARK
+#define WATERMARK __DATE__ " " __TIME__ " (v" TOSTRING(V_MAJOR) "." TOSTRING(V_MINOR) "." TOSTRING(V_BUILD) "." TOSTRING(V_REVISION) ") [" BRANCH_NAME "]"
+#endif
 
 namespace GUI
 {
@@ -284,6 +296,21 @@ namespace GUI
 			}
 			/* draw overlay end */
 
+#ifdef _DEBUG
+			ImGui::PushFont(MonospaceFont);
+			ImVec2 sz = ImGui::CalcTextSize(WATERMARK);
+
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+			ImGui::SetNextWindowPos(ImVec2((Renderer::Width - sz.x) / 2, 0));
+			if (ImGui::Begin("NEXUS_BUILDINFO", (bool*)0, WindowFlags_Watermark))
+			{
+				ImGui::TextOutlined(WATERMARK);
+			};
+			ImGui::End();
+			ImGui::PopStyleVar();
+			ImGui::PopFont();
+#endif
+
 			/* end frame */
 			ImGui::EndFrame();
 			ImGui::Render();
@@ -326,26 +353,34 @@ namespace GUI
 
 					ImGuiStyle* style = &ImGui::GetStyle();
 
-					while (std::getline(arcIni, line))
+					try
 					{
-						if (line.find(styleKey, 0) != line.npos)
+						while (std::getline(arcIni, line))
 						{
-							line = line.substr(styleKey.length());
-							std::string decode = Base64::Decode(&line[0], line.length());
-							memcpy(style, &decode[0], decode.length());
-						}
-						else if (line.find(coloursKey, 0) != line.npos)
-						{
-							line = line.substr(coloursKey.length());
-							std::string decode = Base64::Decode(&line[0], line.length());
-							memcpy(&style->Colors[0], &decode[0], decode.length());
-						}
-						else if (line.find(fontSizeKey, 0) != line.npos)
-						{
-							line = line.substr(fontSizeKey.length());
-							FontSize = std::stof(line);
+							if (line.find(styleKey, 0) != line.npos)
+							{
+								line = line.substr(styleKey.length());
+								std::string decode = Base64::Decode(&line[0], line.length());
+								memcpy(style, &decode[0], decode.length());
+							}
+							else if (line.find(coloursKey, 0) != line.npos)
+							{
+								line = line.substr(coloursKey.length());
+								std::string decode = Base64::Decode(&line[0], line.length());
+								memcpy(&style->Colors[0], &decode[0], decode.length());
+							}
+							else if (line.find(fontSizeKey, 0) != line.npos)
+							{
+								line = line.substr(fontSizeKey.length());
+								FontSize = std::stof(line);
+							}
 						}
 					}
+					catch (...)
+					{
+						LogDebug(CH_CORE, "Couldn't parse ArcDPS style.");
+					}
+					
 					arcIni.close();
 				}
 			}
@@ -654,23 +689,22 @@ namespace GUI
 		rb.AddRanges(io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
 		rb.BuildRanges(&ranges);
 
-		/* add user font, or fallback to default */
+		/* add user font */
 		if (!LinkArcDPSStyle && std::filesystem::exists(Path::F_FONT))
 		{
 			fontPath = Path::F_FONT;
 			std::string strFont = Path::F_FONT.string();
-			io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize, nullptr, ranges.Data);
+			UserFont = io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize, nullptr, ranges.Data);
 		}
 		else if (LinkArcDPSStyle && std::filesystem::exists(Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf"))
 		{
 			fontPath = Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf";
 			std::string strFont = (Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf").string();
-			io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize, nullptr, ranges.Data);
+			UserFont = io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize, nullptr, ranges.Data);
 		}
-		else
-		{
-			io.Fonts->AddFontDefault();
-		}
+
+		/* add default font */
+		MonospaceFont = io.Fonts->AddFontDefault();
 
 		/* load gw2 fonts */
 		LPVOID resM{}; DWORD szM{};

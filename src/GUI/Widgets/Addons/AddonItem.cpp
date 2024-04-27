@@ -137,6 +137,26 @@ namespace GUI
 																		aAddon->Definitions->UpdateLink != nullptr ? aAddon->Definitions->UpdateLink : ""))
 												{
 													Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
+
+													std::string notification = aAddon->Definitions->Name;
+													if (aAddon->State == EAddonState::LoadedLOCKED)
+													{
+														notification.append(Language.Translate("((000079))"));
+													}
+													else
+													{
+														notification.append(" ");
+														notification.append(Language.Translate("((000081))"));
+													}
+
+													GUI::Alerts::Notify(notification.c_str());
+												}
+												else
+												{
+													std::string notification = aAddon->Definitions->Name;
+													notification.append(" ");
+													notification.append(Language.Translate("((000082))"));
+													GUI::Alerts::Notify(notification.c_str());
 												}
 												Sleep(1000); // arbitrary sleep otherwise the user never even sees "is checking..."
 												aAddon->IsCheckingForUpdates = false;
@@ -159,6 +179,7 @@ namespace GUI
 							CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 						{
 							aAddon->IsPausingUpdates = !aAddon->IsPausingUpdates;
+							Loader::SaveAddonConfig();
 						}
 
 						ImGui::Separator();
