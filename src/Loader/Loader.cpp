@@ -139,6 +139,8 @@ namespace Loader
 	{
 		if (State::Nexus == ENexusState::SHUTTING_DOWN)
 		{
+			bool loaderWasWorking = FSNotifierID != 0;
+
 			if (FSNotifierID != 0)
 			{
 				SHChangeNotifyDeregister(FSNotifierID);
@@ -151,8 +153,11 @@ namespace Loader
 				FSItemList = 0;
 			}
 
-			const std::lock_guard<std::mutex> lock(Mutex);
-			SaveAddonConfig();
+			if (loaderWasWorking)
+			{
+				const std::lock_guard<std::mutex> lock(Mutex);
+				SaveAddonConfig();
+			}
 
 			{
 				while (Addons.size() != 0)
