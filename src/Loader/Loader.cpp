@@ -153,9 +153,9 @@ namespace Loader
 				FSItemList = 0;
 			}
 
+			const std::lock_guard<std::mutex> lock(Mutex);
 			if (loaderWasWorking)
 			{
-				const std::lock_guard<std::mutex> lock(Mutex);
 				SaveAddonConfig();
 			}
 
