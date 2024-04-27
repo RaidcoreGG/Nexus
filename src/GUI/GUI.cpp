@@ -702,6 +702,10 @@ namespace GUI
 			std::string strFont = (Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf").string();
 			UserFont = io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize, nullptr, ranges.Data);
 		}
+		else
+		{
+			UserFont = io.Fonts->AddFontDefault();
+		}
 
 		/* add default font */
 		MonospaceFont = io.Fonts->AddFontDefault();
