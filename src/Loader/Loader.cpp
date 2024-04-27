@@ -510,11 +510,9 @@ namespace Loader
 						catch (std::filesystem::filesystem_error fErr)
 						{
 							LogDebug(CH_LOADER, "%s", fErr.what());
-							return;
 						}
 					}
-
-					if (path.extension() == extOld)
+					else if (path.extension() == extOld)
 					{
 						try
 						{
@@ -523,7 +521,6 @@ namespace Loader
 						catch (std::filesystem::filesystem_error fErr)
 						{
 							LogDebug(CH_LOADER, "%s", fErr.what());
-							return;
 						}
 					}
 				}
