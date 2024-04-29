@@ -168,7 +168,7 @@ namespace Main
 			std::filesystem::remove(Path::F_OLD_DLL);
 		}
 
-		json resVersion = RaidcoreAPI->Get("/nexusversion");;
+		json resVersion = RaidcoreAPI->Get("/nexusversion", "", true);
 
 		if (resVersion.is_null())
 		{

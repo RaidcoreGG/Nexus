@@ -37,7 +37,7 @@ public:
 	Get:
 	Returns the response string.
 	*/
-	json Get(std::string aEndpoint, std::string aParameters = "");
+	json Get(std::string aEndpoint, std::string aParameters = "", bool aBypassCache = false);
 
 	json Post(std::string aEndpoint, std::string aParameters = "");
 	/*

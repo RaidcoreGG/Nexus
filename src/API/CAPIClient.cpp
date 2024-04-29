@@ -55,11 +55,11 @@ CAPIClient::~CAPIClient()
 	LogDebug(("CAPIClient::" + BaseURL).c_str(), "~CAPIClient(%s)", BaseURL.c_str());
 }
 
-json CAPIClient::Get(std::string aEndpoint, std::string aParameters)
+json CAPIClient::Get(std::string aEndpoint, std::string aParameters, bool aBypassCache)
 {
 	std::string query = GetQuery(aEndpoint, aParameters);
 
-	CachedResponse* cachedResponse = GetCachedResponse(query);
+	CachedResponse* cachedResponse = aBypassCache ? nullptr : GetCachedResponse(query);
 
 	if (cachedResponse != nullptr)
 	{
