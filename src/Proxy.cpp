@@ -39,10 +39,13 @@ namespace Proxy
 					{
 						State::IsChainloading = true;
 
-						LogInfo(CH_CORE, "Attempting to chainload.");
-
 						std::string strChainload = Path::F_CHAINLOAD_DLL.string();
 						D3D11Handle = LoadLibraryA(strChainload.c_str());
+
+						if (D3D11Handle)
+						{
+							LogInfo(CH_CORE, "Loaded Chainload DLL: %s", strChainload.c_str());
+						}
 					}
 				}
 
