@@ -82,10 +82,18 @@ namespace Loader
 		{
 			LoadAddonConfig();
 
-			FSItemList = ILCreateFromPathA(Path::GetAddonDirectory(nullptr));
+			//FSItemList = ILCreateFromPathA(Path::GetAddonDirectory(nullptr));
+			std::wstring addonDirW = StrToWStr(Path::D_GW2_ADDONS.string());
+			HRESULT hresult = SHParseDisplayName(
+				addonDirW.c_str(),
+				0,
+				&FSItemList,
+				0xFFFFFFFF,
+				0
+			);
 			if (FSItemList == 0)
 			{
-				LogCritical(CH_LOADER, "Loader disabled. Reason: ILCreateFromPathA(Path::D_GW2_ADDONS) returned 0.");
+				LogCritical(CH_LOADER, "Loader disabled. Reason: SHParseDisplayName(Path::D_GW2_ADDONS) returned %d.", hresult);
 				return;
 			}
 
@@ -853,6 +861,54 @@ namespace Loader
 			ArcDPS::InitializeBridge(addon->Module);
 		}
 	}
+
+	void CallUnloadAndVerify(const std::filesystem::path& aPath, Addon* aAddon, bool aIsShutdown)
+	{
+		if (!aIsShutdown)
+		{
+			/* cache the flag, save that the addon will disable, then restore it */
+			bool flagDisable = aAddon->IsFlaggedForDisable;
+			aAddon->IsFlaggedForDisable = true;
+			
+			/* wrap around mutex lock/unlock because if SyncUnload it will already be locked, as it's executed from ProcessQueue */
+			if (!aAddon->Definitions->HasFlag(EAddonFlags::SyncUnload)) { Mutex.lock(); }
+			SaveAddonConfig();
+			if (!aAddon->Definitions->HasFlag(EAddonFlags::SyncUnload)) { Mutex.unlock(); }
+
+			aAddon->IsFlaggedForDisable = flagDisable;
+		}
+
+		std::chrono::steady_clock::time_point start_time = std::chrono::high_resolution_clock::now();
+		if (aAddon->Definitions->Unload) // guaranteed to have defs because only called from UnloadAddon()
+		{
+			aAddon->Definitions->Unload();
+		}
+		std::chrono::steady_clock::time_point end_time = std::chrono::high_resolution_clock::now();
+		std::chrono::steady_clock::duration time = end_time - start_time;
+
+		if (aAddon->Module && aAddon->ModuleSize > 0)
+		{
+			/* Verify all APIs don't have any unreleased references to the addons address space */
+			void* startAddress = aAddon->Module;
+			void* endAddress = ((PBYTE)aAddon->Module) + aAddon->ModuleSize;
+
+			int leftoverRefs = 0;
+			leftoverRefs += Events::Verify(startAddress, endAddress);
+			leftoverRefs += GUI::Verify(startAddress, endAddress);
+			leftoverRefs += GUI::QuickAccess::Verify(startAddress, endAddress);
+			leftoverRefs += Keybinds::Verify(startAddress, endAddress);
+			leftoverRefs += WndProc::Verify(startAddress, endAddress);
+
+			if (leftoverRefs > 0)
+			{
+				LogWarning(CH_LOADER, "Removed %d unreleased references from \"%s\". Make sure your addon releases all references during Addon::Unload().", leftoverRefs, aPath.filename().string().c_str());
+			}
+		}
+
+		aAddon->IsWaitingForUnload = false;
+		LogInfo(CH_LOADER, u8"Unloaded addon: %s (Took %uµs.)", aPath.filename().string().c_str(), time / std::chrono::microseconds(1));
+	}
+
 	void UnloadAddon(const std::filesystem::path& aPath, bool aDoReload)
 	{
 		std::string path = aPath.string();
@@ -860,17 +916,22 @@ namespace Loader
 
 		Addon* addon = FindAddonByPath(aPath);
 
+		/* if the to be unloaded addon does not exist or isn't loaded (or loadedLocked) -> abort */
 		if (!addon || !(addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED))
 		{
-			if (!std::filesystem::exists(aPath))
+			/* check if the addon exists because it could be null here */
+			if (addon && !std::filesystem::exists(aPath))
 			{
 				auto it = std::find(Addons.begin(), Addons.end(), addon);
 				if (it != Addons.end())
 				{
+					/* attempt freeing the addonDefs if the addon is still in memory */
 					if (addon->Definitions)
 					{
 						AddonDefinition::Free(&addon->Definitions);
 					}
+
+					/* remove addon from list, it's no longer on disk*/
 					Addons.erase(it);
 				}
 			}
@@ -887,64 +948,40 @@ namespace Loader
 			if ((addon->State == EAddonState::Loaded) || (addon->State == EAddonState::LoadedLOCKED && isShutdown))
 			{
 				addon->IsWaitingForUnload = true;
-				std::thread unloadTask([addon, aPath, isShutdown, aDoReload]()
+
+				if (addon->Definitions->HasFlag(EAddonFlags::SyncUnload))
+				{
+					CallUnloadAndVerify(aPath, addon, isShutdown);
+					FreeAddon(aPath);
+
+					if (aDoReload)
 					{
-						if (!isShutdown)
+						LoadAddon(aPath, true);
+					}
+				}
+				else
+				{
+					std::thread unloadTask([addon, aPath, isShutdown, aDoReload]()
 						{
-							/* cache the flag, save that the addon will disable, then restore it */
-							bool flagDisable = addon->IsFlaggedForDisable;
-							addon->IsFlaggedForDisable = true;
-							const std::lock_guard<std::mutex> lock(Mutex);
-							SaveAddonConfig();
-							addon->IsFlaggedForDisable = flagDisable;
-						}
+							CallUnloadAndVerify(aPath, addon, isShutdown);
 
-						std::chrono::steady_clock::time_point start_time = std::chrono::high_resolution_clock::now();
-						if (addon->Definitions->Unload)
-						{
-							addon->Definitions->Unload();
-						}
-						std::chrono::steady_clock::time_point end_time = std::chrono::high_resolution_clock::now();
-						std::chrono::steady_clock::duration time = end_time - start_time;
-
-						if (addon->Module && addon->ModuleSize > 0)
-						{
-							/* Verify all APIs don't have any unreleased references to the addons address space */
-							void* startAddress = addon->Module;
-							void* endAddress = ((PBYTE)addon->Module) + addon->ModuleSize;
-
-							int leftoverRefs = 0;
-							leftoverRefs += Events::Verify(startAddress, endAddress);
-							leftoverRefs += GUI::Verify(startAddress, endAddress);
-							leftoverRefs += GUI::QuickAccess::Verify(startAddress, endAddress);
-							leftoverRefs += Keybinds::Verify(startAddress, endAddress);
-							leftoverRefs += WndProc::Verify(startAddress, endAddress);
-
-							if (leftoverRefs > 0)
+							if (!isShutdown)
 							{
-								LogWarning(CH_LOADER, "Removed %d unreleased references from \"%s\". Make sure your addon releases all references during Addon::Unload().", leftoverRefs, aPath.filename().string().c_str());
-							}
-						}
+								Events::Raise(EV_ADDON_UNLOADED, &addon->Definitions->Signature);
 
-						addon->IsWaitingForUnload = false;
-						LogInfo(CH_LOADER, u8"Unloaded addon: %s (Took %uµs.)", aPath.filename().string().c_str(), time / std::chrono::microseconds(1));
-
-						if (!isShutdown)
-						{
-							Events::Raise(EV_ADDON_UNLOADED, &addon->Definitions->Signature);
-
-							const std::lock_guard<std::mutex> lock(Mutex);
-							if (aDoReload)
-							{
-								Loader::QueueAddon(ELoaderAction::FreeLibraryThenLoad, aPath);
+								const std::lock_guard<std::mutex> lock(Mutex);
+								if (aDoReload)
+								{
+									Loader::QueueAddon(ELoaderAction::FreeLibraryThenLoad, aPath);
+								}
+								else
+								{
+									Loader::QueueAddon(ELoaderAction::FreeLibrary, aPath);
+								}
 							}
-							else
-							{
-								Loader::QueueAddon(ELoaderAction::FreeLibrary, aPath);
-							}
-						}
-					});
-				unloadTask.detach();
+						});
+					unloadTask.detach();
+				}
 			}
 		}
 	}
