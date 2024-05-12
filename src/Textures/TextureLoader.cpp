@@ -356,7 +356,7 @@ namespace TextureLoader
 	}
 	void CreateTexture(QueuedTexture aQueuedTexture)
 	{
-		LogDebug(CH_TEXTURES, "Create %s", aQueuedTexture.Identifier.c_str());
+		//LogDebug(CH_TEXTURES, "Create %s", aQueuedTexture.Identifier.c_str());
 
 		Texture* tex = new Texture{};
 		tex->Width = aQueuedTexture.Width;

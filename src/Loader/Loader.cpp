@@ -452,8 +452,8 @@ namespace Loader
 				// check all tracked addons
 				for (Addon* addon : Addons)
 				{
-					// if addon no longer on disk
-					if (!std::filesystem::exists(addon->Path))
+					// if addon no longer on disk (also check if the path is not null, else it's from config)
+					if (!std::filesystem::exists(addon->Path) && addon->Path != "")
 					{
 						QueueAddon(ELoaderAction::Unload, addon->Path);
 						continue;
@@ -1701,9 +1701,9 @@ namespace Loader
 			{
 				if (lhs->Definitions && rhs->Definitions)
 				{
-					std::string lname = lhs->Definitions->Name;
+					std::string lname = Normalize(lhs->Definitions->Name);
 					std::transform(lname.begin(), lname.end(), lname.begin(), ::tolower);
-					std::string rname = rhs->Definitions->Name;
+					std::string rname = Normalize(rhs->Definitions->Name);
 					std::transform(rname.begin(), rname.end(), rname.begin(), ::tolower);
 
 					return lname < rname;
