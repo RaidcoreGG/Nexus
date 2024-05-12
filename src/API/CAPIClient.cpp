@@ -22,7 +22,7 @@ CAPIClient::CAPIClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::p
 	RefillAmount = aRefillAmount;
 	RefillInterval = aRefillInterval;
 
-	LogDebug(("CAPIClient::" + BaseURL).c_str(), "CAPIClient(BaseURL: %s, EnableSSL: %s, CacheDirectory: %s, CacheLifetime: %d, BucketCapacity: %d, RefillAmount: %d, RefillInterval: %d)",
+	LogDebug("CApiClient", "CAPIClient(BaseURL: %s, EnableSSL: %s, CacheDirectory: %s, CacheLifetime: %d, BucketCapacity: %d, RefillAmount: %d, RefillInterval: %d)",
 		BaseURL.c_str(),
 		aEnableSSL ? "true" : "false",
 		CacheDirectory.string().c_str(),
@@ -52,7 +52,7 @@ CAPIClient::~CAPIClient()
 
 	delete Client;
 
-	LogDebug(("CAPIClient::" + BaseURL).c_str(), "~CAPIClient(%s)", BaseURL.c_str());
+	LogDebug("CApiClient", "~CAPIClient(%s)", BaseURL.c_str());
 }
 
 json CAPIClient::Get(std::string aEndpoint, std::string aParameters, bool aBypassCache)
@@ -67,12 +67,12 @@ json CAPIClient::Get(std::string aEndpoint, std::string aParameters, bool aBypas
 
 		if (diff < CacheLifetime && cachedResponse->Content != nullptr)
 		{
-			//LogDebug(("CAPIClient::" + BaseURL).c_str(), "Cached message %d seconds old. Reading from cache.", diff);
+			//LogDebug("CApiClient", "[%s] Cached message %d seconds old. Reading from cache.", BaseURL.c_str(), diff);
 			return cachedResponse->Content;
 		}
 		else
 		{
-			//LogDebug(("CAPIClient::" + BaseURL).c_str(), "Cached message %d seconds old. CacheLifetime %d. Queueing request.", diff, CacheLifetime);
+			//LogDebug("CApiClient", "[%s] Cached message %d seconds old. CacheLifetime %d. Queueing request.", BaseURL.c_str(), diff, CacheLifetime);
 		}
 	}
 
@@ -121,12 +121,12 @@ json CAPIClient::Post(std::string aEndpoint, std::string aParameters)
 
 		if (diff < CacheLifetime && cachedResponse->Content != nullptr)
 		{
-			//LogDebug(("CAPIClient::" + BaseURL).c_str(), "Cached message %d seconds old. Reading from cache.", diff);
+			//LogDebug("CApiClient", "[%s] Cached message %d seconds old. Reading from cache.", BaseURL.c_str(), diff);
 			return cachedResponse->Content;
 		}
 		else
 		{
-			//LogDebug(("CAPIClient::" + BaseURL).c_str(), "Cached message %d seconds old. CacheLifetime %d. Queueing request.", diff, CacheLifetime);
+			//LogDebug("CApiClient", "[%s] Cached message %d seconds old. CacheLifetime %d. Queueing request.", BaseURL.c_str(), diff, CacheLifetime);
 		}
 	}
 
@@ -178,7 +178,7 @@ void CAPIClient::Download(std::filesystem::path aOutPath, std::string aEndpoint,
 
 	if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
 	{
-		LogWarning(("CAPIClient::" + BaseURL).c_str(), "Error fetching %s", query.c_str());
+		LogWarning("CApiClient", "[%s] Error fetching %s", BaseURL.c_str(), query.c_str());
 		return;
 	}
 }
@@ -212,7 +212,7 @@ CachedResponse* CAPIClient::GetCachedResponse(const std::string& aQuery)
 		}
 		catch (json::parse_error& ex)
 		{
-			Log(("CAPIClient::" + BaseURL).c_str(), "%s could not be parsed. Error: %s", path.string().c_str(), ex.what());
+			Log("CApiClient", "[%s] %s could not be parsed. Error: %s", BaseURL.c_str(), path.string().c_str(), ex.what());
 		}
 	}
 
@@ -367,7 +367,7 @@ void CAPIClient::ProcessRequests()
 				std::error_code err;
 				if (!CreateDirectoryRecursive(normalizedPath.parent_path().string(), err))
 				{
-					LogWarning(("CAPIClient::" + BaseURL).c_str(), "CreateDirectoryRecursive FAILED, err: % s", err.message());
+					LogWarning("CApiClient", "[%s] CreateDirectoryRecursive FAILED, err: % s", BaseURL.c_str(), err.message());
 				}
 
 				std::ofstream file(normalizedPath);
@@ -419,14 +419,14 @@ APIResponse CAPIClient::HttpGet(APIRequest aRequest)
 
 	if (!result)
 	{
-		LogWarning(("CAPIClient::" + BaseURL).c_str(), "Error fetching %s", aRequest.Query.c_str());
+		LogWarning("CApiClient", "[%s] Error fetching %s", BaseURL.c_str(), aRequest.Query.c_str());
 		response.Status = 1;
 		return response;
 	}
 
 	if (result->status != 200) // not HTTP_OK
 	{
-		LogWarning(("CAPIClient::" + BaseURL).c_str(), "Status %d when fetching %s", result->status, aRequest.Query.c_str());
+		LogWarning("CApiClient", "[%s] Status %d when fetching %s", BaseURL.c_str(), result->status, aRequest.Query.c_str());
 		response.Status = result->status;
 		return response;
 	}
@@ -439,25 +439,25 @@ APIResponse CAPIClient::HttpGet(APIRequest aRequest)
 	}
 	catch (json::parse_error& ex)
 	{
-		LogWarning(("CAPIClient::" + BaseURL).c_str(), "Response from %s could not be parsed. Error: %s", aRequest.Query.c_str(), ex.what());
+		LogWarning("CApiClient", "[%s] Response from %s could not be parsed. Error: %s", BaseURL.c_str(), aRequest.Query.c_str(), ex.what());
 		return response;
 	}
 
 	if (jsonResult.is_null())
 	{
-		LogWarning(("CAPIClient::" + BaseURL).c_str(), "Error parsing API response from %s.", aRequest.Query.c_str());
+		LogWarning("CApiClient", "[%s] Error parsing API response from %s.", BaseURL.c_str(), aRequest.Query.c_str());
 		return response;
 	}
 
 	//response.Headers = result->headers;
-	/*Log(("CAPIClient::" + BaseURL).c_str(), "%s", aRequest.Query.c_str());
+	/*Log("CApiClient", "[%s] %s", BaseURL.c_str(), aRequest.Query.c_str());
 	for (auto it = result->headers.begin(); it != result->headers.end(); ++it)
 	{
 		if (it->first == "Last-Modified")
 		{
 			Log("meme", "Last-Modified: %d", LastModifiedToTimestamp(it->second));
 		}
-		Log(("CAPIClient::" + BaseURL).c_str(), "%s : %s", it->first.c_str(), it->second.c_str());
+		Log("CApiClient", "[%s] %s : %s", BaseURL.c_str(), it->first.c_str(), it->second.c_str());
 	}*/
 	response.Content = jsonResult;
 	return response;
