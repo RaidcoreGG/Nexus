@@ -141,6 +141,7 @@ namespace GUI
 													std::string notification = aAddon->Definitions->Name;
 													if (aAddon->State == EAddonState::LoadedLOCKED)
 													{
+														notification.append(" ");
 														notification.append(Language.Translate("((000079))"));
 													}
 													else
