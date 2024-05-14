@@ -66,8 +66,9 @@ namespace Main
 		RegisterLogger(new CFileLogger(ELogLevel::ALL, Path::F_LOG));
 
 		LogInfo(CH_CORE, GetCommandLineA());
-		LogInfo(CH_CORE, "Version: %s", Version.ToString().c_str());
-		LogInfo(CH_CORE, "Main::Initialize() called. Entry method: %d", State::EntryMethod);
+		LogInfo(CH_CORE, "%s: %s", Path::F_HOST_DLL != Path::F_CHAINLOAD_DLL ? "Proxy" : "Chainload", Path::F_HOST_DLL.string().c_str());
+		LogInfo(CH_CORE, "Build: %s", Version.ToString().c_str());
+		LogInfo(CH_CORE, "Entry method: %d", State::EntryMethod);
 
 		State::Initialize();
 
