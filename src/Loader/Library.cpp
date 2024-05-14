@@ -164,6 +164,7 @@ namespace Loader
 					if (std::string_view(assetName).substr(assetName.size() - 4) == ".dll")
 					{
 						asset["browser_download_url"].get_to(endpointDownload);
+						break;
 					}
 				}
 
