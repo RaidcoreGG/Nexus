@@ -56,6 +56,7 @@ namespace Main
 		NexusModuleSize = moduleInfo.SizeOfImage;
 
 		Path::Initialize(NexusHandle);
+		State::Initialize();
 		
 		/* setup default loggers */
 		RegisterLogger(
@@ -69,8 +70,6 @@ namespace Main
 		LogInfo(CH_CORE, "%s: %s", Path::F_HOST_DLL != Path::F_CHAINLOAD_DLL ? "Proxy" : "Chainload", Path::F_HOST_DLL.string().c_str());
 		LogInfo(CH_CORE, "Build: %s", Version.ToString().c_str());
 		LogInfo(CH_CORE, "Entry method: %d", State::EntryMethod);
-
-		State::Initialize();
 
 		RaidcoreAPI = new CAPIClient("https://api.raidcore.gg", true, Path::D_GW2_ADDONS_COMMON_API_RAIDCORE, 30 * 60, 300, 5, 1);
 		GitHubAPI = new CAPIClient("https://api.github.com", true, Path::D_GW2_ADDONS_COMMON_API_GITHUB, 30 * 60, 60, 60, 60 * 60);
