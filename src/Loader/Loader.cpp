@@ -84,7 +84,7 @@ namespace Loader
 			LoadAddonConfig();
 
 			//FSItemList = ILCreateFromPathA(Path::GetAddonDirectory(nullptr));
-			std::wstring addonDirW = StrToWStr(Path::D_GW2_ADDONS.string());
+			std::wstring addonDirW = String::ToWString(Path::D_GW2_ADDONS.string());
 			HRESULT hresult = SHParseDisplayName(
 				addonDirW.c_str(),
 				0,

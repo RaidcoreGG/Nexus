@@ -17,9 +17,6 @@ void PathSystemAppend(std::filesystem::path& aDestination, const char* aAppend);
 
 bool FindFunction(HMODULE aModule, LPVOID aFunction, LPCSTR aName);
 
-std::string WStrToStr(const std::wstring& aWstring);
-std::wstring StrToWStr(const std::string& aString);
-
 const char* ConvertToUTF8(const char* multibyteStr);
 
 long long Timestamp();

@@ -39,7 +39,7 @@ namespace State
 		for (int i = 0; i < argc; i++)
 		{
 			std::wstring paramW = argv[i];
-			std::string token = WStrToStr(paramW);
+			std::string token = String::ToString(paramW);
 			
 			std::string cmp = token;
 
@@ -59,7 +59,7 @@ namespace State
 			if (cmp == "-mumble" && i + 1 <= argc)
 			{
 				std::wstring mumbleNameW = argv[i + 1];
-				std::string mumbleName = WStrToStr(mumbleNameW);
+				std::string mumbleName = String::ToString(mumbleNameW);
 
 				customMumble = true;
 				MumbleLinkName = mumbleName;
@@ -72,7 +72,7 @@ namespace State
 			else if (cmp == "-ggaddons" && i + 1 <= argc)
 			{
 				std::wstring addonIdsW = argv[i + 1];
-				std::string addonIds = WStrToStr(addonIdsW);
+				std::string addonIds = String::ToString(addonIdsW);
 
 				std::vector<std::string> idList = String::Split(addonIds, ",");
 
