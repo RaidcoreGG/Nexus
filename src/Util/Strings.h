@@ -36,6 +36,12 @@ namespace String
 	std::vector<std::string> Split(const std::string& aString, const std::string& aDelimiter, bool aKeepDelimiters = false);
 
 	///----------------------------------------------------------------------------------------------------
+	/// StartsWith:
+	/// 	Returns true if a string starts with a given sequence.
+	///----------------------------------------------------------------------------------------------------
+	bool StartsWith(std::string aString, const std::string& aStringFind);
+
+	///----------------------------------------------------------------------------------------------------
 	/// EndsWith:
 	/// 	Returns true if a string ends with a given sequence.
 	///----------------------------------------------------------------------------------------------------
@@ -52,6 +58,18 @@ namespace String
 	/// 	Returns a normalized string.
 	///----------------------------------------------------------------------------------------------------
 	std::string Normalize(const std::string& aString);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ToLower:
+	/// 	Returns a lowercase version of the passed string.
+	///----------------------------------------------------------------------------------------------------
+	std::string ToLower(std::string aString);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ToUpper:
+	/// 	Returns a uppercase version of the passed string.
+	///----------------------------------------------------------------------------------------------------
+	std::string ToUpper(std::string aString);
 }
 
 #endif

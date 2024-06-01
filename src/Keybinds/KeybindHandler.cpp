@@ -289,7 +289,7 @@ namespace Keybinds
 
 		if (aKeybind == "(null)" || aKeybind == "(NULL)") { return kb; }
 
-		std::transform(aKeybind.begin(), aKeybind.end(), aKeybind.begin(), ::toupper);
+		aKeybind = String::ToUpper(aKeybind);
 		std::string delimiter = "+";
 
 		size_t pos = 0;

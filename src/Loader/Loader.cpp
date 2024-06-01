@@ -1431,18 +1431,14 @@ namespace Loader
 			{
 				if (lhs->Definitions && rhs->Definitions)
 				{
-					std::string lname = String::Normalize(lhs->Definitions->Name);
-					std::transform(lname.begin(), lname.end(), lname.begin(), ::tolower);
-					std::string rname = String::Normalize(rhs->Definitions->Name);
-					std::transform(rname.begin(), rname.end(), rname.begin(), ::tolower);
+					std::string lname = String::ToLower(String::Normalize(lhs->Definitions->Name));
+					std::string rname = String::ToLower(String::Normalize(rhs->Definitions->Name));
 
 					return lname < rname;
 				}
 
-				std::string lpath = lhs->Path.string();
-				std::transform(lpath.begin(), lpath.end(), lpath.begin(), ::tolower);
-				std::string rpath = rhs->Path.string();
-				std::transform(rpath.begin(), rpath.end(), rpath.begin(), ::tolower);
+				std::string lpath = String::ToLower(lhs->Path.string());
+				std::string rpath = String::ToLower(rhs->Path.string());
 
 				return lpath < rpath;
 			});

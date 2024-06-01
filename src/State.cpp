@@ -45,7 +45,7 @@ namespace State
 
 			if (first) { first = false; continue; } // skip location param
 
-			std::transform(cmp.begin(), cmp.end(), cmp.begin(), ::tolower);
+			cmp = String::ToLower(cmp);
 
 			// token -> is the unmodified string as from the commandline
 			// cmp -> same as token, except it's been normalised (aka written in lowercase)

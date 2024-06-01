@@ -55,7 +55,7 @@ std::string Keybind::ToString(bool padded)
 
 	delete[] buff;
 
-	std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+	str = String::ToUpper(str);
 
 	// Convert Multibyte encoding to UFT-8 bytes
 	const char* multibyte_pointer = str.c_str();

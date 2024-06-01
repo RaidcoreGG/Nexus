@@ -8,6 +8,7 @@
 
 #include "Strings.h"
 
+#include <algorithm>
 #include <cstdarg>
 
 namespace String
@@ -61,6 +62,18 @@ namespace String
 		return parts;
 	}
 
+	bool StartsWith(std::string aString, const std::string& aStringFind)
+	{
+		aString = aString.substr(0, aStringFind.length());
+
+		if (aString == aStringFind)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	bool EndsWith(std::string aString, const std::string& aStringFind)
 	{
 		aString = aString.substr(aString.length() - aStringFind.length(), aStringFind.length());
@@ -106,4 +119,15 @@ namespace String
 		return ret;
 	}
 
+	std::string ToLower(std::string aString)
+	{
+		std::transform(aString.begin(), aString.end(), aString.begin(), ::tolower);
+		return aString;
+	}
+
+	std::string ToUpper(std::string aString)
+	{
+		std::transform(aString.begin(), aString.end(), aString.begin(), ::toupper);
+		return aString;
+	}
 }
