@@ -1,6 +1,56 @@
 #include "AddonDefinition.h"
 
-std::string AddonVersion::ToString()
+#include <regex>
+
+AddonVersion::AddonVersion(json& aJson)
+{
+	Major = !aJson["Major"].is_null()
+			? aJson["Major"].get<signed short>()
+			: 0;
+
+	Minor = !aJson["Minor"].is_null()
+			? aJson["Minor"].get<signed short>()
+			: 0;
+
+	Build = !aJson["Build"].is_null()
+			? aJson["Build"].get<signed short>()
+			: 0;
+
+	Revision =	!aJson["Revision"].is_null()
+				? aJson["Revision"].get<signed short>()
+				: 0;
+}
+
+AddonVersion::AddonVersion(std::string aVersionString)
+{
+	if (!std::regex_match(aVersionString, std::regex(R"(v?\d+[.]\d+[.]\d+[.]\d+)")))
+	{
+		return;
+	}
+
+	if (aVersionString._Starts_with("v"))
+	{
+		aVersionString = aVersionString.substr(1);
+	}
+
+	size_t pos = 0;
+	int i = 0;
+	while ((pos = aVersionString.find(".")) != std::string::npos)
+	{
+		switch (i)
+		{
+		case 0: Major = static_cast<unsigned short>(std::stoi(aVersionString.substr(0, pos))); break;
+		case 1: Minor = static_cast<unsigned short>(std::stoi(aVersionString.substr(0, pos))); break;
+		case 2: Build = static_cast<unsigned short>(std::stoi(aVersionString.substr(0, pos))); break;
+		default: break;
+		}
+		i++;
+		aVersionString.erase(0, pos + 1);
+	}
+	Revision = static_cast<unsigned short>(std::stoi(aVersionString));
+}
+
+std::string AddonVersion::string()
 {
 	std::string str;
 	str.append(std::to_string(Major) + ".");
@@ -8,30 +58,6 @@ std::string AddonVersion::ToString()
 	str.append(std::to_string(Build) + ".");
 	str.append(std::to_string(Revision));
 	return str;
-}
-
-AddonVersion VersionFromJson(json aJson)
-{
-	AddonVersion version{};
-
-	if (!aJson["Major"].is_null())
-	{
-		aJson["Major"].get_to(version.Major);
-	}
-	if (!aJson["Minor"].is_null())
-	{
-		aJson["Minor"].get_to(version.Minor);
-	}
-	if (!aJson["Build"].is_null())
-	{
-		aJson["Build"].get_to(version.Build);
-	}
-	if (!aJson["Revision"].is_null())
-	{
-		aJson["Revision"].get_to(version.Revision);
-	}
-
-	return version;
 }
 
 bool operator>(AddonVersion lhs, AddonVersion rhs)
@@ -57,6 +83,30 @@ bool operator<(AddonVersion lhs, AddonVersion rhs)
 	}
 
 	return false;
+}
+bool operator==(AddonVersion lhs, AddonVersion rhs)
+{
+	if (lhs.Major == rhs.Major &&
+		lhs.Minor == rhs.Minor &&
+		lhs.Build == rhs.Build &&
+		lhs.Revision == rhs.Revision)
+	{
+		return true;
+	}
+
+	return false;
+}
+bool operator!=(AddonVersion lhs, AddonVersion rhs)
+{
+	return !(lhs == rhs);
+}
+bool operator<=(AddonVersion lhs, AddonVersion rhs)
+{
+	return lhs < rhs || lhs == rhs;
+}
+bool operator>=(AddonVersion lhs, AddonVersion rhs)
+{
+	return lhs > rhs || lhs == rhs;
 }
 
 bool AddonDefinition::HasMinimumRequirements()

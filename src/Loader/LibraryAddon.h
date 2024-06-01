@@ -9,10 +9,12 @@ struct LibraryAddon
 {
 	signed int		Signature;
 	std::string		Name;
+	std::string		Author;
 	std::string		Description;
 	EUpdateProvider	Provider;
 	std::string		DownloadURL;
 	std::string		ToSComplianceNotice;
+	bool			IsNew;
 
 	bool			IsInstalling = false;
 };

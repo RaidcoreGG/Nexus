@@ -113,6 +113,7 @@ RES_ICON_GENERIC_HOVER			PNG             "Resources\\QuickAccess\\Generic_Hover.
 RES_ICON_NOTIFICATION			PNG             "Resources\\QuickAccess\\Notification.png"
 
 /* Menu*/
+RES_ICON_RETURN					PNG             "Resources\\Menu\\BtnReturn.png"
 RES_ICON_ADDONS					PNG             "Resources\\Menu\\BtnAddons.png"
 RES_ICON_OPTIONS				PNG             "Resources\\Menu\\BtnOptions.png"
 RES_ICON_OPTIONS_HOVER			PNG             "Resources\\Menu\\BtnOptions_Hover.png"
@@ -128,6 +129,7 @@ RES_TEX_MENU_BUTTON_HOVER		PNG             "Resources\\Menu\\MenuItem_Hover.png"
 /* AddonsWindow */
 RES_TEX_ADDONS_BACKGROUND		PNG             "Resources\\AddonsWindow\\Background.png"
 RES_TEX_ADDONITEM				PNG             "Resources\\AddonsWindow\\AddonItem.png"
+RES_TEX_ADDONITEM_HIGHLIGHT		PNG             "Resources\\AddonsWindow\\AddonItem_Highlight.png"
 
 RES_TEX_ADDONS_TITLEBAR			PNG             "Resources\\AddonsWindow\\TitleBar.png"
 RES_TEX_ADDONS_TITLEBAR_HOVER	PNG             "Resources\\AddonsWindow\\TitleBar_Hover.png"

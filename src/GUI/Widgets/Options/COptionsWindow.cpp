@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <vector>
 
+#include "Consts.h"
 #include "Shared.h"
 #include "Paths.h"
 #include "State.h"
@@ -41,6 +42,7 @@ namespace GUI
 	void StyleTab();
 	void KeybindsTab();
 	void APITab();
+	void ChangelogTab();
 
 	static bool LocalizedItemsGetter(void* data, int idx, const char** out_text)
 	{
@@ -85,6 +87,7 @@ namespace GUI
 				StyleTab();
 				KeybindsTab();
 				//APITab();
+				ChangelogTab();
 
 				ImGui::EndTabBar();
 			}
@@ -220,7 +223,7 @@ namespace GUI
 
 				ImGui::TextDisabled(Language.Translate("((000054))"));
 				{
-					if (ImGui::InputFloat("##fontsize", &FontSize, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_EnterReturnsTrue))
+					if (ImGui::InputFloat("##fontsize", &FontSize, 0.0f, 0.0f, "%.1f"))
 					{
 						if (FontSize < 8.0f)
 						{
@@ -614,6 +617,40 @@ namespace GUI
 				}
 
 				ImGui::EndChild();
+			}
+
+			ImGui::EndTabItem();
+		}
+	}
+
+	void ChangelogTab()
+	{
+		static bool didNotify = false;
+
+		if (!didNotify)
+		{
+			QuickAccess::SetNotificationShortcut(QA_MENU, false);
+			didNotify = true;
+		}
+
+		if (ImGui::BeginTabItem(Language.Translate("((000005))")))
+		{
+			if (IsUpdateAvailable)
+			{
+				ImGui::TextColored(ImVec4(0, 0.580f, 1, 1), Language.Translate("((000039))"));
+			}
+			else
+			{
+				ImGui::Text(Language.Translate("((000040))"));
+			}
+
+			if (!ChangelogText.empty())
+			{
+				ImGui::TextWrapped(ChangelogText.c_str());
+			}
+			else
+			{
+				ImGui::Text(Language.Translate("((000037))"));
 			}
 
 			ImGui::EndTabItem();

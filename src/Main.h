@@ -10,8 +10,6 @@ namespace Main
 	void Initialize();
 	void Shutdown(unsigned int aReason);
 
-	void SelfUpdate();
-
 	void UnpackLocales();
 }
 

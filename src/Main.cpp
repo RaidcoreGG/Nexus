@@ -12,6 +12,7 @@
 #include "Renderer.h"
 #include "Shared.h"
 #include "State.h"
+#include "Certs.h"
 
 #include "DataLink/DataLink.h"
 #include "GUI/GUI.h"
@@ -22,7 +23,9 @@
 #include "Logging/CFileLogger.h"
 #include "Mumble/Mumble.h"
 #include "Settings/Settings.h"
-#include "API/CAPIClient.h"
+#include "API/ApiClient.h"
+#include "Updater/Updater.h"
+#include "Multibox/Multibox.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -68,23 +71,29 @@ namespace Main
 
 		LogInfo(CH_CORE, GetCommandLineA());
 		LogInfo(CH_CORE, "%s: %s", Path::F_HOST_DLL != Path::F_CHAINLOAD_DLL ? "Proxy" : "Chainload", Path::F_HOST_DLL.string().c_str());
-		LogInfo(CH_CORE, "Build: %s", Version.ToString().c_str());
+		LogInfo(CH_CORE, "Build: %s", Version.string().c_str());
 		LogInfo(CH_CORE, "Entry method: %d", State::EntryMethod);
 
-		RaidcoreAPI = new CAPIClient("https://api.raidcore.gg", true, Path::D_GW2_ADDONS_COMMON_API_RAIDCORE, 30 * 60, 300, 5, 1);
-		GitHubAPI = new CAPIClient("https://api.github.com", true, Path::D_GW2_ADDONS_COMMON_API_GITHUB, 30 * 60, 60, 60, 60 * 60);
+		RaidcoreAPI = new CApiClient("https://api.raidcore.gg", true, Path::D_GW2_ADDONS_COMMON_API_RAIDCORE, 30 * 60, 300, 5, 1);//, Certs::Raidcore);
+		GitHubAPI = new CApiClient("https://api.github.com", true, Path::D_GW2_ADDONS_COMMON_API_GITHUB, 30 * 60, 60, 60, 60 * 60);
 
-		UnpackLocales();
-		Language.SetLocaleDirectory(Path::D_GW2_ADDONS_RAIDCORE_LOCALES);
-		Language.BuildLocaleAtlas();
-
+		std::thread([]()
+			{
+				CUpdater::GetInstance().UpdateNexus();
+			})
+			.detach();
+		
 		//Paradigm::Initialize();
-		std::thread update(SelfUpdate);
-		update.detach();
 
 		/* Don't initialize anything if vanilla */
 		if (!State::IsVanilla)
 		{
+			Multibox::KillMutex();
+
+			UnpackLocales();
+			Language.SetLocaleDirectory(Path::D_GW2_ADDONS_RAIDCORE_LOCALES);
+			Language.BuildLocaleAtlas();
+
 			MH_Initialize();
 
 			Keybinds::Initialize();
@@ -159,52 +168,6 @@ namespace Main
 		// FIXME: make arc not shit itself when the game shuts down, for now let windows handle the rest
 		//if (D3D11Handle) { FreeLibrary(D3D11Handle); }
 		//if (D3D11SystemHandle) { FreeLibrary(D3D11SystemHandle); }
-	}
-
-	void SelfUpdate()
-	{
-		if (std::filesystem::exists(Path::F_OLD_DLL))
-		{
-			std::filesystem::remove(Path::F_OLD_DLL);
-		}
-
-		json resVersion = RaidcoreAPI->Get("/nexusversion", "", true);
-
-		if (resVersion.is_null())
-		{
-			LogWarning(CH_CORE, "Error parsing API response /nexusversion.");
-			return;
-		}
-
-		AddonVersion remoteVersion = VersionFromJson(resVersion);
-
-		if (!resVersion["Changelog"].is_null()) { resVersion["Changelog"].get_to(ChangelogText); }
-
-		if (remoteVersion > Version)
-		{
-			LogInfo(CH_CORE, "Outdated: API replied with Version %s but installed is Version %s", remoteVersion.ToString().c_str(), Version.ToString().c_str());
-			IsUpdateAvailable = true;
-
-			RaidcoreAPI->Download(Path::F_UPDATE_DLL, "/d3d11.dll");
-
-			std::filesystem::rename(Path::F_HOST_DLL, Path::F_OLD_DLL);
-			std::filesystem::rename(Path::F_UPDATE_DLL, Path::F_HOST_DLL);
-
-			LogInfo(CH_CORE, "Successfully updated Nexus. Restart required to take effect.");
-		}
-		else if (remoteVersion < Version)
-		{
-			LogInfo(CH_CORE, "Installed Build of Nexus is more up-to-date than remote. (Installed: %s) (Remote: %s)", Version.ToString().c_str(), remoteVersion.ToString().c_str());
-		}
-		else
-		{
-			LogInfo(CH_CORE, "Installed Build of Nexus is up-to-date.");
-		}
-
-		if (std::filesystem::exists(Path::F_UPDATE_DLL))
-		{
-			std::filesystem::remove(Path::F_UPDATE_DLL);
-		}
 	}
 
 	void UnpackLocales()

@@ -125,6 +125,9 @@ namespace DataLink
 			result = resource.Pointer;
 		}
 
+		/* initial null */
+		memset(resource.Pointer, 0, resource.Size);
+
 		LogInfo(CH_DATALINK, "Created shared resource: \"%s\" (with underlying name \"%s\")", str.c_str(), strOverride.c_str());
 
 		return result;

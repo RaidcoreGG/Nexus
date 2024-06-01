@@ -10,8 +10,11 @@
 #include "Loader/EAddonFlags.h"
 #include "Loader/Loader.h"
 #include "Loader/Library.h"
+#include "Loader/ArcDPS.h"
 #include "Textures/TextureLoader.h"
 #include "Textures/Texture.h"
+
+#include "Updater/Updater.h"
 
 #include "Events/EventHandler.h"
 
@@ -32,6 +35,7 @@ namespace GUI
 	float size = 24.0f;
 
 	Texture* Background = nullptr;
+	Texture* BackgroundHighlight = nullptr;
 	Texture* BtnOptions = nullptr;
 	Texture* CtxMenuBullet = nullptr;
 	Texture* CtxMenuHighlight = nullptr;
@@ -85,7 +89,7 @@ namespace GUI
 				ImGui::PushFont(Font);
 				ImGui::TextColored(ImVec4(1.0f, 0.933f, 0.733f, 1.0f), aAddon->Definitions->Name); ImGui::SameLine();
 				ImGui::PopFont();
-				ImGui::TextColored(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "(%s)", aAddon->Definitions->Version.ToString().c_str()); ImGui::SameLine();
+				ImGui::TextColored(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "(%s)", aAddon->Definitions->Version.string().c_str()); ImGui::SameLine();
 				ImGui::TextColored(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "by %s", aAddon->Definitions->Author);
 
 				if (aAddon->State == EAddonState::NotLoadedIncompatibleAPI)
@@ -132,40 +136,46 @@ namespace GUI
 										std::filesystem::path tmpPath = addon->Path.string();
 										std::thread([aAddon, tmpPath]()
 											{
-												if (Loader::UpdateAddon(tmpPath, aAddon->Definitions->Signature, aAddon->Definitions->Name,
-																		aAddon->Definitions->Version, aAddon->Definitions->Provider,
-																		aAddon->Definitions->UpdateLink != nullptr ? aAddon->Definitions->UpdateLink : ""))
+												CUpdater& inst = CUpdater::GetInstance();
+
+												AddonInfo addonInfo
+												{
+													aAddon->Definitions->Signature,
+													aAddon->Definitions->Name,
+													aAddon->Definitions->Version,
+													aAddon->Definitions->Provider,
+													aAddon->Definitions->UpdateLink != nullptr 
+														? aAddon->Definitions->UpdateLink 
+														: "",
+													aAddon->MD5
+												};
+
+												if (inst.UpdateAddon(tmpPath, addonInfo))
 												{
 													Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
 
-													std::string notification = aAddon->Definitions->Name;
-													if (aAddon->State == EAddonState::LoadedLOCKED)
-													{
-														notification.append(" ");
-														notification.append(Language.Translate("((000079))"));
-													}
-													else
-													{
-														notification.append(" ");
-														notification.append(Language.Translate("((000081))"));
-													}
-
-													GUI::Alerts::Notify(notification.c_str());
+													GUI::Alerts::Notify(
+														String::Format("%s %s",
+															aAddon->Definitions->Name,
+															aAddon->State == EAddonState::LoadedLOCKED
+															? Language.Translate("((000079))")
+															: Language.Translate("((000081))")
+														).c_str()
+													);
 												}
 												else
 												{
-													std::string notification = aAddon->Definitions->Name;
-													notification.append(" ");
-													notification.append(Language.Translate("((000082))"));
-													GUI::Alerts::Notify(notification.c_str());
+													GUI::Alerts::Notify(String::Format("%s %s",
+														aAddon->Definitions->Name,
+														Language.Translate("((000082))")).c_str());
 												}
 												Sleep(1000); // arbitrary sleep otherwise the user never even sees "is checking..."
 												aAddon->IsCheckingForUpdates = false;
 											})
 											.detach();
 
-											//LogDebug(CH_GUI, "Update called: %s", it.second->Definitions->Name);
-											break;
+										//LogDebug(CH_GUI, "Update called: %s", it.second->Definitions->Name);
+										break;
 									}
 								}
 							}
@@ -264,10 +274,8 @@ namespace GUI
 
 						if (aAddon->IsFlaggedForEnable)
 						{
-							std::string msg = aAddon->Definitions->Name;
-							msg.append(" ");
-							msg.append(Language.Translate("((000080))"));
-							GUI::Alerts::Notify(msg.c_str());
+							aAddon->IsDisabledUntilUpdate = false; // explicitly loaded
+							GUI::Alerts::Notify(String::Format("%s %s",aAddon->Definitions->Name, Language.Translate("((000080))")).c_str());
 						}
 					}
 					if (aAddon->IsFlaggedForEnable)
@@ -317,14 +325,29 @@ namespace GUI
 		// initial is explicitly set within the window, therefore all positions should be relative to it
 		ImVec2 initial = ImGui::GetCursorPos();
 
-		if (Background)
+		if (aAddon->IsNew)
 		{
-			ImGui::SetCursorPos(initial);
-			ImGui::Image(Background->Resource, ImVec2(itemWidthScaled, itemHeightScaled));
+			if (BackgroundHighlight)
+			{
+				ImGui::SetCursorPos(initial);
+				ImGui::Image(BackgroundHighlight->Resource, ImVec2(itemWidthScaled, itemHeightScaled));
+			}
+			else
+			{
+				BackgroundHighlight = TextureLoader::GetOrCreate("TEX_ADDONITEM_BACKGROUND_HIGHLIGHT", RES_TEX_ADDONITEM_HIGHLIGHT, NexusHandle);
+			}
 		}
 		else
 		{
-			Background = TextureLoader::GetOrCreate("TEX_ADDONITEM_BACKGROUND", RES_TEX_ADDONITEM, NexusHandle);
+			if (Background)
+			{
+				ImGui::SetCursorPos(initial);
+				ImGui::Image(Background->Resource, ImVec2(itemWidthScaled, itemHeightScaled));
+			}
+			else
+			{
+				Background = TextureLoader::GetOrCreate("TEX_ADDONITEM_BACKGROUND", RES_TEX_ADDONITEM, NexusHandle);
+			}
 		}
 
 		{
@@ -341,6 +364,11 @@ namespace GUI
 				ImGui::PushFont(Font);
 				ImGui::TextColored(ImVec4(1.0f, 0.933f, 0.733f, 1.0f), aAddon->Name.c_str());
 				ImGui::PopFont();
+				if (!aAddon->Author.empty())
+				{
+					ImGui::SameLine();
+					ImGui::TextColored(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "by %s", aAddon->Author.c_str());
+				}
 
 				ImGui::TextWrapped(aAddon->Description.c_str());
 
@@ -390,7 +418,19 @@ namespace GUI
 						{
 							std::thread([aAddon, aIsArcPlugin]()
 								{
-									Loader::Library::InstallAddon(aAddon, aIsArcPlugin);
+									CUpdater& inst = CUpdater::GetInstance();
+									inst.InstallAddon(aAddon, aIsArcPlugin);
+
+									if (aIsArcPlugin)
+									{
+										ArcDPS::AddToAtlasBySig(aAddon->Signature);
+									}
+									else
+									{
+										Loader::NotifyChanges();
+										//Loader::QueueAddon(ELoaderAction::Reload, installPath);
+									}
+
 									aAddon->IsInstalling = false;
 								})
 								.detach();

@@ -1,14 +1,18 @@
-#include "CAPIClient.h"
+#include "ApiClient.h"
 
 #include <fstream>
 
 #include "core.h"
 #include "Shared.h"
 
-CAPIClient::CAPIClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::path aCacheDirectory, int aCacheLifetime, int aBucketCapacity, int aRefillAmount, int aRefillInterval)
+CApiClient::CApiClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::path aCacheDirectory, int aCacheLifetime, int aBucketCapacity, int aRefillAmount, int aRefillInterval, const char* aCertificate)
 {
-	BaseURL = GetBaseURL(aBaseURL); // sanitize url just to be sure
+	BaseURL = URL::GetBase(aBaseURL); // sanitize url just to be sure
 	Client = new httplib::Client(BaseURL);
+	if (aCertificate)
+	{
+		Client->load_ca_cert_store(aCertificate, sizeof(aCertificate));
+	}
 	Client->enable_server_certificate_verification(aEnableSSL);
 	Client->set_follow_location(true);
 
@@ -22,13 +26,13 @@ CAPIClient::CAPIClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::p
 	RefillAmount = aRefillAmount;
 	RefillInterval = aRefillInterval;
 
-	LogDebug("CApiClient", "CAPIClient(BaseURL: %s, EnableSSL: %s, CacheDirectory: %s, CacheLifetime: %d, BucketCapacity: %d, RefillAmount: %d, RefillInterval: %d)",
+	LogDebug("CApiClient", "CApiClient(BaseURL: %s, EnableSSL: %s, CacheDirectory: %s, CacheLifetime: %d, BucketCapacity: %d, RefillAmount: %d, RefillInterval: %d)",
 		BaseURL.c_str(),
 		aEnableSSL ? "true" : "false",
 		CacheDirectory.string().c_str(),
 		CacheLifetime, BucketCapacity, RefillAmount, RefillInterval);
 
-	WorkerThread = std::thread(&CAPIClient::ProcessRequests, this);
+	WorkerThread = std::thread(&CApiClient::ProcessRequests, this);
 	WorkerThread.detach();
 
 	std::filesystem::path timeOffset = aCacheDirectory / "0";
@@ -38,7 +42,7 @@ CAPIClient::CAPIClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::p
 
 	FileTimeOffset = Timestamp() - std::chrono::duration_cast<std::chrono::seconds>(std::filesystem::last_write_time(timeOffset).time_since_epoch()).count();
 }
-CAPIClient::~CAPIClient()
+CApiClient::~CApiClient()
 {
 	const std::lock_guard<std::mutex> lock(Mutex);
 	while (ResponseCache.size() > 0)
@@ -52,12 +56,12 @@ CAPIClient::~CAPIClient()
 
 	delete Client;
 
-	LogDebug("CApiClient", "~CAPIClient(%s)", BaseURL.c_str());
+	LogDebug("CApiClient", "~CApiClient(%s)", BaseURL.c_str());
 }
 
-json CAPIClient::Get(std::string aEndpoint, std::string aParameters, bool aBypassCache)
+json CApiClient::Get(std::string aEndpoint, std::string aParameters, bool aBypassCache)
 {
-	std::string query = GetQuery(aEndpoint, aParameters);
+	std::string query = URL::GetQuery(aEndpoint, aParameters);
 
 	CachedResponse* cachedResponse = aBypassCache ? nullptr : GetCachedResponse(query);
 
@@ -109,9 +113,9 @@ json CAPIClient::Get(std::string aEndpoint, std::string aParameters, bool aBypas
 
 	return cachedResponse != nullptr ? cachedResponse->Content : json{};
 }
-json CAPIClient::Post(std::string aEndpoint, std::string aParameters)
+json CApiClient::Post(std::string aEndpoint, std::string aParameters)
 {
-	std::string query = GetQuery(aEndpoint, aParameters);
+	std::string query = URL::GetQuery(aEndpoint, aParameters);
 
 	CachedResponse* cachedResponse = GetCachedResponse(query);
 
@@ -163,9 +167,9 @@ json CAPIClient::Post(std::string aEndpoint, std::string aParameters)
 
 	return cachedResponse != nullptr ? cachedResponse->Content : json{};
 }
-void CAPIClient::Download(std::filesystem::path aOutPath, std::string aEndpoint, std::string aParameters)
+bool CApiClient::Download(std::filesystem::path aOutPath, std::string aEndpoint, std::string aParameters)
 {
-	std::string query = GetQuery(aEndpoint, aParameters);
+	std::string query = URL::GetQuery(aEndpoint, aParameters);
 
 	size_t bytesWritten = 0;
 	std::ofstream file(aOutPath, std::ofstream::binary);
@@ -179,11 +183,13 @@ void CAPIClient::Download(std::filesystem::path aOutPath, std::string aEndpoint,
 	if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
 	{
 		LogWarning("CApiClient", "[%s] Error fetching %s", BaseURL.c_str(), query.c_str());
-		return;
+		return false;
 	}
+	
+	return true;
 }
 
-CachedResponse* CAPIClient::GetCachedResponse(const std::string& aQuery)
+CachedResponse* CApiClient::GetCachedResponse(const std::string& aQuery)
 {
 	std::filesystem::path path = GetNormalizedPath(aQuery);
 
@@ -218,7 +224,7 @@ CachedResponse* CAPIClient::GetCachedResponse(const std::string& aQuery)
 
 	return nullptr;
 }
-std::filesystem::path CAPIClient::GetNormalizedPath(const std::string& aQuery) const
+std::filesystem::path CApiClient::GetNormalizedPath(const std::string& aQuery) const
 {
 	std::string pathStr = aQuery;
 
@@ -263,7 +269,7 @@ std::filesystem::path CAPIClient::GetNormalizedPath(const std::string& aQuery) c
 	return CacheDirectory.string() + pathStr.c_str();
 }
 
-void CAPIClient::ProcessRequests()
+void CApiClient::ProcessRequests()
 {
 	for (;;)
 	{
@@ -399,7 +405,7 @@ void CAPIClient::ProcessRequests()
 		IsSuspended = true;
 	}
 }
-APIResponse CAPIClient::HttpGet(APIRequest aRequest)
+APIResponse CApiClient::HttpGet(APIRequest aRequest)
 {
 	APIResponse response{
 		0,
@@ -419,7 +425,7 @@ APIResponse CAPIClient::HttpGet(APIRequest aRequest)
 
 	if (!result)
 	{
-		LogWarning("CApiClient", "[%s] Error fetching %s", BaseURL.c_str(), aRequest.Query.c_str());
+		LogWarning("CApiClient", "[%s] Error fetching %s | %s", BaseURL.c_str(), aRequest.Query.c_str(), httplib::to_string(result.error()).c_str());
 		response.Status = 1;
 		return response;
 	}

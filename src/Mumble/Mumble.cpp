@@ -47,6 +47,11 @@ namespace Mumble
 		UpdateStateThread = std::thread(UpdateStateLoop);
 		UpdateStateThread.detach();
 
+		if (MumbleLinkName == "0")
+		{
+			State::IsMumbleDisabled = true;
+		}
+		MumbleLink = (LinkedMem*)DataLink::ShareResource(DL_MUMBLE_LINK, sizeof(LinkedMem), MumbleLinkName.c_str());
 		NexusLink = (NexusLinkData*)DataLink::ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData));
 	}
 

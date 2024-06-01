@@ -20,13 +20,25 @@ struct AddonVersion
 	signed short	Build;
 	signed short	Revision;
 
-	std::string ToString();
-};
+	AddonVersion() = default;
+	AddonVersion(signed short aMajor, signed short aMinor, signed short aBuild, signed short aRevision)
+		: Major{ aMajor }
+		, Minor{ aMinor }
+		, Build{ aBuild }
+		, Revision{ aRevision }
+	{}
+	AddonVersion(json& aJson);
+	AddonVersion(std::string aVersionString);
 
-AddonVersion VersionFromJson(json aJson);
+	std::string string();
+};
 
 bool operator>(AddonVersion lhs, AddonVersion rhs);
 bool operator<(AddonVersion lhs, AddonVersion rhs);
+bool operator==(AddonVersion lhs, AddonVersion rhs);
+bool operator!=(AddonVersion lhs, AddonVersion rhs);
+bool operator<=(AddonVersion lhs, AddonVersion rhs);
+bool operator>=(AddonVersion lhs, AddonVersion rhs);
 
 struct AddonDefinition
 {

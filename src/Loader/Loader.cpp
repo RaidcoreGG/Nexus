@@ -37,6 +37,7 @@
 #include "GUI/Widgets/Alerts/Alerts.h"
 #include "Settings/Settings.h"
 #include "Localization/Localization.h"
+#include "Updater/Updater.h"
 
 #include "ArcDPS.h"
 #include "Library.h"
@@ -115,10 +116,8 @@ namespace Loader
 				return;
 			}
 
-			std::thread lib(Library::Fetch);
-			lib.detach();
-			std::thread arclib(ArcDPS::GetPluginLibrary);
-			arclib.detach();
+			std::thread(Library::Fetch).detach();
+			std::thread(ArcDPS::GetPluginLibrary).detach();
 
 			std::thread checkLaunchSequence([]()
 				{
@@ -130,7 +129,7 @@ namespace Loader
 						Sleep(1);
 						nothingCounter++;
 
-						if (nothingCounter > 10000)
+						if (nothingCounter > 30000)
 						{
 							break;
 						}
@@ -210,7 +209,10 @@ namespace Loader
 
 					/* should load, indicates whether it was loaded last time */
 					bool shouldLoad = false;
-					if (!addonInfo["IsLoaded"].is_null()) { addonInfo["IsLoaded"].get_to(shouldLoad); }
+					if (!addonInfo["IsLoaded"].is_null())
+					{
+						shouldLoad = addonInfo["IsLoaded"].get<bool>() && !addon->IsDisabledUntilUpdate;
+					}
 
 					if (shouldLoad)
 					{
@@ -246,42 +248,56 @@ namespace Loader
 	}
 	void SaveAddonConfig()
 	{
-		if (RequestedAddons.size() == 0) // don't save state if state was overridden via start param
+		// don't save state if state was overridden via start param
+		if (RequestedAddons.size() > 0) { return; }
+
+		// don't save state if we're shutting down
+		if (State::Nexus >= ENexusState::SHUTTING_DOWN) { return; }
+
+		json cfg = json::array();
+
+		std::vector<signed int> trackedSigs;
+
+		for (auto addon : Addons)
 		{
-			json cfg = json::array();
+			signed int sig = addon->Definitions ? addon->Definitions->Signature : addon->MatchSignature;
 
-			std::vector<signed int> trackedSigs;
+			// skip bridge
+			if (sig == 0xFED81763) { continue; }
+			if (sig == 0) { continue; }
 
-			for (auto addon : Addons)
+			auto tracked = std::find(trackedSigs.begin(), trackedSigs.end(), sig);
+			if (tracked != trackedSigs.end()) { continue; }
+
+			json addonInfo =
 			{
-				// skip bridge
-				if (!addon->Definitions) { continue; }
-				if (addon->MatchSignature == 0xFED81763 || (addon->Definitions && addon->Definitions->Signature == 0xFED81763)) { continue; }
+				{"Signature", sig},
+				{"IsLoaded", addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED || addon->IsFlaggedForEnable},
+				{"IsPausingUpdates", addon->IsPausingUpdates},
+				{"IsDisabledUntilUpdate", addon->IsDisabledUntilUpdate}
+			};
 
-				auto tracked = std::find(trackedSigs.begin(), trackedSigs.end(), addon->Definitions->Signature);
-				if (tracked != trackedSigs.end()) { continue; }
-
-				json addonInfo =
+			/* override loaded state, if it's still the initial startup sequence */
+			if (addon->State == EAddonState::None)
+			{
+				if (std::find(WhitelistedAddons.begin(), WhitelistedAddons.end(), sig) != WhitelistedAddons.end())
 				{
-					{"Signature", addon->Definitions ? addon->Definitions->Signature : addon->MatchSignature},
-					{"IsLoaded", addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED || addon->IsFlaggedForEnable},
-					{"IsPausingUpdates", addon->IsPausingUpdates},
-					{"IsDisabledUntilUpdate", addon->IsDisabledUntilUpdate}
-				};
-
-				/* override loaded state, if it's supposed to disable next launch */
-				if (addon->IsFlaggedForDisable)
-				{
-					addonInfo["IsLoaded"] = false;
+					addonInfo["IsLoaded"] = true;
 				}
-
-				cfg.push_back(addonInfo);
 			}
 
-			std::ofstream file(Path::F_ADDONCONFIG);
-			file << cfg.dump(1, '\t') << std::endl;
-			file.close();
+			/* override loaded state, if it's supposed to disable next launch */
+			if (addon->IsFlaggedForDisable)
+			{
+				addonInfo["IsLoaded"] = false;
+			}
+
+			cfg.push_back(addonInfo);
 		}
+
+		std::ofstream file(Path::F_ADDONCONFIG);
+		file << cfg.dump(1, '\t') << std::endl;
+		file.close();
 	}
 
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -383,158 +399,138 @@ namespace Loader
 	void ProcessChanges()
 	{
 		/* fetch game version before loading addons */
-		/* prepare client request */
-		httplib::Client client("http://assetcdn.101.arenanetworks.com");
-		client.enable_server_certificate_verification(false);
-
-		std::string buildStr;
-
-		size_t bytesWritten = 0;
-		auto result = client.Get("/latest64/101", [&](const char* data, size_t data_length) {
-			buildStr += data;
-			bytesWritten += data_length;
-			return true;
-			});
-
-		if (!result || result->status != 200)
-		{
-			LogWarning(CH_LOADER, "Error fetching \"http://assetcdn.101.arenanetworks.com/latest64/101\"");
-		}
-		else
-		{
-			int gameBuild = std::stoi(buildStr);
-
-			int lastGameBuild = 0;
-
-			if (!Settings::Settings.is_null())
-			{
-				if (!Settings::Settings[OPT_LASTGAMEBUILD].is_null())
-				{
-					Settings::Settings[OPT_LASTGAMEBUILD].get_to(lastGameBuild);
-				}
-			}
-
-			if (gameBuild - lastGameBuild > 350 && lastGameBuild != 0)
-			{
-				DisableVolatileUntilUpdate = true;
-				LogWarning(CH_LOADER, "Game updated. Current Build %d. Old Build: %d. Disabling volatile addons until they update.", gameBuild, lastGameBuild);
-
-				std::string msg = Language.Translate("((000001))");
-				msg.append("\n");
-				msg.append(Language.Translate("((000002))"));
-				GUI::Alerts::Notify(msg.c_str());
-			}
-
-			Settings::Settings[OPT_LASTGAMEBUILD] = gameBuild;
-			Settings::Save();
-		}
+		GetGameBuild();
 
 		for (;;)
 		{
-			{
-				std::unique_lock<std::mutex> lockThread(ThreadMutex);
-				ConVar.wait(lockThread, [] { return !IsSuspended; });
+			std::unique_lock<std::mutex> lockThread(ThreadMutex);
+			ConVar.wait(lockThread, [] { return !IsSuspended; });
 
-				auto start_time = std::chrono::high_resolution_clock::now();
-				while (DirectoryChangeCountdown > 0)
+			auto start_time = std::chrono::high_resolution_clock::now();
+			while (DirectoryChangeCountdown > 0)
+			{
+				Sleep(1);
+				DirectoryChangeCountdown -= 1;
+			}
+			auto end_time = std::chrono::high_resolution_clock::now();
+			auto time = end_time - start_time;
+			Log(CH_LOADER, "Processing changes after waiting for %ums.", time / std::chrono::milliseconds(1));
+
+			const std::lock_guard<std::mutex> lock(Mutex);
+			// check all tracked addons
+			for (Addon* addon : Addons)
+			{
+				// if addon no longer on disk (also check if the path is not null, else it's from config)
+				if (!std::filesystem::exists(addon->Path) && addon->Path != "")
 				{
-					Sleep(1);
-					DirectoryChangeCountdown -= 1;
+					QueueAddon(ELoaderAction::Unload, addon->Path);
+					continue;
 				}
-				auto end_time = std::chrono::high_resolution_clock::now();
-				auto time = end_time - start_time;
-				Log(CH_LOADER, "Processing changes after waiting for %ums.", time / std::chrono::milliseconds(1));
+
+				// get md5 of each file currently on disk and compare to tracked md5
+				// also check if an update is available (e.g. "addon.dll" + ".update" -> "addon.dll.update" exists)
+				std::vector<unsigned char> md5 = MD5Util::FromFile(addon->Path);
+				std::filesystem::path updatePath = addon->Path.string() + extUpdate;
+				if ((addon->MD5.empty() || addon->MD5 != md5) || std::filesystem::exists(updatePath))
+				{
+					UpdateSwapAddon(addon->Path);
+
+					// only reload if it already is loaded
+					if (addon->State == EAddonState::Loaded)
+					{
+						QueueAddon(ELoaderAction::Reload, addon->Path);
+					}
+				}
 			}
 
+			// check all other files in the directory
+			for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Path::D_GW2_ADDONS))
 			{
-				const std::lock_guard<std::mutex> lock(Mutex);
+				std::filesystem::path path = entry.path();
 
-				// check all tracked addons
-				for (Addon* addon : Addons)
+				if (std::filesystem::is_directory(path))
 				{
-					// if addon no longer on disk (also check if the path is not null, else it's from config)
-					if (!std::filesystem::exists(addon->Path) && addon->Path != "")
+					continue;
+				}
+
+				// if already tracked
+				Addon* exists = FindAddonByPath(path);
+				if (exists)
+				{
+					continue;
+				}
+
+				if (std::filesystem::is_symlink(path))
+				{
+					std::filesystem::path realLocation = std::filesystem::read_symlink(path);
+
+					if (std::filesystem::is_directory(realLocation) ||
+						!std::filesystem::exists(realLocation) ||
+						std::filesystem::file_size(realLocation) == 0)
 					{
-						QueueAddon(ELoaderAction::Unload, addon->Path);
 						continue;
-					}
-
-					// get md5 of each file currently on disk and compare to tracked md5
-					// also check if an update is available (e.g. "addon.dll" + ".update" -> "addon.dll.update" exists)
-					std::vector<unsigned char> md5 = MD5FromFile(addon->Path);
-					std::filesystem::path updatePath = addon->Path.string() + extUpdate;
-					if ((addon->MD5.empty() || addon->MD5 != md5) || std::filesystem::exists(updatePath))
-					{
-						UpdateSwapAddon(addon->Path);
-
-						// only reload if it already is loadedw
-						if (addon->State == EAddonState::Loaded)
-						{
-							QueueAddon(ELoaderAction::Reload, addon->Path);
-						}
 					}
 				}
 
-				// check all other files in the directory
-				for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Path::D_GW2_ADDONS))
+				if (std::filesystem::file_size(path) == 0)
 				{
-					std::filesystem::path path = entry.path();
+					continue;
+				}
 
-					if (std::filesystem::is_directory(path))
-					{
-						continue;
-					}
-
-					// if already tracked
-					Addon* exists = FindAddonByPath(path);
-					if (exists)
-					{
-						continue;
-					}
-
-					if (std::filesystem::is_symlink(path))
-					{
-						std::filesystem::path realLocation = std::filesystem::read_symlink(path);
-
-						if (std::filesystem::is_directory(realLocation) ||
-							!std::filesystem::exists(realLocation) ||
-							std::filesystem::file_size(realLocation) == 0)
-						{
-							continue;
-						}
-					}
-
-					if (std::filesystem::file_size(path) == 0)
-					{
-						continue;
-					}
-
-					if (path.extension() == extDll)
+				if (path.extension() == extDll)
+				{
+					std::vector<unsigned char> md5 = MD5Util::FromFile(path);
+					if (FindAddonByMD5(md5) == nullptr)
 					{
 						QueueAddon(ELoaderAction::Load, path);
 					}
+				}
 
-					if (path.extension() == extUninstall)
+				if (path.extension() == extUninstall)
+				{
+					try
 					{
-						try
-						{
-							std::filesystem::remove(path);
-						}
-						catch (std::filesystem::filesystem_error fErr)
-						{
-							LogDebug(CH_LOADER, "%s", fErr.what());
-						}
+						std::filesystem::remove(path);
 					}
-					else if (path.extension() == extOld)
+					catch (std::filesystem::filesystem_error fErr)
 					{
-						try
-						{
-							std::filesystem::remove(path);
-						}
-						catch (std::filesystem::filesystem_error fErr)
-						{
-							LogDebug(CH_LOADER, "%s", fErr.what());
-						}
+						LogDebug(CH_LOADER, "%s", fErr.what());
+					}
+				}
+				else if (path.extension() == extOld)
+				{
+					std::filesystem::path actualPath = path.string().substr(0, path.string().length() - extOld.length());
+
+					Addon* addon = FindAddonByPath(actualPath);
+
+					/* not orphaned, will be handled by loader */
+					if (addon) { continue; }
+
+					try
+					{
+						std::filesystem::remove(path);
+					}
+					catch (std::filesystem::filesystem_error fErr)
+					{
+						LogDebug(CH_LOADER, "%s", fErr.what());
+					}
+				}
+				else if (path.extension() == extUpdate)
+				{
+					std::filesystem::path actualPath = path.string().substr(0, path.string().length() - extUpdate.length());
+
+					Addon* addon = FindAddonByPath(actualPath);
+
+					/* not orphaned, will be handled by loader */
+					if (addon) { continue; }
+
+					try
+					{
+						std::filesystem::rename(path, actualPath);
+					}
+					catch (std::filesystem::filesystem_error fErr)
+					{
+						LogDebug(CH_LOADER, "%s", fErr.what());
 					}
 				}
 			}
@@ -572,7 +568,7 @@ namespace Loader
 		UpdateSwapAddon(aPath);
 
 		GETADDONDEF getAddonDef = 0;
-		addon->MD5 = MD5FromFile(aPath);
+		addon->MD5 = MD5Util::FromFile(aPath);
 		addon->Module = LoadLibraryA(path.c_str());
 
 		/* load lib failed */
@@ -649,10 +645,7 @@ namespace Loader
 			else
 			{
 				addon->MatchSignature = addon->Definitions->Signature;
-				if (allocNew)
-				{
-					Addons.push_back(addon); // track this anyway
-				}
+				Addons.push_back(addon); // track this anyway
 			}
 		}
 
@@ -711,9 +704,22 @@ namespace Loader
 			std::thread([tmpPath, addon, locked, shouldLoad, onlyInitialLaunch]()
 				{
 					bool lShouldLoad = shouldLoad;
-					if (UpdateAddon(tmpPath, addon->Definitions->Signature, addon->Definitions->Name,
-									addon->Definitions->Version, addon->Definitions->Provider,
-									addon->Definitions->UpdateLink != nullptr ? addon->Definitions->UpdateLink : ""))
+
+					CUpdater& inst = CUpdater::GetInstance();
+
+					AddonInfo addonInfo
+					{
+						addon->Definitions->Signature,
+						addon->Definitions->Name,
+						addon->Definitions->Version,
+						addon->Definitions->Provider,
+						addon->Definitions->UpdateLink != nullptr
+							? addon->Definitions->UpdateLink
+							: "",
+						addon->MD5
+					};
+
+					if (inst.UpdateAddon(tmpPath, addonInfo))
 					{
 						LogInfo(CH_LOADER, "Update available for \"%s\".", tmpPath.string().c_str());
 						if (addon->IsDisabledUntilUpdate)
@@ -721,6 +727,7 @@ namespace Loader
 							// reset state, because it updated
 							addon->IsDisabledUntilUpdate = false;
 							lShouldLoad = true;
+							addon->IsFlaggedForEnable = true;
 
 							// mutex because we're async/threading
 							{
@@ -738,10 +745,7 @@ namespace Loader
 							}
 							else
 							{
-								std::string msg = addon->Definitions->Name;
-								msg.append(" ");
-								msg.append(Language.Translate("((000079))"));
-								GUI::Alerts::Notify(msg.c_str());
+								GUI::Alerts::Notify(String::Format("%s %s", addon->Definitions->Name, Language.Translate("((000079))")).c_str());
 							}
 						}
 					}
@@ -781,11 +785,8 @@ namespace Loader
 		if (addon->IsDisabledUntilUpdate && DisableVolatileUntilUpdate)
 		{
 			// show message that addon was disabled due to game update
-			std::string msg = addon->Definitions->Name;
-			msg.append(" ");
-			msg.append(Language.Translate("((000073))"));
 			Events::Raise(EV_VOLATILE_ADDON_DISABLED, &addon->Definitions->Signature);
-			GUI::Alerts::Notify(msg.c_str());
+			GUI::Alerts::Notify(String::Format("%s %s", addon->Definitions->Name, Language.Translate("((000073))")).c_str());
 
 			FreeLibrary(addon->Module);
 			addon->State = EAddonState::NotLoaded;
@@ -862,18 +863,28 @@ namespace Loader
 		}
 	}
 
-	void CallUnloadAndVerify(const std::filesystem::path& aPath, Addon* aAddon, bool aIsShutdown)
+	void CallUnloadAndVerify(const std::filesystem::path& aPath, Addon* aAddon)
 	{
-		if (!aIsShutdown)
+		bool isShutdown = State::Nexus == ENexusState::SHUTTING_DOWN;
+
+		if (!isShutdown)
 		{
 			/* cache the flag, save that the addon will disable, then restore it */
 			bool flagDisable = aAddon->IsFlaggedForDisable;
 			aAddon->IsFlaggedForDisable = true;
 			
 			/* wrap around mutex lock/unlock because if SyncUnload it will already be locked, as it's executed from ProcessQueue */
-			if (!aAddon->Definitions->HasFlag(EAddonFlags::SyncUnload)) { Mutex.lock(); }
-			SaveAddonConfig();
-			if (!aAddon->Definitions->HasFlag(EAddonFlags::SyncUnload)) { Mutex.unlock(); }
+			if (!aAddon->Definitions->HasFlag(EAddonFlags::SyncUnload))
+			{
+				/* explictly lock the mutex, because we're unloading ASYNC -> threadsafe */
+				const std::lock_guard<std::mutex> lock(Mutex);
+				SaveAddonConfig();
+			}
+			else
+			{
+				/* do not explicitly lock the mutex, because we're unloading SYNC -> already locked in ProcessQueue */
+				SaveAddonConfig();
+			}
 
 			aAddon->IsFlaggedForDisable = flagDisable;
 		}
@@ -951,8 +962,12 @@ namespace Loader
 
 				if (addon->Definitions->HasFlag(EAddonFlags::SyncUnload))
 				{
-					CallUnloadAndVerify(aPath, addon, isShutdown);
-					FreeAddon(aPath);
+					CallUnloadAndVerify(aPath, addon);
+
+					if (!isShutdown)
+					{
+						FreeAddon(aPath);
+					}
 
 					if (aDoReload)
 					{
@@ -961,9 +976,9 @@ namespace Loader
 				}
 				else
 				{
-					std::thread unloadTask([addon, aPath, isShutdown, aDoReload]()
+					std::thread unloadTask([addon, aPath, aDoReload, isShutdown]()
 						{
-							CallUnloadAndVerify(aPath, addon, isShutdown);
+							CallUnloadAndVerify(aPath, addon);
 
 							if (!isShutdown)
 							{
@@ -1009,7 +1024,7 @@ namespace Loader
 
 		addon->State = EAddonState::NotLoaded;
 
-		SaveAddonConfig();
+		SaveAddonConfig(); // no need to check if this is a shutdown, SaveAddonConfig checks that and prevents saving
 
 		if (!std::filesystem::exists(aPath))
 		{
@@ -1025,6 +1040,8 @@ namespace Loader
 		}
 
 		//LogDebug(CH_LOADER, "Called FreeLibrary() %d times on \"%s\".", freeCalls, strFile.c_str());
+
+		Loader::NotifyChanges();
 	}
 
 	void UninstallAddon(const std::filesystem::path& aPath)
@@ -1080,40 +1097,18 @@ namespace Loader
 		}
 	}
 
-	bool UpdateAddon(const std::filesystem::path& aPath, signed int aSignature, std::string aName, AddonVersion aVersion, EUpdateProvider aProvider, std::string aUpdateLink)
+	bool UpdateSwapAddon(const std::filesystem::path& aPath)
 	{
 		/* setup paths */
 		std::filesystem::path pathOld = aPath.string() + extOld;
 		std::filesystem::path pathUpdate = aPath.string() + extUpdate;
 
-		Addon* addon = FindAddonByPath(aPath);
-
-		if (!addon)
+		/* remove leftover .old */
+		if (std::filesystem::exists(pathOld))
 		{
-			return false;
-		}
-
-		/* cleanup old files */
-		try
-		{
-			if (std::filesystem::exists(pathOld)) { std::filesystem::remove(pathOld); }
-		}
-		catch (std::filesystem::filesystem_error fErr)
-		{
-			LogDebug(CH_LOADER, "%s", fErr.what());
-			return true; // report as update here, as it was probably moved here during runtime but the dll is locked
-		}
-		if (std::filesystem::exists(pathUpdate))
-		{
-			if (addon->MD5 != MD5FromFile(pathUpdate))
-			{
-				UpdateSwapAddon(aPath);
-				return true;
-			}
-
 			try
 			{
-				std::filesystem::remove(pathUpdate);
+				std::filesystem::remove(pathOld);
 			}
 			catch (std::filesystem::filesystem_error fErr)
 			{
@@ -1122,290 +1117,12 @@ namespace Loader
 			}
 		}
 
-		bool wasUpdated = false;
-
-		std::string baseUrl;
-		std::string endpoint;
-
-		// override provider if none set, but a Raidcore ID is used
-		if (aProvider == EUpdateProvider::None && aSignature > 0)
-		{
-			aProvider = EUpdateProvider::Raidcore;
-		}
-
-		/* setup baseUrl and endpoint */
-		switch (aProvider)
-		{
-		case EUpdateProvider::None: return false;
-
-		case EUpdateProvider::Raidcore:
-			baseUrl = API_RAIDCORE;
-			endpoint = "/addons/" + std::to_string(aSignature);
-
-			break;
-
-		case EUpdateProvider::GitHub:
-			baseUrl = API_GITHUB;
-			if (aUpdateLink.empty())
-			{
-				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::GitHub but has no UpdateLink set.", aName.c_str());
-				return false;
-			}
-
-			endpoint = "/repos" + GetEndpoint(aUpdateLink) + "/releases"; // "/releases/latest"; // fuck you Sognus
-
-			break;
-
-		case EUpdateProvider::Direct:
-			if (aUpdateLink.empty())
-			{
-				LogWarning(CH_LOADER, "Addon %s declares EUpdateProvider::Direct but has no UpdateLink set.", aName.c_str());
-				return false;
-			}
-
-			baseUrl = GetBaseURL(aUpdateLink);
-			endpoint = GetEndpoint(aUpdateLink);
-
-			if (baseUrl.empty() || endpoint.empty())
-			{
-				return false;
-			}
-
-			break;
-		}
-
-		if (EUpdateProvider::Raidcore == aProvider)
-		{
-			json resVersion = RaidcoreAPI->Get(endpoint);
-
-			if (resVersion.is_null())
-			{
-				LogWarning(CH_LOADER, "Error parsing API response.");
-				return false;
-			}
-
-			AddonVersion remoteVersion = VersionFromJson(resVersion);
-
-			if (remoteVersion > aVersion)
-			{
-				LogInfo(CH_LOADER, "%s is outdated: API replied with Version %s but installed is Version %s", aName.c_str(), remoteVersion.ToString().c_str(), aVersion.ToString().c_str());
-
-				RaidcoreAPI->Download(pathUpdate, endpoint + "/download"); // e.g. api.raidcore.gg/addons/17/download
-
-				LogInfo(CH_LOADER, "Successfully updated %s.", aName.c_str());
-				wasUpdated = true;
-			}
-		}
-		else if (EUpdateProvider::GitHub == aProvider)
-		{
-			json response = GitHubAPI->Get(endpoint);
-
-			if (response.is_null())
-			{
-				LogWarning(CH_LOADER, "Error parsing API response.");
-				return false;
-			}
-
-			response = response[0]; // filthy hack to get "latest"
-
-			if (response["tag_name"].is_null())
-			{
-				LogWarning(CH_LOADER, "No tag_name set on %s%s", baseUrl.c_str(), endpoint.c_str());
-				return false;
-			}
-
-			std::string tagName = response["tag_name"].get<std::string>();
-
-			if (!std::regex_match(tagName, std::regex(R"(v?\d+[.]\d+[.]\d+[.]\d+)")))
-			{
-				LogWarning(CH_LOADER, "tag_name on %s%s does not match convention e.g. \"1.0.0.1\" or \"v1.0.0.1\". Cannot check against version.", baseUrl.c_str(), endpoint.c_str());
-				return false;
-			}
-
-			if (tagName._Starts_with("v"))
-			{
-				tagName = tagName.substr(1);
-			}
-
-			AddonVersion remoteVersion{};
-
-			size_t pos = 0;
-			int i = 0;
-			while ((pos = tagName.find(".")) != std::string::npos)
-			{
-				switch (i)
-				{
-				case 0: remoteVersion.Major = static_cast<unsigned short>(std::stoi(tagName.substr(0, pos))); break;
-				case 1: remoteVersion.Minor = static_cast<unsigned short>(std::stoi(tagName.substr(0, pos))); break;
-				case 2: remoteVersion.Build = static_cast<unsigned short>(std::stoi(tagName.substr(0, pos))); break;
-				}
-				i++;
-				tagName.erase(0, pos + 1);
-			}
-			remoteVersion.Revision = static_cast<unsigned short>(std::stoi(tagName));
-
-			if (remoteVersion > aVersion)
-			{
-				LogInfo(CH_LOADER, "%s is outdated: API replied with Version %s but installed is Version %s", aName.c_str(), remoteVersion.ToString().c_str(), aVersion.ToString().c_str());
-
-				std::string endpointDownload; // e.g. github.com/RaidcoreGG/GW2-CommandersToolkit/releases/download/20220918-135925/squadmanager.dll
-
-				if (response["assets"].is_null())
-				{
-					LogWarning(CH_LOADER, "Release has no assets. Cannot check against version. (%s%s)", baseUrl.c_str(), endpoint.c_str());
-					return false;
-				}
-
-				for (auto& asset : response["assets"])
-				{
-					std::string assetName = asset["name"].get<std::string>();
-
-					if (String::Contains(assetName, ".dll"))
-					{
-						asset["browser_download_url"].get_to(endpointDownload);
-						break;
-					}
-				}
-
-				std::string downloadBaseUrl = GetBaseURL(endpointDownload);
-				endpointDownload = GetEndpoint(endpointDownload);
-
-				httplib::Client downloadClient(downloadBaseUrl);
-				downloadClient.enable_server_certificate_verification(false);
-				downloadClient.set_follow_location(true);
-
-				size_t bytesWritten = 0;
-				std::ofstream file(pathUpdate, std::ofstream::binary);
-				auto downloadResult = downloadClient.Get(endpointDownload, [&](const char* data, size_t data_length) {
-					file.write(data, data_length);
-					bytesWritten += data_length;
-					return true;
-					});
-				file.close();
-
-				if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
-				{
-					LogWarning(CH_LOADER, "Error fetching %s%s", downloadBaseUrl.c_str(), endpointDownload.c_str());
-					return false;
-				}
-
-				LogInfo(CH_LOADER, "Successfully updated %s.", aName.c_str());
-				wasUpdated = true;
-			}
-		}
-		else if (EUpdateProvider::Direct == aProvider)
-		{
-			/* prepare client request */
-			httplib::Client client(baseUrl);
-			client.enable_server_certificate_verification(false);
-
-			std::string endpointMD5 = endpoint + ".md5sum";
-
-			std::ifstream fileCurrent(aPath, std::ios::binary);
-			fileCurrent.seekg(0, std::ios::end);
-			size_t length = fileCurrent.tellg();
-			fileCurrent.seekg(0, std::ios::beg);
-			char* buffer = new char[length];
-			fileCurrent.read(buffer, length);
-
-			std::vector<unsigned char> md5current = MD5((const unsigned char*)buffer, length);
-			std::vector<unsigned char> md5remote;
-
-			auto resultMd5Req = client.Get(endpointMD5, [&](const char* data, size_t data_length) {
-				for (size_t i = 0; i < data_length; i += 2)
-				{
-					if (md5current.size() == md5remote.size())
-					{
-						break; // more bytes aren't needed
-					}
-
-					std::string str{};
-					str += data[i];
-					str += data[i + 1];
-
-					unsigned char byte = (unsigned char)strtol(str.c_str(), NULL, 16);
-
-					md5remote.push_back(byte);
-				}
-				return true;
-				});
-
-			delete[] buffer;
-
-			if (!resultMd5Req || resultMd5Req->status != 200)
-			{
-				LogWarning(CH_LOADER, "Error fetching %s%s", baseUrl.c_str(), endpoint.c_str());
-				return false;
-			}
-
-			if (md5current == md5remote)
-			{
-				return false;
-			}
-
-			/*auto lmHeader = resultMd5Req->headers.find("Last-Modified");
-
-			if (lmHeader != resultMd5Req->headers.end())
-			{
-				long long remoteTimestamp = LastModifiedToTimestamp(lmHeader->second);
-
-				std::filesystem::path timeOffsetFile = aPath.parent_path() / (aPath.stem().string() + ".0");
-				std::ofstream file(timeOffsetFile);
-				file << "0" << std::endl;
-				file.close();
-
-				long long timeOffset = Timestamp() - std::chrono::duration_cast<std::chrono::seconds>(std::filesystem::last_write_time(timeOffsetFile).time_since_epoch()).count();
-				std::filesystem::remove(timeOffsetFile);
-
-				long long lastWriteTime = std::chrono::duration_cast<std::chrono::seconds>(std::filesystem::last_write_time(aPath).time_since_epoch()).count();
-				if (lastWriteTime + timeOffset > remoteTimestamp)
-				{
-					return false;
-				}
-			}*/
-
-			size_t bytesWritten = 0;
-			std::ofstream fileUpdate(pathUpdate, std::ofstream::binary);
-			auto downloadResult = client.Get(endpoint, [&](const char* data, size_t data_length) {
-				fileUpdate.write(data, data_length);
-				bytesWritten += data_length;
-				return true;
-				});
-			fileUpdate.close();
-
-			if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
-			{
-				LogWarning(CH_LOADER, "Error fetching %s%s", baseUrl.c_str(), endpoint.c_str());
-				return false;
-			}
-
-			wasUpdated = true;
-		}
-
-		return wasUpdated;
-	}
-	bool UpdateSwapAddon(const std::filesystem::path& aPath)
-	{
-		/* setup paths */
-		std::filesystem::path pathOld = aPath.string() + extOld;
-		std::filesystem::path pathUpdate = aPath.string() + extUpdate;
-
 		if (std::filesystem::exists(pathUpdate))
 		{
 			try
 			{
-				if (std::filesystem::exists(pathOld))
-				{
-					std::filesystem::remove(pathOld);
-				}
-
 				std::filesystem::rename(aPath, pathOld);
 				std::filesystem::rename(pathUpdate, aPath);
-
-				if (std::filesystem::exists(pathOld))
-				{
-					std::filesystem::remove(pathOld);
-				}
 
 				return true;
 			}
@@ -1694,6 +1411,19 @@ namespace Loader
 
 		return nullptr;
 	}
+	Addon* FindAddonByMD5(std::vector<unsigned char> aMD5)
+	{
+		auto it = std::find_if(Addons.begin(), Addons.end(), [aMD5](Addon* addon) {
+			// check if it has definitions and if the signature is the same
+			return addon->MD5 == aMD5;
+			});
+
+		if (it != Addons.end()) {
+			return *it;
+		}
+
+		return nullptr;
+	}
 
 	void SortAddons()
 	{
@@ -1701,9 +1431,9 @@ namespace Loader
 			{
 				if (lhs->Definitions && rhs->Definitions)
 				{
-					std::string lname = Normalize(lhs->Definitions->Name);
+					std::string lname = String::Normalize(lhs->Definitions->Name);
 					std::transform(lname.begin(), lname.end(), lname.begin(), ::tolower);
-					std::string rname = Normalize(rhs->Definitions->Name);
+					std::string rname = String::Normalize(rhs->Definitions->Name);
 					std::transform(rname.begin(), rname.end(), rname.begin(), ::tolower);
 
 					return lname < rname;
@@ -1716,5 +1446,50 @@ namespace Loader
 
 				return lpath < rpath;
 			});
+	}
+
+	void GetGameBuild()
+	{
+		/* prepare client request */
+		httplib::Client client("http://assetcdn.101.arenanetworks.com");
+		client.enable_server_certificate_verification(false);
+
+		std::string buildStr;
+
+		size_t bytesWritten = 0;
+		auto result = client.Get("/latest64/101", [&](const char* data, size_t data_length) {
+			buildStr += data;
+			bytesWritten += data_length;
+			return true;
+			});
+
+		if (!result || result->status != 200)
+		{
+			LogWarning(CH_LOADER, "Error fetching \"http://assetcdn.101.arenanetworks.com/latest64/101\"");
+			return;
+		}
+
+		int gameBuild = std::stoi(buildStr);
+
+		int lastGameBuild = 0;
+
+		if (!Settings::Settings.is_null())
+		{
+			if (!Settings::Settings[OPT_LASTGAMEBUILD].is_null())
+			{
+				Settings::Settings[OPT_LASTGAMEBUILD].get_to(lastGameBuild);
+			}
+		}
+
+		if (gameBuild - lastGameBuild > 350 && lastGameBuild != 0)
+		{
+			DisableVolatileUntilUpdate = true;
+			LogWarning(CH_LOADER, "Game updated. Current Build %d. Old Build: %d. Disabling volatile addons until they update.", gameBuild, lastGameBuild);
+
+			GUI::Alerts::Notify(String::Format("%s\n%s", Language.Translate("((000001))"), Language.Translate("((000002))")).c_str());
+		}
+
+		Settings::Settings[OPT_LASTGAMEBUILD] = gameBuild;
+		Settings::Save();
 	}
 }

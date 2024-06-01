@@ -18,11 +18,11 @@
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
-class CAPIClient
+class CApiClient
 {
 public:
 	/*
-	CAPIClient:
+	CApiClient:
 	- aBaseUrl is the API base
 	- aCacheDirectory is the directory to where the requests will be cached on disk
 	- aCacheLifetime (seconds) refers to how long a response should still be considered valid, if it's a cached one, before refetching it
@@ -30,8 +30,8 @@ public:
 	- aRefillAmount refers to how many tokens you get back after each interval
 	- aRefillInterval (seconds) refers to when the bucket gets refilled
 	*/
-	CAPIClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::path aCacheDirectory, int aCacheLifetime, int aBucketCapacity, int aRefillAmount, int aRefillInterval);
-	~CAPIClient();
+	CApiClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::path aCacheDirectory, int aCacheLifetime, int aBucketCapacity, int aRefillAmount, int aRefillInterval, const char* aCertificate = nullptr);
+	~CApiClient();
 
 	/*
 	Get:
@@ -44,7 +44,7 @@ public:
 	Download:
 	Downloads the remote resource to disk.
 	*/
-	void Download(std::filesystem::path aOutPath, std::string aEndpoint, std::string aParameters = "");
+	bool Download(std::filesystem::path aOutPath, std::string aEndpoint, std::string aParameters = "");
 
 protected:
 	std::string					BaseURL;

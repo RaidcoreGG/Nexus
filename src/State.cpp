@@ -13,7 +13,6 @@
 
 #include "Mumble/Mumble.h"
 #include "DataLink/DataLink.h"
-#include "Multibox/Multibox.h"
 
 namespace State
 {
@@ -53,6 +52,7 @@ namespace State
 
 			if (cmp == "-ggdev") { IsDeveloperMode = true; }
 			if (cmp == "-ggvanilla") { IsVanilla = true; }
+			if (cmp == "-ggconsole") { IsConsoleEnabled = true; }
 			if (cmp == "-sharearchive") { MultiboxState |= EMultiboxState::ARCHIVE_SHARED; }
 			if (cmp == "-multi") { MultiboxState |= EMultiboxState::LOCAL_SHARED; }
 
@@ -62,7 +62,7 @@ namespace State
 				std::string mumbleName = WStrToStr(mumbleNameW);
 
 				customMumble = true;
-				MumbleLink = (LinkedMem*)DataLink::ShareResource(DL_MUMBLE_LINK, sizeof(LinkedMem), mumbleName.c_str());
+				MumbleLinkName = mumbleName;
 
 				token.append(" ");
 				token.append(mumbleName);
@@ -106,10 +106,8 @@ namespace State
 
 		if (!customMumble)
 		{
-			MumbleLink = (LinkedMem*)DataLink::ShareResource(DL_MUMBLE_LINK, sizeof(LinkedMem), "MumbleLink");
+			MumbleLinkName = "MumbleLink";
 		}
-
-		Multibox::KillMutex();
 	}
 }
 

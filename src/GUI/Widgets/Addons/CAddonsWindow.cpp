@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 #include <shellapi.h>
+#include <thread>
 
 #include "Consts.h"
 #include "Shared.h"
@@ -14,6 +15,8 @@
 #include "Loader/ArcDPS.h"
 #include "AddonItem.h"
 #include "Textures/TextureLoader.h"
+
+#include "Updater/Updater.h"
 
 #include "imgui.h"
 #include "imgui_extensions.h"
@@ -181,6 +184,7 @@ namespace GUI
 			if (ImGui::ImageButton(!refreshHovered ? BtnRefresh->Resource : BtnRefreshHover->Resource, ImVec2(Renderer::Scaling * 24.0f, Renderer::Scaling * 24.0f)))
 			{
 				Loader::NotifyChanges();
+				std::thread(Loader::Library::Fetch).detach();
 			}
 			refreshHovered = ImGui::IsItemHovered();
 			ImGui::PopStyleVar();
@@ -251,9 +255,21 @@ namespace GUI
 
 									std::thread([tmpPath, addon]()
 										{
-											if (Loader::UpdateAddon(tmpPath, addon->Definitions->Signature, addon->Definitions->Name,
-												addon->Definitions->Version, addon->Definitions->Provider,
-												addon->Definitions->UpdateLink != nullptr ? addon->Definitions->UpdateLink : ""))
+											CUpdater& inst = CUpdater::GetInstance();
+
+											AddonInfo addonInfo
+											{
+												addon->Definitions->Signature,
+												addon->Definitions->Name,
+												addon->Definitions->Version,
+												addon->Definitions->Provider,
+												addon->Definitions->UpdateLink != nullptr
+													? addon->Definitions->UpdateLink
+													: "",
+												addon->MD5
+											};
+
+											if (inst.UpdateAddon(tmpPath, addonInfo))
 											{
 												Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
 											}

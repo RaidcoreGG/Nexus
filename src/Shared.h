@@ -10,7 +10,7 @@
 #include "Mumble/LinkedMem.h"
 #include "Mumble/Identity.h"
 #include "Logging/LogHandler.h"
-#include "API/CAPIClient.h"
+#include "API/ApiClient.h"
 #include "Localization/Localization.h"
 
 #include "imgui.h"
@@ -30,6 +30,7 @@ extern std::vector<signed int>		RequestedAddons;
 
 extern long long					FrameCounter;
 
+extern std::string					MumbleLinkName;
 extern LinkedMem*                   MumbleLink;
 extern Identity*                    MumbleIdentity;
 extern bool							IsMoving;
@@ -51,8 +52,8 @@ extern ImGuiWindowFlags				WindowFlags_Overlay;
 extern ImGuiWindowFlags				WindowFlags_Custom;
 extern ImGuiWindowFlags				WindowFlags_Watermark;
 
-extern CAPIClient*					RaidcoreAPI;
-extern CAPIClient*					GitHubAPI;
+extern CApiClient*					RaidcoreAPI;
+extern CApiClient*					GitHubAPI;
 
 extern std::string					ChangelogText;
 extern bool							IsUpdateAvailable;

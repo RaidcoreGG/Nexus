@@ -94,9 +94,6 @@
     <Filter Include="GUI\Widgets\EULA">
       <UniqueIdentifier>{fdc50f5d-b3a6-4446-89c4-7450b69cb75d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GUI\Widgets\Changelog">
-      <UniqueIdentifier>{be8ccf31-a4c8-4d59-9e7d-195975790006}</UniqueIdentifier>
-    </Filter>
     <Filter Include="_EXTERNAL">
       <UniqueIdentifier>{04d6bcbc-bde2-4787-bd80-0289963e456b}</UniqueIdentifier>
     </Filter>
@@ -138,6 +135,12 @@
     </Filter>
     <Filter Include="GUI\Widgets\Alerts">
       <UniqueIdentifier>{442c3943-23d3-443c-bbd4-c0dc42250d4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Updater">
+      <UniqueIdentifier>{25b274e7-7bee-44a7-b1ba-f82be0e3a1e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{7b045384-37df-47bf-a9d8-13b7470614b0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -267,9 +270,6 @@
     <ClCompile Include="GUI\Widgets\Menu\Menu.cpp">
       <Filter>GUI\Widgets\Menu</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\Options\COptionsWindow.cpp">
-      <Filter>GUI\Widgets\Options</Filter>
-    </ClCompile>
     <ClCompile Include="Settings\Settings.cpp">
       <Filter>Settings</Filter>
     </ClCompile>
@@ -288,16 +288,13 @@
     <ClCompile Include="GUI\Widgets\EULA\CEULAModal.cpp">
       <Filter>GUI\Widgets\EULA</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\Changelog\CChangelogWindow.cpp">
-      <Filter>GUI\Widgets\Changelog</Filter>
-    </ClCompile>
     <ClCompile Include="Multibox\Multibox.cpp">
       <Filter>Multibox</Filter>
     </ClCompile>
     <ClCompile Include="Proxy.cpp">
       <Filter>_GLOBAL</Filter>
     </ClCompile>
-    <ClCompile Include="API\CAPIClient.cpp">
+    <ClCompile Include="API\ApiClient.cpp">
       <Filter>API</Filter>
     </ClCompile>
     <ClCompile Include="Loader\EAddonFlags.cpp">
@@ -320,6 +317,27 @@
     </ClCompile>
     <ClCompile Include="Loader\Library.cpp">
       <Filter>Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="Updater\Updater.cpp">
+      <Filter>Updater</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Widgets\Options\COptionsWindow.cpp">
+      <Filter>GUI\Widgets\Options</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\Strings.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\MD5.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\Url.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\Base64.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Loader\EUpdateProvider.cpp">
+      <Filter>Loader\Enums</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -529,9 +547,6 @@
     </ClInclude>
     <ClInclude Include="GUI\Widgets\Menu\Menu.h">
       <Filter>GUI\Widgets\Menu</Filter>
-    </ClInclude>
-    <ClInclude Include="GUI\Widgets\Options\COptionsWindow.h">
-      <Filter>GUI\Widgets\Options</Filter>
     </ClInclude>
     <ClInclude Include="Settings\Settings.h">
       <Filter>Settings</Filter>
@@ -995,9 +1010,6 @@
     <ClInclude Include="resource.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\Changelog\CChangelogWindow.h">
-      <Filter>GUI\Widgets\Changelog</Filter>
-    </ClInclude>
     <ClInclude Include="stb\stb_image.h">
       <Filter>_EXTERNAL</Filter>
     </ClInclude>
@@ -1019,7 +1031,7 @@
     <ClInclude Include="API\APIRequest.h">
       <Filter>API</Filter>
     </ClInclude>
-    <ClInclude Include="API\CAPIClient.h">
+    <ClInclude Include="API\ApiClient.h">
       <Filter>API</Filter>
     </ClInclude>
     <ClInclude Include="API\CachedResponse.h">
@@ -1072,6 +1084,27 @@
     </ClInclude>
     <ClInclude Include="Loader\Library.h">
       <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="Updater\Updater.h">
+      <Filter>Updater</Filter>
+    </ClInclude>
+    <ClInclude Include="Certs.h">
+      <Filter>_GLOBAL</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Widgets\Options\COptionsWindow.h">
+      <Filter>GUI\Widgets\Options</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Strings.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\MD5.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Url.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Base64.h">
+      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1215,6 +1248,12 @@
     </Image>
     <Image Include="Resources\BtnRefresh.png">
       <Filter>Resource Files\Images</Filter>
+    </Image>
+    <Image Include="Resources\Menu\BtnReturn.png">
+      <Filter>Resource Files\Images\Menu</Filter>
+    </Image>
+    <Image Include="Resources\AddonsWindow\AddonItem_Highlight.png">
+      <Filter>Resource Files\Images\AddonsWindow</Filter>
     </Image>
   </ItemGroup>
 </Project>

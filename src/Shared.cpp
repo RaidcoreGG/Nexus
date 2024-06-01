@@ -14,6 +14,7 @@ std::vector<signed int>		RequestedAddons		= {};
 
 long long					FrameCounter		= 0;
 
+std::string					MumbleLinkName;
 LinkedMem*					MumbleLink			= nullptr;
 Identity*					MumbleIdentity		= new Identity{};
 bool						IsMoving			= false;
@@ -56,8 +57,8 @@ ImGuiWindowFlags			WindowFlags_Watermark = ImGuiWindowFlags_NoDecoration |
 													ImGuiWindowFlags_NoBringToFrontOnFocus |
 													ImGuiWindowFlags_NoBackground;
 
-CAPIClient*					RaidcoreAPI			= nullptr;
-CAPIClient*					GitHubAPI			= nullptr;
+CApiClient*					RaidcoreAPI			= nullptr;
+CApiClient*					GitHubAPI			= nullptr;
 
 std::string					ChangelogText;
 bool						IsUpdateAvailable	= false;

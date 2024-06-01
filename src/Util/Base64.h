@@ -1,38 +1,32 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  Library.h
-/// Description  :  Handles installation of new addons and fetching them from the Raidcore API.
+/// Name         :  Base64.h
+/// Description  :  Contains a variety of utility for Base64.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LIBRARY_H
-#define LIBRARY_H
+#ifndef BASE64_H
+#define BASE64_H
 
-#include <mutex>
-#include <vector>
-
-#include "LibraryAddon.h"
+#include <string>
 
 ///----------------------------------------------------------------------------------------------------
-/// Loader Namespace
+/// Base64 Namespace
 ///----------------------------------------------------------------------------------------------------
-namespace Loader
+namespace Base64
 {
 	///----------------------------------------------------------------------------------------------------
-	/// Library Namespace
+	/// Encode:
+	/// 	Encodes a buffer into Base64.
 	///----------------------------------------------------------------------------------------------------
-	namespace Library
-	{
-		extern std::mutex					Mutex;
-		extern std::vector<LibraryAddon*>	Addons;
+	std::string Encode(const unsigned char* src, size_t len);
 
-		///----------------------------------------------------------------------------------------------------
-		/// Fetch:
-		/// 	Fetch AddonLibrary.
-		///----------------------------------------------------------------------------------------------------
-		void Fetch();
-	}
+	///----------------------------------------------------------------------------------------------------
+	/// Decode:
+	/// 	Decodes a Base64 string.
+	///----------------------------------------------------------------------------------------------------
+	std::string Decode(const void* data, const size_t len);
 }
 
 #endif

@@ -12,7 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="API\ActiveToken.cpp" />
-    <ClCompile Include="API\CAPIClient.cpp" />
+    <ClCompile Include="API\ApiClient.cpp" />
     <ClCompile Include="API\APIController.cpp" />
     <ClCompile Include="Consts.cpp" />
     <ClCompile Include="core.cpp" />
@@ -20,7 +20,9 @@
     <ClCompile Include="DataLink\DataLink.cpp" />
     <ClCompile Include="Events\EventSubscriber.cpp" />
     <ClCompile Include="GUI\Widgets\Alerts\Alerts.cpp" />
+    <ClCompile Include="GUI\Widgets\Options\COptionsWindow.cpp" />
     <ClCompile Include="Loader\ArcDPS.cpp" />
+    <ClCompile Include="Loader\EUpdateProvider.cpp" />
     <ClCompile Include="Loader\Library.cpp" />
     <ClCompile Include="Localization\Localization.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -29,13 +31,11 @@
     <ClCompile Include="GUI\Widgets\About\CAboutBox.cpp" />
     <ClCompile Include="GUI\Widgets\Addons\AddonItem.cpp" />
     <ClCompile Include="GUI\Widgets\Addons\CAddonsWindow.cpp" />
-    <ClCompile Include="GUI\Widgets\Changelog\CChangelogWindow.cpp" />
     <ClCompile Include="GUI\Widgets\Debug\CDebugWindow.cpp" />
     <ClCompile Include="GUI\Widgets\EULA\CEULAModal.cpp" />
     <ClCompile Include="GUI\Widgets\Log\CLogWindow.cpp" />
     <ClCompile Include="GUI\Widgets\Menu\Menu.cpp" />
     <ClCompile Include="GUI\Widgets\Menu\MenuItem.cpp" />
-    <ClCompile Include="GUI\Widgets\Options\COptionsWindow.cpp" />
     <ClCompile Include="GUI\Widgets\Overlay\CMumbleOverlay.cpp" />
     <ClCompile Include="GUI\Widgets\QuickAccess\QuickAccess.cpp" />
     <ClCompile Include="Hooks.cpp" />
@@ -70,16 +70,22 @@
     <ClCompile Include="State.cpp" />
     <ClCompile Include="Textures\TextureLoader.cpp" />
     <ClCompile Include="types.cpp" />
+    <ClCompile Include="Updater\Updater.cpp" />
+    <ClCompile Include="Util\Base64.cpp" />
+    <ClCompile Include="Util\MD5.cpp" />
+    <ClCompile Include="Util\Strings.cpp" />
+    <ClCompile Include="Util\Url.cpp" />
     <ClCompile Include="WndProc\WndProcHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="API\CAPIClient.h" />
+    <ClInclude Include="API\ApiClient.h" />
     <ClInclude Include="API\APIController.h" />
     <ClInclude Include="API\ActiveToken.h" />
     <ClInclude Include="API\APIRequest.h" />
     <ClInclude Include="API\APIResponse.h" />
     <ClInclude Include="API\CachedResponse.h" />
     <ClInclude Include="Branch.h" />
+    <ClInclude Include="Certs.h" />
     <ClInclude Include="Consts.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="CrashHandler.h" />
@@ -99,7 +105,6 @@
     <ClInclude Include="GUI\Widgets\Addons\CAddonsWindow.h" />
     <ClInclude Include="GUI\Widgets\Alerts\Alerts.h" />
     <ClInclude Include="GUI\Widgets\Alerts\FuncDefs.h" />
-    <ClInclude Include="GUI\Widgets\Changelog\CChangelogWindow.h" />
     <ClInclude Include="GUI\Widgets\Debug\CDebugWindow.h" />
     <ClInclude Include="GUI\Widgets\EULA\CEULAModal.h" />
     <ClInclude Include="GUI\Widgets\Log\CLogWindow.h" />
@@ -319,6 +324,11 @@
     <ClInclude Include="Textures\Texture.h" />
     <ClInclude Include="Textures\TextureLoader.h" />
     <ClInclude Include="types.h" />
+    <ClInclude Include="Updater\Updater.h" />
+    <ClInclude Include="Util\Base64.h" />
+    <ClInclude Include="Util\MD5.h" />
+    <ClInclude Include="Util\Strings.h" />
+    <ClInclude Include="Util\Url.h" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="WndProc\FuncDefs.h" />
     <ClInclude Include="WndProc\WndProcHandler.h" />
@@ -342,6 +352,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\AddonsWindow\AddonItem.png" />
+    <Image Include="Resources\AddonsWindow\AddonItem_Highlight.png" />
     <Image Include="Resources\AddonsWindow\Background.png" />
     <Image Include="Resources\AddonsWindow\Background_blue.png" />
     <Image Include="Resources\AddonsWindow\TitleBar.png" />
@@ -360,6 +371,7 @@
     <Image Include="Resources\Menu\BtnLog.png" />
     <Image Include="Resources\Menu\BtnOptions.png" />
     <Image Include="Resources\Menu\BtnOptions_Hover.png" />
+    <Image Include="Resources\Menu\BtnReturn.png" />
     <Image Include="Resources\Menu\MenuItem.png" />
     <Image Include="Resources\Menu\MenuItem_Hover.png" />
     <Image Include="Resources\Notification.png" />

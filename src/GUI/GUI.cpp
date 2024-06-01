@@ -30,7 +30,6 @@
 #include "Widgets/Menu/MenuItem.h"
 #include "Widgets/Addons/CAddonsWindow.h"
 #include "Widgets/Options/COptionsWindow.h"
-#include "Widgets/Changelog/CChangelogWindow.h"
 #include "Widgets/Log/CLogWindow.h"
 #include "Widgets/Debug/CDebugWindow.h"
 #include "Widgets/About/CAboutBox.h"
@@ -766,7 +765,6 @@ namespace GUI
 		CAddonsWindow* addonsWnd = new CAddonsWindow("Addons");
 
 		COptionsWindow* opsWnd = new COptionsWindow("Options");
-		CChangelogWindow* chlWnd = new CChangelogWindow("Changelog");
 		CLogWindow* logWnd = new CLogWindow("Log", ELogLevel::ALL);
 		LogHandler::RegisterLogger(logWnd);
 		CDebugWindow* dbgWnd = new CDebugWindow("Debug");
@@ -781,16 +779,18 @@ namespace GUI
 
 		AddWindow(addonsWnd);
 		AddWindow(opsWnd);
-		AddWindow(chlWnd);
 		AddWindow(logWnd);
 		AddWindow(dbgWnd);
 		AddWindow(aboutWnd);
 
+		Menu::AddMenuItem("((Return to Game))",		ICON_RETURN,	RES_ICON_RETURN,	&Menu::Visible);
 		Menu::AddMenuItem("((000003))",		ICON_ADDONS,	RES_ICON_ADDONS,	&addonsWnd->Visible);
 		Menu::AddMenuItem("((000004))",		ICON_OPTIONS,	RES_ICON_OPTIONS,	&opsWnd->Visible);
-		Menu::AddMenuItem("((000005))",		ICON_CHANGELOG, RES_ICON_CHANGELOG,	&chlWnd->Visible);
 		Menu::AddMenuItem("((000006))",		ICON_LOG,		RES_ICON_LOG,		&logWnd->Visible);
-		Menu::AddMenuItem("((000007))",		ICON_DEBUG,		RES_ICON_DEBUG,		&dbgWnd->Visible);
+		if (State::IsDeveloperMode)
+		{
+			Menu::AddMenuItem("((000007))", ICON_DEBUG, RES_ICON_DEBUG, &dbgWnd->Visible);
+		}
 		Menu::AddMenuItem("((000008))",		ICON_ABOUT,		RES_ICON_ABOUT,		&aboutWnd->Visible);
 
 		/* register keybinds */

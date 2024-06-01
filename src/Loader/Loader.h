@@ -11,6 +11,7 @@
 
 #include <mutex>
 #include <map>
+#include <vector>
 #include <unordered_map>
 #include <thread>
 #include <filesystem>
@@ -121,12 +122,6 @@ namespace Loader
 	void UninstallAddon(const std::filesystem::path& aPath);
 
 	///----------------------------------------------------------------------------------------------------
-	/// UpdateAddon:
-	/// 	Returns true if the addon updated.
-	///----------------------------------------------------------------------------------------------------
-	bool UpdateAddon(const std::filesystem::path& aPath, signed int aSignature, std::string aName, AddonVersion aVersion, EUpdateProvider aProvider, std::string aUpdateLink);
-
-	///----------------------------------------------------------------------------------------------------
 	/// UpdateSwapAddon:
 	/// 	Swaps addon.dll with addon.dll.update.
 	/// 	Returns true if there was an update dll.
@@ -170,10 +165,22 @@ namespace Loader
 	Addon* FindAddonByMatchSig(signed int aMatchSignature);
 
 	///----------------------------------------------------------------------------------------------------
+	/// FindAddonByMD5:
+	/// 	Returns the addon with a matching MD5 or nullptr.
+	///----------------------------------------------------------------------------------------------------
+	Addon* FindAddonByMD5(std::vector<unsigned char> aMD5);
+
+	///----------------------------------------------------------------------------------------------------
 	/// SortAddons:
 	/// 	Sorts addons by name but prioritizes DUU state.
 	///----------------------------------------------------------------------------------------------------
 	void SortAddons();
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetGameBuild:
+	/// 	Gets the game build and sets the Disable Until Update state.
+	///----------------------------------------------------------------------------------------------------
+	void GetGameBuild();
 }
 
 #endif

@@ -346,7 +346,7 @@ namespace GUI
 								ImGui::TextDisabled(state.c_str());
 								ImGui::TextDisabled("Module: %p", addon->Module);
 								ImGui::TextDisabled("Module Size: %u", addon->ModuleSize);
-								ImGui::TextDisabled("MD5: %s", MD5ToString(addon->MD5).c_str());
+								ImGui::TextDisabled("MD5: %s", MD5Util::ToString(addon->MD5).c_str());
 								ImGui::TextDisabled("Definitions: %p", addon->Definitions);
 								ImGui::Separator();
 								ImGui::TextDisabled("IsFlaggedForDisable: %s", addon->IsFlaggedForDisable ? "true" : "false");
