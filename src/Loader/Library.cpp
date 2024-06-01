@@ -59,6 +59,10 @@ namespace Loader
 				}
 
 				std::sort(Addons.begin(), Addons.end(), [](LibraryAddon* a, LibraryAddon* b) {
+					if (a->IsNew != b->IsNew)
+					{
+						return a->IsNew > b->IsNew;
+					}
 					return a->Name < b->Name;
 					});
 			}
