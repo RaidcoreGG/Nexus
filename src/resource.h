@@ -35,7 +35,6 @@
 #define RES_TEX_MENU_BUTTON_HOVER       310
 
 /* CAddonsWindow */
-
 #define RES_TEX_ADDONS_BACKGROUND		401
 #define RES_TEX_ADDONITEM				402
 #define RES_TEX_ADDONITEM_HIGHLIGHT		403
@@ -63,6 +62,12 @@
 #define RES_TEX_CONTEXTMENU_HIGHLIGHT	702
 
 #define RES_LOCALE_EN					801
+
+/* CEulaWindow */
+#define RES_TEX_EULA_BACKGROUND			901
+
+#define RES_TEX_EULA_TITLEBAR			902
+#define RES_TEX_EULA_TITLEBAR_HOVER		903
 
 // Next default values for new objects
 // 

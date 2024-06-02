@@ -155,6 +155,12 @@ RES_TEX_CONTEXTMENU_HIGHLIGHT	PNG				"Resources\\ContextMenu\\ContextMenu_Highli
 
 RES_LOCALE_EN					JSON			"Resources\\Locales\\en_Main.json"
 
+/* CEulaWindow */
+RES_TEX_EULA_BACKGROUND			PNG             "Resources\\EulaWindow\\Background.png"
+
+RES_TEX_EULA_TITLEBAR			PNG             "Resources\\EulaWindow\\TitleBar.png"
+RES_TEX_EULA_TITLEBAR_HOVER		PNG             "Resources\\EulaWindow\\TitleBar_Hover.png"
+
 #endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
 

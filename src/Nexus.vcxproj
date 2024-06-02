@@ -354,8 +354,7 @@
     <Image Include="Resources\AddonsWindow\AddonItem.png" />
     <Image Include="Resources\AddonsWindow\AddonItem_DUU.png" />
     <Image Include="Resources\AddonsWindow\AddonItem_Highlight.png" />
-    <Image Include="Resources\AddonsWindow\Background.png" />
-    <Image Include="Resources\AddonsWindow\Background_blue.png" />
+    <Image Include="Resources\AddonsWidow\Background.png" />
     <Image Include="Resources\AddonsWindow\TitleBar.png" />
     <Image Include="Resources\AddonsWindow\TitleBar_Hover.png" />
     <Image Include="Resources\BtnClose.png" />
@@ -364,6 +363,9 @@
     <Image Include="Resources\BtnRefresh_Hover.png" />
     <Image Include="Resources\ContextMenu\ContextMenu_Bullet.png" />
     <Image Include="Resources\ContextMenu\ContextMenu_Highlight.png" />
+    <Image Include="Resources\EulaWindow\Background.png" />
+    <Image Include="Resources\EulaWindow\TitleBar.png" />
+    <Image Include="Resources\EulaWindow\TitleBar_Hover.png" />
     <Image Include="Resources\Menu\Background.png" />
     <Image Include="Resources\Menu\BtnAbout.png" />
     <Image Include="Resources\Menu\BtnAddons.png" />

@@ -142,6 +142,9 @@
     <Filter Include="Util">
       <UniqueIdentifier>{7b045384-37df-47bf-a9d8-13b7470614b0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Images\EulaWindow">
+      <UniqueIdentifier>{09e279e3-be44-477f-b606-076e436a1995}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -1150,10 +1153,7 @@
     <Image Include="Resources\AddonsWindow\AddonItem.png">
       <Filter>Resource Files\Images\AddonsWindow</Filter>
     </Image>
-    <Image Include="Resources\AddonsWindow\Background.png">
-      <Filter>Resource Files\Images\AddonsWindow</Filter>
-    </Image>
-    <Image Include="Resources\AddonsWindow\Background_blue.png">
+    <Image Include="Resources\AddonsWidow\Background.png">
       <Filter>Resource Files\Images\AddonsWindow</Filter>
     </Image>
     <Image Include="Resources\AddonsWindow\TitleBar.png">
@@ -1257,6 +1257,15 @@
     </Image>
     <Image Include="Resources\AddonsWindow\AddonItem_DUU.png">
       <Filter>Resource Files\Images\AddonsWindow</Filter>
+    </Image>
+    <Image Include="Resources\EulaWindow\Background.png">
+      <Filter>Resource Files\Images\EulaWindow</Filter>
+    </Image>
+    <Image Include="Resources\EulaWindow\TitleBar.png">
+      <Filter>Resource Files\Images\EulaWindow</Filter>
+    </Image>
+    <Image Include="Resources\EulaWindow\TitleBar_Hover.png">
+      <Filter>Resource Files\Images\EulaWindow</Filter>
     </Image>
   </ItemGroup>
 </Project>

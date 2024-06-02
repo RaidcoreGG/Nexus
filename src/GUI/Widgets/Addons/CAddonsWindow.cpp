@@ -25,17 +25,6 @@
 
 namespace GUI
 {
-	float windowWidth = 620.0f;
-	float windowHeight = 480.0f;
-	float contentWidth = 540.0f;
-	float contentHeight = 424.0f;
-
-	bool showInstalled = false;
-	bool refreshHovered = false;
-
-	int queuedForCheck = 0;
-	int checkedForUpdates = -1;
-
 	CAddonsWindow::CAddonsWindow(std::string aName)
 	{
 		Name = aName;
@@ -253,7 +242,7 @@ namespace GUI
 
 									std::filesystem::path tmpPath = addon->Path.string();
 
-									std::thread([tmpPath, addon]()
+									std::thread([this, tmpPath, addon]()
 										{
 											CUpdater& inst = CUpdater::GetInstance();
 
