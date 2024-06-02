@@ -266,7 +266,8 @@ namespace GUI
 												addon->Definitions->UpdateLink != nullptr
 													? addon->Definitions->UpdateLink
 													: "",
-												addon->MD5
+												addon->MD5,
+												addon->AllowPrereleases
 											};
 
 											if (inst.UpdateAddon(tmpPath, addonInfo))

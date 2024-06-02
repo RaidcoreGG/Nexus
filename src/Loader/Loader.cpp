@@ -203,6 +203,7 @@ namespace Loader
 
 					if (!addonInfo["IsPausingUpdates"].is_null()) { addonInfo["IsPausingUpdates"].get_to(addon->IsPausingUpdates); }
 					if (!addonInfo["IsDisabledUntilUpdate"].is_null()) { addonInfo["IsDisabledUntilUpdate"].get_to(addon->IsDisabledUntilUpdate); }
+					if (!addonInfo["AllowPrereleases"].is_null()) { addonInfo["AllowPrereleases"].get_to(addon->AllowPrereleases); }
 
 					// to match the actual addon to the saved states
 					addon->MatchSignature = signature;
@@ -274,7 +275,8 @@ namespace Loader
 				{"Signature", sig},
 				{"IsLoaded", addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED || addon->IsFlaggedForEnable},
 				{"IsPausingUpdates", addon->IsPausingUpdates},
-				{"IsDisabledUntilUpdate", addon->IsDisabledUntilUpdate}
+				{"IsDisabledUntilUpdate", addon->IsDisabledUntilUpdate},
+				{"AllowPrereleases", addon->AllowPrereleases}
 			};
 
 			/* override loaded state, if it's still the initial startup sequence */
@@ -716,7 +718,8 @@ namespace Loader
 						addon->Definitions->UpdateLink != nullptr
 							? addon->Definitions->UpdateLink
 							: "",
-						addon->MD5
+						addon->MD5,
+						addon->AllowPrereleases
 					};
 
 					if (inst.UpdateAddon(tmpPath, addonInfo))
@@ -1434,18 +1437,13 @@ namespace Loader
 					return lhs->IsDisabledUntilUpdate > rhs->IsDisabledUntilUpdate;
 				}
 
-				std::string lcmp, rcmp;
+				std::string lcmp = lhs->Definitions
+					? String::ToLower(String::Normalize(lhs->Definitions->Name))
+					: String::ToLower(lhs->Path.filename().string());
 
-				if (lhs->Definitions && rhs->Definitions)
-				{
-					lcmp = String::ToLower(String::Normalize(lhs->Definitions->Name));
-					rcmp = String::ToLower(String::Normalize(rhs->Definitions->Name));
-				}
-				else
-				{
-					lcmp = String::ToLower(lhs->Path.string());
-					rcmp = String::ToLower(rhs->Path.string());
-				}
+				std::string rcmp = rhs->Definitions
+					? String::ToLower(String::Normalize(rhs->Definitions->Name))
+					: String::ToLower(rhs->Path.filename().string());
 
 				return lcmp < rcmp;
 			});

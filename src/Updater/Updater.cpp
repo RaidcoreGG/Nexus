@@ -184,7 +184,7 @@ void CUpdater::UpdateNexus()
 	}
 }
 
-bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonInfo, bool aAllowPrereleases, bool aIgnoreTagFormat)
+bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonInfo, bool aIgnoreTagFormat)
 {
 	/* setup paths */
 	std::filesystem::path pathOld = aPath.string() + ".old";
@@ -303,7 +303,7 @@ bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonI
 		break;
 
 	case EUpdateProvider::GitHub:
-		if (this->UpdateGitHub(tmpPath, endpoint, aAddonInfo.Version, aAllowPrereleases, aIgnoreTagFormat))
+		if (this->UpdateGitHub(tmpPath, endpoint, aAddonInfo.Version, aAddonInfo.AllowPrereleases, aIgnoreTagFormat))
 		{
 			didDownload = true;
 		}
@@ -375,7 +375,7 @@ bool CUpdater::InstallAddon(LibraryAddon* aAddon, bool aIsArcPlugin)
 	std::filesystem::path installPath = Path::D_GW2_ADDONS / (filename + ".dll");
 	installPath = GetUnclaimedPath(installPath);
 
-	if (this->UpdateAddon(installPath, addonInfo, false, true))
+	if (this->UpdateAddon(installPath, addonInfo, true))
 	{
 		try
 		{

@@ -21,6 +21,7 @@ struct Addon
 	/* Saved states */
 	bool						IsPausingUpdates;
 	bool						IsDisabledUntilUpdate;
+	bool						AllowPrereleases;
 
 	/* Runtime states */
 	signed int					MatchSignature;

@@ -164,7 +164,8 @@ namespace GUI
 													aAddon->Definitions->UpdateLink != nullptr 
 														? aAddon->Definitions->UpdateLink 
 														: "",
-													aAddon->MD5
+													aAddon->MD5,
+													aAddon->AllowPrereleases
 												};
 
 												if (inst.UpdateAddon(tmpPath, addonInfo))
@@ -202,12 +203,19 @@ namespace GUI
 							ImGui::GW2::TooltipGeneric(Language.Translate("((000012))"));
 						}
 
-						if (ImGui::GW2::ContextMenuItem((aAddon->IsPausingUpdates ? "Resume Updates##" : "Pause Updates##" + sig).c_str(),
-							aAddon->IsPausingUpdates ? Language.Translate("((000013))") : Language.Translate("((000014))"),
-							CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+						if (ImGui::GW2::ContextMenuItem(("ToggleUpdates##" + sig).c_str(), aAddon->IsPausingUpdates ? Language.Translate("((000013))") : Language.Translate("((000014))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 						{
 							aAddon->IsPausingUpdates = !aAddon->IsPausingUpdates;
 							Loader::SaveAddonConfig();
+						}
+
+						if (aAddon->Definitions->Provider == EUpdateProvider::GitHub)
+						{
+							if (ImGui::GW2::ContextMenuItem(("TogglePrereleases##" + sig).c_str(), aAddon->AllowPrereleases ? Language.Translate("((Disable Prereleases))") : Language.Translate("((Allow Prereleases))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+							{
+								aAddon->AllowPrereleases = !aAddon->AllowPrereleases;
+								Loader::SaveAddonConfig();
+							}
 						}
 
 						ImGui::Separator();

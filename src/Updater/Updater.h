@@ -30,6 +30,7 @@ struct AddonInfo
 	EUpdateProvider				Provider;
 	std::string					UpdateLink;
 	std::vector<unsigned char>	MD5;
+	bool						AllowPrereleases;
 };
 
 ///----------------------------------------------------------------------------------------------------
@@ -66,7 +67,7 @@ public:
 	/// UpdateAddon:
 	/// 	Checks for an update for an addon.
 	///----------------------------------------------------------------------------------------------------
-	bool UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonInfo, bool aAllowPrereleases = false, bool aIgnoreTagFormat = false);
+	bool UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonInfo, bool aIgnoreTagFormat = false);
 
 	///----------------------------------------------------------------------------------------------------
 	/// InstallAddon:
