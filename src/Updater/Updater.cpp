@@ -9,7 +9,6 @@
 #include "Updater.h"
 
 #include <thread>
-#include <regex>
 
 #include "core.h"
 #include "Shared.h"
@@ -17,11 +16,46 @@
 
 namespace Updater
 {
-	const char* ADDONAPI_RequestUpdate(const char* aUpdateURL)
+	void ADDONAPI_RequestUpdate(signed int aSignature, const char* aUpdateURL)
 	{
-		//CUpdater& inst = CUpdater::GetInstance();
-		//inst.UpdateAddon()
-		return nullptr;
+		if (!aSignature) { return; }
+		if (!aUpdateURL) { return; }
+
+		const std::lock_guard<std::mutex> lock(Loader::Mutex);
+
+		Addon* addon = Loader::FindAddonBySig(aSignature);
+
+		if (!addon) { return; }
+		if (!addon->Definitions) { return; }
+		if (addon->Definitions->Provider != EUpdateProvider::Self)
+		{
+			LogWarning(CH_UPDATER, "Update requested for %s but provider is not EUpdateProvider::Self. Cancelling.", addon->Definitions->Name);
+			return;
+		}
+
+		/* TODO: Add verification */
+		// 1. Addon -> API::RequestUpdate(signature);
+		// 2. Nexus -> Events::RaiseSingle(signature, password123);
+		// 3. Addon -> API::ConfirmUpdate(password123);
+
+		std::filesystem::path path = addon->Path;
+
+		AddonInfo addonInfo
+		{
+			addon->Definitions->Signature,
+			addon->Definitions->Name,
+			addon->Definitions->Version,
+			addon->Definitions->Provider,
+			aUpdateURL,
+			addon->MD5
+		};
+
+		std::thread([path, addonInfo]()
+			{
+				CUpdater& inst = CUpdater::GetInstance();
+				inst.UpdateAddon(path, addonInfo);
+			})
+			.detach();
 	}
 }
 
@@ -231,6 +265,23 @@ bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonI
 		}
 
 		break;
+	
+	case EUpdateProvider::Self:
+		if (aAddonInfo.UpdateLink.empty())
+		{
+			LogWarning(CH_UPDATER, "Addon %s declares EUpdateProvider::Self but has no UpdateLink set.", aAddonInfo.Name.c_str());
+			return false;
+		}
+
+		baseUrl = URL::GetBase(aAddonInfo.UpdateLink);
+		endpoint = URL::GetEndpoint(aAddonInfo.UpdateLink);
+
+		if (baseUrl.empty())
+		{
+			return false;
+		}
+
+		break;
 	}
 
 	/* this shouldn't happen */
@@ -242,26 +293,35 @@ bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonI
 	std::filesystem::path tmpPath = aPath.string() + ".update" + ".tmp"; // path that isn't tracked by the Loader like .update is
 	tmpPath = GetUnclaimedPath(tmpPath); // ensure no overlap
 
-	if (EUpdateProvider::Raidcore == aAddonInfo.Provider)
+	switch (aAddonInfo.Provider)
 	{
+	case EUpdateProvider::Raidcore:
 		if (this->UpdateRaidcore())
 		{
 			didDownload = true;
 		}
-	}
-	else if (EUpdateProvider::GitHub == aAddonInfo.Provider)
-	{
+		break;
+
+	case EUpdateProvider::GitHub:
 		if (this->UpdateGitHub(tmpPath, endpoint, aAddonInfo.Version, aAllowPrereleases, aIgnoreTagFormat))
 		{
 			didDownload = true;
 		}
-	}
-	else if (EUpdateProvider::Direct == aAddonInfo.Provider)
-	{
+		break;
+
+	case EUpdateProvider::Direct:
 		if (this->UpdateDirect(tmpPath, baseUrl, endpoint, aAddonInfo.MD5))
 		{
 			didDownload = true;
 		}
+		break;
+
+	case EUpdateProvider::Self:
+		if (this->UpdateSelf(tmpPath, baseUrl, endpoint))
+		{
+			didDownload = true;
+		}
+		break;
 	}
 
 	if (didDownload)
@@ -485,6 +545,55 @@ bool CUpdater::UpdateDirect(std::filesystem::path& aDownloadPath, std::string& a
 			return false;
 		}
 	}
+
+	size_t bytesWritten = 0;
+	std::ofstream fileUpdate(aDownloadPath, std::ofstream::binary);
+	auto downloadResult = client.Get(aEndpointDownload,
+		[&](const char* data, size_t data_length)
+		{
+			fileUpdate.write(data, data_length);
+			bytesWritten += data_length;
+			return true;
+		});
+	fileUpdate.close();
+
+	if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
+	{
+		LogWarning(CH_UPDATER, "Error fetching %s%s", aBaseURL.c_str(), aEndpointDownload.c_str());
+
+		// try cleaning failed download
+		if (std::filesystem::exists(aDownloadPath))
+		{
+			try
+			{
+				std::filesystem::remove(aDownloadPath);
+			}
+			catch (std::filesystem::filesystem_error fErr)
+			{
+				LogWarning(CH_UPDATER, "Couldn't remove \"%s\".", aDownloadPath.string().c_str());
+			}
+		}
+
+		return false;
+	}
+
+	return true;
+}
+
+bool CUpdater::UpdateSelf(std::filesystem::path& aDownloadPath, std::string& aBaseURL, std::string& aEndpointDownload)
+{
+	/* sanity check params */
+	if (aDownloadPath.empty() ||
+		aBaseURL.empty() ||
+		aEndpointDownload.empty())
+	{
+		LogWarning(CH_UPDATER, "One or more parameters were empty.");
+		return false;
+	}
+
+	/* prepare client request */
+	httplib::Client client(aBaseURL);
+	client.enable_server_certificate_verification(true);
 
 	size_t bytesWritten = 0;
 	std::ofstream fileUpdate(aDownloadPath, std::ofstream::binary);

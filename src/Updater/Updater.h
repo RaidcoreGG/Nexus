@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 
+#include "Loader/Loader.h"
 #include "Loader/AddonDefinition.h"
 #include "Loader/LibraryAddon.h"
 
@@ -38,9 +39,9 @@ namespace Updater
 {
 	///----------------------------------------------------------------------------------------------------
 	/// ADDONAPI_RequestUpdate:
-	/// 	Addon API wrapper function for -
+	/// 	Addon API wrapper to self update.
 	///----------------------------------------------------------------------------------------------------
-	const char* ADDONAPI_RequestUpdate(const char* aUpdateURL);
+	void ADDONAPI_RequestUpdate(signed int aSignature, const char* aUpdateURL);
 }
 
 ///----------------------------------------------------------------------------------------------------
@@ -103,6 +104,14 @@ private:
 	/// 	Downloads the latest addon available at the remote, if it's newer than current.
 	///----------------------------------------------------------------------------------------------------
 	bool UpdateDirect(std::filesystem::path& aDownloadPath, std::string& aBaseURL, std::string& aEndpointDownload, std::vector<unsigned char> aCurrentMD5);
+
+	///----------------------------------------------------------------------------------------------------
+	/// UpdateSelf:
+	/// 	Downloads the addon available at remote without checking its version.
+	/// 	The addon already did that.
+	/// 	I hope.
+	///----------------------------------------------------------------------------------------------------
+	bool UpdateSelf(std::filesystem::path& aDownloadPath, std::string& aBaseURL, std::string& aEndpointDownload);
 };
 
 #endif
