@@ -295,13 +295,14 @@ namespace GUI
 					if (ImGui::GW2::Button((Language.Translate(aAddon->IsFlaggedForEnable ? "((000020))" : "((000024))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						aAddon->IsFlaggedForEnable = !aAddon->IsFlaggedForEnable;
-						Loader::SaveAddonConfig();
 
 						if (aAddon->IsFlaggedForEnable)
 						{
 							aAddon->IsDisabledUntilUpdate = false; // explicitly loaded
 							GUI::Alerts::Notify(String::Format("%s %s",aAddon->Definitions->Name, Language.Translate("((000080))")).c_str());
 						}
+
+						Loader::SaveAddonConfig();
 					}
 					if (aAddon->IsFlaggedForEnable)
 					{

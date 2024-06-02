@@ -32,6 +32,8 @@ namespace GUI
 	extern bool							HasAcceptedEULA;
 	extern bool							NotifyChangelog;
 
+	extern bool							ShowAddonsWindowAfterDUU;
+
 	void Initialize();
 	void Shutdown();
 

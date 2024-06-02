@@ -15,25 +15,26 @@
 #include "Consts.h"
 #include "Shared.h"
 
-const char* OPT_LASTGAMEBUILD			= "LastGameBuild";
-const char* OPT_LASTCHECKEDGAMEBUILD	= "LastCheckedGameBuild";
-const char* OPT_ACCEPTEULA				= "AcceptEULA";
-const char* OPT_NOTIFYCHANGELOG			= "NotifyChangelog";
-const char* OPT_DEVMODE					= "DevMode";
-const char* OPT_CLOSEMENU				= "CloseMenuAfterSelecting";
-const char* OPT_CLOSEESCAPE				= "CloseOnEscape";
-const char* OPT_LASTUISCALE				= "LastUIScale";
-const char* OPT_FONTSIZE				= "FontSize";
-const char* OPT_QAVERTICAL				= "QAVertical";
-const char* OPT_QALOCATION				= "QALocation";
-const char* OPT_QAOFFSETX				= "QAOffsetX";
-const char* OPT_QAOFFSETY				= "QAOffsetY";
-const char* OPT_LINKARCSTYLE			= "LinkWithArcDPSStyle";
-const char* OPT_IMGUISTYLE				= "ImGuiStyle";
-const char* OPT_IMGUICOLORS				= "ImGuiColors";
-const char* OPT_LANGUAGE				= "Language";
-const char* OPT_ALWAYSSHOWQUICKACCESS	= "AlwaysShowQuickAccess";
-const char* OPT_GLOBALSCALE				= "GlobalScale";
+const char* OPT_LASTGAMEBUILD				= "LastGameBuild";
+const char* OPT_LASTCHECKEDGAMEBUILD		= "LastCheckedGameBuild";
+const char* OPT_ACCEPTEULA					= "AcceptEULA";
+const char* OPT_NOTIFYCHANGELOG				= "NotifyChangelog";
+const char* OPT_DEVMODE						= "DevMode";
+const char* OPT_CLOSEMENU					= "CloseMenuAfterSelecting";
+const char* OPT_CLOSEESCAPE					= "CloseOnEscape";
+const char* OPT_LASTUISCALE					= "LastUIScale";
+const char* OPT_FONTSIZE					= "FontSize";
+const char* OPT_QAVERTICAL					= "QAVertical";
+const char* OPT_QALOCATION					= "QALocation";
+const char* OPT_QAOFFSETX					= "QAOffsetX";
+const char* OPT_QAOFFSETY					= "QAOffsetY";
+const char* OPT_LINKARCSTYLE				= "LinkWithArcDPSStyle";
+const char* OPT_IMGUISTYLE					= "ImGuiStyle";
+const char* OPT_IMGUICOLORS					= "ImGuiColors";
+const char* OPT_LANGUAGE					= "Language";
+const char* OPT_ALWAYSSHOWQUICKACCESS		= "AlwaysShowQuickAccess";
+const char* OPT_GLOBALSCALE					= "GlobalScale";
+const char* OPT_SHOWADDONSWINDOWAFTERDUU	= "ShowAddonsWindowAfterDisableUntilUpdate";
 
 namespace Settings
 {

@@ -80,6 +80,8 @@ namespace GUI
 	bool						HasAcceptedEULA				= false;
 	bool						NotifyChangelog				= false;
 
+	bool						ShowAddonsWindowAfterDUU	= false;
+
 	void Initialize()
 	{
 		// Init imgui
@@ -512,6 +514,15 @@ namespace GUI
 		}
 	}
 
+	void OnAddonDUU(void* aEventArgs)
+	{
+		if (!ShowAddonsWindowAfterDUU) { return; }
+
+		const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Addons"; });
+		if (it == Windows.end()) { return; }
+		(*it)->Visible = true;
+	}
+
 	void Setup()
 	{
 		ImGuiIO& io = ImGui::GetIO();
@@ -666,6 +677,15 @@ namespace GUI
 				Settings::Settings[OPT_GLOBALSCALE] = 1.0f;
 			}
 
+			if (!Settings::Settings[OPT_SHOWADDONSWINDOWAFTERDUU].is_null())
+			{
+				Settings::Settings[OPT_SHOWADDONSWINDOWAFTERDUU].get_to(ShowAddonsWindowAfterDUU);
+			}
+			else
+			{
+				Settings::Settings[OPT_SHOWADDONSWINDOWAFTERDUU] = 1.0f;
+			}
+
 			Renderer::Scaling = LastScaling * io.FontGlobalScale;
 		}
 
@@ -759,6 +779,7 @@ namespace GUI
 
 		Events::Subscribe(EV_MUMBLE_IDENTITY_UPDATED, OnMumbleIdentityChanged);
 		Events::Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", OnLanguageChanged);
+		Events::Subscribe(EV_VOLATILE_ADDON_DISABLED, OnAddonDUU);
 		OnMumbleIdentityChanged(nullptr);
 
 		/* set up and add windows */
