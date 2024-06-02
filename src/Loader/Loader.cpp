@@ -1432,11 +1432,6 @@ namespace Loader
 	{
 		std::sort(Addons.begin(), Addons.end(), [](Addon* lhs, Addon* rhs)
 			{
-				if (lhs->IsDisabledUntilUpdate != rhs->IsDisabledUntilUpdate)
-				{
-					return lhs->IsDisabledUntilUpdate > rhs->IsDisabledUntilUpdate;
-				}
-
 				std::string lcmp = lhs->Definitions
 					? String::ToLower(String::Normalize(lhs->Definitions->Name))
 					: String::ToLower(lhs->Path.filename().string());
@@ -1445,7 +1440,8 @@ namespace Loader
 					? String::ToLower(String::Normalize(rhs->Definitions->Name))
 					: String::ToLower(rhs->Path.filename().string());
 
-				return lcmp < rcmp;
+				return lhs->IsDisabledUntilUpdate > rhs->IsDisabledUntilUpdate ||
+					((lhs->IsDisabledUntilUpdate == rhs->IsDisabledUntilUpdate) && lcmp < rcmp);
 			});
 	}
 

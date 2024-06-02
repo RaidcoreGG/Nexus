@@ -58,12 +58,10 @@ namespace Loader
 					Addons.push_back(newAddon);
 				}
 
-				std::sort(Addons.begin(), Addons.end(), [](LibraryAddon* a, LibraryAddon* b) {
-					if (a->IsNew != b->IsNew)
+				std::sort(Addons.begin(), Addons.end(), [](LibraryAddon* lhs, LibraryAddon* rhs)
 					{
-						return a->IsNew > b->IsNew;
-					}
-					return a->Name < b->Name;
+						return lhs->IsNew > rhs->IsNew ||
+							((lhs->IsNew == rhs->IsNew) && lhs->Name < rhs->Name);
 					});
 			}
 			else
