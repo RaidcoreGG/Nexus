@@ -130,6 +130,7 @@ RES_TEX_MENU_BUTTON_HOVER		PNG             "Resources\\Menu\\MenuItem_Hover.png"
 RES_TEX_ADDONS_BACKGROUND		PNG             "Resources\\AddonsWindow\\Background.png"
 RES_TEX_ADDONITEM				PNG             "Resources\\AddonsWindow\\AddonItem.png"
 RES_TEX_ADDONITEM_HIGHLIGHT		PNG             "Resources\\AddonsWindow\\AddonItem_Highlight.png"
+RES_TEX_ADDONITEM_DUU			PNG             "Resources\\AddonsWindow\\AddonItem_DUU.png"
 
 RES_TEX_ADDONS_TITLEBAR			PNG             "Resources\\AddonsWindow\\TitleBar.png"
 RES_TEX_ADDONS_TITLEBAR_HOVER	PNG             "Resources\\AddonsWindow\\TitleBar_Hover.png"

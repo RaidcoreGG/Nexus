@@ -1255,5 +1255,8 @@
     <Image Include="Resources\AddonsWindow\AddonItem_Highlight.png">
       <Filter>Resource Files\Images\AddonsWindow</Filter>
     </Image>
+    <Image Include="Resources\AddonsWindow\AddonItem_DUU.png">
+      <Filter>Resource Files\Images\AddonsWindow</Filter>
+    </Image>
   </ItemGroup>
 </Project>

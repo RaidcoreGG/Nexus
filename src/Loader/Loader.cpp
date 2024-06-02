@@ -1429,18 +1429,25 @@ namespace Loader
 	{
 		std::sort(Addons.begin(), Addons.end(), [](Addon* lhs, Addon* rhs)
 			{
-				if (lhs->Definitions && rhs->Definitions)
+				if (lhs->IsDisabledUntilUpdate != rhs->IsDisabledUntilUpdate)
 				{
-					std::string lname = String::ToLower(String::Normalize(lhs->Definitions->Name));
-					std::string rname = String::ToLower(String::Normalize(rhs->Definitions->Name));
-
-					return lname < rname;
+					return lhs->IsDisabledUntilUpdate > rhs->IsDisabledUntilUpdate;
 				}
 
-				std::string lpath = String::ToLower(lhs->Path.string());
-				std::string rpath = String::ToLower(rhs->Path.string());
+				std::string lcmp, rcmp;
 
-				return lpath < rpath;
+				if (lhs->Definitions && rhs->Definitions)
+				{
+					lcmp = String::ToLower(String::Normalize(lhs->Definitions->Name));
+					rcmp = String::ToLower(String::Normalize(rhs->Definitions->Name));
+				}
+				else
+				{
+					lcmp = String::ToLower(lhs->Path.string());
+					rcmp = String::ToLower(rhs->Path.string());
+				}
+
+				return lcmp < rcmp;
 			});
 	}
 

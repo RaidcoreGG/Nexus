@@ -36,6 +36,7 @@ namespace GUI
 
 	Texture* Background = nullptr;
 	Texture* BackgroundHighlight = nullptr;
+	Texture* BackgroundDUU = nullptr;
 	Texture* BtnOptions = nullptr;
 	Texture* CtxMenuBullet = nullptr;
 	Texture* CtxMenuHighlight = nullptr;
@@ -61,15 +62,31 @@ namespace GUI
 		// initial is explicitly set within the window, therefore all positions should be relative to it
 		ImVec2 initial = ImGui::GetCursorPos();
 
-		if (Background)
+		if (aAddon->IsDisabledUntilUpdate)
 		{
-			ImGui::SetCursorPos(initial);
-			ImGui::Image(Background->Resource, ImVec2(itemWidthScaled, itemHeightScaled));
+			if (BackgroundDUU)
+			{
+				ImGui::SetCursorPos(initial);
+				ImGui::Image(BackgroundDUU->Resource, ImVec2(itemWidthScaled, itemHeightScaled));
+			}
+			else
+			{
+				BackgroundDUU = TextureLoader::GetOrCreate("TEX_ADDONITEM_BACKGROUND_DUU", RES_TEX_ADDONITEM_DUU, NexusHandle);
+			}
 		}
 		else
 		{
-			Background = TextureLoader::GetOrCreate("TEX_ADDONITEM_BACKGROUND", RES_TEX_ADDONITEM, NexusHandle);
+			if (Background)
+			{
+				ImGui::SetCursorPos(initial);
+				ImGui::Image(Background->Resource, ImVec2(itemWidthScaled, itemHeightScaled));
+			}
+			else
+			{
+				Background = TextureLoader::GetOrCreate("TEX_ADDONITEM_BACKGROUND", RES_TEX_ADDONITEM, NexusHandle);
+			}
 		}
+
 
 		if (!BtnOptions) { BtnOptions = TextureLoader::GetOrCreate("ICON_OPTIONS", RES_ICON_OPTIONS, NexusHandle); }
 		if (!CtxMenuBullet) { CtxMenuBullet = TextureLoader::GetOrCreate("TEX_CTXMENU_BULLET", RES_TEX_CONTEXTMENU_BULLET, NexusHandle); }
