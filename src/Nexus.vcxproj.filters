@@ -145,6 +145,9 @@
     <Filter Include="Resource Files\Images\EulaWindow">
       <UniqueIdentifier>{09e279e3-be44-477f-b606-076e436a1995}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Fonts">
+      <UniqueIdentifier>{eb799d0b-f3d2-4af6-b1bc-c37b5e5c258d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -341,6 +344,9 @@
     </ClCompile>
     <ClCompile Include="Loader\EUpdateProvider.cpp">
       <Filter>Loader\Enums</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Fonts\FontManager.cpp">
+      <Filter>GUI\Fonts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -544,9 +550,6 @@
     </ClInclude>
     <ClInclude Include="GUI\Widgets\Menu\MenuItem.h">
       <Filter>GUI\Widgets\Menu</Filter>
-    </ClInclude>
-    <ClInclude Include="GUI\EFontIdentifier.h">
-      <Filter>GUI</Filter>
     </ClInclude>
     <ClInclude Include="GUI\Widgets\Menu\Menu.h">
       <Filter>GUI\Widgets\Menu</Filter>
@@ -1109,6 +1112,18 @@
     <ClInclude Include="Util\Base64.h">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="Updater\FuncDefs.h">
+      <Filter>Updater</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\EFontIdentifier.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Fonts\FontManager.h">
+      <Filter>GUI\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Fonts\FuncDefs.h">
+      <Filter>GUI\Fonts</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Nexus.rc">
@@ -1146,6 +1161,9 @@
       <Filter>Resource Files\Fonts</Filter>
     </Font>
     <Font Include="Resources\Fonts\TrebuchetMS.ttf">
+      <Filter>Resource Files\Fonts</Filter>
+    </Font>
+    <Font Include="Resources\Fonts\ProggyClean.ttf">
       <Filter>Resource Files\Fonts</Filter>
     </Font>
   </ItemGroup>

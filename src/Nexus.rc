@@ -92,8 +92,8 @@ END
 //
 
 RES_FONT_MENOMONIA      FONT                    "Resources\\Fonts\\Menomonia.ttf"
-
 RES_FONT_TREBUCHET      FONT                    "Resources\\Fonts\\TrebuchetMS.ttf"
+RES_FONT_PROGGYCLEAN    FONT                    "Resources\\Fonts\\ProggyClean.ttf"
 /////////////////////////////////////////////////////////////////////////////
 //
 // PNG

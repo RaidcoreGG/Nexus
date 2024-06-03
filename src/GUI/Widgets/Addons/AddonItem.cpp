@@ -299,7 +299,7 @@ namespace GUI
 						if (aAddon->IsFlaggedForEnable)
 						{
 							aAddon->IsDisabledUntilUpdate = false; // explicitly loaded
-							GUI::Alerts::Notify(String::Format("%s %s",aAddon->Definitions->Name, Language.Translate("((000080))")).c_str());
+							GUI::Alerts::Notify(String::Format("%s %s", aAddon->Definitions->Name, Language.Translate("((000080))")).c_str());
 						}
 
 						Loader::SaveAddonConfig();

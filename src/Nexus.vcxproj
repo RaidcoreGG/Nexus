@@ -19,6 +19,7 @@
     <ClCompile Include="CrashHandler.cpp" />
     <ClCompile Include="DataLink\DataLink.cpp" />
     <ClCompile Include="Events\EventSubscriber.cpp" />
+    <ClCompile Include="GUI\Fonts\FontManager.cpp" />
     <ClCompile Include="GUI\Widgets\Alerts\Alerts.cpp" />
     <ClCompile Include="GUI\Widgets\Options\COptionsWindow.cpp" />
     <ClCompile Include="Loader\ArcDPS.cpp" />
@@ -97,6 +98,8 @@
     <ClInclude Include="Events\FuncDefs.h" />
     <ClInclude Include="GUI\EFontIdentifier.h" />
     <ClInclude Include="GUI\ERenderType.h" />
+    <ClInclude Include="GUI\Fonts\FontManager.h" />
+    <ClInclude Include="GUI\Fonts\FuncDefs.h" />
     <ClInclude Include="GUI\FuncDefs.h" />
     <ClInclude Include="GUI\GUI.h" />
     <ClInclude Include="GUI\IWindow.h" />
@@ -324,6 +327,7 @@
     <ClInclude Include="Textures\Texture.h" />
     <ClInclude Include="Textures\TextureLoader.h" />
     <ClInclude Include="types.h" />
+    <ClInclude Include="Updater\FuncDefs.h" />
     <ClInclude Include="Updater\Updater.h" />
     <ClInclude Include="Util\Base64.h" />
     <ClInclude Include="Util\MD5.h" />
@@ -348,6 +352,7 @@
   </ItemGroup>
   <ItemGroup>
     <Font Include="Resources\Fonts\Menomonia.ttf" />
+    <Font Include="Resources\Fonts\ProggyClean.ttf" />
     <Font Include="Resources\Fonts\TrebuchetMS.ttf" />
   </ItemGroup>
   <ItemGroup>
