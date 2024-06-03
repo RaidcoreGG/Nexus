@@ -38,6 +38,7 @@
 #include "Settings/Settings.h"
 #include "Localization/Localization.h"
 #include "Updater/Updater.h"
+#include "GUI/Fonts/FontManager.h"
 
 #include "ArcDPS.h"
 #include "Library.h"
@@ -1321,6 +1322,77 @@ namespace Loader
 
 			ApiDefs.insert({ aVersion, api });
 			return api;
+
+		case 4:
+			api = new AddonAPI4();
+
+			((AddonAPI4*)api)->SwapChain = Renderer::SwapChain;
+			((AddonAPI4*)api)->ImguiContext = Renderer::GuiContext;
+			((AddonAPI4*)api)->ImguiMalloc = ImGui::MemAlloc;
+			((AddonAPI4*)api)->ImguiFree = ImGui::MemFree;
+			((AddonAPI4*)api)->RegisterRender = GUI::Register;
+			((AddonAPI4*)api)->DeregisterRender = GUI::Deregister;
+
+			((AddonAPI4*)api)->RequestUpdate = Updater::ADDONAPI_RequestUpdate;
+
+			((AddonAPI4*)api)->GetGameDirectory = Path::GetGameDirectory;
+			((AddonAPI4*)api)->GetAddonDirectory = Path::GetAddonDirectory;
+			((AddonAPI4*)api)->GetCommonDirectory = Path::GetCommonDirectory;
+
+			((AddonAPI4*)api)->CreateHook = MH_CreateHook;
+			((AddonAPI4*)api)->RemoveHook = MH_RemoveHook;
+			((AddonAPI4*)api)->EnableHook = MH_EnableHook;
+			((AddonAPI4*)api)->DisableHook = MH_DisableHook;
+
+			((AddonAPI4*)api)->Log = ADDONAPI_LogMessage2;
+
+			((AddonAPI4*)api)->SendAlert = GUI::Alerts::Notify;
+
+			((AddonAPI4*)api)->RaiseEvent = Events::ADDONAPI_RaiseEvent;
+			((AddonAPI4*)api)->RaiseEventNotification = Events::ADDONAPI_RaiseNotification;
+			((AddonAPI4*)api)->RaiseEventTargeted = Events::ADDONAPI_RaiseEventTargeted;
+			((AddonAPI4*)api)->RaiseEventNotificationTargeted = Events::ADDONAPI_RaiseNotificationTargeted;
+			((AddonAPI4*)api)->SubscribeEvent = Events::Subscribe;
+			((AddonAPI4*)api)->UnsubscribeEvent = Events::Unsubscribe;
+
+			((AddonAPI4*)api)->RegisterWndProc = WndProc::Register;
+			((AddonAPI4*)api)->DeregisterWndProc = WndProc::Deregister;
+			((AddonAPI4*)api)->SendWndProcToGameOnly = WndProc::SendWndProcToGame;
+
+			((AddonAPI4*)api)->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString;
+			((AddonAPI4*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct;
+			((AddonAPI4*)api)->DeregisterKeybind = Keybinds::Deregister;
+
+			((AddonAPI4*)api)->GetResource = DataLink::GetResource;
+			((AddonAPI4*)api)->ShareResource = DataLink::ShareResource;
+
+			((AddonAPI4*)api)->GetTexture = TextureLoader::Get;
+			((AddonAPI4*)api)->GetTextureOrCreateFromFile = TextureLoader::ADDONAPI_GetOrCreateFromFile;
+			((AddonAPI4*)api)->GetTextureOrCreateFromResource = TextureLoader::ADDONAPI_GetOrCreateFromResource;
+			((AddonAPI4*)api)->GetTextureOrCreateFromURL = TextureLoader::ADDONAPI_GetOrCreateFromURL;
+			((AddonAPI4*)api)->GetTextureOrCreateFromMemory = TextureLoader::ADDONAPI_GetOrCreateFromMemory;
+			((AddonAPI4*)api)->LoadTextureFromFile = TextureLoader::LoadFromFile;
+			((AddonAPI4*)api)->LoadTextureFromResource = TextureLoader::LoadFromResource;
+			((AddonAPI4*)api)->LoadTextureFromURL = TextureLoader::LoadFromURL;
+			((AddonAPI4*)api)->LoadTextureFromMemory = TextureLoader::LoadFromMemory;
+
+			((AddonAPI4*)api)->AddShortcut = GUI::QuickAccess::AddShortcut;
+			((AddonAPI4*)api)->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
+			((AddonAPI4*)api)->NotifyShortcut = GUI::QuickAccess::NotifyShortcut;
+			((AddonAPI4*)api)->AddSimpleShortcut = GUI::QuickAccess::AddSimpleShortcut;
+			((AddonAPI4*)api)->RemoveSimpleShortcut = GUI::QuickAccess::RemoveSimpleShortcut;
+
+			((AddonAPI4*)api)->Translate = Localization::ADDONAPI_Translate;
+			((AddonAPI4*)api)->TranslateTo = Localization::ADDONAPI_TranslateTo;
+
+			((AddonAPI4*)api)->GetFont = FontManager::ADDONAPI_Get;
+			((AddonAPI4*)api)->ReleaseFont = FontManager::ADDONAPI_Release;
+			((AddonAPI4*)api)->AddFontFromFile = FontManager::ADDONAPI_AddFontFromFile;
+			((AddonAPI4*)api)->AddFontFromResource = FontManager::ADDONAPI_AddFontFromResource;
+			((AddonAPI4*)api)->AddFontFromMemory = FontManager::ADDONAPI_AddFontFromMemory;
+
+			ApiDefs.insert({ aVersion, api });
+			return api;
 		}
 
 		// there is no matching version
@@ -1336,6 +1408,8 @@ namespace Loader
 			return sizeof(AddonAPI2);
 		case 3:
 			return sizeof(AddonAPI3);
+		case 4:
+			return sizeof(AddonAPI4);
 		}
 
 		return 0;
@@ -1377,12 +1451,10 @@ namespace Loader
 
 	Addon* FindAddonBySig(signed int aSignature)
 	{
-		auto it = std::find_if(Addons.begin(), Addons.end(), [aSignature](Addon* addon) {
-			// check if it has definitions and if the signature is the same
-			return addon->Definitions && addon->Definitions->Signature == aSignature;
-			});
+		auto it = std::find_if(Addons.begin(), Addons.end(), [aSignature](Addon* addon) { return addon->Definitions && addon->Definitions->Signature == aSignature; });
 
-		if (it != Addons.end()) {
+		if (it != Addons.end())
+		{
 			return *it;
 		}
 
@@ -1390,12 +1462,10 @@ namespace Loader
 	}
 	Addon* FindAddonByPath(const std::filesystem::path& aPath)
 	{
-		auto it = std::find_if(Addons.begin(), Addons.end(), [aPath](Addon* addon) {
-			// check if it has definitions and if the signature is the same
-			return addon->Path == aPath;
-			});
+		auto it = std::find_if(Addons.begin(), Addons.end(), [aPath](Addon* addon) { return addon->Path == aPath; });
 
-		if (it != Addons.end()) {
+		if (it != Addons.end())
+		{
 			return *it;
 		}
 
@@ -1403,12 +1473,10 @@ namespace Loader
 	}
 	Addon* FindAddonByMatchSig(signed int aMatchSignature)
 	{
-		auto it = std::find_if(Addons.begin(), Addons.end(), [aMatchSignature](Addon* addon) {
-			// check if it has definitions and if the signature is the same
-			return addon->MatchSignature == aMatchSignature;
-			});
+		auto it = std::find_if(Addons.begin(), Addons.end(), [aMatchSignature](Addon* addon) { return addon->MatchSignature == aMatchSignature; });
 
-		if (it != Addons.end()) {
+		if (it != Addons.end())
+		{
 			return *it;
 		}
 
@@ -1416,12 +1484,10 @@ namespace Loader
 	}
 	Addon* FindAddonByMD5(std::vector<unsigned char> aMD5)
 	{
-		auto it = std::find_if(Addons.begin(), Addons.end(), [aMD5](Addon* addon) {
-			// check if it has definitions and if the signature is the same
-			return addon->MD5 == aMD5;
-			});
+		auto it = std::find_if(Addons.begin(), Addons.end(), [aMD5](Addon* addon) { return addon->MD5 == aMD5; });
 
-		if (it != Addons.end()) {
+		if (it != Addons.end())
+		{
 			return *it;
 		}
 

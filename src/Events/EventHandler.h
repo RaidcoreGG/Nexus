@@ -50,7 +50,7 @@ namespace Events
 struct EventData
 {
 	std::vector<EventSubscriber>	Subscribers;
-	unsigned long long				AmountRaises;
+	unsigned long long				AmountRaises = 0;
 };
 
 ///----------------------------------------------------------------------------------------------------

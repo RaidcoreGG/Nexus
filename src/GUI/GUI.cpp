@@ -37,8 +37,9 @@
 #include "Widgets/EULA/CEULAModal.h"
 #include "Widgets/Alerts/Alerts.h"
 
+#include "Fonts/FontManager.h"
+
 #include "resource.h"
-#include "Textures/Texture.h"
 
 #ifndef STRINGIFY
 #define STRINGIFY(x) #x
@@ -81,6 +82,8 @@ namespace GUI
 	bool						NotifyChangelog				= false;
 
 	bool						ShowAddonsWindowAfterDUU	= false;
+
+	bool						HasCustomFont				= false;
 
 	void Initialize()
 	{
@@ -263,6 +266,13 @@ namespace GUI
 			if (callback) { callback(); }
 		}
 		/* pre-render callbacks end*/
+
+		CFontManager& fntMgr = CFontManager::GetInstance();
+		if (fntMgr.Advance())
+		{
+			OnMumbleIdentityChanged(nullptr);
+			Shutdown();
+		}
 
 		if (State::IsImGuiInitialized)
 		{
@@ -523,6 +533,41 @@ namespace GUI
 		(*it)->Visible = true;
 	}
 
+	void FontReceiver(const char* aIdentifier, ImFont* aFont)
+	{
+		std::string str = aIdentifier;
+
+		if (str == "USER_FONT")
+		{
+			UserFont = aFont;
+		}
+		if (str == "FONT_DEFAULT")
+		{
+			MonospaceFont = aFont;
+
+			if (!HasCustomFont)
+			{
+				UserFont = aFont;
+			}
+		}
+
+		if (str == "MENOMONIA_S")		{ FontIndex[EFont::Menomonia_Small] = aFont; }
+		if (str == "MENOMONIA_BIG_S")	{ FontIndex[EFont::MenomoniaBig_Small] = aFont; }
+		if (str == "TREBUCHET_S")		{ FontIndex[EFont::Trebuchet_Small] = aFont; }
+
+		if (str == "MENOMONIA_N")		{ FontIndex[EFont::Menomonia_Normal] = aFont; }
+		if (str == "MENOMONIA_BIG_N")	{ FontIndex[EFont::MenomoniaBig_Normal] = aFont; }
+		if (str == "TREBUCHET_N")		{ FontIndex[EFont::Trebuchet_Normal] = aFont; }
+
+		if (str == "MENOMONIA_L")		{ FontIndex[EFont::Menomonia_Large] = aFont; }
+		if (str == "MENOMONIA_BIG_L")	{ FontIndex[EFont::MenomoniaBig_Large] = aFont; }
+		if (str == "TREBUCHET_L")		{ FontIndex[EFont::Trebuchet_Large] = aFont; }
+
+		if (str == "MENOMONIA_XL")		{ FontIndex[EFont::Menomonia_Larger] = aFont; }
+		if (str == "MENOMONIA_BIG_XL")	{ FontIndex[EFont::MenomoniaBig_Larger] = aFont; }
+		if (str == "TREBUCHET_XL")		{ FontIndex[EFont::Trebuchet_Larger] = aFont; }
+	}
+
 	void Setup()
 	{
 		ImGuiIO& io = ImGui::GetIO();
@@ -693,89 +738,82 @@ namespace GUI
 
 		std::filesystem::path fontPath{};
 
-		ImVector<ImWchar> ranges;
-
-		ImFontGlyphRangesBuilder rb{};
-		ImWchar rangesLatinExt[] =
-		{
-			0x0100, 0x017F,
-			0x0180, 0x024F,
-			0,
-		};
-		rb.AddRanges(io.Fonts->GetGlyphRangesDefault());
-		rb.AddRanges(rangesLatinExt);
-		rb.AddRanges(io.Fonts->GetGlyphRangesCyrillic());
-		rb.AddRanges(io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
-		rb.BuildRanges(&ranges);
+		CFontManager& fntMgr = CFontManager::GetInstance();
 
 		/* add user font */
 		if (!LinkArcDPSStyle && std::filesystem::exists(Path::F_FONT))
 		{
 			fontPath = Path::F_FONT;
-			std::string strFont = Path::F_FONT.string();
-			UserFont = io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize, nullptr, ranges.Data);
+			fntMgr.AddFont("USER_FONT", FontSize, fontPath.string().c_str(), FontReceiver, nullptr);
+			HasCustomFont = true;
 		}
 		else if (LinkArcDPSStyle && std::filesystem::exists(Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf"))
 		{
 			fontPath = Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf";
-			std::string strFont = (Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf").string();
-			UserFont = io.Fonts->AddFontFromFileTTF(strFont.c_str(), FontSize, nullptr, ranges.Data);
+			fntMgr.AddFont("USER_FONT", FontSize, fontPath.string().c_str(), FontReceiver, nullptr);
+			HasCustomFont = true;
 		}
 		else
 		{
-			UserFont = io.Fonts->AddFontDefault();
+			fntMgr.AddDefaultFont(FontReceiver);
 		}
 
-		/* add default font */
-		MonospaceFont = io.Fonts->AddFontDefault();
+		/* add default font for monospace */
+		fntMgr.AddDefaultFont(FontReceiver);
 
 		/* load gw2 fonts */
-		LPVOID resM{}; DWORD szM{};
+		/*LPVOID resM{}; DWORD szM{};
 		GetResource(NexusHandle, MAKEINTRESOURCE(RES_FONT_MENOMONIA), RT_FONT, &resM, &szM);
 
 		LPVOID resT{}; DWORD szT{};
-		GetResource(NexusHandle, MAKEINTRESOURCE(RES_FONT_TREBUCHET), RT_FONT, &resT, &szT);
+		GetResource(NexusHandle, MAKEINTRESOURCE(RES_FONT_TREBUCHET), RT_FONT, &resT, &szT);*/
 
 		{
 			const std::lock_guard<std::mutex> lock(Mutex);
 
 			ImFontConfig config;
 			config.MergeMode = true;
-
+			
 			/* small UI*/
-			FontIndex.emplace(EFont::Menomonia_Small, io.Fonts->AddFontFromMemoryTTF(resM, szM, 16.0f, 0, ranges.Data));
-			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 16.0f, &config, ranges.Data); }
-			FontIndex.emplace(EFont::MenomoniaBig_Small, io.Fonts->AddFontFromMemoryTTF(resM, szM, 22.0f, 0, ranges.Data));
-			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 22.0f, &config, ranges.Data); }
-			FontIndex.emplace(EFont::Trebuchet_Small, io.Fonts->AddFontFromMemoryTTF(resT, szT, 15.0f, 0, ranges.Data));
-			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 15.0f, &config, ranges.Data); }
+			fntMgr.AddFont("MENOMONIA_S", 16.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
+			if (!fontPath.empty()) { fntMgr.AddFont("MENOMONIA_S_MERGE", 16.0f, fontPath.string().c_str(), FontReceiver, &config); }
+			fntMgr.AddFont("MENOMONIA_BIG_S", 22.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
+			if (!fontPath.empty()) { fntMgr.AddFont("MENOMONIA_BIG_S_MERGE", 22.0f, fontPath.string().c_str(), FontReceiver, &config); }
+			fntMgr.AddFont("TREBUCHET_S", 15.0f, RES_FONT_TREBUCHET, NexusHandle, FontReceiver, nullptr);
+			if (!fontPath.empty()) { fntMgr.AddFont("TREBUCHET_S_MERGE", 15.0f, fontPath.string().c_str(), FontReceiver, &config); }
 
 			/* normal UI*/
-			FontIndex.emplace(EFont::Menomonia_Normal, io.Fonts->AddFontFromMemoryTTF(resM, szM, 18.0f, 0, ranges.Data));
-			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 18.0f, &config, ranges.Data); }
-			FontIndex.emplace(EFont::MenomoniaBig_Normal, io.Fonts->AddFontFromMemoryTTF(resM, szM, 24.0f, 0, ranges.Data));
-			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 24.0f, &config, ranges.Data); }
-			FontIndex.emplace(EFont::Trebuchet_Normal, io.Fonts->AddFontFromMemoryTTF(resT, szT, 16.0f, 0, ranges.Data));
-			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 16.0f, &config, ranges.Data); }
+			fntMgr.AddFont("MENOMONIA_N", 18.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
+			if (!fontPath.empty()) { fntMgr.AddFont("MENOMONIA_N_MERGE", 18.0f, fontPath.string().c_str(), FontReceiver, &config); }
+			fntMgr.AddFont("MENOMONIA_BIG_N", 24.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
+			if (!fontPath.empty()) { fntMgr.AddFont("MENOMONIA_BIG_N_MERGE", 24.0f, fontPath.string().c_str(), FontReceiver, &config); }
+			fntMgr.AddFont("TREBUCHET_N", 16.0f, RES_FONT_TREBUCHET, NexusHandle, FontReceiver, nullptr);
+			if (!fontPath.empty()) { fntMgr.AddFont("TREBUCHET_N_MERGE", 16.0f, fontPath.string().c_str(), FontReceiver, &config); }
 
 			/* large UI*/
-			FontIndex.emplace(EFont::Menomonia_Large, io.Fonts->AddFontFromMemoryTTF(resM, szM, 20.0f, 0, ranges.Data));
-			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 20.0f, &config, ranges.Data); }
-			FontIndex.emplace(EFont::MenomoniaBig_Large, io.Fonts->AddFontFromMemoryTTF(resM, szM, 26.0f, 0, ranges.Data));
-			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 26.0f, &config, ranges.Data); }
-			FontIndex.emplace(EFont::Trebuchet_Large, io.Fonts->AddFontFromMemoryTTF(resT, szT, 17.5f, 0, ranges.Data));
-			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 17.5f, &config, ranges.Data); }
+			fntMgr.AddFont("MENOMONIA_L", 20.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
+			if (!fontPath.empty()) { fntMgr.AddFont("MENOMONIA_L_MERGE", 20.0f, fontPath.string().c_str(), FontReceiver, &config); }
+			fntMgr.AddFont("MENOMONIA_BIG_L", 26.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
+			if (!fontPath.empty()) { fntMgr.AddFont("MENOMONIA_BIG_L_MERGE", 26.0f, fontPath.string().c_str(), FontReceiver, &config); }
+			fntMgr.AddFont("TREBUCHET_L", 17.5f, RES_FONT_TREBUCHET, NexusHandle, FontReceiver, nullptr);
+			if (!fontPath.empty()) { fntMgr.AddFont("TREBUCHET_L_MERGE", 17.5f, fontPath.string().c_str(), FontReceiver, &config); }
 
 			/* larger UI*/
-			FontIndex.emplace(EFont::Menomonia_Larger, io.Fonts->AddFontFromMemoryTTF(resM, szM, 22.0f, 0, ranges.Data));
-			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 22.0f, &config, ranges.Data); }
-			FontIndex.emplace(EFont::MenomoniaBig_Larger, io.Fonts->AddFontFromMemoryTTF(resM, szM, 28.0f, 0, ranges.Data));
-			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 28.0f, &config, ranges.Data); }
-			FontIndex.emplace(EFont::Trebuchet_Larger, io.Fonts->AddFontFromMemoryTTF(resT, szT, 19.5f, 0, ranges.Data));
-			if (!fontPath.empty()) { io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 19.5f, &config, ranges.Data); }
+			fntMgr.AddFont("MENOMONIA_XL", 22.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
+			if (!fontPath.empty()) { fntMgr.AddFont("MENOMONIA_XL_MERGE", 22.0f, fontPath.string().c_str(), FontReceiver, &config); }
+			fntMgr.AddFont("MENOMONIA_BIG_XL", 28.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
+			if (!fontPath.empty()) { fntMgr.AddFont("MENOMONIA_BIG_XL_MERGE", 28.0f, fontPath.string().c_str(), FontReceiver, &config); }
+			fntMgr.AddFont("TREBUCHET_XL", 19.5f, RES_FONT_TREBUCHET, NexusHandle, FontReceiver, nullptr);
+			if (!fontPath.empty()) { fntMgr.AddFont("TREBUCHET_XL_MERGE", 19.5f, fontPath.string().c_str(), FontReceiver, &config); }
 		}
 
-		io.Fonts->Build();
+		/*io.Fonts->Build();
+
+		io.Fonts->Clear(); // this probably leaks memory. oops.
+		io.Fonts->AddFontDefault();
+		io.Fonts->AddFontFromFileTTF("C:\\Program Files\\Guild Wars 2\\addons\\arcdps\\menomonia.ttf", 19.5f);
+		io.Fonts->AddFontFromFileTTF("C:\\Program Files\\Guild Wars 2\\addons\\arcdps\\segoeui.ttf", 19.5f);
+		io.Fonts->AddFontFromFileTTF("C:\\Program Files\\Guild Wars 2\\addons\\arcdps\\trugen.ttf", 19.5f);*/
 
 		Events::Subscribe(EV_MUMBLE_IDENTITY_UPDATED, OnMumbleIdentityChanged);
 		Events::Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", OnLanguageChanged);
@@ -926,6 +964,9 @@ namespace GUI
 				refCounter++;
 			}
 		}
+
+		CFontManager& fntMgr = CFontManager::GetInstance();
+		fntMgr.Verify(aStartAddress, aEndAddress);
 
 		return refCounter;
 	}
