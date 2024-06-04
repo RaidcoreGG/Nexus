@@ -728,7 +728,7 @@ namespace GUI
 			}
 			else
 			{
-				Settings::Settings[OPT_SHOWADDONSWINDOWAFTERDUU] = 1.0f;
+				Settings::Settings[OPT_SHOWADDONSWINDOWAFTERDUU] = false;
 			}
 
 			Renderer::Scaling = LastScaling * io.FontGlobalScale;
