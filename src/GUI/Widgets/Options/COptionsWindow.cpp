@@ -122,7 +122,7 @@ namespace GUI
 						Settings::Settings[OPT_CLOSEESCAPE] = GUI::CloseOnEscape;
 						Settings::Save();
 					}
-					if (ImGui::Checkbox(Language.Translate("((Show Addons Window when volatile addons get disabled))"), &GUI::ShowAddonsWindowAfterDUU))
+					if (ImGui::Checkbox(Language.Translate("((000086))"), &GUI::ShowAddonsWindowAfterDUU))
 					{
 						Settings::Settings[OPT_SHOWADDONSWINDOWAFTERDUU] = GUI::ShowAddonsWindowAfterDUU;
 						Settings::Save();

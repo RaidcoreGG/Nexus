@@ -211,7 +211,7 @@ namespace GUI
 
 						if (aAddon->Definitions->Provider == EUpdateProvider::GitHub)
 						{
-							if (ImGui::GW2::ContextMenuItem(("TogglePrereleases##" + sig).c_str(), aAddon->AllowPrereleases ? Language.Translate("((Disable Prereleases))") : Language.Translate("((Allow Prereleases))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+							if (ImGui::GW2::ContextMenuItem(("TogglePrereleases##" + sig).c_str(), aAddon->AllowPrereleases ? Language.Translate("((000085))") : Language.Translate("((000084))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 							{
 								aAddon->AllowPrereleases = !aAddon->AllowPrereleases;
 								Loader::SaveAddonConfig();

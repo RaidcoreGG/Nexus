@@ -842,7 +842,7 @@ namespace GUI
 		AddWindow(dbgWnd);
 		AddWindow(aboutWnd);
 
-		Menu::AddMenuItem("((Return to Game))",		ICON_RETURN,	RES_ICON_RETURN,	&Menu::Visible);
+		Menu::AddMenuItem("((000083))",		ICON_RETURN,	RES_ICON_RETURN,	&Menu::Visible);
 		Menu::AddMenuItem("((000003))",		ICON_ADDONS,	RES_ICON_ADDONS,	&addonsWnd->Visible);
 		Menu::AddMenuItem("((000004))",		ICON_OPTIONS,	RES_ICON_OPTIONS,	&opsWnd->Visible);
 		Menu::AddMenuItem("((000006))",		ICON_LOG,		RES_ICON_LOG,		&logWnd->Visible);
