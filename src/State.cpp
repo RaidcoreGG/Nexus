@@ -53,8 +53,6 @@ namespace State
 			if (cmp == "-ggdev") { IsDeveloperMode = true; }
 			if (cmp == "-ggvanilla") { IsVanilla = true; }
 			if (cmp == "-ggconsole") { IsConsoleEnabled = true; }
-			if (cmp == "-sharearchive") { MultiboxState |= EMultiboxState::ARCHIVE_SHARED; }
-			if (cmp == "-multi") { MultiboxState |= EMultiboxState::LOCAL_SHARED; }
 
 			if (cmp == "-mumble" && i + 1 <= argc)
 			{

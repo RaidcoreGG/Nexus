@@ -12,44 +12,58 @@
 #include <Windows.h>
 #include <winternl.h>
 #include <ntstatus.h>
-#include <chrono>
+#include <vector>
+#include <string>
 
-#include "Consts.h"
-#include "Shared.h"
-#include "State.h"
 #include "core.h"
+#include "Util/Strings.h"
 
 typedef struct _SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX
 {
-	PVOID Object;
-	ULONG_PTR UniqueProcessId;
-	ULONG_PTR HandleValue;
-	ULONG GrantedAccess;
-	USHORT CreatorBackTraceIndex;
-	USHORT ObjectTypeIndex;
-	ULONG HandleAttributes;
-	ULONG Reserved;
-} SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX, * PSYSTEM_HANDLE_TABLE_ENTRY_INFO_EX;
+	PVOID								Object;
+	ULONG_PTR							UniqueProcessId;
+	ULONG_PTR							HandleValue;
+	ULONG								GrantedAccess;
+	USHORT								CreatorBackTraceIndex;
+	USHORT								ObjectTypeIndex;
+	ULONG								HandleAttributes;
+	ULONG								Reserved;
+} SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX, *PSYSTEM_HANDLE_TABLE_ENTRY_INFO_EX;
 
 typedef struct _SYSTEM_HANDLE_INFORMATION_EX
 {
-	ULONG_PTR NumberOfHandles;
-	ULONG_PTR Reserved;
-	SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX Handles[1];
-} SYSTEM_HANDLE_INFORMATION_EX, * PSYSTEM_HANDLE_INFORMATION_EX;
+	ULONG_PTR							NumberOfHandles;
+	ULONG_PTR							Reserved;
+	SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX	Handles[1];
+} SYSTEM_HANDLE_INFORMATION_EX, *PSYSTEM_HANDLE_INFORMATION_EX;
 
-typedef NTSTATUS(* PFN_NTQUERYSYSTEMINFORMATION)(
-	SYSTEM_INFORMATION_CLASS SystemInformationClass,
-	PVOID                    SystemInformation,
-	ULONG                    SystemInformationLength,
-	PULONG                   ReturnLength
+typedef NTSTATUS(* PFN_NTQUERYSYSTEMINFORMATION)
+(
+	SYSTEM_INFORMATION_CLASS			SystemInformationClass,
+	PVOID								SystemInformation,
+	ULONG								SystemInformationLength,
+	PULONG								ReturnLength
 );
 
-NTSTATUS GetProcessHandles(std::vector<HANDLE>& handles)
+typedef NTSTATUS(*PFN_NTQUERYOBJECT)(
+	HANDLE								Handle,
+	OBJECT_INFORMATION_CLASS			ObjectInformationClass,
+	PVOID								ObjectInformation,
+	ULONG								ObjectInformationLength,
+	PULONG								ReturnLength
+);
+
+typedef NTSTATUS(*PFN_RTLINITUNICODESTRING)(
+	PUNICODE_STRING						DestinationString,
+	PCWSTR								SourceString
+);
+
+NTSTATUS GetProcessHandles(std::vector<HANDLE>& aHandles)
 {
 	NTSTATUS result;
 	ULONG bufferSize = 2048;
 	SYSTEM_HANDLE_INFORMATION_EX* info = nullptr;
+
 	do
 	{
 		delete[] info;
@@ -67,103 +81,101 @@ NTSTATUS GetProcessHandles(std::vector<HANDLE>& handles)
 		auto handle = info->Handles[i];
 		if (handle.UniqueProcessId == currentProcessId)
 		{
-			handles.push_back((HANDLE)handle.HandleValue);
+			aHandles.push_back((HANDLE)handle.HandleValue);
 		}
 	}
 
 	delete[] info;
+
 	return result;
 }
 
-typedef NTSTATUS(* PFN_NTQUERYOBJECT)(
-	HANDLE                   Handle,
-	OBJECT_INFORMATION_CLASS ObjectInformationClass,
-	PVOID                    ObjectInformation,
-	ULONG                    ObjectInformationLength,
-	PULONG                   ReturnLength
-);
-
-bool GetHandleName(HANDLE handle, PUNICODE_STRING name, ULONG nameSize)
+bool GetHandleName(HANDLE aHandle, PUNICODE_STRING aName, ULONG aNameSize)
 {
 	static PFN_NTQUERYOBJECT func;
 	FindFunction(GetModuleHandle("ntdll.dll"), &func, "NtQueryObject");
 
-	NTSTATUS result = func(handle, (OBJECT_INFORMATION_CLASS)0x01, name, nameSize,	&nameSize);
-	return NT_SUCCESS(result) ? true : false;
+	NTSTATUS result = func(aHandle, (OBJECT_INFORMATION_CLASS)0x01, aName, aNameSize, &aNameSize);
+	return NT_SUCCESS(result)
+		? true
+		: false;
 }
 
-bool UnicodeStringContains(PCUNICODE_STRING String1, PCUNICODE_STRING String2)
+bool UnicodeStringContains(PCUNICODE_STRING aStr1, PCUNICODE_STRING aStr2)
 {
-	if (String1->Buffer == nullptr && String2->Buffer == nullptr)
+	if (!aStr1->Buffer && !aStr2->Buffer)
 	{
 		return true;
 	}
-	if (String1->Buffer != nullptr && String2->Buffer != nullptr)
+
+	if (aStr1->Buffer && aStr2->Buffer)
 	{
-		return wcsstr(String1->Buffer, String2->Buffer) != nullptr;
+		return wcsstr(aStr1->Buffer, aStr2->Buffer) != nullptr;
 	}
+
 	return false;
 }
 
-typedef NTSTATUS(*PFN_RTLINITUNICODESTRING)(
-	PUNICODE_STRING DestinationString,
-	PCWSTR          SourceString
-);
-
 namespace Multibox
 {
-	void ShareArchive()
+	bool ShareArchive()
 	{
-		LogCritical(CH_CORE, "Multibox::ShareArchive() not implemented.");
-		return;
+		std::string cmdLine = String::ToLower(GetCommandLineA());
+		if (String::Contains(cmdLine, "-sharearchive"))
+		{
+			/* archive already shared via commandline arguments */
+			return true;
+		}
+
+		//LogCritical(CH_CORE, "Multibox::ShareArchive() not implemented.");
+
+		return false;
 	}
 
-	void ShareLocal()
+	bool ShareLocal()
 	{
-		LogCritical(CH_CORE, "Multibox::ShareLocal() not implemented.");
-		return;
+		std::string cmdLine = String::ToLower(GetCommandLineA());
+		if (String::Contains(cmdLine, "-multi"))
+		{
+			/* local archive already shared via commandline arguments */
+			return true;
+		}
+
+		//LogCritical(CH_CORE, "Multibox::ShareLocal() not implemented.");
+
+		return false;
 	}
 
-	void KillMutex()
+	bool KillMutex()
 	{
 		bool wasClosed = false;
-
-		auto start_time = std::chrono::high_resolution_clock::now();
 
 		ULONG handleNameSize = 2048;
 		UNICODE_STRING* handleName = (UNICODE_STRING*) new unsigned char[handleNameSize];
 
 		UNICODE_STRING mutexName;
-		static PFN_RTLINITUNICODESTRING func;
-		FindFunction(GetModuleHandle("ntdll.dll"), &func, "RtlInitUnicodeString");
-		func(&mutexName, L"AN-Mutex-Window-Guild Wars 2");
-
-		std::vector<HANDLE> handles;
-		GetProcessHandles(handles);
-
-		for (int i = 0; i < handles.size(); i++)
+		PFN_RTLINITUNICODESTRING func;
+		if (FindFunction(GetModuleHandle("ntdll.dll"), &func, "RtlInitUnicodeString"))
 		{
-			HANDLE handle = handles[i];
-			if (GetHandleName(handle, handleName, handleNameSize) && UnicodeStringContains(handleName, &mutexName))
+			func(&mutexName, L"AN-Mutex-Window-Guild Wars 2");
+
+			std::vector<HANDLE> handles;
+			GetProcessHandles(handles);
+
+			for (int i = 0; i < handles.size(); i++)
 			{
-				CloseHandle(handle);
-				wasClosed = true;
-				break;
+				HANDLE handle = handles[i];
+				if (GetHandleName(handle, handleName, handleNameSize) && UnicodeStringContains(handleName, &mutexName))
+				{
+					CloseHandle(handle);
+					wasClosed = true;
+					break;
+				}
 			}
 		}
 
 		delete[] handleName;
 
-		auto end_time = std::chrono::high_resolution_clock::now();
-		auto time = end_time - start_time;
-		if (wasClosed)
-		{
-			State::MultiboxState |= EMultiboxState::MUTEX_CLOSED;
-			LogInfo(CH_CORE, "Destroyed \"AN-Mutex-Window-Guild Wars 2\" in %ums.", time / std::chrono::milliseconds(1));
-		}
-		else
-		{
-			LogWarning(CH_CORE, "No mutex was closed.");
-		}
+		return wasClosed;
 	}
 }

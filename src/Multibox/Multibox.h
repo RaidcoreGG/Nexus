@@ -18,19 +18,19 @@ namespace Multibox
 	/// ShareArchive:
 	/// 	Shares the game archive that prevents the game client from opening multiple times.
 	///----------------------------------------------------------------------------------------------------
-	void ShareArchive();
+	bool ShareArchive();
 
 	///----------------------------------------------------------------------------------------------------
 	/// ShareLocal:
 	/// 	Shares the local archive that prevents the game client from opening multiple times.
 	///----------------------------------------------------------------------------------------------------
-	void ShareLocal();
+	bool ShareLocal();
 
 	///----------------------------------------------------------------------------------------------------
 	/// KillMutex:
 	/// 	Kills the mutex that prevents the game client from opening multiple times.
 	///----------------------------------------------------------------------------------------------------
-	void KillMutex();
+	bool KillMutex();
 }
 
 #endif

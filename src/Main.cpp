@@ -88,7 +88,10 @@ namespace Main
 		/* Don't initialize anything if vanilla */
 		if (!State::IsVanilla)
 		{
-			Multibox::KillMutex();
+			if (Multibox::ShareArchive())	{ State::MultiboxState |= EMultiboxState::ARCHIVE_SHARED; }
+			if (Multibox::ShareLocal())		{ State::MultiboxState |= EMultiboxState::LOCAL_SHARED; }
+			if (Multibox::KillMutex())		{ State::MultiboxState |= EMultiboxState::MUTEX_CLOSED; }
+			LogInfo(CH_CORE, "Multibox State: %d", State::MultiboxState);
 
 			UnpackLocales();
 			Language.SetLocaleDirectory(Path::D_GW2_ADDONS_RAIDCORE_LOCALES);
