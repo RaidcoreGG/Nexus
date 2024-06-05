@@ -1,0 +1,516 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\API\ActiveToken.cpp" />
+    <ClCompile Include="src\API\ApiClient.cpp" />
+    <ClCompile Include="src\API\APIController.cpp" />
+    <ClCompile Include="src\Consts.cpp" />
+    <ClCompile Include="src\core.cpp" />
+    <ClCompile Include="src\CrashHandler.cpp" />
+    <ClCompile Include="src\DataLink\DataLink.cpp" />
+    <ClCompile Include="src\Events\EventSubscriber.cpp" />
+    <ClCompile Include="src\GUI\Fonts\FontManager.cpp" />
+    <ClCompile Include="src\GUI\Widgets\Alerts\Alerts.cpp" />
+    <ClCompile Include="src\GUI\Widgets\Options\COptionsWindow.cpp" />
+    <ClCompile Include="src\Loader\ArcDPS.cpp" />
+    <ClCompile Include="src\Loader\EUpdateProvider.cpp" />
+    <ClCompile Include="src\Loader\Library.cpp" />
+    <ClCompile Include="src\Localization\Localization.cpp" />
+    <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\Events\EventHandler.cpp" />
+    <ClCompile Include="src\GUI\GUI.cpp" />
+    <ClCompile Include="src\GUI\Widgets\About\CAboutBox.cpp" />
+    <ClCompile Include="src\GUI\Widgets\Addons\AddonItem.cpp" />
+    <ClCompile Include="src\GUI\Widgets\Addons\CAddonsWindow.cpp" />
+    <ClCompile Include="src\GUI\Widgets\Debug\CDebugWindow.cpp" />
+    <ClCompile Include="src\GUI\Widgets\EULA\CEULAModal.cpp" />
+    <ClCompile Include="src\GUI\Widgets\Log\CLogWindow.cpp" />
+    <ClCompile Include="src\GUI\Widgets\Menu\Menu.cpp" />
+    <ClCompile Include="src\GUI\Widgets\Menu\MenuItem.cpp" />
+    <ClCompile Include="src\GUI\Widgets\Overlay\CMumbleOverlay.cpp" />
+    <ClCompile Include="src\GUI\Widgets\QuickAccess\QuickAccess.cpp" />
+    <ClCompile Include="src\Hooks.cpp" />
+    <ClCompile Include="src\imgui\imgui.cpp" />
+    <ClCompile Include="src\imgui\imgui_draw.cpp" />
+    <ClCompile Include="src\imgui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="src\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="src\imgui\imgui_tables.cpp" />
+    <ClCompile Include="src\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\Keybinds\Keybind.cpp" />
+    <ClCompile Include="src\Keybinds\KeybindHandler.cpp" />
+    <ClCompile Include="src\Loader\AddonDefinition.cpp" />
+    <ClCompile Include="src\Loader\EAddonFlags.cpp" />
+    <ClCompile Include="src\Loader\Loader.cpp" />
+    <ClCompile Include="src\Logging\CFileLogger.cpp" />
+    <ClCompile Include="src\Logging\ILogger.cpp" />
+    <ClCompile Include="src\Logging\LogEntry.cpp" />
+    <ClCompile Include="src\Logging\LogHandler.cpp" />
+    <ClCompile Include="src\Logging\CConsoleLogger.cpp" />
+    <ClCompile Include="src\minhook\mh_buffer.cpp" />
+    <ClCompile Include="src\minhook\mh_disasm.cpp" />
+    <ClCompile Include="src\minhook\mh_hook.cpp" />
+    <ClCompile Include="src\minhook\mh_trampoline.cpp" />
+    <ClCompile Include="src\Multibox\Multibox.cpp" />
+    <ClCompile Include="src\Mumble\Identity.cpp" />
+    <ClCompile Include="src\Mumble\Mumble.cpp" />
+    <ClCompile Include="src\Paths.cpp" />
+    <ClCompile Include="src\Proxy.cpp" />
+    <ClCompile Include="src\Renderer.cpp" />
+    <ClCompile Include="src\Settings\Settings.cpp" />
+    <ClCompile Include="src\Shared.cpp" />
+    <ClCompile Include="src\State.cpp" />
+    <ClCompile Include="src\Textures\TextureLoader.cpp" />
+    <ClCompile Include="src\types.cpp" />
+    <ClCompile Include="src\Updater\Updater.cpp" />
+    <ClCompile Include="src\Util\Base64.cpp" />
+    <ClCompile Include="src\Util\MD5.cpp" />
+    <ClCompile Include="src\Util\Strings.cpp" />
+    <ClCompile Include="src\Util\Url.cpp" />
+    <ClCompile Include="src\WndProc\WndProcHandler.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\API\ApiClient.h" />
+    <ClInclude Include="src\API\APIController.h" />
+    <ClInclude Include="src\API\ActiveToken.h" />
+    <ClInclude Include="src\API\APIRequest.h" />
+    <ClInclude Include="src\API\APIResponse.h" />
+    <ClInclude Include="src\API\CachedResponse.h" />
+    <ClInclude Include="src\Branch.h" />
+    <ClInclude Include="src\Certs.h" />
+    <ClInclude Include="src\Consts.h" />
+    <ClInclude Include="src\core.h" />
+    <ClInclude Include="src\CrashHandler.h" />
+    <ClInclude Include="src\DataLink\DataLink.h" />
+    <ClInclude Include="src\DataLink\FuncDefs.h" />
+    <ClInclude Include="src\DataLink\LinkedResource.h" />
+    <ClInclude Include="src\Events\EventHandler.h" />
+    <ClInclude Include="src\Events\EventSubscriber.h" />
+    <ClInclude Include="src\Events\FuncDefs.h" />
+    <ClInclude Include="src\GUI\EFontIdentifier.h" />
+    <ClInclude Include="src\GUI\ERenderType.h" />
+    <ClInclude Include="src\GUI\Fonts\FontManager.h" />
+    <ClInclude Include="src\GUI\Fonts\FuncDefs.h" />
+    <ClInclude Include="src\GUI\FuncDefs.h" />
+    <ClInclude Include="src\GUI\GUI.h" />
+    <ClInclude Include="src\GUI\IWindow.h" />
+    <ClInclude Include="src\GUI\Widgets\About\CAboutBox.h" />
+    <ClInclude Include="src\GUI\Widgets\Addons\AddonItem.h" />
+    <ClInclude Include="src\GUI\Widgets\Addons\CAddonsWindow.h" />
+    <ClInclude Include="src\GUI\Widgets\Alerts\Alerts.h" />
+    <ClInclude Include="src\GUI\Widgets\Alerts\FuncDefs.h" />
+    <ClInclude Include="src\GUI\Widgets\Debug\CDebugWindow.h" />
+    <ClInclude Include="src\GUI\Widgets\EULA\CEULAModal.h" />
+    <ClInclude Include="src\GUI\Widgets\Log\CLogWindow.h" />
+    <ClInclude Include="src\GUI\Widgets\Menu\Menu.h" />
+    <ClInclude Include="src\GUI\Widgets\Menu\MenuItem.h" />
+    <ClInclude Include="src\GUI\Widgets\Options\COptionsWindow.h" />
+    <ClInclude Include="src\GUI\Widgets\Overlay\CMumbleOverlay.h" />
+    <ClInclude Include="src\GUI\Widgets\QuickAccess\EQAPosition.h" />
+    <ClInclude Include="src\GUI\Widgets\QuickAccess\FuncDefs.h" />
+    <ClInclude Include="src\GUI\Widgets\QuickAccess\QuickAccess.h" />
+    <ClInclude Include="src\GUI\Widgets\QuickAccess\Shortcut.h" />
+    <ClInclude Include="src\Hooks.h" />
+    <ClInclude Include="src\httplib\httplib.h" />
+    <ClInclude Include="src\imgui\imconfig.h" />
+    <ClInclude Include="src\imgui\imgui.h" />
+    <ClInclude Include="src\imgui\imgui_extensions.h" />
+    <ClInclude Include="src\imgui\imgui_impl_dx11.h" />
+    <ClInclude Include="src\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="src\imgui\imgui_internal.h" />
+    <ClInclude Include="src\imgui\imgui_memory_editor.h" />
+    <ClInclude Include="src\imgui\imstb_rectpack.h" />
+    <ClInclude Include="src\imgui\imstb_textedit.h" />
+    <ClInclude Include="src\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\Keybinds\ActiveKeybind.h" />
+    <ClInclude Include="src\Keybinds\FuncDefs.h" />
+    <ClInclude Include="src\Keybinds\Keybind.h" />
+    <ClInclude Include="src\Keybinds\KeybindHandler.h" />
+    <ClInclude Include="src\Keybinds\KeystrokeMessageFlags.h" />
+    <ClInclude Include="src\Loader\Addon.h" />
+    <ClInclude Include="src\Loader\ArcDPS.h" />
+    <ClInclude Include="src\Loader\EAddonFlags.h" />
+    <ClInclude Include="src\Loader\EAddonState.h" />
+    <ClInclude Include="src\Loader\ELoaderAction.h" />
+    <ClInclude Include="src\Loader\FuncDefs.h" />
+    <ClInclude Include="src\Loader\Library.h" />
+    <ClInclude Include="src\Loader\LibraryAddon.h" />
+    <ClInclude Include="src\Loader\Loader.h" />
+    <ClInclude Include="src\Loader\NexusLinkData.h" />
+    <ClInclude Include="src\Localization\FuncDefs.h" />
+    <ClInclude Include="src\Localization\Localization.h" />
+    <ClInclude Include="src\Logging\FuncDefs.h" />
+    <ClInclude Include="src\Main.h" />
+    <ClInclude Include="src\Multibox\Multibox.h" />
+    <ClInclude Include="src\Mumble\Compass.h" />
+    <ClInclude Include="src\Mumble\Context.h" />
+    <ClInclude Include="src\Mumble\EMapType.h" />
+    <ClInclude Include="src\Mumble\EMountIndex.h" />
+    <ClInclude Include="src\Mumble\EProfession.h" />
+    <ClInclude Include="src\Mumble\ERace.h" />
+    <ClInclude Include="src\Mumble\ESpecialization.h" />
+    <ClInclude Include="src\Mumble\EUIScale.h" />
+    <ClInclude Include="src\Mumble\Identity.h" />
+    <ClInclude Include="src\Mumble\LinkedMem.h" />
+    <ClInclude Include="src\nlohmann\json.hpp" />
+    <ClInclude Include="src\openssl\aes.h" />
+    <ClInclude Include="src\openssl\asn1.h" />
+    <ClInclude Include="src\openssl\asn1err.h" />
+    <ClInclude Include="src\openssl\asn1t.h" />
+    <ClInclude Include="src\openssl\asn1_mac.h" />
+    <ClInclude Include="src\openssl\async.h" />
+    <ClInclude Include="src\openssl\asyncerr.h" />
+    <ClInclude Include="src\openssl\bio.h" />
+    <ClInclude Include="src\openssl\bioerr.h" />
+    <ClInclude Include="src\openssl\blowfish.h" />
+    <ClInclude Include="src\openssl\bn.h" />
+    <ClInclude Include="src\openssl\bnerr.h" />
+    <ClInclude Include="src\openssl\buffer.h" />
+    <ClInclude Include="src\openssl\buffererr.h" />
+    <ClInclude Include="src\openssl\camellia.h" />
+    <ClInclude Include="src\openssl\cast.h" />
+    <ClInclude Include="src\openssl\cmac.h" />
+    <ClInclude Include="src\openssl\cmp.h" />
+    <ClInclude Include="src\openssl\cmperr.h" />
+    <ClInclude Include="src\openssl\cmp_util.h" />
+    <ClInclude Include="src\openssl\cms.h" />
+    <ClInclude Include="src\openssl\cmserr.h" />
+    <ClInclude Include="src\openssl\comp.h" />
+    <ClInclude Include="src\openssl\comperr.h" />
+    <ClInclude Include="src\openssl\conf.h" />
+    <ClInclude Include="src\openssl\conferr.h" />
+    <ClInclude Include="src\openssl\configuration.h" />
+    <ClInclude Include="src\openssl\conftypes.h" />
+    <ClInclude Include="src\openssl\conf_api.h" />
+    <ClInclude Include="src\openssl\core.h" />
+    <ClInclude Include="src\openssl\core_dispatch.h" />
+    <ClInclude Include="src\openssl\core_names.h" />
+    <ClInclude Include="src\openssl\core_object.h" />
+    <ClInclude Include="src\openssl\crmf.h" />
+    <ClInclude Include="src\openssl\crmferr.h" />
+    <ClInclude Include="src\openssl\crypto.h" />
+    <ClInclude Include="src\openssl\cryptoerr.h" />
+    <ClInclude Include="src\openssl\cryptoerr_legacy.h" />
+    <ClInclude Include="src\openssl\ct.h" />
+    <ClInclude Include="src\openssl\cterr.h" />
+    <ClInclude Include="src\openssl\decoder.h" />
+    <ClInclude Include="src\openssl\decodererr.h" />
+    <ClInclude Include="src\openssl\des.h" />
+    <ClInclude Include="src\openssl\dh.h" />
+    <ClInclude Include="src\openssl\dherr.h" />
+    <ClInclude Include="src\openssl\dsa.h" />
+    <ClInclude Include="src\openssl\dsaerr.h" />
+    <ClInclude Include="src\openssl\dtls1.h" />
+    <ClInclude Include="src\openssl\ebcdic.h" />
+    <ClInclude Include="src\openssl\ec.h" />
+    <ClInclude Include="src\openssl\ecdh.h" />
+    <ClInclude Include="src\openssl\ecdsa.h" />
+    <ClInclude Include="src\openssl\ecerr.h" />
+    <ClInclude Include="src\openssl\encoder.h" />
+    <ClInclude Include="src\openssl\encodererr.h" />
+    <ClInclude Include="src\openssl\engine.h" />
+    <ClInclude Include="src\openssl\engineerr.h" />
+    <ClInclude Include="src\openssl\err.h" />
+    <ClInclude Include="src\openssl\ess.h" />
+    <ClInclude Include="src\openssl\esserr.h" />
+    <ClInclude Include="src\openssl\evp.h" />
+    <ClInclude Include="src\openssl\evperr.h" />
+    <ClInclude Include="src\openssl\e_os2.h" />
+    <ClInclude Include="src\openssl\fipskey.h" />
+    <ClInclude Include="src\openssl\fips_names.h" />
+    <ClInclude Include="src\openssl\hmac.h" />
+    <ClInclude Include="src\openssl\http.h" />
+    <ClInclude Include="src\openssl\httperr.h" />
+    <ClInclude Include="src\openssl\idea.h" />
+    <ClInclude Include="src\openssl\kdf.h" />
+    <ClInclude Include="src\openssl\kdferr.h" />
+    <ClInclude Include="src\openssl\lhash.h" />
+    <ClInclude Include="src\openssl\macros.h" />
+    <ClInclude Include="src\openssl\md2.h" />
+    <ClInclude Include="src\openssl\md4.h" />
+    <ClInclude Include="src\openssl\md5.h" />
+    <ClInclude Include="src\openssl\mdc2.h" />
+    <ClInclude Include="src\openssl\modes.h" />
+    <ClInclude Include="src\openssl\objects.h" />
+    <ClInclude Include="src\openssl\objectserr.h" />
+    <ClInclude Include="src\openssl\obj_mac.h" />
+    <ClInclude Include="src\openssl\ocsp.h" />
+    <ClInclude Include="src\openssl\ocsperr.h" />
+    <ClInclude Include="src\openssl\opensslconf.h" />
+    <ClInclude Include="src\openssl\opensslv.h" />
+    <ClInclude Include="src\openssl\ossl_typ.h" />
+    <ClInclude Include="src\openssl\params.h" />
+    <ClInclude Include="src\openssl\param_build.h" />
+    <ClInclude Include="src\openssl\pem.h" />
+    <ClInclude Include="src\openssl\pem2.h" />
+    <ClInclude Include="src\openssl\pemerr.h" />
+    <ClInclude Include="src\openssl\pkcs12.h" />
+    <ClInclude Include="src\openssl\pkcs12err.h" />
+    <ClInclude Include="src\openssl\pkcs7.h" />
+    <ClInclude Include="src\openssl\pkcs7err.h" />
+    <ClInclude Include="src\openssl\proverr.h" />
+    <ClInclude Include="src\openssl\provider.h" />
+    <ClInclude Include="src\openssl\prov_ssl.h" />
+    <ClInclude Include="src\openssl\rand.h" />
+    <ClInclude Include="src\openssl\randerr.h" />
+    <ClInclude Include="src\openssl\rc2.h" />
+    <ClInclude Include="src\openssl\rc4.h" />
+    <ClInclude Include="src\openssl\rc5.h" />
+    <ClInclude Include="src\openssl\ripemd.h" />
+    <ClInclude Include="src\openssl\rsa.h" />
+    <ClInclude Include="src\openssl\rsaerr.h" />
+    <ClInclude Include="src\openssl\safestack.h" />
+    <ClInclude Include="src\openssl\seed.h" />
+    <ClInclude Include="src\openssl\self_test.h" />
+    <ClInclude Include="src\openssl\sha.h" />
+    <ClInclude Include="src\openssl\srp.h" />
+    <ClInclude Include="src\openssl\srtp.h" />
+    <ClInclude Include="src\openssl\ssl.h" />
+    <ClInclude Include="src\openssl\ssl2.h" />
+    <ClInclude Include="src\openssl\ssl3.h" />
+    <ClInclude Include="src\openssl\sslerr.h" />
+    <ClInclude Include="src\openssl\sslerr_legacy.h" />
+    <ClInclude Include="src\openssl\stack.h" />
+    <ClInclude Include="src\openssl\store.h" />
+    <ClInclude Include="src\openssl\storeerr.h" />
+    <ClInclude Include="src\openssl\symhacks.h" />
+    <ClInclude Include="src\openssl\tls1.h" />
+    <ClInclude Include="src\openssl\trace.h" />
+    <ClInclude Include="src\openssl\ts.h" />
+    <ClInclude Include="src\openssl\tserr.h" />
+    <ClInclude Include="src\openssl\txt_db.h" />
+    <ClInclude Include="src\openssl\types.h" />
+    <ClInclude Include="src\openssl\ui.h" />
+    <ClInclude Include="src\openssl\uierr.h" />
+    <ClInclude Include="src\openssl\whrlpool.h" />
+    <ClInclude Include="src\openssl\x509.h" />
+    <ClInclude Include="src\openssl\x509err.h" />
+    <ClInclude Include="src\openssl\x509v3.h" />
+    <ClInclude Include="src\openssl\x509v3err.h" />
+    <ClInclude Include="src\openssl\x509_vfy.h" />
+    <ClInclude Include="src\openssl\__DECC_INCLUDE_EPILOGUE.H" />
+    <ClInclude Include="src\openssl\__DECC_INCLUDE_PROLOGUE.H" />
+    <ClInclude Include="src\Paths.h" />
+    <ClInclude Include="src\Loader\AddonDefinition.h" />
+    <ClInclude Include="src\Loader\EUpdateProvider.h" />
+    <ClInclude Include="src\Loader\AddonAPI.h" />
+    <ClInclude Include="src\Logging\CFileLogger.h" />
+    <ClInclude Include="src\Logging\ILogger.h" />
+    <ClInclude Include="src\Logging\LogEntry.h" />
+    <ClInclude Include="src\Logging\LogHandler.h" />
+    <ClInclude Include="src\Logging\ELogLevel.h" />
+    <ClInclude Include="src\Logging\CConsoleLogger.h" />
+    <ClInclude Include="src\minhook\mh_buffer.h" />
+    <ClInclude Include="src\minhook\mh_disasm.h" />
+    <ClInclude Include="src\minhook\mh_hook.h" />
+    <ClInclude Include="src\minhook\mh_trampoline.h" />
+    <ClInclude Include="src\Mumble\Mumble.h" />
+    <ClInclude Include="src\Paths\FuncDefs.h" />
+    <ClInclude Include="src\Proxy.h" />
+    <ClInclude Include="src\Renderer.h" />
+    <ClInclude Include="src\resource.h" />
+    <ClInclude Include="src\Settings\Settings.h" />
+    <ClInclude Include="src\Shared.h" />
+    <ClInclude Include="src\State.h" />
+    <ClInclude Include="src\stb\stb_image.h" />
+    <ClInclude Include="src\Textures\FuncDefs.h" />
+    <ClInclude Include="src\Textures\QueuedTexture.h" />
+    <ClInclude Include="src\Textures\Texture.h" />
+    <ClInclude Include="src\Textures\TextureLoader.h" />
+    <ClInclude Include="src\types.h" />
+    <ClInclude Include="src\Updater\FuncDefs.h" />
+    <ClInclude Include="src\Updater\Updater.h" />
+    <ClInclude Include="src\Util\Base64.h" />
+    <ClInclude Include="src\Util\MD5.h" />
+    <ClInclude Include="src\Util\Strings.h" />
+    <ClInclude Include="src\Util\Url.h" />
+    <ClInclude Include="src\Version.h" />
+    <ClInclude Include="src\WndProc\FuncDefs.h" />
+    <ClInclude Include="src\WndProc\WndProcHandler.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="src\Nexus.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\exports.def" />
+    <None Include="src\Resources\bin64\arcdps_integration64.dll" />
+    <None Include="src\Resources\Locales\br_Main.json" />
+    <None Include="src\Resources\Locales\de_Main.json" />
+    <None Include="src\Resources\Locales\en_Main.json" />
+    <None Include="src\Resources\Locales\es_Main.json" />
+    <None Include="src\Resources\Locales\it_Main.json" />
+    <None Include="src\Resources\Locales\ru_Main.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="src\Resources\Fonts\Menomonia.ttf" />
+    <Font Include="src\Resources\Fonts\ProggyClean.ttf" />
+    <Font Include="src\Resources\Fonts\TrebuchetMS.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="src\Resources\AddonsWindow\AddonItem.png" />
+    <Image Include="src\Resources\AddonsWindow\AddonItem_DUU.png" />
+    <Image Include="src\Resources\AddonsWindow\AddonItem_Highlight.png" />
+    <Image Include="src\Resources\AddonsWidow\Background.png" />
+    <Image Include="src\Resources\AddonsWindow\TitleBar.png" />
+    <Image Include="src\Resources\AddonsWindow\TitleBar_Hover.png" />
+    <Image Include="src\Resources\BtnClose.png" />
+    <Image Include="src\Resources\BtnClose_Hover.png" />
+    <Image Include="src\Resources\BtnRefresh.png" />
+    <Image Include="src\Resources\BtnRefresh_Hover.png" />
+    <Image Include="src\Resources\ContextMenu\ContextMenu_Bullet.png" />
+    <Image Include="src\Resources\ContextMenu\ContextMenu_Highlight.png" />
+    <Image Include="src\Resources\EulaWindow\Background.png" />
+    <Image Include="src\Resources\EulaWindow\TitleBar.png" />
+    <Image Include="src\Resources\EulaWindow\TitleBar_Hover.png" />
+    <Image Include="src\Resources\Menu\Background.png" />
+    <Image Include="src\Resources\Menu\BtnAbout.png" />
+    <Image Include="src\Resources\Menu\BtnAddons.png" />
+    <Image Include="src\Resources\Menu\BtnChangelog.png" />
+    <Image Include="src\Resources\Menu\BtnDebug.png" />
+    <Image Include="src\Resources\Menu\BtnLog.png" />
+    <Image Include="src\Resources\Menu\BtnOptions.png" />
+    <Image Include="src\Resources\Menu\BtnOptions_Hover.png" />
+    <Image Include="src\Resources\Menu\BtnReturn.png" />
+    <Image Include="src\Resources\Menu\MenuItem.png" />
+    <Image Include="src\Resources\Menu\MenuItem_Hover.png" />
+    <Image Include="src\Resources\Notification.png" />
+    <Image Include="src\Resources\QuickAccess\Generic.png" />
+    <Image Include="src\Resources\QuickAccess\Generic_Hover.png" />
+    <Image Include="src\Resources\QuickAccess\Nexus.png" />
+    <Image Include="src\Resources\QuickAccess\NexusHalloween.png" />
+    <Image Include="src\Resources\QuickAccess\NexusHalloween_Hover.png" />
+    <Image Include="src\Resources\QuickAccess\NexusXmas.png" />
+    <Image Include="src\Resources\QuickAccess\NexusXmas_Hover.png" />
+    <Image Include="src\Resources\QuickAccess\Nexus_Hover.png" />
+    <Image Include="src\Resources\TabBtn.png" />
+    <Image Include="src\Resources\TabBtn_Hover.png" />
+    <Image Include="src\Resources\TitleBarEnd.png" />
+    <Image Include="src\Resources\TitleBarEnd_Hover.png" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{70b0e807-04cf-46a6-b838-7904e154581e}</ProjectGuid>
+    <RootNamespace>Nexus</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Nexus</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="src\GlobalPropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="src\GlobalPropertySheet.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>d3d11</TargetName>
+    <OutDir>$(SolutionDir)$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)$(Platform)\</IntDir>
+    <IncludePath>$(ProjectDir)src\;$(ProjectDir)src\imgui;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)src\openssl\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>d3d11</TargetName>
+    <OutDir>$(SolutionDir)$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)$(Platform)\</IntDir>
+    <IncludePath>$(ProjectDir)src\;$(ProjectDir)src\imgui;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)src\openssl\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;NEXUS_EXPORTS;_WINDOWS;_USRDLL;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <ModuleDefinitionFile>src\exports.def</ModuleDefinitionFile>
+      <AdditionalDependencies>Shlwapi.lib;PathCch.lib;Shell32.lib;Psapi.lib;libssl.lib;libcrypto.lib;ws2_32.lib;gdi32.lib;advapi32.lib;crypt32.lib;user32.lib</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>CALL $(SolutionDir)Scripts\branch.bat
+CALL $(SolutionDir)Scripts\version.bat</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;NEXUS_EXPORTS;_WINDOWS;_USRDLL;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <ModuleDefinitionFile>src\exports.def</ModuleDefinitionFile>
+      <AdditionalDependencies>Shlwapi.lib;PathCch.lib;Shell32.lib;Psapi.lib;libssl.lib;libcrypto.lib;ws2_32.lib;gdi32.lib;advapi32.lib;crypt32.lib;user32.lib;ntdll.lib</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>CALL $(SolutionDir)Scripts\branch.bat
+CALL $(SolutionDir)Scripts\version.bat</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

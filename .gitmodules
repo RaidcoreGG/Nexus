@@ -1,3 +1,6 @@
 [submodule "src/Resources/Locales"]
 	path = src/Resources/Locales
 	url = https://github.com/RaidcoreGG/Nexus-Translations
+[submodule "Scripts"]
+	path = Scripts
+	url = https://github.com/RaidcoreGG/RCGG-Scripts

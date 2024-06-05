@@ -150,1139 +150,1139 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
+    <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="imgui\imgui_widgets.cpp">
+    <ClCompile Include="src\imgui\imgui_widgets.cpp">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="imgui\imgui_tables.cpp">
+    <ClCompile Include="src\imgui\imgui_tables.cpp">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="imgui\imgui_draw.cpp">
+    <ClCompile Include="src\imgui\imgui_draw.cpp">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="imgui\imgui.cpp">
+    <ClCompile Include="src\imgui\imgui.cpp">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="imgui\imgui_impl_win32.cpp">
+    <ClCompile Include="src\imgui\imgui_impl_win32.cpp">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="imgui\imgui_impl_dx11.cpp">
+    <ClCompile Include="src\imgui\imgui_impl_dx11.cpp">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="minhook\mh_buffer.cpp">
+    <ClCompile Include="src\minhook\mh_buffer.cpp">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClCompile>
-    <ClCompile Include="minhook\mh_disasm.cpp">
+    <ClCompile Include="src\minhook\mh_disasm.cpp">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClCompile>
-    <ClCompile Include="minhook\mh_hook.cpp">
+    <ClCompile Include="src\minhook\mh_hook.cpp">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClCompile>
-    <ClCompile Include="minhook\mh_trampoline.cpp">
+    <ClCompile Include="src\minhook\mh_trampoline.cpp">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClCompile>
-    <ClCompile Include="Logging\CFileLogger.cpp">
+    <ClCompile Include="src\Logging\CFileLogger.cpp">
       <Filter>Logging</Filter>
     </ClCompile>
-    <ClCompile Include="Logging\ILogger.cpp">
+    <ClCompile Include="src\Logging\ILogger.cpp">
       <Filter>Logging</Filter>
     </ClCompile>
-    <ClCompile Include="Logging\LogEntry.cpp">
+    <ClCompile Include="src\Logging\LogEntry.cpp">
       <Filter>Logging</Filter>
     </ClCompile>
-    <ClCompile Include="Logging\LogHandler.cpp">
+    <ClCompile Include="src\Logging\LogHandler.cpp">
       <Filter>Logging</Filter>
     </ClCompile>
-    <ClCompile Include="Logging\CConsoleLogger.cpp">
+    <ClCompile Include="src\Logging\CConsoleLogger.cpp">
       <Filter>Logging</Filter>
     </ClCompile>
-    <ClCompile Include="core.cpp">
+    <ClCompile Include="src\core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mumble\Mumble.cpp">
+    <ClCompile Include="src\Mumble\Mumble.cpp">
       <Filter>Mumble</Filter>
     </ClCompile>
-    <ClCompile Include="Events\EventHandler.cpp">
+    <ClCompile Include="src\Events\EventHandler.cpp">
       <Filter>Events</Filter>
     </ClCompile>
-    <ClCompile Include="Keybinds\KeybindHandler.cpp">
+    <ClCompile Include="src\Keybinds\KeybindHandler.cpp">
       <Filter>Keybinds</Filter>
     </ClCompile>
-    <ClCompile Include="Paths.cpp">
+    <ClCompile Include="src\Paths.cpp">
       <Filter>_GLOBAL</Filter>
     </ClCompile>
-    <ClCompile Include="State.cpp">
+    <ClCompile Include="src\State.cpp">
       <Filter>_GLOBAL</Filter>
     </ClCompile>
-    <ClCompile Include="Hooks.cpp">
+    <ClCompile Include="src\Hooks.cpp">
       <Filter>_GLOBAL</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer.cpp">
+    <ClCompile Include="src\Renderer.cpp">
       <Filter>_GLOBAL</Filter>
     </ClCompile>
-    <ClCompile Include="Shared.cpp">
+    <ClCompile Include="src\Shared.cpp">
       <Filter>_GLOBAL</Filter>
     </ClCompile>
-    <ClCompile Include="Keybinds\Keybind.cpp">
+    <ClCompile Include="src\Keybinds\Keybind.cpp">
       <Filter>Keybinds</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\GUI.cpp">
+    <ClCompile Include="src\GUI\GUI.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\About\CAboutBox.cpp">
+    <ClCompile Include="src\GUI\Widgets\About\CAboutBox.cpp">
       <Filter>GUI\Widgets\About</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\Addons\CAddonsWindow.cpp">
+    <ClCompile Include="src\GUI\Widgets\Addons\CAddonsWindow.cpp">
       <Filter>GUI\Widgets\Addons</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\Log\CLogWindow.cpp">
+    <ClCompile Include="src\GUI\Widgets\Log\CLogWindow.cpp">
       <Filter>GUI\Widgets\Log</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\Overlay\CMumbleOverlay.cpp">
+    <ClCompile Include="src\GUI\Widgets\Overlay\CMumbleOverlay.cpp">
       <Filter>GUI\Widgets\Overlay</Filter>
     </ClCompile>
-    <ClCompile Include="Mumble\Identity.cpp">
+    <ClCompile Include="src\Mumble\Identity.cpp">
       <Filter>Mumble</Filter>
     </ClCompile>
-    <ClCompile Include="Loader\Loader.cpp">
+    <ClCompile Include="src\Loader\Loader.cpp">
       <Filter>Loader</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\Debug\CDebugWindow.cpp">
+    <ClCompile Include="src\GUI\Widgets\Debug\CDebugWindow.cpp">
       <Filter>GUI\Widgets\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="DataLink\DataLink.cpp">
+    <ClCompile Include="src\DataLink\DataLink.cpp">
       <Filter>DataLink</Filter>
     </ClCompile>
-    <ClCompile Include="Textures\TextureLoader.cpp">
+    <ClCompile Include="src\Textures\TextureLoader.cpp">
       <Filter>Textures</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\QuickAccess\QuickAccess.cpp">
+    <ClCompile Include="src\GUI\Widgets\QuickAccess\QuickAccess.cpp">
       <Filter>GUI\Widgets\QuickAccess</Filter>
     </ClCompile>
-    <ClCompile Include="types.cpp">
+    <ClCompile Include="src\types.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Consts.cpp">
+    <ClCompile Include="src\Consts.cpp">
       <Filter>_GLOBAL</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\Addons\AddonItem.cpp">
+    <ClCompile Include="src\GUI\Widgets\Addons\AddonItem.cpp">
       <Filter>GUI\Widgets\Addons</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\Menu\MenuItem.cpp">
+    <ClCompile Include="src\GUI\Widgets\Menu\MenuItem.cpp">
       <Filter>GUI\Widgets\Menu</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\Menu\Menu.cpp">
+    <ClCompile Include="src\GUI\Widgets\Menu\Menu.cpp">
       <Filter>GUI\Widgets\Menu</Filter>
     </ClCompile>
-    <ClCompile Include="Settings\Settings.cpp">
+    <ClCompile Include="src\Settings\Settings.cpp">
       <Filter>Settings</Filter>
     </ClCompile>
-    <ClCompile Include="API\APIController.cpp">
+    <ClCompile Include="src\API\APIController.cpp">
       <Filter>API</Filter>
     </ClCompile>
-    <ClCompile Include="API\ActiveToken.cpp">
+    <ClCompile Include="src\API\ActiveToken.cpp">
       <Filter>API</Filter>
     </ClCompile>
-    <ClCompile Include="WndProc\WndProcHandler.cpp">
+    <ClCompile Include="src\WndProc\WndProcHandler.cpp">
       <Filter>WndProc</Filter>
     </ClCompile>
-    <ClCompile Include="CrashHandler.cpp">
+    <ClCompile Include="src\CrashHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\EULA\CEULAModal.cpp">
+    <ClCompile Include="src\GUI\Widgets\EULA\CEULAModal.cpp">
       <Filter>GUI\Widgets\EULA</Filter>
     </ClCompile>
-    <ClCompile Include="Multibox\Multibox.cpp">
+    <ClCompile Include="src\Multibox\Multibox.cpp">
       <Filter>Multibox</Filter>
     </ClCompile>
-    <ClCompile Include="Proxy.cpp">
+    <ClCompile Include="src\Proxy.cpp">
       <Filter>_GLOBAL</Filter>
     </ClCompile>
-    <ClCompile Include="API\ApiClient.cpp">
+    <ClCompile Include="src\API\ApiClient.cpp">
       <Filter>API</Filter>
     </ClCompile>
-    <ClCompile Include="Loader\EAddonFlags.cpp">
+    <ClCompile Include="src\Loader\EAddonFlags.cpp">
       <Filter>Loader\Enums</Filter>
     </ClCompile>
-    <ClCompile Include="Loader\AddonDefinition.cpp">
+    <ClCompile Include="src\Loader\AddonDefinition.cpp">
       <Filter>Loader\Structs</Filter>
     </ClCompile>
-    <ClCompile Include="Localization\Localization.cpp">
+    <ClCompile Include="src\Localization\Localization.cpp">
       <Filter>Localization</Filter>
     </ClCompile>
-    <ClCompile Include="Events\EventSubscriber.cpp">
+    <ClCompile Include="src\Events\EventSubscriber.cpp">
       <Filter>Events</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\Alerts\Alerts.cpp">
+    <ClCompile Include="src\GUI\Widgets\Alerts\Alerts.cpp">
       <Filter>GUI\Widgets\Alerts</Filter>
     </ClCompile>
-    <ClCompile Include="Loader\ArcDPS.cpp">
+    <ClCompile Include="src\Loader\ArcDPS.cpp">
       <Filter>Loader</Filter>
     </ClCompile>
-    <ClCompile Include="Loader\Library.cpp">
+    <ClCompile Include="src\Loader\Library.cpp">
       <Filter>Loader</Filter>
     </ClCompile>
-    <ClCompile Include="Updater\Updater.cpp">
+    <ClCompile Include="src\Updater\Updater.cpp">
       <Filter>Updater</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Widgets\Options\COptionsWindow.cpp">
+    <ClCompile Include="src\GUI\Widgets\Options\COptionsWindow.cpp">
       <Filter>GUI\Widgets\Options</Filter>
     </ClCompile>
-    <ClCompile Include="Util\Strings.cpp">
+    <ClCompile Include="src\Util\Strings.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="Util\MD5.cpp">
+    <ClCompile Include="src\Util\MD5.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="Util\Url.cpp">
+    <ClCompile Include="src\Util\Url.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="Util\Base64.cpp">
+    <ClCompile Include="src\Util\Base64.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="Loader\EUpdateProvider.cpp">
+    <ClCompile Include="src\Loader\EUpdateProvider.cpp">
       <Filter>Loader\Enums</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Fonts\FontManager.cpp">
+    <ClCompile Include="src\GUI\Fonts\FontManager.cpp">
       <Filter>GUI\Fonts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="imgui\imstb_truetype.h">
+    <ClInclude Include="src\imgui\imstb_truetype.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\imstb_textedit.h">
+    <ClInclude Include="src\imgui\imstb_textedit.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\imstb_rectpack.h">
+    <ClInclude Include="src\imgui\imstb_rectpack.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\imgui_internal.h">
+    <ClInclude Include="src\imgui\imgui_internal.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\imgui.h">
+    <ClInclude Include="src\imgui\imgui.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\imconfig.h">
+    <ClInclude Include="src\imgui\imconfig.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\imgui_impl_win32.h">
+    <ClInclude Include="src\imgui\imgui_impl_win32.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\imgui_impl_dx11.h">
+    <ClInclude Include="src\imgui\imgui_impl_dx11.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="minhook\mh_hook.h">
+    <ClInclude Include="src\minhook\mh_hook.h">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClInclude>
-    <ClInclude Include="minhook\mh_trampoline.h">
+    <ClInclude Include="src\minhook\mh_trampoline.h">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClInclude>
-    <ClInclude Include="minhook\mh_disasm.h">
+    <ClInclude Include="src\minhook\mh_disasm.h">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClInclude>
-    <ClInclude Include="minhook\mh_buffer.h">
+    <ClInclude Include="src\minhook\mh_buffer.h">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClInclude>
-    <ClInclude Include="Logging\CFileLogger.h">
+    <ClInclude Include="src\Logging\CFileLogger.h">
       <Filter>Logging</Filter>
     </ClInclude>
-    <ClInclude Include="Logging\ILogger.h">
+    <ClInclude Include="src\Logging\ILogger.h">
       <Filter>Logging</Filter>
     </ClInclude>
-    <ClInclude Include="Logging\LogEntry.h">
+    <ClInclude Include="src\Logging\LogEntry.h">
       <Filter>Logging</Filter>
     </ClInclude>
-    <ClInclude Include="Logging\LogHandler.h">
+    <ClInclude Include="src\Logging\LogHandler.h">
       <Filter>Logging</Filter>
     </ClInclude>
-    <ClInclude Include="Logging\ELogLevel.h">
+    <ClInclude Include="src\Logging\ELogLevel.h">
       <Filter>Logging</Filter>
     </ClInclude>
-    <ClInclude Include="Logging\CConsoleLogger.h">
+    <ClInclude Include="src\Logging\CConsoleLogger.h">
       <Filter>Logging</Filter>
     </ClInclude>
-    <ClInclude Include="core.h">
+    <ClInclude Include="src\core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Mumble\Mumble.h">
+    <ClInclude Include="src\Mumble\Mumble.h">
       <Filter>Mumble</Filter>
     </ClInclude>
-    <ClInclude Include="Events\EventHandler.h">
+    <ClInclude Include="src\Events\EventHandler.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="Keybinds\KeybindHandler.h">
+    <ClInclude Include="src\Keybinds\KeybindHandler.h">
       <Filter>Keybinds</Filter>
     </ClInclude>
-    <ClInclude Include="State.h">
+    <ClInclude Include="src\State.h">
       <Filter>_GLOBAL</Filter>
     </ClInclude>
-    <ClInclude Include="Paths.h">
+    <ClInclude Include="src\Paths.h">
       <Filter>_GLOBAL</Filter>
     </ClInclude>
-    <ClInclude Include="Hooks.h">
+    <ClInclude Include="src\Hooks.h">
       <Filter>_GLOBAL</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer.h">
+    <ClInclude Include="src\Renderer.h">
       <Filter>_GLOBAL</Filter>
     </ClInclude>
-    <ClInclude Include="Shared.h">
+    <ClInclude Include="src\Shared.h">
       <Filter>_GLOBAL</Filter>
     </ClInclude>
-    <ClInclude Include="Localization\Localization.h">
+    <ClInclude Include="src\Localization\Localization.h">
       <Filter>Localization</Filter>
     </ClInclude>
-    <ClInclude Include="Keybinds\Keybind.h">
+    <ClInclude Include="src\Keybinds\Keybind.h">
       <Filter>Keybinds</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\GUI.h">
+    <ClInclude Include="src\GUI\GUI.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\imgui_extensions.h">
+    <ClInclude Include="src\imgui\imgui_extensions.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\IWindow.h">
+    <ClInclude Include="src\GUI\IWindow.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\About\CAboutBox.h">
+    <ClInclude Include="src\GUI\Widgets\About\CAboutBox.h">
       <Filter>GUI\Widgets\About</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\Log\CLogWindow.h">
+    <ClInclude Include="src\GUI\Widgets\Log\CLogWindow.h">
       <Filter>GUI\Widgets\Log</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\Overlay\CMumbleOverlay.h">
+    <ClInclude Include="src\GUI\Widgets\Overlay\CMumbleOverlay.h">
       <Filter>GUI\Widgets\Overlay</Filter>
     </ClInclude>
-    <ClInclude Include="Mumble\EMapType.h">
+    <ClInclude Include="src\Mumble\EMapType.h">
       <Filter>Mumble</Filter>
     </ClInclude>
-    <ClInclude Include="Mumble\EMountIndex.h">
+    <ClInclude Include="src\Mumble\EMountIndex.h">
       <Filter>Mumble</Filter>
     </ClInclude>
-    <ClInclude Include="Mumble\EProfession.h">
+    <ClInclude Include="src\Mumble\EProfession.h">
       <Filter>Mumble</Filter>
     </ClInclude>
-    <ClInclude Include="Mumble\ESpecialization.h">
+    <ClInclude Include="src\Mumble\ESpecialization.h">
       <Filter>Mumble</Filter>
     </ClInclude>
-    <ClInclude Include="Mumble\ERace.h">
+    <ClInclude Include="src\Mumble\ERace.h">
       <Filter>Mumble</Filter>
     </ClInclude>
-    <ClInclude Include="Mumble\EUIScale.h">
+    <ClInclude Include="src\Mumble\EUIScale.h">
       <Filter>Mumble</Filter>
     </ClInclude>
-    <ClInclude Include="Mumble\Compass.h">
+    <ClInclude Include="src\Mumble\Compass.h">
       <Filter>Mumble</Filter>
     </ClInclude>
-    <ClInclude Include="Mumble\Context.h">
+    <ClInclude Include="src\Mumble\Context.h">
       <Filter>Mumble</Filter>
     </ClInclude>
-    <ClInclude Include="Mumble\LinkedMem.h">
+    <ClInclude Include="src\Mumble\LinkedMem.h">
       <Filter>Mumble</Filter>
     </ClInclude>
-    <ClInclude Include="types.h">
+    <ClInclude Include="src\types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Mumble\Identity.h">
+    <ClInclude Include="src\Mumble\Identity.h">
       <Filter>Mumble</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\Loader.h">
+    <ClInclude Include="src\Loader\Loader.h">
       <Filter>Loader</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\Addons\CAddonsWindow.h">
+    <ClInclude Include="src\GUI\Widgets\Addons\CAddonsWindow.h">
       <Filter>GUI\Widgets\Addons</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\Debug\CDebugWindow.h">
+    <ClInclude Include="src\GUI\Widgets\Debug\CDebugWindow.h">
       <Filter>GUI\Widgets\Debug</Filter>
     </ClInclude>
-    <ClInclude Include="DataLink\DataLink.h">
+    <ClInclude Include="src\DataLink\DataLink.h">
       <Filter>DataLink</Filter>
     </ClInclude>
-    <ClInclude Include="DataLink\LinkedResource.h">
+    <ClInclude Include="src\DataLink\LinkedResource.h">
       <Filter>DataLink</Filter>
     </ClInclude>
-    <ClInclude Include="Textures\TextureLoader.h">
+    <ClInclude Include="src\Textures\TextureLoader.h">
       <Filter>Textures</Filter>
     </ClInclude>
-    <ClInclude Include="DataLink\FuncDefs.h">
+    <ClInclude Include="src\DataLink\FuncDefs.h">
       <Filter>DataLink</Filter>
     </ClInclude>
-    <ClInclude Include="Events\FuncDefs.h">
+    <ClInclude Include="src\Events\FuncDefs.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="Keybinds\FuncDefs.h">
+    <ClInclude Include="src\Keybinds\FuncDefs.h">
       <Filter>Keybinds</Filter>
     </ClInclude>
-    <ClInclude Include="Logging\FuncDefs.h">
+    <ClInclude Include="src\Logging\FuncDefs.h">
       <Filter>Logging</Filter>
     </ClInclude>
-    <ClInclude Include="Textures\FuncDefs.h">
+    <ClInclude Include="src\Textures\FuncDefs.h">
       <Filter>Textures</Filter>
     </ClInclude>
-    <ClInclude Include="Textures\Texture.h">
+    <ClInclude Include="src\Textures\Texture.h">
       <Filter>Textures</Filter>
     </ClInclude>
-    <ClInclude Include="Textures\QueuedTexture.h">
+    <ClInclude Include="src\Textures\QueuedTexture.h">
       <Filter>Textures</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\FuncDefs.h">
+    <ClInclude Include="src\Loader\FuncDefs.h">
       <Filter>Loader</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\QuickAccess\QuickAccess.h">
+    <ClInclude Include="src\GUI\Widgets\QuickAccess\QuickAccess.h">
       <Filter>GUI\Widgets\QuickAccess</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\QuickAccess\FuncDefs.h">
+    <ClInclude Include="src\GUI\Widgets\QuickAccess\FuncDefs.h">
       <Filter>GUI\Widgets\QuickAccess</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\QuickAccess\Shortcut.h">
+    <ClInclude Include="src\GUI\Widgets\QuickAccess\Shortcut.h">
       <Filter>GUI\Widgets\QuickAccess</Filter>
     </ClInclude>
-    <ClInclude Include="Consts.h">
+    <ClInclude Include="src\Consts.h">
       <Filter>_GLOBAL</Filter>
     </ClInclude>
-    <ClInclude Include="Keybinds\ActiveKeybind.h">
+    <ClInclude Include="src\Keybinds\ActiveKeybind.h">
       <Filter>Keybinds</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\Addons\AddonItem.h">
+    <ClInclude Include="src\GUI\Widgets\Addons\AddonItem.h">
       <Filter>GUI\Widgets\Addons</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\Menu\MenuItem.h">
+    <ClInclude Include="src\GUI\Widgets\Menu\MenuItem.h">
       <Filter>GUI\Widgets\Menu</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\Menu\Menu.h">
+    <ClInclude Include="src\GUI\Widgets\Menu\Menu.h">
       <Filter>GUI\Widgets\Menu</Filter>
     </ClInclude>
-    <ClInclude Include="Settings\Settings.h">
+    <ClInclude Include="src\Settings\Settings.h">
       <Filter>Settings</Filter>
     </ClInclude>
-    <ClInclude Include="API\APIController.h">
+    <ClInclude Include="src\API\APIController.h">
       <Filter>API</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\QuickAccess\EQAPosition.h">
+    <ClInclude Include="src\GUI\Widgets\QuickAccess\EQAPosition.h">
       <Filter>GUI\Widgets\QuickAccess</Filter>
     </ClInclude>
-    <ClInclude Include="API\ActiveToken.h">
+    <ClInclude Include="src\API\ActiveToken.h">
       <Filter>API</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\imgui_memory_editor.h">
+    <ClInclude Include="src\imgui\imgui_memory_editor.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\FuncDefs.h">
+    <ClInclude Include="src\GUI\FuncDefs.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="WndProc\WndProcHandler.h">
+    <ClInclude Include="src\WndProc\WndProcHandler.h">
       <Filter>WndProc</Filter>
     </ClInclude>
-    <ClInclude Include="WndProc\FuncDefs.h">
+    <ClInclude Include="src\WndProc\FuncDefs.h">
       <Filter>WndProc</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\aes.h">
+    <ClInclude Include="src\openssl\aes.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\asn1.h">
+    <ClInclude Include="src\openssl\asn1.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\asn1err.h">
+    <ClInclude Include="src\openssl\asn1err.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\asn1t.h">
+    <ClInclude Include="src\openssl\asn1t.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\asn1_mac.h">
+    <ClInclude Include="src\openssl\asn1_mac.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\async.h">
+    <ClInclude Include="src\openssl\async.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\asyncerr.h">
+    <ClInclude Include="src\openssl\asyncerr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\bio.h">
+    <ClInclude Include="src\openssl\bio.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\bioerr.h">
+    <ClInclude Include="src\openssl\bioerr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\blowfish.h">
+    <ClInclude Include="src\openssl\blowfish.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\bn.h">
+    <ClInclude Include="src\openssl\bn.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\bnerr.h">
+    <ClInclude Include="src\openssl\bnerr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\buffer.h">
+    <ClInclude Include="src\openssl\buffer.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\buffererr.h">
+    <ClInclude Include="src\openssl\buffererr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\camellia.h">
+    <ClInclude Include="src\openssl\camellia.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\cast.h">
+    <ClInclude Include="src\openssl\cast.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\cmac.h">
+    <ClInclude Include="src\openssl\cmac.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\cmp.h">
+    <ClInclude Include="src\openssl\cmp.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\cmperr.h">
+    <ClInclude Include="src\openssl\cmperr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\cmp_util.h">
+    <ClInclude Include="src\openssl\cmp_util.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\cms.h">
+    <ClInclude Include="src\openssl\cms.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\cmserr.h">
+    <ClInclude Include="src\openssl\cmserr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\comp.h">
+    <ClInclude Include="src\openssl\comp.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\comperr.h">
+    <ClInclude Include="src\openssl\comperr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\conf.h">
+    <ClInclude Include="src\openssl\conf.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\conferr.h">
+    <ClInclude Include="src\openssl\conferr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\configuration.h">
+    <ClInclude Include="src\openssl\configuration.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\conftypes.h">
+    <ClInclude Include="src\openssl\conftypes.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\conf_api.h">
+    <ClInclude Include="src\openssl\conf_api.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\core.h">
+    <ClInclude Include="src\openssl\core.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\core_dispatch.h">
+    <ClInclude Include="src\openssl\core_dispatch.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\core_names.h">
+    <ClInclude Include="src\openssl\core_names.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\core_object.h">
+    <ClInclude Include="src\openssl\core_object.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\crmf.h">
+    <ClInclude Include="src\openssl\crmf.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\crmferr.h">
+    <ClInclude Include="src\openssl\crmferr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\crypto.h">
+    <ClInclude Include="src\openssl\crypto.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\cryptoerr.h">
+    <ClInclude Include="src\openssl\cryptoerr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\cryptoerr_legacy.h">
+    <ClInclude Include="src\openssl\cryptoerr_legacy.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\ct.h">
+    <ClInclude Include="src\openssl\ct.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\cterr.h">
+    <ClInclude Include="src\openssl\cterr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\decoder.h">
+    <ClInclude Include="src\openssl\decoder.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\decodererr.h">
+    <ClInclude Include="src\openssl\decodererr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\des.h">
+    <ClInclude Include="src\openssl\des.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\dh.h">
+    <ClInclude Include="src\openssl\dh.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\dherr.h">
+    <ClInclude Include="src\openssl\dherr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\dsa.h">
+    <ClInclude Include="src\openssl\dsa.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\dsaerr.h">
+    <ClInclude Include="src\openssl\dsaerr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\dtls1.h">
+    <ClInclude Include="src\openssl\dtls1.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\ebcdic.h">
+    <ClInclude Include="src\openssl\ebcdic.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\ec.h">
+    <ClInclude Include="src\openssl\ec.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\ecdh.h">
+    <ClInclude Include="src\openssl\ecdh.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\ecdsa.h">
+    <ClInclude Include="src\openssl\ecdsa.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\ecerr.h">
+    <ClInclude Include="src\openssl\ecerr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\encoder.h">
+    <ClInclude Include="src\openssl\encoder.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\encodererr.h">
+    <ClInclude Include="src\openssl\encodererr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\engine.h">
+    <ClInclude Include="src\openssl\engine.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\engineerr.h">
+    <ClInclude Include="src\openssl\engineerr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\err.h">
+    <ClInclude Include="src\openssl\err.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\ess.h">
+    <ClInclude Include="src\openssl\ess.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\esserr.h">
+    <ClInclude Include="src\openssl\esserr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\evp.h">
+    <ClInclude Include="src\openssl\evp.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\evperr.h">
+    <ClInclude Include="src\openssl\evperr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\e_os2.h">
+    <ClInclude Include="src\openssl\e_os2.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\fipskey.h">
+    <ClInclude Include="src\openssl\fipskey.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\fips_names.h">
+    <ClInclude Include="src\openssl\fips_names.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\hmac.h">
+    <ClInclude Include="src\openssl\hmac.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\http.h">
+    <ClInclude Include="src\openssl\http.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\httperr.h">
+    <ClInclude Include="src\openssl\httperr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\idea.h">
+    <ClInclude Include="src\openssl\idea.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\kdf.h">
+    <ClInclude Include="src\openssl\kdf.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\kdferr.h">
+    <ClInclude Include="src\openssl\kdferr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\lhash.h">
+    <ClInclude Include="src\openssl\lhash.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\macros.h">
+    <ClInclude Include="src\openssl\macros.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\md2.h">
+    <ClInclude Include="src\openssl\md2.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\md4.h">
+    <ClInclude Include="src\openssl\md4.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\md5.h">
+    <ClInclude Include="src\openssl\md5.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\mdc2.h">
+    <ClInclude Include="src\openssl\mdc2.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\modes.h">
+    <ClInclude Include="src\openssl\modes.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\objects.h">
+    <ClInclude Include="src\openssl\objects.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\objectserr.h">
+    <ClInclude Include="src\openssl\objectserr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\obj_mac.h">
+    <ClInclude Include="src\openssl\obj_mac.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\ocsp.h">
+    <ClInclude Include="src\openssl\ocsp.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\ocsperr.h">
+    <ClInclude Include="src\openssl\ocsperr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\opensslconf.h">
+    <ClInclude Include="src\openssl\opensslconf.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\opensslv.h">
+    <ClInclude Include="src\openssl\opensslv.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\ossl_typ.h">
+    <ClInclude Include="src\openssl\ossl_typ.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\params.h">
+    <ClInclude Include="src\openssl\params.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\param_build.h">
+    <ClInclude Include="src\openssl\param_build.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\pem.h">
+    <ClInclude Include="src\openssl\pem.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\pem2.h">
+    <ClInclude Include="src\openssl\pem2.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\pemerr.h">
+    <ClInclude Include="src\openssl\pemerr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\pkcs12.h">
+    <ClInclude Include="src\openssl\pkcs12.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\pkcs12err.h">
+    <ClInclude Include="src\openssl\pkcs12err.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\pkcs7.h">
+    <ClInclude Include="src\openssl\pkcs7.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\pkcs7err.h">
+    <ClInclude Include="src\openssl\pkcs7err.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\proverr.h">
+    <ClInclude Include="src\openssl\proverr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\provider.h">
+    <ClInclude Include="src\openssl\provider.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\prov_ssl.h">
+    <ClInclude Include="src\openssl\prov_ssl.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\rand.h">
+    <ClInclude Include="src\openssl\rand.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\randerr.h">
+    <ClInclude Include="src\openssl\randerr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\rc2.h">
+    <ClInclude Include="src\openssl\rc2.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\rc4.h">
+    <ClInclude Include="src\openssl\rc4.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\rc5.h">
+    <ClInclude Include="src\openssl\rc5.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\ripemd.h">
+    <ClInclude Include="src\openssl\ripemd.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\rsa.h">
+    <ClInclude Include="src\openssl\rsa.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\rsaerr.h">
+    <ClInclude Include="src\openssl\rsaerr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\safestack.h">
+    <ClInclude Include="src\openssl\safestack.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\seed.h">
+    <ClInclude Include="src\openssl\seed.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\self_test.h">
+    <ClInclude Include="src\openssl\self_test.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\sha.h">
+    <ClInclude Include="src\openssl\sha.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\srp.h">
+    <ClInclude Include="src\openssl\srp.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\srtp.h">
+    <ClInclude Include="src\openssl\srtp.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\ssl.h">
+    <ClInclude Include="src\openssl\ssl.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\ssl2.h">
+    <ClInclude Include="src\openssl\ssl2.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\ssl3.h">
+    <ClInclude Include="src\openssl\ssl3.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\sslerr.h">
+    <ClInclude Include="src\openssl\sslerr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\sslerr_legacy.h">
+    <ClInclude Include="src\openssl\sslerr_legacy.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\stack.h">
+    <ClInclude Include="src\openssl\stack.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\store.h">
+    <ClInclude Include="src\openssl\store.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\storeerr.h">
+    <ClInclude Include="src\openssl\storeerr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\symhacks.h">
+    <ClInclude Include="src\openssl\symhacks.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\tls1.h">
+    <ClInclude Include="src\openssl\tls1.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\trace.h">
+    <ClInclude Include="src\openssl\trace.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\ts.h">
+    <ClInclude Include="src\openssl\ts.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\tserr.h">
+    <ClInclude Include="src\openssl\tserr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\txt_db.h">
+    <ClInclude Include="src\openssl\txt_db.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\types.h">
+    <ClInclude Include="src\openssl\types.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\ui.h">
+    <ClInclude Include="src\openssl\ui.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\uierr.h">
+    <ClInclude Include="src\openssl\uierr.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\whrlpool.h">
+    <ClInclude Include="src\openssl\whrlpool.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\x509.h">
+    <ClInclude Include="src\openssl\x509.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\x509err.h">
+    <ClInclude Include="src\openssl\x509err.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\x509v3.h">
+    <ClInclude Include="src\openssl\x509v3.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\x509v3err.h">
+    <ClInclude Include="src\openssl\x509v3err.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\x509_vfy.h">
+    <ClInclude Include="src\openssl\x509_vfy.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\__DECC_INCLUDE_EPILOGUE.H">
+    <ClInclude Include="src\openssl\__DECC_INCLUDE_EPILOGUE.H">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="openssl\__DECC_INCLUDE_PROLOGUE.H">
+    <ClInclude Include="src\openssl\__DECC_INCLUDE_PROLOGUE.H">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
-    <ClInclude Include="Branch.h">
+    <ClInclude Include="src\Branch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Keybinds\KeystrokeMessageFlags.h">
+    <ClInclude Include="src\Keybinds\KeystrokeMessageFlags.h">
       <Filter>Keybinds</Filter>
     </ClInclude>
-    <ClInclude Include="Paths\FuncDefs.h">
+    <ClInclude Include="src\Paths\FuncDefs.h">
       <Filter>Paths</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\ERenderType.h">
+    <ClInclude Include="src\GUI\ERenderType.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="Keybinds\KeystrokeMessageFlags.h">
+    <ClInclude Include="src\Keybinds\KeystrokeMessageFlags.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Version.h">
+    <ClInclude Include="src\Version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CrashHandler.h">
+    <ClInclude Include="src\CrashHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\EULA\CEULAModal.h">
+    <ClInclude Include="src\GUI\Widgets\EULA\CEULAModal.h">
       <Filter>GUI\Widgets\EULA</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
+    <ClInclude Include="src\resource.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="stb\stb_image.h">
+    <ClInclude Include="src\stb\stb_image.h">
       <Filter>_EXTERNAL</Filter>
     </ClInclude>
-    <ClInclude Include="nlohmann\json.hpp">
+    <ClInclude Include="src\nlohmann\json.hpp">
       <Filter>_EXTERNAL</Filter>
     </ClInclude>
-    <ClInclude Include="httplib\httplib.h">
+    <ClInclude Include="src\httplib\httplib.h">
       <Filter>_EXTERNAL</Filter>
     </ClInclude>
-    <ClInclude Include="Multibox\Multibox.h">
+    <ClInclude Include="src\Multibox\Multibox.h">
       <Filter>Multibox</Filter>
     </ClInclude>
-    <ClInclude Include="Proxy.h">
+    <ClInclude Include="src\Proxy.h">
       <Filter>_GLOBAL</Filter>
     </ClInclude>
-    <ClInclude Include="Main.h">
+    <ClInclude Include="src\Main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="API\APIRequest.h">
+    <ClInclude Include="src\API\APIRequest.h">
       <Filter>API</Filter>
     </ClInclude>
-    <ClInclude Include="API\ApiClient.h">
+    <ClInclude Include="src\API\ApiClient.h">
       <Filter>API</Filter>
     </ClInclude>
-    <ClInclude Include="API\CachedResponse.h">
+    <ClInclude Include="src\API\CachedResponse.h">
       <Filter>API</Filter>
     </ClInclude>
-    <ClInclude Include="API\APIResponse.h">
+    <ClInclude Include="src\API\APIResponse.h">
       <Filter>API</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\Addon.h">
+    <ClInclude Include="src\Loader\Addon.h">
       <Filter>Loader\Structs</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\EUpdateProvider.h">
+    <ClInclude Include="src\Loader\EUpdateProvider.h">
       <Filter>Loader\Enums</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\ELoaderAction.h">
+    <ClInclude Include="src\Loader\ELoaderAction.h">
       <Filter>Loader\Enums</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\EAddonState.h">
+    <ClInclude Include="src\Loader\EAddonState.h">
       <Filter>Loader\Enums</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\EAddonFlags.h">
+    <ClInclude Include="src\Loader\EAddonFlags.h">
       <Filter>Loader\Enums</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\LibraryAddon.h">
+    <ClInclude Include="src\Loader\LibraryAddon.h">
       <Filter>Loader\Structs</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\AddonDefinition.h">
+    <ClInclude Include="src\Loader\AddonDefinition.h">
       <Filter>Loader\Structs</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\AddonAPI.h">
+    <ClInclude Include="src\Loader\AddonAPI.h">
       <Filter>Loader\Structs</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\NexusLinkData.h">
+    <ClInclude Include="src\Loader\NexusLinkData.h">
       <Filter>Loader\Structs</Filter>
     </ClInclude>
-    <ClInclude Include="Localization\FuncDefs.h">
+    <ClInclude Include="src\Localization\FuncDefs.h">
       <Filter>Localization</Filter>
     </ClInclude>
-    <ClInclude Include="Events\EventSubscriber.h">
+    <ClInclude Include="src\Events\EventSubscriber.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\Alerts\Alerts.h">
+    <ClInclude Include="src\GUI\Widgets\Alerts\Alerts.h">
       <Filter>GUI\Widgets\Alerts</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\Alerts\FuncDefs.h">
+    <ClInclude Include="src\GUI\Widgets\Alerts\FuncDefs.h">
       <Filter>GUI\Widgets\Alerts</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\ArcDPS.h">
+    <ClInclude Include="src\Loader\ArcDPS.h">
       <Filter>Loader</Filter>
     </ClInclude>
-    <ClInclude Include="Loader\Library.h">
+    <ClInclude Include="src\Loader\Library.h">
       <Filter>Loader</Filter>
     </ClInclude>
-    <ClInclude Include="Updater\Updater.h">
+    <ClInclude Include="src\Updater\Updater.h">
       <Filter>Updater</Filter>
     </ClInclude>
-    <ClInclude Include="Certs.h">
+    <ClInclude Include="src\Certs.h">
       <Filter>_GLOBAL</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Widgets\Options\COptionsWindow.h">
+    <ClInclude Include="src\GUI\Widgets\Options\COptionsWindow.h">
       <Filter>GUI\Widgets\Options</Filter>
     </ClInclude>
-    <ClInclude Include="Util\Strings.h">
+    <ClInclude Include="src\Util\Strings.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="Util\MD5.h">
+    <ClInclude Include="src\Util\MD5.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="Util\Url.h">
+    <ClInclude Include="src\Util\Url.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="Util\Base64.h">
+    <ClInclude Include="src\Util\Base64.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="Updater\FuncDefs.h">
+    <ClInclude Include="src\Updater\FuncDefs.h">
       <Filter>Updater</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\EFontIdentifier.h">
+    <ClInclude Include="src\GUI\EFontIdentifier.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Fonts\FontManager.h">
+    <ClInclude Include="src\GUI\Fonts\FontManager.h">
       <Filter>GUI\Fonts</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Fonts\FuncDefs.h">
+    <ClInclude Include="src\GUI\Fonts\FuncDefs.h">
       <Filter>GUI\Fonts</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Nexus.rc">
+    <ResourceCompile Include="src\Nexus.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="exports.def">
+    <None Include="src\exports.def">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="Resources\bin64\arcdps_integration64.dll">
+    <None Include="src\Resources\bin64\arcdps_integration64.dll">
       <Filter>Resource Files\bin64</Filter>
     </None>
-    <None Include="Resources\Locales\en_Main.json">
+    <None Include="src\Resources\Locales\en_Main.json">
       <Filter>Resource Files\Locales</Filter>
     </None>
-    <None Include="Resources\Locales\br_Main.json">
+    <None Include="src\Resources\Locales\br_Main.json">
       <Filter>Resource Files\Locales</Filter>
     </None>
-    <None Include="Resources\Locales\de_Main.json">
+    <None Include="src\Resources\Locales\de_Main.json">
       <Filter>Resource Files\Locales</Filter>
     </None>
-    <None Include="Resources\Locales\es_Main.json">
+    <None Include="src\Resources\Locales\es_Main.json">
       <Filter>Resource Files\Locales</Filter>
     </None>
-    <None Include="Resources\Locales\it_Main.json">
+    <None Include="src\Resources\Locales\it_Main.json">
       <Filter>Resource Files\Locales</Filter>
     </None>
-    <None Include="Resources\Locales\ru_Main.json">
+    <None Include="src\Resources\Locales\ru_Main.json">
       <Filter>Resource Files\Locales</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Font Include="Resources\Fonts\Menomonia.ttf">
+    <Font Include="src\Resources\Fonts\Menomonia.ttf">
       <Filter>Resource Files\Fonts</Filter>
     </Font>
-    <Font Include="Resources\Fonts\TrebuchetMS.ttf">
+    <Font Include="src\Resources\Fonts\TrebuchetMS.ttf">
       <Filter>Resource Files\Fonts</Filter>
     </Font>
-    <Font Include="Resources\Fonts\ProggyClean.ttf">
+    <Font Include="src\Resources\Fonts\ProggyClean.ttf">
       <Filter>Resource Files\Fonts</Filter>
     </Font>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Resources\AddonsWindow\AddonItem.png">
+    <Image Include="src\Resources\AddonsWindow\AddonItem.png">
       <Filter>Resource Files\Images\AddonsWindow</Filter>
     </Image>
-    <Image Include="Resources\AddonsWidow\Background.png">
+    <Image Include="src\Resources\AddonsWidow\Background.png">
       <Filter>Resource Files\Images\AddonsWindow</Filter>
     </Image>
-    <Image Include="Resources\AddonsWindow\TitleBar.png">
+    <Image Include="src\Resources\AddonsWindow\TitleBar.png">
       <Filter>Resource Files\Images\AddonsWindow</Filter>
     </Image>
-    <Image Include="Resources\AddonsWindow\TitleBar_Hover.png">
+    <Image Include="src\Resources\AddonsWindow\TitleBar_Hover.png">
       <Filter>Resource Files\Images\AddonsWindow</Filter>
     </Image>
-    <Image Include="Resources\Menu\Background.png">
+    <Image Include="src\Resources\Menu\Background.png">
       <Filter>Resource Files\Images\Menu</Filter>
     </Image>
-    <Image Include="Resources\Menu\BtnAbout.png">
+    <Image Include="src\Resources\Menu\BtnAbout.png">
       <Filter>Resource Files\Images\Menu</Filter>
     </Image>
-    <Image Include="Resources\Menu\BtnAddons.png">
+    <Image Include="src\Resources\Menu\BtnAddons.png">
       <Filter>Resource Files\Images\Menu</Filter>
     </Image>
-    <Image Include="Resources\Menu\BtnChangelog.png">
+    <Image Include="src\Resources\Menu\BtnChangelog.png">
       <Filter>Resource Files\Images\Menu</Filter>
     </Image>
-    <Image Include="Resources\Menu\BtnDebug.png">
+    <Image Include="src\Resources\Menu\BtnDebug.png">
       <Filter>Resource Files\Images\Menu</Filter>
     </Image>
-    <Image Include="Resources\Menu\BtnLog.png">
+    <Image Include="src\Resources\Menu\BtnLog.png">
       <Filter>Resource Files\Images\Menu</Filter>
     </Image>
-    <Image Include="Resources\Menu\BtnOptions.png">
+    <Image Include="src\Resources\Menu\BtnOptions.png">
       <Filter>Resource Files\Images\Menu</Filter>
     </Image>
-    <Image Include="Resources\Menu\MenuItem.png">
+    <Image Include="src\Resources\Menu\MenuItem.png">
       <Filter>Resource Files\Images\Menu</Filter>
     </Image>
-    <Image Include="Resources\Menu\MenuItem_Hover.png">
+    <Image Include="src\Resources\Menu\MenuItem_Hover.png">
       <Filter>Resource Files\Images\Menu</Filter>
     </Image>
-    <Image Include="Resources\QuickAccess\Generic.png">
+    <Image Include="src\Resources\QuickAccess\Generic.png">
       <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
-    <Image Include="Resources\QuickAccess\Generic_Hover.png">
+    <Image Include="src\Resources\QuickAccess\Generic_Hover.png">
       <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
-    <Image Include="Resources\QuickAccess\Nexus.png">
+    <Image Include="src\Resources\QuickAccess\Nexus.png">
       <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
-    <Image Include="Resources\QuickAccess\Nexus_Hover.png">
+    <Image Include="src\Resources\QuickAccess\Nexus_Hover.png">
       <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
-    <Image Include="Resources\QuickAccess\NexusHalloween.png">
+    <Image Include="src\Resources\QuickAccess\NexusHalloween.png">
       <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
-    <Image Include="Resources\QuickAccess\NexusHalloween_Hover.png">
+    <Image Include="src\Resources\QuickAccess\NexusHalloween_Hover.png">
       <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
-    <Image Include="Resources\QuickAccess\NexusXmas.png">
+    <Image Include="src\Resources\QuickAccess\NexusXmas.png">
       <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
-    <Image Include="Resources\QuickAccess\NexusXmas_Hover.png">
+    <Image Include="src\Resources\QuickAccess\NexusXmas_Hover.png">
       <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
-    <Image Include="Resources\BtnClose.png">
+    <Image Include="src\Resources\BtnClose.png">
       <Filter>Resource Files\Images</Filter>
     </Image>
-    <Image Include="Resources\BtnClose_Hover.png">
+    <Image Include="src\Resources\BtnClose_Hover.png">
       <Filter>Resource Files\Images</Filter>
     </Image>
-    <Image Include="Resources\TitleBarEnd.png">
+    <Image Include="src\Resources\TitleBarEnd.png">
       <Filter>Resource Files\Images</Filter>
     </Image>
-    <Image Include="Resources\TitleBarEnd_Hover.png">
+    <Image Include="src\Resources\TitleBarEnd_Hover.png">
       <Filter>Resource Files\Images</Filter>
     </Image>
-    <Image Include="Resources\TabBtn.png">
+    <Image Include="src\Resources\TabBtn.png">
       <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
-    <Image Include="Resources\TabBtn_Hover.png">
+    <Image Include="src\Resources\TabBtn_Hover.png">
       <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
-    <Image Include="Resources\Notification.png">
+    <Image Include="src\Resources\Notification.png">
       <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
-    <Image Include="Resources\Menu\BtnOptions_Hover.png">
+    <Image Include="src\Resources\Menu\BtnOptions_Hover.png">
       <Filter>Resource Files\Images\Menu</Filter>
     </Image>
-    <Image Include="Resources\ContextMenu\ContextMenu_Bullet.png">
+    <Image Include="src\Resources\ContextMenu\ContextMenu_Bullet.png">
       <Filter>Resource Files\Images\ContextMenu</Filter>
     </Image>
-    <Image Include="Resources\ContextMenu\ContextMenu_Highlight.png">
+    <Image Include="src\Resources\ContextMenu\ContextMenu_Highlight.png">
       <Filter>Resource Files\Images\ContextMenu</Filter>
     </Image>
-    <Image Include="Resources\BtnRefresh_Hover.png">
+    <Image Include="src\Resources\BtnRefresh_Hover.png">
       <Filter>Resource Files\Images</Filter>
     </Image>
-    <Image Include="Resources\BtnRefresh.png">
+    <Image Include="src\Resources\BtnRefresh.png">
       <Filter>Resource Files\Images</Filter>
     </Image>
-    <Image Include="Resources\Menu\BtnReturn.png">
+    <Image Include="src\Resources\Menu\BtnReturn.png">
       <Filter>Resource Files\Images\Menu</Filter>
     </Image>
-    <Image Include="Resources\AddonsWindow\AddonItem_Highlight.png">
+    <Image Include="src\Resources\AddonsWindow\AddonItem_Highlight.png">
       <Filter>Resource Files\Images\AddonsWindow</Filter>
     </Image>
-    <Image Include="Resources\AddonsWindow\AddonItem_DUU.png">
+    <Image Include="src\Resources\AddonsWindow\AddonItem_DUU.png">
       <Filter>Resource Files\Images\AddonsWindow</Filter>
     </Image>
-    <Image Include="Resources\EulaWindow\Background.png">
+    <Image Include="src\Resources\EulaWindow\Background.png">
       <Filter>Resource Files\Images\EulaWindow</Filter>
     </Image>
-    <Image Include="Resources\EulaWindow\TitleBar.png">
+    <Image Include="src\Resources\EulaWindow\TitleBar.png">
       <Filter>Resource Files\Images\EulaWindow</Filter>
     </Image>
-    <Image Include="Resources\EulaWindow\TitleBar_Hover.png">
+    <Image Include="src\Resources\EulaWindow\TitleBar_Hover.png">
       <Filter>Resource Files\Images\EulaWindow</Filter>
     </Image>
   </ItemGroup>
