@@ -4,10 +4,18 @@
 #include "Keybind.h"
 #include "FuncDefs.h"
 
+typedef enum class EKeybindHandlerType
+{
+	None,
+	DownOnly,
+	DownAndRelease
+} EKBHType;
+
 struct ActiveKeybind
 {
-	Keybind Bind;
-	KEYBINDS_PROCESS Handler;
+	Keybind					Bind;
+	EKeybindHandlerType		HandlerType;
+	void*					Handler;
 };
 
 #endif

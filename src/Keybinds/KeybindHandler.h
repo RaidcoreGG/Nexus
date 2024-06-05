@@ -13,6 +13,7 @@
 #include <mutex>
 #include <map>
 #include <string>
+#include <vector>
 
 #include "FuncDefs.h"
 
@@ -26,15 +27,27 @@ namespace Keybinds
 {
 	///----------------------------------------------------------------------------------------------------
 	/// ADDONAPI_RegisterWithString:
-	/// 	Addon API wrapper function for Register from string.
+	/// 	[Revision 1] Addon API wrapper function for Register from string.
 	///----------------------------------------------------------------------------------------------------
 	void ADDONAPI_RegisterWithString(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const char* aKeybind);
 
 	///----------------------------------------------------------------------------------------------------
 	/// ADDONAPI_RegisterWithStruct:
-	/// 	Addon API wrapper function for Register from struct.
+	/// 	[Revision 1] Addon API wrapper function for Register from struct.
 	///----------------------------------------------------------------------------------------------------
 	void ADDONAPI_RegisterWithStruct(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, Keybind aKeybind);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_RegisterWithString:
+	/// 	[Revision 2] Addon API wrapper function for Register from string.
+	///----------------------------------------------------------------------------------------------------
+	void ADDONAPI_RegisterWithString2(const char* aIdentifier, KEYBINDS_PROCESS2 aKeybindHandler, const char* aKeybind);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_RegisterWithStruct:
+	/// 	[Revision 2] Addon API wrapper function for Register from struct.
+	///----------------------------------------------------------------------------------------------------
+	void ADDONAPI_RegisterWithStruct2(const char* aIdentifier, KEYBINDS_PROCESS2 aKeybindHandler, Keybind aKeybind);
 }
 
 ///----------------------------------------------------------------------------------------------------
@@ -48,6 +61,13 @@ namespace Keybinds
 	extern bool										IsSettingKeybind;
 	extern Keybind									CurrentKeybind;
 	extern std::string								CurrentKeybindUsedBy;
+
+	/* this is ugly as fuck */
+	extern bool										AltTracked;
+	extern bool										CtrlTracked;
+	extern bool										ShiftTracked;
+	extern std::vector<unsigned short>				KeysTracked;
+	extern std::map<std::string, ActiveKeybind>		HeldKeybinds;
 
 	extern std::map<unsigned short, std::string>	ScancodeLookupTable;
 
@@ -80,14 +100,14 @@ namespace Keybinds
 	/// 	Generates and registers a keybind from the given string with the given identifier and handler,
 	/// 	if no bind was previously stored the given one will be used.
 	///----------------------------------------------------------------------------------------------------
-	void Register(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const char* aKeybind);
+	void Register(const char* aIdentifier, EKeybindHandlerType aKeybindHandlerType, void* aKeybindHandler, const char* aKeybind);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Register:
 	/// 	Registers a keybind from the given struct with the given identifier and handler,
 	/// 	if no bind was previously stored the given one will be used.
 	///----------------------------------------------------------------------------------------------------
-	void Register(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, Keybind aKeybind);
+	void Register(const char* aIdentifier, EKeybindHandlerType aKeybindHandlerType, void* aKeybindHandler, Keybind aKeybind);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Deregister:
@@ -118,7 +138,7 @@ namespace Keybinds
 	/// 	Invokes the action on the corresponding keybind handler.
 	/// 	Returns true if the keybind was dispatched.
 	///----------------------------------------------------------------------------------------------------
-	bool Invoke(std::string aIdentifier);
+	bool Invoke(std::string aIdentifier, bool aIsRelease = false);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Deletes:

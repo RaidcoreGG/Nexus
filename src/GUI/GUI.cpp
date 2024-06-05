@@ -829,12 +829,12 @@ namespace GUI
 		CDebugWindow* dbgWnd = new CDebugWindow("Debug");
 		CAboutBox* aboutWnd = new CAboutBox("About");
 
-		Keybinds::Register(KB_ADDONS, ProcessKeybind, "(null)");
-		Keybinds::Register(KB_OPTIONS, ProcessKeybind, "(null)");
-		Keybinds::Register(KB_CHANGELOG, ProcessKeybind, "(null)");
-		Keybinds::Register(KB_LOG, ProcessKeybind, "(null)");
-		Keybinds::Register(KB_DEBUG, ProcessKeybind, "(null)");
-		Keybinds::Register(KB_MUMBLEOVERLAY, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_ADDONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_OPTIONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_CHANGELOG, EKBHType::DownOnly, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_LOG, EKBHType::DownOnly, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_DEBUG, EKBHType::DownOnly, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_MUMBLEOVERLAY, EKBHType::DownOnly, ProcessKeybind, "(null)");
 
 		AddWindow(addonsWnd);
 		AddWindow(opsWnd);
@@ -853,8 +853,8 @@ namespace GUI
 		Menu::AddMenuItem("((000008))",		ICON_ABOUT,		RES_ICON_ABOUT,		&aboutWnd->Visible);
 
 		/* register keybinds */
-		Keybinds::Register(KB_MENU, ProcessKeybind, "CTRL+O");
-		Keybinds::Register(KB_TOGGLEHIDEUI, ProcessKeybind, "CTRL+H");
+		Keybinds::Register(KB_MENU, EKBHType::DownOnly, ProcessKeybind, "CTRL+O");
+		Keybinds::Register(KB_TOGGLEHIDEUI, EKBHType::DownOnly, ProcessKeybind, "CTRL+H");
 
 		/* load icons */
 		std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());

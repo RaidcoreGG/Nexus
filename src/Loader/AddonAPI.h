@@ -262,8 +262,8 @@ struct AddonAPI4 : AddonAPI
 	WNDPROC_SENDTOGAME					SendWndProcToGameOnly;
 
 	/* Keybinds */
-	KEYBINDS_REGISTERWITHSTRING			RegisterKeybindWithString;
-	KEYBINDS_REGISTERWITHSTRUCT			RegisterKeybindWithStruct;
+	KEYBINDS_REGISTERWITHSTRING2		RegisterKeybindWithString;
+	KEYBINDS_REGISTERWITHSTRUCT2		RegisterKeybindWithStruct;
 	KEYBINDS_DEREGISTER					DeregisterKeybind;
 
 	/* DataLink */
