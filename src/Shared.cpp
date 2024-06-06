@@ -17,11 +17,10 @@ long long					FrameCounter		= 0;
 std::string					MumbleLinkName;
 Mumble::Data*				MumbleLink			= nullptr;
 Identity*					MumbleIdentity		= new Identity{};
+NexusLinkData*				NexusLink			= nullptr;
 bool						IsMoving			= false;
 bool						IsCameraMoving		= false;
 bool						IsGameplay			= false;
-
-NexusLinkData*				NexusLink			= nullptr;
 
 CLocalization&				Language			= CLocalization::GetInstance();
 

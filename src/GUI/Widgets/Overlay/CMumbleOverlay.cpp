@@ -23,7 +23,7 @@ namespace GUI
 		ImGui::SetNextWindowBgAlpha(0.35f);
 		ImGui::SetNextWindowPos(pos);
 		ImGui::SetNextWindowSize(size);
-		if (!State::IsMumbleDisabled)
+		if (MumbleLink && MumbleLink->UITick)
 		{
 			if (ImGui::Begin("MumbleUI", &Visible, WindowFlags_Overlay))
 			{

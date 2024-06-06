@@ -46,6 +46,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
 namespace Main
 {
+	CMumbleReader* MumbleReader;
+
 	void Initialize()
 	{
 		if (State::Nexus >= ENexusState::LOAD) { return; }
@@ -118,7 +120,7 @@ namespace Main
 
 			//API::Initialize();
 
-			Mumble::Initialize();
+			MumbleReader = new CMumbleReader(MumbleLinkName);
 
 			// create imgui context
 			if (!Renderer::GuiContext) { Renderer::GuiContext = ImGui::CreateContext(); }
@@ -153,7 +155,6 @@ namespace Main
 			Loader::Shutdown();
 
 			GUI::Shutdown();
-			Mumble::Shutdown();
 
 			// shared mem
 			DataLink::Free();

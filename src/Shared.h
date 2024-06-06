@@ -8,6 +8,7 @@
 #include "Loader/AddonDefinition.h"
 #include "Loader/NexusLinkData.h"
 #include "Services/Mumble/Definitions/Mumble.h"
+#include "Services/Mumble/Reader.h"
 #include "Logging/LogHandler.h"
 #include "API/ApiClient.h"
 #include "Localization/Localization.h"
@@ -32,11 +33,10 @@ extern long long					FrameCounter;
 extern std::string					MumbleLinkName;
 extern Mumble::Data*				MumbleLink;
 extern Identity*					MumbleIdentity;
+extern NexusLinkData*				NexusLink;
 extern bool							IsMoving;
 extern bool							IsCameraMoving;
 extern bool							IsGameplay;
-
-extern NexusLinkData*				NexusLink;
 
 extern CLocalization&				Language;
 
