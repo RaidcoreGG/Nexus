@@ -10,7 +10,7 @@
 #include "State.h"
 #include "Renderer.h"
 
-#include "Keybinds/KeybindHandler.h"
+#include "Inputs/Keybinds/KeybindHandler.h"
 #include "API/APIController.h"
 #include "Settings/Settings.h"
 #include "Loader/Loader.h"

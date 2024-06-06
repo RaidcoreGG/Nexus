@@ -46,8 +46,8 @@
     <ClCompile Include="src\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="src\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\Keybinds\Keybind.cpp" />
-    <ClCompile Include="src\Keybinds\KeybindHandler.cpp" />
+    <ClCompile Include="src\Inputs\Keybinds\Keybind.cpp" />
+    <ClCompile Include="src\Inputs\Keybinds\KeybindHandler.cpp" />
     <ClCompile Include="src\Loader\AddonDefinition.cpp" />
     <ClCompile Include="src\Loader\EAddonFlags.cpp" />
     <ClCompile Include="src\Loader\Loader.cpp" />
@@ -76,7 +76,7 @@
     <ClCompile Include="src\Util\MD5.cpp" />
     <ClCompile Include="src\Util\Strings.cpp" />
     <ClCompile Include="src\Util\Url.cpp" />
-    <ClCompile Include="src\WndProc\WndProcHandler.cpp" />
+    <ClCompile Include="src\Inputs\WndProc\WndProcHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\API\ApiClient.h" />
@@ -131,11 +131,11 @@
     <ClInclude Include="src\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\imgui\imstb_textedit.h" />
     <ClInclude Include="src\imgui\imstb_truetype.h" />
-    <ClInclude Include="src\Keybinds\ActiveKeybind.h" />
-    <ClInclude Include="src\Keybinds\FuncDefs.h" />
-    <ClInclude Include="src\Keybinds\Keybind.h" />
-    <ClInclude Include="src\Keybinds\KeybindHandler.h" />
-    <ClInclude Include="src\Keybinds\KeystrokeMessageFlags.h" />
+    <ClInclude Include="src\Inputs\Keybinds\ActiveKeybind.h" />
+    <ClInclude Include="src\Inputs\Keybinds\FuncDefs.h" />
+    <ClInclude Include="src\Inputs\Keybinds\Keybind.h" />
+    <ClInclude Include="src\Inputs\Keybinds\KeybindHandler.h" />
+    <ClInclude Include="src\Inputs\Keybinds\KeystrokeMessageFlags.h" />
     <ClInclude Include="src\Loader\Addon.h" />
     <ClInclude Include="src\Loader\ArcDPS.h" />
     <ClInclude Include="src\Loader\EAddonFlags.h" />
@@ -334,8 +334,8 @@
     <ClInclude Include="src\Util\Strings.h" />
     <ClInclude Include="src\Util\Url.h" />
     <ClInclude Include="src\Version.h" />
-    <ClInclude Include="src\WndProc\FuncDefs.h" />
-    <ClInclude Include="src\WndProc\WndProcHandler.h" />
+    <ClInclude Include="src\Inputs\WndProc\FuncDefs.h" />
+    <ClInclude Include="src\Inputs\WndProc\WndProcHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\Nexus.rc" />

@@ -16,7 +16,7 @@
 
 #include "DataLink/DataLink.h"
 #include "GUI/GUI.h"
-#include "Keybinds/KeybindHandler.h"
+#include "Inputs/Keybinds/KeybindHandler.h"
 #include "Loader/Loader.h"
 #include "Logging/LogHandler.h"
 #include "Logging/CConsoleLogger.h"

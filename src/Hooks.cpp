@@ -10,11 +10,11 @@
 #include "Events/EventHandler.h"
 #include "GUI/GUI.h"
 #include "GUI/Widgets/QuickAccess/QuickAccess.h"
-#include "Keybinds/KeybindHandler.h"
+#include "Inputs/Keybinds/KeybindHandler.h"
 #include "Loader/Loader.h"
 #include "Loader/NexusLinkData.h"
 #include "Textures/TextureLoader.h"
-#include "WndProc/WndProcHandler.h"
+#include "Inputs/WndProc/WndProcHandler.h"
 
 namespace Hooks
 {

@@ -25,9 +25,6 @@
     <Filter Include="Events">
       <UniqueIdentifier>{062ec4b8-2804-4978-b3c4-381b0cdd4b35}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Keybinds">
-      <UniqueIdentifier>{f0552fcd-0842-4914-bd35-54f18d11b0cd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Localization">
       <UniqueIdentifier>{7943e0f9-3a02-4820-bc47-49d1198f39b8}</UniqueIdentifier>
     </Filter>
@@ -84,9 +81,6 @@
     </Filter>
     <Filter Include="API">
       <UniqueIdentifier>{e65ccd89-40e0-4106-92d5-9e47ea8f3189}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="WndProc">
-      <UniqueIdentifier>{9bfe2e48-8bc4-40bd-a652-2237dd01af65}</UniqueIdentifier>
     </Filter>
     <Filter Include="Paths">
       <UniqueIdentifier>{b0fd71ca-41a2-4a72-a523-b30138c9dcef}</UniqueIdentifier>
@@ -148,6 +142,15 @@
     <Filter Include="GUI\Fonts">
       <UniqueIdentifier>{eb799d0b-f3d2-4af6-b1bc-c37b5e5c258d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Inputs">
+      <UniqueIdentifier>{68734b2f-4069-4723-961d-83db00b90810}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Inputs\WndProc">
+      <UniqueIdentifier>{9bfe2e48-8bc4-40bd-a652-2237dd01af65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Inputs\Keybinds">
+      <UniqueIdentifier>{f0552fcd-0842-4914-bd35-54f18d11b0cd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -207,8 +210,8 @@
     <ClCompile Include="src\Events\EventHandler.cpp">
       <Filter>Events</Filter>
     </ClCompile>
-    <ClCompile Include="src\Keybinds\KeybindHandler.cpp">
-      <Filter>Keybinds</Filter>
+    <ClCompile Include="src\Inputs\Keybinds\KeybindHandler.cpp">
+      <Filter>Inputs\Keybinds</Filter>
     </ClCompile>
     <ClCompile Include="src\Paths.cpp">
       <Filter>_GLOBAL</Filter>
@@ -225,8 +228,8 @@
     <ClCompile Include="src\Shared.cpp">
       <Filter>_GLOBAL</Filter>
     </ClCompile>
-    <ClCompile Include="src\Keybinds\Keybind.cpp">
-      <Filter>Keybinds</Filter>
+    <ClCompile Include="src\Inputs\Keybinds\Keybind.cpp">
+      <Filter>Inputs\Keybinds</Filter>
     </ClCompile>
     <ClCompile Include="src\GUI\GUI.cpp">
       <Filter>GUI</Filter>
@@ -285,8 +288,8 @@
     <ClCompile Include="src\API\ActiveToken.cpp">
       <Filter>API</Filter>
     </ClCompile>
-    <ClCompile Include="src\WndProc\WndProcHandler.cpp">
-      <Filter>WndProc</Filter>
+    <ClCompile Include="src\Inputs\WndProc\WndProcHandler.cpp">
+      <Filter>Inputs\WndProc</Filter>
     </ClCompile>
     <ClCompile Include="src\CrashHandler.cpp">
       <Filter>Source Files</Filter>
@@ -413,8 +416,8 @@
     <ClInclude Include="src\Events\EventHandler.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="src\Keybinds\KeybindHandler.h">
-      <Filter>Keybinds</Filter>
+    <ClInclude Include="src\Inputs\Keybinds\KeybindHandler.h">
+      <Filter>Inputs\Keybinds</Filter>
     </ClInclude>
     <ClInclude Include="src\State.h">
       <Filter>_GLOBAL</Filter>
@@ -434,8 +437,8 @@
     <ClInclude Include="src\Localization\Localization.h">
       <Filter>Localization</Filter>
     </ClInclude>
-    <ClInclude Include="src\Keybinds\Keybind.h">
-      <Filter>Keybinds</Filter>
+    <ClInclude Include="src\Inputs\Keybinds\Keybind.h">
+      <Filter>Inputs\Keybinds</Filter>
     </ClInclude>
     <ClInclude Include="src\GUI\GUI.h">
       <Filter>GUI</Filter>
@@ -512,8 +515,8 @@
     <ClInclude Include="src\Events\FuncDefs.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="src\Keybinds\FuncDefs.h">
-      <Filter>Keybinds</Filter>
+    <ClInclude Include="src\Inputs\Keybinds\FuncDefs.h">
+      <Filter>Inputs\Keybinds</Filter>
     </ClInclude>
     <ClInclude Include="src\Logging\FuncDefs.h">
       <Filter>Logging</Filter>
@@ -542,8 +545,8 @@
     <ClInclude Include="src\Consts.h">
       <Filter>_GLOBAL</Filter>
     </ClInclude>
-    <ClInclude Include="src\Keybinds\ActiveKeybind.h">
-      <Filter>Keybinds</Filter>
+    <ClInclude Include="src\Inputs\Keybinds\ActiveKeybind.h">
+      <Filter>Inputs\Keybinds</Filter>
     </ClInclude>
     <ClInclude Include="src\GUI\Widgets\Addons\AddonItem.h">
       <Filter>GUI\Widgets\Addons</Filter>
@@ -572,11 +575,11 @@
     <ClInclude Include="src\GUI\FuncDefs.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="src\WndProc\WndProcHandler.h">
-      <Filter>WndProc</Filter>
+    <ClInclude Include="src\Inputs\WndProc\WndProcHandler.h">
+      <Filter>Inputs\WndProc</Filter>
     </ClInclude>
-    <ClInclude Include="src\WndProc\FuncDefs.h">
-      <Filter>WndProc</Filter>
+    <ClInclude Include="src\Inputs\WndProc\FuncDefs.h">
+      <Filter>Inputs\WndProc</Filter>
     </ClInclude>
     <ClInclude Include="src\openssl\aes.h">
       <Filter>_EXTERNAL\openssl</Filter>
@@ -992,8 +995,8 @@
     <ClInclude Include="src\Branch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Keybinds\KeystrokeMessageFlags.h">
-      <Filter>Keybinds</Filter>
+    <ClInclude Include="src\Inputs\Keybinds\KeystrokeMessageFlags.h">
+      <Filter>Inputs\Keybinds</Filter>
     </ClInclude>
     <ClInclude Include="src\Paths\FuncDefs.h">
       <Filter>Paths</Filter>

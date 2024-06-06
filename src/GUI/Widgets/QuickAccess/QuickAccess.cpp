@@ -8,7 +8,7 @@
 
 #include "Textures/Texture.h"
 #include "Textures/TextureLoader.h"
-#include "Keybinds/KeybindHandler.h"
+#include "Inputs/Keybinds/KeybindHandler.h"
 #include "Loader/Loader.h"
 
 #include "resource.h"
