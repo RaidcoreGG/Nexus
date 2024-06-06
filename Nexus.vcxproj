@@ -61,8 +61,7 @@
     <ClCompile Include="src\minhook\mh_hook.cpp" />
     <ClCompile Include="src\minhook\mh_trampoline.cpp" />
     <ClCompile Include="src\Multibox\Multibox.cpp" />
-    <ClCompile Include="src\Mumble\Identity.cpp" />
-    <ClCompile Include="src\Mumble\Mumble.cpp" />
+    <ClCompile Include="src\Services\Mumble\Reader.cpp" />
     <ClCompile Include="src\Paths.cpp" />
     <ClCompile Include="src\Proxy.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
@@ -70,7 +69,6 @@
     <ClCompile Include="src\Shared.cpp" />
     <ClCompile Include="src\State.cpp" />
     <ClCompile Include="src\Textures\TextureLoader.cpp" />
-    <ClCompile Include="src\types.cpp" />
     <ClCompile Include="src\Updater\Updater.cpp" />
     <ClCompile Include="src\Util\Base64.cpp" />
     <ClCompile Include="src\Util\MD5.cpp" />
@@ -151,16 +149,7 @@
     <ClInclude Include="src\Logging\FuncDefs.h" />
     <ClInclude Include="src\Main.h" />
     <ClInclude Include="src\Multibox\Multibox.h" />
-    <ClInclude Include="src\Mumble\Compass.h" />
-    <ClInclude Include="src\Mumble\Context.h" />
-    <ClInclude Include="src\Mumble\EMapType.h" />
-    <ClInclude Include="src\Mumble\EMountIndex.h" />
-    <ClInclude Include="src\Mumble\EProfession.h" />
-    <ClInclude Include="src\Mumble\ERace.h" />
-    <ClInclude Include="src\Mumble\ESpecialization.h" />
-    <ClInclude Include="src\Mumble\EUIScale.h" />
-    <ClInclude Include="src\Mumble\Identity.h" />
-    <ClInclude Include="src\Mumble\LinkedMem.h" />
+    <ClInclude Include="src\Services\Mumble\Definitions\Mumble.h" />
     <ClInclude Include="src\nlohmann\json.hpp" />
     <ClInclude Include="src\openssl\aes.h" />
     <ClInclude Include="src\openssl\asn1.h" />
@@ -313,7 +302,7 @@
     <ClInclude Include="src\minhook\mh_disasm.h" />
     <ClInclude Include="src\minhook\mh_hook.h" />
     <ClInclude Include="src\minhook\mh_trampoline.h" />
-    <ClInclude Include="src\Mumble\Mumble.h" />
+    <ClInclude Include="src\Services\Mumble\Reader.h" />
     <ClInclude Include="src\Paths\FuncDefs.h" />
     <ClInclude Include="src\Proxy.h" />
     <ClInclude Include="src\Renderer.h" />
@@ -326,7 +315,6 @@
     <ClInclude Include="src\Textures\QueuedTexture.h" />
     <ClInclude Include="src\Textures\Texture.h" />
     <ClInclude Include="src\Textures\TextureLoader.h" />
-    <ClInclude Include="src\types.h" />
     <ClInclude Include="src\Updater\FuncDefs.h" />
     <ClInclude Include="src\Updater\Updater.h" />
     <ClInclude Include="src\Util\Base64.h" />

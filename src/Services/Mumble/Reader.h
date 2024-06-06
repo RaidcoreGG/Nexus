@@ -1,15 +1,17 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  Mumble.h
+/// Name         :  Reader.h
 /// Description  :  Provides Mumble API events and extended data.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef MUMBLE_H
-#define MUMBLE_H
+#ifndef MUMBLE_READER_H
+#define MUMBLE_READER_H
 
 #include <thread>
+
+#include "Services/Mumble/Definitions/Mumble.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Mumble Namespace
@@ -49,7 +51,7 @@ namespace Mumble
 	/// GetScalingFactor:
 	/// 	Returns the scaling factor for the given the UISize enum.
 	///----------------------------------------------------------------------------------------------------
-	float GetScalingFactor(unsigned aSize);
+	float GetScalingFactor(EUIScale aSize);
 };
 
 #endif

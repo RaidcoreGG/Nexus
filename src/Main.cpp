@@ -21,7 +21,7 @@
 #include "Logging/LogHandler.h"
 #include "Logging/CConsoleLogger.h"
 #include "Logging/CFileLogger.h"
-#include "Mumble/Mumble.h"
+#include "Services/Mumble/Reader.h"
 #include "Settings/Settings.h"
 #include "API/ApiClient.h"
 #include "Updater/Updater.h"

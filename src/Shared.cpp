@@ -15,7 +15,7 @@ std::vector<signed int>		RequestedAddons		= {};
 long long					FrameCounter		= 0;
 
 std::string					MumbleLinkName;
-LinkedMem*					MumbleLink			= nullptr;
+Mumble::Data*				MumbleLink			= nullptr;
 Identity*					MumbleIdentity		= new Identity{};
 bool						IsMoving			= false;
 bool						IsCameraMoving		= false;

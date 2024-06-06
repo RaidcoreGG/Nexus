@@ -13,7 +13,7 @@
 #include "Branch.h"
 #include "Version.h"
 
-#include "Mumble/Mumble.h"
+#include "Services/Mumble/Reader.h"
 
 #include "Events/EventHandler.h"
 #include "Inputs/Keybinds/KeybindHandler.h"
@@ -475,23 +475,23 @@ namespace GUI
 
 			switch (MumbleIdentity->UISize)
 			{
-			case 0:
+			case EUIScale::Small:
 				Font = FontIndex[EFont::Menomonia_Small];
 				FontBig = FontIndex[EFont::MenomoniaBig_Small];
 				FontUI = FontIndex[EFont::Trebuchet_Small];
 				break;
 			default:
-			case 1:
+			case EUIScale::Normal:
 				Font = FontIndex[EFont::Menomonia_Normal];
 				FontBig = FontIndex[EFont::MenomoniaBig_Normal];
 				FontUI = FontIndex[EFont::Trebuchet_Normal];
 				break;
-			case 2:
+			case EUIScale::Large:
 				Font = FontIndex[EFont::Menomonia_Large];
 				FontBig = FontIndex[EFont::MenomoniaBig_Large];
 				FontUI = FontIndex[EFont::Trebuchet_Large];
 				break;
-			case 3:
+			case EUIScale::Larger:
 				Font = FontIndex[EFont::Menomonia_Larger];
 				FontBig = FontIndex[EFont::MenomoniaBig_Larger];
 				FontUI = FontIndex[EFont::Trebuchet_Larger];

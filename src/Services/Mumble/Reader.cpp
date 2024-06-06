@@ -1,12 +1,12 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  Mumble.cpp
+/// Name         :  Reader.cpp
 /// Description  :  Provides Mumble API events and extended data.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "Mumble.h"
+#include "Services/Mumble/Reader.h"
 
 #include <map>
 #include <string>
@@ -17,7 +17,6 @@
 #include "Renderer.h"
 #include "Consts.h"
 
-#include "LinkedMem.h"
 #include "Events/EventHandler.h"
 #include "DataLink/DataLink.h"
 
@@ -26,6 +25,60 @@ using json = nlohmann::json;
 
 namespace Mumble
 {
+	bool operator==(const Identity& lhs, const Identity& rhs)
+	{
+		if (strcmp(lhs.Name, rhs.Name) == 0 &&
+			lhs.Profession == rhs.Profession &&
+			lhs.Specialization == rhs.Specialization &&
+			lhs.Race == rhs.Race &&
+			lhs.MapID == rhs.MapID &&
+			lhs.WorldID == rhs.WorldID &&
+			lhs.TeamColorID == rhs.TeamColorID &&
+			lhs.IsCommander == rhs.IsCommander &&
+			lhs.FOV == rhs.FOV &&
+			lhs.UISize == rhs.UISize)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	bool operator!=(const Identity& lhs, const Identity& rhs)
+	{
+		return !(lhs == rhs);
+	}
+
+	bool operator==(const Vector2& lhs, const Vector2& rhs)
+	{
+		if (trunc(1000. * lhs.X) == trunc(1000. * rhs.X) &&
+			trunc(1000. * lhs.Y) == trunc(1000. * rhs.Y))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	bool operator!=(const Vector2& lhs, const Vector2& rhs)
+	{
+		return !(lhs == rhs);
+	}
+
+	bool operator==(const Vector3& lhs, const Vector3& rhs)
+	{
+		if (trunc(1000. * lhs.X) == trunc(1000. * rhs.X) &&
+			trunc(1000. * lhs.Y) == trunc(1000. * rhs.Y) &&
+			trunc(1000. * lhs.Z) == trunc(1000. * rhs.Z))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	bool operator!=(const Vector3& lhs, const Vector3& rhs)
+	{
+		return !(lhs == rhs);
+	}
+
 	bool IsRunning = false;
 
 	std::thread UpdateIdentityThread;
@@ -51,7 +104,7 @@ namespace Mumble
 		{
 			State::IsMumbleDisabled = true;
 		}
-		MumbleLink = (LinkedMem*)DataLink::ShareResource(DL_MUMBLE_LINK, sizeof(LinkedMem), MumbleLinkName.c_str());
+		MumbleLink = (Mumble::Data*)DataLink::ShareResource(DL_MUMBLE_LINK, sizeof(Mumble::Data), MumbleLinkName.c_str());
 		NexusLink = (NexusLinkData*)DataLink::ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData));
 	}
 
@@ -138,15 +191,15 @@ namespace Mumble
 		}
 	}
 
-	float GetScalingFactor(unsigned aSize)
+	float GetScalingFactor(EUIScale aSize)
 	{
 		switch (aSize)
 		{
-		case 0: return SC_SMALL;	// Small
+		case EUIScale::Small: return SC_SMALL;	// Small
 		default:
-		case 1: return SC_NORMAL;	// Normal
-		case 2: return SC_LARGE;	// Large
-		case 3: return SC_LARGER;	// Larger
+		case EUIScale::Normal: return SC_NORMAL;	// Normal
+		case EUIScale::Large: return SC_LARGE;	// Large
+		case EUIScale::Larger: return SC_LARGER;	// Larger
 		}
 	}
 }

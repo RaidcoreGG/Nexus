@@ -7,8 +7,7 @@
 
 #include "Loader/AddonDefinition.h"
 #include "Loader/NexusLinkData.h"
-#include "Mumble/LinkedMem.h"
-#include "Mumble/Identity.h"
+#include "Services/Mumble/Definitions/Mumble.h"
 #include "Logging/LogHandler.h"
 #include "API/ApiClient.h"
 #include "Localization/Localization.h"
@@ -31,8 +30,8 @@ extern std::vector<signed int>		RequestedAddons;
 extern long long					FrameCounter;
 
 extern std::string					MumbleLinkName;
-extern LinkedMem*                   MumbleLink;
-extern Identity*                    MumbleIdentity;
+extern Mumble::Data*				MumbleLink;
+extern Identity*					MumbleIdentity;
 extern bool							IsMoving;
 extern bool							IsCameraMoving;
 extern bool							IsGameplay;

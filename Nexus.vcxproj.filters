@@ -151,6 +151,9 @@
     <Filter Include="Inputs\Keybinds">
       <UniqueIdentifier>{f0552fcd-0842-4914-bd35-54f18d11b0cd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Services">
+      <UniqueIdentifier>{7cebddb9-057f-4d36-bd2c-bbda84c7a459}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -204,7 +207,7 @@
     <ClCompile Include="src\core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Mumble\Mumble.cpp">
+    <ClCompile Include="src\Services\Mumble\Reader.cpp">
       <Filter>Mumble</Filter>
     </ClCompile>
     <ClCompile Include="src\Events\EventHandler.cpp">
@@ -246,9 +249,6 @@
     <ClCompile Include="src\GUI\Widgets\Overlay\CMumbleOverlay.cpp">
       <Filter>GUI\Widgets\Overlay</Filter>
     </ClCompile>
-    <ClCompile Include="src\Mumble\Identity.cpp">
-      <Filter>Mumble</Filter>
-    </ClCompile>
     <ClCompile Include="src\Loader\Loader.cpp">
       <Filter>Loader</Filter>
     </ClCompile>
@@ -263,9 +263,6 @@
     </ClCompile>
     <ClCompile Include="src\GUI\Widgets\QuickAccess\QuickAccess.cpp">
       <Filter>GUI\Widgets\QuickAccess</Filter>
-    </ClCompile>
-    <ClCompile Include="src\types.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Consts.cpp">
       <Filter>_GLOBAL</Filter>
@@ -410,7 +407,7 @@
     <ClInclude Include="src\core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Mumble\Mumble.h">
+    <ClInclude Include="src\Services\Mumble\Reader.h">
       <Filter>Mumble</Filter>
     </ClInclude>
     <ClInclude Include="src\Events\EventHandler.h">
@@ -457,39 +454,6 @@
     </ClInclude>
     <ClInclude Include="src\GUI\Widgets\Overlay\CMumbleOverlay.h">
       <Filter>GUI\Widgets\Overlay</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Mumble\EMapType.h">
-      <Filter>Mumble</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Mumble\EMountIndex.h">
-      <Filter>Mumble</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Mumble\EProfession.h">
-      <Filter>Mumble</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Mumble\ESpecialization.h">
-      <Filter>Mumble</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Mumble\ERace.h">
-      <Filter>Mumble</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Mumble\EUIScale.h">
-      <Filter>Mumble</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Mumble\Compass.h">
-      <Filter>Mumble</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Mumble\Context.h">
-      <Filter>Mumble</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Mumble\LinkedMem.h">
-      <Filter>Mumble</Filter>
-    </ClInclude>
-    <ClInclude Include="src\types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Mumble\Identity.h">
-      <Filter>Mumble</Filter>
     </ClInclude>
     <ClInclude Include="src\Loader\Loader.h">
       <Filter>Loader</Filter>
@@ -1126,6 +1090,9 @@
     </ClInclude>
     <ClInclude Include="src\GUI\Fonts\FuncDefs.h">
       <Filter>GUI\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Services\Mumble\Definitions\Mumble.h">
+      <Filter>Mumble</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
