@@ -14,6 +14,19 @@
 
 #include "Services/Mumble/Definitions/Mumble.h"
 
+/* Log Channel*/
+constexpr const char* CH_MUMBLE_READER	= "MumbleReader";
+
+/* DataLink */
+constexpr const char* DL_MUMBLE_LINK	= "DL_MUMBLE_LINK";
+constexpr const char* DL_NEXUS_LINK		= "DL_NEXUS_LINK";
+
+/* UI Scale */
+constexpr const float SC_SMALL			= 0.90f;
+constexpr const float SC_NORMAL			= 1.00f;
+constexpr const float SC_LARGE			= 1.11f;
+constexpr const float SC_LARGER			= 1.22f;
+
 ///----------------------------------------------------------------------------------------------------
 /// Mumble Namespace
 ///----------------------------------------------------------------------------------------------------

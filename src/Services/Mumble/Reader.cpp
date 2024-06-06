@@ -8,14 +8,8 @@
 
 #include "Services/Mumble/Reader.h"
 
-#include <map>
-#include <string>
-#include <Windows.h>
-
 #include "Shared.h"
 #include "State.h"
-#include "Renderer.h"
-#include "Consts.h"
 
 #include "Events/EventHandler.h"
 #include "DataLink/DataLink.h"
@@ -146,21 +140,21 @@ void CMumbleReader::Advance()
 			}
 			catch (json::parse_error& ex)
 			{
-				Log(CH_CORE, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
+				Log(CH_MUMBLE_READER, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
 			}
 			catch (json::type_error& ex)
 			{
-				Log(CH_CORE, "MumbleLink could not be parsed. Type Error: %s", ex.what());
+				Log(CH_MUMBLE_READER, "MumbleLink could not be parsed. Type Error: %s", ex.what());
 			}
 			catch (...)
 			{
-				Log(CH_CORE, "MumbleLink could not be parsed. Unknown Error.");
+				Log(CH_MUMBLE_READER, "MumbleLink could not be parsed. Unknown Error.");
 			}
 
 			/* notify (also notifies the GUI to update its scaling factor) */
 			if (*MumbleIdentity != this->PreviousIdentity)
 			{
-				Events::Raise(EV_MUMBLE_IDENTITY_UPDATED, MumbleIdentity);
+				Events::Raise("EV_MUMBLE_IDENTITY_UPDATED", MumbleIdentity);
 			}
 		}
 
