@@ -9,7 +9,6 @@
 #include "Services/Mumble/Reader.h"
 
 #include "Shared.h"
-#include "State.h"
 
 #include "Events/EventHandler.h"
 #include "DataLink/DataLink.h"
@@ -100,14 +99,25 @@ CMumbleReader::CMumbleReader(std::string aMumbleName)
 	}
 	else
 	{
+		this->IsRunning = true;
 		this->Thread = std::thread(&CMumbleReader::Advance, this);
 		this->Thread.detach();
 	}
 }
 
+CMumbleReader::~CMumbleReader()
+{
+	this->IsRunning = false;
+
+	if (this->Thread.joinable())
+	{
+		this->Thread.join();
+	}
+}
+
 void CMumbleReader::Advance()
 {
-	while (State::Nexus < ENexusState::SHUTTING_DOWN)
+	while (this->IsRunning)
 	{
 		IsGameplay		= PreviousTick != MumbleLink->UITick || (PreviousFrameCounter == FrameCounter && IsGameplay);
 		IsMoving		= PreviousAvatarPosition != MumbleLink->AvatarPosition;

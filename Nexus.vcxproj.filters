@@ -16,9 +16,6 @@
     <Filter Include="Logging">
       <UniqueIdentifier>{72f71e79-5933-4318-b293-5087228d8bf4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Mumble">
-      <UniqueIdentifier>{63ff3d3b-f85c-4e99-8c66-7638fa8d524f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Loader">
       <UniqueIdentifier>{ef159aa7-0ceb-4ef5-a926-097dfc64a130}</UniqueIdentifier>
     </Filter>
@@ -154,6 +151,9 @@
     <Filter Include="Services">
       <UniqueIdentifier>{7cebddb9-057f-4d36-bd2c-bbda84c7a459}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Services\Mumble">
+      <UniqueIdentifier>{63ff3d3b-f85c-4e99-8c66-7638fa8d524f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -208,7 +208,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Services\Mumble\Reader.cpp">
-      <Filter>Mumble</Filter>
+      <Filter>Services\Mumble</Filter>
     </ClCompile>
     <ClCompile Include="src\Events\EventHandler.cpp">
       <Filter>Events</Filter>
@@ -408,7 +408,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\Mumble\Reader.h">
-      <Filter>Mumble</Filter>
+      <Filter>Services\Mumble</Filter>
     </ClInclude>
     <ClInclude Include="src\Events\EventHandler.h">
       <Filter>Events</Filter>
@@ -968,9 +968,6 @@
     <ClInclude Include="src\GUI\ERenderType.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="src\Keybinds\KeystrokeMessageFlags.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1092,7 +1089,7 @@
       <Filter>GUI\Fonts</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\Mumble\Definitions\Mumble.h">
-      <Filter>Mumble</Filter>
+      <Filter>Services\Mumble</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

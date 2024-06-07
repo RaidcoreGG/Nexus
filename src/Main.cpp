@@ -155,6 +155,7 @@ namespace Main
 			Loader::Shutdown();
 
 			GUI::Shutdown();
+			delete MumbleReader;
 
 			// shared mem
 			DataLink::Free();

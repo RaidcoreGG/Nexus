@@ -55,10 +55,11 @@ public:
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
-	~CMumbleReader() = default;
+	~CMumbleReader();
 private:
 	std::string			Name;
 	std::thread			Thread;
+	bool				IsRunning				= false;
 
 	unsigned			PreviousTick			= 0;
 	Vector3				PreviousAvatarPosition	= {};
