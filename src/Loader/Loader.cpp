@@ -40,6 +40,8 @@
 #include "Updater/Updater.h"
 #include "GUI/Fonts/FontManager.h"
 
+#include "Services/Mumble/Reader.h"
+
 #include "ArcDPS.h"
 #include "Library.h"
 
@@ -428,7 +430,7 @@ namespace Loader
 			for (Addon* addon : Addons)
 			{
 				// if addon no longer on disk (also check if the path is not null, else it's from config)
-				if (!std::filesystem::exists(addon->Path) && addon->Path != "")
+				if (!addon->Path.empty() && !std::filesystem::exists(addon->Path))
 				{
 					QueueAddon(ELoaderAction::Unload, addon->Path);
 					continue;
@@ -712,8 +714,6 @@ namespace Loader
 				{
 					bool lShouldLoad = shouldLoad;
 
-					CUpdater& inst = CUpdater::GetInstance();
-
 					AddonInfo addonInfo
 					{
 						addon->Definitions->Signature,
@@ -727,7 +727,7 @@ namespace Loader
 						addon->AllowPrereleases
 					};
 
-					if (inst.UpdateAddon(tmpPath, addonInfo))
+					if (Updater.UpdateAddon(tmpPath, addonInfo))
 					{
 						LogInfo(CH_LOADER, "Update available for \"%s\".", tmpPath.string().c_str());
 						if (addon->IsDisabledUntilUpdate)
@@ -844,7 +844,7 @@ namespace Loader
 		auto time = end_time - start_time;
 
 		Events::Raise(EV_ADDON_LOADED, &addon->Definitions->Signature);
-		Events::Raise(EV_MUMBLE_IDENTITY_UPDATED, MumbleIdentity);
+		Events::Raise(EV_MUMBLE_IDENTITY_UPDATED, Mumble::IdentityParsed);
 
 		SortAddons();
 
@@ -1337,7 +1337,7 @@ namespace Loader
 			((AddonAPI4*)api)->RegisterRender = GUI::Register;
 			((AddonAPI4*)api)->DeregisterRender = GUI::Deregister;
 
-			((AddonAPI4*)api)->RequestUpdate = Updater::ADDONAPI_RequestUpdate;
+			((AddonAPI4*)api)->RequestUpdate = UpdaterStatic::ADDONAPI_RequestUpdate;
 
 			((AddonAPI4*)api)->GetGameDirectory = Path::GetGameDirectory;
 			((AddonAPI4*)api)->GetAddonDirectory = Path::GetAddonDirectory;

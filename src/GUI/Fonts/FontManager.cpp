@@ -102,7 +102,7 @@ bool CFontManager::Advance()
 
 	for (auto& font : this->Registry)
 	{
-		font.Pointer = io.Fonts->AddFontFromMemoryTTF(font.Data, font.DataSize, font.Size, font.Config, ranges.Data);
+		font.Pointer = io.Fonts->AddFontFromMemoryTTF(font.Data, static_cast<int>(font.DataSize), font.Size, font.Config, ranges.Data);
 	}
 
 	/* finally build atlas */

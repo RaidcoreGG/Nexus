@@ -81,7 +81,7 @@ namespace Main
 
 		std::thread([]()
 			{
-				CUpdater::GetInstance().UpdateNexus();
+				Updater.UpdateNexus();
 			})
 			.detach();
 		

@@ -52,6 +52,10 @@ extern const char* EV_ADDON_LOADED;
 extern const char* EV_ADDON_UNLOADED;
 extern const char* EV_VOLATILE_ADDON_DISABLED;
 
+/* DataLink */
+constexpr const char* DL_MUMBLE_LINK = "DL_MUMBLE_LINK";
+constexpr const char* DL_NEXUS_LINK = "DL_NEXUS_LINK";
+
 /* Loader */
 extern const UINT WM_ADDONDIRUPDATE;
 

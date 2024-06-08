@@ -8,6 +8,7 @@
 
 #include "Services/Mumble/Reader.h"
 
+#include "Consts.h"
 #include "Shared.h" /* FIXME: This is included at the moment because the LogHandler isn't dependency-injected. Fix before 2024/06/30. */
 #include "Renderer.h"
 #include "Hooks.h" /* FIXME: This is included at the moment because the NexusLink isn't dependency-injected. Fix before 2024/06/30. */
@@ -22,7 +23,7 @@ using namespace Mumble;
 
 namespace Mumble
 {
-	Identity* MumbleIdentity = new Identity{};
+	Identity* IdentityParsed = new Identity{};
 
 	bool operator==(const Identity& lhs, const Identity& rhs)
 	{
@@ -138,22 +139,22 @@ void CMumbleReader::Advance()
 		if (this->MumbleLink->Identity[0])
 		{
 			/* cache identity */
-			this->PreviousIdentity = *MumbleIdentity;
+			this->PreviousIdentity = *IdentityParsed;
 
 			try
 			{
 				/* parse and assign current identity */
 				json j = json::parse(MumbleLink->Identity);
-				strcpy(MumbleIdentity->Name, j["name"].get<std::string>().c_str());
-				j["profession"].get_to(MumbleIdentity->Profession);
-				j["spec"].get_to(MumbleIdentity->Specialization);
-				j["race"].get_to(MumbleIdentity->Race);
-				j["map_id"].get_to(MumbleIdentity->MapID);
-				j["world_id"].get_to(MumbleIdentity->WorldID);
-				j["team_color_id"].get_to(MumbleIdentity->TeamColorID);
-				j["commander"].get_to(MumbleIdentity->IsCommander);
-				j["fov"].get_to(MumbleIdentity->FOV);
-				j["uisz"].get_to(MumbleIdentity->UISize);
+				strcpy(IdentityParsed->Name, j["name"].get<std::string>().c_str());
+				j["profession"].get_to(IdentityParsed->Profession);
+				j["spec"].get_to(IdentityParsed->Specialization);
+				j["race"].get_to(IdentityParsed->Race);
+				j["map_id"].get_to(IdentityParsed->MapID);
+				j["world_id"].get_to(IdentityParsed->WorldID);
+				j["team_color_id"].get_to(IdentityParsed->TeamColorID);
+				j["commander"].get_to(IdentityParsed->IsCommander);
+				j["fov"].get_to(IdentityParsed->FOV);
+				j["uisz"].get_to(IdentityParsed->UISize);
 			}
 			catch (json::parse_error& ex)
 			{
@@ -169,9 +170,9 @@ void CMumbleReader::Advance()
 			}
 
 			/* notify (also notifies the GUI to update its scaling factor) */
-			if (*MumbleIdentity != this->PreviousIdentity)
+			if (*IdentityParsed != this->PreviousIdentity)
 			{
-				Events::Raise("EV_MUMBLE_IDENTITY_UPDATED", MumbleIdentity);
+				Events::Raise("EV_MUMBLE_IDENTITY_UPDATED", IdentityParsed);
 			}
 		}
 

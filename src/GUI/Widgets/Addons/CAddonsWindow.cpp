@@ -244,8 +244,6 @@ namespace GUI
 
 									std::thread([this, tmpPath, addon]()
 										{
-											CUpdater& inst = CUpdater::GetInstance();
-
 											AddonInfo addonInfo
 											{
 												addon->Definitions->Signature,
@@ -259,7 +257,7 @@ namespace GUI
 												addon->AllowPrereleases
 											};
 
-											if (inst.UpdateAddon(tmpPath, addonInfo))
+											if (Updater.UpdateAddon(tmpPath, addonInfo))
 											{
 												Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
 											}

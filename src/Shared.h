@@ -6,16 +6,13 @@
 #include <string>
 
 #include "Loader/AddonDefinition.h"
-#include "Loader/NexusLinkData.h"
-#include "Services/Mumble/Definitions/Mumble.h"
-#include "Services/Mumble/Reader.h"
 #include "Logging/LogHandler.h"
 #include "API/ApiClient.h"
 #include "Localization/Localization.h"
+#include "Updater/Updater.h"
 
 #include "imgui.h"
 
-using namespace Mumble;
 using namespace LogHandler;
 
 extern DWORD						NexusModuleSize;
@@ -28,7 +25,9 @@ extern AddonVersion					Version;
 extern std::vector<std::string>		Parameters;
 extern std::vector<signed int>		RequestedAddons;
 
+/* FIXME: these need to be dependency injected. Fix before 2024/06/30. */
 extern CLocalization&				Language;
+extern CUpdater&					Updater;
 
 extern ImFont*						MonospaceFont;	/* default/monospace/console font */
 extern ImFont*						UserFont;		/* custom user font */

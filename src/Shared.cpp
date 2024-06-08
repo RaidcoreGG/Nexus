@@ -13,6 +13,7 @@ std::vector<std::string>	Parameters			= {};
 std::vector<signed int>		RequestedAddons		= {};
 
 CLocalization&				Language			= CLocalization::GetInstance();
+CUpdater&					Updater				= CUpdater::GetInstance();
 
 ImFont*						MonospaceFont		= nullptr;
 ImFont*						UserFont			= nullptr;

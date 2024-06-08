@@ -106,15 +106,13 @@ namespace Hooks
 
 			if (NexusLink)
 			{
-				NexusLink->Width = Renderer::Width;
-				NexusLink->Height = Renderer::Height;
 				NexusLink->Scaling = Renderer::Scaling;
 
 				NexusLink->Font = Font;
 				NexusLink->FontBig = FontBig;
 				NexusLink->FontUI = FontUI;
 
-				NexusLink->QuickAccessIconsCount = GUI::QuickAccess::Registry.size(); // write this only when adding/removing icons
+				NexusLink->QuickAccessIconsCount = static_cast<int>(GUI::QuickAccess::Registry.size()); // write this only when adding/removing icons
 				NexusLink->QuickAccessMode = (int)GUI::QuickAccess::Location;
 				NexusLink->QuickAccessIsVertical = GUI::QuickAccess::VerticalLayout;
 			}

@@ -455,8 +455,8 @@ namespace GUI
 
 	void Rescale()
 	{
-		float currScaling = MumbleIdentity
-			? Mumble::GetScalingFactor(MumbleIdentity->UISize)
+		float currScaling = Mumble::IdentityParsed
+			? Mumble::GetScalingFactor(Mumble::IdentityParsed->UISize)
 			: 1.0f;
 
 		ImGuiIO& io = ImGui::GetIO();
@@ -465,9 +465,9 @@ namespace GUI
 	
 	void OnMumbleIdentityChanged(void* aEventArgs)
 	{
-		if (MumbleIdentity)
+		if (Mumble::IdentityParsed)
 		{
-			float currScaling = Mumble::GetScalingFactor(MumbleIdentity->UISize);
+			float currScaling = Mumble::GetScalingFactor(Mumble::IdentityParsed->UISize);
 			if (currScaling != LastScaling && NexusLink->IsGameplay)
 			{
 				Rescale();
@@ -476,25 +476,25 @@ namespace GUI
 				Settings::Save();
 			}
 
-			switch (MumbleIdentity->UISize)
+			switch (Mumble::IdentityParsed->UISize)
 			{
-			case EUIScale::Small:
+			case Mumble::EUIScale::Small:
 				Font = FontIndex[EFont::Menomonia_Small];
 				FontBig = FontIndex[EFont::MenomoniaBig_Small];
 				FontUI = FontIndex[EFont::Trebuchet_Small];
 				break;
 			default:
-			case EUIScale::Normal:
+			case Mumble::EUIScale::Normal:
 				Font = FontIndex[EFont::Menomonia_Normal];
 				FontBig = FontIndex[EFont::MenomoniaBig_Normal];
 				FontUI = FontIndex[EFont::Trebuchet_Normal];
 				break;
-			case EUIScale::Large:
+			case Mumble::EUIScale::Large:
 				Font = FontIndex[EFont::Menomonia_Large];
 				FontBig = FontIndex[EFont::MenomoniaBig_Large];
 				FontUI = FontIndex[EFont::Trebuchet_Large];
 				break;
-			case EUIScale::Larger:
+			case Mumble::EUIScale::Larger:
 				Font = FontIndex[EFont::Menomonia_Larger];
 				FontBig = FontIndex[EFont::MenomoniaBig_Larger];
 				FontUI = FontIndex[EFont::Trebuchet_Larger];
