@@ -8,10 +8,12 @@
 
 #include "Textures/Texture.h"
 #include "Textures/TextureLoader.h"
-#include "Keybinds/KeybindHandler.h"
+#include "Inputs/Keybinds/KeybindHandler.h"
 #include "Loader/Loader.h"
 
 #include "resource.h"
+
+#include "GUI/GUI.h"
 
 namespace GUI
 {
@@ -59,7 +61,7 @@ namespace GUI
 
 		void Render()
 		{
-			if (!(AlwaysShow || IsGameplay))
+			if (!(AlwaysShow || GUI::NexusLink->IsGameplay))
 			{
 				return;
 			}

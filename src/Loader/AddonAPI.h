@@ -5,8 +5,8 @@
 #include "Paths/FuncDefs.h"
 #include "Logging/FuncDefs.h"
 #include "Events/FuncDefs.h"
-#include "WndProc/FuncDefs.h"
-#include "Keybinds/FuncDefs.h"
+#include "Inputs/WndProc/FuncDefs.h"
+#include "Inputs/Keybinds/FuncDefs.h"
 #include "imgui/imgui.h"
 #include "minhook/mh_hook.h"
 #include "DataLink/FuncDefs.h"
@@ -262,8 +262,8 @@ struct AddonAPI4 : AddonAPI
 	WNDPROC_SENDTOGAME					SendWndProcToGameOnly;
 
 	/* Keybinds */
-	KEYBINDS_REGISTERWITHSTRING			RegisterKeybindWithString;
-	KEYBINDS_REGISTERWITHSTRUCT			RegisterKeybindWithStruct;
+	KEYBINDS_REGISTERWITHSTRING2		RegisterKeybindWithString;
+	KEYBINDS_REGISTERWITHSTRUCT2		RegisterKeybindWithStruct;
 	KEYBINDS_DEREGISTER					DeregisterKeybind;
 
 	/* DataLink */

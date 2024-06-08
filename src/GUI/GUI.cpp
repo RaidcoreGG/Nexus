@@ -13,10 +13,10 @@
 #include "Branch.h"
 #include "Version.h"
 
-#include "Mumble/Mumble.h"
+#include "Services/Mumble/Reader.h"
 
 #include "Events/EventHandler.h"
-#include "Keybinds/KeybindHandler.h"
+#include "Inputs/Keybinds/KeybindHandler.h"
 #include "Loader/Loader.h"
 #include "Settings/Settings.h"
 #include "Textures/TextureLoader.h"
@@ -58,6 +58,9 @@ namespace GUI
 	void OnMumbleIdentityChanged(void* aEventArgs);
 	void OnLanguageChanged(void* aEventArgs);
 	void Setup();
+
+	Mumble::Data*				MumbleLink					= nullptr;
+	NexusLinkData*				NexusLink					= nullptr;
 
 	std::mutex					Mutex;
 	std::vector<GUI_RENDER>		RegistryPreRender;
@@ -452,8 +455,8 @@ namespace GUI
 
 	void Rescale()
 	{
-		float currScaling = MumbleIdentity
-			? Mumble::GetScalingFactor(MumbleIdentity->UISize)
+		float currScaling = Mumble::IdentityParsed
+			? Mumble::GetScalingFactor(Mumble::IdentityParsed->UISize)
 			: 1.0f;
 
 		ImGuiIO& io = ImGui::GetIO();
@@ -462,10 +465,10 @@ namespace GUI
 	
 	void OnMumbleIdentityChanged(void* aEventArgs)
 	{
-		if (MumbleIdentity)
+		if (Mumble::IdentityParsed)
 		{
-			float currScaling = Mumble::GetScalingFactor(MumbleIdentity->UISize);
-			if (currScaling != LastScaling && IsGameplay)
+			float currScaling = Mumble::GetScalingFactor(Mumble::IdentityParsed->UISize);
+			if (currScaling != LastScaling && NexusLink->IsGameplay)
 			{
 				Rescale();
 				LastScaling = currScaling;
@@ -473,25 +476,25 @@ namespace GUI
 				Settings::Save();
 			}
 
-			switch (MumbleIdentity->UISize)
+			switch (Mumble::IdentityParsed->UISize)
 			{
-			case 0:
+			case Mumble::EUIScale::Small:
 				Font = FontIndex[EFont::Menomonia_Small];
 				FontBig = FontIndex[EFont::MenomoniaBig_Small];
 				FontUI = FontIndex[EFont::Trebuchet_Small];
 				break;
 			default:
-			case 1:
+			case Mumble::EUIScale::Normal:
 				Font = FontIndex[EFont::Menomonia_Normal];
 				FontBig = FontIndex[EFont::MenomoniaBig_Normal];
 				FontUI = FontIndex[EFont::Trebuchet_Normal];
 				break;
-			case 2:
+			case Mumble::EUIScale::Large:
 				Font = FontIndex[EFont::Menomonia_Large];
 				FontBig = FontIndex[EFont::MenomoniaBig_Large];
 				FontUI = FontIndex[EFont::Trebuchet_Large];
 				break;
-			case 3:
+			case Mumble::EUIScale::Larger:
 				Font = FontIndex[EFont::Menomonia_Larger];
 				FontBig = FontIndex[EFont::MenomoniaBig_Larger];
 				FontUI = FontIndex[EFont::Trebuchet_Larger];
@@ -829,12 +832,12 @@ namespace GUI
 		CDebugWindow* dbgWnd = new CDebugWindow("Debug");
 		CAboutBox* aboutWnd = new CAboutBox("About");
 
-		Keybinds::Register(KB_ADDONS, ProcessKeybind, "(null)");
-		Keybinds::Register(KB_OPTIONS, ProcessKeybind, "(null)");
-		Keybinds::Register(KB_CHANGELOG, ProcessKeybind, "(null)");
-		Keybinds::Register(KB_LOG, ProcessKeybind, "(null)");
-		Keybinds::Register(KB_DEBUG, ProcessKeybind, "(null)");
-		Keybinds::Register(KB_MUMBLEOVERLAY, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_ADDONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_OPTIONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_CHANGELOG, EKBHType::DownOnly, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_LOG, EKBHType::DownOnly, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_DEBUG, EKBHType::DownOnly, ProcessKeybind, "(null)");
+		Keybinds::Register(KB_MUMBLEOVERLAY, EKBHType::DownOnly, ProcessKeybind, "(null)");
 
 		AddWindow(addonsWnd);
 		AddWindow(opsWnd);
@@ -853,8 +856,8 @@ namespace GUI
 		Menu::AddMenuItem("((000008))",		ICON_ABOUT,		RES_ICON_ABOUT,		&aboutWnd->Visible);
 
 		/* register keybinds */
-		Keybinds::Register(KB_MENU, ProcessKeybind, "CTRL+O");
-		Keybinds::Register(KB_TOGGLEHIDEUI, ProcessKeybind, "CTRL+H");
+		Keybinds::Register(KB_MENU, EKBHType::DownOnly, ProcessKeybind, "CTRL+O");
+		Keybinds::Register(KB_TOGGLEHIDEUI, EKBHType::DownOnly, ProcessKeybind, "CTRL+H");
 
 		/* load icons */
 		std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());

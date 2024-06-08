@@ -13,8 +13,14 @@
 
 #include "imgui/imgui.h"
 
+#include "Services/Mumble/Definitions/Mumble.h"
+#include "Loader/NexusLinkData.h"
+
 namespace GUI
 {
+	extern Mumble::Data*				MumbleLink;
+	extern NexusLinkData*				NexusLink;
+
 	extern std::mutex					Mutex;
 	extern std::vector<GUI_RENDER>		RegistryPreRender;
 	extern std::vector<GUI_RENDER>		RegistryRender;

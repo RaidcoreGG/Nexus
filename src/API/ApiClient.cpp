@@ -289,7 +289,7 @@ void CApiClient::ProcessRequests()
 				/* time difference divided by interval gives how many "ticks" happened (rounded down)
 				 * multiplied with how many tokens are regenerated
 				 * in c++ integer division is truncated toward 0 and is defined behaviour */
-				Bucket += (deltaRefill / RefillInterval) * RefillAmount;
+				Bucket += static_cast<int>((deltaRefill / RefillInterval) * RefillAmount);
 
 				/* time is not set to current timestamp but rather when the last tick happened*/
 				TimeSinceLastRefill = Timestamp() - (deltaRefill % RefillInterval);

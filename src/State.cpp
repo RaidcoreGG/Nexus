@@ -11,7 +11,7 @@
 #include "Consts.h"
 #include "Shared.h"
 
-#include "Mumble/Mumble.h"
+#include "Services/Mumble/Reader.h"
 #include "DataLink/DataLink.h"
 
 namespace State
@@ -26,12 +26,12 @@ namespace State
 	bool			IsDeveloperMode				= false;
 	bool			IsConsoleEnabled			= false;
 	bool			IsVanilla					= false;
-	bool			IsMumbleDisabled			= false;
 
-	void Initialize()
+	std::string Initialize()
 	{
 		bool first = true;
 		bool customMumble = false;
+		std::string mumbleName;
 
 		int argc;
 		LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
@@ -57,10 +57,9 @@ namespace State
 			if (cmp == "-mumble" && i + 1 <= argc)
 			{
 				std::wstring mumbleNameW = argv[i + 1];
-				std::string mumbleName = String::ToString(mumbleNameW);
 
 				customMumble = true;
-				MumbleLinkName = mumbleName;
+				mumbleName = String::ToString(mumbleNameW);
 
 				token.append(" ");
 				token.append(mumbleName);
@@ -104,8 +103,10 @@ namespace State
 
 		if (!customMumble)
 		{
-			MumbleLinkName = "MumbleLink";
+			mumbleName = "MumbleLink";
 		}
+
+		return mumbleName;
 	}
 }
 

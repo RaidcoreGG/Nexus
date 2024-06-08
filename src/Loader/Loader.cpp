@@ -26,8 +26,8 @@
 
 #include "Logging/LogHandler.h"
 #include "Events/EventHandler.h"
-#include "WndProc/WndProcHandler.h"
-#include "Keybinds/KeybindHandler.h"
+#include "Inputs/WndProc/WndProcHandler.h"
+#include "Inputs/Keybinds/KeybindHandler.h"
 #include "imgui/imgui.h"
 #include "minhook/mh_hook.h"
 #include "DataLink/DataLink.h"
@@ -39,6 +39,8 @@
 #include "Localization/Localization.h"
 #include "Updater/Updater.h"
 #include "GUI/Fonts/FontManager.h"
+
+#include "Services/Mumble/Reader.h"
 
 #include "ArcDPS.h"
 #include "Library.h"
@@ -52,6 +54,8 @@ using json = nlohmann::json;
 
 namespace Loader
 {
+	NexusLinkData*				NexusLink = nullptr;;
+
 	std::mutex					Mutex;
 	std::unordered_map<
 		std::filesystem::path,
@@ -80,6 +84,8 @@ namespace Loader
 
 	void Initialize()
 	{
+		NexusLink = (NexusLinkData*)DataLink::ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData));
+
 		if (State::Nexus == ENexusState::LOADED)
 		{
 			LoadAddonConfig();
@@ -124,7 +130,7 @@ namespace Loader
 				{
 					Sleep(5000);
 					int nothingCounter = 0;
-					while (!IsGameplay)
+					while (!NexusLink->IsGameplay)
 					{
 						/* do nothing */
 						Sleep(1);
@@ -424,7 +430,7 @@ namespace Loader
 			for (Addon* addon : Addons)
 			{
 				// if addon no longer on disk (also check if the path is not null, else it's from config)
-				if (!std::filesystem::exists(addon->Path) && addon->Path != "")
+				if (!addon->Path.empty() && !std::filesystem::exists(addon->Path))
 				{
 					QueueAddon(ELoaderAction::Unload, addon->Path);
 					continue;
@@ -708,8 +714,6 @@ namespace Loader
 				{
 					bool lShouldLoad = shouldLoad;
 
-					CUpdater& inst = CUpdater::GetInstance();
-
 					AddonInfo addonInfo
 					{
 						addon->Definitions->Signature,
@@ -723,7 +727,7 @@ namespace Loader
 						addon->AllowPrereleases
 					};
 
-					if (inst.UpdateAddon(tmpPath, addonInfo))
+					if (Updater.UpdateAddon(tmpPath, addonInfo))
 					{
 						LogInfo(CH_LOADER, "Update available for \"%s\".", tmpPath.string().c_str());
 						if (addon->IsDisabledUntilUpdate)
@@ -840,7 +844,7 @@ namespace Loader
 		auto time = end_time - start_time;
 
 		Events::Raise(EV_ADDON_LOADED, &addon->Definitions->Signature);
-		Events::Raise(EV_MUMBLE_IDENTITY_UPDATED, MumbleIdentity);
+		Events::Raise(EV_MUMBLE_IDENTITY_UPDATED, Mumble::IdentityParsed);
 
 		SortAddons();
 
@@ -1333,7 +1337,7 @@ namespace Loader
 			((AddonAPI4*)api)->RegisterRender = GUI::Register;
 			((AddonAPI4*)api)->DeregisterRender = GUI::Deregister;
 
-			((AddonAPI4*)api)->RequestUpdate = Updater::ADDONAPI_RequestUpdate;
+			((AddonAPI4*)api)->RequestUpdate = UpdaterStatic::ADDONAPI_RequestUpdate;
 
 			((AddonAPI4*)api)->GetGameDirectory = Path::GetGameDirectory;
 			((AddonAPI4*)api)->GetAddonDirectory = Path::GetAddonDirectory;
@@ -1359,8 +1363,8 @@ namespace Loader
 			((AddonAPI4*)api)->DeregisterWndProc = WndProc::Deregister;
 			((AddonAPI4*)api)->SendWndProcToGameOnly = WndProc::SendWndProcToGame;
 
-			((AddonAPI4*)api)->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString;
-			((AddonAPI4*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct;
+			((AddonAPI4*)api)->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString2;
+			((AddonAPI4*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct2;
 			((AddonAPI4*)api)->DeregisterKeybind = Keybinds::Deregister;
 
 			((AddonAPI4*)api)->GetResource = DataLink::GetResource;

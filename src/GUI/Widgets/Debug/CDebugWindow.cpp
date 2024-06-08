@@ -4,7 +4,7 @@
 #include "State.h"
 
 #include "Events/EventHandler.h"
-#include "Keybinds/KeybindHandler.h"
+#include "Inputs/Keybinds/KeybindHandler.h"
 #include "DataLink/DataLink.h"
 #include "Textures/TextureLoader.h"
 #include "GUI/Widgets/QuickAccess/QuickAccess.h"

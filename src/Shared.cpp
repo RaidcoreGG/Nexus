@@ -12,18 +12,8 @@ AddonVersion				Version				= { V_MAJOR, V_MINOR, V_BUILD, V_REVISION };
 std::vector<std::string>	Parameters			= {};
 std::vector<signed int>		RequestedAddons		= {};
 
-long long					FrameCounter		= 0;
-
-std::string					MumbleLinkName;
-LinkedMem*					MumbleLink			= nullptr;
-Identity*					MumbleIdentity		= new Identity{};
-bool						IsMoving			= false;
-bool						IsCameraMoving		= false;
-bool						IsGameplay			= false;
-
-NexusLinkData*				NexusLink			= nullptr;
-
 CLocalization&				Language			= CLocalization::GetInstance();
+CUpdater&					Updater				= CUpdater::GetInstance();
 
 ImFont*						MonospaceFont		= nullptr;
 ImFont*						UserFont			= nullptr;

@@ -1,11 +1,5 @@
 #include "Consts.h"
 
-/* UI Scale */
-const float SC_SMALL					= 0.90f;
-const float SC_NORMAL					= 1.00f;
-const float SC_LARGE					= 1.11f;
-const float SC_LARGER					= 1.22f;
-
 /* Channels */
 const char* CH_CORE						= "Core";
 const char* CH_EVENTS					= "Events";
@@ -56,10 +50,6 @@ const char* EV_MUMBLE_IDENTITY_UPDATED	= "EV_MUMBLE_IDENTITY_UPDATED";
 const char* EV_ADDON_LOADED				= "EV_ADDON_LOADED";
 const char* EV_ADDON_UNLOADED			= "EV_ADDON_UNLOADED";
 const char* EV_VOLATILE_ADDON_DISABLED	= "EV_VOLATILE_ADDON_DISABLED";
-
-/* DataLink */
-const char* DL_MUMBLE_LINK				= "DL_MUMBLE_LINK";
-const char* DL_NEXUS_LINK				= "DL_NEXUS_LINK";
 
 /* Loader */
 const UINT WM_ADDONDIRUPDATE			= WM_USER + 101;

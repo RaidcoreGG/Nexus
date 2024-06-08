@@ -14,7 +14,7 @@
 #include "Shared.h"
 #include "Paths.h"
 
-namespace Updater
+namespace UpdaterStatic
 {
 	void ADDONAPI_RequestUpdate(signed int aSignature, const char* aUpdateURL)
 	{

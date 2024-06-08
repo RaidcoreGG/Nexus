@@ -153,8 +153,6 @@ namespace GUI
 										std::filesystem::path tmpPath = addon->Path.string();
 										std::thread([aAddon, tmpPath]()
 											{
-												CUpdater& inst = CUpdater::GetInstance();
-
 												AddonInfo addonInfo
 												{
 													aAddon->Definitions->Signature,
@@ -168,7 +166,7 @@ namespace GUI
 													aAddon->AllowPrereleases
 												};
 
-												if (inst.UpdateAddon(tmpPath, addonInfo))
+												if (Updater.UpdateAddon(tmpPath, addonInfo))
 												{
 													Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
 
@@ -444,8 +442,7 @@ namespace GUI
 						{
 							std::thread([aAddon, aIsArcPlugin]()
 								{
-									CUpdater& inst = CUpdater::GetInstance();
-									inst.InstallAddon(aAddon, aIsArcPlugin);
+									Updater.InstallAddon(aAddon, aIsArcPlugin);
 
 									if (aIsArcPlugin)
 									{

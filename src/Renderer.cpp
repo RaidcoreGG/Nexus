@@ -10,6 +10,8 @@ namespace Renderer
 
 	HWND					WindowHandle		= nullptr;
 
+	long long				FrameCounter		= 0;
+
 	unsigned				Width				= 0;
 	unsigned				Height				= 0;
 	float					Scaling				= 0;

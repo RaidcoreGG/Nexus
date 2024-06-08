@@ -17,6 +17,8 @@ namespace Renderer
 
 	extern HWND						WindowHandle;		/* GW2's window handle*/
 
+	extern long long				FrameCounter;
+
 	extern unsigned					Width;
 	extern unsigned					Height;
 	extern float					Scaling;

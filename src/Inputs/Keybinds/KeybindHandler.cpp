@@ -28,12 +28,22 @@ namespace Keybinds
 {
 	void ADDONAPI_RegisterWithString(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const char* aKeybind)
 	{
-		Register(aIdentifier, aKeybindHandler, aKeybind);
+		Register(aIdentifier, EKeybindHandlerType::DownOnly, aKeybindHandler, aKeybind);
 	}
 
 	void ADDONAPI_RegisterWithStruct(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, Keybind aKeybind)
 	{
-		Register(aIdentifier, aKeybindHandler, aKeybind);
+		Register(aIdentifier, EKeybindHandlerType::DownOnly, aKeybindHandler, aKeybind);
+	}
+
+	void ADDONAPI_RegisterWithString2(const char* aIdentifier, KEYBINDS_PROCESS2 aKeybindHandler, const char* aKeybind)
+	{
+		Register(aIdentifier, EKeybindHandlerType::DownAndRelease, aKeybindHandler, aKeybind);
+	}
+
+	void ADDONAPI_RegisterWithStruct2(const char* aIdentifier, KEYBINDS_PROCESS2 aKeybindHandler, Keybind aKeybind)
+	{
+		Register(aIdentifier, EKeybindHandlerType::DownAndRelease, aKeybindHandler, aKeybind);
 	}
 }
 
@@ -45,6 +55,12 @@ namespace Keybinds
 	bool									IsSettingKeybind = false;
 	Keybind									CurrentKeybind;
 	std::string								CurrentKeybindUsedBy;
+
+	bool									AltTracked;
+	bool									CtrlTracked;
+	bool									ShiftTracked;
+	std::vector<unsigned short>				KeysTracked;
+	std::map<std::string, ActiveKeybind>	HeldKeybinds;
 
 	std::map<unsigned short, std::string>	ScancodeLookupTable;
 
@@ -77,27 +93,42 @@ namespace Keybinds
 
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
+		Keybind kb{};
+
 		switch (uMsg)
 		{
+		case WM_ACTIVATE:
+			AltTracked = false;
+			CtrlTracked = false;
+			ShiftTracked = false;
+			KeysTracked.clear();
+
+			for (auto& bind : HeldKeybinds)
+			{
+				Invoke(bind.first, true);
+			}
+
+			HeldKeybinds.clear();
+			break;
+
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
 			if (wParam > 255) break;
 
 			KeyLParam keylp = LParamToKMF(lParam);
 
-			Keybind kb{};
 			kb.Alt = GetKeyState(VK_MENU) & 0x8000;
 			kb.Ctrl = GetKeyState(VK_CONTROL) & 0x8000;
 			kb.Shift = GetKeyState(VK_SHIFT) & 0x8000;
 			kb.Key = keylp.GetScanCode();
-			
+
 			// if shift, ctrl or alt set key to 0
 			if (wParam == 16 || wParam == 17 || wParam == 18)
 			{
 				kb.Key = 0;
 			}
 
-			if (!kb.Alt && !kb.Ctrl && !kb.Shift && kb.Key == 0)
+			if (kb == Keybind{})
 			{
 				return uMsg;
 			}
@@ -106,7 +137,7 @@ namespace Keybinds
 			{
 				return uMsg;
 			}
-			
+
 			/* only check if not currently setting keybind */
 			if (!IsSettingKeybind)
 			{
@@ -114,10 +145,28 @@ namespace Keybinds
 				{
 					if (kb == it.second.Bind)
 					{
+						/* keybind was found */
+
+						/* track these keys for the release event */
+						if (kb.Alt) { AltTracked = true; }
+						if (kb.Ctrl) { CtrlTracked = true; }
+						if (kb.Shift) { ShiftTracked = true; }
+						if (std::find(KeysTracked.begin(), KeysTracked.end(), kb.Key) == KeysTracked.end())
+						{
+							KeysTracked.push_back(kb.Key);
+						}
+
+						/* track the actual bind/id combo too */
+						if (HeldKeybinds.find(it.first) == HeldKeybinds.end())
+						{
+							HeldKeybinds[it.first] = it.second;
+						}
+
 						if (it.first == KB_TOGGLEHIDEUI)
 						{
 							// invoke but do not return, pass through to game (multi hide)
 							Invoke(it.first);
+							break;
 						}
 						else
 						{
@@ -133,6 +182,59 @@ namespace Keybinds
 				CurrentKeybindUsedBy = Keybinds::IsInUse(kb);
 			}
 			
+			break;
+
+		case WM_SYSKEYUP:
+		case WM_KEYUP:
+			if (wParam > 255) break;
+
+			/* only check if not currently setting keybind */
+			if (IsSettingKeybind)
+			{
+				return uMsg;
+			}
+
+			std::vector<std::string> heldBindsPop;
+
+			for (auto& bind : HeldKeybinds)
+			{
+				if (wParam == 16 && bind.second.Bind.Shift)
+				{
+					Invoke(bind.first, true);
+					ShiftTracked = false;
+					heldBindsPop.push_back(bind.first);
+				}
+				else if (wParam == 17 && bind.second.Bind.Ctrl)
+				{
+					Invoke(bind.first, true);
+					CtrlTracked = false;
+					heldBindsPop.push_back(bind.first);
+				}
+				else if (wParam == 18 && bind.second.Bind.Alt)
+				{
+					Invoke(bind.first, true);
+					AltTracked = false;
+					heldBindsPop.push_back(bind.first);
+				}
+				else
+				{
+					KeyLParam keylp = LParamToKMF(lParam);
+					unsigned short scanCode = keylp.GetScanCode();
+
+					if (scanCode == bind.second.Bind.Key)
+					{
+						Invoke(bind.first, true);
+						KeysTracked.erase(std::find(KeysTracked.begin(), KeysTracked.end(), scanCode));
+						heldBindsPop.push_back(bind.first);
+					}
+				}
+			}
+
+			for (auto bind : heldBindsPop)
+			{
+				HeldKeybinds.erase(bind);
+			}
+
 			break;
 		}
 
@@ -211,12 +313,12 @@ namespace Keybinds
 		file.close();
 	}
 
-	void Register(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const char* aKeybind)
+	void Register(const char* aIdentifier, EKeybindHandlerType aKeybindHandlerType, void* aKeybindHandler, const char* aKeybind)
 	{
 		Keybind requestedBind = KBFromString(aKeybind);
-		Register(aIdentifier, aKeybindHandler, requestedBind);
+		Register(aIdentifier, aKeybindHandlerType, aKeybindHandler, requestedBind);
 	}
-	void Register(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, Keybind aKeybind)
+	void Register(const char* aIdentifier, EKeybindHandlerType aKeybindHandlerType, void* aKeybindHandler, Keybind aKeybind)
 	{
 		std::string str = aIdentifier;
 
@@ -241,6 +343,7 @@ namespace Keybinds
 				Registry[str].Bind = requestedBind;
 			}
 
+			Registry[str].HandlerType = aKeybindHandlerType;
 			Registry[str].Handler = aKeybindHandler;
 		}
 
@@ -340,19 +443,37 @@ namespace Keybinds
 		Save();
 	}
 
-	bool Invoke(std::string aIdentifier)
+	bool Invoke(std::string aIdentifier, bool aIsRelease)
 	{
 		bool called = false;
 
 		const std::lock_guard<std::mutex> lock(Mutex);
 
-		if (Registry[aIdentifier].Handler)
+		auto& bind = Registry[aIdentifier];
+
+		void* handlerFunc = bind.Handler;
+		EKeybindHandlerType type = bind.HandlerType;
+
+		if (handlerFunc)
 		{
-			std::thread([aIdentifier]()
-				{
-					Registry[aIdentifier].Handler(aIdentifier.c_str());
-				}).detach();
+			if ((bind.HandlerType == EKeybindHandlerType::DownOnly && !aIsRelease) ||
+				bind.HandlerType == EKeybindHandlerType::DownAndRelease)
+			{
+				std::thread([aIdentifier, type, handlerFunc, aIsRelease]()
+					{
+						switch (type)
+						{
+						case EKeybindHandlerType::DownOnly:
+							((KEYBINDS_PROCESS)handlerFunc)(aIdentifier.c_str());
+							break;
+						case EKeybindHandlerType::DownAndRelease:
+							((KEYBINDS_PROCESS2)handlerFunc)(aIdentifier.c_str(), aIsRelease);
+							break;
+						}
+					}).detach();
+
 				called = true;
+			}
 		}
 
 		return called;

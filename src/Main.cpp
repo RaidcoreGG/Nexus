@@ -16,16 +16,16 @@
 
 #include "DataLink/DataLink.h"
 #include "GUI/GUI.h"
-#include "Keybinds/KeybindHandler.h"
+#include "Inputs/Keybinds/KeybindHandler.h"
 #include "Loader/Loader.h"
 #include "Logging/LogHandler.h"
 #include "Logging/CConsoleLogger.h"
 #include "Logging/CFileLogger.h"
-#include "Mumble/Mumble.h"
+#include "Services/Mumble/Reader.h"
 #include "Settings/Settings.h"
 #include "API/ApiClient.h"
 #include "Updater/Updater.h"
-#include "Multibox/Multibox.h"
+#include "Services/Multibox/Multibox.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -46,6 +46,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
 namespace Main
 {
+	CMumbleReader* MumbleReader;
+
 	void Initialize()
 	{
 		if (State::Nexus >= ENexusState::LOAD) { return; }
@@ -59,7 +61,7 @@ namespace Main
 		NexusModuleSize = moduleInfo.SizeOfImage;
 
 		Path::Initialize(NexusHandle);
-		State::Initialize();
+		std::string mumbleName = State::Initialize();
 		
 		/* setup default loggers */
 		RegisterLogger(
@@ -79,7 +81,7 @@ namespace Main
 
 		std::thread([]()
 			{
-				CUpdater::GetInstance().UpdateNexus();
+				Updater.UpdateNexus();
 			})
 			.detach();
 		
@@ -118,7 +120,7 @@ namespace Main
 
 			//API::Initialize();
 
-			Mumble::Initialize();
+			MumbleReader = new CMumbleReader(mumbleName);
 
 			// create imgui context
 			if (!Renderer::GuiContext) { Renderer::GuiContext = ImGui::CreateContext(); }
@@ -153,7 +155,7 @@ namespace Main
 			Loader::Shutdown();
 
 			GUI::Shutdown();
-			Mumble::Shutdown();
+			delete MumbleReader;
 
 			// shared mem
 			DataLink::Free();

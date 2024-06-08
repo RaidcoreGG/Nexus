@@ -1,55 +1,79 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  Mumble.h
+/// Name         :  Reader.h
 /// Description  :  Provides Mumble API events and extended data.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef MUMBLE_H
-#define MUMBLE_H
+#ifndef MUMBLE_READER_H
+#define MUMBLE_READER_H
 
 #include <thread>
+#include <string>
+
+#include "Services/Mumble/Definitions/Mumble.h"
+#include "Loader/NexusLinkData.h"
+
+/* Log Channel*/
+constexpr const char* CH_MUMBLE_READER				= "MumbleReader";
+
+/* UI Scale */
+constexpr const float SC_SMALL						= 0.90f;
+constexpr const float SC_NORMAL						= 1.00f;
+constexpr const float SC_LARGE						= 1.11f;
+constexpr const float SC_LARGER						= 1.22f;
 
 ///----------------------------------------------------------------------------------------------------
 /// Mumble Namespace
 ///----------------------------------------------------------------------------------------------------
 namespace Mumble
 {
-	extern bool IsRunning;
-
-	extern std::thread UpdateIdentityThread;
-	extern std::thread UpdateStateThread;
-
-	///----------------------------------------------------------------------------------------------------
-	/// Initialize:
-	/// 	Initializes the threads parsing the MumbleLink.
-	///----------------------------------------------------------------------------------------------------
-	void Initialize();
-
-	///----------------------------------------------------------------------------------------------------
-	/// Shutdown:
-	/// 	Stops the MumbleLink threads.
-	///----------------------------------------------------------------------------------------------------
-	void Shutdown();
-
-	///----------------------------------------------------------------------------------------------------
-	/// UpdateIdentityLoop:
-	/// 	Loop that polls Mumble->Identity.
-	///----------------------------------------------------------------------------------------------------
-	void UpdateIdentityLoop();
-
-	///----------------------------------------------------------------------------------------------------
-	/// UpdateStateLoop:
-	/// 	Loop that polls various derived states.
-	///----------------------------------------------------------------------------------------------------
-	void UpdateStateLoop();
+	extern Identity* IdentityParsed;
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetScalingFactor:
 	/// 	Returns the scaling factor for the given the UISize enum.
 	///----------------------------------------------------------------------------------------------------
-	float GetScalingFactor(unsigned aSize);
+	float GetScalingFactor(EUIScale aSize);
+};
+
+///----------------------------------------------------------------------------------------------------
+/// CMumbleReader Class
+///----------------------------------------------------------------------------------------------------
+class CMumbleReader
+{
+public:
+	bool			IsMumbleDisabled			= false;
+
+	///----------------------------------------------------------------------------------------------------
+	/// ctor
+	///----------------------------------------------------------------------------------------------------
+	CMumbleReader(std::string aMumbleName = "MumbleLink");
+
+	///----------------------------------------------------------------------------------------------------
+	/// dtor
+	///----------------------------------------------------------------------------------------------------
+	~CMumbleReader();
+private:
+	std::thread			Thread;
+	bool				IsRunning				= false;
+
+	std::string			Name;
+	Mumble::Data*		MumbleLink				= nullptr;
+	NexusLinkData*		NexusLink				= nullptr;
+
+	unsigned			PreviousTick			= 0;
+	Vector3				PreviousAvatarPosition	= {};
+	Vector3				PreviousCameraFront		= {};
+	Mumble::Identity	PreviousIdentity		= Mumble::Identity{};
+	long long			PreviousFrameCounter	= 0;
+
+	///----------------------------------------------------------------------------------------------------
+	/// Advance:
+	/// 	Reader loop function.
+	///----------------------------------------------------------------------------------------------------
+	void Advance();
 };
 
 #endif

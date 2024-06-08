@@ -3,12 +3,6 @@
 
 #include <Windows.h>
 
-/* UI Scale */
-extern const float SC_SMALL;
-extern const float SC_NORMAL;
-extern const float SC_LARGE;
-extern const float SC_LARGER;
-
 /* Channels */
 extern const char* CH_CORE;
 extern const char* CH_EVENTS;
@@ -59,8 +53,8 @@ extern const char* EV_ADDON_UNLOADED;
 extern const char* EV_VOLATILE_ADDON_DISABLED;
 
 /* DataLink */
-extern const char* DL_MUMBLE_LINK;
-extern const char* DL_NEXUS_LINK;
+constexpr const char* DL_MUMBLE_LINK = "DL_MUMBLE_LINK";
+constexpr const char* DL_NEXUS_LINK = "DL_NEXUS_LINK";
 
 /* Loader */
 extern const UINT WM_ADDONDIRUPDATE;

@@ -10,14 +10,16 @@
 #include "Events/EventHandler.h"
 #include "GUI/GUI.h"
 #include "GUI/Widgets/QuickAccess/QuickAccess.h"
-#include "Keybinds/KeybindHandler.h"
+#include "Inputs/Keybinds/KeybindHandler.h"
 #include "Loader/Loader.h"
 #include "Loader/NexusLinkData.h"
 #include "Textures/TextureLoader.h"
-#include "WndProc/WndProcHandler.h"
+#include "Inputs/WndProc/WndProcHandler.h"
 
 namespace Hooks
 {
+	NexusLinkData* NexusLink = nullptr;
+
 	namespace DXGI
 	{
 		DXPRESENT		Present = nullptr;
@@ -102,21 +104,15 @@ namespace Hooks
 
 			TextureLoader::ProcessQueue();
 
-			//void UpdateNexusLink()
+			if (NexusLink)
 			{
-				NexusLink->Width = Renderer::Width;
-				NexusLink->Height = Renderer::Height;
 				NexusLink->Scaling = Renderer::Scaling;
-
-				NexusLink->IsMoving = IsMoving;
-				NexusLink->IsCameraMoving = IsCameraMoving;
-				NexusLink->IsGameplay = IsGameplay;
 
 				NexusLink->Font = Font;
 				NexusLink->FontBig = FontBig;
 				NexusLink->FontUI = FontUI;
 
-				NexusLink->QuickAccessIconsCount = GUI::QuickAccess::Registry.size(); // write this only when adding/removing icons
+				NexusLink->QuickAccessIconsCount = static_cast<int>(GUI::QuickAccess::Registry.size()); // write this only when adding/removing icons
 				NexusLink->QuickAccessMode = (int)GUI::QuickAccess::Location;
 				NexusLink->QuickAccessIsVertical = GUI::QuickAccess::VerticalLayout;
 			}
@@ -124,7 +120,7 @@ namespace Hooks
 			GUI::Render();
 		}
 		
-		FrameCounter++;
+		Renderer::FrameCounter++;
 
 		return Hooks::DXGI::Present(pChain, SyncInterval, Flags);
 	}
@@ -136,9 +132,12 @@ namespace Hooks
 		Renderer::Width = Width;
 		Renderer::Height = Height;
 
-		/* Already write to nexus link, as addons depend on that and the next frame isn't called yet so no update to values*/
-		NexusLink->Width = Width;
-		NexusLink->Height = Height;
+		if (NexusLink)
+		{
+			/* Already write to nexus link, as addons depend on that and the next frame isn't called yet so no update to values */
+			NexusLink->Width = Width;
+			NexusLink->Height = Height;
+		}
 
 		Events::Raise(EV_WINDOW_RESIZED);
 
