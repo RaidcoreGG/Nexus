@@ -20,6 +20,7 @@
 #include "Loader/Loader.h"
 #include "Settings/Settings.h"
 #include "Textures/TextureLoader.h"
+#include "DataLink/DataLink.h"
 
 #include "imgui.h"
 #include "imgui_extensions.h"
@@ -573,6 +574,9 @@ namespace GUI
 
 	void Setup()
 	{
+		MumbleLink = (Mumble::Data*)DataLink::GetResource(DL_MUMBLE_LINK);
+		NexusLink = (NexusLinkData*)DataLink::GetResource(DL_NEXUS_LINK);
+
 		ImGuiIO& io = ImGui::GetIO();
 
 		if (!Settings::Settings.is_null())
