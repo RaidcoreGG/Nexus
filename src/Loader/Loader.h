@@ -22,8 +22,12 @@
 #include "Addon.h"
 #include "AddonAPI.h"
 
+#include "Loader/NexusLinkData.h"
+
 namespace Loader
 {
+	extern NexusLinkData*				NexusLink;
+
 	extern std::mutex					Mutex;
 	extern std::unordered_map<
 		std::filesystem::path,

@@ -12,9 +12,9 @@ struct NexusLinkData
 	bool		IsCameraMoving;
 	bool		IsGameplay;
 
-	ImFont*		Font;
-	ImFont*		FontBig;
-	ImFont*		FontUI;
+	void*		Font;
+	void*		FontBig;
+	void*		FontUI;
 
 	signed int	QuickAccessIconsCount;
 	signed int	QuickAccessMode;

@@ -2,6 +2,9 @@
 
 #include "Shared.h"
 #include "State.h"
+#include "Renderer.h"
+
+#include "DataLink/DataLink.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -11,6 +14,12 @@ using json = nlohmann::json;
 
 namespace GUI
 {
+	CMumbleOverlay::CMumbleOverlay()
+	{
+		MumbleLink = (Mumble::Data*)DataLink::GetResource(DL_MUMBLE_LINK);
+		NexusLink = (NexusLinkData*)DataLink::GetResource(DL_NEXUS_LINK);
+	}
+
 	void CMumbleOverlay::Render()
 	{
 		if (!Visible) { return; }
@@ -260,16 +269,16 @@ namespace GUI
 				{
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0); ImGui::Text("frame");
-					ImGui::TableSetColumnIndex(1); ImGui::Text("%d", FrameCounter);
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%d", Renderer::FrameCounter);
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0); ImGui::Text("isMoving");
-					ImGui::TableSetColumnIndex(1); ImGui::Text("%s", IsMoving ? "true" : "false");
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%s", NexusLink->IsMoving ? "true" : "false");
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0); ImGui::Text("isCameraMoving");
-					ImGui::TableSetColumnIndex(1); ImGui::Text("%s", IsCameraMoving ? "true" : "false");
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%s", NexusLink->IsCameraMoving ? "true" : "false");
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0); ImGui::Text("isGameplay");
-					ImGui::TableSetColumnIndex(1); ImGui::Text("%s", IsGameplay ? "true" : "false");
+					ImGui::TableSetColumnIndex(1); ImGui::Text("%s", NexusLink->IsGameplay ? "true" : "false");
 
 					ImGui::EndTable();
 				}

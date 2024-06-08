@@ -18,6 +18,8 @@
 
 namespace Hooks
 {
+	NexusLinkData* NexusLink = nullptr;
+
 	namespace DXGI
 	{
 		DXPRESENT		Present = nullptr;
@@ -102,15 +104,11 @@ namespace Hooks
 
 			TextureLoader::ProcessQueue();
 
-			//void UpdateNexusLink()
+			if (NexusLink)
 			{
 				NexusLink->Width = Renderer::Width;
 				NexusLink->Height = Renderer::Height;
 				NexusLink->Scaling = Renderer::Scaling;
-
-				NexusLink->IsMoving = IsMoving;
-				NexusLink->IsCameraMoving = IsCameraMoving;
-				NexusLink->IsGameplay = IsGameplay;
 
 				NexusLink->Font = Font;
 				NexusLink->FontBig = FontBig;
@@ -124,7 +122,7 @@ namespace Hooks
 			GUI::Render();
 		}
 		
-		FrameCounter++;
+		Renderer::FrameCounter++;
 
 		return Hooks::DXGI::Present(pChain, SyncInterval, Flags);
 	}
@@ -136,9 +134,12 @@ namespace Hooks
 		Renderer::Width = Width;
 		Renderer::Height = Height;
 
-		/* Already write to nexus link, as addons depend on that and the next frame isn't called yet so no update to values*/
-		NexusLink->Width = Width;
-		NexusLink->Height = Height;
+		if (NexusLink)
+		{
+			/* Already write to nexus link, as addons depend on that and the next frame isn't called yet so no update to values */
+			NexusLink->Width = Width;
+			NexusLink->Height = Height;
+		}
 
 		Events::Raise(EV_WINDOW_RESIZED);
 

@@ -8,7 +8,9 @@
 
 #include "Services/Mumble/Reader.h"
 
-#include "Shared.h"
+#include "Shared.h" /* FIXME: This is included at the moment because the LogHandler isn't dependency-injected. Fix before 2024/06/30. */
+#include "Renderer.h"
+#include "Hooks.h" /* FIXME: This is included at the moment because the NexusLink isn't dependency-injected. Fix before 2024/06/30. */
 
 #include "Events/EventHandler.h"
 #include "DataLink/DataLink.h"
@@ -16,8 +18,12 @@
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
+using namespace Mumble;
+
 namespace Mumble
 {
+	Identity* MumbleIdentity = new Identity{};
+
 	bool operator==(const Identity& lhs, const Identity& rhs)
 	{
 		if (strcmp(lhs.Name, rhs.Name) == 0 &&
@@ -76,11 +82,11 @@ namespace Mumble
 	{
 		switch (aSize)
 		{
-		case EUIScale::Small: return SC_SMALL;	// Small
+		case EUIScale::Small:	return SC_SMALL;	// Small
 		default:
-		case EUIScale::Normal: return SC_NORMAL;	// Normal
-		case EUIScale::Large: return SC_LARGE;	// Large
-		case EUIScale::Larger: return SC_LARGER;	// Larger
+		case EUIScale::Normal:	return SC_NORMAL;	// Normal
+		case EUIScale::Large:	return SC_LARGE;	// Large
+		case EUIScale::Larger:	return SC_LARGER;	// Larger
 		}
 	}
 }
@@ -90,8 +96,8 @@ CMumbleReader::CMumbleReader(std::string aMumbleName)
 	this->Name = aMumbleName;
 
 	/* share the linked mem regardless whether it's disabled, for dependant addons */
-	MumbleLink = (Mumble::Data*)DataLink::ShareResource(DL_MUMBLE_LINK, sizeof(Mumble::Data), MumbleLinkName.c_str());
-	NexusLink = (NexusLinkData*)DataLink::ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData));
+	MumbleLink = (Mumble::Data*)DataLink::ShareResource(DL_MUMBLE_LINK, sizeof(Mumble::Data), aMumbleName.c_str());
+	Hooks::NexusLink = NexusLink = (NexusLinkData*)DataLink::ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData));
 
 	if (aMumbleName == "0")
 	{
@@ -119,16 +125,17 @@ void CMumbleReader::Advance()
 {
 	while (this->IsRunning)
 	{
-		IsGameplay		= PreviousTick != MumbleLink->UITick || (PreviousFrameCounter == FrameCounter && IsGameplay);
-		IsMoving		= PreviousAvatarPosition != MumbleLink->AvatarPosition;
-		IsCameraMoving	= PreviousCameraFront != MumbleLink->CameraFront;
+		this->NexusLink->IsGameplay		= this->PreviousTick != this->MumbleLink->UITick || 
+										  (this->PreviousFrameCounter == Renderer::FrameCounter && this->NexusLink->IsGameplay);
+		this->NexusLink->IsMoving		= this->PreviousAvatarPosition != this->MumbleLink->AvatarPosition;
+		this->NexusLink->IsCameraMoving	= this->PreviousCameraFront != this->MumbleLink->CameraFront;
 
-		this->PreviousFrameCounter		= FrameCounter;
-		this->PreviousTick				= MumbleLink->UITick;
-		this->PreviousAvatarPosition	= MumbleLink->AvatarPosition;
-		this->PreviousCameraFront		= MumbleLink->CameraFront;
+		this->PreviousFrameCounter		= Renderer::FrameCounter;
+		this->PreviousTick				= this->MumbleLink->UITick;
+		this->PreviousAvatarPosition	= this->MumbleLink->AvatarPosition;
+		this->PreviousCameraFront		= this->MumbleLink->CameraFront;
 
-		if (MumbleLink->Identity[0])
+		if (this->MumbleLink->Identity[0])
 		{
 			/* cache identity */
 			this->PreviousIdentity = *MumbleIdentity;

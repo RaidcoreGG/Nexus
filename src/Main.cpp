@@ -25,7 +25,7 @@
 #include "Settings/Settings.h"
 #include "API/ApiClient.h"
 #include "Updater/Updater.h"
-#include "Multibox/Multibox.h"
+#include "Services/Multibox/Multibox.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -61,7 +61,7 @@ namespace Main
 		NexusModuleSize = moduleInfo.SizeOfImage;
 
 		Path::Initialize(NexusHandle);
-		State::Initialize();
+		std::string mumbleName = State::Initialize();
 		
 		/* setup default loggers */
 		RegisterLogger(
@@ -120,7 +120,7 @@ namespace Main
 
 			//API::Initialize();
 
-			MumbleReader = new CMumbleReader(MumbleLinkName);
+			MumbleReader = new CMumbleReader(mumbleName);
 
 			// create imgui context
 			if (!Renderer::GuiContext) { Renderer::GuiContext = ImGui::CreateContext(); }

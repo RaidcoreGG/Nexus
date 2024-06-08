@@ -59,6 +59,9 @@ namespace GUI
 	void OnLanguageChanged(void* aEventArgs);
 	void Setup();
 
+	Mumble::Data*				MumbleLink					= nullptr;
+	NexusLinkData*				NexusLink					= nullptr;
+
 	std::mutex					Mutex;
 	std::vector<GUI_RENDER>		RegistryPreRender;
 	std::vector<GUI_RENDER>		RegistryRender;
@@ -465,7 +468,7 @@ namespace GUI
 		if (MumbleIdentity)
 		{
 			float currScaling = Mumble::GetScalingFactor(MumbleIdentity->UISize);
-			if (currScaling != LastScaling && IsGameplay)
+			if (currScaling != LastScaling && NexusLink->IsGameplay)
 			{
 				Rescale();
 				LastScaling = currScaling;

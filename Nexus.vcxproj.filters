@@ -97,9 +97,6 @@
     <Filter Include="_EXTERNAL\imgui">
       <UniqueIdentifier>{9cf5a43b-f25a-40a9-985c-dc3e2c93acbb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Multibox">
-      <UniqueIdentifier>{a1bb18bc-73ac-4f45-bea0-8e830d61c56f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files\Images\Backgrounds">
       <UniqueIdentifier>{938be6e2-4197-4fb0-a513-f396feecfc9a}</UniqueIdentifier>
     </Filter>
@@ -153,6 +150,9 @@
     </Filter>
     <Filter Include="Services\Mumble">
       <UniqueIdentifier>{63ff3d3b-f85c-4e99-8c66-7638fa8d524f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Services\Multibox">
+      <UniqueIdentifier>{a1bb18bc-73ac-4f45-bea0-8e830d61c56f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -294,8 +294,8 @@
     <ClCompile Include="src\GUI\Widgets\EULA\CEULAModal.cpp">
       <Filter>GUI\Widgets\EULA</Filter>
     </ClCompile>
-    <ClCompile Include="src\Multibox\Multibox.cpp">
-      <Filter>Multibox</Filter>
+    <ClCompile Include="src\Services\Multibox\Multibox.cpp">
+      <Filter>Services\Multibox</Filter>
     </ClCompile>
     <ClCompile Include="src\Proxy.cpp">
       <Filter>_GLOBAL</Filter>
@@ -989,8 +989,8 @@
     <ClInclude Include="src\httplib\httplib.h">
       <Filter>_EXTERNAL</Filter>
     </ClInclude>
-    <ClInclude Include="src\Multibox\Multibox.h">
-      <Filter>Multibox</Filter>
+    <ClInclude Include="src\Services\Multibox\Multibox.h">
+      <Filter>Services\Multibox</Filter>
     </ClInclude>
     <ClInclude Include="src\Proxy.h">
       <Filter>_GLOBAL</Filter>

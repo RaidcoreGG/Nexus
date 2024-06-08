@@ -1,6 +1,8 @@
 #ifndef STATE_H
 #define STATE_H
 
+#include <string>
+
 /* State of Nexus */
 enum class ENexusState
 {
@@ -64,7 +66,7 @@ namespace State
 	extern bool				IsConsoleEnabled;		/* Is the console window enabled */
 	extern bool				IsVanilla;				/* Is Nexus running in vanilla mode and should not load any mods */
 
-	void Initialize();
+	std::string Initialize();
 }
 
 #endif

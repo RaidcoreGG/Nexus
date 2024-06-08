@@ -52,6 +52,8 @@ using json = nlohmann::json;
 
 namespace Loader
 {
+	NexusLinkData*				NexusLink = nullptr;;
+
 	std::mutex					Mutex;
 	std::unordered_map<
 		std::filesystem::path,
@@ -80,6 +82,8 @@ namespace Loader
 
 	void Initialize()
 	{
+		NexusLink = (NexusLinkData*)DataLink::ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData));
+
 		if (State::Nexus == ENexusState::LOADED)
 		{
 			LoadAddonConfig();
@@ -124,7 +128,7 @@ namespace Loader
 				{
 					Sleep(5000);
 					int nothingCounter = 0;
-					while (!IsGameplay)
+					while (!NexusLink->IsGameplay)
 					{
 						/* do nothing */
 						Sleep(1);

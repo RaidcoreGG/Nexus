@@ -28,16 +28,6 @@ extern AddonVersion					Version;
 extern std::vector<std::string>		Parameters;
 extern std::vector<signed int>		RequestedAddons;
 
-extern long long					FrameCounter;
-
-extern std::string					MumbleLinkName;
-extern Mumble::Data*				MumbleLink;
-extern Identity*					MumbleIdentity;
-extern NexusLinkData*				NexusLink;
-extern bool							IsMoving;
-extern bool							IsCameraMoving;
-extern bool							IsGameplay;
-
 extern CLocalization&				Language;
 
 extern ImFont*						MonospaceFont;	/* default/monospace/console font */

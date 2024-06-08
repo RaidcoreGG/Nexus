@@ -13,6 +13,8 @@
 
 #include "resource.h"
 
+#include "GUI/GUI.h"
+
 namespace GUI
 {
 	namespace QuickAccess
@@ -59,7 +61,7 @@ namespace GUI
 
 		void Render()
 		{
-			if (!(AlwaysShow || IsGameplay))
+			if (!(AlwaysShow || GUI::NexusLink->IsGameplay))
 			{
 				return;
 			}

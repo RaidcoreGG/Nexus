@@ -13,25 +13,28 @@
 #include <string>
 
 #include "Services/Mumble/Definitions/Mumble.h"
+#include "Loader/NexusLinkData.h"
 
 /* Log Channel*/
-constexpr const char* CH_MUMBLE_READER	= "MumbleReader";
+constexpr const char* CH_MUMBLE_READER				= "MumbleReader";
 
 /* DataLink */
-constexpr const char* DL_MUMBLE_LINK	= "DL_MUMBLE_LINK";
-constexpr const char* DL_NEXUS_LINK		= "DL_NEXUS_LINK";
+constexpr const char* DL_MUMBLE_LINK				= "DL_MUMBLE_LINK";
+constexpr const char* DL_NEXUS_LINK					= "DL_NEXUS_LINK";
 
 /* UI Scale */
-constexpr const float SC_SMALL			= 0.90f;
-constexpr const float SC_NORMAL			= 1.00f;
-constexpr const float SC_LARGE			= 1.11f;
-constexpr const float SC_LARGER			= 1.22f;
+constexpr const float SC_SMALL						= 0.90f;
+constexpr const float SC_NORMAL						= 1.00f;
+constexpr const float SC_LARGE						= 1.11f;
+constexpr const float SC_LARGER						= 1.22f;
 
 ///----------------------------------------------------------------------------------------------------
 /// Mumble Namespace
 ///----------------------------------------------------------------------------------------------------
 namespace Mumble
 {
+	extern Identity* MumbleIdentity;
+
 	///----------------------------------------------------------------------------------------------------
 	/// GetScalingFactor:
 	/// 	Returns the scaling factor for the given the UISize enum.
@@ -57,14 +60,17 @@ public:
 	///----------------------------------------------------------------------------------------------------
 	~CMumbleReader();
 private:
-	std::string			Name;
 	std::thread			Thread;
 	bool				IsRunning				= false;
+
+	std::string			Name;
+	Mumble::Data*		MumbleLink				= nullptr;
+	NexusLinkData*		NexusLink				= nullptr;
 
 	unsigned			PreviousTick			= 0;
 	Vector3				PreviousAvatarPosition	= {};
 	Vector3				PreviousCameraFront		= {};
-	Mumble::Identity	PreviousIdentity		= {};
+	Mumble::Identity	PreviousIdentity		= Mumble::Identity{};
 	long long			PreviousFrameCounter	= 0;
 
 	///----------------------------------------------------------------------------------------------------
