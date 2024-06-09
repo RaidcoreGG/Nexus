@@ -11,6 +11,8 @@ typedef void (*KEYBINDS_PROCESS2)(const char* aIdentifier, bool aIsRelease);
 typedef void (*KEYBINDS_REGISTERWITHSTRING2)(const char* aIdentifier, KEYBINDS_PROCESS2 aKeybindHandler, const char* aKeybind);
 typedef void (*KEYBINDS_REGISTERWITHSTRUCT2)(const char* aIdentifier, KEYBINDS_PROCESS2 aKeybindHandler, Keybind aKeybind);
 
+typedef void (KEYBINDS_INVOKE)(const char* aIdentifier, bool aIsRelease);
+
 typedef void (*KEYBINDS_DEREGISTER)(const char* aIdentifier);
 
 #endif

@@ -45,6 +45,11 @@ namespace Keybinds
 	{
 		Register(aIdentifier, EKeybindHandlerType::DownAndRelease, aKeybindHandler, aKeybind);
 	}
+
+	void ADDONAPI_InvokeKeybind(const char* aIdentifier, bool aIsRelease)
+	{
+		Invoke(aIdentifier, aIsRelease);
+	}
 }
 
 namespace Keybinds

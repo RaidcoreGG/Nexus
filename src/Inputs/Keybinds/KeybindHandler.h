@@ -48,6 +48,12 @@ namespace Keybinds
 	/// 	[Revision 2] Addon API wrapper function for Register from struct.
 	///----------------------------------------------------------------------------------------------------
 	void ADDONAPI_RegisterWithStruct2(const char* aIdentifier, KEYBINDS_PROCESS2 aKeybindHandler, Keybind aKeybind);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_InvokeKeybind:
+	/// 	Addon API wrapper function for Invoke.
+	///----------------------------------------------------------------------------------------------------
+	void ADDONAPI_InvokeKeybind(const char* aIdentifier, bool aIsRelease);
 }
 
 ///----------------------------------------------------------------------------------------------------
