@@ -684,7 +684,7 @@ namespace Loader
 		bool shouldCheckForUpdate = !(addon->IsPausingUpdates && !addon->IsDisabledUntilUpdate);
 
 		/* set DUU state if game has updated and addon is volatile and this is the intial load */
-		if (isInitialLoad && addon->Definitions->HasFlag(EAddonFlags::IsVolatile) && DisableVolatileUntilUpdate)
+		if (isInitialLoad && addon->Definitions->HasFlag(EAddonFlags::IsVolatile) && DisableVolatileUntilUpdate && !addon->IsPausingUpdates)
 		{
 			addon->IsDisabledUntilUpdate = true;
 			SaveAddonConfig(); // save the DUU state

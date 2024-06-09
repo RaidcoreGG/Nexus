@@ -222,6 +222,11 @@ namespace GUI
 						{
 							//LogDebug(CH_GUI, "ToggleDUU called: %s", it.second->Definitions->Name);
 							aAddon->IsDisabledUntilUpdate = !aAddon->IsDisabledUntilUpdate;
+							if (aAddon->IsDisabledUntilUpdate)
+							{
+								/* if explicitly disabled until update from menu, override pausing update setting */
+								aAddon->IsPausingUpdates = false;
+							}
 							Loader::SaveAddonConfig();
 
 							if (aAddon->State == EAddonState::Loaded)
