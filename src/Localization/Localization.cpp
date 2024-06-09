@@ -28,17 +28,36 @@ namespace Localization
 		return inst.Translate(aIdentifier, aLanguageIdentifier);
 	}
 
-	/*static void ADDONAPI_Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aString)
+	void ADDONAPI_Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aString)
 	{
 		CLocalization& inst = CLocalization::GetInstance();
 		inst.Set(aIdentifier, aLanguageIdentifier, aString);
-	}*/
+	}
 }
 
 CLocalization& CLocalization::GetInstance()
 {
 	static CLocalization Instance;
 	return Instance;
+}
+
+void CLocalization::Advance()
+{
+	const std::lock_guard<std::mutex> lock(Mutex);
+
+	while (this->Queued.size() > 0)
+	{
+		QueuedTranslation& item = this->Queued.front();
+		
+		auto atlasIt = LocaleAtlas.find(item.LanguageIdentifier);
+
+		if (atlasIt != LocaleAtlas.end())
+		{
+			atlasIt->second.Texts[item.Identifier] = _strdup(item.Text.c_str());
+		}
+
+		this->Queued.erase(this->Queued.begin());
+	}
 }
 
 const char* CLocalization::Translate(const char* aIdentifier, const char* aLanguageIdentifier)
@@ -97,28 +116,15 @@ const char* CLocalization::Translate(const char* aIdentifier, const char* aLangu
 	return aIdentifier;
 }
 
-/*void CLocalization::Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aString)
+void CLocalization::Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aString)
 {
 	if (!(aIdentifier && aLanguageIdentifier && aString))
 	{
 		return;
 	}
 
-	std::string identifier = aIdentifier;
-	std::string languageIdentifier = aLanguageIdentifier;
-
-	if (aLanguageIdentifier)
-	{
-		std::string languageIdentifier = aLanguageIdentifier;
-
-		auto atlasIt = LocaleAtlas.find(languageIdentifier);
-
-		if (atlasIt != LocaleAtlas.end())
-		{
-			atlasIt->second.Texts[identifier] = _strdup(aString);
-		}
-	}
-}*/
+	this->Queued.push_back({ aIdentifier, aLanguageIdentifier, aString });
+}
 
 void CLocalization::SetLanguage(const std::string& aIdentifier)
 {

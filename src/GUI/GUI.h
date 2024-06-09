@@ -10,6 +10,7 @@
 
 #include "IWindow.h"
 #include "EFontIdentifier.h"
+#include "Fonts/FontManager.h"
 
 #include "imgui/imgui.h"
 
@@ -18,6 +19,8 @@
 
 namespace GUI
 {
+	extern CFontManager&				FontManager;
+
 	extern Mumble::Data*				MumbleLink;
 	extern NexusLinkData*				NexusLink;
 

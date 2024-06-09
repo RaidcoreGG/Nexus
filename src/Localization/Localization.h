@@ -35,7 +35,7 @@ namespace Localization
 	/// ADDONAPI_Set:
 	/// 	Addon API wrapper function to set translated strings.
 	///----------------------------------------------------------------------------------------------------
-	/*static void ADDONAPI_Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aString);*/
+	void ADDONAPI_Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aString);
 }
 
 ///----------------------------------------------------------------------------------------------------
@@ -45,6 +45,16 @@ struct Locale
 {
 	std::string DisplayName;
 	std::map<std::string, const char*> Texts;
+};
+
+///----------------------------------------------------------------------------------------------------
+/// QueuedTranslation data struct
+///----------------------------------------------------------------------------------------------------
+struct QueuedTranslation
+{
+	std::string Identifier;
+	std::string LanguageIdentifier;
+	std::string Text;
 };
 
 ///----------------------------------------------------------------------------------------------------
@@ -60,6 +70,12 @@ public:
 	static CLocalization& GetInstance();
 
 	///----------------------------------------------------------------------------------------------------
+	/// Advance:
+	/// 	Processes new strings and adds them to the atlas.
+	///----------------------------------------------------------------------------------------------------
+	void Advance();
+
+	///----------------------------------------------------------------------------------------------------
 	/// Translate:
 	/// 	Returns the translated string with the given identifier and language.
 	/// 	If no language is specified, the currently set one will be used.
@@ -70,7 +86,7 @@ public:
 	/// Set:
 	/// 	Adds or sets/overrides a localized string with a given identifier.
 	///----------------------------------------------------------------------------------------------------
-	/*void Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aString);*/
+	void Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aString);
 
 	///----------------------------------------------------------------------------------------------------
 	/// SetLanguage:
@@ -125,6 +141,7 @@ private:
 	std::filesystem::path					Directory;
 	// Identifier (e.g. "EN-GB") maps to object with display name ("English (United Kingdom)") and a map of all its texts
 	std::map<std::string, Locale>			LocaleAtlas;
+	std::vector<QueuedTranslation>			Queued;
 
 	Locale* ActiveLocale					= nullptr;
 

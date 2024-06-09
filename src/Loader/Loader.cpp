@@ -1397,6 +1397,78 @@ namespace Loader
 
 			ApiDefs.insert({ aVersion, api });
 			return api;
+		case 5:
+			api = new AddonAPI5();
+
+			((AddonAPI5*)api)->SwapChain = Renderer::SwapChain;
+			((AddonAPI5*)api)->ImguiContext = Renderer::GuiContext;
+			((AddonAPI5*)api)->ImguiMalloc = ImGui::MemAlloc;
+			((AddonAPI5*)api)->ImguiFree = ImGui::MemFree;
+			((AddonAPI5*)api)->RegisterRender = GUI::Register;
+			((AddonAPI5*)api)->DeregisterRender = GUI::Deregister;
+
+			((AddonAPI5*)api)->RequestUpdate = UpdaterStatic::ADDONAPI_RequestUpdate;
+
+			((AddonAPI5*)api)->GetGameDirectory = Path::GetGameDirectory;
+			((AddonAPI5*)api)->GetAddonDirectory = Path::GetAddonDirectory;
+			((AddonAPI5*)api)->GetCommonDirectory = Path::GetCommonDirectory;
+
+			((AddonAPI5*)api)->CreateHook = MH_CreateHook;
+			((AddonAPI5*)api)->RemoveHook = MH_RemoveHook;
+			((AddonAPI5*)api)->EnableHook = MH_EnableHook;
+			((AddonAPI5*)api)->DisableHook = MH_DisableHook;
+
+			((AddonAPI5*)api)->Log = ADDONAPI_LogMessage2;
+
+			((AddonAPI5*)api)->SendAlert = GUI::Alerts::Notify;
+
+			((AddonAPI5*)api)->RaiseEvent = Events::ADDONAPI_RaiseEvent;
+			((AddonAPI5*)api)->RaiseEventNotification = Events::ADDONAPI_RaiseNotification;
+			((AddonAPI5*)api)->RaiseEventTargeted = Events::ADDONAPI_RaiseEventTargeted;
+			((AddonAPI5*)api)->RaiseEventNotificationTargeted = Events::ADDONAPI_RaiseNotificationTargeted;
+			((AddonAPI5*)api)->SubscribeEvent = Events::Subscribe;
+			((AddonAPI5*)api)->UnsubscribeEvent = Events::Unsubscribe;
+
+			((AddonAPI5*)api)->RegisterWndProc = WndProc::Register;
+			((AddonAPI5*)api)->DeregisterWndProc = WndProc::Deregister;
+			((AddonAPI5*)api)->SendWndProcToGameOnly = WndProc::SendWndProcToGame;
+
+			((AddonAPI5*)api)->InvokeKeybind = Keybinds::ADDONAPI_InvokeKeybind;
+			((AddonAPI5*)api)->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString2;
+			((AddonAPI5*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct2;
+			((AddonAPI5*)api)->DeregisterKeybind = Keybinds::Deregister;
+
+			((AddonAPI5*)api)->GetResource = DataLink::GetResource;
+			((AddonAPI5*)api)->ShareResource = DataLink::ShareResource;
+
+			((AddonAPI5*)api)->GetTexture = TextureLoader::Get;
+			((AddonAPI5*)api)->GetTextureOrCreateFromFile = TextureLoader::ADDONAPI_GetOrCreateFromFile;
+			((AddonAPI5*)api)->GetTextureOrCreateFromResource = TextureLoader::ADDONAPI_GetOrCreateFromResource;
+			((AddonAPI5*)api)->GetTextureOrCreateFromURL = TextureLoader::ADDONAPI_GetOrCreateFromURL;
+			((AddonAPI5*)api)->GetTextureOrCreateFromMemory = TextureLoader::ADDONAPI_GetOrCreateFromMemory;
+			((AddonAPI5*)api)->LoadTextureFromFile = TextureLoader::LoadFromFile;
+			((AddonAPI5*)api)->LoadTextureFromResource = TextureLoader::LoadFromResource;
+			((AddonAPI5*)api)->LoadTextureFromURL = TextureLoader::LoadFromURL;
+			((AddonAPI5*)api)->LoadTextureFromMemory = TextureLoader::LoadFromMemory;
+
+			((AddonAPI5*)api)->AddShortcut = GUI::QuickAccess::AddShortcut;
+			((AddonAPI5*)api)->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
+			((AddonAPI5*)api)->NotifyShortcut = GUI::QuickAccess::NotifyShortcut;
+			((AddonAPI5*)api)->AddSimpleShortcut = GUI::QuickAccess::AddSimpleShortcut;
+			((AddonAPI5*)api)->RemoveSimpleShortcut = GUI::QuickAccess::RemoveSimpleShortcut;
+
+			((AddonAPI5*)api)->Translate = Localization::ADDONAPI_Translate;
+			((AddonAPI5*)api)->TranslateTo = Localization::ADDONAPI_TranslateTo;
+			((AddonAPI5*)api)->SetTranslatedString = Localization::ADDONAPI_Set;
+
+			((AddonAPI5*)api)->GetFont = FontManager::ADDONAPI_Get;
+			((AddonAPI5*)api)->ReleaseFont = FontManager::ADDONAPI_Release;
+			((AddonAPI5*)api)->AddFontFromFile = FontManager::ADDONAPI_AddFontFromFile;
+			((AddonAPI5*)api)->AddFontFromResource = FontManager::ADDONAPI_AddFontFromResource;
+			((AddonAPI5*)api)->AddFontFromMemory = FontManager::ADDONAPI_AddFontFromMemory;
+
+			ApiDefs.insert({ aVersion, api });
+			return api;
 		}
 
 		// there is no matching version
@@ -1414,6 +1486,8 @@ namespace Loader
 			return sizeof(AddonAPI3);
 		case 4:
 			return sizeof(AddonAPI4);
+		case 5:
+			return sizeof(AddonAPI5);
 		}
 
 		return 0;

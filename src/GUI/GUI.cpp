@@ -38,8 +38,6 @@
 #include "Widgets/EULA/CEULAModal.h"
 #include "Widgets/Alerts/Alerts.h"
 
-#include "Fonts/FontManager.h"
-
 #include "resource.h"
 
 #ifndef STRINGIFY
@@ -55,6 +53,9 @@
 
 namespace GUI
 {
+	/* FIXME: this needs to be dependency injected. Fix before 2024/06/30. */
+	CFontManager& FontManager = CFontManager::GetInstance();
+
 	/* internal forward declarations */
 	void OnMumbleIdentityChanged(void* aEventArgs);
 	void OnLanguageChanged(void* aEventArgs);
@@ -264,19 +265,19 @@ namespace GUI
 	{
 		const std::lock_guard<std::mutex> lock(GUI::Mutex);
 
+		if (FontManager.Advance())
+		{
+			OnMumbleIdentityChanged(nullptr);
+			Shutdown();
+		}
+		Language.Advance();
+
 		/* pre-render callbacks */
 		for (GUI_RENDER callback : RegistryPreRender)
 		{
 			if (callback) { callback(); }
 		}
 		/* pre-render callbacks end*/
-
-		CFontManager& fntMgr = CFontManager::GetInstance();
-		if (fntMgr.Advance())
-		{
-			OnMumbleIdentityChanged(nullptr);
-			Shutdown();
-		}
 
 		if (State::IsImGuiInitialized)
 		{
@@ -419,12 +420,6 @@ namespace GUI
 		else if (str == KB_ADDONS)
 		{
 			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Addons"; });
-			if (it == Windows.end()) { return; }
-			(*it)->Visible = !(*it)->Visible;
-		}
-		else if (str == KB_CHANGELOG)
-		{
-			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Changelog"; });
 			if (it == Windows.end()) { return; }
 			(*it)->Visible = !(*it)->Visible;
 		}
@@ -838,7 +833,6 @@ namespace GUI
 
 		Keybinds::Register(KB_ADDONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
 		Keybinds::Register(KB_OPTIONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
-		Keybinds::Register(KB_CHANGELOG, EKBHType::DownOnly, ProcessKeybind, "(null)");
 		Keybinds::Register(KB_LOG, EKBHType::DownOnly, ProcessKeybind, "(null)");
 		Keybinds::Register(KB_DEBUG, EKBHType::DownOnly, ProcessKeybind, "(null)");
 		Keybinds::Register(KB_MUMBLEOVERLAY, EKBHType::DownOnly, ProcessKeybind, "(null)");

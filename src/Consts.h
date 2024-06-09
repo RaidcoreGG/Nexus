@@ -17,7 +17,6 @@ extern const char* CH_LOCALIZATION;
 extern const char* KB_MENU;
 extern const char* KB_ADDONS;
 extern const char* KB_OPTIONS;
-extern const char* KB_CHANGELOG;
 extern const char* KB_LOG;
 extern const char* KB_DEBUG;
 extern const char* KB_MUMBLEOVERLAY;
