@@ -130,7 +130,7 @@ namespace Loader
 				{
 					Sleep(5000);
 					int nothingCounter = 0;
-					while (!NexusLink->IsGameplay)
+					while (State::Nexus < ENexusState::SHUTTING_DOWN && !NexusLink->IsGameplay)
 					{
 						/* do nothing */
 						Sleep(1);
