@@ -364,7 +364,7 @@ bool CUpdater::InstallAddon(LibraryAddon* aAddon, bool aIsArcPlugin)
 		{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0} // null md5
 	};
 
-	std::string filename = URL::GetFilename(aAddon->DownloadURL);
+	std::string filename = String::Normalize(aAddon->Name);
 	std::filesystem::path installPath = Path::D_GW2_ADDONS / (filename + ".dll");
 	installPath = GetUnclaimedPath(installPath);
 
