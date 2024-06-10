@@ -14,7 +14,7 @@
 #include "Shared.h"
 #include "Paths.h"
 
-namespace UpdaterStatic
+namespace Updater
 {
 	void ADDONAPI_RequestUpdate(signed int aSignature, const char* aUpdateURL)
 	{
@@ -52,7 +52,7 @@ namespace UpdaterStatic
 
 		std::thread([path, addonInfo]()
 			{
-				Updater->UpdateAddon(path, addonInfo);
+				UpdateService->UpdateAddon(path, addonInfo);
 			})
 			.detach();
 	}

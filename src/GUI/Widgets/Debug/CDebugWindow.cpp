@@ -30,7 +30,7 @@ namespace GUI
 	void DbgEventsTab();
 	void DbgKeybindsTab();
 	void DbgDataLinkTab();
-	void DbgTexturesTab();
+	//void DbgTexturesTab();
 	void DbgShortcutsTab();
 	void DbgLoaderTab();
 	void DbgAPITab();
@@ -97,7 +97,7 @@ namespace GUI
 				DbgEventsTab();
 				DbgKeybindsTab();
 				DbgDataLinkTab();
-				DbgTexturesTab();
+				//DbgTexturesTab();
 				DbgShortcutsTab();
 				DbgLoaderTab();
 				DbgAPITab();
@@ -229,7 +229,7 @@ namespace GUI
 			ImGui::EndTabItem();
 		}
 	}
-	void DbgTexturesTab()
+	/*void DbgTexturesTab()
 	{
 		if (ImGui::BeginTabItem("Textures"))
 		{
@@ -299,7 +299,7 @@ namespace GUI
 
 			ImGui::EndTabItem();
 		}
-	}
+	}*/
 	void DbgShortcutsTab()
 	{
 		if (ImGui::BeginTabItem("Shortcuts"))

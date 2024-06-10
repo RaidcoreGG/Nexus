@@ -71,7 +71,7 @@ namespace GUI
 			}
 			else
 			{
-				BackgroundDUU = TextureLoader::GetOrCreate("TEX_ADDONITEM_BACKGROUND_DUU", RES_TEX_ADDONITEM_DUU, NexusHandle);
+				BackgroundDUU = TextureService->GetOrCreate("TEX_ADDONITEM_BACKGROUND_DUU", RES_TEX_ADDONITEM_DUU, NexusHandle);
 			}
 		}
 		else
@@ -83,13 +83,13 @@ namespace GUI
 			}
 			else
 			{
-				Background = TextureLoader::GetOrCreate("TEX_ADDONITEM_BACKGROUND", RES_TEX_ADDONITEM, NexusHandle);
+				Background = TextureService->GetOrCreate("TEX_ADDONITEM_BACKGROUND", RES_TEX_ADDONITEM, NexusHandle);
 			}
 		}
 
-		if (!BtnOptions) { BtnOptions = TextureLoader::GetOrCreate("ICON_OPTIONS", RES_ICON_OPTIONS, NexusHandle); }
-		if (!CtxMenuBullet) { CtxMenuBullet = TextureLoader::GetOrCreate("TEX_CTXMENU_BULLET", RES_TEX_CONTEXTMENU_BULLET, NexusHandle); }
-		if (!CtxMenuHighlight) { CtxMenuHighlight = TextureLoader::GetOrCreate("TEX_CTXMENU_HIGHLIGHT", RES_TEX_CONTEXTMENU_HIGHLIGHT, NexusHandle); }
+		if (!BtnOptions) { BtnOptions = TextureService->GetOrCreate("ICON_OPTIONS", RES_ICON_OPTIONS, NexusHandle); }
+		if (!CtxMenuBullet) { CtxMenuBullet = TextureService->GetOrCreate("TEX_CTXMENU_BULLET", RES_TEX_CONTEXTMENU_BULLET, NexusHandle); }
+		if (!CtxMenuHighlight) { CtxMenuHighlight = TextureService->GetOrCreate("TEX_CTXMENU_HIGHLIGHT", RES_TEX_CONTEXTMENU_HIGHLIGHT, NexusHandle); }
 
 		{
 			ImGui::SetCursorPos(initial);
@@ -165,7 +165,7 @@ namespace GUI
 													aAddon->AllowPrereleases
 												};
 
-												if (Updater->UpdateAddon(tmpPath, addonInfo))
+												if (UpdateService->UpdateAddon(tmpPath, addonInfo))
 												{
 													Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
 
@@ -362,7 +362,7 @@ namespace GUI
 			}
 			else
 			{
-				BackgroundHighlight = TextureLoader::GetOrCreate("TEX_ADDONITEM_BACKGROUND_HIGHLIGHT", RES_TEX_ADDONITEM_HIGHLIGHT, NexusHandle);
+				BackgroundHighlight = TextureService->GetOrCreate("TEX_ADDONITEM_BACKGROUND_HIGHLIGHT", RES_TEX_ADDONITEM_HIGHLIGHT, NexusHandle);
 			}
 		}
 		else
@@ -374,7 +374,7 @@ namespace GUI
 			}
 			else
 			{
-				Background = TextureLoader::GetOrCreate("TEX_ADDONITEM_BACKGROUND", RES_TEX_ADDONITEM, NexusHandle);
+				Background = TextureService->GetOrCreate("TEX_ADDONITEM_BACKGROUND", RES_TEX_ADDONITEM, NexusHandle);
 			}
 		}
 
@@ -433,7 +433,7 @@ namespace GUI
 					}
 					else
 					{
-						ToSComplianceWarning = TextureLoader::GetOrCreate(ICON_WARNING, RES_ICON_WARNING, NexusHandle);
+						ToSComplianceWarning = TextureService->GetOrCreate(ICON_WARNING, RES_ICON_WARNING, NexusHandle);
 					}
 				}
 
@@ -446,7 +446,7 @@ namespace GUI
 						{
 							std::thread([aAddon, aIsArcPlugin]()
 								{
-									Updater->InstallAddon(aAddon, aIsArcPlugin);
+									UpdateService->InstallAddon(aAddon, aIsArcPlugin);
 
 									if (aIsArcPlugin)
 									{

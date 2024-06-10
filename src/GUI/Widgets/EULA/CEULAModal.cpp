@@ -27,13 +27,13 @@ namespace GUI
 
 	void CEULAModal::Render()
 	{
-		if (!Background) { Background = TextureLoader::GetOrCreate("TEX_EULA_BACKGROUND", RES_TEX_EULA_BACKGROUND, NexusHandle); }
-		if (!TitleBar) { TitleBar = TextureLoader::GetOrCreate("TEX_EULA_TITLEBAR", RES_TEX_EULA_TITLEBAR, NexusHandle); }
-		if (!TitleBarHover) { TitleBarHover = TextureLoader::GetOrCreate("TEX_EULA_TITLEBAR_HOVER", RES_TEX_EULA_TITLEBAR_HOVER, NexusHandle); }
-		if (!TitleBarEnd) { TitleBarEnd = TextureLoader::GetOrCreate("TEX_TITLEBAREND", RES_TEX_TITLEBAREND, NexusHandle); }
-		if (!TitleBarEndHover) { TitleBarEndHover = TextureLoader::GetOrCreate("TEX_TITLEBAREND_HOVER", RES_TEX_TITLEBAREND_HOVER, NexusHandle); }
-		if (!BtnClose) { BtnClose = TextureLoader::GetOrCreate("TEX_BTNCLOSE", RES_TEX_BTNCLOSE, NexusHandle); }
-		if (!BtnCloseHover) { BtnCloseHover = TextureLoader::GetOrCreate("TEX_BTNCLOSE_HOVER", RES_TEX_BTNCLOSE_HOVER, NexusHandle); }
+		if (!Background) { Background = TextureService->GetOrCreate("TEX_EULA_BACKGROUND", RES_TEX_EULA_BACKGROUND, NexusHandle); }
+		if (!TitleBar) { TitleBar = TextureService->GetOrCreate("TEX_EULA_TITLEBAR", RES_TEX_EULA_TITLEBAR, NexusHandle); }
+		if (!TitleBarHover) { TitleBarHover = TextureService->GetOrCreate("TEX_EULA_TITLEBAR_HOVER", RES_TEX_EULA_TITLEBAR_HOVER, NexusHandle); }
+		if (!TitleBarEnd) { TitleBarEnd = TextureService->GetOrCreate("TEX_TITLEBAREND", RES_TEX_TITLEBAREND, NexusHandle); }
+		if (!TitleBarEndHover) { TitleBarEndHover = TextureService->GetOrCreate("TEX_TITLEBAREND_HOVER", RES_TEX_TITLEBAREND_HOVER, NexusHandle); }
+		if (!BtnClose) { BtnClose = TextureService->GetOrCreate("TEX_BTNCLOSE", RES_TEX_BTNCLOSE, NexusHandle); }
+		if (!BtnCloseHover) { BtnCloseHover = TextureService->GetOrCreate("TEX_BTNCLOSE_HOVER", RES_TEX_BTNCLOSE_HOVER, NexusHandle); }
 
 		if (!(
 			Background &&

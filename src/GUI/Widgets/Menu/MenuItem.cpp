@@ -64,7 +64,7 @@ namespace GUI
 				}
 				else
 				{
-					Icon = TextureLoader::GetOrCreate(TextureIdentifier.c_str(), ResourceID, NexusHandle);
+					Icon = TextureService->GetOrCreate(TextureIdentifier.c_str(), ResourceID, NexusHandle);
 				}
 
 				ImGui::SetCursorPos(txtPos);

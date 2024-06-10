@@ -13,7 +13,8 @@ std::vector<std::string>	Parameters			= {};
 std::vector<signed int>		RequestedAddons		= {};
 
 CLocalization*				Language			= new CLocalization();
-CUpdater*					Updater				= new CUpdater();
+CUpdater*					UpdateService		= new CUpdater();
+CTextureLoader*				TextureService		= new CTextureLoader();
 
 ImFont*						MonospaceFont		= nullptr;
 ImFont*						UserFont			= nullptr;

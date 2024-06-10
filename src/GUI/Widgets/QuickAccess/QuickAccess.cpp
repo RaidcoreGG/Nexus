@@ -133,8 +133,8 @@ namespace GUI
 					}
 					else if (shortcut.TextureGetAttempts < 10)
 					{
-						shortcut.TextureNormal = TextureLoader::Get(shortcut.TextureNormalIdentifier.c_str());
-						shortcut.TextureHover = TextureLoader::Get(shortcut.TextureHoverIdentifier.c_str());
+						shortcut.TextureNormal = TextureService->Get(shortcut.TextureNormalIdentifier.c_str());
+						shortcut.TextureHover = TextureService->Get(shortcut.TextureHoverIdentifier.c_str());
 						shortcut.TextureGetAttempts++;
 					}
 					else
@@ -142,8 +142,8 @@ namespace GUI
 						LogWarning(CH_QUICKACCESS, "Cancelled getting textures for shortcut \"%s\" after 10 failed attempts.", identifier.c_str());
 
 						/* fallback icons */
-						shortcut.TextureNormal = TextureLoader::Get(ICON_GENERIC);
-						shortcut.TextureHover = TextureLoader::Get(ICON_GENERIC_HOVER);
+						shortcut.TextureNormal = TextureService->Get(ICON_GENERIC);
+						shortcut.TextureHover = TextureService->Get(ICON_GENERIC_HOVER);
 
 						/* absolute sanity check */
 						if (shortcut.TextureNormal == nullptr || shortcut.TextureHover == nullptr)
@@ -179,7 +179,7 @@ namespace GUI
 					}
 					else
 					{
-						IconNotification = TextureLoader::GetOrCreate(ICON_NOTIFICATION, RES_ICON_NOTIFICATION, NexusHandle);
+						IconNotification = TextureService->GetOrCreate(ICON_NOTIFICATION, RES_ICON_NOTIFICATION, NexusHandle);
 					}
 
 					ImGui::PopStyleVar();
@@ -269,8 +269,8 @@ namespace GUI
 			{
 				if (Registry.find(str) == Registry.end())
 				{
-					Texture* normal = TextureLoader::Get(strTexId.c_str());
-					Texture* hover = TextureLoader::Get(strTexHoverId.c_str());
+					Texture* normal = TextureService->Get(strTexId.c_str());
+					Texture* hover = TextureService->Get(strTexHoverId.c_str());
 					Shortcut sh{};
 					sh.TextureNormalIdentifier = aTextureIdentifier;
 					sh.TextureHoverIdentifier = aTextureHoverIdentifier;

@@ -691,7 +691,7 @@ namespace Loader
 						addon->AllowPrereleases
 					};
 
-					if (Updater->UpdateAddon(tmpPath, addonInfo))
+					if (UpdateService->UpdateAddon(tmpPath, addonInfo))
 					{
 						LogInfo(CH_LOADER, "Update available for \"%s\".", tmpPath.string().c_str());
 						if (addon->IsDisabledUntilUpdate)
@@ -1154,10 +1154,10 @@ namespace Loader
 			((AddonAPI1*)api)->GetResource = DataLink::GetResource;
 			((AddonAPI1*)api)->ShareResource = DataLink::ShareResource;
 
-			((AddonAPI1*)api)->GetTexture = TextureLoader::Get;
-			((AddonAPI1*)api)->LoadTextureFromFile = TextureLoader::LoadFromFile;
-			((AddonAPI1*)api)->LoadTextureFromResource = TextureLoader::LoadFromResource;
-			((AddonAPI1*)api)->LoadTextureFromURL = TextureLoader::LoadFromURL;
+			((AddonAPI1*)api)->GetTexture = TextureLoader::ADDONAPI_Get;
+			((AddonAPI1*)api)->LoadTextureFromFile = TextureLoader::ADDONAPI_LoadFromFile;
+			((AddonAPI1*)api)->LoadTextureFromResource = TextureLoader::ADDONAPI_LoadFromResource;
+			((AddonAPI1*)api)->LoadTextureFromURL = TextureLoader::ADDONAPI_LoadFromURL;
 
 			((AddonAPI1*)api)->AddShortcut = GUI::QuickAccess::AddShortcut;
 			((AddonAPI1*)api)->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
@@ -1204,15 +1204,15 @@ namespace Loader
 			((AddonAPI2*)api)->GetResource = DataLink::GetResource;
 			((AddonAPI2*)api)->ShareResource = DataLink::ShareResource;
 
-			((AddonAPI2*)api)->GetTexture = TextureLoader::Get;
+			((AddonAPI2*)api)->GetTexture = TextureLoader::ADDONAPI_Get;
 			((AddonAPI2*)api)->GetTextureOrCreateFromFile = TextureLoader::ADDONAPI_GetOrCreateFromFile;
 			((AddonAPI2*)api)->GetTextureOrCreateFromResource = TextureLoader::ADDONAPI_GetOrCreateFromResource;
 			((AddonAPI2*)api)->GetTextureOrCreateFromURL = TextureLoader::ADDONAPI_GetOrCreateFromURL;
 			((AddonAPI2*)api)->GetTextureOrCreateFromMemory = TextureLoader::ADDONAPI_GetOrCreateFromMemory;
-			((AddonAPI2*)api)->LoadTextureFromFile = TextureLoader::LoadFromFile;
-			((AddonAPI2*)api)->LoadTextureFromResource = TextureLoader::LoadFromResource;
-			((AddonAPI2*)api)->LoadTextureFromURL = TextureLoader::LoadFromURL;
-			((AddonAPI2*)api)->LoadTextureFromMemory = TextureLoader::LoadFromMemory;
+			((AddonAPI2*)api)->LoadTextureFromFile = TextureLoader::ADDONAPI_LoadFromFile;
+			((AddonAPI2*)api)->LoadTextureFromResource = TextureLoader::ADDONAPI_LoadFromResource;
+			((AddonAPI2*)api)->LoadTextureFromURL = TextureLoader::ADDONAPI_LoadFromURL;
+			((AddonAPI2*)api)->LoadTextureFromMemory = TextureLoader::ADDONAPI_LoadFromMemory;
 
 			((AddonAPI2*)api)->AddShortcut = GUI::QuickAccess::AddShortcut;
 			((AddonAPI2*)api)->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
@@ -1267,15 +1267,15 @@ namespace Loader
 			((AddonAPI3*)api)->GetResource = DataLink::GetResource;
 			((AddonAPI3*)api)->ShareResource = DataLink::ShareResource;
 
-			((AddonAPI3*)api)->GetTexture = TextureLoader::Get;
+			((AddonAPI3*)api)->GetTexture = TextureLoader::ADDONAPI_Get;
 			((AddonAPI3*)api)->GetTextureOrCreateFromFile = TextureLoader::ADDONAPI_GetOrCreateFromFile;
 			((AddonAPI3*)api)->GetTextureOrCreateFromResource = TextureLoader::ADDONAPI_GetOrCreateFromResource;
 			((AddonAPI3*)api)->GetTextureOrCreateFromURL = TextureLoader::ADDONAPI_GetOrCreateFromURL;
 			((AddonAPI3*)api)->GetTextureOrCreateFromMemory = TextureLoader::ADDONAPI_GetOrCreateFromMemory;
-			((AddonAPI3*)api)->LoadTextureFromFile = TextureLoader::LoadFromFile;
-			((AddonAPI3*)api)->LoadTextureFromResource = TextureLoader::LoadFromResource;
-			((AddonAPI3*)api)->LoadTextureFromURL = TextureLoader::LoadFromURL;
-			((AddonAPI3*)api)->LoadTextureFromMemory = TextureLoader::LoadFromMemory;
+			((AddonAPI3*)api)->LoadTextureFromFile = TextureLoader::ADDONAPI_LoadFromFile;
+			((AddonAPI3*)api)->LoadTextureFromResource = TextureLoader::ADDONAPI_LoadFromResource;
+			((AddonAPI3*)api)->LoadTextureFromURL = TextureLoader::ADDONAPI_LoadFromURL;
+			((AddonAPI3*)api)->LoadTextureFromMemory = TextureLoader::ADDONAPI_LoadFromMemory;
 
 			((AddonAPI3*)api)->AddShortcut = GUI::QuickAccess::AddShortcut;
 			((AddonAPI3*)api)->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
@@ -1299,7 +1299,7 @@ namespace Loader
 			((AddonAPI4*)api)->RegisterRender = GUI::Register;
 			((AddonAPI4*)api)->DeregisterRender = GUI::Deregister;
 
-			((AddonAPI4*)api)->RequestUpdate = UpdaterStatic::ADDONAPI_RequestUpdate;
+			((AddonAPI4*)api)->RequestUpdate = Updater::ADDONAPI_RequestUpdate;
 
 			((AddonAPI4*)api)->GetGameDirectory = Path::GetGameDirectory;
 			((AddonAPI4*)api)->GetAddonDirectory = Path::GetAddonDirectory;
@@ -1332,15 +1332,15 @@ namespace Loader
 			((AddonAPI4*)api)->GetResource = DataLink::GetResource;
 			((AddonAPI4*)api)->ShareResource = DataLink::ShareResource;
 
-			((AddonAPI4*)api)->GetTexture = TextureLoader::Get;
+			((AddonAPI4*)api)->GetTexture = TextureLoader::ADDONAPI_Get;
 			((AddonAPI4*)api)->GetTextureOrCreateFromFile = TextureLoader::ADDONAPI_GetOrCreateFromFile;
 			((AddonAPI4*)api)->GetTextureOrCreateFromResource = TextureLoader::ADDONAPI_GetOrCreateFromResource;
 			((AddonAPI4*)api)->GetTextureOrCreateFromURL = TextureLoader::ADDONAPI_GetOrCreateFromURL;
 			((AddonAPI4*)api)->GetTextureOrCreateFromMemory = TextureLoader::ADDONAPI_GetOrCreateFromMemory;
-			((AddonAPI4*)api)->LoadTextureFromFile = TextureLoader::LoadFromFile;
-			((AddonAPI4*)api)->LoadTextureFromResource = TextureLoader::LoadFromResource;
-			((AddonAPI4*)api)->LoadTextureFromURL = TextureLoader::LoadFromURL;
-			((AddonAPI4*)api)->LoadTextureFromMemory = TextureLoader::LoadFromMemory;
+			((AddonAPI4*)api)->LoadTextureFromFile = TextureLoader::ADDONAPI_LoadFromFile;
+			((AddonAPI4*)api)->LoadTextureFromResource = TextureLoader::ADDONAPI_LoadFromResource;
+			((AddonAPI4*)api)->LoadTextureFromURL = TextureLoader::ADDONAPI_LoadFromURL;
+			((AddonAPI4*)api)->LoadTextureFromMemory = TextureLoader::ADDONAPI_LoadFromMemory;
 
 			((AddonAPI4*)api)->AddShortcut = GUI::QuickAccess::AddShortcut;
 			((AddonAPI4*)api)->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
@@ -1369,7 +1369,7 @@ namespace Loader
 			((AddonAPI5*)api)->RegisterRender = GUI::Register;
 			((AddonAPI5*)api)->DeregisterRender = GUI::Deregister;
 
-			((AddonAPI5*)api)->RequestUpdate = UpdaterStatic::ADDONAPI_RequestUpdate;
+			((AddonAPI5*)api)->RequestUpdate = Updater::ADDONAPI_RequestUpdate;
 
 			((AddonAPI5*)api)->GetGameDirectory = Path::GetGameDirectory;
 			((AddonAPI5*)api)->GetAddonDirectory = Path::GetAddonDirectory;
@@ -1403,15 +1403,15 @@ namespace Loader
 			((AddonAPI5*)api)->GetResource = DataLink::GetResource;
 			((AddonAPI5*)api)->ShareResource = DataLink::ShareResource;
 
-			((AddonAPI5*)api)->GetTexture = TextureLoader::Get;
+			((AddonAPI5*)api)->GetTexture = TextureLoader::ADDONAPI_Get;
 			((AddonAPI5*)api)->GetTextureOrCreateFromFile = TextureLoader::ADDONAPI_GetOrCreateFromFile;
 			((AddonAPI5*)api)->GetTextureOrCreateFromResource = TextureLoader::ADDONAPI_GetOrCreateFromResource;
 			((AddonAPI5*)api)->GetTextureOrCreateFromURL = TextureLoader::ADDONAPI_GetOrCreateFromURL;
 			((AddonAPI5*)api)->GetTextureOrCreateFromMemory = TextureLoader::ADDONAPI_GetOrCreateFromMemory;
-			((AddonAPI5*)api)->LoadTextureFromFile = TextureLoader::LoadFromFile;
-			((AddonAPI5*)api)->LoadTextureFromResource = TextureLoader::LoadFromResource;
-			((AddonAPI5*)api)->LoadTextureFromURL = TextureLoader::LoadFromURL;
-			((AddonAPI5*)api)->LoadTextureFromMemory = TextureLoader::LoadFromMemory;
+			((AddonAPI5*)api)->LoadTextureFromFile = TextureLoader::ADDONAPI_LoadFromFile;
+			((AddonAPI5*)api)->LoadTextureFromResource = TextureLoader::ADDONAPI_LoadFromResource;
+			((AddonAPI5*)api)->LoadTextureFromURL = TextureLoader::ADDONAPI_LoadFromURL;
+			((AddonAPI5*)api)->LoadTextureFromMemory = TextureLoader::ADDONAPI_LoadFromMemory;
 
 			((AddonAPI5*)api)->AddShortcut = GUI::QuickAccess::AddShortcut;
 			((AddonAPI5*)api)->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;

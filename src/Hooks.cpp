@@ -102,7 +102,7 @@ namespace Hooks
 
 			Loader::ProcessQueue();
 
-			TextureLoader::ProcessQueue();
+			TextureService->Advance();
 
 			if (NexusLink)
 			{

@@ -81,7 +81,7 @@ namespace Main
 
 		std::thread([]()
 			{
-				Updater->UpdateNexus();
+				UpdateService->UpdateNexus();
 			})
 			.detach();
 		

@@ -897,21 +897,21 @@ namespace GUI
 		switch (month)
 		{
 		case 10:
-			TextureLoader::LoadFromResource(ICON_NEXUS, RES_ICON_NEXUS_HALLOWEEN, NexusHandle, nullptr);
-			TextureLoader::LoadFromResource(ICON_NEXUS_HOVER, RES_ICON_NEXUS_HALLOWEEN_HOVER, NexusHandle, nullptr);
+			TextureService->Load(ICON_NEXUS, RES_ICON_NEXUS_HALLOWEEN, NexusHandle, nullptr);
+			TextureService->Load(ICON_NEXUS_HOVER, RES_ICON_NEXUS_HALLOWEEN_HOVER, NexusHandle, nullptr);
 			break;
 		case 12:
-			TextureLoader::LoadFromResource(ICON_NEXUS, RES_ICON_NEXUS_XMAS, NexusHandle, nullptr);
-			TextureLoader::LoadFromResource(ICON_NEXUS_HOVER, RES_ICON_NEXUS_XMAS_HOVER, NexusHandle, nullptr);
+			TextureService->Load(ICON_NEXUS, RES_ICON_NEXUS_XMAS, NexusHandle, nullptr);
+			TextureService->Load(ICON_NEXUS_HOVER, RES_ICON_NEXUS_XMAS_HOVER, NexusHandle, nullptr);
 			break;
 		default:
-			TextureLoader::LoadFromResource(ICON_NEXUS, RES_ICON_NEXUS, NexusHandle, nullptr);
-			TextureLoader::LoadFromResource(ICON_NEXUS_HOVER, RES_ICON_NEXUS_HOVER, NexusHandle, nullptr);
+			TextureService->Load(ICON_NEXUS, RES_ICON_NEXUS, NexusHandle, nullptr);
+			TextureService->Load(ICON_NEXUS_HOVER, RES_ICON_NEXUS_HOVER, NexusHandle, nullptr);
 			break;
 		}
 
-		TextureLoader::LoadFromResource(ICON_GENERIC, RES_ICON_GENERIC, NexusHandle, nullptr);
-		TextureLoader::LoadFromResource(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, NexusHandle, nullptr);
+		TextureService->Load(ICON_GENERIC, RES_ICON_GENERIC, NexusHandle, nullptr);
+		TextureService->Load(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, NexusHandle, nullptr);
 
 		/* add shortcut */
 		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, Language->Translate("((000009))"));

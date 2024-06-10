@@ -26,6 +26,12 @@
 namespace TextureLoader
 {
 	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_Get:
+	/// 	Addon API wrapper function for Get.
+	///----------------------------------------------------------------------------------------------------
+	Texture* ADDONAPI_Get(const char* aIdentifier);
+
+	///----------------------------------------------------------------------------------------------------
 	/// ADDONAPI_GetOrCreateFromFile:
 	/// 	Addon API wrapper function for GetOrCreate from file.
 	///----------------------------------------------------------------------------------------------------
@@ -48,16 +54,52 @@ namespace TextureLoader
 	/// 	Addon API wrapper function for GetOrCreate from memory.
 	///----------------------------------------------------------------------------------------------------
 	Texture* ADDONAPI_GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_LoadFromFile:
+	/// 	Addon API wrapper function for LoadFromFile.
+	///----------------------------------------------------------------------------------------------------
+	void ADDONAPI_LoadFromFile(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_LoadFromResource:
+	/// 	Addon API wrapper function for LoadFromResource.
+	///----------------------------------------------------------------------------------------------------
+	void ADDONAPI_LoadFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_LoadFromURL:
+	/// 	Addon API wrapper function for LoadFromURL.
+	///----------------------------------------------------------------------------------------------------
+	void ADDONAPI_LoadFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_LoadFromMemory:
+	/// 	Addon API wrapper function for LoadFromMemory.
+	///----------------------------------------------------------------------------------------------------
+	void ADDONAPI_LoadFromMemory(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback);
 }
 
 ///----------------------------------------------------------------------------------------------------
-/// TextureLoader Namespace
+/// CTextureLoader Class
 ///----------------------------------------------------------------------------------------------------
-namespace TextureLoader
+class CTextureLoader
 {
-	extern std::mutex						Mutex;
-	extern std::map<std::string, Texture*>	Registry;
-	extern std::vector<QueuedTexture>		QueuedTextures;
+public:
+	///----------------------------------------------------------------------------------------------------
+	/// ctor
+	///----------------------------------------------------------------------------------------------------
+	CTextureLoader() = default;
+	///----------------------------------------------------------------------------------------------------
+	/// dtor
+	///----------------------------------------------------------------------------------------------------
+	~CTextureLoader() = default;
+
+	///----------------------------------------------------------------------------------------------------
+	/// Advance:
+	/// 	Processes all currently queued textures.
+	///----------------------------------------------------------------------------------------------------
+	void Advance();
 
 	///----------------------------------------------------------------------------------------------------
 	/// Get:
@@ -90,40 +132,39 @@ namespace TextureLoader
 	Texture* GetOrCreate(const char* aIdentifier, void* aData, size_t aSize);
 
 	///----------------------------------------------------------------------------------------------------
-	/// LoadFromFile:
+	/// Load:
 	/// 	Requests to load a texture from file and returns to the given callback.
 	///----------------------------------------------------------------------------------------------------
-	void LoadFromFile(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback);
+	void Load(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback);
 
 	///----------------------------------------------------------------------------------------------------
-	/// LoadFromResource:
+	/// Load:
 	/// 	Requests to load a texture from an embedded resource and returns to the given callback.
 	///----------------------------------------------------------------------------------------------------
-	void LoadFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback);
+	void Load(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback);
 
 	///----------------------------------------------------------------------------------------------------
-	/// LoadFromURL:
+	/// Load:
 	/// 	Requests to load a texture from remote URL and returns to the given callback.
 	///----------------------------------------------------------------------------------------------------
-	void LoadFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback);
+	void Load(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback);
 
 	///----------------------------------------------------------------------------------------------------
-	/// LoadFromMemory:
+	/// Load:
 	/// 	Requests to load a texture from memory and returns to the given callback.
 	///----------------------------------------------------------------------------------------------------
-	void LoadFromMemory(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback);
+	void Load(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback);
+
+private:
+	std::mutex						Mutex;
+	std::map<std::string, Texture*>	Registry;
+	std::vector<QueuedTexture>		QueuedTextures;
 
 	///----------------------------------------------------------------------------------------------------
 	/// OverrideTexture:
 	/// 	Internal function to override texture load with custom user texture on disk.
 	///----------------------------------------------------------------------------------------------------
 	bool OverrideTexture(const char* aIdentifier, TEXTURES_RECEIVECALLBACK aCallback);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ProcessQueue:
-	/// 	Processes all currently queued textures.
-	///----------------------------------------------------------------------------------------------------
-	void ProcessQueue();
 
 	///----------------------------------------------------------------------------------------------------
 	/// QueueTexture:
@@ -136,6 +177,6 @@ namespace TextureLoader
 	/// 	Creates a texture and adds it to the registry.
 	///----------------------------------------------------------------------------------------------------
 	void CreateTexture(QueuedTexture aQueuedTexture);
-}
+};
 
 #endif
