@@ -22,9 +22,6 @@
     <Filter Include="Events">
       <UniqueIdentifier>{062ec4b8-2804-4978-b3c4-381b0cdd4b35}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Localization">
-      <UniqueIdentifier>{7943e0f9-3a02-4820-bc47-49d1198f39b8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GUI">
       <UniqueIdentifier>{8e3da8bf-b792-4844-a919-647f2d4786f6}</UniqueIdentifier>
     </Filter>
@@ -153,6 +150,9 @@
     </Filter>
     <Filter Include="Services\Textures">
       <UniqueIdentifier>{6389b79a-d0aa-4b99-97d2-74a74d8ec33b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Services\Localization">
+      <UniqueIdentifier>{7943e0f9-3a02-4820-bc47-49d1198f39b8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -309,8 +309,8 @@
     <ClCompile Include="src\Loader\AddonDefinition.cpp">
       <Filter>Loader\Structs</Filter>
     </ClCompile>
-    <ClCompile Include="src\Localization\Localization.cpp">
-      <Filter>Localization</Filter>
+    <ClCompile Include="src\Services\Localization\Localization.cpp">
+      <Filter>Services\Localization</Filter>
     </ClCompile>
     <ClCompile Include="src\Events\EventSubscriber.cpp">
       <Filter>Events</Filter>
@@ -431,8 +431,8 @@
     <ClInclude Include="src\Shared.h">
       <Filter>_GLOBAL</Filter>
     </ClInclude>
-    <ClInclude Include="src\Localization\Localization.h">
-      <Filter>Localization</Filter>
+    <ClInclude Include="src\Services\Localization\Localization.h">
+      <Filter>Services\Localization</Filter>
     </ClInclude>
     <ClInclude Include="src\Inputs\Keybinds\Keybind.h">
       <Filter>Inputs\Keybinds</Filter>
@@ -1037,8 +1037,8 @@
     <ClInclude Include="src\Loader\NexusLinkData.h">
       <Filter>Loader\Structs</Filter>
     </ClInclude>
-    <ClInclude Include="src\Localization\FuncDefs.h">
-      <Filter>Localization</Filter>
+    <ClInclude Include="src\Services\Localization\FuncDefs.h">
+      <Filter>Services\Localization</Filter>
     </ClInclude>
     <ClInclude Include="src\Events\EventSubscriber.h">
       <Filter>Events</Filter>

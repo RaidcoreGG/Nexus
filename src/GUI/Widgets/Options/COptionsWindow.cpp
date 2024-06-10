@@ -14,7 +14,7 @@
 #include "API/APIController.h"
 #include "Settings/Settings.h"
 #include "Loader/Loader.h"
-#include "Localization/Localization.h"
+#include "Services/Localization/Localization.h"
 
 #include "GUI/GUI.h"
 #include "GUI/IWindow.h"

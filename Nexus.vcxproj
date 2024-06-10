@@ -25,7 +25,7 @@
     <ClCompile Include="src\Loader\ArcDPS.cpp" />
     <ClCompile Include="src\Loader\EUpdateProvider.cpp" />
     <ClCompile Include="src\Loader\Library.cpp" />
-    <ClCompile Include="src\Localization\Localization.cpp" />
+    <ClCompile Include="src\Services\Localization\Localization.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Events\EventHandler.cpp" />
     <ClCompile Include="src\GUI\GUI.cpp" />
@@ -144,8 +144,8 @@
     <ClInclude Include="src\Loader\LibraryAddon.h" />
     <ClInclude Include="src\Loader\Loader.h" />
     <ClInclude Include="src\Loader\NexusLinkData.h" />
-    <ClInclude Include="src\Localization\FuncDefs.h" />
-    <ClInclude Include="src\Localization\Localization.h" />
+    <ClInclude Include="src\Services\Localization\FuncDefs.h" />
+    <ClInclude Include="src\Services\Localization\Localization.h" />
     <ClInclude Include="src\Logging\FuncDefs.h" />
     <ClInclude Include="src\Main.h" />
     <ClInclude Include="src\Services\Multibox\Multibox.h" />

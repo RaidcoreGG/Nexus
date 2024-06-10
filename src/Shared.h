@@ -8,7 +8,7 @@
 #include "Loader/AddonDefinition.h"
 #include "Logging/LogHandler.h"
 #include "API/ApiClient.h"
-#include "Localization/Localization.h"
+#include "Services/Localization/Localization.h"
 #include "Services/Updater/Updater.h"
 #include "Services/Textures/TextureLoader.h"
 
