@@ -736,6 +736,8 @@ namespace GUI
 			Renderer::Scaling = LastScaling * io.FontGlobalScale;
 		}
 
+		Language->Advance(); // advance once to build lang atlas prior to creation Quick Access
+
 		ImportArcDPSStyle();
 
 		std::filesystem::path fontPath{};
