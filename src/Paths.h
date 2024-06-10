@@ -37,6 +37,12 @@ namespace Path
 	extern std::filesystem::path F_LOCALE_FR;
 	extern std::filesystem::path F_LOCALE_ES;
 
+	extern std::filesystem::path F_LOCALE_BR;
+	extern std::filesystem::path F_LOCALE_CZ;
+	extern std::filesystem::path F_LOCALE_IT;
+	extern std::filesystem::path F_LOCALE_PL;
+	extern std::filesystem::path F_LOCALE_RU;
+
 	extern std::vector<std::string>	ExistingPaths;
 
 	/* Initialize all path variables relative to the base modules location */

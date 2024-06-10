@@ -95,9 +95,6 @@ namespace Main
 			if (Multibox::KillMutex())		{ State::MultiboxState |= EMultiboxState::MUTEX_CLOSED; }
 			LogInfo(CH_CORE, "Multibox State: %d", State::MultiboxState);
 
-			UnpackLocales();
-			Language->SetLocaleDirectory(Path::D_GW2_ADDONS_RAIDCORE_LOCALES);
-
 			MH_Initialize();
 
 			Keybinds::Initialize();
@@ -172,28 +169,5 @@ namespace Main
 		// FIXME: make arc not shit itself when the game shuts down, for now let windows handle the rest
 		//if (D3D11Handle) { FreeLibrary(D3D11Handle); }
 		//if (D3D11SystemHandle) { FreeLibrary(D3D11SystemHandle); }
-	}
-
-	void UnpackLocales()
-	{
-		LPVOID res{}; DWORD sz{};
-		GetResource(NexusHandle, MAKEINTRESOURCE(RES_LOCALE_EN), "JSON", &res, &sz);
-
-		try
-		{
-			if (std::filesystem::exists(Path::F_LOCALE_EN))
-			{
-				std::filesystem::remove(Path::F_LOCALE_EN);
-			}
-
-			std::ofstream file(Path::F_LOCALE_EN);
-			file.write((const char*)res, sz);
-			file.close();
-		}
-		catch (std::filesystem::filesystem_error fErr)
-		{
-			LogDebug(CH_LOADER, "%s", fErr.what());
-			return;
-		}
 	}
 }

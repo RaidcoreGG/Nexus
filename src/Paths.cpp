@@ -34,6 +34,12 @@ namespace Path
 	std::filesystem::path F_LOCALE_FR{};
 	std::filesystem::path F_LOCALE_ES{};
 
+	std::filesystem::path F_LOCALE_BR{};
+	std::filesystem::path F_LOCALE_CZ{};
+	std::filesystem::path F_LOCALE_IT{};
+	std::filesystem::path F_LOCALE_PL{};
+	std::filesystem::path F_LOCALE_RU{};
+
 	std::vector<std::string> ExistingPaths;
 
 	void Initialize(HMODULE aBaseModule)
@@ -77,6 +83,12 @@ namespace Path
 		F_LOCALE_DE = D_GW2_ADDONS_RAIDCORE_LOCALES / "de_Main.json";
 		F_LOCALE_FR = D_GW2_ADDONS_RAIDCORE_LOCALES / "fr_Main.json";
 		F_LOCALE_ES = D_GW2_ADDONS_RAIDCORE_LOCALES / "es_Main.json";
+
+		F_LOCALE_BR = D_GW2_ADDONS_RAIDCORE_LOCALES / "br_Main.json";
+		F_LOCALE_CZ = D_GW2_ADDONS_RAIDCORE_LOCALES / "cz_Main.json";
+		F_LOCALE_IT = D_GW2_ADDONS_RAIDCORE_LOCALES / "it_Main.json";
+		F_LOCALE_PL = D_GW2_ADDONS_RAIDCORE_LOCALES / "pl_Main.json";
+		F_LOCALE_RU = D_GW2_ADDONS_RAIDCORE_LOCALES / "ru_Main.json";
 
 		/* push to paths */
 		ExistingPaths.push_back(D_GW2.string());

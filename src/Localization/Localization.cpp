@@ -270,6 +270,10 @@ void CLocalization::BuildLocaleAtlas()
 	}
 
 	this->IsLocaleAtlasBuilt = true;
+	if (this->ActiveLocale)
+	{
+		this->SetLanguage(this->ActiveLocale->DisplayName);
+	}
 }
 
 void CLocalization::ClearLocaleAtlas()

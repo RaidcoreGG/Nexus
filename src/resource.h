@@ -63,6 +63,15 @@
 #define RES_TEX_CONTEXTMENU_HIGHLIGHT	702
 
 #define RES_LOCALE_EN					801
+#define RES_LOCALE_DE					802
+//#define RES_LOCALE_FR					803
+#define RES_LOCALE_ES					804
+
+#define RES_LOCALE_BR					805
+#define RES_LOCALE_CZ					806
+#define RES_LOCALE_IT					807
+#define RES_LOCALE_PL					808
+#define RES_LOCALE_RU					809
 
 /* CEulaWindow */
 #define RES_TEX_EULA_BACKGROUND			901
