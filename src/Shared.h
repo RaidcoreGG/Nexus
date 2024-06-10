@@ -9,7 +9,7 @@
 #include "Logging/LogHandler.h"
 #include "API/ApiClient.h"
 #include "Localization/Localization.h"
-#include "Updater/Updater.h"
+#include "Services/Updater/Updater.h"
 
 #include "imgui.h"
 

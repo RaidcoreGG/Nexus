@@ -3,6 +3,8 @@
 
 #include <Windows.h>
 
+constexpr const char* NULLSTR = "(null)";
+
 /* Channels */
 extern const char* CH_CORE;
 extern const char* CH_EVENTS;

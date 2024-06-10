@@ -16,7 +16,7 @@
 #include "AddonItem.h"
 #include "Textures/TextureLoader.h"
 
-#include "Updater/Updater.h"
+#include "Services/Updater/Updater.h"
 
 #include "imgui.h"
 #include "imgui_extensions.h"

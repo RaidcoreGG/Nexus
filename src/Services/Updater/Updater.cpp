@@ -6,7 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "Updater.h"
+#include "Services/Updater/Updater.h"
 
 #include <thread>
 

@@ -14,7 +14,7 @@
 #include "Textures/TextureLoader.h"
 #include "Textures/Texture.h"
 
-#include "Updater/Updater.h"
+#include "Services/Updater/Updater.h"
 
 #include "Events/EventHandler.h"
 

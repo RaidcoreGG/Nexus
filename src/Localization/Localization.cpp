@@ -170,7 +170,7 @@ const std::string& CLocalization::GetActiveLanguage()
 		return this->ActiveLocale->DisplayName;
 	}
 
-	return "(null)";
+	return NULLSTR;
 }
 
 void CLocalization::SetLocaleDirectory(std::filesystem::path aPath)

@@ -24,7 +24,7 @@
 #include "Services/Mumble/Reader.h"
 #include "Settings/Settings.h"
 #include "API/ApiClient.h"
-#include "Updater/Updater.h"
+#include "Services/Updater/Updater.h"
 #include "Services/Multibox/Multibox.h"
 
 #include "nlohmann/json.hpp"

@@ -15,7 +15,7 @@
 #include "GUI/Widgets/QuickAccess/FuncDefs.h"
 #include "GUI/Widgets/Alerts/FuncDefs.h"
 #include "Localization/FuncDefs.h"
-#include "Updater/FuncDefs.h"
+#include "Services/Updater/FuncDefs.h"
 #include "GUI/Fonts/FuncDefs.h"
 
 // Base

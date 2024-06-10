@@ -37,7 +37,7 @@
 #include "GUI/Widgets/Alerts/Alerts.h"
 #include "Settings/Settings.h"
 #include "Localization/Localization.h"
-#include "Updater/Updater.h"
+#include "Services/Updater/Updater.h"
 #include "GUI/Fonts/FontManager.h"
 
 #include "Services/Mumble/Reader.h"
