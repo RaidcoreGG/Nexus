@@ -375,7 +375,7 @@ bool CUpdater::InstallAddon(LibraryAddon* aAddon, bool aIsArcPlugin)
 	std::filesystem::path installPath = Path::D_GW2_ADDONS / (filename + ".dll");
 	installPath = GetUnclaimedPath(installPath);
 
-	if (this->UpdateAddon(installPath, addonInfo, true))
+	if (this->UpdateAddon(installPath, addonInfo, aIsArcPlugin))
 	{
 		try
 		{

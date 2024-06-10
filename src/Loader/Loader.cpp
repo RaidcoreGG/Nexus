@@ -506,42 +506,6 @@ namespace Loader
 						LogDebug(CH_LOADER, "%s", fErr.what());
 					}
 				}
-				else if (path.extension() == extOld)
-				{
-					std::filesystem::path actualPath = path.string().substr(0, path.string().length() - extOld.length());
-
-					Addon* addon = FindAddonByPath(actualPath);
-
-					/* not orphaned, will be handled by loader */
-					if (addon) { continue; }
-
-					try
-					{
-						std::filesystem::remove(path);
-					}
-					catch (std::filesystem::filesystem_error fErr)
-					{
-						LogDebug(CH_LOADER, "%s", fErr.what());
-					}
-				}
-				else if (path.extension() == extUpdate)
-				{
-					std::filesystem::path actualPath = path.string().substr(0, path.string().length() - extUpdate.length());
-
-					Addon* addon = FindAddonByPath(actualPath);
-
-					/* not orphaned, will be handled by loader */
-					if (addon) { continue; }
-
-					try
-					{
-						std::filesystem::rename(path, actualPath);
-					}
-					catch (std::filesystem::filesystem_error fErr)
-					{
-						LogDebug(CH_LOADER, "%s", fErr.what());
-					}
-				}
 			}
 			
 			IsSuspended = true;
@@ -845,8 +809,6 @@ namespace Loader
 
 		Events::Raise(EV_ADDON_LOADED, &addon->Definitions->Signature);
 		Events::Raise(EV_MUMBLE_IDENTITY_UPDATED, Mumble::IdentityParsed);
-
-		SortAddons();
 
 		addon->State = locked ? EAddonState::LoadedLOCKED : EAddonState::Loaded;
 		SaveAddonConfig();

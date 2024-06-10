@@ -87,7 +87,6 @@ namespace GUI
 			}
 		}
 
-
 		if (!BtnOptions) { BtnOptions = TextureLoader::GetOrCreate("ICON_OPTIONS", RES_ICON_OPTIONS, NexusHandle); }
 		if (!CtxMenuBullet) { CtxMenuBullet = TextureLoader::GetOrCreate("TEX_CTXMENU_BULLET", RES_TEX_CONTEXTMENU_BULLET, NexusHandle); }
 		if (!CtxMenuHighlight) { CtxMenuHighlight = TextureLoader::GetOrCreate("TEX_CTXMENU_HIGHLIGHT", RES_TEX_CONTEXTMENU_HIGHLIGHT, NexusHandle); }
