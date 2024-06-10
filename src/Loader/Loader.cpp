@@ -691,7 +691,7 @@ namespace Loader
 						addon->AllowPrereleases
 					};
 
-					if (Updater.UpdateAddon(tmpPath, addonInfo))
+					if (Updater->UpdateAddon(tmpPath, addonInfo))
 					{
 						LogInfo(CH_LOADER, "Update available for \"%s\".", tmpPath.string().c_str());
 						if (addon->IsDisabledUntilUpdate)
@@ -717,7 +717,7 @@ namespace Loader
 							}
 							else
 							{
-								GUI::Alerts::Notify(String::Format("%s %s", addon->Definitions->Name, Language.Translate("((000079))")).c_str());
+								GUI::Alerts::Notify(String::Format("%s %s", addon->Definitions->Name, Language->Translate("((000079))")).c_str());
 							}
 						}
 					}
@@ -758,7 +758,7 @@ namespace Loader
 		{
 			// show message that addon was disabled due to game update
 			Events::Raise(EV_VOLATILE_ADDON_DISABLED, &addon->Definitions->Signature);
-			GUI::Alerts::Notify(String::Format("%s %s", addon->Definitions->Name, Language.Translate("((000073))")).c_str());
+			GUI::Alerts::Notify(String::Format("%s %s", addon->Definitions->Name, Language->Translate("((000073))")).c_str());
 
 			FreeLibrary(addon->Module);
 			addon->State = EAddonState::NotLoaded;
@@ -1589,7 +1589,7 @@ namespace Loader
 			DisableVolatileUntilUpdate = true;
 			LogWarning(CH_LOADER, "Game updated. Current Build %d. Old Build: %d. Disabling volatile addons until they update.", gameBuild, lastGameBuild);
 
-			GUI::Alerts::Notify(String::Format("%s\n%s", Language.Translate("((000001))"), Language.Translate("((000002))")).c_str());
+			GUI::Alerts::Notify(String::Format("%s\n%s", Language->Translate("((000001))"), Language->Translate("((000002))")).c_str());
 		}
 
 		Settings::Settings[OPT_LASTGAMEBUILD] = gameBuild;

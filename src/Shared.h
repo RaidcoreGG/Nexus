@@ -26,8 +26,8 @@ extern std::vector<std::string>		Parameters;
 extern std::vector<signed int>		RequestedAddons;
 
 /* FIXME: these need to be dependency injected. Fix before 2024/06/30. */
-extern CLocalization&				Language;
-extern CUpdater&					Updater;
+extern CLocalization*				Language;
+extern CUpdater*					Updater;
 
 extern ImFont*						MonospaceFont;	/* default/monospace/console font */
 extern ImFont*						UserFont;		/* custom user font */

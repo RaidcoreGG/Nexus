@@ -163,7 +163,7 @@ namespace GUI
 
 			ImGui::PushFont(FontBig);
 			ImGui::SetCursorPos(ImVec2(28.0f, 20.0f * Renderer::Scaling));
-			ImGui::TextColored(ImVec4(1.0f, .933f, .733f, 1.0f), Language.Translate("Legal Agreement"));
+			ImGui::TextColored(ImVec4(1.0f, .933f, .733f, 1.0f), Language->Translate("Legal Agreement"));
 			ImGui::PopFont();
 
 			ImGui::EndPopup();

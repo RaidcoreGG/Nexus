@@ -52,17 +52,10 @@ namespace UpdaterStatic
 
 		std::thread([path, addonInfo]()
 			{
-				CUpdater& inst = CUpdater::GetInstance();
-				inst.UpdateAddon(path, addonInfo);
+				Updater->UpdateAddon(path, addonInfo);
 			})
 			.detach();
 	}
-}
-
-CUpdater& CUpdater::GetInstance()
-{
-	static CUpdater Instance;
-	return Instance;
 }
 
 void CUpdater::UpdateNexus()

@@ -99,9 +99,9 @@ namespace GUI
 
 			ImGui::SetCursorPos(ImVec2(28.0f, 8.0f + (64.0f * Renderer::Scaling)));
 
-			ImVec2 text1sz = ImGui::CalcTextSize(Language.Translate("((000031))"));
-			ImVec2 text2sz = ImGui::CalcTextSize(Language.Translate("((000032))"));
-			ImVec2 text3sz = ImGui::CalcTextSize(Language.Translate("((000075))"));
+			ImVec2 text1sz = ImGui::CalcTextSize(Language->Translate("((000031))"));
+			ImVec2 text2sz = ImGui::CalcTextSize(Language->Translate("((000032))"));
+			ImVec2 text3sz = ImGui::CalcTextSize(Language->Translate("((000075))"));
 
 			float tab1width = 96.0f > text1sz.x + 16.0f ? 96.0f : text1sz.x + 32.0f;
 			float tab2width = 96.0f > text2sz.x + 16.0f ? 96.0f : text2sz.x + 32.0f;
@@ -137,9 +137,9 @@ namespace GUI
 			{
 				ImGui::SameLine();
 
-				std::string legacyNotice = Language.Translate("((000076))");
+				std::string legacyNotice = Language->Translate("((000076))");
 				legacyNotice.append("\n");
-				legacyNotice.append(Language.Translate("((000077))"));
+				legacyNotice.append(Language->Translate("((000077))"));
 
 				tab3origin = ImGui::GetCursorPos();
 				if (ImGui::ImageButton(!Tab3Hovered ? TabBtn->Resource : TabBtnHover->Resource, ImVec2(tab3width * Renderer::Scaling, 24.0f * Renderer::Scaling)))
@@ -154,15 +154,15 @@ namespace GUI
 			ImGui::PopStyleVar();
 
 			ImGui::SetCursorPos(ImVec2(tab1origin.x + text1offset.x, tab1origin.y + text1offset.y));
-			ImGui::TextColored(TabIndex == 0 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000031))"));
+			ImGui::TextColored(TabIndex == 0 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language->Translate("((000031))"));
 
 			ImGui::SetCursorPos(ImVec2(tab2origin.x + text2offset.x, tab2origin.y + text2offset.y));
-			ImGui::TextColored(TabIndex == 1 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000032))"));
+			ImGui::TextColored(TabIndex == 1 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language->Translate("((000032))"));
 
 			if (ArcDPS::IsLoaded)
 			{
 				ImGui::SetCursorPos(ImVec2(tab3origin.x + text3offset.x, tab3origin.y + text3offset.y));
-				ImGui::TextColored(TabIndex == 2 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000075))"));
+				ImGui::TextColored(TabIndex == 2 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language->Translate("((000075))"));
 			}
 			
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
@@ -191,10 +191,10 @@ namespace GUI
 						if (Loader::Addons.size() == 0)
 						{
 							ImVec2 windowSize = ImGui::GetWindowSize();
-							ImVec2 textSize = ImGui::CalcTextSize(Language.Translate("((000033))"));
+							ImVec2 textSize = ImGui::CalcTextSize(Language->Translate("((000033))"));
 							ImVec2 position = ImGui::GetCursorPos();
 							ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-							ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000033))"));
+							ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language->Translate("((000033))"));
 						}
 						else
 						{
@@ -211,17 +211,17 @@ namespace GUI
 						ImGui::EndChild();
 					}
 
-					if (ImGui::GW2::Button(Language.Translate("((000034))"), ImVec2(ImGui::CalcTextSize(Language.Translate("((000034))")).x + 16.0f, btnHeight)))
+					if (ImGui::GW2::Button(Language->Translate("((000034))"), ImVec2(ImGui::CalcTextSize(Language->Translate("((000034))")).x + 16.0f, btnHeight)))
 					{
 						std::string strAddons = Path::D_GW2_ADDONS.string();
 						ShellExecuteA(NULL, "explore", strAddons.c_str(), NULL, NULL, SW_SHOW);
 					}
 					ImGui::SameLine();
-					float btnUpdateCheckWidth = ImGui::CalcTextSize(Language.Translate("((000035))")).x;
-					float btnUpdateCheckingWidth = ImGui::CalcTextSize(Language.Translate("((000071))")).x;
+					float btnUpdateCheckWidth = ImGui::CalcTextSize(Language->Translate("((000035))")).x;
+					float btnUpdateCheckingWidth = ImGui::CalcTextSize(Language->Translate("((000071))")).x;
 					float btnUCWidth = btnUpdateCheckingWidth > btnUpdateCheckWidth ? btnUpdateCheckingWidth : btnUpdateCheckWidth;
 
-					if (ImGui::GW2::Button(checkedForUpdates == -1 ? Language.Translate("((000035))") : Language.Translate("((000071))"), ImVec2(btnUCWidth + 16.0f, btnHeight)))
+					if (ImGui::GW2::Button(checkedForUpdates == -1 ? Language->Translate("((000035))") : Language->Translate("((000071))"), ImVec2(btnUCWidth + 16.0f, btnHeight)))
 					{
 						if (checkedForUpdates == -1)
 						{
@@ -257,7 +257,7 @@ namespace GUI
 												addon->AllowPrereleases
 											};
 
-											if (Updater.UpdateAddon(tmpPath, addonInfo))
+											if (Updater->UpdateAddon(tmpPath, addonInfo))
 											{
 												Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
 											}
@@ -274,7 +274,7 @@ namespace GUI
 							}
 						}
 					}
-					ImGui::GW2::TooltipGeneric(Language.Translate("((000036))"));
+					ImGui::GW2::TooltipGeneric(Language->Translate("((000036))"));
 				}
 				else if (TabIndex == 1)
 				{
@@ -312,16 +312,16 @@ namespace GUI
 						if (Loader::Library::Addons.size() == 0 || downloadable == 0)
 						{
 							ImVec2 windowSize = ImGui::GetWindowSize();
-							ImVec2 textSize = ImGui::CalcTextSize(Language.Translate("((000037))"));
+							ImVec2 textSize = ImGui::CalcTextSize(Language->Translate("((000037))"));
 							ImVec2 position = ImGui::GetCursorPos();
 							ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-							ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000037))"));
+							ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language->Translate("((000037))"));
 						}
 
 						ImGui::EndChild();
 					}
 
-					ImGui::Checkbox(Language.Translate("((000038))"), &showInstalled);
+					ImGui::Checkbox(Language->Translate("((000038))"), &showInstalled);
 				}
 				else if (TabIndex == 2)
 				{
@@ -359,10 +359,10 @@ namespace GUI
 						if (ArcDPS::PluginLibrary.size() == 0 || downloadable == 0)
 						{
 							ImVec2 windowSize = ImGui::GetWindowSize();
-							ImVec2 textSize = ImGui::CalcTextSize(Language.Translate("((000037))"));
+							ImVec2 textSize = ImGui::CalcTextSize(Language->Translate("((000037))"));
 							ImVec2 position = ImGui::GetCursorPos();
 							ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-							ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000037))"));
+							ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language->Translate("((000037))"));
 						}
 
 						ImGui::EndChild();
@@ -370,13 +370,13 @@ namespace GUI
 					else
 					{
 						ImVec2 windowSize = ImGui::GetWindowSize();
-						ImVec2 textSize = ImGui::CalcTextSize(Language.Translate("((000071))"));
+						ImVec2 textSize = ImGui::CalcTextSize(Language->Translate("((000071))"));
 						ImVec2 position = ImGui::GetCursorPos();
 						ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-						ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000071))"));
+						ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language->Translate("((000071))"));
 					}
 
-					ImGui::Checkbox(Language.Translate("((000038))"), &showInstalled);
+					ImGui::Checkbox(Language->Translate("((000038))"), &showInstalled);
 				}
 
 				ImGui::EndChild();
@@ -410,7 +410,7 @@ namespace GUI
 
 			ImGui::PushFont(FontBig);
 			ImGui::SetCursorPos(ImVec2(28.0f, 20.0f * Renderer::Scaling));
-			ImGui::TextColored(ImVec4(1.0f, .933f, .733f, 1.0f), Language.Translate("((000003))"));
+			ImGui::TextColored(ImVec4(1.0f, .933f, .733f, 1.0f), Language->Translate("((000003))"));
 			ImGui::PopFont();
 		}
 		ImGui::End();

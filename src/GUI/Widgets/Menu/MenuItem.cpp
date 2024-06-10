@@ -31,7 +31,7 @@ namespace GUI
 				ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.f, 0.f, 0.f, 0.f));
 
 				ImVec2 pos = ImGui::GetCursorPos();
-				ImVec2 offset = ImGui::CalcTextSize(Language.Translate(Label.c_str()));
+				ImVec2 offset = ImGui::CalcTextSize(Language->Translate(Label.c_str()));
 
 				pos.x = (wndWidth - width) / 2.0f + 8.0f;
 
@@ -68,7 +68,7 @@ namespace GUI
 				}
 
 				ImGui::SetCursorPos(txtPos);
-				ImGui::Text(Language.Translate(Label.c_str()));
+				ImGui::Text(Language->Translate(Label.c_str()));
 
 				ImGui::PopStyleColor(4);
 

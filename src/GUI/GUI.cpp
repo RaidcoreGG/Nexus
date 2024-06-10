@@ -270,7 +270,7 @@ namespace GUI
 			OnMumbleIdentityChanged(nullptr);
 			Shutdown();
 		}
-		Language.Advance();
+		Language->Advance();
 
 		/* pre-render callbacks */
 		for (GUI_RENDER callback : RegistryPreRender)
@@ -506,16 +506,16 @@ namespace GUI
 		switch (langId)
 		{
 		case 0:
-			Language.SetLanguage("English");
+			Language->SetLanguage("English");
 			break;
 		case 2:
-			Language.SetLanguage("Français");
+			Language->SetLanguage("Français");
 			break;
 		case 3:
-			Language.SetLanguage("Deutsch");
+			Language->SetLanguage("Deutsch");
 			break;
 		case 4:
-			Language.SetLanguage(u8"Español");
+			Language->SetLanguage(u8"Español");
 			break;
 		/*case 5:
 			Language.SetLanguage(u8"Chinese");
@@ -692,11 +692,11 @@ namespace GUI
 
 			if (!Settings::Settings[OPT_LANGUAGE].is_null())
 			{
-				Language.SetLanguage(Settings::Settings[OPT_LANGUAGE].get<std::string>());
+				Language->SetLanguage(Settings::Settings[OPT_LANGUAGE].get<std::string>());
 			}
 			else
 			{
-				Language.SetLanguage("en");
+				Language->SetLanguage("en");
 			}
 
 			if (!Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS].is_null())
@@ -882,7 +882,7 @@ namespace GUI
 		TextureLoader::LoadFromResource(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, NexusHandle, nullptr);
 
 		/* add shortcut */
-		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, Language.Translate("((000009))"));
+		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, Language->Translate("((000009))"));
 
 		if (IsUpdateAvailable && NotifyChangelog)
 		{

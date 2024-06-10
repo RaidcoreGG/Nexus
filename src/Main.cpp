@@ -81,7 +81,7 @@ namespace Main
 
 		std::thread([]()
 			{
-				Updater.UpdateNexus();
+				Updater->UpdateNexus();
 			})
 			.detach();
 		
@@ -96,8 +96,7 @@ namespace Main
 			LogInfo(CH_CORE, "Multibox State: %d", State::MultiboxState);
 
 			UnpackLocales();
-			Language.SetLocaleDirectory(Path::D_GW2_ADDONS_RAIDCORE_LOCALES);
-			Language.BuildLocaleAtlas();
+			Language->SetLocaleDirectory(Path::D_GW2_ADDONS_RAIDCORE_LOCALES);
 
 			MH_Initialize();
 

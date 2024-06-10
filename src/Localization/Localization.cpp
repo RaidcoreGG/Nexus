@@ -18,40 +18,41 @@ namespace Localization
 {
 	const char* ADDONAPI_Translate(const char* aIdentifier)
 	{
-		CLocalization& inst = CLocalization::GetInstance();
-		return inst.Translate(aIdentifier);
+		return Language->Translate(aIdentifier);
 	}
 
 	const char* ADDONAPI_TranslateTo(const char* aIdentifier, const char* aLanguageIdentifier)
 	{
-		CLocalization& inst = CLocalization::GetInstance();
-		return inst.Translate(aIdentifier, aLanguageIdentifier);
+		return Language->Translate(aIdentifier, aLanguageIdentifier);
 	}
 
 	void ADDONAPI_Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aString)
 	{
-		CLocalization& inst = CLocalization::GetInstance();
-		inst.Set(aIdentifier, aLanguageIdentifier, aString);
+		Language->Set(aIdentifier, aLanguageIdentifier, aString);
 	}
 }
 
-CLocalization& CLocalization::GetInstance()
+CLocalization::~CLocalization()
 {
-	static CLocalization Instance;
-	return Instance;
+	this->ClearLocaleAtlas();
 }
 
 void CLocalization::Advance()
 {
-	const std::lock_guard<std::mutex> lock(Mutex);
+	if (!this->IsLocaleAtlasBuilt)
+	{
+		BuildLocaleAtlas();
+	}
+
+	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	while (this->Queued.size() > 0)
 	{
 		QueuedTranslation& item = this->Queued.front();
 		
-		auto atlasIt = LocaleAtlas.find(item.LanguageIdentifier);
+		auto atlasIt = this->LocaleAtlas.find(item.LanguageIdentifier);
 
-		if (atlasIt != LocaleAtlas.end())
+		if (atlasIt != this->LocaleAtlas.end())
 		{
 			atlasIt->second.Texts[item.Identifier] = _strdup(item.Text.c_str());
 		}
@@ -128,33 +129,33 @@ void CLocalization::Set(const char* aIdentifier, const char* aLanguageIdentifier
 
 void CLocalization::SetLanguage(const std::string& aIdentifier)
 {
-	auto atlasIt = LocaleAtlas.find(aIdentifier);
+	auto atlasIt = this->LocaleAtlas.find(aIdentifier);
 
 	/* find via identifier */
-	if (atlasIt != LocaleAtlas.end())
+	if (atlasIt != this->LocaleAtlas.end())
 	{
-		ActiveLocale = &atlasIt->second;
+		this->ActiveLocale = &atlasIt->second;
 		return;
 	}
 
 	/* find via display name */
-	for (auto& it : LocaleAtlas)
+	for (auto& it : this->LocaleAtlas)
 	{
 		if (it.second.DisplayName == aIdentifier)
 		{
-			ActiveLocale = &it.second;
+			this->ActiveLocale = &it.second;
 			return;
 		}
 	}
 
-	ActiveLocale = nullptr;
+	this->ActiveLocale = nullptr;
 }
 
 std::vector<std::string> CLocalization::GetLanguages()
 {
 	std::vector<std::string> langs;
 
-	for (auto& it : LocaleAtlas)
+	for (auto& it : this->LocaleAtlas)
 	{
 		langs.push_back(it.second.DisplayName);
 	}
@@ -164,9 +165,9 @@ std::vector<std::string> CLocalization::GetLanguages()
 
 const std::string& CLocalization::GetActiveLanguage()
 {
-	if (ActiveLocale)
+	if (this->ActiveLocale)
 	{
-		return ActiveLocale->DisplayName;
+		return this->ActiveLocale->DisplayName;
 	}
 
 	return "(null)";
@@ -174,8 +175,8 @@ const std::string& CLocalization::GetActiveLanguage()
 
 void CLocalization::SetLocaleDirectory(std::filesystem::path aPath)
 {
-	Directory = aPath;
-	IsLocaleDirectorySet = true;
+	this->Directory = aPath;
+	this->IsLocaleDirectorySet = true;
 }
 
 void CLocalization::BuildLocaleAtlas()
@@ -188,9 +189,9 @@ void CLocalization::BuildLocaleAtlas()
 	/* Clear existing atlas */
 	ClearLocaleAtlas();
 
-	const std::lock_guard<std::mutex> lock(Mutex);
+	const std::lock_guard<std::mutex> lock(this->Mutex);
 	/* find files, merge files, alloc strings */
-	for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Directory))
+	for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(this->Directory))
 	{
 		std::filesystem::path path = entry.path();
 
@@ -227,10 +228,10 @@ void CLocalization::BuildLocaleAtlas()
 
 			std::string locId = localeJson["Identifier"].get<std::string>();;
 
-			auto atlasIt = LocaleAtlas.find(locId);
+			auto atlasIt = this->LocaleAtlas.find(locId);
 
 			Locale loc{};
-			if (atlasIt != LocaleAtlas.end())
+			if (atlasIt != this->LocaleAtlas.end())
 			{
 				loc = atlasIt->second;
 			}
@@ -260,7 +261,7 @@ void CLocalization::BuildLocaleAtlas()
 				loc.Texts[key] = _strdup(value.get<std::string>().c_str());
 			}
 
-			LocaleAtlas[locId] = loc;
+			this->LocaleAtlas[locId] = loc;
 		}
 		catch (json::parse_error& ex)
 		{
@@ -268,20 +269,20 @@ void CLocalization::BuildLocaleAtlas()
 		}
 	}
 
-	IsLocaleAtlasBuilt = true;
+	this->IsLocaleAtlasBuilt = true;
 }
 
 void CLocalization::ClearLocaleAtlas()
 {
-	if (!IsLocaleAtlasBuilt)
+	if (!this->IsLocaleAtlasBuilt)
 	{
 		return;
 	}
 
-	const std::lock_guard<std::mutex> lock(Mutex);
+	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	/* delete strings */
-	for (auto& locale : LocaleAtlas)
+	for (auto& locale : this->LocaleAtlas)
 	{
 		for (auto& text : locale.second.Texts)
 		{
@@ -289,5 +290,5 @@ void CLocalization::ClearLocaleAtlas()
 		}
 	}
 
-	IsLocaleAtlasBuilt = false;
+	this->IsLocaleAtlasBuilt = false;
 }

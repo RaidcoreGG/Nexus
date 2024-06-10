@@ -56,9 +56,9 @@ namespace GUI
 	{
 		Name = aName;
 
-		const std::string& activeLang = Language.GetActiveLanguage();
+		const std::string& activeLang = Language->GetActiveLanguage();
 
-		std::vector<std::string> langs = Language.GetLanguages();
+		std::vector<std::string> langs = Language->GetLanguages();
 		languagesSize = langs.size();
 		languages = new const char*[langs.size()];
 		for (size_t i = 0; i < langs.size(); i++)
@@ -97,32 +97,32 @@ namespace GUI
 
 	void GeneralTab()
 	{
-		if (ImGui::BeginTabItem(Language.Translate("((000052))")))
+		if (ImGui::BeginTabItem(Language->Translate("((000052))")))
 		{
 			{
 				ImGui::BeginChild("##GeneralTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-				ImGui::TextDisabled(Language.Translate("((000041))"));
+				ImGui::TextDisabled(Language->Translate("((000041))"));
 				if (ImGui::Combo("##language", (int*)&languagesIndex, languages, languagesSize))
 				{
-					Language.SetLanguage(languages[languagesIndex]);
+					Language->SetLanguage(languages[languagesIndex]);
 					Settings::Settings[OPT_LANGUAGE] = languages[languagesIndex];
 					Settings::Save();
 				}
 
-				ImGui::TextDisabled(Language.Translate("((000042))"));
+				ImGui::TextDisabled(Language->Translate("((000042))"));
 				{
-					if (ImGui::Checkbox(Language.Translate("((000043))"), &GUI::CloseMenuAfterSelecting))
+					if (ImGui::Checkbox(Language->Translate("((000043))"), &GUI::CloseMenuAfterSelecting))
 					{
 						Settings::Settings[OPT_CLOSEMENU] = GUI::CloseMenuAfterSelecting;
 						Settings::Save();
 					}
-					if (ImGui::Checkbox(Language.Translate("((000044))"), &GUI::CloseOnEscape))
+					if (ImGui::Checkbox(Language->Translate("((000044))"), &GUI::CloseOnEscape))
 					{
 						Settings::Settings[OPT_CLOSEESCAPE] = GUI::CloseOnEscape;
 						Settings::Save();
 					}
-					if (ImGui::Checkbox(Language.Translate("((000086))"), &GUI::ShowAddonsWindowAfterDUU))
+					if (ImGui::Checkbox(Language->Translate("((000086))"), &GUI::ShowAddonsWindowAfterDUU))
 					{
 						Settings::Settings[OPT_SHOWADDONSWINDOWAFTERDUU] = GUI::ShowAddonsWindowAfterDUU;
 						Settings::Save();
@@ -131,33 +131,33 @@ namespace GUI
 
 				ImGui::Separator();
 
-				ImGui::TextDisabled(Language.Translate("((000045))"));
+				ImGui::TextDisabled(Language->Translate("((000045))"));
 				{
-					if (ImGui::Checkbox(Language.Translate("((000046))"), &QuickAccess::VerticalLayout))
+					if (ImGui::Checkbox(Language->Translate("((000046))"), &QuickAccess::VerticalLayout))
 					{
 						Settings::Settings[OPT_QAVERTICAL] = QuickAccess::VerticalLayout;
 						Settings::Save();
 					}
-					if (ImGui::Checkbox(Language.Translate("((000047))"), &QuickAccess::AlwaysShow))
+					if (ImGui::Checkbox(Language->Translate("((000047))"), &QuickAccess::AlwaysShow))
 					{
 						Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS] = QuickAccess::AlwaysShow;
 						Settings::Save();
 					}
-					ImGui::TooltipGeneric(Language.Translate("((000048))"));
+					ImGui::TooltipGeneric(Language->Translate("((000048))"));
 
-					if (ImGui::Checkbox(Language.Translate("((000049))"), &GUI::NotifyChangelog))
+					if (ImGui::Checkbox(Language->Translate("((000049))"), &GUI::NotifyChangelog))
 					{
 						Settings::Settings[OPT_NOTIFYCHANGELOG] = GUI::NotifyChangelog;
 						Settings::Save();
 					}
 
-					ImGui::Text(Language.Translate("((000050))"));
-					if (ImGui::BeginCombo("##qalocation", Language.Translate(qaLocations[(int)QuickAccess::Location])))
+					ImGui::Text(Language->Translate("((000050))"));
+					if (ImGui::BeginCombo("##qalocation", Language->Translate(qaLocations[(int)QuickAccess::Location])))
 					{
 						for (int n = 0; n < IM_ARRAYSIZE(qaLocations); n++)
 						{
 							bool is_selected = ((int)QuickAccess::Location == n); // You can store your selection however you want, outside or inside your objects
-							if (ImGui::Selectable(Language.Translate(qaLocations[n]), is_selected))
+							if (ImGui::Selectable(Language->Translate(qaLocations[n]), is_selected))
 							{
 								QuickAccess::Location = (EQAPosition)n;
 								Settings::Settings[OPT_QALOCATION] = QuickAccess::Location;
@@ -172,7 +172,7 @@ namespace GUI
 						ImGui::EndCombo();
 					}
 
-					ImGui::Text(Language.Translate("((000051))"));
+					ImGui::Text(Language->Translate("((000051))"));
 					if (ImGui::DragFloat2("##qaoffset", (float*)&QuickAccess::Offset, 1.0f, (static_cast<int>(Renderer::Height)) * -1, static_cast<int>(Renderer::Height)))
 					{
 						Settings::Settings[OPT_QAOFFSETX] = QuickAccess::Offset.x;
@@ -190,7 +190,7 @@ namespace GUI
 
 	void AddonsTab()
 	{
-		if (ImGui::BeginTabItem(Language.Translate("((000003))")))
+		if (ImGui::BeginTabItem(Language->Translate("((000003))")))
 		{
 			{
 				ImGui::BeginChild("##AddonsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
@@ -221,12 +221,12 @@ namespace GUI
 
 	void StyleTab()
 	{
-		if (ImGui::BeginTabItem(Language.Translate("((000053))")))
+		if (ImGui::BeginTabItem(Language->Translate("((000053))")))
 		{
 			{
 				ImGui::BeginChild("##StyleTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-				ImGui::TextDisabled(Language.Translate("((000054))"));
+				ImGui::TextDisabled(Language->Translate("((000054))"));
 				{
 					if (ImGui::InputFloat("##fontsize", &FontSize, 0.0f, 0.0f, "%.1f"))
 					{
@@ -237,11 +237,11 @@ namespace GUI
 						Settings::Settings[OPT_FONTSIZE] = FontSize;
 						Settings::Save();
 					}
-					ImGui::TooltipGeneric(Language.Translate("((000055))"));
+					ImGui::TooltipGeneric(Language->Translate("((000055))"));
 				}
 
 				ImGuiIO& io = ImGui::GetIO();
-				ImGui::TextDisabled(Language.Translate("((000072))"));
+				ImGui::TextDisabled(Language->Translate("((000072))"));
 				if (ImGui::DragFloat("##globalscale", &io.FontGlobalScale, 0.005f, 0.75f, 3.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp))
 				{
 					Settings::Settings[OPT_GLOBALSCALE] = io.FontGlobalScale;
@@ -252,19 +252,19 @@ namespace GUI
 
 				ImGui::Separator();
 
-				if (ImGui::Checkbox(Language.Translate("((000056))"), &GUI::LinkArcDPSStyle))
+				if (ImGui::Checkbox(Language->Translate("((000056))"), &GUI::LinkArcDPSStyle))
 				{
 					Settings::Settings[OPT_LINKARCSTYLE] = GUI::LinkArcDPSStyle;
 					ImportArcDPSStyle();
 					Settings::Save();
 				}
-				ImGui::TooltipGeneric(Language.Translate("((000057))"));
+				ImGui::TooltipGeneric(Language->Translate("((000057))"));
 
 				if (!GUI::LinkArcDPSStyle)
 				{
 					ImGuiStyle& style = ImGui::GetStyle();
 
-					if (ImGui::SmallButton(Language.Translate("((000058))")))
+					if (ImGui::SmallButton(Language->Translate("((000058))")))
 					{
 						std::string encode = Base64::Encode((unsigned char*)&style, sizeof(ImGuiStyle));
 						Settings::Settings[OPT_IMGUISTYLE] = encode;
@@ -275,7 +275,7 @@ namespace GUI
 						Settings::Save();
 					}
 					ImGui::SameLine();
-					if (ImGui::SmallButton(Language.Translate("((000059))")))
+					if (ImGui::SmallButton(Language->Translate("((000059))")))
 					{
 						if (!Settings::Settings[OPT_IMGUISTYLE].is_null())
 						{
@@ -417,7 +417,7 @@ namespace GUI
 
 	void KeybindsTab()
 	{
-		if (ImGui::BeginTabItem(Language.Translate("((000060))")))
+		if (ImGui::BeginTabItem(Language->Translate("((000060))")))
 		{
 			{
 				ImGui::BeginChild("##KeybindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
@@ -456,7 +456,7 @@ namespace GUI
 
 									ImGui::TableNextRow();
 									ImGui::TableSetColumnIndex(0);
-									ImGui::Text(Language.Translate(identifier.c_str()));
+									ImGui::Text(Language->Translate(identifier.c_str()));
 
 									ImGui::TableSetColumnIndex(1);
 									if (ImGui::Button((keybind.Bind.ToString(true) + "##" + identifier).c_str(), ImVec2(kbButtonWidth, 0.0f)))
@@ -474,7 +474,7 @@ namespace GUI
 											staleBindIdentifier = identifier;
 										}
 										ImGui::SameLine();
-										ImGui::TextDisabled(Language.Translate("((000061))"));
+										ImGui::TextDisabled(Language->Translate("((000061))"));
 									}
 								}
 
@@ -492,8 +492,8 @@ namespace GUI
 					staleBindIdentifier.clear();
 				}
 
-				std::string kbModalTitle = Language.Translate("((000062))");
-				kbModalTitle.append(Language.Translate(CurrentlyEditing.c_str()));
+				std::string kbModalTitle = Language->Translate("((000062))");
+				kbModalTitle.append(Language->Translate(CurrentlyEditing.c_str()));
 
 				if (openEditor)
 				{
@@ -519,13 +519,13 @@ namespace GUI
 
 					if (Keybinds::CurrentKeybindUsedBy != CurrentlyEditing && Keybinds::CurrentKeybindUsedBy != "")
 					{
-						ImGui::TextColored(ImVec4(255, 0, 0, 255), (Language.Translate("((000063))") + Keybinds::CurrentKeybindUsedBy + ".").c_str());
+						ImGui::TextColored(ImVec4(255, 0, 0, 255), (Language->Translate("((000063))") + Keybinds::CurrentKeybindUsedBy + ".").c_str());
 						overwriting = true;
 					}
 
 					bool close = false;
 
-					if (ImGui::Button(Language.Translate("((000064))")))
+					if (ImGui::Button(Language->Translate("((000064))")))
 					{
 						Keybinds::Set(CurrentlyEditing, Keybind{});
 						close = true;
@@ -541,7 +541,7 @@ namespace GUI
 					ImGui::SameLine();
 					/* i love imgui end*/
 
-					if (ImGui::Button(Language.Translate("((000065))")))
+					if (ImGui::Button(Language->Translate("((000065))")))
 					{
 						if (overwriting)
 						{
@@ -551,7 +551,7 @@ namespace GUI
 						close = true;
 					}
 					ImGui::SameLine();
-					if (ImGui::Button(Language.Translate("((000066))")))
+					if (ImGui::Button(Language->Translate("((000066))")))
 					{
 						close = true;
 					}
@@ -638,15 +638,15 @@ namespace GUI
 			didNotify = true;
 		}
 
-		if (ImGui::BeginTabItem(Language.Translate("((000005))")))
+		if (ImGui::BeginTabItem(Language->Translate("((000005))")))
 		{
 			if (IsUpdateAvailable)
 			{
-				ImGui::TextColored(ImVec4(0, 0.580f, 1, 1), Language.Translate("((000039))"));
+				ImGui::TextColored(ImVec4(0, 0.580f, 1, 1), Language->Translate("((000039))"));
 			}
 			else
 			{
-				ImGui::Text(Language.Translate("((000040))"));
+				ImGui::Text(Language->Translate("((000040))"));
 			}
 
 			if (!ChangelogText.empty())
@@ -655,7 +655,7 @@ namespace GUI
 			}
 			else
 			{
-				ImGui::Text(Language.Translate("((000037))"));
+				ImGui::Text(Language->Translate("((000037))"));
 			}
 
 			ImGui::EndTabItem();
