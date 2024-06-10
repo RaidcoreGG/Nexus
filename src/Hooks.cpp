@@ -13,7 +13,7 @@
 #include "Inputs/Keybinds/KeybindHandler.h"
 #include "Loader/Loader.h"
 #include "Loader/NexusLinkData.h"
-#include "Textures/TextureLoader.h"
+#include "Services/Textures/TextureLoader.h"
 #include "Inputs/WndProc/WndProcHandler.h"
 
 namespace Hooks

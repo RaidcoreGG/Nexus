@@ -6,7 +6,7 @@
 #include "Events/EventHandler.h"
 #include "Inputs/Keybinds/KeybindHandler.h"
 #include "DataLink/DataLink.h"
-#include "Textures/TextureLoader.h"
+#include "Services/Textures/TextureLoader.h"
 #include "GUI/Widgets/QuickAccess/QuickAccess.h"
 #include "Loader/Loader.h"
 

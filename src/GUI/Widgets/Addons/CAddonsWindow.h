@@ -6,7 +6,7 @@
 #include <mutex>
 
 #include "GUI/IWindow.h"
-#include "Textures/Texture.h"
+#include "Services/Textures/Texture.h"
 #include "Loader/LibraryAddon.h"
 
 namespace GUI

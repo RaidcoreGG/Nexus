@@ -10,7 +10,7 @@
 #include "GUI/GUI.h"
 #include "GUI/IWindow.h"
 
-#include "Textures/TextureLoader.h"
+#include "Services/Textures/TextureLoader.h"
 
 #include "imgui.h"
 #include "imgui_extensions.h"

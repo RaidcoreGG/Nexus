@@ -10,7 +10,7 @@
 #include "imgui/imgui.h"
 #include "minhook/mh_hook.h"
 #include "DataLink/FuncDefs.h"
-#include "Textures/FuncDefs.h"
+#include "Services/Textures/FuncDefs.h"
 #include "GUI/FuncDefs.h"
 #include "GUI/Widgets/QuickAccess/FuncDefs.h"
 #include "GUI/Widgets/Alerts/FuncDefs.h"

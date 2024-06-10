@@ -4,8 +4,8 @@
 #include "Shared.h"
 
 #include "Menu.h"
-#include "Textures/TextureLoader.h"
-#include "Textures/Texture.h"
+#include "Services/Textures/TextureLoader.h"
+#include "Services/Textures/Texture.h"
 
 #include "imgui.h"
 #include "imgui_extensions.h"

@@ -68,7 +68,7 @@
     <ClCompile Include="src\Settings\Settings.cpp" />
     <ClCompile Include="src\Shared.cpp" />
     <ClCompile Include="src\State.cpp" />
-    <ClCompile Include="src\Textures\TextureLoader.cpp" />
+    <ClCompile Include="src\Services\Textures\TextureLoader.cpp" />
     <ClCompile Include="src\Services\Updater\Updater.cpp" />
     <ClCompile Include="src\Util\Base64.cpp" />
     <ClCompile Include="src\Util\MD5.cpp" />
@@ -311,10 +311,10 @@
     <ClInclude Include="src\Shared.h" />
     <ClInclude Include="src\State.h" />
     <ClInclude Include="src\stb\stb_image.h" />
-    <ClInclude Include="src\Textures\FuncDefs.h" />
-    <ClInclude Include="src\Textures\QueuedTexture.h" />
-    <ClInclude Include="src\Textures\Texture.h" />
-    <ClInclude Include="src\Textures\TextureLoader.h" />
+    <ClInclude Include="src\Services\Textures\FuncDefs.h" />
+    <ClInclude Include="src\Services\Textures\QueuedTexture.h" />
+    <ClInclude Include="src\Services\Textures\Texture.h" />
+    <ClInclude Include="src\Services\Textures\TextureLoader.h" />
     <ClInclude Include="src\Services\Updater\FuncDefs.h" />
     <ClInclude Include="src\Services\Updater\Updater.h" />
     <ClInclude Include="src\Util\Base64.h" />

@@ -6,7 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "TextureLoader.h"
+#include "Services/Textures/TextureLoader.h"
 
 #include <d3d11.h>
 #include <vector>

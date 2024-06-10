@@ -14,7 +14,7 @@
 #include "Loader/Library.h"
 #include "Loader/ArcDPS.h"
 #include "AddonItem.h"
-#include "Textures/TextureLoader.h"
+#include "Services/Textures/TextureLoader.h"
 
 #include "Services/Updater/Updater.h"
 

@@ -10,7 +10,7 @@
 #include "API/ApiClient.h"
 #include "Localization/Localization.h"
 #include "Services/Updater/Updater.h"
-#include "Textures/TextureLoader.h"
+#include "Services/Textures/TextureLoader.h"
 
 #include "imgui.h"
 

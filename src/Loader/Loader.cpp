@@ -31,7 +31,7 @@
 #include "imgui/imgui.h"
 #include "minhook/mh_hook.h"
 #include "DataLink/DataLink.h"
-#include "Textures/TextureLoader.h"
+#include "Services/Textures/TextureLoader.h"
 #include "GUI/GUI.h"
 #include "GUI/Widgets/QuickAccess/QuickAccess.h"
 #include "GUI/Widgets/Alerts/Alerts.h"

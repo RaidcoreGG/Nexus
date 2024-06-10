@@ -6,8 +6,8 @@
 #include "Renderer.h"
 #include "Consts.h"
 
-#include "Textures/Texture.h"
-#include "Textures/TextureLoader.h"
+#include "Services/Textures/Texture.h"
+#include "Services/Textures/TextureLoader.h"
 #include "Inputs/Keybinds/KeybindHandler.h"
 #include "Loader/Loader.h"
 

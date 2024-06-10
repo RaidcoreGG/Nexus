@@ -11,8 +11,8 @@
 #include "Loader/Loader.h"
 #include "Loader/Library.h"
 #include "Loader/ArcDPS.h"
-#include "Textures/TextureLoader.h"
-#include "Textures/Texture.h"
+#include "Services/Textures/TextureLoader.h"
+#include "Services/Textures/Texture.h"
 
 #include "Services/Updater/Updater.h"
 

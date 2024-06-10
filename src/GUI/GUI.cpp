@@ -19,7 +19,7 @@
 #include "Inputs/Keybinds/KeybindHandler.h"
 #include "Loader/Loader.h"
 #include "Settings/Settings.h"
-#include "Textures/TextureLoader.h"
+#include "Services/Textures/TextureLoader.h"
 #include "DataLink/DataLink.h"
 
 #include "imgui.h"

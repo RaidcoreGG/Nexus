@@ -11,7 +11,7 @@
 #include "GUI/GUI.h"
 #include "Settings/Settings.h"
 #include "Events/EventHandler.h"
-#include "Textures/TextureLoader.h"
+#include "Services/Textures/TextureLoader.h"
 
 #include "imgui.h"
 #include "imgui_extensions.h"
