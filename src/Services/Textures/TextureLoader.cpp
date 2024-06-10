@@ -90,9 +90,9 @@ Texture* CTextureLoader::Get(const char* aIdentifier)
 
 	{
 		const std::lock_guard<std::mutex> lock(Mutex);
-		if (Registry.find(str) != Registry.end())
+		if (this->Registry.find(str) != this->Registry.end())
 		{
-			result = Registry[str];
+			result = this->Registry[str];
 		}
 	}
 
@@ -103,13 +103,13 @@ Texture* CTextureLoader::GetOrCreate(const char* aIdentifier, const char* aFilen
 {
 	Texture* result = Get(aIdentifier);
 
-	if (OverrideTexture(aIdentifier, nullptr))
+	if (this->OverrideTexture(aIdentifier, nullptr))
 	{
 		return result;
 	}
 	else if (!result)
 	{
-		Load(aIdentifier, aFilename, nullptr);
+		this->Load(aIdentifier, aFilename, nullptr);
 	}
 
 	return result;
@@ -117,15 +117,15 @@ Texture* CTextureLoader::GetOrCreate(const char* aIdentifier, const char* aFilen
 
 Texture* CTextureLoader::GetOrCreate(const char* aIdentifier, unsigned aResourceID, HMODULE aModule)
 {
-	Texture* result = Get(aIdentifier);
+	Texture* result = this->Get(aIdentifier);
 
-	if (OverrideTexture(aIdentifier, nullptr))
+	if (this->OverrideTexture(aIdentifier, nullptr))
 	{
 		return result;
 	}
 	else if (!result)
 	{
-		Load(aIdentifier, aResourceID, aModule, nullptr);
+		this->Load(aIdentifier, aResourceID, aModule, nullptr);
 	}
 
 	return result;
@@ -133,15 +133,15 @@ Texture* CTextureLoader::GetOrCreate(const char* aIdentifier, unsigned aResource
 
 Texture* CTextureLoader::GetOrCreate(const char* aIdentifier, const char* aRemote, const char* aEndpoint)
 {
-	Texture* result = Get(aIdentifier);
+	Texture* result = this->Get(aIdentifier);
 
-	if (OverrideTexture(aIdentifier, nullptr))
+	if (this->OverrideTexture(aIdentifier, nullptr))
 	{
 		return result;
 	}
 	else if (!result)
 	{
-		Load(aIdentifier, aRemote, aEndpoint, nullptr);
+		this->Load(aIdentifier, aRemote, aEndpoint, nullptr);
 	}
 
 	return result;
@@ -149,15 +149,15 @@ Texture* CTextureLoader::GetOrCreate(const char* aIdentifier, const char* aRemot
 
 Texture* CTextureLoader::GetOrCreate(const char* aIdentifier, void* aData, size_t aSize)
 {
-	Texture* result = Get(aIdentifier);
+	Texture* result = this->Get(aIdentifier);
 
-	if (OverrideTexture(aIdentifier, nullptr))
+	if (this->OverrideTexture(aIdentifier, nullptr))
 	{
 		return result;
 	}
 	else if (!result)
 	{
-		Load(aIdentifier, aData, aSize, nullptr);
+		this->Load(aIdentifier, aData, aSize, nullptr);
 	}
 
 	return result;
@@ -169,7 +169,7 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aFilename, TEXTUR
 
 	std::string str = aIdentifier;
 
-	Texture* tex = Get(str.c_str());
+	Texture* tex = this->Get(str.c_str());
 	if (tex != nullptr)
 	{
 		if (aCallback)
@@ -178,7 +178,7 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aFilename, TEXTUR
 		}
 		return;
 	}
-	else if (OverrideTexture(aIdentifier, aCallback))
+	else if (this->OverrideTexture(aIdentifier, aCallback))
 	{
 		return;
 	}
@@ -194,7 +194,7 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aFilename, TEXTUR
 	int image_height = 0;
 	unsigned char* image_data = stbi_load(aFilename, &image_width, &image_height, NULL, 4);
 
-	QueueTexture(aIdentifier, image_data, image_width, image_height, aCallback);
+	this->QueueTexture(aIdentifier, image_data, image_width, image_height, aCallback);
 }
 
 void CTextureLoader::Load(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback)
@@ -203,7 +203,7 @@ void CTextureLoader::Load(const char* aIdentifier, unsigned aResourceID, HMODULE
 
 	std::string str = aIdentifier;
 
-	Texture* tex = Get(str.c_str());
+	Texture* tex = this->Get(str.c_str());
 	if (tex != nullptr)
 	{
 		if (aCallback)
@@ -212,7 +212,7 @@ void CTextureLoader::Load(const char* aIdentifier, unsigned aResourceID, HMODULE
 		}
 		return;
 	}
-	else if (OverrideTexture(aIdentifier, aCallback))
+	else if (this->OverrideTexture(aIdentifier, aCallback))
 	{
 		return;
 	}
@@ -250,7 +250,7 @@ void CTextureLoader::Load(const char* aIdentifier, unsigned aResourceID, HMODULE
 	int image_components = 0;
 	unsigned char* image_data = stbi_load_from_memory((const stbi_uc*)imageFile, imageFileSize, &image_width, &image_height, &image_components, 4);
 
-	QueueTexture(str.c_str(), image_data, image_width, image_height, aCallback);
+	this->QueueTexture(str.c_str(), image_data, image_width, image_height, aCallback);
 }
 
 void CTextureLoader::Load(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback)
@@ -259,7 +259,7 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aRemote, const ch
 
 	std::string str = aIdentifier;
 
-	Texture* tex = Get(str.c_str());
+	Texture* tex = this->Get(str.c_str());
 	if (tex != nullptr)
 	{
 		if (aCallback)
@@ -268,7 +268,7 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aRemote, const ch
 		}
 		return;
 	}
-	else if (OverrideTexture(aIdentifier, aCallback))
+	else if (this->OverrideTexture(aIdentifier, aCallback))
 	{
 		return;
 	}
@@ -302,7 +302,7 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aRemote, const ch
 
 	delete[] remote_data;
 
-	QueueTexture(str.c_str(), data, image_width, image_height, aCallback);
+	this->QueueTexture(str.c_str(), data, image_width, image_height, aCallback);
 }
 
 void CTextureLoader::Load(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback)
@@ -311,7 +311,7 @@ void CTextureLoader::Load(const char* aIdentifier, void* aData, size_t aSize, TE
 
 	std::string str = aIdentifier;
 
-	Texture* tex = Get(str.c_str());
+	Texture* tex = this->Get(str.c_str());
 	if (tex != nullptr)
 	{
 		if (aCallback)
@@ -320,7 +320,7 @@ void CTextureLoader::Load(const char* aIdentifier, void* aData, size_t aSize, TE
 		}
 		return;
 	}
-	else if (OverrideTexture(aIdentifier, aCallback))
+	else if (this->OverrideTexture(aIdentifier, aCallback))
 	{
 		return;
 	}
@@ -330,7 +330,7 @@ void CTextureLoader::Load(const char* aIdentifier, void* aData, size_t aSize, TE
 	int image_components = 0;
 	unsigned char* image_data = stbi_load_from_memory((const stbi_uc*)aData, static_cast<int>(aSize), &image_width, &image_height, &image_components, 4);
 
-	QueueTexture(str.c_str(), image_data, image_width, image_height, aCallback);
+	this->QueueTexture(str.c_str(), image_data, image_width, image_height, aCallback);
 }
 
 bool CTextureLoader::OverrideTexture(const char* aIdentifier, TEXTURES_RECEIVECALLBACK aCallback)
@@ -346,7 +346,7 @@ bool CTextureLoader::OverrideTexture(const char* aIdentifier, TEXTURES_RECEIVECA
 		int image_height = 0;
 		unsigned char* image_data = stbi_load(customPath.string().c_str(), &image_width, &image_height, NULL, 4);
 
-		QueueTexture(aIdentifier, image_data, image_width, image_height, aCallback);
+		this->QueueTexture(aIdentifier, image_data, image_width, image_height, aCallback);
 		return true;
 	}
 	return false;
@@ -357,8 +357,8 @@ void CTextureLoader::QueueTexture(const char* aIdentifier, unsigned char* aImage
 	std::string str = aIdentifier;
 
 	{
-		const std::lock_guard<std::mutex> lock(Mutex);
-		for (QueuedTexture& tex : QueuedTextures)
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+		for (QueuedTexture& tex : this->QueuedTextures)
 		{
 			if (tex.Identifier == str)
 			{
@@ -377,8 +377,8 @@ void CTextureLoader::QueueTexture(const char* aIdentifier, unsigned char* aImage
 	raw.Callback = aCallback;
 
 	{
-		const std::lock_guard<std::mutex> lock(Mutex);
-		QueuedTextures.push_back(raw);
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+		this->QueuedTextures.push_back(raw);
 	}
 }
 
@@ -428,7 +428,7 @@ void CTextureLoader::CreateTexture(QueuedTexture aQueuedTexture)
 	Renderer::Device->CreateShaderResourceView(pTexture, &srvDesc, &tex->Resource);
 	pTexture->Release();
 
-	Registry[aQueuedTexture.Identifier] = tex;
+	this->Registry[aQueuedTexture.Identifier] = tex;
 	if (aQueuedTexture.Callback)
 	{
 		aQueuedTexture.Callback(aQueuedTexture.Identifier.c_str(), tex);
