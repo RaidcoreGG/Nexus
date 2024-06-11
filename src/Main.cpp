@@ -81,7 +81,24 @@ namespace Main
 
 		std::thread([]()
 			{
+				HANDLE hMutex = CreateMutexA(0, true, "RCGG-Mutex-Patch-Nexus");
+
+				if (GetLastError() == ERROR_ALREADY_EXISTS)
+				{
+					LogInfo(CH_CORE, "Cannot patch Nexus, mutex locked.");
+					CloseHandle(hMutex);
+					return;
+				}
+
+				/* perform/check for update */
 				UpdateService->UpdateNexus();
+
+				/* sanity check to make the compiler happy */
+				if (hMutex)
+				{
+					ReleaseMutex(hMutex);
+					CloseHandle(hMutex);
+				}
 			})
 			.detach();
 		
