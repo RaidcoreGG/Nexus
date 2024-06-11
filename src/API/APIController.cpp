@@ -98,7 +98,7 @@ namespace API
 
 	std::string Request(std::string aEndpoint, std::string aParameters)
 	{
-		LogDebug("Fetching %s/%s%s", BaseURL, aEndpoint, aParameters);
+		Logger->Debug("Fetching %s/%s%s", BaseURL, aEndpoint, aParameters);
 
 		/* Check cache first */
 

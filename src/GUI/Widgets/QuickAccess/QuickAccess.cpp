@@ -101,7 +101,7 @@ namespace GUI
 					ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
 					ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
 
-					//LogDebug(CH_QUICKACCESS, "size: %f | c: %d | scale: %f", size, c, Renderer::Scaling);
+					//Logger->Debug(CH_QUICKACCESS, "size: %f | c: %d | scale: %f", size, c, Renderer::Scaling);
 
 					ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f }); // smol checkbox
 					if (VerticalLayout)
@@ -139,7 +139,7 @@ namespace GUI
 					}
 					else
 					{
-						LogWarning(CH_QUICKACCESS, "Cancelled getting textures for shortcut \"%s\" after 10 failed attempts.", identifier.c_str());
+						Logger->Warning(CH_QUICKACCESS, "Cancelled getting textures for shortcut \"%s\" after 10 failed attempts.", identifier.c_str());
 
 						/* fallback icons */
 						shortcut.TextureNormal = TextureService->Get(ICON_GENERIC);
@@ -148,7 +148,7 @@ namespace GUI
 						/* absolute sanity check */
 						if (shortcut.TextureNormal == nullptr || shortcut.TextureHover == nullptr)
 						{
-							LogWarning(CH_QUICKACCESS, "Neither promised textures nor fallback textures could be loaded, removing shortcut \"%s\".", identifier.c_str());
+							Logger->Warning(CH_QUICKACCESS, "Neither promised textures nor fallback textures could be loaded, removing shortcut \"%s\".", identifier.c_str());
 
 							// call this async because we're currently iterating the list
 							std::thread([identifier]()
@@ -287,7 +287,7 @@ namespace GUI
 
 					if (amt < 2)
 					{
-						LogDebug(CH_QUICKACCESS, "Shortcut \"%s\" was promised 2 textures, but received %d.", str.c_str(), amt);
+						Logger->Debug(CH_QUICKACCESS, "Shortcut \"%s\" was promised 2 textures, but received %d.", str.c_str(), amt);
 					}
 				}
 			}

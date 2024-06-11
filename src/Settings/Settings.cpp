@@ -54,7 +54,7 @@ namespace Settings
 		}
 		catch (json::parse_error& ex)
 		{
-			LogWarning(CH_CORE, "Settings.json could not be parsed. Error: %s", ex.what());
+			Logger->Warning(CH_CORE, "Settings.json could not be parsed. Error: %s", ex.what());
 		}
 	}
 

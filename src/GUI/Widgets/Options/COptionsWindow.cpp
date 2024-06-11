@@ -36,6 +36,8 @@ namespace GUI
 	int languagesIndex;
 	int languagesSize;
 
+	int isSetup = false;
+
 	/* proto tabs */
 	void GeneralTab();
 	void AddonsTab();
@@ -55,27 +57,35 @@ namespace GUI
 	COptionsWindow::COptionsWindow(std::string aName)
 	{
 		Name = aName;
-
-		const std::string& activeLang = Language->GetActiveLanguage();
-
-		std::vector<std::string> langs = Language->GetLanguages();
-		languagesSize = langs.size();
-		languages = new const char*[langs.size()];
-		for (size_t i = 0; i < langs.size(); i++)
-		{
-			languages[i] = new char[langs[i].size() + 1];
-			strcpy((char*)languages[i], langs[i].c_str());
-
-			if (languages[i] == activeLang)
-			{
-				languagesIndex = i;
-			}
-		}
 	}
 
 	void COptionsWindow::Render()
 	{
 		if (!Visible) { return; }
+
+		if (!isSetup)
+		{
+			if (Language)
+			{
+				const std::string& activeLang = Language->GetActiveLanguage();
+
+				std::vector<std::string> langs = Language->GetLanguages();
+				languagesSize = langs.size();
+				languages = new const char* [langs.size()];
+				for (size_t i = 0; i < langs.size(); i++)
+				{
+					languages[i] = new char[langs[i].size() + 1];
+					strcpy((char*)languages[i], langs[i].c_str());
+
+					if (languages[i] == activeLang)
+					{
+						languagesIndex = i;
+					}
+				}
+
+				isSetup = true;
+			}
+		}
 
 		ImGui::SetNextWindowSize(ImVec2(owWidth * ImGui::GetFontSize(), owHeight * ImGui::GetFontSize()), ImGuiCond_FirstUseEver);
 		if (ImGui::Begin(Name.c_str(), &Visible, ImGuiWindowFlags_NoCollapse))

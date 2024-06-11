@@ -32,7 +32,7 @@ CConsoleLogger::~CConsoleLogger()
 
 void CConsoleLogger::LogMessage(LogEntry aLogEntry)
 {
-	const std::lock_guard<std::mutex> lock(MessageMutex);
+	const std::lock_guard<std::mutex> lock(Mutex);
 	{
 		switch (aLogEntry.LogLevel)
 		{

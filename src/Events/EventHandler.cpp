@@ -65,7 +65,7 @@ namespace Events
 
 		//auto end_time = std::chrono::high_resolution_clock::now();
 		//auto time = end_time - start_time;
-		//LogDebug(CH_EVENTS, u8"Executed event (%s) in %uµs.", aIdentifier, time / std::chrono::microseconds(1));
+		//Logger->Debug(CH_EVENTS, u8"Executed event (%s) in %uµs.", aIdentifier, time / std::chrono::microseconds(1));
 	}
 
 	void Raise(signed int aSignature, const char* aIdentifier, void* aEventData)
@@ -130,7 +130,7 @@ namespace Events
 
 			if (sub.Signature == 0)
 			{
-				LogWarning(CH_EVENTS, "Event registered but no addon address space matches function pointer. %p", aConsumeEventCallback);
+				Logger->Warning(CH_EVENTS, "Event registered but no addon address space matches function pointer. %p", aConsumeEventCallback);
 			}
 
 			/* dirty hack for arcdps (I hate my life) */

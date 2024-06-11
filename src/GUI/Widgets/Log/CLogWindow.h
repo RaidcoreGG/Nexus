@@ -2,6 +2,7 @@
 #define GUI_LOGWINDOW_H
 
 #include <string>
+#include <vector>
 
 #include "GUI/IWindow.h"
 #include "Logging/ILogger.h"
@@ -17,6 +18,10 @@ namespace GUI
 
 		void Render();
 		void LogMessage(LogEntry aLogEntry);
+
+	private:
+		std::vector<LogEntry>		LogEntries;
+		std::vector<std::string>	Channels;
 	};
 }
 

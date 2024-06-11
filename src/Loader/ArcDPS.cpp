@@ -56,7 +56,7 @@ namespace ArcDPS
 		}
 		else
 		{
-			LogWarning(CH_CORE, "Error parsing API response for /arcdpslibrary.");
+			Logger->Warning(CH_CORE, "Error parsing API response for /arcdpslibrary.");
 		}
 	}
 
@@ -82,7 +82,7 @@ namespace ArcDPS
 					ModuleHandle = hModule;
 					IsLoaded = true;
 
-					LogInfo("ArcDPS", "ArcDPS is not loaded as Nexus addon but was detected as Chainload.");
+					Logger->Info("ArcDPS", "ArcDPS is not loaded as Nexus addon but was detected as Chainload.");
 
 					DeployBridge();
 					return;
@@ -104,7 +104,7 @@ namespace ArcDPS
 					ModuleHandle = hModule;
 					IsLoaded = true;
 
-					LogInfo("ArcDPS", "ArcDPS is not loaded as Nexus addon but was detected as Addon-Loader addon.");
+					Logger->Info("ArcDPS", "ArcDPS is not loaded as Nexus addon but was detected as Addon-Loader addon.");
 
 					DeployBridge();
 					return;
@@ -126,7 +126,7 @@ namespace ArcDPS
 					ModuleHandle = hModule;
 					IsLoaded = true;
 
-					LogInfo("ArcDPS", "ArcDPS is not loaded as Nexus addon but was detected as Proxy.");
+					Logger->Info("ArcDPS", "ArcDPS is not loaded as Nexus addon but was detected as Proxy.");
 
 					DeployBridge();
 					return;
@@ -157,7 +157,7 @@ namespace ArcDPS
 		}
 		catch (std::filesystem::filesystem_error fErr)
 		{
-			LogDebug("ArcDPS", "%s", fErr.what());
+			Logger->Debug("ArcDPS", "%s", fErr.what());
 			return;
 		}
 	}
@@ -172,21 +172,21 @@ namespace ArcDPS
 		if (true == FindFunction(ModuleHandle, &exp_addextension2, "addextension2"))
 		{
 			int result = exp_addextension2(aBridgeModule);
-			LogInfo("ArcDPS", "Deployed ArcDPS Integration. Result: %d", result);
+			Logger->Info("ArcDPS", "Deployed ArcDPS Integration. Result: %d", result);
 		}
 		else
 		{
-			LogWarning("ArcDPS", "Addon with signature \"0xFFF694D1\" found but \"addextension2\" is not exported. ArcDPS combat events won't be relayed.");
+			Logger->Warning("ArcDPS", "Addon with signature \"0xFFF694D1\" found but \"addextension2\" is not exported. ArcDPS combat events won't be relayed.");
 		}
 
 		if (true == FindFunction(ModuleHandle, &exp_listextension, "listextension"))
 		{
 			GetPlugins();
-			LogInfo("ArcDPS", "Received ArcDPS plugins.");
+			Logger->Info("ArcDPS", "Received ArcDPS plugins.");
 		}
 		else
 		{
-			LogWarning("ArcDPS", "Addon with signature \"0xFFF694D1\" found but \"listextension\" is not exported.");
+			Logger->Warning("ArcDPS", "Addon with signature \"0xFFF694D1\" found but \"listextension\" is not exported.");
 		}
 
 		IsBridgeDeployed = true;
@@ -233,7 +233,7 @@ namespace ArcDPS
 			int result = exp_addextension2(aModule);
 			if (result != 0)
 			{
-				LogDebug("ArcDPS", "Could not add extension. Error %d", result);
+				Logger->Debug("ArcDPS", "Could not add extension. Error %d", result);
 			}
 		}
 	}

@@ -165,7 +165,7 @@ Texture* CTextureLoader::GetOrCreate(const char* aIdentifier, void* aData, size_
 
 void CTextureLoader::Load(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback)
 {
-	//LogInfo(CH_TEXTURES, "this->LoadFromFile(aIdentifier: %s, aFilename: %s, aCallback: %p)", aIdentifier, aFilename, aCallback);
+	//Logger->Info(CH_TEXTURES, "this->LoadFromFile(aIdentifier: %s, aFilename: %s, aCallback: %p)", aIdentifier, aFilename, aCallback);
 
 	std::string str = aIdentifier;
 
@@ -185,7 +185,7 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aFilename, TEXTUR
 
 	if (!std::filesystem::exists(aFilename))
 	{
-		LogWarning(CH_TEXTURES, "File provided does not exist: %s (%s)", aFilename, str.c_str());
+		Logger->Warning(CH_TEXTURES, "File provided does not exist: %s (%s)", aFilename, str.c_str());
 		return;
 	}
 
@@ -199,7 +199,7 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aFilename, TEXTUR
 
 void CTextureLoader::Load(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback)
 {
-	//LogInfo(CH_TEXTURES, "this->LoadFromResource(aIdentifier: %s, aResourceID: %u, aModule: %p, aCallback: %p)", aIdentifier, aResourceID, aModule, aCallback);
+	//Logger->Info(CH_TEXTURES, "this->LoadFromResource(aIdentifier: %s, aResourceID: %u, aModule: %p, aCallback: %p)", aIdentifier, aResourceID, aModule, aCallback);
 
 	std::string str = aIdentifier;
 
@@ -220,28 +220,28 @@ void CTextureLoader::Load(const char* aIdentifier, unsigned aResourceID, HMODULE
 	HRSRC imageResHandle = FindResourceA(aModule, MAKEINTRESOURCEA(aResourceID), "PNG");
 	if (!imageResHandle)
 	{
-		LogDebug(CH_TEXTURES, "Resource not found ResID: %u (%s)", aResourceID, str.c_str());
+		Logger->Debug(CH_TEXTURES, "Resource not found ResID: %u (%s)", aResourceID, str.c_str());
 		return;
 	}
 
 	HGLOBAL imageResDataHandle = LoadResource(aModule, imageResHandle);
 	if (!imageResDataHandle)
 	{
-		LogDebug(CH_TEXTURES, "Failed loading resource: %u (%s)", aResourceID, str.c_str());
+		Logger->Debug(CH_TEXTURES, "Failed loading resource: %u (%s)", aResourceID, str.c_str());
 		return;
 	}
 
 	LPVOID imageFile = LockResource(imageResDataHandle);
 	if (!imageFile)
 	{
-		LogDebug(CH_TEXTURES, "Failed locking resource: %u (%s)", aResourceID, str.c_str());
+		Logger->Debug(CH_TEXTURES, "Failed locking resource: %u (%s)", aResourceID, str.c_str());
 		return;
 	}
 
 	DWORD imageFileSize = SizeofResource(aModule, imageResHandle);
 	if (!imageFileSize)
 	{
-		LogDebug(CH_TEXTURES, "Failed getting size of resource: %u (%s)", aResourceID, str.c_str());
+		Logger->Debug(CH_TEXTURES, "Failed getting size of resource: %u (%s)", aResourceID, str.c_str());
 		return;
 	}
 
@@ -255,7 +255,7 @@ void CTextureLoader::Load(const char* aIdentifier, unsigned aResourceID, HMODULE
 
 void CTextureLoader::Load(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback)
 {
-	//LogInfo(CH_TEXTURES, "this->LoadFromURL(aIdentifier: %s, aRemote: %s, aEndpoint: %s, aCallback: %p)", aIdentifier, aRemote, aEndpoint, aCallback);
+	//Logger->Info(CH_TEXTURES, "this->LoadFromURL(aIdentifier: %s, aRemote: %s, aEndpoint: %s, aCallback: %p)", aIdentifier, aRemote, aEndpoint, aCallback);
 
 	std::string str = aIdentifier;
 
@@ -279,14 +279,14 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aRemote, const ch
 
 	if (!result)
 	{
-		LogDebug(CH_TEXTURES, "Error fetching %s%s (%s)", aRemote, aEndpoint, aIdentifier);
+		Logger->Debug(CH_TEXTURES, "Error fetching %s%s (%s)", aRemote, aEndpoint, aIdentifier);
 		return;
 	}
 
 	// Status is not HTTP_OK
 	if (result->status != 200)
 	{
-		LogDebug(CH_TEXTURES, "Status %d when fetching %s%s (%s)", result->status, aRemote, aEndpoint, aIdentifier);
+		Logger->Debug(CH_TEXTURES, "Status %d when fetching %s%s (%s)", result->status, aRemote, aEndpoint, aIdentifier);
 		return;
 	}
 
@@ -307,7 +307,7 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aRemote, const ch
 
 void CTextureLoader::Load(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback)
 {
-	//LogInfo(CH_TEXTURES, "this->LoadFromMemory(aIdentifier: %s, aData: %p, aSize: %u, aCallback: %p)", aIdentifier, aData, aSize, aCallback);
+	//Logger->Info(CH_TEXTURES, "this->LoadFromMemory(aIdentifier: %s, aData: %p, aSize: %u, aCallback: %p)", aIdentifier, aData, aSize, aCallback);
 
 	std::string str = aIdentifier;
 
@@ -367,7 +367,7 @@ void CTextureLoader::QueueTexture(const char* aIdentifier, unsigned char* aImage
 		}
 	}
 
-	//LogDebug(CH_TEXTURES, "Queued %s", str.c_str());
+	//Logger->Debug(CH_TEXTURES, "Queued %s", str.c_str());
 
 	QueuedTexture raw{};
 	raw.Identifier = str;
@@ -384,7 +384,7 @@ void CTextureLoader::QueueTexture(const char* aIdentifier, unsigned char* aImage
 
 void CTextureLoader::CreateTexture(QueuedTexture aQueuedTexture)
 {
-	//LogDebug(CH_TEXTURES, "Create %s", aQueuedTexture.Identifier.c_str());
+	//Logger->Debug(CH_TEXTURES, "Create %s", aQueuedTexture.Identifier.c_str());
 
 	Texture* tex = new Texture{};
 	tex->Width = aQueuedTexture.Width;
@@ -412,7 +412,7 @@ void CTextureLoader::CreateTexture(QueuedTexture aQueuedTexture)
 
 	if (!pTexture)
 	{
-		LogDebug(CH_TEXTURES, "pTexture was null");
+		Logger->Debug(CH_TEXTURES, "pTexture was null");
 		stbi_image_free(aQueuedTexture.Data);
 		return;
 	}

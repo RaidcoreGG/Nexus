@@ -101,7 +101,7 @@ namespace Loader
 			);
 			if (FSItemList == 0)
 			{
-				LogCritical(CH_LOADER, "Loader disabled. Reason: SHParseDisplayName(Path::D_GW2_ADDONS) returned %d.", hresult);
+				Logger->Critical(CH_LOADER, "Loader disabled. Reason: SHParseDisplayName(Path::D_GW2_ADDONS) returned %d.", hresult);
 				return;
 			}
 
@@ -119,7 +119,7 @@ namespace Loader
 
 			if (FSNotifierID <= 0)
 			{
-				LogCritical(CH_LOADER, "Loader disabled. Reason: SHChangeNotifyRegister(...) returned 0.");
+				Logger->Critical(CH_LOADER, "Loader disabled. Reason: SHChangeNotifyRegister(...) returned 0.");
 				return;
 			}
 
@@ -236,7 +236,7 @@ namespace Loader
 			}
 			catch (json::parse_error& ex)
 			{
-				LogWarning(CH_KEYBINDS, "AddonConfig.json could not be parsed. Error: %s", ex.what());
+				Logger->Warning(CH_KEYBINDS, "AddonConfig.json could not be parsed. Error: %s", ex.what());
 			}
 		}
 
@@ -423,7 +423,7 @@ namespace Loader
 			}
 			auto end_time = std::chrono::high_resolution_clock::now();
 			auto time = end_time - start_time;
-			Log(CH_LOADER, "Processing changes after waiting for %ums.", time / std::chrono::milliseconds(1));
+			Logger->Trace(CH_LOADER, "Processing changes after waiting for %ums.", time / std::chrono::milliseconds(1));
 
 			const std::lock_guard<std::mutex> lock(Mutex);
 			// check all tracked addons
@@ -503,7 +503,7 @@ namespace Loader
 					}
 					catch (std::filesystem::filesystem_error fErr)
 					{
-						LogDebug(CH_LOADER, "%s", fErr.what());
+						Logger->Debug(CH_LOADER, "%s", fErr.what());
 					}
 				}
 			}
@@ -526,7 +526,7 @@ namespace Loader
 		{
 			if (addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED)
 			{
-				//LogWarning(CH_LOADER, "Cancelled loading \"%s\". Already loaded.", strFile.c_str());
+				//Logger->Warning(CH_LOADER, "Cancelled loading \"%s\". Already loaded.", strFile.c_str());
 				return;
 			}
 		}
@@ -547,7 +547,7 @@ namespace Loader
 		/* load lib failed */
 		if (!addon->Module)
 		{
-			LogWarning(CH_LOADER, "Failed LoadLibrary on \"%s\". Incompatible. Last Error: %u", strFile.c_str(), GetLastError());
+			Logger->Warning(CH_LOADER, "Failed LoadLibrary on \"%s\". Incompatible. Last Error: %u", strFile.c_str(), GetLastError());
 			addon->State = EAddonState::NotLoadedIncompatible;
 
 			if (allocNew)
@@ -561,7 +561,7 @@ namespace Loader
 		/* doesn't have GetAddonDef */
 		if (FindFunction(addon->Module, &getAddonDef, "GetAddonDef") == false)
 		{
-			LogWarning(CH_LOADER, "\"%s\" is not a Nexus-compatible library. Incompatible.", strFile.c_str());
+			Logger->Warning(CH_LOADER, "\"%s\" is not a Nexus-compatible library. Incompatible.", strFile.c_str());
 			FreeLibrary(addon->Module);
 			addon->State = EAddonState::NotLoadedIncompatible;
 			addon->Module = nullptr;
@@ -579,7 +579,7 @@ namespace Loader
 		/* addon defs are nullptr */
 		if (tmpDefs == nullptr)
 		{
-			LogWarning(CH_LOADER, "\"%s\" is exporting \"GetAddonDef\" but returned a nullptr. Incompatible.", strFile.c_str());
+			Logger->Warning(CH_LOADER, "\"%s\" is exporting \"GetAddonDef\" but returned a nullptr. Incompatible.", strFile.c_str());
 			FreeLibrary(addon->Module);
 			addon->State = EAddonState::NotLoadedIncompatible;
 			addon->Module = nullptr;
@@ -630,7 +630,7 @@ namespace Loader
 				cmpAddon->Definitions->Signature == addon->Definitions->Signature;
 			});
 		if (duplicate != Addons.end()) {
-			LogWarning(CH_LOADER, "\"%s\" or another addon with this signature (%d) is already loaded. Duplicate.", strFile.c_str(), addon->Definitions->Signature);
+			Logger->Warning(CH_LOADER, "\"%s\" or another addon with this signature (%d) is already loaded. Duplicate.", strFile.c_str(), addon->Definitions->Signature);
 			FreeLibrary(addon->Module);
 			AddonDefinition::Free(&addon->Definitions);
 			addon->State = EAddonState::NotLoadedDuplicate;
@@ -693,7 +693,7 @@ namespace Loader
 
 					if (UpdateService->UpdateAddon(tmpPath, addonInfo))
 					{
-						LogInfo(CH_LOADER, "Update available for \"%s\".", tmpPath.string().c_str());
+						Logger->Info(CH_LOADER, "Update available for \"%s\".", tmpPath.string().c_str());
 						if (addon->IsDisabledUntilUpdate)
 						{
 							// reset state, because it updated
@@ -747,7 +747,7 @@ namespace Loader
 		/* don't load addons that weren't requested or loaded last time (ignore arcdps integration) */
 		if (!shouldLoad)
 		{
-			//LogInfo(CH_LOADER, "\"%s\" was not requested via start parameter or last state was disabled. Skipped.", strFile.c_str(), addon->Definitions->Signature);
+			//Logger->Info(CH_LOADER, "\"%s\" was not requested via start parameter or last state was disabled. Skipped.", strFile.c_str(), addon->Definitions->Signature);
 			FreeLibrary(addon->Module);
 			addon->State = EAddonState::NotLoaded;
 			addon->Module = nullptr;
@@ -769,7 +769,7 @@ namespace Loader
 		/* doesn't fulfill min reqs */
 		if (!addon->Definitions->HasMinimumRequirements())
 		{
-			LogWarning(CH_LOADER, "\"%s\" does not fulfill minimum requirements. At least define Name, Version, Author, Description as well as the Load function. Incompatible.", strFile.c_str());
+			Logger->Warning(CH_LOADER, "\"%s\" does not fulfill minimum requirements. At least define Name, Version, Author, Description as well as the Load function. Incompatible.", strFile.c_str());
 			FreeLibrary(addon->Module);
 			addon->State = EAddonState::NotLoadedIncompatible;
 			addon->Module = nullptr;
@@ -779,7 +779,7 @@ namespace Loader
 		/* (effectively duplicate check) if someone wants to do shenanigans and inject a different integration module */
 		if (addon->Definitions->Signature == 0xFED81763 && aPath != Path::F_ARCDPSINTEGRATION)
 		{
-			LogWarning(CH_LOADER, "\"%s\" declares signature 0xFED81763 but is not the actual Nexus ArcDPS Integration. Either this was in error or an attempt to tamper with Nexus files. Incompatible.", strFile.c_str());
+			Logger->Warning(CH_LOADER, "\"%s\" declares signature 0xFED81763 but is not the actual Nexus ArcDPS Integration. Either this was in error or an attempt to tamper with Nexus files. Incompatible.", strFile.c_str());
 			FreeLibrary(addon->Module);
 			addon->State = EAddonState::NotLoadedIncompatible;
 			addon->Module = nullptr;
@@ -791,7 +791,7 @@ namespace Loader
 		// if the api doesn't exist and there was one requested
 		if (api == nullptr && addon->Definitions->APIVersion != 0)
 		{
-			LogWarning(CH_LOADER, "Loading was cancelled because \"%s\" requested an API of version %d and no such version exists. Incompatible.", strFile.c_str(), addon->Definitions->APIVersion);
+			Logger->Warning(CH_LOADER, "Loading was cancelled because \"%s\" requested an API of version %d and no such version exists. Incompatible.", strFile.c_str(), addon->Definitions->APIVersion);
 			FreeLibrary(addon->Module);
 			addon->State = EAddonState::NotLoadedIncompatibleAPI;
 			addon->Module = nullptr;
@@ -813,7 +813,7 @@ namespace Loader
 		addon->State = locked ? EAddonState::LoadedLOCKED : EAddonState::Loaded;
 		SaveAddonConfig();
 
-		LogInfo(CH_LOADER, u8"Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.) Took %u탎.", 
+		Logger->Info(CH_LOADER, u8"Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.) Took %u탎.", 
 			strFile.c_str(), addon->Definitions->Signature,
 			addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage,
 			addon->Definitions->APIVersion, time / std::chrono::microseconds(1)
@@ -882,12 +882,12 @@ namespace Loader
 
 			if (leftoverRefs > 0)
 			{
-				LogWarning(CH_LOADER, "Removed %d unreleased references from \"%s\". Make sure your addon releases all references during Addon::Unload().", leftoverRefs, aPath.filename().string().c_str());
+				Logger->Warning(CH_LOADER, "Removed %d unreleased references from \"%s\". Make sure your addon releases all references during Addon::Unload().", leftoverRefs, aPath.filename().string().c_str());
 			}
 		}
 
 		aAddon->IsWaitingForUnload = false;
-		LogInfo(CH_LOADER, u8"Unloaded addon: %s (Took %u탎.)", aPath.filename().string().c_str(), time / std::chrono::microseconds(1));
+		Logger->Info(CH_LOADER, u8"Unloaded addon: %s (Took %u탎.)", aPath.filename().string().c_str(), time / std::chrono::microseconds(1));
 	}
 
 	void UnloadAddon(const std::filesystem::path& aPath, bool aDoReload)
@@ -916,7 +916,7 @@ namespace Loader
 					Addons.erase(it);
 				}
 			}
-			//LogWarning(CH_LOADER, "Cancelled unload of \"%s\". EAddonState = %d.", strFile.c_str(), addon->State);
+			//Logger->Warning(CH_LOADER, "Cancelled unload of \"%s\". EAddonState = %d.", strFile.c_str(), addon->State);
 			return;
 		}
 
@@ -1009,7 +1009,7 @@ namespace Loader
 			}
 		}
 
-		//LogDebug(CH_LOADER, "Called FreeLibrary() %d times on \"%s\".", freeCalls, strFile.c_str());
+		//Logger->Debug(CH_LOADER, "Called FreeLibrary() %d times on \"%s\".", freeCalls, strFile.c_str());
 
 		Loader::NotifyChanges();
 	}
@@ -1029,11 +1029,11 @@ namespace Loader
 				{
 					std::filesystem::rename(aPath, aPath.string() + extUninstall);
 					addon->IsFlaggedForUninstall = true;
-					LogWarning(CH_LOADER, "Addon is stilled loaded, it will be uninstalled the next time the game is restarted: %s", aPath.string().c_str());
+					Logger->Warning(CH_LOADER, "Addon is stilled loaded, it will be uninstalled the next time the game is restarted: %s", aPath.string().c_str());
 				}
 				catch (std::filesystem::filesystem_error fErr)
 				{
-					LogDebug(CH_LOADER, "%s", fErr.what());
+					Logger->Debug(CH_LOADER, "%s", fErr.what());
 					return;
 				}
 
@@ -1057,11 +1057,11 @@ namespace Loader
 					}
 					Addons.erase(it);
 				}
-				LogInfo(CH_LOADER, "Uninstalled addon: %s", aPath.string().c_str());
+				Logger->Info(CH_LOADER, "Uninstalled addon: %s", aPath.string().c_str());
 			}
 			catch (std::filesystem::filesystem_error fErr)
 			{
-				LogDebug(CH_LOADER, "%s", fErr.what());
+				Logger->Debug(CH_LOADER, "%s", fErr.what());
 				return;
 			}
 		}
@@ -1082,7 +1082,7 @@ namespace Loader
 			}
 			catch (std::filesystem::filesystem_error fErr)
 			{
-				LogDebug(CH_LOADER, "%s", fErr.what());
+				Logger->Debug(CH_LOADER, "%s", fErr.what());
 				return false;
 			}
 		}
@@ -1098,7 +1098,7 @@ namespace Loader
 			}
 			catch (std::filesystem::filesystem_error fErr)
 			{
-				LogDebug(CH_LOADER, "%s", fErr.what());
+				Logger->Debug(CH_LOADER, "%s", fErr.what());
 				return false;
 			}
 		}
@@ -1568,7 +1568,7 @@ namespace Loader
 
 		if (!result || result->status != 200)
 		{
-			LogWarning(CH_LOADER, "Error fetching \"http://assetcdn.101.arenanetworks.com/latest64/101\"");
+			Logger->Warning(CH_LOADER, "Error fetching \"http://assetcdn.101.arenanetworks.com/latest64/101\"");
 			return;
 		}
 
@@ -1587,7 +1587,7 @@ namespace Loader
 		if (gameBuild - lastGameBuild > 350 && lastGameBuild != 0)
 		{
 			DisableVolatileUntilUpdate = true;
-			LogWarning(CH_LOADER, "Game updated. Current Build %d. Old Build: %d. Disabling volatile addons until they update.", gameBuild, lastGameBuild);
+			Logger->Warning(CH_LOADER, "Game updated. Current Build %d. Old Build: %d. Disabling volatile addons until they update.", gameBuild, lastGameBuild);
 
 			GUI::Alerts::Notify(String::Format("%s\n%s", Language->Translate("((000001))"), Language->Translate("((000002))")).c_str());
 		}

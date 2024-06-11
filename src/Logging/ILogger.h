@@ -50,7 +50,7 @@ class ILogger
 
 	protected:
 		ELogLevel	LogLevel;
-		std::mutex	MessageMutex;
+		std::mutex	Mutex;
 };
 
 #endif

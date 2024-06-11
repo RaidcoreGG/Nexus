@@ -12,6 +12,7 @@ AddonVersion				Version				= { V_MAJOR, V_MINOR, V_BUILD, V_REVISION };
 std::vector<std::string>	Parameters			= {};
 std::vector<signed int>		RequestedAddons		= {};
 
+CLogHandler*				Logger				= new CLogHandler;
 CLocalization*				Language			= new CLocalization();
 CUpdater*					UpdateService		= new CUpdater();
 CTextureLoader*				TextureService		= new CTextureLoader();

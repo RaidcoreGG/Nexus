@@ -265,7 +265,7 @@ void CLocalization::BuildLocaleAtlas()
 		}
 		catch (json::parse_error& ex)
 		{
-			LogWarning(CH_LOCALIZATION, "%s could not be parsed. Error: %s", path.filename().string().c_str(), ex.what());
+			Logger->Warning(CH_LOCALIZATION, "%s could not be parsed. Error: %s", path.filename().string().c_str(), ex.what());
 		}
 	}
 

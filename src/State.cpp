@@ -82,11 +82,11 @@ namespace State
 					}
 					catch (const std::invalid_argument& e)
 					{
-						Log(CH_CORE, "Invalid argument (-ggaddons): %s", addonId.c_str());
+						Logger->Trace(CH_CORE, "Invalid argument (-ggaddons): %s", addonId.c_str());
 					}
 					catch (const std::out_of_range& e)
 					{
-						Log(CH_CORE, "Out of range (-ggaddons): %s", addonId.c_str());
+						Logger->Trace(CH_CORE, "Out of range (-ggaddons): %s", addonId.c_str());
 					}
 				}
 

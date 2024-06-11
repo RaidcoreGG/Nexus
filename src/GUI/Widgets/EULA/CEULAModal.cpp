@@ -122,15 +122,8 @@ namespace GUI
 			if (close)
 			{
 				ImGui::CloseCurrentPopup();
-				auto it = std::find_if(GUI::Windows.begin(), GUI::Windows.end(), [](const IWindow* wnd) {
-					return wnd->Name == "CEULAModal";
-					});
-
-				if (it != GUI::Windows.end())
-				{
-					delete (*it);
-					GUI::Windows.erase(it);
-				}
+				delete this;
+				GUI::EULAWindow = nullptr;
 			}
 
 			ImGui::EndChild();

@@ -189,7 +189,7 @@ namespace GUI
 											})
 											.detach();
 
-										//LogDebug(CH_GUI, "Update called: %s", it.second->Definitions->Name);
+										//Logger->Debug(CH_GUI, "Update called: %s", it.second->Definitions->Name);
 										break;
 									}
 								}
@@ -219,7 +219,7 @@ namespace GUI
 
 						if (ImGui::GW2::ContextMenuItem(("ToggleDUU##" + sig).c_str(), aAddon->IsDisabledUntilUpdate ? Language->Translate("((000015))") : Language->Translate("((000016))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 						{
-							//LogDebug(CH_GUI, "ToggleDUU called: %s", it.second->Definitions->Name);
+							//Logger->Debug(CH_GUI, "ToggleDUU called: %s", it.second->Definitions->Name);
 							aAddon->IsDisabledUntilUpdate = !aAddon->IsDisabledUntilUpdate;
 							if (aAddon->IsDisabledUntilUpdate)
 							{
@@ -242,7 +242,7 @@ namespace GUI
 
 						if (ImGui::GW2::ContextMenuItem(("Uninstall##" + sig).c_str(), Language->Translate("((000018))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 						{
-							//LogDebug(CH_GUI, "Uninstall called: %s", it.second->Definitions->Name);
+							//Logger->Debug(CH_GUI, "Uninstall called: %s", it.second->Definitions->Name);
 							Loader::QueueAddon(ELoaderAction::Uninstall, aPath);
 						}
 						if (aAddon->State == EAddonState::LoadedLOCKED)
@@ -265,7 +265,7 @@ namespace GUI
 					{
 						if (!aAddon->IsWaitingForUnload)
 						{
-							//LogDebug(CH_GUI, "Unload called: %s", it.second->Definitions->Name);
+							//Logger->Debug(CH_GUI, "Unload called: %s", it.second->Definitions->Name);
 							Loader::QueueAddon(ELoaderAction::Unload, aPath);
 						}
 					}
@@ -315,7 +315,7 @@ namespace GUI
 				{
 					if (ImGui::GW2::Button((Language->Translate("((000026))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
-						//LogDebug(CH_GUI, "Load called: %s", it.second->Definitions->Name);
+						//Logger->Debug(CH_GUI, "Load called: %s", it.second->Definitions->Name);
 						aAddon->IsDisabledUntilUpdate = false; // explicitly loaded
 						Loader::QueueAddon(ELoaderAction::Load, aPath);
 					}

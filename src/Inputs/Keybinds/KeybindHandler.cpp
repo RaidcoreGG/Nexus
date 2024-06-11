@@ -265,7 +265,7 @@ namespace Keybinds
 					binding["Ctrl"].is_null() ||
 					binding["Shift"].is_null())
 				{
-					LogDebug(CH_KEYBINDS, "One or more fields of keybind were null.");
+					Logger->Debug(CH_KEYBINDS, "One or more fields of keybind were null.");
 					continue;
 				}
 
@@ -284,7 +284,7 @@ namespace Keybinds
 		}
 		catch (json::parse_error& ex)
 		{
-			LogWarning(CH_KEYBINDS, "Keybinds.json could not be parsed. Error: %s", ex.what());
+			Logger->Warning(CH_KEYBINDS, "Keybinds.json could not be parsed. Error: %s", ex.what());
 		}
 	}
 

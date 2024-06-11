@@ -29,13 +29,7 @@
 
 #include "Widgets/Menu/Menu.h"
 #include "Widgets/Menu/MenuItem.h"
-#include "Widgets/Addons/CAddonsWindow.h"
-#include "Widgets/Options/COptionsWindow.h"
-#include "Widgets/Log/CLogWindow.h"
-#include "Widgets/Debug/CDebugWindow.h"
-#include "Widgets/About/CAboutBox.h"
 #include "Widgets/QuickAccess/QuickAccess.h"
-#include "Widgets/EULA/CEULAModal.h"
 #include "Widgets/Alerts/Alerts.h"
 
 #include "resource.h"
@@ -56,6 +50,13 @@ namespace GUI
 	/* FIXME: this needs to be dependency injected. Fix before 2024/06/30. */
 	CFontManager& FontManager = CFontManager::GetInstance();
 
+	CAddonsWindow*	AddonsWindow	= new CAddonsWindow("Addons");
+	COptionsWindow*	OptionsWindow	= new COptionsWindow("Options");
+	CLogWindow*		LogWindow		= new CLogWindow("Log", ELogLevel::ALL);
+	CDebugWindow*	DebugWindow		= new CDebugWindow("Debug");
+	CAboutBox*		AboutWindow		= new CAboutBox("About");
+	CEULAModal*		EULAWindow		= nullptr;
+
 	/* internal forward declarations */
 	void OnMumbleIdentityChanged(void* aEventArgs);
 	void OnLanguageChanged(void* aEventArgs);
@@ -69,7 +70,7 @@ namespace GUI
 	std::vector<GUI_RENDER>		RegistryRender;
 	std::vector<GUI_RENDER>		RegistryPostRender;
 	std::vector<GUI_RENDER>		RegistryOptionsRender;
-	std::vector<IWindow*>		Windows;
+
 	std::map<EFont, ImFont*>	FontIndex;
 	float						FontSize					= 16.0f;
 	bool						CloseMenuAfterSelecting		= true;
@@ -142,14 +143,30 @@ namespace GUI
 							Menu::Visible = false;
 							return 0;
 						}
-
-						for (IWindow* wnd : Windows)
+						else if (strcmp(windows[i]->Name, "Addons") == 0 && AddonsWindow->Visible)
 						{
-							if (wnd->Name == windows[i]->Name && wnd->Visible)
-							{
-								wnd->Visible = false;
-								return 0;
-							}
+							AddonsWindow->Visible = false;
+							return 0;
+						}
+						else if (strcmp(windows[i]->Name, "Options") == 0 && OptionsWindow->Visible)
+						{
+							OptionsWindow->Visible = false;
+							return 0;
+						}
+						else if (strcmp(windows[i]->Name, "Log") == 0 && LogWindow->Visible)
+						{
+							LogWindow->Visible = false;
+							return 0;
+						}
+						else if (strcmp(windows[i]->Name, "Debug") == 0 && DebugWindow->Visible)
+						{
+							DebugWindow->Visible = false;
+							return 0;
+						}
+						else if (strcmp(windows[i]->Name, "About") == 0 && AboutWindow->Visible)
+						{
+							AboutWindow->Visible = false;
+							return 0;
 						}
 					}
 				}
@@ -298,9 +315,14 @@ namespace GUI
 				/* draw addons end*/
 
 				/* draw nexus windows */
-				for (IWindow* wnd : Windows)
+				AddonsWindow->Render();
+				OptionsWindow->Render();
+				LogWindow->Render();
+				DebugWindow->Render();
+				AboutWindow->Render();
+				if (!HasAcceptedEULA && EULAWindow)
 				{
-					wnd->Render();
+					EULAWindow->Render();
 				}
 				/* draw nexus windows end */
 
@@ -341,13 +363,6 @@ namespace GUI
 			if (callback) { callback(); }
 		}
 		/* post-render callbacks end*/
-	}
-
-	void AddWindow(IWindow* aWindowPtr)
-	{
-		const std::lock_guard<std::mutex> lock(Mutex);
-		
-		Windows.push_back(aWindowPtr);
 	}
 
 	void ImportArcDPSStyle()
@@ -394,7 +409,7 @@ namespace GUI
 					}
 					catch (...)
 					{
-						LogDebug(CH_CORE, "Couldn't parse ArcDPS style.");
+						Logger->Debug(CH_CORE, "Couldn't parse ArcDPS style.");
 					}
 					
 					arcIni.close();
@@ -419,33 +434,23 @@ namespace GUI
 		}
 		else if (str == KB_ADDONS)
 		{
-			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Addons"; });
-			if (it == Windows.end()) { return; }
-			(*it)->Visible = !(*it)->Visible;
+			AddonsWindow->Visible = !AddonsWindow->Visible;
 		}
 		else if (str == KB_DEBUG)
 		{
-			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Debug"; });
-			if (it == Windows.end()) { return; }
-			(*it)->Visible = !(*it)->Visible;
+			DebugWindow->Visible = !DebugWindow->Visible;
 		}
 		else if (str == KB_LOG)
 		{
-			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Log"; });
-			if (it == Windows.end()) { return; }
-			(*it)->Visible = !(*it)->Visible;
+			LogWindow->Visible = !LogWindow->Visible;
 		}
 		else if (str == KB_OPTIONS)
 		{
-			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Options"; });
-			if (it == Windows.end()) { return; }
-			(*it)->Visible = !(*it)->Visible;
+			OptionsWindow->Visible = !OptionsWindow->Visible;
 		}
 		else if (str == KB_MUMBLEOVERLAY)
 		{
-			const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Debug"; });
-			if (it == Windows.end()) { return; }
-			((CDebugWindow*)(*it))->MumbleWindow->Visible = !((CDebugWindow*)(*it))->MumbleWindow->Visible;
+			DebugWindow->MumbleWindow->Visible = !DebugWindow->MumbleWindow->Visible;
 		}
 	}
 
@@ -527,9 +532,7 @@ namespace GUI
 	{
 		if (!ShowAddonsWindowAfterDUU) { return; }
 
-		const auto& it = std::find_if(Windows.begin(), Windows.end(), [](const IWindow* wnd) { return wnd->Name == "Addons"; });
-		if (it == Windows.end()) { return; }
-		(*it)->Visible = true;
+		AddonsWindow->Visible = true;
 	}
 
 	void FontReceiver(const char* aIdentifier, ImFont* aFont)
@@ -585,7 +588,7 @@ namespace GUI
 		}
 		catch (std::filesystem::filesystem_error fErr)
 		{
-			LogDebug(CH_LOADER, "%s", fErr.what());
+			Logger->Debug(CH_LOADER, "%s", fErr.what());
 			return;
 		}
 	}
@@ -855,35 +858,21 @@ namespace GUI
 		Events::Subscribe(EV_VOLATILE_ADDON_DISABLED, OnAddonDUU);
 		OnMumbleIdentityChanged(nullptr);
 
-		/* set up and add windows */
-		CAddonsWindow* addonsWnd = new CAddonsWindow("Addons");
-		COptionsWindow* opsWnd = new COptionsWindow("Options");
-		CLogWindow* logWnd = new CLogWindow("Log", ELogLevel::ALL);
-		LogHandler::RegisterLogger(logWnd);
-		CDebugWindow* dbgWnd = new CDebugWindow("Debug");
-		CAboutBox* aboutWnd = new CAboutBox("About");
-
 		Keybinds::Register(KB_ADDONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
 		Keybinds::Register(KB_OPTIONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
 		Keybinds::Register(KB_LOG, EKBHType::DownOnly, ProcessKeybind, "(null)");
 		Keybinds::Register(KB_DEBUG, EKBHType::DownOnly, ProcessKeybind, "(null)");
 		Keybinds::Register(KB_MUMBLEOVERLAY, EKBHType::DownOnly, ProcessKeybind, "(null)");
 
-		AddWindow(addonsWnd);
-		AddWindow(opsWnd);
-		AddWindow(logWnd);
-		AddWindow(dbgWnd);
-		AddWindow(aboutWnd);
-
 		Menu::AddMenuItem("((000083))",		ICON_RETURN,	RES_ICON_RETURN,	&Menu::Visible);
-		Menu::AddMenuItem("((000003))",		ICON_ADDONS,	RES_ICON_ADDONS,	&addonsWnd->Visible);
-		Menu::AddMenuItem("((000004))",		ICON_OPTIONS,	RES_ICON_OPTIONS,	&opsWnd->Visible);
-		Menu::AddMenuItem("((000006))",		ICON_LOG,		RES_ICON_LOG,		&logWnd->Visible);
+		Menu::AddMenuItem("((000003))",		ICON_ADDONS,	RES_ICON_ADDONS,	&AddonsWindow->Visible);
+		Menu::AddMenuItem("((000004))",		ICON_OPTIONS,	RES_ICON_OPTIONS,	&OptionsWindow->Visible);
+		Menu::AddMenuItem("((000006))",		ICON_LOG,		RES_ICON_LOG,		&LogWindow->Visible);
 		if (State::IsDeveloperMode)
 		{
-			Menu::AddMenuItem("((000007))", ICON_DEBUG, RES_ICON_DEBUG, &dbgWnd->Visible);
+			Menu::AddMenuItem("((000007))", ICON_DEBUG, RES_ICON_DEBUG, &DebugWindow->Visible);
 		}
-		Menu::AddMenuItem("((000008))",		ICON_ABOUT,		RES_ICON_ABOUT,		&aboutWnd->Visible);
+		Menu::AddMenuItem("((000008))",		ICON_ABOUT,		RES_ICON_ABOUT,		&AboutWindow->Visible);
 
 		/* register keybinds */
 		Keybinds::Register(KB_MENU, EKBHType::DownOnly, ProcessKeybind, "CTRL+O");
@@ -923,8 +912,7 @@ namespace GUI
 
 		if (!HasAcceptedEULA)
 		{
-			CEULAModal* eulaModal = new CEULAModal();
-			AddWindow(eulaModal);
+			EULAWindow = new CEULAModal();
 		}
 
 		IsSetup = true;
@@ -998,8 +986,7 @@ namespace GUI
 			}
 		}
 
-		CFontManager& fntMgr = CFontManager::GetInstance();
-		fntMgr.Verify(aStartAddress, aEndAddress);
+		FontManager.Verify(aStartAddress, aEndAddress);
 
 		return refCounter;
 	}

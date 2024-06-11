@@ -27,6 +27,7 @@ extern std::vector<std::string>		Parameters;
 extern std::vector<signed int>		RequestedAddons;
 
 /* FIXME: these need to be dependency injected. Fix before 2024/06/30. */
+extern CLogHandler*					Logger;
 extern CLocalization*				Language;
 extern CUpdater*					UpdateService;
 extern CTextureLoader*				TextureService;

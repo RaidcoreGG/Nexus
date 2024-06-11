@@ -66,7 +66,7 @@ namespace Loader
 			}
 			else
 			{
-				LogWarning(CH_LOADER, "Error parsing API response for /addonlibrary.");
+				Logger->Warning(CH_LOADER, "Error parsing API response for /addonlibrary.");
 			}
 		}
 	}

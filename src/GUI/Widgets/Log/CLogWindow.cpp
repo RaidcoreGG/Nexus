@@ -60,7 +60,7 @@ namespace GUI
 
 				ImGui::Text("Channel:");
 
-				LogHandler::Mutex.lock();
+				const std::lock_guard<std::mutex> lock(Mutex);
 				{
 					for (std::string ch : Channels)
 					{
@@ -85,8 +85,6 @@ namespace GUI
 						ImGui::PopStyleVar();
 					}
 				}
-				LogHandler::Mutex.unlock();
-
 				ImGui::TextDisabled("Showing %d out of %d", amtShown, LogEntries.size() > 400 ? 400 : LogEntries.size());
 
 				ImGui::EndChild();
@@ -102,7 +100,7 @@ namespace GUI
 				ImGuiStyle& style = ImGui::GetStyle();
 				float wrapWidth = ImGui::GetContentRegionAvailWidth() - off1 - off2 - style.ScrollbarSize;
 
-				LogHandler::Mutex.lock();
+				const std::lock_guard<std::mutex> lock(Mutex);
 				{
 					/* Show last 400 log messages */
 					size_t start = 0;
@@ -309,7 +307,6 @@ namespace GUI
 						}
 					}
 				}
-				LogHandler::Mutex.unlock();
 
 				if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
 				{
@@ -322,5 +319,15 @@ namespace GUI
 		ImGui::End();
 	}
 
-	void CLogWindow::LogMessage(LogEntry aLogEntry) {}
+	void CLogWindow::LogMessage(LogEntry aLogEntry)
+	{
+		const std::lock_guard<std::mutex> lock(Mutex);
+
+		if (std::find(this->Channels.begin(), this->Channels.end(), aLogEntry.Channel) == this->Channels.end())
+		{
+			this->Channels.push_back(aLogEntry.Channel);
+		}
+
+		this->LogEntries.push_back(aLogEntry);
+	}
 }

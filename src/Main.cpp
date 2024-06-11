@@ -64,17 +64,17 @@ namespace Main
 		std::string mumbleName = State::Initialize();
 		
 		/* setup default loggers */
-		RegisterLogger(
-			true == State::IsConsoleEnabled
-			? new CConsoleLogger(ELogLevel::ALL)
-			: nullptr
-		);
-		RegisterLogger(new CFileLogger(ELogLevel::ALL, Path::F_LOG));
+		if (State::IsConsoleEnabled)
+		{
+			Logger->RegisterLogger(new CConsoleLogger(ELogLevel::ALL));
+		}
+		Logger->RegisterLogger(new CFileLogger(ELogLevel::ALL, Path::F_LOG));
+		Logger->RegisterLogger(GUI::LogWindow);
 
-		LogInfo(CH_CORE, GetCommandLineA());
-		LogInfo(CH_CORE, "%s: %s", Path::F_HOST_DLL != Path::F_CHAINLOAD_DLL ? "Proxy" : "Chainload", Path::F_HOST_DLL.string().c_str());
-		LogInfo(CH_CORE, "Build: %s", Version.string().c_str());
-		LogInfo(CH_CORE, "Entry method: %d", State::EntryMethod);
+		Logger->Info(CH_CORE, GetCommandLineA());
+		Logger->Info(CH_CORE, "%s: %s", Path::F_HOST_DLL != Path::F_CHAINLOAD_DLL ? "Proxy" : "Chainload", Path::F_HOST_DLL.string().c_str());
+		Logger->Info(CH_CORE, "Build: %s", Version.string().c_str());
+		Logger->Info(CH_CORE, "Entry method: %d", State::EntryMethod);
 
 		RaidcoreAPI = new CApiClient("https://api.raidcore.gg", true, Path::D_GW2_ADDONS_COMMON_API_RAIDCORE, 30 * 60, 300, 5, 1);//, Certs::Raidcore);
 		GitHubAPI = new CApiClient("https://api.github.com", true, Path::D_GW2_ADDONS_COMMON_API_GITHUB, 30 * 60, 60, 60, 60 * 60);
@@ -85,7 +85,7 @@ namespace Main
 
 				if (GetLastError() == ERROR_ALREADY_EXISTS)
 				{
-					LogInfo(CH_CORE, "Cannot patch Nexus, mutex locked.");
+					Logger->Info(CH_CORE, "Cannot patch Nexus, mutex locked.");
 
 					/* sanity check to make the compiler happy */
 					if (hMutex)
@@ -116,7 +116,7 @@ namespace Main
 			if (Multibox::ShareArchive())	{ State::MultiboxState |= EMultiboxState::ARCHIVE_SHARED; }
 			if (Multibox::ShareLocal())		{ State::MultiboxState |= EMultiboxState::LOCAL_SHARED; }
 			if (Multibox::KillMutex())		{ State::MultiboxState |= EMultiboxState::MUTEX_CLOSED; }
-			LogInfo(CH_CORE, "Multibox State: %d", State::MultiboxState);
+			Logger->Info(CH_CORE, "Multibox State: %d", State::MultiboxState);
 
 			MH_Initialize();
 
@@ -156,13 +156,13 @@ namespace Main
 		switch (aReason)
 		{
 		case WM_DESTROY:
-			LogCritical(CH_CORE, "Main::Shutdown() | Reason: WM_DESTROY");
+			Logger->Critical(CH_CORE, "Main::Shutdown() | Reason: WM_DESTROY");
 			break;
 		case WM_CLOSE:
-			LogCritical(CH_CORE, "Main::Shutdown() | Reason: WM_CLOSE");
+			Logger->Critical(CH_CORE, "Main::Shutdown() | Reason: WM_CLOSE");
 			break;
 		case WM_QUIT:
-			LogCritical(CH_CORE, "Main::Shutdown() | Reason: WM_QUIT");
+			Logger->Critical(CH_CORE, "Main::Shutdown() | Reason: WM_QUIT");
 			break;
 		}
 
@@ -181,7 +181,7 @@ namespace Main
 
 			MH_Uninitialize();
 
-			LogInfo(CH_CORE, "Shutdown performed.");
+			Logger->Info(CH_CORE, "Shutdown performed.");
 
 			//SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)Hooks::GW2::WndProc);
 

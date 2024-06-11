@@ -36,14 +36,19 @@ namespace LogHandler
 }
 
 ///----------------------------------------------------------------------------------------------------
-/// LogHandler Namespace
+/// CLogHandler Class
 ///----------------------------------------------------------------------------------------------------
-namespace LogHandler
+class CLogHandler
 {
-	extern std::mutex					Mutex;
-	extern std::vector<ILogger*>		Registry;
-	extern std::vector<LogEntry>		LogEntries;
-	extern std::vector<std::string>		Channels;
+public:
+	///----------------------------------------------------------------------------------------------------
+	/// ctor
+	///----------------------------------------------------------------------------------------------------
+	CLogHandler() = default;
+	///----------------------------------------------------------------------------------------------------
+	/// dtor
+	///----------------------------------------------------------------------------------------------------
+	~CLogHandler() = default;
 
 	///----------------------------------------------------------------------------------------------------
 	/// RegisterLogger:
@@ -58,34 +63,34 @@ namespace LogHandler
 	void DeregisterLogger(ILogger* aLogger);
 
 	///----------------------------------------------------------------------------------------------------
-	/// LogCritical:
+	/// Critical:
 	/// 	Logs a message with level Critical.
 	///----------------------------------------------------------------------------------------------------
-	void LogCritical(const std::string& aChannel, const char* aFmt, ...);
+	void Critical(const std::string& aChannel, const char* aFmt, ...);
 
 	///----------------------------------------------------------------------------------------------------
-	/// LogWarning:
+	/// Warning:
 	/// 	Logs a message with level Warning.
 	///----------------------------------------------------------------------------------------------------
-	void LogWarning(const std::string& aChannel, const char* aFmt, ...);
+	void Warning(const std::string& aChannel, const char* aFmt, ...);
 
 	///----------------------------------------------------------------------------------------------------
-	/// LogInfo:
+	/// Info:
 	/// 	Logs a message with level Info.
 	///----------------------------------------------------------------------------------------------------
-	void LogInfo(const std::string& aChannel, const char* aFmt, ...);
+	void Info(const std::string& aChannel, const char* aFmt, ...);
 
 	///----------------------------------------------------------------------------------------------------
-	/// LogDebug:
+	/// Debug:
 	/// 	Logs a message with level Debug.
 	///----------------------------------------------------------------------------------------------------
-	void LogDebug(const std::string& aChannel, const char* aFmt, ...);
+	void Debug(const std::string& aChannel, const char* aFmt, ...);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Log:
 	/// 	Logs a message with level Trace.
 	///----------------------------------------------------------------------------------------------------
-	void Log(const std::string& aChannel, const char* aFmt, ...);
+	void Trace(const std::string& aChannel, const char* aFmt, ...);
 
 	///----------------------------------------------------------------------------------------------------
 	/// LogMessage:
@@ -104,6 +109,10 @@ namespace LogHandler
 	/// 	Logs an unformatted message to a specific channel.
 	///----------------------------------------------------------------------------------------------------
 	void LogMessageUnformatted(ELogLevel aLogLevel, std::string aChannel, const char* aMsg);
-}
+
+private:
+	std::mutex					Mutex;
+	std::vector<ILogger*>		Registry;
+};
 
 #endif

@@ -158,15 +158,15 @@ void CMumbleReader::Advance()
 			}
 			catch (json::parse_error& ex)
 			{
-				Log(CH_MUMBLE_READER, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
+				Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
 			}
 			catch (json::type_error& ex)
 			{
-				Log(CH_MUMBLE_READER, "MumbleLink could not be parsed. Type Error: %s", ex.what());
+				Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Type Error: %s", ex.what());
 			}
 			catch (...)
 			{
-				Log(CH_MUMBLE_READER, "MumbleLink could not be parsed. Unknown Error.");
+				Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Unknown Error.");
 			}
 
 			/* notify (also notifies the GUI to update its scaling factor) */

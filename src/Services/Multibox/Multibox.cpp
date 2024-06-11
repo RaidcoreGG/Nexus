@@ -127,7 +127,7 @@ namespace Multibox
 			return true;
 		}
 
-		//LogCritical(CH_CORE, "Multibox::ShareArchive() not implemented.");
+		//Logger->Critical(CH_CORE, "Multibox::ShareArchive() not implemented.");
 
 		return false;
 	}
@@ -141,7 +141,7 @@ namespace Multibox
 			return true;
 		}
 
-		//LogCritical(CH_CORE, "Multibox::ShareLocal() not implemented.");
+		//Logger->Critical(CH_CORE, "Multibox::ShareLocal() not implemented.");
 
 		return false;
 	}

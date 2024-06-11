@@ -44,7 +44,7 @@ namespace Proxy
 
 						if (D3D11Handle)
 						{
-							LogInfo(CH_CORE, "Loaded Chainload DLL: %s", strChainload.c_str());
+							Logger->Info(CH_CORE, "Loaded Chainload DLL: %s", strChainload.c_str());
 						}
 					}
 				}
@@ -53,7 +53,7 @@ namespace Proxy
 				{
 					if (State::IsChainloading)
 					{
-						LogWarning(CH_CORE, "Chainload failed to load. Last Error: %u", GetLastError());
+						Logger->Warning(CH_CORE, "Chainload failed to load. Last Error: %u", GetLastError());
 						State::IsChainloading = false;
 					}
 
@@ -62,7 +62,7 @@ namespace Proxy
 
 					assert(D3D11Handle && "Could not load system d3d11.dll");
 
-					LogInfo(CH_CORE, "Loaded System DLL: %s", strSystem.c_str());
+					Logger->Info(CH_CORE, "Loaded System DLL: %s", strSystem.c_str());
 				}
 
 				State::Directx = EDxState::LOADED;
@@ -128,7 +128,7 @@ namespace Proxy
 
 			if (State::Directx >= EDxState::LOADED && Proxy::D3D11::CreateDevice)
 			{
-				LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
+				Logger->Warning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
 				if (!D3D11SystemHandle)
 				{
@@ -162,7 +162,7 @@ namespace Proxy
 
 			if (State::Directx >= EDxState::LOADED && Proxy::D3D11::CreateDeviceAndSwapChain)
 			{
-				LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
+				Logger->Warning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
 				if (!D3D11SystemHandle)
 				{
@@ -196,7 +196,7 @@ namespace Proxy
 
 			if (State::Directx >= EDxState::LOADED && Proxy::D3D11::CoreCreateDevice)
 			{
-				LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
+				Logger->Warning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
 				if (!D3D11SystemHandle)
 				{
@@ -230,7 +230,7 @@ namespace Proxy
 
 			if (State::Directx >= EDxState::LOADED && Proxy::D3D11::CoreCreateLayeredDevice)
 			{
-				LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
+				Logger->Warning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
 				if (!D3D11SystemHandle)
 				{
@@ -264,7 +264,7 @@ namespace Proxy
 
 			if (State::Directx >= EDxState::LOADED && Proxy::D3D11::CoreGetLayeredDeviceSize)
 			{
-				LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
+				Logger->Warning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
 				if (!D3D11SystemHandle)
 				{
@@ -298,7 +298,7 @@ namespace Proxy
 
 			if (State::Directx >= EDxState::LOADED && Proxy::D3D11::CoreRegisterLayers)
 			{
-				LogWarning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
+				Logger->Warning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
 				if (!D3D11SystemHandle)
 				{

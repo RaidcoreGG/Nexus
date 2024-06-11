@@ -47,7 +47,7 @@ namespace DataLink
 					it->second.Handle = nullptr;
 				}
 
-				LogInfo(CH_DATALINK, "Freed shared resource: \"%s\"", it->first.c_str());
+				Logger->Info(CH_DATALINK, "Freed shared resource: \"%s\"", it->first.c_str());
 
 				Registry.erase(it);
 			}
@@ -95,7 +95,7 @@ namespace DataLink
 			}
 			else
 			{
-				LogWarning(CH_DATALINK, "Resource with name \"%s\" already exists with size %u but size %u was requested.", str.c_str(), it->second.Size, aResourceSize);
+				Logger->Warning(CH_DATALINK, "Resource with name \"%s\" already exists with size %u but size %u was requested.", str.c_str(), it->second.Size, aResourceSize);
 				return nullptr;
 			}
 		}
@@ -128,7 +128,7 @@ namespace DataLink
 		/* initial null */
 		memset(resource.Pointer, 0, resource.Size);
 
-		LogInfo(CH_DATALINK, "Created shared resource: \"%s\" (with underlying name \"%s\")", str.c_str(), strOverride.c_str());
+		Logger->Info(CH_DATALINK, "Created shared resource: \"%s\" (with underlying name \"%s\")", str.c_str(), strOverride.c_str());
 
 		return result;
 	}
