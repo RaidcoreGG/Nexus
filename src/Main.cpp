@@ -86,7 +86,13 @@ namespace Main
 				if (GetLastError() == ERROR_ALREADY_EXISTS)
 				{
 					LogInfo(CH_CORE, "Cannot patch Nexus, mutex locked.");
-					CloseHandle(hMutex);
+
+					/* sanity check to make the compiler happy */
+					if (hMutex)
+					{
+						CloseHandle(hMutex);
+					}
+
 					return;
 				}
 
