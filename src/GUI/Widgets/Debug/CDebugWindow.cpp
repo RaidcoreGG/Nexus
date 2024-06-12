@@ -24,7 +24,6 @@ namespace GUI
 	size_t memSz = 0;
 
 	bool showMetricsDebugger = false;
-	bool showFontDebugger = false;
 
 	/* proto tabs */
 	void DbgEventsTab();
@@ -34,6 +33,7 @@ namespace GUI
 	void DbgShortcutsTab();
 	void DbgLoaderTab();
 	void DbgAPITab();
+	void DbgFontsTab();
 
 	void NodeFont(ImFont* font);
 
@@ -56,40 +56,12 @@ namespace GUI
 			ImGui::ShowMetricsWindow();
 		}
 
-		if (showFontDebugger)
-		{
-			if (ImGui::Begin("Fonts", (bool*)0, ImGuiWindowFlags_AlwaysAutoResize))
-			{
-				ImGuiIO& io = ImGui::GetIO();
-				ImFontAtlas* atlas = io.Fonts;
-				ImGui::PushItemWidth(120);
-				for (int i = 0; i < atlas->Fonts.Size; i++)
-				{
-					ImFont* font = atlas->Fonts[i];
-					ImGui::PushID(font);
-					NodeFont(font);
-					ImGui::PopID();
-				}
-				if (ImGui::TreeNode("Atlas texture", "Atlas texture (%dx%d pixels)", atlas->TexWidth, atlas->TexHeight))
-				{
-					ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
-					ImVec4 border_col = ImVec4(1.0f, 1.0f, 1.0f, 0.5f);
-					ImGui::Image(atlas->TexID, ImVec2((float)atlas->TexWidth, (float)atlas->TexHeight), ImVec2(0, 0), ImVec2(1, 1), tint_col, border_col);
-					ImGui::TreePop();
-				}
-				ImGui::PopItemWidth();
-			}
-
-			ImGui::End();
-		}
-
 		ImGui::SetNextWindowSize(ImVec2(dwWidth * ImGui::GetFontSize(), dwHeight * ImGui::GetFontSize()), ImGuiCond_FirstUseEver);
 		if (ImGui::Begin(Name.c_str(), &Visible, ImGuiWindowFlags_NoCollapse))
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f });
 			ImGui::Checkbox("Show Mumble overlay", &MumbleWindow->Visible);
 			ImGui::Checkbox("Show Metrics / Debugger", &showMetricsDebugger);
-			ImGui::Checkbox("Show Font Debugger", &showFontDebugger);
 			ImGui::PopStyleVar();
 
 			if (ImGui::BeginTabBar("DebugTabBar", ImGuiTabBarFlags_None))
@@ -101,6 +73,7 @@ namespace GUI
 				DbgShortcutsTab();
 				DbgLoaderTab();
 				DbgAPITab();
+				DbgFontsTab();
 				/*if (ImGui::BeginTabItem("Meme"))
 				{
 					{
@@ -459,6 +432,36 @@ namespace GUI
 	void DbgAPITab()
 	{
 
+	}
+	void DbgFontsTab()
+	{
+		if (ImGui::BeginTabItem("Fonts"))
+		{
+			ImGui::BeginChild("##FontsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+
+			ImGuiIO& io = ImGui::GetIO();
+			ImFontAtlas* atlas = io.Fonts;
+			ImGui::PushItemWidth(120);
+			for (int i = 0; i < atlas->Fonts.Size; i++)
+			{
+				ImFont* font = atlas->Fonts[i];
+				ImGui::PushID(font);
+				NodeFont(font);
+				ImGui::PopID();
+			}
+			if (ImGui::TreeNode("Atlas texture", "Atlas texture (%dx%d pixels)", atlas->TexWidth, atlas->TexHeight))
+			{
+				ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+				ImVec4 border_col = ImVec4(1.0f, 1.0f, 1.0f, 0.5f);
+				ImGui::Image(atlas->TexID, ImVec2((float)atlas->TexWidth, (float)atlas->TexHeight), ImVec2(0, 0), ImVec2(1, 1), tint_col, border_col);
+				ImGui::TreePop();
+			}
+			ImGui::PopItemWidth();
+
+			ImGui::EndChild();
+
+			ImGui::EndTabItem();
+		}
 	}
 
 	void NodeFont(ImFont* font)
