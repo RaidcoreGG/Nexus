@@ -35,6 +35,12 @@ void CLogHandler::RegisterLogger(ILogger* aLogger)
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	this->Registry.push_back(aLogger);
+
+	/* replay log messages */
+	for (LogEntry entry : this->LogEntries)
+	{
+		aLogger->LogMessage(entry);
+	}
 }
 
 void CLogHandler::DeregisterLogger(ILogger* aLogger)
@@ -111,6 +117,9 @@ void CLogHandler::LogMessageUnformatted(ELogLevel aLogLevel, std::string aChanne
 	entry.Message = aMsg;
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	/* store log entries */
+	this->LogEntries.push_back(entry);
 
 	for (ILogger* logger : this->Registry)
 	{

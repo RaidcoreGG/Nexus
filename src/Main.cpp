@@ -69,7 +69,6 @@ namespace Main
 			Logger->RegisterLogger(new CConsoleLogger(ELogLevel::ALL));
 		}
 		Logger->RegisterLogger(new CFileLogger(ELogLevel::ALL, Path::F_LOG));
-		Logger->RegisterLogger(GUI::LogWindow);
 
 		Logger->Info(CH_CORE, GetCommandLineA());
 		Logger->Info(CH_CORE, "%s: %s", Path::F_HOST_DLL != Path::F_CHAINLOAD_DLL ? "Proxy" : "Chainload", Path::F_HOST_DLL.string().c_str());

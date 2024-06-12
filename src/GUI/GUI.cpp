@@ -858,6 +858,8 @@ namespace GUI
 		Events::Subscribe(EV_VOLATILE_ADDON_DISABLED, OnAddonDUU);
 		OnMumbleIdentityChanged(nullptr);
 
+		Logger->RegisterLogger(GUI::LogWindow);
+
 		Keybinds::Register(KB_ADDONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
 		Keybinds::Register(KB_OPTIONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
 		Keybinds::Register(KB_LOG, EKBHType::DownOnly, ProcessKeybind, "(null)");
