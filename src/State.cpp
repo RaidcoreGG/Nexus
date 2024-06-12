@@ -12,7 +12,7 @@
 #include "Shared.h"
 
 #include "Services/Mumble/Reader.h"
-#include "DataLink/DataLink.h"
+#include "Services/DataLink/DataLink.h"
 
 namespace State
 {

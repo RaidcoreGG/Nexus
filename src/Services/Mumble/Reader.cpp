@@ -14,7 +14,7 @@
 #include "Hooks.h" /* FIXME: This is included at the moment because the NexusLink isn't dependency-injected. Fix before 2024/06/30. */
 
 #include "Events/EventHandler.h"
-#include "DataLink/DataLink.h"
+#include "Services/DataLink/DataLink.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;

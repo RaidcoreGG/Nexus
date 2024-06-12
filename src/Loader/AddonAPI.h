@@ -3,13 +3,13 @@
 
 #include <dxgi.h>
 #include "Paths/FuncDefs.h"
-#include "Logging/FuncDefs.h"
+#include "Services/Logging/FuncDefs.h"
 #include "Events/FuncDefs.h"
 #include "Inputs/WndProc/FuncDefs.h"
 #include "Inputs/Keybinds/FuncDefs.h"
 #include "imgui/imgui.h"
 #include "minhook/mh_hook.h"
-#include "DataLink/FuncDefs.h"
+#include "Services/DataLink/FuncDefs.h"
 #include "Services/Textures/FuncDefs.h"
 #include "GUI/FuncDefs.h"
 #include "GUI/Widgets/QuickAccess/FuncDefs.h"

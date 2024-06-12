@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Logging">
-      <UniqueIdentifier>{72f71e79-5933-4318-b293-5087228d8bf4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Loader">
       <UniqueIdentifier>{ef159aa7-0ceb-4ef5-a926-097dfc64a130}</UniqueIdentifier>
     </Filter>
@@ -45,9 +42,6 @@
     </Filter>
     <Filter Include="GUI\Widgets\Debug">
       <UniqueIdentifier>{c9b428d0-6faf-4a6c-90d5-d8264bb96899}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DataLink">
-      <UniqueIdentifier>{bc75dd17-819f-48c8-a82d-b3b2dd12becb}</UniqueIdentifier>
     </Filter>
     <Filter Include="GUI\Widgets\QuickAccess">
       <UniqueIdentifier>{4c9af9fd-e1d8-4b1c-8a86-b5d5c91c500f}</UniqueIdentifier>
@@ -154,6 +148,12 @@
     <Filter Include="Services\Localization">
       <UniqueIdentifier>{7943e0f9-3a02-4820-bc47-49d1198f39b8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Services\DataLink">
+      <UniqueIdentifier>{bc75dd17-819f-48c8-a82d-b3b2dd12becb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Services\Logging">
+      <UniqueIdentifier>{72f71e79-5933-4318-b293-5087228d8bf4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -189,20 +189,20 @@
     <ClCompile Include="src\minhook\mh_trampoline.cpp">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClCompile>
-    <ClCompile Include="src\Logging\CFileLogger.cpp">
-      <Filter>Logging</Filter>
+    <ClCompile Include="src\Services\Logging\CFileLogger.cpp">
+      <Filter>Services\Logging</Filter>
     </ClCompile>
-    <ClCompile Include="src\Logging\ILogger.cpp">
-      <Filter>Logging</Filter>
+    <ClCompile Include="src\Services\Logging\ILogger.cpp">
+      <Filter>Services\Logging</Filter>
     </ClCompile>
-    <ClCompile Include="src\Logging\LogEntry.cpp">
-      <Filter>Logging</Filter>
+    <ClCompile Include="src\Services\Logging\LogEntry.cpp">
+      <Filter>Services\Logging</Filter>
     </ClCompile>
-    <ClCompile Include="src\Logging\LogHandler.cpp">
-      <Filter>Logging</Filter>
+    <ClCompile Include="src\Services\Logging\LogHandler.cpp">
+      <Filter>Services\Logging</Filter>
     </ClCompile>
-    <ClCompile Include="src\Logging\CConsoleLogger.cpp">
-      <Filter>Logging</Filter>
+    <ClCompile Include="src\Services\Logging\CConsoleLogger.cpp">
+      <Filter>Services\Logging</Filter>
     </ClCompile>
     <ClCompile Include="src\core.cpp">
       <Filter>Source Files</Filter>
@@ -255,8 +255,8 @@
     <ClCompile Include="src\GUI\Widgets\Debug\CDebugWindow.cpp">
       <Filter>GUI\Widgets\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="src\DataLink\DataLink.cpp">
-      <Filter>DataLink</Filter>
+    <ClCompile Include="src\Services\DataLink\DataLink.cpp">
+      <Filter>Services\DataLink</Filter>
     </ClCompile>
     <ClCompile Include="src\Services\Textures\TextureLoader.cpp">
       <Filter>Services\Textures</Filter>
@@ -386,23 +386,23 @@
     <ClInclude Include="src\minhook\mh_buffer.h">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClInclude>
-    <ClInclude Include="src\Logging\CFileLogger.h">
-      <Filter>Logging</Filter>
+    <ClInclude Include="src\Services\Logging\CFileLogger.h">
+      <Filter>Services\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="src\Logging\ILogger.h">
-      <Filter>Logging</Filter>
+    <ClInclude Include="src\Services\Logging\ILogger.h">
+      <Filter>Services\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="src\Logging\LogEntry.h">
-      <Filter>Logging</Filter>
+    <ClInclude Include="src\Services\Logging\LogEntry.h">
+      <Filter>Services\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="src\Logging\LogHandler.h">
-      <Filter>Logging</Filter>
+    <ClInclude Include="src\Services\Logging\LogHandler.h">
+      <Filter>Services\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="src\Logging\ELogLevel.h">
-      <Filter>Logging</Filter>
+    <ClInclude Include="src\Services\Logging\ELogLevel.h">
+      <Filter>Services\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="src\Logging\CConsoleLogger.h">
-      <Filter>Logging</Filter>
+    <ClInclude Include="src\Services\Logging\CConsoleLogger.h">
+      <Filter>Services\Logging</Filter>
     </ClInclude>
     <ClInclude Include="src\core.h">
       <Filter>Header Files</Filter>
@@ -464,17 +464,17 @@
     <ClInclude Include="src\GUI\Widgets\Debug\CDebugWindow.h">
       <Filter>GUI\Widgets\Debug</Filter>
     </ClInclude>
-    <ClInclude Include="src\DataLink\DataLink.h">
-      <Filter>DataLink</Filter>
+    <ClInclude Include="src\Services\DataLink\DataLink.h">
+      <Filter>Services\DataLink</Filter>
     </ClInclude>
-    <ClInclude Include="src\DataLink\LinkedResource.h">
-      <Filter>DataLink</Filter>
+    <ClInclude Include="src\Services\DataLink\LinkedResource.h">
+      <Filter>Services\DataLink</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\Textures\TextureLoader.h">
       <Filter>Services\Textures</Filter>
     </ClInclude>
-    <ClInclude Include="src\DataLink\FuncDefs.h">
-      <Filter>DataLink</Filter>
+    <ClInclude Include="src\Services\DataLink\FuncDefs.h">
+      <Filter>Services\DataLink</Filter>
     </ClInclude>
     <ClInclude Include="src\Events\FuncDefs.h">
       <Filter>Events</Filter>
@@ -482,8 +482,8 @@
     <ClInclude Include="src\Inputs\Keybinds\FuncDefs.h">
       <Filter>Inputs\Keybinds</Filter>
     </ClInclude>
-    <ClInclude Include="src\Logging\FuncDefs.h">
-      <Filter>Logging</Filter>
+    <ClInclude Include="src\Services\Logging\FuncDefs.h">
+      <Filter>Services\Logging</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\Textures\FuncDefs.h">
       <Filter>Services\Textures</Filter>

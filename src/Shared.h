@@ -6,16 +6,14 @@
 #include <string>
 
 #include "Loader/AddonDefinition.h"
-#include "Logging/LogHandler.h"
+#include "Services/Logging/LogHandler.h"
 #include "API/ApiClient.h"
 #include "Services/Localization/Localization.h"
 #include "Services/Updater/Updater.h"
 #include "Services/Textures/TextureLoader.h"
-#include "DataLink/DataLink.h"
+#include "Services/DataLink/DataLink.h"
 
 #include "imgui.h"
-
-using namespace LogHandler;
 
 extern DWORD						NexusModuleSize;
 extern HMODULE						NexusHandle;

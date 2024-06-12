@@ -24,13 +24,13 @@
 #include "AddonDefinition.h"
 #include "FuncDefs.h"
 
-#include "Logging/LogHandler.h"
+#include "Services/Logging/LogHandler.h"
 #include "Events/EventHandler.h"
 #include "Inputs/WndProc/WndProcHandler.h"
 #include "Inputs/Keybinds/KeybindHandler.h"
 #include "imgui/imgui.h"
 #include "minhook/mh_hook.h"
-#include "DataLink/DataLink.h"
+#include "Services/DataLink/DataLink.h"
 #include "Services/Textures/TextureLoader.h"
 #include "GUI/GUI.h"
 #include "GUI/Widgets/QuickAccess/QuickAccess.h"
@@ -1138,7 +1138,7 @@ namespace Loader
 			((AddonAPI1*)api)->EnableHook = MH_EnableHook;
 			((AddonAPI1*)api)->DisableHook = MH_DisableHook;
 
-			((AddonAPI1*)api)->Log = ADDONAPI_LogMessage;
+			((AddonAPI1*)api)->Log = LogHandler::ADDONAPI_LogMessage;
 
 			((AddonAPI1*)api)->RaiseEvent = Events::ADDONAPI_RaiseEvent;
 			((AddonAPI1*)api)->SubscribeEvent = Events::Subscribe;
@@ -1186,7 +1186,7 @@ namespace Loader
 			((AddonAPI2*)api)->EnableHook = MH_EnableHook;
 			((AddonAPI2*)api)->DisableHook = MH_DisableHook;
 
-			((AddonAPI2*)api)->Log = ADDONAPI_LogMessage2;
+			((AddonAPI2*)api)->Log = LogHandler::ADDONAPI_LogMessage2;
 
 			((AddonAPI2*)api)->RaiseEvent = Events::ADDONAPI_RaiseEvent;
 			((AddonAPI2*)api)->RaiseEventNotification = Events::ADDONAPI_RaiseNotification;
@@ -1245,7 +1245,7 @@ namespace Loader
 			((AddonAPI3*)api)->EnableHook = MH_EnableHook;
 			((AddonAPI3*)api)->DisableHook = MH_DisableHook;
 
-			((AddonAPI3*)api)->Log = ADDONAPI_LogMessage2;
+			((AddonAPI3*)api)->Log = LogHandler::ADDONAPI_LogMessage2;
 
 			((AddonAPI3*)api)->SendAlert = GUI::Alerts::Notify;
 
@@ -1310,7 +1310,7 @@ namespace Loader
 			((AddonAPI4*)api)->EnableHook = MH_EnableHook;
 			((AddonAPI4*)api)->DisableHook = MH_DisableHook;
 
-			((AddonAPI4*)api)->Log = ADDONAPI_LogMessage2;
+			((AddonAPI4*)api)->Log = LogHandler::ADDONAPI_LogMessage2;
 
 			((AddonAPI4*)api)->SendAlert = GUI::Alerts::Notify;
 
@@ -1380,7 +1380,7 @@ namespace Loader
 			((AddonAPI5*)api)->EnableHook = MH_EnableHook;
 			((AddonAPI5*)api)->DisableHook = MH_DisableHook;
 
-			((AddonAPI5*)api)->Log = ADDONAPI_LogMessage2;
+			((AddonAPI5*)api)->Log = LogHandler::ADDONAPI_LogMessage2;
 
 			((AddonAPI5*)api)->SendAlert = GUI::Alerts::Notify;
 

@@ -6,7 +6,7 @@
 #include "Paths.h"
 #include "State.h"
 
-#include "Logging/LogHandler.h"
+#include "Services/Logging/LogHandler.h"
 
 #include "imgui.h"
 #include "imgui_extensions.h"
