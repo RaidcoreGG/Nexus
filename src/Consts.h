@@ -10,7 +10,6 @@ extern const char* CH_CORE;
 extern const char* CH_EVENTS;
 extern const char* CH_QUICKACCESS;
 extern const char* CH_LOADER;
-extern const char* CH_DATALINK;
 extern const char* CH_KEYBINDS;
 
 /* Keybinds */

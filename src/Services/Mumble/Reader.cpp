@@ -97,8 +97,8 @@ CMumbleReader::CMumbleReader(std::string aMumbleName)
 	this->Name = aMumbleName;
 
 	/* share the linked mem regardless whether it's disabled, for dependant addons */
-	MumbleLink = (Mumble::Data*)DataLink::ShareResource(DL_MUMBLE_LINK, sizeof(Mumble::Data), aMumbleName.c_str());
-	Hooks::NexusLink = NexusLink = (NexusLinkData*)DataLink::ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData));
+	MumbleLink = (Mumble::Data*)DataLinkService->ShareResource(DL_MUMBLE_LINK, sizeof(Mumble::Data), aMumbleName.c_str(), true);
+	Hooks::NexusLink = NexusLink = (NexusLinkData*)DataLinkService->ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData), true);
 
 	if (aMumbleName == "0")
 	{

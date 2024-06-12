@@ -176,7 +176,7 @@ namespace Main
 			delete MumbleReader;
 
 			// shared mem
-			DataLink::Free();
+			delete DataLinkService;
 
 			MH_Uninitialize();
 

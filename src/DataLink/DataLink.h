@@ -15,11 +15,19 @@
 
 #include "LinkedResource.h"
 
+constexpr const char* CH_DATALINK = "DataLink";
+
 ///----------------------------------------------------------------------------------------------------
 /// DataLink Namespace
 ///----------------------------------------------------------------------------------------------------
 namespace DataLink
 {
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_GetResource:
+	/// 	Addon API wrapper function for GetResource.
+	///----------------------------------------------------------------------------------------------------
+	void* ADDONAPI_GetResource(const char* aIdentifier);
+
 	///----------------------------------------------------------------------------------------------------
 	/// ADDONAPI_ShareResource:
 	/// 	Addon API wrapper function for ShareResource.
@@ -27,18 +35,19 @@ namespace DataLink
 	void* ADDONAPI_ShareResource(const char* aIdentifier, size_t aResourceSize);
 }
 ///----------------------------------------------------------------------------------------------------
-/// DataLink Namespace
+/// CDataLink Class
 ///----------------------------------------------------------------------------------------------------
-namespace DataLink
+class CDataLink
 {
-	extern std::mutex										Mutex;
-	extern std::unordered_map<std::string, LinkedResource>	Registry;
-
+public:
 	///----------------------------------------------------------------------------------------------------
-	/// Free:
-	/// 	Frees all remaining resources.
+	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	void Free();
+	CDataLink() = default;
+	///----------------------------------------------------------------------------------------------------
+	/// dtor
+	///----------------------------------------------------------------------------------------------------
+	~CDataLink();
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetResource:
@@ -50,14 +59,24 @@ namespace DataLink
 	/// ShareResource:
 	/// 	Allocates memory of the given size, accessible via the provided identifier.
 	///----------------------------------------------------------------------------------------------------
-	void* ShareResource(const char* aIdentifier, size_t aResourceSize);
+	void* ShareResource(const char* aIdentifier, size_t aResourceSize, bool aIsPublic);
 
 	///----------------------------------------------------------------------------------------------------
 	/// ShareResource:
 	/// 	Allocates memory of the given size, accessible via the provided identifier,
 	/// 	but with a different internal/underlying name.
 	///----------------------------------------------------------------------------------------------------
-	void* ShareResource(const char* aIdentifier, size_t aResourceSize, const char* aUnderlyingName);
-}
+	void* ShareResource(const char* aIdentifier, size_t aResourceSize, const char* aUnderlyingName, bool aIsPublic);
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetRegistry:
+	/// 	Returns a copy of the registry.
+	///----------------------------------------------------------------------------------------------------
+	std::unordered_map<std::string, LinkedResource> GetRegistry();
+
+private:
+	std::mutex										Mutex;
+	std::unordered_map<std::string, LinkedResource>	Registry;
+};
 
 #endif

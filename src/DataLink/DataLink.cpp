@@ -14,96 +14,114 @@
 
 namespace DataLink
 {
+	void* ADDONAPI_GetResource(const char* aIdentifier)
+	{
+		return DataLinkService->GetResource(aIdentifier);
+	}
+
 	void* ADDONAPI_ShareResource(const char* aIdentifier, size_t aResourceSize)
 	{
-		return ShareResource(aIdentifier, aResourceSize);
+		return DataLinkService->ShareResource(aIdentifier, aResourceSize, false);
 	}
 }
 
-namespace DataLink
+CDataLink::~CDataLink()
 {
-	std::mutex										Mutex;
-	std::unordered_map<std::string, LinkedResource>	Registry;
+	const std::lock_guard<std::mutex> lock(this->Mutex);
 
-	void Free()
+	while (this->Registry.size() > 0)
 	{
-		if (State::Nexus == ENexusState::SHUTTING_DOWN)
+		const auto& it = this->Registry.begin();
+
+		switch (it->second.Type)
 		{
-			const std::lock_guard<std::mutex> lock(Mutex);
-			
-			while (Registry.size() > 0)
+		case ELinkedResourceType::Public:
+			if (it->second.Pointer)
 			{
-				const auto& it = Registry.begin();
-
-				if (it->second.Pointer)
-				{
-					UnmapViewOfFile((LPVOID)it->second.Pointer);
-					it->second.Pointer = nullptr;
-				}
-
-				if (it->second.Handle)
-				{
-					CloseHandle(it->second.Handle);
-					it->second.Handle = nullptr;
-				}
-
-				Logger->Info(CH_DATALINK, "Freed shared resource: \"%s\"", it->first.c_str());
-
-				Registry.erase(it);
+				UnmapViewOfFile((LPVOID)it->second.Pointer);
+				it->second.Pointer = nullptr;
 			}
-		}
-		
-	}
 
-	void* GetResource(const char* aIdentifier)
-	{
-		std::string str = aIdentifier;
+			if (it->second.Handle)
+			{
+				CloseHandle(it->second.Handle);
+				it->second.Handle = nullptr;
+			}
+			break;
 
-		void* result = nullptr;
-
-		const std::lock_guard<std::mutex> lock(Mutex);
-		
-		const auto& it = Registry.find(str);
-		if (it != Registry.end())
-		{
-			result = it->second.Pointer;
+		case ELinkedResourceType::Internal:
+			if (it->second.Pointer)
+			{
+				delete it->second.Pointer;
+				it->second.Pointer = nullptr;
+			}
+			break;
 		}
 
-		return result;
+		Logger->Info(CH_DATALINK, "Freed shared resource: \"%s\"", it->first.c_str());
+
+		this->Registry.erase(it);
+	}
+}
+
+void* CDataLink::GetResource(const char* aIdentifier)
+{
+	std::string str = aIdentifier;
+
+	void* result = nullptr;
+
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	const auto& it = this->Registry.find(str);
+	if (it != this->Registry.end())
+	{
+		result = it->second.Pointer;
 	}
 
-	void* ShareResource(const char* aIdentifier, size_t aResourceSize)
-	{
-		return ShareResource(aIdentifier, aResourceSize, "");
-	}
-	void* ShareResource(const char* aIdentifier, size_t aResourceSize, const char* aUnderlyingName)
-	{
-		std::string str = aIdentifier;
-		std::string strOverride = aUnderlyingName;
+	return result;
+}
 
-		void* result = nullptr;
+void* CDataLink::ShareResource(const char* aIdentifier, size_t aResourceSize, bool aIsPublic)
+{
+	return ShareResource(aIdentifier, aResourceSize, "", aIsPublic);
+}
 
-		const std::lock_guard<std::mutex> lock(Mutex);
-		
-		/* resource already exists */
-		const auto& it = Registry.find(str);
-		if (it != Registry.end())
+void* CDataLink::ShareResource(const char* aIdentifier, size_t aResourceSize, const char* aUnderlyingName, bool aIsPublic)
+{
+	std::string str = aIdentifier;
+	std::string strOverride = aUnderlyingName;
+
+	void* result = nullptr;
+
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	/* resource already exists */
+	const auto& it = this->Registry.find(str);
+	if (it != this->Registry.end())
+	{
+		if (it->second.Size == aResourceSize)
 		{
-			if (it->second.Size == aResourceSize)
-			{
-				return it->second.Pointer;
-			}
-			else
-			{
-				Logger->Warning(CH_DATALINK, "Resource with name \"%s\" already exists with size %u but size %u was requested.", str.c_str(), it->second.Size, aResourceSize);
-				return nullptr;
-			}
+			return it->second.Pointer;
 		}
+		else
+		{
+			Logger->Warning(CH_DATALINK, "Resource with name \"%s\" already exists with size %u but size %u was requested.", str.c_str(), it->second.Size, aResourceSize);
+			return nullptr;
+		}
+	}
 
-		/* allocate new resource */
-		LinkedResource resource{};
-		resource.Size = aResourceSize;
+	/* allocate new resource */
+	LinkedResource resource{};
+	resource.Size = aResourceSize;
+	resource.Type = aIsPublic ? ELinkedResourceType::Public : ELinkedResourceType::Internal;
 
+	switch (resource.Type)
+	{
+	default:
+	case ELinkedResourceType::None:
+		return nullptr;
+	case ELinkedResourceType::Public:
+		/* attach PID for unique name */
 		if (strOverride.empty())
 		{
 			strOverride = str + "_" + std::to_string(GetCurrentProcessId());
@@ -111,25 +129,48 @@ namespace DataLink
 
 		resource.UnderlyingName = strOverride;
 
+		/* acquire handle */
 		resource.Handle = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, strOverride.c_str());
 		if (!resource.Handle)
 		{
 			resource.Handle = CreateFileMappingA(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, static_cast<DWORD>(aResourceSize), strOverride.c_str());
 		}
 
+		/* acquire pointer */
 		if (resource.Handle)
 		{
 			resource.Pointer = MapViewOfFile(resource.Handle, FILE_MAP_ALL_ACCESS, 0, 0, static_cast<DWORD>(aResourceSize));
 
-			Registry[str] = resource;
-			result = resource.Pointer;
+			/* sanity check */
+			if (!resource.Pointer)
+			{
+				return nullptr;
+			}
 		}
 
-		/* initial null */
-		memset(resource.Pointer, 0, resource.Size);
+		Logger->Info(CH_DATALINK, "Created public shared resource: \"%s\" (with underlying name \"%s\")", str.c_str(), strOverride.c_str());
+		break;
 
-		Logger->Info(CH_DATALINK, "Created shared resource: \"%s\" (with underlying name \"%s\")", str.c_str(), strOverride.c_str());
+	case ELinkedResourceType::Internal:
+		resource.Pointer = new char[resource.Size];
 
-		return result;
+		Logger->Info(CH_DATALINK, "Created internal shared resource: \"%s\"", str.c_str());
+		break;
 	}
+
+	/* store linkedresource */
+	this->Registry[str] = resource;
+	result = resource.Pointer;
+
+	/* initial null */
+	memset(resource.Pointer, 0, resource.Size);
+
+	return result;
+}
+
+std::unordered_map<std::string, LinkedResource> CDataLink::GetRegistry()
+{
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	return this->Registry;
 }

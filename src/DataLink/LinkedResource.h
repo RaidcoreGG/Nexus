@@ -13,14 +13,25 @@
 #include <string>
 
 ///----------------------------------------------------------------------------------------------------
+/// ELinkedResourceType enum
+///----------------------------------------------------------------------------------------------------
+enum class ELinkedResourceType
+{
+	None,
+	Public,
+	Internal
+};
+
+///----------------------------------------------------------------------------------------------------
 /// LinkedResource data struct
 ///----------------------------------------------------------------------------------------------------
 struct LinkedResource
 {
-	HANDLE		Handle;				/* The handle of the resource. */
-	void*		Pointer;			/* The pointer to the resource. */
-	size_t		Size;				/* The size of the resource. */
-	std::string UnderlyingName;		/* The real name of the memory mapped file.*/
+	ELinkedResourceType		Type;				/* The type of the resource. Public or Internal. */
+	HANDLE					Handle;				/* The handle of the resource. */
+	void*					Pointer;			/* The pointer to the resource. */
+	size_t					Size;				/* The size of the resource. */
+	std::string				UnderlyingName;		/* The real name of the memory mapped file.*/
 };
 
 #endif

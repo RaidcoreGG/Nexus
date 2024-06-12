@@ -11,6 +11,7 @@
 #include "Services/Localization/Localization.h"
 #include "Services/Updater/Updater.h"
 #include "Services/Textures/TextureLoader.h"
+#include "DataLink/DataLink.h"
 
 #include "imgui.h"
 
@@ -31,6 +32,7 @@ extern CLogHandler*					Logger;
 extern CLocalization*				Language;
 extern CUpdater*					UpdateService;
 extern CTextureLoader*				TextureService;
+extern CDataLink*					DataLinkService;
 
 extern ImFont*						MonospaceFont;	/* default/monospace/console font */
 extern ImFont*						UserFont;		/* custom user font */

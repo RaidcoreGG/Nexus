@@ -16,6 +16,7 @@ CLogHandler*				Logger				= new CLogHandler;
 CLocalization*				Language			= new CLocalization();
 CUpdater*					UpdateService		= new CUpdater();
 CTextureLoader*				TextureService		= new CTextureLoader();
+CDataLink*					DataLinkService		= new CDataLink();
 
 ImFont*						MonospaceFont		= nullptr;
 ImFont*						UserFont			= nullptr;

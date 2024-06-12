@@ -84,7 +84,7 @@ namespace Loader
 
 	void Initialize()
 	{
-		NexusLink = (NexusLinkData*)DataLink::ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData));
+		NexusLink = (NexusLinkData*)DataLinkService->ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData), true);
 
 		if (State::Nexus == ENexusState::LOADED)
 		{
@@ -1151,8 +1151,8 @@ namespace Loader
 			((AddonAPI1*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct;
 			((AddonAPI1*)api)->DeregisterKeybind = Keybinds::Deregister;
 
-			((AddonAPI1*)api)->GetResource = DataLink::GetResource;
-			((AddonAPI1*)api)->ShareResource = DataLink::ShareResource;
+			((AddonAPI1*)api)->GetResource = DataLink::ADDONAPI_GetResource;
+			((AddonAPI1*)api)->ShareResource = DataLink::ADDONAPI_ShareResource;
 
 			((AddonAPI1*)api)->GetTexture = TextureLoader::ADDONAPI_Get;
 			((AddonAPI1*)api)->LoadTextureFromFile = TextureLoader::ADDONAPI_LoadFromFile;
@@ -1201,8 +1201,8 @@ namespace Loader
 			((AddonAPI2*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct;
 			((AddonAPI2*)api)->DeregisterKeybind = Keybinds::Deregister;
 
-			((AddonAPI2*)api)->GetResource = DataLink::GetResource;
-			((AddonAPI2*)api)->ShareResource = DataLink::ShareResource;
+			((AddonAPI2*)api)->GetResource = DataLink::ADDONAPI_GetResource;
+			((AddonAPI2*)api)->ShareResource = DataLink::ADDONAPI_ShareResource;
 
 			((AddonAPI2*)api)->GetTexture = TextureLoader::ADDONAPI_Get;
 			((AddonAPI2*)api)->GetTextureOrCreateFromFile = TextureLoader::ADDONAPI_GetOrCreateFromFile;
@@ -1264,8 +1264,8 @@ namespace Loader
 			((AddonAPI3*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct;
 			((AddonAPI3*)api)->DeregisterKeybind = Keybinds::Deregister;
 
-			((AddonAPI3*)api)->GetResource = DataLink::GetResource;
-			((AddonAPI3*)api)->ShareResource = DataLink::ShareResource;
+			((AddonAPI3*)api)->GetResource = DataLink::ADDONAPI_GetResource;
+			((AddonAPI3*)api)->ShareResource = DataLink::ADDONAPI_ShareResource;
 
 			((AddonAPI3*)api)->GetTexture = TextureLoader::ADDONAPI_Get;
 			((AddonAPI3*)api)->GetTextureOrCreateFromFile = TextureLoader::ADDONAPI_GetOrCreateFromFile;
@@ -1329,8 +1329,8 @@ namespace Loader
 			((AddonAPI4*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct2;
 			((AddonAPI4*)api)->DeregisterKeybind = Keybinds::Deregister;
 
-			((AddonAPI4*)api)->GetResource = DataLink::GetResource;
-			((AddonAPI4*)api)->ShareResource = DataLink::ShareResource;
+			((AddonAPI4*)api)->GetResource = DataLink::ADDONAPI_GetResource;
+			((AddonAPI4*)api)->ShareResource = DataLink::ADDONAPI_ShareResource;
 
 			((AddonAPI4*)api)->GetTexture = TextureLoader::ADDONAPI_Get;
 			((AddonAPI4*)api)->GetTextureOrCreateFromFile = TextureLoader::ADDONAPI_GetOrCreateFromFile;
@@ -1400,8 +1400,8 @@ namespace Loader
 			((AddonAPI5*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct2;
 			((AddonAPI5*)api)->DeregisterKeybind = Keybinds::Deregister;
 
-			((AddonAPI5*)api)->GetResource = DataLink::GetResource;
-			((AddonAPI5*)api)->ShareResource = DataLink::ShareResource;
+			((AddonAPI5*)api)->GetResource = DataLink::ADDONAPI_GetResource;
+			((AddonAPI5*)api)->ShareResource = DataLink::ADDONAPI_ShareResource;
 
 			((AddonAPI5*)api)->GetTexture = TextureLoader::ADDONAPI_Get;
 			((AddonAPI5*)api)->GetTextureOrCreateFromFile = TextureLoader::ADDONAPI_GetOrCreateFromFile;

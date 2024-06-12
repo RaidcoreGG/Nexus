@@ -18,8 +18,8 @@ namespace GUI
 {
 	CMumbleOverlay::CMumbleOverlay()
 	{
-		MumbleLink = (Mumble::Data*)DataLink::GetResource(DL_MUMBLE_LINK);
-		NexusLink = (NexusLinkData*)DataLink::GetResource(DL_NEXUS_LINK);
+		MumbleLink = (Mumble::Data*)DataLinkService->GetResource(DL_MUMBLE_LINK);
+		NexusLink = (NexusLinkData*)DataLinkService->GetResource(DL_NEXUS_LINK);
 	}
 
 	void CMumbleOverlay::Render()

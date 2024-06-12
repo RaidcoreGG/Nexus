@@ -168,36 +168,32 @@ namespace GUI
 	{
 		if (ImGui::BeginTabItem("DataLink"))
 		{
+			ImGui::BeginChild("##DataLinkTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+
+			std::unordered_map<std::string, LinkedResource>	DataLinkRegistry = DataLinkService->GetRegistry();
+
+			for (auto& [identifier, resource] : DataLinkRegistry)
 			{
-				ImGui::BeginChild("##DataLinkTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
-
-				DataLink::Mutex.lock();
+				if (ImGui::TreeNode(identifier.c_str()))
 				{
-					for (auto& [identifier, resource] : DataLink::Registry)
+					ImGui::TextDisabled("Handle: %p", resource.Handle);
+					ImGui::TextDisabled("Pointer: %p", resource.Pointer);
+					ImGui::TextDisabled("Size: %d", resource.Size);
+					ImGui::TextDisabled("Name: %s", resource.UnderlyingName.c_str());
+					ImGui::TooltipGeneric("The real underlying name of the file.");
+
+					if (ImGui::SmallButton("Memory Editor"))
 					{
-						if (ImGui::TreeNode(identifier.c_str()))
-						{
-							ImGui::TextDisabled("Handle: %p", resource.Handle);
-							ImGui::TextDisabled("Pointer: %p", resource.Pointer);
-							ImGui::TextDisabled("Size: %d", resource.Size);
-							ImGui::TextDisabled("Name: %s", resource.UnderlyingName.c_str());
-							ImGui::TooltipGeneric("The real underlying name of the file.");
-
-							if (ImGui::SmallButton("Memory Editor"))
-							{
-								memEditor.Open = true;
-								memPtr = resource.Pointer;
-								memSz = resource.Size;
-							}
-
-							ImGui::TreePop();
-						}
+						memEditor.Open = true;
+						memPtr = resource.Pointer;
+						memSz = resource.Size;
 					}
-				}
-				DataLink::Mutex.unlock();
 
-				ImGui::EndChild();
+					ImGui::TreePop();
+				}
 			}
+
+			ImGui::EndChild();
 
 			ImGui::EndTabItem();
 		}

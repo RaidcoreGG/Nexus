@@ -595,8 +595,8 @@ namespace GUI
 
 	void Setup()
 	{
-		MumbleLink = (Mumble::Data*)DataLink::GetResource(DL_MUMBLE_LINK);
-		NexusLink = (NexusLinkData*)DataLink::GetResource(DL_NEXUS_LINK);
+		MumbleLink = (Mumble::Data*)DataLinkService->GetResource(DL_MUMBLE_LINK);
+		NexusLink = (NexusLinkData*)DataLinkService->GetResource(DL_NEXUS_LINK);
 
 		Language->SetLocaleDirectory(Path::D_GW2_ADDONS_RAIDCORE_LOCALES);
 		UnpackLocale(Path::F_LOCALE_EN, RES_LOCALE_EN);
