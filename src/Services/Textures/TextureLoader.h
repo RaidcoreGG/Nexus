@@ -157,6 +157,18 @@ public:
 	///----------------------------------------------------------------------------------------------------
 	void Load(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback);
 
+	///----------------------------------------------------------------------------------------------------
+	/// GetRegistry:
+	/// 	Returns a copy of the registry.
+	///----------------------------------------------------------------------------------------------------
+	std::map<std::string, Texture*> GetRegistry();
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetQueuedTextures:
+	/// 	Returns a copy of all currently queued textures.
+	///----------------------------------------------------------------------------------------------------
+	std::vector<QueuedTexture> GetQueuedTextures();
+
 private:
 	std::mutex						Mutex;
 	std::map<std::string, Texture*>	Registry;

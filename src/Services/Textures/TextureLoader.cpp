@@ -333,6 +333,20 @@ void CTextureLoader::Load(const char* aIdentifier, void* aData, size_t aSize, TE
 	this->QueueTexture(str.c_str(), image_data, image_width, image_height, aCallback);
 }
 
+std::map<std::string, Texture*> CTextureLoader::GetRegistry()
+{
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	return this->Registry;
+}
+
+std::vector<QueuedTexture> CTextureLoader::GetQueuedTextures()
+{
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	return this->QueuedTextures;
+}
+
 bool CTextureLoader::OverrideTexture(const char* aIdentifier, TEXTURES_RECEIVECALLBACK aCallback)
 {
 	std::string file = aIdentifier;

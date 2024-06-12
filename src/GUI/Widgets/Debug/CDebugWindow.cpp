@@ -30,7 +30,7 @@ namespace GUI
 	void DbgEventsTab();
 	void DbgKeybindsTab();
 	void DbgDataLinkTab();
-	//void DbgTexturesTab();
+	void DbgTexturesTab();
 	void DbgShortcutsTab();
 	void DbgLoaderTab();
 	void DbgAPITab();
@@ -97,7 +97,7 @@ namespace GUI
 				DbgEventsTab();
 				DbgKeybindsTab();
 				DbgDataLinkTab();
-				//DbgTexturesTab();
+				DbgTexturesTab();
 				DbgShortcutsTab();
 				DbgLoaderTab();
 				DbgAPITab();
@@ -229,77 +229,82 @@ namespace GUI
 			ImGui::EndTabItem();
 		}
 	}
-	/*void DbgTexturesTab()
+	void DbgTexturesTab()
 	{
 		if (ImGui::BeginTabItem("Textures"))
 		{
+			ImGui::BeginChild("##TexturesTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+
+			std::map<std::string, Texture*>	TexRegistry = TextureService->GetRegistry();
+			std::vector<QueuedTexture>		TexQueued = TextureService->GetQueuedTextures();
+
+			float previewSize = ImGui::GetTextLineHeightWithSpacing() * 3;
+
+			ImGui::Text("Loaded Textures:");
+			for (auto& [identifier, texture] : TexRegistry)
 			{
-				ImGui::BeginChild("##TexturesTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+				ImGui::Image(texture->Resource, ImVec2(previewSize, previewSize));
 
-				TextureLoader::Mutex.lock();
+				if (ImGui::IsItemHovered())
 				{
-					ImGui::Text("Loaded Textures:");
-					for (auto& [identifier, texture] : TextureLoader::Registry)
+					if (ImGui::Tooltip())
 					{
-						if (ImGui::TreeNode(identifier.c_str()))
+						if (texture->Resource)
 						{
-							ImGui::TextDisabled("Dimensions: %dx%d", texture->Width, texture->Height);
-							ImGui::TextDisabled("Pointer: %p", texture->Resource);
-
-							ImGui::TreePop();
-						}
-						if (ImGui::IsItemHovered())
-						{
-							if (ImGui::Tooltip())
+							float scale = 1.0f;
+							if (texture->Width > 400.0f || texture->Height > 400.0f)
 							{
-								if (texture->Resource)
-								{
-									float scale = 1.0f;
-									if (texture->Width > 400.0f || texture->Height > 400.0f)
-									{
-										scale = (texture->Width > texture->Height ? texture->Width : texture->Height) / 400.0f;
-									}
-									float previewWidth = texture->Width / scale;
-									float previewHeight = texture->Height / scale;
-
-									ImGui::Image(texture->Resource, ImVec2(previewWidth, previewHeight));
-								}
-
-								ImGui::EndTooltip();
+								scale = (texture->Width > texture->Height ? texture->Width : texture->Height) / 400.0f;
 							}
+							float previewWidth = texture->Width / scale;
+							float previewHeight = texture->Height / scale;
 
+							ImGui::Image(texture->Resource, ImVec2(previewWidth, previewHeight));
 						}
-					}
-					if (TextureLoader::Registry.size() == 0)
-					{
-						ImGui::TextDisabled("No textures loaded.");
-					}
-					ImGui::Separator();
-					ImGui::Text("Queued Textures:");
-					for (auto& qtexture : TextureLoader::QueuedTextures)
-					{
-						if (ImGui::TreeNode(qtexture.Identifier.c_str()))
-						{
-							ImGui::TextDisabled("Dimensions: %dx%d", qtexture.Width, qtexture.Height);
-							ImGui::TextDisabled("ReceiveCallback: %p", qtexture.Callback);
-							ImGui::TextDisabled("Data: ", qtexture.Data);
 
-							ImGui::TreePop();
-						}
-					}
-					if (TextureLoader::QueuedTextures.size() == 0)
-					{
-						ImGui::TextDisabled("No textures queued for loading.");
+						ImGui::EndTooltip();
 					}
 				}
-				TextureLoader::Mutex.unlock();
 
+				ImGui::SameLine();
+
+				ImGui::BeginChild((identifier + "##TextureDetails").c_str(), ImVec2(ImGui::GetWindowContentRegionWidth() - previewSize - 8.0f, previewSize));
+				ImGui::Text("Identifier: %s", identifier.c_str());
+				ImGui::TextDisabled("Dimensions: %dx%d", texture->Width, texture->Height);
+				ImGui::TextDisabled("Pointer: %p", texture->Resource);
 				ImGui::EndChild();
 			}
 
+			if (TexRegistry.size() == 0)
+			{
+				ImGui::TextDisabled("No textures loaded.");
+			}
+			ImGui::Separator();
+			ImGui::Text("Queued Textures:");
+			for (auto& qtexture : TexQueued)
+			{
+				if (ImGui::TreeNode(qtexture.Identifier.c_str()))
+				{
+					ImGui::TextDisabled("Dimensions: %dx%d", qtexture.Width, qtexture.Height);
+					ImGui::TextDisabled("ReceiveCallback: %p", qtexture.Callback);
+					ImGui::TextDisabled("Data: ", qtexture.Data);
+
+					ImGui::TreePop();
+				}
+			}
+			if (TexQueued.size() == 0)
+			{
+				ImGui::TextDisabled("No textures queued for loading.");
+			}
+
+			TexRegistry.clear();
+			TexQueued.clear();
+
+			ImGui::EndChild();
+
 			ImGui::EndTabItem();
 		}
-	}*/
+	}
 	void DbgShortcutsTab()
 	{
 		if (ImGui::BeginTabItem("Shortcuts"))
