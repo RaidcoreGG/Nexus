@@ -50,11 +50,11 @@ namespace GUI
 	/* FIXME: this needs to be dependency injected. Fix before 2024/06/30. */
 	CFontManager& FontManager = CFontManager::GetInstance();
 
-	CAddonsWindow*	AddonsWindow	= new CAddonsWindow("Addons");
-	COptionsWindow*	OptionsWindow	= new COptionsWindow("Options");
-	CLogWindow*		LogWindow		= new CLogWindow("Log", ELogLevel::ALL);
-	CDebugWindow*	DebugWindow		= new CDebugWindow("Debug");
-	CAboutBox*		AboutWindow		= new CAboutBox("About");
+	CAddonsWindow*	AddonsWindow	= nullptr;
+	COptionsWindow*	OptionsWindow	= nullptr;
+	CLogWindow*		LogWindow		= nullptr;
+	CDebugWindow*	DebugWindow		= nullptr;
+	CAboutBox*		AboutWindow		= nullptr;
 	CEULAModal*		EULAWindow		= nullptr;
 
 	/* internal forward declarations */
@@ -857,6 +857,12 @@ namespace GUI
 		Events::Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", OnLanguageChanged);
 		Events::Subscribe(EV_VOLATILE_ADDON_DISABLED, OnAddonDUU);
 		OnMumbleIdentityChanged(nullptr);
+
+		AddonsWindow	= new CAddonsWindow("Addons");
+		OptionsWindow	= new COptionsWindow("Options");
+		LogWindow		= new CLogWindow("Log", ELogLevel::ALL);
+		DebugWindow		= new CDebugWindow("Debug");
+		AboutWindow		= new CAboutBox("About");
 
 		Logger->RegisterLogger(GUI::LogWindow);
 
