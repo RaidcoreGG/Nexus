@@ -2,11 +2,11 @@
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
 /// Name         :  WndProcHandler.cpp
-/// Description  :  Proxy for WndProc callbacks/hooks.
+/// Description  :  API for WndProc callbacks/hooks.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "WndProcHandler.h"
+#include "RawInputApi.h"
 
 #include "Hooks.h"
 #include "Shared.h"

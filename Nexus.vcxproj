@@ -74,7 +74,7 @@
     <ClCompile Include="src\Util\MD5.cpp" />
     <ClCompile Include="src\Util\Strings.cpp" />
     <ClCompile Include="src\Util\Url.cpp" />
-    <ClCompile Include="src\Inputs\WndProc\WndProcHandler.cpp" />
+    <ClCompile Include="src\Inputs\RawInput\RawInputApi.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Services\API\ApiClient.h" />
@@ -322,8 +322,8 @@
     <ClInclude Include="src\Util\Strings.h" />
     <ClInclude Include="src\Util\Url.h" />
     <ClInclude Include="src\Version.h" />
-    <ClInclude Include="src\Inputs\WndProc\FuncDefs.h" />
-    <ClInclude Include="src\Inputs\WndProc\WndProcHandler.h" />
+    <ClInclude Include="src\Inputs\RawInput\FuncDefs.h" />
+    <ClInclude Include="src\Inputs\RawInput\RawInputApi.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\Nexus.rc" />

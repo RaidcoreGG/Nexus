@@ -26,7 +26,7 @@
 
 #include "Services/Logging/LogHandler.h"
 #include "Events/EventHandler.h"
-#include "Inputs/WndProc/WndProcHandler.h"
+#include "Inputs/RawInput/RawInputApi.h"
 #include "Inputs/Keybinds/KeybindHandler.h"
 #include "imgui/imgui.h"
 #include "minhook/mh_hook.h"

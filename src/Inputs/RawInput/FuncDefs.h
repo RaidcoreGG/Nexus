@@ -1,5 +1,5 @@
-#ifndef WNDPROC_FUNCDEFS_H
-#define WNDPROC_FUNCDEFS_H
+#ifndef RAWINPUT_FUNCDEFS_H
+#define RAWINPUT_FUNCDEFS_H
 
 #include <Windows.h>
 

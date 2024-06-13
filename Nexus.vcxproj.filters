@@ -118,9 +118,6 @@
     <Filter Include="Inputs">
       <UniqueIdentifier>{68734b2f-4069-4723-961d-83db00b90810}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Inputs\WndProc">
-      <UniqueIdentifier>{9bfe2e48-8bc4-40bd-a652-2237dd01af65}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Inputs\Keybinds">
       <UniqueIdentifier>{f0552fcd-0842-4914-bd35-54f18d11b0cd}</UniqueIdentifier>
     </Filter>
@@ -153,6 +150,9 @@
     </Filter>
     <Filter Include="Services\API">
       <UniqueIdentifier>{e65ccd89-40e0-4106-92d5-9e47ea8f3189}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Inputs\RawInput">
+      <UniqueIdentifier>{9bfe2e48-8bc4-40bd-a652-2237dd01af65}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -285,8 +285,8 @@
     <ClCompile Include="src\Services\API\ActiveToken.cpp">
       <Filter>Services\API</Filter>
     </ClCompile>
-    <ClCompile Include="src\Inputs\WndProc\WndProcHandler.cpp">
-      <Filter>Inputs\WndProc</Filter>
+    <ClCompile Include="src\Inputs\RawInput\RawInputApi.cpp">
+      <Filter>Inputs\RawInput</Filter>
     </ClCompile>
     <ClCompile Include="src\CrashHandler.cpp">
       <Filter>Source Files</Filter>
@@ -539,11 +539,11 @@
     <ClInclude Include="src\GUI\FuncDefs.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="src\Inputs\WndProc\WndProcHandler.h">
-      <Filter>Inputs\WndProc</Filter>
+    <ClInclude Include="src\Inputs\RawInput\RawInputApi.h">
+      <Filter>Inputs\RawInput</Filter>
     </ClInclude>
-    <ClInclude Include="src\Inputs\WndProc\FuncDefs.h">
-      <Filter>Inputs\WndProc</Filter>
+    <ClInclude Include="src\Inputs\RawInput\FuncDefs.h">
+      <Filter>Inputs\RawInput</Filter>
     </ClInclude>
     <ClInclude Include="src\thirdparty\openssl\aes.h">
       <Filter>_EXTERNAL\openssl</Filter>

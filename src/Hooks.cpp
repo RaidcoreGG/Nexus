@@ -14,7 +14,7 @@
 #include "Loader/Loader.h"
 #include "Loader/NexusLinkData.h"
 #include "Services/Textures/TextureLoader.h"
-#include "Inputs/WndProc/WndProcHandler.h"
+#include "Inputs/RawInput/RawInputApi.h"
 
 namespace Hooks
 {

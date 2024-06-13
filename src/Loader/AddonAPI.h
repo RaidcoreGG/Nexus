@@ -5,7 +5,7 @@
 #include "Paths/FuncDefs.h"
 #include "Services/Logging/FuncDefs.h"
 #include "Events/FuncDefs.h"
-#include "Inputs/WndProc/FuncDefs.h"
+#include "Inputs/RawInput/FuncDefs.h"
 #include "Inputs/Keybinds/FuncDefs.h"
 #include "imgui/imgui.h"
 #include "minhook/mh_hook.h"

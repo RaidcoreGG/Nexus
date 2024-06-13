@@ -1,13 +1,13 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  WndProcHandler.h
-/// Description  :  Proxy for WndProc callbacks/hooks.
+/// Name         :  RawInputApi.h
+/// Description  :  API for WndProc callbacks/hooks.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef WNDPROCHANDLER_H
-#define WNDPROCHANDLER_H
+#ifndef RAWINPUTAPI_H
+#define RAWINPUTAPI_H
 
 #include <vector>
 #include <mutex>
