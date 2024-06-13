@@ -11,8 +11,8 @@
 #include "Renderer.h"
 
 #include "Inputs/Keybinds/KeybindHandler.h"
-#include "API/APIController.h"
-#include "Settings/Settings.h"
+#include "Services/API/APIController.h"
+#include "Services/Settings/Settings.h"
 #include "Loader/Loader.h"
 #include "Services/Localization/Localization.h"
 
@@ -20,8 +20,8 @@
 #include "GUI/IWindow.h"
 #include "GUI/Widgets/QuickAccess/QuickAccess.h"
 
-#include "imgui.h"
-#include "imgui_extensions.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_extensions.h"
 
 namespace GUI
 {

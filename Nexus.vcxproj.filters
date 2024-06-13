@@ -61,12 +61,6 @@
     <Filter Include="GUI\Widgets\Options">
       <UniqueIdentifier>{b211fbda-c7b4-4d75-b2c9-6801eab1bc0a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Settings">
-      <UniqueIdentifier>{6eacccbc-bce6-44c6-b183-963cda72c287}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="API">
-      <UniqueIdentifier>{e65ccd89-40e0-4106-92d5-9e47ea8f3189}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Paths">
       <UniqueIdentifier>{b0fd71ca-41a2-4a72-a523-b30138c9dcef}</UniqueIdentifier>
     </Filter>
@@ -154,39 +148,48 @@
     <Filter Include="Services\Logging">
       <UniqueIdentifier>{72f71e79-5933-4318-b293-5087228d8bf4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{c4b0dcc9-d38c-441c-8bf2-b0606c7ec796}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Services\Settings">
+      <UniqueIdentifier>{6eacccbc-bce6-44c6-b183-963cda72c287}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Services\API">
+      <UniqueIdentifier>{e65ccd89-40e0-4106-92d5-9e47ea8f3189}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\imgui\imgui_widgets.cpp">
+    <ClCompile Include="src\thirdparty\imgui\imgui_widgets.cpp">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="src\imgui\imgui_tables.cpp">
+    <ClCompile Include="src\thirdparty\imgui\imgui_tables.cpp">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="src\imgui\imgui_draw.cpp">
+    <ClCompile Include="src\thirdparty\imgui\imgui_draw.cpp">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="src\imgui\imgui.cpp">
+    <ClCompile Include="src\thirdparty\imgui\imgui.cpp">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="src\imgui\imgui_impl_win32.cpp">
+    <ClCompile Include="src\thirdparty\imgui\imgui_impl_win32.cpp">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="src\imgui\imgui_impl_dx11.cpp">
+    <ClCompile Include="src\thirdparty\imgui\imgui_impl_dx11.cpp">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="src\minhook\mh_buffer.cpp">
+    <ClCompile Include="src\thirdparty\minhook\mh_buffer.cpp">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClCompile>
-    <ClCompile Include="src\minhook\mh_disasm.cpp">
+    <ClCompile Include="src\thirdparty\minhook\mh_disasm.cpp">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClCompile>
-    <ClCompile Include="src\minhook\mh_hook.cpp">
+    <ClCompile Include="src\thirdparty\minhook\mh_hook.cpp">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClCompile>
-    <ClCompile Include="src\minhook\mh_trampoline.cpp">
+    <ClCompile Include="src\thirdparty\minhook\mh_trampoline.cpp">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClCompile>
     <ClCompile Include="src\Services\Logging\CFileLogger.cpp">
@@ -276,14 +279,14 @@
     <ClCompile Include="src\GUI\Widgets\Menu\Menu.cpp">
       <Filter>GUI\Widgets\Menu</Filter>
     </ClCompile>
-    <ClCompile Include="src\Settings\Settings.cpp">
-      <Filter>Settings</Filter>
+    <ClCompile Include="src\Services\Settings\Settings.cpp">
+      <Filter>Services\Settings</Filter>
     </ClCompile>
-    <ClCompile Include="src\API\APIController.cpp">
-      <Filter>API</Filter>
+    <ClCompile Include="src\Services\API\APIController.cpp">
+      <Filter>Services\API</Filter>
     </ClCompile>
-    <ClCompile Include="src\API\ActiveToken.cpp">
-      <Filter>API</Filter>
+    <ClCompile Include="src\Services\API\ActiveToken.cpp">
+      <Filter>Services\API</Filter>
     </ClCompile>
     <ClCompile Include="src\Inputs\WndProc\WndProcHandler.cpp">
       <Filter>Inputs\WndProc</Filter>
@@ -300,8 +303,8 @@
     <ClCompile Include="src\Proxy.cpp">
       <Filter>_GLOBAL</Filter>
     </ClCompile>
-    <ClCompile Include="src\API\ApiClient.cpp">
-      <Filter>API</Filter>
+    <ClCompile Include="src\Services\API\ApiClient.cpp">
+      <Filter>Services\API</Filter>
     </ClCompile>
     <ClCompile Include="src\Loader\EAddonFlags.cpp">
       <Filter>Loader\Enums</Filter>
@@ -350,40 +353,40 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\imgui\imstb_truetype.h">
+    <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="src\imgui\imstb_textedit.h">
+    <ClInclude Include="src\thirdparty\imgui\imstb_textedit.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="src\imgui\imstb_rectpack.h">
+    <ClInclude Include="src\thirdparty\imgui\imstb_rectpack.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="src\imgui\imgui_internal.h">
+    <ClInclude Include="src\thirdparty\imgui\imgui_internal.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="src\imgui\imgui.h">
+    <ClInclude Include="src\thirdparty\imgui\imgui.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="src\imgui\imconfig.h">
+    <ClInclude Include="src\thirdparty\imgui\imconfig.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="src\imgui\imgui_impl_win32.h">
+    <ClInclude Include="src\thirdparty\imgui\imgui_impl_win32.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="src\imgui\imgui_impl_dx11.h">
+    <ClInclude Include="src\thirdparty\imgui\imgui_impl_dx11.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="src\minhook\mh_hook.h">
+    <ClInclude Include="src\thirdparty\minhook\mh_hook.h">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClInclude>
-    <ClInclude Include="src\minhook\mh_trampoline.h">
+    <ClInclude Include="src\thirdparty\minhook\mh_trampoline.h">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClInclude>
-    <ClInclude Include="src\minhook\mh_disasm.h">
+    <ClInclude Include="src\thirdparty\minhook\mh_disasm.h">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClInclude>
-    <ClInclude Include="src\minhook\mh_buffer.h">
+    <ClInclude Include="src\thirdparty\minhook\mh_buffer.h">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\Logging\CFileLogger.h">
@@ -440,7 +443,7 @@
     <ClInclude Include="src\GUI\GUI.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="src\imgui\imgui_extensions.h">
+    <ClInclude Include="src\thirdparty\imgui\imgui_extensions.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
     <ClInclude Include="src\GUI\IWindow.h">
@@ -521,19 +524,19 @@
     <ClInclude Include="src\GUI\Widgets\Menu\Menu.h">
       <Filter>GUI\Widgets\Menu</Filter>
     </ClInclude>
-    <ClInclude Include="src\Settings\Settings.h">
-      <Filter>Settings</Filter>
+    <ClInclude Include="src\Services\Settings\Settings.h">
+      <Filter>Services\Settings</Filter>
     </ClInclude>
-    <ClInclude Include="src\API\APIController.h">
-      <Filter>API</Filter>
+    <ClInclude Include="src\Services\API\APIController.h">
+      <Filter>Services\API</Filter>
     </ClInclude>
     <ClInclude Include="src\GUI\Widgets\QuickAccess\EQAPosition.h">
       <Filter>GUI\Widgets\QuickAccess</Filter>
     </ClInclude>
-    <ClInclude Include="src\API\ActiveToken.h">
-      <Filter>API</Filter>
+    <ClInclude Include="src\Services\API\ActiveToken.h">
+      <Filter>Services\API</Filter>
     </ClInclude>
-    <ClInclude Include="src\imgui\imgui_memory_editor.h">
+    <ClInclude Include="src\thirdparty\imgui\imgui_memory_editor.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
     <ClInclude Include="src\GUI\FuncDefs.h">
@@ -980,13 +983,13 @@
     <ClInclude Include="src\resource.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\stb\stb_image.h">
+    <ClInclude Include="src\thirdparty\stb\stb_image.h">
       <Filter>_EXTERNAL</Filter>
     </ClInclude>
-    <ClInclude Include="src\nlohmann\json.hpp">
+    <ClInclude Include="src\thirdparty\nlohmann\json.hpp">
       <Filter>_EXTERNAL</Filter>
     </ClInclude>
-    <ClInclude Include="src\httplib\httplib.h">
+    <ClInclude Include="src\thirdparty\httplib\httplib.h">
       <Filter>_EXTERNAL</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\Multibox\Multibox.h">
@@ -998,17 +1001,17 @@
     <ClInclude Include="src\Main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\API\APIRequest.h">
-      <Filter>API</Filter>
+    <ClInclude Include="src\Services\API\APIRequest.h">
+      <Filter>Services\API</Filter>
     </ClInclude>
-    <ClInclude Include="src\API\ApiClient.h">
-      <Filter>API</Filter>
+    <ClInclude Include="src\Services\API\ApiClient.h">
+      <Filter>Services\API</Filter>
     </ClInclude>
-    <ClInclude Include="src\API\CachedResponse.h">
-      <Filter>API</Filter>
+    <ClInclude Include="src\Services\API\CachedResponse.h">
+      <Filter>Services\API</Filter>
     </ClInclude>
-    <ClInclude Include="src\API\APIResponse.h">
-      <Filter>API</Filter>
+    <ClInclude Include="src\Services\API\APIResponse.h">
+      <Filter>Services\API</Filter>
     </ClInclude>
     <ClInclude Include="src\Loader\Addon.h">
       <Filter>Loader\Structs</Filter>

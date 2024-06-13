@@ -10,8 +10,8 @@
 #include "Shortcut.h"
 #include "EQAPosition.h"
 
-#include "imgui.h"
-#include "imgui_extensions.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_extensions.h"
 
 namespace GUI
 {

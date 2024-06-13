@@ -22,8 +22,8 @@
 #include "Services/Logging/CConsoleLogger.h"
 #include "Services/Logging/CFileLogger.h"
 #include "Services/Mumble/Reader.h"
-#include "Settings/Settings.h"
-#include "API/ApiClient.h"
+#include "Services/Settings/Settings.h"
+#include "Services/API/ApiClient.h"
 #include "Services/Updater/Updater.h"
 #include "Services/Multibox/Multibox.h"
 

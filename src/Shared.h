@@ -7,14 +7,14 @@
 
 #include "Loader/AddonDefinition.h"
 #include "Services/Logging/LogHandler.h"
-#include "API/ApiClient.h"
+#include "Services/API/ApiClient.h"
 #include "Services/Localization/Localization.h"
 #include "Services/Updater/Updater.h"
 #include "Services/Textures/TextureLoader.h"
 #include "Services/DataLink/DataLink.h"
 #include "Events/EventHandler.h"
 
-#include "imgui.h"
+#include "imgui/imgui.h"
 
 extern DWORD						NexusModuleSize;
 extern HMODULE						NexusHandle;

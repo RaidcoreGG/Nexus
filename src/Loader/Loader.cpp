@@ -35,7 +35,7 @@
 #include "GUI/GUI.h"
 #include "GUI/Widgets/QuickAccess/QuickAccess.h"
 #include "GUI/Widgets/Alerts/Alerts.h"
-#include "Settings/Settings.h"
+#include "Services/Settings/Settings.h"
 #include "Services/Localization/Localization.h"
 #include "Services/Updater/Updater.h"
 #include "GUI/Fonts/FontManager.h"

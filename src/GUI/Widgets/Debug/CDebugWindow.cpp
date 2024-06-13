@@ -10,9 +10,9 @@
 #include "GUI/Widgets/QuickAccess/QuickAccess.h"
 #include "Loader/Loader.h"
 
-#include "imgui.h"
-#include "imgui_extensions.h"
-#include "imgui_memory_editor.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_extensions.h"
+#include "imgui/imgui_memory_editor.h"
 
 namespace GUI
 {

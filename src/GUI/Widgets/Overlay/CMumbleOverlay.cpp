@@ -11,8 +11,8 @@
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
-#include "imgui.h"
-#include "imgui_extensions.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_extensions.h"
 
 namespace GUI
 {
