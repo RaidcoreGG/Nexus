@@ -13,6 +13,7 @@
 #include "Services/Textures/TextureLoader.h"
 #include "Services/DataLink/DataLink.h"
 #include "Events/EventHandler.h"
+#include "Inputs/WndProc/WndProcHandler.h"
 
 #include "imgui/imgui.h"
 
@@ -33,6 +34,7 @@ extern CUpdater*					UpdateService;
 extern CTextureLoader*				TextureService;
 extern CDataLink*					DataLinkService;
 extern CEventApi*					EventApi;
+extern CRawInputApi*				RawInputApi;
 
 extern ImFont*						MonospaceFont;	/* default/monospace/console font */
 extern ImFont*						UserFont;		/* custom user font */

@@ -878,7 +878,7 @@ namespace Loader
 			leftoverRefs += GUI::Verify(startAddress, endAddress);
 			leftoverRefs += GUI::QuickAccess::Verify(startAddress, endAddress);
 			leftoverRefs += Keybinds::Verify(startAddress, endAddress);
-			leftoverRefs += WndProc::Verify(startAddress, endAddress);
+			leftoverRefs += RawInputApi->Verify(startAddress, endAddress);
 
 			if (leftoverRefs > 0)
 			{
@@ -1144,8 +1144,8 @@ namespace Loader
 			((AddonAPI1*)api)->SubscribeEvent = Events::ADDONAPI_Subscribe;
 			((AddonAPI1*)api)->UnsubscribeEvent = Events::ADDONAPI_Unsubscribe;
 
-			((AddonAPI1*)api)->RegisterWndProc = WndProc::Register;
-			((AddonAPI1*)api)->DeregisterWndProc = WndProc::Deregister;
+			((AddonAPI1*)api)->RegisterWndProc = RawInput::ADDONAPI_Register;
+			((AddonAPI1*)api)->DeregisterWndProc = RawInput::ADDONAPI_Deregister;
 
 			((AddonAPI1*)api)->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString;
 			((AddonAPI1*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct;
@@ -1193,9 +1193,9 @@ namespace Loader
 			((AddonAPI2*)api)->SubscribeEvent = Events::ADDONAPI_Subscribe;
 			((AddonAPI2*)api)->UnsubscribeEvent = Events::ADDONAPI_Unsubscribe;
 
-			((AddonAPI2*)api)->RegisterWndProc = WndProc::Register;
-			((AddonAPI2*)api)->DeregisterWndProc = WndProc::Deregister;
-			((AddonAPI2*)api)->SendWndProcToGameOnly = WndProc::SendWndProcToGame;
+			((AddonAPI2*)api)->RegisterWndProc = RawInput::ADDONAPI_Register;
+			((AddonAPI2*)api)->DeregisterWndProc = RawInput::ADDONAPI_Deregister;
+			((AddonAPI2*)api)->SendWndProcToGameOnly = RawInput::ADDONAPI_SendWndProcToGame;
 
 			((AddonAPI2*)api)->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString;
 			((AddonAPI2*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct;
@@ -1256,9 +1256,9 @@ namespace Loader
 			((AddonAPI3*)api)->SubscribeEvent = Events::ADDONAPI_Subscribe;
 			((AddonAPI3*)api)->UnsubscribeEvent = Events::ADDONAPI_Unsubscribe;
 
-			((AddonAPI3*)api)->RegisterWndProc = WndProc::Register;
-			((AddonAPI3*)api)->DeregisterWndProc = WndProc::Deregister;
-			((AddonAPI3*)api)->SendWndProcToGameOnly = WndProc::SendWndProcToGame;
+			((AddonAPI3*)api)->RegisterWndProc = RawInput::ADDONAPI_Register;
+			((AddonAPI3*)api)->DeregisterWndProc = RawInput::ADDONAPI_Deregister;
+			((AddonAPI3*)api)->SendWndProcToGameOnly = RawInput::ADDONAPI_SendWndProcToGame;
 
 			((AddonAPI3*)api)->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString;
 			((AddonAPI3*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct;
@@ -1321,9 +1321,9 @@ namespace Loader
 			((AddonAPI4*)api)->SubscribeEvent = Events::ADDONAPI_Subscribe;
 			((AddonAPI4*)api)->UnsubscribeEvent = Events::ADDONAPI_Unsubscribe;
 
-			((AddonAPI4*)api)->RegisterWndProc = WndProc::Register;
-			((AddonAPI4*)api)->DeregisterWndProc = WndProc::Deregister;
-			((AddonAPI4*)api)->SendWndProcToGameOnly = WndProc::SendWndProcToGame;
+			((AddonAPI4*)api)->RegisterWndProc = RawInput::ADDONAPI_Register;
+			((AddonAPI4*)api)->DeregisterWndProc = RawInput::ADDONAPI_Deregister;
+			((AddonAPI4*)api)->SendWndProcToGameOnly = RawInput::ADDONAPI_SendWndProcToGame;
 
 			((AddonAPI4*)api)->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString2;
 			((AddonAPI4*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct2;
@@ -1391,9 +1391,9 @@ namespace Loader
 			((AddonAPI5*)api)->SubscribeEvent = Events::ADDONAPI_Subscribe;
 			((AddonAPI5*)api)->UnsubscribeEvent = Events::ADDONAPI_Unsubscribe;
 
-			((AddonAPI5*)api)->RegisterWndProc = WndProc::Register;
-			((AddonAPI5*)api)->DeregisterWndProc = WndProc::Deregister;
-			((AddonAPI5*)api)->SendWndProcToGameOnly = WndProc::SendWndProcToGame;
+			((AddonAPI5*)api)->RegisterWndProc = RawInput::ADDONAPI_Register;
+			((AddonAPI5*)api)->DeregisterWndProc = RawInput::ADDONAPI_Deregister;
+			((AddonAPI5*)api)->SendWndProcToGameOnly = RawInput::ADDONAPI_SendWndProcToGame;
 
 			((AddonAPI5*)api)->InvokeKeybind = Keybinds::ADDONAPI_InvokeKeybind;
 			((AddonAPI5*)api)->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString2;

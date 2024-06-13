@@ -148,9 +148,6 @@
     <Filter Include="Services\Logging">
       <UniqueIdentifier>{72f71e79-5933-4318-b293-5087228d8bf4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine">
-      <UniqueIdentifier>{c4b0dcc9-d38c-441c-8bf2-b0606c7ec796}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Services\Settings">
       <UniqueIdentifier>{6eacccbc-bce6-44c6-b183-963cda72c287}</UniqueIdentifier>
     </Filter>

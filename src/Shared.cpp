@@ -18,6 +18,7 @@ CUpdater*					UpdateService		= new CUpdater();
 CTextureLoader*				TextureService		= new CTextureLoader();
 CDataLink*					DataLinkService		= new CDataLink();
 CEventApi*					EventApi			= new CEventApi();
+CRawInputApi*				RawInputApi			= new CRawInputApi();
 
 ImFont*						MonospaceFont		= nullptr;
 ImFont*						UserFont			= nullptr;

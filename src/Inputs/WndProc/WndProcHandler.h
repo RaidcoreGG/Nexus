@@ -15,12 +15,43 @@
 #include "FuncDefs.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// WndProc Namespace
+/// RawInput Namespace
 ///----------------------------------------------------------------------------------------------------
-namespace WndProc
+namespace RawInput
 {
-	extern std::mutex						Mutex;
-	extern std::vector<WNDPROC_CALLBACK>	Registry;
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_SendWndProcToGame:
+	/// 	Skips all WndProc callbacks and sends it directly to the original.
+	///----------------------------------------------------------------------------------------------------
+	LRESULT ADDONAPI_SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_Register:
+	/// 	Registers the provided WndProcCallback.
+	///----------------------------------------------------------------------------------------------------
+	void ADDONAPI_Register(WNDPROC_CALLBACK aWndProcCallback);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_Deregister:
+	/// 	Deregisters the provided WndProcCallback.
+	///----------------------------------------------------------------------------------------------------
+	void ADDONAPI_Deregister(WNDPROC_CALLBACK aWndProcCallback);
+}
+
+///----------------------------------------------------------------------------------------------------
+/// CRawInputApi Class
+///----------------------------------------------------------------------------------------------------
+class CRawInputApi
+{
+public:
+	///----------------------------------------------------------------------------------------------------
+	/// ctor
+	///----------------------------------------------------------------------------------------------------
+	CRawInputApi() = default;
+	///----------------------------------------------------------------------------------------------------
+	/// dtor
+	///----------------------------------------------------------------------------------------------------
+	~CRawInputApi() = default;
 
 	///----------------------------------------------------------------------------------------------------
 	/// WndProc:
@@ -30,7 +61,7 @@ namespace WndProc
 
 	///----------------------------------------------------------------------------------------------------
 	/// SendWndProcToGame:
-	/// 	Skips all WndProc callbacks and sends to game only.
+	/// 	Skips all WndProc callbacks and sends it directly to the original.
 	///----------------------------------------------------------------------------------------------------
 	LRESULT SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -51,6 +82,10 @@ namespace WndProc
 	/// 	Removes all WndProc Callbacks that are within the provided address space.
 	///----------------------------------------------------------------------------------------------------
 	int Verify(void* aStartAddress, void* aEndAddress);
-}
+
+private:
+	mutable std::mutex				Mutex;
+	std::vector<WNDPROC_CALLBACK>	Registry;
+};
 
 #endif

@@ -9,60 +9,74 @@
 #include "WndProcHandler.h"
 
 #include "Hooks.h"
+#include "Shared.h"
 
-namespace WndProc
+namespace RawInput
 {
-	std::mutex						Mutex;
-	std::vector<WNDPROC_CALLBACK>	Registry;
-
-	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	LRESULT ADDONAPI_SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		// don't pass to game if addon wndproc
-		const std::lock_guard<std::mutex> lock(Mutex);
-		for (WNDPROC_CALLBACK wndprocCb : Registry)
+		return RawInputApi->SendWndProcToGame(hWnd, uMsg, wParam, lParam);
+	}
+
+	void ADDONAPI_Register(WNDPROC_CALLBACK aWndProcCallback)
+	{
+		RawInputApi->Register(aWndProcCallback);
+	}
+
+	void ADDONAPI_Deregister(WNDPROC_CALLBACK aWndProcCallback)
+	{
+		RawInputApi->Deregister(aWndProcCallback);
+	}
+}
+
+UINT CRawInputApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	// don't pass to game if addon wndproc
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	for (WNDPROC_CALLBACK wndprocCb : this->Registry)
+	{
+		if (wndprocCb(hWnd, uMsg, wParam, lParam) == 0)
 		{
-			if (wndprocCb(hWnd, uMsg, wParam, lParam) == 0)
-			{
-				return 0;
-			}
+			return 0;
 		}
-
-		return 1;
 	}
 
-	LRESULT SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	return 1;
+}
+
+LRESULT CRawInputApi::SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	return CallWindowProcA(Hooks::GW2::WndProc, hWnd, uMsg, wParam, lParam);
+}
+
+void CRawInputApi::Register(WNDPROC_CALLBACK aWndProcCallback)
+{
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	this->Registry.push_back(aWndProcCallback);
+}
+
+void CRawInputApi::Deregister(WNDPROC_CALLBACK aWndProcCallback)
+{
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	this->Registry.erase(std::remove(this->Registry.begin(), this->Registry.end(), aWndProcCallback), this->Registry.end());
+}
+
+int CRawInputApi::Verify(void* aStartAddress, void* aEndAddress)
+{
+	int refCounter = 0;
+
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+	for (WNDPROC_CALLBACK wndprocCb : this->Registry)
 	{
-		return CallWindowProcA(Hooks::GW2::WndProc, hWnd, uMsg, wParam, lParam);
-	}
-
-	void Register(WNDPROC_CALLBACK aWndProcCallback)
-	{
-		const std::lock_guard<std::mutex> lock(Mutex);
-
-		Registry.push_back(aWndProcCallback);
-	}
-
-	void Deregister(WNDPROC_CALLBACK aWndProcCallback)
-	{
-		const std::lock_guard<std::mutex> lock(Mutex);
-
-		Registry.erase(std::remove(Registry.begin(), Registry.end(), aWndProcCallback), Registry.end());
-	}
-
-	int Verify(void* aStartAddress, void* aEndAddress)
-	{
-		int refCounter = 0;
-
-		const std::lock_guard<std::mutex> lock(Mutex);
-		for (WNDPROC_CALLBACK wndprocCb : Registry)
+		if (wndprocCb >= aStartAddress && wndprocCb <= aEndAddress)
 		{
-			if (wndprocCb >= aStartAddress && wndprocCb <= aEndAddress)
-			{
-				Registry.erase(std::remove(Registry.begin(), Registry.end(), wndprocCb), Registry.end());
-				refCounter++;
-			}
+			this->Registry.erase(std::remove(this->Registry.begin(), this->Registry.end(), wndprocCb), this->Registry.end());
+			refCounter++;
 		}
-
-		return refCounter;
 	}
+
+	return refCounter;
 }
