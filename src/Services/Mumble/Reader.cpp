@@ -172,7 +172,7 @@ void CMumbleReader::Advance()
 			/* notify (also notifies the GUI to update its scaling factor) */
 			if (*IdentityParsed != this->PreviousIdentity)
 			{
-				Events::Raise("EV_MUMBLE_IDENTITY_UPDATED", IdentityParsed);
+				EventApi->Raise("EV_MUMBLE_IDENTITY_UPDATED", IdentityParsed);
 			}
 		}
 

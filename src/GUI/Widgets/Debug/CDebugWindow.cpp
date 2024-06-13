@@ -96,40 +96,36 @@ namespace GUI
 	{
 		if (ImGui::BeginTabItem("Events"))
 		{
+			ImGui::BeginChild("##EventsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+
+			std::map<std::string, EventData> EventRegistry = EventApi->GetRegistry();
+
+			for (auto& [identifier, ev] : EventRegistry)
 			{
-				ImGui::BeginChild("##EventsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+				std::string header = identifier + " ";
+				header.append("(");
+				header.append(std::to_string(ev.AmountRaises));
+				header.append(")");
 
-				Events::Mutex.lock();
+				if (ImGui::TreeNode(header.c_str()))
 				{
-					for (auto& [identifier, ev] : Events::Registry)
+					if (ev.Subscribers.size() == 0)
 					{
-						std::string header = identifier + " ";
-						header.append("(");
-						header.append(std::to_string(ev.AmountRaises));
-						header.append(")");
-
-						if (ImGui::TreeNode(header.c_str()))
+						ImGui::TextDisabled("This event has no subscribers.");
+					}
+					else
+					{
+						ImGui::TextDisabled("Subscribers:");
+						for (EventSubscriber sub : ev.Subscribers)
 						{
-							if (ev.Subscribers.size() == 0)
-							{
-								ImGui::TextDisabled("This event has no subscribers.");
-							}
-							else
-							{
-								ImGui::TextDisabled("Subscribers:");
-								for (EventSubscriber sub : ev.Subscribers)
-								{
-									ImGui::Text(""); ImGui::SameLine(); ImGui::TextDisabled("Owner: %d | Callback: %p", sub.Signature, sub.Callback);
-								}
-							}
-							ImGui::TreePop();
+							ImGui::Text(""); ImGui::SameLine(); ImGui::TextDisabled("Owner: %d | Callback: %p", sub.Signature, sub.Callback);
 						}
 					}
+					ImGui::TreePop();
 				}
-				Events::Mutex.unlock();
-
-				ImGui::EndChild();
 			}
+
+			ImGui::EndChild();
 
 			ImGui::EndTabItem();
 		}

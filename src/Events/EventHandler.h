@@ -23,6 +23,18 @@
 namespace Events
 {
 	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_Subscribe:
+	/// 	Addon API wrapper function for subscribing to events.
+	///----------------------------------------------------------------------------------------------------
+	void ADDONAPI_Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_Unsubscribe:
+	/// 	Addon API wrapper function for unsubscribing from events.
+	///----------------------------------------------------------------------------------------------------
+	void ADDONAPI_Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
+
+	///----------------------------------------------------------------------------------------------------
 	/// ADDONAPI_RaiseEvent:
 	/// 	Addon API wrapper function for raising events.
 	///----------------------------------------------------------------------------------------------------
@@ -47,6 +59,9 @@ namespace Events
 	void ADDONAPI_RaiseNotificationTargeted(signed int aSignature, const char* aIdentifier);
 }
 
+///----------------------------------------------------------------------------------------------------
+/// EventData data struct
+///----------------------------------------------------------------------------------------------------
 struct EventData
 {
 	std::vector<EventSubscriber>	Subscribers;
@@ -54,12 +69,19 @@ struct EventData
 };
 
 ///----------------------------------------------------------------------------------------------------
-/// Events Namespace
+/// CEventApi Class
 ///----------------------------------------------------------------------------------------------------
-namespace Events
+class CEventApi
 {
-	extern std::mutex						Mutex;
-	extern std::map<std::string, EventData>	Registry;
+public:
+	///----------------------------------------------------------------------------------------------------
+	/// ctor
+	///----------------------------------------------------------------------------------------------------
+	CEventApi() = default;
+	///----------------------------------------------------------------------------------------------------
+	/// dtor
+	///----------------------------------------------------------------------------------------------------
+	~CEventApi() = default;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Raise:
@@ -102,6 +124,16 @@ namespace Events
 	/// 	Removes any elements within the provided address space from the Registry.
 	///----------------------------------------------------------------------------------------------------
 	int Verify(void* aStartAddress, void* aEndAddress);
-}
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetRegistry:
+	/// 	Returns a copy of the registry.
+	///----------------------------------------------------------------------------------------------------
+	std::map<std::string, EventData> GetRegistry() const;
+
+private:
+	mutable std::mutex					Mutex;
+	std::map<std::string, EventData>	Registry;
+};
 
 #endif

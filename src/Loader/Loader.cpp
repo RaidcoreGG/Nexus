@@ -757,7 +757,7 @@ namespace Loader
 		if (addon->IsDisabledUntilUpdate && DisableVolatileUntilUpdate)
 		{
 			// show message that addon was disabled due to game update
-			Events::Raise(EV_VOLATILE_ADDON_DISABLED, &addon->Definitions->Signature);
+			EventApi->Raise(EV_VOLATILE_ADDON_DISABLED, &addon->Definitions->Signature);
 			GUI::Alerts::Notify(String::Format("%s %s", addon->Definitions->Name, Language->Translate("((000073))")).c_str());
 
 			FreeLibrary(addon->Module);
@@ -807,8 +807,8 @@ namespace Loader
 		auto end_time = std::chrono::high_resolution_clock::now();
 		auto time = end_time - start_time;
 
-		Events::Raise(EV_ADDON_LOADED, &addon->Definitions->Signature);
-		Events::Raise(EV_MUMBLE_IDENTITY_UPDATED, Mumble::IdentityParsed);
+		EventApi->Raise(EV_ADDON_LOADED, &addon->Definitions->Signature);
+		EventApi->Raise(EV_MUMBLE_IDENTITY_UPDATED, Mumble::IdentityParsed);
 
 		addon->State = locked ? EAddonState::LoadedLOCKED : EAddonState::Loaded;
 		SaveAddonConfig();
@@ -874,7 +874,7 @@ namespace Loader
 			void* endAddress = ((PBYTE)aAddon->Module) + aAddon->ModuleSize;
 
 			int leftoverRefs = 0;
-			leftoverRefs += Events::Verify(startAddress, endAddress);
+			leftoverRefs += EventApi->Verify(startAddress, endAddress);
 			leftoverRefs += GUI::Verify(startAddress, endAddress);
 			leftoverRefs += GUI::QuickAccess::Verify(startAddress, endAddress);
 			leftoverRefs += Keybinds::Verify(startAddress, endAddress);
@@ -952,7 +952,7 @@ namespace Loader
 
 							if (!isShutdown)
 							{
-								Events::Raise(EV_ADDON_UNLOADED, &addon->Definitions->Signature);
+								EventApi->Raise(EV_ADDON_UNLOADED, &addon->Definitions->Signature);
 
 								const std::lock_guard<std::mutex> lock(Mutex);
 								if (aDoReload)
@@ -1141,8 +1141,8 @@ namespace Loader
 			((AddonAPI1*)api)->Log = LogHandler::ADDONAPI_LogMessage;
 
 			((AddonAPI1*)api)->RaiseEvent = Events::ADDONAPI_RaiseEvent;
-			((AddonAPI1*)api)->SubscribeEvent = Events::Subscribe;
-			((AddonAPI1*)api)->UnsubscribeEvent = Events::Unsubscribe;
+			((AddonAPI1*)api)->SubscribeEvent = Events::ADDONAPI_Subscribe;
+			((AddonAPI1*)api)->UnsubscribeEvent = Events::ADDONAPI_Unsubscribe;
 
 			((AddonAPI1*)api)->RegisterWndProc = WndProc::Register;
 			((AddonAPI1*)api)->DeregisterWndProc = WndProc::Deregister;
@@ -1190,8 +1190,8 @@ namespace Loader
 
 			((AddonAPI2*)api)->RaiseEvent = Events::ADDONAPI_RaiseEvent;
 			((AddonAPI2*)api)->RaiseEventNotification = Events::ADDONAPI_RaiseNotification;
-			((AddonAPI2*)api)->SubscribeEvent = Events::Subscribe;
-			((AddonAPI2*)api)->UnsubscribeEvent = Events::Unsubscribe;
+			((AddonAPI2*)api)->SubscribeEvent = Events::ADDONAPI_Subscribe;
+			((AddonAPI2*)api)->UnsubscribeEvent = Events::ADDONAPI_Unsubscribe;
 
 			((AddonAPI2*)api)->RegisterWndProc = WndProc::Register;
 			((AddonAPI2*)api)->DeregisterWndProc = WndProc::Deregister;
@@ -1253,8 +1253,8 @@ namespace Loader
 			((AddonAPI3*)api)->RaiseEventNotification = Events::ADDONAPI_RaiseNotification;
 			((AddonAPI3*)api)->RaiseEventTargeted = Events::ADDONAPI_RaiseEventTargeted;
 			((AddonAPI3*)api)->RaiseEventNotificationTargeted = Events::ADDONAPI_RaiseNotificationTargeted;
-			((AddonAPI3*)api)->SubscribeEvent = Events::Subscribe;
-			((AddonAPI3*)api)->UnsubscribeEvent = Events::Unsubscribe;
+			((AddonAPI3*)api)->SubscribeEvent = Events::ADDONAPI_Subscribe;
+			((AddonAPI3*)api)->UnsubscribeEvent = Events::ADDONAPI_Unsubscribe;
 
 			((AddonAPI3*)api)->RegisterWndProc = WndProc::Register;
 			((AddonAPI3*)api)->DeregisterWndProc = WndProc::Deregister;
@@ -1318,8 +1318,8 @@ namespace Loader
 			((AddonAPI4*)api)->RaiseEventNotification = Events::ADDONAPI_RaiseNotification;
 			((AddonAPI4*)api)->RaiseEventTargeted = Events::ADDONAPI_RaiseEventTargeted;
 			((AddonAPI4*)api)->RaiseEventNotificationTargeted = Events::ADDONAPI_RaiseNotificationTargeted;
-			((AddonAPI4*)api)->SubscribeEvent = Events::Subscribe;
-			((AddonAPI4*)api)->UnsubscribeEvent = Events::Unsubscribe;
+			((AddonAPI4*)api)->SubscribeEvent = Events::ADDONAPI_Subscribe;
+			((AddonAPI4*)api)->UnsubscribeEvent = Events::ADDONAPI_Unsubscribe;
 
 			((AddonAPI4*)api)->RegisterWndProc = WndProc::Register;
 			((AddonAPI4*)api)->DeregisterWndProc = WndProc::Deregister;
@@ -1388,8 +1388,8 @@ namespace Loader
 			((AddonAPI5*)api)->RaiseEventNotification = Events::ADDONAPI_RaiseNotification;
 			((AddonAPI5*)api)->RaiseEventTargeted = Events::ADDONAPI_RaiseEventTargeted;
 			((AddonAPI5*)api)->RaiseEventNotificationTargeted = Events::ADDONAPI_RaiseNotificationTargeted;
-			((AddonAPI5*)api)->SubscribeEvent = Events::Subscribe;
-			((AddonAPI5*)api)->UnsubscribeEvent = Events::Unsubscribe;
+			((AddonAPI5*)api)->SubscribeEvent = Events::ADDONAPI_Subscribe;
+			((AddonAPI5*)api)->UnsubscribeEvent = Events::ADDONAPI_Unsubscribe;
 
 			((AddonAPI5*)api)->RegisterWndProc = WndProc::Register;
 			((AddonAPI5*)api)->DeregisterWndProc = WndProc::Deregister;

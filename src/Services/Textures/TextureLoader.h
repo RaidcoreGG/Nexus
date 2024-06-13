@@ -161,16 +161,16 @@ public:
 	/// GetRegistry:
 	/// 	Returns a copy of the registry.
 	///----------------------------------------------------------------------------------------------------
-	std::map<std::string, Texture*> GetRegistry();
+	std::map<std::string, Texture*> GetRegistry() const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetQueuedTextures:
 	/// 	Returns a copy of all currently queued textures.
 	///----------------------------------------------------------------------------------------------------
-	std::vector<QueuedTexture> GetQueuedTextures();
+	std::vector<QueuedTexture> GetQueuedTextures() const;
 
 private:
-	std::mutex						Mutex;
+	mutable std::mutex				Mutex;
 	std::map<std::string, Texture*>	Registry;
 	std::vector<QueuedTexture>		QueuedTextures;
 

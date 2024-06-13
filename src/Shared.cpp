@@ -17,6 +17,7 @@ CLocalization*				Language			= new CLocalization();
 CUpdater*					UpdateService		= new CUpdater();
 CTextureLoader*				TextureService		= new CTextureLoader();
 CDataLink*					DataLinkService		= new CDataLink();
+CEventApi*					EventApi			= new CEventApi();
 
 ImFont*						MonospaceFont		= nullptr;
 ImFont*						UserFont			= nullptr;

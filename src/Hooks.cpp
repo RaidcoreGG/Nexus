@@ -139,7 +139,7 @@ namespace Hooks
 			NexusLink->Height = Height;
 		}
 
-		Events::Raise(EV_WINDOW_RESIZED);
+		EventApi->Raise(EV_WINDOW_RESIZED);
 
 		return Hooks::DXGI::ResizeBuffers(pChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
 	}

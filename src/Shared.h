@@ -12,6 +12,7 @@
 #include "Services/Updater/Updater.h"
 #include "Services/Textures/TextureLoader.h"
 #include "Services/DataLink/DataLink.h"
+#include "Events/EventHandler.h"
 
 #include "imgui.h"
 
@@ -31,6 +32,7 @@ extern CLocalization*				Language;
 extern CUpdater*					UpdateService;
 extern CTextureLoader*				TextureService;
 extern CDataLink*					DataLinkService;
+extern CEventApi*					EventApi;
 
 extern ImFont*						MonospaceFont;	/* default/monospace/console font */
 extern ImFont*						UserFont;		/* custom user font */
