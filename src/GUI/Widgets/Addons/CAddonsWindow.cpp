@@ -16,6 +16,7 @@
 #include "AddonItem.h"
 #include "Services/Textures/TextureLoader.h"
 
+#include "GUI/Widgets/Alerts/Alerts.h"
 #include "Services/Updater/Updater.h"
 
 #include "imgui/imgui.h"
@@ -229,6 +230,8 @@ namespace GUI
 							{
 								checkedForUpdates = 0;
 								queuedForCheck = 0;
+								updatedCount = 0;
+
 								/* pre-iterate to get the count of how many need to be checked, else one call might finish before the count can be incremented */
 								for (auto addon : Loader::Addons)
 								{
@@ -260,6 +263,17 @@ namespace GUI
 											if (UpdateService->UpdateAddon(tmpPath, addonInfo))
 											{
 												Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
+
+												GUI::Alerts::Notify(
+													String::Format("%s %s",
+														addon->Definitions->Name,
+														addon->State == EAddonState::LoadedLOCKED
+														? Language->Translate("((000079))")
+														: Language->Translate("((000081))")
+													).c_str()
+												);
+
+												updatedCount++;
 											}
 											checkedForUpdates++;
 
@@ -267,6 +281,11 @@ namespace GUI
 											{
 												checkedForUpdates = -1;
 												queuedForCheck = 0;
+
+												if (updatedCount == 0)
+												{
+													GUI::Alerts::Notify(Language->Translate("((000087))"));
+												}
 											}
 										})
 										.detach();

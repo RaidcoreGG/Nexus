@@ -48,6 +48,7 @@ namespace GUI
 
 		int queuedForCheck = 0;
 		int checkedForUpdates = -1;
+		int updatedCount = 0;
 	};
 }
 
