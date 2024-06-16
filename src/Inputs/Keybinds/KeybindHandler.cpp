@@ -534,7 +534,7 @@ std::map<std::string, ActiveKeybind> CKeybindApi::GetRegistry() const
 	return this->Registry;
 }
 
-Keybind CKeybindApi::GetHeldKeybind() const
+Keybind CKeybindApi::GetCapturedKeybind() const
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 

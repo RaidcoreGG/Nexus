@@ -538,7 +538,7 @@ namespace GUI
 			{
 				KeybindApi->StartCapturing();
 
-				Keybind currKeybind = KeybindApi->GetHeldKeybind();
+				Keybind currKeybind = KeybindApi->GetCapturedKeybind();
 				std::string usedBy = KeybindApi->IsInUse(currKeybind);
 
 				if (currKeybind == Keybind{})
