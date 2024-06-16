@@ -10,46 +10,56 @@
 
 namespace Base64
 {
-	static const unsigned char base64_table[65] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+	static const unsigned char Base64Table[65] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-	std::string Encode(const unsigned char* src, size_t len)
+	std::string Encode(const unsigned char* aData, size_t aSize)
 	{
-		unsigned char* out, * pos;
-		const unsigned char* end, * in;
+		unsigned char* out;
+		unsigned char* pos;
+		const unsigned char* end;
+		const unsigned char* in;
 
-		size_t olen;
+		size_t outLength;
 
-		olen = 4 * ((len + 2) / 3); /* 3-byte blocks to 4-byte */
+		outLength = 4 * ((aSize + 2) / 3);
 
-		if (olen < len)
-			return std::string(); /* integer overflow */
+		if (outLength < aSize)
+		{
+			return "";
+		}
 
 		std::string outStr;
-		outStr.resize(olen);
+		outStr.resize(outLength);
 		out = (unsigned char*)&outStr[0];
 
-		end = src + len;
-		in = src;
+		end = aData + aSize;
+		in = aData;
 		pos = out;
-		while (end - in >= 3) {
-			*pos++ = base64_table[in[0] >> 2];
-			*pos++ = base64_table[((in[0] & 0x03) << 4) | (in[1] >> 4)];
-			*pos++ = base64_table[((in[1] & 0x0f) << 2) | (in[2] >> 6)];
-			*pos++ = base64_table[in[2] & 0x3f];
+		while (end - in >= 3)
+		{
+			*pos++ = Base64Table[in[0] >> 2];
+			*pos++ = Base64Table[((in[0] & 0x03) << 4) | (in[1] >> 4)];
+			*pos++ = Base64Table[((in[1] & 0x0f) << 2) | (in[2] >> 6)];
+			*pos++ = Base64Table[in[2] & 0x3f];
 			in += 3;
 		}
 
-		if (end - in) {
-			*pos++ = base64_table[in[0] >> 2];
-			if (end - in == 1) {
-				*pos++ = base64_table[(in[0] & 0x03) << 4];
+		if (end - in)
+		{
+			*pos++ = Base64Table[in[0] >> 2];
+
+			if (end - in == 1)
+			{
+				*pos++ = Base64Table[(in[0] & 0x03) << 4];
 				*pos++ = '=';
 			}
-			else {
-				*pos++ = base64_table[((in[0] & 0x03) << 4) |
+			else
+			{
+				*pos++ = Base64Table[((in[0] & 0x03) << 4) |
 					(in[1] >> 4)];
-				*pos++ = base64_table[(in[1] & 0x0f) << 2];
+				*pos++ = Base64Table[(in[1] & 0x0f) << 2];
 			}
+
 			*pos++ = '=';
 		}
 
@@ -64,11 +74,11 @@ namespace Base64
 	0,  0,  0, 63,  0, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
 	41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51 };
 
-	std::string Decode(const void* data, const size_t len)
+	std::string Decode(std::string aData, size_t aSize)
 	{
-		unsigned char* p = (unsigned char*)data;
-		int pad = len > 0 && (len % 4 || p[len - 1] == '=');
-		const size_t L = ((len + 3) / 4 - pad) * 4;
+		unsigned char* p = (unsigned char*)aData.c_str();
+		int pad = aSize > 0 && (aSize % 4 || p[aSize - 1] == '=');
+		const size_t L = ((aSize + 3) / 4 - pad) * 4;
 		std::string str(L / 4 * 3 + pad, '\0');
 
 		for (size_t i = 0, j = 0; i < L; i += 4)
@@ -78,17 +88,19 @@ namespace Base64
 			str[j++] = n >> 8 & 0xFF;
 			str[j++] = n & 0xFF;
 		}
+
 		if (pad)
 		{
 			int n = B64index[p[L]] << 18 | B64index[p[L + 1]] << 12;
 			str[str.size() - 1] = n >> 16;
 
-			if (len > L + 2 && p[L + 2] != '=')
+			if (aSize > L + 2 && p[L + 2] != '=')
 			{
 				n |= B64index[p[L + 2]] << 6;
 				str.push_back(n >> 8 & 0xFF);
 			}
 		}
+
 		return str;
 	}
 }
