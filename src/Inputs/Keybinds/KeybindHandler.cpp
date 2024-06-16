@@ -57,7 +57,10 @@ namespace Keybinds
 
 	std::string ScancodeToString(unsigned short aScanCode)
 	{
-		BuildscanCodeLookupTable();
+		if (!IsLookupTableBuilt)
+		{
+			BuildscanCodeLookupTable();
+		}
 
 		auto it = ScancodeLookupTable.find(aScanCode);
 		if (it != ScancodeLookupTable.end())
@@ -70,7 +73,10 @@ namespace Keybinds
 
 	Keybind KBFromString(std::string aKeybind)
 	{
-		BuildscanCodeLookupTable();
+		if (!IsLookupTableBuilt)
+		{
+			BuildscanCodeLookupTable();
+		}
 
 		Keybind kb{};
 
@@ -114,7 +120,10 @@ namespace Keybinds
 
 	std::string KBToString(Keybind aKeybind, bool padded)
 	{
-		BuildscanCodeLookupTable();
+		if (!IsLookupTableBuilt)
+		{
+			BuildscanCodeLookupTable();
+		}
 
 		if (!aKeybind.Key) { return "(null)"; }
 
@@ -260,7 +269,7 @@ UINT CKeybindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 					/* explicitly scope for heldbinds and tracked keys */
 					{
-						const std::lock_guard<std::mutex> lock(this->MutexHeldKeys);
+						//const std::lock_guard<std::mutex> lock(this->MutexHeldKeys);
 						if (std::find(this->HeldKeys.begin(), this->HeldKeys.end(), kb.Key) == this->HeldKeys.end())
 						{
 							this->HeldKeys.push_back(kb.Key);
@@ -307,7 +316,7 @@ UINT CKeybindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		std::vector<std::string> heldBindsPop;
 
-		const std::lock_guard<std::mutex> lock(this->MutexHeldKeys);
+		//const std::lock_guard<std::mutex> lock(this->MutexHeldKeys);
 		for (auto& bind : this->HeldKeybinds)
 		{
 			if (wParam == 16 && bind.second.Bind.Shift)
@@ -390,9 +399,12 @@ void CKeybindApi::Register(const char* aIdentifier, EKeybindHandlerType aKeybind
 		/* check if this keybind is not already set */
 		if (this->Registry.find(str) == Registry.end())
 		{
+			// FIXME: Double lookup.
 			this->Registry[str].Bind = requestedBind;
+			this->Registry[str].DisplayText = Keybinds::KBToString(requestedBind, true);
 		}
 
+		// FIXME: Even more lookups.
 		this->Registry[str].HandlerType = aKeybindHandlerType;
 		this->Registry[str].Handler = aKeybindHandler;
 	}
@@ -446,7 +458,9 @@ void CKeybindApi::Set(std::string aIdentifier, Keybind aKeybind)
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
+		// FIXME: Double lookup.
 		this->Registry[aIdentifier].Bind = aKeybind;
+		this->Registry[aIdentifier].DisplayText = Keybinds::KBToString(aKeybind, true);
 	}
 
 	this->Save();
@@ -572,7 +586,9 @@ void CKeybindApi::Load()
 
 			std::string identifier = binding["Identifier"].get<std::string>();
 
+			// FIXME: Double lookup.
 			this->Registry[identifier].Bind = kb;
+			this->Registry[identifier].DisplayText = Keybinds::KBToString(kb, true);
 		}
 
 		file.close();
@@ -619,7 +635,7 @@ void CKeybindApi::ReleaseAll()
 	this->IsCtrlHeld = false;
 	this->IsShiftHeld = false;
 
-	const std::lock_guard<std::mutex> lock(this->MutexHeldKeys);
+	//const std::lock_guard<std::mutex> lock(this->MutexHeldKeys);
 	for (auto& bind : this->HeldKeybinds)
 	{
 		this->Invoke(bind.first, true);

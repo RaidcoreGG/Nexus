@@ -28,6 +28,15 @@ namespace GUI
 	float owWidth = 30.0f;
 	float owHeight = 24.0f;
 
+	// this is so dirty, but I am so lazy
+	struct KBCat
+	{
+		std::string								Name;
+		std::map<std::string, ActiveKeybind>	Keybinds;
+	};
+
+	bool IsKeybindsPanelOpen = false; // used to refetch binds
+	std::vector<KBCat> KeybindCategoryMap;
 	std::string CurrentlyEditing; // the identifier
 	std::string CurrentlyEditingBind; // the current bind
 	char CurrentAPIKey[73]{};
@@ -37,7 +46,7 @@ namespace GUI
 	int languagesIndex;
 	int languagesSize;
 
-	int isSetup = false;
+	bool isSetup = false;
 
 	/* proto tabs */
 	void GeneralTab();
@@ -430,6 +439,36 @@ namespace GUI
 	{
 		if (ImGui::BeginTabItem(Language->Translate("((000060))")))
 		{
+			if (!IsKeybindsPanelOpen)
+			{
+				KeybindCategoryMap.clear();
+
+				/* copy of all keybinds */
+				std::map<std::string, ActiveKeybind> KeybindRegistry = KeybindApi->GetRegistry();
+
+				/* acquire categories */
+				for (auto& [identifier, keybind] : KeybindRegistry)
+				{
+					std::string owner = Loader::GetOwner(keybind.Handler);
+
+					auto it = std::find_if(KeybindCategoryMap.begin(), KeybindCategoryMap.end(), [owner](KBCat category) { return category.Name == owner; });
+
+					if (it == KeybindCategoryMap.end())
+					{
+						KBCat cat{};
+						cat.Name = owner;
+						cat.Keybinds[identifier] = keybind;
+						KeybindCategoryMap.push_back(cat);
+					}
+					else
+					{
+						it->Keybinds[identifier] = keybind;
+					}
+				}
+			}
+
+			IsKeybindsPanelOpen = true;
+
 			ImGui::BeginChild("##KeybindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
 			float kbButtonWidth = ImGui::CalcTextSize("XXXXXXXXXXXXXXXXXXXXXXXX").x;
@@ -438,41 +477,23 @@ namespace GUI
 			bool deleteStaleBind = false;
 			std::string staleBindIdentifier;
 
-			std::map<std::string, ActiveKeybind> KeybindRegistry = KeybindApi->GetRegistry();
-
-			// I'm gonna regret writing this code in a moment
-				// so the idea is to iterate over all keybinds, get their owners in a list
-				// then iterate over all keybinds again, for every single category and this time checking if they belong to the current category
-				// there's probably a smart/clean way of doing this but it's 4:29AM
-			std::vector<std::string> categories;
-			for (auto& [identifier, keybind] : KeybindRegistry)
+			for (KBCat cat : KeybindCategoryMap)
 			{
-				std::string owner = Loader::GetOwner(keybind.Handler);
-
-				if (std::find(categories.begin(), categories.end(), owner) == categories.end())
+				if (ImGui::CollapsingHeader(cat.Name != "(null)" ? cat.Name.c_str() : "Inactive", ImGuiTreeNodeFlags_DefaultOpen))
 				{
-					categories.push_back(owner);
-				}
-			}
-			for (std::string cat : categories)
-			{
-				if (ImGui::CollapsingHeader(cat != "(null)" ? cat.c_str() : "Inactive", ImGuiTreeNodeFlags_DefaultOpen))
-				{
-					if (ImGui::BeginTable(("table_keybinds##" + cat).c_str(), 3, ImGuiTableFlags_BordersInnerH))
+					if (ImGui::BeginTable(("table_keybinds##" + cat.Name).c_str(), 3, ImGuiTableFlags_BordersInnerH))
 					{
-						for (auto& [identifier, keybind] : KeybindRegistry)
+						for (auto& [identifier, keybind] : cat.Keybinds)
 						{
-							if (Loader::GetOwner(keybind.Handler) != cat) { continue; }
-
 							ImGui::TableNextRow();
 							ImGui::TableSetColumnIndex(0);
 							ImGui::Text(Language->Translate(identifier.c_str()));
 
 							ImGui::TableSetColumnIndex(1);
-							if (ImGui::Button((Keybinds::KBToString(keybind.Bind, true) + "##" + identifier).c_str(), ImVec2(kbButtonWidth, 0.0f)))
+							if (ImGui::Button((keybind.DisplayText + "##" + identifier).c_str(), ImVec2(kbButtonWidth, 0.0f)))
 							{
 								CurrentlyEditing = identifier;
-								CurrentlyEditingBind = Keybinds::KBToString(keybind.Bind, true);
+								CurrentlyEditingBind = keybind.DisplayText;
 								openEditor = true;
 							}
 
@@ -499,6 +520,7 @@ namespace GUI
 				KeybindApi->Delete(staleBindIdentifier);
 				deleteStaleBind = false;
 				staleBindIdentifier.clear();
+				IsKeybindsPanelOpen = false; // we set this so the display gets refreshed
 			}
 
 			std::string kbModalTitle = Language->Translate("((000062))");
@@ -541,6 +563,7 @@ namespace GUI
 				if (ImGui::Button(Language->Translate("((000064))")))
 				{
 					KeybindApi->Set(CurrentlyEditing, Keybind{});
+					IsKeybindsPanelOpen = false; // we set this so the display gets refreshed
 					close = true;
 				}
 
@@ -561,6 +584,7 @@ namespace GUI
 						KeybindApi->Set(usedBy, Keybind{});
 					}
 					KeybindApi->Set(CurrentlyEditing, currKeybind);
+					IsKeybindsPanelOpen = false; // we set this so the display gets refreshed
 					close = true;
 				}
 				ImGui::SameLine();
@@ -583,6 +607,10 @@ namespace GUI
 			ImGui::EndChild();
 
 			ImGui::EndTabItem();
+		}
+		else
+		{
+			IsKeybindsPanelOpen = false;
 		}
 	}
 
