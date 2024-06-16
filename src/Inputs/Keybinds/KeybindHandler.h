@@ -159,10 +159,10 @@ public:
 	std::map<std::string, ActiveKeybind> GetRegistry() const;
 
 	///----------------------------------------------------------------------------------------------------
-	/// GetHeldKeybind:
+	/// GetCapturedKeybind:
 	/// 	Gets which keybind is currently held, regardless of it being mapped or not.
 	///----------------------------------------------------------------------------------------------------
-	Keybind GetHeldKeybind() const;
+	Keybind GetCapturedKeybind() const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// StartCapturing:
