@@ -28,7 +28,8 @@ namespace GUI
 	float owWidth = 30.0f;
 	float owHeight = 24.0f;
 
-	std::string CurrentlyEditing;
+	std::string CurrentlyEditing; // the identifier
+	std::string CurrentlyEditingBind; // the current bind
 	char CurrentAPIKey[73]{};
 
 	const char* qaLocations[] = { "((000067))", "((000068))", "((000069))", "((000070))" };
@@ -429,157 +430,157 @@ namespace GUI
 	{
 		if (ImGui::BeginTabItem(Language->Translate("((000060))")))
 		{
+			ImGui::BeginChild("##KeybindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+
+			float kbButtonWidth = ImGui::CalcTextSize("XXXXXXXXXXXXXXXXXXXXXXXX").x;
+
+			bool openEditor = false;
+			bool deleteStaleBind = false;
+			std::string staleBindIdentifier;
+
+			std::map<std::string, ActiveKeybind> KeybindRegistry = KeybindApi->GetRegistry();
+
+			// I'm gonna regret writing this code in a moment
+				// so the idea is to iterate over all keybinds, get their owners in a list
+				// then iterate over all keybinds again, for every single category and this time checking if they belong to the current category
+				// there's probably a smart/clean way of doing this but it's 4:29AM
+			std::vector<std::string> categories;
+			for (auto& [identifier, keybind] : KeybindRegistry)
 			{
-				ImGui::BeginChild("##KeybindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+				std::string owner = Loader::GetOwner(keybind.Handler);
 
-				float kbButtonWidth = ImGui::CalcTextSize("XXXXXXXXXXXXXXXXXXXXXXXX").x;
-
-				bool openEditor = false;
-				bool deleteStaleBind = false;
-				std::string staleBindIdentifier;
-
-				Keybinds::Mutex.lock();
+				if (std::find(categories.begin(), categories.end(), owner) == categories.end())
 				{
-					// I'm gonna regret writing this code in a moment
-					// so the idea is to iterate over all keybinds, get their owners in a list
-					// then iterate over all keybinds again, for every single category and this time checking if they belong to the current category
-					// there's probably a smart/clean way of doing this but it's 4:29AM
-					std::vector<std::string> categories;
-					for (auto& [identifier, keybind] : Keybinds::Registry)
+					categories.push_back(owner);
+				}
+			}
+			for (std::string cat : categories)
+			{
+				if (ImGui::CollapsingHeader(cat != "(null)" ? cat.c_str() : "Inactive", ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					if (ImGui::BeginTable(("table_keybinds##" + cat).c_str(), 3, ImGuiTableFlags_BordersInnerH))
 					{
-						std::string owner = Loader::GetOwner(keybind.Handler);
+						for (auto& [identifier, keybind] : KeybindRegistry)
+						{
+							if (Loader::GetOwner(keybind.Handler) != cat) { continue; }
 
-						if (std::find(categories.begin(), categories.end(), owner) == categories.end())
-						{
-							categories.push_back(owner);
-						}
-					}
-					for (std::string cat : categories)
-					{
-						if (ImGui::CollapsingHeader(cat != "(null)" ? cat.c_str() : "Inactive", ImGuiTreeNodeFlags_DefaultOpen))
-						{
-							if (ImGui::BeginTable(("table_keybinds##" + cat).c_str(), 3, ImGuiTableFlags_BordersInnerH))
+							ImGui::TableNextRow();
+							ImGui::TableSetColumnIndex(0);
+							ImGui::Text(Language->Translate(identifier.c_str()));
+
+							ImGui::TableSetColumnIndex(1);
+							if (ImGui::Button((Keybinds::KBToString(keybind.Bind, true) + "##" + identifier).c_str(), ImVec2(kbButtonWidth, 0.0f)))
 							{
-								for (auto& [identifier, keybind] : Keybinds::Registry)
+								CurrentlyEditing = identifier;
+								CurrentlyEditingBind = Keybinds::KBToString(keybind.Bind, true);
+								openEditor = true;
+							}
+
+							ImGui::TableSetColumnIndex(2);
+							if (keybind.Handler == nullptr)
+							{
+								if (ImGui::SmallButton(("X##" + identifier).c_str()))
 								{
-									if (Loader::GetOwner(keybind.Handler) != cat) { continue; }
-
-									ImGui::TableNextRow();
-									ImGui::TableSetColumnIndex(0);
-									ImGui::Text(Language->Translate(identifier.c_str()));
-
-									ImGui::TableSetColumnIndex(1);
-									if (ImGui::Button((keybind.Bind.ToString(true) + "##" + identifier).c_str(), ImVec2(kbButtonWidth, 0.0f)))
-									{
-										CurrentlyEditing = identifier;
-										openEditor = true;
-									}
-
-									ImGui::TableSetColumnIndex(2);
-									if (keybind.Handler == nullptr)
-									{
-										if (ImGui::SmallButton(("X##" + identifier).c_str()))
-										{
-											deleteStaleBind = true;
-											staleBindIdentifier = identifier;
-										}
-										ImGui::SameLine();
-										ImGui::TextDisabled(Language->Translate("((000061))"));
-									}
+									deleteStaleBind = true;
+									staleBindIdentifier = identifier;
 								}
-
-								ImGui::EndTable();
+								ImGui::SameLine();
+								ImGui::TextDisabled(Language->Translate("((000061))"));
 							}
 						}
+
+						ImGui::EndTable();
 					}
 				}
-				Keybinds::Mutex.unlock();
-
-				if (deleteStaleBind && !staleBindIdentifier.empty())
-				{
-					Keybinds::Delete(staleBindIdentifier);
-					deleteStaleBind = false;
-					staleBindIdentifier.clear();
-				}
-
-				std::string kbModalTitle = Language->Translate("((000062))");
-				kbModalTitle.append(Language->Translate(CurrentlyEditing.c_str()));
-
-				if (openEditor)
-				{
-					openEditor = false;
-					ImGui::OpenPopup(kbModalTitle.c_str(), ImGuiPopupFlags_AnyPopupLevel);
-				}
-
-				ImVec2 center(Renderer::Width * 0.5f, Renderer::Height * 0.5f);
-				ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-				if (ImGui::BeginPopupModal(kbModalTitle.c_str(), NULL, WindowFlags_Default))
-				{
-					Keybinds::IsSettingKeybind = true;
-					if (Keybinds::CurrentKeybind == Keybind{})
-					{
-						ImGui::Text(Keybinds::Registry[CurrentlyEditing].Bind.ToString(true).c_str());
-					}
-					else
-					{
-						ImGui::Text(Keybinds::CurrentKeybind.ToString(true).c_str());
-					}
-
-					bool overwriting = false;
-
-					if (Keybinds::CurrentKeybindUsedBy != CurrentlyEditing && Keybinds::CurrentKeybindUsedBy != "")
-					{
-						ImGui::TextColored(ImVec4(255, 0, 0, 255), (Language->Translate("((000063))") + Keybinds::CurrentKeybindUsedBy + ".").c_str());
-						overwriting = true;
-					}
-
-					bool close = false;
-
-					if (ImGui::Button(Language->Translate("((000064))")))
-					{
-						Keybinds::Set(CurrentlyEditing, Keybind{});
-						close = true;
-					}
-
-					/* i love imgui */
-					ImGui::SameLine();
-					ImGui::Spacing();
-					ImGui::SameLine();
-					ImGui::Spacing();
-					ImGui::SameLine();
-					ImGui::Spacing();
-					ImGui::SameLine();
-					/* i love imgui end*/
-
-					if (ImGui::Button(Language->Translate("((000065))")))
-					{
-						if (overwriting)
-						{
-							Keybinds::Set(Keybinds::CurrentKeybindUsedBy, Keybind{});
-						}
-						Keybinds::Set(CurrentlyEditing, Keybinds::CurrentKeybind);
-						close = true;
-					}
-					ImGui::SameLine();
-					if (ImGui::Button(Language->Translate("((000066))")))
-					{
-						close = true;
-					}
-
-					if (close)
-					{
-						CurrentlyEditing = "";
-						Keybinds::CurrentKeybind = Keybind{};
-						Keybinds::CurrentKeybindUsedBy = "";
-						Keybinds::IsSettingKeybind = false;
-						ImGui::CloseCurrentPopup();
-					}
-
-					ImGui::EndPopup();
-				}
-
-				ImGui::EndChild();
 			}
+
+			if (deleteStaleBind && !staleBindIdentifier.empty())
+			{
+				KeybindApi->Delete(staleBindIdentifier);
+				deleteStaleBind = false;
+				staleBindIdentifier.clear();
+			}
+
+			std::string kbModalTitle = Language->Translate("((000062))");
+			kbModalTitle.append(Language->Translate(CurrentlyEditing.c_str()));
+
+			if (openEditor)
+			{
+				openEditor = false;
+				ImGui::OpenPopup(kbModalTitle.c_str(), ImGuiPopupFlags_AnyPopupLevel);
+			}
+
+			ImVec2 center(Renderer::Width * 0.5f, Renderer::Height * 0.5f);
+			ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+			if (ImGui::BeginPopupModal(kbModalTitle.c_str(), NULL, WindowFlags_Default))
+			{
+				KeybindApi->StartCapturing();
+
+				Keybind currKeybind = KeybindApi->GetHeldKeybind();
+				std::string usedBy = KeybindApi->IsInUse(currKeybind);
+
+				if (currKeybind == Keybind{})
+				{
+					ImGui::Text(CurrentlyEditingBind.c_str());
+				}
+				else
+				{
+					ImGui::Text(Keybinds::KBToString(currKeybind, true).c_str());
+				}
+
+				bool overwriting = false;
+
+				if (usedBy != CurrentlyEditing && !usedBy.empty())
+				{
+					ImGui::TextColored(ImVec4(255, 0, 0, 255), (Language->Translate("((000063))") + usedBy + ".").c_str());
+					overwriting = true;
+				}
+
+				bool close = false;
+
+				if (ImGui::Button(Language->Translate("((000064))")))
+				{
+					KeybindApi->Set(CurrentlyEditing, Keybind{});
+					close = true;
+				}
+
+				/* i love imgui */
+				ImGui::SameLine();
+				ImGui::Spacing();
+				ImGui::SameLine();
+				ImGui::Spacing();
+				ImGui::SameLine();
+				ImGui::Spacing();
+				ImGui::SameLine();
+				/* i love imgui end*/
+
+				if (ImGui::Button(Language->Translate("((000065))")))
+				{
+					if (overwriting)
+					{
+						KeybindApi->Set(usedBy, Keybind{});
+					}
+					KeybindApi->Set(CurrentlyEditing, currKeybind);
+					close = true;
+				}
+				ImGui::SameLine();
+				if (ImGui::Button(Language->Translate("((000066))")))
+				{
+					close = true;
+				}
+
+				if (close)
+				{
+					CurrentlyEditing = "";
+					CurrentlyEditingBind = "";
+					KeybindApi->EndCapturing();
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
+			}
+
+			ImGui::EndChild();
 
 			ImGui::EndTabItem();
 		}

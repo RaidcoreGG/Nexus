@@ -134,28 +134,24 @@ namespace GUI
 	{
 		if (ImGui::BeginTabItem("Keybinds"))
 		{
+			ImGui::BeginChild("##KeybindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+
+			std::map<std::string, ActiveKeybind> KeybindRegistry = KeybindApi->GetRegistry();
+			
+			for (auto& [identifier, keybind] : KeybindRegistry)
 			{
-				ImGui::BeginChild("##KeybindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
-
-				Keybinds::Mutex.lock();
+				ImGui::Text(identifier.c_str()); ImGui::SameLine();
+				if (keybind.Handler)
 				{
-					for (auto& [identifier, keybind] : Keybinds::Registry)
-					{
-						ImGui::Text(identifier.c_str()); ImGui::SameLine();
-						if (keybind.Handler)
-						{
-							ImGui::TextDisabled("Handler: %p", keybind.Handler);
-						}
-						else
-						{
-							ImGui::TextDisabled("Handler: (null)");
-						}
-					}
+					ImGui::TextDisabled("Handler: %p", keybind.Handler);
 				}
-				Keybinds::Mutex.unlock();
-
-				ImGui::EndChild();
+				else
+				{
+					ImGui::TextDisabled("Handler: (null)");
+				}
 			}
+
+			ImGui::EndChild();
 
 			ImGui::EndTabItem();
 		}

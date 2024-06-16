@@ -866,11 +866,11 @@ namespace GUI
 
 		Logger->RegisterLogger(GUI::LogWindow);
 
-		Keybinds::Register(KB_ADDONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
-		Keybinds::Register(KB_OPTIONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
-		Keybinds::Register(KB_LOG, EKBHType::DownOnly, ProcessKeybind, "(null)");
-		Keybinds::Register(KB_DEBUG, EKBHType::DownOnly, ProcessKeybind, "(null)");
-		Keybinds::Register(KB_MUMBLEOVERLAY, EKBHType::DownOnly, ProcessKeybind, "(null)");
+		KeybindApi->Register(KB_ADDONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
+		KeybindApi->Register(KB_OPTIONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
+		KeybindApi->Register(KB_LOG, EKBHType::DownOnly, ProcessKeybind, "(null)");
+		KeybindApi->Register(KB_DEBUG, EKBHType::DownOnly, ProcessKeybind, "(null)");
+		KeybindApi->Register(KB_MUMBLEOVERLAY, EKBHType::DownOnly, ProcessKeybind, "(null)");
 
 		Menu::AddMenuItem("((000083))",		ICON_RETURN,	RES_ICON_RETURN,	&Menu::Visible);
 		Menu::AddMenuItem("((000003))",		ICON_ADDONS,	RES_ICON_ADDONS,	&AddonsWindow->Visible);
@@ -883,8 +883,8 @@ namespace GUI
 		Menu::AddMenuItem("((000008))",		ICON_ABOUT,		RES_ICON_ABOUT,		&AboutWindow->Visible);
 
 		/* register keybinds */
-		Keybinds::Register(KB_MENU, EKBHType::DownOnly, ProcessKeybind, "CTRL+O");
-		Keybinds::Register(KB_TOGGLEHIDEUI, EKBHType::DownOnly, ProcessKeybind, "CTRL+H");
+		KeybindApi->Register(KB_MENU, EKBHType::DownOnly, ProcessKeybind, "CTRL+O");
+		KeybindApi->Register(KB_TOGGLEHIDEUI, EKBHType::DownOnly, ProcessKeybind, "CTRL+H");
 
 		/* load icons */
 		std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());

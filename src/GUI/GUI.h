@@ -24,6 +24,8 @@
 #include "Widgets/About/CAboutBox.h"
 #include "Widgets/EULA/CEULAModal.h"
 
+#include "Inputs/Keybinds/Keybind.h"
+
 namespace GUI
 {
 	extern CFontManager&				FontManager;

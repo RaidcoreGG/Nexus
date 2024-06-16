@@ -126,7 +126,7 @@ namespace GUI
 							if (shortcut.Keybind.length() > 0)
 							{
 								shortcut.HasNotification = false;
-								Keybinds::Invoke(shortcut.Keybind);
+								KeybindApi->Invoke(shortcut.Keybind);
 							}
 						}
 						iconHovered = ImGui::IsItemHovered();

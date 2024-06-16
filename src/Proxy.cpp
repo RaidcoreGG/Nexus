@@ -69,16 +69,16 @@ namespace Proxy
 
 				if (State::Directx < EDxState::HOOKED && !State::IsVanilla)
 				{
-					WNDCLASSEXW wc;
+					WNDCLASSEXA wc;
 					memset(&wc, 0, sizeof(wc));
 					wc.cbSize = sizeof(wc);
-					wc.lpfnWndProc = DefWindowProcW;
-					wc.hInstance = GetModuleHandleW(0);
+					wc.lpfnWndProc = DefWindowProcA;
+					wc.hInstance = GetModuleHandleA(0);
 					wc.hbrBackground = (HBRUSH)(COLOR_WINDOW);
-					wc.lpszClassName = L"TempDxWndClass";
-					RegisterClassExW(&wc);
+					wc.lpszClassName = "Raidcore_Dx_Window_Class";
+					RegisterClassExA(&wc);
 
-					HWND wnd = CreateWindowExW(0, wc.lpszClassName, 0, WS_OVERLAPPEDWINDOW, 0, 0, 128, 128, 0, 0, wc.hInstance, 0);
+					HWND wnd = CreateWindowExA(0, wc.lpszClassName, 0, WS_OVERLAPPED, 0, 0, 1280, 720, 0, 0, wc.hInstance, 0);
 					if (wnd)
 					{
 						DXGI_SWAP_CHAIN_DESC swap_desc = {};
@@ -114,7 +114,7 @@ namespace Proxy
 						DestroyWindow(wnd);
 					}
 
-					UnregisterClassW(wc.lpszClassName, wc.hInstance);
+					UnregisterClassA(wc.lpszClassName, wc.hInstance);
 
 					State::Directx = EDxState::HOOKED;
 				}

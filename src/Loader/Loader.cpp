@@ -877,7 +877,7 @@ namespace Loader
 			leftoverRefs += EventApi->Verify(startAddress, endAddress);
 			leftoverRefs += GUI::Verify(startAddress, endAddress);
 			leftoverRefs += GUI::QuickAccess::Verify(startAddress, endAddress);
-			leftoverRefs += Keybinds::Verify(startAddress, endAddress);
+			leftoverRefs += KeybindApi->Verify(startAddress, endAddress);
 			leftoverRefs += RawInputApi->Verify(startAddress, endAddress);
 
 			if (leftoverRefs > 0)
@@ -1149,7 +1149,7 @@ namespace Loader
 
 			((AddonAPI1*)api)->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString;
 			((AddonAPI1*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct;
-			((AddonAPI1*)api)->DeregisterKeybind = Keybinds::Deregister;
+			((AddonAPI1*)api)->DeregisterKeybind = Keybinds::ADDONAPI_Deregister;
 
 			((AddonAPI1*)api)->GetResource = DataLink::ADDONAPI_GetResource;
 			((AddonAPI1*)api)->ShareResource = DataLink::ADDONAPI_ShareResource;
@@ -1199,7 +1199,7 @@ namespace Loader
 
 			((AddonAPI2*)api)->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString;
 			((AddonAPI2*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct;
-			((AddonAPI2*)api)->DeregisterKeybind = Keybinds::Deregister;
+			((AddonAPI2*)api)->DeregisterKeybind = Keybinds::ADDONAPI_Deregister;
 
 			((AddonAPI2*)api)->GetResource = DataLink::ADDONAPI_GetResource;
 			((AddonAPI2*)api)->ShareResource = DataLink::ADDONAPI_ShareResource;
@@ -1262,7 +1262,7 @@ namespace Loader
 
 			((AddonAPI3*)api)->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString;
 			((AddonAPI3*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct;
-			((AddonAPI3*)api)->DeregisterKeybind = Keybinds::Deregister;
+			((AddonAPI3*)api)->DeregisterKeybind = Keybinds::ADDONAPI_Deregister;
 
 			((AddonAPI3*)api)->GetResource = DataLink::ADDONAPI_GetResource;
 			((AddonAPI3*)api)->ShareResource = DataLink::ADDONAPI_ShareResource;
@@ -1327,7 +1327,7 @@ namespace Loader
 
 			((AddonAPI4*)api)->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString2;
 			((AddonAPI4*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct2;
-			((AddonAPI4*)api)->DeregisterKeybind = Keybinds::Deregister;
+			((AddonAPI4*)api)->DeregisterKeybind = Keybinds::ADDONAPI_Deregister;
 
 			((AddonAPI4*)api)->GetResource = DataLink::ADDONAPI_GetResource;
 			((AddonAPI4*)api)->ShareResource = DataLink::ADDONAPI_ShareResource;
@@ -1398,7 +1398,7 @@ namespace Loader
 			((AddonAPI5*)api)->InvokeKeybind = Keybinds::ADDONAPI_InvokeKeybind;
 			((AddonAPI5*)api)->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString2;
 			((AddonAPI5*)api)->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct2;
-			((AddonAPI5*)api)->DeregisterKeybind = Keybinds::Deregister;
+			((AddonAPI5*)api)->DeregisterKeybind = Keybinds::ADDONAPI_Deregister;
 
 			((AddonAPI5*)api)->GetResource = DataLink::ADDONAPI_GetResource;
 			((AddonAPI5*)api)->ShareResource = DataLink::ADDONAPI_ShareResource;

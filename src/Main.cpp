@@ -119,7 +119,7 @@ namespace Main
 
 			MH_Initialize();
 
-			Keybinds::Initialize();
+			KeybindApi = new CKeybindApi();
 			Settings::Load();
 
 			// if it's not already been explicitly set via command line, check settings

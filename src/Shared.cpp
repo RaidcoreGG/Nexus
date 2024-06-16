@@ -19,6 +19,7 @@ CTextureLoader*				TextureService		= new CTextureLoader();
 CDataLink*					DataLinkService		= new CDataLink();
 CEventApi*					EventApi			= new CEventApi();
 CRawInputApi*				RawInputApi			= new CRawInputApi();
+CKeybindApi*				KeybindApi			= nullptr; //new CKeybindApi();
 
 ImFont*						MonospaceFont		= nullptr;
 ImFont*						UserFont			= nullptr;

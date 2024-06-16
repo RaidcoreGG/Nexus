@@ -389,5 +389,4 @@ struct AddonAPI5 : AddonAPI
 		// LOGITECH API FUNCS
 };
 
-
 #endif

@@ -42,19 +42,10 @@ namespace Hooks
 			if (RawInputApi->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
 			// don't pass to game if keybind
-			if (Keybinds::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
+			if (KeybindApi->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
 			// don't pass to game if gui
 			if (GUI::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
-
-			// don't pass keys to game if currently editing keybinds
-			if (Keybinds::IsSettingKeybind)
-			{
-				if (uMsg == WM_SYSKEYDOWN || uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYUP || uMsg == WM_KEYUP)
-				{
-					return 0;
-				}
-			}
 
 			if (uMsg == WM_DESTROY || uMsg == WM_QUIT || uMsg == WM_CLOSE)
 			{
