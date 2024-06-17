@@ -15,8 +15,6 @@
 
 bool FindFunction(HMODULE aModule, LPVOID aFunction, LPCSTR aName);
 
-const char* ConvertToUTF8(const char* multibyteStr);
-
 bool GetResource(HMODULE aModule, LPCSTR aResourceName, LPCSTR aResourceType, LPVOID* aOutLockedResource, DWORD* aOutResourceSize);
 
 #endif

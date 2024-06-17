@@ -172,11 +172,7 @@ namespace Keybinds
 
 		str = String::ToUpper(str);
 
-		// Convert Multibyte encoding to UFT-8 bytes
-		const char* multibyte_pointer = str.c_str();
-		const char* utf8_bytes = ConvertToUTF8(multibyte_pointer);
-
-		return std::string(utf8_bytes);
+		return String::ConvertMBToUTF8(str);
 	}
 
 	void ADDONAPI_RegisterWithString(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const char* aKeybind)

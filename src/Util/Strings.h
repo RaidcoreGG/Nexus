@@ -82,6 +82,12 @@ namespace String
 	/// 	Converts a string into a wstring.
 	///----------------------------------------------------------------------------------------------------
 	std::wstring ToWString(const std::string& aString);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ConvertMBToUTF8:
+	/// 	Converts a multibyte string to UTF-8.
+	///----------------------------------------------------------------------------------------------------
+	std::string ConvertMBToUTF8(std::string aString);
 }
 
 #endif
