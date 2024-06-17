@@ -15,6 +15,4 @@
 
 bool FindFunction(HMODULE aModule, LPVOID aFunction, LPCSTR aName);
 
-bool GetResource(HMODULE aModule, LPCSTR aResourceName, LPCSTR aResourceType, LPVOID* aOutLockedResource, DWORD* aOutResourceSize);
-
 #endif

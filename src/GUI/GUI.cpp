@@ -34,6 +34,7 @@
 
 #include "resource.h"
 #include "Util/Time.h"
+#include "Util/Resources.h"
 
 #ifndef STRINGIFY
 #define STRINGIFY(x) #x
@@ -571,44 +572,21 @@ namespace GUI
 		if (str == "TREBUCHET_XL")		{ FontIndex[EFont::Trebuchet_Larger] = aFont; }
 	}
 
-	void UnpackLocale(std::filesystem::path aPath, unsigned aResourceID)
-	{
-		LPVOID res{}; DWORD sz{};
-		GetResource(NexusHandle, MAKEINTRESOURCE(aResourceID), "JSON", &res, &sz);
-
-		try
-		{
-			if (std::filesystem::exists(aPath))
-			{
-				std::filesystem::remove(aPath);
-			}
-
-			std::ofstream file(aPath);
-			file.write((const char*)res, sz);
-			file.close();
-		}
-		catch (std::filesystem::filesystem_error fErr)
-		{
-			Logger->Debug(CH_LOADER, "%s", fErr.what());
-			return;
-		}
-	}
-
 	void Setup()
 	{
 		MumbleLink = (Mumble::Data*)DataLinkService->GetResource(DL_MUMBLE_LINK);
 		NexusLink = (NexusLinkData*)DataLinkService->GetResource(DL_NEXUS_LINK);
 
 		Language->SetLocaleDirectory(Index::D_GW2_ADDONS_RAIDCORE_LOCALES);
-		UnpackLocale(Index::F_LOCALE_EN, RES_LOCALE_EN);
-		UnpackLocale(Index::F_LOCALE_DE, RES_LOCALE_DE);
-		//UnpackLocale(Index::F_LOCALE_FR, RES_LOCALE_FR);
-		UnpackLocale(Index::F_LOCALE_ES, RES_LOCALE_ES);
-		UnpackLocale(Index::F_LOCALE_BR, RES_LOCALE_BR);
-		UnpackLocale(Index::F_LOCALE_CZ, RES_LOCALE_CZ);
-		UnpackLocale(Index::F_LOCALE_IT, RES_LOCALE_IT);
-		UnpackLocale(Index::F_LOCALE_PL, RES_LOCALE_PL);
-		UnpackLocale(Index::F_LOCALE_RU, RES_LOCALE_RU);
+		Resources::Unpack(NexusHandle, Index::F_LOCALE_EN, RES_LOCALE_EN, "JSON");
+		Resources::Unpack(NexusHandle, Index::F_LOCALE_DE, RES_LOCALE_DE, "JSON");
+		//Resources::Unpack(NexusHandle, Index::F_LOCALE_FR, RES_LOCALE_FR, "JSON");
+		Resources::Unpack(NexusHandle, Index::F_LOCALE_ES, RES_LOCALE_ES, "JSON");
+		Resources::Unpack(NexusHandle, Index::F_LOCALE_BR, RES_LOCALE_BR, "JSON");
+		Resources::Unpack(NexusHandle, Index::F_LOCALE_CZ, RES_LOCALE_CZ, "JSON");
+		Resources::Unpack(NexusHandle, Index::F_LOCALE_IT, RES_LOCALE_IT, "JSON");
+		Resources::Unpack(NexusHandle, Index::F_LOCALE_PL, RES_LOCALE_PL, "JSON");
+		Resources::Unpack(NexusHandle, Index::F_LOCALE_RU, RES_LOCALE_RU, "JSON");
 		Language->Advance(); // advance once to build lang atlas prior to creation of Quick Access
 
 		ImGuiIO& io = ImGui::GetIO();

@@ -12,6 +12,8 @@
 
 #include "Loader.h"
 
+#include "Util/Resources.h"
+
 namespace ArcDPS
 {
 	std::mutex					Mutex;
@@ -136,20 +138,9 @@ namespace ArcDPS
 	}
 	void DeployBridge()
 	{
-		/* write bridge to disk and queue load */
-		LPVOID res{}; DWORD sz{};
-		GetResource(NexusHandle, MAKEINTRESOURCE(RES_ARCDPS_INTEGRATION), "DLL", &res, &sz);
-
 		try
 		{
-			if (std::filesystem::exists(Index::F_ARCDPSINTEGRATION))
-			{
-				std::filesystem::remove(Index::F_ARCDPSINTEGRATION);
-			}
-
-			std::ofstream file(Index::F_ARCDPSINTEGRATION, std::ios::binary);
-			file.write((const char*)res, sz);
-			file.close();
+			Resources::Unpack(NexusHandle, Index::F_ARCDPSINTEGRATION, RES_ARCDPS_INTEGRATION, "DLL", true);
 
 			// reload is set to true because the dll is always deployed from resource
 			// and since it's locked it would not load here directly but instead after checking for updates (which does not apply to it)

@@ -16,6 +16,8 @@
 
 #include "imgui/imgui_internal.h"
 
+#include "Util/Resources.h"
+
 const char* GetDefaultCompressedFontDataTTFBase85();
 
 namespace FontManager
@@ -249,7 +251,7 @@ void CFontManager::AddFont(const char* aIdentifier, float aFontSize, unsigned aR
 		size_t size = 0;
 
 		/* get data */
-		GetResource(aModule, MAKEINTRESOURCE(aResourceID), RT_FONT, &buffer, (DWORD*)&size);
+		Resources::Get(aModule, MAKEINTRESOURCE(aResourceID), RT_FONT, &buffer, (DWORD*)&size);
 
 		/* call this->AddFontInternal with the memory buffer */
 		this->AddFontInternal(aIdentifier, aFontSize, buffer, size, aCallback, aConfig);
@@ -310,7 +312,7 @@ void CFontManager::AddDefaultFont(FONTS_RECEIVECALLBACK aCallback)
 		size_t size = 0;
 
 		/* get data */
-		GetResource(NexusHandle, MAKEINTRESOURCE(RES_FONT_PROGGYCLEAN), RT_FONT, &buffer, (DWORD*)&size);
+		Resources::Get(NexusHandle, MAKEINTRESOURCE(RES_FONT_PROGGYCLEAN), RT_FONT, &buffer, (DWORD*)&size);
 
 		/* call this->AddFontInternal with the memory buffer */
 		this->AddFontInternal("FONT_DEFAULT", 13.0f, buffer, size, aCallback, nullptr);
