@@ -35,6 +35,7 @@ const char* OPT_LANGUAGE					= "Language";
 const char* OPT_ALWAYSSHOWQUICKACCESS		= "AlwaysShowQuickAccess";
 const char* OPT_GLOBALSCALE					= "GlobalScale";
 const char* OPT_SHOWADDONSWINDOWAFTERDUU	= "ShowAddonsWindowAfterDisableUntilUpdate";
+const char* OPT_NETWORKINGTRIPPLE			= "NetworkingTripple";
 
 namespace Settings
 {

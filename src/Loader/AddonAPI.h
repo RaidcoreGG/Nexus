@@ -17,6 +17,7 @@
 #include "Services/Localization/FuncDefs.h"
 #include "Services/Updater/FuncDefs.h"
 #include "GUI/Fonts/FuncDefs.h"
+#include "Networking/Packet.h"
 
 // Base
 struct AddonAPI {};
@@ -298,6 +299,11 @@ struct AddonAPI4 : AddonAPI
 	FONTS_ADDFROMFILE					AddFontFromFile;
 	FONTS_ADDFROMRESOURCE				AddFontFromResource;
 	FONTS_ADDFROMMEMORY					AddFontFromMemory;
+
+	//TODO(Rennorb) @cleanup: probably needs new revision
+	/// The addon should set this member if desired, so nexus can read it back.
+	Networking::PacketPrepareAndBroadcast* PrepareAndBroadcastPacket;
+	Networking::PacketHandler*             HandleIncomingPacket;
 };
 
 // Revision 5

@@ -24,6 +24,7 @@
 #include "Services/API/ApiClient.h"
 #include "Services/Updater/Updater.h"
 #include "Services/Multibox/Multibox.h"
+#include "Networking/Networking.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -169,6 +170,12 @@ namespace Main
 
 			// free addons
 			Loader::Shutdown();
+
+			//NOTE(Rennorb): At this point addons had their time to send final packets in their shutdown handlers,
+			// now we can disconnect if we were connected until now.
+			if(Networking::State == Networking::InitState::SessionEstablished) {
+				Networking::LeaveSession();
+			}
 
 			GUI::Shutdown();
 			delete MumbleReader;

@@ -154,6 +154,9 @@
     <Filter Include="Inputs\RawInput">
       <UniqueIdentifier>{9bfe2e48-8bc4-40bd-a652-2237dd01af65}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Networking">
+      <UniqueIdentifier>{ecb89c55-d6a8-4cad-a245-a0219d7fcd05}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -344,6 +347,9 @@
     </ClCompile>
     <ClCompile Include="src\GUI\Fonts\FontManager.cpp">
       <Filter>GUI\Fonts</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Networking\Networking.cpp">
+      <Filter>Networking</Filter>
     </ClCompile>
     <ClCompile Include="src\Util\Time.cpp">
       <Filter>Util</Filter>
@@ -1093,6 +1099,15 @@
     </ClInclude>
     <ClInclude Include="src\Services\Mumble\Definitions\Mumble.h">
       <Filter>Services\Mumble</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Networking\Networking.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Networking\Packet.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Networking\PacketInternal.h">
+      <Filter>Networking</Filter>
     </ClInclude>
     <ClInclude Include="src\Util\Time.h">
       <Filter>Util</Filter>

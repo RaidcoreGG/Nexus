@@ -39,6 +39,7 @@
 #include "Services/Settings/Settings.h"
 #include "Services/Textures/TextureLoader.h"
 #include "Services/Updater/Updater.h"
+#include "Networking/Networking.h"
 
 #include "Util/DLL.h"
 #include "Util/MD5.h"
@@ -809,6 +810,20 @@ namespace Loader
 		auto end_time = std::chrono::high_resolution_clock::now();
 		auto time = end_time - start_time;
 
+		auto packetHandler = Networking::GetPacketHandlerFromApi(addon->Definitions->APIVersion, api);
+		if(packetHandler) {
+			//INVAR(Rennorb): addons cannot have the same id, and only one handler, so no need to check if its already in the list
+			Networking::Handlers.emplace(addon->Definitions->Signature, packetHandler);
+			if(Networking::State < Networking::InitState::Initializing) {
+				Logger->Info(CH_LOADER, "At least one addon is using Networking, initializing...");
+				auto start = std::chrono::high_resolution_clock::now();
+				Networking::Init();
+				//Networking::JoinSession(); //TODO(Rennorb): this is not the correct place for this, we cannot really know whom to join at this point
+				auto end = std::chrono::high_resolution_clock::now();
+				Logger->Info(CH_LOADER, u8"Network init took %uµs.", (end - start) / std::chrono::microseconds(1));
+			}
+		}
+
 		EventApi->Raise(EV_ADDON_LOADED, &addon->Definitions->Signature);
 		EventApi->Raise(EV_MUMBLE_IDENTITY_UPDATED, Mumble::IdentityParsed);
 
@@ -991,6 +1006,12 @@ namespace Loader
 		if (!addon)
 		{
 			return;
+		}
+
+		// we have to remove the packet handler before we unload the module, otherwise the handler points to invalid mem for a while
+		if (addon->Definitions)
+		{
+			Networking::Handlers.erase(addon->Definitions->Signature);
 		}
 
 		/* sanity check */
@@ -1366,6 +1387,9 @@ namespace Loader
 			((AddonAPI4*)api)->AddFontFromFile = FontManager::ADDONAPI_AddFontFromFile;
 			((AddonAPI4*)api)->AddFontFromResource = FontManager::ADDONAPI_AddFontFromResource;
 			((AddonAPI4*)api)->AddFontFromMemory = FontManager::ADDONAPI_AddFontFromMemory;
+
+			((AddonAPI4*)api)->HandleIncomingPacket = 0;
+			((AddonAPI4*)api)->PrepareAndBroadcastPacket = Networking::PrepareAndBroadcastPacket;
 
 			ApiDefs.insert({ aVersion, api });
 			return api;
