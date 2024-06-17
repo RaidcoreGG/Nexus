@@ -151,7 +151,7 @@
     <ClInclude Include="src\Services\Logging\FuncDefs.h" />
     <ClInclude Include="src\Main.h" />
     <ClInclude Include="src\Networking\Networking.h" />
-    <ClInclude Include="src\Networking\Packet.h" />
+    <ClInclude Include="src\Networking\NetworkingPublic.h" />
     <ClInclude Include="src\Networking\PacketInternal.h" />
     <ClInclude Include="src\Services\Multibox\Multibox.h" />
     <ClInclude Include="src\Services\Mumble\Definitions\Mumble.h" />

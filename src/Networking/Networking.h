@@ -1,12 +1,15 @@
 #pragma once
 
-#include "Packet.h"
+#include "NetworkingPublic.h"
 #include "Loader/AddonAPI.h"
 #include <WinSock2.h>
 #include <map>
 
 namespace Networking
 {
+	typedef uint32_t u32;
+	typedef uint16_t u16;
+
 	typedef u32 UserId;
 	typedef u32 SessionId;
 

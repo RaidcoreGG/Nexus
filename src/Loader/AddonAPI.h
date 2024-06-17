@@ -17,7 +17,7 @@
 #include "Services/Localization/FuncDefs.h"
 #include "Services/Updater/FuncDefs.h"
 #include "GUI/Fonts/FuncDefs.h"
-#include "Networking/Packet.h"
+#include "Networking/NetworkingPublic.h"
 
 // Base
 struct AddonAPI {};

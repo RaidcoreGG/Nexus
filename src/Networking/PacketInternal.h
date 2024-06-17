@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Networking.h"
-#include "Packet.h"
 
 namespace Networking {
 namespace Internal {

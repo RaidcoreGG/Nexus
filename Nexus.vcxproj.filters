@@ -1103,10 +1103,10 @@
     <ClInclude Include="src\Networking\Networking.h">
       <Filter>Networking</Filter>
     </ClInclude>
-    <ClInclude Include="src\Networking\Packet.h">
+    <ClInclude Include="src\Networking\PacketInternal.h">
       <Filter>Networking</Filter>
     </ClInclude>
-    <ClInclude Include="src\Networking\PacketInternal.h">
+    <ClInclude Include="src\Networking\NetworkingPublic.h">
       <Filter>Networking</Filter>
     </ClInclude>
     <ClInclude Include="src\Util\Time.h">

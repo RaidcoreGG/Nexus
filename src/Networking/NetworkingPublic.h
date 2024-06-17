@@ -1,6 +1,4 @@
 #pragma once
-//TODO(Rennorb) @cleanup: choose a better file name
-
 /*
 
 	This header contains the public struct definitions for packages transferred by the routing system,
@@ -16,7 +14,7 @@
 	#define MY_ADDON_ID  -1234
 	#define _LOG(lvl, fmt, ...) Log(ELogLevel::ELogLevel_ ## lvl, "PingPongAddon", fmt, __VA_ARGS__)
 
-	enum PacketType : u16 {
+	enum PacketType : uint16_t {
 		_UNKNOWN = 0,
 		Ping = 1,
 		Pong = 2,
@@ -28,7 +26,7 @@
 		PacketHeader Header;
 		PacketType PacketType; // if we want to have multiple packets, we need to differentiate them somehow
 
-		u32 Number; // additional data we want to send
+		uint32_t Number; // additional data we want to send
 
 		PacketChecksum CRC; // just for sizing, we dont touch that
 	};
@@ -118,17 +116,15 @@ namespace Networking {
 #endif
 
 typedef int32_t AddonSignature;
-typedef uint32_t u32;
-typedef uint16_t u16;
 
 #pragma pack(push, 1)
 typedef struct {
 	/// The addon should not fill this out, the routing will give it the correct id.
 	//TODO(Rennorb): endianess?
-	u32 TargetAddonId;
+	int32_t TargetAddonId;
 	/// The total length of the packet in int32's this includes teh header and crc32 at the end, so it should be
 	/// 1 + round_up(0.5 + byte_len(data) / 4) + 1
-	u16 LengthInU32s;
+	uint16_t LengthInU32s;
 } PacketHeader;
 
 #ifdef __cplusplus
@@ -146,15 +142,15 @@ typedef struct {
 	PacketHeader Header;
 	/// Your data. This is just an array of u16 for alignment purposes, its actual content will not be touched by the routing.
 	/// This must always come up to a full int32 alignment together with the header, or in other words: It must always contain 2n + 1 int16's.
-	u16 Data[];
+	uint16_t Data[];
 	//TODO(Rennorb): crc endianess?
 } Packet;
 #pragma warning(pop)
 #pragma pack(pop)
 
-typedef u32 PacketChecksum;
+typedef uint32_t PacketChecksum;
 
-//TODO(Rennorb) @cleanup: change case to mathch other exposed fns
+//TODO(Rennorb) @cleanup: change case to match other exposed fns
 
 /// The shape of function that a plugin can register to handle packets destined for it.
 /// If you receive a packet from this callback it is already destined for you and the crc has been validated.
