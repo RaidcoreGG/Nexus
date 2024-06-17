@@ -16,7 +16,6 @@
 #include "Consts.h"
 #include "Shared.h"
 #include "Index.h"
-#include "core.h"
 #include "Renderer.h"
 
 /* For some reason this has to be defined AND included here. */

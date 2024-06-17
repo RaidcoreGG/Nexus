@@ -7,12 +7,13 @@
 #include <regex>
 #include <type_traits>
 
-#include "core.h"
 #include "Consts.h"
 #include "Shared.h"
 
 #include "Services/Mumble/Reader.h"
 #include "Services/DataLink/DataLink.h"
+
+#include "Util/Strings.h"
 
 namespace State
 {

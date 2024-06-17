@@ -5,7 +5,6 @@
 #include <Psapi.h>
 
 #include "resource.h"
-#include "core.h"
 #include "Consts.h"
 #include "Hooks.h"
 #include "Index.h"

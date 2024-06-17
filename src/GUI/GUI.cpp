@@ -1,16 +1,16 @@
 #include "GUI.h"
 
-#include <filesystem>
 #include <algorithm>
 #include <chrono>
+#include <filesystem>
 #include <fstream>
 
-#include "State.h"
-#include "Renderer.h"
-#include "Index.h"
-#include "Shared.h"
-#include "Consts.h"
 #include "Branch.h"
+#include "Consts.h"
+#include "Index.h"
+#include "Renderer.h"
+#include "Shared.h"
+#include "State.h"
 #include "Version.h"
 
 #include "Services/Mumble/Reader.h"
@@ -18,23 +18,24 @@
 #include "Events/EventHandler.h"
 #include "Inputs/Keybinds/KeybindHandler.h"
 #include "Loader/Loader.h"
+#include "Services/DataLink/DataLink.h"
 #include "Services/Settings/Settings.h"
 #include "Services/Textures/TextureLoader.h"
-#include "Services/DataLink/DataLink.h"
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_extensions.h"
-#include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_impl_dx11.h"
+#include "imgui/imgui_impl_win32.h"
 
+#include "Widgets/Alerts/Alerts.h"
 #include "Widgets/Menu/Menu.h"
 #include "Widgets/Menu/MenuItem.h"
 #include "Widgets/QuickAccess/QuickAccess.h"
-#include "Widgets/Alerts/Alerts.h"
 
 #include "resource.h"
-#include "Util/Time.h"
+#include "Util/Base64.h"
 #include "Util/Resources.h"
+#include "Util/Time.h"
 
 #ifndef STRINGIFY
 #define STRINGIFY(x) #x

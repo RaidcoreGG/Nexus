@@ -204,9 +204,6 @@
     <ClCompile Include="src\Services\Logging\CConsoleLogger.cpp">
       <Filter>Services\Logging</Filter>
     </ClCompile>
-    <ClCompile Include="src\core.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Services\Mumble\Reader.cpp">
       <Filter>Services\Mumble</Filter>
     </ClCompile>
@@ -357,6 +354,9 @@
     <ClCompile Include="src\Util\Resources.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+    <ClCompile Include="src\Util\DLL.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h">
@@ -412,9 +412,6 @@
     </ClInclude>
     <ClInclude Include="src\Services\Logging\CConsoleLogger.h">
       <Filter>Services\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="src\core.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\Mumble\Reader.h">
       <Filter>Services\Mumble</Filter>
@@ -1107,6 +1104,9 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="src\Util\Resources.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Util\DLL.h">
       <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>

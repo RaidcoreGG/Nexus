@@ -3,7 +3,6 @@
 #include <filesystem>
 
 #include "Consts.h"
-#include "core.h"
 #include "Index.h"
 #include "Shared.h"
 #include "State.h"
@@ -12,6 +11,7 @@
 
 #include "Loader.h"
 
+#include "Util/DLL.h"
 #include "Util/Resources.h"
 
 namespace ArcDPS
@@ -79,7 +79,7 @@ namespace ArcDPS
 
 			if (hModule)
 			{
-				if (true == FindFunction(hModule, &func, "addextension2"))
+				if (DLL::FindFunction(hModule, &func, "addextension2"))
 				{
 					ModuleHandle = hModule;
 					IsLoaded = true;
@@ -101,7 +101,7 @@ namespace ArcDPS
 
 			if (hModule)
 			{
-				if (true == FindFunction(hModule, &func, "addextension2"))
+				if (DLL::FindFunction(hModule, &func, "addextension2"))
 				{
 					ModuleHandle = hModule;
 					IsLoaded = true;
@@ -123,7 +123,7 @@ namespace ArcDPS
 
 			if (hModule)
 			{
-				if (true == FindFunction(hModule, &func, "addextension2"))
+				if (DLL::FindFunction(hModule, &func, "addextension2"))
 				{
 					ModuleHandle = hModule;
 					IsLoaded = true;
@@ -160,7 +160,7 @@ namespace ArcDPS
 		}
 
 		/* arcdps integration detection & deploy */
-		if (true == FindFunction(ModuleHandle, &exp_addextension2, "addextension2"))
+		if (DLL::FindFunction(ModuleHandle, &exp_addextension2, "addextension2"))
 		{
 			int result = exp_addextension2(aBridgeModule);
 			Logger->Info("ArcDPS", "Deployed ArcDPS Integration. Result: %d", result);
@@ -170,7 +170,7 @@ namespace ArcDPS
 			Logger->Warning("ArcDPS", "Addon with signature \"0xFFF694D1\" found but \"addextension2\" is not exported. ArcDPS combat events won't be relayed.");
 		}
 
-		if (true == FindFunction(ModuleHandle, &exp_listextension, "listextension"))
+		if (DLL::FindFunction(ModuleHandle, &exp_listextension, "listextension"))
 		{
 			GetPlugins();
 			Logger->Info("ArcDPS", "Received ArcDPS plugins.");

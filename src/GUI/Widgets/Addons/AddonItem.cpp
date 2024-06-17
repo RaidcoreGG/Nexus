@@ -18,6 +18,8 @@
 
 #include "Events/EventHandler.h"
 
+#include "Util/Strings.h"
+
 #include "GUI/Widgets/Alerts/Alerts.h"
 
 #include "imgui/imgui.h"

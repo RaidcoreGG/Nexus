@@ -8,39 +8,41 @@
 
 #include "Loader.h"
 
-#include <Windows.h>
+#include <chrono>
 #include <Psapi.h>
 #include <regex>
 #include <vector>
-#include <chrono>
+#include <Windows.h>
 
-#include "core.h"
-#include "State.h"
-#include "Shared.h"
+#include "Consts.h"
 #include "Index.h"
 #include "Renderer.h"
-#include "Consts.h"
+#include "Shared.h"
+#include "State.h"
 
 #include "AddonDefinition.h"
 #include "FuncDefs.h"
 
-#include "Services/Logging/LogHandler.h"
 #include "Events/EventHandler.h"
-#include "Inputs/RawInput/RawInputApi.h"
-#include "Inputs/Keybinds/KeybindHandler.h"
+#include "GUI/Fonts/FontManager.h"
+#include "GUI/GUI.h"
+#include "GUI/Widgets/Alerts/Alerts.h"
+#include "GUI/Widgets/QuickAccess/QuickAccess.h"
 #include "imgui/imgui.h"
+#include "Inputs/Keybinds/KeybindHandler.h"
+#include "Inputs/RawInput/RawInputApi.h"
 #include "minhook/mh_hook.h"
 #include "Services/DataLink/DataLink.h"
-#include "Services/Textures/TextureLoader.h"
-#include "GUI/GUI.h"
-#include "GUI/Widgets/QuickAccess/QuickAccess.h"
-#include "GUI/Widgets/Alerts/Alerts.h"
-#include "Services/Settings/Settings.h"
 #include "Services/Localization/Localization.h"
-#include "Services/Updater/Updater.h"
-#include "GUI/Fonts/FontManager.h"
-
+#include "Services/Logging/LogHandler.h"
 #include "Services/Mumble/Reader.h"
+#include "Services/Settings/Settings.h"
+#include "Services/Textures/TextureLoader.h"
+#include "Services/Updater/Updater.h"
+
+#include "Util/DLL.h"
+#include "Util/MD5.h"
+#include "Util/Strings.h"
 
 #include "ArcDPS.h"
 #include "Library.h"
@@ -559,7 +561,7 @@ namespace Loader
 		}
 
 		/* doesn't have GetAddonDef */
-		if (FindFunction(addon->Module, &getAddonDef, "GetAddonDef") == false)
+		if (DLL::FindFunction(addon->Module, &getAddonDef, "GetAddonDef") == false)
 		{
 			Logger->Warning(CH_LOADER, "\"%s\" is not a Nexus-compatible library. Incompatible.", strFile.c_str());
 			FreeLibrary(addon->Module);

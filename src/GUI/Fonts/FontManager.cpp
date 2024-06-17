@@ -10,7 +10,6 @@
 
 #include <algorithm>
 
-#include "core.h"
 #include "resource.h"
 #include "Shared.h"
 

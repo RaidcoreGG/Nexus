@@ -1,20 +1,22 @@
 #include "COptionsWindow.h"
 
-#include <regex>
 #include <algorithm>
+#include <regex>
 #include <vector>
 
 #include "Consts.h"
-#include "Shared.h"
 #include "Index.h"
-#include "State.h"
 #include "Renderer.h"
+#include "Shared.h"
+#include "State.h"
 
 #include "Inputs/Keybinds/KeybindHandler.h"
-#include "Services/API/APIController.h"
-#include "Services/Settings/Settings.h"
 #include "Loader/Loader.h"
+#include "Services/API/APIController.h"
 #include "Services/Localization/Localization.h"
+#include "Services/Settings/Settings.h"
+
+#include "Util/Base64.h"
 
 #include "GUI/GUI.h"
 #include "GUI/IWindow.h"

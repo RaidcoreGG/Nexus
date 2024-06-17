@@ -11,7 +11,6 @@
 #include "Loader.h"
 #include "ArcDPS.h"
 
-#include "core.h"
 #include "Consts.h"
 #include "Shared.h"
 #include "Index.h"

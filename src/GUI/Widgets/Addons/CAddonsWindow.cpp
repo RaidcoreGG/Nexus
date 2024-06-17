@@ -19,6 +19,8 @@
 #include "GUI/Widgets/Alerts/Alerts.h"
 #include "Services/Updater/Updater.h"
 
+#include "Util/Strings.h"
+
 #include "imgui/imgui.h"
 #include "imgui/imgui_extensions.h"
 

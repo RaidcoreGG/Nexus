@@ -4,8 +4,6 @@
 #include <algorithm>
 #include <map>
 
-#include "core.h"
-
 #include "KeybindHandler.h"
 
 bool operator==(const Keybind& lhs, const Keybind& rhs)

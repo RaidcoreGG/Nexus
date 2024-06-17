@@ -15,7 +15,6 @@
     <ClCompile Include="src\Services\API\ApiClient.cpp" />
     <ClCompile Include="src\Services\API\APIController.cpp" />
     <ClCompile Include="src\Consts.cpp" />
-    <ClCompile Include="src\core.cpp" />
     <ClCompile Include="src\CrashHandler.cpp" />
     <ClCompile Include="src\Services\DataLink\DataLink.cpp" />
     <ClCompile Include="src\Events\EventSubscriber.cpp" />
@@ -71,6 +70,7 @@
     <ClCompile Include="src\Services\Textures\TextureLoader.cpp" />
     <ClCompile Include="src\Services\Updater\Updater.cpp" />
     <ClCompile Include="src\Util\Base64.cpp" />
+    <ClCompile Include="src\Util\DLL.cpp" />
     <ClCompile Include="src\Util\MD5.cpp" />
     <ClCompile Include="src\Util\Paths.cpp" />
     <ClCompile Include="src\Util\Resources.cpp" />
@@ -89,7 +89,6 @@
     <ClInclude Include="src\Branch.h" />
     <ClInclude Include="src\Certs.h" />
     <ClInclude Include="src\Consts.h" />
-    <ClInclude Include="src\core.h" />
     <ClInclude Include="src\CrashHandler.h" />
     <ClInclude Include="src\Services\DataLink\DataLink.h" />
     <ClInclude Include="src\Services\DataLink\FuncDefs.h" />
@@ -321,6 +320,7 @@
     <ClInclude Include="src\Services\Updater\FuncDefs.h" />
     <ClInclude Include="src\Services\Updater\Updater.h" />
     <ClInclude Include="src\Util\Base64.h" />
+    <ClInclude Include="src\Util\DLL.h" />
     <ClInclude Include="src\Util\MD5.h" />
     <ClInclude Include="src\Util\Paths.h" />
     <ClInclude Include="src\Util\Resources.h" />
@@ -456,6 +456,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -487,6 +488,7 @@ CALL $(SolutionDir)Scripts\version.bat</Command>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

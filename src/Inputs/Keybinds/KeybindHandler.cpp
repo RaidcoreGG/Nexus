@@ -8,16 +8,17 @@
 
 #include "KeybindHandler.h"
 
-#include <fstream>
-#include <filesystem>
-#include <string>
 #include <cstdarg>
+#include <filesystem>
+#include <fstream>
+#include <string>
 
-#include "core.h"
 #include "Consts.h"
 #include "Index.h"
 #include "Shared.h"
 #include "State.h"
+
+#include "Util/Strings.h"
 
 #include "KeystrokeMessageFlags.h"
 

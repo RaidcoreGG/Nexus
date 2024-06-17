@@ -6,11 +6,12 @@
 #include "Main.h"
 
 #include "Consts.h"
-#include "Core.h"
 #include "Hooks.h"
 #include "Index.h"
 #include "Shared.h"
 #include "State.h"
+
+#include "Util/DLL.h"
 
 #include "minhook/mh_hook.h"
 
@@ -138,7 +139,7 @@ namespace Proxy
 
 				Proxy::D3D11::CreateDevice = nullptr;
 
-				if (FindFunction(D3D11SystemHandle, &Proxy::D3D11::CreateDevice, "D3D11CreateDevice") == false)
+				if (DLL::FindFunction(D3D11SystemHandle, &Proxy::D3D11::CreateDevice, "D3D11CreateDevice") == false)
 				{
 					return 0;
 				}
@@ -148,7 +149,7 @@ namespace Proxy
 
 			if (Proxy::D3D11::CreateDevice == nullptr)
 			{
-				if (FindFunction(D3D11Handle, &Proxy::D3D11::CreateDevice, "D3D11CreateDevice") == false)
+				if (DLL::FindFunction(D3D11Handle, &Proxy::D3D11::CreateDevice, "D3D11CreateDevice") == false)
 				{
 					return 0;
 				}
@@ -172,7 +173,7 @@ namespace Proxy
 
 				Proxy::D3D11::CreateDeviceAndSwapChain = nullptr;
 
-				if (FindFunction(D3D11SystemHandle, &Proxy::D3D11::CreateDeviceAndSwapChain, "D3D11CreateDeviceAndSwapChain") == false)
+				if (DLL::FindFunction(D3D11SystemHandle, &Proxy::D3D11::CreateDeviceAndSwapChain, "D3D11CreateDeviceAndSwapChain") == false)
 				{
 					return 0;
 				}
@@ -182,7 +183,7 @@ namespace Proxy
 
 			if (Proxy::D3D11::CreateDeviceAndSwapChain == nullptr)
 			{
-				if (FindFunction(D3D11Handle, &Proxy::D3D11::CreateDeviceAndSwapChain, "D3D11CreateDeviceAndSwapChain") == false)
+				if (DLL::FindFunction(D3D11Handle, &Proxy::D3D11::CreateDeviceAndSwapChain, "D3D11CreateDeviceAndSwapChain") == false)
 				{
 					return 0;
 				}
@@ -206,7 +207,7 @@ namespace Proxy
 
 				Proxy::D3D11::CoreCreateDevice = nullptr;
 
-				if (FindFunction(D3D11SystemHandle, &Proxy::D3D11::CoreCreateDevice, "D3D11CoreCreateDevice") == false)
+				if (DLL::FindFunction(D3D11SystemHandle, &Proxy::D3D11::CoreCreateDevice, "D3D11CoreCreateDevice") == false)
 				{
 					return 0;
 				}
@@ -216,7 +217,7 @@ namespace Proxy
 
 			if (Proxy::D3D11::CoreCreateDevice == nullptr)
 			{
-				if (FindFunction(D3D11Handle, &Proxy::D3D11::CoreCreateDevice, "D3D11CoreCreateDevice") == false)
+				if (DLL::FindFunction(D3D11Handle, &Proxy::D3D11::CoreCreateDevice, "D3D11CoreCreateDevice") == false)
 				{
 					return 0;
 				}
@@ -240,7 +241,7 @@ namespace Proxy
 
 				Proxy::D3D11::CoreCreateLayeredDevice = nullptr;
 
-				if (FindFunction(D3D11SystemHandle, &Proxy::D3D11::CoreCreateLayeredDevice, "D3D11CoreCreateLayeredDevice") == false)
+				if (DLL::FindFunction(D3D11SystemHandle, &Proxy::D3D11::CoreCreateLayeredDevice, "D3D11CoreCreateLayeredDevice") == false)
 				{
 					return 0;
 				}
@@ -250,7 +251,7 @@ namespace Proxy
 
 			if (Proxy::D3D11::CoreCreateLayeredDevice == nullptr)
 			{
-				if (FindFunction(D3D11Handle, &Proxy::D3D11::CoreCreateLayeredDevice, "D3D11CoreCreateLayeredDevice") == false)
+				if (DLL::FindFunction(D3D11Handle, &Proxy::D3D11::CoreCreateLayeredDevice, "D3D11CoreCreateLayeredDevice") == false)
 				{
 					return 0;
 				}
@@ -274,7 +275,7 @@ namespace Proxy
 
 				Proxy::D3D11::CoreGetLayeredDeviceSize = nullptr;
 
-				if (FindFunction(D3D11SystemHandle, &Proxy::D3D11::CoreGetLayeredDeviceSize, "D3D11CoreGetLayeredDeviceSize") == false)
+				if (DLL::FindFunction(D3D11SystemHandle, &Proxy::D3D11::CoreGetLayeredDeviceSize, "D3D11CoreGetLayeredDeviceSize") == false)
 				{
 					return 0;
 				}
@@ -284,7 +285,7 @@ namespace Proxy
 
 			if (Proxy::D3D11::CoreGetLayeredDeviceSize == nullptr)
 			{
-				if (FindFunction(D3D11Handle, &Proxy::D3D11::CoreGetLayeredDeviceSize, "D3D11CoreGetLayeredDeviceSize") == false)
+				if (DLL::FindFunction(D3D11Handle, &Proxy::D3D11::CoreGetLayeredDeviceSize, "D3D11CoreGetLayeredDeviceSize") == false)
 				{
 					return 0;
 				}
@@ -308,7 +309,7 @@ namespace Proxy
 
 				Proxy::D3D11::CoreRegisterLayers = nullptr;
 
-				if (FindFunction(D3D11SystemHandle, &Proxy::D3D11::CoreRegisterLayers, "D3D11CoreRegisterLayers") == false)
+				if (DLL::FindFunction(D3D11SystemHandle, &Proxy::D3D11::CoreRegisterLayers, "D3D11CoreRegisterLayers") == false)
 				{
 					return 0;
 				}
@@ -318,7 +319,7 @@ namespace Proxy
 
 			if (Proxy::D3D11::CoreRegisterLayers == nullptr)
 			{
-				if (FindFunction(D3D11Handle, &Proxy::D3D11::CoreRegisterLayers, "D3D11CoreRegisterLayers") == false)
+				if (DLL::FindFunction(D3D11Handle, &Proxy::D3D11::CoreRegisterLayers, "D3D11CoreRegisterLayers") == false)
 				{
 					return 0;
 				}

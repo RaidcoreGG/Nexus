@@ -4,8 +4,6 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 
-#include "core.h"
-
 namespace ImGui
 {
 	static void TextCenteredColumn(const char* fmt, ...)

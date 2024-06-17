@@ -10,11 +10,13 @@
 
 #include <thread>
 
-#include "core.h"
-#include "Shared.h"
 #include "Index.h"
+#include "Shared.h"
 
+#include "Util/MD5.h"
 #include "Util/Paths.h"
+#include "Util/Strings.h"
+#include "Util/URL.h"
 
 namespace Updater
 {
