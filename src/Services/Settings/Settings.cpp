@@ -11,7 +11,7 @@
 #include <filesystem>
 #include <fstream>
 
-#include "Paths.h"
+#include "Index.h"
 #include "Consts.h"
 #include "Shared.h"
 
@@ -43,12 +43,12 @@ namespace Settings
 
 	void Load()
 	{
-		if (!std::filesystem::exists(Path::F_SETTINGS)) { return; }
+		if (!std::filesystem::exists(Index::F_SETTINGS)) { return; }
 
 		const std::lock_guard<std::mutex> lock(Mutex);
 		try
 		{
-			std::ifstream file(Path::F_SETTINGS);
+			std::ifstream file(Index::F_SETTINGS);
 			Settings = json::parse(file);
 			file.close();
 		}
@@ -62,7 +62,7 @@ namespace Settings
 	{
 		const std::lock_guard<std::mutex> lock(Mutex);
 
-		std::ofstream file(Path::F_SETTINGS);
+		std::ofstream file(Index::F_SETTINGS);
 		file << Settings.dump(1, '\t') << std::endl;
 		file.close();
 	}

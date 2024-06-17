@@ -8,15 +8,6 @@
 #include <iomanip>
 #include <sstream>
 
-void PathSystemAppend(std::filesystem::path& aDestination, const char* aAppend)
-{
-	char* buff = new char[MAX_PATH];
-	GetSystemDirectoryA(buff, MAX_PATH);
-	aDestination = buff;
-	aDestination.append(aAppend);
-	delete[] buff;
-}
-
 bool FindFunction(HMODULE aModule, LPVOID aFunction, LPCSTR aName)
 {
 	FARPROC* fp = (FARPROC*)aFunction;
@@ -45,25 +36,6 @@ const char* ConvertToUTF8(const char* multibyteStr)
 	}
 
 	return utf8Str;
-}
-
-// Returns:
-//   true upon success.
-//   false upon failure, and set the std::error_code & err accordingly.
-bool CreateDirectoryRecursive(std::string const& dirName, std::error_code& err)
-{
-	err.clear();
-	if (!std::filesystem::create_directories(dirName, err))
-	{
-		if (std::filesystem::exists(dirName))
-		{
-			// The folder already exists:
-			err.clear();
-			return true;
-		}
-		return false;
-	}
-	return true;
 }
 
 bool GetResource(HMODULE aModule, LPCSTR aResourceName, LPCSTR aResourceType, LPVOID* aOutLockedResource, DWORD* aOutResourceSize)
@@ -96,18 +68,4 @@ bool GetResource(HMODULE aModule, LPCSTR aResourceName, LPCSTR aResourceType, LP
 	*aOutResourceSize = dwResSz;
 
 	return true;
-}
-
-std::filesystem::path GetUnclaimedPath(std::filesystem::path& aPath)
-{
-	std::filesystem::path probe = aPath;
-
-	int i = 0;
-	while (std::filesystem::exists(probe))
-	{
-		probe = aPath.string() + "_" + std::to_string(i);
-		i++;
-	}
-
-	return probe;
 }

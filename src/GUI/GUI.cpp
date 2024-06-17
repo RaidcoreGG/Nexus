@@ -7,7 +7,7 @@
 
 #include "State.h"
 #include "Renderer.h"
-#include "Paths.h"
+#include "Index.h"
 #include "Shared.h"
 #include "Consts.h"
 #include "Branch.h"
@@ -370,7 +370,7 @@ namespace GUI
 	{
 		if (LinkArcDPSStyle)
 		{
-			std::filesystem::path arcIniPath = Path::D_GW2_ADDONS / "arcdps/arcdps.ini";
+			std::filesystem::path arcIniPath = Index::D_GW2_ADDONS / "arcdps/arcdps.ini";
 
 			if (std::filesystem::exists(arcIniPath))
 			{
@@ -599,16 +599,16 @@ namespace GUI
 		MumbleLink = (Mumble::Data*)DataLinkService->GetResource(DL_MUMBLE_LINK);
 		NexusLink = (NexusLinkData*)DataLinkService->GetResource(DL_NEXUS_LINK);
 
-		Language->SetLocaleDirectory(Path::D_GW2_ADDONS_RAIDCORE_LOCALES);
-		UnpackLocale(Path::F_LOCALE_EN, RES_LOCALE_EN);
-		UnpackLocale(Path::F_LOCALE_DE, RES_LOCALE_DE);
-		//UnpackLocale(Path::F_LOCALE_FR, RES_LOCALE_FR);
-		UnpackLocale(Path::F_LOCALE_ES, RES_LOCALE_ES);
-		UnpackLocale(Path::F_LOCALE_BR, RES_LOCALE_BR);
-		UnpackLocale(Path::F_LOCALE_CZ, RES_LOCALE_CZ);
-		UnpackLocale(Path::F_LOCALE_IT, RES_LOCALE_IT);
-		UnpackLocale(Path::F_LOCALE_PL, RES_LOCALE_PL);
-		UnpackLocale(Path::F_LOCALE_RU, RES_LOCALE_RU);
+		Language->SetLocaleDirectory(Index::D_GW2_ADDONS_RAIDCORE_LOCALES);
+		UnpackLocale(Index::F_LOCALE_EN, RES_LOCALE_EN);
+		UnpackLocale(Index::F_LOCALE_DE, RES_LOCALE_DE);
+		//UnpackLocale(Index::F_LOCALE_FR, RES_LOCALE_FR);
+		UnpackLocale(Index::F_LOCALE_ES, RES_LOCALE_ES);
+		UnpackLocale(Index::F_LOCALE_BR, RES_LOCALE_BR);
+		UnpackLocale(Index::F_LOCALE_CZ, RES_LOCALE_CZ);
+		UnpackLocale(Index::F_LOCALE_IT, RES_LOCALE_IT);
+		UnpackLocale(Index::F_LOCALE_PL, RES_LOCALE_PL);
+		UnpackLocale(Index::F_LOCALE_RU, RES_LOCALE_RU);
 		Language->Advance(); // advance once to build lang atlas prior to creation of Quick Access
 
 		ImGuiIO& io = ImGui::GetIO();
@@ -780,15 +780,15 @@ namespace GUI
 		std::filesystem::path fontPath{};
 
 		/* add user font */
-		if (!LinkArcDPSStyle && std::filesystem::exists(Path::F_FONT))
+		if (!LinkArcDPSStyle && std::filesystem::exists(Index::F_FONT))
 		{
-			fontPath = Path::F_FONT;
+			fontPath = Index::F_FONT;
 			FontManager.AddFont("USER_FONT", FontSize, fontPath.string().c_str(), FontReceiver, nullptr);
 			HasCustomFont = true;
 		}
-		else if (LinkArcDPSStyle && std::filesystem::exists(Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf"))
+		else if (LinkArcDPSStyle && std::filesystem::exists(Index::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf"))
 		{
-			fontPath = Path::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf";
+			fontPath = Index::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf";
 			FontManager.AddFont("USER_FONT", FontSize, fontPath.string().c_str(), FontReceiver, nullptr);
 			HasCustomFont = true;
 		}

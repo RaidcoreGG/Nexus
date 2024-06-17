@@ -15,7 +15,7 @@
 
 #include "core.h"
 #include "Consts.h"
-#include "Paths.h"
+#include "Index.h"
 #include "Shared.h"
 #include "State.h"
 
@@ -557,13 +557,13 @@ void CKeybindApi::EndCapturing()
 
 void CKeybindApi::Load()
 {
-	if (!std::filesystem::exists(Path::F_KEYBINDS)) { return; }
+	if (!std::filesystem::exists(Index::F_KEYBINDS)) { return; }
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	try
 	{
-		std::ifstream file(Path::F_KEYBINDS);
+		std::ifstream file(Index::F_KEYBINDS);
 
 		json keybinds = json::parse(file);
 		for (json binding : keybinds)
@@ -622,7 +622,7 @@ void CKeybindApi::Save()
 		keybinds.push_back(binding);
 	}
 
-	std::ofstream file(Path::F_KEYBINDS);
+	std::ofstream file(Index::F_KEYBINDS);
 
 	file << keybinds.dump(1, '\t') << std::endl;
 

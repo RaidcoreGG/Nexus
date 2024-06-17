@@ -62,7 +62,7 @@
     <ClCompile Include="src\thirdparty\minhook\mh_trampoline.cpp" />
     <ClCompile Include="src\Services\Multibox\Multibox.cpp" />
     <ClCompile Include="src\Services\Mumble\Reader.cpp" />
-    <ClCompile Include="src\Paths.cpp" />
+    <ClCompile Include="src\Index.cpp" />
     <ClCompile Include="src\Proxy.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Services\Settings\Settings.cpp" />
@@ -72,6 +72,7 @@
     <ClCompile Include="src\Services\Updater\Updater.cpp" />
     <ClCompile Include="src\Util\Base64.cpp" />
     <ClCompile Include="src\Util\MD5.cpp" />
+    <ClCompile Include="src\Util\Paths.cpp" />
     <ClCompile Include="src\Util\Strings.cpp" />
     <ClCompile Include="src\Util\Time.cpp" />
     <ClCompile Include="src\Util\Url.cpp" />
@@ -289,7 +290,7 @@
     <ClInclude Include="src\thirdparty\openssl\x509_vfy.h" />
     <ClInclude Include="src\thirdparty\openssl\__DECC_INCLUDE_EPILOGUE.H" />
     <ClInclude Include="src\thirdparty\openssl\__DECC_INCLUDE_PROLOGUE.H" />
-    <ClInclude Include="src\Paths.h" />
+    <ClInclude Include="src\Index.h" />
     <ClInclude Include="src\Loader\AddonDefinition.h" />
     <ClInclude Include="src\Loader\EUpdateProvider.h" />
     <ClInclude Include="src\Loader\AddonAPI.h" />
@@ -320,6 +321,7 @@
     <ClInclude Include="src\Services\Updater\Updater.h" />
     <ClInclude Include="src\Util\Base64.h" />
     <ClInclude Include="src\Util\MD5.h" />
+    <ClInclude Include="src\Util\Paths.h" />
     <ClInclude Include="src\Util\Strings.h" />
     <ClInclude Include="src\Util\Time.h" />
     <ClInclude Include="src\Util\Url.h" />

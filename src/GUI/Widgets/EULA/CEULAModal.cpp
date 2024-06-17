@@ -5,7 +5,7 @@
 
 #include "Renderer.h"
 #include "Shared.h"
-#include "Paths.h"
+#include "Index.h"
 #include "Consts.h"
 
 #include "GUI/GUI.h"
@@ -84,7 +84,7 @@ namespace GUI
 			ImGui::Text("If you do not agree to these terms, do not use the software.");
 
 			ImGui::TextWrapped("By clicking \"I do NOT agree\" your game will close and Nexus will attempt to uninstall.");
-			ImGui::TextWrapped("If you see this prompt again after restarting, you will have to manually remove \"%s\" while the game is closed.", Path::F_HOST_DLL.string().c_str());
+			ImGui::TextWrapped("If you see this prompt again after restarting, you will have to manually remove \"%s\" while the game is closed.", Index::F_HOST_DLL.string().c_str());
 
 			ImVec2 remainingPos = ImGui::GetCursorPos();
 			float remainingHeight = remainingPos.y;
@@ -104,7 +104,7 @@ namespace GUI
 			ImGui::SetCursorPos(ImVec2((contentWidth * Renderer::Scaling / 2.0f) + 4.0f + remainingPos.x, y + remainingPos.y));
 			if (ImGui::GW2::Button("I do NOT agree", ImVec2(btnWidth, btnHeight)))
 			{
-				std::string strHost = Path::F_HOST_DLL.string();
+				std::string strHost = Index::F_HOST_DLL.string();
 
 				SHFILEOPSTRUCT fileOp;
 				fileOp.hwnd = NULL;

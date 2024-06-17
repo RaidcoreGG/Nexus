@@ -1,7 +1,7 @@
 #include "Menu.h"
 
 #include "Shared.h"
-#include "Paths.h"
+#include "Index.h"
 #include "State.h"
 #include "Renderer.h"
 #include "resource.h"

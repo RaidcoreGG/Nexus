@@ -17,7 +17,7 @@
 #include "core.h"
 #include "State.h"
 #include "Shared.h"
-#include "Paths.h"
+#include "Index.h"
 #include "Renderer.h"
 #include "Consts.h"
 
@@ -90,8 +90,8 @@ namespace Loader
 		{
 			LoadAddonConfig();
 
-			//FSItemList = ILCreateFromPathA(Path::GetAddonDirectory(nullptr));
-			std::wstring addonDirW = String::ToWString(Path::D_GW2_ADDONS.string());
+			//FSItemList = ILCreateFromPathA(Index::GetAddonDirectory(nullptr));
+			std::wstring addonDirW = String::ToWString(Index::D_GW2_ADDONS.string());
 			HRESULT hresult = SHParseDisplayName(
 				addonDirW.c_str(),
 				0,
@@ -101,7 +101,7 @@ namespace Loader
 			);
 			if (FSItemList == 0)
 			{
-				Logger->Critical(CH_LOADER, "Loader disabled. Reason: SHParseDisplayName(Path::D_GW2_ADDONS) returned %d.", hresult);
+				Logger->Critical(CH_LOADER, "Loader disabled. Reason: SHParseDisplayName(Index::D_GW2_ADDONS) returned %d.", hresult);
 				return;
 			}
 
@@ -185,11 +185,11 @@ namespace Loader
 
 	void LoadAddonConfig()
 	{
-		if (std::filesystem::exists(Path::F_ADDONCONFIG))
+		if (std::filesystem::exists(Index::F_ADDONCONFIG))
 		{
 			try
 			{
-				std::ifstream file(Path::F_ADDONCONFIG);
+				std::ifstream file(Index::F_ADDONCONFIG);
 
 				json cfg = json::parse(file);
 				for (json addonInfo : cfg)
@@ -304,7 +304,7 @@ namespace Loader
 			cfg.push_back(addonInfo);
 		}
 
-		std::ofstream file(Path::F_ADDONCONFIG);
+		std::ofstream file(Index::F_ADDONCONFIG);
 		file << cfg.dump(1, '\t') << std::endl;
 		file.close();
 	}
@@ -324,7 +324,7 @@ namespace Loader
 					char path[MAX_PATH];
 					if (SHGetPathFromIDList(ppidl[0], path))
 					{
-						if (Path::D_GW2_ADDONS == std::string(path))
+						if (Index::D_GW2_ADDONS == std::string(path))
 						{
 							NotifyChanges();
 						}
@@ -453,7 +453,7 @@ namespace Loader
 			}
 
 			// check all other files in the directory
-			for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Path::D_GW2_ADDONS))
+			for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Index::D_GW2_ADDONS))
 			{
 				std::filesystem::path path = entry.path();
 
@@ -777,7 +777,7 @@ namespace Loader
 		}
 
 		/* (effectively duplicate check) if someone wants to do shenanigans and inject a different integration module */
-		if (addon->Definitions->Signature == 0xFED81763 && aPath != Path::F_ARCDPSINTEGRATION)
+		if (addon->Definitions->Signature == 0xFED81763 && aPath != Index::F_ARCDPSINTEGRATION)
 		{
 			Logger->Warning(CH_LOADER, "\"%s\" declares signature 0xFED81763 but is not the actual Nexus ArcDPS Integration. Either this was in error or an attempt to tamper with Nexus files. Incompatible.", strFile.c_str());
 			FreeLibrary(addon->Module);
@@ -1129,9 +1129,9 @@ namespace Loader
 			((AddonAPI1*)api)->RegisterRender = GUI::Register;
 			((AddonAPI1*)api)->DeregisterRender = GUI::Deregister;
 
-			((AddonAPI1*)api)->GetGameDirectory	= Path::GetGameDirectory;
-			((AddonAPI1*)api)->GetAddonDirectory = Path::GetAddonDirectory;
-			((AddonAPI1*)api)->GetCommonDirectory = Path::GetCommonDirectory;
+			((AddonAPI1*)api)->GetGameDirectory	= Index::GetGameDirectory;
+			((AddonAPI1*)api)->GetAddonDirectory = Index::GetAddonDirectory;
+			((AddonAPI1*)api)->GetCommonDirectory = Index::GetCommonDirectory;
 
 			((AddonAPI1*)api)->CreateHook = MH_CreateHook;
 			((AddonAPI1*)api)->RemoveHook = MH_RemoveHook;
@@ -1177,9 +1177,9 @@ namespace Loader
 			((AddonAPI2*)api)->RegisterRender = GUI::Register;
 			((AddonAPI2*)api)->DeregisterRender = GUI::Deregister;
 
-			((AddonAPI2*)api)->GetGameDirectory = Path::GetGameDirectory;
-			((AddonAPI2*)api)->GetAddonDirectory = Path::GetAddonDirectory;
-			((AddonAPI2*)api)->GetCommonDirectory = Path::GetCommonDirectory;
+			((AddonAPI2*)api)->GetGameDirectory = Index::GetGameDirectory;
+			((AddonAPI2*)api)->GetAddonDirectory = Index::GetAddonDirectory;
+			((AddonAPI2*)api)->GetCommonDirectory = Index::GetCommonDirectory;
 
 			((AddonAPI2*)api)->CreateHook = MH_CreateHook;
 			((AddonAPI2*)api)->RemoveHook = MH_RemoveHook;
@@ -1236,9 +1236,9 @@ namespace Loader
 			((AddonAPI3*)api)->RegisterRender = GUI::Register;
 			((AddonAPI3*)api)->DeregisterRender = GUI::Deregister;
 
-			((AddonAPI3*)api)->GetGameDirectory = Path::GetGameDirectory;
-			((AddonAPI3*)api)->GetAddonDirectory = Path::GetAddonDirectory;
-			((AddonAPI3*)api)->GetCommonDirectory = Path::GetCommonDirectory;
+			((AddonAPI3*)api)->GetGameDirectory = Index::GetGameDirectory;
+			((AddonAPI3*)api)->GetAddonDirectory = Index::GetAddonDirectory;
+			((AddonAPI3*)api)->GetCommonDirectory = Index::GetCommonDirectory;
 
 			((AddonAPI3*)api)->CreateHook = MH_CreateHook;
 			((AddonAPI3*)api)->RemoveHook = MH_RemoveHook;
@@ -1301,9 +1301,9 @@ namespace Loader
 
 			((AddonAPI4*)api)->RequestUpdate = Updater::ADDONAPI_RequestUpdate;
 
-			((AddonAPI4*)api)->GetGameDirectory = Path::GetGameDirectory;
-			((AddonAPI4*)api)->GetAddonDirectory = Path::GetAddonDirectory;
-			((AddonAPI4*)api)->GetCommonDirectory = Path::GetCommonDirectory;
+			((AddonAPI4*)api)->GetGameDirectory = Index::GetGameDirectory;
+			((AddonAPI4*)api)->GetAddonDirectory = Index::GetAddonDirectory;
+			((AddonAPI4*)api)->GetCommonDirectory = Index::GetCommonDirectory;
 
 			((AddonAPI4*)api)->CreateHook = MH_CreateHook;
 			((AddonAPI4*)api)->RemoveHook = MH_RemoveHook;
@@ -1371,9 +1371,9 @@ namespace Loader
 
 			((AddonAPI5*)api)->RequestUpdate = Updater::ADDONAPI_RequestUpdate;
 
-			((AddonAPI5*)api)->GetGameDirectory = Path::GetGameDirectory;
-			((AddonAPI5*)api)->GetAddonDirectory = Path::GetAddonDirectory;
-			((AddonAPI5*)api)->GetCommonDirectory = Path::GetCommonDirectory;
+			((AddonAPI5*)api)->GetGameDirectory = Index::GetGameDirectory;
+			((AddonAPI5*)api)->GetAddonDirectory = Index::GetAddonDirectory;
+			((AddonAPI5*)api)->GetCommonDirectory = Index::GetCommonDirectory;
 
 			((AddonAPI5*)api)->CreateHook = MH_CreateHook;
 			((AddonAPI5*)api)->RemoveHook = MH_RemoveHook;

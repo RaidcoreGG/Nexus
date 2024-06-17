@@ -1,56 +1,45 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  Time.h
-/// Description  :  Contains a variety of utility for time based functions.
+/// Name         :  Paths.h
+/// Description  :  Contains a variety of utility for the filesystem and paths.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef TIME_H
-#define TIME_H
+#ifndef PATHS_H
+#define PATHS_H
 
-#include <string>	
+#include <filesystem>
 
 ///----------------------------------------------------------------------------------------------------
-/// Time Namespace
+/// Path Namespace
 ///----------------------------------------------------------------------------------------------------
-namespace Time
+namespace Path
 {
 	///----------------------------------------------------------------------------------------------------
-	/// GetTimestamp:
-	/// 	Returns the current timestamp.
+	/// GetModule:
+	/// 	Returns the path of the specified module.
 	///----------------------------------------------------------------------------------------------------
-	long long GetTimestamp();
+	std::filesystem::path GetModule(HMODULE aModule);
 
 	///----------------------------------------------------------------------------------------------------
-	/// LastModifiedToTimestamp:
-	/// 	Converts a "Last-Modified" HTTP header to a timestamp.
+	/// GetSystem:
+	/// 	Returns a system path with the specified string appended.
 	///----------------------------------------------------------------------------------------------------
-	long long LastModifiedToTimestamp(const std::string& aLastModified);
+	std::filesystem::path GetSystem(const char* aAppend = nullptr);
 
 	///----------------------------------------------------------------------------------------------------
-	/// GetYear:
-	/// 	Returns the year.
+	/// CreateDir:
+	/// 	Wrapper function to create directories recursively.
 	///----------------------------------------------------------------------------------------------------
-	int GetYear();
+	void CreateDir(const std::filesystem::path& aDirectory);
 
 	///----------------------------------------------------------------------------------------------------
-	/// GetMonth:
-	/// 	Returns the month 1-12.
+	/// GetUnused:
+	/// 	Returns an unused path based on the passed one. Increments a _# suffix until unused.
+	/// 	aOverWriteExtension = true will append the suffix to the extension rather than the filename.
 	///----------------------------------------------------------------------------------------------------
-	int GetMonth();
-
-	///----------------------------------------------------------------------------------------------------
-	/// GetDay:
-	/// 	Returns the day of the month 1-31.
-	///----------------------------------------------------------------------------------------------------
-	int GetDay();
-
-	///----------------------------------------------------------------------------------------------------
-	/// GetWeekday:
-	/// 	Returns the current weekday starting Sunday = 0.
-	///----------------------------------------------------------------------------------------------------
-	int GetWeekday();
+	std::filesystem::path GetUnused(const std::filesystem::path& aPath, bool aOverwriteExtension = false);
 }
 
 #endif

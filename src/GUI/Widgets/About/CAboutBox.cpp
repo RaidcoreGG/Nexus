@@ -1,7 +1,7 @@
 #include "CAboutBox.h"
 
 #include "Shared.h"
-#include "Paths.h"
+#include "Index.h"
 #include "State.h"
 #include "Branch.h"
 
@@ -29,7 +29,7 @@ namespace GUI
 			ImGui::SameLine(); ImGui::TextDisabled("release/" BRANCH_NAME);
 #endif
 			ImGui::TextDisabled("Location:");
-			ImGui::Text(""); ImGui::SameLine(); ImGui::Text(Path::F_HOST_DLL.string().c_str());
+			ImGui::Text(""); ImGui::SameLine(); ImGui::Text(Index::F_HOST_DLL.string().c_str());
 			if (ImGui::Tooltip())
 			{
 				for (std::string param : Parameters)

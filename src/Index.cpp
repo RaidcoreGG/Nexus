@@ -1,10 +1,16 @@
-#include "Paths.h"
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  Index.cpp
+/// Description  :  Contains an index of all paths.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
 
-#include <algorithm>
+#include "Index.h"
 
-#include "core.h"
+#include "Util/Paths.h"
 
-namespace Path
+namespace Index
 {
 	std::filesystem::path D_GW2{};
 	std::filesystem::path D_GW2_ADDONS{};
@@ -40,13 +46,11 @@ namespace Path
 	std::filesystem::path F_LOCALE_PL{};
 	std::filesystem::path F_LOCALE_RU{};
 
-	std::vector<std::string> ExistingPaths;
+	std::vector<std::string> PathStore;
 
-	void Initialize(HMODULE aBaseModule)
+	void BuildIndex(HMODULE aBaseModule)
 	{
-		char buff[MAX_PATH]{};
-		GetModuleFileNameA(aBaseModule, buff, MAX_PATH);								/* get self dll path */
-		F_HOST_DLL = buff;
+		F_HOST_DLL = Path::GetModule(aBaseModule);										/* get self dll path */
 
 		/* directories */
 		D_GW2 = F_HOST_DLL.parent_path();												/* get current directory */
@@ -59,10 +63,11 @@ namespace Path
 		D_GW2_ADDONS_RAIDCORE_LOCALES = D_GW2_ADDONS_NEXUS / "Locales";					/* get addons/Nexus/Locales path */
 
 		/* ensure folder tree*/
-		std::filesystem::create_directory(D_GW2_ADDONS);								/* ensure addons dir */
-		std::filesystem::create_directory(D_GW2_ADDONS_COMMON);							/* ensure addons/common dir */
-		std::filesystem::create_directory(D_GW2_ADDONS_NEXUS);							/* ensure addons/Nexus dir */
-		std::filesystem::create_directory(D_GW2_ADDONS_RAIDCORE_LOCALES);				/* ensure addons/Nexus/Locales dir */	
+		Path::CreateDir(D_GW2_ADDONS);
+		Path::CreateDir(D_GW2_ADDONS);													/* ensure addons dir */
+		Path::CreateDir(D_GW2_ADDONS_COMMON);											/* ensure addons/common dir */
+		Path::CreateDir(D_GW2_ADDONS_NEXUS);											/* ensure addons/Nexus dir */
+		Path::CreateDir(D_GW2_ADDONS_RAIDCORE_LOCALES);									/* ensure addons/Nexus/Locales dir */
 
 		/* files */
 		F_LOG = D_GW2_ADDONS_NEXUS / "Nexus.log";										/* get log path */
@@ -75,7 +80,7 @@ namespace Path
 		/* static paths */
 		F_OLD_DLL = F_HOST_DLL.string() + ".old";										/* get old dll path */
 		F_UPDATE_DLL = F_HOST_DLL.string() + ".update";									/* get update dll path */
-		PathSystemAppend(F_SYSTEM_DLL, "d3d11.dll");									/* get system dll path */
+		F_SYSTEM_DLL = Path::GetSystem("d3d11.dll");									/* get system dll path */
 		F_CHAINLOAD_DLL = D_GW2 / "d3d11_chainload.dll";								/* get chainload dll path */
 		F_ARCDPSINTEGRATION = D_GW2_ADDONS_NEXUS / "arcdps_integration64.dll";			/* get arcdps integration dll path */
 
@@ -91,16 +96,16 @@ namespace Path
 		F_LOCALE_RU = D_GW2_ADDONS_RAIDCORE_LOCALES / "ru_Main.json";
 
 		/* push to paths */
-		ExistingPaths.push_back(D_GW2.string());
-		ExistingPaths.push_back(D_GW2_ADDONS_COMMON.string());
-		ExistingPaths.push_back(D_GW2_ADDONS_COMMON_API_GW2.string());
-		ExistingPaths.push_back(D_GW2_ADDONS_COMMON_API_RAIDCORE.string());
+		PathStore.push_back(D_GW2.string());
+		PathStore.push_back(D_GW2_ADDONS_COMMON.string());
+		PathStore.push_back(D_GW2_ADDONS_COMMON_API_GW2.string());
+		PathStore.push_back(D_GW2_ADDONS_COMMON_API_RAIDCORE.string());
 	}
 
 	const char* GetGameDirectory()
 	{
 		// guaranteed to exist from init func
-		const auto& it = std::find(ExistingPaths.begin(), ExistingPaths.end(), D_GW2.string());
+		const auto& it = std::find(PathStore.begin(), PathStore.end(), D_GW2.string());
 		return it->c_str();
 	}
 
@@ -117,12 +122,12 @@ namespace Path
 			str = (D_GW2_ADDONS / aName).string();
 		}
 
-		const auto& it = std::find(ExistingPaths.begin(), ExistingPaths.end(), str);
+		const auto& it = std::find(PathStore.begin(), PathStore.end(), str);
 
-		if (it == ExistingPaths.end())
+		if (it == PathStore.end())
 		{
-			ExistingPaths.push_back(str);
-			return ExistingPaths.back().c_str();
+			PathStore.push_back(str);
+			return PathStore.back().c_str();
 		}
 
 		return it->c_str();
@@ -131,7 +136,7 @@ namespace Path
 	const char* GetCommonDirectory()
 	{
 		// guaranteed to exist from init func
-		const auto& it = std::find(ExistingPaths.begin(), ExistingPaths.end(), D_GW2_ADDONS_COMMON.string());
+		const auto& it = std::find(PathStore.begin(), PathStore.end(), D_GW2_ADDONS_COMMON.string());
 		return it->c_str();
 	}
 }

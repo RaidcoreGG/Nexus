@@ -5,6 +5,7 @@
 #include "core.h"
 #include "Shared.h"
 
+#include "Util/Paths.h"
 #include "Util/Time.h"
 
 CApiClient::CApiClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::path aCacheDirectory, int aCacheLifetime, int aBucketCapacity, int aRefillAmount, int aRefillInterval, const char* aCertificate)
@@ -372,11 +373,7 @@ void CApiClient::ProcessRequests()
 				request.CV->notify_all();
 
 				// write to disk after having notified the caller
-				std::error_code err;
-				if (!CreateDirectoryRecursive(normalizedPath.parent_path().string(), err))
-				{
-					Logger->Warning("CApiClient", "[%s] CreateDirectoryRecursive FAILED, err: % s", BaseURL.c_str(), err.message());
-				}
+				Path::CreateDir(normalizedPath.parent_path());
 
 				std::ofstream file(normalizedPath);
 				file << response.Content.dump(1, '\t') << std::endl;

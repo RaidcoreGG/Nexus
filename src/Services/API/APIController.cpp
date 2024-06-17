@@ -4,7 +4,7 @@
 #include <fstream>
 #include <algorithm>
 
-#include "Paths.h"
+#include "Index.h"
 #include "Shared.h"
 
 #include "httplib/httplib.h"
@@ -32,11 +32,11 @@ namespace API
 
 	void Load()
 	{
-		if (!std::filesystem::exists(Path::F_APIKEYS)) { return; }
+		if (!std::filesystem::exists(Index::F_APIKEYS)) { return; }
 
 		API::Mutex.lock();
 		{
-			std::ifstream file(Path::F_APIKEYS);
+			std::ifstream file(Index::F_APIKEYS);
 			json j = json::parse(file);
 			for (std::string key : j)
 			{
@@ -59,7 +59,7 @@ namespace API
 				keys.push_back(token.Key);
 			}
 
-			std::ofstream file(Path::F_APIKEYS);
+			std::ofstream file(Index::F_APIKEYS);
 			file << keys.dump(1, '\t') << std::endl;
 			file.close();
 		}

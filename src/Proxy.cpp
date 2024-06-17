@@ -8,7 +8,7 @@
 #include "Consts.h"
 #include "Core.h"
 #include "Hooks.h"
-#include "Paths.h"
+#include "Index.h"
 #include "Shared.h"
 #include "State.h"
 
@@ -33,13 +33,13 @@ namespace Proxy
 
 				/* attempt to chainload */
 				/* sanity check that the current dll isn't the chainload */
-				if (Path::F_HOST_DLL != Path::F_CHAINLOAD_DLL)
+				if (Index::F_HOST_DLL != Index::F_CHAINLOAD_DLL)
 				{
-					if (std::filesystem::exists(Path::F_CHAINLOAD_DLL))
+					if (std::filesystem::exists(Index::F_CHAINLOAD_DLL))
 					{
 						State::IsChainloading = true;
 
-						std::string strChainload = Path::F_CHAINLOAD_DLL.string();
+						std::string strChainload = Index::F_CHAINLOAD_DLL.string();
 						D3D11Handle = LoadLibraryA(strChainload.c_str());
 
 						if (D3D11Handle)
@@ -57,7 +57,7 @@ namespace Proxy
 						State::IsChainloading = false;
 					}
 
-					std::string strSystem = Path::F_SYSTEM_DLL.string();
+					std::string strSystem = Index::F_SYSTEM_DLL.string();
 					D3D11Handle = LoadLibraryA(strSystem.c_str());
 
 					assert(D3D11Handle && "Could not load system d3d11.dll");
@@ -132,7 +132,7 @@ namespace Proxy
 
 				if (!D3D11SystemHandle)
 				{
-					std::string strSystem = Path::F_SYSTEM_DLL.string();
+					std::string strSystem = Index::F_SYSTEM_DLL.string();
 					D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
 				}
 
@@ -166,7 +166,7 @@ namespace Proxy
 
 				if (!D3D11SystemHandle)
 				{
-					std::string strSystem = Path::F_SYSTEM_DLL.string();
+					std::string strSystem = Index::F_SYSTEM_DLL.string();
 					D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
 				}
 
@@ -200,7 +200,7 @@ namespace Proxy
 
 				if (!D3D11SystemHandle)
 				{
-					std::string strSystem = Path::F_SYSTEM_DLL.string();
+					std::string strSystem = Index::F_SYSTEM_DLL.string();
 					D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
 				}
 
@@ -234,7 +234,7 @@ namespace Proxy
 
 				if (!D3D11SystemHandle)
 				{
-					std::string strSystem = Path::F_SYSTEM_DLL.string();
+					std::string strSystem = Index::F_SYSTEM_DLL.string();
 					D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
 				}
 
@@ -268,7 +268,7 @@ namespace Proxy
 
 				if (!D3D11SystemHandle)
 				{
-					std::string strSystem = Path::F_SYSTEM_DLL.string();
+					std::string strSystem = Index::F_SYSTEM_DLL.string();
 					D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
 				}
 
@@ -302,7 +302,7 @@ namespace Proxy
 
 				if (!D3D11SystemHandle)
 				{
-					std::string strSystem = Path::F_SYSTEM_DLL.string();
+					std::string strSystem = Index::F_SYSTEM_DLL.string();
 					D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
 				}
 

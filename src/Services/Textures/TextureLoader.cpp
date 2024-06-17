@@ -15,7 +15,7 @@
 
 #include "Consts.h"
 #include "Shared.h"
-#include "Paths.h"
+#include "Index.h"
 #include "core.h"
 #include "Renderer.h"
 
@@ -351,7 +351,7 @@ bool CTextureLoader::OverrideTexture(const char* aIdentifier, TEXTURES_RECEIVECA
 {
 	std::string file = aIdentifier;
 	file.append(".png");
-	std::filesystem::path customPath = Path::D_GW2_ADDONS_NEXUS / "Textures" / file.c_str();
+	std::filesystem::path customPath = Index::D_GW2_ADDONS_NEXUS / "Textures" / file.c_str();
 
 	if (std::filesystem::exists(customPath))
 	{

@@ -4,7 +4,7 @@
 
 #include "Consts.h"
 #include "core.h"
-#include "Paths.h"
+#include "Index.h"
 #include "Shared.h"
 #include "State.h"
 
@@ -69,9 +69,9 @@ namespace ArcDPS
 
 		// The following code is a bit ugly and repetitive, but this is because for each of these dlls you need to check whether it is arcdps
 
-		if (State::IsChainloading && std::filesystem::exists(Path::F_CHAINLOAD_DLL))
+		if (State::IsChainloading && std::filesystem::exists(Index::F_CHAINLOAD_DLL))
 		{
-			HMODULE hModule = GetModuleHandle(Path::F_CHAINLOAD_DLL.string().c_str());
+			HMODULE hModule = GetModuleHandle(Index::F_CHAINLOAD_DLL.string().c_str());
 
 			void* func = nullptr;
 
@@ -90,7 +90,7 @@ namespace ArcDPS
 			}
 		}
 
-		std::filesystem::path alArc = Path::D_GW2_ADDONS / "arcdps" / "gw2addon_arcdps.dll";
+		std::filesystem::path alArc = Index::D_GW2_ADDONS / "arcdps" / "gw2addon_arcdps.dll";
 		if (std::filesystem::exists(alArc))
 		{
 			HMODULE hModule = GetModuleHandle(alArc.string().c_str());
@@ -112,7 +112,7 @@ namespace ArcDPS
 			}
 		}
 
-		std::filesystem::path proxyArc = Path::D_GW2 / "d3d11.dll";
+		std::filesystem::path proxyArc = Index::D_GW2 / "d3d11.dll";
 		if (std::filesystem::exists(proxyArc))
 		{
 			HMODULE hModule = GetModuleHandle(proxyArc.string().c_str());
@@ -142,18 +142,18 @@ namespace ArcDPS
 
 		try
 		{
-			if (std::filesystem::exists(Path::F_ARCDPSINTEGRATION))
+			if (std::filesystem::exists(Index::F_ARCDPSINTEGRATION))
 			{
-				std::filesystem::remove(Path::F_ARCDPSINTEGRATION);
+				std::filesystem::remove(Index::F_ARCDPSINTEGRATION);
 			}
 
-			std::ofstream file(Path::F_ARCDPSINTEGRATION, std::ios::binary);
+			std::ofstream file(Index::F_ARCDPSINTEGRATION, std::ios::binary);
 			file.write((const char*)res, sz);
 			file.close();
 
 			// reload is set to true because the dll is always deployed from resource
 			// and since it's locked it would not load here directly but instead after checking for updates (which does not apply to it)
-			Loader::QueueAddon(ELoaderAction::Reload, Path::F_ARCDPSINTEGRATION);
+			Loader::QueueAddon(ELoaderAction::Reload, Index::F_ARCDPSINTEGRATION);
 		}
 		catch (std::filesystem::filesystem_error fErr)
 		{

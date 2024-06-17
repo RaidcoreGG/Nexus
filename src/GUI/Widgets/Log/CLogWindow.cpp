@@ -3,7 +3,7 @@
 #include <regex>
 
 #include "Shared.h"
-#include "Paths.h"
+#include "Index.h"
 #include "State.h"
 
 #include "Services/Logging/LogHandler.h"

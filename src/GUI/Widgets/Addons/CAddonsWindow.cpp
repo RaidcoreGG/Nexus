@@ -6,7 +6,7 @@
 
 #include "Consts.h"
 #include "Shared.h"
-#include "Paths.h"
+#include "Index.h"
 #include "State.h"
 #include "Renderer.h"
 
@@ -214,7 +214,7 @@ namespace GUI
 
 					if (ImGui::GW2::Button(Language->Translate("((000034))"), ImVec2(ImGui::CalcTextSize(Language->Translate("((000034))")).x + 16.0f, btnHeight)))
 					{
-						std::string strAddons = Path::D_GW2_ADDONS.string();
+						std::string strAddons = Index::D_GW2_ADDONS.string();
 						ShellExecuteA(NULL, "explore", strAddons.c_str(), NULL, NULL, SW_SHOW);
 					}
 					ImGui::SameLine();

@@ -8,7 +8,7 @@
 #include "core.h"
 #include "Consts.h"
 #include "Hooks.h"
-#include "Paths.h"
+#include "Index.h"
 #include "Renderer.h"
 #include "Shared.h"
 #include "State.h"
@@ -60,7 +60,7 @@ namespace Main
 		GetModuleInformation(GetCurrentProcess(), NexusHandle, &moduleInfo, sizeof(moduleInfo));
 		NexusModuleSize = moduleInfo.SizeOfImage;
 
-		Path::Initialize(NexusHandle);
+		Index::BuildIndex(NexusHandle);
 		std::string mumbleName = State::Initialize();
 		
 		/* setup default loggers */
@@ -68,15 +68,15 @@ namespace Main
 		{
 			Logger->RegisterLogger(new CConsoleLogger(ELogLevel::ALL));
 		}
-		Logger->RegisterLogger(new CFileLogger(ELogLevel::ALL, Path::F_LOG));
+		Logger->RegisterLogger(new CFileLogger(ELogLevel::ALL, Index::F_LOG));
 
 		Logger->Info(CH_CORE, GetCommandLineA());
-		Logger->Info(CH_CORE, "%s: %s", Path::F_HOST_DLL != Path::F_CHAINLOAD_DLL ? "Proxy" : "Chainload", Path::F_HOST_DLL.string().c_str());
+		Logger->Info(CH_CORE, "%s: %s", Index::F_HOST_DLL != Index::F_CHAINLOAD_DLL ? "Proxy" : "Chainload", Index::F_HOST_DLL.string().c_str());
 		Logger->Info(CH_CORE, "Build: %s", Version.string().c_str());
 		Logger->Info(CH_CORE, "Entry method: %d", State::EntryMethod);
 
-		RaidcoreAPI = new CApiClient("https://api.raidcore.gg", true, Path::D_GW2_ADDONS_COMMON_API_RAIDCORE, 30 * 60, 300, 5, 1);//, Certs::Raidcore);
-		GitHubAPI = new CApiClient("https://api.github.com", true, Path::D_GW2_ADDONS_COMMON_API_GITHUB, 30 * 60, 60, 60, 60 * 60);
+		RaidcoreAPI = new CApiClient("https://api.raidcore.gg", true, Index::D_GW2_ADDONS_COMMON_API_RAIDCORE, 30 * 60, 300, 5, 1);//, Certs::Raidcore);
+		GitHubAPI = new CApiClient("https://api.github.com", true, Index::D_GW2_ADDONS_COMMON_API_GITHUB, 30 * 60, 60, 60, 60 * 60);
 
 		std::thread([]()
 			{

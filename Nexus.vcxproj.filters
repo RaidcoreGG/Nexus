@@ -216,7 +216,7 @@
     <ClCompile Include="src\Inputs\Keybinds\KeybindHandler.cpp">
       <Filter>Inputs\Keybinds</Filter>
     </ClCompile>
-    <ClCompile Include="src\Paths.cpp">
+    <ClCompile Include="src\Index.cpp">
       <Filter>_GLOBAL</Filter>
     </ClCompile>
     <ClCompile Include="src\State.cpp">
@@ -351,6 +351,9 @@
     <ClCompile Include="src\Util\Time.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+    <ClCompile Include="src\Util\Paths.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h">
@@ -422,7 +425,7 @@
     <ClInclude Include="src\State.h">
       <Filter>_GLOBAL</Filter>
     </ClInclude>
-    <ClInclude Include="src\Paths.h">
+    <ClInclude Include="src\Index.h">
       <Filter>_GLOBAL</Filter>
     </ClInclude>
     <ClInclude Include="src\Hooks.h">
@@ -1095,6 +1098,9 @@
       <Filter>Services\Mumble</Filter>
     </ClInclude>
     <ClInclude Include="src\Util\Time.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Util\Paths.h">
       <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
