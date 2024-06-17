@@ -5,6 +5,8 @@
 #include "core.h"
 #include "Shared.h"
 
+#include "Util/Time.h"
+
 CApiClient::CApiClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::path aCacheDirectory, int aCacheLifetime, int aBucketCapacity, int aRefillAmount, int aRefillInterval, const char* aCertificate)
 {
 	BaseURL = URL::GetBase(aBaseURL); // sanitize url just to be sure
@@ -20,7 +22,7 @@ CApiClient::CApiClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::p
 	std::filesystem::create_directories(CacheDirectory);
 	CacheLifetime = aCacheLifetime;
 
-	TimeSinceLastRefill = Timestamp();
+	TimeSinceLastRefill = Time::GetTimestamp();
 	Bucket = aBucketCapacity;
 	BucketCapacity = aBucketCapacity;
 	RefillAmount = aRefillAmount;
@@ -40,7 +42,7 @@ CApiClient::CApiClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::p
 	file << "0" << std::endl;
 	file.close();
 
-	FileTimeOffset = Timestamp() - std::chrono::duration_cast<std::chrono::seconds>(std::filesystem::last_write_time(timeOffset).time_since_epoch()).count();
+	FileTimeOffset = Time::GetTimestamp() - std::chrono::duration_cast<std::chrono::seconds>(std::filesystem::last_write_time(timeOffset).time_since_epoch()).count();
 }
 CApiClient::~CApiClient()
 {
@@ -67,7 +69,7 @@ json CApiClient::Get(std::string aEndpoint, std::string aParameters, bool aBypas
 
 	if (cachedResponse != nullptr)
 	{
-		long long diff = Timestamp() - cachedResponse->Timestamp;
+		long long diff = Time::GetTimestamp() - cachedResponse->Timestamp;
 
 		if (diff < CacheLifetime && cachedResponse->Content != nullptr)
 		{
@@ -121,7 +123,7 @@ json CApiClient::Post(std::string aEndpoint, std::string aParameters)
 
 	if (cachedResponse != nullptr)
 	{
-		long long diff = Timestamp() - cachedResponse->Timestamp;
+		long long diff = Time::GetTimestamp() - cachedResponse->Timestamp;
 
 		if (diff < CacheLifetime && cachedResponse->Content != nullptr)
 		{
@@ -283,7 +285,7 @@ void CApiClient::ProcessRequests()
 		while (QueuedRequests.size() > 0)
 		{
 			/* Calculate current bucket */
-			long long deltaRefill = Timestamp() - TimeSinceLastRefill;
+			long long deltaRefill = Time::GetTimestamp() - TimeSinceLastRefill;
 			if (deltaRefill >= RefillInterval)
 			{
 				/* time difference divided by interval gives how many "ticks" happened (rounded down)
@@ -292,7 +294,7 @@ void CApiClient::ProcessRequests()
 				Bucket += static_cast<int>((deltaRefill / RefillInterval) * RefillAmount);
 
 				/* time is not set to current timestamp but rather when the last tick happened*/
-				TimeSinceLastRefill = Timestamp() - (deltaRefill % RefillInterval);
+				TimeSinceLastRefill = Time::GetTimestamp() - (deltaRefill % RefillInterval);
 
 				/* Prevent bucket overflow */
 				if (Bucket > BucketCapacity)
@@ -336,7 +338,7 @@ void CApiClient::ProcessRequests()
 				{
 				case 429: // Rate Limited: explicitly set Bucket to 0 and set TimeSinceLastRefill to now and start over
 					Bucket = 0;
-					TimeSinceLastRefill = Timestamp();
+					TimeSinceLastRefill = Time::GetTimestamp();
 					retry = true;
 					break;
 				}
@@ -351,7 +353,7 @@ void CApiClient::ProcessRequests()
 			{
 				CachedResponse* cached = new CachedResponse{};
 				cached->Content = response.Content;
-				cached->Timestamp = Timestamp();
+				cached->Timestamp = Time::GetTimestamp();
 
 				std::filesystem::path normalizedPath = GetNormalizedPath(request.Query);
 				

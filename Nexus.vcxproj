@@ -73,6 +73,7 @@
     <ClCompile Include="src\Util\Base64.cpp" />
     <ClCompile Include="src\Util\MD5.cpp" />
     <ClCompile Include="src\Util\Strings.cpp" />
+    <ClCompile Include="src\Util\Time.cpp" />
     <ClCompile Include="src\Util\Url.cpp" />
     <ClCompile Include="src\Inputs\RawInput\RawInputApi.cpp" />
   </ItemGroup>
@@ -320,6 +321,7 @@
     <ClInclude Include="src\Util\Base64.h" />
     <ClInclude Include="src\Util\MD5.h" />
     <ClInclude Include="src\Util\Strings.h" />
+    <ClInclude Include="src\Util\Time.h" />
     <ClInclude Include="src\Util\Url.h" />
     <ClInclude Include="src\Version.h" />
     <ClInclude Include="src\Inputs\RawInput\FuncDefs.h" />

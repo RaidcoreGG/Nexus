@@ -348,6 +348,9 @@
     <ClCompile Include="src\GUI\Fonts\FontManager.cpp">
       <Filter>GUI\Fonts</Filter>
     </ClCompile>
+    <ClCompile Include="src\Util\Time.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h">
@@ -1090,6 +1093,9 @@
     </ClInclude>
     <ClInclude Include="src\Services\Mumble\Definitions\Mumble.h">
       <Filter>Services\Mumble</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Util\Time.h">
+      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

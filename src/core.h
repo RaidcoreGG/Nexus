@@ -19,9 +19,6 @@ bool FindFunction(HMODULE aModule, LPVOID aFunction, LPCSTR aName);
 
 const char* ConvertToUTF8(const char* multibyteStr);
 
-long long Timestamp();
-long long LastModifiedToTimestamp(const std::string& aLastModified);
-
 bool CreateDirectoryRecursive(std::string const& dirName, std::error_code& err);
 
 bool GetResource(HMODULE aModule, LPCSTR aResourceName, LPCSTR aResourceType, LPVOID* aOutLockedResource, DWORD* aOutResourceSize);

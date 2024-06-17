@@ -33,6 +33,7 @@
 #include "Widgets/Alerts/Alerts.h"
 
 #include "resource.h"
+#include "Util/Time.h"
 
 #ifndef STRINGIFY
 #define STRINGIFY(x) #x
@@ -887,9 +888,7 @@ namespace GUI
 		KeybindApi->Register(KB_TOGGLEHIDEUI, EKBHType::DownOnly, ProcessKeybind, "CTRL+H");
 
 		/* load icons */
-		std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-		tm local_tm = *localtime(&t);
-		int month = local_tm.tm_mon + 1;
+		int month = Time::GetMonth();
 
 		switch (month)
 		{
