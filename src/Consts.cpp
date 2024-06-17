@@ -53,3 +53,8 @@ const UINT WM_ADDONDIRUPDATE			= WM_USER + 101;
 extern const char* API_RAIDCORE			= "https://api.raidcore.gg";
 extern const char* API_GITHUB			= "https://api.github.com";
 extern const char* API_GW2				= "https://api.guildwars2.com";
+
+/* Specific Addon Signatures */
+extern const int SIG_ARCDPS        = 0xFFF694D1;
+extern const int SIG_ARCDPS_BRIDGE = 0xFED81763;
+extern const int SIG_NETWORKING    = 0x00000000; //TODO(Rennorb)

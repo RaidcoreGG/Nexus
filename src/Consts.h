@@ -62,4 +62,10 @@ extern const char* API_RAIDCORE;
 extern const char* API_GITHUB;
 extern const char* API_GW2;
 
+/* Specific Addon Signatures */
+//TODO(Rennorb) @cleanup: Use dedicated type for signatures
+extern const int SIG_ARCDPS;
+extern const int SIG_ARCDPS_BRIDGE;
+extern const int SIG_NETWORKING;
+
 #endif

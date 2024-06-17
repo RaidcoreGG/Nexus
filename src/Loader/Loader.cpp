@@ -251,10 +251,10 @@ namespace Loader
 		}
 
 		/* ensure arcdps integration will be loaded */
-		auto hasArcIntegration = std::find(WhitelistedAddons.begin(), WhitelistedAddons.end(), 0xFED81763);
+		auto hasArcIntegration = std::find(WhitelistedAddons.begin(), WhitelistedAddons.end(), SIG_ARCDPS_BRIDGE);
 		if (hasArcIntegration == WhitelistedAddons.end())
 		{
-			WhitelistedAddons.push_back(0xFED81763);
+			WhitelistedAddons.push_back(SIG_ARCDPS_BRIDGE);
 		}
 	}
 	void SaveAddonConfig()
@@ -274,7 +274,7 @@ namespace Loader
 			signed int sig = addon->Definitions ? addon->Definitions->Signature : addon->MatchSignature;
 
 			// skip bridge
-			if (sig == 0xFED81763) { continue; }
+			if (sig == SIG_ARCDPS_BRIDGE) { continue; }
 			if (sig == 0) { continue; }
 
 			auto tracked = std::find(trackedSigs.begin(), trackedSigs.end(), sig);
@@ -664,7 +664,7 @@ namespace Loader
 
 		/* predeclare locked helper for later */
 		bool locked = addon->Definitions->Unload == nullptr || addon->Definitions->HasFlag(EAddonFlags::DisableHotloading);
-		bool onlyInitialLaunch = addon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || addon->Definitions->Signature == 0xFFF694D1;
+		bool onlyInitialLaunch = addon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || addon->Definitions->Signature == SIG_ARCDPS;
 		// FIXME: remove the arcdps check as soon as it adds the flag
 
 		/* override shoudLoad */
@@ -780,7 +780,7 @@ namespace Loader
 		}
 
 		/* (effectively duplicate check) if someone wants to do shenanigans and inject a different integration module */
-		if (addon->Definitions->Signature == 0xFED81763 && aPath != Index::F_ARCDPSINTEGRATION)
+		if (addon->Definitions->Signature == SIG_ARCDPS_BRIDGE && aPath != Index::F_ARCDPSINTEGRATION)
 		{
 			Logger->Warning(CH_LOADER, "\"%s\" declares signature 0xFED81763 but is not the actual Nexus ArcDPS Integration. Either this was in error or an attempt to tamper with Nexus files. Incompatible.", strFile.c_str());
 			FreeLibrary(addon->Module);
@@ -836,15 +836,14 @@ namespace Loader
 			addon->Definitions->APIVersion, time / std::chrono::microseconds(1)
 		);
 
-		/* if arcdps */
-		if (addon->Definitions->Signature == 0xFFF694D1)
+		if (addon->Definitions->Signature == SIG_ARCDPS)
 		{
 			ArcDPS::ModuleHandle = addon->Module;
 			ArcDPS::IsLoaded = true;
 
 			ArcDPS::DeployBridge();
 		}
-		else if (addon->Definitions->Signature == 0xFED81763 && ArcDPS::ModuleHandle) /* if arcdps bridge */
+		else if (addon->Definitions->Signature == SIG_ARCDPS_BRIDGE && ArcDPS::ModuleHandle)
 		{
 			ArcDPS::InitializeBridge(addon->Module);
 		}

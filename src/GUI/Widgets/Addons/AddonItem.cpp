@@ -293,7 +293,7 @@ namespace GUI
 					}
 					ImGui::GW2::TooltipGeneric(Language->Translate(aAddon->IsFlaggedForDisable ? "((000025))" : "((000023))"), additionalInfo.c_str());
 				}
-				else if (aAddon->State == EAddonState::NotLoaded && (aAddon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || aAddon->Definitions->Signature == 0xFFF694D1) && !IsGameLaunchSequence)
+				else if (aAddon->State == EAddonState::NotLoaded && (aAddon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || aAddon->Definitions->Signature == SIG_ARCDPS) && !IsGameLaunchSequence)
 				{
 					/* if it's too late to load this addon */
 					if (ImGui::GW2::Button((Language->Translate(aAddon->IsFlaggedForEnable ? "((000020))" : "((000024))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))

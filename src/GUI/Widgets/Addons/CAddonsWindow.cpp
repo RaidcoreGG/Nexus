@@ -315,7 +315,7 @@ namespace GUI
 										// if libAddon already exist in installed addons
 										// or if arcdps is loaded another way and the libAddon is arc
 										if ((addon->Definitions != nullptr && addon->Definitions->Signature == libAddon->Signature) ||
-											(ArcDPS::IsLoaded && libAddon->Signature == 0xFFF694D1))
+											(ArcDPS::IsLoaded && libAddon->Signature == SIG_ARCDPS))
 										{
 											exists = true;
 											break;
