@@ -24,7 +24,7 @@ namespace Networking
 
 	void ReportSystemError(char const* fmt, int error);
 	u32 CalculatePacketChecksum(Packet* packet);
-	UserId HashName(char const* start, int len);
+	UserId HashName(char const* start, size_t len);
 	void HandleInternalPacket(Packet* packet);
 	void InitializeSessionSource(SessionSource newSource);
 	void EnterReceiveLoop();
@@ -40,7 +40,7 @@ namespace Networking
 	sockaddr ServerEndpoint;
 	const UserId INVALID_USER = 0;
 	UserId MyUserId = INVALID_USER, SquadmateUserId = INVALID_USER;
-	int CurrentSquadSize = 0;
+	size_t CurrentSquadSize = 0;
 
 
 	bool SetServerAddress(char const* host, u16 port)
@@ -603,7 +603,7 @@ namespace Networking
 
 
 
-	UserId HashName(char const* name, int len)
+	UserId HashName(char const* name, size_t len)
 	{
 		u32* namedData = (u32*)name;
 		u32* end = namedData + len / 4;
@@ -612,7 +612,7 @@ namespace Networking
 			hash ^= *namedData++;
 		}
 
-		int remaining = len % 4;
+		size_t remaining = len % 4;
 		if(remaining != 0) {
 			u32 r = 0;
 			char* rest = (char*)end;
