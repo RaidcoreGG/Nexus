@@ -173,7 +173,7 @@ namespace Main
 
 			//NOTE(Rennorb): At this point addons had their time to send final packets in their shutdown handlers,
 			// now we can disconnect if we were connected until now.
-			if(Networking::State == Networking::InitState::SessionEstablished) {
+			if(Networking::State == Networking::ModuleState::SessionEstablished) {
 				Networking::LeaveSession();
 			}
 

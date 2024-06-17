@@ -81,6 +81,7 @@
     <ClCompile Include="src\Inputs\RawInput\RawInputApi.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ArcBridge.h" />
     <ClInclude Include="src\Services\API\ApiClient.h" />
     <ClInclude Include="src\Services\API\APIController.h" />
     <ClInclude Include="src\Services\API\ActiveToken.h" />

@@ -814,7 +814,7 @@ namespace Loader
 		if(packetHandler) {
 			//INVAR(Rennorb): addons cannot have the same id, and only one handler, so no need to check if its already in the list
 			Networking::Handlers.emplace(addon->Definitions->Signature, packetHandler);
-			if(Networking::State < Networking::InitState::Initializing) {
+			if(Networking::State < Networking::ModuleState::Initializing) {
 				Logger->Info(CH_LOADER, "At least one addon is using Networking, initializing...");
 				auto start = std::chrono::high_resolution_clock::now();
 				Networking::Init();
@@ -836,16 +836,28 @@ namespace Loader
 			addon->Definitions->APIVersion, time / std::chrono::microseconds(1)
 		);
 
-		if (addon->Definitions->Signature == SIG_ARCDPS)
-		{
-			ArcDPS::ModuleHandle = addon->Module;
-			ArcDPS::IsLoaded = true;
+		switch(addon->Definitions->Signature) {
+			case SIG_ARCDPS:
+				ArcDPS::ModuleHandle = addon->Module;
+				ArcDPS::IsLoaded = true;
 
-			ArcDPS::DeployBridge();
-		}
-		else if (addon->Definitions->Signature == SIG_ARCDPS_BRIDGE && ArcDPS::ModuleHandle)
-		{
-			ArcDPS::InitializeBridge(addon->Module);
+				if(Networking::CurrentSessionSource < Networking::SessionSource::Arc)
+					Networking::ChangeSessionSource(Networking::SessionSource::Arc);
+
+				ArcDPS::DeployBridge();
+				break;
+
+			case SIG_ARCDPS_BRIDGE: if (ArcDPS::ModuleHandle) {
+				ArcDPS::InitializeBridge(addon->Module);
+
+				if(Networking::CurrentSessionSource < Networking::SessionSource::ArcBridge)
+					Networking::ChangeSessionSource(Networking::SessionSource::ArcBridge);
+			}	break;
+
+			case SIG_NETWORKING: 
+				if(Networking::CurrentSessionSource < Networking::SessionSource::NetworkAddon)
+					Networking::ChangeSessionSource(Networking::SessionSource::NetworkAddon);
+				break;
 		}
 	}
 
@@ -948,6 +960,35 @@ namespace Loader
 
 		if (addon->Definitions)
 		{
+			// don't need to do all the switching if we are shutting down either way
+			if(addon->State == EAddonState::Loaded) {
+				switch(addon->Definitions->Signature) {
+					case SIG_ARCDPS:
+						if(Networking::CurrentSessionSource == Networking::SessionSource::Arc || Networking::CurrentSessionSource == Networking::SessionSource::ArcBridge) {
+							Networking::ChangeSessionSource(Networking::SessionSource::Mumble);
+						}
+						break;
+
+					case SIG_ARCDPS_BRIDGE:
+						if(Networking::CurrentSessionSource == Networking::SessionSource::ArcBridge) {
+							Networking::ChangeSessionSource(ArcDPS::IsLoaded ? Networking::SessionSource::Arc : Networking::SessionSource::Mumble);
+						}
+						break;
+
+					case SIG_NETWORKING:
+						//NOTE(Rennorb): redundant check, but just in case we add higher modes later on
+						if(Networking::CurrentSessionSource == Networking::SessionSource::NetworkAddon) {
+							Networking::ChangeSessionSource(ArcDPS::IsBridgeDeployed
+								? Networking::SessionSource::ArcBridge 
+								: ArcDPS::IsLoaded 
+									? Networking::SessionSource::Arc 
+									: Networking::SessionSource::Mumble
+							);
+						}
+						break;
+				}
+			}
+
 			// Either normal unload
 			// or shutting down anyway, addon has Unload defined, so it can save settings etc
 			if ((addon->State == EAddonState::Loaded) || (addon->State == EAddonState::LoadedLOCKED && isShutdown))
