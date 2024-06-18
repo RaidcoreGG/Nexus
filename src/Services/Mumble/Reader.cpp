@@ -126,15 +126,19 @@ void CMumbleReader::Advance()
 {
 	while (this->IsRunning)
 	{
-		this->NexusLink->IsGameplay		= this->PreviousTick != this->MumbleLink->UITick || 
-										  (this->PreviousFrameCounter == Renderer::FrameCounter && this->NexusLink->IsGameplay);
-		this->NexusLink->IsMoving		= this->PreviousAvatarPosition != this->MumbleLink->AvatarPosition;
-		this->NexusLink->IsCameraMoving	= this->PreviousCameraFront != this->MumbleLink->CameraFront;
+		this->Flip = !this->Flip; // every other tick so it gets refreshed every 100ms
+		if (this->Flip)
+		{
+			this->NexusLink->IsGameplay = this->PreviousTick != this->MumbleLink->UITick ||
+				(this->PreviousFrameCounter == Renderer::FrameCounter && this->NexusLink->IsGameplay);
+			this->NexusLink->IsMoving = this->PreviousAvatarPosition != this->MumbleLink->AvatarPosition;
+			this->NexusLink->IsCameraMoving = this->PreviousCameraFront != this->MumbleLink->CameraFront;
 
-		this->PreviousFrameCounter		= Renderer::FrameCounter;
-		this->PreviousTick				= this->MumbleLink->UITick;
-		this->PreviousAvatarPosition	= this->MumbleLink->AvatarPosition;
-		this->PreviousCameraFront		= this->MumbleLink->CameraFront;
+			this->PreviousFrameCounter = Renderer::FrameCounter;
+			this->PreviousTick = this->MumbleLink->UITick;
+			this->PreviousAvatarPosition = this->MumbleLink->AvatarPosition;
+			this->PreviousCameraFront = this->MumbleLink->CameraFront;
+		}
 
 		if (this->MumbleLink->Identity[0])
 		{
