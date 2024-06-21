@@ -4,15 +4,17 @@
 #include "State.h"
 
 #include "Events/EventHandler.h"
-#include "Inputs/Keybinds/KeybindHandler.h"
-#include "DataLink/DataLink.h"
-#include "Textures/TextureLoader.h"
 #include "GUI/Widgets/QuickAccess/QuickAccess.h"
+#include "Inputs/Keybinds/KeybindHandler.h"
 #include "Loader/Loader.h"
+#include "Services/DataLink/DataLink.h"
+#include "Services/Textures/TextureLoader.h"
 
-#include "imgui.h"
-#include "imgui_extensions.h"
-#include "imgui_memory_editor.h"
+#include "Util/MD5.h"
+
+#include "imgui/imgui.h"
+#include "imgui/imgui_extensions.h"
+#include "imgui/imgui_memory_editor.h"
 
 namespace GUI
 {
@@ -24,7 +26,6 @@ namespace GUI
 	size_t memSz = 0;
 
 	bool showMetricsDebugger = false;
-	bool showFontDebugger = false;
 
 	/* proto tabs */
 	void DbgEventsTab();
@@ -34,6 +35,7 @@ namespace GUI
 	void DbgShortcutsTab();
 	void DbgLoaderTab();
 	void DbgAPITab();
+	void DbgFontsTab();
 
 	void NodeFont(ImFont* font);
 
@@ -56,40 +58,12 @@ namespace GUI
 			ImGui::ShowMetricsWindow();
 		}
 
-		if (showFontDebugger)
-		{
-			if (ImGui::Begin("Fonts", (bool*)0, ImGuiWindowFlags_AlwaysAutoResize))
-			{
-				ImGuiIO& io = ImGui::GetIO();
-				ImFontAtlas* atlas = io.Fonts;
-				ImGui::PushItemWidth(120);
-				for (int i = 0; i < atlas->Fonts.Size; i++)
-				{
-					ImFont* font = atlas->Fonts[i];
-					ImGui::PushID(font);
-					NodeFont(font);
-					ImGui::PopID();
-				}
-				if (ImGui::TreeNode("Atlas texture", "Atlas texture (%dx%d pixels)", atlas->TexWidth, atlas->TexHeight))
-				{
-					ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
-					ImVec4 border_col = ImVec4(1.0f, 1.0f, 1.0f, 0.5f);
-					ImGui::Image(atlas->TexID, ImVec2((float)atlas->TexWidth, (float)atlas->TexHeight), ImVec2(0, 0), ImVec2(1, 1), tint_col, border_col);
-					ImGui::TreePop();
-				}
-				ImGui::PopItemWidth();
-			}
-
-			ImGui::End();
-		}
-
 		ImGui::SetNextWindowSize(ImVec2(dwWidth * ImGui::GetFontSize(), dwHeight * ImGui::GetFontSize()), ImGuiCond_FirstUseEver);
 		if (ImGui::Begin(Name.c_str(), &Visible, ImGuiWindowFlags_NoCollapse))
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f });
 			ImGui::Checkbox("Show Mumble overlay", &MumbleWindow->Visible);
 			ImGui::Checkbox("Show Metrics / Debugger", &showMetricsDebugger);
-			ImGui::Checkbox("Show Font Debugger", &showFontDebugger);
 			ImGui::PopStyleVar();
 
 			if (ImGui::BeginTabBar("DebugTabBar", ImGuiTabBarFlags_None))
@@ -101,6 +75,7 @@ namespace GUI
 				DbgShortcutsTab();
 				DbgLoaderTab();
 				DbgAPITab();
+				DbgFontsTab();
 				/*if (ImGui::BeginTabItem("Meme"))
 				{
 					{
@@ -123,40 +98,36 @@ namespace GUI
 	{
 		if (ImGui::BeginTabItem("Events"))
 		{
+			ImGui::BeginChild("##EventsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+
+			std::map<std::string, EventData> EventRegistry = EventApi->GetRegistry();
+
+			for (auto& [identifier, ev] : EventRegistry)
 			{
-				ImGui::BeginChild("##EventsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+				std::string header = identifier + " ";
+				header.append("(");
+				header.append(std::to_string(ev.AmountRaises));
+				header.append(")");
 
-				Events::Mutex.lock();
+				if (ImGui::TreeNode(header.c_str()))
 				{
-					for (auto& [identifier, ev] : Events::Registry)
+					if (ev.Subscribers.size() == 0)
 					{
-						std::string header = identifier + " ";
-						header.append("(");
-						header.append(std::to_string(ev.AmountRaises));
-						header.append(")");
-
-						if (ImGui::TreeNode(header.c_str()))
+						ImGui::TextDisabled("This event has no subscribers.");
+					}
+					else
+					{
+						ImGui::TextDisabled("Subscribers:");
+						for (EventSubscriber sub : ev.Subscribers)
 						{
-							if (ev.Subscribers.size() == 0)
-							{
-								ImGui::TextDisabled("This event has no subscribers.");
-							}
-							else
-							{
-								ImGui::TextDisabled("Subscribers:");
-								for (EventSubscriber sub : ev.Subscribers)
-								{
-									ImGui::Text(""); ImGui::SameLine(); ImGui::TextDisabled("Owner: %d | Callback: %p", sub.Signature, sub.Callback);
-								}
-							}
-							ImGui::TreePop();
+							ImGui::Text(""); ImGui::SameLine(); ImGui::TextDisabled("Owner: %d | Callback: %p", sub.Signature, sub.Callback);
 						}
 					}
+					ImGui::TreePop();
 				}
-				Events::Mutex.unlock();
-
-				ImGui::EndChild();
 			}
+
+			ImGui::EndChild();
 
 			ImGui::EndTabItem();
 		}
@@ -165,28 +136,24 @@ namespace GUI
 	{
 		if (ImGui::BeginTabItem("Keybinds"))
 		{
+			ImGui::BeginChild("##KeybindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+
+			std::map<std::string, ActiveKeybind> KeybindRegistry = KeybindApi->GetRegistry();
+			
+			for (auto& [identifier, keybind] : KeybindRegistry)
 			{
-				ImGui::BeginChild("##KeybindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
-
-				Keybinds::Mutex.lock();
+				ImGui::Text(identifier.c_str()); ImGui::SameLine();
+				if (keybind.Handler)
 				{
-					for (auto& [identifier, keybind] : Keybinds::Registry)
-					{
-						ImGui::Text(identifier.c_str()); ImGui::SameLine();
-						if (keybind.Handler)
-						{
-							ImGui::TextDisabled("Handler: %p", keybind.Handler);
-						}
-						else
-						{
-							ImGui::TextDisabled("Handler: (null)");
-						}
-					}
+					ImGui::TextDisabled("Handler: %p", keybind.Handler);
 				}
-				Keybinds::Mutex.unlock();
-
-				ImGui::EndChild();
+				else
+				{
+					ImGui::TextDisabled("Handler: (null)");
+				}
 			}
+
+			ImGui::EndChild();
 
 			ImGui::EndTabItem();
 		}
@@ -195,36 +162,32 @@ namespace GUI
 	{
 		if (ImGui::BeginTabItem("DataLink"))
 		{
+			ImGui::BeginChild("##DataLinkTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+
+			std::unordered_map<std::string, LinkedResource>	DataLinkRegistry = DataLinkService->GetRegistry();
+
+			for (auto& [identifier, resource] : DataLinkRegistry)
 			{
-				ImGui::BeginChild("##DataLinkTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
-
-				DataLink::Mutex.lock();
+				if (ImGui::TreeNode(identifier.c_str()))
 				{
-					for (auto& [identifier, resource] : DataLink::Registry)
+					ImGui::TextDisabled("Handle: %p", resource.Handle);
+					ImGui::TextDisabled("Pointer: %p", resource.Pointer);
+					ImGui::TextDisabled("Size: %d", resource.Size);
+					ImGui::TextDisabled("Name: %s", resource.UnderlyingName.c_str());
+					ImGui::TooltipGeneric("The real underlying name of the file.");
+
+					if (ImGui::SmallButton("Memory Editor"))
 					{
-						if (ImGui::TreeNode(identifier.c_str()))
-						{
-							ImGui::TextDisabled("Handle: %p", resource.Handle);
-							ImGui::TextDisabled("Pointer: %p", resource.Pointer);
-							ImGui::TextDisabled("Size: %d", resource.Size);
-							ImGui::TextDisabled("Name: %s", resource.UnderlyingName.c_str());
-							ImGui::TooltipGeneric("The real underlying name of the file.");
-
-							if (ImGui::SmallButton("Memory Editor"))
-							{
-								memEditor.Open = true;
-								memPtr = resource.Pointer;
-								memSz = resource.Size;
-							}
-
-							ImGui::TreePop();
-						}
+						memEditor.Open = true;
+						memPtr = resource.Pointer;
+						memSz = resource.Size;
 					}
-				}
-				DataLink::Mutex.unlock();
 
-				ImGui::EndChild();
+					ImGui::TreePop();
+				}
 			}
+
+			ImGui::EndChild();
 
 			ImGui::EndTabItem();
 		}
@@ -233,69 +196,74 @@ namespace GUI
 	{
 		if (ImGui::BeginTabItem("Textures"))
 		{
+			ImGui::BeginChild("##TexturesTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+
+			std::map<std::string, Texture*>	TexRegistry = TextureService->GetRegistry();
+			std::vector<QueuedTexture>		TexQueued = TextureService->GetQueuedTextures();
+
+			float previewSize = ImGui::GetTextLineHeightWithSpacing() * 3;
+
+			ImGui::Text("Loaded Textures:");
+			for (auto& [identifier, texture] : TexRegistry)
 			{
-				ImGui::BeginChild("##TexturesTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+				ImGui::Image(texture->Resource, ImVec2(previewSize, previewSize));
 
-				TextureLoader::Mutex.lock();
+				if (ImGui::IsItemHovered())
 				{
-					ImGui::Text("Loaded Textures:");
-					for (auto& [identifier, texture] : TextureLoader::Registry)
+					if (ImGui::Tooltip())
 					{
-						if (ImGui::TreeNode(identifier.c_str()))
+						if (texture->Resource)
 						{
-							ImGui::TextDisabled("Dimensions: %dx%d", texture->Width, texture->Height);
-							ImGui::TextDisabled("Pointer: %p", texture->Resource);
-
-							ImGui::TreePop();
-						}
-						if (ImGui::IsItemHovered())
-						{
-							if (ImGui::Tooltip())
+							float scale = 1.0f;
+							if (texture->Width > 400.0f || texture->Height > 400.0f)
 							{
-								if (texture->Resource)
-								{
-									float scale = 1.0f;
-									if (texture->Width > 400.0f || texture->Height > 400.0f)
-									{
-										scale = (texture->Width > texture->Height ? texture->Width : texture->Height) / 400.0f;
-									}
-									float previewWidth = texture->Width / scale;
-									float previewHeight = texture->Height / scale;
-
-									ImGui::Image(texture->Resource, ImVec2(previewWidth, previewHeight));
-								}
-
-								ImGui::EndTooltip();
+								scale = (texture->Width > texture->Height ? texture->Width : texture->Height) / 400.0f;
 							}
+							float previewWidth = texture->Width / scale;
+							float previewHeight = texture->Height / scale;
 
+							ImGui::Image(texture->Resource, ImVec2(previewWidth, previewHeight));
 						}
-					}
-					if (TextureLoader::Registry.size() == 0)
-					{
-						ImGui::TextDisabled("No textures loaded.");
-					}
-					ImGui::Separator();
-					ImGui::Text("Queued Textures:");
-					for (auto& qtexture : TextureLoader::QueuedTextures)
-					{
-						if (ImGui::TreeNode(qtexture.Identifier.c_str()))
-						{
-							ImGui::TextDisabled("Dimensions: %dx%d", qtexture.Width, qtexture.Height);
-							ImGui::TextDisabled("ReceiveCallback: %p", qtexture.Callback);
-							ImGui::TextDisabled("Data: ", qtexture.Data);
 
-							ImGui::TreePop();
-						}
-					}
-					if (TextureLoader::QueuedTextures.size() == 0)
-					{
-						ImGui::TextDisabled("No textures queued for loading.");
+						ImGui::EndTooltip();
 					}
 				}
-				TextureLoader::Mutex.unlock();
 
+				ImGui::SameLine();
+
+				ImGui::BeginChild((identifier + "##TextureDetails").c_str(), ImVec2(ImGui::GetWindowContentRegionWidth() - previewSize - 8.0f, previewSize));
+				ImGui::Text("Identifier: %s", identifier.c_str());
+				ImGui::TextDisabled("Dimensions: %dx%d", texture->Width, texture->Height);
+				ImGui::TextDisabled("Pointer: %p", texture->Resource);
 				ImGui::EndChild();
 			}
+
+			if (TexRegistry.size() == 0)
+			{
+				ImGui::TextDisabled("No textures loaded.");
+			}
+			ImGui::Separator();
+			ImGui::Text("Queued Textures:");
+			for (auto& qtexture : TexQueued)
+			{
+				if (ImGui::TreeNode(qtexture.Identifier.c_str()))
+				{
+					ImGui::TextDisabled("Dimensions: %dx%d", qtexture.Width, qtexture.Height);
+					ImGui::TextDisabled("ReceiveCallback: %p", qtexture.Callback);
+					ImGui::TextDisabled("Data: ", qtexture.Data);
+
+					ImGui::TreePop();
+				}
+			}
+			if (TexQueued.size() == 0)
+			{
+				ImGui::TextDisabled("No textures queued for loading.");
+			}
+
+			TexRegistry.clear();
+			TexQueued.clear();
+
+			ImGui::EndChild();
 
 			ImGui::EndTabItem();
 		}
@@ -454,6 +422,36 @@ namespace GUI
 	void DbgAPITab()
 	{
 
+	}
+	void DbgFontsTab()
+	{
+		if (ImGui::BeginTabItem("Fonts"))
+		{
+			ImGui::BeginChild("##FontsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+
+			ImGuiIO& io = ImGui::GetIO();
+			ImFontAtlas* atlas = io.Fonts;
+			ImGui::PushItemWidth(120);
+			for (int i = 0; i < atlas->Fonts.Size; i++)
+			{
+				ImFont* font = atlas->Fonts[i];
+				ImGui::PushID(font);
+				NodeFont(font);
+				ImGui::PopID();
+			}
+			if (ImGui::TreeNode("Atlas texture", "Atlas texture (%dx%d pixels)", atlas->TexWidth, atlas->TexHeight))
+			{
+				ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+				ImVec4 border_col = ImVec4(1.0f, 1.0f, 1.0f, 0.5f);
+				ImGui::Image(atlas->TexID, ImVec2((float)atlas->TexWidth, (float)atlas->TexHeight), ImVec2(0, 0), ImVec2(1, 1), tint_col, border_col);
+				ImGui::TreePop();
+			}
+			ImGui::PopItemWidth();
+
+			ImGui::EndChild();
+
+			ImGui::EndTabItem();
+		}
 	}
 
 	void NodeFont(ImFont* font)

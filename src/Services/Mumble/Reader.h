@@ -63,6 +63,7 @@ private:
 	Mumble::Data*		MumbleLink				= nullptr;
 	NexusLinkData*		NexusLink				= nullptr;
 
+	bool				Flip					= false;
 	unsigned			PreviousTick			= 0;
 	Vector3				PreviousAvatarPosition	= {};
 	Vector3				PreviousCameraFront		= {};

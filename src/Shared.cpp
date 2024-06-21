@@ -12,8 +12,14 @@ AddonVersion				Version				= { V_MAJOR, V_MINOR, V_BUILD, V_REVISION };
 std::vector<std::string>	Parameters			= {};
 std::vector<signed int>		RequestedAddons		= {};
 
-CLocalization&				Language			= CLocalization::GetInstance();
-CUpdater&					Updater				= CUpdater::GetInstance();
+CLogHandler*				Logger				= new CLogHandler;
+CLocalization*				Language			= new CLocalization();
+CUpdater*					UpdateService		= new CUpdater();
+CTextureLoader*				TextureService		= new CTextureLoader();
+CDataLink*					DataLinkService		= new CDataLink();
+CEventApi*					EventApi			= new CEventApi();
+CRawInputApi*				RawInputApi			= new CRawInputApi();
+CKeybindApi*				KeybindApi			= nullptr; //new CKeybindApi();
 
 ImFont*						MonospaceFont		= nullptr;
 ImFont*						UserFont			= nullptr;

@@ -1,7 +1,7 @@
 #include "Menu.h"
 
 #include "Shared.h"
-#include "Paths.h"
+#include "Index.h"
 #include "State.h"
 #include "Renderer.h"
 #include "resource.h"
@@ -10,10 +10,10 @@
 #include "GUI/GUI.h"
 #include "GUI/IWindow.h"
 
-#include "Textures/TextureLoader.h"
+#include "Services/Textures/TextureLoader.h"
 
-#include "imgui.h"
-#include "imgui_extensions.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_extensions.h"
 
 namespace GUI
 {
@@ -46,17 +46,17 @@ namespace GUI
 				}
 				else
 				{
-					MenuBG = TextureLoader::GetOrCreate(TEX_MENU_BACKGROUND, RES_TEX_MENU_BACKGROUND, NexusHandle);
+					MenuBG = TextureService->GetOrCreate(TEX_MENU_BACKGROUND, RES_TEX_MENU_BACKGROUND, NexusHandle);
 				}
 
 				if (!MenuButton)
 				{
-					MenuButton = TextureLoader::GetOrCreate(TEX_MENU_BUTTON, RES_TEX_MENU_BUTTON, NexusHandle);
+					MenuButton = TextureService->GetOrCreate(TEX_MENU_BUTTON, RES_TEX_MENU_BUTTON, NexusHandle);
 				}
 
 				if (!MenuButtonHover)
 				{
-					MenuButtonHover = TextureLoader::GetOrCreate(TEX_MENU_BUTTON_HOVER, RES_TEX_MENU_BUTTON_HOVER, NexusHandle);
+					MenuButtonHover = TextureService->GetOrCreate(TEX_MENU_BUTTON_HOVER, RES_TEX_MENU_BUTTON_HOVER, NexusHandle);
 				}
 
 				ImGui::PushFont(FontUI);
@@ -89,7 +89,7 @@ namespace GUI
 
 		void AddMenuItem(std::string aLabel, std::string aTextureIdentifier, unsigned int aResourceID, bool* aToggle)
 		{
-			Texture* icon = TextureLoader::Get(aTextureIdentifier.c_str());
+			Texture* icon = TextureService->Get(aTextureIdentifier.c_str());
 			MenuItem* mItem = new MenuItem{ aLabel, aTextureIdentifier, aResourceID, aToggle, icon, false };
 
 			{

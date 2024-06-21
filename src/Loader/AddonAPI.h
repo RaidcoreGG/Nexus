@@ -3,19 +3,19 @@
 
 #include <dxgi.h>
 #include "Paths/FuncDefs.h"
-#include "Logging/FuncDefs.h"
+#include "Services/Logging/FuncDefs.h"
 #include "Events/FuncDefs.h"
-#include "Inputs/WndProc/FuncDefs.h"
+#include "Inputs/RawInput/FuncDefs.h"
 #include "Inputs/Keybinds/FuncDefs.h"
 #include "imgui/imgui.h"
 #include "minhook/mh_hook.h"
-#include "DataLink/FuncDefs.h"
-#include "Textures/FuncDefs.h"
+#include "Services/DataLink/FuncDefs.h"
+#include "Services/Textures/FuncDefs.h"
 #include "GUI/FuncDefs.h"
 #include "GUI/Widgets/QuickAccess/FuncDefs.h"
 #include "GUI/Widgets/Alerts/FuncDefs.h"
-#include "Localization/FuncDefs.h"
-#include "Updater/FuncDefs.h"
+#include "Services/Localization/FuncDefs.h"
+#include "Services/Updater/FuncDefs.h"
 #include "GUI/Fonts/FuncDefs.h"
 
 // Base
@@ -388,6 +388,5 @@ struct AddonAPI5 : AddonAPI
 		// GW2 API FUNCS
 		// LOGITECH API FUNCS
 };
-
 
 #endif

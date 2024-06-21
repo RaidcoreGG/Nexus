@@ -15,8 +15,8 @@
 #include <vector>
 #include <string>
 
-#include "core.h"
 #include "Util/Strings.h"
+#include "Util/DLL.h"
 
 typedef struct _SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX
 {
@@ -70,7 +70,7 @@ NTSTATUS GetProcessHandles(std::vector<HANDLE>& aHandles)
 		info = (SYSTEM_HANDLE_INFORMATION_EX*) new BYTE[bufferSize];
 
 		static PFN_NTQUERYSYSTEMINFORMATION func;
-		FindFunction(GetModuleHandle("ntdll.dll"), &func, "NtQuerySystemInformation");
+		DLL::FindFunction(GetModuleHandle("ntdll.dll"), &func, "NtQuerySystemInformation");
 		result = func((SYSTEM_INFORMATION_CLASS)0x40, info, bufferSize, &bufferSize);
 	}
 	while (result == STATUS_INFO_LENGTH_MISMATCH);
@@ -93,7 +93,7 @@ NTSTATUS GetProcessHandles(std::vector<HANDLE>& aHandles)
 bool GetHandleName(HANDLE aHandle, PUNICODE_STRING aName, ULONG aNameSize)
 {
 	static PFN_NTQUERYOBJECT func;
-	FindFunction(GetModuleHandle("ntdll.dll"), &func, "NtQueryObject");
+	DLL::FindFunction(GetModuleHandle("ntdll.dll"), &func, "NtQueryObject");
 
 	NTSTATUS result = func(aHandle, (OBJECT_INFORMATION_CLASS)0x01, aName, aNameSize, &aNameSize);
 	return NT_SUCCESS(result)
@@ -127,7 +127,7 @@ namespace Multibox
 			return true;
 		}
 
-		//LogCritical(CH_CORE, "Multibox::ShareArchive() not implemented.");
+		//Logger->Critical(CH_CORE, "Multibox::ShareArchive() not implemented.");
 
 		return false;
 	}
@@ -141,7 +141,7 @@ namespace Multibox
 			return true;
 		}
 
-		//LogCritical(CH_CORE, "Multibox::ShareLocal() not implemented.");
+		//Logger->Critical(CH_CORE, "Multibox::ShareLocal() not implemented.");
 
 		return false;
 	}
@@ -155,7 +155,7 @@ namespace Multibox
 
 		UNICODE_STRING mutexName;
 		PFN_RTLINITUNICODESTRING func;
-		if (FindFunction(GetModuleHandle("ntdll.dll"), &func, "RtlInitUnicodeString"))
+		if (DLL::FindFunction(GetModuleHandle("ntdll.dll"), &func, "RtlInitUnicodeString"))
 		{
 			func(&mutexName, L"AN-Mutex-Window-Guild Wars 2");
 

@@ -26,6 +26,24 @@
 namespace Keybinds
 {
 	///----------------------------------------------------------------------------------------------------
+	/// ScancodeToString:
+	/// 	Returns the display string of a scan code.
+	///----------------------------------------------------------------------------------------------------
+	std::string ScancodeToString(unsigned short aScanCode);
+
+	///----------------------------------------------------------------------------------------------------
+	/// KBFromString:
+	/// 	Helper function to create a keybind from a string.
+	///----------------------------------------------------------------------------------------------------
+	Keybind KBFromString(std::string aKeybind);
+
+	///----------------------------------------------------------------------------------------------------
+	/// KBToString:
+	/// 	Helper function to get the display string of a keybind.
+	///----------------------------------------------------------------------------------------------------
+	std::string KBToString(Keybind aKebyind, bool padded = false);
+
+	///----------------------------------------------------------------------------------------------------
 	/// ADDONAPI_RegisterWithString:
 	/// 	[Revision 1] Addon API wrapper function for Register from string.
 	///----------------------------------------------------------------------------------------------------
@@ -54,52 +72,34 @@ namespace Keybinds
 	/// 	Addon API wrapper function for Invoke.
 	///----------------------------------------------------------------------------------------------------
 	void ADDONAPI_InvokeKeybind(const char* aIdentifier, bool aIsRelease);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_Deregister:
+	/// 	Addon API wrapper function for Deregister.
+	///----------------------------------------------------------------------------------------------------
+	void ADDONAPI_Deregister(const char* aIdentifier);
 }
 
 ///----------------------------------------------------------------------------------------------------
-/// Keybinds Namespace
+/// CKeybindApi Class
 ///----------------------------------------------------------------------------------------------------
-namespace Keybinds
+class CKeybindApi
 {
-	extern std::mutex								Mutex;
-	extern std::map<std::string, ActiveKeybind>		Registry;
-
-	extern bool										IsSettingKeybind;
-	extern Keybind									CurrentKeybind;
-	extern std::string								CurrentKeybindUsedBy;
-
-	/* this is ugly as fuck */
-	extern bool										AltTracked;
-	extern bool										CtrlTracked;
-	extern bool										ShiftTracked;
-	extern std::vector<unsigned short>				KeysTracked;
-	extern std::map<std::string, ActiveKeybind>		HeldKeybinds;
-
-	extern std::map<unsigned short, std::string>	ScancodeLookupTable;
-
+public:
 	///----------------------------------------------------------------------------------------------------
-	/// Initialize:
-	/// 	Sets up the ScancodeLookupTable and loads the keybinds.
+	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	void Initialize();
+	CKeybindApi();
+	///----------------------------------------------------------------------------------------------------
+	/// dtor
+	///----------------------------------------------------------------------------------------------------
+	~CKeybindApi() = default;
 
 	///----------------------------------------------------------------------------------------------------
 	/// WndProc:
 	/// 	Returns 0 if a keybind was invoked.
 	///----------------------------------------------------------------------------------------------------
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-	///----------------------------------------------------------------------------------------------------
-	/// Load:
-	/// 	Loads the keybinds.
-	///----------------------------------------------------------------------------------------------------
-	void Load();
-
-	///----------------------------------------------------------------------------------------------------
-	/// Save:
-	/// 	Saves the keybinds.
-	///----------------------------------------------------------------------------------------------------
-	void Save();
 
 	///----------------------------------------------------------------------------------------------------
 	/// Register:
@@ -128,12 +128,6 @@ namespace Keybinds
 	std::string IsInUse(Keybind aKeybind);
 
 	///----------------------------------------------------------------------------------------------------
-	/// KBFromString:
-	/// 	Helper function to create a keybind from a string.
-	///----------------------------------------------------------------------------------------------------
-	Keybind KBFromString(std::string aKeybind);
-	
-	///----------------------------------------------------------------------------------------------------
 	/// Set:
 	/// 	Sets a keybind.
 	///----------------------------------------------------------------------------------------------------
@@ -157,6 +151,62 @@ namespace Keybinds
 	/// 	Removes all KeybindHandlers that are within the provided address space.
 	///----------------------------------------------------------------------------------------------------
 	int Verify(void* aStartAddress, void* aEndAddress);
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetRegistry:
+	/// 	Returns a copy of the registry.
+	///----------------------------------------------------------------------------------------------------
+	std::map<std::string, ActiveKeybind> GetRegistry() const;
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetCapturedKeybind:
+	/// 	Gets which keybind is currently held, regardless of it being mapped or not.
+	///----------------------------------------------------------------------------------------------------
+	Keybind GetCapturedKeybind() const;
+
+	///----------------------------------------------------------------------------------------------------
+	/// StartCapturing:
+	/// 	Starts capturing the held keybind.
+	///----------------------------------------------------------------------------------------------------
+	void StartCapturing();
+
+	///----------------------------------------------------------------------------------------------------
+	/// EndCapturing:
+	/// 	Ends capturing the held keybind.
+	///----------------------------------------------------------------------------------------------------
+	void EndCapturing();
+
+private:
+	mutable std::mutex						Mutex;
+	std::map<std::string, ActiveKeybind>	Registry;
+
+	bool									IsCapturing;
+	Keybind									CapturedKeybind;
+
+	//mutable std::mutex						MutexHeldKeys;
+	bool									IsAltHeld;
+	bool									IsCtrlHeld;
+	bool									IsShiftHeld;
+	std::vector<unsigned short>				HeldKeys;
+	std::map<std::string, ActiveKeybind>	HeldKeybinds;
+
+	///----------------------------------------------------------------------------------------------------
+	/// Load:
+	/// 	Loads the keybinds.
+	///----------------------------------------------------------------------------------------------------
+	void Load();
+
+	///----------------------------------------------------------------------------------------------------
+	/// Save:
+	/// 	Saves the keybinds.
+	///----------------------------------------------------------------------------------------------------
+	void Save();
+
+	///----------------------------------------------------------------------------------------------------
+	/// ReleaseAll:
+	/// 	Clears all currently held key states and keybinds and invokes a release.
+	///----------------------------------------------------------------------------------------------------
+	void ReleaseAll();
 };
 
 #endif

@@ -7,12 +7,13 @@
 #include <regex>
 #include <type_traits>
 
-#include "core.h"
 #include "Consts.h"
 #include "Shared.h"
 
 #include "Services/Mumble/Reader.h"
-#include "DataLink/DataLink.h"
+#include "Services/DataLink/DataLink.h"
+
+#include "Util/Strings.h"
 
 namespace State
 {
@@ -82,11 +83,11 @@ namespace State
 					}
 					catch (const std::invalid_argument& e)
 					{
-						Log(CH_CORE, "Invalid argument (-ggaddons): %s", addonId.c_str());
+						Logger->Trace(CH_CORE, "Invalid argument (-ggaddons): %s", addonId.c_str());
 					}
 					catch (const std::out_of_range& e)
 					{
-						Log(CH_CORE, "Out of range (-ggaddons): %s", addonId.c_str());
+						Logger->Trace(CH_CORE, "Out of range (-ggaddons): %s", addonId.c_str());
 					}
 				}
 

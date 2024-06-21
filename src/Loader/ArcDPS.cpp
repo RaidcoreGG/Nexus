@@ -3,14 +3,16 @@
 #include <filesystem>
 
 #include "Consts.h"
-#include "core.h"
-#include "Paths.h"
+#include "Index.h"
 #include "Shared.h"
 #include "State.h"
 
 #include "resource.h"
 
 #include "Loader.h"
+
+#include "Util/DLL.h"
+#include "Util/Resources.h"
 
 namespace ArcDPS
 {
@@ -56,7 +58,7 @@ namespace ArcDPS
 		}
 		else
 		{
-			LogWarning(CH_CORE, "Error parsing API response for /arcdpslibrary.");
+			Logger->Warning(CH_CORE, "Error parsing API response for /arcdpslibrary.");
 		}
 	}
 
@@ -69,20 +71,20 @@ namespace ArcDPS
 
 		// The following code is a bit ugly and repetitive, but this is because for each of these dlls you need to check whether it is arcdps
 
-		if (State::IsChainloading && std::filesystem::exists(Path::F_CHAINLOAD_DLL))
+		if (State::IsChainloading && std::filesystem::exists(Index::F_CHAINLOAD_DLL))
 		{
-			HMODULE hModule = GetModuleHandle(Path::F_CHAINLOAD_DLL.string().c_str());
+			HMODULE hModule = GetModuleHandle(Index::F_CHAINLOAD_DLL.string().c_str());
 
 			void* func = nullptr;
 
 			if (hModule)
 			{
-				if (true == FindFunction(hModule, &func, "addextension2"))
+				if (DLL::FindFunction(hModule, &func, "addextension2"))
 				{
 					ModuleHandle = hModule;
 					IsLoaded = true;
 
-					LogInfo("ArcDPS", "ArcDPS is not loaded as Nexus addon but was detected as Chainload.");
+					Logger->Info("ArcDPS", "ArcDPS is not loaded as Nexus addon but was detected as Chainload.");
 
 					DeployBridge();
 					return;
@@ -90,7 +92,7 @@ namespace ArcDPS
 			}
 		}
 
-		std::filesystem::path alArc = Path::D_GW2_ADDONS / "arcdps" / "gw2addon_arcdps.dll";
+		std::filesystem::path alArc = Index::D_GW2_ADDONS / "arcdps" / "gw2addon_arcdps.dll";
 		if (std::filesystem::exists(alArc))
 		{
 			HMODULE hModule = GetModuleHandle(alArc.string().c_str());
@@ -99,12 +101,12 @@ namespace ArcDPS
 
 			if (hModule)
 			{
-				if (true == FindFunction(hModule, &func, "addextension2"))
+				if (DLL::FindFunction(hModule, &func, "addextension2"))
 				{
 					ModuleHandle = hModule;
 					IsLoaded = true;
 
-					LogInfo("ArcDPS", "ArcDPS is not loaded as Nexus addon but was detected as Addon-Loader addon.");
+					Logger->Info("ArcDPS", "ArcDPS is not loaded as Nexus addon but was detected as Addon-Loader addon.");
 
 					DeployBridge();
 					return;
@@ -112,7 +114,7 @@ namespace ArcDPS
 			}
 		}
 
-		std::filesystem::path proxyArc = Path::D_GW2 / "d3d11.dll";
+		std::filesystem::path proxyArc = Index::D_GW2 / "d3d11.dll";
 		if (std::filesystem::exists(proxyArc))
 		{
 			HMODULE hModule = GetModuleHandle(proxyArc.string().c_str());
@@ -121,12 +123,12 @@ namespace ArcDPS
 
 			if (hModule)
 			{
-				if (true == FindFunction(hModule, &func, "addextension2"))
+				if (DLL::FindFunction(hModule, &func, "addextension2"))
 				{
 					ModuleHandle = hModule;
 					IsLoaded = true;
 
-					LogInfo("ArcDPS", "ArcDPS is not loaded as Nexus addon but was detected as Proxy.");
+					Logger->Info("ArcDPS", "ArcDPS is not loaded as Nexus addon but was detected as Proxy.");
 
 					DeployBridge();
 					return;
@@ -136,28 +138,17 @@ namespace ArcDPS
 	}
 	void DeployBridge()
 	{
-		/* write bridge to disk and queue load */
-		LPVOID res{}; DWORD sz{};
-		GetResource(NexusHandle, MAKEINTRESOURCE(RES_ARCDPS_INTEGRATION), "DLL", &res, &sz);
-
 		try
 		{
-			if (std::filesystem::exists(Path::F_ARCDPSINTEGRATION))
-			{
-				std::filesystem::remove(Path::F_ARCDPSINTEGRATION);
-			}
-
-			std::ofstream file(Path::F_ARCDPSINTEGRATION, std::ios::binary);
-			file.write((const char*)res, sz);
-			file.close();
+			Resources::Unpack(NexusHandle, Index::F_ARCDPSINTEGRATION, RES_ARCDPS_INTEGRATION, "DLL", true);
 
 			// reload is set to true because the dll is always deployed from resource
 			// and since it's locked it would not load here directly but instead after checking for updates (which does not apply to it)
-			Loader::QueueAddon(ELoaderAction::Reload, Path::F_ARCDPSINTEGRATION);
+			Loader::QueueAddon(ELoaderAction::Reload, Index::F_ARCDPSINTEGRATION);
 		}
 		catch (std::filesystem::filesystem_error fErr)
 		{
-			LogDebug("ArcDPS", "%s", fErr.what());
+			Logger->Debug("ArcDPS", "%s", fErr.what());
 			return;
 		}
 	}
@@ -169,24 +160,24 @@ namespace ArcDPS
 		}
 
 		/* arcdps integration detection & deploy */
-		if (true == FindFunction(ModuleHandle, &exp_addextension2, "addextension2"))
+		if (DLL::FindFunction(ModuleHandle, &exp_addextension2, "addextension2"))
 		{
 			int result = exp_addextension2(aBridgeModule);
-			LogInfo("ArcDPS", "Deployed ArcDPS Integration. Result: %d", result);
+			Logger->Info("ArcDPS", "Deployed ArcDPS Integration. Result: %d", result);
 		}
 		else
 		{
-			LogWarning("ArcDPS", "Addon with signature \"0xFFF694D1\" found but \"addextension2\" is not exported. ArcDPS combat events won't be relayed.");
+			Logger->Warning("ArcDPS", "Addon with signature \"0xFFF694D1\" found but \"addextension2\" is not exported. ArcDPS combat events won't be relayed.");
 		}
 
-		if (true == FindFunction(ModuleHandle, &exp_listextension, "listextension"))
+		if (DLL::FindFunction(ModuleHandle, &exp_listextension, "listextension"))
 		{
 			GetPlugins();
-			LogInfo("ArcDPS", "Received ArcDPS plugins.");
+			Logger->Info("ArcDPS", "Received ArcDPS plugins.");
 		}
 		else
 		{
-			LogWarning("ArcDPS", "Addon with signature \"0xFFF694D1\" found but \"listextension\" is not exported.");
+			Logger->Warning("ArcDPS", "Addon with signature \"0xFFF694D1\" found but \"listextension\" is not exported.");
 		}
 
 		IsBridgeDeployed = true;
@@ -233,7 +224,7 @@ namespace ArcDPS
 			int result = exp_addextension2(aModule);
 			if (result != 0)
 			{
-				LogDebug("ArcDPS", "Could not add extension. Error %d", result);
+				Logger->Debug("ArcDPS", "Could not add extension. Error %d", result);
 			}
 		}
 	}

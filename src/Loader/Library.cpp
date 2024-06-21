@@ -11,10 +11,9 @@
 #include "Loader.h"
 #include "ArcDPS.h"
 
-#include "core.h"
 #include "Consts.h"
 #include "Shared.h"
-#include "Paths.h"
+#include "Index.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -66,7 +65,7 @@ namespace Loader
 			}
 			else
 			{
-				LogWarning(CH_LOADER, "Error parsing API response for /addonlibrary.");
+				Logger->Warning(CH_LOADER, "Error parsing API response for /addonlibrary.");
 			}
 		}
 	}

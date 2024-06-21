@@ -6,7 +6,7 @@
 #include <mutex>
 
 #include "GUI/IWindow.h"
-#include "Textures/Texture.h"
+#include "Services/Textures/Texture.h"
 #include "Loader/LibraryAddon.h"
 
 namespace GUI
@@ -48,6 +48,7 @@ namespace GUI
 
 		int queuedForCheck = 0;
 		int checkedForUpdates = -1;
+		int updatedCount = 0;
 	};
 }
 

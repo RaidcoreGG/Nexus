@@ -5,21 +5,21 @@
 #include "State.h"
 #include "Renderer.h"
 
-#include "DataLink/DataLink.h"
+#include "Services/DataLink/DataLink.h"
 #include "Services/Mumble/Reader.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
-#include "imgui.h"
-#include "imgui_extensions.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_extensions.h"
 
 namespace GUI
 {
 	CMumbleOverlay::CMumbleOverlay()
 	{
-		MumbleLink = (Mumble::Data*)DataLink::GetResource(DL_MUMBLE_LINK);
-		NexusLink = (NexusLinkData*)DataLink::GetResource(DL_NEXUS_LINK);
+		MumbleLink = (Mumble::Data*)DataLinkService->GetResource(DL_MUMBLE_LINK);
+		NexusLink = (NexusLinkData*)DataLinkService->GetResource(DL_NEXUS_LINK);
 	}
 
 	void CMumbleOverlay::Render()

@@ -159,4 +159,27 @@ namespace String
 		MultiByteToWideChar(CP_ACP, 0, aString.c_str(), (int)aString.length(), &str[0], (int)str.length());
 		return str;
 	}
+
+	std::string ConvertMBToUTF8(std::string aString)
+	{
+		char* utf8Str = nullptr;
+
+		int wideCharCount = MultiByteToWideChar(CP_ACP, 0, aString.c_str(), -1, NULL, 0);
+		if (wideCharCount > 0)
+		{
+			wchar_t* wideCharBuff = new wchar_t[wideCharCount];
+			MultiByteToWideChar(CP_ACP, 0, aString.c_str(), -1, wideCharBuff, wideCharCount);
+
+			int utf8Count = WideCharToMultiByte(CP_UTF8, 0, wideCharBuff, -1, NULL, 0, NULL, NULL);
+			if (utf8Count > 0)
+			{
+				utf8Str = new char[utf8Count];
+				WideCharToMultiByte(CP_UTF8, 0, wideCharBuff, -1, utf8Str, utf8Count, NULL, NULL);
+			}
+
+			delete[] wideCharBuff;
+		}
+
+		return std::string(utf8Str ? utf8Str : "");
+	}
 }

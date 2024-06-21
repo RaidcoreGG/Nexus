@@ -11,17 +11,19 @@
 #include "Loader/Loader.h"
 #include "Loader/Library.h"
 #include "Loader/ArcDPS.h"
-#include "Textures/TextureLoader.h"
-#include "Textures/Texture.h"
+#include "Services/Textures/TextureLoader.h"
+#include "Services/Textures/Texture.h"
 
-#include "Updater/Updater.h"
+#include "Services/Updater/Updater.h"
 
 #include "Events/EventHandler.h"
 
+#include "Util/Strings.h"
+
 #include "GUI/Widgets/Alerts/Alerts.h"
 
-#include "imgui.h"
-#include "imgui_extensions.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_extensions.h"
 
 #include "resource.h"
 
@@ -71,7 +73,7 @@ namespace GUI
 			}
 			else
 			{
-				BackgroundDUU = TextureLoader::GetOrCreate("TEX_ADDONITEM_BACKGROUND_DUU", RES_TEX_ADDONITEM_DUU, NexusHandle);
+				BackgroundDUU = TextureService->GetOrCreate("TEX_ADDONITEM_BACKGROUND_DUU", RES_TEX_ADDONITEM_DUU, NexusHandle);
 			}
 		}
 		else
@@ -83,13 +85,13 @@ namespace GUI
 			}
 			else
 			{
-				Background = TextureLoader::GetOrCreate("TEX_ADDONITEM_BACKGROUND", RES_TEX_ADDONITEM, NexusHandle);
+				Background = TextureService->GetOrCreate("TEX_ADDONITEM_BACKGROUND", RES_TEX_ADDONITEM, NexusHandle);
 			}
 		}
 
-		if (!BtnOptions) { BtnOptions = TextureLoader::GetOrCreate("ICON_OPTIONS", RES_ICON_OPTIONS, NexusHandle); }
-		if (!CtxMenuBullet) { CtxMenuBullet = TextureLoader::GetOrCreate("TEX_CTXMENU_BULLET", RES_TEX_CONTEXTMENU_BULLET, NexusHandle); }
-		if (!CtxMenuHighlight) { CtxMenuHighlight = TextureLoader::GetOrCreate("TEX_CTXMENU_HIGHLIGHT", RES_TEX_CONTEXTMENU_HIGHLIGHT, NexusHandle); }
+		if (!BtnOptions) { BtnOptions = TextureService->GetOrCreate("ICON_OPTIONS", RES_ICON_OPTIONS, NexusHandle); }
+		if (!CtxMenuBullet) { CtxMenuBullet = TextureService->GetOrCreate("TEX_CTXMENU_BULLET", RES_TEX_CONTEXTMENU_BULLET, NexusHandle); }
+		if (!CtxMenuHighlight) { CtxMenuHighlight = TextureService->GetOrCreate("TEX_CTXMENU_HIGHLIGHT", RES_TEX_CONTEXTMENU_HIGHLIGHT, NexusHandle); }
 
 		{
 			ImGui::SetCursorPos(initial);
@@ -110,7 +112,7 @@ namespace GUI
 
 				if (aAddon->State == EAddonState::NotLoadedIncompatibleAPI)
 				{
-					ImGui::TextColored(ImVec4(255, 255, 0, 255), Language.Translate("((000010))"), aAddon->Definitions->APIVersion);
+					ImGui::TextColored(ImVec4(255, 255, 0, 255), Language->Translate("((000010))"), aAddon->Definitions->APIVersion);
 				}
 				else
 				{
@@ -139,7 +141,7 @@ namespace GUI
 					ImGui::ImageButton(BtnOptions->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling));
 					if (ImGui::BeginPopupContextItem("##AddonItemActionsMore"))
 					{
-						if (ImGui::GW2::ContextMenuItem(("Update##" + sig).c_str(), !aAddon->IsCheckingForUpdates ? Language.Translate("((000011))") : Language.Translate("((000071))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+						if (ImGui::GW2::ContextMenuItem(("Update##" + sig).c_str(), !aAddon->IsCheckingForUpdates ? Language->Translate("((000011))") : Language->Translate("((000071))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 						{
 							if (!aAddon->IsCheckingForUpdates)
 							{
@@ -165,7 +167,7 @@ namespace GUI
 													aAddon->AllowPrereleases
 												};
 
-												if (Updater.UpdateAddon(tmpPath, addonInfo))
+												if (UpdateService->UpdateAddon(tmpPath, addonInfo))
 												{
 													Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
 
@@ -173,8 +175,8 @@ namespace GUI
 														String::Format("%s %s",
 															aAddon->Definitions->Name,
 															aAddon->State == EAddonState::LoadedLOCKED
-															? Language.Translate("((000079))")
-															: Language.Translate("((000081))")
+															? Language->Translate("((000079))")
+															: Language->Translate("((000081))")
 														).c_str()
 													);
 												}
@@ -182,14 +184,14 @@ namespace GUI
 												{
 													GUI::Alerts::Notify(String::Format("%s %s",
 														aAddon->Definitions->Name,
-														Language.Translate("((000082))")).c_str());
+														Language->Translate("((000082))")).c_str());
 												}
 												Sleep(1000); // arbitrary sleep otherwise the user never even sees "is checking..."
 												aAddon->IsCheckingForUpdates = false;
 											})
 											.detach();
 
-										//LogDebug(CH_GUI, "Update called: %s", it.second->Definitions->Name);
+										//Logger->Debug(CH_GUI, "Update called: %s", it.second->Definitions->Name);
 										break;
 									}
 								}
@@ -197,10 +199,10 @@ namespace GUI
 						}
 						if (aAddon->State == EAddonState::LoadedLOCKED)
 						{
-							ImGui::GW2::TooltipGeneric(Language.Translate("((000012))"));
+							ImGui::GW2::TooltipGeneric(Language->Translate("((000012))"));
 						}
 
-						if (ImGui::GW2::ContextMenuItem(("ToggleUpdates##" + sig).c_str(), aAddon->IsPausingUpdates ? Language.Translate("((000013))") : Language.Translate("((000014))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+						if (ImGui::GW2::ContextMenuItem(("ToggleUpdates##" + sig).c_str(), aAddon->IsPausingUpdates ? Language->Translate("((000013))") : Language->Translate("((000014))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 						{
 							aAddon->IsPausingUpdates = !aAddon->IsPausingUpdates;
 							Loader::SaveAddonConfig();
@@ -208,7 +210,7 @@ namespace GUI
 
 						if (aAddon->Definitions->Provider == EUpdateProvider::GitHub)
 						{
-							if (ImGui::GW2::ContextMenuItem(("TogglePrereleases##" + sig).c_str(), aAddon->AllowPrereleases ? Language.Translate("((000085))") : Language.Translate("((000084))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+							if (ImGui::GW2::ContextMenuItem(("TogglePrereleases##" + sig).c_str(), aAddon->AllowPrereleases ? Language->Translate("((000085))") : Language->Translate("((000084))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 							{
 								aAddon->AllowPrereleases = !aAddon->AllowPrereleases;
 								Loader::SaveAddonConfig();
@@ -217,9 +219,9 @@ namespace GUI
 
 						ImGui::Separator();
 
-						if (ImGui::GW2::ContextMenuItem(("ToggleDUU##" + sig).c_str(), aAddon->IsDisabledUntilUpdate ? Language.Translate("((000015))") : Language.Translate("((000016))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+						if (ImGui::GW2::ContextMenuItem(("ToggleDUU##" + sig).c_str(), aAddon->IsDisabledUntilUpdate ? Language->Translate("((000015))") : Language->Translate("((000016))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 						{
-							//LogDebug(CH_GUI, "ToggleDUU called: %s", it.second->Definitions->Name);
+							//Logger->Debug(CH_GUI, "ToggleDUU called: %s", it.second->Definitions->Name);
 							aAddon->IsDisabledUntilUpdate = !aAddon->IsDisabledUntilUpdate;
 							if (aAddon->IsDisabledUntilUpdate)
 							{
@@ -235,19 +237,19 @@ namespace GUI
 						}
 						if (aAddon->State == EAddonState::LoadedLOCKED)
 						{
-							ImGui::GW2::TooltipGeneric(Language.Translate("((000017))"));
+							ImGui::GW2::TooltipGeneric(Language->Translate("((000017))"));
 						}
 
 						ImGui::Separator();
 
-						if (ImGui::GW2::ContextMenuItem(("Uninstall##" + sig).c_str(), Language.Translate("((000018))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+						if (ImGui::GW2::ContextMenuItem(("Uninstall##" + sig).c_str(), Language->Translate("((000018))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 						{
-							//LogDebug(CH_GUI, "Uninstall called: %s", it.second->Definitions->Name);
+							//Logger->Debug(CH_GUI, "Uninstall called: %s", it.second->Definitions->Name);
 							Loader::QueueAddon(ELoaderAction::Uninstall, aPath);
 						}
 						if (aAddon->State == EAddonState::LoadedLOCKED)
 						{
-							ImGui::GW2::TooltipGeneric(Language.Translate("((000019))"));
+							ImGui::GW2::TooltipGeneric(Language->Translate("((000019))"));
 						}
 
 						ImGui::EndPopup();
@@ -261,17 +263,17 @@ namespace GUI
 				// just check if loaded, if it was not hot-reloadable it would be EAddonState::LoadedLOCKED
 				if (aAddon->State == EAddonState::Loaded)
 				{
-					if (ImGui::GW2::Button((aAddon->IsWaitingForUnload ? Language.Translate("((000078))") : Language.Translate("((000020))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button((aAddon->IsWaitingForUnload ? Language->Translate("((000078))") : Language->Translate("((000020))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						if (!aAddon->IsWaitingForUnload)
 						{
-							//LogDebug(CH_GUI, "Unload called: %s", it.second->Definitions->Name);
+							//Logger->Debug(CH_GUI, "Unload called: %s", it.second->Definitions->Name);
 							Loader::QueueAddon(ELoaderAction::Unload, aPath);
 						}
 					}
 					if (RequestedAddons.size() > 0)
 					{
-						ImGui::GW2::TooltipGeneric(Language.Translate("((000021))"));
+						ImGui::GW2::TooltipGeneric(Language->Translate("((000021))"));
 					}
 				}
 				else if (aAddon->State == EAddonState::LoadedLOCKED)
@@ -281,53 +283,53 @@ namespace GUI
 					if (RequestedAddons.size() > 0)
 					{
 						additionalInfo.append("\n");
-						additionalInfo.append(Language.Translate("((000021))"));
+						additionalInfo.append(Language->Translate("((000021))"));
 					}
 
-					if (ImGui::GW2::Button((Language.Translate(aAddon->IsFlaggedForDisable ? "((000024))" : "((000022))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button((Language->Translate(aAddon->IsFlaggedForDisable ? "((000024))" : "((000022))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						aAddon->IsFlaggedForDisable = !aAddon->IsFlaggedForDisable;
 						Loader::SaveAddonConfig();
 					}
-					ImGui::GW2::TooltipGeneric(Language.Translate(aAddon->IsFlaggedForDisable ? "((000025))" : "((000023))"), additionalInfo.c_str());
+					ImGui::GW2::TooltipGeneric(Language->Translate(aAddon->IsFlaggedForDisable ? "((000025))" : "((000023))"), additionalInfo.c_str());
 				}
 				else if (aAddon->State == EAddonState::NotLoaded && (aAddon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || aAddon->Definitions->Signature == 0xFFF694D1) && !IsGameLaunchSequence)
 				{
 					/* if it's too late to load this addon */
-					if (ImGui::GW2::Button((Language.Translate(aAddon->IsFlaggedForEnable ? "((000020))" : "((000024))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button((Language->Translate(aAddon->IsFlaggedForEnable ? "((000020))" : "((000024))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						aAddon->IsFlaggedForEnable = !aAddon->IsFlaggedForEnable;
 
 						if (aAddon->IsFlaggedForEnable)
 						{
 							aAddon->IsDisabledUntilUpdate = false; // explicitly loaded
-							GUI::Alerts::Notify(String::Format("%s %s", aAddon->Definitions->Name, Language.Translate("((000080))")).c_str());
+							GUI::Alerts::Notify(String::Format("%s %s", aAddon->Definitions->Name, Language->Translate("((000080))")).c_str());
 						}
 
 						Loader::SaveAddonConfig();
 					}
 					if (aAddon->IsFlaggedForEnable)
 					{
-						ImGui::GW2::TooltipGeneric(Language.Translate("((000025))"), "");
+						ImGui::GW2::TooltipGeneric(Language->Translate("((000025))"), "");
 					}
 				}
 				else if (aAddon->State == EAddonState::NotLoaded)
 				{
-					if (ImGui::GW2::Button((Language.Translate("((000026))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button((Language->Translate("((000026))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
-						//LogDebug(CH_GUI, "Load called: %s", it.second->Definitions->Name);
+						//Logger->Debug(CH_GUI, "Load called: %s", it.second->Definitions->Name);
 						aAddon->IsDisabledUntilUpdate = false; // explicitly loaded
 						Loader::QueueAddon(ELoaderAction::Load, aPath);
 					}
 					if (RequestedAddons.size() > 0)
 					{
-						ImGui::GW2::TooltipGeneric(Language.Translate("((000021))"));
+						ImGui::GW2::TooltipGeneric(Language->Translate("((000021))"));
 					}
 				}
 
 				if (aAddon->Definitions->Provider == EUpdateProvider::GitHub && aAddon->Definitions->UpdateLink)
 				{
-					if (ImGui::GW2::Button((Language.Translate("((000030))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button((Language->Translate("((000030))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						ShellExecuteA(0, 0, aAddon->Definitions->UpdateLink, 0, 0, SW_SHOW);
 					}
@@ -362,7 +364,7 @@ namespace GUI
 			}
 			else
 			{
-				BackgroundHighlight = TextureLoader::GetOrCreate("TEX_ADDONITEM_BACKGROUND_HIGHLIGHT", RES_TEX_ADDONITEM_HIGHLIGHT, NexusHandle);
+				BackgroundHighlight = TextureService->GetOrCreate("TEX_ADDONITEM_BACKGROUND_HIGHLIGHT", RES_TEX_ADDONITEM_HIGHLIGHT, NexusHandle);
 			}
 		}
 		else
@@ -374,7 +376,7 @@ namespace GUI
 			}
 			else
 			{
-				Background = TextureLoader::GetOrCreate("TEX_ADDONITEM_BACKGROUND", RES_TEX_ADDONITEM, NexusHandle);
+				Background = TextureService->GetOrCreate("TEX_ADDONITEM_BACKGROUND", RES_TEX_ADDONITEM, NexusHandle);
 			}
 		}
 
@@ -411,7 +413,7 @@ namespace GUI
 				{
 					if (ToSComplianceWarning)
 					{
-						std::string tosNotice = Language.Translate("((000074))");
+						std::string tosNotice = Language->Translate("((000074))");
 						tosNotice.append("\n");
 						tosNotice.append(aAddon->ToSComplianceNotice);
 
@@ -433,20 +435,20 @@ namespace GUI
 					}
 					else
 					{
-						ToSComplianceWarning = TextureLoader::GetOrCreate(ICON_WARNING, RES_ICON_WARNING, NexusHandle);
+						ToSComplianceWarning = TextureService->GetOrCreate(ICON_WARNING, RES_ICON_WARNING, NexusHandle);
 					}
 				}
 
 				// just check if loaded, if it was not hot-reloadable it would be EAddonState::LoadedLOCKED
 				if (!aInstalled)
 				{
-					if (ImGui::GW2::Button(aAddon->IsInstalling ? (Language.Translate("((000027))") + sig).c_str() : (Language.Translate("((000028))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button(aAddon->IsInstalling ? (Language->Translate("((000027))") + sig).c_str() : (Language->Translate("((000028))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						if (!aAddon->IsInstalling)
 						{
 							std::thread([aAddon, aIsArcPlugin]()
 								{
-									Updater.InstallAddon(aAddon, aIsArcPlugin);
+									UpdateService->InstallAddon(aAddon, aIsArcPlugin);
 
 									if (aIsArcPlugin)
 									{
@@ -468,11 +470,11 @@ namespace GUI
 				}
 				else
 				{
-					ImGui::Text(Language.Translate("((000029))"));
+					ImGui::Text(Language->Translate("((000029))"));
 				}
 				if (aAddon->Provider == EUpdateProvider::GitHub && !aAddon->DownloadURL.empty())
 				{
-					if (ImGui::GW2::Button((Language.Translate("((000030))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+					if (ImGui::GW2::Button((Language->Translate("((000030))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						ShellExecuteA(0, 0, aAddon->DownloadURL.c_str(), 0, 0, SW_SHOW);
 					}

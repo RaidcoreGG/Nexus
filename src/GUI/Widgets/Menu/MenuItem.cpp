@@ -4,11 +4,11 @@
 #include "Shared.h"
 
 #include "Menu.h"
-#include "Textures/TextureLoader.h"
-#include "Textures/Texture.h"
+#include "Services/Textures/TextureLoader.h"
+#include "Services/Textures/Texture.h"
 
-#include "imgui.h"
-#include "imgui_extensions.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_extensions.h"
 
 namespace GUI
 {
@@ -31,7 +31,7 @@ namespace GUI
 				ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.f, 0.f, 0.f, 0.f));
 
 				ImVec2 pos = ImGui::GetCursorPos();
-				ImVec2 offset = ImGui::CalcTextSize(Language.Translate(Label.c_str()));
+				ImVec2 offset = ImGui::CalcTextSize(Language->Translate(Label.c_str()));
 
 				pos.x = (wndWidth - width) / 2.0f + 8.0f;
 
@@ -64,11 +64,11 @@ namespace GUI
 				}
 				else
 				{
-					Icon = TextureLoader::GetOrCreate(TextureIdentifier.c_str(), ResourceID, NexusHandle);
+					Icon = TextureService->GetOrCreate(TextureIdentifier.c_str(), ResourceID, NexusHandle);
 				}
 
 				ImGui::SetCursorPos(txtPos);
-				ImGui::Text(Language.Translate(Label.c_str()));
+				ImGui::Text(Language->Translate(Label.c_str()));
 
 				ImGui::PopStyleColor(4);
 

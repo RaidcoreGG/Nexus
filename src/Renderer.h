@@ -4,7 +4,7 @@
 #include <Windows.h>
 #include <d3d11.h>
 
-#include "imgui.h"
+#include "imgui/imgui.h"
 
 /* Namespace for renderer variables */
 namespace Renderer

@@ -20,13 +20,13 @@ namespace Base64
 	/// Encode:
 	/// 	Encodes a buffer into Base64.
 	///----------------------------------------------------------------------------------------------------
-	std::string Encode(const unsigned char* src, size_t len);
+	std::string Encode(const unsigned char* aData, size_t aSize);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Decode:
 	/// 	Decodes a Base64 string.
 	///----------------------------------------------------------------------------------------------------
-	std::string Decode(const void* data, const size_t len);
+	std::string Decode(std::string aData, size_t aSize);
 }
 
 #endif

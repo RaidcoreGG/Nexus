@@ -6,14 +6,17 @@
 #include <string>
 
 #include "Loader/AddonDefinition.h"
-#include "Logging/LogHandler.h"
-#include "API/ApiClient.h"
-#include "Localization/Localization.h"
-#include "Updater/Updater.h"
+#include "Services/Logging/LogHandler.h"
+#include "Services/API/ApiClient.h"
+#include "Services/Localization/Localization.h"
+#include "Services/Updater/Updater.h"
+#include "Services/Textures/TextureLoader.h"
+#include "Services/DataLink/DataLink.h"
+#include "Events/EventHandler.h"
+#include "Inputs/RawInput/RawInputApi.h"
+#include "Inputs/Keybinds/KeybindHandler.h"
 
-#include "imgui.h"
-
-using namespace LogHandler;
+#include "imgui/imgui.h"
 
 extern DWORD						NexusModuleSize;
 extern HMODULE						NexusHandle;
@@ -26,8 +29,14 @@ extern std::vector<std::string>		Parameters;
 extern std::vector<signed int>		RequestedAddons;
 
 /* FIXME: these need to be dependency injected. Fix before 2024/06/30. */
-extern CLocalization&				Language;
-extern CUpdater&					Updater;
+extern CLogHandler*					Logger;
+extern CLocalization*				Language;
+extern CUpdater*					UpdateService;
+extern CTextureLoader*				TextureService;
+extern CDataLink*					DataLinkService;
+extern CEventApi*					EventApi;
+extern CRawInputApi*				RawInputApi;
+extern CKeybindApi*					KeybindApi;
 
 extern ImFont*						MonospaceFont;	/* default/monospace/console font */
 extern ImFont*						UserFont;		/* custom user font */

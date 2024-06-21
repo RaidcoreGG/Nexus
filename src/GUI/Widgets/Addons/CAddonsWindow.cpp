@@ -6,7 +6,7 @@
 
 #include "Consts.h"
 #include "Shared.h"
-#include "Paths.h"
+#include "Index.h"
 #include "State.h"
 #include "Renderer.h"
 
@@ -14,12 +14,15 @@
 #include "Loader/Library.h"
 #include "Loader/ArcDPS.h"
 #include "AddonItem.h"
-#include "Textures/TextureLoader.h"
+#include "Services/Textures/TextureLoader.h"
 
-#include "Updater/Updater.h"
+#include "GUI/Widgets/Alerts/Alerts.h"
+#include "Services/Updater/Updater.h"
 
-#include "imgui.h"
-#include "imgui_extensions.h"
+#include "Util/Strings.h"
+
+#include "imgui/imgui.h"
+#include "imgui/imgui_extensions.h"
 
 #include "resource.h"
 
@@ -54,17 +57,17 @@ namespace GUI
 	{
 		if (!Visible) { return; }
 
-		if (!Background) { Background = TextureLoader::GetOrCreate("TEX_ADDONS_BACKGROUND", RES_TEX_ADDONS_BACKGROUND, NexusHandle); }
-		if (!TitleBar) { TitleBar = TextureLoader::GetOrCreate("TEX_ADDONS_TITLEBAR", RES_TEX_ADDONS_TITLEBAR, NexusHandle); }
-		if (!TitleBarHover) { TitleBarHover = TextureLoader::GetOrCreate("TEX_ADDONS_TITLEBAR_HOVER", RES_TEX_ADDONS_TITLEBAR_HOVER, NexusHandle); }
-		if (!TitleBarEnd) { TitleBarEnd = TextureLoader::GetOrCreate("TEX_TITLEBAREND", RES_TEX_TITLEBAREND, NexusHandle); }
-		if (!TitleBarEndHover) { TitleBarEndHover = TextureLoader::GetOrCreate("TEX_TITLEBAREND_HOVER", RES_TEX_TITLEBAREND_HOVER, NexusHandle); }
-		if (!BtnClose) { BtnClose = TextureLoader::GetOrCreate("TEX_BTNCLOSE", RES_TEX_BTNCLOSE, NexusHandle); }
-		if (!BtnCloseHover) { BtnCloseHover = TextureLoader::GetOrCreate("TEX_BTNCLOSE_HOVER", RES_TEX_BTNCLOSE_HOVER, NexusHandle); }
-		if (!TabBtn) { TabBtn = TextureLoader::GetOrCreate("TEX_TABBTN", RES_TEX_TABBTN, NexusHandle); }
-		if (!TabBtnHover) { TabBtnHover = TextureLoader::GetOrCreate("TEX_TABBTN_HOVER", RES_TEX_TABBTN_HOVER, NexusHandle); }
-		if (!BtnRefresh) { BtnRefresh = TextureLoader::GetOrCreate("TEX_BTNREFRESH", RES_TEX_BTNREFRESH, NexusHandle); }
-		if (!BtnRefreshHover) { BtnRefreshHover = TextureLoader::GetOrCreate("TEX_BTNREFRESH_HOVER", RES_TEX_BTNREFRESH_HOVER, NexusHandle); }
+		if (!Background) { Background = TextureService->GetOrCreate("TEX_ADDONS_BACKGROUND", RES_TEX_ADDONS_BACKGROUND, NexusHandle); }
+		if (!TitleBar) { TitleBar = TextureService->GetOrCreate("TEX_ADDONS_TITLEBAR", RES_TEX_ADDONS_TITLEBAR, NexusHandle); }
+		if (!TitleBarHover) { TitleBarHover = TextureService->GetOrCreate("TEX_ADDONS_TITLEBAR_HOVER", RES_TEX_ADDONS_TITLEBAR_HOVER, NexusHandle); }
+		if (!TitleBarEnd) { TitleBarEnd = TextureService->GetOrCreate("TEX_TITLEBAREND", RES_TEX_TITLEBAREND, NexusHandle); }
+		if (!TitleBarEndHover) { TitleBarEndHover = TextureService->GetOrCreate("TEX_TITLEBAREND_HOVER", RES_TEX_TITLEBAREND_HOVER, NexusHandle); }
+		if (!BtnClose) { BtnClose = TextureService->GetOrCreate("TEX_BTNCLOSE", RES_TEX_BTNCLOSE, NexusHandle); }
+		if (!BtnCloseHover) { BtnCloseHover = TextureService->GetOrCreate("TEX_BTNCLOSE_HOVER", RES_TEX_BTNCLOSE_HOVER, NexusHandle); }
+		if (!TabBtn) { TabBtn = TextureService->GetOrCreate("TEX_TABBTN", RES_TEX_TABBTN, NexusHandle); }
+		if (!TabBtnHover) { TabBtnHover = TextureService->GetOrCreate("TEX_TABBTN_HOVER", RES_TEX_TABBTN_HOVER, NexusHandle); }
+		if (!BtnRefresh) { BtnRefresh = TextureService->GetOrCreate("TEX_BTNREFRESH", RES_TEX_BTNREFRESH, NexusHandle); }
+		if (!BtnRefreshHover) { BtnRefreshHover = TextureService->GetOrCreate("TEX_BTNREFRESH_HOVER", RES_TEX_BTNREFRESH_HOVER, NexusHandle); }
 
 		if (!(
 			Background &&
@@ -99,9 +102,9 @@ namespace GUI
 
 			ImGui::SetCursorPos(ImVec2(28.0f, 8.0f + (64.0f * Renderer::Scaling)));
 
-			ImVec2 text1sz = ImGui::CalcTextSize(Language.Translate("((000031))"));
-			ImVec2 text2sz = ImGui::CalcTextSize(Language.Translate("((000032))"));
-			ImVec2 text3sz = ImGui::CalcTextSize(Language.Translate("((000075))"));
+			ImVec2 text1sz = ImGui::CalcTextSize(Language->Translate("((000031))"));
+			ImVec2 text2sz = ImGui::CalcTextSize(Language->Translate("((000032))"));
+			ImVec2 text3sz = ImGui::CalcTextSize(Language->Translate("((000075))"));
 
 			float tab1width = 96.0f > text1sz.x + 16.0f ? 96.0f : text1sz.x + 32.0f;
 			float tab2width = 96.0f > text2sz.x + 16.0f ? 96.0f : text2sz.x + 32.0f;
@@ -137,9 +140,9 @@ namespace GUI
 			{
 				ImGui::SameLine();
 
-				std::string legacyNotice = Language.Translate("((000076))");
+				std::string legacyNotice = Language->Translate("((000076))");
 				legacyNotice.append("\n");
-				legacyNotice.append(Language.Translate("((000077))"));
+				legacyNotice.append(Language->Translate("((000077))"));
 
 				tab3origin = ImGui::GetCursorPos();
 				if (ImGui::ImageButton(!Tab3Hovered ? TabBtn->Resource : TabBtnHover->Resource, ImVec2(tab3width * Renderer::Scaling, 24.0f * Renderer::Scaling)))
@@ -154,15 +157,15 @@ namespace GUI
 			ImGui::PopStyleVar();
 
 			ImGui::SetCursorPos(ImVec2(tab1origin.x + text1offset.x, tab1origin.y + text1offset.y));
-			ImGui::TextColored(TabIndex == 0 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000031))"));
+			ImGui::TextColored(TabIndex == 0 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language->Translate("((000031))"));
 
 			ImGui::SetCursorPos(ImVec2(tab2origin.x + text2offset.x, tab2origin.y + text2offset.y));
-			ImGui::TextColored(TabIndex == 1 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000032))"));
+			ImGui::TextColored(TabIndex == 1 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language->Translate("((000032))"));
 
 			if (ArcDPS::IsLoaded)
 			{
 				ImGui::SetCursorPos(ImVec2(tab3origin.x + text3offset.x, tab3origin.y + text3offset.y));
-				ImGui::TextColored(TabIndex == 2 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000075))"));
+				ImGui::TextColored(TabIndex == 2 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language->Translate("((000075))"));
 			}
 			
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
@@ -191,10 +194,10 @@ namespace GUI
 						if (Loader::Addons.size() == 0)
 						{
 							ImVec2 windowSize = ImGui::GetWindowSize();
-							ImVec2 textSize = ImGui::CalcTextSize(Language.Translate("((000033))"));
+							ImVec2 textSize = ImGui::CalcTextSize(Language->Translate("((000033))"));
 							ImVec2 position = ImGui::GetCursorPos();
 							ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-							ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000033))"));
+							ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language->Translate("((000033))"));
 						}
 						else
 						{
@@ -211,17 +214,17 @@ namespace GUI
 						ImGui::EndChild();
 					}
 
-					if (ImGui::GW2::Button(Language.Translate("((000034))"), ImVec2(ImGui::CalcTextSize(Language.Translate("((000034))")).x + 16.0f, btnHeight)))
+					if (ImGui::GW2::Button(Language->Translate("((000034))"), ImVec2(ImGui::CalcTextSize(Language->Translate("((000034))")).x + 16.0f, btnHeight)))
 					{
-						std::string strAddons = Path::D_GW2_ADDONS.string();
+						std::string strAddons = Index::D_GW2_ADDONS.string();
 						ShellExecuteA(NULL, "explore", strAddons.c_str(), NULL, NULL, SW_SHOW);
 					}
 					ImGui::SameLine();
-					float btnUpdateCheckWidth = ImGui::CalcTextSize(Language.Translate("((000035))")).x;
-					float btnUpdateCheckingWidth = ImGui::CalcTextSize(Language.Translate("((000071))")).x;
+					float btnUpdateCheckWidth = ImGui::CalcTextSize(Language->Translate("((000035))")).x;
+					float btnUpdateCheckingWidth = ImGui::CalcTextSize(Language->Translate("((000071))")).x;
 					float btnUCWidth = btnUpdateCheckingWidth > btnUpdateCheckWidth ? btnUpdateCheckingWidth : btnUpdateCheckWidth;
 
-					if (ImGui::GW2::Button(checkedForUpdates == -1 ? Language.Translate("((000035))") : Language.Translate("((000071))"), ImVec2(btnUCWidth + 16.0f, btnHeight)))
+					if (ImGui::GW2::Button(checkedForUpdates == -1 ? Language->Translate("((000035))") : Language->Translate("((000071))"), ImVec2(btnUCWidth + 16.0f, btnHeight)))
 					{
 						if (checkedForUpdates == -1)
 						{
@@ -229,6 +232,8 @@ namespace GUI
 							{
 								checkedForUpdates = 0;
 								queuedForCheck = 0;
+								updatedCount = 0;
+
 								/* pre-iterate to get the count of how many need to be checked, else one call might finish before the count can be incremented */
 								for (auto addon : Loader::Addons)
 								{
@@ -257,9 +262,20 @@ namespace GUI
 												addon->AllowPrereleases
 											};
 
-											if (Updater.UpdateAddon(tmpPath, addonInfo))
+											if (UpdateService->UpdateAddon(tmpPath, addonInfo))
 											{
 												Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
+
+												GUI::Alerts::Notify(
+													String::Format("%s %s",
+														addon->Definitions->Name,
+														addon->State == EAddonState::LoadedLOCKED
+														? Language->Translate("((000079))")
+														: Language->Translate("((000081))")
+													).c_str()
+												);
+
+												updatedCount++;
 											}
 											checkedForUpdates++;
 
@@ -267,6 +283,11 @@ namespace GUI
 											{
 												checkedForUpdates = -1;
 												queuedForCheck = 0;
+
+												if (updatedCount == 0)
+												{
+													GUI::Alerts::Notify(Language->Translate("((000087))"));
+												}
 											}
 										})
 										.detach();
@@ -274,7 +295,7 @@ namespace GUI
 							}
 						}
 					}
-					ImGui::GW2::TooltipGeneric(Language.Translate("((000036))"));
+					ImGui::GW2::TooltipGeneric(Language->Translate("((000036))"));
 				}
 				else if (TabIndex == 1)
 				{
@@ -312,16 +333,16 @@ namespace GUI
 						if (Loader::Library::Addons.size() == 0 || downloadable == 0)
 						{
 							ImVec2 windowSize = ImGui::GetWindowSize();
-							ImVec2 textSize = ImGui::CalcTextSize(Language.Translate("((000037))"));
+							ImVec2 textSize = ImGui::CalcTextSize(Language->Translate("((000037))"));
 							ImVec2 position = ImGui::GetCursorPos();
 							ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-							ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000037))"));
+							ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language->Translate("((000037))"));
 						}
 
 						ImGui::EndChild();
 					}
 
-					ImGui::Checkbox(Language.Translate("((000038))"), &showInstalled);
+					ImGui::Checkbox(Language->Translate("((000038))"), &showInstalled);
 				}
 				else if (TabIndex == 2)
 				{
@@ -359,10 +380,10 @@ namespace GUI
 						if (ArcDPS::PluginLibrary.size() == 0 || downloadable == 0)
 						{
 							ImVec2 windowSize = ImGui::GetWindowSize();
-							ImVec2 textSize = ImGui::CalcTextSize(Language.Translate("((000037))"));
+							ImVec2 textSize = ImGui::CalcTextSize(Language->Translate("((000037))"));
 							ImVec2 position = ImGui::GetCursorPos();
 							ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-							ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000037))"));
+							ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language->Translate("((000037))"));
 						}
 
 						ImGui::EndChild();
@@ -370,13 +391,13 @@ namespace GUI
 					else
 					{
 						ImVec2 windowSize = ImGui::GetWindowSize();
-						ImVec2 textSize = ImGui::CalcTextSize(Language.Translate("((000071))"));
+						ImVec2 textSize = ImGui::CalcTextSize(Language->Translate("((000071))"));
 						ImVec2 position = ImGui::GetCursorPos();
 						ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-						ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language.Translate("((000071))"));
+						ImGui::TextColoredOutlined(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language->Translate("((000071))"));
 					}
 
-					ImGui::Checkbox(Language.Translate("((000038))"), &showInstalled);
+					ImGui::Checkbox(Language->Translate("((000038))"), &showInstalled);
 				}
 
 				ImGui::EndChild();
@@ -410,7 +431,7 @@ namespace GUI
 
 			ImGui::PushFont(FontBig);
 			ImGui::SetCursorPos(ImVec2(28.0f, 20.0f * Renderer::Scaling));
-			ImGui::TextColored(ImVec4(1.0f, .933f, .733f, 1.0f), Language.Translate("((000003))"));
+			ImGui::TextColored(ImVec4(1.0f, .933f, .733f, 1.0f), Language->Translate("((000003))"));
 			ImGui::PopFont();
 		}
 		ImGui::End();

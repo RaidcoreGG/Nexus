@@ -10,9 +10,6 @@ struct Keybind
 	bool			Alt;
 	bool			Ctrl;
 	bool			Shift;
-
-	/* Prints the keybind to a string for display. Pass true if spacing/padding should be added. */
-	std::string ToString(bool padded = false);
 };
 
 bool operator==(const Keybind& lhs, const Keybind& rhs);

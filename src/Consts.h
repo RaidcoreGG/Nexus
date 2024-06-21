@@ -3,15 +3,14 @@
 
 #include <Windows.h>
 
+constexpr const char* NULLSTR = "(null)";
+
 /* Channels */
 extern const char* CH_CORE;
 extern const char* CH_EVENTS;
-extern const char* CH_TEXTURES;
 extern const char* CH_QUICKACCESS;
 extern const char* CH_LOADER;
-extern const char* CH_DATALINK;
 extern const char* CH_KEYBINDS;
-extern const char* CH_LOCALIZATION;
 
 /* Keybinds */
 extern const char* KB_MENU;

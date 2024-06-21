@@ -5,16 +5,16 @@
 
 #include "Renderer.h"
 #include "Shared.h"
-#include "Paths.h"
+#include "Index.h"
 #include "Consts.h"
 
 #include "GUI/GUI.h"
-#include "Settings/Settings.h"
+#include "Services/Settings/Settings.h"
 #include "Events/EventHandler.h"
-#include "Textures/TextureLoader.h"
+#include "Services/Textures/TextureLoader.h"
 
-#include "imgui.h"
-#include "imgui_extensions.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_extensions.h"
 
 #include "resource.h"
 
@@ -27,13 +27,13 @@ namespace GUI
 
 	void CEULAModal::Render()
 	{
-		if (!Background) { Background = TextureLoader::GetOrCreate("TEX_EULA_BACKGROUND", RES_TEX_EULA_BACKGROUND, NexusHandle); }
-		if (!TitleBar) { TitleBar = TextureLoader::GetOrCreate("TEX_EULA_TITLEBAR", RES_TEX_EULA_TITLEBAR, NexusHandle); }
-		if (!TitleBarHover) { TitleBarHover = TextureLoader::GetOrCreate("TEX_EULA_TITLEBAR_HOVER", RES_TEX_EULA_TITLEBAR_HOVER, NexusHandle); }
-		if (!TitleBarEnd) { TitleBarEnd = TextureLoader::GetOrCreate("TEX_TITLEBAREND", RES_TEX_TITLEBAREND, NexusHandle); }
-		if (!TitleBarEndHover) { TitleBarEndHover = TextureLoader::GetOrCreate("TEX_TITLEBAREND_HOVER", RES_TEX_TITLEBAREND_HOVER, NexusHandle); }
-		if (!BtnClose) { BtnClose = TextureLoader::GetOrCreate("TEX_BTNCLOSE", RES_TEX_BTNCLOSE, NexusHandle); }
-		if (!BtnCloseHover) { BtnCloseHover = TextureLoader::GetOrCreate("TEX_BTNCLOSE_HOVER", RES_TEX_BTNCLOSE_HOVER, NexusHandle); }
+		if (!Background) { Background = TextureService->GetOrCreate("TEX_EULA_BACKGROUND", RES_TEX_EULA_BACKGROUND, NexusHandle); }
+		if (!TitleBar) { TitleBar = TextureService->GetOrCreate("TEX_EULA_TITLEBAR", RES_TEX_EULA_TITLEBAR, NexusHandle); }
+		if (!TitleBarHover) { TitleBarHover = TextureService->GetOrCreate("TEX_EULA_TITLEBAR_HOVER", RES_TEX_EULA_TITLEBAR_HOVER, NexusHandle); }
+		if (!TitleBarEnd) { TitleBarEnd = TextureService->GetOrCreate("TEX_TITLEBAREND", RES_TEX_TITLEBAREND, NexusHandle); }
+		if (!TitleBarEndHover) { TitleBarEndHover = TextureService->GetOrCreate("TEX_TITLEBAREND_HOVER", RES_TEX_TITLEBAREND_HOVER, NexusHandle); }
+		if (!BtnClose) { BtnClose = TextureService->GetOrCreate("TEX_BTNCLOSE", RES_TEX_BTNCLOSE, NexusHandle); }
+		if (!BtnCloseHover) { BtnCloseHover = TextureService->GetOrCreate("TEX_BTNCLOSE_HOVER", RES_TEX_BTNCLOSE_HOVER, NexusHandle); }
 
 		if (!(
 			Background &&
@@ -84,7 +84,7 @@ namespace GUI
 			ImGui::Text("If you do not agree to these terms, do not use the software.");
 
 			ImGui::TextWrapped("By clicking \"I do NOT agree\" your game will close and Nexus will attempt to uninstall.");
-			ImGui::TextWrapped("If you see this prompt again after restarting, you will have to manually remove \"%s\" while the game is closed.", Path::F_HOST_DLL.string().c_str());
+			ImGui::TextWrapped("If you see this prompt again after restarting, you will have to manually remove \"%s\" while the game is closed.", Index::F_HOST_DLL.string().c_str());
 
 			ImVec2 remainingPos = ImGui::GetCursorPos();
 			float remainingHeight = remainingPos.y;
@@ -104,7 +104,7 @@ namespace GUI
 			ImGui::SetCursorPos(ImVec2((contentWidth * Renderer::Scaling / 2.0f) + 4.0f + remainingPos.x, y + remainingPos.y));
 			if (ImGui::GW2::Button("I do NOT agree", ImVec2(btnWidth, btnHeight)))
 			{
-				std::string strHost = Path::F_HOST_DLL.string();
+				std::string strHost = Index::F_HOST_DLL.string();
 
 				SHFILEOPSTRUCT fileOp;
 				fileOp.hwnd = NULL;
@@ -122,15 +122,8 @@ namespace GUI
 			if (close)
 			{
 				ImGui::CloseCurrentPopup();
-				auto it = std::find_if(GUI::Windows.begin(), GUI::Windows.end(), [](const IWindow* wnd) {
-					return wnd->Name == "CEULAModal";
-					});
-
-				if (it != GUI::Windows.end())
-				{
-					delete (*it);
-					GUI::Windows.erase(it);
-				}
+				delete this;
+				GUI::EULAWindow = nullptr;
 			}
 
 			ImGui::EndChild();
@@ -163,7 +156,7 @@ namespace GUI
 
 			ImGui::PushFont(FontBig);
 			ImGui::SetCursorPos(ImVec2(28.0f, 20.0f * Renderer::Scaling));
-			ImGui::TextColored(ImVec4(1.0f, .933f, .733f, 1.0f), Language.Translate("Legal Agreement"));
+			ImGui::TextColored(ImVec4(1.0f, .933f, .733f, 1.0f), Language->Translate("Legal Agreement"));
 			ImGui::PopFont();
 
 			ImGui::EndPopup();

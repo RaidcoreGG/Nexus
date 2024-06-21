@@ -1,13 +1,13 @@
 #include "QuickAccess.h"
 
 #include "Shared.h"
-#include "Paths.h"
+#include "Index.h"
 #include "State.h"
 #include "Renderer.h"
 #include "Consts.h"
 
-#include "Textures/Texture.h"
-#include "Textures/TextureLoader.h"
+#include "Services/Textures/Texture.h"
+#include "Services/Textures/TextureLoader.h"
 #include "Inputs/Keybinds/KeybindHandler.h"
 #include "Loader/Loader.h"
 
@@ -101,7 +101,7 @@ namespace GUI
 					ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
 					ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
 
-					//LogDebug(CH_QUICKACCESS, "size: %f | c: %d | scale: %f", size, c, Renderer::Scaling);
+					//Logger->Debug(CH_QUICKACCESS, "size: %f | c: %d | scale: %f", size, c, Renderer::Scaling);
 
 					ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f }); // smol checkbox
 					if (VerticalLayout)
@@ -126,29 +126,29 @@ namespace GUI
 							if (shortcut.Keybind.length() > 0)
 							{
 								shortcut.HasNotification = false;
-								Keybinds::Invoke(shortcut.Keybind);
+								KeybindApi->Invoke(shortcut.Keybind);
 							}
 						}
 						iconHovered = ImGui::IsItemHovered();
 					}
 					else if (shortcut.TextureGetAttempts < 10)
 					{
-						shortcut.TextureNormal = TextureLoader::Get(shortcut.TextureNormalIdentifier.c_str());
-						shortcut.TextureHover = TextureLoader::Get(shortcut.TextureHoverIdentifier.c_str());
+						shortcut.TextureNormal = TextureService->Get(shortcut.TextureNormalIdentifier.c_str());
+						shortcut.TextureHover = TextureService->Get(shortcut.TextureHoverIdentifier.c_str());
 						shortcut.TextureGetAttempts++;
 					}
 					else
 					{
-						LogWarning(CH_QUICKACCESS, "Cancelled getting textures for shortcut \"%s\" after 10 failed attempts.", identifier.c_str());
+						Logger->Warning(CH_QUICKACCESS, "Cancelled getting textures for shortcut \"%s\" after 10 failed attempts.", identifier.c_str());
 
 						/* fallback icons */
-						shortcut.TextureNormal = TextureLoader::Get(ICON_GENERIC);
-						shortcut.TextureHover = TextureLoader::Get(ICON_GENERIC_HOVER);
+						shortcut.TextureNormal = TextureService->Get(ICON_GENERIC);
+						shortcut.TextureHover = TextureService->Get(ICON_GENERIC_HOVER);
 
 						/* absolute sanity check */
 						if (shortcut.TextureNormal == nullptr || shortcut.TextureHover == nullptr)
 						{
-							LogWarning(CH_QUICKACCESS, "Neither promised textures nor fallback textures could be loaded, removing shortcut \"%s\".", identifier.c_str());
+							Logger->Warning(CH_QUICKACCESS, "Neither promised textures nor fallback textures could be loaded, removing shortcut \"%s\".", identifier.c_str());
 
 							// call this async because we're currently iterating the list
 							std::thread([identifier]()
@@ -179,7 +179,7 @@ namespace GUI
 					}
 					else
 					{
-						IconNotification = TextureLoader::GetOrCreate(ICON_NOTIFICATION, RES_ICON_NOTIFICATION, NexusHandle);
+						IconNotification = TextureService->GetOrCreate(ICON_NOTIFICATION, RES_ICON_NOTIFICATION, NexusHandle);
 					}
 
 					ImGui::PopStyleVar();
@@ -269,8 +269,8 @@ namespace GUI
 			{
 				if (Registry.find(str) == Registry.end())
 				{
-					Texture* normal = TextureLoader::Get(strTexId.c_str());
-					Texture* hover = TextureLoader::Get(strTexHoverId.c_str());
+					Texture* normal = TextureService->Get(strTexId.c_str());
+					Texture* hover = TextureService->Get(strTexHoverId.c_str());
 					Shortcut sh{};
 					sh.TextureNormalIdentifier = aTextureIdentifier;
 					sh.TextureHoverIdentifier = aTextureHoverIdentifier;
@@ -287,7 +287,7 @@ namespace GUI
 
 					if (amt < 2)
 					{
-						LogDebug(CH_QUICKACCESS, "Shortcut \"%s\" was promised 2 textures, but received %d.", str.c_str(), amt);
+						Logger->Debug(CH_QUICKACCESS, "Shortcut \"%s\" was promised 2 textures, but received %d.", str.c_str(), amt);
 					}
 				}
 			}

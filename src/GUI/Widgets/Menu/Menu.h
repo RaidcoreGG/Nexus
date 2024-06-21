@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "MenuItem.h"
-#include "Textures/Texture.h"
+#include "Services/Textures/Texture.h"
 
 namespace GUI
 {

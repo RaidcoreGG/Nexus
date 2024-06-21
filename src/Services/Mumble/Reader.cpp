@@ -14,7 +14,7 @@
 #include "Hooks.h" /* FIXME: This is included at the moment because the NexusLink isn't dependency-injected. Fix before 2024/06/30. */
 
 #include "Events/EventHandler.h"
-#include "DataLink/DataLink.h"
+#include "Services/DataLink/DataLink.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -97,8 +97,8 @@ CMumbleReader::CMumbleReader(std::string aMumbleName)
 	this->Name = aMumbleName;
 
 	/* share the linked mem regardless whether it's disabled, for dependant addons */
-	MumbleLink = (Mumble::Data*)DataLink::ShareResource(DL_MUMBLE_LINK, sizeof(Mumble::Data), aMumbleName.c_str());
-	Hooks::NexusLink = NexusLink = (NexusLinkData*)DataLink::ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData));
+	MumbleLink = (Mumble::Data*)DataLinkService->ShareResource(DL_MUMBLE_LINK, sizeof(Mumble::Data), aMumbleName.c_str(), true);
+	Hooks::NexusLink = NexusLink = (NexusLinkData*)DataLinkService->ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData), true);
 
 	if (aMumbleName == "0")
 	{
@@ -108,7 +108,6 @@ CMumbleReader::CMumbleReader(std::string aMumbleName)
 	{
 		this->IsRunning = true;
 		this->Thread = std::thread(&CMumbleReader::Advance, this);
-		this->Thread.detach();
 	}
 }
 
@@ -126,15 +125,19 @@ void CMumbleReader::Advance()
 {
 	while (this->IsRunning)
 	{
-		this->NexusLink->IsGameplay		= this->PreviousTick != this->MumbleLink->UITick || 
-										  (this->PreviousFrameCounter == Renderer::FrameCounter && this->NexusLink->IsGameplay);
-		this->NexusLink->IsMoving		= this->PreviousAvatarPosition != this->MumbleLink->AvatarPosition;
-		this->NexusLink->IsCameraMoving	= this->PreviousCameraFront != this->MumbleLink->CameraFront;
+		this->Flip = !this->Flip; // every other tick so it gets refreshed every 100ms
+		if (this->Flip)
+		{
+			this->NexusLink->IsGameplay = this->PreviousTick != this->MumbleLink->UITick ||
+				(this->PreviousFrameCounter == Renderer::FrameCounter && this->NexusLink->IsGameplay);
+			this->NexusLink->IsMoving = this->PreviousAvatarPosition != this->MumbleLink->AvatarPosition;
+			this->NexusLink->IsCameraMoving = this->PreviousCameraFront != this->MumbleLink->CameraFront;
 
-		this->PreviousFrameCounter		= Renderer::FrameCounter;
-		this->PreviousTick				= this->MumbleLink->UITick;
-		this->PreviousAvatarPosition	= this->MumbleLink->AvatarPosition;
-		this->PreviousCameraFront		= this->MumbleLink->CameraFront;
+			this->PreviousFrameCounter = Renderer::FrameCounter;
+			this->PreviousTick = this->MumbleLink->UITick;
+			this->PreviousAvatarPosition = this->MumbleLink->AvatarPosition;
+			this->PreviousCameraFront = this->MumbleLink->CameraFront;
+		}
 
 		if (this->MumbleLink->Identity[0])
 		{
@@ -158,24 +161,28 @@ void CMumbleReader::Advance()
 			}
 			catch (json::parse_error& ex)
 			{
-				Log(CH_MUMBLE_READER, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
+				Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
 			}
 			catch (json::type_error& ex)
 			{
-				Log(CH_MUMBLE_READER, "MumbleLink could not be parsed. Type Error: %s", ex.what());
+				Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Type Error: %s", ex.what());
 			}
 			catch (...)
 			{
-				Log(CH_MUMBLE_READER, "MumbleLink could not be parsed. Unknown Error.");
+				Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Unknown Error.");
 			}
 
 			/* notify (also notifies the GUI to update its scaling factor) */
 			if (*IdentityParsed != this->PreviousIdentity)
 			{
-				Events::Raise("EV_MUMBLE_IDENTITY_UPDATED", IdentityParsed);
+				EventApi->Raise("EV_MUMBLE_IDENTITY_UPDATED", IdentityParsed);
 			}
 		}
+		for (size_t i = 0; i < 50; i++)
+		{
+			if (!this->IsRunning) { return; } // abort if shutdown during sleep
 
-		Sleep(50);
+			Sleep(1);
+		}
 	}
 }

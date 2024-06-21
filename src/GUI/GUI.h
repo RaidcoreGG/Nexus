@@ -17,9 +17,25 @@
 #include "Services/Mumble/Definitions/Mumble.h"
 #include "Loader/NexusLinkData.h"
 
+#include "Widgets/Addons/CAddonsWindow.h"
+#include "Widgets/Options/COptionsWindow.h"
+#include "Widgets/Log/CLogWindow.h"
+#include "Widgets/Debug/CDebugWindow.h"
+#include "Widgets/About/CAboutBox.h"
+#include "Widgets/EULA/CEULAModal.h"
+
+#include "Inputs/Keybinds/Keybind.h"
+
 namespace GUI
 {
 	extern CFontManager&				FontManager;
+
+	extern CAddonsWindow*				AddonsWindow;
+	extern COptionsWindow*				OptionsWindow;
+	extern CLogWindow*					LogWindow;
+	extern CDebugWindow*				DebugWindow;
+	extern CAboutBox*					AboutWindow;
+	extern CEULAModal*					EULAWindow;
 
 	extern Mumble::Data*				MumbleLink;
 	extern NexusLinkData*				NexusLink;
@@ -29,7 +45,7 @@ namespace GUI
 	extern std::vector<GUI_RENDER>		RegistryRender;
 	extern std::vector<GUI_RENDER>		RegistryPostRender;
 	extern std::vector<GUI_RENDER>		RegistryOptionsRender;
-	extern std::vector<IWindow*>		Windows;
+
 	extern std::map<EFont, ImFont*>		FontIndex;
 	extern float						FontSize;
 	extern bool							CloseMenuAfterSelecting;
@@ -50,8 +66,6 @@ namespace GUI
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	void Render();
-
-	void AddWindow(IWindow* aWindowPtr);
 
 	void ImportArcDPSStyle();
 

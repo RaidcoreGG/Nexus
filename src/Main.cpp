@@ -5,26 +5,25 @@
 #include <Psapi.h>
 
 #include "resource.h"
-#include "core.h"
 #include "Consts.h"
 #include "Hooks.h"
-#include "Paths.h"
+#include "Index.h"
 #include "Renderer.h"
 #include "Shared.h"
 #include "State.h"
 #include "Certs.h"
 
-#include "DataLink/DataLink.h"
+#include "Services/DataLink/DataLink.h"
 #include "GUI/GUI.h"
 #include "Inputs/Keybinds/KeybindHandler.h"
 #include "Loader/Loader.h"
-#include "Logging/LogHandler.h"
-#include "Logging/CConsoleLogger.h"
-#include "Logging/CFileLogger.h"
+#include "Services/Logging/LogHandler.h"
+#include "Services/Logging/CConsoleLogger.h"
+#include "Services/Logging/CFileLogger.h"
 #include "Services/Mumble/Reader.h"
-#include "Settings/Settings.h"
-#include "API/ApiClient.h"
-#include "Updater/Updater.h"
+#include "Services/Settings/Settings.h"
+#include "Services/API/ApiClient.h"
+#include "Services/Updater/Updater.h"
 #include "Services/Multibox/Multibox.h"
 
 #include "nlohmann/json.hpp"
@@ -60,28 +59,50 @@ namespace Main
 		GetModuleInformation(GetCurrentProcess(), NexusHandle, &moduleInfo, sizeof(moduleInfo));
 		NexusModuleSize = moduleInfo.SizeOfImage;
 
-		Path::Initialize(NexusHandle);
+		Index::BuildIndex(NexusHandle);
 		std::string mumbleName = State::Initialize();
 		
 		/* setup default loggers */
-		RegisterLogger(
-			true == State::IsConsoleEnabled
-			? new CConsoleLogger(ELogLevel::ALL)
-			: nullptr
-		);
-		RegisterLogger(new CFileLogger(ELogLevel::ALL, Path::F_LOG));
+		if (State::IsConsoleEnabled)
+		{
+			Logger->RegisterLogger(new CConsoleLogger(ELogLevel::ALL));
+		}
+		Logger->RegisterLogger(new CFileLogger(ELogLevel::ALL, Index::F_LOG));
 
-		LogInfo(CH_CORE, GetCommandLineA());
-		LogInfo(CH_CORE, "%s: %s", Path::F_HOST_DLL != Path::F_CHAINLOAD_DLL ? "Proxy" : "Chainload", Path::F_HOST_DLL.string().c_str());
-		LogInfo(CH_CORE, "Build: %s", Version.string().c_str());
-		LogInfo(CH_CORE, "Entry method: %d", State::EntryMethod);
+		Logger->Info(CH_CORE, GetCommandLineA());
+		Logger->Info(CH_CORE, "%s: %s", Index::F_HOST_DLL != Index::F_CHAINLOAD_DLL ? "Proxy" : "Chainload", Index::F_HOST_DLL.string().c_str());
+		Logger->Info(CH_CORE, "Build: %s", Version.string().c_str());
+		Logger->Info(CH_CORE, "Entry method: %d", State::EntryMethod);
 
-		RaidcoreAPI = new CApiClient("https://api.raidcore.gg", true, Path::D_GW2_ADDONS_COMMON_API_RAIDCORE, 30 * 60, 300, 5, 1);//, Certs::Raidcore);
-		GitHubAPI = new CApiClient("https://api.github.com", true, Path::D_GW2_ADDONS_COMMON_API_GITHUB, 30 * 60, 60, 60, 60 * 60);
+		RaidcoreAPI = new CApiClient("https://api.raidcore.gg", true, Index::D_GW2_ADDONS_COMMON_API_RAIDCORE, 30 * 60, 300, 5, 1);//, Certs::Raidcore);
+		GitHubAPI = new CApiClient("https://api.github.com", true, Index::D_GW2_ADDONS_COMMON_API_GITHUB, 30 * 60, 60, 60, 60 * 60);
 
 		std::thread([]()
 			{
-				Updater.UpdateNexus();
+				HANDLE hMutex = CreateMutexA(0, true, "RCGG-Mutex-Patch-Nexus");
+
+				if (GetLastError() == ERROR_ALREADY_EXISTS)
+				{
+					Logger->Info(CH_CORE, "Cannot patch Nexus, mutex locked.");
+
+					/* sanity check to make the compiler happy */
+					if (hMutex)
+					{
+						CloseHandle(hMutex);
+					}
+
+					return;
+				}
+
+				/* perform/check for update */
+				UpdateService->UpdateNexus();
+
+				/* sanity check to make the compiler happy */
+				if (hMutex)
+				{
+					ReleaseMutex(hMutex);
+					CloseHandle(hMutex);
+				}
 			})
 			.detach();
 		
@@ -93,15 +114,11 @@ namespace Main
 			if (Multibox::ShareArchive())	{ State::MultiboxState |= EMultiboxState::ARCHIVE_SHARED; }
 			if (Multibox::ShareLocal())		{ State::MultiboxState |= EMultiboxState::LOCAL_SHARED; }
 			if (Multibox::KillMutex())		{ State::MultiboxState |= EMultiboxState::MUTEX_CLOSED; }
-			LogInfo(CH_CORE, "Multibox State: %d", State::MultiboxState);
-
-			UnpackLocales();
-			Language.SetLocaleDirectory(Path::D_GW2_ADDONS_RAIDCORE_LOCALES);
-			Language.BuildLocaleAtlas();
+			Logger->Info(CH_CORE, "Multibox State: %d", State::MultiboxState);
 
 			MH_Initialize();
 
-			Keybinds::Initialize();
+			KeybindApi = new CKeybindApi();
 			Settings::Load();
 
 			// if it's not already been explicitly set via command line, check settings
@@ -137,13 +154,13 @@ namespace Main
 		switch (aReason)
 		{
 		case WM_DESTROY:
-			LogCritical(CH_CORE, "Main::Shutdown() | Reason: WM_DESTROY");
+			Logger->Critical(CH_CORE, "Main::Shutdown() | Reason: WM_DESTROY");
 			break;
 		case WM_CLOSE:
-			LogCritical(CH_CORE, "Main::Shutdown() | Reason: WM_CLOSE");
+			Logger->Critical(CH_CORE, "Main::Shutdown() | Reason: WM_CLOSE");
 			break;
 		case WM_QUIT:
-			LogCritical(CH_CORE, "Main::Shutdown() | Reason: WM_QUIT");
+			Logger->Critical(CH_CORE, "Main::Shutdown() | Reason: WM_QUIT");
 			break;
 		}
 
@@ -158,11 +175,11 @@ namespace Main
 			delete MumbleReader;
 
 			// shared mem
-			DataLink::Free();
+			delete DataLinkService;
 
 			MH_Uninitialize();
 
-			LogInfo(CH_CORE, "Shutdown performed.");
+			Logger->Info(CH_CORE, "Shutdown performed.");
 
 			//SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)Hooks::GW2::WndProc);
 
@@ -173,28 +190,5 @@ namespace Main
 		// FIXME: make arc not shit itself when the game shuts down, for now let windows handle the rest
 		//if (D3D11Handle) { FreeLibrary(D3D11Handle); }
 		//if (D3D11SystemHandle) { FreeLibrary(D3D11SystemHandle); }
-	}
-
-	void UnpackLocales()
-	{
-		LPVOID res{}; DWORD sz{};
-		GetResource(NexusHandle, MAKEINTRESOURCE(RES_LOCALE_EN), "JSON", &res, &sz);
-
-		try
-		{
-			if (std::filesystem::exists(Path::F_LOCALE_EN))
-			{
-				std::filesystem::remove(Path::F_LOCALE_EN);
-			}
-
-			std::ofstream file(Path::F_LOCALE_EN);
-			file.write((const char*)res, sz);
-			file.close();
-		}
-		catch (std::filesystem::filesystem_error fErr)
-		{
-			LogDebug(CH_LOADER, "%s", fErr.what());
-			return;
-		}
 	}
 }
