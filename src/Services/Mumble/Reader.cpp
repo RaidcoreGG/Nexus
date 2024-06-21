@@ -108,7 +108,6 @@ CMumbleReader::CMumbleReader(std::string aMumbleName)
 	{
 		this->IsRunning = true;
 		this->Thread = std::thread(&CMumbleReader::Advance, this);
-		this->Thread.detach();
 	}
 }
 
@@ -179,7 +178,11 @@ void CMumbleReader::Advance()
 				EventApi->Raise("EV_MUMBLE_IDENTITY_UPDATED", IdentityParsed);
 			}
 		}
+		for (size_t i = 0; i < 50; i++)
+		{
+			if (!this->IsRunning) { return; } // abort if shutdown during sleep
 
-		Sleep(50);
+			Sleep(1);
+		}
 	}
 }
