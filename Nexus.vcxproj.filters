@@ -1064,9 +1064,6 @@
     <ClInclude Include="src\Services\Updater\Updater.h">
       <Filter>Services\Updater</Filter>
     </ClInclude>
-    <ClInclude Include="src\Certs.h">
-      <Filter>_GLOBAL</Filter>
-    </ClInclude>
     <ClInclude Include="src\GUI\Widgets\Options\COptionsWindow.h">
       <Filter>GUI\Widgets\Options</Filter>
     </ClInclude>
