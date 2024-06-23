@@ -16,6 +16,7 @@
 #include "imgui/imgui_internal.h"
 
 #include "Util/Resources.h"
+#include "Util/Strings.h"
 
 const char* GetDefaultCompressedFontDataTTFBase85();
 
@@ -68,8 +69,8 @@ bool CFontManager::Advance()
 
 	ImGuiIO& io = ImGui::GetIO();
 
-	/* build glyph ranges */
-	ImVector<ImWchar> ranges;
+	/* build full ranges */
+	ImVector<ImWchar> rangesFull;
 	ImFontGlyphRangesBuilder rb{};
 	ImWchar rangesLatinExt[] =
 	{
@@ -81,6 +82,12 @@ bool CFontManager::Advance()
 	rb.AddRanges(rangesLatinExt);
 	rb.AddRanges(io.Fonts->GetGlyphRangesCyrillic());
 	rb.AddRanges(io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+	rb.BuildRanges(&rangesFull);
+
+	/* build simple ranges*/
+	ImVector<ImWchar> ranges;
+	rb.Clear();
+	rb.AddRanges(io.Fonts->GetGlyphRangesDefault());
 	rb.BuildRanges(&ranges);
 
 	io.Fonts->Clear();
@@ -103,7 +110,7 @@ bool CFontManager::Advance()
 
 	for (auto& font : this->Registry)
 	{
-		font.Pointer = io.Fonts->AddFontFromMemoryTTF(font.Data, static_cast<int>(font.DataSize), font.Size, font.Config, ranges.Data);
+		font.Pointer = io.Fonts->AddFontFromMemoryTTF(font.Data, static_cast<int>(font.DataSize), font.Size, font.Config, font.Identifier == "USER_FONT" || String::StartsWith(font.Identifier, "TREBUCHET") ? rangesFull.Data : ranges.Data);
 	}
 
 	/* finally build atlas */
