@@ -875,16 +875,24 @@ namespace Loader
 			void* startAddress = aAddon->Module;
 			void* endAddress = ((PBYTE)aAddon->Module) + aAddon->ModuleSize;
 
-			int leftoverRefs = 0;
-			leftoverRefs += EventApi->Verify(startAddress, endAddress);
-			leftoverRefs += GUI::Verify(startAddress, endAddress);
-			leftoverRefs += GUI::QuickAccess::Verify(startAddress, endAddress);
-			leftoverRefs += KeybindApi->Verify(startAddress, endAddress);
-			leftoverRefs += RawInputApi->Verify(startAddress, endAddress);
+			int evRefs = EventApi->Verify(startAddress, endAddress);
+			int uiRefs = GUI::Verify(startAddress, endAddress);
+			int qaRefs = GUI::QuickAccess::Verify(startAddress, endAddress);
+			int kbRefs = KeybindApi->Verify(startAddress, endAddress);
+			int riRefs = RawInputApi->Verify(startAddress, endAddress);
+			int leftoverRefs = evRefs + uiRefs + qaRefs + kbRefs + riRefs;
 
 			if (leftoverRefs > 0)
 			{
-				Logger->Warning(CH_LOADER, "Removed %d unreleased references from \"%s\". Make sure your addon releases all references during Addon::Unload().", leftoverRefs, aPath.filename().string().c_str());
+				std::string str = String::Format("Removed %d unreleased references from \"%s\".", leftoverRefs, aPath.filename().string().c_str());
+				str.append(" ");
+				str.append("Make sure your addon releases all references during Addon::Unload().");
+				if (evRefs) { str.append(String::Format(" Events: %d", evRefs)); }
+				if (uiRefs) { str.append(String::Format(" UI: %d", uiRefs)); }
+				if (qaRefs) { str.append(String::Format(" QuickAccess: %d", qaRefs)); }
+				if (kbRefs) { str.append(String::Format(" Keybinds: %d", kbRefs)); }
+				if (riRefs) { str.append(String::Format(" WndProc: %d", riRefs)); }
+				Logger->Warning(CH_LOADER, str.c_str());
 			}
 		}
 
