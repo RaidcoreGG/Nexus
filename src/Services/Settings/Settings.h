@@ -34,6 +34,7 @@ extern const char* OPT_LANGUAGE;
 extern const char* OPT_ALWAYSSHOWQUICKACCESS;
 extern const char* OPT_GLOBALSCALE;
 extern const char* OPT_SHOWADDONSWINDOWAFTERDUU;
+extern const char* OPT_SUPPRESS_EXCESSIVE_MUMBLE_PARSE_ERRORS;
 
 ///----------------------------------------------------------------------------------------------------
 /// Settings Namespace

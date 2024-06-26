@@ -24,6 +24,8 @@ using namespace Mumble;
 namespace Mumble
 {
 	Identity* IdentityParsed = new Identity{};
+	volatile bool SuppressExcessiveParseErrors = false;
+	volatile unsigned int ParserErrorCount = 0;
 
 	bool operator==(const Identity& lhs, const Identity& rhs)
 	{
@@ -123,6 +125,8 @@ CMumbleReader::~CMumbleReader()
 
 void CMumbleReader::Advance()
 {
+	constexpr unsigned int MAX_ERRORS = 5;
+
 	while (this->IsRunning)
 	{
 		this->Flip = !this->Flip; // every other tick so it gets refreshed every 100ms
@@ -161,15 +165,27 @@ void CMumbleReader::Advance()
 			}
 			catch (json::parse_error& ex)
 			{
-				Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
+				if(!SuppressExcessiveParseErrors || ParserErrorCount < MAX_ERRORS)
+					Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
+				else if(ParserErrorCount == MAX_ERRORS)
+					Logger->Trace(CH_MUMBLE_READER, "Suppressing further errors");
+				ParserErrorCount++;
 			}
 			catch (json::type_error& ex)
 			{
-				Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Type Error: %s", ex.what());
+				if(!SuppressExcessiveParseErrors || ParserErrorCount < MAX_ERRORS)
+					Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Type Error: %s", ex.what());
+				else if(ParserErrorCount == MAX_ERRORS)
+					Logger->Trace(CH_MUMBLE_READER, "Suppressing further errors");
+				ParserErrorCount++;
 			}
 			catch (...)
 			{
-				Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Unknown Error.");
+				if(!SuppressExcessiveParseErrors || ParserErrorCount < MAX_ERRORS)
+					Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Unknown Error.");
+				else if(ParserErrorCount == MAX_ERRORS)
+					Logger->Trace(CH_MUMBLE_READER, "Suppressing further errors");
+				ParserErrorCount++;
 			}
 
 			/* notify (also notifies the GUI to update its scaling factor) */

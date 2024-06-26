@@ -693,6 +693,17 @@ namespace GUI
 				Settings::Settings[OPT_LINKARCSTYLE] = true;
 			}
 
+			if (!Settings::Settings[OPT_SUPPRESS_EXCESSIVE_MUMBLE_PARSE_ERRORS].is_null())
+			{
+				Settings::Settings[OPT_SUPPRESS_EXCESSIVE_MUMBLE_PARSE_ERRORS].get_to(*(bool*)&Mumble::SuppressExcessiveParseErrors);
+			}
+			else
+			{
+				Mumble::SuppressExcessiveParseErrors = false;
+				Settings::Settings[OPT_SUPPRESS_EXCESSIVE_MUMBLE_PARSE_ERRORS] = false;
+			}
+
+
 			ImGuiStyle* style = &ImGui::GetStyle();
 			if (!Settings::Settings[OPT_IMGUISTYLE].is_null())
 			{

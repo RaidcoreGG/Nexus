@@ -15,6 +15,7 @@
 #include "Services/API/APIController.h"
 #include "Services/Localization/Localization.h"
 #include "Services/Settings/Settings.h"
+#include "Services/Mumble/Reader.h"
 
 #include "Util/Base64.h"
 
@@ -201,6 +202,18 @@ namespace GUI
 						Settings::Settings[OPT_QAOFFSETY] = QuickAccess::Offset.y;
 						Settings::Save();
 					}
+				}
+
+				ImGui::Separator();
+
+				ImGui::TextDisabled(Language->Translate("log_settings"));
+				{
+					if (ImGui::Checkbox(Language->Translate("supress_excessive_mumble_parsing_errors"), (bool*)&Mumble::SuppressExcessiveParseErrors))
+					{
+						Settings::Settings[OPT_SUPPRESS_EXCESSIVE_MUMBLE_PARSE_ERRORS] = Mumble::SuppressExcessiveParseErrors;
+						Settings::Save();
+					}
+					ImGui::TextDisabled(Language->Translate("parse_errors_so_far_%u"), Mumble::ParserErrorCount);
 				}
 
 				ImGui::EndChild();

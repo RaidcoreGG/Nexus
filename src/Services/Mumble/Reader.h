@@ -30,6 +30,8 @@ constexpr const float SC_LARGER						= 1.22f;
 namespace Mumble
 {
 	extern Identity* IdentityParsed;
+	extern volatile bool SuppressExcessiveParseErrors;
+	extern volatile unsigned int ParserErrorCount;
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetScalingFactor:
