@@ -22,6 +22,10 @@ CConsoleLogger::CConsoleLogger(ELogLevel aLogLevel)
 	freopen_s(&iobuf, "CONIN$", "r", stdin);
 	freopen_s(&iobuf, "CONOUT$", "w", stderr);
 	freopen_s(&iobuf, "CONOUT$", "w", stdout);
+	//NOTE(Rennorb): Set the console to utf8 mode.
+	// This is required for the µ (mu) symbol used in the timing logs.
+	// By default Windows uses a codepage specific to the selected locale, which wich likely doesn't have that symbol
+	SetConsoleOutputCP(CP_UTF8);
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 }
 

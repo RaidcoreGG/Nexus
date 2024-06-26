@@ -815,7 +815,7 @@ namespace Loader
 		addon->State = locked ? EAddonState::LoadedLOCKED : EAddonState::Loaded;
 		SaveAddonConfig();
 
-		Logger->Info(CH_LOADER, u8"Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.) Took %uµs.", 
+		Logger->Info(CH_LOADER, u8"Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.) Took %uÂµs.", 
 			strFile.c_str(), addon->Definitions->Signature,
 			addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage,
 			addon->Definitions->APIVersion, time / std::chrono::microseconds(1)
@@ -897,7 +897,7 @@ namespace Loader
 		}
 
 		aAddon->IsWaitingForUnload = false;
-		Logger->Info(CH_LOADER, u8"Unloaded addon: %s (Took %uµs.)", aPath.filename().string().c_str(), time / std::chrono::microseconds(1));
+		Logger->Info(CH_LOADER, u8"Unloaded addon: %s (Took %uÂµs.)", aPath.filename().string().c_str(), time / std::chrono::microseconds(1));
 	}
 
 	void UnloadAddon(const std::filesystem::path& aPath, bool aDoReload)
