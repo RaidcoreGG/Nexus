@@ -517,13 +517,13 @@ namespace GUI
 			Language->SetLanguage("English");
 			break;
 		case 2:
-			Language->SetLanguage("Français");
+			Language->SetLanguage("FranÃ§ais");
 			break;
 		case 3:
 			Language->SetLanguage("Deutsch");
 			break;
 		case 4:
-			Language->SetLanguage(u8"Español");
+			Language->SetLanguage(u8"EspaÃ±ol");
 			break;
 		/*case 5:
 			Language.SetLanguage(u8"Chinese");
