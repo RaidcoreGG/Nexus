@@ -1,17 +1,16 @@
 #pragma once
 
+#include <stdint.h>
 #include "Networking.h"
 
 namespace Networking {
 namespace Internal {
 
-	enum class PacketType : u16 {
+	enum class PacketType : uint16_t {
 		_UNKNOWN       = 0,
 		JoinSession    = 1,
 		SessionCreated = 2,
-		ChangeUserId   = 3,
 		LeaveSession   = 4,
-
 	};
 
 	struct PacketHeader {
@@ -25,15 +24,8 @@ namespace Internal {
 	
 	struct JoinSession {
 		PacketHeader Header {{ INTERNAL_PACKET, PACKET_LEN(JoinSession) }, PacketType::JoinSession };
-		UserId SessionUser;
 		UserId Me;
-		PacketChecksum CRC;
-	};
-
-	struct ChangeUserId {
-		PacketHeader Header {{ INTERNAL_PACKET, PACKET_LEN(ChangeUserId) }, PacketType::ChangeUserId };
-		UserId OldId;
-		UserId NewId;
+		SessionId Session;
 		PacketChecksum CRC;
 	};
 

@@ -8,39 +8,40 @@
 #include "Services/Settings/Settings.h"
 #include "Events/EventHandler.h"
 #include "Consts.h"
-#include "ArcBridge.h"
+#include "SquadEvents.h"
 #include <WinSock2.h>
 #include <WS2tcpip.h> // inet_pton
+#include <stdint.h>
 #include <thread>
 
 #define _LOG(lvl, fmt, ...) Logger->LogMessage(ELogLevel:: lvl, "Networking", fmt, __VA_ARGS__)
 
 namespace Networking
 {
-	SessionSource CurrentSessionSource = SessionSource::Mumble;
+	typedef uint32_t u32;
+	typedef uint16_t u16;
+	
 	ModuleState State = ModuleState::_UNKNOWN;
+	bool AddonLoaded = false;
 	std::map<AddonSignature, PacketHandler*> Handlers;
 
 
 	void ReportSystemError(char const* fmt, int error);
 	u32 CalculatePacketChecksum(Packet* packet);
-	UserId HashName(char const* start, size_t len);
 	void HandleInternalPacket(Packet* packet);
-	void InitializeSessionSource(SessionSource newSource);
 	void EnterReceiveLoop();
-	void MumbleIdentityUpdated(Mumble::Identity* identity);
-	void ArcBridgeAccNameUpdated(char* accountName);
-	void ArcBridgeIJoinedSquad(ArcBridge::AgentUpdate* me);
-	void ArcBridgeOtherJoinedSquad(ArcBridge::AgentUpdate* player);
-	void ArcBridgeOtherLeftSquad(ArcBridge::AgentUpdate* player);
-	void ArcBridgeUEXSquadUpdated(ArcBridge::SquadUpdate* squad);
-	char const* NameOf(SessionSource s);
+	void SendInternalPacket(Packet* packet);
+	void IJoinedSquad(SquadEvents::Squad* squad);
+	void ILeftSquad(SquadEvents::LeaveReason reason);
+	void AddonStateResponse(SquadEvents::Squad* squad);
 	
+	constexpr UserId INVALID_USER = {0};
+	constexpr SessionId INVALID_SESSION = {0};
+
 	SOCKET Socket = INVALID_SOCKET;
 	sockaddr ServerEndpoint;
-	const UserId INVALID_USER = 0;
-	UserId MyUserId = INVALID_USER, SquadmateUserId = INVALID_USER;
-	size_t CurrentSquadSize = 0;
+	UserId MyUserId = INVALID_USER;
+	SessionId MySessionId = INVALID_SESSION;
 
 
 	bool SetServerAddress(char const* host, u16 port)
@@ -83,6 +84,7 @@ namespace Networking
 		}
 
 		freeaddrinfo(addresses);
+
 		return acceptedOne;
 	}
 
@@ -175,277 +177,44 @@ namespace Networking
 		SetThreadDescription(rcvThread.native_handle(), L"Packet receive and dispatch");
 		rcvThread.detach();
 
-		State = ModuleState::WaitingForUserIds;
-		_LOG(TRACE, "Initializing with %s as the session source.", NameOf(CurrentSessionSource));
-		InitializeSessionSource(CurrentSessionSource);
+		EventApi->Subscribe(SquadEvents::EV_SQUAD_I_JOINED, (EVENT_CONSUME)IJoinedSquad);
+		EventApi->Subscribe(SquadEvents::EV_SQUAD_I_LEFT, (EVENT_CONSUME)ILeftSquad);
+
+		EventApi->Subscribe(SquadEvents::EV_SQUAD_RESPONSE_STATE, (EVENT_CONSUME)AddonStateResponse);
+		//TODO(Rennorb) @cleanup: Would be nice to receive the sender signature so i can send a response back to only this target here.
+		EventApi->Raise(SIG_NETWORKING, SquadEvents::EV_SQUAD_REQUEST_STATE);
+
+		KeybindApi->Register("disconnect_session", EKeybindHandlerType::DownOnly, LeaveSession, "Ctrl+Shift+D");
+
+		State = ModuleState::WaitingForJoin;
 	}
 
-	void InitializeSessionSource(SessionSource newSource)
-	{
-		switch(newSource) {
-			case SessionSource::Mumble:
-				EventApi->Subscribe(EV_MUMBLE_IDENTITY_UPDATED, (EVENT_CONSUME)MumbleIdentityUpdated);
-				break;
-
-			case SessionSource::Arc:
-				//TODO
-				if(CurrentSessionSource == SessionSource::Mumble) return;
-				_LOG(WARNING, "Pure arc as a session source is currently not supported. Will drop down to mumble support.");
-				newSource = SessionSource::Mumble;
-				break;
-
-			case SessionSource::ArcBridge:
-				EventApi->Subscribe(ArcBridge::EV_RES_ACC_NAME, (EVENT_CONSUME)ArcBridgeAccNameUpdated);
-				EventApi->Subscribe(ArcBridge::EV_RES_SQUAD_SELF_JOIN, (EVENT_CONSUME)ArcBridgeIJoinedSquad);
-				EventApi->Subscribe(ArcBridge::EV_RES_SQUAD_OTHER_JOIN, (EVENT_CONSUME)ArcBridgeOtherJoinedSquad);
-				EventApi->Subscribe(ArcBridge::EV_RES_SQUAD_UPDATE, (EVENT_CONSUME)ArcBridgeUEXSquadUpdated);
-				EventApi->Raise(ArcBridge::EV_REQ_ACC_NAME); // unlikely to get a good response, but we can at least try
-				break;
-		}
+	void AddonStateResponse(SquadEvents::Squad* squad) {
+		if(squad->id != UUID {0})  IJoinedSquad(squad);
 	}
 
-	void ChangeSessionSource(SessionSource newSource)
+	void IJoinedSquad(SquadEvents::Squad* squad)
 	{
-		_LOG(TRACE, "Changing session source to %s.", NameOf(newSource));
+		auto newUserId = squad->members[squad->my_index].id;
 
-		if(State >= ModuleState::WaitingForUserIds) {
-			switch(CurrentSessionSource) {
-				case SessionSource::Mumble:
-					EventApi->Unsubscribe(EV_MUMBLE_IDENTITY_UPDATED, (EVENT_CONSUME)MumbleIdentityUpdated);
-					LeaveSession(); // leave global mumble session
-					break;
+		if(MyUserId != newUserId || MySessionId == INVALID_SESSION) {
+			_LOG(TRACE, "Joining new session");
 
-				case SessionSource::Arc:
-					//TODO
-					if(newSource < SessionSource::Arc) LeaveSession();
-					break;
+			Internal::JoinSession joinPacket {};
+			joinPacket.Me      = newUserId;
+			joinPacket.Session = squad->id;
 
-				case SessionSource::ArcBridge:
-					EventApi->Unsubscribe(ArcBridge::EV_RES_ACC_NAME, (EVENT_CONSUME)ArcBridgeAccNameUpdated);
-					EventApi->Unsubscribe(ArcBridge::EV_RES_SQUAD_SELF_JOIN, (EVENT_CONSUME)ArcBridgeIJoinedSquad);
-					EventApi->Unsubscribe(ArcBridge::EV_RES_SQUAD_OTHER_JOIN, (EVENT_CONSUME)ArcBridgeOtherJoinedSquad);
-					EventApi->Unsubscribe(ArcBridge::EV_RES_SQUAD_UPDATE, (EVENT_CONSUME)ArcBridgeUEXSquadUpdated);
-					if(newSource < SessionSource::Arc) LeaveSession();
-					break;
-			}
-
-			InitializeSessionSource(newSource);
-		}
-
-		CurrentSessionSource = newSource;
-	}
-
-	void MumbleIdentityUpdated(Mumble::Identity* identity)
-	{
-		if(!identity->Name[0]) {
-			_LOG(TRACE, "Discarding UserId update event with empty character name");
-			return;
-		}
-
-		UserId newUserId = HashName(identity->Name, sizeof(identity->Name));
-		if(MyUserId == newUserId) return;
-
-		switch(State) {
-			case ModuleState::WaitingForUserIds:
-			case ModuleState::ReadyForSession: {
-				State = ModuleState::ReadyForSession;
-				_LOG(TRACE, "Initial UserId established");
-
-				//NOTE(Rennorb): Request to join the global "Squad" as soon as we have our id.
-				// Cant really do much more if we don't have extended information from an addon.
-				Internal::JoinSession joinPacket {};
-				joinPacket.Me = newUserId;
-				joinPacket.SessionUser = INVALID_USER;
-				SendInternalPacket((Packet*)&joinPacket);
-			} break;
-
-			case ModuleState::SessionEstablished: {
-				Internal::ChangeUserId changePacket {};
-				changePacket.OldId = MyUserId;
-				changePacket.NewId = newUserId;
-				SendInternalPacket((Packet*)&changePacket);
-
-				_LOG(TRACE, "Updated UserId");
-			} break;
-		}
-
-		MyUserId = newUserId;
-	}
-
-	void ArcBridgeAccNameUpdated(char* accountName)
-	{
-		if(!accountName[0]) {
-			_LOG(TRACE, "Discarding UserId update event with empty account name");
-			return;
-		}
-
-		UserId newUserId = HashName(accountName, strlen(accountName));
-		if(MyUserId == newUserId) return;
-
-		switch(State) {
-			case ModuleState::WaitingForUserIds: {
-				State = ModuleState::ReadyForSession;
-				_LOG(TRACE, "Initial UserId established");
-			} break;
-
-			case ModuleState::SessionEstablished: {
-				Internal::ChangeUserId changePacket {};
-				changePacket.OldId = MyUserId;
-				changePacket.NewId = newUserId;
-				SendInternalPacket((Packet*)&changePacket);
-
-				_LOG(TRACE, "Updated UserId");
-			} break;
-		}
-
-		MyUserId = newUserId;
-	}
-
-	void ArcBridgeIJoinedSquad(ArcBridge::AgentUpdate* me)
-	{
-		switch(State) {
-			case ModuleState::WaitingForUserIds: {
-				if(!me->account || !me->account[0])  {
-					_LOG(TRACE, "Bridge JoinSelf without own account name");
-					return;
-				}
-				UserId newUserId = HashName(me->account, strlen(me->account));
-				if(MyUserId != newUserId) {
-					MyUserId = newUserId;
-					_LOG(TRACE, "Initial UserId established");
-				}
-				
-			} [[fallthrough]]; // although we should basically never have the squadmate id at this point
-
-			case ModuleState::ReadyForSession:
-			// join also handles switching sessions
-			case ModuleState::SessionEstablished: {
-				if(SquadmateUserId == INVALID_USER) {
-					_LOG(TRACE, "Still waiting for squadmate user id");
-					break;
-				}
-
-				Internal::JoinSession changePacket {};
-				changePacket.Me = MyUserId;
-				changePacket.SessionUser = SquadmateUserId;
-				SendInternalPacket((Packet*)&changePacket);
-
-				_LOG(TRACE, "Requested join");
-			} break;
-		}
-	}
-
-	void ArcBridgeOtherJoinedSquad(ArcBridge::AgentUpdate* player)
-	{
-		if(SquadmateUserId != INVALID_USER || State > ModuleState::WaitingForUserIds) return;
-		if(!player->account || !player->account[0])  {
-			_LOG(TRACE, "Bridge Join without account name");
-			return;
-		}
-
-		//TODO(Rennorb) @correctness: cannot assume everyone is running nexus, so we need to figure out who we can use for joining.
-		// If we dont, sessions will fragment
-
-		SquadmateUserId = HashName(player->account, strlen(player->account));
-		
-		if(MyUserId != INVALID_USER) {
-			State = ModuleState::ReadyForSession;
-
-			Internal::JoinSession changePacket {};
-			changePacket.Me = MyUserId;
-			changePacket.SessionUser = SquadmateUserId;
-			SendInternalPacket((Packet*)&changePacket);
-		}
-	}
-
-	void ArcBridgeOtherLeftSquad(ArcBridge::AgentUpdate* player)
-	{
-		if(SquadmateUserId == INVALID_USER || State != ModuleState::WaitingForUserIds) return;
-		if(!player->account || !player->account[0])  {
-			_LOG(TRACE, "Bridge Leave without account name");
-			return;
-		}
-
-		UserId userId = HashName(player->account, strlen(player->account));
-
-		if(SquadmateUserId == userId)  SquadmateUserId = INVALID_USER;
-	}
-
-	void ArcBridgeUEXSquadUpdated(ArcBridge::SquadUpdate* squad)
-	{
-		if(!squad->Infos || !squad->InfoCount)  {
-			_LOG(TRACE, "Bridge SquadUpdate without data");
-			return;
-		}
-
-		if(SquadmateUserId == INVALID_USER && State == ModuleState::WaitingForUserIds) {
-			if(CurrentSquadSize == 0 && squad->InfoCount == 1) {
-				// created a new squad
-				if(MyUserId == INVALID_USER) {
-					auto player = squad->Infos;
-					MyUserId = HashName(player->AccountName, strlen(player->AccountName));
-				}
-
-				CurrentSquadSize = 1;
-				State = ModuleState::ReadyForSession;
-
-				Internal::JoinSession changePacket {};
-				changePacket.Me = MyUserId;
-				changePacket.SessionUser = MyUserId;
-				SendInternalPacket((Packet*)&changePacket);
-
-				return;
-			}
-
-			// joined existing squad or already in squad
-
-			if(MyUserId == INVALID_USER) {
-				_LOG(TRACE, "Got UEX SquadUpdate with multiple players, but don't know own ID yet, so we cannot filter out. Waiting for the next SquadUpdate.");
-				CurrentSquadSize = squad->InfoCount;
-				return;
-			}
-
-			ArcBridge::UserInfo* player = squad->Infos;
-			ArcBridge::UserInfo* playerEnd = squad->Infos + squad->InfoCount;
-			UserId playerId;
-			do {
-				// find the first user that is not us
-				playerId = HashName(player->AccountName, strlen(player->AccountName));
+			State = ModuleState::WaitingForServerResponse;
 			
-				//TODO(Rennorb) @correctness: cannot assume everyone is running nexus, so we need to figure out who we can use for joining.
-				// If we dont, sessions will fragment
-				if(playerId != MyUserId) break;
-
-			} while(++player < playerEnd);
-			if(player >= playerEnd) {
-				// try again i guess
-				CurrentSquadSize = squad->InfoCount;
-				return;
-			}
-
-			SquadmateUserId = playerId;
-
-			if(MyUserId != INVALID_USER) {
-				State = ModuleState::ReadyForSession;
-
-				Internal::JoinSession changePacket {};
-				changePacket.Me = MyUserId;
-				changePacket.SessionUser = SquadmateUserId;
-				SendInternalPacket((Packet*)&changePacket);
-			}
-		}
-		else { // not looking for squadmate
-			if(CurrentSquadSize == 1 && squad->InfoCount == 1) {
-				// last one to leave
-				if(MyUserId != INVALID_USER) {
-					LeaveSession();
-					CurrentSquadSize = 0;
-					return;
-				}
-			}
+			SendInternalPacket((Packet*)&joinPacket);
 		}
 
-		CurrentSquadSize = squad->InfoCount;
+		MyUserId = newUserId;
+	}
+
+	void ILeftSquad(SquadEvents::LeaveReason reason)
+	{
+		LeaveSession();
 	}
 
 
@@ -481,7 +250,7 @@ namespace Networking
 
 	void SendInternalPacket(Packet* packet)
 	{
-		if(State < ModuleState::ReadyForSession) return;
+		if(State < ModuleState::WaitingForServerResponse) return;
 
 		packet->Header.TargetAddonId = Internal::INTERNAL_PACKET;
 		if(packet->Header.LengthInU32s < 3) {
@@ -504,15 +273,15 @@ namespace Networking
 
 	void LeaveSession()
 	{
-		if(State < ModuleState::SessionEstablished) return;
+		if(State < ModuleState::SessionEstablished || MyUserId == INVALID_USER) return;
 		_LOG(TRACE, "Disconnecting from established session");
 
 		Internal::LeaveSession leavePacket;
 		leavePacket.Me = MyUserId;
 		SendInternalPacket((Packet*)&leavePacket);
 
-		SquadmateUserId = INVALID_USER;
-		State = ModuleState::WaitingForUserIds;
+		MySessionId = INVALID_SESSION;
+		State = ModuleState::WaitingForJoin;
 	}
 
 
@@ -576,8 +345,16 @@ namespace Networking
 		switch(header->Type) {
 			case Internal::PacketType::SessionCreated:
 				if(packet->Header.LengthInU32s * 4 == sizeof(Internal::SessionCreated)) {
-					State = ModuleState::SessionEstablished;
-					_LOG(TRACE, "Joined session %08x.", ((Internal::SessionCreated*)packet)->Session);
+					if(AddonLoaded) { // one more safety just in case the networking addon got unloaded between request and response
+						State = ModuleState::SessionEstablished;
+						MySessionId = ((Internal::SessionCreated*)packet)->Session;
+						auto as_u32s = (u32*)&MySessionId;
+						_LOG(TRACE, "Joined session %08x %08x %08x %08x.", as_u32s[0], as_u32s[1], as_u32s[2], as_u32s[3]);
+
+						//NOTE(Rennorb): Spawn this in a separate thread as addons will likely try to immediately fire packets ones this goes out,
+						// and we dont want to block the receiver for responses.
+						std::thread([]() { EventApi->Raise(EV_NETWORKING_READY); }).detach();
+					}
 				}
 				else
 					_LOG(TRACE, "Received SessionCreated packet that is not the correct size (%d instead of the expected %d).", packet->Header.LengthInU32s, sizeof(Internal::SessionCreated));
@@ -600,39 +377,10 @@ namespace Networking
 	}
 
 
-
-
-
-	UserId HashName(char const* name, size_t len)
+	void ResetHandlerPtr(int version, AddonAPI* api)
 	{
-		u32* namedData = (u32*)name;
-		u32* end = namedData + len / 4;
-		UserId hash = 0;
-		while(namedData < end) {
-			hash ^= *namedData++;
-		}
-
-		size_t remaining = len % 4;
-		if(remaining != 0) {
-			u32 r = 0;
-			char* rest = (char*)end;
-			while(remaining-- > 0) {
-				r = (r << 8) | *end++;
-			}
-			hash ^= r;
-		}
-
-		return hash;
-	}
-
-	char const* NameOf(SessionSource s)
-	{
-		switch(s) {
-			case SessionSource::Mumble: return "Mumble";
-			case SessionSource::Arc: return "Arc";
-			case SessionSource::ArcBridge: return "ArcBridge";
-			case SessionSource::NetworkAddon: return "DedicatedNetworkAddon";
-			default: return "unknown";
+		switch(version) {
+			case 4: ((AddonAPI4*)api)->HandleIncomingPacket = 0;
 		}
 	}
 

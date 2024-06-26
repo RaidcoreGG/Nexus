@@ -81,7 +81,7 @@
     <ClCompile Include="src\Inputs\RawInput\RawInputApi.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\ArcBridge.h" />
+    <ClInclude Include="src\SquadEvents.h" />
     <ClInclude Include="src\Services\API\ApiClient.h" />
     <ClInclude Include="src\Services\API\APIController.h" />
     <ClInclude Include="src\Services\API\ActiveToken.h" />
@@ -474,8 +474,7 @@
 CALL $(SolutionDir)Scripts\version.bat</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>copy /y /b $(OutputPath)d3d11.dll + $(OutputPath)d3d11.pdb "C:\games\Guild Wars 2\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

@@ -301,9 +301,13 @@ struct AddonAPI4 : AddonAPI
 	FONTS_ADDFROMMEMORY					AddFontFromMemory;
 
 	//TODO(Rennorb) @cleanup: probably needs new revision
-	/// The addon should set this member if desired, so nexus can read it back.
+	/// Addons should set this member if desired, so nexus can read it back.
 	Networking::PacketPrepareAndBroadcast* PrepareAndBroadcastPacket;
 	Networking::PacketHandler*             HandleIncomingPacket;
+	/// Because of the asynchronous nature of the addon loading process, addons might miss the EV_NETWORKING_READY event.
+	/// Addons my look at this field to determine if networking is already available during their load callback, 
+	/// or if they have to wait for the EV_NETWORKING_READY (`EV_NW_RDY`) event.
+	bool                                   NetworkingIsAvailableImmediately;
 };
 
 // Revision 5

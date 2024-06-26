@@ -805,6 +805,9 @@ namespace Loader
 		GetModuleInformation(GetCurrentProcess(), addon->Module, &moduleInfo, sizeof(moduleInfo));
 		addon->ModuleSize = moduleInfo.SizeOfImage;
 
+		// reset the handler pointer to zero from previous invocations so we dont leake function pointers between addons
+		Networking::ResetHandlerPtr(addon->Definitions->APIVersion, api);
+
 		auto start_time = std::chrono::high_resolution_clock::now();
 		addon->Definitions->Load(api);
 		auto end_time = std::chrono::high_resolution_clock::now();
@@ -818,7 +821,6 @@ namespace Loader
 				Logger->Info(CH_LOADER, "At least one addon is using Networking, initializing...");
 				auto start = std::chrono::high_resolution_clock::now();
 				Networking::Init();
-				//Networking::JoinSession(); //TODO(Rennorb): this is not the correct place for this, we cannot really know whom to join at this point
 				auto end = std::chrono::high_resolution_clock::now();
 				Logger->Info(CH_LOADER, u8"Network init took %uµs.", (end - start) / std::chrono::microseconds(1));
 			}
@@ -840,23 +842,15 @@ namespace Loader
 			case SIG_ARCDPS:
 				ArcDPS::ModuleHandle = addon->Module;
 				ArcDPS::IsLoaded = true;
-
-				if(Networking::CurrentSessionSource < Networking::SessionSource::Arc)
-					Networking::ChangeSessionSource(Networking::SessionSource::Arc);
-
 				ArcDPS::DeployBridge();
 				break;
 
 			case SIG_ARCDPS_BRIDGE: if (ArcDPS::ModuleHandle) {
 				ArcDPS::InitializeBridge(addon->Module);
-
-				if(Networking::CurrentSessionSource < Networking::SessionSource::ArcBridge)
-					Networking::ChangeSessionSource(Networking::SessionSource::ArcBridge);
 			}	break;
 
 			case SIG_NETWORKING: 
-				if(Networking::CurrentSessionSource < Networking::SessionSource::NetworkAddon)
-					Networking::ChangeSessionSource(Networking::SessionSource::NetworkAddon);
+				Networking::AddonLoaded = true;
 				break;
 		}
 	}
@@ -960,32 +954,13 @@ namespace Loader
 
 		if (addon->Definitions)
 		{
-			// don't need to do all the switching if we are shutting down either way
+			// Disconnect from any session we are left on. This will also disable networking in general.
 			if(addon->State == EAddonState::Loaded) {
-				switch(addon->Definitions->Signature) {
-					case SIG_ARCDPS:
-						if(Networking::CurrentSessionSource == Networking::SessionSource::Arc || Networking::CurrentSessionSource == Networking::SessionSource::ArcBridge) {
-							Networking::ChangeSessionSource(Networking::SessionSource::Mumble);
-						}
-						break;
-
-					case SIG_ARCDPS_BRIDGE:
-						if(Networking::CurrentSessionSource == Networking::SessionSource::ArcBridge) {
-							Networking::ChangeSessionSource(ArcDPS::IsLoaded ? Networking::SessionSource::Arc : Networking::SessionSource::Mumble);
-						}
-						break;
-
-					case SIG_NETWORKING:
-						//NOTE(Rennorb): redundant check, but just in case we add higher modes later on
-						if(Networking::CurrentSessionSource == Networking::SessionSource::NetworkAddon) {
-							Networking::ChangeSessionSource(ArcDPS::IsBridgeDeployed
-								? Networking::SessionSource::ArcBridge 
-								: ArcDPS::IsLoaded 
-									? Networking::SessionSource::Arc 
-									: Networking::SessionSource::Mumble
-							);
-						}
-						break;
+				if(addon->Definitions->Signature == SIG_NETWORKING && Networking::State == Networking::ModuleState::SessionEstablished) {
+					Logger->Trace(CH_LOADER, "Unloaded Networking addon, disconnecting any remaining session.");
+					EventApi->Raise(Networking::EV_NETWORKING_UNLOADING);
+					Networking::AddonLoaded = false;
+					Networking::LeaveSession();
 				}
 			}
 
@@ -1430,6 +1405,7 @@ namespace Loader
 
 			((AddonAPI4*)api)->HandleIncomingPacket = 0;
 			((AddonAPI4*)api)->PrepareAndBroadcastPacket = Networking::PrepareAndBroadcastPacket;
+			((AddonAPI4*)api)->NetworkingIsAvailableImmediately = Networking::State == Networking::ModuleState::SessionEstablished;
 
 			ApiDefs.insert({ aVersion, api });
 			return api;

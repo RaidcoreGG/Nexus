@@ -7,42 +7,32 @@
 
 namespace Networking
 {
-	typedef uint32_t u32;
-	typedef uint16_t u16;
+	/// Networking is now ready. As networking requires an addon, this event in not guaranteed to ever be raised.
+	/// no payload
+	constexpr char const EV_NETWORKING_READY[] = "EV_NW_RDY";
+	/// Networking is about to unload, this is your last chance to get packets out.
+	/// no payload
+	constexpr char const EV_NETWORKING_UNLOADING[] = "EV_NW_UNL";
 
-	typedef u32 UserId;
-	typedef u32 SessionId;
+	typedef UUID UserId;
+	typedef UUID SessionId;
 
 	extern std::map<AddonSignature, PacketHandler*> Handlers;
 
-	/// The source from wich to pull squad join information.
-	/// Higher values are more desirable.
-	enum SessionSource {
-		/// No proper squad information is available, the player can only join a global squad based on his current character name.
-		Mumble         = 0,
-		/// Arc is available, but ArcBridge is not, will use arc directly for squad events.
-		Arc            = 1,
-		ArcBridge      = 2,
-		/// Custom network addon is loaded. This should provide the best events for this specific purpose.
-		NetworkAddon   = 3,
-	};
-	extern SessionSource CurrentSessionSource;
-	/// Will handle required cahnges in the UserID and packet sending depending on initialization state of nexus and the networking module
-	void ChangeSessionSource(SessionSource newSource);
-
 	enum ModuleState {
-		_UNKNOWN           = 0,
-		Initializing       = 1,
-		WaitingForUserIds   = 2,
-		ReadyForSession    = 3,
-		SessionEstablished = 4
+		_UNKNOWN                 = 0,
+		Initializing             = 1,
+		WaitingForJoin           = 2,
+		WaitingForServerResponse = 3,
+		SessionEstablished       = 4
 	};
 	extern ModuleState State;
+	extern bool AddonLoaded;
 	void Init();
 
 	bool PrepareAndBroadcastPacket(Packet* packet);
-	void SendInternalPacket(Packet* packet);
 	void LeaveSession();
 
 	PacketHandler* GetPacketHandlerFromApi(int version, AddonAPI* api);
+	void ResetHandlerPtr(int version, AddonAPI* api);
 }
