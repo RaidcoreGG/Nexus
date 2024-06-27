@@ -581,13 +581,14 @@ namespace GUI
 		Language->SetLocaleDirectory(Index::D_GW2_ADDONS_RAIDCORE_LOCALES);
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_EN, RES_LOCALE_EN, "JSON");
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_DE, RES_LOCALE_DE, "JSON");
-		//Resources::Unpack(NexusHandle, Index::F_LOCALE_FR, RES_LOCALE_FR, "JSON");
+		Resources::Unpack(NexusHandle, Index::F_LOCALE_FR, RES_LOCALE_FR, "JSON");
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_ES, RES_LOCALE_ES, "JSON");
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_BR, RES_LOCALE_BR, "JSON");
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_CZ, RES_LOCALE_CZ, "JSON");
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_IT, RES_LOCALE_IT, "JSON");
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_PL, RES_LOCALE_PL, "JSON");
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_RU, RES_LOCALE_RU, "JSON");
+		Resources::Unpack(NexusHandle, Index::F_LOCALE_CN, RES_LOCALE_CN, "JSON");
 		Language->Advance(); // advance once to build lang atlas prior to creation of Quick Access
 
 		ImGuiIO& io = ImGui::GetIO();

@@ -45,6 +45,7 @@ namespace Index
 	std::filesystem::path F_LOCALE_IT{};
 	std::filesystem::path F_LOCALE_PL{};
 	std::filesystem::path F_LOCALE_RU{};
+	std::filesystem::path F_LOCALE_CN{};
 
 	std::vector<std::string> PathStore;
 
@@ -94,6 +95,7 @@ namespace Index
 		F_LOCALE_IT = D_GW2_ADDONS_RAIDCORE_LOCALES / "it_Main.json";
 		F_LOCALE_PL = D_GW2_ADDONS_RAIDCORE_LOCALES / "pl_Main.json";
 		F_LOCALE_RU = D_GW2_ADDONS_RAIDCORE_LOCALES / "ru_Main.json";
+		F_LOCALE_CN = D_GW2_ADDONS_RAIDCORE_LOCALES / "cn_Main.json";
 
 		/* push to paths */
 		PathStore.push_back(D_GW2.string());
