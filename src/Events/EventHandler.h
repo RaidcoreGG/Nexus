@@ -10,7 +10,7 @@
 #define EVENTHANDLER_H
 
 #include <mutex>
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include <string>
 
@@ -129,11 +129,11 @@ public:
 	/// GetRegistry:
 	/// 	Returns a copy of the registry.
 	///----------------------------------------------------------------------------------------------------
-	std::map<std::string, EventData> GetRegistry() const;
+	std::unordered_map<std::string, EventData> GetRegistry() const;
 
 private:
-	mutable std::mutex					Mutex;
-	std::map<std::string, EventData>	Registry;
+	mutable std::mutex							Mutex;
+	std::unordered_map<std::string, EventData>	Registry;
 };
 
 #endif

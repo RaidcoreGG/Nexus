@@ -185,7 +185,7 @@ int CEventApi::Verify(void* aStartAddress, void* aEndAddress)
 	return refCounter;
 }
 
-std::map<std::string, EventData> CEventApi::GetRegistry() const
+std::unordered_map<std::string, EventData> CEventApi::GetRegistry() const
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
