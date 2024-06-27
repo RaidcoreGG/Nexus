@@ -310,7 +310,7 @@ void CApiClient::ProcessRequests()
 			{
 				Bucket = 0;
 
-				Sleep(RefillInterval - deltaRefill * 1000);
+				Sleep(RefillInterval - static_cast<int>(deltaRefill) * 1000);
 				continue;
 			}
 

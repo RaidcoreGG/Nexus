@@ -263,8 +263,8 @@ namespace ImGui
 	static ImVec4 HEXtoIV4(const char* hex)
 	{
 		int r, g, b;
-		std::sscanf(hex, "%02x%02x%02x", &r, &g, &b);
-		return ImVec4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
+		int in = std::sscanf(hex, "%02x%02x%02x", &r, &g, &b);
+		return in == 0 ? ImVec4() : ImVec4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
 	}
 }
 
