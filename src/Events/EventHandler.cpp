@@ -69,7 +69,7 @@ void CEventApi::Raise(const char* aIdentifier, void* aEventData)
 
 	//auto end_time = std::chrono::high_resolution_clock::now();
 	//auto time = end_time - start_time;
-	//Logger->Debug(CH_EVENTS, u8"Executed event (%s) in %uµs.", aIdentifier, time / std::chrono::microseconds(1));
+	//Logger->Debug(CH_EVENTS, u8"Executed event (%s) in %uÂµs.", aIdentifier, time / std::chrono::microseconds(1));
 }
 
 void CEventApi::Raise(signed int aSignature, const char* aIdentifier, void* aEventData)

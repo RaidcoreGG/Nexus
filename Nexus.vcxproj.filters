@@ -1106,6 +1106,9 @@
     <ClInclude Include="src\Util\DLL.h">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="src\Inputs\GameBinds\GameBindsHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\Nexus.rc">

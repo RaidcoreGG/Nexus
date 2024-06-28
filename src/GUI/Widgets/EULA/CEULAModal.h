@@ -10,13 +10,13 @@ namespace GUI
 	class CEULAModal : public IWindow
 	{
 	public:
-		Texture* Background;
-		Texture* TitleBar;
-		Texture* TitleBarHover;
-		Texture* TitleBarEnd;
-		Texture* TitleBarEndHover;
-		Texture* BtnClose;
-		Texture* BtnCloseHover;
+		Texture* Background	= nullptr;
+		Texture* TitleBar = nullptr;
+		Texture* TitleBarHover = nullptr;
+		Texture* TitleBarEnd = nullptr;
+		Texture* TitleBarEndHover = nullptr;
+		Texture* BtnClose = nullptr;
+		Texture* BtnCloseHover = nullptr;
 
 		bool TitleBarControlled;
 		bool CloseHovered;

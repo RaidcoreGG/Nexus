@@ -514,16 +514,16 @@ namespace GUI
 		switch (langId)
 		{
 		case 0:
-			Language->SetLanguage("English");
+			Language->SetLanguage("en");
 			break;
 		case 2:
-			Language->SetLanguage("Français");
+			Language->SetLanguage("fr");
 			break;
 		case 3:
-			Language->SetLanguage("Deutsch");
+			Language->SetLanguage("de");
 			break;
 		case 4:
-			Language->SetLanguage(u8"Español");
+			Language->SetLanguage("es");
 			break;
 		/*case 5:
 			Language.SetLanguage(u8"Chinese");
