@@ -624,6 +624,25 @@ namespace Loader
 			}
 		}
 
+		/* doesn't fulfill min reqs */
+		if (!addon->Definitions->HasMinimumRequirements())
+		{
+			std::string reqMsg = String::Format("\"%s\" does not fulfill minimum requirements. Incompatible. Reasons: \n", strFile.c_str());
+			if (!addon->Definitions->Signature)		{ reqMsg.append("Signature is 0.\n"); }
+			if (!addon->Definitions->Name)			{ reqMsg.append("Name is nullptr.\n"); }
+			if (!addon->Definitions->Author)		{ reqMsg.append("Author is nullptr.\n"); }
+			if (!addon->Definitions->Description)	{ reqMsg.append("Description is nullptr.\n"); }
+			if (!addon->Definitions->Load)			{ reqMsg.append("Load function is nullptr.\n"); }
+			if (!addon->Definitions->Unload &&
+				!addon->Definitions->HasFlag(EAddonFlags::DisableHotloading))
+													{ reqMsg.append("Unload function is nullptr, but Hotloading was not disabled."); }
+			Logger->Warning(CH_LOADER, reqMsg.c_str());
+			FreeLibrary(addon->Module);
+			addon->State = EAddonState::NotLoadedIncompatible;
+			addon->Module = nullptr;
+			return;
+		}
+
 		/* check if duplicate signature */
 		auto duplicate = std::find_if(Addons.begin(), Addons.end(), [addon](Addon* cmpAddon) {
 			// check if it has definitions and if the signature is the same
@@ -768,16 +787,6 @@ namespace Loader
 			return;
 		}
 
-		/* doesn't fulfill min reqs */
-		if (!addon->Definitions->HasMinimumRequirements())
-		{
-			Logger->Warning(CH_LOADER, "\"%s\" does not fulfill minimum requirements. At least define Name, Version, Author, Description as well as the Load function. Incompatible.", strFile.c_str());
-			FreeLibrary(addon->Module);
-			addon->State = EAddonState::NotLoadedIncompatible;
-			addon->Module = nullptr;
-			return;
-		}
-
 		/* (effectively duplicate check) if someone wants to do shenanigans and inject a different integration module */
 		if (addon->Definitions->Signature == 0xFED81763 && aPath != Index::F_ARCDPSINTEGRATION)
 		{
@@ -886,12 +895,12 @@ namespace Loader
 			{
 				std::string str = String::Format("Removed %d unreleased references from \"%s\".", leftoverRefs, aPath.filename().string().c_str());
 				str.append(" ");
-				str.append("Make sure your addon releases all references during Addon::Unload().");
-				if (evRefs) { str.append(String::Format(" Events: %d", evRefs)); }
-				if (uiRefs) { str.append(String::Format(" UI: %d", uiRefs)); }
-				if (qaRefs) { str.append(String::Format(" QuickAccess: %d", qaRefs)); }
-				if (kbRefs) { str.append(String::Format(" Keybinds: %d", kbRefs)); }
-				if (riRefs) { str.append(String::Format(" WndProc: %d", riRefs)); }
+				str.append("Make sure your addon releases all references during Addon::Unload().\n");
+				if (evRefs) { str.append(String::Format("Events: %d\n", evRefs)); }
+				if (uiRefs) { str.append(String::Format("UI: %d\n", uiRefs)); }
+				if (qaRefs) { str.append(String::Format("QuickAccess: %d\n", qaRefs)); }
+				if (kbRefs) { str.append(String::Format("Keybinds: %d\n", kbRefs)); }
+				if (riRefs) { str.append(String::Format("WndProc: %d", riRefs)); }
 				Logger->Warning(CH_LOADER, str.c_str());
 			}
 		}
@@ -1548,11 +1557,11 @@ namespace Loader
 	{
 		std::sort(Addons.begin(), Addons.end(), [](Addon* lhs, Addon* rhs)
 			{
-				std::string lcmp = lhs->Definitions
+				std::string lcmp = lhs->Definitions && lhs->Definitions->Name
 					? String::ToLower(String::Normalize(lhs->Definitions->Name))
 					: String::ToLower(lhs->Path.filename().string());
 
-				std::string rcmp = rhs->Definitions
+				std::string rcmp = rhs->Definitions && rhs->Definitions->Name
 					? String::ToLower(String::Normalize(rhs->Definitions->Name))
 					: String::ToLower(rhs->Path.filename().string());
 
