@@ -13,24 +13,23 @@ namespace Internal {
 		LeaveSession   = 4,
 	};
 
-	struct PacketHeader {
-		Networking::PacketHeader BaseHeader;
+	struct PacketHeader : Networking::PacketHeader {
 		PacketType Type;
 	};
-	static_assert(sizeof(PacketHeader) == 8);
+	static_assert(sizeof(PacketHeader) % 4 == 0);
 
 	const AddonSignature INTERNAL_PACKET = 0;
 	const int MIN_PACKET_SIZE = (sizeof(PacketHeader) + 3) / 4 + (sizeof(PacketChecksum) + 3) / 4; // separate division for separate rounding for alignment requirements
 	
 	struct JoinSession {
-		PacketHeader Header {{ INTERNAL_PACKET, PACKET_LEN(JoinSession) }, PacketType::JoinSession };
+		PacketHeader Header { INTERNAL_PACKET, PACKET_LEN(JoinSession), PacketType::JoinSession };
 		UserId Me;
 		SessionId Session;
 		PacketChecksum CRC;
 	};
 
 	struct LeaveSession {
-		PacketHeader Header {{ INTERNAL_PACKET, PACKET_LEN(LeaveSession) }, PacketType::LeaveSession };
+		PacketHeader Header { INTERNAL_PACKET, PACKET_LEN(LeaveSession), PacketType::LeaveSession };
 		UserId Me;
 		PacketChecksum CRC;
 	};

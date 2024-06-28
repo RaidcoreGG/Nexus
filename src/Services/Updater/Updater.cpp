@@ -25,7 +25,7 @@ namespace Updater
 		if (!aSignature) { return; }
 		if (!aUpdateURL) { return; }
 
-		const std::lock_guard<std::mutex> lock(Loader::Mutex);
+		const std::unique_lock wLock(Loader::AddonsMutex);
 
 		Addon* addon = Loader::FindAddonBySig(aSignature);
 

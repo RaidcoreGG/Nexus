@@ -24,7 +24,8 @@
 #include "Services/API/ApiClient.h"
 #include "Services/Updater/Updater.h"
 #include "Services/Multibox/Multibox.h"
-#include "Networking/Networking.h"
+#include "Services/AddonShare/AddonShare.h"
+#include "Services/Networking/Networking.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -141,6 +142,8 @@ namespace Main
 
 			// create imgui context
 			if (!Renderer::GuiContext) { Renderer::GuiContext = ImGui::CreateContext(); }
+
+			AddonShare::Init();
 
 			State::Nexus = ENexusState::LOADED;
 		}

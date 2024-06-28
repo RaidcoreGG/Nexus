@@ -33,6 +33,7 @@ namespace GUI
 		bool Tab1Hovered;
 		bool Tab2Hovered;
 		bool Tab3Hovered;
+		bool Tab4Hovered;
 
 		CAddonsWindow(std::string aName);
 		void Render();

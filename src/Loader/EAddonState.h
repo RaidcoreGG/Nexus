@@ -1,6 +1,8 @@
 #ifndef EADDONSTATE_H
 #define EADDONSTATE_H
 
+#include "BaseTypes.h"
+
 enum class EAddonState
 {
 	None,
@@ -13,5 +15,8 @@ enum class EAddonState
 	Loaded,							/* Addon is loaded. */
 	LoadedLOCKED					/* Addon is loaded, but locked and mustn't be unloaded. */
 };
+
+/// returns null if value is not in enum
+Option<char const*> ToString(EAddonState state);
 
 #endif

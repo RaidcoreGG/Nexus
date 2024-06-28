@@ -15,9 +15,12 @@ namespace Networking
 	constexpr char const EV_NETWORKING_UNLOADING[] = "EV_NW_UNL";
 
 	typedef UUID UserId;
-	typedef UUID SessionId;
+	constexpr UserId INVALID_USER = {0};
 
-	extern std::map<AddonSignature, PacketHandler*> Handlers;
+	typedef UUID SessionId;
+	constexpr SessionId INVALID_SESSION = {0};
+
+	
 
 	enum ModuleState {
 		_UNKNOWN                 = 0,
@@ -26,8 +29,12 @@ namespace Networking
 		WaitingForServerResponse = 3,
 		SessionEstablished       = 4
 	};
+
+	extern std::map<AddonSignature, PacketHandler*> Handlers;
 	extern ModuleState State;
 	extern bool AddonLoaded;
+	extern UserId MyUserId;
+
 	void Init();
 
 	bool PrepareAndBroadcastPacket(Packet* packet);

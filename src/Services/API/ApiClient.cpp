@@ -108,7 +108,7 @@ json CApiClient::Get(std::string aEndpoint, std::string aParameters, bool aBypas
 
 	// Wait for the response
 	{
-		std::unique_lock<std::mutex> lock(mtx);
+		std::unique_lock lock(mtx);
 		cv.wait(lock, [&]{ return done; });
 	}
 
@@ -162,7 +162,7 @@ json CApiClient::Post(std::string aEndpoint, std::string aParameters)
 
 	// Wait for the response
 	{
-		std::unique_lock<std::mutex> lock(mtx);
+		std::unique_lock lock(mtx);
 		cv.wait(lock, [&] { return done; });
 	}
 
@@ -278,7 +278,7 @@ void CApiClient::ProcessRequests()
 	for (;;)
 	{
 		{
-			std::unique_lock<std::mutex> lockThread(ThreadMutex);
+			std::unique_lock lockThread(ThreadMutex);
 			ConVar.wait(lockThread, [this] { return !IsSuspended; });
 		}
 

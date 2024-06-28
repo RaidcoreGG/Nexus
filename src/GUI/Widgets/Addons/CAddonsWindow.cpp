@@ -15,6 +15,7 @@
 #include "Loader/ArcDPS.h"
 #include "AddonItem.h"
 #include "Services/Textures/TextureLoader.h"
+#include "Services/AddonShare/AddonShare.h"
 
 #include "GUI/Widgets/Alerts/Alerts.h"
 #include "Services/Updater/Updater.h"
@@ -51,6 +52,7 @@ namespace GUI
 		Tab1Hovered = false;
 		Tab2Hovered = false;
 		Tab3Hovered = false;
+		Tab4Hovered = false;
 	}
 
 	void CAddonsWindow::Render()
@@ -102,17 +104,25 @@ namespace GUI
 
 			ImGui::SetCursorPos(ImVec2(28.0f, 8.0f + (64.0f * Renderer::Scaling)));
 
-			ImVec2 text1sz = ImGui::CalcTextSize(Language->Translate("((000031))"));
-			ImVec2 text2sz = ImGui::CalcTextSize(Language->Translate("((000032))"));
-			ImVec2 text3sz = ImGui::CalcTextSize(Language->Translate("((000075))"));
+			char const* text1 = Language->Translate("((000031))");
+			char const* text2 = Language->Translate("((000032))");
+			char const* text3 = Language->Translate("((000075))");
+			char const* text4 = Language->Translate("squad_members");
+
+			ImVec2 text1sz = ImGui::CalcTextSize(text1);
+			ImVec2 text2sz = ImGui::CalcTextSize(text2);
+			ImVec2 text3sz = ImGui::CalcTextSize(text3);
+			ImVec2 text4sz = ImGui::CalcTextSize(text4);
 
 			float tab1width = 96.0f > text1sz.x + 16.0f ? 96.0f : text1sz.x + 32.0f;
 			float tab2width = 96.0f > text2sz.x + 16.0f ? 96.0f : text2sz.x + 32.0f;
 			float tab3width = 96.0f > text3sz.x + 16.0f ? 96.0f : text3sz.x + 32.0f;
+			float tab4width = 96.0f > text4sz.x + 16.0f ? 96.0f : text4sz.x + 32.0f;
 
 			ImVec2 text1offset = ImVec2(((tab1width * Renderer::Scaling) - text1sz.x) / 2, ((24.0f * Renderer::Scaling) - text1sz.y) / 2);
 			ImVec2 text2offset = ImVec2(((tab2width * Renderer::Scaling) - text2sz.x) / 2, ((24.0f * Renderer::Scaling) - text2sz.y) / 2);
 			ImVec2 text3offset = ImVec2(((tab3width * Renderer::Scaling) - text3sz.x) / 2, ((24.0f * Renderer::Scaling) - text3sz.y) / 2);
+			ImVec2 text4offset = ImVec2(((tab4width * Renderer::Scaling) - text4sz.x) / 2, ((24.0f * Renderer::Scaling) - text4sz.y) / 2);
 			
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
@@ -153,20 +163,32 @@ namespace GUI
 				ImGui::GW2::TooltipGeneric(legacyNotice.c_str());
 			}
 
+			ImGui::SameLine();
+
+			ImVec2 tab4origin = ImGui::GetCursorPos();
+			if (ImGui::ImageButton(!Tab4Hovered ? TabBtn->Resource : TabBtnHover->Resource, ImVec2(tab4width * Renderer::Scaling, 24.0f * Renderer::Scaling)))
+			{
+				TabIndex = 3;
+			}
+			Tab4Hovered = ImGui::IsItemHovered();
+
 			ImGui::PopStyleColor(3);
 			ImGui::PopStyleVar();
 
 			ImGui::SetCursorPos(ImVec2(tab1origin.x + text1offset.x, tab1origin.y + text1offset.y));
-			ImGui::TextColored(TabIndex == 0 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language->Translate("((000031))"));
+			ImGui::TextColored(TabIndex == 0 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), text1);
 
 			ImGui::SetCursorPos(ImVec2(tab2origin.x + text2offset.x, tab2origin.y + text2offset.y));
-			ImGui::TextColored(TabIndex == 1 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language->Translate("((000032))"));
+			ImGui::TextColored(TabIndex == 1 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), text2);
 
 			if (ArcDPS::IsLoaded)
 			{
 				ImGui::SetCursorPos(ImVec2(tab3origin.x + text3offset.x, tab3origin.y + text3offset.y));
-				ImGui::TextColored(TabIndex == 2 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), Language->Translate("((000075))"));
+				ImGui::TextColored(TabIndex == 2 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), text3);
 			}
+
+			ImGui::SetCursorPos(ImVec2(tab4origin.x + text4offset.x, tab4origin.y + text4offset.y));
+			ImGui::TextColored(TabIndex == 3 ? ImVec4(1, 1, 1, 1) : ImVec4(0.666f, 0.666f, 0.666f, 1.0f), text4);
 			
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
@@ -201,7 +223,7 @@ namespace GUI
 						}
 						else
 						{
-							const std::lock_guard<std::mutex> lock(Loader::Mutex);
+							const std::shared_lock rLock(Loader::AddonsMutex);
 							{
 								for (auto addon : Loader::Addons)
 								{
@@ -228,7 +250,7 @@ namespace GUI
 					{
 						if (checkedForUpdates == -1)
 						{
-							const std::lock_guard<std::mutex> lock(Loader::Mutex);
+							const std::shared_lock rLock(Loader::AddonsMutex);
 							{
 								checkedForUpdates = 0;
 								queuedForCheck = 0;
@@ -303,7 +325,7 @@ namespace GUI
 						ImGui::BeginChild("##AddonTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), (btnHeight * 1.5f) * -1));
 
 						int downloadable = 0;
-						const std::lock_guard<std::mutex> lockLoader(Loader::Mutex);
+						const std::shared_lock rLockLoader(Loader::AddonsMutex);
 						if (Loader::Library::Addons.size() != 0)
 						{
 							for (auto& libAddon : Loader::Library::Addons)
@@ -398,6 +420,64 @@ namespace GUI
 					}
 
 					ImGui::Checkbox(Language->Translate("((000038))"), &showInstalled);
+				}
+				else if(TabIndex == 3)
+				{
+					ImVec2 position = ImGui::GetCursorPos();
+
+					std::shared_lock rLockMembers(AddonShare::MemberDataMutex);
+					std::shared_lock rLockAddons(Loader::AddonsMutex);
+
+					int nCols = (int)(AddonShare::Members.size() + 2);
+					if(ImGui::BeginTable("shared_addons_tbl", nCols)) {
+						char buffer[128];
+
+						ImGui::TableSetupColumn(Language->Translate("addon"));
+						ImGui::TableSetupColumn(Language->Translate("you"));
+						for(auto& member : AddonShare::Members) {
+							snprintf(buffer, 127, "%u", member.Id);
+							ImGui::TableSetupColumn(buffer);
+						}
+						ImGui::TableSetupScrollFreeze(nCols, 1);
+						ImGui::TableHeadersRow();
+
+						ImGui::TableNextRow();
+						for(auto addon : Loader::Addons) { //TODO use full list of all addons instead of just yours
+							if(addon->Definitions) {
+								// addon
+								ImGui::TableNextColumn();
+								ImGui::Text(addon->Definitions->Name);
+								
+								// your addon state
+								ImGui::TableNextColumn();
+								IF_SOME(ToString(addon->State), {
+									ImGui::Text(it);
+								}
+								else {
+									snprintf(buffer, 127, "%u", addon->State);
+									ImGui::Text(buffer);
+								})
+								
+
+								// others addon state
+								for(auto& member : AddonShare::Members) {
+									ImGui::TableNextColumn();
+									auto otherState = member.Addons.find(addon->Definitions->Signature);
+									if(otherState != member.Addons.end()) {
+										IF_SOME(ToString(otherState->second), {
+											ImGui::Text(it);
+										}
+										else {
+											snprintf(buffer, 127, "%u", addon->State);
+											ImGui::Text(buffer);
+										})
+									}
+								}
+							}
+						}
+
+						ImGui::EndTable();
+					}
 				}
 
 				ImGui::EndChild();

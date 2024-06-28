@@ -39,7 +39,7 @@
 #include "Services/Settings/Settings.h"
 #include "Services/Textures/TextureLoader.h"
 #include "Services/Updater/Updater.h"
-#include "Networking/Networking.h"
+#include "Services/Networking/Networking.h"
 
 #include "Util/DLL.h"
 #include "Util/MD5.h"
@@ -59,7 +59,7 @@ namespace Loader
 {
 	NexusLinkData*				NexusLink = nullptr;;
 
-	std::mutex					Mutex;
+	std::shared_mutex			AddonsMutex;
 	std::unordered_map<
 		std::filesystem::path,
 		ELoaderAction
@@ -170,7 +170,7 @@ namespace Loader
 				FSItemList = 0;
 			}
 
-			const std::lock_guard<std::mutex> lock(Mutex);
+			const std::unique_lock wLock(AddonsMutex);
 			if (loaderWasWorking)
 			{
 				SaveAddonConfig();
@@ -214,6 +214,7 @@ namespace Loader
 					if (!addonInfo["IsPausingUpdates"].is_null()) { addonInfo["IsPausingUpdates"].get_to(addon->IsPausingUpdates); }
 					if (!addonInfo["IsDisabledUntilUpdate"].is_null()) { addonInfo["IsDisabledUntilUpdate"].get_to(addon->IsDisabledUntilUpdate); }
 					if (!addonInfo["AllowPrereleases"].is_null()) { addonInfo["AllowPrereleases"].get_to(addon->AllowPrereleases); }
+					if (!addonInfo["VisibleToSquadMembers"].is_null()) { addonInfo["VisibleToSquadMembers"].get_to(addon->VisibleToSquadMembers); }
 
 					// to match the actual addon to the saved states
 					addon->MatchSignature = signature;
@@ -286,7 +287,8 @@ namespace Loader
 				{"IsLoaded", addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED || addon->IsFlaggedForEnable},
 				{"IsPausingUpdates", addon->IsPausingUpdates},
 				{"IsDisabledUntilUpdate", addon->IsDisabledUntilUpdate},
-				{"AllowPrereleases", addon->AllowPrereleases}
+				{"AllowPrereleases", addon->AllowPrereleases},
+				{"VisibleToSquadMembers", addon->VisibleToSquadMembers},
 			};
 
 			/* override loaded state, if it's still the initial startup sequence */
@@ -345,7 +347,7 @@ namespace Loader
 
 	void ProcessQueue()
 	{
-		const std::lock_guard<std::mutex> lock(Mutex);
+		const std::unique_lock wLock(AddonsMutex);
 		while (QueuedAddons.size() > 0)
 		{
 			auto it = QueuedAddons.begin();
@@ -415,7 +417,7 @@ namespace Loader
 
 		for (;;)
 		{
-			std::unique_lock<std::mutex> lockThread(ThreadMutex);
+			std::unique_lock lockThread(ThreadMutex);
 			ConVar.wait(lockThread, [] { return !IsSuspended; });
 
 			auto start_time = std::chrono::high_resolution_clock::now();
@@ -428,7 +430,7 @@ namespace Loader
 			auto time = end_time - start_time;
 			Logger->Trace(CH_LOADER, "Processing changes after waiting for %ums.", time / std::chrono::milliseconds(1));
 
-			const std::lock_guard<std::mutex> lock(Mutex);
+			const std::unique_lock wLock(AddonsMutex);
 			// check all tracked addons
 			for (Addon* addon : Addons)
 			{
@@ -706,7 +708,7 @@ namespace Loader
 
 							// mutex because we're async/threading
 							{
-								const std::lock_guard<std::mutex> lock(Mutex);
+								const std::shared_lock rLock(AddonsMutex);
 								SaveAddonConfig(); // save the DUU state
 							}
 						}
@@ -822,7 +824,7 @@ namespace Loader
 				auto start = std::chrono::high_resolution_clock::now();
 				Networking::Init();
 				auto end = std::chrono::high_resolution_clock::now();
-				Logger->Info(CH_LOADER, u8"Network init took %uµs.", (end - start) / std::chrono::microseconds(1));
+				Logger->Info(CH_LOADER, u8"Network init took %us.", (end - start) / std::chrono::microseconds(1));
 			}
 		}
 
@@ -832,7 +834,7 @@ namespace Loader
 		addon->State = locked ? EAddonState::LoadedLOCKED : EAddonState::Loaded;
 		SaveAddonConfig();
 
-		Logger->Info(CH_LOADER, u8"Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.) Took %uµs.", 
+		Logger->Info(CH_LOADER, u8"Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.) Took %us.", 
 			strFile.c_str(), addon->Definitions->Signature,
 			addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage,
 			addon->Definitions->APIVersion, time / std::chrono::microseconds(1)
@@ -868,8 +870,8 @@ namespace Loader
 			/* wrap around mutex lock/unlock because if SyncUnload it will already be locked, as it's executed from ProcessQueue */
 			if (!aAddon->Definitions->HasFlag(EAddonFlags::SyncUnload))
 			{
-				/* explictly lock the mutex, because we're unloading ASYNC -> threadsafe */
-				const std::lock_guard<std::mutex> lock(Mutex);
+				/* explicitly lock the mutex, because we're unloading ASYNC -> threadsafe */
+				const std::shared_lock rLock(AddonsMutex);
 				SaveAddonConfig();
 			}
 			else
@@ -917,7 +919,7 @@ namespace Loader
 		}
 
 		aAddon->IsWaitingForUnload = false;
-		Logger->Info(CH_LOADER, u8"Unloaded addon: %s (Took %uµs.)", aPath.filename().string().c_str(), time / std::chrono::microseconds(1));
+		Logger->Info(CH_LOADER, u8"Unloaded addon: %s (Took %us.)", aPath.filename().string().c_str(), time / std::chrono::microseconds(1));
 	}
 
 	void UnloadAddon(const std::filesystem::path& aPath, bool aDoReload)
@@ -994,7 +996,7 @@ namespace Loader
 							{
 								EventApi->Raise(EV_ADDON_UNLOADED, &addon->Definitions->Signature);
 
-								const std::lock_guard<std::mutex> lock(Mutex);
+								const std::unique_lock wLock(AddonsMutex);
 								if (aDoReload)
 								{
 									Loader::QueueAddon(ELoaderAction::FreeLibraryThenLoad, aPath);
@@ -1512,7 +1514,7 @@ namespace Loader
 			return "(null)";
 		}
 
-		//const std::lock_guard<std::mutex> lock(Mutex);
+		//const std::shared_lock rLock(AddonsMutex);
 		{
 			for (auto& addon : Addons)
 			{

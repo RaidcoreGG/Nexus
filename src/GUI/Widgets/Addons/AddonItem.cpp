@@ -13,6 +13,8 @@
 #include "Loader/ArcDPS.h"
 #include "Services/Textures/TextureLoader.h"
 #include "Services/Textures/Texture.h"
+#include "Services/AddonShare/AddonShare.h"
+#include <Networking/Networking.h>
 
 #include "Services/Updater/Updater.h"
 
@@ -58,6 +60,7 @@ namespace GUI
 		float btnHeight = 22.0f * Renderer::Scaling;
 		float itemWidthScaled = itemWidth * Renderer::Scaling;
 		float itemHeightScaled = itemHeight * Renderer::Scaling;
+		if(Networking::AddonLoaded) itemHeightScaled += btnHeight + 4; // some padding, otherwise we get scrollbars
 
 		std::string sig = std::to_string(aAddon->Definitions->Signature); // helper for unique chkbxIds
 
@@ -332,6 +335,15 @@ namespace GUI
 					if (ImGui::GW2::Button((Language->Translate("((000030))") + sig).c_str(), ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
 					{
 						ShellExecuteA(0, 0, aAddon->Definitions->UpdateLink, 0, 0, SW_SHOW);
+					}
+				}
+
+				if (Networking::AddonLoaded)
+				{
+					if (ImGui::Checkbox((Language->Translate("visible_to_squad_members") + sig).c_str(), &aAddon->VisibleToSquadMembers))
+					{
+						AddonShare::BroadcastAddonStateUpdate(aAddon->Definitions->Signature, aAddon->VisibleToSquadMembers ? aAddon->State : EAddonState::None);
+						Loader::SaveAddonConfig();
 					}
 				}
 

@@ -3,9 +3,10 @@
 #include "Networking.h"
 #include "PacketInternal.h"
 #include "State.h"
-#include "Shared.h" // Logger adn EventApi instance
+#include "Shared.h" // Logger and EventApi instance
 #include "Services/Mumble/Reader.h"
 #include "Services/Settings/Settings.h"
+#include "Services/AddonShare/AddonShare.h"
 #include "Events/EventHandler.h"
 #include "Consts.h"
 #include "SquadEvents.h"
@@ -24,6 +25,7 @@ namespace Networking
 	ModuleState State = ModuleState::_UNKNOWN;
 	bool AddonLoaded = false;
 	std::map<AddonSignature, PacketHandler*> Handlers;
+	UserId MyUserId = INVALID_USER;
 
 
 	void ReportSystemError(char const* fmt, int error);
@@ -34,14 +36,12 @@ namespace Networking
 	void IJoinedSquad(SquadEvents::Squad* squad);
 	void ILeftSquad(SquadEvents::LeaveReason reason);
 	void AddonStateResponse(SquadEvents::Squad* squad);
-	
-	constexpr UserId INVALID_USER = {0};
-	constexpr SessionId INVALID_SESSION = {0};
+	void SomeoneLeftSquad(SquadEvents::SquadMember* member);
 
 	SOCKET Socket = INVALID_SOCKET;
 	sockaddr ServerEndpoint;
-	UserId MyUserId = INVALID_USER;
 	SessionId MySessionId = INVALID_SESSION;
+	Option<SquadEvents::Squad*> CurrentSquad;
 
 
 	bool SetServerAddress(char const* host, u16 port)
@@ -88,7 +88,7 @@ namespace Networking
 		return acceptedOne;
 	}
 
-	u16 ParseSettings(nlohmann::json& settings)
+	bool ParseSettings(nlohmann::json& settings, u16* outlistenPort)
 	{
 		auto& setting = Settings::Settings[OPT_NETWORKINGTRIPPLE];
 		auto settingsTripple = setting.get<std::string>();
@@ -97,25 +97,29 @@ namespace Networking
 		char serverHost[128];
 		if(_snscanf(settingsTripple.data(), settingsTripple.length(), " %u %127s %u ", &listenPort, &serverHost, &serverPort) != 3) {
 			_LOG(WARNING, "Networking Tripple settings was set to '%*s', but failed to parse as '%%u %%127s %%u'. Make sure the setting follows this format, with the fields being 'listen port', 'server host' and 'server port' in that order. Using fallback values.", settingsTripple);
-			return 0;
+			return false;
 		}
 
 		if(listenPort <= 1024 || listenPort > 0xffff) {
-			_LOG(WARNING, "Networking Tripple setting was set, but 'listen port' (first part) %d was out of range; 1024 < port < 65535 must hold. Using fallback values.", listenPort);
-			return 0;
+			_LOG(WARNING, "Networking Tripple setting was set, but 'listen port' (first part) %d was out of range; 1024 < port < 65535 must hold. Using any available local port.", listenPort);
+			*outlistenPort = 0;
 		}
+		else {
+			*outlistenPort = (u16)listenPort;
+		}
+
 
 		if(serverPort <= 1024 || serverPort > 0xffff) {
 			_LOG(WARNING, "Networking Tripple setting was set, but 'server port' (third part) %d was out of range; 1024 < port < 65535 must hold. Using fallback values.", serverPort);
-			return 0;
+			return false;
 		}
 
 		if(!SetServerAddress(serverHost, serverPort)) {
 			_LOG(WARNING, "Networking Tripple setting was set, but 'server host' (second part) '%s' failed to resolve to any address (see warning above this one). Using fallback values.", serverHost);
-			return 0;
+			return false;
 		}
 
-		return listenPort;
+		return true;
 	}
 
 	void Init()
@@ -135,12 +139,12 @@ namespace Networking
 		u16 listenPort = 0;
 		{
 			auto& setting = Settings::Settings[OPT_NETWORKINGTRIPPLE];
+			bool useFallback = true;
 			if(!setting.is_null()) {
-				listenPort = ParseSettings(setting);
+				useFallback = !ParseSettings(setting, &listenPort);
 			}
 
-			if(listenPort == 0) {
-				listenPort = 1338;
+			if(useFallback) {
 				if(!SetServerAddress("nexus.sacul.dev", 1337)) {
 					_LOG(CRITICAL, "Networking will be unavailable.");
 					return;
@@ -179,6 +183,7 @@ namespace Networking
 
 		EventApi->Subscribe(SquadEvents::EV_SQUAD_I_JOINED, (EVENT_CONSUME)IJoinedSquad);
 		EventApi->Subscribe(SquadEvents::EV_SQUAD_I_LEFT, (EVENT_CONSUME)ILeftSquad);
+		EventApi->Subscribe(SquadEvents::EV_SQUAD_SOMEONE_LEFT, (EVENT_CONSUME)SomeoneLeftSquad);
 
 		EventApi->Subscribe(SquadEvents::EV_SQUAD_RESPONSE_STATE, (EVENT_CONSUME)AddonStateResponse);
 		//TODO(Rennorb) @cleanup: Would be nice to receive the sender signature so i can send a response back to only this target here.
@@ -195,6 +200,7 @@ namespace Networking
 
 	void IJoinedSquad(SquadEvents::Squad* squad)
 	{
+		CurrentSquad = Some(squad);
 		auto newUserId = squad->members[squad->my_index].id;
 
 		if(MyUserId != newUserId || MySessionId == INVALID_SESSION) {
@@ -215,6 +221,11 @@ namespace Networking
 	void ILeftSquad(SquadEvents::LeaveReason reason)
 	{
 		LeaveSession();
+	}
+
+	void SomeoneLeftSquad(SquadEvents::SquadMember* member)
+	{
+		AddonShare::RemoveSpecificMember(member->id);
 	}
 
 
@@ -280,8 +291,11 @@ namespace Networking
 		leavePacket.Me = MyUserId;
 		SendInternalPacket((Packet*)&leavePacket);
 
+		CurrentSquad = None<SquadEvents::Squad*>();
 		MySessionId = INVALID_SESSION;
 		State = ModuleState::WaitingForJoin;
+
+		AddonShare::ClearOthers();
 	}
 
 
@@ -289,9 +303,7 @@ namespace Networking
 	{
 		char buffer[1024]; //TODO size
 		while(true) {
-			sockaddr_in from {};
-			int fromSize = sizeof(from);
-			int rcvdLength = recvfrom(Socket, buffer, sizeof(buffer), 0, (SOCKADDR*)&from, &fromSize);
+			int rcvdLength = recv(Socket, buffer, sizeof(buffer), 0);
 			if(rcvdLength == SOCKET_ERROR) {
 				ReportSystemError("Failed to read from socket:\n%d: %s", WSAGetLastError());
 				continue;
@@ -354,6 +366,12 @@ namespace Networking
 						//NOTE(Rennorb): Spawn this in a separate thread as addons will likely try to immediately fire packets ones this goes out,
 						// and we dont want to block the receiver for responses.
 						std::thread([]() { EventApi->Raise(EV_NETWORKING_READY); }).detach();
+
+						AddonShare::BroadcastAddons();
+						// if we joined a squad with other members, ask them for their addons
+						IF_SOME(CurrentSquad, if(it->member_count > 1) {
+							AddonShare::RequestAddons();
+						})
 					}
 				}
 				else
@@ -361,7 +379,7 @@ namespace Networking
 				break;
 
 			default:
-				_LOG(TRACE, "Received unknown internal (type: %d, len: %d Bytes). Packet will be discarded.", header->Type, header->BaseHeader.LengthInU32s * 4);
+				_LOG(TRACE, "Received unknown internal (type: %d, len: %d Bytes). Packet will be discarded.", header->Type, header->LengthInU32s * 4);
 		}
 	}
 

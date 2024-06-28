@@ -348,7 +348,7 @@
     <ClCompile Include="src\GUI\Fonts\FontManager.cpp">
       <Filter>GUI\Fonts</Filter>
     </ClCompile>
-    <ClCompile Include="src\Networking\Networking.cpp">
+    <ClCompile Include="src\Services\Networking\Networking.cpp">
       <Filter>Networking</Filter>
     </ClCompile>
     <ClCompile Include="src\Util\Time.cpp">
@@ -1100,13 +1100,13 @@
     <ClInclude Include="src\Services\Mumble\Definitions\Mumble.h">
       <Filter>Services\Mumble</Filter>
     </ClInclude>
-    <ClInclude Include="src\Networking\Networking.h">
+    <ClInclude Include="src\Services\Networking\Networking.h">
       <Filter>Networking</Filter>
     </ClInclude>
-    <ClInclude Include="src\Networking\PacketInternal.h">
+    <ClInclude Include="src\Services\Networking\PacketInternal.h">
       <Filter>Networking</Filter>
     </ClInclude>
-    <ClInclude Include="src\Networking\NetworkingPublic.h">
+    <ClInclude Include="src\Services\Networking\NetworkingPublic.h">
       <Filter>Networking</Filter>
     </ClInclude>
     <ClInclude Include="src\Util\Time.h">

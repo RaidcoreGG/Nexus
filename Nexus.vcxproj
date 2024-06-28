@@ -11,6 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Loader\EAddonState.cpp" />
+    <ClCompile Include="src\Services\AddonShare\AddonShare.cpp" />
     <ClCompile Include="src\Services\API\ActiveToken.cpp" />
     <ClCompile Include="src\Services\API\ApiClient.cpp" />
     <ClCompile Include="src\Services\API\APIController.cpp" />
@@ -59,7 +61,7 @@
     <ClCompile Include="src\thirdparty\minhook\mh_disasm.cpp" />
     <ClCompile Include="src\thirdparty\minhook\mh_hook.cpp" />
     <ClCompile Include="src\thirdparty\minhook\mh_trampoline.cpp" />
-    <ClCompile Include="src\Networking\Networking.cpp" />
+    <ClCompile Include="src\Services\Networking\Networking.cpp" />
     <ClCompile Include="src\Services\Multibox\Multibox.cpp" />
     <ClCompile Include="src\Services\Mumble\Reader.cpp" />
     <ClCompile Include="src\Index.cpp" />
@@ -81,6 +83,9 @@
     <ClCompile Include="src\Inputs\RawInput\RawInputApi.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\BaseTypes.h" />
+    <ClInclude Include="src\Loader\EAddonState.h" />
+    <ClInclude Include="src\Services\AddonShare\AddonShare.h" />
     <ClInclude Include="src\SquadEvents.h" />
     <ClInclude Include="src\Services\API\ApiClient.h" />
     <ClInclude Include="src\Services\API\APIController.h" />
@@ -140,7 +145,6 @@
     <ClInclude Include="src\Loader\Addon.h" />
     <ClInclude Include="src\Loader\ArcDPS.h" />
     <ClInclude Include="src\Loader\EAddonFlags.h" />
-    <ClInclude Include="src\Loader\EAddonState.h" />
     <ClInclude Include="src\Loader\ELoaderAction.h" />
     <ClInclude Include="src\Loader\FuncDefs.h" />
     <ClInclude Include="src\Loader\Library.h" />
@@ -151,9 +155,9 @@
     <ClInclude Include="src\Services\Localization\Localization.h" />
     <ClInclude Include="src\Services\Logging\FuncDefs.h" />
     <ClInclude Include="src\Main.h" />
-    <ClInclude Include="src\Networking\Networking.h" />
-    <ClInclude Include="src\Networking\NetworkingPublic.h" />
-    <ClInclude Include="src\Networking\PacketInternal.h" />
+    <ClInclude Include="src\Services\Networking\Networking.h" />
+    <ClInclude Include="src\Services\Networking\NetworkingPublic.h" />
+    <ClInclude Include="src\Services\Networking\PacketInternal.h" />
     <ClInclude Include="src\Services\Multibox\Multibox.h" />
     <ClInclude Include="src\Services\Mumble\Definitions\Mumble.h" />
     <ClInclude Include="src\thirdparty\nlohmann\json.hpp" />

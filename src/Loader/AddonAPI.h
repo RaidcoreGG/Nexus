@@ -11,13 +11,13 @@
 #include "minhook/mh_hook.h"
 #include "Services/DataLink/FuncDefs.h"
 #include "Services/Textures/FuncDefs.h"
+#include "Services/Networking/NetworkingPublic.h"
 #include "GUI/FuncDefs.h"
 #include "GUI/Widgets/QuickAccess/FuncDefs.h"
 #include "GUI/Widgets/Alerts/FuncDefs.h"
 #include "Services/Localization/FuncDefs.h"
 #include "Services/Updater/FuncDefs.h"
 #include "GUI/Fonts/FuncDefs.h"
-#include "Networking/NetworkingPublic.h"
 
 // Base
 struct AddonAPI {};
