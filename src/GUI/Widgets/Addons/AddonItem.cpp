@@ -14,8 +14,7 @@
 #include "Services/Textures/TextureLoader.h"
 #include "Services/Textures/Texture.h"
 #include "Services/AddonShare/AddonShare.h"
-#include <Networking/Networking.h>
-
+#include "Services/Networking/Networking.h"
 #include "Services/Updater/Updater.h"
 
 #include "Events/EventHandler.h"

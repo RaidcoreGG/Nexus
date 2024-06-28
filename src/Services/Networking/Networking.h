@@ -1,7 +1,9 @@
 #pragma once
 
+#include "BaseTypes.h"
 #include "NetworkingPublic.h"
 #include "Loader/AddonAPI.h"
+#include "SquadEvents.h"
 #include <WinSock2.h>
 #include <map>
 
@@ -34,6 +36,7 @@ namespace Networking
 	extern ModuleState State;
 	extern bool AddonLoaded;
 	extern UserId MyUserId;
+	extern Option<SquadEvents::Squad*> CurrentSquad; //TODO(Rennorb) @cleanup: should this be a shared resource?
 
 	void Init();
 

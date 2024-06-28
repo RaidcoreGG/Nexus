@@ -52,6 +52,8 @@ namespace SquadEvents {
 		/// Current slot in the global array, or the slot this member was removed from.
 		/// If the member is not yet in the squad, this will be `MEMBER_INDEX_EXTERNAL` (256).
 		uint8_t array_index;
+		uint8_t is_ready;
+		uint8_t _reserved[3];
 	};
 
 	constexpr uint8_t const MEMBER_INDEX_EXTERNAL = 255;

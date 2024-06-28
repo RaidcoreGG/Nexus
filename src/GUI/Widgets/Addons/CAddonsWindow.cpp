@@ -16,6 +16,7 @@
 #include "AddonItem.h"
 #include "Services/Textures/TextureLoader.h"
 #include "Services/AddonShare/AddonShare.h"
+#include "Services/Networking/Networking.h"
 
 #include "GUI/Widgets/Alerts/Alerts.h"
 #include "Services/Updater/Updater.h"
@@ -435,40 +436,80 @@ namespace GUI
 						ImGui::TableSetupColumn(Language->Translate("addon"));
 						ImGui::TableSetupColumn(Language->Translate("you"));
 						for(auto& member : AddonShare::Members) {
-							snprintf(buffer, 127, "%u", member.Id);
+							IF_SOME(Networking::CurrentSquad, {
+								for(int i = 0; i < it->member_count; i++) {
+									if(it->members[i].id == member.Id) {
+										ImGui::TableSetupColumn(it->members[i].account_name);
+										goto found_member_name; /* outer continue */
+									}
+								}
+							});
+							
+							// if we cannot fine a name for some reason just display a bit of the id
+							snprintf(buffer, 127, "%u...", *(uint32_t*)&member.Id);
 							ImGui::TableSetupColumn(buffer);
+
+							found_member_name:;
 						}
 						ImGui::TableSetupScrollFreeze(nCols, 1);
 						ImGui::TableHeadersRow();
 
 						ImGui::TableNextRow();
-						for(auto addon : Loader::Addons) { //TODO use full list of all addons instead of just yours
-							if(addon->Definitions) {
+						for(auto addon : Loader::Addons) {
+							if(!addon->Definitions) continue;
+
+							// addon
+							ImGui::TableNextColumn();
+							ImGui::Text(addon->Definitions->Name);
+
+							// your addon state
+							ImGui::TableNextColumn();
+							IF_SOME(ToString(addon->State), {
+								ImGui::Text(it);
+								}
+							else {
+								snprintf(buffer, 127, "%u", addon->State);
+								ImGui::Text(buffer);
+							})
+
+
+							// others addon state
+							for(auto& member : AddonShare::Members) {
+								ImGui::TableNextColumn();
+								auto otherState = member.Addons.find(addon->Definitions->Signature);
+								if(otherState != member.Addons.end()) {
+									IF_SOME(ToString(otherState->second), {
+										ImGui::Text(it);
+									}
+									else {
+										snprintf(buffer, 127, "%u", otherState->second);
+										ImGui::Text(buffer);
+									})
+								}
+							}
+						}
+						// addons you dont have but we were told about
+						if(!AddonShare::SharedAddons.empty()) {
+							ImGui::TableNextRow();
+							for(auto addonSig : AddonShare::SharedAddons) {
 								// addon
 								ImGui::TableNextColumn();
-								ImGui::Text(addon->Definitions->Name);
-								
+								ImGui::Text("%x08", addonSig);
+
 								// your addon state
 								ImGui::TableNextColumn();
-								IF_SOME(ToString(addon->State), {
-									ImGui::Text(it);
-								}
-								else {
-									snprintf(buffer, 127, "%u", addon->State);
-									ImGui::Text(buffer);
-								})
-								
+								ImGui::Text("X");
 
 								// others addon state
 								for(auto& member : AddonShare::Members) {
 									ImGui::TableNextColumn();
-									auto otherState = member.Addons.find(addon->Definitions->Signature);
+									auto otherState = member.Addons.find(addonSig);
 									if(otherState != member.Addons.end()) {
 										IF_SOME(ToString(otherState->second), {
 											ImGui::Text(it);
 										}
 										else {
-											snprintf(buffer, 127, "%u", addon->State);
+											snprintf(buffer, 127, "%u", otherState->second);
 											ImGui::Text(buffer);
 										})
 									}
