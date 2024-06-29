@@ -95,21 +95,6 @@ bool CFontManager::Advance()
 	io.Fonts->Clear();
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	std::vector<std::string> markedForDeletion;
-	for (auto& font : this->Registry)
-	{
-		if (!font.Data && font.DataSize == 0 && font.Subscribers.size() == 0)
-		{
-			markedForDeletion.push_back(font.Identifier);
-		}
-	}
-
-	for (auto& identifier : markedForDeletion)
-	{
-		this->Registry.erase(std::find_if(this->Registry.begin(), this->Registry.end(), [identifier](ManagedFont& font) { return font.Identifier == identifier; }));
-	}
-
 	for (auto& font : this->Registry)
 	{
 		font.Pointer = io.Fonts->AddFontFromMemoryTTF(font.Data, static_cast<int>(font.DataSize), font.Size, font.Config, font.Identifier == "USER_FONT" || String::StartsWith(font.Identifier, "TREBUCHET") ? rangesFull.Data : ranges.Data);
@@ -176,6 +161,8 @@ void CFontManager::Release(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallb
 
 		delete font.Config;
 		font.Config = nullptr;
+
+		this->Registry.erase(it);
 
 		this->IsFontAtlasBuilt = false;
 	}
