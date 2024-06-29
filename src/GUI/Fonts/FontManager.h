@@ -156,8 +156,9 @@ private:
 	///----------------------------------------------------------------------------------------------------
 	/// NotifyCallbacks:
 	/// 	Notifies all callbacks with the new font.
+	/// 	aNotifyNull will send a nullptr, effectively "clearing" the subscriber.
 	///----------------------------------------------------------------------------------------------------
-	void NotifyCallbacks();
+	void NotifyCallbacks(bool aNotifyNull = false);
 };
 
 #endif

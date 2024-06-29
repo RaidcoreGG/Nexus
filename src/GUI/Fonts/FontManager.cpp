@@ -67,6 +67,8 @@ bool CFontManager::Advance()
 {
 	if (this->IsFontAtlasBuilt) { return false; }
 
+	this->NotifyCallbacks(true);
+
 	ImGuiIO& io = ImGui::GetIO();
 
 	/* build full ranges */
@@ -406,13 +408,13 @@ void CFontManager::AddFontInternal(const char* aIdentifier, float aFontSize, voi
 	this->IsFontAtlasBuilt = false;
 }
 
-void CFontManager::NotifyCallbacks()
+void CFontManager::NotifyCallbacks(bool aNotifyNull)
 {
 	for (auto const& font : this->Registry)
 	{
 		for (FONTS_RECEIVECALLBACK callback : font.Subscribers)
 		{
-			callback(font.Identifier.c_str(), font.Pointer);
+			callback(font.Identifier.c_str(), aNotifyNull ? nullptr : font.Pointer);
 		}
 	}
 }
