@@ -1,7 +1,7 @@
 #ifndef EADDONSTATE_H
 #define EADDONSTATE_H
 
-#include "BaseTypes.h"
+#include <sal.h>
 
 enum class EAddonState
 {
@@ -17,6 +17,6 @@ enum class EAddonState
 };
 
 /// returns null if value is not in enum
-Option<char const*> ToString(EAddonState state);
+_Ret_maybenull_z_ char const* ToString(EAddonState state);
 
 #endif

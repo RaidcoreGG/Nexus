@@ -1121,9 +1121,6 @@
     <ClInclude Include="src\Util\DLL.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="src\BaseTypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Services\Networking\Networking.h">
       <Filter>Services\Networking</Filter>
     </ClInclude>
@@ -1138,6 +1135,9 @@
     </ClInclude>
     <ClInclude Include="src\Services\Networking\PacketInternal.h">
       <Filter>Services\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BaseTypes.h">
+      <Filter>_GLOBAL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

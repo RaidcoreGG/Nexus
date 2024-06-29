@@ -436,17 +436,17 @@ namespace GUI
 						ImGui::TableSetupColumn(Language->Translate("addon"));
 						ImGui::TableSetupColumn(Language->Translate("you"));
 						for(auto& member : AddonShare::Members) {
-							IF_SOME(Networking::CurrentSquad, {
-								for(int i = 0; i < it->member_count; i++) {
-									if(it->members[i].id == member.Id) {
-										ImGui::TableSetupColumn(it->members[i].account_name);
+							if(Networking::CurrentSquad) {
+								for(int i = 0; i < Networking::CurrentSquad->member_count; i++) {
+									if(Networking::CurrentSquad->members[i].id == member.Id) {
+										ImGui::TableSetupColumn(Networking::CurrentSquad->members[i].account_name);
 										goto found_member_name; /* outer continue */
 									}
 								}
-							});
+							}
 							
 							// if we cannot fine a name for some reason just display a bit of the id
-							snprintf(buffer, 127, "%u...", *(uint32_t*)&member.Id);
+							snprintf(buffer, sizeof(buffer) - 1, "%u...", *(uint32_t*)&member.Id);
 							ImGui::TableSetupColumn(buffer);
 
 							found_member_name:;
@@ -464,13 +464,14 @@ namespace GUI
 
 							// your addon state
 							ImGui::TableNextColumn();
-							IF_SOME(ToString(addon->State), {
-								ImGui::Text(it);
-								}
+							auto stateName = ToString(addon->State);
+							if(stateName) {
+								ImGui::Text(stateName);
+							}
 							else {
 								snprintf(buffer, 127, "%u", addon->State);
 								ImGui::Text(buffer);
-							})
+							}
 
 
 							// others addon state
@@ -478,13 +479,14 @@ namespace GUI
 								ImGui::TableNextColumn();
 								auto otherState = member.Addons.find(addon->Definitions->Signature);
 								if(otherState != member.Addons.end()) {
-									IF_SOME(ToString(otherState->second), {
-										ImGui::Text(it);
+									auto stateName = ToString(otherState->second);
+									if(stateName) {
+										ImGui::Text(stateName);
 									}
 									else {
-										snprintf(buffer, 127, "%u", otherState->second);
+										snprintf(buffer, sizeof(buffer) - 1, "%u", otherState->second);
 										ImGui::Text(buffer);
-									})
+									}
 								}
 							}
 						}
@@ -505,13 +507,14 @@ namespace GUI
 									ImGui::TableNextColumn();
 									auto otherState = member.Addons.find(addonSig);
 									if(otherState != member.Addons.end()) {
-										IF_SOME(ToString(otherState->second), {
-											ImGui::Text(it);
+										auto stateName = ToString(otherState->second);
+										if(stateName) {
+											ImGui::Text(stateName);
 										}
 										else {
-											snprintf(buffer, 127, "%u", otherState->second);
+											snprintf(buffer, sizeof(buffer) - 1, "%u", otherState->second);
 											ImGui::Text(buffer);
-										})
+										}
 									}
 								}
 							}

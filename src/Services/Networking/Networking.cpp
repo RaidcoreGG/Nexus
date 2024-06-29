@@ -41,7 +41,7 @@ namespace Networking
 	SOCKET Socket = INVALID_SOCKET;
 	sockaddr ServerEndpoint;
 	SessionId MySessionId = INVALID_SESSION;
-	Option<SquadEvents::Squad*> CurrentSquad;
+	SquadEvents::Squad* CurrentSquad;
 
 
 	bool SetServerAddress(char const* host, u16 port)
@@ -200,7 +200,7 @@ namespace Networking
 
 	void IJoinedSquad(SquadEvents::Squad* squad)
 	{
-		CurrentSquad = Some(squad);
+		CurrentSquad = squad;
 		auto newUserId = squad->members[squad->my_index].id;
 
 		if(MyUserId != newUserId || MySessionId == INVALID_SESSION) {
@@ -291,7 +291,7 @@ namespace Networking
 		leavePacket.Me = MyUserId;
 		SendInternalPacket((Packet*)&leavePacket);
 
-		CurrentSquad = None<SquadEvents::Squad*>();
+		CurrentSquad = 0;
 		MySessionId = INVALID_SESSION;
 		State = ModuleState::WaitingForJoin;
 
@@ -369,9 +369,9 @@ namespace Networking
 
 						AddonShare::BroadcastAddons();
 						// if we joined a squad with other members, ask them for their addons
-						IF_SOME(CurrentSquad, if(it->member_count > 1) {
+						if(CurrentSquad && CurrentSquad->member_count > 1) {
 							AddonShare::RequestAddons();
-						})
+						}
 					}
 				}
 				else

@@ -1,16 +1,17 @@
 #include "EAddonState.h"
 
 /// returns null if value is not in enum
-Option<char const*> ToString(EAddonState state) {
+_Ret_maybenull_z_
+char const* ToString(EAddonState state) {
 	switch(state) {
-		case EAddonState::None:                     return Some("None");
-		case EAddonState::NotLoaded:                return Some("NotLoaded");
-		case EAddonState::NotLoadedDuplicate:       return Some("NotLoadedDuplicate");
-		case EAddonState::NotLoadedIncompatible:    return Some("NotLoadedIncompatible");
-		case EAddonState::NotLoadedIncompatibleAPI: return Some("NotLoadedIncompatibleAPI");
-		case EAddonState::Loaded:                   return Some("Loaded");
-		case EAddonState::LoadedLOCKED:             return Some("LoadedLOCKED");
-		default: return None<char const*>();
+		case EAddonState::None:                     return "None";
+		case EAddonState::NotLoaded:                return "NotLoaded";
+		case EAddonState::NotLoadedDuplicate:       return "NotLoadedDuplicate";
+		case EAddonState::NotLoadedIncompatible:    return "NotLoadedIncompatible";
+		case EAddonState::NotLoadedIncompatibleAPI: return "NotLoadedIncompatibleAPI";
+		case EAddonState::Loaded:                   return "Loaded";
+		case EAddonState::LoadedLOCKED:             return "LoadedLOCKED";
+		default: return 0;
 	}
 }
 
