@@ -39,6 +39,7 @@
 #include "Services/Settings/Settings.h"
 #include "Services/Textures/TextureLoader.h"
 #include "Services/Updater/Updater.h"
+#include "Services/Networking/Networking.h"
 
 #include "Util/DLL.h"
 #include "Util/MD5.h"
@@ -58,7 +59,7 @@ namespace Loader
 {
 	NexusLinkData*				NexusLink = nullptr;;
 
-	std::mutex					Mutex;
+	std::shared_mutex			AddonsMutex;
 	std::unordered_map<
 		std::filesystem::path,
 		ELoaderAction
@@ -169,7 +170,7 @@ namespace Loader
 				FSItemList = 0;
 			}
 
-			const std::lock_guard<std::mutex> lock(Mutex);
+			const std::unique_lock wLock(AddonsMutex);
 			if (loaderWasWorking)
 			{
 				SaveAddonConfig();
@@ -213,6 +214,7 @@ namespace Loader
 					if (!addonInfo["IsPausingUpdates"].is_null()) { addonInfo["IsPausingUpdates"].get_to(addon->IsPausingUpdates); }
 					if (!addonInfo["IsDisabledUntilUpdate"].is_null()) { addonInfo["IsDisabledUntilUpdate"].get_to(addon->IsDisabledUntilUpdate); }
 					if (!addonInfo["AllowPrereleases"].is_null()) { addonInfo["AllowPrereleases"].get_to(addon->AllowPrereleases); }
+					if (!addonInfo["VisibleToSquadMembers"].is_null()) { addonInfo["VisibleToSquadMembers"].get_to(addon->VisibleToSquadMembers); }
 
 					// to match the actual addon to the saved states
 					addon->MatchSignature = signature;
@@ -250,10 +252,10 @@ namespace Loader
 		}
 
 		/* ensure arcdps integration will be loaded */
-		auto hasArcIntegration = std::find(WhitelistedAddons.begin(), WhitelistedAddons.end(), 0xFED81763);
+		auto hasArcIntegration = std::find(WhitelistedAddons.begin(), WhitelistedAddons.end(), SIG_ARCDPS_BRIDGE);
 		if (hasArcIntegration == WhitelistedAddons.end())
 		{
-			WhitelistedAddons.push_back(0xFED81763);
+			WhitelistedAddons.push_back(SIG_ARCDPS_BRIDGE);
 		}
 	}
 	void SaveAddonConfig()
@@ -273,7 +275,7 @@ namespace Loader
 			signed int sig = addon->Definitions ? addon->Definitions->Signature : addon->MatchSignature;
 
 			// skip bridge
-			if (sig == 0xFED81763) { continue; }
+			if (sig == SIG_ARCDPS_BRIDGE) { continue; }
 			if (sig == 0) { continue; }
 
 			auto tracked = std::find(trackedSigs.begin(), trackedSigs.end(), sig);
@@ -285,7 +287,8 @@ namespace Loader
 				{"IsLoaded", addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED || addon->IsFlaggedForEnable},
 				{"IsPausingUpdates", addon->IsPausingUpdates},
 				{"IsDisabledUntilUpdate", addon->IsDisabledUntilUpdate},
-				{"AllowPrereleases", addon->AllowPrereleases}
+				{"AllowPrereleases", addon->AllowPrereleases},
+				{"VisibleToSquadMembers", addon->VisibleToSquadMembers},
 			};
 
 			/* override loaded state, if it's still the initial startup sequence */
@@ -344,7 +347,7 @@ namespace Loader
 
 	void ProcessQueue()
 	{
-		const std::lock_guard<std::mutex> lock(Mutex);
+		const std::unique_lock wLock(AddonsMutex);
 		while (QueuedAddons.size() > 0)
 		{
 			auto it = QueuedAddons.begin();
@@ -414,7 +417,7 @@ namespace Loader
 
 		for (;;)
 		{
-			std::unique_lock<std::mutex> lockThread(ThreadMutex);
+			std::unique_lock lockThread(ThreadMutex);
 			ConVar.wait(lockThread, [] { return !IsSuspended; });
 
 			auto start_time = std::chrono::high_resolution_clock::now();
@@ -427,7 +430,7 @@ namespace Loader
 			auto time = end_time - start_time;
 			Logger->Trace(CH_LOADER, "Processing changes after waiting for %ums.", time / std::chrono::milliseconds(1));
 
-			const std::lock_guard<std::mutex> lock(Mutex);
+			const std::unique_lock wLock(AddonsMutex);
 			// check all tracked addons
 			for (Addon* addon : Addons)
 			{
@@ -663,7 +666,7 @@ namespace Loader
 
 		/* predeclare locked helper for later */
 		bool locked = addon->Definitions->Unload == nullptr || addon->Definitions->HasFlag(EAddonFlags::DisableHotloading);
-		bool onlyInitialLaunch = addon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || addon->Definitions->Signature == 0xFFF694D1;
+		bool onlyInitialLaunch = addon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || addon->Definitions->Signature == SIG_ARCDPS;
 		// FIXME: remove the arcdps check as soon as it adds the flag
 
 		/* override shoudLoad */
@@ -705,7 +708,7 @@ namespace Loader
 
 							// mutex because we're async/threading
 							{
-								const std::lock_guard<std::mutex> lock(Mutex);
+								const std::shared_lock rLock(AddonsMutex);
 								SaveAddonConfig(); // save the DUU state
 							}
 						}
@@ -779,7 +782,7 @@ namespace Loader
 		}
 
 		/* (effectively duplicate check) if someone wants to do shenanigans and inject a different integration module */
-		if (addon->Definitions->Signature == 0xFED81763 && aPath != Index::F_ARCDPSINTEGRATION)
+		if (addon->Definitions->Signature == SIG_ARCDPS_BRIDGE && aPath != Index::F_ARCDPSINTEGRATION)
 		{
 			Logger->Warning(CH_LOADER, "\"%s\" declares signature 0xFED81763 but is not the actual Nexus ArcDPS Integration. Either this was in error or an attempt to tamper with Nexus files. Incompatible.", strFile.c_str());
 			FreeLibrary(addon->Module);
@@ -804,10 +807,26 @@ namespace Loader
 		GetModuleInformation(GetCurrentProcess(), addon->Module, &moduleInfo, sizeof(moduleInfo));
 		addon->ModuleSize = moduleInfo.SizeOfImage;
 
+		// reset the handler pointer to zero from previous invocations so we dont leake function pointers between addons
+		Networking::ResetHandlerPtr(addon->Definitions->APIVersion, api);
+
 		auto start_time = std::chrono::high_resolution_clock::now();
 		addon->Definitions->Load(api);
 		auto end_time = std::chrono::high_resolution_clock::now();
 		auto time = end_time - start_time;
+
+		auto packetHandler = Networking::GetPacketHandlerFromApi(addon->Definitions->APIVersion, api);
+		if(packetHandler) {
+			//INVAR(Rennorb): addons cannot have the same id, and only one handler, so no need to check if its already in the list
+			Networking::Handlers.emplace(addon->Definitions->Signature, packetHandler);
+			if(Networking::State < Networking::ModuleState::Initializing) {
+				Logger->Info(CH_LOADER, "At least one addon is using Networking, initializing...");
+				auto start = std::chrono::high_resolution_clock::now();
+				Networking::Init();
+				auto end = std::chrono::high_resolution_clock::now();
+				Logger->Info(CH_LOADER, u8"Network init took %us.", (end - start) / std::chrono::microseconds(1));
+			}
+		}
 
 		EventApi->Raise(EV_ADDON_LOADED, &addon->Definitions->Signature);
 		EventApi->Raise(EV_MUMBLE_IDENTITY_UPDATED, Mumble::IdentityParsed);
@@ -815,23 +834,26 @@ namespace Loader
 		addon->State = locked ? EAddonState::LoadedLOCKED : EAddonState::Loaded;
 		SaveAddonConfig();
 
-		Logger->Info(CH_LOADER, u8"Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.) Took %uµs.", 
+		Logger->Info(CH_LOADER, u8"Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.) Took %us.", 
 			strFile.c_str(), addon->Definitions->Signature,
 			addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage,
 			addon->Definitions->APIVersion, time / std::chrono::microseconds(1)
 		);
 
-		/* if arcdps */
-		if (addon->Definitions->Signature == 0xFFF694D1)
-		{
-			ArcDPS::ModuleHandle = addon->Module;
-			ArcDPS::IsLoaded = true;
+		switch(addon->Definitions->Signature) {
+			case SIG_ARCDPS:
+				ArcDPS::ModuleHandle = addon->Module;
+				ArcDPS::IsLoaded = true;
+				ArcDPS::DeployBridge();
+				break;
 
-			ArcDPS::DeployBridge();
-		}
-		else if (addon->Definitions->Signature == 0xFED81763 && ArcDPS::ModuleHandle) /* if arcdps bridge */
-		{
-			ArcDPS::InitializeBridge(addon->Module);
+			case SIG_ARCDPS_BRIDGE: if (ArcDPS::ModuleHandle) {
+				ArcDPS::InitializeBridge(addon->Module);
+			}	break;
+
+			case SIG_NETWORKING: 
+				Networking::AddonLoaded = true;
+				break;
 		}
 	}
 
@@ -848,8 +870,8 @@ namespace Loader
 			/* wrap around mutex lock/unlock because if SyncUnload it will already be locked, as it's executed from ProcessQueue */
 			if (!aAddon->Definitions->HasFlag(EAddonFlags::SyncUnload))
 			{
-				/* explictly lock the mutex, because we're unloading ASYNC -> threadsafe */
-				const std::lock_guard<std::mutex> lock(Mutex);
+				/* explicitly lock the mutex, because we're unloading ASYNC -> threadsafe */
+				const std::shared_lock rLock(AddonsMutex);
 				SaveAddonConfig();
 			}
 			else
@@ -897,7 +919,7 @@ namespace Loader
 		}
 
 		aAddon->IsWaitingForUnload = false;
-		Logger->Info(CH_LOADER, u8"Unloaded addon: %s (Took %uµs.)", aPath.filename().string().c_str(), time / std::chrono::microseconds(1));
+		Logger->Info(CH_LOADER, u8"Unloaded addon: %s (Took %us.)", aPath.filename().string().c_str(), time / std::chrono::microseconds(1));
 	}
 
 	void UnloadAddon(const std::filesystem::path& aPath, bool aDoReload)
@@ -934,6 +956,16 @@ namespace Loader
 
 		if (addon->Definitions)
 		{
+			// Disconnect from any session we are left on. This will also disable networking in general.
+			if(addon->State == EAddonState::Loaded) {
+				if(addon->Definitions->Signature == SIG_NETWORKING && Networking::State == Networking::ModuleState::SessionEstablished) {
+					Logger->Trace(CH_LOADER, "Unloaded Networking addon, disconnecting any remaining session.");
+					EventApi->Raise(Networking::EV_NETWORKING_UNLOADING);
+					Networking::AddonLoaded = false;
+					Networking::LeaveSession();
+				}
+			}
+
 			// Either normal unload
 			// or shutting down anyway, addon has Unload defined, so it can save settings etc
 			if ((addon->State == EAddonState::Loaded) || (addon->State == EAddonState::LoadedLOCKED && isShutdown))
@@ -964,7 +996,7 @@ namespace Loader
 							{
 								EventApi->Raise(EV_ADDON_UNLOADED, &addon->Definitions->Signature);
 
-								const std::lock_guard<std::mutex> lock(Mutex);
+								const std::unique_lock wLock(AddonsMutex);
 								if (aDoReload)
 								{
 									Loader::QueueAddon(ELoaderAction::FreeLibraryThenLoad, aPath);
@@ -991,6 +1023,12 @@ namespace Loader
 		if (!addon)
 		{
 			return;
+		}
+
+		// we have to remove the packet handler before we unload the module, otherwise the handler points to invalid mem for a while
+		if (addon->Definitions)
+		{
+			Networking::Handlers.erase(addon->Definitions->Signature);
 		}
 
 		/* sanity check */
@@ -1367,6 +1405,10 @@ namespace Loader
 			((AddonAPI4*)api)->AddFontFromResource = FontManager::ADDONAPI_AddFontFromResource;
 			((AddonAPI4*)api)->AddFontFromMemory = FontManager::ADDONAPI_AddFontFromMemory;
 
+			((AddonAPI4*)api)->HandleIncomingPacket = 0;
+			((AddonAPI4*)api)->PrepareAndBroadcastPacket = Networking::PrepareAndBroadcastPacket;
+			((AddonAPI4*)api)->NetworkingIsAvailableImmediately = Networking::State == Networking::ModuleState::SessionEstablished;
+
 			ApiDefs.insert({ aVersion, api });
 			return api;
 		case 5:
@@ -1472,7 +1514,7 @@ namespace Loader
 			return "(null)";
 		}
 
-		//const std::lock_guard<std::mutex> lock(Mutex);
+		//const std::shared_lock rLock(AddonsMutex);
 		{
 			for (auto& addon : Addons)
 			{

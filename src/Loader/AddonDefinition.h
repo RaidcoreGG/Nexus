@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "BaseTypes.h"
 #include "AddonAPI.h"
 #include "EAddonFlags.h"
 #include "EUpdateProvider.h"
@@ -43,10 +44,10 @@ bool operator>=(AddonVersion lhs, AddonVersion rhs);
 struct AddonDefinition
 {
 	/* required */
-	signed int      Signature;      /* Raidcore Addon ID, set to random unqiue negative integer if not on Raidcore */
-	signed int		APIVersion;		/* Determines which AddonAPI struct revision the Loader will pass, use the NEXUS_API_VERSION define from Nexus.h */
+	AddonSignature  Signature;      /* Raidcore Addon ID, set to random unqiue negative integer if not on Raidcore */
+	signed int      APIVersion;     /* Determines which AddonAPI struct revision the Loader will pass, use the NEXUS_API_VERSION define from Nexus.h */
 	const char*     Name;           /* Name of the addon as shown in the library */
-	AddonVersion	Version;
+	AddonVersion    Version;
 	const char*     Author;         /* Author of the addon */
 	const char*     Description;    /* Short description */
 	ADDON_LOAD      Load;           /* Pointer to Load Function of the addon */

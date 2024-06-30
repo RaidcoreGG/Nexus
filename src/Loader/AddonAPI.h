@@ -11,6 +11,7 @@
 #include "minhook/mh_hook.h"
 #include "Services/DataLink/FuncDefs.h"
 #include "Services/Textures/FuncDefs.h"
+#include "Services/Networking/NetworkingPublic.h"
 #include "GUI/FuncDefs.h"
 #include "GUI/Widgets/QuickAccess/FuncDefs.h"
 #include "GUI/Widgets/Alerts/FuncDefs.h"
@@ -298,6 +299,15 @@ struct AddonAPI4 : AddonAPI
 	FONTS_ADDFROMFILE					AddFontFromFile;
 	FONTS_ADDFROMRESOURCE				AddFontFromResource;
 	FONTS_ADDFROMMEMORY					AddFontFromMemory;
+
+	//TODO(Rennorb) @cleanup: probably needs new revision
+	/// Addons should set this member if desired, so nexus can read it back.
+	Networking::PacketPrepareAndBroadcast* PrepareAndBroadcastPacket;
+	Networking::PacketHandler*             HandleIncomingPacket;
+	/// Because of the asynchronous nature of the addon loading process, addons might miss the EV_NETWORKING_READY event.
+	/// Addons my look at this field to determine if networking is already available during their load callback, 
+	/// or if they have to wait for the EV_NETWORKING_READY (`EV_NW_RDY`) event.
+	bool                                   NetworkingIsAvailableImmediately;
 };
 
 // Revision 5

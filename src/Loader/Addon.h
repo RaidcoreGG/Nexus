@@ -22,6 +22,7 @@ struct Addon
 	bool						IsPausingUpdates;
 	bool						IsDisabledUntilUpdate;
 	bool						AllowPrereleases;
+	bool						VisibleToSquadMembers;
 
 	/* Runtime states */
 	signed int					MatchSignature;

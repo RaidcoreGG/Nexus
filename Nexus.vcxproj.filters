@@ -154,6 +154,12 @@
     <Filter Include="Inputs\RawInput">
       <UniqueIdentifier>{9bfe2e48-8bc4-40bd-a652-2237dd01af65}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Services\Networking">
+      <UniqueIdentifier>{c235196f-495c-4b3f-8a31-bca8b86b2271}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Services\AddonShare">
+      <UniqueIdentifier>{b037a0b4-b277-4aa8-aade-dcc00d1cf8c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -356,6 +362,15 @@
     </ClCompile>
     <ClCompile Include="src\Util\DLL.cpp">
       <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Services\Networking\Networking.cpp">
+      <Filter>Services\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Services\AddonShare\AddonShare.cpp">
+      <Filter>Services\AddonShare</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Loader\EAddonState.cpp">
+      <Filter>Loader\Enums</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1105,6 +1120,24 @@
     </ClInclude>
     <ClInclude Include="src\Util\DLL.h">
       <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Services\Networking\Networking.h">
+      <Filter>Services\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Services\Networking\NetworkingPublic.h">
+      <Filter>Services\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SquadEvents.h">
+      <Filter>_EXTERNAL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Services\AddonShare\AddonShare.h">
+      <Filter>Services\AddonShare</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Services\Networking\PacketInternal.h">
+      <Filter>Services\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BaseTypes.h">
+      <Filter>_GLOBAL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

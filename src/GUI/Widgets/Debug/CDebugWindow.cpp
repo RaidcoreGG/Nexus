@@ -319,7 +319,7 @@ namespace GUI
 			{
 				ImGui::BeginChild("##LoaderTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-				Loader::Mutex.lock();
+				std::shared_lock rLock(Loader::AddonsMutex);
 				{
 					if (ImGui::TreeNode("Tracked"))
 					{
@@ -411,7 +411,6 @@ namespace GUI
 						ImGui::TreePop();
 					}
 				}
-				Loader::Mutex.unlock();
 
 				ImGui::EndChild();
 			}

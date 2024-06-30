@@ -24,6 +24,8 @@
 #include "Services/API/ApiClient.h"
 #include "Services/Updater/Updater.h"
 #include "Services/Multibox/Multibox.h"
+#include "Services/AddonShare/AddonShare.h"
+#include "Services/Networking/Networking.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -141,6 +143,8 @@ namespace Main
 			// create imgui context
 			if (!Renderer::GuiContext) { Renderer::GuiContext = ImGui::CreateContext(); }
 
+			AddonShare::Init();
+
 			State::Nexus = ENexusState::LOADED;
 		}
 		else
@@ -169,6 +173,12 @@ namespace Main
 
 			// free addons
 			Loader::Shutdown();
+
+			//NOTE(Rennorb): At this point addons had their time to send final packets in their shutdown handlers,
+			// now we can disconnect if we were connected until now.
+			if(Networking::State == Networking::ModuleState::SessionEstablished) {
+				Networking::LeaveSession();
+			}
 
 			GUI::Shutdown();
 			delete MumbleReader;
