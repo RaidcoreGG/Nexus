@@ -239,8 +239,11 @@ namespace Networking
 			_LOG(WARNING, "Header.TargetAddonId is 0. Auto ids are not currently supported, please set the id manually. Packet will be discarded.");
 			return false;
 		}
-		if(packet->Header.LengthInU32s < 3) {
-			_LOG(WARNING, "Header.Length is %d, which less than the minimum plausible length (3). Packet will be discarded.", packet->Header.LengthInU32s);
+		auto minSize = 3;
+		if(packet->Header.Flags & PacketFlags::ContainsSource) minSize += sizeof(UserId) / 4;
+		if(packet->Header.Flags & PacketFlags::ContainsTarget) minSize += sizeof(UserId) / 4;
+		if(packet->Header.LengthInU32s < (uint8_t)minSize) {
+			_LOG(WARNING, "Header.Length is %d, which less than the minimum plausible length (%d) for the given flags. Packet will be discarded.", packet->Header.LengthInU32s, minSize);
 			return false;
 		}
 
@@ -266,6 +269,10 @@ namespace Networking
 		packet->Header.TargetAddonId = Internal::INTERNAL_PACKET;
 		if(packet->Header.LengthInU32s < 3) {
 			_LOG(WARNING, "Header.Length is %d, which less than the minimum plausible length (3). Packet will be discarded.", packet->Header.LengthInU32s);
+			return;
+		}
+		if(packet->Header.Flags) {
+			_LOG(WARNING, "Header.Flags (was %02x) are ignored for internals packets.", packet->Header.Flags);
 			return;
 		}
 		// packet checksum is the last u32 in the packet, packet has to be aligned
@@ -301,7 +308,7 @@ namespace Networking
 
 	void EnterReceiveLoop()
 	{
-		char buffer[1024]; //TODO size
+		char buffer[1 << (sizeof(PacketHeader::LengthInU32s) * 8)];
 		while(true) {
 			int rcvdLength = recv(Socket, buffer, sizeof(buffer), 0);
 			if(rcvdLength == SOCKET_ERROR) {
@@ -309,17 +316,21 @@ namespace Networking
 				continue;
 			}
 
+			Packet* packet = (Packet*)buffer;
+
 			//NOTE(Rennorb): Only trace these messages because incoming packets might just contain junk.
 			// The packets that are sent are already checked with higher log levels.
-			int lengthInU32s = rcvdLength / 4;
-			const int MIN_PACKET_SIZE = (sizeof(PacketHeader) + 3) / 4 + (sizeof(PacketChecksum) + 3) / 4;
-			if(rcvdLength % 4 != 0 || lengthInU32s < MIN_PACKET_SIZE) {
-				_LOG(TRACE, "Packet length is %d Bytes, not evenly divisible by 4 or less than the minimum plausible length (%d Bytes). Packet will be discarded.", rcvdLength, MIN_PACKET_SIZE * 4);
+			int minPacketLength = (sizeof(PacketHeader) + 3) / 4 + (sizeof(PacketChecksum) + 3) / 4;
+			if(rcvdLength >= minPacketLength) {
+				if(packet->Header.Flags & PacketFlags::ContainsTarget) minPacketLength += sizeof(UserId);
+				if(packet->Header.Flags & PacketFlags::ContainsSource) minPacketLength += sizeof(UserId);
+			}
+			if(rcvdLength % 4 != 0 || rcvdLength < minPacketLength) {
+				_LOG(TRACE, "Packet length is %d Bytes, not evenly divisible by 4 or less than the minimum plausible length (%d Bytes). Packet will be discarded.", rcvdLength, minPacketLength);
 				continue;
 			}
 
-			Packet* packet = (Packet*)buffer;
-
+			int lengthInU32s = rcvdLength / 4;
 			if(packet->Header.LengthInU32s != lengthInU32s) {
 				_LOG(TRACE, "Actual packet length (%d) does not match length in packet header (%d).", packet->Header.LengthInU32s, lengthInU32s);
 				continue;
@@ -367,7 +378,7 @@ namespace Networking
 						// and we dont want to block the receiver for responses.
 						std::thread([]() { EventApi->Raise(EV_NETWORKING_READY); }).detach();
 
-						AddonShare::BroadcastAddons();
+						AddonShare::TransmitAddonStates(0);
 						// if we joined a squad with other members, ask them for their addons
 						if(CurrentSquad && CurrentSquad->member_count > 1) {
 							AddonShare::RequestAddons();
@@ -379,7 +390,7 @@ namespace Networking
 				break;
 
 			default:
-				_LOG(TRACE, "Received unknown internal (type: %d, len: %d Bytes). Packet will be discarded.", header->Type, header->LengthInU32s * 4);
+				_LOG(TRACE, FORMAT_DISCARD_MESSAGE(packet));
 		}
 	}
 

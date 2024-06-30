@@ -25,7 +25,8 @@ namespace AddonShare {
 	void Init();
 
 	void BroadcastAddonStateUpdate(AddonSignature addon, EAddonState state);
-	void BroadcastAddons();
+	/// Target can be null to broadcast the packet
+	void TransmitAddonStates(Networking::UserId* target);
 	void RequestAddons();
 
 	void ClearOthers();

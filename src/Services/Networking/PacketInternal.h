@@ -22,14 +22,14 @@ namespace Internal {
 	const int MIN_PACKET_SIZE = (sizeof(PacketHeader) + 3) / 4 + (sizeof(PacketChecksum) + 3) / 4; // separate division for separate rounding for alignment requirements
 	
 	struct JoinSession {
-		PacketHeader Header { INTERNAL_PACKET, PACKET_LEN(JoinSession), PacketType::JoinSession };
+		PacketHeader Header { INTERNAL_PACKET, PACKET_LEN(JoinSession), PacketFlags::None, PacketType::JoinSession };
 		UserId Me;
 		SessionId Session;
 		PacketChecksum CRC;
 	};
 
 	struct LeaveSession {
-		PacketHeader Header { INTERNAL_PACKET, PACKET_LEN(LeaveSession), PacketType::LeaveSession };
+		PacketHeader Header { INTERNAL_PACKET, PACKET_LEN(LeaveSession), PacketFlags::None, PacketType::LeaveSession };
 		UserId Me;
 		PacketChecksum CRC;
 	};

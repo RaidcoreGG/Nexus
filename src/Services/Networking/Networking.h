@@ -6,6 +6,7 @@
 #include "SquadEvents.h"
 #include <WinSock2.h>
 #include <map>
+#include <guiddef.h>
 
 namespace Networking
 {
@@ -16,10 +17,10 @@ namespace Networking
 	/// no payload
 	constexpr char const EV_NETWORKING_UNLOADING[] = "EV_NW_UNL";
 
-	typedef UUID UserId;
+	typedef GUID UserId;
 	constexpr UserId INVALID_USER = {0};
 
-	typedef UUID SessionId;
+	typedef GUID SessionId;
 	constexpr SessionId INVALID_SESSION = {0};
 
 	

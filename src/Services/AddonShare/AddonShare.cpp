@@ -9,6 +9,7 @@
 namespace AddonShare {
 	using Networking::PacketChecksum;
 	using Networking::UserId;
+	using Networking::PacketFlags;
 
 	constexpr AddonSignature AS_PACKET = 1;
 
@@ -46,14 +47,15 @@ namespace AddonShare {
 	static_assert(sizeof(AddonState) % 4 == 0);
 
 	struct StateUpdatePacket {
-		PacketHeader   Header = { AS_PACKET, PACKET_LEN(StateUpdatePacket), PacketType::IndividualUpdate };
-		UserId         UserId;
+		PacketHeader   Header = { AS_PACKET, PACKET_LEN(StateUpdatePacket), PacketFlags::ContainsSource, PacketType::IndividualUpdate };
+		UserId         UserId; // set by the server
 		AddonState     Update;
 		PacketChecksum CRC;
 	};
 
 	struct StatusRequestPacket {
-		PacketHeader   Header = { AS_PACKET, PACKET_LEN(StatusRequestPacket), PacketType::StatusRequest };
+		PacketHeader   Header = { AS_PACKET, PACKET_LEN(StatusRequestPacket), PacketFlags::ContainsSource, PacketType::StatusRequest };
+		UserId         UserId; // set by the server
 		PacketChecksum CRC;
 	};
 
@@ -62,7 +64,7 @@ namespace AddonShare {
 	/// Dynamically sized! Must manually initialize all fields and add space for crc!
 	struct ListUpdatePacket {
 		PacketHeader   Header;
-		UserId         UserId;
+		UserId         UserId; // set by the server
 		AddonState     Updates[];
 	};
 	#pragma warning(pop)
@@ -72,8 +74,6 @@ namespace AddonShare {
 	void BroadcastAddonStateUpdate(AddonSignature addon, EAddonState state)
 	{
 		StateUpdatePacket p;
-		//NOTE(Rennorb): Doesn't matter if its not set; if it isn't, then we don't send the packet either way.
-		p.UserId  = Networking::MyUserId;
 		p.Update = { addon, state };
 
 		Networking::PrepareAndBroadcastPacket((Networking::Packet*)&p);
@@ -85,13 +85,19 @@ namespace AddonShare {
 		Networking::PrepareAndBroadcastPacket((Networking::Packet*)&p);
 	}
 
-	void BroadcastAddons()
+	/// Target can be null to broadcast the packet
+	void TransmitAddonStates(UserId* target)
 	{
 		std::shared_lock rLock(Loader::AddonsMutex);
 
 		auto packetSize = PACKET_STATUS_RESPONSE_EMPTY_SIZE + sizeof(AddonState) * std::count_if(Loader::Addons.begin(), Loader::Addons.end(), [](Addon* a){ return a->VisibleToSquadMembers; });
+		if(target) packetSize += sizeof(UserId);
+		//NOTE(Rennorb): Could test for null alloc here, but realistically if we run out of memory what are we going to do? 
+		// Might aswell pretend it always works
 		auto p = (ListUpdatePacket*)_malloca(packetSize);
-		p->Header = { AS_PACKET, (uint16_t)(packetSize / 4), PacketType::ListUpdate };
+		auto flags = PacketFlags::ContainsSource;
+		if(target) flags = (PacketFlags)(flags | PacketFlags::ContainsTarget);
+		p->Header = { AS_PACKET, (uint8_t)(packetSize / 4), flags, PacketType::ListUpdate };
 
 		size_t i = 0;
 		for(auto addon : Loader::Addons) {
@@ -102,10 +108,12 @@ namespace AddonShare {
 
 		rLock.unlock(); // cannot use scoping here, we don't want to destroy the stackalloced packet
 
+		if(target) *(UserId*)(p->Updates + i) = *target;
+
 		Networking::PrepareAndBroadcastPacket((Networking::Packet*)p);
+		_freea(p);
 	}
 
-	static bool g_goingToBroadcastState = false;
 
 	static void InsertIntoSharedAddonsIfUnknownSig(AddonSignature signature)
 	{
@@ -118,7 +126,7 @@ namespace AddonShare {
 	{
 		auto header = (PacketHeader*)&packet->Header;
 		switch(header->Type) {
-			case PacketType::IndividualUpdate: {
+			case PacketType::IndividualUpdate: if(header->Flags == PacketFlags::ContainsSource) {
 				auto response = (StateUpdatePacket*)packet;
 
 				std::unique_lock wLock(MemberDataMutex);
@@ -144,24 +152,41 @@ namespace AddonShare {
 				}
 
 				skip_insertion:;
+				return;
 			} break;
 
-			case PacketType::StatusRequest: if(!g_goingToBroadcastState) {
-				g_goingToBroadcastState = true;
-				// We spawn a thread here to accumulate multiple requests, as it is very likely that we ge multiple requests upon joining a squad.
-				//TODO(Rennorb) @perf: Could keep this thread around instead of recreating one every time. Requires more complicated signaling.
-				std::thread([]() {
-					Sleep(100);
+			case PacketType::StatusRequest: if(header->Flags & PacketFlags::ContainsSource) {
+				enum ReportTarget {
+					None = 0,
+					Single,
+					Broadcast,
+				};
+				static ReportTarget s_reportTarget = None;
+				static UserId s_reportTo;
+				
+				if(s_reportTarget == None) {
+					s_reportTarget = Single;
+					s_reportTo = ((StatusRequestPacket*)packet)->UserId;
+					// We spawn a thread here to accumulate multiple requests, as it is very likely that we ge multiple requests upon merging a squad.
+					//TODO(Rennorb) @perf: Could keep this thread around instead of recreating one every time. Requires more complicated signaling.
+					std::thread([]() {
+						Sleep(100);
 
-					BroadcastAddons();
+						TransmitAddonStates(s_reportTarget == Single ? &s_reportTo : 0);
 
-					g_goingToBroadcastState = false;
-				}).detach();
+						s_reportTarget = None;
+					}).detach();
+				}
+				else {
+					// if we get multiple requests we just broadcast
+					s_reportTarget = Broadcast;
+				}
+				return;
 			} break;
 
-			case PacketType::ListUpdate: {
+			case PacketType::ListUpdate: if(header->Flags & PacketFlags::ContainsSource) {
 				auto response = (ListUpdatePacket*)packet;
-				auto addonsInPacket = (packet->Header.LengthInU32s * 4 - PACKET_STATUS_RESPONSE_EMPTY_SIZE) / sizeof(AddonState);
+				auto addonsInPacket = (header->LengthInU32s * 4 - PACKET_STATUS_RESPONSE_EMPTY_SIZE) / sizeof(AddonState);
 
 				std::unique_lock wLock(MemberDataMutex);
 				std::shared_lock rLock(Loader::AddonsMutex);
@@ -195,11 +220,10 @@ namespace AddonShare {
 				}
 
 				skip_insertion_response:;
+				return;
 			} break;
-
-			default:
-				_LOG(TRACE, "Discarding invalid packet with type %u.", header->Type);
 		}
+		_LOG(TRACE, FORMAT_DISCARD_MESSAGE(packet));
 	}
 
 	void ClearOthers()
