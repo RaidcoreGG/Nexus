@@ -90,6 +90,7 @@ bool CFontManager::Advance()
 	ImVector<ImWchar> ranges;
 	rb.Clear();
 	rb.AddRanges(io.Fonts->GetGlyphRangesDefault());
+	rb.AddRanges(rangesLatinExt);
 	rb.BuildRanges(&ranges);
 
 	io.Fonts->Clear();
