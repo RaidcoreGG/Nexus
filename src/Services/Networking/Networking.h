@@ -20,10 +20,12 @@ namespace Networking
 	typedef GUID UserId;
 	constexpr UserId INVALID_USER = {0};
 
+#define SPLIT_USER_ID(id) ((unsigned int*)&id)[0], ((unsigned int*)&id)[1], ((unsigned int*)&id)[2], ((unsigned int*)&id)[3]
+
 	typedef GUID SessionId;
 	constexpr SessionId INVALID_SESSION = {0};
 
-	
+#define SPLIT_SESSION_ID(id) ((unsigned int*)&id)[0], ((unsigned int*)&id)[1], ((unsigned int*)&id)[2], ((unsigned int*)&id)[3]
 
 	enum ModuleState {
 		_UNKNOWN                 = 0,

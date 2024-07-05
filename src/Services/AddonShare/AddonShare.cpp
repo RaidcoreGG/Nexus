@@ -101,7 +101,8 @@ namespace AddonShare {
 
 		size_t i = 0;
 		for(auto addon : Loader::Addons) {
-			if(!addon->VisibleToSquadMembers) continue;
+			// sometimes the deffinition is 0
+			if(!addon->VisibleToSquadMembers || !addon->Definitions) continue;
 
 			p->Updates[i++] = { addon->Definitions->Signature, addon->State };
 		}
@@ -187,6 +188,8 @@ namespace AddonShare {
 			case PacketType::ListUpdate: if(header->Flags & PacketFlags::ContainsSource) {
 				auto response = (ListUpdatePacket*)packet;
 				auto addonsInPacket = (header->LengthInU32s * 4 - PACKET_STATUS_RESPONSE_EMPTY_SIZE) / sizeof(AddonState);
+				static_assert(sizeof(UserId) % sizeof(AddonState) == 0);
+				if(header->Flags & PacketFlags::ContainsTarget) addonsInPacket -= sizeof(UserId) / sizeof(AddonState);
 
 				std::unique_lock wLock(MemberDataMutex);
 				std::shared_lock rLock(Loader::AddonsMutex);
@@ -243,8 +246,10 @@ namespace AddonShare {
 
 			std::swap(*iter, Members.back());
 			Members.pop_back();
-			break;
+			return;
 		}
+
+		_LOG(TRACE, "Failed to find member %08x%08x%08x%08x to remove", SPLIT_USER_ID(memberId));
 	}
 }
 

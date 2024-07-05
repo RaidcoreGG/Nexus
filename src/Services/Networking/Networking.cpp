@@ -350,7 +350,7 @@ namespace Networking
 
 			auto it = Handlers.find(packet->Header.TargetAddonId);
 			if(it == Handlers.end()) {
-				_LOG(TRACE, "Received packet for which the addon (%08x) is not installed.", packet->Header.TargetAddonId);
+				_LOG(TRACE, "Received packet for which the addon (%08x) is not installed or did not register a handler.", packet->Header.TargetAddonId);
 				continue;
 			}
 
@@ -371,8 +371,7 @@ namespace Networking
 					if(AddonLoaded) { // one more safety just in case the networking addon got unloaded between request and response
 						State = ModuleState::SessionEstablished;
 						MySessionId = ((Internal::SessionCreated*)packet)->Session;
-						auto as_u32s = (u32*)&MySessionId;
-						_LOG(TRACE, "Joined session %08x %08x %08x %08x.", as_u32s[0], as_u32s[1], as_u32s[2], as_u32s[3]);
+						_LOG(TRACE, "Joined session %08x%08x%08x%08x.", SPLIT_SESSION_ID(MySessionId));
 
 						//NOTE(Rennorb): Spawn this in a separate thread as addons will likely try to immediately fire packets ones this goes out,
 						// and we dont want to block the receiver for responses.
