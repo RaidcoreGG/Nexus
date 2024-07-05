@@ -10,6 +10,7 @@
 #define LOADER_H
 
 #include <mutex>
+#include <shared_mutex>
 #include <map>
 #include <vector>
 #include <unordered_map>
@@ -28,7 +29,8 @@ namespace Loader
 {
 	extern NexusLinkData*				NexusLink;
 
-	extern std::mutex					Mutex;
+	//used for accessing the `Addons` vector
+	extern std::shared_mutex		AddonsMutex;
 	extern std::unordered_map<
 		std::filesystem::path,
 		ELoaderAction

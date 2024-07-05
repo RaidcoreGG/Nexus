@@ -82,7 +82,7 @@ namespace GUI
 				const std::string& activeLang = Language->GetActiveLanguage();
 
 				std::vector<std::string> langs = Language->GetLanguages();
-				languagesSize = langs.size();
+				languagesSize = (int)langs.size();
 				languages = new const char* [langs.size()];
 				for (size_t i = 0; i < langs.size(); i++)
 				{
@@ -91,7 +91,7 @@ namespace GUI
 
 					if (languages[i] == activeLang)
 					{
-						languagesIndex = i;
+						languagesIndex = (int)i;
 					}
 				}
 
@@ -195,7 +195,7 @@ namespace GUI
 					}
 
 					ImGui::Text(Language->Translate("((000051))"));
-					if (ImGui::DragFloat2("##qaoffset", (float*)&QuickAccess::Offset, 1.0f, (static_cast<int>(Renderer::Height)) * -1, static_cast<int>(Renderer::Height)))
+					if (ImGui::DragFloat2("##qaoffset", (float*)&QuickAccess::Offset, 1.0f, (float)(static_cast<int>(Renderer::Height) * -1), (float)static_cast<int>(Renderer::Height)))
 					{
 						Settings::Settings[OPT_QAOFFSETX] = QuickAccess::Offset.x;
 						Settings::Settings[OPT_QAOFFSETY] = QuickAccess::Offset.y;

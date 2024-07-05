@@ -170,7 +170,10 @@ const std::string& CLocalization::GetActiveLanguage()
 		return this->ActiveLocale->DisplayName;
 	}
 
-	return NULLSTR;
+	//NOTE(Rennorb): Need to convert to a string first if we want to return a reference to a string from the fn, 
+	// otherwise we do actually return a reference to a local that runs out of scope after the call.
+	static std::string const fallback = NULLSTR;
+	return fallback;
 }
 
 void CLocalization::SetLocaleDirectory(std::filesystem::path aPath)

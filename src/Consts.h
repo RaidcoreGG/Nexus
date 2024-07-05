@@ -62,4 +62,11 @@ extern const char* API_RAIDCORE;
 extern const char* API_GITHUB;
 extern const char* API_GW2;
 
+/* Specific Addon Signatures */
+//TODO(Rennorb) @cleanup: Use dedicated type for signatures
+//NOTE(Rennorb): constexpr so we can use it in case statements. thanks cpp
+constexpr const int SIG_ARCDPS        = 0xFFF694D1;
+constexpr const int SIG_ARCDPS_BRIDGE = 0xFED81763;
+constexpr const int SIG_NETWORKING    = -123456; //TODO(Rennorb)
+
 #endif
