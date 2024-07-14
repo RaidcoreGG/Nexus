@@ -281,6 +281,7 @@ namespace Loader
 
 			json addonInfo =
 			{
+				{"Name", addon->Definitions ? addon->Definitions->Name : "-"},
 				{"Signature", sig},
 				{"IsLoaded", addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED || addon->IsFlaggedForEnable},
 				{"IsPausingUpdates", addon->IsPausingUpdates},
