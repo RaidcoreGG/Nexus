@@ -659,6 +659,14 @@ namespace Loader
 			return;
 		}
 
+		/* fix update provider in case none was set, but a link was provided. */
+		if (addon->Definitions->Provider == EUpdateProvider::None && addon->Definitions->UpdateLink)
+		{
+			addon->Definitions->Provider = GetProvider(addon->Definitions->UpdateLink);
+
+			Logger->Info(CH_LOADER, "\"%s\" does not have a provider set, but declares an update resource. Deduced Provider %d from URL.", addon->Definitions->Name, addon->Definitions->Provider);
+		}
+
 		bool isInitialLoad = addon->State == EAddonState::None;
 
 		// if not on whitelist and its the initial load (aka not manually invoked)
