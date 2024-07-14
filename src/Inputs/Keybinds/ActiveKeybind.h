@@ -13,7 +13,6 @@ typedef enum class EKeybindHandlerType
 
 struct ActiveKeybind
 {
-	std::string				DisplayText;
 	Keybind					Bind;
 	EKeybindHandlerType		HandlerType;
 	void*					Handler;

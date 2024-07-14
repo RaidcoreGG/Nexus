@@ -37,6 +37,7 @@ namespace Index
 
 	extern std::filesystem::path F_LOG;
 	extern std::filesystem::path F_KEYBINDS;
+	extern std::filesystem::path F_GAMEBINDS;
 	extern std::filesystem::path F_FONT;
 	extern std::filesystem::path F_SETTINGS;
 	extern std::filesystem::path F_ADDONCONFIG;

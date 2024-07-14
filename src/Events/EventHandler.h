@@ -17,6 +17,8 @@
 #include "FuncDefs.h"
 #include "EventSubscriber.h"
 
+constexpr const char* CH_EVENTS = "Events";
+
 ///----------------------------------------------------------------------------------------------------
 /// Events Namespace
 ///----------------------------------------------------------------------------------------------------
@@ -111,7 +113,7 @@ public:
 	/// Subscribe:
 	/// 	Subscribes the provided ConsumeEventCallback function, to the provided event name.
 	///----------------------------------------------------------------------------------------------------
-	void Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
+	void Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback, bool aIsInternal = false);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Unsubscribe:

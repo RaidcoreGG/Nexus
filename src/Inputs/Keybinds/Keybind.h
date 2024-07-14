@@ -10,6 +10,8 @@ struct Keybind
 	bool			Alt;
 	bool			Ctrl;
 	bool			Shift;
+
+	bool IsBound();
 };
 
 bool operator==(const Keybind& lhs, const Keybind& rhs);

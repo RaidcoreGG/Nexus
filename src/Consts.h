@@ -7,10 +7,8 @@ constexpr const char* NULLSTR = "(null)";
 
 /* Channels */
 extern const char* CH_CORE;
-extern const char* CH_EVENTS;
 extern const char* CH_QUICKACCESS;
 extern const char* CH_LOADER;
-extern const char* CH_KEYBINDS;
 
 /* Keybinds */
 extern const char* KB_MENU;

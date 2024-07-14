@@ -154,6 +154,12 @@
     <Filter Include="Inputs\RawInput">
       <UniqueIdentifier>{9bfe2e48-8bc4-40bd-a652-2237dd01af65}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Inputs\GameBinds">
+      <UniqueIdentifier>{b724c373-9b37-4f5e-b102-697fa296d3d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Inputs\GameBinds\Enums">
+      <UniqueIdentifier>{9c11a759-acfa-40e2-b7f5-042ba9d0428a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -355,6 +361,12 @@
       <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="src\Util\DLL.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Inputs\GameBinds\GameBindsHandler.cpp">
+      <Filter>Inputs\GameBinds</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Util\Inputs.cpp">
       <Filter>Util</Filter>
     </ClCompile>
   </ItemGroup>
@@ -965,9 +977,6 @@
     <ClInclude Include="src\Branch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Inputs\Keybinds\KeystrokeMessageFlags.h">
-      <Filter>Inputs\Keybinds</Filter>
-    </ClInclude>
     <ClInclude Include="src\Paths\FuncDefs.h">
       <Filter>Paths</Filter>
     </ClInclude>
@@ -1107,7 +1116,13 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="src\Inputs\GameBinds\GameBindsHandler.h">
-      <Filter>Header Files</Filter>
+      <Filter>Inputs\GameBinds</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Inputs\GameBinds\EGameBinds.h">
+      <Filter>Inputs\GameBinds\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Util\Inputs.h">
+      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

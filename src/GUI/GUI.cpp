@@ -834,9 +834,9 @@ namespace GUI
 		io.Fonts->AddFontFromFileTTF("C:\\Program Files\\Guild Wars 2\\addons\\arcdps\\segoeui.ttf", 19.5f);
 		io.Fonts->AddFontFromFileTTF("C:\\Program Files\\Guild Wars 2\\addons\\arcdps\\trugen.ttf", 19.5f);*/
 
-		EventApi->Subscribe(EV_MUMBLE_IDENTITY_UPDATED, OnMumbleIdentityChanged);
-		EventApi->Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", OnLanguageChanged);
-		EventApi->Subscribe(EV_VOLATILE_ADDON_DISABLED, OnAddonDUU);
+		EventApi->Subscribe(EV_MUMBLE_IDENTITY_UPDATED, OnMumbleIdentityChanged, true);
+		EventApi->Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", OnLanguageChanged, true);
+		EventApi->Subscribe(EV_VOLATILE_ADDON_DISABLED, OnAddonDUU, true);
 		OnMumbleIdentityChanged(nullptr);
 
 		AddonsWindow	= new CAddonsWindow("Addons");
