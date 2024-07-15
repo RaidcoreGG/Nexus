@@ -352,7 +352,7 @@ int CTextureLoader::Verify(void* aStartAddress, void* aEndAddress)
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
-	for (QueuedTexture qTex : this->QueuedTextures)
+	for (QueuedTexture& qTex : this->QueuedTextures)
 	{
 		if (qTex.Callback >= aStartAddress && qTex.Callback <= aEndAddress)
 		{
