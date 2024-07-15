@@ -346,6 +346,24 @@ std::vector<QueuedTexture> CTextureLoader::GetQueuedTextures() const
 	return this->QueuedTextures;
 }
 
+int CTextureLoader::Verify(void* aStartAddress, void* aEndAddress)
+{
+	int refCounter = 0;
+
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	for (QueuedTexture qTex : this->QueuedTextures)
+	{
+		if (qTex.Callback >= aStartAddress && qTex.Callback <= aEndAddress)
+		{
+			qTex.Callback = nullptr;
+			refCounter++;
+		}
+	}
+
+	return refCounter;
+}
+
 bool CTextureLoader::OverrideTexture(const char* aIdentifier, TEXTURES_RECEIVECALLBACK aCallback)
 {
 	std::string file = aIdentifier;

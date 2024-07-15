@@ -898,7 +898,8 @@ namespace Loader
 			int qaRefs = GUI::QuickAccess::Verify(startAddress, endAddress);
 			int kbRefs = KeybindApi->Verify(startAddress, endAddress);
 			int riRefs = RawInputApi->Verify(startAddress, endAddress);
-			int leftoverRefs = evRefs + uiRefs + qaRefs + kbRefs + riRefs;
+			int txRefs = TextureService->Verify(startAddress, endAddress);
+			int leftoverRefs = evRefs + uiRefs + qaRefs + kbRefs + riRefs + txRefs;
 
 			if (leftoverRefs > 0)
 			{
@@ -909,7 +910,8 @@ namespace Loader
 				if (uiRefs) { str.append(String::Format("UI: %d\n", uiRefs)); }
 				if (qaRefs) { str.append(String::Format("QuickAccess: %d\n", qaRefs)); }
 				if (kbRefs) { str.append(String::Format("Keybinds: %d\n", kbRefs)); }
-				if (riRefs) { str.append(String::Format("WndProc: %d", riRefs)); }
+				if (riRefs) { str.append(String::Format("WndProc: %d\n", riRefs)); }
+				if (txRefs) { str.append(String::Format("Textures: %d", txRefs)); }
 				Logger->Warning(CH_LOADER, str.c_str());
 			}
 		}
