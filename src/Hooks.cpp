@@ -38,6 +38,9 @@ namespace Hooks
 			// don't pass to game if loader
 			if (Loader::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
+			// don't pass to game if wndprocCb or keybind
+			//if (InputCtx->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return; }
+
 			// don't pass to game if custom wndproc
 			if (RawInputApi->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 

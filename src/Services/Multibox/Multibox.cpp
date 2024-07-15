@@ -70,7 +70,7 @@ NTSTATUS GetProcessHandles(std::vector<HANDLE>& aHandles)
 		info = (SYSTEM_HANDLE_INFORMATION_EX*) new BYTE[bufferSize];
 
 		static PFN_NTQUERYSYSTEMINFORMATION func;
-		DLL::FindFunction(GetModuleHandle("ntdll.dll"), &func, "NtQuerySystemInformation");
+		DLL::FindFunction(GetModuleHandleA("ntdll.dll"), &func, "NtQuerySystemInformation");
 		result = func((SYSTEM_INFORMATION_CLASS)0x40, info, bufferSize, &bufferSize);
 	}
 	while (result == STATUS_INFO_LENGTH_MISMATCH);
@@ -93,7 +93,7 @@ NTSTATUS GetProcessHandles(std::vector<HANDLE>& aHandles)
 bool GetHandleName(HANDLE aHandle, PUNICODE_STRING aName, ULONG aNameSize)
 {
 	static PFN_NTQUERYOBJECT func;
-	DLL::FindFunction(GetModuleHandle("ntdll.dll"), &func, "NtQueryObject");
+	DLL::FindFunction(GetModuleHandleA("ntdll.dll"), &func, "NtQueryObject");
 
 	NTSTATUS result = func(aHandle, (OBJECT_INFORMATION_CLASS)0x01, aName, aNameSize, &aNameSize);
 	return NT_SUCCESS(result)
@@ -155,7 +155,7 @@ namespace Multibox
 
 		UNICODE_STRING mutexName;
 		PFN_RTLINITUNICODESTRING func;
-		if (DLL::FindFunction(GetModuleHandle("ntdll.dll"), &func, "RtlInitUnicodeString"))
+		if (DLL::FindFunction(GetModuleHandleA("ntdll.dll"), &func, "RtlInitUnicodeString"))
 		{
 			func(&mutexName, L"AN-Mutex-Window-Guild Wars 2");
 

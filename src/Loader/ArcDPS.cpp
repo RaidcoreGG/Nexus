@@ -73,7 +73,7 @@ namespace ArcDPS
 
 		if (State::IsChainloading && std::filesystem::exists(Index::F_CHAINLOAD_DLL))
 		{
-			HMODULE hModule = GetModuleHandle(Index::F_CHAINLOAD_DLL.string().c_str());
+			HMODULE hModule = GetModuleHandleA(Index::F_CHAINLOAD_DLL.string().c_str());
 
 			void* func = nullptr;
 
@@ -95,7 +95,7 @@ namespace ArcDPS
 		std::filesystem::path alArc = Index::D_GW2_ADDONS / "arcdps" / "gw2addon_arcdps.dll";
 		if (std::filesystem::exists(alArc))
 		{
-			HMODULE hModule = GetModuleHandle(alArc.string().c_str());
+			HMODULE hModule = GetModuleHandleA(alArc.string().c_str());
 
 			void* func = nullptr;
 
@@ -117,7 +117,7 @@ namespace ArcDPS
 		std::filesystem::path proxyArc = Index::D_GW2 / "d3d11.dll";
 		if (std::filesystem::exists(proxyArc))
 		{
-			HMODULE hModule = GetModuleHandle(proxyArc.string().c_str());
+			HMODULE hModule = GetModuleHandleA(proxyArc.string().c_str());
 
 			void* func = nullptr;
 

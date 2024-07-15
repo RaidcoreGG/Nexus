@@ -9,6 +9,7 @@
 #include "RawInputApi.h"
 
 #include "Hooks.h"
+#include "Renderer.h"
 #include "Shared.h"
 
 namespace RawInput
@@ -47,7 +48,7 @@ UINT CRawInputApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 LRESULT CRawInputApi::SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	return CallWindowProcA(Hooks::GW2::WndProc, hWnd, uMsg, wParam, lParam);
+	return CallWindowProcA(Hooks::GW2::WndProc, Renderer::WindowHandle, uMsg, wParam, lParam);
 }
 
 void CRawInputApi::Register(WNDPROC_CALLBACK aWndProcCallback)

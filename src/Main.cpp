@@ -15,6 +15,7 @@
 #include "Services/DataLink/DataLink.h"
 #include "GUI/GUI.h"
 #include "Inputs/Keybinds/KeybindHandler.h"
+#include "Inputs/GameBinds/GameBindsHandler.h"
 #include "Loader/Loader.h"
 #include "Services/Logging/LogHandler.h"
 #include "Services/Logging/CConsoleLogger.h"
@@ -118,6 +119,8 @@ namespace Main
 			MH_Initialize();
 
 			KeybindApi = new CKeybindApi();
+			//GameBindsApi = new CGameBindsApi(RawInputApi, Logger, EventApi);
+
 			Settings::Load();
 
 			// if it's not already been explicitly set via command line, check settings

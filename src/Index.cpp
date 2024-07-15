@@ -30,6 +30,7 @@ namespace Index
 
 	std::filesystem::path F_LOG{};
 	std::filesystem::path F_KEYBINDS{};
+	std::filesystem::path F_GAMEBINDS{};
 	std::filesystem::path F_FONT{};
 	std::filesystem::path F_SETTINGS{};
 	std::filesystem::path F_ADDONCONFIG{};
@@ -45,6 +46,7 @@ namespace Index
 	std::filesystem::path F_LOCALE_IT{};
 	std::filesystem::path F_LOCALE_PL{};
 	std::filesystem::path F_LOCALE_RU{};
+	std::filesystem::path F_LOCALE_CN{};
 
 	std::vector<std::string> PathStore;
 
@@ -72,6 +74,7 @@ namespace Index
 		/* files */
 		F_LOG = D_GW2_ADDONS_NEXUS / "Nexus.log";										/* get log path */
 		F_KEYBINDS = D_GW2_ADDONS_NEXUS / "Keybinds.json";								/* get keybinds path */
+		F_GAMEBINDS = D_GW2_ADDONS_NEXUS / "GameBinds.json";							/* get gamebinds path */
 		F_FONT = D_GW2_ADDONS_NEXUS / "Font.ttf";										/* get font path */
 		F_SETTINGS = D_GW2_ADDONS_NEXUS / "Settings.json";								/* get settings path */
 		F_ADDONCONFIG = D_GW2_ADDONS_NEXUS / "AddonConfig.json";						/* get addon config path */
@@ -94,6 +97,7 @@ namespace Index
 		F_LOCALE_IT = D_GW2_ADDONS_RAIDCORE_LOCALES / "it_Main.json";
 		F_LOCALE_PL = D_GW2_ADDONS_RAIDCORE_LOCALES / "pl_Main.json";
 		F_LOCALE_RU = D_GW2_ADDONS_RAIDCORE_LOCALES / "ru_Main.json";
+		F_LOCALE_CN = D_GW2_ADDONS_RAIDCORE_LOCALES / "cn_Main.json";
 
 		/* push to paths */
 		PathStore.push_back(D_GW2.string());

@@ -169,6 +169,12 @@ public:
 	///----------------------------------------------------------------------------------------------------
 	std::vector<QueuedTexture> GetQueuedTextures() const;
 
+	///----------------------------------------------------------------------------------------------------
+	/// Verify:
+	/// 	Removes all TextureReceiver Callbacks that are within the provided address space.
+	///----------------------------------------------------------------------------------------------------
+	int Verify(void* aStartAddress, void* aEndAddress);
+
 private:
 	mutable std::mutex				Mutex;
 	std::map<std::string, Texture*>	Registry;

@@ -155,7 +155,7 @@ RES_TEX_CONTEXTMENU_HIGHLIGHT	PNG				"Resources\\ContextMenu\\ContextMenu_Highli
 
 RES_LOCALE_EN					JSON			"Resources\\Locales\\en_Main.json"
 RES_LOCALE_DE					JSON			"Resources\\Locales\\de_Main.json"
-//RES_LOCALE_FR					JSON			"Resources\\Locales\\fr_Main.json"
+RES_LOCALE_FR					JSON			"Resources\\Locales\\fr_Main.json"
 RES_LOCALE_ES					JSON			"Resources\\Locales\\es_Main.json"
 
 RES_LOCALE_BR					JSON			"Resources\\Locales\\br_Main.json"
@@ -163,6 +163,7 @@ RES_LOCALE_CZ					JSON			"Resources\\Locales\\cz_Main.json"
 RES_LOCALE_IT					JSON			"Resources\\Locales\\it_Main.json"
 RES_LOCALE_PL					JSON			"Resources\\Locales\\pl_Main.json"
 RES_LOCALE_RU					JSON			"Resources\\Locales\\ru_Main.json"
+RES_LOCALE_CN					JSON			"Resources\\Locales\\cn_Main.json"
 
 /* CEulaWindow */
 RES_TEX_EULA_BACKGROUND			PNG             "Resources\\EulaWindow\\Background.png"

@@ -11,6 +11,8 @@
 #include <iomanip>
 #include <sstream>
 
+#include "Util/Strings.h"
+
 std::string LogEntry::TimestampString(bool aIncludeDate)
 {
 	struct tm timeinfo;
@@ -44,10 +46,30 @@ std::string LogEntry::ToString(bool aIncludeChannel)
 	}
 
 	std::stringstream oss;
-	oss << std::setw(10) << TimestampString();
-	if (aIncludeChannel) { oss << std::setw(20) << + "[" + Channel + "]"; }
+	oss << std::setw(20) << TimestampString();
+	if (aIncludeChannel) { oss << std::setw(24) << + "[" + Channel + "]"; }
 	oss << std::setw(12) << level;
-	std::string str = oss.str() + std::string{Message} + "\n";
 
-	return str;
+	/* remove trailing newline from message */
+	if (String::EndsWith(Message, "\n"))
+	{
+		Message = Message.substr(0, Message.length() - 1);
+	}
+
+	std::vector<std::string> parts = String::Split(Message, "\n");
+
+	for (size_t i = 0; i < parts.size(); i++)
+	{
+		if (i == 0)
+		{
+			oss << parts[i] << "\n";
+		}
+		else
+		{
+			oss << std::setw(56) << ""; // 56 magic number is total length of padded prefix (timestamp + channel + level)
+			oss << parts[i] << "\n";
+		}
+	}
+
+	return oss.str();
 }

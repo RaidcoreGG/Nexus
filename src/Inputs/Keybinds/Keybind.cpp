@@ -6,6 +6,11 @@
 
 #include "KeybindHandler.h"
 
+bool Keybind::IsBound()
+{
+	return *this != Keybind{};
+}
+
 bool operator==(const Keybind& lhs, const Keybind& rhs)
 {
 	return	lhs.Key		== rhs.Key &&
