@@ -69,7 +69,7 @@ void CEventApi::Raise(const char* aIdentifier, void* aEventData)
 
 	//auto end_time = std::chrono::high_resolution_clock::now();
 	//auto time = end_time - start_time;
-	//Logger->Debug(CH_EVENTS, u8"Executed event (%s) in %uµs.", aIdentifier, time / std::chrono::microseconds(1));
+	//Logger->Debug(CH_EVENTS, u8"Executed event (%s) in %uÂµs.", aIdentifier, time / std::chrono::microseconds(1));
 }
 
 void CEventApi::Raise(signed int aSignature, const char* aIdentifier, void* aEventData)
@@ -100,7 +100,7 @@ void CEventApi::Raise(signed int aSignature, const char* aIdentifier)
 	this->Raise(aSignature, aIdentifier, nullptr);
 }
 
-void CEventApi::Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback)
+void CEventApi::Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback, bool aIsInternal)
 {
 	std::string str = aIdentifier;
 
@@ -131,7 +131,7 @@ void CEventApi::Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCa
 
 	this->Registry[str].Subscribers.push_back(sub);
 
-	if (sub.Signature == 0)
+	if (sub.Signature == 0 && !aIsInternal)
 	{
 		Logger->Warning(CH_EVENTS, "Event registered but no addon address space matches function pointer. %p", aConsumeEventCallback);
 	}
@@ -185,7 +185,7 @@ int CEventApi::Verify(void* aStartAddress, void* aEndAddress)
 	return refCounter;
 }
 
-std::map<std::string, EventData> CEventApi::GetRegistry() const
+std::unordered_map<std::string, EventData> CEventApi::GetRegistry() const
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 

@@ -514,16 +514,16 @@ namespace GUI
 		switch (langId)
 		{
 		case 0:
-			Language->SetLanguage("English");
+			Language->SetLanguage("en");
 			break;
 		case 2:
-			Language->SetLanguage("Français");
+			Language->SetLanguage("fr");
 			break;
 		case 3:
-			Language->SetLanguage("Deutsch");
+			Language->SetLanguage("de");
 			break;
 		case 4:
-			Language->SetLanguage(u8"Español");
+			Language->SetLanguage("es");
 			break;
 		/*case 5:
 			Language.SetLanguage(u8"Chinese");
@@ -581,13 +581,14 @@ namespace GUI
 		Language->SetLocaleDirectory(Index::D_GW2_ADDONS_RAIDCORE_LOCALES);
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_EN, RES_LOCALE_EN, "JSON");
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_DE, RES_LOCALE_DE, "JSON");
-		//Resources::Unpack(NexusHandle, Index::F_LOCALE_FR, RES_LOCALE_FR, "JSON");
+		Resources::Unpack(NexusHandle, Index::F_LOCALE_FR, RES_LOCALE_FR, "JSON");
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_ES, RES_LOCALE_ES, "JSON");
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_BR, RES_LOCALE_BR, "JSON");
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_CZ, RES_LOCALE_CZ, "JSON");
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_IT, RES_LOCALE_IT, "JSON");
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_PL, RES_LOCALE_PL, "JSON");
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_RU, RES_LOCALE_RU, "JSON");
+		Resources::Unpack(NexusHandle, Index::F_LOCALE_CN, RES_LOCALE_CN, "JSON");
 		Language->Advance(); // advance once to build lang atlas prior to creation of Quick Access
 
 		ImGuiIO& io = ImGui::GetIO();
@@ -833,9 +834,9 @@ namespace GUI
 		io.Fonts->AddFontFromFileTTF("C:\\Program Files\\Guild Wars 2\\addons\\arcdps\\segoeui.ttf", 19.5f);
 		io.Fonts->AddFontFromFileTTF("C:\\Program Files\\Guild Wars 2\\addons\\arcdps\\trugen.ttf", 19.5f);*/
 
-		EventApi->Subscribe(EV_MUMBLE_IDENTITY_UPDATED, OnMumbleIdentityChanged);
-		EventApi->Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", OnLanguageChanged);
-		EventApi->Subscribe(EV_VOLATILE_ADDON_DISABLED, OnAddonDUU);
+		EventApi->Subscribe(EV_MUMBLE_IDENTITY_UPDATED, OnMumbleIdentityChanged, true);
+		EventApi->Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", OnLanguageChanged, true);
+		EventApi->Subscribe(EV_VOLATILE_ADDON_DISABLED, OnAddonDUU, true);
 		OnMumbleIdentityChanged(nullptr);
 
 		AddonsWindow	= new CAddonsWindow("Addons");

@@ -67,6 +67,8 @@ bool CFontManager::Advance()
 {
 	if (this->IsFontAtlasBuilt) { return false; }
 
+	this->NotifyCallbacks(true);
+
 	ImGuiIO& io = ImGui::GetIO();
 
 	/* build full ranges */
@@ -88,26 +90,12 @@ bool CFontManager::Advance()
 	ImVector<ImWchar> ranges;
 	rb.Clear();
 	rb.AddRanges(io.Fonts->GetGlyphRangesDefault());
+	rb.AddRanges(rangesLatinExt);
 	rb.BuildRanges(&ranges);
 
 	io.Fonts->Clear();
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	std::vector<std::string> markedForDeletion;
-	for (auto& font : this->Registry)
-	{
-		if (!font.Data && font.DataSize == 0 && font.Subscribers.size() == 0)
-		{
-			markedForDeletion.push_back(font.Identifier);
-		}
-	}
-
-	for (auto& identifier : markedForDeletion)
-	{
-		this->Registry.erase(std::find_if(this->Registry.begin(), this->Registry.end(), [identifier](ManagedFont& font) { return font.Identifier == identifier; }));
-	}
-
 	for (auto& font : this->Registry)
 	{
 		font.Pointer = io.Fonts->AddFontFromMemoryTTF(font.Data, static_cast<int>(font.DataSize), font.Size, font.Config, font.Identifier == "USER_FONT" || String::StartsWith(font.Identifier, "TREBUCHET") ? rangesFull.Data : ranges.Data);
@@ -174,6 +162,8 @@ void CFontManager::Release(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallb
 
 		delete font.Config;
 		font.Config = nullptr;
+
+		this->Registry.erase(it);
 
 		this->IsFontAtlasBuilt = false;
 	}
@@ -406,13 +396,13 @@ void CFontManager::AddFontInternal(const char* aIdentifier, float aFontSize, voi
 	this->IsFontAtlasBuilt = false;
 }
 
-void CFontManager::NotifyCallbacks()
+void CFontManager::NotifyCallbacks(bool aNotifyNull)
 {
 	for (auto const& font : this->Registry)
 	{
 		for (FONTS_RECEIVECALLBACK callback : font.Subscribers)
 		{
-			callback(font.Identifier.c_str(), font.Pointer);
+			callback(font.Identifier.c_str(), aNotifyNull ? nullptr : font.Pointer);
 		}
 	}
 }

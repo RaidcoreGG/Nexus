@@ -20,6 +20,7 @@ CDataLink*					DataLinkService		= new CDataLink();
 CEventApi*					EventApi			= new CEventApi();
 CRawInputApi*				RawInputApi			= new CRawInputApi();
 CKeybindApi*				KeybindApi			= nullptr; //new CKeybindApi();
+CGameBindsApi*				GameBindsApi		= nullptr; //new CGameBindsApi();
 
 ImFont*						MonospaceFont		= nullptr;
 ImFont*						UserFont			= nullptr;

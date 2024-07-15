@@ -49,7 +49,7 @@ class ILogger
 		virtual void LogMessage(LogEntry aLogEntry) = 0;
 
 	protected:
-		ELogLevel	LogLevel;
+		ELogLevel	LogLevel = ELogLevel::ALL;
 		std::mutex	Mutex;
 };
 

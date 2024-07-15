@@ -15,6 +15,7 @@
 #include "Events/EventHandler.h"
 #include "Inputs/RawInput/RawInputApi.h"
 #include "Inputs/Keybinds/KeybindHandler.h"
+#include "Inputs/GameBinds/GameBindsHandler.h"
 
 #include "imgui/imgui.h"
 
@@ -37,6 +38,7 @@ extern CDataLink*					DataLinkService;
 extern CEventApi*					EventApi;
 extern CRawInputApi*				RawInputApi;
 extern CKeybindApi*					KeybindApi;
+extern CGameBindsApi*				GameBindsApi;
 
 extern ImFont*						MonospaceFont;	/* default/monospace/console font */
 extern ImFont*						UserFont;		/* custom user font */

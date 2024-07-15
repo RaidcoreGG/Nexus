@@ -22,6 +22,7 @@ CConsoleLogger::CConsoleLogger(ELogLevel aLogLevel)
 	freopen_s(&iobuf, "CONIN$", "r", stdin);
 	freopen_s(&iobuf, "CONOUT$", "w", stderr);
 	freopen_s(&iobuf, "CONOUT$", "w", stdout);
+	SetConsoleOutputCP(CP_UTF8);
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 }
 

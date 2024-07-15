@@ -37,6 +37,7 @@ namespace Index
 
 	extern std::filesystem::path F_LOG;
 	extern std::filesystem::path F_KEYBINDS;
+	extern std::filesystem::path F_GAMEBINDS;
 	extern std::filesystem::path F_FONT;
 	extern std::filesystem::path F_SETTINGS;
 	extern std::filesystem::path F_ADDONCONFIG;
@@ -52,6 +53,7 @@ namespace Index
 	extern std::filesystem::path F_LOCALE_IT;
 	extern std::filesystem::path F_LOCALE_PL;
 	extern std::filesystem::path F_LOCALE_RU;
+	extern std::filesystem::path F_LOCALE_CN;
 
 	extern std::vector<std::string>	PathStore;
 

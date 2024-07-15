@@ -12,6 +12,7 @@
 #include "State.h"
 
 #include "Util/DLL.h"
+#include "Util/MD5.h"
 
 #include "minhook/mh_hook.h"
 
@@ -38,14 +39,30 @@ namespace Proxy
 				{
 					if (std::filesystem::exists(Index::F_CHAINLOAD_DLL))
 					{
-						State::IsChainloading = true;
-
-						std::string strChainload = Index::F_CHAINLOAD_DLL.string();
-						D3D11Handle = LoadLibraryA(strChainload.c_str());
-
-						if (D3D11Handle)
+						if (MD5Util::FromFile(Index::F_HOST_DLL) == MD5Util::FromFile(Index::F_CHAINLOAD_DLL))
 						{
-							Logger->Info(CH_CORE, "Loaded Chainload DLL: %s", strChainload.c_str());
+							try
+							{
+								std::filesystem::remove(Index::F_CHAINLOAD_DLL);
+
+								Logger->Info(CH_LOADER, "Removed duplicate Nexus from chainload.");
+							}
+							catch (std::filesystem::filesystem_error fErr)
+							{
+								Logger->Debug(CH_LOADER, "%s", fErr.what());
+							}
+						}
+						else
+						{
+							State::IsChainloading = true;
+
+							std::string strChainload = Index::F_CHAINLOAD_DLL.string();
+							D3D11Handle = LoadLibraryA(strChainload.c_str());
+
+							if (D3D11Handle)
+							{
+								Logger->Info(CH_CORE, "Loaded Chainload DLL: %s", strChainload.c_str());
+							}
 						}
 					}
 				}

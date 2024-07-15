@@ -23,7 +23,17 @@ AddonVersion::AddonVersion(json& aJson)
 
 AddonVersion::AddonVersion(std::string aVersionString)
 {
-	if (!std::regex_match(aVersionString, std::regex(R"(v?\d+[.]\d+[.]\d+[.]\d+)")))
+	bool isSemVer = false;
+
+	if (std::regex_match(aVersionString, std::regex(R"(v?\d+[.]\d+[.]\d+[.]\d+)")))
+	{
+		isSemVer = false; // is nexus versioning
+	}
+	else if (std::regex_match(aVersionString, std::regex(R"(v?\d+[.]\d+[.]\d+)")))
+	{
+		isSemVer = true; // is semver
+	}
+	else
 	{
 		return;
 	}
@@ -47,7 +57,18 @@ AddonVersion::AddonVersion(std::string aVersionString)
 		i++;
 		aVersionString.erase(0, pos + 1);
 	}
-	Revision = static_cast<unsigned short>(std::stoi(aVersionString));
+	if (!isSemVer)
+	{
+		Revision = static_cast<unsigned short>(std::stoi(aVersionString));
+	}
+	else
+	{
+		/* this is left over, instead of the revision, so we assign it */
+		Build = static_cast<unsigned short>(std::stoi(aVersionString));
+
+		/* set revision to -1 to omit it */
+		Revision = -1;
+	}
 }
 
 std::string AddonVersion::string()
@@ -55,8 +76,17 @@ std::string AddonVersion::string()
 	std::string str;
 	str.append(std::to_string(Major) + ".");
 	str.append(std::to_string(Minor) + ".");
-	str.append(std::to_string(Build) + ".");
-	str.append(std::to_string(Revision));
+	str.append(std::to_string(Build));
+
+	if (Revision >= 0)
+	{
+		str.append("." + std::to_string(Revision));
+	}
+	else
+	{
+		// TODO: display (Alpha)/(Beta)/(rc) etc
+	}
+
 	return str;
 }
 

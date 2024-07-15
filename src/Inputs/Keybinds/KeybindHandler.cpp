@@ -19,8 +19,7 @@
 #include "State.h"
 
 #include "Util/Strings.h"
-
-#include "KeystrokeMessageFlags.h"
+#include "Util/Inputs.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -398,7 +397,6 @@ void CKeybindApi::Register(const char* aIdentifier, EKeybindHandlerType aKeybind
 		{
 			// FIXME: Double lookup.
 			this->Registry[str].Bind = requestedBind;
-			this->Registry[str].DisplayText = Keybinds::KBToString(requestedBind, true);
 		}
 
 		// FIXME: Even more lookups.
@@ -457,7 +455,6 @@ void CKeybindApi::Set(std::string aIdentifier, Keybind aKeybind)
 
 		// FIXME: Double lookup.
 		this->Registry[aIdentifier].Bind = aKeybind;
-		this->Registry[aIdentifier].DisplayText = Keybinds::KBToString(aKeybind, true);
 	}
 
 	this->Save();
@@ -585,7 +582,6 @@ void CKeybindApi::Load()
 
 			// FIXME: Double lookup.
 			this->Registry[identifier].Bind = kb;
-			this->Registry[identifier].DisplayText = Keybinds::KBToString(kb, true);
 		}
 
 		file.close();

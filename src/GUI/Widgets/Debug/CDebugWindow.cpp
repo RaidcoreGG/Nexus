@@ -100,7 +100,7 @@ namespace GUI
 		{
 			ImGui::BeginChild("##EventsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-			std::map<std::string, EventData> EventRegistry = EventApi->GetRegistry();
+			std::unordered_map<std::string, EventData> EventRegistry = EventApi->GetRegistry();
 
 			for (auto& [identifier, ev] : EventRegistry)
 			{
