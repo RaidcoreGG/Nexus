@@ -140,7 +140,11 @@ namespace GUI
 					ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 0);
 
 					ImGui::SetCursorPos(ImVec2(actionsWidth - (size * Renderer::Scaling), ImGui::GetCursorPosY()));
-					ImGui::ImageButton(BtnOptions->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling));
+					if (ImGui::ImageButton(BtnOptions->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
+					{
+						Logger->Debug("Nexus GUI", "Opened addon settings");
+						ConfirmUninstall = false;
+					}
 					if (ImGui::BeginPopupContextItem("##AddonItemActionsMore"))
 					{
 						if (ImGui::GW2::ContextMenuItem(("Update##" + sig).c_str(), !aAddon->IsCheckingForUpdates ? Language->Translate("((000011))") : Language->Translate("((000071))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
