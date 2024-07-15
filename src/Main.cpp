@@ -119,7 +119,7 @@ namespace Main
 			MH_Initialize();
 
 			KeybindApi = new CKeybindApi();
-			GameBindsApi = new CGameBindsApi(RawInputApi, Logger, EventApi);
+			//GameBindsApi = new CGameBindsApi(RawInputApi, Logger, EventApi);
 
 			Settings::Load();
 
