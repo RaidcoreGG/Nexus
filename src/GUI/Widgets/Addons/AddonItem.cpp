@@ -44,6 +44,8 @@ namespace GUI
 	Texture* CtxMenuHighlight = nullptr;
 	Texture* ToSComplianceWarning = nullptr;
 
+	bool ConfirmUninstall = false;
+
 	void AddonItem(std::filesystem::path aPath, Addon* aAddon)
 	{
 		if (aAddon == nullptr ||
@@ -242,10 +244,21 @@ namespace GUI
 
 						ImGui::Separator();
 
-						if (ImGui::GW2::ContextMenuItem(("Uninstall##" + sig).c_str(), Language->Translate("((000018))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+						if (!ConfirmUninstall)
 						{
-							//Logger->Debug(CH_GUI, "Uninstall called: %s", it.second->Definitions->Name);
-							Loader::QueueAddon(ELoaderAction::Uninstall, aPath);
+							if (ImGui::GW2::ContextMenuItem(("Uninstall##" + sig).c_str(), Language->Translate("((000018))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+							{
+								ConfirmUninstall = true;
+							}
+						}
+						else
+						{
+							if (ImGui::GW2::ContextMenuItem(("ConfirmUninstall##" + sig).c_str(), Language->Translate("((000065))"), CtxMenuBullet->Resource, CtxMenuHighlight->Resource, ImVec2(btnWidth * ImGui::GetFontSize(), btnHeight)))
+							{
+								ConfirmUninstall = false;
+								Loader::QueueAddon(ELoaderAction::Uninstall, aPath);
+								//Logger->Debug(CH_GUI, "Uninstall called: %s", it.second->Definitions->Name);
+							}
 						}
 						if (aAddon->State == EAddonState::LoadedLOCKED)
 						{
