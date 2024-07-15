@@ -217,145 +217,145 @@ UINT CKeybindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	switch (uMsg)
 	{
-	case WM_ACTIVATE:
-		this->ReleaseAll();
-		break;
-
-	case WM_SYSKEYDOWN:
-	case WM_KEYDOWN:
-		if (wParam > 255) break;
-
-		KeyLParam keylp = LParamToKMF(lParam);
-
-		if (wParam == VK_MENU) { this->IsAltHeld = true; }
-		else if (wParam == VK_CONTROL) { this->IsCtrlHeld = true; }
-		else if (wParam == VK_SHIFT) { this->IsShiftHeld = true; }
-
-		// FIXME: this right here should be reworked.
-		// rather than getting the keystate here, the keys should be tracked individually
-		kb.Alt = this->IsAltHeld;
-		kb.Ctrl = this->IsCtrlHeld;
-		kb.Shift = this->IsShiftHeld;
-		kb.Key = keylp.GetScanCode();
-
-		// if shift, ctrl or alt set key to 0
-		if (wParam == 16 || wParam == 17 || wParam == 18)
+		case WM_ACTIVATEAPP:
 		{
-			kb.Key = 0;
+			this->ReleaseAll();
+			break;
 		}
 
-		if (kb == Keybind{})
+		case WM_SYSKEYDOWN:
+		case WM_KEYDOWN:
 		{
-			return uMsg;
-		}
+			if (wParam > 255) break;
 
-		if (keylp.PreviousKeyState)
-		{
-			return uMsg;
-		}
+			KeyLParam keylp = LParamToKMF(lParam);
 
-		if (!this->IsCapturing)
-		{
-			for (auto& it : this->Registry)
+			if (wParam == VK_MENU) { this->IsAltHeld = true; }
+			else if (wParam == VK_CONTROL) { this->IsCtrlHeld = true; }
+			else if (wParam == VK_SHIFT) { this->IsShiftHeld = true; }
+
+			kb.Alt = this->IsAltHeld;
+			kb.Ctrl = this->IsCtrlHeld;
+			kb.Shift = this->IsShiftHeld;
+			kb.Key = keylp.GetScanCode();
+
+			// if shift, ctrl or alt set key to 0
+			if (wParam == VK_SHIFT || wParam == VK_CONTROL || wParam == VK_MENU)
 			{
-				if (kb == it.second.Bind)
-				{
-					/* keybind was found */
-
-					/* explicitly scope for heldbinds and tracked keys */
-					{
-						//const std::lock_guard<std::mutex> lock(this->MutexHeldKeys);
-						if (std::find(this->HeldKeys.begin(), this->HeldKeys.end(), kb.Key) == this->HeldKeys.end())
-						{
-							this->HeldKeys.push_back(kb.Key);
-						}
-
-						/* track the actual bind/id combo too */
-						if (this->HeldKeybinds.find(it.first) == this->HeldKeybinds.end())
-						{
-							this->HeldKeybinds[it.first] = it.second;
-						}
-					}
-
-					if (it.first == KB_TOGGLEHIDEUI)
-					{
-						// invoke but do not return, pass through to game (multi hide)
-						this->Invoke(it.first);
-						break;
-					}
-					else
-					{
-						// if Invoke returns true, pass 0 to the wndproc to stop processing
-						return this->Invoke(it.first) ? 0 : 1;
-					}
-				}
+				kb.Key = 0;
 			}
-		}
-		else
-		{
-			/* store the currently held bind */
-			this->CapturedKeybind = kb;
-		}
 
-		break;
-
-	case WM_SYSKEYUP:
-	case WM_KEYUP:
-		if (wParam > 255) break;
-
-		if (wParam == VK_MENU) { this->IsAltHeld = false; }
-		else if (wParam == VK_CONTROL) { this->IsCtrlHeld = false; }
-		else if (wParam == VK_SHIFT) { this->IsShiftHeld = false; }
-
-		/* only check if not currently setting keybind */
-		if (this->IsCapturing)
-		{
-			return uMsg;
-		}
-
-		std::vector<std::string> heldBindsPop;
-
-		//const std::lock_guard<std::mutex> lock(this->MutexHeldKeys);
-		for (auto& bind : this->HeldKeybinds)
-		{
-			if (wParam == 16 && bind.second.Bind.Shift)
+			if (kb == Keybind{})
 			{
-				this->Invoke(bind.first, true);
-				this->IsShiftHeld = false;
-				heldBindsPop.push_back(bind.first);
+				return uMsg;
 			}
-			else if (wParam == 17 && bind.second.Bind.Ctrl)
+
+			if (keylp.PreviousKeyState)
 			{
-				this->Invoke(bind.first, true);
-				this->IsCtrlHeld = false;
-				heldBindsPop.push_back(bind.first);
+				return uMsg;
 			}
-			else if (wParam == 18 && bind.second.Bind.Alt)
+
+			if (this->IsCapturing)
 			{
-				this->Invoke(bind.first, true);
-				this->IsAltHeld = false;
-				heldBindsPop.push_back(bind.first);
+				/* store the currently held bind */
+				this->CapturedKeybind = kb;
+
+				/* prevent invoking keybinds */
+				break;
+			}
+
+			auto heldBind = std::find_if(this->Registry.begin(), this->Registry.end(), [kb](auto activeKeybind) { return activeKeybind.second.Bind == kb; });
+			
+			if (heldBind == this->Registry.end()) /* if held bind does not match any registered */
+			{
+				break;
+			}
+
+			if (std::find(this->HeldKeys.begin(), this->HeldKeys.end(), kb.Key) == this->HeldKeys.end())
+			{
+				this->HeldKeys.push_back(kb.Key);
+			}
+
+			/* track the actual bind/id combo too */
+			if (this->HeldKeybinds.find(heldBind->first) == this->HeldKeybinds.end())
+			{
+				this->HeldKeybinds[heldBind->first] = heldBind->second;
+			}
+
+			if (heldBind->first == KB_TOGGLEHIDEUI)
+			{
+				// invoke but do not return, pass through to game (multi hide)
+				this->Invoke(heldBind->first);
+				break;
 			}
 			else
 			{
-				KeyLParam keylp = LParamToKMF(lParam);
-				unsigned short scanCode = keylp.GetScanCode();
+				// if Invoke returns true, pass 0 to the wndproc to stop processing
+				return this->Invoke(heldBind->first) ? 0 : 1;
+			}
 
-				if (scanCode == bind.second.Bind.Key)
+			break;
+		}
+
+		case WM_SYSKEYUP:
+		case WM_KEYUP:
+		{
+			if (wParam > 255) break;
+
+			if (wParam == VK_MENU) { this->IsAltHeld = false; }
+			else if (wParam == VK_CONTROL) { this->IsCtrlHeld = false; }
+			else if (wParam == VK_SHIFT) { this->IsShiftHeld = false; }
+
+			/* only check if not currently setting keybind */
+			if (this->IsCapturing)
+			{
+				return uMsg;
+			}
+
+			std::vector<std::string> heldBindsPop;
+
+			//const std::lock_guard<std::mutex> lock(this->MutexHeldKeys);
+			for (auto& bind : this->HeldKeybinds)
+			{
+				if (wParam == VK_SHIFT && bind.second.Bind.Shift)
 				{
 					this->Invoke(bind.first, true);
-					this->HeldKeys.erase(std::find(this->HeldKeys.begin(), this->HeldKeys.end(), scanCode));
+					this->IsShiftHeld = false;
 					heldBindsPop.push_back(bind.first);
 				}
+				else if (wParam == VK_CONTROL && bind.second.Bind.Ctrl)
+				{
+					this->Invoke(bind.first, true);
+					this->IsCtrlHeld = false;
+					heldBindsPop.push_back(bind.first);
+				}
+				else if (wParam == VK_MENU && bind.second.Bind.Alt)
+				{
+					this->Invoke(bind.first, true);
+					this->IsAltHeld = false;
+					heldBindsPop.push_back(bind.first);
+				}
+				else
+				{
+					KeyLParam keylp = LParamToKMF(lParam);
+					unsigned short scanCode = keylp.GetScanCode();
+
+					if (scanCode == bind.second.Bind.Key)
+					{
+						this->Invoke(bind.first, true);
+						this->HeldKeys.erase(std::find(this->HeldKeys.begin(), this->HeldKeys.end(), scanCode));
+						heldBindsPop.push_back(bind.first);
+					}
+				}
 			}
-		}
 
-		for (auto bind : heldBindsPop)
-		{
-			this->HeldKeybinds.erase(bind);
-		}
+			for (auto bind : heldBindsPop)
+			{
+				this->HeldKeybinds.erase(bind);
+			}
 
-		break;
+			break;
+		}
 	}
 
 	// don't pass keys to game if currently editing keybinds
@@ -434,7 +434,7 @@ std::string CKeybindApi::IsInUse(Keybind aKeybind)
 	if (aKeybind == Keybind{}) { return ""; }
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
-	
+
 	/* check if another identifier, already uses the keybind */
 	for (auto& [identifier, keybind] : this->Registry)
 	{
@@ -480,19 +480,19 @@ bool CKeybindApi::Invoke(std::string aIdentifier, bool aIsRelease)
 			bind.HandlerType == EKeybindHandlerType::DownAndRelease)
 		{
 			std::thread([aIdentifier, type, handlerFunc, aIsRelease]()
+			{
+				switch (type)
 				{
-					switch (type)
-					{
 					case EKeybindHandlerType::DownOnly:
 						((KEYBINDS_PROCESS)handlerFunc)(aIdentifier.c_str());
 						break;
 					case EKeybindHandlerType::DownAndRelease:
 						((KEYBINDS_PROCESS2)handlerFunc)(aIdentifier.c_str(), aIsRelease);
 						break;
-					}
-				}).detach();
+				}
+			}).detach();
 
-				called = true;
+			called = true;
 		}
 	}
 
@@ -540,14 +540,19 @@ Keybind CKeybindApi::GetCapturedKeybind() const
 
 void CKeybindApi::StartCapturing()
 {
-	this->IsCapturing = true;
+	if (!this->IsCapturing)
+	{
+		this->ReleaseAll();
+	}
 
-	this->ReleaseAll();
+	this->IsCapturing = true;
 }
 
 void CKeybindApi::EndCapturing()
 {
 	this->IsCapturing = false;
+
+	this->ReleaseAll();
 
 	CapturedKeybind = Keybind{};
 }
