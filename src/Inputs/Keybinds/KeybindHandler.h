@@ -185,7 +185,6 @@ private:
 	bool									IsCapturing;
 	Keybind									CapturedKeybind;
 
-	//mutable std::mutex						MutexHeldKeys;
 	bool									IsAltHeld;
 	bool									IsCtrlHeld;
 	bool									IsShiftHeld;

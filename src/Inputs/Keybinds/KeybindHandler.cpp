@@ -227,11 +227,15 @@ UINT CKeybindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		KeyLParam keylp = LParamToKMF(lParam);
 
+		if (wParam == VK_MENU) { this->IsAltHeld = true; }
+		else if (wParam == VK_CONTROL) { this->IsCtrlHeld = true; }
+		else if (wParam == VK_SHIFT) { this->IsShiftHeld = true; }
+
 		// FIXME: this right here should be reworked.
 		// rather than getting the keystate here, the keys should be tracked individually
-		kb.Alt = GetKeyState(VK_MENU) & 0x8000;
-		kb.Ctrl = GetKeyState(VK_CONTROL) & 0x8000;
-		kb.Shift = GetKeyState(VK_SHIFT) & 0x8000;
+		kb.Alt = this->IsAltHeld;
+		kb.Ctrl = this->IsCtrlHeld;
+		kb.Shift = this->IsShiftHeld;
 		kb.Key = keylp.GetScanCode();
 
 		// if shift, ctrl or alt set key to 0
@@ -257,11 +261,6 @@ UINT CKeybindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				if (kb == it.second.Bind)
 				{
 					/* keybind was found */
-
-					/* track these keys for the release event */
-					if (kb.Alt) { this->IsAltHeld = true; }
-					if (kb.Ctrl) { this->IsCtrlHeld = true; }
-					if (kb.Shift) { this->IsShiftHeld = true; }
 
 					/* explicitly scope for heldbinds and tracked keys */
 					{
@@ -303,6 +302,10 @@ UINT CKeybindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_SYSKEYUP:
 	case WM_KEYUP:
 		if (wParam > 255) break;
+
+		if (wParam == VK_MENU) { this->IsAltHeld = false; }
+		else if (wParam == VK_CONTROL) { this->IsCtrlHeld = false; }
+		else if (wParam == VK_SHIFT) { this->IsShiftHeld = false; }
 
 		/* only check if not currently setting keybind */
 		if (this->IsCapturing)
