@@ -142,7 +142,6 @@ namespace GUI
 					ImGui::SetCursorPos(ImVec2(actionsWidth - (size * Renderer::Scaling), ImGui::GetCursorPosY()));
 					if (ImGui::ImageButton(BtnOptions->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
 					{
-						Logger->Debug("Nexus GUI", "Opened addon settings");
 						ConfirmUninstall = false;
 					}
 					if (ImGui::BeginPopupContextItem("##AddonItemActionsMore"))
