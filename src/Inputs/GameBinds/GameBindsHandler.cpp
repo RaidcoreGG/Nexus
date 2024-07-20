@@ -16,165 +16,6 @@
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
-CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, CEventApi* aEventApi)
-{
-	this->RawInputApi = aRawInputApi;
-	this->Logger = aLogger;
-	this->EventApi = aEventApi;
-
-	this->Load();
-	this->AddDefaultBinds();
-
-	CGameBindsApi::EnableUEKeybindUpdates(this);
-	this->EventApi->Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEKeybindChanged);
-
-	//ASSERT(this->RawInputApi);
-	//ASSERT(this->Logger);
-}
-
-CGameBindsApi::~CGameBindsApi()
-{
-	CGameBindsApi::DisableUEKeybindUpdates();
-	this->EventApi->Unsubscribe(EV_UE_KB_CH, CGameBindsApi::OnUEKeybindChanged);
-
-	this->RawInputApi = nullptr;
-	this->Logger = nullptr;
-	this->EventApi = nullptr;
-}
-
-void CGameBindsApi::PressAsync(EGameBinds aGameBind)
-{
-	std::thread([this, aGameBind]() {
-		this->Press(aGameBind);
-	}).detach();
-}
-
-void CGameBindsApi::ReleaseAsync(EGameBinds aGameBind)
-{
-	std::thread([this, aGameBind]() {
-		this->Release(aGameBind);
-	}).detach();
-}
-
-void CGameBindsApi::InvokeAsync(EGameBinds aGameBind, int aDuration)
-{
-	std::thread([this, aGameBind, aDuration]() {
-		this->Press(aGameBind);
-		Sleep(aDuration);
-		this->Release(aGameBind);
-	}).detach();
-}
-
-void CGameBindsApi::Press(EGameBinds aGameBind)
-{
-	Keybind kb = this->Get(aGameBind);
-
-	if (!kb.IsBound())
-	{
-		return;
-	}
-
-	KeyLParam key{};
-	key.RepeatCount = 1;
-	key.ScanCode = kb.Key;
-	key.ExtendedFlag = (kb.Key & 0xE000) != 0;
-	key.Reserved = 0;
-	key.ContextCode = kb.Alt;
-	key.PreviousKeyState = 0;
-	key.TransitionState = 0;
-
-	if (kb.Alt)
-	{
-		this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYDOWN, VK_MENU, GetKeyMessageLPARAM(VK_MENU, true, true));
-	}
-	if (kb.Ctrl)
-	{
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_CONTROL, GetKeyMessageLPARAM(VK_CONTROL, true, false));
-	}
-	if (kb.Shift)
-	{
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, true, false));
-	}
-
-	this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, MapVirtualKeyA(kb.Key, MAPVK_VSC_TO_VK), KMFToLParam(key));
-}
-
-void CGameBindsApi::Release(EGameBinds aGameBind)
-{
-	Keybind kb = this->Get(aGameBind);
-
-	if (!kb.IsBound())
-	{
-		return;
-	}
-
-	KeyLParam key{};
-	key.RepeatCount = 1;
-	key.ScanCode = kb.Key;
-	key.ExtendedFlag = (kb.Key & 0xE000) != 0;
-	key.Reserved = 0;
-	key.ContextCode = kb.Alt;
-	key.PreviousKeyState = 1;
-	key.TransitionState = 1;
-
-	this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, MapVirtualKeyA(kb.Key, MAPVK_VSC_TO_VK), KMFToLParam(key));
-
-	if (kb.Alt)
-	{
-		this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYUP, VK_MENU, GetKeyMessageLPARAM(VK_MENU, false, true));
-	}
-	if (kb.Ctrl)
-	{
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, VK_CONTROL, GetKeyMessageLPARAM(VK_CONTROL, false, false));
-	}
-	if (kb.Shift)
-	{
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, false, false));
-	}
-}
-
-bool CGameBindsApi::IsBound(EGameBinds aGameBind)
-{
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	return this->Registry[aGameBind].IsBound();
-}
-
-void CGameBindsApi::Import(std::filesystem::path aPath)
-{
-	return;
-}
-
-Keybind CGameBindsApi::Get(EGameBinds aGameBind)
-{
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	return this->Registry[aGameBind];
-}
-
-void CGameBindsApi::Set(EGameBinds aGameBind, Keybind aKeybind, bool aIsRuntimeBind)
-{
-	{
-		const std::lock_guard<std::mutex> lock(this->Mutex);
-
-		this->Registry[aGameBind] = aKeybind;
-
-		if (aIsRuntimeBind)
-		{
-			this->IsReceivingRuntimeBinds = true;
-		}
-	}
-
-	this->Save();
-}
-
-std::map<EGameBinds, Keybind> CGameBindsApi::GetRegistry() const
-{
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	return this->Registry;
-}
-
 std::string CGameBindsApi::ToString(EGameBinds aGameBind)
 {
 	static std::map<EGameBinds, std::string> LookupTable =
@@ -776,6 +617,165 @@ void CGameBindsApi::OnUEKeybindChanged(void* aData)
 	}
 
 	UEKeybindUpdatesTarget->Set(kbChange->Identifier, kb, true);
+}
+
+CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, CEventApi* aEventApi)
+{
+	this->RawInputApi = aRawInputApi;
+	this->Logger = aLogger;
+	this->EventApi = aEventApi;
+
+	this->Load();
+	this->AddDefaultBinds();
+
+	CGameBindsApi::EnableUEKeybindUpdates(this);
+	this->EventApi->Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEKeybindChanged);
+
+	//ASSERT(this->RawInputApi);
+	//ASSERT(this->Logger);
+}
+
+CGameBindsApi::~CGameBindsApi()
+{
+	CGameBindsApi::DisableUEKeybindUpdates();
+	this->EventApi->Unsubscribe(EV_UE_KB_CH, CGameBindsApi::OnUEKeybindChanged);
+
+	this->RawInputApi = nullptr;
+	this->Logger = nullptr;
+	this->EventApi = nullptr;
+}
+
+void CGameBindsApi::PressAsync(EGameBinds aGameBind)
+{
+	std::thread([this, aGameBind]() {
+		this->Press(aGameBind);
+	}).detach();
+}
+
+void CGameBindsApi::ReleaseAsync(EGameBinds aGameBind)
+{
+	std::thread([this, aGameBind]() {
+		this->Release(aGameBind);
+	}).detach();
+}
+
+void CGameBindsApi::InvokeAsync(EGameBinds aGameBind, int aDuration)
+{
+	std::thread([this, aGameBind, aDuration]() {
+		this->Press(aGameBind);
+		Sleep(aDuration);
+		this->Release(aGameBind);
+	}).detach();
+}
+
+void CGameBindsApi::Press(EGameBinds aGameBind)
+{
+	Keybind kb = this->Get(aGameBind);
+
+	if (!kb.IsBound())
+	{
+		return;
+	}
+
+	KeyLParam key{};
+	key.RepeatCount = 1;
+	key.ScanCode = kb.Key;
+	key.ExtendedFlag = (kb.Key & 0xE000) != 0;
+	key.Reserved = 0;
+	key.ContextCode = kb.Alt;
+	key.PreviousKeyState = 0;
+	key.TransitionState = 0;
+
+	if (kb.Alt)
+	{
+		this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYDOWN, VK_MENU, GetKeyMessageLPARAM(VK_MENU, true, true));
+	}
+	if (kb.Ctrl)
+	{
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_CONTROL, GetKeyMessageLPARAM(VK_CONTROL, true, false));
+	}
+	if (kb.Shift)
+	{
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, true, false));
+	}
+
+	this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, MapVirtualKeyA(kb.Key, MAPVK_VSC_TO_VK), KMFToLParam(key));
+}
+
+void CGameBindsApi::Release(EGameBinds aGameBind)
+{
+	Keybind kb = this->Get(aGameBind);
+
+	if (!kb.IsBound())
+	{
+		return;
+	}
+
+	KeyLParam key{};
+	key.RepeatCount = 1;
+	key.ScanCode = kb.Key;
+	key.ExtendedFlag = (kb.Key & 0xE000) != 0;
+	key.Reserved = 0;
+	key.ContextCode = kb.Alt;
+	key.PreviousKeyState = 1;
+	key.TransitionState = 1;
+
+	this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, MapVirtualKeyA(kb.Key, MAPVK_VSC_TO_VK), KMFToLParam(key));
+
+	if (kb.Alt)
+	{
+		this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYUP, VK_MENU, GetKeyMessageLPARAM(VK_MENU, false, true));
+	}
+	if (kb.Ctrl)
+	{
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, VK_CONTROL, GetKeyMessageLPARAM(VK_CONTROL, false, false));
+	}
+	if (kb.Shift)
+	{
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, false, false));
+	}
+}
+
+bool CGameBindsApi::IsBound(EGameBinds aGameBind)
+{
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	return this->Registry[aGameBind].IsBound();
+}
+
+void CGameBindsApi::Import(std::filesystem::path aPath)
+{
+	return;
+}
+
+Keybind CGameBindsApi::Get(EGameBinds aGameBind)
+{
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	return this->Registry[aGameBind];
+}
+
+void CGameBindsApi::Set(EGameBinds aGameBind, Keybind aKeybind, bool aIsRuntimeBind)
+{
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		this->Registry[aGameBind] = aKeybind;
+
+		if (aIsRuntimeBind)
+		{
+			this->IsReceivingRuntimeBinds = true;
+		}
+	}
+
+	this->Save();
+}
+
+std::map<EGameBinds, Keybind> CGameBindsApi::GetRegistry() const
+{
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	return this->Registry;
 }
 
 void CGameBindsApi::AddDefaultBinds()

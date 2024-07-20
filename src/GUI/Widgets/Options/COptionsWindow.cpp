@@ -485,7 +485,7 @@ namespace GUI
 						KBCat cat{};
 						cat.Name = owner;
 						cat.Keybinds[identifier] = { 
-							Keybinds::KBToString(keybind.Bind, true),
+							CKeybindApi::KBToString(keybind.Bind, true),
 							keybind
 						};
 						KeybindCategoryMap.push_back(cat);
@@ -493,7 +493,7 @@ namespace GUI
 					else
 					{
 						it->Keybinds[identifier] = {
-							Keybinds::KBToString(keybind.Bind, true),
+							CKeybindApi::KBToString(keybind.Bind, true),
 							keybind
 						};
 					}
@@ -582,7 +582,7 @@ namespace GUI
 				}
 				else
 				{
-					ImGui::Text(Keybinds::KBToString(currKeybind, true).c_str());
+					ImGui::Text(CKeybindApi::KBToString(currKeybind, true).c_str());
 				}
 
 				bool overwriting = false;
@@ -673,7 +673,7 @@ namespace GUI
 						cat.Name = catName;
 						cat.GameKeybinds[identifier] = {
 							CGameBindsApi::ToString(identifier),
-							Keybinds::KBToString(keybind, true),
+							CKeybindApi::KBToString(keybind, true),
 							keybind
 						};
 						GameKeybindCategoryMap.push_back(cat);
@@ -682,7 +682,7 @@ namespace GUI
 					{
 						it->GameKeybinds[identifier] = {
 							CGameBindsApi::ToString(identifier),
-							Keybinds::KBToString(keybind, true),
+							CKeybindApi::KBToString(keybind, true),
 							keybind
 						};
 					}
@@ -749,7 +749,7 @@ namespace GUI
 				}
 				else
 				{
-					ImGui::Text(Keybinds::KBToString(currKeybind, true).c_str());
+					ImGui::Text(CKeybindApi::KBToString(currKeybind, true).c_str());
 				}
 
 				bool close = false;

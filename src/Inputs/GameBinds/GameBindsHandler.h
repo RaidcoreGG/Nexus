@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <map>
 #include <mutex>
+#include <string>
 
 #include "EGameBinds.h"
 
@@ -27,7 +28,44 @@ constexpr const char* EV_UE_KB_CH = "EV_UNOFFICIAL_EXTRAS_KEYBIND_CHANGED";
 
 class CGameBindsApi
 {
-public:
+	public:
+	///----------------------------------------------------------------------------------------------------
+	/// ToString:
+	/// 	Returns the unlocalized identifier of a game bind.
+	///----------------------------------------------------------------------------------------------------
+	static std::string ToString(EGameBinds aGameBind);
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetCategory:
+	/// 	Returns the unlocalized category of a game bind.
+	///----------------------------------------------------------------------------------------------------
+	static std::string GetCategory(EGameBinds aGameBind);
+
+	///----------------------------------------------------------------------------------------------------
+	/// GameBindCodeToScanCode:
+	/// 	Converts a scan code from the game to a regular scan code.
+	///----------------------------------------------------------------------------------------------------
+	static unsigned short GameBindCodeToScanCode(unsigned short aGameScanCode);
+
+	///----------------------------------------------------------------------------------------------------
+	/// EnableUEKeybindUpdates:
+	/// 	Enables Unofficial Extras keybind updates for the passed API.
+	///----------------------------------------------------------------------------------------------------
+	static void EnableUEKeybindUpdates(CGameBindsApi* aGameBindsApi);
+
+	///----------------------------------------------------------------------------------------------------
+	/// DisableUEKeybindUpdates:
+	/// 	Disables Unofficial Extras keybind updates.
+	///----------------------------------------------------------------------------------------------------
+	static void DisableUEKeybindUpdates();
+
+	///----------------------------------------------------------------------------------------------------
+	/// OnUEKeybindChanged:
+	/// 	Receives runtime keybind updates from Unofficial Extras.
+	///----------------------------------------------------------------------------------------------------
+	static void OnUEKeybindChanged(void* aData);
+
+	public:
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
@@ -98,52 +136,16 @@ public:
 	///----------------------------------------------------------------------------------------------------
 	std::map<EGameBinds, Keybind> GetRegistry() const;
 
-	///----------------------------------------------------------------------------------------------------
-	/// ToString:
-	/// 	Returns the unlocalized identifier of a game bind.
-	///----------------------------------------------------------------------------------------------------
-	static std::string ToString(EGameBinds aGameBind);
-
-	///----------------------------------------------------------------------------------------------------
-	/// GetCategory:
-	/// 	Returns the unlocalized category of a game bind.
-	///----------------------------------------------------------------------------------------------------
-	static std::string GetCategory(EGameBinds aGameBind);
-
-	///----------------------------------------------------------------------------------------------------
-	/// GameBindCodeToScanCode:
-	/// 	Converts a scan code from the game to a regular scan code.
-	///----------------------------------------------------------------------------------------------------
-	static unsigned short GameBindCodeToScanCode(unsigned short aGameScanCode);
-
-	///----------------------------------------------------------------------------------------------------
-	/// EnableUEKeybindUpdates:
-	/// 	Enables Unofficial Extras keybind updates for the passed API.
-	///----------------------------------------------------------------------------------------------------
-	static void EnableUEKeybindUpdates(CGameBindsApi* aGameBindsApi);
-
-	///----------------------------------------------------------------------------------------------------
-	/// DisableUEKeybindUpdates:
-	/// 	Disables Unofficial Extras keybind updates.
-	///----------------------------------------------------------------------------------------------------
-	static void DisableUEKeybindUpdates();
-
-	///----------------------------------------------------------------------------------------------------
-	/// OnUEKeybindChanged:
-	/// 	Receives runtime keybind updates from Unofficial Extras.
-	///----------------------------------------------------------------------------------------------------
-	static void OnUEKeybindChanged(void* aData);
-
-private:
-	CRawInputApi*					RawInputApi;
-	CLogHandler*					Logger;
-	CEventApi*						EventApi;
+	private:
+	CRawInputApi* RawInputApi;
+	CLogHandler* Logger;
+	CEventApi* EventApi;
 
 	mutable std::mutex				Mutex;
 	std::map<EGameBinds, Keybind>	Registry;
 
 	bool							IsReceivingRuntimeBinds;
-	
+
 	///----------------------------------------------------------------------------------------------------
 	/// AddDefaultBinds:
 	/// 	Adds the default binds, if they don't already exist.

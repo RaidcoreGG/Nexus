@@ -26,155 +26,6 @@ using json = nlohmann::json;
 
 namespace Keybinds
 {
-	static bool IsLookupTableBuilt = false;
-	static std::map<unsigned short, std::string> ScancodeLookupTable;
-	void BuildscanCodeLookupTable()
-	{
-		if (IsLookupTableBuilt) { return; }
-
-		for (long long i = 0; i < 255; i++)
-		{
-			KeyLParam key{};
-			key.ScanCode = i;
-			char* buff = new char[64];
-			std::string str;
-			GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, 64);
-			str.append(buff);
-
-			ScancodeLookupTable[key.GetScanCode()] = str;
-
-			key.ExtendedFlag = 1;
-			buff = new char[64];
-			str = "";
-			GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, 64);
-			str.append(buff);
-
-			ScancodeLookupTable[key.GetScanCode()] = str;
-
-			delete[] buff;
-		};
-	}
-
-	std::string ScancodeToString(unsigned short aScanCode)
-	{
-		if (!IsLookupTableBuilt)
-		{
-			BuildscanCodeLookupTable();
-		}
-
-		auto it = ScancodeLookupTable.find(aScanCode);
-		if (it != ScancodeLookupTable.end())
-		{
-			return it->second;
-		}
-
-		return "";
-	}
-
-	Keybind KBFromString(std::string aKeybind)
-	{
-		if (!IsLookupTableBuilt)
-		{
-			BuildscanCodeLookupTable();
-		}
-
-		Keybind kb{};
-
-		if (aKeybind == "(null)" || aKeybind == "(NULL)") { return kb; }
-
-		aKeybind = String::ToUpper(aKeybind);
-		std::string delimiter = "+";
-
-		size_t pos = 0;
-		std::string token;
-		while ((pos = aKeybind.find(delimiter)) != std::string::npos)
-		{
-			token = aKeybind.substr(0, pos);
-			aKeybind.erase(0, pos + delimiter.length());
-
-			if (token == "ALT")
-			{
-				kb.Alt = true;
-			}
-			else if (token == "CTRL")
-			{
-				kb.Ctrl = true;
-			}
-			else if (token == "SHIFT")
-			{
-				kb.Shift = true;
-			}
-		}
-
-		for (auto it = ScancodeLookupTable.begin(); it != ScancodeLookupTable.end(); ++it)
-		{
-			if (it->second == aKeybind)
-			{
-				kb.Key = it->first;
-				break;
-			}
-		}
-
-		return kb;
-	}
-
-	std::string KBToString(Keybind aKeybind, bool padded)
-	{
-		if (!IsLookupTableBuilt)
-		{
-			BuildscanCodeLookupTable();
-		}
-
-		if (!aKeybind.Key) { return "(null)"; }
-
-		char* buff = new char[100];
-		std::string str;
-
-		if (aKeybind.Alt)
-		{
-			GetKeyNameTextA(MapVirtualKeyA(VK_MENU, MAPVK_VK_TO_VSC) << 16, buff, 100);
-			str.append(buff);
-			str.append(padded ? " + " : "+");
-		}
-
-		if (aKeybind.Ctrl)
-		{
-			GetKeyNameTextA(MapVirtualKeyA(VK_CONTROL, MAPVK_VK_TO_VSC) << 16, buff, 100);
-			str.append(buff);
-			str.append(padded ? " + " : "+");
-		}
-
-		if (aKeybind.Shift)
-		{
-			GetKeyNameTextA(MapVirtualKeyA(VK_SHIFT, MAPVK_VK_TO_VSC) << 16, buff, 100);
-			str.append(buff);
-			str.append(padded ? " + " : "+");
-		}
-
-		HKL hkl = GetKeyboardLayout(0);
-		UINT vk = MapVirtualKeyA(aKeybind.Key, MAPVK_VSC_TO_VK);
-
-		if (vk >= 65 && vk <= 90 || vk >= 48 && vk <= 57)
-		{
-			GetKeyNameTextA(aKeybind.Key << 16, buff, 100);
-			str.append(buff);
-		}
-		else
-		{
-			auto it = ScancodeLookupTable.find(aKeybind.Key);
-			if (it != ScancodeLookupTable.end())
-			{
-				str.append(it->second);
-			}
-		}
-
-		delete[] buff;
-
-		str = String::ToUpper(str);
-
-		return String::ConvertMBToUTF8(str);
-	}
-
 	void ADDONAPI_RegisterWithString(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const char* aKeybind)
 	{
 		KeybindApi->Register(aIdentifier, EKeybindHandlerType::DownOnly, aKeybindHandler, aKeybind);
@@ -204,6 +55,156 @@ namespace Keybinds
 	{
 		KeybindApi->Deregister(aIdentifier);
 	}
+}
+
+static bool IsLookupTableBuilt = false;
+static std::map<unsigned short, std::string> ScancodeLookupTable;
+
+void BuildscanCodeLookupTable()
+{
+	if (IsLookupTableBuilt) { return; }
+
+	for (long long i = 0; i < 255; i++)
+	{
+		KeyLParam key{};
+		key.ScanCode = i;
+		char* buff = new char[64];
+		std::string str;
+		GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, 64);
+		str.append(buff);
+
+		ScancodeLookupTable[key.GetScanCode()] = str;
+
+		key.ExtendedFlag = 1;
+		buff = new char[64];
+		str = "";
+		GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, 64);
+		str.append(buff);
+
+		ScancodeLookupTable[key.GetScanCode()] = str;
+
+		delete[] buff;
+	};
+}
+
+std::string CKeybindApi::ScancodeToString(unsigned short aScanCode)
+{
+	if (!IsLookupTableBuilt)
+	{
+		BuildscanCodeLookupTable();
+	}
+
+	auto it = ScancodeLookupTable.find(aScanCode);
+	if (it != ScancodeLookupTable.end())
+	{
+		return it->second;
+	}
+
+	return "";
+}
+
+Keybind CKeybindApi::KBFromString(std::string aKeybind)
+{
+	if (!IsLookupTableBuilt)
+	{
+		BuildscanCodeLookupTable();
+	}
+
+	Keybind kb{};
+
+	if (aKeybind == "(null)" || aKeybind == "(NULL)") { return kb; }
+
+	aKeybind = String::ToUpper(aKeybind);
+	std::string delimiter = "+";
+
+	size_t pos = 0;
+	std::string token;
+	while ((pos = aKeybind.find(delimiter)) != std::string::npos)
+	{
+		token = aKeybind.substr(0, pos);
+		aKeybind.erase(0, pos + delimiter.length());
+
+		if (token == "ALT")
+		{
+			kb.Alt = true;
+		}
+		else if (token == "CTRL")
+		{
+			kb.Ctrl = true;
+		}
+		else if (token == "SHIFT")
+		{
+			kb.Shift = true;
+		}
+	}
+
+	for (auto it = ScancodeLookupTable.begin(); it != ScancodeLookupTable.end(); ++it)
+	{
+		if (it->second == aKeybind)
+		{
+			kb.Key = it->first;
+			break;
+		}
+	}
+
+	return kb;
+}
+
+std::string CKeybindApi::KBToString(Keybind aKeybind, bool padded)
+{
+	if (!IsLookupTableBuilt)
+	{
+		BuildscanCodeLookupTable();
+	}
+
+	if (!aKeybind.Key) { return "(null)"; }
+
+	char* buff = new char[100];
+	std::string str;
+
+	if (aKeybind.Alt)
+	{
+		GetKeyNameTextA(MapVirtualKeyA(VK_MENU, MAPVK_VK_TO_VSC) << 16, buff, 100);
+		str.append(buff);
+		str.append(padded ? " + " : "+");
+	}
+
+	if (aKeybind.Ctrl)
+	{
+		GetKeyNameTextA(MapVirtualKeyA(VK_CONTROL, MAPVK_VK_TO_VSC) << 16, buff, 100);
+		str.append(buff);
+		str.append(padded ? " + " : "+");
+	}
+
+	if (aKeybind.Shift)
+	{
+		GetKeyNameTextA(MapVirtualKeyA(VK_SHIFT, MAPVK_VK_TO_VSC) << 16, buff, 100);
+		str.append(buff);
+		str.append(padded ? " + " : "+");
+	}
+
+	HKL hkl = GetKeyboardLayout(0);
+	UINT vk = MapVirtualKeyA(aKeybind.Key, MAPVK_VSC_TO_VK);
+
+	if (vk >= 65 && vk <= 90 || vk >= 48 && vk <= 57)
+	{
+		GetKeyNameTextA(aKeybind.Key << 16, buff, 100);
+		str.append(buff);
+	}
+	else
+	{
+		auto it = ScancodeLookupTable.find(aKeybind.Key);
+		if (it != ScancodeLookupTable.end())
+		{
+			str.append(it->second);
+		}
+	}
+
+	delete[] buff;
+
+	str = String::ToUpper(str);
+
+	return String::ConvertMBToUTF8(str);
 }
 
 CKeybindApi::CKeybindApi()
@@ -265,7 +266,7 @@ UINT CKeybindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 
 			auto heldBind = std::find_if(this->Registry.begin(), this->Registry.end(), [kb](auto activeKeybind) { return activeKeybind.second.Bind == kb; });
-			
+
 			if (heldBind == this->Registry.end()) /* if held bind does not match any registered */
 			{
 				break;
@@ -372,7 +373,7 @@ UINT CKeybindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void CKeybindApi::Register(const char* aIdentifier, EKeybindHandlerType aKeybindHandlerType, void* aKeybindHandler, const char* aKeybind)
 {
-	Keybind requestedBind = Keybinds::KBFromString(aKeybind);
+	Keybind requestedBind = CKeybindApi::KBFromString(aKeybind);
 	this->Register(aIdentifier, aKeybindHandlerType, aKeybindHandler, requestedBind);
 }
 
