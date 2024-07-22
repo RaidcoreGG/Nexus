@@ -132,7 +132,7 @@ namespace GUI
 				AddonsTab();
 				StyleTab();
 				KeybindsTab();
-				//GameKeybindsTab();
+				GameKeybindsTab();
 				//APITab();
 				ChangelogTab();
 
