@@ -52,22 +52,22 @@ namespace TextureLoader
 
 	void ADDONAPI_LoadFromFile(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback)
 	{
-		TextureService->Load(aIdentifier, aFilename, aCallback);
+		TextureService->Load(aIdentifier, aFilename, aCallback, true);
 	}
 	
 	void ADDONAPI_LoadFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback)
 	{
-		TextureService->Load(aIdentifier, aResourceID, aModule, aCallback);
+		TextureService->Load(aIdentifier, aResourceID, aModule, aCallback, true);
 	}
 	
 	void ADDONAPI_LoadFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback)
 	{
-		TextureService->Load(aIdentifier, aRemote, aEndpoint, aCallback);
+		TextureService->Load(aIdentifier, aRemote, aEndpoint, aCallback, true);
 	}
 	
 	void ADDONAPI_LoadFromMemory(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback)
 	{
-		TextureService->Load(aIdentifier, aData, aSize, aCallback);
+		TextureService->Load(aIdentifier, aData, aSize, aCallback, true);
 	}
 }
 
@@ -162,13 +162,13 @@ Texture* CTextureLoader::GetOrCreate(const char* aIdentifier, void* aData, size_
 	return result;
 }
 
-void CTextureLoader::Load(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback)
+void CTextureLoader::Load(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback, bool aIsShadowing)
 {
 	//Logger->Info(CH_TEXTURES, "this->LoadFromFile(aIdentifier: %s, aFilename: %s, aCallback: %p)", aIdentifier, aFilename, aCallback);
 
 	std::string str = aIdentifier;
 
-	Texture* tex = this->Get(str.c_str());
+	Texture* tex = aIsShadowing ? nullptr : this->Get(str.c_str());
 	if (tex != nullptr)
 	{
 		if (aCallback)
@@ -196,13 +196,13 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aFilename, TEXTUR
 	this->QueueTexture(aIdentifier, image_data, image_width, image_height, aCallback);
 }
 
-void CTextureLoader::Load(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback)
+void CTextureLoader::Load(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback, bool aIsShadowing)
 {
 	//Logger->Info(CH_TEXTURES, "this->LoadFromResource(aIdentifier: %s, aResourceID: %u, aModule: %p, aCallback: %p)", aIdentifier, aResourceID, aModule, aCallback);
 
 	std::string str = aIdentifier;
 
-	Texture* tex = this->Get(str.c_str());
+	Texture* tex = aIsShadowing ? nullptr : this->Get(str.c_str());
 	if (tex != nullptr)
 	{
 		if (aCallback)
@@ -252,13 +252,13 @@ void CTextureLoader::Load(const char* aIdentifier, unsigned aResourceID, HMODULE
 	this->QueueTexture(str.c_str(), image_data, image_width, image_height, aCallback);
 }
 
-void CTextureLoader::Load(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback)
+void CTextureLoader::Load(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback, bool aIsShadowing)
 {
 	//Logger->Info(CH_TEXTURES, "this->LoadFromURL(aIdentifier: %s, aRemote: %s, aEndpoint: %s, aCallback: %p)", aIdentifier, aRemote, aEndpoint, aCallback);
 
 	std::string str = aIdentifier;
 
-	Texture* tex = this->Get(str.c_str());
+	Texture* tex = aIsShadowing ? nullptr : this->Get(str.c_str());
 	if (tex != nullptr)
 	{
 		if (aCallback)
@@ -309,13 +309,13 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aRemote, const ch
 	}).detach();
 }
 
-void CTextureLoader::Load(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback)
+void CTextureLoader::Load(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback, bool aIsShadowing)
 {
 	//Logger->Info(CH_TEXTURES, "this->LoadFromMemory(aIdentifier: %s, aData: %p, aSize: %u, aCallback: %p)", aIdentifier, aData, aSize, aCallback);
 
 	std::string str = aIdentifier;
 
-	Texture* tex = this->Get(str.c_str());
+	Texture* tex = aIsShadowing ? nullptr : this->Get(str.c_str());
 	if (tex != nullptr)
 	{
 		if (aCallback)
