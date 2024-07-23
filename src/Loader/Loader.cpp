@@ -179,7 +179,12 @@ namespace Loader
 				while (Addons.size() != 0)
 				{
 					UnloadAddon(Addons.front()->Path);
-					Addons.erase(Addons.begin());
+
+					/* sanity check in case UnloadAddon removes the entry, because the file is no longer on disk. */
+					if (Addons.size() != 0)
+					{
+						Addons.erase(Addons.begin());
+					}
 				}
 			}
 		}
