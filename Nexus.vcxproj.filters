@@ -369,6 +369,9 @@
     <ClCompile Include="src\Util\Inputs.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+    <ClCompile Include="src\Loader\AddonVersion.cpp">
+      <Filter>Loader\Structs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h">
@@ -1123,6 +1126,9 @@
     </ClInclude>
     <ClInclude Include="src\Util\Inputs.h">
       <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\AddonVersion.h">
+      <Filter>Loader\Structs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

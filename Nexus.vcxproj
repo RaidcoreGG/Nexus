@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Inputs\GameBinds\GameBindsHandler.cpp" />
+    <ClCompile Include="src\Loader\AddonVersion.cpp" />
     <ClCompile Include="src\Services\API\ActiveToken.cpp" />
     <ClCompile Include="src\Services\API\ApiClient.cpp" />
     <ClCompile Include="src\Services\API\APIController.cpp" />
@@ -84,6 +85,7 @@
   <ItemGroup>
     <ClInclude Include="src\Inputs\GameBinds\EGameBinds.h" />
     <ClInclude Include="src\Inputs\GameBinds\GameBindsHandler.h" />
+    <ClInclude Include="src\Loader\AddonVersion.h" />
     <ClInclude Include="src\Services\API\ApiClient.h" />
     <ClInclude Include="src\Services\API\APIController.h" />
     <ClInclude Include="src\Services\API\ActiveToken.h" />

@@ -1,44 +1,13 @@
 #ifndef ADDONDEF_H
 #define ADDONDEF_H
 
-#include <string>
-
 #include "AddonAPI.h"
 #include "EAddonFlags.h"
 #include "EUpdateProvider.h"
-
-#include "nlohmann/json.hpp"
-using json = nlohmann::json;
+#include "AddonVersion.h"
 
 typedef void (*ADDON_LOAD)(AddonAPI* aAPI);
 typedef void (*ADDON_UNLOAD)();
-
-struct AddonVersion
-{
-	signed short	Major;
-	signed short	Minor;
-	signed short	Build;
-	signed short	Revision;
-
-	AddonVersion() = default;
-	AddonVersion(signed short aMajor, signed short aMinor, signed short aBuild, signed short aRevision)
-		: Major{ aMajor }
-		, Minor{ aMinor }
-		, Build{ aBuild }
-		, Revision{ aRevision }
-	{}
-	AddonVersion(json& aJson);
-	AddonVersion(std::string aVersionString);
-
-	std::string string();
-};
-
-bool operator>(AddonVersion lhs, AddonVersion rhs);
-bool operator<(AddonVersion lhs, AddonVersion rhs);
-bool operator==(AddonVersion lhs, AddonVersion rhs);
-bool operator!=(AddonVersion lhs, AddonVersion rhs);
-bool operator<=(AddonVersion lhs, AddonVersion rhs);
-bool operator>=(AddonVersion lhs, AddonVersion rhs);
 
 struct AddonDefinition
 {

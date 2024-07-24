@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-#include "Loader/AddonDefinition.h"
+#include "Loader/AddonVersion.h"
 #include "Services/Logging/LogHandler.h"
 #include "Services/API/ApiClient.h"
 #include "Services/Localization/Localization.h"
