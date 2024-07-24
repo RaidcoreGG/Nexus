@@ -277,14 +277,13 @@ namespace GUI
 				{
 					if (ImGui::InputFloat("##fontsize", &FontSize, 0.0f, 0.0f, "%.1f"))
 					{
-						if (FontSize < 8.0f)
-						{
-							FontSize = 8.0f;
-						}
+						FontSize = min(max(FontSize, 1.0f), 50.0f);
+
 						Settings::Settings[OPT_FONTSIZE] = FontSize;
 						Settings::Save();
+
+						FontManager.ResizeFont("USER_FONT", FontSize);
 					}
-					ImGui::TooltipGeneric(Language->Translate("((000055))"));
 				}
 
 				ImGuiIO& io = ImGui::GetIO();
