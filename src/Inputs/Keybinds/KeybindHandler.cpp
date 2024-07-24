@@ -396,16 +396,16 @@ void CKeybindApi::Register(const char* aIdentifier, EKeybindHandlerType aKeybind
 		/* explicitly scoping here because the subsequent Save call will also lock the mutex */
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
+		auto it = this->Registry.find(str);
+
 		/* check if this keybind is not already set */
-		if (this->Registry.find(str) == Registry.end())
+		if (it == Registry.end())
 		{
-			// FIXME: Double lookup.
 			this->Registry[str].Bind = requestedBind;
 		}
 
-		// FIXME: Even more lookups.
-		this->Registry[str].HandlerType = aKeybindHandlerType;
-		this->Registry[str].Handler = aKeybindHandler;
+		it->second.HandlerType = aKeybindHandlerType;
+		it->second.Handler = aKeybindHandler;
 	}
 
 	this->Save();
@@ -457,7 +457,6 @@ void CKeybindApi::Set(std::string aIdentifier, Keybind aKeybind)
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
-		// FIXME: Double lookup.
 		this->Registry[aIdentifier].Bind = aKeybind;
 	}
 
@@ -589,7 +588,6 @@ void CKeybindApi::Load()
 
 			std::string identifier = binding["Identifier"].get<std::string>();
 
-			// FIXME: Double lookup.
 			this->Registry[identifier].Bind = kb;
 		}
 
