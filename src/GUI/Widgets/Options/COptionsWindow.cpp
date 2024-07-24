@@ -275,7 +275,7 @@ namespace GUI
 
 				ImGui::TextDisabled(Language->Translate("((000054))"));
 				{
-					if (ImGui::InputFloat("##fontsize", &FontSize, 0.0f, 0.0f, "%.1f"))
+					if (ImGui::InputFloat("##fontsize", &FontSize, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_EnterReturnsTrue))
 					{
 						FontSize = min(max(FontSize, 1.0f), 50.0f);
 
