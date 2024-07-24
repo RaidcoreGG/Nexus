@@ -13,8 +13,44 @@
 #include "Index.h"
 #include "Util/Inputs.h"
 
+/* FIXME: remove this -> DI */
+#include "Shared.h"
+
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
+
+namespace GameBinds
+{
+	void ADDONAPI_PressAsync(EGameBinds aGameBind)
+	{
+		GameBindsApi->PressAsync(aGameBind);
+	}
+
+	void ADDONAPI_ReleaseAsync(EGameBinds aGameBind)
+	{
+		GameBindsApi->ReleaseAsync(aGameBind);
+	}
+
+	void ADDONAPI_InvokeAsync(EGameBinds aGameBind, int aDuration)
+	{
+		GameBindsApi->InvokeAsync(aGameBind, aDuration);
+	}
+
+	void ADDONAPI_Press(EGameBinds aGameBind)
+	{
+		GameBindsApi->Press(aGameBind);
+	}
+
+	void ADDONAPI_Release(EGameBinds aGameBind)
+	{
+		GameBindsApi->Release(aGameBind);
+	}
+
+	bool ADDONAPI_IsBound(EGameBinds aGameBind)
+	{
+		return GameBindsApi->IsBound(aGameBind);
+	}
+}
 
 std::string CGameBindsApi::ToString(EGameBinds aGameBind)
 {

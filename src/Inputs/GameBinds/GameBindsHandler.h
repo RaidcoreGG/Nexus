@@ -26,6 +26,49 @@
 constexpr const char* CH_GAMEBINDS = "GameBinds";
 constexpr const char* EV_UE_KB_CH = "EV_UNOFFICIAL_EXTRAS_KEYBIND_CHANGED";
 
+///----------------------------------------------------------------------------------------------------
+/// GameBinds Namespace
+///----------------------------------------------------------------------------------------------------
+namespace GameBinds
+{
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_PressAsync:
+	/// 	Presses the keys of a game bind.
+	///----------------------------------------------------------------------------------------------------
+	void ADDONAPI_PressAsync(EGameBinds aGameBind);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_ReleaseAsync:
+	/// 	Releases the keys of a game bind.
+	///----------------------------------------------------------------------------------------------------
+	void ADDONAPI_ReleaseAsync(EGameBinds aGameBind);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_InvokeAsync:
+	/// 	Presses and releases the keys of a game bind.
+	/// 	aDuration is the wait time in milliseconds between press and release.
+	///----------------------------------------------------------------------------------------------------
+	void ADDONAPI_InvokeAsync(EGameBinds aGameBind, int aDuration);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_Press:
+	/// 	Presses the keys of a game bind.
+	///----------------------------------------------------------------------------------------------------
+	void ADDONAPI_Press(EGameBinds aGameBind);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_Release:
+	/// 	Releases the keys of a game bind.
+	///----------------------------------------------------------------------------------------------------
+	void ADDONAPI_Release(EGameBinds aGameBind);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_IsBound:
+	/// 	Returns whether a game bind has a keybind set or not.
+	///----------------------------------------------------------------------------------------------------
+	bool ADDONAPI_IsBound(EGameBinds aGameBind);
+}
+
 class CGameBindsApi
 {
 	public:
