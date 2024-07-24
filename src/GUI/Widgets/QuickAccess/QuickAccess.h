@@ -19,9 +19,9 @@ namespace GUI
 	{
 		extern float Opacity;
 
-		extern std::mutex							Mutex;
-		extern std::map<std::string, Shortcut>		Registry;
-		extern std::map<std::string, GUI_RENDER>	RegistrySimple;
+		extern std::mutex								Mutex;
+		extern std::map<std::string, Shortcut>			Registry;
+		extern std::map<std::string, SimpleShortcut>	OrphanedCallbacks;
 
 		extern std::thread		AnimationThread;
 		extern bool				IsAnimating;
@@ -36,6 +36,7 @@ namespace GUI
 		extern Texture*			IconNotification;
 
 		void Render();
+		void RenderContextMenu(const std::string& aIdentifier, const Shortcut& aShortcut, bool* aIsActive);
 
 		void AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aKeybindIdentifier, const char* aTooltipText);
 		void RemoveShortcut(const char* aIdentifier);
@@ -43,6 +44,7 @@ namespace GUI
 		void SetNotificationShortcut(const char* aIdentifier, bool aState);
 
 		void AddSimpleShortcut(const char* aIdentifier, GUI_RENDER aShortcutRenderCallback);
+		void AddSimpleShortcut2(const char* aIdentifier, const char* aTargetShortcutIdentifier, GUI_RENDER aShortcutRenderCallback);
 		void RemoveSimpleShortcut(const char* aIdentifier);
 
 		int Verify(void* aStartAddress, void* aEndAddress);

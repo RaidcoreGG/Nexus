@@ -288,13 +288,22 @@ namespace GUI
 							ImGui::TextDisabled("OnClick (Keybind): %s", shortcut.Keybind.length() != 0 ? shortcut.Keybind.c_str() : "(null)");
 							ImGui::TextDisabled("Tooltip: %s", shortcut.TooltipText.length() != 0 ? shortcut.TooltipText.c_str() : "(null)");
 							ImGui::TextDisabled("IsHovering: %s", shortcut.IsHovering ? "true" : "false");
+							ImGui::Text("Simple shortcuts:");
+							for (auto& [identifier, shortcut] : shortcut.ContextItems)
+							{
+								if (ImGui::TreeNode(identifier.c_str()))
+								{
+									ImGui::TextDisabled("Callback: %p", shortcut);
 
+									ImGui::TreePop();
+								}
+							}
 							ImGui::TreePop();
 						}
 					}
 					ImGui::Separator();
-					ImGui::Text("Simple shortcuts:");
-					for (auto& [identifier, shortcut] : QuickAccess::RegistrySimple)
+					ImGui::Text("Orphaned shortcuts:");
+					for (auto& [identifier, shortcut] : QuickAccess::OrphanedCallbacks)
 					{
 						if (ImGui::TreeNode(identifier.c_str()))
 						{
@@ -303,6 +312,7 @@ namespace GUI
 							ImGui::TreePop();
 						}
 					}
+					
 				}
 				QuickAccess::Mutex.unlock();
 
