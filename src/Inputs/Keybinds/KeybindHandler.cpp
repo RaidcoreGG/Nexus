@@ -401,11 +401,17 @@ void CKeybindApi::Register(const char* aIdentifier, EKeybindHandlerType aKeybind
 		/* check if this keybind is not already set */
 		if (it == Registry.end())
 		{
-			this->Registry[str].Bind = requestedBind;
+			this->Registry[str] = ActiveKeybind{
+				requestedBind,
+				aKeybindHandlerType,
+				aKeybindHandler
+			};
 		}
-
-		it->second.HandlerType = aKeybindHandlerType;
-		it->second.Handler = aKeybindHandler;
+		else
+		{
+			it->second.HandlerType = aKeybindHandlerType;
+			it->second.Handler = aKeybindHandler;
+		}
 	}
 
 	this->Save();
