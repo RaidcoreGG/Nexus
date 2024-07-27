@@ -19,6 +19,11 @@ namespace Time
 		return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	}
 
+	int GetMilliseconds()
+	{
+		return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() % 1000;
+	}
+
 	long long LastModifiedToTimestamp(const std::string& aLastModified)
 	{
 		std::tm tm = {};

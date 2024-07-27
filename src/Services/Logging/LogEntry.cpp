@@ -13,12 +13,13 @@
 
 #include "Util/Strings.h"
 
-std::string LogEntry::TimestampString(bool aIncludeDate)
+std::string LogEntry::TimestampString(bool aIncludeDate, bool aIncludeMs)
 {
 	struct tm timeinfo;
 	localtime_s(&timeinfo, (time_t*)&Timestamp);
 
 	std::stringstream oss;
+
 	if (aIncludeDate)
 	{
 		oss << std::put_time(&timeinfo, "%Y-%m-%d %H:%M:%S");
@@ -27,11 +28,17 @@ std::string LogEntry::TimestampString(bool aIncludeDate)
 	{
 		oss << std::put_time(&timeinfo, "%H:%M:%S");
 	}
+
+	if (aIncludeMs)
+	{
+		oss << "." << TimestampMilliseconds;
+	}
+
 	std::string str = oss.str();
 	return str;
 }
 
-std::string LogEntry::ToString(bool aIncludeChannel)
+std::string LogEntry::ToString(bool aIncludeChannel, bool aIncludeDate, bool aIncludeMs)
 {
 	const char* level;
 
@@ -46,9 +53,12 @@ std::string LogEntry::ToString(bool aIncludeChannel)
 	}
 
 	std::stringstream oss;
-	oss << std::setw(20) << TimestampString();
-	if (aIncludeChannel) { oss << std::setw(24) << + "[" + Channel + "]"; }
-	oss << std::setw(12) << level;
+	oss << std::left << std::setw(26) << TimestampString(aIncludeDate, aIncludeMs);
+	if (aIncludeChannel)
+	{
+		oss << std::right << std::setw(24) << + "[" + Channel + "]";
+	}
+	oss << std::right << std::setw(12) << level;
 
 	/* remove trailing newline from message */
 	if (String::EndsWith(Message, "\n"))
@@ -66,7 +76,7 @@ std::string LogEntry::ToString(bool aIncludeChannel)
 		}
 		else
 		{
-			oss << std::setw(56) << ""; // 56 magic number is total length of padded prefix (timestamp + channel + level)
+			oss << std::right << std::setw(62) << " "; // 62 magic number is total length of padded prefix (timestamp + channel + level)
 			oss << parts[i] << "\n";
 		}
 	}

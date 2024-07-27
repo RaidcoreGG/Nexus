@@ -44,6 +44,6 @@ void CConsoleLogger::LogMessage(LogEntry aLogEntry)
 			default:                     SetConsoleTextAttribute(hConsole, 7); break;
 		}
 
-		std::cout << aLogEntry.ToString();
+		std::cout << aLogEntry.ToString(true, true, true);
 	}
 }

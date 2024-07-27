@@ -36,7 +36,7 @@ namespace GUI
 
 		if (!(off1 && off2))
 		{
-			off1 = ImGui::CalcTextSize("XXXXXXXXX").x;
+			off1 = ImGui::CalcTextSize("XX:XX:XX.XXX  ").x;
 			off2 = ImGui::CalcTextSize("XXXXXXXXXXX").x;
 		}
 
@@ -130,7 +130,7 @@ namespace GUI
 							}
 
 							/* time */
-							ImGui::TextColored(levelColor, entry.TimestampString(false).c_str()); ImGui::SameLine(off1);
+							ImGui::TextColored(levelColor, entry.TimestampString(false, true).c_str()); ImGui::SameLine(off1);
 
 							/* level */
 							ImGui::TextColored(levelColor, level); ImGui::SameLine(off1 + off2);

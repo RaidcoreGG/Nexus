@@ -26,155 +26,6 @@ using json = nlohmann::json;
 
 namespace Keybinds
 {
-	static bool IsLookupTableBuilt = false;
-	static std::map<unsigned short, std::string> ScancodeLookupTable;
-	void BuildscanCodeLookupTable()
-	{
-		if (IsLookupTableBuilt) { return; }
-
-		for (long long i = 0; i < 255; i++)
-		{
-			KeyLParam key{};
-			key.ScanCode = i;
-			char* buff = new char[64];
-			std::string str;
-			GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, 64);
-			str.append(buff);
-
-			ScancodeLookupTable[key.GetScanCode()] = str;
-
-			key.ExtendedFlag = 1;
-			buff = new char[64];
-			str = "";
-			GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, 64);
-			str.append(buff);
-
-			ScancodeLookupTable[key.GetScanCode()] = str;
-
-			delete[] buff;
-		};
-	}
-
-	std::string ScancodeToString(unsigned short aScanCode)
-	{
-		if (!IsLookupTableBuilt)
-		{
-			BuildscanCodeLookupTable();
-		}
-
-		auto it = ScancodeLookupTable.find(aScanCode);
-		if (it != ScancodeLookupTable.end())
-		{
-			return it->second;
-		}
-
-		return "";
-	}
-
-	Keybind KBFromString(std::string aKeybind)
-	{
-		if (!IsLookupTableBuilt)
-		{
-			BuildscanCodeLookupTable();
-		}
-
-		Keybind kb{};
-
-		if (aKeybind == "(null)" || aKeybind == "(NULL)") { return kb; }
-
-		aKeybind = String::ToUpper(aKeybind);
-		std::string delimiter = "+";
-
-		size_t pos = 0;
-		std::string token;
-		while ((pos = aKeybind.find(delimiter)) != std::string::npos)
-		{
-			token = aKeybind.substr(0, pos);
-			aKeybind.erase(0, pos + delimiter.length());
-
-			if (token == "ALT")
-			{
-				kb.Alt = true;
-			}
-			else if (token == "CTRL")
-			{
-				kb.Ctrl = true;
-			}
-			else if (token == "SHIFT")
-			{
-				kb.Shift = true;
-			}
-		}
-
-		for (auto it = ScancodeLookupTable.begin(); it != ScancodeLookupTable.end(); ++it)
-		{
-			if (it->second == aKeybind)
-			{
-				kb.Key = it->first;
-				break;
-			}
-		}
-
-		return kb;
-	}
-
-	std::string KBToString(Keybind aKeybind, bool padded)
-	{
-		if (!IsLookupTableBuilt)
-		{
-			BuildscanCodeLookupTable();
-		}
-
-		if (!aKeybind.Key) { return "(null)"; }
-
-		char* buff = new char[100];
-		std::string str;
-
-		if (aKeybind.Alt)
-		{
-			GetKeyNameTextA(MapVirtualKeyA(VK_MENU, MAPVK_VK_TO_VSC) << 16, buff, 100);
-			str.append(buff);
-			str.append(padded ? " + " : "+");
-		}
-
-		if (aKeybind.Ctrl)
-		{
-			GetKeyNameTextA(MapVirtualKeyA(VK_CONTROL, MAPVK_VK_TO_VSC) << 16, buff, 100);
-			str.append(buff);
-			str.append(padded ? " + " : "+");
-		}
-
-		if (aKeybind.Shift)
-		{
-			GetKeyNameTextA(MapVirtualKeyA(VK_SHIFT, MAPVK_VK_TO_VSC) << 16, buff, 100);
-			str.append(buff);
-			str.append(padded ? " + " : "+");
-		}
-
-		HKL hkl = GetKeyboardLayout(0);
-		UINT vk = MapVirtualKeyA(aKeybind.Key, MAPVK_VSC_TO_VK);
-
-		if (vk >= 65 && vk <= 90 || vk >= 48 && vk <= 57)
-		{
-			GetKeyNameTextA(aKeybind.Key << 16, buff, 100);
-			str.append(buff);
-		}
-		else
-		{
-			auto it = ScancodeLookupTable.find(aKeybind.Key);
-			if (it != ScancodeLookupTable.end())
-			{
-				str.append(it->second);
-			}
-		}
-
-		delete[] buff;
-
-		str = String::ToUpper(str);
-
-		return String::ConvertMBToUTF8(str);
-	}
-
 	void ADDONAPI_RegisterWithString(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const char* aKeybind)
 	{
 		KeybindApi->Register(aIdentifier, EKeybindHandlerType::DownOnly, aKeybindHandler, aKeybind);
@@ -206,6 +57,156 @@ namespace Keybinds
 	}
 }
 
+static bool IsLookupTableBuilt = false;
+static std::map<unsigned short, std::string> ScancodeLookupTable;
+
+void BuildscanCodeLookupTable()
+{
+	if (IsLookupTableBuilt) { return; }
+
+	for (long long i = 0; i < 255; i++)
+	{
+		KeyLParam key{};
+		key.ScanCode = i;
+		char* buff = new char[64];
+		std::string str;
+		GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, 64);
+		str.append(buff);
+
+		ScancodeLookupTable[key.GetScanCode()] = str;
+
+		key.ExtendedFlag = 1;
+		buff = new char[64];
+		str = "";
+		GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, 64);
+		str.append(buff);
+
+		ScancodeLookupTable[key.GetScanCode()] = str;
+
+		delete[] buff;
+	};
+}
+
+std::string CKeybindApi::ScancodeToString(unsigned short aScanCode)
+{
+	if (!IsLookupTableBuilt)
+	{
+		BuildscanCodeLookupTable();
+	}
+
+	auto it = ScancodeLookupTable.find(aScanCode);
+	if (it != ScancodeLookupTable.end())
+	{
+		return it->second;
+	}
+
+	return "";
+}
+
+Keybind CKeybindApi::KBFromString(std::string aKeybind)
+{
+	if (!IsLookupTableBuilt)
+	{
+		BuildscanCodeLookupTable();
+	}
+
+	Keybind kb{};
+
+	if (aKeybind == "(null)" || aKeybind == "(NULL)") { return kb; }
+
+	aKeybind = String::ToUpper(aKeybind);
+	std::string delimiter = "+";
+
+	size_t pos = 0;
+	std::string token;
+	while ((pos = aKeybind.find(delimiter)) != std::string::npos)
+	{
+		token = aKeybind.substr(0, pos);
+		aKeybind.erase(0, pos + delimiter.length());
+
+		if (token == "ALT")
+		{
+			kb.Alt = true;
+		}
+		else if (token == "CTRL")
+		{
+			kb.Ctrl = true;
+		}
+		else if (token == "SHIFT")
+		{
+			kb.Shift = true;
+		}
+	}
+
+	for (auto it = ScancodeLookupTable.begin(); it != ScancodeLookupTable.end(); ++it)
+	{
+		if (it->second == aKeybind)
+		{
+			kb.Key = it->first;
+			break;
+		}
+	}
+
+	return kb;
+}
+
+std::string CKeybindApi::KBToString(Keybind aKeybind, bool padded)
+{
+	if (!IsLookupTableBuilt)
+	{
+		BuildscanCodeLookupTable();
+	}
+
+	if (!aKeybind.Key) { return "(null)"; }
+
+	char* buff = new char[100];
+	std::string str;
+
+	if (aKeybind.Alt)
+	{
+		GetKeyNameTextA(MapVirtualKeyA(VK_MENU, MAPVK_VK_TO_VSC) << 16, buff, 100);
+		str.append(buff);
+		str.append(padded ? " + " : "+");
+	}
+
+	if (aKeybind.Ctrl)
+	{
+		GetKeyNameTextA(MapVirtualKeyA(VK_CONTROL, MAPVK_VK_TO_VSC) << 16, buff, 100);
+		str.append(buff);
+		str.append(padded ? " + " : "+");
+	}
+
+	if (aKeybind.Shift)
+	{
+		GetKeyNameTextA(MapVirtualKeyA(VK_SHIFT, MAPVK_VK_TO_VSC) << 16, buff, 100);
+		str.append(buff);
+		str.append(padded ? " + " : "+");
+	}
+
+	HKL hkl = GetKeyboardLayout(0);
+	UINT vk = MapVirtualKeyA(aKeybind.Key, MAPVK_VSC_TO_VK);
+
+	if (vk >= 65 && vk <= 90 || vk >= 48 && vk <= 57)
+	{
+		GetKeyNameTextA(aKeybind.Key << 16, buff, 100);
+		str.append(buff);
+	}
+	else
+	{
+		auto it = ScancodeLookupTable.find(aKeybind.Key);
+		if (it != ScancodeLookupTable.end())
+		{
+			str.append(it->second);
+		}
+	}
+
+	delete[] buff;
+
+	str = String::ToUpper(str);
+
+	return String::ConvertMBToUTF8(str);
+}
+
 CKeybindApi::CKeybindApi()
 {
 	this->Load();
@@ -217,142 +218,145 @@ UINT CKeybindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	switch (uMsg)
 	{
-	case WM_ACTIVATE:
-		this->ReleaseAll();
-		break;
-
-	case WM_SYSKEYDOWN:
-	case WM_KEYDOWN:
-		if (wParam > 255) break;
-
-		KeyLParam keylp = LParamToKMF(lParam);
-
-		// FIXME: this right here should be reworked.
-		// rather than getting the keystate here, the keys should be tracked individually
-		kb.Alt = GetKeyState(VK_MENU) & 0x8000;
-		kb.Ctrl = GetKeyState(VK_CONTROL) & 0x8000;
-		kb.Shift = GetKeyState(VK_SHIFT) & 0x8000;
-		kb.Key = keylp.GetScanCode();
-
-		// if shift, ctrl or alt set key to 0
-		if (wParam == 16 || wParam == 17 || wParam == 18)
+		case WM_ACTIVATEAPP:
 		{
-			kb.Key = 0;
+			this->ReleaseAll();
+			break;
 		}
 
-		if (kb == Keybind{})
+		case WM_SYSKEYDOWN:
+		case WM_KEYDOWN:
 		{
-			return uMsg;
-		}
+			if (wParam > 255) break;
 
-		if (keylp.PreviousKeyState)
-		{
-			return uMsg;
-		}
+			KeyLParam keylp = LParamToKMF(lParam);
 
-		if (!this->IsCapturing)
-		{
-			for (auto& it : this->Registry)
+			if (wParam == VK_MENU) { this->IsAltHeld = true; }
+			else if (wParam == VK_CONTROL) { this->IsCtrlHeld = true; }
+			else if (wParam == VK_SHIFT) { this->IsShiftHeld = true; }
+
+			kb.Alt = this->IsAltHeld;
+			kb.Ctrl = this->IsCtrlHeld;
+			kb.Shift = this->IsShiftHeld;
+			kb.Key = keylp.GetScanCode();
+
+			// if shift, ctrl or alt set key to 0
+			if (wParam == VK_SHIFT || wParam == VK_CONTROL || wParam == VK_MENU)
 			{
-				if (kb == it.second.Bind)
-				{
-					/* keybind was found */
-
-					/* track these keys for the release event */
-					if (kb.Alt) { this->IsAltHeld = true; }
-					if (kb.Ctrl) { this->IsCtrlHeld = true; }
-					if (kb.Shift) { this->IsShiftHeld = true; }
-
-					/* explicitly scope for heldbinds and tracked keys */
-					{
-						//const std::lock_guard<std::mutex> lock(this->MutexHeldKeys);
-						if (std::find(this->HeldKeys.begin(), this->HeldKeys.end(), kb.Key) == this->HeldKeys.end())
-						{
-							this->HeldKeys.push_back(kb.Key);
-						}
-
-						/* track the actual bind/id combo too */
-						if (this->HeldKeybinds.find(it.first) == this->HeldKeybinds.end())
-						{
-							this->HeldKeybinds[it.first] = it.second;
-						}
-					}
-
-					if (it.first == KB_TOGGLEHIDEUI)
-					{
-						// invoke but do not return, pass through to game (multi hide)
-						this->Invoke(it.first);
-						break;
-					}
-					else
-					{
-						// if Invoke returns true, pass 0 to the wndproc to stop processing
-						return this->Invoke(it.first) ? 0 : 1;
-					}
-				}
+				kb.Key = 0;
 			}
-		}
-		else
-		{
-			/* store the currently held bind */
-			this->CapturedKeybind = kb;
-		}
 
-		break;
-
-	case WM_SYSKEYUP:
-	case WM_KEYUP:
-		if (wParam > 255) break;
-
-		/* only check if not currently setting keybind */
-		if (this->IsCapturing)
-		{
-			return uMsg;
-		}
-
-		std::vector<std::string> heldBindsPop;
-
-		//const std::lock_guard<std::mutex> lock(this->MutexHeldKeys);
-		for (auto& bind : this->HeldKeybinds)
-		{
-			if (wParam == 16 && bind.second.Bind.Shift)
+			if (kb == Keybind{})
 			{
-				this->Invoke(bind.first, true);
-				this->IsShiftHeld = false;
-				heldBindsPop.push_back(bind.first);
+				return uMsg;
 			}
-			else if (wParam == 17 && bind.second.Bind.Ctrl)
+
+			if (keylp.PreviousKeyState)
 			{
-				this->Invoke(bind.first, true);
-				this->IsCtrlHeld = false;
-				heldBindsPop.push_back(bind.first);
+				return uMsg;
 			}
-			else if (wParam == 18 && bind.second.Bind.Alt)
+
+			if (this->IsCapturing)
 			{
-				this->Invoke(bind.first, true);
-				this->IsAltHeld = false;
-				heldBindsPop.push_back(bind.first);
+				/* store the currently held bind */
+				this->CapturedKeybind = kb;
+
+				/* prevent invoking keybinds */
+				break;
+			}
+
+			auto heldBind = std::find_if(this->Registry.begin(), this->Registry.end(), [kb](auto activeKeybind) { return activeKeybind.second.Bind == kb; });
+
+			if (heldBind == this->Registry.end()) /* if held bind does not match any registered */
+			{
+				break;
+			}
+
+			if (std::find(this->HeldKeys.begin(), this->HeldKeys.end(), kb.Key) == this->HeldKeys.end())
+			{
+				this->HeldKeys.push_back(kb.Key);
+			}
+
+			/* track the actual bind/id combo too */
+			if (this->HeldKeybinds.find(heldBind->first) == this->HeldKeybinds.end())
+			{
+				this->HeldKeybinds[heldBind->first] = heldBind->second;
+			}
+
+			if (heldBind->first == KB_TOGGLEHIDEUI)
+			{
+				// invoke but do not return, pass through to game (multi hide)
+				this->Invoke(heldBind->first);
+				break;
 			}
 			else
 			{
-				KeyLParam keylp = LParamToKMF(lParam);
-				unsigned short scanCode = keylp.GetScanCode();
+				// if Invoke returns true, pass 0 to the wndproc to stop processing
+				return this->Invoke(heldBind->first) ? 0 : 1;
+			}
 
-				if (scanCode == bind.second.Bind.Key)
+			break;
+		}
+
+		case WM_SYSKEYUP:
+		case WM_KEYUP:
+		{
+			if (wParam > 255) break;
+
+			if (wParam == VK_MENU) { this->IsAltHeld = false; }
+			else if (wParam == VK_CONTROL) { this->IsCtrlHeld = false; }
+			else if (wParam == VK_SHIFT) { this->IsShiftHeld = false; }
+
+			/* only check if not currently setting keybind */
+			if (this->IsCapturing)
+			{
+				return uMsg;
+			}
+
+			std::vector<std::string> heldBindsPop;
+
+			//const std::lock_guard<std::mutex> lock(this->MutexHeldKeys);
+			for (auto& bind : this->HeldKeybinds)
+			{
+				if (wParam == VK_SHIFT && bind.second.Bind.Shift)
 				{
 					this->Invoke(bind.first, true);
-					this->HeldKeys.erase(std::find(this->HeldKeys.begin(), this->HeldKeys.end(), scanCode));
+					this->IsShiftHeld = false;
 					heldBindsPop.push_back(bind.first);
 				}
+				else if (wParam == VK_CONTROL && bind.second.Bind.Ctrl)
+				{
+					this->Invoke(bind.first, true);
+					this->IsCtrlHeld = false;
+					heldBindsPop.push_back(bind.first);
+				}
+				else if (wParam == VK_MENU && bind.second.Bind.Alt)
+				{
+					this->Invoke(bind.first, true);
+					this->IsAltHeld = false;
+					heldBindsPop.push_back(bind.first);
+				}
+				else
+				{
+					KeyLParam keylp = LParamToKMF(lParam);
+					unsigned short scanCode = keylp.GetScanCode();
+
+					if (scanCode == bind.second.Bind.Key)
+					{
+						this->Invoke(bind.first, true);
+						this->HeldKeys.erase(std::find(this->HeldKeys.begin(), this->HeldKeys.end(), scanCode));
+						heldBindsPop.push_back(bind.first);
+					}
+				}
 			}
-		}
 
-		for (auto bind : heldBindsPop)
-		{
-			this->HeldKeybinds.erase(bind);
-		}
+			for (auto bind : heldBindsPop)
+			{
+				this->HeldKeybinds.erase(bind);
+			}
 
-		break;
+			break;
+		}
 	}
 
 	// don't pass keys to game if currently editing keybinds
@@ -369,7 +373,7 @@ UINT CKeybindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void CKeybindApi::Register(const char* aIdentifier, EKeybindHandlerType aKeybindHandlerType, void* aKeybindHandler, const char* aKeybind)
 {
-	Keybind requestedBind = Keybinds::KBFromString(aKeybind);
+	Keybind requestedBind = CKeybindApi::KBFromString(aKeybind);
 	this->Register(aIdentifier, aKeybindHandlerType, aKeybindHandler, requestedBind);
 }
 
@@ -392,16 +396,22 @@ void CKeybindApi::Register(const char* aIdentifier, EKeybindHandlerType aKeybind
 		/* explicitly scoping here because the subsequent Save call will also lock the mutex */
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
-		/* check if this keybind is not already set */
-		if (this->Registry.find(str) == Registry.end())
-		{
-			// FIXME: Double lookup.
-			this->Registry[str].Bind = requestedBind;
-		}
+		auto it = this->Registry.find(str);
 
-		// FIXME: Even more lookups.
-		this->Registry[str].HandlerType = aKeybindHandlerType;
-		this->Registry[str].Handler = aKeybindHandler;
+		/* check if this keybind is not already set */
+		if (it == Registry.end())
+		{
+			this->Registry[str] = ActiveKeybind{
+				requestedBind,
+				aKeybindHandlerType,
+				aKeybindHandler
+			};
+		}
+		else
+		{
+			it->second.HandlerType = aKeybindHandlerType;
+			it->second.Handler = aKeybindHandler;
+		}
 	}
 
 	this->Save();
@@ -431,7 +441,7 @@ std::string CKeybindApi::IsInUse(Keybind aKeybind)
 	if (aKeybind == Keybind{}) { return ""; }
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
-	
+
 	/* check if another identifier, already uses the keybind */
 	for (auto& [identifier, keybind] : this->Registry)
 	{
@@ -453,7 +463,6 @@ void CKeybindApi::Set(std::string aIdentifier, Keybind aKeybind)
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
-		// FIXME: Double lookup.
 		this->Registry[aIdentifier].Bind = aKeybind;
 	}
 
@@ -477,19 +486,19 @@ bool CKeybindApi::Invoke(std::string aIdentifier, bool aIsRelease)
 			bind.HandlerType == EKeybindHandlerType::DownAndRelease)
 		{
 			std::thread([aIdentifier, type, handlerFunc, aIsRelease]()
+			{
+				switch (type)
 				{
-					switch (type)
-					{
 					case EKeybindHandlerType::DownOnly:
 						((KEYBINDS_PROCESS)handlerFunc)(aIdentifier.c_str());
 						break;
 					case EKeybindHandlerType::DownAndRelease:
 						((KEYBINDS_PROCESS2)handlerFunc)(aIdentifier.c_str(), aIsRelease);
 						break;
-					}
-				}).detach();
+				}
+			}).detach();
 
-				called = true;
+			called = true;
 		}
 	}
 
@@ -537,14 +546,19 @@ Keybind CKeybindApi::GetCapturedKeybind() const
 
 void CKeybindApi::StartCapturing()
 {
-	this->IsCapturing = true;
+	if (!this->IsCapturing)
+	{
+		this->ReleaseAll();
+	}
 
-	this->ReleaseAll();
+	this->IsCapturing = true;
 }
 
 void CKeybindApi::EndCapturing()
 {
 	this->IsCapturing = false;
+
+	this->ReleaseAll();
 
 	CapturedKeybind = Keybind{};
 }
@@ -580,7 +594,6 @@ void CKeybindApi::Load()
 
 			std::string identifier = binding["Identifier"].get<std::string>();
 
-			// FIXME: Double lookup.
 			this->Registry[identifier].Bind = kb;
 		}
 

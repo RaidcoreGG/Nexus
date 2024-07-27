@@ -15,6 +15,8 @@
 
 #include "Shared.h"
 
+#include "Util/Time.h"
+
 namespace LogHandler
 {
 	void ADDONAPI_LogMessage(ELogLevel aLogLevel, const char* aStr)
@@ -112,7 +114,8 @@ void CLogHandler::LogMessageUnformatted(ELogLevel aLogLevel, std::string aChanne
 {
 	LogEntry entry;
 	entry.LogLevel = aLogLevel;
-	entry.Timestamp = time(NULL);
+	entry.Timestamp = Time::GetTimestamp();
+	entry.TimestampMilliseconds = Time::GetMilliseconds();
 	entry.Channel = aChannel;
 	entry.Message = aMsg;
 

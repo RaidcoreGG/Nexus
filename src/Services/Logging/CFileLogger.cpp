@@ -24,6 +24,6 @@ void CFileLogger::LogMessage(LogEntry aLogEntry)
 {
 	const std::lock_guard<std::mutex> lock(Mutex);
 
-	File << aLogEntry.ToString();
+	File << aLogEntry.ToString(true, true, true);
 	File.flush();
 }

@@ -174,6 +174,26 @@ namespace ImGui
 		return clicked;
 	}
 
+	static bool IconButton(ImTextureID user_texture_id, const ImVec2& size, const ImVec2& uv0 = ImVec2(0, 0), const ImVec2& uv1 = ImVec2(1, 1), int frame_padding = -1, const ImVec4& bg_col = ImVec4(0, 0, 0, 0), const ImVec4& tint_col = ImVec4(1, 1, 1, 1))
+	{
+		bool ret = false;
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
+		ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.863f, 0.863f, 0.863f, 1));
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f });
+
+		if (ImGui::ImageButton(user_texture_id, size, uv0, uv1, frame_padding, bg_col, tint_col))
+		{
+			ret = true;
+		}
+		ImGui::PopStyleColor(4);
+		ImGui::PopStyleVar();
+
+		return ret;
+	}
+
 	namespace GW2
 	{
 		static bool Button(const char* label, const ImVec2& size_arg = ImVec2(0, 0))

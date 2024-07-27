@@ -14,28 +14,14 @@
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_extensions.h"
-#include "imgui/imgui_memory_editor.h"
 
 namespace GUI
 {
 	float dwWidth = 30.0f;
 	float dwHeight = 24.0f;
 
-	static ImGui::MemoryEditor memEditor;
 	void* memPtr = nullptr;
 	size_t memSz = 0;
-
-	bool showMetricsDebugger = false;
-
-	/* proto tabs */
-	void DbgEventsTab();
-	void DbgKeybindsTab();
-	void DbgDataLinkTab();
-	void DbgTexturesTab();
-	void DbgShortcutsTab();
-	void DbgLoaderTab();
-	void DbgAPITab();
-	void DbgFontsTab();
 
 	void NodeFont(ImFont* font);
 
@@ -43,27 +29,28 @@ namespace GUI
 	{
 		Name = aName;
 		MumbleWindow = new CMumbleOverlay();
+		MemoryViewer.ReadOnly = true;
 	}
 
 	void CDebugWindow::Render()
 	{
 		MumbleWindow->Render();
 
-		memEditor.DrawWindow("Memory Editor", memPtr, memSz);
+		MemoryViewer.DrawWindow("Memory Viewer", memPtr, memSz);
 
-		if (!Visible) { return; }
-
-		if (showMetricsDebugger)
+		if (IsMetricsWindowVisible)
 		{
 			ImGui::ShowMetricsWindow();
 		}
+
+		if (!Visible) { return; }
 
 		ImGui::SetNextWindowSize(ImVec2(dwWidth * ImGui::GetFontSize(), dwHeight * ImGui::GetFontSize()), ImGuiCond_FirstUseEver);
 		if (ImGui::Begin(Name.c_str(), &Visible, ImGuiWindowFlags_NoCollapse))
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f });
 			ImGui::Checkbox("Show Mumble overlay", &MumbleWindow->Visible);
-			ImGui::Checkbox("Show Metrics / Debugger", &showMetricsDebugger);
+			ImGui::Checkbox("Show Metrics / Debugger", &IsMetricsWindowVisible);
 			ImGui::PopStyleVar();
 
 			if (ImGui::BeginTabBar("DebugTabBar", ImGuiTabBarFlags_None))
@@ -94,7 +81,7 @@ namespace GUI
 		ImGui::End();
 	}
 
-	void DbgEventsTab()
+	void CDebugWindow::DbgEventsTab()
 	{
 		if (ImGui::BeginTabItem("Events"))
 		{
@@ -132,14 +119,14 @@ namespace GUI
 			ImGui::EndTabItem();
 		}
 	}
-	void DbgKeybindsTab()
+	void CDebugWindow::DbgKeybindsTab()
 	{
 		if (ImGui::BeginTabItem("Keybinds"))
 		{
 			ImGui::BeginChild("##KeybindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
 			std::map<std::string, ActiveKeybind> KeybindRegistry = KeybindApi->GetRegistry();
-			
+
 			for (auto& [identifier, keybind] : KeybindRegistry)
 			{
 				ImGui::Text(identifier.c_str()); ImGui::SameLine();
@@ -158,7 +145,7 @@ namespace GUI
 			ImGui::EndTabItem();
 		}
 	}
-	void DbgDataLinkTab()
+	void CDebugWindow::DbgDataLinkTab()
 	{
 		if (ImGui::BeginTabItem("DataLink"))
 		{
@@ -176,9 +163,9 @@ namespace GUI
 					ImGui::TextDisabled("Name: %s", resource.UnderlyingName.c_str());
 					ImGui::TooltipGeneric("The real underlying name of the file.");
 
-					if (ImGui::SmallButton("Memory Editor"))
+					if (ImGui::SmallButton("Memory Viewer"))
 					{
-						memEditor.Open = true;
+						MemoryViewer.Open = true;
 						memPtr = resource.Pointer;
 						memSz = resource.Size;
 					}
@@ -192,7 +179,7 @@ namespace GUI
 			ImGui::EndTabItem();
 		}
 	}
-	void DbgTexturesTab()
+	void CDebugWindow::DbgTexturesTab()
 	{
 		if (ImGui::BeginTabItem("Textures"))
 		{
@@ -268,7 +255,7 @@ namespace GUI
 			ImGui::EndTabItem();
 		}
 	}
-	void DbgShortcutsTab()
+	void CDebugWindow::DbgShortcutsTab()
 	{
 		if (ImGui::BeginTabItem("Shortcuts"))
 		{
@@ -288,13 +275,22 @@ namespace GUI
 							ImGui::TextDisabled("OnClick (Keybind): %s", shortcut.Keybind.length() != 0 ? shortcut.Keybind.c_str() : "(null)");
 							ImGui::TextDisabled("Tooltip: %s", shortcut.TooltipText.length() != 0 ? shortcut.TooltipText.c_str() : "(null)");
 							ImGui::TextDisabled("IsHovering: %s", shortcut.IsHovering ? "true" : "false");
+							ImGui::Text("Simple shortcuts:");
+							for (auto& [identifier, shortcut] : shortcut.ContextItems)
+							{
+								if (ImGui::TreeNode(identifier.c_str()))
+								{
+									ImGui::TextDisabled("Callback: %p", shortcut);
 
+									ImGui::TreePop();
+								}
+							}
 							ImGui::TreePop();
 						}
 					}
 					ImGui::Separator();
-					ImGui::Text("Simple shortcuts:");
-					for (auto& [identifier, shortcut] : QuickAccess::RegistrySimple)
+					ImGui::Text("Orphaned shortcuts:");
+					for (auto& [identifier, shortcut] : QuickAccess::OrphanedCallbacks)
 					{
 						if (ImGui::TreeNode(identifier.c_str()))
 						{
@@ -303,6 +299,7 @@ namespace GUI
 							ImGui::TreePop();
 						}
 					}
+
 				}
 				QuickAccess::Mutex.unlock();
 
@@ -312,7 +309,7 @@ namespace GUI
 			ImGui::EndTabItem();
 		}
 	}
-	void DbgLoaderTab()
+	void CDebugWindow::DbgLoaderTab()
 	{
 		if (ImGui::BeginTabItem("Loader"))
 		{
@@ -333,13 +330,13 @@ namespace GUI
 								std::string state = "State: ";
 								switch (addon->State)
 								{
-								case EAddonState::None:							state.append("None"); break;
-								case EAddonState::Loaded:						state.append("Loaded"); break;
-								case EAddonState::LoadedLOCKED:					state.append("LoadedLOCKED"); break;
-								case EAddonState::NotLoaded:					state.append("NotLoaded"); break;
-								case EAddonState::NotLoadedDuplicate:			state.append("NotLoadedDuplicate"); break;
-								case EAddonState::NotLoadedIncompatible:		state.append("NotLoadedIncompatible"); break;
-								case EAddonState::NotLoadedIncompatibleAPI:		state.append("NotLoadedIncompatibleAPI"); break;
+									case EAddonState::None:							state.append("None"); break;
+									case EAddonState::Loaded:						state.append("Loaded"); break;
+									case EAddonState::LoadedLOCKED:					state.append("LoadedLOCKED"); break;
+									case EAddonState::NotLoaded:					state.append("NotLoaded"); break;
+									case EAddonState::NotLoadedDuplicate:			state.append("NotLoadedDuplicate"); break;
+									case EAddonState::NotLoadedIncompatible:		state.append("NotLoadedIncompatible"); break;
+									case EAddonState::NotLoadedIncompatibleAPI:		state.append("NotLoadedIncompatibleAPI"); break;
 								}
 
 								ImGui::TextDisabled(state.c_str());
@@ -355,9 +352,9 @@ namespace GUI
 
 								if (addon->Definitions != nullptr)
 								{
-									if (ImGui::SmallButton("Memory Editor"))
+									if (ImGui::SmallButton("Memory Viewer"))
 									{
-										memEditor.Open = true;
+										MemoryViewer.Open = true;
 										memPtr = addon->Definitions;
 										memSz = sizeof(AddonDefinition);
 									}
@@ -374,15 +371,15 @@ namespace GUI
 						{
 							switch (action)
 							{
-							case ELoaderAction::Load:
-								ImGui::Text("Load");
-								break;
-							case ELoaderAction::Unload:
-								ImGui::Text("Unload");
-								break;
-							case ELoaderAction::Uninstall:
-								ImGui::Text("Uninstall");
-								break;
+								case ELoaderAction::Load:
+									ImGui::Text("Load");
+									break;
+								case ELoaderAction::Unload:
+									ImGui::Text("Unload");
+									break;
+								case ELoaderAction::Uninstall:
+									ImGui::Text("Uninstall");
+									break;
 							}
 							ImGui::SameLine();
 							ImGui::TextDisabled("%s", path.string().c_str());
@@ -398,9 +395,9 @@ namespace GUI
 								ImGui::TextDisabled("Pointer: %p", api);
 								ImGui::TextDisabled("Size: %d", Loader::GetAddonAPISize(version));
 
-								if (ImGui::SmallButton("Memory Editor"))
+								if (ImGui::SmallButton("Memory Viewer"))
 								{
-									memEditor.Open = true;
+									MemoryViewer.Open = true;
 									memPtr = api;
 									memSz = Loader::GetAddonAPISize(version);
 								}
@@ -419,11 +416,11 @@ namespace GUI
 			ImGui::EndTabItem();
 		}
 	}
-	void DbgAPITab()
+	void CDebugWindow::DbgAPITab()
 	{
 
 	}
-	void DbgFontsTab()
+	void CDebugWindow::DbgFontsTab()
 	{
 		if (ImGui::BeginTabItem("Fonts"))
 		{
@@ -459,7 +456,7 @@ namespace GUI
 		ImGuiIO& io = ImGui::GetIO();
 		ImGuiStyle& style = ImGui::GetStyle();
 		bool font_details_opened = ImGui::TreeNode(font, "Font: \"%s\"\n%.2f px, %d glyphs, %d file(s)",
-			font->ConfigData ? font->ConfigData[0].Name : "", font->FontSize, font->Glyphs.Size, font->ConfigDataCount);
+												   font->ConfigData ? font->ConfigData[0].Name : "", font->FontSize, font->Glyphs.Size, font->ConfigDataCount);
 		ImGui::SameLine(); if (ImGui::SmallButton("Set as default")) { io.FontDefault = font; }
 		if (!font_details_opened)
 			return;
@@ -483,7 +480,7 @@ namespace GUI
 			if (font->ConfigData)
 				if (const ImFontConfig* cfg = &font->ConfigData[config_i])
 					ImGui::BulletText("Input %d: \'%s\', Oversample: (%d,%d), PixelSnapH: %d, Offset: (%.1f,%.1f)",
-						config_i, cfg->Name, cfg->OversampleH, cfg->OversampleV, cfg->PixelSnapH, cfg->GlyphOffset.x, cfg->GlyphOffset.y);
+									  config_i, cfg->Name, cfg->OversampleH, cfg->OversampleV, cfg->PixelSnapH, cfg->GlyphOffset.x, cfg->GlyphOffset.y);
 		if (ImGui::TreeNode("Glyphs", "Glyphs (%d)", font->Glyphs.Size))
 		{
 			// Display all glyphs of the fonts in separate pages of 256 characters

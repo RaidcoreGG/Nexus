@@ -26,6 +26,8 @@
 #include "Services/Updater/Updater.h"
 #include "Services/Multibox/Multibox.h"
 
+#include "Util/Strings.h"
+
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
@@ -34,11 +36,17 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 {
 	switch (ul_reason_for_call)
 	{
-	case DLL_PROCESS_ATTACH:
-		DisableThreadLibraryCalls(hModule);
-		NexusHandle = hModule;
-		break;
-	case DLL_PROCESS_DETACH: break;
+		case DLL_PROCESS_ATTACH:
+			DisableThreadLibraryCalls(hModule);
+			NexusHandle = hModule;
+			break;
+		case DLL_PROCESS_DETACH:
+			/* cleanly remove wndproc hook */
+			if (Renderer::WindowHandle && Hooks::GW2::WndProc)
+			{
+				SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)Hooks::GW2::WndProc);
+			}
+			break;
 	}
 	return true;
 }
@@ -61,7 +69,7 @@ namespace Main
 
 		Index::BuildIndex(NexusHandle);
 		std::string mumbleName = State::Initialize();
-		
+
 		/* setup default loggers */
 		if (State::IsConsoleEnabled)
 		{
@@ -78,48 +86,48 @@ namespace Main
 		GitHubAPI = new CApiClient("https://api.github.com", true, Index::D_GW2_ADDONS_COMMON_API_GITHUB, 30 * 60, 60, 60, 60 * 60);
 
 		std::thread([]()
+		{
+			HANDLE hMutex = CreateMutexA(0, true, "RCGG-Mutex-Patch-Nexus");
+
+			if (GetLastError() == ERROR_ALREADY_EXISTS)
 			{
-				HANDLE hMutex = CreateMutexA(0, true, "RCGG-Mutex-Patch-Nexus");
-
-				if (GetLastError() == ERROR_ALREADY_EXISTS)
-				{
-					Logger->Info(CH_CORE, "Cannot patch Nexus, mutex locked.");
-
-					/* sanity check to make the compiler happy */
-					if (hMutex)
-					{
-						CloseHandle(hMutex);
-					}
-
-					return;
-				}
-
-				/* perform/check for update */
-				UpdateService->UpdateNexus();
+				Logger->Info(CH_CORE, "Cannot patch Nexus, mutex locked.");
 
 				/* sanity check to make the compiler happy */
 				if (hMutex)
 				{
-					ReleaseMutex(hMutex);
 					CloseHandle(hMutex);
 				}
-			})
+
+				return;
+			}
+
+			/* perform/check for update */
+			UpdateService->UpdateNexus();
+
+			/* sanity check to make the compiler happy */
+			if (hMutex)
+			{
+				ReleaseMutex(hMutex);
+				CloseHandle(hMutex);
+			}
+		})
 			.detach();
-		
+
 		//Paradigm::Initialize();
 
 		/* Don't initialize anything if vanilla */
 		if (!State::IsVanilla)
 		{
-			if (Multibox::ShareArchive())	{ State::MultiboxState |= EMultiboxState::ARCHIVE_SHARED; }
-			if (Multibox::ShareLocal())		{ State::MultiboxState |= EMultiboxState::LOCAL_SHARED; }
-			if (Multibox::KillMutex())		{ State::MultiboxState |= EMultiboxState::MUTEX_CLOSED; }
+			if (Multibox::ShareArchive()) { State::MultiboxState |= EMultiboxState::ARCHIVE_SHARED; }
+			if (Multibox::ShareLocal()) { State::MultiboxState |= EMultiboxState::LOCAL_SHARED; }
+			if (Multibox::KillMutex()) { State::MultiboxState |= EMultiboxState::MUTEX_CLOSED; }
 			Logger->Info(CH_CORE, "Multibox State: %d", State::MultiboxState);
 
 			MH_Initialize();
 
 			KeybindApi = new CKeybindApi();
-			//GameBindsApi = new CGameBindsApi(RawInputApi, Logger, EventApi);
+			GameBindsApi = new CGameBindsApi(RawInputApi, Logger, EventApi);
 
 			Settings::Load();
 
@@ -153,18 +161,15 @@ namespace Main
 	}
 	void Shutdown(unsigned int aReason)
 	{
+		const char* reasonStr;
 		switch (aReason)
 		{
-		case WM_DESTROY:
-			Logger->Critical(CH_CORE, "Main::Shutdown() | Reason: WM_DESTROY");
-			break;
-		case WM_CLOSE:
-			Logger->Critical(CH_CORE, "Main::Shutdown() | Reason: WM_CLOSE");
-			break;
-		case WM_QUIT:
-			Logger->Critical(CH_CORE, "Main::Shutdown() | Reason: WM_QUIT");
-			break;
+			case WM_DESTROY:	reasonStr = "WM_DESTROY"; break;
+			case WM_CLOSE:		reasonStr = "WM_CLOSE"; break;
+			case WM_QUIT:		reasonStr = "WM_QUIT"; break;
+			default:			reasonStr = "(null)"; break;
 		}
+		Logger->Critical(CH_CORE, String::Format("Main::Shutdown() | Reason: %s", reasonStr).c_str());
 
 		if (State::Nexus < ENexusState::SHUTTING_DOWN)
 		{
@@ -183,14 +188,10 @@ namespace Main
 
 			Logger->Info(CH_CORE, "Shutdown performed.");
 
-			//SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)Hooks::GW2::WndProc);
-
 			State::Nexus = ENexusState::SHUTDOWN;
 		}
 
-		// free libs
-		// FIXME: make arc not shit itself when the game shuts down, for now let windows handle the rest
-		//if (D3D11Handle) { FreeLibrary(D3D11Handle); }
-		//if (D3D11SystemHandle) { FreeLibrary(D3D11SystemHandle); }
+		if (D3D11Handle) { FreeLibrary(D3D11Handle); }
+		if (D3D11SystemHandle) { FreeLibrary(D3D11SystemHandle); }
 	}
 }

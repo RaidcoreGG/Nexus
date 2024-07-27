@@ -42,7 +42,11 @@ namespace GUI
 	Texture* BtnOptions = nullptr;
 	Texture* CtxMenuBullet = nullptr;
 	Texture* CtxMenuHighlight = nullptr;
-	Texture* ToSComplianceWarning = nullptr;
+	Texture* PolicyTier1 = nullptr;
+	Texture* PolicyTier2 = nullptr;
+	Texture* PolicyTier3 = nullptr;
+	Texture* PolicyTierUnknown = nullptr;
+	Texture* AuthorRaidcore = nullptr;
 
 	void AddonItem(std::filesystem::path aPath, Addon* aAddon)
 	{
@@ -104,11 +108,30 @@ namespace GUI
 				ImGui::SetCursorPos(ImVec2(12.0f, 12.0f));
 				ImGui::BeginChild("##AddonItemDescription", ImVec2(descWidth, itemHeightScaled - 12.0f - 12.0f));
 
+				bool isRaidcore = strcmp(aAddon->Definitions->Author, "Raidcore") == 0;
+				if (isRaidcore)
+				{
+					if (AuthorRaidcore)
+					{
+						// icon dimensions are 128x104. scale relative to height
+						ImGui::Image(AuthorRaidcore->Resource, ImVec2(ImGui::GetFontSize() / 104.0f * 128.0f, ImGui::GetFontSize()));
+						ImGui::SameLine();
+					}
+					else
+					{
+						AuthorRaidcore = TextureService->GetOrCreate("ICON_RAIDCORE", RES_ICON_RAIDCORE, NexusHandle);
+					}
+				}
+
 				ImGui::PushFont(Font);
 				ImGui::TextColored(ImVec4(1.0f, 0.933f, 0.733f, 1.0f), aAddon->Definitions->Name); ImGui::SameLine();
 				ImGui::PopFont();
-				ImGui::TextColored(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "(%s)", aAddon->Definitions->Version.string().c_str()); ImGui::SameLine();
-				ImGui::TextColored(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "by %s", aAddon->Definitions->Author);
+				ImGui::TextColored(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "(%s)", aAddon->Definitions->Version.string().c_str());
+				if (!isRaidcore)
+				{
+					ImGui::SameLine();
+					ImGui::TextColored(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "by %s", aAddon->Definitions->Author);
+				}
 
 				if (aAddon->State == EAddonState::NotLoadedIncompatibleAPI)
 				{
@@ -391,10 +414,25 @@ namespace GUI
 				ImGui::SetCursorPos(ImVec2(12.0f, 12.0f));
 				ImGui::BeginChild("##AddonItemDescription", ImVec2(descWidth, itemHeightScaled - 12.0f - 12.0f));
 
+				bool isRaidcore = aAddon->Author == "Raidcore";
+				if (isRaidcore)
+				{
+					if (AuthorRaidcore)
+					{
+						// icon dimensions are 128x104. scale relative to height
+						ImGui::Image(AuthorRaidcore->Resource, ImVec2(ImGui::GetFontSize() / 104.0f * 128.0f, ImGui::GetFontSize()));
+						ImGui::SameLine();
+					}
+					else
+					{
+						AuthorRaidcore = TextureService->GetOrCreate("ICON_RAIDCORE", RES_ICON_RAIDCORE, NexusHandle);
+					}
+				}
+
 				ImGui::PushFont(Font);
 				ImGui::TextColored(ImVec4(1.0f, 0.933f, 0.733f, 1.0f), aAddon->Name.c_str());
 				ImGui::PopFont();
-				if (!aAddon->Author.empty())
+				if (!aAddon->Author.empty() && !isRaidcore)
 				{
 					ImGui::SameLine();
 					ImGui::TextColored(ImVec4(0.666f, 0.666f, 0.666f, 1.0f), "by %s", aAddon->Author.c_str());
@@ -409,33 +447,104 @@ namespace GUI
 				ImGui::SetCursorPos(ImVec2(descWidth + 12.0f + 12.0f, 12.0f));
 				ImGui::BeginChild("##AddonItemActions", ImVec2(actionsWidth, itemHeightScaled - 12.0f - 12.0f));
 
-				if (!aAddon->ToSComplianceNotice.empty())
+				if (aAddon->PolicyTier != 0)
 				{
-					if (ToSComplianceWarning)
+					switch (aAddon->PolicyTier)
+					{
+						case -1:
+						{
+							if (PolicyTierUnknown)
+							{
+								ImGui::SetCursorPos(ImVec2(actionsWidth - (size * Renderer::Scaling), ImGui::GetCursorPosY()));
+								if (ImGui::IconButton(PolicyTierUnknown->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
+								{
+									ShellExecuteA(0, 0, "https://raidcore.gg/Legal#addon-policy", 0, 0, SW_SHOW);
+								}
+
+								ImGui::GW2::TooltipGeneric(Language->Translate("((000090))"));
+							}
+							else
+							{
+								PolicyTierUnknown = TextureService->GetOrCreate("ICON_ADDONPOLICY_TIER_UNKNOWN", RES_ICON_TIER_UNKNOWN, NexusHandle);
+							}
+							break;
+						}
+
+						case 1:
+						{
+							if (PolicyTier1)
+							{
+								ImGui::SetCursorPos(ImVec2(actionsWidth - (size * Renderer::Scaling), ImGui::GetCursorPosY()));
+								if (ImGui::IconButton(PolicyTier1->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
+								{
+									ShellExecuteA(0, 0, "https://raidcore.gg/Legal#addon-policy", 0, 0, SW_SHOW);
+								}
+								
+								ImGui::GW2::TooltipGeneric(String::Format(Language->Translate("((000089))"), 1).c_str());
+							}
+							else
+							{
+								PolicyTier1 = TextureService->GetOrCreate("ICON_ADDONPOLICY_TIER1", RES_ICON_TIER1, NexusHandle);
+							}
+							break;
+						}
+						case 2:
+						{
+							if (PolicyTier2)
+							{
+								ImGui::SetCursorPos(ImVec2(actionsWidth - (size * Renderer::Scaling), ImGui::GetCursorPosY()));
+								if (ImGui::IconButton(PolicyTier2->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
+								{
+									ShellExecuteA(0, 0, "https://raidcore.gg/Legal#addon-policy", 0, 0, SW_SHOW);
+								}
+
+								ImGui::GW2::TooltipGeneric(String::Format(Language->Translate("((000089))"), 2).c_str());
+							}
+							else
+							{
+								PolicyTier2 = TextureService->GetOrCreate("ICON_ADDONPOLICY_TIER2", RES_ICON_TIER2, NexusHandle);
+							}
+							break;
+						}
+						case 3:
+						{
+							if (PolicyTier3)
+							{
+								ImGui::SetCursorPos(ImVec2(actionsWidth - (size * Renderer::Scaling), ImGui::GetCursorPosY()));
+								if (ImGui::IconButton(PolicyTier3->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
+								{
+									ShellExecuteA(0, 0, "https://raidcore.gg/Legal#addon-policy", 0, 0, SW_SHOW);
+								}
+
+								ImGui::GW2::TooltipGeneric(String::Format(Language->Translate("((000089))"), 3).c_str());
+							}
+							else
+							{
+								PolicyTier3 = TextureService->GetOrCreate("ICON_ADDONPOLICY_TIER3", RES_ICON_TIER3, NexusHandle);
+							}
+							break;
+						}
+					}
+				}
+				else if (!aAddon->ToSComplianceNotice.empty())
+				{
+					if (PolicyTier1)
 					{
 						std::string tosNotice = Language->Translate("((000074))");
 						tosNotice.append("\n");
 						tosNotice.append(aAddon->ToSComplianceNotice);
 
-						ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
-						ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
-						ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
-						ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.863f, 0.863f, 0.863f, 1));
-						ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f });
-
 						ImGui::SetCursorPos(ImVec2(actionsWidth - (size * Renderer::Scaling), ImGui::GetCursorPosY()));
-						if (ImGui::ImageButton(ToSComplianceWarning->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
+						if (ImGui::IconButton(PolicyTier1->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
 						{
 							ShellExecuteA(0, 0, "https://help.guildwars2.com/hc/en-us/articles/360013625034-Policy-Third-Party-Programs", 0, 0, SW_SHOW);
 						}
-						ImGui::PopStyleColor(4);
-						ImGui::PopStyleVar();
 
 						ImGui::GW2::TooltipGeneric(tosNotice.c_str());
 					}
 					else
 					{
-						ToSComplianceWarning = TextureService->GetOrCreate(ICON_WARNING, RES_ICON_WARNING, NexusHandle);
+						PolicyTier1 = TextureService->GetOrCreate(ICON_WARNING, RES_ICON_TIER1, NexusHandle);
 					}
 				}
 

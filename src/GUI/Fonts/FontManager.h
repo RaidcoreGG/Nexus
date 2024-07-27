@@ -68,6 +68,12 @@ namespace FontManager
 	/// 	Addon API wrapper to add a font from memory.
 	///----------------------------------------------------------------------------------------------------
 	void ADDONAPI_AddFontFromMemory(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_ResizeFont:
+	/// 	Changes the size of a given font.
+	///----------------------------------------------------------------------------------------------------
+	void ADDONAPI_ResizeFont(const char* aIdentifier, float aFontSize);
 }
 
 ///----------------------------------------------------------------------------------------------------
@@ -123,6 +129,12 @@ public:
 	/// 	Adds a the default ImGui font.
 	///----------------------------------------------------------------------------------------------------
 	void AddDefaultFont(FONTS_RECEIVECALLBACK aCallback = nullptr);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ResizeFont:
+	/// 	Changes the size of a given font.
+	///----------------------------------------------------------------------------------------------------
+	void ResizeFont(const char* aIdentifier, float aFontSize);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Verify:

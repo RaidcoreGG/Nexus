@@ -20,6 +20,7 @@ struct LogEntry
 {
 	ELogLevel LogLevel;
 	unsigned long long Timestamp;
+	int TimestampMilliseconds;
 	std::string Channel;
 	std::string Message;
 
@@ -27,13 +28,13 @@ struct LogEntry
 	/// TimestampString:
 	/// 	Converts the timestamp of the log message to a string.
 	///----------------------------------------------------------------------------------------------------
-	std::string TimestampString(bool aIncludeDate = true);
+	std::string TimestampString(bool aIncludeDate = true, bool aIncludeMs = false);
 
 	///----------------------------------------------------------------------------------------------------
 	/// ToString:
 	/// 	Converts the log message to a printable string.
 	///----------------------------------------------------------------------------------------------------
-	std::string ToString(bool aIncludeChannel = true);
+	std::string ToString(bool aIncludeChannel = true, bool aIncludeDate = true, bool aIncludeMs = false);
 };
 
 #endif

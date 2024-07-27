@@ -5,6 +5,7 @@
 #include <mutex>
 #include <vector>
 #include <map>
+#include <unordered_map>
 
 #include "FuncDefs.h"
 
@@ -28,36 +29,37 @@
 
 namespace GUI
 {
-	extern CFontManager&				FontManager;
+	extern CFontManager&							FontManager;
 
-	extern CAddonsWindow*				AddonsWindow;
-	extern COptionsWindow*				OptionsWindow;
-	extern CLogWindow*					LogWindow;
-	extern CDebugWindow*				DebugWindow;
-	extern CAboutBox*					AboutWindow;
-	extern CEULAModal*					EULAWindow;
+	extern CAddonsWindow*							AddonsWindow;
+	extern COptionsWindow*							OptionsWindow;
+	extern CLogWindow*								LogWindow;
+	extern CDebugWindow*							DebugWindow;
+	extern CAboutBox*								AboutWindow;
+	extern CEULAModal*								EULAWindow;
 
-	extern Mumble::Data*				MumbleLink;
-	extern NexusLinkData*				NexusLink;
+	extern Mumble::Data*							MumbleLink;
+	extern NexusLinkData*							NexusLink;
 
-	extern std::mutex					Mutex;
-	extern std::vector<GUI_RENDER>		RegistryPreRender;
-	extern std::vector<GUI_RENDER>		RegistryRender;
-	extern std::vector<GUI_RENDER>		RegistryPostRender;
-	extern std::vector<GUI_RENDER>		RegistryOptionsRender;
+	extern std::mutex								Mutex;
+	extern std::vector<GUI_RENDER>					RegistryPreRender;
+	extern std::vector<GUI_RENDER>					RegistryRender;
+	extern std::vector<GUI_RENDER>					RegistryPostRender;
+	extern std::vector<GUI_RENDER>					RegistryOptionsRender;
+	extern std::unordered_map<std::string, bool*>	RegistryCloseOnEscape;
 
-	extern std::map<EFont, ImFont*>		FontIndex;
-	extern float						FontSize;
-	extern bool							CloseMenuAfterSelecting;
-	extern bool							CloseOnEscape;
-	extern bool							LinkArcDPSStyle;
+	extern std::map<EFont, ImFont*>					FontIndex;
+	extern float									FontSize;
+	extern bool										CloseMenuAfterSelecting;
+	extern bool										CloseOnEscape;
+	extern bool										LinkArcDPSStyle;
 
-	extern bool							IsUIVisible;
+	extern bool										IsUIVisible;
 
-	extern bool							HasAcceptedEULA;
-	extern bool							NotifyChangelog;
+	extern bool										HasAcceptedEULA;
+	extern bool										NotifyChangelog;
 
-	extern bool							ShowAddonsWindowAfterDUU;
+	extern bool										ShowAddonsWindowAfterDUU;
 
 	void Initialize();
 	void Shutdown();
@@ -75,6 +77,9 @@ namespace GUI
 	void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback);
 	/* Deregisters the provided RenderCallback. */
 	void Deregister(GUI_RENDER aRenderCallback);
+
+	void RegisterCloseOnEscape(const char* aWindowName, bool* aIsVisible);
+	void DeregisterCloseOnEscape(const char* aWindowName);
 
 	/* Removes all subscribers that are within the provided address space. */
 	int Verify(void* aStartAddress, void* aEndAddress);

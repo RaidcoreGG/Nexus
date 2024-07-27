@@ -55,6 +55,12 @@ namespace FontManager
 		CFontManager& inst = CFontManager::GetInstance();
 		inst.AddFont(aIdentifier, aFontSize, aData, aSize, aCallback, aConfig);
 	}
+	
+	void ADDONAPI_ResizeFont(const char* aIdentifier, float aFontSize)
+	{
+		CFontManager& inst = CFontManager::GetInstance();
+		inst.ResizeFont(aIdentifier, aFontSize);
+	}
 }
 
 CFontManager& CFontManager::GetInstance()
@@ -312,6 +318,30 @@ void CFontManager::AddDefaultFont(FONTS_RECEIVECALLBACK aCallback)
 
 		/* call this->AddFontInternal with the memory buffer */
 		this->AddFontInternal("FONT_DEFAULT", 13.0f, buffer, size, aCallback, nullptr);
+	}
+}
+
+void CFontManager::ResizeFont(const char* aIdentifier, float aFontSize)
+{
+	if (aFontSize < 1.0f) { return; }
+
+	std::string str = aIdentifier;
+
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [str](ManagedFont& font) { return font.Identifier == str; });
+
+	if (it != this->Registry.end()) /* font already exists */
+	{
+		/* get the reference */
+		ManagedFont& font = *it;
+
+		if (font.Size != aFontSize)
+		{
+			font.Size = aFontSize;
+
+			/* invalidate the font atlas to be rebuilt on this->Advance */
+			this->IsFontAtlasBuilt = false;
+		}
 	}
 }
 

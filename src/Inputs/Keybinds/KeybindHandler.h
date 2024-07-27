@@ -28,24 +28,6 @@ constexpr const char* CH_KEYBINDS = "Keybinds";
 namespace Keybinds
 {
 	///----------------------------------------------------------------------------------------------------
-	/// ScancodeToString:
-	/// 	Returns the display string of a scan code.
-	///----------------------------------------------------------------------------------------------------
-	std::string ScancodeToString(unsigned short aScanCode);
-
-	///----------------------------------------------------------------------------------------------------
-	/// KBFromString:
-	/// 	Helper function to create a keybind from a string.
-	///----------------------------------------------------------------------------------------------------
-	Keybind KBFromString(std::string aKeybind);
-
-	///----------------------------------------------------------------------------------------------------
-	/// KBToString:
-	/// 	Helper function to get the display string of a keybind.
-	///----------------------------------------------------------------------------------------------------
-	std::string KBToString(Keybind aKebyind, bool padded = false);
-
-	///----------------------------------------------------------------------------------------------------
 	/// ADDONAPI_RegisterWithString:
 	/// 	[Revision 1] Addon API wrapper function for Register from string.
 	///----------------------------------------------------------------------------------------------------
@@ -87,7 +69,26 @@ namespace Keybinds
 ///----------------------------------------------------------------------------------------------------
 class CKeybindApi
 {
-public:
+	public:
+	///----------------------------------------------------------------------------------------------------
+	/// ScancodeToString:
+	/// 	Returns the display string of a scan code.
+	///----------------------------------------------------------------------------------------------------
+	static std::string ScancodeToString(unsigned short aScanCode);
+
+	///----------------------------------------------------------------------------------------------------
+	/// KBFromString:
+	/// 	Helper function to create a keybind from a string.
+	///----------------------------------------------------------------------------------------------------
+	static Keybind KBFromString(std::string aKeybind);
+
+	///----------------------------------------------------------------------------------------------------
+	/// KBToString:
+	/// 	Helper function to get the display string of a keybind.
+	///----------------------------------------------------------------------------------------------------
+	static std::string KBToString(Keybind aKebyind, bool padded = false);
+
+	public:
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
@@ -122,7 +123,7 @@ public:
 	/// 	Deregisters a KeybindHandler from an identifier.
 	///----------------------------------------------------------------------------------------------------
 	void Deregister(const char* aIdentifier);
-	
+
 	///----------------------------------------------------------------------------------------------------
 	/// IsInUse:
 	/// 	Returns an empty string if keybind is unused or the identifier that uses this keybind.
@@ -178,14 +179,13 @@ public:
 	///----------------------------------------------------------------------------------------------------
 	void EndCapturing();
 
-private:
+	private:
 	mutable std::mutex						Mutex;
 	std::map<std::string, ActiveKeybind>	Registry;
 
 	bool									IsCapturing;
 	Keybind									CapturedKeybind;
 
-	//mutable std::mutex						MutexHeldKeys;
 	bool									IsAltHeld;
 	bool									IsCtrlHeld;
 	bool									IsShiftHeld;
