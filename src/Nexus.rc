@@ -135,7 +135,12 @@ RES_TEX_ADDONITEM_DUU			PNG             "Resources\\AddonsWindow\\AddonItem_DUU.
 RES_TEX_ADDONS_TITLEBAR			PNG             "Resources\\AddonsWindow\\TitleBar.png"
 RES_TEX_ADDONS_TITLEBAR_HOVER	PNG             "Resources\\AddonsWindow\\TitleBar_Hover.png"
 
-RES_ICON_WARNING				PNG             "Resources\\AddonsWindow\\TosWarning.png"
+RES_ICON_TIER1					PNG             "Resources\\AddonsWindow\\Tier1.png"
+RES_ICON_TIER2					PNG             "Resources\\AddonsWindow\\Tier2.png"
+RES_ICON_TIER3					PNG             "Resources\\AddonsWindow\\Tier3.png"
+RES_ICON_TIER_UNKNOWN			PNG             "Resources\\AddonsWindow\\TierUnknown.png"
+
+RES_ICON_RAIDCORE				PNG             "Resources\\RaidcoreTag.png"
 
 /* Generic */
 RES_TEX_TABBTN					PNG             "Resources\\TabBtn.png"
