@@ -289,6 +289,81 @@ namespace GUI
 		}
 	}
 
+	void PopulateInputBinds()
+	{
+		if (!IsKeybindsPanelOpen)
+		{
+			KeybindCategoryMap.clear();
+
+			/* copy of all keybinds */
+			std::map<std::string, ActiveKeybind> KeybindRegistry = KeybindApi->GetRegistry();
+
+			/* acquire categories */
+			for (auto& [identifier, keybind] : KeybindRegistry)
+			{
+				std::string owner = Loader::GetOwner(keybind.Handler);
+
+				auto it = std::find_if(KeybindCategoryMap.begin(), KeybindCategoryMap.end(), [owner](KBCat category) { return category.Name == owner; });
+
+				if (it == KeybindCategoryMap.end())
+				{
+					KBCat cat{};
+					cat.Name = owner;
+					cat.Keybinds[identifier] = {
+						CKeybindApi::KBToString(keybind.Bind, true),
+						keybind
+					};
+					KeybindCategoryMap.push_back(cat);
+				}
+				else
+				{
+					it->Keybinds[identifier] = {
+						CKeybindApi::KBToString(keybind.Bind, true),
+						keybind
+					};
+				}
+			}
+		}
+	}
+	void PopulateGameBinds()
+	{
+		if (!IsGameKeybindsPanelOpen)
+		{
+			GameKeybindCategoryMap.clear();
+
+			/* copy of all keybinds */
+			std::map<EGameBinds, Keybind> KeybindRegistry = GameBindsApi->GetRegistry();
+
+			/* acquire categories */
+			for (auto& [identifier, keybind] : KeybindRegistry)
+			{
+				std::string catName = CGameBindsApi::GetCategory(identifier);
+
+				auto it = std::find_if(GameKeybindCategoryMap.begin(), GameKeybindCategoryMap.end(), [catName](GKBCat category) { return category.Name == catName; });
+
+				if (it == GameKeybindCategoryMap.end())
+				{
+					GKBCat cat{};
+					cat.Name = catName;
+					cat.GameKeybinds[identifier] = {
+						CGameBindsApi::ToString(identifier),
+						CKeybindApi::KBToString(keybind, true),
+						keybind
+					};
+					GameKeybindCategoryMap.push_back(cat);
+				}
+				else
+				{
+					it->GameKeybinds[identifier] = {
+						CGameBindsApi::ToString(identifier),
+						CKeybindApi::KBToString(keybind, true),
+						keybind
+					};
+				}
+			}
+		}
+	}
+
 	void COptionsWindow::Render()
 	{
 		if (!Visible) { return; }
@@ -446,6 +521,8 @@ namespace GUI
 		{
 			isActive = true;
 
+			PopulateInputBinds();
+
 			IsKeybindsPanelOpen = true;
 
 			ImGui::BeginChild("##AddonsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
@@ -477,8 +554,6 @@ namespace GUI
 
 								//ImGui::EndChild();
 							}
-
-							ImGui::Separator();
 
 							if (ImGui::CollapsingHeader("Options", ImGuiTreeNodeFlags_DefaultOpen))
 							{
@@ -696,42 +771,6 @@ namespace GUI
 		}
 	}
 
-	void PopulateInputBinds()
-	{
-		if (!IsKeybindsPanelOpen)
-		{
-			KeybindCategoryMap.clear();
-
-			/* copy of all keybinds */
-			std::map<std::string, ActiveKeybind> KeybindRegistry = KeybindApi->GetRegistry();
-
-			/* acquire categories */
-			for (auto& [identifier, keybind] : KeybindRegistry)
-			{
-				std::string owner = Loader::GetOwner(keybind.Handler);
-
-				auto it = std::find_if(KeybindCategoryMap.begin(), KeybindCategoryMap.end(), [owner](KBCat category) { return category.Name == owner; });
-
-				if (it == KeybindCategoryMap.end())
-				{
-					KBCat cat{};
-					cat.Name = owner;
-					cat.Keybinds[identifier] = {
-						CKeybindApi::KBToString(keybind.Bind, true),
-						keybind
-					};
-					KeybindCategoryMap.push_back(cat);
-				}
-				else
-				{
-					it->Keybinds[identifier] = {
-						CKeybindApi::KBToString(keybind.Bind, true),
-						keybind
-					};
-				}
-			}
-		}
-	}
 	bool KeybindsTab()
 	{
 		bool isActive = false;
@@ -762,44 +801,6 @@ namespace GUI
 		return isActive;
 	}
 
-	void PopulateGameBinds()
-	{
-		if (!IsGameKeybindsPanelOpen)
-		{
-			GameKeybindCategoryMap.clear();
-
-			/* copy of all keybinds */
-			std::map<EGameBinds, Keybind> KeybindRegistry = GameBindsApi->GetRegistry();
-
-			/* acquire categories */
-			for (auto& [identifier, keybind] : KeybindRegistry)
-			{
-				std::string catName = CGameBindsApi::GetCategory(identifier);
-
-				auto it = std::find_if(GameKeybindCategoryMap.begin(), GameKeybindCategoryMap.end(), [catName](GKBCat category) { return category.Name == catName; });
-
-				if (it == GameKeybindCategoryMap.end())
-				{
-					GKBCat cat{};
-					cat.Name = catName;
-					cat.GameKeybinds[identifier] = {
-						CGameBindsApi::ToString(identifier),
-						CKeybindApi::KBToString(keybind, true),
-						keybind
-					};
-					GameKeybindCategoryMap.push_back(cat);
-				}
-				else
-				{
-					it->GameKeybinds[identifier] = {
-						CGameBindsApi::ToString(identifier),
-						CKeybindApi::KBToString(keybind, true),
-						keybind
-					};
-				}
-			}
-		}
-	}
 	void GameKeybindsTab()
 	{
 		if (ImGui::BeginTabItem(Language->Translate("((Game Binds))")))
