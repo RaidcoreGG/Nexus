@@ -180,9 +180,9 @@ class CGameBindsApi
 	std::map<EGameBinds, Keybind> GetRegistry() const;
 
 	private:
-	CRawInputApi* RawInputApi;
-	CLogHandler* Logger;
-	CEventApi* EventApi;
+	CRawInputApi*					RawInputApi;
+	CLogHandler*					Logger;
+	CEventApi*						EventApi;
 
 	mutable std::mutex				Mutex;
 	std::map<EGameBinds, Keybind>	Registry;

@@ -1130,6 +1130,9 @@
     <ClInclude Include="src\Loader\AddonVersion.h">
       <Filter>Loader\Structs</Filter>
     </ClInclude>
+    <ClInclude Include="src\Inputs\GameBinds\FuncDefs.h">
+      <Filter>Inputs\GameBinds</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\Nexus.rc">
