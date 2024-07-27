@@ -1489,6 +1489,8 @@ namespace Loader
 				api->Log = LogHandler::ADDONAPI_LogMessage2;
 
 				api->UI.SendAlert = GUI::Alerts::Notify;
+				api->UI.RegisterCloseOnEscape = GUI::RegisterCloseOnEscape;
+				api->UI.DeregisterCloseOnEscape = GUI::DeregisterCloseOnEscape;
 
 				api->Paths.GetGameDirectory = Index::GetGameDirectory;
 				api->Paths.GetAddonDirectory = Index::GetAddonDirectory;

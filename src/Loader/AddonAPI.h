@@ -407,6 +407,8 @@ struct AddonAPI6 : AddonAPI
 	struct UIVT
 	{
 		ALERTS_NOTIFY						SendAlert;
+		GUI_REGISTERCLOSEONESCAPE			RegisterCloseOnEscape;
+		GUI_DEREGISTERCLOSEONESCAPE			DeregisterCloseOnEscape;
 	};
 	UIVT									UI;
 

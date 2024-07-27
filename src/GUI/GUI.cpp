@@ -34,6 +34,7 @@
 
 #include "resource.h"
 #include "Util/Base64.h"
+#include "Util/Inputs.h"
 #include "Util/Resources.h"
 #include "Util/Time.h"
 
@@ -65,34 +66,35 @@ namespace GUI
 	void OnLanguageChanged(void* aEventArgs);
 	void Setup();
 
-	Mumble::Data*				MumbleLink					= nullptr;
-	NexusLinkData*				NexusLink					= nullptr;
+	Mumble::Data*							MumbleLink					= nullptr;
+	NexusLinkData*							NexusLink					= nullptr;
 
-	std::mutex					Mutex;
-	std::vector<GUI_RENDER>		RegistryPreRender;
-	std::vector<GUI_RENDER>		RegistryRender;
-	std::vector<GUI_RENDER>		RegistryPostRender;
-	std::vector<GUI_RENDER>		RegistryOptionsRender;
+	std::mutex								Mutex;
+	std::vector<GUI_RENDER>					RegistryPreRender;
+	std::vector<GUI_RENDER>					RegistryRender;
+	std::vector<GUI_RENDER>					RegistryPostRender;
+	std::vector<GUI_RENDER>					RegistryOptionsRender;
+	std::unordered_map<std::string, bool*>	RegistryCloseOnEscape;
 
-	std::map<EFont, ImFont*>	FontIndex;
-	float						FontSize					= 16.0f;
-	bool						CloseMenuAfterSelecting		= true;
-	bool						CloseOnEscape				= true;
-	bool						LinkArcDPSStyle				= true;
+	std::map<EFont, ImFont*>				FontIndex;
+	float									FontSize					= 16.0f;
+	bool									CloseMenuAfterSelecting		= true;
+	bool									CloseOnEscape				= true;
+	bool									LinkArcDPSStyle				= true;
 
-	bool						IsUIVisible					= true;
+	bool									IsUIVisible					= true;
 
-	bool						IsRightClickHeld			= false;
-	bool						IsLeftClickHeld				= false;
-	bool						IsSetup						= false;
-	float						LastScaling					= 1.0f;
+	bool									IsRightClickHeld			= false;
+	bool									IsLeftClickHeld				= false;
+	bool									IsSetup						= false;
+	float									LastScaling					= 1.0f;
 
-	bool						HasAcceptedEULA				= false;
-	bool						NotifyChangelog				= false;
+	bool									HasAcceptedEULA				= false;
+	bool									NotifyChangelog				= false;
 
-	bool						ShowAddonsWindowAfterDUU	= false;
+	bool									ShowAddonsWindowAfterDUU	= false;
 
-	bool						HasCustomFont				= false;
+	bool									HasCustomFont				= false;
 
 	void Initialize()
 	{
@@ -137,39 +139,24 @@ namespace GUI
 			{
 				if (uMsg == WM_KEYDOWN && wParam == VK_ESCAPE)
 				{
-					ImVector<ImGuiWindow*> windows = Renderer::GuiContext->Windows;
+					KeyLParam keylp = LParamToKMF(lParam);
 
-					for (int i = windows.Size - 1; i > 0; i--)
+					if (!keylp.PreviousKeyState)
 					{
-						if (strcmp(windows[i]->Name, "Menu") == 0 && Menu::Visible)
+						ImVector<ImGuiWindow*> windows = Renderer::GuiContext->Windows;
+
+						for (int i = windows.Size - 1; i > 0; i--)
 						{
-							Menu::Visible = false;
-							return 0;
-						}
-						else if (strcmp(windows[i]->Name, "Addons") == 0 && AddonsWindow->Visible)
-						{
-							AddonsWindow->Visible = false;
-							return 0;
-						}
-						else if (strcmp(windows[i]->Name, "Options") == 0 && OptionsWindow->Visible)
-						{
-							OptionsWindow->Visible = false;
-							return 0;
-						}
-						else if (strcmp(windows[i]->Name, "Log") == 0 && LogWindow->Visible)
-						{
-							LogWindow->Visible = false;
-							return 0;
-						}
-						else if (strcmp(windows[i]->Name, "Debug") == 0 && DebugWindow->Visible)
-						{
-							DebugWindow->Visible = false;
-							return 0;
-						}
-						else if (strcmp(windows[i]->Name, "About") == 0 && AboutWindow->Visible)
-						{
-							AboutWindow->Visible = false;
-							return 0;
+							std::string windowName = windows[i]->Name;
+
+							for (auto& [wndName, boolptr] : RegistryCloseOnEscape)
+							{
+								if (windowName == wndName && *boolptr)
+								{
+									*boolptr = false;
+									return 0;
+								}
+							}
 						}
 					}
 				}
@@ -847,12 +834,7 @@ namespace GUI
 
 		Logger->RegisterLogger(GUI::LogWindow);
 
-		KeybindApi->Register(KB_ADDONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
-		KeybindApi->Register(KB_OPTIONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
-		KeybindApi->Register(KB_LOG, EKBHType::DownOnly, ProcessKeybind, "(null)");
-		KeybindApi->Register(KB_DEBUG, EKBHType::DownOnly, ProcessKeybind, "(null)");
-		KeybindApi->Register(KB_MUMBLEOVERLAY, EKBHType::DownOnly, ProcessKeybind, "(null)");
-
+		/* add menu items */
 		Menu::AddMenuItem("((000083))",		ICON_RETURN,	RES_ICON_RETURN,	&Menu::Visible);
 		Menu::AddMenuItem("((000003))",		ICON_ADDONS,	RES_ICON_ADDONS,	&AddonsWindow->Visible);
 		Menu::AddMenuItem("((000004))",		ICON_OPTIONS,	RES_ICON_OPTIONS,	&OptionsWindow->Visible);
@@ -863,8 +845,23 @@ namespace GUI
 		}
 		Menu::AddMenuItem("((000008))",		ICON_ABOUT,		RES_ICON_ABOUT,		&AboutWindow->Visible);
 
+		/* register close on escape */
+		RegisterCloseOnEscape("Menu", &Menu::Visible);
+		RegisterCloseOnEscape("Addons", &AddonsWindow->Visible);
+		RegisterCloseOnEscape("Options", &OptionsWindow->Visible);
+		RegisterCloseOnEscape("Log", &LogWindow->Visible);
+		RegisterCloseOnEscape("Debug", &DebugWindow->Visible);
+		RegisterCloseOnEscape("Dear ImGui Metrics/Debugger", &DebugWindow->IsMetricsWindowVisible);
+		RegisterCloseOnEscape("Memory Viewer", &DebugWindow->MemoryViewer.Open);
+		RegisterCloseOnEscape("About", &AboutWindow->Visible);
+		
 		/* register keybinds */
 		KeybindApi->Register(KB_MENU, EKBHType::DownOnly, ProcessKeybind, "CTRL+O");
+		KeybindApi->Register(KB_ADDONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
+		KeybindApi->Register(KB_OPTIONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
+		KeybindApi->Register(KB_LOG, EKBHType::DownOnly, ProcessKeybind, "(null)");
+		KeybindApi->Register(KB_DEBUG, EKBHType::DownOnly, ProcessKeybind, "(null)");
+		KeybindApi->Register(KB_MUMBLEOVERLAY, EKBHType::DownOnly, ProcessKeybind, "(null)");
 		KeybindApi->Register(KB_TOGGLEHIDEUI, EKBHType::DownOnly, ProcessKeybind, "CTRL+H");
 
 		/* load icons */
@@ -935,6 +932,19 @@ namespace GUI
 		RegistryOptionsRender.erase(std::remove(RegistryOptionsRender.begin(), RegistryOptionsRender.end(), aRenderCallback), RegistryOptionsRender.end());
 	}
 
+	void RegisterCloseOnEscape(const char* aWindowName, bool* aIsVisible)
+	{
+		const std::lock_guard<std::mutex> lock(Mutex);
+
+		RegistryCloseOnEscape[aWindowName] = aIsVisible;
+	}
+	void DeregisterCloseOnEscape(const char* aWindowName)
+	{
+		const std::lock_guard<std::mutex> lock(Mutex);
+
+		RegistryCloseOnEscape.erase(aWindowName);
+	}
+
 	int Verify(void* aStartAddress, void* aEndAddress)
 	{
 		int refCounter = 0;
@@ -967,8 +977,16 @@ namespace GUI
 		for (GUI_RENDER renderCb : RegistryOptionsRender)
 		{
 			if (renderCb >= aStartAddress && renderCb <= aEndAddress)
-				{
+			{
 				RegistryOptionsRender.erase(std::remove(RegistryOptionsRender.begin(), RegistryOptionsRender.end(), renderCb), RegistryOptionsRender.end());
+				refCounter++;
+			}
+		}
+		for (auto& [windowname, boolptr] : RegistryCloseOnEscape)
+		{
+			if (boolptr >= aStartAddress && boolptr <= aEndAddress)
+			{
+				RegistryCloseOnEscape.erase(windowname);
 				refCounter++;
 			}
 		}
