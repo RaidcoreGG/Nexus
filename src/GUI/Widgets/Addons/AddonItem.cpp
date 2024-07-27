@@ -461,7 +461,7 @@ namespace GUI
 									ShellExecuteA(0, 0, "https://raidcore.gg/Legal#addon-policy", 0, 0, SW_SHOW);
 								}
 
-								ImGui::GW2::TooltipGeneric("This addon is not classified within the Nexus Addon Library. It may violate the Terms of Service.");
+								ImGui::GW2::TooltipGeneric(Language->Translate("((000090))"));
 							}
 							else
 							{
@@ -480,7 +480,7 @@ namespace GUI
 									ShellExecuteA(0, 0, "https://raidcore.gg/Legal#addon-policy", 0, 0, SW_SHOW);
 								}
 								
-								ImGui::GW2::TooltipGeneric("This is a tier 1 addon. Click to read the Raidcore Addon Policy.");
+								ImGui::GW2::TooltipGeneric(String::Format(Language->Translate("((000089))"), 1).c_str());
 							}
 							else
 							{
@@ -498,7 +498,7 @@ namespace GUI
 									ShellExecuteA(0, 0, "https://raidcore.gg/Legal#addon-policy", 0, 0, SW_SHOW);
 								}
 
-								ImGui::GW2::TooltipGeneric("This is a tier 2 addon. Click to read the Raidcore Addon Policy.");
+								ImGui::GW2::TooltipGeneric(String::Format(Language->Translate("((000089))"), 2).c_str());
 							}
 							else
 							{
@@ -516,7 +516,7 @@ namespace GUI
 									ShellExecuteA(0, 0, "https://raidcore.gg/Legal#addon-policy", 0, 0, SW_SHOW);
 								}
 
-								ImGui::GW2::TooltipGeneric("This is a tier 3 addon. Click to read the Raidcore Addon Policy.");
+								ImGui::GW2::TooltipGeneric(String::Format(Language->Translate("((000089))"), 3).c_str());
 							}
 							else
 							{

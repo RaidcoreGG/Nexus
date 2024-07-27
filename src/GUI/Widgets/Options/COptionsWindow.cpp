@@ -546,7 +546,7 @@ namespace GUI
 									if (cat.Name != parent) { continue; }
 									if (cat.Keybinds.size() == 0) { continue; }
 
-									if (ImGui::CollapsingHeader("Keybinds", ImGuiTreeNodeFlags_DefaultOpen))
+									if (ImGui::CollapsingHeader(Language->Translate("((000060))"), ImGuiTreeNodeFlags_DefaultOpen))
 									{
 										DrawInputBindsTable(cat.Keybinds);
 									}
@@ -555,7 +555,7 @@ namespace GUI
 								//ImGui::EndChild();
 							}
 
-							if (ImGui::CollapsingHeader("Options", ImGuiTreeNodeFlags_DefaultOpen))
+							if (ImGui::CollapsingHeader(Language->Translate("((000004))"), ImGuiTreeNodeFlags_DefaultOpen))
 							{
 								renderCb();
 							}
@@ -787,7 +787,7 @@ namespace GUI
 
 			for (KBCat cat : KeybindCategoryMap)
 			{
-				if (ImGui::CollapsingHeader(cat.Name != "(null)" ? cat.Name.c_str() : "Inactive", ImGuiTreeNodeFlags_DefaultOpen))
+				if (ImGui::CollapsingHeader(cat.Name != "(null)" ? cat.Name.c_str() : Language->Translate("((000088))"), ImGuiTreeNodeFlags_DefaultOpen))
 				{
 					DrawInputBindsTable(cat.Keybinds);
 				}
