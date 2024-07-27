@@ -803,7 +803,7 @@ namespace GUI
 
 	void GameKeybindsTab()
 	{
-		if (ImGui::BeginTabItem(Language->Translate("((Game Binds))")))
+		if (ImGui::BeginTabItem(Language->Translate("((000091))")))
 		{
 			PopulateGameBinds();
 			
@@ -813,7 +813,7 @@ namespace GUI
 
 			for (GKBCat cat : GameKeybindCategoryMap)
 			{
-				if (ImGui::CollapsingHeader(cat.Name != "(null)" ? cat.Name.c_str() : "Inactive", ImGuiTreeNodeFlags_DefaultOpen))
+				if (ImGui::CollapsingHeader(Language->Translate(cat.Name.c_str()), ImGuiTreeNodeFlags_DefaultOpen))
 				{
 					DrawGameBindsTable(cat.GameKeybinds);
 				}
