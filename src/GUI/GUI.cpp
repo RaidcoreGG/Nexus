@@ -77,6 +77,7 @@ namespace GUI
 	std::unordered_map<std::string, bool*>	RegistryCloseOnEscape;
 
 	std::map<EFont, ImFont*>				FontIndex;
+	std::string								FontFile;
 	float									FontSize					= 16.0f;
 	bool									CloseMenuAfterSelecting		= true;
 	bool									CloseOnEscape				= true;
@@ -93,8 +94,6 @@ namespace GUI
 	bool									NotifyChangelog				= false;
 
 	bool									ShowAddonsWindowAfterDUU	= false;
-
-	bool									HasCustomFont				= false;
 
 	void Initialize()
 	{
@@ -532,12 +531,17 @@ namespace GUI
 		if (str == "USER_FONT")
 		{
 			UserFont = aFont;
+			if (UserFont)
+			{
+				ImGuiIO& io = ImGui::GetIO();
+				io.FontDefault = UserFont;
+			}
 		}
 		if (str == "FONT_DEFAULT")
 		{
 			MonospaceFont = aFont;
 
-			if (!HasCustomFont)
+			if (FontFile.empty())
 			{
 				UserFont = aFont;
 			}
@@ -565,7 +569,7 @@ namespace GUI
 		MumbleLink = (Mumble::Data*)DataLinkService->GetResource(DL_MUMBLE_LINK);
 		NexusLink = (NexusLinkData*)DataLinkService->GetResource(DL_NEXUS_LINK);
 
-		Language->SetLocaleDirectory(Index::D_GW2_ADDONS_RAIDCORE_LOCALES);
+		Language->SetLocaleDirectory(Index::D_GW2_ADDONS_NEXUS_LOCALES);
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_EN, RES_LOCALE_EN, "JSON");
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_DE, RES_LOCALE_DE, "JSON");
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_FR, RES_LOCALE_FR, "JSON");
@@ -598,6 +602,15 @@ namespace GUI
 			else
 			{
 				NotifyChangelog = false;
+			}
+
+			if (!Settings::Settings[OPT_USERFONT].is_null())
+			{
+				Settings::Settings[OPT_USERFONT].get_to(FontFile);
+			}
+			else
+			{
+				FontFile = "";
 			}
 
 			if (!Settings::Settings[OPT_FONTSIZE].is_null())
@@ -747,17 +760,15 @@ namespace GUI
 		std::filesystem::path fontPath{};
 
 		/* add user font */
-		if (!LinkArcDPSStyle && std::filesystem::exists(Index::F_FONT))
+		if (!FontFile.empty() && std::filesystem::exists(Index::D_GW2_ADDONS_NEXUS_FONTS / FontFile))
 		{
-			fontPath = Index::F_FONT;
+			fontPath = Index::D_GW2_ADDONS_NEXUS_FONTS / FontFile;
 			FontManager.AddFont("USER_FONT", FontSize, fontPath.string().c_str(), FontReceiver, nullptr);
-			HasCustomFont = true;
 		}
 		else if (LinkArcDPSStyle && std::filesystem::exists(Index::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf"))
 		{
 			fontPath = Index::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf";
 			FontManager.AddFont("USER_FONT", FontSize, fontPath.string().c_str(), FontReceiver, nullptr);
-			HasCustomFont = true;
 		}
 		else
 		{

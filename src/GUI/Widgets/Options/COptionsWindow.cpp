@@ -4,6 +4,7 @@
 #include <regex>
 #include <vector>
 #include <thread>
+#include <filesystem>
 
 #include "Consts.h"
 #include "Index.h"
@@ -30,6 +31,10 @@ namespace GUI
 {
 	float owWidth = 30.0f;
 	float owHeight = 24.0f;
+
+	bool IsStylePanelOpen = false;
+	std::vector<std::string> Fonts;
+
 	float kbButtonWidth = 0.0f;
 
 	struct KeybindPacked
@@ -289,6 +294,26 @@ namespace GUI
 		}
 	}
 
+	void PopulateFonts()
+	{
+		if (!IsStylePanelOpen)
+		{
+			Fonts.clear();
+
+			for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Index::D_GW2_ADDONS_NEXUS_FONTS))
+			{
+				std::filesystem::path path = entry.path();
+
+				/* sanity checks */
+				if (std::filesystem::is_directory(path)) { continue; }
+				if (std::filesystem::file_size(path) == 0) { continue; }
+				if (path.extension() == ".ttf")
+				{
+					Fonts.push_back(path.filename().string());
+				}
+			}
+		}
+	}
 	void PopulateInputBinds()
 	{
 		if (!IsKeybindsPanelOpen)
@@ -580,192 +605,209 @@ namespace GUI
 	{
 		if (ImGui::BeginTabItem(Language->Translate("((000053))")))
 		{
+			PopulateFonts();
+
+			IsStylePanelOpen = true;
+
+			ImGui::BeginChild("##StyleTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+
+			ImGui::TextDisabled("Font");
+			if (ImGui::BeginCombo("##fontselector", GUI::FontFile.c_str()))
 			{
-				ImGui::BeginChild("##StyleTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
-
-				ImGui::TextDisabled(Language->Translate("((000054))"));
+				for (std::string font : Fonts)
 				{
-					if (ImGui::InputFloat("##fontsize", &FontSize, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_EnterReturnsTrue))
+					if (ImGui::Selectable(font.c_str(), font == GUI::FontFile))
 					{
-						FontSize = min(max(FontSize, 1.0f), 50.0f);
+						FontFile = font;
+						FontManager.ReplaceFont("USER_FONT", FontSize, (Index::D_GW2_ADDONS_NEXUS_FONTS / font).string().c_str(), GUI::FontReceiver, nullptr);
 
-						Settings::Settings[OPT_FONTSIZE] = FontSize;
-						Settings::Save();
-
-						FontManager.ResizeFont("USER_FONT", FontSize);
-					}
-				}
-
-				ImGuiIO& io = ImGui::GetIO();
-				ImGui::TextDisabled(Language->Translate("((000072))"));
-				if (ImGui::DragFloat("##globalscale", &io.FontGlobalScale, 0.005f, 0.75f, 3.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp))
-				{
-					Settings::Settings[OPT_GLOBALSCALE] = io.FontGlobalScale;
-					Settings::Save();
-
-					GUI::Rescale();
-				}
-
-				ImGui::Separator();
-
-				if (ImGui::Checkbox(Language->Translate("((000056))"), &GUI::LinkArcDPSStyle))
-				{
-					Settings::Settings[OPT_LINKARCSTYLE] = GUI::LinkArcDPSStyle;
-					ImportArcDPSStyle();
-					Settings::Save();
-				}
-				ImGui::TooltipGeneric(Language->Translate("((000057))"));
-
-				if (!GUI::LinkArcDPSStyle)
-				{
-					ImGuiStyle& style = ImGui::GetStyle();
-
-					if (ImGui::SmallButton(Language->Translate("((000058))")))
-					{
-						std::string encode = Base64::Encode((unsigned char*)&style, sizeof(ImGuiStyle));
-						Settings::Settings[OPT_IMGUISTYLE] = encode;
-						Settings::Save();
-
-						encode = Base64::Encode((unsigned char*)&style.Colors[0], sizeof(ImVec4) * ImGuiCol_COUNT);
-						Settings::Settings[OPT_IMGUICOLORS] = encode;
+						Settings::Settings[OPT_USERFONT] = FontFile;
 						Settings::Save();
 					}
-					ImGui::SameLine();
-					if (ImGui::SmallButton(Language->Translate("((000059))")))
-					{
-						if (!Settings::Settings[OPT_IMGUISTYLE].is_null())
-						{
-							std::string style64 = Settings::Settings[OPT_IMGUISTYLE].get<std::string>();
-							std::string decode = Base64::Decode(&style64[0], style64.length());
-							memcpy(&style, &decode[0], decode.length());
-						}
-
-						if (!Settings::Settings[OPT_IMGUICOLORS].is_null())
-						{
-							std::string colors64 = Settings::Settings[OPT_IMGUICOLORS].get<std::string>();
-							std::string decode = Base64::Decode(&colors64[0], colors64.length());
-							memcpy(&style.Colors[0], &decode[0], decode.length());
-						}
-					}
-
-					if (ImGui::BeginTabBar("##tabs", ImGuiTabBarFlags_None))
-					{
-						if (ImGui::BeginTabItem("Sizes"))
-						{
-							ImGui::Text("Main");
-							ImGui::SliderFloat2("WindowPadding", (float*)&style.WindowPadding, 0.0f, 20.0f, "%.0f");
-							ImGui::SliderFloat2("FramePadding", (float*)&style.FramePadding, 0.0f, 20.0f, "%.0f");
-							ImGui::SliderFloat2("CellPadding", (float*)&style.CellPadding, 0.0f, 20.0f, "%.0f");
-							ImGui::SliderFloat2("ItemSpacing", (float*)&style.ItemSpacing, 0.0f, 20.0f, "%.0f");
-							ImGui::SliderFloat2("ItemInnerSpacing", (float*)&style.ItemInnerSpacing, 0.0f, 20.0f, "%.0f");
-							ImGui::SliderFloat2("TouchExtraPadding", (float*)&style.TouchExtraPadding, 0.0f, 10.0f, "%.0f");
-							ImGui::SliderFloat("IndentSpacing", &style.IndentSpacing, 0.0f, 30.0f, "%.0f");
-							ImGui::SliderFloat("ScrollbarSize", &style.ScrollbarSize, 1.0f, 20.0f, "%.0f");
-							ImGui::SliderFloat("GrabMinSize", &style.GrabMinSize, 1.0f, 20.0f, "%.0f");
-							ImGui::Text("Borders");
-							ImGui::SliderFloat("WindowBorderSize", &style.WindowBorderSize, 0.0f, 1.0f, "%.0f");
-							ImGui::SliderFloat("ChildBorderSize", &style.ChildBorderSize, 0.0f, 1.0f, "%.0f");
-							ImGui::SliderFloat("PopupBorderSize", &style.PopupBorderSize, 0.0f, 1.0f, "%.0f");
-							ImGui::SliderFloat("FrameBorderSize", &style.FrameBorderSize, 0.0f, 1.0f, "%.0f");
-							ImGui::SliderFloat("TabBorderSize", &style.TabBorderSize, 0.0f, 1.0f, "%.0f");
-							ImGui::Text("Rounding");
-							ImGui::SliderFloat("WindowRounding", &style.WindowRounding, 0.0f, 12.0f, "%.0f");
-							ImGui::SliderFloat("ChildRounding", &style.ChildRounding, 0.0f, 12.0f, "%.0f");
-							ImGui::SliderFloat("FrameRounding", &style.FrameRounding, 0.0f, 12.0f, "%.0f");
-							ImGui::SliderFloat("PopupRounding", &style.PopupRounding, 0.0f, 12.0f, "%.0f");
-							ImGui::SliderFloat("ScrollbarRounding", &style.ScrollbarRounding, 0.0f, 12.0f, "%.0f");
-							ImGui::SliderFloat("GrabRounding", &style.GrabRounding, 0.0f, 12.0f, "%.0f");
-							ImGui::SliderFloat("LogSliderDeadzone", &style.LogSliderDeadzone, 0.0f, 12.0f, "%.0f");
-							ImGui::SliderFloat("TabRounding", &style.TabRounding, 0.0f, 12.0f, "%.0f");
-							ImGui::Text("Alignment");
-							ImGui::SliderFloat2("WindowTitleAlign", (float*)&style.WindowTitleAlign, 0.0f, 1.0f, "%.2f");
-							int window_menu_button_position = style.WindowMenuButtonPosition + 1;
-							if (ImGui::Combo("WindowMenuButtonPosition", (int*)&window_menu_button_position, "None\0Left\0Right\0"))
-								style.WindowMenuButtonPosition = window_menu_button_position - 1;
-							ImGui::Combo("ColorButtonPosition", (int*)&style.ColorButtonPosition, "Left\0Right\0");
-							ImGui::SliderFloat2("ButtonTextAlign", (float*)&style.ButtonTextAlign, 0.0f, 1.0f, "%.2f");
-							ImGui::SameLine(); ImGui::HelpMarker("Alignment applies when a button is larger than its text content.");
-							ImGui::SliderFloat2("SelectableTextAlign", (float*)&style.SelectableTextAlign, 0.0f, 1.0f, "%.2f");
-							ImGui::SameLine(); ImGui::HelpMarker("Alignment applies when a selectable is larger than its text content.");
-							ImGui::Text("Safe Area Padding");
-							ImGui::SameLine(); ImGui::HelpMarker("Adjust if you cannot see the edges of your screen (e.g. on a TV where scaling has not been configured).");
-							ImGui::SliderFloat2("DisplaySafeAreaPadding", (float*)&style.DisplaySafeAreaPadding, 0.0f, 30.0f, "%.0f");
-							ImGui::EndTabItem();
-						}
-
-						if (ImGui::BeginTabItem("Colors"))
-						{
-							static ImGuiTextFilter filter;
-							filter.Draw("Filter colors", ImGui::GetFontSize() * 16);
-
-							ImGui::BeginChild("##colors", ImVec2(0, 0), true, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_AlwaysHorizontalScrollbar | ImGuiWindowFlags_NavFlattened);
-							ImGui::PushItemWidth(-160);
-							for (int i = 0; i < ImGuiCol_COUNT; i++)
-							{
-								const char* name = ImGui::GetStyleColorName(i);
-								if (!filter.PassFilter(name))
-									continue;
-								ImGui::PushID(i);
-								ImGui::ColorEdit4("##color", (float*)&style.Colors[i], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
-								ImGui::SameLine(0.0f, style.ItemInnerSpacing.x);
-								ImGui::TextUnformatted(name);
-								ImGui::PopID();
-							}
-							ImGui::PopItemWidth();
-							ImGui::EndChild();
-
-							ImGui::EndTabItem();
-						}
-
-						if (ImGui::BeginTabItem("Rendering"))
-						{
-							ImGui::Checkbox("Anti-aliased lines", &style.AntiAliasedLines);
-							ImGui::SameLine();
-							ImGui::HelpMarker("When disabling anti-aliasing lines, you'll probably want to disable borders in your style as well.");
-
-							ImGui::Checkbox("Anti-aliased lines use texture", &style.AntiAliasedLinesUseTex);
-							ImGui::SameLine();
-							ImGui::HelpMarker("Faster lines using texture data. Require backend to render with bilinear filtering (not point/nearest filtering).");
-
-							ImGui::Checkbox("Anti-aliased fill", &style.AntiAliasedFill);
-							ImGui::PushItemWidth(100);
-							ImGui::DragFloat("Curve Tessellation Tolerance", &style.CurveTessellationTol, 0.02f, 0.10f, 10.0f, "%.2f");
-							if (style.CurveTessellationTol < 0.10f) style.CurveTessellationTol = 0.10f;
-
-							// When editing the "Circle Segment Max Error" value, draw a preview of its effect on auto-tessellated circles.
-							ImGui::DragFloat("Circle Segment Max Error", &style.CircleSegmentMaxError, 0.01f, 0.10f, 10.0f, "%.2f");
-							if (ImGui::IsItemActive())
-							{
-								ImGui::SetNextWindowPos(ImGui::GetCursorScreenPos());
-								ImGui::BeginTooltip();
-								ImVec2 p = ImGui::GetCursorScreenPos();
-								ImDrawList* draw_list = ImGui::GetWindowDrawList();
-								float RAD_MIN = 10.0f, RAD_MAX = 80.0f;
-								float off_x = 10.0f;
-								for (int n = 0; n < 7; n++)
-								{
-									const float rad = RAD_MIN + (RAD_MAX - RAD_MIN) * (float)n / (7.0f - 1.0f);
-									draw_list->AddCircle(ImVec2(p.x + off_x + rad, p.y + RAD_MAX), rad, ImGui::GetColorU32(ImGuiCol_Text), 0);
-									off_x += 10.0f + rad * 2.0f;
-								}
-								ImGui::Dummy(ImVec2(off_x, RAD_MAX * 2.0f));
-								ImGui::EndTooltip();
-							}
-							ImGui::SameLine();
-							ImGui::HelpMarker("When drawing circle primitives with \"num_segments == 0\" tesselation will be calculated automatically.");
-
-							ImGui::DragFloat("Global Alpha", &style.Alpha, 0.005f, 0.20f, 1.0f, "%.2f"); // Not exposing zero here so user doesn't "lose" the UI (zero alpha clips all widgets). But application code could have a toggle to switch between zero and non-zero.
-							ImGui::PopItemWidth();
-
-							ImGui::EndTabItem();
-						}
-
-						ImGui::EndTabBar();
-					}
 				}
-
-				ImGui::EndChild();
+				ImGui::EndCombo();
 			}
+
+			ImGui::TextDisabled(Language->Translate("((000054))"));
+			if (ImGui::InputFloat("##fontsize", &FontSize, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_EnterReturnsTrue))
+			{
+				FontSize = min(max(FontSize, 1.0f), 50.0f);
+
+				Settings::Settings[OPT_FONTSIZE] = FontSize;
+				Settings::Save();
+
+				FontManager.ResizeFont("USER_FONT", FontSize);
+			}
+
+			ImGuiIO& io = ImGui::GetIO();
+			ImGui::TextDisabled(Language->Translate("((000072))"));
+			if (ImGui::DragFloat("##globalscale", &io.FontGlobalScale, 0.005f, 0.75f, 3.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp))
+			{
+				Settings::Settings[OPT_GLOBALSCALE] = io.FontGlobalScale;
+				Settings::Save();
+
+				GUI::Rescale();
+			}
+
+			ImGui::Separator();
+
+			if (ImGui::Checkbox(Language->Translate("((000056))"), &GUI::LinkArcDPSStyle))
+			{
+				Settings::Settings[OPT_LINKARCSTYLE] = GUI::LinkArcDPSStyle;
+				ImportArcDPSStyle();
+				Settings::Save();
+			}
+			ImGui::TooltipGeneric(Language->Translate("((000057))"));
+
+			if (!GUI::LinkArcDPSStyle)
+			{
+				ImGuiStyle& style = ImGui::GetStyle();
+
+				if (ImGui::SmallButton(Language->Translate("((000058))")))
+				{
+					std::string encode = Base64::Encode((unsigned char*)&style, sizeof(ImGuiStyle));
+					Settings::Settings[OPT_IMGUISTYLE] = encode;
+					Settings::Save();
+
+					encode = Base64::Encode((unsigned char*)&style.Colors[0], sizeof(ImVec4) * ImGuiCol_COUNT);
+					Settings::Settings[OPT_IMGUICOLORS] = encode;
+					Settings::Save();
+				}
+				ImGui::SameLine();
+				if (ImGui::SmallButton(Language->Translate("((000059))")))
+				{
+					if (!Settings::Settings[OPT_IMGUISTYLE].is_null())
+					{
+						std::string style64 = Settings::Settings[OPT_IMGUISTYLE].get<std::string>();
+						std::string decode = Base64::Decode(&style64[0], style64.length());
+						memcpy(&style, &decode[0], decode.length());
+					}
+
+					if (!Settings::Settings[OPT_IMGUICOLORS].is_null())
+					{
+						std::string colors64 = Settings::Settings[OPT_IMGUICOLORS].get<std::string>();
+						std::string decode = Base64::Decode(&colors64[0], colors64.length());
+						memcpy(&style.Colors[0], &decode[0], decode.length());
+					}
+				}
+
+				if (ImGui::BeginTabBar("##tabs", ImGuiTabBarFlags_None))
+				{
+					if (ImGui::BeginTabItem("Sizes"))
+					{
+						ImGui::Text("Main");
+						ImGui::SliderFloat2("WindowPadding", (float*)&style.WindowPadding, 0.0f, 20.0f, "%.0f");
+						ImGui::SliderFloat2("FramePadding", (float*)&style.FramePadding, 0.0f, 20.0f, "%.0f");
+						ImGui::SliderFloat2("CellPadding", (float*)&style.CellPadding, 0.0f, 20.0f, "%.0f");
+						ImGui::SliderFloat2("ItemSpacing", (float*)&style.ItemSpacing, 0.0f, 20.0f, "%.0f");
+						ImGui::SliderFloat2("ItemInnerSpacing", (float*)&style.ItemInnerSpacing, 0.0f, 20.0f, "%.0f");
+						ImGui::SliderFloat2("TouchExtraPadding", (float*)&style.TouchExtraPadding, 0.0f, 10.0f, "%.0f");
+						ImGui::SliderFloat("IndentSpacing", &style.IndentSpacing, 0.0f, 30.0f, "%.0f");
+						ImGui::SliderFloat("ScrollbarSize", &style.ScrollbarSize, 1.0f, 20.0f, "%.0f");
+						ImGui::SliderFloat("GrabMinSize", &style.GrabMinSize, 1.0f, 20.0f, "%.0f");
+						ImGui::Text("Borders");
+						ImGui::SliderFloat("WindowBorderSize", &style.WindowBorderSize, 0.0f, 1.0f, "%.0f");
+						ImGui::SliderFloat("ChildBorderSize", &style.ChildBorderSize, 0.0f, 1.0f, "%.0f");
+						ImGui::SliderFloat("PopupBorderSize", &style.PopupBorderSize, 0.0f, 1.0f, "%.0f");
+						ImGui::SliderFloat("FrameBorderSize", &style.FrameBorderSize, 0.0f, 1.0f, "%.0f");
+						ImGui::SliderFloat("TabBorderSize", &style.TabBorderSize, 0.0f, 1.0f, "%.0f");
+						ImGui::Text("Rounding");
+						ImGui::SliderFloat("WindowRounding", &style.WindowRounding, 0.0f, 12.0f, "%.0f");
+						ImGui::SliderFloat("ChildRounding", &style.ChildRounding, 0.0f, 12.0f, "%.0f");
+						ImGui::SliderFloat("FrameRounding", &style.FrameRounding, 0.0f, 12.0f, "%.0f");
+						ImGui::SliderFloat("PopupRounding", &style.PopupRounding, 0.0f, 12.0f, "%.0f");
+						ImGui::SliderFloat("ScrollbarRounding", &style.ScrollbarRounding, 0.0f, 12.0f, "%.0f");
+						ImGui::SliderFloat("GrabRounding", &style.GrabRounding, 0.0f, 12.0f, "%.0f");
+						ImGui::SliderFloat("LogSliderDeadzone", &style.LogSliderDeadzone, 0.0f, 12.0f, "%.0f");
+						ImGui::SliderFloat("TabRounding", &style.TabRounding, 0.0f, 12.0f, "%.0f");
+						ImGui::Text("Alignment");
+						ImGui::SliderFloat2("WindowTitleAlign", (float*)&style.WindowTitleAlign, 0.0f, 1.0f, "%.2f");
+						int window_menu_button_position = style.WindowMenuButtonPosition + 1;
+						if (ImGui::Combo("WindowMenuButtonPosition", (int*)&window_menu_button_position, "None\0Left\0Right\0"))
+							style.WindowMenuButtonPosition = window_menu_button_position - 1;
+						ImGui::Combo("ColorButtonPosition", (int*)&style.ColorButtonPosition, "Left\0Right\0");
+						ImGui::SliderFloat2("ButtonTextAlign", (float*)&style.ButtonTextAlign, 0.0f, 1.0f, "%.2f");
+						ImGui::SameLine(); ImGui::HelpMarker("Alignment applies when a button is larger than its text content.");
+						ImGui::SliderFloat2("SelectableTextAlign", (float*)&style.SelectableTextAlign, 0.0f, 1.0f, "%.2f");
+						ImGui::SameLine(); ImGui::HelpMarker("Alignment applies when a selectable is larger than its text content.");
+						ImGui::Text("Safe Area Padding");
+						ImGui::SameLine(); ImGui::HelpMarker("Adjust if you cannot see the edges of your screen (e.g. on a TV where scaling has not been configured).");
+						ImGui::SliderFloat2("DisplaySafeAreaPadding", (float*)&style.DisplaySafeAreaPadding, 0.0f, 30.0f, "%.0f");
+						ImGui::EndTabItem();
+					}
+
+					if (ImGui::BeginTabItem("Colors"))
+					{
+						static ImGuiTextFilter filter;
+						filter.Draw("Filter colors", ImGui::GetFontSize() * 16);
+
+						ImGui::BeginChild("##colors", ImVec2(0, 0), true, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_AlwaysHorizontalScrollbar | ImGuiWindowFlags_NavFlattened);
+						ImGui::PushItemWidth(-160);
+						for (int i = 0; i < ImGuiCol_COUNT; i++)
+						{
+							const char* name = ImGui::GetStyleColorName(i);
+							if (!filter.PassFilter(name))
+								continue;
+							ImGui::PushID(i);
+							ImGui::ColorEdit4("##color", (float*)&style.Colors[i], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
+							ImGui::SameLine(0.0f, style.ItemInnerSpacing.x);
+							ImGui::TextUnformatted(name);
+							ImGui::PopID();
+						}
+						ImGui::PopItemWidth();
+						ImGui::EndChild();
+
+						ImGui::EndTabItem();
+					}
+
+					if (ImGui::BeginTabItem("Rendering"))
+					{
+						ImGui::Checkbox("Anti-aliased lines", &style.AntiAliasedLines);
+						ImGui::SameLine();
+						ImGui::HelpMarker("When disabling anti-aliasing lines, you'll probably want to disable borders in your style as well.");
+
+						ImGui::Checkbox("Anti-aliased lines use texture", &style.AntiAliasedLinesUseTex);
+						ImGui::SameLine();
+						ImGui::HelpMarker("Faster lines using texture data. Require backend to render with bilinear filtering (not point/nearest filtering).");
+
+						ImGui::Checkbox("Anti-aliased fill", &style.AntiAliasedFill);
+						ImGui::PushItemWidth(100);
+						ImGui::DragFloat("Curve Tessellation Tolerance", &style.CurveTessellationTol, 0.02f, 0.10f, 10.0f, "%.2f");
+						if (style.CurveTessellationTol < 0.10f) style.CurveTessellationTol = 0.10f;
+
+						// When editing the "Circle Segment Max Error" value, draw a preview of its effect on auto-tessellated circles.
+						ImGui::DragFloat("Circle Segment Max Error", &style.CircleSegmentMaxError, 0.01f, 0.10f, 10.0f, "%.2f");
+						if (ImGui::IsItemActive())
+						{
+							ImGui::SetNextWindowPos(ImGui::GetCursorScreenPos());
+							ImGui::BeginTooltip();
+							ImVec2 p = ImGui::GetCursorScreenPos();
+							ImDrawList* draw_list = ImGui::GetWindowDrawList();
+							float RAD_MIN = 10.0f, RAD_MAX = 80.0f;
+							float off_x = 10.0f;
+							for (int n = 0; n < 7; n++)
+							{
+								const float rad = RAD_MIN + (RAD_MAX - RAD_MIN) * (float)n / (7.0f - 1.0f);
+								draw_list->AddCircle(ImVec2(p.x + off_x + rad, p.y + RAD_MAX), rad, ImGui::GetColorU32(ImGuiCol_Text), 0);
+								off_x += 10.0f + rad * 2.0f;
+							}
+							ImGui::Dummy(ImVec2(off_x, RAD_MAX * 2.0f));
+							ImGui::EndTooltip();
+						}
+						ImGui::SameLine();
+						ImGui::HelpMarker("When drawing circle primitives with \"num_segments == 0\" tesselation will be calculated automatically.");
+
+						ImGui::DragFloat("Global Alpha", &style.Alpha, 0.005f, 0.20f, 1.0f, "%.2f"); // Not exposing zero here so user doesn't "lose" the UI (zero alpha clips all widgets). But application code could have a toggle to switch between zero and non-zero.
+						ImGui::PopItemWidth();
+
+						ImGui::EndTabItem();
+					}
+
+					ImGui::EndTabBar();
+				}
+			}
+
+			ImGui::EndChild();
 
 			ImGui::EndTabItem();
 		}
