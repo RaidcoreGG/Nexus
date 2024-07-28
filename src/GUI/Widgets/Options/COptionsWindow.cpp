@@ -618,11 +618,14 @@ namespace GUI
 				{
 					if (ImGui::Selectable(font.c_str(), font == GUI::FontFile))
 					{
-						FontFile = font;
-						FontManager.ReplaceFont("USER_FONT", FontSize, (Index::D_GW2_ADDONS_NEXUS_FONTS / font).string().c_str(), GUI::FontReceiver, nullptr);
+						if (font != FontFile)
+						{
+							FontFile = font;
+							FontManager.ReplaceFont("USER_FONT", FontSize, (Index::D_GW2_ADDONS_NEXUS_FONTS / font).string().c_str(), GUI::FontReceiver, nullptr);
 
-						Settings::Settings[OPT_USERFONT] = FontFile;
-						Settings::Save();
+							Settings::Settings[OPT_USERFONT] = FontFile;
+							Settings::Save();
+						}
 					}
 				}
 				ImGui::EndCombo();
