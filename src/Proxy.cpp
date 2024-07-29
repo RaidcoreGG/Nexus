@@ -13,6 +13,7 @@
 
 #include "Util/DLL.h"
 #include "Util/MD5.h"
+#include "Util/Memory.h"
 
 #include "minhook/mh_hook.h"
 
@@ -27,6 +28,10 @@ namespace Proxy
 		extern PFN_D3D11_CORE_GET_LAYERED_DEVICE_SIZE	CoreGetLayeredDeviceSize	= nullptr;
 		extern PFN_D3D11_CORE_REGISTER_LAYERS			CoreRegisterLayers			= nullptr;
 
+		///----------------------------------------------------------------------------------------------------
+		/// DxLoad:
+		/// 	Loads the target DirectX DLL and hooks the functions necessary to render.
+		///----------------------------------------------------------------------------------------------------
 		bool DxLoad()
 		{
 			if (State::Directx < EDxState::LOAD)
@@ -120,8 +125,8 @@ namespace Proxy
 							//dxgi_present = hook_vtbl_fn(vtbl, 8, dxgi_present_hook);
 							//dxgi_resize_buffers = hook_vtbl_fn(vtbl, 13, dxgi_resize_buffers_hook);
 
-							MH_CreateHook(vtbl[8], (LPVOID)&Hooks::DXGIPresent, (LPVOID*)&Hooks::DXGI::Present);
-							MH_CreateHook(vtbl[13], (LPVOID)&Hooks::DXGIResizeBuffers, (LPVOID*)&Hooks::DXGI::ResizeBuffers);
+							MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[8]), (LPVOID)&Hooks::DXGIPresent, (LPVOID*)&Hooks::DXGI::Present);
+							MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[13]), (LPVOID)&Hooks::DXGIResizeBuffers, (LPVOID*)&Hooks::DXGI::ResizeBuffers);
 							MH_EnableHook(MH_ALL_HOOKS);
 
 							context->Release();
@@ -138,8 +143,15 @@ namespace Proxy
 				}
 			}
 
-			return (D3D11Handle != NULL);
+			if (!D3D11Handle)
+			{
+				Logger->Critical(CH_CORE, "Could not acquire D3D11 handle.");
+				return false;
+			}
+
+			return true;
 		}
+
 		HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext)
 		{
 			if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CREATEDEVICE; Main::Initialize(); }

@@ -372,6 +372,9 @@
     <ClCompile Include="src\Loader\AddonVersion.cpp">
       <Filter>Loader\Structs</Filter>
     </ClCompile>
+    <ClCompile Include="src\Util\Memory.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h">
@@ -1132,6 +1135,9 @@
     </ClInclude>
     <ClInclude Include="src\Inputs\GameBinds\FuncDefs.h">
       <Filter>Inputs\GameBinds</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Util\Memory.h">
+      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
