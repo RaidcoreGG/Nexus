@@ -15,11 +15,13 @@
 
 #include "Consts.h"
 #include "Index.h"
-#include "Shared.h"
 #include "State.h"
 
 #include "Util/Strings.h"
 #include "Util/Inputs.h"
+
+/* FIXME: remove this -> DI */
+#include "Shared.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -31,7 +33,7 @@ namespace InputBinds
 		InputBindApi->Register(aIdentifier, EInputBindHandlerType::DownOnly, aInputBindHandler, aInputBind);
 	}
 
-	void ADDONAPI_RegisterWithStruct(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, InputBind aInputBind)
+	void ADDONAPI_RegisterWithStruct(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, LegacyInputBind aInputBind)
 	{
 		InputBindApi->Register(aIdentifier, EInputBindHandlerType::DownOnly, aInputBindHandler, aInputBind);
 	}
@@ -41,7 +43,7 @@ namespace InputBinds
 		InputBindApi->Register(aIdentifier, EInputBindHandlerType::DownAndRelease, aInputBindHandler, aInputBind);
 	}
 
-	void ADDONAPI_RegisterWithStruct2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, InputBind aInputBind)
+	void ADDONAPI_RegisterWithStruct2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, LegacyInputBind aInputBind)
 	{
 		InputBindApi->Register(aIdentifier, EInputBindHandlerType::DownAndRelease, aInputBindHandler, aInputBind);
 	}
@@ -142,7 +144,7 @@ InputBind CInputBindApi::KBFromString(std::string aInputBind)
 	{
 		if (it->second == aInputBind)
 		{
-			kb.Key = it->first;
+			kb.Code = it->first;
 			break;
 		}
 	}
@@ -157,7 +159,7 @@ std::string CInputBindApi::KBToString(InputBind aInputBind, bool padded)
 		BuildscanCodeLookupTable();
 	}
 
-	if (!aInputBind.Key) { return "(null)"; }
+	if (!aInputBind.Code) { return "(null)"; }
 
 	char* buff = new char[100];
 	std::string str;
@@ -184,16 +186,16 @@ std::string CInputBindApi::KBToString(InputBind aInputBind, bool padded)
 	}
 
 	HKL hkl = GetKeyboardLayout(0);
-	UINT vk = MapVirtualKeyA(aInputBind.Key, MAPVK_VSC_TO_VK);
+	UINT vk = MapVirtualKeyA(aInputBind.Code, MAPVK_VSC_TO_VK);
 
 	if (vk >= 65 && vk <= 90 || vk >= 48 && vk <= 57)
 	{
-		GetKeyNameTextA(aInputBind.Key << 16, buff, 100);
+		GetKeyNameTextA(aInputBind.Code << 16, buff, 100);
 		str.append(buff);
 	}
 	else
 	{
-		auto it = ScancodeLookupTable.find(aInputBind.Key);
+		auto it = ScancodeLookupTable.find(aInputBind.Code);
 		if (it != ScancodeLookupTable.end())
 		{
 			str.append(it->second);
@@ -207,8 +209,10 @@ std::string CInputBindApi::KBToString(InputBind aInputBind, bool padded)
 	return String::ConvertMBToUTF8(str);
 }
 
-CInputBindApi::CInputBindApi()
+CInputBindApi::CInputBindApi(CLogHandler* aLogger)
 {
+	this->Logger = aLogger;
+
 	this->Load();
 }
 
@@ -238,12 +242,12 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			kb.Alt = this->IsAltHeld;
 			kb.Ctrl = this->IsCtrlHeld;
 			kb.Shift = this->IsShiftHeld;
-			kb.Key = keylp.GetScanCode();
+			kb.Code = keylp.GetScanCode();
 
 			// if shift, ctrl or alt set key to 0
 			if (wParam == VK_SHIFT || wParam == VK_CONTROL || wParam == VK_MENU)
 			{
-				kb.Key = 0;
+				kb.Code = 0;
 			}
 
 			if (kb == InputBind{})
@@ -272,9 +276,9 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				break;
 			}
 
-			if (std::find(this->HeldKeys.begin(), this->HeldKeys.end(), kb.Key) == this->HeldKeys.end())
+			if (std::find(this->HeldKeys.begin(), this->HeldKeys.end(), kb.Code) == this->HeldKeys.end())
 			{
-				this->HeldKeys.push_back(kb.Key);
+				this->HeldKeys.push_back(kb.Code);
 			}
 
 			/* track the actual bind/id combo too */
@@ -341,7 +345,7 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					KeyLParam keylp = LParamToKMF(lParam);
 					unsigned short scanCode = keylp.GetScanCode();
 
-					if (scanCode == bind.second.Bind.Key)
+					if (scanCode == bind.second.Bind.Code)
 					{
 						this->Invoke(bind.first, true);
 						this->HeldKeys.erase(std::find(this->HeldKeys.begin(), this->HeldKeys.end(), scanCode));
@@ -401,7 +405,7 @@ void CInputBindApi::Register(const char* aIdentifier, EInputBindHandlerType aInp
 		/* check if this InputBind is not already set */
 		if (it == Registry.end())
 		{
-			this->Registry[str] = ActiveInputBind{
+			this->Registry[str] = ManagedInputBind{
 				requestedBind,
 				aInputBindHandlerType,
 				aInputBindHandler
@@ -530,7 +534,7 @@ int CInputBindApi::Verify(void* aStartAddress, void* aEndAddress)
 	return refCounter;
 }
 
-std::map<std::string, ActiveInputBind> CInputBindApi::GetRegistry() const
+std::map<std::string, ManagedInputBind> CInputBindApi::GetRegistry() const
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -587,7 +591,7 @@ void CInputBindApi::Load()
 			}
 
 			InputBind kb{};
-			binding["Key"].get_to(kb.Key);
+			binding["Key"].get_to(kb.Code);
 			binding["Alt"].get_to(kb.Alt);
 			binding["Ctrl"].get_to(kb.Ctrl);
 			binding["Shift"].get_to(kb.Shift);
@@ -619,7 +623,7 @@ void CInputBindApi::Save()
 		json binding =
 		{
 			{"Identifier",	id},
-			{"Key",			kb.Key},
+			{"Key",			kb.Code},
 			{"Alt",			kb.Alt},
 			{"Ctrl",		kb.Ctrl},
 			{"Shift",		kb.Shift}

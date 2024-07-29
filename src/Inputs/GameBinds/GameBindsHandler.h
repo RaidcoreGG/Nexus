@@ -16,11 +16,9 @@
 
 #include "EGameBinds.h"
 
-#include "Inputs/RawInput/RawInputApi.h"
-#include "Inputs/InputBinds/InputBind.h"
-
 #include "Events/EventHandler.h"
-
+#include "Inputs/InputBinds/InputBind.h"
+#include "Inputs/RawInput/RawInputApi.h"
 #include "Services/Logging/LogHandler.h"
 
 constexpr const char* CH_GAMEBINDS = "GameBinds";

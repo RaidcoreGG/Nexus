@@ -130,7 +130,7 @@ namespace Main
 
 			MH_Initialize();
 
-			InputBindApi = new CInputBindApi();
+			InputBindApi = new CInputBindApi(Logger);
 			GameBindsApi = new CGameBindsApi(RawInputApi, Logger, EventApi);
 
 			Settings::Load();

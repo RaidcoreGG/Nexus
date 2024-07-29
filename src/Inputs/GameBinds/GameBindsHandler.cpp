@@ -640,19 +640,19 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 	/* only process keyboard binds (for now) */
 	if (kbChange->Bind.DeviceType == 1) { return; }
 
-	InputBind kb{};
+	InputBind ib{};
 
 	/* if key was unbound */
 	if (kbChange->Bind.DeviceType != 0)
 	{
-		kb.Alt = kbChange->Bind.Modifiers & 0b0100;
-		kb.Ctrl = kbChange->Bind.Modifiers & 0b0010;
-		kb.Shift = kbChange->Bind.Modifiers & 0b0001;
+		ib.Alt = kbChange->Bind.Modifiers & 0b0100;
+		ib.Ctrl = kbChange->Bind.Modifiers & 0b0010;
+		ib.Shift = kbChange->Bind.Modifiers & 0b0001;
 
-		kb.Key = CGameBindsApi::GameBindCodeToScanCode(kbChange->Bind.Code);
+		ib.Code = CGameBindsApi::GameBindCodeToScanCode(kbChange->Bind.Code);
 	}
 
-	UEInputBindUpdatesTarget->Set(kbChange->Identifier, kb, true);
+	UEInputBindUpdatesTarget->Set(kbChange->Identifier, ib, true);
 }
 
 CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, CEventApi* aEventApi)
@@ -706,67 +706,67 @@ void CGameBindsApi::InvokeAsync(EGameBinds aGameBind, int aDuration)
 
 void CGameBindsApi::Press(EGameBinds aGameBind)
 {
-	InputBind kb = this->Get(aGameBind);
+	InputBind ib = this->Get(aGameBind);
 
-	if (!kb.IsBound())
+	if (!ib.IsBound())
 	{
 		return;
 	}
 
 	KeyLParam key{};
 	key.RepeatCount = 1;
-	key.ScanCode = kb.Key;
-	key.ExtendedFlag = (kb.Key & 0xE000) != 0;
+	key.ScanCode = ib.Code;
+	key.ExtendedFlag = (ib.Code & 0xE000) != 0;
 	key.Reserved = 0;
-	key.ContextCode = kb.Alt;
+	key.ContextCode = ib.Alt;
 	key.PreviousKeyState = 0;
 	key.TransitionState = 0;
 
-	if (kb.Alt)
+	if (ib.Alt)
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYDOWN, VK_MENU, GetKeyMessageLPARAM(VK_MENU, true, true));
 	}
-	if (kb.Ctrl)
+	if (ib.Ctrl)
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_CONTROL, GetKeyMessageLPARAM(VK_CONTROL, true, false));
 	}
-	if (kb.Shift)
+	if (ib.Shift)
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, true, false));
 	}
 
-	this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, MapVirtualKeyA(kb.Key, MAPVK_VSC_TO_VK), KMFToLParam(key));
+	this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK), KMFToLParam(key));
 }
 
 void CGameBindsApi::Release(EGameBinds aGameBind)
 {
-	InputBind kb = this->Get(aGameBind);
+	InputBind ib = this->Get(aGameBind);
 
-	if (!kb.IsBound())
+	if (!ib.IsBound())
 	{
 		return;
 	}
 
 	KeyLParam key{};
 	key.RepeatCount = 1;
-	key.ScanCode = kb.Key;
-	key.ExtendedFlag = (kb.Key & 0xE000) != 0;
+	key.ScanCode = ib.Code;
+	key.ExtendedFlag = (ib.Code & 0xE000) != 0;
 	key.Reserved = 0;
-	key.ContextCode = kb.Alt;
+	key.ContextCode = ib.Alt;
 	key.PreviousKeyState = 1;
 	key.TransitionState = 1;
 
-	this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, MapVirtualKeyA(kb.Key, MAPVK_VSC_TO_VK), KMFToLParam(key));
+	this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK), KMFToLParam(key));
 
-	if (kb.Alt)
+	if (ib.Alt)
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYUP, VK_MENU, GetKeyMessageLPARAM(VK_MENU, false, true));
 	}
-	if (kb.Ctrl)
+	if (ib.Ctrl)
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, VK_CONTROL, GetKeyMessageLPARAM(VK_CONTROL, false, false));
 	}
-	if (kb.Shift)
+	if (ib.Shift)
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, false, false));
 	}
@@ -853,15 +853,15 @@ void CGameBindsApi::Load()
 				continue;
 			}
 
-			InputBind kb{};
-			binding["Key"].get_to(kb.Key);
-			binding["Alt"].get_to(kb.Alt);
-			binding["Ctrl"].get_to(kb.Ctrl);
-			binding["Shift"].get_to(kb.Shift);
+			InputBind ib{};
+			binding["Key"].get_to(ib.Code);
+			binding["Alt"].get_to(ib.Alt);
+			binding["Ctrl"].get_to(ib.Ctrl);
+			binding["Shift"].get_to(ib.Shift);
 
 			EGameBinds identifier = binding["Identifier"].get<EGameBinds>();
 
-			this->Registry[identifier] = kb;
+			this->Registry[identifier] = ib;
 		}
 
 		file.close();
@@ -882,18 +882,18 @@ void CGameBindsApi::Save()
 
 	for (auto& it : this->Registry)
 	{
-		InputBind kb = it.second;
+		InputBind ib = it.second;
 		EGameBinds id = it.first;
 
-		if (!kb.IsBound()) { continue; }
+		if (!ib.IsBound()) { continue; }
 
 		json binding =
 		{
 			{"Identifier",	id},
-			{"Key",			kb.Key},
-			{"Alt",			kb.Alt},
-			{"Ctrl",		kb.Ctrl},
-			{"Shift",		kb.Shift}
+			{"Key",			ib.Code},
+			{"Alt",			ib.Alt},
+			{"Ctrl",		ib.Ctrl},
+			{"Shift",		ib.Shift}
 		};
 
 		InputBinds.push_back(binding);

@@ -10,15 +10,16 @@
 #define INPUTBINDHANDLER_H
 
 #include <Windows.h>
-#include <mutex>
 #include <map>
+#include <mutex>
 #include <string>
 #include <vector>
 
 #include "FuncDefs.h"
-
-#include "ActiveInputBind.h"
 #include "InputBind.h"
+#include "ManagedInputBind.h"
+
+#include "Services/Logging/LogHandler.h"
 
 constexpr const char* CH_INPUTBINDS = "InputBinds";
 
@@ -37,7 +38,7 @@ namespace InputBinds
 	/// ADDONAPI_RegisterWithStruct:
 	/// 	[Revision 1] Addon API wrapper function for Register from struct.
 	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_RegisterWithStruct(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, InputBind aInputBind);
+	void ADDONAPI_RegisterWithStruct(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, LegacyInputBind aInputBind);
 
 	///----------------------------------------------------------------------------------------------------
 	/// ADDONAPI_RegisterWithString:
@@ -49,7 +50,7 @@ namespace InputBinds
 	/// ADDONAPI_RegisterWithStruct:
 	/// 	[Revision 2] Addon API wrapper function for Register from struct.
 	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_RegisterWithStruct2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, InputBind aInputBind);
+	void ADDONAPI_RegisterWithStruct2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, LegacyInputBind aInputBind);
 
 	///----------------------------------------------------------------------------------------------------
 	/// ADDONAPI_InvokeInputBind:
@@ -92,7 +93,7 @@ class CInputBindApi
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CInputBindApi();
+	CInputBindApi(CLogHandler* aLogger);
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
@@ -159,7 +160,7 @@ class CInputBindApi
 	/// GetRegistry:
 	/// 	Returns a copy of the registry.
 	///----------------------------------------------------------------------------------------------------
-	std::map<std::string, ActiveInputBind> GetRegistry() const;
+	std::map<std::string, ManagedInputBind> GetRegistry() const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetCapturedInputBind:
@@ -180,17 +181,19 @@ class CInputBindApi
 	void EndCapturing();
 
 	private:
+	CLogHandler*							Logger;
+
 	mutable std::mutex						Mutex;
-	std::map<std::string, ActiveInputBind>	Registry;
+	std::map<std::string, ManagedInputBind>	Registry;
 
 	bool									IsCapturing;
-	InputBind									CapturedInputBind;
+	InputBind								CapturedInputBind;
 
 	bool									IsAltHeld;
 	bool									IsCtrlHeld;
 	bool									IsShiftHeld;
 	std::vector<unsigned short>				HeldKeys;
-	std::map<std::string, ActiveInputBind>	HeldInputBinds;
+	std::map<std::string, ManagedInputBind>	HeldInputBinds;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Load:

@@ -88,6 +88,8 @@
     <ClInclude Include="src\Inputs\GameBinds\EGameBinds.h" />
     <ClInclude Include="src\Inputs\GameBinds\FuncDefs.h" />
     <ClInclude Include="src\Inputs\GameBinds\GameBindsHandler.h" />
+    <ClInclude Include="src\Inputs\InputBinds\EInputBindHandlerType.h" />
+    <ClInclude Include="src\Inputs\InputBinds\EInputBindType.h" />
     <ClInclude Include="src\Loader\AddonVersion.h" />
     <ClInclude Include="src\Services\API\ApiClient.h" />
     <ClInclude Include="src\Services\API\APIController.h" />
@@ -139,7 +141,7 @@
     <ClInclude Include="src\thirdparty\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\thirdparty\imgui\imstb_textedit.h" />
     <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h" />
-    <ClInclude Include="src\Inputs\InputBinds\ActiveInputBind.h" />
+    <ClInclude Include="src\Inputs\InputBinds\ManagedInputBind.h" />
     <ClInclude Include="src\Inputs\InputBinds\FuncDefs.h" />
     <ClInclude Include="src\Inputs\InputBinds\InputBind.h" />
     <ClInclude Include="src\Inputs\InputBinds\InputBindHandler.h" />

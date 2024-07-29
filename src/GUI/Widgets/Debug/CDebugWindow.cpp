@@ -125,7 +125,7 @@ namespace GUI
 		{
 			ImGui::BeginChild("##InputBindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-			std::map<std::string, ActiveInputBind> InputBindRegistry = InputBindApi->GetRegistry();
+			std::map<std::string, ManagedInputBind> InputBindRegistry = InputBindApi->GetRegistry();
 
 			for (auto& [identifier, inputBind] : InputBindRegistry)
 			{

@@ -1,10 +1,22 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  InputBind.cpp
+/// Description  :  InputBind struct definition.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #include "InputBind.h"
 
-#include <Windows.h>
-#include <algorithm>
-#include <map>
+InputBind::InputBind(LegacyInputBind aLegacyInputBind)
+{
+	Alt = aLegacyInputBind.Alt;
+	Ctrl = aLegacyInputBind.Ctrl;
+	Shift = aLegacyInputBind.Shift;
 
-#include "InputBindHandler.h"
+	Type = EInputBindType::Keyboard;
+	Code = aLegacyInputBind.Key;
+}
 
 bool InputBind::IsBound()
 {
@@ -13,10 +25,11 @@ bool InputBind::IsBound()
 
 bool operator==(const InputBind& lhs, const InputBind& rhs)
 {
-	return	lhs.Key		== rhs.Key &&
-			lhs.Alt		== rhs.Alt &&
+	return	lhs.Alt		== rhs.Alt &&
 			lhs.Ctrl	== rhs.Ctrl &&
-			lhs.Shift	== rhs.Shift;
+			lhs.Shift	== rhs.Shift &&
+			lhs.Type	== rhs.Type &&
+			lhs.Code	== rhs.Code;
 }
 
 bool operator!=(const InputBind& lhs, const InputBind& rhs)

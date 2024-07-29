@@ -40,7 +40,7 @@ namespace GUI
 	struct InputBindPacked
 	{
 		std::string KeysText;
-		ActiveInputBind Bind;
+		ManagedInputBind Bind;
 	};
 
 	struct KBCat
@@ -306,7 +306,7 @@ namespace GUI
 			InputBindCategoryMap.clear();
 
 			/* copy of all InputBinds */
-			std::map<std::string, ActiveInputBind> InputBindRegistry = InputBindApi->GetRegistry();
+			std::map<std::string, ManagedInputBind> InputBindRegistry = InputBindApi->GetRegistry();
 
 			/* acquire categories */
 			for (auto& [identifier, inputBind] : InputBindRegistry)
