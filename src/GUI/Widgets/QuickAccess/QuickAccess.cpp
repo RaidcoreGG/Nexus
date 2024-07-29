@@ -8,7 +8,7 @@
 
 #include "Services/Textures/Texture.h"
 #include "Services/Textures/TextureLoader.h"
-#include "Inputs/Keybinds/KeybindHandler.h"
+#include "Inputs/InputBinds/InputBindHandler.h"
 #include "Loader/Loader.h"
 
 #include "resource.h"
@@ -168,10 +168,10 @@ namespace GUI
 						if (ImGui::ImageButton(!shortcut.IsHovering ? shortcut.TextureNormal->Resource : shortcut.TextureHover->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
 						{
 							isActive = true;
-							if (shortcut.Keybind.length() > 0)
+							if (shortcut.InputBind.length() > 0)
 							{
 								shortcut.HasNotification = false;
-								KeybindApi->Invoke(shortcut.Keybind);
+								InputBindApi->Invoke(shortcut.InputBind);
 							}
 						}
 						iconHovered = ImGui::IsItemHovered();
@@ -328,12 +328,12 @@ namespace GUI
 			}
 		}
 
-		void AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aKeybindIdentifier, const char* aTooltipText)
+		void AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aInputBindIdentifier, const char* aTooltipText)
 		{
 			std::string str = aIdentifier;
 			std::string strTexId = aTextureIdentifier;
 			std::string strTexHoverId = aTextureHoverIdentifier;
-			std::string strKbId = aKeybindIdentifier;
+			std::string strKbId = aInputBindIdentifier;
 			std::string strTT = aTooltipText;
 
 			{
@@ -347,7 +347,7 @@ namespace GUI
 					sh.TextureHoverIdentifier = aTextureHoverIdentifier;
 					sh.TextureNormal = normal;
 					sh.TextureHover = hover;
-					sh.Keybind = aKeybindIdentifier;
+					sh.InputBind = aInputBindIdentifier;
 					sh.TooltipText = aTooltipText;
 					sh.TextureGetAttempts = 0;
 					Registry[str] = sh;

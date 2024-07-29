@@ -2,7 +2,7 @@
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
 /// Name         :  GameBindsHandler.cpp
-/// Description  :  Provides functions for game keybinds.
+/// Description  :  Provides functions for game InputBinds.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
@@ -599,21 +599,21 @@ unsigned short CGameBindsApi::GameBindCodeToScanCode(unsigned short aGameScanCod
 	return LookupTable[aGameScanCode];
 }
 
-static CGameBindsApi* UEKeybindUpdatesTarget = nullptr;
+static CGameBindsApi* UEInputBindUpdatesTarget = nullptr;
 
-void CGameBindsApi::EnableUEKeybindUpdates(CGameBindsApi* aGameBindsApi)
+void CGameBindsApi::EnableUEInputBindUpdates(CGameBindsApi* aGameBindsApi)
 {
-	UEKeybindUpdatesTarget = aGameBindsApi;
+	UEInputBindUpdatesTarget = aGameBindsApi;
 }
 
-void CGameBindsApi::DisableUEKeybindUpdates()
+void CGameBindsApi::DisableUEInputBindUpdates()
 {
-	UEKeybindUpdatesTarget = nullptr;
+	UEInputBindUpdatesTarget = nullptr;
 }
 
-void CGameBindsApi::OnUEKeybindChanged(void* aData)
+void CGameBindsApi::OnUEInputBindChanged(void* aData)
 {
-	if (!UEKeybindUpdatesTarget) { return; }
+	if (!UEInputBindUpdatesTarget) { return; }
 
 	struct UEKey
 	{
@@ -622,17 +622,17 @@ void CGameBindsApi::OnUEKeybindChanged(void* aData)
 		signed Modifiers; // Bit 1 = Shfit, Bit 2 = Ctrl, Bit 3 = Alt
 	};
 
-	struct UEKeybindChanged
+	struct UEInputBindChanged
 	{
 		EGameBinds Identifier;
 		unsigned Index; // 0 = Primary, 1 = Secondary
 		UEKey Bind;
 	};
 
-	UEKeybindChanged* kbChange = (UEKeybindChanged*)aData;
+	UEInputBindChanged* kbChange = (UEInputBindChanged*)aData;
 
 	/* abort if it's the secondary bind, but the key is already set*/
-	if (kbChange->Index == 1 && UEKeybindUpdatesTarget->IsBound(kbChange->Identifier))
+	if (kbChange->Index == 1 && UEInputBindUpdatesTarget->IsBound(kbChange->Identifier))
 	{
 		return;
 	}
@@ -640,7 +640,7 @@ void CGameBindsApi::OnUEKeybindChanged(void* aData)
 	/* only process keyboard binds (for now) */
 	if (kbChange->Bind.DeviceType == 1) { return; }
 
-	Keybind kb{};
+	InputBind kb{};
 
 	/* if key was unbound */
 	if (kbChange->Bind.DeviceType != 0)
@@ -652,7 +652,7 @@ void CGameBindsApi::OnUEKeybindChanged(void* aData)
 		kb.Key = CGameBindsApi::GameBindCodeToScanCode(kbChange->Bind.Code);
 	}
 
-	UEKeybindUpdatesTarget->Set(kbChange->Identifier, kb, true);
+	UEInputBindUpdatesTarget->Set(kbChange->Identifier, kb, true);
 }
 
 CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, CEventApi* aEventApi)
@@ -664,8 +664,8 @@ CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, C
 	this->Load();
 	this->AddDefaultBinds();
 
-	CGameBindsApi::EnableUEKeybindUpdates(this);
-	this->EventApi->Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEKeybindChanged);
+	CGameBindsApi::EnableUEInputBindUpdates(this);
+	this->EventApi->Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
 
 	//ASSERT(this->RawInputApi);
 	//ASSERT(this->Logger);
@@ -673,8 +673,8 @@ CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, C
 
 CGameBindsApi::~CGameBindsApi()
 {
-	CGameBindsApi::DisableUEKeybindUpdates();
-	this->EventApi->Unsubscribe(EV_UE_KB_CH, CGameBindsApi::OnUEKeybindChanged);
+	CGameBindsApi::DisableUEInputBindUpdates();
+	this->EventApi->Unsubscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
 
 	this->RawInputApi = nullptr;
 	this->Logger = nullptr;
@@ -706,7 +706,7 @@ void CGameBindsApi::InvokeAsync(EGameBinds aGameBind, int aDuration)
 
 void CGameBindsApi::Press(EGameBinds aGameBind)
 {
-	Keybind kb = this->Get(aGameBind);
+	InputBind kb = this->Get(aGameBind);
 
 	if (!kb.IsBound())
 	{
@@ -740,7 +740,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 
 void CGameBindsApi::Release(EGameBinds aGameBind)
 {
-	Keybind kb = this->Get(aGameBind);
+	InputBind kb = this->Get(aGameBind);
 
 	if (!kb.IsBound())
 	{
@@ -784,19 +784,19 @@ void CGameBindsApi::Import(std::filesystem::path aPath)
 	return;
 }
 
-Keybind CGameBindsApi::Get(EGameBinds aGameBind)
+InputBind CGameBindsApi::Get(EGameBinds aGameBind)
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	return this->Registry[aGameBind];
 }
 
-void CGameBindsApi::Set(EGameBinds aGameBind, Keybind aKeybind, bool aIsRuntimeBind)
+void CGameBindsApi::Set(EGameBinds aGameBind, InputBind aInputBind, bool aIsRuntimeBind)
 {
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
-		this->Registry[aGameBind] = aKeybind;
+		this->Registry[aGameBind] = aInputBind;
 
 		if (aIsRuntimeBind)
 		{
@@ -807,7 +807,7 @@ void CGameBindsApi::Set(EGameBinds aGameBind, Keybind aKeybind, bool aIsRuntimeB
 	this->Save();
 }
 
-std::map<EGameBinds, Keybind> CGameBindsApi::GetRegistry() const
+std::map<EGameBinds, InputBind> CGameBindsApi::GetRegistry() const
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -824,7 +824,7 @@ void CGameBindsApi::AddDefaultBinds()
 
 		if (this->Registry.find(bind) == this->Registry.end())
 		{
-			this->Registry[bind] = Keybind{};
+			this->Registry[bind] = InputBind{};
 		}
 	}
 }
@@ -839,8 +839,8 @@ void CGameBindsApi::Load()
 	{
 		std::ifstream file(Index::F_GAMEBINDS);
 
-		json keybinds = json::parse(file);
-		for (json binding : keybinds)
+		json InputBinds = json::parse(file);
+		for (json binding : InputBinds)
 		{
 			if (binding.is_null() ||
 				binding["Key"].is_null() ||
@@ -849,11 +849,11 @@ void CGameBindsApi::Load()
 				binding["Shift"].is_null() ||
 				binding["Identifier"].is_null())
 			{
-				Logger->Debug(CH_GAMEBINDS, "One or more fields of keybind were null.");
+				Logger->Debug(CH_GAMEBINDS, "One or more fields of InputBind were null.");
 				continue;
 			}
 
-			Keybind kb{};
+			InputBind kb{};
 			binding["Key"].get_to(kb.Key);
 			binding["Alt"].get_to(kb.Alt);
 			binding["Ctrl"].get_to(kb.Ctrl);
@@ -868,7 +868,7 @@ void CGameBindsApi::Load()
 	}
 	catch (json::parse_error& ex)
 	{
-		Logger->Warning(CH_GAMEBINDS, "Keybinds.json could not be parsed. Error: %s", ex.what());
+		Logger->Warning(CH_GAMEBINDS, "InputBinds.json could not be parsed. Error: %s", ex.what());
 	}
 }
 
@@ -878,11 +878,11 @@ void CGameBindsApi::Save()
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
-	json keybinds = json::array();
+	json InputBinds = json::array();
 
 	for (auto& it : this->Registry)
 	{
-		Keybind kb = it.second;
+		InputBind kb = it.second;
 		EGameBinds id = it.first;
 
 		if (!kb.IsBound()) { continue; }
@@ -896,12 +896,12 @@ void CGameBindsApi::Save()
 			{"Shift",		kb.Shift}
 		};
 
-		keybinds.push_back(binding);
+		InputBinds.push_back(binding);
 	}
 
 	std::ofstream file(Index::F_GAMEBINDS);
 
-	file << keybinds.dump(1, '\t') << std::endl;
+	file << InputBinds.dump(1, '\t') << std::endl;
 
 	file.close();
 }

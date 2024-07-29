@@ -14,7 +14,7 @@
 #include "Services/DataLink/DataLink.h"
 #include "Events/EventHandler.h"
 #include "Inputs/RawInput/RawInputApi.h"
-#include "Inputs/Keybinds/KeybindHandler.h"
+#include "Inputs/InputBinds/InputBindHandler.h"
 #include "Inputs/GameBinds/GameBindsHandler.h"
 
 #include "imgui/imgui.h"
@@ -37,7 +37,7 @@ extern CTextureLoader*				TextureService;
 extern CDataLink*					DataLinkService;
 extern CEventApi*					EventApi;
 extern CRawInputApi*				RawInputApi;
-extern CKeybindApi*					KeybindApi;
+extern CInputBindApi*				InputBindApi;
 extern CGameBindsApi*				GameBindsApi;
 
 extern ImFont*						MonospaceFont;	/* default/monospace/console font */

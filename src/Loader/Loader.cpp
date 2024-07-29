@@ -29,7 +29,7 @@
 #include "GUI/Widgets/Alerts/Alerts.h"
 #include "GUI/Widgets/QuickAccess/QuickAccess.h"
 #include "imgui/imgui.h"
-#include "Inputs/Keybinds/KeybindHandler.h"
+#include "Inputs/InputBinds/InputBindHandler.h"
 #include "Inputs/RawInput/RawInputApi.h"
 #include "minhook/mh_hook.h"
 #include "Services/DataLink/DataLink.h"
@@ -242,7 +242,7 @@ namespace Loader
 			}
 			catch (json::parse_error& ex)
 			{
-				Logger->Warning(CH_KEYBINDS, "AddonConfig.json could not be parsed. Error: %s", ex.what());
+				Logger->Warning(CH_LOADER, "AddonConfig.json could not be parsed. Error: %s", ex.what());
 			}
 		}
 
@@ -902,7 +902,7 @@ namespace Loader
 			int evRefs = EventApi->Verify(startAddress, endAddress);
 			int uiRefs = GUI::Verify(startAddress, endAddress);
 			int qaRefs = GUI::QuickAccess::Verify(startAddress, endAddress);
-			int kbRefs = KeybindApi->Verify(startAddress, endAddress);
+			int kbRefs = InputBindApi->Verify(startAddress, endAddress);
 			int riRefs = RawInputApi->Verify(startAddress, endAddress);
 			int txRefs = TextureService->Verify(startAddress, endAddress);
 			int leftoverRefs = evRefs + uiRefs + qaRefs + kbRefs + riRefs + txRefs;
@@ -915,7 +915,7 @@ namespace Loader
 				if (evRefs) { str.append(String::Format("Events: %d\n", evRefs)); }
 				if (uiRefs) { str.append(String::Format("UI: %d\n", uiRefs)); }
 				if (qaRefs) { str.append(String::Format("QuickAccess: %d\n", qaRefs)); }
-				if (kbRefs) { str.append(String::Format("Keybinds: %d\n", kbRefs)); }
+				if (kbRefs) { str.append(String::Format("InputBinds: %d\n", kbRefs)); }
 				if (riRefs) { str.append(String::Format("WndProc: %d\n", riRefs)); }
 				if (txRefs) { str.append(String::Format("Textures: %d", txRefs)); }
 				Logger->Warning(CH_LOADER, str.c_str());
@@ -1182,9 +1182,9 @@ namespace Loader
 				api->RegisterWndProc = RawInput::ADDONAPI_Register;
 				api->DeregisterWndProc = RawInput::ADDONAPI_Deregister;
 
-				api->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString;
-				api->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct;
-				api->DeregisterKeybind = Keybinds::ADDONAPI_Deregister;
+				api->RegisterInputBindWithString = InputBinds::ADDONAPI_RegisterWithString;
+				api->RegisterInputBindWithStruct = InputBinds::ADDONAPI_RegisterWithStruct;
+				api->DeregisterInputBind = InputBinds::ADDONAPI_Deregister;
 
 				api->GetResource = DataLink::ADDONAPI_GetResource;
 				api->ShareResource = DataLink::ADDONAPI_ShareResource;
@@ -1233,9 +1233,9 @@ namespace Loader
 				api->DeregisterWndProc = RawInput::ADDONAPI_Deregister;
 				api->SendWndProcToGameOnly = RawInput::ADDONAPI_SendWndProcToGame;
 
-				api->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString;
-				api->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct;
-				api->DeregisterKeybind = Keybinds::ADDONAPI_Deregister;
+				api->RegisterInputBindWithString = InputBinds::ADDONAPI_RegisterWithString;
+				api->RegisterInputBindWithStruct = InputBinds::ADDONAPI_RegisterWithStruct;
+				api->DeregisterInputBind = InputBinds::ADDONAPI_Deregister;
 
 				api->GetResource = DataLink::ADDONAPI_GetResource;
 				api->ShareResource = DataLink::ADDONAPI_ShareResource;
@@ -1297,9 +1297,9 @@ namespace Loader
 				api->DeregisterWndProc = RawInput::ADDONAPI_Deregister;
 				api->SendWndProcToGameOnly = RawInput::ADDONAPI_SendWndProcToGame;
 
-				api->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString;
-				api->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct;
-				api->DeregisterKeybind = Keybinds::ADDONAPI_Deregister;
+				api->RegisterInputBindWithString = InputBinds::ADDONAPI_RegisterWithString;
+				api->RegisterInputBindWithStruct = InputBinds::ADDONAPI_RegisterWithStruct;
+				api->DeregisterInputBind = InputBinds::ADDONAPI_Deregister;
 
 				api->GetResource = DataLink::ADDONAPI_GetResource;
 				api->ShareResource = DataLink::ADDONAPI_ShareResource;
@@ -1363,9 +1363,9 @@ namespace Loader
 				api->DeregisterWndProc = RawInput::ADDONAPI_Deregister;
 				api->SendWndProcToGameOnly = RawInput::ADDONAPI_SendWndProcToGame;
 
-				api->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString2;
-				api->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct2;
-				api->DeregisterKeybind = Keybinds::ADDONAPI_Deregister;
+				api->RegisterInputBindWithString = InputBinds::ADDONAPI_RegisterWithString2;
+				api->RegisterInputBindWithStruct = InputBinds::ADDONAPI_RegisterWithStruct2;
+				api->DeregisterInputBind = InputBinds::ADDONAPI_Deregister;
 
 				api->GetResource = DataLink::ADDONAPI_GetResource;
 				api->ShareResource = DataLink::ADDONAPI_ShareResource;
@@ -1435,10 +1435,10 @@ namespace Loader
 				api->DeregisterWndProc = RawInput::ADDONAPI_Deregister;
 				api->SendWndProcToGameOnly = RawInput::ADDONAPI_SendWndProcToGame;
 
-				api->InvokeKeybind = Keybinds::ADDONAPI_InvokeKeybind;
-				api->RegisterKeybindWithString = Keybinds::ADDONAPI_RegisterWithString2;
-				api->RegisterKeybindWithStruct = Keybinds::ADDONAPI_RegisterWithStruct2;
-				api->DeregisterKeybind = Keybinds::ADDONAPI_Deregister;
+				api->InvokeInputBind = InputBinds::ADDONAPI_InvokeInputBind;
+				api->RegisterInputBindWithString = InputBinds::ADDONAPI_RegisterWithString2;
+				api->RegisterInputBindWithStruct = InputBinds::ADDONAPI_RegisterWithStruct2;
+				api->DeregisterInputBind = InputBinds::ADDONAPI_Deregister;
 
 				api->GetResource = DataLink::ADDONAPI_GetResource;
 				api->ShareResource = DataLink::ADDONAPI_ShareResource;
@@ -1512,10 +1512,10 @@ namespace Loader
 				api->WndProc.Deregister = RawInput::ADDONAPI_Deregister;
 				api->WndProc.SendToGameOnly = RawInput::ADDONAPI_SendWndProcToGame;
 
-				api->InputBinds.Invoke = Keybinds::ADDONAPI_InvokeKeybind;
-				api->InputBinds.RegisterWithString = Keybinds::ADDONAPI_RegisterWithString2;
-				api->InputBinds.RegisterWithStruct = Keybinds::ADDONAPI_RegisterWithStruct2;
-				api->InputBinds.Deregister = Keybinds::ADDONAPI_Deregister;
+				api->InputBinds.Invoke = InputBinds::ADDONAPI_InvokeInputBind;
+				api->InputBinds.RegisterWithString = InputBinds::ADDONAPI_RegisterWithString2;
+				api->InputBinds.RegisterWithStruct = InputBinds::ADDONAPI_RegisterWithStruct2;
+				api->InputBinds.Deregister = InputBinds::ADDONAPI_Deregister;
 
 				api->GameBinds.PressAsync = GameBinds::ADDONAPI_PressAsync;
 				api->GameBinds.ReleaseAsync = GameBinds::ADDONAPI_ReleaseAsync;

@@ -25,7 +25,7 @@
 #include "Widgets/About/CAboutBox.h"
 #include "Widgets/EULA/CEULAModal.h"
 
-#include "Inputs/Keybinds/Keybind.h"
+#include "Inputs/InputBinds/InputBind.h"
 
 namespace GUI
 {

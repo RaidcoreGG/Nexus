@@ -37,9 +37,8 @@ namespace Index
 	extern std::filesystem::path F_ARCDPSINTEGRATION;
 
 	extern std::filesystem::path F_LOG;
-	extern std::filesystem::path F_KEYBINDS;
+	extern std::filesystem::path F_INPUTBINDS;
 	extern std::filesystem::path F_GAMEBINDS;
-	extern std::filesystem::path F_FONT;
 	extern std::filesystem::path F_SETTINGS;
 	extern std::filesystem::path F_ADDONCONFIG;
 	extern std::filesystem::path F_APIKEYS;

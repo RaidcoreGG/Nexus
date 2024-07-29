@@ -1,12 +1,12 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  KeybindHandler.cpp
-/// Description  :  Provides functions for keybinds.
+/// Name         :  InputBindHandler.cpp
+/// Description  :  Provides functions for InputBinds.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "KeybindHandler.h"
+#include "InputBindHandler.h"
 
 #include <cstdarg>
 #include <filesystem>
@@ -24,36 +24,36 @@
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
-namespace Keybinds
+namespace InputBinds
 {
-	void ADDONAPI_RegisterWithString(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, const char* aKeybind)
+	void ADDONAPI_RegisterWithString(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, const char* aInputBind)
 	{
-		KeybindApi->Register(aIdentifier, EKeybindHandlerType::DownOnly, aKeybindHandler, aKeybind);
+		InputBindApi->Register(aIdentifier, EInputBindHandlerType::DownOnly, aInputBindHandler, aInputBind);
 	}
 
-	void ADDONAPI_RegisterWithStruct(const char* aIdentifier, KEYBINDS_PROCESS aKeybindHandler, Keybind aKeybind)
+	void ADDONAPI_RegisterWithStruct(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, InputBind aInputBind)
 	{
-		KeybindApi->Register(aIdentifier, EKeybindHandlerType::DownOnly, aKeybindHandler, aKeybind);
+		InputBindApi->Register(aIdentifier, EInputBindHandlerType::DownOnly, aInputBindHandler, aInputBind);
 	}
 
-	void ADDONAPI_RegisterWithString2(const char* aIdentifier, KEYBINDS_PROCESS2 aKeybindHandler, const char* aKeybind)
+	void ADDONAPI_RegisterWithString2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, const char* aInputBind)
 	{
-		KeybindApi->Register(aIdentifier, EKeybindHandlerType::DownAndRelease, aKeybindHandler, aKeybind);
+		InputBindApi->Register(aIdentifier, EInputBindHandlerType::DownAndRelease, aInputBindHandler, aInputBind);
 	}
 
-	void ADDONAPI_RegisterWithStruct2(const char* aIdentifier, KEYBINDS_PROCESS2 aKeybindHandler, Keybind aKeybind)
+	void ADDONAPI_RegisterWithStruct2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, InputBind aInputBind)
 	{
-		KeybindApi->Register(aIdentifier, EKeybindHandlerType::DownAndRelease, aKeybindHandler, aKeybind);
+		InputBindApi->Register(aIdentifier, EInputBindHandlerType::DownAndRelease, aInputBindHandler, aInputBind);
 	}
 
-	void ADDONAPI_InvokeKeybind(const char* aIdentifier, bool aIsRelease)
+	void ADDONAPI_InvokeInputBind(const char* aIdentifier, bool aIsRelease)
 	{
-		KeybindApi->Invoke(aIdentifier, aIsRelease);
+		InputBindApi->Invoke(aIdentifier, aIsRelease);
 	}
 
 	void ADDONAPI_Deregister(const char* aIdentifier)
 	{
-		KeybindApi->Deregister(aIdentifier);
+		InputBindApi->Deregister(aIdentifier);
 	}
 }
 
@@ -87,7 +87,7 @@ void BuildscanCodeLookupTable()
 	};
 }
 
-std::string CKeybindApi::ScancodeToString(unsigned short aScanCode)
+std::string CInputBindApi::ScancodeToString(unsigned short aScanCode)
 {
 	if (!IsLookupTableBuilt)
 	{
@@ -103,26 +103,26 @@ std::string CKeybindApi::ScancodeToString(unsigned short aScanCode)
 	return "";
 }
 
-Keybind CKeybindApi::KBFromString(std::string aKeybind)
+InputBind CInputBindApi::KBFromString(std::string aInputBind)
 {
 	if (!IsLookupTableBuilt)
 	{
 		BuildscanCodeLookupTable();
 	}
 
-	Keybind kb{};
+	InputBind kb{};
 
-	if (aKeybind == "(null)" || aKeybind == "(NULL)") { return kb; }
+	if (aInputBind == "(null)" || aInputBind == "(NULL)") { return kb; }
 
-	aKeybind = String::ToUpper(aKeybind);
+	aInputBind = String::ToUpper(aInputBind);
 	std::string delimiter = "+";
 
 	size_t pos = 0;
 	std::string token;
-	while ((pos = aKeybind.find(delimiter)) != std::string::npos)
+	while ((pos = aInputBind.find(delimiter)) != std::string::npos)
 	{
-		token = aKeybind.substr(0, pos);
-		aKeybind.erase(0, pos + delimiter.length());
+		token = aInputBind.substr(0, pos);
+		aInputBind.erase(0, pos + delimiter.length());
 
 		if (token == "ALT")
 		{
@@ -140,7 +140,7 @@ Keybind CKeybindApi::KBFromString(std::string aKeybind)
 
 	for (auto it = ScancodeLookupTable.begin(); it != ScancodeLookupTable.end(); ++it)
 	{
-		if (it->second == aKeybind)
+		if (it->second == aInputBind)
 		{
 			kb.Key = it->first;
 			break;
@@ -150,33 +150,33 @@ Keybind CKeybindApi::KBFromString(std::string aKeybind)
 	return kb;
 }
 
-std::string CKeybindApi::KBToString(Keybind aKeybind, bool padded)
+std::string CInputBindApi::KBToString(InputBind aInputBind, bool padded)
 {
 	if (!IsLookupTableBuilt)
 	{
 		BuildscanCodeLookupTable();
 	}
 
-	if (!aKeybind.Key) { return "(null)"; }
+	if (!aInputBind.Key) { return "(null)"; }
 
 	char* buff = new char[100];
 	std::string str;
 
-	if (aKeybind.Alt)
+	if (aInputBind.Alt)
 	{
 		GetKeyNameTextA(MapVirtualKeyA(VK_MENU, MAPVK_VK_TO_VSC) << 16, buff, 100);
 		str.append(buff);
 		str.append(padded ? " + " : "+");
 	}
 
-	if (aKeybind.Ctrl)
+	if (aInputBind.Ctrl)
 	{
 		GetKeyNameTextA(MapVirtualKeyA(VK_CONTROL, MAPVK_VK_TO_VSC) << 16, buff, 100);
 		str.append(buff);
 		str.append(padded ? " + " : "+");
 	}
 
-	if (aKeybind.Shift)
+	if (aInputBind.Shift)
 	{
 		GetKeyNameTextA(MapVirtualKeyA(VK_SHIFT, MAPVK_VK_TO_VSC) << 16, buff, 100);
 		str.append(buff);
@@ -184,16 +184,16 @@ std::string CKeybindApi::KBToString(Keybind aKeybind, bool padded)
 	}
 
 	HKL hkl = GetKeyboardLayout(0);
-	UINT vk = MapVirtualKeyA(aKeybind.Key, MAPVK_VSC_TO_VK);
+	UINT vk = MapVirtualKeyA(aInputBind.Key, MAPVK_VSC_TO_VK);
 
 	if (vk >= 65 && vk <= 90 || vk >= 48 && vk <= 57)
 	{
-		GetKeyNameTextA(aKeybind.Key << 16, buff, 100);
+		GetKeyNameTextA(aInputBind.Key << 16, buff, 100);
 		str.append(buff);
 	}
 	else
 	{
-		auto it = ScancodeLookupTable.find(aKeybind.Key);
+		auto it = ScancodeLookupTable.find(aInputBind.Key);
 		if (it != ScancodeLookupTable.end())
 		{
 			str.append(it->second);
@@ -207,14 +207,14 @@ std::string CKeybindApi::KBToString(Keybind aKeybind, bool padded)
 	return String::ConvertMBToUTF8(str);
 }
 
-CKeybindApi::CKeybindApi()
+CInputBindApi::CInputBindApi()
 {
 	this->Load();
 }
 
-UINT CKeybindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	Keybind kb{};
+	InputBind kb{};
 
 	switch (uMsg)
 	{
@@ -246,7 +246,7 @@ UINT CKeybindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				kb.Key = 0;
 			}
 
-			if (kb == Keybind{})
+			if (kb == InputBind{})
 			{
 				return uMsg;
 			}
@@ -259,13 +259,13 @@ UINT CKeybindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (this->IsCapturing)
 			{
 				/* store the currently held bind */
-				this->CapturedKeybind = kb;
+				this->CapturedInputBind = kb;
 
-				/* prevent invoking keybinds */
+				/* prevent invoking InputBinds */
 				break;
 			}
 
-			auto heldBind = std::find_if(this->Registry.begin(), this->Registry.end(), [kb](auto activeKeybind) { return activeKeybind.second.Bind == kb; });
+			auto heldBind = std::find_if(this->Registry.begin(), this->Registry.end(), [kb](auto activeInputBind) { return activeInputBind.second.Bind == kb; });
 
 			if (heldBind == this->Registry.end()) /* if held bind does not match any registered */
 			{
@@ -278,9 +278,9 @@ UINT CKeybindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 
 			/* track the actual bind/id combo too */
-			if (this->HeldKeybinds.find(heldBind->first) == this->HeldKeybinds.end())
+			if (this->HeldInputBinds.find(heldBind->first) == this->HeldInputBinds.end())
 			{
-				this->HeldKeybinds[heldBind->first] = heldBind->second;
+				this->HeldInputBinds[heldBind->first] = heldBind->second;
 			}
 
 			if (heldBind->first == KB_TOGGLEHIDEUI)
@@ -307,7 +307,7 @@ UINT CKeybindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			else if (wParam == VK_CONTROL) { this->IsCtrlHeld = false; }
 			else if (wParam == VK_SHIFT) { this->IsShiftHeld = false; }
 
-			/* only check if not currently setting keybind */
+			/* only check if not currently setting InputBind */
 			if (this->IsCapturing)
 			{
 				return uMsg;
@@ -316,7 +316,7 @@ UINT CKeybindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			std::vector<std::string> heldBindsPop;
 
 			//const std::lock_guard<std::mutex> lock(this->MutexHeldKeys);
-			for (auto& bind : this->HeldKeybinds)
+			for (auto& bind : this->HeldInputBinds)
 			{
 				if (wParam == VK_SHIFT && bind.second.Bind.Shift)
 				{
@@ -352,14 +352,14 @@ UINT CKeybindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			for (auto bind : heldBindsPop)
 			{
-				this->HeldKeybinds.erase(bind);
+				this->HeldInputBinds.erase(bind);
 			}
 
 			break;
 		}
 	}
 
-	// don't pass keys to game if currently editing keybinds
+	// don't pass keys to game if currently editing InputBinds
 	if (this->IsCapturing)
 	{
 		if (uMsg == WM_SYSKEYDOWN || uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYUP || uMsg == WM_KEYUP)
@@ -371,19 +371,19 @@ UINT CKeybindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return uMsg;
 }
 
-void CKeybindApi::Register(const char* aIdentifier, EKeybindHandlerType aKeybindHandlerType, void* aKeybindHandler, const char* aKeybind)
+void CInputBindApi::Register(const char* aIdentifier, EInputBindHandlerType aInputBindHandlerType, void* aInputBindHandler, const char* aInputBind)
 {
-	Keybind requestedBind = CKeybindApi::KBFromString(aKeybind);
-	this->Register(aIdentifier, aKeybindHandlerType, aKeybindHandler, requestedBind);
+	InputBind requestedBind = CInputBindApi::KBFromString(aInputBind);
+	this->Register(aIdentifier, aInputBindHandlerType, aInputBindHandler, requestedBind);
 }
 
-void CKeybindApi::Register(const char* aIdentifier, EKeybindHandlerType aKeybindHandlerType, void* aKeybindHandler, Keybind aKeybind)
+void CInputBindApi::Register(const char* aIdentifier, EInputBindHandlerType aInputBindHandlerType, void* aInputBindHandler, InputBind aInputBind)
 {
 	std::string str = aIdentifier;
 
-	Keybind requestedBind = aKeybind;
+	InputBind requestedBind = aInputBind;
 
-	/* check if another identifier, already uses the keybind */
+	/* check if another identifier, already uses the InputBind */
 	std::string res = this->IsInUse(requestedBind);
 
 	if (res != str && res != "")
@@ -398,26 +398,26 @@ void CKeybindApi::Register(const char* aIdentifier, EKeybindHandlerType aKeybind
 
 		auto it = this->Registry.find(str);
 
-		/* check if this keybind is not already set */
+		/* check if this InputBind is not already set */
 		if (it == Registry.end())
 		{
-			this->Registry[str] = ActiveKeybind{
+			this->Registry[str] = ActiveInputBind{
 				requestedBind,
-				aKeybindHandlerType,
-				aKeybindHandler
+				aInputBindHandlerType,
+				aInputBindHandler
 			};
 		}
 		else
 		{
-			it->second.HandlerType = aKeybindHandlerType;
-			it->second.Handler = aKeybindHandler;
+			it->second.HandlerType = aInputBindHandlerType;
+			it->second.Handler = aInputBindHandler;
 		}
 	}
 
 	this->Save();
 }
 
-void CKeybindApi::Deregister(const char* aIdentifier)
+void CInputBindApi::Deregister(const char* aIdentifier)
 {
 	std::string str = aIdentifier;
 
@@ -435,17 +435,17 @@ void CKeybindApi::Deregister(const char* aIdentifier)
 	this->Save();
 }
 
-std::string CKeybindApi::IsInUse(Keybind aKeybind)
+std::string CInputBindApi::IsInUse(InputBind aInputBind)
 {
 	/* sanity check */
-	if (aKeybind == Keybind{}) { return ""; }
+	if (aInputBind == InputBind{}) { return ""; }
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
-	/* check if another identifier, already uses the keybind */
-	for (auto& [identifier, keybind] : this->Registry)
+	/* check if another identifier, already uses the InputBind */
+	for (auto& [identifier, InputBind] : this->Registry)
 	{
-		if (keybind.Bind == aKeybind)
+		if (InputBind.Bind == aInputBind)
 		{
 			return identifier;
 		}
@@ -454,22 +454,22 @@ std::string CKeybindApi::IsInUse(Keybind aKeybind)
 	return "";
 }
 
-void CKeybindApi::Set(std::string aIdentifier, Keybind aKeybind)
+void CInputBindApi::Set(std::string aIdentifier, InputBind aInputBind)
 {
-	std::string res = this->IsInUse(aKeybind);
+	std::string res = this->IsInUse(aInputBind);
 
 	if (res != aIdentifier && res != "") { return; }
 
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
-		this->Registry[aIdentifier].Bind = aKeybind;
+		this->Registry[aIdentifier].Bind = aInputBind;
 	}
 
 	this->Save();
 }
 
-bool CKeybindApi::Invoke(std::string aIdentifier, bool aIsRelease)
+bool CInputBindApi::Invoke(std::string aIdentifier, bool aIsRelease)
 {
 	bool called = false;
 
@@ -478,22 +478,22 @@ bool CKeybindApi::Invoke(std::string aIdentifier, bool aIsRelease)
 	auto& bind = this->Registry[aIdentifier];
 
 	void* handlerFunc = bind.Handler;
-	EKeybindHandlerType type = bind.HandlerType;
+	EInputBindHandlerType type = bind.HandlerType;
 
 	if (handlerFunc)
 	{
-		if ((bind.HandlerType == EKeybindHandlerType::DownOnly && !aIsRelease) ||
-			bind.HandlerType == EKeybindHandlerType::DownAndRelease)
+		if ((bind.HandlerType == EInputBindHandlerType::DownOnly && !aIsRelease) ||
+			bind.HandlerType == EInputBindHandlerType::DownAndRelease)
 		{
 			std::thread([aIdentifier, type, handlerFunc, aIsRelease]()
 			{
 				switch (type)
 				{
-					case EKeybindHandlerType::DownOnly:
-						((KEYBINDS_PROCESS)handlerFunc)(aIdentifier.c_str());
+					case EInputBindHandlerType::DownOnly:
+						((INPUTBINDS_PROCESS)handlerFunc)(aIdentifier.c_str());
 						break;
-					case EKeybindHandlerType::DownAndRelease:
-						((KEYBINDS_PROCESS2)handlerFunc)(aIdentifier.c_str(), aIsRelease);
+					case EInputBindHandlerType::DownAndRelease:
+						((INPUTBINDS_PROCESS2)handlerFunc)(aIdentifier.c_str(), aIsRelease);
 						break;
 				}
 			}).detach();
@@ -505,14 +505,14 @@ bool CKeybindApi::Invoke(std::string aIdentifier, bool aIsRelease)
 	return called;
 }
 
-void CKeybindApi::Delete(std::string aIdentifier)
+void CInputBindApi::Delete(std::string aIdentifier)
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	this->Registry.erase(aIdentifier);
 }
 
-int CKeybindApi::Verify(void* aStartAddress, void* aEndAddress)
+int CInputBindApi::Verify(void* aStartAddress, void* aEndAddress)
 {
 	int refCounter = 0;
 
@@ -530,21 +530,21 @@ int CKeybindApi::Verify(void* aStartAddress, void* aEndAddress)
 	return refCounter;
 }
 
-std::map<std::string, ActiveKeybind> CKeybindApi::GetRegistry() const
+std::map<std::string, ActiveInputBind> CInputBindApi::GetRegistry() const
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	return this->Registry;
 }
 
-Keybind CKeybindApi::GetCapturedKeybind() const
+InputBind CInputBindApi::GetCapturedInputBind() const
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
-	return this->CapturedKeybind;
+	return this->CapturedInputBind;
 }
 
-void CKeybindApi::StartCapturing()
+void CInputBindApi::StartCapturing()
 {
 	if (!this->IsCapturing)
 	{
@@ -554,27 +554,27 @@ void CKeybindApi::StartCapturing()
 	this->IsCapturing = true;
 }
 
-void CKeybindApi::EndCapturing()
+void CInputBindApi::EndCapturing()
 {
 	this->IsCapturing = false;
 
 	this->ReleaseAll();
 
-	CapturedKeybind = Keybind{};
+	CapturedInputBind = InputBind{};
 }
 
-void CKeybindApi::Load()
+void CInputBindApi::Load()
 {
-	if (!std::filesystem::exists(Index::F_KEYBINDS)) { return; }
+	if (!std::filesystem::exists(Index::F_INPUTBINDS)) { return; }
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	try
 	{
-		std::ifstream file(Index::F_KEYBINDS);
+		std::ifstream file(Index::F_INPUTBINDS);
 
-		json keybinds = json::parse(file);
-		for (json binding : keybinds)
+		json InputBinds = json::parse(file);
+		for (json binding : InputBinds)
 		{
 			if (binding.is_null() ||
 				binding["Key"].is_null() ||
@@ -582,11 +582,11 @@ void CKeybindApi::Load()
 				binding["Ctrl"].is_null() ||
 				binding["Shift"].is_null())
 			{
-				Logger->Debug(CH_KEYBINDS, "One or more fields of keybind were null.");
+				Logger->Debug(CH_INPUTBINDS, "One or more fields of InputBind were null.");
 				continue;
 			}
 
-			Keybind kb{};
+			InputBind kb{};
 			binding["Key"].get_to(kb.Key);
 			binding["Alt"].get_to(kb.Alt);
 			binding["Ctrl"].get_to(kb.Ctrl);
@@ -601,19 +601,19 @@ void CKeybindApi::Load()
 	}
 	catch (json::parse_error& ex)
 	{
-		Logger->Warning(CH_KEYBINDS, "Keybinds.json could not be parsed. Error: %s", ex.what());
+		Logger->Warning(CH_INPUTBINDS, "InputBinds.json could not be parsed. Error: %s", ex.what());
 	}
 }
 
-void CKeybindApi::Save()
+void CInputBindApi::Save()
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
-	json keybinds = json::array();
+	json InputBinds = json::array();
 
 	for (auto& it : this->Registry)
 	{
-		Keybind kb = it.second.Bind;
+		InputBind kb = it.second.Bind;
 		std::string id = it.first;
 
 		json binding =
@@ -625,28 +625,28 @@ void CKeybindApi::Save()
 			{"Shift",		kb.Shift}
 		};
 
-		keybinds.push_back(binding);
+		InputBinds.push_back(binding);
 	}
 
-	std::ofstream file(Index::F_KEYBINDS);
+	std::ofstream file(Index::F_INPUTBINDS);
 
-	file << keybinds.dump(1, '\t') << std::endl;
+	file << InputBinds.dump(1, '\t') << std::endl;
 
 	file.close();
 }
 
-void CKeybindApi::ReleaseAll()
+void CInputBindApi::ReleaseAll()
 {
 	this->IsAltHeld = false;
 	this->IsCtrlHeld = false;
 	this->IsShiftHeld = false;
 
 	//const std::lock_guard<std::mutex> lock(this->MutexHeldKeys);
-	for (auto& bind : this->HeldKeybinds)
+	for (auto& bind : this->HeldInputBinds)
 	{
 		this->Invoke(bind.first, true);
 	}
 
 	this->HeldKeys.clear();
-	this->HeldKeybinds.clear();
+	this->HeldInputBinds.clear();
 }

@@ -39,7 +39,7 @@ namespace GUI
 		void Render();
 		void RenderContextMenu(const std::string& aIdentifier, const Shortcut& aShortcut, bool* aIsActive);
 
-		void AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aKeybindIdentifier, const char* aTooltipText);
+		void AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aInputBindIdentifier, const char* aTooltipText);
 		void RemoveShortcut(const char* aIdentifier);
 		void NotifyShortcut(const char* aIdentifier);
 		void SetNotificationShortcut(const char* aIdentifier, bool aState);

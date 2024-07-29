@@ -5,7 +5,7 @@
 
 #include "Events/EventHandler.h"
 #include "GUI/Widgets/QuickAccess/QuickAccess.h"
-#include "Inputs/Keybinds/KeybindHandler.h"
+#include "Inputs/InputBinds/InputBindHandler.h"
 #include "Loader/Loader.h"
 #include "Services/DataLink/DataLink.h"
 #include "Services/Textures/TextureLoader.h"
@@ -56,7 +56,7 @@ namespace GUI
 			if (ImGui::BeginTabBar("DebugTabBar", ImGuiTabBarFlags_None))
 			{
 				DbgEventsTab();
-				DbgKeybindsTab();
+				DbgInputBindsTab();
 				DbgDataLinkTab();
 				DbgTexturesTab();
 				DbgShortcutsTab();
@@ -119,20 +119,20 @@ namespace GUI
 			ImGui::EndTabItem();
 		}
 	}
-	void CDebugWindow::DbgKeybindsTab()
+	void CDebugWindow::DbgInputBindsTab()
 	{
-		if (ImGui::BeginTabItem("Keybinds"))
+		if (ImGui::BeginTabItem("InputBinds"))
 		{
-			ImGui::BeginChild("##KeybindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+			ImGui::BeginChild("##InputBindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-			std::map<std::string, ActiveKeybind> KeybindRegistry = KeybindApi->GetRegistry();
+			std::map<std::string, ActiveInputBind> InputBindRegistry = InputBindApi->GetRegistry();
 
-			for (auto& [identifier, keybind] : KeybindRegistry)
+			for (auto& [identifier, inputBind] : InputBindRegistry)
 			{
 				ImGui::Text(identifier.c_str()); ImGui::SameLine();
-				if (keybind.Handler)
+				if (inputBind.Handler)
 				{
-					ImGui::TextDisabled("Handler: %p", keybind.Handler);
+					ImGui::TextDisabled("Handler: %p", inputBind.Handler);
 				}
 				else
 				{
@@ -272,7 +272,7 @@ namespace GUI
 						{
 							ImGui::TextDisabled("Texture: %p", shortcut.TextureNormal != nullptr ? shortcut.TextureNormal->Resource : nullptr);
 							ImGui::TextDisabled("Texture (Hover): %p", shortcut.TextureHover != nullptr ? shortcut.TextureHover->Resource : nullptr);
-							ImGui::TextDisabled("OnClick (Keybind): %s", shortcut.Keybind.length() != 0 ? shortcut.Keybind.c_str() : "(null)");
+							ImGui::TextDisabled("OnClick (InputBind): %s", shortcut.InputBind.length() != 0 ? shortcut.InputBind.c_str() : "(null)");
 							ImGui::TextDisabled("Tooltip: %s", shortcut.TooltipText.length() != 0 ? shortcut.TooltipText.c_str() : "(null)");
 							ImGui::TextDisabled("IsHovering: %s", shortcut.IsHovering ? "true" : "false");
 							ImGui::Text("Simple shortcuts:");

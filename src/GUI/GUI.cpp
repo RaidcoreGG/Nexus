@@ -16,7 +16,7 @@
 #include "Services/Mumble/Reader.h"
 
 #include "Events/EventHandler.h"
-#include "Inputs/Keybinds/KeybindHandler.h"
+#include "Inputs/InputBinds/InputBindHandler.h"
 #include "Loader/Loader.h"
 #include "Services/DataLink/DataLink.h"
 #include "Services/Settings/Settings.h"
@@ -469,7 +469,7 @@ namespace GUI
 		colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
 	}
 
-	void ProcessKeybind(const char* aIdentifier)
+	void ProcessInputBind(const char* aIdentifier)
 	{
 		std::string str = aIdentifier;
 
@@ -937,14 +937,14 @@ namespace GUI
 		RegisterCloseOnEscape("Memory Viewer", &DebugWindow->MemoryViewer.Open);
 		RegisterCloseOnEscape("About", &AboutWindow->Visible);
 		
-		/* register keybinds */
-		KeybindApi->Register(KB_MENU, EKBHType::DownOnly, ProcessKeybind, "CTRL+O");
-		KeybindApi->Register(KB_ADDONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
-		KeybindApi->Register(KB_OPTIONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
-		KeybindApi->Register(KB_LOG, EKBHType::DownOnly, ProcessKeybind, "(null)");
-		KeybindApi->Register(KB_DEBUG, EKBHType::DownOnly, ProcessKeybind, "(null)");
-		KeybindApi->Register(KB_MUMBLEOVERLAY, EKBHType::DownOnly, ProcessKeybind, "(null)");
-		KeybindApi->Register(KB_TOGGLEHIDEUI, EKBHType::DownOnly, ProcessKeybind, "CTRL+H");
+		/* register InputBinds */
+		InputBindApi->Register(KB_MENU, EIBHType::DownOnly, ProcessInputBind, "CTRL+O");
+		InputBindApi->Register(KB_ADDONS, EIBHType::DownOnly, ProcessInputBind, "(null)");
+		InputBindApi->Register(KB_OPTIONS, EIBHType::DownOnly, ProcessInputBind, "(null)");
+		InputBindApi->Register(KB_LOG, EIBHType::DownOnly, ProcessInputBind, "(null)");
+		InputBindApi->Register(KB_DEBUG, EIBHType::DownOnly, ProcessInputBind, "(null)");
+		InputBindApi->Register(KB_MUMBLEOVERLAY, EIBHType::DownOnly, ProcessInputBind, "(null)");
+		InputBindApi->Register(KB_TOGGLEHIDEUI, EIBHType::DownOnly, ProcessInputBind, "CTRL+H");
 
 		/* load icons */
 		int month = Time::GetMonth();

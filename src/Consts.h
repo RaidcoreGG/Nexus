@@ -10,7 +10,7 @@ extern const char* CH_CORE;
 extern const char* CH_QUICKACCESS;
 extern const char* CH_LOADER;
 
-/* Keybinds */
+/* InputBinds */
 extern const char* KB_MENU;
 extern const char* KB_ADDONS;
 extern const char* KB_OPTIONS;
