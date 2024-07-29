@@ -13,6 +13,7 @@
 
 #include "Util/DLL.h"
 #include "Util/MD5.h"
+#include "Util/Memory.h"
 
 #include "minhook/mh_hook.h"
 
@@ -27,6 +28,10 @@ namespace Proxy
 		extern PFN_D3D11_CORE_GET_LAYERED_DEVICE_SIZE	CoreGetLayeredDeviceSize	= nullptr;
 		extern PFN_D3D11_CORE_REGISTER_LAYERS			CoreRegisterLayers			= nullptr;
 
+		///----------------------------------------------------------------------------------------------------
+		/// DxLoad:
+		/// 	Loads the target DirectX DLL and hooks the functions necessary to render.
+		///----------------------------------------------------------------------------------------------------
 		bool DxLoad()
 		{
 			if (State::Directx < EDxState::LOAD)
@@ -120,8 +125,8 @@ namespace Proxy
 							//dxgi_present = hook_vtbl_fn(vtbl, 8, dxgi_present_hook);
 							//dxgi_resize_buffers = hook_vtbl_fn(vtbl, 13, dxgi_resize_buffers_hook);
 
-							MH_CreateHook(vtbl[8], (LPVOID)&Hooks::DXGIPresent, (LPVOID*)&Hooks::DXGI::Present);
-							MH_CreateHook(vtbl[13], (LPVOID)&Hooks::DXGIResizeBuffers, (LPVOID*)&Hooks::DXGI::ResizeBuffers);
+							MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[8]), (LPVOID)&Hooks::DXGIPresent, (LPVOID*)&Hooks::DXGI::Present);
+							MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[13]), (LPVOID)&Hooks::DXGIResizeBuffers, (LPVOID*)&Hooks::DXGI::ResizeBuffers);
 							MH_EnableHook(MH_ALL_HOOKS);
 
 							context->Release();
@@ -138,13 +143,30 @@ namespace Proxy
 				}
 			}
 
-			return (D3D11Handle != NULL);
-		}
-		HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext)
-		{
-			if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CREATEDEVICE; Main::Initialize(); }
+			if (!D3D11Handle)
+			{
+				Logger->Critical(CH_CORE, "Could not acquire D3D11 handle.");
+				return false;
+			}
 
-			if (State::Directx >= EDxState::LOADED && Proxy::D3D11::CreateDevice)
+			return true;
+		}
+
+		///----------------------------------------------------------------------------------------------------
+		/// InitProxyFunc:
+		/// 	Loads the proxy function and returns true on success, false on error.
+		///----------------------------------------------------------------------------------------------------
+		bool InitProxyFunc(EEntryMethod aEntryMethod, void** aFunction, const char* aName)
+		{
+			/* Set entry method and call Nexus entry. */
+			if (State::EntryMethod == EEntryMethod::NONE)
+			{
+				State::EntryMethod = aEntryMethod;
+				Main::Initialize();
+			}
+
+			/* Check if this is a rebound. */
+			if (State::Directx >= EDxState::LOADED && *aFunction)
 			{
 				Logger->Warning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
@@ -154,192 +176,82 @@ namespace Proxy
 					D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
 				}
 
-				Proxy::D3D11::CreateDevice = nullptr;
+				*aFunction = nullptr;
 
-				if (DLL::FindFunction(D3D11SystemHandle, &Proxy::D3D11::CreateDevice, "D3D11CreateDevice") == false)
+				if (DLL::FindFunction(D3D11SystemHandle, aFunction, aName) == false)
 				{
-					return 0;
+					return false;
 				}
 			}
 
-			if (DxLoad() == false) { return 0; }
-
-			if (Proxy::D3D11::CreateDevice == nullptr)
+			/* Get DX Handle. */
+			if (DxLoad() == false)
 			{
-				if (DLL::FindFunction(D3D11Handle, &Proxy::D3D11::CreateDevice, "D3D11CreateDevice") == false)
+				return false;
+			}
+
+			/* Proxy the function. */
+			if (*aFunction == nullptr)
+			{
+				if (DLL::FindFunction(D3D11Handle, aFunction, aName) == false)
 				{
-					return 0;
+					return false;
 				}
+			}
+
+			return true;
+		}
+
+		HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext)
+		{
+			if (InitProxyFunc(EEntryMethod::CREATEDEVICE, (void**)&Proxy::D3D11::CreateDevice, "D3D11CreateDevice") == false)
+			{
+				return 0;
 			}
 
 			return Proxy::D3D11::CreateDevice(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
 		}
 		HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, const DXGI_SWAP_CHAIN_DESC* pSwapChainDesc, IDXGISwapChain** ppSwapChain, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext)
 		{
-			if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CREATEDEVICEANDSWAPCHAIN; Main::Initialize(); }
-
-			if (State::Directx >= EDxState::LOADED && Proxy::D3D11::CreateDeviceAndSwapChain)
+			if (InitProxyFunc(EEntryMethod::CREATEDEVICEANDSWAPCHAIN, (void**)&Proxy::D3D11::CreateDeviceAndSwapChain, "D3D11CreateDeviceAndSwapChain") == false)
 			{
-				Logger->Warning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
-
-				if (!D3D11SystemHandle)
-				{
-					std::string strSystem = Index::F_SYSTEM_DLL.string();
-					D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
-				}
-
-				Proxy::D3D11::CreateDeviceAndSwapChain = nullptr;
-
-				if (DLL::FindFunction(D3D11SystemHandle, &Proxy::D3D11::CreateDeviceAndSwapChain, "D3D11CreateDeviceAndSwapChain") == false)
-				{
-					return 0;
-				}
-			}
-
-			if (DxLoad() == false) { return 0; }
-
-			if (Proxy::D3D11::CreateDeviceAndSwapChain == nullptr)
-			{
-				if (DLL::FindFunction(D3D11Handle, &Proxy::D3D11::CreateDeviceAndSwapChain, "D3D11CreateDeviceAndSwapChain") == false)
-				{
-					return 0;
-				}
+				return 0;
 			}
 
 			return Proxy::D3D11::CreateDeviceAndSwapChain(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice, pFeatureLevel, ppImmediateContext);
 		}
 		HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pAdapter, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, ID3D11Device** ppDevice)
 		{
-			if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_CREATEDEVICE; Main::Initialize(); }
-
-			if (State::Directx >= EDxState::LOADED && Proxy::D3D11::CoreCreateDevice)
+			if (InitProxyFunc(EEntryMethod::CORE_CREATEDEVICE, (void**)&Proxy::D3D11::CoreCreateDevice, "D3D11CoreCreateDevice") == false)
 			{
-				Logger->Warning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
-
-				if (!D3D11SystemHandle)
-				{
-					std::string strSystem = Index::F_SYSTEM_DLL.string();
-					D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
-				}
-
-				Proxy::D3D11::CoreCreateDevice = nullptr;
-
-				if (DLL::FindFunction(D3D11SystemHandle, &Proxy::D3D11::CoreCreateDevice, "D3D11CoreCreateDevice") == false)
-				{
-					return 0;
-				}
-			}
-
-			if (DxLoad() == false) { return 0; }
-
-			if (Proxy::D3D11::CoreCreateDevice == nullptr)
-			{
-				if (DLL::FindFunction(D3D11Handle, &Proxy::D3D11::CoreCreateDevice, "D3D11CoreCreateDevice") == false)
-				{
-					return 0;
-				}
+				return 0;
 			}
 
 			return Proxy::D3D11::CoreCreateDevice(pFactory, pAdapter, Flags, pFeatureLevels, FeatureLevels, ppDevice);
 		}
 		HRESULT __stdcall D3D11CoreCreateLayeredDevice(const void* unknown0, DWORD unknown1, const void* unknown2, REFIID riid, void** ppvObj)
 		{
-			if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_CREATELAYEREDDEVICE; Main::Initialize(); }
-
-			if (State::Directx >= EDxState::LOADED && Proxy::D3D11::CoreCreateLayeredDevice)
+			if (InitProxyFunc(EEntryMethod::CORE_CREATELAYEREDDEVICE, (void**)&Proxy::D3D11::CoreCreateLayeredDevice, "D3D11CoreCreateLayeredDevice") == false)
 			{
-				Logger->Warning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
-
-				if (!D3D11SystemHandle)
-				{
-					std::string strSystem = Index::F_SYSTEM_DLL.string();
-					D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
-				}
-
-				Proxy::D3D11::CoreCreateLayeredDevice = nullptr;
-
-				if (DLL::FindFunction(D3D11SystemHandle, &Proxy::D3D11::CoreCreateLayeredDevice, "D3D11CoreCreateLayeredDevice") == false)
-				{
-					return 0;
-				}
-			}
-
-			if (DxLoad() == false) { return 0; }
-
-			if (Proxy::D3D11::CoreCreateLayeredDevice == nullptr)
-			{
-				if (DLL::FindFunction(D3D11Handle, &Proxy::D3D11::CoreCreateLayeredDevice, "D3D11CoreCreateLayeredDevice") == false)
-				{
-					return 0;
-				}
+				return 0;
 			}
 
 			return Proxy::D3D11::CoreCreateLayeredDevice(unknown0, unknown1, unknown2, riid, ppvObj);
 		}
 		SIZE_T  __stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unknown1)
 		{
-			if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_GETLAYEREDDEVICESIZE; Main::Initialize(); }
-
-			if (State::Directx >= EDxState::LOADED && Proxy::D3D11::CoreGetLayeredDeviceSize)
+			if (InitProxyFunc(EEntryMethod::CORE_GETLAYEREDDEVICESIZE, (void**)&Proxy::D3D11::CoreGetLayeredDeviceSize, "D3D11CoreGetLayeredDeviceSize") == false)
 			{
-				Logger->Warning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
-
-				if (!D3D11SystemHandle)
-				{
-					std::string strSystem = Index::F_SYSTEM_DLL.string();
-					D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
-				}
-
-				Proxy::D3D11::CoreGetLayeredDeviceSize = nullptr;
-
-				if (DLL::FindFunction(D3D11SystemHandle, &Proxy::D3D11::CoreGetLayeredDeviceSize, "D3D11CoreGetLayeredDeviceSize") == false)
-				{
-					return 0;
-				}
+				return 0;
 			}
-
-			if (DxLoad() == false) { return 0; }
-
-			if (Proxy::D3D11::CoreGetLayeredDeviceSize == nullptr)
-			{
-				if (DLL::FindFunction(D3D11Handle, &Proxy::D3D11::CoreGetLayeredDeviceSize, "D3D11CoreGetLayeredDeviceSize") == false)
-				{
-					return 0;
-				}
-			}
-
+			
 			return Proxy::D3D11::CoreGetLayeredDeviceSize(unknown0, unknown1);
 		}
 		HRESULT __stdcall D3D11CoreRegisterLayers(const void* unknown0, DWORD unknown1)
 		{
-			if (State::EntryMethod == EEntryMethod::NONE) { State::EntryMethod = EEntryMethod::CORE_REGISTERLAYERS; Main::Initialize(); }
-
-			if (State::Directx >= EDxState::LOADED && Proxy::D3D11::CoreRegisterLayers)
+			if (InitProxyFunc(EEntryMethod::CORE_REGISTERLAYERS, (void**)&Proxy::D3D11::CoreRegisterLayers, "D3D11CoreRegisterLayers") == false)
 			{
-				Logger->Warning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
-
-				if (!D3D11SystemHandle)
-				{
-					std::string strSystem = Index::F_SYSTEM_DLL.string();
-					D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
-				}
-
-				Proxy::D3D11::CoreRegisterLayers = nullptr;
-
-				if (DLL::FindFunction(D3D11SystemHandle, &Proxy::D3D11::CoreRegisterLayers, "D3D11CoreRegisterLayers") == false)
-				{
-					return 0;
-				}
-			}
-
-			if (DxLoad() == false) { return 0; }
-
-			if (Proxy::D3D11::CoreRegisterLayers == nullptr)
-			{
-				if (DLL::FindFunction(D3D11Handle, &Proxy::D3D11::CoreRegisterLayers, "D3D11CoreRegisterLayers") == false)
-				{
-					return 0;
-				}
+				return 0;
 			}
 
 			return Proxy::D3D11::CoreRegisterLayers(unknown0, unknown1);

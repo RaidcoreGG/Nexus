@@ -75,6 +75,7 @@
     <ClCompile Include="src\Util\DLL.cpp" />
     <ClCompile Include="src\Util\Inputs.cpp" />
     <ClCompile Include="src\Util\MD5.cpp" />
+    <ClCompile Include="src\Util\Memory.cpp" />
     <ClCompile Include="src\Util\Paths.cpp" />
     <ClCompile Include="src\Util\Resources.cpp" />
     <ClCompile Include="src\Util\Strings.cpp" />
@@ -328,6 +329,7 @@
     <ClInclude Include="src\Util\DLL.h" />
     <ClInclude Include="src\Util\Inputs.h" />
     <ClInclude Include="src\Util\MD5.h" />
+    <ClInclude Include="src\Util\Memory.h" />
     <ClInclude Include="src\Util\Paths.h" />
     <ClInclude Include="src\Util\Resources.h" />
     <ClInclude Include="src\Util\Strings.h" />

@@ -49,6 +49,7 @@ namespace GUI
 	extern std::unordered_map<std::string, bool*>	RegistryCloseOnEscape;
 
 	extern std::map<EFont, ImFont*>					FontIndex;
+	extern std::string								FontFile;
 	extern float									FontSize;
 	extern bool										CloseMenuAfterSelecting;
 	extern bool										CloseOnEscape;
@@ -72,6 +73,8 @@ namespace GUI
 	void ImportArcDPSStyle();
 
 	void Rescale();
+
+	void FontReceiver(const char* aIdentifier, ImFont* aFont);
 
 	/* Registers the provided RenderCallback. */
 	void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback);
