@@ -152,14 +152,23 @@ InputBind CInputBindApi::KBFromString(std::string aInputBind)
 	return kb;
 }
 
-std::string CInputBindApi::KBToString(InputBind aInputBind, bool padded)
+std::string CInputBindApi::KBToString(InputBind aInputBind, bool aPadded)
 {
 	if (!IsLookupTableBuilt)
 	{
 		BuildscanCodeLookupTable();
 	}
 
-	if (!aInputBind.Code) { return "(null)"; }
+	/* type is not set -> invalid*/
+	/* type is keyboard and code 0 because only modifiers -> valid */
+	/* type is mouse and code is 0 -> invalid */
+	/* type is keyboard, no code, no modifiers -> invalid */
+	if (aInputBind.Type == EInputBindType::None ||
+		(aInputBind.Type == EInputBindType::Mouse && !aInputBind.Code) ||
+		(aInputBind.Type == EInputBindType::Keyboard && !aInputBind.Code && !aInputBind.Alt && !aInputBind.Ctrl && !aInputBind.Shift))
+	{
+		return "(null)";
+	}
 
 	char* buff = new char[100];
 	std::string str;
@@ -168,24 +177,23 @@ std::string CInputBindApi::KBToString(InputBind aInputBind, bool padded)
 	{
 		GetKeyNameTextA(MapVirtualKeyA(VK_MENU, MAPVK_VK_TO_VSC) << 16, buff, 100);
 		str.append(buff);
-		str.append(padded ? " + " : "+");
+		str.append(aPadded ? " + " : "+");
 	}
 
 	if (aInputBind.Ctrl)
 	{
 		GetKeyNameTextA(MapVirtualKeyA(VK_CONTROL, MAPVK_VK_TO_VSC) << 16, buff, 100);
 		str.append(buff);
-		str.append(padded ? " + " : "+");
+		str.append(aPadded ? " + " : "+");
 	}
 
 	if (aInputBind.Shift)
 	{
 		GetKeyNameTextA(MapVirtualKeyA(VK_SHIFT, MAPVK_VK_TO_VSC) << 16, buff, 100);
 		str.append(buff);
-		str.append(padded ? " + " : "+");
+		str.append(aPadded ? " + " : "+");
 	}
 
-	HKL hkl = GetKeyboardLayout(0);
 	UINT vk = MapVirtualKeyA(aInputBind.Code, MAPVK_VSC_TO_VK);
 
 	if (vk >= 65 && vk <= 90 || vk >= 48 && vk <= 57)
@@ -195,10 +203,17 @@ std::string CInputBindApi::KBToString(InputBind aInputBind, bool padded)
 	}
 	else
 	{
-		auto it = ScancodeLookupTable.find(aInputBind.Code);
-		if (it != ScancodeLookupTable.end())
+		if (aInputBind.Type == EInputBindType::Keyboard && aInputBind.Code == 0)
 		{
-			str.append(it->second);
+			str = str.substr(0, str.length() - (aPadded ? 3 : 1));
+		}
+		else
+		{
+			auto it = ScancodeLookupTable.find(aInputBind.Code);
+			if (it != ScancodeLookupTable.end())
+			{
+				str.append(it->second);
+			}
 		}
 	}
 
@@ -218,7 +233,7 @@ CInputBindApi::CInputBindApi(CLogHandler* aLogger)
 
 UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	InputBind kb{};
+	InputBind ib{};
 
 	switch (uMsg)
 	{
@@ -239,18 +254,20 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			else if (wParam == VK_CONTROL) { this->IsCtrlHeld = true; }
 			else if (wParam == VK_SHIFT) { this->IsShiftHeld = true; }
 
-			kb.Alt = this->IsAltHeld;
-			kb.Ctrl = this->IsCtrlHeld;
-			kb.Shift = this->IsShiftHeld;
-			kb.Code = keylp.GetScanCode();
+			ib.Alt = this->IsAltHeld;
+			ib.Ctrl = this->IsCtrlHeld;
+			ib.Shift = this->IsShiftHeld;
+
+			ib.Type = EInputBindType::Keyboard; // type keyboard, since we're listening to keypresses
+			ib.Code = keylp.GetScanCode();
 
 			// if shift, ctrl or alt set key to 0
 			if (wParam == VK_SHIFT || wParam == VK_CONTROL || wParam == VK_MENU)
 			{
-				kb.Code = 0;
+				ib.Code = 0;
 			}
 
-			if (kb == InputBind{})
+			if (ib == InputBind{})
 			{
 				return uMsg;
 			}
@@ -263,22 +280,22 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (this->IsCapturing)
 			{
 				/* store the currently held bind */
-				this->CapturedInputBind = kb;
+				this->CapturedInputBind = ib;
 
 				/* prevent invoking InputBinds */
 				break;
 			}
 
-			auto heldBind = std::find_if(this->Registry.begin(), this->Registry.end(), [kb](auto activeInputBind) { return activeInputBind.second.Bind == kb; });
+			auto heldBind = std::find_if(this->Registry.begin(), this->Registry.end(), [ib](auto& activeInputBind) { return activeInputBind.second.Bind == ib; });
 
 			if (heldBind == this->Registry.end()) /* if held bind does not match any registered */
 			{
 				break;
 			}
 
-			if (std::find(this->HeldKeys.begin(), this->HeldKeys.end(), kb.Code) == this->HeldKeys.end())
+			if (std::find(this->HeldKeys.begin(), this->HeldKeys.end(), ib.Code) == this->HeldKeys.end())
 			{
-				this->HeldKeys.push_back(kb.Code);
+				this->HeldKeys.push_back(ib.Code);
 			}
 
 			/* track the actual bind/id combo too */
@@ -577,28 +594,36 @@ void CInputBindApi::Load()
 	{
 		std::ifstream file(Index::F_INPUTBINDS);
 
-		json InputBinds = json::parse(file);
-		for (json binding : InputBinds)
+		json inputBinds = json::parse(file);
+
+		for (json binding : inputBinds)
 		{
-			if (binding.is_null() ||
-				binding["Key"].is_null() ||
-				binding["Alt"].is_null() ||
-				binding["Ctrl"].is_null() ||
-				binding["Shift"].is_null())
+			/* if bind is null, or neither key nor code are set -> invalid */
+			if (binding.is_null() || (binding["Key"].is_null() && binding["Code"].is_null()))
 			{
-				Logger->Debug(CH_INPUTBINDS, "One or more fields of InputBind were null.");
 				continue;
 			}
 
-			InputBind kb{};
-			binding["Key"].get_to(kb.Code);
-			binding["Alt"].get_to(kb.Alt);
-			binding["Ctrl"].get_to(kb.Ctrl);
-			binding["Shift"].get_to(kb.Shift);
+			InputBind ib{};
+			binding["Alt"].get_to(ib.Alt);
+			binding["Ctrl"].get_to(ib.Ctrl);
+			binding["Shift"].get_to(ib.Shift);
+
+			/* neither code nor type null -> inputbind */
+			if (!binding["Type"].is_null() && !binding["Code"].is_null())
+			{
+				binding["Type"].get_to(ib.Type);
+				binding["Code"].get_to(ib.Code);
+			}
+			else /* legacy inputbind */
+			{
+				ib.Type = EInputBindType::Keyboard;
+				binding["Key"].get_to(ib.Code);
+			}
 
 			std::string identifier = binding["Identifier"].get<std::string>();
 
-			this->Registry[identifier].Bind = kb;
+			this->Registry[identifier].Bind = ib;
 		}
 
 		file.close();
@@ -617,17 +642,23 @@ void CInputBindApi::Save()
 
 	for (auto& it : this->Registry)
 	{
-		InputBind kb = it.second.Bind;
 		std::string id = it.first;
+		InputBind ib = it.second.Bind;
 
 		json binding =
 		{
 			{"Identifier",	id},
-			{"Key",			kb.Code},
-			{"Alt",			kb.Alt},
-			{"Ctrl",		kb.Ctrl},
-			{"Shift",		kb.Shift}
+			{"Alt",			ib.Alt},
+			{"Ctrl",		ib.Ctrl},
+			{"Shift",		ib.Shift},
+			{"Type",		ib.Type},
+			{"Code",		ib.Code}
 		};
+
+		if (!ib.Alt && !ib.Ctrl && !ib.Shift && !ib.Code)
+		{
+			ib.Type = EInputBindType::None;
+		}
 
 		InputBinds.push_back(binding);
 	}

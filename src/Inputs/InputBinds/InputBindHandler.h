@@ -87,7 +87,7 @@ class CInputBindApi
 	/// KBToString:
 	/// 	Helper function to get the display string of a InputBind.
 	///----------------------------------------------------------------------------------------------------
-	static std::string KBToString(InputBind aKebyind, bool padded = false);
+	static std::string KBToString(InputBind aKebyind, bool aPadded = false);
 
 	public:
 	///----------------------------------------------------------------------------------------------------
