@@ -1,7 +1,7 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  Memory.h
+/// Name         :  Memory.cpp
 /// Description  :  Contains functions for memory related operations.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
