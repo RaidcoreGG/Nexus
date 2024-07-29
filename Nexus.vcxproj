@@ -84,6 +84,7 @@
     <ClCompile Include="src\Inputs\RawInput\RawInputApi.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\GUI\Widgets\QuickAccess\EQAVisibility.h" />
     <ClInclude Include="src\Inputs\GameBinds\EGameBinds.h" />
     <ClInclude Include="src\Inputs\GameBinds\FuncDefs.h" />
     <ClInclude Include="src\Inputs\GameBinds\GameBindsHandler.h" />

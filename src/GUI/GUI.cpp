@@ -711,7 +711,7 @@ namespace GUI
 			else
 			{
 				QuickAccess::Location = EQAPosition::Extend;
-				Settings::Settings[OPT_QALOCATION] = 0;
+				Settings::Settings[OPT_QALOCATION] = EQAPosition::Extend;
 			}
 
 			if (!Settings::Settings[OPT_QAOFFSETX].is_null() && !Settings::Settings[OPT_QAOFFSETY].is_null())
@@ -780,13 +780,21 @@ namespace GUI
 				Language->SetLanguage("en");
 			}
 
+			/* legacy quick access visibility */
 			if (!Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS].is_null())
 			{
-				Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS].get_to(QuickAccess::AlwaysShow);
+				/* delete legacy key */
+				Settings::Settings.erase(OPT_ALWAYSSHOWQUICKACCESS);
+			}
+
+			if (!Settings::Settings[OPT_QAVISIBILITY].is_null())
+			{
+				Settings::Settings[OPT_QAVISIBILITY].get_to(QuickAccess::Visibility);
 			}
 			else
 			{
-				Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS] = false;
+				QuickAccess::Visibility = EQAVisibility::AlwaysShow;
+				Settings::Settings[OPT_QAVISIBILITY] = EQAVisibility::AlwaysShow;
 			}
 
 			ImGuiIO& io = ImGui::GetIO();

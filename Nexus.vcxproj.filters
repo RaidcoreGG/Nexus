@@ -1139,6 +1139,9 @@
     <ClInclude Include="src\Util\Memory.h">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="src\GUI\Widgets\QuickAccess\EQAVisibility.h">
+      <Filter>GUI\Widgets\QuickAccess</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\Nexus.rc">

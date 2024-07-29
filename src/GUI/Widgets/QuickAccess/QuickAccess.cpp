@@ -34,8 +34,8 @@ namespace GUI
 		bool			IsFadingIn			= false;
 		bool			IsHovering			= false;
 
-		bool			AlwaysShow			= false;
 		bool			VerticalLayout		= false;
+		EQAVisibility	Visibility			= EQAVisibility::AlwaysShow;
 		EQAPosition		Location			= EQAPosition::Extend;
 		ImVec2			Offset				= ImVec2(0, 0);
 
@@ -58,9 +58,57 @@ namespace GUI
 
 		void Render()
 		{
-			if (!(AlwaysShow || GUI::NexusLink->IsGameplay))
+			switch (Visibility)
 			{
-				return;
+				/* continue rendering */
+				default:
+				case EQAVisibility::AlwaysShow: { break; }
+
+				case EQAVisibility::Gameplay:
+				{
+					/* don't render if not gameplay */
+					if (!GUI::NexusLink->IsGameplay)
+					{
+						return;
+					}
+
+					break;
+				}
+				case EQAVisibility::OutOfCombat:
+				{
+					/* don't render if not gameplay */
+					if (!GUI::NexusLink->IsGameplay)
+					{
+						return;
+					}
+
+					/* don't render if in combat */
+					if (GUI::MumbleLink->Context.IsInCombat)
+					{
+						return;
+					}
+
+					break;
+				}
+				case EQAVisibility::InCombat:
+				{
+					/* don't render if not gameplay */
+					if (!GUI::NexusLink->IsGameplay)
+					{
+						return;
+					}
+
+					/* don't render if out of combat */
+					if (!GUI::MumbleLink->Context.IsInCombat)
+					{
+						return;
+					}
+
+					break;
+				}
+
+				/* don't render*/
+				case EQAVisibility::Hide: { return; }
 			}
 
 			bool isActive = false;
@@ -405,6 +453,24 @@ namespace GUI
 			}
 		}
 
+		std::string EQAVisibilityToString(EQAVisibility aQAVisibility)
+		{
+			switch (aQAVisibility)
+			{
+				case EQAVisibility::AlwaysShow:
+					return "((000047))";
+				case EQAVisibility::Gameplay:
+					return "((000093))";
+				case EQAVisibility::OutOfCombat:
+					return "((000094))";
+				case EQAVisibility::InCombat:
+					return "((000095))";
+				case EQAVisibility::Hide:
+					return "((000096))";
+				default:
+					return "(null)";
+			}
+		}
 		std::string EQAPositionToString(EQAPosition aQAPosition)
 		{
 			switch (aQAPosition)

@@ -86,14 +86,6 @@ namespace GUI
 	void APITab();
 	void ChangelogTab();
 
-	static bool LocalizedItemsGetter(void* data, int idx, const char** out_text)
-	{
-		const char* const* items = (const char* const*)data;
-		if (out_text)
-			*out_text = items[idx];
-		return true;
-	}
-	
 	COptionsWindow::COptionsWindow(std::string aName)
 	{
 		Name = aName;
@@ -477,13 +469,45 @@ namespace GUI
 			Settings::Settings[OPT_QAVERTICAL] = QuickAccess::VerticalLayout;
 			Settings::Save();
 		}
-		/* always show */
-		if (ImGui::Checkbox(Language->Translate("((000047))"), &QuickAccess::AlwaysShow))
+
+		/* prefetch currently selected position string */
+		std::string qaVisStr = QuickAccess::EQAVisibilityToString(QuickAccess::Visibility);
+		EQAVisibility newQaVis = QuickAccess::Visibility;
+
+		ImGui::Text(Language->Translate("((000097))"));
+		if (ImGui::BeginCombo("##qavisibility", Language->Translate(qaVisStr.c_str())))
 		{
-			Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS] = QuickAccess::AlwaysShow;
+			if (ImGui::Selectable(Language->Translate("((000047))"), qaVisStr == "((000047))"))
+			{
+				newQaVis = EQAVisibility::AlwaysShow;
+			}
+			if (ImGui::Selectable(Language->Translate("((000093))"), qaVisStr == "((000093))"))
+			{
+				newQaVis = EQAVisibility::Gameplay;
+			}
+			if (ImGui::Selectable(Language->Translate("((000094))"), qaVisStr == "((000094))"))
+			{
+				newQaVis = EQAVisibility::OutOfCombat;
+			}
+			if (ImGui::Selectable(Language->Translate("((000095))"), qaVisStr == "((000095))"))
+			{
+				newQaVis = EQAVisibility::InCombat;
+			}
+			if (ImGui::Selectable(Language->Translate("((000096))"), qaVisStr == "((000096))"))
+			{
+				newQaVis = EQAVisibility::Hide;
+			}
+
+			ImGui::EndCombo();
+		}
+
+		/* save if qaVis was changed */
+		if (QuickAccess::Visibility != newQaVis)
+		{
+			QuickAccess::Visibility = newQaVis;
+			Settings::Settings[OPT_QAVISIBILITY] = QuickAccess::Visibility;
 			Settings::Save();
 		}
-		ImGui::TooltipGeneric(Language->Translate("((000048))"));
 
 		/* show notification icon on update */
 		if (ImGui::Checkbox(Language->Translate("((000049))"), &GUI::NotifyChangelog))
@@ -616,7 +640,7 @@ namespace GUI
 
 			ImGui::BeginChild("##StyleTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-			ImGui::TextDisabled("Font");
+			ImGui::TextDisabled(Language->Translate("((000092))"));
 			if (ImGui::BeginCombo("##fontselector", GUI::FontFile.c_str()))
 			{
 				for (std::string font : Fonts)

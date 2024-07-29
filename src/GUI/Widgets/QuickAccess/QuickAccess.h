@@ -9,6 +9,7 @@
 
 #include "Shortcut.h"
 #include "EQAPosition.h"
+#include "EQAVisibility.h"
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_extensions.h"
@@ -28,8 +29,8 @@ namespace GUI
 		extern bool				IsFadingIn;
 		extern bool				IsHovering;
 
-		extern bool				AlwaysShow;
 		extern bool				VerticalLayout;
+		extern EQAVisibility	Visibility;
 		extern EQAPosition		Location;
 		extern ImVec2			Offset;
 
@@ -47,6 +48,7 @@ namespace GUI
 		void AddSimpleShortcut2(const char* aIdentifier, const char* aTargetShortcutIdentifier, GUI_RENDER aShortcutRenderCallback);
 		void RemoveSimpleShortcut(const char* aIdentifier);
 
+		std::string EQAVisibilityToString(EQAVisibility aQAVisibility);
 		std::string EQAPositionToString(EQAPosition aQAPosition);
 
 		int Verify(void* aStartAddress, void* aEndAddress);
