@@ -405,6 +405,23 @@ namespace GUI
 			}
 		}
 
+		std::string EQAPositionToString(EQAPosition aQAPosition)
+		{
+			switch (aQAPosition)
+			{
+				case EQAPosition::Extend:
+					return "((000067))";
+				case EQAPosition::Under:
+					return "((000068))";
+				case EQAPosition::Bottom:
+					return "((000069))";
+				case EQAPosition::Custom:
+					return "((000070))";
+				default:
+					return "(null)";
+			}
+		}
+
 		int Verify(void* aStartAddress, void* aEndAddress)
 		{
 			int refCounter = 0;

@@ -47,6 +47,8 @@ namespace GUI
 		void AddSimpleShortcut2(const char* aIdentifier, const char* aTargetShortcutIdentifier, GUI_RENDER aShortcutRenderCallback);
 		void RemoveSimpleShortcut(const char* aIdentifier);
 
+		std::string EQAPositionToString(EQAPosition aQAPosition);
+
 		int Verify(void* aStartAddress, void* aEndAddress);
 	}
 }

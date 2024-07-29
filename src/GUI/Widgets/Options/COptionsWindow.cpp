@@ -75,13 +75,6 @@ namespace GUI
 	EGameBinds CurrentlyEditingGame; // the identifier
 	std::vector<GKBCat> GameKeybindCategoryMap;
 
-	const char* qaLocations[] = { "((000067))", "((000068))", "((000069))", "((000070))" };
-	const char** languages;
-	int languagesIndex;
-	int languagesSize;
-
-	bool isSetup = false;
-
 	char CurrentAPIKey[73]{};
 
 	/* proto tabs */
@@ -393,30 +386,6 @@ namespace GUI
 	{
 		if (!Visible) { return; }
 
-		if (!isSetup)
-		{
-			if (Language)
-			{
-				const std::string& activeLang = Language->GetActiveLanguage();
-
-				std::vector<std::string> langs = Language->GetLanguages();
-				languagesSize = langs.size();
-				languages = new const char* [langs.size()];
-				for (size_t i = 0; i < langs.size(); i++)
-				{
-					languages[i] = new char[langs[i].size() + 1];
-					strcpy((char*)languages[i], langs[i].c_str());
-
-					if (languages[i] == activeLang)
-					{
-						languagesIndex = i;
-					}
-				}
-
-				isSetup = true;
-			}
-		}
-
 		ImGui::SetNextWindowSize(ImVec2(owWidth * ImGui::GetFontSize(), owHeight * ImGui::GetFontSize()), ImGuiCond_FirstUseEver);
 		if (ImGui::Begin(Name.c_str(), &Visible, ImGuiWindowFlags_NoCollapse))
 		{
@@ -445,94 +414,141 @@ namespace GUI
 		DrawBindSetterModal();
 	}
 
+	void LanguageSettings()
+	{
+		/* header */
+		ImGui::TextDisabled(Language->Translate("((000041))"));
+
+		/* prefetch active lang */
+		std::string activeLang = Language->GetActiveLanguage();
+
+		/* selector dropdown */
+		if (ImGui::BeginCombo("##languageselector", activeLang.c_str()))
+		{
+			for (std::string lang : Language->GetLanguages())
+			{
+				if (ImGui::Selectable(lang.c_str(), lang == activeLang))
+				{
+					if (lang != activeLang)
+					{
+						Language->SetLanguage(lang);
+						Settings::Settings[OPT_LANGUAGE] = lang;
+						Settings::Save();
+					}
+				}
+			}
+			ImGui::EndCombo();
+		}
+	}
+	void UIUXSettings()
+	{
+		/* header */
+		ImGui::TextDisabled(Language->Translate("((000042))"));
+		
+		/* close menu after selecting item */
+		if (ImGui::Checkbox(Language->Translate("((000043))"), &GUI::CloseMenuAfterSelecting))
+		{
+			Settings::Settings[OPT_CLOSEMENU] = GUI::CloseMenuAfterSelecting;
+			Settings::Save();
+		}
+
+		/* close windows on escape */
+		if (ImGui::Checkbox(Language->Translate("((000044))"), &GUI::CloseOnEscape))
+		{
+			Settings::Settings[OPT_CLOSEESCAPE] = GUI::CloseOnEscape;
+			Settings::Save();
+		}
+
+		/* show addons window after after addons were disabled because of an update */
+		if (ImGui::Checkbox(Language->Translate("((000086))"), &GUI::ShowAddonsWindowAfterDUU))
+		{
+			Settings::Settings[OPT_SHOWADDONSWINDOWAFTERDUU] = GUI::ShowAddonsWindowAfterDUU;
+			Settings::Save();
+		}
+	}
+	void QuickAccessSettings()
+	{
+		/* header */
+		ImGui::TextDisabled(Language->Translate("((000045))"));
+		
+		/* toggle vertical layout */
+		if (ImGui::Checkbox(Language->Translate("((000046))"), &QuickAccess::VerticalLayout))
+		{
+			Settings::Settings[OPT_QAVERTICAL] = QuickAccess::VerticalLayout;
+			Settings::Save();
+		}
+		/* always show */
+		if (ImGui::Checkbox(Language->Translate("((000047))"), &QuickAccess::AlwaysShow))
+		{
+			Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS] = QuickAccess::AlwaysShow;
+			Settings::Save();
+		}
+		ImGui::TooltipGeneric(Language->Translate("((000048))"));
+
+		/* show notification icon on update */
+		if (ImGui::Checkbox(Language->Translate("((000049))"), &GUI::NotifyChangelog))
+		{
+			Settings::Settings[OPT_NOTIFYCHANGELOG] = GUI::NotifyChangelog;
+			Settings::Save();
+		}
+
+		/* prefetch currently selected position string */
+		std::string qaPosStr = QuickAccess::EQAPositionToString(QuickAccess::Location);
+		EQAPosition newQaPos = QuickAccess::Location;
+
+		/* position/location dropdown */
+		ImGui::Text(Language->Translate("((000050))"));
+		if (ImGui::BeginCombo("##qalocation", Language->Translate(qaPosStr.c_str())))
+		{
+			if (ImGui::Selectable(Language->Translate("((000067))"), qaPosStr == "((000067))"))
+			{
+				newQaPos = EQAPosition::Extend;
+			}
+			if (ImGui::Selectable(Language->Translate("((000068))"), qaPosStr == "((000068))"))
+			{
+				newQaPos = EQAPosition::Under;
+			}
+			if (ImGui::Selectable(Language->Translate("((000069))"), qaPosStr == "((000069))"))
+			{
+				newQaPos = EQAPosition::Bottom;
+			}
+			if (ImGui::Selectable(Language->Translate("((000070))"), qaPosStr == "((000070))"))
+			{
+				newQaPos = EQAPosition::Custom;
+			}
+
+			ImGui::EndCombo();
+		}
+
+		/* save if qaPos was changed */
+		if (QuickAccess::Location != newQaPos)
+		{
+			QuickAccess::Location = newQaPos;
+			Settings::Settings[OPT_QALOCATION] = QuickAccess::Location;
+			Settings::Save();
+		}
+
+		/* offset */
+		ImGui::Text(Language->Translate("((000051))"));
+		if (ImGui::DragFloat2("##qaoffset", (float*)&QuickAccess::Offset, 1.0f, (static_cast<int>(Renderer::Height)) * -1, static_cast<int>(Renderer::Height)))
+		{
+			Settings::Settings[OPT_QAOFFSETX] = QuickAccess::Offset.x;
+			Settings::Settings[OPT_QAOFFSETY] = QuickAccess::Offset.y;
+			Settings::Save();
+		}
+	}
+
 	void GeneralTab()
 	{
 		if (ImGui::BeginTabItem(Language->Translate("((000052))")))
 		{
-			{
-				ImGui::BeginChild("##GeneralTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+			ImGui::BeginChild("##GeneralTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-				ImGui::TextDisabled(Language->Translate("((000041))"));
-				if (ImGui::Combo("##language", (int*)&languagesIndex, languages, languagesSize))
-				{
-					Language->SetLanguage(languages[languagesIndex]);
-					Settings::Settings[OPT_LANGUAGE] = languages[languagesIndex];
-					Settings::Save();
-				}
+			LanguageSettings();
+			UIUXSettings();
+			QuickAccessSettings();
 
-				ImGui::TextDisabled(Language->Translate("((000042))"));
-				{
-					if (ImGui::Checkbox(Language->Translate("((000043))"), &GUI::CloseMenuAfterSelecting))
-					{
-						Settings::Settings[OPT_CLOSEMENU] = GUI::CloseMenuAfterSelecting;
-						Settings::Save();
-					}
-					if (ImGui::Checkbox(Language->Translate("((000044))"), &GUI::CloseOnEscape))
-					{
-						Settings::Settings[OPT_CLOSEESCAPE] = GUI::CloseOnEscape;
-						Settings::Save();
-					}
-					if (ImGui::Checkbox(Language->Translate("((000086))"), &GUI::ShowAddonsWindowAfterDUU))
-					{
-						Settings::Settings[OPT_SHOWADDONSWINDOWAFTERDUU] = GUI::ShowAddonsWindowAfterDUU;
-						Settings::Save();
-					}
-				}
-
-				ImGui::Separator();
-
-				ImGui::TextDisabled(Language->Translate("((000045))"));
-				{
-					if (ImGui::Checkbox(Language->Translate("((000046))"), &QuickAccess::VerticalLayout))
-					{
-						Settings::Settings[OPT_QAVERTICAL] = QuickAccess::VerticalLayout;
-						Settings::Save();
-					}
-					if (ImGui::Checkbox(Language->Translate("((000047))"), &QuickAccess::AlwaysShow))
-					{
-						Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS] = QuickAccess::AlwaysShow;
-						Settings::Save();
-					}
-					ImGui::TooltipGeneric(Language->Translate("((000048))"));
-
-					if (ImGui::Checkbox(Language->Translate("((000049))"), &GUI::NotifyChangelog))
-					{
-						Settings::Settings[OPT_NOTIFYCHANGELOG] = GUI::NotifyChangelog;
-						Settings::Save();
-					}
-
-					ImGui::Text(Language->Translate("((000050))"));
-					if (ImGui::BeginCombo("##qalocation", Language->Translate(qaLocations[(int)QuickAccess::Location])))
-					{
-						for (int n = 0; n < IM_ARRAYSIZE(qaLocations); n++)
-						{
-							bool is_selected = ((int)QuickAccess::Location == n); // You can store your selection however you want, outside or inside your objects
-							if (ImGui::Selectable(Language->Translate(qaLocations[n]), is_selected))
-							{
-								QuickAccess::Location = (EQAPosition)n;
-								Settings::Settings[OPT_QALOCATION] = QuickAccess::Location;
-								Settings::Save();
-							}
-							if (is_selected)
-							{
-								ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
-							}
-						}
-
-						ImGui::EndCombo();
-					}
-
-					ImGui::Text(Language->Translate("((000051))"));
-					if (ImGui::DragFloat2("##qaoffset", (float*)&QuickAccess::Offset, 1.0f, (static_cast<int>(Renderer::Height)) * -1, static_cast<int>(Renderer::Height)))
-					{
-						Settings::Settings[OPT_QAOFFSETX] = QuickAccess::Offset.x;
-						Settings::Settings[OPT_QAOFFSETY] = QuickAccess::Offset.y;
-						Settings::Save();
-					}
-				}
-
-				ImGui::EndChild();
-			}
+			ImGui::EndChild();
 
 			ImGui::EndTabItem();
 		}
@@ -556,37 +572,26 @@ namespace GUI
 			{
 				for (GUI_RENDER renderCb : RegistryOptionsRender)
 				{
-					if (renderCb)
+					std::string parent = Loader::GetOwner(renderCb);
+					if (ImGui::BeginTabItem((parent + "##AddonOptions").c_str()))
 					{
-						std::string parent = Loader::GetOwner(renderCb);
-						if (ImGui::BeginTabItem((parent + "##AddonOptions").c_str()))
+						for (KBCat cat : KeybindCategoryMap)
 						{
+							if (cat.Name != parent) { continue; }
+							if (cat.Keybinds.size() == 0) { continue; }
+
+							if (ImGui::CollapsingHeader(Language->Translate("((000060))"), ImGuiTreeNodeFlags_DefaultOpen))
 							{
-								//ImGui::BeginChild("##KeybindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
-
-								bool openEditor = false;
-
-								for (KBCat cat : KeybindCategoryMap)
-								{
-									if (cat.Name != parent) { continue; }
-									if (cat.Keybinds.size() == 0) { continue; }
-
-									if (ImGui::CollapsingHeader(Language->Translate("((000060))"), ImGuiTreeNodeFlags_DefaultOpen))
-									{
-										DrawInputBindsTable(cat.Keybinds);
-									}
-								}
-
-								//ImGui::EndChild();
+								DrawInputBindsTable(cat.Keybinds);
 							}
-
-							if (ImGui::CollapsingHeader(Language->Translate("((000004))"), ImGuiTreeNodeFlags_DefaultOpen))
-							{
-								renderCb();
-							}
-
-							ImGui::EndTabItem();
 						}
+
+						if (ImGui::CollapsingHeader(Language->Translate("((000004))"), ImGuiTreeNodeFlags_DefaultOpen))
+						{
+							renderCb();
+						}
+
+						ImGui::EndTabItem();
 					}
 				}
 

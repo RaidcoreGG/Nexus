@@ -978,6 +978,8 @@ namespace GUI
 
 	void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback)
 	{
+		if (!aRenderCallback) { return; }
+
 		const std::lock_guard<std::mutex> lock(Mutex);
 
 		switch (aRenderType)
