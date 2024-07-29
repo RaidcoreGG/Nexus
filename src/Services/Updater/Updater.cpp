@@ -6,7 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "Services/Updater/Updater.h"
+#include "Updater.h"
 
 #include <thread>
 
@@ -97,7 +97,7 @@ void CUpdater::UpdateNexus()
 	}
 
 	// check for update and bypass cache
-	json resVersion = RaidcoreAPI->Get("/nexusversion", "", true);
+	json resVersion = RaidcoreAPI->Get("/nexusversion", "", 0);
 
 	if (resVersion.is_null())
 	{
@@ -181,7 +181,7 @@ void CUpdater::UpdateNexus()
 	}
 }
 
-bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonInfo, bool aIgnoreTagFormat)
+bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonInfo, bool aIgnoreTagFormat, int aCacheLifetimeOverride)
 {
 	/* setup paths */
 	std::filesystem::path pathOld = aPath.string() + ".old";
@@ -293,14 +293,14 @@ bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonI
 	switch (aAddonInfo.Provider)
 	{
 	case EUpdateProvider::Raidcore:
-		if (this->UpdateRaidcore())
+		if (this->UpdateRaidcore(aCacheLifetimeOverride))
 		{
 			didDownload = true;
 		}
 		break;
 
 	case EUpdateProvider::GitHub:
-		if (this->UpdateGitHub(tmpPath, endpoint, aAddonInfo.Version, aAddonInfo.AllowPrereleases, aIgnoreTagFormat))
+		if (this->UpdateGitHub(tmpPath, endpoint, aAddonInfo.Version, aAddonInfo.AllowPrereleases, aIgnoreTagFormat, aCacheLifetimeOverride))
 		{
 			didDownload = true;
 		}
@@ -392,7 +392,7 @@ bool CUpdater::InstallAddon(LibraryAddon* aAddon, bool aIsArcPlugin)
 	return false;
 }
 
-bool CUpdater::UpdateRaidcore(void)
+bool CUpdater::UpdateRaidcore(int aCacheLifetimeOverride)
 {
 	return false;
 
@@ -417,9 +417,9 @@ bool CUpdater::UpdateRaidcore(void)
 	}*/
 }
 
-bool CUpdater::UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& aEndpoint, AddonVersion aCurrentVersion, bool aAllowPrereleases, bool aIgnoreTagFormat)
+bool CUpdater::UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& aEndpoint, AddonVersion aCurrentVersion, bool aAllowPrereleases, bool aIgnoreTagFormat, int aCacheLifetimeOverride)
 {
-	json response = GitHubAPI->Get(aEndpoint);
+	json response = GitHubAPI->Get(aEndpoint, "", aCacheLifetimeOverride);
 
 	if (response.is_null())
 	{

@@ -1,5 +1,13 @@
-#ifndef APIHANDLER_H
-#define APIHANDLER_H
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  ApiClient.h
+/// Description  :  Provides functions for web requests.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
+#ifndef APICLIENT_H
+#define APICLIENT_H
 
 #include <string>
 #include <thread>
@@ -18,37 +26,53 @@
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
+///----------------------------------------------------------------------------------------------------
+/// CApiClient Class
+///----------------------------------------------------------------------------------------------------
 class CApiClient
 {
-public:
-	/*
-	CApiClient:
-	- aBaseUrl is the API base
-	- aCacheDirectory is the directory to where the requests will be cached on disk
-	- aCacheLifetime (seconds) refers to how long a response should still be considered valid, if it's a cached one, before refetching it
-	- aBucketCapacity refers to the bucket size for requests
-	- aRefillAmount refers to how many tokens you get back after each interval
-	- aRefillInterval (seconds) refers to when the bucket gets refilled
-	*/
+	public:
+	///----------------------------------------------------------------------------------------------------
+	/// ctor:
+	/// 	- aCacheDirectory is the directory to where the requests will be cached on disk
+	/// 	- aCacheLifetime(seconds) refers to how long a response should still be considered valid, if it's a cached one, before refetching it
+	/// 	- aBucketCapacity refers to the bucket size for requests
+	/// 	- aRefillAmount refers to how many tokens you get back after each interval
+	/// 	- aRefillInterval(seconds) refers to when the bucket gets refilled
+	///----------------------------------------------------------------------------------------------------
 	CApiClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::path aCacheDirectory, int aCacheLifetime, int aBucketCapacity, int aRefillAmount, int aRefillInterval, const char* aCertificate = nullptr);
+	///----------------------------------------------------------------------------------------------------
+	/// dtor
+	///----------------------------------------------------------------------------------------------------
 	~CApiClient();
 
 	/*
 	Get:
 	Returns the response string.
 	*/
-	json Get(std::string aEndpoint, std::string aParameters = "", bool aBypassCache = false);
 
+	///----------------------------------------------------------------------------------------------------
+	/// Get:
+	/// 	Sends a http requests and fetches the response.
+	/// 	- aOverrideCacheLifetime(seconds) changes the cache lifetime to the given one. -1 means, don't change it.
+	///----------------------------------------------------------------------------------------------------
+	json Get(std::string aEndpoint, std::string aParameters = "", int aOverrideCacheLifetime = -1);
+
+	///----------------------------------------------------------------------------------------------------
+	/// Post:
+	/// 	Sends a http post.
+	///----------------------------------------------------------------------------------------------------
 	json Post(std::string aEndpoint, std::string aParameters = "");
-	/*
-	Download:
-	Downloads the remote resource to disk.
-	*/
+
+	///----------------------------------------------------------------------------------------------------
+	/// Download:
+	/// 	Downloads a remote resource to disk.
+	///----------------------------------------------------------------------------------------------------
 	bool Download(std::filesystem::path aOutPath, std::string aEndpoint, std::string aParameters = "");
 
-protected:
+	protected:
 	std::string					BaseURL;
-	httplib::Client*			Client;
+	httplib::Client* Client;
 
 	std::mutex					Mutex;
 	std::filesystem::path		CacheDirectory;
@@ -71,24 +95,35 @@ protected:
 
 	std::vector<APIRequest>		QueuedRequests;
 
-	/*
-	GetCachedResponse:
-	Returns a pointer to an existing response or nullptr.
-	- aEndpoint should have a prefixed "/"
-	- aParameters should have a prefixed "?"
-	*/
+	///----------------------------------------------------------------------------------------------------
+	/// GetCachedResponse:
+	/// 	Returns a pointer to an existing response or nullptr.
+	/// 	- aEndpoint should have a prefixed "/"
+	/// 	- aParameters should have a prefixed "?"
+	///----------------------------------------------------------------------------------------------------
 	CachedResponse* GetCachedResponse(const std::string& aQuery);
-	/* 
-	GetNormalizedPath:
-	- aEndpoint should have a prefixed "/"
-	- aParameters should have a prefixed "?"
-	*/
+	
+	///----------------------------------------------------------------------------------------------------
+	/// GetNormalizedPath:
+	/// 	Normalizes a path.
+	/// 	- aEndpoint should have a prefixed "/"
+	/// 	- aParameters should have a prefixed "?"
+	///----------------------------------------------------------------------------------------------------
 	std::filesystem::path GetNormalizedPath(const std::string& aQuery) const;
 
-private:
+	private:
 	long long FileTimeOffset;
 
+	///----------------------------------------------------------------------------------------------------
+	/// ProcessRequests:
+	/// 	Loop to handle http requests.
+	///----------------------------------------------------------------------------------------------------
 	void ProcessRequests();
+
+	///----------------------------------------------------------------------------------------------------
+	/// HttpGet:
+	/// 	Internal HTTP get.
+	///----------------------------------------------------------------------------------------------------
 	APIResponse HttpGet(APIRequest aRequest);
 };
 

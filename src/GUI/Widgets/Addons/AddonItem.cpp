@@ -190,7 +190,7 @@ namespace GUI
 													aAddon->AllowPrereleases
 												};
 
-												if (UpdateService->UpdateAddon(tmpPath, addonInfo))
+												if (UpdateService->UpdateAddon(tmpPath, addonInfo, false, 5 * 60))
 												{
 													Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
 
