@@ -728,10 +728,11 @@ namespace GUI
 			else
 			{
 				FontFile = "font.ttf";
-				if (!std::filesystem::exists(Index::D_GW2_ADDONS_NEXUS_FONTS / FontFile))
-				{
-					FontFile = "";
-				}
+			}
+
+			if (!std::filesystem::exists(Index::D_GW2_ADDONS_NEXUS_FONTS / FontFile))
+			{
+				FontFile = "";
 			}
 
 			if (!Settings::Settings[OPT_FONTSIZE].is_null())
