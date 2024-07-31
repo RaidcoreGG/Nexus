@@ -844,6 +844,10 @@ namespace GUI
 
 			ImGui::EndTabItem();
 		}
+		else
+		{
+			IsStylePanelOpen = false;
+		}
 	}
 
 	bool InputBindsTab()
