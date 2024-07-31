@@ -271,12 +271,15 @@ namespace GUI
 	{
 		const std::lock_guard<std::mutex> lock(GUI::Mutex);
 
+		if (Language->Advance())
+		{
+			FontManager.Reload();
+		}
 		if (FontManager.Advance())
 		{
 			OnMumbleIdentityChanged(nullptr);
 			Shutdown();
 		}
-		Language->Advance();
 
 		/* pre-render callbacks */
 		for (GUI_RENDER callback : RegistryPreRender)

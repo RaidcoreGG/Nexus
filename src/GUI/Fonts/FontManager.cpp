@@ -81,6 +81,11 @@ CFontManager& CFontManager::GetInstance()
 	return Instance;
 }
 
+void CFontManager::Reload()
+{
+	this->IsFontAtlasBuilt = false;
+}
+
 bool CFontManager::Advance()
 {
 	if (this->IsFontAtlasBuilt) { return false; }
