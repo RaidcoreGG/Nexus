@@ -269,7 +269,7 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				ib.Shift = false;
 			}
 
-			if (ib == InputBind{})
+			if (!ib.IsBound())
 			{
 				return uMsg;
 			}
@@ -657,7 +657,8 @@ void CInputBindApi::Save()
 			{"Code",		ib.Code}
 		};
 
-		if (!ib.Alt && !ib.Ctrl && !ib.Shift && !ib.Code)
+		/* override type */
+		if (!ib.Code)
 		{
 			ib.Type = EInputBindType::None;
 		}

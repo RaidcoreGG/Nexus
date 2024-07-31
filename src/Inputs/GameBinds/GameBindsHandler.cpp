@@ -617,7 +617,7 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 
 	struct UEKey
 	{
-		unsigned DeviceType; // 0 = Unset, 1 = Keyboard, 2 = Mouse
+		unsigned DeviceType; // 0 = Unset, 1 = Mouse, 2 = Keyboard
 		signed Code; // Custom ArenaNet Scancode
 		signed Modifiers; // Bit 1 = Shfit, Bit 2 = Ctrl, Bit 3 = Alt
 	};
@@ -637,12 +637,13 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 		return;
 	}
 
-	/* only process keyboard binds (for now) */
+	/* if bind type == mouse */
 	if (kbChange->Bind.DeviceType == 1) { return; }
 
 	InputBind ib{};
+	ib.Type = EInputBindType::Keyboard;
 
-	/* if key was unbound */
+	/* if key was bound */
 	if (kbChange->Bind.DeviceType != 0)
 	{
 		ib.Alt = kbChange->Bind.Modifiers & 0b0100;
@@ -882,20 +883,26 @@ void CGameBindsApi::Save()
 
 	for (auto& it : this->Registry)
 	{
-		InputBind ib = it.second;
 		EGameBinds id = it.first;
+		InputBind ib = it.second;
 
 		if (!ib.IsBound()) { continue; }
 
 		json binding =
 		{
 			{"Identifier",	id},
-			{"Key",			ib.Code},
 			{"Alt",			ib.Alt},
 			{"Ctrl",		ib.Ctrl},
-			{"Shift",		ib.Shift}
+			{"Shift",		ib.Shift},
+			{"Type",		ib.Type},
+			{"Code",		ib.Code}
 		};
 
+		/* override type */
+		if (!ib.Code)
+		{
+			ib.Type = EInputBindType::None;
+		}
 		InputBinds.push_back(binding);
 	}
 
