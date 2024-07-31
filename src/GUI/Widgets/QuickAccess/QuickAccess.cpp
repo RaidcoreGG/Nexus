@@ -445,6 +445,8 @@ namespace GUI
 			{
 				shortcut.ContextItems.erase(aIdentifier);
 			}
+
+			OrphanedCallbacks.erase(aIdentifier);
 		}
 
 		std::string EQAVisibilityToString(EQAVisibility aQAVisibility)
