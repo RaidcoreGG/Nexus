@@ -274,8 +274,8 @@ namespace GUI
 		{
 			if (aShortcut.ContextItems.size() > 0)
 			{
-				const char* ctxId = ("ShortcutsCtxMenu##" + aIdentifier).c_str();
-				if (ImGui::BeginPopupContextItem(ctxId))
+				std::string ctxId = "ShortcutsCtxMenu##" + aIdentifier;
+				if (ImGui::BeginPopupContextItem(ctxId.c_str()))
 				{
 					*aIsActive = true;
 
@@ -302,7 +302,7 @@ namespace GUI
 
 					ImGui::EndPopup();
 				}
-				ImGui::OpenPopupOnItemClick(ctxId, 1);
+				ImGui::OpenPopupOnItemClick(ctxId.c_str(), 1);
 			}
 		}
 
