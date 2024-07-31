@@ -296,3 +296,18 @@ void CLocalization::ClearLocaleAtlas()
 
 	this->IsLocaleAtlasBuilt = false;
 }
+
+std::vector<const char*> CLocalization::GetAllTexts()
+{
+	std::vector<const char*> allTexts;
+
+	for (auto& [atlasId, atlasLocale] : this->LocaleAtlas)
+	{
+		for (auto& [textId, textVal] : atlasLocale.Texts)
+		{
+			allTexts.push_back(textVal);
+		}
+	}
+
+	return allTexts;
+}

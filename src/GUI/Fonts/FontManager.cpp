@@ -89,8 +89,8 @@ bool CFontManager::Advance()
 
 	ImGuiIO& io = ImGui::GetIO();
 
-	/* build full ranges */
-	ImVector<ImWchar> rangesFull;
+	/* add default ranges */
+	ImVector<ImWchar> ranges;
 	ImFontGlyphRangesBuilder rb{};
 	ImWchar rangesLatinExt[] =
 	{
@@ -100,15 +100,14 @@ bool CFontManager::Advance()
 	};
 	rb.AddRanges(io.Fonts->GetGlyphRangesDefault());
 	rb.AddRanges(rangesLatinExt);
-	rb.AddRanges(io.Fonts->GetGlyphRangesCyrillic());
-	rb.AddRanges(io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
-	rb.BuildRanges(&rangesFull);
 
-	/* build simple ranges*/
-	ImVector<ImWchar> ranges;
-	rb.Clear();
-	rb.AddRanges(io.Fonts->GetGlyphRangesDefault());
-	rb.AddRanges(rangesLatinExt);
+	/* add ranges on demand*/
+	for (const char* str : Language->GetAllTexts())
+	{
+		rb.AddText(str);
+	}
+
+	/* build ranges */
 	rb.BuildRanges(&ranges);
 
 	io.Fonts->Clear();
@@ -116,7 +115,7 @@ bool CFontManager::Advance()
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 	for (auto& font : this->Registry)
 	{
-		font.Pointer = io.Fonts->AddFontFromMemoryTTF(font.Data, static_cast<int>(font.DataSize), font.Size, font.Config, font.Identifier == "USER_FONT" || String::StartsWith(font.Identifier, "TREBUCHET") ? rangesFull.Data : ranges.Data);
+		font.Pointer = io.Fonts->AddFontFromMemoryTTF(font.Data, static_cast<int>(font.DataSize), font.Size, font.Config, ranges.Data);
 	}
 
 	/* finally build atlas */
