@@ -951,7 +951,7 @@ namespace GUI
 		TextureService->Load(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, NexusHandle, nullptr);
 
 		/* add shortcut */
-		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, Language->Translate("((000009))"));
+		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "((000009))");
 
 		if (IsUpdateAvailable && NotifyChangelog)
 		{

@@ -231,7 +231,7 @@ namespace GUI
 					shortcut.IsHovering = iconHovered || notifHovered;
 					if (shortcut.TooltipText.length() > 0)
 					{
-						ImGui::TooltipGeneric(shortcut.TooltipText.c_str());
+						ImGui::TooltipGeneric(Language->Translate(shortcut.TooltipText.c_str()));
 					}
 
 					ImGui::PopStyleColor(3);
@@ -369,50 +369,44 @@ namespace GUI
 		{
 			std::string str = aIdentifier;
 
-			{
-				const std::lock_guard<std::mutex> lock(QuickAccess::Mutex);
+			const std::lock_guard<std::mutex> lock(QuickAccess::Mutex);
 
-				auto it = Registry.find(str);
-				if (it != Registry.end())
+			auto it = Registry.find(str);
+			if (it != Registry.end())
+			{
+				for (auto& orphan : it->second.ContextItems)
 				{
-					for (auto& orphan : it->second.ContextItems)
-					{
-						OrphanedCallbacks[orphan.first] = orphan.second;
-					}
+					OrphanedCallbacks[orphan.first] = orphan.second;
 				}
-				Registry.erase(str);
 			}
+			Registry.erase(str);
 
 		}
 		void NotifyShortcut(const char* aIdentifier)
 		{
 			std::string str = aIdentifier;
 
-			QuickAccess::Mutex.lock();
-			{
-				auto it = Registry.find(str);
+			const std::lock_guard<std::mutex> lock(QuickAccess::Mutex);
+			
+			auto it = Registry.find(str);
 
-				if (it != Registry.end())
-				{
-					it->second.HasNotification = true;
-				}
+			if (it != Registry.end())
+			{
+				it->second.HasNotification = true;
 			}
-			QuickAccess::Mutex.unlock();
 		}
 		void SetNotificationShortcut(const char* aIdentifier, bool aState)
 		{
 			std::string str = aIdentifier;
 
-			QuickAccess::Mutex.lock();
-			{
-				auto it = Registry.find(str);
+			const std::lock_guard<std::mutex> lock(QuickAccess::Mutex);
+			
+			auto it = Registry.find(str);
 
-				if (it != Registry.end())
-				{
-					it->second.HasNotification = aState;
-				}
+			if (it != Registry.end())
+			{
+				it->second.HasNotification = aState;
 			}
-			QuickAccess::Mutex.unlock();
 		}
 
 		void AddSimpleShortcut(const char* aIdentifier, GUI_RENDER aShortcutRenderCallback)
