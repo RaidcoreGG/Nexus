@@ -843,22 +843,27 @@ void CGameBindsApi::Load()
 		json InputBinds = json::parse(file);
 		for (json binding : InputBinds)
 		{
-			if (binding.is_null() ||
-				binding["Key"].is_null() ||
-				binding["Alt"].is_null() ||
-				binding["Ctrl"].is_null() ||
-				binding["Shift"].is_null() ||
-				binding["Identifier"].is_null())
+			if (binding.is_null() || (binding["Key"].is_null() && binding["Code"].is_null()))
 			{
-				Logger->Debug(CH_GAMEBINDS, "One or more fields of InputBind were null.");
 				continue;
 			}
 
 			InputBind ib{};
-			binding["Key"].get_to(ib.Code);
 			binding["Alt"].get_to(ib.Alt);
 			binding["Ctrl"].get_to(ib.Ctrl);
 			binding["Shift"].get_to(ib.Shift);
+
+			/* neither code nor type null -> inputbind */
+			if (!binding["Type"].is_null() && !binding["Code"].is_null())
+			{
+				binding["Type"].get_to(ib.Type);
+				binding["Code"].get_to(ib.Code);
+			}
+			else /* legacy inputbind */
+			{
+				ib.Type = EInputBindType::Keyboard;
+				binding["Key"].get_to(ib.Code);
+			}
 
 			EGameBinds identifier = binding["Identifier"].get<EGameBinds>();
 
