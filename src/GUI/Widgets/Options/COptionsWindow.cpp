@@ -650,7 +650,8 @@ namespace GUI
 						if (font != FontFile)
 						{
 							FontFile = font;
-							FontManager.ReplaceFont("USER_FONT", FontSize, (Index::D_GW2_ADDONS_NEXUS_FONTS / font).string().c_str(), GUI::FontReceiver, nullptr);
+							
+							GUI::LoadFonts();
 
 							Settings::Settings[OPT_USERFONT] = FontFile;
 							Settings::Save();

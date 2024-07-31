@@ -76,6 +76,8 @@ namespace GUI
 
 	void FontReceiver(const char* aIdentifier, ImFont* aFont);
 
+	void LoadFonts();
+
 	/* Registers the provided RenderCallback. */
 	void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback);
 	/* Deregisters the provided RenderCallback. */
