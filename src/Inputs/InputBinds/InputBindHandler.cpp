@@ -261,10 +261,12 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			ib.Type = EInputBindType::Keyboard; // type keyboard, since we're listening to keypresses
 			ib.Code = keylp.GetScanCode();
 
-			// if shift, ctrl or alt set key to 0
+			/* if the pressed key is a modifier, reset all modifiers for the actual bind */
 			if (wParam == VK_SHIFT || wParam == VK_CONTROL || wParam == VK_MENU)
 			{
-				ib.Code = 0;
+				ib.Alt = false;
+				ib.Ctrl = false;
+				ib.Shift = false;
 			}
 
 			if (ib == InputBind{})
