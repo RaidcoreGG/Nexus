@@ -637,20 +637,45 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 		return;
 	}
 
-	/* if bind type == mouse */
-	if (kbChange->Bind.DeviceType == 1) { return; }
-
 	InputBind ib{};
-	ib.Type = EInputBindType::Keyboard;
 
-	/* if key was bound */
-	if (kbChange->Bind.DeviceType != 0)
+	/* if key was bound (keyboard) */
+	if (kbChange->Bind.DeviceType == 2)
 	{
 		ib.Alt = kbChange->Bind.Modifiers & 0b0100;
 		ib.Ctrl = kbChange->Bind.Modifiers & 0b0010;
 		ib.Shift = kbChange->Bind.Modifiers & 0b0001;
 
+		ib.Type = EInputBindType::Keyboard;
 		ib.Code = CGameBindsApi::GameBindCodeToScanCode(kbChange->Bind.Code);
+	}
+	else if (kbChange->Bind.DeviceType == 1) /* (mouse) */
+	{
+		ib.Alt = kbChange->Bind.Modifiers & 0b0100;
+		ib.Ctrl = kbChange->Bind.Modifiers & 0b0010;
+		ib.Shift = kbChange->Bind.Modifiers & 0b0001;
+
+		ib.Type = EInputBindType::Mouse;
+		if (kbChange->Bind.Code == 0)
+		{
+			ib.Code = (unsigned short)EMouseButtons::LMB;
+		}
+		else if (kbChange->Bind.Code == 2)
+		{
+			ib.Code = (unsigned short)EMouseButtons::RMB;
+		}
+		else if (kbChange->Bind.Code == 1)
+		{
+			ib.Code = (unsigned short)EMouseButtons::MMB;
+		}
+		else if (kbChange->Bind.Code == 3)
+		{
+			ib.Code = (unsigned short)EMouseButtons::M4;
+		}
+		else if (kbChange->Bind.Code == 4)
+		{
+			ib.Code = (unsigned short)EMouseButtons::M5;
+		}
 	}
 
 	UEInputBindUpdatesTarget->Set(kbChange->Identifier, ib, true);

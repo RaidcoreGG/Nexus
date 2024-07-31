@@ -20,7 +20,7 @@ InputBind::InputBind(LegacyInputBind aLegacyInputBind)
 
 bool InputBind::IsBound()
 {
-	return *this != InputBind{};
+	return Type != EInputBindType::None && Code != 0;
 }
 
 bool operator==(const InputBind& lhs, const InputBind& rhs)

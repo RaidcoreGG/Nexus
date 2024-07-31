@@ -105,7 +105,7 @@ std::string CInputBindApi::ScancodeToString(unsigned short aScanCode)
 	return "";
 }
 
-InputBind CInputBindApi::KBFromString(std::string aInputBind)
+InputBind CInputBindApi::IBFromString(std::string aInputBind)
 {
 	if (!IsLookupTableBuilt)
 	{
@@ -152,7 +152,7 @@ InputBind CInputBindApi::KBFromString(std::string aInputBind)
 	return kb;
 }
 
-std::string CInputBindApi::KBToString(InputBind aInputBind, bool aPadded)
+std::string CInputBindApi::IBToString(InputBind aInputBind, bool aPadded)
 {
 	if (!IsLookupTableBuilt)
 	{
@@ -194,25 +194,59 @@ std::string CInputBindApi::KBToString(InputBind aInputBind, bool aPadded)
 		str.append(aPadded ? " + " : "+");
 	}
 
-	UINT vk = MapVirtualKeyA(aInputBind.Code, MAPVK_VSC_TO_VK);
+	if (aInputBind.Type == EInputBindType::Keyboard)
+	{
+		UINT vk = MapVirtualKeyA(aInputBind.Code, MAPVK_VSC_TO_VK);
 
-	if (vk >= 65 && vk <= 90 || vk >= 48 && vk <= 57)
-	{
-		GetKeyNameTextA(aInputBind.Code << 16, buff, 100);
-		str.append(buff);
-	}
-	else
-	{
-		if (aInputBind.Type == EInputBindType::Keyboard && aInputBind.Code == 0)
+		if (vk >= 65 && vk <= 90 || vk >= 48 && vk <= 57)
 		{
-			str = str.substr(0, str.length() - (aPadded ? 3 : 1));
+			GetKeyNameTextA(aInputBind.Code << 16, buff, 100);
+			str.append(buff);
 		}
 		else
 		{
-			auto it = ScancodeLookupTable.find(aInputBind.Code);
-			if (it != ScancodeLookupTable.end())
+			if (aInputBind.Type == EInputBindType::Keyboard && aInputBind.Code == 0)
 			{
-				str.append(it->second);
+				str = str.substr(0, str.length() - (aPadded ? 3 : 1));
+			}
+			else
+			{
+				auto it = ScancodeLookupTable.find(aInputBind.Code);
+				if (it != ScancodeLookupTable.end())
+				{
+					str.append(it->second);
+				}
+			}
+		}
+	}
+	else if (aInputBind.Type == EInputBindType::Mouse)
+	{
+		switch ((EMouseButtons)aInputBind.Code)
+		{
+			case EMouseButtons::LMB:
+			{
+				str.append("LMB");
+				break;
+			}
+			case EMouseButtons::RMB:
+			{
+				str.append("RMB");
+				break;
+			}
+			case EMouseButtons::MMB:
+			{
+				str.append("MMB");
+				break;
+			}
+			case EMouseButtons::M4:
+			{
+				str.append("M4");
+				break;
+			}
+			case EMouseButtons::M5:
+			{
+				str.append("M5");
+				break;
 			}
 		}
 	}
@@ -233,8 +267,59 @@ CInputBindApi::CInputBindApi(CLogHandler* aLogger)
 
 UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	bool isModifier = false;
+
+	/* preprocess for modifiers */
+	switch (uMsg)
+	{
+		case WM_SYSKEYDOWN:
+		case WM_KEYDOWN:
+		{
+			if (wParam == VK_MENU)
+			{
+				isModifier = true;
+				this->IsAltHeld = true;
+			}
+			else if (wParam == VK_CONTROL)
+			{
+				isModifier = true;
+				this->IsCtrlHeld = true;
+			}
+			else if (wParam == VK_SHIFT)
+			{
+				isModifier = true;
+				this->IsShiftHeld = true;
+			}
+
+			break;
+		}
+
+		case WM_SYSKEYUP:
+		case WM_KEYUP:
+		{
+			if (wParam == VK_MENU)
+			{
+				isModifier = true;
+				this->IsAltHeld = false;
+			}
+			else if (wParam == VK_CONTROL)
+			{
+				isModifier = true;
+				this->IsCtrlHeld = false;
+			}
+			else if (wParam == VK_SHIFT)
+			{
+				isModifier = true;
+				this->IsShiftHeld = false;
+			}
+
+			break;
+		}
+	}
+
 	InputBind ib{};
 
+	/* actual input processing */
 	switch (uMsg)
 	{
 		case WM_ACTIVATEAPP:
@@ -246,37 +331,34 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
 		{
-			if (wParam > 255) break;
-
-			KeyLParam keylp = LParamToKMF(lParam);
-
-			if (wParam == VK_MENU) { this->IsAltHeld = true; }
-			else if (wParam == VK_CONTROL) { this->IsCtrlHeld = true; }
-			else if (wParam == VK_SHIFT) { this->IsShiftHeld = true; }
-
-			ib.Alt = this->IsAltHeld;
-			ib.Ctrl = this->IsCtrlHeld;
-			ib.Shift = this->IsShiftHeld;
-
-			ib.Type = EInputBindType::Keyboard; // type keyboard, since we're listening to keypresses
-			ib.Code = keylp.GetScanCode();
+			if (wParam > 255) { break; }
 
 			/* if the pressed key is a modifier, reset all modifiers for the actual bind */
-			if (wParam == VK_SHIFT || wParam == VK_CONTROL || wParam == VK_MENU)
+			if (isModifier)
 			{
 				ib.Alt = false;
 				ib.Ctrl = false;
 				ib.Shift = false;
 			}
+			else
+			{
+				ib.Alt = this->IsAltHeld;
+				ib.Ctrl = this->IsCtrlHeld;
+				ib.Shift = this->IsShiftHeld;
+			}
+
+			KeyLParam keylp = LParamToKMF(lParam);
+			ib.Type = EInputBindType::Keyboard; // type keyboard, since we're listening to keypresses
+			ib.Code = keylp.GetScanCode();
 
 			if (!ib.IsBound())
 			{
-				return uMsg;
+				break;
 			}
 
 			if (keylp.PreviousKeyState)
 			{
-				return uMsg;
+				break;
 			}
 
 			if (this->IsCapturing)
@@ -284,38 +366,14 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				/* store the currently held bind */
 				this->CapturedInputBind = ib;
 
-				/* prevent invoking InputBinds */
-				break;
+				/* send zero to prevent invoking InputBinds and further processing */
+				return 0;
 			}
 
-			auto heldBind = std::find_if(this->Registry.begin(), this->Registry.end(), [ib](auto& activeInputBind) { return activeInputBind.second.Bind == ib; });
-
-			if (heldBind == this->Registry.end()) /* if held bind does not match any registered */
+			/* if something was invoked, send zero to stop further processing */
+			if (this->Press(ib))
 			{
-				break;
-			}
-
-			if (std::find(this->HeldKeys.begin(), this->HeldKeys.end(), ib.Code) == this->HeldKeys.end())
-			{
-				this->HeldKeys.push_back(ib.Code);
-			}
-
-			/* track the actual bind/id combo too */
-			if (this->HeldInputBinds.find(heldBind->first) == this->HeldInputBinds.end())
-			{
-				this->HeldInputBinds[heldBind->first] = heldBind->second;
-			}
-
-			if (heldBind->first == KB_TOGGLEHIDEUI)
-			{
-				// invoke but do not return, pass through to game (multi hide)
-				this->Invoke(heldBind->first);
-				break;
-			}
-			else
-			{
-				// if Invoke returns true, pass 0 to the wndproc to stop processing
-				return this->Invoke(heldBind->first) ? 0 : 1;
+				return 0;
 			}
 
 			break;
@@ -324,70 +382,90 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
 		{
-			if (wParam > 255) break;
+			if (wParam > 255) { break; }
 
-			if (wParam == VK_MENU) { this->IsAltHeld = false; }
-			else if (wParam == VK_CONTROL) { this->IsCtrlHeld = false; }
-			else if (wParam == VK_SHIFT) { this->IsShiftHeld = false; }
+			if (isModifier)
+			{
+				this->Release(wParam);
+			}
+			else
+			{
+				this->Release(EInputBindType::Keyboard, LParamToKMF(lParam).GetScanCode());
+			}
 
 			/* only check if not currently setting InputBind */
 			if (this->IsCapturing)
 			{
+				/* send non-zero here so key RELEASES get passed through anyway */
 				return uMsg;
-			}
-
-			std::vector<std::string> heldBindsPop;
-
-			//const std::lock_guard<std::mutex> lock(this->MutexHeldKeys);
-			for (auto& bind : this->HeldInputBinds)
-			{
-				if (wParam == VK_SHIFT && bind.second.Bind.Shift)
-				{
-					this->Invoke(bind.first, true);
-					this->IsShiftHeld = false;
-					heldBindsPop.push_back(bind.first);
-				}
-				else if (wParam == VK_CONTROL && bind.second.Bind.Ctrl)
-				{
-					this->Invoke(bind.first, true);
-					this->IsCtrlHeld = false;
-					heldBindsPop.push_back(bind.first);
-				}
-				else if (wParam == VK_MENU && bind.second.Bind.Alt)
-				{
-					this->Invoke(bind.first, true);
-					this->IsAltHeld = false;
-					heldBindsPop.push_back(bind.first);
-				}
-				else
-				{
-					KeyLParam keylp = LParamToKMF(lParam);
-					unsigned short scanCode = keylp.GetScanCode();
-
-					if (scanCode == bind.second.Bind.Code)
-					{
-						this->Invoke(bind.first, true);
-						this->HeldKeys.erase(std::find(this->HeldKeys.begin(), this->HeldKeys.end(), scanCode));
-						heldBindsPop.push_back(bind.first);
-					}
-				}
-			}
-
-			for (auto bind : heldBindsPop)
-			{
-				this->HeldInputBinds.erase(bind);
 			}
 
 			break;
 		}
-	}
 
-	// don't pass keys to game if currently editing InputBinds
-	if (this->IsCapturing)
-	{
-		if (uMsg == WM_SYSKEYDOWN || uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYUP || uMsg == WM_KEYUP)
+		case WM_MBUTTONDOWN:
+		case WM_XBUTTONDOWN:
 		{
-			return 0;
+			ib.Alt = this->IsAltHeld;
+			ib.Ctrl = this->IsCtrlHeld;
+			ib.Shift = this->IsShiftHeld;
+
+			ib.Type = EInputBindType::Mouse; // type mouse, since we're listening to mbuttons
+
+			if (uMsg == WM_MBUTTONDOWN)
+			{
+				ib.Code = (unsigned short)EMouseButtons::MMB;
+			} /* else it's implicitly an XBUTTON */
+			else if (HIWORD(wParam) == XBUTTON1)
+			{
+				ib.Code = (unsigned short)EMouseButtons::M4;
+			}
+			else if (HIWORD(wParam) == XBUTTON2)
+			{
+				ib.Code = (unsigned short)EMouseButtons::M5;
+			}
+
+			if (this->IsCapturing)
+			{
+				/* store the currently held bind */
+				this->CapturedInputBind = ib;
+
+				/* send zero to prevent invoking InputBinds and further processing */
+				return 0;
+			}
+
+			/* if something was invoked, send zero to stop further processing */
+			if (this->Press(ib))
+			{
+				return 0;
+			}
+
+			break;
+		}
+		case WM_MBUTTONUP:
+		case WM_XBUTTONUP:
+		{
+			if (uMsg == WM_MBUTTONUP)
+			{
+				this->Release(EInputBindType::Mouse, (unsigned short)EMouseButtons::MMB);
+			} /* else it's implicitly an XBUTTON */
+			else if (HIWORD(wParam) == XBUTTON1)
+			{
+				this->Release(EInputBindType::Mouse, (unsigned short)EMouseButtons::M4);
+			}
+			else if (HIWORD(wParam) == XBUTTON2)
+			{
+				this->Release(EInputBindType::Mouse, (unsigned short)EMouseButtons::M5);
+			}
+
+			/* only check if not currently setting InputBind */
+			if (this->IsCapturing)
+			{
+				/* send non-zero here so mouse RELEASES get passed through anyway */
+				return uMsg;
+			}
+
+			break;
 		}
 	}
 
@@ -396,7 +474,7 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void CInputBindApi::Register(const char* aIdentifier, EInputBindHandlerType aInputBindHandlerType, void* aInputBindHandler, const char* aInputBind)
 {
-	InputBind requestedBind = CInputBindApi::KBFromString(aInputBind);
+	InputBind requestedBind = CInputBindApi::IBFromString(aInputBind);
 	this->Register(aIdentifier, aInputBindHandlerType, aInputBindHandler, requestedBind);
 }
 
@@ -673,18 +751,96 @@ void CInputBindApi::Save()
 	file.close();
 }
 
+bool CInputBindApi::Press(const InputBind& aInputBind)
+{
+	auto heldBind = this->FindInputBind(aInputBind);
+
+	/* if held bind does not match any registered */
+	if (heldBind == this->Registry.end())
+	{
+		return false;
+	}
+
+	/* track the actual bind/id combo */
+	this->HeldInputBinds[heldBind->first] = heldBind->second;
+
+	bool invoked = this->Invoke(heldBind->first);;
+
+	/* if was invoked -> stop processing (unless it was the togglehideui bind, pass through for multi hide)*/
+	if (invoked && heldBind->first != KB_TOGGLEHIDEUI)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+void CInputBindApi::Release(unsigned int aModifierVK)
+{
+	std::vector<std::string> heldBindsPop;
+
+	for (auto& entry : this->HeldInputBinds)
+	{
+		if (aModifierVK == VK_SHIFT && entry.second.Bind.Shift)
+		{
+			this->Invoke(entry.first, true);
+			heldBindsPop.push_back(entry.first);
+		}
+		else if (aModifierVK == VK_CONTROL && entry.second.Bind.Ctrl)
+		{
+			this->Invoke(entry.first, true);
+			heldBindsPop.push_back(entry.first);
+		}
+		else if (aModifierVK == VK_MENU && entry.second.Bind.Alt)
+		{
+			this->Invoke(entry.first, true);
+			heldBindsPop.push_back(entry.first);
+		}
+	}
+
+	for (auto entry : heldBindsPop)
+	{
+		this->HeldInputBinds.erase(entry);
+	}
+}
+
+void CInputBindApi::Release(EInputBindType aType, unsigned short aCode)
+{
+	std::vector<std::string> heldBindsPop;
+
+	for (auto& entry : this->HeldInputBinds)
+	{
+		if (entry.second.Bind.Type == aType && entry.second.Bind.Code == aCode)
+		{
+			this->Invoke(entry.first, true);
+			heldBindsPop.push_back(entry.first);
+		}
+	}
+
+	for (auto entry : heldBindsPop)
+	{
+		this->HeldInputBinds.erase(entry);
+	}
+}
+
 void CInputBindApi::ReleaseAll()
 {
 	this->IsAltHeld = false;
 	this->IsCtrlHeld = false;
 	this->IsShiftHeld = false;
 
-	//const std::lock_guard<std::mutex> lock(this->MutexHeldKeys);
 	for (auto& bind : this->HeldInputBinds)
 	{
 		this->Invoke(bind.first, true);
 	}
 
-	this->HeldKeys.clear();
 	this->HeldInputBinds.clear();
+}
+
+std::map<std::string, ManagedInputBind>::iterator CInputBindApi::FindInputBind(const InputBind& aInputBind)
+{
+	return std::find_if(this->Registry.begin(), this->Registry.end(), [aInputBind](auto& entry)
+	{
+		return entry.second.Bind == aInputBind;
+	});
 }

@@ -194,7 +194,7 @@ namespace GUI
 			}
 			else
 			{
-				ImGui::Text(CInputBindApi::KBToString(currInputBind, true).c_str());
+				ImGui::Text(CInputBindApi::IBToString(currInputBind, true).c_str());
 			}
 
 			bool overwriting = false;
@@ -320,7 +320,7 @@ namespace GUI
 					KBCat cat{};
 					cat.Name = owner;
 					cat.InputBinds[identifier] = {
-						CInputBindApi::KBToString(inputBind.Bind, true),
+						CInputBindApi::IBToString(inputBind.Bind, true),
 						inputBind
 					};
 					InputBindCategoryMap.push_back(cat);
@@ -328,7 +328,7 @@ namespace GUI
 				else
 				{
 					it->InputBinds[identifier] = {
-						CInputBindApi::KBToString(inputBind.Bind, true),
+						CInputBindApi::IBToString(inputBind.Bind, true),
 						inputBind
 					};
 				}
@@ -357,7 +357,7 @@ namespace GUI
 					cat.Name = catName;
 					cat.GameInputBinds[identifier] = {
 						CGameBindsApi::ToString(identifier),
-						CInputBindApi::KBToString(inputBind, true),
+						CInputBindApi::IBToString(inputBind, true),
 						inputBind
 					};
 					GameInputBindCategoryMap.push_back(cat);
@@ -366,7 +366,7 @@ namespace GUI
 				{
 					it->GameInputBinds[identifier] = {
 						CGameBindsApi::ToString(identifier),
-						CInputBindApi::KBToString(inputBind, true),
+						CInputBindApi::IBToString(inputBind, true),
 						inputBind
 					};
 				}

@@ -78,16 +78,16 @@ class CInputBindApi
 	static std::string ScancodeToString(unsigned short aScanCode);
 
 	///----------------------------------------------------------------------------------------------------
-	/// KBFromString:
+	/// IBFromString:
 	/// 	Helper function to create a InputBind from a string.
 	///----------------------------------------------------------------------------------------------------
-	static InputBind KBFromString(std::string aInputBind);
+	static InputBind IBFromString(std::string aInputBind);
 
 	///----------------------------------------------------------------------------------------------------
-	/// KBToString:
+	/// IBToString:
 	/// 	Helper function to get the display string of a InputBind.
 	///----------------------------------------------------------------------------------------------------
-	static std::string KBToString(InputBind aKebyind, bool aPadded = false);
+	static std::string IBToString(InputBind aKebyind, bool aPadded = false);
 
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -192,7 +192,6 @@ class CInputBindApi
 	bool									IsAltHeld;
 	bool									IsCtrlHeld;
 	bool									IsShiftHeld;
-	std::vector<unsigned short>				HeldKeys;
 	std::map<std::string, ManagedInputBind>	HeldInputBinds;
 
 	///----------------------------------------------------------------------------------------------------
@@ -208,10 +207,35 @@ class CInputBindApi
 	void Save();
 
 	///----------------------------------------------------------------------------------------------------
+	/// Press:
+	/// 	Invokes an InputBind that matches the pressed inputs.
+	/// 	Returns true if a bind was found and invoked.
+	///----------------------------------------------------------------------------------------------------
+	bool Press(const InputBind& aInputBind);
+
+	///----------------------------------------------------------------------------------------------------
+	/// Release:
+	/// 	Releases all InputBinds matching the criteria and invokes a release.
+	///----------------------------------------------------------------------------------------------------
+	void Release(unsigned int aModifierVK);
+
+	///----------------------------------------------------------------------------------------------------
+	/// Release:
+	/// 	Releases all InputBinds matching the criteria and invokes a release.
+	///----------------------------------------------------------------------------------------------------
+	void Release(EInputBindType aType, unsigned short aCode);
+
+	///----------------------------------------------------------------------------------------------------
 	/// ReleaseAll:
 	/// 	Clears all currently held key states and InputBinds and invokes a release.
 	///----------------------------------------------------------------------------------------------------
 	void ReleaseAll();
+
+	///----------------------------------------------------------------------------------------------------
+	/// FindInputBind:
+	/// 	Finds a registry entry based on the InputBind values.
+	///----------------------------------------------------------------------------------------------------
+	std::map<std::string, ManagedInputBind>::iterator FindInputBind(const InputBind& aInputBind);
 };
 
 #endif
