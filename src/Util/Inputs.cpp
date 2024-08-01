@@ -58,3 +58,41 @@ LPARAM GetKeyMessageLPARAM(unsigned aVKey, bool aIsDown, bool aIsSystem)
 
 	return KMFToLParam(lp);
 }
+
+WPARAM GetMouseMessageWPARAM(EMouseButtons aMouseButton, bool aIsCtrl, bool aIsShift, bool aIsDown)
+{
+	int lo = 0;
+	int ho = 0;
+
+	switch (aMouseButton)
+	{
+		case EMouseButtons::LMB:
+			lo = aIsDown ? MK_LBUTTON : 0;
+			break;
+		case EMouseButtons::RMB:
+			lo = aIsDown ? MK_RBUTTON : 0;
+			break;
+		case EMouseButtons::MMB:
+			lo = aIsDown ? MK_MBUTTON : 0;
+			break;
+		case EMouseButtons::M4:
+			lo = aIsDown ? MK_XBUTTON1 : 0;
+			ho = XBUTTON1;
+			break;
+		case EMouseButtons::M5:
+			lo = aIsDown ? MK_XBUTTON2 : 0;
+			ho = XBUTTON2;
+			break;
+	}
+
+	return MAKEWPARAM(
+		(
+			(aIsCtrl ? MK_CONTROL : 0) |
+			(aIsShift ? MK_SHIFT : 0) |
+			(lo)
+		),
+		(
+			(ho)
+		)
+	);
+}

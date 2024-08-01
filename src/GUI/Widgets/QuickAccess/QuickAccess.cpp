@@ -8,7 +8,7 @@
 
 #include "Services/Textures/Texture.h"
 #include "Services/Textures/TextureLoader.h"
-#include "Inputs/Keybinds/KeybindHandler.h"
+#include "Inputs/InputBinds/InputBindHandler.h"
 #include "Loader/Loader.h"
 
 #include "resource.h"
@@ -34,8 +34,8 @@ namespace GUI
 		bool			IsFadingIn			= false;
 		bool			IsHovering			= false;
 
-		bool			AlwaysShow			= false;
 		bool			VerticalLayout		= false;
+		EQAVisibility	Visibility			= EQAVisibility::AlwaysShow;
 		EQAPosition		Location			= EQAPosition::Extend;
 		ImVec2			Offset				= ImVec2(0, 0);
 
@@ -58,9 +58,57 @@ namespace GUI
 
 		void Render()
 		{
-			if (!(AlwaysShow || GUI::NexusLink->IsGameplay))
+			switch (Visibility)
 			{
-				return;
+				/* continue rendering */
+				default:
+				case EQAVisibility::AlwaysShow: { break; }
+
+				case EQAVisibility::Gameplay:
+				{
+					/* don't render if not gameplay */
+					if (!GUI::NexusLink->IsGameplay)
+					{
+						return;
+					}
+
+					break;
+				}
+				case EQAVisibility::OutOfCombat:
+				{
+					/* don't render if not gameplay */
+					if (!GUI::NexusLink->IsGameplay)
+					{
+						return;
+					}
+
+					/* don't render if in combat */
+					if (GUI::MumbleLink->Context.IsInCombat)
+					{
+						return;
+					}
+
+					break;
+				}
+				case EQAVisibility::InCombat:
+				{
+					/* don't render if not gameplay */
+					if (!GUI::NexusLink->IsGameplay)
+					{
+						return;
+					}
+
+					/* don't render if out of combat */
+					if (!GUI::MumbleLink->Context.IsInCombat)
+					{
+						return;
+					}
+
+					break;
+				}
+
+				/* don't render*/
+				case EQAVisibility::Hide: { return; }
 			}
 
 			bool isActive = false;
@@ -120,10 +168,10 @@ namespace GUI
 						if (ImGui::ImageButton(!shortcut.IsHovering ? shortcut.TextureNormal->Resource : shortcut.TextureHover->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
 						{
 							isActive = true;
-							if (shortcut.Keybind.length() > 0)
+							if (shortcut.InputBind.length() > 0)
 							{
 								shortcut.HasNotification = false;
-								KeybindApi->Invoke(shortcut.Keybind);
+								InputBindApi->Invoke(shortcut.InputBind);
 							}
 						}
 						iconHovered = ImGui::IsItemHovered();
@@ -183,7 +231,7 @@ namespace GUI
 					shortcut.IsHovering = iconHovered || notifHovered;
 					if (shortcut.TooltipText.length() > 0)
 					{
-						ImGui::TooltipGeneric(shortcut.TooltipText.c_str());
+						ImGui::TooltipGeneric(Language->Translate(shortcut.TooltipText.c_str()));
 					}
 
 					ImGui::PopStyleColor(3);
@@ -226,8 +274,8 @@ namespace GUI
 		{
 			if (aShortcut.ContextItems.size() > 0)
 			{
-				const char* ctxId = ("ShortcutsCtxMenu##" + aIdentifier).c_str();
-				if (ImGui::BeginPopupContextItem(ctxId))
+				std::string ctxId = "ShortcutsCtxMenu##" + aIdentifier;
+				if (ImGui::BeginPopupContextItem(ctxId.c_str()))
 				{
 					*aIsActive = true;
 
@@ -254,7 +302,7 @@ namespace GUI
 
 					ImGui::EndPopup();
 				}
-				ImGui::OpenPopupOnItemClick(ctxId, 1);
+				ImGui::OpenPopupOnItemClick(ctxId.c_str(), 1);
 			}
 		}
 
@@ -280,12 +328,12 @@ namespace GUI
 			}
 		}
 
-		void AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aKeybindIdentifier, const char* aTooltipText)
+		void AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aInputBindIdentifier, const char* aTooltipText)
 		{
 			std::string str = aIdentifier;
 			std::string strTexId = aTextureIdentifier;
 			std::string strTexHoverId = aTextureHoverIdentifier;
-			std::string strKbId = aKeybindIdentifier;
+			std::string strKbId = aInputBindIdentifier;
 			std::string strTT = aTooltipText;
 
 			{
@@ -299,7 +347,7 @@ namespace GUI
 					sh.TextureHoverIdentifier = aTextureHoverIdentifier;
 					sh.TextureNormal = normal;
 					sh.TextureHover = hover;
-					sh.Keybind = aKeybindIdentifier;
+					sh.InputBind = aInputBindIdentifier;
 					sh.TooltipText = aTooltipText;
 					sh.TextureGetAttempts = 0;
 					Registry[str] = sh;
@@ -321,50 +369,44 @@ namespace GUI
 		{
 			std::string str = aIdentifier;
 
-			{
-				const std::lock_guard<std::mutex> lock(QuickAccess::Mutex);
+			const std::lock_guard<std::mutex> lock(QuickAccess::Mutex);
 
-				auto it = Registry.find(str);
-				if (it != Registry.end())
+			auto it = Registry.find(str);
+			if (it != Registry.end())
+			{
+				for (auto& orphan : it->second.ContextItems)
 				{
-					for (auto& orphan : it->second.ContextItems)
-					{
-						OrphanedCallbacks[orphan.first] = orphan.second;
-					}
+					OrphanedCallbacks[orphan.first] = orphan.second;
 				}
-				Registry.erase(str);
 			}
+			Registry.erase(str);
 
 		}
 		void NotifyShortcut(const char* aIdentifier)
 		{
 			std::string str = aIdentifier;
 
-			QuickAccess::Mutex.lock();
-			{
-				auto it = Registry.find(str);
+			const std::lock_guard<std::mutex> lock(QuickAccess::Mutex);
+			
+			auto it = Registry.find(str);
 
-				if (it != Registry.end())
-				{
-					it->second.HasNotification = true;
-				}
+			if (it != Registry.end())
+			{
+				it->second.HasNotification = true;
 			}
-			QuickAccess::Mutex.unlock();
 		}
 		void SetNotificationShortcut(const char* aIdentifier, bool aState)
 		{
 			std::string str = aIdentifier;
 
-			QuickAccess::Mutex.lock();
-			{
-				auto it = Registry.find(str);
+			const std::lock_guard<std::mutex> lock(QuickAccess::Mutex);
+			
+			auto it = Registry.find(str);
 
-				if (it != Registry.end())
-				{
-					it->second.HasNotification = aState;
-				}
+			if (it != Registry.end())
+			{
+				it->second.HasNotification = aState;
 			}
-			QuickAccess::Mutex.unlock();
 		}
 
 		void AddSimpleShortcut(const char* aIdentifier, GUI_RENDER aShortcutRenderCallback)
@@ -402,6 +444,43 @@ namespace GUI
 			for (auto& [identifier, shortcut] : Registry)
 			{
 				shortcut.ContextItems.erase(aIdentifier);
+			}
+
+			OrphanedCallbacks.erase(aIdentifier);
+		}
+
+		std::string EQAVisibilityToString(EQAVisibility aQAVisibility)
+		{
+			switch (aQAVisibility)
+			{
+				case EQAVisibility::AlwaysShow:
+					return "((000047))";
+				case EQAVisibility::Gameplay:
+					return "((000093))";
+				case EQAVisibility::OutOfCombat:
+					return "((000094))";
+				case EQAVisibility::InCombat:
+					return "((000095))";
+				case EQAVisibility::Hide:
+					return "((000096))";
+				default:
+					return "(null)";
+			}
+		}
+		std::string EQAPositionToString(EQAPosition aQAPosition)
+		{
+			switch (aQAPosition)
+			{
+				case EQAPosition::Extend:
+					return "((000067))";
+				case EQAPosition::Under:
+					return "((000068))";
+				case EQAPosition::Bottom:
+					return "((000069))";
+				case EQAPosition::Custom:
+					return "((000070))";
+				default:
+					return "(null)";
 			}
 		}
 

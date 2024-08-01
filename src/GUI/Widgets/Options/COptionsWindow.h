@@ -1,5 +1,5 @@
-#ifndef GUI_KEYBINDSWINDOW_H
-#define GUI_KEYBINDSWINDOW_H
+#ifndef GUI_OPTIONSWINDOW_H
+#define GUI_OPTIONSWINDOW_H
 
 #include <string>
 

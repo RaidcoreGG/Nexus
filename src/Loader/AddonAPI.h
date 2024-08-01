@@ -10,7 +10,7 @@
 #include "GUI/Widgets/Alerts/FuncDefs.h"
 #include "GUI/Widgets/QuickAccess/FuncDefs.h"
 #include "Inputs/GameBinds/FuncDefs.h"
-#include "Inputs/Keybinds/FuncDefs.h"
+#include "Inputs/InputBinds/FuncDefs.h"
 #include "Inputs/RawInput/FuncDefs.h"
 #include "minhook/mh_hook.h"
 #include "Paths/FuncDefs.h"
@@ -56,10 +56,10 @@ struct AddonAPI1 : AddonAPI
 	WNDPROC_ADDREM				RegisterWndProc;
 	WNDPROC_ADDREM				DeregisterWndProc;
 
-	/* Keybinds */
-	KEYBINDS_REGISTERWITHSTRING	RegisterKeybindWithString;
-	KEYBINDS_REGISTERWITHSTRUCT	RegisterKeybindWithStruct;
-	KEYBINDS_DEREGISTER			DeregisterKeybind;
+	/* InputBinds */
+	INPUTBINDS_REGISTERWITHSTRING	RegisterInputBindWithString;
+	INPUTBINDS_REGISTERWITHSTRUCT	RegisterInputBindWithStruct;
+	INPUTBINDS_DEREGISTER			DeregisterInputBind;
 
 	/* DataLink */
 	DATALINK_GETRESOURCE		GetResource;
@@ -113,10 +113,10 @@ struct AddonAPI2 : AddonAPI
 	WNDPROC_ADDREM						DeregisterWndProc;
 	WNDPROC_SENDTOGAME					SendWndProcToGameOnly;
 
-	/* Keybinds */
-	KEYBINDS_REGISTERWITHSTRING			RegisterKeybindWithString;
-	KEYBINDS_REGISTERWITHSTRUCT			RegisterKeybindWithStruct;
-	KEYBINDS_DEREGISTER					DeregisterKeybind;
+	/* InputBinds */
+	INPUTBINDS_REGISTERWITHSTRING			RegisterInputBindWithString;
+	INPUTBINDS_REGISTERWITHSTRUCT			RegisterInputBindWithStruct;
+	INPUTBINDS_DEREGISTER					DeregisterInputBind;
 
 	/* DataLink */
 	DATALINK_GETRESOURCE				GetResource;
@@ -184,10 +184,10 @@ struct AddonAPI3 : AddonAPI
 	WNDPROC_ADDREM						DeregisterWndProc;
 	WNDPROC_SENDTOGAME					SendWndProcToGameOnly;
 
-	/* Keybinds */
-	KEYBINDS_REGISTERWITHSTRING			RegisterKeybindWithString;
-	KEYBINDS_REGISTERWITHSTRUCT			RegisterKeybindWithStruct;
-	KEYBINDS_DEREGISTER					DeregisterKeybind;
+	/* InputBinds */
+	INPUTBINDS_REGISTERWITHSTRING			RegisterInputBindWithString;
+	INPUTBINDS_REGISTERWITHSTRUCT			RegisterInputBindWithStruct;
+	INPUTBINDS_DEREGISTER					DeregisterInputBind;
 
 	/* DataLink */
 	DATALINK_GETRESOURCE				GetResource;
@@ -259,10 +259,10 @@ struct AddonAPI4 : AddonAPI
 	WNDPROC_ADDREM						DeregisterWndProc;
 	WNDPROC_SENDTOGAME					SendWndProcToGameOnly;
 
-	/* Keybinds */
-	KEYBINDS_REGISTERWITHSTRING2		RegisterKeybindWithString;
-	KEYBINDS_REGISTERWITHSTRUCT2		RegisterKeybindWithStruct;
-	KEYBINDS_DEREGISTER					DeregisterKeybind;
+	/* InputBinds */
+	INPUTBINDS_REGISTERWITHSTRING2		RegisterInputBindWithString;
+	INPUTBINDS_REGISTERWITHSTRUCT2		RegisterInputBindWithStruct;
+	INPUTBINDS_DEREGISTER					DeregisterInputBind;
 
 	/* DataLink */
 	DATALINK_GETRESOURCE				GetResource;
@@ -341,11 +341,11 @@ struct AddonAPI5 : AddonAPI
 	WNDPROC_ADDREM						DeregisterWndProc;
 	WNDPROC_SENDTOGAME					SendWndProcToGameOnly;
 
-	/* Keybinds */
-	KEYBINDS_INVOKE						InvokeKeybind;
-	KEYBINDS_REGISTERWITHSTRING2		RegisterKeybindWithString;
-	KEYBINDS_REGISTERWITHSTRUCT2		RegisterKeybindWithStruct;
-	KEYBINDS_DEREGISTER					DeregisterKeybind;
+	/* InputBinds */
+	INPUTBINDS_INVOKE						InvokeInputBind;
+	INPUTBINDS_REGISTERWITHSTRING2		RegisterInputBindWithString;
+	INPUTBINDS_REGISTERWITHSTRUCT2		RegisterInputBindWithStruct;
+	INPUTBINDS_DEREGISTER					DeregisterInputBind;
 
 	/* DataLink */
 	DATALINK_GETRESOURCE				GetResource;
@@ -455,10 +455,10 @@ struct AddonAPI6 : AddonAPI
 	/* InputBinds */
 	struct InputBindsVT
 	{
-		KEYBINDS_INVOKE						Invoke;
-		KEYBINDS_REGISTERWITHSTRING2		RegisterWithString;
-		KEYBINDS_REGISTERWITHSTRUCT2		RegisterWithStruct;
-		KEYBINDS_DEREGISTER					Deregister;
+		INPUTBINDS_INVOKE						Invoke;
+		INPUTBINDS_REGISTERWITHSTRING2		RegisterWithString;
+		INPUTBINDS_REGISTERWITHSTRUCT2		RegisterWithStruct;
+		INPUTBINDS_DEREGISTER					Deregister;
 	};
 	InputBindsVT							InputBinds;
 

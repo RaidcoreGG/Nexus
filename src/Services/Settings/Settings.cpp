@@ -25,6 +25,7 @@ const char* OPT_CLOSEESCAPE					= "CloseOnEscape";
 const char* OPT_LASTUISCALE					= "LastUIScale";
 const char* OPT_FONTSIZE					= "FontSize";
 const char* OPT_QAVERTICAL					= "QAVertical";
+const char* OPT_QAVISIBILITY				= "QAVisibility";
 const char* OPT_QALOCATION					= "QALocation";
 const char* OPT_QAOFFSETX					= "QAOffsetX";
 const char* OPT_QAOFFSETY					= "QAOffsetY";

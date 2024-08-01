@@ -25,7 +25,7 @@
 #include "Widgets/About/CAboutBox.h"
 #include "Widgets/EULA/CEULAModal.h"
 
-#include "Inputs/Keybinds/Keybind.h"
+#include "Inputs/InputBinds/InputBind.h"
 
 namespace GUI
 {
@@ -75,6 +75,8 @@ namespace GUI
 	void Rescale();
 
 	void FontReceiver(const char* aIdentifier, ImFont* aFont);
+
+	void LoadFonts();
 
 	/* Registers the provided RenderCallback. */
 	void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback);

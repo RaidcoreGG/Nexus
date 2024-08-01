@@ -14,7 +14,7 @@
 
 #include "Services/DataLink/DataLink.h"
 #include "GUI/GUI.h"
-#include "Inputs/Keybinds/KeybindHandler.h"
+#include "Inputs/InputBinds/InputBindHandler.h"
 #include "Inputs/GameBinds/GameBindsHandler.h"
 #include "Loader/Loader.h"
 #include "Services/Logging/LogHandler.h"
@@ -37,16 +37,20 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	switch (ul_reason_for_call)
 	{
 		case DLL_PROCESS_ATTACH:
+		{
 			DisableThreadLibraryCalls(hModule);
 			NexusHandle = hModule;
 			break;
+		}
 		case DLL_PROCESS_DETACH:
+		{
 			/* cleanly remove wndproc hook */
 			if (Renderer::WindowHandle && Hooks::GW2::WndProc)
 			{
 				SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)Hooks::GW2::WndProc);
 			}
 			break;
+		}
 	}
 	return true;
 }
@@ -126,7 +130,7 @@ namespace Main
 
 			MH_Initialize();
 
-			KeybindApi = new CKeybindApi();
+			InputBindApi = new CInputBindApi(Logger);
 			GameBindsApi = new CGameBindsApi(RawInputApi, Logger, EventApi);
 
 			Settings::Load();
@@ -191,7 +195,8 @@ namespace Main
 			State::Nexus = ENexusState::SHUTDOWN;
 		}
 
-		if (D3D11Handle) { FreeLibrary(D3D11Handle); }
-		if (D3D11SystemHandle) { FreeLibrary(D3D11SystemHandle); }
+		/* do not free lib, let the OS handle it. else gw2 crashes on shutdown */
+		//if (D3D11Handle) { FreeLibrary(D3D11Handle); }
+		//if (D3D11SystemHandle) { FreeLibrary(D3D11SystemHandle); }
 	}
 }

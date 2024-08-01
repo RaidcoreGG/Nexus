@@ -47,8 +47,8 @@
     <ClCompile Include="src\thirdparty\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\Inputs\Keybinds\Keybind.cpp" />
-    <ClCompile Include="src\Inputs\Keybinds\KeybindHandler.cpp" />
+    <ClCompile Include="src\Inputs\InputBinds\InputBind.cpp" />
+    <ClCompile Include="src\Inputs\InputBinds\InputBindHandler.cpp" />
     <ClCompile Include="src\Loader\AddonDefinition.cpp" />
     <ClCompile Include="src\Loader\EAddonFlags.cpp" />
     <ClCompile Include="src\Loader\Loader.cpp" />
@@ -84,9 +84,12 @@
     <ClCompile Include="src\Inputs\RawInput\RawInputApi.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\GUI\Widgets\QuickAccess\EQAVisibility.h" />
     <ClInclude Include="src\Inputs\GameBinds\EGameBinds.h" />
     <ClInclude Include="src\Inputs\GameBinds\FuncDefs.h" />
     <ClInclude Include="src\Inputs\GameBinds\GameBindsHandler.h" />
+    <ClInclude Include="src\Inputs\InputBinds\EInputBindHandlerType.h" />
+    <ClInclude Include="src\Inputs\InputBinds\EInputBindType.h" />
     <ClInclude Include="src\Loader\AddonVersion.h" />
     <ClInclude Include="src\Services\API\ApiClient.h" />
     <ClInclude Include="src\Services\API\APIController.h" />
@@ -138,10 +141,10 @@
     <ClInclude Include="src\thirdparty\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\thirdparty\imgui\imstb_textedit.h" />
     <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h" />
-    <ClInclude Include="src\Inputs\Keybinds\ActiveKeybind.h" />
-    <ClInclude Include="src\Inputs\Keybinds\FuncDefs.h" />
-    <ClInclude Include="src\Inputs\Keybinds\Keybind.h" />
-    <ClInclude Include="src\Inputs\Keybinds\KeybindHandler.h" />
+    <ClInclude Include="src\Inputs\InputBinds\ManagedInputBind.h" />
+    <ClInclude Include="src\Inputs\InputBinds\FuncDefs.h" />
+    <ClInclude Include="src\Inputs\InputBinds\InputBind.h" />
+    <ClInclude Include="src\Inputs\InputBinds\InputBindHandler.h" />
     <ClInclude Include="src\Loader\Addon.h" />
     <ClInclude Include="src\Loader\ArcDPS.h" />
     <ClInclude Include="src\Loader\EAddonFlags.h" />

@@ -2,7 +2,7 @@
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
 /// Name         :  GameBindsHandler.cpp
-/// Description  :  Provides functions for game keybinds.
+/// Description  :  Provides functions for game InputBinds.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
@@ -599,60 +599,86 @@ unsigned short CGameBindsApi::GameBindCodeToScanCode(unsigned short aGameScanCod
 	return LookupTable[aGameScanCode];
 }
 
-static CGameBindsApi* UEKeybindUpdatesTarget = nullptr;
+static CGameBindsApi* UEInputBindUpdatesTarget = nullptr;
 
-void CGameBindsApi::EnableUEKeybindUpdates(CGameBindsApi* aGameBindsApi)
+void CGameBindsApi::EnableUEInputBindUpdates(CGameBindsApi* aGameBindsApi)
 {
-	UEKeybindUpdatesTarget = aGameBindsApi;
+	UEInputBindUpdatesTarget = aGameBindsApi;
 }
 
-void CGameBindsApi::DisableUEKeybindUpdates()
+void CGameBindsApi::DisableUEInputBindUpdates()
 {
-	UEKeybindUpdatesTarget = nullptr;
+	UEInputBindUpdatesTarget = nullptr;
 }
 
-void CGameBindsApi::OnUEKeybindChanged(void* aData)
+void CGameBindsApi::OnUEInputBindChanged(void* aData)
 {
-	if (!UEKeybindUpdatesTarget) { return; }
+	if (!UEInputBindUpdatesTarget) { return; }
 
 	struct UEKey
 	{
-		unsigned DeviceType; // 0 = Unset, 1 = Keyboard, 2 = Mouse
+		unsigned DeviceType; // 0 = Unset, 1 = Mouse, 2 = Keyboard
 		signed Code; // Custom ArenaNet Scancode
 		signed Modifiers; // Bit 1 = Shfit, Bit 2 = Ctrl, Bit 3 = Alt
 	};
 
-	struct UEKeybindChanged
+	struct UEInputBindChanged
 	{
 		EGameBinds Identifier;
 		unsigned Index; // 0 = Primary, 1 = Secondary
 		UEKey Bind;
 	};
 
-	UEKeybindChanged* kbChange = (UEKeybindChanged*)aData;
+	UEInputBindChanged* kbChange = (UEInputBindChanged*)aData;
 
 	/* abort if it's the secondary bind, but the key is already set*/
-	if (kbChange->Index == 1 && UEKeybindUpdatesTarget->IsBound(kbChange->Identifier))
+	if (kbChange->Index == 1 && UEInputBindUpdatesTarget->IsBound(kbChange->Identifier))
 	{
 		return;
 	}
 
-	/* only process keyboard binds (for now) */
-	if (kbChange->Bind.DeviceType == 1) { return; }
+	InputBind ib{};
 
-	Keybind kb{};
-
-	/* if key was unbound */
-	if (kbChange->Bind.DeviceType != 0)
+	/* if key was bound (keyboard) */
+	if (kbChange->Bind.DeviceType == 2)
 	{
-		kb.Alt = kbChange->Bind.Modifiers & 0b0100;
-		kb.Ctrl = kbChange->Bind.Modifiers & 0b0010;
-		kb.Shift = kbChange->Bind.Modifiers & 0b0001;
+		ib.Alt = kbChange->Bind.Modifiers & 0b0100;
+		ib.Ctrl = kbChange->Bind.Modifiers & 0b0010;
+		ib.Shift = kbChange->Bind.Modifiers & 0b0001;
 
-		kb.Key = CGameBindsApi::GameBindCodeToScanCode(kbChange->Bind.Code);
+		ib.Type = EInputBindType::Keyboard;
+		ib.Code = CGameBindsApi::GameBindCodeToScanCode(kbChange->Bind.Code);
+	}
+	else if (kbChange->Bind.DeviceType == 1) /* (mouse) */
+	{
+		ib.Alt = kbChange->Bind.Modifiers & 0b0100;
+		ib.Ctrl = kbChange->Bind.Modifiers & 0b0010;
+		ib.Shift = kbChange->Bind.Modifiers & 0b0001;
+
+		ib.Type = EInputBindType::Mouse;
+		if (kbChange->Bind.Code == 0)
+		{
+			ib.Code = (unsigned short)EMouseButtons::LMB;
+		}
+		else if (kbChange->Bind.Code == 2)
+		{
+			ib.Code = (unsigned short)EMouseButtons::RMB;
+		}
+		else if (kbChange->Bind.Code == 1)
+		{
+			ib.Code = (unsigned short)EMouseButtons::MMB;
+		}
+		else if (kbChange->Bind.Code == 3)
+		{
+			ib.Code = (unsigned short)EMouseButtons::M4;
+		}
+		else if (kbChange->Bind.Code == 4)
+		{
+			ib.Code = (unsigned short)EMouseButtons::M5;
+		}
 	}
 
-	UEKeybindUpdatesTarget->Set(kbChange->Identifier, kb, true);
+	UEInputBindUpdatesTarget->Set(kbChange->Identifier, ib, true);
 }
 
 CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, CEventApi* aEventApi)
@@ -664,8 +690,8 @@ CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, C
 	this->Load();
 	this->AddDefaultBinds();
 
-	CGameBindsApi::EnableUEKeybindUpdates(this);
-	this->EventApi->Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEKeybindChanged);
+	CGameBindsApi::EnableUEInputBindUpdates(this);
+	this->EventApi->Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged, true);
 
 	//ASSERT(this->RawInputApi);
 	//ASSERT(this->Logger);
@@ -673,8 +699,8 @@ CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, C
 
 CGameBindsApi::~CGameBindsApi()
 {
-	CGameBindsApi::DisableUEKeybindUpdates();
-	this->EventApi->Unsubscribe(EV_UE_KB_CH, CGameBindsApi::OnUEKeybindChanged);
+	CGameBindsApi::DisableUEInputBindUpdates();
+	this->EventApi->Unsubscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
 
 	this->RawInputApi = nullptr;
 	this->Logger = nullptr;
@@ -706,67 +732,163 @@ void CGameBindsApi::InvokeAsync(EGameBinds aGameBind, int aDuration)
 
 void CGameBindsApi::Press(EGameBinds aGameBind)
 {
-	Keybind kb = this->Get(aGameBind);
+	InputBind ib = this->Get(aGameBind);
 
-	if (!kb.IsBound())
+	if (!ib.IsBound())
 	{
 		return;
 	}
 
-	KeyLParam key{};
-	key.RepeatCount = 1;
-	key.ScanCode = kb.Key;
-	key.ExtendedFlag = (kb.Key & 0xE000) != 0;
-	key.Reserved = 0;
-	key.ContextCode = kb.Alt;
-	key.PreviousKeyState = 0;
-	key.TransitionState = 0;
-
-	if (kb.Alt)
+	if (ib.Alt)
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYDOWN, VK_MENU, GetKeyMessageLPARAM(VK_MENU, true, true));
 	}
-	if (kb.Ctrl)
+	if (ib.Ctrl)
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_CONTROL, GetKeyMessageLPARAM(VK_CONTROL, true, false));
 	}
-	if (kb.Shift)
+	if (ib.Shift)
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, true, false));
 	}
 
-	this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, MapVirtualKeyA(kb.Key, MAPVK_VSC_TO_VK), KMFToLParam(key));
+	if (ib.Type == EInputBindType::Keyboard)
+	{
+		KeyLParam key{};
+		key.RepeatCount = 1;
+		key.ScanCode = ib.Code;
+		key.ExtendedFlag = (ib.Code & 0xE000) != 0;
+		key.Reserved = 0;
+		key.ContextCode = ib.Alt;
+		key.PreviousKeyState = 0;
+		key.TransitionState = 0;
+
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK), KMFToLParam(key));
+	}
+	else if (ib.Type == EInputBindType::Mouse)
+	{
+		/* get point for lparam */
+		POINT point{};
+		GetCursorPos(&point);
+
+		switch ((EMouseButtons)ib.Code)
+		{
+			case EMouseButtons::LMB:
+			{
+				this->RawInputApi->SendWndProcToGame(0, WM_LBUTTONDOWN,
+													 GetMouseMessageWPARAM(EMouseButtons::LMB, ib.Ctrl, ib.Shift, true),
+													 MAKELPARAM(point.x, point.y));
+				break;
+			}
+			case EMouseButtons::RMB:
+			{
+				this->RawInputApi->SendWndProcToGame(0, WM_RBUTTONDOWN,
+													 GetMouseMessageWPARAM(EMouseButtons::RMB, ib.Ctrl, ib.Shift, true),
+													 MAKELPARAM(point.x, point.y));
+				break;
+			}
+			case EMouseButtons::MMB:
+			{
+				this->RawInputApi->SendWndProcToGame(0, WM_MBUTTONDOWN,
+													 GetMouseMessageWPARAM(EMouseButtons::MMB, ib.Ctrl, ib.Shift, true),
+													 MAKELPARAM(point.x, point.y));
+				break;
+			}
+			case EMouseButtons::M4:
+			{
+				this->RawInputApi->SendWndProcToGame(0, WM_XBUTTONDOWN,
+													 GetMouseMessageWPARAM(EMouseButtons::M4, ib.Ctrl, ib.Shift, true),
+													 MAKELPARAM(point.x, point.y));
+				break;
+			}
+			case EMouseButtons::M5:
+			{
+				this->RawInputApi->SendWndProcToGame(0, WM_XBUTTONDOWN,
+													 GetMouseMessageWPARAM(EMouseButtons::M5, ib.Ctrl, ib.Shift, true),
+													 MAKELPARAM(point.x, point.y));
+				break;
+			}
+		}
+	}
 }
 
 void CGameBindsApi::Release(EGameBinds aGameBind)
 {
-	Keybind kb = this->Get(aGameBind);
+	InputBind ib = this->Get(aGameBind);
 
-	if (!kb.IsBound())
+	if (!ib.IsBound())
 	{
 		return;
 	}
 
-	KeyLParam key{};
-	key.RepeatCount = 1;
-	key.ScanCode = kb.Key;
-	key.ExtendedFlag = (kb.Key & 0xE000) != 0;
-	key.Reserved = 0;
-	key.ContextCode = kb.Alt;
-	key.PreviousKeyState = 1;
-	key.TransitionState = 1;
+	if (ib.Type == EInputBindType::Keyboard)
+	{
+		KeyLParam key{};
+		key.RepeatCount = 1;
+		key.ScanCode = ib.Code;
+		key.ExtendedFlag = (ib.Code & 0xE000) != 0;
+		key.Reserved = 0;
+		key.ContextCode = ib.Alt;
+		key.PreviousKeyState = 1;
+		key.TransitionState = 1;
 
-	this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, MapVirtualKeyA(kb.Key, MAPVK_VSC_TO_VK), KMFToLParam(key));
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK), KMFToLParam(key));
+	}
+	else if (ib.Type == EInputBindType::Mouse)
+	{
+		/* get point for lparam */
+		POINT point{};
+		GetCursorPos(&point);
 
-	if (kb.Alt)
+		switch ((EMouseButtons)ib.Code)
+		{
+			case EMouseButtons::LMB:
+			{
+				this->RawInputApi->SendWndProcToGame(0, WM_LBUTTONUP,
+													 GetMouseMessageWPARAM(EMouseButtons::LMB, ib.Ctrl, ib.Shift, false),
+													 MAKELPARAM(point.x, point.y));
+				break;
+			}
+			case EMouseButtons::RMB:
+			{
+				this->RawInputApi->SendWndProcToGame(0, WM_RBUTTONUP,
+													 GetMouseMessageWPARAM(EMouseButtons::RMB, ib.Ctrl, ib.Shift, false),
+													 MAKELPARAM(point.x, point.y));
+				break;
+			}
+			case EMouseButtons::MMB:
+			{
+				this->RawInputApi->SendWndProcToGame(0, WM_MBUTTONUP,
+													 GetMouseMessageWPARAM(EMouseButtons::MMB, ib.Ctrl, ib.Shift, false),
+													 MAKELPARAM(point.x, point.y));
+				break;
+			}
+			case EMouseButtons::M4:
+			{
+				this->RawInputApi->SendWndProcToGame(0, WM_XBUTTONUP,
+													 GetMouseMessageWPARAM(EMouseButtons::M4, ib.Ctrl, ib.Shift, false),
+													 MAKELPARAM(point.x, point.y));
+				break;
+			}
+			case EMouseButtons::M5:
+			{
+				this->RawInputApi->SendWndProcToGame(0, WM_XBUTTONUP,
+													 GetMouseMessageWPARAM(EMouseButtons::M5, ib.Ctrl, ib.Shift, false),
+													 MAKELPARAM(point.x, point.y));
+				break;
+			}
+		}
+	}
+
+	if (ib.Alt)
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYUP, VK_MENU, GetKeyMessageLPARAM(VK_MENU, false, true));
 	}
-	if (kb.Ctrl)
+	if (ib.Ctrl)
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, VK_CONTROL, GetKeyMessageLPARAM(VK_CONTROL, false, false));
 	}
-	if (kb.Shift)
+	if (ib.Shift)
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, false, false));
 	}
@@ -784,19 +906,19 @@ void CGameBindsApi::Import(std::filesystem::path aPath)
 	return;
 }
 
-Keybind CGameBindsApi::Get(EGameBinds aGameBind)
+InputBind CGameBindsApi::Get(EGameBinds aGameBind)
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	return this->Registry[aGameBind];
 }
 
-void CGameBindsApi::Set(EGameBinds aGameBind, Keybind aKeybind, bool aIsRuntimeBind)
+void CGameBindsApi::Set(EGameBinds aGameBind, InputBind aInputBind, bool aIsRuntimeBind)
 {
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
-		this->Registry[aGameBind] = aKeybind;
+		this->Registry[aGameBind] = aInputBind;
 
 		if (aIsRuntimeBind)
 		{
@@ -807,7 +929,7 @@ void CGameBindsApi::Set(EGameBinds aGameBind, Keybind aKeybind, bool aIsRuntimeB
 	this->Save();
 }
 
-std::map<EGameBinds, Keybind> CGameBindsApi::GetRegistry() const
+std::map<EGameBinds, InputBind> CGameBindsApi::GetRegistry() const
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -824,7 +946,7 @@ void CGameBindsApi::AddDefaultBinds()
 
 		if (this->Registry.find(bind) == this->Registry.end())
 		{
-			this->Registry[bind] = Keybind{};
+			this->Registry[bind] = InputBind{};
 		}
 	}
 }
@@ -839,36 +961,41 @@ void CGameBindsApi::Load()
 	{
 		std::ifstream file(Index::F_GAMEBINDS);
 
-		json keybinds = json::parse(file);
-		for (json binding : keybinds)
+		json InputBinds = json::parse(file);
+		for (json binding : InputBinds)
 		{
-			if (binding.is_null() ||
-				binding["Key"].is_null() ||
-				binding["Alt"].is_null() ||
-				binding["Ctrl"].is_null() ||
-				binding["Shift"].is_null() ||
-				binding["Identifier"].is_null())
+			if (binding.is_null() || (binding["Key"].is_null() && binding["Code"].is_null()))
 			{
-				Logger->Debug(CH_GAMEBINDS, "One or more fields of keybind were null.");
 				continue;
 			}
 
-			Keybind kb{};
-			binding["Key"].get_to(kb.Key);
-			binding["Alt"].get_to(kb.Alt);
-			binding["Ctrl"].get_to(kb.Ctrl);
-			binding["Shift"].get_to(kb.Shift);
+			InputBind ib{};
+			binding["Alt"].get_to(ib.Alt);
+			binding["Ctrl"].get_to(ib.Ctrl);
+			binding["Shift"].get_to(ib.Shift);
+
+			/* neither code nor type null -> inputbind */
+			if (!binding["Type"].is_null() && !binding["Code"].is_null())
+			{
+				binding["Type"].get_to(ib.Type);
+				binding["Code"].get_to(ib.Code);
+			}
+			else /* legacy inputbind */
+			{
+				ib.Type = EInputBindType::Keyboard;
+				binding["Key"].get_to(ib.Code);
+			}
 
 			EGameBinds identifier = binding["Identifier"].get<EGameBinds>();
 
-			this->Registry[identifier] = kb;
+			this->Registry[identifier] = ib;
 		}
 
 		file.close();
 	}
 	catch (json::parse_error& ex)
 	{
-		Logger->Warning(CH_GAMEBINDS, "Keybinds.json could not be parsed. Error: %s", ex.what());
+		Logger->Warning(CH_GAMEBINDS, "InputBinds.json could not be parsed. Error: %s", ex.what());
 	}
 }
 
@@ -878,30 +1005,36 @@ void CGameBindsApi::Save()
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
-	json keybinds = json::array();
+	json InputBinds = json::array();
 
 	for (auto& it : this->Registry)
 	{
-		Keybind kb = it.second;
 		EGameBinds id = it.first;
+		InputBind ib = it.second;
 
-		if (!kb.IsBound()) { continue; }
+		if (!ib.IsBound()) { continue; }
 
 		json binding =
 		{
 			{"Identifier",	id},
-			{"Key",			kb.Key},
-			{"Alt",			kb.Alt},
-			{"Ctrl",		kb.Ctrl},
-			{"Shift",		kb.Shift}
+			{"Alt",			ib.Alt},
+			{"Ctrl",		ib.Ctrl},
+			{"Shift",		ib.Shift},
+			{"Type",		ib.Type},
+			{"Code",		ib.Code}
 		};
 
-		keybinds.push_back(binding);
+		/* override type */
+		if (!ib.Code)
+		{
+			ib.Type = EInputBindType::None;
+		}
+		InputBinds.push_back(binding);
 	}
 
 	std::ofstream file(Index::F_GAMEBINDS);
 
-	file << keybinds.dump(1, '\t') << std::endl;
+	file << InputBinds.dump(1, '\t') << std::endl;
 
 	file.close();
 }

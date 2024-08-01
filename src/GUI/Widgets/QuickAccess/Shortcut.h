@@ -23,7 +23,7 @@ namespace GUI
 
 		Texture*									TextureNormal;
 		Texture*									TextureHover;
-		std::string									Keybind;
+		std::string									InputBind;
 		std::string									TooltipText;
 		bool										IsHovering;
 		bool										HasNotification;

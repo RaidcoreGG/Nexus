@@ -6,7 +6,7 @@ const char* CH_QUICKACCESS				= "QuickAccess";
 const char* CH_LOADER					= "Loader";
 const char* CH_GUI						= "GUI";
 
-/* Keybinds */
+/* InputBinds */
 const char* KB_MENU						= "KB_MENU";
 const char* KB_ADDONS					= "KB_ADDONS";
 const char* KB_OPTIONS					= "KB_OPTIONS";

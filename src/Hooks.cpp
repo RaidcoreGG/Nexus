@@ -10,7 +10,7 @@
 #include "Events/EventHandler.h"
 #include "GUI/GUI.h"
 #include "GUI/Widgets/QuickAccess/QuickAccess.h"
-#include "Inputs/Keybinds/KeybindHandler.h"
+#include "Inputs/InputBinds/InputBindHandler.h"
 #include "Loader/Loader.h"
 #include "Loader/NexusLinkData.h"
 #include "Services/Textures/TextureLoader.h"
@@ -38,14 +38,14 @@ namespace Hooks
 			// don't pass to game if loader
 			if (Loader::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
-			// don't pass to game if wndprocCb or keybind
+			// don't pass to game if wndprocCb or InputBind
 			//if (InputCtx->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return; }
 
 			// don't pass to game if custom wndproc
 			if (RawInputApi->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
-			// don't pass to game if keybind
-			if (KeybindApi->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
+			// don't pass to game if InputBind
+			if (InputBindApi->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
 			// don't pass to game if gui
 			if (GUI::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }

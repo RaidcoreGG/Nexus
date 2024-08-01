@@ -12,7 +12,7 @@
 #include "Shared.h"
 #include "State.h"
 
-#include "Inputs/Keybinds/KeybindHandler.h"
+#include "Inputs/InputBinds/InputBindHandler.h"
 #include "Loader/Loader.h"
 #include "Services/API/APIController.h"
 #include "Services/Localization/Localization.h"
@@ -37,50 +37,43 @@ namespace GUI
 
 	float kbButtonWidth = 0.0f;
 
-	struct KeybindPacked
+	struct InputBindPacked
 	{
 		std::string KeysText;
-		ActiveKeybind Bind;
+		ManagedInputBind Bind;
 	};
 
 	struct KBCat
 	{
 		std::string								Name;
-		std::map<std::string, KeybindPacked>	Keybinds;
+		std::map<std::string, InputBindPacked>	InputBinds;
 	};
 
-	bool ShouldOpenKeybindModal = false;
+	bool ShouldOpenInputBindModal = false;
 	bool IsEditingGameBind = false;
-	std::string KeybindModalTitle;
+	std::string InputBindModalTitle;
 
-	bool IsKeybindsPanelOpen = false; // used to refetch binds
-	std::vector<KBCat> KeybindCategoryMap;
+	bool IsInputBindsPanelOpen = false; // used to refetch binds
+	std::vector<KBCat> InputBindCategoryMap;
 	std::string CurrentlyEditing; // the identifier
 	std::string CurrentlyEditingBind; // the current bind
 
-	struct GameKeybindPacked
+	struct GameInputBindPacked
 	{
 		std::string Name;
 		std::string KeysText;
-		Keybind Bind;
+		InputBind Bind;
 	};
 
 	struct GKBCat
 	{
 		std::string Name;
-		std::map<EGameBinds, GameKeybindPacked> GameKeybinds;
+		std::map<EGameBinds, GameInputBindPacked> GameInputBinds;
 	};
 
-	bool IsGameKeybindsPanelOpen = false; // used to refetch binds
+	bool IsGameInputBindsPanelOpen = false; // used to refetch binds
 	EGameBinds CurrentlyEditingGame; // the identifier
-	std::vector<GKBCat> GameKeybindCategoryMap;
-
-	const char* qaLocations[] = { "((000067))", "((000068))", "((000069))", "((000070))" };
-	const char** languages;
-	int languagesIndex;
-	int languagesSize;
-
-	bool isSetup = false;
+	std::vector<GKBCat> GameInputBindCategoryMap;
 
 	char CurrentAPIKey[73]{};
 
@@ -88,19 +81,11 @@ namespace GUI
 	void GeneralTab();
 	bool AddonsTab();
 	void StyleTab();
-	bool KeybindsTab();
-	void GameKeybindsTab();
+	bool InputBindsTab();
+	void GameInputBindsTab();
 	void APITab();
 	void ChangelogTab();
 
-	static bool LocalizedItemsGetter(void* data, int idx, const char** out_text)
-	{
-		const char* const* items = (const char* const*)data;
-		if (out_text)
-			*out_text = items[idx];
-		return true;
-	}
-	
 	COptionsWindow::COptionsWindow(std::string aName)
 	{
 		Name = aName;
@@ -111,15 +96,15 @@ namespace GUI
 		if (aIdentifier.empty()) { return; }
 
 		std::thread([aIdentifier]() {
-			KeybindApi->Delete(aIdentifier);
-			IsKeybindsPanelOpen = false; // we set this so the display gets refreshed
+			InputBindApi->Delete(aIdentifier);
+			IsInputBindsPanelOpen = false; // we set this so the display gets refreshed
 		}).detach();
 	}
-	void DrawInputBindsTable(const std::map<std::string, KeybindPacked>& aKeybinds)
+	void DrawInputBindsTable(const std::map<std::string, InputBindPacked>& aInputBinds)
 	{
 		if (ImGui::BeginTable("table_inputbinds", 3, ImGuiTableFlags_BordersInnerH))
 		{
-			for (auto& [identifier, keybind] : aKeybinds)
+			for (auto& [identifier, inputBind] : aInputBinds)
 			{
 				ImGui::TableNextRow();
 				ImGui::TableSetColumnIndex(0);
@@ -127,22 +112,22 @@ namespace GUI
 
 				ImGui::TableSetColumnIndex(1);
 				ImGui::PushID(identifier.c_str());
-				if (ImGui::Button(keybind.KeysText.c_str(), ImVec2(kbButtonWidth, 0.0f)))
+				if (ImGui::Button(inputBind.KeysText.c_str(), ImVec2(kbButtonWidth, 0.0f)))
 				{
 					CurrentlyEditing = identifier;
-					CurrentlyEditingBind = keybind.KeysText;
+					CurrentlyEditingBind = inputBind.KeysText;
 
-					ShouldOpenKeybindModal = true;
+					ShouldOpenInputBindModal = true;
 					IsEditingGameBind = false;
 
-					KeybindModalTitle = Language->Translate("((000062))");
-					KeybindModalTitle.append(Language->Translate(CurrentlyEditing.c_str()));
-					KeybindModalTitle.append("###keybind_setter_modal");
+					InputBindModalTitle = Language->Translate("((000062))");
+					InputBindModalTitle.append(Language->Translate(CurrentlyEditing.c_str()));
+					InputBindModalTitle.append("###inputbind_setter_modal");
 				}
 				ImGui::PopID();
 
 				ImGui::TableSetColumnIndex(2);
-				if (keybind.Bind.Handler == nullptr)
+				if (inputBind.Bind.Handler == nullptr)
 				{
 					if (ImGui::SmallButton(("X##" + identifier).c_str()))
 					{
@@ -156,29 +141,29 @@ namespace GUI
 			ImGui::EndTable();
 		}
 	}
-	void DrawGameBindsTable(const std::map<EGameBinds, GameKeybindPacked>& aKeybinds)
+	void DrawGameBindsTable(const std::map<EGameBinds, GameInputBindPacked>& aInputBinds)
 	{
-		if (ImGui::BeginTable("table_gamekeybinds", 2, ImGuiTableFlags_BordersInnerH))
+		if (ImGui::BeginTable("table_gameinputbinds", 2, ImGuiTableFlags_BordersInnerH))
 		{
-			for (auto& [identifier, keybind] : aKeybinds)
+			for (auto& [identifier, inputBind] : aInputBinds)
 			{
 				ImGui::TableNextRow();
 				ImGui::TableSetColumnIndex(0);
 				ImGui::Text(Language->Translate(CGameBindsApi::ToString(identifier).c_str())); // get translation here
 
 				ImGui::TableSetColumnIndex(1);
-				ImGui::PushID(keybind.Name.c_str());
-				if (ImGui::Button(keybind.KeysText.c_str(), ImVec2(kbButtonWidth, 0.0f)))
+				ImGui::PushID(inputBind.Name.c_str());
+				if (ImGui::Button(inputBind.KeysText.c_str(), ImVec2(kbButtonWidth, 0.0f)))
 				{
 					CurrentlyEditingGame = identifier;
-					CurrentlyEditingBind = keybind.KeysText;
+					CurrentlyEditingBind = inputBind.KeysText;
 
-					ShouldOpenKeybindModal = true;
+					ShouldOpenInputBindModal = true;
 					IsEditingGameBind = true;
 
-					KeybindModalTitle = Language->Translate("((000062))");
-					KeybindModalTitle.append(Language->Translate(CGameBindsApi::ToString(CurrentlyEditingGame).c_str()));
-					KeybindModalTitle.append("###keybind_setter_modal");
+					InputBindModalTitle = Language->Translate("((000062))");
+					InputBindModalTitle.append(Language->Translate(CGameBindsApi::ToString(CurrentlyEditingGame).c_str()));
+					InputBindModalTitle.append("###inputbind_setter_modal");
 				}
 				ImGui::PopID();
 			}
@@ -188,28 +173,28 @@ namespace GUI
 	}
 	void DrawBindSetterModal()
 	{
-		if (ShouldOpenKeybindModal == true)
+		if (ShouldOpenInputBindModal == true)
 		{
-			ImGui::OpenPopup(KeybindModalTitle.c_str());
-			ShouldOpenKeybindModal = false;
+			ImGui::OpenPopup(InputBindModalTitle.c_str());
+			ShouldOpenInputBindModal = false;
 		}
 
 		ImVec2 center(Renderer::Width * 0.5f, Renderer::Height * 0.5f);
 		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-		if (ImGui::BeginPopupModal(KeybindModalTitle.c_str(), NULL, WindowFlags_Default))
+		if (ImGui::BeginPopupModal(InputBindModalTitle.c_str(), NULL, WindowFlags_Default))
 		{
-			KeybindApi->StartCapturing();
+			InputBindApi->StartCapturing();
 
-			Keybind currKeybind = KeybindApi->GetCapturedKeybind();
-			std::string usedBy = KeybindApi->IsInUse(currKeybind);
+			InputBind currInputBind = InputBindApi->GetCapturedInputBind();
+			std::string usedBy = InputBindApi->IsInUse(currInputBind);
 
-			if (currKeybind == Keybind{})
+			if (currInputBind == InputBind{})
 			{
 				ImGui::Text(CurrentlyEditingBind.c_str());
 			}
 			else
 			{
-				ImGui::Text(CKeybindApi::KBToString(currKeybind, true).c_str());
+				ImGui::Text(CInputBindApi::IBToString(currInputBind, true).c_str());
 			}
 
 			bool overwriting = false;
@@ -226,13 +211,13 @@ namespace GUI
 			{
 				if (IsEditingGameBind)
 				{
-					GameBindsApi->Set(CurrentlyEditingGame, Keybind{});
-					IsGameKeybindsPanelOpen = false; // we set this so the display gets refreshed
+					GameBindsApi->Set(CurrentlyEditingGame, InputBind{});
+					IsGameInputBindsPanelOpen = false; // we set this so the display gets refreshed
 				}
 				else
 				{
-					KeybindApi->Set(CurrentlyEditing, Keybind{});
-					IsKeybindsPanelOpen = false; // we set this so the display gets refreshed
+					InputBindApi->Set(CurrentlyEditing, InputBind{});
+					IsInputBindsPanelOpen = false; // we set this so the display gets refreshed
 				}
 				close = true;
 			}
@@ -251,18 +236,18 @@ namespace GUI
 			{
 				if (IsEditingGameBind)
 				{
-					GameBindsApi->Set(CurrentlyEditingGame, currKeybind);
-					IsGameKeybindsPanelOpen = false; // we set this so the display gets refreshed
+					GameBindsApi->Set(CurrentlyEditingGame, currInputBind);
+					IsGameInputBindsPanelOpen = false; // we set this so the display gets refreshed
 				}
 				else
 				{
 					if (overwriting)
 					{
-						KeybindApi->Set(usedBy, Keybind{});
+						InputBindApi->Set(usedBy, InputBind{});
 					}
 
-					KeybindApi->Set(CurrentlyEditing, currKeybind);
-					IsKeybindsPanelOpen = false; // we set this so the display gets refreshed
+					InputBindApi->Set(CurrentlyEditing, currInputBind);
+					IsInputBindsPanelOpen = false; // we set this so the display gets refreshed
 				}
 				
 				close = true;
@@ -286,7 +271,7 @@ namespace GUI
 					CurrentlyEditingBind = "";
 				}
 
-				KeybindApi->EndCapturing();
+				InputBindApi->EndCapturing();
 				ImGui::CloseCurrentPopup();
 			}
 
@@ -316,35 +301,35 @@ namespace GUI
 	}
 	void PopulateInputBinds()
 	{
-		if (!IsKeybindsPanelOpen)
+		if (!IsInputBindsPanelOpen)
 		{
-			KeybindCategoryMap.clear();
+			InputBindCategoryMap.clear();
 
-			/* copy of all keybinds */
-			std::map<std::string, ActiveKeybind> KeybindRegistry = KeybindApi->GetRegistry();
+			/* copy of all InputBinds */
+			std::map<std::string, ManagedInputBind> InputBindRegistry = InputBindApi->GetRegistry();
 
 			/* acquire categories */
-			for (auto& [identifier, keybind] : KeybindRegistry)
+			for (auto& [identifier, inputBind] : InputBindRegistry)
 			{
-				std::string owner = Loader::GetOwner(keybind.Handler);
+				std::string owner = Loader::GetOwner(inputBind.Handler);
 
-				auto it = std::find_if(KeybindCategoryMap.begin(), KeybindCategoryMap.end(), [owner](KBCat category) { return category.Name == owner; });
+				auto it = std::find_if(InputBindCategoryMap.begin(), InputBindCategoryMap.end(), [owner](KBCat category) { return category.Name == owner; });
 
-				if (it == KeybindCategoryMap.end())
+				if (it == InputBindCategoryMap.end())
 				{
 					KBCat cat{};
 					cat.Name = owner;
-					cat.Keybinds[identifier] = {
-						CKeybindApi::KBToString(keybind.Bind, true),
-						keybind
+					cat.InputBinds[identifier] = {
+						CInputBindApi::IBToString(inputBind.Bind, true),
+						inputBind
 					};
-					KeybindCategoryMap.push_back(cat);
+					InputBindCategoryMap.push_back(cat);
 				}
 				else
 				{
-					it->Keybinds[identifier] = {
-						CKeybindApi::KBToString(keybind.Bind, true),
-						keybind
+					it->InputBinds[identifier] = {
+						CInputBindApi::IBToString(inputBind.Bind, true),
+						inputBind
 					};
 				}
 			}
@@ -352,37 +337,37 @@ namespace GUI
 	}
 	void PopulateGameBinds()
 	{
-		if (!IsGameKeybindsPanelOpen)
+		if (!IsGameInputBindsPanelOpen)
 		{
-			GameKeybindCategoryMap.clear();
+			GameInputBindCategoryMap.clear();
 
-			/* copy of all keybinds */
-			std::map<EGameBinds, Keybind> KeybindRegistry = GameBindsApi->GetRegistry();
+			/* copy of all InputBinds */
+			std::map<EGameBinds, InputBind> InputBindRegistry = GameBindsApi->GetRegistry();
 
 			/* acquire categories */
-			for (auto& [identifier, keybind] : KeybindRegistry)
+			for (auto& [identifier, inputBind] : InputBindRegistry)
 			{
 				std::string catName = CGameBindsApi::GetCategory(identifier);
 
-				auto it = std::find_if(GameKeybindCategoryMap.begin(), GameKeybindCategoryMap.end(), [catName](GKBCat category) { return category.Name == catName; });
+				auto it = std::find_if(GameInputBindCategoryMap.begin(), GameInputBindCategoryMap.end(), [catName](GKBCat category) { return category.Name == catName; });
 
-				if (it == GameKeybindCategoryMap.end())
+				if (it == GameInputBindCategoryMap.end())
 				{
 					GKBCat cat{};
 					cat.Name = catName;
-					cat.GameKeybinds[identifier] = {
+					cat.GameInputBinds[identifier] = {
 						CGameBindsApi::ToString(identifier),
-						CKeybindApi::KBToString(keybind, true),
-						keybind
+						CInputBindApi::IBToString(inputBind, true),
+						inputBind
 					};
-					GameKeybindCategoryMap.push_back(cat);
+					GameInputBindCategoryMap.push_back(cat);
 				}
 				else
 				{
-					it->GameKeybinds[identifier] = {
+					it->GameInputBinds[identifier] = {
 						CGameBindsApi::ToString(identifier),
-						CKeybindApi::KBToString(keybind, true),
-						keybind
+						CInputBindApi::IBToString(inputBind, true),
+						inputBind
 					};
 				}
 			}
@@ -392,30 +377,6 @@ namespace GUI
 	void COptionsWindow::Render()
 	{
 		if (!Visible) { return; }
-
-		if (!isSetup)
-		{
-			if (Language)
-			{
-				const std::string& activeLang = Language->GetActiveLanguage();
-
-				std::vector<std::string> langs = Language->GetLanguages();
-				languagesSize = langs.size();
-				languages = new const char* [langs.size()];
-				for (size_t i = 0; i < langs.size(); i++)
-				{
-					languages[i] = new char[langs[i].size() + 1];
-					strcpy((char*)languages[i], langs[i].c_str());
-
-					if (languages[i] == activeLang)
-					{
-						languagesIndex = i;
-					}
-				}
-
-				isSetup = true;
-			}
-		}
 
 		ImGui::SetNextWindowSize(ImVec2(owWidth * ImGui::GetFontSize(), owHeight * ImGui::GetFontSize()), ImGuiCond_FirstUseEver);
 		if (ImGui::Begin(Name.c_str(), &Visible, ImGuiWindowFlags_NoCollapse))
@@ -427,14 +388,14 @@ namespace GUI
 				GeneralTab();
 				bool addonsActive = AddonsTab();
 				StyleTab();
-				bool kbActive = KeybindsTab();
-				GameKeybindsTab();
+				bool kbActive = InputBindsTab();
+				GameInputBindsTab();
 				//APITab();
 				ChangelogTab();
 
 				if (!addonsActive && !kbActive)
 				{
-					IsKeybindsPanelOpen = false;
+					IsInputBindsPanelOpen = false;
 				}
 
 				ImGui::EndTabBar();
@@ -445,94 +406,173 @@ namespace GUI
 		DrawBindSetterModal();
 	}
 
+	void LanguageSettings()
+	{
+		/* header */
+		ImGui::TextDisabled(Language->Translate("((000041))"));
+
+		/* prefetch active lang */
+		std::string activeLang = Language->GetActiveLanguage();
+
+		/* selector dropdown */
+		if (ImGui::BeginCombo("##languageselector", activeLang.c_str()))
+		{
+			for (std::string lang : Language->GetLanguages())
+			{
+				if (ImGui::Selectable(lang.c_str(), lang == activeLang))
+				{
+					if (lang != activeLang)
+					{
+						Language->SetLanguage(lang);
+						Settings::Settings[OPT_LANGUAGE] = lang;
+						Settings::Save();
+					}
+				}
+			}
+			ImGui::EndCombo();
+		}
+	}
+	void UIUXSettings()
+	{
+		/* header */
+		ImGui::TextDisabled(Language->Translate("((000042))"));
+		
+		/* close menu after selecting item */
+		if (ImGui::Checkbox(Language->Translate("((000043))"), &GUI::CloseMenuAfterSelecting))
+		{
+			Settings::Settings[OPT_CLOSEMENU] = GUI::CloseMenuAfterSelecting;
+			Settings::Save();
+		}
+
+		/* close windows on escape */
+		if (ImGui::Checkbox(Language->Translate("((000044))"), &GUI::CloseOnEscape))
+		{
+			Settings::Settings[OPT_CLOSEESCAPE] = GUI::CloseOnEscape;
+			Settings::Save();
+		}
+
+		/* show addons window after after addons were disabled because of an update */
+		if (ImGui::Checkbox(Language->Translate("((000086))"), &GUI::ShowAddonsWindowAfterDUU))
+		{
+			Settings::Settings[OPT_SHOWADDONSWINDOWAFTERDUU] = GUI::ShowAddonsWindowAfterDUU;
+			Settings::Save();
+		}
+	}
+	void QuickAccessSettings()
+	{
+		/* header */
+		ImGui::TextDisabled(Language->Translate("((000045))"));
+		
+		/* toggle vertical layout */
+		if (ImGui::Checkbox(Language->Translate("((000046))"), &QuickAccess::VerticalLayout))
+		{
+			Settings::Settings[OPT_QAVERTICAL] = QuickAccess::VerticalLayout;
+			Settings::Save();
+		}
+
+		/* prefetch currently selected position string */
+		std::string qaVisStr = QuickAccess::EQAVisibilityToString(QuickAccess::Visibility);
+		EQAVisibility newQaVis = QuickAccess::Visibility;
+
+		ImGui::Text(Language->Translate("((000097))"));
+		if (ImGui::BeginCombo("##qavisibility", Language->Translate(qaVisStr.c_str())))
+		{
+			if (ImGui::Selectable(Language->Translate("((000047))"), qaVisStr == "((000047))"))
+			{
+				newQaVis = EQAVisibility::AlwaysShow;
+			}
+			if (ImGui::Selectable(Language->Translate("((000093))"), qaVisStr == "((000093))"))
+			{
+				newQaVis = EQAVisibility::Gameplay;
+			}
+			if (ImGui::Selectable(Language->Translate("((000094))"), qaVisStr == "((000094))"))
+			{
+				newQaVis = EQAVisibility::OutOfCombat;
+			}
+			if (ImGui::Selectable(Language->Translate("((000095))"), qaVisStr == "((000095))"))
+			{
+				newQaVis = EQAVisibility::InCombat;
+			}
+			if (ImGui::Selectable(Language->Translate("((000096))"), qaVisStr == "((000096))"))
+			{
+				newQaVis = EQAVisibility::Hide;
+			}
+
+			ImGui::EndCombo();
+		}
+
+		/* save if qaVis was changed */
+		if (QuickAccess::Visibility != newQaVis)
+		{
+			QuickAccess::Visibility = newQaVis;
+			Settings::Settings[OPT_QAVISIBILITY] = QuickAccess::Visibility;
+			Settings::Save();
+		}
+
+		/* show notification icon on update */
+		if (ImGui::Checkbox(Language->Translate("((000049))"), &GUI::NotifyChangelog))
+		{
+			Settings::Settings[OPT_NOTIFYCHANGELOG] = GUI::NotifyChangelog;
+			Settings::Save();
+		}
+
+		/* prefetch currently selected position string */
+		std::string qaPosStr = QuickAccess::EQAPositionToString(QuickAccess::Location);
+		EQAPosition newQaPos = QuickAccess::Location;
+
+		/* position/location dropdown */
+		ImGui::Text(Language->Translate("((000050))"));
+		if (ImGui::BeginCombo("##qalocation", Language->Translate(qaPosStr.c_str())))
+		{
+			if (ImGui::Selectable(Language->Translate("((000067))"), qaPosStr == "((000067))"))
+			{
+				newQaPos = EQAPosition::Extend;
+			}
+			if (ImGui::Selectable(Language->Translate("((000068))"), qaPosStr == "((000068))"))
+			{
+				newQaPos = EQAPosition::Under;
+			}
+			if (ImGui::Selectable(Language->Translate("((000069))"), qaPosStr == "((000069))"))
+			{
+				newQaPos = EQAPosition::Bottom;
+			}
+			if (ImGui::Selectable(Language->Translate("((000070))"), qaPosStr == "((000070))"))
+			{
+				newQaPos = EQAPosition::Custom;
+			}
+
+			ImGui::EndCombo();
+		}
+
+		/* save if qaPos was changed */
+		if (QuickAccess::Location != newQaPos)
+		{
+			QuickAccess::Location = newQaPos;
+			Settings::Settings[OPT_QALOCATION] = QuickAccess::Location;
+			Settings::Save();
+		}
+
+		/* offset */
+		ImGui::Text(Language->Translate("((000051))"));
+		if (ImGui::DragFloat2("##qaoffset", (float*)&QuickAccess::Offset, 1.0f, (static_cast<int>(Renderer::Height)) * -1, static_cast<int>(Renderer::Height)))
+		{
+			Settings::Settings[OPT_QAOFFSETX] = QuickAccess::Offset.x;
+			Settings::Settings[OPT_QAOFFSETY] = QuickAccess::Offset.y;
+			Settings::Save();
+		}
+	}
+
 	void GeneralTab()
 	{
 		if (ImGui::BeginTabItem(Language->Translate("((000052))")))
 		{
-			{
-				ImGui::BeginChild("##GeneralTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+			ImGui::BeginChild("##GeneralTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-				ImGui::TextDisabled(Language->Translate("((000041))"));
-				if (ImGui::Combo("##language", (int*)&languagesIndex, languages, languagesSize))
-				{
-					Language->SetLanguage(languages[languagesIndex]);
-					Settings::Settings[OPT_LANGUAGE] = languages[languagesIndex];
-					Settings::Save();
-				}
+			LanguageSettings();
+			UIUXSettings();
+			QuickAccessSettings();
 
-				ImGui::TextDisabled(Language->Translate("((000042))"));
-				{
-					if (ImGui::Checkbox(Language->Translate("((000043))"), &GUI::CloseMenuAfterSelecting))
-					{
-						Settings::Settings[OPT_CLOSEMENU] = GUI::CloseMenuAfterSelecting;
-						Settings::Save();
-					}
-					if (ImGui::Checkbox(Language->Translate("((000044))"), &GUI::CloseOnEscape))
-					{
-						Settings::Settings[OPT_CLOSEESCAPE] = GUI::CloseOnEscape;
-						Settings::Save();
-					}
-					if (ImGui::Checkbox(Language->Translate("((000086))"), &GUI::ShowAddonsWindowAfterDUU))
-					{
-						Settings::Settings[OPT_SHOWADDONSWINDOWAFTERDUU] = GUI::ShowAddonsWindowAfterDUU;
-						Settings::Save();
-					}
-				}
-
-				ImGui::Separator();
-
-				ImGui::TextDisabled(Language->Translate("((000045))"));
-				{
-					if (ImGui::Checkbox(Language->Translate("((000046))"), &QuickAccess::VerticalLayout))
-					{
-						Settings::Settings[OPT_QAVERTICAL] = QuickAccess::VerticalLayout;
-						Settings::Save();
-					}
-					if (ImGui::Checkbox(Language->Translate("((000047))"), &QuickAccess::AlwaysShow))
-					{
-						Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS] = QuickAccess::AlwaysShow;
-						Settings::Save();
-					}
-					ImGui::TooltipGeneric(Language->Translate("((000048))"));
-
-					if (ImGui::Checkbox(Language->Translate("((000049))"), &GUI::NotifyChangelog))
-					{
-						Settings::Settings[OPT_NOTIFYCHANGELOG] = GUI::NotifyChangelog;
-						Settings::Save();
-					}
-
-					ImGui::Text(Language->Translate("((000050))"));
-					if (ImGui::BeginCombo("##qalocation", Language->Translate(qaLocations[(int)QuickAccess::Location])))
-					{
-						for (int n = 0; n < IM_ARRAYSIZE(qaLocations); n++)
-						{
-							bool is_selected = ((int)QuickAccess::Location == n); // You can store your selection however you want, outside or inside your objects
-							if (ImGui::Selectable(Language->Translate(qaLocations[n]), is_selected))
-							{
-								QuickAccess::Location = (EQAPosition)n;
-								Settings::Settings[OPT_QALOCATION] = QuickAccess::Location;
-								Settings::Save();
-							}
-							if (is_selected)
-							{
-								ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
-							}
-						}
-
-						ImGui::EndCombo();
-					}
-
-					ImGui::Text(Language->Translate("((000051))"));
-					if (ImGui::DragFloat2("##qaoffset", (float*)&QuickAccess::Offset, 1.0f, (static_cast<int>(Renderer::Height)) * -1, static_cast<int>(Renderer::Height)))
-					{
-						Settings::Settings[OPT_QAOFFSETX] = QuickAccess::Offset.x;
-						Settings::Settings[OPT_QAOFFSETY] = QuickAccess::Offset.y;
-						Settings::Save();
-					}
-				}
-
-				ImGui::EndChild();
-			}
+			ImGui::EndChild();
 
 			ImGui::EndTabItem();
 		}
@@ -548,7 +588,7 @@ namespace GUI
 
 			PopulateInputBinds();
 
-			IsKeybindsPanelOpen = true;
+			IsInputBindsPanelOpen = true;
 
 			ImGui::BeginChild("##AddonsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
@@ -556,37 +596,26 @@ namespace GUI
 			{
 				for (GUI_RENDER renderCb : RegistryOptionsRender)
 				{
-					if (renderCb)
+					std::string parent = Loader::GetOwner(renderCb);
+					if (ImGui::BeginTabItem((parent + "##AddonOptions").c_str()))
 					{
-						std::string parent = Loader::GetOwner(renderCb);
-						if (ImGui::BeginTabItem((parent + "##AddonOptions").c_str()))
+						for (KBCat cat : InputBindCategoryMap)
 						{
+							if (cat.Name != parent) { continue; }
+							if (cat.InputBinds.size() == 0) { continue; }
+
+							if (ImGui::CollapsingHeader(Language->Translate("((000060))"), ImGuiTreeNodeFlags_DefaultOpen))
 							{
-								//ImGui::BeginChild("##KeybindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
-
-								bool openEditor = false;
-
-								for (KBCat cat : KeybindCategoryMap)
-								{
-									if (cat.Name != parent) { continue; }
-									if (cat.Keybinds.size() == 0) { continue; }
-
-									if (ImGui::CollapsingHeader(Language->Translate("((000060))"), ImGuiTreeNodeFlags_DefaultOpen))
-									{
-										DrawInputBindsTable(cat.Keybinds);
-									}
-								}
-
-								//ImGui::EndChild();
+								DrawInputBindsTable(cat.InputBinds);
 							}
-
-							if (ImGui::CollapsingHeader(Language->Translate("((000004))"), ImGuiTreeNodeFlags_DefaultOpen))
-							{
-								renderCb();
-							}
-
-							ImGui::EndTabItem();
 						}
+
+						if (ImGui::CollapsingHeader(Language->Translate("((000004))"), ImGuiTreeNodeFlags_DefaultOpen))
+						{
+							renderCb();
+						}
+
+						ImGui::EndTabItem();
 					}
 				}
 
@@ -611,7 +640,7 @@ namespace GUI
 
 			ImGui::BeginChild("##StyleTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-			ImGui::TextDisabled("Font");
+			ImGui::TextDisabled(Language->Translate("((000092))"));
 			if (ImGui::BeginCombo("##fontselector", GUI::FontFile.c_str()))
 			{
 				for (std::string font : Fonts)
@@ -621,7 +650,8 @@ namespace GUI
 						if (font != FontFile)
 						{
 							FontFile = font;
-							FontManager.ReplaceFont("USER_FONT", FontSize, (Index::D_GW2_ADDONS_NEXUS_FONTS / font).string().c_str(), GUI::FontReceiver, nullptr);
+							
+							GUI::LoadFonts();
 
 							Settings::Settings[OPT_USERFONT] = FontFile;
 							Settings::Save();
@@ -814,9 +844,13 @@ namespace GUI
 
 			ImGui::EndTabItem();
 		}
+		else
+		{
+			IsStylePanelOpen = false;
+		}
 	}
 
-	bool KeybindsTab()
+	bool InputBindsTab()
 	{
 		bool isActive = false;
 
@@ -826,15 +860,15 @@ namespace GUI
 
 			PopulateInputBinds();
 
-			IsKeybindsPanelOpen = true;
+			IsInputBindsPanelOpen = true;
 
-			ImGui::BeginChild("##KeybindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
+			ImGui::BeginChild("##InputBindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-			for (KBCat cat : KeybindCategoryMap)
+			for (KBCat cat : InputBindCategoryMap)
 			{
 				if (ImGui::CollapsingHeader(cat.Name != "(null)" ? cat.Name.c_str() : Language->Translate("((000088))"), ImGuiTreeNodeFlags_DefaultOpen))
 				{
-					DrawInputBindsTable(cat.Keybinds);
+					DrawInputBindsTable(cat.InputBinds);
 				}
 			}
 
@@ -846,21 +880,21 @@ namespace GUI
 		return isActive;
 	}
 
-	void GameKeybindsTab()
+	void GameInputBindsTab()
 	{
 		if (ImGui::BeginTabItem(Language->Translate("((000091))")))
 		{
 			PopulateGameBinds();
 			
-			IsGameKeybindsPanelOpen = true;
+			IsGameInputBindsPanelOpen = true;
 
 			ImGui::BeginChild("##GameBindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-			for (GKBCat cat : GameKeybindCategoryMap)
+			for (GKBCat cat : GameInputBindCategoryMap)
 			{
 				if (ImGui::CollapsingHeader(Language->Translate(cat.Name.c_str()), ImGuiTreeNodeFlags_DefaultOpen))
 				{
-					DrawGameBindsTable(cat.GameKeybinds);
+					DrawGameBindsTable(cat.GameInputBinds);
 				}
 			}
 			
@@ -870,7 +904,7 @@ namespace GUI
 		}
 		else
 		{
-			IsGameKeybindsPanelOpen = false;
+			IsGameInputBindsPanelOpen = false;
 		}
 	}
 

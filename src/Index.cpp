@@ -30,9 +30,8 @@ namespace Index
 	std::filesystem::path F_ARCDPSINTEGRATION{};
 
 	std::filesystem::path F_LOG{};
-	std::filesystem::path F_KEYBINDS{};
+	std::filesystem::path F_INPUTBINDS{};
 	std::filesystem::path F_GAMEBINDS{};
-	std::filesystem::path F_FONT{};
 	std::filesystem::path F_SETTINGS{};
 	std::filesystem::path F_ADDONCONFIG{};
 	std::filesystem::path F_APIKEYS{};
@@ -76,9 +75,8 @@ namespace Index
 
 		/* files */
 		F_LOG = D_GW2_ADDONS_NEXUS / "Nexus.log";										/* get log path */
-		F_KEYBINDS = D_GW2_ADDONS_NEXUS / "Keybinds.json";								/* get keybinds path */
+		F_INPUTBINDS = D_GW2_ADDONS_NEXUS / "InputBinds.json";							/* get inputbinds path */
 		F_GAMEBINDS = D_GW2_ADDONS_NEXUS / "GameBinds.json";							/* get gamebinds path */
-		F_FONT = D_GW2_ADDONS_NEXUS / "Font.ttf";										/* get font path */
 		F_SETTINGS = D_GW2_ADDONS_NEXUS / "Settings.json";								/* get settings path */
 		F_ADDONCONFIG = D_GW2_ADDONS_NEXUS / "AddonConfig.json";						/* get addon config path */
 		F_APIKEYS = D_GW2_ADDONS_COMMON / "APIKeys.json";								/* get apikeys path */
@@ -109,15 +107,35 @@ namespace Index
 		PathStore.push_back(D_GW2_ADDONS_COMMON_API_RAIDCORE.string());
 
 		/* migrate old font */
-		if (std::filesystem::exists(F_FONT))
+		std::filesystem::path legacyFontPath = D_GW2_ADDONS_NEXUS / "Font.ttf";
+		if (std::filesystem::exists(legacyFontPath))
 		{
-			std::filesystem::path targetPath = D_GW2_ADDONS_NEXUS_FONTS / F_FONT.filename();
+			std::filesystem::path targetPath = D_GW2_ADDONS_NEXUS_FONTS / legacyFontPath.filename();
 
 			targetPath = Path::GetUnused(targetPath);
 
 			try
 			{
-				std::filesystem::rename(F_FONT, targetPath);
+				std::filesystem::rename(legacyFontPath, targetPath);
+			}
+			catch (std::filesystem::filesystem_error fErr)
+			{
+				/* do nothing. we cannot log here yet, but this is also not really relevant. */
+			}
+		}
+
+		/* migrate keybinds */
+
+		std::filesystem::path legacyKeybindsPath = D_GW2_ADDONS_NEXUS / "Keybinds.json";
+		if (std::filesystem::exists(legacyKeybindsPath))
+		{
+			std::filesystem::path targetPath = F_INPUTBINDS;
+
+			targetPath = Path::GetUnused(targetPath);
+
+			try
+			{
+				std::filesystem::rename(legacyKeybindsPath, targetPath);
 			}
 			catch (std::filesystem::filesystem_error fErr)
 			{

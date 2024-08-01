@@ -24,7 +24,7 @@ namespace GUI
 
 		private:
 		void DbgEventsTab();
-		void DbgKeybindsTab();
+		void DbgInputBindsTab();
 		void DbgDataLinkTab();
 		void DbgTexturesTab();
 		void DbgShortcutsTab();

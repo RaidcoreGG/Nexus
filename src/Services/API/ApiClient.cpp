@@ -1,3 +1,11 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  ApiClient.cpp
+/// Description  :  Provides functions for web requests.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #include "ApiClient.h"
 
 #include <fstream>
@@ -31,10 +39,10 @@ CApiClient::CApiClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::p
 	RefillInterval = aRefillInterval;
 
 	Logger->Debug("CApiClient", "CApiClient(BaseURL: %s, EnableSSL: %s, CacheDirectory: %s, CacheLifetime: %d, BucketCapacity: %d, RefillAmount: %d, RefillInterval: %d)",
-		BaseURL.c_str(),
-		aEnableSSL ? "true" : "false",
-		CacheDirectory.string().c_str(),
-		CacheLifetime, BucketCapacity, RefillAmount, RefillInterval);
+				  BaseURL.c_str(),
+				  aEnableSSL ? "true" : "false",
+				  CacheDirectory.string().c_str(),
+				  CacheLifetime, BucketCapacity, RefillAmount, RefillInterval);
 
 	WorkerThread = std::thread(&CApiClient::ProcessRequests, this);
 	WorkerThread.detach();
@@ -63,17 +71,20 @@ CApiClient::~CApiClient()
 	Logger->Debug("CApiClient", "~CApiClient(%s)", BaseURL.c_str());
 }
 
-json CApiClient::Get(std::string aEndpoint, std::string aParameters, bool aBypassCache)
+json CApiClient::Get(std::string aEndpoint, std::string aParameters, int aOverrideCacheLifetime)
 {
 	std::string query = URL::GetQuery(aEndpoint, aParameters);
 
-	CachedResponse* cachedResponse = aBypassCache ? nullptr : GetCachedResponse(query);
+	/* override == 0, don't even bother getting the cache */
+	CachedResponse* cachedResponse = aOverrideCacheLifetime == 0 ? nullptr : GetCachedResponse(query);
 
 	if (cachedResponse != nullptr)
 	{
 		long long diff = Time::GetTimestamp() - cachedResponse->Timestamp;
 
-		if (diff < CacheLifetime && cachedResponse->Content != nullptr)
+		int permittedCacheLifetime = aOverrideCacheLifetime == -1 ? CacheLifetime : aOverrideCacheLifetime;
+
+		if (diff < permittedCacheLifetime && cachedResponse->Content != nullptr)
 		{
 			//Logger->Debug("CApiClient", "[%s] Cached message %d seconds old. Reading from cache.", BaseURL.c_str(), diff);
 			return cachedResponse->Content;
@@ -109,7 +120,7 @@ json CApiClient::Get(std::string aEndpoint, std::string aParameters, bool aBypas
 	// Wait for the response
 	{
 		std::unique_lock<std::mutex> lock(mtx);
-		cv.wait(lock, [&]{ return done; });
+		cv.wait(lock, [&] { return done; });
 	}
 
 	cachedResponse = nullptr; // sanity
@@ -181,7 +192,7 @@ bool CApiClient::Download(std::filesystem::path aOutPath, std::string aEndpoint,
 		file.write(data, data_length);
 		bytesWritten += data_length;
 		return true;
-		});
+	});
 	file.close();
 
 	if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
@@ -189,7 +200,7 @@ bool CApiClient::Download(std::filesystem::path aOutPath, std::string aEndpoint,
 		Logger->Warning("CApiClient", "[%s] Error fetching %s", BaseURL.c_str(), query.c_str());
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -338,11 +349,11 @@ void CApiClient::ProcessRequests()
 				/* client error */
 				switch (response.Status)
 				{
-				case 429: // Rate Limited: explicitly set Bucket to 0 and set TimeSinceLastRefill to now and start over
-					Bucket = 0;
-					TimeSinceLastRefill = Time::GetTimestamp();
-					retry = true;
-					break;
+					case 429: // Rate Limited: explicitly set Bucket to 0 and set TimeSinceLastRefill to now and start over
+						Bucket = 0;
+						TimeSinceLastRefill = Time::GetTimestamp();
+						retry = true;
+						break;
 				}
 			}
 			else if (response.Status >= 500 && response.Status <= 599)
@@ -358,7 +369,7 @@ void CApiClient::ProcessRequests()
 				cached->Timestamp = Time::GetTimestamp();
 
 				std::filesystem::path normalizedPath = GetNormalizedPath(request.Query);
-				
+
 				auto it = ResponseCache.find(normalizedPath);
 
 				if (it != ResponseCache.end())
@@ -415,12 +426,12 @@ APIResponse CApiClient::HttpGet(APIRequest aRequest)
 	httplib::Result result{};
 	switch (aRequest.Type)
 	{
-	case ERequestType::Get:
-		result = Client->Get(aRequest.Query);
-		break;
-	case ERequestType::Post:
-		result = Client->Post(aRequest.Query);
-		break;
+		case ERequestType::Get:
+			result = Client->Get(aRequest.Query);
+			break;
+		case ERequestType::Post:
+			result = Client->Post(aRequest.Query);
+			break;
 	}
 
 	if (!result)
