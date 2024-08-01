@@ -62,4 +62,10 @@ LPARAM& KMFToLParam(KeystrokeMessageFlags& aKmf);
 ///----------------------------------------------------------------------------------------------------
 LPARAM GetKeyMessageLPARAM(unsigned aVKey, bool aIsDown, bool aIsSystem);
 
+///----------------------------------------------------------------------------------------------------
+/// GetMouseMessageWPARAM:
+/// 	Creates an WPARAM for mouse messages.
+///----------------------------------------------------------------------------------------------------
+WPARAM GetMouseMessageWPARAM(EMouseButtons aMouseButton, bool aIsCtrl, bool aIsShift, bool aIsDown);
+
 #endif

@@ -691,7 +691,7 @@ CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, C
 	this->AddDefaultBinds();
 
 	CGameBindsApi::EnableUEInputBindUpdates(this);
-	this->EventApi->Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
+	this->EventApi->Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged, true);
 
 	//ASSERT(this->RawInputApi);
 	//ASSERT(this->Logger);
@@ -739,15 +739,6 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 		return;
 	}
 
-	KeyLParam key{};
-	key.RepeatCount = 1;
-	key.ScanCode = ib.Code;
-	key.ExtendedFlag = (ib.Code & 0xE000) != 0;
-	key.Reserved = 0;
-	key.ContextCode = ib.Alt;
-	key.PreviousKeyState = 0;
-	key.TransitionState = 0;
-
 	if (ib.Alt)
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYDOWN, VK_MENU, GetKeyMessageLPARAM(VK_MENU, true, true));
@@ -761,7 +752,64 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, true, false));
 	}
 
-	this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK), KMFToLParam(key));
+	if (ib.Type == EInputBindType::Keyboard)
+	{
+		KeyLParam key{};
+		key.RepeatCount = 1;
+		key.ScanCode = ib.Code;
+		key.ExtendedFlag = (ib.Code & 0xE000) != 0;
+		key.Reserved = 0;
+		key.ContextCode = ib.Alt;
+		key.PreviousKeyState = 0;
+		key.TransitionState = 0;
+
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK), KMFToLParam(key));
+	}
+	else if (ib.Type == EInputBindType::Mouse)
+	{
+		/* get point for lparam */
+		POINT point{};
+		GetCursorPos(&point);
+
+		switch ((EMouseButtons)ib.Code)
+		{
+			case EMouseButtons::LMB:
+			{
+				this->RawInputApi->SendWndProcToGame(0, WM_LBUTTONDOWN,
+													 GetMouseMessageWPARAM(EMouseButtons::LMB, ib.Ctrl, ib.Shift, true),
+													 MAKELPARAM(point.x, point.y));
+				break;
+			}
+			case EMouseButtons::RMB:
+			{
+				this->RawInputApi->SendWndProcToGame(0, WM_RBUTTONDOWN,
+													 GetMouseMessageWPARAM(EMouseButtons::RMB, ib.Ctrl, ib.Shift, true),
+													 MAKELPARAM(point.x, point.y));
+				break;
+			}
+			case EMouseButtons::MMB:
+			{
+				this->RawInputApi->SendWndProcToGame(0, WM_MBUTTONDOWN,
+													 GetMouseMessageWPARAM(EMouseButtons::MMB, ib.Ctrl, ib.Shift, true),
+													 MAKELPARAM(point.x, point.y));
+				break;
+			}
+			case EMouseButtons::M4:
+			{
+				this->RawInputApi->SendWndProcToGame(0, WM_XBUTTONDOWN,
+													 GetMouseMessageWPARAM(EMouseButtons::M4, ib.Ctrl, ib.Shift, true),
+													 MAKELPARAM(point.x, point.y));
+				break;
+			}
+			case EMouseButtons::M5:
+			{
+				this->RawInputApi->SendWndProcToGame(0, WM_XBUTTONDOWN,
+													 GetMouseMessageWPARAM(EMouseButtons::M5, ib.Ctrl, ib.Shift, true),
+													 MAKELPARAM(point.x, point.y));
+				break;
+			}
+		}
+	}
 }
 
 void CGameBindsApi::Release(EGameBinds aGameBind)
@@ -773,16 +821,64 @@ void CGameBindsApi::Release(EGameBinds aGameBind)
 		return;
 	}
 
-	KeyLParam key{};
-	key.RepeatCount = 1;
-	key.ScanCode = ib.Code;
-	key.ExtendedFlag = (ib.Code & 0xE000) != 0;
-	key.Reserved = 0;
-	key.ContextCode = ib.Alt;
-	key.PreviousKeyState = 1;
-	key.TransitionState = 1;
+	if (ib.Type == EInputBindType::Keyboard)
+	{
+		KeyLParam key{};
+		key.RepeatCount = 1;
+		key.ScanCode = ib.Code;
+		key.ExtendedFlag = (ib.Code & 0xE000) != 0;
+		key.Reserved = 0;
+		key.ContextCode = ib.Alt;
+		key.PreviousKeyState = 1;
+		key.TransitionState = 1;
 
-	this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK), KMFToLParam(key));
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK), KMFToLParam(key));
+	}
+	else if (ib.Type == EInputBindType::Mouse)
+	{
+		/* get point for lparam */
+		POINT point{};
+		GetCursorPos(&point);
+
+		switch ((EMouseButtons)ib.Code)
+		{
+			case EMouseButtons::LMB:
+			{
+				this->RawInputApi->SendWndProcToGame(0, WM_LBUTTONUP,
+													 GetMouseMessageWPARAM(EMouseButtons::LMB, ib.Ctrl, ib.Shift, false),
+													 MAKELPARAM(point.x, point.y));
+				break;
+			}
+			case EMouseButtons::RMB:
+			{
+				this->RawInputApi->SendWndProcToGame(0, WM_RBUTTONUP,
+													 GetMouseMessageWPARAM(EMouseButtons::RMB, ib.Ctrl, ib.Shift, false),
+													 MAKELPARAM(point.x, point.y));
+				break;
+			}
+			case EMouseButtons::MMB:
+			{
+				this->RawInputApi->SendWndProcToGame(0, WM_MBUTTONUP,
+													 GetMouseMessageWPARAM(EMouseButtons::MMB, ib.Ctrl, ib.Shift, false),
+													 MAKELPARAM(point.x, point.y));
+				break;
+			}
+			case EMouseButtons::M4:
+			{
+				this->RawInputApi->SendWndProcToGame(0, WM_XBUTTONUP,
+													 GetMouseMessageWPARAM(EMouseButtons::M4, ib.Ctrl, ib.Shift, false),
+													 MAKELPARAM(point.x, point.y));
+				break;
+			}
+			case EMouseButtons::M5:
+			{
+				this->RawInputApi->SendWndProcToGame(0, WM_XBUTTONUP,
+													 GetMouseMessageWPARAM(EMouseButtons::M5, ib.Ctrl, ib.Shift, false),
+													 MAKELPARAM(point.x, point.y));
+				break;
+			}
+		}
+	}
 
 	if (ib.Alt)
 	{
