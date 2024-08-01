@@ -349,10 +349,12 @@
     <None Include="src\exports.def" />
     <None Include="src\Resources\bin64\arcdps_integration64.dll" />
     <None Include="src\Resources\Locales\br_Main.json" />
+    <None Include="src\Resources\Locales\cn_Main.json" />
     <None Include="src\Resources\Locales\cz_Main.json" />
     <None Include="src\Resources\Locales\de_Main.json" />
     <None Include="src\Resources\Locales\en_Main.json" />
     <None Include="src\Resources\Locales\es_Main.json" />
+    <None Include="src\Resources\Locales\fr_Main.json" />
     <None Include="src\Resources\Locales\it_Main.json" />
     <None Include="src\Resources\Locales\pl_Main.json" />
     <None Include="src\Resources\Locales\ru_Main.json" />
