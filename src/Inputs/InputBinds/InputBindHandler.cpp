@@ -142,26 +142,32 @@ InputBind CInputBindApi::IBFromString(std::string aInputBind)
 
 	if (aInputBind == "LMB")
 	{
+		ib.Type = EInputBindType::Mouse;
 		ib.Code = (unsigned short)EMouseButtons::LMB;
 	}
 	else if (aInputBind == "RMB")
 	{
+		ib.Type = EInputBindType::Mouse;
 		ib.Code = (unsigned short)EMouseButtons::RMB;
 	}
 	else if (aInputBind == "MMB")
 	{
+		ib.Type = EInputBindType::Mouse;
 		ib.Code = (unsigned short)EMouseButtons::MMB;
 	}
 	else if (aInputBind == "M4")
 	{
+		ib.Type = EInputBindType::Mouse;
 		ib.Code = (unsigned short)EMouseButtons::M4;
 	}
 	else if (aInputBind == "M5")
 	{
+		ib.Type = EInputBindType::Mouse;
 		ib.Code = (unsigned short)EMouseButtons::M5;
 	}
 	else
 	{
+		ib.Type = EInputBindType::Keyboard;
 		for (auto it = ScancodeLookupTable.begin(); it != ScancodeLookupTable.end(); ++it)
 		{
 			if (it->second == aInputBind)
