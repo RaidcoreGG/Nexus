@@ -112,9 +112,9 @@ InputBind CInputBindApi::IBFromString(std::string aInputBind)
 		BuildscanCodeLookupTable();
 	}
 
-	InputBind kb{};
+	InputBind ib{};
 
-	if (aInputBind == "(null)" || aInputBind == "(NULL)") { return kb; }
+	if (aInputBind == "(null)" || aInputBind == "(NULL)") { return ib; }
 
 	aInputBind = String::ToUpper(aInputBind);
 	std::string delimiter = "+";
@@ -128,28 +128,51 @@ InputBind CInputBindApi::IBFromString(std::string aInputBind)
 
 		if (token == "ALT")
 		{
-			kb.Alt = true;
+			ib.Alt = true;
 		}
 		else if (token == "CTRL")
 		{
-			kb.Ctrl = true;
+			ib.Ctrl = true;
 		}
 		else if (token == "SHIFT")
 		{
-			kb.Shift = true;
+			ib.Shift = true;
 		}
 	}
 
-	for (auto it = ScancodeLookupTable.begin(); it != ScancodeLookupTable.end(); ++it)
+	if (aInputBind == "LMB")
 	{
-		if (it->second == aInputBind)
+		ib.Code = (unsigned short)EMouseButtons::LMB;
+	}
+	else if (aInputBind == "RMB")
+	{
+		ib.Code = (unsigned short)EMouseButtons::RMB;
+	}
+	else if (aInputBind == "MMB")
+	{
+		ib.Code = (unsigned short)EMouseButtons::MMB;
+	}
+	else if (aInputBind == "M4")
+	{
+		ib.Code = (unsigned short)EMouseButtons::M4;
+	}
+	else if (aInputBind == "M5")
+	{
+		ib.Code = (unsigned short)EMouseButtons::M5;
+	}
+	else
+	{
+		for (auto it = ScancodeLookupTable.begin(); it != ScancodeLookupTable.end(); ++it)
 		{
-			kb.Code = it->first;
-			break;
+			if (it->second == aInputBind)
+			{
+				ib.Code = it->first;
+				break;
+			}
 		}
 	}
 
-	return kb;
+	return ib;
 }
 
 std::string CInputBindApi::IBToString(InputBind aInputBind, bool aPadded)
