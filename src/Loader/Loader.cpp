@@ -89,6 +89,11 @@ namespace Loader
 
 		if (State::Nexus == ENexusState::LOADED)
 		{
+			if (Index::F_ADDONCONFIG != Index::F_ADDONCONFIG_DEFAULT)
+			{
+				Logger->Info(CH_LOADER, "AddonConfig path specified. Saving to \"%s\"", Index::F_ADDONCONFIG.string().c_str());
+			}
+
 			LoadAddonConfig();
 
 			//FSItemList = ILCreateFromPathA(Index::GetAddonDirectory(nullptr));

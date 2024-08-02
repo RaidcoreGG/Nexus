@@ -9,9 +9,7 @@
 
 #include "Consts.h"
 #include "Shared.h"
-
-#include "Services/Mumble/Reader.h"
-#include "Services/DataLink/DataLink.h"
+#include "Index.h"
 
 #include "Util/Strings.h"
 
@@ -74,20 +72,29 @@ namespace State
 
 				std::vector<std::string> idList = String::Split(addonIds, ",");
 
-				for (std::string addonId : idList)
+				/* if -ggaddons param is config path, else it's id list*/
+				if (idList.size() == 1 && String::Contains(idList[0], ".json"))
 				{
-					try
+					/* overwrite index path */
+					Index::F_ADDONCONFIG = idList[0];
+				}
+				else
+				{
+					for (std::string addonId : idList)
 					{
-						signed int i = std::stoi(addonId);
-						RequestedAddons.push_back(i);
-					}
-					catch (const std::invalid_argument& e)
-					{
-						Logger->Trace(CH_CORE, "Invalid argument (-ggaddons): %s (exc: %s)", addonId.c_str(), e.what());
-					}
-					catch (const std::out_of_range& e)
-					{
-						Logger->Trace(CH_CORE, "Out of range (-ggaddons): %s (exc: %s)", addonId.c_str(), e.what());
+						try
+						{
+							signed int i = std::stoi(addonId);
+							RequestedAddons.push_back(i);
+						}
+						catch (const std::invalid_argument& e)
+						{
+							Logger->Trace(CH_CORE, "Invalid argument (-ggaddons): %s (exc: %s)", addonId.c_str(), e.what());
+						}
+						catch (const std::out_of_range& e)
+						{
+							Logger->Trace(CH_CORE, "Out of range (-ggaddons): %s (exc: %s)", addonId.c_str(), e.what());
+						}
 					}
 				}
 

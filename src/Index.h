@@ -41,6 +41,7 @@ namespace Index
 	extern std::filesystem::path F_GAMEBINDS;
 	extern std::filesystem::path F_SETTINGS;
 	extern std::filesystem::path F_ADDONCONFIG;
+	extern std::filesystem::path F_ADDONCONFIG_DEFAULT;
 	extern std::filesystem::path F_APIKEYS;
 
 	extern std::filesystem::path F_LOCALE_EN;
