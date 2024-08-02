@@ -774,7 +774,7 @@ namespace GUI
 						static ImGuiTextFilter filter;
 						filter.Draw("Filter colors", ImGui::GetFontSize() * 16);
 
-						ImGui::BeginChild("##colors", ImVec2(0, 0), true, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_AlwaysHorizontalScrollbar | ImGuiWindowFlags_NavFlattened);
+						ImGui::BeginChild("##colors", ImVec2(0, 0), true);
 						ImGui::PushItemWidth(-160);
 						for (int i = 0; i < ImGuiCol_COUNT; i++)
 						{
