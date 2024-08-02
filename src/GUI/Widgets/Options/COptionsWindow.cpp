@@ -408,8 +408,7 @@ namespace GUI
 
 	void LanguageSettings()
 	{
-		/* header */
-		ImGui::TextDisabled(Language->Translate("((000041))"));
+		ImGui::BeginGroupPanel(Language->Translate("((000041))"), ImVec2(-1.0f, 0.0f));
 
 		/* prefetch active lang */
 		std::string activeLang = Language->GetActiveLanguage();
@@ -431,12 +430,13 @@ namespace GUI
 			}
 			ImGui::EndCombo();
 		}
+
+		ImGui::EndGroupPanel();
 	}
 	void UIUXSettings()
 	{
-		/* header */
-		ImGui::TextDisabled(Language->Translate("((000042))"));
-		
+		ImGui::BeginGroupPanel(Language->Translate("((000042))"), ImVec2(-1.0f, 0.0f));
+
 		/* close menu after selecting item */
 		if (ImGui::Checkbox(Language->Translate("((000043))"), &GUI::CloseMenuAfterSelecting))
 		{
@@ -457,12 +457,13 @@ namespace GUI
 			Settings::Settings[OPT_SHOWADDONSWINDOWAFTERDUU] = GUI::ShowAddonsWindowAfterDUU;
 			Settings::Save();
 		}
+
+		ImGui::EndGroupPanel();
 	}
 	void QuickAccessSettings()
 	{
-		/* header */
-		ImGui::TextDisabled(Language->Translate("((000045))"));
-		
+		ImGui::BeginGroupPanel(Language->Translate("((000045))"), ImVec2(-1.0f, 0.0f));
+
 		/* toggle vertical layout */
 		if (ImGui::Checkbox(Language->Translate("((000046))"), &QuickAccess::VerticalLayout))
 		{
@@ -560,6 +561,7 @@ namespace GUI
 			Settings::Settings[OPT_QAOFFSETY] = QuickAccess::Offset.y;
 			Settings::Save();
 		}
+		ImGui::EndGroupPanel();
 	}
 
 	void GeneralTab()
@@ -580,6 +582,8 @@ namespace GUI
 
 	bool AddonsTab()
 	{
+		if (RegistryOptionsRender.size() == 0) { return false; }
+
 		bool isActive = false;
 
 		if (ImGui::BeginTabItem(Language->Translate("((000003))")))
@@ -640,7 +644,7 @@ namespace GUI
 
 			ImGui::BeginChild("##StyleTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f));
 
-			ImGui::TextDisabled(Language->Translate("((000092))"));
+			ImGui::BeginGroupPanel(Language->Translate("((000092))"), ImVec2(-1.0f, 0.0f));
 			if (ImGui::BeginCombo("##fontselector", GUI::FontFile.c_str()))
 			{
 				for (std::string font : Fonts)
@@ -660,8 +664,9 @@ namespace GUI
 				}
 				ImGui::EndCombo();
 			}
+			ImGui::EndGroupPanel();
 
-			ImGui::TextDisabled(Language->Translate("((000054))"));
+			ImGui::BeginGroupPanel(Language->Translate("((000054))"), ImVec2(-1.0f, 0.0f));
 			if (ImGui::InputFloat("##fontsize", &FontSize, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_EnterReturnsTrue))
 			{
 				FontSize = min(max(FontSize, 1.0f), 50.0f);
@@ -671,9 +676,10 @@ namespace GUI
 
 				FontManager.ResizeFont("USER_FONT", FontSize);
 			}
+			ImGui::EndGroupPanel();
 
 			ImGuiIO& io = ImGui::GetIO();
-			ImGui::TextDisabled(Language->Translate("((000072))"));
+			ImGui::BeginGroupPanel(Language->Translate("((000072))"), ImVec2(-1.0f, 0.0f));
 			if (ImGui::DragFloat("##globalscale", &io.FontGlobalScale, 0.005f, 0.75f, 3.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp))
 			{
 				Settings::Settings[OPT_GLOBALSCALE] = io.FontGlobalScale;
@@ -681,9 +687,9 @@ namespace GUI
 
 				GUI::Rescale();
 			}
+			ImGui::EndGroupPanel();
 
-			ImGui::Separator();
-
+			ImGui::BeginGroupPanel(Language->Translate("((000053))"), ImVec2(-1.0f, 0.0f));
 			if (ImGui::Checkbox(Language->Translate("((000056))"), &GUI::LinkArcDPSStyle))
 			{
 				Settings::Settings[OPT_LINKARCSTYLE] = GUI::LinkArcDPSStyle;
@@ -839,6 +845,7 @@ namespace GUI
 					ImGui::EndTabBar();
 				}
 			}
+			ImGui::EndGroupPanel();
 
 			ImGui::EndChild();
 
