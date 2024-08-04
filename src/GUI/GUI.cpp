@@ -16,7 +16,7 @@
 #include "Services/Mumble/Reader.h"
 
 #include "Events/EventHandler.h"
-#include "Inputs/Keybinds/KeybindHandler.h"
+#include "Inputs/InputBinds/InputBindHandler.h"
 #include "Loader/Loader.h"
 #include "Services/DataLink/DataLink.h"
 #include "Services/Settings/Settings.h"
@@ -34,6 +34,7 @@
 
 #include "resource.h"
 #include "Util/Base64.h"
+#include "Util/Inputs.h"
 #include "Util/Resources.h"
 #include "Util/Time.h"
 
@@ -65,34 +66,34 @@ namespace GUI
 	void OnLanguageChanged(void* aEventArgs);
 	void Setup();
 
-	Mumble::Data*				MumbleLink					= nullptr;
-	NexusLinkData*				NexusLink					= nullptr;
+	Mumble::Data*							MumbleLink					= nullptr;
+	NexusLinkData*							NexusLink					= nullptr;
 
-	std::mutex					Mutex;
-	std::vector<GUI_RENDER>		RegistryPreRender;
-	std::vector<GUI_RENDER>		RegistryRender;
-	std::vector<GUI_RENDER>		RegistryPostRender;
-	std::vector<GUI_RENDER>		RegistryOptionsRender;
+	std::mutex								Mutex;
+	std::vector<GUI_RENDER>					RegistryPreRender;
+	std::vector<GUI_RENDER>					RegistryRender;
+	std::vector<GUI_RENDER>					RegistryPostRender;
+	std::vector<GUI_RENDER>					RegistryOptionsRender;
+	std::unordered_map<std::string, bool*>	RegistryCloseOnEscape;
 
-	std::map<EFont, ImFont*>	FontIndex;
-	float						FontSize					= 16.0f;
-	bool						CloseMenuAfterSelecting		= true;
-	bool						CloseOnEscape				= true;
-	bool						LinkArcDPSStyle				= true;
+	std::map<EFont, ImFont*>				FontIndex;
+	std::string								FontFile;
+	float									FontSize					= 16.0f;
+	bool									CloseMenuAfterSelecting		= true;
+	bool									CloseOnEscape				= true;
+	bool									LinkArcDPSStyle				= true;
 
-	bool						IsUIVisible					= true;
+	bool									IsUIVisible					= true;
 
-	bool						IsRightClickHeld			= false;
-	bool						IsLeftClickHeld				= false;
-	bool						IsSetup						= false;
-	float						LastScaling					= 1.0f;
+	bool									IsRightClickHeld			= false;
+	bool									IsLeftClickHeld				= false;
+	bool									IsSetup						= false;
+	float									LastScaling					= 1.0f;
 
-	bool						HasAcceptedEULA				= false;
-	bool						NotifyChangelog				= false;
+	bool									HasAcceptedEULA				= false;
+	bool									NotifyChangelog				= false;
 
-	bool						ShowAddonsWindowAfterDUU	= false;
-
-	bool						HasCustomFont				= false;
+	bool									ShowAddonsWindowAfterDUU	= false;
 
 	void Initialize()
 	{
@@ -137,39 +138,24 @@ namespace GUI
 			{
 				if (uMsg == WM_KEYDOWN && wParam == VK_ESCAPE)
 				{
-					ImVector<ImGuiWindow*> windows = Renderer::GuiContext->Windows;
+					KeyLParam keylp = LParamToKMF(lParam);
 
-					for (int i = windows.Size - 1; i > 0; i--)
+					if (!keylp.PreviousKeyState)
 					{
-						if (strcmp(windows[i]->Name, "Menu") == 0 && Menu::Visible)
+						ImVector<ImGuiWindow*> windows = Renderer::GuiContext->Windows;
+
+						for (int i = windows.Size - 1; i > 0; i--)
 						{
-							Menu::Visible = false;
-							return 0;
-						}
-						else if (strcmp(windows[i]->Name, "Addons") == 0 && AddonsWindow->Visible)
-						{
-							AddonsWindow->Visible = false;
-							return 0;
-						}
-						else if (strcmp(windows[i]->Name, "Options") == 0 && OptionsWindow->Visible)
-						{
-							OptionsWindow->Visible = false;
-							return 0;
-						}
-						else if (strcmp(windows[i]->Name, "Log") == 0 && LogWindow->Visible)
-						{
-							LogWindow->Visible = false;
-							return 0;
-						}
-						else if (strcmp(windows[i]->Name, "Debug") == 0 && DebugWindow->Visible)
-						{
-							DebugWindow->Visible = false;
-							return 0;
-						}
-						else if (strcmp(windows[i]->Name, "About") == 0 && AboutWindow->Visible)
-						{
-							AboutWindow->Visible = false;
-							return 0;
+							std::string windowName = windows[i]->Name;
+
+							for (auto& [wndName, boolptr] : RegistryCloseOnEscape)
+							{
+								if (windowName == wndName && *boolptr)
+								{
+									*boolptr = false;
+									return 0;
+								}
+							}
 						}
 					}
 				}
@@ -285,12 +271,15 @@ namespace GUI
 	{
 		const std::lock_guard<std::mutex> lock(GUI::Mutex);
 
+		if (Language->Advance())
+		{
+			FontManager.Reload();
+		}
 		if (FontManager.Advance())
 		{
 			OnMumbleIdentityChanged(nullptr);
 			Shutdown();
 		}
-		Language->Advance();
 
 		/* pre-render callbacks */
 		for (GUI_RENDER callback : RegistryPreRender)
@@ -421,7 +410,69 @@ namespace GUI
 		}
 	}
 
-	void ProcessKeybind(const char* aIdentifier)
+	void StyleColorsRaidcoreNexus()
+	{
+		return;
+
+		ImGuiStyle* style = &ImGui::GetStyle();
+		ImVec4* colors = style->Colors;
+
+		colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+		colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+		colors[ImGuiCol_WindowBg] = ImVec4(0.06f, 0.06f, 0.06f, 0.94f);
+		colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+		colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
+		colors[ImGuiCol_Border] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
+		colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+		colors[ImGuiCol_FrameBg] = ImVec4(0.16f, 0.29f, 0.48f, 0.54f);
+		colors[ImGuiCol_FrameBgHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
+		colors[ImGuiCol_FrameBgActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
+		colors[ImGuiCol_TitleBg] = ImVec4(0.04f, 0.04f, 0.04f, 1.00f);
+		colors[ImGuiCol_TitleBgActive] = ImVec4(0.16f, 0.29f, 0.48f, 1.00f);
+		colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 0.51f);
+		colors[ImGuiCol_MenuBarBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+		colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
+		colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
+		colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
+		colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
+		colors[ImGuiCol_CheckMark] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+		colors[ImGuiCol_SliderGrab] = ImVec4(0.24f, 0.52f, 0.88f, 1.00f);
+		colors[ImGuiCol_SliderGrabActive] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+		colors[ImGuiCol_Button] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
+		colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+		colors[ImGuiCol_ButtonActive] = ImVec4(0.06f, 0.53f, 0.98f, 1.00f);
+		colors[ImGuiCol_Header] = ImVec4(0.26f, 0.59f, 0.98f, 0.31f);
+		colors[ImGuiCol_HeaderHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.80f);
+		colors[ImGuiCol_HeaderActive] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+		colors[ImGuiCol_Separator] = colors[ImGuiCol_Border];
+		colors[ImGuiCol_SeparatorHovered] = ImVec4(0.10f, 0.40f, 0.75f, 0.78f);
+		colors[ImGuiCol_SeparatorActive] = ImVec4(0.10f, 0.40f, 0.75f, 1.00f);
+		colors[ImGuiCol_ResizeGrip] = ImVec4(0.26f, 0.59f, 0.98f, 0.20f);
+		colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
+		colors[ImGuiCol_ResizeGripActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
+		colors[ImGuiCol_Tab] = ImLerp(colors[ImGuiCol_Header], colors[ImGuiCol_TitleBgActive], 0.80f);
+		colors[ImGuiCol_TabHovered] = colors[ImGuiCol_HeaderHovered];
+		colors[ImGuiCol_TabActive] = ImLerp(colors[ImGuiCol_HeaderActive], colors[ImGuiCol_TitleBgActive], 0.60f);
+		colors[ImGuiCol_TabUnfocused] = ImLerp(colors[ImGuiCol_Tab], colors[ImGuiCol_TitleBg], 0.80f);
+		colors[ImGuiCol_TabUnfocusedActive] = ImLerp(colors[ImGuiCol_TabActive], colors[ImGuiCol_TitleBg], 0.40f);
+		colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
+		colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
+		colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+		colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
+		colors[ImGuiCol_TableHeaderBg] = ImVec4(0.19f, 0.19f, 0.20f, 1.00f);
+		colors[ImGuiCol_TableBorderStrong] = ImVec4(0.31f, 0.31f, 0.35f, 1.00f);   // Prefer using Alpha=1.0 here
+		colors[ImGuiCol_TableBorderLight] = ImVec4(0.23f, 0.23f, 0.25f, 1.00f);   // Prefer using Alpha=1.0 here
+		colors[ImGuiCol_TableRowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+		colors[ImGuiCol_TableRowBgAlt] = ImVec4(1.00f, 1.00f, 1.00f, 0.06f);
+		colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
+		colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
+		colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+		colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
+		colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
+		colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+	}
+
+	void ProcessInputBind(const char* aIdentifier)
 	{
 		std::string str = aIdentifier;
 
@@ -545,12 +596,17 @@ namespace GUI
 		if (str == "USER_FONT")
 		{
 			UserFont = aFont;
+			if (UserFont)
+			{
+				ImGuiIO& io = ImGui::GetIO();
+				io.FontDefault = UserFont;
+			}
 		}
 		if (str == "FONT_DEFAULT")
 		{
 			MonospaceFont = aFont;
 
-			if (!HasCustomFont)
+			if (FontFile.empty())
 			{
 				UserFont = aFont;
 			}
@@ -573,12 +629,67 @@ namespace GUI
 		if (str == "TREBUCHET_XL")		{ FontIndex[EFont::Trebuchet_Larger] = aFont; }
 	}
 
+	void LoadFonts()
+	{
+		std::filesystem::path fontPath{};
+
+		/* add user font */
+		if (!FontFile.empty() && std::filesystem::exists(Index::D_GW2_ADDONS_NEXUS_FONTS / FontFile))
+		{
+			fontPath = Index::D_GW2_ADDONS_NEXUS_FONTS / FontFile;
+			FontManager.ReplaceFont("USER_FONT", FontSize, fontPath.string().c_str(), FontReceiver, nullptr);
+		}
+		else if (LinkArcDPSStyle && std::filesystem::exists(Index::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf"))
+		{
+			fontPath = Index::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf";
+			FontManager.ReplaceFont("USER_FONT", FontSize, fontPath.string().c_str(), FontReceiver, nullptr);
+		}
+
+		/* add default font for monospace */
+		FontManager.AddDefaultFont(FontReceiver);
+
+		ImFontConfig config;
+		config.MergeMode = true;
+
+		/* small UI*/
+		FontManager.ReplaceFont("MENOMONIA_S", 16.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
+		if (!fontPath.empty()) { FontManager.ReplaceFont("MENOMONIA_S_MERGE", 16.0f, fontPath.string().c_str(), FontReceiver, &config); }
+		FontManager.ReplaceFont("MENOMONIA_BIG_S", 22.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
+		if (!fontPath.empty()) { FontManager.ReplaceFont("MENOMONIA_BIG_S_MERGE", 22.0f, fontPath.string().c_str(), FontReceiver, &config); }
+		FontManager.ReplaceFont("TREBUCHET_S", 15.0f, RES_FONT_TREBUCHET, NexusHandle, FontReceiver, nullptr);
+		if (!fontPath.empty()) { FontManager.ReplaceFont("TREBUCHET_S_MERGE", 15.0f, fontPath.string().c_str(), FontReceiver, &config); }
+
+		/* normal UI*/
+		FontManager.ReplaceFont("MENOMONIA_N", 18.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
+		if (!fontPath.empty()) { FontManager.ReplaceFont("MENOMONIA_N_MERGE", 18.0f, fontPath.string().c_str(), FontReceiver, &config); }
+		FontManager.ReplaceFont("MENOMONIA_BIG_N", 24.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
+		if (!fontPath.empty()) { FontManager.ReplaceFont("MENOMONIA_BIG_N_MERGE", 24.0f, fontPath.string().c_str(), FontReceiver, &config); }
+		FontManager.ReplaceFont("TREBUCHET_N", 16.0f, RES_FONT_TREBUCHET, NexusHandle, FontReceiver, nullptr);
+		if (!fontPath.empty()) { FontManager.ReplaceFont("TREBUCHET_N_MERGE", 16.0f, fontPath.string().c_str(), FontReceiver, &config); }
+
+		/* large UI*/
+		FontManager.ReplaceFont("MENOMONIA_L", 20.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
+		if (!fontPath.empty()) { FontManager.ReplaceFont("MENOMONIA_L_MERGE", 20.0f, fontPath.string().c_str(), FontReceiver, &config); }
+		FontManager.ReplaceFont("MENOMONIA_BIG_L", 26.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
+		if (!fontPath.empty()) { FontManager.ReplaceFont("MENOMONIA_BIG_L_MERGE", 26.0f, fontPath.string().c_str(), FontReceiver, &config); }
+		FontManager.ReplaceFont("TREBUCHET_L", 17.5f, RES_FONT_TREBUCHET, NexusHandle, FontReceiver, nullptr);
+		if (!fontPath.empty()) { FontManager.ReplaceFont("TREBUCHET_L_MERGE", 17.5f, fontPath.string().c_str(), FontReceiver, &config); }
+
+		/* larger UI*/
+		FontManager.ReplaceFont("MENOMONIA_XL", 22.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
+		if (!fontPath.empty()) { FontManager.ReplaceFont("MENOMONIA_XL_MERGE", 22.0f, fontPath.string().c_str(), FontReceiver, &config); }
+		FontManager.ReplaceFont("MENOMONIA_BIG_XL", 28.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
+		if (!fontPath.empty()) { FontManager.ReplaceFont("MENOMONIA_BIG_XL_MERGE", 28.0f, fontPath.string().c_str(), FontReceiver, &config); }
+		FontManager.ReplaceFont("TREBUCHET_XL", 19.5f, RES_FONT_TREBUCHET, NexusHandle, FontReceiver, nullptr);
+		if (!fontPath.empty()) { FontManager.ReplaceFont("TREBUCHET_XL_MERGE", 19.5f, fontPath.string().c_str(), FontReceiver, &config); }
+	}
+
 	void Setup()
 	{
 		MumbleLink = (Mumble::Data*)DataLinkService->GetResource(DL_MUMBLE_LINK);
 		NexusLink = (NexusLinkData*)DataLinkService->GetResource(DL_NEXUS_LINK);
 
-		Language->SetLocaleDirectory(Index::D_GW2_ADDONS_RAIDCORE_LOCALES);
+		Language->SetLocaleDirectory(Index::D_GW2_ADDONS_NEXUS_LOCALES);
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_EN, RES_LOCALE_EN, "JSON");
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_DE, RES_LOCALE_DE, "JSON");
 		Resources::Unpack(NexusHandle, Index::F_LOCALE_FR, RES_LOCALE_FR, "JSON");
@@ -611,6 +722,20 @@ namespace GUI
 			else
 			{
 				NotifyChangelog = false;
+			}
+
+			if (!Settings::Settings[OPT_USERFONT].is_null())
+			{
+				Settings::Settings[OPT_USERFONT].get_to(FontFile);
+			}
+			else
+			{
+				FontFile = "font.ttf";
+			}
+
+			if (!std::filesystem::exists(Index::D_GW2_ADDONS_NEXUS_FONTS / FontFile))
+			{
+				FontFile = "";
 			}
 
 			if (!Settings::Settings[OPT_FONTSIZE].is_null())
@@ -649,7 +774,7 @@ namespace GUI
 			else
 			{
 				QuickAccess::Location = EQAPosition::Extend;
-				Settings::Settings[OPT_QALOCATION] = 0;
+				Settings::Settings[OPT_QALOCATION] = EQAPosition::Extend;
 			}
 
 			if (!Settings::Settings[OPT_QAOFFSETX].is_null() && !Settings::Settings[OPT_QAOFFSETY].is_null())
@@ -718,13 +843,21 @@ namespace GUI
 				Language->SetLanguage("en");
 			}
 
+			/* legacy quick access visibility */
 			if (!Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS].is_null())
 			{
-				Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS].get_to(QuickAccess::AlwaysShow);
+				/* delete legacy key */
+				Settings::Settings.erase(OPT_ALWAYSSHOWQUICKACCESS);
+			}
+
+			if (!Settings::Settings[OPT_QAVISIBILITY].is_null())
+			{
+				Settings::Settings[OPT_QAVISIBILITY].get_to(QuickAccess::Visibility);
 			}
 			else
 			{
-				Settings::Settings[OPT_ALWAYSSHOWQUICKACCESS] = false;
+				QuickAccess::Visibility = EQAVisibility::AlwaysShow;
+				Settings::Settings[OPT_QAVISIBILITY] = EQAVisibility::AlwaysShow;
 			}
 
 			ImGuiIO& io = ImGui::GetIO();
@@ -755,84 +888,10 @@ namespace GUI
 			Renderer::Scaling = LastScaling * io.FontGlobalScale;
 		}
 
+		StyleColorsRaidcoreNexus();
 		ImportArcDPSStyle();
 
-		std::filesystem::path fontPath{};
-
-		/* add user font */
-		if (!LinkArcDPSStyle && std::filesystem::exists(Index::F_FONT))
-		{
-			fontPath = Index::F_FONT;
-			FontManager.AddFont("USER_FONT", FontSize, fontPath.string().c_str(), FontReceiver, nullptr);
-			HasCustomFont = true;
-		}
-		else if (LinkArcDPSStyle && std::filesystem::exists(Index::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf"))
-		{
-			fontPath = Index::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf";
-			FontManager.AddFont("USER_FONT", FontSize, fontPath.string().c_str(), FontReceiver, nullptr);
-			HasCustomFont = true;
-		}
-		else
-		{
-			FontManager.AddDefaultFont(FontReceiver);
-		}
-
-		/* add default font for monospace */
-		FontManager.AddDefaultFont(FontReceiver);
-
-		/* load gw2 fonts */
-		/*LPVOID resM{}; DWORD szM{};
-		GetResource(NexusHandle, MAKEINTRESOURCE(RES_FONT_MENOMONIA), RT_FONT, &resM, &szM);
-
-		LPVOID resT{}; DWORD szT{};
-		GetResource(NexusHandle, MAKEINTRESOURCE(RES_FONT_TREBUCHET), RT_FONT, &resT, &szT);*/
-
-		{
-			const std::lock_guard<std::mutex> lock(Mutex);
-
-			ImFontConfig config;
-			config.MergeMode = true;
-			
-			/* small UI*/
-			FontManager.AddFont("MENOMONIA_S", 16.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
-			if (!fontPath.empty()) { FontManager.AddFont("MENOMONIA_S_MERGE", 16.0f, fontPath.string().c_str(), FontReceiver, &config); }
-			FontManager.AddFont("MENOMONIA_BIG_S", 22.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
-			if (!fontPath.empty()) { FontManager.AddFont("MENOMONIA_BIG_S_MERGE", 22.0f, fontPath.string().c_str(), FontReceiver, &config); }
-			FontManager.AddFont("TREBUCHET_S", 15.0f, RES_FONT_TREBUCHET, NexusHandle, FontReceiver, nullptr);
-			if (!fontPath.empty()) { FontManager.AddFont("TREBUCHET_S_MERGE", 15.0f, fontPath.string().c_str(), FontReceiver, &config); }
-
-			/* normal UI*/
-			FontManager.AddFont("MENOMONIA_N", 18.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
-			if (!fontPath.empty()) { FontManager.AddFont("MENOMONIA_N_MERGE", 18.0f, fontPath.string().c_str(), FontReceiver, &config); }
-			FontManager.AddFont("MENOMONIA_BIG_N", 24.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
-			if (!fontPath.empty()) { FontManager.AddFont("MENOMONIA_BIG_N_MERGE", 24.0f, fontPath.string().c_str(), FontReceiver, &config); }
-			FontManager.AddFont("TREBUCHET_N", 16.0f, RES_FONT_TREBUCHET, NexusHandle, FontReceiver, nullptr);
-			if (!fontPath.empty()) { FontManager.AddFont("TREBUCHET_N_MERGE", 16.0f, fontPath.string().c_str(), FontReceiver, &config); }
-
-			/* large UI*/
-			FontManager.AddFont("MENOMONIA_L", 20.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
-			if (!fontPath.empty()) { FontManager.AddFont("MENOMONIA_L_MERGE", 20.0f, fontPath.string().c_str(), FontReceiver, &config); }
-			FontManager.AddFont("MENOMONIA_BIG_L", 26.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
-			if (!fontPath.empty()) { FontManager.AddFont("MENOMONIA_BIG_L_MERGE", 26.0f, fontPath.string().c_str(), FontReceiver, &config); }
-			FontManager.AddFont("TREBUCHET_L", 17.5f, RES_FONT_TREBUCHET, NexusHandle, FontReceiver, nullptr);
-			if (!fontPath.empty()) { FontManager.AddFont("TREBUCHET_L_MERGE", 17.5f, fontPath.string().c_str(), FontReceiver, &config); }
-
-			/* larger UI*/
-			FontManager.AddFont("MENOMONIA_XL", 22.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
-			if (!fontPath.empty()) { FontManager.AddFont("MENOMONIA_XL_MERGE", 22.0f, fontPath.string().c_str(), FontReceiver, &config); }
-			FontManager.AddFont("MENOMONIA_BIG_XL", 28.0f, RES_FONT_MENOMONIA, NexusHandle, FontReceiver, nullptr);
-			if (!fontPath.empty()) { FontManager.AddFont("MENOMONIA_BIG_XL_MERGE", 28.0f, fontPath.string().c_str(), FontReceiver, &config); }
-			FontManager.AddFont("TREBUCHET_XL", 19.5f, RES_FONT_TREBUCHET, NexusHandle, FontReceiver, nullptr);
-			if (!fontPath.empty()) { FontManager.AddFont("TREBUCHET_XL_MERGE", 19.5f, fontPath.string().c_str(), FontReceiver, &config); }
-		}
-
-		/*io.Fonts->Build();
-
-		io.Fonts->Clear(); // this probably leaks memory. oops.
-		io.Fonts->AddFontDefault();
-		io.Fonts->AddFontFromFileTTF("C:\\Program Files\\Guild Wars 2\\addons\\arcdps\\menomonia.ttf", 19.5f);
-		io.Fonts->AddFontFromFileTTF("C:\\Program Files\\Guild Wars 2\\addons\\arcdps\\segoeui.ttf", 19.5f);
-		io.Fonts->AddFontFromFileTTF("C:\\Program Files\\Guild Wars 2\\addons\\arcdps\\trugen.ttf", 19.5f);*/
+		LoadFonts();
 
 		EventApi->Subscribe(EV_MUMBLE_IDENTITY_UPDATED, OnMumbleIdentityChanged, true);
 		EventApi->Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", OnLanguageChanged, true);
@@ -847,12 +906,7 @@ namespace GUI
 
 		Logger->RegisterLogger(GUI::LogWindow);
 
-		KeybindApi->Register(KB_ADDONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
-		KeybindApi->Register(KB_OPTIONS, EKBHType::DownOnly, ProcessKeybind, "(null)");
-		KeybindApi->Register(KB_LOG, EKBHType::DownOnly, ProcessKeybind, "(null)");
-		KeybindApi->Register(KB_DEBUG, EKBHType::DownOnly, ProcessKeybind, "(null)");
-		KeybindApi->Register(KB_MUMBLEOVERLAY, EKBHType::DownOnly, ProcessKeybind, "(null)");
-
+		/* add menu items */
 		Menu::AddMenuItem("((000083))",		ICON_RETURN,	RES_ICON_RETURN,	&Menu::Visible);
 		Menu::AddMenuItem("((000003))",		ICON_ADDONS,	RES_ICON_ADDONS,	&AddonsWindow->Visible);
 		Menu::AddMenuItem("((000004))",		ICON_OPTIONS,	RES_ICON_OPTIONS,	&OptionsWindow->Visible);
@@ -863,9 +917,24 @@ namespace GUI
 		}
 		Menu::AddMenuItem("((000008))",		ICON_ABOUT,		RES_ICON_ABOUT,		&AboutWindow->Visible);
 
-		/* register keybinds */
-		KeybindApi->Register(KB_MENU, EKBHType::DownOnly, ProcessKeybind, "CTRL+O");
-		KeybindApi->Register(KB_TOGGLEHIDEUI, EKBHType::DownOnly, ProcessKeybind, "CTRL+H");
+		/* register close on escape */
+		RegisterCloseOnEscape("Menu", &Menu::Visible);
+		RegisterCloseOnEscape("Addons", &AddonsWindow->Visible);
+		RegisterCloseOnEscape("Options", &OptionsWindow->Visible);
+		RegisterCloseOnEscape("Log", &LogWindow->Visible);
+		RegisterCloseOnEscape("Debug", &DebugWindow->Visible);
+		RegisterCloseOnEscape("Dear ImGui Metrics/Debugger", &DebugWindow->IsMetricsWindowVisible);
+		RegisterCloseOnEscape("Memory Viewer", &DebugWindow->MemoryViewer.Open);
+		RegisterCloseOnEscape("About", &AboutWindow->Visible);
+		
+		/* register InputBinds */
+		InputBindApi->Register(KB_MENU, EIBHType::DownOnly, ProcessInputBind, "CTRL+O");
+		InputBindApi->Register(KB_ADDONS, EIBHType::DownOnly, ProcessInputBind, "(null)");
+		InputBindApi->Register(KB_OPTIONS, EIBHType::DownOnly, ProcessInputBind, "(null)");
+		InputBindApi->Register(KB_LOG, EIBHType::DownOnly, ProcessInputBind, "(null)");
+		InputBindApi->Register(KB_DEBUG, EIBHType::DownOnly, ProcessInputBind, "(null)");
+		InputBindApi->Register(KB_MUMBLEOVERLAY, EIBHType::DownOnly, ProcessInputBind, "(null)");
+		InputBindApi->Register(KB_TOGGLEHIDEUI, EIBHType::DownOnly, ProcessInputBind, "CTRL+H");
 
 		/* load icons */
 		int month = Time::GetMonth();
@@ -890,7 +959,7 @@ namespace GUI
 		TextureService->Load(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, NexusHandle, nullptr);
 
 		/* add shortcut */
-		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, Language->Translate("((000009))"));
+		QuickAccess::AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "((000009))");
 
 		if (IsUpdateAvailable && NotifyChangelog)
 		{
@@ -907,6 +976,8 @@ namespace GUI
 
 	void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback)
 	{
+		if (!aRenderCallback) { return; }
+
 		const std::lock_guard<std::mutex> lock(Mutex);
 
 		switch (aRenderType)
@@ -933,6 +1004,19 @@ namespace GUI
 		RegistryRender.erase(std::remove(RegistryRender.begin(), RegistryRender.end(), aRenderCallback), RegistryRender.end());
 		RegistryPostRender.erase(std::remove(RegistryPostRender.begin(), RegistryPostRender.end(), aRenderCallback), RegistryPostRender.end());
 		RegistryOptionsRender.erase(std::remove(RegistryOptionsRender.begin(), RegistryOptionsRender.end(), aRenderCallback), RegistryOptionsRender.end());
+	}
+
+	void RegisterCloseOnEscape(const char* aWindowName, bool* aIsVisible)
+	{
+		const std::lock_guard<std::mutex> lock(Mutex);
+
+		RegistryCloseOnEscape[aWindowName] = aIsVisible;
+	}
+	void DeregisterCloseOnEscape(const char* aWindowName)
+	{
+		const std::lock_guard<std::mutex> lock(Mutex);
+
+		RegistryCloseOnEscape.erase(aWindowName);
 	}
 
 	int Verify(void* aStartAddress, void* aEndAddress)
@@ -967,8 +1051,16 @@ namespace GUI
 		for (GUI_RENDER renderCb : RegistryOptionsRender)
 		{
 			if (renderCb >= aStartAddress && renderCb <= aEndAddress)
-				{
+			{
 				RegistryOptionsRender.erase(std::remove(RegistryOptionsRender.begin(), RegistryOptionsRender.end(), renderCb), RegistryOptionsRender.end());
+				refCounter++;
+			}
+		}
+		for (auto& [windowname, boolptr] : RegistryCloseOnEscape)
+		{
+			if (boolptr >= aStartAddress && boolptr <= aEndAddress)
+			{
+				RegistryCloseOnEscape.erase(windowname);
 				refCounter++;
 			}
 		}

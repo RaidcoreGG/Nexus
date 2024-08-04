@@ -2,23 +2,32 @@
 #define QUICKACCESS_SHORTCUT_H
 
 #include <string>
+#include <map>
 
 #include "Services/Textures/Texture.h"
+#include "GUI/FuncDefs.h"
 
 namespace GUI
 {
+	struct SimpleShortcut
+	{
+		std::string TargetShortcut;
+		GUI_RENDER Callback;
+	};
+
 	struct Shortcut
 	{
-		int						TextureGetAttempts;
-		std::string				TextureNormalIdentifier;
-		std::string				TextureHoverIdentifier;
+		int											TextureGetAttempts;
+		std::string									TextureNormalIdentifier;
+		std::string									TextureHoverIdentifier;
 
-		Texture*				TextureNormal;
-		Texture*				TextureHover;
-		std::string				Keybind;
-		std::string				TooltipText;
-		bool					IsHovering;
-		bool					HasNotification;
+		Texture*									TextureNormal;
+		Texture*									TextureHover;
+		std::string									InputBind;
+		std::string									TooltipText;
+		bool										IsHovering;
+		bool										HasNotification;
+		std::map<std::string, SimpleShortcut>		ContextItems;
 	};
 }
 

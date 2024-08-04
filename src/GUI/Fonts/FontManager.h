@@ -46,6 +46,12 @@ namespace FontManager
 	void ADDONAPI_Get(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback);
 
 	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_Get2:
+	/// 	Addon API wrapper to get a font sent to the callback.
+	///----------------------------------------------------------------------------------------------------
+	ImFont* ADDONAPI_Get2(const char* aIdentifier);
+
+	///----------------------------------------------------------------------------------------------------
 	/// ADDONAPI_Release:
 	/// 	Addon API wrapper to release a receiver/callback from a specific font.
 	///----------------------------------------------------------------------------------------------------
@@ -68,6 +74,12 @@ namespace FontManager
 	/// 	Addon API wrapper to add a font from memory.
 	///----------------------------------------------------------------------------------------------------
 	void ADDONAPI_AddFontFromMemory(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ADDONAPI_ResizeFont:
+	/// 	Changes the size of a given font.
+	///----------------------------------------------------------------------------------------------------
+	void ADDONAPI_ResizeFont(const char* aIdentifier, float aFontSize);
 }
 
 ///----------------------------------------------------------------------------------------------------
@@ -83,6 +95,12 @@ public:
 	static CFontManager& GetInstance();
 
 	///----------------------------------------------------------------------------------------------------
+	/// Reload:
+	/// 	Forces the font atlas to rebuild.
+	///----------------------------------------------------------------------------------------------------
+	void Reload();
+
+	///----------------------------------------------------------------------------------------------------
 	/// Advance:
 	/// 	Processes fonts and notifies callbacks.
 	///----------------------------------------------------------------------------------------------------
@@ -90,9 +108,9 @@ public:
 
 	///----------------------------------------------------------------------------------------------------
 	/// Get:
-	/// 	Requests a font to be sent to the given callback/receiver.
+	/// 	Returns a font if it exists or nullptr.
 	///----------------------------------------------------------------------------------------------------
-	void Get(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback);
+	ManagedFont* Get(const char* aIdentifier);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Release:
@@ -119,10 +137,34 @@ public:
 	void AddFont(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
 
 	///----------------------------------------------------------------------------------------------------
+	/// ReplaceFont:
+	/// 	Replaces a font from disk and sends updates to the callback.
+	///----------------------------------------------------------------------------------------------------
+	void ReplaceFont(const char* aIdentifier, float aFontSize, const char* aFilename, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ReplaceFont:
+	/// 	Replaces a font from an embedded resource and sends updates to the callback.
+	///----------------------------------------------------------------------------------------------------
+	void ReplaceFont(const char* aIdentifier, float aFontSize, unsigned aResourceID, HMODULE aModule, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ReplaceFont:
+	/// 	Replaces a font from memory and sends updates to the callback.
+	///----------------------------------------------------------------------------------------------------
+	void ReplaceFont(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
+
+	///----------------------------------------------------------------------------------------------------
 	/// AddDefaultFont:
 	/// 	Adds a the default ImGui font.
 	///----------------------------------------------------------------------------------------------------
 	void AddDefaultFont(FONTS_RECEIVECALLBACK aCallback = nullptr);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ResizeFont:
+	/// 	Changes the size of a given font.
+	///----------------------------------------------------------------------------------------------------
+	void ResizeFont(const char* aIdentifier, float aFontSize);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Verify:
@@ -159,6 +201,12 @@ private:
 	/// 	aNotifyNull will send a nullptr, effectively "clearing" the subscriber.
 	///----------------------------------------------------------------------------------------------------
 	void NotifyCallbacks(bool aNotifyNull = false);
+
+	///----------------------------------------------------------------------------------------------------
+	/// CreateManagedFont:
+	/// 	Creates a new ManagedFont for the Registry.
+	///----------------------------------------------------------------------------------------------------
+	ManagedFont CreateManagedFont(std::string aIdentifier, float aFontSize, void* aData, size_t aSize, ImFontConfig* aConfig);
 };
 
 #endif

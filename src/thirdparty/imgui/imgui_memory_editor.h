@@ -241,7 +241,7 @@ namespace ImGui
 
             bool data_next = false;
 
-            if (ReadOnly || DataEditingAddr >= mem_size)
+            if (DataEditingAddr >= mem_size)
                 DataEditingAddr = (size_t)-1;
             if (DataPreviewAddr >= mem_size)
                 DataPreviewAddr = (size_t)-1;
@@ -340,7 +340,7 @@ namespace ImGui
                             UserData user_data;
                             user_data.CursorPos = -1;
                             sprintf(user_data.CurrentBufOverwrite, format_byte, ReadFn ? ReadFn(mem_data, addr) : mem_data[addr]);
-                            ImGuiInputTextFlags flags = ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_NoHorizontalScroll | ImGuiInputTextFlags_CallbackAlways;
+                            ImGuiInputTextFlags flags = ReadOnly ? ImGuiInputTextFlags_ReadOnly : 0 | ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_NoHorizontalScroll | ImGuiInputTextFlags_CallbackAlways;
 #if IMGUI_VERSION_NUM >= 18104
                             flags |= ImGuiInputTextFlags_AlwaysOverwrite;
 #else
@@ -357,7 +357,7 @@ namespace ImGui
                             if (data_editing_addr_next != (size_t)-1)
                                 data_write = data_next = false;
                             unsigned int data_input_value = 0;
-                            if (data_write && sscanf(DataInputBuf, "%X", &data_input_value) == 1)
+                            if (!ReadOnly && data_write && sscanf(DataInputBuf, "%X", &data_input_value) == 1)
                             {
                                 if (WriteFn)
                                     WriteFn(mem_data, addr, (ImU8)data_input_value);
@@ -389,7 +389,7 @@ namespace ImGui
                                 else
                                     ImGui::Text(format_byte_space, b);
                             }
-                            if (!ReadOnly && ImGui::IsItemHovered() && ImGui::IsMouseClicked(0))
+                            if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0))
                             {
                                 DataEditingTakeFocus = true;
                                 data_editing_addr_next = addr;

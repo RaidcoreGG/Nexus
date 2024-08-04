@@ -37,11 +37,14 @@ CLocalization::~CLocalization()
 	this->ClearLocaleAtlas();
 }
 
-void CLocalization::Advance()
+bool CLocalization::Advance()
 {
+	bool didModify = false;
+
 	if (!this->IsLocaleAtlasBuilt)
 	{
 		BuildLocaleAtlas();
+		didModify = true;
 	}
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
@@ -58,7 +61,11 @@ void CLocalization::Advance()
 		}
 
 		this->Queued.erase(this->Queued.begin());
+
+		didModify = true;
 	}
+
+	return didModify;
 }
 
 const char* CLocalization::Translate(const char* aIdentifier, const char* aLanguageIdentifier)
@@ -270,6 +277,7 @@ void CLocalization::BuildLocaleAtlas()
 	}
 
 	this->IsLocaleAtlasBuilt = true;
+
 	if (this->ActiveLocale)
 	{
 		this->SetLanguage(this->ActiveLocale->DisplayName);
@@ -295,4 +303,19 @@ void CLocalization::ClearLocaleAtlas()
 	}
 
 	this->IsLocaleAtlasBuilt = false;
+}
+
+std::vector<const char*> CLocalization::GetAllTexts()
+{
+	std::vector<const char*> allTexts;
+
+	for (auto& [atlasId, atlasLocale] : this->LocaleAtlas)
+	{
+		for (auto& [textId, textVal] : atlasLocale.Texts)
+		{
+			allTexts.push_back(textVal);
+		}
+	}
+
+	return allTexts;
 }

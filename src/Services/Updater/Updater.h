@@ -70,7 +70,7 @@ public:
 	/// UpdateAddon:
 	/// 	Checks for an update for an addon.
 	///----------------------------------------------------------------------------------------------------
-	bool UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonInfo, bool aIgnoreTagFormat = false);
+	bool UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonInfo, bool aIgnoreTagFormat = false, int aCacheLifetimeOverride = -1);
 
 	///----------------------------------------------------------------------------------------------------
 	/// InstallAddon:
@@ -84,13 +84,13 @@ private:
 	/// UpdateRaidcore:
 	/// 	Downloads the latest addon available at the remote, if it's newer than current.
 	///----------------------------------------------------------------------------------------------------
-	bool UpdateRaidcore(void);
+	bool UpdateRaidcore(int aCacheLifetimeOverride = -1);
 
 	///----------------------------------------------------------------------------------------------------
 	/// UpdateGitHub:
 	/// 	Downloads the latest addon available at the remote, if it's newer than current.
 	///----------------------------------------------------------------------------------------------------
-	bool UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& aEndpoint, AddonVersion aCurrentVersion, bool aAllowPrereleases, bool aIgnoreTagFormat = false);
+	bool UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& aEndpoint, AddonVersion aCurrentVersion, bool aAllowPrereleases, bool aIgnoreTagFormat = false, int aCacheLifetimeOverride = -1);
 
 	///----------------------------------------------------------------------------------------------------
 	/// UpdateDirect:

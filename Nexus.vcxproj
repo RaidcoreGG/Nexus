@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Inputs\GameBinds\GameBindsHandler.cpp" />
+    <ClCompile Include="src\Loader\AddonVersion.cpp" />
     <ClCompile Include="src\Services\API\ActiveToken.cpp" />
     <ClCompile Include="src\Services\API\ApiClient.cpp" />
     <ClCompile Include="src\Services\API\APIController.cpp" />
@@ -46,8 +47,8 @@
     <ClCompile Include="src\thirdparty\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\Inputs\Keybinds\Keybind.cpp" />
-    <ClCompile Include="src\Inputs\Keybinds\KeybindHandler.cpp" />
+    <ClCompile Include="src\Inputs\InputBinds\InputBind.cpp" />
+    <ClCompile Include="src\Inputs\InputBinds\InputBindHandler.cpp" />
     <ClCompile Include="src\Loader\AddonDefinition.cpp" />
     <ClCompile Include="src\Loader\EAddonFlags.cpp" />
     <ClCompile Include="src\Loader\Loader.cpp" />
@@ -74,6 +75,7 @@
     <ClCompile Include="src\Util\DLL.cpp" />
     <ClCompile Include="src\Util\Inputs.cpp" />
     <ClCompile Include="src\Util\MD5.cpp" />
+    <ClCompile Include="src\Util\Memory.cpp" />
     <ClCompile Include="src\Util\Paths.cpp" />
     <ClCompile Include="src\Util\Resources.cpp" />
     <ClCompile Include="src\Util\Strings.cpp" />
@@ -82,8 +84,13 @@
     <ClCompile Include="src\Inputs\RawInput\RawInputApi.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\GUI\Widgets\QuickAccess\EQAVisibility.h" />
     <ClInclude Include="src\Inputs\GameBinds\EGameBinds.h" />
+    <ClInclude Include="src\Inputs\GameBinds\FuncDefs.h" />
     <ClInclude Include="src\Inputs\GameBinds\GameBindsHandler.h" />
+    <ClInclude Include="src\Inputs\InputBinds\EInputBindHandlerType.h" />
+    <ClInclude Include="src\Inputs\InputBinds\EInputBindType.h" />
+    <ClInclude Include="src\Loader\AddonVersion.h" />
     <ClInclude Include="src\Services\API\ApiClient.h" />
     <ClInclude Include="src\Services\API\APIController.h" />
     <ClInclude Include="src\Services\API\ActiveToken.h" />
@@ -134,10 +141,10 @@
     <ClInclude Include="src\thirdparty\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\thirdparty\imgui\imstb_textedit.h" />
     <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h" />
-    <ClInclude Include="src\Inputs\Keybinds\ActiveKeybind.h" />
-    <ClInclude Include="src\Inputs\Keybinds\FuncDefs.h" />
-    <ClInclude Include="src\Inputs\Keybinds\Keybind.h" />
-    <ClInclude Include="src\Inputs\Keybinds\KeybindHandler.h" />
+    <ClInclude Include="src\Inputs\InputBinds\ManagedInputBind.h" />
+    <ClInclude Include="src\Inputs\InputBinds\FuncDefs.h" />
+    <ClInclude Include="src\Inputs\InputBinds\InputBind.h" />
+    <ClInclude Include="src\Inputs\InputBinds\InputBindHandler.h" />
     <ClInclude Include="src\Loader\Addon.h" />
     <ClInclude Include="src\Loader\ArcDPS.h" />
     <ClInclude Include="src\Loader\EAddonFlags.h" />
@@ -325,6 +332,7 @@
     <ClInclude Include="src\Util\DLL.h" />
     <ClInclude Include="src\Util\Inputs.h" />
     <ClInclude Include="src\Util\MD5.h" />
+    <ClInclude Include="src\Util\Memory.h" />
     <ClInclude Include="src\Util\Paths.h" />
     <ClInclude Include="src\Util\Resources.h" />
     <ClInclude Include="src\Util\Strings.h" />
@@ -341,10 +349,12 @@
     <None Include="src\exports.def" />
     <None Include="src\Resources\bin64\arcdps_integration64.dll" />
     <None Include="src\Resources\Locales\br_Main.json" />
+    <None Include="src\Resources\Locales\cn_Main.json" />
     <None Include="src\Resources\Locales\cz_Main.json" />
     <None Include="src\Resources\Locales\de_Main.json" />
     <None Include="src\Resources\Locales\en_Main.json" />
     <None Include="src\Resources\Locales\es_Main.json" />
+    <None Include="src\Resources\Locales\fr_Main.json" />
     <None Include="src\Resources\Locales\it_Main.json" />
     <None Include="src\Resources\Locales\pl_Main.json" />
     <None Include="src\Resources\Locales\ru_Main.json" />

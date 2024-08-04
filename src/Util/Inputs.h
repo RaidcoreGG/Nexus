@@ -11,6 +11,16 @@
 
 #include <Windows.h>
 
+enum class EMouseButtons
+{
+	None,
+	LMB,
+	RMB,
+	MMB,
+	M4,
+	M5
+};
+
 ///----------------------------------------------------------------------------------------------------
 /// KeystrokeMessageFlags/KeyLParam struct
 ///----------------------------------------------------------------------------------------------------
@@ -51,5 +61,11 @@ LPARAM& KMFToLParam(KeystrokeMessageFlags& aKmf);
 /// 	Creates an LPARAM for key messages.
 ///----------------------------------------------------------------------------------------------------
 LPARAM GetKeyMessageLPARAM(unsigned aVKey, bool aIsDown, bool aIsSystem);
+
+///----------------------------------------------------------------------------------------------------
+/// GetMouseMessageWPARAM:
+/// 	Creates an WPARAM for mouse messages.
+///----------------------------------------------------------------------------------------------------
+WPARAM GetMouseMessageWPARAM(EMouseButtons aMouseButton, bool aIsCtrl, bool aIsShift, bool aIsDown);
 
 #endif

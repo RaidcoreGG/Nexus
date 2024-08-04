@@ -48,6 +48,10 @@ namespace ArcDPS
 				{
 					newAddon->ToSComplianceNotice = addon["tos_compliance"];
 				}
+				if (addon.contains("addon_policy_tier") && !addon["addon_policy_tier"].is_null())
+				{
+					newAddon->PolicyTier = addon["addon_policy_tier"];
+				}
 
 				PluginLibrary.push_back(newAddon);
 			}

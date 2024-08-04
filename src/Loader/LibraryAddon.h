@@ -14,6 +14,7 @@ struct LibraryAddon
 	EUpdateProvider	Provider;
 	std::string		DownloadURL;
 	std::string		ToSComplianceNotice;
+	int				PolicyTier;
 	bool			IsNew;
 
 	bool			IsInstalling = false;

@@ -6,6 +6,8 @@
 #include "GUI/IWindow.h"
 #include "GUI/Widgets/Overlay/CMumbleOverlay.h"
 
+#include "imgui/imgui_memory_editor.h"
+
 namespace GUI
 {
 	class CDebugWindow : public IWindow
@@ -17,6 +19,18 @@ namespace GUI
 		void Render();
 
 		CMumbleOverlay* MumbleWindow;
+		ImGui::MemoryEditor MemoryViewer;
+		bool IsMetricsWindowVisible;
+
+		private:
+		void DbgEventsTab();
+		void DbgInputBindsTab();
+		void DbgDataLinkTab();
+		void DbgTexturesTab();
+		void DbgShortcutsTab();
+		void DbgLoaderTab();
+		void DbgAPITab();
+		void DbgFontsTab();
 	};
 }
 

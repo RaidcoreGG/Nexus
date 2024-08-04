@@ -24,6 +24,7 @@ extern const char* OPT_CLOSEESCAPE;
 extern const char* OPT_LASTUISCALE;
 extern const char* OPT_FONTSIZE;
 extern const char* OPT_QAVERTICAL;
+extern const char* OPT_QAVISIBILITY;
 extern const char* OPT_QALOCATION;
 extern const char* OPT_QAOFFSETX;
 extern const char* OPT_QAOFFSETY;
@@ -34,6 +35,7 @@ extern const char* OPT_LANGUAGE;
 extern const char* OPT_ALWAYSSHOWQUICKACCESS;
 extern const char* OPT_GLOBALSCALE;
 extern const char* OPT_SHOWADDONSWINDOWAFTERDUU;
+extern const char* OPT_USERFONT;
 
 ///----------------------------------------------------------------------------------------------------
 /// Settings Namespace

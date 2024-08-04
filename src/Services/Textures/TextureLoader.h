@@ -137,25 +137,25 @@ public:
 	/// Load:
 	/// 	Requests to load a texture from file and returns to the given callback.
 	///----------------------------------------------------------------------------------------------------
-	void Load(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback);
+	void Load(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback, bool aIsShadowing = false);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Load:
 	/// 	Requests to load a texture from an embedded resource and returns to the given callback.
 	///----------------------------------------------------------------------------------------------------
-	void Load(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback);
+	void Load(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback, bool aIsShadowing = false);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Load:
 	/// 	Requests to load a texture from remote URL and returns to the given callback.
 	///----------------------------------------------------------------------------------------------------
-	void Load(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback);
+	void Load(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback, bool aIsShadowing = false);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Load:
 	/// 	Requests to load a texture from memory and returns to the given callback.
 	///----------------------------------------------------------------------------------------------------
-	void Load(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback);
+	void Load(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback, bool aIsShadowing = false);
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetRegistry:

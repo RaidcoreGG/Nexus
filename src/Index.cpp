@@ -19,7 +19,8 @@ namespace Index
 	std::filesystem::path D_GW2_ADDONS_COMMON_API_RAIDCORE{};
 	std::filesystem::path D_GW2_ADDONS_COMMON_API_GITHUB{};
 	std::filesystem::path D_GW2_ADDONS_NEXUS{};
-	std::filesystem::path D_GW2_ADDONS_RAIDCORE_LOCALES{};
+	std::filesystem::path D_GW2_ADDONS_NEXUS_FONTS{};
+	std::filesystem::path D_GW2_ADDONS_NEXUS_LOCALES{};
 
 	std::filesystem::path F_HOST_DLL{};
 	std::filesystem::path F_UPDATE_DLL{};
@@ -29,9 +30,8 @@ namespace Index
 	std::filesystem::path F_ARCDPSINTEGRATION{};
 
 	std::filesystem::path F_LOG{};
-	std::filesystem::path F_KEYBINDS{};
+	std::filesystem::path F_INPUTBINDS{};
 	std::filesystem::path F_GAMEBINDS{};
-	std::filesystem::path F_FONT{};
 	std::filesystem::path F_SETTINGS{};
 	std::filesystem::path F_ADDONCONFIG{};
 	std::filesystem::path F_APIKEYS{};
@@ -62,20 +62,21 @@ namespace Index
 		D_GW2_ADDONS_COMMON_API_RAIDCORE = D_GW2_ADDONS_COMMON / "api.raidcore.gg";		/* get addons/common/api.raidcore.gg path */
 		D_GW2_ADDONS_COMMON_API_GITHUB = D_GW2_ADDONS_COMMON / "api.github.com";		/* get addons/common/api.github.com path */
 		D_GW2_ADDONS_NEXUS = D_GW2_ADDONS / "Nexus";									/* get addons/Nexus path */
-		D_GW2_ADDONS_RAIDCORE_LOCALES = D_GW2_ADDONS_NEXUS / "Locales";					/* get addons/Nexus/Locales path */
+		D_GW2_ADDONS_NEXUS_FONTS = D_GW2_ADDONS_NEXUS / "Fonts";						/* get addons/Nexus/Fonts path */
+		D_GW2_ADDONS_NEXUS_LOCALES = D_GW2_ADDONS_NEXUS / "Locales";					/* get addons/Nexus/Locales path */
 
 		/* ensure folder tree*/
 		Path::CreateDir(D_GW2_ADDONS);
 		Path::CreateDir(D_GW2_ADDONS);													/* ensure addons dir */
 		Path::CreateDir(D_GW2_ADDONS_COMMON);											/* ensure addons/common dir */
 		Path::CreateDir(D_GW2_ADDONS_NEXUS);											/* ensure addons/Nexus dir */
-		Path::CreateDir(D_GW2_ADDONS_RAIDCORE_LOCALES);									/* ensure addons/Nexus/Locales dir */
+		Path::CreateDir(D_GW2_ADDONS_NEXUS_FONTS);										/* ensure addons/Nexus/Fonts dir */
+		Path::CreateDir(D_GW2_ADDONS_NEXUS_LOCALES);									/* ensure addons/Nexus/Locales dir */
 
 		/* files */
 		F_LOG = D_GW2_ADDONS_NEXUS / "Nexus.log";										/* get log path */
-		F_KEYBINDS = D_GW2_ADDONS_NEXUS / "Keybinds.json";								/* get keybinds path */
+		F_INPUTBINDS = D_GW2_ADDONS_NEXUS / "InputBinds.json";							/* get inputbinds path */
 		F_GAMEBINDS = D_GW2_ADDONS_NEXUS / "GameBinds.json";							/* get gamebinds path */
-		F_FONT = D_GW2_ADDONS_NEXUS / "Font.ttf";										/* get font path */
 		F_SETTINGS = D_GW2_ADDONS_NEXUS / "Settings.json";								/* get settings path */
 		F_ADDONCONFIG = D_GW2_ADDONS_NEXUS / "AddonConfig.json";						/* get addon config path */
 		F_APIKEYS = D_GW2_ADDONS_COMMON / "APIKeys.json";								/* get apikeys path */
@@ -87,23 +88,60 @@ namespace Index
 		F_CHAINLOAD_DLL = D_GW2 / "d3d11_chainload.dll";								/* get chainload dll path */
 		F_ARCDPSINTEGRATION = D_GW2_ADDONS_NEXUS / "arcdps_integration64.dll";			/* get arcdps integration dll path */
 
-		F_LOCALE_EN = D_GW2_ADDONS_RAIDCORE_LOCALES / "en_Main.json";
-		F_LOCALE_DE = D_GW2_ADDONS_RAIDCORE_LOCALES / "de_Main.json";
-		F_LOCALE_FR = D_GW2_ADDONS_RAIDCORE_LOCALES / "fr_Main.json";
-		F_LOCALE_ES = D_GW2_ADDONS_RAIDCORE_LOCALES / "es_Main.json";
+		F_LOCALE_EN = D_GW2_ADDONS_NEXUS_LOCALES / "en_Main.json";
+		F_LOCALE_DE = D_GW2_ADDONS_NEXUS_LOCALES / "de_Main.json";
+		F_LOCALE_FR = D_GW2_ADDONS_NEXUS_LOCALES / "fr_Main.json";
+		F_LOCALE_ES = D_GW2_ADDONS_NEXUS_LOCALES / "es_Main.json";
 
-		F_LOCALE_BR = D_GW2_ADDONS_RAIDCORE_LOCALES / "br_Main.json";
-		F_LOCALE_CZ = D_GW2_ADDONS_RAIDCORE_LOCALES / "cz_Main.json";
-		F_LOCALE_IT = D_GW2_ADDONS_RAIDCORE_LOCALES / "it_Main.json";
-		F_LOCALE_PL = D_GW2_ADDONS_RAIDCORE_LOCALES / "pl_Main.json";
-		F_LOCALE_RU = D_GW2_ADDONS_RAIDCORE_LOCALES / "ru_Main.json";
-		F_LOCALE_CN = D_GW2_ADDONS_RAIDCORE_LOCALES / "cn_Main.json";
+		F_LOCALE_BR = D_GW2_ADDONS_NEXUS_LOCALES / "br_Main.json";
+		F_LOCALE_CZ = D_GW2_ADDONS_NEXUS_LOCALES / "cz_Main.json";
+		F_LOCALE_IT = D_GW2_ADDONS_NEXUS_LOCALES / "it_Main.json";
+		F_LOCALE_PL = D_GW2_ADDONS_NEXUS_LOCALES / "pl_Main.json";
+		F_LOCALE_RU = D_GW2_ADDONS_NEXUS_LOCALES / "ru_Main.json";
+		F_LOCALE_CN = D_GW2_ADDONS_NEXUS_LOCALES / "cn_Main.json";
 
 		/* push to paths */
 		PathStore.push_back(D_GW2.string());
 		PathStore.push_back(D_GW2_ADDONS_COMMON.string());
 		PathStore.push_back(D_GW2_ADDONS_COMMON_API_GW2.string());
 		PathStore.push_back(D_GW2_ADDONS_COMMON_API_RAIDCORE.string());
+
+		/* migrate old font */
+		std::filesystem::path legacyFontPath = D_GW2_ADDONS_NEXUS / "Font.ttf";
+		if (std::filesystem::exists(legacyFontPath))
+		{
+			std::filesystem::path targetPath = D_GW2_ADDONS_NEXUS_FONTS / legacyFontPath.filename();
+
+			targetPath = Path::GetUnused(targetPath);
+
+			try
+			{
+				std::filesystem::rename(legacyFontPath, targetPath);
+			}
+			catch (std::filesystem::filesystem_error fErr)
+			{
+				/* do nothing. we cannot log here yet, but this is also not really relevant. */
+			}
+		}
+
+		/* migrate keybinds */
+
+		std::filesystem::path legacyKeybindsPath = D_GW2_ADDONS_NEXUS / "Keybinds.json";
+		if (std::filesystem::exists(legacyKeybindsPath))
+		{
+			std::filesystem::path targetPath = F_INPUTBINDS;
+
+			targetPath = Path::GetUnused(targetPath);
+
+			try
+			{
+				std::filesystem::rename(legacyKeybindsPath, targetPath);
+			}
+			catch (std::filesystem::filesystem_error fErr)
+			{
+				/* do nothing. we cannot log here yet, but this is also not really relevant. */
+			}
+		}
 	}
 
 	const char* GetGameDirectory()

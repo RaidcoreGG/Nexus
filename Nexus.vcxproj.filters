@@ -118,9 +118,6 @@
     <Filter Include="Inputs">
       <UniqueIdentifier>{68734b2f-4069-4723-961d-83db00b90810}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Inputs\Keybinds">
-      <UniqueIdentifier>{f0552fcd-0842-4914-bd35-54f18d11b0cd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Services">
       <UniqueIdentifier>{7cebddb9-057f-4d36-bd2c-bbda84c7a459}</UniqueIdentifier>
     </Filter>
@@ -159,6 +156,12 @@
     </Filter>
     <Filter Include="Inputs\GameBinds\Enums">
       <UniqueIdentifier>{9c11a759-acfa-40e2-b7f5-042ba9d0428a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Inputs\InputBinds">
+      <UniqueIdentifier>{f0552fcd-0842-4914-bd35-54f18d11b0cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Inputs\InputBinds\Enums">
+      <UniqueIdentifier>{5f7a3796-ab71-4979-ace3-8063d007c8b8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -216,8 +219,8 @@
     <ClCompile Include="src\Events\EventHandler.cpp">
       <Filter>Events</Filter>
     </ClCompile>
-    <ClCompile Include="src\Inputs\Keybinds\KeybindHandler.cpp">
-      <Filter>Inputs\Keybinds</Filter>
+    <ClCompile Include="src\Inputs\InputBinds\InputBindHandler.cpp">
+      <Filter>Inputs\InputBinds</Filter>
     </ClCompile>
     <ClCompile Include="src\Index.cpp">
       <Filter>_GLOBAL</Filter>
@@ -234,8 +237,8 @@
     <ClCompile Include="src\Shared.cpp">
       <Filter>_GLOBAL</Filter>
     </ClCompile>
-    <ClCompile Include="src\Inputs\Keybinds\Keybind.cpp">
-      <Filter>Inputs\Keybinds</Filter>
+    <ClCompile Include="src\Inputs\InputBinds\InputBind.cpp">
+      <Filter>Inputs\InputBinds</Filter>
     </ClCompile>
     <ClCompile Include="src\GUI\GUI.cpp">
       <Filter>GUI</Filter>
@@ -369,6 +372,12 @@
     <ClCompile Include="src\Util\Inputs.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+    <ClCompile Include="src\Loader\AddonVersion.cpp">
+      <Filter>Loader\Structs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Util\Memory.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h">
@@ -431,8 +440,8 @@
     <ClInclude Include="src\Events\EventHandler.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="src\Inputs\Keybinds\KeybindHandler.h">
-      <Filter>Inputs\Keybinds</Filter>
+    <ClInclude Include="src\Inputs\InputBinds\InputBindHandler.h">
+      <Filter>Inputs\InputBinds</Filter>
     </ClInclude>
     <ClInclude Include="src\State.h">
       <Filter>_GLOBAL</Filter>
@@ -452,8 +461,8 @@
     <ClInclude Include="src\Services\Localization\Localization.h">
       <Filter>Services\Localization</Filter>
     </ClInclude>
-    <ClInclude Include="src\Inputs\Keybinds\Keybind.h">
-      <Filter>Inputs\Keybinds</Filter>
+    <ClInclude Include="src\Inputs\InputBinds\InputBind.h">
+      <Filter>Inputs\InputBinds</Filter>
     </ClInclude>
     <ClInclude Include="src\GUI\GUI.h">
       <Filter>GUI</Filter>
@@ -497,8 +506,8 @@
     <ClInclude Include="src\Events\FuncDefs.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="src\Inputs\Keybinds\FuncDefs.h">
-      <Filter>Inputs\Keybinds</Filter>
+    <ClInclude Include="src\Inputs\InputBinds\FuncDefs.h">
+      <Filter>Inputs\InputBinds</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\Logging\FuncDefs.h">
       <Filter>Services\Logging</Filter>
@@ -527,8 +536,8 @@
     <ClInclude Include="src\Consts.h">
       <Filter>_GLOBAL</Filter>
     </ClInclude>
-    <ClInclude Include="src\Inputs\Keybinds\ActiveKeybind.h">
-      <Filter>Inputs\Keybinds</Filter>
+    <ClInclude Include="src\Inputs\InputBinds\ManagedInputBind.h">
+      <Filter>Inputs\InputBinds</Filter>
     </ClInclude>
     <ClInclude Include="src\GUI\Widgets\Addons\AddonItem.h">
       <Filter>GUI\Widgets\Addons</Filter>
@@ -1123,6 +1132,24 @@
     </ClInclude>
     <ClInclude Include="src\Util\Inputs.h">
       <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\AddonVersion.h">
+      <Filter>Loader\Structs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Inputs\GameBinds\FuncDefs.h">
+      <Filter>Inputs\GameBinds</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Util\Memory.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GUI\Widgets\QuickAccess\EQAVisibility.h">
+      <Filter>GUI\Widgets\QuickAccess</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Inputs\InputBinds\EInputBindHandlerType.h">
+      <Filter>Inputs\InputBinds\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Inputs\InputBinds\EInputBindType.h">
+      <Filter>Inputs\InputBinds\Enums</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

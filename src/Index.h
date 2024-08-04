@@ -26,7 +26,8 @@ namespace Index
 	extern std::filesystem::path D_GW2_ADDONS_COMMON_API_RAIDCORE;
 	extern std::filesystem::path D_GW2_ADDONS_COMMON_API_GITHUB;
 	extern std::filesystem::path D_GW2_ADDONS_NEXUS;
-	extern std::filesystem::path D_GW2_ADDONS_RAIDCORE_LOCALES;
+	extern std::filesystem::path D_GW2_ADDONS_NEXUS_FONTS;
+	extern std::filesystem::path D_GW2_ADDONS_NEXUS_LOCALES;
 
 	extern std::filesystem::path F_HOST_DLL;
 	extern std::filesystem::path F_UPDATE_DLL;
@@ -36,9 +37,8 @@ namespace Index
 	extern std::filesystem::path F_ARCDPSINTEGRATION;
 
 	extern std::filesystem::path F_LOG;
-	extern std::filesystem::path F_KEYBINDS;
+	extern std::filesystem::path F_INPUTBINDS;
 	extern std::filesystem::path F_GAMEBINDS;
-	extern std::filesystem::path F_FONT;
 	extern std::filesystem::path F_SETTINGS;
 	extern std::filesystem::path F_ADDONCONFIG;
 	extern std::filesystem::path F_APIKEYS;
