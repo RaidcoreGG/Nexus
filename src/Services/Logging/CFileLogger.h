@@ -37,6 +37,7 @@ class CFileLogger : public virtual ILogger
 		void LogMessage(LogEntry aLogEntry);
 
 	private:
+		void rotate(const std::filesystem::path& aPath);
 		std::ofstream File;
 };
 
