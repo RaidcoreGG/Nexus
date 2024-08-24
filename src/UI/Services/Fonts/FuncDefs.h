@@ -1,5 +1,5 @@
-#ifndef FONTS_FUNCDEFS_H
-#define FONTS_FUNCDEFS_H
+#ifndef UI_SERVICES_FONTS_FUNCDEFS_H
+#define UI_SERVICES_FONTS_FUNCDEFS_H
 
 #include <Windows.h>
 

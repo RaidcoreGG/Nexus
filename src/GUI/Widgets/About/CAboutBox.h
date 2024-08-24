@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "GUI/IWindow.h"
+#include "UI/Controls/CtlWindow.h"
 
 namespace GUI
 {

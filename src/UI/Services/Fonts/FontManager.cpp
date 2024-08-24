@@ -2,83 +2,28 @@
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
 /// Name         :  FontManager.cpp
-/// Description  :  Handles fonts for the ImGui implementation of the GUI.
+/// Description  :  Handles fonts for the ImGui implementation of the UI.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
 #include "FontManager.h"
 
-#include <algorithm>
-
-#include "resource.h"
-#include "Shared.h"
+#include <filesystem>
 
 #include "imgui/imgui_internal.h"
 
+#include "resource.h"
+#include "Shared.h"
 #include "Util/Resources.h"
-#include "Util/Strings.h"
 
-const char* GetDefaultCompressedFontDataTTFBase85();
-
-namespace FontManager
+CFontManager::CFontManager(CLocalization* aLocalization)
 {
-	void ADDONAPI_Get(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback)
-	{
-		if (!aCallback) { return; }
-
-		CFontManager& inst = CFontManager::GetInstance();
-		ManagedFont* font = inst.Get(aIdentifier);
-
-		aCallback(aIdentifier, font->Pointer);
-	}
-
-	ImFont* ADDONAPI_Get2(const char* aIdentifier)
-	{
-		if (!aIdentifier) { return nullptr; }
-
-		CFontManager& inst = CFontManager::GetInstance();
-		ManagedFont* font = inst.Get(aIdentifier);
-
-		return font->Pointer;
-	}
-
-	void ADDONAPI_Release(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback)
-	{
-		if (!aCallback) { return; }
-
-		CFontManager& inst = CFontManager::GetInstance();
-		inst.Release(aIdentifier, aCallback);
-	}
-
-	void ADDONAPI_AddFontFromFile(const char* aIdentifier, float aFontSize, const char* aFilename, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
-	{
-		CFontManager& inst = CFontManager::GetInstance();
-		inst.AddFont(aIdentifier, aFontSize, aFilename, aCallback, aConfig);
-	}
-
-	void ADDONAPI_AddFontFromResource(const char* aIdentifier, float aFontSize, unsigned aResourceID, HMODULE aModule, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
-	{
-		CFontManager& inst = CFontManager::GetInstance();
-		inst.AddFont(aIdentifier, aFontSize, aResourceID, aModule, aCallback, aConfig);
-	}
-
-	void ADDONAPI_AddFontFromMemory(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
-	{
-		CFontManager& inst = CFontManager::GetInstance();
-		inst.AddFont(aIdentifier, aFontSize, aData, aSize, aCallback, aConfig);
-	}
-	
-	void ADDONAPI_ResizeFont(const char* aIdentifier, float aFontSize)
-	{
-		CFontManager& inst = CFontManager::GetInstance();
-		inst.ResizeFont(aIdentifier, aFontSize);
-	}
+	this->Language = aLocalization;
 }
 
-CFontManager& CFontManager::GetInstance()
+CFontManager::~CFontManager()
 {
-	static CFontManager Instance;
-	return Instance;
+	this->Language = nullptr;
 }
 
 void CFontManager::Reload()
@@ -107,7 +52,7 @@ bool CFontManager::Advance()
 	rb.AddRanges(rangesLatinExt);
 
 	/* add ranges on demand*/
-	for (const char* str : Language->GetAllTexts())
+	for (const char* str : this->Language->GetAllTexts())
 	{
 		rb.AddText(str);
 	}
@@ -197,10 +142,10 @@ void CFontManager::AddFont(const char* aIdentifier, float aFontSize, const char*
 
 	std::string str = aIdentifier;
 
-	ManagedFont* font = this->Get(aIdentifier);
+	ManagedFont* font = Get(aIdentifier);
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
-	
+
 	if (font != nullptr) /* font already exists */
 	{
 		/* add the callback */
@@ -214,10 +159,10 @@ void CFontManager::AddFont(const char* aIdentifier, float aFontSize, const char*
 		size_t size = 0;
 		void* buffer = ImFileLoadToMemory(aFilename, "rb", &size, 0);
 
-		/* call this->AddFontInternal with the memory buffer */
+		/* call AddFontInternal with the memory buffer */
 		this->AddFontInternal(aIdentifier, aFontSize, buffer, size, aCallback, aConfig);
 
-		/* delete buffer, because it was copied in this->AddFont */
+		/* delete buffer, because it was copied in AddFont */
 		delete[] buffer;
 	}
 }
@@ -251,7 +196,7 @@ void CFontManager::AddFont(const char* aIdentifier, float aFontSize, unsigned aR
 		/* get data */
 		Resources::Get(aModule, MAKEINTRESOURCE(aResourceID), RT_FONT, &buffer, (DWORD*)&size);
 
-		/* call this->AddFontInternal with the memory buffer */
+		/* call AddFontInternal with the memory buffer */
 		this->AddFontInternal(aIdentifier, aFontSize, buffer, size, aCallback, aConfig);
 	}
 }
@@ -267,7 +212,7 @@ void CFontManager::AddFont(const char* aIdentifier, float aFontSize, void* aData
 	ManagedFont* font = this->Get(aIdentifier);
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
-	
+
 	if (font != nullptr) /* font already exists */
 	{
 		/* add the callback */
@@ -278,7 +223,7 @@ void CFontManager::AddFont(const char* aIdentifier, float aFontSize, void* aData
 	}
 	else /* create new font */
 	{
-		/* call this->AddFontInternal with the memory buffer */
+		/* call AddFontInternal with the memory buffer */
 		this->AddFontInternal(aIdentifier, aFontSize, aData, aSize, aCallback, aConfig);
 	}
 }
@@ -327,11 +272,11 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, const c
 	}
 	else
 	{
-		/* call this->AddFontInternal with the memory buffer */
+		/* call AddFontInternal with the memory buffer */
 		this->AddFontInternal(aIdentifier, aFontSize, buffer, size, aCallback, aConfig);
 	}
 
-	/* delete buffer, because it was copied in this->AddFont */
+	/* delete buffer, because it was copied in AddFont */
 	delete[] buffer;
 }
 
@@ -383,7 +328,7 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, unsigne
 	}
 	else
 	{
-		/* call this->AddFontInternal with the memory buffer */
+		/* call AddFontInternal with the memory buffer */
 		this->AddFontInternal(aIdentifier, aFontSize, buffer, size, aCallback, aConfig);
 	}
 }
@@ -429,7 +374,7 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, void* a
 	}
 	else
 	{
-		/* call this->AddFontInternal with the memory buffer */
+		/* call AddFontInternal with the memory buffer */
 		this->AddFontInternal(aIdentifier, aFontSize, aData, aSize, aCallback, aConfig);
 	}
 }
@@ -461,7 +406,7 @@ void CFontManager::AddDefaultFont(FONTS_RECEIVECALLBACK aCallback)
 		/* get data */
 		Resources::Get(NexusHandle, MAKEINTRESOURCE(RES_FONT_PROGGYCLEAN), RT_FONT, &buffer, (DWORD*)&size);
 
-		/* call this->AddFontInternal with the memory buffer */
+		/* call AddFontInternal with the memory buffer */
 		this->AddFontInternal("FONT_DEFAULT", 13.0f, buffer, size, aCallback, nullptr);
 	}
 }
@@ -484,7 +429,7 @@ void CFontManager::ResizeFont(const char* aIdentifier, float aFontSize)
 		{
 			font.Size = aFontSize;
 
-			/* invalidate the font atlas to be rebuilt on this->Advance */
+			/* invalidate the font atlas to be rebuilt on Advance */
 			this->IsFontAtlasBuilt = false;
 		}
 	}
@@ -540,7 +485,7 @@ void CFontManager::AddFontInternal(const char* aIdentifier, float aFontSize, voi
 
 	this->Registry.push_back(font);
 
-	/* invalidate the font atlas to be rebuilt on this->Advance */
+	/* invalidate the font atlas to be rebuilt on Advance */
 	this->IsFontAtlasBuilt = false;
 }
 

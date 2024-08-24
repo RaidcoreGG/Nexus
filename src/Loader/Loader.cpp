@@ -24,10 +24,11 @@
 #include "FuncDefs.h"
 
 #include "Events/EventHandler.h"
-#include "GUI/Fonts/FontManager.h"
-#include "GUI/GUI.h"
-#include "GUI/Widgets/Alerts/Alerts.h"
-#include "GUI/Widgets/QuickAccess/QuickAccess.h"
+#include "UI/UiContext.h"
+#include "UI/Services/Fonts/FontManager.h"
+#include "UI/Services/QoL/EscapeClosing.h"
+#include "UI/Widgets/Alerts/Alerts.h"
+#include "UI/Widgets/QuickAccess/QuickAccess.h"
 #include "imgui/imgui.h"
 #include "Inputs/InputBinds/InputBindHandler.h"
 #include "Inputs/RawInput/RawInputApi.h"
@@ -60,7 +61,8 @@ using json = nlohmann::json;
 
 namespace Loader
 {
-	NexusLinkData* NexusLink = nullptr;;
+	NexusLinkData* NexusLink = nullptr;
+	Mumble::Identity* MumbleIdentity = nullptr;
 
 	std::mutex					Mutex;
 	std::unordered_map<
@@ -86,6 +88,7 @@ namespace Loader
 	void Initialize()
 	{
 		NexusLink = (NexusLinkData*)DataLinkService->ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData), true);
+		MumbleIdentity = (Mumble::Identity*)DataLinkService->ShareResource(DL_MUMBLE_LINK_IDENTITY, sizeof(Mumble::Identity), false);
 
 		if (State::Nexus == ENexusState::LOADED)
 		{
@@ -758,7 +761,7 @@ namespace Loader
 						}
 						else
 						{
-							GUI::Alerts::Notify(String::Format("%s %s", addon->Definitions->Name, Language->Translate("((000079))")).c_str());
+							UIRoot::Alerts::ADDONAPI_Notify(String::Format("%s %s", addon->Definitions->Name, Language->Translate("((000079))")).c_str());
 						}
 					}
 				}
@@ -799,7 +802,7 @@ namespace Loader
 		{
 			// show message that addon was disabled due to game update
 			EventApi->Raise(EV_VOLATILE_ADDON_DISABLED, &addon->Definitions->Signature);
-			GUI::Alerts::Notify(String::Format("%s %s", addon->Definitions->Name, Language->Translate("((000073))")).c_str());
+			UIRoot::Alerts::ADDONAPI_Notify(String::Format("%s %s", addon->Definitions->Name, Language->Translate("((000073))")).c_str());
 
 			FreeLibrary(addon->Module);
 			addon->State = EAddonState::NotLoaded;
@@ -839,7 +842,7 @@ namespace Loader
 		auto time = end_time - start_time;
 
 		EventApi->Raise(EV_ADDON_LOADED, &addon->Definitions->Signature);
-		EventApi->Raise(EV_MUMBLE_IDENTITY_UPDATED, Mumble::IdentityParsed);
+		EventApi->Raise(EV_MUMBLE_IDENTITY_UPDATED, MumbleIdentity);
 
 		addon->State = locked ? EAddonState::LoadedLOCKED : EAddonState::Loaded;
 		SaveAddonConfig();
@@ -905,8 +908,10 @@ namespace Loader
 			void* endAddress = ((PBYTE)aAddon->Module) + aAddon->ModuleSize;
 
 			int evRefs = EventApi->Verify(startAddress, endAddress);
-			int uiRefs = GUI::Verify(startAddress, endAddress);
-			int qaRefs = GUI::QuickAccess::Verify(startAddress, endAddress);
+			int uiRefs = UIRoot::GUI::UICtx->Verify(startAddress, endAddress);
+			int fnRefs = UIRoot::Fonts::FontCtx->Verify(startAddress, endAddress);
+			int esRefs = UIRoot::EscapeClosing::EscCtx->Verify(startAddress, endAddress);
+			int qaRefs = UIRoot::QuickAccess::QACtx->Verify(startAddress, endAddress);
 			int kbRefs = InputBindApi->Verify(startAddress, endAddress);
 			int riRefs = RawInputApi->Verify(startAddress, endAddress);
 			int txRefs = TextureService->Verify(startAddress, endAddress);
@@ -919,6 +924,8 @@ namespace Loader
 				str.append("Make sure your addon releases all references during Addon::Unload().\n");
 				if (evRefs) { str.append(String::Format("Events: %d\n", evRefs)); }
 				if (uiRefs) { str.append(String::Format("UI: %d\n", uiRefs)); }
+				if (fnRefs) { str.append(String::Format("Fonts: %d\n", fnRefs)); }
+				if (esRefs) { str.append(String::Format("CloseOnEscape: %d\n", esRefs)); }
 				if (qaRefs) { str.append(String::Format("QuickAccess: %d\n", qaRefs)); }
 				if (kbRefs) { str.append(String::Format("InputBinds: %d\n", kbRefs)); }
 				if (riRefs) { str.append(String::Format("WndProc: %d\n", riRefs)); }
@@ -1163,11 +1170,11 @@ namespace Loader
 				AddonAPI1* api = new AddonAPI1();
 
 				api->SwapChain = Renderer::SwapChain;
-				api->ImguiContext = Renderer::GuiContext;
+				api->ImguiContext = ImGui::GetCurrentContext();
 				api->ImguiMalloc = ImGui::MemAlloc;
 				api->ImguiFree = ImGui::MemFree;
-				api->RegisterRender = GUI::Register;
-				api->DeregisterRender = GUI::Deregister;
+				api->RegisterRender = UIRoot::GUI::ADDONAPI_Register;
+				api->DeregisterRender = UIRoot::GUI::ADDONAPI_Deregister;
 
 				api->GetGameDirectory = Index::GetGameDirectory;
 				api->GetAddonDirectory = Index::GetAddonDirectory;
@@ -1199,10 +1206,10 @@ namespace Loader
 				api->LoadTextureFromResource = TextureLoader::ADDONAPI_LoadFromResource;
 				api->LoadTextureFromURL = TextureLoader::ADDONAPI_LoadFromURL;
 
-				api->AddShortcut = GUI::QuickAccess::AddShortcut;
-				api->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
-				api->AddSimpleShortcut = GUI::QuickAccess::AddSimpleShortcut;
-				api->RemoveSimpleShortcut = GUI::QuickAccess::RemoveSimpleShortcut;
+				api->AddShortcut = UIRoot::QuickAccess::ADDONAPI_AddShortcut;
+				api->RemoveShortcut = UIRoot::QuickAccess::ADDONAPI_RemoveShortcut;
+				api->AddSimpleShortcut = UIRoot::QuickAccess::ADDONAPI_AddContextItem;
+				api->RemoveSimpleShortcut = UIRoot::QuickAccess::ADDONAPI_RemoveContextItem;
 
 				ApiDefs.insert({ aVersion, api });
 				return api;
@@ -1212,11 +1219,11 @@ namespace Loader
 				AddonAPI2* api = new AddonAPI2();
 
 				api->SwapChain = Renderer::SwapChain;
-				api->ImguiContext = Renderer::GuiContext;
+				api->ImguiContext = ImGui::GetCurrentContext();
 				api->ImguiMalloc = ImGui::MemAlloc;
 				api->ImguiFree = ImGui::MemFree;
-				api->RegisterRender = GUI::Register;
-				api->DeregisterRender = GUI::Deregister;
+				api->RegisterRender = UIRoot::GUI::ADDONAPI_Register;
+				api->DeregisterRender = UIRoot::GUI::ADDONAPI_Deregister;
 
 				api->GetGameDirectory = Index::GetGameDirectory;
 				api->GetAddonDirectory = Index::GetAddonDirectory;
@@ -1255,11 +1262,11 @@ namespace Loader
 				api->LoadTextureFromURL = TextureLoader::ADDONAPI_LoadFromURL;
 				api->LoadTextureFromMemory = TextureLoader::ADDONAPI_LoadFromMemory;
 
-				api->AddShortcut = GUI::QuickAccess::AddShortcut;
-				api->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
-				api->NotifyShortcut = GUI::QuickAccess::NotifyShortcut;
-				api->AddSimpleShortcut = GUI::QuickAccess::AddSimpleShortcut;
-				api->RemoveSimpleShortcut = GUI::QuickAccess::RemoveSimpleShortcut;
+				api->AddShortcut = UIRoot::QuickAccess::ADDONAPI_AddShortcut;
+				api->RemoveShortcut = UIRoot::QuickAccess::ADDONAPI_RemoveShortcut;
+				api->NotifyShortcut = UIRoot::QuickAccess::ADDONAPI_NotifyShortcut;
+				api->AddSimpleShortcut = UIRoot::QuickAccess::ADDONAPI_AddContextItem;
+				api->RemoveSimpleShortcut = UIRoot::QuickAccess::ADDONAPI_RemoveContextItem;
 
 				api->Translate = Localization::ADDONAPI_Translate;
 				api->TranslateTo = Localization::ADDONAPI_TranslateTo;
@@ -1272,11 +1279,11 @@ namespace Loader
 				AddonAPI3* api = new AddonAPI3();
 
 				api->SwapChain = Renderer::SwapChain;
-				api->ImguiContext = Renderer::GuiContext;
+				api->ImguiContext = ImGui::GetCurrentContext();
 				api->ImguiMalloc = ImGui::MemAlloc;
 				api->ImguiFree = ImGui::MemFree;
-				api->RegisterRender = GUI::Register;
-				api->DeregisterRender = GUI::Deregister;
+				api->RegisterRender = UIRoot::GUI::ADDONAPI_Register;
+				api->DeregisterRender = UIRoot::GUI::ADDONAPI_Deregister;
 
 				api->GetGameDirectory = Index::GetGameDirectory;
 				api->GetAddonDirectory = Index::GetAddonDirectory;
@@ -1289,7 +1296,7 @@ namespace Loader
 
 				api->Log = LogHandler::ADDONAPI_LogMessage2;
 
-				api->SendAlert = GUI::Alerts::Notify;
+				api->SendAlert = UIRoot::Alerts::ADDONAPI_Notify;
 
 				api->RaiseEvent = Events::ADDONAPI_RaiseEvent;
 				api->RaiseEventNotification = Events::ADDONAPI_RaiseNotification;
@@ -1319,11 +1326,11 @@ namespace Loader
 				api->LoadTextureFromURL = TextureLoader::ADDONAPI_LoadFromURL;
 				api->LoadTextureFromMemory = TextureLoader::ADDONAPI_LoadFromMemory;
 
-				api->AddShortcut = GUI::QuickAccess::AddShortcut;
-				api->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
-				api->NotifyShortcut = GUI::QuickAccess::NotifyShortcut;
-				api->AddSimpleShortcut = GUI::QuickAccess::AddSimpleShortcut;
-				api->RemoveSimpleShortcut = GUI::QuickAccess::RemoveSimpleShortcut;
+				api->AddShortcut = UIRoot::QuickAccess::ADDONAPI_AddShortcut;
+				api->RemoveShortcut = UIRoot::QuickAccess::ADDONAPI_RemoveShortcut;
+				api->NotifyShortcut = UIRoot::QuickAccess::ADDONAPI_NotifyShortcut;
+				api->AddSimpleShortcut = UIRoot::QuickAccess::ADDONAPI_AddContextItem;
+				api->RemoveSimpleShortcut = UIRoot::QuickAccess::ADDONAPI_RemoveContextItem;
 
 				api->Translate = Localization::ADDONAPI_Translate;
 				api->TranslateTo = Localization::ADDONAPI_TranslateTo;
@@ -1336,11 +1343,11 @@ namespace Loader
 				AddonAPI4* api = new AddonAPI4();
 
 				api->SwapChain = Renderer::SwapChain;
-				api->ImguiContext = Renderer::GuiContext;
+				api->ImguiContext = ImGui::GetCurrentContext();
 				api->ImguiMalloc = ImGui::MemAlloc;
 				api->ImguiFree = ImGui::MemFree;
-				api->RegisterRender = GUI::Register;
-				api->DeregisterRender = GUI::Deregister;
+				api->RegisterRender = UIRoot::GUI::ADDONAPI_Register;
+				api->DeregisterRender = UIRoot::GUI::ADDONAPI_Deregister;
 
 				api->RequestUpdate = Updater::ADDONAPI_RequestUpdate;
 
@@ -1355,7 +1362,7 @@ namespace Loader
 
 				api->Log = LogHandler::ADDONAPI_LogMessage2;
 
-				api->SendAlert = GUI::Alerts::Notify;
+				api->SendAlert = UIRoot::Alerts::ADDONAPI_Notify;
 
 				api->RaiseEvent = Events::ADDONAPI_RaiseEvent;
 				api->RaiseEventNotification = Events::ADDONAPI_RaiseNotification;
@@ -1385,20 +1392,20 @@ namespace Loader
 				api->LoadTextureFromURL = TextureLoader::ADDONAPI_LoadFromURL;
 				api->LoadTextureFromMemory = TextureLoader::ADDONAPI_LoadFromMemory;
 
-				api->AddShortcut = GUI::QuickAccess::AddShortcut;
-				api->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
-				api->NotifyShortcut = GUI::QuickAccess::NotifyShortcut;
-				api->AddSimpleShortcut = GUI::QuickAccess::AddSimpleShortcut;
-				api->RemoveSimpleShortcut = GUI::QuickAccess::RemoveSimpleShortcut;
+				api->AddShortcut = UIRoot::QuickAccess::ADDONAPI_AddShortcut;
+				api->RemoveShortcut = UIRoot::QuickAccess::ADDONAPI_RemoveShortcut;
+				api->NotifyShortcut = UIRoot::QuickAccess::ADDONAPI_NotifyShortcut;
+				api->AddSimpleShortcut = UIRoot::QuickAccess::ADDONAPI_AddContextItem;
+				api->RemoveSimpleShortcut = UIRoot::QuickAccess::ADDONAPI_RemoveContextItem;
 
 				api->Translate = Localization::ADDONAPI_Translate;
 				api->TranslateTo = Localization::ADDONAPI_TranslateTo;
 
-				api->GetFont = FontManager::ADDONAPI_Get;
-				api->ReleaseFont = FontManager::ADDONAPI_Release;
-				api->AddFontFromFile = FontManager::ADDONAPI_AddFontFromFile;
-				api->AddFontFromResource = FontManager::ADDONAPI_AddFontFromResource;
-				api->AddFontFromMemory = FontManager::ADDONAPI_AddFontFromMemory;
+				api->GetFont = UIRoot::Fonts::ADDONAPI_Get;
+				api->ReleaseFont = UIRoot::Fonts::ADDONAPI_Release;
+				api->AddFontFromFile = UIRoot::Fonts::ADDONAPI_AddFontFromFile;
+				api->AddFontFromResource = UIRoot::Fonts::ADDONAPI_AddFontFromResource;
+				api->AddFontFromMemory = UIRoot::Fonts::ADDONAPI_AddFontFromMemory;
 
 				ApiDefs.insert({ aVersion, api });
 				return api;
@@ -1408,11 +1415,11 @@ namespace Loader
 				AddonAPI5* api = new AddonAPI5();
 
 				api->SwapChain = Renderer::SwapChain;
-				api->ImguiContext = Renderer::GuiContext;
+				api->ImguiContext = ImGui::GetCurrentContext();
 				api->ImguiMalloc = ImGui::MemAlloc;
 				api->ImguiFree = ImGui::MemFree;
-				api->RegisterRender = GUI::Register;
-				api->DeregisterRender = GUI::Deregister;
+				api->RegisterRender = UIRoot::GUI::ADDONAPI_Register;
+				api->DeregisterRender = UIRoot::GUI::ADDONAPI_Deregister;
 
 				api->RequestUpdate = Updater::ADDONAPI_RequestUpdate;
 
@@ -1427,7 +1434,7 @@ namespace Loader
 
 				api->Log = LogHandler::ADDONAPI_LogMessage2;
 
-				api->SendAlert = GUI::Alerts::Notify;
+				api->SendAlert = UIRoot::Alerts::ADDONAPI_Notify;
 
 				api->RaiseEvent = Events::ADDONAPI_RaiseEvent;
 				api->RaiseEventNotification = Events::ADDONAPI_RaiseNotification;
@@ -1458,21 +1465,21 @@ namespace Loader
 				api->LoadTextureFromURL = TextureLoader::ADDONAPI_LoadFromURL;
 				api->LoadTextureFromMemory = TextureLoader::ADDONAPI_LoadFromMemory;
 
-				api->AddShortcut = GUI::QuickAccess::AddShortcut;
-				api->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
-				api->NotifyShortcut = GUI::QuickAccess::NotifyShortcut;
-				api->AddSimpleShortcut = GUI::QuickAccess::AddSimpleShortcut;
-				api->RemoveSimpleShortcut = GUI::QuickAccess::RemoveSimpleShortcut;
+				api->AddShortcut = UIRoot::QuickAccess::ADDONAPI_AddShortcut;
+				api->RemoveShortcut = UIRoot::QuickAccess::ADDONAPI_RemoveShortcut;
+				api->NotifyShortcut = UIRoot::QuickAccess::ADDONAPI_NotifyShortcut;
+				api->AddSimpleShortcut = UIRoot::QuickAccess::ADDONAPI_AddContextItem;
+				api->RemoveSimpleShortcut = UIRoot::QuickAccess::ADDONAPI_RemoveContextItem;
 
 				api->Translate = Localization::ADDONAPI_Translate;
 				api->TranslateTo = Localization::ADDONAPI_TranslateTo;
 				api->SetTranslatedString = Localization::ADDONAPI_Set;
 
-				api->GetFont = FontManager::ADDONAPI_Get;
-				api->ReleaseFont = FontManager::ADDONAPI_Release;
-				api->AddFontFromFile = FontManager::ADDONAPI_AddFontFromFile;
-				api->AddFontFromResource = FontManager::ADDONAPI_AddFontFromResource;
-				api->AddFontFromMemory = FontManager::ADDONAPI_AddFontFromMemory;
+				api->GetFont = UIRoot::Fonts::ADDONAPI_Get;
+				api->ReleaseFont = UIRoot::Fonts::ADDONAPI_Release;
+				api->AddFontFromFile = UIRoot::Fonts::ADDONAPI_AddFontFromFile;
+				api->AddFontFromResource = UIRoot::Fonts::ADDONAPI_AddFontFromResource;
+				api->AddFontFromMemory = UIRoot::Fonts::ADDONAPI_AddFontFromMemory;
 
 				ApiDefs.insert({ aVersion, api });
 				return api;
@@ -1482,20 +1489,20 @@ namespace Loader
 				AddonAPI6* api = new AddonAPI6();
 
 				api->SwapChain = Renderer::SwapChain;
-				api->ImguiContext = Renderer::GuiContext;
+				api->ImguiContext = ImGui::GetCurrentContext();
 				api->ImguiMalloc = ImGui::MemAlloc;
 				api->ImguiFree = ImGui::MemFree;
 
-				api->Renderer.Register = GUI::Register;
-				api->Renderer.Deregister = GUI::Deregister;
+				api->Renderer.Register = UIRoot::GUI::ADDONAPI_Register;
+				api->Renderer.Deregister = UIRoot::GUI::ADDONAPI_Deregister;
 
 				api->RequestUpdate = Updater::ADDONAPI_RequestUpdate;
 
 				api->Log = LogHandler::ADDONAPI_LogMessage2;
 
-				api->UI.SendAlert = GUI::Alerts::Notify;
-				api->UI.RegisterCloseOnEscape = GUI::RegisterCloseOnEscape;
-				api->UI.DeregisterCloseOnEscape = GUI::DeregisterCloseOnEscape;
+				api->UI.SendAlert = UIRoot::Alerts::ADDONAPI_Notify;
+				api->UI.RegisterCloseOnEscape = UIRoot::EscapeClosing::ADDONAPI_Register;
+				api->UI.DeregisterCloseOnEscape = UIRoot::EscapeClosing::ADDONAPI_Deregister;
 
 				api->Paths.GetGameDirectory = Index::GetGameDirectory;
 				api->Paths.GetAddonDirectory = Index::GetAddonDirectory;
@@ -1542,22 +1549,22 @@ namespace Loader
 				api->Textures.LoadFromURL = TextureLoader::ADDONAPI_LoadFromURL;
 				api->Textures.LoadFromMemory = TextureLoader::ADDONAPI_LoadFromMemory;
 
-				api->QuickAccess.Add = GUI::QuickAccess::AddShortcut;
-				api->QuickAccess.Remove = GUI::QuickAccess::RemoveShortcut;
-				api->QuickAccess.Notify = GUI::QuickAccess::NotifyShortcut;
-				api->QuickAccess.AddContextMenu = GUI::QuickAccess::AddSimpleShortcut2;
-				api->QuickAccess.RemoveContextMenu = GUI::QuickAccess::RemoveSimpleShortcut;
+				api->QuickAccess.Add = UIRoot::QuickAccess::ADDONAPI_AddShortcut;
+				api->QuickAccess.Remove = UIRoot::QuickAccess::ADDONAPI_RemoveShortcut;
+				api->QuickAccess.Notify = UIRoot::QuickAccess::ADDONAPI_NotifyShortcut;
+				api->QuickAccess.AddContextMenu = UIRoot::QuickAccess::ADDONAPI_AddContextItem2;
+				api->QuickAccess.RemoveContextMenu = UIRoot::QuickAccess::ADDONAPI_RemoveContextItem;
 
 				api->Localization.Translate = Localization::ADDONAPI_Translate;
 				api->Localization.TranslateTo = Localization::ADDONAPI_TranslateTo;
 				api->Localization.SetTranslatedString = Localization::ADDONAPI_Set;
 
-				api->Fonts.Get = FontManager::ADDONAPI_Get;
-				api->Fonts.Release = FontManager::ADDONAPI_Release;
-				api->Fonts.AddFromFile = FontManager::ADDONAPI_AddFontFromFile;
-				api->Fonts.AddFromResource = FontManager::ADDONAPI_AddFontFromResource;
-				api->Fonts.AddFromMemory = FontManager::ADDONAPI_AddFontFromMemory;
-				api->Fonts.Resize = FontManager::ADDONAPI_ResizeFont;
+				api->Fonts.Get = UIRoot::Fonts::ADDONAPI_Get;
+				api->Fonts.Release = UIRoot::Fonts::ADDONAPI_Release;
+				api->Fonts.AddFromFile = UIRoot::Fonts::ADDONAPI_AddFontFromFile;
+				api->Fonts.AddFromResource = UIRoot::Fonts::ADDONAPI_AddFontFromResource;
+				api->Fonts.AddFromMemory = UIRoot::Fonts::ADDONAPI_AddFontFromMemory;
+				api->Fonts.Resize = UIRoot::Fonts::ADDONAPI_ResizeFont;
 
 				ApiDefs.insert({ aVersion, api });
 				return api;
@@ -1722,7 +1729,7 @@ namespace Loader
 			DisableVolatileUntilUpdate = true;
 			Logger->Warning(CH_LOADER, "Game updated. Current Build %d. Old Build: %d. Disabling volatile addons until they update.", gameBuild, lastGameBuild);
 
-			GUI::Alerts::Notify(String::Format("%s\n%s", Language->Translate("((000001))"), Language->Translate("((000002))")).c_str());
+			UIRoot::Alerts::ADDONAPI_Notify(String::Format("%s\n%s", Language->Translate("((000001))"), Language->Translate("((000002))")).c_str());
 		}
 
 		Settings::Settings[OPT_LASTGAMEBUILD] = gameBuild;

@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "GUI/IWindow.h"
+#include "UI/Controls/CtlWindow.h"
 #include "GUI/Widgets/Overlay/CMumbleOverlay.h"
 
 #include "imgui/imgui_memory_editor.h"

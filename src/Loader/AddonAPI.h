@@ -1,24 +1,26 @@
 #ifndef ADDONAPI_H
 #define ADDONAPI_H
 
-#include "imgui/imgui.h"
 #include <dxgi.h>
 
+#include "imgui/imgui.h"
+#include "minhook/mh_hook.h"
+
 #include "Events/FuncDefs.h"
-#include "GUI/Fonts/FuncDefs.h"
-#include "GUI/FuncDefs.h"
-#include "GUI/Widgets/Alerts/FuncDefs.h"
-#include "GUI/Widgets/QuickAccess/FuncDefs.h"
 #include "Inputs/GameBinds/FuncDefs.h"
 #include "Inputs/InputBinds/FuncDefs.h"
 #include "Inputs/RawInput/FuncDefs.h"
-#include "minhook/mh_hook.h"
 #include "Paths/FuncDefs.h"
 #include "Services/DataLink/FuncDefs.h"
 #include "Services/Localization/FuncDefs.h"
 #include "Services/Logging/FuncDefs.h"
 #include "Services/Textures/FuncDefs.h"
 #include "Services/Updater/FuncDefs.h"
+#include "UI/FuncDefs.h"
+#include "UI/Services/Fonts/FuncDefs.h"
+#include "UI/Services/QoL/FuncDefs.h"
+#include "UI/Widgets/Alerts/FuncDefs.h"
+#include "UI/Widgets/QuickAccess/FuncDefs.h"
 
 // Base
 struct AddonAPI {};

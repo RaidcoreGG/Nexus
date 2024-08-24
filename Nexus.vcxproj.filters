@@ -43,9 +43,6 @@
     <Filter Include="GUI\Widgets\Debug">
       <UniqueIdentifier>{c9b428d0-6faf-4a6c-90d5-d8264bb96899}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GUI\Widgets\QuickAccess">
-      <UniqueIdentifier>{4c9af9fd-e1d8-4b1c-8a86-b5d5c91c500f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GUI\Widgets\Menu">
       <UniqueIdentifier>{eeef4dfb-cf8e-4d2e-a1e7-657fe0b03f13}</UniqueIdentifier>
     </Filter>
@@ -103,17 +100,11 @@
     <Filter Include="Resource Files\Locales">
       <UniqueIdentifier>{3e8eab0f-abb6-49e7-9b6e-4347fe84f0b9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GUI\Widgets\Alerts">
-      <UniqueIdentifier>{442c3943-23d3-443c-bbd4-c0dc42250d4c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Util">
       <UniqueIdentifier>{7b045384-37df-47bf-a9d8-13b7470614b0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource Files\Images\EulaWindow">
       <UniqueIdentifier>{09e279e3-be44-477f-b606-076e436a1995}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Fonts">
-      <UniqueIdentifier>{eb799d0b-f3d2-4af6-b1bc-c37b5e5c258d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Inputs">
       <UniqueIdentifier>{68734b2f-4069-4723-961d-83db00b90810}</UniqueIdentifier>
@@ -162,6 +153,42 @@
     </Filter>
     <Filter Include="Inputs\InputBinds\Enums">
       <UniqueIdentifier>{5f7a3796-ab71-4979-ace3-8063d007c8b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{82694dd7-d18b-47e2-b118-c0f555122384}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Services">
+      <UniqueIdentifier>{da13c2f6-1efe-4ddf-a84a-1a5ab83b861c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Widgets">
+      <UniqueIdentifier>{dcf015c1-0e23-4a23-a6f6-04ec9a32c053}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Controls">
+      <UniqueIdentifier>{67ab7906-56ba-408f-90d6-abbcd288967d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Services\Animations">
+      <UniqueIdentifier>{dd3d0c27-870a-416c-bd18-f6690151c8b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Services\QoL">
+      <UniqueIdentifier>{df5af072-1334-4d7a-aff2-9f123cfc38fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Services\Sizing">
+      <UniqueIdentifier>{37474280-adcc-402c-8a0a-df838e14bf40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Services\Fonts">
+      <UniqueIdentifier>{93966cbf-564e-4ce7-943c-76d6620f32b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Widgets\MainWindow">
+      <UniqueIdentifier>{fa4b555a-3ed5-4aa0-9d6c-c6d1d34b0fbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Widgets\Alerts">
+      <UniqueIdentifier>{69e72b47-869f-4ca1-b3ff-c05b5578b065}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Widgets\QuickAccess">
+      <UniqueIdentifier>{d472dc9b-3c23-4c4a-86bb-1a8e2ed57f59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Widgets\EULA">
+      <UniqueIdentifier>{47a73a5f-ea70-44b3-a9d5-a6b0c73149c7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -267,9 +294,6 @@
     <ClCompile Include="src\Services\Textures\TextureLoader.cpp">
       <Filter>Services\Textures</Filter>
     </ClCompile>
-    <ClCompile Include="src\GUI\Widgets\QuickAccess\QuickAccess.cpp">
-      <Filter>GUI\Widgets\QuickAccess</Filter>
-    </ClCompile>
     <ClCompile Include="src\Consts.cpp">
       <Filter>_GLOBAL</Filter>
     </ClCompile>
@@ -297,9 +321,6 @@
     <ClCompile Include="src\CrashHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GUI\Widgets\EULA\CEULAModal.cpp">
-      <Filter>GUI\Widgets\EULA</Filter>
-    </ClCompile>
     <ClCompile Include="src\Services\Multibox\Multibox.cpp">
       <Filter>Services\Multibox</Filter>
     </ClCompile>
@@ -320,9 +341,6 @@
     </ClCompile>
     <ClCompile Include="src\Events\EventSubscriber.cpp">
       <Filter>Events</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GUI\Widgets\Alerts\Alerts.cpp">
-      <Filter>GUI\Widgets\Alerts</Filter>
     </ClCompile>
     <ClCompile Include="src\Loader\ArcDPS.cpp">
       <Filter>Loader</Filter>
@@ -351,9 +369,6 @@
     <ClCompile Include="src\Loader\EUpdateProvider.cpp">
       <Filter>Loader\Enums</Filter>
     </ClCompile>
-    <ClCompile Include="src\GUI\Fonts\FontManager.cpp">
-      <Filter>GUI\Fonts</Filter>
-    </ClCompile>
     <ClCompile Include="src\Util\Time.cpp">
       <Filter>Util</Filter>
     </ClCompile>
@@ -377,6 +392,30 @@
     </ClCompile>
     <ClCompile Include="src\Util\Memory.cpp">
       <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Controls\CtlWindow.cpp">
+      <Filter>UI\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Services\QoL\EscapeClosing.cpp">
+      <Filter>UI\Services\QoL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\UiContext.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Services\Fonts\FontManager.cpp">
+      <Filter>UI\Services\Fonts</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Widgets\QuickAccess\QuickAccess.cpp">
+      <Filter>UI\Widgets\QuickAccess</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Widgets\Alerts\Alerts.cpp">
+      <Filter>UI\Widgets\Alerts</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Widgets\MainWindow\MainWindow.cpp">
+      <Filter>UI\Widgets\MainWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Widgets\EULA\EULAModal.cpp">
+      <Filter>UI\Widgets\EULA</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -464,14 +503,8 @@
     <ClInclude Include="src\Inputs\InputBinds\InputBind.h">
       <Filter>Inputs\InputBinds</Filter>
     </ClInclude>
-    <ClInclude Include="src\GUI\GUI.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
     <ClInclude Include="src\thirdparty\imgui\imgui_extensions.h">
       <Filter>_EXTERNAL\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\IWindow.h">
-      <Filter>GUI</Filter>
     </ClInclude>
     <ClInclude Include="src\GUI\Widgets\About\CAboutBox.h">
       <Filter>GUI\Widgets\About</Filter>
@@ -524,15 +557,6 @@
     <ClInclude Include="src\Loader\FuncDefs.h">
       <Filter>Loader</Filter>
     </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\QuickAccess\QuickAccess.h">
-      <Filter>GUI\Widgets\QuickAccess</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\QuickAccess\FuncDefs.h">
-      <Filter>GUI\Widgets\QuickAccess</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\QuickAccess\Shortcut.h">
-      <Filter>GUI\Widgets\QuickAccess</Filter>
-    </ClInclude>
     <ClInclude Include="src\Consts.h">
       <Filter>_GLOBAL</Filter>
     </ClInclude>
@@ -554,17 +578,11 @@
     <ClInclude Include="src\Services\API\APIController.h">
       <Filter>Services\API</Filter>
     </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\QuickAccess\EQAPosition.h">
-      <Filter>GUI\Widgets\QuickAccess</Filter>
-    </ClInclude>
     <ClInclude Include="src\Services\API\ActiveToken.h">
       <Filter>Services\API</Filter>
     </ClInclude>
     <ClInclude Include="src\thirdparty\imgui\imgui_memory_editor.h">
       <Filter>_EXTERNAL\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\FuncDefs.h">
-      <Filter>GUI</Filter>
     </ClInclude>
     <ClInclude Include="src\Inputs\RawInput\RawInputApi.h">
       <Filter>Inputs\RawInput</Filter>
@@ -989,17 +1007,11 @@
     <ClInclude Include="src\Paths\FuncDefs.h">
       <Filter>Paths</Filter>
     </ClInclude>
-    <ClInclude Include="src\GUI\ERenderType.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
     <ClInclude Include="src\Version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\CrashHandler.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\EULA\CEULAModal.h">
-      <Filter>GUI\Widgets\EULA</Filter>
     </ClInclude>
     <ClInclude Include="src\resource.h">
       <Filter>Resource Files</Filter>
@@ -1067,12 +1079,6 @@
     <ClInclude Include="src\Events\EventSubscriber.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\Alerts\Alerts.h">
-      <Filter>GUI\Widgets\Alerts</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\Alerts\FuncDefs.h">
-      <Filter>GUI\Widgets\Alerts</Filter>
-    </ClInclude>
     <ClInclude Include="src\Loader\ArcDPS.h">
       <Filter>Loader</Filter>
     </ClInclude>
@@ -1099,15 +1105,6 @@
     </ClInclude>
     <ClInclude Include="src\Services\Updater\FuncDefs.h">
       <Filter>Services\Updater</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\EFontIdentifier.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Fonts\FontManager.h">
-      <Filter>GUI\Fonts</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Fonts\FuncDefs.h">
-      <Filter>GUI\Fonts</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\Mumble\Definitions\Mumble.h">
       <Filter>Services\Mumble</Filter>
@@ -1142,14 +1139,68 @@
     <ClInclude Include="src\Util\Memory.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\QuickAccess\EQAVisibility.h">
-      <Filter>GUI\Widgets\QuickAccess</Filter>
-    </ClInclude>
     <ClInclude Include="src\Inputs\InputBinds\EInputBindHandlerType.h">
       <Filter>Inputs\InputBinds\Enums</Filter>
     </ClInclude>
     <ClInclude Include="src\Inputs\InputBinds\EInputBindType.h">
       <Filter>Inputs\InputBinds\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\UiContext.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Controls\CtlWindow.h">
+      <Filter>UI\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Services\Animations\AnimationController.h">
+      <Filter>UI\Services\Animations</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Services\QoL\EscapeClosing.h">
+      <Filter>UI\Services\QoL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Services\Sizing\Sizing.h">
+      <Filter>UI\Services\Sizing</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\FuncDefs.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Services\QoL\FuncDefs.h">
+      <Filter>UI\Services\QoL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\ERenderType.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Services\Fonts\FontManager.h">
+      <Filter>UI\Services\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Services\Fonts\FuncDefs.h">
+      <Filter>UI\Services\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\MainWindow\MainWindow.h">
+      <Filter>UI\Widgets\MainWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\QuickAccess\QuickAccess.h">
+      <Filter>UI\Widgets\QuickAccess</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\QuickAccess\EQAPosition.h">
+      <Filter>UI\Widgets\QuickAccess</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\QuickAccess\EQAVisibility.h">
+      <Filter>UI\Widgets\QuickAccess</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\QuickAccess\FuncDefs.h">
+      <Filter>UI\Widgets\QuickAccess</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\QuickAccess\Shortcut.h">
+      <Filter>UI\Widgets\QuickAccess</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\Alerts\FuncDefs.h">
+      <Filter>UI\Widgets\Alerts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\Alerts\Alerts.h">
+      <Filter>UI\Widgets\Alerts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\EULA\EULAModal.h">
+      <Filter>UI\Widgets\EULA</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1186,6 +1237,12 @@
       <Filter>Resource Files\Locales</Filter>
     </None>
     <None Include="src\Resources\Locales\pl_Main.json">
+      <Filter>Resource Files\Locales</Filter>
+    </None>
+    <None Include="src\Resources\Locales\fr_Main.json">
+      <Filter>Resource Files\Locales</Filter>
+    </None>
+    <None Include="src\Resources\Locales\cn_Main.json">
       <Filter>Resource Files\Locales</Filter>
     </None>
   </ItemGroup>

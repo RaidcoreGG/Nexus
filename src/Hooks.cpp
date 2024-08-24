@@ -8,8 +8,7 @@
 #include "State.h"
 
 #include "Events/EventHandler.h"
-#include "GUI/GUI.h"
-#include "GUI/Widgets/QuickAccess/QuickAccess.h"
+#include "UI/UiContext.h"
 #include "Inputs/InputBinds/InputBindHandler.h"
 #include "Loader/Loader.h"
 #include "Loader/NexusLinkData.h"
@@ -48,7 +47,7 @@ namespace Hooks
 			if (InputBindApi->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
 			// don't pass to game if gui
-			if (GUI::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
+			if (UIContext->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
 			if (uMsg == WM_DESTROY || uMsg == WM_QUIT || uMsg == WM_CLOSE)
 			{
@@ -89,29 +88,13 @@ namespace Hooks
 				State::Directx = EDxState::READY; /* acquired swapchain */
 			}
 
-			if (State::Nexus == ENexusState::READY && !State::IsImGuiInitialized)
-			{
-				GUI::Initialize();
-			}
+			UIContext->Initialize(Renderer::WindowHandle, Renderer::Device, Renderer::DeviceContext, Renderer::SwapChain);
 
 			Loader::ProcessQueue();
 
 			TextureService->Advance();
 
-			if (NexusLink)
-			{
-				NexusLink->Scaling = Renderer::Scaling;
-
-				NexusLink->Font = Font;
-				NexusLink->FontBig = FontBig;
-				NexusLink->FontUI = FontUI;
-
-				NexusLink->QuickAccessIconsCount = static_cast<int>(GUI::QuickAccess::Registry.size()); // write this only when adding/removing icons
-				NexusLink->QuickAccessMode = (int)GUI::QuickAccess::Location;
-				NexusLink->QuickAccessIsVertical = GUI::QuickAccess::VerticalLayout;
-			}
-
-			GUI::Render();
+			UIContext->Render();
 		}
 		
 		Renderer::FrameCounter++;
@@ -120,7 +103,7 @@ namespace Hooks
 	}
 	HRESULT __stdcall DXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
 	{
-		GUI::Shutdown();
+		UIContext->Shutdown();
 
 		/* Cache window dimensions */
 		Renderer::Width = Width;

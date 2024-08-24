@@ -1,5 +1,5 @@
-#ifndef ERENDERTYPE_H
-#define ERENDERTYPE_H
+#ifndef UI_ERENDERTYPE_H
+#define UI_ERENDERTYPE_H
 
 enum class ERenderType
 {

@@ -5,7 +5,7 @@
 #include <vector>
 #include <mutex>
 
-#include "GUI/IWindow.h"
+#include "UI/Controls/CtlWindow.h"
 #include "Services/Textures/Texture.h"
 #include "Loader/LibraryAddon.h"
 

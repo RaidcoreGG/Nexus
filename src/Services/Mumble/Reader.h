@@ -17,6 +17,8 @@
 
 /* Log Channel*/
 constexpr const char* CH_MUMBLE_READER				= "MumbleReader";
+constexpr const char* DL_MUMBLE_LINK				= "DL_MUMBLE_LINK";
+constexpr const char* DL_MUMBLE_LINK_IDENTITY		= "DL_MUMBLE_LINK_IDENTITY";
 
 /* UI Scale */
 constexpr const float SC_SMALL						= 0.90f;
@@ -29,8 +31,6 @@ constexpr const float SC_LARGER						= 1.22f;
 ///----------------------------------------------------------------------------------------------------
 namespace Mumble
 {
-	extern Identity* IdentityParsed;
-
 	///----------------------------------------------------------------------------------------------------
 	/// GetScalingFactor:
 	/// 	Returns the scaling factor for the given the UISize enum.
@@ -61,6 +61,7 @@ private:
 
 	std::string			Name;
 	Mumble::Data*		MumbleLink				= nullptr;
+	Mumble::Identity*	MumbleIdentity			= nullptr;
 	NexusLinkData*		NexusLink				= nullptr;
 
 	bool				Flip					= false;

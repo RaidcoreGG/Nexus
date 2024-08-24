@@ -8,9 +8,7 @@
 
 #include "DataLink.h"
 
-#include "Consts.h"
 #include "Shared.h"
-#include "State.h"
 
 namespace DataLink
 {

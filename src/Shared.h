@@ -16,6 +16,7 @@
 #include "Inputs/RawInput/RawInputApi.h"
 #include "Inputs/InputBinds/InputBindHandler.h"
 #include "Inputs/GameBinds/GameBindsHandler.h"
+#include "UI/UiContext.h"
 
 #include "imgui/imgui.h"
 
@@ -39,16 +40,10 @@ extern CEventApi*					EventApi;
 extern CRawInputApi*				RawInputApi;
 extern CInputBindApi*				InputBindApi;
 extern CGameBindsApi*				GameBindsApi;
-
-extern ImFont*						MonospaceFont;	/* default/monospace/console font */
-extern ImFont*						UserFont;		/* custom user font */
-extern ImFont*						Font;			/* Menomonia */
-extern ImFont*						FontBig;		/* Menomonia, but slightly bigger */
-extern ImFont*						FontUI;			/* Trebuchet */
+extern CUiContext*					UIContext;
 
 extern ImGuiWindowFlags				WindowFlags_Default;
 extern ImGuiWindowFlags				WindowFlags_Overlay;
-extern ImGuiWindowFlags				WindowFlags_Custom;
 extern ImGuiWindowFlags				WindowFlags_Watermark;
 
 extern CApiClient*					RaidcoreAPI;

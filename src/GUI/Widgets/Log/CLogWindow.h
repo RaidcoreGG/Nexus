@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "GUI/IWindow.h"
+#include "UI/Controls/CtlWindow.h"
 #include "Services/Logging/ILogger.h"
 #include "Services/Logging//ELogLevel.h"
 #include "Services/Logging/LogEntry.h"

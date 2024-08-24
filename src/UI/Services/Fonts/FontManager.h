@@ -2,21 +2,22 @@
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
 /// Name         :  FontManager.h
-/// Description  :  Handles fonts for the ImGui implementation of the GUI.
+/// Description  :  Handles fonts for the ImGui implementation of the UI.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
 #ifndef FONTMANAGER_H
 #define FONTMANAGER_H
 
-#include <Windows.h>
 #include <mutex>
 #include <string>
 #include <vector>
-
-#include "FuncDefs.h"
+#include <Windows.h>
 
 #include "imgui/imgui.h"
+
+#include "FuncDefs.h"
+#include "Services/Localization/Localization.h"
 
 constexpr const char* CH_FONTMANAGER = "CFontManager";
 
@@ -35,64 +36,19 @@ struct ManagedFont
 };
 
 ///----------------------------------------------------------------------------------------------------
-/// FontManager Namespace
-///----------------------------------------------------------------------------------------------------
-namespace FontManager
-{
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_Get:
-	/// 	Addon API wrapper to get a font sent to the callback.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_Get(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_Get2:
-	/// 	Addon API wrapper to get a font sent to the callback.
-	///----------------------------------------------------------------------------------------------------
-	ImFont* ADDONAPI_Get2(const char* aIdentifier);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_Release:
-	/// 	Addon API wrapper to release a receiver/callback from a specific font.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_Release(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_AddFontFromFile:
-	/// 	Addon API wrapper to add a font from file.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_AddFontFromFile(const char* aIdentifier, float aFontSize, const char* aFilename, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_AddFontFromResource:
-	/// 	Addon API wrapper to add a font from an embedded resource.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_AddFontFromResource(const char* aIdentifier, float aFontSize, unsigned aResourceID, HMODULE aModule, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_AddFontFromMemory:
-	/// 	Addon API wrapper to add a font from memory.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_AddFontFromMemory(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_ResizeFont:
-	/// 	Changes the size of a given font.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_ResizeFont(const char* aIdentifier, float aFontSize);
-}
-
-///----------------------------------------------------------------------------------------------------
-/// CFontManager Singleton
+/// CFontManager Class
 ///----------------------------------------------------------------------------------------------------
 class CFontManager
 {
-public:
+	public:
 	///----------------------------------------------------------------------------------------------------
-	/// GetInstance:
-	/// 	Returns a reference to an instance of CFontManager.
+	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	static CFontManager& GetInstance();
+	CFontManager(CLocalization* aLocalization);
+	///----------------------------------------------------------------------------------------------------
+	/// dtor
+	///----------------------------------------------------------------------------------------------------
+	~CFontManager();
 
 	///----------------------------------------------------------------------------------------------------
 	/// Reload:
@@ -172,22 +128,12 @@ public:
 	///----------------------------------------------------------------------------------------------------
 	int Verify(void* aStartAddress, void* aEndAddress);
 
-	CFontManager(CFontManager const&) = delete;
-	void operator=(CFontManager const&) = delete;
+	private:
+	CLocalization* Language;
 
-private:
-	std::mutex					Mutex;
+	mutable std::mutex			Mutex;
 	std::vector<ManagedFont>	Registry;
 	bool						IsFontAtlasBuilt = false;
-
-	///----------------------------------------------------------------------------------------------------
-	/// ctor
-	///----------------------------------------------------------------------------------------------------
-	CFontManager() = default;
-	///----------------------------------------------------------------------------------------------------
-	/// dtor
-	///----------------------------------------------------------------------------------------------------
-	~CFontManager() = default;
 
 	///----------------------------------------------------------------------------------------------------
 	/// AddFontInternal:

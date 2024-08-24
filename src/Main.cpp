@@ -13,7 +13,7 @@
 #include "State.h"
 
 #include "Services/DataLink/DataLink.h"
-#include "GUI/GUI.h"
+#include "UI/UiContext.h"
 #include "Inputs/InputBinds/InputBindHandler.h"
 #include "Inputs/GameBinds/GameBindsHandler.h"
 #include "Loader/Loader.h"
@@ -153,8 +153,7 @@ namespace Main
 
 			MumbleReader = new CMumbleReader(mumbleName);
 
-			// create imgui context
-			if (!Renderer::GuiContext) { Renderer::GuiContext = ImGui::CreateContext(); }
+			UIContext = new CUiContext(Logger, Language, TextureService, DataLinkService, InputBindApi);
 
 			State::Nexus = ENexusState::LOADED;
 		}
@@ -182,7 +181,8 @@ namespace Main
 			// free addons
 			Loader::Shutdown();
 
-			GUI::Shutdown();
+			UIContext->Shutdown();
+			delete UIContext;
 			delete MumbleReader;
 
 			// shared mem

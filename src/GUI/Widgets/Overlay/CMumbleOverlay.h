@@ -1,24 +1,23 @@
 #ifndef GUI_MUMBLEOVERLAY_H
 #define GUI_MUMBLEOVERLAY_H
 
-#include "GUI/IWindow.h"
+#include "UI/Controls/CtlWindow.h"
 
-#include "Services/Mumble/Definitions/Mumble.h"
 #include "Loader/NexusLinkData.h"
+#include "Services/DataLink/DataLink.h"
+#include "Services/Mumble/Definitions/Mumble.h"
 
-namespace GUI
+class CMumbleOverlay : public IWindow
 {
-	class CMumbleOverlay : public IWindow
-	{
 	public:
-		CMumbleOverlay();
+	CMumbleOverlay(CDataLink* aDataLink);
 
-		void Render();
+	void Render();
 
 	private:
-		Mumble::Data*	MumbleLink;
-		NexusLinkData*	NexusLink;
-	};
-}
+	Mumble::Data* MumbleLink;
+	Mumble::Identity* MumbleIdentity;
+	NexusLinkData* NexusLink;
+};
 
 #endif

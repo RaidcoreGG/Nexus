@@ -59,7 +59,7 @@ namespace State
 	extern EEntryMethod		EntryMethod;			/* How was the host initialized */
 	extern EMultiboxState	MultiboxState;			/* Is this game instance occupying any resources */
 	extern bool				IsChainloading;			/* Is the Nexus chainloading another proxy dll*/
-	extern bool				IsImGuiInitialized;		/* Is ImGui currently up and running */
+	extern bool				IsEULAAccepted;			/* Is the EULA accepted */
 
 	/* start parameters */
 	extern bool				IsDeveloperMode;		/* Is Nexus running in developer mode */

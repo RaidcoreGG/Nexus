@@ -5,8 +5,6 @@ namespace Renderer
 	ID3D11Device*			Device				= nullptr;
 	ID3D11DeviceContext*	DeviceContext		= nullptr;
 	IDXGISwapChain*			SwapChain			= nullptr;
-	ID3D11RenderTargetView* RenderTargetView	= nullptr;
-	ImGuiContext*			GuiContext			= nullptr;
 
 	HWND					WindowHandle		= nullptr;
 

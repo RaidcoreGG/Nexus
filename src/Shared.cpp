@@ -21,12 +21,7 @@ CEventApi*					EventApi			= new CEventApi();
 CRawInputApi*				RawInputApi			= new CRawInputApi();
 CInputBindApi*				InputBindApi		= nullptr; //new CInputBindApi();
 CGameBindsApi*				GameBindsApi		= nullptr; //new CGameBindsApi();
-
-ImFont*						MonospaceFont		= nullptr;
-ImFont*						UserFont			= nullptr;
-ImFont*						Font				= nullptr;
-ImFont*						FontBig				= nullptr;
-ImFont*						FontUI				= nullptr;
+CUiContext*					UIContext			= nullptr;
 
 ImGuiWindowFlags			WindowFlags_Default	=	ImGuiWindowFlags_AlwaysAutoResize |
 													ImGuiWindowFlags_NoResize |
@@ -39,11 +34,6 @@ ImGuiWindowFlags			WindowFlags_Overlay =	ImGuiWindowFlags_NoDecoration |
 													ImGuiWindowFlags_NoMove |
 													ImGuiWindowFlags_NoInputs |
 													ImGuiWindowFlags_NoBringToFrontOnFocus;
-ImGuiWindowFlags			WindowFlags_Custom	=	ImGuiWindowFlags_AlwaysAutoResize |
-													ImGuiWindowFlags_NoResize |
-													ImGuiWindowFlags_NoCollapse |
-													ImGuiWindowFlags_NoBackground |
-													ImGuiWindowFlags_NoTitleBar;
 ImGuiWindowFlags			WindowFlags_Watermark = ImGuiWindowFlags_NoDecoration |
 													ImGuiWindowFlags_AlwaysAutoResize |
 													ImGuiWindowFlags_NoSavedSettings |
