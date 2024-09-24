@@ -17,23 +17,23 @@
 
 struct ContextItem
 {
-	std::string TargetShortcut;
-	GUI_RENDER Callback;
+	std::string                        TargetShortcut;
+	GUI_RENDER                         Callback;
 };
 
 struct Shortcut
 {
-	int										TextureGetAttempts;
-	std::string								TextureNormalIdentifier;
-	std::string								TextureHoverIdentifier;
+	int                                TextureGetAttempts;
+	std::string                        TextureNormalIdentifier;
+	std::string                        TextureHoverIdentifier;
 
-	Texture* TextureNormal;
-	Texture* TextureHover;
-	std::string								InputBind;
-	std::string								TooltipText;
-	bool									IsHovering;
-	bool									HasNotification;
-	std::map<std::string, ContextItem>		ContextItems;
+	Texture*                           TextureNormal;
+	Texture*                           TextureHover;
+	std::string                        InputBind;
+	std::string                        TooltipText;
+	bool                               IsHovering;
+	bool                               HasNotification;
+	std::map<std::string, ContextItem> ContextItems;
 };
 
 #endif

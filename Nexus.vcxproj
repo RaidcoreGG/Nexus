@@ -37,6 +37,7 @@
     <ClCompile Include="src\GUI\Widgets\Menu\MenuItem.cpp" />
     <ClCompile Include="src\GUI\Widgets\Overlay\CMumbleOverlay.cpp" />
     <ClCompile Include="src\Hooks.cpp" />
+    <ClCompile Include="src\thirdparty\ImAnimate\ImAnimate.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui_draw.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui_impl_dx11.cpp" />
@@ -120,6 +121,7 @@
     <ClInclude Include="src\GUI\Widgets\Overlay\CMumbleOverlay.h" />
     <ClInclude Include="src\Hooks.h" />
     <ClInclude Include="src\thirdparty\httplib\httplib.h" />
+    <ClInclude Include="src\thirdparty\ImAnimate\ImAnimate.h" />
     <ClInclude Include="src\thirdparty\imgui\imconfig.h" />
     <ClInclude Include="src\thirdparty\imgui\imgui.h" />
     <ClInclude Include="src\thirdparty\imgui\imgui_extensions.h" />
@@ -475,8 +477,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\thirdparty\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -509,8 +510,7 @@ CALL $(SolutionDir)Scripts\version.bat</Command>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\thirdparty\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8</AdditionalOptions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>

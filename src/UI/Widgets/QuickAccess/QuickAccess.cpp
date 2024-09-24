@@ -12,6 +12,7 @@
 
 #include "imgui/imgui_extensions.h"
 #include "imgui/imgui_internal.h"
+#include "ImAnimate/ImAnimate.h"
 
 #include "Consts.h"
 #include "Renderer.h"
@@ -344,20 +345,16 @@ void CQuickAccess::Render()
 			}
 		}
 
-		bool newHoverState = ImGui::IsWindowHovered() || isActive || isHoveringNative;
-		if (newHoverState != IsHovering)
+		bool isHovering = ImGui::IsWindowHovered() || isActive || isHoveringNative;
+
+		if (isHovering)
 		{
-			if (newHoverState) { IsFadingIn = true; }
-			else { IsFadingIn = false; }
-
-			if (!IsAnimating)
-			{
-				AnimationThread = std::thread(Fade);
-				AnimationThread.detach();
-			}
+			ImGui::Animate(0.5f, 1, 350, &this->Opacity, ImAnimate::ECurve::InCubic);
 		}
-		IsHovering = newHoverState;
-
+		else
+		{
+			ImGui::Animate(1, 0.5f, 350, &this->Opacity, ImAnimate::ECurve::InCubic);
+		}
 	}
 	ImGui::End();
 

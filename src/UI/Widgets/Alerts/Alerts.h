@@ -45,12 +45,18 @@ class CAlerts
 	void Notify(const char* aMessage);
 
 	private:
-	NexusLinkData* NexusLink;
+	struct Alert
+	{
+		std::string    Message;
+		double         StartTime  = 0;
+	};
 
-	std::mutex					Mutex;
-	std::vector<std::string>	Queue;
+	NexusLinkData*     NexusLink;
 
-	float						Opacity = 1.0f;
+	std::mutex         Mutex;
+	std::vector<Alert> Queue;
+
+	float              Opacity    = 1.0f;
 };
 
 #endif

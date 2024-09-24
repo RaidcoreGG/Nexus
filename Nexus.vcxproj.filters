@@ -190,6 +190,9 @@
     <Filter Include="UI\Widgets\EULA">
       <UniqueIdentifier>{47a73a5f-ea70-44b3-a9d5-a6b0c73149c7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="_EXTERNAL\ImAnimate">
+      <UniqueIdentifier>{b15de497-e84e-4c7c-bf38-644089178710}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -416,6 +419,9 @@
     </ClCompile>
     <ClCompile Include="src\UI\Widgets\EULA\EULAModal.cpp">
       <Filter>UI\Widgets\EULA</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thirdparty\ImAnimate\ImAnimate.cpp">
+      <Filter>_EXTERNAL\ImAnimate</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1201,6 +1207,9 @@
     </ClInclude>
     <ClInclude Include="src\UI\Widgets\EULA\EULAModal.h">
       <Filter>UI\Widgets\EULA</Filter>
+    </ClInclude>
+    <ClInclude Include="src\thirdparty\ImAnimate\ImAnimate.h">
+      <Filter>_EXTERNAL\ImAnimate</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

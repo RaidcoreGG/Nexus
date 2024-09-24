@@ -120,25 +120,25 @@ class CQuickAccess
 	int Verify(void* aStartAddress, void* aEndAddress);
 
 	private:
-	NexusLinkData* NexusLink;
-	Mumble::Data* MumbleLink;
-	CLogHandler* Logger;
-	CInputBindApi* InputBindApi;
-	CTextureLoader* TextureService;
-	CLocalization* Language;
+	NexusLinkData*                     NexusLink;
+	Mumble::Data*                      MumbleLink;
+	CLogHandler*                       Logger;
+	CInputBindApi*                     InputBindApi;
+	CTextureLoader*                    TextureService;
+	CLocalization*                     Language;
 
-	mutable std::mutex					Mutex;
-	std::map<std::string, Shortcut>		Registry;
-	std::map<std::string, ContextItem>	OrphanedCallbacks;
+	mutable std::mutex                 Mutex;
+	std::map<std::string, Shortcut>    Registry;
+	std::map<std::string, ContextItem> OrphanedCallbacks;
 
-	float								Opacity = 0.50f;
+	float                              Opacity           = 0.50f;
 
-	bool								VerticalLayout = false;
-	EQAVisibility						Visibility = EQAVisibility::AlwaysShow;
-	EQAPosition							Location = EQAPosition::Extend;
-	ImVec2								Offset = ImVec2(0, 0);
+	bool                               VerticalLayout    = false;
+	EQAVisibility                      Visibility        = EQAVisibility::AlwaysShow;
+	EQAPosition                        Location          = EQAPosition::Extend;
+	ImVec2                             Offset            = ImVec2(0, 0);
 
-	Texture* IconNotification = nullptr;
+	Texture*                           IconNotification  = nullptr;
 
 	///----------------------------------------------------------------------------------------------------
 	/// WhereAreMyParents:

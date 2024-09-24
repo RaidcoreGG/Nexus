@@ -324,7 +324,7 @@ void CUiContext::Render()
 			if (State::IsEULAAccepted)
 			{
 				this->Alerts->Render();
-				this->MainWindow::Render();
+				this->MainWindow->Render();
 				this->QuickAccess->Render();
 			}
 			else
@@ -570,7 +570,6 @@ void CUiContext::CreateNexusShortcut()
 
 	/* add shortcut */
 	this->QuickAccess->AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "((000009))");
-
 }
 
 void CUiContext::ApplyStyle()
@@ -873,15 +872,6 @@ namespace UIRoot::Fonts
 		aCallback(aIdentifier, font->Pointer);
 	}
 
-	ImFont* ADDONAPI_Get2(const char* aIdentifier)
-	{
-		if (!aIdentifier) { return nullptr; }
-
-		ManagedFont* font = FontCtx->Get(aIdentifier);
-
-		return font->Pointer;
-	}
-
 	void ADDONAPI_Release(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback)
 	{
 		if (!aCallback) { return; }
@@ -961,12 +951,12 @@ namespace UIRoot::EscapeClosing
 {
 	CEscapeClosing* EscCtx = nullptr;
 
-	void Register(const char* aWindowName, bool* aIsVisible)
+	void ADDONAPI_Register(const char* aWindowName, bool* aIsVisible)
 	{
 		EscCtx->Register(aWindowName, aIsVisible);
 	}
 
-	void Deregister(const char* aWindowName)
+	void ADDONAPI_Deregister(const char* aWindowName)
 	{
 		EscCtx->Deregister(aWindowName);
 	}

@@ -7,3 +7,6 @@
 [submodule "src/Services/Mumble/Definitions"]
 	path = src/Services/Mumble/Definitions
 	url = https://github.com/RaidcoreGG/RCGG-lib-mumble-api
+[submodule "src/thirdparty/ImAnimate"]
+	path = src/thirdparty/ImAnimate
+	url = https://github.com/RaidcoreGG/ImAnimate

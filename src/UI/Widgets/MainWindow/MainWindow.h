@@ -18,8 +18,11 @@ constexpr const char* KB_MENU = "KB_MENU";
 ///----------------------------------------------------------------------------------------------------
 class CMainWindow
 {
+	public:
 	void AddWindow(IWindow* aWindow);
 	void RemoveWindow();
+
+	void Render();
 };
 
 #endif

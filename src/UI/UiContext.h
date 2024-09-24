@@ -203,8 +203,6 @@ namespace UIRoot::Fonts
 
 	void ADDONAPI_Get(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback);
 
-	ImFont* ADDONAPI_Get2(const char* aIdentifier);
-
 	void ADDONAPI_Release(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback);
 
 	void ADDONAPI_AddFontFromFile(const char* aIdentifier, float aFontSize, const char* aFilename, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
