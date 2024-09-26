@@ -554,7 +554,7 @@ namespace GUI
 
 		/* offset */
 		ImGui::Text(Language->Translate("((000051))"));
-		if (ImGui::DragFloat2("##qaoffset", (float*)&QuickAccess::Offset, 1.0f, (static_cast<int>(Renderer::Height)) * -1, static_cast<int>(Renderer::Height)))
+		if (ImGui::DragFloat2("##qaoffset", (float*)&QuickAccess::Offset, 1.0f, static_cast<float>(Renderer::Height) * -1.0f, static_cast<float>(Renderer::Height)))
 		{
 			Settings::Settings[OPT_QAOFFSETX] = QuickAccess::Offset.x;
 			Settings::Settings[OPT_QAOFFSETY] = QuickAccess::Offset.y;

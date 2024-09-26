@@ -279,7 +279,7 @@ namespace GUI
 				{
 					*aIsActive = true;
 
-					int amtItems = aShortcut.ContextItems.size();
+					int amtItems = static_cast<int>(aShortcut.ContextItems.size());
 					int idx = 0;
 
 					ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f }); // smol checkbox
