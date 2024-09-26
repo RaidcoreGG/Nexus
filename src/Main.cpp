@@ -171,7 +171,7 @@ namespace Main
 			case WM_DESTROY:	reasonStr = "WM_DESTROY"; break;
 			case WM_CLOSE:		reasonStr = "WM_CLOSE"; break;
 			case WM_QUIT:		reasonStr = "WM_QUIT"; break;
-			default:			reasonStr = "(null)"; break;
+			default:			reasonStr = NULLSTR; break;
 		}
 		Logger->Critical(CH_CORE, String::Format("Main::Shutdown() | Reason: %s", reasonStr).c_str());
 

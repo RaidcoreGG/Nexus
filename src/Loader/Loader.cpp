@@ -1587,7 +1587,7 @@ namespace Loader
 	{
 		if (aAddress == nullptr)
 		{
-			return "(null)";
+			return NULLSTR;
 		}
 
 		//const std::lock_guard<std::mutex> lock(Mutex);
@@ -1601,7 +1601,7 @@ namespace Loader
 
 				if (aAddress >= startAddress && aAddress <= endAddress)
 				{
-					return addon->Definitions ? addon->Definitions->Name : "(null)";
+					return addon->Definitions ? addon->Definitions->Name : NULLSTR;
 				}
 			}
 
@@ -1614,7 +1614,7 @@ namespace Loader
 			}
 		}
 
-		return "(null)";
+		return NULLSTR;
 	}
 
 	Addon* FindAddonBySig(signed int aSignature)

@@ -464,7 +464,7 @@ namespace GUI
 				case EQAVisibility::Hide:
 					return "((000096))";
 				default:
-					return "(null)";
+					return NULLSTR;
 			}
 		}
 		std::string EQAPositionToString(EQAPosition aQAPosition)
@@ -480,7 +480,7 @@ namespace GUI
 				case EQAPosition::Custom:
 					return "((000070))";
 				default:
-					return "(null)";
+					return NULLSTR;
 			}
 		}
 

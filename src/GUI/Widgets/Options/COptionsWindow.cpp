@@ -866,7 +866,7 @@ namespace GUI
 
 			for (KBCat cat : InputBindCategoryMap)
 			{
-				if (ImGui::CollapsingHeader(cat.Name != "(null)" ? cat.Name.c_str() : Language->Translate("((000088))"), ImGuiTreeNodeFlags_DefaultOpen))
+				if (ImGui::CollapsingHeader(cat.Name != NULLSTR ? cat.Name.c_str() : Language->Translate("((000088))"), ImGuiTreeNodeFlags_DefaultOpen))
 				{
 					DrawInputBindsTable(cat.InputBinds);
 				}

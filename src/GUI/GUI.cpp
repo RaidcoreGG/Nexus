@@ -929,11 +929,11 @@ namespace GUI
 		
 		/* register InputBinds */
 		InputBindApi->Register(KB_MENU, EIBHType::DownOnly, ProcessInputBind, "CTRL+O");
-		InputBindApi->Register(KB_ADDONS, EIBHType::DownOnly, ProcessInputBind, "(null)");
-		InputBindApi->Register(KB_OPTIONS, EIBHType::DownOnly, ProcessInputBind, "(null)");
-		InputBindApi->Register(KB_LOG, EIBHType::DownOnly, ProcessInputBind, "(null)");
-		InputBindApi->Register(KB_DEBUG, EIBHType::DownOnly, ProcessInputBind, "(null)");
-		InputBindApi->Register(KB_MUMBLEOVERLAY, EIBHType::DownOnly, ProcessInputBind, "(null)");
+		InputBindApi->Register(KB_ADDONS, EIBHType::DownOnly, ProcessInputBind, NULLSTR);
+		InputBindApi->Register(KB_OPTIONS, EIBHType::DownOnly, ProcessInputBind, NULLSTR);
+		InputBindApi->Register(KB_LOG, EIBHType::DownOnly, ProcessInputBind, NULLSTR);
+		InputBindApi->Register(KB_DEBUG, EIBHType::DownOnly, ProcessInputBind, NULLSTR);
+		InputBindApi->Register(KB_MUMBLEOVERLAY, EIBHType::DownOnly, ProcessInputBind, NULLSTR);
 		InputBindApi->Register(KB_TOGGLEHIDEUI, EIBHType::DownOnly, ProcessInputBind, "CTRL+H");
 
 		/* load icons */
