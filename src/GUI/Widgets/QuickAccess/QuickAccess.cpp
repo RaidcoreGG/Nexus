@@ -10,6 +10,7 @@
 #include "Services/Textures/TextureLoader.h"
 #include "Inputs/InputBinds/InputBindHandler.h"
 #include "Loader/Loader.h"
+#include "Util/Strings.h"
 
 #include "resource.h"
 
@@ -231,7 +232,16 @@ namespace GUI
 					shortcut.IsHovering = iconHovered || notifHovered;
 					if (shortcut.TooltipText.length() > 0)
 					{
-						ImGui::TooltipGeneric(Language->Translate(shortcut.TooltipText.c_str()));
+						const auto ibRegistry = InputBindApi->GetRegistry();
+						if(const auto registeredInputBind = ibRegistry.find(shortcut.InputBind); registeredInputBind != ibRegistry.end())
+						{
+							const auto ibstr = CInputBindApi::IBToString(registeredInputBind->second.Bind, true);
+							ImGui::TooltipGeneric(String::Format("%s [%s]", Language->Translate(shortcut.TooltipText.c_str()), ibstr).c_str());
+						}
+						else
+						{
+							ImGui::TooltipGeneric(Language->Translate(shortcut.TooltipText.c_str()));
+						}
 					}
 
 					ImGui::PopStyleColor(3);
@@ -351,15 +361,6 @@ namespace GUI
 					sh.TooltipText = aTooltipText;
 					sh.TextureGetAttempts = 0;
 					Registry[str] = sh;
-
-					int amt = 0;
-					if (sh.TextureNormal != nullptr) { amt++; }
-					if (sh.TextureHover != nullptr) { amt++; }
-
-					/*if (amt < 2)
-					{
-						Logger->Debug(CH_QUICKACCESS, "Shortcut \"%s\" was promised 2 textures, but received %d.", str.c_str(), amt);
-					}*/
 				}
 			}
 
