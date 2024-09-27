@@ -20,6 +20,7 @@
 #include "Services/Settings/Settings.h"
 #include "Shared.h"
 #include "UI/UIContext.h"
+#include "Util/Strings.h"
 
 #define GW2_QUICKACCESS_ITEMS 10;
 
@@ -319,7 +320,16 @@ void CQuickAccess::Render()
 				if (ImGui::IsItemHovered())
 				{
 					ImGui::BeginTooltip();
-					ImGui::Text(this->Language->Translate(shortcut.TooltipText.c_str()));
+					const auto ibRegistry = this->InputBindApi->GetRegistry();
+					if(const auto registeredInputBind = ibRegistry.find(shortcut.InputBind); registeredInputBind != ibRegistry.end())
+					{
+						const auto ibstr = CInputBindApi::IBToString(registeredInputBind->second.Bind, true);
+						ImGui::Text(String::Format("%s [%s]", this->Language->Translate(shortcut.TooltipText.c_str()), ibstr).c_str());
+					}
+					else
+					{
+						ImGui::Text(this->Language->Translate(shortcut.TooltipText.c_str()));
+					}
 					if (shortcut.ContextItems.size() > 0)
 					{
 						ImGui::TextDisabled(this->Language->Translate("((Right-Click to for more options.))"));
