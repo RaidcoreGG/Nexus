@@ -43,11 +43,11 @@ namespace Hooks
 			// don't pass to game if custom wndproc
 			if (RawInputApi->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
-			// don't pass to game if InputBind
-			if (InputBindApi->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
-
 			// don't pass to game if gui
 			if (UIContext->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
+
+			// don't pass to game if InputBind
+			if (InputBindApi->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
 			if (uMsg == WM_DESTROY || uMsg == WM_QUIT || uMsg == WM_CLOSE)
 			{
