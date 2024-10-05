@@ -49,6 +49,11 @@ class CQuickAccess
 	static std::string EQAPositionToString(EQAPosition aQAPosition);
 
 	public:
+	bool                               VerticalLayout = false;
+	EQAVisibility                      Visibility     = EQAVisibility::AlwaysShow;
+	EQAPosition                        Location       = EQAPosition::Extend;
+	ImVec2                             Offset         = ImVec2(0, 0);
+
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
@@ -112,6 +117,18 @@ class CQuickAccess
 	/// 	Removes a context item.
 	///----------------------------------------------------------------------------------------------------
 	void RemoveContextItem(const char* aIdentifier);
+	
+	///----------------------------------------------------------------------------------------------------
+	/// GetRegistry:
+	/// 	Returns a copy of the registry.
+	///----------------------------------------------------------------------------------------------------
+	std::map<std::string, Shortcut> GetRegistry() const;
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetOrphanage:
+	/// 	Returns a copy of the orphaned callbacks.
+	///----------------------------------------------------------------------------------------------------
+	std::map<std::string, ContextItem> GetOrphanage() const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Verify:
@@ -133,16 +150,11 @@ class CQuickAccess
 
 	float                              Opacity           = 0.50f;
 
-	bool                               VerticalLayout    = false;
-	EQAVisibility                      Visibility        = EQAVisibility::AlwaysShow;
-	EQAPosition                        Location          = EQAPosition::Extend;
-	ImVec2                             Offset            = ImVec2(0, 0);
-
 	Texture*                           IconNotification  = nullptr;
 
 	///----------------------------------------------------------------------------------------------------
 	/// WhereAreMyParents:
-	/// 	Returns context items to their parents.
+	/// 	Returns orphaned context items to their parents.
 	///----------------------------------------------------------------------------------------------------
 	void WhereAreMyParents();
 };

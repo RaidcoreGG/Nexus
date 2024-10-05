@@ -113,7 +113,7 @@ public:
 private:
 	std::mutex					Mutex;
 	std::vector<ILogger*>		Registry;
-	std::vector<LogEntry>		LogEntries;
+	std::vector<LogEntry*>		LogEntries;
 };
 
 #endif

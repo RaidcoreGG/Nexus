@@ -10,11 +10,12 @@
 
 #include <vector>
 
+#include "ImAnimate/ImAnimate.h"
 #include "imgui/imgui_extensions.h"
 #include "imgui/imgui_internal.h"
-#include "ImAnimate/ImAnimate.h"
 
 #include "Consts.h"
+#include "Context.h"
 #include "Renderer.h"
 #include "resource.h"
 #include "Services/Settings/Settings.h"
@@ -40,7 +41,7 @@ std::string CQuickAccess::EQAVisibilityToString(EQAVisibility aQAVisibility)
 		case EQAVisibility::Hide:
 			return "((000096))";
 		default:
-			return "(null)";
+			return NULLSTR;
 	}
 }
 
@@ -57,7 +58,7 @@ std::string CQuickAccess::EQAPositionToString(EQAPosition aQAPosition)
 		case EQAPosition::Custom:
 			return "((000070))";
 		default:
-			return "(null)";
+			return NULLSTR;
 	}
 }
 
@@ -70,58 +71,14 @@ CQuickAccess::CQuickAccess(CDataLink* aDataLink, CLogHandler* aLogger, CInputBin
 	this->TextureService = aTextureService;
 	this->Language = aLocalization;
 
-	/* load settings */
-	if (!Settings::Settings.is_null())
-	{
-		bool anyDefaultSet = false;
+	CContext* ctx = CContext::GetContext();
+	CSettings* settingsCtx = ctx->GetSettingsCtx();
 
-		if (!Settings::Settings[OPT_QAVERTICAL].is_null())
-		{
-			Settings::Settings[OPT_QAVERTICAL].get_to(this->VerticalLayout);
-		}
-		else
-		{
-			Settings::Settings[OPT_QAVERTICAL] = this->VerticalLayout;
-			anyDefaultSet = true;
-		}
-
-		if (!Settings::Settings[OPT_QALOCATION].is_null())
-		{
-			Settings::Settings[OPT_QALOCATION].get_to(this->Location);
-		}
-		else
-		{
-			Settings::Settings[OPT_QALOCATION] = this->Location;
-			anyDefaultSet = true;
-		}
-
-		if (!Settings::Settings[OPT_QAOFFSETX].is_null() && !Settings::Settings[OPT_QAOFFSETY].is_null())
-		{
-			Settings::Settings[OPT_QAOFFSETX].get_to(this->Offset.x);
-			Settings::Settings[OPT_QAOFFSETY].get_to(this->Offset.y);
-		}
-		else
-		{
-			Settings::Settings[OPT_QAOFFSETX] = this->Offset.x;
-			Settings::Settings[OPT_QAOFFSETY] = this->Offset.y;
-			anyDefaultSet = true;
-		}
-
-		if (!Settings::Settings[OPT_QAVISIBILITY].is_null())
-		{
-			Settings::Settings[OPT_QAVISIBILITY].get_to(this->Visibility);
-		}
-		else
-		{
-			Settings::Settings[OPT_QAVISIBILITY] = this->Visibility;
-			anyDefaultSet = true;
-		}
-
-		if (anyDefaultSet)
-		{
-			Settings::Save();
-		}
-	}
+	this->VerticalLayout = settingsCtx->Get<bool>(OPT_QAVERTICAL);
+	this->Location = settingsCtx->Get<EQAPosition>(OPT_QALOCATION);
+	this->Offset.x = settingsCtx->Get<float>(OPT_QAOFFSETX);
+	this->Offset.y = settingsCtx->Get<float>(OPT_QAOFFSETY);
+	this->Visibility = settingsCtx->Get<EQAVisibility>(OPT_QAVISIBILITY);
 }
 
 CQuickAccess::~CQuickAccess()
@@ -260,7 +217,7 @@ void CQuickAccess::Render()
 						this->InputBindApi->Invoke(shortcut.InputBind);
 					}
 				}
-				iconHovered = ImGui::IsItemHovered();
+				iconHovered = ImGui::IsItemHovered() || ImGui::IsItemClicked();
 			}
 			else if (shortcut.TextureGetAttempts < 10)
 			{
@@ -322,7 +279,7 @@ void CQuickAccess::Render()
 					ImGui::Text(this->Language->Translate(shortcut.TooltipText.c_str()));
 					if (shortcut.ContextItems.size() > 0)
 					{
-						ImGui::TextDisabled(this->Language->Translate("((Right-Click to for more options.))"));
+						ImGui::TextDisabled(this->Language->Translate("((Right-Click for more options.))"));
 					}
 					ImGui::EndTooltip();
 				}
@@ -349,11 +306,11 @@ void CQuickAccess::Render()
 
 		if (isHovering)
 		{
-			ImGui::Animate(0.5f, 1, 350, &this->Opacity, ImAnimate::ECurve::InCubic);
+			ImGui::Animate(0.5f, 1, 350, &this->Opacity, ImAnimate::ECurve::Linear);
 		}
 		else
 		{
-			ImGui::Animate(1, 0.5f, 350, &this->Opacity, ImAnimate::ECurve::InCubic);
+			ImGui::Animate(1, 0.5f, 350, &this->Opacity, ImAnimate::ECurve::Linear);
 		}
 	}
 	ImGui::End();
@@ -370,8 +327,8 @@ void CQuickAccess::RenderContextMenu(const std::string& aIdentifier, const Short
 		{
 			*aIsActive = true;
 
-			int amtItems = aShortcut.ContextItems.size();
-			int idx = 0;
+			size_t amtItems = aShortcut.ContextItems.size();
+			size_t idx = 0;
 
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f }); // smol checkbox
 			for (auto& [cbidentifier, cbshortcut] : aShortcut.ContextItems)
@@ -518,6 +475,20 @@ void CQuickAccess::RemoveContextItem(const char* aIdentifier)
 	}
 
 	this->OrphanedCallbacks.erase(aIdentifier);
+}
+
+std::map<std::string, Shortcut> CQuickAccess::GetRegistry() const
+{
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	return this->Registry;
+}
+
+std::map<std::string, ContextItem> CQuickAccess::GetOrphanage() const
+{
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	return this->OrphanedCallbacks;
 }
 
 int CQuickAccess::Verify(void* aStartAddress, void* aEndAddress)

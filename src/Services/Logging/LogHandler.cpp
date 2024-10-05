@@ -39,7 +39,7 @@ void CLogHandler::RegisterLogger(ILogger* aLogger)
 	this->Registry.push_back(aLogger);
 
 	/* replay log messages */
-	for (LogEntry entry : this->LogEntries)
+	for (LogEntry* entry : this->LogEntries)
 	{
 		aLogger->LogMessage(entry);
 	}
@@ -112,12 +112,12 @@ void CLogHandler::LogMessageV(ELogLevel aLogLevel, std::string aChannel, const c
 
 void CLogHandler::LogMessageUnformatted(ELogLevel aLogLevel, std::string aChannel, const char* aMsg)
 {
-	LogEntry entry;
-	entry.LogLevel = aLogLevel;
-	entry.Timestamp = Time::GetTimestamp();
-	entry.TimestampMilliseconds = Time::GetMilliseconds();
-	entry.Channel = aChannel;
-	entry.Message = aMsg;
+	LogEntry* entry = new LogEntry();
+	entry->LogLevel = aLogLevel;
+	entry->Timestamp = Time::GetTimestamp();
+	entry->TimestampMilliseconds = Time::GetMilliseconds();
+	entry->Channel = aChannel;
+	entry->Message = aMsg;
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -127,7 +127,7 @@ void CLogHandler::LogMessageUnformatted(ELogLevel aLogLevel, std::string aChanne
 	for (ILogger* logger : this->Registry)
 	{
 		/* send logged message to logger if message log level is lower than logger level */
-		if (entry.LogLevel <= logger->GetLogLevel())
+		if (entry->LogLevel <= logger->GetLogLevel())
 		{
 			logger->LogMessage(entry);
 		}

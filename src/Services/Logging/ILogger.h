@@ -46,7 +46,7 @@ class ILogger
 		/// LogMessage:
 		/// 	Virtual function to implement custom logic for logging.
 		///----------------------------------------------------------------------------------------------------
-		virtual void LogMessage(LogEntry aLogEntry) = 0;
+		virtual void LogMessage(LogEntry* aLogEntry) = 0;
 
 	protected:
 		ELogLevel	LogLevel = ELogLevel::ALL;

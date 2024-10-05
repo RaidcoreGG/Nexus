@@ -114,7 +114,7 @@ InputBind CInputBindApi::IBFromString(std::string aInputBind)
 
 	InputBind ib{};
 
-	if (aInputBind == "(null)" || aInputBind == "(NULL)") { return ib; }
+	if (String::ToLower(aInputBind) == NULLSTR) { return ib; }
 
 	aInputBind = String::ToUpper(aInputBind);
 	std::string delimiter = "+";
@@ -196,7 +196,7 @@ std::string CInputBindApi::IBToString(InputBind aInputBind, bool aPadded)
 		(aInputBind.Type == EInputBindType::Mouse && !aInputBind.Code) ||
 		(aInputBind.Type == EInputBindType::Keyboard && !aInputBind.Code && !aInputBind.Alt && !aInputBind.Ctrl && !aInputBind.Shift))
 	{
-		return "(null)";
+		return NULLSTR;
 	}
 
 	char* buff = new char[100];
@@ -415,7 +415,7 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			if (isModifier)
 			{
-				this->Release(wParam);
+				this->Release((unsigned int)wParam);
 			}
 			else
 			{

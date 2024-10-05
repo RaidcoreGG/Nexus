@@ -5,8 +5,6 @@
 
 constexpr const char* NULLSTR = "(null)";
 
-constexpr const char* KB_TOGGLEHIDEUI = "KB_TOGGLEHIDEUI";
-
 /* Channels */
 extern const char* CH_CORE;
 extern const char* CH_LOADER;

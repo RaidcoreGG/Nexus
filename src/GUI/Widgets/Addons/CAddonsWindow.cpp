@@ -1,3 +1,4 @@
+#ifdef MEME
 #include "CAddonsWindow.h"
 
 #include <Windows.h>
@@ -441,3 +442,4 @@ namespace GUI
 		ImGui::PopFont();
 	}
 }
+#endif

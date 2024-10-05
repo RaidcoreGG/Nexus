@@ -28,6 +28,8 @@
 
 #include "Util/Strings.h"
 
+#include "Context.h"
+
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
@@ -133,27 +135,31 @@ namespace Main
 			InputBindApi = new CInputBindApi(Logger);
 			GameBindsApi = new CGameBindsApi(RawInputApi, Logger, EventApi);
 
-			Settings::Load();
+			CSettings* settings = new CSettings(Index::F_SETTINGS);
 
 			// if it's not already been explicitly set via command line, check settings
 			if (!State::IsDeveloperMode)
 			{
-				if (!Settings::Settings[OPT_DEVMODE].is_null())
-				{
-					Settings::Settings[OPT_DEVMODE].get_to(State::IsDeveloperMode);
-				}
-				else
-				{
-					State::IsDeveloperMode = false;
-					Settings::Settings[OPT_DEVMODE] = false;
-				}
+				State::IsDeveloperMode = settings->Get<bool>(OPT_DEVMODE);
 			}
 
 			//API::Initialize();
 
 			MumbleReader = new CMumbleReader(mumbleName);
 
+			CContext* ctx = CContext::GetContext();
+			ctx->SetSettingsCtx(settings);
+			ctx->SetModule(NexusHandle);
+			ctx->SetTextureService(TextureService);
+			ctx->SetEventApi(EventApi);
+			ctx->SetInputBindApi(InputBindApi);
+			ctx->SetDataLink(DataLinkService);
+			ctx->SetLocalization(Language);
+			ctx->SetGameBindsApi(GameBindsApi);
+
 			UIContext = new CUiContext(Logger, Language, TextureService, DataLinkService, InputBindApi);
+
+			ctx->SetUIContext(UIContext);
 
 			State::Nexus = ENexusState::LOADED;
 		}
@@ -170,7 +176,7 @@ namespace Main
 			case WM_DESTROY:	reasonStr = "WM_DESTROY"; break;
 			case WM_CLOSE:		reasonStr = "WM_CLOSE"; break;
 			case WM_QUIT:		reasonStr = "WM_QUIT"; break;
-			default:			reasonStr = "(null)"; break;
+			default:			reasonStr = NULLSTR; break;
 		}
 		Logger->Critical(CH_CORE, String::Format("Main::Shutdown() | Reason: %s", reasonStr).c_str());
 

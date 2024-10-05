@@ -1,3 +1,4 @@
+#ifdef MEME
 #ifndef GUI_ADDONSWINDOW_H
 #define GUI_ADDONSWINDOW_H
 
@@ -52,4 +53,5 @@ namespace GUI
 	};
 }
 
+#endif
 #endif

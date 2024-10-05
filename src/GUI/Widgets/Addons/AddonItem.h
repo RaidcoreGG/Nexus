@@ -1,3 +1,4 @@
+#ifdef MEME
 #ifndef GUI_ADDONITEM_H
 #define GUI_ADDONITEM_H
 
@@ -12,4 +13,5 @@ namespace GUI
 	void AddonItem(LibraryAddon* aAddon, bool aInstalled = false, bool aIsArcPlugin = false);
 }
 
+#endif
 #endif

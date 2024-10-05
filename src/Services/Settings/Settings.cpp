@@ -11,9 +11,8 @@
 #include <filesystem>
 #include <fstream>
 
-#include "Index.h"
 #include "Consts.h"
-#include "Shared.h"
+#include "Context.h"
 
 const char* OPT_LASTGAMEBUILD				= "LastGameBuild";
 const char* OPT_LASTCHECKEDGAMEBUILD		= "LastCheckedGameBuild";
@@ -37,35 +36,51 @@ const char* OPT_ALWAYSSHOWQUICKACCESS		= "AlwaysShowQuickAccess";
 const char* OPT_GLOBALSCALE					= "GlobalScale";
 const char* OPT_SHOWADDONSWINDOWAFTERDUU	= "ShowAddonsWindowAfterDisableUntilUpdate";
 const char* OPT_USERFONT					= "UserFont";
+const char* OPT_DISABLEFESTIVEFLAIR			= "DisableFestiveFlair";
 
-namespace Settings
+CSettings::CSettings(std::filesystem::path aPath)
 {
-	std::mutex	Mutex;
-	json		Settings = json::object();
+	this->Path = aPath;
+	this->Load();
+}
 
-	void Load()
+void CSettings::Load()
+{
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	this->LoadInternal();
+}
+
+void CSettings::Save()
+{
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	this->SaveInternal();
+}
+
+void CSettings::LoadInternal()
+{
+	if (!std::filesystem::exists(this->Path))
 	{
-		if (!std::filesystem::exists(Index::F_SETTINGS)) { return; }
-
-		const std::lock_guard<std::mutex> lock(Mutex);
-		try
-		{
-			std::ifstream file(Index::F_SETTINGS);
-			Settings = json::parse(file);
-			file.close();
-		}
-		catch (json::parse_error& ex)
-		{
-			Logger->Warning(CH_CORE, "Settings.json could not be parsed. Error: %s", ex.what());
-		}
+		return;
 	}
 
-	void Save()
+	try
 	{
-		const std::lock_guard<std::mutex> lock(Mutex);
-
-		std::ofstream file(Index::F_SETTINGS);
-		file << Settings.dump(1, '\t') << std::endl;
+		std::ifstream file(this->Path);
+		this->Store = json::parse(file);
 		file.close();
 	}
+	catch (json::parse_error& ex)
+	{
+		CContext* ctx = CContext::GetContext();
+		ctx->GetLogger()->Warning(CH_SETTINGS, "Settings.json could not be parsed. Error: %s", ex.what());
+	}
+}
+
+void CSettings::SaveInternal()
+{
+	std::ofstream file(this->Path);
+	file << this->Store.dump(1, '\t') << std::endl;
+	file.close();
 }

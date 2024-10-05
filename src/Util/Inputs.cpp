@@ -96,3 +96,14 @@ WPARAM GetMouseMessageWPARAM(EMouseButtons aMouseButton, bool aIsCtrl, bool aIsS
 		)
 	);
 }
+
+namespace Inputs
+{
+	bool IsCursorHidden()
+	{
+		CURSORINFO curInfo{};
+		curInfo.cbSize = sizeof(CURSORINFO);
+		GetCursorInfo(&curInfo);
+		return !(curInfo.flags & CURSOR_SHOWING);
+	}
+}

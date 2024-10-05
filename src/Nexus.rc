@@ -74,7 +74,7 @@ BEGIN
 			VALUE "FileDescription", "Unofficial Guild Wars 2 Addon Host"
 			VALUE "FileVersion", TOSTRING(V_MAJOR) "." TOSTRING(V_MINOR) "." TOSTRING(V_BUILD) "." TOSTRING(V_REVISION)
 			VALUE "InternalName", "nexus.dll"
-			VALUE "LegalCopyright", "© 2023-2024 Raidcore"
+			VALUE "LegalCopyright", "© 2021-2024 Raidcore"
 			VALUE "ProductName", "Nexus"
 			VALUE "ProductVersion", TOSTRING(V_MAJOR) "." TOSTRING(V_MINOR) "." TOSTRING(V_BUILD) "." TOSTRING(V_REVISION)
 		END
@@ -85,96 +85,62 @@ BEGIN
 	END
 END
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Font
-//
-
-RES_FONT_MENOMONIA      FONT                    "Resources\\Fonts\\Menomonia.ttf"
-RES_FONT_TREBUCHET      FONT                    "Resources\\Fonts\\TrebuchetMS.ttf"
-RES_FONT_PROGGYCLEAN    FONT                    "Resources\\Fonts\\ProggyClean.ttf"
-/////////////////////////////////////////////////////////////////////////////
-//
-// PNG
-//
+/* Fonts */
+RES_FONT_MENOMONIA              FONT    "Resources\\Fonts\\Menomonia.ttf"
+RES_FONT_TREBUCHET              FONT    "Resources\\Fonts\\TrebuchetMS.ttf"
+RES_FONT_PROGGYCLEAN            FONT    "Resources\\Fonts\\ProggyClean.ttf"
 
 /* QuickAccess */
-RES_ICON_NEXUS                  PNG             "Resources\\QuickAccess\\Nexus.png"
-RES_ICON_NEXUS_HOVER            PNG             "Resources\\QuickAccess\\Nexus_Hover.png"
-RES_ICON_NEXUS_HALLOWEEN        PNG             "Resources\\QuickAccess\\NexusHalloween.png"
-RES_ICON_NEXUS_HALLOWEEN_HOVER  PNG             "Resources\\QuickAccess\\NexusHalloween_Hover.png"
-RES_ICON_NEXUS_XMAS             PNG             "Resources\\QuickAccess\\NexusXmas.png"
-RES_ICON_NEXUS_XMAS_HOVER       PNG             "Resources\\QuickAccess\\NexusXmas_Hover.png"
+RES_ICON_NEXUS                  PNG     "Resources\\QuickAccess\\Nexus.png"
+RES_ICON_NEXUS_HOVER            PNG     "Resources\\QuickAccess\\Nexus_Hover.png"
+RES_ICON_NEXUS_HALLOWEEN        PNG     "Resources\\QuickAccess\\NexusHalloween.png"
+RES_ICON_NEXUS_HALLOWEEN_HOVER  PNG     "Resources\\QuickAccess\\NexusHalloween_Hover.png"
+RES_ICON_NEXUS_XMAS             PNG     "Resources\\QuickAccess\\NexusXmas.png"
+RES_ICON_NEXUS_XMAS_HOVER       PNG     "Resources\\QuickAccess\\NexusXmas_Hover.png"
 
-RES_ICON_GENERIC				PNG             "Resources\\QuickAccess\\Generic.png"
-RES_ICON_GENERIC_HOVER			PNG             "Resources\\QuickAccess\\Generic_Hover.png"
+RES_ICON_GENERIC                PNG     "Resources\\QuickAccess\\Generic.png"
+RES_ICON_GENERIC_HOVER          PNG     "Resources\\QuickAccess\\Generic_Hover.png"
 
-RES_ICON_NOTIFICATION			PNG             "Resources\\QuickAccess\\Notification.png"
+RES_ICON_NOTIFICATION           PNG     "Resources\\QuickAccess\\Notification.png"
 
 /* Menu*/
-RES_ICON_RETURN					PNG             "Resources\\Menu\\BtnReturn.png"
-RES_ICON_ADDONS					PNG             "Resources\\Menu\\BtnAddons.png"
-RES_ICON_OPTIONS				PNG             "Resources\\Menu\\BtnOptions.png"
-RES_ICON_OPTIONS_HOVER			PNG             "Resources\\Menu\\BtnOptions_Hover.png"
-RES_ICON_CHANGELOG				PNG             "Resources\\Menu\\BtnChangelog.png"
-RES_ICON_LOG					PNG             "Resources\\Menu\\BtnLog.png"
-RES_ICON_DEBUG					PNG             "Resources\\Menu\\BtnDebug.png"
-RES_ICON_ABOUT					PNG             "Resources\\Menu\\BtnAbout.png"
+RES_ICON_ADDONS                 PNG     "Resources\\icons\\addons.png"
+RES_ICON_OPTIONS                PNG     "Resources\\icons\\settings.png"
+RES_ICON_BINDS                  PNG     "Resources\\icons\\binds.png"
+RES_ICON_LOG                    PNG     "Resources\\icons\\log.png"
+RES_ICON_DEBUG                  PNG     "Resources\\icons\\debug.png"
+RES_ICON_DASHBOARD              PNG     "Resources\\icons\\home.png"
+RES_ICON_ABOUT                  PNG     "Resources\\icons\\about.png"
 
-RES_TEX_MENU_BACKGROUND			PNG             "Resources\\Menu\\Background.png"
-RES_TEX_MENU_BUTTON				PNG             "Resources\\Menu\\MenuItem.png"
-RES_TEX_MENU_BUTTON_HOVER		PNG             "Resources\\Menu\\MenuItem_Hover.png"
-
-/* AddonsWindow */
-RES_TEX_ADDONS_BACKGROUND		PNG             "Resources\\AddonsWindow\\Background.png"
-RES_TEX_ADDONITEM				PNG             "Resources\\AddonsWindow\\AddonItem.png"
-RES_TEX_ADDONITEM_HIGHLIGHT		PNG             "Resources\\AddonsWindow\\AddonItem_Highlight.png"
-RES_TEX_ADDONITEM_DUU			PNG             "Resources\\AddonsWindow\\AddonItem_DUU.png"
-
-RES_TEX_ADDONS_TITLEBAR			PNG             "Resources\\AddonsWindow\\TitleBar.png"
-RES_TEX_ADDONS_TITLEBAR_HOVER	PNG             "Resources\\AddonsWindow\\TitleBar_Hover.png"
-
-RES_ICON_TIER1					PNG             "Resources\\AddonsWindow\\Tier1.png"
-RES_ICON_TIER2					PNG             "Resources\\AddonsWindow\\Tier2.png"
-RES_ICON_TIER3					PNG             "Resources\\AddonsWindow\\Tier3.png"
-RES_ICON_TIER_UNKNOWN			PNG             "Resources\\AddonsWindow\\TierUnknown.png"
-
-RES_ICON_RAIDCORE				PNG             "Resources\\RaidcoreTag.png"
+/* Addon Policy Tiers */
+RES_ICON_TIER_UNKNOWN           PNG     "Resources\\icons\\addonpolicy_notier.png"
+RES_ICON_TIER1                  PNG     "Resources\\icons\\addonpolicy_tier1.png"
+RES_ICON_TIER2                  PNG     "Resources\\icons\\addonpolicy_tier2.png"
+RES_ICON_TIER3                  PNG     "Resources\\icons\\addonpolicy_tier3.png"
 
 /* Generic */
-RES_TEX_TABBTN					PNG             "Resources\\TabBtn.png"
-RES_TEX_TABBTN_HOVER			PNG             "Resources\\TabBtn_Hover.png"
-RES_TEX_BTNCLOSE				PNG             "Resources\\BtnClose.png"
-RES_TEX_BTNCLOSE_HOVER			PNG             "Resources\\BtnClose_Hover.png"
-RES_TEX_TITLEBAREND				PNG             "Resources\\TitleBarEnd.png"
-RES_TEX_TITLEBAREND_HOVER		PNG             "Resources\\TitleBarEnd_Hover.png"
-RES_TEX_BTNREFRESH				PNG				"Resources\\BtnRefresh.png"
-RES_TEX_BTNREFRESH_HOVER		PNG				"Resources\\BtnRefresh_Hover.png"
+RES_ICON_RAIDCORE               PNG     "Resources\\RaidcoreTag.png"
+RES_ICON_POPOUT                 PNG     "Resources\\icons\\ext.png"
+RES_ICON_CLOSE                  PNG     "Resources\\icons\\close.png"
+RES_BANNER_DISCORD              PNG     "Resources\\banners\\discord.png"
+RES_BANNER_PATREON              PNG     "Resources\\banners\\patreon.png"
 
-RES_ARCDPS_INTEGRATION			DLL				"Resources\\bin64\\arcdps_integration64.dll"
+/* Binary */
+RES_ARCDPS_INTEGRATION          DLL     "Resources\\bin64\\arcdps_integration64.dll"
 
-/* ContextMenu */
-RES_TEX_CONTEXTMENU_BULLET		PNG				"Resources\\ContextMenu\\ContextMenu_Bullet.png"
-RES_TEX_CONTEXTMENU_HIGHLIGHT	PNG				"Resources\\ContextMenu\\ContextMenu_Highlight.png"
+/* Locales (primary) */
+RES_LOCALE_EN                   JSON    "Resources\\Locales\\en_Main.json"
+RES_LOCALE_DE                   JSON    "Resources\\Locales\\de_Main.json"
+RES_LOCALE_FR                   JSON    "Resources\\Locales\\fr_Main.json"
+RES_LOCALE_ES                   JSON    "Resources\\Locales\\es_Main.json"
 
-RES_LOCALE_EN					JSON			"Resources\\Locales\\en_Main.json"
-RES_LOCALE_DE					JSON			"Resources\\Locales\\de_Main.json"
-RES_LOCALE_FR					JSON			"Resources\\Locales\\fr_Main.json"
-RES_LOCALE_ES					JSON			"Resources\\Locales\\es_Main.json"
-
-RES_LOCALE_BR					JSON			"Resources\\Locales\\br_Main.json"
-RES_LOCALE_CZ					JSON			"Resources\\Locales\\cz_Main.json"
-RES_LOCALE_IT					JSON			"Resources\\Locales\\it_Main.json"
-RES_LOCALE_PL					JSON			"Resources\\Locales\\pl_Main.json"
-RES_LOCALE_RU					JSON			"Resources\\Locales\\ru_Main.json"
-RES_LOCALE_CN					JSON			"Resources\\Locales\\cn_Main.json"
-
-/* CEulaWindow */
-RES_TEX_EULA_BACKGROUND			PNG             "Resources\\EulaWindow\\Background.png"
-
-RES_TEX_EULA_TITLEBAR			PNG             "Resources\\EulaWindow\\TitleBar.png"
-RES_TEX_EULA_TITLEBAR_HOVER		PNG             "Resources\\EulaWindow\\TitleBar_Hover.png"
+/* Locales (secondary) */
+RES_LOCALE_BR                   JSON    "Resources\\Locales\\br_Main.json"
+RES_LOCALE_CZ                   JSON    "Resources\\Locales\\cz_Main.json"
+RES_LOCALE_IT                   JSON    "Resources\\Locales\\it_Main.json"
+RES_LOCALE_PL                   JSON    "Resources\\Locales\\pl_Main.json"
+RES_LOCALE_RU                   JSON    "Resources\\Locales\\ru_Main.json"
+RES_LOCALE_CN                   JSON    "Resources\\Locales\\cn_Main.json"
 
 #endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////

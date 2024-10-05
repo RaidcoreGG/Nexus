@@ -1,3 +1,4 @@
+#ifdef MEME
 #include "AddonItem.h"
 
 #include <shellapi.h>
@@ -598,3 +599,4 @@ namespace GUI
 		}
 	}
 }
+#endif

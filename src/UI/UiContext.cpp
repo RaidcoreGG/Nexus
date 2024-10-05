@@ -18,6 +18,8 @@
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_internal.h"
 
+#include "Consts.h"
+#include "Context.h"
 #include "Index.h"
 #include "Renderer.h"
 #include "resource.h"
@@ -26,21 +28,29 @@
 #include "Shared.h"
 #include "State.h"
 #include "Util/Base64.h"
+#include "Util/Inputs.h"
 #include "Util/Resources.h"
 #include "Util/Time.h"
 
+#include "UI/Widgets/MainWindow/About/About.h"
+#include "UI/Widgets/MainWindow/Addons/Addons.h"
+#include "UI/Widgets/MainWindow/Binds/Binds.h"
+#include "UI/Widgets/MainWindow/Debug/Debug.h"
+#include "UI/Widgets/MainWindow/Log/Log.h"
+#include "UI/Widgets/MainWindow/Options/Options.h"
+
 namespace UIRoot
 {
-	ImFont* MonospaceFont				= nullptr;
-	ImFont* UserFont					= nullptr;
-	ImFont* Font						= nullptr;
-	ImFont* FontBig						= nullptr;
-	ImFont* FontUI						= nullptr;
+	ImFont* MonospaceFont            = nullptr;
+	ImFont* UserFont                 = nullptr;
+	ImFont* Font                     = nullptr;
+	ImFont* FontBig                  = nullptr;
+	ImFont* FontUI                   = nullptr;
 
-	CLocalization* Language				= nullptr;
-	CFontManager* FontManager			= nullptr;
-	Mumble::Identity* MumbleIdentity	= nullptr;
-	NexusLinkData* NexusLink			= nullptr;
+	CLocalization* Language          = nullptr;
+	CFontManager* FontManager        = nullptr;
+	Mumble::Identity* MumbleIdentity = nullptr;
+	NexusLinkData* NexusLink         = nullptr;
 
 	void Initialize(CLocalization* aLocalization, CDataLink* aDataLink, CFontManager* aFontManager)
 	{
@@ -143,13 +153,15 @@ namespace UIRoot
 			return;
 		}
 
+		CContext* ctx = CContext::GetContext();
+		CSettings* settingsctx = ctx->GetSettingsCtx();
+
 		float currScaling = Mumble::GetScalingFactor(MumbleIdentity->UISize);
-		if (currScaling != Settings::Settings[OPT_LASTUISCALE] && NexusLink->IsGameplay)
+		if (currScaling != settingsctx->Get<float>(OPT_LASTUISCALE) && NexusLink->IsGameplay)
 		{
 			ImGuiIO& io = ImGui::GetIO();
 			Renderer::Scaling = currScaling * io.FontGlobalScale;
-			Settings::Settings[OPT_LASTUISCALE] = currScaling;
-			Settings::Save();
+			settingsctx->Set(OPT_LASTUISCALE, currScaling);
 		}
 
 		if (!FontManager)
@@ -194,26 +206,119 @@ namespace UIRoot
 			}
 		}
 	}
+
+	void OnInputBind(const char* aIdentifier)
+	{
+		CContext* ctx = CContext::GetContext();
+		CUiContext* uictx = ctx->GetUIContext();
+
+		assert(uictx);
+
+		uictx->OnInputBind(aIdentifier);
+	}
+
+	void OnVolatileAddonsDisabled(void* aEventData)
+	{
+		CContext* ctx = CContext::GetContext();
+		CUiContext* uictx = ctx->GetUIContext();
+		CSettings* settingsctx = ctx->GetSettingsCtx();
+
+		assert(uictx);
+		assert(settingsctx);
+
+		if (settingsctx->Get<bool>(OPT_SHOWADDONSWINDOWAFTERDUU))
+		{
+			uictx->OnInputBind(KB_ADDONS);
+		}
+	}
+
+	void OnInputBindUpdate(void* aEventData)
+	{
+		CContext* ctx = CContext::GetContext();
+		CUiContext* uictx = ctx->GetUIContext();
+
+		assert(uictx);
+
+		uictx->Invalidate();
+	}
+
+	void OnTranslationUpdate(void* aEventData)
+	{
+		CContext* ctx = CContext::GetContext();
+		CUiContext* uictx = ctx->GetUIContext();
+
+		assert(uictx);
+
+		uictx->Invalidate();
+	}
 }
 
 CUiContext::CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CTextureLoader* aTextureService, CDataLink* aDataLink, CInputBindApi* aInputBindApi)
 {
-	this->Logger = aLogger;
-	this->Language = aLocalization;
+	this->Logger         = aLogger;
+	this->Language       = aLocalization;
 	this->TextureService = aTextureService;
+	this->DataLink       = aDataLink;
+	this->InputBindApi   = aInputBindApi;
 
-	this->ImGuiContext = ImGui::CreateContext();
+	this->ImGuiContext   = ImGui::CreateContext();
 
-	this->Alerts = new CAlerts(aDataLink);
-	this->MainWindow = new CMainWindow();
-	this->QuickAccess = new CQuickAccess(aDataLink, aLogger, aInputBindApi, aTextureService, aLocalization);
+	this->Alerts         = new CAlerts(aDataLink);
+	this->MainWindow     = new CMainWindow();
+	this->QuickAccess    = new CQuickAccess(aDataLink, aLogger, aInputBindApi, aTextureService, aLocalization);
 
-	this->FontManager = new CFontManager(aLocalization);
-	this->EscapeClose = new CEscapeClosing();
+	this->FontManager    = new CFontManager(aLocalization);
+	this->EscapeClose    = new CEscapeClosing();
 
-	this->ApplyStyle();
-	this->CreateNexusShortcut();
+	UIRoot::Initialize(this->Language, this->DataLink, this->FontManager);
+	UIRoot::GUI::UICtx            = this;
+	UIRoot::Fonts::FontCtx        = this->FontManager;
+	UIRoot::Alerts::AlertCtx      = this->Alerts;
+	UIRoot::QuickAccess::QACtx    = this->QuickAccess;
+	UIRoot::EscapeClosing::EscCtx = this->EscapeClose;
+
+	EventApi->Subscribe("EV_MUMBLE_IDENTITY_UPDATED",            UIRoot::OnMumbleIdentityChanged, true);
+	EventApi->Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", UIRoot::OnUELanguageChanged, true);
+	EventApi->Subscribe("EV_VOLATILE_ADDON_DISABLED",            UIRoot::OnVolatileAddonsDisabled, true);
+	EventApi->Subscribe("EV_INPUTBIND_UPDATED",                  UIRoot::OnInputBindUpdate, true);
+	EventApi->Subscribe("EV_TRANSLATION_UPDATED",                UIRoot::OnTranslationUpdate, true);
+
+	CAddonsWindow*  addonsWnd  = new CAddonsWindow();
+	COptionsWindow* optionsWnd = new COptionsWindow();
+	CBindsWindow*   bindsWNd   = new CBindsWindow();
+	CLogWindow*     logWnd     = new CLogWindow();
+	CDebugWindow*   debugWnd   = new CDebugWindow();
+	CAboutBox*      aboutWnd   = new CAboutBox();
+
+	this->Logger->RegisterLogger(logWnd);
+
+	this->MainWindow->AddWindow(addonsWnd);
+	this->MainWindow->AddWindow(optionsWnd);
+	this->MainWindow->AddWindow(bindsWNd);
+	this->MainWindow->AddWindow(logWnd);
+	this->MainWindow->AddWindow(debugWnd);
+	this->MainWindow->AddWindow(aboutWnd);
+
+	/* register InputBinds */
+	this->InputBindApi->Register(KB_MENU,          EIBHType::DownOnly, UIRoot::OnInputBind, "CTRL+O");
+	this->InputBindApi->Register(KB_ADDONS,        EIBHType::DownOnly, UIRoot::OnInputBind, NULLSTR);
+	this->InputBindApi->Register(KB_OPTIONS,       EIBHType::DownOnly, UIRoot::OnInputBind, NULLSTR);
+	this->InputBindApi->Register(KB_LOG,           EIBHType::DownOnly, UIRoot::OnInputBind, NULLSTR);
+	this->InputBindApi->Register(KB_DEBUG,         EIBHType::DownOnly, UIRoot::OnInputBind, NULLSTR);
+	this->InputBindApi->Register(KB_TOGGLEHIDEUI,  EIBHType::DownOnly, UIRoot::OnInputBind, "CTRL+H");
+
+	this->EscapeClose->Register("Nexus", this->MainWindow->GetVisibleStatePtr());
+	this->EscapeClose->Register(addonsWnd->GetName().c_str(), addonsWnd->GetVisibleStatePtr());
+	this->EscapeClose->Register(optionsWnd->GetName().c_str(), optionsWnd->GetVisibleStatePtr());
+	this->EscapeClose->Register(bindsWNd->GetName().c_str(), bindsWNd->GetVisibleStatePtr());
+	this->EscapeClose->Register(logWnd->GetName().c_str(), logWnd->GetVisibleStatePtr());
+	this->EscapeClose->Register(debugWnd->GetName().c_str(), debugWnd->GetVisibleStatePtr());
+	this->EscapeClose->Register(aboutWnd->GetName().c_str(), aboutWnd->GetVisibleStatePtr());
+
 	this->UnpackLocales();
+	this->LoadSettings();
+	this->CreateNexusShortcut();
+	this->LoadFonts();
 }
 
 CUiContext::~CUiContext()
@@ -312,35 +417,39 @@ void CUiContext::Render()
 		ImGui::NewFrame();
 
 		/* draw overlay */
-		if (this->IsVisible)
+		if (State::IsEULAAccepted)
 		{
-			/* draw addons*/
-			for (GUI_RENDER callback : this->RegistryRender)
+			if (this->IsVisible)
 			{
-				if (callback) { callback(); }
-			}
+				/* draw addons*/
+				for (GUI_RENDER callback : this->RegistryRender)
+				{
+					if (callback) { callback(); }
+				}
 
-			/* draw nexus windows */
-			if (State::IsEULAAccepted)
-			{
+				/* draw nexus windows */
 				this->Alerts->Render();
 				this->MainWindow->Render();
 				this->QuickAccess->Render();
 			}
-			else
+		}
+		else
+		{
+			/* only create eula modal when we actually need it */
+			if (!this->EULAModal)
 			{
-				/* only create eula modal when we actually need it */
-				if (!this->EULAModal)
-				{
-					this->EULAModal = new CEULAModal(this->WindowHandle, this->Language);
-				}
+				this->EULAModal = new CEULAModal(this->WindowHandle, this->Language);
+			}
 
-				/* if returns true, eula was accepted. free the memory */
-				if (this->EULAModal->Render())
-				{
-					delete this->EULAModal;
-					this->EULAModal = nullptr;
-				}
+			/* if returns true, eula was accepted. free the memory */
+			if (this->EULAModal->Render())
+			{
+				delete this->EULAModal;
+				this->EULAModal = nullptr;
+				State::IsEULAAccepted = true;
+
+				/* activate main window for the first time */
+				this->MainWindow->Activate();
 			}
 		}
 
@@ -358,6 +467,13 @@ void CUiContext::Render()
 	}
 }
 
+void CUiContext::Invalidate()
+{
+	//this->Alerts->Invalidate();
+	this->MainWindow->Invalidate();
+	//this->QuickAccess->Invalidate();
+}
+
 UINT CUiContext::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	if (!this->IsInitialized)
@@ -371,63 +487,52 @@ UINT CUiContext::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		// mouse input
 		case WM_MOUSEMOVE:
-			io.MousePos = ImVec2((float)(LOWORD(lParam)), (float)(HIWORD(lParam)));
-
-			/* don't update mouse left or right click held */
-			/*if (this->IsLeftClickHeld || this->IsRightClickHeld)
+			if (!Inputs::IsCursorHidden())
 			{
-				io.MousePos = ImVec2(-FLT_MAX, -FLT_MAX);
-			}
-			else */if (io.WantCaptureMouse)
-			{
-				return 0;
+				/* only set cursor pos if cursor is visible */
+				io.MousePos = ImVec2((float)(LOWORD(lParam)), (float)(HIWORD(lParam)));
 			}
 			break;
 
 		case WM_LBUTTONDBLCLK:
 		case WM_LBUTTONDOWN:
-			if (io.WantCaptureMouse && !this->IsLeftClickHeld && !this->IsRightClickHeld)
+			if (io.WantCaptureMouse && !Inputs::IsCursorHidden())
 			{
 				io.MouseDown[0] = true;
 				return 0;
 			}
 			else //if (!io.WantCaptureMouse)
 			{
-				this->IsLeftClickHeld = true;
 				ImGui::ClearActiveID();
 			}
 			break;
 		case WM_RBUTTONDBLCLK:
 		case WM_RBUTTONDOWN:
-			if (io.WantCaptureMouse && !this->IsLeftClickHeld && !this->IsRightClickHeld)
+			if (io.WantCaptureMouse && !Inputs::IsCursorHidden())
 			{
 				io.MouseDown[1] = true;
 				return 0;
-			}
-			else //if (!io.WantCaptureMouse)
-			{
-				this->IsRightClickHeld = true;
 			}
 			break;
 
 			// doesn't hurt passing these through to the game
 		case WM_LBUTTONUP:
-			this->IsLeftClickHeld = false; io.MouseDown[0] = false;
+			io.MouseDown[0] = false;
 			break;
 		case WM_RBUTTONUP:
-			this->IsRightClickHeld = false; io.MouseDown[1] = false;
+			io.MouseDown[1] = false;
 			break;
 
 			// scroll
 		case WM_MOUSEWHEEL:
-			if (io.WantCaptureMouse && !this->IsLeftClickHeld && !this->IsRightClickHeld)
+			if (io.WantCaptureMouse && !Inputs::IsCursorHidden())
 			{
 				io.MouseWheel += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;
 				return 0;
 			}
 			break;
 		case WM_MOUSEHWHEEL:
-			if (io.WantCaptureMouse && !this->IsLeftClickHeld && !this->IsRightClickHeld)
+			if (io.WantCaptureMouse && !Inputs::IsCursorHidden())
 			{
 				io.MouseWheelH += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;
 				return 0;
@@ -458,17 +563,14 @@ UINT CUiContext::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				return 0;
 			}
 			break;
-
-			// other
-		case WM_ACTIVATEAPP:
-			// alt tab should reset clickHeld state
-			if (!wParam)
-			{
-				this->IsLeftClickHeld = false;
-				this->IsRightClickHeld = false;
-			}
-			break;
 	}
+
+	if (this->EscapeClose->WndProc(hWnd, uMsg, wParam, lParam) == 0)
+	{
+		return 0;
+	}
+
+	return uMsg;
 }
 
 void CUiContext::Register(ERenderType aRenderType, GUI_RENDER aRenderCallback)
@@ -545,171 +647,69 @@ int CUiContext::Verify(void* aStartAddress, void* aEndAddress)
 	return refCounter;
 }
 
-void CUiContext::CreateNexusShortcut()
+void CUiContext::OnInputBind(std::string aIdentifier)
 {
-	int month = Time::GetMonth();
-
-	switch (month)
+	if (aIdentifier == KB_TOGGLEHIDEUI)
 	{
-		case 10:
-			this->TextureService->Load(ICON_NEXUS, RES_ICON_NEXUS_HALLOWEEN, NexusHandle, nullptr);
-			this->TextureService->Load(ICON_NEXUS_HOVER, RES_ICON_NEXUS_HALLOWEEN_HOVER, NexusHandle, nullptr);
-			break;
-		case 12:
-			this->TextureService->Load(ICON_NEXUS, RES_ICON_NEXUS_XMAS, NexusHandle, nullptr);
-			this->TextureService->Load(ICON_NEXUS_HOVER, RES_ICON_NEXUS_XMAS_HOVER, NexusHandle, nullptr);
-			break;
-		default:
-			this->TextureService->Load(ICON_NEXUS, RES_ICON_NEXUS, NexusHandle, nullptr);
-			this->TextureService->Load(ICON_NEXUS_HOVER, RES_ICON_NEXUS_HOVER, NexusHandle, nullptr);
-			break;
+		this->IsVisible = !this->IsVisible;
 	}
-
-	this->TextureService->Load(ICON_GENERIC, RES_ICON_GENERIC, NexusHandle, nullptr);
-	this->TextureService->Load(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, NexusHandle, nullptr);
-
-	/* add shortcut */
-	this->QuickAccess->AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "((000009))");
+	else if (aIdentifier == KB_MENU)
+	{
+		this->MainWindow->Activate();
+	}
+	else if (aIdentifier == KB_ADDONS)
+	{
+		this->MainWindow->Activate("Addons");
+	}
+	else if (aIdentifier == KB_DEBUG)
+	{
+		this->MainWindow->Activate("Debug");
+	}
+	else if (aIdentifier == KB_LOG)
+	{
+		this->MainWindow->Activate("Log");
+	}
+	else if (aIdentifier == KB_OPTIONS)
+	{
+		this->MainWindow->Activate("Options");
+	}
 }
 
-void CUiContext::ApplyStyle()
+CAlerts* CUiContext::GetAlerts()
 {
-	if (LinkArcDPSStyle)
-	{
-		std::filesystem::path arcIniPath = Index::D_GW2_ADDONS / "arcdps/arcdps.ini";
-
-		if (std::filesystem::exists(arcIniPath))
-		{
-			std::ifstream arcIni(arcIniPath);
-
-			if (arcIni.is_open())
-			{
-				std::string line;
-				std::string styleKey = "appearance_imgui_style180=";
-				std::string coloursKey = "appearance_imgui_colours180=";
-				std::string fontSizeKey = "font_size=";
-
-				ImGuiStyle* style = &ImGui::GetStyle();
-
-				try
-				{
-					while (std::getline(arcIni, line))
-					{
-						if (line.find(styleKey, 0) != line.npos)
-						{
-							line = line.substr(styleKey.length());
-							std::string decode = Base64::Decode(&line[0], line.length());
-							memcpy(style, &decode[0], decode.length());
-						}
-						else if (line.find(coloursKey, 0) != line.npos)
-						{
-							line = line.substr(coloursKey.length());
-							std::string decode = Base64::Decode(&line[0], line.length());
-							memcpy(&style->Colors[0], &decode[0], decode.length());
-						}
-						else if (line.find(fontSizeKey, 0) != line.npos)
-						{
-							line = line.substr(fontSizeKey.length());
-							this->ImGuiContext->FontSize = std::stof(line);
-						}
-					}
-				}
-				catch (...)
-				{
-					this->Logger->Debug(CH_UICONTEXT, "Couldn't parse ArcDPS style.");
-				}
-
-				arcIni.close();
-			}
-		}
-	}
-
-	return;
-
-	ImGuiStyle* style = &ImGui::GetStyle();
-	ImVec4* colors = style->Colors;
-
-	colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-	colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
-	colors[ImGuiCol_WindowBg] = ImVec4(0.06f, 0.06f, 0.06f, 0.94f);
-	colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-	colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
-	colors[ImGuiCol_Border] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
-	colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-	colors[ImGuiCol_FrameBg] = ImVec4(0.16f, 0.29f, 0.48f, 0.54f);
-	colors[ImGuiCol_FrameBgHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
-	colors[ImGuiCol_FrameBgActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
-	colors[ImGuiCol_TitleBg] = ImVec4(0.04f, 0.04f, 0.04f, 1.00f);
-	colors[ImGuiCol_TitleBgActive] = ImVec4(0.16f, 0.29f, 0.48f, 1.00f);
-	colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 0.51f);
-	colors[ImGuiCol_MenuBarBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
-	colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
-	colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
-	colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
-	colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
-	colors[ImGuiCol_CheckMark] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-	colors[ImGuiCol_SliderGrab] = ImVec4(0.24f, 0.52f, 0.88f, 1.00f);
-	colors[ImGuiCol_SliderGrabActive] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-	colors[ImGuiCol_Button] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
-	colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-	colors[ImGuiCol_ButtonActive] = ImVec4(0.06f, 0.53f, 0.98f, 1.00f);
-	colors[ImGuiCol_Header] = ImVec4(0.26f, 0.59f, 0.98f, 0.31f);
-	colors[ImGuiCol_HeaderHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.80f);
-	colors[ImGuiCol_HeaderActive] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-	colors[ImGuiCol_Separator] = colors[ImGuiCol_Border];
-	colors[ImGuiCol_SeparatorHovered] = ImVec4(0.10f, 0.40f, 0.75f, 0.78f);
-	colors[ImGuiCol_SeparatorActive] = ImVec4(0.10f, 0.40f, 0.75f, 1.00f);
-	colors[ImGuiCol_ResizeGrip] = ImVec4(0.26f, 0.59f, 0.98f, 0.20f);
-	colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
-	colors[ImGuiCol_ResizeGripActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
-	colors[ImGuiCol_Tab] = ImLerp(colors[ImGuiCol_Header], colors[ImGuiCol_TitleBgActive], 0.80f);
-	colors[ImGuiCol_TabHovered] = colors[ImGuiCol_HeaderHovered];
-	colors[ImGuiCol_TabActive] = ImLerp(colors[ImGuiCol_HeaderActive], colors[ImGuiCol_TitleBgActive], 0.60f);
-	colors[ImGuiCol_TabUnfocused] = ImLerp(colors[ImGuiCol_Tab], colors[ImGuiCol_TitleBg], 0.80f);
-	colors[ImGuiCol_TabUnfocusedActive] = ImLerp(colors[ImGuiCol_TabActive], colors[ImGuiCol_TitleBg], 0.40f);
-	colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
-	colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
-	colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
-	colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
-	colors[ImGuiCol_TableHeaderBg] = ImVec4(0.19f, 0.19f, 0.20f, 1.00f);
-	colors[ImGuiCol_TableBorderStrong] = ImVec4(0.31f, 0.31f, 0.35f, 1.00f);   // Prefer using Alpha=1.0 here
-	colors[ImGuiCol_TableBorderLight] = ImVec4(0.23f, 0.23f, 0.25f, 1.00f);   // Prefer using Alpha=1.0 here
-	colors[ImGuiCol_TableRowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-	colors[ImGuiCol_TableRowBgAlt] = ImVec4(1.00f, 1.00f, 1.00f, 0.06f);
-	colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
-	colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
-	colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-	colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
-	colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
-	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+	return this->Alerts;
 }
 
-void CUiContext::UnpackLocales()
+CQuickAccess* CUiContext::GetQuickAccess()
 {
-	this->Language->SetLocaleDirectory(Index::D_GW2_ADDONS_NEXUS_LOCALES);
-	Resources::Unpack(NexusHandle, Index::F_LOCALE_EN, RES_LOCALE_EN, "JSON");
-	Resources::Unpack(NexusHandle, Index::F_LOCALE_DE, RES_LOCALE_DE, "JSON");
-	Resources::Unpack(NexusHandle, Index::F_LOCALE_FR, RES_LOCALE_FR, "JSON");
-	Resources::Unpack(NexusHandle, Index::F_LOCALE_ES, RES_LOCALE_ES, "JSON");
-	Resources::Unpack(NexusHandle, Index::F_LOCALE_BR, RES_LOCALE_BR, "JSON");
-	Resources::Unpack(NexusHandle, Index::F_LOCALE_CZ, RES_LOCALE_CZ, "JSON");
-	Resources::Unpack(NexusHandle, Index::F_LOCALE_IT, RES_LOCALE_IT, "JSON");
-	Resources::Unpack(NexusHandle, Index::F_LOCALE_PL, RES_LOCALE_PL, "JSON");
-	Resources::Unpack(NexusHandle, Index::F_LOCALE_RU, RES_LOCALE_RU, "JSON");
-	Resources::Unpack(NexusHandle, Index::F_LOCALE_CN, RES_LOCALE_CN, "JSON");
+	return this->QuickAccess;
+}
+
+CFontManager* CUiContext::GetFontManager()
+{
+	return this->FontManager;
+}
+
+CEscapeClosing* CUiContext::GetEscapeClosingService()
+{
+	return this->EscapeClose;
 }
 
 void CUiContext::LoadFonts()
 {
 	std::filesystem::path fontPath{};
 
+	CContext* ctx = CContext::GetContext();
+	CSettings* settingsctx = ctx->GetSettingsCtx();
+
 	/* add user font */
-	if (!FontFile.empty() && std::filesystem::exists(Index::D_GW2_ADDONS_NEXUS_FONTS / FontFile))
+	std::string fontFile = settingsctx->Get<std::string>(OPT_USERFONT);
+	if (!fontFile.empty() && std::filesystem::exists(Index::D_GW2_ADDONS_NEXUS_FONTS / fontFile))
 	{
-		fontPath = Index::D_GW2_ADDONS_NEXUS_FONTS / FontFile;
+		fontPath = Index::D_GW2_ADDONS_NEXUS_FONTS / fontFile;
 		this->FontManager->ReplaceFont("USER_FONT", this->ImGuiContext->FontSize, fontPath.string().c_str(), UIRoot::FontReceiver, nullptr);
 	}
-	else if (LinkArcDPSStyle && std::filesystem::exists(Index::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf"))
+	else if (settingsctx->Get<bool>(OPT_LINKARCSTYLE) && std::filesystem::exists(Index::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf"))
 	{
 		fontPath = Index::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf";
 		this->FontManager->ReplaceFont("USER_FONT", this->ImGuiContext->FontSize, fontPath.string().c_str(), UIRoot::FontReceiver, nullptr);
@@ -754,95 +754,248 @@ void CUiContext::LoadFonts()
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("TREBUCHET_XL_MERGE", 19.5f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
 }
 
+void CUiContext::ApplyStyle(EUIStyle aStyle)
+{
+	ImGuiStyle* style = &ImGui::GetStyle();
+
+	switch (aStyle)
+	{
+		case EUIStyle::ImGui_Classic:
+		{
+			ImGui::StyleColorsClassic();
+			return;
+		}
+		case EUIStyle::ImGui_Light:
+		{
+			ImGui::StyleColorsLight();
+			return;
+		}
+		case EUIStyle::ImGui_Dark:
+		{
+			ImGui::StyleColorsDark();
+			return;
+		}
+		case EUIStyle::Nexus:
+		{
+			ImVec4* colors = style->Colors;
+
+			colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+			colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+			colors[ImGuiCol_WindowBg] = ImVec4(0.06f, 0.06f, 0.06f, 0.94f);
+			colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+			colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
+			colors[ImGuiCol_Border] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
+			colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+			colors[ImGuiCol_FrameBg] = ImVec4(0.16f, 0.29f, 0.48f, 0.54f);
+			colors[ImGuiCol_FrameBgHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
+			colors[ImGuiCol_FrameBgActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
+			colors[ImGuiCol_TitleBg] = ImVec4(0.04f, 0.04f, 0.04f, 1.00f);
+			colors[ImGuiCol_TitleBgActive] = ImVec4(0.16f, 0.29f, 0.48f, 1.00f);
+			colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 0.51f);
+			colors[ImGuiCol_MenuBarBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+			colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
+			colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
+			colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
+			colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
+			colors[ImGuiCol_CheckMark] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+			colors[ImGuiCol_SliderGrab] = ImVec4(0.24f, 0.52f, 0.88f, 1.00f);
+			colors[ImGuiCol_SliderGrabActive] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+			colors[ImGuiCol_Button] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
+			colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+			colors[ImGuiCol_ButtonActive] = ImVec4(0.06f, 0.53f, 0.98f, 1.00f);
+			colors[ImGuiCol_Header] = ImVec4(0.26f, 0.59f, 0.98f, 0.31f);
+			colors[ImGuiCol_HeaderHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.80f);
+			colors[ImGuiCol_HeaderActive] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+			colors[ImGuiCol_Separator] = colors[ImGuiCol_Border];
+			colors[ImGuiCol_SeparatorHovered] = ImVec4(0.10f, 0.40f, 0.75f, 0.78f);
+			colors[ImGuiCol_SeparatorActive] = ImVec4(0.10f, 0.40f, 0.75f, 1.00f);
+			colors[ImGuiCol_ResizeGrip] = ImVec4(0.26f, 0.59f, 0.98f, 0.20f);
+			colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
+			colors[ImGuiCol_ResizeGripActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
+			colors[ImGuiCol_Tab] = ImLerp(colors[ImGuiCol_Header], colors[ImGuiCol_TitleBgActive], 0.80f);
+			colors[ImGuiCol_TabHovered] = colors[ImGuiCol_HeaderHovered];
+			colors[ImGuiCol_TabActive] = ImLerp(colors[ImGuiCol_HeaderActive], colors[ImGuiCol_TitleBgActive], 0.60f);
+			colors[ImGuiCol_TabUnfocused] = ImLerp(colors[ImGuiCol_Tab], colors[ImGuiCol_TitleBg], 0.80f);
+			colors[ImGuiCol_TabUnfocusedActive] = ImLerp(colors[ImGuiCol_TabActive], colors[ImGuiCol_TitleBg], 0.40f);
+			colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
+			colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
+			colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+			colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
+			colors[ImGuiCol_TableHeaderBg] = ImVec4(0.19f, 0.19f, 0.20f, 1.00f);
+			colors[ImGuiCol_TableBorderStrong] = ImVec4(0.31f, 0.31f, 0.35f, 1.00f);   // Prefer using Alpha=1.0 here
+			colors[ImGuiCol_TableBorderLight] = ImVec4(0.23f, 0.23f, 0.25f, 1.00f);   // Prefer using Alpha=1.0 here
+			colors[ImGuiCol_TableRowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+			colors[ImGuiCol_TableRowBgAlt] = ImVec4(1.00f, 1.00f, 1.00f, 0.06f);
+			colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
+			colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
+			colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+			colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
+			colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
+			colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+			return;
+		}
+	}
+
+	CContext* ctx = CContext::GetContext();
+	CSettings* settingsctx = ctx->GetSettingsCtx();
+
+	if (settingsctx->Get<bool>(OPT_LINKARCSTYLE))
+	{
+		std::filesystem::path arcIniPath = Index::D_GW2_ADDONS / "arcdps/arcdps.ini";
+
+		if (std::filesystem::exists(arcIniPath))
+		{
+			std::ifstream arcIni(arcIniPath);
+
+			if (arcIni.is_open())
+			{
+				std::string line;
+				std::string styleKey = "appearance_imgui_style180=";
+				std::string coloursKey = "appearance_imgui_colours180=";
+				std::string fontSizeKey = "font_size=";
+
+				try
+				{
+					while (std::getline(arcIni, line))
+					{
+						if (line.find(styleKey, 0) != line.npos)
+						{
+							line = line.substr(styleKey.length());
+							std::string decode = Base64::Decode(&line[0], line.length());
+							memcpy(style, &decode[0], decode.length());
+						}
+						else if (line.find(coloursKey, 0) != line.npos)
+						{
+							line = line.substr(coloursKey.length());
+							std::string decode = Base64::Decode(&line[0], line.length());
+							memcpy(&style->Colors[0], &decode[0], decode.length());
+						}
+						else if (line.find(fontSizeKey, 0) != line.npos)
+						{
+							line = line.substr(fontSizeKey.length());
+							this->ImGuiContext->FontSize = std::stof(line);
+						}
+					}
+				}
+				catch (...)
+				{
+					this->Logger->Debug(CH_UICONTEXT, "Couldn't parse ArcDPS style.");
+				}
+
+				arcIni.close();
+			}
+		}
+	}
+	else
+	{
+		std::string b64_style = settingsctx->Get<std::string>(OPT_IMGUISTYLE);
+		std::string b64_colors = settingsctx->Get<std::string>(OPT_IMGUICOLORS);
+
+		if (b64_style.empty() || b64_colors.empty())
+		{
+			this->ApplyStyle(EUIStyle::Nexus);
+		}
+
+		{
+			std::string decode = Base64::Decode(&b64_style[0], b64_style.length());
+			memcpy_s(style, sizeof(ImGuiStyle), &decode[0], decode.length());
+		}
+
+		{
+			std::string decode = Base64::Decode(&b64_colors[0], b64_colors.length());
+			memcpy_s(&style->Colors[0], sizeof(ImVec4) * ImGuiCol_COUNT, &decode[0], decode.length());
+		}
+	}
+}
+
+void CUiContext::CreateNexusShortcut()
+{
+	int month = Time::GetMonth();
+
+	CContext* ctx = CContext::GetContext();
+	CSettings* settingsctx = ctx->GetSettingsCtx();
+
+	bool isPartyPooper = settingsctx->Get<bool>(OPT_DISABLEFESTIVEFLAIR);
+
+	if (isPartyPooper)
+	{
+		month = 0;
+	}
+	
+	int resIcon = 0;
+	int resIconHover = 0;
+
+	switch (month)
+	{
+		case 10:
+			resIcon = RES_ICON_NEXUS_HALLOWEEN;
+			resIconHover = RES_ICON_NEXUS_HALLOWEEN_HOVER;
+			break;
+		case 12:
+			resIcon = RES_ICON_NEXUS_XMAS;
+			resIconHover = RES_ICON_NEXUS_XMAS_HOVER;
+			break;
+		default:
+			resIcon = RES_ICON_NEXUS;
+			resIconHover = RES_ICON_NEXUS_HOVER;
+			break;
+	}
+
+	this->TextureService->Load(ICON_NEXUS, resIcon, NexusHandle, nullptr);
+	this->TextureService->Load(ICON_NEXUS_HOVER, resIconHover, NexusHandle, nullptr);
+
+	this->TextureService->Load(ICON_GENERIC, RES_ICON_GENERIC, NexusHandle, nullptr);
+	this->TextureService->Load(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, NexusHandle, nullptr);
+
+	/* add shortcut */
+	this->QuickAccess->AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "((000009))");
+}
+
+void CUiContext::UnpackLocales()
+{
+	this->Language->SetLocaleDirectory(Index::D_GW2_ADDONS_NEXUS_LOCALES);
+	Resources::Unpack(NexusHandle, Index::F_LOCALE_EN, RES_LOCALE_EN, "JSON");
+	Resources::Unpack(NexusHandle, Index::F_LOCALE_DE, RES_LOCALE_DE, "JSON");
+	Resources::Unpack(NexusHandle, Index::F_LOCALE_FR, RES_LOCALE_FR, "JSON");
+	Resources::Unpack(NexusHandle, Index::F_LOCALE_ES, RES_LOCALE_ES, "JSON");
+	Resources::Unpack(NexusHandle, Index::F_LOCALE_BR, RES_LOCALE_BR, "JSON");
+	Resources::Unpack(NexusHandle, Index::F_LOCALE_CZ, RES_LOCALE_CZ, "JSON");
+	Resources::Unpack(NexusHandle, Index::F_LOCALE_IT, RES_LOCALE_IT, "JSON");
+	Resources::Unpack(NexusHandle, Index::F_LOCALE_PL, RES_LOCALE_PL, "JSON");
+	Resources::Unpack(NexusHandle, Index::F_LOCALE_RU, RES_LOCALE_RU, "JSON");
+	Resources::Unpack(NexusHandle, Index::F_LOCALE_CN, RES_LOCALE_CN, "JSON");
+	this->Language->Advance();
+}
+
 void CUiContext::LoadSettings()
 {
-	/* FIXME */
-	if (!Settings::Settings.is_null())
+	CContext* ctx = CContext::GetContext();
+	CSettings* settingsCtx = ctx->GetSettingsCtx();
+
+	ImGuiIO& io = ImGui::GetIO();
+	ImGuiStyle* style = &ImGui::GetStyle();
+
+	State::IsEULAAccepted = settingsCtx->Get<bool>(OPT_ACCEPTEULA);
+
+	float storedFontSz = settingsCtx->Get<float>(OPT_FONTSIZE);
+	this->ImGuiContext->FontSize = storedFontSz > 0 ? storedFontSz : 16.0f;
+
+	this->ApplyStyle();
+	
+	std::string lang = settingsCtx->Get<std::string>(OPT_LANGUAGE);
+	Language->SetLanguage(!lang.empty() ? lang : "en");
+
+	float storedGlobalFontScale = settingsCtx->Get<float>(OPT_GLOBALSCALE);
+	io.FontGlobalScale = storedGlobalFontScale > 0 ? storedGlobalFontScale : 1.0f;
+
+	float lastUiScale = settingsCtx->Get<float>(OPT_LASTUISCALE);
+	if (lastUiScale == 0)
 	{
-		ImGuiIO& io = ImGui::GetIO();
-
-		if (!Settings::Settings[OPT_ACCEPTEULA].is_null())
-		{
-			Settings::Settings[OPT_ACCEPTEULA].get_to(State::IsEULAAccepted);
-		}
-		else
-		{
-			Settings::Settings[OPT_ACCEPTEULA] = State::IsEULAAccepted;
-		}
-
-		if (!Settings::Settings[OPT_USERFONT].is_null())
-		{
-			Settings::Settings[OPT_USERFONT].get_to(this->FontFile);
-		}
-		else
-		{
-			this->FontFile = "font.ttf";
-		}
-
-		if (!std::filesystem::exists(Index::D_GW2_ADDONS_NEXUS_FONTS / this->FontFile))
-		{
-			this->FontFile = "";
-		}
-
-		if (!Settings::Settings[OPT_FONTSIZE].is_null())
-		{
-			Settings::Settings[OPT_FONTSIZE].get_to(this->ImGuiContext->FontSize);
-		}
-		else
-		{
-			Settings::Settings[OPT_FONTSIZE] = this->ImGuiContext->FontSize = 16.0f;
-		}
-
-		if (Settings::Settings[OPT_LASTUISCALE].is_null())
-		{
-			Settings::Settings[OPT_LASTUISCALE] = SC_NORMAL;
-		}
-
-		if (!Settings::Settings[OPT_LINKARCSTYLE].is_null())
-		{
-			Settings::Settings[OPT_LINKARCSTYLE].get_to(LinkArcDPSStyle);
-		}
-		else
-		{
-			LinkArcDPSStyle = true;
-			Settings::Settings[OPT_LINKARCSTYLE] = true;
-		}
-
-		ImGuiStyle* style = &ImGui::GetStyle();
-		if (!Settings::Settings[OPT_IMGUISTYLE].is_null())
-		{
-			std::string style64 = Settings::Settings[OPT_IMGUISTYLE].get<std::string>();
-			std::string decode = Base64::Decode(&style64[0], style64.length());
-			memcpy(style, &decode[0], decode.length());
-		}
-
-		if (!Settings::Settings[OPT_IMGUICOLORS].is_null())
-		{
-			std::string colors64 = Settings::Settings[OPT_IMGUICOLORS].get<std::string>();
-			std::string decode = Base64::Decode(&colors64[0], colors64.length());
-			memcpy(&style->Colors[0], &decode[0], decode.length());
-		}
-
-		if (!Settings::Settings[OPT_LANGUAGE].is_null())
-		{
-			Language->SetLanguage(Settings::Settings[OPT_LANGUAGE].get<std::string>());
-		}
-		else
-		{
-			Language->SetLanguage("en");
-		}
-
-		if (!Settings::Settings[OPT_GLOBALSCALE].is_null())
-		{
-			Settings::Settings[OPT_GLOBALSCALE].get_to(io.FontGlobalScale);
-		}
-		else
-		{
-			Settings::Settings[OPT_GLOBALSCALE] = 1.0f;
-		}
-
-		Renderer::Scaling = Settings::Settings[OPT_LASTUISCALE].get<float>() * io.FontGlobalScale;
+		lastUiScale = SC_NORMAL;
+		settingsCtx->Set(OPT_LASTUISCALE, SC_NORMAL);
 	}
+	
+	Renderer::Scaling = lastUiScale * io.FontGlobalScale;
 }
 
 namespace UIRoot::GUI

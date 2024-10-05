@@ -13,7 +13,6 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_extensions.h"
 
-#include "Hooks.h"
 #include "Index.h"
 #include "Renderer.h"
 
@@ -36,10 +35,10 @@ bool CEULAModal::Render()
 	ImGui::OpenPopup(this->Language->Translate("Legal Agreement"), ImGuiPopupFlags_AnyPopupLevel);
 	ImVec2 center(Renderer::Width * 0.5f, Renderer::Height * 0.5f);
 	ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-	if (ImGui::BeginPopupModal(this->Language->Translate("Legal Agreement"), 0, ImGuiWindowFlags_NoSavedSettings))
+	if (ImGui::BeginPopupModal(this->Language->Translate("Legal Agreement"), 0, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		ImGui::TextWrapped("This is an unofficial library and Raidcore is in no way associated with ArenaNet nor with any of its partners.");
-		ImGui::TextWrapped("Modifying Guild Wars 2 through any third party software is not supported by ArenaNet nor by any of its partners.");
+		ImGui::TextWrapped("Modifying Guild Wars 2 through any third party software is not supported by ArenaNet.");
 		ImGui::TextWrapped("By using this software you are agreeing to the terms and conditions as laid out on:");
 
 		if (ImGui::TextURL("https://raidcore.gg/Legal", false, false))
@@ -81,7 +80,7 @@ bool CEULAModal::Render()
 			close = true;
 
 			/* inject close message into wndproc for clean shutdown */
-			Hooks::WndProc(this->WindowHandle, WM_CLOSE, 0, 0);
+			PostMessage(this->WindowHandle, WM_CLOSE, 0, 0);
 		}
 
 		if (close)

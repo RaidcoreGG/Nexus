@@ -14,6 +14,7 @@
 #include <vector>
 #include <Windows.h>
 
+#include "Context.h"
 #include "Consts.h"
 #include "Index.h"
 #include "Renderer.h"
@@ -847,7 +848,7 @@ namespace Loader
 		addon->State = locked ? EAddonState::LoadedLOCKED : EAddonState::Loaded;
 		SaveAddonConfig();
 
-		Logger->Info(CH_LOADER, u8"Loaded addon: %s (Signature %d) [%p - %p] (API Version %d was requested.) Took %uµs.",
+		Logger->Info(CH_LOADER, u8"Loaded addon: %s\nSignature: %d\nAddress Space: %p - %p\nAPI Version: %d\nTook %uµs to load.",
 					 strFile.c_str(), addon->Definitions->Signature,
 					 addon->Module, ((PBYTE)addon->Module) + moduleInfo.SizeOfImage,
 					 addon->Definitions->APIVersion, time / std::chrono::microseconds(1)
@@ -1212,6 +1213,8 @@ namespace Loader
 				api->RemoveSimpleShortcut = UIRoot::QuickAccess::ADDONAPI_RemoveContextItem;
 
 				ApiDefs.insert({ aVersion, api });
+				AddonAPI1* shared = (AddonAPI1*)DataLinkService->ShareResource("ADDONAPI_1", sizeof(AddonAPI1), false);
+				memcpy_s(shared, sizeof(AddonAPI1), api, (sizeof(AddonAPI1)));
 				return api;
 			}
 			case 2:
@@ -1272,6 +1275,8 @@ namespace Loader
 				api->TranslateTo = Localization::ADDONAPI_TranslateTo;
 
 				ApiDefs.insert({ aVersion, api });
+				AddonAPI2* shared = (AddonAPI2*)DataLinkService->ShareResource("ADDONAPI_2", sizeof(AddonAPI2), false);
+				memcpy_s(shared, sizeof(AddonAPI2), api, (sizeof(AddonAPI2)));
 				return api;
 			}
 			case 3:
@@ -1336,6 +1341,8 @@ namespace Loader
 				api->TranslateTo = Localization::ADDONAPI_TranslateTo;
 
 				ApiDefs.insert({ aVersion, api });
+				AddonAPI3* shared = (AddonAPI3*)DataLinkService->ShareResource("ADDONAPI_3", sizeof(AddonAPI3), false);
+				memcpy_s(shared, sizeof(AddonAPI3), api, (sizeof(AddonAPI3)));
 				return api;
 			}
 			case 4:
@@ -1408,6 +1415,8 @@ namespace Loader
 				api->AddFontFromMemory = UIRoot::Fonts::ADDONAPI_AddFontFromMemory;
 
 				ApiDefs.insert({ aVersion, api });
+				AddonAPI4* shared = (AddonAPI4*)DataLinkService->ShareResource("ADDONAPI_4", sizeof(AddonAPI4), false);
+				memcpy_s(shared, sizeof(AddonAPI4), api, (sizeof(AddonAPI4)));
 				return api;
 			}
 			case 5:
@@ -1482,6 +1491,8 @@ namespace Loader
 				api->AddFontFromMemory = UIRoot::Fonts::ADDONAPI_AddFontFromMemory;
 
 				ApiDefs.insert({ aVersion, api });
+				AddonAPI5* shared = (AddonAPI5*)DataLinkService->ShareResource("ADDONAPI_5", sizeof(AddonAPI5), false);
+				memcpy_s(shared, sizeof(AddonAPI5), api, (sizeof(AddonAPI5)));
 				return api;
 			}
 			case 6:
@@ -1567,6 +1578,8 @@ namespace Loader
 				api->Fonts.Resize = UIRoot::Fonts::ADDONAPI_ResizeFont;
 
 				ApiDefs.insert({ aVersion, api });
+				AddonAPI6* shared = (AddonAPI6*)DataLinkService->ShareResource("ADDONAPI_6", sizeof(AddonAPI6), false);
+				memcpy_s(shared, sizeof(AddonAPI6), api, (sizeof(AddonAPI6)));
 				return api;
 			}
 		}
@@ -1599,7 +1612,7 @@ namespace Loader
 	{
 		if (aAddress == nullptr)
 		{
-			return "(null)";
+			return NULLSTR;
 		}
 
 		//const std::lock_guard<std::mutex> lock(Mutex);
@@ -1613,7 +1626,7 @@ namespace Loader
 
 				if (aAddress >= startAddress && aAddress <= endAddress)
 				{
-					return addon->Definitions ? addon->Definitions->Name : "(null)";
+					return addon->Definitions ? addon->Definitions->Name : NULLSTR;
 				}
 			}
 
@@ -1626,7 +1639,7 @@ namespace Loader
 			}
 		}
 
-		return "(null)";
+		return NULLSTR;
 	}
 
 	Addon* FindAddonBySig(signed int aSignature)
@@ -1714,15 +1727,10 @@ namespace Loader
 
 		int gameBuild = std::stoi(buildStr);
 
-		int lastGameBuild = 0;
+		CContext* ctx = CContext::GetContext();
+		CSettings* settingsCtx = ctx->GetSettingsCtx();
 
-		if (!Settings::Settings.is_null())
-		{
-			if (!Settings::Settings[OPT_LASTGAMEBUILD].is_null())
-			{
-				Settings::Settings[OPT_LASTGAMEBUILD].get_to(lastGameBuild);
-			}
-		}
+		int lastGameBuild = settingsCtx->Get<int>(OPT_LASTGAMEBUILD);
 
 		if (gameBuild - lastGameBuild > 350 && lastGameBuild != 0)
 		{
@@ -1732,7 +1740,9 @@ namespace Loader
 			UIRoot::Alerts::ADDONAPI_Notify(String::Format("%s\n%s", Language->Translate("((000001))"), Language->Translate("((000002))")).c_str());
 		}
 
-		Settings::Settings[OPT_LASTGAMEBUILD] = gameBuild;
-		Settings::Save();
+		if (lastGameBuild != gameBuild)
+		{
+			settingsCtx->Set(OPT_LASTGAMEBUILD, gameBuild);
+		}
 	}
 }

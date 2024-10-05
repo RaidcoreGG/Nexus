@@ -9,6 +9,7 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+#include <filesystem>
 #include <mutex>
 
 #include "nlohmann/json.hpp"
@@ -36,14 +37,17 @@ extern const char* OPT_ALWAYSSHOWQUICKACCESS;
 extern const char* OPT_GLOBALSCALE;
 extern const char* OPT_SHOWADDONSWINDOWAFTERDUU;
 extern const char* OPT_USERFONT;
+extern const char* OPT_DISABLEFESTIVEFLAIR;
+
+constexpr const char* CH_SETTINGS = "Settings";
 
 ///----------------------------------------------------------------------------------------------------
-/// Settings Namespace
+/// CSettings Class
 ///----------------------------------------------------------------------------------------------------
-namespace Settings
+class CSettings
 {
-	extern std::mutex	Mutex;
-	extern json			Settings;
+	public:
+	CSettings(std::filesystem::path aPath);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Load:
@@ -56,6 +60,46 @@ namespace Settings
 	/// 	Saves the settings.
 	///----------------------------------------------------------------------------------------------------
 	void Save();
-}
+
+	template <typename T>
+	void Set(std::string aIdentifier, T aValue)
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		this->Store[aIdentifier] = aValue;
+		this->SaveInternal();
+	}
+
+	template <typename T>
+	T Get(const std::string& aIdentifier)
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		if (this->Store[aIdentifier].is_null())
+		{
+			return T{};
+		}
+
+		return this->Store[aIdentifier].get<T>();
+	}
+
+	private:
+	std::filesystem::path Path;
+
+	std::mutex            Mutex;
+	json                  Store;
+
+	///----------------------------------------------------------------------------------------------------
+	/// Load:
+	/// 	Loads the settings without locking the mutex.
+	///----------------------------------------------------------------------------------------------------
+	void LoadInternal();
+
+	///----------------------------------------------------------------------------------------------------
+	/// Save:
+	/// 	Saves the settings without locking the mutex.
+	///----------------------------------------------------------------------------------------------------
+	void SaveInternal();
+};
 
 #endif

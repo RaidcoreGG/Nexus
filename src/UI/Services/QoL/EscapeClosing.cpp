@@ -10,22 +10,16 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 
+#include "Context.h"
 #include "Services/Settings/Settings.h"
 #include "Util/Inputs.h"
 
 CEscapeClosing::CEscapeClosing()
 {
-	if (!Settings::Settings.is_null())
-	{
-		if (!Settings::Settings[OPT_CLOSEESCAPE].is_null())
-		{
-			Settings::Settings[OPT_CLOSEESCAPE].get_to(this->Enabled);
-		}
-		else
-		{
-			Settings::Settings[OPT_CLOSEESCAPE] = this->Enabled;
-		}
-	}
+	CContext* ctx = CContext::GetContext();
+	CSettings* settingsCtx = ctx->GetSettingsCtx();
+
+	this->Enabled = settingsCtx->Get<bool>(OPT_CLOSEESCAPE);
 }
 
 UINT CEscapeClosing::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -56,6 +50,8 @@ UINT CEscapeClosing::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 		}
 	}
+
+	return uMsg;
 }
 
 void CEscapeClosing::Register(const char* aWindowName, bool* aIsVisible)

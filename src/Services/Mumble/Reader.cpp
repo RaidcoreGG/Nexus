@@ -157,6 +157,8 @@ void CMumbleReader::Advance()
 				j["commander"].get_to(this->MumbleIdentity->IsCommander);
 				j["fov"].get_to(this->MumbleIdentity->FOV);
 				j["uisz"].get_to(this->MumbleIdentity->UISize);
+
+				this->NexusLink->Scaling = GetScalingFactor(this->MumbleIdentity->UISize);
 			}
 			catch (json::parse_error& ex)
 			{

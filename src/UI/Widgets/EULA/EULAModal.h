@@ -36,7 +36,7 @@ class CEULAModal
 	bool Render();
 
 	private:
-	HWND WindowHandle;
+	HWND           WindowHandle;
 	CLocalization* Language;
 };
 

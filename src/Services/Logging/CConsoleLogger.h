@@ -31,7 +31,7 @@ class CConsoleLogger : public virtual ILogger
 		/// LogMessage:
 		/// 	Overriden function to write to a console window.
 		///----------------------------------------------------------------------------------------------------
-		void LogMessage(LogEntry aLogEntry);
+		void LogMessage(LogEntry* aLogEntry);
 };
 
 #endif

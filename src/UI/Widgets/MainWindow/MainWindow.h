@@ -9,20 +9,41 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "UI/Controls/CtlWindow.h"
+#include <mutex>
+#include <vector>
 
-constexpr const char* KB_MENU = "KB_MENU";
+#include "UI/Controls/CtlWindow.h"
+#include "UI/Controls/CtlSubWindow.h"
+#include "Services/Textures/Texture.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// CMainWindow Class
 ///----------------------------------------------------------------------------------------------------
-class CMainWindow
+class CMainWindow : public virtual IWindow
 {
 	public:
-	void AddWindow(IWindow* aWindow);
-	void RemoveWindow();
+	void AddWindow(ISubWindow* aWindow);
+	void RemoveWindow(ISubWindow* aWindow);
 
-	void Render();
+	void Render() override;
+
+	void Invalidate() override;
+
+	void Activate(const std::string& aWindowName = "");
+
+	private:
+	std::mutex               Mutex;
+	std::vector<ISubWindow*> Windows;
+	ISubWindow*              ActiveContent;
+	bool                     IsSidebarActive;
+	bool                     IsHandleHeld;
+
+	private:
+	void RenderDashboard();
+
+	Texture*                 Tex_RaidcoreTag;
+	Texture*                 Tex_CloseIcon;
+	Texture*                 Tex_DashboardIcon;
 };
 
 #endif

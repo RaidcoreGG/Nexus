@@ -2,6 +2,7 @@
 // Microsoft Visual C++ generated include file.
 // Used by Nexus.rc
 //
+
 /* Fonts */
 #define RES_FONT_MENOMONIA              101
 #define RES_FONT_TREBUCHET              102
@@ -18,72 +19,46 @@
 #define RES_ICON_GENERIC                207
 #define RES_ICON_GENERIC_HOVER          208
 
-#define RES_ICON_NOTIFICATION			209
+#define RES_ICON_NOTIFICATION           209
 
-/* Menu*/
+/* MainWindow */
+#define RES_ICON_DASHBOARD              300
+#define RES_ICON_ADDONS                 301
+#define RES_ICON_OPTIONS                302
+#define RES_ICON_BINDS                  303
+#define RES_ICON_LOG                    304
+#define RES_ICON_DEBUG                  305
+#define RES_ICON_ABOUT                  306
 
-#define RES_ICON_RETURN					300
-#define RES_ICON_ADDONS					301
-#define RES_ICON_OPTIONS				302
-#define RES_ICON_OPTIONS_HOVER			303
-#define RES_ICON_CHANGELOG				304
-#define RES_ICON_LOG					305
-#define RES_ICON_DEBUG					306
-#define RES_ICON_ABOUT					307
-
-#define RES_TEX_MENU_BACKGROUND         308
-#define RES_TEX_MENU_BUTTON             309
-#define RES_TEX_MENU_BUTTON_HOVER       310
-
-/* CAddonsWindow */
-#define RES_TEX_ADDONS_BACKGROUND		401
-#define RES_TEX_ADDONITEM				402
-#define RES_TEX_ADDONITEM_HIGHLIGHT		403
-#define RES_TEX_ADDONITEM_DUU			404
-
-#define RES_TEX_ADDONS_TITLEBAR			405
-#define RES_TEX_ADDONS_TITLEBAR_HOVER	406
-
-#define RES_ICON_TIER1					407
-#define RES_ICON_TIER2					408
-#define RES_ICON_TIER3					409
-#define RES_ICON_TIER_UNKNOWN			410
-
-#define RES_ICON_RAIDCORE				411
+/* Addon Policy Tiers */
+#define RES_ICON_TIER_UNKNOWN           400
+#define RES_ICON_TIER1                  401
+#define RES_ICON_TIER2                  402
+#define RES_ICON_TIER3                  403
 
 /* Generic */
-#define RES_TEX_TABBTN					506
-#define RES_TEX_TABBTN_HOVER			507
-#define RES_TEX_BTNCLOSE				508
-#define RES_TEX_BTNCLOSE_HOVER			509
-#define RES_TEX_TITLEBAREND				510
-#define RES_TEX_TITLEBAREND_HOVER		511
-#define RES_TEX_BTNREFRESH				512
-#define RES_TEX_BTNREFRESH_HOVER		513
+#define RES_ICON_RAIDCORE               500
+#define RES_ICON_POPOUT                 501
+#define RES_ICON_CLOSE                  502
+#define RES_BANNER_DISCORD              503
+#define RES_BANNER_PATREON              504
 
-#define RES_ARCDPS_INTEGRATION			601
+/* Binary */
+#define RES_ARCDPS_INTEGRATION          601
 
-/* ContextMenu */
-#define RES_TEX_CONTEXTMENU_BULLET		701
-#define RES_TEX_CONTEXTMENU_HIGHLIGHT	702
+/* Locales (primary) */
+#define RES_LOCALE_EN                   701
+#define RES_LOCALE_DE                   702
+#define RES_LOCALE_FR                   703
+#define RES_LOCALE_ES                   704
 
-#define RES_LOCALE_EN					801
-#define RES_LOCALE_DE					802
-#define RES_LOCALE_FR					803
-#define RES_LOCALE_ES					804
-
-#define RES_LOCALE_BR					805
-#define RES_LOCALE_CZ					806
-#define RES_LOCALE_IT					807
-#define RES_LOCALE_PL					808
-#define RES_LOCALE_RU					809
-#define RES_LOCALE_CN					810
-
-/* CEulaWindow */
-#define RES_TEX_EULA_BACKGROUND			901
-
-#define RES_TEX_EULA_TITLEBAR			902
-#define RES_TEX_EULA_TITLEBAR_HOVER		903
+/* Locales (secondary) */
+#define RES_LOCALE_BR                   705
+#define RES_LOCALE_CZ                   706
+#define RES_LOCALE_IT                   707
+#define RES_LOCALE_PL                   708
+#define RES_LOCALE_RU                   709
+#define RES_LOCALE_CN                   710
 
 // Next default values for new objects
 // 

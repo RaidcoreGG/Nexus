@@ -26,11 +26,27 @@
 #include "UI/Widgets/MainWindow/MainWindow.h"
 #include "UI/Widgets/QuickAccess/QuickAccess.h"
 
-constexpr const char* CH_UICONTEXT = "UI Context";
-constexpr const char* ICON_NEXUS = "ICON_NEXUS";
-constexpr const char* ICON_NEXUS_HOVER = "ICON_NEXUS_HOVER";
-constexpr const char* ICON_GENERIC = "ICON_GENERIC";
+constexpr const char* CH_UICONTEXT       = "UI Context";
+constexpr const char* ICON_NEXUS         = "ICON_NEXUS";
+constexpr const char* ICON_NEXUS_HOVER   = "ICON_NEXUS_HOVER";
+constexpr const char* ICON_GENERIC       = "ICON_GENERIC";
 constexpr const char* ICON_GENERIC_HOVER = "ICON_GENERIC_HOVER";
+constexpr const char* KB_MENU            = "KB_MENU";
+constexpr const char* KB_ADDONS          = "KB_ADDONS";
+constexpr const char* KB_OPTIONS         = "KB_OPTIONS";
+constexpr const char* KB_LOG             = "KB_LOG";
+constexpr const char* KB_DEBUG           = "KB_DEBUG";
+constexpr const char* KB_MUMBLEOVERLAY   = "KB_MUMBLEOVERLAY";
+constexpr const char* KB_TOGGLEHIDEUI    = "KB_TOGGLEHIDEUI";
+
+enum class EUIStyle
+{
+	User,
+	ImGui_Classic,
+	ImGui_Light,
+	ImGui_Dark,
+	Nexus
+};
 
 ///----------------------------------------------------------------------------------------------------
 /// UIRoot Namespace
@@ -66,6 +82,30 @@ namespace UIRoot
 	/// 	Changes fonts and UI scale when the game settings are changed.
 	///----------------------------------------------------------------------------------------------------
 	void OnMumbleIdentityChanged(void* aEventArgs);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ProcessInputBind:
+	/// 	Receives input bind invocations.
+	///----------------------------------------------------------------------------------------------------
+	void OnInputBind(const char* aIdentifier);
+
+	///----------------------------------------------------------------------------------------------------
+	/// OnVolatileAddonsDisabled:
+	/// 	Receiver for volatile addons disabled event to bring up the addons window.
+	///----------------------------------------------------------------------------------------------------
+	void OnVolatileAddonsDisabled(void* aEventData);
+
+	///----------------------------------------------------------------------------------------------------
+	/// OnInputBindUpdate:
+	/// 	Reacts to input bind changes, to trigger a UI refresh.
+	///----------------------------------------------------------------------------------------------------
+	void OnInputBindUpdate(void* aEventData);
+
+	///----------------------------------------------------------------------------------------------------
+	/// OnTranslationUpdate:
+	/// 	Reacts to translation changes, to trigger a UI refresh.
+	///----------------------------------------------------------------------------------------------------
+	void OnTranslationUpdate(void* aEventData);
 }
 
 ///----------------------------------------------------------------------------------------------------
@@ -103,6 +143,12 @@ class CUiContext
 	void Render();
 
 	///----------------------------------------------------------------------------------------------------
+	/// Invalidate:
+	/// 	Calls all UI children's invalidate function, causing them to refresh.
+	///----------------------------------------------------------------------------------------------------
+	void Invalidate();
+
+	///----------------------------------------------------------------------------------------------------
 	/// WndProc:
 	/// 	Returns 0 if message was processed.
 	///----------------------------------------------------------------------------------------------------
@@ -126,37 +172,82 @@ class CUiContext
 	///----------------------------------------------------------------------------------------------------
 	int Verify(void* aStartAddress, void* aEndAddress);
 
+	///----------------------------------------------------------------------------------------------------
+	/// OnInputBind:
+	/// 	Invokes an input bind.
+	///----------------------------------------------------------------------------------------------------
+	void OnInputBind(std::string aIdentifier);
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetAlerts:
+	/// 	Returns the alerts component.
+	///----------------------------------------------------------------------------------------------------
+	CAlerts* GetAlerts();
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetQuickAccess:
+	/// 	Returns the quick access component.
+	///----------------------------------------------------------------------------------------------------
+	CQuickAccess* GetQuickAccess();
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetFontManager:
+	/// 	Returns the font manager.
+	///----------------------------------------------------------------------------------------------------
+	CFontManager* GetFontManager();
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetEscapeClosingService:
+	/// 	Returns the escape-closing service.
+	///----------------------------------------------------------------------------------------------------
+	CEscapeClosing* GetEscapeClosingService();
+
+	///----------------------------------------------------------------------------------------------------
+	/// LoadFonts:
+	/// 	Loads the fonts.
+	///----------------------------------------------------------------------------------------------------
+	void LoadFonts();
+
+	///----------------------------------------------------------------------------------------------------
+	/// ApplyStyle:
+	/// 	Applies the ImGui style.
+	///----------------------------------------------------------------------------------------------------
+	void ApplyStyle(EUIStyle aStyle = EUIStyle::User);
+
 	private:
-	CLogHandler* Logger;
-	CLocalization* Language;
-	CTextureLoader* TextureService;
+	/* Services */
+	CLogHandler*            Logger;
+	CLocalization*          Language;
+	CTextureLoader*         TextureService;
+	CDataLink*              DataLink;
+	CInputBindApi*          InputBindApi;
 
-	HWND WindowHandle;
-	ID3D11Device* Device;
-	ID3D11DeviceContext* DeviceContext;
-	IDXGISwapChain* SwapChain;
+	/* Rendering */
+	HWND                    WindowHandle;
+	ID3D11Device*           Device;
+	ID3D11DeviceContext*    DeviceContext;
+	IDXGISwapChain*         SwapChain;
 	ID3D11RenderTargetView* RenderTargetView;
-	ImGuiContext* ImGuiContext;
+	ImGuiContext*           ImGuiContext;
 
-	CEULAModal* EULAModal;
-	CAlerts* Alerts;
-	CMainWindow* MainWindow;
-	CQuickAccess* QuickAccess;
+	/* Windows/Widgets */
+	CEULAModal*             EULAModal;
+	CAlerts*                Alerts;
+	CMainWindow*            MainWindow;
+	CQuickAccess*           QuickAccess;
 
-	CFontManager* FontManager;
-	CEscapeClosing* EscapeClose;
+	/* UI Services */
+	CFontManager*           FontManager;
+	CEscapeClosing*         EscapeClose;
 
-	mutable std::mutex Mutex;
+	mutable std::mutex      Mutex;
 	std::vector<GUI_RENDER> RegistryPreRender;
 	std::vector<GUI_RENDER> RegistryRender;
 	std::vector<GUI_RENDER> RegistryPostRender;
 	std::vector<GUI_RENDER> RegistryOptionsRender;
 
-	bool IsInitialized = false;
-	bool IsVisible = true;
-
-	bool IsRightClickHeld = false;
-	bool IsLeftClickHeld = false;
+	bool                    IsInitialized = false;
+	bool                    IsVisible = true;
 
 	///----------------------------------------------------------------------------------------------------
 	/// CreateNexusShortcut:
@@ -165,26 +256,15 @@ class CUiContext
 	void CreateNexusShortcut();
 
 	///----------------------------------------------------------------------------------------------------
-	/// ApplyStyle:
-	/// 	Applies the ImGui style.
-	///----------------------------------------------------------------------------------------------------
-	void ApplyStyle();
-
-	///----------------------------------------------------------------------------------------------------
 	/// UnpackLocales:
 	/// 	Unpacks the default locale files.
 	///----------------------------------------------------------------------------------------------------
 	void UnpackLocales();
 
 	///----------------------------------------------------------------------------------------------------
-	/// LoadFonts:
-	/// 	Loads the fonts.
+	/// LoadSettings:
+	/// 	Loads all the UI settings.
 	///----------------------------------------------------------------------------------------------------
-	void LoadFonts();
-
-	/* FIXME: dirty, this shit needs to be done properly */
-	std::string FontFile;
-	bool LinkArcDPSStyle = true;
 	void LoadSettings();
 };
 
