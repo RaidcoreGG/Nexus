@@ -204,28 +204,28 @@ std::string CInputBindApi::IBToString(InputBind aInputBind, bool aPadded)
 
 	if (aInputBind.Alt)
 	{
-		GetKeyNameTextA(MapVirtualKeyA(VK_MENU, MAPVK_VK_TO_VSC) << 16, buff, 100);
+		GetKeyNameTextA(MapVirtualKeyA(VK_MENU, MAPVK_VK_TO_VSC_EX) << 16, buff, 100);
 		str.append(buff);
 		str.append(aPadded ? " + " : "+");
 	}
 
 	if (aInputBind.Ctrl)
 	{
-		GetKeyNameTextA(MapVirtualKeyA(VK_CONTROL, MAPVK_VK_TO_VSC) << 16, buff, 100);
+		GetKeyNameTextA(MapVirtualKeyA(VK_CONTROL, MAPVK_VK_TO_VSC_EX) << 16, buff, 100);
 		str.append(buff);
 		str.append(aPadded ? " + " : "+");
 	}
 
 	if (aInputBind.Shift)
 	{
-		GetKeyNameTextA(MapVirtualKeyA(VK_SHIFT, MAPVK_VK_TO_VSC) << 16, buff, 100);
+		GetKeyNameTextA(MapVirtualKeyA(VK_SHIFT, MAPVK_VK_TO_VSC_EX) << 16, buff, 100);
 		str.append(buff);
 		str.append(aPadded ? " + " : "+");
 	}
 
 	if (aInputBind.Type == EInputBindType::Keyboard)
 	{
-		UINT vk = MapVirtualKeyA(aInputBind.Code, MAPVK_VSC_TO_VK);
+		UINT vk = MapVirtualKeyA(aInputBind.Code, MAPVK_VSC_TO_VK_EX);
 
 		if (vk >= 65 && vk <= 90 || vk >= 48 && vk <= 57)
 		{

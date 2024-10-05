@@ -768,8 +768,8 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 
 	if (ib.Type == EInputBindType::Keyboard)
 	{
-		int vk = MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK);
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, vk, GetKeyMessageLPARAM(vk, true, false));
+		UINT vk = MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK_EX);
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, vk, GetKeyMessageLPARAM_ScanCode(ib.Code, true, false));
 	}
 	else if (ib.Type == EInputBindType::Mouse)
 	{
@@ -843,8 +843,8 @@ void CGameBindsApi::Release(EGameBinds aGameBind)
 
 	if (ib.Type == EInputBindType::Keyboard)
 	{
-		int vk = MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK);
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, vk, GetKeyMessageLPARAM(vk, false, false));
+		int vk = MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK_EX);
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, vk, GetKeyMessageLPARAM_ScanCode(ib.Code, false, false));
 	}
 	else if (ib.Type == EInputBindType::Mouse)
 	{

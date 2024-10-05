@@ -63,6 +63,12 @@ LPARAM& KMFToLParam(KeystrokeMessageFlags& aKmf);
 LPARAM GetKeyMessageLPARAM(unsigned aVKey, bool aIsDown, bool aIsSystem);
 
 ///----------------------------------------------------------------------------------------------------
+/// GetKeyMessageLPARAM_ScanCode:
+/// 	Creates an LPARAM for key messages.
+///----------------------------------------------------------------------------------------------------
+LPARAM GetKeyMessageLPARAM_ScanCode(unsigned short aScanCode, bool aIsDown, bool aIsSystem);
+
+///----------------------------------------------------------------------------------------------------
 /// GetMouseMessageWPARAM:
 /// 	Creates an WPARAM for mouse messages.
 ///----------------------------------------------------------------------------------------------------
