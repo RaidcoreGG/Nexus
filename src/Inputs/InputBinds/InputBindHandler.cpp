@@ -415,12 +415,12 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			if (isModifier)
 			{
+				/* do this, to check all binds that use the modifier */
 				this->Release((unsigned int)wParam);
 			}
-			else
-			{
-				this->Release(EInputBindType::Keyboard, LParamToKMF(lParam).GetScanCode());
-			}
+			
+			/* always do this, because even if it's a modifier, it might be a modifier-key bind */
+			this->Release(EInputBindType::Keyboard, LParamToKMF(lParam).GetScanCode());
 
 			/* only check if not currently setting InputBind */
 			if (this->IsCapturing)
