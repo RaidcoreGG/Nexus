@@ -53,6 +53,13 @@ namespace Hooks
 			{
 				Main::Shutdown(uMsg);
 			}
+
+			/* offset of 7997, if uMsg in that range it's a nexus game only message */
+			if (uMsg >= WM_PASSTHROUGH_FIRST && uMsg <= WM_PASSTHROUGH_LAST)
+			{
+				/* modify the uMsg code to the original code */
+				uMsg -= WM_PASSTHROUGH_FIRST;
+			}
 		}
 		
 		return CallWindowProcA(Hooks::GW2::WndProc, hWnd, uMsg, wParam, lParam);

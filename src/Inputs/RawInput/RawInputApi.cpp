@@ -8,7 +8,6 @@
 
 #include "RawInputApi.h"
 
-#include "Hooks.h"
 #include "Renderer.h"
 #include "Shared.h"
 
@@ -48,6 +47,15 @@ UINT CRawInputApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 LRESULT CRawInputApi::SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	if (uMsg >= WM_USER)
+	{
+		return PostMessageA(Renderer::WindowHandle, uMsg, wParam, lParam);
+	}
+	else
+	{
+		return PostMessageA(Renderer::WindowHandle, uMsg + WM_PASSTHROUGH_FIRST, wParam, lParam);
+	}
+
 	return PostMessage(Renderer::WindowHandle, uMsg, wParam, lParam);
 }
 
