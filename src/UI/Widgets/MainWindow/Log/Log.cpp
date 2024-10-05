@@ -234,8 +234,31 @@ void CLogWindow::LogMessage(LogEntry* aLogEntry)
 		this->Channels.push_back(aLogEntry->Channel);
 	}
 
-	DisplayLogEntry* displayMsg = new DisplayLogEntry();
-	displayMsg->Entry = aLogEntry;
+	DisplayLogEntry* displayMsg = nullptr;
+
+	if (aLogEntry->RepeatCount > 1)
+	{
+		displayMsg = this->LogEntries[this->LogEntries.size() - 1];
+		displayMsg->Entry->RepeatCount = aLogEntry->RepeatCount;
+		displayMsg->Parts.clear();
+	}
+	else
+	{
+		displayMsg = new DisplayLogEntry();
+		displayMsg->Entry = aLogEntry;
+	}
+
+	if (displayMsg->Entry->RepeatCount > 1)
+	{
+		MessagePart msgPart{};
+		msgPart.Type = EMessagePartType::Text;
+		msgPart.Text = "(" + std::to_string(displayMsg->Entry->RepeatCount) + ")";
+		displayMsg->Parts.push_back(msgPart);
+		MessagePart msgSpace{};
+		msgSpace.Type = EMessagePartType::Text;
+		msgSpace.Text = " ";
+		displayMsg->Parts.push_back(msgSpace);
+	}
 
 	size_t idxLastWordStart = 0;
 	for (size_t i = 0; i < aLogEntry->Message.size(); i++)
@@ -271,11 +294,11 @@ void CLogWindow::LogMessage(LogEntry* aLogEntry)
 		}
 		// magic number 10 because a string like "<c=#123456>" is 11 chars long
 		else if (remainingLength >= 10 &&
-				 aLogEntry->Message[i] == '<' &&
-				 aLogEntry->Message[i + 1] == 'c' &&
-				 aLogEntry->Message[i + 2] == '=' &&
-				 aLogEntry->Message[i + 3] == '#' &&
-				 aLogEntry->Message[i + 10] == '>')
+				aLogEntry->Message[i] == '<' &&
+				aLogEntry->Message[i + 1] == 'c' &&
+				aLogEntry->Message[i + 2] == '=' &&
+				aLogEntry->Message[i + 3] == '#' &&
+				aLogEntry->Message[i + 10] == '>')
 		{
 			std::string hexCol = aLogEntry->Message.substr(i + 4, 6);
 
@@ -325,5 +348,8 @@ void CLogWindow::LogMessage(LogEntry* aLogEntry)
 		}
 	}
 
-	this->LogEntries.push_back(displayMsg);
+	if (aLogEntry->RepeatCount == 1)
+	{
+		this->LogEntries.push_back(displayMsg);
+	}
 }

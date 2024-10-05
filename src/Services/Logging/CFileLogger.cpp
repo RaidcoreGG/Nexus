@@ -24,6 +24,9 @@ void CFileLogger::LogMessage(LogEntry* aLogEntry)
 {
 	const std::lock_guard<std::mutex> lock(Mutex);
 
-	File << aLogEntry->ToString(true, true, true);
-	File.flush();
+	if (aLogEntry->RepeatCount == 1)
+	{
+		File << aLogEntry->ToString(true, true, true);
+		File.flush();
+	}
 }

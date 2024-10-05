@@ -112,17 +112,29 @@ void CLogHandler::LogMessageV(ELogLevel aLogLevel, std::string aChannel, const c
 
 void CLogHandler::LogMessageUnformatted(ELogLevel aLogLevel, std::string aChannel, const char* aMsg)
 {
-	LogEntry* entry = new LogEntry();
-	entry->LogLevel = aLogLevel;
-	entry->Timestamp = Time::GetTimestamp();
-	entry->TimestampMilliseconds = Time::GetMilliseconds();
-	entry->Channel = aChannel;
-	entry->Message = aMsg;
+	LogEntry* entry = nullptr;
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
-	/* store log entries */
-	this->LogEntries.push_back(entry);
+	if (aMsg == LastMessage && aLogLevel == LastMessageLevel)
+	{
+		entry = this->LogEntries[this->LogEntries.size() - 1];
+		entry->RepeatCount++;
+	}
+	else
+	{
+		entry = new LogEntry();
+		entry->LogLevel = aLogLevel;
+		entry->Timestamp = Time::GetTimestamp();
+		entry->TimestampMilliseconds = Time::GetMilliseconds();
+		entry->Channel = aChannel;
+		entry->Message = aMsg;
+		LastMessage = aMsg;
+		LastMessageLevel = aLogLevel;
+
+		/* store new log entry */
+		this->LogEntries.push_back(entry);
+	}
 
 	for (ILogger* logger : this->Registry)
 	{

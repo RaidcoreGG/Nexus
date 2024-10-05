@@ -23,6 +23,7 @@ struct LogEntry
 	int TimestampMilliseconds;
 	std::string Channel;
 	std::string Message;
+	int RepeatCount = 1;
 
 	///----------------------------------------------------------------------------------------------------
 	/// TimestampString:

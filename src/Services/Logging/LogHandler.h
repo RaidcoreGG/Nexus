@@ -111,9 +111,12 @@ public:
 	void LogMessageUnformatted(ELogLevel aLogLevel, std::string aChannel, const char* aMsg);
 
 private:
-	std::mutex					Mutex;
-	std::vector<ILogger*>		Registry;
-	std::vector<LogEntry*>		LogEntries;
+	std::mutex             Mutex;
+	std::vector<ILogger*>  Registry;
+	std::vector<LogEntry*> LogEntries;
+
+	std::string            LastMessage;
+	ELogLevel              LastMessageLevel;
 };
 
 #endif

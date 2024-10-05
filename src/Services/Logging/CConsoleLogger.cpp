@@ -34,6 +34,8 @@ CConsoleLogger::~CConsoleLogger()
 void CConsoleLogger::LogMessage(LogEntry* aLogEntry)
 {
 	const std::lock_guard<std::mutex> lock(Mutex);
+
+	if (aLogEntry->RepeatCount == 1)
 	{
 		switch (aLogEntry->LogLevel)
 		{
