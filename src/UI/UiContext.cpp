@@ -1022,6 +1022,7 @@ namespace UIRoot::Fonts
 
 		ManagedFont* font = FontCtx->Get(aIdentifier);
 
+		font->Subscribers.push_back(aCallback);
 		aCallback(aIdentifier, font->Pointer);
 	}
 
