@@ -87,7 +87,7 @@ namespace TextureLoader
 ///----------------------------------------------------------------------------------------------------
 class CTextureLoader
 {
-public:
+	public:
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
@@ -175,10 +175,17 @@ public:
 	///----------------------------------------------------------------------------------------------------
 	int Verify(void* aStartAddress, void* aEndAddress);
 
-private:
-	mutable std::mutex				Mutex;
-	std::map<std::string, Texture*>	Registry;
-	std::vector<QueuedTexture>		QueuedTextures;
+	private:
+	mutable std::mutex                           Mutex;
+	std::map<std::string, Texture*>              Registry;
+	std::vector<QueuedTexture>                   QueuedTextures;
+
+	struct StagedTextureCallback
+	{
+		TEXTURES_RECEIVECALLBACK                 Callback;
+		bool                                     IsValid;
+	};
+	std::map<std::string, StagedTextureCallback> PendingCallbacks; /* set to false if no longer valid */
 
 	///----------------------------------------------------------------------------------------------------
 	/// OverrideTexture:

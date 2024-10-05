@@ -272,6 +272,11 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aRemote, const ch
 		return;
 	}
 	
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+		this->PendingCallbacks[str] = StagedTextureCallback{ aCallback, true };
+	}
+
 	std::string remote = aRemote;
 	std::string endpoint = aEndpoint;
 
@@ -304,6 +309,19 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aRemote, const ch
 		stbi_uc* data = stbi_load_from_memory(remote_data, static_cast<int>(size), &image_width, &image_height, &image_components, 4);
 
 		delete[] remote_data;
+
+		{
+			const std::lock_guard<std::mutex> lock(this->Mutex);
+			if (this->PendingCallbacks[str].IsValid == false)
+			{
+				this->PendingCallbacks.erase(str);
+				if (data)
+				{
+					stbi_image_free(data);
+				}
+				return;
+			}
+		}
 
 		this->QueueTexture(str.c_str(), data, image_width, image_height, aCallback);
 	}).detach();
@@ -366,6 +384,15 @@ int CTextureLoader::Verify(void* aStartAddress, void* aEndAddress)
 		}
 	}
 
+	for (auto [identifier, callback] : this->PendingCallbacks)
+	{
+		if (callback.Callback >= aStartAddress && callback.Callback <= aEndAddress)
+		{
+			this->PendingCallbacks[identifier].IsValid = false;
+			refCounter++;
+		}
+	}
+
 	return refCounter;
 }
 
@@ -392,14 +419,12 @@ void CTextureLoader::QueueTexture(const char* aIdentifier, unsigned char* aImage
 {
 	std::string str = aIdentifier;
 
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+	for (QueuedTexture& tex : this->QueuedTextures)
 	{
-		const std::lock_guard<std::mutex> lock(this->Mutex);
-		for (QueuedTexture& tex : this->QueuedTextures)
+		if (tex.Identifier == str)
 		{
-			if (tex.Identifier == str)
-			{
-				return;
-			}
+			return;
 		}
 	}
 
@@ -412,10 +437,8 @@ void CTextureLoader::QueueTexture(const char* aIdentifier, unsigned char* aImage
 	raw.Height = aHeight;
 	raw.Callback = aCallback;
 
-	{
-		const std::lock_guard<std::mutex> lock(this->Mutex);
-		this->QueuedTextures.push_back(raw);
-	}
+	this->PendingCallbacks.erase(str);
+	this->QueuedTextures.push_back(raw);
 }
 
 void CTextureLoader::CreateTexture(QueuedTexture aQueuedTexture)
