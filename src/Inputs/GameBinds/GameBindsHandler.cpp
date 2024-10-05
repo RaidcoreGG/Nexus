@@ -220,6 +220,7 @@ std::string CGameBindsApi::ToString(EGameBinds aGameBind)
 		{ EGameBinds::MasteryAccess03, "((MasteryAccess03))" }, // Jade Bot Waypoint
 		{ EGameBinds::MasteryAccess04, "((MasteryAccess04))" }, // Rift Scan
 		{ EGameBinds::MasteryAccess05, "((MasteryAccess05))" }, // Skyscale
+		{ EGameBinds::MasteryAccess06, "((MasteryAccess06))" }, // // Homestead Doorway
 
 		// Miscellaneous Binds
 		{ EGameBinds::MiscAoELoot, "((MiscAoELoot))" },
@@ -230,6 +231,7 @@ std::string CGameBindsApi::ToString(EGameBinds aGameBind)
 		{ EGameBinds::MiscToggleLanguage, "((MiscToggleLanguage))" },
 		{ EGameBinds::MiscTogglePetCombat, "((MiscTogglePetCombat))" },
 		{ EGameBinds::MiscToggleFullScreen, "((MiscToggleFullScreen))" },
+		{ EGameBinds::MiscToggleDecorationMode, "((MiscToggleDecorationMode))" }, // Decoration Mode
 
 		// Toys/Novelties
 		{ EGameBinds::ToyUseDefault, "((ToyUseDefault))" },
@@ -446,6 +448,7 @@ std::string CGameBindsApi::GetCategory(EGameBinds aGameBind)
 		{ EGameBinds::MasteryAccess03, GKBCAT_MASTERY }, // Jade Bot Waypoint
 		{ EGameBinds::MasteryAccess04, GKBCAT_MASTERY }, // Rift Scan
 		{ EGameBinds::MasteryAccess05, GKBCAT_MASTERY }, // Skyscale
+		{ EGameBinds::MasteryAccess06, GKBCAT_MASTERY }, // Homestead Doorway
 
 		// Miscellaneous Binds
 		{ EGameBinds::MiscAoELoot, GKBCAT_MISC },
@@ -456,6 +459,7 @@ std::string CGameBindsApi::GetCategory(EGameBinds aGameBind)
 		{ EGameBinds::MiscToggleLanguage, GKBCAT_MISC },
 		{ EGameBinds::MiscTogglePetCombat, GKBCAT_MISC },
 		{ EGameBinds::MiscToggleFullScreen, GKBCAT_MISC },
+		{ EGameBinds::MiscToggleDecorationMode, GKBCAT_MISC }, // Decoration Mode
 
 		// Toys/Novelties
 		{ EGameBinds::ToyUseDefault, GKBCAT_MISC },
