@@ -816,6 +816,20 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 			}
 		}
 	}
+
+	/* restore modifiers */
+	if (!ib.Alt && GetAsyncKeyState(VK_MENU))
+	{
+		this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYDOWN, VK_MENU, GetKeyMessageLPARAM(VK_MENU, true, true));
+	}
+	if (!ib.Ctrl && GetAsyncKeyState(VK_CONTROL))
+	{
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_CONTROL, GetKeyMessageLPARAM(VK_CONTROL, true, false));
+	}
+	if (!ib.Shift && GetAsyncKeyState(VK_SHIFT))
+	{
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, true, false));
+	}
 }
 
 void CGameBindsApi::Release(EGameBinds aGameBind)
