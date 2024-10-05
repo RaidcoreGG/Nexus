@@ -741,11 +741,11 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 
 	if (ib.Alt)
 	{
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_MENU, GetKeyMessageLPARAM(VK_MENU, true, true));
+		this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYDOWN, VK_MENU, GetKeyMessageLPARAM(VK_MENU, true, true));
 	}
 	else if (!ib.Alt && GetAsyncKeyState(VK_MENU))
 	{
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, VK_MENU, GetKeyMessageLPARAM(VK_MENU, false, true));
+		this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYUP, VK_MENU, GetKeyMessageLPARAM(VK_MENU, false, true));
 	}
 
 	if (ib.Ctrl)
@@ -768,7 +768,8 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 
 	if (ib.Type == EInputBindType::Keyboard)
 	{
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK), GetKeyMessageLPARAM(MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK), true, false));
+		int vk = MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK);
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, vk, GetKeyMessageLPARAM(vk, true, false));
 	}
 	else if (ib.Type == EInputBindType::Mouse)
 	{
@@ -815,20 +816,6 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 			}
 		}
 	}
-
-	/* restore modifiers */
-	if (GetAsyncKeyState(VK_MENU))
-	{
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_MENU, GetKeyMessageLPARAM(VK_MENU, true, true));
-	}
-	if (GetAsyncKeyState(VK_CONTROL))
-	{
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_CONTROL, GetKeyMessageLPARAM(VK_CONTROL, true, false));
-	}
-	if (GetAsyncKeyState(VK_SHIFT))
-	{
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, true, false));
-	}
 }
 
 void CGameBindsApi::Release(EGameBinds aGameBind)
@@ -842,7 +829,8 @@ void CGameBindsApi::Release(EGameBinds aGameBind)
 
 	if (ib.Type == EInputBindType::Keyboard)
 	{
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK), GetKeyMessageLPARAM(MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK), false, false));
+		int vk = MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK);
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, vk, GetKeyMessageLPARAM(vk, false, false));
 	}
 	else if (ib.Type == EInputBindType::Mouse)
 	{
@@ -890,29 +878,29 @@ void CGameBindsApi::Release(EGameBinds aGameBind)
 		}
 	}
 
-	if (ib.Alt)
+	if (ib.Alt && !GetAsyncKeyState(VK_MENU))
 	{
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, VK_MENU, GetKeyMessageLPARAM(VK_MENU, false, true));
+		this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYUP, VK_MENU, GetKeyMessageLPARAM(VK_MENU, false, true));
 	}
-	if (ib.Ctrl)
+	else if (GetAsyncKeyState(VK_MENU))
+	{
+		this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYDOWN, VK_MENU, GetKeyMessageLPARAM(VK_MENU, true, true));
+	}
+
+	if (ib.Ctrl && !GetAsyncKeyState(VK_CONTROL))
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, VK_CONTROL, GetKeyMessageLPARAM(VK_CONTROL, false, false));
 	}
-	if (ib.Shift)
-	{
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, false, false));
-	}
-
-	/* restore modifiers */
-	if (GetAsyncKeyState(VK_MENU))
-	{
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_MENU, GetKeyMessageLPARAM(VK_MENU, true, true));
-	}
-	if (GetAsyncKeyState(VK_CONTROL))
+	else if (GetAsyncKeyState(VK_CONTROL))
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_CONTROL, GetKeyMessageLPARAM(VK_CONTROL, true, false));
 	}
-	if (GetAsyncKeyState(VK_SHIFT))
+
+	if (ib.Shift && !GetAsyncKeyState(VK_SHIFT))
+	{
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, false, false));
+	}
+	else if (GetAsyncKeyState(VK_SHIFT))
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, true, false));
 	}
