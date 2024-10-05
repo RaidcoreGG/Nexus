@@ -119,10 +119,27 @@ void CUpdater::UpdateNexus()
 		Logger->Info(CH_UPDATER, "Outdated: API replied with Version %s but installed is Version %s", remoteVersion.string().c_str(), Version.string().c_str());
 		IsUpdateAvailable = true;
 
-		// ensure download successful
-		if (!RaidcoreAPI->Download(Index::F_UPDATE_DLL, "/d3d11.dll"))
+		bool githubFailure = false;
+		/* get from github */
+		std::string downloadBaseUrl = URL::GetBase("https://github.com");
+		std::string endpointDownload = URL::GetEndpoint("/RaidcoreGG/Nexus/releases/latest/download/d3d11.dll");
+		httplib::Client downloadClient(downloadBaseUrl);
+		downloadClient.enable_server_certificate_verification(true);
+		downloadClient.set_follow_location(true);
+		size_t bytesWritten = 0;
+		std::ofstream file(Index::F_UPDATE_DLL, std::ofstream::binary);
+		auto downloadResult = downloadClient.Get(endpointDownload,
+												 [&](const char* data, size_t data_length) {
+			file.write(data, data_length);
+			bytesWritten += data_length;
+			return true;
+		}
+		);
+		file.close();
+
+		if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
 		{
-			Logger->Warning(CH_UPDATER, "Nexus Update failed: Download failed.");
+			Logger->Warning(CH_UPDATER, "Error fetching %s%s", downloadBaseUrl.c_str(), endpointDownload.c_str());
 
 			// try cleaning failed download
 			if (std::filesystem::exists(Index::F_UPDATE_DLL))
@@ -134,11 +151,35 @@ void CUpdater::UpdateNexus()
 				catch (std::filesystem::filesystem_error fErr)
 				{
 					Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\".", Index::F_UPDATE_DLL.string().c_str());
-					return;
 				}
 			}
 
-			return;
+			githubFailure = true;
+		}
+
+		/* fallback to raidcore site */
+		if (githubFailure)
+		{
+			Logger->Info(CH_UPDATER, "Nexus update via GitHub not possible. Falling back to Raidcore API.");
+			// ensure download successful
+			if (!RaidcoreAPI->Download(Index::F_UPDATE_DLL, "/d3d11.dll"))
+			{
+				Logger->Warning(CH_UPDATER, "Nexus Update failed: Download failed.");
+				// try cleaning failed download
+				if (std::filesystem::exists(Index::F_UPDATE_DLL))
+				{
+					try
+					{
+						std::filesystem::remove(Index::F_UPDATE_DLL);
+					}
+					catch (std::filesystem::filesystem_error fErr)
+					{
+						Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\".", Index::F_UPDATE_DLL.string().c_str());
+						return;
+					}
+				}
+				return;
+			}
 		}
 
 		// absolute redundant sanity check

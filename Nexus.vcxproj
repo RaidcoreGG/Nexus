@@ -482,7 +482,8 @@
     </Link>
     <PreBuildEvent>
       <Command>CALL $(SolutionDir)Scripts\branch.bat
-CALL $(SolutionDir)Scripts\version.bat</Command>
+CALL $(SolutionDir)Scripts\version.bat
+CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -517,7 +518,8 @@ CALL $(SolutionDir)Scripts\version.bat</Command>
     </Link>
     <PreBuildEvent>
       <Command>CALL $(SolutionDir)Scripts\branch.bat
-CALL $(SolutionDir)Scripts\version.bat</Command>
+CALL $(SolutionDir)Scripts\version.bat
+CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
