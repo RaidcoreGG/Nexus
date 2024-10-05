@@ -64,7 +64,7 @@ LPARAM GetKeyMessageLPARAM(unsigned aVKey, bool aIsDown, bool aIsSystem)
 LPARAM GetKeyMessageLPARAM_ScanCode(unsigned short aScanCode, bool aIsDown, bool aIsSystem)
 {
 	KeyLParam lp = GetKeyMessageLPARAM(0, aIsDown, aIsSystem);
-	lp.ScanCode = aScanCode;
+	lp.ScanCode = LOBYTE(aScanCode);
 	lp.ExtendedFlag = (HIBYTE(aScanCode) == 0xE0 || HIBYTE(aScanCode) == 0xE1) ? 1 : 0;
 	return KMFToLParam(lp);
 }

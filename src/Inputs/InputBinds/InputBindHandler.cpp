@@ -59,59 +59,8 @@ namespace InputBinds
 	}
 }
 
-static bool IsLookupTableBuilt = false;
-static std::map<unsigned short, std::string> ScancodeLookupTable;
-
-void BuildscanCodeLookupTable()
-{
-	if (IsLookupTableBuilt) { return; }
-
-	for (long long i = 0; i < 255; i++)
-	{
-		KeyLParam key{};
-		key.ScanCode = i;
-		char* buff = new char[64];
-		std::string str;
-		GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, 64);
-		str.append(buff);
-
-		ScancodeLookupTable[key.GetScanCode()] = str;
-
-		key.ExtendedFlag = 1;
-		buff = new char[64];
-		str = "";
-		GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, 64);
-		str.append(buff);
-
-		ScancodeLookupTable[key.GetScanCode()] = str;
-
-		delete[] buff;
-	};
-}
-
-std::string CInputBindApi::ScancodeToString(unsigned short aScanCode)
-{
-	if (!IsLookupTableBuilt)
-	{
-		BuildscanCodeLookupTable();
-	}
-
-	auto it = ScancodeLookupTable.find(aScanCode);
-	if (it != ScancodeLookupTable.end())
-	{
-		return it->second;
-	}
-
-	return "";
-}
-
 InputBind CInputBindApi::IBFromString(std::string aInputBind)
 {
-	if (!IsLookupTableBuilt)
-	{
-		BuildscanCodeLookupTable();
-	}
-
 	InputBind ib{};
 
 	if (String::ToLower(aInputBind) == NULLSTR) { return ib; }
@@ -168,6 +117,30 @@ InputBind CInputBindApi::IBFromString(std::string aInputBind)
 	else
 	{
 		ib.Type = EInputBindType::Keyboard;
+
+		static bool IsLookupTableBuilt = false;
+		static std::map<unsigned short, std::string> ScancodeLookupTable;
+		if (!IsLookupTableBuilt)
+		{
+			for (long long i = 0; i < 255; i++)
+			{
+				KeyLParam key{};
+				key.ScanCode = i;
+				char* buff = new char[64];
+				std::string str;
+				GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, 64);
+				str.append(buff);
+				ScancodeLookupTable[key.GetScanCode()] = str;
+				key.ExtendedFlag = 1;
+				buff = new char[64];
+				str = "";
+				GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, 64);
+				str.append(buff);
+				ScancodeLookupTable[key.GetScanCode()] = str;
+				delete[] buff;
+			};
+		}
+
 		for (auto it = ScancodeLookupTable.begin(); it != ScancodeLookupTable.end(); ++it)
 		{
 			if (it->second == aInputBind)
@@ -183,11 +156,6 @@ InputBind CInputBindApi::IBFromString(std::string aInputBind)
 
 std::string CInputBindApi::IBToString(InputBind aInputBind, bool aPadded)
 {
-	if (!IsLookupTableBuilt)
-	{
-		BuildscanCodeLookupTable();
-	}
-
 	/* type is not set -> invalid*/
 	/* type is keyboard and code 0 because only modifiers -> valid */
 	/* type is mouse and code is 0 -> invalid */
@@ -204,49 +172,29 @@ std::string CInputBindApi::IBToString(InputBind aInputBind, bool aPadded)
 
 	if (aInputBind.Alt)
 	{
-		GetKeyNameTextA(MapVirtualKeyA(VK_MENU, MAPVK_VK_TO_VSC_EX) << 16, buff, 100);
+		GetKeyNameTextA(MapVirtualKeyA(VK_MENU, MAPVK_VK_TO_VSC) << 16, buff, 100);
 		str.append(buff);
 		str.append(aPadded ? " + " : "+");
 	}
 
 	if (aInputBind.Ctrl)
 	{
-		GetKeyNameTextA(MapVirtualKeyA(VK_CONTROL, MAPVK_VK_TO_VSC_EX) << 16, buff, 100);
+		GetKeyNameTextA(MapVirtualKeyA(VK_CONTROL, MAPVK_VK_TO_VSC) << 16, buff, 100);
 		str.append(buff);
 		str.append(aPadded ? " + " : "+");
 	}
 
 	if (aInputBind.Shift)
 	{
-		GetKeyNameTextA(MapVirtualKeyA(VK_SHIFT, MAPVK_VK_TO_VSC_EX) << 16, buff, 100);
+		GetKeyNameTextA(MapVirtualKeyA(VK_SHIFT, MAPVK_VK_TO_VSC) << 16, buff, 100);
 		str.append(buff);
 		str.append(aPadded ? " + " : "+");
 	}
 
 	if (aInputBind.Type == EInputBindType::Keyboard)
 	{
-		UINT vk = MapVirtualKeyA(aInputBind.Code, MAPVK_VSC_TO_VK_EX);
-
-		if (vk >= 65 && vk <= 90 || vk >= 48 && vk <= 57)
-		{
-			GetKeyNameTextA(aInputBind.Code << 16, buff, 100);
-			str.append(buff);
-		}
-		else
-		{
-			if (aInputBind.Type == EInputBindType::Keyboard && aInputBind.Code == 0)
-			{
-				str = str.substr(0, str.length() - (aPadded ? 3 : 1));
-			}
-			else
-			{
-				auto it = ScancodeLookupTable.find(aInputBind.Code);
-				if (it != ScancodeLookupTable.end())
-				{
-					str.append(it->second);
-				}
-			}
-		}
+		GetKeyNameTextA(GetKeyMessageLPARAM_ScanCode(aInputBind.Code, false, false), buff, 100);
+		str.append(buff);
 	}
 	else if (aInputBind.Type == EInputBindType::Mouse)
 	{
