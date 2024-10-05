@@ -185,6 +185,13 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aFilename, TEXTUR
 	if (!std::filesystem::exists(aFilename))
 	{
 		Logger->Warning(CH_TEXTURES, "File provided does not exist: %s (%s)", aFilename, str.c_str());
+
+		/* nullptr response on fail */
+		if (aCallback)
+		{
+			aCallback(str.c_str(), nullptr);
+		}
+
 		return;
 	}
 
@@ -220,6 +227,13 @@ void CTextureLoader::Load(const char* aIdentifier, unsigned aResourceID, HMODULE
 	if (!imageResHandle)
 	{
 		Logger->Debug(CH_TEXTURES, "Resource not found ResID: %u (%s)", aResourceID, str.c_str());
+
+		/* nullptr response on fail */
+		if (aCallback)
+		{
+			aCallback(str.c_str(), nullptr);
+		}
+
 		return;
 	}
 
@@ -227,6 +241,13 @@ void CTextureLoader::Load(const char* aIdentifier, unsigned aResourceID, HMODULE
 	if (!imageResDataHandle)
 	{
 		Logger->Debug(CH_TEXTURES, "Failed loading resource: %u (%s)", aResourceID, str.c_str());
+
+		/* nullptr response on fail */
+		if (aCallback)
+		{
+			aCallback(str.c_str(), nullptr);
+		}
+
 		return;
 	}
 
@@ -234,6 +255,13 @@ void CTextureLoader::Load(const char* aIdentifier, unsigned aResourceID, HMODULE
 	if (!imageFile)
 	{
 		Logger->Debug(CH_TEXTURES, "Failed locking resource: %u (%s)", aResourceID, str.c_str());
+
+		/* nullptr response on fail */
+		if (aCallback)
+		{
+			aCallback(str.c_str(), nullptr);
+		}
+
 		return;
 	}
 
@@ -241,6 +269,13 @@ void CTextureLoader::Load(const char* aIdentifier, unsigned aResourceID, HMODULE
 	if (!imageFileSize)
 	{
 		Logger->Debug(CH_TEXTURES, "Failed getting size of resource: %u (%s)", aResourceID, str.c_str());
+
+		/* nullptr response on fail */
+		if (aCallback)
+		{
+			aCallback(str.c_str(), nullptr);
+		}
+
 		return;
 	}
 
@@ -288,13 +323,42 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aRemote, const ch
 		if (!result)
 		{
 			Logger->Debug(CH_TEXTURES, "Error fetching %s%s (%s)", remote.c_str(), endpoint.c_str(), str.c_str());
+
+			if (aCallback)
+			{
+				const std::lock_guard<std::mutex> lock(this->Mutex);
+				if (this->PendingCallbacks[str].IsValid == false)
+				{
+					this->PendingCallbacks.erase(str);
+				}
+				else
+				{
+					aCallback(str.c_str(), nullptr);
+				}
+			}
+
 			return;
 		}
 
 		// Status is not HTTP_OK
 		if (result->status != 200)
 		{
-			Logger->Debug(CH_TEXTURES, "Status %d when fetching %s%s (%s)", result->status, remote.c_str(), endpoint.c_str(), str.c_str());
+			Logger->Debug(CH_TEXTURES, "Status %d when fetching %s%s (%s) | %s", result->status, remote.c_str(), endpoint.c_str(), str.c_str(), httplib::to_string(result.error()).c_str());
+			
+			/* nullptr response on fail */
+			if (aCallback)
+			{
+				const std::lock_guard<std::mutex> lock(this->Mutex);
+				if (this->PendingCallbacks[str].IsValid == false)
+				{
+					this->PendingCallbacks.erase(str);
+				}
+				else
+				{
+					aCallback(str.c_str(), nullptr);
+				}
+			}
+
 			return;
 		}
 
@@ -420,6 +484,7 @@ void CTextureLoader::QueueTexture(const char* aIdentifier, unsigned char* aImage
 	std::string str = aIdentifier;
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
+
 	for (QueuedTexture& tex : this->QueuedTextures)
 	{
 		if (tex.Identifier == str)
@@ -437,8 +502,8 @@ void CTextureLoader::QueueTexture(const char* aIdentifier, unsigned char* aImage
 	raw.Height = aHeight;
 	raw.Callback = aCallback;
 
-	this->PendingCallbacks.erase(str);
 	this->QueuedTextures.push_back(raw);
+	this->PendingCallbacks.erase(str);
 }
 
 void CTextureLoader::CreateTexture(QueuedTexture aQueuedTexture)
@@ -473,6 +538,13 @@ void CTextureLoader::CreateTexture(QueuedTexture aQueuedTexture)
 	{
 		Logger->Debug(CH_TEXTURES, "pTexture was null");
 		stbi_image_free(aQueuedTexture.Data);
+
+		/* nullptr response on fail */
+		if (aQueuedTexture.Callback)
+		{
+			aQueuedTexture.Callback(aQueuedTexture.Identifier.c_str(), nullptr);
+		}
+
 		return;
 	}
 
@@ -493,6 +565,9 @@ void CTextureLoader::CreateTexture(QueuedTexture aQueuedTexture)
 		aQueuedTexture.Callback(aQueuedTexture.Identifier.c_str(), tex);
 	}
 
-	stbi_image_free(aQueuedTexture.Data);
-	aQueuedTexture.Data = {};
+	if (aQueuedTexture.Data)
+	{
+		stbi_image_free(aQueuedTexture.Data);
+		aQueuedTexture.Data = {};
+	}
 }
