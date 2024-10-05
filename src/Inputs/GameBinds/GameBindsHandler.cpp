@@ -560,8 +560,8 @@ unsigned short CGameBindsApi::GameBindCodeToScanCode(unsigned short aGameScanCod
 		{ 74, 0x24 }, // J
 		{ 75, 0x25 }, // K
 		{ 76, 0x26 }, // L
-		{ 77, 0x31 }, // M
-		{ 78, 0x32 }, // N
+		{ 77, 0x32 }, // M
+		{ 78, 0x31 }, // N
 		{ 79, 0x18 }, // O
 		{ 80, 0x19 }, // P
 		{ 81, 0x10 }, // Q
