@@ -35,6 +35,8 @@ void CAddonsWindow::RenderContent()
 	/* filters */
 	static char filter[400] = {};
 
+	ImGui::Text("Filter:");
+	ImGui::SameLine();
 	ImGui::InputText("##addonsfilter", &filter[0], 400);
 
 	std::string filterStr = filter;

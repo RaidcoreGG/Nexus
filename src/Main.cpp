@@ -137,12 +137,6 @@ namespace Main
 
 			CSettings* settings = new CSettings(Index::F_SETTINGS);
 
-			// if it's not already been explicitly set via command line, check settings
-			if (!State::IsDeveloperMode)
-			{
-				State::IsDeveloperMode = settings->Get<bool>(OPT_DEVMODE);
-			}
-
 			//API::Initialize();
 
 			MumbleReader = new CMumbleReader(mumbleName);

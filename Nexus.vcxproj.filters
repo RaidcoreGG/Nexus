@@ -1217,6 +1217,9 @@
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\AddonDetails.h">
       <Filter>UI\Widgets\MainWindow\Pages\Addons</Filter>
     </ClInclude>
+    <ClInclude Include="src\Remote.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\Nexus.rc">

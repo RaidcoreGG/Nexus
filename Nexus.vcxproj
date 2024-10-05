@@ -99,6 +99,7 @@
     <ClInclude Include="src\Inputs\InputBinds\EInputBindHandlerType.h" />
     <ClInclude Include="src\Inputs\InputBinds\EInputBindType.h" />
     <ClInclude Include="src\Loader\AddonVersion.h" />
+    <ClInclude Include="src\Remote.h" />
     <ClInclude Include="src\Services\API\ApiClient.h" />
     <ClInclude Include="src\Services\API\APIController.h" />
     <ClInclude Include="src\Services\API\ActiveToken.h" />

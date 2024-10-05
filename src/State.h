@@ -62,7 +62,6 @@ namespace State
 	extern bool				IsEULAAccepted;			/* Is the EULA accepted */
 
 	/* start parameters */
-	extern bool				IsDeveloperMode;		/* Is Nexus running in developer mode */
 	extern bool				IsConsoleEnabled;		/* Is the console window enabled */
 	extern bool				IsVanilla;				/* Is Nexus running in vanilla mode and should not load any mods */
 

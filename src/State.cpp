@@ -22,7 +22,6 @@ namespace State
 	bool			IsChainloading				= false;
 	bool			IsEULAAccepted				= false;
 
-	bool			IsDeveloperMode				= false;
 	bool			IsConsoleEnabled			= false;
 	bool			IsVanilla					= false;
 
@@ -49,7 +48,6 @@ namespace State
 			// token -> is the unmodified string as from the commandline
 			// cmp -> same as token, except it's been normalised (aka written in lowercase)
 
-			if (cmp == "-ggdev") { IsDeveloperMode = true; }
 			if (cmp == "-ggvanilla") { IsVanilla = true; }
 			if (cmp == "-ggconsole") { IsConsoleEnabled = true; }
 
