@@ -183,16 +183,14 @@ namespace Loader
 				SaveAddonConfig();
 			}
 
+			while (Addons.size() != 0)
 			{
-				while (Addons.size() != 0)
-				{
-					UnloadAddon(Addons.front()->Path);
+				UnloadAddon(Addons.front()->Path);
 
-					/* sanity check in case UnloadAddon removes the entry, because the file is no longer on disk. */
-					if (Addons.size() != 0)
-					{
-						Addons.erase(Addons.begin());
-					}
+				/* sanity check in case UnloadAddon removes the entry, because the file is no longer on disk. */
+				if (Addons.size() != 0)
+				{
+					Addons.erase(Addons.begin());
 				}
 			}
 		}
@@ -946,6 +944,8 @@ namespace Loader
 
 		Addon* addon = FindAddonByPath(aPath);
 
+		bool isShutdown = State::Nexus == ENexusState::SHUTTING_DOWN;
+
 		/* if the to be unloaded addon does not exist or isn't loaded (or loadedLocked) -> abort */
 		if (!addon || !(addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED))
 		{
@@ -962,14 +962,15 @@ namespace Loader
 					}
 
 					/* remove addon from list, it's no longer on disk*/
-					Addons.erase(it);
+					if (!isShutdown)
+					{
+						Addons.erase(it);
+					}
 				}
 			}
 			//Logger->Warning(CH_LOADER, "Cancelled unload of \"%s\". EAddonState = %d.", strFile.c_str(), addon->State);
 			return;
 		}
-
-		bool isShutdown = State::Nexus == ENexusState::SHUTTING_DOWN;
 
 		if (addon->Definitions)
 		{
