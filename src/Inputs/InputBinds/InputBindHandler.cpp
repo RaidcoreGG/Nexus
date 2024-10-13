@@ -493,6 +493,10 @@ void CInputBindApi::Register(const char* aIdentifier, EInputBindHandlerType aInp
 	}
 
 	this->Save();
+
+	std::thread([]() {
+		EventApi->Raise("EV_INPUTBIND_UPDATED");
+	}).detach();
 }
 
 void CInputBindApi::Deregister(const char* aIdentifier)
@@ -545,6 +549,10 @@ void CInputBindApi::Set(std::string aIdentifier, InputBind aInputBind)
 	}
 
 	this->Save();
+
+	std::thread([]() {
+		EventApi->Raise("EV_INPUTBIND_UPDATED");
+	}).detach();
 }
 
 bool CInputBindApi::Invoke(std::string aIdentifier, bool aIsRelease)
@@ -588,6 +596,10 @@ void CInputBindApi::Delete(std::string aIdentifier)
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	this->Registry.erase(aIdentifier);
+
+	std::thread([]() {
+		EventApi->Raise("EV_INPUTBIND_UPDATED");
+	}).detach();
 }
 
 int CInputBindApi::Verify(void* aStartAddress, void* aEndAddress)

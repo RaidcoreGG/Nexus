@@ -11,7 +11,10 @@
 
 #include <d3d11.h>
 #include <Windows.h>
+#include <vector>
+#include <map>
 
+#include "DisplayBinds.h"
 #include "ERenderType.h"
 #include "FuncDefs.h"
 #include "Inputs/InputBinds/InputBindHandler.h"
@@ -84,7 +87,7 @@ namespace UIRoot
 	void OnMumbleIdentityChanged(void* aEventArgs);
 
 	///----------------------------------------------------------------------------------------------------
-	/// ProcessInputBind:
+	/// OnInputBind:
 	/// 	Receives input bind invocations.
 	///----------------------------------------------------------------------------------------------------
 	void OnInputBind(const char* aIdentifier);
@@ -203,6 +206,30 @@ class CUiContext
 	CEscapeClosing* GetEscapeClosingService();
 
 	///----------------------------------------------------------------------------------------------------
+	/// GetOptionsCallbacks:
+	/// 	Returns a copy of the options callbacks.
+	///----------------------------------------------------------------------------------------------------
+	std::vector<GUI_RENDER> GetOptionsCallbacks();
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetInputBinds:
+	/// 	Returns a copy of the display input binds.
+	///----------------------------------------------------------------------------------------------------
+	std::vector<InputBindCategory> GetInputBinds();
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetInputBinds:
+	/// 	Returns a copy of the display input binds.
+	///----------------------------------------------------------------------------------------------------
+	std::map<std::string, InputBindPacked> GetInputBinds(const std::string& aCategory);
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetGameBinds:
+	/// 	Returns a copy of the display game input binds.
+	///----------------------------------------------------------------------------------------------------
+	std::vector<GameInputBindCategory> GetGameBinds();
+
+	///----------------------------------------------------------------------------------------------------
 	/// LoadFonts:
 	/// 	Loads the fonts.
 	///----------------------------------------------------------------------------------------------------
@@ -216,38 +243,43 @@ class CUiContext
 
 	private:
 	/* Services */
-	CLogHandler*            Logger;
-	CLocalization*          Language;
-	CTextureLoader*         TextureService;
-	CDataLink*              DataLink;
-	CInputBindApi*          InputBindApi;
+	CLogHandler*                       Logger;
+	CLocalization*                     Language;
+	CTextureLoader*                    TextureService;
+	CDataLink*                         DataLink;
+	CInputBindApi*                     InputBindApi;
 
 	/* Rendering */
-	HWND                    WindowHandle;
-	ID3D11Device*           Device;
-	ID3D11DeviceContext*    DeviceContext;
-	IDXGISwapChain*         SwapChain;
-	ID3D11RenderTargetView* RenderTargetView;
-	ImGuiContext*           ImGuiContext;
+	HWND                               WindowHandle;
+	ID3D11Device*                      Device;
+	ID3D11DeviceContext*               DeviceContext;
+	IDXGISwapChain*                    SwapChain;
+	ID3D11RenderTargetView*            RenderTargetView;
+	ImGuiContext*                      ImGuiContext;
 
 	/* Windows/Widgets */
-	CEULAModal*             EULAModal;
-	CAlerts*                Alerts;
-	CMainWindow*            MainWindow;
-	CQuickAccess*           QuickAccess;
+	CEULAModal*                        EULAModal;
+	CAlerts*                           Alerts;
+	CMainWindow*                       MainWindow;
+	CQuickAccess*                      QuickAccess;
 
 	/* UI Services */
-	CFontManager*           FontManager;
-	CEscapeClosing*         EscapeClose;
+	CFontManager*                      FontManager;
+	CEscapeClosing*                    EscapeClose;
 
-	mutable std::mutex      Mutex;
-	std::vector<GUI_RENDER> RegistryPreRender;
-	std::vector<GUI_RENDER> RegistryRender;
-	std::vector<GUI_RENDER> RegistryPostRender;
-	std::vector<GUI_RENDER> RegistryOptionsRender;
+	mutable std::mutex                 Mutex;
+	std::vector<GUI_RENDER>            RegistryPreRender;
+	std::vector<GUI_RENDER>            RegistryRender;
+	std::vector<GUI_RENDER>            RegistryPostRender;
+	std::vector<GUI_RENDER>            RegistryOptionsRender;
 
-	bool                    IsInitialized = false;
-	bool                    IsVisible = true;
+	mutable std::mutex                 DisplayBindsMutex;
+	std::vector<InputBindCategory>     DisplayInputBinds;
+	std::vector<GameInputBindCategory> DisplayGameBinds;
+
+	bool                               IsInitialized = false;
+	bool                               IsVisible = true;
+	bool                               IsInvalid = true;
 
 	///----------------------------------------------------------------------------------------------------
 	/// CreateNexusShortcut:
@@ -266,6 +298,18 @@ class CUiContext
 	/// 	Loads all the UI settings.
 	///----------------------------------------------------------------------------------------------------
 	void LoadSettings();
+
+	///----------------------------------------------------------------------------------------------------
+	/// UpdateDisplayInputBinds:
+	/// 	Refreshes the displayed input binds.
+	///----------------------------------------------------------------------------------------------------
+	void UpdateDisplayInputBinds();
+
+	///----------------------------------------------------------------------------------------------------
+	/// UpdateDisplayGameBinds:
+	/// 	Refreshes the displayed game input binds.
+	///----------------------------------------------------------------------------------------------------
+	void UpdateDisplayGameBinds();
 };
 
 // FIXME: addon wrapper garbage

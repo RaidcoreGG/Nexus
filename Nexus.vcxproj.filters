@@ -28,9 +28,6 @@
     <Filter Include="GUI\Widgets">
       <UniqueIdentifier>{911cde00-7b9a-4d41-9272-bc884666c983}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GUI\Widgets\Addons">
-      <UniqueIdentifier>{c991172a-2d10-4648-a529-d49c1325f759}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files\Fonts">
       <UniqueIdentifier>{1893bf7b-bd45-42e7-ad87-1a27b5dd5c62}</UniqueIdentifier>
     </Filter>
@@ -264,9 +261,6 @@
     <ClCompile Include="src\Inputs\InputBinds\InputBind.cpp">
       <Filter>Inputs\InputBinds</Filter>
     </ClCompile>
-    <ClCompile Include="src\GUI\Widgets\Addons\CAddonsWindow.cpp">
-      <Filter>GUI\Widgets\Addons</Filter>
-    </ClCompile>
     <ClCompile Include="src\Loader\Loader.cpp">
       <Filter>Loader</Filter>
     </ClCompile>
@@ -278,9 +272,6 @@
     </ClCompile>
     <ClCompile Include="src\Consts.cpp">
       <Filter>_GLOBAL</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GUI\Widgets\Addons\AddonItem.cpp">
-      <Filter>GUI\Widgets\Addons</Filter>
     </ClCompile>
     <ClCompile Include="src\Services\Settings\Settings.cpp">
       <Filter>Services\Settings</Filter>
@@ -423,7 +414,7 @@
     <ClCompile Include="src\UI\Controls\CtlWindow.cpp">
       <Filter>UI\Controls</Filter>
     </ClCompile>
-    <ClCompile Include="src\UI\Widgets\MainWindow\Addons\AddonDetails.cpp">
+    <ClCompile Include="src\UI\Widgets\MainWindow\Addons\AddonItem.cpp">
       <Filter>UI\Widgets\MainWindow\Pages\Addons</Filter>
     </ClCompile>
   </ItemGroup>
@@ -518,9 +509,6 @@
     <ClInclude Include="src\Loader\Loader.h">
       <Filter>Loader</Filter>
     </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\Addons\CAddonsWindow.h">
-      <Filter>GUI\Widgets\Addons</Filter>
-    </ClInclude>
     <ClInclude Include="src\Services\DataLink\DataLink.h">
       <Filter>Services\DataLink</Filter>
     </ClInclude>
@@ -559,9 +547,6 @@
     </ClInclude>
     <ClInclude Include="src\Inputs\InputBinds\ManagedInputBind.h">
       <Filter>Inputs\InputBinds</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\Addons\AddonItem.h">
-      <Filter>GUI\Widgets\Addons</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\Settings\Settings.h">
       <Filter>Services\Settings</Filter>
@@ -1214,11 +1199,17 @@
     <ClInclude Include="src\UI\Controls\CtlWindow.h">
       <Filter>UI\Controls</Filter>
     </ClInclude>
-    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\AddonDetails.h">
-      <Filter>UI\Widgets\MainWindow\Pages\Addons</Filter>
-    </ClInclude>
     <ClInclude Include="src\Remote.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\AddonItem.h">
+      <Filter>UI\Widgets\MainWindow\Pages\Addons</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\DisplayAddon.h">
+      <Filter>UI\Widgets\MainWindow\Pages\Addons</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\DisplayBinds.h">
+      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1353,6 +1344,9 @@
     </Image>
     <Image Include="src\Resources\banners\patreon.png">
       <Filter>Resource Files\Images\banners</Filter>
+    </Image>
+    <Image Include="src\Resources\icons\chevron_rt.png">
+      <Filter>Resource Files\Images\icons</Filter>
     </Image>
   </ItemGroup>
 </Project>

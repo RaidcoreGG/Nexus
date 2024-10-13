@@ -3,6 +3,9 @@
 
 #include <shellapi.h>
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_extensions.h"
+
 #include "Shared.h"
 #include "Consts.h"
 #include "Renderer.h"
@@ -12,23 +15,12 @@
 #include "Loader/Loader.h"
 #include "Loader/Library.h"
 #include "Loader/ArcDPS.h"
-#include "Services/Textures/TextureLoader.h"
-#include "Services/Textures/Texture.h"
-
-#include "Services/Updater/Updater.h"
-
-#include "Events/EventHandler.h"
 
 #include "Util/Strings.h"
 
-#include "GUI/Widgets/Alerts/Alerts.h"
-
-#include "imgui/imgui.h"
-#include "imgui/imgui_extensions.h"
-
 #include "resource.h"
 
-namespace GUI
+namespace UIRoot
 {
 	float itemWidth = 520.0f;
 	float itemHeight = 104.0f;
@@ -37,12 +29,6 @@ namespace GUI
 
 	float size = 24.0f;
 
-	Texture* Background = nullptr;
-	Texture* BackgroundHighlight = nullptr;
-	Texture* BackgroundDUU = nullptr;
-	Texture* BtnOptions = nullptr;
-	Texture* CtxMenuBullet = nullptr;
-	Texture* CtxMenuHighlight = nullptr;
 	Texture* PolicyTier1 = nullptr;
 	Texture* PolicyTier2 = nullptr;
 	Texture* PolicyTier3 = nullptr;
@@ -68,35 +54,6 @@ namespace GUI
 
 		// initial is explicitly set within the window, therefore all positions should be relative to it
 		ImVec2 initial = ImGui::GetCursorPos();
-
-		if (aAddon->IsDisabledUntilUpdate)
-		{
-			if (BackgroundDUU)
-			{
-				ImGui::SetCursorPos(initial);
-				ImGui::Image(BackgroundDUU->Resource, ImVec2(itemWidthScaled, itemHeightScaled));
-			}
-			else
-			{
-				BackgroundDUU = TextureService->GetOrCreate("TEX_ADDONITEM_BACKGROUND_DUU", RES_TEX_ADDONITEM_DUU, NexusHandle);
-			}
-		}
-		else
-		{
-			if (Background)
-			{
-				ImGui::SetCursorPos(initial);
-				ImGui::Image(Background->Resource, ImVec2(itemWidthScaled, itemHeightScaled));
-			}
-			else
-			{
-				Background = TextureService->GetOrCreate("TEX_ADDONITEM_BACKGROUND", RES_TEX_ADDONITEM, NexusHandle);
-			}
-		}
-
-		if (!BtnOptions) { BtnOptions = TextureService->GetOrCreate("ICON_OPTIONS", RES_ICON_OPTIONS, NexusHandle); }
-		if (!CtxMenuBullet) { CtxMenuBullet = TextureService->GetOrCreate("TEX_CTXMENU_BULLET", RES_TEX_CONTEXTMENU_BULLET, NexusHandle); }
-		if (!CtxMenuHighlight) { CtxMenuHighlight = TextureService->GetOrCreate("TEX_CTXMENU_HIGHLIGHT", RES_TEX_CONTEXTMENU_HIGHLIGHT, NexusHandle); }
 
 		{
 			ImGui::SetCursorPos(initial);

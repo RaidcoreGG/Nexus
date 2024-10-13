@@ -35,10 +35,15 @@ CBindsWindow::CBindsWindow()
 
 void CBindsWindow::RenderContent()
 {
+	CContext* ctx = CContext::GetContext();
+
 	if (this->IsInvalid)
 	{
-		this->PopulateInputBinds();
-		this->PopulateGameInputBinds();
+		CUiContext* uictx = ctx->GetUIContext();
+
+		this->IBCategories = uictx->GetInputBinds();
+		this->GIBCategories = uictx->GetGameBinds();
+
 		this->IsInvalid = false;
 	}
 
@@ -63,7 +68,6 @@ void CBindsWindow::RenderContent()
 
 	ImVec2 initial = ImGui::GetCursorPos();
 
-	CContext* ctx = CContext::GetContext();
 	CLocalization* langApi = ctx->GetLocalization();
 
 	ImGui::SetCursorPos(initial);
@@ -114,7 +118,7 @@ void CBindsWindow::RenderContent()
 
 void CBindsWindow::RenderSubWindows()
 {
-	DrawBindSetterModal();
+	this->DrawBindSetterModal();
 }
 
 void CBindsWindow::RenderInputBindsTable(const std::map<std::string, InputBindPacked>& aInputBinds)
@@ -193,86 +197,6 @@ void CBindsWindow::RenderGameInputBindsTable(const std::map<EGameBinds, GameInpu
 		}
 
 		ImGui::EndTable();
-	}
-}
-
-void CBindsWindow::PopulateInputBinds()
-{
-	this->IBCategories.clear();
-
-	CContext* ctx = CContext::GetContext();
-	CInputBindApi* inputBindApi = ctx->GetInputBindApi();
-
-	/* copy of all InputBinds */
-	std::map<std::string, ManagedInputBind> InputBindRegistry = inputBindApi->GetRegistry();
-
-	/* acquire categories */
-	for (auto& [identifier, inputBind] : InputBindRegistry)
-	{
-		std::string owner = Loader::GetOwner(inputBind.Handler);
-
-		auto it = std::find_if(this->IBCategories.begin(), this->IBCategories.end(), [owner](InputBindCategory category) { return category.Name == owner; });
-
-		if (it == this->IBCategories.end())
-		{
-			InputBindCategory cat{};
-			cat.Name = owner;
-			cat.InputBinds[identifier] =
-			{
-				CInputBindApi::IBToString(inputBind.Bind, true),
-				inputBind
-			};
-			this->IBCategories.push_back(cat);
-		}
-		else
-		{
-			it->InputBinds[identifier] =
-			{
-				CInputBindApi::IBToString(inputBind.Bind, true),
-				inputBind
-			};
-		}
-	}
-}
-
-void CBindsWindow::PopulateGameInputBinds()
-{
-	this->GIBCategories.clear();
-
-	CContext* ctx = CContext::GetContext();
-	CGameBindsApi* gameBindsApi = ctx->GetGameBindsApi();
-
-	/* copy of all InputBinds */
-	std::map<EGameBinds, InputBind> InputBindRegistry = gameBindsApi->GetRegistry();
-
-	/* acquire categories */
-	for (auto& [identifier, inputBind] : InputBindRegistry)
-	{
-		std::string catName = CGameBindsApi::GetCategory(identifier);
-
-		auto it = std::find_if(this->GIBCategories.begin(), this->GIBCategories.end(), [catName](GameInputBindCategory category) { return category.Name == catName; });
-
-		if (it == this->GIBCategories.end())
-		{
-			GameInputBindCategory cat{};
-			cat.Name = catName;
-			cat.GameInputBinds[identifier] =
-			{
-				CGameBindsApi::ToString(identifier),
-				CInputBindApi::IBToString(inputBind, true),
-				inputBind
-			};
-			this->GIBCategories.push_back(cat);
-		}
-		else
-		{
-			it->GameInputBinds[identifier] =
-			{
-				CGameBindsApi::ToString(identifier),
-				CInputBindApi::IBToString(inputBind, true),
-				inputBind
-			};
-		}
 	}
 }
 
@@ -386,6 +310,5 @@ void CBindsWindow::DeleteStaleBind(const std::string& aIdentifier)
 		CInputBindApi* inputBindApi = ctx->GetInputBindApi();
 
 		inputBindApi->Delete(aIdentifier);
-		this->Invalidate();
 	}).detach();
 }

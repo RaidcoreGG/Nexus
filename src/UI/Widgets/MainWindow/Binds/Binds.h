@@ -16,38 +16,7 @@
 #include "Inputs/GameBinds/EGameBinds.h"
 #include "Inputs/InputBinds/ManagedInputBind.h"
 #include "UI/Controls/CtlSubWindow.h"
-
-struct InputBindPacked
-{
-	std::string                               KeysText;
-	ManagedInputBind                          Bind;
-};
-
-struct InputBindCategory
-{
-	std::string                               Name;
-	std::map<std::string, InputBindPacked>    InputBinds;
-};
-
-struct GameInputBindPacked
-{
-	std::string                               Name;
-	std::string                               KeysText;
-	InputBind                                 Bind;
-};
-
-struct GameInputBindCategory
-{
-	std::string                               Name;
-	std::map<EGameBinds, GameInputBindPacked> GameInputBinds;
-};
-
-enum class EBindEditType
-{
-	None,
-	Nexus,
-	Game
-};
+#include "UI/DisplayBinds.h"
 
 class CBindsWindow : public ISubWindow
 {
@@ -70,9 +39,6 @@ class CBindsWindow : public ISubWindow
 
 	void RenderInputBindsTable(const std::map<std::string, InputBindPacked>& aInputBinds);
 	void RenderGameInputBindsTable(const std::map<EGameBinds, GameInputBindPacked>& aInputBinds);
-
-	void PopulateInputBinds();
-	void PopulateGameInputBinds();
 
 	void DrawBindSetterModal();
 

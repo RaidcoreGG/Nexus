@@ -9,42 +9,52 @@
 #ifndef MAINWINDOW_ADDONS_H
 #define MAINWINDOW_ADDONS_H
 
+#include <mutex>
+#include <vector>
+
+#include "DisplayAddon.h"
 #include "UI/Controls/CtlSubWindow.h"
-#include "AddonDetails.h"
-#include "UI/FuncDefs.h"
-#include "Loader/LibraryAddon.h"
-#include "Loader/Addon.h"
-
-enum class EAddonType
-{
-	Nexus,
-	Library,
-	ArcDPS
-};
-
-struct AddonItemData
-{
-	EAddonType Type;
-	union
-	{
-		Addon* NexusAddon;
-		LibraryAddon* LibraryAddon;
-		//ArcDPS
-	};
-	GUI_RENDER OptionsRender;
-};
 
 class CAddonsWindow : public ISubWindow
 {
 	public:
 	CAddonsWindow();
-	void RenderSubWindows() override;
 	void Invalidate() override;
 
+	void Invalidate(signed int aAddonID);
+
 	private:
-	CAddonDetailsWindow* Details;
+	std::string                Filter;
+	std::vector<AddonItemData> Addons;
+
+	/* Details */
+	std::mutex                 Mutex;
+	bool                       HasContent = false;
+	AddonItemData              AddonData = {};
+
+	/* Bind Editor */
+	EBindEditType                              IsEditing = EBindEditType::None;
+	std::string                                Editing_Identifier;
+	EGameBinds                                 Editing_GameIdentifier;
+	std::string                                Editing_BindText;
+
+	std::string                                ModalTitle;
+	bool                                       OpenModalNextFrame;
+
+	void SetContent(AddonItemData aAddonData);
+	void ClearContent();
+
+	void AddonItem(AddonItemData aAddonData, float aWidth);
 
 	void RenderContent() override;
+	void RenderSubWindows() override;
+	void RenderDetails();
+	void RenderInputBindsTable(const std::map<std::string, InputBindPacked>& aInputBinds);
+
+	void DrawBindSetterModal();
+
+	void PopulateAddons();
+	void PopulateLibrary();
 };
 
 #endif

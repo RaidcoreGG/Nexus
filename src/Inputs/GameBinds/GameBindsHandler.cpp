@@ -15,6 +15,7 @@
 
 /* FIXME: remove this -> DI */
 #include "Shared.h"
+#include "Context.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -683,6 +684,11 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 	}
 
 	UEInputBindUpdatesTarget->Set(kbChange->Identifier, ib, true);
+
+	CContext* ctx = CContext::GetContext();
+	CUiContext* uictx = ctx->GetUIContext();
+
+	uictx->Invalidate();
 }
 
 CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, CEventApi* aEventApi)

@@ -217,6 +217,16 @@ namespace UIRoot
 		uictx->OnInputBind(aIdentifier);
 	}
 
+	void OnAddonLoadUnload(void* aEventData)
+	{
+		CContext* ctx = CContext::GetContext();
+		CUiContext* uictx = ctx->GetUIContext();
+
+		assert(uictx);
+
+		uictx->Invalidate();
+	}
+
 	void OnVolatileAddonsDisabled(void* aEventData)
 	{
 		CContext* ctx = CContext::GetContext();
@@ -237,9 +247,10 @@ namespace UIRoot
 		CContext* ctx = CContext::GetContext();
 		CUiContext* uictx = ctx->GetUIContext();
 
-		assert(uictx);
-
-		uictx->Invalidate();
+		if (uictx)
+		{
+			uictx->Invalidate();
+		}
 	}
 
 	void OnTranslationUpdate(void* aEventData)
@@ -281,7 +292,6 @@ CUiContext::CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CText
 	EventApi->Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", UIRoot::OnUELanguageChanged, true);
 	EventApi->Subscribe("EV_VOLATILE_ADDON_DISABLED",            UIRoot::OnVolatileAddonsDisabled, true);
 	EventApi->Subscribe("EV_INPUTBIND_UPDATED",                  UIRoot::OnInputBindUpdate, true);
-	EventApi->Subscribe("EV_TRANSLATION_UPDATED",                UIRoot::OnTranslationUpdate, true);
 
 	CAddonsWindow*  addonsWnd  = new CAddonsWindow();
 	COptionsWindow* optionsWnd = new COptionsWindow();
@@ -399,8 +409,21 @@ void CUiContext::Render()
 	}
 	if (this->FontManager->Advance())
 	{
+		UIRoot::OnTranslationUpdate(nullptr);
 		UIRoot::OnMumbleIdentityChanged(nullptr);
 		Shutdown();
+	}
+
+	if (this->IsInvalid)
+	{
+		this->UpdateDisplayInputBinds();
+		this->UpdateDisplayGameBinds();
+
+		//this->Alerts->Invalidate();
+		this->MainWindow->Invalidate();
+		//this->QuickAccess->Invalidate();
+
+		this->IsInvalid = false;
 	}
 
 	/* pre-render callbacks */
@@ -469,9 +492,7 @@ void CUiContext::Render()
 
 void CUiContext::Invalidate()
 {
-	//this->Alerts->Invalidate();
-	this->MainWindow->Invalidate();
-	//this->QuickAccess->Invalidate();
+	this->IsInvalid = true;
 }
 
 UINT CUiContext::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -693,6 +714,41 @@ CFontManager* CUiContext::GetFontManager()
 CEscapeClosing* CUiContext::GetEscapeClosingService()
 {
 	return this->EscapeClose;
+}
+
+std::vector<GUI_RENDER> CUiContext::GetOptionsCallbacks()
+{
+	// no lock here, only safe to call from within render callbacks
+	//const std::lock_guard<std::mutex> lock(this->Mutex);
+	return this->RegistryOptionsRender;
+}
+
+std::vector<InputBindCategory> CUiContext::GetInputBinds()
+{
+	const std::lock_guard<std::mutex> lock(this->DisplayBindsMutex);
+
+	return this->DisplayInputBinds;
+}
+
+std::map<std::string, InputBindPacked> CUiContext::GetInputBinds(const std::string& aCategory)
+{
+	const std::lock_guard<std::mutex> lock(this->DisplayBindsMutex);
+
+	auto it = std::find_if(this->DisplayInputBinds.begin(), this->DisplayInputBinds.end(), [aCategory](InputBindCategory cat) {return cat.Name == aCategory; });
+	
+	if (it != this->DisplayInputBinds.end())
+	{
+		return it->InputBinds;
+	}
+	
+	return {};
+}
+
+std::vector<GameInputBindCategory> CUiContext::GetGameBinds()
+{
+	const std::lock_guard<std::mutex> lock(this->DisplayBindsMutex);
+
+	return this->DisplayGameBinds;
 }
 
 void CUiContext::LoadFonts()
@@ -996,6 +1052,90 @@ void CUiContext::LoadSettings()
 	}
 	
 	Renderer::Scaling = lastUiScale * io.FontGlobalScale;
+}
+
+void CUiContext::UpdateDisplayInputBinds()
+{
+	const std::lock_guard<std::mutex> lock(this->DisplayBindsMutex);
+
+	this->DisplayInputBinds.clear();
+
+	CContext* ctx = CContext::GetContext();
+	CInputBindApi* inputBindApi = ctx->GetInputBindApi();
+
+	/* copy of all InputBinds */
+	std::map<std::string, ManagedInputBind> InputBindRegistry = inputBindApi->GetRegistry();
+
+	/* acquire categories */
+	for (auto& [identifier, inputBind] : InputBindRegistry)
+	{
+		std::string owner = Loader::GetOwner(inputBind.Handler);
+
+		auto it = std::find_if(this->DisplayInputBinds.begin(), this->DisplayInputBinds.end(), [owner](InputBindCategory category) { return category.Name == owner; });
+
+		if (it == this->DisplayInputBinds.end())
+		{
+			InputBindCategory cat{};
+			cat.Name = owner;
+			cat.InputBinds[identifier] =
+			{
+				CInputBindApi::IBToString(inputBind.Bind, true),
+				inputBind
+			};
+			this->DisplayInputBinds.push_back(cat);
+		}
+		else
+		{
+			it->InputBinds[identifier] =
+			{
+				CInputBindApi::IBToString(inputBind.Bind, true),
+				inputBind
+			};
+		}
+	}
+}
+
+void CUiContext::UpdateDisplayGameBinds()
+{
+	const std::lock_guard<std::mutex> lock(this->DisplayBindsMutex);
+
+	this->DisplayGameBinds.clear();
+
+	CContext* ctx = CContext::GetContext();
+	CGameBindsApi* gameBindsApi = ctx->GetGameBindsApi();
+
+	/* copy of all InputBinds */
+	std::map<EGameBinds, InputBind> InputBindRegistry = gameBindsApi->GetRegistry();
+
+	/* acquire categories */
+	for (auto& [identifier, inputBind] : InputBindRegistry)
+	{
+		std::string catName = CGameBindsApi::GetCategory(identifier);
+
+		auto it = std::find_if(this->DisplayGameBinds.begin(), this->DisplayGameBinds.end(), [catName](GameInputBindCategory category) { return category.Name == catName; });
+
+		if (it == this->DisplayGameBinds.end())
+		{
+			GameInputBindCategory cat{};
+			cat.Name = catName;
+			cat.GameInputBinds[identifier] =
+			{
+				CGameBindsApi::ToString(identifier),
+				CInputBindApi::IBToString(inputBind, true),
+				inputBind
+			};
+			this->DisplayGameBinds.push_back(cat);
+		}
+		else
+		{
+			it->GameInputBinds[identifier] =
+			{
+				CGameBindsApi::ToString(identifier),
+				CInputBindApi::IBToString(inputBind, true),
+				inputBind
+			};
+		}
+	}
 }
 
 namespace UIRoot::GUI

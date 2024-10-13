@@ -122,6 +122,7 @@ RES_ICON_TIER3                  PNG     "Resources\\icons\\addonpolicy_tier3.png
 RES_ICON_RAIDCORE               PNG     "Resources\\RaidcoreTag.png"
 RES_ICON_POPOUT                 PNG     "Resources\\icons\\ext.png"
 RES_ICON_CLOSE                  PNG     "Resources\\icons\\close.png"
+RES_ICON_CHEVRON_RT             PNG     "Resources\\icons\\chevron_rt.png"
 RES_BANNER_DISCORD              PNG     "Resources\\banners\\discord.png"
 RES_BANNER_PATREON              PNG     "Resources\\banners\\patreon.png"
 

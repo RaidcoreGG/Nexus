@@ -40,8 +40,9 @@
 #define RES_ICON_RAIDCORE               500
 #define RES_ICON_POPOUT                 501
 #define RES_ICON_CLOSE                  502
-#define RES_BANNER_DISCORD              503
-#define RES_BANNER_PATREON              504
+#define RES_ICON_CHEVRON_RT             503
+#define RES_BANNER_DISCORD              504
+#define RES_BANNER_PATREON              505
 
 /* Binary */
 #define RES_ARCDPS_INTEGRATION          601

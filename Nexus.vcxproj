@@ -28,8 +28,6 @@
     <ClCompile Include="src\Services\Localization\Localization.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Events\EventHandler.cpp" />
-    <ClCompile Include="src\GUI\Widgets\Addons\AddonItem.cpp" />
-    <ClCompile Include="src\GUI\Widgets\Addons\CAddonsWindow.cpp" />
     <ClCompile Include="src\Hooks.cpp" />
     <ClCompile Include="src\thirdparty\ImAnimate\ImAnimate.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui.cpp" />
@@ -71,7 +69,7 @@
     <ClCompile Include="src\UI\Widgets\Alerts\Alerts.cpp" />
     <ClCompile Include="src\UI\Widgets\EULA\EULAModal.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\About\About.cpp" />
-    <ClCompile Include="src\UI\Widgets\MainWindow\Addons\AddonDetails.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\Addons\AddonItem.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\Addons\Addons.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\Binds\Binds.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\Debug\Debug.cpp" />
@@ -115,8 +113,6 @@
     <ClInclude Include="src\Events\EventHandler.h" />
     <ClInclude Include="src\Events\EventSubscriber.h" />
     <ClInclude Include="src\Events\FuncDefs.h" />
-    <ClInclude Include="src\GUI\Widgets\Addons\AddonItem.h" />
-    <ClInclude Include="src\GUI\Widgets\Addons\CAddonsWindow.h" />
     <ClInclude Include="src\Hooks.h" />
     <ClInclude Include="src\thirdparty\httplib\httplib.h" />
     <ClInclude Include="src\thirdparty\ImAnimate\ImAnimate.h" />
@@ -319,6 +315,7 @@
     <ClInclude Include="src\Services\Updater\Updater.h" />
     <ClInclude Include="src\UI\Controls\CtlSubWindow.h" />
     <ClInclude Include="src\UI\Controls\CtlWindow.h" />
+    <ClInclude Include="src\UI\DisplayBinds.h" />
     <ClInclude Include="src\UI\ERenderType.h" />
     <ClInclude Include="src\UI\FuncDefs.h" />
     <ClInclude Include="src\UI\Overlay\MumbleInspector\MumbleInspector.h" />
@@ -331,8 +328,9 @@
     <ClInclude Include="src\UI\Widgets\Alerts\FuncDefs.h" />
     <ClInclude Include="src\UI\Widgets\EULA\EULAModal.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\About\About.h" />
-    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\AddonDetails.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\AddonItem.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\Addons.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\DisplayAddon.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Binds\Binds.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Debug\Debug.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Log\Log.h" />
@@ -389,6 +387,7 @@
     <Image Include="src\Resources\icons\addonpolicy_tier3.png" />
     <Image Include="src\Resources\icons\addons.png" />
     <Image Include="src\Resources\icons\binds.png" />
+    <Image Include="src\Resources\icons\chevron_rt.png" />
     <Image Include="src\Resources\icons\close.png" />
     <Image Include="src\Resources\icons\debug.png" />
     <Image Include="src\Resources\icons\ext.png" />

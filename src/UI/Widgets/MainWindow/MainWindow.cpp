@@ -8,12 +8,13 @@
 
 #include "MainWindow.h"
 
+#include "ImAnimate/ImAnimate.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
-#include "ImAnimate/ImAnimate.h"
 
 #include "Context.h"
 #include "resource.h"
+#include "Util/Time.h"
 
 constexpr ImGuiWindowFlags Flags = ImGuiWindowFlags_NoTitleBar  |
 								   ImGuiWindowFlags_NoCollapse  |
@@ -79,7 +80,7 @@ void CMainWindow::Render()
 	float headerHeight = ImGui::GetTextLineHeight() * 2;
 	float footerHeight = ImGui::GetTextLineHeight() * 1.5f;
 	float sidebarWidth_Collapsed = (padding.x * 2) + headerHeight;
-	float sidebarWidth_Expanded = 300.f * fontScaleFactor;
+	float sidebarWidth_Expanded = 250.f * fontScaleFactor;
 
 	bool poppedPadding = false;
 
@@ -101,7 +102,7 @@ void CMainWindow::Render()
 
 		static float renderedSidebarWidth = sidebarWidth_Collapsed;
 		static float navTextAlpha = 0;
-		if (this->IsSidebarActive)
+		if (this->IsSidebarActive && (Time::GetTimestampMs() - this->SidebarActiveStart) > 350)
 		{
 			ImGui::Animate(sidebarWidth_Collapsed, sidebarWidth_Expanded, 500, &renderedSidebarWidth, ImAnimate::ECurve::InOutCubic);
 			
@@ -249,6 +250,19 @@ void CMainWindow::Render()
 			window->DrawList->AddLine(sepP1, sepP2, ImGui::GetColorU32(ImGuiCol_Separator));
 		}
 		this->IsSidebarActive = ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
+
+		if (this->IsSidebarActive)
+		{
+			if (this->SidebarActiveStart == 0)
+			{
+				this->SidebarActiveStart = Time::GetTimestampMs();
+			}
+		}
+		else
+		{
+			this->SidebarActiveStart = 0;
+		}
+
 		ImGui::EndChild();
 		ImGui::PopStyleColor();
 
