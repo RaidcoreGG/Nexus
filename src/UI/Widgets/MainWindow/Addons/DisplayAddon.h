@@ -17,22 +17,9 @@
 #include "UI/DisplayBinds.h"
 #include "UI/FuncDefs.h"
 
-enum class EAddonType
-{
-	Nexus,
-	Library,
-	ArcDPS
-};
-
 struct AddonItemData
 {
-	EAddonType                             Type;
-	union
-	{
-		Addon*                             NexusAddon;
-		LibraryAddon*                      LibraryAddon;
-		//ArcDPS
-	};
+	Addon* NexusAddon;
 	std::map<std::string, InputBindPacked> InputBinds;
 	GUI_RENDER                             OptionsRender;
 };

@@ -3,6 +3,7 @@
 #include <filesystem>
 
 #include "Consts.h"
+#include "Context.h"
 #include "Index.h"
 #include "Shared.h"
 #include "State.h"
@@ -41,6 +42,7 @@ namespace ArcDPS
 				LibraryAddon* newAddon = new LibraryAddon{};
 				newAddon->Signature = addon["id"];
 				newAddon->Name = addon["name"];
+				newAddon->Author = addon["author"];
 				newAddon->Description = addon["description"];
 				newAddon->Provider = GetProvider(addon["download"]);
 				newAddon->DownloadURL = addon["download"];
@@ -210,6 +212,12 @@ namespace ArcDPS
 		}
 
 		IsPluginAtlasBuilt = true;
+
+		std::thread([]() {
+			CContext* ctx = CContext::GetContext();
+			CUiContext* uictx = ctx->GetUIContext();
+			uictx->Invalidate();
+		}).detach();
 	}
 	void AddToAtlasBySig(unsigned int aArcSignature)
 	{

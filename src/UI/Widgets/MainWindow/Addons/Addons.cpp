@@ -44,6 +44,7 @@ CAddonsWindow::CAddonsWindow()
 	this->IconIdentifier = "ICON_ADDONS";
 	this->IconID         = RES_ICON_ADDONS;
 	this->IsHost         = true;
+	this->IsAnchored     = true;
 
 	this->Invalidate();
 
@@ -120,6 +121,7 @@ void CAddonsWindow::AddonItem(AddonItemData aAddonData, float aWidth)
 
 		ImGui::Text(aAddonData.NexusAddon->Definitions->Name);
 		ImGui::SameLine();
+		ImGui::TextDisabled(aAddonData.NexusAddon->Definitions->Version.string().c_str());
 		ImGui::TextDisabled("by %s", aAddonData.NexusAddon->Definitions->Author);
 
 		/* Incompatible notice or description */
@@ -213,7 +215,198 @@ void CAddonsWindow::AddonItem(AddonItemData aAddonData, float aWidth)
 	ImGui::EndChild();
 	ImGui::PopStyleVar();
 }
-void AddonItem(LibraryAddon* aAddon, bool aInstalled = false, bool aIsArcPlugin = false);
+void CAddonsWindow::AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalled, bool aIsArcPlugin)
+{
+	if (!aAddon) { return; }
+
+	std::string sig = std::to_string(aAddon->Signature);
+
+	ImGuiStyle& style = ImGui::GetStyle();
+
+	ImVec2 itemSz = ImVec2(aWidth, ImGui::GetTextLineHeightWithSpacing() * 5);
+
+	ImVec2 btnTextSz = ImGui::CalcTextSize("############");
+
+	float btnWidth = btnTextSz.x + (style.FramePadding.x * 2);
+	float actionsAreaWidth = btnWidth + (style.WindowPadding.x * 2);
+
+	ImVec2 curPos = ImGui::GetCursorPos();
+
+	/*  above visible space                        || under visible space */
+	if (curPos.y < ImGui::GetScrollY() - itemSz.y || curPos.y > ImGui::GetScrollY() + ImGui::GetWindowHeight())
+	{
+		ImGui::Dummy(itemSz);
+		return;
+	}
+
+	ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1);
+	if (ImGui::BeginChild(("##addonlisting_" + sig).c_str(), itemSz, true))
+	{
+		//if (ImGui::BeginChild("##addonlisting_info", ImVec2(itemSz.x - (style.WindowPadding.x * 2) - actionsAreaWidth, 0)))
+
+		static CContext* ctx = CContext::GetContext();
+		static CLocalization* langApi = ctx->GetLocalization();
+		static CUiContext* uictx = ctx->GetUIContext();
+		static CAlerts* alertctx = uictx->GetAlerts();
+
+		ImGui::Text(aAddon->Name.c_str());
+		ImGui::TextDisabled("by %s", aAddon->Author.c_str());
+
+		/* description */
+		ImGui::PushTextWrapPos(aWidth - actionsAreaWidth - style.WindowPadding.x);
+		ImGui::TextWrapped(aAddon->Description.c_str());
+		ImGui::PopTextWrapPos();
+
+		static CTextureLoader* textureApi = ctx->GetTextureService();
+		static Texture* T1 = TextureService->GetOrCreate("ICON_ADDONPOLICY_TIER1", RES_ICON_TIER1, ctx->GetModule());
+		static Texture* T2 = TextureService->GetOrCreate("ICON_ADDONPOLICY_TIER2", RES_ICON_TIER2, ctx->GetModule());
+		static Texture* T3 = TextureService->GetOrCreate("ICON_ADDONPOLICY_TIER3", RES_ICON_TIER3, ctx->GetModule());
+		static Texture* TX = TextureService->GetOrCreate("ICON_ADDONPOLICY_TIER_UNKNOWN", RES_ICON_TIER_UNKNOWN, ctx->GetModule());
+
+		Texture* noticeIcon = nullptr;
+		std::string noticeURL;
+		std::string noticeTT;
+
+		if (aAddon->PolicyTier != 0)
+		{
+			switch (aAddon->PolicyTier)
+			{
+				case -1:
+				{
+					noticeIcon = TX;
+					noticeURL = "https://raidcore.gg/Legal#addon-policy";
+					noticeTT = Language->Translate("((000090))");
+
+					if (!TX)
+					{
+						TX = TextureService->GetOrCreate("ICON_ADDONPOLICY_TIER_UNKNOWN", RES_ICON_TIER_UNKNOWN, ctx->GetModule());
+					}
+
+					break;
+				}
+
+				case 1:
+				{
+					noticeIcon = T1;
+					noticeURL = "https://raidcore.gg/Legal#addon-policy";
+					noticeTT = String::Format(Language->Translate("((000089))"), 1);
+
+					if (!T1)
+					{
+						T1 = TextureService->GetOrCreate("ICON_ADDONPOLICY_TIER1", RES_ICON_TIER1, ctx->GetModule());
+					}
+
+					break;
+				}
+				case 2:
+				{
+					noticeIcon = T2;
+					noticeURL = "https://raidcore.gg/Legal#addon-policy";
+					noticeTT = String::Format(Language->Translate("((000089))"), 2);
+
+					if (!T2)
+					{
+						T2 = TextureService->GetOrCreate("ICON_ADDONPOLICY_TIER2", RES_ICON_TIER2, ctx->GetModule());
+					}
+
+					break;
+				}
+				case 3:
+				{
+					noticeIcon = T3;
+					noticeURL = "https://raidcore.gg/Legal#addon-policy";
+					noticeTT = String::Format(Language->Translate("((000089))"), 3);
+
+					if (!T3)
+					{
+						T3 = TextureService->GetOrCreate("ICON_ADDONPOLICY_TIER3", RES_ICON_TIER3, ctx->GetModule());
+					}
+
+					break;
+				}
+			}
+		}
+		else if (!aAddon->ToSComplianceNotice.empty())
+		{
+			noticeIcon = T1;
+			noticeURL = "https://help.guildwars2.com/hc/en-us/articles/360013625034-Policy-Third-Party-Programs";
+
+			std::string tosNotice = Language->Translate("((000074))");
+			tosNotice.append("\n");
+			tosNotice.append(aAddon->ToSComplianceNotice);
+
+			noticeTT = tosNotice;
+		}
+
+		if (noticeIcon)
+		{
+			float fontScaleFactor = ImGui::GetFontSize() / 16.0f;
+			float btnSz = 28.0f * fontScaleFactor * 0.75f;
+
+			ImGui::SetCursorPos(ImVec2(aWidth - btnSz, 0));
+			if (ImGui::IconButton(noticeIcon->Resource, ImVec2(btnSz, btnSz)))
+			{
+				ShellExecuteA(0, 0, noticeURL.c_str(), 0, 0, SW_SHOW);
+			}
+
+			ImGui::TooltipGeneric(Language->Translate(noticeTT.c_str()));
+		}
+
+		/* Install Button */
+		ImGui::SetCursorPos(ImVec2(aWidth - actionsAreaWidth + style.WindowPadding.x, (ImGui::GetWindowHeight() - (btnTextSz.y * 2) - style.ItemSpacing.y - (style.FramePadding.y * 2)) / 2));
+		// just check if loaded, if it was not hot-reloadable it would be EAddonState::LoadedLOCKED
+		if (!aInstalled)
+		{
+			if (ImGui::Button(aAddon->IsInstalling 
+				? (Language->Translate("((000027))") + sig).c_str() 
+				: (Language->Translate("((000028))") + sig).c_str(),
+				ImVec2(btnWidth, 0)))
+			{
+				if (!aAddon->IsInstalling)
+				{
+					std::thread([aAddon, aIsArcPlugin]()
+					{
+						UpdateService->InstallAddon(aAddon, aIsArcPlugin);
+
+						if (aIsArcPlugin)
+						{
+							ArcDPS::AddToAtlasBySig(aAddon->Signature);
+						}
+						else
+						{
+							Loader::NotifyChanges();
+							//Loader::QueueAddon(ELoaderAction::Reload, installPath);
+						}
+
+						CContext* ctx = CContext::GetContext();
+						CUiContext* uictx = ctx->GetUIContext();
+						uictx->Invalidate();
+
+						aAddon->IsInstalling = false;
+					}).detach();
+
+					//Loader::AddonConfig[aAddon->Signature].IsLoaded = true;
+				}
+			}
+		}
+		else
+		{
+			ImGui::Text(Language->Translate("((000029))"));
+		}
+
+		/* Configure Button */
+		if (aAddon->Provider == EUpdateProvider::GitHub && !aAddon->DownloadURL.empty())
+		{
+			ImGui::SetCursorPos(ImVec2(aWidth - actionsAreaWidth + style.WindowPadding.x, ImGui::GetCursorPosY()));
+			if (ImGui::Button((Language->Translate("((000030))") + sig).c_str(), ImVec2(btnWidth, 0)))
+			{
+				ShellExecuteA(0, 0, aAddon->DownloadURL.c_str(), 0, 0, SW_SHOW);
+			}
+		}
+	}
+	ImGui::EndChild();
+	ImGui::PopStyleVar();
+}
 
 void CAddonsWindow::RenderContent()
 {
@@ -351,13 +544,15 @@ void CAddonsWindow::RenderContent()
 			int downloadable = 0;
 
 			const std::lock_guard<std::mutex> lockLoader(Loader::Mutex);
-			if (Loader::Library::Addons.size() != 0)
+			if (this->Library.size() != 0)
 			{
-				for (auto& libAddon : Loader::Library::Addons)
+				int i = 0;
+
+				for (LibraryAddon* libAddon : this->Library)
 				{
 					bool exists = false;
 					{
-						for (auto addon : Loader::Addons)
+						for (Addon* addon : Loader::Addons)
 						{
 							// if libAddon already exist in installed addons
 							// or if arcdps is loaded another way and the libAddon is arc
@@ -369,15 +564,22 @@ void CAddonsWindow::RenderContent()
 							}
 						}
 					}
-					if (false == exists)
+
+					if (!exists || showInstalled)
 					{
-						//MEME AddonItem(libAddon, exists);
+						if (i % 2 == 1)
+						{
+							ImGui::SameLine();
+						}
+
+						AddonItem(libAddon, listAreaWidth_Half, exists);
+						i++;
 						downloadable++;
 					}
 				}
 			}
 
-			if (Loader::Library::Addons.size() == 0 || downloadable == 0)
+			if (this->Library.size() == 0 || downloadable == 0)
 			{
 				ImVec2 windowSize = ImGui::GetWindowSize();
 				ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((No items matching filter.))"));
@@ -394,13 +596,15 @@ void CAddonsWindow::RenderContent()
 			{
 				int downloadable = 0;
 				const std::lock_guard<std::mutex> lockLoader(ArcDPS::Mutex);
-				if (ArcDPS::PluginLibrary.size() != 0)
+				if (this->ArcLibrary.size() != 0)
 				{
-					for (auto& arclibAddon : ArcDPS::PluginLibrary)
+					int i = 0;
+
+					for (LibraryAddon* arclibAddon : this->ArcLibrary)
 					{
 						bool exists = false;
 						{
-							for (auto& arcAddonSig : ArcDPS::Plugins)
+							for (int& arcAddonSig : ArcDPS::Plugins)
 							{
 								// if arclibAddon already exist in installed addons
 								// or if arcdps is loaded another way and the arclibAddon is arc
@@ -411,15 +615,21 @@ void CAddonsWindow::RenderContent()
 								}
 							}
 						}
-						if (false == exists || true == showInstalled)
+						if (!exists || true == showInstalled)
 						{
-							//MEME AddonItem(arclibAddon, exists, true);
+							if (i % 2 == 1)
+							{
+								ImGui::SameLine();
+							}
+
+							AddonItem(arclibAddon, listAreaWidth_Half, exists, true);
+							i++;
 							downloadable++;
 						}
 					}
 				}
 
-				if (ArcDPS::PluginLibrary.size() == 0 || downloadable == 0)
+				if (this->ArcLibrary.size() == 0 || downloadable == 0)
 				{
 					ImVec2 windowSize = ImGui::GetWindowSize();
 					ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((No items matching filter.))"));
@@ -927,7 +1137,6 @@ void CAddonsWindow::PopulateAddons()
 		if (!this->Filter.empty() && !String::Contains(String::ToLower(addon->Definitions->Name), this->Filter)) { continue; }
 
 		AddonItemData addonItem{};
-		addonItem.Type = EAddonType::Nexus;
 		addonItem.NexusAddon = addon;
 
 		for (GUI_RENDER renderCb : uictx->GetOptionsCallbacks())
@@ -952,5 +1161,28 @@ void CAddonsWindow::PopulateAddons()
 
 void CAddonsWindow::PopulateLibrary()
 {
+	this->Library.clear();
+	this->ArcLibrary.clear();
 
+	{
+		const std::lock_guard<std::mutex> lock(Loader::Library::Mutex);
+
+		for (LibraryAddon* addon : Loader::Library::Addons)
+		{
+			if (!this->Filter.empty() && !String::Contains(String::ToLower(addon->Name), this->Filter)) { continue; }
+
+			this->Library.push_back(addon);
+		}
+	}
+	
+	{
+		const std::lock_guard<std::mutex> lockLoader(ArcDPS::Mutex);
+
+		for (LibraryAddon* addon : ArcDPS::PluginLibrary)
+		{
+			if (!this->Filter.empty() && !String::Contains(String::ToLower(addon->Name), this->Filter)) { continue; }
+
+			this->ArcLibrary.push_back(addon);
+		}
+	}
 }

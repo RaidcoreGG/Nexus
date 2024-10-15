@@ -65,6 +65,7 @@ class ISubWindow : public virtual IWindow
 	protected:
 	bool                     IsPoppedOut = false;
 	bool                     IsHost = false;
+	bool                     IsAnchored = false;
 
 	std::string              IconIdentifier;
 	int                      IconID;

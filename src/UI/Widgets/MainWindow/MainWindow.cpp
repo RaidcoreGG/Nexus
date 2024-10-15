@@ -73,6 +73,18 @@ void CMainWindow::Render()
 		this->ActiveContent = nullptr;
 	}
 
+	if (!this->ActiveContent)
+	{
+		for (ISubWindow* window : this->Windows)
+		{
+			if (!window->IsPopOut())
+			{
+				this->ActiveContent = window;
+				break;
+			}
+		}
+	}
+
 	ImGuiStyle& style = ImGui::GetStyle();
 	ImVec2 padding = style.WindowPadding;
 
@@ -139,7 +151,7 @@ void CMainWindow::Render()
 				}
 				else
 				{
-					this->RenderDashboard();
+				//	this->RenderDashboard();
 				}
 			}
 			ImGui::EndChild();
@@ -168,32 +180,32 @@ void CMainWindow::Render()
 
 			/* Dashboard Nav Item */
 			{
-				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-				ImGui::SetCursorPos(ImVec2(navX, navY));
-				if (ImGui::Selectable("##Dashboard",
-					this->ActiveContent == nullptr,
-					0,
-					navItemSz))
-				{
-					this->ActiveContent = nullptr;
-				}
-				ImGui::PopStyleVar();
+				//ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+				//ImGui::SetCursorPos(ImVec2(navX, navY));
+				//if (ImGui::Selectable("##Dashboard",
+				//	this->ActiveContent == nullptr,
+				//	0,
+				//	navItemSz))
+				//{
+				//	this->ActiveContent = nullptr;
+				//}
+				//ImGui::PopStyleVar();
 
-				if (this->Tex_DashboardIcon)
-				{
-					ImGui::SetCursorPos(ImVec2(navX, navY));
-					ImGui::Image(Tex_DashboardIcon->Resource, ImVec2(navItemSz.y, navItemSz.y));
-				}
-				else
-				{
-					CContext* ctx = CContext::GetContext();
-					this->Tex_DashboardIcon = ctx->GetTextureService()->GetOrCreate("ICON_DASHBOARD", RES_ICON_DASHBOARD, ctx->GetModule());
-				}
+				//if (this->Tex_DashboardIcon)
+				//{
+				//	ImGui::SetCursorPos(ImVec2(navX, navY));
+				//	ImGui::Image(Tex_DashboardIcon->Resource, ImVec2(navItemSz.y, navItemSz.y));
+				//}
+				//else
+				//{
+				//	CContext* ctx = CContext::GetContext();
+				//	this->Tex_DashboardIcon = ctx->GetTextureService()->GetOrCreate("ICON_DASHBOARD", RES_ICON_DASHBOARD, ctx->GetModule());
+				//}
 
-				ImGui::SetCursorPos(ImVec2(navX + navItemSz.y + padding.x, navY + ((navItemSz.y - ImGui::GetTextLineHeight()) / 2)));
-				ImGui::TextColored(navTextCol, "Dashboard");
+				//ImGui::SetCursorPos(ImVec2(navX + navItemSz.y + padding.x, navY + ((navItemSz.y - ImGui::GetTextLineHeight()) / 2)));
+				//ImGui::TextColored(navTextCol, "Dashboard");
 
-				navY += navItemSz.y + padding.y;
+				//navY += navItemSz.y + padding.y;
 			}
 			
 			/* Dynamic Nav Items */
@@ -362,9 +374,4 @@ void CMainWindow::Activate(const std::string& aWindowName)
 			}
 		}
 	}
-}
-
-void CMainWindow::RenderDashboard()
-{
-	ImGui::Text("Dashboard");
 }

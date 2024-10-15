@@ -26,6 +26,8 @@ class CAddonsWindow : public ISubWindow
 	private:
 	std::string                Filter;
 	std::vector<AddonItemData> Addons;
+	std::vector<LibraryAddon*> Library;
+	std::vector<LibraryAddon*> ArcLibrary;
 
 	/* Details */
 	std::mutex                 Mutex;
@@ -33,18 +35,19 @@ class CAddonsWindow : public ISubWindow
 	AddonItemData              AddonData = {};
 
 	/* Bind Editor */
-	EBindEditType                              IsEditing = EBindEditType::None;
-	std::string                                Editing_Identifier;
-	EGameBinds                                 Editing_GameIdentifier;
-	std::string                                Editing_BindText;
+	EBindEditType              IsEditing = EBindEditType::None;
+	std::string                Editing_Identifier;
+	EGameBinds                 Editing_GameIdentifier;
+	std::string                Editing_BindText;
 
-	std::string                                ModalTitle;
-	bool                                       OpenModalNextFrame;
+	std::string                ModalTitle;
+	bool                       OpenModalNextFrame;
 
 	void SetContent(AddonItemData aAddonData);
 	void ClearContent();
 
 	void AddonItem(AddonItemData aAddonData, float aWidth);
+	void AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalled = false, bool aIsArcPlugin = false);
 
 	void RenderContent() override;
 	void RenderSubWindows() override;

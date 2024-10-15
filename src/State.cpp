@@ -20,7 +20,6 @@ namespace State
 	EEntryMethod	EntryMethod					= EEntryMethod::NONE;
 	EMultiboxState	MultiboxState				= EMultiboxState::NONE;
 	bool			IsChainloading				= false;
-	bool			IsEULAAccepted				= false;
 
 	bool			IsConsoleEnabled			= false;
 	bool			IsVanilla					= false;

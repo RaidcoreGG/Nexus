@@ -40,11 +40,8 @@ class CMainWindow : public virtual IWindow
 	bool                     IsHandleHeld;
 
 	private:
-	void RenderDashboard();
-
 	Texture*                 Tex_RaidcoreTag;
 	Texture*                 Tex_CloseIcon;
-	Texture*                 Tex_DashboardIcon;
 };
 
 #endif

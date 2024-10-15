@@ -17,6 +17,13 @@
 
 void ISubWindow::Render()
 {
+	bool anchored = this->IsAnchored;
+
+	if (anchored)
+	{
+		this->IsPoppedOut = false;
+	}
+
 	bool popout = this->IsPopOut();
 
 	if (popout)
@@ -37,6 +44,11 @@ void ISubWindow::Render()
 	ImVec2 btnPos = ImVec2(width - (btnSz + (this->IsPoppedOut ? style.WindowPadding.x : 0)) - (wnd->ScrollbarY ? wnd->ScrollbarSizes.x : 0), wnd->TitleBarHeight() + (this->IsPoppedOut ? style.WindowPadding.y : 0));
 
 	this->RenderContent();
+
+	if (anchored)
+	{
+		return;
+	}
 
 	if (!popout && this->Tex_PopoutIcon)
 	{
@@ -79,7 +91,7 @@ const Texture* ISubWindow::GetIcon()
 
 bool ISubWindow::IsPopOut()
 {
-	return this->IsPoppedOut;
+	return this->IsPoppedOut && !this->IsAnchored;
 }
 
 void ISubWindow::PopIn()

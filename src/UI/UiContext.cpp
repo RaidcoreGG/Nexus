@@ -298,7 +298,7 @@ CUiContext::CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CText
 	CBindsWindow*   bindsWNd   = new CBindsWindow();
 	CLogWindow*     logWnd     = new CLogWindow();
 	CDebugWindow*   debugWnd   = new CDebugWindow();
-	CAboutBox*      aboutWnd   = new CAboutBox();
+	//CAboutBox*      aboutWnd   = new CAboutBox();
 
 	this->Logger->RegisterLogger(logWnd);
 
@@ -307,7 +307,7 @@ CUiContext::CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CText
 	this->MainWindow->AddWindow(bindsWNd);
 	this->MainWindow->AddWindow(logWnd);
 	this->MainWindow->AddWindow(debugWnd);
-	this->MainWindow->AddWindow(aboutWnd);
+	//this->MainWindow->AddWindow(aboutWnd);
 
 	/* register InputBinds */
 	this->InputBindApi->Register(KB_MENU,          EIBHType::DownOnly, UIRoot::OnInputBind, "CTRL+O");
@@ -323,7 +323,7 @@ CUiContext::CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CText
 	this->EscapeClose->Register(bindsWNd->GetName().c_str(), bindsWNd->GetVisibleStatePtr());
 	this->EscapeClose->Register(logWnd->GetName().c_str(), logWnd->GetVisibleStatePtr());
 	this->EscapeClose->Register(debugWnd->GetName().c_str(), debugWnd->GetVisibleStatePtr());
-	this->EscapeClose->Register(aboutWnd->GetName().c_str(), aboutWnd->GetVisibleStatePtr());
+	//this->EscapeClose->Register(aboutWnd->GetName().c_str(), aboutWnd->GetVisibleStatePtr());
 
 	this->UnpackLocales();
 	this->LoadSettings();
@@ -398,6 +398,8 @@ void CUiContext::Shutdown()
 	this->IsInitialized = false;
 }
 
+static bool EulaAccepted = false;
+
 void CUiContext::Render()
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
@@ -440,7 +442,8 @@ void CUiContext::Render()
 		ImGui::NewFrame();
 
 		/* draw overlay */
-		if (State::IsEULAAccepted)
+		//static bool eulaAccepted = 
+		if (EulaAccepted)
 		{
 			if (this->IsVisible)
 			{
@@ -469,7 +472,11 @@ void CUiContext::Render()
 			{
 				delete this->EULAModal;
 				this->EULAModal = nullptr;
-				State::IsEULAAccepted = true;
+
+				CContext* ctx = CContext::GetContext();
+				CSettings* settingsctx = ctx->GetSettingsCtx();
+				settingsctx->Set(OPT_ACCEPTEULA, true);
+				EulaAccepted = true;
 
 				/* activate main window for the first time */
 				this->MainWindow->Activate();
@@ -758,6 +765,8 @@ void CUiContext::LoadFonts()
 	CContext* ctx = CContext::GetContext();
 	CSettings* settingsctx = ctx->GetSettingsCtx();
 
+	EulaAccepted = settingsctx->Get<bool>(OPT_ACCEPTEULA);
+
 	/* add user font */
 	std::string fontFile = settingsctx->Get<std::string>(OPT_USERFONT);
 	if (!fontFile.empty() && std::filesystem::exists(Index::D_GW2_ADDONS_NEXUS_FONTS / fontFile))
@@ -773,6 +782,7 @@ void CUiContext::LoadFonts()
 
 	/* add default font for monospace */
 	this->FontManager->AddDefaultFont(UIRoot::FontReceiver);
+	this->FontManager->ResizeFont("FONT_DEFAULT", this->ImGuiContext->FontSize);
 
 	ImFontConfig config;
 	config.MergeMode = true;
@@ -1030,8 +1040,6 @@ void CUiContext::LoadSettings()
 
 	ImGuiIO& io = ImGui::GetIO();
 	ImGuiStyle* style = &ImGui::GetStyle();
-
-	State::IsEULAAccepted = settingsCtx->Get<bool>(OPT_ACCEPTEULA);
 
 	float storedFontSz = settingsCtx->Get<float>(OPT_FONTSIZE);
 	this->ImGuiContext->FontSize = storedFontSz > 0 ? storedFontSz : 16.0f;
