@@ -264,13 +264,14 @@ namespace UIRoot
 	}
 }
 
-CUiContext::CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CTextureLoader* aTextureService, CDataLink* aDataLink, CInputBindApi* aInputBindApi)
+CUiContext::CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CTextureLoader* aTextureService, CDataLink* aDataLink, CInputBindApi* aInputBindApi, CEventApi* aEventApi)
 {
 	this->Logger         = aLogger;
 	this->Language       = aLocalization;
 	this->TextureService = aTextureService;
 	this->DataLink       = aDataLink;
 	this->InputBindApi   = aInputBindApi;
+	this->EventApi       = aEventApi;
 
 	this->ImGuiContext   = ImGui::CreateContext();
 
@@ -282,16 +283,11 @@ CUiContext::CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CText
 	this->EscapeClose    = new CEscapeClosing();
 
 	UIRoot::Initialize(this->Language, this->DataLink, this->FontManager);
-	UIRoot::GUI::UICtx            = this;
-	UIRoot::Fonts::FontCtx        = this->FontManager;
-	UIRoot::Alerts::AlertCtx      = this->Alerts;
-	UIRoot::QuickAccess::QACtx    = this->QuickAccess;
-	UIRoot::EscapeClosing::EscCtx = this->EscapeClose;
 
-	EventApi->Subscribe("EV_MUMBLE_IDENTITY_UPDATED",            UIRoot::OnMumbleIdentityChanged, true);
-	EventApi->Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", UIRoot::OnUELanguageChanged, true);
-	EventApi->Subscribe("EV_VOLATILE_ADDON_DISABLED",            UIRoot::OnVolatileAddonsDisabled, true);
-	EventApi->Subscribe("EV_INPUTBIND_UPDATED",                  UIRoot::OnInputBindUpdate, true);
+	this->EventApi->Subscribe("EV_MUMBLE_IDENTITY_UPDATED",            UIRoot::OnMumbleIdentityChanged);
+	this->EventApi->Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", UIRoot::OnUELanguageChanged);
+	this->EventApi->Subscribe("EV_VOLATILE_ADDON_DISABLED",            UIRoot::OnVolatileAddonsDisabled);
+	this->EventApi->Subscribe("EV_INPUTBIND_UPDATED",                  UIRoot::OnInputBindUpdate);
 
 	CAddonsWindow*  addonsWnd  = new CAddonsWindow();
 	COptionsWindow* optionsWnd = new COptionsWindow();
@@ -788,35 +784,35 @@ void CUiContext::LoadFonts()
 	config.MergeMode = true;
 
 	/* small UI*/
-	this->FontManager->ReplaceFont("MENOMONIA_S", 16.0f, RES_FONT_MENOMONIA, NexusHandle, UIRoot::FontReceiver, nullptr);
+	this->FontManager->ReplaceFont("MENOMONIA_S", 16.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_S_MERGE", 16.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
-	this->FontManager->ReplaceFont("MENOMONIA_BIG_S", 22.0f, RES_FONT_MENOMONIA, NexusHandle, UIRoot::FontReceiver, nullptr);
+	this->FontManager->ReplaceFont("MENOMONIA_BIG_S", 22.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_S_MERGE", 22.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
-	this->FontManager->ReplaceFont("TREBUCHET_S", 15.0f, RES_FONT_TREBUCHET, NexusHandle, UIRoot::FontReceiver, nullptr);
+	this->FontManager->ReplaceFont("TREBUCHET_S", 15.0f, RES_FONT_TREBUCHET, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("TREBUCHET_S_MERGE", 15.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
 
 	/* normal UI*/
-	this->FontManager->ReplaceFont("MENOMONIA_N", 18.0f, RES_FONT_MENOMONIA, NexusHandle, UIRoot::FontReceiver, nullptr);
+	this->FontManager->ReplaceFont("MENOMONIA_N", 18.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_N_MERGE", 18.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
-	this->FontManager->ReplaceFont("MENOMONIA_BIG_N", 24.0f, RES_FONT_MENOMONIA, NexusHandle, UIRoot::FontReceiver, nullptr);
+	this->FontManager->ReplaceFont("MENOMONIA_BIG_N", 24.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_N_MERGE", 24.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
-	this->FontManager->ReplaceFont("TREBUCHET_N", 16.0f, RES_FONT_TREBUCHET, NexusHandle, UIRoot::FontReceiver, nullptr);
+	this->FontManager->ReplaceFont("TREBUCHET_N", 16.0f, RES_FONT_TREBUCHET, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("TREBUCHET_N_MERGE", 16.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
 
 	/* large UI*/
-	this->FontManager->ReplaceFont("MENOMONIA_L", 20.0f, RES_FONT_MENOMONIA, NexusHandle, UIRoot::FontReceiver, nullptr);
+	this->FontManager->ReplaceFont("MENOMONIA_L", 20.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_L_MERGE", 20.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
-	this->FontManager->ReplaceFont("MENOMONIA_BIG_L", 26.0f, RES_FONT_MENOMONIA, NexusHandle, UIRoot::FontReceiver, nullptr);
+	this->FontManager->ReplaceFont("MENOMONIA_BIG_L", 26.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_L_MERGE", 26.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
-	this->FontManager->ReplaceFont("TREBUCHET_L", 17.5f, RES_FONT_TREBUCHET, NexusHandle, UIRoot::FontReceiver, nullptr);
+	this->FontManager->ReplaceFont("TREBUCHET_L", 17.5f, RES_FONT_TREBUCHET, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("TREBUCHET_L_MERGE", 17.5f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
 
 	/* larger UI*/
-	this->FontManager->ReplaceFont("MENOMONIA_XL", 22.0f, RES_FONT_MENOMONIA, NexusHandle, UIRoot::FontReceiver, nullptr);
+	this->FontManager->ReplaceFont("MENOMONIA_XL", 22.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_XL_MERGE", 22.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
-	this->FontManager->ReplaceFont("MENOMONIA_BIG_XL", 28.0f, RES_FONT_MENOMONIA, NexusHandle, UIRoot::FontReceiver, nullptr);
+	this->FontManager->ReplaceFont("MENOMONIA_BIG_XL", 28.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_XL_MERGE", 28.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
-	this->FontManager->ReplaceFont("TREBUCHET_XL", 19.5f, RES_FONT_TREBUCHET, NexusHandle, UIRoot::FontReceiver, nullptr);
+	this->FontManager->ReplaceFont("TREBUCHET_XL", 19.5f, RES_FONT_TREBUCHET, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("TREBUCHET_XL_MERGE", 19.5f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
 }
 
@@ -1007,11 +1003,11 @@ void CUiContext::CreateNexusShortcut()
 			break;
 	}
 
-	this->TextureService->Load(ICON_NEXUS, resIcon, NexusHandle, nullptr);
-	this->TextureService->Load(ICON_NEXUS_HOVER, resIconHover, NexusHandle, nullptr);
+	this->TextureService->Load(ICON_NEXUS, resIcon, ctx->GetModule(), nullptr);
+	this->TextureService->Load(ICON_NEXUS_HOVER, resIconHover, ctx->GetModule(), nullptr);
 
-	this->TextureService->Load(ICON_GENERIC, RES_ICON_GENERIC, NexusHandle, nullptr);
-	this->TextureService->Load(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, NexusHandle, nullptr);
+	this->TextureService->Load(ICON_GENERIC, RES_ICON_GENERIC, ctx->GetModule(), nullptr);
+	this->TextureService->Load(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, ctx->GetModule(), nullptr);
 
 	/* add shortcut */
 	this->QuickAccess->AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "((000009))");
@@ -1019,17 +1015,19 @@ void CUiContext::CreateNexusShortcut()
 
 void CUiContext::UnpackLocales()
 {
+	CContext* ctx = CContext::GetContext();
+
 	this->Language->SetLocaleDirectory(Index::D_GW2_ADDONS_NEXUS_LOCALES);
-	Resources::Unpack(NexusHandle, Index::F_LOCALE_EN, RES_LOCALE_EN, "JSON");
-	Resources::Unpack(NexusHandle, Index::F_LOCALE_DE, RES_LOCALE_DE, "JSON");
-	Resources::Unpack(NexusHandle, Index::F_LOCALE_FR, RES_LOCALE_FR, "JSON");
-	Resources::Unpack(NexusHandle, Index::F_LOCALE_ES, RES_LOCALE_ES, "JSON");
-	Resources::Unpack(NexusHandle, Index::F_LOCALE_BR, RES_LOCALE_BR, "JSON");
-	Resources::Unpack(NexusHandle, Index::F_LOCALE_CZ, RES_LOCALE_CZ, "JSON");
-	Resources::Unpack(NexusHandle, Index::F_LOCALE_IT, RES_LOCALE_IT, "JSON");
-	Resources::Unpack(NexusHandle, Index::F_LOCALE_PL, RES_LOCALE_PL, "JSON");
-	Resources::Unpack(NexusHandle, Index::F_LOCALE_RU, RES_LOCALE_RU, "JSON");
-	Resources::Unpack(NexusHandle, Index::F_LOCALE_CN, RES_LOCALE_CN, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index::F_LOCALE_EN, RES_LOCALE_EN, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index::F_LOCALE_DE, RES_LOCALE_DE, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index::F_LOCALE_FR, RES_LOCALE_FR, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index::F_LOCALE_ES, RES_LOCALE_ES, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index::F_LOCALE_BR, RES_LOCALE_BR, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index::F_LOCALE_CZ, RES_LOCALE_CZ, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index::F_LOCALE_IT, RES_LOCALE_IT, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index::F_LOCALE_PL, RES_LOCALE_PL, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index::F_LOCALE_RU, RES_LOCALE_RU, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index::F_LOCALE_CN, RES_LOCALE_CN, "JSON");
 	this->Language->Advance();
 }
 
@@ -1143,123 +1141,5 @@ void CUiContext::UpdateDisplayGameBinds()
 				inputBind
 			};
 		}
-	}
-}
-
-namespace UIRoot::GUI
-{
-	CUiContext* UICtx = nullptr;
-
-	void ADDONAPI_Register(ERenderType aRenderType, GUI_RENDER aRenderCallback)
-	{
-		UICtx->Register(aRenderType, aRenderCallback);
-	}
-
-	void ADDONAPI_Deregister(GUI_RENDER aRenderCallback)
-	{
-		UICtx->Deregister(aRenderCallback);
-	}
-}
-namespace UIRoot::Fonts
-{
-	CFontManager* FontCtx = nullptr;
-
-	void ADDONAPI_Get(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback)
-	{
-		if (!aCallback) { return; }
-
-		ManagedFont* font = FontCtx->Get(aIdentifier);
-
-		font->Subscribers.push_back(aCallback);
-		aCallback(aIdentifier, font->Pointer);
-	}
-
-	void ADDONAPI_Release(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback)
-	{
-		if (!aCallback) { return; }
-
-		FontCtx->Release(aIdentifier, aCallback);
-	}
-
-	void ADDONAPI_AddFontFromFile(const char* aIdentifier, float aFontSize, const char* aFilename, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
-	{
-		FontCtx->AddFont(aIdentifier, aFontSize, aFilename, aCallback, aConfig);
-	}
-
-	void ADDONAPI_AddFontFromResource(const char* aIdentifier, float aFontSize, unsigned aResourceID, HMODULE aModule, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
-	{
-		FontCtx->AddFont(aIdentifier, aFontSize, aResourceID, aModule, aCallback, aConfig);
-	}
-
-	void ADDONAPI_AddFontFromMemory(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
-	{
-		FontCtx->AddFont(aIdentifier, aFontSize, aData, aSize, aCallback, aConfig);
-	}
-
-	void ADDONAPI_ResizeFont(const char* aIdentifier, float aFontSize)
-	{
-		FontCtx->ResizeFont(aIdentifier, aFontSize);
-	}
-}
-namespace UIRoot::Alerts
-{
-	CAlerts* AlertCtx = nullptr;
-
-	void ADDONAPI_Notify(const char* aMessage)
-	{
-		AlertCtx->Notify(aMessage);
-	}
-}
-namespace UIRoot::QuickAccess
-{
-	CQuickAccess* QACtx = nullptr;
-
-	void ADDONAPI_AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aInputBindIdentifier, const char* aTooltipText)
-	{
-		QACtx->AddShortcut(aIdentifier, aTextureIdentifier, aTextureHoverIdentifier, aInputBindIdentifier, aTooltipText);
-	}
-
-	void ADDONAPI_RemoveShortcut(const char* aIdentifier)
-	{
-		QACtx->RemoveShortcut(aIdentifier);
-	}
-
-	void ADDONAPI_NotifyShortcut(const char* aIdentifier)
-	{
-		QACtx->NotifyShortcut(aIdentifier);
-	}
-
-	void ADDONAPI_SetNotificationShortcut(const char* aIdentifier, bool aState)
-	{
-		QACtx->SetNotificationShortcut(aIdentifier, aState);
-	}
-
-	void ADDONAPI_AddContextItem(const char* aIdentifier, GUI_RENDER aShortcutRenderCallback)
-	{
-		QACtx->AddContextItem(aIdentifier, aShortcutRenderCallback);
-	}
-
-	void ADDONAPI_AddContextItem2(const char* aIdentifier, const char* aTargetShortcutIdentifier, GUI_RENDER aShortcutRenderCallback)
-	{
-		QACtx->AddContextItem(aIdentifier, aTargetShortcutIdentifier, aShortcutRenderCallback);
-	}
-
-	void ADDONAPI_RemoveContextItem(const char* aIdentifier)
-	{
-		QACtx->RemoveContextItem(aIdentifier);
-	}
-}
-namespace UIRoot::EscapeClosing
-{
-	CEscapeClosing* EscCtx = nullptr;
-
-	void ADDONAPI_Register(const char* aWindowName, bool* aIsVisible)
-	{
-		EscCtx->Register(aWindowName, aIsVisible);
-	}
-
-	void ADDONAPI_Deregister(const char* aWindowName)
-	{
-		EscCtx->Deregister(aWindowName);
 	}
 }

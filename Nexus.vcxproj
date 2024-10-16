@@ -14,6 +14,7 @@
     <ClCompile Include="src\Context.cpp" />
     <ClCompile Include="src\Inputs\GameBinds\GameBindsHandler.cpp" />
     <ClCompile Include="src\Loader\AddonVersion.cpp" />
+    <ClCompile Include="src\Loader\API\ApiFunctionMapper.cpp" />
     <ClCompile Include="src\Services\API\ActiveToken.cpp" />
     <ClCompile Include="src\Services\API\ApiClient.cpp" />
     <ClCompile Include="src\Services\API\APIController.cpp" />
@@ -21,7 +22,6 @@
     <ClCompile Include="src\CrashHandler.cpp" />
     <ClCompile Include="src\Services\DataLink\DataLink.cpp" />
     <ClCompile Include="src\Events\EventSubscriber.cpp" />
-    <ClCompile Include="src\GUI\Widgets\Options\COptionsWindow.cpp" />
     <ClCompile Include="src\Loader\ArcDPS.cpp" />
     <ClCompile Include="src\Loader\EUpdateProvider.cpp" />
     <ClCompile Include="src\Loader\Library.cpp" />
@@ -78,6 +78,7 @@
     <ClCompile Include="src\UI\Widgets\MainWindow\Options\Options.cpp" />
     <ClCompile Include="src\UI\Widgets\QuickAccess\QuickAccess.cpp" />
     <ClCompile Include="src\Util\Base64.cpp" />
+    <ClCompile Include="src\Util\CmdLine.cpp" />
     <ClCompile Include="src\Util\DLL.cpp" />
     <ClCompile Include="src\Util\Inputs.cpp" />
     <ClCompile Include="src\Util\MD5.cpp" />
@@ -97,6 +98,7 @@
     <ClInclude Include="src\Inputs\InputBinds\EInputBindHandlerType.h" />
     <ClInclude Include="src\Inputs\InputBinds\EInputBindType.h" />
     <ClInclude Include="src\Loader\AddonVersion.h" />
+    <ClInclude Include="src\Loader\API\ApiFunctionMapper.h" />
     <ClInclude Include="src\Remote.h" />
     <ClInclude Include="src\Services\API\ApiClient.h" />
     <ClInclude Include="src\Services\API\APIController.h" />
@@ -287,7 +289,7 @@
     <ClInclude Include="src\Index.h" />
     <ClInclude Include="src\Loader\AddonDefinition.h" />
     <ClInclude Include="src\Loader\EUpdateProvider.h" />
-    <ClInclude Include="src\Loader\AddonAPI.h" />
+    <ClInclude Include="src\Loader\API\AddonAPI.h" />
     <ClInclude Include="src\Services\Logging\CFileLogger.h" />
     <ClInclude Include="src\Services\Logging\ILogger.h" />
     <ClInclude Include="src\Services\Logging\LogEntry.h" />
@@ -342,6 +344,7 @@
     <ClInclude Include="src\UI\Widgets\QuickAccess\QuickAccess.h" />
     <ClInclude Include="src\UI\Widgets\QuickAccess\Shortcut.h" />
     <ClInclude Include="src\Util\Base64.h" />
+    <ClInclude Include="src\Util\CmdLine.h" />
     <ClInclude Include="src\Util\DLL.h" />
     <ClInclude Include="src\Util\Inputs.h" />
     <ClInclude Include="src\Util\MD5.h" />

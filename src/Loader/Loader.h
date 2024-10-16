@@ -20,7 +20,7 @@
 
 #include "ELoaderAction.h"
 #include "Addon.h"
-#include "AddonAPI.h"
+#include "API/AddonAPI.h"
 
 #include "Loader/NexusLinkData.h"
 
@@ -131,18 +131,6 @@ namespace Loader
 	/// 	Returns true if there was an update dll.
 	///----------------------------------------------------------------------------------------------------
 	bool UpdateSwapAddon(const std::filesystem::path& aPath);
-
-	///----------------------------------------------------------------------------------------------------
-	/// GetAddonAPI:
-	/// 	Gets or creates a pointer to the provided version, or nullptr if no such version exists.
-	///----------------------------------------------------------------------------------------------------
-	AddonAPI* GetAddonAPI(int aVersion);
-
-	///----------------------------------------------------------------------------------------------------
-	/// GetAddonAPISize:
-	/// 	Returns the size of the provided API version.
-	///----------------------------------------------------------------------------------------------------
-	long GetAddonAPISize(int aVersion);
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetOwner:

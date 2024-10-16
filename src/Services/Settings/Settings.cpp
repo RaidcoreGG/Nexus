@@ -38,8 +38,12 @@ const char* OPT_SHOWADDONSWINDOWAFTERDUU	= "ShowAddonsWindowAfterDisableUntilUpd
 const char* OPT_USERFONT					= "UserFont";
 const char* OPT_DISABLEFESTIVEFLAIR			= "DisableFestiveFlair";
 
-CSettings::CSettings(std::filesystem::path aPath)
+CSettings::CSettings(std::filesystem::path aPath, CLogHandler* aLogger)
 {
+	assert(aLogger);
+
+	this->Logger = aLogger;
+
 	this->Path = aPath;
 	this->Load();
 }
@@ -73,14 +77,20 @@ void CSettings::LoadInternal()
 	}
 	catch (json::parse_error& ex)
 	{
-		CContext* ctx = CContext::GetContext();
-		ctx->GetLogger()->Warning(CH_SETTINGS, "Settings.json could not be parsed. Error: %s", ex.what());
+		this->Logger->Warning(CH_SETTINGS, "Settings.json could not be parsed. Error: %s", ex.what());
 	}
 }
 
 void CSettings::SaveInternal()
 {
-	std::ofstream file(this->Path);
-	file << this->Store.dump(1, '\t') << std::endl;
-	file.close();
+	try
+	{
+		std::ofstream file(this->Path);
+		file << this->Store.dump(1, '\t') << std::endl;
+		file.close();
+	}
+	catch (...)
+	{
+		this->Logger->Warning(CH_SETTINGS, "Settings.json could not be saved.");
+	}
 }

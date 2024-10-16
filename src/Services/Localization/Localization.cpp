@@ -8,28 +8,18 @@
 
 #include "Localization.h"
 
-#include "Consts.h"
-#include "Shared.h"
+#include <fstream>
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
-namespace Localization
+#include "Consts.h"
+
+CLocalization::CLocalization(CLogHandler* aLogger)
 {
-	const char* ADDONAPI_Translate(const char* aIdentifier)
-	{
-		return Language->Translate(aIdentifier);
-	}
+	assert(aLogger);
 
-	const char* ADDONAPI_TranslateTo(const char* aIdentifier, const char* aLanguageIdentifier)
-	{
-		return Language->Translate(aIdentifier, aLanguageIdentifier);
-	}
-
-	void ADDONAPI_Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aString)
-	{
-		Language->Set(aIdentifier, aLanguageIdentifier, aString);
-	}
+	this->Logger = aLogger;
 }
 
 CLocalization::~CLocalization()

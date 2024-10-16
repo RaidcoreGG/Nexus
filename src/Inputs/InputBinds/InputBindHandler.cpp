@@ -13,51 +13,14 @@
 #include <fstream>
 #include <string>
 
-#include "Consts.h"
-#include "Index.h"
-#include "State.h"
-
-#include "Util/Strings.h"
-#include "Util/Inputs.h"
-
-/* FIXME: remove this -> DI */
-#include "Shared.h"
-
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
-namespace InputBinds
-{
-	void ADDONAPI_RegisterWithString(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, const char* aInputBind)
-	{
-		InputBindApi->Register(aIdentifier, EInputBindHandlerType::DownOnly, aInputBindHandler, aInputBind);
-	}
-
-	void ADDONAPI_RegisterWithStruct(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, LegacyInputBind aInputBind)
-	{
-		InputBindApi->Register(aIdentifier, EInputBindHandlerType::DownOnly, aInputBindHandler, aInputBind);
-	}
-
-	void ADDONAPI_RegisterWithString2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, const char* aInputBind)
-	{
-		InputBindApi->Register(aIdentifier, EInputBindHandlerType::DownAndRelease, aInputBindHandler, aInputBind);
-	}
-
-	void ADDONAPI_RegisterWithStruct2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, LegacyInputBind aInputBind)
-	{
-		InputBindApi->Register(aIdentifier, EInputBindHandlerType::DownAndRelease, aInputBindHandler, aInputBind);
-	}
-
-	void ADDONAPI_InvokeInputBind(const char* aIdentifier, bool aIsRelease)
-	{
-		InputBindApi->Invoke(aIdentifier, aIsRelease);
-	}
-
-	void ADDONAPI_Deregister(const char* aIdentifier)
-	{
-		InputBindApi->Deregister(aIdentifier);
-	}
-}
+#include "Consts.h"
+#include "Index.h"
+#include "State.h"
+#include "Util/Strings.h"
+#include "Util/Inputs.h"
 
 InputBind CInputBindApi::IBFromString(std::string aInputBind)
 {
@@ -235,8 +198,12 @@ std::string CInputBindApi::IBToString(InputBind aInputBind, bool aPadded)
 	return String::ConvertMBToUTF8(str);
 }
 
-CInputBindApi::CInputBindApi(CLogHandler* aLogger)
+CInputBindApi::CInputBindApi(CEventApi* aEventApi, CLogHandler* aLogger)
 {
+	assert(aEventApi);
+	assert(aLogger);
+
+	this->EventApi = aEventApi;
 	this->Logger = aLogger;
 
 	this->Load();
@@ -494,8 +461,8 @@ void CInputBindApi::Register(const char* aIdentifier, EInputBindHandlerType aInp
 
 	this->Save();
 
-	std::thread([]() {
-		EventApi->Raise("EV_INPUTBIND_UPDATED");
+	std::thread([this]() {
+		this->EventApi->Raise("EV_INPUTBIND_UPDATED");
 	}).detach();
 }
 
@@ -550,8 +517,8 @@ void CInputBindApi::Set(std::string aIdentifier, InputBind aInputBind)
 
 	this->Save();
 
-	std::thread([]() {
-		EventApi->Raise("EV_INPUTBIND_UPDATED");
+	std::thread([this]() {
+		this->EventApi->Raise("EV_INPUTBIND_UPDATED");
 	}).detach();
 }
 
@@ -597,8 +564,8 @@ void CInputBindApi::Delete(std::string aIdentifier)
 
 	this->Registry.erase(aIdentifier);
 
-	std::thread([]() {
-		EventApi->Raise("EV_INPUTBIND_UPDATED");
+	std::thread([this]() {
+		this->EventApi->Raise("EV_INPUTBIND_UPDATED");
 	}).detach();
 }
 
@@ -756,7 +723,7 @@ bool CInputBindApi::Press(const InputBind& aInputBind)
 	bool invoked = this->Invoke(heldBind->first);;
 
 	/* if was invoked -> stop processing (unless it was the togglehideui bind, pass through for multi hide)*/
-	if (invoked && heldBind->first != KB_TOGGLEHIDEUI)
+	if (invoked && heldBind->first != "KB_TOGGLEHIDEUI")
 	{
 		return true;
 	}

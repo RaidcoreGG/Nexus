@@ -15,6 +15,8 @@
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
+#include "Services/Logging/LogHandler.h"
+
 extern const char* OPT_LASTGAMEBUILD;
 extern const char* OPT_LASTCHECKEDGAMEBUILD;
 extern const char* OPT_ACCEPTEULA;
@@ -47,7 +49,7 @@ constexpr const char* CH_SETTINGS = "Settings";
 class CSettings
 {
 	public:
-	CSettings(std::filesystem::path aPath);
+	CSettings(std::filesystem::path aPath, CLogHandler* aLogger);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Load:
@@ -84,6 +86,8 @@ class CSettings
 	}
 
 	private:
+	CLogHandler*          Logger = nullptr;
+
 	std::filesystem::path Path;
 
 	std::mutex            Mutex;

@@ -13,9 +13,10 @@
 #include <string>
 #include <vector>
 
-#include "Loader/Loader.h"
 #include "Loader/AddonDefinition.h"
 #include "Loader/LibraryAddon.h"
+#include "Loader/Loader.h"
+#include "Services/Logging/LogHandler.h"
 
 constexpr const char* CH_UPDATER = "Updater";
 
@@ -24,37 +25,25 @@ constexpr const char* CH_UPDATER = "Updater";
 ///----------------------------------------------------------------------------------------------------
 struct AddonInfo
 {
-	signed int					Signature;
-	std::string					Name;
-	AddonVersion				Version;
-	EUpdateProvider				Provider;
-	std::string					UpdateLink;
-	std::vector<unsigned char>	MD5;
-	bool						AllowPrereleases;
+	signed int                 Signature;
+	std::string                Name;
+	AddonVersion               Version;
+	EUpdateProvider            Provider;
+	std::string                UpdateLink;
+	std::vector<unsigned char> MD5;
+	bool                       AllowPrereleases;
 };
-
-///----------------------------------------------------------------------------------------------------
-/// Updater Namespace
-///----------------------------------------------------------------------------------------------------
-namespace Updater
-{
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_RequestUpdate:
-	/// 	Addon API wrapper to self update.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_RequestUpdate(signed int aSignature, const char* aUpdateURL);
-}
 
 ///----------------------------------------------------------------------------------------------------
 /// CUpdater Class
 ///----------------------------------------------------------------------------------------------------
 class CUpdater
 {
-public:
+	public:
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CUpdater() = default;
+	CUpdater(CLogHandler* aLogger);
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
@@ -78,7 +67,8 @@ public:
 	///----------------------------------------------------------------------------------------------------
 	bool InstallAddon(LibraryAddon* aAddon, bool aIsArcPlugin = false);
 
-private:
+	private:
+	CLogHandler* Logger = nullptr;
 
 	///----------------------------------------------------------------------------------------------------
 	/// UpdateRaidcore:

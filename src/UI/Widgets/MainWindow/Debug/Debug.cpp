@@ -479,27 +479,6 @@ void CDebugWindow::TabLoader()
 			}
 			ImGui::TreePop();
 		}
-		if (ImGui::TreeNode("API Versions"))
-		{
-			for (auto& [version, api] : Loader::ApiDefs)
-			{
-				if (ImGui::TreeNode(("Version " + std::to_string(version)).c_str()))
-				{
-					ImGui::TextDisabled("Pointer: %p", api);
-					ImGui::TextDisabled("Size: %d", Loader::GetAddonAPISize(version));
-
-					if (ImGui::SmallButton("Memory Viewer"))
-					{
-						this->MemoryViewer.Open = true;
-						this->MV_Ptr = api;
-						this->MV_Size = Loader::GetAddonAPISize(version);
-					}
-
-					ImGui::TreePop();
-				}
-			}
-			ImGui::TreePop();
-		}
 	}
 	ImGui::EndChild();
 

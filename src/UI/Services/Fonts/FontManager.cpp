@@ -12,8 +12,8 @@
 
 #include "imgui/imgui_internal.h"
 
+#include "Context.h"
 #include "resource.h"
-#include "Shared.h"
 #include "Util/Resources.h"
 
 CFontManager::CFontManager(CLocalization* aLocalization)
@@ -404,7 +404,8 @@ void CFontManager::AddDefaultFont(FONTS_RECEIVECALLBACK aCallback)
 		size_t size = 0;
 
 		/* get data */
-		Resources::Get(NexusHandle, MAKEINTRESOURCE(RES_FONT_PROGGYCLEAN), RT_FONT, &buffer, (DWORD*)&size);
+		CContext* ctx = CContext::GetContext();
+		Resources::Get(ctx->GetModule(), MAKEINTRESOURCE(RES_FONT_PROGGYCLEAN), RT_FONT, &buffer, (DWORD*)&size);
 
 		/* call AddFontInternal with the memory buffer */
 		this->AddFontInternal("FONT_DEFAULT", 13.0f, buffer, size, aCallback, nullptr);

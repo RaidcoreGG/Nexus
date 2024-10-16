@@ -10,12 +10,13 @@
 #define UICONTEXT_H
 
 #include <d3d11.h>
-#include <Windows.h>
-#include <vector>
 #include <map>
+#include <vector>
+#include <Windows.h>
 
 #include "DisplayBinds.h"
 #include "ERenderType.h"
+#include "Events/EventHandler.h"
 #include "FuncDefs.h"
 #include "Inputs/InputBinds/InputBindHandler.h"
 #include "Services/DataLink/DataLink.h"
@@ -120,7 +121,7 @@ class CUiContext
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CTextureLoader* aTextureService, CDataLink* aDataLink, CInputBindApi* aInputBindApi);
+	CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CTextureLoader* aTextureService, CDataLink* aDataLink, CInputBindApi* aInputBindApi, CEventApi* aEventApi);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -243,11 +244,12 @@ class CUiContext
 
 	private:
 	/* Services */
-	CLogHandler*                       Logger;
-	CLocalization*                     Language;
-	CTextureLoader*                    TextureService;
-	CDataLink*                         DataLink;
-	CInputBindApi*                     InputBindApi;
+	CLogHandler*                       Logger         = nullptr;
+	CLocalization*                     Language       = nullptr;
+	CTextureLoader*                    TextureService = nullptr;
+	CDataLink*                         DataLink       = nullptr;
+	CInputBindApi*                     InputBindApi   = nullptr;
+	CEventApi*                         EventApi       = nullptr;
 
 	/* Rendering */
 	HWND                               WindowHandle;
@@ -311,63 +313,5 @@ class CUiContext
 	///----------------------------------------------------------------------------------------------------
 	void UpdateDisplayGameBinds();
 };
-
-// FIXME: addon wrapper garbage
-namespace UIRoot::GUI
-{
-	extern CUiContext* UICtx;
-
-	void ADDONAPI_Register(ERenderType aRenderType, GUI_RENDER aRenderCallback);
-
-	void ADDONAPI_Deregister(GUI_RENDER aRenderCallback);
-}
-namespace UIRoot::Fonts
-{
-	extern CFontManager* FontCtx;
-
-	void ADDONAPI_Get(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback);
-
-	void ADDONAPI_Release(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback);
-
-	void ADDONAPI_AddFontFromFile(const char* aIdentifier, float aFontSize, const char* aFilename, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
-
-	void ADDONAPI_AddFontFromResource(const char* aIdentifier, float aFontSize, unsigned aResourceID, HMODULE aModule, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
-
-	void ADDONAPI_AddFontFromMemory(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
-
-	void ADDONAPI_ResizeFont(const char* aIdentifier, float aFontSize);
-}
-namespace UIRoot::Alerts
-{
-	extern CAlerts* AlertCtx;
-
-	void ADDONAPI_Notify(const char* aMessage);
-}
-namespace UIRoot::QuickAccess
-{
-	extern CQuickAccess* QACtx;
-
-	void ADDONAPI_AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aInputBindIdentifier, const char* aTooltipText);
-
-	void ADDONAPI_RemoveShortcut(const char* aIdentifier);
-
-	void ADDONAPI_NotifyShortcut(const char* aIdentifier);
-
-	void ADDONAPI_SetNotificationShortcut(const char* aIdentifier, bool aState);
-
-	void ADDONAPI_AddContextItem(const char* aIdentifier, GUI_RENDER aShortcutRenderCallback);
-
-	void ADDONAPI_AddContextItem2(const char* aIdentifier, const char* aTargetShortcutIdentifier, GUI_RENDER aShortcutRenderCallback);
-
-	void ADDONAPI_RemoveContextItem(const char* aIdentifier);
-}
-namespace UIRoot::EscapeClosing
-{
-	extern CEscapeClosing* EscCtx;
-
-	void ADDONAPI_Register(const char* aWindowName, bool* aIsVisible);
-
-	void ADDONAPI_Deregister(const char* aWindowName);
-}
 
 #endif

@@ -1,34 +1,33 @@
 #include "Main.h"
 
 #include <filesystem>
-#include <string>
 #include <Psapi.h>
+#include <string>
 
-#include "resource.h"
 #include "Consts.h"
 #include "Hooks.h"
 #include "Index.h"
 #include "Renderer.h"
+#include "resource.h"
 #include "Shared.h"
 #include "State.h"
 
-#include "Services/DataLink/DataLink.h"
-#include "UI/UiContext.h"
-#include "Inputs/InputBinds/InputBindHandler.h"
+#include "Context.h"
 #include "Inputs/GameBinds/GameBindsHandler.h"
+#include "Inputs/InputBinds/InputBindHandler.h"
 #include "Loader/Loader.h"
-#include "Services/Logging/LogHandler.h"
+#include "Services/API/ApiClient.h"
+#include "Services/DataLink/DataLink.h"
 #include "Services/Logging/CConsoleLogger.h"
 #include "Services/Logging/CFileLogger.h"
+#include "Services/Logging/LogHandler.h"
+#include "Services/Multibox/Multibox.h"
 #include "Services/Mumble/Reader.h"
 #include "Services/Settings/Settings.h"
-#include "Services/API/ApiClient.h"
 #include "Services/Updater/Updater.h"
-#include "Services/Multibox/Multibox.h"
-
+#include "UI/UiContext.h"
+#include "Util/CmdLine.h"
 #include "Util/Strings.h"
-
-#include "Context.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -41,7 +40,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		case DLL_PROCESS_ATTACH:
 		{
 			DisableThreadLibraryCalls(hModule);
-			NexusHandle = hModule;
+			CContext* ctx = CContext::GetContext();
+			ctx->SetModule(hModule);
 			break;
 		}
 		case DLL_PROCESS_DETACH:
@@ -59,45 +59,43 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
 namespace Main
 {
-	CMumbleReader* MumbleReader;
-
-	void Initialize()
+	void Initialize(EEntryMethod aEntryMethod)
 	{
 		if (State::Nexus >= ENexusState::LOAD) { return; }
 
 		State::Nexus = ENexusState::LOAD;
 
-		//SetUnhandledExceptionFilter(UnhandledExcHandler);
-		GameHandle = GetModuleHandle(NULL);
-		MODULEINFO moduleInfo{};
-		GetModuleInformation(GetCurrentProcess(), NexusHandle, &moduleInfo, sizeof(moduleInfo));
-		NexusModuleSize = moduleInfo.SizeOfImage;
+		CContext* ctx = CContext::GetContext();
 
-		Index::BuildIndex(NexusHandle);
-		std::string mumbleName = State::Initialize();
+		//SetUnhandledExceptionFilter(UnhandledExcHandler);
+		
+		Index::BuildIndex(ctx->GetModule());
+		
+		CLogHandler* logger = ctx->GetLogger();
+		CUpdater* updater = ctx->GetUpdater();
 
 		/* setup default loggers */
-		if (State::IsConsoleEnabled)
+		if (CmdLine::HasArgument("-ggconsole"))
 		{
-			Logger->RegisterLogger(new CConsoleLogger(ELogLevel::ALL));
+			logger->RegisterLogger(new CConsoleLogger(ELogLevel::ALL));
 		}
-		Logger->RegisterLogger(new CFileLogger(ELogLevel::ALL, Index::F_LOG));
+		logger->RegisterLogger(new CFileLogger(ELogLevel::ALL, Index::F_LOG));
 
-		Logger->Info(CH_CORE, GetCommandLineA());
-		Logger->Info(CH_CORE, "%s: %s", Index::F_HOST_DLL != Index::F_CHAINLOAD_DLL ? "Proxy" : "Chainload", Index::F_HOST_DLL.string().c_str());
-		Logger->Info(CH_CORE, "Build: %s", Version.string().c_str());
-		Logger->Info(CH_CORE, "Entry method: %d", State::EntryMethod);
+		logger->Info(CH_CORE, GetCommandLineA());
+		logger->Info(CH_CORE, "%s: %s", Index::F_HOST_DLL != Index::F_CHAINLOAD_DLL ? "Proxy" : "Chainload", Index::F_HOST_DLL.string().c_str());
+		logger->Info(CH_CORE, "Nexus: %s %s", ctx->GetVersion().string().c_str(), ctx->GetBuild());
+		logger->Info(CH_CORE, "Entry method: %d", aEntryMethod);
 
 		RaidcoreAPI = new CApiClient("https://api.raidcore.gg", true, Index::D_GW2_ADDONS_COMMON_API_RAIDCORE, 30 * 60, 300, 5, 1);//, Certs::Raidcore);
 		GitHubAPI = new CApiClient("https://api.github.com", true, Index::D_GW2_ADDONS_COMMON_API_GITHUB, 30 * 60, 60, 60, 60 * 60);
 
-		std::thread([]()
+		std::thread([logger, updater]()
 		{
 			HANDLE hMutex = CreateMutexA(0, true, "RCGG-Mutex-Patch-Nexus");
 
 			if (GetLastError() == ERROR_ALREADY_EXISTS)
 			{
-				Logger->Info(CH_CORE, "Cannot patch Nexus, mutex locked.");
+				logger->Info(CH_CORE, "Cannot patch Nexus, mutex locked.");
 
 				/* sanity check to make the compiler happy */
 				if (hMutex)
@@ -109,7 +107,7 @@ namespace Main
 			}
 
 			/* perform/check for update */
-			UpdateService->UpdateNexus();
+			updater->UpdateNexus();
 
 			/* sanity check to make the compiler happy */
 			if (hMutex)
@@ -117,43 +115,26 @@ namespace Main
 				ReleaseMutex(hMutex);
 				CloseHandle(hMutex);
 			}
-		})
-			.detach();
+		}).detach();
 
-		//Paradigm::Initialize();
-
-		/* Don't initialize anything if vanilla */
-		if (!State::IsVanilla)
+		/* Only initalise if not vanilla */
+		if (!CmdLine::HasArgument("-ggvanilla"))
 		{
-			if (Multibox::ShareArchive()) { State::MultiboxState |= EMultiboxState::ARCHIVE_SHARED; }
-			if (Multibox::ShareLocal()) { State::MultiboxState |= EMultiboxState::LOCAL_SHARED; }
-			if (Multibox::KillMutex()) { State::MultiboxState |= EMultiboxState::MUTEX_CLOSED; }
-			Logger->Info(CH_CORE, "Multibox State: %d", State::MultiboxState);
+			Multibox::ShareArchive();
+			Multibox::ShareLocal();
+			Multibox::KillMutex();
+			logger->Info(CH_CORE, "Multibox State: %d", Multibox::GetState());
 
 			MH_Initialize();
 
-			InputBindApi = new CInputBindApi(Logger);
-			GameBindsApi = new CGameBindsApi(RawInputApi, Logger, EventApi);
+			ctx->GetMumbleReader();
 
-			CSettings* settings = new CSettings(Index::F_SETTINGS);
-
-			//API::Initialize();
-
-			MumbleReader = new CMumbleReader(mumbleName);
-
-			CContext* ctx = CContext::GetContext();
-			ctx->SetSettingsCtx(settings);
-			ctx->SetModule(NexusHandle);
-			ctx->SetTextureService(TextureService);
-			ctx->SetEventApi(EventApi);
-			ctx->SetInputBindApi(InputBindApi);
-			ctx->SetDataLink(DataLinkService);
-			ctx->SetLocalization(Language);
-			ctx->SetGameBindsApi(GameBindsApi);
-
-			UIContext = new CUiContext(Logger, Language, TextureService, DataLinkService, InputBindApi);
-
-			ctx->SetUIContext(UIContext);
+			Hooks::NexusLink = (NexusLinkData*)ctx->GetDataLink()->GetResource(DL_NEXUS_LINK);
+			Hooks::RawInputApi = ctx->GetRawInputApi();
+			Hooks::InputBindApi = ctx->GetInputBindApi();
+			Hooks::UIContext = ctx->GetUIContext();
+			Hooks::TextureService = ctx->GetTextureService();
+			Hooks::EventApi = ctx->GetEventApi();
 
 			State::Nexus = ENexusState::LOADED;
 		}
@@ -162,17 +143,22 @@ namespace Main
 			State::Nexus = ENexusState::SHUTDOWN;
 		}
 	}
+
 	void Shutdown(unsigned int aReason)
 	{
 		const char* reasonStr;
 		switch (aReason)
 		{
-			case WM_DESTROY:	reasonStr = "WM_DESTROY"; break;
-			case WM_CLOSE:		reasonStr = "WM_CLOSE"; break;
-			case WM_QUIT:		reasonStr = "WM_QUIT"; break;
-			default:			reasonStr = NULLSTR; break;
+			case WM_DESTROY: reasonStr = "WM_DESTROY"; break;
+			case WM_CLOSE:   reasonStr = "WM_CLOSE"; break;
+			case WM_QUIT:    reasonStr = "WM_QUIT"; break;
+			default:         reasonStr = NULLSTR; break;
 		}
-		Logger->Critical(CH_CORE, String::Format("Main::Shutdown() | Reason: %s", reasonStr).c_str());
+
+		CContext* ctx = CContext::GetContext();
+		CLogHandler* logger = ctx->GetLogger();
+
+		logger->Critical(CH_CORE, String::Format("Main::Shutdown() | Reason: %s", reasonStr).c_str());
 
 		if (State::Nexus < ENexusState::SHUTTING_DOWN)
 		{
@@ -181,16 +167,16 @@ namespace Main
 			// free addons
 			Loader::Shutdown();
 
-			UIContext->Shutdown();
-			delete UIContext;
-			delete MumbleReader;
+			ctx->GetUIContext()->Shutdown();
+			//delete UIContext;
+			//delete MumbleReader;
 
 			// shared mem
-			delete DataLinkService;
+			//delete DataLinkService;
 
 			MH_Uninitialize();
 
-			Logger->Info(CH_CORE, "Shutdown performed.");
+			logger->Info(CH_CORE, "Shutdown performed.");
 
 			State::Nexus = ENexusState::SHUTDOWN;
 		}

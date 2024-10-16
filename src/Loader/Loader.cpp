@@ -41,9 +41,11 @@
 #include "Services/Settings/Settings.h"
 #include "Services/Textures/TextureLoader.h"
 #include "Services/Updater/Updater.h"
+#include "API/ApiFunctionMapper.h"
 
 #include "Util/DLL.h"
 #include "Util/MD5.h"
+#include "Util/CmdLine.h"
 #include "Util/Strings.h"
 
 #include "ArcDPS.h"
@@ -86,11 +88,58 @@ namespace Loader
 
 	bool						DisableVolatileUntilUpdate = false;
 
+	CDataLink*     DataLink = nullptr;
+	CLogHandler*   Logger   = nullptr;
+	CEventApi*     EventApi = nullptr;
+	CUpdater*      Updater  = nullptr;
+	CAlerts*       Alerts   = nullptr;
+	CLocalization* Language = nullptr;
+
 	void Initialize()
 	{
-		NexusLink = (NexusLinkData*)DataLinkService->ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData), true);
-		MumbleIdentity = (Mumble::Identity*)DataLinkService->ShareResource(DL_MUMBLE_LINK_IDENTITY, sizeof(Mumble::Identity), false);
+		CContext* ctx = CContext::GetContext();
+		DataLink = ctx->GetDataLink();
+		Logger = ctx->GetLogger();
+		EventApi = ctx->GetEventApi();
+		Updater = ctx->GetUpdater();
+		CUiContext* uictx = ctx->GetUIContext();
+		Alerts = uictx->GetAlerts();
+		Language = ctx->GetLocalization();
 
+		NexusLink = (NexusLinkData*)DataLink->ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData), true);
+		MumbleIdentity = (Mumble::Identity*)DataLink->ShareResource(DL_MUMBLE_LINK_IDENTITY, sizeof(Mumble::Identity), false);
+
+		if (CmdLine::HasArgument("-ggaddons"))
+		{
+			std::vector<std::string> idList = String::Split(CmdLine::GetArgumentValue("-ggaddons"), ",");
+
+			/* if -ggaddons param is config path, else it's id list*/
+			if (idList.size() == 1 && String::Contains(idList[0], ".json"))
+			{
+				/* overwrite index path */
+				Index::F_ADDONCONFIG = idList[0];
+			}
+			else
+			{
+				for (std::string addonId : idList)
+				{
+					try
+					{
+						signed int i = std::stoi(addonId);
+						RequestedAddons.push_back(i);
+					}
+					catch (const std::invalid_argument& e)
+					{
+						Logger->Trace(CH_CORE, "Invalid argument (-ggaddons): %s (exc: %s)", addonId.c_str(), e.what());
+					}
+					catch (const std::out_of_range& e)
+					{
+						Logger->Trace(CH_CORE, "Out of range (-ggaddons): %s (exc: %s)", addonId.c_str(), e.what());
+					}
+				}
+			}
+		}
+		
 		if (State::Nexus == ENexusState::LOADED)
 		{
 			if (Index::F_ADDONCONFIG != Index::F_ADDONCONFIG_DEFAULT)
@@ -739,7 +788,7 @@ namespace Loader
 					addon->AllowPrereleases
 				};
 
-				if (UpdateService->UpdateAddon(tmpPath, addonInfo))
+				if (Updater->UpdateAddon(tmpPath, addonInfo))
 				{
 					Logger->Info(CH_LOADER, "Update available for \"%s\".", tmpPath.string().c_str());
 					if (addon->IsDisabledUntilUpdate)
@@ -765,7 +814,7 @@ namespace Loader
 						}
 						else
 						{
-							UIRoot::Alerts::ADDONAPI_Notify(String::Format("%s %s", addon->Definitions->Name, Language->Translate("((000079))")).c_str());
+							Alerts->Notify(String::Format("%s %s", addon->Definitions->Name, Language->Translate("((000079))")).c_str());
 						}
 					}
 				}
@@ -806,7 +855,7 @@ namespace Loader
 		{
 			// show message that addon was disabled due to game update
 			EventApi->Raise(EV_VOLATILE_ADDON_DISABLED, &addon->Definitions->Signature);
-			UIRoot::Alerts::ADDONAPI_Notify(String::Format("%s %s", addon->Definitions->Name, Language->Translate("((000073))")).c_str());
+			Alerts->Notify(String::Format("%s %s", addon->Definitions->Name, Language->Translate("((000073))")).c_str());
 
 			FreeLibrary(addon->Module);
 			addon->State = EAddonState::NotLoaded;
@@ -824,7 +873,7 @@ namespace Loader
 			return;
 		}
 
-		AddonAPI* api = GetAddonAPI(addon->Definitions->APIVersion); // will be nullptr if doesn't exist or APIVersion = 0
+		AddonAPI* api = ADDONAPI::Get(addon->Definitions->APIVersion); // will be nullptr if doesn't exist or APIVersion = 0
 
 		// if the api doesn't exist and there was one requested
 		if (api == nullptr && addon->Definitions->APIVersion != 0)
@@ -911,14 +960,17 @@ namespace Loader
 			void* startAddress = aAddon->Module;
 			void* endAddress = ((PBYTE)aAddon->Module) + aAddon->ModuleSize;
 
-			int evRefs = EventApi->Verify(startAddress, endAddress);
-			int uiRefs = UIRoot::GUI::UICtx->Verify(startAddress, endAddress);
-			int fnRefs = UIRoot::Fonts::FontCtx->Verify(startAddress, endAddress);
-			int esRefs = UIRoot::EscapeClosing::EscCtx->Verify(startAddress, endAddress);
-			int qaRefs = UIRoot::QuickAccess::QACtx->Verify(startAddress, endAddress);
-			int kbRefs = InputBindApi->Verify(startAddress, endAddress);
-			int riRefs = RawInputApi->Verify(startAddress, endAddress);
-			int txRefs = TextureService->Verify(startAddress, endAddress);
+			CContext* ctx = CContext::GetContext();
+			CUiContext* uictx = ctx->GetUIContext();
+
+			int evRefs = ctx->GetEventApi()->Verify(startAddress, endAddress);
+			int uiRefs = uictx->Verify(startAddress, endAddress);
+			int fnRefs = uictx->GetFontManager()->Verify(startAddress, endAddress);
+			int esRefs = uictx->GetEscapeClosingService()->Verify(startAddress, endAddress);
+			int qaRefs = uictx->GetQuickAccess()->Verify(startAddress, endAddress);
+			int kbRefs = ctx->GetInputBindApi()->Verify(startAddress, endAddress);
+			int riRefs = ctx->GetRawInputApi()->Verify(startAddress, endAddress);
+			int txRefs = ctx->GetTextureService()->Verify(startAddress, endAddress);
 			int leftoverRefs = evRefs + uiRefs + qaRefs + kbRefs + riRefs + txRefs;
 
 			if (leftoverRefs > 0)
@@ -1161,459 +1213,6 @@ namespace Loader
 		return false;
 	}
 
-	AddonAPI* GetAddonAPI(int aVersion)
-	{
-		// API defs with that version already exist, just return them
-		if (ApiDefs.find(aVersion) != ApiDefs.end())
-		{
-			return ApiDefs[aVersion];
-		}
-
-		// create the requested version, add it to the map and return it
-		switch (aVersion)
-		{
-			case 1:
-			{
-				AddonAPI1* api = new AddonAPI1();
-
-				api->SwapChain = Renderer::SwapChain;
-				api->ImguiContext = ImGui::GetCurrentContext();
-				api->ImguiMalloc = ImGui::MemAlloc;
-				api->ImguiFree = ImGui::MemFree;
-				api->RegisterRender = UIRoot::GUI::ADDONAPI_Register;
-				api->DeregisterRender = UIRoot::GUI::ADDONAPI_Deregister;
-
-				api->GetGameDirectory = Index::GetGameDirectory;
-				api->GetAddonDirectory = Index::GetAddonDirectory;
-				api->GetCommonDirectory = Index::GetCommonDirectory;
-
-				api->CreateHook = MH_CreateHook;
-				api->RemoveHook = MH_RemoveHook;
-				api->EnableHook = MH_EnableHook;
-				api->DisableHook = MH_DisableHook;
-
-				api->Log = LogHandler::ADDONAPI_LogMessage;
-
-				api->RaiseEvent = Events::ADDONAPI_RaiseEvent;
-				api->SubscribeEvent = Events::ADDONAPI_Subscribe;
-				api->UnsubscribeEvent = Events::ADDONAPI_Unsubscribe;
-
-				api->RegisterWndProc = RawInput::ADDONAPI_Register;
-				api->DeregisterWndProc = RawInput::ADDONAPI_Deregister;
-
-				api->RegisterInputBindWithString = InputBinds::ADDONAPI_RegisterWithString;
-				api->RegisterInputBindWithStruct = InputBinds::ADDONAPI_RegisterWithStruct;
-				api->DeregisterInputBind = InputBinds::ADDONAPI_Deregister;
-
-				api->GetResource = DataLink::ADDONAPI_GetResource;
-				api->ShareResource = DataLink::ADDONAPI_ShareResource;
-
-				api->GetTexture = TextureLoader::ADDONAPI_Get;
-				api->LoadTextureFromFile = TextureLoader::ADDONAPI_LoadFromFile;
-				api->LoadTextureFromResource = TextureLoader::ADDONAPI_LoadFromResource;
-				api->LoadTextureFromURL = TextureLoader::ADDONAPI_LoadFromURL;
-
-				api->AddShortcut = UIRoot::QuickAccess::ADDONAPI_AddShortcut;
-				api->RemoveShortcut = UIRoot::QuickAccess::ADDONAPI_RemoveShortcut;
-				api->AddSimpleShortcut = UIRoot::QuickAccess::ADDONAPI_AddContextItem;
-				api->RemoveSimpleShortcut = UIRoot::QuickAccess::ADDONAPI_RemoveContextItem;
-
-				ApiDefs.insert({ aVersion, api });
-				AddonAPI1* shared = (AddonAPI1*)DataLinkService->ShareResource("ADDONAPI_1", sizeof(AddonAPI1), false);
-				memcpy_s(shared, sizeof(AddonAPI1), api, (sizeof(AddonAPI1)));
-				return api;
-			}
-			case 2:
-			{
-				AddonAPI2* api = new AddonAPI2();
-
-				api->SwapChain = Renderer::SwapChain;
-				api->ImguiContext = ImGui::GetCurrentContext();
-				api->ImguiMalloc = ImGui::MemAlloc;
-				api->ImguiFree = ImGui::MemFree;
-				api->RegisterRender = UIRoot::GUI::ADDONAPI_Register;
-				api->DeregisterRender = UIRoot::GUI::ADDONAPI_Deregister;
-
-				api->GetGameDirectory = Index::GetGameDirectory;
-				api->GetAddonDirectory = Index::GetAddonDirectory;
-				api->GetCommonDirectory = Index::GetCommonDirectory;
-
-				api->CreateHook = MH_CreateHook;
-				api->RemoveHook = MH_RemoveHook;
-				api->EnableHook = MH_EnableHook;
-				api->DisableHook = MH_DisableHook;
-
-				api->Log = LogHandler::ADDONAPI_LogMessage2;
-
-				api->RaiseEvent = Events::ADDONAPI_RaiseEvent;
-				api->RaiseEventNotification = Events::ADDONAPI_RaiseNotification;
-				api->SubscribeEvent = Events::ADDONAPI_Subscribe;
-				api->UnsubscribeEvent = Events::ADDONAPI_Unsubscribe;
-
-				api->RegisterWndProc = RawInput::ADDONAPI_Register;
-				api->DeregisterWndProc = RawInput::ADDONAPI_Deregister;
-				api->SendWndProcToGameOnly = RawInput::ADDONAPI_SendWndProcToGame;
-
-				api->RegisterInputBindWithString = InputBinds::ADDONAPI_RegisterWithString;
-				api->RegisterInputBindWithStruct = InputBinds::ADDONAPI_RegisterWithStruct;
-				api->DeregisterInputBind = InputBinds::ADDONAPI_Deregister;
-
-				api->GetResource = DataLink::ADDONAPI_GetResource;
-				api->ShareResource = DataLink::ADDONAPI_ShareResource;
-
-				api->GetTexture = TextureLoader::ADDONAPI_Get;
-				api->GetTextureOrCreateFromFile = TextureLoader::ADDONAPI_GetOrCreateFromFile;
-				api->GetTextureOrCreateFromResource = TextureLoader::ADDONAPI_GetOrCreateFromResource;
-				api->GetTextureOrCreateFromURL = TextureLoader::ADDONAPI_GetOrCreateFromURL;
-				api->GetTextureOrCreateFromMemory = TextureLoader::ADDONAPI_GetOrCreateFromMemory;
-				api->LoadTextureFromFile = TextureLoader::ADDONAPI_LoadFromFile;
-				api->LoadTextureFromResource = TextureLoader::ADDONAPI_LoadFromResource;
-				api->LoadTextureFromURL = TextureLoader::ADDONAPI_LoadFromURL;
-				api->LoadTextureFromMemory = TextureLoader::ADDONAPI_LoadFromMemory;
-
-				api->AddShortcut = UIRoot::QuickAccess::ADDONAPI_AddShortcut;
-				api->RemoveShortcut = UIRoot::QuickAccess::ADDONAPI_RemoveShortcut;
-				api->NotifyShortcut = UIRoot::QuickAccess::ADDONAPI_NotifyShortcut;
-				api->AddSimpleShortcut = UIRoot::QuickAccess::ADDONAPI_AddContextItem;
-				api->RemoveSimpleShortcut = UIRoot::QuickAccess::ADDONAPI_RemoveContextItem;
-
-				api->Translate = Localization::ADDONAPI_Translate;
-				api->TranslateTo = Localization::ADDONAPI_TranslateTo;
-
-				ApiDefs.insert({ aVersion, api });
-				AddonAPI2* shared = (AddonAPI2*)DataLinkService->ShareResource("ADDONAPI_2", sizeof(AddonAPI2), false);
-				memcpy_s(shared, sizeof(AddonAPI2), api, (sizeof(AddonAPI2)));
-				return api;
-			}
-			case 3:
-			{
-				AddonAPI3* api = new AddonAPI3();
-
-				api->SwapChain = Renderer::SwapChain;
-				api->ImguiContext = ImGui::GetCurrentContext();
-				api->ImguiMalloc = ImGui::MemAlloc;
-				api->ImguiFree = ImGui::MemFree;
-				api->RegisterRender = UIRoot::GUI::ADDONAPI_Register;
-				api->DeregisterRender = UIRoot::GUI::ADDONAPI_Deregister;
-
-				api->GetGameDirectory = Index::GetGameDirectory;
-				api->GetAddonDirectory = Index::GetAddonDirectory;
-				api->GetCommonDirectory = Index::GetCommonDirectory;
-
-				api->CreateHook = MH_CreateHook;
-				api->RemoveHook = MH_RemoveHook;
-				api->EnableHook = MH_EnableHook;
-				api->DisableHook = MH_DisableHook;
-
-				api->Log = LogHandler::ADDONAPI_LogMessage2;
-
-				api->SendAlert = UIRoot::Alerts::ADDONAPI_Notify;
-
-				api->RaiseEvent = Events::ADDONAPI_RaiseEvent;
-				api->RaiseEventNotification = Events::ADDONAPI_RaiseNotification;
-				api->RaiseEventTargeted = Events::ADDONAPI_RaiseEventTargeted;
-				api->RaiseEventNotificationTargeted = Events::ADDONAPI_RaiseNotificationTargeted;
-				api->SubscribeEvent = Events::ADDONAPI_Subscribe;
-				api->UnsubscribeEvent = Events::ADDONAPI_Unsubscribe;
-
-				api->RegisterWndProc = RawInput::ADDONAPI_Register;
-				api->DeregisterWndProc = RawInput::ADDONAPI_Deregister;
-				api->SendWndProcToGameOnly = RawInput::ADDONAPI_SendWndProcToGame;
-
-				api->RegisterInputBindWithString = InputBinds::ADDONAPI_RegisterWithString;
-				api->RegisterInputBindWithStruct = InputBinds::ADDONAPI_RegisterWithStruct;
-				api->DeregisterInputBind = InputBinds::ADDONAPI_Deregister;
-
-				api->GetResource = DataLink::ADDONAPI_GetResource;
-				api->ShareResource = DataLink::ADDONAPI_ShareResource;
-
-				api->GetTexture = TextureLoader::ADDONAPI_Get;
-				api->GetTextureOrCreateFromFile = TextureLoader::ADDONAPI_GetOrCreateFromFile;
-				api->GetTextureOrCreateFromResource = TextureLoader::ADDONAPI_GetOrCreateFromResource;
-				api->GetTextureOrCreateFromURL = TextureLoader::ADDONAPI_GetOrCreateFromURL;
-				api->GetTextureOrCreateFromMemory = TextureLoader::ADDONAPI_GetOrCreateFromMemory;
-				api->LoadTextureFromFile = TextureLoader::ADDONAPI_LoadFromFile;
-				api->LoadTextureFromResource = TextureLoader::ADDONAPI_LoadFromResource;
-				api->LoadTextureFromURL = TextureLoader::ADDONAPI_LoadFromURL;
-				api->LoadTextureFromMemory = TextureLoader::ADDONAPI_LoadFromMemory;
-
-				api->AddShortcut = UIRoot::QuickAccess::ADDONAPI_AddShortcut;
-				api->RemoveShortcut = UIRoot::QuickAccess::ADDONAPI_RemoveShortcut;
-				api->NotifyShortcut = UIRoot::QuickAccess::ADDONAPI_NotifyShortcut;
-				api->AddSimpleShortcut = UIRoot::QuickAccess::ADDONAPI_AddContextItem;
-				api->RemoveSimpleShortcut = UIRoot::QuickAccess::ADDONAPI_RemoveContextItem;
-
-				api->Translate = Localization::ADDONAPI_Translate;
-				api->TranslateTo = Localization::ADDONAPI_TranslateTo;
-
-				ApiDefs.insert({ aVersion, api });
-				AddonAPI3* shared = (AddonAPI3*)DataLinkService->ShareResource("ADDONAPI_3", sizeof(AddonAPI3), false);
-				memcpy_s(shared, sizeof(AddonAPI3), api, (sizeof(AddonAPI3)));
-				return api;
-			}
-			case 4:
-			{
-				AddonAPI4* api = new AddonAPI4();
-
-				api->SwapChain = Renderer::SwapChain;
-				api->ImguiContext = ImGui::GetCurrentContext();
-				api->ImguiMalloc = ImGui::MemAlloc;
-				api->ImguiFree = ImGui::MemFree;
-				api->RegisterRender = UIRoot::GUI::ADDONAPI_Register;
-				api->DeregisterRender = UIRoot::GUI::ADDONAPI_Deregister;
-
-				api->RequestUpdate = Updater::ADDONAPI_RequestUpdate;
-
-				api->GetGameDirectory = Index::GetGameDirectory;
-				api->GetAddonDirectory = Index::GetAddonDirectory;
-				api->GetCommonDirectory = Index::GetCommonDirectory;
-
-				api->CreateHook = MH_CreateHook;
-				api->RemoveHook = MH_RemoveHook;
-				api->EnableHook = MH_EnableHook;
-				api->DisableHook = MH_DisableHook;
-
-				api->Log = LogHandler::ADDONAPI_LogMessage2;
-
-				api->SendAlert = UIRoot::Alerts::ADDONAPI_Notify;
-
-				api->RaiseEvent = Events::ADDONAPI_RaiseEvent;
-				api->RaiseEventNotification = Events::ADDONAPI_RaiseNotification;
-				api->RaiseEventTargeted = Events::ADDONAPI_RaiseEventTargeted;
-				api->RaiseEventNotificationTargeted = Events::ADDONAPI_RaiseNotificationTargeted;
-				api->SubscribeEvent = Events::ADDONAPI_Subscribe;
-				api->UnsubscribeEvent = Events::ADDONAPI_Unsubscribe;
-
-				api->RegisterWndProc = RawInput::ADDONAPI_Register;
-				api->DeregisterWndProc = RawInput::ADDONAPI_Deregister;
-				api->SendWndProcToGameOnly = RawInput::ADDONAPI_SendWndProcToGame;
-
-				api->RegisterInputBindWithString = InputBinds::ADDONAPI_RegisterWithString2;
-				api->RegisterInputBindWithStruct = InputBinds::ADDONAPI_RegisterWithStruct2;
-				api->DeregisterInputBind = InputBinds::ADDONAPI_Deregister;
-
-				api->GetResource = DataLink::ADDONAPI_GetResource;
-				api->ShareResource = DataLink::ADDONAPI_ShareResource;
-
-				api->GetTexture = TextureLoader::ADDONAPI_Get;
-				api->GetTextureOrCreateFromFile = TextureLoader::ADDONAPI_GetOrCreateFromFile;
-				api->GetTextureOrCreateFromResource = TextureLoader::ADDONAPI_GetOrCreateFromResource;
-				api->GetTextureOrCreateFromURL = TextureLoader::ADDONAPI_GetOrCreateFromURL;
-				api->GetTextureOrCreateFromMemory = TextureLoader::ADDONAPI_GetOrCreateFromMemory;
-				api->LoadTextureFromFile = TextureLoader::ADDONAPI_LoadFromFile;
-				api->LoadTextureFromResource = TextureLoader::ADDONAPI_LoadFromResource;
-				api->LoadTextureFromURL = TextureLoader::ADDONAPI_LoadFromURL;
-				api->LoadTextureFromMemory = TextureLoader::ADDONAPI_LoadFromMemory;
-
-				api->AddShortcut = UIRoot::QuickAccess::ADDONAPI_AddShortcut;
-				api->RemoveShortcut = UIRoot::QuickAccess::ADDONAPI_RemoveShortcut;
-				api->NotifyShortcut = UIRoot::QuickAccess::ADDONAPI_NotifyShortcut;
-				api->AddSimpleShortcut = UIRoot::QuickAccess::ADDONAPI_AddContextItem;
-				api->RemoveSimpleShortcut = UIRoot::QuickAccess::ADDONAPI_RemoveContextItem;
-
-				api->Translate = Localization::ADDONAPI_Translate;
-				api->TranslateTo = Localization::ADDONAPI_TranslateTo;
-
-				api->GetFont = UIRoot::Fonts::ADDONAPI_Get;
-				api->ReleaseFont = UIRoot::Fonts::ADDONAPI_Release;
-				api->AddFontFromFile = UIRoot::Fonts::ADDONAPI_AddFontFromFile;
-				api->AddFontFromResource = UIRoot::Fonts::ADDONAPI_AddFontFromResource;
-				api->AddFontFromMemory = UIRoot::Fonts::ADDONAPI_AddFontFromMemory;
-
-				ApiDefs.insert({ aVersion, api });
-				AddonAPI4* shared = (AddonAPI4*)DataLinkService->ShareResource("ADDONAPI_4", sizeof(AddonAPI4), false);
-				memcpy_s(shared, sizeof(AddonAPI4), api, (sizeof(AddonAPI4)));
-				return api;
-			}
-			case 5:
-			{
-				AddonAPI5* api = new AddonAPI5();
-
-				api->SwapChain = Renderer::SwapChain;
-				api->ImguiContext = ImGui::GetCurrentContext();
-				api->ImguiMalloc = ImGui::MemAlloc;
-				api->ImguiFree = ImGui::MemFree;
-				api->RegisterRender = UIRoot::GUI::ADDONAPI_Register;
-				api->DeregisterRender = UIRoot::GUI::ADDONAPI_Deregister;
-
-				api->RequestUpdate = Updater::ADDONAPI_RequestUpdate;
-
-				api->GetGameDirectory = Index::GetGameDirectory;
-				api->GetAddonDirectory = Index::GetAddonDirectory;
-				api->GetCommonDirectory = Index::GetCommonDirectory;
-
-				api->CreateHook = MH_CreateHook;
-				api->RemoveHook = MH_RemoveHook;
-				api->EnableHook = MH_EnableHook;
-				api->DisableHook = MH_DisableHook;
-
-				api->Log = LogHandler::ADDONAPI_LogMessage2;
-
-				api->SendAlert = UIRoot::Alerts::ADDONAPI_Notify;
-
-				api->RaiseEvent = Events::ADDONAPI_RaiseEvent;
-				api->RaiseEventNotification = Events::ADDONAPI_RaiseNotification;
-				api->RaiseEventTargeted = Events::ADDONAPI_RaiseEventTargeted;
-				api->RaiseEventNotificationTargeted = Events::ADDONAPI_RaiseNotificationTargeted;
-				api->SubscribeEvent = Events::ADDONAPI_Subscribe;
-				api->UnsubscribeEvent = Events::ADDONAPI_Unsubscribe;
-
-				api->RegisterWndProc = RawInput::ADDONAPI_Register;
-				api->DeregisterWndProc = RawInput::ADDONAPI_Deregister;
-				api->SendWndProcToGameOnly = RawInput::ADDONAPI_SendWndProcToGame;
-
-				api->InvokeInputBind = InputBinds::ADDONAPI_InvokeInputBind;
-				api->RegisterInputBindWithString = InputBinds::ADDONAPI_RegisterWithString2;
-				api->RegisterInputBindWithStruct = InputBinds::ADDONAPI_RegisterWithStruct2;
-				api->DeregisterInputBind = InputBinds::ADDONAPI_Deregister;
-
-				api->GetResource = DataLink::ADDONAPI_GetResource;
-				api->ShareResource = DataLink::ADDONAPI_ShareResource;
-
-				api->GetTexture = TextureLoader::ADDONAPI_Get;
-				api->GetTextureOrCreateFromFile = TextureLoader::ADDONAPI_GetOrCreateFromFile;
-				api->GetTextureOrCreateFromResource = TextureLoader::ADDONAPI_GetOrCreateFromResource;
-				api->GetTextureOrCreateFromURL = TextureLoader::ADDONAPI_GetOrCreateFromURL;
-				api->GetTextureOrCreateFromMemory = TextureLoader::ADDONAPI_GetOrCreateFromMemory;
-				api->LoadTextureFromFile = TextureLoader::ADDONAPI_LoadFromFile;
-				api->LoadTextureFromResource = TextureLoader::ADDONAPI_LoadFromResource;
-				api->LoadTextureFromURL = TextureLoader::ADDONAPI_LoadFromURL;
-				api->LoadTextureFromMemory = TextureLoader::ADDONAPI_LoadFromMemory;
-
-				api->AddShortcut = UIRoot::QuickAccess::ADDONAPI_AddShortcut;
-				api->RemoveShortcut = UIRoot::QuickAccess::ADDONAPI_RemoveShortcut;
-				api->NotifyShortcut = UIRoot::QuickAccess::ADDONAPI_NotifyShortcut;
-				api->AddSimpleShortcut = UIRoot::QuickAccess::ADDONAPI_AddContextItem;
-				api->RemoveSimpleShortcut = UIRoot::QuickAccess::ADDONAPI_RemoveContextItem;
-
-				api->Translate = Localization::ADDONAPI_Translate;
-				api->TranslateTo = Localization::ADDONAPI_TranslateTo;
-				api->SetTranslatedString = Localization::ADDONAPI_Set;
-
-				api->GetFont = UIRoot::Fonts::ADDONAPI_Get;
-				api->ReleaseFont = UIRoot::Fonts::ADDONAPI_Release;
-				api->AddFontFromFile = UIRoot::Fonts::ADDONAPI_AddFontFromFile;
-				api->AddFontFromResource = UIRoot::Fonts::ADDONAPI_AddFontFromResource;
-				api->AddFontFromMemory = UIRoot::Fonts::ADDONAPI_AddFontFromMemory;
-
-				ApiDefs.insert({ aVersion, api });
-				AddonAPI5* shared = (AddonAPI5*)DataLinkService->ShareResource("ADDONAPI_5", sizeof(AddonAPI5), false);
-				memcpy_s(shared, sizeof(AddonAPI5), api, (sizeof(AddonAPI5)));
-				return api;
-			}
-			case 6:
-			{
-				AddonAPI6* api = new AddonAPI6();
-
-				api->SwapChain = Renderer::SwapChain;
-				api->ImguiContext = ImGui::GetCurrentContext();
-				api->ImguiMalloc = ImGui::MemAlloc;
-				api->ImguiFree = ImGui::MemFree;
-
-				api->Renderer.Register = UIRoot::GUI::ADDONAPI_Register;
-				api->Renderer.Deregister = UIRoot::GUI::ADDONAPI_Deregister;
-
-				api->RequestUpdate = Updater::ADDONAPI_RequestUpdate;
-
-				api->Log = LogHandler::ADDONAPI_LogMessage2;
-
-				api->UI.SendAlert = UIRoot::Alerts::ADDONAPI_Notify;
-				api->UI.RegisterCloseOnEscape = UIRoot::EscapeClosing::ADDONAPI_Register;
-				api->UI.DeregisterCloseOnEscape = UIRoot::EscapeClosing::ADDONAPI_Deregister;
-
-				api->Paths.GetGameDirectory = Index::GetGameDirectory;
-				api->Paths.GetAddonDirectory = Index::GetAddonDirectory;
-				api->Paths.GetCommonDirectory = Index::GetCommonDirectory;
-
-				api->MinHook.Create = MH_CreateHook;
-				api->MinHook.Remove = MH_RemoveHook;
-				api->MinHook.Enable = MH_EnableHook;
-				api->MinHook.Disable = MH_DisableHook;
-
-				api->Events.Raise = Events::ADDONAPI_RaiseEvent;
-				api->Events.RaiseNotification = Events::ADDONAPI_RaiseNotification;
-				api->Events.RaiseTargeted = Events::ADDONAPI_RaiseEventTargeted;
-				api->Events.RaiseNotificationTargeted = Events::ADDONAPI_RaiseNotificationTargeted;
-				api->Events.Subscribe = Events::ADDONAPI_Subscribe;
-				api->Events.Unsubscribe = Events::ADDONAPI_Unsubscribe;
-
-				api->WndProc.Register = RawInput::ADDONAPI_Register;
-				api->WndProc.Deregister = RawInput::ADDONAPI_Deregister;
-				api->WndProc.SendToGameOnly = RawInput::ADDONAPI_SendWndProcToGame;
-
-				api->InputBinds.Invoke = InputBinds::ADDONAPI_InvokeInputBind;
-				api->InputBinds.RegisterWithString = InputBinds::ADDONAPI_RegisterWithString2;
-				api->InputBinds.RegisterWithStruct = InputBinds::ADDONAPI_RegisterWithStruct2;
-				api->InputBinds.Deregister = InputBinds::ADDONAPI_Deregister;
-
-				api->GameBinds.PressAsync = GameBinds::ADDONAPI_PressAsync;
-				api->GameBinds.ReleaseAsync = GameBinds::ADDONAPI_ReleaseAsync;
-				api->GameBinds.InvokeAsync = GameBinds::ADDONAPI_InvokeAsync;
-				api->GameBinds.Press = GameBinds::ADDONAPI_Press;
-				api->GameBinds.Release = GameBinds::ADDONAPI_Release;
-				api->GameBinds.IsBound = GameBinds::ADDONAPI_IsBound;
-
-				api->DataLink.Get = DataLink::ADDONAPI_GetResource;
-				api->DataLink.Share = DataLink::ADDONAPI_ShareResource;
-
-				api->Textures.Get = TextureLoader::ADDONAPI_Get;
-				api->Textures.GetOrCreateFromFile = TextureLoader::ADDONAPI_GetOrCreateFromFile;
-				api->Textures.GetOrCreateFromResource = TextureLoader::ADDONAPI_GetOrCreateFromResource;
-				api->Textures.GetOrCreateFromURL = TextureLoader::ADDONAPI_GetOrCreateFromURL;
-				api->Textures.GetOrCreateFromMemory = TextureLoader::ADDONAPI_GetOrCreateFromMemory;
-				api->Textures.LoadFromFile = TextureLoader::ADDONAPI_LoadFromFile;
-				api->Textures.LoadFromResource = TextureLoader::ADDONAPI_LoadFromResource;
-				api->Textures.LoadFromURL = TextureLoader::ADDONAPI_LoadFromURL;
-				api->Textures.LoadFromMemory = TextureLoader::ADDONAPI_LoadFromMemory;
-
-				api->QuickAccess.Add = UIRoot::QuickAccess::ADDONAPI_AddShortcut;
-				api->QuickAccess.Remove = UIRoot::QuickAccess::ADDONAPI_RemoveShortcut;
-				api->QuickAccess.Notify = UIRoot::QuickAccess::ADDONAPI_NotifyShortcut;
-				api->QuickAccess.AddContextMenu = UIRoot::QuickAccess::ADDONAPI_AddContextItem2;
-				api->QuickAccess.RemoveContextMenu = UIRoot::QuickAccess::ADDONAPI_RemoveContextItem;
-
-				api->Localization.Translate = Localization::ADDONAPI_Translate;
-				api->Localization.TranslateTo = Localization::ADDONAPI_TranslateTo;
-				api->Localization.SetTranslatedString = Localization::ADDONAPI_Set;
-
-				api->Fonts.Get = UIRoot::Fonts::ADDONAPI_Get;
-				api->Fonts.Release = UIRoot::Fonts::ADDONAPI_Release;
-				api->Fonts.AddFromFile = UIRoot::Fonts::ADDONAPI_AddFontFromFile;
-				api->Fonts.AddFromResource = UIRoot::Fonts::ADDONAPI_AddFontFromResource;
-				api->Fonts.AddFromMemory = UIRoot::Fonts::ADDONAPI_AddFontFromMemory;
-				api->Fonts.Resize = UIRoot::Fonts::ADDONAPI_ResizeFont;
-
-				ApiDefs.insert({ aVersion, api });
-				AddonAPI6* shared = (AddonAPI6*)DataLinkService->ShareResource("ADDONAPI_6", sizeof(AddonAPI6), false);
-				memcpy_s(shared, sizeof(AddonAPI6), api, (sizeof(AddonAPI6)));
-				return api;
-			}
-		}
-
-		// there is no matching version
-		return nullptr;
-	}
-	long GetAddonAPISize(int aVersion)
-	{
-		switch (aVersion)
-		{
-			case 1:
-				return sizeof(AddonAPI1);
-			case 2:
-				return sizeof(AddonAPI2);
-			case 3:
-				return sizeof(AddonAPI3);
-			case 4:
-				return sizeof(AddonAPI4);
-			case 5:
-				return sizeof(AddonAPI5);
-			case 6:
-				return sizeof(AddonAPI6);
-		}
-
-		return 0;
-	}
-
 	std::string GetOwner(void* aAddress)
 	{
 		if (aAddress == nullptr)
@@ -1636,8 +1235,10 @@ namespace Loader
 				}
 			}
 
-			void* startAddress = NexusHandle;
-			void* endAddress = ((PBYTE)NexusHandle) + NexusModuleSize;
+			CContext* ctx = CContext::GetContext();
+
+			void* startAddress = ctx->GetModule();
+			void* endAddress = ((PBYTE)ctx->GetModule()) + ctx->GetModuleSize();
 
 			if (aAddress >= startAddress && aAddress <= endAddress)
 			{
@@ -1743,7 +1344,7 @@ namespace Loader
 			DisableVolatileUntilUpdate = true;
 			Logger->Warning(CH_LOADER, "Game updated. Current Build %d. Old Build: %d. Disabling volatile addons until they update.", gameBuild, lastGameBuild);
 
-			UIRoot::Alerts::ADDONAPI_Notify(String::Format("%s\n%s", Language->Translate("((000001))"), Language->Translate("((000002))")).c_str());
+			Alerts->Notify(String::Format("%s\n%s", Language->Translate("((000001))"), Language->Translate("((000002))")).c_str());
 		}
 
 		if (lastGameBuild != gameBuild)

@@ -19,23 +19,14 @@
     <Filter Include="Events">
       <UniqueIdentifier>{062ec4b8-2804-4978-b3c4-381b0cdd4b35}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GUI">
-      <UniqueIdentifier>{8e3da8bf-b792-4844-a919-647f2d4786f6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="_GLOBAL">
       <UniqueIdentifier>{8e43094f-c05b-4eb0-9c90-afd74f653c5b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Widgets">
-      <UniqueIdentifier>{911cde00-7b9a-4d41-9272-bc884666c983}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource Files\Fonts">
       <UniqueIdentifier>{1893bf7b-bd45-42e7-ad87-1a27b5dd5c62}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource Files\Images">
       <UniqueIdentifier>{df3c3a30-d02f-4c04-a27c-cfaafff031bb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Widgets\Options">
-      <UniqueIdentifier>{b211fbda-c7b4-4d75-b2c9-6801eab1bc0a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Paths">
       <UniqueIdentifier>{b0fd71ca-41a2-4a72-a523-b30138c9dcef}</UniqueIdentifier>
@@ -184,6 +175,9 @@
     <Filter Include="Resource Files\Images\banners">
       <UniqueIdentifier>{99846d4e-f4ca-443a-91cd-d6df9457545b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Loader\API">
+      <UniqueIdentifier>{e8eae412-d99b-4737-825b-da0c7d8c0a74}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -318,9 +312,6 @@
     <ClCompile Include="src\Services\Updater\Updater.cpp">
       <Filter>Services\Updater</Filter>
     </ClCompile>
-    <ClCompile Include="src\GUI\Widgets\Options\COptionsWindow.cpp">
-      <Filter>GUI\Widgets\Options</Filter>
-    </ClCompile>
     <ClCompile Include="src\Util\Strings.cpp">
       <Filter>Util</Filter>
     </ClCompile>
@@ -416,6 +407,12 @@
     </ClCompile>
     <ClCompile Include="src\UI\Widgets\MainWindow\Addons\AddonItem.cpp">
       <Filter>UI\Widgets\MainWindow\Pages\Addons</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Util\CmdLine.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Loader\API\ApiFunctionMapper.cpp">
+      <Filter>Loader\API</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1043,9 +1040,6 @@
     <ClInclude Include="src\Loader\AddonDefinition.h">
       <Filter>Loader\Structs</Filter>
     </ClInclude>
-    <ClInclude Include="src\Loader\AddonAPI.h">
-      <Filter>Loader\Structs</Filter>
-    </ClInclude>
     <ClInclude Include="src\Loader\NexusLinkData.h">
       <Filter>Loader\Structs</Filter>
     </ClInclude>
@@ -1210,6 +1204,15 @@
     </ClInclude>
     <ClInclude Include="src\UI\DisplayBinds.h">
       <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Util\CmdLine.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\API\ApiFunctionMapper.h">
+      <Filter>Loader\API</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\API\AddonAPI.h">
+      <Filter>Loader\API</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

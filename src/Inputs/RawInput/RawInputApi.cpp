@@ -9,25 +9,6 @@
 #include "RawInputApi.h"
 
 #include "Renderer.h"
-#include "Shared.h"
-
-namespace RawInput
-{
-	LRESULT ADDONAPI_SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-	{
-		return RawInputApi->SendWndProcToGame(hWnd, uMsg, wParam, lParam);
-	}
-
-	void ADDONAPI_Register(WNDPROC_CALLBACK aWndProcCallback)
-	{
-		RawInputApi->Register(aWndProcCallback);
-	}
-
-	void ADDONAPI_Deregister(WNDPROC_CALLBACK aWndProcCallback)
-	{
-		RawInputApi->Deregister(aWndProcCallback);
-	}
-}
 
 UINT CRawInputApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {

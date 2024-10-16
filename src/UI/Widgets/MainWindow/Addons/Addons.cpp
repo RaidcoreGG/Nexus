@@ -51,8 +51,8 @@ CAddonsWindow::CAddonsWindow()
 	CContext* ctx = CContext::GetContext();
 	CEventApi* evtapi = ctx->GetEventApi();
 
-	evtapi->Subscribe("EV_ADDON_LOADED", OnAddonLoadUnload, true);
-	evtapi->Subscribe("EV_ADDON_UNLOADED", OnAddonLoadUnload, true);
+	evtapi->Subscribe("EV_ADDON_LOADED", OnAddonLoadUnload);
+	evtapi->Subscribe("EV_ADDON_UNLOADED", OnAddonLoadUnload);
 	AddonsWindow = this;
 }
 
@@ -258,10 +258,10 @@ void CAddonsWindow::AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalle
 		ImGui::PopTextWrapPos();
 
 		static CTextureLoader* textureApi = ctx->GetTextureService();
-		static Texture* T1 = TextureService->GetOrCreate("ICON_ADDONPOLICY_TIER1", RES_ICON_TIER1, ctx->GetModule());
-		static Texture* T2 = TextureService->GetOrCreate("ICON_ADDONPOLICY_TIER2", RES_ICON_TIER2, ctx->GetModule());
-		static Texture* T3 = TextureService->GetOrCreate("ICON_ADDONPOLICY_TIER3", RES_ICON_TIER3, ctx->GetModule());
-		static Texture* TX = TextureService->GetOrCreate("ICON_ADDONPOLICY_TIER_UNKNOWN", RES_ICON_TIER_UNKNOWN, ctx->GetModule());
+		static Texture* T1 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER1", RES_ICON_TIER1, ctx->GetModule());
+		static Texture* T2 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER2", RES_ICON_TIER2, ctx->GetModule());
+		static Texture* T3 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER3", RES_ICON_TIER3, ctx->GetModule());
+		static Texture* TX = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER_UNKNOWN", RES_ICON_TIER_UNKNOWN, ctx->GetModule());
 
 		Texture* noticeIcon = nullptr;
 		std::string noticeURL;
@@ -275,11 +275,11 @@ void CAddonsWindow::AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalle
 				{
 					noticeIcon = TX;
 					noticeURL = "https://raidcore.gg/Legal#addon-policy";
-					noticeTT = Language->Translate("((000090))");
+					noticeTT = langApi->Translate("((000090))");
 
 					if (!TX)
 					{
-						TX = TextureService->GetOrCreate("ICON_ADDONPOLICY_TIER_UNKNOWN", RES_ICON_TIER_UNKNOWN, ctx->GetModule());
+						TX = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER_UNKNOWN", RES_ICON_TIER_UNKNOWN, ctx->GetModule());
 					}
 
 					break;
@@ -289,11 +289,11 @@ void CAddonsWindow::AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalle
 				{
 					noticeIcon = T1;
 					noticeURL = "https://raidcore.gg/Legal#addon-policy";
-					noticeTT = String::Format(Language->Translate("((000089))"), 1);
+					noticeTT = String::Format(langApi->Translate("((000089))"), 1);
 
 					if (!T1)
 					{
-						T1 = TextureService->GetOrCreate("ICON_ADDONPOLICY_TIER1", RES_ICON_TIER1, ctx->GetModule());
+						T1 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER1", RES_ICON_TIER1, ctx->GetModule());
 					}
 
 					break;
@@ -302,11 +302,11 @@ void CAddonsWindow::AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalle
 				{
 					noticeIcon = T2;
 					noticeURL = "https://raidcore.gg/Legal#addon-policy";
-					noticeTT = String::Format(Language->Translate("((000089))"), 2);
+					noticeTT = String::Format(langApi->Translate("((000089))"), 2);
 
 					if (!T2)
 					{
-						T2 = TextureService->GetOrCreate("ICON_ADDONPOLICY_TIER2", RES_ICON_TIER2, ctx->GetModule());
+						T2 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER2", RES_ICON_TIER2, ctx->GetModule());
 					}
 
 					break;
@@ -315,11 +315,11 @@ void CAddonsWindow::AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalle
 				{
 					noticeIcon = T3;
 					noticeURL = "https://raidcore.gg/Legal#addon-policy";
-					noticeTT = String::Format(Language->Translate("((000089))"), 3);
+					noticeTT = String::Format(langApi->Translate("((000089))"), 3);
 
 					if (!T3)
 					{
-						T3 = TextureService->GetOrCreate("ICON_ADDONPOLICY_TIER3", RES_ICON_TIER3, ctx->GetModule());
+						T3 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER3", RES_ICON_TIER3, ctx->GetModule());
 					}
 
 					break;
@@ -331,7 +331,7 @@ void CAddonsWindow::AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalle
 			noticeIcon = T1;
 			noticeURL = "https://help.guildwars2.com/hc/en-us/articles/360013625034-Policy-Third-Party-Programs";
 
-			std::string tosNotice = Language->Translate("((000074))");
+			std::string tosNotice = langApi->Translate("((000074))");
 			tosNotice.append("\n");
 			tosNotice.append(aAddon->ToSComplianceNotice);
 
@@ -349,7 +349,7 @@ void CAddonsWindow::AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalle
 				ShellExecuteA(0, 0, noticeURL.c_str(), 0, 0, SW_SHOW);
 			}
 
-			ImGui::TooltipGeneric(Language->Translate(noticeTT.c_str()));
+			ImGui::TooltipGeneric(langApi->Translate(noticeTT.c_str()));
 		}
 
 		/* Install Button */
@@ -358,15 +358,17 @@ void CAddonsWindow::AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalle
 		if (!aInstalled)
 		{
 			if (ImGui::Button(aAddon->IsInstalling 
-				? (Language->Translate("((000027))") + sig).c_str() 
-				: (Language->Translate("((000028))") + sig).c_str(),
+				? (langApi->Translate("((000027))") + sig).c_str()
+				: (langApi->Translate("((000028))") + sig).c_str(),
 				ImVec2(btnWidth, 0)))
 			{
 				if (!aAddon->IsInstalling)
 				{
 					std::thread([aAddon, aIsArcPlugin]()
 					{
-						UpdateService->InstallAddon(aAddon, aIsArcPlugin);
+						CContext* ctx = CContext::GetContext();
+						CUpdater* updater = ctx->GetUpdater();
+						updater->InstallAddon(aAddon, aIsArcPlugin);
 
 						if (aIsArcPlugin)
 						{
@@ -378,7 +380,6 @@ void CAddonsWindow::AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalle
 							//Loader::QueueAddon(ELoaderAction::Reload, installPath);
 						}
 
-						CContext* ctx = CContext::GetContext();
 						CUiContext* uictx = ctx->GetUIContext();
 						uictx->Invalidate();
 
@@ -391,14 +392,14 @@ void CAddonsWindow::AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalle
 		}
 		else
 		{
-			ImGui::Text(Language->Translate("((000029))"));
+			ImGui::Text(langApi->Translate("((000029))"));
 		}
 
 		/* Configure Button */
 		if (aAddon->Provider == EUpdateProvider::GitHub && !aAddon->DownloadURL.empty())
 		{
 			ImGui::SetCursorPos(ImVec2(aWidth - actionsAreaWidth + style.WindowPadding.x, ImGui::GetCursorPosY()));
-			if (ImGui::Button((Language->Translate("((000030))") + sig).c_str(), ImVec2(btnWidth, 0)))
+			if (ImGui::Button((langApi->Translate("((000030))") + sig).c_str(), ImVec2(btnWidth, 0)))
 			{
 				ShellExecuteA(0, 0, aAddon->DownloadURL.c_str(), 0, 0, SW_SHOW);
 			}

@@ -13,6 +13,7 @@
 
 #include "Consts.h"
 #include "Shared.h"
+#include "Context.h"
 #include "Index.h"
 
 #include "nlohmann/json.hpp"
@@ -69,7 +70,7 @@ namespace Loader
 			}
 			else
 			{
-				Logger->Warning(CH_LOADER, "Error parsing API response for /addonlibrary.");
+				CContext::GetContext()->GetLogger()->Warning(CH_LOADER, "Error parsing API response for /addonlibrary.");
 			}
 		}
 	}

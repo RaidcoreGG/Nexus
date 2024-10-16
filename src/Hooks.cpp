@@ -4,30 +4,27 @@
 
 #include "Consts.h"
 #include "Renderer.h"
-#include "Shared.h"
+#include "Context.h"
 #include "State.h"
-
-#include "Events/EventHandler.h"
-#include "UI/UiContext.h"
-#include "Inputs/InputBinds/InputBindHandler.h"
-#include "Loader/Loader.h"
-#include "Loader/NexusLinkData.h"
-#include "Services/Textures/TextureLoader.h"
-#include "Inputs/RawInput/RawInputApi.h"
 
 namespace Hooks
 {
-	NexusLinkData* NexusLink = nullptr;
+	NexusLinkData*  NexusLink      = nullptr;
+	CRawInputApi*   RawInputApi    = nullptr;
+	CInputBindApi*  InputBindApi   = nullptr;
+	CUiContext*     UIContext      = nullptr;
+	CTextureLoader* TextureService = nullptr;
+	CEventApi*      EventApi       = nullptr;
 
 	namespace DXGI
 	{
-		DXPRESENT		Present = nullptr;
-		DXRESIZEBUFFERS	ResizeBuffers = nullptr;
+		DXPRESENT       Present       = nullptr;
+		DXRESIZEBUFFERS ResizeBuffers = nullptr;
 	}
 
 	namespace GW2
 	{
-		WNDPROC			WndProc = nullptr;
+		WNDPROC         WndProc = nullptr;
 	}
 
 	LRESULT __stdcall WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

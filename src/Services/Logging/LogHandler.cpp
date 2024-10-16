@@ -13,22 +13,7 @@
 #include <algorithm>
 #include <chrono>
 
-#include "Shared.h"
-
 #include "Util/Time.h"
-
-namespace LogHandler
-{
-	void ADDONAPI_LogMessage(ELogLevel aLogLevel, const char* aStr)
-	{
-		Logger->LogMessageUnformatted(aLogLevel, "Addon", aStr);
-	}
-
-	void ADDONAPI_LogMessage2(ELogLevel aLogLevel, const char* aChannel, const char* aStr)
-	{
-		Logger->LogMessageUnformatted(aLogLevel, aChannel, aStr);
-	}
-}
 
 void CLogHandler::RegisterLogger(ILogger* aLogger)
 {

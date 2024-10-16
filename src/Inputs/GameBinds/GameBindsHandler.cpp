@@ -10,48 +10,12 @@
 
 #include <fstream>
 
+#include "Context.h"
 #include "Index.h"
 #include "Util/Inputs.h"
 
-/* FIXME: remove this -> DI */
-#include "Shared.h"
-#include "Context.h"
-
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
-
-namespace GameBinds
-{
-	void ADDONAPI_PressAsync(EGameBinds aGameBind)
-	{
-		GameBindsApi->PressAsync(aGameBind);
-	}
-
-	void ADDONAPI_ReleaseAsync(EGameBinds aGameBind)
-	{
-		GameBindsApi->ReleaseAsync(aGameBind);
-	}
-
-	void ADDONAPI_InvokeAsync(EGameBinds aGameBind, int aDuration)
-	{
-		GameBindsApi->InvokeAsync(aGameBind, aDuration);
-	}
-
-	void ADDONAPI_Press(EGameBinds aGameBind)
-	{
-		GameBindsApi->Press(aGameBind);
-	}
-
-	void ADDONAPI_Release(EGameBinds aGameBind)
-	{
-		GameBindsApi->Release(aGameBind);
-	}
-
-	bool ADDONAPI_IsBound(EGameBinds aGameBind)
-	{
-		return GameBindsApi->IsBound(aGameBind);
-	}
-}
 
 std::string CGameBindsApi::ToString(EGameBinds aGameBind)
 {
@@ -604,21 +568,17 @@ unsigned short CGameBindsApi::GameBindCodeToScanCode(unsigned short aGameScanCod
 	return LookupTable[aGameScanCode];
 }
 
-static CGameBindsApi* UEInputBindUpdatesTarget = nullptr;
-
-void CGameBindsApi::EnableUEInputBindUpdates(CGameBindsApi* aGameBindsApi)
-{
-	UEInputBindUpdatesTarget = aGameBindsApi;
-}
-
-void CGameBindsApi::DisableUEInputBindUpdates()
-{
-	UEInputBindUpdatesTarget = nullptr;
-}
-
 void CGameBindsApi::OnUEInputBindChanged(void* aData)
 {
-	if (!UEInputBindUpdatesTarget) { return; }
+	static CGameBindsApi* s_GameBindsApi = nullptr;
+
+	if (!s_GameBindsApi)
+	{
+		CContext* ctx = CContext::GetContext();
+		s_GameBindsApi = ctx->GetGameBindsApi();
+
+		assert(s_GameBindsApi);
+	}
 
 	struct UEKey
 	{
@@ -637,7 +597,7 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 	UEInputBindChanged* kbChange = (UEInputBindChanged*)aData;
 
 	/* abort if it's the secondary bind, but the key is already set*/
-	if (kbChange->Index == 1 && UEInputBindUpdatesTarget->IsBound(kbChange->Identifier))
+	if (kbChange->Index == 1 && s_GameBindsApi->IsBound(kbChange->Identifier))
 	{
 		return;
 	}
@@ -683,7 +643,7 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 		}
 	}
 
-	UEInputBindUpdatesTarget->Set(kbChange->Identifier, ib, true);
+	s_GameBindsApi->Set(kbChange->Identifier, ib, true);
 
 	CContext* ctx = CContext::GetContext();
 	CUiContext* uictx = ctx->GetUIContext();
@@ -693,6 +653,10 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 
 CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, CEventApi* aEventApi)
 {
+	assert(aRawInputApi);
+	assert(aLogger);
+	assert(aEventApi);
+
 	this->RawInputApi = aRawInputApi;
 	this->Logger = aLogger;
 	this->EventApi = aEventApi;
@@ -700,21 +664,12 @@ CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, C
 	this->Load();
 	this->AddDefaultBinds();
 
-	CGameBindsApi::EnableUEInputBindUpdates(this);
-	this->EventApi->Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged, true);
-
-	//ASSERT(this->RawInputApi);
-	//ASSERT(this->Logger);
+	this->EventApi->Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
 }
 
 CGameBindsApi::~CGameBindsApi()
 {
-	CGameBindsApi::DisableUEInputBindUpdates();
 	this->EventApi->Unsubscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
-
-	this->RawInputApi = nullptr;
-	this->Logger = nullptr;
-	this->EventApi = nullptr;
 }
 
 void CGameBindsApi::PressAsync(EGameBinds aGameBind)

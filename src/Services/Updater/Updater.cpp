@@ -12,58 +12,24 @@
 
 #include "Index.h"
 #include "Shared.h"
+#include "Context.h"
 
 #include "Util/MD5.h"
 #include "Util/Paths.h"
 #include "Util/Strings.h"
 #include "Util/URL.h"
 
-namespace Updater
+CUpdater::CUpdater(CLogHandler* aLogger)
 {
-	void ADDONAPI_RequestUpdate(signed int aSignature, const char* aUpdateURL)
-	{
-		if (!aSignature) { return; }
-		if (!aUpdateURL) { return; }
+	assert(aLogger);
 
-		const std::lock_guard<std::mutex> lock(Loader::Mutex);
-
-		Addon* addon = Loader::FindAddonBySig(aSignature);
-
-		if (!addon) { return; }
-		if (!addon->Definitions) { return; }
-		if (addon->Definitions->Provider != EUpdateProvider::Self)
-		{
-			Logger->Warning(CH_UPDATER, "Update requested for %s but provider is not EUpdateProvider::Self. Cancelling.", addon->Definitions->Name);
-			return;
-		}
-
-		/* TODO: Add verification */
-		// 1. Addon -> API::RequestUpdate(signature);
-		// 2. Nexus -> Events::RaiseSingle(signature, password123);
-		// 3. Addon -> API::ConfirmUpdate(password123);
-
-		std::filesystem::path path = addon->Path;
-
-		AddonInfo addonInfo
-		{
-			addon->Definitions->Signature,
-			addon->Definitions->Name,
-			addon->Definitions->Version,
-			addon->Definitions->Provider,
-			aUpdateURL,
-			addon->MD5
-		};
-
-		std::thread([path, addonInfo]()
-			{
-				UpdateService->UpdateAddon(path, addonInfo);
-			})
-			.detach();
-	}
+	this->Logger = aLogger;
 }
 
 void CUpdater::UpdateNexus()
 {
+	AddonVersion currentVersion = CContext::GetContext()->GetVersion();
+
 	// ensure .old path is not claimed
 	if (std::filesystem::exists(Index::F_OLD_DLL))
 	{
@@ -76,7 +42,7 @@ void CUpdater::UpdateNexus()
 			std::filesystem::path fallback = Path::GetUnused(Index::F_OLD_DLL);
 			std::filesystem::rename(Index::F_OLD_DLL, fallback);
 
-			Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\". Renamed to \"%s\".", Index::F_OLD_DLL.string().c_str(), fallback.string().c_str());
+			this->Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\". Renamed to \"%s\".", Index::F_OLD_DLL.string().c_str(), fallback.string().c_str());
 		}
 	}
 
@@ -92,7 +58,7 @@ void CUpdater::UpdateNexus()
 			std::filesystem::path fallback = Path::GetUnused(Index::F_UPDATE_DLL);
 			std::filesystem::rename(Index::F_UPDATE_DLL, fallback);
 
-			Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\". Renamed to \"%s\".", Index::F_UPDATE_DLL.string().c_str(), fallback.string().c_str());
+			this->Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\". Renamed to \"%s\".", Index::F_UPDATE_DLL.string().c_str(), fallback.string().c_str());
 		}
 	}
 
@@ -101,7 +67,7 @@ void CUpdater::UpdateNexus()
 
 	if (resVersion.is_null())
 	{
-		Logger->Warning(CH_UPDATER, "Error parsing API response /nexusversion.");
+		this->Logger->Warning(CH_UPDATER, "Error parsing API response /nexusversion.");
 		return;
 	}
 
@@ -114,9 +80,9 @@ void CUpdater::UpdateNexus()
 		resVersion["Changelog"].get_to(ChangelogText);
 	}
 
-	if (remoteVersion > Version)
+	if (remoteVersion > currentVersion)
 	{
-		Logger->Info(CH_UPDATER, "Outdated: API replied with Version %s but installed is Version %s", remoteVersion.string().c_str(), Version.string().c_str());
+		this->Logger->Info(CH_UPDATER, "Outdated: API replied with Version %s but installed is Version %s", remoteVersion.string().c_str(), currentVersion.string().c_str());
 		IsUpdateAvailable = true;
 
 		bool githubFailure = false;
@@ -139,7 +105,7 @@ void CUpdater::UpdateNexus()
 
 		if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
 		{
-			Logger->Warning(CH_UPDATER, "Error fetching %s%s", downloadBaseUrl.c_str(), endpointDownload.c_str());
+			this->Logger->Warning(CH_UPDATER, "Error fetching %s%s", downloadBaseUrl.c_str(), endpointDownload.c_str());
 
 			// try cleaning failed download
 			if (std::filesystem::exists(Index::F_UPDATE_DLL))
@@ -150,7 +116,7 @@ void CUpdater::UpdateNexus()
 				}
 				catch (std::filesystem::filesystem_error fErr)
 				{
-					Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\".", Index::F_UPDATE_DLL.string().c_str());
+					this->Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\".", Index::F_UPDATE_DLL.string().c_str());
 				}
 			}
 
@@ -160,11 +126,11 @@ void CUpdater::UpdateNexus()
 		/* fallback to raidcore site */
 		if (githubFailure)
 		{
-			Logger->Info(CH_UPDATER, "Nexus update via GitHub not possible. Falling back to Raidcore API.");
+			this->Logger->Info(CH_UPDATER, "Nexus update via GitHub not possible. Falling back to Raidcore API.");
 			// ensure download successful
 			if (!RaidcoreAPI->Download(Index::F_UPDATE_DLL, "/d3d11.dll"))
 			{
-				Logger->Warning(CH_UPDATER, "Nexus Update failed: Download failed.");
+				this->Logger->Warning(CH_UPDATER, "Nexus Update failed: Download failed.");
 				// try cleaning failed download
 				if (std::filesystem::exists(Index::F_UPDATE_DLL))
 				{
@@ -174,7 +140,7 @@ void CUpdater::UpdateNexus()
 					}
 					catch (std::filesystem::filesystem_error fErr)
 					{
-						Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\".", Index::F_UPDATE_DLL.string().c_str());
+						this->Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\".", Index::F_UPDATE_DLL.string().c_str());
 						return;
 					}
 				}
@@ -195,7 +161,7 @@ void CUpdater::UpdateNexus()
 		}
 		catch (std::filesystem::filesystem_error fErr)
 		{
-			Logger->Warning(CH_UPDATER, "Nexus update failed: Couldn't move \"%s\" to \"%s\".", Index::F_HOST_DLL.string().c_str(), oldPath.string().c_str());
+			this->Logger->Warning(CH_UPDATER, "Nexus update failed: Couldn't move \"%s\" to \"%s\".", Index::F_HOST_DLL.string().c_str(), oldPath.string().c_str());
 			return;
 		}
 
@@ -206,19 +172,19 @@ void CUpdater::UpdateNexus()
 		}
 		catch (std::filesystem::filesystem_error fErr)
 		{
-			Logger->Warning(CH_UPDATER, "Nexus update failed: Couldn't move \"%s\" to \"%s\".", Index::F_UPDATE_DLL.string().c_str(), Index::F_HOST_DLL.string().c_str());
+			this->Logger->Warning(CH_UPDATER, "Nexus update failed: Couldn't move \"%s\" to \"%s\".", Index::F_UPDATE_DLL.string().c_str(), Index::F_HOST_DLL.string().c_str());
 			return;
 		}
 
-		Logger->Info(CH_UPDATER, "Successfully updated Nexus. Restart required to take effect. (Current: %s) (New: %s)", Version.string().c_str(), remoteVersion.string().c_str());
+		this->Logger->Info(CH_UPDATER, "Successfully updated Nexus. Restart required to take effect. (Current: %s) (New: %s)", currentVersion.string().c_str(), remoteVersion.string().c_str());
 	}
-	else if (remoteVersion < Version)
+	else if (remoteVersion < currentVersion)
 	{
-		Logger->Info(CH_UPDATER, "Installed Build of Nexus is more up-to-date than remote. (Installed: %s) (Remote: %s)", Version.string().c_str(), remoteVersion.string().c_str());
+		this->Logger->Info(CH_UPDATER, "Installed Build of Nexus is more up-to-date than remote. (Installed: %s) (Remote: %s)", currentVersion.string().c_str(), remoteVersion.string().c_str());
 	}
 	else
 	{
-		Logger->Info(CH_UPDATER, "Installed Build of Nexus is up-to-date.");
+		this->Logger->Info(CH_UPDATER, "Installed Build of Nexus is up-to-date.");
 	}
 }
 
@@ -235,7 +201,7 @@ bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonI
 	}
 	catch (std::filesystem::filesystem_error fErr)
 	{
-		Logger->Debug(CH_UPDATER, "%s", fErr.what());
+		this->Logger->Debug(CH_UPDATER, "%s", fErr.what());
 		return true; // report as update here, as it was probably moved here during runtime but the dll is locked
 	}
 
@@ -252,7 +218,7 @@ bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonI
 		}
 		catch (std::filesystem::filesystem_error fErr)
 		{
-			Logger->Debug(CH_UPDATER, "%s", fErr.what());
+			this->Logger->Debug(CH_UPDATER, "%s", fErr.what());
 			return false;
 		}
 	}
@@ -280,7 +246,7 @@ bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonI
 	case EUpdateProvider::GitHub:
 		if (aAddonInfo.UpdateLink.empty())
 		{
-			Logger->Warning(CH_UPDATER, "Addon %s declares EUpdateProvider::GitHub but has no UpdateLink set.", aAddonInfo.Name.c_str());
+			this->Logger->Warning(CH_UPDATER, "Addon %s declares EUpdateProvider::GitHub but has no UpdateLink set.", aAddonInfo.Name.c_str());
 			return false;
 		}
 
@@ -290,7 +256,7 @@ bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonI
 	case EUpdateProvider::Direct:
 		if (aAddonInfo.UpdateLink.empty())
 		{
-			Logger->Warning(CH_UPDATER, "Addon %s declares EUpdateProvider::Direct but has no UpdateLink set.", aAddonInfo.Name.c_str());
+			this->Logger->Warning(CH_UPDATER, "Addon %s declares EUpdateProvider::Direct but has no UpdateLink set.", aAddonInfo.Name.c_str());
 			return false;
 		}
 
@@ -307,7 +273,7 @@ bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonI
 	case EUpdateProvider::Self:
 		if (aAddonInfo.UpdateLink.empty())
 		{
-			Logger->Warning(CH_UPDATER, "Addon %s declares EUpdateProvider::Self but has no UpdateLink set.", aAddonInfo.Name.c_str());
+			this->Logger->Warning(CH_UPDATER, "Addon %s declares EUpdateProvider::Self but has no UpdateLink set.", aAddonInfo.Name.c_str());
 			return false;
 		}
 
@@ -370,7 +336,7 @@ bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonI
 			std::filesystem::rename(tmpPath, pathUpdate);
 			if (aAddonInfo.Version != AddonVersion{}) // if 0.0.0.0 -> install
 			{
-				Logger->Info(CH_UPDATER, "Successfully updated %s.", aAddonInfo.Name.c_str());
+				this->Logger->Info(CH_UPDATER, "Successfully updated %s.", aAddonInfo.Name.c_str());
 			}
 			return true;
 		}
@@ -379,11 +345,11 @@ bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonI
 			try
 			{
 				std::filesystem::remove(tmpPath);
-				Logger->Debug(CH_UPDATER, "Error when trying to rename tmp file to update. Deleting. Error: %s", fErr.what());
+				this->Logger->Debug(CH_UPDATER, "Error when trying to rename tmp file to update. Deleting. Error: %s", fErr.what());
 			}
 			catch (std::filesystem::filesystem_error fErr)
 			{
-				Logger->Debug(CH_UPDATER, "Error when trying to rename tmp file to update. Then another error when deleting. Error: %s", fErr.what());
+				this->Logger->Debug(CH_UPDATER, "Error when trying to rename tmp file to update. Then another error when deleting. Error: %s", fErr.what());
 			}
 			return false;
 		}
@@ -421,11 +387,11 @@ bool CUpdater::InstallAddon(LibraryAddon* aAddon, bool aIsArcPlugin)
 		}
 		catch (std::filesystem::filesystem_error fErr)
 		{
-			Logger->Debug(CH_UPDATER, "Error when trying to rename update file to dll during installation. Error: %s", fErr.what());
+			this->Logger->Debug(CH_UPDATER, "Error when trying to rename update file to dll during installation. Error: %s", fErr.what());
 			return false;
 		}
 
-		Logger->Info(CH_UPDATER, "Successfully installed %s.", aAddon->Name.c_str());
+		this->Logger->Info(CH_UPDATER, "Successfully installed %s.", aAddon->Name.c_str());
 
 		return true;
 	}
@@ -441,7 +407,7 @@ bool CUpdater::UpdateRaidcore(int aCacheLifetimeOverride)
 
 	if (resVersion.is_null())
 	{
-		Logger->Warning(CH_LOADER, "Error parsing API response.");
+		this->Logger->Warning(CH_LOADER, "Error parsing API response.");
 		return false;
 	}
 
@@ -449,11 +415,11 @@ bool CUpdater::UpdateRaidcore(int aCacheLifetimeOverride)
 
 	if (remoteVersion > aVersion)
 	{
-		Logger->Info(CH_LOADER, "%s is outdated: API replied with Version %s but installed is Version %s", aName.c_str(), remoteVersion.string().c_str(), aVersion.string().c_str());
+		this->Logger->Info(CH_LOADER, "%s is outdated: API replied with Version %s but installed is Version %s", aName.c_str(), remoteVersion.string().c_str(), aVersion.string().c_str());
 
 		RaidcoreAPI->Download(pathUpdate, endpoint + "/download"); // e.g. api.raidcore.gg/addons/17/download
 
-		Logger->Info(CH_LOADER, "Successfully updated %s.", aName.c_str());
+		this->Logger->Info(CH_LOADER, "Successfully updated %s.", aName.c_str());
 		wasUpdated = true;
 	}*/
 }
@@ -464,7 +430,7 @@ bool CUpdater::UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& a
 
 	if (response.is_null())
 	{
-		Logger->Warning(CH_UPDATER, "Error parsing API response.");
+		this->Logger->Warning(CH_UPDATER, "Error parsing API response.");
 		return false;
 	}
 
@@ -531,7 +497,7 @@ bool CUpdater::UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& a
 
 	if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
 	{
-		Logger->Warning(CH_UPDATER, "Error fetching %s%s", downloadBaseUrl.c_str(), endpointDownload.c_str());
+		this->Logger->Warning(CH_UPDATER, "Error fetching %s%s", downloadBaseUrl.c_str(), endpointDownload.c_str());
 
 		// try cleaning failed download
 		if (std::filesystem::exists(aDownloadPath))
@@ -542,7 +508,7 @@ bool CUpdater::UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& a
 			}
 			catch (std::filesystem::filesystem_error fErr)
 			{
-				Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\".", aDownloadPath.string().c_str());
+				this->Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\".", aDownloadPath.string().c_str());
 			}
 		}
 
@@ -560,7 +526,7 @@ bool CUpdater::UpdateDirect(std::filesystem::path& aDownloadPath, std::string& a
 		aEndpointDownload.empty() ||
 		aCurrentMD5.size() != 16)
 	{
-		Logger->Warning(CH_UPDATER, "One or more parameters were empty.");
+		this->Logger->Warning(CH_UPDATER, "One or more parameters were empty.");
 		return false;
 	}
 
@@ -597,7 +563,7 @@ bool CUpdater::UpdateDirect(std::filesystem::path& aDownloadPath, std::string& a
 
 	if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
 	{
-		Logger->Warning(CH_UPDATER, "Error fetching %s%s", aBaseURL.c_str(), aEndpointDownload.c_str());
+		this->Logger->Warning(CH_UPDATER, "Error fetching %s%s", aBaseURL.c_str(), aEndpointDownload.c_str());
 
 		// try cleaning failed download
 		if (std::filesystem::exists(aDownloadPath))
@@ -608,7 +574,7 @@ bool CUpdater::UpdateDirect(std::filesystem::path& aDownloadPath, std::string& a
 			}
 			catch (std::filesystem::filesystem_error fErr)
 			{
-				Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\".", aDownloadPath.string().c_str());
+				this->Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\".", aDownloadPath.string().c_str());
 			}
 		}
 
@@ -625,7 +591,7 @@ bool CUpdater::UpdateSelf(std::filesystem::path& aDownloadPath, std::string& aBa
 		aBaseURL.empty() ||
 		aEndpointDownload.empty())
 	{
-		Logger->Warning(CH_UPDATER, "One or more parameters were empty.");
+		this->Logger->Warning(CH_UPDATER, "One or more parameters were empty.");
 		return false;
 	}
 
@@ -646,7 +612,7 @@ bool CUpdater::UpdateSelf(std::filesystem::path& aDownloadPath, std::string& aBa
 
 	if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
 	{
-		Logger->Warning(CH_UPDATER, "Error fetching %s%s", aBaseURL.c_str(), aEndpointDownload.c_str());
+		this->Logger->Warning(CH_UPDATER, "Error fetching %s%s", aBaseURL.c_str(), aEndpointDownload.c_str());
 
 		// try cleaning failed download
 		if (std::filesystem::exists(aDownloadPath))
@@ -657,7 +623,7 @@ bool CUpdater::UpdateSelf(std::filesystem::path& aDownloadPath, std::string& aBa
 			}
 			catch (std::filesystem::filesystem_error fErr)
 			{
-				Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\".", aDownloadPath.string().c_str());
+				this->Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\".", aDownloadPath.string().c_str());
 			}
 		}
 

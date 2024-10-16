@@ -18,40 +18,6 @@
 #include "Loader/Loader.h"
 #include "Loader/ArcDPS.h"
 
-namespace Events
-{
-
-	void ADDONAPI_Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback)
-	{
-		EventApi->Subscribe(aIdentifier, aConsumeEventCallback);
-	}
-
-	void ADDONAPI_Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback)
-	{
-		EventApi->Unsubscribe(aIdentifier, aConsumeEventCallback);
-	}
-
-	void ADDONAPI_RaiseEvent(const char* aIdentifier, void* aEventData)
-	{
-		EventApi->Raise(aIdentifier, aEventData);
-	}
-
-	void ADDONAPI_RaiseNotification(const char* aIdentifier)
-	{
-		EventApi->Raise(aIdentifier, nullptr);
-	}
-
-	void ADDONAPI_RaiseEventTargeted(signed int aSignature, const char* aIdentifier, void* aEventData)
-	{
-		EventApi->Raise(aSignature, aIdentifier, aEventData);
-	}
-
-	void ADDONAPI_RaiseNotificationTargeted(signed int aSignature, const char* aIdentifier)
-	{
-		EventApi->Raise(aSignature, aIdentifier, nullptr);
-	}
-}
-
 void CEventApi::Raise(const char* aIdentifier, void* aEventData)
 {
 	this->Registry[aIdentifier].AmountRaises++;
@@ -100,7 +66,7 @@ void CEventApi::Raise(signed int aSignature, const char* aIdentifier)
 	this->Raise(aSignature, aIdentifier, nullptr);
 }
 
-void CEventApi::Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback, bool aIsInternal)
+void CEventApi::Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback)
 {
 	std::string str = aIdentifier;
 
@@ -130,11 +96,6 @@ void CEventApi::Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCa
 	}
 
 	this->Registry[str].Subscribers.push_back(sub);
-
-	if (sub.Signature == 0 && !aIsInternal)
-	{
-		Logger->Warning(CH_EVENTS, "Event registered but no addon address space matches function pointer. %p", aConsumeEventCallback);
-	}
 
 	/* dirty hack for arcdps (I hate my life) */
 	if ((str == "EV_ARCDPS_COMBATEVENT_LOCAL_RAW" || str == "EV_ARCDPS_COMBATEVENT_SQUAD_RAW") && !ArcDPS::IsLoaded)

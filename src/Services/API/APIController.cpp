@@ -1,3 +1,4 @@
+#ifdef NO_IMPL
 #include "APIController.h"
 
 #include <filesystem>
@@ -189,3 +190,4 @@ namespace API
 		}
 	}
 }
+#endif

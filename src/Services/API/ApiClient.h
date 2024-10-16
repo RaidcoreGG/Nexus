@@ -22,6 +22,7 @@
 #include "CachedResponse.h"
 #include "ApiRequest.h"
 #include "ApiResponse.h"
+#include "Services/Logging/LogHandler.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -112,6 +113,7 @@ class CApiClient
 	std::filesystem::path GetNormalizedPath(const std::string& aQuery) const;
 
 	private:
+	CLogHandler* Logger = nullptr;
 	long long FileTimeOffset;
 
 	///----------------------------------------------------------------------------------------------------

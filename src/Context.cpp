@@ -8,13 +8,16 @@
 
 #include "Context.h"
 
+#include <Psapi.h>
+
 #include "Branch.h"
+#include "Index.h"
 #include "Version.h"
 
 CContext* CContext::GetContext()
 {
-	static CContext context;
-	return &context;
+	static CContext s_Context;
+	return &s_Context;
 }
 
 AddonVersion const& CContext::GetVersion()
@@ -42,118 +45,119 @@ void CContext::SetModule(HMODULE aModule)
 {
 	assert(!this->Module);
 	this->Module = aModule;
+
+	MODULEINFO moduleInfo{};
+	GetModuleInformation(GetCurrentProcess(), this->Module, &moduleInfo, sizeof(moduleInfo));
+	this->ModuleSize = moduleInfo.SizeOfImage;
 }
+
 HMODULE CContext::GetModule()
 {
 	return this->Module;
 }
 
-void CContext::SetLogger(CLogHandler* aLogger)
+DWORD CContext::GetModuleSize()
 {
-	assert(!this->Logger);
-	this->Logger = aLogger;
+	return this->ModuleSize;
 }
+
 CLogHandler* CContext::GetLogger()
 {
-	return this->Logger;
+	static CLogHandler s_Logger = CLogHandler();
+	return &s_Logger;
 }
 
-void CContext::SetLocalization(CLocalization* aLocalization)
-{
-	assert(!this->Language);
-	this->Language = aLocalization;
-}
 CLocalization* CContext::GetLocalization()
 {
-	return this->Language;
+	static CLocalization s_LocalizationApi = CLocalization(
+		this->GetLogger()
+	);
+	return &s_LocalizationApi;
 }
 
-void CContext::SetUpdater(CUpdater* aUpdater)
-{
-	assert(!this->UpdateService);
-	this->UpdateService = aUpdater;
-}
 CUpdater* CContext::GetUpdater()
 {
-	return this->UpdateService;
+	static CUpdater s_Upater = CUpdater(
+		this->GetLogger()
+	);
+	return &s_Upater;
 }
 
-void CContext::SetTextureService(CTextureLoader* aTextureService)
-{
-	assert(!this->TextureService);
-	this->TextureService = aTextureService;
-}
 CTextureLoader* CContext::GetTextureService()
 {
-	return this->TextureService;
+	static CTextureLoader s_TextureApi = CTextureLoader(
+		this->GetLogger()
+	);
+	return &s_TextureApi;
 }
 
-void CContext::SetDataLink(CDataLink* aDataLink)
-{
-	assert(!this->DataLinkService);
-	this->DataLinkService = aDataLink;
-}
 CDataLink* CContext::GetDataLink()
 {
-	return this->DataLinkService;
+	static CDataLink s_DataLinkApi = CDataLink(
+		this->GetLogger()
+	);
+	return &s_DataLinkApi;
 }
 
-void CContext::SetEventApi(CEventApi* aEventApi)
-{
-	assert(!this->EventApi);
-	this->EventApi = aEventApi;
-}
 CEventApi* CContext::GetEventApi()
 {
-	return this->EventApi;
+	static CEventApi s_EventApi = CEventApi();
+	return &s_EventApi;
 }
 
-void CContext::SetRawInputApi(CRawInputApi* aRawInputApi)
-{
-	assert(!this->RawInputApi);
-	this->RawInputApi = aRawInputApi;
-}
 CRawInputApi* CContext::GetRawInputApi()
 {
-	return this->RawInputApi;
+	static CRawInputApi s_RawInputApi = CRawInputApi();
+	return &s_RawInputApi;
 }
 
-void CContext::SetInputBindApi(CInputBindApi* aInputBindApi)
-{
-	assert(!this->InputBindApi);
-	this->InputBindApi = aInputBindApi;
-}
 CInputBindApi* CContext::GetInputBindApi()
 {
-	return this->InputBindApi;
+	static CInputBindApi s_InputBindApi = CInputBindApi(
+		this->GetEventApi(),
+		this->GetLogger()
+	);
+	return &s_InputBindApi;
 }
 
-void CContext::SetGameBindsApi(CGameBindsApi* aGameBindsApi)
-{
-	assert(!this->GameBindsApi);
-	this->GameBindsApi = aGameBindsApi;
-}
 CGameBindsApi* CContext::GetGameBindsApi()
 {
-	return this->GameBindsApi;
+	static CGameBindsApi s_GameBindsApi = CGameBindsApi(
+		this->GetRawInputApi(),
+		this->GetLogger(),
+		this->GetEventApi()
+	);
+	return &s_GameBindsApi;
 }
 
-void CContext::SetUIContext(CUiContext* aUiContext)
-{
-	assert(!this->UIContext);
-	this->UIContext = aUiContext;
-}
 CUiContext* CContext::GetUIContext()
 {
-	return this->UIContext;
+	static CUiContext s_UiContext = CUiContext(
+		this->GetLogger(),
+		this->GetLocalization(),
+		this->GetTextureService(),
+		this->GetDataLink(),
+		this->GetInputBindApi(),
+		this->GetEventApi()
+	);
+	return &s_UiContext;
 }
 
-void CContext::SetSettingsCtx(CSettings* aSettingsCtx)
-{
-	assert(!this->Settings);
-	this->Settings = aSettingsCtx;
-}
 CSettings* CContext::GetSettingsCtx()
 {
-	return this->Settings;
+	static CSettings s_SettingsApi = CSettings(
+		Index::F_SETTINGS,
+		this->GetLogger()
+	);
+	return &s_SettingsApi;
+}
+
+CMumbleReader* CContext::GetMumbleReader()
+{
+	static CMumbleReader s_MumbleReader = CMumbleReader(
+		this->GetDataLink(),
+		this->GetEventApi(),
+		this->GetLogger()
+	);
+	return &s_MumbleReader;
 }
