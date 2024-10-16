@@ -5,7 +5,6 @@
 #include <string>
 
 #include "Consts.h"
-#include "Hooks.h"
 #include "Index.h"
 #include "Renderer.h"
 #include "resource.h"
@@ -47,9 +46,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		case DLL_PROCESS_DETACH:
 		{
 			/* cleanly remove wndproc hook */
-			if (Renderer::WindowHandle && Hooks::GW2::WndProc)
+			if (Renderer::WindowHandle && Hooks::WndProc)
 			{
-				SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)Hooks::GW2::WndProc);
+				SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)Hooks::WndProc);
 			}
 			break;
 		}
@@ -57,8 +56,22 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	return true;
 }
 
+namespace Hooks
+{
+	DXPRESENT       DXGIPresent       = nullptr;
+	DXRESIZEBUFFERS DXGIResizeBuffers = nullptr;
+	WNDPROC         WndProc           = nullptr;
+}
+
 namespace Main
 {
+	static NexusLinkData*  s_NexusLink      = nullptr;
+	static CRawInputApi*   s_RawInputApi    = nullptr;
+	static CInputBindApi*  s_InputBindApi   = nullptr;
+	static CUiContext*     s_UIContext      = nullptr;
+	static CTextureLoader* s_TextureService = nullptr;
+	static CEventApi*      s_EventApi       = nullptr;
+
 	void Initialize(EEntryMethod aEntryMethod)
 	{
 		if (State::Nexus >= ENexusState::LOAD) { return; }
@@ -129,12 +142,12 @@ namespace Main
 
 			ctx->GetMumbleReader();
 
-			Hooks::NexusLink = (NexusLinkData*)ctx->GetDataLink()->GetResource(DL_NEXUS_LINK);
-			Hooks::RawInputApi = ctx->GetRawInputApi();
-			Hooks::InputBindApi = ctx->GetInputBindApi();
-			Hooks::UIContext = ctx->GetUIContext();
-			Hooks::TextureService = ctx->GetTextureService();
-			Hooks::EventApi = ctx->GetEventApi();
+			s_NexusLink = (NexusLinkData*)ctx->GetDataLink()->GetResource(DL_NEXUS_LINK);
+			s_RawInputApi = ctx->GetRawInputApi();
+			s_InputBindApi = ctx->GetInputBindApi();
+			s_UIContext = ctx->GetUIContext();
+			s_TextureService = ctx->GetTextureService();
+			s_EventApi = ctx->GetEventApi();
 
 			State::Nexus = ENexusState::LOADED;
 		}
@@ -168,11 +181,6 @@ namespace Main
 			Loader::Shutdown();
 
 			ctx->GetUIContext()->Shutdown();
-			//delete UIContext;
-			//delete MumbleReader;
-
-			// shared mem
-			//delete DataLinkService;
 
 			MH_Uninitialize();
 
@@ -185,4 +193,116 @@ namespace Main
 		//if (D3D11Handle) { FreeLibrary(D3D11Handle); }
 		//if (D3D11SystemHandle) { FreeLibrary(D3D11SystemHandle); }
 	}
+
+	LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		if (State::Nexus != ENexusState::SHUTDOWN)
+		{
+			assert(s_RawInputApi);
+			assert(s_UIContext);
+			assert(s_InputBindApi);
+
+			// don't pass to game if loader
+			if (Loader::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
+
+			// don't pass to game if wndprocCb or InputBind
+			//if (InputCtx->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return; }
+
+			// don't pass to game if custom wndproc
+			if (s_RawInputApi->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
+
+			// don't pass to game if gui
+			if (s_UIContext->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
+
+			// don't pass to game if InputBind
+			if (s_InputBindApi->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
+
+			if (uMsg == WM_DESTROY || uMsg == WM_QUIT || uMsg == WM_CLOSE)
+			{
+				Main::Shutdown(uMsg);
+			}
+
+			/* offset of 7997, if uMsg in that range it's a nexus game only message */
+			if (uMsg >= WM_PASSTHROUGH_FIRST && uMsg <= WM_PASSTHROUGH_LAST)
+			{
+				/* modify the uMsg code to the original code */
+				uMsg -= WM_PASSTHROUGH_FIRST;
+			}
+		}
+
+		return CallWindowProcA(Hooks::WndProc, hWnd, uMsg, wParam, lParam);
+	}
+
+	HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
+	{
+		if (!(State::Nexus == ENexusState::SHUTTING_DOWN || State::Nexus == ENexusState::SHUTDOWN))
+		{
+			assert(s_UIContext);
+			assert(s_TextureService);
+
+			if (Renderer::SwapChain != pChain)
+			{
+				Renderer::SwapChain = pChain;
+
+				if (Renderer::Device)
+				{
+					Renderer::DeviceContext->Release();
+					Renderer::DeviceContext = 0;
+					Renderer::Device->Release();
+					Renderer::Device = 0;
+				}
+
+				Renderer::SwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&Renderer::Device);
+				Renderer::Device->GetImmediateContext(&Renderer::DeviceContext);
+
+				DXGI_SWAP_CHAIN_DESC swapChainDesc;
+				Renderer::SwapChain->GetDesc(&swapChainDesc);
+
+				Renderer::WindowHandle = swapChainDesc.OutputWindow;
+				Hooks::WndProc = (WNDPROC)SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)hkWndProc);
+
+				Loader::Initialize();
+
+				State::Nexus = ENexusState::READY;
+				State::Directx = EDxState::READY; /* acquired swapchain */
+			}
+
+			s_UIContext->Initialize(Renderer::WindowHandle, Renderer::Device, Renderer::DeviceContext, Renderer::SwapChain);
+
+			Loader::ProcessQueue();
+
+			s_TextureService->Advance();
+
+			s_UIContext->Render();
+		}
+
+		Renderer::FrameCounter++;
+
+		return Hooks::DXGIPresent(pChain, SyncInterval, Flags);
+	}
+
+	HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
+	{
+		assert(s_UIContext);
+		assert(s_NexusLink);
+		assert(s_EventApi);
+
+		s_UIContext->Shutdown();
+
+		/* Cache window dimensions */
+		Renderer::Width = Width;
+		Renderer::Height = Height;
+
+		if (s_NexusLink)
+		{
+			/* Already write to nexus link, as addons depend on that and the next frame isn't called yet so no update to values */
+			s_NexusLink->Width = Width;
+			s_NexusLink->Height = Height;
+		}
+
+		s_EventApi->Raise(EV_WINDOW_RESIZED);
+
+		return Hooks::DXGIResizeBuffers(pChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
+	}
+
 }

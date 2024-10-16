@@ -243,9 +243,6 @@
     <ClCompile Include="src\State.cpp">
       <Filter>_GLOBAL</Filter>
     </ClCompile>
-    <ClCompile Include="src\Hooks.cpp">
-      <Filter>_GLOBAL</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer.cpp">
       <Filter>_GLOBAL</Filter>
     </ClCompile>
@@ -483,9 +480,6 @@
       <Filter>_GLOBAL</Filter>
     </ClInclude>
     <ClInclude Include="src\Index.h">
-      <Filter>_GLOBAL</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Hooks.h">
       <Filter>_GLOBAL</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer.h">

@@ -4,9 +4,7 @@
 #include <string>
 
 #include "Main.h"
-
 #include "Consts.h"
-#include "Hooks.h"
 #include "Index.h"
 #include "Shared.h"
 #include "State.h"
@@ -139,8 +137,8 @@ namespace Proxy
 						//dxgi_present = hook_vtbl_fn(vtbl, 8, dxgi_present_hook);
 						//dxgi_resize_buffers = hook_vtbl_fn(vtbl, 13, dxgi_resize_buffers_hook);
 
-						MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[8]), (LPVOID)&Hooks::DXGIPresent, (LPVOID*)&Hooks::DXGI::Present);
-						MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[13]), (LPVOID)&Hooks::DXGIResizeBuffers, (LPVOID*)&Hooks::DXGI::ResizeBuffers);
+						MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[8]), (LPVOID)&Main::hkDXGIPresent, (LPVOID*)&Hooks::DXGIPresent);
+						MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[13]), (LPVOID)&Main::hkDXGIResizeBuffers, (LPVOID*)&Hooks::DXGIResizeBuffers);
 						MH_EnableHook(MH_ALL_HOOKS);
 
 						context->Release();

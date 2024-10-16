@@ -28,7 +28,6 @@
     <ClCompile Include="src\Services\Localization\Localization.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Events\EventHandler.cpp" />
-    <ClCompile Include="src\Hooks.cpp" />
     <ClCompile Include="src\thirdparty\ImAnimate\ImAnimate.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui_draw.cpp" />
@@ -115,7 +114,6 @@
     <ClInclude Include="src\Events\EventHandler.h" />
     <ClInclude Include="src\Events\EventSubscriber.h" />
     <ClInclude Include="src\Events\FuncDefs.h" />
-    <ClInclude Include="src\Hooks.h" />
     <ClInclude Include="src\thirdparty\httplib\httplib.h" />
     <ClInclude Include="src\thirdparty\ImAnimate\ImAnimate.h" />
     <ClInclude Include="src\thirdparty\imgui\imconfig.h" />
