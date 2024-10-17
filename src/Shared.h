@@ -23,9 +23,6 @@
 extern CApiClient*					RaidcoreAPI;
 extern CApiClient*					GitHubAPI;
 
-extern std::string					ChangelogText;
-extern bool							IsUpdateAvailable;
-
 extern bool							IsGameLaunchSequence;
 
 #endif

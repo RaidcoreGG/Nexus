@@ -77,13 +77,13 @@ void CUpdater::UpdateNexus()
 	// cache changelog for ingame window
 	if (!resVersion["Changelog"].is_null())
 	{
-		resVersion["Changelog"].get_to(ChangelogText);
+		resVersion["Changelog"].get_to(this->Changelog);
 	}
 
 	if (remoteVersion > currentVersion)
 	{
 		this->Logger->Info(CH_UPDATER, "Outdated: API replied with Version %s but installed is Version %s", remoteVersion.string().c_str(), currentVersion.string().c_str());
-		IsUpdateAvailable = true;
+		this->UpdateAvailable = true;
 
 		bool githubFailure = false;
 		/* get from github */
@@ -95,11 +95,11 @@ void CUpdater::UpdateNexus()
 		size_t bytesWritten = 0;
 		std::ofstream file(Index::F_UPDATE_DLL, std::ofstream::binary);
 		auto downloadResult = downloadClient.Get(endpointDownload,
-												 [&](const char* data, size_t data_length) {
-			file.write(data, data_length);
-			bytesWritten += data_length;
-			return true;
-		}
+			[&](const char* data, size_t data_length) {
+				file.write(data, data_length);
+				bytesWritten += data_length;
+				return true;
+			}
 		);
 		file.close();
 
@@ -397,6 +397,16 @@ bool CUpdater::InstallAddon(LibraryAddon* aAddon, bool aIsArcPlugin)
 	}
 
 	return false;
+}
+
+bool CUpdater::IsUpdateAvailable()
+{
+	return this->UpdateAvailable;
+}
+
+const std::string& CUpdater::GetChangelog()
+{
+	return this->Changelog;
 }
 
 bool CUpdater::UpdateRaidcore(int aCacheLifetimeOverride)
