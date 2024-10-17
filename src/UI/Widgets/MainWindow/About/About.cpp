@@ -19,6 +19,7 @@
 CAboutBox::CAboutBox()
 {
 	this->Name           = "About";
+	this->DisplayName    = "((000008))";
 	this->IconIdentifier = "ICON_ABOUT";
 	this->IconID         = RES_ICON_ABOUT;
 }

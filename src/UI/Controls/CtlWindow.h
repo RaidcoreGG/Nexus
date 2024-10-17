@@ -30,6 +30,12 @@ class IWindow
 	const std::string& GetName();
 
 	///----------------------------------------------------------------------------------------------------
+	/// GetDisplayName:
+	/// 	Returns the display name of the window.
+	///----------------------------------------------------------------------------------------------------
+	const std::string& GetDisplayName();
+
+	///----------------------------------------------------------------------------------------------------
 	/// Invalidate:
 	/// 	Invalidates all dynamic resources and refreshes them.
 	///----------------------------------------------------------------------------------------------------
@@ -43,6 +49,7 @@ class IWindow
 
 	protected:
 	std::string              Name;
+	std::string              DisplayName;
 	bool                     IsVisible = false;
 	bool                     IsInvalid = false;
 };

@@ -402,9 +402,6 @@
     <ClCompile Include="src\UI\Controls\CtlWindow.cpp">
       <Filter>UI\Controls</Filter>
     </ClCompile>
-    <ClCompile Include="src\UI\Widgets\MainWindow\Addons\AddonItem.cpp">
-      <Filter>UI\Widgets\MainWindow\Pages\Addons</Filter>
-    </ClCompile>
     <ClCompile Include="src\Util\CmdLine.cpp">
       <Filter>Util</Filter>
     </ClCompile>
@@ -1189,9 +1186,6 @@
     </ClInclude>
     <ClInclude Include="src\Remote.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\AddonItem.h">
-      <Filter>UI\Widgets\MainWindow\Pages\Addons</Filter>
     </ClInclude>
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\DisplayAddon.h">
       <Filter>UI\Widgets\MainWindow\Pages\Addons</Filter>

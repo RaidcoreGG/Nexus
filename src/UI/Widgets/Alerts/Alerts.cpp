@@ -35,7 +35,7 @@ void CAlerts::Render()
 
 		/* center horizontally */
 		ImGui::SetNextWindowPos(ImVec2((Renderer::Width - width) / 2.0f, 230.0f * Renderer::Scaling));
-		if (ImGui::Begin("##alerts", (bool*)0, ImGuiWindowFlags_NoDecoration |
+		if (ImGui::Begin("##Alerts", (bool*)0, ImGuiWindowFlags_NoDecoration |
 			ImGuiWindowFlags_NoInputs |
 			ImGuiWindowFlags_NoNav |
 			ImGuiWindowFlags_AlwaysAutoResize |

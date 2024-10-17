@@ -17,6 +17,7 @@
 CLogWindow::CLogWindow()
 {
 	this->Name           = "Log";
+	this->DisplayName    = "((000006))";
 	this->IconIdentifier = "ICON_LOG";
 	this->IconID         = RES_ICON_LOG;
 	this->LogLevel       = ELogLevel::ALL;
@@ -34,7 +35,7 @@ void CLogWindow::RenderContent()
 	float off2 = ImGui::CalcTextSize("XXXXXXXXXXX").x;
 
 	ImGui::Text("Filter: "); ImGui::SameLine();
-	ImGui::Combo("##filterLogLevel", &selectedLevel, filterLevels, IM_ARRAYSIZE(filterLevels));
+	ImGui::Combo("##Filter_LogLevel", &selectedLevel, filterLevels, IM_ARRAYSIZE(filterLevels));
 
 	ELogLevel filterLevel = (ELogLevel)(selectedLevel + 1);
 
@@ -45,7 +46,7 @@ void CLogWindow::RenderContent()
 
 	ImGui::Separator();
 	{
-		ImGui::BeginChild("logchannels", ImVec2(windowWidthQuarter, 0.0f));
+		ImGui::BeginChild("##LogChannels", ImVec2(windowWidthQuarter, 0.0f));
 
 		ImGui::Text("Channel:");
 
@@ -111,7 +112,7 @@ void CLogWindow::RenderContent()
 			size_t start = 0;
 			if (displayedEntries.size() > 400) { start = displayedEntries.size() - 400; }
 
-			if (ImGui::BeginTable("##logmessages_table", 3, ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_SizingFixedFit))
+			if (ImGui::BeginTable("##LogMessages", 3, ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_SizingFixedFit))
 			{
 				for (size_t i = start; i < displayedEntries.size(); i++)
 				{

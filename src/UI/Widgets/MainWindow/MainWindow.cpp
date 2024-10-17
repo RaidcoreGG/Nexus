@@ -104,6 +104,8 @@ void CMainWindow::Render()
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(minWidth * .5f, minHeight * .5f));
 	if (ImGui::Begin("Nexus", (bool*)0, Flags | (this->IsHandleHeld ? 0 : ImGuiWindowFlags_NoMove)))
 	{
+		static CContext* ctx = CContext::GetContext();
+
 		float wndWidth = ImGui::GetWindowWidth();
 		float contentHeight = ImGui::GetWindowHeight() - headerHeight;
 		float contentWidth = wndWidth - sidebarWidth_Collapsed;
@@ -139,10 +141,10 @@ void CMainWindow::Render()
 
 		ImGui::PushClipRect(contentP1, contentP2, false);
 		ImGui::SetCursorPos(ImVec2(sidebarWidth_Collapsed, headerHeight));
-		if (ImGui::BeginChild("Nexus##mainwindow_content", ImVec2(contentWidth, contentHeight - footerHeight)))
+		if (ImGui::BeginChild("Nexus##Main_Content", ImVec2(contentWidth, contentHeight - footerHeight)))
 		{
 			ImGui::SetCursorPos(padding);
-			if (ImGui::BeginChild("Nexus##mainwindow_contentinner", ImVec2(contentWidth - (padding.x * 2), contentHeight - footerHeight - (padding.y * 2))))
+			if (ImGui::BeginChild("Nexus##Main_ContentInner", ImVec2(contentWidth - (padding.x * 2), contentHeight - footerHeight - (padding.y * 2))))
 			{
 				if (this->ActiveContent)
 				{
@@ -158,7 +160,7 @@ void CMainWindow::Render()
 		ImGui::EndChild();
 
 		ImGui::SetCursorPos(ImVec2(sidebarWidth_Collapsed, headerHeight + contentHeight - footerHeight));
-		if (ImGui::BeginChild("Nexus##mainwindow_footer", ImVec2(contentWidth, footerHeight), false, Flags))
+		if (ImGui::BeginChild("Nexus##Main_Footer", ImVec2(contentWidth, footerHeight), false, Flags))
 		{
 			ImGui::SetCursorPos(ImVec2(0, 0));
 			ImGui::Separator();
@@ -171,7 +173,7 @@ void CMainWindow::Render()
 
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::GetColorU32(ImGuiCol_TitleBgCollapsed));
 		ImGui::SetCursorPos(ImVec2(0, headerHeight));
-		if (ImGui::BeginChild("Nexus##mainwindow_sidebar", ImVec2(renderedSidebarWidth, contentHeight)))
+		if (ImGui::BeginChild("Nexus##Main_Sidebar", ImVec2(renderedSidebarWidth, contentHeight)))
 		{
 			ImVec2 navItemSz = ImVec2(renderedSidebarWidth - (padding.x * 2), headerHeight);
 			float navX = padding.x;
@@ -207,6 +209,8 @@ void CMainWindow::Render()
 				//navY += navItemSz.y + padding.y;
 			}
 			
+			static CLocalization* langApi = ctx->GetLocalization();
+
 			/* Dynamic Nav Items */
 			for (ISubWindow* window : this->Windows)
 			{
@@ -223,7 +227,8 @@ void CMainWindow::Render()
 					}
 					else
 					{
-						ImGui::SetWindowFocus(window->GetName().c_str());
+						std::string wndName = langApi->Translate(window->GetDisplayName().c_str());
+						ImGui::SetWindowFocus((wndName + "##" + window->GetName()).c_str());
 					}
 				}
 				ImGui::PopStyleVar();
@@ -236,7 +241,7 @@ void CMainWindow::Render()
 				}
 
 				ImGui::SetCursorPos(ImVec2(navX + navItemSz.y + padding.x, navY + ((navItemSz.y - ImGui::GetTextLineHeight()) / 2)));
-				ImGui::TextColored(navTextCol, window->GetName().c_str());
+				ImGui::TextColored(navTextCol, langApi->Translate(window->GetDisplayName().c_str()));
 
 				navY += navItemSz.y + padding.y;
 			}
@@ -244,7 +249,6 @@ void CMainWindow::Render()
 			ImVec4 colDisabled = ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled);
 			colDisabled.w = navTextAlpha;
 			float lineHeight = ImGui::GetTextLineHeightWithSpacing();
-			CContext* ctx = CContext::GetContext();
 			
 			ImGui::SetCursorPos(ImVec2(navX, contentHeight - padding.y - (lineHeight * 2)));
 			ImGui::TextColored(colDisabled, ctx->GetVersion().string().c_str());
@@ -279,7 +283,7 @@ void CMainWindow::Render()
 
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, style.Colors[ImGuiCol_TitleBgActive]);
 		ImGui::SetCursorPos(ImVec2(0, 0));
-		if (ImGui::BeginChild("Nexus##mainwindow_header", ImVec2(wndWidth, headerHeight), false, Flags))
+		if (ImGui::BeginChild("Nexus##Main_Header", ImVec2(wndWidth, headerHeight), false, Flags))
 		{
 			if (this->Tex_RaidcoreTag)
 			{
@@ -297,7 +301,6 @@ void CMainWindow::Render()
 			}
 			else
 			{
-				CContext* ctx = CContext::GetContext();
 				this->Tex_RaidcoreTag = ctx->GetTextureService()->GetOrCreate("RAIDCORE_TAG", RES_ICON_RAIDCORE, ctx->GetModule());
 			}
 
@@ -316,7 +319,6 @@ void CMainWindow::Render()
 			}
 			else
 			{
-				CContext* ctx = CContext::GetContext();
 				this->Tex_CloseIcon = ctx->GetTextureService()->GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx->GetModule());
 			}
 		}

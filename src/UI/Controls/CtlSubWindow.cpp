@@ -28,7 +28,16 @@ void ISubWindow::Render()
 
 	if (popout)
 	{
-		ImGui::Begin(this->Name.c_str(), &this->IsPoppedOut, ImGuiWindowFlags_NoCollapse);
+		static CContext* ctx = CContext::GetContext();
+		static CLocalization* langApi = ctx->GetLocalization();
+
+		std::string wndName = langApi->Translate(this->DisplayName.c_str());
+
+		static float minWidth = 1000.f;
+		static float minHeight = 600.f + ImGui::GetFontSize() * 2;
+
+		ImGui::SetNextWindowSize(ImVec2(minWidth, minHeight), ImGuiCond_FirstUseEver);
+		ImGui::Begin((wndName + "##" + this->Name).c_str(), &this->IsPoppedOut, ImGuiWindowFlags_NoCollapse);
 	}
 
 	float width = ImGui::GetWindowWidth();

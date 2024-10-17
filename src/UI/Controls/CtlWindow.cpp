@@ -13,6 +13,11 @@ const std::string& IWindow::GetName()
 	return this->Name;
 }
 
+const std::string& IWindow::GetDisplayName()
+{
+	return this->DisplayName;
+}
+
 void IWindow::Invalidate()
 {
 	this->IsInvalid = true;

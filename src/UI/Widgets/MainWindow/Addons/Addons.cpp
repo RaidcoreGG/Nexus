@@ -41,6 +41,7 @@ void OnAddonLoadUnload(void* aEventData)
 CAddonsWindow::CAddonsWindow()
 {
 	this->Name           = "Addons";
+	this->DisplayName    = "((000003))";
 	this->IconIdentifier = "ICON_ADDONS";
 	this->IconID         = RES_ICON_ADDONS;
 	this->IsHost         = true;
@@ -110,7 +111,7 @@ void CAddonsWindow::AddonItem(AddonItemData aAddonData, float aWidth)
 	}
 
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1);
-	if (ImGui::BeginChild(("##addonlisting_" + sig).c_str(), itemSz, true))
+	if (ImGui::BeginChild(("##AddonItem_" + sig).c_str(), itemSz, true))
 	{
 		//if (ImGui::BeginChild("##addonlisting_info", ImVec2(itemSz.x - (style.WindowPadding.x * 2) - actionsAreaWidth, 0)))
 		
@@ -240,7 +241,7 @@ void CAddonsWindow::AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalle
 	}
 
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1);
-	if (ImGui::BeginChild(("##addonlisting_" + sig).c_str(), itemSz, true))
+	if (ImGui::BeginChild(("##AddonItem_" + sig).c_str(), itemSz, true))
 	{
 		//if (ImGui::BeginChild("##addonlisting_info", ImVec2(itemSz.x - (style.WindowPadding.x * 2) - actionsAreaWidth, 0)))
 
@@ -515,10 +516,10 @@ void CAddonsWindow::RenderContent()
 			if (this->Addons.size() == 0)
 			{
 				ImVec2 windowSize = ImGui::GetWindowSize();
-				ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((No items matching filter.))"));
+				ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((000098))"));
 				ImVec2 position = ImGui::GetCursorPos();
 				ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-				ImGui::TextDisabled(langApi->Translate("((No items matching filter.))"));
+				ImGui::TextDisabled(langApi->Translate("((000098))"));
 			}
 			else
 			{
@@ -581,10 +582,10 @@ void CAddonsWindow::RenderContent()
 			if (this->Library.size() == 0 || downloadable == 0)
 			{
 				ImVec2 windowSize = ImGui::GetWindowSize();
-				ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((No items matching filter.))"));
+				ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((000098))"));
 				ImVec2 position = ImGui::GetCursorPos();
 				ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-				ImGui::TextDisabled(langApi->Translate("((No items matching filter.))"));
+				ImGui::TextDisabled(langApi->Translate("((000098))"));
 			}
 		}
 		else if (quickFilterMode == 2)
@@ -631,19 +632,19 @@ void CAddonsWindow::RenderContent()
 				if (this->ArcLibrary.size() == 0 || downloadable == 0)
 				{
 					ImVec2 windowSize = ImGui::GetWindowSize();
-					ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((No items matching filter.))"));
+					ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((000098))"));
 					ImVec2 position = ImGui::GetCursorPos();
 					ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-					ImGui::TextDisabled(langApi->Translate("((No items matching filter.))"));
+					ImGui::TextDisabled(langApi->Translate("((000098))"));
 				}
 			}
 			else
 			{
 				ImVec2 windowSize = ImGui::GetWindowSize();
-				ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((No items matching filter.))"));
+				ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((000098))"));
 				ImVec2 position = ImGui::GetCursorPos();
 				ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-				ImGui::TextDisabled(langApi->Translate("((No items matching filter.))"));
+				ImGui::TextDisabled(langApi->Translate("((000098))"));
 			}
 		}
 	}
@@ -787,9 +788,9 @@ void CAddonsWindow::RenderDetails()
 	ImVec2 initial = ImGui::GetCursorPos();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-	if (ImGui::BeginChild("##details_collapse", ImVec2(btnSz, 0)))
+	if (ImGui::BeginChild("##Addons_Details_Collapse", ImVec2(btnSz, 0)))
 	{
-		if (ImGui::Button("##cleardetails", ImGui::GetWindowSize()))
+		if (ImGui::Button("##ClearDetails", ImGui::GetWindowSize()))
 		{
 			this->ClearContent();
 		}
@@ -799,7 +800,7 @@ void CAddonsWindow::RenderDetails()
 
 	ImGui::SameLine();
 
-	if (ImGui::BeginChild("##details_content"))
+	if (ImGui::BeginChild("##Addons_Details_Content"))
 	{
 		static CContext* ctx = CContext::GetContext();
 		static CLocalization* langApi = ctx->GetLocalization();
@@ -814,7 +815,8 @@ void CAddonsWindow::RenderDetails()
 		// helper variable in case we unload or do anything else that might modify the callback before ->Invalidate() is invoked
 		bool skipOptions = false;
 
-		std::string headerStr = langApi->Translate("((Configuring)): ");
+		std::string headerStr = langApi->Translate("((000099))");
+		headerStr.append(" ");
 		headerStr.append(addonData.NexusAddon->Definitions->Name);
 
 		if (ImGui::CollapsingHeader(headerStr.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
@@ -944,10 +946,10 @@ void CAddonsWindow::RenderDetails()
 		if (!(addonData.NexusAddon->State == EAddonState::Loaded || addonData.NexusAddon->State == EAddonState::LoadedLOCKED))
 		{
 			ImVec2 windowSize = ImGui::GetWindowSize();
-			ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((Load addon to configure binds and options.))"));
+			ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((000100))"));
 			ImVec2 position = ImGui::GetCursorPos();
 			ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-			ImGui::TextDisabled(langApi->Translate("((Load addon to configure binds and options.))"));
+			ImGui::TextDisabled(langApi->Translate("((000100))"));
 		}
 		else
 		{
@@ -1008,7 +1010,7 @@ void CAddonsWindow::RenderInputBindsTable(const std::map<std::string, InputBindP
 
 				this->ModalTitle = langApi->Translate("((000062))");
 				this->ModalTitle.append(langApi->Translate(this->Editing_Identifier.c_str()));
-				this->ModalTitle.append("###inputbind_setter_modal_addons");
+				this->ModalTitle.append("##InputBindSetter_Addons");
 			}
 			ImGui::PopID();
 		}

@@ -33,6 +33,7 @@ static void DebugWindow_OnInputBind(const char* aIdentifier)
 CDebugWindow::CDebugWindow()
 {
 	this->Name           = "Debug";
+	this->DisplayName    = "((000007))";
 	this->IconIdentifier = "ICON_DEBUG";
 	this->IconID         = RES_ICON_DEBUG;
 	this->IsHost         = true; /* set to true to enable RenderSubWindows() call*/

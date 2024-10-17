@@ -26,6 +26,7 @@ constexpr ImGuiWindowFlags ModalFlags = ImGuiWindowFlags_AlwaysAutoResize |
 CBindsWindow::CBindsWindow()
 {
 	this->Name           = "Binds";
+	this->DisplayName    = "((000060))";
 	this->IconIdentifier = "ICON_BINDS";
 	this->IconID         = RES_ICON_BINDS;
 	this->IsHost         = true;
@@ -145,7 +146,7 @@ void CBindsWindow::RenderInputBindsTable(const std::map<std::string, InputBindPa
 
 				this->ModalTitle = langApi->Translate("((000062))");
 				this->ModalTitle.append(langApi->Translate(this->Editing_Identifier.c_str()));
-				this->ModalTitle.append("###inputbind_setter_modal");
+				this->ModalTitle.append("##InputBindSetter");
 			}
 			ImGui::PopID();
 
@@ -190,7 +191,7 @@ void CBindsWindow::RenderGameInputBindsTable(const std::map<EGameBinds, GameInpu
 
 				this->ModalTitle = langApi->Translate("((000062))");
 				this->ModalTitle.append(langApi->Translate(CGameBindsApi::ToString(this->Editing_GameIdentifier).c_str()));
-				this->ModalTitle.append("###inputbind_setter_modal");
+				this->ModalTitle.append("##InputBindSetter");
 			}
 			ImGui::PopID();
 		}

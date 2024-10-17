@@ -280,7 +280,7 @@ void CQuickAccess::Render()
 					ImGui::Text(this->Language->Translate(shortcut.TooltipText.c_str()));
 					if (shortcut.ContextItems.size() > 0)
 					{
-						ImGui::TextDisabled(this->Language->Translate("((Right-Click for more options.))"));
+						ImGui::TextDisabled(this->Language->Translate("((000102))"));
 					}
 					ImGui::EndTooltip();
 				}

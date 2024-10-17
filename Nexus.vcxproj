@@ -68,7 +68,6 @@
     <ClCompile Include="src\UI\Widgets\Alerts\Alerts.cpp" />
     <ClCompile Include="src\UI\Widgets\EULA\EULAModal.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\About\About.cpp" />
-    <ClCompile Include="src\UI\Widgets\MainWindow\Addons\AddonItem.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\Addons\Addons.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\Binds\Binds.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\Debug\Debug.cpp" />
@@ -328,7 +327,6 @@
     <ClInclude Include="src\UI\Widgets\Alerts\FuncDefs.h" />
     <ClInclude Include="src\UI\Widgets\EULA\EULAModal.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\About\About.h" />
-    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\AddonItem.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\Addons.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\DisplayAddon.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Binds\Binds.h" />

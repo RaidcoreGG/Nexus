@@ -21,6 +21,7 @@
 COptionsWindow::COptionsWindow()
 {
 	this->Name           = "Options";
+	this->DisplayName    = "((000004))";
 	this->IconIdentifier = "ICON_OPTIONS";
 	this->IconID         = RES_ICON_OPTIONS;
 
@@ -63,7 +64,7 @@ void COptionsWindow::TabGeneral()
 				std::string activeLang = langApi->GetActiveLanguage();
 
 				/* selector dropdown */
-				if (ImGui::BeginCombo("##languageselector", activeLang.c_str()))
+				if (ImGui::BeginCombo("##LanguageSelector", activeLang.c_str()))
 				{
 					for (std::string lang : langApi->GetLanguages())
 					{
@@ -100,7 +101,7 @@ void COptionsWindow::TabGeneral()
 				}
 
 				static bool disableFestiveFlair = settingsctx->Get<bool>(OPT_DISABLEFESTIVEFLAIR);
-				if (ImGui::Checkbox(langApi->Translate("((Disable festive flair))"), &disableFestiveFlair))
+				if (ImGui::Checkbox(langApi->Translate("((000101))"), &disableFestiveFlair))
 				{
 					settingsctx->Set(OPT_DISABLEFESTIVEFLAIR, disableFestiveFlair);
 				}
@@ -122,7 +123,7 @@ void COptionsWindow::TabGeneral()
 				EQAVisibility newQaVis = qactx->Visibility;
 
 				ImGui::Text(langApi->Translate("((000097))"));
-				if (ImGui::BeginCombo("##qavisibility", langApi->Translate(qaVisStr.c_str())))
+				if (ImGui::BeginCombo("##QAVisibilitySelector", langApi->Translate(qaVisStr.c_str())))
 				{
 					if (ImGui::Selectable(langApi->Translate("((000047))"), qaVisStr == "((000047))"))
 					{
@@ -168,7 +169,7 @@ void COptionsWindow::TabGeneral()
 
 				/* position/location dropdown */
 				ImGui::Text(langApi->Translate("((000050))"));
-				if (ImGui::BeginCombo("##qalocation", langApi->Translate(qaPosStr.c_str())))
+				if (ImGui::BeginCombo("##QALocationSelector", langApi->Translate(qaPosStr.c_str())))
 				{
 					if (ImGui::Selectable(langApi->Translate("((000067))"), qaPosStr == "((000067))"))
 					{
@@ -199,7 +200,7 @@ void COptionsWindow::TabGeneral()
 
 				/* offset */
 				ImGui::Text(langApi->Translate("((000051))"));
-				if (ImGui::DragFloat2("##qaoffset", (float*)&qactx->Offset, 1.0f, (static_cast<int>(Renderer::Height)) * -1, static_cast<int>(Renderer::Height)))
+				if (ImGui::DragFloat2("##QAOffsetInput", (float*)&qactx->Offset, 1.0f, (static_cast<int>(Renderer::Height)) * -1, static_cast<int>(Renderer::Height)))
 				{
 					settingsctx->Set(OPT_QAOFFSETX, qactx->Offset.x);
 					settingsctx->Set(OPT_QAOFFSETY, qactx->Offset.y);
@@ -229,7 +230,7 @@ void COptionsWindow::TabStyle()
 
 			ImGui::BeginGroupPanel(langApi->Translate("((000092))"), ImVec2(-1.0f, 0.0f));
 			static std::string fontFile = settingsctx->Get<std::string>(OPT_USERFONT);
-			if (ImGui::BeginCombo("##fontselector", fontFile.c_str()))
+			if (ImGui::BeginCombo("##FontSelector", fontFile.c_str()))
 			{
 				long long now = Time::GetTimestamp();
 
@@ -259,7 +260,7 @@ void COptionsWindow::TabStyle()
 			ImGuiContext* imguictx = ImGui::GetCurrentContext();
 
 			ImGui::BeginGroupPanel(langApi->Translate("((000054))"), ImVec2(-1.0f, 0.0f));
-			if (ImGui::InputFloat("##fontsize", &imguictx->FontSize, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_EnterReturnsTrue))
+			if (ImGui::InputFloat("##FontSizeInput", &imguictx->FontSize, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_EnterReturnsTrue))
 			{
 				imguictx->FontSize = min(max(imguictx->FontSize, 1.0f), 50.0f);
 
@@ -273,7 +274,7 @@ void COptionsWindow::TabStyle()
 
 			ImGuiIO& io = ImGui::GetIO();
 			ImGui::BeginGroupPanel(langApi->Translate("((000072))"), ImVec2(-1.0f, 0.0f));
-			if (ImGui::DragFloat("##globalscale", &io.FontGlobalScale, 0.005f, 0.75f, 3.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp))
+			if (ImGui::DragFloat("##GlobalScaleInput", &io.FontGlobalScale, 0.005f, 0.75f, 3.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp))
 			{
 				settingsctx->Set(OPT_GLOBALSCALE, io.FontGlobalScale);
 				float uiScale = settingsctx->Get<float>(OPT_LASTUISCALE);
@@ -300,13 +301,13 @@ void COptionsWindow::TabStyle()
 			{
 				ImGuiStyle& style = ImGui::GetStyle();
 
-				ImGui::Text("((Select from preset:))");
-				if (ImGui::BeginCombo("##stylepreset", nullptr))
+				ImGui::Text("Select from preset:");
+				if (ImGui::BeginCombo("##StylePresetSelector", nullptr))
 				{
-					if (ImGui::Selectable("Nexus"))
+					/*if (ImGui::Selectable("Nexus"))
 					{
 						uictx->ApplyStyle(EUIStyle::Nexus);
-					}
+					}*/
 					if (ImGui::Selectable("ImGui Classic"))
 					{
 						uictx->ApplyStyle(EUIStyle::ImGui_Classic);
