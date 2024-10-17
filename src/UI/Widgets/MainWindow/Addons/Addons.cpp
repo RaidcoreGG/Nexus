@@ -790,14 +790,26 @@ void CAddonsWindow::RenderDetails()
 
 	static Texture* chevronRt = nullptr;
 
-	ImVec2 initial = ImGui::GetCursorPos();
-
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	if (ImGui::BeginChild("##Addons_Details_Collapse", ImVec2(btnSz, 0)))
 	{
+		ImVec2 initial = ImGui::GetCursorPos();
+
 		if (ImGui::Button("##ClearDetails", ImGui::GetWindowSize()))
 		{
 			this->ClearContent();
+		}
+
+		if (chevronRt)
+		{
+			ImGui::SetCursorPos(ImVec2(initial.x, (ImGui::GetWindowHeight() - btnSz) / 2));
+			ImGui::Image(chevronRt->Resource, ImVec2(btnSz, btnSz));
+		}
+		else
+		{
+			CContext* ctx = CContext::GetContext();
+			CTextureLoader* textureApi = ctx->GetTextureService();
+			chevronRt = textureApi->GetOrCreate("ICON_CHEVRON_RT", RES_ICON_CHEVRON_RT, ctx->GetModule());
 		}
 	}
 	ImGui::EndChild();
@@ -976,18 +988,6 @@ void CAddonsWindow::RenderDetails()
 		}
 	}
 	ImGui::EndChild();
-
-	if (chevronRt)
-	{
-		ImGui::SetCursorPos(ImVec2(initial.x, (ImGui::GetWindowHeight() - btnSz) / 2));
-		ImGui::Image(chevronRt->Resource, ImVec2(btnSz, btnSz));
-	}
-	else
-	{
-		CContext* ctx = CContext::GetContext();
-		CTextureLoader* textureApi = ctx->GetTextureService();
-		chevronRt = textureApi->GetOrCreate("ICON_CHEVRON_RT", RES_ICON_CHEVRON_RT, ctx->GetModule());
-	}
 }
 
 void CAddonsWindow::RenderInputBindsTable(const std::map<std::string, InputBindPacked>& aInputBinds)
