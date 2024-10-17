@@ -231,6 +231,7 @@ void COptionsWindow::TabStyle()
 
 			ImGui::BeginGroupPanel(langApi->Translate("((000092))"), ImVec2(-1.0f, 0.0f));
 			static std::string fontFile = settingsctx->Get<std::string>(OPT_USERFONT);
+			if (fontFile.empty()) { fontFile = "Default"; }
 			if (ImGui::BeginCombo("##FontSelector", fontFile.c_str()))
 			{
 				long long now = Time::GetTimestamp();
