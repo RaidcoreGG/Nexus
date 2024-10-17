@@ -20,6 +20,9 @@
 
 namespace Proxy
 {
+	static HMODULE s_D3D11Handle;
+	static HMODULE s_D3D11SystemHandle;
+
 	// CreateDevice defined in d3d11.h
 	// CreateDeviceAndSwapChain defined in d3d11.h
 	typedef HRESULT(WINAPI* PFN_D3D11_CORE_CREATE_DEVICE)(IDXGIFactory*, IDXGIAdapter*, UINT, const D3D_FEATURE_LEVEL*, UINT, ID3D11Device**);
@@ -74,9 +77,9 @@ namespace Proxy
 						State::IsChainloading = true;
 
 						std::string strChainload = Index::F_CHAINLOAD_DLL.string();
-						D3D11Handle = LoadLibraryA(strChainload.c_str());
+						s_D3D11Handle = LoadLibraryA(strChainload.c_str());
 
-						if (D3D11Handle)
+						if (s_D3D11Handle)
 						{
 							logger->Info(CH_CORE, "Loaded Chainload DLL: %s", strChainload.c_str());
 						}
@@ -84,7 +87,7 @@ namespace Proxy
 				}
 			}
 
-			if (!D3D11Handle)
+			if (!s_D3D11Handle)
 			{
 				if (State::IsChainloading)
 				{
@@ -93,9 +96,9 @@ namespace Proxy
 				}
 
 				std::string strSystem = Index::F_SYSTEM_DLL.string();
-				D3D11Handle = LoadLibraryA(strSystem.c_str());
+				s_D3D11Handle = LoadLibraryA(strSystem.c_str());
 
-				assert(D3D11Handle && "Could not load system d3d11.dll");
+				assert(s_D3D11Handle && "Could not load system d3d11.dll");
 
 				logger->Info(CH_CORE, "Loaded System DLL: %s", strSystem.c_str());
 			}
@@ -155,7 +158,7 @@ namespace Proxy
 			}
 		}
 
-		if (!D3D11Handle)
+		if (!s_D3D11Handle)
 		{
 			logger->Critical(CH_CORE, "Could not acquire D3D11 handle.");
 			return false;
@@ -187,15 +190,15 @@ namespace Proxy
 		{
 			logger->Warning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 
-			if (!D3D11SystemHandle)
+			if (!s_D3D11SystemHandle)
 			{
 				std::string strSystem = Index::F_SYSTEM_DLL.string();
-				D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
+				s_D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
 			}
 
 			*aFunction = nullptr;
 
-			if (DLL::FindFunction(D3D11SystemHandle, aFunction, aName) == false)
+			if (DLL::FindFunction(s_D3D11SystemHandle, aFunction, aName) == false)
 			{
 				return false;
 			}
@@ -210,7 +213,7 @@ namespace Proxy
 		/* Proxy the function. */
 		if (*aFunction == nullptr)
 		{
-			if (DLL::FindFunction(D3D11Handle, aFunction, aName) == false)
+			if (DLL::FindFunction(s_D3D11Handle, aFunction, aName) == false)
 			{
 				return false;
 			}

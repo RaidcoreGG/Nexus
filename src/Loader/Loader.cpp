@@ -73,7 +73,8 @@ namespace Loader
 		ELoaderAction
 	>							QueuedAddons;
 	std::vector<Addon*>			Addons;
-	std::map<int, AddonAPI*>	ApiDefs;
+	bool						HasCustomConfig = false;
+	std::vector<signed int>		RequestedAddons;
 
 	int							DirectoryChangeCountdown = 0;
 	std::condition_variable		ConVar;
@@ -111,6 +112,8 @@ namespace Loader
 
 		if (CmdLine::HasArgument("-ggaddons"))
 		{
+			HasCustomConfig = true;
+
 			std::vector<std::string> idList = String::Split(CmdLine::GetArgumentValue("-ggaddons"), ",");
 
 			/* if -ggaddons param is config path, else it's id list*/

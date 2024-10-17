@@ -34,7 +34,7 @@ namespace Loader
 		ELoaderAction
 	>									QueuedAddons;					/* To be loaded or unloaded addons */
 	extern std::vector<Addon*>			Addons;
-	extern std::map<int, AddonAPI*>		ApiDefs;						/* Addon API definitions, created on demand */
+	extern bool							HasCustomConfig;
 
 	extern int							DirectoryChangeCountdown;
 	extern std::condition_variable		ConVar;

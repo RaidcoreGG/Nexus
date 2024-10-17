@@ -764,21 +764,29 @@ void CUiContext::LoadFonts()
 	EulaAccepted = settingsctx->Get<bool>(OPT_ACCEPTEULA);
 
 	/* add user font */
+	bool hasUserFont = false;
+
 	std::string fontFile = settingsctx->Get<std::string>(OPT_USERFONT);
 	if (!fontFile.empty() && std::filesystem::exists(Index::D_GW2_ADDONS_NEXUS_FONTS / fontFile))
 	{
 		fontPath = Index::D_GW2_ADDONS_NEXUS_FONTS / fontFile;
 		this->FontManager->ReplaceFont("USER_FONT", this->ImGuiContext->FontSize, fontPath.string().c_str(), UIRoot::FontReceiver, nullptr);
+		hasUserFont = true;
 	}
 	else if (settingsctx->Get<bool>(OPT_LINKARCSTYLE) && std::filesystem::exists(Index::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf"))
 	{
 		fontPath = Index::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf";
 		this->FontManager->ReplaceFont("USER_FONT", this->ImGuiContext->FontSize, fontPath.string().c_str(), UIRoot::FontReceiver, nullptr);
+		hasUserFont = true;
 	}
 
 	/* add default font for monospace */
 	this->FontManager->AddDefaultFont(UIRoot::FontReceiver);
-	this->FontManager->ResizeFont("FONT_DEFAULT", this->ImGuiContext->FontSize);
+
+	if (!hasUserFont)
+	{
+		this->FontManager->ResizeFont("FONT_DEFAULT", this->ImGuiContext->FontSize);
+	}
 
 	ImFontConfig config;
 	config.MergeMode = true;

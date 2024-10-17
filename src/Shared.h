@@ -20,16 +20,6 @@
 
 #include "imgui/imgui.h"
 
-extern HMODULE						D3D11Handle;
-extern HMODULE						D3D11SystemHandle;
-
-extern std::vector<std::string>		Parameters;
-extern std::vector<signed int>		RequestedAddons;
-
-extern ImGuiWindowFlags				WindowFlags_Default;
-extern ImGuiWindowFlags				WindowFlags_Overlay;
-extern ImGuiWindowFlags				WindowFlags_Watermark;
-
 extern CApiClient*					RaidcoreAPI;
 extern CApiClient*					GitHubAPI;
 

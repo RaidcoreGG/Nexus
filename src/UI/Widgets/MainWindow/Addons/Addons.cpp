@@ -149,7 +149,7 @@ void CAddonsWindow::AddonItem(AddonItemData aAddonData, float aWidth)
 					Loader::QueueAddon(ELoaderAction::Unload, aAddonData.NexusAddon->Path);
 				}
 			}
-			if (RequestedAddons.size() > 0)
+			if (Loader::HasCustomConfig)
 			{
 				ImGui::TooltipGeneric(langApi->Translate("((000021))"));
 			}
@@ -158,7 +158,7 @@ void CAddonsWindow::AddonItem(AddonItemData aAddonData, float aWidth)
 		{
 			std::string additionalInfo;
 
-			if (RequestedAddons.size() > 0)
+			if (Loader::HasCustomConfig)
 			{
 				additionalInfo.append("\n");
 				additionalInfo.append(langApi->Translate("((000021))"));
@@ -199,7 +199,7 @@ void CAddonsWindow::AddonItem(AddonItemData aAddonData, float aWidth)
 				aAddonData.NexusAddon->IsDisabledUntilUpdate = false; // explicitly loaded
 				Loader::QueueAddon(ELoaderAction::Load, aAddonData.NexusAddon->Path);
 			}
-			if (RequestedAddons.size() > 0)
+			if (Loader::HasCustomConfig)
 			{
 				ImGui::TooltipGeneric(langApi->Translate("((000021))"));
 			}
