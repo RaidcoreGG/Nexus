@@ -88,16 +88,15 @@ void CMainWindow::Render()
 	ImGuiStyle& style = ImGui::GetStyle();
 	ImVec2 padding = style.WindowPadding;
 
-	float fontScaleFactor = ImGui::GetTextLineHeight() / 16.f;
-	float headerHeight = ImGui::GetTextLineHeight() * 2;
-	float footerHeight = ImGui::GetTextLineHeight() * 1.5f;
+	float headerHeight = ImGui::GetFontSize() * 2;
+	float footerHeight = ImGui::GetFontSize() * 1.5f;
 	float sidebarWidth_Collapsed = (padding.x * 2) + headerHeight;
-	float sidebarWidth_Expanded = 250.f * fontScaleFactor;
+	float sidebarWidth_Expanded = 250.f;
 
 	bool poppedPadding = false;
 
-	float minWidth = 1000.f * fontScaleFactor;
-	float minHeight = (600.f * fontScaleFactor) + headerHeight;
+	float minWidth = 1000.f;
+	float minHeight = 600.f + headerHeight;
 
 	/* render main window */
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));

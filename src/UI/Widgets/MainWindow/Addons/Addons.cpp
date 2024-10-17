@@ -340,8 +340,7 @@ void CAddonsWindow::AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalle
 
 		if (noticeIcon)
 		{
-			float fontScaleFactor = ImGui::GetFontSize() / 16.0f;
-			float btnSz = 28.0f * fontScaleFactor * 0.75f;
+			float btnSz = ImGui::GetFontSize() * 1.5f;
 
 			ImGui::SetCursorPos(ImVec2(aWidth - btnSz, 0));
 			if (ImGui::IconButton(noticeIcon->Resource, ImVec2(btnSz, btnSz)))
@@ -434,8 +433,7 @@ void CAddonsWindow::RenderContent()
 
 	if (!this->IsPoppedOut)
 	{
-		float fontScaleFactor = ImGui::GetFontSize() / 16.0f;
-		float btnSz = 28.0f * fontScaleFactor * 0.75f;
+		float btnSz = ImGui::GetFontSize() * 1.5f;
 		filterAreaSz.x = region.x - style.ItemSpacing.x - btnSz - style.ItemSpacing.x;
 	}
 
@@ -782,8 +780,7 @@ void CAddonsWindow::RenderDetails()
 
 	ImGuiStyle& style = ImGui::GetStyle();
 
-	float fontScaleFactor = ImGui::GetFontSize() / 16.0f;
-	float btnSz = 28.0f * fontScaleFactor * 0.75f;
+	float btnSz = ImGui::GetFontSize() * 1.5f;
 
 	static Texture* chevronRt = nullptr;
 
@@ -812,8 +809,7 @@ void CAddonsWindow::RenderDetails()
 
 		ImGuiStyle& style = ImGui::GetStyle();
 
-		float fontScaleFactor = ImGui::GetFontSize() / 16.0f;
-		float btnSz = 28.0f * fontScaleFactor * 0.75f;
+		float btnSz = ImGui::GetFontSize() * 1.5f;
 
 		// helper variable in case we unload or do anything else that might modify the callback before ->Invalidate() is invoked
 		bool skipOptions = false;

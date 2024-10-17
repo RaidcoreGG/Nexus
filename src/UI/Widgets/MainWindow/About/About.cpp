@@ -27,8 +27,7 @@ void CAboutBox::RenderContent()
 {
 	ImGuiStyle& style = ImGui::GetStyle();
 
-	float fontScaleFactor = ImGui::GetFontSize() / 16.0f;
-	float btnSz = 28.0f * fontScaleFactor * 0.75f;
+	float btnSz = ImGui::GetFontSize() * 1.5f;
 
 	float width = ImGui::GetContentRegionAvailWidth();
 	float btnWidth;
