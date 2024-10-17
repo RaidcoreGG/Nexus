@@ -18,7 +18,6 @@
     <ClCompile Include="src\Services\API\ActiveToken.cpp" />
     <ClCompile Include="src\Services\API\ApiClient.cpp" />
     <ClCompile Include="src\Services\API\APIController.cpp" />
-    <ClCompile Include="src\Consts.cpp" />
     <ClCompile Include="src\CrashHandler.cpp" />
     <ClCompile Include="src\Services\DataLink\DataLink.cpp" />
     <ClCompile Include="src\Events\EventSubscriber.cpp" />

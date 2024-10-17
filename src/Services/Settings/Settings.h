@@ -17,30 +17,6 @@ using json = nlohmann::json;
 
 #include "Services/Logging/LogHandler.h"
 
-extern const char* OPT_LASTGAMEBUILD;
-extern const char* OPT_LASTCHECKEDGAMEBUILD;
-extern const char* OPT_ACCEPTEULA;
-extern const char* OPT_NOTIFYCHANGELOG;
-extern const char* OPT_DEVMODE;
-extern const char* OPT_CLOSEMENU;
-extern const char* OPT_CLOSEESCAPE;
-extern const char* OPT_LASTUISCALE;
-extern const char* OPT_FONTSIZE;
-extern const char* OPT_QAVERTICAL;
-extern const char* OPT_QAVISIBILITY;
-extern const char* OPT_QALOCATION;
-extern const char* OPT_QAOFFSETX;
-extern const char* OPT_QAOFFSETY;
-extern const char* OPT_LINKARCSTYLE;
-extern const char* OPT_IMGUISTYLE;
-extern const char* OPT_IMGUICOLORS;
-extern const char* OPT_LANGUAGE;
-extern const char* OPT_ALWAYSSHOWQUICKACCESS;
-extern const char* OPT_GLOBALSCALE;
-extern const char* OPT_SHOWADDONSWINDOWAFTERDUU;
-extern const char* OPT_USERFONT;
-extern const char* OPT_DISABLEFESTIVEFLAIR;
-
 constexpr const char* CH_SETTINGS = "Settings";
 
 ///----------------------------------------------------------------------------------------------------

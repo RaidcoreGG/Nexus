@@ -261,9 +261,6 @@
     <ClCompile Include="src\Services\Textures\TextureLoader.cpp">
       <Filter>Services\Textures</Filter>
     </ClCompile>
-    <ClCompile Include="src\Consts.cpp">
-      <Filter>_GLOBAL</Filter>
-    </ClCompile>
     <ClCompile Include="src\Services\Settings\Settings.cpp">
       <Filter>Services\Settings</Filter>
     </ClCompile>

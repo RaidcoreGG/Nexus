@@ -858,6 +858,12 @@ namespace Loader
 		{
 			// show message that addon was disabled due to game update
 			EventApi->Raise(EV_VOLATILE_ADDON_DISABLED, &addon->Definitions->Signature);
+			static bool didNotify = false;
+			if (!didNotify)
+			{
+				Alerts->Notify(String::Format("%s\n%s", Language->Translate("((000001))"), Language->Translate("((000002))")).c_str());
+				didNotify = true;
+			}
 			Alerts->Notify(String::Format("%s %s", addon->Definitions->Name, Language->Translate("((000073))")).c_str());
 
 			FreeLibrary(addon->Module);
@@ -1346,8 +1352,6 @@ namespace Loader
 		{
 			DisableVolatileUntilUpdate = true;
 			Logger->Warning(CH_LOADER, "Game updated. Current Build %d. Old Build: %d. Disabling volatile addons until they update.", gameBuild, lastGameBuild);
-
-			Alerts->Notify(String::Format("%s\n%s", Language->Translate("((000001))"), Language->Translate("((000002))")).c_str());
 		}
 
 		if (lastGameBuild != gameBuild)

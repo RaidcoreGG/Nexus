@@ -31,6 +31,7 @@
 #include "Util/Inputs.h"
 #include "Util/Resources.h"
 #include "Util/Time.h"
+#include "Util/Strings.h"
 
 #include "UI/Widgets/MainWindow/About/About.h"
 #include "UI/Widgets/MainWindow/Addons/Addons.h"
@@ -566,7 +567,7 @@ UINT CUiContext::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			// key input
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
-			if (io.WantTextInput)
+			if (io.WantCaptureKeyboard || io.WantTextInput)
 			{
 				if (wParam < 256)
 					io.KeysDown[wParam] = true;
@@ -579,7 +580,7 @@ UINT CUiContext::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				io.KeysDown[wParam] = false;
 			break;
 		case WM_CHAR:
-			if (io.WantTextInput)
+			if (io.WantCaptureKeyboard || io.WantTextInput)
 			{
 				// You can also use ToAscii()+GetKeyboardState() to retrieve characters.
 				if (wParam > 0 && wParam < 0x10000)
@@ -1048,7 +1049,7 @@ void CUiContext::LoadSettings()
 	ImGuiStyle* style = &ImGui::GetStyle();
 
 	float storedFontSz = settingsCtx->Get<float>(OPT_FONTSIZE);
-	this->ImGuiContext->FontSize = storedFontSz > 0 ? storedFontSz : 16.0f;
+	this->ImGuiContext->FontSize = storedFontSz > 0 ? storedFontSz : 13.0f;
 
 	this->ApplyStyle();
 	

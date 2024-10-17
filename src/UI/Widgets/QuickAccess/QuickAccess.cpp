@@ -267,7 +267,7 @@ void CQuickAccess::Render()
 			else
 			{
 				CContext* ctx = CContext::GetContext();
-				this->IconNotification = this->TextureService->GetOrCreate(ICON_NOTIFICATION, RES_ICON_NOTIFICATION, ctx->GetModule());
+				this->IconNotification = this->TextureService->GetOrCreate("ICON_NOTIFICATION", RES_ICON_NOTIFICATION, ctx->GetModule());
 			}
 
 			ImGui::PopStyleVar();

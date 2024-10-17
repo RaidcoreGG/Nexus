@@ -24,6 +24,8 @@
 
 #include "Loader/NexusLinkData.h"
 
+constexpr const UINT WM_ADDONDIRUPDATE = WM_USER + 101;
+
 namespace Loader
 {
 	extern NexusLinkData*				NexusLink;

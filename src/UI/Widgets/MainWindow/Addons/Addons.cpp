@@ -704,6 +704,11 @@ void CAddonsWindow::RenderContent()
 						queuedForCheck++;
 					}
 
+					if (queuedForCheck == 0)
+					{
+						checkedForUpdates = -1;
+					}
+
 					for (auto addon : Loader::Addons)
 					{
 						if (nullptr == addon->Definitions) { continue; }
