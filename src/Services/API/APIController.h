@@ -1,3 +1,4 @@
+#ifdef NO_IMPL
 #ifndef APICONTROLLER_H
 #define APICONTROLLER_H
 
@@ -39,4 +40,5 @@ namespace API
 	void ProcessRequestsLoop();
 }
 
+#endif
 #endif

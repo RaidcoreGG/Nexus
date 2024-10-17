@@ -9,61 +9,19 @@
 #ifndef INPUTBINDHANDLER_H
 #define INPUTBINDHANDLER_H
 
-#include <Windows.h>
 #include <map>
 #include <mutex>
 #include <string>
 #include <vector>
+#include <Windows.h>
 
+#include "Events/EventHandler.h"
 #include "FuncDefs.h"
 #include "InputBind.h"
 #include "ManagedInputBind.h"
-
 #include "Services/Logging/LogHandler.h"
 
 constexpr const char* CH_INPUTBINDS = "InputBinds";
-
-///----------------------------------------------------------------------------------------------------
-/// InputBinds Namespace
-///----------------------------------------------------------------------------------------------------
-namespace InputBinds
-{
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_RegisterWithString:
-	/// 	[Revision 1] Addon API wrapper function for Register from string.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_RegisterWithString(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, const char* aInputBind);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_RegisterWithStruct:
-	/// 	[Revision 1] Addon API wrapper function for Register from struct.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_RegisterWithStruct(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, LegacyInputBind aInputBind);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_RegisterWithString:
-	/// 	[Revision 2] Addon API wrapper function for Register from string.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_RegisterWithString2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, const char* aInputBind);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_RegisterWithStruct:
-	/// 	[Revision 2] Addon API wrapper function for Register from struct.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_RegisterWithStruct2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, LegacyInputBind aInputBind);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_InvokeInputBind:
-	/// 	Addon API wrapper function for Invoke.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_InvokeInputBind(const char* aIdentifier, bool aIsRelease);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_Deregister:
-	/// 	Addon API wrapper function for Deregister.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_Deregister(const char* aIdentifier);
-}
 
 ///----------------------------------------------------------------------------------------------------
 /// CInputBindApi Class
@@ -71,12 +29,6 @@ namespace InputBinds
 class CInputBindApi
 {
 	public:
-	///----------------------------------------------------------------------------------------------------
-	/// ScancodeToString:
-	/// 	Returns the display string of a scan code.
-	///----------------------------------------------------------------------------------------------------
-	static std::string ScancodeToString(unsigned short aScanCode);
-
 	///----------------------------------------------------------------------------------------------------
 	/// IBFromString:
 	/// 	Helper function to create a InputBind from a string.
@@ -93,7 +45,7 @@ class CInputBindApi
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CInputBindApi(CLogHandler* aLogger);
+	CInputBindApi(CEventApi* aEventApi, CLogHandler* aLogger);
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
@@ -181,18 +133,19 @@ class CInputBindApi
 	void EndCapturing();
 
 	private:
-	CLogHandler*							Logger;
+	CEventApi*                              EventApi          = nullptr;
+	CLogHandler*                            Logger            = nullptr;
 
-	mutable std::mutex						Mutex;
-	std::map<std::string, ManagedInputBind>	Registry;
+	mutable std::mutex                      Mutex;
+	std::map<std::string, ManagedInputBind> Registry;
 
-	bool									IsCapturing;
-	InputBind								CapturedInputBind;
+	bool                                    IsCapturing;
+	InputBind                               CapturedInputBind;
 
-	bool									IsAltHeld;
-	bool									IsCtrlHeld;
-	bool									IsShiftHeld;
-	std::map<std::string, ManagedInputBind>	HeldInputBinds;
+	bool                                    IsAltHeld;
+	bool                                    IsCtrlHeld;
+	bool                                    IsShiftHeld;
+	std::map<std::string, ManagedInputBind> HeldInputBinds;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Load:

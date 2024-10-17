@@ -3,6 +3,7 @@
 #include <filesystem>
 
 #include "Consts.h"
+#include "Context.h"
 #include "Index.h"
 #include "Shared.h"
 #include "State.h"
@@ -41,6 +42,7 @@ namespace ArcDPS
 				LibraryAddon* newAddon = new LibraryAddon{};
 				newAddon->Signature = addon["id"];
 				newAddon->Name = addon["name"];
+				newAddon->Author = addon["author"];
 				newAddon->Description = addon["description"];
 				newAddon->Provider = GetProvider(addon["download"]);
 				newAddon->DownloadURL = addon["download"];
@@ -62,7 +64,7 @@ namespace ArcDPS
 		}
 		else
 		{
-			Logger->Warning(CH_CORE, "Error parsing API response for /arcdpslibrary.");
+			CContext::GetContext()->GetLogger()->Warning(CH_CORE, "Error parsing API response for /arcdpslibrary.");
 		}
 	}
 
@@ -88,7 +90,7 @@ namespace ArcDPS
 					ModuleHandle = hModule;
 					IsLoaded = true;
 
-					Logger->Info("ArcDPS", "ArcDPS is not loaded as Nexus addon but was detected as Chainload.");
+					CContext::GetContext()->GetLogger()->Info("ArcDPS", "ArcDPS is not loaded as Nexus addon but was detected as Chainload.");
 
 					DeployBridge();
 					return;
@@ -110,7 +112,7 @@ namespace ArcDPS
 					ModuleHandle = hModule;
 					IsLoaded = true;
 
-					Logger->Info("ArcDPS", "ArcDPS is not loaded as Nexus addon but was detected as Addon-Loader addon.");
+					CContext::GetContext()->GetLogger()->Info("ArcDPS", "ArcDPS is not loaded as Nexus addon but was detected as Addon-Loader addon.");
 
 					DeployBridge();
 					return;
@@ -132,7 +134,7 @@ namespace ArcDPS
 					ModuleHandle = hModule;
 					IsLoaded = true;
 
-					Logger->Info("ArcDPS", "ArcDPS is not loaded as Nexus addon but was detected as Proxy.");
+					CContext::GetContext()->GetLogger()->Info("ArcDPS", "ArcDPS is not loaded as Nexus addon but was detected as Proxy.");
 
 					DeployBridge();
 					return;
@@ -142,9 +144,10 @@ namespace ArcDPS
 	}
 	void DeployBridge()
 	{
+		CContext* ctx = CContext::GetContext();
 		try
 		{
-			Resources::Unpack(NexusHandle, Index::F_ARCDPSINTEGRATION, RES_ARCDPS_INTEGRATION, "DLL", true);
+			Resources::Unpack(ctx->GetModule(), Index::F_ARCDPSINTEGRATION, RES_ARCDPS_INTEGRATION, "DLL", true);
 
 			// reload is set to true because the dll is always deployed from resource
 			// and since it's locked it would not load here directly but instead after checking for updates (which does not apply to it)
@@ -152,7 +155,7 @@ namespace ArcDPS
 		}
 		catch (std::filesystem::filesystem_error fErr)
 		{
-			Logger->Debug("ArcDPS", "%s", fErr.what());
+			ctx->GetLogger()->Debug("ArcDPS", "%s", fErr.what());
 			return;
 		}
 	}
@@ -167,21 +170,21 @@ namespace ArcDPS
 		if (DLL::FindFunction(ModuleHandle, &exp_addextension2, "addextension2"))
 		{
 			int result = exp_addextension2(aBridgeModule);
-			Logger->Info("ArcDPS", "Deployed ArcDPS Integration. Result: %d", result);
+			CContext::GetContext()->GetLogger()->Info("ArcDPS", "Deployed ArcDPS Integration. Result: %d", result);
 		}
 		else
 		{
-			Logger->Warning("ArcDPS", "Addon with signature \"0xFFF694D1\" found but \"addextension2\" is not exported. ArcDPS combat events won't be relayed.");
+			CContext::GetContext()->GetLogger()->Warning("ArcDPS", "Addon with signature \"0xFFF694D1\" found but \"addextension2\" is not exported. ArcDPS combat events won't be relayed.");
 		}
 
 		if (DLL::FindFunction(ModuleHandle, &exp_listextension, "listextension"))
 		{
 			GetPlugins();
-			Logger->Info("ArcDPS", "Received ArcDPS plugins.");
+			CContext::GetContext()->GetLogger()->Info("ArcDPS", "Received ArcDPS plugins.");
 		}
 		else
 		{
-			Logger->Warning("ArcDPS", "Addon with signature \"0xFFF694D1\" found but \"listextension\" is not exported.");
+			CContext::GetContext()->GetLogger()->Warning("ArcDPS", "Addon with signature \"0xFFF694D1\" found but \"listextension\" is not exported.");
 		}
 
 		IsBridgeDeployed = true;
@@ -210,6 +213,12 @@ namespace ArcDPS
 		}
 
 		IsPluginAtlasBuilt = true;
+
+		std::thread([]() {
+			CContext* ctx = CContext::GetContext();
+			CUiContext* uictx = ctx->GetUIContext();
+			uictx->Invalidate();
+		}).detach();
 	}
 	void AddToAtlasBySig(unsigned int aArcSignature)
 	{
@@ -228,7 +237,7 @@ namespace ArcDPS
 			int result = exp_addextension2(aModule);
 			if (result != 0)
 			{
-				Logger->Debug("ArcDPS", "Could not add extension. Error %d", result);
+				CContext::GetContext()->GetLogger()->Debug("ArcDPS", "Could not add extension. Error %d", result);
 			}
 		}
 	}

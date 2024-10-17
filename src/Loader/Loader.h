@@ -20,9 +20,11 @@
 
 #include "ELoaderAction.h"
 #include "Addon.h"
-#include "AddonAPI.h"
+#include "API/AddonAPI.h"
 
 #include "Loader/NexusLinkData.h"
+
+constexpr const UINT WM_ADDONDIRUPDATE = WM_USER + 101;
 
 namespace Loader
 {
@@ -34,7 +36,7 @@ namespace Loader
 		ELoaderAction
 	>									QueuedAddons;					/* To be loaded or unloaded addons */
 	extern std::vector<Addon*>			Addons;
-	extern std::map<int, AddonAPI*>		ApiDefs;						/* Addon API definitions, created on demand */
+	extern bool							HasCustomConfig;
 
 	extern int							DirectoryChangeCountdown;
 	extern std::condition_variable		ConVar;
@@ -131,18 +133,6 @@ namespace Loader
 	/// 	Returns true if there was an update dll.
 	///----------------------------------------------------------------------------------------------------
 	bool UpdateSwapAddon(const std::filesystem::path& aPath);
-
-	///----------------------------------------------------------------------------------------------------
-	/// GetAddonAPI:
-	/// 	Gets or creates a pointer to the provided version, or nullptr if no such version exists.
-	///----------------------------------------------------------------------------------------------------
-	AddonAPI* GetAddonAPI(int aVersion);
-
-	///----------------------------------------------------------------------------------------------------
-	/// GetAddonAPISize:
-	/// 	Returns the size of the provided API version.
-	///----------------------------------------------------------------------------------------------------
-	long GetAddonAPISize(int aVersion);
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetOwner:

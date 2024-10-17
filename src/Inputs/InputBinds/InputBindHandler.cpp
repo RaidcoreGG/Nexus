@@ -13,108 +13,20 @@
 #include <fstream>
 #include <string>
 
-#include "Consts.h"
-#include "Index.h"
-#include "State.h"
-
-#include "Util/Strings.h"
-#include "Util/Inputs.h"
-
-/* FIXME: remove this -> DI */
-#include "Shared.h"
-
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
-namespace InputBinds
-{
-	void ADDONAPI_RegisterWithString(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, const char* aInputBind)
-	{
-		InputBindApi->Register(aIdentifier, EInputBindHandlerType::DownOnly, aInputBindHandler, aInputBind);
-	}
-
-	void ADDONAPI_RegisterWithStruct(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, LegacyInputBind aInputBind)
-	{
-		InputBindApi->Register(aIdentifier, EInputBindHandlerType::DownOnly, aInputBindHandler, aInputBind);
-	}
-
-	void ADDONAPI_RegisterWithString2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, const char* aInputBind)
-	{
-		InputBindApi->Register(aIdentifier, EInputBindHandlerType::DownAndRelease, aInputBindHandler, aInputBind);
-	}
-
-	void ADDONAPI_RegisterWithStruct2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, LegacyInputBind aInputBind)
-	{
-		InputBindApi->Register(aIdentifier, EInputBindHandlerType::DownAndRelease, aInputBindHandler, aInputBind);
-	}
-
-	void ADDONAPI_InvokeInputBind(const char* aIdentifier, bool aIsRelease)
-	{
-		InputBindApi->Invoke(aIdentifier, aIsRelease);
-	}
-
-	void ADDONAPI_Deregister(const char* aIdentifier)
-	{
-		InputBindApi->Deregister(aIdentifier);
-	}
-}
-
-static bool IsLookupTableBuilt = false;
-static std::map<unsigned short, std::string> ScancodeLookupTable;
-
-void BuildscanCodeLookupTable()
-{
-	if (IsLookupTableBuilt) { return; }
-
-	for (long long i = 0; i < 255; i++)
-	{
-		KeyLParam key{};
-		key.ScanCode = i;
-		char* buff = new char[64];
-		std::string str;
-		GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, 64);
-		str.append(buff);
-
-		ScancodeLookupTable[key.GetScanCode()] = str;
-
-		key.ExtendedFlag = 1;
-		buff = new char[64];
-		str = "";
-		GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, 64);
-		str.append(buff);
-
-		ScancodeLookupTable[key.GetScanCode()] = str;
-
-		delete[] buff;
-	};
-}
-
-std::string CInputBindApi::ScancodeToString(unsigned short aScanCode)
-{
-	if (!IsLookupTableBuilt)
-	{
-		BuildscanCodeLookupTable();
-	}
-
-	auto it = ScancodeLookupTable.find(aScanCode);
-	if (it != ScancodeLookupTable.end())
-	{
-		return it->second;
-	}
-
-	return "";
-}
+#include "Consts.h"
+#include "Index.h"
+#include "State.h"
+#include "Util/Strings.h"
+#include "Util/Inputs.h"
 
 InputBind CInputBindApi::IBFromString(std::string aInputBind)
 {
-	if (!IsLookupTableBuilt)
-	{
-		BuildscanCodeLookupTable();
-	}
-
 	InputBind ib{};
 
-	if (aInputBind == "(null)" || aInputBind == "(NULL)") { return ib; }
+	if (String::ToLower(aInputBind) == NULLSTR) { return ib; }
 
 	aInputBind = String::ToUpper(aInputBind);
 	std::string delimiter = "+";
@@ -168,6 +80,30 @@ InputBind CInputBindApi::IBFromString(std::string aInputBind)
 	else
 	{
 		ib.Type = EInputBindType::Keyboard;
+
+		static bool IsLookupTableBuilt = false;
+		static std::map<unsigned short, std::string> ScancodeLookupTable;
+		if (!IsLookupTableBuilt)
+		{
+			for (long long i = 0; i < 255; i++)
+			{
+				KeyLParam key{};
+				key.ScanCode = i;
+				char* buff = new char[64];
+				std::string str;
+				GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, 64);
+				str.append(buff);
+				ScancodeLookupTable[key.GetScanCode()] = str;
+				key.ExtendedFlag = 1;
+				buff = new char[64];
+				str = "";
+				GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, 64);
+				str.append(buff);
+				ScancodeLookupTable[key.GetScanCode()] = str;
+				delete[] buff;
+			};
+		}
+
 		for (auto it = ScancodeLookupTable.begin(); it != ScancodeLookupTable.end(); ++it)
 		{
 			if (it->second == aInputBind)
@@ -183,11 +119,6 @@ InputBind CInputBindApi::IBFromString(std::string aInputBind)
 
 std::string CInputBindApi::IBToString(InputBind aInputBind, bool aPadded)
 {
-	if (!IsLookupTableBuilt)
-	{
-		BuildscanCodeLookupTable();
-	}
-
 	/* type is not set -> invalid*/
 	/* type is keyboard and code 0 because only modifiers -> valid */
 	/* type is mouse and code is 0 -> invalid */
@@ -196,7 +127,7 @@ std::string CInputBindApi::IBToString(InputBind aInputBind, bool aPadded)
 		(aInputBind.Type == EInputBindType::Mouse && !aInputBind.Code) ||
 		(aInputBind.Type == EInputBindType::Keyboard && !aInputBind.Code && !aInputBind.Alt && !aInputBind.Ctrl && !aInputBind.Shift))
 	{
-		return "(null)";
+		return NULLSTR;
 	}
 
 	char* buff = new char[100];
@@ -225,28 +156,8 @@ std::string CInputBindApi::IBToString(InputBind aInputBind, bool aPadded)
 
 	if (aInputBind.Type == EInputBindType::Keyboard)
 	{
-		UINT vk = MapVirtualKeyA(aInputBind.Code, MAPVK_VSC_TO_VK);
-
-		if (vk >= 65 && vk <= 90 || vk >= 48 && vk <= 57)
-		{
-			GetKeyNameTextA(aInputBind.Code << 16, buff, 100);
-			str.append(buff);
-		}
-		else
-		{
-			if (aInputBind.Type == EInputBindType::Keyboard && aInputBind.Code == 0)
-			{
-				str = str.substr(0, str.length() - (aPadded ? 3 : 1));
-			}
-			else
-			{
-				auto it = ScancodeLookupTable.find(aInputBind.Code);
-				if (it != ScancodeLookupTable.end())
-				{
-					str.append(it->second);
-				}
-			}
-		}
+		GetKeyNameTextA(GetKeyMessageLPARAM_ScanCode(aInputBind.Code, false, false), buff, 100);
+		str.append(buff);
 	}
 	else if (aInputBind.Type == EInputBindType::Mouse)
 	{
@@ -287,8 +198,12 @@ std::string CInputBindApi::IBToString(InputBind aInputBind, bool aPadded)
 	return String::ConvertMBToUTF8(str);
 }
 
-CInputBindApi::CInputBindApi(CLogHandler* aLogger)
+CInputBindApi::CInputBindApi(CEventApi* aEventApi, CLogHandler* aLogger)
 {
+	assert(aEventApi);
+	assert(aLogger);
+
+	this->EventApi = aEventApi;
 	this->Logger = aLogger;
 
 	this->Load();
@@ -415,12 +330,12 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			if (isModifier)
 			{
-				this->Release(wParam);
+				/* do this, to check all binds that use the modifier */
+				this->Release((unsigned int)wParam);
 			}
-			else
-			{
-				this->Release(EInputBindType::Keyboard, LParamToKMF(lParam).GetScanCode());
-			}
+			
+			/* always do this, because even if it's a modifier, it might be a modifier-key bind */
+			this->Release(EInputBindType::Keyboard, LParamToKMF(lParam).GetScanCode());
 
 			/* only check if not currently setting InputBind */
 			if (this->IsCapturing)
@@ -545,6 +460,10 @@ void CInputBindApi::Register(const char* aIdentifier, EInputBindHandlerType aInp
 	}
 
 	this->Save();
+
+	std::thread([this]() {
+		this->EventApi->Raise("EV_INPUTBIND_UPDATED");
+	}).detach();
 }
 
 void CInputBindApi::Deregister(const char* aIdentifier)
@@ -597,6 +516,10 @@ void CInputBindApi::Set(std::string aIdentifier, InputBind aInputBind)
 	}
 
 	this->Save();
+
+	std::thread([this]() {
+		this->EventApi->Raise("EV_INPUTBIND_UPDATED");
+	}).detach();
 }
 
 bool CInputBindApi::Invoke(std::string aIdentifier, bool aIsRelease)
@@ -640,6 +563,10 @@ void CInputBindApi::Delete(std::string aIdentifier)
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	this->Registry.erase(aIdentifier);
+
+	std::thread([this]() {
+		this->EventApi->Raise("EV_INPUTBIND_UPDATED");
+	}).detach();
 }
 
 int CInputBindApi::Verify(void* aStartAddress, void* aEndAddress)
@@ -796,7 +723,7 @@ bool CInputBindApi::Press(const InputBind& aInputBind)
 	bool invoked = this->Invoke(heldBind->first);;
 
 	/* if was invoked -> stop processing (unless it was the togglehideui bind, pass through for multi hide)*/
-	if (invoked && heldBind->first != KB_TOGGLEHIDEUI)
+	if (invoked && heldBind->first != "KB_TOGGLEHIDEUI")
 	{
 		return true;
 	}

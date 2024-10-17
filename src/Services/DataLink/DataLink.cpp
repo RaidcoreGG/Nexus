@@ -8,21 +8,13 @@
 
 #include "DataLink.h"
 
-#include "Consts.h"
-#include "Shared.h"
-#include "State.h"
+#include <assert.h>
 
-namespace DataLink
+CDataLink::CDataLink(CLogHandler* aLogger)
 {
-	void* ADDONAPI_GetResource(const char* aIdentifier)
-	{
-		return DataLinkService->GetResource(aIdentifier);
-	}
+	assert(aLogger);
 
-	void* ADDONAPI_ShareResource(const char* aIdentifier, size_t aResourceSize)
-	{
-		return DataLinkService->ShareResource(aIdentifier, aResourceSize, false);
-	}
+	this->Logger = aLogger;
 }
 
 CDataLink::~CDataLink()
@@ -58,7 +50,7 @@ CDataLink::~CDataLink()
 			break;
 		}
 
-		Logger->Info(CH_DATALINK, "Freed shared resource: \"%s\"", it->first.c_str());
+		this->Logger->Info(CH_DATALINK, "Freed shared resource: \"%s\"", it->first.c_str());
 
 		this->Registry.erase(it);
 	}
@@ -105,7 +97,7 @@ void* CDataLink::ShareResource(const char* aIdentifier, size_t aResourceSize, co
 		}
 		else
 		{
-			Logger->Warning(CH_DATALINK, "Resource with name \"%s\" already exists with size %u but size %u was requested.", str.c_str(), it->second.Size, aResourceSize);
+			this->Logger->Warning(CH_DATALINK, "Resource with name \"%s\" already exists with size %u but size %u was requested.", str.c_str(), it->second.Size, aResourceSize);
 			return nullptr;
 		}
 	}
@@ -148,13 +140,13 @@ void* CDataLink::ShareResource(const char* aIdentifier, size_t aResourceSize, co
 			}
 		}
 
-		Logger->Info(CH_DATALINK, "Created public shared resource: \"%s\" (with underlying name \"%s\")", str.c_str(), strOverride.c_str());
+		this->Logger->Info(CH_DATALINK, "Created public shared resource: \"%s\" (with underlying name \"%s\")", str.c_str(), strOverride.c_str());
 		break;
 
 	case ELinkedResourceType::Internal:
 		resource.Pointer = new char[resource.Size];
 
-		Logger->Info(CH_DATALINK, "Created internal shared resource: \"%s\"", str.c_str());
+		this->Logger->Info(CH_DATALINK, "Created internal shared resource: \"%s\"", str.c_str());
 		break;
 	}
 

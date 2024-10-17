@@ -20,6 +20,7 @@ Nexus is a next-gen Addon Manager & Loader for Guild Wars 2. It provides a power
 - **Consistent behaviour across addons**.
 - **Multiboxing** compatibile.
 - **100% ToS compliant.** Doesn't read game memory at all.
+- **Integrates with ArcDPS**
 
 ### Overview for addon developers
 - **Hot-Loading**, enabling fast feature iteration.
@@ -29,11 +30,6 @@ Nexus is a next-gen Addon Manager & Loader for Guild Wars 2. It provides a power
 - **Resource Registry** to share resources & functions between Addons.
 - **Texture/Image Loader**
 - Shared &amp; parsed **[Mumble](https://github.com/RaidcoreGG/RCGG-lib-mumble-api)**
-- Shared **local combat log**
-- **Integrates with ArcDPS**
-- Shared world &amp; **map completion progress**
-- Shared **character stats**
-- Managed **[GW2 Web API](https://api.guildwars2.com/v2)**
 
 ## Installation
 1. Download `d3d11.dll` found in the [latest release](https://github.com/RaidcoreGG/Nexus/releases).
@@ -49,8 +45,11 @@ If you want another proxy d3d11.dll, for example ArcDPS, you can chainload it by
 ### [Dear ImGui](https://github.com/ocornut/imgui)
 Licensed under the MIT license.
 
-### [cpp-httplib](https://github.com/yhirose/cpp-httplib)
+### [yhirose/cpp-httplib](https://github.com/yhirose/cpp-httplib)
 Licensed under the MIT license.
+
+### [TsudaKageyu/minhook](https://github.com/TsudaKageyu/minhook)
+Licensed under the BSD 2-Clause license.
 
 ### [nlohmann/json](https://github.com/nlohmann/json)
 Licensed under the MIT license.
@@ -61,11 +60,8 @@ Licensed under the MIT license.
 ### [openssl](https://github.com/openssl/openssl)
 Licensed under the Apache-2.0 license.
 
-### [TsudaKageyu/minhook](https://github.com/TsudaKageyu/minhook)
-Licensed under the BSD 2-Clause license.
-
 ## Special Thanks
-### [GGDM](https://nkga.github.io/post/ggdm---combat-analysis-mod-for-guild-wars-2/)
+### GGDM
 For the idea of a proxy dll & hot-loading.
 
 ### [Deltaconnected / ArcDPS](https://www.deltaconnected.com/arcdps/)

@@ -10,40 +10,24 @@
 #define DATALINK_H
 
 #include <mutex>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
 #include "LinkedResource.h"
+#include "Services/Logging/LogHandler.h"
 
 constexpr const char* CH_DATALINK = "DataLink";
 
-///----------------------------------------------------------------------------------------------------
-/// DataLink Namespace
-///----------------------------------------------------------------------------------------------------
-namespace DataLink
-{
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_GetResource:
-	/// 	Addon API wrapper function for GetResource.
-	///----------------------------------------------------------------------------------------------------
-	void* ADDONAPI_GetResource(const char* aIdentifier);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_ShareResource:
-	/// 	Addon API wrapper function for ShareResource.
-	///----------------------------------------------------------------------------------------------------
-	void* ADDONAPI_ShareResource(const char* aIdentifier, size_t aResourceSize);
-}
 ///----------------------------------------------------------------------------------------------------
 /// CDataLink Class
 ///----------------------------------------------------------------------------------------------------
 class CDataLink
 {
-public:
+	public:
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CDataLink() = default;
+	CDataLink(CLogHandler* aLogger);
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
@@ -74,9 +58,11 @@ public:
 	///----------------------------------------------------------------------------------------------------
 	std::unordered_map<std::string, LinkedResource> GetRegistry();
 
-private:
-	std::mutex										Mutex;
-	std::unordered_map<std::string, LinkedResource>	Registry;
+	private:
+	CLogHandler*                                    Logger   = nullptr;
+
+	std::mutex                                      Mutex;
+	std::unordered_map<std::string, LinkedResource> Registry;
 };
 
 #endif

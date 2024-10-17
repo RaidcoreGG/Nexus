@@ -48,14 +48,24 @@ LPARAM GetKeyMessageLPARAM(unsigned aVKey, bool aIsDown, bool aIsSystem)
 {
 	KeyLParam lp;
 
+	UINT sc = MapVirtualKeyA(aVKey, MAPVK_VK_TO_VSC_EX);
+
 	lp.RepeatCount = 1;
-	lp.ScanCode = MapVirtualKeyA(aVKey, MAPVK_VK_TO_VSC);
-	lp.ExtendedFlag = lp.ScanCode & 0xE0 ? 1 : 0;
+	lp.ScanCode = LOBYTE(sc);
+	lp.ExtendedFlag = (HIBYTE(sc) == 0xE0 || HIBYTE(sc) == 0xE1) ? 1 : 0;
 	lp.Reserved = 0;
-	lp.ContextCode = aIsSystem ? 1 : 0;
+	lp.ContextCode = 0;//aIsSystem ? 1 : 0;
 	lp.PreviousKeyState = aIsDown ? 0 : 1;
 	lp.TransitionState = aIsDown ? 0 : 1;
 
+	return KMFToLParam(lp);
+}
+
+LPARAM GetKeyMessageLPARAM_ScanCode(unsigned short aScanCode, bool aIsDown, bool aIsSystem)
+{
+	KeyLParam lp = GetKeyMessageLPARAM(0, aIsDown, aIsSystem);
+	lp.ScanCode = LOBYTE(aScanCode);
+	lp.ExtendedFlag = (HIBYTE(aScanCode) == 0xE0 || HIBYTE(aScanCode) == 0xE1) ? 1 : 0;
 	return KMFToLParam(lp);
 }
 
@@ -95,4 +105,15 @@ WPARAM GetMouseMessageWPARAM(EMouseButtons aMouseButton, bool aIsCtrl, bool aIsS
 			(ho)
 		)
 	);
+}
+
+namespace Inputs
+{
+	bool IsCursorHidden()
+	{
+		CURSORINFO curInfo{};
+		curInfo.cbSize = sizeof(CURSORINFO);
+		GetCursorInfo(&curInfo);
+		return !(curInfo.flags & CURSOR_SHOWING);
+	}
 }

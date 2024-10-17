@@ -10,7 +10,7 @@
 
 #include <fstream>
 
-#include "Shared.h"
+#include "Context.h"
 
 #include "Util/Paths.h"
 #include "Util/Strings.h"
@@ -19,6 +19,9 @@
 
 CApiClient::CApiClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::path aCacheDirectory, int aCacheLifetime, int aBucketCapacity, int aRefillAmount, int aRefillInterval, const char* aCertificate)
 {
+	CContext* ctx = CContext::GetContext();
+	this->Logger = ctx->GetLogger();
+
 	BaseURL = URL::GetBase(aBaseURL); // sanitize url just to be sure
 	Client = new httplib::Client(BaseURL);
 	if (aCertificate)

@@ -9,28 +9,31 @@
 #ifndef MUMBLE_READER_H
 #define MUMBLE_READER_H
 
-#include <thread>
 #include <string>
+#include <thread>
 
-#include "Services/Mumble/Definitions/Mumble.h"
+#include "Events/EventHandler.h"
 #include "Loader/NexusLinkData.h"
+#include "Services/DataLink/DataLink.h"
+#include "Services/Logging/LogHandler.h"
+#include "Services/Mumble/Definitions/Mumble.h"
 
-/* Log Channel*/
-constexpr const char* CH_MUMBLE_READER				= "MumbleReader";
+constexpr const char* CH_MUMBLE_READER = "MumbleReader";
+constexpr const char* DL_MUMBLE_LINK = "DL_MUMBLE_LINK";
+constexpr const char* DL_MUMBLE_LINK_IDENTITY = "DL_MUMBLE_LINK_IDENTITY";
+constexpr const char* EV_MUMBLE_IDENTITY_UPDATED = "EV_MUMBLE_IDENTITY_UPDATED";
 
 /* UI Scale */
-constexpr const float SC_SMALL						= 0.90f;
-constexpr const float SC_NORMAL						= 1.00f;
-constexpr const float SC_LARGE						= 1.11f;
-constexpr const float SC_LARGER						= 1.22f;
+constexpr const float SC_SMALL = 0.90f;
+constexpr const float SC_NORMAL = 1.00f;
+constexpr const float SC_LARGE = 1.11f;
+constexpr const float SC_LARGER = 1.22f;
 
 ///----------------------------------------------------------------------------------------------------
 /// Mumble Namespace
 ///----------------------------------------------------------------------------------------------------
 namespace Mumble
 {
-	extern Identity* IdentityParsed;
-
 	///----------------------------------------------------------------------------------------------------
 	/// GetScalingFactor:
 	/// 	Returns the scaling factor for the given the UISize enum.
@@ -43,32 +46,48 @@ namespace Mumble
 ///----------------------------------------------------------------------------------------------------
 class CMumbleReader
 {
-public:
-	bool			IsMumbleDisabled			= false;
-
+	public:
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CMumbleReader(std::string aMumbleName = "MumbleLink");
+	CMumbleReader(CDataLink* aDataLink, CEventApi* aEventApi, CLogHandler* aLogger);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
 	~CMumbleReader();
-private:
-	std::thread			Thread;
-	bool				IsRunning				= false;
 
-	std::string			Name;
-	Mumble::Data*		MumbleLink				= nullptr;
-	NexusLinkData*		NexusLink				= nullptr;
+	///----------------------------------------------------------------------------------------------------
+	/// GetName:
+	/// 	Returns the name of the MumbleLink file.
+	///----------------------------------------------------------------------------------------------------
+	std::string GetName();
 
-	bool				Flip					= false;
-	unsigned			PreviousTick			= 0;
-	Vector3				PreviousAvatarPosition	= {};
-	Vector3				PreviousCameraFront		= {};
-	Mumble::Identity	PreviousIdentity		= Mumble::Identity{};
-	long long			PreviousFrameCounter	= 0;
+	///----------------------------------------------------------------------------------------------------
+	/// IsDisabled:
+	/// 	Returns whether the MumbleLink API is explicitly disabled.
+	///----------------------------------------------------------------------------------------------------
+	bool IsDisabled();
+
+	private:
+	CDataLink*        DataLinkApi            = nullptr;
+	CEventApi*        EventApi               = nullptr;
+	CLogHandler*      Logger                 = nullptr;
+
+	std::thread       Thread;
+	bool              IsRunning              = false;
+
+	std::string       Name;
+	Mumble::Data*     MumbleLink             = nullptr;
+	Mumble::Identity* MumbleIdentity         = nullptr;
+	NexusLinkData*    NexusLink              = nullptr;
+
+	bool              Flip                   = false;
+	unsigned          PreviousTick           = 0;
+	Vector3           PreviousAvatarPosition = {};
+	Vector3           PreviousCameraFront    = {};
+	Mumble::Identity  PreviousIdentity       = Mumble::Identity{};
+	long long         PreviousFrameCounter   = 0;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Advance:

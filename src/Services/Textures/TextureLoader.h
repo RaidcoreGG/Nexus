@@ -9,89 +9,29 @@
 #ifndef TEXTURELOADER_H
 #define TEXTURELOADER_H
 
-#include <Windows.h>
-#include <mutex>
 #include <map>
+#include <mutex>
 #include <string>
 #include <vector>
+#include <Windows.h>
 
 #include "FuncDefs.h"
-
-#include "Texture.h"
 #include "QueuedTexture.h"
+#include "Services/Logging/LogHandler.h"
+#include "Texture.h"
 
 constexpr const char* CH_TEXTURES = "Textures";
-
-///----------------------------------------------------------------------------------------------------
-/// TextureLoader Namespace
-///----------------------------------------------------------------------------------------------------
-namespace TextureLoader
-{
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_Get:
-	/// 	Addon API wrapper function for Get.
-	///----------------------------------------------------------------------------------------------------
-	Texture* ADDONAPI_Get(const char* aIdentifier);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_GetOrCreateFromFile:
-	/// 	Addon API wrapper function for GetOrCreate from file.
-	///----------------------------------------------------------------------------------------------------
-	Texture* ADDONAPI_GetOrCreateFromFile(const char* aIdentifier, const char* aFilename);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_GetOrCreateFromResource:
-	/// 	Addon API wrapper function for GetOrCreate from embedded resource.
-	///----------------------------------------------------------------------------------------------------
-	Texture* ADDONAPI_GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_GetOrCreateFromURL:
-	/// 	Addon API wrapper function for GetOrCreate from remote URL.
-	///----------------------------------------------------------------------------------------------------
-	Texture* ADDONAPI_GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_GetOrCreateFromMemory:
-	/// 	Addon API wrapper function for GetOrCreate from memory.
-	///----------------------------------------------------------------------------------------------------
-	Texture* ADDONAPI_GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_LoadFromFile:
-	/// 	Addon API wrapper function for LoadFromFile.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_LoadFromFile(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_LoadFromResource:
-	/// 	Addon API wrapper function for LoadFromResource.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_LoadFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_LoadFromURL:
-	/// 	Addon API wrapper function for LoadFromURL.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_LoadFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_LoadFromMemory:
-	/// 	Addon API wrapper function for LoadFromMemory.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_LoadFromMemory(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback);
-}
 
 ///----------------------------------------------------------------------------------------------------
 /// CTextureLoader Class
 ///----------------------------------------------------------------------------------------------------
 class CTextureLoader
 {
-public:
+	public:
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CTextureLoader() = default;
+	CTextureLoader(CLogHandler* aLogger);
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
@@ -175,10 +115,19 @@ public:
 	///----------------------------------------------------------------------------------------------------
 	int Verify(void* aStartAddress, void* aEndAddress);
 
-private:
-	mutable std::mutex				Mutex;
-	std::map<std::string, Texture*>	Registry;
-	std::vector<QueuedTexture>		QueuedTextures;
+	private:
+	CLogHandler*                                 Logger         = nullptr;
+
+	mutable std::mutex                           Mutex;
+	std::map<std::string, Texture*>              Registry;
+	std::vector<QueuedTexture>                   QueuedTextures;
+
+	struct StagedTextureCallback
+	{
+		TEXTURES_RECEIVECALLBACK                 Callback;
+		bool                                     IsValid;
+	};
+	std::map<std::string, StagedTextureCallback> PendingCallbacks; /* set to false if no longer valid */
 
 	///----------------------------------------------------------------------------------------------------
 	/// OverrideTexture:

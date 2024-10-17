@@ -14,31 +14,9 @@
 #include <map>
 #include <string>
 
+#include "Services/Logging/LogHandler.h"
+
 constexpr const char* CH_LOCALIZATION = "Localization";
-
-///----------------------------------------------------------------------------------------------------
-/// Localization Namespace
-///----------------------------------------------------------------------------------------------------
-namespace Localization
-{
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_Translate:
-	/// 	Addon API wrapper function for Translate. Translates into the currently set language.
-	///----------------------------------------------------------------------------------------------------
-	const char* ADDONAPI_Translate(const char* aIdentifier);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_TranslateTo:
-	/// 	Addon API wrapper function for Translate. Translates into a specific language.
-	///----------------------------------------------------------------------------------------------------
-	const char* ADDONAPI_TranslateTo(const char* aIdentifier, const char* aLanguageIdentifier);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_Set:
-	/// 	Addon API wrapper function to set translated strings.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aString);
-}
 
 ///----------------------------------------------------------------------------------------------------
 /// Locale data struct
@@ -64,11 +42,11 @@ struct QueuedTranslation
 ///----------------------------------------------------------------------------------------------------
 class CLocalization
 {
-public:
+	public:
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CLocalization() = default;
+	CLocalization(CLogHandler* aLogger);
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
@@ -135,18 +113,19 @@ public:
 	///----------------------------------------------------------------------------------------------------
 	std::vector<const char*> GetAllTexts();
 
-private:
+	private:
+	CLogHandler*                   Logger      = nullptr;
 
-	std::mutex								Mutex;
-	std::filesystem::path					Directory;
+	std::mutex                     Mutex;
+	std::filesystem::path          Directory;
 	// Identifier (e.g. "EN-GB") maps to object with display name ("English (United Kingdom)") and a map of all its texts
-	std::map<std::string, Locale>			LocaleAtlas;
-	std::vector<QueuedTranslation>			Queued;
+	std::map<std::string, Locale>  LocaleAtlas;
+	std::vector<QueuedTranslation> Queued;
 
-	Locale* ActiveLocale					= nullptr;
+	Locale* ActiveLocale = nullptr;
 
-	bool IsLocaleDirectorySet				= false;
-	bool IsLocaleAtlasBuilt					= false;
+	bool IsLocaleDirectorySet = false;
+	bool IsLocaleAtlasBuilt = false;
 };
 
 #endif

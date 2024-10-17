@@ -170,16 +170,18 @@ enum class EGameBinds
 	MasteryAccess03		= 206, // Jade Bot Waypoint
 	MasteryAccess04		= 207, // Rift Scan
 	MasteryAccess05		= 208, // Skyscale
+	MasteryAccess06		= 211, // Homestead Doorway
 
 	// Miscellaneous Binds
-	MiscAoELoot				= 74,
-	MiscInteract			= 65,
-	MiscShowEnemies			= 66,
-	MiscShowAllies			= 67,
-	MiscCombatStance		= 68, // Stow/Draw
-	MiscToggleLanguage		= 69,
-	MiscTogglePetCombat		= 76,
-	MiscToggleFullScreen	= 160,
+	MiscAoELoot					= 74,
+	MiscInteract				= 65,
+	MiscShowEnemies				= 66,
+	MiscShowAllies				= 67,
+	MiscCombatStance			= 68, // Stow/Draw
+	MiscToggleLanguage			= 69,
+	MiscTogglePetCombat			= 76,
+	MiscToggleFullScreen		= 160,
+	MiscToggleDecorationMode	= 210, // DecorateMode
 
 	// Toys/Novelties
 	ToyUseDefault	= 162,

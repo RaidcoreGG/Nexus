@@ -17,6 +17,7 @@
 
 #include "Util/Strings.h"
 #include "Util/DLL.h"
+#include "Util/CmdLine.h"
 
 typedef struct _SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX
 {
@@ -116,37 +117,58 @@ bool UnicodeStringContains(PCUNICODE_STRING aStr1, PCUNICODE_STRING aStr2)
 	return false;
 }
 
+EMultiboxState operator|(EMultiboxState lhs, EMultiboxState rhs)
+{
+	return static_cast<EMultiboxState>(std::underlying_type_t<EMultiboxState>(lhs) | std::underlying_type_t<EMultiboxState>(rhs));
+}
+EMultiboxState operator&(EMultiboxState lhs, EMultiboxState rhs)
+{
+	return static_cast<EMultiboxState>(std::underlying_type_t<EMultiboxState>(lhs) & std::underlying_type_t<EMultiboxState>(rhs));
+}
+EMultiboxState operator|=(EMultiboxState& lhs, EMultiboxState rhs)
+{
+	return lhs = lhs | rhs;
+}
+
 namespace Multibox
 {
-	bool ShareArchive()
+	static EMultiboxState s_State          = EMultiboxState::NONE;
+	static bool           s_ArchiveShared  = false;
+	static bool           s_LocalShared    = false;
+	static bool           s_MutexDestroyed = false;
+
+	EMultiboxState GetState()
 	{
-		std::string cmdLine = String::ToLower(GetCommandLineA());
-		if (String::Contains(cmdLine, "-sharearchive"))
+		s_State = EMultiboxState::NONE;
+
+		if (s_ArchiveShared)  { s_State |= EMultiboxState::ARCHIVE_SHARED; }
+		if (s_LocalShared)    { s_State |= EMultiboxState::LOCAL_SHARED; }
+		if (s_MutexDestroyed) { s_State |= EMultiboxState::MUTEX_CLOSED; }
+
+		return s_State;
+	}
+
+	void ShareArchive()
+	{
+		if (CmdLine::HasArgument("-sharearchive"))
 		{
-			/* archive already shared via commandline arguments */
-			return true;
+			s_ArchiveShared = true;
 		}
 
 		//Logger->Critical(CH_CORE, "Multibox::ShareArchive() not implemented.");
-
-		return false;
 	}
 
-	bool ShareLocal()
+	void ShareLocal()
 	{
-		std::string cmdLine = String::ToLower(GetCommandLineA());
-		if (String::Contains(cmdLine, "-multi"))
+		if (CmdLine::HasArgument("-multi"))
 		{
-			/* local archive already shared via commandline arguments */
-			return true;
+			s_LocalShared = true;
 		}
 
 		//Logger->Critical(CH_CORE, "Multibox::ShareLocal() not implemented.");
-
-		return false;
 	}
 
-	bool KillMutex()
+	void KillMutex()
 	{
 		bool wasClosed = false;
 
@@ -162,20 +184,33 @@ namespace Multibox
 			std::vector<HANDLE> handles;
 			GetProcessHandles(handles);
 
+			bool found = false;
+
 			for (int i = 0; i < handles.size(); i++)
 			{
 				HANDLE handle = handles[i];
-				if (GetHandleName(handle, handleName, handleNameSize) && UnicodeStringContains(handleName, &mutexName))
+				if (GetHandleName(handle, handleName, handleNameSize))
 				{
-					CloseHandle(handle);
-					wasClosed = true;
-					break;
+					if (UnicodeStringContains(handleName, &mutexName))
+					{
+						found = true;
+
+						if (CloseHandle(handle))
+						{
+							s_MutexDestroyed = true;
+						}
+
+						break;
+					}
 				}
+			}
+
+			if (!found)
+			{
+				s_MutexDestroyed = true;
 			}
 		}
 
 		delete[] handleName;
-
-		return wasClosed;
 	}
 }

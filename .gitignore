@@ -334,3 +334,4 @@ ASALocalRun/
 .localhistory/
 src/Branch.h
 src/Version.h
+/src/Remote.h

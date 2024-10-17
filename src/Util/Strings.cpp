@@ -100,6 +100,21 @@ namespace String
 		return buffer;
 	}
 
+	std::string FormatByteSize(size_t aSize)
+	{
+		const char* sizes[] = { "Bytes", "KB", "MB", "GB" };
+		float sz = (float)aSize;
+		int order = 0;
+
+		while (sz >= 1024 && order < 3)
+		{
+			order++;
+			sz /= 1024;
+		}
+
+		return Format("%.2f %s", sz, sizes[order]);
+	}
+
 	std::string Normalize(const std::string& aString)
 	{
 		std::string ret;

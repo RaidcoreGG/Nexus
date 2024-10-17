@@ -19,35 +19,8 @@
     <Filter Include="Events">
       <UniqueIdentifier>{062ec4b8-2804-4978-b3c4-381b0cdd4b35}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GUI">
-      <UniqueIdentifier>{8e3da8bf-b792-4844-a919-647f2d4786f6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="_GLOBAL">
       <UniqueIdentifier>{8e43094f-c05b-4eb0-9c90-afd74f653c5b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Widgets">
-      <UniqueIdentifier>{911cde00-7b9a-4d41-9272-bc884666c983}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Widgets\Log">
-      <UniqueIdentifier>{18181f26-b91b-4aa3-b369-8ad04300c752}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Widgets\Addons">
-      <UniqueIdentifier>{c991172a-2d10-4648-a529-d49c1325f759}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Widgets\About">
-      <UniqueIdentifier>{f4d01667-1986-4ab9-96e8-a783ecd77243}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Widgets\Overlay">
-      <UniqueIdentifier>{f86218d1-7120-4b72-9d7e-c97dbee918c7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Widgets\Debug">
-      <UniqueIdentifier>{c9b428d0-6faf-4a6c-90d5-d8264bb96899}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Widgets\QuickAccess">
-      <UniqueIdentifier>{4c9af9fd-e1d8-4b1c-8a86-b5d5c91c500f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Widgets\Menu">
-      <UniqueIdentifier>{eeef4dfb-cf8e-4d2e-a1e7-657fe0b03f13}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource Files\Fonts">
       <UniqueIdentifier>{1893bf7b-bd45-42e7-ad87-1a27b5dd5c62}</UniqueIdentifier>
@@ -55,17 +28,8 @@
     <Filter Include="Resource Files\Images">
       <UniqueIdentifier>{df3c3a30-d02f-4c04-a27c-cfaafff031bb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Images\Menu">
-      <UniqueIdentifier>{ba4ee355-8394-4c12-b6c5-e9b9dcfda39d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Widgets\Options">
-      <UniqueIdentifier>{b211fbda-c7b4-4d75-b2c9-6801eab1bc0a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Paths">
       <UniqueIdentifier>{b0fd71ca-41a2-4a72-a523-b30138c9dcef}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Widgets\EULA">
-      <UniqueIdentifier>{fdc50f5d-b3a6-4446-89c4-7450b69cb75d}</UniqueIdentifier>
     </Filter>
     <Filter Include="_EXTERNAL">
       <UniqueIdentifier>{04d6bcbc-bde2-4787-bd80-0289963e456b}</UniqueIdentifier>
@@ -79,12 +43,6 @@
     <Filter Include="_EXTERNAL\imgui">
       <UniqueIdentifier>{9cf5a43b-f25a-40a9-985c-dc3e2c93acbb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Images\Backgrounds">
-      <UniqueIdentifier>{938be6e2-4197-4fb0-a513-f396feecfc9a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\Images\AddonsWindow">
-      <UniqueIdentifier>{83d6e4ae-4b45-4149-aad4-475bff0bc918}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files\Images\QuickAccess">
       <UniqueIdentifier>{c46e3486-9b1a-4bf8-bc57-adcaf1023e47}</UniqueIdentifier>
     </Filter>
@@ -97,23 +55,11 @@
     <Filter Include="Loader\Enums">
       <UniqueIdentifier>{29b4df1b-599d-49f1-adc5-17961c6073b2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Images\ContextMenu">
-      <UniqueIdentifier>{70632a7c-1799-446b-9390-ea6d16d18e9c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files\Locales">
       <UniqueIdentifier>{3e8eab0f-abb6-49e7-9b6e-4347fe84f0b9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GUI\Widgets\Alerts">
-      <UniqueIdentifier>{442c3943-23d3-443c-bbd4-c0dc42250d4c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Util">
       <UniqueIdentifier>{7b045384-37df-47bf-a9d8-13b7470614b0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\Images\EulaWindow">
-      <UniqueIdentifier>{09e279e3-be44-477f-b606-076e436a1995}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Fonts">
-      <UniqueIdentifier>{eb799d0b-f3d2-4af6-b1bc-c37b5e5c258d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Inputs">
       <UniqueIdentifier>{68734b2f-4069-4723-961d-83db00b90810}</UniqueIdentifier>
@@ -162,6 +108,75 @@
     </Filter>
     <Filter Include="Inputs\InputBinds\Enums">
       <UniqueIdentifier>{5f7a3796-ab71-4979-ace3-8063d007c8b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{82694dd7-d18b-47e2-b118-c0f555122384}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Services">
+      <UniqueIdentifier>{da13c2f6-1efe-4ddf-a84a-1a5ab83b861c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Widgets">
+      <UniqueIdentifier>{dcf015c1-0e23-4a23-a6f6-04ec9a32c053}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Controls">
+      <UniqueIdentifier>{67ab7906-56ba-408f-90d6-abbcd288967d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Services\QoL">
+      <UniqueIdentifier>{df5af072-1334-4d7a-aff2-9f123cfc38fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Services\Fonts">
+      <UniqueIdentifier>{93966cbf-564e-4ce7-943c-76d6620f32b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Widgets\MainWindow">
+      <UniqueIdentifier>{fa4b555a-3ed5-4aa0-9d6c-c6d1d34b0fbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Widgets\Alerts">
+      <UniqueIdentifier>{69e72b47-869f-4ca1-b3ff-c05b5578b065}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Widgets\QuickAccess">
+      <UniqueIdentifier>{d472dc9b-3c23-4c4a-86bb-1a8e2ed57f59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Widgets\EULA">
+      <UniqueIdentifier>{47a73a5f-ea70-44b3-a9d5-a6b0c73149c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_EXTERNAL\ImAnimate">
+      <UniqueIdentifier>{b15de497-e84e-4c7c-bf38-644089178710}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Widgets\MainWindow\Pages">
+      <UniqueIdentifier>{c038cf7e-846b-4a4c-b25e-02dd40fc7fae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Widgets\MainWindow\Pages\Addons">
+      <UniqueIdentifier>{d314d878-e692-49a9-ba0f-da234ef926fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Widgets\MainWindow\Pages\Options">
+      <UniqueIdentifier>{d4c1be83-e870-4bbc-96b2-cd9678bc19d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Widgets\MainWindow\Pages\Log">
+      <UniqueIdentifier>{f0a17962-1dd6-4bd6-8425-9f6d31886561}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Widgets\MainWindow\Pages\About">
+      <UniqueIdentifier>{83b4340f-1b7b-464a-82b7-30a55be221dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Widgets\MainWindow\Pages\Debug">
+      <UniqueIdentifier>{b8ba2958-92c3-4991-a69c-43b4b1f27dce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Widgets\MainWindow\Pages\Binds">
+      <UniqueIdentifier>{c8221a12-6ee1-4eda-853e-6e7565a5b6a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Widgets\Overlay">
+      <UniqueIdentifier>{40e19d6d-1ca9-417f-a2ad-4ea1f0a15517}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Widgets\Overlay\MumbleInspector">
+      <UniqueIdentifier>{0275c141-3eb7-4a9b-8fc5-ea935b2c4c87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Images\icons">
+      <UniqueIdentifier>{ebfcf47c-67f0-41ad-902f-36bd3f225e3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Images\banners">
+      <UniqueIdentifier>{99846d4e-f4ca-443a-91cd-d6df9457545b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Loader\API">
+      <UniqueIdentifier>{e8eae412-d99b-4737-825b-da0c7d8c0a74}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -228,9 +243,6 @@
     <ClCompile Include="src\State.cpp">
       <Filter>_GLOBAL</Filter>
     </ClCompile>
-    <ClCompile Include="src\Hooks.cpp">
-      <Filter>_GLOBAL</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer.cpp">
       <Filter>_GLOBAL</Filter>
     </ClCompile>
@@ -240,47 +252,14 @@
     <ClCompile Include="src\Inputs\InputBinds\InputBind.cpp">
       <Filter>Inputs\InputBinds</Filter>
     </ClCompile>
-    <ClCompile Include="src\GUI\GUI.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GUI\Widgets\About\CAboutBox.cpp">
-      <Filter>GUI\Widgets\About</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GUI\Widgets\Addons\CAddonsWindow.cpp">
-      <Filter>GUI\Widgets\Addons</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GUI\Widgets\Log\CLogWindow.cpp">
-      <Filter>GUI\Widgets\Log</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GUI\Widgets\Overlay\CMumbleOverlay.cpp">
-      <Filter>GUI\Widgets\Overlay</Filter>
-    </ClCompile>
     <ClCompile Include="src\Loader\Loader.cpp">
       <Filter>Loader</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GUI\Widgets\Debug\CDebugWindow.cpp">
-      <Filter>GUI\Widgets\Debug</Filter>
     </ClCompile>
     <ClCompile Include="src\Services\DataLink\DataLink.cpp">
       <Filter>Services\DataLink</Filter>
     </ClCompile>
     <ClCompile Include="src\Services\Textures\TextureLoader.cpp">
       <Filter>Services\Textures</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GUI\Widgets\QuickAccess\QuickAccess.cpp">
-      <Filter>GUI\Widgets\QuickAccess</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Consts.cpp">
-      <Filter>_GLOBAL</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GUI\Widgets\Addons\AddonItem.cpp">
-      <Filter>GUI\Widgets\Addons</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GUI\Widgets\Menu\MenuItem.cpp">
-      <Filter>GUI\Widgets\Menu</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GUI\Widgets\Menu\Menu.cpp">
-      <Filter>GUI\Widgets\Menu</Filter>
     </ClCompile>
     <ClCompile Include="src\Services\Settings\Settings.cpp">
       <Filter>Services\Settings</Filter>
@@ -296,9 +275,6 @@
     </ClCompile>
     <ClCompile Include="src\CrashHandler.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GUI\Widgets\EULA\CEULAModal.cpp">
-      <Filter>GUI\Widgets\EULA</Filter>
     </ClCompile>
     <ClCompile Include="src\Services\Multibox\Multibox.cpp">
       <Filter>Services\Multibox</Filter>
@@ -321,9 +297,6 @@
     <ClCompile Include="src\Events\EventSubscriber.cpp">
       <Filter>Events</Filter>
     </ClCompile>
-    <ClCompile Include="src\GUI\Widgets\Alerts\Alerts.cpp">
-      <Filter>GUI\Widgets\Alerts</Filter>
-    </ClCompile>
     <ClCompile Include="src\Loader\ArcDPS.cpp">
       <Filter>Loader</Filter>
     </ClCompile>
@@ -332,9 +305,6 @@
     </ClCompile>
     <ClCompile Include="src\Services\Updater\Updater.cpp">
       <Filter>Services\Updater</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GUI\Widgets\Options\COptionsWindow.cpp">
-      <Filter>GUI\Widgets\Options</Filter>
     </ClCompile>
     <ClCompile Include="src\Util\Strings.cpp">
       <Filter>Util</Filter>
@@ -350,9 +320,6 @@
     </ClCompile>
     <ClCompile Include="src\Loader\EUpdateProvider.cpp">
       <Filter>Loader\Enums</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GUI\Fonts\FontManager.cpp">
-      <Filter>GUI\Fonts</Filter>
     </ClCompile>
     <ClCompile Include="src\Util\Time.cpp">
       <Filter>Util</Filter>
@@ -377,6 +344,66 @@
     </ClCompile>
     <ClCompile Include="src\Util\Memory.cpp">
       <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Controls\CtlSubWindow.cpp">
+      <Filter>UI\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Services\QoL\EscapeClosing.cpp">
+      <Filter>UI\Services\QoL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\UiContext.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Services\Fonts\FontManager.cpp">
+      <Filter>UI\Services\Fonts</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Widgets\QuickAccess\QuickAccess.cpp">
+      <Filter>UI\Widgets\QuickAccess</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Widgets\Alerts\Alerts.cpp">
+      <Filter>UI\Widgets\Alerts</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Widgets\MainWindow\MainWindow.cpp">
+      <Filter>UI\Widgets\MainWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Widgets\EULA\EULAModal.cpp">
+      <Filter>UI\Widgets\EULA</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thirdparty\ImAnimate\ImAnimate.cpp">
+      <Filter>_EXTERNAL\ImAnimate</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Context.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Widgets\MainWindow\About\About.cpp">
+      <Filter>UI\Widgets\MainWindow\Pages\About</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Widgets\MainWindow\Addons\Addons.cpp">
+      <Filter>UI\Widgets\MainWindow\Pages\Addons</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Widgets\MainWindow\Binds\Binds.cpp">
+      <Filter>UI\Widgets\MainWindow\Pages\Binds</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Widgets\MainWindow\Debug\Debug.cpp">
+      <Filter>UI\Widgets\MainWindow\Pages\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Widgets\MainWindow\Log\Log.cpp">
+      <Filter>UI\Widgets\MainWindow\Pages\Log</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Widgets\MainWindow\Options\Options.cpp">
+      <Filter>UI\Widgets\MainWindow\Pages\Options</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Overlay\MumbleInspector\MumbleInspector.cpp">
+      <Filter>UI\Widgets\Overlay\MumbleInspector</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Controls\CtlWindow.cpp">
+      <Filter>UI\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Util\CmdLine.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Loader\API\ApiFunctionMapper.cpp">
+      <Filter>Loader\API</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -449,9 +476,6 @@
     <ClInclude Include="src\Index.h">
       <Filter>_GLOBAL</Filter>
     </ClInclude>
-    <ClInclude Include="src\Hooks.h">
-      <Filter>_GLOBAL</Filter>
-    </ClInclude>
     <ClInclude Include="src\Renderer.h">
       <Filter>_GLOBAL</Filter>
     </ClInclude>
@@ -464,32 +488,11 @@
     <ClInclude Include="src\Inputs\InputBinds\InputBind.h">
       <Filter>Inputs\InputBinds</Filter>
     </ClInclude>
-    <ClInclude Include="src\GUI\GUI.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
     <ClInclude Include="src\thirdparty\imgui\imgui_extensions.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="src\GUI\IWindow.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\About\CAboutBox.h">
-      <Filter>GUI\Widgets\About</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\Log\CLogWindow.h">
-      <Filter>GUI\Widgets\Log</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\Overlay\CMumbleOverlay.h">
-      <Filter>GUI\Widgets\Overlay</Filter>
-    </ClInclude>
     <ClInclude Include="src\Loader\Loader.h">
       <Filter>Loader</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\Addons\CAddonsWindow.h">
-      <Filter>GUI\Widgets\Addons</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\Debug\CDebugWindow.h">
-      <Filter>GUI\Widgets\Debug</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\DataLink\DataLink.h">
       <Filter>Services\DataLink</Filter>
@@ -524,29 +527,11 @@
     <ClInclude Include="src\Loader\FuncDefs.h">
       <Filter>Loader</Filter>
     </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\QuickAccess\QuickAccess.h">
-      <Filter>GUI\Widgets\QuickAccess</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\QuickAccess\FuncDefs.h">
-      <Filter>GUI\Widgets\QuickAccess</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\QuickAccess\Shortcut.h">
-      <Filter>GUI\Widgets\QuickAccess</Filter>
-    </ClInclude>
     <ClInclude Include="src\Consts.h">
       <Filter>_GLOBAL</Filter>
     </ClInclude>
     <ClInclude Include="src\Inputs\InputBinds\ManagedInputBind.h">
       <Filter>Inputs\InputBinds</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\Addons\AddonItem.h">
-      <Filter>GUI\Widgets\Addons</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\Menu\MenuItem.h">
-      <Filter>GUI\Widgets\Menu</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\Menu\Menu.h">
-      <Filter>GUI\Widgets\Menu</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\Settings\Settings.h">
       <Filter>Services\Settings</Filter>
@@ -554,17 +539,11 @@
     <ClInclude Include="src\Services\API\APIController.h">
       <Filter>Services\API</Filter>
     </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\QuickAccess\EQAPosition.h">
-      <Filter>GUI\Widgets\QuickAccess</Filter>
-    </ClInclude>
     <ClInclude Include="src\Services\API\ActiveToken.h">
       <Filter>Services\API</Filter>
     </ClInclude>
     <ClInclude Include="src\thirdparty\imgui\imgui_memory_editor.h">
       <Filter>_EXTERNAL\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\FuncDefs.h">
-      <Filter>GUI</Filter>
     </ClInclude>
     <ClInclude Include="src\Inputs\RawInput\RawInputApi.h">
       <Filter>Inputs\RawInput</Filter>
@@ -989,17 +968,11 @@
     <ClInclude Include="src\Paths\FuncDefs.h">
       <Filter>Paths</Filter>
     </ClInclude>
-    <ClInclude Include="src\GUI\ERenderType.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
     <ClInclude Include="src\Version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\CrashHandler.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\EULA\CEULAModal.h">
-      <Filter>GUI\Widgets\EULA</Filter>
     </ClInclude>
     <ClInclude Include="src\resource.h">
       <Filter>Resource Files</Filter>
@@ -1055,9 +1028,6 @@
     <ClInclude Include="src\Loader\AddonDefinition.h">
       <Filter>Loader\Structs</Filter>
     </ClInclude>
-    <ClInclude Include="src\Loader\AddonAPI.h">
-      <Filter>Loader\Structs</Filter>
-    </ClInclude>
     <ClInclude Include="src\Loader\NexusLinkData.h">
       <Filter>Loader\Structs</Filter>
     </ClInclude>
@@ -1067,12 +1037,6 @@
     <ClInclude Include="src\Events\EventSubscriber.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\Alerts\Alerts.h">
-      <Filter>GUI\Widgets\Alerts</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\Alerts\FuncDefs.h">
-      <Filter>GUI\Widgets\Alerts</Filter>
-    </ClInclude>
     <ClInclude Include="src\Loader\ArcDPS.h">
       <Filter>Loader</Filter>
     </ClInclude>
@@ -1081,9 +1045,6 @@
     </ClInclude>
     <ClInclude Include="src\Services\Updater\Updater.h">
       <Filter>Services\Updater</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\Options\COptionsWindow.h">
-      <Filter>GUI\Widgets\Options</Filter>
     </ClInclude>
     <ClInclude Include="src\Util\Strings.h">
       <Filter>Util</Filter>
@@ -1099,15 +1060,6 @@
     </ClInclude>
     <ClInclude Include="src\Services\Updater\FuncDefs.h">
       <Filter>Services\Updater</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\EFontIdentifier.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Fonts\FontManager.h">
-      <Filter>GUI\Fonts</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GUI\Fonts\FuncDefs.h">
-      <Filter>GUI\Fonts</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\Mumble\Definitions\Mumble.h">
       <Filter>Services\Mumble</Filter>
@@ -1142,14 +1094,110 @@
     <ClInclude Include="src\Util\Memory.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="src\GUI\Widgets\QuickAccess\EQAVisibility.h">
-      <Filter>GUI\Widgets\QuickAccess</Filter>
-    </ClInclude>
     <ClInclude Include="src\Inputs\InputBinds\EInputBindHandlerType.h">
       <Filter>Inputs\InputBinds\Enums</Filter>
     </ClInclude>
     <ClInclude Include="src\Inputs\InputBinds\EInputBindType.h">
       <Filter>Inputs\InputBinds\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\UiContext.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Controls\CtlSubWindow.h">
+      <Filter>UI\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Services\QoL\EscapeClosing.h">
+      <Filter>UI\Services\QoL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\FuncDefs.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Services\QoL\FuncDefs.h">
+      <Filter>UI\Services\QoL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\ERenderType.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Services\Fonts\FontManager.h">
+      <Filter>UI\Services\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Services\Fonts\FuncDefs.h">
+      <Filter>UI\Services\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\MainWindow\MainWindow.h">
+      <Filter>UI\Widgets\MainWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\QuickAccess\QuickAccess.h">
+      <Filter>UI\Widgets\QuickAccess</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\QuickAccess\EQAPosition.h">
+      <Filter>UI\Widgets\QuickAccess</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\QuickAccess\EQAVisibility.h">
+      <Filter>UI\Widgets\QuickAccess</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\QuickAccess\FuncDefs.h">
+      <Filter>UI\Widgets\QuickAccess</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\QuickAccess\Shortcut.h">
+      <Filter>UI\Widgets\QuickAccess</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\Alerts\FuncDefs.h">
+      <Filter>UI\Widgets\Alerts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\Alerts\Alerts.h">
+      <Filter>UI\Widgets\Alerts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\EULA\EULAModal.h">
+      <Filter>UI\Widgets\EULA</Filter>
+    </ClInclude>
+    <ClInclude Include="src\thirdparty\ImAnimate\ImAnimate.h">
+      <Filter>_EXTERNAL\ImAnimate</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Context.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\MainWindow\About\About.h">
+      <Filter>UI\Widgets\MainWindow\Pages\About</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\Addons.h">
+      <Filter>UI\Widgets\MainWindow\Pages\Addons</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\MainWindow\Binds\Binds.h">
+      <Filter>UI\Widgets\MainWindow\Pages\Binds</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\MainWindow\Debug\Debug.h">
+      <Filter>UI\Widgets\MainWindow\Pages\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\MainWindow\Log\Log.h">
+      <Filter>UI\Widgets\MainWindow\Pages\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\MainWindow\Options\Options.h">
+      <Filter>UI\Widgets\MainWindow\Pages\Options</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Overlay\MumbleInspector\MumbleInspector.h">
+      <Filter>UI\Widgets\Overlay\MumbleInspector</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Controls\CtlWindow.h">
+      <Filter>UI\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Remote.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\DisplayAddon.h">
+      <Filter>UI\Widgets\MainWindow\Pages\Addons</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\DisplayBinds.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Util\CmdLine.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\API\ApiFunctionMapper.h">
+      <Filter>Loader\API</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\API\AddonAPI.h">
+      <Filter>Loader\API</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1188,6 +1236,12 @@
     <None Include="src\Resources\Locales\pl_Main.json">
       <Filter>Resource Files\Locales</Filter>
     </None>
+    <None Include="src\Resources\Locales\fr_Main.json">
+      <Filter>Resource Files\Locales</Filter>
+    </None>
+    <None Include="src\Resources\Locales\cn_Main.json">
+      <Filter>Resource Files\Locales</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Font Include="src\Resources\Fonts\Menomonia.ttf">
@@ -1201,45 +1255,6 @@
     </Font>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="src\Resources\AddonsWindow\AddonItem.png">
-      <Filter>Resource Files\Images\AddonsWindow</Filter>
-    </Image>
-    <Image Include="src\Resources\AddonsWidow\Background.png">
-      <Filter>Resource Files\Images\AddonsWindow</Filter>
-    </Image>
-    <Image Include="src\Resources\AddonsWindow\TitleBar.png">
-      <Filter>Resource Files\Images\AddonsWindow</Filter>
-    </Image>
-    <Image Include="src\Resources\AddonsWindow\TitleBar_Hover.png">
-      <Filter>Resource Files\Images\AddonsWindow</Filter>
-    </Image>
-    <Image Include="src\Resources\Menu\Background.png">
-      <Filter>Resource Files\Images\Menu</Filter>
-    </Image>
-    <Image Include="src\Resources\Menu\BtnAbout.png">
-      <Filter>Resource Files\Images\Menu</Filter>
-    </Image>
-    <Image Include="src\Resources\Menu\BtnAddons.png">
-      <Filter>Resource Files\Images\Menu</Filter>
-    </Image>
-    <Image Include="src\Resources\Menu\BtnChangelog.png">
-      <Filter>Resource Files\Images\Menu</Filter>
-    </Image>
-    <Image Include="src\Resources\Menu\BtnDebug.png">
-      <Filter>Resource Files\Images\Menu</Filter>
-    </Image>
-    <Image Include="src\Resources\Menu\BtnLog.png">
-      <Filter>Resource Files\Images\Menu</Filter>
-    </Image>
-    <Image Include="src\Resources\Menu\BtnOptions.png">
-      <Filter>Resource Files\Images\Menu</Filter>
-    </Image>
-    <Image Include="src\Resources\Menu\MenuItem.png">
-      <Filter>Resource Files\Images\Menu</Filter>
-    </Image>
-    <Image Include="src\Resources\Menu\MenuItem_Hover.png">
-      <Filter>Resource Files\Images\Menu</Filter>
-    </Image>
     <Image Include="src\Resources\QuickAccess\Generic.png">
       <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
@@ -1264,59 +1279,62 @@
     <Image Include="src\Resources\QuickAccess\NexusXmas_Hover.png">
       <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
-    <Image Include="src\Resources\BtnClose.png">
-      <Filter>Resource Files\Images</Filter>
-    </Image>
-    <Image Include="src\Resources\BtnClose_Hover.png">
-      <Filter>Resource Files\Images</Filter>
-    </Image>
-    <Image Include="src\Resources\TitleBarEnd.png">
-      <Filter>Resource Files\Images</Filter>
-    </Image>
-    <Image Include="src\Resources\TitleBarEnd_Hover.png">
-      <Filter>Resource Files\Images</Filter>
-    </Image>
-    <Image Include="src\Resources\TabBtn.png">
-      <Filter>Resource Files\Images\QuickAccess</Filter>
-    </Image>
-    <Image Include="src\Resources\TabBtn_Hover.png">
-      <Filter>Resource Files\Images\QuickAccess</Filter>
-    </Image>
     <Image Include="src\Resources\Notification.png">
       <Filter>Resource Files\Images\QuickAccess</Filter>
     </Image>
-    <Image Include="src\Resources\Menu\BtnOptions_Hover.png">
-      <Filter>Resource Files\Images\Menu</Filter>
-    </Image>
-    <Image Include="src\Resources\ContextMenu\ContextMenu_Bullet.png">
-      <Filter>Resource Files\Images\ContextMenu</Filter>
-    </Image>
-    <Image Include="src\Resources\ContextMenu\ContextMenu_Highlight.png">
-      <Filter>Resource Files\Images\ContextMenu</Filter>
-    </Image>
-    <Image Include="src\Resources\BtnRefresh_Hover.png">
+    <Image Include="src\Resources\RaidcoreTag.png">
       <Filter>Resource Files\Images</Filter>
     </Image>
-    <Image Include="src\Resources\BtnRefresh.png">
-      <Filter>Resource Files\Images</Filter>
+    <Image Include="src\Resources\icons\about.png">
+      <Filter>Resource Files\Images\icons</Filter>
     </Image>
-    <Image Include="src\Resources\Menu\BtnReturn.png">
-      <Filter>Resource Files\Images\Menu</Filter>
+    <Image Include="src\Resources\icons\addonpolicy_notier.png">
+      <Filter>Resource Files\Images\icons</Filter>
     </Image>
-    <Image Include="src\Resources\AddonsWindow\AddonItem_Highlight.png">
-      <Filter>Resource Files\Images\AddonsWindow</Filter>
+    <Image Include="src\Resources\icons\addonpolicy_tier1.png">
+      <Filter>Resource Files\Images\icons</Filter>
     </Image>
-    <Image Include="src\Resources\AddonsWindow\AddonItem_DUU.png">
-      <Filter>Resource Files\Images\AddonsWindow</Filter>
+    <Image Include="src\Resources\icons\addonpolicy_tier2.png">
+      <Filter>Resource Files\Images\icons</Filter>
     </Image>
-    <Image Include="src\Resources\EulaWindow\Background.png">
-      <Filter>Resource Files\Images\EulaWindow</Filter>
+    <Image Include="src\Resources\icons\addonpolicy_tier3.png">
+      <Filter>Resource Files\Images\icons</Filter>
     </Image>
-    <Image Include="src\Resources\EulaWindow\TitleBar.png">
-      <Filter>Resource Files\Images\EulaWindow</Filter>
+    <Image Include="src\Resources\icons\addons.png">
+      <Filter>Resource Files\Images\icons</Filter>
     </Image>
-    <Image Include="src\Resources\EulaWindow\TitleBar_Hover.png">
-      <Filter>Resource Files\Images\EulaWindow</Filter>
+    <Image Include="src\Resources\icons\binds.png">
+      <Filter>Resource Files\Images\icons</Filter>
+    </Image>
+    <Image Include="src\Resources\icons\close.png">
+      <Filter>Resource Files\Images\icons</Filter>
+    </Image>
+    <Image Include="src\Resources\icons\debug.png">
+      <Filter>Resource Files\Images\icons</Filter>
+    </Image>
+    <Image Include="src\Resources\icons\ext.png">
+      <Filter>Resource Files\Images\icons</Filter>
+    </Image>
+    <Image Include="src\Resources\icons\home.png">
+      <Filter>Resource Files\Images\icons</Filter>
+    </Image>
+    <Image Include="src\Resources\icons\log.png">
+      <Filter>Resource Files\Images\icons</Filter>
+    </Image>
+    <Image Include="src\Resources\icons\refresh.png">
+      <Filter>Resource Files\Images\icons</Filter>
+    </Image>
+    <Image Include="src\Resources\icons\settings.png">
+      <Filter>Resource Files\Images\icons</Filter>
+    </Image>
+    <Image Include="src\Resources\banners\discord.png">
+      <Filter>Resource Files\Images\banners</Filter>
+    </Image>
+    <Image Include="src\Resources\banners\patreon.png">
+      <Filter>Resource Files\Images\banners</Filter>
+    </Image>
+    <Image Include="src\Resources\icons\chevron_rt.png">
+      <Filter>Resource Files\Images\icons</Filter>
     </Image>
   </ItemGroup>
 </Project>

@@ -34,7 +34,7 @@ class CFileLogger : public virtual ILogger
 		/// LogMessage:
 		/// 	Overriden function to write to a file.
 		///----------------------------------------------------------------------------------------------------
-		void LogMessage(LogEntry aLogEntry);
+		void LogMessage(LogEntry* aLogEntry);
 
 	private:
 		std::ofstream File;

@@ -13,22 +13,7 @@
 #include <algorithm>
 #include <chrono>
 
-#include "Shared.h"
-
 #include "Util/Time.h"
-
-namespace LogHandler
-{
-	void ADDONAPI_LogMessage(ELogLevel aLogLevel, const char* aStr)
-	{
-		Logger->LogMessageUnformatted(aLogLevel, "Addon", aStr);
-	}
-
-	void ADDONAPI_LogMessage2(ELogLevel aLogLevel, const char* aChannel, const char* aStr)
-	{
-		Logger->LogMessageUnformatted(aLogLevel, aChannel, aStr);
-	}
-}
 
 void CLogHandler::RegisterLogger(ILogger* aLogger)
 {
@@ -39,7 +24,7 @@ void CLogHandler::RegisterLogger(ILogger* aLogger)
 	this->Registry.push_back(aLogger);
 
 	/* replay log messages */
-	for (LogEntry entry : this->LogEntries)
+	for (LogEntry* entry : this->LogEntries)
 	{
 		aLogger->LogMessage(entry);
 	}
@@ -112,22 +97,34 @@ void CLogHandler::LogMessageV(ELogLevel aLogLevel, std::string aChannel, const c
 
 void CLogHandler::LogMessageUnformatted(ELogLevel aLogLevel, std::string aChannel, const char* aMsg)
 {
-	LogEntry entry;
-	entry.LogLevel = aLogLevel;
-	entry.Timestamp = Time::GetTimestamp();
-	entry.TimestampMilliseconds = Time::GetMilliseconds();
-	entry.Channel = aChannel;
-	entry.Message = aMsg;
+	LogEntry* entry = nullptr;
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
-	/* store log entries */
-	this->LogEntries.push_back(entry);
+	if (aMsg == LastMessage && aLogLevel == LastMessageLevel)
+	{
+		entry = this->LogEntries[this->LogEntries.size() - 1];
+		entry->RepeatCount++;
+	}
+	else
+	{
+		entry = new LogEntry();
+		entry->LogLevel = aLogLevel;
+		entry->Timestamp = Time::GetTimestamp();
+		entry->TimestampMilliseconds = Time::GetMilliseconds();
+		entry->Channel = aChannel;
+		entry->Message = aMsg;
+		LastMessage = aMsg;
+		LastMessageLevel = aLogLevel;
+
+		/* store new log entry */
+		this->LogEntries.push_back(entry);
+	}
 
 	for (ILogger* logger : this->Registry)
 	{
 		/* send logged message to logger if message log level is lower than logger level */
-		if (entry.LogLevel <= logger->GetLogLevel())
+		if (entry->LogLevel <= logger->GetLogLevel())
 		{
 			logger->LogMessage(entry);
 		}

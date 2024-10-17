@@ -83,7 +83,7 @@ AddonVersion::AddonVersion(std::string aVersionString)
 	}
 }
 
-std::string AddonVersion::string()
+std::string AddonVersion::string() const
 {
 	std::string str;
 	str.append(std::to_string(Major) + ".");

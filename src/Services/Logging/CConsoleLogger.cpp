@@ -31,11 +31,13 @@ CConsoleLogger::~CConsoleLogger()
 	FreeConsole();
 }
 
-void CConsoleLogger::LogMessage(LogEntry aLogEntry)
+void CConsoleLogger::LogMessage(LogEntry* aLogEntry)
 {
 	const std::lock_guard<std::mutex> lock(Mutex);
+
+	if (aLogEntry->RepeatCount == 1)
 	{
-		switch (aLogEntry.LogLevel)
+		switch (aLogEntry->LogLevel)
 		{
 			case ELogLevel::CRITICAL:    SetConsoleTextAttribute(hConsole, 12); break;
 			case ELogLevel::WARNING:     SetConsoleTextAttribute(hConsole, 14); break;
@@ -44,6 +46,6 @@ void CConsoleLogger::LogMessage(LogEntry aLogEntry)
 			default:                     SetConsoleTextAttribute(hConsole, 7); break;
 		}
 
-		std::cout << aLogEntry.ToString(true, true, true);
+		std::cout << aLogEntry->ToString(true, true, true);
 	}
 }

@@ -34,7 +34,7 @@ struct AddonVersion
 	AddonVersion(json& aJson);
 	AddonVersion(std::string aVersionString);
 
-	std::string string();
+	std::string string() const;
 };
 
 bool operator>(AddonVersion lhs, AddonVersion rhs);

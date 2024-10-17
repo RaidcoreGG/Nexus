@@ -34,6 +34,7 @@ namespace Index
 	std::filesystem::path F_GAMEBINDS{};
 	std::filesystem::path F_SETTINGS{};
 	std::filesystem::path F_ADDONCONFIG{};
+	std::filesystem::path F_ADDONCONFIG_DEFAULT{};
 	std::filesystem::path F_APIKEYS{};
 
 	std::filesystem::path F_LOCALE_EN{};
@@ -79,6 +80,7 @@ namespace Index
 		F_GAMEBINDS = D_GW2_ADDONS_NEXUS / "GameBinds.json";							/* get gamebinds path */
 		F_SETTINGS = D_GW2_ADDONS_NEXUS / "Settings.json";								/* get settings path */
 		F_ADDONCONFIG = D_GW2_ADDONS_NEXUS / "AddonConfig.json";						/* get addon config path */
+		F_ADDONCONFIG_DEFAULT = D_GW2_ADDONS_NEXUS / "AddonConfig.json";						/* get addon config path */
 		F_APIKEYS = D_GW2_ADDONS_COMMON / "APIKeys.json";								/* get apikeys path */
 			
 		/* static paths */

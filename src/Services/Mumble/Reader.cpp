@@ -8,13 +8,8 @@
 
 #include "Services/Mumble/Reader.h"
 
-#include "Consts.h"
-#include "Shared.h" /* FIXME: This is included at the moment because the LogHandler isn't dependency-injected. Fix before 2024/06/30. */
 #include "Renderer.h"
-#include "Hooks.h" /* FIXME: This is included at the moment because the NexusLink isn't dependency-injected. Fix before 2024/06/30. */
-
-#include "Events/EventHandler.h"
-#include "Services/DataLink/DataLink.h"
+#include "Util/CmdLine.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -23,8 +18,6 @@ using namespace Mumble;
 
 namespace Mumble
 {
-	Identity* IdentityParsed = new Identity{};
-
 	bool operator==(const Identity& lhs, const Identity& rhs)
 	{
 		if (strcmp(lhs.Name, rhs.Name) == 0 &&
@@ -92,19 +85,29 @@ namespace Mumble
 	}
 }
 
-CMumbleReader::CMumbleReader(std::string aMumbleName)
+CMumbleReader::CMumbleReader(CDataLink* aDataLink, CEventApi* aEventApi, CLogHandler* aLogger)
 {
-	this->Name = aMumbleName;
+	assert(aDataLink);
+	assert(aEventApi);
+	assert(aLogger);
+
+	this->DataLinkApi = aDataLink;
+	this->EventApi = aEventApi;
+	this->Logger = aLogger;
+
+	this->Name = CmdLine::GetArgumentValue("-mumble");
+
+	if (this->Name.empty())
+	{
+		this->Name = "MumbleLink";
+	}
 
 	/* share the linked mem regardless whether it's disabled, for dependant addons */
-	MumbleLink = (Mumble::Data*)DataLinkService->ShareResource(DL_MUMBLE_LINK, sizeof(Mumble::Data), aMumbleName.c_str(), true);
-	Hooks::NexusLink = NexusLink = (NexusLinkData*)DataLinkService->ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData), true);
+	this->MumbleLink = (Mumble::Data*)this->DataLinkApi->ShareResource(DL_MUMBLE_LINK, sizeof(Mumble::Data), this->Name.c_str(), true);
+	this->MumbleIdentity = (Mumble::Identity*)this->DataLinkApi->ShareResource(DL_MUMBLE_LINK_IDENTITY, sizeof(Mumble::Identity), false);
+	this->NexusLink = (NexusLinkData*)this->DataLinkApi->ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData), true);
 
-	if (aMumbleName == "0")
-	{
-		this->IsMumbleDisabled = true;
-	}
-	else
+	if (this->Name != "0")
 	{
 		this->IsRunning = true;
 		this->Thread = std::thread(&CMumbleReader::Advance, this);
@@ -121,11 +124,21 @@ CMumbleReader::~CMumbleReader()
 	}
 }
 
+std::string CMumbleReader::GetName()
+{
+	return this->Name;
+}
+
+bool CMumbleReader::IsDisabled()
+{
+	return !this->IsRunning;
+}
+
 void CMumbleReader::Advance()
 {
 	while (this->IsRunning)
 	{
-		this->Flip = !this->Flip; // every other tick so it gets refreshed every 100ms
+		this->Flip = !this->Flip; // every other tick so it gets refreshed every 100ms // FIXME: this is ugly lol
 		if (this->Flip)
 		{
 			this->NexusLink->IsGameplay = this->PreviousTick != this->MumbleLink->UITick ||
@@ -142,42 +155,45 @@ void CMumbleReader::Advance()
 		if (this->MumbleLink->Identity[0])
 		{
 			/* cache identity */
-			this->PreviousIdentity = *IdentityParsed;
+			this->PreviousIdentity = *this->MumbleIdentity;
 
 			try
 			{
 				/* parse and assign current identity */
 				json j = json::parse(MumbleLink->Identity);
-				strcpy(IdentityParsed->Name, j["name"].get<std::string>().c_str());
-				j["profession"].get_to(IdentityParsed->Profession);
-				j["spec"].get_to(IdentityParsed->Specialization);
-				j["race"].get_to(IdentityParsed->Race);
-				j["map_id"].get_to(IdentityParsed->MapID);
-				j["world_id"].get_to(IdentityParsed->WorldID);
-				j["team_color_id"].get_to(IdentityParsed->TeamColorID);
-				j["commander"].get_to(IdentityParsed->IsCommander);
-				j["fov"].get_to(IdentityParsed->FOV);
-				j["uisz"].get_to(IdentityParsed->UISize);
+				strcpy(this->MumbleIdentity->Name, j["name"].get<std::string>().c_str());
+				j["profession"].get_to(this->MumbleIdentity->Profession);
+				j["spec"].get_to(this->MumbleIdentity->Specialization);
+				j["race"].get_to(this->MumbleIdentity->Race);
+				j["map_id"].get_to(this->MumbleIdentity->MapID);
+				j["world_id"].get_to(this->MumbleIdentity->WorldID);
+				j["team_color_id"].get_to(this->MumbleIdentity->TeamColorID);
+				j["commander"].get_to(this->MumbleIdentity->IsCommander);
+				j["fov"].get_to(this->MumbleIdentity->FOV);
+				j["uisz"].get_to(this->MumbleIdentity->UISize);
+
+				this->NexusLink->Scaling = GetScalingFactor(this->MumbleIdentity->UISize);
 			}
 			catch (json::parse_error& ex)
 			{
-				Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
+				this->Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
 			}
 			catch (json::type_error& ex)
 			{
-				Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Type Error: %s", ex.what());
+				this->Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Type Error: %s", ex.what());
 			}
 			catch (...)
 			{
-				Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Unknown Error.");
+				this->Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Unknown Error.");
 			}
 
 			/* notify (also notifies the GUI to update its scaling factor) */
-			if (*IdentityParsed != this->PreviousIdentity)
+			if (*this->MumbleIdentity != this->PreviousIdentity)
 			{
-				EventApi->Raise("EV_MUMBLE_IDENTITY_UPDATED", IdentityParsed);
+				this->EventApi->Raise(EV_MUMBLE_IDENTITY_UPDATED, this->MumbleIdentity);
 			}
 		}
+
 		for (size_t i = 0; i < 50; i++)
 		{
 			if (!this->IsRunning) { return; } // abort if shutdown during sleep

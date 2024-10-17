@@ -63,9 +63,28 @@ LPARAM& KMFToLParam(KeystrokeMessageFlags& aKmf);
 LPARAM GetKeyMessageLPARAM(unsigned aVKey, bool aIsDown, bool aIsSystem);
 
 ///----------------------------------------------------------------------------------------------------
+/// GetKeyMessageLPARAM_ScanCode:
+/// 	Creates an LPARAM for key messages.
+///----------------------------------------------------------------------------------------------------
+LPARAM GetKeyMessageLPARAM_ScanCode(unsigned short aScanCode, bool aIsDown, bool aIsSystem);
+
+///----------------------------------------------------------------------------------------------------
 /// GetMouseMessageWPARAM:
 /// 	Creates an WPARAM for mouse messages.
 ///----------------------------------------------------------------------------------------------------
 WPARAM GetMouseMessageWPARAM(EMouseButtons aMouseButton, bool aIsCtrl, bool aIsShift, bool aIsDown);
+
+///----------------------------------------------------------------------------------------------------
+/// Inputs Namespace
+///----------------------------------------------------------------------------------------------------
+namespace Inputs
+{
+
+	///----------------------------------------------------------------------------------------------------
+	/// IsCursorHidden:
+	/// 	Returns true if the cursor is hidden.
+	///----------------------------------------------------------------------------------------------------
+	bool IsCursorHidden();
+}
 
 #endif

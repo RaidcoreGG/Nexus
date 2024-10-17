@@ -10,47 +10,12 @@
 
 #include <fstream>
 
+#include "Context.h"
 #include "Index.h"
 #include "Util/Inputs.h"
 
-/* FIXME: remove this -> DI */
-#include "Shared.h"
-
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
-
-namespace GameBinds
-{
-	void ADDONAPI_PressAsync(EGameBinds aGameBind)
-	{
-		GameBindsApi->PressAsync(aGameBind);
-	}
-
-	void ADDONAPI_ReleaseAsync(EGameBinds aGameBind)
-	{
-		GameBindsApi->ReleaseAsync(aGameBind);
-	}
-
-	void ADDONAPI_InvokeAsync(EGameBinds aGameBind, int aDuration)
-	{
-		GameBindsApi->InvokeAsync(aGameBind, aDuration);
-	}
-
-	void ADDONAPI_Press(EGameBinds aGameBind)
-	{
-		GameBindsApi->Press(aGameBind);
-	}
-
-	void ADDONAPI_Release(EGameBinds aGameBind)
-	{
-		GameBindsApi->Release(aGameBind);
-	}
-
-	bool ADDONAPI_IsBound(EGameBinds aGameBind)
-	{
-		return GameBindsApi->IsBound(aGameBind);
-	}
-}
 
 std::string CGameBindsApi::ToString(EGameBinds aGameBind)
 {
@@ -220,6 +185,7 @@ std::string CGameBindsApi::ToString(EGameBinds aGameBind)
 		{ EGameBinds::MasteryAccess03, "((MasteryAccess03))" }, // Jade Bot Waypoint
 		{ EGameBinds::MasteryAccess04, "((MasteryAccess04))" }, // Rift Scan
 		{ EGameBinds::MasteryAccess05, "((MasteryAccess05))" }, // Skyscale
+		{ EGameBinds::MasteryAccess06, "((MasteryAccess06))" }, // // Homestead Doorway
 
 		// Miscellaneous Binds
 		{ EGameBinds::MiscAoELoot, "((MiscAoELoot))" },
@@ -230,6 +196,7 @@ std::string CGameBindsApi::ToString(EGameBinds aGameBind)
 		{ EGameBinds::MiscToggleLanguage, "((MiscToggleLanguage))" },
 		{ EGameBinds::MiscTogglePetCombat, "((MiscTogglePetCombat))" },
 		{ EGameBinds::MiscToggleFullScreen, "((MiscToggleFullScreen))" },
+		{ EGameBinds::MiscToggleDecorationMode, "((MiscToggleDecorationMode))" }, // Decoration Mode
 
 		// Toys/Novelties
 		{ EGameBinds::ToyUseDefault, "((ToyUseDefault))" },
@@ -446,6 +413,7 @@ std::string CGameBindsApi::GetCategory(EGameBinds aGameBind)
 		{ EGameBinds::MasteryAccess03, GKBCAT_MASTERY }, // Jade Bot Waypoint
 		{ EGameBinds::MasteryAccess04, GKBCAT_MASTERY }, // Rift Scan
 		{ EGameBinds::MasteryAccess05, GKBCAT_MASTERY }, // Skyscale
+		{ EGameBinds::MasteryAccess06, GKBCAT_MASTERY }, // Homestead Doorway
 
 		// Miscellaneous Binds
 		{ EGameBinds::MiscAoELoot, GKBCAT_MISC },
@@ -456,6 +424,7 @@ std::string CGameBindsApi::GetCategory(EGameBinds aGameBind)
 		{ EGameBinds::MiscToggleLanguage, GKBCAT_MISC },
 		{ EGameBinds::MiscTogglePetCombat, GKBCAT_MISC },
 		{ EGameBinds::MiscToggleFullScreen, GKBCAT_MISC },
+		{ EGameBinds::MiscToggleDecorationMode, GKBCAT_MISC }, // Decoration Mode
 
 		// Toys/Novelties
 		{ EGameBinds::ToyUseDefault, GKBCAT_MISC },
@@ -560,8 +529,8 @@ unsigned short CGameBindsApi::GameBindCodeToScanCode(unsigned short aGameScanCod
 		{ 74, 0x24 }, // J
 		{ 75, 0x25 }, // K
 		{ 76, 0x26 }, // L
-		{ 77, 0x31 }, // M
-		{ 78, 0x32 }, // N
+		{ 77, 0x32 }, // M
+		{ 78, 0x31 }, // N
 		{ 79, 0x18 }, // O
 		{ 80, 0x19 }, // P
 		{ 81, 0x10 }, // Q
@@ -599,21 +568,17 @@ unsigned short CGameBindsApi::GameBindCodeToScanCode(unsigned short aGameScanCod
 	return LookupTable[aGameScanCode];
 }
 
-static CGameBindsApi* UEInputBindUpdatesTarget = nullptr;
-
-void CGameBindsApi::EnableUEInputBindUpdates(CGameBindsApi* aGameBindsApi)
-{
-	UEInputBindUpdatesTarget = aGameBindsApi;
-}
-
-void CGameBindsApi::DisableUEInputBindUpdates()
-{
-	UEInputBindUpdatesTarget = nullptr;
-}
-
 void CGameBindsApi::OnUEInputBindChanged(void* aData)
 {
-	if (!UEInputBindUpdatesTarget) { return; }
+	static CGameBindsApi* s_GameBindsApi = nullptr;
+
+	if (!s_GameBindsApi)
+	{
+		CContext* ctx = CContext::GetContext();
+		s_GameBindsApi = ctx->GetGameBindsApi();
+
+		assert(s_GameBindsApi);
+	}
 
 	struct UEKey
 	{
@@ -632,7 +597,7 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 	UEInputBindChanged* kbChange = (UEInputBindChanged*)aData;
 
 	/* abort if it's the secondary bind, but the key is already set*/
-	if (kbChange->Index == 1 && UEInputBindUpdatesTarget->IsBound(kbChange->Identifier))
+	if (kbChange->Index == 1 && s_GameBindsApi->IsBound(kbChange->Identifier))
 	{
 		return;
 	}
@@ -678,11 +643,20 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 		}
 	}
 
-	UEInputBindUpdatesTarget->Set(kbChange->Identifier, ib, true);
+	s_GameBindsApi->Set(kbChange->Identifier, ib, true);
+
+	CContext* ctx = CContext::GetContext();
+	CUiContext* uictx = ctx->GetUIContext();
+
+	uictx->Invalidate();
 }
 
 CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, CEventApi* aEventApi)
 {
+	assert(aRawInputApi);
+	assert(aLogger);
+	assert(aEventApi);
+
 	this->RawInputApi = aRawInputApi;
 	this->Logger = aLogger;
 	this->EventApi = aEventApi;
@@ -690,21 +664,12 @@ CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, C
 	this->Load();
 	this->AddDefaultBinds();
 
-	CGameBindsApi::EnableUEInputBindUpdates(this);
-	this->EventApi->Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged, true);
-
-	//ASSERT(this->RawInputApi);
-	//ASSERT(this->Logger);
+	this->EventApi->Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
 }
 
 CGameBindsApi::~CGameBindsApi()
 {
-	CGameBindsApi::DisableUEInputBindUpdates();
 	this->EventApi->Unsubscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
-
-	this->RawInputApi = nullptr;
-	this->Logger = nullptr;
-	this->EventApi = nullptr;
 }
 
 void CGameBindsApi::PressAsync(EGameBinds aGameBind)
@@ -743,27 +708,33 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYDOWN, VK_MENU, GetKeyMessageLPARAM(VK_MENU, true, true));
 	}
+	else if (!ib.Alt && GetAsyncKeyState(VK_MENU))
+	{
+		this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYUP, VK_MENU, GetKeyMessageLPARAM(VK_MENU, false, true));
+	}
+
 	if (ib.Ctrl)
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_CONTROL, GetKeyMessageLPARAM(VK_CONTROL, true, false));
 	}
+	else if (!ib.Ctrl && GetAsyncKeyState(VK_CONTROL))
+	{
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, VK_CONTROL, GetKeyMessageLPARAM(VK_CONTROL, false, false));
+	}
+
 	if (ib.Shift)
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, true, false));
 	}
+	else if (!ib.Shift && GetAsyncKeyState(VK_SHIFT))
+	{
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, false, false));
+	}
 
 	if (ib.Type == EInputBindType::Keyboard)
 	{
-		KeyLParam key{};
-		key.RepeatCount = 1;
-		key.ScanCode = ib.Code;
-		key.ExtendedFlag = (ib.Code & 0xE000) != 0;
-		key.Reserved = 0;
-		key.ContextCode = ib.Alt;
-		key.PreviousKeyState = 0;
-		key.TransitionState = 0;
-
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK), KMFToLParam(key));
+		UINT vk = MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK_EX);
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, vk, GetKeyMessageLPARAM_ScanCode(ib.Code, true, false));
 	}
 	else if (ib.Type == EInputBindType::Mouse)
 	{
@@ -810,6 +781,20 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 			}
 		}
 	}
+
+	/* restore modifiers */
+	if (!ib.Alt && GetAsyncKeyState(VK_MENU))
+	{
+		this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYDOWN, VK_MENU, GetKeyMessageLPARAM(VK_MENU, true, true));
+	}
+	if (!ib.Ctrl && GetAsyncKeyState(VK_CONTROL))
+	{
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_CONTROL, GetKeyMessageLPARAM(VK_CONTROL, true, false));
+	}
+	if (!ib.Shift && GetAsyncKeyState(VK_SHIFT))
+	{
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, true, false));
+	}
 }
 
 void CGameBindsApi::Release(EGameBinds aGameBind)
@@ -823,16 +808,8 @@ void CGameBindsApi::Release(EGameBinds aGameBind)
 
 	if (ib.Type == EInputBindType::Keyboard)
 	{
-		KeyLParam key{};
-		key.RepeatCount = 1;
-		key.ScanCode = ib.Code;
-		key.ExtendedFlag = (ib.Code & 0xE000) != 0;
-		key.Reserved = 0;
-		key.ContextCode = ib.Alt;
-		key.PreviousKeyState = 1;
-		key.TransitionState = 1;
-
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK), KMFToLParam(key));
+		int vk = MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK_EX);
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, vk, GetKeyMessageLPARAM_ScanCode(ib.Code, false, false));
 	}
 	else if (ib.Type == EInputBindType::Mouse)
 	{
@@ -880,17 +857,31 @@ void CGameBindsApi::Release(EGameBinds aGameBind)
 		}
 	}
 
-	if (ib.Alt)
+	if (ib.Alt && !GetAsyncKeyState(VK_MENU))
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYUP, VK_MENU, GetKeyMessageLPARAM(VK_MENU, false, true));
 	}
-	if (ib.Ctrl)
+	else if (GetAsyncKeyState(VK_MENU))
+	{
+		this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYDOWN, VK_MENU, GetKeyMessageLPARAM(VK_MENU, true, true));
+	}
+
+	if (ib.Ctrl && !GetAsyncKeyState(VK_CONTROL))
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, VK_CONTROL, GetKeyMessageLPARAM(VK_CONTROL, false, false));
 	}
-	if (ib.Shift)
+	else if (GetAsyncKeyState(VK_CONTROL))
+	{
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_CONTROL, GetKeyMessageLPARAM(VK_CONTROL, true, false));
+	}
+
+	if (ib.Shift && !GetAsyncKeyState(VK_SHIFT))
 	{
 		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, false, false));
+	}
+	else if (GetAsyncKeyState(VK_SHIFT))
+	{
+		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, true, false));
 	}
 }
 

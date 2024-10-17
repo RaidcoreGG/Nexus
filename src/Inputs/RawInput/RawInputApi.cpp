@@ -8,27 +8,7 @@
 
 #include "RawInputApi.h"
 
-#include "Hooks.h"
 #include "Renderer.h"
-#include "Shared.h"
-
-namespace RawInput
-{
-	LRESULT ADDONAPI_SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-	{
-		return RawInputApi->SendWndProcToGame(hWnd, uMsg, wParam, lParam);
-	}
-
-	void ADDONAPI_Register(WNDPROC_CALLBACK aWndProcCallback)
-	{
-		RawInputApi->Register(aWndProcCallback);
-	}
-
-	void ADDONAPI_Deregister(WNDPROC_CALLBACK aWndProcCallback)
-	{
-		RawInputApi->Deregister(aWndProcCallback);
-	}
-}
 
 UINT CRawInputApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -48,7 +28,16 @@ UINT CRawInputApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 LRESULT CRawInputApi::SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	return CallWindowProcA(Hooks::GW2::WndProc, Renderer::WindowHandle, uMsg, wParam, lParam);
+	if (uMsg >= WM_USER)
+	{
+		return PostMessageA(Renderer::WindowHandle, uMsg, wParam, lParam);
+	}
+	else
+	{
+		return PostMessageA(Renderer::WindowHandle, uMsg + WM_PASSTHROUGH_FIRST, wParam, lParam);
+	}
+
+	return PostMessage(Renderer::WindowHandle, uMsg, wParam, lParam);
 }
 
 void CRawInputApi::Register(WNDPROC_CALLBACK aWndProcCallback)

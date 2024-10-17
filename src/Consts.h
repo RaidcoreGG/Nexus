@@ -1,63 +1,42 @@
 #ifndef CONSTS_H
 #define CONSTS_H
 
-#include <Windows.h>
-
 constexpr const char* NULLSTR = "(null)";
 
+/* Options */
+constexpr const char* OPT_LASTGAMEBUILD            = "LastGameBuild";
+constexpr const char* OPT_ACCEPTEULA               = "AcceptEULA";
+constexpr const char* OPT_NOTIFYCHANGELOG          = "NotifyChangelog";
+constexpr const char* OPT_CLOSEESCAPE              = "CloseOnEscape";
+constexpr const char* OPT_LASTUISCALE              = "LastUIScale";
+constexpr const char* OPT_FONTSIZE                 = "FontSize";
+constexpr const char* OPT_QAVERTICAL               = "QAVertical";
+constexpr const char* OPT_QAVISIBILITY             = "QAVisibility";
+constexpr const char* OPT_QALOCATION               = "QALocation";
+constexpr const char* OPT_QAOFFSETX                = "QAOffsetX";
+constexpr const char* OPT_QAOFFSETY                = "QAOffsetY";
+constexpr const char* OPT_LINKARCSTYLE             = "LinkWithArcDPSStyle";
+constexpr const char* OPT_IMGUISTYLE               = "ImGuiStyle";
+constexpr const char* OPT_IMGUICOLORS              = "ImGuiColors";
+constexpr const char* OPT_LANGUAGE                 = "Language";
+constexpr const char* OPT_GLOBALSCALE              = "GlobalScale";
+constexpr const char* OPT_SHOWADDONSWINDOWAFTERDUU = "ShowAddonsWindowAfterDisableUntilUpdate";
+constexpr const char* OPT_USERFONT                 = "UserFont";
+constexpr const char* OPT_DISABLEFESTIVEFLAIR      = "DisableFestiveFlair";
+
 /* Channels */
-extern const char* CH_CORE;
-extern const char* CH_QUICKACCESS;
-extern const char* CH_LOADER;
-
-/* InputBinds */
-extern const char* KB_MENU;
-extern const char* KB_ADDONS;
-extern const char* KB_OPTIONS;
-extern const char* KB_LOG;
-extern const char* KB_DEBUG;
-extern const char* KB_MUMBLEOVERLAY;
-extern const char* KB_TOGGLEHIDEUI;
-
-/* Textures & Icons */
-extern const char* ICON_NEXUS;
-extern const char* ICON_NEXUS_HOVER;
-extern const char* ICON_GENERIC;
-extern const char* ICON_GENERIC_HOVER;
-extern const char* ICON_NOTIFICATION;
-extern const char* ICON_WARNING;
-extern const char* ICON_RETURN;
-extern const char* ICON_ADDONS;
-extern const char* ICON_OPTIONS;
-extern const char* ICON_OPTIONS_HOVER;
-extern const char* ICON_CHANGELOG;
-extern const char* ICON_LOG;
-extern const char* ICON_DEBUG;
-extern const char* ICON_ABOUT;
-extern const char* TEX_MENU_BACKGROUND;
-extern const char* TEX_MENU_BUTTON;
-extern const char* TEX_MENU_BUTTON_HOVER;
-
-/* Quick Access*/
-extern const char* QA_MENU;
+constexpr const char* CH_CORE = "Core";
+constexpr const char* CH_LOADER = "Loader";
 
 /* Events */
-extern const char* EV_WINDOW_RESIZED;
-extern const char* EV_MUMBLE_IDENTITY_UPDATED;
-extern const char* EV_ADDON_LOADED;
-extern const char* EV_ADDON_UNLOADED;
-extern const char* EV_VOLATILE_ADDON_DISABLED;
-
-/* DataLink */
-constexpr const char* DL_MUMBLE_LINK = "DL_MUMBLE_LINK";
-constexpr const char* DL_NEXUS_LINK = "DL_NEXUS_LINK";
-
-/* Loader */
-extern const UINT WM_ADDONDIRUPDATE;
+constexpr const char* EV_WINDOW_RESIZED = "EV_WINDOW_RESIZED";
+constexpr const char* EV_ADDON_LOADED = "EV_ADDON_LOADED";
+constexpr const char* EV_ADDON_UNLOADED = "EV_ADDON_UNLOADED";
+constexpr const char* EV_VOLATILE_ADDON_DISABLED = "EV_VOLATILE_ADDON_DISABLED";
 
 /* API */
-extern const char* API_RAIDCORE;
-extern const char* API_GITHUB;
-extern const char* API_GW2;
+constexpr const char* API_RAIDCORE = "https://api.raidcore.gg";
+constexpr const char* API_GITHUB = "https://api.github.com";
+constexpr const char* API_GW2 = "https://api.guildwars2.com";
 
 #endif

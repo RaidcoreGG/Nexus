@@ -20,48 +20,6 @@
 constexpr const char* CH_EVENTS = "Events";
 
 ///----------------------------------------------------------------------------------------------------
-/// Events Namespace
-///----------------------------------------------------------------------------------------------------
-namespace Events
-{
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_Subscribe:
-	/// 	Addon API wrapper function for subscribing to events.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_Unsubscribe:
-	/// 	Addon API wrapper function for unsubscribing from events.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_RaiseEvent:
-	/// 	Addon API wrapper function for raising events.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_RaiseEvent(const char* aIdentifier, void* aEventData);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_RaiseNotification:
-	/// 	Addon API wrapper function for raising events without payloads.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_RaiseNotification(const char* aIdentifier);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_RaiseEventTargeted:
-	/// 	Addon API wrapper function for raising events targeted at a specific subscriber.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_RaiseEventTargeted(signed int aSignature, const char* aIdentifier, void* aEventData);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ADDONAPI_RaiseNotificationTargeted:
-	/// 	Addon API wrapper function for raising notifications targeted at a specific subscriber.
-	///----------------------------------------------------------------------------------------------------
-	void ADDONAPI_RaiseNotificationTargeted(signed int aSignature, const char* aIdentifier);
-}
-
-///----------------------------------------------------------------------------------------------------
 /// EventData data struct
 ///----------------------------------------------------------------------------------------------------
 struct EventData
@@ -113,7 +71,7 @@ public:
 	/// Subscribe:
 	/// 	Subscribes the provided ConsumeEventCallback function, to the provided event name.
 	///----------------------------------------------------------------------------------------------------
-	void Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback, bool aIsInternal = false);
+	void Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Unsubscribe:

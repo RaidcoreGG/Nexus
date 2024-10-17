@@ -11,36 +11,23 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Context.cpp" />
     <ClCompile Include="src\Inputs\GameBinds\GameBindsHandler.cpp" />
     <ClCompile Include="src\Loader\AddonVersion.cpp" />
+    <ClCompile Include="src\Loader\API\ApiFunctionMapper.cpp" />
     <ClCompile Include="src\Services\API\ActiveToken.cpp" />
     <ClCompile Include="src\Services\API\ApiClient.cpp" />
     <ClCompile Include="src\Services\API\APIController.cpp" />
-    <ClCompile Include="src\Consts.cpp" />
     <ClCompile Include="src\CrashHandler.cpp" />
     <ClCompile Include="src\Services\DataLink\DataLink.cpp" />
     <ClCompile Include="src\Events\EventSubscriber.cpp" />
-    <ClCompile Include="src\GUI\Fonts\FontManager.cpp" />
-    <ClCompile Include="src\GUI\Widgets\Alerts\Alerts.cpp" />
-    <ClCompile Include="src\GUI\Widgets\Options\COptionsWindow.cpp" />
     <ClCompile Include="src\Loader\ArcDPS.cpp" />
     <ClCompile Include="src\Loader\EUpdateProvider.cpp" />
     <ClCompile Include="src\Loader\Library.cpp" />
     <ClCompile Include="src\Services\Localization\Localization.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Events\EventHandler.cpp" />
-    <ClCompile Include="src\GUI\GUI.cpp" />
-    <ClCompile Include="src\GUI\Widgets\About\CAboutBox.cpp" />
-    <ClCompile Include="src\GUI\Widgets\Addons\AddonItem.cpp" />
-    <ClCompile Include="src\GUI\Widgets\Addons\CAddonsWindow.cpp" />
-    <ClCompile Include="src\GUI\Widgets\Debug\CDebugWindow.cpp" />
-    <ClCompile Include="src\GUI\Widgets\EULA\CEULAModal.cpp" />
-    <ClCompile Include="src\GUI\Widgets\Log\CLogWindow.cpp" />
-    <ClCompile Include="src\GUI\Widgets\Menu\Menu.cpp" />
-    <ClCompile Include="src\GUI\Widgets\Menu\MenuItem.cpp" />
-    <ClCompile Include="src\GUI\Widgets\Overlay\CMumbleOverlay.cpp" />
-    <ClCompile Include="src\GUI\Widgets\QuickAccess\QuickAccess.cpp" />
-    <ClCompile Include="src\Hooks.cpp" />
+    <ClCompile Include="src\thirdparty\ImAnimate\ImAnimate.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui_draw.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui_impl_dx11.cpp" />
@@ -71,7 +58,24 @@
     <ClCompile Include="src\State.cpp" />
     <ClCompile Include="src\Services\Textures\TextureLoader.cpp" />
     <ClCompile Include="src\Services\Updater\Updater.cpp" />
+    <ClCompile Include="src\UI\Controls\CtlSubWindow.cpp" />
+    <ClCompile Include="src\UI\Controls\CtlWindow.cpp" />
+    <ClCompile Include="src\UI\Overlay\MumbleInspector\MumbleInspector.cpp" />
+    <ClCompile Include="src\UI\Services\Fonts\FontManager.cpp" />
+    <ClCompile Include="src\UI\Services\QoL\EscapeClosing.cpp" />
+    <ClCompile Include="src\UI\UiContext.cpp" />
+    <ClCompile Include="src\UI\Widgets\Alerts\Alerts.cpp" />
+    <ClCompile Include="src\UI\Widgets\EULA\EULAModal.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\About\About.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\Addons\Addons.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\Binds\Binds.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\Debug\Debug.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\Log\Log.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\MainWindow.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\Options\Options.cpp" />
+    <ClCompile Include="src\UI\Widgets\QuickAccess\QuickAccess.cpp" />
     <ClCompile Include="src\Util\Base64.cpp" />
+    <ClCompile Include="src\Util\CmdLine.cpp" />
     <ClCompile Include="src\Util\DLL.cpp" />
     <ClCompile Include="src\Util\Inputs.cpp" />
     <ClCompile Include="src\Util\MD5.cpp" />
@@ -84,13 +88,15 @@
     <ClCompile Include="src\Inputs\RawInput\RawInputApi.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\GUI\Widgets\QuickAccess\EQAVisibility.h" />
+    <ClInclude Include="src\Context.h" />
     <ClInclude Include="src\Inputs\GameBinds\EGameBinds.h" />
     <ClInclude Include="src\Inputs\GameBinds\FuncDefs.h" />
     <ClInclude Include="src\Inputs\GameBinds\GameBindsHandler.h" />
     <ClInclude Include="src\Inputs\InputBinds\EInputBindHandlerType.h" />
     <ClInclude Include="src\Inputs\InputBinds\EInputBindType.h" />
     <ClInclude Include="src\Loader\AddonVersion.h" />
+    <ClInclude Include="src\Loader\API\ApiFunctionMapper.h" />
+    <ClInclude Include="src\Remote.h" />
     <ClInclude Include="src\Services\API\ApiClient.h" />
     <ClInclude Include="src\Services\API\APIController.h" />
     <ClInclude Include="src\Services\API\ActiveToken.h" />
@@ -106,31 +112,8 @@
     <ClInclude Include="src\Events\EventHandler.h" />
     <ClInclude Include="src\Events\EventSubscriber.h" />
     <ClInclude Include="src\Events\FuncDefs.h" />
-    <ClInclude Include="src\GUI\EFontIdentifier.h" />
-    <ClInclude Include="src\GUI\ERenderType.h" />
-    <ClInclude Include="src\GUI\Fonts\FontManager.h" />
-    <ClInclude Include="src\GUI\Fonts\FuncDefs.h" />
-    <ClInclude Include="src\GUI\FuncDefs.h" />
-    <ClInclude Include="src\GUI\GUI.h" />
-    <ClInclude Include="src\GUI\IWindow.h" />
-    <ClInclude Include="src\GUI\Widgets\About\CAboutBox.h" />
-    <ClInclude Include="src\GUI\Widgets\Addons\AddonItem.h" />
-    <ClInclude Include="src\GUI\Widgets\Addons\CAddonsWindow.h" />
-    <ClInclude Include="src\GUI\Widgets\Alerts\Alerts.h" />
-    <ClInclude Include="src\GUI\Widgets\Alerts\FuncDefs.h" />
-    <ClInclude Include="src\GUI\Widgets\Debug\CDebugWindow.h" />
-    <ClInclude Include="src\GUI\Widgets\EULA\CEULAModal.h" />
-    <ClInclude Include="src\GUI\Widgets\Log\CLogWindow.h" />
-    <ClInclude Include="src\GUI\Widgets\Menu\Menu.h" />
-    <ClInclude Include="src\GUI\Widgets\Menu\MenuItem.h" />
-    <ClInclude Include="src\GUI\Widgets\Options\COptionsWindow.h" />
-    <ClInclude Include="src\GUI\Widgets\Overlay\CMumbleOverlay.h" />
-    <ClInclude Include="src\GUI\Widgets\QuickAccess\EQAPosition.h" />
-    <ClInclude Include="src\GUI\Widgets\QuickAccess\FuncDefs.h" />
-    <ClInclude Include="src\GUI\Widgets\QuickAccess\QuickAccess.h" />
-    <ClInclude Include="src\GUI\Widgets\QuickAccess\Shortcut.h" />
-    <ClInclude Include="src\Hooks.h" />
     <ClInclude Include="src\thirdparty\httplib\httplib.h" />
+    <ClInclude Include="src\thirdparty\ImAnimate\ImAnimate.h" />
     <ClInclude Include="src\thirdparty\imgui\imconfig.h" />
     <ClInclude Include="src\thirdparty\imgui\imgui.h" />
     <ClInclude Include="src\thirdparty\imgui\imgui_extensions.h" />
@@ -302,7 +285,7 @@
     <ClInclude Include="src\Index.h" />
     <ClInclude Include="src\Loader\AddonDefinition.h" />
     <ClInclude Include="src\Loader\EUpdateProvider.h" />
-    <ClInclude Include="src\Loader\AddonAPI.h" />
+    <ClInclude Include="src\Loader\API\AddonAPI.h" />
     <ClInclude Include="src\Services\Logging\CFileLogger.h" />
     <ClInclude Include="src\Services\Logging\ILogger.h" />
     <ClInclude Include="src\Services\Logging\LogEntry.h" />
@@ -328,7 +311,35 @@
     <ClInclude Include="src\Services\Textures\TextureLoader.h" />
     <ClInclude Include="src\Services\Updater\FuncDefs.h" />
     <ClInclude Include="src\Services\Updater\Updater.h" />
+    <ClInclude Include="src\UI\Controls\CtlSubWindow.h" />
+    <ClInclude Include="src\UI\Controls\CtlWindow.h" />
+    <ClInclude Include="src\UI\DisplayBinds.h" />
+    <ClInclude Include="src\UI\ERenderType.h" />
+    <ClInclude Include="src\UI\FuncDefs.h" />
+    <ClInclude Include="src\UI\Overlay\MumbleInspector\MumbleInspector.h" />
+    <ClInclude Include="src\UI\Services\Fonts\FontManager.h" />
+    <ClInclude Include="src\UI\Services\Fonts\FuncDefs.h" />
+    <ClInclude Include="src\UI\Services\QoL\EscapeClosing.h" />
+    <ClInclude Include="src\UI\Services\QoL\FuncDefs.h" />
+    <ClInclude Include="src\UI\UiContext.h" />
+    <ClInclude Include="src\UI\Widgets\Alerts\Alerts.h" />
+    <ClInclude Include="src\UI\Widgets\Alerts\FuncDefs.h" />
+    <ClInclude Include="src\UI\Widgets\EULA\EULAModal.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\About\About.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\Addons.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\DisplayAddon.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Binds\Binds.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Debug\Debug.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Log\Log.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\MainWindow.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Options\Options.h" />
+    <ClInclude Include="src\UI\Widgets\QuickAccess\EQAPosition.h" />
+    <ClInclude Include="src\UI\Widgets\QuickAccess\EQAVisibility.h" />
+    <ClInclude Include="src\UI\Widgets\QuickAccess\FuncDefs.h" />
+    <ClInclude Include="src\UI\Widgets\QuickAccess\QuickAccess.h" />
+    <ClInclude Include="src\UI\Widgets\QuickAccess\Shortcut.h" />
     <ClInclude Include="src\Util\Base64.h" />
+    <ClInclude Include="src\Util\CmdLine.h" />
     <ClInclude Include="src\Util\DLL.h" />
     <ClInclude Include="src\Util\Inputs.h" />
     <ClInclude Include="src\Util\MD5.h" />
@@ -365,32 +376,23 @@
     <Font Include="src\Resources\Fonts\TrebuchetMS.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="src\Resources\AddonsWindow\AddonItem.png" />
-    <Image Include="src\Resources\AddonsWindow\AddonItem_DUU.png" />
-    <Image Include="src\Resources\AddonsWindow\AddonItem_Highlight.png" />
-    <Image Include="src\Resources\AddonsWidow\Background.png" />
-    <Image Include="src\Resources\AddonsWindow\TitleBar.png" />
-    <Image Include="src\Resources\AddonsWindow\TitleBar_Hover.png" />
-    <Image Include="src\Resources\BtnClose.png" />
-    <Image Include="src\Resources\BtnClose_Hover.png" />
-    <Image Include="src\Resources\BtnRefresh.png" />
-    <Image Include="src\Resources\BtnRefresh_Hover.png" />
-    <Image Include="src\Resources\ContextMenu\ContextMenu_Bullet.png" />
-    <Image Include="src\Resources\ContextMenu\ContextMenu_Highlight.png" />
-    <Image Include="src\Resources\EulaWindow\Background.png" />
-    <Image Include="src\Resources\EulaWindow\TitleBar.png" />
-    <Image Include="src\Resources\EulaWindow\TitleBar_Hover.png" />
-    <Image Include="src\Resources\Menu\Background.png" />
-    <Image Include="src\Resources\Menu\BtnAbout.png" />
-    <Image Include="src\Resources\Menu\BtnAddons.png" />
-    <Image Include="src\Resources\Menu\BtnChangelog.png" />
-    <Image Include="src\Resources\Menu\BtnDebug.png" />
-    <Image Include="src\Resources\Menu\BtnLog.png" />
-    <Image Include="src\Resources\Menu\BtnOptions.png" />
-    <Image Include="src\Resources\Menu\BtnOptions_Hover.png" />
-    <Image Include="src\Resources\Menu\BtnReturn.png" />
-    <Image Include="src\Resources\Menu\MenuItem.png" />
-    <Image Include="src\Resources\Menu\MenuItem_Hover.png" />
+    <Image Include="src\Resources\banners\discord.png" />
+    <Image Include="src\Resources\banners\patreon.png" />
+    <Image Include="src\Resources\icons\about.png" />
+    <Image Include="src\Resources\icons\addonpolicy_notier.png" />
+    <Image Include="src\Resources\icons\addonpolicy_tier1.png" />
+    <Image Include="src\Resources\icons\addonpolicy_tier2.png" />
+    <Image Include="src\Resources\icons\addonpolicy_tier3.png" />
+    <Image Include="src\Resources\icons\addons.png" />
+    <Image Include="src\Resources\icons\binds.png" />
+    <Image Include="src\Resources\icons\chevron_rt.png" />
+    <Image Include="src\Resources\icons\close.png" />
+    <Image Include="src\Resources\icons\debug.png" />
+    <Image Include="src\Resources\icons\ext.png" />
+    <Image Include="src\Resources\icons\home.png" />
+    <Image Include="src\Resources\icons\log.png" />
+    <Image Include="src\Resources\icons\refresh.png" />
+    <Image Include="src\Resources\icons\settings.png" />
     <Image Include="src\Resources\Notification.png" />
     <Image Include="src\Resources\QuickAccess\Generic.png" />
     <Image Include="src\Resources\QuickAccess\Generic_Hover.png" />
@@ -400,10 +402,7 @@
     <Image Include="src\Resources\QuickAccess\NexusXmas.png" />
     <Image Include="src\Resources\QuickAccess\NexusXmas_Hover.png" />
     <Image Include="src\Resources\QuickAccess\Nexus_Hover.png" />
-    <Image Include="src\Resources\TabBtn.png" />
-    <Image Include="src\Resources\TabBtn_Hover.png" />
-    <Image Include="src\Resources\TitleBarEnd.png" />
-    <Image Include="src\Resources\TitleBarEnd_Hover.png" />
+    <Image Include="src\Resources\RaidcoreTag.png" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -467,8 +466,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\thirdparty\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -482,7 +480,8 @@
     </Link>
     <PreBuildEvent>
       <Command>CALL $(SolutionDir)Scripts\branch.bat
-CALL $(SolutionDir)Scripts\version.bat</Command>
+CALL $(SolutionDir)Scripts\version.bat
+CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -501,8 +500,7 @@ CALL $(SolutionDir)Scripts\version.bat</Command>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\thirdparty\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8</AdditionalOptions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -518,7 +516,8 @@ CALL $(SolutionDir)Scripts\version.bat</Command>
     </Link>
     <PreBuildEvent>
       <Command>CALL $(SolutionDir)Scripts\branch.bat
-CALL $(SolutionDir)Scripts\version.bat</Command>
+CALL $(SolutionDir)Scripts\version.bat
+CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
