@@ -8,7 +8,7 @@
 
 #include "MainWindow.h"
 
-#include "ImAnimate/ImAnimate.h"
+#include "imgui/imgui_extensions.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 
@@ -90,8 +90,7 @@ void CMainWindow::Render()
 
 	float headerHeight = ImGui::GetFontSize() * 2;
 	float footerHeight = ImGui::GetFontSize() * 1.5f;
-	float sidebarWidth_Collapsed = (padding.x * 2) + headerHeight;
-	float sidebarWidth_Expanded = 250.f;
+	float sidebarWidth = (padding.x * 2) + headerHeight;
 
 	bool poppedPadding = false;
 
@@ -108,39 +107,12 @@ void CMainWindow::Render()
 
 		float wndWidth = ImGui::GetWindowWidth();
 		float contentHeight = ImGui::GetWindowHeight() - headerHeight;
-		float contentWidth = wndWidth - sidebarWidth_Collapsed;
+		float contentWidth = wndWidth - sidebarWidth;
 
 		ImGui::PopStyleVar(2);
 		poppedPadding = true;
 
-		static float renderedSidebarWidth = sidebarWidth_Collapsed;
-		static float navTextAlpha = 0;
-		if (this->IsSidebarActive && (Time::GetTimestampMs() - this->SidebarActiveStart) > 350)
-		{
-			ImGui::Animate(sidebarWidth_Collapsed, sidebarWidth_Expanded, 250, &renderedSidebarWidth, ImAnimate::ECurve::InOutCubic);
-			
-			if (renderedSidebarWidth > sidebarWidth_Expanded * .5f)
-			{
-				ImGui::Animate(0, 1, 125, &navTextAlpha, ImAnimate::ECurve::InOutCubic);
-			}
-		}
-		else
-		{
-			ImGui::Animate(sidebarWidth_Expanded, sidebarWidth_Collapsed, 250, &renderedSidebarWidth, ImAnimate::ECurve::InOutCubic);
-			ImGui::Animate(1, 0, 125, &navTextAlpha, ImAnimate::ECurve::InOutCubic);
-		}
-
-		ImVec4 navTextCol = style.Colors[ImGuiCol_Text];
-		navTextCol.w = navTextAlpha;
-
-		ImVec2 sidebarP1 = ImGui::GetWindowPos();
-		sidebarP1.y += headerHeight;
-		ImVec2 sidebarP2 = ImVec2(renderedSidebarWidth + sidebarP1.x, contentHeight + sidebarP1.y);
-		ImVec2 contentP1 = ImVec2(sidebarP2.x, sidebarP1.y);
-		ImVec2 contentP2 = ImVec2(sidebarP2.x + wndWidth - renderedSidebarWidth, sidebarP2.y);
-
-		ImGui::PushClipRect(contentP1, contentP2, false);
-		ImGui::SetCursorPos(ImVec2(sidebarWidth_Collapsed, headerHeight));
+		ImGui::SetCursorPos(ImVec2(sidebarWidth, headerHeight));
 		if (ImGui::BeginChild("Nexus##Main_Content", ImVec2(contentWidth, contentHeight - footerHeight)))
 		{
 			ImGui::SetCursorPos(padding);
@@ -159,23 +131,22 @@ void CMainWindow::Render()
 		}
 		ImGui::EndChild();
 
-		ImGui::SetCursorPos(ImVec2(sidebarWidth_Collapsed, headerHeight + contentHeight - footerHeight));
+		ImGui::SetCursorPos(ImVec2(sidebarWidth, headerHeight + contentHeight - footerHeight));
 		if (ImGui::BeginChild("Nexus##Main_Footer", ImVec2(contentWidth, footerHeight), false, Flags))
 		{
 			ImGui::SetCursorPos(ImVec2(0, 0));
 			ImGui::Separator();
 
-			ImGui::SetCursorPos(ImVec2((contentWidth - ImGui::CalcTextSize(u8"© 2021 - 2024 Raidcore").x) / 2 - sidebarWidth_Collapsed, (footerHeight - ImGui::GetFontSize()) / 2));
+			ImGui::SetCursorPos(ImVec2(((contentWidth - ImGui::CalcTextSize(u8"© 2021 - 2024 Raidcore").x) / 2) - sidebarWidth, (footerHeight - ImGui::GetFontSize()) / 2));
 			ImGui::Text(u8"© 2021 - 2024 Raidcore");
 		}
 		ImGui::EndChild();
-		ImGui::PopClipRect();
 
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::GetColorU32(ImGuiCol_TitleBgCollapsed));
 		ImGui::SetCursorPos(ImVec2(0, headerHeight));
-		if (ImGui::BeginChild("Nexus##Main_Sidebar", ImVec2(renderedSidebarWidth, contentHeight)))
+		if (ImGui::BeginChild("Nexus##Main_Sidebar", ImVec2(sidebarWidth, contentHeight)))
 		{
-			ImVec2 navItemSz = ImVec2(renderedSidebarWidth - (padding.x * 2), headerHeight);
+			ImVec2 navItemSz = ImVec2(sidebarWidth - (padding.x * 2), headerHeight);
 			float navX = padding.x;
 			float navY = padding.y;
 
@@ -233,6 +204,8 @@ void CMainWindow::Render()
 				}
 				ImGui::PopStyleVar();
 
+				ImGui::TooltipGeneric(langApi->Translate(window->GetDisplayName().c_str()));
+
 				const Texture* icon = window->GetIcon();
 				if (icon)
 				{
@@ -240,42 +213,16 @@ void CMainWindow::Render()
 					ImGui::Image(icon->Resource, ImVec2(navItemSz.y, navItemSz.y));
 				}
 
-				ImGui::SetCursorPos(ImVec2(navX + navItemSz.y + padding.x, navY + ((navItemSz.y - ImGui::GetTextLineHeight()) / 2)));
-				ImGui::TextColored(navTextCol, langApi->Translate(window->GetDisplayName().c_str()));
-
 				navY += navItemSz.y + padding.y;
 			}
-
-			ImVec4 colDisabled = ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled);
-			colDisabled.w = navTextAlpha;
-			float lineHeight = ImGui::GetTextLineHeightWithSpacing();
-			
-			ImGui::SetCursorPos(ImVec2(navX, contentHeight - padding.y - (lineHeight * 2)));
-			ImGui::TextColored(colDisabled, ctx->GetVersion().string().c_str());
-
-			ImGui::SetCursorPos(ImVec2(navX, contentHeight - padding.y - lineHeight));
-			ImGui::TextColored(colDisabled, ctx->GetBuild());
 
 			/* vertical separator line */
 			ImGuiWindow* window = ImGui::GetCurrentWindow();
 
-			ImVec2 sepP1 = ImVec2(window->Pos.x + renderedSidebarWidth - 1.0f, window->Pos.y);
-			ImVec2 sepP2 = ImVec2(window->Pos.x + renderedSidebarWidth - 1.0f, window->Pos.y + contentHeight);
+			ImVec2 sepP1 = ImVec2(window->Pos.x + sidebarWidth - 1.0f, window->Pos.y);
+			ImVec2 sepP2 = ImVec2(window->Pos.x + sidebarWidth - 1.0f, window->Pos.y + contentHeight);
 
 			window->DrawList->AddLine(sepP1, sepP2, ImGui::GetColorU32(ImGuiCol_Separator));
-		}
-		this->IsSidebarActive = ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
-
-		if (this->IsSidebarActive)
-		{
-			if (this->SidebarActiveStart == 0)
-			{
-				this->SidebarActiveStart = Time::GetTimestampMs();
-			}
-		}
-		else
-		{
-			this->SidebarActiveStart = 0;
 		}
 
 		ImGui::EndChild();
@@ -298,6 +245,14 @@ void CMainWindow::Render()
 
 				ImGui::SetCursorPos(ImVec2(offset + offset + tagWidth, (headerHeight - titleSz.y) / 2.0f));
 				ImGui::Text("Nexus");
+
+				//ImGui::SetCursorPos(ImVec2(navX, contentHeight - padding.y - (lineHeight * 2)));
+				ImGui::SetCursorPos(ImVec2(offset + offset + offset + tagWidth + titleSz.x, (headerHeight - titleSz.y) / 2.0f));
+				ImGui::TextDisabled(ctx->GetVersion().string().c_str());
+
+				//ImGui::SetCursorPos(ImVec2(navX, contentHeight - padding.y - lineHeight));
+				//ImGui::TextColored(colDisabled, ctx->GetBuild());
+
 			}
 			else
 			{

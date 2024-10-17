@@ -10,9 +10,8 @@
 
 #include <shellapi.h>
 
-#include "ImAnimate/ImAnimate.h"
-#include "imgui/imgui.h"
 #include "imgui_extensions.h"
+#include "imgui/imgui.h"
 
 #include "Context.h"
 #include "Renderer.h"
@@ -443,21 +442,21 @@ void CAddonsWindow::RenderContent()
 
 	float listAreaWidth_Half = (region.x - (style.ItemSpacing.x * 2) - style.ScrollbarSize) / 2;
 
-	static float detailsAreaWidth = 0;
+	//static float detailsAreaWidth = 0;
 
-	bool detailsExpanded = this->HasContent;
+	bool configuring = this->HasContent;
 
-	if (detailsExpanded)
+	/*if (configuring)
 	{
-		ImGui::Animate(0, region.x, 350, &detailsAreaWidth, ImAnimate::ECurve::InOutCubic);
+		detailsAreaWidth = region.x;
 	}
 	else
 	{
-		ImGui::Animate(region.x, 0, 350, &detailsAreaWidth, ImAnimate::ECurve::InOutCubic);
-	}
+		detailsAreaWidth = 0;
+	}*/
 
-	ImVec2 detailsAreaSz = ImVec2(detailsAreaWidth - style.ItemSpacing.x, region.y - filterAreaSz.y - actionsAreaSz.y - style.ItemSpacing.y - style.ItemSpacing.y);
-	ImVec2 listAreaSz = ImVec2(region.x, detailsAreaSz.y);
+	//ImVec2 detailsAreaSz = ImVec2(detailsAreaWidth - style.ItemSpacing.x, region.y - filterAreaSz.y - actionsAreaSz.y - style.ItemSpacing.y - style.ItemSpacing.y);
+	ImVec2 listAreaSz = ImVec2(region.x, region.y - filterAreaSz.y - actionsAreaSz.y - style.ItemSpacing.y - style.ItemSpacing.y);
 
 	if (ImGui::BeginChild("##Addons_Filters", filterAreaSz))
 	{
@@ -503,133 +502,89 @@ void CAddonsWindow::RenderContent()
 	ImGui::EndChild();
 	
 	/* list */
-	ImVec2 listP1 = ImGui::GetWindowPos();
-	ImVec2 listP2 = ImVec2(listP1.x + listAreaSz.x - detailsAreaWidth, listP1.y + listAreaSz.y + filterAreaSz.y + style.ItemSpacing.y);
+	//ImVec2 listP1 = ImGui::GetWindowPos();
+	//ImVec2 listP2 = ImVec2(listP1.x + listAreaSz.x - detailsAreaWidth, listP1.y + listAreaSz.y + filterAreaSz.y + style.ItemSpacing.y);
 
-	ImVec2 posList = ImGui::GetCursorPos();
+	//ImVec2 posList = ImGui::GetCursorPos();
 
-	ImGui::PushClipRect(listP1, listP2, true);
+	//ImGui::PushClipRect(listP1, listP2, true);
 	if (ImGui::BeginChild("##Addons_List", listAreaSz))
 	{
-		if (quickFilterMode == 0)
+		if (configuring)
 		{
-			if (this->Addons.size() == 0)
-			{
-				ImVec2 windowSize = ImGui::GetWindowSize();
-				ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((000098))"));
-				ImVec2 position = ImGui::GetCursorPos();
-				ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-				ImGui::TextDisabled(langApi->Translate("((000098))"));
-			}
-			else
-			{
-				int i = 0;
-
-				for (AddonItemData addon : this->Addons)
-				{
-					if (i % 2 == 1)
-					{
-						ImGui::SameLine();
-					}
-
-					AddonItem(addon, listAreaWidth_Half);
-					i++;
-				}
-			}
+			this->RenderDetails();
 		}
-		else if (quickFilterMode == 1)
+		else
 		{
-			ImGui::Checkbox(langApi->Translate("((000038))"), &showInstalled);
-
-			int downloadable = 0;
-
-			const std::lock_guard<std::mutex> lockLoader(Loader::Mutex);
-			if (this->Library.size() != 0)
+			if (quickFilterMode == 0)
 			{
-				int i = 0;
-
-				for (LibraryAddon* libAddon : this->Library)
+				if (this->Addons.size() == 0)
 				{
-					bool exists = false;
-					{
-						for (Addon* addon : Loader::Addons)
-						{
-							// if libAddon already exist in installed addons
-							// or if arcdps is loaded another way and the libAddon is arc
-							if ((addon->Definitions != nullptr && addon->Definitions->Signature == libAddon->Signature) ||
-								(ArcDPS::IsLoaded && libAddon->Signature == 0xFFF694D1))
-							{
-								exists = true;
-								break;
-							}
-						}
-					}
+					ImVec2 windowSize = ImGui::GetWindowSize();
+					ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((000098))"));
+					ImVec2 position = ImGui::GetCursorPos();
+					ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
+					ImGui::TextDisabled(langApi->Translate("((000098))"));
+				}
+				else
+				{
+					int i = 0;
 
-					if (!exists || showInstalled)
+					for (AddonItemData addon : this->Addons)
 					{
 						if (i % 2 == 1)
 						{
 							ImGui::SameLine();
 						}
 
-						AddonItem(libAddon, listAreaWidth_Half, exists);
+						AddonItem(addon, listAreaWidth_Half);
 						i++;
-						downloadable++;
 					}
 				}
 			}
-
-			if (this->Library.size() == 0 || downloadable == 0)
+			else if (quickFilterMode == 1)
 			{
-				ImVec2 windowSize = ImGui::GetWindowSize();
-				ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((000098))"));
-				ImVec2 position = ImGui::GetCursorPos();
-				ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-				ImGui::TextDisabled(langApi->Translate("((000098))"));
-			}
-		}
-		else if (quickFilterMode == 2)
-		{
-			ImGui::Checkbox(langApi->Translate("((000038))"), &showInstalled);
+				ImGui::Checkbox(langApi->Translate("((000038))"), &showInstalled);
 
-			if (ArcDPS::IsPluginAtlasBuilt)
-			{
 				int downloadable = 0;
-				const std::lock_guard<std::mutex> lockLoader(ArcDPS::Mutex);
-				if (this->ArcLibrary.size() != 0)
+
+				const std::lock_guard<std::mutex> lockLoader(Loader::Mutex);
+				if (this->Library.size() != 0)
 				{
 					int i = 0;
 
-					for (LibraryAddon* arclibAddon : this->ArcLibrary)
+					for (LibraryAddon* libAddon : this->Library)
 					{
 						bool exists = false;
 						{
-							for (int& arcAddonSig : ArcDPS::Plugins)
+							for (Addon* addon : Loader::Addons)
 							{
-								// if arclibAddon already exist in installed addons
-								// or if arcdps is loaded another way and the arclibAddon is arc
-								if (arclibAddon->Signature == arcAddonSig)
+								// if libAddon already exist in installed addons
+								// or if arcdps is loaded another way and the libAddon is arc
+								if ((addon->Definitions != nullptr && addon->Definitions->Signature == libAddon->Signature) ||
+									(ArcDPS::IsLoaded && libAddon->Signature == 0xFFF694D1))
 								{
 									exists = true;
 									break;
 								}
 							}
 						}
-						if (!exists || true == showInstalled)
+
+						if (!exists || showInstalled)
 						{
 							if (i % 2 == 1)
 							{
 								ImGui::SameLine();
 							}
 
-							AddonItem(arclibAddon, listAreaWidth_Half, exists, true);
+							AddonItem(libAddon, listAreaWidth_Half, exists);
 							i++;
 							downloadable++;
 						}
 					}
 				}
 
-				if (this->ArcLibrary.size() == 0 || downloadable == 0)
+				if (this->Library.size() == 0 || downloadable == 0)
 				{
 					ImVec2 windowSize = ImGui::GetWindowSize();
 					ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((000098))"));
@@ -638,21 +593,72 @@ void CAddonsWindow::RenderContent()
 					ImGui::TextDisabled(langApi->Translate("((000098))"));
 				}
 			}
-			else
+			else if (quickFilterMode == 2)
 			{
-				ImVec2 windowSize = ImGui::GetWindowSize();
-				ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((000098))"));
-				ImVec2 position = ImGui::GetCursorPos();
-				ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-				ImGui::TextDisabled(langApi->Translate("((000098))"));
+				ImGui::Checkbox(langApi->Translate("((000038))"), &showInstalled);
+
+				if (ArcDPS::IsPluginAtlasBuilt)
+				{
+					int downloadable = 0;
+					const std::lock_guard<std::mutex> lockLoader(ArcDPS::Mutex);
+					if (this->ArcLibrary.size() != 0)
+					{
+						int i = 0;
+
+						for (LibraryAddon* arclibAddon : this->ArcLibrary)
+						{
+							bool exists = false;
+							{
+								for (int& arcAddonSig : ArcDPS::Plugins)
+								{
+									// if arclibAddon already exist in installed addons
+									// or if arcdps is loaded another way and the arclibAddon is arc
+									if (arclibAddon->Signature == arcAddonSig)
+									{
+										exists = true;
+										break;
+									}
+								}
+							}
+							if (!exists || true == showInstalled)
+							{
+								if (i % 2 == 1)
+								{
+									ImGui::SameLine();
+								}
+
+								AddonItem(arclibAddon, listAreaWidth_Half, exists, true);
+								i++;
+								downloadable++;
+							}
+						}
+					}
+
+					if (this->ArcLibrary.size() == 0 || downloadable == 0)
+					{
+						ImVec2 windowSize = ImGui::GetWindowSize();
+						ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((000098))"));
+						ImVec2 position = ImGui::GetCursorPos();
+						ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
+						ImGui::TextDisabled(langApi->Translate("((000098))"));
+					}
+				}
+				else
+				{
+					ImVec2 windowSize = ImGui::GetWindowSize();
+					ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((000098))"));
+					ImVec2 position = ImGui::GetCursorPos();
+					ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
+					ImGui::TextDisabled(langApi->Translate("((000098))"));
+				}
 			}
 		}
 	}
 	ImGui::EndChild();
-	ImGui::PopClipRect();
+	//ImGui::PopClipRect();
 
 	/* details */
-	ImGui::SetCursorPos(ImVec2(posList.x + (region.x - detailsAreaWidth) + style.ItemSpacing.x, posList.y));
+	/*ImGui::SetCursorPos(ImVec2(posList.x + (region.x - detailsAreaWidth) + style.ItemSpacing.x, posList.y));
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1);
 	bool poppedBorder = false;
 	if (ImGui::BeginChild("##Addons_Details", detailsAreaSz, true))
@@ -670,7 +676,7 @@ void CAddonsWindow::RenderContent()
 	if (!poppedBorder)
 	{
 		ImGui::PopStyleVar();
-	}
+	}*/
 	
 
 	if (ImGui::BeginChild("##Addons_Actions", actionsAreaSz))

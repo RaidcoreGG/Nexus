@@ -35,8 +35,6 @@ class CMainWindow : public virtual IWindow
 	std::mutex               Mutex;
 	std::vector<ISubWindow*> Windows;
 	ISubWindow*              ActiveContent;
-	long long                SidebarActiveStart;
-	bool                     IsSidebarActive;
 	bool                     IsHandleHeld;
 
 	private:
