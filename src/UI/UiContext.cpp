@@ -149,7 +149,7 @@ namespace UIRoot
 
 	void OnMumbleIdentityChanged(void* aEventArgs)
 	{
-		if (!MumbleIdentity)
+		if (!MumbleIdentity || !NexusLink)
 		{
 			return;
 		}
@@ -161,7 +161,8 @@ namespace UIRoot
 		if (currScaling != settingsctx->Get<float>(OPT_LASTUISCALE) && NexusLink->IsGameplay)
 		{
 			ImGuiIO& io = ImGui::GetIO();
-			Renderer::Scaling = currScaling * io.FontGlobalScale;
+
+			NexusLink->Scaling = Renderer::Scaling = currScaling * io.FontGlobalScale;
 			settingsctx->Set(OPT_LASTUISCALE, currScaling);
 		}
 
@@ -567,7 +568,7 @@ UINT CUiContext::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			// key input
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
-			if (io.WantCaptureKeyboard || io.WantTextInput)
+			if (io.WantTextInput)
 			{
 				if (wParam < 256)
 					io.KeysDown[wParam] = true;
@@ -580,7 +581,7 @@ UINT CUiContext::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				io.KeysDown[wParam] = false;
 			break;
 		case WM_CHAR:
-			if (io.WantCaptureKeyboard || io.WantTextInput)
+			if (io.WantTextInput)
 			{
 				// You can also use ToAscii()+GetKeyboardState() to retrieve characters.
 				if (wParam > 0 && wParam < 0x10000)
@@ -1066,7 +1067,7 @@ void CUiContext::LoadSettings()
 		settingsCtx->Set(OPT_LASTUISCALE, SC_NORMAL);
 	}
 	
-	Renderer::Scaling = lastUiScale * io.FontGlobalScale;
+	UIRoot::NexusLink->Scaling =  Renderer::Scaling = lastUiScale * io.FontGlobalScale;
 }
 
 void CUiContext::UpdateDisplayInputBinds()

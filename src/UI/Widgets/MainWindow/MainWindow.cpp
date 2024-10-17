@@ -117,17 +117,17 @@ void CMainWindow::Render()
 		static float navTextAlpha = 0;
 		if (this->IsSidebarActive && (Time::GetTimestampMs() - this->SidebarActiveStart) > 350)
 		{
-			ImGui::Animate(sidebarWidth_Collapsed, sidebarWidth_Expanded, 500, &renderedSidebarWidth, ImAnimate::ECurve::InOutCubic);
+			ImGui::Animate(sidebarWidth_Collapsed, sidebarWidth_Expanded, 250, &renderedSidebarWidth, ImAnimate::ECurve::InOutCubic);
 			
 			if (renderedSidebarWidth > sidebarWidth_Expanded * .5f)
 			{
-				ImGui::Animate(0, 1, 250, &navTextAlpha, ImAnimate::ECurve::InOutCubic);
+				ImGui::Animate(0, 1, 125, &navTextAlpha, ImAnimate::ECurve::InOutCubic);
 			}
 		}
 		else
 		{
-			ImGui::Animate(sidebarWidth_Expanded, sidebarWidth_Collapsed, 500, &renderedSidebarWidth, ImAnimate::ECurve::InOutCubic);
-			ImGui::Animate(1, 0, 250, &navTextAlpha, ImAnimate::ECurve::InOutCubic);
+			ImGui::Animate(sidebarWidth_Expanded, sidebarWidth_Collapsed, 250, &renderedSidebarWidth, ImAnimate::ECurve::InOutCubic);
+			ImGui::Animate(1, 0, 125, &navTextAlpha, ImAnimate::ECurve::InOutCubic);
 		}
 
 		ImVec4 navTextCol = style.Colors[ImGuiCol_Text];
