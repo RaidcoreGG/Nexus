@@ -390,9 +390,11 @@
     <Image Include="src\Resources\icons\debug.png" />
     <Image Include="src\Resources\icons\ext.png" />
     <Image Include="src\Resources\icons\home.png" />
+    <Image Include="src\Resources\icons\list.png" />
     <Image Include="src\Resources\icons\log.png" />
     <Image Include="src\Resources\icons\refresh.png" />
     <Image Include="src\Resources\icons\settings.png" />
+    <Image Include="src\Resources\icons\tiles.png" />
     <Image Include="src\Resources\Notification.png" />
     <Image Include="src\Resources\QuickAccess\Generic.png" />
     <Image Include="src\Resources\QuickAccess\Generic_Hover.png" />

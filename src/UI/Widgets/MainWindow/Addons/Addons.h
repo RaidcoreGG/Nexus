@@ -15,6 +15,8 @@
 #include "DisplayAddon.h"
 #include "UI/Controls/CtlSubWindow.h"
 
+constexpr const char* OPT_ISLISTMODE = "IsListMode";
+
 class CAddonsWindow : public ISubWindow
 {
 	public:

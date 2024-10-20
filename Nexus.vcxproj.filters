@@ -1336,5 +1336,11 @@
     <Image Include="src\Resources\icons\chevron_rt.png">
       <Filter>Resource Files\Images\icons</Filter>
     </Image>
+    <Image Include="src\Resources\icons\list.png">
+      <Filter>Resource Files\Images\icons</Filter>
+    </Image>
+    <Image Include="src\Resources\icons\tiles.png">
+      <Filter>Resource Files\Images\icons</Filter>
+    </Image>
   </ItemGroup>
 </Project>

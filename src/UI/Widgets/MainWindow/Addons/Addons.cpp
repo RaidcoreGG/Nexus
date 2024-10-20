@@ -421,8 +421,9 @@ void CAddonsWindow::RenderContent()
 	static int quickFilterMode = 0; // 0 = nexus, 1 = library, 2 = arcdps // FIXME: merge it all into one, do actual filtering
 	static bool showInstalled = false;
 
-	CContext* ctx = CContext::GetContext();
-	CLocalization* langApi = ctx->GetLocalization();
+	static CContext* ctx = CContext::GetContext();
+	static CLocalization* langApi = ctx->GetLocalization();
+	static CSettings* settingsctx = ctx->GetSettingsCtx();
 
 	ImVec2 region = ImGui::GetContentRegionAvail();
 
@@ -440,8 +441,6 @@ void CAddonsWindow::RenderContent()
 	static float actionsAreaEndY = region.y;
 	ImVec2 actionsAreaSz = ImVec2(region.x, actionsAreaEndY);
 
-	float listAreaWidth_Half = (region.x - (style.ItemSpacing.x * 2) - style.ScrollbarSize) / 2;
-
 	//static float detailsAreaWidth = 0;
 
 	bool configuring = this->HasContent;
@@ -457,6 +456,8 @@ void CAddonsWindow::RenderContent()
 
 	//ImVec2 detailsAreaSz = ImVec2(detailsAreaWidth - style.ItemSpacing.x, region.y - filterAreaSz.y - actionsAreaSz.y - style.ItemSpacing.y - style.ItemSpacing.y);
 	ImVec2 listAreaSz = ImVec2(region.x, region.y - filterAreaSz.y - actionsAreaSz.y - style.ItemSpacing.y - style.ItemSpacing.y);
+
+	static bool isListMode = settingsctx->Get<bool>(OPT_ISLISTMODE);
 
 	if (ImGui::BeginChild("##Addons_Filters", filterAreaSz))
 	{
@@ -488,7 +489,7 @@ void CAddonsWindow::RenderContent()
 			ImGui::TooltipGeneric(legacyNotice.c_str());
 		}
 
-		/* filters */
+		/* filter search */
 		ImGui::Text("Search");
 		ImGui::SameLine();
 		if (ImGui::InputText("##addonsfilter", &filter[0], 400))
@@ -497,10 +498,34 @@ void CAddonsWindow::RenderContent()
 			this->Invalidate();
 		}
 
+		/* view mode */
+		static Texture* viewModeTex = nullptr;
+		if (viewModeTex)
+		{
+			ImGui::SameLine();
+			if (ImGui::ImageButton(viewModeTex->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
+			{
+				viewModeTex = nullptr;
+				isListMode = !isListMode;
+				settingsctx->Set(OPT_ISLISTMODE, isListMode);
+			}
+		}
+		else
+		{
+			CTextureLoader* texapi = ctx->GetTextureService();
+			viewModeTex = isListMode
+				? texapi->GetOrCreate("ICON_LIST", RES_ICON_LIST, ctx->GetModule())
+				: texapi->GetOrCreate("ICON_TILES", RES_ICON_TILES, ctx->GetModule());
+		}
+
 		filterAreaEndY = ImGui::GetCursorPos().y;
 	}
 	ImGui::EndChild();
 	
+	float addonItemWidth = isListMode
+		? (region.x - style.ItemSpacing.x - style.ScrollbarSize)
+		: ((region.x - (style.ItemSpacing.x * 2) - style.ScrollbarSize) / 2);
+
 	/* list */
 	//ImVec2 listP1 = ImGui::GetWindowPos();
 	//ImVec2 listP2 = ImVec2(listP1.x + listAreaSz.x - detailsAreaWidth, listP1.y + listAreaSz.y + filterAreaSz.y + style.ItemSpacing.y);
@@ -532,12 +557,12 @@ void CAddonsWindow::RenderContent()
 
 					for (AddonItemData addon : this->Addons)
 					{
-						if (i % 2 == 1)
+						if (!isListMode && i % 2 == 1)
 						{
 							ImGui::SameLine();
 						}
 
-						AddonItem(addon, listAreaWidth_Half);
+						AddonItem(addon, addonItemWidth);
 						i++;
 					}
 				}
@@ -572,12 +597,12 @@ void CAddonsWindow::RenderContent()
 
 						if (!exists || showInstalled)
 						{
-							if (i % 2 == 1)
+							if (!isListMode && i % 2 == 1)
 							{
 								ImGui::SameLine();
 							}
 
-							AddonItem(libAddon, listAreaWidth_Half, exists);
+							AddonItem(libAddon, addonItemWidth, exists);
 							i++;
 							downloadable++;
 						}
@@ -622,12 +647,12 @@ void CAddonsWindow::RenderContent()
 							}
 							if (!exists || true == showInstalled)
 							{
-								if (i % 2 == 1)
+								if (!isListMode && i % 2 == 1)
 								{
 									ImGui::SameLine();
 								}
 
-								AddonItem(arclibAddon, listAreaWidth_Half, exists, true);
+								AddonItem(arclibAddon, addonItemWidth, exists, true);
 								i++;
 								downloadable++;
 							}
