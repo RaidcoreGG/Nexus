@@ -534,7 +534,7 @@ void CAddonsWindow::RenderContent()
 		else
 		{
 			CTextureLoader* texapi = ctx->GetTextureService();
-			viewModeTex = isListMode
+			viewModeTex = !isListMode
 				? texapi->GetOrCreate("ICON_LIST", RES_ICON_LIST, ctx->GetModule())
 				: texapi->GetOrCreate("ICON_TILES", RES_ICON_TILES, ctx->GetModule());
 		}
