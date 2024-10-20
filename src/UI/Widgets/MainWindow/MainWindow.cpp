@@ -246,9 +246,13 @@ void CMainWindow::Render()
 				ImGui::SetCursorPos(ImVec2(offset + offset + tagWidth, (headerHeight - titleSz.y) / 2.0f));
 				ImGui::Text("Nexus");
 
+				std::string v = ctx->GetVersion().string();
+
+				ImVec2 versionSz = ImGui::CalcTextSize(v.c_str());
+
 				//ImGui::SetCursorPos(ImVec2(navX, contentHeight - padding.y - (lineHeight * 2)));
-				ImGui::SetCursorPos(ImVec2(offset + offset + offset + tagWidth + titleSz.x, (headerHeight - titleSz.y) / 2.0f));
-				ImGui::TextDisabled(ctx->GetVersion().string().c_str());
+				ImGui::SetCursorPos(ImVec2(offset + offset + offset + tagWidth + titleSz.x, (headerHeight - versionSz.y) / 2.0f));
+				ImGui::TextDisabled(v.c_str());
 
 				//ImGui::SetCursorPos(ImVec2(navX, contentHeight - padding.y - lineHeight));
 				//ImGui::TextColored(colDisabled, ctx->GetBuild());
