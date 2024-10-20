@@ -94,6 +94,7 @@ void CAddonsWindow::AddonItem(AddonItemData aAddonData, float aWidth)
 	ImGuiStyle& style = ImGui::GetStyle();
 
 	ImVec2 itemSz = ImVec2(aWidth, ImGui::GetTextLineHeightWithSpacing() * 5);
+	float innerHeight = itemSz.y - (style.WindowPadding.y * 2);
 
 	ImVec2 btnTextSz = ImGui::CalcTextSize("############");
 
@@ -102,7 +103,7 @@ void CAddonsWindow::AddonItem(AddonItemData aAddonData, float aWidth)
 
 	ImVec2 curPos = ImGui::GetCursorPos();
 
-	/*  above visible space                        || under visible space */
+	/* above visible space                        || under visible space */
 	if (curPos.y < ImGui::GetScrollY() - itemSz.y || curPos.y > ImGui::GetScrollY() + ImGui::GetWindowHeight())
 	{
 		ImGui::Dummy(itemSz);
@@ -112,105 +113,113 @@ void CAddonsWindow::AddonItem(AddonItemData aAddonData, float aWidth)
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1);
 	if (ImGui::BeginChild(("##AddonItem_" + sig).c_str(), itemSz, true))
 	{
-		//if (ImGui::BeginChild("##addonlisting_info", ImVec2(itemSz.x - (style.WindowPadding.x * 2) - actionsAreaWidth, 0)))
-		
 		static CContext* ctx = CContext::GetContext();
 		static CLocalization* langApi = ctx->GetLocalization();
 		static CUiContext* uictx = ctx->GetUIContext();
 		static CAlerts* alertctx = uictx->GetAlerts();
 
-		ImGui::Text(aAddonData.NexusAddon->Definitions->Name);
-		ImGui::SameLine();
-		ImGui::TextDisabled(aAddonData.NexusAddon->Definitions->Version.string().c_str());
-		ImGui::TextDisabled("by %s", aAddonData.NexusAddon->Definitions->Author);
+		if (ImGui::BeginChild("##AddonItem_Info_", ImVec2(itemSz.x - style.ItemSpacing.x - actionsAreaWidth, innerHeight)))
+		{
+			ImGui::Text(aAddonData.NexusAddon->Definitions->Name);
+			ImGui::SameLine();
+			ImGui::TextDisabled(aAddonData.NexusAddon->Definitions->Version.string().c_str());
+			ImGui::TextDisabled("by %s", aAddonData.NexusAddon->Definitions->Author);
 
-		/* Incompatible notice or description */
-		if (aAddonData.NexusAddon->State == EAddonState::NotLoadedIncompatibleAPI)
-		{
-			ImGui::TextColored(ImVec4(255, 255, 0, 255), langApi->Translate("((000010))"), aAddonData.NexusAddon->Definitions->APIVersion);
-		}
-		else
-		{
-			ImGui::PushTextWrapPos(aWidth - actionsAreaWidth - style.WindowPadding.x);
-			ImGui::TextWrapped(aAddonData.NexusAddon->Definitions->Description);
-			ImGui::PopTextWrapPos();
-		}
-
-		/* Load/Unload Button */
-		ImGui::SetCursorPos(ImVec2(aWidth - actionsAreaWidth + style.WindowPadding.x, (ImGui::GetWindowHeight() - (btnTextSz.y * 2) - style.ItemSpacing.y - (style.FramePadding.y * 2)) / 2));
-		// just check if loaded, if it was not hot-reloadable it would be EAddonState::LoadedLOCKED
-		if (aAddonData.NexusAddon->State == EAddonState::Loaded)
-		{
-			if (ImGui::Button((aAddonData.NexusAddon->IsWaitingForUnload ? langApi->Translate("((000078))") : langApi->Translate("((000020))") + sig).c_str(), ImVec2(btnWidth, 0)))
+			/* Incompatible notice or description */
+			if (aAddonData.NexusAddon->State == EAddonState::NotLoadedIncompatibleAPI)
 			{
-				if (!aAddonData.NexusAddon->IsWaitingForUnload)
+				ImGui::TextColored(ImVec4(255, 255, 0, 255), langApi->Translate("((000010))"), aAddonData.NexusAddon->Definitions->APIVersion);
+			}
+			else
+			{
+				ImGui::TextWrapped(aAddonData.NexusAddon->Definitions->Description);
+			}
+		}
+		ImGui::EndChild();
+		
+		ImGui::SameLine();
+
+		if (ImGui::BeginChild("##AddonItem_Actions_", ImVec2(actionsAreaWidth, innerHeight)))
+		{
+			float initialX = ImGui::GetCursorPosX();
+
+			/* Load/Unload Button */
+			ImGui::SetCursorPos(ImVec2(initialX, (ImGui::GetWindowHeight() - (btnTextSz.y * 2) - style.ItemSpacing.y - (style.FramePadding.y * 2)) / 2));
+			// just check if loaded, if it was not hot-reloadable it would be EAddonState::LoadedLOCKED
+			if (aAddonData.NexusAddon->State == EAddonState::Loaded)
+			{
+				if (ImGui::Button((aAddonData.NexusAddon->IsWaitingForUnload ? langApi->Translate("((000078))") : langApi->Translate("((000020))") + sig).c_str(), ImVec2(btnWidth, 0)))
 				{
-					//Logger->Debug(CH_GUI, "Unload called: %s", it.second->Definitions->Name);
-					Loader::QueueAddon(ELoaderAction::Unload, aAddonData.NexusAddon->Path);
+					if (!aAddonData.NexusAddon->IsWaitingForUnload)
+					{
+						//Logger->Debug(CH_GUI, "Unload called: %s", it.second->Definitions->Name);
+						Loader::QueueAddon(ELoaderAction::Unload, aAddonData.NexusAddon->Path);
+					}
+				}
+				if (Loader::HasCustomConfig)
+				{
+					ImGui::TooltipGeneric(langApi->Translate("((000021))"));
 				}
 			}
-			if (Loader::HasCustomConfig)
+			else if (aAddonData.NexusAddon->State == EAddonState::LoadedLOCKED)
 			{
-				ImGui::TooltipGeneric(langApi->Translate("((000021))"));
-			}
-		}
-		else if (aAddonData.NexusAddon->State == EAddonState::LoadedLOCKED)
-		{
-			std::string additionalInfo;
+				std::string additionalInfo;
 
-			if (Loader::HasCustomConfig)
-			{
-				additionalInfo.append("\n");
-				additionalInfo.append(langApi->Translate("((000021))"));
-			}
+				if (Loader::HasCustomConfig)
+				{
+					additionalInfo.append("\n");
+					additionalInfo.append(langApi->Translate("((000021))"));
+				}
 
-			if (ImGui::Button((langApi->Translate(aAddonData.NexusAddon->IsFlaggedForDisable ? "((000024))" : "((000022))") + sig).c_str(), ImVec2(btnWidth, 0)))
-			{
-				aAddonData.NexusAddon->IsFlaggedForDisable = !aAddonData.NexusAddon->IsFlaggedForDisable;
-				Loader::SaveAddonConfig();
+				if (ImGui::Button((langApi->Translate(aAddonData.NexusAddon->IsFlaggedForDisable ? "((000024))" : "((000022))") + sig).c_str(), ImVec2(btnWidth, 0)))
+				{
+					aAddonData.NexusAddon->IsFlaggedForDisable = !aAddonData.NexusAddon->IsFlaggedForDisable;
+					Loader::SaveAddonConfig();
+				}
+				ImGui::TooltipGeneric(langApi->Translate(aAddonData.NexusAddon->IsFlaggedForDisable ? "((000025))" : "((000023))"), additionalInfo.c_str());
 			}
-			ImGui::TooltipGeneric(langApi->Translate(aAddonData.NexusAddon->IsFlaggedForDisable ? "((000025))" : "((000023))"), additionalInfo.c_str());
-		}
-		else if (aAddonData.NexusAddon->State == EAddonState::NotLoaded && (aAddonData.NexusAddon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || aAddonData.NexusAddon->Definitions->Signature == 0xFFF694D1) && !IsGameLaunchSequence)
-		{
-			/* if it's too late to load this addon */
-			if (ImGui::Button((langApi->Translate(aAddonData.NexusAddon->IsFlaggedForEnable ? "((000020))" : "((000024))") + sig).c_str(), ImVec2(btnWidth, 0)))
+			else if (aAddonData.NexusAddon->State == EAddonState::NotLoaded && (aAddonData.NexusAddon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || aAddonData.NexusAddon->Definitions->Signature == 0xFFF694D1) && !IsGameLaunchSequence)
 			{
-				aAddonData.NexusAddon->IsFlaggedForEnable = !aAddonData.NexusAddon->IsFlaggedForEnable;
+				/* if it's too late to load this addon */
+				if (ImGui::Button((langApi->Translate(aAddonData.NexusAddon->IsFlaggedForEnable ? "((000020))" : "((000024))") + sig).c_str(), ImVec2(btnWidth, 0)))
+				{
+					aAddonData.NexusAddon->IsFlaggedForEnable = !aAddonData.NexusAddon->IsFlaggedForEnable;
 
+					if (aAddonData.NexusAddon->IsFlaggedForEnable)
+					{
+						aAddonData.NexusAddon->IsDisabledUntilUpdate = false; // explicitly loaded
+						alertctx->Notify(String::Format("%s %s", aAddonData.NexusAddon->Definitions->Name, langApi->Translate("((000080))")).c_str());
+					}
+
+					Loader::SaveAddonConfig();
+				}
 				if (aAddonData.NexusAddon->IsFlaggedForEnable)
 				{
-					aAddonData.NexusAddon->IsDisabledUntilUpdate = false; // explicitly loaded
-					alertctx->Notify(String::Format("%s %s", aAddonData.NexusAddon->Definitions->Name, langApi->Translate("((000080))")).c_str());
+					ImGui::TooltipGeneric(langApi->Translate("((000025))"), "");
 				}
+			}
+			else if (aAddonData.NexusAddon->State == EAddonState::NotLoaded)
+			{
+				if (ImGui::Button((langApi->Translate("((000026))") + sig).c_str(), ImVec2(btnWidth, 0)))
+				{
+					//Logger->Debug(CH_GUI, "Load called: %s", it.second->Definitions->Name);
+					aAddonData.NexusAddon->IsDisabledUntilUpdate = false; // explicitly loaded
+					Loader::QueueAddon(ELoaderAction::Load, aAddonData.NexusAddon->Path);
+				}
+				if (Loader::HasCustomConfig)
+				{
+					ImGui::TooltipGeneric(langApi->Translate("((000021))"));
+				}
+			}
 
-				Loader::SaveAddonConfig();
-			}
-			if (aAddonData.NexusAddon->IsFlaggedForEnable)
+			/* Configure Button */
+			ImGui::SetCursorPos(ImVec2(initialX, ImGui::GetCursorPosY()));
+			if (ImGui::Button("Configure", ImVec2(btnWidth, 0)))
 			{
-				ImGui::TooltipGeneric(langApi->Translate("((000025))"), "");
+				this->SetContent(aAddonData);
 			}
 		}
-		else if (aAddonData.NexusAddon->State == EAddonState::NotLoaded)
-		{
-			if (ImGui::Button((langApi->Translate("((000026))") + sig).c_str(), ImVec2(btnWidth, 0)))
-			{
-				//Logger->Debug(CH_GUI, "Load called: %s", it.second->Definitions->Name);
-				aAddonData.NexusAddon->IsDisabledUntilUpdate = false; // explicitly loaded
-				Loader::QueueAddon(ELoaderAction::Load, aAddonData.NexusAddon->Path);
-			}
-			if (Loader::HasCustomConfig)
-			{
-				ImGui::TooltipGeneric(langApi->Translate("((000021))"));
-			}
-		}
-
-		/* Configure Button */
-		ImGui::SetCursorPos(ImVec2(aWidth - actionsAreaWidth + style.WindowPadding.x, ImGui::GetCursorPosY()));
-		if (ImGui::Button("Configure", ImVec2(btnWidth, 0)))
-		{
-			this->SetContent(aAddonData);
-		}
+		ImGui::EndChild();
 	}
 	ImGui::EndChild();
 	ImGui::PopStyleVar();
@@ -224,6 +233,7 @@ void CAddonsWindow::AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalle
 	ImGuiStyle& style = ImGui::GetStyle();
 
 	ImVec2 itemSz = ImVec2(aWidth, ImGui::GetTextLineHeightWithSpacing() * 5);
+	float innerHeight = itemSz.y - (style.WindowPadding.y * 2);
 
 	ImVec2 btnTextSz = ImGui::CalcTextSize("############");
 
@@ -232,7 +242,7 @@ void CAddonsWindow::AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalle
 
 	ImVec2 curPos = ImGui::GetCursorPos();
 
-	/*  above visible space                        || under visible space */
+	/* above visible space                        || under visible space */
 	if (curPos.y < ImGui::GetScrollY() - itemSz.y || curPos.y > ImGui::GetScrollY() + ImGui::GetWindowHeight())
 	{
 		ImGui::Dummy(itemSz);
@@ -242,167 +252,175 @@ void CAddonsWindow::AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalle
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1);
 	if (ImGui::BeginChild(("##AddonItem_" + sig).c_str(), itemSz, true))
 	{
-		//if (ImGui::BeginChild("##addonlisting_info", ImVec2(itemSz.x - (style.WindowPadding.x * 2) - actionsAreaWidth, 0)))
-
 		static CContext* ctx = CContext::GetContext();
 		static CLocalization* langApi = ctx->GetLocalization();
 		static CUiContext* uictx = ctx->GetUIContext();
 		static CAlerts* alertctx = uictx->GetAlerts();
 
-		ImGui::Text(aAddon->Name.c_str());
-		ImGui::TextDisabled("by %s", aAddon->Author.c_str());
-
-		/* description */
-		ImGui::PushTextWrapPos(aWidth - actionsAreaWidth - style.WindowPadding.x);
-		ImGui::TextWrapped(aAddon->Description.c_str());
-		ImGui::PopTextWrapPos();
-
-		static CTextureLoader* textureApi = ctx->GetTextureService();
-		static Texture* T1 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER1", RES_ICON_TIER1, ctx->GetModule());
-		static Texture* T2 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER2", RES_ICON_TIER2, ctx->GetModule());
-		static Texture* T3 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER3", RES_ICON_TIER3, ctx->GetModule());
-		static Texture* TX = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER_UNKNOWN", RES_ICON_TIER_UNKNOWN, ctx->GetModule());
-
-		Texture* noticeIcon = nullptr;
-		std::string noticeURL;
-		std::string noticeTT;
-
-		if (aAddon->PolicyTier != 0)
+		if (ImGui::BeginChild("##AddonItem_Info_", ImVec2(itemSz.x - style.ItemSpacing.x - actionsAreaWidth, innerHeight)))
 		{
-			switch (aAddon->PolicyTier)
-			{
-				case -1:
-				{
-					noticeIcon = TX;
-					noticeURL = "https://raidcore.gg/Legal#addon-policy";
-					noticeTT = langApi->Translate("((000090))");
+			ImGui::Text(aAddon->Name.c_str());
+			ImGui::TextDisabled("by %s", aAddon->Author.c_str());
 
-					if (!TX)
-					{
-						TX = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER_UNKNOWN", RES_ICON_TIER_UNKNOWN, ctx->GetModule());
-					}
-
-					break;
-				}
-
-				case 1:
-				{
-					noticeIcon = T1;
-					noticeURL = "https://raidcore.gg/Legal#addon-policy";
-					noticeTT = String::Format(langApi->Translate("((000089))"), 1);
-
-					if (!T1)
-					{
-						T1 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER1", RES_ICON_TIER1, ctx->GetModule());
-					}
-
-					break;
-				}
-				case 2:
-				{
-					noticeIcon = T2;
-					noticeURL = "https://raidcore.gg/Legal#addon-policy";
-					noticeTT = String::Format(langApi->Translate("((000089))"), 2);
-
-					if (!T2)
-					{
-						T2 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER2", RES_ICON_TIER2, ctx->GetModule());
-					}
-
-					break;
-				}
-				case 3:
-				{
-					noticeIcon = T3;
-					noticeURL = "https://raidcore.gg/Legal#addon-policy";
-					noticeTT = String::Format(langApi->Translate("((000089))"), 3);
-
-					if (!T3)
-					{
-						T3 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER3", RES_ICON_TIER3, ctx->GetModule());
-					}
-
-					break;
-				}
-			}
+			/* description */
+			ImGui::TextWrapped(aAddon->Description.c_str());
 		}
-		else if (!aAddon->ToSComplianceNotice.empty())
+		ImGui::EndChild();
+		
+		ImGui::SameLine();
+
+		if (ImGui::BeginChild("##AddonItem_Actions_", ImVec2(actionsAreaWidth, innerHeight)))
 		{
-			noticeIcon = T1;
-			noticeURL = "https://help.guildwars2.com/hc/en-us/articles/360013625034-Policy-Third-Party-Programs";
+			float initialX = ImGui::GetCursorPosX();
 
-			std::string tosNotice = langApi->Translate("((000074))");
-			tosNotice.append("\n");
-			tosNotice.append(aAddon->ToSComplianceNotice);
+			static CTextureLoader* textureApi = ctx->GetTextureService();
+			static Texture* T1 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER1", RES_ICON_TIER1, ctx->GetModule());
+			static Texture* T2 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER2", RES_ICON_TIER2, ctx->GetModule());
+			static Texture* T3 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER3", RES_ICON_TIER3, ctx->GetModule());
+			static Texture* TX = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER_UNKNOWN", RES_ICON_TIER_UNKNOWN, ctx->GetModule());
 
-			noticeTT = tosNotice;
-		}
+			Texture* noticeIcon = nullptr;
+			std::string noticeURL;
+			std::string noticeTT;
 
-		if (noticeIcon)
-		{
-			float btnSz = ImGui::GetFontSize() * 1.5f;
-
-			ImGui::SetCursorPos(ImVec2(aWidth - btnSz, 0));
-			if (ImGui::IconButton(noticeIcon->Resource, ImVec2(btnSz, btnSz)))
+			if (aAddon->PolicyTier != 0)
 			{
-				ShellExecuteA(0, 0, noticeURL.c_str(), 0, 0, SW_SHOW);
-			}
-
-			ImGui::TooltipGeneric(langApi->Translate(noticeTT.c_str()));
-		}
-
-		/* Install Button */
-		ImGui::SetCursorPos(ImVec2(aWidth - actionsAreaWidth + style.WindowPadding.x, (ImGui::GetWindowHeight() - (btnTextSz.y * 2) - style.ItemSpacing.y - (style.FramePadding.y * 2)) / 2));
-		// just check if loaded, if it was not hot-reloadable it would be EAddonState::LoadedLOCKED
-		if (!aInstalled)
-		{
-			if (ImGui::Button(aAddon->IsInstalling 
-				? (langApi->Translate("((000027))") + sig).c_str()
-				: (langApi->Translate("((000028))") + sig).c_str(),
-				ImVec2(btnWidth, 0)))
-			{
-				if (!aAddon->IsInstalling)
+				switch (aAddon->PolicyTier)
 				{
-					std::thread([aAddon, aIsArcPlugin]()
+					case -1:
 					{
-						CContext* ctx = CContext::GetContext();
-						CUpdater* updater = ctx->GetUpdater();
-						updater->InstallAddon(aAddon, aIsArcPlugin);
+						noticeIcon = TX;
+						noticeURL = "https://raidcore.gg/Legal#addon-policy";
+						noticeTT = langApi->Translate("((000090))");
 
-						if (aIsArcPlugin)
+						if (!TX)
 						{
-							ArcDPS::AddToAtlasBySig(aAddon->Signature);
-						}
-						else
-						{
-							Loader::NotifyChanges();
-							//Loader::QueueAddon(ELoaderAction::Reload, installPath);
+							TX = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER_UNKNOWN", RES_ICON_TIER_UNKNOWN, ctx->GetModule());
 						}
 
-						CUiContext* uictx = ctx->GetUIContext();
-						uictx->Invalidate();
+						break;
+					}
 
-						aAddon->IsInstalling = false;
-					}).detach();
+					case 1:
+					{
+						noticeIcon = T1;
+						noticeURL = "https://raidcore.gg/Legal#addon-policy";
+						noticeTT = String::Format(langApi->Translate("((000089))"), 1);
 
-					//Loader::AddonConfig[aAddon->Signature].IsLoaded = true;
+						if (!T1)
+						{
+							T1 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER1", RES_ICON_TIER1, ctx->GetModule());
+						}
+
+						break;
+					}
+					case 2:
+					{
+						noticeIcon = T2;
+						noticeURL = "https://raidcore.gg/Legal#addon-policy";
+						noticeTT = String::Format(langApi->Translate("((000089))"), 2);
+
+						if (!T2)
+						{
+							T2 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER2", RES_ICON_TIER2, ctx->GetModule());
+						}
+
+						break;
+					}
+					case 3:
+					{
+						noticeIcon = T3;
+						noticeURL = "https://raidcore.gg/Legal#addon-policy";
+						noticeTT = String::Format(langApi->Translate("((000089))"), 3);
+
+						if (!T3)
+						{
+							T3 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER3", RES_ICON_TIER3, ctx->GetModule());
+						}
+
+						break;
+					}
+				}
+			}
+			else if (!aAddon->ToSComplianceNotice.empty())
+			{
+				noticeIcon = T1;
+				noticeURL = "https://help.guildwars2.com/hc/en-us/articles/360013625034-Policy-Third-Party-Programs";
+
+				std::string tosNotice = langApi->Translate("((000074))");
+				tosNotice.append("\n");
+				tosNotice.append(aAddon->ToSComplianceNotice);
+
+				noticeTT = tosNotice;
+			}
+
+			if (noticeIcon)
+			{
+				float btnSz = ImGui::GetFontSize() * 1.5f;
+
+				ImGui::SetCursorPos(ImVec2(initialX + btnWidth - btnSz, 0));
+				if (ImGui::IconButton(noticeIcon->Resource, ImVec2(btnSz, btnSz)))
+				{
+					ShellExecuteA(0, 0, noticeURL.c_str(), 0, 0, SW_SHOW);
+				}
+
+				ImGui::TooltipGeneric(langApi->Translate(noticeTT.c_str()));
+			}
+
+			/* Install Button */
+			ImGui::SetCursorPos(ImVec2(initialX, (ImGui::GetWindowHeight() - (btnTextSz.y * 2) - style.ItemSpacing.y - (style.FramePadding.y * 2)) / 2));
+			// just check if loaded, if it was not hot-reloadable it would be EAddonState::LoadedLOCKED
+			if (!aInstalled)
+			{
+				if (ImGui::Button(aAddon->IsInstalling
+					? (langApi->Translate("((000027))") + sig).c_str()
+					: (langApi->Translate("((000028))") + sig).c_str(),
+					ImVec2(btnWidth, 0)))
+				{
+					if (!aAddon->IsInstalling)
+					{
+						std::thread([aAddon, aIsArcPlugin]()
+						{
+							CContext* ctx = CContext::GetContext();
+							CUpdater* updater = ctx->GetUpdater();
+							updater->InstallAddon(aAddon, aIsArcPlugin);
+
+							if (aIsArcPlugin)
+							{
+								ArcDPS::AddToAtlasBySig(aAddon->Signature);
+							}
+							else
+							{
+								Loader::NotifyChanges();
+								//Loader::QueueAddon(ELoaderAction::Reload, installPath);
+							}
+
+							CUiContext* uictx = ctx->GetUIContext();
+							uictx->Invalidate();
+
+							aAddon->IsInstalling = false;
+						}).detach();
+
+						//Loader::AddonConfig[aAddon->Signature].IsLoaded = true;
+					}
+				}
+			}
+			else
+			{
+				ImGui::Text(langApi->Translate("((000029))"));
+			}
+
+			/* GitHub Button */
+			if (aAddon->Provider == EUpdateProvider::GitHub && !aAddon->DownloadURL.empty())
+			{
+				ImGui::SetCursorPos(ImVec2(initialX, ImGui::GetCursorPosY()));
+				if (ImGui::Button((langApi->Translate("((000030))") + sig).c_str(), ImVec2(btnWidth, 0)))
+				{
+					ShellExecuteA(0, 0, aAddon->DownloadURL.c_str(), 0, 0, SW_SHOW);
 				}
 			}
 		}
-		else
-		{
-			ImGui::Text(langApi->Translate("((000029))"));
-		}
-
-		/* Configure Button */
-		if (aAddon->Provider == EUpdateProvider::GitHub && !aAddon->DownloadURL.empty())
-		{
-			ImGui::SetCursorPos(ImVec2(aWidth - actionsAreaWidth + style.WindowPadding.x, ImGui::GetCursorPosY()));
-			if (ImGui::Button((langApi->Translate("((000030))") + sig).c_str(), ImVec2(btnWidth, 0)))
-			{
-				ShellExecuteA(0, 0, aAddon->DownloadURL.c_str(), 0, 0, SW_SHOW);
-			}
-		}
+		ImGui::EndChild();
 	}
 	ImGui::EndChild();
 	ImGui::PopStyleVar();
