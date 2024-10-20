@@ -465,6 +465,7 @@ void CAddonsWindow::RenderContent()
 		if (ImGui::Button(langApi->Translate("((000031))")))
 		{
 			quickFilterMode = 0;
+			this->ClearContent();
 		}
 
 		ImGui::SameLine();
@@ -472,6 +473,7 @@ void CAddonsWindow::RenderContent()
 		if (ImGui::Button(langApi->Translate("((000032))")))
 		{
 			quickFilterMode = 1;
+			this->ClearContent();
 		}
 
 		if (ArcDPS::IsLoaded)
@@ -485,6 +487,7 @@ void CAddonsWindow::RenderContent()
 			if (ImGui::Button(langApi->Translate("((000075))")))
 			{
 				quickFilterMode = 2;
+				this->ClearContent();
 			}
 			ImGui::TooltipGeneric(legacyNotice.c_str());
 		}
