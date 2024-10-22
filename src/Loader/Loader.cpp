@@ -452,7 +452,6 @@ namespace Loader
 
 			QueuedAddons.erase(it);
 
-			SortAddons();
 			ArcDPS::GetPlugins();
 		}
 	}
@@ -1303,25 +1302,6 @@ namespace Loader
 		}
 
 		return nullptr;
-	}
-
-	void SortAddons()
-	{
-		std::sort(Addons.begin(), Addons.end(), [](Addon* lhs, Addon* rhs)
-		{
-			std::string lcmp = lhs->Definitions && lhs->Definitions->Name
-				? String::ToLower(String::Normalize(lhs->Definitions->Name))
-				: String::ToLower(lhs->Path.filename().string());
-
-			std::string rcmp = rhs->Definitions && rhs->Definitions->Name
-				? String::ToLower(String::Normalize(rhs->Definitions->Name))
-				: String::ToLower(rhs->Path.filename().string());
-
-			return 
-				(lhs->IsFavorite > rhs->IsFavorite) ||
-				((lhs->IsFavorite == rhs->IsFavorite) && (lhs->IsDisabledUntilUpdate > rhs->IsDisabledUntilUpdate)) ||
-				((lhs->IsFavorite == rhs->IsFavorite) && (lhs->IsDisabledUntilUpdate == rhs->IsDisabledUntilUpdate) && lcmp < rcmp);
-		});
 	}
 
 	void GetGameBuild()

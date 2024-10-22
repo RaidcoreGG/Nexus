@@ -252,7 +252,6 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 				{
 					aAddonData.NexusAddon->IsFavorite = !aAddonData.NexusAddon->IsFavorite;
 					Loader::SaveAddonConfig();
-					Loader::SortAddons(); // quite ugly to call from here, but oh well
 					this->Invalidate();
 					clickedFavorite = true;
 				}
@@ -1065,7 +1064,6 @@ void CAddonsWindow::RenderDetails()
 				//Logger->Debug(CH_GUI, "ToggleDUU called: %s", it.second->Definitions->Name);
 
 				Loader::SaveAddonConfig();
-				Loader::SortAddons(); // quite ugly to call from here, but oh well
 				this->Invalidate();
 
 				if (addonData.NexusAddon->State == EAddonState::Loaded)
@@ -1301,6 +1299,22 @@ void CAddonsWindow::PopulateAddons()
 			this->SetContent(addonItem);
 		}
 	}
+
+	std::sort(this->Addons.begin(), this->Addons.end(), [](AddonItemData& lhs, AddonItemData& rhs)
+	{
+		std::string lcmp = lhs.NexusAddon->Definitions && lhs.NexusAddon->Definitions->Name
+			? String::ToLower(String::Normalize(lhs.NexusAddon->Definitions->Name))
+			: String::ToLower(lhs.NexusAddon->Path.filename().string());
+
+		std::string rcmp = rhs.NexusAddon->Definitions && rhs.NexusAddon->Definitions->Name
+			? String::ToLower(String::Normalize(rhs.NexusAddon->Definitions->Name))
+			: String::ToLower(rhs.NexusAddon->Path.filename().string());
+
+		return
+			(lhs.NexusAddon->IsFavorite > rhs.NexusAddon->IsFavorite) ||
+			((lhs.NexusAddon->IsFavorite == rhs.NexusAddon->IsFavorite) && (lhs.NexusAddon->IsDisabledUntilUpdate > rhs.NexusAddon->IsDisabledUntilUpdate)) ||
+			((lhs.NexusAddon->IsFavorite == rhs.NexusAddon->IsFavorite) && (lhs.NexusAddon->IsDisabledUntilUpdate == rhs.NexusAddon->IsDisabledUntilUpdate) && lcmp < rcmp);
+	});
 }
 
 void CAddonsWindow::PopulateLibrary()
