@@ -113,11 +113,27 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 		return;
 	}
 
+	bool isduu = aAddonData.NexusAddon->IsDisabledUntilUpdate;
+
+	if (isduu)
+	{
+		ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(.675f, .349f, .349f, 1.0f));
+	}
+
+	bool poppedCol = false;
+
+	static CContext* ctx = CContext::GetContext();
+	static CLocalization* langApi = ctx->GetLocalization();
+
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1);
 	if (ImGui::BeginChild(("##AddonItem_" + sig).c_str(), itemSz, true))
 	{
-		static CContext* ctx = CContext::GetContext();
-		static CLocalization* langApi = ctx->GetLocalization();
+		if (isduu)
+		{
+			ImGui::PopStyleColor();
+			poppedCol = true;
+		}
+
 		static CUiContext* uictx = ctx->GetUIContext();
 		static CAlerts* alertctx = uictx->GetAlerts();
 
@@ -253,6 +269,19 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 	}
 	aAddonData.IsHovered = hoveredFavorite || clickedFavorite || ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows);
 	ImGui::EndChild();
+
+	if (isduu && aAddonData.IsHovered)
+	{
+		ImGui::BeginTooltip();
+		ImGui::Text(langApi->Translate("((000103))"));
+		ImGui::EndTooltip();
+	}
+
+	if (isduu && !poppedCol)
+	{
+		ImGui::PopStyleColor();
+	}
+
 	ImGui::PopStyleVar();
 }
 void CAddonsWindow::AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalled, bool aIsArcPlugin)
@@ -1028,6 +1057,8 @@ void CAddonsWindow::RenderDetails()
 				//Logger->Debug(CH_GUI, "ToggleDUU called: %s", it.second->Definitions->Name);
 
 				Loader::SaveAddonConfig();
+				Loader::SortAddons(); // quite ugly to call from here, but oh well
+				this->Invalidate();
 
 				if (addonData.NexusAddon->State == EAddonState::Loaded)
 				{
