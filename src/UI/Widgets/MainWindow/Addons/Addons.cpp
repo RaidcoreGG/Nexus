@@ -490,8 +490,16 @@ void CAddonsWindow::RenderContent()
 {
 	if (this->IsInvalid)
 	{
+		static CContext* ctx = CContext::GetContext();
+		static CUiContext* uictx = ctx->GetUIContext();
+		static CEscapeClosing* escclose = uictx->GetEscapeClosingService();
+
+		escclose->Deregister(this->GetVisibleStatePtr());
+		escclose->Register(this->GetNameID().c_str(), this->GetVisibleStatePtr());
+
 		this->PopulateAddons();
 		this->PopulateLibrary();
+
 		this->IsInvalid = false;
 	}
 

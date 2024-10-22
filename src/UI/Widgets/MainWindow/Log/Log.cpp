@@ -12,6 +12,7 @@
 
 #include "imgui_extensions.h"
 
+#include "Context.h"
 #include "resource.h"
 
 CLogWindow::CLogWindow()
@@ -25,6 +26,18 @@ CLogWindow::CLogWindow()
 
 void CLogWindow::RenderContent()
 {
+	if (this->IsInvalid)
+	{
+		static CContext* ctx = CContext::GetContext();
+		static CUiContext* uictx = ctx->GetUIContext();
+		static CEscapeClosing* escclose = uictx->GetEscapeClosingService();
+
+		escclose->Deregister(this->GetVisibleStatePtr());
+		escclose->Register(this->GetNameID().c_str(), this->GetVisibleStatePtr());
+
+		this->IsInvalid = false;
+	}
+
 	static int selectedLevel = (int)(ELogLevel::ALL)-1;
 	static const char* filterLevels[] = { "Critical", "Warning", "Info", "Debug", "Trace", "All" };
 	static bool selectedOnly = false;

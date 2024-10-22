@@ -33,6 +33,13 @@ void COptionsWindow::RenderContent()
 {
 	if (this->IsInvalid)
 	{
+		static CContext* ctx = CContext::GetContext();
+		static CUiContext* uictx = ctx->GetUIContext();
+		static CEscapeClosing* escclose = uictx->GetEscapeClosingService();
+
+		escclose->Deregister(this->GetVisibleStatePtr());
+		escclose->Register(this->GetNameID().c_str(), this->GetVisibleStatePtr());
+
 		this->PopulateFonts();
 		this->IsInvalid = false;
 	}
@@ -48,11 +55,11 @@ void COptionsWindow::RenderContent()
 
 void COptionsWindow::TabGeneral()
 {
-	CContext* ctx = CContext::GetContext();
-	CLocalization* langApi = ctx->GetLocalization();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
-	CUiContext* uictx = ctx->GetUIContext();
-	CQuickAccess* qactx = uictx->GetQuickAccess();
+	static CContext* ctx = CContext::GetContext();
+	static CLocalization* langApi = ctx->GetLocalization();
+	static CSettings* settingsctx = ctx->GetSettingsCtx();
+	static CUiContext* uictx = ctx->GetUIContext();
+	static CQuickAccess* qactx = uictx->GetQuickAccess();
 
 	if (ImGui::BeginTabItem(langApi->Translate("((000052))")))
 	{

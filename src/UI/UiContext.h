@@ -106,10 +106,10 @@ namespace UIRoot
 	void OnInputBindUpdate(void* aEventData);
 
 	///----------------------------------------------------------------------------------------------------
-	/// OnTranslationUpdate:
+	/// OnLanguageChanged:
 	/// 	Reacts to translation changes, to trigger a UI refresh.
 	///----------------------------------------------------------------------------------------------------
-	void OnTranslationUpdate(void* aEventData);
+	void OnLanguageChanged(void* aEventData);
 }
 
 ///----------------------------------------------------------------------------------------------------

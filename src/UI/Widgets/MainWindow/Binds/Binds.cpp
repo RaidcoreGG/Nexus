@@ -40,7 +40,12 @@ void CBindsWindow::RenderContent()
 
 	if (this->IsInvalid)
 	{
-		CUiContext* uictx = ctx->GetUIContext();
+		static CContext* ctx = CContext::GetContext();
+		static CUiContext* uictx = ctx->GetUIContext();
+		static CEscapeClosing* escclose = uictx->GetEscapeClosingService();
+
+		escclose->Deregister(this->GetVisibleStatePtr());
+		escclose->Register(this->GetNameID().c_str(), this->GetVisibleStatePtr());
 
 		this->IBCategories = uictx->GetInputBinds();
 		this->GIBCategories = uictx->GetGameBinds();

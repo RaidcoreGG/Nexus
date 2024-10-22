@@ -51,6 +51,12 @@ class CEscapeClosing
 	void Deregister(const char* aWindowName);
 
 	///----------------------------------------------------------------------------------------------------
+	/// Deregister:
+	/// 	Deregisters the matching bool pointer from being toggled on escape.
+	///----------------------------------------------------------------------------------------------------
+	void Deregister(bool* aIsVisible);
+
+	///----------------------------------------------------------------------------------------------------
 	/// Verify:
 	/// 	Removes all registered close-on-escape hooks that match the address space.
 	///----------------------------------------------------------------------------------------------------

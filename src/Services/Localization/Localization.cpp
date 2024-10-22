@@ -15,11 +15,13 @@ using json = nlohmann::json;
 
 #include "Consts.h"
 
-CLocalization::CLocalization(CLogHandler* aLogger)
+CLocalization::CLocalization(CLogHandler* aLogger, CEventApi* aEventApi)
 {
 	assert(aLogger);
+	assert(aEventApi);
 
 	this->Logger = aLogger;
+	this->EventApi = aEventApi;
 }
 
 CLocalization::~CLocalization()
@@ -132,6 +134,11 @@ void CLocalization::SetLanguage(const std::string& aIdentifier)
 	if (atlasIt != this->LocaleAtlas.end())
 	{
 		this->ActiveLocale = &atlasIt->second;
+
+		std::thread([this]() {
+			this->EventApi->Raise("EV_LANGUAGE_CHANGED");
+		}).detach();
+
 		return;
 	}
 
@@ -141,11 +148,20 @@ void CLocalization::SetLanguage(const std::string& aIdentifier)
 		if (it.second.DisplayName == aIdentifier)
 		{
 			this->ActiveLocale = &it.second;
+
+			std::thread([this]() {
+				this->EventApi->Raise("EV_LANGUAGE_CHANGED");
+			}).detach();
+
 			return;
 		}
 	}
 
 	this->ActiveLocale = nullptr;
+
+	std::thread([this]() {
+		this->EventApi->Raise("EV_LANGUAGE_CHANGED");
+	}).detach();
 }
 
 std::vector<std::string> CLocalization::GetLanguages()

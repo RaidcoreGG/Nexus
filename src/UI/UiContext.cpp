@@ -219,16 +219,6 @@ namespace UIRoot
 		uictx->OnInputBind(aIdentifier);
 	}
 
-	void OnAddonLoadUnload(void* aEventData)
-	{
-		CContext* ctx = CContext::GetContext();
-		CUiContext* uictx = ctx->GetUIContext();
-
-		assert(uictx);
-
-		uictx->Invalidate();
-	}
-
 	void OnVolatileAddonsDisabled(void* aEventData)
 	{
 		CContext* ctx = CContext::GetContext();
@@ -255,7 +245,7 @@ namespace UIRoot
 		}
 	}
 
-	void OnTranslationUpdate(void* aEventData)
+	void OnLanguageChanged(void* aEventData)
 	{
 		CContext* ctx = CContext::GetContext();
 		CUiContext* uictx = ctx->GetUIContext();
@@ -290,6 +280,7 @@ CUiContext::CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CText
 	this->EventApi->Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", UIRoot::OnUELanguageChanged);
 	this->EventApi->Subscribe("EV_VOLATILE_ADDON_DISABLED",            UIRoot::OnVolatileAddonsDisabled);
 	this->EventApi->Subscribe("EV_INPUTBIND_UPDATED",                  UIRoot::OnInputBindUpdate);
+	this->EventApi->Subscribe("EV_LANGUAGE_CHANGED",                   UIRoot::OnLanguageChanged);
 
 	CAddonsWindow*  addonsWnd  = new CAddonsWindow();
 	COptionsWindow* optionsWnd = new COptionsWindow();
@@ -316,12 +307,6 @@ CUiContext::CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CText
 	this->InputBindApi->Register(KB_TOGGLEHIDEUI,  EIBHType::DownOnly, UIRoot::OnInputBind, "CTRL+H");
 
 	this->EscapeClose->Register("Nexus", this->MainWindow->GetVisibleStatePtr());
-	this->EscapeClose->Register(addonsWnd->GetName().c_str(), addonsWnd->GetVisibleStatePtr());
-	this->EscapeClose->Register(optionsWnd->GetName().c_str(), optionsWnd->GetVisibleStatePtr());
-	this->EscapeClose->Register(bindsWNd->GetName().c_str(), bindsWNd->GetVisibleStatePtr());
-	this->EscapeClose->Register(logWnd->GetName().c_str(), logWnd->GetVisibleStatePtr());
-	this->EscapeClose->Register(debugWnd->GetName().c_str(), debugWnd->GetVisibleStatePtr());
-	//this->EscapeClose->Register(aboutWnd->GetName().c_str(), aboutWnd->GetVisibleStatePtr());
 
 	this->UnpackLocales();
 	this->LoadSettings();
@@ -409,7 +394,7 @@ void CUiContext::Render()
 	}
 	if (this->FontManager->Advance())
 	{
-		UIRoot::OnTranslationUpdate(nullptr);
+		UIRoot::OnLanguageChanged(nullptr);
 		UIRoot::OnMumbleIdentityChanged(nullptr);
 		Shutdown();
 	}

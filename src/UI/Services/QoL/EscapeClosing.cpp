@@ -69,6 +69,18 @@ void CEscapeClosing::Deregister(const char* aWindowName)
 	this->Registry.erase(aWindowName);
 }
 
+void CEscapeClosing::Deregister(bool* aIsVisible)
+{
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [aIsVisible](std::pair<std::string, bool*> entry) { return  aIsVisible == entry.second; });
+	
+	if (it != this->Registry.end())
+	{
+		this->Registry.erase(it);
+	}
+}
+
 int CEscapeClosing::Verify(void* aStartAddress, void* aEndAddress)
 {
 	int refCounter = 0;

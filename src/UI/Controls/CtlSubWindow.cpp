@@ -112,6 +112,16 @@ bool ISubWindow::HasSubWindows()
 	return this->IsHost;
 }
 
+std::string ISubWindow::GetNameID()
+{
+	static CContext* ctx = CContext::GetContext();
+	static CLocalization* langApi = ctx->GetLocalization();
+
+	std::string wndName = langApi->Translate(this->DisplayName.c_str());
+
+	return wndName + "##" + this->Name;
+}
+
 bool* ISubWindow::GetVisibleStatePtr()
 {
 	return &this->IsPoppedOut;

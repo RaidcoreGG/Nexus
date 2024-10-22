@@ -70,7 +70,8 @@ CLogHandler* CContext::GetLogger()
 CLocalization* CContext::GetLocalization()
 {
 	static CLocalization s_LocalizationApi = CLocalization(
-		this->GetLogger()
+		this->GetLogger(),
+		this->GetEventApi()
 	);
 	return &s_LocalizationApi;
 }

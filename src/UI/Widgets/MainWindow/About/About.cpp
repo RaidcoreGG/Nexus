@@ -26,6 +26,18 @@ CAboutBox::CAboutBox()
 
 void CAboutBox::RenderContent()
 {
+	if (this->IsInvalid)
+	{
+		static CContext* ctx = CContext::GetContext();
+		static CUiContext* uictx = ctx->GetUIContext();
+		static CEscapeClosing* escclose = uictx->GetEscapeClosingService();
+
+		escclose->Deregister(this->GetVisibleStatePtr());
+		escclose->Register(this->GetNameID().c_str(), this->GetVisibleStatePtr());
+
+		this->IsInvalid = false;
+	}
+
 	ImGuiStyle& style = ImGui::GetStyle();
 
 	float btnSz = ImGui::GetFontSize() * 1.5f;
