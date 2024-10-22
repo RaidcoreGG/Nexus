@@ -22,6 +22,7 @@ struct AddonItemData
 	Addon* NexusAddon;
 	std::map<std::string, InputBindPacked> InputBinds;
 	GUI_RENDER                             OptionsRender;
+	bool                                   IsHovered;
 };
 
 #endif

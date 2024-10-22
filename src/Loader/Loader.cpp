@@ -281,6 +281,7 @@ namespace Loader
 					if (!addonInfo["IsPausingUpdates"].is_null()) { addonInfo["IsPausingUpdates"].get_to(addon->IsPausingUpdates); }
 					if (!addonInfo["IsDisabledUntilUpdate"].is_null()) { addonInfo["IsDisabledUntilUpdate"].get_to(addon->IsDisabledUntilUpdate); }
 					if (!addonInfo["AllowPrereleases"].is_null()) { addonInfo["AllowPrereleases"].get_to(addon->AllowPrereleases); }
+					if (!addonInfo["IsFavorite"].is_null()) { addonInfo["IsFavorite"].get_to(addon->IsFavorite); }
 
 					// to match the actual addon to the saved states
 					addon->MatchSignature = signature;
@@ -354,7 +355,8 @@ namespace Loader
 				{"IsLoaded", addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED || addon->IsFlaggedForEnable},
 				{"IsPausingUpdates", addon->IsPausingUpdates},
 				{"IsDisabledUntilUpdate", addon->IsDisabledUntilUpdate},
-				{"AllowPrereleases", addon->AllowPrereleases}
+				{"AllowPrereleases", addon->AllowPrereleases},
+				{"IsFavorite", addon->IsFavorite}
 			};
 
 			/* override loaded state, if it's still the initial startup sequence */
@@ -1315,8 +1317,10 @@ namespace Loader
 				? String::ToLower(String::Normalize(rhs->Definitions->Name))
 				: String::ToLower(rhs->Path.filename().string());
 
-			return lhs->IsDisabledUntilUpdate > rhs->IsDisabledUntilUpdate ||
-				((lhs->IsDisabledUntilUpdate == rhs->IsDisabledUntilUpdate) && lcmp < rcmp);
+			return 
+				(lhs->IsFavorite > rhs->IsFavorite) ||
+				((lhs->IsFavorite == rhs->IsFavorite) && (lhs->IsDisabledUntilUpdate > rhs->IsDisabledUntilUpdate)) ||
+				((lhs->IsFavorite == rhs->IsFavorite) && (lhs->IsDisabledUntilUpdate == rhs->IsDisabledUntilUpdate) && lcmp < rcmp);
 		});
 	}
 

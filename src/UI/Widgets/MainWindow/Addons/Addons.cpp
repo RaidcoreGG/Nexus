@@ -69,7 +69,7 @@ void CAddonsWindow::Invalidate(signed int aAddonID)
 	}
 }
 
-void CAddonsWindow::SetContent(AddonItemData aAddonData)
+void CAddonsWindow::SetContent(AddonItemData& aAddonData)
 {
 	CContext* ctx = CContext::GetContext();
 	CUiContext* uictx = ctx->GetUIContext();
@@ -85,7 +85,7 @@ void CAddonsWindow::ClearContent()
 	this->HasContent = false;
 }
 
-void CAddonsWindow::AddonItem(AddonItemData aAddonData, float aWidth)
+void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 {
 	if (!aAddonData.NexusAddon || !aAddonData.NexusAddon->Definitions) { return; }
 
@@ -102,6 +102,9 @@ void CAddonsWindow::AddonItem(AddonItemData aAddonData, float aWidth)
 	float actionsAreaWidth = btnWidth + (style.WindowPadding.x * 2);
 
 	ImVec2 curPos = ImGui::GetCursorPos();
+
+	bool hoveredFavorite = false;
+	bool clickedFavorite = false;
 
 	/* above visible space                        || under visible space */
 	if (curPos.y < ImGui::GetScrollY() - itemSz.y || curPos.y > ImGui::GetScrollY() + ImGui::GetWindowHeight())
@@ -218,9 +221,37 @@ void CAddonsWindow::AddonItem(AddonItemData aAddonData, float aWidth)
 			{
 				this->SetContent(aAddonData);
 			}
+
+			static Texture* favoriteTex = nullptr;
+			static Texture* canFavoriteTex = nullptr;
+
+			Texture* favTex = aAddonData.NexusAddon->IsFavorite ? favoriteTex : canFavoriteTex;
+
+			if ((aAddonData.NexusAddon->IsFavorite || aAddonData.IsHovered) && favTex)
+			{
+				float btnSz = ImGui::GetFontSize() * 1.5f;
+
+				ImGui::SetCursorPos(ImVec2(initialX + btnWidth - btnSz, 0));
+				if (ImGui::IconButton(favTex->Resource, ImVec2(btnSz, btnSz)))
+				{
+					aAddonData.NexusAddon->IsFavorite = !aAddonData.NexusAddon->IsFavorite;
+					Loader::SaveAddonConfig();
+					Loader::SortAddons(); // quite ugly to call from here, but oh well
+					this->Invalidate();
+					clickedFavorite = true;
+				}
+				hoveredFavorite = ImGui::IsItemHovered();
+			}
+			else if (!favTex)
+			{
+				CTextureLoader* texapi = ctx->GetTextureService();
+				favoriteTex = texapi->GetOrCreate("ICON_FAVORITE", RES_ICON_FAVORITE, ctx->GetModule());
+				canFavoriteTex = texapi->GetOrCreate("ICON_CANFAVORITE", RES_ICON_CANFAVORITE, ctx->GetModule());
+			}
 		}
 		ImGui::EndChild();
 	}
+	aAddonData.IsHovered = hoveredFavorite || clickedFavorite || ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows);
 	ImGui::EndChild();
 	ImGui::PopStyleVar();
 }
@@ -594,7 +625,7 @@ void CAddonsWindow::RenderContent()
 				{
 					int i = 0;
 
-					for (AddonItemData addon : this->Addons)
+					for (AddonItemData& addon : this->Addons)
 					{
 						if (!isListMode && i % 2 == 1)
 						{

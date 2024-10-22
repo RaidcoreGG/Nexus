@@ -385,10 +385,12 @@
     <Image Include="src\Resources\icons\addonpolicy_tier3.png" />
     <Image Include="src\Resources\icons\addons.png" />
     <Image Include="src\Resources\icons\binds.png" />
+    <Image Include="src\Resources\icons\canfavorite.png" />
     <Image Include="src\Resources\icons\chevron_rt.png" />
     <Image Include="src\Resources\icons\close.png" />
     <Image Include="src\Resources\icons\debug.png" />
     <Image Include="src\Resources\icons\ext.png" />
+    <Image Include="src\Resources\icons\favorite.png" />
     <Image Include="src\Resources\icons\home.png" />
     <Image Include="src\Resources\icons\list.png" />
     <Image Include="src\Resources\icons\log.png" />

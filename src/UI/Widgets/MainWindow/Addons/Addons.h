@@ -45,10 +45,10 @@ class CAddonsWindow : public ISubWindow
 	std::string                ModalTitle;
 	bool                       OpenModalNextFrame;
 
-	void SetContent(AddonItemData aAddonData);
+	void SetContent(AddonItemData& aAddonData);
 	void ClearContent();
 
-	void AddonItem(AddonItemData aAddonData, float aWidth);
+	void AddonItem(AddonItemData& aAddonData, float aWidth);
 	void AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalled = false, bool aIsArcPlugin = false);
 
 	void RenderContent() override;

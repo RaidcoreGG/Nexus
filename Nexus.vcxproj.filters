@@ -1342,5 +1342,11 @@
     <Image Include="src\Resources\icons\tiles.png">
       <Filter>Resource Files\Images\icons</Filter>
     </Image>
+    <Image Include="src\Resources\icons\canfavorite.png">
+      <Filter>Resource Files\Images\icons</Filter>
+    </Image>
+    <Image Include="src\Resources\icons\favorite.png">
+      <Filter>Resource Files\Images\icons</Filter>
+    </Image>
   </ItemGroup>
 </Project>
