@@ -519,6 +519,24 @@ void CAddonsWindow::RenderContent()
 			this->Invalidate();
 		}
 
+		/* clear filter */
+		static Texture* clearFilterTex = nullptr;
+		if (clearFilterTex)
+		{
+			ImGui::SameLine();
+			if (ImGui::ImageButton(clearFilterTex->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
+			{
+				memset(filter, 0, 400);
+				this->Filter = String::ToLower(filter);
+				this->Invalidate();
+			}
+		}
+		else
+		{
+			CTextureLoader* texapi = ctx->GetTextureService();
+			clearFilterTex = texapi->GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx->GetModule());
+		}
+
 		/* view mode */
 		static Texture* viewModeTex = nullptr;
 		if (viewModeTex)
