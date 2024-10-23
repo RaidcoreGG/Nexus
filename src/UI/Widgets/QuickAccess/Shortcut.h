@@ -29,7 +29,8 @@ struct Shortcut
 
 	Texture*                           TextureNormal;
 	Texture*                           TextureHover;
-	std::string                        InputBind;
+	std::string                        IBIdentifier;
+	std::string                        IBText;
 	std::string                        TooltipText;
 	bool                               IsHovering;
 	bool                               HasNotification;

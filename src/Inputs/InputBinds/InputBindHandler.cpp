@@ -503,6 +503,21 @@ std::string CInputBindApi::IsInUse(InputBind aInputBind)
 	return "";
 }
 
+const InputBind& CInputBindApi::Get(const std::string& aIdentifier)
+{
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	for (auto& [identifier, mib] : this->Registry)
+	{
+		if (identifier == aIdentifier)
+		{
+			return mib.Bind;
+		}
+	}
+
+	return {};
+}
+
 void CInputBindApi::Set(std::string aIdentifier, InputBind aInputBind)
 {
 	std::string res = this->IsInUse(aInputBind);

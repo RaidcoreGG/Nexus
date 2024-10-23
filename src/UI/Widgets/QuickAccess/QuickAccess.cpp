@@ -93,6 +93,25 @@ CQuickAccess::~CQuickAccess()
 
 void CQuickAccess::Render()
 {
+	if (this->IsInvalid)
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+		for (auto& [identifier, shortcut] : this->Registry)
+		{
+			const InputBind& ib = this->InputBindApi->Get(shortcut.IBIdentifier);
+			if (ib.Type != EInputBindType::None)
+			{
+				shortcut.IBText = CInputBindApi::IBToString(ib, true);
+			}
+			else
+			{
+				shortcut.IBText.clear();
+			}
+		}
+
+		this->IsInvalid = false;
+	}
+
 	this->NexusLink->QuickAccessIconsCount = static_cast<int>(this->Registry.size());
 	this->NexusLink->QuickAccessMode = (int)this->Location;
 	this->NexusLink->QuickAccessIsVertical = this->VerticalLayout;
@@ -211,10 +230,10 @@ void CQuickAccess::Render()
 				if (ImGui::ImageButton(!shortcut.IsHovering ? shortcut.TextureNormal->Resource : shortcut.TextureHover->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
 				{
 					isActive = true;
-					if (shortcut.InputBind.length() > 0)
+					if (shortcut.IBIdentifier.length() > 0)
 					{
 						shortcut.HasNotification = false;
-						this->InputBindApi->Invoke(shortcut.InputBind);
+						this->InputBindApi->Invoke(shortcut.IBIdentifier);
 					}
 				}
 				iconHovered = ImGui::IsItemHovered() || ImGui::IsItemClicked();
@@ -277,7 +296,14 @@ void CQuickAccess::Render()
 				if (ImGui::IsItemHovered())
 				{
 					ImGui::BeginTooltip();
-					ImGui::Text(this->Language->Translate(shortcut.TooltipText.c_str()));
+					if (shortcut.IBText.empty())
+					{
+						ImGui::Text(this->Language->Translate(shortcut.TooltipText.c_str()));
+					}
+					else
+					{
+						ImGui::Text("%s (%s)", this->Language->Translate(shortcut.TooltipText.c_str()), shortcut.IBText.c_str());
+					}
 					if (shortcut.ContextItems.size() > 0)
 					{
 						ImGui::TextDisabled(this->Language->Translate("((000102))"));
@@ -375,7 +401,14 @@ void CQuickAccess::AddShortcut(const char* aIdentifier, const char* aTextureIden
 			sh.TextureHoverIdentifier = aTextureHoverIdentifier;
 			sh.TextureNormal = normal;
 			sh.TextureHover = hover;
-			sh.InputBind = aInputBindIdentifier;
+			sh.IBIdentifier = aInputBindIdentifier;
+
+			const InputBind& ib = this->InputBindApi->Get(aInputBindIdentifier);
+			if (ib.Type != EInputBindType::None)
+			{
+				sh.IBText = CInputBindApi::IBToString(ib, true);
+			}
+
 			sh.TooltipText = aTooltipText;
 			sh.TextureGetAttempts = 0;
 			this->Registry[str] = sh;

@@ -406,7 +406,7 @@ void CUiContext::Render()
 
 		//this->Alerts->Invalidate();
 		this->MainWindow->Invalidate();
-		//this->QuickAccess->Invalidate();
+		this->QuickAccess->Invalidate();
 
 		this->IsInvalid = false;
 	}

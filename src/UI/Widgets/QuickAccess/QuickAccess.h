@@ -25,6 +25,7 @@
 #include "Services/Mumble/Reader.h"
 #include "Services/Textures/TextureLoader.h"
 #include "Shortcut.h"
+#include "UI/Controls/CtlWindow.h"
 #include "UI/FuncDefs.h"
 
 constexpr const char* CH_QUICKACCESS = "Quick Access";
@@ -33,7 +34,7 @@ constexpr const char* QA_MENU = "0_QA_MENU";
 ///----------------------------------------------------------------------------------------------------
 /// CQuickAccess Class
 ///----------------------------------------------------------------------------------------------------
-class CQuickAccess
+class CQuickAccess : public virtual IWindow
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -68,7 +69,7 @@ class CQuickAccess
 	/// Render:
 	/// 	Renders the Quick Access.
 	///----------------------------------------------------------------------------------------------------
-	void Render();
+	void Render() override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// RenderContextMenu:
