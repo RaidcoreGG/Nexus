@@ -277,7 +277,7 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aRemote, const ch
 
 		if (!result)
 		{
-			this->Logger->Debug(CH_TEXTURES, "Error fetching %s%s (%s)", remote.c_str(), endpoint.c_str(), str.c_str());
+			this->Logger->Debug(CH_TEXTURES, "Error fetching %s%s (%s)\nError: %s", remote.c_str(), endpoint.c_str(), str.c_str(), httplib::to_string(result.error()).c_str());
 
 			if (aCallback)
 			{

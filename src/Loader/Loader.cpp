@@ -1321,7 +1321,7 @@ namespace Loader
 
 		if (!result || result->status != 200)
 		{
-			Logger->Warning(CH_LOADER, "Error fetching \"http://assetcdn.101.arenanetworks.com/latest64/101\"");
+			Logger->Warning(CH_LOADER, "Error fetching \"http://assetcdn.101.arenanetworks.com/latest64/101\"\nError: %s", httplib::to_string(result.error()).c_str());
 			return;
 		}
 

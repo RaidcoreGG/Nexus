@@ -105,7 +105,7 @@ void CUpdater::UpdateNexus()
 
 		if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
 		{
-			this->Logger->Warning(CH_UPDATER, "Error fetching %s%s", downloadBaseUrl.c_str(), endpointDownload.c_str());
+			this->Logger->Warning(CH_UPDATER, "Error fetching %s%s\nError: %s", downloadBaseUrl.c_str(), endpointDownload.c_str(), httplib::to_string(downloadResult.error()).c_str());
 
 			// try cleaning failed download
 			if (std::filesystem::exists(Index::F_UPDATE_DLL))
@@ -507,8 +507,8 @@ bool CUpdater::UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& a
 
 	if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
 	{
-		this->Logger->Warning(CH_UPDATER, "Error fetching %s%s", downloadBaseUrl.c_str(), endpointDownload.c_str());
-
+		this->Logger->Warning(CH_UPDATER, "Error fetching %s%s\nError: %s", downloadBaseUrl.c_str(), endpointDownload.c_str(), httplib::to_string(downloadResult.error()).c_str());
+		
 		// try cleaning failed download
 		if (std::filesystem::exists(aDownloadPath))
 		{
@@ -573,8 +573,8 @@ bool CUpdater::UpdateDirect(std::filesystem::path& aDownloadPath, std::string& a
 
 	if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
 	{
-		this->Logger->Warning(CH_UPDATER, "Error fetching %s%s", aBaseURL.c_str(), aEndpointDownload.c_str());
-
+		this->Logger->Warning(CH_UPDATER, "Error fetching %s%s\nError: %s", aBaseURL.c_str(), aEndpointDownload.c_str(), httplib::to_string(downloadResult.error()).c_str());
+		
 		// try cleaning failed download
 		if (std::filesystem::exists(aDownloadPath))
 		{
@@ -622,8 +622,8 @@ bool CUpdater::UpdateSelf(std::filesystem::path& aDownloadPath, std::string& aBa
 
 	if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
 	{
-		this->Logger->Warning(CH_UPDATER, "Error fetching %s%s", aBaseURL.c_str(), aEndpointDownload.c_str());
-
+		this->Logger->Warning(CH_UPDATER, "Error fetching %s%s\nError: %s", aBaseURL.c_str(), aEndpointDownload.c_str(), httplib::to_string(downloadResult.error()).c_str());
+		
 		// try cleaning failed download
 		if (std::filesystem::exists(aDownloadPath))
 		{
