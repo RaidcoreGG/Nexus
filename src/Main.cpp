@@ -304,5 +304,4 @@ namespace Main
 
 		return Hooks::DXGIResizeBuffers(pChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
 	}
-
 }

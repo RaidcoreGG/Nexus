@@ -293,10 +293,7 @@ void COptionsWindow::TabStyle()
 					uiScale = SC_NORMAL;
 				}
 
-				CDataLink* dlapi = ctx->GetDataLink();
-				NexusLinkData* nexuslink = (NexusLinkData*)dlapi->GetResource(DL_NEXUS_LINK);
-
-				nexuslink->Scaling = Renderer::Scaling = uiScale * io.FontGlobalScale;
+				uictx->UpdateScaling();
 			}
 			ImGui::EndGroupPanel();
 

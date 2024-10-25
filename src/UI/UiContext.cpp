@@ -162,8 +162,10 @@ namespace UIRoot
 		{
 			ImGuiIO& io = ImGui::GetIO();
 
-			NexusLink->Scaling = Renderer::Scaling = currScaling * io.FontGlobalScale;
 			settingsctx->Set(OPT_LASTUISCALE, currScaling);
+
+			CUiContext* uictx = ctx->GetUIContext();
+			uictx->UpdateScaling();
 		}
 
 		if (!FontManager)
@@ -358,6 +360,8 @@ void CUiContext::Initialize(HWND aWindowHandle, ID3D11Device* aDevice, ID3D11Dev
 		this->Logger->Critical(CH_UICONTEXT, "CUiContext::Initialize() failed. RenderTargetView could not be created.");
 		return;
 	}
+
+	this->UpdateScaling();
 
 	this->IsInitialized = true;
 }
@@ -683,6 +687,26 @@ void CUiContext::OnInputBind(std::string aIdentifier)
 	else if (aIdentifier == KB_OPTIONS)
 	{
 		this->MainWindow->Activate("Options");
+	}
+}
+
+void CUiContext::UpdateScaling()
+{
+	NexusLinkData* nexuslink = (NexusLinkData*)this->DataLink->GetResource(DL_NEXUS_LINK);
+	
+	ImGuiIO& io = ImGui::GetIO();
+
+	CContext* ctx = CContext::GetContext();
+	CSettings* settingsctx = ctx->GetSettingsCtx();
+
+	float ingamescale = settingsctx->Get<float>(OPT_LASTUISCALE);
+
+	Renderer::Scaling = ingamescale * io.FontGlobalScale
+		* min(min(Renderer::Width, 1024.0) / 1024.0, min(Renderer::Height, 768.0) / 768.0);
+
+	if (nexuslink)
+	{
+		nexuslink->Scaling = Renderer::Scaling;
 	}
 }
 
@@ -1052,7 +1076,7 @@ void CUiContext::LoadSettings()
 		settingsCtx->Set(OPT_LASTUISCALE, SC_NORMAL);
 	}
 	
-	UIRoot::NexusLink->Scaling =  Renderer::Scaling = lastUiScale * io.FontGlobalScale;
+	this->UpdateScaling();
 }
 
 void CUiContext::UpdateDisplayInputBinds()
