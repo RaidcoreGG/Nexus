@@ -915,6 +915,12 @@ void CGameBindsApi::Set(EGameBinds aGameBind, InputBind aInputBind, bool aIsRunt
 		{
 			this->IsReceivingRuntimeBinds = true;
 		}
+		else
+		{
+			std::thread([this]() {
+				this->EventApi->Raise("EV_INPUTBIND_UPDATED");
+			}).detach();
+		}
 	}
 
 	this->Save();
