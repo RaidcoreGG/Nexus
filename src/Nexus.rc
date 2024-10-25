@@ -127,6 +127,7 @@ RES_ICON_LIST                   PNG     "Resources\\icons\\list.png"
 RES_ICON_TILES                  PNG     "Resources\\icons\\tiles.png"
 RES_ICON_CANFAVORITE            PNG     "Resources\\icons\\canfavorite.png"
 RES_ICON_FAVORITE               PNG     "Resources\\icons\\favorite.png"
+RES_ICON_REFRESH                PNG     "Resources\\icons\\refresh.png"
 RES_BANNER_DISCORD              PNG     "Resources\\banners\\discord.png"
 RES_BANNER_PATREON              PNG     "Resources\\banners\\patreon.png"
 

@@ -907,6 +907,26 @@ void CAddonsWindow::RenderContent()
 		}
 		ImGui::TooltipGeneric(langApi->Translate("((000036))"));
 
+		static Texture* refreshTex = nullptr;
+		if (refreshTex)
+		{
+			ImGui::SameLine();
+
+			if (ImGui::ImageButton(refreshTex->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
+			{
+				Loader::NotifyChanges();
+				std::thread([this]() {
+					Loader::Library::Fetch();
+					this->Invalidate();
+				}).detach();
+			}
+		}
+		else
+		{
+			CTextureLoader* texapi = ctx->GetTextureService();
+			refreshTex = texapi->GetOrCreate("ICON_REFRESH", RES_ICON_REFRESH, ctx->GetModule());
+		}
+
 		actionsAreaEndY = ImGui::GetCursorPos().y;
 	}
 	ImGui::EndChild();

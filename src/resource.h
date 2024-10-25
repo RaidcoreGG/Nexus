@@ -45,8 +45,9 @@
 #define RES_ICON_TILES                  505
 #define RES_ICON_CANFAVORITE            506
 #define RES_ICON_FAVORITE               507
-#define RES_BANNER_DISCORD              508
-#define RES_BANNER_PATREON              509
+#define RES_ICON_REFRESH                508
+#define RES_BANNER_DISCORD              509
+#define RES_BANNER_PATREON              510
 
 /* Binary */
 #define RES_ARCDPS_INTEGRATION          601
