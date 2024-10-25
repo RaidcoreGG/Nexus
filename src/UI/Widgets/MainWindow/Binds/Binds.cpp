@@ -53,9 +53,6 @@ void CBindsWindow::RenderContent()
 		this->IsInvalid = false;
 	}
 
-	/* controls whether to display the nexus or game binds */
-	static bool isShowingNexusBinds = true;
-
 	ImGuiStyle& style = ImGui::GetStyle();
 
 	float btnSz = ImGui::GetFontSize() * 1.5f;
@@ -75,50 +72,52 @@ void CBindsWindow::RenderContent()
 
 	CLocalization* langApi = ctx->GetLocalization();
 
-	ImGui::SetCursorPos(initial);
-	if (ImGui::Button("Nexus", ImVec2(btnWidth, ImGui::GetTextLineHeight() * 2)))
+	if (ImGui::BeginTabBar("##BindsTabBar", ImGuiTabBarFlags_None))
 	{
-		isShowingNexusBinds = true;
-	}
-
-	ImGui::SetCursorPos(ImVec2(initial.x + btnWidth + style.ItemSpacing.x, initial.y));
-	if (ImGui::Button("Guild Wars 2", ImVec2(btnWidth, ImGui::GetTextLineHeight() * 2)))
-	{
-		isShowingNexusBinds = false;
-	}
-
-	if (ImGui::BeginChild("##BindsScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
-	{
-		if (isShowingNexusBinds)
+		if (ImGui::BeginTabItem("Nexus"))
 		{
-			for (InputBindCategory cat : this->IBCategories)
+			if (ImGui::BeginChild("##InputBindsScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
 			{
-				if (ImGui::CollapsingHeader(
-					cat.Name != NULLSTR
-					? cat.Name.c_str()
-					: langApi->Translate("((000088))"),
-					ImGuiTreeNodeFlags_DefaultOpen))
+				for (InputBindCategory cat : this->IBCategories)
 				{
-					RenderInputBindsTable(cat.InputBinds);
+					if (ImGui::CollapsingHeader(
+						cat.Name != NULLSTR
+						? cat.Name.c_str()
+						: langApi->Translate("((000088))"),
+						ImGuiTreeNodeFlags_DefaultOpen))
+					{
+						RenderInputBindsTable(cat.InputBinds);
+					}
 				}
 			}
-		}
-		else
-		{
-			ImGui::Text("Info:");
-			ImGui::TextWrapped("These binds are used by addons to emulate key presses for you in order to execute macros or similar.");
-			ImGui::TextWrapped("The binds you set here should match the ones you use in-game.");
+			ImGui::EndChild();
 
-			for (GameInputBindCategory cat : this->GIBCategories)
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("Guild Wars 2"))
+		{
+			if (ImGui::BeginChild("##GameBindsScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
 			{
-				if (ImGui::CollapsingHeader(langApi->Translate(cat.Name.c_str()), ImGuiTreeNodeFlags_DefaultOpen))
+				ImGui::Text("Info:");
+				ImGui::TextWrapped("These binds are used by addons to emulate key presses for you in order to execute macros or similar.");
+				ImGui::TextWrapped("The binds you set here should match the ones you use in-game.");
+
+				for (GameInputBindCategory cat : this->GIBCategories)
 				{
-					RenderGameInputBindsTable(cat.GameInputBinds);
+					if (ImGui::CollapsingHeader(langApi->Translate(cat.Name.c_str()), ImGuiTreeNodeFlags_DefaultOpen))
+					{
+						RenderGameInputBindsTable(cat.GameInputBinds);
+					}
 				}
 			}
+			ImGui::EndChild();
+
+			ImGui::EndTabItem();
 		}
+
+		ImGui::EndTabBar();
 	}
-	ImGui::EndChild();
 }
 
 void CBindsWindow::RenderSubWindows()

@@ -44,7 +44,7 @@ void COptionsWindow::RenderContent()
 		this->IsInvalid = false;
 	}
 
-	if (ImGui::BeginTabBar("OptionsTabBar", ImGuiTabBarFlags_None))
+	if (ImGui::BeginTabBar("##OptionsTabBar", ImGuiTabBarFlags_None))
 	{
 		this->TabGeneral();
 		this->TabStyle();
