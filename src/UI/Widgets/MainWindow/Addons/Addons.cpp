@@ -99,7 +99,7 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 	ImVec2 btnTextSz = ImGui::CalcTextSize("############");
 
 	float btnWidth = btnTextSz.x + (style.FramePadding.x * 2);
-	float actionsAreaWidth = btnWidth + (style.WindowPadding.x * 2);
+	float actionsAreaWidth = btnWidth;
 
 	ImVec2 curPos = ImGui::GetCursorPos();
 
@@ -137,7 +137,7 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 		static CUiContext* uictx = ctx->GetUIContext();
 		static CAlerts* alertctx = uictx->GetAlerts();
 
-		if (ImGui::BeginChild("##AddonItem_Info_", ImVec2(itemSz.x - style.ItemSpacing.x - actionsAreaWidth, innerHeight)))
+		if (ImGui::BeginChild("##AddonItem_Info_", ImVec2(itemSz.x - style.ItemSpacing.x - actionsAreaWidth - (style.WindowPadding.x * 2), innerHeight)))
 		{
 			ImGui::Text(aAddonData.NexusAddon->Definitions->Name);
 			ImGui::SameLine();
@@ -158,8 +158,14 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 		
 		ImGui::SameLine();
 
+		bool poppedActionsPad = false;
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 		if (ImGui::BeginChild("##AddonItem_Actions_", ImVec2(actionsAreaWidth, innerHeight)))
 		{
+			ImGui::PopStyleVar();
+			poppedActionsPad = true;
+
 			float initialX = ImGui::GetCursorPosX();
 
 			/* Load/Unload Button */
@@ -265,6 +271,11 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 			}
 		}
 		ImGui::EndChild();
+
+		if (!poppedActionsPad)
+		{
+			ImGui::PopStyleVar();
+		}
 	}
 	aAddonData.IsHovered = hoveredFavorite || clickedFavorite || ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows);
 	ImGui::EndChild();
@@ -297,8 +308,8 @@ void CAddonsWindow::AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalle
 	ImVec2 btnTextSz = ImGui::CalcTextSize("############");
 
 	float btnWidth = btnTextSz.x + (style.FramePadding.x * 2);
-	float actionsAreaWidth = btnWidth + (style.WindowPadding.x * 2);
-
+	float actionsAreaWidth = btnWidth;
+	
 	ImVec2 curPos = ImGui::GetCursorPos();
 
 	/* above visible space                        || under visible space */
@@ -316,7 +327,7 @@ void CAddonsWindow::AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalle
 		static CUiContext* uictx = ctx->GetUIContext();
 		static CAlerts* alertctx = uictx->GetAlerts();
 
-		if (ImGui::BeginChild("##AddonItem_Info_", ImVec2(itemSz.x - style.ItemSpacing.x - actionsAreaWidth, innerHeight)))
+		if (ImGui::BeginChild("##AddonItem_Info_", ImVec2(itemSz.x - style.ItemSpacing.x - actionsAreaWidth - (style.WindowPadding.x * 2), innerHeight)))
 		{
 			ImGui::Text(aAddon->Name.c_str());
 			ImGui::TextDisabled("by %s", aAddon->Author.c_str());
@@ -328,8 +339,14 @@ void CAddonsWindow::AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalle
 		
 		ImGui::SameLine();
 
+		bool poppedActionsPad = false;
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 		if (ImGui::BeginChild("##AddonItem_Actions_", ImVec2(actionsAreaWidth, innerHeight)))
 		{
+			ImGui::PopStyleVar();
+			poppedActionsPad = true;
+
 			float initialX = ImGui::GetCursorPosX();
 
 			static CTextureLoader* textureApi = ctx->GetTextureService();
@@ -480,6 +497,11 @@ void CAddonsWindow::AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalle
 			}
 		}
 		ImGui::EndChild();
+
+		if (!poppedActionsPad)
+		{
+			ImGui::PopStyleVar();
+		}
 	}
 	ImGui::EndChild();
 	ImGui::PopStyleVar();
@@ -631,6 +653,8 @@ void CAddonsWindow::RenderContent()
 	float addonItemWidth = isListMode
 		? (region.x - style.ItemSpacing.x - style.ScrollbarSize)
 		: ((region.x - (style.ItemSpacing.x * 2) - style.ScrollbarSize) / 2);
+
+	addonItemWidth -= (style.WindowPadding.x * 2);
 
 	/* list */
 	//ImVec2 listP1 = ImGui::GetWindowPos();
