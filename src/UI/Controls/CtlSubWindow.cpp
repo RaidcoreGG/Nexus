@@ -45,11 +45,11 @@ void ISubWindow::Render()
 
 	ImGuiStyle& style = ImGui::GetStyle();
 
-	float btnSz = ImGui::GetFontSize() * 1.5f;
+	float btnSz = ImGui::GetFontSize();
 
 	ImGuiWindow* wnd = ImGui::GetCurrentWindow();
 
-	ImVec2 btnPos = ImVec2(width - (btnSz + (this->IsPoppedOut ? style.WindowPadding.x : 0)) - (wnd->ScrollbarY ? wnd->ScrollbarSizes.x : 0), wnd->TitleBarHeight() + (this->IsPoppedOut ? style.WindowPadding.y : 0));
+	ImVec2 btnPos = ImVec2(width - (btnSz + (style.FramePadding.x * 2) + (this->IsPoppedOut ? style.WindowPadding.x : 0)) - (wnd->ScrollbarY ? wnd->ScrollbarSizes.x : 0), wnd->TitleBarHeight() + (this->IsPoppedOut ? style.WindowPadding.y : 0));
 
 	this->RenderContent();
 
@@ -60,13 +60,11 @@ void ISubWindow::Render()
 
 	if (!popout && this->Tex_PopoutIcon)
 	{
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
 		ImGui::SetCursorPos(btnPos);
 		if (ImGui::ImageButton(this->Tex_PopoutIcon->Resource, ImVec2(btnSz, btnSz)))
 		{
 			this->IsPoppedOut = !this->IsPoppedOut;
 		}
-		ImGui::PopStyleVar();
 		ImGui::TooltipGeneric("Click to pop-out into separate window.");
 	}
 	else
