@@ -17,9 +17,23 @@
 #include "UI/DisplayBinds.h"
 #include "UI/FuncDefs.h"
 
+enum class EAddonType
+{
+	None,
+	Nexus,
+	Library,
+	LibraryArc
+};
+
 struct AddonItemData
 {
-	Addon* NexusAddon;
+
+	EAddonType                             Type;
+	union
+	{
+		Addon*                             NexusAddon;
+		LibraryAddon*                      LibraryAddon;
+	};
 	std::map<std::string, InputBindPacked> InputBinds;
 	GUI_RENDER                             OptionsRender;
 	bool                                   IsHovered;

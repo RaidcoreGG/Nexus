@@ -46,8 +46,9 @@
 #define RES_ICON_CANFAVORITE            506
 #define RES_ICON_FAVORITE               507
 #define RES_ICON_REFRESH                508
-#define RES_BANNER_DISCORD              509
-#define RES_BANNER_PATREON              510
+#define RES_ICON_FILTER                 509
+#define RES_BANNER_DISCORD              510
+#define RES_BANNER_PATREON              511
 
 /* Binary */
 #define RES_ARCDPS_INTEGRATION          601

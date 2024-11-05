@@ -16,6 +16,17 @@
 #include "UI/Controls/CtlSubWindow.h"
 
 constexpr const char* OPT_ISLISTMODE = "IsListMode";
+constexpr const char* OPT_ADDONFILTERS = "AddonFilters";
+
+enum class EAddonsFilterFlags
+{
+	None,
+	ShowEnabled          = 1 << 0,
+	ShowDisabled         = 1 << 1,
+	ShowDownloadable     = 1 << 2,
+	ShowInstalled_Arc    = 1 << 3,
+	ShowDownloadable_Arc = 1 << 4,
+};
 
 class CAddonsWindow : public ISubWindow
 {
@@ -26,10 +37,9 @@ class CAddonsWindow : public ISubWindow
 	void Invalidate(signed int aAddonID);
 
 	private:
-	std::string                Filter;
+	std::string                FilterName;
+	EAddonsFilterFlags         Filter;
 	std::vector<AddonItemData> Addons;
-	std::vector<LibraryAddon*> Library;
-	std::vector<LibraryAddon*> ArcLibrary;
 
 	/* Details */
 	std::mutex                 Mutex;
@@ -49,7 +59,6 @@ class CAddonsWindow : public ISubWindow
 	void ClearContent();
 
 	void AddonItem(AddonItemData& aAddonData, float aWidth);
-	void AddonItem(LibraryAddon* aAddon, float aWidth, bool aInstalled = false, bool aIsArcPlugin = false);
 
 	void RenderContent() override;
 	void RenderSubWindows() override;
@@ -59,7 +68,6 @@ class CAddonsWindow : public ISubWindow
 	void DrawBindSetterModal();
 
 	void PopulateAddons();
-	void PopulateLibrary();
 };
 
 #endif
