@@ -1141,6 +1141,7 @@ void CAddonsWindow::RenderDetails()
 				Loader::QueueAddon(ELoaderAction::Uninstall, addonData.NexusAddon->Path);
 				skipOptions = true;
 				this->ClearContent();
+				this->Invalidate();
 			}
 			if (addonData.NexusAddon->State == EAddonState::LoadedLOCKED)
 			{
