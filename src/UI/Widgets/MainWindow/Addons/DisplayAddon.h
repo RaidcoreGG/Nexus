@@ -22,6 +22,7 @@ enum class EAddonType
 	None,
 	Nexus,
 	Library,
+	Arc,
 	LibraryArc
 };
 

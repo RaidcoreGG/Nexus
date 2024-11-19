@@ -297,7 +297,7 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 
 		ImGui::PopStyleVar();
 	}
-	else if (aAddonData.Type == EAddonType::Library || aAddonData.Type == EAddonType::LibraryArc)
+	else if (aAddonData.Type == EAddonType::Library || aAddonData.Type == EAddonType::Arc || aAddonData.Type == EAddonType::LibraryArc)
 	{
 		if (!aAddonData.LibraryAddon) { return; }
 
@@ -448,41 +448,50 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 
 				/* Install Button */
 				ImGui::SetCursorPos(ImVec2(initialX, (ImGui::GetWindowHeight() - (btnTextSz.y * 2) - style.ItemSpacing.y - (style.FramePadding.y * 2)) / 2));
-				if (ImGui::Button(aAddonData.LibraryAddon->IsInstalling
-					? (langApi->Translate("((000027))") + sig).c_str()
-					: (langApi->Translate("((000028))") + sig).c_str(),
-					ImVec2(btnWidth, 0)))
+				if (aAddonData.Type != EAddonType::Arc)
 				{
-					if (!aAddonData.LibraryAddon->IsInstalling)
+					if (ImGui::Button(aAddonData.LibraryAddon->IsInstalling
+						? (langApi->Translate("((000027))") + sig).c_str()
+						: (langApi->Translate("((000028))") + sig).c_str(),
+						ImVec2(btnWidth, 0)))
 					{
-						bool isArcPlugin = aAddonData.Type == EAddonType::LibraryArc;
-
-						std::thread([aAddonData, isArcPlugin]()
+						if (!aAddonData.LibraryAddon->IsInstalling)
 						{
-							CContext* ctx = CContext::GetContext();
-							CUpdater* updater = ctx->GetUpdater();
-							updater->InstallAddon(aAddonData.LibraryAddon, isArcPlugin);
+							bool isArcPlugin = aAddonData.Type == EAddonType::LibraryArc;
 
-							if (isArcPlugin)
+							std::thread([aAddonData, isArcPlugin]()
 							{
-								ArcDPS::AddToAtlasBySig(aAddonData.LibraryAddon->Signature);
-							}
-							else
-							{
-								Loader::NotifyChanges();
-								//Loader::QueueAddon(ELoaderAction::Reload, installPath);
-							}
+								CContext* ctx = CContext::GetContext();
+								CUpdater* updater = ctx->GetUpdater();
+								updater->InstallAddon(aAddonData.LibraryAddon, isArcPlugin);
 
-							CUiContext* uictx = ctx->GetUIContext();
-							uictx->Invalidate();
+								if (isArcPlugin)
+								{
+									ArcDPS::AddToAtlasBySig(aAddonData.LibraryAddon->Signature);
+								}
+								else
+								{
+									Loader::NotifyChanges();
+									//Loader::QueueAddon(ELoaderAction::Reload, installPath);
+								}
 
-							aAddonData.LibraryAddon->IsInstalling = false;
-						}).detach();
+								CUiContext* uictx = ctx->GetUIContext();
+								uictx->Invalidate();
 
-						//Loader::AddonConfig[aAddon->Signature].IsLoaded = true;
+								aAddonData.LibraryAddon->IsInstalling = false;
+							}).detach();
+
+							//Loader::AddonConfig[aAddon->Signature].IsLoaded = true;
+						}
 					}
 				}
-
+				else
+				{
+					float width = ImGui::CalcTextSize("via ArcDPS").x;
+					ImGui::SetCursorPosX((btnWidth - width) / 2);
+					ImGui::Text("via ArcDPS");
+				}
+				
 				/* GitHub Button */
 				if (aAddonData.LibraryAddon->Provider == EUpdateProvider::GitHub && !aAddonData.LibraryAddon->DownloadURL.empty())
 				{
@@ -566,7 +575,7 @@ void CAddonsWindow::RenderContent()
 		/* quick filters */
 		if (ImGui::Button(langApi->Translate("((000031))")))
 		{
-			this->Filter = (EAddonsFilterFlags)((int)EAddonsFilterFlags::ShowEnabled | (int)EAddonsFilterFlags::ShowDisabled);
+			this->Filter = (EAddonsFilterFlags)((int)EAddonsFilterFlags::ShowEnabled | (int)EAddonsFilterFlags::ShowDisabled | (int)EAddonsFilterFlags::ShowInstalled_Arc);
 			settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
 			this->Invalidate();
 			this->ClearContent();
@@ -592,7 +601,7 @@ void CAddonsWindow::RenderContent()
 
 			if (ImGui::Button(langApi->Translate("((000075))")))
 			{
-				this->Filter = (EAddonsFilterFlags)((int)EAddonsFilterFlags::ShowDownloadable_Arc | (int)EAddonsFilterFlags::ShowDisabled);
+				this->Filter = EAddonsFilterFlags::ShowDownloadable_Arc;
 				settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
 				this->Invalidate();
 				this->ClearContent();
@@ -632,19 +641,19 @@ void CAddonsWindow::RenderContent()
 		static Texture* filtersTex = nullptr;
 		if (filtersTex)
 		{
-			static bool showEnabled = (int)this->Filter & (int)EAddonsFilterFlags::ShowEnabled;
-			static bool showDisabled = (int)this->Filter & (int)EAddonsFilterFlags::ShowDisabled;
-			static bool showDownloadable = (int)this->Filter & (int)EAddonsFilterFlags::ShowDownloadable;
-			static bool showInstalledArc = (int)this->Filter & (int)EAddonsFilterFlags::ShowInstalled_Arc;
+			static bool showEnabled =         (int)this->Filter & (int)EAddonsFilterFlags::ShowEnabled;
+			static bool showDisabled =        (int)this->Filter & (int)EAddonsFilterFlags::ShowDisabled;
+			static bool showDownloadable =    (int)this->Filter & (int)EAddonsFilterFlags::ShowDownloadable;
+			static bool showInstalledArc =    (int)this->Filter & (int)EAddonsFilterFlags::ShowInstalled_Arc;
 			static bool showDownloadableArc = (int)this->Filter & (int)EAddonsFilterFlags::ShowDownloadable_Arc;
 
 			ImGui::SameLine();
 			if (ImGui::ImageButton(filtersTex->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
 			{
-				showEnabled = (int)this->Filter & (int)EAddonsFilterFlags::ShowEnabled;
-				showDisabled = (int)this->Filter & (int)EAddonsFilterFlags::ShowDisabled;
-				showDownloadable = (int)this->Filter & (int)EAddonsFilterFlags::ShowDownloadable;
-				showInstalledArc = (int)this->Filter & (int)EAddonsFilterFlags::ShowInstalled_Arc;
+				showEnabled =         (int)this->Filter & (int)EAddonsFilterFlags::ShowEnabled;
+				showDisabled =        (int)this->Filter & (int)EAddonsFilterFlags::ShowDisabled;
+				showDownloadable =    (int)this->Filter & (int)EAddonsFilterFlags::ShowDownloadable;
+				showInstalledArc =    (int)this->Filter & (int)EAddonsFilterFlags::ShowInstalled_Arc;
 				showDownloadableArc = (int)this->Filter & (int)EAddonsFilterFlags::ShowDownloadable_Arc;
 				ImGui::OpenPopup("##addonsfilter");
 			}
@@ -763,10 +772,8 @@ void CAddonsWindow::RenderContent()
 	ImGui::EndChild();
 	
 	float addonItemWidth = isListMode
-		? (region.x - style.ItemSpacing.x - style.ScrollbarSize)
-		: ((region.x - (style.ItemSpacing.x * 2) - style.ScrollbarSize) / 2);
-
-	addonItemWidth -= (style.WindowPadding.x * 2);
+		? (region.x - style.ScrollbarSize)
+		: ((region.x - style.ItemSpacing.x - style.ScrollbarSize) / 2);
 
 	/* list */
 	//ImVec2 listP1 = ImGui::GetWindowPos();
@@ -1430,7 +1437,7 @@ void CAddonsWindow::PopulateAddons()
 			}
 
 			AddonItemData addonItem{};
-			addonItem.Type = EAddonType::LibraryArc;
+			addonItem.Type = installed ? EAddonType::Arc : EAddonType::LibraryArc;
 			addonItem.LibraryAddon = addon;
 
 			this->Addons.push_back(addonItem);
@@ -1448,7 +1455,7 @@ void CAddonsWindow::PopulateAddons()
 				? String::ToLower(String::Normalize(lhs.NexusAddon->Definitions->Name))
 				: String::ToLower(lhs.NexusAddon->Path.filename().string());
 		}
-		else if (lhs.Type == EAddonType::Library || lhs.Type == EAddonType::LibraryArc)
+		else if (lhs.Type == EAddonType::Library || lhs.Type == EAddonType::Arc || lhs.Type == EAddonType::LibraryArc)
 		{
 			lcmp = String::ToLower(String::Normalize(lhs.LibraryAddon->Name));
 		}
@@ -1459,7 +1466,7 @@ void CAddonsWindow::PopulateAddons()
 				? String::ToLower(String::Normalize(rhs.NexusAddon->Definitions->Name))
 				: String::ToLower(rhs.NexusAddon->Path.filename().string());
 		}
-		else if (rhs.Type == EAddonType::Library || rhs.Type == EAddonType::LibraryArc)
+		else if (rhs.Type == EAddonType::Library || rhs.Type == EAddonType::Arc || rhs.Type == EAddonType::LibraryArc)
 		{
 			rcmp = String::ToLower(String::Normalize(rhs.LibraryAddon->Name));
 		}
