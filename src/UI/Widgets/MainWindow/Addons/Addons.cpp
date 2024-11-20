@@ -257,6 +257,7 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 					float btnSz = ImGui::GetFontSize() * 1.5f;
 
 					ImGui::SetCursorPos(ImVec2(initialX + btnWidth - btnSz, 0));
+					ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
 					if (ImGui::IconButton(favTex->Resource, ImVec2(btnSz, btnSz)))
 					{
 						aAddonData.NexusAddon->IsFavorite = !aAddonData.NexusAddon->IsFavorite;
@@ -264,6 +265,7 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 						this->Invalidate();
 						clickedFavorite = true;
 					}
+					ImGui::PopStyleVar();
 					hoveredFavorite = ImGui::IsItemHovered();
 				}
 				else if (!favTex)
@@ -438,11 +440,12 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 					float btnSz = ImGui::GetFontSize() * 1.5f;
 
 					ImGui::SetCursorPos(ImVec2(initialX + btnWidth - btnSz, 0));
+					ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
 					if (ImGui::IconButton(noticeIcon->Resource, ImVec2(btnSz, btnSz)))
 					{
 						ShellExecuteA(0, 0, noticeURL.c_str(), 0, 0, SW_SHOW);
 					}
-
+					ImGui::PopStyleVar();
 					ImGui::TooltipGeneric(langApi->Translate(noticeTT.c_str()));
 				}
 

@@ -204,10 +204,6 @@ void CQuickAccess::Render()
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 		for (auto& [identifier, shortcut] : this->Registry)
 		{
-			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
-			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
-			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
-
 			//Logger->Debug(CH_QUICKACCESS, "size: %f | c: %d | scale: %f", size, c, Renderer::Scaling);
 
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f }); // smol checkbox
@@ -227,7 +223,8 @@ void CQuickAccess::Render()
 			if (shortcut.TextureNormal && shortcut.TextureNormal->Resource &&
 				shortcut.TextureHover && shortcut.TextureHover->Resource)
 			{
-				if (ImGui::ImageButton(!shortcut.IsHovering ? shortcut.TextureNormal->Resource : shortcut.TextureHover->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
+				ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+				if (ImGui::IconButton(!shortcut.IsHovering ? shortcut.TextureNormal->Resource : shortcut.TextureHover->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
 				{
 					isActive = true;
 					if (shortcut.IBIdentifier.length() > 0)
@@ -236,6 +233,7 @@ void CQuickAccess::Render()
 						this->InputBindApi->Invoke(shortcut.IBIdentifier);
 					}
 				}
+				ImGui::PopStyleVar();
 				iconHovered = ImGui::IsItemHovered() || ImGui::IsItemClicked();
 			}
 			else if (shortcut.TextureGetAttempts < 10)
@@ -311,8 +309,6 @@ void CQuickAccess::Render()
 					ImGui::EndTooltip();
 				}
 			}
-
-			ImGui::PopStyleColor(3);
 
 			c++;
 
