@@ -242,7 +242,7 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 
 				/* Configure Button */
 				ImGui::SetCursorPos(ImVec2(initialX, ImGui::GetCursorPosY()));
-				if (ImGui::Button("Configure", ImVec2(btnWidth, 0)))
+				if (ImGui::Button(langApi->Translate("((000105))"), ImVec2(btnWidth, 0)))
 				{
 					this->SetContent(aAddonData);
 				}
@@ -530,7 +530,7 @@ void CAddonsWindow::RenderContent()
 		this->IsInvalid = false;
 	}
 
-	static char filter[400] = {};
+	static char searchTerm[400] = {};
 	
 	static CContext* ctx = CContext::GetContext();
 	static CLocalization* langApi = ctx->GetLocalization();
@@ -610,11 +610,9 @@ void CAddonsWindow::RenderContent()
 		}
 
 		/* filter search */
-		ImGui::Text("Search");
-		ImGui::SameLine();
-		if (ImGui::InputText("##addonssearch", &filter[0], 400))
+		if (ImGui::InputTextWithHint("##addonssearch", langApi->Translate("((000104))"), &searchTerm[0], 400))
 		{
-			this->FilterName = String::ToLower(filter);
+			this->SearchTerm = String::ToLower(searchTerm);
 			this->Invalidate();
 			this->ClearContent();
 		}
@@ -626,8 +624,8 @@ void CAddonsWindow::RenderContent()
 			ImGui::SameLine();
 			if (ImGui::ImageButton(clearFilterTex->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
 			{
-				memset(filter, 0, 400);
-				this->FilterName = String::ToLower(filter);
+				memset(searchTerm, 0, 400);
+				this->SearchTerm = String::ToLower(searchTerm);
 				this->Invalidate();
 				this->ClearContent();
 			}
@@ -660,7 +658,7 @@ void CAddonsWindow::RenderContent()
 
 			if (ImGui::BeginPopupContextItem("##addonsfilter"))
 			{
-				if (ImGui::Checkbox("Show Enabled", &showEnabled))
+				if (ImGui::Checkbox(langApi->Translate("((000106))"), &showEnabled))
 				{
 					if (showEnabled)
 					{
@@ -675,7 +673,7 @@ void CAddonsWindow::RenderContent()
 					this->ClearContent();
 				}
 
-				if (ImGui::Checkbox("Show Disabled", &showDisabled))
+				if (ImGui::Checkbox(langApi->Translate("((000107))"), &showDisabled))
 				{
 					if (showDisabled)
 					{
@@ -690,7 +688,7 @@ void CAddonsWindow::RenderContent()
 					this->ClearContent();
 				}
 
-				if (ImGui::Checkbox("Show Downloadable", &showDownloadable))
+				if (ImGui::Checkbox(langApi->Translate("((000108))"), &showDownloadable))
 				{
 					if (showDownloadable)
 					{
@@ -707,7 +705,7 @@ void CAddonsWindow::RenderContent()
 
 				if (ArcDPS::IsLoaded)
 				{
-					if (ImGui::Checkbox("Show Installed (ArcDPS)", &showInstalledArc))
+					if (ImGui::Checkbox(langApi->Translate("((000109))"), &showInstalledArc))
 					{
 						if (showInstalledArc)
 						{
@@ -722,7 +720,7 @@ void CAddonsWindow::RenderContent()
 						this->ClearContent();
 					}
 
-					if (ImGui::Checkbox("Show Downloadable (ArcDPS)", &showDownloadableArc))
+					if (ImGui::Checkbox(langApi->Translate("((000110))"), &showDownloadableArc))
 					{
 						if (showDownloadableArc)
 						{
@@ -1330,7 +1328,7 @@ void CAddonsWindow::PopulateAddons()
 		if (addon->Path.filename() == "arcdps_integration64.dll") { continue; }
 		if (!addon->Definitions) { continue; }
 
-		if (!this->FilterName.empty() && !String::Contains(String::ToLower(addon->Definitions->Name), this->FilterName)) { continue; }
+		if (!this->SearchTerm.empty() && !String::Contains(String::ToLower(addon->Definitions->Name), this->SearchTerm)) { continue; }
 
 		if ((addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED) &&
 			((int)this->Filter & (int)EAddonsFilterFlags::ShowEnabled) == 0)
@@ -1373,7 +1371,7 @@ void CAddonsWindow::PopulateAddons()
 
 		for (LibraryAddon* addon : Loader::Library::Addons)
 		{
-			if (!this->FilterName.empty() && !String::Contains(String::ToLower(addon->Name), this->FilterName)) { continue; }
+			if (!this->SearchTerm.empty() && !String::Contains(String::ToLower(addon->Name), this->SearchTerm)) { continue; }
 
 			bool installed = false;
 
@@ -1412,7 +1410,7 @@ void CAddonsWindow::PopulateAddons()
 
 		for (LibraryAddon* addon : ArcDPS::PluginLibrary)
 		{
-			if (!this->FilterName.empty() && !String::Contains(String::ToLower(addon->Name), this->FilterName)) { continue; }
+			if (!this->SearchTerm.empty() && !String::Contains(String::ToLower(addon->Name), this->SearchTerm)) { continue; }
 
 			bool installed = false;
 

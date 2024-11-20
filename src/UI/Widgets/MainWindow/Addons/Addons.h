@@ -37,7 +37,7 @@ class CAddonsWindow : public ISubWindow
 	void Invalidate(signed int aAddonID);
 
 	private:
-	std::string                FilterName;
+	std::string                SearchTerm;
 	EAddonsFilterFlags         Filter;
 	std::vector<AddonItemData> Addons;
 

@@ -310,7 +310,7 @@ void COptionsWindow::TabStyle()
 			{
 				ImGuiStyle& style = ImGui::GetStyle();
 
-				ImGui::Text("Select from preset:");
+				ImGui::Text("Preset:");
 				if (ImGui::BeginCombo("##StylePresetSelector", nullptr))
 				{
 					/*if (ImGui::Selectable("Nexus"))
