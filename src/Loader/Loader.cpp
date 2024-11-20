@@ -1330,7 +1330,7 @@ namespace Loader
 		CContext* ctx = CContext::GetContext();
 		CSettings* settingsCtx = ctx->GetSettingsCtx();
 
-		int lastGameBuild = settingsCtx->Get<int>(OPT_LASTGAMEBUILD);
+		int lastGameBuild = settingsCtx->Get<int>(OPT_LASTGAMEBUILD, 0);
 
 		if (gameBuild - lastGameBuild > 350 && lastGameBuild != 0)
 		{

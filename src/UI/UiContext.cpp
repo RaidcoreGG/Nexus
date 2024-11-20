@@ -158,7 +158,7 @@ namespace UIRoot
 		CSettings* settingsctx = ctx->GetSettingsCtx();
 
 		float currScaling = Mumble::GetScalingFactor(MumbleIdentity->UISize);
-		if (currScaling != settingsctx->Get<float>(OPT_LASTUISCALE) && NexusLink->IsGameplay)
+		if (currScaling != settingsctx->Get<float>(OPT_LASTUISCALE, 1.0f) && NexusLink->IsGameplay)
 		{
 			ImGuiIO& io = ImGui::GetIO();
 
@@ -230,7 +230,7 @@ namespace UIRoot
 		assert(uictx);
 		assert(settingsctx);
 
-		if (settingsctx->Get<bool>(OPT_SHOWADDONSWINDOWAFTERDUU))
+		if (settingsctx->Get<bool>(OPT_SHOWADDONSWINDOWAFTERDUU, false))
 		{
 			uictx->OnInputBind(KB_ADDONS);
 		}
@@ -698,7 +698,7 @@ void CUiContext::UpdateScaling()
 	CContext* ctx = CContext::GetContext();
 	CSettings* settingsctx = ctx->GetSettingsCtx();
 
-	float ingamescale = settingsctx->Get<float>(OPT_LASTUISCALE);
+	float ingamescale = settingsctx->Get<float>(OPT_LASTUISCALE, 1.0f);
 
 	Renderer::Scaling = ingamescale * io.FontGlobalScale
 		* min(min(Renderer::Width, 1024.0) / 1024.0, min(Renderer::Height, 768.0) / 768.0);
@@ -771,19 +771,19 @@ void CUiContext::LoadFonts()
 	CContext* ctx = CContext::GetContext();
 	CSettings* settingsctx = ctx->GetSettingsCtx();
 
-	EulaAccepted = settingsctx->Get<bool>(OPT_ACCEPTEULA);
+	EulaAccepted = settingsctx->Get<bool>(OPT_ACCEPTEULA, false);
 
 	/* add user font */
 	bool hasUserFont = false;
 
-	std::string fontFile = settingsctx->Get<std::string>(OPT_USERFONT);
+	std::string fontFile = settingsctx->Get<std::string>(OPT_USERFONT, "");
 	if (!fontFile.empty() && std::filesystem::exists(Index::D_GW2_ADDONS_NEXUS_FONTS / fontFile))
 	{
 		fontPath = Index::D_GW2_ADDONS_NEXUS_FONTS / fontFile;
 		this->FontManager->ReplaceFont("USER_FONT", this->ImGuiContext->FontSize, fontPath.string().c_str(), UIRoot::FontReceiver, nullptr);
 		hasUserFont = true;
 	}
-	else if (settingsctx->Get<bool>(OPT_LINKARCSTYLE) && std::filesystem::exists(Index::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf"))
+	else if (settingsctx->Get<bool>(OPT_LINKARCSTYLE, true) && std::filesystem::exists(Index::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf"))
 	{
 		fontPath = Index::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf";
 		this->FontManager->ReplaceFont("USER_FONT", this->ImGuiContext->FontSize, fontPath.string().c_str(), UIRoot::FontReceiver, nullptr);
@@ -919,7 +919,7 @@ void CUiContext::ApplyStyle(EUIStyle aStyle)
 	CContext* ctx = CContext::GetContext();
 	CSettings* settingsctx = ctx->GetSettingsCtx();
 
-	if (settingsctx->Get<bool>(OPT_LINKARCSTYLE))
+	if (settingsctx->Get<bool>(OPT_LINKARCSTYLE, true))
 	{
 		std::filesystem::path arcIniPath = Index::D_GW2_ADDONS / "arcdps/arcdps.ini";
 
@@ -968,8 +968,8 @@ void CUiContext::ApplyStyle(EUIStyle aStyle)
 	}
 	else
 	{
-		std::string b64_style = settingsctx->Get<std::string>(OPT_IMGUISTYLE);
-		std::string b64_colors = settingsctx->Get<std::string>(OPT_IMGUICOLORS);
+		std::string b64_style = settingsctx->Get<std::string>(OPT_IMGUISTYLE, {});
+		std::string b64_colors = settingsctx->Get<std::string>(OPT_IMGUICOLORS, {});
 
 		if (b64_style.empty() || b64_colors.empty())
 		{
@@ -995,7 +995,7 @@ void CUiContext::CreateNexusShortcut()
 	CContext* ctx = CContext::GetContext();
 	CSettings* settingsctx = ctx->GetSettingsCtx();
 
-	bool isPartyPooper = settingsctx->Get<bool>(OPT_DISABLEFESTIVEFLAIR);
+	bool isPartyPooper = settingsctx->Get<bool>(OPT_DISABLEFESTIVEFLAIR, false);
 
 	if (isPartyPooper)
 	{
@@ -1057,18 +1057,18 @@ void CUiContext::LoadSettings()
 	ImGuiIO& io = ImGui::GetIO();
 	ImGuiStyle* style = &ImGui::GetStyle();
 
-	float storedFontSz = settingsCtx->Get<float>(OPT_FONTSIZE);
+	float storedFontSz = settingsCtx->Get<float>(OPT_FONTSIZE, 13.0f);
 	this->ImGuiContext->FontSize = storedFontSz > 0 ? storedFontSz : 13.0f;
 
 	this->ApplyStyle();
 	
-	std::string lang = settingsCtx->Get<std::string>(OPT_LANGUAGE);
+	std::string lang = settingsCtx->Get<std::string>(OPT_LANGUAGE, "en");
 	Language->SetLanguage(!lang.empty() ? lang : "en");
 
-	float storedGlobalFontScale = settingsCtx->Get<float>(OPT_GLOBALSCALE);
+	float storedGlobalFontScale = settingsCtx->Get<float>(OPT_GLOBALSCALE, 1.0f);
 	io.FontGlobalScale = storedGlobalFontScale > 0 ? storedGlobalFontScale : 1.0f;
 
-	float lastUiScale = settingsCtx->Get<float>(OPT_LASTUISCALE);
+	float lastUiScale = settingsCtx->Get<float>(OPT_LASTUISCALE, 1.0f);
 	if (lastUiScale == 0)
 	{
 		lastUiScale = SC_NORMAL;

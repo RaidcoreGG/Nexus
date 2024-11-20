@@ -95,20 +95,20 @@ void COptionsWindow::TabGeneral()
 				ImGui::BeginGroupPanel(langApi->Translate("((000042))"), ImVec2(-1.0f, 0.0f));
 
 				/* close windows on escape */
-				static bool closeOnEscape = settingsctx->Get<bool>(OPT_CLOSEESCAPE);
+				static bool closeOnEscape = settingsctx->Get<bool>(OPT_CLOSEESCAPE, true);
 				if (ImGui::Checkbox(langApi->Translate("((000044))"), &closeOnEscape))
 				{
 					settingsctx->Set(OPT_CLOSEESCAPE, closeOnEscape);
 				}
 
 				/* show addons window after after addons were disabled because of an update */
-				static bool showAddonsWindowOnGameUpdate = settingsctx->Get<bool>(OPT_SHOWADDONSWINDOWAFTERDUU);
+				static bool showAddonsWindowOnGameUpdate = settingsctx->Get<bool>(OPT_SHOWADDONSWINDOWAFTERDUU, false);
 				if (ImGui::Checkbox(langApi->Translate("((000086))"), &showAddonsWindowOnGameUpdate))
 				{
 					settingsctx->Set(OPT_SHOWADDONSWINDOWAFTERDUU, showAddonsWindowOnGameUpdate);
 				}
 
-				static bool disableFestiveFlair = settingsctx->Get<bool>(OPT_DISABLEFESTIVEFLAIR);
+				static bool disableFestiveFlair = settingsctx->Get<bool>(OPT_DISABLEFESTIVEFLAIR, false);
 				if (ImGui::Checkbox(langApi->Translate("((000101))"), &disableFestiveFlair))
 				{
 					settingsctx->Set(OPT_DISABLEFESTIVEFLAIR, disableFestiveFlair);
@@ -165,7 +165,7 @@ void COptionsWindow::TabGeneral()
 				}
 
 				/* show notification icon on update */
-				static bool notifyChangelog = settingsctx->Get<bool>(OPT_NOTIFYCHANGELOG);
+				static bool notifyChangelog = settingsctx->Get<bool>(OPT_NOTIFYCHANGELOG, false);
 				if (ImGui::Checkbox(langApi->Translate("((000049))"), &notifyChangelog))
 				{
 					settingsctx->Set(OPT_NOTIFYCHANGELOG, notifyChangelog);
@@ -237,7 +237,7 @@ void COptionsWindow::TabStyle()
 			static long long lastCheckedFonts = Time::GetTimestamp();
 
 			ImGui::BeginGroupPanel(langApi->Translate("((000092))"), ImVec2(-1.0f, 0.0f));
-			static std::string fontFile = settingsctx->Get<std::string>(OPT_USERFONT);
+			static std::string fontFile = settingsctx->Get<std::string>(OPT_USERFONT, "");
 			if (fontFile.empty()) { fontFile = "Default"; }
 			if (ImGui::BeginCombo("##FontSelector", fontFile.c_str()))
 			{
@@ -286,7 +286,7 @@ void COptionsWindow::TabStyle()
 			if (ImGui::DragFloat("##GlobalScaleInput", &io.FontGlobalScale, 0.005f, 0.75f, 3.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp))
 			{
 				settingsctx->Set(OPT_GLOBALSCALE, io.FontGlobalScale);
-				float uiScale = settingsctx->Get<float>(OPT_LASTUISCALE);
+				float uiScale = settingsctx->Get<float>(OPT_LASTUISCALE, 1.0f);
 
 				if (uiScale <= 0)
 				{
@@ -298,7 +298,7 @@ void COptionsWindow::TabStyle()
 			ImGui::EndGroupPanel();
 
 			ImGui::BeginGroupPanel(langApi->Translate("((000053))"), ImVec2(-1.0f, 0.0f));
-			static bool linkArcDpsStyle = settingsctx->Get<bool>(OPT_LINKARCSTYLE);
+			static bool linkArcDpsStyle = settingsctx->Get<bool>(OPT_LINKARCSTYLE, true);
 			if (ImGui::Checkbox(langApi->Translate("((000056))"), &linkArcDpsStyle))
 			{
 				settingsctx->Set(OPT_LINKARCSTYLE, linkArcDpsStyle);

@@ -28,6 +28,10 @@ constexpr ImGuiWindowFlags ModalFlags = ImGuiWindowFlags_AlwaysAutoResize |
 										ImGuiWindowFlags_NoResize |
 										ImGuiWindowFlags_NoCollapse;
 
+constexpr EAddonsFilterFlags quickFilter_Installed = (EAddonsFilterFlags)((int)EAddonsFilterFlags::ShowEnabled | (int)EAddonsFilterFlags::ShowDisabled | (int)EAddonsFilterFlags::ShowInstalled_Arc);
+constexpr EAddonsFilterFlags quickFilter_Library = EAddonsFilterFlags::ShowDownloadable;
+constexpr EAddonsFilterFlags quickFilter_ArcPlugins = EAddonsFilterFlags::ShowDownloadable_Arc;
+
 static CAddonsWindow* AddonsWindow = nullptr;
 
 void OnAddonLoadUnload(void* aEventData)
@@ -571,7 +575,7 @@ void CAddonsWindow::RenderContent()
 	//ImVec2 detailsAreaSz = ImVec2(detailsAreaWidth - style.ItemSpacing.x, region.y - filterAreaSz.y - actionsAreaSz.y - style.ItemSpacing.y - style.ItemSpacing.y);
 	ImVec2 listAreaSz = ImVec2(region.x, region.y - filterAreaSz.y - actionsAreaSz.y - style.ItemSpacing.y - style.ItemSpacing.y);
 
-	static bool isListMode = settingsctx->Get<bool>(OPT_ISLISTMODE);
+	static bool isListMode = settingsctx->Get<bool>(OPT_ISLISTMODE, false);
 	
 	if (ImGui::BeginChild("Filters", filterAreaSz))
 	{
@@ -624,10 +628,7 @@ void CAddonsWindow::RenderContent()
 
 		/* advanced filters */
 		bool doPopHighlight = false;
-		constexpr EAddonsFilterFlags quickFilter_Installed = (EAddonsFilterFlags)((int)EAddonsFilterFlags::ShowEnabled | (int)EAddonsFilterFlags::ShowDisabled | (int)EAddonsFilterFlags::ShowInstalled_Arc);
-		constexpr EAddonsFilterFlags quickFilter_Library = EAddonsFilterFlags::ShowDownloadable;
-		constexpr EAddonsFilterFlags quickFilter_ArcPlugins = EAddonsFilterFlags::ShowDownloadable_Arc;
-
+		
 		static Texture* filtersTex = nullptr;
 		if (filtersTex)
 		{
@@ -1383,7 +1384,7 @@ void CAddonsWindow::PopulateAddons()
 	CUiContext* uictx = ctx->GetUIContext();
 	CSettings* settingsctx = ctx->GetSettingsCtx();
 
-	this->Filter = settingsctx->Get<EAddonsFilterFlags>(OPT_ADDONFILTERS);
+	this->Filter = settingsctx->Get<EAddonsFilterFlags>(OPT_ADDONFILTERS, quickFilter_Installed);
 
 	for (Addon* addon : Loader::Addons)
 	{

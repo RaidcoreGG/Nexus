@@ -74,11 +74,11 @@ CQuickAccess::CQuickAccess(CDataLink* aDataLink, CLogHandler* aLogger, CInputBin
 	CContext* ctx = CContext::GetContext();
 	CSettings* settingsCtx = ctx->GetSettingsCtx();
 
-	this->VerticalLayout = settingsCtx->Get<bool>(OPT_QAVERTICAL);
-	this->Location = settingsCtx->Get<EQAPosition>(OPT_QALOCATION);
-	this->Offset.x = settingsCtx->Get<float>(OPT_QAOFFSETX);
-	this->Offset.y = settingsCtx->Get<float>(OPT_QAOFFSETY);
-	this->Visibility = settingsCtx->Get<EQAVisibility>(OPT_QAVISIBILITY);
+	this->VerticalLayout = settingsCtx->Get<bool>(OPT_QAVERTICAL, false);
+	this->Location = settingsCtx->Get<EQAPosition>(OPT_QALOCATION, EQAPosition::Extend);
+	this->Offset.x = settingsCtx->Get<float>(OPT_QAOFFSETX, 0.0f);
+	this->Offset.y = settingsCtx->Get<float>(OPT_QAOFFSETY, 0.0f);
+	this->Visibility = settingsCtx->Get<EQAVisibility>(OPT_QAVISIBILITY, EQAVisibility::AlwaysShow);
 }
 
 CQuickAccess::~CQuickAccess()

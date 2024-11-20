@@ -20,7 +20,7 @@ CEscapeClosing::CEscapeClosing()
 	CContext* ctx = CContext::GetContext();
 	CSettings* settingsCtx = ctx->GetSettingsCtx();
 
-	this->Enabled = settingsCtx->Get<bool>(OPT_CLOSEESCAPE);
+	this->Enabled = settingsCtx->Get<bool>(OPT_CLOSEESCAPE, true);
 }
 
 UINT CEscapeClosing::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

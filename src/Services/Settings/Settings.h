@@ -49,13 +49,16 @@ class CSettings
 	}
 
 	template <typename T>
-	T Get(const std::string& aIdentifier)
+	T Get(const std::string& aIdentifier, T aDefaultValue = {})
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
 		if (this->Store[aIdentifier].is_null())
 		{
-			return T{};
+			this->Store[aIdentifier] = aDefaultValue;
+			this->SaveInternal();
+
+			return aDefaultValue;
 		}
 
 		return this->Store[aIdentifier].get<T>();
