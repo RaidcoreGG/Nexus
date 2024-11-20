@@ -113,10 +113,10 @@ void CMainWindow::Render()
 		poppedPadding = true;
 
 		ImGui::SetCursorPos(ImVec2(sidebarWidth, headerHeight));
-		if (ImGui::BeginChild("Nexus##Main_Content", ImVec2(contentWidth, contentHeight - footerHeight)))
+		if (ImGui::BeginChild("Content", ImVec2(contentWidth, contentHeight - footerHeight)))
 		{
 			ImGui::SetCursorPos(padding);
-			if (ImGui::BeginChild("Nexus##Main_ContentInner", ImVec2(contentWidth - (padding.x * 2), contentHeight - footerHeight - (padding.y * 2))))
+			if (ImGui::BeginChild("ContentInner", ImVec2(contentWidth - (padding.x * 2), contentHeight - footerHeight - (padding.y * 2))))
 			{
 				if (this->ActiveContent)
 				{
@@ -132,7 +132,7 @@ void CMainWindow::Render()
 		ImGui::EndChild();
 
 		ImGui::SetCursorPos(ImVec2(sidebarWidth, headerHeight + contentHeight - footerHeight));
-		if (ImGui::BeginChild("Nexus##Main_Footer", ImVec2(contentWidth, footerHeight), false, Flags))
+		if (ImGui::BeginChild("Footer", ImVec2(contentWidth, footerHeight), false, Flags))
 		{
 			ImGui::SetCursorPos(ImVec2(0, 0));
 			ImGui::Separator();
@@ -144,7 +144,7 @@ void CMainWindow::Render()
 
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::GetColorU32(ImGuiCol_TitleBgCollapsed));
 		ImGui::SetCursorPos(ImVec2(0, headerHeight));
-		if (ImGui::BeginChild("Nexus##Main_Sidebar", ImVec2(sidebarWidth, contentHeight)))
+		if (ImGui::BeginChild("Sidebar", ImVec2(sidebarWidth, contentHeight)))
 		{
 			ImVec2 navItemSz = ImVec2(sidebarWidth - (padding.x * 2), headerHeight);
 			float navX = padding.x;
@@ -230,7 +230,7 @@ void CMainWindow::Render()
 
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, style.Colors[ImGuiCol_TitleBgActive]);
 		ImGui::SetCursorPos(ImVec2(0, 0));
-		if (ImGui::BeginChild("Nexus##Main_Header", ImVec2(wndWidth, headerHeight), false, Flags))
+		if (ImGui::BeginChild("Header", ImVec2(wndWidth, headerHeight), false, Flags))
 		{
 			if (this->Tex_RaidcoreTag)
 			{

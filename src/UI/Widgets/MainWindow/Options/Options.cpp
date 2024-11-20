@@ -44,7 +44,7 @@ void COptionsWindow::RenderContent()
 		this->IsInvalid = false;
 	}
 
-	if (ImGui::BeginTabBar("##OptionsTabBar", ImGuiTabBarFlags_None))
+	if (ImGui::BeginTabBar("OptionsTabBar", ImGuiTabBarFlags_None))
 	{
 		this->TabGeneral();
 		this->TabStyle();
@@ -63,7 +63,7 @@ void COptionsWindow::TabGeneral()
 
 	if (ImGui::BeginTabItem(langApi->Translate("((000052))")))
 	{
-		if (ImGui::BeginChild("##GeneralTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
+		if (ImGui::BeginChild("GeneralTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
 		{
 			{
 				ImGui::BeginGroupPanel(langApi->Translate("((000041))"), ImVec2(-1.0f, 0.0f));
@@ -232,7 +232,7 @@ void COptionsWindow::TabStyle()
 
 	if (ImGui::BeginTabItem(langApi->Translate("((000053))")))
 	{
-		if (ImGui::BeginChild("##StyleTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
+		if (ImGui::BeginChild("StyleTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
 		{
 			static long long lastCheckedFonts = Time::GetTimestamp();
 

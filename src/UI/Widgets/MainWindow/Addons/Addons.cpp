@@ -129,7 +129,7 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 		static CLocalization* langApi = ctx->GetLocalization();
 
 		ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1);
-		if (ImGui::BeginChild(("##AddonItem_" + sig).c_str(), itemSz, true))
+		if (ImGui::BeginChild(("AddonItem_" + sig).c_str(), itemSz, true))
 		{
 			if (isduu)
 			{
@@ -140,7 +140,7 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 			static CUiContext* uictx = ctx->GetUIContext();
 			static CAlerts* alertctx = uictx->GetAlerts();
 
-			if (ImGui::BeginChild("##AddonItem_Info_", ImVec2(itemSz.x - style.ItemSpacing.x - actionsAreaWidth - (style.WindowPadding.x * 2), innerHeight)))
+			if (ImGui::BeginChild("Info", ImVec2(itemSz.x - style.ItemSpacing.x - actionsAreaWidth - (style.WindowPadding.x * 2), innerHeight)))
 			{
 				ImGui::Text(aAddonData.NexusAddon->Definitions->Name);
 				ImGui::SameLine();
@@ -164,7 +164,7 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 			bool poppedActionsPad = false;
 
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-			if (ImGui::BeginChild("##AddonItem_Actions_", ImVec2(actionsAreaWidth, innerHeight)))
+			if (ImGui::BeginChild("Actions", ImVec2(actionsAreaWidth, innerHeight)))
 			{
 				ImGui::PopStyleVar();
 				poppedActionsPad = true;
@@ -323,14 +323,14 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 		}
 
 		ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1);
-		if (ImGui::BeginChild(("##AddonItem_" + sig).c_str(), itemSz, true))
+		if (ImGui::BeginChild(("AddonItem_" + sig).c_str(), itemSz, true))
 		{
 			static CContext* ctx = CContext::GetContext();
 			static CLocalization* langApi = ctx->GetLocalization();
 			static CUiContext* uictx = ctx->GetUIContext();
 			static CAlerts* alertctx = uictx->GetAlerts();
 
-			if (ImGui::BeginChild("##AddonItem_Info_", ImVec2(itemSz.x - style.ItemSpacing.x - actionsAreaWidth - (style.WindowPadding.x * 2), innerHeight)))
+			if (ImGui::BeginChild("Info", ImVec2(itemSz.x - style.ItemSpacing.x - actionsAreaWidth - (style.WindowPadding.x * 2), innerHeight)))
 			{
 				ImGui::Text(aAddonData.LibraryAddon->Name.c_str());
 				ImGui::TextDisabled("by %s", aAddonData.LibraryAddon->Author.c_str());
@@ -345,7 +345,7 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 			bool poppedActionsPad = false;
 
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-			if (ImGui::BeginChild("##AddonItem_Actions_", ImVec2(actionsAreaWidth, innerHeight)))
+			if (ImGui::BeginChild("Actions", ImVec2(actionsAreaWidth, innerHeight)))
 			{
 				ImGui::PopStyleVar();
 				poppedActionsPad = true;
@@ -570,7 +570,7 @@ void CAddonsWindow::RenderContent()
 
 	static bool isListMode = settingsctx->Get<bool>(OPT_ISLISTMODE);
 	
-	if (ImGui::BeginChild("##Addons_Filters", filterAreaSz))
+	if (ImGui::BeginChild("Filters", filterAreaSz))
 	{
 		/* quick filters */
 		if (ImGui::Button(langApi->Translate("((000031))")))
@@ -610,7 +610,7 @@ void CAddonsWindow::RenderContent()
 		}
 
 		/* filter search */
-		if (ImGui::InputTextWithHint("##addonssearch", langApi->Translate("((000104))"), &searchTerm[0], 400))
+		if (ImGui::InputTextWithHint("##SearchTerm", langApi->Translate("((000104))"), &searchTerm[0], 400))
 		{
 			this->SearchTerm = String::ToLower(searchTerm);
 			this->Invalidate();
@@ -653,10 +653,10 @@ void CAddonsWindow::RenderContent()
 				showDownloadable =    (int)this->Filter & (int)EAddonsFilterFlags::ShowDownloadable;
 				showInstalledArc =    (int)this->Filter & (int)EAddonsFilterFlags::ShowInstalled_Arc;
 				showDownloadableArc = (int)this->Filter & (int)EAddonsFilterFlags::ShowDownloadable_Arc;
-				ImGui::OpenPopup("##addonsfilter");
+				ImGui::OpenPopup("Filters");
 			}
 
-			if (ImGui::BeginPopupContextItem("##addonsfilter"))
+			if (ImGui::BeginPopupContextItem("Filters"))
 			{
 				if (ImGui::Checkbox(langApi->Translate("((000106))"), &showEnabled))
 				{
@@ -780,7 +780,7 @@ void CAddonsWindow::RenderContent()
 	//ImVec2 posList = ImGui::GetCursorPos();
 
 	//ImGui::PushClipRect(listP1, listP2, true);
-	if (ImGui::BeginChild("##Addons_List", listAreaSz))
+	if (ImGui::BeginChild("List", listAreaSz))
 	{
 		if (configuring)
 		{
@@ -820,7 +820,7 @@ void CAddonsWindow::RenderContent()
 	/*ImGui::SetCursorPos(ImVec2(posList.x + (region.x - detailsAreaWidth) + style.ItemSpacing.x, posList.y));
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1);
 	bool poppedBorder = false;
-	if (ImGui::BeginChild("##Addons_Details", detailsAreaSz, true))
+	if (ImGui::BeginChild("Details", detailsAreaSz, true))
 	{
 		poppedBorder = true;
 		ImGui::PopStyleVar();
@@ -838,7 +838,7 @@ void CAddonsWindow::RenderContent()
 	}*/
 	
 
-	if (ImGui::BeginChild("##Addons_Actions", actionsAreaSz))
+	if (ImGui::BeginChild("Actions", actionsAreaSz))
 	{
 		if (ImGui::Button(langApi->Translate("((000034))")))
 		{
@@ -976,7 +976,7 @@ void CAddonsWindow::RenderDetails()
 	static Texture* chevronRt = nullptr;
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-	if (ImGui::BeginChild("##Addons_Details_Collapse", ImVec2(btnSz, 0)))
+	if (ImGui::BeginChild("Details_Collapse", ImVec2(btnSz, 0)))
 	{
 		ImVec2 initial = ImGui::GetCursorPos();
 
@@ -1002,7 +1002,7 @@ void CAddonsWindow::RenderDetails()
 
 	ImGui::SameLine();
 
-	if (ImGui::BeginChild("##Addons_Details_Content"))
+	if (ImGui::BeginChild("Details_Content"))
 	{
 		static CContext* ctx = CContext::GetContext();
 		static CLocalization* langApi = ctx->GetLocalization();

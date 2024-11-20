@@ -59,7 +59,7 @@ void CLogWindow::RenderContent()
 
 	ImGui::Separator();
 	{
-		ImGui::BeginChild("##LogChannels", ImVec2(windowWidthQuarter, 0.0f));
+		ImGui::BeginChild("LogChannels", ImVec2(windowWidthQuarter, 0.0f));
 
 		ImGui::Text("Channel:");
 
