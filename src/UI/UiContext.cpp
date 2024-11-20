@@ -429,7 +429,6 @@ void CUiContext::Render()
 		ImGui::NewFrame();
 
 		/* draw overlay */
-		//static bool eulaAccepted = 
 		if (EulaAccepted)
 		{
 			if (this->IsVisible)
