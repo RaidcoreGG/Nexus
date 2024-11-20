@@ -92,7 +92,15 @@ namespace Main
 		{
 			logger->RegisterLogger(new CConsoleLogger(ELogLevel::ALL));
 		}
-		logger->RegisterLogger(new CFileLogger(ELogLevel::ALL, Index::F_LOG));
+
+		std::filesystem::path logPathOverride;
+
+		if (CmdLine::HasArgument("-mumble"))
+		{
+			logPathOverride = (Index::D_GW2_ADDONS_NEXUS / "Nexus_").string() + CmdLine::GetArgumentValue("-mumble") + ".log";
+		}
+
+		logger->RegisterLogger(new CFileLogger(ELogLevel::ALL, logPathOverride.empty() ? Index::F_LOG : logPathOverride));
 
 		logger->Info(CH_CORE, GetCommandLineA());
 		logger->Info(CH_CORE, "%s: %s", Index::F_HOST_DLL != Index::F_CHAINLOAD_DLL ? "Proxy" : "Chainload", Index::F_HOST_DLL.string().c_str());
