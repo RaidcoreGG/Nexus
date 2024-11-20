@@ -575,44 +575,7 @@ void CAddonsWindow::RenderContent()
 	
 	if (ImGui::BeginChild("Filters", filterAreaSz))
 	{
-		/* quick filters */
-		if (ImGui::Button(langApi->Translate("((000031))")))
-		{
-			this->Filter = (EAddonsFilterFlags)((int)EAddonsFilterFlags::ShowEnabled | (int)EAddonsFilterFlags::ShowDisabled | (int)EAddonsFilterFlags::ShowInstalled_Arc);
-			settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
-			this->Invalidate();
-			this->ClearContent();
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button(langApi->Translate("((000032))")))
-		{
-			this->Filter = EAddonsFilterFlags::ShowDownloadable;
-			settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
-			this->Invalidate();
-			this->ClearContent();
-		}
-
-		if (ArcDPS::IsLoaded)
-		{
-			ImGui::SameLine();
-
-			std::string legacyNotice = langApi->Translate("((000076))");
-			legacyNotice.append("\n");
-			legacyNotice.append(langApi->Translate("((000077))"));
-
-			if (ImGui::Button(langApi->Translate("((000075))")))
-			{
-				this->Filter = EAddonsFilterFlags::ShowDownloadable_Arc;
-				settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
-				this->Invalidate();
-				this->ClearContent();
-			}
-			ImGui::TooltipGeneric(legacyNotice.c_str());
-		}
-
-		/* filter search */
+		/* search term */
 		if (ImGui::InputTextWithHint("##SearchTerm", langApi->Translate("((000104))"), &searchTerm[0], 400))
 		{
 			this->SearchTerm = String::ToLower(searchTerm);
@@ -620,12 +583,12 @@ void CAddonsWindow::RenderContent()
 			this->ClearContent();
 		}
 
-		/* clear filter */
-		static Texture* clearFilterTex = nullptr;
-		if (clearFilterTex)
+		/* clear search term */
+		static Texture* clearSearchTermTex = nullptr;
+		if (clearSearchTermTex)
 		{
 			ImGui::SameLine();
-			if (ImGui::ImageButton(clearFilterTex->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
+			if (ImGui::ImageButton(clearSearchTermTex->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
 			{
 				memset(searchTerm, 0, 400);
 				this->SearchTerm = String::ToLower(searchTerm);
@@ -636,27 +599,66 @@ void CAddonsWindow::RenderContent()
 		else
 		{
 			CTextureLoader* texapi = ctx->GetTextureService();
-			clearFilterTex = texapi->GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx->GetModule());
+			clearSearchTermTex = texapi->GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx->GetModule());
 		}
+
+		/* view mode */
+		static Texture* viewModeTex = nullptr;
+		if (viewModeTex)
+		{
+			ImGui::SameLine();
+			if (ImGui::ImageButton(viewModeTex->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
+			{
+				viewModeTex = nullptr;
+				isListMode = !isListMode;
+				settingsctx->Set(OPT_ISLISTMODE, isListMode);
+			}
+		}
+		else
+		{
+			CTextureLoader* texapi = ctx->GetTextureService();
+			viewModeTex = !isListMode
+				? texapi->GetOrCreate("ICON_LIST", RES_ICON_LIST, ctx->GetModule())
+				: texapi->GetOrCreate("ICON_TILES", RES_ICON_TILES, ctx->GetModule());
+		}
+
+		/* advanced filters */
+		bool doPopHighlight = false;
+		constexpr EAddonsFilterFlags quickFilter_Installed = (EAddonsFilterFlags)((int)EAddonsFilterFlags::ShowEnabled | (int)EAddonsFilterFlags::ShowDisabled | (int)EAddonsFilterFlags::ShowInstalled_Arc);
+		constexpr EAddonsFilterFlags quickFilter_Library = EAddonsFilterFlags::ShowDownloadable;
+		constexpr EAddonsFilterFlags quickFilter_ArcPlugins = EAddonsFilterFlags::ShowDownloadable_Arc;
 
 		static Texture* filtersTex = nullptr;
 		if (filtersTex)
 		{
-			static bool showEnabled =         (int)this->Filter & (int)EAddonsFilterFlags::ShowEnabled;
-			static bool showDisabled =        (int)this->Filter & (int)EAddonsFilterFlags::ShowDisabled;
-			static bool showDownloadable =    (int)this->Filter & (int)EAddonsFilterFlags::ShowDownloadable;
-			static bool showInstalledArc =    (int)this->Filter & (int)EAddonsFilterFlags::ShowInstalled_Arc;
+			static bool showEnabled = (int)this->Filter & (int)EAddonsFilterFlags::ShowEnabled;
+			static bool showDisabled = (int)this->Filter & (int)EAddonsFilterFlags::ShowDisabled;
+			static bool showDownloadable = (int)this->Filter & (int)EAddonsFilterFlags::ShowDownloadable;
+			static bool showInstalledArc = (int)this->Filter & (int)EAddonsFilterFlags::ShowInstalled_Arc;
 			static bool showDownloadableArc = (int)this->Filter & (int)EAddonsFilterFlags::ShowDownloadable_Arc;
 
-			ImGui::SameLine();
+			if (!(this->Filter == quickFilter_Installed ||
+				this->Filter == quickFilter_Library ||
+				this->Filter == quickFilter_ArcPlugins))
+			{
+				ImGui::PushStyleColor(ImGuiCol_Button, style.Colors[ImGuiCol_ButtonActive]);
+				doPopHighlight = true;
+			}
+
 			if (ImGui::ImageButton(filtersTex->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
 			{
-				showEnabled =         (int)this->Filter & (int)EAddonsFilterFlags::ShowEnabled;
-				showDisabled =        (int)this->Filter & (int)EAddonsFilterFlags::ShowDisabled;
-				showDownloadable =    (int)this->Filter & (int)EAddonsFilterFlags::ShowDownloadable;
-				showInstalledArc =    (int)this->Filter & (int)EAddonsFilterFlags::ShowInstalled_Arc;
+				showEnabled = (int)this->Filter & (int)EAddonsFilterFlags::ShowEnabled;
+				showDisabled = (int)this->Filter & (int)EAddonsFilterFlags::ShowDisabled;
+				showDownloadable = (int)this->Filter & (int)EAddonsFilterFlags::ShowDownloadable;
+				showInstalledArc = (int)this->Filter & (int)EAddonsFilterFlags::ShowInstalled_Arc;
 				showDownloadableArc = (int)this->Filter & (int)EAddonsFilterFlags::ShowDownloadable_Arc;
 				ImGui::OpenPopup("Filters");
+			}
+
+			if (doPopHighlight)
+			{
+				ImGui::PopStyleColor();
+				doPopHighlight = false;
 			}
 
 			if (ImGui::BeginPopupContextItem("Filters"))
@@ -748,24 +750,81 @@ void CAddonsWindow::RenderContent()
 			filtersTex = texapi->GetOrCreate("ICON_FILTER", RES_ICON_FILTER, ctx->GetModule());
 		}
 
-		/* view mode */
-		static Texture* viewModeTex = nullptr;
-		if (viewModeTex)
+		ImGui::SameLine();
+
+		/* quick filters */
+		
+		if (this->Filter == quickFilter_Installed)
+		{
+			ImGui::PushStyleColor(ImGuiCol_Button, style.Colors[ImGuiCol_ButtonActive]);
+			doPopHighlight = true;
+		}
+
+		if (ImGui::Button(langApi->Translate("((000031))")))
+		{
+			this->Filter = quickFilter_Installed;
+			settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
+			this->Invalidate();
+			this->ClearContent();
+		}
+
+		if (doPopHighlight)
+		{
+			ImGui::PopStyleColor();
+			doPopHighlight = false;
+		}
+
+		ImGui::SameLine();
+
+		if (this->Filter == quickFilter_Library)
+		{
+			ImGui::PushStyleColor(ImGuiCol_Button, style.Colors[ImGuiCol_ButtonActive]);
+			doPopHighlight = true;
+		}
+
+		if (ImGui::Button(langApi->Translate("((000032))")))
+		{
+			this->Filter = quickFilter_Library;
+			settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
+			this->Invalidate();
+			this->ClearContent();
+		}
+
+		if (doPopHighlight)
+		{
+			ImGui::PopStyleColor();
+			doPopHighlight = false;
+		}
+
+		if (ArcDPS::IsLoaded)
 		{
 			ImGui::SameLine();
-			if (ImGui::ImageButton(viewModeTex->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
+
+			std::string legacyNotice = langApi->Translate("((000076))");
+			legacyNotice.append("\n");
+			legacyNotice.append(langApi->Translate("((000077))"));
+
+			if (this->Filter == quickFilter_ArcPlugins)
 			{
-				viewModeTex = nullptr;
-				isListMode = !isListMode;
-				settingsctx->Set(OPT_ISLISTMODE, isListMode);
+				ImGui::PushStyleColor(ImGuiCol_Button, style.Colors[ImGuiCol_ButtonActive]);
+				doPopHighlight = true;
 			}
-		}
-		else
-		{
-			CTextureLoader* texapi = ctx->GetTextureService();
-			viewModeTex = !isListMode
-				? texapi->GetOrCreate("ICON_LIST", RES_ICON_LIST, ctx->GetModule())
-				: texapi->GetOrCreate("ICON_TILES", RES_ICON_TILES, ctx->GetModule());
+
+			if (ImGui::Button(langApi->Translate("((000075))")))
+			{
+				this->Filter = quickFilter_ArcPlugins;
+				settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
+				this->Invalidate();
+				this->ClearContent();
+			}
+
+			if (doPopHighlight)
+			{
+				ImGui::PopStyleColor();
+				doPopHighlight = false;
+			}
+
+			ImGui::TooltipGeneric(legacyNotice.c_str());
 		}
 
 		filterAreaEndY = ImGui::GetCursorPos().y;
