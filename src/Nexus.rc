@@ -85,6 +85,8 @@ BEGIN
 	END
 END
 
+RES_ICON_SNOWFLAKE              PNG     "Resources\\icons\\snowflake.png"
+
 /* Fonts */
 RES_FONT_MENOMONIA              FONT    "Resources\\Fonts\\Menomonia.ttf"
 RES_FONT_TREBUCHET              FONT    "Resources\\Fonts\\TrebuchetMS.ttf"

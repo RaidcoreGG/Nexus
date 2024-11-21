@@ -73,6 +73,7 @@
     <ClCompile Include="src\UI\Widgets\MainWindow\Log\Log.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\MainWindow.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\Options\Options.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\SnowflakeMgr.cpp" />
     <ClCompile Include="src\UI\Widgets\QuickAccess\QuickAccess.cpp" />
     <ClCompile Include="src\Util\Base64.cpp" />
     <ClCompile Include="src\Util\CmdLine.cpp" />
@@ -333,6 +334,7 @@
     <ClInclude Include="src\UI\Widgets\MainWindow\Log\Log.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\MainWindow.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Options\Options.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\SnowflakeMgr.h" />
     <ClInclude Include="src\UI\Widgets\QuickAccess\EQAPosition.h" />
     <ClInclude Include="src\UI\Widgets\QuickAccess\EQAVisibility.h" />
     <ClInclude Include="src\UI\Widgets\QuickAccess\FuncDefs.h" />

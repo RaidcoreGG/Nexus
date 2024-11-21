@@ -405,6 +405,9 @@
     <ClCompile Include="src\Loader\API\ApiFunctionMapper.cpp">
       <Filter>Loader\API</Filter>
     </ClCompile>
+    <ClCompile Include="src\UI\Widgets\MainWindow\SnowflakeMgr.cpp">
+      <Filter>UI\Widgets\MainWindow</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h">
@@ -1198,6 +1201,9 @@
     </ClInclude>
     <ClInclude Include="src\Loader\API\AddonAPI.h">
       <Filter>Loader\API</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\MainWindow\SnowflakeMgr.h">
+      <Filter>UI\Widgets\MainWindow</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

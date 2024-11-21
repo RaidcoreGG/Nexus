@@ -11,10 +11,13 @@
 #include "imgui/imgui_extensions.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
+#include "ImAnimate/ImAnimate.h"
 
 #include "Context.h"
 #include "resource.h"
 #include "Util/Time.h"
+
+#include "SnowflakeMgr.h"
 
 constexpr ImGuiWindowFlags Flags = ImGuiWindowFlags_NoTitleBar  |
 								   ImGuiWindowFlags_NoCollapse  |
@@ -61,9 +64,12 @@ void CMainWindow::Render()
 		}
 	}
 
+	static CSnowflakeMgr s_SnowflakeMgr = {}; // winter flair
+
 	/* don't continue if not visible */
 	if (!this->IsVisible)
 	{
+		s_SnowflakeMgr.Clear();
 		return;
 	}
 
@@ -284,6 +290,8 @@ void CMainWindow::Render()
 		this->IsHandleHeld = ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows);
 		ImGui::EndChild();
 		ImGui::PopStyleColor();
+
+		s_SnowflakeMgr.Update();
 	}
 	ImGui::End();
 
