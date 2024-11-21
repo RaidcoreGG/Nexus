@@ -18,7 +18,7 @@
 
 CSnowflakeMgr::CSnowflakeMgr()
 {
-	IsItChristmas = true;// Time::GetMonth() == 12;
+	IsItChristmas = Time::GetMonth() == 12;
 }
 
 ImVec2 Rotate(const ImVec2& aPoint, float aCosA, float aSinA)
