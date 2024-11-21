@@ -11,14 +11,20 @@
 #include "imgui/imgui_extensions.h"
 #include "imgui/imgui_internal.h"
 
-#include "ImAnimate/ImAnimate.h"
-#include "Util/Time.h"
+#include "Consts.h"
 #include "Context.h"
+#include "ImAnimate/ImAnimate.h"
 #include "resource.h"
+#include "Util/Time.h"
 
 CSnowflakeMgr::CSnowflakeMgr()
 {
-	IsItChristmas = Time::GetMonth() == 12;
+	CContext* ctx = CContext::GetContext();
+	CSettings* settingsctx = ctx->GetSettingsCtx();
+
+	bool isPartyPooper = settingsctx->Get<bool>(OPT_DISABLEFESTIVEFLAIR, false);
+
+	IsItChristmas = Time::GetMonth() == 12 && !isPartyPooper;
 }
 
 ImVec2 Rotate(const ImVec2& aPoint, float aCosA, float aSinA)
