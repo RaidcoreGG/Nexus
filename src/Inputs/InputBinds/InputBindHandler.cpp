@@ -672,6 +672,11 @@ void CInputBindApi::Load()
 				binding["Key"].get_to(ib.Code);
 			}
 
+			if (ib.Code == 0)
+			{
+				ib.Type = EInputBindType::None;
+			}
+
 			std::string identifier = binding["Identifier"].get<std::string>();
 
 			this->Registry[identifier].Bind = ib;
