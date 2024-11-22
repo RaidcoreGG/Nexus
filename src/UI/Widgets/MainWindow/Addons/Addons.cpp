@@ -1441,7 +1441,7 @@ void CAddonsWindow::PopulateAddons()
 			for (Addon* installedAddon : Loader::Addons)
 			{
 				// filter out already installed
-				if (addon->Signature == installedAddon->MatchSignature)
+				if (addon->Signature == installedAddon->MatchSignature && installedAddon->State != EAddonState::None)
 				{
 					installed = true;
 					break;
