@@ -792,7 +792,7 @@ namespace Loader
 					addon->AllowPrereleases
 				};
 
-				if (Updater->UpdateAddon(tmpPath, addonInfo))
+				if (addon->Definitions->Provider != EUpdateProvider::Self && Updater->UpdateAddon(tmpPath, addonInfo))
 				{
 					Logger->Info(CH_LOADER, "Update available for \"%s\".", tmpPath.string().c_str());
 					if (addon->IsDisabledUntilUpdate)

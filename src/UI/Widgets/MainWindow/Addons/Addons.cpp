@@ -964,7 +964,7 @@ void CAddonsWindow::RenderContent()
 							CUiContext* uictx = ctx->GetUIContext();
 							CAlerts* alertctx = uictx->GetAlerts();
 
-							if (updater->UpdateAddon(tmpPath, addonInfo, false, 5 * 60))
+							if (addon->Definitions->Provider != EUpdateProvider::Self && updater->UpdateAddon(tmpPath, addonInfo, false, 5 * 60))
 							{
 								Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
 
@@ -1086,76 +1086,79 @@ void CAddonsWindow::RenderDetails()
 
 		if (ImGui::CollapsingHeader(headerStr.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			if (ImGui::Button((!addonData.NexusAddon->IsCheckingForUpdates
-				? langApi->Translate("((000035))")
-				: langApi->Translate("((000071))") + sigid).c_str()))
+			if (addonData.NexusAddon->Definitions->Provider != EUpdateProvider::Self)
 			{
-				if (!addonData.NexusAddon->IsCheckingForUpdates)
+				if (ImGui::Button((!addonData.NexusAddon->IsCheckingForUpdates
+					? langApi->Translate("((000035))")
+					: langApi->Translate("((000071))") + sigid).c_str()))
 				{
-					for (auto addon : Loader::Addons)
+					if (!addonData.NexusAddon->IsCheckingForUpdates)
 					{
-						if (addon->Definitions == addonData.NexusAddon->Definitions)
+						for (auto addon : Loader::Addons)
 						{
-							addonData.NexusAddon->IsCheckingForUpdates = true;
-
-							Addon* addon = addonData.NexusAddon;
-
-							std::filesystem::path tmpPath = addon->Path.string();
-							std::thread([addon, tmpPath]()
+							if (addon->Definitions == addonData.NexusAddon->Definitions)
 							{
-								AddonInfo addonInfo
+								addonData.NexusAddon->IsCheckingForUpdates = true;
+
+								Addon* addon = addonData.NexusAddon;
+
+								std::filesystem::path tmpPath = addon->Path.string();
+								std::thread([addon, tmpPath]()
 								{
-									addon->Definitions->Signature,
-									addon->Definitions->Name,
-									addon->Definitions->Version,
-									addon->Definitions->Provider,
-									addon->Definitions->UpdateLink != nullptr
-										? addon->Definitions->UpdateLink
-										: "",
-									addon->MD5,
-									addon->AllowPrereleases
-								};
-
-								CContext* ctx = CContext::GetContext();
-								CUpdater* updater = ctx->GetUpdater();
-								CUiContext* uictx = ctx->GetUIContext();
-								CAlerts* alertctx = uictx->GetAlerts();
-								CLocalization* langApi = ctx->GetLocalization();
-
-								if (updater->UpdateAddon(tmpPath, addonInfo, false, 5 * 60))
-								{
-									Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
-
-									alertctx->Notify(
-										String::Format("%s %s",
+									AddonInfo addonInfo
+									{
+										addon->Definitions->Signature,
 										addon->Definitions->Name,
-										addon->State == EAddonState::LoadedLOCKED
-										? langApi->Translate("((000079))")
-										: langApi->Translate("((000081))")
-									).c_str()
-									);
-								}
-								else
-								{
-									alertctx->Notify(String::Format("%s %s",
-													 addon->Definitions->Name,
-													 langApi->Translate("((000082))")).c_str());
-								}
-								Sleep(1000); // arbitrary sleep otherwise the user never even sees "is checking..."
-								addon->IsCheckingForUpdates = false;
-							}).detach();
+										addon->Definitions->Version,
+										addon->Definitions->Provider,
+										addon->Definitions->UpdateLink != nullptr
+											? addon->Definitions->UpdateLink
+											: "",
+										addon->MD5,
+										addon->AllowPrereleases
+									};
 
-							//Logger->Debug(CH_GUI, "Update called: %s", it.second->Definitions->Name);
-							break;
+									CContext* ctx = CContext::GetContext();
+									CUpdater* updater = ctx->GetUpdater();
+									CUiContext* uictx = ctx->GetUIContext();
+									CAlerts* alertctx = uictx->GetAlerts();
+									CLocalization* langApi = ctx->GetLocalization();
+
+									if (updater->UpdateAddon(tmpPath, addonInfo, false, 5 * 60))
+									{
+										Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
+
+										alertctx->Notify(
+											String::Format("%s %s",
+											addon->Definitions->Name,
+											addon->State == EAddonState::LoadedLOCKED
+											? langApi->Translate("((000079))")
+											: langApi->Translate("((000081))")
+										).c_str()
+										);
+									}
+									else
+									{
+										alertctx->Notify(String::Format("%s %s",
+														 addon->Definitions->Name,
+														 langApi->Translate("((000082))")).c_str());
+									}
+									Sleep(1000); // arbitrary sleep otherwise the user never even sees "is checking..."
+									addon->IsCheckingForUpdates = false;
+								}).detach();
+
+								//Logger->Debug(CH_GUI, "Update called: %s", it.second->Definitions->Name);
+								break;
+							}
 						}
 					}
 				}
+				if (addonData.NexusAddon->State == EAddonState::LoadedLOCKED)
+				{
+					ImGui::TooltipGeneric(langApi->Translate("((000012))"));
+				}
 			}
-			if (addonData.NexusAddon->State == EAddonState::LoadedLOCKED)
-			{
-				ImGui::TooltipGeneric(langApi->Translate("((000012))"));
-			}
-
+			
 			if (addonData.NexusAddon->Definitions->Provider == EUpdateProvider::GitHub && addonData.NexusAddon->Definitions->UpdateLink)
 			{
 				ImGui::SameLine();

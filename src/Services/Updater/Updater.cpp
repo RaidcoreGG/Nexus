@@ -608,6 +608,7 @@ bool CUpdater::UpdateSelf(std::filesystem::path& aDownloadPath, std::string& aBa
 	/* prepare client request */
 	httplib::Client client(aBaseURL);
 	client.enable_server_certificate_verification(true);
+	client.set_follow_location(true);
 
 	size_t bytesWritten = 0;
 	std::ofstream fileUpdate(aDownloadPath, std::ofstream::binary);
