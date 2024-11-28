@@ -543,18 +543,29 @@ bool CUpdater::UpdateDirect(std::filesystem::path& aDownloadPath, std::string& a
 	/* prepare client request */
 	httplib::Client client(aBaseURL);
 	client.enable_server_certificate_verification(true);
+	client.set_follow_location(true);
 
-	std::string endpointMD5 = aEndpointDownload + ".md5sum";
-
-	std::vector<unsigned char> md5remote = MD5Util::FromRemoteURL(client, endpointMD5);
-
-	// if md5 is incomplete cannot check for update -> false
-	// or md5 is same as current -> no update -> false
-	if (md5remote.size() != 16 ||
-		aCurrentMD5 == md5remote)
+	/* null md5 means we're ignoring it (install) */
+	if (aCurrentMD5 != std::vector<unsigned char>{ 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 })
 	{
-		// another inner check if it's a null md5 (install)
-		if (aCurrentMD5 != std::vector<unsigned char>{ 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 })
+		std::string endpointMD5 = aEndpointDownload + ".md5";
+		std::vector<unsigned char> md5remote = MD5Util::FromRemoteURL(client, endpointMD5);
+
+		// if .md5 doesn't exist or is not just the md5, check .md5sum
+		if (md5remote.empty())
+		{
+			endpointMD5 = aEndpointDownload + ".md5sum";
+			md5remote = MD5Util::FromRemoteURL(client, endpointMD5);
+
+			// .md5sum also invalid/doesn't exist
+			if (md5remote.empty())
+			{
+				return false;
+			}
+		}
+
+		// current version is up-to-date
+		if (aCurrentMD5 == md5remote)
 		{
 			return false;
 		}
