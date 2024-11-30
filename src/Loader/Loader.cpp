@@ -619,7 +619,8 @@ namespace Loader
 		/* load lib failed */
 		if (!addon->Module)
 		{
-			Logger->Warning(CH_LOADER, "Failed LoadLibrary on \"%s\". Incompatible. Last Error: %u", strFile.c_str(), GetLastError());
+			const std::error_condition ecnd = std::system_category().default_error_condition(GetLastError());
+			Logger->Warning(CH_LOADER, "Failed LoadLibrary on \"%s\". Incompatible.\nError Code %u : %s", strFile.c_str(), ecnd.value(), ecnd.message().c_str());
 			addon->State = EAddonState::NotLoadedIncompatible;
 
 			if (allocNew)
