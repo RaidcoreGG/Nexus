@@ -1039,12 +1039,6 @@ namespace Loader
 			return;
 		}
 
-		/* remove from whitelisted */
-		if (!isShutdown)
-		{
-			WhitelistedAddons.erase(std::find(WhitelistedAddons.begin(), WhitelistedAddons.end(), addon->Definitions->Signature));
-		}
-
 		if (addon->Definitions)
 		{
 			// Either normal unload
