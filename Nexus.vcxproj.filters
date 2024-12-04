@@ -1199,7 +1199,7 @@
     <ClInclude Include="src\Loader\API\ApiFunctionMapper.h">
       <Filter>Loader\API</Filter>
     </ClInclude>
-    <ClInclude Include="src\Loader\API\AddonAPI.h">
+    <ClInclude Include="src\Loader\API\ApiDefs.h">
       <Filter>Loader\API</Filter>
     </ClInclude>
     <ClInclude Include="src\UI\Widgets\MainWindow\SnowflakeMgr.h">

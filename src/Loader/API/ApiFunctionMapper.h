@@ -11,7 +11,7 @@
 
 #include <Windows.h>
 
-#include "AddonAPI.h"
+#include "ApiDefs.h"
 #include "Events/FuncDefs.h"
 #include "Inputs/GameBinds/EGameBinds.h"
 #include "Inputs/InputBinds/FuncDefs.h"

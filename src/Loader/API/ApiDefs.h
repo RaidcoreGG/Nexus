@@ -1,5 +1,13 @@
-#ifndef ADDONAPI_H
-#define ADDONAPI_H
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  ApiDefs.h
+/// Description  :  Contains the definitions for the Nexus addon API.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
+#ifndef APIDEFS_H
+#define APIDEFS_H
 
 #include <dxgi.h>
 

@@ -286,7 +286,7 @@
     <ClInclude Include="src\Index.h" />
     <ClInclude Include="src\Loader\AddonDefinition.h" />
     <ClInclude Include="src\Loader\EUpdateProvider.h" />
-    <ClInclude Include="src\Loader\API\AddonAPI.h" />
+    <ClInclude Include="src\Loader\API\ApiDefs.h" />
     <ClInclude Include="src\Services\Logging\CFileLogger.h" />
     <ClInclude Include="src\Services\Logging\ILogger.h" />
     <ClInclude Include="src\Services\Logging\LogEntry.h" />
