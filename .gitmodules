@@ -10,3 +10,6 @@
 [submodule "src/thirdparty/ImAnimate"]
 	path = src/thirdparty/ImAnimate
 	url = https://github.com/RaidcoreGG/ImAnimate
+[submodule "src/thirdparty/arcdps"]
+	path = src/thirdparty/arcdps
+	url = https://github.com/RaidcoreGG/RCGG-lib-arcdps-api

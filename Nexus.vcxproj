@@ -113,6 +113,7 @@
     <ClInclude Include="src\Events\EventHandler.h" />
     <ClInclude Include="src\Events\EventSubscriber.h" />
     <ClInclude Include="src\Events\FuncDefs.h" />
+    <ClInclude Include="src\thirdparty\arcdps\ArcDPS.h" />
     <ClInclude Include="src\thirdparty\httplib\httplib.h" />
     <ClInclude Include="src\thirdparty\ImAnimate\ImAnimate.h" />
     <ClInclude Include="src\thirdparty\imgui\imconfig.h" />

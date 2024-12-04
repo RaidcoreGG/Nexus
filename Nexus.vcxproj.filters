@@ -1205,6 +1205,9 @@
     <ClInclude Include="src\UI\Widgets\MainWindow\SnowflakeMgr.h">
       <Filter>UI\Widgets\MainWindow</Filter>
     </ClInclude>
+    <ClInclude Include="src\thirdparty\arcdps\ArcDPS.h">
+      <Filter>_EXTERNAL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\Nexus.rc">
