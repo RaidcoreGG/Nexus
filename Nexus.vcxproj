@@ -97,6 +97,7 @@
     <ClInclude Include="src\Inputs\InputBinds\EInputBindType.h" />
     <ClInclude Include="src\Loader\AddonVersion.h" />
     <ClInclude Include="src\Loader\API\ApiFunctionMapper.h" />
+    <ClInclude Include="src\Loader\EUpdateMode.h" />
     <ClInclude Include="src\Remote.h" />
     <ClInclude Include="src\Services\API\ApiClient.h" />
     <ClInclude Include="src\Services\API\APIController.h" />

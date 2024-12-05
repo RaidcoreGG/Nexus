@@ -1,23 +1,23 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  EAddonState.h
-/// Description  :  Contains the addon states.
+/// Name         :  EUpdateMode.h
+/// Description  :  Contains the update behaviors.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef EADDONSTATE_H
-#define EADDONSTATE_H
+#ifndef EUPDATEMODE_H
+#define EUPDATEMODE_H
 
 ///----------------------------------------------------------------------------------------------------
-/// EAddonState Enumeration
+/// EUpdateMode Enumeration
 ///----------------------------------------------------------------------------------------------------
-enum class EAddonState
+enum class EUpdateMode
 {
 	None,
-	NotLoaded,
-	Loaded,
-	Error      /* Call CAddon::GetError() for information. */
+	AutoUpdate, /* Automatically check and perform updates. */
+	Prompt,     /* Automatically check for updates, but prompt to perform. */
+	Disabled    /* Automatically check for updates, but do nothing. */
 };
 
 #endif

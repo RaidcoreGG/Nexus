@@ -1,37 +1,52 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  AddonDefinition.h
+/// Description  :  Contains the definition for aaddons.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #ifndef ADDONDEF_H
 #define ADDONDEF_H
 
-#include "API/AddonAPI.h"
+#include "API/ApiDefs.h"
+#include "AddonVersion.h"
 #include "EAddonFlags.h"
 #include "EUpdateProvider.h"
-#include "AddonVersion.h"
 
 typedef void (*ADDON_LOAD)(AddonAPI* aAPI);
 typedef void (*ADDON_UNLOAD)();
 
+///----------------------------------------------------------------------------------------------------
+/// AddonDefinition Struct
+///----------------------------------------------------------------------------------------------------
 struct AddonDefinition
 {
-	/* required */
-	signed int      Signature;      /* Raidcore Addon ID, set to random unqiue negative integer if not on Raidcore */
-	signed int      APIVersion;     /* Determines which AddonAPI struct revision the Loader will pass, use the NEXUS_API_VERSION define from Nexus.h */
-	const char*     Name;           /* Name of the addon as shown in the library */
-	AddonVersion    Version;
-	const char*     Author;         /* Author of the addon */
-	const char*     Description;    /* Short description */
-	ADDON_LOAD      Load;           /* Pointer to Load Function of the addon */
-	ADDON_UNLOAD    Unload;         /* Pointer to Unload Function of the addon. Not required if EAddonFlags::DisableHotloading is set. */
-	EAddonFlags     Flags;          /* Information about the addon */
+	signed int      Signature;   /* [Required] Unique addon ID. Set to random unqiue negative integer if not hosted on Raidcore. */
+	signed int      APIVersion;  /* [Required] Determines the API revision that's passed to the Load function. Use the "NEXUS_API_VERSION" define from Nexus.h */
+	const char*     Name;        /* [Required] */
+	AddonVersion    Version;     /* [Required] */
+	const char*     Author;      /* [Required] */
+	const char*     Description; /* [Required] */
+	ADDON_LOAD      Load;        /* [Required] Pointer to Load Function. */
+	ADDON_UNLOAD    Unload;      /* [Optional] Pointer to Unload Function. Not setting it implicitly declares EAddonFlags::DisableHotloading. */
+	EAddonFlags     Flags;       /* [Optional] Additional flags changing some behaviors regarding the addon. */
 
-	/* update fallback */
-	EUpdateProvider Provider;       /* What platform is the the addon hosted on */
-	const char*     UpdateLink;     /* Link to the update resource */
+	EUpdateProvider Provider;    /* [Optional] */
+	const char*     UpdateLink;  /* [Optional] URL to update resource. Depends on provider. */
 
-	/* internal */
-	bool HasMinimumRequirements();
-	bool HasFlag(EAddonFlags aAddonFlag);
+	///----------------------------------------------------------------------------------------------------
+	/// dtor
+	///----------------------------------------------------------------------------------------------------
+	~AddonDefinition();
 
-	static void Copy(AddonDefinition* aSrc, AddonDefinition** aDst);
-	static void Free(AddonDefinition** aDefinitions);
+	///----------------------------------------------------------------------------------------------------
+	/// IsValid:
+	/// 	Returns true if the addon has all the required fields.
+	///----------------------------------------------------------------------------------------------------
+	bool IsValid();
+
+	AddonDefinition& operator=(const AddonDefinition& rhs);
 };
 
 #endif

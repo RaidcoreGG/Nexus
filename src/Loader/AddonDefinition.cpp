@@ -1,13 +1,28 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  AddonDefinition.cpp
+/// Description  :  Contains the definition for aaddons.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #include "AddonDefinition.h"
 
-bool AddonDefinition::HasMinimumRequirements()
+AddonDefinition::~AddonDefinition()
 {
-	if (Signature != 0 &&
-		Name &&
-		Author &&
-		Description &&
-		Load &&
-		(HasFlag(EAddonFlags::DisableHotloading) || Unload))
+	if (this->Name)        { free((char*)this->Name);        }
+	if (this->Author)      { free((char*)this->Author);      }
+	if (this->Description) { free((char*)this->Description); }
+	if (this->UpdateLink)  { free((char*)this->UpdateLink);  }
+}
+
+bool AddonDefinition::IsValid()
+{
+	if (this->Signature != 0 &&
+		this->Name &&
+		this->Author &&
+		this->Description &&
+		this->Load)
 	{
 		return true;
 	}
@@ -15,39 +30,16 @@ bool AddonDefinition::HasMinimumRequirements()
 	return false;
 }
 
-bool AddonDefinition::HasFlag(EAddonFlags aAddonFlag)
+AddonDefinition& AddonDefinition::operator=(const AddonDefinition& rhs)
 {
-	return (bool)(Flags & aAddonFlag);
-}
+	/* copy all */
+	memcpy_s(this, sizeof(AddonDefinition), &rhs, sizeof(AddonDefinition));
 
-void AddonDefinition::Copy(AddonDefinition* aSrc, AddonDefinition** aDst)
-{
-	if (aSrc == nullptr)
-	{
-		*aDst = new AddonDefinition{};
-		return;
-	}
+	/* deep copy strings */
+	this->Name        = rhs.Name        ? _strdup(rhs.Name)        : nullptr;
+	this->Author      = rhs.Author      ? _strdup(rhs.Author)      : nullptr;
+	this->Description = rhs.Description ? _strdup(rhs.Description) : nullptr;
+	this->UpdateLink  = rhs.UpdateLink  ? _strdup(rhs.UpdateLink)  : nullptr;
 
-	// Allocate new memory and copy data, copy strings
-	*aDst = new AddonDefinition(*aSrc);
-	(*aDst)->Name = _strdup(aSrc->Name);
-	(*aDst)->Author = _strdup(aSrc->Author);
-	(*aDst)->Description = _strdup(aSrc->Description);
-	(*aDst)->UpdateLink = aSrc->UpdateLink ? _strdup(aSrc->UpdateLink) : nullptr;
-}
-
-void AddonDefinition::Free(AddonDefinition** aDefinitions)
-{
-	if (*aDefinitions == nullptr) { return; }
-
-	free((char*)(*aDefinitions)->Name);
-	free((char*)(*aDefinitions)->Author);
-	free((char*)(*aDefinitions)->Description);
-	if ((*aDefinitions)->UpdateLink)
-	{
-		free((char*)(*aDefinitions)->UpdateLink);
-	}
-	delete* aDefinitions;
-
-	*aDefinitions = nullptr;
+	return *this;
 }

@@ -1010,9 +1010,6 @@
     <ClInclude Include="src\Services\API\APIResponse.h">
       <Filter>Services\API</Filter>
     </ClInclude>
-    <ClInclude Include="src\Loader\Addon.h">
-      <Filter>Loader\Structs</Filter>
-    </ClInclude>
     <ClInclude Include="src\Loader\EUpdateProvider.h">
       <Filter>Loader\Enums</Filter>
     </ClInclude>
@@ -1207,6 +1204,12 @@
     </ClInclude>
     <ClInclude Include="src\thirdparty\arcdps\ArcDPS.h">
       <Filter>_EXTERNAL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\EUpdateMode.h">
+      <Filter>Loader\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\Addon.h">
+      <Filter>Loader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
