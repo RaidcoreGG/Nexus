@@ -75,6 +75,7 @@ CQuickAccess::CQuickAccess(CDataLink* aDataLink, CLogHandler* aLogger, CInputBin
 	CSettings* settingsCtx = ctx->GetSettingsCtx();
 
 	this->VerticalLayout = settingsCtx->Get<bool>(OPT_QAVERTICAL, false);
+	this->ShowArcDPSShortcut = settingsCtx->Get<bool>(OPT_QASHOWARCDPS, true);
 	this->Location = settingsCtx->Get<EQAPosition>(OPT_QALOCATION, EQAPosition::Extend);
 	this->Offset.x = settingsCtx->Get<float>(OPT_QAOFFSETX, 0.0f);
 	this->Offset.y = settingsCtx->Get<float>(OPT_QAOFFSETY, 0.0f);
@@ -204,6 +205,8 @@ void CQuickAccess::Render()
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 		for (auto& [identifier, shortcut] : this->Registry)
 		{
+			if (this->ShowArcDPSShortcut == false && identifier == QA_ARCDPS) { continue; }
+
 			//Logger->Debug(CH_QUICKACCESS, "size: %f | c: %d | scale: %f", size, c, Renderer::Scaling);
 
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f }); // smol checkbox

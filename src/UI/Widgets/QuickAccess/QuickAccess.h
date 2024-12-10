@@ -30,6 +30,7 @@
 
 constexpr const char* CH_QUICKACCESS = "Quick Access";
 constexpr const char* QA_MENU = "0_QA_MENU";
+constexpr const char* QA_ARCDPS = "QA_ARCDPS";
 
 ///----------------------------------------------------------------------------------------------------
 /// CQuickAccess Class
@@ -50,10 +51,11 @@ class CQuickAccess : public virtual IWindow
 	static std::string EQAPositionToString(EQAPosition aQAPosition);
 
 	public:
-	bool                               VerticalLayout = false;
-	EQAVisibility                      Visibility     = EQAVisibility::AlwaysShow;
-	EQAPosition                        Location       = EQAPosition::Extend;
-	ImVec2                             Offset         = ImVec2(0, 0);
+	bool                               VerticalLayout     = false;
+	bool                               ShowArcDPSShortcut = true;
+	EQAVisibility                      Visibility         = EQAVisibility::AlwaysShow;
+	EQAPosition                        Location           = EQAPosition::Extend;
+	ImVec2                             Offset             = ImVec2(0, 0);
 
 	///----------------------------------------------------------------------------------------------------
 	/// ctor

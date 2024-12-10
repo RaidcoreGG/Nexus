@@ -126,6 +126,12 @@ void COptionsWindow::TabGeneral()
 					settingsctx->Set(OPT_QAVERTICAL, qactx->VerticalLayout);
 				}
 
+				/* show arcdps icon*/
+				if (ImGui::Checkbox(langApi->Translate("((000111))"), &qactx->ShowArcDPSShortcut))
+				{
+					settingsctx->Set(OPT_QASHOWARCDPS, qactx->ShowArcDPSShortcut);
+				}
+
 				/* prefetch currently selected position string */
 				std::string qaVisStr = qactx->EQAVisibilityToString(qactx->Visibility);
 				EQAVisibility newQaVis = qactx->Visibility;

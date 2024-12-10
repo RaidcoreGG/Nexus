@@ -15,6 +15,7 @@ constexpr const char* OPT_QAVISIBILITY             = "QAVisibility";
 constexpr const char* OPT_QALOCATION               = "QALocation";
 constexpr const char* OPT_QAOFFSETX                = "QAOffsetX";
 constexpr const char* OPT_QAOFFSETY                = "QAOffsetY";
+constexpr const char* OPT_QASHOWARCDPS             = "QAShowArcDPS";
 constexpr const char* OPT_LINKARCSTYLE             = "LinkWithArcDPSStyle";
 constexpr const char* OPT_IMGUISTYLE               = "ImGuiStyle";
 constexpr const char* OPT_IMGUICOLORS              = "ImGuiColors";
