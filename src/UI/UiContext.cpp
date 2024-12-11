@@ -271,7 +271,7 @@ CUiContext::CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CText
 
 	this->Alerts         = new CAlerts(aDataLink);
 	this->MainWindow     = new CMainWindow();
-	this->QuickAccess    = new CQuickAccess(aDataLink, aLogger, aInputBindApi, aTextureService, aLocalization);
+	this->QuickAccess    = new CQuickAccess(aDataLink, aLogger, aInputBindApi, aTextureService, aLocalization, aEventApi);
 
 	this->FontManager    = new CFontManager(aLocalization);
 	this->EscapeClose    = new CEscapeClosing();

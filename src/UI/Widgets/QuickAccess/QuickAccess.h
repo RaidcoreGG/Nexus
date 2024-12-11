@@ -50,6 +50,12 @@ class CQuickAccess : public virtual IWindow
 	///----------------------------------------------------------------------------------------------------
 	static std::string EQAPositionToString(EQAPosition aQAPosition);
 
+	///----------------------------------------------------------------------------------------------------
+	/// OnAddonLoaded:
+	/// 	Rechecks invalid shortcuts on addon load.
+	///----------------------------------------------------------------------------------------------------
+	static void OnAddonLoaded(void* aEventData);
+
 	public:
 	bool                               VerticalLayout     = false;
 	bool                               ShowArcDPSShortcut = true;
@@ -60,7 +66,7 @@ class CQuickAccess : public virtual IWindow
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CQuickAccess(CDataLink* aDataLink, CLogHandler* aLogger, CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization);
+	CQuickAccess(CDataLink* aDataLink, CLogHandler* aLogger, CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization, CEventApi* aEventApi);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -139,6 +145,12 @@ class CQuickAccess : public virtual IWindow
 	///----------------------------------------------------------------------------------------------------
 	int Verify(void* aStartAddress, void* aEndAddress);
 
+	///----------------------------------------------------------------------------------------------------
+	/// Validate:
+	/// 	Validates all shortcuts.
+	///----------------------------------------------------------------------------------------------------
+	void Validate(bool aLock);
+
 	private:
 	NexusLinkData*                     NexusLink;
 	Mumble::Data*                      MumbleLink;
@@ -146,6 +158,7 @@ class CQuickAccess : public virtual IWindow
 	CInputBindApi*                     InputBindApi;
 	CTextureLoader*                    TextureService;
 	CLocalization*                     Language;
+	CEventApi*                         EventApi;
 
 	mutable std::mutex                 Mutex;
 	std::map<std::string, Shortcut>    Registry;
@@ -155,11 +168,19 @@ class CQuickAccess : public virtual IWindow
 
 	Texture*                           IconNotification  = nullptr;
 
+	bool                               HasArcDPSShortcut = false;
+
 	///----------------------------------------------------------------------------------------------------
 	/// WhereAreMyParents:
 	/// 	Returns orphaned context items to their parents.
 	///----------------------------------------------------------------------------------------------------
 	void WhereAreMyParents();
+
+	///----------------------------------------------------------------------------------------------------
+	/// IsValid:
+	/// 	Returns true if the passed shortcut is valid. Not threadsafe.
+	///----------------------------------------------------------------------------------------------------
+	bool IsValid(const Shortcut& aShortcut);
 };
 
 #endif

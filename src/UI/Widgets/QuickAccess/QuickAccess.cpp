@@ -62,7 +62,16 @@ std::string CQuickAccess::EQAPositionToString(EQAPosition aQAPosition)
 	}
 }
 
-CQuickAccess::CQuickAccess(CDataLink* aDataLink, CLogHandler* aLogger, CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization)
+void CQuickAccess::OnAddonLoaded(void* aEventData)
+{
+	CContext* ctx = CContext::GetContext();
+	CUiContext* uictx = ctx->GetUIContext();
+	CQuickAccess* qactx = uictx->GetQuickAccess();
+
+	qactx->Validate(true);
+}
+
+CQuickAccess::CQuickAccess(CDataLink* aDataLink, CLogHandler* aLogger, CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization, CEventApi* aEventApi)
 {
 	this->NexusLink = (NexusLinkData*)aDataLink->GetResource(DL_NEXUS_LINK);
 	this->MumbleLink = (Mumble::Data*)aDataLink->GetResource(DL_MUMBLE_LINK);
@@ -70,6 +79,7 @@ CQuickAccess::CQuickAccess(CDataLink* aDataLink, CLogHandler* aLogger, CInputBin
 	this->InputBindApi = aInputBindApi;
 	this->TextureService = aTextureService;
 	this->Language = aLocalization;
+	this->EventApi = aEventApi;
 
 	CContext* ctx = CContext::GetContext();
 	CSettings* settingsCtx = ctx->GetSettingsCtx();
@@ -80,16 +90,21 @@ CQuickAccess::CQuickAccess(CDataLink* aDataLink, CLogHandler* aLogger, CInputBin
 	this->Offset.x = settingsCtx->Get<float>(OPT_QAOFFSETX, 0.0f);
 	this->Offset.y = settingsCtx->Get<float>(OPT_QAOFFSETY, 0.0f);
 	this->Visibility = settingsCtx->Get<EQAVisibility>(OPT_QAVISIBILITY, EQAVisibility::AlwaysShow);
+
+	this->EventApi->Subscribe(EV_ADDON_LOADED, CQuickAccess::OnAddonLoaded);
 }
 
 CQuickAccess::~CQuickAccess()
 {
+	this->EventApi->Unsubscribe(EV_ADDON_LOADED, CQuickAccess::OnAddonLoaded);
+
 	this->NexusLink = nullptr;
 	this->MumbleLink = nullptr;
 	this->Logger = nullptr;
 	this->InputBindApi = nullptr;
 	this->TextureService = nullptr;
 	this->Language = nullptr;
+	this->EventApi = nullptr;
 }
 
 void CQuickAccess::Render()
@@ -113,7 +128,6 @@ void CQuickAccess::Render()
 		this->IsInvalid = false;
 	}
 
-	this->NexusLink->QuickAccessIconsCount = static_cast<int>(this->Registry.size());
 	this->NexusLink->QuickAccessMode = (int)this->Location;
 	this->NexusLink->QuickAccessIsVertical = this->VerticalLayout;
 
@@ -205,7 +219,7 @@ void CQuickAccess::Render()
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 		for (auto& [identifier, shortcut] : this->Registry)
 		{
-			if (this->ShowArcDPSShortcut == false && identifier == QA_ARCDPS) { continue; }
+			if (!shortcut.IsValid) { continue; }
 
 			//Logger->Debug(CH_QUICKACCESS, "size: %f | c: %d | scale: %f", size, c, Renderer::Scaling);
 
@@ -415,10 +429,17 @@ void CQuickAccess::AddShortcut(const char* aIdentifier, const char* aTextureIden
 			int amt = 0;
 			if (sh.TextureNormal != nullptr) { amt++; }
 			if (sh.TextureHover != nullptr) { amt++; }
+
+			if (str == QA_ARCDPS)
+			{
+				this->HasArcDPSShortcut = true;
+			}
 		}
 	}
 
 	this->WhereAreMyParents();
+
+	this->Validate(true);
 }
 
 void CQuickAccess::RemoveShortcut(const char* aIdentifier)
@@ -431,6 +452,11 @@ void CQuickAccess::RemoveShortcut(const char* aIdentifier)
 
 	if (it != this->Registry.end())
 	{
+		if (strcmp(aIdentifier, QA_ARCDPS) == 0)
+		{
+			this->HasArcDPSShortcut = false;
+		}
+
 		for (auto& orphan : it->second.ContextItems)
 		{
 			this->OrphanedCallbacks[orphan.first] = orphan.second;
@@ -438,6 +464,8 @@ void CQuickAccess::RemoveShortcut(const char* aIdentifier)
 	}
 
 	this->Registry.erase(str);
+
+	this->Validate(false);
 }
 
 void CQuickAccess::NotifyShortcut(const char* aIdentifier)
@@ -494,6 +522,8 @@ void CQuickAccess::AddContextItem(const char* aIdentifier, const char* aTargetSh
 	{
 		this->OrphanedCallbacks[str] = shortcut;
 	}
+
+	this->Validate(false);
 }
 
 void CQuickAccess::RemoveContextItem(const char* aIdentifier)
@@ -508,6 +538,8 @@ void CQuickAccess::RemoveContextItem(const char* aIdentifier)
 	}
 
 	this->OrphanedCallbacks.erase(aIdentifier);
+
+	this->Validate(false);
 }
 
 std::map<std::string, Shortcut> CQuickAccess::GetRegistry() const
@@ -543,11 +575,6 @@ int CQuickAccess::Verify(void* aStartAddress, void* aEndAddress)
 				refCounter++;
 			}
 		}
-
-		for (std::string remidentifier : remove)
-		{
-			shortcut.ContextItems.erase(remidentifier);
-		}
 	}
 
 	/* remove bastard children */
@@ -567,7 +594,38 @@ int CQuickAccess::Verify(void* aStartAddress, void* aEndAddress)
 		this->OrphanedCallbacks.erase(remidentifier);
 	}
 
+	this->Validate(false);
+
 	return refCounter;
+}
+
+void CQuickAccess::Validate(bool aLock)
+{
+	if (aLock)
+	{
+		this->Mutex.lock();
+	}
+
+	int amtValid = 0;
+
+	for (auto& [identifier, shortcut] : this->Registry)
+	{
+		shortcut.IsValid = this->IsValid(shortcut);
+
+		if (this->ShowArcDPSShortcut == false && identifier == QA_ARCDPS)
+		{
+			shortcut.IsValid = false;
+		}
+
+		if (shortcut.IsValid) { amtValid++; }
+	}
+
+	if (aLock)
+	{
+		this->Mutex.unlock();
+	}
+
+	this->NexusLink->QuickAccessIconsCount = amtValid;
 }
 
 void CQuickAccess::WhereAreMyParents()
@@ -590,4 +648,9 @@ void CQuickAccess::WhereAreMyParents()
 	{
 		this->OrphanedCallbacks.erase(remidentifier);
 	}
+}
+
+bool CQuickAccess::IsValid(const Shortcut& aShortcut)
+{
+	return aShortcut.ContextItems.size() > 0 || this->InputBindApi->HasHandler(aShortcut.IBIdentifier);
 }

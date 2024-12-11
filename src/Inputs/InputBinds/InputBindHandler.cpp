@@ -503,6 +503,19 @@ std::string CInputBindApi::IsInUse(InputBind aInputBind)
 	return "";
 }
 
+bool CInputBindApi::HasHandler(const std::string& aIdentifier)
+{
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	auto it = this->Registry.find(aIdentifier);
+	if (it != this->Registry.end())
+	{
+		return it->second.Handler != nullptr;
+	}
+	
+	return false;
+}
+
 const InputBind& CInputBindApi::Get(const std::string& aIdentifier)
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);

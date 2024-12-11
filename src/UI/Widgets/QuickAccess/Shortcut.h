@@ -23,6 +23,8 @@ struct ContextItem
 
 struct Shortcut
 {
+	bool                               IsValid;
+
 	int                                TextureGetAttempts;
 	std::string                        TextureNormalIdentifier;
 	std::string                        TextureHoverIdentifier;

@@ -130,6 +130,7 @@ void COptionsWindow::TabGeneral()
 				if (ImGui::Checkbox(langApi->Translate("((000111))"), &qactx->ShowArcDPSShortcut))
 				{
 					settingsctx->Set(OPT_QASHOWARCDPS, qactx->ShowArcDPSShortcut);
+					qactx->Validate(true);
 				}
 
 				/* prefetch currently selected position string */
