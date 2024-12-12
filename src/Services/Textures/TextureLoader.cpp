@@ -57,11 +57,7 @@ Texture* CTextureLoader::GetOrCreate(const char* aIdentifier, const char* aFilen
 {
 	Texture* result = Get(aIdentifier);
 
-	if (this->OverrideTexture(aIdentifier, nullptr))
-	{
-		return result;
-	}
-	else if (!result)
+	if (!result)
 	{
 		this->Load(aIdentifier, aFilename, nullptr);
 	}
@@ -73,11 +69,7 @@ Texture* CTextureLoader::GetOrCreate(const char* aIdentifier, unsigned aResource
 {
 	Texture* result = this->Get(aIdentifier);
 
-	if (this->OverrideTexture(aIdentifier, nullptr))
-	{
-		return result;
-	}
-	else if (!result)
+	if (!result)
 	{
 		this->Load(aIdentifier, aResourceID, aModule, nullptr);
 	}
@@ -89,11 +81,7 @@ Texture* CTextureLoader::GetOrCreate(const char* aIdentifier, const char* aRemot
 {
 	Texture* result = this->Get(aIdentifier);
 
-	if (this->OverrideTexture(aIdentifier, nullptr))
-	{
-		return result;
-	}
-	else if (!result)
+	if (!result)
 	{
 		this->Load(aIdentifier, aRemote, aEndpoint, nullptr);
 	}
@@ -105,11 +93,7 @@ Texture* CTextureLoader::GetOrCreate(const char* aIdentifier, void* aData, size_
 {
 	Texture* result = this->Get(aIdentifier);
 
-	if (this->OverrideTexture(aIdentifier, nullptr))
-	{
-		return result;
-	}
-	else if (!result)
+	if (!result)
 	{
 		this->Load(aIdentifier, aData, aSize, nullptr);
 	}
