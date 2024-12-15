@@ -14,7 +14,7 @@
 
 #include "Context.h"
 #include "resource.h"
-#include "Util/Resources.h"
+#include "Util/src/Resources.h"
 
 CFontManager::CFontManager(CLocalization* aLocalization)
 {

@@ -17,7 +17,7 @@
 #include "Renderer.h"
 #include "resource.h"
 #include "Shared.h"
-#include "Util/Strings.h"
+#include "Util/src/Strings.h"
 
 #include "Index.h"
 #include "Loader/ArcDPS.h"

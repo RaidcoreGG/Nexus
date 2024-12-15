@@ -19,7 +19,7 @@
 #include "Inputs/InputBinds/InputBindHandler.h"
 #include "resource.h"
 #include "Util/MD5.h"
-#include "Util/Strings.h"
+#include "Util/src/Strings.h"
 
 static CDebugWindow* DebugWindow = nullptr;
 static void DebugWindow_OnInputBind(const char* aIdentifier)

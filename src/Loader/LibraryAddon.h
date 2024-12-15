@@ -26,7 +26,6 @@ struct LibraryAddon
 	std::string     DownloadURL;
 	std::string     ToSComplianceNotice;
 	int             PolicyTier;
-	bool            IsNew;
 };
 
 #endif

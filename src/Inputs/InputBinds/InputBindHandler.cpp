@@ -19,8 +19,8 @@ using json = nlohmann::json;
 #include "Consts.h"
 #include "Index.h"
 #include "State.h"
-#include "Util/Strings.h"
-#include "Util/Inputs.h"
+#include "Util/src/Strings.h"
+#include "Util/src/Inputs.h"
 
 InputBind CInputBindApi::IBFromString(std::string aInputBind)
 {

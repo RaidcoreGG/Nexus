@@ -25,8 +25,8 @@
 #include "Services/Settings/Settings.h"
 #include "Services/Updater/Updater.h"
 #include "UI/UiContext.h"
-#include "Util/CmdLine.h"
-#include "Util/Strings.h"
+#include "Util/src/CmdLine.h"
+#include "Util/src/Strings.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;

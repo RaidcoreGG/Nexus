@@ -1,6 +1,6 @@
 #include "EUpdateProvider.h"
 
-#include "Util/Strings.h"
+#include "Util/src/Strings.h"
 
 EUpdateProvider GetProvider(const std::string& aUrl)
 {

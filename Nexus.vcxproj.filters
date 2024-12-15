@@ -252,7 +252,7 @@
     <ClCompile Include="src\Inputs\InputBinds\InputBind.cpp">
       <Filter>Inputs\InputBinds</Filter>
     </ClCompile>
-    <ClCompile Include="src\Loader\Loader.cpp">
+    <ClCompile Include="src\Loader\OLD_Loader.cpp">
       <Filter>Loader</Filter>
     </ClCompile>
     <ClCompile Include="src\Services\DataLink\DataLink.cpp">
@@ -285,9 +285,6 @@
     <ClCompile Include="src\Services\API\ApiClient.cpp">
       <Filter>Services\API</Filter>
     </ClCompile>
-    <ClCompile Include="src\Loader\EAddonFlags.cpp">
-      <Filter>Loader\Enums</Filter>
-    </ClCompile>
     <ClCompile Include="src\Loader\AddonDefinition.cpp">
       <Filter>Loader\Structs</Filter>
     </ClCompile>
@@ -297,53 +294,26 @@
     <ClCompile Include="src\Events\EventSubscriber.cpp">
       <Filter>Events</Filter>
     </ClCompile>
-    <ClCompile Include="src\Loader\ArcDPS.cpp">
+    <ClCompile Include="src\Loader\OLD_ArcDPS.cpp">
       <Filter>Loader</Filter>
     </ClCompile>
-    <ClCompile Include="src\Loader\Library.cpp">
+    <ClCompile Include="src\Loader\OLD_Library.cpp">
       <Filter>Loader</Filter>
     </ClCompile>
     <ClCompile Include="src\Services\Updater\Updater.cpp">
       <Filter>Services\Updater</Filter>
     </ClCompile>
-    <ClCompile Include="src\Util\Strings.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
     <ClCompile Include="src\Util\MD5.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Util\Url.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Util\Base64.cpp">
       <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="src\Loader\EUpdateProvider.cpp">
       <Filter>Loader\Enums</Filter>
     </ClCompile>
-    <ClCompile Include="src\Util\Time.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Util\Paths.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Util\Resources.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Util\DLL.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
     <ClCompile Include="src\Inputs\GameBinds\GameBindsHandler.cpp">
       <Filter>Inputs\GameBinds</Filter>
     </ClCompile>
-    <ClCompile Include="src\Util\Inputs.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
     <ClCompile Include="src\Loader\AddonVersion.cpp">
       <Filter>Loader\Structs</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Util\Memory.cpp">
-      <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="src\UI\Controls\CtlSubWindow.cpp">
       <Filter>UI\Controls</Filter>
@@ -399,14 +369,47 @@
     <ClCompile Include="src\UI\Controls\CtlWindow.cpp">
       <Filter>UI\Controls</Filter>
     </ClCompile>
-    <ClCompile Include="src\Util\CmdLine.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
     <ClCompile Include="src\Loader\API\ApiFunctionMapper.cpp">
       <Filter>Loader\API</Filter>
     </ClCompile>
     <ClCompile Include="src\UI\Widgets\MainWindow\SnowflakeMgr.cpp">
       <Filter>UI\Widgets\MainWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Loader\Addon.cpp">
+      <Filter>Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thirdparty\Util\src\Inputs.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thirdparty\Util\src\Memory.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thirdparty\Util\src\Paths.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thirdparty\Util\src\Resources.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thirdparty\Util\src\Strings.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thirdparty\Util\src\Time.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thirdparty\Util\src\Url.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thirdparty\Util\src\Base64.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thirdparty\Util\src\CmdLine.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thirdparty\Util\src\DLL.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Loader\Loader.cpp">
+      <Filter>Loader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -494,7 +497,7 @@
     <ClInclude Include="src\thirdparty\imgui\imgui_extensions.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="src\Loader\Loader.h">
+    <ClInclude Include="src\Loader\OLD_Loader.h">
       <Filter>Loader</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\DataLink\DataLink.h">
@@ -1019,7 +1022,7 @@
     <ClInclude Include="src\Loader\EAddonState.h">
       <Filter>Loader\Enums</Filter>
     </ClInclude>
-    <ClInclude Include="src\Loader\EAddonFlags.h">
+    <ClInclude Include="src\Loader\EAddonDefFlags.h">
       <Filter>Loader\Enums</Filter>
     </ClInclude>
     <ClInclude Include="src\Loader\LibraryAddon.h">
@@ -1037,25 +1040,16 @@
     <ClInclude Include="src\Events\EventSubscriber.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="src\Loader\ArcDPS.h">
+    <ClInclude Include="src\Loader\OLD_ArcDPS.h">
       <Filter>Loader</Filter>
     </ClInclude>
-    <ClInclude Include="src\Loader\Library.h">
+    <ClInclude Include="src\Loader\OLD_Library.h">
       <Filter>Loader</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\Updater\Updater.h">
       <Filter>Services\Updater</Filter>
     </ClInclude>
-    <ClInclude Include="src\Util\Strings.h">
-      <Filter>Util</Filter>
-    </ClInclude>
     <ClInclude Include="src\Util\MD5.h">
-      <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Util\Url.h">
-      <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Util\Base64.h">
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\Updater\FuncDefs.h">
@@ -1064,35 +1058,17 @@
     <ClInclude Include="src\Services\Mumble\Definitions\Mumble.h">
       <Filter>Services\Mumble</Filter>
     </ClInclude>
-    <ClInclude Include="src\Util\Time.h">
-      <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Util\Paths.h">
-      <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Util\Resources.h">
-      <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Util\DLL.h">
-      <Filter>Util</Filter>
-    </ClInclude>
     <ClInclude Include="src\Inputs\GameBinds\GameBindsHandler.h">
       <Filter>Inputs\GameBinds</Filter>
     </ClInclude>
     <ClInclude Include="src\Inputs\GameBinds\EGameBinds.h">
       <Filter>Inputs\GameBinds\Enums</Filter>
     </ClInclude>
-    <ClInclude Include="src\Util\Inputs.h">
-      <Filter>Util</Filter>
-    </ClInclude>
     <ClInclude Include="src\Loader\AddonVersion.h">
       <Filter>Loader\Structs</Filter>
     </ClInclude>
     <ClInclude Include="src\Inputs\GameBinds\FuncDefs.h">
       <Filter>Inputs\GameBinds</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Util\Memory.h">
-      <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="src\Inputs\InputBinds\EInputBindHandlerType.h">
       <Filter>Inputs\InputBinds\Enums</Filter>
@@ -1190,9 +1166,6 @@
     <ClInclude Include="src\UI\DisplayBinds.h">
       <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="src\Util\CmdLine.h">
-      <Filter>Util</Filter>
-    </ClInclude>
     <ClInclude Include="src\Loader\API\ApiFunctionMapper.h">
       <Filter>Loader\API</Filter>
     </ClInclude>
@@ -1209,6 +1182,48 @@
       <Filter>Loader\Enums</Filter>
     </ClInclude>
     <ClInclude Include="src\Loader\Addon.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\Loader.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\AddonPreferences.h">
+      <Filter>Loader\Structs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\thirdparty\Util\src\DLL.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\thirdparty\Util\src\Enums.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\thirdparty\Util\src\Inputs.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\thirdparty\Util\src\Memory.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\thirdparty\Util\src\Paths.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\thirdparty\Util\src\Resources.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\thirdparty\Util\src\Strings.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\thirdparty\Util\src\Time.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\thirdparty\Util\src\Url.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\thirdparty\Util\src\Base64.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\thirdparty\Util\src\CmdLine.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\LoaderConst.h">
       <Filter>Loader</Filter>
     </ClInclude>
   </ItemGroup>

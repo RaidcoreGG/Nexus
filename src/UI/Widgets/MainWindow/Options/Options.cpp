@@ -16,8 +16,8 @@
 #include "Index.h"
 #include "Renderer.h"
 #include "resource.h"
-#include "Util/Base64.h"
-#include "Util/Time.h"
+#include "Util/src/Base64.h"
+#include "Util/src/Time.h"
 
 COptionsWindow::COptionsWindow()
 {

@@ -8,7 +8,7 @@
 
 #include "Index.h"
 
-#include "Util/Paths.h"
+#include "Util/src/Paths.h"
 
 namespace Index
 {

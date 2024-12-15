@@ -15,9 +15,9 @@
 #include <vector>
 #include <string>
 
-#include "Util/Strings.h"
-#include "Util/DLL.h"
-#include "Util/CmdLine.h"
+#include "Util/src/Strings.h"
+#include "Util/src/DLL.h"
+#include "Util/src/CmdLine.h"
 
 typedef struct _SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX
 {

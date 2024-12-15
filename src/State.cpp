@@ -11,8 +11,8 @@
 #include "Shared.h"
 #include "Index.h"
 
-#include "Util/Strings.h"
-#include "Util/CmdLine.h"
+#include "Util/src/Strings.h"
+#include "Util/src/CmdLine.h"
 
 namespace State
 {

@@ -11,7 +11,7 @@
 
 #include "API/ApiDefs.h"
 #include "AddonVersion.h"
-#include "EAddonFlags.h"
+#include "EAddonDefFlags.h"
 #include "EUpdateProvider.h"
 
 typedef void (*ADDON_LOAD)(AddonAPI* aAPI);
@@ -30,7 +30,7 @@ struct AddonDefinition
 	const char*     Description; /* [Required] */
 	ADDON_LOAD      Load;        /* [Required] Pointer to Load Function. */
 	ADDON_UNLOAD    Unload;      /* [Optional] Pointer to Unload Function. Not setting it implicitly declares EAddonFlags::DisableHotloading. */
-	EAddonFlags     Flags;       /* [Optional] Additional flags changing some behaviors regarding the addon. */
+	EAddonDefFlags  Flags;       /* [Optional] Additional flags changing some behaviors regarding the addon. */
 
 	EUpdateProvider Provider;    /* [Optional] */
 	const char*     UpdateLink;  /* [Optional] URL to update resource. Depends on provider. */

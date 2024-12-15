@@ -11,6 +11,7 @@
 #include "Inputs/InputBinds/InputBindHandler.h"
 #include "Inputs/RawInput/RawInputApi.h"
 #include "Loader/AddonVersion.h"
+#include "Loader/Loader.h"
 #include "Services/DataLink/DataLink.h"
 #include "Services/Localization/Localization.h"
 #include "Services/Logging/LogHandler.h"
@@ -41,29 +42,31 @@ class CContext
 
 	DWORD GetModuleSize();
 
-	CLogHandler* GetLogger();
-
-	CLocalization* GetLocalization();
-
-	CUpdater* GetUpdater();
-
-	CTextureLoader* GetTextureService();
-
 	CDataLink* GetDataLink();
 
 	CEventApi* GetEventApi();
 
-	CRawInputApi* GetRawInputApi();
+	CGameBindsApi* GetGameBindsApi();
 
 	CInputBindApi* GetInputBindApi();
 
-	CGameBindsApi* GetGameBindsApi();
+	CLoader* GetLoader();
 
-	CUiContext* GetUIContext();
+	CLocalization* GetLocalization();
+
+	CLogHandler* GetLogger();
+
+	CMumbleReader* GetMumbleReader();
+
+	CRawInputApi* GetRawInputApi();
 
 	CSettings* GetSettingsCtx();
 
-	CMumbleReader* GetMumbleReader();
+	CTextureLoader* GetTextureService();
+
+	CUiContext* GetUIContext();
+
+	CUpdater* GetUpdater();
 
 	private:
 	CContext() = default;

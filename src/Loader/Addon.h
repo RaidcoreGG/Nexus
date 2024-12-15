@@ -18,8 +18,16 @@
 
 #include "EAddonState.h"
 #include "AddonDefinition.h"
-#include "EUpdateMode.h"
 #include "LibraryAddon.h"
+#include "AddonPreferences.h"
+#include "Loader.h"
+#include "Events/EventHandler.h"
+#include "Services/Logging/LogHandler.h"
+#include "LoaderConst.h"
+#include "Consts.h"
+
+/* prototype for cyclic dependency */
+class CLoader;
 
 ///----------------------------------------------------------------------------------------------------
 /// EAddonType Enumeration
@@ -28,9 +36,49 @@ enum class EAddonType
 {
 	None,
 	Nexus,
-	AddonConfig,
 	Library,
-	ArcDPS
+	ArcDPS,
+	Incompatible
+};
+
+///----------------------------------------------------------------------------------------------------
+/// AddonFlags Struct
+///----------------------------------------------------------------------------------------------------
+struct AddonFlags
+{
+	/* Behavior flags */
+	bool                   IsLocked             : 1; /* Set if the state can no longer be changed. E.g. because of EAddonFlags::DisableHotloading. */
+
+	/* Info flags */
+	bool                   IsModuleLoaded       : 1; /* Set when LoadLibrary was called. */
+	bool                   IsUpdateAvailable    : 1; /* Set when an update is available after checking. */
+	bool                   UninstallNextLaunch  : 1; /* Set when the addon is locked and/or can't remove the file on disk. */
+
+	/* Action flags */
+	bool                   IsCheckingForUpdates : 1; /* Set when an update check is currently running. */
+	bool                   IsUpdating           : 1; /* Set while the addon is updating. */
+	bool                   IsLoading            : 1; /* Set when the addon is currently loading. */
+	bool                   IsUnloading          : 1; /* Set when the addon is currently unloading. */
+	bool                   IsInstalling         : 1; /* Set for library addons when installing. */
+	bool                   IsUninstalling       : 1; /* Set when the addon is currently uninstalling. */
+
+	/* Pref flags */
+	bool                   LoadNextLaunch       : 1; /* Set when the addon is locked and should be loaded next game start. E.g. because of EAddonFlags::OnlyLoadOnGameLaunch. */
+	bool                   UnloadNextLaunch     : 1; /* Set when the addon is locked and should be unloaded next game start. */
+};
+
+///----------------------------------------------------------------------------------------------------
+/// EAddonAction Enumeration
+///----------------------------------------------------------------------------------------------------
+enum class EAddonAction
+{
+	None,
+	Load,
+	Unload,
+	Install,
+	Uninstall,
+	CheckUpdate,
+	Update
 };
 
 ///----------------------------------------------------------------------------------------------------
@@ -42,17 +90,12 @@ class CAddon
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CAddon(signed int aSignature);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ctor
-	///----------------------------------------------------------------------------------------------------
 	CAddon(AddonDefinition* aAddonDef);
 
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CAddon(ArcDPS::PluginInfo* aPluginDef);
+	CAddon(ArcdpsPlugin* aPluginDef);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -60,23 +103,90 @@ class CAddon
 	~CAddon();
 
 	///----------------------------------------------------------------------------------------------------
-	/// Merge:
-	/// 	Merges an addon definition into a config.
+	/// GetFlags:
+	/// 	Returns flags of the addon.
 	///----------------------------------------------------------------------------------------------------
-	void Merge(AddonDefinition* aAddonDef);
+	const AddonFlags& GetFlags();
+
+	///----------------------------------------------------------------------------------------------------
+	/// IsUpdateAvailable:
+	/// 	Returns true if an update is available.
+	///----------------------------------------------------------------------------------------------------
+	bool IsUpdateAvailable();
+	
+	///----------------------------------------------------------------------------------------------------
+	/// GetError:
+	/// 	Returns the current error message.
+	///----------------------------------------------------------------------------------------------------
+	std::string GetError();
+
+	///----------------------------------------------------------------------------------------------------
+	/// OwnsAddress:
+	/// 	Returns true if the address is part of the addons address space.
+	///----------------------------------------------------------------------------------------------------
+	bool OwnsAddress(void* aAddress);
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetName:
+	/// 	Returns the name of the addon.
+	///----------------------------------------------------------------------------------------------------
+	std::string GetName();
+
+	///----------------------------------------------------------------------------------------------------
+	/// QueueAction:
+	/// 	Queues and performs an action.
+	///----------------------------------------------------------------------------------------------------
+	void QueueAction(EAddonAction aAction);
+
+	private:
+	CLoader*                   Loader;
+	CEventApi*                 EventApi;
+	CLogHandler*               Logger;
+
+	EAddonAction               QueuedAction;
+	std::condition_variable    ConVar;
+	bool                       IsCanceled;
+	std::mutex                 ProcessorMutex;
+	std::thread                ProcessorThread;
+
+	std::mutex                 Mutex;
+	EAddonType                 Type;
+	EAddonState                State;
+	AddonFlags                 Flags;
+	std::string                ErrorDescription;
+
+	AddonPreferences*          Preferences;
+	LibraryAddon*              LibraryDef;       /* Used when the addon is available for download. */
+
+	union /* Definitions */
+	{
+		AddonDefinition        AddonDef;         /* Used for Nexus addons. */
+		ArcdpsPlugin           PluginDef;        /* Used for ArcDPS plugins. */
+	};
+	std::filesystem::path      Location;         /* Contains the intended location. */
+	std::filesystem::path      RealLocation;     /* Contains the real location. E.g. .tmp path during updates. */
+	std::vector<unsigned char> MD5;
+	HMODULE                    Module;
+	size_t                     ModuleSize;
+
+	///----------------------------------------------------------------------------------------------------
+	/// Process:
+	/// 	Performs queued actions.
+	///----------------------------------------------------------------------------------------------------
+	void Process();
 
 	///----------------------------------------------------------------------------------------------------
 	/// Load:
 	/// 	Loads the addon.
 	///----------------------------------------------------------------------------------------------------
 	void Load();
-	
+
 	///----------------------------------------------------------------------------------------------------
 	/// Unload:
 	/// 	Unloads the addon.
 	///----------------------------------------------------------------------------------------------------
 	void Unload();
-	
+
 	///----------------------------------------------------------------------------------------------------
 	/// Install:
 	/// 	Installs the addon.
@@ -88,7 +198,7 @@ class CAddon
 	/// 	Uninstalls the addon.
 	///----------------------------------------------------------------------------------------------------
 	void Uninstall();
-	
+
 	///----------------------------------------------------------------------------------------------------
 	/// CheckForUpdate:
 	/// 	Checks if an update is available.
@@ -96,89 +206,10 @@ class CAddon
 	void CheckForUpdate();
 
 	///----------------------------------------------------------------------------------------------------
-	/// IsUpdateAvailable:
-	/// 	Returns true if an update is available.
-	///----------------------------------------------------------------------------------------------------
-	bool IsUpdateAvailable();
-	
-	///----------------------------------------------------------------------------------------------------
 	/// Update:
 	/// 	Updates the addon.
 	///----------------------------------------------------------------------------------------------------
 	void Update();
-
-	///----------------------------------------------------------------------------------------------------
-	/// OwnsAddress:
-	/// 	Returns true if the passed address is part of the addon's address space.
-	///----------------------------------------------------------------------------------------------------
-	bool OwnsAddress(void* aAddress);
-
-	///----------------------------------------------------------------------------------------------------
-	/// GetError:
-	/// 	Returns the current error message.
-	///----------------------------------------------------------------------------------------------------
-	std::string GetError();
-
-	///----------------------------------------------------------------------------------------------------
-	/// IsPersistent:
-	/// 	Returns true if the addon should store data.
-	///----------------------------------------------------------------------------------------------------
-	bool IsPersistent();
-
-	private:
-	std::mutex                 Mutex;
-	EAddonType                 Type;
-	EAddonState                State;
-	struct
-	{
-		/* Behavior flags */
-		bool                   IsLocked             : 1; /* Set if the addon declares EAddonFlags::DisableHotloading. */
-
-		/* Update flags*/
-		bool                   IsCheckingForUpdates : 1; /* Set when an update check is currently running. */
-		bool                   IsUpdateAvailable    : 1; /* Set when an update is available after checking. */
-
-		/* Transition flags */
-		bool                   IsUpdating           : 1; /* Set while the addon is updating. */
-		bool                   IsDisabling          : 1; /* Set when the addon is currently unloading. */
-		bool                   IsInstalling         : 1; /* Set for library addons when installing. */
-		bool                   IsUninstalling       : 1; /* Set when the addon is currently uninstalling. */
-
-		/* Restart flags */
-		bool                   EnableNextLaunch     : 1; /* Set when the addon is locked and should enable next game start. E.g. because of EAddonFlags::OnlyLoadOnGameLaunch. */
-		bool                   DisableNextLaunch    : 1; /* Set when the addon is locked and should disable next game start. */
-		bool                   UninstallNextLaunch  : 1; /* Set when the addon is locked and/or can't remove the file on disk. */
-	} Flags;
-
-	struct
-	{
-		EUpdateMode            UpdateMode;               /* Behavior regarding updates. */
-		bool                   AllowPreReleases;         /* If the update provider supports pre-releases. */
-		bool                   IsFavorite;               /* Marked as favorite. */
-		bool                   IsDisabledUntilUpdate;    /* Overrides UpdateMode::Disable to prompt instead. */
-	} Preferences;
-
-	std::filesystem::path      Location;                 /* Contains the intended location. */
-	std::filesystem::path      RealLocation;             /* Contains the real location. E.g. .tmp path during updates. */
-	std::vector<unsigned char> MD5;
-	HMODULE                    Module;
-	size_t                     ModuleSize;
-
-	std::string                ErrorDescription;
-
-	union /* Definitions */
-	{
-		AddonDefinition        AddonDef;                 /* Used for Nexus addons. */
-		signed int             Signature;                /* Used when the addon is initialized from config. */
-		ArcDPS::PluginInfo     PluginDef;                /* Used for ArcDPS plugins. */
-	};
-	LibraryAddon*              LibraryDef;               /* Used when the addon is available for download. */
-
-	///----------------------------------------------------------------------------------------------------
-	/// Free:
-	/// 	Calls free library and frees other resources.
-	///----------------------------------------------------------------------------------------------------
-	void Free();
 
 	///----------------------------------------------------------------------------------------------------
 	/// ShouldUpdate:

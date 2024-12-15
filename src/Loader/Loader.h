@@ -2,74 +2,40 @@
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
 /// Name         :  Loader.h
-/// Description  :  Handles addon hot-loading, updates etc.
+/// Description  :  Addon loader component for managing addons.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
 #ifndef LOADER_H
 #define LOADER_H
 
-#include <mutex>
-#include <map>
+#include <string>
 #include <vector>
 #include <unordered_map>
-#include <thread>
+#include <mutex>
 #include <filesystem>
 #include <Shlobj.h>
-#include <condition_variable>
 
-#include "ELoaderAction.h"
+#include "LoaderConst.h"
 #include "Addon.h"
-#include "API/AddonAPI.h"
+#include "AddonPreferences.h"
+#include "Services/Logging/LogHandler.h"
 
-#include "Loader/NexusLinkData.h"
-
-constexpr const UINT WM_ADDONDIRUPDATE = WM_USER + 101;
-
-namespace Loader
+///----------------------------------------------------------------------------------------------------
+/// CLoader Class
+///----------------------------------------------------------------------------------------------------
+class CLoader
 {
-	extern NexusLinkData*				NexusLink;
-
-	extern std::mutex					Mutex;
-	extern std::unordered_map<
-		std::filesystem::path,
-		ELoaderAction
-	>									QueuedAddons;					/* To be loaded or unloaded addons */
-	extern std::vector<Addon*>			Addons;
-	extern bool							HasCustomConfig;
-
-	extern int							DirectoryChangeCountdown;
-	extern std::condition_variable		ConVar;
-	extern std::mutex					ThreadMutex;
-	extern std::thread					LoaderThread;
-	extern bool							IsSuspended;
-
-	extern PIDLIST_ABSOLUTE				FSItemList;
-	extern ULONG						FSNotifierID;
+	public:
+	///----------------------------------------------------------------------------------------------------
+	/// ctor
+	///----------------------------------------------------------------------------------------------------
+	CLoader(CLogHandler* aLogger);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Initialize:
-	/// 	Registers the addon directory update notifications and loads all addons.
+	/// dtor
 	///----------------------------------------------------------------------------------------------------
-	void Initialize();
-
-	///----------------------------------------------------------------------------------------------------
-	/// Shutdown:
-	/// 	Deregisters the directory updates and calls unload on all addons.
-	///----------------------------------------------------------------------------------------------------
-	void Shutdown();
-
-	///----------------------------------------------------------------------------------------------------
-	/// LoadAddonConfig:
-	/// 	Load AddonConfig.
-	///----------------------------------------------------------------------------------------------------
-	void LoadAddonConfig();
-
-	///----------------------------------------------------------------------------------------------------
-	/// SaveAddonConfig:
-	/// 	Save AddonConfig.
-	///----------------------------------------------------------------------------------------------------
-	void SaveAddonConfig();
+	~CLoader();
 
 	///----------------------------------------------------------------------------------------------------
 	/// WndProc:
@@ -78,97 +44,81 @@ namespace Loader
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	///----------------------------------------------------------------------------------------------------
-	/// ProcessQueue:
-	/// 	Processes all currently queued addons.
-	///----------------------------------------------------------------------------------------------------
-	void ProcessQueue();
-
-	///----------------------------------------------------------------------------------------------------
-	/// QueueAddon:
-	/// 	Pushes an item to the queue.
-	///----------------------------------------------------------------------------------------------------
-	void QueueAddon(ELoaderAction aAction, const std::filesystem::path& aPath);
-
-	///----------------------------------------------------------------------------------------------------
 	/// NotifyChanges:
-	/// 	Notifies that something in the addon directory changed.
+	/// 	Notifies the processor of changes to addons.
 	///----------------------------------------------------------------------------------------------------
 	void NotifyChanges();
 
 	///----------------------------------------------------------------------------------------------------
+	/// RegisterPrefs:
+	/// 	Returns the preferences of the given addon signature or registered if they don't exist.
+	///----------------------------------------------------------------------------------------------------
+	AddonPreferences* RegisterPrefs(signed int aSignature);
+
+	///----------------------------------------------------------------------------------------------------
+	/// DeregisterPrefs:
+	/// 	Deletes the preferences of the addon.
+	///----------------------------------------------------------------------------------------------------
+	void DeregisterPrefs(signed int aSignature);
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetOwner:
+	/// 	Returns the name of the addon owning the address.
+	///----------------------------------------------------------------------------------------------------
+	std::string GetOwner(void* aAddress);
+
+	private:
+	CLogHandler*                                     Logger;
+
+	PIDLIST_ABSOLUTE                                 FSItemList;
+	ULONG                                            FSNotifierID;
+
+	std::condition_variable                          ConVar;
+	bool                                             IsCanceled;
+	std::thread                                      ProcessorThread;
+	int                                              ProcessorCountdown;
+
+	std::mutex                                       AddonsMutex;
+	std::vector<CAddon>                              Addons;
+
+	std::mutex                                       PrefMutex;
+	std::unordered_map<signed int, AddonPreferences> Preferences;
+
+	///----------------------------------------------------------------------------------------------------
 	/// ProcessChanges:
-	/// 	Detects and processes any changes to addons.
+	/// 	Infinite loop that checks for changes to addons.
 	///----------------------------------------------------------------------------------------------------
 	void ProcessChanges();
 
 	///----------------------------------------------------------------------------------------------------
-	/// LoadAddon:
-	/// 	Loads an addon.
+	/// Discover:
+	/// 	Discovers the addons on disk.
 	///----------------------------------------------------------------------------------------------------
-	void LoadAddon(const std::filesystem::path& aPath, bool aIsReload = false);
-	
-	///----------------------------------------------------------------------------------------------------
-	/// UnloadAddon:
-	/// 	Unloads an addon and performs a reload as soon as the addon returns, if requested.
-	///----------------------------------------------------------------------------------------------------
-	void UnloadAddon(const std::filesystem::path& aPath, bool aDoReload = false);
+	void Discover();
 
 	///----------------------------------------------------------------------------------------------------
-	/// FreeAddon:
-	/// 	Calls FreeLibrary on the specified addon.
-	/// 	This function should not be invoked manually, but through Addon::Unload + Queue(Free).
+	/// IsValid:
+	/// 	Returns true if the provided path is a valid addon path.
 	///----------------------------------------------------------------------------------------------------
-	void FreeAddon(const std::filesystem::path& aPath);
+	bool IsValid(std::filesystem::path aPath);
 
 	///----------------------------------------------------------------------------------------------------
-	/// UninstallAddon:
-	/// 	Uninstalls an addon, or moves it to addon.dll.uninstall to be cleaned up by the loader later.
-	/// 	This function should not be invoked manually, but through Unload + FollowUpAction::Uninstall.
+	/// ProbeAddonType:
+	/// 	Returns the addon type of the given DLL. Caller must ensure pathis a valid addon path.
 	///----------------------------------------------------------------------------------------------------
-	void UninstallAddon(const std::filesystem::path& aPath);
+	EAddonType ProbeAddonType(std::filesystem::path aPath);
 
 	///----------------------------------------------------------------------------------------------------
-	/// UpdateSwapAddon:
-	/// 	Swaps addon.dll with addon.dll.update.
-	/// 	Returns true if there was an update dll.
+	/// LoadPrefs:
+	/// 	Loads the addon preferences from disk.
 	///----------------------------------------------------------------------------------------------------
-	bool UpdateSwapAddon(const std::filesystem::path& aPath);
+	void LoadPrefs();
 
 	///----------------------------------------------------------------------------------------------------
-	/// GetOwner:
-	/// 	Returns the name of the addon owning the provided address.
+	/// GetFlags:
+	/// 	Saves the addon preferences to disk.
 	///----------------------------------------------------------------------------------------------------
-	std::string GetOwner(void* aAddress);
-
-	///----------------------------------------------------------------------------------------------------
-	/// FindAddonBySig:
-	/// 	Returns the addon with a matching signature or nullptr.
-	///----------------------------------------------------------------------------------------------------
-	Addon* FindAddonBySig(signed int aSignature);
-
-	///----------------------------------------------------------------------------------------------------
-	/// FindAddonByPath:
-	/// 	Returns the addon with a matching path or nullptr.
-	///----------------------------------------------------------------------------------------------------
-	Addon* FindAddonByPath(const std::filesystem::path& aPath);
-
-	///----------------------------------------------------------------------------------------------------
-	/// FindAddonByMatchSig:
-	/// 	Returns the addon with a matching mock signature or nullptr.
-	///----------------------------------------------------------------------------------------------------
-	Addon* FindAddonByMatchSig(signed int aMatchSignature);
-
-	///----------------------------------------------------------------------------------------------------
-	/// FindAddonByMD5:
-	/// 	Returns the addon with a matching MD5 or nullptr.
-	///----------------------------------------------------------------------------------------------------
-	Addon* FindAddonByMD5(std::vector<unsigned char> aMD5);
-
-	///----------------------------------------------------------------------------------------------------
-	/// GetGameBuild:
-	/// 	Gets the game build and sets the Disable Until Update state.
-	///----------------------------------------------------------------------------------------------------
-	void GetGameBuild();
-}
+	void SavePrefs();
+};
 
 #endif

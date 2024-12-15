@@ -13,7 +13,7 @@
 #include "Consts.h"
 #include "Context.h"
 #include "Services/Settings/Settings.h"
-#include "Util/Inputs.h"
+#include "Util/src/Inputs.h"
 
 CEscapeClosing::CEscapeClosing()
 {

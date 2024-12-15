@@ -11,7 +11,7 @@
 #include <iomanip>
 #include <sstream>
 
-#include "Util/Strings.h"
+#include "Util/src/Strings.h"
 
 std::string LogEntry::TimestampString(bool aIncludeDate, bool aIncludeMs)
 {

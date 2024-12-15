@@ -12,10 +12,10 @@
 
 #include "Context.h"
 
-#include "Util/Paths.h"
-#include "Util/Strings.h"
-#include "Util/Time.h"
-#include "Util/URL.h"
+#include "Util/src/Paths.h"
+#include "Util/src/Strings.h"
+#include "Util/src/Time.h"
+#include "Util/src/URL.h"
 
 CApiClient::CApiClient(std::string aBaseURL, bool aEnableSSL, std::filesystem::path aCacheDirectory, int aCacheLifetime, int aBucketCapacity, int aRefillAmount, int aRefillInterval, const char* aCertificate)
 {

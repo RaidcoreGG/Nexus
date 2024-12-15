@@ -11,10 +11,10 @@
 #include "Context.h"
 #include "Renderer.h"
 
-#include "Util/CmdLine.h"
-#include "Util/DLL.h"
+#include "Util/src/CmdLine.h"
+#include "Util/src/DLL.h"
 #include "Util/MD5.h"
-#include "Util/Memory.h"
+#include "Util/src/Memory.h"
 
 #include "minhook/mh_hook.h"
 
