@@ -15,9 +15,9 @@
 enum class EUpdateMode
 {
 	None,
-	AutoUpdate, /* Automatically check and perform updates. */
+	Background, /* Automatically check for updates, but do nothing. */
 	Prompt,     /* Automatically check for updates, but prompt to perform. */
-	Disabled    /* Automatically check for updates, but do nothing. */
+	AutoUpdate, /* Automatically check and perform updates. */
 };
 
 #endif
