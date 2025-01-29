@@ -11,6 +11,9 @@
 
 #include <string>
 
+#include "nlohmann/json.hpp"
+using json = nlohmann::json;
+
 #include "EUpdateProvider.h"
 
 ///----------------------------------------------------------------------------------------------------
@@ -24,8 +27,10 @@ struct LibraryAddon
 	std::string     Description;
 	EUpdateProvider Provider;
 	std::string     DownloadURL;
-	std::string     ToSComplianceNotice;
 	int             PolicyTier;
+
+	LibraryAddon() = default;
+	LibraryAddon(json& aJson);
 };
 
 #endif

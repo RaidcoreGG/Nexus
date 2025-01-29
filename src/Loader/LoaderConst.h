@@ -14,7 +14,7 @@
 /* Alias */
 typedef ArcDPS::PluginInfo ArcdpsPlugin;
 
-/* Log Channel*/
+/* Log Channel */
 constexpr const char* CH_LOADER                         = "Loader";
 
 /* WndProc */
