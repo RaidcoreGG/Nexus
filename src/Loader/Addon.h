@@ -55,6 +55,7 @@ struct AddonFlags
 	bool                   UninstallNextLaunch  : 1; /* Set when the addon is locked and/or can't remove the file on disk. */
 
 	/* Action flags */
+	bool                   IsRunningAction      : 1; /* Set when any action is running. */
 	bool                   IsCheckingForUpdates : 1; /* Set when an update check is currently running. */
 	bool                   IsUpdating           : 1; /* Set while the addon is updating. */
 	bool                   IsLoading            : 1; /* Set when the addon is currently loading. */
@@ -62,7 +63,7 @@ struct AddonFlags
 	bool                   IsInstalling         : 1; /* Set for library addons when installing. */
 	bool                   IsUninstalling       : 1; /* Set when the addon is currently uninstalling. */
 
-	/* Pref flags */
+	/* Pref modifying flags */
 	bool                   LoadNextLaunch       : 1; /* Set when the addon is locked and should be loaded next game start. E.g. because of EAddonFlags::OnlyLoadOnGameLaunch. */
 	bool                   UnloadNextLaunch     : 1; /* Set when the addon is locked and should be unloaded next game start. */
 };
@@ -155,7 +156,7 @@ class CAddon
 	AddonFlags                 Flags;
 	std::string                ErrorDescription;
 
-	AddonPreferences*          Preferences;
+	AddonPrefs*                Preferences;
 	LibraryAddon*              LibraryDef;       /* Used when the addon is available for download. */
 
 	union /* Definitions */
@@ -163,8 +164,7 @@ class CAddon
 		AddonDefinition        AddonDef;         /* Used for Nexus addons. */
 		ArcdpsPlugin           PluginDef;        /* Used for ArcDPS plugins. */
 	};
-	std::filesystem::path      Location;         /* Contains the intended location. */
-	std::filesystem::path      RealLocation;     /* Contains the real location. E.g. .tmp path during updates. */
+	std::filesystem::path      Location;         /* Contains the location of the actual (loaded) module. */
 	std::vector<unsigned char> MD5;
 	HMODULE                    Module;
 	size_t                     ModuleSize;

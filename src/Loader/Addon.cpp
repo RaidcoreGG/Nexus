@@ -8,6 +8,8 @@
 
 #include "Addon.h"
 
+#include "Index.h"
+
 CAddon::CAddon(AddonDefinition* aAddonDef)
 {
 	
@@ -43,40 +45,6 @@ std::string CAddon::GetError()
 	assert(this->State == EAddonState::Error);
 
 	return this->ErrorDescription;
-}
-
-/* FIXME: this needs to be moved to the loader, as that will own the prefs */
-json CAddon::GetPrefs()
-{
-	if (!this->IsPersistent())
-	{
-		return nullptr;
-	}
-
-	/* Do not save any preferences if uninstalling. */
-	if (this->Flags.UninstallNextLaunch)
-	{
-		return nullptr;
-	}
-
-	json j{};
-	
-	j[PREFS_ADDON_SIGNATURE]             = this->AddonDef.Signature;
-	j[PREFS_ADDON_NAME]                  = this->AddonDef.Name;
-	j[PREFS_ADDON_UPDATEMODE]            = this->Preferences->UpdateMode;
-	j[PREFS_ADDON_ALLOWPRERELEASES]      = this->Preferences->AllowPreReleases;
-	j[PREFS_ADDON_ISFAVORITE]            = this->Preferences->IsFavorite;
-	j[PREFS_ADDON_ISDISABLEDUNTILUPDATE] = this->Preferences->IsDisabledUntilUpdate;
-
-	j[PREFS_ADDON_ISLOADED]              = (this->State == EAddonState::Loaded || this->Flags.LoadNextLaunch) && !this->Flags.UnloadNextLaunch;
-	
-	/* Sanity check. */
-	if (j[PREFS_ADDON_SIGNATURE].get<signed int>() == 0)
-	{
-		return nullptr;
-	}
-
-	return j;
 }
 
 bool CAddon::OwnsAddress(void* aAddress)
@@ -148,6 +116,8 @@ void CAddon::Process()
 			std::swap(action, this->QueuedAction);
 		}
 
+		this->Flags.IsRunningAction = true;
+
 		switch (action)
 		{
 			case EAddonAction::Load:
@@ -193,6 +163,8 @@ void CAddon::Process()
 				break;
 			}
 		}
+
+		this->Flags.IsRunningAction = false;
 	}
 }
 
@@ -259,12 +231,11 @@ void CAddon::Uninstall()
 
 		try
 		{
-			std::filesystem::path current = this->Location;
+			std::filesystem::path targetLocation = Index::D_GW2_ADDONS_NEXUS_TEMP / this->Location.filename().append(EXT_UNINSTALL);
 
-			std::filesystem::rename(this->Location, this->Location.string() + EXT_UNINSTALL);
+			std::filesystem::rename(this->Location, targetLocation);
 
-			this->RealLocation = this->Location; // points to .dll.uninstall
-			this->Location     = current;        // points to .dll
+			this->Location = targetLocation;
 
 			this->Logger->Warning(CH_LOADER, "Addon is stilled loaded, it will be uninstalled the next time the game is started: %s", this->Location.string().c_str());
 		}
@@ -277,15 +248,15 @@ void CAddon::Uninstall()
 	}
 
 	/* file no longer on disk */
-	if (!std::filesystem::exists(this->RealLocation))
+	if (!std::filesystem::exists(this->Location))
 	{
-		this->RealLocation.clear();
+		this->Location.clear();
 		return;
 	}
 
 	try
 	{
-		std::filesystem::remove(this->RealLocation.string().c_str());
+		std::filesystem::remove(this->Location.string().c_str());
 
 		switch (this->Type)
 		{

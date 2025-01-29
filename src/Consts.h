@@ -4,7 +4,6 @@
 constexpr const char* NULLSTR = "(null)";
 
 /* Options */
-constexpr const char* OPT_LASTGAMEBUILD            = "LastGameBuild";
 constexpr const char* OPT_ACCEPTEULA               = "AcceptEULA";
 constexpr const char* OPT_NOTIFYCHANGELOG          = "NotifyChangelog";
 constexpr const char* OPT_CLOSEESCAPE              = "CloseOnEscape";

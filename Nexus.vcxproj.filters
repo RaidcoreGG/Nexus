@@ -49,12 +49,6 @@
     <Filter Include="Resource Files\bin64">
       <UniqueIdentifier>{86b26924-5f68-4789-a455-7a9aadb24c45}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Loader\Structs">
-      <UniqueIdentifier>{68742126-4d19-4b9e-a4cc-594a8e22a51d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Loader\Enums">
-      <UniqueIdentifier>{29b4df1b-599d-49f1-adc5-17961c6073b2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files\Locales">
       <UniqueIdentifier>{3e8eab0f-abb6-49e7-9b6e-4347fe84f0b9}</UniqueIdentifier>
     </Filter>
@@ -178,6 +172,15 @@
     <Filter Include="Loader\API">
       <UniqueIdentifier>{e8eae412-d99b-4737-825b-da0c7d8c0a74}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Loader\Prefs">
+      <UniqueIdentifier>{e19db266-4587-41dd-a67c-bdce662a5742}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Loader\Library">
+      <UniqueIdentifier>{50f72eeb-23fb-46db-91ae-60d3330d5d95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Loader\Core">
+      <UniqueIdentifier>{c4f44470-30ce-4973-9d65-3298b91ff6ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -285,9 +288,6 @@
     <ClCompile Include="src\Services\API\ApiClient.cpp">
       <Filter>Services\API</Filter>
     </ClCompile>
-    <ClCompile Include="src\Loader\AddonDefinition.cpp">
-      <Filter>Loader\Structs</Filter>
-    </ClCompile>
     <ClCompile Include="src\Services\Localization\Localization.cpp">
       <Filter>Services\Localization</Filter>
     </ClCompile>
@@ -297,23 +297,14 @@
     <ClCompile Include="src\Loader\OLD_ArcDPS.cpp">
       <Filter>Loader</Filter>
     </ClCompile>
-    <ClCompile Include="src\Loader\OLD_Library.cpp">
-      <Filter>Loader</Filter>
-    </ClCompile>
     <ClCompile Include="src\Services\Updater\Updater.cpp">
       <Filter>Services\Updater</Filter>
     </ClCompile>
     <ClCompile Include="src\Util\MD5.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="src\Loader\EUpdateProvider.cpp">
-      <Filter>Loader\Enums</Filter>
-    </ClCompile>
     <ClCompile Include="src\Inputs\GameBinds\GameBindsHandler.cpp">
       <Filter>Inputs\GameBinds</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Loader\AddonVersion.cpp">
-      <Filter>Loader\Structs</Filter>
     </ClCompile>
     <ClCompile Include="src\UI\Controls\CtlSubWindow.cpp">
       <Filter>UI\Controls</Filter>
@@ -375,9 +366,6 @@
     <ClCompile Include="src\UI\Widgets\MainWindow\SnowflakeMgr.cpp">
       <Filter>UI\Widgets\MainWindow</Filter>
     </ClCompile>
-    <ClCompile Include="src\Loader\Addon.cpp">
-      <Filter>Loader</Filter>
-    </ClCompile>
     <ClCompile Include="src\thirdparty\Util\src\Inputs.cpp">
       <Filter>Util</Filter>
     </ClCompile>
@@ -408,8 +396,32 @@
     <ClCompile Include="src\thirdparty\Util\src\DLL.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+    <ClCompile Include="src\Loader\PreferenceMgr.cpp">
+      <Filter>Loader\Prefs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Loader\AddonPreferences.cpp">
+      <Filter>Loader\Prefs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Loader\LibraryMgr.cpp">
+      <Filter>Loader\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Loader\LibraryAddon.cpp">
+      <Filter>Loader\Library</Filter>
+    </ClCompile>
     <ClCompile Include="src\Loader\Loader.cpp">
-      <Filter>Loader</Filter>
+      <Filter>Loader\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Loader\Addon.cpp">
+      <Filter>Loader\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Loader\AddonVersion.cpp">
+      <Filter>Loader\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Loader\AddonDefinition.cpp">
+      <Filter>Loader\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Loader\EUpdateProvider.cpp">
+      <Filter>Loader\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -529,9 +541,6 @@
     </ClInclude>
     <ClInclude Include="src\Services\Textures\QueuedTexture.h">
       <Filter>Services\Textures</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Loader\FuncDefs.h">
-      <Filter>Loader</Filter>
     </ClInclude>
     <ClInclude Include="src\Consts.h">
       <Filter>_GLOBAL</Filter>
@@ -1013,27 +1022,6 @@
     <ClInclude Include="src\Services\API\APIResponse.h">
       <Filter>Services\API</Filter>
     </ClInclude>
-    <ClInclude Include="src\Loader\EUpdateProvider.h">
-      <Filter>Loader\Enums</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Loader\ELoaderAction.h">
-      <Filter>Loader\Enums</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Loader\EAddonState.h">
-      <Filter>Loader\Enums</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Loader\EAddonDefFlags.h">
-      <Filter>Loader\Enums</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Loader\LibraryAddon.h">
-      <Filter>Loader\Structs</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Loader\AddonDefinition.h">
-      <Filter>Loader\Structs</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Loader\NexusLinkData.h">
-      <Filter>Loader\Structs</Filter>
-    </ClInclude>
     <ClInclude Include="src\Services\Localization\FuncDefs.h">
       <Filter>Services\Localization</Filter>
     </ClInclude>
@@ -1041,9 +1029,6 @@
       <Filter>Events</Filter>
     </ClInclude>
     <ClInclude Include="src\Loader\OLD_ArcDPS.h">
-      <Filter>Loader</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Loader\OLD_Library.h">
       <Filter>Loader</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\Updater\Updater.h">
@@ -1063,9 +1048,6 @@
     </ClInclude>
     <ClInclude Include="src\Inputs\GameBinds\EGameBinds.h">
       <Filter>Inputs\GameBinds\Enums</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Loader\AddonVersion.h">
-      <Filter>Loader\Structs</Filter>
     </ClInclude>
     <ClInclude Include="src\Inputs\GameBinds\FuncDefs.h">
       <Filter>Inputs\GameBinds</Filter>
@@ -1178,18 +1160,6 @@
     <ClInclude Include="src\thirdparty\arcdps\ArcDPS.h">
       <Filter>_EXTERNAL</Filter>
     </ClInclude>
-    <ClInclude Include="src\Loader\EUpdateMode.h">
-      <Filter>Loader\Enums</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Loader\Addon.h">
-      <Filter>Loader</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Loader\Loader.h">
-      <Filter>Loader</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Loader\AddonPreferences.h">
-      <Filter>Loader\Structs</Filter>
-    </ClInclude>
     <ClInclude Include="src\thirdparty\Util\src\DLL.h">
       <Filter>Util</Filter>
     </ClInclude>
@@ -1223,8 +1193,53 @@
     <ClInclude Include="src\thirdparty\Util\src\CmdLine.h">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="src\Loader\PreferenceMgr.h">
+      <Filter>Loader\Prefs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\AddonPreferences.h">
+      <Filter>Loader\Prefs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\LibraryMgr.h">
+      <Filter>Loader\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\LibraryAddon.h">
+      <Filter>Loader\Library</Filter>
+    </ClInclude>
     <ClInclude Include="src\Loader\LoaderConst.h">
-      <Filter>Loader</Filter>
+      <Filter>Loader\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\Loader.h">
+      <Filter>Loader\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\FuncDefs.h">
+      <Filter>Loader\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\Addon.h">
+      <Filter>Loader\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\NexusLinkData.h">
+      <Filter>Loader\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\AddonVersion.h">
+      <Filter>Loader\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\AddonDefinition.h">
+      <Filter>Loader\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\EUpdateProvider.h">
+      <Filter>Loader\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\EUpdateMode.h">
+      <Filter>Loader\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\ELoaderAction.h">
+      <Filter>Loader\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\EAddonState.h">
+      <Filter>Loader\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\EAddonDefFlags.h">
+      <Filter>Loader\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

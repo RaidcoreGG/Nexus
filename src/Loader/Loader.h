@@ -9,17 +9,20 @@
 #ifndef LOADER_H
 #define LOADER_H
 
-#include <string>
-#include <vector>
-#include <unordered_map>
-#include <mutex>
 #include <filesystem>
+#include <mutex>
 #include <Shlobj.h>
+#include <string>
+#include <thread>
+#include <unordered_map>
+#include <vector>
 
-#include "LoaderConst.h"
 #include "Addon.h"
-#include "AddonPreferences.h"
+#include "PreferenceMgr.h"
+#include "LibraryMgr.h"
+#include "LoaderConst.h"
 #include "Services/Logging/LogHandler.h"
+#include "Services/Settings/Settings.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// CLoader Class
@@ -30,7 +33,7 @@ class CLoader
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CLoader(CLogHandler* aLogger);
+	CLoader(CLogHandler* aLogger, CSettings* aSettings, std::vector<signed int> aWhitelist = {});
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -50,39 +53,30 @@ class CLoader
 	void NotifyChanges();
 
 	///----------------------------------------------------------------------------------------------------
-	/// RegisterPrefs:
-	/// 	Returns the preferences of the given addon signature or registered if they don't exist.
-	///----------------------------------------------------------------------------------------------------
-	AddonPreferences* RegisterPrefs(signed int aSignature);
-
-	///----------------------------------------------------------------------------------------------------
-	/// DeregisterPrefs:
-	/// 	Deletes the preferences of the addon.
-	///----------------------------------------------------------------------------------------------------
-	void DeregisterPrefs(signed int aSignature);
-
-	///----------------------------------------------------------------------------------------------------
 	/// GetOwner:
 	/// 	Returns the name of the addon owning the address.
 	///----------------------------------------------------------------------------------------------------
 	std::string GetOwner(void* aAddress);
 
 	private:
-	CLogHandler*                                     Logger;
+	CLogHandler*            Logger;
+	CSettings*              Settings;
 
-	PIDLIST_ABSOLUTE                                 FSItemList;
-	ULONG                                            FSNotifierID;
+	int                     GameBuild;
 
-	std::condition_variable                          ConVar;
-	bool                                             IsCanceled;
-	std::thread                                      ProcessorThread;
-	int                                              ProcessorCountdown;
+	PIDLIST_ABSOLUTE        FSItemList;
+	ULONG                   FSNotifierID;
 
-	std::mutex                                       AddonsMutex;
-	std::vector<CAddon>                              Addons;
+	std::condition_variable ConVar;
+	bool                    IsCanceled;
+	std::thread             ProcessorThread;
+	int                     ProcessorCountdown;
 
-	std::mutex                                       PrefMutex;
-	std::unordered_map<signed int, AddonPreferences> Preferences;
+	std::mutex              AddonsMutex;
+	std::vector<CAddon>     Addons;
+
+	CPreferenceMgr*         PreferenceMgr;
+	CLibraryMgr*            LibraryMgr;
 
 	///----------------------------------------------------------------------------------------------------
 	/// ProcessChanges:
@@ -91,34 +85,40 @@ class CLoader
 	void ProcessChanges();
 
 	///----------------------------------------------------------------------------------------------------
+	/// DetectChanges:
+	/// 	Checks for changes to already tracked addons.
+	///----------------------------------------------------------------------------------------------------
+	void DetectChanges();
+
+	///----------------------------------------------------------------------------------------------------
 	/// Discover:
 	/// 	Discovers the addons on disk.
 	///----------------------------------------------------------------------------------------------------
 	void Discover();
 
 	///----------------------------------------------------------------------------------------------------
-	/// IsValid:
+	/// PathIsValid:
 	/// 	Returns true if the provided path is a valid addon path.
 	///----------------------------------------------------------------------------------------------------
-	bool IsValid(std::filesystem::path aPath);
+	bool PathIsValid(std::filesystem::path aPath);
 
 	///----------------------------------------------------------------------------------------------------
-	/// ProbeAddonType:
+	/// IsTracked:
+	/// 	Returns true if the provided path is an already tracked addon.
+	///----------------------------------------------------------------------------------------------------
+	bool IsTracked(std::filesystem::path aPath);
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetAddonType:
 	/// 	Returns the addon type of the given DLL. Caller must ensure pathis a valid addon path.
 	///----------------------------------------------------------------------------------------------------
-	EAddonType ProbeAddonType(std::filesystem::path aPath);
+	EAddonType GetAddonType(std::filesystem::path aPath);
 
 	///----------------------------------------------------------------------------------------------------
-	/// LoadPrefs:
-	/// 	Loads the addon preferences from disk.
+	/// GetGameBuild:
+	/// 	Gets the current game build from the API.
 	///----------------------------------------------------------------------------------------------------
-	void LoadPrefs();
-
-	///----------------------------------------------------------------------------------------------------
-	/// GetFlags:
-	/// 	Saves the addon preferences to disk.
-	///----------------------------------------------------------------------------------------------------
-	void SavePrefs();
+	void GetGameBuild();
 };
 
 #endif

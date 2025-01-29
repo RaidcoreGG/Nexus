@@ -10,14 +10,23 @@
 
 #include <Windows.h>
 
+#include "httplib/httplib.h"
+
 #include "Context.h"
 #include "Index.h"
 #include "FuncDefs.h"
-#include "Util//src/DLL.h"
+#include "Util/src/DLL.h"
 
-CLoader::CLoader(CLogHandler* aLogger)
+CLoader::CLoader(CLogHandler* aLogger, CSettings* aSettings, std::vector<signed int> aWhitelist)
 {
 	this->Logger = aLogger;
+	this->Settings = aSettings;
+
+	this->PreferenceMgr = new CPreferenceMgr(aLogger, Index::F_ADDONCONFIG, aWhitelist.size() > 0);
+
+	this->LibraryMgr = new CLibraryMgr(aLogger);
+	this->LibraryMgr->AddSource("https://api.raidcore.gg/addonlibrary");
+	this->LibraryMgr->AddSource("https://api.raidcore.gg/arcdpslibrary");
 }
 
 CLoader::~CLoader()
@@ -25,6 +34,9 @@ CLoader::~CLoader()
 	this->IsCanceled = true;
 	this->ProcessorCountdown = 0;
 	this->ConVar.notify_one();
+
+	this->Logger = nullptr;
+	this->Settings = nullptr;
 }
 
 UINT CLoader::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -73,37 +85,10 @@ UINT CLoader::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void CLoader::NotifyChanges()
 {
+	if (IsCanceled) { return; }
+
 	this->ProcessorCountdown = LOADER_WAITTIME_MS;
 	this->ConVar.notify_one();
-}
-
-AddonPreferences* CLoader::RegisterPrefs(signed int aSignature)
-{
-	const std::lock_guard<std::mutex> lock(this->PrefMutex);
-	
-	auto it = this->Preferences.find(aSignature);
-
-	if (it != this->Preferences.end())
-	{
-		return &it->second;
-	}
-
-	/* set defaults */
-	this->Preferences[aSignature] = AddonPreferences{
-		EUpdateMode::AutoUpdate,
-		false,
-		false,
-		false
-	};
-
-	return &this->Preferences[aSignature];
-}
-
-void CLoader::DeregisterPrefs(signed int aSignature)
-{
-	const std::lock_guard<std::mutex> lock(this->PrefMutex);
-	
-	this->Preferences.erase(aSignature);
 }
 
 std::string CLoader::GetOwner(void* aAddress)
@@ -139,6 +124,10 @@ std::string CLoader::GetOwner(void* aAddress)
 
 void CLoader::ProcessChanges()
 {
+	/* frontload some async work */
+	this->LibraryMgr->Update();
+	this->GetGameBuild();
+
 	for (;;)
 	{
 		EAddonAction action = EAddonAction::None;
@@ -167,8 +156,14 @@ void CLoader::ProcessChanges()
 
 		if (this->IsCanceled) { return; }
 
-		fixme continue here
+		this->DetectChanges();
+		this->Discover();
 	}
+}
+
+void CLoader::DetectChanges()
+{
+
 }
 
 void CLoader::Discover()
@@ -187,9 +182,8 @@ void CLoader::Discover()
 		}
 
 		/* if not tracked, the path needs to be validated */
-		if (!this->IsValid(path))
+		if (!this->PathIsValid(path))
 		{
-			/* TODO: maybe track as incompatible */
 			continue;
 		}
 
@@ -202,7 +196,7 @@ void CLoader::Discover()
 
 		if (path.extension() == EXT_DLL)
 		{
-			EAddonType type = this->ProbeAddonType(path);
+			EAddonType type = this->GetAddonType(path);
 
 			CAddon addon = CAddon(EAddonType::Nexus);
 		}
@@ -221,7 +215,7 @@ void CLoader::Discover()
 	}
 }
 
-bool CLoader::IsValid(std::filesystem::path aPath)
+bool CLoader::PathIsValid(std::filesystem::path aPath)
 {
 	if (std::filesystem::is_symlink(aPath))
 	{
@@ -247,9 +241,15 @@ bool CLoader::IsValid(std::filesystem::path aPath)
 	return true;
 }
 
-EAddonType CLoader::ProbeAddonType(std::filesystem::path aPath)
+bool IsTracked(std::filesystem::path aPath)
 {
-	assert(this->IsValid(aPath));
+	throw; /* Not impl. */
+}
+
+EAddonType CLoader::GetAddonType(std::filesystem::path aPath)
+{
+	assert(this->PathIsValid(aPath));
+
 #ifdef _DEBUG
 	HMODULE module = LoadLibraryExA(aPath.string().c_str(), 0, DONT_RESOLVE_DLL_REFERENCES);
 
@@ -279,22 +279,30 @@ EAddonType CLoader::ProbeAddonType(std::filesystem::path aPath)
 
 	return EAddonType::Incompatible;
 #else
-	throw; // do this properly without the deprecated flag
+	FIXME: do this properly without the deprecated flag
 #endif
 }
 
-void CLoader::LoadPrefs()
+void CLoader::GetGameBuild()
 {
-	const std::lock_guard<std::mutex> lock(this->PrefMutex);
+	/* prepare client request */
+	httplib::Client client("http://assetcdn.101.arenanetworks.com");
+	client.enable_server_certificate_verification(false);
 
-}
+	std::string buildStr;
 
-void CLoader::SavePrefs()
-{
-	const std::lock_guard<std::mutex> lock(this->PrefMutex);
+	size_t bytesWritten = 0;
+	auto result = client.Get("/latest64/101", [&](const char* data, size_t data_length) {
+		buildStr += data;
+		bytesWritten += data_length;
+		return true;
+	});
 
-	for (auto& [sig, prefs] : this->Preferences)
+	if (!result || result->status != 200)
 	{
-
+		this->Logger->Warning(CH_LOADER, "Error fetching \"http://assetcdn.101.arenanetworks.com/latest64/101\"\nError: %s", httplib::to_string(result.error()).c_str());
+		return;
 	}
+
+	this->GameBuild = std::stoi(buildStr);
 }
