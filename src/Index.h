@@ -28,6 +28,7 @@ namespace Index
 	extern std::filesystem::path D_GW2_ADDONS_NEXUS;
 	extern std::filesystem::path D_GW2_ADDONS_NEXUS_FONTS;
 	extern std::filesystem::path D_GW2_ADDONS_NEXUS_LOCALES;
+	extern std::filesystem::path D_GW2_ADDONS_NEXUS_TEMP;
 
 	extern std::filesystem::path F_HOST_DLL;
 	extern std::filesystem::path F_UPDATE_DLL;
