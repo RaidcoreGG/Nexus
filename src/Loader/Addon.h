@@ -157,7 +157,7 @@ class CAddon
 	std::string                ErrorDescription;
 
 	AddonPrefs*                Preferences;
-	LibraryAddon*              LibraryDef;       /* Used when the addon is available for download. */
+	LibraryAddon*              LibraryDef;       /* Used when the addon is available for download from a library. */
 
 	union /* Definitions */
 	{
@@ -210,6 +210,12 @@ class CAddon
 	/// 	Updates the addon.
 	///----------------------------------------------------------------------------------------------------
 	void Update();
+
+	///----------------------------------------------------------------------------------------------------
+	/// ShouldCheckForUpdate:
+	/// 	Returns true if the addon should check for updates.
+	///----------------------------------------------------------------------------------------------------
+	bool ShouldCheckForUpdate();
 
 	///----------------------------------------------------------------------------------------------------
 	/// ShouldUpdate:

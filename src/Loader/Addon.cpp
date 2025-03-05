@@ -186,6 +186,8 @@ void CAddon::Load()
 		this->Flags.UninstallNextLaunch = false;
 		return;
 	}
+
+	// TODO: load
 }
 
 void CAddon::Unload()
@@ -206,11 +208,16 @@ void CAddon::Unload()
 		this->Flags.UninstallNextLaunch = false;
 		return;
 	}
+
+	// TODO: unload
 }
 
 void CAddon::Install()
 {
 	assert(this->Type == EAddonType::Library);
+	assert(this->State == EAddonState::None);
+
+	// TODO: install
 }
 
 void CAddon::Uninstall()
@@ -282,11 +289,32 @@ void CAddon::Uninstall()
 void CAddon::CheckForUpdate()
 {
 	assert(this->Type == EAddonType::Nexus);
+
+	// TODO: check
 }
 
 void CAddon::Update()
 {
 	assert(this->Type == EAddonType::Nexus);
+
+	// TODO: update
+}
+
+bool CAddon::ShouldCheckForUpdate()
+{
+	assert(this->Type == EAddonType::Nexus);
+	assert(this->Preferences);
+
+	switch (this->Preferences->UpdateMode)
+	{
+		default:
+		case EUpdateMode::None:
+			return false;
+		case EUpdateMode::Background:
+		case EUpdateMode::Prompt:
+		case EUpdateMode::AutoUpdate:
+			return true;
+	}
 }
 
 bool CAddon::ShouldUpdate()
@@ -305,6 +333,12 @@ bool CAddon::ShouldUpdate()
 bool CAddon::ShouldLoad()
 {
 	assert(this->Type == EAddonType::Nexus);
+	assert(this->Preferences);
+
+	if (this->Preferences->ShouldLoad)
+	{
+		return true;
+	}
 
 	return false;
 }

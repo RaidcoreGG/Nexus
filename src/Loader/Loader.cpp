@@ -142,7 +142,7 @@ void CLoader::ProcessChanges()
 		auto start_time = std::chrono::high_resolution_clock::now();
 #endif
 
-		while (this->ProcessorCountdown > 0)
+		while (this->ProcessorCountdown > 0 && !this->IsCanceled)
 		{
 			Sleep(1);
 			this->ProcessorCountdown -= 1;
