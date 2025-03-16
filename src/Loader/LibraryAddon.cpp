@@ -16,16 +16,17 @@ constexpr const char* K_AUTHOR      = "author";
 constexpr const char* K_DESCRIPTION = "description";
 constexpr const char* K_DOWNLOADURL = "download";
 constexpr const char* K_POLICY      = "addon_policy_tier";
+constexpr const char* K_FILENAME    = "filename";
 
 LibraryAddon::LibraryAddon(json& aJson)
 {
-	this->Signature   = 0;
-	this->Name        = NULLSTR;
-	this->Author      = NULLSTR;
-	this->Description = NULLSTR;
-	this->Provider    = EUpdateProvider::None;
-	this->DownloadURL = NULLSTR;
-	this->PolicyTier  = 0;
+	this->Signature        = 0;
+	this->Name             = NULLSTR;
+	this->Author           = NULLSTR;
+	this->Description      = NULLSTR;
+	this->DownloadURL      = NULLSTR;
+	this->PolicyTier       = 0;
+	this->FriendlyFilename = NULLSTR;
 
 	if (!aJson[K_SIGNATURE].is_null())
 	{
@@ -55,5 +56,10 @@ LibraryAddon::LibraryAddon(json& aJson)
 	if (!aJson[K_POLICY].is_null())
 	{
 		aJson[K_POLICY].get_to(this->PolicyTier);
+	}
+
+	if (!aJson[K_FILENAME].is_null())
+	{
+		aJson[K_FILENAME].get_to(this->FriendlyFilename);
 	}
 }

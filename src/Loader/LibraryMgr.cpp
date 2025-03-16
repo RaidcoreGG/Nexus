@@ -29,20 +29,20 @@ void CLibraryMgr::Update()
 
 	this->Addons.clear();
 
-	for (std::string& libSrc : this->Sources)
+	for (const std::string& libSrc : this->Sources)
 	{
 		std::string base     = URL::GetBase(libSrc);
 		std::string endpoint = URL::GetEndpoint(libSrc);
 
 		httplib::Client client(base);
 		client.set_follow_location(true);
-		client.enable_server_certificate_verification(false);
+		client.enable_server_certificate_verification(URL::UsingHTTPS(libSrc));
 
 		httplib::Result result = client.Get(endpoint);
 
 		if (!result || result->status != 200)
 		{
-			this->Logger->Warning(CH_LOADER, "Library: Error fetching \"%s\"\nError: %s", libSrc.c_str(), httplib::to_string(result.error()).c_str());
+			this->Logger->Warning(CH_LOADER, "Library: Error fetching \"%s\"\n\tError: %s", libSrc.c_str(), httplib::to_string(result.error()).c_str());
 			continue;
 		}
 
@@ -50,8 +50,17 @@ void CLibraryMgr::Update()
 		{
 			json libJSON = json::parse(result->body);
 
-			if (libJSON.is_null()) { continue; }
-			if (!libJSON.is_array()) { continue; }
+			if (libJSON.is_null())
+			{
+				this->Logger->Warning(CH_LOADER, "Library: \"%s\" had an empty response.", libSrc.c_str());
+				continue;
+			}
+
+			if (!libJSON.is_array())
+			{
+				this->Logger->Warning(CH_LOADER, "Library: \"%s\" does not conform to library specification.", libSrc.c_str());
+				continue;
+			}
 
 			for (json& addonJSON : libJSON)
 			{
@@ -60,7 +69,7 @@ void CLibraryMgr::Update()
 		}
 		catch (json::parse_error& ex)
 		{
-			this->Logger->Warning(CH_LOADER, "Library: %s could not be parsed. Error: %s", libSrc.c_str(), ex.what());
+			this->Logger->Warning(CH_LOADER, "Library: \"%s\" could not be parsed.\n\tError: %s", libSrc.c_str(), ex.what());
 		}
 	}
 }

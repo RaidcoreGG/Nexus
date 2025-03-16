@@ -14,22 +14,19 @@
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
-#include "EUpdateProvider.h"
-
 ///----------------------------------------------------------------------------------------------------
 /// LibraryAddon Struct
 ///----------------------------------------------------------------------------------------------------
 struct LibraryAddon
 {
-	signed int      Signature;
-	std::string     Name;
-	std::string     Author;
-	std::string     Description;
-	EUpdateProvider Provider;
-	std::string     DownloadURL;
-	int             PolicyTier;
+	signed int  Signature;
+	std::string Name;
+	std::string Author;
+	std::string Description;
+	std::string DownloadURL;
+	int         PolicyTier;
+	std::string FriendlyFilename;
 
-	LibraryAddon() = default;
 	LibraryAddon(json& aJson);
 };
 

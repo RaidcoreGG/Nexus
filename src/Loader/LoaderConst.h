@@ -29,13 +29,4 @@ constexpr const char* EXT_UPDATE                        = ".update";
 constexpr const char* EXT_OLD                           = ".old";
 constexpr const char* EXT_UNINSTALL                     = ".uninstall";
 
-/* Preferences */
-constexpr const char* PREFS_ADDON_SIGNATURE             = "Signature";
-constexpr const char* PREFS_ADDON_ISLOADED              = "IsLoaded";
-constexpr const char* PREFS_ADDON_NAME                  = "Name";
-constexpr const char* PREFS_ADDON_UPDATEMODE            = "UpdateMode";
-constexpr const char* PREFS_ADDON_ALLOWPRERELEASES      = "AllowPrereleases";
-constexpr const char* PREFS_ADDON_ISFAVORITE            = "IsFavorite";
-constexpr const char* PREFS_ADDON_ISDISABLEDUNTILUPDATE = "IsDisabledUntilUpdate";
-
 #endif

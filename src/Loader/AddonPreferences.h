@@ -20,12 +20,12 @@ using json = nlohmann::json;
 ///----------------------------------------------------------------------------------------------------
 struct AddonPrefs
 {
-	EUpdateMode UpdateMode;            /* Behavior regarding updates. */
-	bool        AllowPreReleases;      /* If the update provider supports pre-releases. */
-	bool        IsFavorite;            /* Marked as favorite. */
-	bool        IsDisabledUntilUpdate; /* Overrides EUpdateMode::Disable to prompt instead. */
+	EUpdateMode UpdateMode;            /* Behavior regarding updates.                          */
+	bool        AllowPreReleases;      /* If the update provider supports pre-releases.        */
+	bool        IsFavorite;            /* Marked as favorite.                                  */
+	bool        IsDisabledUntilUpdate; /* Overrides EUpdateMode::Disable to prompt instead.    */
 	bool        ShouldLoad;            /* Indicates if this addon should load next game start. */
-	int         LastGameBuild;         /* The game build when the addon was last loaded. */
+	int         LastGameBuild;         /* The game build when the addon was last loaded.       */
 
 	CAddon*     Owner;
 

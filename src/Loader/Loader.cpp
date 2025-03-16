@@ -37,6 +37,12 @@ CLoader::~CLoader()
 
 	this->Logger = nullptr;
 	this->Settings = nullptr;
+
+	delete this->PreferenceMgr;
+	this->PreferenceMgr = nullptr;
+	
+	delete this->LibraryMgr;
+	this->LibraryMgr = nullptr;
 }
 
 UINT CLoader::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -73,7 +79,7 @@ UINT CLoader::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return uMsg;
 	}
 
-	if (Index::D_GW2_ADDONS == std::string(path))
+	if (Index::D_GW2_ADDONS == path)
 	{
 		this->NotifyChanges();
 	}

@@ -47,25 +47,25 @@ enum class EAddonType
 struct AddonFlags
 {
 	/* Behavior flags */
-	bool                   IsLocked             : 1; /* Set if the state can no longer be changed. E.g. because of EAddonFlags::DisableHotloading. */
+	bool IsLocked             : 1; /* Set if the state can no longer be changed. E.g. because of EAddonFlags::DisableHotloading. */
 
 	/* Info flags */
-	bool                   IsModuleLoaded       : 1; /* Set when LoadLibrary was called. */
-	bool                   IsUpdateAvailable    : 1; /* Set when an update is available after checking. */
-	bool                   UninstallNextLaunch  : 1; /* Set when the addon is locked and/or can't remove the file on disk. */
+	bool IsModuleLoaded       : 1; /* Set when LoadLibrary was called. */
+	bool IsUpdateAvailable    : 1; /* Set when an update is available after checking. */
+	bool UninstallNextLaunch  : 1; /* Set when the addon is locked and/or can't remove the file on disk. */
 
 	/* Action flags */
-	bool                   IsRunningAction      : 1; /* Set when any action is running. */
-	bool                   IsCheckingForUpdates : 1; /* Set when an update check is currently running. */
-	bool                   IsUpdating           : 1; /* Set while the addon is updating. */
-	bool                   IsLoading            : 1; /* Set when the addon is currently loading. */
-	bool                   IsUnloading          : 1; /* Set when the addon is currently unloading. */
-	bool                   IsInstalling         : 1; /* Set for library addons when installing. */
-	bool                   IsUninstalling       : 1; /* Set when the addon is currently uninstalling. */
+	bool IsRunningAction      : 1; /* Set when any action is running. */
+	bool IsCheckingForUpdates : 1; /* Set when an update check is currently running. */
+	bool IsUpdating           : 1; /* Set while the addon is updating. */
+	bool IsLoading            : 1; /* Set when the addon is currently loading. */
+	bool IsUnloading          : 1; /* Set when the addon is currently unloading. */
+	bool IsInstalling         : 1; /* Set for library addons when installing. */
+	bool IsUninstalling       : 1; /* Set when the addon is currently uninstalling. */
 
 	/* Pref modifying flags */
-	bool                   LoadNextLaunch       : 1; /* Set when the addon is locked and should be loaded next game start. E.g. because of EAddonFlags::OnlyLoadOnGameLaunch. */
-	bool                   UnloadNextLaunch     : 1; /* Set when the addon is locked and should be unloaded next game start. */
+	bool LoadNextLaunch       : 1; /* Set when the addon is locked and should be loaded next game start. E.g. because of EAddonFlags::OnlyLoadOnGameLaunch. */
+	bool UnloadNextLaunch     : 1; /* Set when the addon is locked and should be unloaded next game start. */
 };
 
 ///----------------------------------------------------------------------------------------------------

@@ -82,11 +82,15 @@ void CPreferenceMgr::SavePrefs()
 
 	for (auto& [sig, pref] : this->Preferences)
 	{
+		if (sig == 0) { continue; }
+
 		/* convert prefs */
 		json prefJSON = pref.ToJSON();
 
 		/* add signature */
 		prefJSON[K_SIGNATURE] = sig;
+
+		prefPack.push_back(prefJSON);
 	}
 
 	std::ofstream file(this->Path);
