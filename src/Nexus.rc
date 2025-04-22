@@ -71,10 +71,10 @@ BEGIN
 		BLOCK "080904b0"
 		BEGIN
 			VALUE "CompanyName", "Raidcore"
-			VALUE "FileDescription", "Unofficial Guild Wars 2 Addon Host"
+			VALUE "FileDescription", "Unofficial Guild Wars 2 Addon Engine"
 			VALUE "FileVersion", TOSTRING(V_MAJOR) "." TOSTRING(V_MINOR) "." TOSTRING(V_BUILD) "." TOSTRING(V_REVISION)
 			VALUE "InternalName", "nexus.dll"
-			VALUE "LegalCopyright", "© 2021-2024 Raidcore"
+			VALUE "LegalCopyright", "© 2021-2025 Raidcore"
 			VALUE "ProductName", "Nexus"
 			VALUE "ProductVersion", TOSTRING(V_MAJOR) "." TOSTRING(V_MINOR) "." TOSTRING(V_BUILD) "." TOSTRING(V_REVISION)
 		END
