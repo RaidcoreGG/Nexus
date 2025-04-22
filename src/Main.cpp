@@ -236,6 +236,49 @@ namespace Main
 				/* modify the uMsg code to the original code */
 				uMsg -= WM_PASSTHROUGH_FIRST;
 			}
+
+			/* Fix for jumping cursor. */
+			if (uMsg == WM_MOUSEMOVE)
+			{
+				/* Get cursor info to query visibility. */
+				CURSORINFO curInfo{};
+				curInfo.cbSize = sizeof(CURSORINFO);
+				GetCursorInfo(&curInfo);
+
+				static bool s_IsConfining = false;
+				static POINT s_LastPos{};
+
+				/* Cursor is hidden. -> Camera is controlled. -> We can confine it. */
+				if (!(curInfo.flags & CURSOR_SHOWING)) /* Use CURSOR_SHOWING flag instead of CURSOR_HIDDEN for win8 compatability. */
+				{
+					if (!s_IsConfining) /* Not yet confining. */
+					{
+						/* Create 1px big rect on current cursor location. */
+						RECT clipRect{
+						  curInfo.ptScreenPos.x,
+						  curInfo.ptScreenPos.y,
+						  curInfo.ptScreenPos.x + 1,
+						  curInfo.ptScreenPos.y + 1,
+						};
+
+						s_LastPos = curInfo.ptScreenPos; /* Store last visible pos. */
+
+						ClipCursor(&clipRect);
+
+						s_IsConfining = true; /* Change state. */
+					}
+				}
+				else /* Cursor is visible. */
+				{
+					if (s_IsConfining)
+					{
+						ClipCursor(NULL); /* Reset confining. */
+						SetCursorPos(s_LastPos.x, s_LastPos.y); /* Restore last visible pos. */
+
+						s_IsConfining = false; /* Change state. */
+					}
+				}
+			}
 		}
 
 		return CallWindowProcA(Hooks::WndProc, hWnd, uMsg, wParam, lParam);
