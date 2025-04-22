@@ -73,10 +73,12 @@ void CLogHandler::Info(const std::string& aChannel, const char* aFmt, ...)
 
 void CLogHandler::Debug(const std::string& aChannel, const char* aFmt, ...)
 {
+#ifdef _DEBUG
 	va_list args;
 	va_start(args, aFmt);
 	this->LogMessageV(ELogLevel::DEBUG, aChannel, aFmt, args);
 	va_end(args);
+#endif
 }
 
 void CLogHandler::LogMessage(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, ...)

@@ -20,4 +20,6 @@ enum class EAddonDefFlags
 	OnlyLoadOnGameLaunch = 1 << 2  /* Prevents loading later than character select, aka will require restart to get loaded. */
 };
 
+DEFINE_ENUM_FLAG_OPERATORS(EAddonDefFlags)
+
 #endif

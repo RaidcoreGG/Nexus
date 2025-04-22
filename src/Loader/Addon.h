@@ -21,6 +21,7 @@
 #include "LibraryAddon.h"
 #include "AddonPreferences.h"
 #include "Loader.h"
+#include "EAddonInterface.h"
 #include "Events/EventHandler.h"
 #include "Services/Logging/LogHandler.h"
 #include "LoaderConst.h"
@@ -30,42 +31,30 @@
 class CLoader;
 
 ///----------------------------------------------------------------------------------------------------
-/// EAddonType Enumeration
-///----------------------------------------------------------------------------------------------------
-enum class EAddonType
-{
-	None,
-	Nexus,
-	Library,
-	ArcDPS,
-	Incompatible
-};
-
-///----------------------------------------------------------------------------------------------------
 /// AddonFlags Struct
 ///----------------------------------------------------------------------------------------------------
 struct AddonFlags
 {
 	/* Behavior flags */
-	bool IsLocked             : 1; /* Set if the state can no longer be changed. E.g. because of EAddonFlags::DisableHotloading. */
+	bool IsStateLocked     : 1; /* State can or must not be modified. */
+	bool IsModuleLocked    : 1; /* Module cannot be unloaded. */
+	bool IsUninstalled     : 1; /* Set when the addon is uninstalled, but can't be removed at runtime due to locked file/module. */
+	bool IsAPICommitted    : 1; /* API calls can be instantly registered. */
 
 	/* Info flags */
-	bool IsModuleLoaded       : 1; /* Set when LoadLibrary was called. */
-	bool IsUpdateAvailable    : 1; /* Set when an update is available after checking. */
-	bool UninstallNextLaunch  : 1; /* Set when the addon is locked and/or can't remove the file on disk. */
+	bool IsModuleLoaded    : 1; /* Set when LoadLibrary was called. */
+	bool IsUpdateAvailable : 1; /* Set when an update is available after checking. */
+
+	bool HasLibraryDef     : 1;
+	bool HasAddonDef       : 1;
+	bool HasPluginDef      : 1;
 
 	/* Action flags */
-	bool IsRunningAction      : 1; /* Set when any action is running. */
-	bool IsCheckingForUpdates : 1; /* Set when an update check is currently running. */
-	bool IsUpdating           : 1; /* Set while the addon is updating. */
-	bool IsLoading            : 1; /* Set when the addon is currently loading. */
-	bool IsUnloading          : 1; /* Set when the addon is currently unloading. */
-	bool IsInstalling         : 1; /* Set for library addons when installing. */
-	bool IsUninstalling       : 1; /* Set when the addon is currently uninstalling. */
+	bool IsRunningAction   : 1; /* Set when any action is running. */
 
 	/* Pref modifying flags */
-	bool LoadNextLaunch       : 1; /* Set when the addon is locked and should be loaded next game start. E.g. because of EAddonFlags::OnlyLoadOnGameLaunch. */
-	bool UnloadNextLaunch     : 1; /* Set when the addon is locked and should be unloaded next game start. */
+	bool LoadNextLaunch    : 1; /* Set when the addon is locked and should be loaded next game start. E.g. because of EAddonFlags::OnlyLoadOnGameLaunch. */
+	bool UnloadNextLaunch  : 1; /* Set when the addon is locked and should be unloaded next game start. */
 };
 
 ///----------------------------------------------------------------------------------------------------
@@ -91,12 +80,7 @@ class CAddon
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CAddon(AddonDefinition* aAddonDef);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ctor
-	///----------------------------------------------------------------------------------------------------
-	CAddon(ArcdpsPlugin* aPluginDef);
+	CAddon(CLogHandler* aLogger, CEventApi* aEventApi, CPreferenceMgr* aPrefMgr, CLibraryMgr* aLibraryMgr);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -104,16 +88,22 @@ class CAddon
 	~CAddon();
 
 	///----------------------------------------------------------------------------------------------------
+	/// IsValid:
+	/// 	Returns true, if the addon has at least one of LibraryDef, AddonDef or PluginDef.
+	///----------------------------------------------------------------------------------------------------
+	bool IsValid() const;
+
+	///----------------------------------------------------------------------------------------------------
 	/// GetFlags:
 	/// 	Returns flags of the addon.
 	///----------------------------------------------------------------------------------------------------
-	const AddonFlags& GetFlags();
+	const AddonFlags& GetFlags() const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// IsUpdateAvailable:
 	/// 	Returns true if an update is available.
 	///----------------------------------------------------------------------------------------------------
-	bool IsUpdateAvailable();
+	bool IsUpdateAvailable() const;
 	
 	///----------------------------------------------------------------------------------------------------
 	/// GetError:
@@ -125,13 +115,31 @@ class CAddon
 	/// OwnsAddress:
 	/// 	Returns true if the address is part of the addons address space.
 	///----------------------------------------------------------------------------------------------------
-	bool OwnsAddress(void* aAddress);
+	bool OwnsAddress(void* aAddress) const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetName:
 	/// 	Returns the name of the addon.
 	///----------------------------------------------------------------------------------------------------
-	std::string GetName();
+	const std::string& GetName() const;
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetLocation:
+	/// 	Returns the location of the addon.
+	///----------------------------------------------------------------------------------------------------
+	const std::filesystem::path& GetLocation() const;
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetMD5:
+	/// 	Returns the MD5 of the addon.
+	///----------------------------------------------------------------------------------------------------
+	const std::vector<unsigned char>& GetMD5() const;
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetLibraryDef:
+	/// 	Returns the library definition of the addon.
+	///----------------------------------------------------------------------------------------------------
+	const LibraryAddon* GetLibraryDef() const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// QueueAction:
@@ -140,40 +148,38 @@ class CAddon
 	void QueueAction(EAddonAction aAction);
 
 	private:
-	CLoader*                   Loader;
-	CEventApi*                 EventApi;
 	CLogHandler*               Logger;
+	CEventApi*                 EventApi;
+	CPreferenceMgr*            PrefMgr;
+	CLibraryMgr*               LibraryMgr;
 
 	EAddonAction               QueuedAction;
 	std::condition_variable    ConVar;
 	bool                       IsCanceled;
 	std::mutex                 ProcessorMutex;
 	std::thread                ProcessorThread;
+	uint32_t                   ProcessorThreadId;
 
 	std::mutex                 Mutex;
-	EAddonType                 Type;
 	EAddonState                State;
 	AddonFlags                 Flags;
 	std::string                ErrorDescription;
 
 	AddonPrefs*                Preferences;
-	LibraryAddon*              LibraryDef;       /* Used when the addon is available for download from a library. */
+	LibraryAddon*              LibraryDef;
+	AddonDefinition            AddonDef;
+	ArcdpsPlugin               PluginDef;
 
-	union /* Definitions */
-	{
-		AddonDefinition        AddonDef;         /* Used for Nexus addons. */
-		ArcdpsPlugin           PluginDef;        /* Used for ArcDPS plugins. */
-	};
-	std::filesystem::path      Location;         /* Contains the location of the actual (loaded) module. */
+	std::filesystem::path      Location;
 	std::vector<unsigned char> MD5;
 	HMODULE                    Module;
 	size_t                     ModuleSize;
 
 	///----------------------------------------------------------------------------------------------------
-	/// Process:
+	/// ProcessAction:
 	/// 	Performs queued actions.
 	///----------------------------------------------------------------------------------------------------
-	void Process();
+	void ProcessAction();
 
 	///----------------------------------------------------------------------------------------------------
 	/// Load:
@@ -210,6 +216,24 @@ class CAddon
 	/// 	Updates the addon.
 	///----------------------------------------------------------------------------------------------------
 	void Update();
+
+	///----------------------------------------------------------------------------------------------------
+	/// API_Commit:
+	/// 	Commits any registrations made to API and enables instant committing.
+	///----------------------------------------------------------------------------------------------------
+	void API_Commit();
+
+	///----------------------------------------------------------------------------------------------------
+	/// API_Invalidate:
+	/// 	Disables any registrations made to the API.
+	///----------------------------------------------------------------------------------------------------
+	void API_Invalidate();
+
+	///----------------------------------------------------------------------------------------------------
+	/// API_Clear:
+	/// 	Clears all registrations made to the API.
+	///----------------------------------------------------------------------------------------------------
+	void API_Clear();
 
 	///----------------------------------------------------------------------------------------------------
 	/// ShouldCheckForUpdate:

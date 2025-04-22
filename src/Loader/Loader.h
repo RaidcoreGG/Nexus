@@ -42,6 +42,7 @@ class CLoader
 
 	///----------------------------------------------------------------------------------------------------
 	/// WndProc:
+	/// 	Responsible for processing "/addon" directory updates.
 	/// 	Returns 0 if message was processed.
 	///----------------------------------------------------------------------------------------------------
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -97,28 +98,55 @@ class CLoader
 	void Discover();
 
 	///----------------------------------------------------------------------------------------------------
-	/// PathIsValid:
+	/// IsValid:
 	/// 	Returns true if the provided path is a valid addon path.
+	/// 	Validity criteria: exists, not a directory, filesize > 0, .dll extension.
+	/// 	Symlinks are followed.
 	///----------------------------------------------------------------------------------------------------
-	bool PathIsValid(std::filesystem::path aPath);
+	bool IsValid(std::filesystem::path aPath);
+
+	///----------------------------------------------------------------------------------------------------
+	/// IsTrackedSafe:
+	/// 	Returns true if the provided path is an already tracked addon. Threadsafe.
+	///----------------------------------------------------------------------------------------------------
+	bool IsTrackedSafe(std::filesystem::path aPath);
+
+	///----------------------------------------------------------------------------------------------------
+	/// IsTrackedSafe:
+	/// 	Returns true if the provided MD5 is an already tracked addon. Threadsafe.
+	///----------------------------------------------------------------------------------------------------
+	bool IsTrackedSafe(const std::vector<unsigned char>& aMD5);
 
 	///----------------------------------------------------------------------------------------------------
 	/// IsTracked:
-	/// 	Returns true if the provided path is an already tracked addon.
+	/// 	Returns true if the provided path is an already tracked addon. Not threadsafe.
 	///----------------------------------------------------------------------------------------------------
 	bool IsTracked(std::filesystem::path aPath);
 
 	///----------------------------------------------------------------------------------------------------
-	/// GetAddonType:
-	/// 	Returns the addon type of the given DLL. Caller must ensure pathis a valid addon path.
+	/// IsTracked:
+	/// 	Returns true if the provided MD5 is an already tracked addon. Not threadsafe.
 	///----------------------------------------------------------------------------------------------------
-	EAddonType GetAddonType(std::filesystem::path aPath);
+	bool IsTracked(const std::vector<unsigned char>& aMD5);
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetAddonInterfaces:
+	/// 	Returns the interfaces of the given DLL.
+	///----------------------------------------------------------------------------------------------------
+	EAddonInterface GetAddonInterfaces(std::filesystem::path aPath);
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetGameBuild:
 	/// 	Gets the current game build from the API.
 	///----------------------------------------------------------------------------------------------------
 	void GetGameBuild();
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetAddonSafe:
+	/// 	Returns the addon with the library def. Threadsafe.
+	///----------------------------------------------------------------------------------------------------
+	CAddon* GetAddonSafe(LibraryAddon* aLibraryDef);
+
 };
 
 #endif

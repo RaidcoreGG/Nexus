@@ -16,6 +16,7 @@
 #include "Index.h"
 #include "FuncDefs.h"
 #include "Util/src/DLL.h"
+#include "Util/src/MD5.h"
 
 CLoader::CLoader(CLogHandler* aLogger, CSettings* aSettings, std::vector<signed int> aWhitelist)
 {
@@ -131,13 +132,10 @@ std::string CLoader::GetOwner(void* aAddress)
 void CLoader::ProcessChanges()
 {
 	/* frontload some async work */
-	this->LibraryMgr->Update();
 	this->GetGameBuild();
 
 	for (;;)
 	{
-		EAddonAction action = EAddonAction::None;
-
 		{
 			static std::mutex s_Lock{}; /* dummy for cvar */
 			std::unique_lock<std::mutex> lockThread(s_Lock);
@@ -162,67 +160,64 @@ void CLoader::ProcessChanges()
 
 		if (this->IsCanceled) { return; }
 
+		/* Refresh library. */
+		this->LibraryMgr->Update();
+
+		/* Recheck existing addons. */
 		this->DetectChanges();
+
+		/* Check for new addons. */
 		this->Discover();
 	}
 }
 
 void CLoader::DetectChanges()
 {
-
+	/* TODO: Check addons again */
+	/* TODO: here or in the main process function, recheck previously erroneous (e.g. duplicate) addons */
+	/* TODO: check librarydefs */
 }
 
 void CLoader::Discover()
 {
-	/* TODO: here or in the main process function, recheck previously erroneous (e.g. duplicate) addons */
-
 	/* check /addons directory for untracked */
 	for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Index::D_GW2_ADDONS))
 	{
 		std::filesystem::path path = entry.path();
 
-		/* check this first, because if it's already tracked it's definitely valid */
-		if (this->IsTracked(path))
+		/* Only check valid paths. */
+		if (!this->IsValid(path))
 		{
 			continue;
 		}
 
-		/* if not tracked, the path needs to be validated */
-		if (!this->PathIsValid(path))
+		/* Check if the valid path is tracked. */
+		if (this->IsTrackedSafe(path))
 		{
 			continue;
 		}
 
-		/* if same module is already loaded, skip */
-		if (this->IsTracked(MD5Util::FromFile(path)))
+		/* Check if it's a duplicate. */
+		if (this->IsTrackedSafe(MD5Util::FromFile(path)))
 		{
-			/* TODO: maybe track as incompatible */
+			/* TODO: Create a new addon, that's incompatible. */
 			continue;
 		}
 
-		if (path.extension() == EXT_DLL)
-		{
-			EAddonType type = this->GetAddonType(path);
+		/* If it's not a duplicate, allocate and start tracking. */
+		EAddonType type = this->GetAddonType(path);
 
-			CAddon addon = CAddon(EAddonType::Nexus);
-		}
-		else if (path.extension() == EXT_UNINSTALL)
-		{
-			/* TODO: move this to a temp folder and on startup just delete it entirely */
-			try
-			{
-				std::filesystem::remove(path);
-			}
-			catch (std::filesystem::filesystem_error fErr)
-			{
-				this->Logger->Debug(CH_LOADER, "%s", fErr.what());
-			}
-		}
+		/* TODO: Create addon*/
 	}
 }
 
-bool CLoader::PathIsValid(std::filesystem::path aPath)
+bool CLoader::IsValid(std::filesystem::path aPath)
 {
+	if (aPath.empty())
+	{
+		return false;
+	}
+
 	if (std::filesystem::is_symlink(aPath))
 	{
 		/* if symlink call recursively */
@@ -244,17 +239,65 @@ bool CLoader::PathIsValid(std::filesystem::path aPath)
 		return false;
 	}
 
+	if (aPath.extension() != EXT_DLL)
+	{
+		return false;
+	}
+
 	return true;
 }
 
-bool IsTracked(std::filesystem::path aPath)
+bool CLoader::IsTrackedSafe(std::filesystem::path aPath)
 {
-	throw; /* Not impl. */
+	const std::lock_guard<std::mutex> lock(this->AddonsMutex);
+	return this->IsTracked(aPath);
 }
 
-EAddonType CLoader::GetAddonType(std::filesystem::path aPath)
+bool CLoader::IsTrackedSafe(const std::vector<unsigned char>& aMD5)
 {
-	assert(this->PathIsValid(aPath));
+	const std::lock_guard<std::mutex> lock(this->AddonsMutex);
+	return this->IsTracked(aMD5);
+}
+
+bool CLoader::IsTracked(std::filesystem::path aPath)
+{
+	if (!this->IsValid(aPath))
+	{
+		return false;
+	}
+
+	for (const CAddon& addon : this->Addons)
+	{
+		if (addon.GetLocation() == aPath)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool CLoader::IsTracked(const std::vector<unsigned char>& aMD5)
+{
+	if (aMD5.empty())
+	{
+		return false;
+	}
+
+	for (const CAddon& addon : this->Addons)
+	{
+		if (addon.GetMD5() == aMD5 && !addon.GetMD5().empty())
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+EAddonInterface CLoader::GetAddonInterfaces(std::filesystem::path aPath)
+{
+	assert(this->IsValid(aPath));
 
 #ifdef _DEBUG
 	HMODULE module = LoadLibraryExA(aPath.string().c_str(), 0, DONT_RESOLVE_DLL_REFERENCES);
@@ -264,14 +307,15 @@ EAddonType CLoader::GetAddonType(std::filesystem::path aPath)
 		const std::error_condition ecnd = std::system_category().default_error_condition(GetLastError());
 		this->Logger->Warning(CH_LOADER, "Failed LoadLibrary on \"%s\" during discovery.\nError Code %u : %s", aPath.filename().string().c_str(), ecnd.value(), ecnd.message().c_str());
 
-		return EAddonType::Incompatible;
+		return EAddonInterface::None;
 	}
+
+	EAddonInterface interfaces = EAddonInterface::None;
 
 	GETADDONDEF getAddonDef = nullptr;
 	if (DLL::FindFunction(module, &getAddonDef, "GetAddonDef"))
 	{
-		FreeLibrary(module);
-		return EAddonType::Nexus;
+		interfaces |= EAddonInterface::Nexus;
 	}
 
 	void* get_init_addr = nullptr;
@@ -279,13 +323,15 @@ EAddonType CLoader::GetAddonType(std::filesystem::path aPath)
 	if (DLL::FindFunction(module, &get_init_addr, "get_init_addr") &&
 		DLL::FindFunction(module, &get_release_addr, "get_release_addr"))
 	{
-		FreeLibrary(module);
-		return EAddonType::ArcDPS;
+		interfaces |= EAddonInterface::ArcDPS;
 	}
 
-	return EAddonType::Incompatible;
+	FreeLibrary(module);
+
+	return interfaces;
 #else
-	FIXME: do this properly without the deprecated flag
+	throw;
+	//FIXME: do this properly without the deprecated flag
 #endif
 }
 
@@ -311,4 +357,25 @@ void CLoader::GetGameBuild()
 	}
 
 	this->GameBuild = std::stoi(buildStr);
+}
+
+CAddon* CLoader::GetAddonSafe(LibraryAddon* aLibraryDef)
+{
+	const std::lock_guard<std::mutex> lock(this->AddonsMutex);
+
+	auto it = std::find_if(
+		this->Addons.begin(),
+		this->Addons.end(),
+		[aLibraryDef](CAddon& aAddon)
+		{
+			return aAddon.GetLibraryDef() == aLibraryDef;
+		}
+	);
+
+	if (it != this->Addons.end())
+	{
+		return it._Ptr;
+	}
+
+	return nullptr;
 }

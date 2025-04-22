@@ -32,6 +32,11 @@ bool AddonDefinition::IsValid()
 
 AddonDefinition& AddonDefinition::operator=(const AddonDefinition& rhs)
 {
+	if (this->Name)        { free((char*)this->Name);        }
+	if (this->Author)      { free((char*)this->Author);      }
+	if (this->Description) { free((char*)this->Description); }
+	if (this->UpdateLink)  { free((char*)this->UpdateLink);  }
+
 	/* copy all */
 	memcpy_s(this, sizeof(AddonDefinition), &rhs, sizeof(AddonDefinition));
 

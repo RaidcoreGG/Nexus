@@ -300,7 +300,7 @@
     <ClCompile Include="src\Services\Updater\Updater.cpp">
       <Filter>Services\Updater</Filter>
     </ClCompile>
-    <ClCompile Include="src\Util\MD5.cpp">
+    <ClCompile Include="src\thirdparty\Util\MD5.cpp">
       <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="src\Inputs\GameBinds\GameBindsHandler.cpp">
@@ -1034,7 +1034,7 @@
     <ClInclude Include="src\Services\Updater\Updater.h">
       <Filter>Services\Updater</Filter>
     </ClInclude>
-    <ClInclude Include="src\Util\MD5.h">
+    <ClInclude Include="src\thirdparty\Util\MD5.h">
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\Updater\FuncDefs.h">
@@ -1239,6 +1239,9 @@
       <Filter>Loader\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Loader\EAddonDefFlags.h">
+      <Filter>Loader\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Loader\EAddonInterface.h">
       <Filter>Loader\Core</Filter>
     </ClInclude>
   </ItemGroup>

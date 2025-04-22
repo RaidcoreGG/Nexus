@@ -16,11 +16,11 @@
 ///----------------------------------------------------------------------------------------------------
 enum class EUpdateProvider
 {
-	None     = 0, /* Does not support auto updating */
-	Raidcore = 1, /* Provider is Raidcore API. */
-	GitHub   = 2, /* Provider is GitHub Releases. */
-	Direct   = 3, /* Provider is direct file URL. */
-	Self     = 4  /* Provider is self check, addon has to request manually and version will not be verified. */
+	None,     /* Does not support auto updating. */
+	Raidcore, /* Provider is Raidcore API. */
+	GitHub,   /* Provider is GitHub Releases. */
+	Direct,   /* Provider is direct file URL. */
+	Self      /* Provider is self check, addon has to request manually and version will not be verified. */
 };
 
 ///----------------------------------------------------------------------------------------------------
