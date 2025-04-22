@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <Psapi.h>
 #include <string>
+#include <windowsx.h>
 
 #include "Consts.h"
 #include "Index.h"
@@ -237,46 +238,100 @@ namespace Main
 				uMsg -= WM_PASSTHROUGH_FIRST;
 			}
 
-			/* Fix for jumping cursor. */
-			if (uMsg == WM_MOUSEMOVE)
+			struct WndProc_t
 			{
-				/* Get cursor info to query visibility. */
-				CURSORINFO curInfo{};
-				curInfo.cbSize = sizeof(CURSORINFO);
-				GetCursorInfo(&curInfo);
+				UINT uMsg;
+				LONG wLeft;
+				LONG wRight;
+				LONG lX;
+				LONG lY;
+			};
 
-				static bool s_IsConfining = false;
-				static POINT s_LastPos{};
-
-				/* Cursor is hidden. -> Camera is controlled. -> We can confine it. */
-				if (!(curInfo.flags & CURSOR_SHOWING)) /* Use CURSOR_SHOWING flag instead of CURSOR_HIDDEN for win8 compatability. */
+			switch (uMsg)
+			{
+				case WM_LBUTTONDOWN:
+				case WM_RBUTTONDOWN:
+				case WM_LBUTTONUP:
+				case WM_RBUTTONUP:
+				case WM_MOUSEMOVE:
 				{
-					if (!s_IsConfining) /* Not yet confining. */
+					WndProc_t proc{
+						uMsg,
+						wParam & MK_LBUTTON,
+						wParam & MK_RBUTTON,
+						GET_X_LPARAM(lParam),
+						GET_Y_LPARAM(lParam)
+					};
+
+					CURSORINFO ci;
+					ci.cbSize = sizeof(CURSORINFO);
+					GetCursorInfo(&ci);
+
+					RECT cliprect{};
+					GetClipCursor(&cliprect);
+
+					CContext::GetContext()->GetLogger()->Debug("dbg", "MSG %d LM %d RM %d X%d Y%d %s (%d %d %d %d)",
+															   proc.uMsg, proc.wLeft, proc.wRight, proc.lX, proc.lY, ci.flags == 0 ? "hidden" : "",
+															   cliprect.left, cliprect.top, cliprect.right, cliprect.bottom);
+
+					if (proc.lX == 0 && proc.lY == 0)
 					{
-						/* Create 1px big rect on current cursor location. */
-						RECT clipRect{
-						  curInfo.ptScreenPos.x,
-						  curInfo.ptScreenPos.y,
-						  curInfo.ptScreenPos.x + 1,
-						  curInfo.ptScreenPos.y + 1,
-						};
-
-						s_LastPos = curInfo.ptScreenPos; /* Store last visible pos. */
-
-						ClipCursor(&clipRect);
-
-						s_IsConfining = true; /* Change state. */
+						CContext::GetContext()->GetLogger()->Debug("dbg", "hit");
 					}
+
+					break;
 				}
-				else /* Cursor is visible. */
+			}
+
+			static bool s_IsConfining = false;
+			static POINT s_LastPos = {};
+
+			switch (uMsg)
+			{
+				case WM_LBUTTONDOWN:
+				case WM_RBUTTONDOWN:
+				case WM_LBUTTONUP:
+				case WM_RBUTTONUP:
+				case WM_MOUSEMOVE:
+				{
+					CURSORINFO ci;
+					ci.cbSize = sizeof(CURSORINFO);
+					GetCursorInfo(&ci);
+
+					if (s_IsConfining && (ci.flags != 0))
+					{
+						ClipCursor(NULL);
+						SetCursorPos(s_LastPos.x, s_LastPos.y);
+						CContext::GetContext()->GetLogger()->Debug("dbg", "unclip: X%d Y%d", s_LastPos.x, s_LastPos.y);
+						s_IsConfining = false;
+					}
+					else if (!s_IsConfining && (ci.flags == 0) && ((wParam & MK_LBUTTON) || (wParam & MK_RBUTTON)))
+					{
+						RECT rect{
+							ci.ptScreenPos.x,
+							ci.ptScreenPos.y,
+							ci.ptScreenPos.x + 1,
+							ci.ptScreenPos.y + 1
+						};
+						ClipCursor(&rect);
+						s_LastPos = ci.ptScreenPos;
+						CContext::GetContext()->GetLogger()->Debug("dbg", "clip: X%d Y%d", s_LastPos.x, s_LastPos.y);
+						s_IsConfining = true;
+					}
+
+					break;
+				}
+				case WM_ACTIVATEAPP:
 				{
 					if (s_IsConfining)
 					{
-						ClipCursor(NULL); /* Reset confining. */
-						SetCursorPos(s_LastPos.x, s_LastPos.y); /* Restore last visible pos. */
-
-						s_IsConfining = false; /* Change state. */
+						ClipCursor(NULL);
+						SetCursorPos(s_LastPos.x, s_LastPos.y);
+						CContext::GetContext()->GetLogger()->Debug("dbg", "unclip: X%d Y%d", s_LastPos.x, s_LastPos.y);
+						s_IsConfining = false;
 					}
+
+					break;
 				}
 			}
 		}
