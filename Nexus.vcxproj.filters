@@ -231,7 +231,7 @@
     <ClCompile Include="src\Services\Mumble\Reader.cpp">
       <Filter>Services\Mumble</Filter>
     </ClCompile>
-    <ClCompile Include="src\Events\EventHandler.cpp">
+    <ClCompile Include="src\Events\EventApi.cpp">
       <Filter>Events</Filter>
     </ClCompile>
     <ClCompile Include="src\Inputs\InputBinds\InputBindHandler.cpp">
@@ -293,9 +293,6 @@
     </ClCompile>
     <ClCompile Include="src\Services\Localization\Localization.cpp">
       <Filter>Services\Localization</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Events\EventSubscriber.cpp">
-      <Filter>Events</Filter>
     </ClCompile>
     <ClCompile Include="src\Loader\ArcDPS.cpp">
       <Filter>Loader</Filter>
@@ -467,7 +464,7 @@
     <ClInclude Include="src\Services\Mumble\Reader.h">
       <Filter>Services\Mumble</Filter>
     </ClInclude>
-    <ClInclude Include="src\Events\EventHandler.h">
+    <ClInclude Include="src\Events\EventApi.h">
       <Filter>Events</Filter>
     </ClInclude>
     <ClInclude Include="src\Inputs\InputBinds\InputBindHandler.h">
@@ -509,7 +506,7 @@
     <ClInclude Include="src\Services\DataLink\FuncDefs.h">
       <Filter>Services\DataLink</Filter>
     </ClInclude>
-    <ClInclude Include="src\Events\FuncDefs.h">
+    <ClInclude Include="src\Events\EvtFuncDefs.h">
       <Filter>Events</Filter>
     </ClInclude>
     <ClInclude Include="src\Inputs\InputBinds\FuncDefs.h">
@@ -1037,7 +1034,7 @@
     <ClInclude Include="src\Services\Localization\FuncDefs.h">
       <Filter>Services\Localization</Filter>
     </ClInclude>
-    <ClInclude Include="src\Events\EventSubscriber.h">
+    <ClInclude Include="src\Events\EvtSubscriber.h">
       <Filter>Events</Filter>
     </ClInclude>
     <ClInclude Include="src\Loader\ArcDPS.h">

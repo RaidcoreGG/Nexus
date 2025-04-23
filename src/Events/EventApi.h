@@ -1,31 +1,31 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  EventHandler.h
+/// Name         :  EventApi.h
 /// Description  :  Provides functions raise and receive events.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef EVENTHANDLER_H
-#define EVENTHANDLER_H
+#ifndef EVENTAPI_H
+#define EVENTAPI_H
 
 #include <mutex>
+#include <string>
 #include <unordered_map>
 #include <vector>
-#include <string>
 
-#include "FuncDefs.h"
-#include "EventSubscriber.h"
+#include "EvtFuncDefs.h"
+#include "EvtSubscriber.h"
 
 constexpr const char* CH_EVENTS = "Events";
 
 ///----------------------------------------------------------------------------------------------------
-/// EventData data struct
+/// EventData Struct
 ///----------------------------------------------------------------------------------------------------
 struct EventData
 {
-	std::vector<EventSubscriber>	Subscribers;
-	unsigned long long				AmountRaises = 0;
+	std::vector<EventSubscriber> Subscribers;
+	unsigned long long           AmountRaises = 0;
 };
 
 ///----------------------------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ struct EventData
 ///----------------------------------------------------------------------------------------------------
 class CEventApi
 {
-public:
+	public:
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
@@ -47,25 +47,13 @@ public:
 	/// Raise:
 	/// 	Raises an event of provided name, passing a pointer to the payload.
 	///----------------------------------------------------------------------------------------------------
-	void Raise(const char* aIdentifier, void* aEventData);
+	void Raise(const char* aIdentifier, void* aEventData = nullptr);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Raise:
 	/// 	Raises an event with a payload meant for only a specific subscriber.
 	///----------------------------------------------------------------------------------------------------
-	void Raise(signed int aSignature, const char* aIdentifier, void* aEventData);
-
-	///----------------------------------------------------------------------------------------------------
-	/// Raise:
-	/// 	Raises an event of provided name without a payload.
-	///----------------------------------------------------------------------------------------------------
-	void Raise(const char* aIdentifier);
-
-	///----------------------------------------------------------------------------------------------------
-	/// Raise:
-	/// 	Raises an event without a payload meant for only a specific subscriber.
-	///----------------------------------------------------------------------------------------------------
-	void Raise(signed int aSignature, const char* aIdentifier);
+	void Raise(signed int aSignature, const char* aIdentifier, void* aEventData = nullptr);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Subscribe:
@@ -91,9 +79,9 @@ public:
 	///----------------------------------------------------------------------------------------------------
 	std::unordered_map<std::string, EventData> GetRegistry() const;
 
-private:
-	mutable std::mutex							Mutex;
-	std::unordered_map<std::string, EventData>	Registry;
+	private:
+	mutable std::mutex                         Mutex;
+	std::unordered_map<std::string, EventData> Registry;
 };
 
 #endif

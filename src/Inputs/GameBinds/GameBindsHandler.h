@@ -16,7 +16,7 @@
 
 #include "EGameBinds.h"
 
-#include "Events/EventHandler.h"
+#include "Events/EventApi.h"
 #include "Inputs/InputBinds/InputBind.h"
 #include "Inputs/RawInput/RawInputApi.h"
 #include "Services/Logging/LogHandler.h"

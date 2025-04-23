@@ -15,7 +15,7 @@
 
 #include "Consts.h"
 #include "Context.h"
-#include "Events/EventHandler.h"
+#include "Events/EventApi.h"
 #include "Inputs/InputBinds/InputBindHandler.h"
 #include "resource.h"
 #include "Util/MD5.h"

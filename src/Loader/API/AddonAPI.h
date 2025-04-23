@@ -6,7 +6,7 @@
 #include "imgui/imgui.h"
 #include "minhook/mh_hook.h"
 
-#include "Events/FuncDefs.h"
+#include "Events/EvtFuncDefs.h"
 #include "Inputs/GameBinds/FuncDefs.h"
 #include "Inputs/InputBinds/FuncDefs.h"
 #include "Inputs/RawInput/FuncDefs.h"

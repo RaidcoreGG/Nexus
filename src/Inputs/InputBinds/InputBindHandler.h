@@ -15,7 +15,7 @@
 #include <vector>
 #include <Windows.h>
 
-#include "Events/EventHandler.h"
+#include "Events/EventApi.h"
 #include "FuncDefs.h"
 #include "InputBind.h"
 #include "ManagedInputBind.h"

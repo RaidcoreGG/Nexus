@@ -20,13 +20,12 @@
     <ClCompile Include="src\Services\API\APIController.cpp" />
     <ClCompile Include="src\CrashHandler.cpp" />
     <ClCompile Include="src\Services\DataLink\DataLink.cpp" />
-    <ClCompile Include="src\Events\EventSubscriber.cpp" />
     <ClCompile Include="src\Loader\ArcDPS.cpp" />
     <ClCompile Include="src\Loader\EUpdateProvider.cpp" />
     <ClCompile Include="src\Loader\Library.cpp" />
     <ClCompile Include="src\Services\Localization\Localization.cpp" />
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\Events\EventHandler.cpp" />
+    <ClCompile Include="src\Events\EventApi.cpp" />
     <ClCompile Include="src\thirdparty\ImAnimate\ImAnimate.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui_draw.cpp" />
@@ -110,9 +109,9 @@
     <ClInclude Include="src\Services\DataLink\DataLink.h" />
     <ClInclude Include="src\Services\DataLink\FuncDefs.h" />
     <ClInclude Include="src\Services\DataLink\LinkedResource.h" />
-    <ClInclude Include="src\Events\EventHandler.h" />
-    <ClInclude Include="src\Events\EventSubscriber.h" />
-    <ClInclude Include="src\Events\FuncDefs.h" />
+    <ClInclude Include="src\Events\EventApi.h" />
+    <ClInclude Include="src\Events\EvtSubscriber.h" />
+    <ClInclude Include="src\Events\EvtFuncDefs.h" />
     <ClInclude Include="src\thirdparty\httplib\httplib.h" />
     <ClInclude Include="src\thirdparty\ImAnimate\ImAnimate.h" />
     <ClInclude Include="src\thirdparty\imgui\imconfig.h" />

@@ -11,7 +11,7 @@
 #include <assert.h>
 
 #include "Context.h"
-#include "Events/EventHandler.h"
+#include "Events/EventApi.h"
 #include "Index.h"
 #include "Inputs/GameBinds/GameBindsHandler.h"
 #include "Inputs/InputBinds/InputBindHandler.h"

@@ -12,7 +12,7 @@
 #include "Services/Updater/Updater.h"
 #include "Services/Textures/TextureLoader.h"
 #include "Services/DataLink/DataLink.h"
-#include "Events/EventHandler.h"
+#include "Events/EventApi.h"
 #include "Inputs/RawInput/RawInputApi.h"
 #include "Inputs/InputBinds/InputBindHandler.h"
 #include "Inputs/GameBinds/GameBindsHandler.h"

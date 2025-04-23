@@ -6,7 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "Events/EventHandler.h"
+#include "Events/EventApi.h"
 #include "Inputs/GameBinds/GameBindsHandler.h"
 #include "Inputs/InputBinds/InputBindHandler.h"
 #include "Inputs/RawInput/RawInputApi.h"

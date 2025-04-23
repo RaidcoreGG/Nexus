@@ -12,7 +12,7 @@
 #include <Windows.h>
 
 #include "AddonAPI.h"
-#include "Events/FuncDefs.h"
+#include "Events/EvtFuncDefs.h"
 #include "Inputs/GameBinds/EGameBinds.h"
 #include "Inputs/InputBinds/FuncDefs.h"
 #include "Inputs/RawInput/FuncDefs.h"

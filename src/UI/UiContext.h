@@ -16,7 +16,7 @@
 
 #include "DisplayBinds.h"
 #include "ERenderType.h"
-#include "Events/EventHandler.h"
+#include "Events/EventApi.h"
 #include "FuncDefs.h"
 #include "Inputs/InputBinds/InputBindHandler.h"
 #include "Services/DataLink/DataLink.h"
