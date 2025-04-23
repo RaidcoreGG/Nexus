@@ -238,6 +238,7 @@ namespace Main
 				uMsg -= WM_PASSTHROUGH_FIRST;
 			}
 
+#ifdef _DEBUG
 			struct WndProc_t
 			{
 				UINT uMsg;
@@ -282,6 +283,7 @@ namespace Main
 					break;
 				}
 			}
+#endif
 
 			static bool s_IsConfining = false;
 			static POINT s_LastPos = {};
@@ -308,7 +310,9 @@ namespace Main
 					{
 						ClipCursor(NULL);
 						SetCursorPos(s_LastPos.x, s_LastPos.y);
+#ifdef _DEBUG
 						CContext::GetContext()->GetLogger()->Debug("dbg", "unclip: X%d Y%d", s_LastPos.x, s_LastPos.y);
+#endif
 						s_IsConfining = false;
 					}
 					else if (!s_IsConfining && (ci.flags == 0) && ((wParam & MK_LBUTTON) || (wParam & MK_RBUTTON)))
@@ -320,7 +324,9 @@ namespace Main
 							s_LastPos.y + 1
 						};
 						ClipCursor(&rect);
+#ifdef _DEBUG
 						CContext::GetContext()->GetLogger()->Debug("dbg", "clip: X%d Y%d", s_LastPos.x, s_LastPos.y);
+#endif
 						s_IsConfining = true;
 					}
 
@@ -332,7 +338,9 @@ namespace Main
 					{
 						ClipCursor(NULL);
 						SetCursorPos(s_LastPos.x, s_LastPos.y);
+#ifdef _DEBUG
 						CContext::GetContext()->GetLogger()->Debug("dbg", "unclip: X%d Y%d", s_LastPos.x, s_LastPos.y);
+#endif
 						s_IsConfining = false;
 					}
 
