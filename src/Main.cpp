@@ -298,6 +298,12 @@ namespace Main
 					ci.cbSize = sizeof(CURSORINFO);
 					GetCursorInfo(&ci);
 
+					/* Cursor not hidden, store the last visible pos. */
+					if (ci.flags != 0)
+					{
+						s_LastPos = ci.ptScreenPos;
+					}
+
 					if (s_IsConfining && (ci.flags != 0))
 					{
 						ClipCursor(NULL);
@@ -308,13 +314,12 @@ namespace Main
 					else if (!s_IsConfining && (ci.flags == 0) && ((wParam & MK_LBUTTON) || (wParam & MK_RBUTTON)))
 					{
 						RECT rect{
-							ci.ptScreenPos.x,
-							ci.ptScreenPos.y,
-							ci.ptScreenPos.x + 1,
-							ci.ptScreenPos.y + 1
+							s_LastPos.x,
+							s_LastPos.y,
+							s_LastPos.x + 1,
+							s_LastPos.y + 1
 						};
 						ClipCursor(&rect);
-						s_LastPos = ci.ptScreenPos;
 						CContext::GetContext()->GetLogger()->Debug("dbg", "clip: X%d Y%d", s_LastPos.x, s_LastPos.y);
 						s_IsConfining = true;
 					}
