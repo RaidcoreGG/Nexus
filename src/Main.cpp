@@ -72,6 +72,7 @@ namespace Main
 	static CUiContext*     s_UIContext      = nullptr;
 	static CTextureLoader* s_TextureService = nullptr;
 	static CEventApi*      s_EventApi       = nullptr;
+	static CSettings*      s_SettingsCtx    = nullptr;
 
 	void Initialize(EEntryMethod aEntryMethod)
 	{
@@ -157,6 +158,7 @@ namespace Main
 			s_UIContext = ctx->GetUIContext();
 			s_TextureService = ctx->GetTextureService();
 			s_EventApi = ctx->GetEventApi();
+			s_SettingsCtx = ctx->GetSettingsCtx();
 
 			State::Nexus = ENexusState::LOADED;
 		}
@@ -284,67 +286,69 @@ namespace Main
 				}
 			}
 #endif
-
-			static bool s_IsConfining = false;
-			static POINT s_LastPos = {};
-
-			switch (uMsg)
+			if (s_SettingsCtx && s_SettingsCtx->Get<bool>(OPT_LOCKHIDDENCURSOR, true))
 			{
-				case WM_LBUTTONDOWN:
-				case WM_RBUTTONDOWN:
-				case WM_LBUTTONUP:
-				case WM_RBUTTONUP:
-				case WM_MOUSEMOVE:
+				static bool s_IsConfining = false;
+				static POINT s_LastPos = {};
+
+				switch (uMsg)
 				{
-					CURSORINFO ci;
-					ci.cbSize = sizeof(CURSORINFO);
-					GetCursorInfo(&ci);
-
-					/* Cursor not hidden, store the last visible pos. */
-					if (ci.flags != 0)
+					case WM_LBUTTONDOWN:
+					case WM_RBUTTONDOWN:
+					case WM_LBUTTONUP:
+					case WM_RBUTTONUP:
+					case WM_MOUSEMOVE:
 					{
-						s_LastPos = ci.ptScreenPos;
-					}
+						CURSORINFO ci;
+						ci.cbSize = sizeof(CURSORINFO);
+						GetCursorInfo(&ci);
 
-					if (s_IsConfining && (ci.flags != 0))
-					{
-						ClipCursor(NULL);
-						SetCursorPos(s_LastPos.x, s_LastPos.y);
+						/* Cursor not hidden, store the last visible pos. */
+						if (ci.flags != 0)
+						{
+							s_LastPos = ci.ptScreenPos;
+						}
+
+						if (s_IsConfining && (ci.flags != 0))
+						{
+							ClipCursor(NULL);
+							SetCursorPos(s_LastPos.x, s_LastPos.y);
 #ifdef _DEBUG
-						CContext::GetContext()->GetLogger()->Debug("dbg", "unclip: X%d Y%d", s_LastPos.x, s_LastPos.y);
+							CContext::GetContext()->GetLogger()->Debug("dbg", "unclip: X%d Y%d", s_LastPos.x, s_LastPos.y);
 #endif
-						s_IsConfining = false;
-					}
-					else if (!s_IsConfining && (ci.flags == 0) && ((wParam & MK_LBUTTON) || (wParam & MK_RBUTTON)))
-					{
-						RECT rect{
-							s_LastPos.x,
-							s_LastPos.y,
-							s_LastPos.x + 1,
-							s_LastPos.y + 1
-						};
-						ClipCursor(&rect);
+							s_IsConfining = false;
+						}
+						else if (!s_IsConfining && (ci.flags == 0) && ((wParam & MK_LBUTTON) || (wParam & MK_RBUTTON)))
+						{
+							RECT rect{
+								s_LastPos.x,
+								s_LastPos.y,
+								s_LastPos.x + 1,
+								s_LastPos.y + 1
+							};
+							ClipCursor(&rect);
 #ifdef _DEBUG
-						CContext::GetContext()->GetLogger()->Debug("dbg", "clip: X%d Y%d", s_LastPos.x, s_LastPos.y);
+							CContext::GetContext()->GetLogger()->Debug("dbg", "clip: X%d Y%d", s_LastPos.x, s_LastPos.y);
 #endif
-						s_IsConfining = true;
-					}
+							s_IsConfining = true;
+						}
 
-					break;
-				}
-				case WM_ACTIVATEAPP:
-				{
-					if (s_IsConfining)
+						break;
+					}
+					case WM_ACTIVATEAPP:
 					{
-						ClipCursor(NULL);
-						SetCursorPos(s_LastPos.x, s_LastPos.y);
+						if (s_IsConfining)
+						{
+							ClipCursor(NULL);
+							SetCursorPos(s_LastPos.x, s_LastPos.y);
 #ifdef _DEBUG
-						CContext::GetContext()->GetLogger()->Debug("dbg", "unclip: X%d Y%d", s_LastPos.x, s_LastPos.y);
+							CContext::GetContext()->GetLogger()->Debug("dbg", "unclip: X%d Y%d", s_LastPos.x, s_LastPos.y);
 #endif
-						s_IsConfining = false;
-					}
+							s_IsConfining = false;
+						}
 
-					break;
+						break;
+					}
 				}
 			}
 		}

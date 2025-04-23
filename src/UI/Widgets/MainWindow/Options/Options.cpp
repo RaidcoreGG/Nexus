@@ -94,6 +94,13 @@ void COptionsWindow::TabGeneral()
 			{
 				ImGui::BeginGroupPanel(langApi->Translate("((000042))"), ImVec2(-1.0f, 0.0f));
 
+				/* fix gw2's jumping cursor */
+				static bool lockHiddenCursor = settingsctx->Get<bool>(OPT_LOCKHIDDENCURSOR, true);
+				if (ImGui::Checkbox(langApi->Translate("((000112))"), &lockHiddenCursor))
+				{
+					settingsctx->Set(OPT_LOCKHIDDENCURSOR, lockHiddenCursor);
+				}
+
 				/* close windows on escape */
 				static bool closeOnEscape = settingsctx->Get<bool>(OPT_CLOSEESCAPE, true);
 				if (ImGui::Checkbox(langApi->Translate("((000044))"), &closeOnEscape))
