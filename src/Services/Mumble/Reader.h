@@ -14,7 +14,7 @@
 
 #include "Events/EventApi.h"
 #include "Loader/NexusLinkData.h"
-#include "Services/DataLink/DataLink.h"
+#include "Services/DataLink/DlApi.h"
 #include "Services/Logging/LogHandler.h"
 #include "Services/Mumble/Definitions/Mumble.h"
 
@@ -50,7 +50,7 @@ class CMumbleReader
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CMumbleReader(CDataLink* aDataLink, CEventApi* aEventApi, CLogHandler* aLogger);
+	CMumbleReader(CDataLinkApi* aDataLink, CEventApi* aEventApi, CLogHandler* aLogger);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -70,7 +70,7 @@ class CMumbleReader
 	bool IsDisabled();
 
 	private:
-	CDataLink*        DataLinkApi            = nullptr;
+	CDataLinkApi*     DataLinkApi            = nullptr;
 	CEventApi*        EventApi               = nullptr;
 	CLogHandler*      Logger                 = nullptr;
 

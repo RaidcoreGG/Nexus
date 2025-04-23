@@ -71,7 +71,7 @@ void CQuickAccess::OnAddonLoaded(void* aEventData)
 	qactx->Validate(true);
 }
 
-CQuickAccess::CQuickAccess(CDataLink* aDataLink, CLogHandler* aLogger, CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization, CEventApi* aEventApi)
+CQuickAccess::CQuickAccess(CDataLinkApi* aDataLink, CLogHandler* aLogger, CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization, CEventApi* aEventApi)
 {
 	this->NexusLink = (NexusLinkData*)aDataLink->GetResource(DL_NEXUS_LINK);
 	this->MumbleLink = (Mumble::Data*)aDataLink->GetResource(DL_MUMBLE_LINK);

@@ -255,7 +255,7 @@
     <ClCompile Include="src\Loader\Loader.cpp">
       <Filter>Loader</Filter>
     </ClCompile>
-    <ClCompile Include="src\Services\DataLink\DataLink.cpp">
+    <ClCompile Include="src\Services\DataLink\DlApi.cpp">
       <Filter>Services\DataLink</Filter>
     </ClCompile>
     <ClCompile Include="src\Services\Textures\TextureLoader.cpp">
@@ -494,16 +494,16 @@
     <ClInclude Include="src\Loader\Loader.h">
       <Filter>Loader</Filter>
     </ClInclude>
-    <ClInclude Include="src\Services\DataLink\DataLink.h">
+    <ClInclude Include="src\Services\DataLink\DlApi.h">
       <Filter>Services\DataLink</Filter>
     </ClInclude>
-    <ClInclude Include="src\Services\DataLink\LinkedResource.h">
+    <ClInclude Include="src\Services\DataLink\DlLinkedResource.h">
       <Filter>Services\DataLink</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\Textures\TextureLoader.h">
       <Filter>Services\Textures</Filter>
     </ClInclude>
-    <ClInclude Include="src\Services\DataLink\FuncDefs.h">
+    <ClInclude Include="src\Services\DataLink\DlFuncDefs.h">
       <Filter>Services\DataLink</Filter>
     </ClInclude>
     <ClInclude Include="src\Events\EvtFuncDefs.h">

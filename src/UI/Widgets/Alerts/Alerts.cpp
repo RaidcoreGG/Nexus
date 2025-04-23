@@ -14,7 +14,7 @@
 
 #include "Renderer.h"
 
-CAlerts::CAlerts(CDataLink* aDataLink)
+CAlerts::CAlerts(CDataLinkApi* aDataLink)
 {
 	this->NexusLink = (NexusLinkData*)aDataLink->GetResource("DL_NEXUS_LINK");
 }

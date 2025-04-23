@@ -19,7 +19,7 @@
 #include "EQAVisibility.h"
 #include "Inputs/InputBinds/InputBindHandler.h"
 #include "Loader/NexusLinkData.h"
-#include "Services/DataLink/DataLink.h"
+#include "Services/DataLink/DlApi.h"
 #include "Services/Localization/Localization.h"
 #include "Services/Logging/LogHandler.h"
 #include "Services/Mumble/Reader.h"
@@ -66,7 +66,7 @@ class CQuickAccess : public virtual IWindow
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CQuickAccess(CDataLink* aDataLink, CLogHandler* aLogger, CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization, CEventApi* aEventApi);
+	CQuickAccess(CDataLinkApi* aDataLink, CLogHandler* aLogger, CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization, CEventApi* aEventApi);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor

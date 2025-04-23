@@ -10,11 +10,11 @@
 
 #include "Context.h"
 #include "Renderer.h"
-#include "Services/DataLink/DataLink.h"
+#include "Services/DataLink/DlApi.h"
 
 CMumbleOverlay::CMumbleOverlay()
 {
-	CDataLink* dlApi = CContext::GetContext()->GetDataLink();
+	CDataLinkApi* dlApi = CContext::GetContext()->GetDataLink();
 
 	this->MumbleLink     = (Mumble::Data*)    dlApi->GetResource(DL_MUMBLE_LINK);
 	this->MumbleIdentity = (Mumble::Identity*)dlApi->GetResource(DL_MUMBLE_LINK_IDENTITY);
@@ -27,7 +27,7 @@ void CMumbleOverlay::Render()
 
 	if (!this->MumbleLink || !this->MumbleIdentity || !this->NexusLink)
 	{
-		CDataLink* dlApi = CContext::GetContext()->GetDataLink();
+		CDataLinkApi* dlApi = CContext::GetContext()->GetDataLink();
 
 		this->MumbleLink = (Mumble::Data*)dlApi->GetResource(DL_MUMBLE_LINK);
 		this->MumbleIdentity = (Mumble::Identity*)dlApi->GetResource(DL_MUMBLE_LINK_IDENTITY);

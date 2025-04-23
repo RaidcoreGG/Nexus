@@ -19,7 +19,7 @@
     <ClCompile Include="src\Services\API\ApiClient.cpp" />
     <ClCompile Include="src\Services\API\APIController.cpp" />
     <ClCompile Include="src\CrashHandler.cpp" />
-    <ClCompile Include="src\Services\DataLink\DataLink.cpp" />
+    <ClCompile Include="src\Services\DataLink\DlApi.cpp" />
     <ClCompile Include="src\Loader\ArcDPS.cpp" />
     <ClCompile Include="src\Loader\EUpdateProvider.cpp" />
     <ClCompile Include="src\Loader\Library.cpp" />
@@ -106,9 +106,9 @@
     <ClInclude Include="src\Branch.h" />
     <ClInclude Include="src\Consts.h" />
     <ClInclude Include="src\CrashHandler.h" />
-    <ClInclude Include="src\Services\DataLink\DataLink.h" />
-    <ClInclude Include="src\Services\DataLink\FuncDefs.h" />
-    <ClInclude Include="src\Services\DataLink\LinkedResource.h" />
+    <ClInclude Include="src\Services\DataLink\DlApi.h" />
+    <ClInclude Include="src\Services\DataLink\DlFuncDefs.h" />
+    <ClInclude Include="src\Services\DataLink\DlLinkedResource.h" />
     <ClInclude Include="src\Events\EventApi.h" />
     <ClInclude Include="src\Events\EvtSubscriber.h" />
     <ClInclude Include="src\Events\EvtFuncDefs.h" />

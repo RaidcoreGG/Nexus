@@ -11,7 +11,7 @@
 #include "Services/Localization/Localization.h"
 #include "Services/Updater/Updater.h"
 #include "Services/Textures/TextureLoader.h"
-#include "Services/DataLink/DataLink.h"
+#include "Services/DataLink/DlApi.h"
 #include "Events/EventApi.h"
 #include "Inputs/RawInput/RawInputApi.h"
 #include "Inputs/InputBinds/InputBindHandler.h"

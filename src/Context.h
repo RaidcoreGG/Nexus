@@ -11,7 +11,7 @@
 #include "Inputs/InputBinds/InputBindHandler.h"
 #include "Inputs/RawInput/RawInputApi.h"
 #include "Loader/AddonVersion.h"
-#include "Services/DataLink/DataLink.h"
+#include "Services/DataLink/DlApi.h"
 #include "Services/Localization/Localization.h"
 #include "Services/Logging/LogHandler.h"
 #include "Services/Mumble/Reader.h"
@@ -49,7 +49,7 @@ class CContext
 
 	CTextureLoader* GetTextureService();
 
-	CDataLink* GetDataLink();
+	CDataLinkApi* GetDataLink();
 
 	CEventApi* GetEventApi();
 

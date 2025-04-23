@@ -1,21 +1,22 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  LinkedResource.h
+/// Name         :  DlLinkedResource.h
 /// Description  :  Contains the Texture data struct definition.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LINKEDRESOURCE_H
-#define LINKEDRESOURCE_H
+#ifndef DLLINKEDRESOURCE_H
+#define DLLINKEDRESOURCE_H
 
-#include <Windows.h>
+#include <windows.h>
 #include <string>
+#include <cstdint>
 
 ///----------------------------------------------------------------------------------------------------
-/// ELinkedResourceType enum
+/// ELinkedResourceType Enumeration
 ///----------------------------------------------------------------------------------------------------
-enum class ELinkedResourceType
+enum class ELinkedResourceType : uint32_t
 {
 	None,
 	Public,
@@ -23,15 +24,15 @@ enum class ELinkedResourceType
 };
 
 ///----------------------------------------------------------------------------------------------------
-/// LinkedResource data struct
+/// LinkedResource Struct
 ///----------------------------------------------------------------------------------------------------
 struct LinkedResource
 {
-	ELinkedResourceType		Type;				/* The type of the resource. Public or Internal. */
-	HANDLE					Handle;				/* The handle of the resource. */
-	void*					Pointer;			/* The pointer to the resource. */
-	size_t					Size;				/* The size of the resource. */
-	std::string				UnderlyingName;		/* The real name of the memory mapped file.*/
+	ELinkedResourceType Type;           /* The type of the resource. Public or Internal. */
+	HANDLE              Handle;         /* The handle of the resource. */
+	void*               Pointer;        /* The pointer to the resource. */
+	size_t              Size;           /* The size of the resource. */
+	std::string         UnderlyingName; /* The real name of the memory mapped file.*/
 };
 
 #endif

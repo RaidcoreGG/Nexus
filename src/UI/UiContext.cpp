@@ -53,7 +53,7 @@ namespace UIRoot
 	Mumble::Identity* MumbleIdentity = nullptr;
 	NexusLinkData* NexusLink         = nullptr;
 
-	void Initialize(CLocalization* aLocalization, CDataLink* aDataLink, CFontManager* aFontManager)
+	void Initialize(CLocalization* aLocalization, CDataLinkApi* aDataLink, CFontManager* aFontManager)
 	{
 		Language = aLocalization;
 		FontManager = aFontManager;
@@ -258,7 +258,7 @@ namespace UIRoot
 	}
 }
 
-CUiContext::CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CTextureLoader* aTextureService, CDataLink* aDataLink, CInputBindApi* aInputBindApi, CEventApi* aEventApi)
+CUiContext::CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CTextureLoader* aTextureService, CDataLinkApi* aDataLink, CInputBindApi* aInputBindApi, CEventApi* aEventApi)
 {
 	this->Logger         = aLogger;
 	this->Language       = aLocalization;

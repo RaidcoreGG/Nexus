@@ -14,7 +14,7 @@
 #include <vector>
 
 #include "Loader/NexusLinkData.h"
-#include "Services/DataLink/DataLink.h"
+#include "Services/DataLink/DlApi.h"
 #include "UI/Controls/CtlWindow.h"
 
 ///----------------------------------------------------------------------------------------------------
@@ -26,7 +26,7 @@ class CAlerts : public virtual IWindow
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CAlerts(CDataLink* aDataLink);
+	CAlerts(CDataLinkApi* aDataLink);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor

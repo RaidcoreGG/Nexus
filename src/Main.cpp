@@ -17,7 +17,7 @@
 #include "Inputs/InputBinds/InputBindHandler.h"
 #include "Loader/Loader.h"
 #include "Services/API/ApiClient.h"
-#include "Services/DataLink/DataLink.h"
+#include "Services/DataLink/DlApi.h"
 #include "Services/Logging/CConsoleLogger.h"
 #include "Services/Logging/CFileLogger.h"
 #include "Services/Logging/LogHandler.h"

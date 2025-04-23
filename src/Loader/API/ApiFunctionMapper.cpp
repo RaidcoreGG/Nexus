@@ -17,7 +17,7 @@
 #include "Inputs/InputBinds/InputBindHandler.h"
 #include "Inputs/RawInput/RawInputApi.h"
 #include "Renderer.h"
-#include "Services/DataLink/DataLink.h"
+#include "Services/DataLink/DlApi.h"
 #include "Services/Localization/Localization.h"
 #include "Services/Logging/LogHandler.h"
 #include "Services/Textures/TextureLoader.h"
@@ -32,7 +32,7 @@ namespace ADDONAPI
 {
 	static bool            s_IsInitialized = false;
 
-	static CDataLink*      s_DataLinkApi   = nullptr;
+	static CDataLinkApi*   s_DataLinkApi   = nullptr;
 	static CEventApi*      s_EventApi      = nullptr;
 	static CGameBindsApi*  s_GameBindsApi  = nullptr;
 	static CInputBindApi*  s_InputBindApi  = nullptr;
@@ -60,7 +60,7 @@ namespace ADDONAPI
 		void* ShareResource(const char* aIdentifier, size_t aResourceSize)
 		{
 			assert(s_DataLinkApi);
-			return s_DataLinkApi->ShareResource(aIdentifier, aResourceSize, false);
+			return s_DataLinkApi->ShareResource(aIdentifier, aResourceSize, "", true);
 		}
 	}
 
@@ -513,7 +513,7 @@ namespace ADDONAPI
 		{
 			case 1:
 			{
-				AddonAPI1* api = (AddonAPI1*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion), false);
+				AddonAPI1* api = (AddonAPI1*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
 				assert(api);
 
 				api->SwapChain = Renderer::SwapChain;
@@ -563,7 +563,7 @@ namespace ADDONAPI
 			}
 			case 2:
 			{
-				AddonAPI2* api = (AddonAPI2*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion), false);
+				AddonAPI2* api = (AddonAPI2*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
 				assert(api);
 
 				api->SwapChain = Renderer::SwapChain;
@@ -624,7 +624,7 @@ namespace ADDONAPI
 			}
 			case 3:
 			{
-				AddonAPI3* api = (AddonAPI3*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion), false);
+				AddonAPI3* api = (AddonAPI3*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
 				assert(api);
 
 				api->SwapChain = Renderer::SwapChain;
@@ -689,7 +689,7 @@ namespace ADDONAPI
 			}
 			case 4:
 			{
-				AddonAPI4* api = (AddonAPI4*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion), false);
+				AddonAPI4* api = (AddonAPI4*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
 				assert(api);
 
 				api->SwapChain = Renderer::SwapChain;
@@ -762,7 +762,7 @@ namespace ADDONAPI
 			}
 			case 5:
 			{
-				AddonAPI5* api = (AddonAPI5*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion), false);
+				AddonAPI5* api = (AddonAPI5*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
 				assert(api);
 
 				api->SwapChain = Renderer::SwapChain;
@@ -837,7 +837,7 @@ namespace ADDONAPI
 			}
 			case 6:
 			{
-				AddonAPI6* api = (AddonAPI6*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion), false);
+				AddonAPI6* api = (AddonAPI6*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
 				assert(api);
 
 				api->SwapChain = Renderer::SwapChain;

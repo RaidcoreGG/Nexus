@@ -85,7 +85,7 @@ namespace Mumble
 	}
 }
 
-CMumbleReader::CMumbleReader(CDataLink* aDataLink, CEventApi* aEventApi, CLogHandler* aLogger)
+CMumbleReader::CMumbleReader(CDataLinkApi* aDataLink, CEventApi* aEventApi, CLogHandler* aLogger)
 {
 	assert(aDataLink);
 	assert(aEventApi);
@@ -104,8 +104,8 @@ CMumbleReader::CMumbleReader(CDataLink* aDataLink, CEventApi* aEventApi, CLogHan
 
 	/* share the linked mem regardless whether it's disabled, for dependant addons */
 	this->MumbleLink = (Mumble::Data*)this->DataLinkApi->ShareResource(DL_MUMBLE_LINK, sizeof(Mumble::Data), this->Name.c_str(), true);
-	this->MumbleIdentity = (Mumble::Identity*)this->DataLinkApi->ShareResource(DL_MUMBLE_LINK_IDENTITY, sizeof(Mumble::Identity), false);
-	this->NexusLink = (NexusLinkData*)this->DataLinkApi->ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData), true);
+	this->MumbleIdentity = (Mumble::Identity*)this->DataLinkApi->ShareResource(DL_MUMBLE_LINK_IDENTITY, sizeof(Mumble::Identity), "", false);
+	this->NexusLink = (NexusLinkData*)this->DataLinkApi->ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData), "", true);
 
 	if (this->Name != "0")
 	{

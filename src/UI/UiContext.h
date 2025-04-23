@@ -19,7 +19,7 @@
 #include "Events/EventApi.h"
 #include "FuncDefs.h"
 #include "Inputs/InputBinds/InputBindHandler.h"
-#include "Services/DataLink/DataLink.h"
+#include "Services/DataLink/DlApi.h"
 #include "Services/Localization/Localization.h"
 #include "Services/Logging/LogHandler.h"
 #include "Services/Textures/TextureLoader.h"
@@ -67,7 +67,7 @@ namespace UIRoot
 	/// Initialize:
 	/// 	Initializes the UIRoot for static functions.
 	///----------------------------------------------------------------------------------------------------
-	void Initialize(CLocalization* aLocalization, CDataLink* aDataLink, CFontManager* aFontManager);
+	void Initialize(CLocalization* aLocalization, CDataLinkApi* aDataLink, CFontManager* aFontManager);
 
 	///----------------------------------------------------------------------------------------------------
 	/// FontReceiver:
@@ -121,7 +121,7 @@ class CUiContext
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CTextureLoader* aTextureService, CDataLink* aDataLink, CInputBindApi* aInputBindApi, CEventApi* aEventApi);
+	CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CTextureLoader* aTextureService, CDataLinkApi* aDataLink, CInputBindApi* aInputBindApi, CEventApi* aEventApi);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -253,7 +253,7 @@ class CUiContext
 	CLogHandler*                       Logger         = nullptr;
 	CLocalization*                     Language       = nullptr;
 	CTextureLoader*                    TextureService = nullptr;
-	CDataLink*                         DataLink       = nullptr;
+	CDataLinkApi*                      DataLink       = nullptr;
 	CInputBindApi*                     InputBindApi   = nullptr;
 	CEventApi*                         EventApi       = nullptr;
 

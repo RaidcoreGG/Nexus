@@ -11,7 +11,7 @@
 #include "Inputs/InputBinds/FuncDefs.h"
 #include "Inputs/RawInput/FuncDefs.h"
 #include "Paths/FuncDefs.h"
-#include "Services/DataLink/FuncDefs.h"
+#include "Services/DataLink/DlFuncDefs.h"
 #include "Services/Localization/FuncDefs.h"
 #include "Services/Logging/FuncDefs.h"
 #include "Services/Textures/FuncDefs.h"

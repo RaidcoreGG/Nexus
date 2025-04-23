@@ -34,7 +34,7 @@
 #include "Inputs/InputBinds/InputBindHandler.h"
 #include "Inputs/RawInput/RawInputApi.h"
 #include "minhook/mh_hook.h"
-#include "Services/DataLink/DataLink.h"
+#include "Services/DataLink/DlApi.h"
 #include "Services/Localization/Localization.h"
 #include "Services/Logging/LogHandler.h"
 #include "Services/Mumble/Reader.h"
@@ -89,7 +89,7 @@ namespace Loader
 
 	bool						DisableVolatileUntilUpdate = false;
 
-	CDataLink*     DataLink = nullptr;
+	CDataLinkApi*  DataLink = nullptr;
 	CLogHandler*   Logger   = nullptr;
 	CEventApi*     EventApi = nullptr;
 	CUpdater*      Updater  = nullptr;
@@ -107,8 +107,8 @@ namespace Loader
 		Alerts = uictx->GetAlerts();
 		Language = ctx->GetLocalization();
 
-		NexusLink = (NexusLinkData*)DataLink->ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData), true);
-		MumbleIdentity = (Mumble::Identity*)DataLink->ShareResource(DL_MUMBLE_LINK_IDENTITY, sizeof(Mumble::Identity), false);
+		NexusLink = (NexusLinkData*)DataLink->ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData), "", true);
+		MumbleIdentity = (Mumble::Identity*)DataLink->ShareResource(DL_MUMBLE_LINK_IDENTITY, sizeof(Mumble::Identity), "", false);
 
 		if (CmdLine::HasArgument("-ggaddons"))
 		{

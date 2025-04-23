@@ -92,9 +92,9 @@ CTextureLoader* CContext::GetTextureService()
 	return &s_TextureApi;
 }
 
-CDataLink* CContext::GetDataLink()
+CDataLinkApi* CContext::GetDataLink()
 {
-	static CDataLink s_DataLinkApi = CDataLink(
+	static CDataLinkApi s_DataLinkApi = CDataLinkApi(
 		this->GetLogger()
 	);
 	return &s_DataLinkApi;
