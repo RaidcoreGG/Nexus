@@ -18,6 +18,7 @@
 #include "Inputs/InputBinds/ManagedInputBind.h"
 #include "Renderer.h"
 #include "resource.h"
+#include "Inputs/GameBinds/GbConst.h"
 
 constexpr ImGuiWindowFlags ModalFlags = ImGuiWindowFlags_AlwaysAutoResize |
 									    ImGuiWindowFlags_NoResize         |
@@ -125,7 +126,7 @@ void CBindsWindow::RenderSubWindows()
 	this->DrawBindSetterModal();
 }
 
-void CBindsWindow::RenderInputBindsTable(const std::map<std::string, InputBindPacked>& aInputBinds)
+void CBindsWindow::RenderInputBindsTable(const std::unordered_map<std::string, InputBindPacked>& aInputBinds)
 {
 	if (ImGui::BeginTable("table_inputbinds", 3, ImGuiTableFlags_BordersInnerH))
 	{
@@ -170,7 +171,7 @@ void CBindsWindow::RenderInputBindsTable(const std::map<std::string, InputBindPa
 	}
 }
 
-void CBindsWindow::RenderGameInputBindsTable(const std::map<EGameBinds, GameInputBindPacked>& aInputBinds)
+void CBindsWindow::RenderGameInputBindsTable(const std::unordered_map<EGameBinds, GameInputBindPacked>& aInputBinds)
 {
 	if (ImGui::BeginTable("table_gameinputbinds", 2, ImGuiTableFlags_BordersInnerH))
 	{
@@ -181,7 +182,7 @@ void CBindsWindow::RenderGameInputBindsTable(const std::map<EGameBinds, GameInpu
 		{
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
-			ImGui::Text(langApi->Translate(CGameBindsApi::ToString(identifier).c_str())); // get translation here
+			ImGui::Text(langApi->Translate(NameFrom(identifier).c_str())); // get translation here
 
 			ImGui::TableSetColumnIndex(1);
 			ImGui::PushID(inputBind.Name.c_str());
@@ -194,7 +195,7 @@ void CBindsWindow::RenderGameInputBindsTable(const std::map<EGameBinds, GameInpu
 				this->IsEditing = EBindEditType::Game;
 
 				this->ModalTitle = langApi->Translate("((000062))");
-				this->ModalTitle.append(langApi->Translate(CGameBindsApi::ToString(this->Editing_GameIdentifier).c_str()));
+				this->ModalTitle.append(langApi->Translate(CategoryNameFrom(this->Editing_GameIdentifier).c_str()));
 				this->ModalTitle.append("##InputBindSetter");
 			}
 			ImGui::PopID();

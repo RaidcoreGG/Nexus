@@ -37,8 +37,8 @@ class CBindsWindow : public ISubWindow
 	std::vector<InputBindCategory>             IBCategories;
 	std::vector<GameInputBindCategory>         GIBCategories;
 
-	void RenderInputBindsTable(const std::map<std::string, InputBindPacked>& aInputBinds);
-	void RenderGameInputBindsTable(const std::map<EGameBinds, GameInputBindPacked>& aInputBinds);
+	void RenderInputBindsTable(const std::unordered_map<std::string, InputBindPacked>& aInputBinds);
+	void RenderGameInputBindsTable(const std::unordered_map<EGameBinds, GameInputBindPacked>& aInputBinds);
 
 	void DrawBindSetterModal();
 

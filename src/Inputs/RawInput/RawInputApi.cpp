@@ -37,7 +37,7 @@ LRESULT CRawInputApi::SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 		return PostMessageA(Renderer::WindowHandle, uMsg + WM_PASSTHROUGH_FIRST, wParam, lParam);
 	}
 
-	return PostMessage(Renderer::WindowHandle, uMsg, wParam, lParam);
+	return PostMessageA(Renderer::WindowHandle, uMsg, wParam, lParam);
 }
 
 void CRawInputApi::Register(WNDPROC_CALLBACK aWndProcCallback)

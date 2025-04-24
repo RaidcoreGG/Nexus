@@ -13,7 +13,7 @@
 #include "State.h"
 
 #include "Context.h"
-#include "Inputs/GameBinds/GameBindsHandler.h"
+#include "Inputs/GameBinds/GbApi.h"
 #include "Inputs/InputBinds/InputBindHandler.h"
 #include "Loader/Loader.h"
 #include "Services/API/ApiClient.h"

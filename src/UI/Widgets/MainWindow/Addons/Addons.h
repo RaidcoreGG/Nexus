@@ -63,7 +63,7 @@ class CAddonsWindow : public ISubWindow
 	void RenderContent() override;
 	void RenderSubWindows() override;
 	void RenderDetails();
-	void RenderInputBindsTable(const std::map<std::string, InputBindPacked>& aInputBinds);
+	void RenderInputBindsTable(const std::unordered_map<std::string, InputBindPacked>& aInputBinds);
 
 	void DrawBindSetterModal();
 

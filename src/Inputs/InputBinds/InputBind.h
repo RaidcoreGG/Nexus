@@ -49,7 +49,7 @@ struct InputBind
 	/// IsBound:
 	/// 	Returns true if this input bind has any values set.
 	///----------------------------------------------------------------------------------------------------
-	bool IsBound();
+	bool IsBound() const;
 };
 
 bool operator==(const InputBind& lhs, const InputBind& rhs);

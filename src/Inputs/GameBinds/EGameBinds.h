@@ -9,9 +9,6 @@
 #ifndef EGAMEBINDS_H
 #define EGAMEBINDS_H
 
-#include <string>
-#include <map>
-
 enum class EGameBinds
 {
 	// Movement

@@ -7,7 +7,7 @@
 ///----------------------------------------------------------------------------------------------------
 
 #include "Events/EventApi.h"
-#include "Inputs/GameBinds/GameBindsHandler.h"
+#include "Inputs/GameBinds/GbApi.h"
 #include "Inputs/InputBinds/InputBindHandler.h"
 #include "Inputs/RawInput/RawInputApi.h"
 #include "Loader/AddonVersion.h"

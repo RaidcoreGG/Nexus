@@ -1,18 +1,17 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  GameBindsHandler.h
+/// Name         :  GbApi.h
 /// Description  :  Provides functions for game InputBinds.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef GAMEBINDSHANDLER_H
-#define GAMEBINDSHANDLER_H
+#ifndef GBAPI_H
+#define GBAPI_H
 
 #include <filesystem>
 #include <map>
 #include <mutex>
-#include <string>
 
 #include "EGameBinds.h"
 
@@ -24,27 +23,13 @@
 constexpr const char* CH_GAMEBINDS = "GameBinds";
 constexpr const char* EV_UE_KB_CH = "EV_UNOFFICIAL_EXTRAS_KEYBIND_CHANGED";
 
+///----------------------------------------------------------------------------------------------------
+/// CGameBindsApi Class
+///----------------------------------------------------------------------------------------------------
 class CGameBindsApi
 {
 	public:
-	///----------------------------------------------------------------------------------------------------
-	/// ToString:
-	/// 	Returns the unlocalized identifier of a game bind.
-	///----------------------------------------------------------------------------------------------------
-	static std::string ToString(EGameBinds aGameBind);
-
-	///----------------------------------------------------------------------------------------------------
-	/// GetCategory:
-	/// 	Returns the unlocalized category of a game bind.
-	///----------------------------------------------------------------------------------------------------
-	static std::string GetCategory(EGameBinds aGameBind);
-
-	///----------------------------------------------------------------------------------------------------
-	/// GameBindCodeToScanCode:
-	/// 	Converts a scan code from the game to a regular scan code.
-	///----------------------------------------------------------------------------------------------------
-	static unsigned short GameBindCodeToScanCode(unsigned short aGameScanCode);
-
+	// FIXME: this needs to be moved to an evtconn
 	///----------------------------------------------------------------------------------------------------
 	/// OnUEInputBindChanged:
 	/// 	Receives runtime InputBind updates from Unofficial Extras.
@@ -108,7 +93,7 @@ class CGameBindsApi
 	/// Get:
 	/// 	Gets a game bind.
 	///----------------------------------------------------------------------------------------------------
-	InputBind Get(EGameBinds aGameBind);
+	const InputBind& Get(EGameBinds aGameBind);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Set:
@@ -120,17 +105,17 @@ class CGameBindsApi
 	/// GetRegistry:
 	/// 	Returns a copy of the registry.
 	///----------------------------------------------------------------------------------------------------
-	std::map<EGameBinds, InputBind> GetRegistry() const;
+	std::unordered_map<EGameBinds, InputBind> GetRegistry() const;
 
 	private:
-	CRawInputApi*                   RawInputApi             = nullptr;
-	CLogHandler*                    Logger                  = nullptr;
-	CEventApi*                      EventApi                = nullptr;
+	CRawInputApi*                             RawInputApi = nullptr;
+	CLogHandler*                              Logger      = nullptr;
+	CEventApi*                                EventApi    = nullptr;
 
-	mutable std::mutex              Mutex;
-	std::map<EGameBinds, InputBind> Registry;
+	mutable std::mutex                        Mutex;
+	std::unordered_map<EGameBinds, InputBind> Registry;
 
-	bool                            IsReceivingRuntimeBinds;
+	bool                                      IsReceivingRuntimeBinds;
 
 	///----------------------------------------------------------------------------------------------------
 	/// AddDefaultBinds:

@@ -32,6 +32,7 @@
 #include "Util/Resources.h"
 #include "Util/Time.h"
 #include "Util/Strings.h"
+#include "Inputs/GameBinds/GbConst.h"
 
 #include "UI/Widgets/MainWindow/About/About.h"
 #include "UI/Widgets/MainWindow/Addons/Addons.h"
@@ -743,7 +744,7 @@ std::vector<InputBindCategory> CUiContext::GetInputBinds()
 	return this->DisplayInputBinds;
 }
 
-std::map<std::string, InputBindPacked> CUiContext::GetInputBinds(const std::string& aCategory)
+std::unordered_map<std::string, InputBindPacked> CUiContext::GetInputBinds(const std::string& aCategory)
 {
 	const std::lock_guard<std::mutex> lock(this->DisplayBindsMutex);
 
@@ -1129,12 +1130,12 @@ void CUiContext::UpdateDisplayGameBinds()
 	CGameBindsApi* gameBindsApi = ctx->GetGameBindsApi();
 
 	/* copy of all InputBinds */
-	std::map<EGameBinds, InputBind> InputBindRegistry = gameBindsApi->GetRegistry();
+	std::unordered_map<EGameBinds, InputBind> InputBindRegistry = gameBindsApi->GetRegistry();
 
 	/* acquire categories */
 	for (auto& [identifier, inputBind] : InputBindRegistry)
 	{
-		std::string catName = CGameBindsApi::GetCategory(identifier);
+		std::string catName = CategoryNameFrom(identifier);
 
 		auto it = std::find_if(this->DisplayGameBinds.begin(), this->DisplayGameBinds.end(), [catName](GameInputBindCategory category) { return category.Name == catName; });
 
@@ -1144,7 +1145,7 @@ void CUiContext::UpdateDisplayGameBinds()
 			cat.Name = catName;
 			cat.GameInputBinds[identifier] =
 			{
-				CGameBindsApi::ToString(identifier),
+				NameFrom(identifier),
 				CInputBindApi::IBToString(inputBind, true),
 				inputBind
 			};
@@ -1154,7 +1155,7 @@ void CUiContext::UpdateDisplayGameBinds()
 		{
 			it->GameInputBinds[identifier] =
 			{
-				CGameBindsApi::ToString(identifier),
+				NameFrom(identifier),
 				CInputBindApi::IBToString(inputBind, true),
 				inputBind
 			};

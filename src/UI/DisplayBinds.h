@@ -9,32 +9,35 @@
 #ifndef DISPLAYBINDS_H
 #define DISPLAYBINDS_H
 
+#include <string>
+#include <unordered_map>
+
 #include "Inputs/GameBinds/EGameBinds.h"
 #include "Inputs/InputBinds/ManagedInputBind.h"
 
 struct InputBindPacked
 {
-	std::string                               KeysText;
-	ManagedInputBind                          Bind;
+	std::string      KeysText;
+	ManagedInputBind Bind;
 };
 
 struct InputBindCategory
 {
-	std::string                               Name;
-	std::map<std::string, InputBindPacked>    InputBinds;
+	std::string                                         Name;
+	std::unordered_map<std::string, InputBindPacked>    InputBinds;
 };
 
 struct GameInputBindPacked
 {
-	std::string                               Name;
-	std::string                               KeysText;
-	InputBind                                 Bind;
+	std::string Name;
+	std::string KeysText;
+	InputBind   Bind;
 };
 
 struct GameInputBindCategory
 {
-	std::string                               Name;
-	std::map<EGameBinds, GameInputBindPacked> GameInputBinds;
+	std::string                                         Name;
+	std::unordered_map<EGameBinds, GameInputBindPacked> GameInputBinds;
 };
 
 enum class EBindEditType

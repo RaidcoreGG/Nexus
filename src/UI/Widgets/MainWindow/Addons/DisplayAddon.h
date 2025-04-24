@@ -28,16 +28,15 @@ enum class EAddonType
 
 struct AddonItemData
 {
-
-	EAddonType                             Type;
+	EAddonType                                       Type;
 	union
 	{
-		Addon*                             NexusAddon;
-		LibraryAddon*                      LibraryAddon;
+		Addon*                                       NexusAddon;
+		LibraryAddon*                                LibraryAddon;
 	};
-	std::map<std::string, InputBindPacked> InputBinds;
-	GUI_RENDER                             OptionsRender;
-	bool                                   IsHovered;
+	std::unordered_map<std::string, InputBindPacked> InputBinds;
+	GUI_RENDER                                       OptionsRender;
+	bool                                             IsHovered;
 };
 
 #endif

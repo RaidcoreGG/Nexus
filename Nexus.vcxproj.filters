@@ -330,7 +330,7 @@
     <ClCompile Include="src\Util\DLL.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="src\Inputs\GameBinds\GameBindsHandler.cpp">
+    <ClCompile Include="src\Inputs\GameBinds\GbApi.cpp">
       <Filter>Inputs\GameBinds</Filter>
     </ClCompile>
     <ClCompile Include="src\Util\Inputs.cpp">
@@ -404,6 +404,9 @@
     </ClCompile>
     <ClCompile Include="src\UI\Widgets\MainWindow\SnowflakeMgr.cpp">
       <Filter>UI\Widgets\MainWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Inputs\GameBinds\GbConst.cpp">
+      <Filter>Inputs\GameBinds</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1076,7 +1079,7 @@
     <ClInclude Include="src\Util\DLL.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="src\Inputs\GameBinds\GameBindsHandler.h">
+    <ClInclude Include="src\Inputs\GameBinds\GbApi.h">
       <Filter>Inputs\GameBinds</Filter>
     </ClInclude>
     <ClInclude Include="src\Inputs\GameBinds\EGameBinds.h">
@@ -1088,7 +1091,7 @@
     <ClInclude Include="src\Loader\AddonVersion.h">
       <Filter>Loader\Structs</Filter>
     </ClInclude>
-    <ClInclude Include="src\Inputs\GameBinds\FuncDefs.h">
+    <ClInclude Include="src\Inputs\GameBinds\GbFuncDefs.h">
       <Filter>Inputs\GameBinds</Filter>
     </ClInclude>
     <ClInclude Include="src\Util\Memory.h">
@@ -1201,6 +1204,9 @@
     </ClInclude>
     <ClInclude Include="src\UI\Widgets\MainWindow\SnowflakeMgr.h">
       <Filter>UI\Widgets\MainWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Inputs\GameBinds\GbConst.h">
+      <Filter>Inputs\GameBinds</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

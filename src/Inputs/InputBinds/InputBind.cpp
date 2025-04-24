@@ -18,7 +18,7 @@ InputBind::InputBind(LegacyInputBind aLegacyInputBind)
 	Code = aLegacyInputBind.Key;
 }
 
-bool InputBind::IsBound()
+bool InputBind::IsBound() const
 {
 	return Type != EInputBindType::None && Code != 0;
 }

@@ -228,7 +228,7 @@ class CUiContext
 	/// GetInputBinds:
 	/// 	Returns a copy of the display input binds.
 	///----------------------------------------------------------------------------------------------------
-	std::map<std::string, InputBindPacked> GetInputBinds(const std::string& aCategory);
+	std::unordered_map<std::string, InputBindPacked> GetInputBinds(const std::string& aCategory);
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetGameBinds:

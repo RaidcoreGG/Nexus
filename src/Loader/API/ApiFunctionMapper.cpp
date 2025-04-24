@@ -13,7 +13,7 @@
 #include "Context.h"
 #include "Events/EventApi.h"
 #include "Index.h"
-#include "Inputs/GameBinds/GameBindsHandler.h"
+#include "Inputs/GameBinds/GbApi.h"
 #include "Inputs/InputBinds/InputBindHandler.h"
 #include "Inputs/RawInput/RawInputApi.h"
 #include "Renderer.h"

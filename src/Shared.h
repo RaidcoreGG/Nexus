@@ -15,7 +15,7 @@
 #include "Events/EventApi.h"
 #include "Inputs/RawInput/RawInputApi.h"
 #include "Inputs/InputBinds/InputBindHandler.h"
-#include "Inputs/GameBinds/GameBindsHandler.h"
+#include "Inputs/GameBinds/GbApi.h"
 #include "UI/UiContext.h"
 
 #include "imgui/imgui.h"

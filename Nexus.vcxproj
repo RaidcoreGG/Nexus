@@ -12,7 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Context.cpp" />
-    <ClCompile Include="src\Inputs\GameBinds\GameBindsHandler.cpp" />
+    <ClCompile Include="src\Inputs\GameBinds\GbApi.cpp" />
+    <ClCompile Include="src\Inputs\GameBinds\GbConst.cpp" />
     <ClCompile Include="src\Loader\AddonVersion.cpp" />
     <ClCompile Include="src\Loader\API\ApiFunctionMapper.cpp" />
     <ClCompile Include="src\Services\API\ActiveToken.cpp" />
@@ -90,8 +91,9 @@
   <ItemGroup>
     <ClInclude Include="src\Context.h" />
     <ClInclude Include="src\Inputs\GameBinds\EGameBinds.h" />
-    <ClInclude Include="src\Inputs\GameBinds\FuncDefs.h" />
-    <ClInclude Include="src\Inputs\GameBinds\GameBindsHandler.h" />
+    <ClInclude Include="src\Inputs\GameBinds\GbConst.h" />
+    <ClInclude Include="src\Inputs\GameBinds\GbFuncDefs.h" />
+    <ClInclude Include="src\Inputs\GameBinds\GbApi.h" />
     <ClInclude Include="src\Inputs\InputBinds\EInputBindHandlerType.h" />
     <ClInclude Include="src\Inputs\InputBinds\EInputBindType.h" />
     <ClInclude Include="src\Loader\AddonVersion.h" />

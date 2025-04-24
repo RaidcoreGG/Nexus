@@ -1243,7 +1243,7 @@ void CAddonsWindow::RenderDetails()
 	ImGui::EndChild();
 }
 
-void CAddonsWindow::RenderInputBindsTable(const std::map<std::string, InputBindPacked>& aInputBinds)
+void CAddonsWindow::RenderInputBindsTable(const std::unordered_map<std::string, InputBindPacked>& aInputBinds)
 {
 	if (ImGui::BeginTable("table_inputbinds_addons", 2, ImGuiTableFlags_BordersInnerH))
 	{

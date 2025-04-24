@@ -7,7 +7,7 @@
 #include "minhook/mh_hook.h"
 
 #include "Events/EvtFuncDefs.h"
-#include "Inputs/GameBinds/FuncDefs.h"
+#include "Inputs/GameBinds/GbFuncDefs.h"
 #include "Inputs/InputBinds/FuncDefs.h"
 #include "Inputs/RawInput/FuncDefs.h"
 #include "Paths/FuncDefs.h"
