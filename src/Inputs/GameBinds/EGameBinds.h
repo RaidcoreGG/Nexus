@@ -12,19 +12,19 @@
 enum class EGameBinds
 {
 	// Movement
-	MoveForward   = 0,
-	MoveBackward  = 1,
-	MoveLeft      = 2,
-	MoveRight     = 3,
-	MoveTurnLeft  = 4,
-	MoveTurnRight = 5,
-	MoveDodge     = 6,
-	MoveAutoRun   = 7,
-	MoveWalk      = 8,
-	MoveJump      = 9,
-	MoveSwimUp    = 10,
-	MoveSwimDown  = 11,
-	MoveAboutFace = 12,
+	MoveForward           = 0,
+	MoveBackward          = 1,
+	MoveLeft              = 2,
+	MoveRight             = 3,
+	MoveTurnLeft          = 4,
+	MoveTurnRight         = 5,
+	MoveDodge             = 6,
+	MoveAutoRun           = 7,
+	MoveWalk              = 8,
+	MoveJump_SwimUp_FlyUp = 9,
+	LEGACY_MoveSwimUp     = 10,
+	MoveSwimDown_FlyDown  = 11,
+	MoveAboutFace         = 12,
 
 	// Skills
 	SkillWeaponSwap    = 17,

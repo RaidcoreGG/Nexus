@@ -150,6 +150,12 @@ void CGameBindsApi::InvokeAsync(EGameBinds aGameBind, int aDuration)
 
 void CGameBindsApi::Press(EGameBinds aGameBind)
 {
+	/* Migrate legacy bind that the game merged. */
+	if (aGameBind == EGameBinds::LEGACY_MoveSwimUp)
+	{
+		aGameBind = EGameBinds::MoveJump_SwimUp_FlyUp;
+	}
+
 	const InputBind& ib = this->Get(aGameBind);
 
 	if (!ib.IsBound())
@@ -317,6 +323,12 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 
 void CGameBindsApi::Release(EGameBinds aGameBind)
 {
+	/* Migrate legacy bind that the game merged. */
+	if (aGameBind == EGameBinds::LEGACY_MoveSwimUp)
+	{
+		aGameBind = EGameBinds::MoveJump_SwimUp_FlyUp;
+	}
+
 	const InputBind& ib = this->Get(aGameBind);
 
 	if (!ib.IsBound())
@@ -459,6 +471,12 @@ const InputBind& CGameBindsApi::Get(EGameBinds aGameBind)
 
 void CGameBindsApi::Set(EGameBinds aGameBind, InputBind aInputBind, bool aIsRuntimeBind)
 {
+	/* Remove legacy bind that the game removed. */
+	if (aGameBind == EGameBinds::LEGACY_MoveSwimUp)
+	{
+		return;
+	}
+
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -500,6 +518,12 @@ void CGameBindsApi::AddDefaultBinds()
 	for (int i = 0; i <= 255; i++)
 	{
 		EGameBinds bind = static_cast<EGameBinds>(i);
+
+		/* Remove legacy bind that the game removed. */
+		if (bind == EGameBinds::LEGACY_MoveSwimUp)
+		{
+			continue;
+		}
 
 		if (CategoryNameFrom(bind).empty()) { continue; }
 
@@ -549,7 +573,13 @@ void CGameBindsApi::Load()
 
 			EGameBinds identifier = binding["Identifier"].get<EGameBinds>();
 
-			this->Registry[identifier] = ib;
+			/* Remove legacy bind that the game removed. */
+			if (identifier == EGameBinds::LEGACY_MoveSwimUp)
+			{
+				continue;
+			}
+
+			this->Registry.emplace(identifier, ib); 
 		}
 
 		file.close();
@@ -572,6 +602,12 @@ void CGameBindsApi::Save()
 	{
 		EGameBinds id = it.first;
 		InputBind ib = it.second;
+
+		/* Remove legacy bind that the game removed. */
+		if (id == EGameBinds::LEGACY_MoveSwimUp)
+		{
+			continue;
+		}
 
 		if (!ib.IsBound()) { continue; }
 

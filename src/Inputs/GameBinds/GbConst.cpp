@@ -24,9 +24,9 @@ std::string& NameFrom(EGameBinds aGameBind)
 		{ EGameBinds::MoveDodge, "((MoveDodge))" },
 		{ EGameBinds::MoveAutoRun, "((MoveAutoRun))" },
 		{ EGameBinds::MoveWalk, "((MoveWalk))" },
-		{ EGameBinds::MoveJump, "((MoveJump))"},
-		{ EGameBinds::MoveSwimUp, "((MoveSwimUp))" },
-		{ EGameBinds::MoveSwimDown, "((MoveSwimDown))" },
+		{ EGameBinds::MoveJump_SwimUp_FlyUp, "((MoveJump))"},
+		{ EGameBinds::LEGACY_MoveSwimUp, "((MoveSwimUp))" },
+		{ EGameBinds::MoveSwimDown_FlyDown, "((MoveSwimDown))" },
 		{ EGameBinds::MoveAboutFace, "((MoveAboutFace))" },
 
 		// Skills
@@ -263,9 +263,9 @@ std::string& CategoryNameFrom(EGameBinds aGameBind)
 		{ EGameBinds::MoveDodge, GKBCAT_MOVEMENT },
 		{ EGameBinds::MoveAutoRun, GKBCAT_MOVEMENT },
 		{ EGameBinds::MoveWalk, GKBCAT_MOVEMENT },
-		{ EGameBinds::MoveJump, GKBCAT_MOVEMENT},
-		{ EGameBinds::MoveSwimUp, GKBCAT_MOVEMENT },
-		{ EGameBinds::MoveSwimDown, GKBCAT_MOVEMENT },
+		{ EGameBinds::MoveJump_SwimUp_FlyUp, GKBCAT_MOVEMENT},
+		{ EGameBinds::LEGACY_MoveSwimUp, GKBCAT_MOVEMENT },
+		{ EGameBinds::MoveSwimDown_FlyDown, GKBCAT_MOVEMENT },
 		{ EGameBinds::MoveAboutFace, GKBCAT_MOVEMENT },
 
 		// Skills
