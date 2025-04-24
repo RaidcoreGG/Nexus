@@ -12,6 +12,8 @@
 #include <fstream>
 #include <mutex>
 #include <vector>
+#include <shellscalingapi.h>
+#pragma comment(lib, "shcore.lib")
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_dx11.h"
@@ -578,6 +580,9 @@ UINT CUiContext::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				return 0;
 			}
 			break;
+		case WM_DPICHANGED:
+			this->UpdateScaling();
+			break;
 	}
 
 	if (this->EscapeClose->WndProc(hWnd, uMsg, wParam, lParam) == 0)
@@ -699,10 +704,27 @@ void CUiContext::UpdateScaling()
 	CContext* ctx = CContext::GetContext();
 	CSettings* settingsctx = ctx->GetSettingsCtx();
 
-	float ingamescale = settingsctx->Get<float>(OPT_LASTUISCALE, 1.0f);
+	if (settingsctx->Get<bool>(OPT_DPISCALING, true))
+	{
+		UINT dpi = GetDpiForWindow(this->WindowHandle);
 
-	Renderer::Scaling = ingamescale * io.FontGlobalScale
-		* min(min(Renderer::Width, 1024.0) / 1024.0, min(Renderer::Height, 768.0) / 768.0);
+		io.FontGlobalScale = dpi / 96.f;
+	}
+	else
+	{
+		io.FontGlobalScale = 1.0f;
+	}
+
+	if (settingsctx->Get<float>(OPT_LASTUISCALE, 1.0f) <= 0.f)
+	{
+		settingsctx->Set<float>(OPT_LASTUISCALE, 1.0f);
+	}
+
+	Renderer::Scaling = 
+		settingsctx->Get<float>(OPT_LASTUISCALE, 1.0f) *
+		settingsctx->Get<float>(OPT_GLOBALSCALE, 1.0f) *
+		io.FontGlobalScale *
+		min(min(Renderer::Width, 1024.0) / 1024.0, min(Renderer::Height, 768.0) / 768.0);
 
 	if (nexuslink)
 	{
@@ -1052,9 +1074,6 @@ void CUiContext::LoadSettings()
 	
 	std::string lang = settingsCtx->Get<std::string>(OPT_LANGUAGE, "en");
 	Language->SetLanguage(!lang.empty() ? lang : "en");
-
-	float storedGlobalFontScale = settingsCtx->Get<float>(OPT_GLOBALSCALE, 1.0f);
-	io.FontGlobalScale = storedGlobalFontScale > 0 ? storedGlobalFontScale : 1.0f;
 
 	float lastUiScale = settingsCtx->Get<float>(OPT_LASTUISCALE, 1.0f);
 	if (lastUiScale == 0)

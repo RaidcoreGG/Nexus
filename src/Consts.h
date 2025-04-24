@@ -25,6 +25,7 @@ constexpr const char* OPT_SHOWADDONSWINDOWAFTERDUU = "ShowAddonsWindowAfterDisab
 constexpr const char* OPT_USERFONT                 = "UserFont";
 constexpr const char* OPT_DISABLEFESTIVEFLAIR      = "DisableFestiveFlair";
 constexpr const char* OPT_LOCKHIDDENCURSOR         = "LockHiddenCursor";
+constexpr const char* OPT_DPISCALING               = "DPIScaling";
 
 /* Channels */
 constexpr const char* CH_CORE = "Core";

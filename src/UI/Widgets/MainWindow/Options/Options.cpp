@@ -288,18 +288,18 @@ void COptionsWindow::TabStyle()
 			}
 			ImGui::EndGroupPanel();
 
-			ImGuiIO& io = ImGui::GetIO();
 			ImGui::BeginGroupPanel(langApi->Translate("((000072))"), ImVec2(-1.0f, 0.0f));
-			if (ImGui::DragFloat("##GlobalScaleInput", &io.FontGlobalScale, 0.005f, 0.75f, 3.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp))
+			static bool dpiScaling = settingsctx->Get<bool>(OPT_DPISCALING, true);
+			if (ImGui::Checkbox(langApi->Translate("((DPI Scaling))"), &dpiScaling))
 			{
-				settingsctx->Set(OPT_GLOBALSCALE, io.FontGlobalScale);
-				float uiScale = settingsctx->Get<float>(OPT_LASTUISCALE, 1.0f);
+				settingsctx->Set(OPT_DPISCALING, dpiScaling);
+				uictx->UpdateScaling();
+			}
 
-				if (uiScale <= 0)
-				{
-					uiScale = SC_NORMAL;
-				}
-
+			static float globalScale = settingsctx->Get<float>(OPT_GLOBALSCALE, 1.0f);
+			if (ImGui::DragFloat("##GlobalScaleInput", &globalScale, 0.005f, 0.75f, 3.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp))
+			{
+				settingsctx->Set(OPT_GLOBALSCALE, globalScale);
 				uictx->UpdateScaling();
 			}
 			ImGui::EndGroupPanel();
