@@ -79,6 +79,11 @@ namespace String
 
 	bool EndsWith(std::string aString, const std::string& aStringFind)
 	{
+		if (aStringFind.length() > aString.length())
+		{
+			return false;
+		}
+
 		aString = aString.substr(aString.length() - aStringFind.length(), aStringFind.length());
 
 		if (aString == aStringFind)
