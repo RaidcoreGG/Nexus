@@ -291,6 +291,33 @@ namespace Main
 				static bool s_IsConfining = false;
 				static POINT s_LastPos = {};
 
+				CURSORINFO ci;
+				ci.cbSize = sizeof(CURSORINFO);
+				GetCursorInfo(&ci);
+
+				/* Store last visible pos on first click. */
+				switch (uMsg)
+				{
+					case WM_LBUTTONDOWN:
+					{
+						if (ci.flags != 0 && (wParam & MK_RBUTTON) != MK_RBUTTON)
+						{
+							s_LastPos = ci.ptScreenPos;
+							CContext::GetContext()->GetLogger()->Debug("dbg", "left-click: X%d Y%d", s_LastPos.x, s_LastPos.y);
+						}
+						break;
+					}
+					case WM_RBUTTONDOWN:
+					{
+						if (ci.flags != 0 && (wParam & MK_LBUTTON) != MK_LBUTTON)
+						{
+							s_LastPos = ci.ptScreenPos;
+							CContext::GetContext()->GetLogger()->Debug("dbg", "right-click: X%d Y%d", s_LastPos.x, s_LastPos.y);
+						}
+						break;
+					}
+				}
+
 				switch (uMsg)
 				{
 					case WM_LBUTTONDOWN:
@@ -299,23 +326,11 @@ namespace Main
 					case WM_RBUTTONUP:
 					case WM_MOUSEMOVE:
 					{
-						CURSORINFO ci;
-						ci.cbSize = sizeof(CURSORINFO);
-						GetCursorInfo(&ci);
-
-						/* Cursor not hidden, store the last visible pos. */
-						if (ci.flags != 0)
-						{
-							s_LastPos = ci.ptScreenPos;
-						}
-
 						if (s_IsConfining && (ci.flags != 0))
 						{
 							ClipCursor(NULL);
 							SetCursorPos(s_LastPos.x, s_LastPos.y);
-#ifdef _DEBUG
 							CContext::GetContext()->GetLogger()->Debug("dbg", "unclip: X%d Y%d", s_LastPos.x, s_LastPos.y);
-#endif
 							s_IsConfining = false;
 						}
 						else if (!s_IsConfining && (ci.flags == 0) && ((wParam & MK_LBUTTON) || (wParam & MK_RBUTTON)))
@@ -327,9 +342,7 @@ namespace Main
 								s_LastPos.y + 1
 							};
 							ClipCursor(&rect);
-#ifdef _DEBUG
 							CContext::GetContext()->GetLogger()->Debug("dbg", "clip: X%d Y%d", s_LastPos.x, s_LastPos.y);
-#endif
 							s_IsConfining = true;
 						}
 
@@ -341,9 +354,7 @@ namespace Main
 						{
 							ClipCursor(NULL);
 							SetCursorPos(s_LastPos.x, s_LastPos.y);
-#ifdef _DEBUG
 							CContext::GetContext()->GetLogger()->Debug("dbg", "unclip: X%d Y%d", s_LastPos.x, s_LastPos.y);
-#endif
 							s_IsConfining = false;
 						}
 

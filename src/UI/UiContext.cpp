@@ -470,6 +470,14 @@ void CUiContext::Render()
 			}
 		}
 
+		ImDrawList* dl = ImGui::GetForegroundDrawList();
+
+		POINT point{};
+		if (GetCursorPos(&point))
+		{
+			dl->AddCircle(ImVec2(point.x, point.y), 3.f, ImColor(1.f, 0.f, 0.f, 1.f), 0, 3.f);
+		}
+
 		/* end frame */
 		ImGui::EndFrame();
 		ImGui::Render();
