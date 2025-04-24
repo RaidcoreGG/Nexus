@@ -926,44 +926,31 @@ void CUiContext::ApplyStyle(EUIStyle aStyle)
 
 		if (std::filesystem::exists(arcIniPath))
 		{
-			std::ifstream arcIni(arcIniPath);
+			char buff[4096]{};
+			std::string decode{};
 
-			if (arcIni.is_open())
+			try
 			{
-				std::string line;
-				std::string styleKey = "appearance_imgui_style180=";
-				std::string coloursKey = "appearance_imgui_colours180=";
-				std::string fontSizeKey = "font_size=";
+				memset(buff, 0, sizeof(buff)); // reset buffer
+				GetPrivateProfileStringA("session", "appearance_imgui_style180", "", &buff[0], sizeof(buff), arcIniPath.string().c_str());
+				std::string arcstyle = buff;
+				decode = Base64::Decode(arcstyle, arcstyle.length());
+				memcpy(style, &decode[0], decode.length());
 
-				try
-				{
-					while (std::getline(arcIni, line))
-					{
-						if (line.find(styleKey, 0) != line.npos)
-						{
-							line = line.substr(styleKey.length());
-							std::string decode = Base64::Decode(&line[0], line.length());
-							memcpy(style, &decode[0], decode.length());
-						}
-						else if (line.find(coloursKey, 0) != line.npos)
-						{
-							line = line.substr(coloursKey.length());
-							std::string decode = Base64::Decode(&line[0], line.length());
-							memcpy(&style->Colors[0], &decode[0], decode.length());
-						}
-						else if (line.find(fontSizeKey, 0) != line.npos)
-						{
-							line = line.substr(fontSizeKey.length());
-							this->ImGuiContext->FontSize = std::stof(line);
-						}
-					}
-				}
-				catch (...)
-				{
-					this->Logger->Debug(CH_UICONTEXT, "Couldn't parse ArcDPS style.");
-				}
+				memset(buff, 0, sizeof(buff)); // reset buffer
+				GetPrivateProfileStringA("session", "appearance_imgui_colours180", "", &buff[0], sizeof(buff), arcIniPath.string().c_str());
+				std::string arccols = buff;
+				decode = Base64::Decode(arccols, arccols.length());
+				memcpy(&style->Colors[0], &decode[0], decode.length());
 
-				arcIni.close();
+				memset(buff, 0, sizeof(buff)); // reset buffer
+				GetPrivateProfileStringA("session", "font_size", "", &buff[0], sizeof(buff), arcIniPath.string().c_str());
+				std::string arcfontsize = buff;
+				this->ImGuiContext->FontSize = std::stof(arcfontsize);
+			}
+			catch (...)
+			{
+				this->Logger->Debug(CH_UICONTEXT, "Couldn't parse ArcDPS style.");
 			}
 		}
 	}
