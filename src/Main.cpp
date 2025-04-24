@@ -240,52 +240,6 @@ namespace Main
 				uMsg -= WM_PASSTHROUGH_FIRST;
 			}
 
-#ifdef _DEBUG
-			struct WndProc_t
-			{
-				UINT uMsg;
-				LONG wLeft;
-				LONG wRight;
-				LONG lX;
-				LONG lY;
-			};
-
-			switch (uMsg)
-			{
-				case WM_LBUTTONDOWN:
-				case WM_RBUTTONDOWN:
-				case WM_LBUTTONUP:
-				case WM_RBUTTONUP:
-				case WM_MOUSEMOVE:
-				{
-					WndProc_t proc{
-						uMsg,
-						wParam & MK_LBUTTON,
-						wParam & MK_RBUTTON,
-						GET_X_LPARAM(lParam),
-						GET_Y_LPARAM(lParam)
-					};
-
-					CURSORINFO ci;
-					ci.cbSize = sizeof(CURSORINFO);
-					GetCursorInfo(&ci);
-
-					RECT cliprect{};
-					GetClipCursor(&cliprect);
-
-					CContext::GetContext()->GetLogger()->Debug("dbg", "MSG %d LM %d RM %d X%d Y%d %s (%d %d %d %d)",
-															   proc.uMsg, proc.wLeft, proc.wRight, proc.lX, proc.lY, ci.flags == 0 ? "hidden" : "",
-															   cliprect.left, cliprect.top, cliprect.right, cliprect.bottom);
-
-					if (proc.lX == 0 && proc.lY == 0)
-					{
-						CContext::GetContext()->GetLogger()->Debug("dbg", "hit");
-					}
-
-					break;
-				}
-			}
-#endif
 			if (s_SettingsCtx && s_SettingsCtx->Get<bool>(OPT_LOCKHIDDENCURSOR, true))
 			{
 				static bool s_IsConfining = false;
@@ -303,7 +257,6 @@ namespace Main
 						if (ci.flags != 0 && (wParam & MK_RBUTTON) != MK_RBUTTON)
 						{
 							s_LastPos = ci.ptScreenPos;
-							CContext::GetContext()->GetLogger()->Debug("dbg", "left-click: X%d Y%d", s_LastPos.x, s_LastPos.y);
 						}
 						break;
 					}
@@ -312,7 +265,6 @@ namespace Main
 						if (ci.flags != 0 && (wParam & MK_LBUTTON) != MK_LBUTTON)
 						{
 							s_LastPos = ci.ptScreenPos;
-							CContext::GetContext()->GetLogger()->Debug("dbg", "right-click: X%d Y%d", s_LastPos.x, s_LastPos.y);
 						}
 						break;
 					}
@@ -330,7 +282,6 @@ namespace Main
 						{
 							ClipCursor(NULL);
 							SetCursorPos(s_LastPos.x, s_LastPos.y);
-							CContext::GetContext()->GetLogger()->Debug("dbg", "unclip: X%d Y%d", s_LastPos.x, s_LastPos.y);
 							s_IsConfining = false;
 						}
 						else if (!s_IsConfining && (ci.flags == 0) && ((wParam & MK_LBUTTON) || (wParam & MK_RBUTTON)))
@@ -342,7 +293,6 @@ namespace Main
 								s_LastPos.y + 1
 							};
 							ClipCursor(&rect);
-							CContext::GetContext()->GetLogger()->Debug("dbg", "clip: X%d Y%d", s_LastPos.x, s_LastPos.y);
 							s_IsConfining = true;
 						}
 
@@ -354,7 +304,6 @@ namespace Main
 						{
 							ClipCursor(NULL);
 							SetCursorPos(s_LastPos.x, s_LastPos.y);
-							CContext::GetContext()->GetLogger()->Debug("dbg", "unclip: X%d Y%d", s_LastPos.x, s_LastPos.y);
 							s_IsConfining = false;
 						}
 
