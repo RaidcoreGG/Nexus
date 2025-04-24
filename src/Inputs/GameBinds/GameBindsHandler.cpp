@@ -216,6 +216,7 @@ std::string CGameBindsApi::ToString(EGameBinds aGameBind)
 		{ EGameBinds::Loadout6, "((Loadout6))" },
 		{ EGameBinds::Loadout7, "((Loadout7))" },
 		{ EGameBinds::Loadout8, "((Loadout8))" },
+		{ EGameBinds::Loadout9, "((Loadout9))" },
 
 		// Equipment Templates
 		{ EGameBinds::GearLoadout1, "((GearLoadout1))" },
@@ -225,7 +226,8 @@ std::string CGameBindsApi::ToString(EGameBinds aGameBind)
 		{ EGameBinds::GearLoadout5, "((GearLoadout5))" },
 		{ EGameBinds::GearLoadout6, "((GearLoadout6))" },
 		{ EGameBinds::GearLoadout7, "((GearLoadout7))" },
-		{ EGameBinds::GearLoadout8, "((GearLoadout8))" }
+		{ EGameBinds::GearLoadout8, "((GearLoadout8))" },
+		{ EGameBinds::GearLoadout9, "((GearLoadout9))" }
 	};
 
 	return LookupTable[aGameBind];
@@ -444,6 +446,7 @@ std::string CGameBindsApi::GetCategory(EGameBinds aGameBind)
 		{ EGameBinds::Loadout6, GKBCAT_TEMPLATES },
 		{ EGameBinds::Loadout7, GKBCAT_TEMPLATES },
 		{ EGameBinds::Loadout8, GKBCAT_TEMPLATES },
+		{ EGameBinds::Loadout9, GKBCAT_TEMPLATES },
 
 		// Equipment Templates
 		{ EGameBinds::GearLoadout1, GKBCAT_TEMPLATES },
@@ -453,7 +456,8 @@ std::string CGameBindsApi::GetCategory(EGameBinds aGameBind)
 		{ EGameBinds::GearLoadout5, GKBCAT_TEMPLATES },
 		{ EGameBinds::GearLoadout6, GKBCAT_TEMPLATES },
 		{ EGameBinds::GearLoadout7, GKBCAT_TEMPLATES },
-		{ EGameBinds::GearLoadout8, GKBCAT_TEMPLATES }
+		{ EGameBinds::GearLoadout8, GKBCAT_TEMPLATES },
+		{ EGameBinds::GearLoadout9, GKBCAT_TEMPLATES }
 	};
 
 	return LookupTable[aGameBind];
