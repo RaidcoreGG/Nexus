@@ -6,30 +6,28 @@
 ![](https://img.shields.io/github/downloads/RaidcoreGG/Nexus/total?style=for-the-badge&labelColor=%23131519&color=%230F79AA&label=Direct%20Downloads)
 ![](https://img.shields.io/github/downloads/RaidcoreGG/NexusInstaller/total?style=for-the-badge&labelColor=%23131519&color=%230F79AA&label=Installer%20Downloads)
 
-# Nexus Addon Loader &amp; Manager
+# Nexus - An addon engine for Guild Wars 2
 
-Nexus is a next-gen Addon Manager & Loader for Guild Wars 2. It provides a powerful API for addons and keeps your plugins always up-to-date. No fidgeting with DLL files, crashing games after updates or inconsistent behaviour across addons. A single installation to manage all your extensions.
-### *This is as close to an official Addon API as it gets.*
+*Host, Loader, Manager, Framework* and *Platform* are all terms describing what Nexus does.
+
+### For Users
+Nexus means **easy setup**, **updating** and **management**. Maximum **convenience**. **Directly in the game.** No fiddling with any DLL files.
+
+### For Developers
+Nexus means focus on developing actual features. **Hot-Loading. Easy Integration. Powerful API.**
 
 ## Features
-### Overview
-- **Loading & unloading** addons **without restarting the game**.
-- **Automatic updates**.
-- **Addon Library** for quick discovery & installation of new addons.
-- **Automatically disable breaking addons** when the game updates.
-- **Consistent behaviour across addons**.
-- **Multiboxing** compatibile.
-- **100% ToS compliant.** Doesn't read game memory at all.
-- **Integrates with ArcDPS**
-
-### Overview for addon developers
-- **Hot-Loading**, enabling fast feature iteration.
-- **Event Publishing / Subscribing**
-- **Managed Keybinds** No need to fiddle with WndProc. *Unless you want to*.
+- **Hot-Loading**
+- **Automatic Updates**
+- **Event PubSub**
+- **Managed Keybinds**
 - **Logging**
 - **Resource Registry** to share resources & functions between Addons.
 - **Texture/Image Loader**
-- Shared &amp; parsed **[Mumble](https://github.com/RaidcoreGG/RCGG-lib-mumble-api)**
+- **Addon Library** for quick discovery & installation.
+- **Auto-Disable on Game Update**
+- **Extended Real-Time APIs**
+- **ArcDPS Integration**
 
 ## Installation
 1. Download `d3d11.dll` found in the [latest release](https://github.com/RaidcoreGG/Nexus/releases).
