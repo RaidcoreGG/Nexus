@@ -722,7 +722,7 @@ void CUiContext::UpdateScaling()
 
 	Renderer::Scaling = 
 		settingsctx->Get<float>(OPT_LASTUISCALE, 1.0f) *
-		settingsctx->Get<float>(OPT_GLOBALSCALE, 1.0f) *
+		/* settingsctx->Get<float>(OPT_GLOBALSCALE, 1.0f) * */
 		io.FontGlobalScale *
 		min(min(Renderer::Width, 1024.0) / 1024.0, min(Renderer::Height, 768.0) / 768.0);
 

@@ -94,6 +94,13 @@ void COptionsWindow::TabGeneral()
 			{
 				ImGui::BeginGroupPanel(langApi->Translate("((000042))"), ImVec2(-1.0f, 0.0f));
 
+				static bool dpiScaling = settingsctx->Get<bool>(OPT_DPISCALING, true);
+				if (ImGui::Checkbox(langApi->Translate("((000113))"), &dpiScaling))
+				{
+					settingsctx->Set(OPT_DPISCALING, dpiScaling);
+					uictx->UpdateScaling();
+				}
+
 				/* fix gw2's jumping cursor */
 				static bool lockHiddenCursor = settingsctx->Get<bool>(OPT_LOCKHIDDENCURSOR, true);
 				if (ImGui::Checkbox(langApi->Translate("((000112))"), &lockHiddenCursor))
@@ -273,14 +280,16 @@ void COptionsWindow::TabStyle()
 			}
 			ImGui::EndGroupPanel();
 
-			ImGuiContext* imguictx = ImGui::GetCurrentContext();
-
 			ImGui::BeginGroupPanel(langApi->Translate("((000054))"), ImVec2(-1.0f, 0.0f));
-			if (ImGui::InputFloat("##FontSizeInput", &imguictx->FontSize, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_EnterReturnsTrue))
+			static float fontSize = settingsctx->Get<float>(OPT_FONTSIZE, 13.0f);
+			if (ImGui::InputFloat("##FontSizeInput", &fontSize, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_EnterReturnsTrue))
 			{
-				imguictx->FontSize = min(max(imguictx->FontSize, 1.0f), 50.0f);
+				fontSize = min(max(fontSize, 1.0f), 50.0f);
 
-				settingsctx->Set(OPT_FONTSIZE, imguictx->FontSize);
+				settingsctx->Set(OPT_FONTSIZE, fontSize);
+
+				ImGuiContext* imguictx = ImGui::GetCurrentContext();
+				imguictx->FontSize = fontSize;
 
 				CFontManager* fontMgr = uictx->GetFontManager();
 				fontMgr->ResizeFont("USER_FONT", imguictx->FontSize);
@@ -288,21 +297,14 @@ void COptionsWindow::TabStyle()
 			}
 			ImGui::EndGroupPanel();
 
-			ImGui::BeginGroupPanel(langApi->Translate("((000072))"), ImVec2(-1.0f, 0.0f));
-			static bool dpiScaling = settingsctx->Get<bool>(OPT_DPISCALING, true);
-			if (ImGui::Checkbox(langApi->Translate("((DPI Scaling))"), &dpiScaling))
-			{
-				settingsctx->Set(OPT_DPISCALING, dpiScaling);
-				uictx->UpdateScaling();
-			}
-
+			/*ImGui::BeginGroupPanel(langApi->Translate("((000072))"), ImVec2(-1.0f, 0.0f));
 			static float globalScale = settingsctx->Get<float>(OPT_GLOBALSCALE, 1.0f);
 			if (ImGui::DragFloat("##GlobalScaleInput", &globalScale, 0.005f, 0.75f, 3.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp))
 			{
 				settingsctx->Set(OPT_GLOBALSCALE, globalScale);
 				uictx->UpdateScaling();
 			}
-			ImGui::EndGroupPanel();
+			ImGui::EndGroupPanel();*/
 
 			ImGui::BeginGroupPanel(langApi->Translate("((000053))"), ImVec2(-1.0f, 0.0f));
 			static bool linkArcDpsStyle = settingsctx->Get<bool>(OPT_LINKARCSTYLE, true);
