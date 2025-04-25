@@ -531,7 +531,7 @@ void CGameBindsApi::AddDefaultBinds()
 
 		if (it == this->Registry.end())
 		{
-			it->second = InputBind{};
+			this->Registry.emplace(bind, InputBind{});
 		}
 	}
 }
