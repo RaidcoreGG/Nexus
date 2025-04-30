@@ -24,8 +24,9 @@ constexpr const char* OPT_GLOBALSCALE              = "GlobalScale";
 constexpr const char* OPT_SHOWADDONSWINDOWAFTERDUU = "ShowAddonsWindowAfterDisableUntilUpdate";
 constexpr const char* OPT_USERFONT                 = "UserFont";
 constexpr const char* OPT_DISABLEFESTIVEFLAIR      = "DisableFestiveFlair";
-constexpr const char* OPT_LOCKHIDDENCURSOR         = "LockHiddenCursor";
 constexpr const char* OPT_DPISCALING               = "DPIScaling";
+constexpr const char* OPT_CAMCTRL_LOCKCURSOR       = "CameraControl_LockCursor";
+constexpr const char* OPT_CAMCTRL_RESETCURSOR      = "CameraControl_ResetCursor";
 
 /* Channels */
 constexpr const char* CH_CORE = "Core";

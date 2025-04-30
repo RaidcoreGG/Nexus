@@ -102,10 +102,16 @@ void COptionsWindow::TabGeneral()
 				}
 
 				/* fix gw2's jumping cursor */
-				static bool lockHiddenCursor = settingsctx->Get<bool>(OPT_LOCKHIDDENCURSOR, true);
+				static bool lockHiddenCursor = settingsctx->Get<bool>(OPT_CAMCTRL_LOCKCURSOR, false);
 				if (ImGui::Checkbox(langApi->Translate("((000112))"), &lockHiddenCursor))
 				{
-					settingsctx->Set(OPT_LOCKHIDDENCURSOR, lockHiddenCursor);
+					settingsctx->Set(OPT_CAMCTRL_LOCKCURSOR, lockHiddenCursor);
+				}
+
+				static bool resetHiddenCursor = settingsctx->Get<bool>(OPT_CAMCTRL_RESETCURSOR, false);
+				if (ImGui::Checkbox(langApi->Translate("((000114))"), &resetHiddenCursor))
+				{
+					settingsctx->Set(OPT_CAMCTRL_RESETCURSOR, resetHiddenCursor);
 				}
 
 				/* close windows on escape */

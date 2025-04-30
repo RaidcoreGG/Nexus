@@ -240,7 +240,9 @@ namespace Main
 				uMsg -= WM_PASSTHROUGH_FIRST;
 			}
 
-			if (s_SettingsCtx && s_SettingsCtx->Get<bool>(OPT_LOCKHIDDENCURSOR, true))
+			bool lockCursor = s_SettingsCtx ? s_SettingsCtx->Get<bool>(OPT_CAMCTRL_LOCKCURSOR, false) : false;
+			bool resetCursor = s_SettingsCtx ? s_SettingsCtx->Get<bool>(OPT_CAMCTRL_RESETCURSOR, false) : false;
+
 			{
 				static bool s_IsConfining = false;
 				static POINT s_LastPos = {};
@@ -280,8 +282,15 @@ namespace Main
 					{
 						if (s_IsConfining && (ci.flags != 0))
 						{
-							ClipCursor(NULL);
-							SetCursorPos(s_LastPos.x, s_LastPos.y);
+							if (lockCursor)
+							{
+								ClipCursor(NULL);
+							}
+
+							if (resetCursor)
+							{
+								SetCursorPos(s_LastPos.x, s_LastPos.y);
+							}
 							s_IsConfining = false;
 						}
 						else if (!s_IsConfining && (ci.flags == 0) && ((wParam & MK_LBUTTON) || (wParam & MK_RBUTTON)))
@@ -292,7 +301,10 @@ namespace Main
 								s_LastPos.x + 1,
 								s_LastPos.y + 1
 							};
-							ClipCursor(&rect);
+							if (lockCursor)
+							{
+								ClipCursor(&rect);
+							}
 							s_IsConfining = true;
 						}
 
@@ -302,8 +314,14 @@ namespace Main
 					{
 						if (s_IsConfining)
 						{
-							ClipCursor(NULL);
-							SetCursorPos(s_LastPos.x, s_LastPos.y);
+							if (lockCursor)
+							{
+								ClipCursor(NULL);
+							}
+							if (resetCursor)
+							{
+								SetCursorPos(s_LastPos.x, s_LastPos.y);
+							}
 							s_IsConfining = false;
 						}
 
