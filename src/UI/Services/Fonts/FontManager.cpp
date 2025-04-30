@@ -40,32 +40,48 @@ bool CFontManager::Advance()
 	ImGuiIO& io = ImGui::GetIO();
 
 	/* add default ranges */
-	ImVector<ImWchar> ranges;
-	ImFontGlyphRangesBuilder rb{};
 	ImWchar rangesLatinExt[] =
 	{
 		0x0100, 0x017F,
 		0x0180, 0x024F,
 		0,
 	};
+	ImVector<ImWchar> ranges;
+	ImFontGlyphRangesBuilder rb{};
 	rb.AddRanges(io.Fonts->GetGlyphRangesDefault());
 	rb.AddRanges(rangesLatinExt);
+
+	ImVector<ImWchar> rangesExt;
+	ImFontGlyphRangesBuilder rbExt{};
+	rbExt.AddRanges(io.Fonts->GetGlyphRangesDefault());
+	rbExt.AddRanges(rangesLatinExt);
+	rbExt.AddRanges(io.Fonts->GetGlyphRangesChineseFull());
+	rbExt.AddRanges(io.Fonts->GetGlyphRangesCyrillic());
 
 	/* add ranges on demand*/
 	for (const char* str : this->Language->GetAllTexts())
 	{
 		rb.AddText(str);
+		rbExt.AddText(str);
 	}
 
 	/* build ranges */
 	rb.BuildRanges(&ranges);
+	rbExt.BuildRanges(&rangesExt);
 
 	io.Fonts->Clear();
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 	for (auto& font : this->Registry)
 	{
-		font.Pointer = io.Fonts->AddFontFromMemoryTTF(font.Data, static_cast<int>(font.DataSize), font.Size, font.Config, ranges.Data);
+		if (font.Identifier == "USER_FONT")
+		{
+			font.Pointer = io.Fonts->AddFontFromMemoryTTF(font.Data, static_cast<int>(font.DataSize), font.Size, font.Config, rangesExt.Data);
+		}
+		else
+		{
+			font.Pointer = io.Fonts->AddFontFromMemoryTTF(font.Data, static_cast<int>(font.DataSize), font.Size, font.Config, ranges.Data);
+		}
 	}
 
 	/* finally build atlas */
