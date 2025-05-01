@@ -313,165 +313,171 @@ void COptionsWindow::TabStyle()
 			ImGui::EndGroupPanel();*/
 
 			ImGui::BeginGroupPanel(langApi->Translate("((000053))"), ImVec2(-1.0f, 0.0f));
-			static bool linkArcDpsStyle = settingsctx->Get<bool>(OPT_LINKARCSTYLE, true);
-			if (ImGui::Checkbox(langApi->Translate("((000056))"), &linkArcDpsStyle))
+			ImGuiStyle& style = ImGui::GetStyle();
+
+			ImGui::Text("Preset:");
+			if (ImGui::BeginCombo("##StylePresetSelector", nullptr))
 			{
-				settingsctx->Set(OPT_LINKARCSTYLE, linkArcDpsStyle);
+				/*if (ImGui::Selectable("Nexus"))
+				{
+					uictx->ApplyStyle(EUIStyle::Nexus);
+				}*/
+				if (ImGui::Selectable("ArcDPS Default"))
+				{
+					uictx->ApplyStyle(EUIStyle::ArcDPS_Default);
+				}
+
+				static std::filesystem::path arcIniPath = Index::D_GW2_ADDONS / "arcdps/arcdps.ini";
+				if (std::filesystem::exists(arcIniPath))
+				{
+					if (ImGui::Selectable("ArcDPS Current (Import)"))
+					{
+						uictx->ApplyStyle(EUIStyle::ArcDPS_Current);
+					}
+				}
+
+				ImGui::Separator();
+
+				if (ImGui::Selectable("ImGui Classic"))
+				{
+					uictx->ApplyStyle(EUIStyle::ImGui_Classic);
+				}
+				if (ImGui::Selectable("ImGui Light"))
+				{
+					uictx->ApplyStyle(EUIStyle::ImGui_Light);
+				}
+				if (ImGui::Selectable("ImGui Dark"))
+				{
+					uictx->ApplyStyle(EUIStyle::ImGui_Dark);
+				}
+				ImGui::TooltipGeneric(langApi->Translate("((000057))"));
+				ImGui::EndCombo();
+			}
+
+			if (ImGui::SmallButton(langApi->Translate("((000058))")))
+			{
+				settingsctx->Set(OPT_IMGUISTYLE, Base64::Encode((unsigned char*)&style, sizeof(ImGuiStyle)));
+				settingsctx->Set(OPT_IMGUICOLORS, Base64::Encode((unsigned char*)&style.Colors[0], sizeof(ImVec4) * ImGuiCol_COUNT));
+			}
+			ImGui::SameLine();
+			if (ImGui::SmallButton(langApi->Translate("((000059))")))
+			{
 				uictx->ApplyStyle();
 			}
-			ImGui::TooltipGeneric(langApi->Translate("((000057))"));
 
-			if (!linkArcDpsStyle)
+			if (ImGui::BeginTabBar("##tabs", ImGuiTabBarFlags_None))
 			{
-				ImGuiStyle& style = ImGui::GetStyle();
-
-				ImGui::Text("Preset:");
-				if (ImGui::BeginCombo("##StylePresetSelector", nullptr))
+				if (ImGui::BeginTabItem("Sizes"))
 				{
-					/*if (ImGui::Selectable("Nexus"))
-					{
-						uictx->ApplyStyle(EUIStyle::Nexus);
-					}*/
-					if (ImGui::Selectable("ImGui Classic"))
-					{
-						uictx->ApplyStyle(EUIStyle::ImGui_Classic);
-					}
-					if (ImGui::Selectable("ImGui Light"))
-					{
-						uictx->ApplyStyle(EUIStyle::ImGui_Light);
-					}
-					if (ImGui::Selectable("ImGui Dark"))
-					{
-						uictx->ApplyStyle(EUIStyle::ImGui_Dark);
-					}
-					ImGui::EndCombo();
+					ImGui::Text("Main");
+					ImGui::SliderFloat2("WindowPadding", (float*)&style.WindowPadding, 0.0f, 20.0f, "%.0f");
+					ImGui::SliderFloat2("FramePadding", (float*)&style.FramePadding, 0.0f, 20.0f, "%.0f");
+					ImGui::SliderFloat2("CellPadding", (float*)&style.CellPadding, 0.0f, 20.0f, "%.0f");
+					ImGui::SliderFloat2("ItemSpacing", (float*)&style.ItemSpacing, 0.0f, 20.0f, "%.0f");
+					ImGui::SliderFloat2("ItemInnerSpacing", (float*)&style.ItemInnerSpacing, 0.0f, 20.0f, "%.0f");
+					ImGui::SliderFloat2("TouchExtraPadding", (float*)&style.TouchExtraPadding, 0.0f, 10.0f, "%.0f");
+					ImGui::SliderFloat("IndentSpacing", &style.IndentSpacing, 0.0f, 30.0f, "%.0f");
+					ImGui::SliderFloat("ScrollbarSize", &style.ScrollbarSize, 1.0f, 20.0f, "%.0f");
+					ImGui::SliderFloat("GrabMinSize", &style.GrabMinSize, 1.0f, 20.0f, "%.0f");
+					ImGui::Text("Borders");
+					ImGui::SliderFloat("WindowBorderSize", &style.WindowBorderSize, 0.0f, 1.0f, "%.0f");
+					ImGui::SliderFloat("ChildBorderSize", &style.ChildBorderSize, 0.0f, 1.0f, "%.0f");
+					ImGui::SliderFloat("PopupBorderSize", &style.PopupBorderSize, 0.0f, 1.0f, "%.0f");
+					ImGui::SliderFloat("FrameBorderSize", &style.FrameBorderSize, 0.0f, 1.0f, "%.0f");
+					ImGui::SliderFloat("TabBorderSize", &style.TabBorderSize, 0.0f, 1.0f, "%.0f");
+					ImGui::Text("Rounding");
+					ImGui::SliderFloat("WindowRounding", &style.WindowRounding, 0.0f, 12.0f, "%.0f");
+					ImGui::SliderFloat("ChildRounding", &style.ChildRounding, 0.0f, 12.0f, "%.0f");
+					ImGui::SliderFloat("FrameRounding", &style.FrameRounding, 0.0f, 12.0f, "%.0f");
+					ImGui::SliderFloat("PopupRounding", &style.PopupRounding, 0.0f, 12.0f, "%.0f");
+					ImGui::SliderFloat("ScrollbarRounding", &style.ScrollbarRounding, 0.0f, 12.0f, "%.0f");
+					ImGui::SliderFloat("GrabRounding", &style.GrabRounding, 0.0f, 12.0f, "%.0f");
+					ImGui::SliderFloat("LogSliderDeadzone", &style.LogSliderDeadzone, 0.0f, 12.0f, "%.0f");
+					ImGui::SliderFloat("TabRounding", &style.TabRounding, 0.0f, 12.0f, "%.0f");
+					ImGui::Text("Alignment");
+					ImGui::SliderFloat2("WindowTitleAlign", (float*)&style.WindowTitleAlign, 0.0f, 1.0f, "%.2f");
+					int window_menu_button_position = style.WindowMenuButtonPosition + 1;
+					if (ImGui::Combo("WindowMenuButtonPosition", (int*)&window_menu_button_position, "None\0Left\0Right\0"))
+						style.WindowMenuButtonPosition = window_menu_button_position - 1;
+					ImGui::Combo("ColorButtonPosition", (int*)&style.ColorButtonPosition, "Left\0Right\0");
+					ImGui::SliderFloat2("ButtonTextAlign", (float*)&style.ButtonTextAlign, 0.0f, 1.0f, "%.2f");
+					ImGui::SameLine(); ImGui::HelpMarker("Alignment applies when a button is larger than its text content.");
+					ImGui::SliderFloat2("SelectableTextAlign", (float*)&style.SelectableTextAlign, 0.0f, 1.0f, "%.2f");
+					ImGui::SameLine(); ImGui::HelpMarker("Alignment applies when a selectable is larger than its text content.");
+					ImGui::Text("Safe Area Padding");
+					ImGui::SameLine(); ImGui::HelpMarker("Adjust if you cannot see the edges of your screen (e.g. on a TV where scaling has not been configured).");
+					ImGui::SliderFloat2("DisplaySafeAreaPadding", (float*)&style.DisplaySafeAreaPadding, 0.0f, 30.0f, "%.0f");
+					ImGui::EndTabItem();
 				}
 
-				if (ImGui::SmallButton(langApi->Translate("((000058))")))
+				if (ImGui::BeginTabItem("Colors"))
 				{
-					settingsctx->Set(OPT_IMGUISTYLE, Base64::Encode((unsigned char*)&style, sizeof(ImGuiStyle)));
-					settingsctx->Set(OPT_IMGUICOLORS, Base64::Encode((unsigned char*)&style.Colors[0], sizeof(ImVec4) * ImGuiCol_COUNT));
-				}
-				ImGui::SameLine();
-				if (ImGui::SmallButton(langApi->Translate("((000059))")))
-				{
-					uictx->ApplyStyle();
-				}
+					static ImGuiTextFilter filter;
+					filter.Draw("Filter colors", ImGui::GetFontSize() * 16);
 
-				if (ImGui::BeginTabBar("##tabs", ImGuiTabBarFlags_None))
-				{
-					if (ImGui::BeginTabItem("Sizes"))
+					ImGui::BeginChild("##colors", ImVec2(0, 0), true);
+					ImGui::PushItemWidth(-160);
+					for (int i = 0; i < ImGuiCol_COUNT; i++)
 					{
-						ImGui::Text("Main");
-						ImGui::SliderFloat2("WindowPadding", (float*)&style.WindowPadding, 0.0f, 20.0f, "%.0f");
-						ImGui::SliderFloat2("FramePadding", (float*)&style.FramePadding, 0.0f, 20.0f, "%.0f");
-						ImGui::SliderFloat2("CellPadding", (float*)&style.CellPadding, 0.0f, 20.0f, "%.0f");
-						ImGui::SliderFloat2("ItemSpacing", (float*)&style.ItemSpacing, 0.0f, 20.0f, "%.0f");
-						ImGui::SliderFloat2("ItemInnerSpacing", (float*)&style.ItemInnerSpacing, 0.0f, 20.0f, "%.0f");
-						ImGui::SliderFloat2("TouchExtraPadding", (float*)&style.TouchExtraPadding, 0.0f, 10.0f, "%.0f");
-						ImGui::SliderFloat("IndentSpacing", &style.IndentSpacing, 0.0f, 30.0f, "%.0f");
-						ImGui::SliderFloat("ScrollbarSize", &style.ScrollbarSize, 1.0f, 20.0f, "%.0f");
-						ImGui::SliderFloat("GrabMinSize", &style.GrabMinSize, 1.0f, 20.0f, "%.0f");
-						ImGui::Text("Borders");
-						ImGui::SliderFloat("WindowBorderSize", &style.WindowBorderSize, 0.0f, 1.0f, "%.0f");
-						ImGui::SliderFloat("ChildBorderSize", &style.ChildBorderSize, 0.0f, 1.0f, "%.0f");
-						ImGui::SliderFloat("PopupBorderSize", &style.PopupBorderSize, 0.0f, 1.0f, "%.0f");
-						ImGui::SliderFloat("FrameBorderSize", &style.FrameBorderSize, 0.0f, 1.0f, "%.0f");
-						ImGui::SliderFloat("TabBorderSize", &style.TabBorderSize, 0.0f, 1.0f, "%.0f");
-						ImGui::Text("Rounding");
-						ImGui::SliderFloat("WindowRounding", &style.WindowRounding, 0.0f, 12.0f, "%.0f");
-						ImGui::SliderFloat("ChildRounding", &style.ChildRounding, 0.0f, 12.0f, "%.0f");
-						ImGui::SliderFloat("FrameRounding", &style.FrameRounding, 0.0f, 12.0f, "%.0f");
-						ImGui::SliderFloat("PopupRounding", &style.PopupRounding, 0.0f, 12.0f, "%.0f");
-						ImGui::SliderFloat("ScrollbarRounding", &style.ScrollbarRounding, 0.0f, 12.0f, "%.0f");
-						ImGui::SliderFloat("GrabRounding", &style.GrabRounding, 0.0f, 12.0f, "%.0f");
-						ImGui::SliderFloat("LogSliderDeadzone", &style.LogSliderDeadzone, 0.0f, 12.0f, "%.0f");
-						ImGui::SliderFloat("TabRounding", &style.TabRounding, 0.0f, 12.0f, "%.0f");
-						ImGui::Text("Alignment");
-						ImGui::SliderFloat2("WindowTitleAlign", (float*)&style.WindowTitleAlign, 0.0f, 1.0f, "%.2f");
-						int window_menu_button_position = style.WindowMenuButtonPosition + 1;
-						if (ImGui::Combo("WindowMenuButtonPosition", (int*)&window_menu_button_position, "None\0Left\0Right\0"))
-							style.WindowMenuButtonPosition = window_menu_button_position - 1;
-						ImGui::Combo("ColorButtonPosition", (int*)&style.ColorButtonPosition, "Left\0Right\0");
-						ImGui::SliderFloat2("ButtonTextAlign", (float*)&style.ButtonTextAlign, 0.0f, 1.0f, "%.2f");
-						ImGui::SameLine(); ImGui::HelpMarker("Alignment applies when a button is larger than its text content.");
-						ImGui::SliderFloat2("SelectableTextAlign", (float*)&style.SelectableTextAlign, 0.0f, 1.0f, "%.2f");
-						ImGui::SameLine(); ImGui::HelpMarker("Alignment applies when a selectable is larger than its text content.");
-						ImGui::Text("Safe Area Padding");
-						ImGui::SameLine(); ImGui::HelpMarker("Adjust if you cannot see the edges of your screen (e.g. on a TV where scaling has not been configured).");
-						ImGui::SliderFloat2("DisplaySafeAreaPadding", (float*)&style.DisplaySafeAreaPadding, 0.0f, 30.0f, "%.0f");
-						ImGui::EndTabItem();
+						const char* name = ImGui::GetStyleColorName(i);
+						if (!filter.PassFilter(name))
+							continue;
+						ImGui::PushID(i);
+						ImGui::ColorEdit4("##color", (float*)&style.Colors[i], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
+						ImGui::SameLine(0.0f, style.ItemInnerSpacing.x);
+						ImGui::TextUnformatted(name);
+						ImGui::PopID();
 					}
+					ImGui::PopItemWidth();
+					ImGui::EndChild();
 
-					if (ImGui::BeginTabItem("Colors"))
+					ImGui::EndTabItem();
+				}
+
+				if (ImGui::BeginTabItem("Rendering"))
+				{
+					ImGui::Checkbox("Anti-aliased lines", &style.AntiAliasedLines);
+					ImGui::SameLine();
+					ImGui::HelpMarker("When disabling anti-aliasing lines, you'll probably want to disable borders in your style as well.");
+
+					ImGui::Checkbox("Anti-aliased lines use texture", &style.AntiAliasedLinesUseTex);
+					ImGui::SameLine();
+					ImGui::HelpMarker("Faster lines using texture data. Require backend to render with bilinear filtering (not point/nearest filtering).");
+
+					ImGui::Checkbox("Anti-aliased fill", &style.AntiAliasedFill);
+					ImGui::PushItemWidth(100);
+					ImGui::DragFloat("Curve Tessellation Tolerance", &style.CurveTessellationTol, 0.02f, 0.10f, 10.0f, "%.2f");
+					if (style.CurveTessellationTol < 0.10f) style.CurveTessellationTol = 0.10f;
+
+					// When editing the "Circle Segment Max Error" value, draw a preview of its effect on auto-tessellated circles.
+					ImGui::DragFloat("Circle Segment Max Error", &style.CircleSegmentMaxError, 0.01f, 0.10f, 10.0f, "%.2f");
+					if (ImGui::IsItemActive())
 					{
-						static ImGuiTextFilter filter;
-						filter.Draw("Filter colors", ImGui::GetFontSize() * 16);
-
-						ImGui::BeginChild("##colors", ImVec2(0, 0), true);
-						ImGui::PushItemWidth(-160);
-						for (int i = 0; i < ImGuiCol_COUNT; i++)
+						ImGui::SetNextWindowPos(ImGui::GetCursorScreenPos());
+						ImGui::BeginTooltip();
+						ImVec2 p = ImGui::GetCursorScreenPos();
+						ImDrawList* draw_list = ImGui::GetWindowDrawList();
+						float RAD_MIN = 10.0f, RAD_MAX = 80.0f;
+						float off_x = 10.0f;
+						for (int n = 0; n < 7; n++)
 						{
-							const char* name = ImGui::GetStyleColorName(i);
-							if (!filter.PassFilter(name))
-								continue;
-							ImGui::PushID(i);
-							ImGui::ColorEdit4("##color", (float*)&style.Colors[i], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
-							ImGui::SameLine(0.0f, style.ItemInnerSpacing.x);
-							ImGui::TextUnformatted(name);
-							ImGui::PopID();
+							const float rad = RAD_MIN + (RAD_MAX - RAD_MIN) * (float)n / (7.0f - 1.0f);
+							draw_list->AddCircle(ImVec2(p.x + off_x + rad, p.y + RAD_MAX), rad, ImGui::GetColorU32(ImGuiCol_Text), 0);
+							off_x += 10.0f + rad * 2.0f;
 						}
-						ImGui::PopItemWidth();
-						ImGui::EndChild();
-
-						ImGui::EndTabItem();
+						ImGui::Dummy(ImVec2(off_x, RAD_MAX * 2.0f));
+						ImGui::EndTooltip();
 					}
+					ImGui::SameLine();
+					ImGui::HelpMarker("When drawing circle primitives with \"num_segments == 0\" tesselation will be calculated automatically.");
 
-					if (ImGui::BeginTabItem("Rendering"))
-					{
-						ImGui::Checkbox("Anti-aliased lines", &style.AntiAliasedLines);
-						ImGui::SameLine();
-						ImGui::HelpMarker("When disabling anti-aliasing lines, you'll probably want to disable borders in your style as well.");
+					ImGui::DragFloat("Global Alpha", &style.Alpha, 0.005f, 0.20f, 1.0f, "%.2f"); // Not exposing zero here so user doesn't "lose" the UI (zero alpha clips all widgets). But application code could have a toggle to switch between zero and non-zero.
+					ImGui::PopItemWidth();
 
-						ImGui::Checkbox("Anti-aliased lines use texture", &style.AntiAliasedLinesUseTex);
-						ImGui::SameLine();
-						ImGui::HelpMarker("Faster lines using texture data. Require backend to render with bilinear filtering (not point/nearest filtering).");
-
-						ImGui::Checkbox("Anti-aliased fill", &style.AntiAliasedFill);
-						ImGui::PushItemWidth(100);
-						ImGui::DragFloat("Curve Tessellation Tolerance", &style.CurveTessellationTol, 0.02f, 0.10f, 10.0f, "%.2f");
-						if (style.CurveTessellationTol < 0.10f) style.CurveTessellationTol = 0.10f;
-
-						// When editing the "Circle Segment Max Error" value, draw a preview of its effect on auto-tessellated circles.
-						ImGui::DragFloat("Circle Segment Max Error", &style.CircleSegmentMaxError, 0.01f, 0.10f, 10.0f, "%.2f");
-						if (ImGui::IsItemActive())
-						{
-							ImGui::SetNextWindowPos(ImGui::GetCursorScreenPos());
-							ImGui::BeginTooltip();
-							ImVec2 p = ImGui::GetCursorScreenPos();
-							ImDrawList* draw_list = ImGui::GetWindowDrawList();
-							float RAD_MIN = 10.0f, RAD_MAX = 80.0f;
-							float off_x = 10.0f;
-							for (int n = 0; n < 7; n++)
-							{
-								const float rad = RAD_MIN + (RAD_MAX - RAD_MIN) * (float)n / (7.0f - 1.0f);
-								draw_list->AddCircle(ImVec2(p.x + off_x + rad, p.y + RAD_MAX), rad, ImGui::GetColorU32(ImGuiCol_Text), 0);
-								off_x += 10.0f + rad * 2.0f;
-							}
-							ImGui::Dummy(ImVec2(off_x, RAD_MAX * 2.0f));
-							ImGui::EndTooltip();
-						}
-						ImGui::SameLine();
-						ImGui::HelpMarker("When drawing circle primitives with \"num_segments == 0\" tesselation will be calculated automatically.");
-
-						ImGui::DragFloat("Global Alpha", &style.Alpha, 0.005f, 0.20f, 1.0f, "%.2f"); // Not exposing zero here so user doesn't "lose" the UI (zero alpha clips all widgets). But application code could have a toggle to switch between zero and non-zero.
-						ImGui::PopItemWidth();
-
-						ImGui::EndTabItem();
-					}
-
-					ImGui::EndTabBar();
+					ImGui::EndTabItem();
 				}
+
+				ImGui::EndTabBar();
 			}
 			ImGui::EndGroupPanel();
 		}

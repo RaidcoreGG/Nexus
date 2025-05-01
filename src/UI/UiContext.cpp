@@ -806,12 +806,6 @@ void CUiContext::LoadFonts()
 		this->FontManager->ReplaceFont("USER_FONT", this->ImGuiContext->FontSize, fontPath.string().c_str(), UIRoot::FontReceiver, nullptr);
 		hasUserFont = true;
 	}
-	else if (settingsctx->Get<bool>(OPT_LINKARCSTYLE, true) && std::filesystem::exists(Index::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf"))
-	{
-		fontPath = Index::D_GW2_ADDONS / "arcdps" / "arcdps_font.ttf";
-		this->FontManager->ReplaceFont("USER_FONT", this->ImGuiContext->FontSize, fontPath.string().c_str(), UIRoot::FontReceiver, nullptr);
-		hasUserFont = true;
-	}
 
 	/* add default font for monospace */
 	this->FontManager->AddDefaultFont(UIRoot::FontReceiver);
@@ -857,143 +851,133 @@ void CUiContext::LoadFonts()
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("TREBUCHET_XL_MERGE", 19.5f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
 }
 
+void ApplyDefaultStyle()
+{
+	try
+	{
+		ImGuiStyle* style = &ImGui::GetStyle();
+		static std::string s_NexusStyleDefault = "AACAPwAAAEEAAABBAAAAAAAAgD8AAABCAAAAQgAAAAAAAAA/AAAAAAAAAAAAAIA/AAAAAAAAgD8AAIBAAABAQAAAAAAAAAAAAAAAQQAAgEAAAIBAAACAQAAAgEAAAABAAAAAAAAAAAAAAKhBAADAQAAAYEEAABBBAAAgQQAAAAAAAIBAAACAQAAAAAAAAAAAAQAAAAAAAD8AAAA/AAAAAAAAAAAAAJhBAACYQQAAQEAAAEBAAACAPwEBAQAAAKA/zczMPwAAgD8AAIA/AACAPwAAgD8AAAA/AAAAPwAAAD8AAIA/j8J1PY/CdT2PwnU916NwPwAAAAAAAAAAAAAAAAAAAAAK16M9CtejPQrXoz3Xo3A/9ijcPvYo3D4AAAA/AAAAPwAAAAAAAAAAAAAAAAAAAAAK1yM+4XqUPo/C9T5xPQo/uB6FPj0KFz9I4Xo/zczMPrgehT49Chc/SOF6Px+FKz8K1yM9CtcjPQrXIz0AAIA/CtcjPuF6lD6PwvU+AACAPwAAAAAAAAAAAAAAAFyPAj8pXA8+KVwPPilcDz4AAIA/CtejPArXozwK16M8FK4HP1K4nj5SuJ4+UriePgAAgD+F69E+hevRPoXr0T4AAIA/XI8CP1yPAj9cjwI/AACAP7gehT49Chc/SOF6PwAAgD+PwnU+uB4FP65HYT8AAIA/uB6FPj0KFz9I4Xo/AACAP7gehT49Chc/SOF6P83MzD64HoU+PQoXP0jhej8AAIA/j8J1PRSuBz9I4Xo/AACAP7gehT49Chc/SOF6P1K4nj64HoU+PQoXP0jhej/NzEw/uB6FPj0KFz9I4Xo/AACAP/Yo3D72KNw+AAAAPwAAAD/NzMw9zczMPgAAQD8Urkc/zczMPc3MzD4AAEA/AACAP7gehT49Chc/SOF6P83MTD64HoU+PQoXP0jhej8fhSs/uB6FPj0KFz9I4Xo/MzNzP+tROD4yM7M+4noUPwisXD+4HoU+PQoXP0jhej/NzEw/zMxMPoTr0T57FC4/AACAP5ZDiz1e5dA9Uo0XPjXveD+UQws+3CSGPocW2T4AAIA/9igcP/YoHD/2KBw/AACAPwAAgD/2KNw+MzOzPgAAgD9mZmY/MzMzPwAAAAAAAIA/AACAP5qZGT8AAAAAAACAP1yPQj5cj0I+zcxMPgAAgD9SuJ4+UriePjMzsz4AAIA/H4VrPh+Faz4AAIA+AACAPwAAAAAAAAAAAAAAAAAAAAAAAIA/AACAPwAAgD+PwnU9uB6FPj0KFz9I4Xo/MzOzPgAAgD8AAIA/AAAAAGZmZj+4HoU+PQoXP0jhej8AAIA/AACAPwAAgD8AAIA/MzMzP83MTD/NzEw/zcxMP83MTD7NzEw/zcxMP83MTD8zM7M+";
+		std::string decodeStyle = Base64::Decode(s_NexusStyleDefault, s_NexusStyleDefault.length());
+		memcpy_s(style, sizeof(ImGuiStyle), &decodeStyle[0], decodeStyle.length());
+	}
+	catch (...)
+	{
+		CContext::GetContext()->GetLogger()->Debug(CH_UICONTEXT, "Error applying default style.");
+	}
+}
+
 void CUiContext::ApplyStyle(EUIStyle aStyle)
 {
 	ImGuiStyle* style = &ImGui::GetStyle();
 
 	switch (aStyle)
 	{
+		case EUIStyle::User:
+		{
+			try
+			{
+				CContext* ctx = CContext::GetContext();
+				CSettings* settingsctx = ctx->GetSettingsCtx();
+
+				std::string b64_style = settingsctx->Get<std::string>(OPT_IMGUISTYLE, {});
+				std::string decodeStyle = Base64::Decode(b64_style, b64_style.length());
+				memcpy_s(style, sizeof(ImGuiStyle), &decodeStyle[0], decodeStyle.length());
+
+				std::string b64_colors = settingsctx->Get<std::string>(OPT_IMGUICOLORS, {}); 
+				std::string decodeColors = Base64::Decode(b64_colors, b64_colors.length());
+				memcpy_s(&style->Colors[0], sizeof(ImVec4) * ImGuiCol_COUNT, &decodeColors[0], decodeColors.length());
+			}
+			catch (...)
+			{
+				this->Logger->Debug(CH_UICONTEXT, "Error applying user style.");
+			}
+			return;
+		}
 		case EUIStyle::ImGui_Classic:
 		{
+			
+			ApplyDefaultStyle();
 			ImGui::StyleColorsClassic();
 			return;
 		}
 		case EUIStyle::ImGui_Light:
 		{
+			ApplyDefaultStyle();
 			ImGui::StyleColorsLight();
 			return;
 		}
 		case EUIStyle::ImGui_Dark:
 		{
+			ApplyDefaultStyle();
 			ImGui::StyleColorsDark();
 			return;
 		}
 		case EUIStyle::Nexus:
 		{
-			ImVec4* colors = style->Colors;
-
-			colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-			colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
-			colors[ImGuiCol_WindowBg] = ImVec4(0.06f, 0.06f, 0.06f, 0.94f);
-			colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-			colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
-			colors[ImGuiCol_Border] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
-			colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-			colors[ImGuiCol_FrameBg] = ImVec4(0.16f, 0.29f, 0.48f, 0.54f);
-			colors[ImGuiCol_FrameBgHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
-			colors[ImGuiCol_FrameBgActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
-			colors[ImGuiCol_TitleBg] = ImVec4(0.04f, 0.04f, 0.04f, 1.00f);
-			colors[ImGuiCol_TitleBgActive] = ImVec4(0.16f, 0.29f, 0.48f, 1.00f);
-			colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 0.51f);
-			colors[ImGuiCol_MenuBarBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
-			colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
-			colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
-			colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
-			colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
-			colors[ImGuiCol_CheckMark] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-			colors[ImGuiCol_SliderGrab] = ImVec4(0.24f, 0.52f, 0.88f, 1.00f);
-			colors[ImGuiCol_SliderGrabActive] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-			colors[ImGuiCol_Button] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
-			colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-			colors[ImGuiCol_ButtonActive] = ImVec4(0.06f, 0.53f, 0.98f, 1.00f);
-			colors[ImGuiCol_Header] = ImVec4(0.26f, 0.59f, 0.98f, 0.31f);
-			colors[ImGuiCol_HeaderHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.80f);
-			colors[ImGuiCol_HeaderActive] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-			colors[ImGuiCol_Separator] = colors[ImGuiCol_Border];
-			colors[ImGuiCol_SeparatorHovered] = ImVec4(0.10f, 0.40f, 0.75f, 0.78f);
-			colors[ImGuiCol_SeparatorActive] = ImVec4(0.10f, 0.40f, 0.75f, 1.00f);
-			colors[ImGuiCol_ResizeGrip] = ImVec4(0.26f, 0.59f, 0.98f, 0.20f);
-			colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
-			colors[ImGuiCol_ResizeGripActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
-			colors[ImGuiCol_Tab] = ImLerp(colors[ImGuiCol_Header], colors[ImGuiCol_TitleBgActive], 0.80f);
-			colors[ImGuiCol_TabHovered] = colors[ImGuiCol_HeaderHovered];
-			colors[ImGuiCol_TabActive] = ImLerp(colors[ImGuiCol_HeaderActive], colors[ImGuiCol_TitleBgActive], 0.60f);
-			colors[ImGuiCol_TabUnfocused] = ImLerp(colors[ImGuiCol_Tab], colors[ImGuiCol_TitleBg], 0.80f);
-			colors[ImGuiCol_TabUnfocusedActive] = ImLerp(colors[ImGuiCol_TabActive], colors[ImGuiCol_TitleBg], 0.40f);
-			colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
-			colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
-			colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
-			colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
-			colors[ImGuiCol_TableHeaderBg] = ImVec4(0.19f, 0.19f, 0.20f, 1.00f);
-			colors[ImGuiCol_TableBorderStrong] = ImVec4(0.31f, 0.31f, 0.35f, 1.00f);   // Prefer using Alpha=1.0 here
-			colors[ImGuiCol_TableBorderLight] = ImVec4(0.23f, 0.23f, 0.25f, 1.00f);   // Prefer using Alpha=1.0 here
-			colors[ImGuiCol_TableRowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-			colors[ImGuiCol_TableRowBgAlt] = ImVec4(1.00f, 1.00f, 1.00f, 0.06f);
-			colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
-			colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
-			colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-			colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
-			colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
-			colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
-			return;
-		}
-	}
-
-	CContext* ctx = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
-
-	if (settingsctx->Get<bool>(OPT_LINKARCSTYLE, true))
-	{
-		std::filesystem::path arcIniPath = Index::D_GW2_ADDONS / "arcdps/arcdps.ini";
-
-		if (std::filesystem::exists(arcIniPath))
-		{
-			char buff[4096]{};
-			std::string decode{};
-
+			ApplyDefaultStyle();
 			try
 			{
-				memset(buff, 0, sizeof(buff)); // reset buffer
-				GetPrivateProfileStringA("session", "appearance_imgui_style180", "", &buff[0], sizeof(buff), arcIniPath.string().c_str());
-				std::string arcstyle = buff;
-				decode = Base64::Decode(arcstyle, arcstyle.length());
-				memcpy(style, &decode[0], decode.length());
-
-				memset(buff, 0, sizeof(buff)); // reset buffer
-				GetPrivateProfileStringA("session", "appearance_imgui_colours180", "", &buff[0], sizeof(buff), arcIniPath.string().c_str());
-				std::string arccols = buff;
-				decode = Base64::Decode(arccols, arccols.length());
-				memcpy(&style->Colors[0], &decode[0], decode.length());
-
-				memset(buff, 0, sizeof(buff)); // reset buffer
-				GetPrivateProfileStringA("session", "font_size", "", &buff[0], sizeof(buff), arcIniPath.string().c_str());
-				std::string arcfontsize = buff;
-				this->ImGuiContext->FontSize = std::stof(arcfontsize);
+				static std::string s_NexusColorsDefault = "AACAPwAAgD8AAIA/AACAPwAAAD8AAAA/AAAAPwAAgD+PwnU9j8J1PY/CdT3Xo3A/AAAAAAAAAAAAAAAAAAAAAArXoz0K16M9CtejPdejcD/2KNw+9ijcPgAAAD8AAAA/AAAAAAAAAAAAAAAAAAAAAArXIz7hepQ+j8L1PnE9Cj+4HoU+PQoXP0jhej/NzMw+uB6FPj0KFz9I4Xo/H4UrPwrXIz0K1yM9CtcjPQAAgD8K1yM+4XqUPo/C9T4AAIA/AAAAAAAAAAAAAAAAXI8CPylcDz4pXA8+KVwPPgAAgD8K16M8CtejPArXozwUrgc/UriePlK4nj5SuJ4+AACAP4Xr0T6F69E+hevRPgAAgD9cjwI/XI8CP1yPAj8AAIA/uB6FPj0KFz9I4Xo/AACAP4/CdT64HgU/rkdhPwAAgD+4HoU+PQoXP0jhej8AAIA/uB6FPj0KFz9I4Xo/zczMPrgehT49Chc/SOF6PwAAgD+PwnU9FK4HP0jhej8AAIA/uB6FPj0KFz9I4Xo/UriePrgehT49Chc/SOF6P83MTD+4HoU+PQoXP0jhej8AAIA/9ijcPvYo3D4AAAA/AAAAP83MzD3NzMw+AABAPxSuRz/NzMw9zczMPgAAQD8AAIA/uB6FPj0KFz9I4Xo/zcxMPrgehT49Chc/SOF6Px+FKz+4HoU+PQoXP0jhej8zM3M/61E4PjIzsz7iehQ/CKxcP7gehT49Chc/SOF6P83MTD/MzEw+hOvRPnsULj8AAIA/lkOLPV7l0D1SjRc+Ne94P5RDCz7cJIY+hxbZPgAAgD/2KBw/9igcP/YoHD8AAIA/AACAP/Yo3D4zM7M+AACAP2ZmZj8zMzM/AAAAAAAAgD8AAIA/mpkZPwAAAAAAAIA/XI9CPlyPQj7NzEw+AACAP1K4nj5SuJ4+MzOzPgAAgD8fhWs+H4VrPgAAgD4AAIA/AAAAAAAAAAAAAAAAAAAAAAAAgD8AAIA/AACAP4/CdT24HoU+PQoXP0jhej8zM7M+AACAPwAAgD8AAAAAZmZmP7gehT49Chc/SOF6PwAAgD8AAIA/AACAPwAAgD8zMzM/zcxMP83MTD/NzEw/zcxMPs3MTD/NzEw/zcxMPzMzsz4=";
+				std::string decodeColors = Base64::Decode(s_NexusColorsDefault, s_NexusColorsDefault.length());
+				memcpy_s(&style->Colors[0], sizeof(ImVec4) * ImGuiCol_COUNT, &decodeColors[0], decodeColors.length());
 			}
 			catch (...)
 			{
-				this->Logger->Debug(CH_UICONTEXT, "Couldn't parse ArcDPS style.");
+				this->Logger->Debug(CH_UICONTEXT, "Error applying Nexus default style.");
 			}
+			return;
 		}
-	}
-	else
-	{
-		std::string b64_style = settingsctx->Get<std::string>(OPT_IMGUISTYLE, {});
-		std::string b64_colors = settingsctx->Get<std::string>(OPT_IMGUICOLORS, {});
-
-		if (b64_style.empty() || b64_colors.empty())
+		case EUIStyle::ArcDPS_Default:
 		{
-			this->ApplyStyle(EUIStyle::Nexus);
+			try
+			{
+				static std::string s_ArcStyleDefault = "AACAPwAAgEAAAIBAAAAAAAAAAAAAAKBAAABAQAAAAAAAAAA/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAIBAAACAQAAAAAAAAAAAAACgQAAAQEAAAKBAAABAQAAAQEAAAAAAAAAAAAAAAAAAAMhBAADAQAAAEEEAAAAAAADIQQAAAAAAAIBAAAAAAAAAAAAAAAAAAQAAAAAAAD8AAAA/AAAAAAAAAAAAAJhBAACYQQAAQEAAAEBAAACAPwEBAQAAAKA/zczMPw==";
+				std::string decodeStyle = Base64::Decode(s_ArcStyleDefault, s_ArcStyleDefault.length());
+				memcpy_s(style, sizeof(ImGuiStyle), &decodeStyle[0], decodeStyle.length());
+
+				static std::string s_ArcColorsDefault = "zcxMP83MTD/helQ/AACAP4/CdT4fhWs+4XqUPgAAgD+PwnU9zcxMPSlcjz0AAEA/KVyPPSlcjz3sUbg9AAAAAClcjz0pXI897FG4PZqZWT8K1yM/hesRPzMzMz/NzEw+CtcjP1K4Hj8fhSs/AAAAAFK4Hj+amRk/ZmYmP83MTD5SuB4/mpkZP2ZmJj8AAEA/KVwPPylcDz/hehQ/AABAP83MzD3sUbg9j8L1PZqZWT/NzMw97FG4PY/C9T2amVk/zczMPexRuD2PwvU9mplZP83MzD3sUbg9j8L1PTMzMz/NzMw97FG4PY/C9T2amRk/H4XrPmZm5j7Xo/A+FK5HPx+FKz8fhSs/16MwPxSuRz8Urkc/FK5HP83MTD8Urkc/zcxMP83MTD/helQ/KVxPP83MTD/NzEw/4XpUP1K4nj6PwnU9zcxMPSlcjz0AAIA/UrgeP5qZGT9mZiY/mpmZPlK4Hj+amRk/ZmYmP5qZGT9SuB4/mpkZP2ZmJj9mZmY/7FG4PuxRuD5cj8I+MzMzP+xRuD7sUbg+XI/CPjMzsz7sUbg+7FG4PlyPwj4zMzM/AAAAPwAAAD8AAAA/mpkZP5qZGT+amRk/MzMzPwAAgD8zMzM/MzMzP2ZmZj8AAIA/AAAAAAAAAAAAAAAAAAAAAClcDz8pXA8/4XoUPwAAgD+PwnU9zcxMPSlcjz0AAIA/MzMzP3sULj/XozA/zczMPTMzMz97FC4/16MwP5qZmT4zMzM/exQuP9ejMD/2KNw+l/+QPpf/kD7hnBE/KjpSP6Fnsz6hZ7M+Qs8mP71SVj8zMzM/exQuP8P1KD8pXA8/AACAPgAAgD8AAAAAAACAPzMzMz97FC4/w/UoP4/C9T4AAIA+AACAPwAAAAAAAIA/cT2KPnE9ij5cj8I+AACAP1K4nj5SuJ4+ZmbmPgAAgD+4HoU+uB6FPilcjz4AAIA/AAAAAAAAAAAAAAAAAAAAAAAAgD8AAIA/AACAPylcjz3sUbg+7FG4Pq5HYT/NzAw/AACAPwAAgD8AAAAAZmZmP2Zm5j5mZuY+ZmZmP83MTD8AAIA/AACAPwAAgD8zMzM/zcxMP83MTD/NzEw/zcxMPs3MTD7NzEw+zcxMPjMzsz4=";
+				std::string decodeColors = Base64::Decode(s_ArcColorsDefault, s_ArcColorsDefault.length());
+				memcpy_s(&style->Colors[0], sizeof(ImVec4) * ImGuiCol_COUNT, &decodeColors[0], decodeColors.length());
+			}
+			catch (...)
+			{
+				this->Logger->Debug(CH_UICONTEXT, "Error applying ArcDPS default style.");
+			}
+			return;
 		}
-
+		case EUIStyle::ArcDPS_Current:
 		{
-			std::string decode = Base64::Decode(&b64_style[0], b64_style.length());
-			memcpy_s(style, sizeof(ImGuiStyle), &decode[0], decode.length());
-		}
+			std::filesystem::path arcIniPath = Index::D_GW2_ADDONS / "arcdps/arcdps.ini";
 
-		{
-			std::string decode = Base64::Decode(&b64_colors[0], b64_colors.length());
-			memcpy_s(&style->Colors[0], sizeof(ImVec4) * ImGuiCol_COUNT, &decode[0], decode.length());
+			if (std::filesystem::exists(arcIniPath))
+			{
+				char buff[4096]{};
+				std::string decode{};
+
+				try
+				{
+					memset(buff, 0, sizeof(buff)); // reset buffer
+					GetPrivateProfileStringA("session", "appearance_imgui_style180", "", &buff[0], sizeof(buff), arcIniPath.string().c_str());
+					std::string arcstyle = buff;
+					decode = Base64::Decode(arcstyle, arcstyle.length());
+					memcpy(style, &decode[0], decode.length());
+
+					memset(buff, 0, sizeof(buff)); // reset buffer
+					GetPrivateProfileStringA("session", "appearance_imgui_colours180", "", &buff[0], sizeof(buff), arcIniPath.string().c_str());
+					std::string arccols = buff;
+					decode = Base64::Decode(arccols, arccols.length());
+					memcpy(&style->Colors[0], &decode[0], decode.length());
+				}
+				catch (...)
+				{
+					this->Logger->Debug(CH_UICONTEXT, "Couldn't parse ArcDPS style.");
+				}
+			}
+			else
+			{
+				this->Logger->Debug(CH_UICONTEXT, "Tried importing ArcDPS style, with no config present.");
+			}
+			return;
 		}
 	}
 }

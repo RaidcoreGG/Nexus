@@ -49,7 +49,9 @@ enum class EUIStyle
 	ImGui_Classic,
 	ImGui_Light,
 	ImGui_Dark,
-	Nexus
+	Nexus,
+	ArcDPS_Default,
+	ArcDPS_Current /* If available. */
 };
 
 ///----------------------------------------------------------------------------------------------------
@@ -57,11 +59,11 @@ enum class EUIStyle
 ///----------------------------------------------------------------------------------------------------
 namespace UIRoot
 {
-	extern ImFont* MonospaceFont;	/* default/monospace/console font */
-	extern ImFont* UserFont;		/* custom user font */
-	extern ImFont* Font;			/* Menomonia */
-	extern ImFont* FontBig;			/* Menomonia, but slightly bigger */
-	extern ImFont* FontUI;			/* Trebuchet */
+	extern ImFont* MonospaceFont; /* default/monospace/console font */
+	extern ImFont* UserFont;      /* custom user font */
+	extern ImFont* Font;          /* Menomonia */
+	extern ImFont* FontBig;       /* Menomonia, but slightly bigger */
+	extern ImFont* FontUI;        /* Trebuchet */
 
 	///----------------------------------------------------------------------------------------------------
 	/// Initialize:
