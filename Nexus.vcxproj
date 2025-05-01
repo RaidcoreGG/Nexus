@@ -37,7 +37,6 @@
     <ClCompile Include="src\Inputs\InputBinds\InputBind.cpp" />
     <ClCompile Include="src\Inputs\InputBinds\InputBindHandler.cpp" />
     <ClCompile Include="src\Loader\AddonDefinition.cpp" />
-    <ClCompile Include="src\Loader\EAddonFlags.cpp" />
     <ClCompile Include="src\Loader\Loader.cpp" />
     <ClCompile Include="src\Services\Logging\CFileLogger.cpp" />
     <ClCompile Include="src\Services\Logging\ILogger.cpp" />

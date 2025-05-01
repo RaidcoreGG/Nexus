@@ -941,18 +941,8 @@ namespace Loader
 			bool flagDisable = aAddon->IsFlaggedForDisable;
 			aAddon->IsFlaggedForDisable = true;
 
-			/* wrap around mutex lock/unlock because if SyncUnload it will already be locked, as it's executed from ProcessQueue */
-			if (!aAddon->Definitions->HasFlag(EAddonFlags::SyncUnload))
-			{
-				/* explictly lock the mutex, because we're unloading ASYNC -> threadsafe */
-				const std::lock_guard<std::mutex> lock(Mutex);
-				SaveAddonConfig();
-			}
-			else
-			{
-				/* do not explicitly lock the mutex, because we're unloading SYNC -> already locked in ProcessQueue */
-				SaveAddonConfig();
-			}
+			const std::lock_guard<std::mutex> lock(Mutex);
+			SaveAddonConfig();
 
 			aAddon->IsFlaggedForDisable = flagDisable;
 		}
@@ -1046,45 +1036,26 @@ namespace Loader
 			// or shutting down anyway, addon has Unload defined, so it can save settings etc
 			if ((addon->State == EAddonState::Loaded) || (addon->State == EAddonState::LoadedLOCKED && isShutdown))
 			{
-				addon->IsWaitingForUnload = true;
-
-				if (addon->Definitions->HasFlag(EAddonFlags::SyncUnload))
+				std::thread unloadTask([addon, aPath, aDoReload, isShutdown]()
 				{
 					CallUnloadAndVerify(aPath, addon);
 
 					if (!isShutdown)
 					{
-						FreeAddon(aPath);
-					}
+						EventApi->Raise(EV_ADDON_UNLOADED, &addon->Definitions->Signature);
 
-					if (aDoReload)
-					{
-						LoadAddon(aPath, true);
-					}
-				}
-				else
-				{
-					std::thread unloadTask([addon, aPath, aDoReload, isShutdown]()
-					{
-						CallUnloadAndVerify(aPath, addon);
-
-						if (!isShutdown)
+						const std::lock_guard<std::mutex> lock(Mutex);
+						if (aDoReload)
 						{
-							EventApi->Raise(EV_ADDON_UNLOADED, &addon->Definitions->Signature);
-
-							const std::lock_guard<std::mutex> lock(Mutex);
-							if (aDoReload)
-							{
-								Loader::QueueAddon(ELoaderAction::FreeLibraryThenLoad, aPath);
-							}
-							else
-							{
-								Loader::QueueAddon(ELoaderAction::FreeLibrary, aPath);
-							}
+							Loader::QueueAddon(ELoaderAction::FreeLibraryThenLoad, aPath);
 						}
-					});
-					unloadTask.detach();
-				}
+						else
+						{
+							Loader::QueueAddon(ELoaderAction::FreeLibrary, aPath);
+						}
+					}
+				});
+				unloadTask.detach();
 			}
 		}
 	}

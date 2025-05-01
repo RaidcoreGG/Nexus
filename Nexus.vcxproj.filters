@@ -285,9 +285,6 @@
     <ClCompile Include="src\Services\API\ApiClient.cpp">
       <Filter>Services\API</Filter>
     </ClCompile>
-    <ClCompile Include="src\Loader\EAddonFlags.cpp">
-      <Filter>Loader\Enums</Filter>
-    </ClCompile>
     <ClCompile Include="src\Loader\AddonDefinition.cpp">
       <Filter>Loader\Structs</Filter>
     </ClCompile>
