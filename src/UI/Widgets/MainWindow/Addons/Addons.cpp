@@ -144,7 +144,7 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 			static CUiContext* uictx = ctx->GetUIContext();
 			static CAlerts* alertctx = uictx->GetAlerts();
 
-			if (ImGui::BeginChild("Info", ImVec2(itemSz.x - style.ItemSpacing.x - actionsAreaWidth - (style.WindowPadding.x * 2), innerHeight)))
+			if (ImGui::BeginChild("Info", ImVec2(itemSz.x - style.ItemSpacing.x - actionsAreaWidth - (style.WindowPadding.x * 2), innerHeight), false, ImGuiWindowFlags_NoBackground))
 			{
 				ImGui::Text(aAddonData.NexusAddon->Definitions->Name);
 				ImGui::SameLine();
@@ -168,7 +168,7 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 			bool poppedActionsPad = false;
 
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-			if (ImGui::BeginChild("Actions", ImVec2(actionsAreaWidth, innerHeight)))
+			if (ImGui::BeginChild("Actions", ImVec2(actionsAreaWidth, innerHeight), false, ImGuiWindowFlags_NoBackground))
 			{
 				ImGui::PopStyleVar();
 				poppedActionsPad = true;
@@ -336,7 +336,7 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 			static CUiContext* uictx = ctx->GetUIContext();
 			static CAlerts* alertctx = uictx->GetAlerts();
 
-			if (ImGui::BeginChild("Info", ImVec2(itemSz.x - style.ItemSpacing.x - actionsAreaWidth - (style.WindowPadding.x * 2), innerHeight)))
+			if (ImGui::BeginChild("Info", ImVec2(itemSz.x - style.ItemSpacing.x - actionsAreaWidth - (style.WindowPadding.x * 2), innerHeight), false, ImGuiWindowFlags_NoBackground))
 			{
 				ImGui::Text(aAddonData.LibraryAddon->Name.c_str());
 				ImGui::TextDisabled("by %s", aAddonData.LibraryAddon->Author.c_str());
@@ -351,7 +351,7 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 			bool poppedActionsPad = false;
 
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-			if (ImGui::BeginChild("Actions", ImVec2(actionsAreaWidth, innerHeight)))
+			if (ImGui::BeginChild("Actions", ImVec2(actionsAreaWidth, innerHeight), false, ImGuiWindowFlags_NoBackground))
 			{
 				ImGui::PopStyleVar();
 				poppedActionsPad = true;
@@ -577,7 +577,7 @@ void CAddonsWindow::RenderContent()
 
 	static bool isListMode = settingsctx->Get<bool>(OPT_ISLISTMODE, false);
 	
-	if (ImGui::BeginChild("Filters", filterAreaSz))
+	if (ImGui::BeginChild("Filters", filterAreaSz, false, ImGuiWindowFlags_NoBackground))
 	{
 		/* search term */
 		if (ImGui::InputTextWithHint("##SearchTerm", langApi->Translate("((000104))"), &searchTerm[0], 400))
@@ -843,7 +843,7 @@ void CAddonsWindow::RenderContent()
 	//ImVec2 posList = ImGui::GetCursorPos();
 
 	//ImGui::PushClipRect(listP1, listP2, true);
-	if (ImGui::BeginChild("List", listAreaSz))
+	if (ImGui::BeginChild("List", listAreaSz, false, ImGuiWindowFlags_NoBackground))
 	{
 		if (configuring)
 		{
@@ -901,7 +901,7 @@ void CAddonsWindow::RenderContent()
 	}*/
 	
 
-	if (ImGui::BeginChild("Actions", actionsAreaSz))
+	if (ImGui::BeginChild("Actions", actionsAreaSz, false, ImGuiWindowFlags_NoBackground))
 	{
 		if (ImGui::Button(langApi->Translate("((000034))")))
 		{
@@ -1039,7 +1039,7 @@ void CAddonsWindow::RenderDetails()
 	static Texture* chevronRt = nullptr;
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-	if (ImGui::BeginChild("Details_Collapse", ImVec2(btnSz, 0)))
+	if (ImGui::BeginChild("Details_Collapse", ImVec2(btnSz, 0), false, ImGuiWindowFlags_NoBackground))
 	{
 		ImVec2 initial = ImGui::GetCursorPos();
 
@@ -1065,7 +1065,7 @@ void CAddonsWindow::RenderDetails()
 
 	ImGui::SameLine();
 
-	if (ImGui::BeginChild("Details_Content"))
+	if (ImGui::BeginChild("Details_Content", ImVec2(0, 0), false, ImGuiWindowFlags_NoBackground))
 	{
 		static CContext* ctx = CContext::GetContext();
 		static CLocalization* langApi = ctx->GetLocalization();

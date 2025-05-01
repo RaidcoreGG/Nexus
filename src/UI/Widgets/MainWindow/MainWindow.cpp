@@ -118,22 +118,17 @@ void CMainWindow::Render()
 		ImGui::PopStyleVar(2);
 		poppedPadding = true;
 
-		ImGui::SetCursorPos(ImVec2(sidebarWidth, headerHeight));
-		if (ImGui::BeginChild("Content", ImVec2(contentWidth, contentHeight - footerHeight)))
+		ImGui::SetCursorPos(ImVec2(sidebarWidth + padding.x, headerHeight + padding.y));
+		if (ImGui::BeginChild("Page", ImVec2(contentWidth - (padding.x * 2), contentHeight - footerHeight - (padding.y * 2)), false, ImGuiWindowFlags_NoBackground))
 		{
-			ImGui::SetCursorPos(padding);
-			if (ImGui::BeginChild("ContentInner", ImVec2(contentWidth - (padding.x * 2), contentHeight - footerHeight - (padding.y * 2))))
+			if (this->ActiveContent)
 			{
-				if (this->ActiveContent)
-				{
-					this->ActiveContent->Render();
-				}
-				else
-				{
-				//	this->RenderDashboard();
-				}
+				this->ActiveContent->Render();
 			}
-			ImGui::EndChild();
+			else
+			{
+				//	this->RenderDashboard();
+			}
 		}
 		ImGui::EndChild();
 

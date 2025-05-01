@@ -77,7 +77,7 @@ void CBindsWindow::RenderContent()
 	{
 		if (ImGui::BeginTabItem("Nexus"))
 		{
-			if (ImGui::BeginChild("InputBindsScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
+			if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 			{
 				for (InputBindCategory cat : this->IBCategories)
 				{
@@ -98,7 +98,7 @@ void CBindsWindow::RenderContent()
 
 		if (ImGui::BeginTabItem("Guild Wars 2"))
 		{
-			if (ImGui::BeginChild("GameBindsScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
+			if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 			{
 				ImGui::Text("Info:");
 				ImGui::TextWrapped("These binds are used by addons to emulate key presses for you in order to execute macros or similar.");

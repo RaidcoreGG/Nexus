@@ -101,7 +101,7 @@ void CDebugWindow::TabEvents()
 		return;
 	}
 
-	if (ImGui::BeginChild("EventsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
+	if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 	{
 		std::unordered_map<std::string, EventData> eventRegistry = CContext::GetContext()->GetEventApi()->GetRegistry();
 
@@ -137,7 +137,7 @@ void CDebugWindow::TabInputBinds()
 		return;
 	}
 
-	if (ImGui::BeginChild("InputBindsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
+	if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 	{
 		std::map<std::string, ManagedInputBind> inputBindRegistry = CContext::GetContext()->GetInputBindApi()->GetRegistry();
 
@@ -166,7 +166,7 @@ void CDebugWindow::TabDataLink()
 		return;
 	}
 
-	if (ImGui::BeginChild("DataLinkTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
+	if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 	{
 		std::unordered_map<std::string, LinkedResource>	dataLinkRegistry = CContext::GetContext()->GetDataLink()->GetRegistry();
 
@@ -203,26 +203,26 @@ void CDebugWindow::TabTextures()
 		return;
 	}
 
-	if (ImGui::BeginChild("TexturesTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
-	{
-		std::map<std::string, Texture*> texRegistry = CContext::GetContext()->GetTextureService()->GetRegistry();
-		std::vector<QueuedTexture>      texQueued = CContext::GetContext()->GetTextureService()->GetQueuedTextures();
+	std::map<std::string, Texture*> texRegistry = CContext::GetContext()->GetTextureService()->GetRegistry();
+	std::vector<QueuedTexture>      texQueued = CContext::GetContext()->GetTextureService()->GetQueuedTextures();
 
+	static char texFilter[400] = {};
+	static int displayedTextures = 0;
+	static size_t displayedMemUsage = 0;
+
+	ImGui::Text("Filter:");
+	ImGui::SameLine();
+	ImGui::InputText("##Filter", &texFilter[0], 400);
+
+	std::string texFilterStr = texFilter;
+
+	ImGui::Text("Displaying %d of %d loaded textures:", displayedTextures, texRegistry.size());
+	ImGui::Text("Combined memory usage of displayed: %s", String::FormatByteSize(displayedMemUsage).c_str());
+
+	if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
+	{
 		float previewSize = ImGui::GetTextLineHeightWithSpacing() * 3;
 		float wndHeight = ImGui::GetWindowHeight();
-
-		static char texFilter[400] = {};
-		static int displayedTextures = 0;
-		static size_t displayedMemUsage = 0;
-
-		ImGui::Text("Filter:");
-		ImGui::SameLine();
-		ImGui::InputText("##Filter", &texFilter[0], 400);
-
-		std::string texFilterStr = texFilter;
-
-		ImGui::Text("Displaying %d of %d loaded textures:", displayedTextures, texRegistry.size());
-		ImGui::Text("Combined memory usage of displayed: %s", String::FormatByteSize(displayedMemUsage).c_str());
 
 		ImVec2 drawPos = ImGui::GetCursorPos();
 
@@ -361,7 +361,7 @@ void CDebugWindow::TabQuickAccess()
 		return;
 	}
 
-	if (ImGui::BeginChild("QuickAccessTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
+	if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 	{
 		ImGui::Text("Items:");
 
@@ -422,7 +422,7 @@ void CDebugWindow::TabLoader()
 
 	const std::lock_guard<std::mutex> lock(Loader::Mutex);
 	
-	if (ImGui::BeginChild("LoaderTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
+	if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 	{
 		if (ImGui::TreeNode("Tracked"))
 		{
@@ -507,7 +507,7 @@ void CDebugWindow::TabFonts()
 		return;
 	}
 
-	if (ImGui::BeginChild("FontsTabScroll", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f)))
+	if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		ImFontAtlas* atlas = io.Fonts;

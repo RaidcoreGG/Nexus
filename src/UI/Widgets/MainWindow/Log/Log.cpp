@@ -55,11 +55,14 @@ void CLogWindow::RenderContent()
 	ImGui::SameLine();
 	ImGui::Checkbox("Selected level only", &selectedOnly);
 
-	float windowWidthQuarter = ImGui::GetWindowContentRegionWidth() / 4.0f;
+	ImGuiStyle& style = ImGui::GetStyle();
+
+	float widthChannels = ImGui::GetWindowContentRegionWidth() * .25f;
+	float widthMessages = ImGui::GetWindowContentRegionWidth() * .75f - style.ItemSpacing.x;
 
 	ImGui::Separator();
 	{
-		ImGui::BeginChild("LogChannels", ImVec2(windowWidthQuarter, 0.0f));
+		ImGui::BeginChild("Channels", ImVec2(widthChannels, 0.0f), false, ImGuiWindowFlags_NoBackground);
 
 		ImGui::Text("Channel:");
 
@@ -73,7 +76,7 @@ void CLogWindow::RenderContent()
 					opacity = 1.0f;
 				}
 				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, opacity);
-				if (ImGui::Button(ch.c_str(), ImVec2(windowWidthQuarter, 0.0f)))
+				if (ImGui::Button(ch.c_str(), ImVec2(widthChannels, 0.0f)))
 				{
 					/* if the selected channel is already the set filter, reset filter */
 					if (channelFilter == ch)
@@ -98,9 +101,8 @@ void CLogWindow::RenderContent()
 	amtShown = 0;
 
 	{
-		ImGui::BeginChild("logmessages", ImVec2(windowWidthQuarter * 3 - 1, 0.0f));
+		ImGui::BeginChild("Messages", ImVec2(widthMessages, 0.0f), false, ImGuiWindowFlags_NoBackground);
 
-		ImGuiStyle& style = ImGui::GetStyle();
 		float wrapWidth = ImGui::GetContentRegionAvailWidth() - off1 - off2 - style.ScrollbarSize;
 		float maxHeight = ImGui::GetWindowHeight();
 
