@@ -64,6 +64,14 @@ class CSettings
 		return this->Store[aIdentifier].get<T>();
 	}
 
+	void Remove(std::string aIdentifier)
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		this->Store.erase(aIdentifier);
+		this->SaveInternal();
+	}
+
 	private:
 	CLogHandler*          Logger = nullptr;
 
