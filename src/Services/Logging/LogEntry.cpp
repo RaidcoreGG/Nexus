@@ -44,12 +44,12 @@ std::string LogEntry::ToString(bool aIncludeChannel, bool aIncludeDate, bool aIn
 
 	switch (LogLevel)
 	{
-		case ELogLevel::CRITICAL:	level = " [CRITICAL] ";     break;
-		case ELogLevel::WARNING:	level = " [WARNING] ";      break;
-		case ELogLevel::INFO:		level = " [INFO] ";         break;
-		case ELogLevel::DEBUG:		level = " [DEBUG] ";        break;
+		case ELogLevel::CRITICAL: level = " [CRITICAL] ";     break;
+		case ELogLevel::WARNING:  level = " [WARNING] ";      break;
+		case ELogLevel::INFO:     level = " [INFO] ";         break;
+		case ELogLevel::DEBUG:    level = " [DEBUG] ";        break;
 
-		default:					level = " [TRACE] ";        break;
+		default:                  level = " [TRACE] ";        break;
 	}
 
 	std::stringstream oss;

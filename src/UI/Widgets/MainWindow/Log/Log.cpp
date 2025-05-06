@@ -38,9 +38,6 @@ void CLogWindow::RenderContent()
 		this->IsInvalid = false;
 	}
 
-	float off1 = ImGui::CalcTextSize("XX:XX:XX.XXX  ").x;
-	float off2 = ImGui::CalcTextSize("XXXXXXXXXXX").x;
-
 	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Shown messages");
 	ImGui::SameLine();
@@ -109,12 +106,12 @@ void CLogWindow::RenderContent()
 
 	ImGuiStyle& style = ImGui::GetStyle();
 
-	float widthChannels = ImGui::GetWindowContentRegionWidth() * .25f;
-	float widthMessages = ImGui::GetWindowContentRegionWidth() * .75f - style.ItemSpacing.x;
-
 	std::vector<std::string> activeChannels;
 
 	static int amtShown = 0;
+	static float widthChannels = 50.f;
+
+	float calcChWidth = .0f;
 
 	ImGui::Separator();
 	{
@@ -123,36 +120,37 @@ void CLogWindow::RenderContent()
 		ImGui::Text("Channels");
 
 		const std::lock_guard<std::mutex> lock(Mutex);
+		for (LogChannel& ch : this->Channels)
 		{
-			for (LogChannel& ch : this->Channels)
+			calcChWidth = max(calcChWidth, ImGui::CalcTextSize(ch.Name.c_str()).x);
+			float opacity = 0.8f;
+			if (ch.IsSelected)
 			{
-				float opacity = 0.8f;
-				if (ch.IsSelected)
-				{
-					opacity = 1.0f;
-					activeChannels.push_back(ch.Name);
-				}
-				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, opacity);
-				if (ImGui::Button(ch.Name.c_str(), ImVec2(widthChannels, 0.0f)))
-				{
-					ch.IsSelected = !ch.IsSelected;
-				}
-				ImGui::PopStyleVar();
+				opacity = 1.0f;
+				activeChannels.push_back(ch.Name);
 			}
+			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, opacity);
+			if (ImGui::Button(ch.Name.c_str(), ImVec2(widthChannels, 0.0f)))
+			{
+				ch.IsSelected = !ch.IsSelected;
+			}
+			ImGui::PopStyleVar();
 		}
-		ImGui::TextDisabled("Showing %d out of %d", amtShown, LogEntries.size());
+		ImGui::TextDisabled("%d / %d", amtShown, LogEntries.size());
 
 		ImGui::EndChild();
 	}
+
+	widthChannels = calcChWidth;
+	widthChannels += ImGui::GetStyle().FramePadding.x * 2;
 
 	ImGui::SameLine();
 
 	amtShown = 0;
 
 	{
-		ImGui::BeginChild("Messages", ImVec2(widthMessages, 0.0f), false, ImGuiWindowFlags_NoBackground);
+		ImGui::BeginChild("Messages", ImVec2(.0f, .0f), false, ImGuiWindowFlags_NoBackground);
 
-		float wrapWidth = ImGui::GetContentRegionAvailWidth() - off1 - off2 - style.ScrollbarSize;
 		float maxHeight = ImGui::GetWindowHeight();
 
 		const std::lock_guard<std::mutex> lock(Mutex);
@@ -202,7 +200,7 @@ void CLogWindow::RenderContent()
 				start = displayedEntries.size() - this->MaxShownCount;
 			}
 
-			if (ImGui::BeginTable("##LogMessages", 3, ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_SizingFixedFit))
+			if (ImGui::BeginTable("##LogMessages", 4, ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_SizingFixedFit))
 			{
 				for (size_t i = start; i < displayedEntries.size(); i++)
 				{
@@ -230,13 +228,17 @@ void CLogWindow::RenderContent()
 					ImGui::TableSetColumnIndex(0);
 					ImGui::TextColored(levelColor, msg->Entry->TimestampString(false, true).c_str());
 
-					/* level */
+					/* channel */
 					ImGui::TableSetColumnIndex(1);
+					ImGui::TextColored(levelColor, msg->Entry->Channel.c_str());
+
+					/* level */
+					ImGui::TableSetColumnIndex(2);
 					ImGui::TextColored(levelColor, level);
 
+					ImGui::TableSetColumnIndex(3);
+					float wrapWidth = ImGui::GetWindowContentRegionWidth() - ImGui::GetCursorPosX() - ImGui::GetStyle().CellPadding.x;
 					float msgHeight = ImGui::CalcTextSize(msg->Entry->Message.c_str(), (const char*)0, false, wrapWidth).y;
-
-					ImGui::TableSetColumnIndex(2);
 
 					/*  above visible space                        || under visible space */
 					if (rowPos.y < ImGui::GetScrollY() - msgHeight || rowPos.y > ImGui::GetScrollY() + maxHeight)

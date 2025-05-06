@@ -43,7 +43,7 @@ class CLogWindow : public ISubWindow, public virtual ILogger
 
 	struct DisplayLogEntry
 	{
-		LogEntry* Entry;
+		LogEntry*                Entry = nullptr;
 		std::vector<MessagePart> Parts;
 	};
 
@@ -53,9 +53,9 @@ class CLogWindow : public ISubWindow, public virtual ILogger
 		std::string Name;
 	};
 
-	int                           MaxShownCount = 400;
-	ELogLevel                     FilterLevel = ELogLevel::ALL;
-	bool                          SelectedLevelOnly;
+	int                           MaxShownCount     = 400;
+	ELogLevel                     FilterLevel       = ELogLevel::ALL;
+	bool                          SelectedLevelOnly = false;
 
 	std::vector<DisplayLogEntry*> LogEntries;
 	std::vector<LogChannel>       Channels;
