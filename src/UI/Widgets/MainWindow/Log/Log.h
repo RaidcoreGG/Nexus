@@ -18,27 +18,6 @@
 #include "Services/Logging/LogEntry.h"
 #include "UI/Controls/CtlSubWindow.h"
 
-enum class EMessagePartType {
-	None,
-	Text,
-	ColorPush,
-	ColorPop,
-	LineBreak
-};
-
-struct MessagePart
-{
-	EMessagePartType            Type;
-	std::string                 Text;
-	ImVec4                      Color;
-};
-
-struct DisplayLogEntry
-{
-	LogEntry* Entry;
-	std::vector<MessagePart>    Parts;
-};
-
 class CLogWindow : public ISubWindow, public virtual ILogger
 {
 	public:
@@ -47,8 +26,39 @@ class CLogWindow : public ISubWindow, public virtual ILogger
 	void LogMessage(LogEntry* aLogEntry) override;
 
 	private:
-	std::vector<DisplayLogEntry*>   LogEntries;
-	std::vector<std::string>        Channels;
+	enum class EMessagePartType {
+		None,
+		Text,
+		ColorPush,
+		ColorPop,
+		LineBreak
+	};
+
+	struct MessagePart
+	{
+		EMessagePartType Type;
+		std::string      Text;
+		ImVec4           Color;
+	};
+
+	struct DisplayLogEntry
+	{
+		LogEntry* Entry;
+		std::vector<MessagePart> Parts;
+	};
+
+	struct LogChannel
+	{
+		bool        IsSelected;
+		std::string Name;
+	};
+
+	int                           MaxShownCount = 400;
+	ELogLevel                     FilterLevel = ELogLevel::ALL;
+	bool                          SelectedLevelOnly;
+
+	std::vector<DisplayLogEntry*> LogEntries;
+	std::vector<LogChannel>       Channels;
 };
 
 #endif
