@@ -352,7 +352,7 @@
     <ClInclude Include="src\Util\Time.h" />
     <ClInclude Include="src\Util\Url.h" />
     <ClInclude Include="src\Version.h" />
-    <ClInclude Include="src\Inputs\RawInput\FuncDefs.h" />
+    <ClInclude Include="src\Inputs\RawInput\RiFuncDefs.h" />
     <ClInclude Include="src\Inputs\RawInput\RawInputApi.h" />
   </ItemGroup>
   <ItemGroup>

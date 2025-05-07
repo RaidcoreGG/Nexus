@@ -12,7 +12,7 @@
 #include <vector>
 #include <mutex>
 
-#include "FuncDefs.h"
+#include "RiFuncDefs.h"
 
 #define WM_PASSTHROUGH_FIRST WM_USER + 7997
 #define WM_PASSTHROUGH_LAST  WM_USER + 7997 + WM_USER - 1
@@ -22,7 +22,7 @@
 ///----------------------------------------------------------------------------------------------------
 class CRawInputApi
 {
-public:
+	public:
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
@@ -62,9 +62,9 @@ public:
 	///----------------------------------------------------------------------------------------------------
 	int Verify(void* aStartAddress, void* aEndAddress);
 
-private:
-	mutable std::mutex				Mutex;
-	std::vector<WNDPROC_CALLBACK>	Registry;
+	private:
+	mutable std::mutex            Mutex;
+	std::vector<WNDPROC_CALLBACK> Registry;
 };
 
 #endif

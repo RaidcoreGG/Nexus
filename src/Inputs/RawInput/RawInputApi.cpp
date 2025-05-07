@@ -1,7 +1,7 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  WndProcHandler.cpp
+/// Name         :  RawInputApi.cpp
 /// Description  :  API for WndProc callbacks/hooks.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------

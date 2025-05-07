@@ -15,7 +15,7 @@
 #include "Events/EvtFuncDefs.h"
 #include "Inputs/GameBinds/EGameBinds.h"
 #include "Inputs/InputBinds/FuncDefs.h"
-#include "Inputs/RawInput/FuncDefs.h"
+#include "Inputs/RawInput/RiFuncDefs.h"
 #include "Services/Logging/ELogLevel.h"
 #include "Services/Textures/FuncDefs.h"
 #include "UI/FuncDefs.h"

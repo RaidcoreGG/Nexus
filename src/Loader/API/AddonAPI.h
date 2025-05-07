@@ -9,7 +9,7 @@
 #include "Events/EvtFuncDefs.h"
 #include "Inputs/GameBinds/GbFuncDefs.h"
 #include "Inputs/InputBinds/FuncDefs.h"
-#include "Inputs/RawInput/FuncDefs.h"
+#include "Inputs/RawInput/RiFuncDefs.h"
 #include "Paths/FuncDefs.h"
 #include "Services/DataLink/DlFuncDefs.h"
 #include "Services/Localization/FuncDefs.h"

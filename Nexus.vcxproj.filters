@@ -548,9 +548,6 @@
     <ClInclude Include="src\Inputs\RawInput\RawInputApi.h">
       <Filter>Inputs\RawInput</Filter>
     </ClInclude>
-    <ClInclude Include="src\Inputs\RawInput\FuncDefs.h">
-      <Filter>Inputs\RawInput</Filter>
-    </ClInclude>
     <ClInclude Include="src\thirdparty\openssl\aes.h">
       <Filter>_EXTERNAL\openssl</Filter>
     </ClInclude>
@@ -1204,6 +1201,9 @@
     </ClInclude>
     <ClInclude Include="src\Inputs\GameBinds\GbConst.h">
       <Filter>Inputs\GameBinds</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Inputs\RawInput\RiFuncDefs.h">
+      <Filter>Inputs\RawInput</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
