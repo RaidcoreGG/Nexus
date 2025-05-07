@@ -143,8 +143,6 @@ namespace Main
 		/* Only initalise if not vanilla */
 		if (!CmdLine::HasArgument("-ggvanilla"))
 		{
-			Multibox::ShareArchive();
-			Multibox::ShareLocal();
 			Multibox::KillMutex();
 			logger->Info(CH_CORE, "Multibox State: %d", Multibox::GetState());
 
@@ -247,7 +245,7 @@ namespace Main
 				static bool s_IsConfining = false;
 				static POINT s_LastPos = {};
 
-				CURSORINFO ci;
+				CURSORINFO ci{};
 				ci.cbSize = sizeof(CURSORINFO);
 				GetCursorInfo(&ci);
 

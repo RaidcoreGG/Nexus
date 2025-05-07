@@ -21,42 +21,42 @@
 
 typedef struct _SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX
 {
-	PVOID								Object;
-	ULONG_PTR							UniqueProcessId;
-	ULONG_PTR							HandleValue;
-	ULONG								GrantedAccess;
-	USHORT								CreatorBackTraceIndex;
-	USHORT								ObjectTypeIndex;
-	ULONG								HandleAttributes;
-	ULONG								Reserved;
+	PVOID     Object;
+	ULONG_PTR UniqueProcessId;
+	ULONG_PTR HandleValue;
+	ULONG     GrantedAccess;
+	USHORT    CreatorBackTraceIndex;
+	USHORT    ObjectTypeIndex;
+	ULONG     HandleAttributes;
+	ULONG     Reserved;
 } SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX, *PSYSTEM_HANDLE_TABLE_ENTRY_INFO_EX;
 
 typedef struct _SYSTEM_HANDLE_INFORMATION_EX
 {
-	ULONG_PTR							NumberOfHandles;
-	ULONG_PTR							Reserved;
-	SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX	Handles[1];
+	ULONG_PTR                         NumberOfHandles;
+	ULONG_PTR                         Reserved;
+	SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX Handles[1];
 } SYSTEM_HANDLE_INFORMATION_EX, *PSYSTEM_HANDLE_INFORMATION_EX;
 
 typedef NTSTATUS(* PFN_NTQUERYSYSTEMINFORMATION)
 (
-	SYSTEM_INFORMATION_CLASS			SystemInformationClass,
-	PVOID								SystemInformation,
-	ULONG								SystemInformationLength,
-	PULONG								ReturnLength
+	SYSTEM_INFORMATION_CLASS SystemInformationClass,
+	PVOID                    SystemInformation,
+	ULONG                    SystemInformationLength,
+	PULONG                   ReturnLength
 );
 
 typedef NTSTATUS(*PFN_NTQUERYOBJECT)(
-	HANDLE								Handle,
-	OBJECT_INFORMATION_CLASS			ObjectInformationClass,
-	PVOID								ObjectInformation,
-	ULONG								ObjectInformationLength,
-	PULONG								ReturnLength
+	HANDLE                   Handle,
+	OBJECT_INFORMATION_CLASS ObjectInformationClass,
+	PVOID                    ObjectInformation,
+	ULONG                    ObjectInformationLength,
+	PULONG                   ReturnLength
 );
 
 typedef NTSTATUS(*PFN_RTLINITUNICODESTRING)(
-	PUNICODE_STRING						DestinationString,
-	PCWSTR								SourceString
+	PUNICODE_STRING DestinationString,
+	PCWSTR          SourceString
 );
 
 NTSTATUS GetProcessHandles(std::vector<HANDLE>& aHandles)
@@ -117,60 +117,33 @@ bool UnicodeStringContains(PCUNICODE_STRING aStr1, PCUNICODE_STRING aStr2)
 	return false;
 }
 
-EMultiboxState operator|(EMultiboxState lhs, EMultiboxState rhs)
-{
-	return static_cast<EMultiboxState>(std::underlying_type_t<EMultiboxState>(lhs) | std::underlying_type_t<EMultiboxState>(rhs));
-}
-EMultiboxState operator&(EMultiboxState lhs, EMultiboxState rhs)
-{
-	return static_cast<EMultiboxState>(std::underlying_type_t<EMultiboxState>(lhs) & std::underlying_type_t<EMultiboxState>(rhs));
-}
-EMultiboxState operator|=(EMultiboxState& lhs, EMultiboxState rhs)
-{
-	return lhs = lhs | rhs;
-}
+DEFINE_ENUM_FLAG_OPERATORS(EMultiboxState)
 
 namespace Multibox
 {
-	static EMultiboxState s_State          = EMultiboxState::NONE;
-	static bool           s_ArchiveShared  = false;
-	static bool           s_LocalShared    = false;
-	static bool           s_MutexDestroyed = false;
+	static EMultiboxState s_State = EMultiboxState::NONE;
 
 	EMultiboxState GetState()
 	{
-		s_State = EMultiboxState::NONE;
+		if (CmdLine::HasArgument("-sharearchive"))
+		{
+			s_State |= EMultiboxState::ARCHIVE_SHARED;
+		}
 
-		if (s_ArchiveShared)  { s_State |= EMultiboxState::ARCHIVE_SHARED; }
-		if (s_LocalShared)    { s_State |= EMultiboxState::LOCAL_SHARED; }
-		if (s_MutexDestroyed) { s_State |= EMultiboxState::MUTEX_CLOSED; }
+		if (CmdLine::HasArgument("-multi"))
+		{
+			s_State |= EMultiboxState::LOCAL_SHARED;
+		}
 
 		return s_State;
 	}
 
-	void ShareArchive()
-	{
-		if (CmdLine::HasArgument("-sharearchive"))
-		{
-			s_ArchiveShared = true;
-		}
-
-		//Logger->Critical(CH_CORE, "Multibox::ShareArchive() not implemented.");
-	}
-
-	void ShareLocal()
-	{
-		if (CmdLine::HasArgument("-multi"))
-		{
-			s_LocalShared = true;
-		}
-
-		//Logger->Critical(CH_CORE, "Multibox::ShareLocal() not implemented.");
-	}
-
 	void KillMutex()
 	{
-		bool wasClosed = false;
+		if ((s_State & EMultiboxState::MUTEX_CLOSED) == EMultiboxState::MUTEX_CLOSED)
+		{
+			return;
+		}
 
 		ULONG handleNameSize = 2048;
 		UNICODE_STRING* handleName = (UNICODE_STRING*) new unsigned char[handleNameSize];
@@ -197,7 +170,7 @@ namespace Multibox
 
 						if (CloseHandle(handle))
 						{
-							s_MutexDestroyed = true;
+							s_State |= EMultiboxState::MUTEX_CLOSED;
 						}
 
 						break;
@@ -207,7 +180,7 @@ namespace Multibox
 
 			if (!found)
 			{
-				s_MutexDestroyed = true;
+				s_State |= EMultiboxState::MUTEX_CLOSED;
 			}
 		}
 

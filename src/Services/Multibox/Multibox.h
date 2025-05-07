@@ -9,21 +9,19 @@
 #ifndef MULTIBOX_H
 #define MULTIBOX_H
 
+#include <cstdint>
+
 ///----------------------------------------------------------------------------------------------------
 /// EMultiboxState Enumeration
 ///----------------------------------------------------------------------------------------------------
-enum class EMultiboxState
+enum class EMultiboxState : uint32_t
 {
-	NONE = 0,
-	ARCHIVE_SHARED = 1,
-	LOCAL_SHARED = 2,
-	MUTEX_CLOSED = 4,
+	NONE           = 0,
+	ARCHIVE_SHARED = 1 << 0,
+	LOCAL_SHARED   = 1 << 1,
+	MUTEX_CLOSED   = 1 << 2,
 	READY = ARCHIVE_SHARED | LOCAL_SHARED | MUTEX_CLOSED
 };
-
-EMultiboxState operator|(EMultiboxState lhs, EMultiboxState rhs);
-EMultiboxState operator&(EMultiboxState lhs, EMultiboxState rhs);
-EMultiboxState operator|=(EMultiboxState& lhs, EMultiboxState rhs);
 
 ///----------------------------------------------------------------------------------------------------
 /// Multibox Namespace
@@ -35,18 +33,6 @@ namespace Multibox
 	/// 	Returns the current state of multiboxing compatibility.
 	///----------------------------------------------------------------------------------------------------
 	EMultiboxState GetState();
-
-	///----------------------------------------------------------------------------------------------------
-	/// ShareArchive:
-	/// 	Shares the game archive that prevents the game client from opening multiple times.
-	///----------------------------------------------------------------------------------------------------
-	void ShareArchive();
-
-	///----------------------------------------------------------------------------------------------------
-	/// ShareLocal:
-	/// 	Shares the local archive that prevents the game client from opening multiple times.
-	///----------------------------------------------------------------------------------------------------
-	void ShareLocal();
 
 	///----------------------------------------------------------------------------------------------------
 	/// KillMutex:
