@@ -31,4 +31,10 @@ std::string& CategoryNameFrom(EGameBinds aGameBind);
 ///----------------------------------------------------------------------------------------------------
 unsigned short GameScanCodeToScanCode(unsigned short aGameScanCode);
 
+///----------------------------------------------------------------------------------------------------
+/// ScanCodeToGameScanCode:
+/// 	Converts a scan code from the game to a regular scan code.
+///----------------------------------------------------------------------------------------------------
+unsigned short ScanCodeToGameScanCode(unsigned short aScanCode);
+
 #endif

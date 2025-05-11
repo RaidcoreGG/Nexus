@@ -126,7 +126,8 @@ CGameBindsApi* CContext::GetGameBindsApi()
 	static CGameBindsApi s_GameBindsApi = CGameBindsApi(
 		this->GetRawInputApi(),
 		this->GetLogger(),
-		this->GetEventApi()
+		this->GetEventApi(),
+		this->GetLocalization()
 	);
 	return &s_GameBindsApi;
 }

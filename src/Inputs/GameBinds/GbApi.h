@@ -19,6 +19,7 @@
 #include "Inputs/InputBinds/InputBind.h"
 #include "Inputs/RawInput/RawInputApi.h"
 #include "Services/Logging/LogHandler.h"
+#include "Services/Localization/Localization.h"
 
 constexpr const char* CH_GAMEBINDS = "GameBinds";
 constexpr const char* EV_UE_KB_CH = "EV_UNOFFICIAL_EXTRAS_KEYBIND_CHANGED";
@@ -40,7 +41,7 @@ class CGameBindsApi
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, CEventApi* aEventApi);
+	CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, CEventApi* aEventApi, CLocalization* aLocalization);
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
@@ -84,12 +85,6 @@ class CGameBindsApi
 	bool IsBound(EGameBinds aGameBind);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Import:
-	/// 	Imports the game binds from an Inputs.xml.
-	///----------------------------------------------------------------------------------------------------
-	void Import(std::filesystem::path aPath);
-
-	///----------------------------------------------------------------------------------------------------
 	/// Get:
 	/// 	Gets a game bind.
 	///----------------------------------------------------------------------------------------------------
@@ -111,11 +106,10 @@ class CGameBindsApi
 	CRawInputApi*                             RawInputApi = nullptr;
 	CLogHandler*                              Logger      = nullptr;
 	CEventApi*                                EventApi    = nullptr;
+	CLocalization*                            Language    = nullptr;
 
 	mutable std::mutex                        Mutex;
 	std::unordered_map<EGameBinds, InputBind> Registry;
-
-	bool                                      IsReceivingRuntimeBinds;
 
 	///----------------------------------------------------------------------------------------------------
 	/// AddDefaultBinds:
@@ -127,7 +121,13 @@ class CGameBindsApi
 	/// Load:
 	/// 	Loads the saved game binds from disk.
 	///----------------------------------------------------------------------------------------------------
-	void Load();
+	void Load(std::filesystem::path aPath);
+
+	///----------------------------------------------------------------------------------------------------
+	/// Migrate:
+	/// 	Loads and migrates the legacy game binds to a game-compatible XML.
+	///----------------------------------------------------------------------------------------------------
+	void Migrate();
 
 	///----------------------------------------------------------------------------------------------------
 	/// Save:

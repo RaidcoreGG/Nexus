@@ -32,6 +32,7 @@ namespace Index
 	std::filesystem::path F_LOG{};
 	std::filesystem::path F_INPUTBINDS{};
 	std::filesystem::path F_GAMEBINDS{};
+	std::filesystem::path F_GAMEBINDS_LEGACY{};
 	std::filesystem::path F_SETTINGS{};
 	std::filesystem::path F_ADDONCONFIG{};
 	std::filesystem::path F_ADDONCONFIG_DEFAULT{};
@@ -77,7 +78,8 @@ namespace Index
 		/* files */
 		F_LOG = D_GW2_ADDONS_NEXUS / "Nexus.log";										/* get log path */
 		F_INPUTBINDS = D_GW2_ADDONS_NEXUS / "InputBinds.json";							/* get inputbinds path */
-		F_GAMEBINDS = D_GW2_ADDONS_NEXUS / "GameBinds.json";							/* get gamebinds path */
+		F_GAMEBINDS = D_GW2_ADDONS_NEXUS / "GameBinds.xml";							/* get gamebinds path */
+		F_GAMEBINDS_LEGACY = D_GW2_ADDONS_NEXUS / "GameBinds.json";							/* get gamebinds path */
 		F_SETTINGS = D_GW2_ADDONS_NEXUS / "Settings.json";								/* get settings path */
 		F_ADDONCONFIG = D_GW2_ADDONS_NEXUS / "AddonConfig.json";						/* get addon config path */
 		F_ADDONCONFIG_DEFAULT = D_GW2_ADDONS_NEXUS / "AddonConfig.json";						/* get addon config path */

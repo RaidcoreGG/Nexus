@@ -178,6 +178,9 @@
     <Filter Include="Loader\API">
       <UniqueIdentifier>{e8eae412-d99b-4737-825b-da0c7d8c0a74}</UniqueIdentifier>
     </Filter>
+    <Filter Include="_EXTERNAL\pugixml">
+      <UniqueIdentifier>{7e7f07ea-8da7-4084-a342-489acad48740}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -404,6 +407,9 @@
     </ClCompile>
     <ClCompile Include="src\Inputs\GameBinds\GbConst.cpp">
       <Filter>Inputs\GameBinds</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thirdparty\pugixml\pugixml.cpp">
+      <Filter>_EXTERNAL\pugixml</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1204,6 +1210,12 @@
     </ClInclude>
     <ClInclude Include="src\Inputs\RawInput\RiFuncDefs.h">
       <Filter>Inputs\RawInput</Filter>
+    </ClInclude>
+    <ClInclude Include="src\thirdparty\pugixml\pugixml.hpp">
+      <Filter>_EXTERNAL\pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\thirdparty\pugixml\pugiconfig.hpp">
+      <Filter>_EXTERNAL\pugixml</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

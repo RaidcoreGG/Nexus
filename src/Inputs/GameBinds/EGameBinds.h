@@ -9,7 +9,9 @@
 #ifndef EGAMEBINDS_H
 #define EGAMEBINDS_H
 
-enum class EGameBinds
+#include <cstdint>
+
+enum class EGameBinds : uint32_t
 {
 	// Movement
 	MoveForward           = 0,

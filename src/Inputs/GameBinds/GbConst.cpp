@@ -474,115 +474,136 @@ std::string& CategoryNameFrom(EGameBinds aGameBind)
 	return s_Nullstr;
 }
 
+static std::unordered_map<unsigned short, unsigned short> s_GSCToSCLUT =
+{
+	{ 0, 0x38 }, // LeftAlt
+	{ 1, 0x1D }, // LeftCtrl
+	{ 2, 0x2A }, // LeftShift
+	{ 3, 0x28 }, // Quote
+	{ 4, 0x2B }, // Hash
+	{ 5, 0x3A }, // CapsLock
+	{ 6, 0x33 }, // Colon
+	{ 7, 0x0C }, // Minus
+	{ 8, 0x0D }, // Equals
+	{ 9, 0x01 }, // Escape
+	{ 10, 0x1A }, // OpenBracket
+	{ 11, 0xE045 }, // NumLock
+	{ 12, 0x34 }, // Period
+	{ 13, 0x1B }, // CloseBracket
+	{ 14, 0x27 }, // Semicolon
+	{ 15, 0x35 }, // Slash
+	{ 16, 0xE037 }, // Print
+	{ 17, 0x29 }, // Tilde
+	{ 18, 0x0E }, // Backspace
+	{ 19, 0xE053 }, // Delete
+	{ 20, 0x1C }, // Enter
+	{ 21, 0x39 }, // Space
+	{ 22, 0x0F }, // Tab
+	{ 23, 0xE04F }, // End
+	{ 24, 0xE047 }, // Home
+	{ 25, 0xE052 }, // Insert
+	{ 26, 0xE051 }, // Next
+	{ 27, 0xE049 }, // Prior
+	{ 28, 0xE050 }, // ArrowDown
+	{ 29, 0xE04B }, // ArrowLeft
+	{ 30, 0xE04D }, // ArrowRight
+	{ 31, 0xE048 }, // ArrowUp
+	{ 32, 0x3B }, // F1
+	{ 33, 0x3C }, // F2
+	{ 34, 0x3D }, // F3
+	{ 35, 0x3E }, // F4
+	{ 36, 0x3F }, // F5
+	{ 37, 0x40 }, // F6
+	{ 38, 0x41 }, // F7
+	{ 39, 0x42 }, // F8
+	{ 40, 0x43 }, // F9
+	{ 41, 0x44 }, // F10
+	{ 42, 0x57 }, // F11
+	{ 43, 0x58 }, // F12
+	{ 48, 0x0B }, // _0
+	{ 49, 0x02 }, // _1
+	{ 50, 0x03 }, // _2
+	{ 51, 0x04 }, // _3
+	{ 52, 0x05 }, // _4
+	{ 53, 0x06 }, // _5
+	{ 54, 0x07 }, // _6
+	{ 55, 0x08 }, // _7
+	{ 56, 0x09 }, // _8
+	{ 57, 0x0A }, // _9
+	{ 65, 0x1E }, // A
+	{ 66, 0x30 }, // B
+	{ 67, 0x2E }, // C
+	{ 68, 0x20 }, // D
+	{ 69, 0x12 }, // E
+	{ 70, 0x21 }, // F
+	{ 71, 0x22 }, // G
+	{ 72, 0x23 }, // H
+	{ 73, 0x17 }, // I
+	{ 74, 0x24 }, // J
+	{ 75, 0x25 }, // K
+	{ 76, 0x26 }, // L
+	{ 77, 0x32 }, // M
+	{ 78, 0x31 }, // N
+	{ 79, 0x18 }, // O
+	{ 80, 0x19 }, // P
+	{ 81, 0x10 }, // Q
+	{ 82, 0x13 }, // R
+	{ 83, 0x1F }, // S
+	{ 84, 0x14 }, // T
+	{ 85, 0x16 }, // U
+	{ 86, 0x2F }, // V
+	{ 87, 0x11 }, // W
+	{ 88, 0x2D }, // X
+	{ 89, 0x15 }, // Y
+	{ 90, 0x2C }, // Z
+	{ 91, 0x4E }, // PlusNum
+	{ 92, 0x53 }, // DecimalNum
+	{ 93, 0xE035 }, // DivideNum
+	{ 94, 0x37 }, // MultiplyNum
+	{ 95, 0x52 }, // _0_NUM
+	{ 96, 0x4F }, // _1_NUM
+	{ 97, 0x50 }, // _2_NUM
+	{ 98, 0x51 }, // _3_NUM
+	{ 99, 0x4B }, // _4_NUM
+	{ 100, 0x4C }, // _5_NUM
+	{ 101, 0x4D }, // _6_NUM
+	{ 102, 0x47 }, // _7_NUM
+	{ 103, 0x48 }, // _8_NUM
+	{ 104, 0x49 }, // _9_NUM
+	{ 105, 0xE01C }, // EnterNum
+	{ 106, 0x4A }, // MinusNum
+	{ 109, 0xE038 }, // RightAlt
+	{ 110, 0xE01D }, // RightCtrl
+	{ 111, 0x56 }, // Backslash
+	{ 135, 0x36 }, // RightShift
+};
+
 unsigned short GameScanCodeToScanCode(unsigned short aGameScanCode)
 {
-	static std::unordered_map<unsigned short, unsigned short> s_GSCToSCLUT =
-	{
-		{ 0, 0x38 }, // LeftAlt
-		{ 1, 0x1D }, // LeftCtrl
-		{ 2, 0x2A }, // LeftShift
-		{ 3, 0x28 }, // Quote
-		{ 4, 0x2B }, // Hash
-		{ 5, 0x3A }, // CapsLock
-		{ 6, 0x33 }, // Colon
-		{ 7, 0x0C }, // Minus
-		{ 8, 0x0D }, // Equals
-		{ 9, 0x01 }, // Escape
-		{ 10, 0x1A }, // OpenBracket
-		{ 11, 0xE045 }, // NumLock
-		{ 12, 0x34 }, // Period
-		{ 13, 0x1B }, // CloseBracket
-		{ 14, 0x27 }, // Semicolon
-		{ 15, 0x35 }, // Slash
-		{ 16, 0xE037 }, // Print
-		{ 17, 0x29 }, // Tilde
-		{ 18, 0x0E }, // Backspace
-		{ 19, 0xE053 }, // Delete
-		{ 20, 0x1C }, // Enter
-		{ 21, 0x39 }, // Space
-		{ 22, 0x0F }, // Tab
-		{ 23, 0xE04F }, // End
-		{ 24, 0xE047 }, // Home
-		{ 25, 0xE052 }, // Insert
-		{ 26, 0xE051 }, // Next
-		{ 27, 0xE049 }, // Prior
-		{ 28, 0xE050 }, // ArrowDown
-		{ 29, 0xE04B }, // ArrowLeft
-		{ 30, 0xE04D }, // ArrowRight
-		{ 31, 0xE048 }, // ArrowUp
-		{ 32, 0x3B }, // F1
-		{ 33, 0x3C }, // F2
-		{ 34, 0x3D }, // F3
-		{ 35, 0x3E }, // F4
-		{ 36, 0x3F }, // F5
-		{ 37, 0x40 }, // F6
-		{ 38, 0x41 }, // F7
-		{ 39, 0x42 }, // F8
-		{ 40, 0x43 }, // F9
-		{ 41, 0x44 }, // F10
-		{ 42, 0x57 }, // F11
-		{ 43, 0x58 }, // F12
-		{ 48, 0x0B }, // _0
-		{ 49, 0x02 }, // _1
-		{ 50, 0x03 }, // _2
-		{ 51, 0x04 }, // _3
-		{ 52, 0x05 }, // _4
-		{ 53, 0x06 }, // _5
-		{ 54, 0x07 }, // _6
-		{ 55, 0x08 }, // _7
-		{ 56, 0x09 }, // _8
-		{ 57, 0x0A }, // _9
-		{ 65, 0x1E }, // A
-		{ 66, 0x30 }, // B
-		{ 67, 0x2E }, // C
-		{ 68, 0x20 }, // D
-		{ 69, 0x12 }, // E
-		{ 70, 0x21 }, // F
-		{ 71, 0x22 }, // G
-		{ 72, 0x23 }, // H
-		{ 73, 0x17 }, // I
-		{ 74, 0x24 }, // J
-		{ 75, 0x25 }, // K
-		{ 76, 0x26 }, // L
-		{ 77, 0x32 }, // M
-		{ 78, 0x31 }, // N
-		{ 79, 0x18 }, // O
-		{ 80, 0x19 }, // P
-		{ 81, 0x10 }, // Q
-		{ 82, 0x13 }, // R
-		{ 83, 0x1F }, // S
-		{ 84, 0x14 }, // T
-		{ 85, 0x16 }, // U
-		{ 86, 0x2F }, // V
-		{ 87, 0x11 }, // W
-		{ 88, 0x2D }, // X
-		{ 89, 0x15 }, // Y
-		{ 90, 0x2C }, // Z
-		{ 91, 0x4E }, // PlusNum
-		{ 92, 0x53 }, // DecimalNum
-		{ 93, 0xE035 }, // DivideNum
-		{ 94, 0x37 }, // MultiplyNum
-		{ 95, 0x52 }, // _0_NUM
-		{ 96, 0x4F }, // _1_NUM
-		{ 97, 0x50 }, // _2_NUM
-		{ 98, 0x51 }, // _3_NUM
-		{ 99, 0x4B }, // _4_NUM
-		{ 100, 0x4C }, // _5_NUM
-		{ 101, 0x4D }, // _6_NUM
-		{ 102, 0x47 }, // _7_NUM
-		{ 103, 0x48 }, // _8_NUM
-		{ 104, 0x49 }, // _9_NUM
-		{ 105, 0xE01C }, // EnterNum
-		{ 106, 0x4A }, // MinusNum
-		{ 109, 0xE038 }, // RightAlt
-		{ 110, 0xE01D }, // RightCtrl
-		{ 111, 0x56 }, // Backslash
-		{ 135, 0x36 }, // RightShift
-	};
-
 	auto it = s_GSCToSCLUT.find(aGameScanCode);
 
 	if (it != s_GSCToSCLUT.end())
+	{
+		return it->second;
+	}
+
+	return 0;
+}
+
+unsigned short ScanCodeToGameScanCode(unsigned short aScanCode)
+{
+	static const std::unordered_map<unsigned short, unsigned short> s_SCToGSCLUT = []{
+		std::unordered_map<unsigned short, unsigned short> inverse;
+		for (const auto& pair : s_GSCToSCLUT)
+		{
+			inverse[pair.second] = pair.first; // overwrites if duplicate values exist
+		}
+		return inverse;
+	}();
+
+	auto it = s_SCToGSCLUT.find(aScanCode);
+
+	if (it != s_SCToGSCLUT.end())
 	{
 		return it->second;
 	}

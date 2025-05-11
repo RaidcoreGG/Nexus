@@ -12,6 +12,7 @@
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
+#include "pugixml/pugixml.hpp"
 
 #include "Context.h"
 #include "Index.h"
@@ -101,7 +102,7 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 	uictx->Invalidate();
 }
 
-CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, CEventApi* aEventApi)
+CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, CEventApi* aEventApi, CLocalization* aLocalization)
 {
 	assert(aRawInputApi);
 	assert(aLogger);
@@ -110,8 +111,9 @@ CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, C
 	this->RawInputApi = aRawInputApi;
 	this->Logger = aLogger;
 	this->EventApi = aEventApi;
+	this->Language = aLocalization;
 
-	this->Load();
+	this->Load(Index::F_GAMEBINDS);
 	this->AddDefaultBinds();
 
 	this->EventApi->Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
@@ -449,12 +451,6 @@ bool CGameBindsApi::IsBound(EGameBinds aGameBind)
 	return it->second.IsBound();
 }
 
-void CGameBindsApi::Import(std::filesystem::path aPath)
-{
-	// TODO: https://github.com/RaidcoreGG/Nexus/issues/63
-	return;
-}
-
 const InputBind& CGameBindsApi::Get(EGameBinds aGameBind)
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
@@ -490,20 +486,15 @@ void CGameBindsApi::Set(EGameBinds aGameBind, InputBind aInputBind, bool aIsRunt
 		{
 			it->second = aInputBind;
 		}
-
-		if (aIsRuntimeBind)
-		{
-			this->IsReceivingRuntimeBinds = true;
-		}
-		else
-		{
-			std::thread([this]() {
-				this->EventApi->Raise("EV_INPUTBIND_UPDATED");
-			}).detach();
-		}
 	}
 
-	this->Save();
+	if (!aIsRuntimeBind)
+	{
+		std::thread([this]() {
+			this->EventApi->Raise("EV_INPUTBIND_UPDATED");
+		}).detach();
+		this->Save();
+	}
 }
 
 std::unordered_map<EGameBinds, InputBind> CGameBindsApi::GetRegistry() const
@@ -536,15 +527,118 @@ void CGameBindsApi::AddDefaultBinds()
 	}
 }
 
-void CGameBindsApi::Load()
+void CGameBindsApi::Load(std::filesystem::path aPath)
 {
-	if (!std::filesystem::exists(Index::F_GAMEBINDS)) { return; }
+	this->Migrate();
 
-	const std::lock_guard<std::mutex> lock(this->Mutex);
+	if (aPath.empty()) { aPath = Index::F_GAMEBINDS; }
+	if (!std::filesystem::exists(aPath)) { return; }
+
+	pugi::xml_document doc;
+	pugi::xml_parse_result result = doc.load_file(aPath.string().c_str());
+
+	if (!result)
+	{
+		this->Logger->Warning(CH_GAMEBINDS, "GameBinds.json could not be parsed. Error: %s", result.description());
+		return;
+	}
+
+	pugi::xml_node root = doc.child("InputBindings");
+
+	for (pugi::xml_node action : root.children("action"))
+	{
+		if (!action.attribute("id")) { continue; }
+
+		try
+		{
+			EGameBinds id = (EGameBinds)strtoul(action.attribute("id").value(), nullptr, 10);
+			InputBind bind{};
+
+			if (action.attribute("device") && action.attribute("button"))
+			{
+				std::string device = action.attribute("device").value();
+				if (device == "Keyboard")
+				{
+					bind.Type = EInputBindType::Keyboard;
+					bind.Code = GameScanCodeToScanCode(static_cast<unsigned short>(strtoul(action.attribute("button").value(), nullptr, 10)));
+				}
+				else if (device == "Mouse")
+				{
+					bind.Type = EInputBindType::Mouse;
+					std::string mousebtn = action.attribute("button").value();
+					if      (mousebtn == "0") { bind.Code = (unsigned short)EMouseButtons::LMB; }
+					else if (mousebtn == "2") { bind.Code = (unsigned short)EMouseButtons::RMB; }
+					else if (mousebtn == "1") { bind.Code = (unsigned short)EMouseButtons::MMB; }
+					else if (mousebtn == "3") { bind.Code = (unsigned short)EMouseButtons::M4; }
+					else if (mousebtn == "4") { bind.Code = (unsigned short)EMouseButtons::M5; }
+				}
+
+				if (action.attribute("mod"))
+				{
+					int mods = strtoul(action.attribute("mod").value(), nullptr, 10);
+					bind.Alt   = mods & 0b0100;
+					bind.Ctrl  = mods & 0b0010;
+					bind.Shift = mods & 0b0001;
+				}
+			}
+
+			/* No Primary bind, try to parse secondary bind. */
+			if (bind.Type == EInputBindType::None)
+			{
+				/* Reset before proceeding, to not have half set binds. */
+				bind.Code  = 0;
+				bind.Alt   = false;
+				bind.Ctrl  = false;
+				bind.Shift = false;
+
+				if (action.attribute("device2") && action.attribute("button2"))
+				{
+					std::string device = action.attribute("device2").value();
+					if (device == "Keyboard")
+					{
+						bind.Type = EInputBindType::Keyboard;
+						bind.Code = GameScanCodeToScanCode(static_cast<unsigned short>(strtoul(action.attribute("button2").value(), nullptr, 10)));
+					}
+					else if (device == "Mouse")
+					{
+						bind.Type = EInputBindType::Mouse;
+						std::string mousebtn = action.attribute("button2").value();
+						if      (mousebtn == "0") { bind.Code = (unsigned short)EMouseButtons::LMB; }
+						else if (mousebtn == "2") { bind.Code = (unsigned short)EMouseButtons::RMB; }
+						else if (mousebtn == "1") { bind.Code = (unsigned short)EMouseButtons::MMB; }
+						else if (mousebtn == "3") { bind.Code = (unsigned short)EMouseButtons::M4; }
+						else if (mousebtn == "4") { bind.Code = (unsigned short)EMouseButtons::M5; }
+					}
+
+					if (action.attribute("mod2"))
+					{
+						int mods = strtoul(action.attribute("mod2").value(), nullptr, 10);
+						bind.Alt   = mods & 0b0100;
+						bind.Ctrl  = mods & 0b0010;
+						bind.Shift = mods & 0b0001;
+					}
+				}
+			}
+
+			/* Neither primary nor secondary bind. */
+			if (bind.Type == EInputBindType::None) { continue; }
+
+			/* Store the bind. */
+			this->Registry.emplace(id, bind);
+		}
+		catch(...) {}
+	}
+}
+
+void CGameBindsApi::Migrate()
+{
+	if (!std::filesystem::exists(Index::F_GAMEBINDS_LEGACY)) { return; }
 
 	try
 	{
-		std::ifstream file(Index::F_GAMEBINDS);
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		std::ifstream file(Index::F_GAMEBINDS_LEGACY);
 
 		json InputBinds = json::parse(file);
 		for (json binding : InputBinds)
@@ -579,59 +673,87 @@ void CGameBindsApi::Load()
 				continue;
 			}
 
-			this->Registry.emplace(identifier, ib); 
+			this->Registry.emplace(identifier, ib);
 		}
 
 		file.close();
+
+		std::filesystem::remove(Index::F_GAMEBINDS_LEGACY); /* Delete old file. */
 	}
 	catch (json::parse_error& ex)
 	{
-		Logger->Warning(CH_GAMEBINDS, "InputBinds.json could not be parsed. Error: %s", ex.what());
+		this->Logger->Warning(CH_GAMEBINDS, "GameBinds.json could not be parsed. Error: %s", ex.what());
 	}
+
+	this->Save(); /* Save as XML. */
 }
 
 void CGameBindsApi::Save()
 {
-	if (this->IsReceivingRuntimeBinds) { return; }
-
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
-	json InputBinds = json::array();
+	pugi::xml_document doc{};
+	pugi::xml_node root = doc.append_child("InputBindings");
 
 	for (auto& it : this->Registry)
 	{
-		EGameBinds id = it.first;
-		InputBind ib = it.second;
+		const EGameBinds& id = it.first;
+		InputBind& ib = it.second;
 
-		/* Remove legacy bind that the game removed. */
-		if (id == EGameBinds::LEGACY_MoveSwimUp)
+		if (id == EGameBinds::LEGACY_MoveSwimUp) { continue; } /* Do not save legacy binds. */
+
+		pugi::xml_node action = root.append_child("action");
+		action.append_attribute("name") = this->Language->Translate(NameFrom(id).c_str()); // Purely descriptive
+		action.append_attribute("id")   = std::to_string((uint32_t)id);                    // Bind ID
+
+		switch (ib.Type)
 		{
-			continue;
+			default:
+				action.append_attribute("device") = "Unknown";
+				break;
+			case EIBType::Keyboard:
+				action.append_attribute("device") = "Keyboard";
+				action.append_attribute("button") = ScanCodeToGameScanCode(ib.Code); // US/Anet Scancode
+				break;
+			case EIBType::Mouse:
+				action.append_attribute("device") = "Mouse";
+				switch ((EMouseButtons)ib.Code)
+				{
+					default:
+					case EMouseButtons::None:
+						break;
+					case EMouseButtons::LMB:
+						action.append_attribute("button") = "0";
+						break;
+					case EMouseButtons::RMB:
+						action.append_attribute("button") = "2";
+						break;
+					case EMouseButtons::MMB:
+						action.append_attribute("button") = "1";
+						break;
+					case EMouseButtons::M4:
+						action.append_attribute("button") = "3";
+						break;
+					case EMouseButtons::M5:
+						action.append_attribute("button") = "4";
+						break;
+				}
+				break;
 		}
 
-		if (!ib.IsBound()) { continue; }
+		int mods = 0;
+		mods += ib.Shift ? 1 : 0;
+		mods += ib.Ctrl  ? 2 : 0;
+		mods += ib.Alt   ? 4 : 0;
 
-		json binding =
+		if (mods)
 		{
-			{"Identifier", id},
-			{"Alt",        ib.Alt},
-			{"Ctrl",       ib.Ctrl},
-			{"Shift",      ib.Shift},
-			{"Type",       ib.Type},
-			{"Code",       ib.Code}
-		};
-
-		/* override type */
-		if (!ib.Code)
-		{
-			ib.Type = EInputBindType::None;
+			action.append_attribute("mod") = std::to_string(mods); // Modifiers
 		}
-		InputBinds.push_back(binding);
 	}
 
-	std::ofstream file(Index::F_GAMEBINDS);
-
-	file << InputBinds.dump(1, '\t') << std::endl;
-
-	file.close();
+	if (!doc.save_file(Index::F_GAMEBINDS.string().c_str(), "\t"))
+	{
+		this->Logger->Warning(CH_GAMEBINDS, "GameBinds.xml could not be saved.");
+	}
 }

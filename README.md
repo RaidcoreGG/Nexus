@@ -58,6 +58,9 @@ Licensed under the MIT license.
 ### [openssl](https://github.com/openssl/openssl)
 Licensed under the Apache-2.0 license.
 
+### [pugixml](https://pugixml.org/)
+Licensed under the MIT license.
+
 ## Special Thanks
 ### GGDM
 For the idea of a proxy dll & hot-loading.

@@ -57,6 +57,7 @@
     <ClCompile Include="src\State.cpp" />
     <ClCompile Include="src\Services\Textures\TextureLoader.cpp" />
     <ClCompile Include="src\Services\Updater\Updater.cpp" />
+    <ClCompile Include="src\thirdparty\pugixml\pugixml.cpp" />
     <ClCompile Include="src\UI\Controls\CtlSubWindow.cpp" />
     <ClCompile Include="src\UI\Controls\CtlWindow.cpp" />
     <ClCompile Include="src\UI\Overlay\MumbleInspector\MumbleInspector.cpp" />
@@ -305,6 +306,8 @@
     <ClInclude Include="src\Services\Settings\Settings.h" />
     <ClInclude Include="src\Shared.h" />
     <ClInclude Include="src\State.h" />
+    <ClInclude Include="src\thirdparty\pugixml\pugiconfig.hpp" />
+    <ClInclude Include="src\thirdparty\pugixml\pugixml.hpp" />
     <ClInclude Include="src\thirdparty\stb\stb_image.h" />
     <ClInclude Include="src\Services\Textures\FuncDefs.h" />
     <ClInclude Include="src\Services\Textures\QueuedTexture.h" />
