@@ -504,29 +504,6 @@ std::unordered_map<EGameBinds, InputBind> CGameBindsApi::GetRegistry() const
 	return this->Registry;
 }
 
-void CGameBindsApi::AddDefaultBinds()
-{
-	for (int i = 0; i <= 255; i++)
-	{
-		EGameBinds bind = static_cast<EGameBinds>(i);
-
-		/* Remove legacy bind that the game removed. */
-		if (bind == EGameBinds::LEGACY_MoveSwimUp)
-		{
-			continue;
-		}
-
-		if (CategoryNameFrom(bind).empty()) { continue; }
-
-		auto it = this->Registry.find(bind);
-
-		if (it == this->Registry.end())
-		{
-			this->Registry.emplace(bind, InputBind{});
-		}
-	}
-}
-
 void CGameBindsApi::Load(std::filesystem::path aPath)
 {
 	this->Migrate();
@@ -627,6 +604,29 @@ void CGameBindsApi::Load(std::filesystem::path aPath)
 			this->Registry.emplace(id, bind);
 		}
 		catch(...) {}
+	}
+}
+
+void CGameBindsApi::AddDefaultBinds()
+{
+	for (int i = 0; i <= 255; i++)
+	{
+		EGameBinds bind = static_cast<EGameBinds>(i);
+
+		/* Remove legacy bind that the game removed. */
+		if (bind == EGameBinds::LEGACY_MoveSwimUp)
+		{
+			continue;
+		}
+
+		if (CategoryNameFrom(bind).empty()) { continue; }
+
+		auto it = this->Registry.find(bind);
+
+		if (it == this->Registry.end())
+		{
+			this->Registry.emplace(bind, InputBind{});
+		}
 	}
 }
 

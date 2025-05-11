@@ -254,7 +254,7 @@ void COptionsWindow::TabStyle()
 	{
 		if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 		{
-			static long long lastCheckedFonts = Time::GetTimestamp();
+			static long long lastCheckedFonts = 0;
 
 			ImGui::BeginGroupPanel(langApi->Translate("((000092))"), ImVec2(-1.0f, 0.0f));
 			static std::string fontFile = settingsctx->Get<std::string>(OPT_USERFONT, "");

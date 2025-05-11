@@ -15,10 +15,12 @@
 
 #include "Consts.h"
 #include "Context.h"
+#include "Index.h"
 #include "Inputs/InputBinds/ManagedInputBind.h"
 #include "Renderer.h"
 #include "resource.h"
 #include "Inputs/GameBinds/GbConst.h"
+#include "Util/Time.h"
 
 constexpr ImGuiWindowFlags ModalFlags = ImGuiWindowFlags_AlwaysAutoResize |
 									    ImGuiWindowFlags_NoResize         |
@@ -103,6 +105,41 @@ void CBindsWindow::RenderContent()
 				ImGui::Text("Info:");
 				ImGui::TextWrapped("These binds are used by addons to emulate key presses for you in order to execute macros or similar.");
 				ImGui::TextWrapped("The binds you set here should match the ones you use in-game.");
+
+				static long long lastCheckedBinds = 0;
+				static std::vector<std::filesystem::path> bindConfigs;
+
+				if (ImGui::BeginCombo("##ImportGameBinds", "Import"))
+				{
+					long long now = Time::GetTimestamp();
+
+					if (now - lastCheckedBinds > 10)
+					{
+						for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Index::D_DOCUMENTS_GW2_INPUTBINDS))
+						{
+							std::filesystem::path path = entry.path();
+
+							/* sanity checks */
+							if (std::filesystem::is_directory(path)) { continue; }
+							if (std::filesystem::file_size(path) == 0) { continue; }
+							if (path.extension() == ".xml")
+							{
+								bindConfigs.push_back(path);
+							}
+						}
+						lastCheckedBinds = now;
+					}
+
+					for (std::filesystem::path path : bindConfigs)
+					{
+						if (ImGui::Selectable(path.filename().string().c_str()))
+						{
+							CGameBindsApi* gameBindsApi = ctx->GetGameBindsApi();
+							gameBindsApi->Load(path);
+						}
+					}
+					ImGui::EndCombo();
+				}
 
 				for (GameInputBindCategory cat : this->GIBCategories)
 				{

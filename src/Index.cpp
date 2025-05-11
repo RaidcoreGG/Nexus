@@ -8,6 +8,8 @@
 
 #include "Index.h"
 
+#include <shlobj.h>
+
 #include "Util/Paths.h"
 
 namespace Index
@@ -21,6 +23,9 @@ namespace Index
 	std::filesystem::path D_GW2_ADDONS_NEXUS{};
 	std::filesystem::path D_GW2_ADDONS_NEXUS_FONTS{};
 	std::filesystem::path D_GW2_ADDONS_NEXUS_LOCALES{};
+	std::filesystem::path D_DOCUMENTS{};
+	std::filesystem::path D_DOCUMENTS_GW2{};
+	std::filesystem::path D_DOCUMENTS_GW2_INPUTBINDS{};
 
 	std::filesystem::path F_HOST_DLL{};
 	std::filesystem::path F_UPDATE_DLL{};
@@ -66,6 +71,11 @@ namespace Index
 		D_GW2_ADDONS_NEXUS = D_GW2_ADDONS / "Nexus";									/* get addons/Nexus path */
 		D_GW2_ADDONS_NEXUS_FONTS = D_GW2_ADDONS_NEXUS / "Fonts";						/* get addons/Nexus/Fonts path */
 		D_GW2_ADDONS_NEXUS_LOCALES = D_GW2_ADDONS_NEXUS / "Locales";					/* get addons/Nexus/Locales path */
+		char documents[MAX_PATH];
+		SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, documents);
+		D_DOCUMENTS = documents;
+		D_DOCUMENTS_GW2 = D_DOCUMENTS / "Guild Wars 2";
+		D_DOCUMENTS_GW2_INPUTBINDS = D_DOCUMENTS_GW2 / "InputBinds";
 
 		/* ensure folder tree*/
 		Path::CreateDir(D_GW2_ADDONS);
