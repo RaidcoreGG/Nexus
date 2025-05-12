@@ -798,12 +798,14 @@ void CUiContext::LoadFonts()
 
 	/* add user font */
 	bool hasUserFont = false;
+	float storedFontSz = settingsctx->Get<float>(OPT_FONTSIZE, 13.0f);
+	storedFontSz = min(max(storedFontSz, 1.0f), 50.0f);
 
 	std::string fontFile = settingsctx->Get<std::string>(OPT_USERFONT, "");
 	if (!fontFile.empty() && std::filesystem::exists(Index::D_GW2_ADDONS_NEXUS_FONTS / fontFile))
 	{
 		fontPath = Index::D_GW2_ADDONS_NEXUS_FONTS / fontFile;
-		this->FontManager->ReplaceFont("USER_FONT", this->ImGuiContext->FontSize, fontPath.string().c_str(), UIRoot::FontReceiver, nullptr);
+		this->FontManager->ReplaceFont("USER_FONT", storedFontSz, fontPath.string().c_str(), UIRoot::FontReceiver, nullptr);
 		hasUserFont = true;
 	}
 
@@ -812,7 +814,7 @@ void CUiContext::LoadFonts()
 
 	if (!hasUserFont)
 	{
-		this->FontManager->ResizeFont("FONT_DEFAULT", this->ImGuiContext->FontSize);
+		this->FontManager->ResizeFont("FONT_DEFAULT", storedFontSz);
 	}
 
 	ImFontConfig config;
@@ -1052,7 +1054,12 @@ void CUiContext::LoadSettings()
 	ImGuiStyle* style = &ImGui::GetStyle();
 
 	float storedFontSz = settingsCtx->Get<float>(OPT_FONTSIZE, 13.0f);
-	this->ImGuiContext->FontSize = storedFontSz > 0 ? storedFontSz : 13.0f;
+	if (storedFontSz <= 0)
+	{
+		storedFontSz = min(max(storedFontSz, 1.0f), 50.0f);
+		settingsCtx->Set(OPT_FONTSIZE, storedFontSz);
+	}
+	this->ImGuiContext->FontSize = storedFontSz;
 
 	this->ApplyStyle();
 	
