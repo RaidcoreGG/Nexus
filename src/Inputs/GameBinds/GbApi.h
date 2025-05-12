@@ -25,6 +25,15 @@ constexpr const char* CH_GAMEBINDS = "GameBinds";
 constexpr const char* EV_UE_KB_CH = "EV_UNOFFICIAL_EXTRAS_KEYBIND_CHANGED";
 
 ///----------------------------------------------------------------------------------------------------
+/// MultiInputBind Struct
+///----------------------------------------------------------------------------------------------------
+struct MultiInputBind
+{
+	InputBind Primary;
+	InputBind Secondary;
+};
+
+///----------------------------------------------------------------------------------------------------
 /// CGameBindsApi Class
 ///----------------------------------------------------------------------------------------------------
 class CGameBindsApi
@@ -88,19 +97,19 @@ class CGameBindsApi
 	/// Get:
 	/// 	Gets a game bind.
 	///----------------------------------------------------------------------------------------------------
-	const InputBind& Get(EGameBinds aGameBind);
+	const MultiInputBind& Get(EGameBinds aGameBind);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Set:
 	/// 	Sets a game bind.
 	///----------------------------------------------------------------------------------------------------
-	void Set(EGameBinds aGameBind, InputBind aInputBind, bool aIsRuntimeBind = false);
+	void Set(EGameBinds aGameBind, InputBind aInputBind, bool aIsPrimary, bool aIsRuntimeBind);
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetRegistry:
 	/// 	Returns a copy of the registry.
 	///----------------------------------------------------------------------------------------------------
-	std::unordered_map<EGameBinds, InputBind> GetRegistry() const;
+	std::unordered_map<EGameBinds, MultiInputBind> GetRegistry() const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Load:
@@ -109,13 +118,13 @@ class CGameBindsApi
 	void Load(std::filesystem::path aPath);
 
 	private:
-	CRawInputApi*                             RawInputApi = nullptr;
-	CLogHandler*                              Logger      = nullptr;
-	CEventApi*                                EventApi    = nullptr;
-	CLocalization*                            Language    = nullptr;
+	CRawInputApi*                                  RawInputApi = nullptr;
+	CLogHandler*                                   Logger      = nullptr;
+	CEventApi*                                     EventApi    = nullptr;
+	CLocalization*                                 Language    = nullptr;
 
-	mutable std::mutex                        Mutex;
-	std::unordered_map<EGameBinds, InputBind> Registry;
+	mutable std::mutex                             Mutex;
+	std::unordered_map<EGameBinds, MultiInputBind> Registry;
 
 	///----------------------------------------------------------------------------------------------------
 	/// AddDefaultBinds:

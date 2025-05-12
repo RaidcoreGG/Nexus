@@ -1326,7 +1326,11 @@ void CAddonsWindow::DrawBindSetterModal()
 			}
 			else if (this->IsEditing == EBindEditType::Game)
 			{
-				gameBindsApi->Set(this->Editing_GameIdentifier, InputBind{});
+				gameBindsApi->Set(this->Editing_GameIdentifier, InputBind{}, true, false);
+			}
+			else if (this->IsEditing == EBindEditType::Game2)
+			{
+				gameBindsApi->Set(this->Editing_GameIdentifier, InputBind{}, false, false);
 			}
 
 			this->Invalidate();
@@ -1348,7 +1352,11 @@ void CAddonsWindow::DrawBindSetterModal()
 			}
 			else if (this->IsEditing == EBindEditType::Game)
 			{
-				gameBindsApi->Set(this->Editing_GameIdentifier, currInputBind);
+				gameBindsApi->Set(this->Editing_GameIdentifier, currInputBind, true, false);
+			}
+			else if (this->IsEditing == EBindEditType::Game2)
+			{
+				gameBindsApi->Set(this->Editing_GameIdentifier, currInputBind, false, false);
 			}
 
 			this->Invalidate();

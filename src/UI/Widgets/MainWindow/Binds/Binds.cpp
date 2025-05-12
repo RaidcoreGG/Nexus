@@ -216,7 +216,7 @@ void CBindsWindow::RenderInputBindsTable(const std::unordered_map<std::string, I
 
 void CBindsWindow::RenderGameInputBindsTable(const std::unordered_map<EGameBinds, GameInputBindPacked>& aInputBinds)
 {
-	if (ImGui::BeginTable("table_gameinputbinds", 2, ImGuiTableFlags_BordersInnerH))
+	if (ImGui::BeginTable("table_gameinputbinds", 3, ImGuiTableFlags_BordersInnerH))
 	{
 		CContext* ctx = CContext::GetContext();
 		CLocalization* langApi = ctx->GetLocalization();
@@ -228,7 +228,7 @@ void CBindsWindow::RenderGameInputBindsTable(const std::unordered_map<EGameBinds
 			ImGui::Text(langApi->Translate(NameFrom(identifier).c_str())); // get translation here
 
 			ImGui::TableSetColumnIndex(1);
-			ImGui::PushID(inputBind.Name.c_str());
+			ImGui::PushID((inputBind.Name +"##Primary").c_str());
 			if (ImGui::Button(inputBind.KeysText.c_str(), ImVec2(ImGui::CalcTextSize("XXXXXXXXXXXXXXXXXXXXXXXX").x, 0.0f)))
 			{
 				this->Editing_GameIdentifier = identifier;
@@ -236,6 +236,22 @@ void CBindsWindow::RenderGameInputBindsTable(const std::unordered_map<EGameBinds
 
 				this->OpenModalNextFrame = true;
 				this->IsEditing = EBindEditType::Game;
+
+				this->ModalTitle = langApi->Translate("((000062))");
+				this->ModalTitle.append(langApi->Translate(CategoryNameFrom(this->Editing_GameIdentifier).c_str()));
+				this->ModalTitle.append("##InputBindSetter");
+			}
+			ImGui::PopID();
+
+			ImGui::TableSetColumnIndex(2);
+			ImGui::PushID((inputBind.Name + "##Secondary").c_str());
+			if (ImGui::Button(inputBind.KeysText2.c_str(), ImVec2(ImGui::CalcTextSize("XXXXXXXXXXXXXXXXXXXXXXXX").x, 0.0f)))
+			{
+				this->Editing_GameIdentifier = identifier;
+				this->Editing_BindText = inputBind.KeysText2;
+
+				this->OpenModalNextFrame = true;
+				this->IsEditing = EBindEditType::Game2;
 
 				this->ModalTitle = langApi->Translate("((000062))");
 				this->ModalTitle.append(langApi->Translate(CategoryNameFrom(this->Editing_GameIdentifier).c_str()));
@@ -297,7 +313,11 @@ void CBindsWindow::DrawBindSetterModal()
 			}
 			else if (this->IsEditing == EBindEditType::Game)
 			{
-				gameBindsApi->Set(this->Editing_GameIdentifier, InputBind{});
+				gameBindsApi->Set(this->Editing_GameIdentifier, InputBind{}, true, false);
+			}
+			else if (this->IsEditing == EBindEditType::Game2)
+			{
+				gameBindsApi->Set(this->Editing_GameIdentifier, InputBind{}, false, false);
 			}
 
 			this->Invalidate();
@@ -319,7 +339,11 @@ void CBindsWindow::DrawBindSetterModal()
 			}
 			else if (this->IsEditing == EBindEditType::Game)
 			{
-				gameBindsApi->Set(this->Editing_GameIdentifier, currInputBind);
+				gameBindsApi->Set(this->Editing_GameIdentifier, currInputBind, true, false);
+			}
+			else if (this->IsEditing == EBindEditType::Game2)
+			{
+				gameBindsApi->Set(this->Editing_GameIdentifier, currInputBind, false, false);
 			}
 
 			this->Invalidate();

@@ -1120,7 +1120,7 @@ void CUiContext::UpdateDisplayGameBinds()
 	CGameBindsApi* gameBindsApi = ctx->GetGameBindsApi();
 
 	/* copy of all InputBinds */
-	std::unordered_map<EGameBinds, InputBind> InputBindRegistry = gameBindsApi->GetRegistry();
+	std::unordered_map<EGameBinds, MultiInputBind> InputBindRegistry = gameBindsApi->GetRegistry();
 
 	/* acquire categories */
 	for (auto& [identifier, inputBind] : InputBindRegistry)
@@ -1136,8 +1136,10 @@ void CUiContext::UpdateDisplayGameBinds()
 			cat.GameInputBinds[identifier] =
 			{
 				NameFrom(identifier),
-				CInputBindApi::IBToString(inputBind, true),
-				inputBind
+				CInputBindApi::IBToString(inputBind.Primary, true),
+				inputBind.Primary,
+				CInputBindApi::IBToString(inputBind.Secondary, true),
+				inputBind.Secondary
 			};
 			this->DisplayGameBinds.push_back(cat);
 		}
@@ -1146,8 +1148,10 @@ void CUiContext::UpdateDisplayGameBinds()
 			it->GameInputBinds[identifier] =
 			{
 				NameFrom(identifier),
-				CInputBindApi::IBToString(inputBind, true),
-				inputBind
+				CInputBindApi::IBToString(inputBind.Primary, true),
+				inputBind.Primary,
+				CInputBindApi::IBToString(inputBind.Secondary, true),
+				inputBind.Secondary
 			};
 		}
 	}

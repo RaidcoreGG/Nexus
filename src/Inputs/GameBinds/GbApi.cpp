@@ -47,12 +47,6 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 
 	UEInputBindChanged* kbChange = (UEInputBindChanged*)aData;
 
-	/* abort if it's the secondary bind, but the key is already set*/
-	if (kbChange->Index == 1 && s_GameBindsApi->IsBound(kbChange->Identifier))
-	{
-		return;
-	}
-
 	InputBind ib{};
 
 	/* if key was bound (keyboard) */
@@ -94,7 +88,7 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 		}
 	}
 
-	s_GameBindsApi->Set(kbChange->Identifier, ib, true);
+	s_GameBindsApi->Set(kbChange->Identifier, ib, kbChange->Index == 0, true);
 
 	CContext* ctx = CContext::GetContext();
 	CUiContext* uictx = ctx->GetUIContext();
@@ -158,7 +152,18 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 		aGameBind = EGameBinds::MoveJump_SwimUp_FlyUp;
 	}
 
-	const InputBind& ib = this->Get(aGameBind);
+	const MultiInputBind& bind = this->Get(aGameBind);
+	InputBind ib{};
+
+	if (bind.Primary.IsBound())
+	{
+		ib = bind.Primary;
+	}
+
+	if (!ib.IsBound())
+	{
+		ib = bind.Secondary;
+	}
 
 	if (!ib.IsBound())
 	{
@@ -331,7 +336,18 @@ void CGameBindsApi::Release(EGameBinds aGameBind)
 		aGameBind = EGameBinds::MoveJump_SwimUp_FlyUp;
 	}
 
-	const InputBind& ib = this->Get(aGameBind);
+	const MultiInputBind& bind = this->Get(aGameBind);
+	InputBind ib{};
+
+	if (bind.Primary.IsBound())
+	{
+		ib = bind.Primary;
+	}
+
+	if (!ib.IsBound())
+	{
+		ib = bind.Secondary;
+	}
 
 	if (!ib.IsBound())
 	{
@@ -448,10 +464,10 @@ bool CGameBindsApi::IsBound(EGameBinds aGameBind)
 		return false;
 	}
 
-	return it->second.IsBound();
+	return it->second.Primary.IsBound() || it->second.Secondary.IsBound();
 }
 
-const InputBind& CGameBindsApi::Get(EGameBinds aGameBind)
+const MultiInputBind& CGameBindsApi::Get(EGameBinds aGameBind)
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -459,13 +475,13 @@ const InputBind& CGameBindsApi::Get(EGameBinds aGameBind)
 
 	if (it == this->Registry.end())
 	{
-		return InputBind{};
+		return MultiInputBind{};
 	}
 
 	return it->second;
 }
 
-void CGameBindsApi::Set(EGameBinds aGameBind, InputBind aInputBind, bool aIsRuntimeBind)
+void CGameBindsApi::Set(EGameBinds aGameBind, InputBind aInputBind, bool aIsPrimary, bool aIsRuntimeBind)
 {
 	/* Remove legacy bind that the game removed. */
 	if (aGameBind == EGameBinds::LEGACY_MoveSwimUp)
@@ -480,11 +496,27 @@ void CGameBindsApi::Set(EGameBinds aGameBind, InputBind aInputBind, bool aIsRunt
 
 		if (it == this->Registry.end())
 		{
-			this->Registry.emplace(aGameBind, aInputBind);
+			MultiInputBind bind{};
+			if (aIsPrimary)
+			{
+				bind.Primary = aInputBind;
+			}
+			else
+			{
+				bind.Secondary = aInputBind;
+			}
+			this->Registry.emplace(aGameBind, bind);
 		}
 		else
 		{
-			it->second = aInputBind;
+			if (aIsPrimary)
+			{
+				it->second.Primary = aInputBind;
+			}
+			else
+			{
+				it->second.Secondary = aInputBind;
+			}
 		}
 	}
 
@@ -497,7 +529,7 @@ void CGameBindsApi::Set(EGameBinds aGameBind, InputBind aInputBind, bool aIsRunt
 	}
 }
 
-std::unordered_map<EGameBinds, InputBind> CGameBindsApi::GetRegistry() const
+std::unordered_map<EGameBinds, MultiInputBind> CGameBindsApi::GetRegistry() const
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -532,76 +564,68 @@ void CGameBindsApi::Load(std::filesystem::path aPath)
 		try
 		{
 			EGameBinds id = (EGameBinds)strtoul(action.attribute("id").value(), nullptr, 10);
-			InputBind bind{};
+			MultiInputBind bind{};
 
+			/* Primary Bind */
 			if (action.attribute("device") && action.attribute("button"))
 			{
 				std::string device = action.attribute("device").value();
 				if (device == "Keyboard")
 				{
-					bind.Type = EInputBindType::Keyboard;
-					bind.Code = GameScanCodeToScanCode(static_cast<unsigned short>(strtoul(action.attribute("button").value(), nullptr, 10)));
+					bind.Primary.Type = EInputBindType::Keyboard;
+					bind.Primary.Code = GameScanCodeToScanCode(static_cast<unsigned short>(strtoul(action.attribute("button").value(), nullptr, 10)));
 				}
 				else if (device == "Mouse")
 				{
-					bind.Type = EInputBindType::Mouse;
+					bind.Primary.Type = EInputBindType::Mouse;
 					std::string mousebtn = action.attribute("button").value();
-					if      (mousebtn == "0") { bind.Code = (unsigned short)EMouseButtons::LMB; }
-					else if (mousebtn == "2") { bind.Code = (unsigned short)EMouseButtons::RMB; }
-					else if (mousebtn == "1") { bind.Code = (unsigned short)EMouseButtons::MMB; }
-					else if (mousebtn == "3") { bind.Code = (unsigned short)EMouseButtons::M4; }
-					else if (mousebtn == "4") { bind.Code = (unsigned short)EMouseButtons::M5; }
+					if      (mousebtn == "0") { bind.Primary.Code = (unsigned short)EMouseButtons::LMB; }
+					else if (mousebtn == "2") { bind.Primary.Code = (unsigned short)EMouseButtons::RMB; }
+					else if (mousebtn == "1") { bind.Primary.Code = (unsigned short)EMouseButtons::MMB; }
+					else if (mousebtn == "3") { bind.Primary.Code = (unsigned short)EMouseButtons::M4; }
+					else if (mousebtn == "4") { bind.Primary.Code = (unsigned short)EMouseButtons::M5; }
 				}
 
 				if (action.attribute("mod"))
 				{
 					int mods = strtoul(action.attribute("mod").value(), nullptr, 10);
-					bind.Alt   = mods & 0b0100;
-					bind.Ctrl  = mods & 0b0010;
-					bind.Shift = mods & 0b0001;
+					bind.Primary.Alt   = mods & 0b0100;
+					bind.Primary.Ctrl  = mods & 0b0010;
+					bind.Primary.Shift = mods & 0b0001;
 				}
 			}
 
-			/* No Primary bind, try to parse secondary bind. */
-			if (bind.Type == EInputBindType::None)
+			/* Secondary Bind */
+			if (action.attribute("device2") && action.attribute("button2"))
 			{
-				/* Reset before proceeding, to not have half set binds. */
-				bind.Code  = 0;
-				bind.Alt   = false;
-				bind.Ctrl  = false;
-				bind.Shift = false;
-
-				if (action.attribute("device2") && action.attribute("button2"))
+				std::string device = action.attribute("device2").value();
+				if (device == "Keyboard")
 				{
-					std::string device = action.attribute("device2").value();
-					if (device == "Keyboard")
-					{
-						bind.Type = EInputBindType::Keyboard;
-						bind.Code = GameScanCodeToScanCode(static_cast<unsigned short>(strtoul(action.attribute("button2").value(), nullptr, 10)));
-					}
-					else if (device == "Mouse")
-					{
-						bind.Type = EInputBindType::Mouse;
-						std::string mousebtn = action.attribute("button2").value();
-						if      (mousebtn == "0") { bind.Code = (unsigned short)EMouseButtons::LMB; }
-						else if (mousebtn == "2") { bind.Code = (unsigned short)EMouseButtons::RMB; }
-						else if (mousebtn == "1") { bind.Code = (unsigned short)EMouseButtons::MMB; }
-						else if (mousebtn == "3") { bind.Code = (unsigned short)EMouseButtons::M4; }
-						else if (mousebtn == "4") { bind.Code = (unsigned short)EMouseButtons::M5; }
-					}
+					bind.Secondary.Type = EInputBindType::Keyboard;
+					bind.Secondary.Code = GameScanCodeToScanCode(static_cast<unsigned short>(strtoul(action.attribute("button2").value(), nullptr, 10)));
+				}
+				else if (device == "Mouse")
+				{
+					bind.Secondary.Type = EInputBindType::Mouse;
+					std::string mousebtn = action.attribute("button2").value();
+					if      (mousebtn == "0") { bind.Secondary.Code = (unsigned short)EMouseButtons::LMB; }
+					else if (mousebtn == "2") { bind.Secondary.Code = (unsigned short)EMouseButtons::RMB; }
+					else if (mousebtn == "1") { bind.Secondary.Code = (unsigned short)EMouseButtons::MMB; }
+					else if (mousebtn == "3") { bind.Secondary.Code = (unsigned short)EMouseButtons::M4; }
+					else if (mousebtn == "4") { bind.Secondary.Code = (unsigned short)EMouseButtons::M5; }
+				}
 
-					if (action.attribute("mod2"))
-					{
-						int mods = strtoul(action.attribute("mod2").value(), nullptr, 10);
-						bind.Alt   = mods & 0b0100;
-						bind.Ctrl  = mods & 0b0010;
-						bind.Shift = mods & 0b0001;
-					}
+				if (action.attribute("mod2"))
+				{
+					int mods = strtoul(action.attribute("mod2").value(), nullptr, 10);
+					bind.Secondary.Alt   = mods & 0b0100;
+					bind.Secondary.Ctrl  = mods & 0b0010;
+					bind.Secondary.Shift = mods & 0b0001;
 				}
 			}
 
 			/* Neither primary nor secondary bind. */
-			if (bind.Type == EInputBindType::None) { continue; }
+			if (!bind.Primary.IsBound() && !bind.Secondary.IsBound()) { continue; }
 
 			/* Store the bind. */
 			auto it = this->Registry.find(id);
@@ -637,7 +661,7 @@ void CGameBindsApi::AddDefaultBinds()
 
 		if (it == this->Registry.end())
 		{
-			this->Registry.emplace(bind, InputBind{});
+			this->Registry.emplace(bind, MultiInputBind{});
 		}
 	}
 }
@@ -660,21 +684,21 @@ void CGameBindsApi::Migrate()
 				continue;
 			}
 
-			InputBind ib{};
-			binding["Alt"].get_to(ib.Alt);
-			binding["Ctrl"].get_to(ib.Ctrl);
-			binding["Shift"].get_to(ib.Shift);
+			MultiInputBind ib{};
+			binding["Alt"].get_to(ib.Primary.Alt);
+			binding["Ctrl"].get_to(ib.Primary.Ctrl);
+			binding["Shift"].get_to(ib.Primary.Shift);
 
 			/* neither code nor type null -> inputbind */
 			if (!binding["Type"].is_null() && !binding["Code"].is_null())
 			{
-				binding["Type"].get_to(ib.Type);
-				binding["Code"].get_to(ib.Code);
+				binding["Type"].get_to(ib.Primary.Type);
+				binding["Code"].get_to(ib.Primary.Code);
 			}
 			else /* legacy inputbind */
 			{
-				ib.Type = EInputBindType::Keyboard;
-				binding["Key"].get_to(ib.Code);
+				ib.Primary.Type = EInputBindType::Keyboard;
+				binding["Key"].get_to(ib.Primary.Code);
 			}
 
 			EGameBinds identifier = binding["Identifier"].get<EGameBinds>();
@@ -710,58 +734,113 @@ void CGameBindsApi::Save()
 	for (auto& it : this->Registry)
 	{
 		const EGameBinds& id = it.first;
-		InputBind& ib = it.second;
+		MultiInputBind& ib = it.second;
 
 		if (id == EGameBinds::LEGACY_MoveSwimUp) { continue; } /* Do not save legacy binds. */
-		if (ib.Type == EInputBindType::None)     { continue; } /* Do not save unset binds. */
+		if (ib.Primary.Type == EInputBindType::None && ib.Secondary.Type == EInputBindType::None)
+		{
+			/* Do not save unset binds. */
+			continue;
+		}
 
 		pugi::xml_node action = root.append_child("action");
 		action.append_attribute("name") = this->Language->Translate(NameFrom(id).c_str()); // Purely descriptive
 		action.append_attribute("id")   = std::to_string((uint32_t)id);                    // Bind ID
 
-		switch (ib.Type)
+		if (ib.Primary.Type != EInputBindType::None)
 		{
-			default:
-				action.append_attribute("device") = "Unknown";
-				break;
-			case EIBType::Keyboard:
-				action.append_attribute("device") = "Keyboard";
-				action.append_attribute("button") = ScanCodeToGameScanCode(ib.Code); // US/Anet Scancode
-				break;
-			case EIBType::Mouse:
-				action.append_attribute("device") = "Mouse";
-				switch ((EMouseButtons)ib.Code)
-				{
-					default:
-					case EMouseButtons::None:
-						break;
-					case EMouseButtons::LMB:
-						action.append_attribute("button") = "0";
-						break;
-					case EMouseButtons::RMB:
-						action.append_attribute("button") = "2";
-						break;
-					case EMouseButtons::MMB:
-						action.append_attribute("button") = "1";
-						break;
-					case EMouseButtons::M4:
-						action.append_attribute("button") = "3";
-						break;
-					case EMouseButtons::M5:
-						action.append_attribute("button") = "4";
-						break;
-				}
-				break;
+			switch (ib.Primary.Type)
+			{
+				default:
+					action.append_attribute("device") = "Unknown";
+					break;
+				case EIBType::Keyboard:
+					action.append_attribute("device") = "Keyboard";
+					action.append_attribute("button") = ScanCodeToGameScanCode(ib.Primary.Code); // US/Anet Scancode
+					break;
+				case EIBType::Mouse:
+					action.append_attribute("device") = "Mouse";
+					switch ((EMouseButtons)ib.Primary.Code)
+					{
+						default:
+						case EMouseButtons::None:
+							break;
+						case EMouseButtons::LMB:
+							action.append_attribute("button") = "0";
+							break;
+						case EMouseButtons::RMB:
+							action.append_attribute("button") = "2";
+							break;
+						case EMouseButtons::MMB:
+							action.append_attribute("button") = "1";
+							break;
+						case EMouseButtons::M4:
+							action.append_attribute("button") = "3";
+							break;
+						case EMouseButtons::M5:
+							action.append_attribute("button") = "4";
+							break;
+					}
+					break;
+			}
+
+			int mods = 0;
+			mods += ib.Primary.Shift ? 1 : 0;
+			mods += ib.Primary.Ctrl ? 2 : 0;
+			mods += ib.Primary.Alt ? 4 : 0;
+
+			if (mods)
+			{
+				action.append_attribute("mod") = std::to_string(mods); // Modifiers
+			}
 		}
 
-		int mods = 0;
-		mods += ib.Shift ? 1 : 0;
-		mods += ib.Ctrl  ? 2 : 0;
-		mods += ib.Alt   ? 4 : 0;
-
-		if (mods)
+		if (ib.Secondary.Type != EInputBindType::None)
 		{
-			action.append_attribute("mod") = std::to_string(mods); // Modifiers
+			switch (ib.Secondary.Type)
+			{
+				default:
+					action.append_attribute("device2") = "Unknown";
+					break;
+				case EIBType::Keyboard:
+					action.append_attribute("device2") = "Keyboard";
+					action.append_attribute("button2") = ScanCodeToGameScanCode(ib.Secondary.Code); // US/Anet Scancode
+					break;
+				case EIBType::Mouse:
+					action.append_attribute("device2") = "Mouse";
+					switch ((EMouseButtons)ib.Secondary.Code)
+					{
+						default:
+						case EMouseButtons::None:
+							break;
+						case EMouseButtons::LMB:
+							action.append_attribute("button2") = "0";
+							break;
+						case EMouseButtons::RMB:
+							action.append_attribute("button2") = "2";
+							break;
+						case EMouseButtons::MMB:
+							action.append_attribute("button2") = "1";
+							break;
+						case EMouseButtons::M4:
+							action.append_attribute("button2") = "3";
+							break;
+						case EMouseButtons::M5:
+							action.append_attribute("button2") = "4";
+							break;
+					}
+					break;
+			}
+
+			int mods2 = 0;
+			mods2 += ib.Secondary.Shift ? 1 : 0;
+			mods2 += ib.Secondary.Ctrl ? 2 : 0;
+			mods2 += ib.Secondary.Alt ? 4 : 0;
+
+			if (mods2)
+			{
+				action.append_attribute("mod2") = std::to_string(mods2); // Modifiers
+			}
 		}
 	}
 

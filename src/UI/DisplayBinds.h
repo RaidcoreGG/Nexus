@@ -14,6 +14,7 @@
 
 #include "Inputs/GameBinds/EGameBinds.h"
 #include "Inputs/InputBinds/ManagedInputBind.h"
+#include "Inputs/InputBinds/InputBind.h"
 
 struct InputBindPacked
 {
@@ -32,6 +33,9 @@ struct GameInputBindPacked
 	std::string Name;
 	std::string KeysText;
 	InputBind   Bind;
+
+	std::string KeysText2;
+	InputBind   Bind2;
 };
 
 struct GameInputBindCategory
@@ -44,7 +48,8 @@ enum class EBindEditType
 {
 	None,
 	Nexus,
-	Game
+	Game,
+	Game2
 };
 
 #endif
