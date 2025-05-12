@@ -520,6 +520,9 @@ void CGameBindsApi::Load(std::filesystem::path aPath)
 		return;
 	}
 
+	this->Registry.clear();
+	this->AddDefaultBinds();
+
 	pugi::xml_node root = doc.child("InputBindings");
 
 	for (pugi::xml_node action : root.children("action"))
@@ -601,7 +604,16 @@ void CGameBindsApi::Load(std::filesystem::path aPath)
 			if (bind.Type == EInputBindType::None) { continue; }
 
 			/* Store the bind. */
-			this->Registry.emplace(id, bind);
+			auto it = this->Registry.find(id);
+
+			if (it == this->Registry.end())
+			{
+				this->Registry.emplace(id, bind);
+			}
+			else
+			{
+				it->second = bind;
+			}
 		}
 		catch(...) {}
 	}
@@ -701,6 +713,7 @@ void CGameBindsApi::Save()
 		InputBind& ib = it.second;
 
 		if (id == EGameBinds::LEGACY_MoveSwimUp) { continue; } /* Do not save legacy binds. */
+		if (ib.Type == EInputBindType::None)     { continue; } /* Do not save unset binds. */
 
 		pugi::xml_node action = root.append_child("action");
 		action.append_attribute("name") = this->Language->Translate(NameFrom(id).c_str()); // Purely descriptive

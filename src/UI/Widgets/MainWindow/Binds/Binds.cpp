@@ -115,6 +115,7 @@ void CBindsWindow::RenderContent()
 
 					if (now - lastCheckedBinds > 10)
 					{
+						bindConfigs.clear();
 						for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Index::D_DOCUMENTS_GW2_INPUTBINDS))
 						{
 							std::filesystem::path path = entry.path();
@@ -130,12 +131,17 @@ void CBindsWindow::RenderContent()
 						lastCheckedBinds = now;
 					}
 
-					for (std::filesystem::path path : bindConfigs)
+					for (std::filesystem::path& path : bindConfigs)
 					{
 						if (ImGui::Selectable(path.filename().string().c_str()))
 						{
+							/* Actually load the binds. */
 							CGameBindsApi* gameBindsApi = ctx->GetGameBindsApi();
 							gameBindsApi->Load(path);
+
+							/* Trigger refresh for display binds. */
+							CUiContext* uictx = ctx->GetUIContext();
+							uictx->Invalidate();
 						}
 					}
 					ImGui::EndCombo();
