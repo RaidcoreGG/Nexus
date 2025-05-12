@@ -661,6 +661,112 @@ void CGameBindsApi::AddDefaultBinds()
 	this->Registry.emplace(EGameBinds::MoveRight, MultiInputBind{
 		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(68) },
 		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(30) }
+	});
+	this->Registry.emplace(EGameBinds::MoveTurnLeft, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(81) }
+	});
+	this->Registry.emplace(EGameBinds::MoveTurnRight, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(69) }
+	});
+	this->Registry.emplace(EGameBinds::MoveDodge, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(86) }
+	});
+	this->Registry.emplace(EGameBinds::MoveAutoRun, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(82) },
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(11) }
+	});
+	this->Registry.emplace(EGameBinds::MoveWalk, MultiInputBind{});
+	this->Registry.emplace(EGameBinds::MoveJump_SwimUp_FlyUp, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(21) }
+	});
+	this->Registry.emplace(EGameBinds::MoveSwimDown_FlyDown, MultiInputBind{});
+	this->Registry.emplace(EGameBinds::MoveAboutFace, MultiInputBind{});
+
+	// Skills
+	this->Registry.emplace(EGameBinds::SkillWeaponSwap, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(17) }
+	});
+	this->Registry.emplace(EGameBinds::SkillWeapon1, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(49) }
+	});
+	this->Registry.emplace(EGameBinds::SkillWeapon2, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(50) }
+	});
+	this->Registry.emplace(EGameBinds::SkillWeapon3, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(51) }
+	});
+	this->Registry.emplace(EGameBinds::SkillWeapon4, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(52) }
+	});
+	this->Registry.emplace(EGameBinds::SkillWeapon5, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(53) }
+	});
+	this->Registry.emplace(EGameBinds::SkillHeal, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(54) }
+	});
+	this->Registry.emplace(EGameBinds::SkillUtility1, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(55) }
+	});
+	this->Registry.emplace(EGameBinds::SkillUtility2, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(56) }
+	});
+	this->Registry.emplace(EGameBinds::SkillUtility3, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(57) }
+	});
+	this->Registry.emplace(EGameBinds::SkillElite, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(48) }
+	});
+	this->Registry.emplace(EGameBinds::SkillProfession1, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(32) }
+	});
+	this->Registry.emplace(EGameBinds::SkillProfession2, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(33) }
+	});
+	this->Registry.emplace(EGameBinds::SkillProfession3, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(34) }
+	});
+	this->Registry.emplace(EGameBinds::SkillProfession4, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(35) }
+	});
+	this->Registry.emplace(EGameBinds::SkillProfession5, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(36) }
+	});
+	this->Registry.emplace(EGameBinds::SkillProfession6, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(37) }
+	});
+	this->Registry.emplace(EGameBinds::SkillProfession7, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(38) }
+	});
+	this->Registry.emplace(EGameBinds::SkillSpecialAction, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(78) }
+	});
+
+	// Targeting
+	this->Registry.emplace(EGameBinds::TargetAlert, MultiInputBind{
+		InputBind{ false, false, true, EIBType::Keyboard, GameScanCodeToScanCode(84) }
+	});
+	this->Registry.emplace(EGameBinds::TargetCall, MultiInputBind{
+		InputBind{ false, true, false, EIBType::Keyboard, GameScanCodeToScanCode(84) }
+	});
+	this->Registry.emplace(EGameBinds::TargetTake, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(84) }
+	});
+	this->Registry.emplace(EGameBinds::TargetCallLocal, MultiInputBind{});
+	this->Registry.emplace(EGameBinds::TargetTakeLocal, MultiInputBind{});
+	this->Registry.emplace(EGameBinds::TargetEnemyNearest, MultiInputBind{});
+	this->Registry.emplace(EGameBinds::TargetEnemyNext, MultiInputBind{
+		InputBind{ false, false, false, EIBType::Keyboard, GameScanCodeToScanCode(22) }
+	});
+	this->Registry.emplace(EGameBinds::TargetEnemyPrev, MultiInputBind{
+		InputBind{ false, false, true, EIBType::Keyboard, GameScanCodeToScanCode(22) }
+	});
+	this->Registry.emplace(EGameBinds::TargetAllyNearest, MultiInputBind{});
+	this->Registry.emplace(EGameBinds::TargetAllyNext, MultiInputBind{});
+	this->Registry.emplace(EGameBinds::TargetAllyPrev, MultiInputBind{});
+	this->Registry.emplace(EGameBinds::TargetLock, MultiInputBind{});
+	this->Registry.emplace(EGameBinds::TargetSnapGroundTarget, MultiInputBind{});
+	this->Registry.emplace(EGameBinds::TargetSnapGroundTargetToggle, MultiInputBind{});
+	this->Registry.emplace(EGameBinds::TargetAutoTargetingDisable, MultiInputBind{});
 	this->Registry.emplace(EGameBinds::TargetAutoTargetingToggle, MultiInputBind{});
 	this->Registry.emplace(EGameBinds::TargetAllyTargetingMode, MultiInputBind{});
 	this->Registry.emplace(EGameBinds::TargetAllyTargetingModeToggle, MultiInputBind{});
