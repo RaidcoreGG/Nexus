@@ -10,7 +10,7 @@
 #ifndef GBFUNCDEFS_H
 #define GBFUNCDEFS_H
 
-#include "EGameBinds.h"
+#include "GbEnum.h"
 
 typedef void (*GAMEBINDS_PRESSASYNC)  (EGameBinds aGameBind);
 typedef void (*GAMEBINDS_RELEASEASYNC)(EGameBinds aGameBind);

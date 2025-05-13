@@ -90,7 +90,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Context.h" />
-    <ClInclude Include="src\Inputs\GameBinds\EGameBinds.h" />
+    <ClInclude Include="src\Inputs\GameBinds\GbEnum.h" />
     <ClInclude Include="src\Inputs\GameBinds\GbConst.h" />
     <ClInclude Include="src\Inputs\GameBinds\GbFuncDefs.h" />
     <ClInclude Include="src\Inputs\GameBinds\GbApi.h" />

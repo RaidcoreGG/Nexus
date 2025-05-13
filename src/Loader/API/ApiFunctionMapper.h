@@ -13,7 +13,7 @@
 
 #include "AddonAPI.h"
 #include "Events/EvtFuncDefs.h"
-#include "Inputs/GameBinds/EGameBinds.h"
+#include "Inputs/GameBinds/GbEnum.h"
 #include "Inputs/InputBinds/FuncDefs.h"
 #include "Inputs/RawInput/RiFuncDefs.h"
 #include "Services/Logging/ELogLevel.h"

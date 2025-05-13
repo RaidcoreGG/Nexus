@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include "Inputs/GameBinds/EGameBinds.h"
+#include "Inputs/GameBinds/GbEnum.h"
 #include "Inputs/InputBinds/ManagedInputBind.h"
 #include "UI/Controls/CtlSubWindow.h"
 #include "UI/DisplayBinds.h"

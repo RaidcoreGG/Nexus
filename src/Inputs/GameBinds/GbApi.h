@@ -13,7 +13,7 @@
 #include <map>
 #include <mutex>
 
-#include "EGameBinds.h"
+#include "GbEnum.h"
 
 #include "Events/EventApi.h"
 #include "Inputs/InputBinds/InputBind.h"

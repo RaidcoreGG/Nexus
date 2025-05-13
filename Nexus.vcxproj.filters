@@ -100,9 +100,6 @@
     <Filter Include="Inputs\GameBinds">
       <UniqueIdentifier>{b724c373-9b37-4f5e-b102-697fa296d3d5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Inputs\GameBinds\Enums">
-      <UniqueIdentifier>{9c11a759-acfa-40e2-b7f5-042ba9d0428a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Inputs\InputBinds">
       <UniqueIdentifier>{f0552fcd-0842-4914-bd35-54f18d11b0cd}</UniqueIdentifier>
     </Filter>
@@ -1082,9 +1079,6 @@
     <ClInclude Include="src\Inputs\GameBinds\GbApi.h">
       <Filter>Inputs\GameBinds</Filter>
     </ClInclude>
-    <ClInclude Include="src\Inputs\GameBinds\EGameBinds.h">
-      <Filter>Inputs\GameBinds\Enums</Filter>
-    </ClInclude>
     <ClInclude Include="src\Util\Inputs.h">
       <Filter>Util</Filter>
     </ClInclude>
@@ -1216,6 +1210,9 @@
     </ClInclude>
     <ClInclude Include="src\thirdparty\pugixml\pugiconfig.hpp">
       <Filter>_EXTERNAL\pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Inputs\GameBinds\GbEnum.h">
+      <Filter>Inputs\GameBinds</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

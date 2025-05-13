@@ -12,7 +12,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "Inputs/GameBinds/EGameBinds.h"
+#include "Inputs/GameBinds/GbEnum.h"
 #include "Inputs/InputBinds/ManagedInputBind.h"
 #include "Inputs/InputBinds/InputBind.h"
 
