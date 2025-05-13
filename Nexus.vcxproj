@@ -86,7 +86,7 @@
     <ClCompile Include="src\Util\Strings.cpp" />
     <ClCompile Include="src\Util\Time.cpp" />
     <ClCompile Include="src\Util\Url.cpp" />
-    <ClCompile Include="src\Inputs\RawInput\RawInputApi.cpp" />
+    <ClCompile Include="src\Inputs\RawInput\RiApi.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Context.h" />
@@ -356,7 +356,7 @@
     <ClInclude Include="src\Util\Url.h" />
     <ClInclude Include="src\Version.h" />
     <ClInclude Include="src\Inputs\RawInput\RiFuncDefs.h" />
-    <ClInclude Include="src\Inputs\RawInput\RawInputApi.h" />
+    <ClInclude Include="src\Inputs\RawInput\RiApi.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\Nexus.rc" />

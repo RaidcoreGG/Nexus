@@ -32,7 +32,7 @@
 #include "UI/Widgets/QuickAccess/QuickAccess.h"
 #include "imgui/imgui.h"
 #include "Inputs/InputBinds/InputBindHandler.h"
-#include "Inputs/RawInput/RawInputApi.h"
+#include "Inputs/RawInput/RiApi.h"
 #include "minhook/mh_hook.h"
 #include "Services/DataLink/DlApi.h"
 #include "Services/Localization/Localization.h"

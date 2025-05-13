@@ -15,7 +15,7 @@
 #include "Index.h"
 #include "Inputs/GameBinds/GbApi.h"
 #include "Inputs/InputBinds/InputBindHandler.h"
-#include "Inputs/RawInput/RawInputApi.h"
+#include "Inputs/RawInput/RiApi.h"
 #include "Renderer.h"
 #include "Services/DataLink/DlApi.h"
 #include "Services/Localization/Localization.h"

@@ -270,7 +270,7 @@
     <ClCompile Include="src\Services\API\ActiveToken.cpp">
       <Filter>Services\API</Filter>
     </ClCompile>
-    <ClCompile Include="src\Inputs\RawInput\RawInputApi.cpp">
+    <ClCompile Include="src\Inputs\RawInput\RiApi.cpp">
       <Filter>Inputs\RawInput</Filter>
     </ClCompile>
     <ClCompile Include="src\CrashHandler.cpp">
@@ -548,7 +548,7 @@
     <ClInclude Include="src\thirdparty\imgui\imgui_memory_editor.h">
       <Filter>_EXTERNAL\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="src\Inputs\RawInput\RawInputApi.h">
+    <ClInclude Include="src\Inputs\RawInput\RiApi.h">
       <Filter>Inputs\RawInput</Filter>
     </ClInclude>
     <ClInclude Include="src\thirdparty\openssl\aes.h">

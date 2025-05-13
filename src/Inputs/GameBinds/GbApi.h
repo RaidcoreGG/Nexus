@@ -17,7 +17,7 @@
 
 #include "Events/EventApi.h"
 #include "Inputs/InputBinds/InputBind.h"
-#include "Inputs/RawInput/RawInputApi.h"
+#include "Inputs/RawInput/RiApi.h"
 #include "Services/Logging/LogHandler.h"
 #include "Services/Localization/Localization.h"
 
