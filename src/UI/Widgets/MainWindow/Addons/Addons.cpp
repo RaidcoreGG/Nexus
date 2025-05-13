@@ -900,7 +900,6 @@ void CAddonsWindow::RenderContent()
 		ImGui::PopStyleVar();
 	}*/
 	
-
 	if (ImGui::BeginChild("Actions", actionsAreaSz, false, ImGuiWindowFlags_NoBackground))
 	{
 		if (ImGui::Button(langApi->Translate("((000034))")))
