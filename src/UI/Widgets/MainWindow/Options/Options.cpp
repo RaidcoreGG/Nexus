@@ -538,7 +538,10 @@ void COptionsWindow::TabStyle()
 								if (!filter.PassFilter(name))
 									continue;
 								ImGui::PushID(i);
-								ImGui::ColorEdit4("##color", (float*)&style.Colors[i], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf);
+								if (ImGui::ColorEdit4("##color", (float*)&style.Colors[i], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreviewHalf))
+								{
+									anyUnsaved = true;
+								}
 								ImGui::SameLine(0.0f, style.ItemInnerSpacing.x);
 								ImGui::TextUnformatted(name);
 								ImGui::PopID();
