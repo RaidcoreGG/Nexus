@@ -94,9 +94,14 @@ void CMainWindow::Render()
 	ImGuiStyle& style = ImGui::GetStyle();
 	ImVec2 padding = style.WindowPadding;
 
-	float headerHeight = ImGui::GetFontSize() * 2;
-	float footerHeight = ImGui::GetFontSize() * 1.5f;
-	float sidebarWidth = (padding.x * 2) + headerHeight;
+	float footerHeight = ImGui::GetFrameHeightWithSpacing();
+	float navItemWidth = (ImGui::GetFrameHeightWithSpacing() * 1.2f);
+	float sidebarWidth = (padding.x * 2) + navItemWidth;
+
+	/* tag is 128x110 */
+	float tagWidth = navItemWidth;
+	float tagHeight = 55.f * (navItemWidth / 64.f);
+	float headerHeight = (padding.x * 2) + tagHeight;
 
 	bool poppedPadding = false;
 
@@ -133,7 +138,7 @@ void CMainWindow::Render()
 		ImGui::EndChild();
 
 		ImGui::SetCursorPos(ImVec2(sidebarWidth, headerHeight + contentHeight - footerHeight));
-		if (ImGui::BeginChild("Footer", ImVec2(contentWidth, footerHeight), false, Flags))
+		if (ImGui::BeginChild("Footer", ImVec2(contentWidth, footerHeight), false, ImGuiWindowFlags_NoBackground))
 		{
 			ImGui::SetCursorPos(ImVec2(0, 0));
 			ImGui::Separator();
@@ -145,9 +150,8 @@ void CMainWindow::Render()
 
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::GetColorU32(ImGuiCol_TitleBgCollapsed));
 		ImGui::SetCursorPos(ImVec2(0, headerHeight));
-		if (ImGui::BeginChild("Sidebar", ImVec2(sidebarWidth, contentHeight)))
+		if (ImGui::BeginChild("Sidebar", ImVec2(sidebarWidth, contentHeight), false, ImGuiWindowFlags_NoBackground))
 		{
-			ImVec2 navItemSz = ImVec2(sidebarWidth - (padding.x * 2), headerHeight);
 			float navX = padding.x;
 			float navY = padding.y;
 
@@ -191,7 +195,7 @@ void CMainWindow::Render()
 				if (ImGui::Selectable(("##" + window->GetName()).c_str(),
 					this->ActiveContent && this->ActiveContent->GetName() == window->GetName(),
 					0,
-					navItemSz))
+					ImVec2(navItemWidth, navItemWidth)))
 				{
 					if (!window->IsPopOut())
 					{
@@ -211,10 +215,10 @@ void CMainWindow::Render()
 				if (icon)
 				{
 					ImGui::SetCursorPos(ImVec2(navX, navY));
-					ImGui::Image(icon->Resource, ImVec2(navItemSz.y, navItemSz.y));
+					ImGui::Image(icon->Resource, ImVec2(navItemWidth, navItemWidth));
 				}
 
-				navY += navItemSz.y + padding.y;
+				navY += navItemWidth + padding.y;
 			}
 
 			/* vertical separator line */
@@ -231,14 +235,11 @@ void CMainWindow::Render()
 
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, style.Colors[ImGuiCol_TitleBgActive]);
 		ImGui::SetCursorPos(ImVec2(0, 0));
-		if (ImGui::BeginChild("Header", ImVec2(wndWidth, headerHeight), false, Flags))
+		if (ImGui::BeginChild("Header", ImVec2(wndWidth, headerHeight), false, ImGuiWindowFlags_NoBackground))
 		{
 			if (this->Tex_RaidcoreTag)
 			{
-				/* tag is 128x104 */
-				float tagHeight = headerHeight * .6f;
-				float tagWidth = (tagHeight / 104.f) * 128.f;
-				float offset = headerHeight * .2f;
+				float offset = style.WindowPadding.x;
 				ImGui::SetCursorPos(ImVec2(offset, offset));
 				ImGui::Image(this->Tex_RaidcoreTag->Resource, ImVec2(tagWidth, tagHeight));
 
