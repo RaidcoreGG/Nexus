@@ -1401,7 +1401,12 @@ void CAddonsWindow::PopulateAddons()
 		if (addon->Path.filename() == "arcdps_integration64.dll") { continue; }
 		if (!addon->Definitions) { continue; }
 
-		if (!this->SearchTerm.empty() && !String::Contains(String::ToLower(addon->Definitions->Name), this->SearchTerm)) { continue; }
+		if (!this->SearchTerm.empty() &&
+			!(String::Contains(String::ToLower(addon->Definitions->Name), this->SearchTerm) ||
+			String::Contains(String::ToLower(addon->Definitions->Description), this->SearchTerm)))
+		{
+			continue;
+		}
 
 		if ((addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED) &&
 			((int)this->Filter & (int)EAddonsFilterFlags::ShowEnabled) == 0)
