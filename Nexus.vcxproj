@@ -58,6 +58,7 @@
     <ClCompile Include="src\Services\Textures\TextureLoader.cpp" />
     <ClCompile Include="src\Services\Updater\Updater.cpp" />
     <ClCompile Include="src\thirdparty\pugixml\pugixml.cpp" />
+    <ClCompile Include="src\UI\Controls\CtlModal.cpp" />
     <ClCompile Include="src\UI\Controls\CtlSubWindow.cpp" />
     <ClCompile Include="src\UI\Controls\CtlWindow.cpp" />
     <ClCompile Include="src\UI\Overlay\MumbleInspector\MumbleInspector.cpp" />
@@ -72,6 +73,8 @@
     <ClCompile Include="src\UI\Widgets\MainWindow\Debug\Debug.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\Log\Log.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\MainWindow.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\Options\ExportStyleModal.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\Options\ImportStyleModal.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\Options\Options.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\SnowflakeMgr.cpp" />
     <ClCompile Include="src\UI\Widgets\QuickAccess\QuickAccess.cpp" />
@@ -315,6 +318,7 @@
     <ClInclude Include="src\Services\Textures\TextureLoader.h" />
     <ClInclude Include="src\Services\Updater\FuncDefs.h" />
     <ClInclude Include="src\Services\Updater\Updater.h" />
+    <ClInclude Include="src\UI\Controls\CtlModal.h" />
     <ClInclude Include="src\UI\Controls\CtlSubWindow.h" />
     <ClInclude Include="src\UI\Controls\CtlWindow.h" />
     <ClInclude Include="src\UI\DisplayBinds.h" />
@@ -336,6 +340,8 @@
     <ClInclude Include="src\UI\Widgets\MainWindow\Debug\Debug.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Log\Log.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\MainWindow.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Options\ExportStyleModal.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Options\ImportStyleModal.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Options\Options.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\SnowflakeMgr.h" />
     <ClInclude Include="src\UI\Widgets\QuickAccess\EQAPosition.h" />

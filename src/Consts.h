@@ -17,7 +17,6 @@ constexpr const char* OPT_QAOFFSETX                = "QAOffsetX";
 constexpr const char* OPT_QAOFFSETY                = "QAOffsetY";
 constexpr const char* OPT_QASHOWARCDPS             = "QAShowArcDPS";
 constexpr const char* OPT_IMGUISTYLE               = "ImGuiStyle";
-constexpr const char* OPT_IMGUICOLORS              = "ImGuiColors";
 constexpr const char* OPT_LANGUAGE                 = "Language";
 constexpr const char* OPT_GLOBALSCALE              = "GlobalScale";
 constexpr const char* OPT_SHOWADDONSWINDOWAFTERDUU = "ShowAddonsWindowAfterDisableUntilUpdate";

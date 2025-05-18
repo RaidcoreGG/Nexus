@@ -23,6 +23,7 @@ namespace Index
 	std::filesystem::path D_GW2_ADDONS_NEXUS{};
 	std::filesystem::path D_GW2_ADDONS_NEXUS_FONTS{};
 	std::filesystem::path D_GW2_ADDONS_NEXUS_LOCALES{};
+	std::filesystem::path D_GW2_ADDONS_NEXUS_STYLES{};
 	std::filesystem::path D_DOCUMENTS{};
 	std::filesystem::path D_DOCUMENTS_GW2{};
 	std::filesystem::path D_DOCUMENTS_GW2_INPUTBINDS{};
@@ -59,48 +60,49 @@ namespace Index
 
 	void BuildIndex(HMODULE aBaseModule)
 	{
-		F_HOST_DLL = Path::GetModule(aBaseModule);										/* get self dll path */
+		F_HOST_DLL = Path::GetModule(aBaseModule); /* get self dll path */
 
 		/* directories */
-		D_GW2 = F_HOST_DLL.parent_path();												/* get current directory */
-		D_GW2_ADDONS = D_GW2 / "addons";												/* get addons path */
-		D_GW2_ADDONS_COMMON = D_GW2_ADDONS / "common";									/* get addons/common path */
-		D_GW2_ADDONS_COMMON_API_GW2 = D_GW2_ADDONS_COMMON / "api.guildwars2.com";		/* get addons/common/api.guildwars2.com path */
-		D_GW2_ADDONS_COMMON_API_RAIDCORE = D_GW2_ADDONS_COMMON / "api.raidcore.gg";		/* get addons/common/api.raidcore.gg path */
-		D_GW2_ADDONS_COMMON_API_GITHUB = D_GW2_ADDONS_COMMON / "api.github.com";		/* get addons/common/api.github.com path */
-		D_GW2_ADDONS_NEXUS = D_GW2_ADDONS / "Nexus";									/* get addons/Nexus path */
-		D_GW2_ADDONS_NEXUS_FONTS = D_GW2_ADDONS_NEXUS / "Fonts";						/* get addons/Nexus/Fonts path */
-		D_GW2_ADDONS_NEXUS_LOCALES = D_GW2_ADDONS_NEXUS / "Locales";					/* get addons/Nexus/Locales path */
+		D_GW2                            = F_HOST_DLL.parent_path();
+		D_GW2_ADDONS                     = D_GW2 / "addons";
+		D_GW2_ADDONS_COMMON              = D_GW2_ADDONS / "common";
+		D_GW2_ADDONS_COMMON_API_GW2      = D_GW2_ADDONS_COMMON / "api.guildwars2.com";
+		D_GW2_ADDONS_COMMON_API_RAIDCORE = D_GW2_ADDONS_COMMON / "api.raidcore.gg";
+		D_GW2_ADDONS_COMMON_API_GITHUB   = D_GW2_ADDONS_COMMON / "api.github.com";
+		D_GW2_ADDONS_NEXUS               = D_GW2_ADDONS / "Nexus";
+		D_GW2_ADDONS_NEXUS_FONTS         = D_GW2_ADDONS_NEXUS / "Fonts";
+		D_GW2_ADDONS_NEXUS_LOCALES       = D_GW2_ADDONS_NEXUS / "Locales";
+		D_GW2_ADDONS_NEXUS_STYLES        = D_GW2_ADDONS_NEXUS / "Styles";
 		char documents[MAX_PATH];
 		SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, documents);
 		D_DOCUMENTS = documents;
 		D_DOCUMENTS_GW2 = D_DOCUMENTS / "Guild Wars 2";
 		D_DOCUMENTS_GW2_INPUTBINDS = D_DOCUMENTS_GW2 / "InputBinds";
 
-		/* ensure folder tree*/
+		/* ensure directory tree*/
 		Path::CreateDir(D_GW2_ADDONS);
-		Path::CreateDir(D_GW2_ADDONS);													/* ensure addons dir */
-		Path::CreateDir(D_GW2_ADDONS_COMMON);											/* ensure addons/common dir */
-		Path::CreateDir(D_GW2_ADDONS_NEXUS);											/* ensure addons/Nexus dir */
-		Path::CreateDir(D_GW2_ADDONS_NEXUS_FONTS);										/* ensure addons/Nexus/Fonts dir */
-		Path::CreateDir(D_GW2_ADDONS_NEXUS_LOCALES);									/* ensure addons/Nexus/Locales dir */
+		Path::CreateDir(D_GW2_ADDONS_COMMON);
+		Path::CreateDir(D_GW2_ADDONS_NEXUS);
+		Path::CreateDir(D_GW2_ADDONS_NEXUS_FONTS);
+		Path::CreateDir(D_GW2_ADDONS_NEXUS_LOCALES);
+		Path::CreateDir(D_GW2_ADDONS_NEXUS_STYLES);
 
 		/* files */
-		F_LOG = D_GW2_ADDONS_NEXUS / "Nexus.log";										/* get log path */
-		F_INPUTBINDS = D_GW2_ADDONS_NEXUS / "InputBinds.json";							/* get inputbinds path */
-		F_GAMEBINDS = D_GW2_ADDONS_NEXUS / "GameBinds.xml";							/* get gamebinds path */
-		F_GAMEBINDS_LEGACY = D_GW2_ADDONS_NEXUS / "GameBinds.json";							/* get gamebinds path */
-		F_SETTINGS = D_GW2_ADDONS_NEXUS / "Settings.json";								/* get settings path */
-		F_ADDONCONFIG = D_GW2_ADDONS_NEXUS / "AddonConfig.json";						/* get addon config path */
-		F_ADDONCONFIG_DEFAULT = D_GW2_ADDONS_NEXUS / "AddonConfig.json";						/* get addon config path */
-		F_APIKEYS = D_GW2_ADDONS_COMMON / "APIKeys.json";								/* get apikeys path */
+		F_LOG = D_GW2_ADDONS_NEXUS / "Nexus.log";
+		F_INPUTBINDS = D_GW2_ADDONS_NEXUS / "InputBinds.json";
+		F_GAMEBINDS = D_GW2_ADDONS_NEXUS / "GameBinds.xml";
+		F_GAMEBINDS_LEGACY = D_GW2_ADDONS_NEXUS / "GameBinds.json";
+		F_SETTINGS = D_GW2_ADDONS_NEXUS / "Settings.json";
+		F_ADDONCONFIG = D_GW2_ADDONS_NEXUS / "AddonConfig.json";
+		F_ADDONCONFIG_DEFAULT = D_GW2_ADDONS_NEXUS / "AddonConfig.json";
+		F_APIKEYS = D_GW2_ADDONS_COMMON / "APIKeys.json";
 			
 		/* static paths */
-		F_OLD_DLL = F_HOST_DLL.string() + ".old";										/* get old dll path */
-		F_UPDATE_DLL = F_HOST_DLL.string() + ".update";									/* get update dll path */
-		F_SYSTEM_DLL = Path::GetSystem("d3d11.dll");									/* get system dll path */
-		F_CHAINLOAD_DLL = D_GW2 / "d3d11_chainload.dll";								/* get chainload dll path */
-		F_ARCDPSINTEGRATION = D_GW2_ADDONS_NEXUS / "arcdps_integration64.dll";			/* get arcdps integration dll path */
+		F_OLD_DLL = F_HOST_DLL.string() + ".old";
+		F_UPDATE_DLL = F_HOST_DLL.string() + ".update";
+		F_SYSTEM_DLL = Path::GetSystem("d3d11.dll");
+		F_CHAINLOAD_DLL = D_GW2 / "d3d11_chainload.dll";
+		F_ARCDPSINTEGRATION = D_GW2_ADDONS_NEXUS / "arcdps_integration64.dll";
 
 		F_LOCALE_EN = D_GW2_ADDONS_NEXUS_LOCALES / "en_Main.json";
 		F_LOCALE_DE = D_GW2_ADDONS_NEXUS_LOCALES / "de_Main.json";

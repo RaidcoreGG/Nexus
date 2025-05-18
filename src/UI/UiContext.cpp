@@ -868,7 +868,7 @@ void ApplyDefaultStyle()
 	}
 }
 
-void CUiContext::ApplyStyle(EUIStyle aStyle)
+void CUiContext::ApplyStyle(EUIStyle aStyle, std::string aValue)
 {
 	ImGuiStyle* style = &ImGui::GetStyle();
 
@@ -884,14 +884,25 @@ void CUiContext::ApplyStyle(EUIStyle aStyle)
 				std::string b64_style = settingsctx->Get<std::string>(OPT_IMGUISTYLE, {});
 				std::string decodeStyle = Base64::Decode(b64_style, b64_style.length());
 				memcpy_s(style, sizeof(ImGuiStyle), &decodeStyle[0], decodeStyle.length());
-
-				std::string b64_colors = settingsctx->Get<std::string>(OPT_IMGUICOLORS, {}); 
-				std::string decodeColors = Base64::Decode(b64_colors, b64_colors.length());
+			}
+			catch (...)
+			{
+				this->Logger->Warning(CH_UICONTEXT, "Error applying user style.");
+			}
+			return;
+		}
+		case EUIStyle::Nexus:
+		{
+			ApplyDefaultStyle();
+			try
+			{
+				static std::string s_NexusColorsDefault = "AACAPwAAgD8AAIA/AACAPwAAAD8AAAA/AAAAPwAAgD+PwnU9j8J1PY/CdT3Xo3A/AAAAAAAAAAAAAAAAAAAAAArXoz0K16M9CtejPdejcD/2KNw+9ijcPgAAAD8AAAA/AAAAAAAAAAAAAAAAAAAAAArXIz7hepQ+j8L1PnE9Cj+4HoU+PQoXP0jhej/NzMw+uB6FPj0KFz9I4Xo/H4UrPwrXIz0K1yM9CtcjPQAAgD8K1yM+4XqUPo/C9T4AAIA/AAAAAAAAAAAAAAAAXI8CPylcDz4pXA8+KVwPPgAAgD8K16M8CtejPArXozwUrgc/UriePlK4nj5SuJ4+AACAP4Xr0T6F69E+hevRPgAAgD9cjwI/XI8CP1yPAj8AAIA/uB6FPj0KFz9I4Xo/AACAP4/CdT64HgU/rkdhPwAAgD+4HoU+PQoXP0jhej8AAIA/uB6FPj0KFz9I4Xo/zczMPrgehT49Chc/SOF6PwAAgD+PwnU9FK4HP0jhej8AAIA/uB6FPj0KFz9I4Xo/UriePrgehT49Chc/SOF6P83MTD+4HoU+PQoXP0jhej8AAIA/9ijcPvYo3D4AAAA/AAAAP83MzD3NzMw+AABAPxSuRz/NzMw9zczMPgAAQD8AAIA/uB6FPj0KFz9I4Xo/zcxMPrgehT49Chc/SOF6Px+FKz+4HoU+PQoXP0jhej8zM3M/61E4PjIzsz7iehQ/CKxcP7gehT49Chc/SOF6P83MTD/MzEw+hOvRPnsULj8AAIA/lkOLPV7l0D1SjRc+Ne94P5RDCz7cJIY+hxbZPgAAgD/2KBw/9igcP/YoHD8AAIA/AACAP/Yo3D4zM7M+AACAP2ZmZj8zMzM/AAAAAAAAgD8AAIA/mpkZPwAAAAAAAIA/XI9CPlyPQj7NzEw+AACAP1K4nj5SuJ4+MzOzPgAAgD8fhWs+H4VrPgAAgD4AAIA/AAAAAAAAAAAAAAAAAAAAAAAAgD8AAIA/AACAP4/CdT24HoU+PQoXP0jhej8zM7M+AACAPwAAgD8AAAAAZmZmP7gehT49Chc/SOF6PwAAgD8AAIA/AACAPwAAgD8zMzM/zcxMP83MTD/NzEw/zcxMPs3MTD/NzEw/zcxMPzMzsz4=";
+				std::string decodeColors = Base64::Decode(s_NexusColorsDefault, s_NexusColorsDefault.length());
 				memcpy_s(&style->Colors[0], sizeof(ImVec4) * ImGuiCol_COUNT, &decodeColors[0], decodeColors.length());
 			}
 			catch (...)
 			{
-				this->Logger->Debug(CH_UICONTEXT, "Error applying user style.");
+				this->Logger->Warning(CH_UICONTEXT, "Error applying Nexus default style.");
 			}
 			return;
 		}
@@ -914,21 +925,6 @@ void CUiContext::ApplyStyle(EUIStyle aStyle)
 			ImGui::StyleColorsDark();
 			return;
 		}
-		case EUIStyle::Nexus:
-		{
-			ApplyDefaultStyle();
-			try
-			{
-				static std::string s_NexusColorsDefault = "AACAPwAAgD8AAIA/AACAPwAAAD8AAAA/AAAAPwAAgD+PwnU9j8J1PY/CdT3Xo3A/AAAAAAAAAAAAAAAAAAAAAArXoz0K16M9CtejPdejcD/2KNw+9ijcPgAAAD8AAAA/AAAAAAAAAAAAAAAAAAAAAArXIz7hepQ+j8L1PnE9Cj+4HoU+PQoXP0jhej/NzMw+uB6FPj0KFz9I4Xo/H4UrPwrXIz0K1yM9CtcjPQAAgD8K1yM+4XqUPo/C9T4AAIA/AAAAAAAAAAAAAAAAXI8CPylcDz4pXA8+KVwPPgAAgD8K16M8CtejPArXozwUrgc/UriePlK4nj5SuJ4+AACAP4Xr0T6F69E+hevRPgAAgD9cjwI/XI8CP1yPAj8AAIA/uB6FPj0KFz9I4Xo/AACAP4/CdT64HgU/rkdhPwAAgD+4HoU+PQoXP0jhej8AAIA/uB6FPj0KFz9I4Xo/zczMPrgehT49Chc/SOF6PwAAgD+PwnU9FK4HP0jhej8AAIA/uB6FPj0KFz9I4Xo/UriePrgehT49Chc/SOF6P83MTD+4HoU+PQoXP0jhej8AAIA/9ijcPvYo3D4AAAA/AAAAP83MzD3NzMw+AABAPxSuRz/NzMw9zczMPgAAQD8AAIA/uB6FPj0KFz9I4Xo/zcxMPrgehT49Chc/SOF6Px+FKz+4HoU+PQoXP0jhej8zM3M/61E4PjIzsz7iehQ/CKxcP7gehT49Chc/SOF6P83MTD/MzEw+hOvRPnsULj8AAIA/lkOLPV7l0D1SjRc+Ne94P5RDCz7cJIY+hxbZPgAAgD/2KBw/9igcP/YoHD8AAIA/AACAP/Yo3D4zM7M+AACAP2ZmZj8zMzM/AAAAAAAAgD8AAIA/mpkZPwAAAAAAAIA/XI9CPlyPQj7NzEw+AACAP1K4nj5SuJ4+MzOzPgAAgD8fhWs+H4VrPgAAgD4AAIA/AAAAAAAAAAAAAAAAAAAAAAAAgD8AAIA/AACAP4/CdT24HoU+PQoXP0jhej8zM7M+AACAPwAAgD8AAAAAZmZmP7gehT49Chc/SOF6PwAAgD8AAIA/AACAPwAAgD8zMzM/zcxMP83MTD/NzEw/zcxMPs3MTD/NzEw/zcxMPzMzsz4=";
-				std::string decodeColors = Base64::Decode(s_NexusColorsDefault, s_NexusColorsDefault.length());
-				memcpy_s(&style->Colors[0], sizeof(ImVec4) * ImGuiCol_COUNT, &decodeColors[0], decodeColors.length());
-			}
-			catch (...)
-			{
-				this->Logger->Debug(CH_UICONTEXT, "Error applying Nexus default style.");
-			}
-			return;
-		}
 		case EUIStyle::ArcDPS_Default:
 		{
 			try
@@ -943,7 +939,7 @@ void CUiContext::ApplyStyle(EUIStyle aStyle)
 			}
 			catch (...)
 			{
-				this->Logger->Debug(CH_UICONTEXT, "Error applying ArcDPS default style.");
+				this->Logger->Warning(CH_UICONTEXT, "Error applying ArcDPS default style.");
 			}
 			return;
 		}
@@ -972,14 +968,68 @@ void CUiContext::ApplyStyle(EUIStyle aStyle)
 				}
 				catch (...)
 				{
-					this->Logger->Debug(CH_UICONTEXT, "Couldn't parse ArcDPS style.");
+					this->Logger->Warning(CH_UICONTEXT, "Couldn't parse ArcDPS style.");
 				}
 			}
 			else
 			{
-				this->Logger->Debug(CH_UICONTEXT, "Tried importing ArcDPS style, with no config present.");
+				this->Logger->Warning(CH_UICONTEXT, "Tried importing ArcDPS style, with no config present.");
 			}
 			return;
+		}
+		case EUIStyle::File:
+		{
+			std::filesystem::path path = Index::D_GW2_ADDONS_NEXUS_STYLES / aValue;
+
+			if (std::filesystem::is_directory(path)) { return; }
+			if (std::filesystem::file_size(path) == 0) { return; }
+			if (path.extension() != ".imstyle180") { return; }
+
+			ImGuiStyle* style = &ImGui::GetStyle();
+
+			try
+			{
+				CContext* ctx = CContext::GetContext();
+				CSettings* settingsctx = ctx->GetSettingsCtx();
+
+				std::ifstream file(path);
+
+				if (file)
+				{
+					std::string b64_style;
+					std::getline(file, b64_style);
+					file.close();
+
+					std::string decodeStyle = Base64::Decode(b64_style, b64_style.length());
+
+					if (decodeStyle.size() != sizeof(ImGuiStyle))
+					{
+						this->Logger->Warning(CH_UICONTEXT, "Error applying stylesheet. Not ImGui 1.80 compatible.");
+						return;
+					}
+
+					memcpy_s(style, sizeof(ImGuiStyle), &decodeStyle[0], decodeStyle.length());
+				}
+			}
+			catch (...)
+			{
+				this->Logger->Warning(CH_UICONTEXT, "Error applying stylesheet.");
+			}
+
+			break;
+		}
+		case EUIStyle::Code:
+		{
+			std::string decodeStyle = Base64::Decode(aValue, aValue.length());
+
+			if (decodeStyle.size() != sizeof(ImGuiStyle))
+			{
+				this->Logger->Warning(CH_UICONTEXT, "Error applying stylesheet. Not ImGui 1.80 compatible.");
+				return;
+			}
+
+			memcpy_s(style, sizeof(ImGuiStyle), &decodeStyle[0], decodeStyle.length());
+			break;
 		}
 	}
 }

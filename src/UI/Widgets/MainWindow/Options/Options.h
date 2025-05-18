@@ -10,23 +10,33 @@
 #define MAINWINDOW_OPTIONS_H
 
 #include <vector>
-#include <string>
+#include <filesystem>
 
 #include "UI/Controls/CtlSubWindow.h"
+#include "ExportStyleModal.h"
+#include "ImportStyleModal.h"
 
 class COptionsWindow : public ISubWindow
 {
 	public:
 	COptionsWindow();
 	void RenderContent() override;
+	void RenderSubWindows() override;
 
 	private:
-	std::vector<std::string> Fonts;
+	CExportStyleModal ExportModal;
+	CImportStyleModal ImportModal;
+
+	std::vector<std::filesystem::path> Fonts;
+	std::vector<std::filesystem::path> Styles;
+
+	bool HasUnsavedStyle = false;
 
 	void TabGeneral();
 	void TabStyle();
 
 	void PopulateFonts();
+	void PopulateStyles();
 };
 
 #endif

@@ -19,18 +19,19 @@
 ///----------------------------------------------------------------------------------------------------
 namespace Index
 {
-	extern std::filesystem::path D_GW2;
-	extern std::filesystem::path D_GW2_ADDONS;
-	extern std::filesystem::path D_GW2_ADDONS_COMMON;
-	extern std::filesystem::path D_GW2_ADDONS_COMMON_API_GW2;
-	extern std::filesystem::path D_GW2_ADDONS_COMMON_API_RAIDCORE;
-	extern std::filesystem::path D_GW2_ADDONS_COMMON_API_GITHUB;
-	extern std::filesystem::path D_GW2_ADDONS_NEXUS;
-	extern std::filesystem::path D_GW2_ADDONS_NEXUS_FONTS;
-	extern std::filesystem::path D_GW2_ADDONS_NEXUS_LOCALES;
-	extern std::filesystem::path D_DOCUMENTS;
-	extern std::filesystem::path D_DOCUMENTS_GW2;
-	extern std::filesystem::path D_DOCUMENTS_GW2_INPUTBINDS;
+	extern std::filesystem::path D_GW2;                            /* current directory -> <GW2> */
+	extern std::filesystem::path D_GW2_ADDONS;                     /* <GW2>/addons */
+	extern std::filesystem::path D_GW2_ADDONS_COMMON;              /* <GW2>/addons/common */
+	extern std::filesystem::path D_GW2_ADDONS_COMMON_API_GW2;      /* <GW2>/addons/common/api.guildwars2.com */
+	extern std::filesystem::path D_GW2_ADDONS_COMMON_API_RAIDCORE; /* <GW2>/addons/common/api.raidcore.gg */
+	extern std::filesystem::path D_GW2_ADDONS_COMMON_API_GITHUB;   /* <GW2>/addons/common/api.github.com */
+	extern std::filesystem::path D_GW2_ADDONS_NEXUS;               /* <GW2>/addons/Nexus */
+	extern std::filesystem::path D_GW2_ADDONS_NEXUS_FONTS;         /* <GW2>/addons/Nexus/Fonts */
+	extern std::filesystem::path D_GW2_ADDONS_NEXUS_LOCALES;       /* <GW2>/addons/Nexus/Locales */
+	extern std::filesystem::path D_GW2_ADDONS_NEXUS_STYLES;        /* <GW2>/addons/Nexus/Styles */
+	extern std::filesystem::path D_DOCUMENTS;                      /* <DOCUMENTS> */
+	extern std::filesystem::path D_DOCUMENTS_GW2;                  /* <DOCUMENTS>/Guild Wars 2 */
+	extern std::filesystem::path D_DOCUMENTS_GW2_INPUTBINDS;       /* <DOCUMENTS>/Guild Wars 2/InputBinds */
 
 	extern std::filesystem::path F_HOST_DLL;
 	extern std::filesystem::path F_UPDATE_DLL;

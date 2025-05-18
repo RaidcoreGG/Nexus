@@ -46,12 +46,14 @@ constexpr const char* KB_TOGGLEHIDEUI    = "KB_TOGGLEHIDEUI";
 enum class EUIStyle
 {
 	User,
+	Nexus,
 	ImGui_Classic,
 	ImGui_Light,
 	ImGui_Dark,
-	Nexus,
 	ArcDPS_Default,
-	ArcDPS_Current /* If available. */
+	ArcDPS_Current, /* If available. */
+	File,
+	Code
 };
 
 ///----------------------------------------------------------------------------------------------------
@@ -246,9 +248,10 @@ class CUiContext
 
 	///----------------------------------------------------------------------------------------------------
 	/// ApplyStyle:
-	/// 	Applies the ImGui style.
+	/// 	Applies an ImGui style.
+	/// 	aValue is either a filename or a code, if the style is EUIStyle::File or EUIStyle::Code.
 	///----------------------------------------------------------------------------------------------------
-	void ApplyStyle(EUIStyle aStyle = EUIStyle::User);
+	void ApplyStyle(EUIStyle aStyle = EUIStyle::User, std::string aValue = "");
 
 	private:
 	/* Services */

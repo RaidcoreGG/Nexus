@@ -408,6 +408,15 @@
     <ClCompile Include="src\thirdparty\pugixml\pugixml.cpp">
       <Filter>_EXTERNAL\pugixml</Filter>
     </ClCompile>
+    <ClCompile Include="src\UI\Widgets\MainWindow\Options\ExportStyleModal.cpp">
+      <Filter>UI\Widgets\MainWindow\Pages\Options</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Controls\CtlModal.cpp">
+      <Filter>UI\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\Widgets\MainWindow\Options\ImportStyleModal.cpp">
+      <Filter>UI\Widgets\MainWindow\Pages\Options</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h">
@@ -1213,6 +1222,15 @@
     </ClInclude>
     <ClInclude Include="src\Inputs\GameBinds\GbEnum.h">
       <Filter>Inputs\GameBinds</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\MainWindow\Options\ExportStyleModal.h">
+      <Filter>UI\Widgets\MainWindow\Pages\Options</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Controls\CtlModal.h">
+      <Filter>UI\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\MainWindow\Options\ImportStyleModal.h">
+      <Filter>UI\Widgets\MainWindow\Pages\Options</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -48,10 +48,10 @@ class IWindow
 	virtual bool* GetVisibleStatePtr();
 
 	protected:
-	std::string              Name;
-	std::string              DisplayName;
-	bool                     IsVisible = false;
-	bool                     IsInvalid = false;
+	std::string Name;
+	std::string DisplayName;
+	bool        IsVisible = false;
+	bool        IsInvalid = false;
 };
 
 #endif
