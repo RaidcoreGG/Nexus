@@ -12,7 +12,6 @@
 
 #include "imgui.h"
 
-#include "Renderer.h"
 #include "Index.h"
 #include "Context.h"
 
