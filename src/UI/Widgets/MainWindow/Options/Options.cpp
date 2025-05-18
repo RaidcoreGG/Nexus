@@ -391,16 +391,17 @@ void COptionsWindow::TabStyle()
 								if (s_TexCross)
 								{
 									ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+									ImGui::PushID(style.stem().string().c_str());
 									if (ImGui::ImageButton(s_TexCross->Resource, ImVec2(ImGui::GetFrameHeight(), ImGui::GetFrameHeight())))
 									{
-										std::filesystem::path tmp = Index::D_GW2_ADDONS_NEXUS_STYLES / style;
 										try
 										{
-											std::filesystem::remove(tmp);
+											std::filesystem::remove(style);
 										}
 										catch (...) {}
 										s_LastPolled = 0; /* Reset to force a refresh. */
 									}
+									ImGui::PopID();
 									ImGui::PopStyleVar();
 									ImGui::TooltipGeneric("Delete preset");
 
