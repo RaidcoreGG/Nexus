@@ -1024,7 +1024,10 @@ void CAddonsWindow::RenderContent()
 
 void CAddonsWindow::RenderSubWindows()
 {
-	this->DrawBindSetterModal();
+	if (this->BindSetterModal.Render() && this->BindSetterModal.GetResult() != EModalResult::None)
+	{
+		this->Invalidate();
+	}
 }
 
 void CAddonsWindow::RenderDetails()
@@ -1259,128 +1262,12 @@ void CAddonsWindow::RenderInputBindsTable(const std::unordered_map<std::string, 
 			ImGui::PushID(identifier.c_str());
 			if (ImGui::Button(inputBind.KeysText.c_str(), ImVec2(ImGui::CalcTextSize("XXXXXXXXXXXXXXXXXXXXXXXX").x, 0.0f)))
 			{
-				this->Editing_Identifier = identifier;
-				this->Editing_BindText = inputBind.KeysText;
-
-				this->OpenModalNextFrame = true;
-				this->IsEditing = EBindEditType::Nexus;
-
-				this->ModalTitle = langApi->Translate("((000062))");
-				this->ModalTitle.append(langApi->Translate(this->Editing_Identifier.c_str()));
-				this->ModalTitle.append("##InputBindSetter_Addons");
+				this->BindSetterModal.SetTarget(identifier);
 			}
 			ImGui::PopID();
 		}
 
 		ImGui::EndTable();
-	}
-}
-
-void CAddonsWindow::DrawBindSetterModal()
-{
-	if (this->OpenModalNextFrame == true)
-	{
-		ImGui::OpenPopup(this->ModalTitle.c_str());
-		this->OpenModalNextFrame = false;
-	}
-
-	ImVec2 center(Renderer::Width * 0.5f, Renderer::Height * 0.5f);
-	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-	if (ImGui::BeginPopupModal(this->ModalTitle.c_str(), NULL, ModalFlags))
-	{
-		CContext* ctx = CContext::GetContext();
-		CLocalization* langApi = ctx->GetLocalization();
-		CInputBindApi* inputBindApi = ctx->GetInputBindApi();
-		CGameBindsApi* gameBindsApi = ctx->GetGameBindsApi();
-
-		inputBindApi->StartCapturing();
-
-		InputBind currInputBind = inputBindApi->GetCapturedInputBind();
-		std::string usedBy = inputBindApi->IsInUse(currInputBind);
-
-		if (currInputBind == InputBind{})
-		{
-			ImGui::Text(this->Editing_BindText.c_str());
-		}
-		else
-		{
-			ImGui::Text(CInputBindApi::IBToString(currInputBind, true).c_str());
-		}
-
-		bool overwriting = false;
-
-		if (usedBy != this->Editing_Identifier && !usedBy.empty())
-		{
-			ImGui::TextColored(ImVec4(255, 0, 0, 255), (langApi->Translate("((000063))") + usedBy + ".").c_str());
-			overwriting = true;
-		}
-
-		bool close = false;
-
-		if (ImGui::Button(langApi->Translate("((000064))")))
-		{
-			if (this->IsEditing == EBindEditType::Nexus)
-			{
-				inputBindApi->Set(this->Editing_Identifier, InputBind{});
-			}
-			else if (this->IsEditing == EBindEditType::Game)
-			{
-				gameBindsApi->Set(this->Editing_GameIdentifier, InputBind{}, true, false);
-			}
-			else if (this->IsEditing == EBindEditType::Game2)
-			{
-				gameBindsApi->Set(this->Editing_GameIdentifier, InputBind{}, false, false);
-			}
-
-			this->Invalidate();
-
-			close = true;
-		}
-		ImGui::SameLine();
-		if (ImGui::Button(langApi->Translate("((000065))")))
-		{
-			if (this->IsEditing == EBindEditType::Nexus)
-			{
-				if (overwriting)
-				{
-					/* unset the bind that's currently using this wombo combo */
-					inputBindApi->Set(usedBy, InputBind{});
-				}
-
-				inputBindApi->Set(this->Editing_Identifier, currInputBind);
-			}
-			else if (this->IsEditing == EBindEditType::Game)
-			{
-				gameBindsApi->Set(this->Editing_GameIdentifier, currInputBind, true, false);
-			}
-			else if (this->IsEditing == EBindEditType::Game2)
-			{
-				gameBindsApi->Set(this->Editing_GameIdentifier, currInputBind, false, false);
-			}
-
-			this->Invalidate();
-
-			close = true;
-		}
-		ImGui::SameLine();
-		if (ImGui::Button(langApi->Translate("((000066))")))
-		{
-			close = true;
-		}
-
-		if (close)
-		{
-			/* unset all editing vars */
-			this->Editing_Identifier = "";
-			this->Editing_GameIdentifier = (EGameBinds)-1;
-			this->Editing_BindText = "";
-			this->IsEditing = EBindEditType::None;
-
-			inputBindApi->EndCapturing();
-			ImGui::CloseCurrentPopup();
-		}
-
-		ImGui::EndPopup();
 	}
 }
 

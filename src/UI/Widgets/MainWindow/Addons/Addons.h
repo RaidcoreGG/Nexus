@@ -14,6 +14,7 @@
 
 #include "DisplayAddon.h"
 #include "UI/Controls/CtlSubWindow.h"
+#include "UI/Widgets/MainWindow/Binds/BindSetterModal.h"
 
 constexpr const char* OPT_ISLISTMODE = "IsListMode";
 constexpr const char* OPT_ADDONFILTERS = "AddonFilters";
@@ -37,6 +38,8 @@ class CAddonsWindow : public ISubWindow
 	void Invalidate(signed int aAddonID);
 
 	private:
+	CBindSetterModal           BindSetterModal;
+
 	std::string                SearchTerm;
 	EAddonsFilterFlags         Filter;
 	std::vector<AddonItemData> Addons;
@@ -45,15 +48,6 @@ class CAddonsWindow : public ISubWindow
 	std::mutex                 Mutex;
 	bool                       HasContent = false;
 	AddonItemData              AddonData = {};
-
-	/* Bind Editor */
-	EBindEditType              IsEditing = EBindEditType::None;
-	std::string                Editing_Identifier;
-	EGameBinds                 Editing_GameIdentifier;
-	std::string                Editing_BindText;
-
-	std::string                ModalTitle;
-	bool                       OpenModalNextFrame;
 
 	void SetContent(AddonItemData& aAddonData);
 	void ClearContent();
@@ -64,8 +58,6 @@ class CAddonsWindow : public ISubWindow
 	void RenderSubWindows() override;
 	void RenderDetails();
 	void RenderInputBindsTable(const std::unordered_map<std::string, InputBindPacked>& aInputBinds);
-
-	void DrawBindSetterModal();
 
 	void PopulateAddons();
 };
