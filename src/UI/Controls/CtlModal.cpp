@@ -34,8 +34,10 @@ bool IModal::Render()
 	ImVec2 center(Renderer::Width * 0.5f, Renderer::Height * 0.5f);
 	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
+	float minWidthTitle = (ImGui::GetStyle().WindowPadding.x * 2) + ImGui::CalcTextSize(this->GetDisplayName().c_str()).x;
+
 	/* Ensure the modal title fits. As the window itself auto resizes, but that does not respect the title length. */
-	ImGui::SetNextWindowSizeConstraints(ImVec2(ImGui::CalcTextSize(this->GetDisplayName().c_str()).x, 0.f), ImVec2(FLT_MAX, FLT_MAX));
+	ImGui::SetNextWindowSizeConstraints(ImVec2(minWidthTitle, 0.f), ImVec2(FLT_MAX, FLT_MAX));
 
 	if (!ImGui::BeginPopupModal(this->GetName().c_str(), NULL, ModalFlags))
 	{
