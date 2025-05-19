@@ -17,6 +17,7 @@
 #include "Inputs/InputBinds/ManagedInputBind.h"
 #include "UI/Controls/CtlSubWindow.h"
 #include "UI/DisplayBinds.h"
+#include "BindSetterModal.h"
 
 class CBindsWindow : public ISubWindow
 {
@@ -26,21 +27,13 @@ class CBindsWindow : public ISubWindow
 	void RenderSubWindows() override;
 
 	private:
-	EBindEditType                              IsEditing = EBindEditType::None;
-	std::string                                Editing_Identifier;
-	EGameBinds                                 Editing_GameIdentifier;
-	std::string                                Editing_BindText;
+	CBindSetterModal                   BindSetterModal;
 
-	std::string                                ModalTitle;
-	bool                                       OpenModalNextFrame;
-
-	std::vector<InputBindCategory>             IBCategories;
-	std::vector<GameInputBindCategory>         GIBCategories;
+	std::vector<InputBindCategory>     IBCategories;
+	std::vector<GameInputBindCategory> GIBCategories;
 
 	void RenderInputBindsTable(const std::unordered_map<std::string, InputBindPacked>& aInputBinds);
 	void RenderGameInputBindsTable(const std::unordered_map<EGameBinds, GameInputBindPacked>& aInputBinds);
-
-	void DrawBindSetterModal();
 
 	void DeleteStaleBind(const std::string& aIdentifier);
 };

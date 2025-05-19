@@ -11,14 +11,6 @@
 
 #include <string>
 
-#include "imgui.h"
-
-constexpr ImGuiWindowFlags ModalFlags
-	= ImGuiWindowFlags_AlwaysAutoResize
-	| ImGuiWindowFlags_NoResize
-	| ImGuiWindowFlags_NoCollapse
-	| ImGuiWindowFlags_NoMove;
-
 ///----------------------------------------------------------------------------------------------------
 /// EModalResult Enumeration
 ///----------------------------------------------------------------------------------------------------
@@ -26,7 +18,9 @@ enum class EModalResult
 {
 	None,
 	OK,
-	Cancel
+	Primary = OK,
+	Secondary,
+	Cancel,
 };
 
 ///----------------------------------------------------------------------------------------------------

@@ -417,6 +417,9 @@
     <ClCompile Include="src\UI\Widgets\MainWindow\Options\ImportStyleModal.cpp">
       <Filter>UI\Widgets\MainWindow\Pages\Options</Filter>
     </ClCompile>
+    <ClCompile Include="src\UI\Widgets\MainWindow\Binds\BindSetterModal.cpp">
+      <Filter>UI\Widgets\MainWindow\Pages\Binds</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h">
@@ -1231,6 +1234,9 @@
     </ClInclude>
     <ClInclude Include="src\UI\Widgets\MainWindow\Options\ImportStyleModal.h">
       <Filter>UI\Widgets\MainWindow\Pages\Options</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\MainWindow\Binds\BindSetterModal.h">
+      <Filter>UI\Widgets\MainWindow\Pages\Binds</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -8,6 +8,8 @@
 
 #include "CtlModal.h"
 
+#include "imgui.h"
+
 #include "Context.h"
 #include "Renderer.h"
 
@@ -21,8 +23,20 @@ bool IModal::Render()
 		this->SetResult(EModalResult::None); /* Reset last result. */
 	}
 
+	constexpr ImGuiWindowFlags ModalFlags
+		= ImGuiWindowFlags_AlwaysAutoResize
+		| ImGuiWindowFlags_NoResize
+		| ImGuiWindowFlags_NoCollapse
+		| ImGuiWindowFlags_NoMove
+		| ImGuiWindowFlags_NoSavedSettings;
+
+	/* Center the modal. */
 	ImVec2 center(Renderer::Width * 0.5f, Renderer::Height * 0.5f);
 	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+	/* Ensure the modal title fits. As the window itself auto resizes, but that does not respect the title length. */
+	ImGui::SetNextWindowSizeConstraints(ImVec2(ImGui::CalcTextSize(this->GetDisplayName().c_str()).x, 0.f), ImVec2(FLT_MAX, FLT_MAX));
+
 	if (!ImGui::BeginPopupModal(this->GetName().c_str(), NULL, ModalFlags))
 	{
 		return false;

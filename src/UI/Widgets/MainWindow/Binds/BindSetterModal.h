@@ -1,30 +1,31 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  ExportStyleModal.h
-/// Description  :  Modal for style exports.
+/// Name         :  BindSetterModal.h
+/// Description  :  Modal for style importing.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef EXPORTSTYLEMODAL_H
-#define EXPORTSTYLEMODAL_H
+#ifndef BINDSETTERMODAL_H
+#define BINDSETTERMODAL_H
 
-#include <windows.h>
 #include <string>
-#include <filesystem>
 
 #include "UI/Controls/CtlModal.h"
+#include "UI/DisplayBinds.h"
+#include "Inputs/InputBinds/InputBind.h"
+#include "Inputs/GameBinds/GbEnum.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// CExportStyleModal Class
+/// CBindSetterModal Class
 ///----------------------------------------------------------------------------------------------------
-class CExportStyleModal : public virtual IModal
+class CBindSetterModal : public virtual IModal
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CExportStyleModal();
+	CBindSetterModal();
 
 	///----------------------------------------------------------------------------------------------------
 	/// RenderContent:
@@ -33,27 +34,43 @@ class CExportStyleModal : public virtual IModal
 	void RenderContent() override;
 
 	///----------------------------------------------------------------------------------------------------
+	/// OnOpening:
+	/// 	Override open to retrieve the bind text of the to be edited bind.
+	///----------------------------------------------------------------------------------------------------
+	void OnOpening() override;
+
+	///----------------------------------------------------------------------------------------------------
 	/// OnClosing:
 	/// 	Override close to process result and reset variables.
 	///----------------------------------------------------------------------------------------------------
 	void OnClosing() override;
 
 	///----------------------------------------------------------------------------------------------------
-	/// SetData:
-	/// 	Sets the to be exported code and shows the modal.
+	/// SetTarget:
+	/// 	Set Nexus bind as editing target.
 	///----------------------------------------------------------------------------------------------------
-	void SetData(const std::string& aBase64Style);
+	void SetTarget(std::string aBindIdentifier);
+
+	///----------------------------------------------------------------------------------------------------
+	/// SetTarget:
+	/// 	Set game bind as editing target.
+	///----------------------------------------------------------------------------------------------------
+	void SetTarget(EGameBinds aBindIdentifier, bool aIsPrimary = true);
 
 	private:
-	std::string           Data;
-	char                  PathBuffer[MAX_PATH];
-	std::filesystem::path Path;
+	EBindEditType Type             = EBindEditType::None;
+	std::string   NexusBindID      = {};
+	EGameBinds    GameBindID       = (EGameBinds)0;
+	std::string   PreviousBindText = {};
+
+	InputBind     Capture          = {};
+	std::string   BindConflict     = {};
 
 	///----------------------------------------------------------------------------------------------------
-	/// ClearData:
-	/// 	Resets the data.
+	/// SetTitle:
+	/// 	Custom title setting, so that the caption says "Set Input Bind: <KEYNAME>".
 	///----------------------------------------------------------------------------------------------------
-	void ClearData();
+	void SetTitle();
 };
 
 #endif
