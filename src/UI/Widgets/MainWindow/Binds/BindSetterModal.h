@@ -2,7 +2,7 @@
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
 /// Name         :  BindSetterModal.h
-/// Description  :  Modal for style importing.
+/// Description  :  Modal for InputBind setter.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 

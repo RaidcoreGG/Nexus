@@ -26,7 +26,7 @@
 #include "UI/Services/Fonts/FontManager.h"
 #include "UI/Services/QoL/EscapeClosing.h"
 #include "UI/Widgets/Alerts/Alerts.h"
-#include "UI/Widgets/EULA/EULAModal.h"
+#include "UI/Widgets/EULA/LicenseAgreementModal.h"
 #include "UI/Widgets/MainWindow/MainWindow.h"
 #include "UI/Widgets/QuickAccess/QuickAccess.h"
 
@@ -271,7 +271,6 @@ class CUiContext
 	ImGuiContext*                      ImGuiContext;
 
 	/* Windows/Widgets */
-	CEULAModal*                        EULAModal;
 	CAlerts*                           Alerts;
 	CMainWindow*                       MainWindow;
 	CQuickAccess*                      QuickAccess;

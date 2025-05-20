@@ -360,7 +360,7 @@
     <ClCompile Include="src\UI\Widgets\MainWindow\MainWindow.cpp">
       <Filter>UI\Widgets\MainWindow</Filter>
     </ClCompile>
-    <ClCompile Include="src\UI\Widgets\EULA\EULAModal.cpp">
+    <ClCompile Include="src\UI\Widgets\EULA\LicenseAgreementModal.cpp">
       <Filter>UI\Widgets\EULA</Filter>
     </ClCompile>
     <ClCompile Include="src\thirdparty\ImAnimate\ImAnimate.cpp">
@@ -1157,7 +1157,7 @@
     <ClInclude Include="src\UI\Widgets\Alerts\Alerts.h">
       <Filter>UI\Widgets\Alerts</Filter>
     </ClInclude>
-    <ClInclude Include="src\UI\Widgets\EULA\EULAModal.h">
+    <ClInclude Include="src\UI\Widgets\EULA\LicenseAgreementModal.h">
       <Filter>UI\Widgets\EULA</Filter>
     </ClInclude>
     <ClInclude Include="src\thirdparty\ImAnimate\ImAnimate.h">

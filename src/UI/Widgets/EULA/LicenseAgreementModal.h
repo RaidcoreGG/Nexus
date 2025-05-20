@@ -1,43 +1,38 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  EULAModal.h
-/// Description  :  Contains the logic for the EULA popup modal.
+/// Name         :  LicenseAgreementModal.h
+/// Description  :  Modal for license agreement.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef EULAMODAL_H
-#define EULAMODAL_H
+#ifndef LICENSEAGREEMENTMODAL_H
+#define LICENSEAGREEMENTMODAL_H
 
-#include <Windows.h>
-
-#include "Services/Localization/Localization.h"
+#include "UI/Controls/CtlModal.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// CEULAModal Class
+/// CLicenseAgreementModal Class
 ///----------------------------------------------------------------------------------------------------
-class CEULAModal
+class CLicenseAgreementModal : public virtual IModal
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CEULAModal(HWND aWindowHandle, CLocalization* aLocalization);
+	CLicenseAgreementModal();
 
 	///----------------------------------------------------------------------------------------------------
-	/// dtor
+	/// RenderContent:
+	/// 	Render function of modal contents.
 	///----------------------------------------------------------------------------------------------------
-	~CEULAModal();
+	void RenderContent() override;
 
 	///----------------------------------------------------------------------------------------------------
-	/// Render:
-	/// 	Renders the EULA modal. Returns true if the EULA was accepted.
+	/// OnClosing:
+	/// 	Override close to process result.
 	///----------------------------------------------------------------------------------------------------
-	bool Render();
-
-	private:
-	HWND           WindowHandle;
-	CLocalization* Language;
+	void OnClosing() override;
 };
 
 #endif

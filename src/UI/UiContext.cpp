@@ -388,8 +388,6 @@ void CUiContext::Shutdown()
 	this->IsInitialized = false;
 }
 
-static bool EulaAccepted = false;
-
 void CUiContext::Render()
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
@@ -431,9 +429,13 @@ void CUiContext::Render()
 		ImGui_ImplDX11_NewFrame();
 		ImGui::NewFrame();
 
-		/* draw overlay */
-		if (EulaAccepted)
+		static CContext*  s_Context      = CContext::GetContext();
+		static CSettings* s_Settings     = s_Context->GetSettingsCtx();
+		static bool       s_EulaAccepted = s_Settings->Get<bool>(OPT_ACCEPTEULA, false);
+		
+		if (s_EulaAccepted)
 		{
+			/* normal overlay */
 			if (this->IsVisible)
 			{
 				/* draw addons*/
@@ -450,25 +452,30 @@ void CUiContext::Render()
 		}
 		else
 		{
-			/* only create eula modal when we actually need it */
-			if (!this->EULAModal)
+			/* license agreement */
+			static CLicenseAgreementModal s_Modal = {};
+			static bool s_OpenedModal = false;
+			
+			if (!s_OpenedModal)
 			{
-				this->EULAModal = new CEULAModal(this->WindowHandle, this->Language);
+				s_Modal.OpenModal();
+				s_OpenedModal = true;
 			}
 
-			/* if returns true, eula was accepted. free the memory */
-			if (this->EULAModal->Render())
+			if (s_Modal.Render())
 			{
-				delete this->EULAModal;
-				this->EULAModal = nullptr;
+				/* Update state. */
+				s_EulaAccepted = s_Settings->Get<bool>(OPT_ACCEPTEULA, false);
 
-				CContext* ctx = CContext::GetContext();
-				CSettings* settingsctx = ctx->GetSettingsCtx();
-				settingsctx->Set(OPT_ACCEPTEULA, true);
-				EulaAccepted = true;
-
-				/* activate main window for the first time */
-				this->MainWindow->Activate();
+				if (s_EulaAccepted)
+				{
+					/* activate main window for the first time */
+					this->MainWindow->Activate();
+				}
+				else
+				{
+					PostMessageA(this->WindowHandle, WM_CLOSE, 0, 0);
+				}
 			}
 		}
 
@@ -793,8 +800,6 @@ void CUiContext::LoadFonts()
 
 	CContext* ctx = CContext::GetContext();
 	CSettings* settingsctx = ctx->GetSettingsCtx();
-
-	EulaAccepted = settingsctx->Get<bool>(OPT_ACCEPTEULA, false);
 
 	/* add user font */
 	bool hasUserFont = false;
