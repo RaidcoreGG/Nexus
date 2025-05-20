@@ -190,6 +190,7 @@ void CBindsWindow::RenderInputBindsTable(const std::unordered_map<std::string, I
 			ImGui::PopID();
 
 			ImGui::TableSetColumnIndex(2);
+			/* FIXME: This access the DownOnly union field. */
 			if (inputBind.Bind.Handler_DownOnly == nullptr)
 			{
 				if (ImGui::SmallButton(("X##" + identifier).c_str()))
