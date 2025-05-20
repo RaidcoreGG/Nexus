@@ -124,13 +124,6 @@ std::string IBToString(const InputBind& aInputBind, bool aPadded)
 	{
 		return NULLSTR;
 	}
-	if (aInputBind.Device == EInputDevice::Keyboard
-		&& !aInputBind.Alt
-		&& !aInputBind.Ctrl
-		&& !aInputBind.Shift)
-	{
-		return NULLSTR;
-	}
 
 	char buff[100]{};
 	std::string str;
