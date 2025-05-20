@@ -31,7 +31,7 @@
 #include "UI/Widgets/Alerts/Alerts.h"
 #include "UI/Widgets/QuickAccess/QuickAccess.h"
 #include "imgui/imgui.h"
-#include "Inputs/InputBinds/InputBindHandler.h"
+#include "Inputs/InputBinds/IbApi.h"
 #include "Inputs/RawInput/RiApi.h"
 #include "minhook/mh_hook.h"
 #include "Services/DataLink/DlApi.h"

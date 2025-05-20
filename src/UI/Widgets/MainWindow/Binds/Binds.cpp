@@ -16,7 +16,7 @@
 #include "Consts.h"
 #include "Context.h"
 #include "Index.h"
-#include "Inputs/InputBinds/ManagedInputBind.h"
+#include "Inputs/InputBinds/IbMapping.h"
 #include "Renderer.h"
 #include "resource.h"
 #include "Inputs/GameBinds/GbConst.h"
@@ -190,7 +190,7 @@ void CBindsWindow::RenderInputBindsTable(const std::unordered_map<std::string, I
 			ImGui::PopID();
 
 			ImGui::TableSetColumnIndex(2);
-			if (inputBind.Bind.Handler == nullptr)
+			if (inputBind.Bind.Handler_DownOnly == nullptr)
 			{
 				if (ImGui::SmallButton(("X##" + identifier).c_str()))
 				{

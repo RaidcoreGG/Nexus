@@ -14,7 +14,7 @@
 #include "AddonAPI.h"
 #include "Events/EvtFuncDefs.h"
 #include "Inputs/GameBinds/GbEnum.h"
-#include "Inputs/InputBinds/FuncDefs.h"
+#include "Inputs/InputBinds/IbFuncDefs.h"
 #include "Inputs/RawInput/RiFuncDefs.h"
 #include "Services/Logging/ELogLevel.h"
 #include "Services/Textures/FuncDefs.h"
@@ -144,7 +144,7 @@ namespace ADDONAPI
 		/// RegisterWithStruct:
 		/// 	[Revision 1] Addon API wrapper function for Register from struct.
 		///----------------------------------------------------------------------------------------------------
-		void RegisterWithStruct(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, LegacyInputBind aInputBind);
+		void RegisterWithStruct(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, InputBindV1 aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// RegisterWithString:
@@ -156,7 +156,7 @@ namespace ADDONAPI
 		/// RegisterWithStruct:
 		/// 	[Revision 2] Addon API wrapper function for Register from struct.
 		///----------------------------------------------------------------------------------------------------
-		void RegisterWithStruct2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, LegacyInputBind aInputBind);
+		void RegisterWithStruct2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, InputBindV1 aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// InvokeInputBind:

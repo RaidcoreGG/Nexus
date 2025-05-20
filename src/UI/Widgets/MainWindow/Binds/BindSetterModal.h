@@ -13,7 +13,7 @@
 
 #include "UI/Controls/CtlModal.h"
 #include "UI/DisplayBinds.h"
-#include "Inputs/InputBinds/InputBind.h"
+#include "Inputs/InputBinds/IbBindV2.h"
 #include "Inputs/GameBinds/GbEnum.h"
 
 ///----------------------------------------------------------------------------------------------------

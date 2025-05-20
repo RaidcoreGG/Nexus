@@ -1,24 +1,23 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  InputBindHandler.h
+/// Name         :  IbApi.h
 /// Description  :  Provides functions for InputBinds.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef INPUTBINDHANDLER_H
-#define INPUTBINDHANDLER_H
+#ifndef IBAPI_H
+#define IBAPI_H
 
 #include <map>
 #include <mutex>
 #include <string>
-#include <vector>
-#include <Windows.h>
+#include <windows.h>
 
 #include "Events/EventApi.h"
-#include "FuncDefs.h"
-#include "InputBind.h"
-#include "ManagedInputBind.h"
+#include "IbFuncDefs.h"
+#include "IbBindV2.h"
+#include "IbMapping.h"
 #include "Services/Logging/LogHandler.h"
 
 constexpr const char* CH_INPUTBINDS = "InputBinds";
@@ -30,26 +29,9 @@ class CInputBindApi
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
-	/// IBFromString:
-	/// 	Helper function to create a InputBind from a string.
-	///----------------------------------------------------------------------------------------------------
-	static InputBind IBFromString(std::string aInputBind);
-
-	///----------------------------------------------------------------------------------------------------
-	/// IBToString:
-	/// 	Helper function to get the display string of a InputBind.
-	///----------------------------------------------------------------------------------------------------
-	static std::string IBToString(InputBind aKebyind, bool aPadded = false);
-
-	public:
-	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
 	CInputBindApi(CEventApi* aEventApi, CLogHandler* aLogger);
-	///----------------------------------------------------------------------------------------------------
-	/// dtor
-	///----------------------------------------------------------------------------------------------------
-	~CInputBindApi() = default;
 
 	///----------------------------------------------------------------------------------------------------
 	/// WndProc:
@@ -62,14 +44,14 @@ class CInputBindApi
 	/// 	Generates and registers a InputBind from the given string with the given identifier and handler,
 	/// 	if no bind was previously stored the given one will be used.
 	///----------------------------------------------------------------------------------------------------
-	void Register(const char* aIdentifier, EInputBindHandlerType aInputBindHandlerType, void* aInputBindHandler, const char* aInputBind);
+	void Register(const char* aIdentifier, EIbHandlerType aInputBindHandlerType, void* aInputBindHandler, const char* aInputBind);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Register:
 	/// 	Registers a InputBind from the given struct with the given identifier and handler,
 	/// 	if no bind was previously stored the given one will be used.
 	///----------------------------------------------------------------------------------------------------
-	void Register(const char* aIdentifier, EInputBindHandlerType aInputBindHandlerType, void* aInputBindHandler, InputBind aInputBind);
+	void Register(const char* aIdentifier, EIbHandlerType aInputBindHandlerType, void* aInputBindHandler, InputBind aInputBind);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Deregister:
@@ -124,7 +106,7 @@ class CInputBindApi
 	/// GetRegistry:
 	/// 	Returns a copy of the registry.
 	///----------------------------------------------------------------------------------------------------
-	std::map<std::string, ManagedInputBind> GetRegistry() const;
+	std::map<std::string, IbMapping> GetRegistry() const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetCapturedInputBind:
@@ -145,29 +127,41 @@ class CInputBindApi
 	void EndCapturing();
 
 	private:
-	CEventApi*                              EventApi          = nullptr;
-	CLogHandler*                            Logger            = nullptr;
+	CEventApi*                       EventApi = nullptr;
+	CLogHandler*                     Logger   = nullptr;
 
-	mutable std::mutex                      Mutex;
-	std::map<std::string, ManagedInputBind> Registry;
+	mutable std::mutex               Mutex;
+	std::map<std::string, IbMapping> Registry;
 
-	bool                                    IsCapturing;
-	InputBind                               CapturedInputBind;
+	bool                             IsCapturing;
+	InputBind                        CapturedInputBind;
 
-	bool                                    IsAltHeld;
-	bool                                    IsCtrlHeld;
-	bool                                    IsShiftHeld;
-	std::map<std::string, ManagedInputBind> HeldInputBinds;
+	bool                             IsAltHeld;
+	bool                             IsCtrlHeld;
+	bool                             IsShiftHeld;
+	std::map<std::string, IbMapping> HeldInputBinds;
+
+	///----------------------------------------------------------------------------------------------------
+	/// LoadSafe:
+	/// 	Loads the InputBinds. Threadafe.
+	///----------------------------------------------------------------------------------------------------
+	void LoadSafe();
 
 	///----------------------------------------------------------------------------------------------------
 	/// Load:
-	/// 	Loads the InputBinds.
+	/// 	Loads the InputBinds. Not threadsafe.
 	///----------------------------------------------------------------------------------------------------
 	void Load();
 
 	///----------------------------------------------------------------------------------------------------
+	/// SaveSafe:
+	/// 	Saves the InputBinds. Threadafe.
+	///----------------------------------------------------------------------------------------------------
+	void SaveSafe();
+
+	///----------------------------------------------------------------------------------------------------
 	/// Save:
-	/// 	Saves the InputBinds.
+	/// 	Saves the InputBinds. Not threadsafe.
 	///----------------------------------------------------------------------------------------------------
 	void Save();
 
@@ -188,19 +182,13 @@ class CInputBindApi
 	/// Release:
 	/// 	Releases all InputBinds matching the criteria and invokes a release.
 	///----------------------------------------------------------------------------------------------------
-	void Release(EInputBindType aType, unsigned short aCode);
+	void Release(EInputDevice aDevice, unsigned short aCode);
 
 	///----------------------------------------------------------------------------------------------------
 	/// ReleaseAll:
 	/// 	Clears all currently held key states and InputBinds and invokes a release.
 	///----------------------------------------------------------------------------------------------------
 	void ReleaseAll();
-
-	///----------------------------------------------------------------------------------------------------
-	/// FindInputBind:
-	/// 	Finds a registry entry based on the InputBind values.
-	///----------------------------------------------------------------------------------------------------
-	std::map<std::string, ManagedInputBind>::iterator FindInputBind(const InputBind& aInputBind);
 };
 
 #endif

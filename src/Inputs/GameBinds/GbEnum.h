@@ -6,8 +6,8 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef EGAMEBINDS_H
-#define EGAMEBINDS_H
+#ifndef GBENUM_H
+#define GBENUM_H
 
 #include <cstdint>
 

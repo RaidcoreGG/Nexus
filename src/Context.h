@@ -8,7 +8,7 @@
 
 #include "Events/EventApi.h"
 #include "Inputs/GameBinds/GbApi.h"
-#include "Inputs/InputBinds/InputBindHandler.h"
+#include "Inputs/InputBinds/IbApi.h"
 #include "Inputs/RawInput/RiApi.h"
 #include "Loader/AddonVersion.h"
 #include "Services/DataLink/DlApi.h"

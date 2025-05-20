@@ -14,7 +14,7 @@
 
 #include "Context.h"
 #include "Inputs/GameBinds/GbApi.h"
-#include "Inputs/InputBinds/InputBindHandler.h"
+#include "Inputs/InputBinds/IbApi.h"
 #include "Loader/Loader.h"
 #include "Services/API/ApiClient.h"
 #include "Services/DataLink/DlApi.h"

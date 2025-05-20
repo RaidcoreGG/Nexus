@@ -21,6 +21,7 @@
 #include "Services/Settings/Settings.h"
 #include "Shared.h"
 #include "UI/UIContext.h"
+#include "Inputs/InputBinds/IbConst.h"
 
 #define GW2_QUICKACCESS_ITEMS 10;
 
@@ -115,9 +116,9 @@ void CQuickAccess::Render()
 		for (auto& [identifier, shortcut] : this->Registry)
 		{
 			const InputBind& ib = this->InputBindApi->Get(shortcut.IBIdentifier);
-			if (ib.Type != EInputBindType::None)
+			if (ib.Device != EInputDevice::None)
 			{
-				shortcut.IBText = CInputBindApi::IBToString(ib, true);
+				shortcut.IBText = IBToString(ib, true);
 			}
 			else
 			{
@@ -417,9 +418,9 @@ void CQuickAccess::AddShortcut(const char* aIdentifier, const char* aTextureIden
 			sh.IBIdentifier = aInputBindIdentifier;
 
 			const InputBind& ib = this->InputBindApi->Get(aInputBindIdentifier);
-			if (ib.Type != EInputBindType::None)
+			if (ib.Device != EInputDevice::None)
 			{
-				sh.IBText = CInputBindApi::IBToString(ib, true);
+				sh.IBText = IBToString(ib, true);
 			}
 
 			sh.TooltipText = aTooltipText;

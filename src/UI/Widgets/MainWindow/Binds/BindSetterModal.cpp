@@ -10,6 +10,7 @@
 
 #include "Context.h"
 #include "Inputs/GameBinds/GbConst.h"
+#include "Inputs/InputBinds/IbConst.h"
 
 CBindSetterModal::CBindSetterModal()
 {
@@ -32,7 +33,7 @@ void CBindSetterModal::RenderContent()
 	}
 	else
 	{
-		ImGui::Text(CInputBindApi::IBToString(this->Capture, true).c_str());
+		ImGui::Text(IBToString(this->Capture, true).c_str());
 	}
 
 	if (this->Type == EBindEditType::Nexus)
@@ -79,17 +80,17 @@ void CBindSetterModal::OnOpening()
 	{
 		case EBindEditType::Nexus:
 		{
-			this->PreviousBindText = CInputBindApi::IBToString(ibapi->Get(this->NexusBindID), true);
+			this->PreviousBindText = IBToString(ibapi->Get(this->NexusBindID), true);
 			break;
 		}
 		case EBindEditType::Game:
 		{
-			this->PreviousBindText = CInputBindApi::IBToString(gbapi->Get(this->GameBindID).Primary, true);
+			this->PreviousBindText = IBToString(gbapi->Get(this->GameBindID).Primary, true);
 			break;
 		}
 		case EBindEditType::Game2:
 		{
-			this->PreviousBindText = CInputBindApi::IBToString(gbapi->Get(this->GameBindID).Secondary, true);
+			this->PreviousBindText = IBToString(gbapi->Get(this->GameBindID).Secondary, true);
 			break;
 		}
 	}

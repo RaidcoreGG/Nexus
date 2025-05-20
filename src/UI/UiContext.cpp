@@ -35,6 +35,7 @@
 #include "Util/Time.h"
 #include "Util/Strings.h"
 #include "Inputs/GameBinds/GbConst.h"
+#include "Inputs/InputBinds/IbConst.h"
 
 #include "UI/Widgets/MainWindow/About/About.h"
 #include "UI/Widgets/MainWindow/Addons/Addons.h"
@@ -304,12 +305,12 @@ CUiContext::CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CText
 	//this->MainWindow->AddWindow(aboutWnd);
 
 	/* register InputBinds */
-	this->InputBindApi->Register(KB_MENU,          EIBHType::DownOnly, UIRoot::OnInputBind, "CTRL+O");
-	this->InputBindApi->Register(KB_ADDONS,        EIBHType::DownOnly, UIRoot::OnInputBind, NULLSTR);
-	this->InputBindApi->Register(KB_OPTIONS,       EIBHType::DownOnly, UIRoot::OnInputBind, NULLSTR);
-	this->InputBindApi->Register(KB_LOG,           EIBHType::DownOnly, UIRoot::OnInputBind, NULLSTR);
-	this->InputBindApi->Register(KB_DEBUG,         EIBHType::DownOnly, UIRoot::OnInputBind, NULLSTR);
-	this->InputBindApi->Register(KB_TOGGLEHIDEUI,  EIBHType::DownOnly, UIRoot::OnInputBind, "CTRL+H");
+	this->InputBindApi->Register(KB_MENU,          EIbHandlerType::DownOnly, UIRoot::OnInputBind, "CTRL+O");
+	this->InputBindApi->Register(KB_ADDONS,        EIbHandlerType::DownOnly, UIRoot::OnInputBind, NULLSTR);
+	this->InputBindApi->Register(KB_OPTIONS,       EIbHandlerType::DownOnly, UIRoot::OnInputBind, NULLSTR);
+	this->InputBindApi->Register(KB_LOG,           EIbHandlerType::DownOnly, UIRoot::OnInputBind, NULLSTR);
+	this->InputBindApi->Register(KB_DEBUG,         EIbHandlerType::DownOnly, UIRoot::OnInputBind, NULLSTR);
+	this->InputBindApi->Register(KB_TOGGLEHIDEUI,  EIbHandlerType::DownOnly, UIRoot::OnInputBind, "CTRL+H");
 
 	this->EscapeClose->Register("Nexus", this->MainWindow->GetVisibleStatePtr());
 
@@ -1138,12 +1139,12 @@ void CUiContext::UpdateDisplayInputBinds()
 	CInputBindApi* inputBindApi = ctx->GetInputBindApi();
 
 	/* copy of all InputBinds */
-	std::map<std::string, ManagedInputBind> InputBindRegistry = inputBindApi->GetRegistry();
+	std::map<std::string, IbMapping> InputBindRegistry = inputBindApi->GetRegistry();
 
 	/* acquire categories */
 	for (auto& [identifier, inputBind] : InputBindRegistry)
 	{
-		std::string owner = Loader::GetOwner(inputBind.Handler);
+		std::string owner = Loader::GetOwner(inputBind.Handler_DownOnly);
 
 		auto it = std::find_if(this->DisplayInputBinds.begin(), this->DisplayInputBinds.end(), [owner](InputBindCategory category) { return category.Name == owner; });
 
@@ -1153,7 +1154,7 @@ void CUiContext::UpdateDisplayInputBinds()
 			cat.Name = owner;
 			cat.InputBinds[identifier] =
 			{
-				CInputBindApi::IBToString(inputBind.Bind, true),
+				IBToString(inputBind.Bind, true),
 				inputBind
 			};
 			this->DisplayInputBinds.push_back(cat);
@@ -1162,7 +1163,7 @@ void CUiContext::UpdateDisplayInputBinds()
 		{
 			it->InputBinds[identifier] =
 			{
-				CInputBindApi::IBToString(inputBind.Bind, true),
+				IBToString(inputBind.Bind, true),
 				inputBind
 			};
 		}
@@ -1195,9 +1196,9 @@ void CUiContext::UpdateDisplayGameBinds()
 			cat.GameInputBinds[identifier] =
 			{
 				NameFrom(identifier),
-				CInputBindApi::IBToString(inputBind.Primary, true),
+				IBToString(inputBind.Primary, true),
 				inputBind.Primary,
-				CInputBindApi::IBToString(inputBind.Secondary, true),
+				IBToString(inputBind.Secondary, true),
 				inputBind.Secondary
 			};
 			this->DisplayGameBinds.push_back(cat);
@@ -1207,9 +1208,9 @@ void CUiContext::UpdateDisplayGameBinds()
 			it->GameInputBinds[identifier] =
 			{
 				NameFrom(identifier),
-				CInputBindApi::IBToString(inputBind.Primary, true),
+				IBToString(inputBind.Primary, true),
 				inputBind.Primary,
-				CInputBindApi::IBToString(inputBind.Secondary, true),
+				IBToString(inputBind.Secondary, true),
 				inputBind.Secondary
 			};
 		}

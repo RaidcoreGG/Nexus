@@ -14,7 +14,7 @@
 #include "Events/EventApi.h"
 #include "Index.h"
 #include "Inputs/GameBinds/GbApi.h"
-#include "Inputs/InputBinds/InputBindHandler.h"
+#include "Inputs/InputBinds/IbApi.h"
 #include "Inputs/RawInput/RiApi.h"
 #include "Renderer.h"
 #include "Services/DataLink/DlApi.h"
@@ -147,25 +147,25 @@ namespace ADDONAPI
 		void RegisterWithString(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, const char* aInputBind)
 		{
 			assert(s_InputBindApi);
-			s_InputBindApi->Register(aIdentifier, EInputBindHandlerType::DownOnly, aInputBindHandler, aInputBind);
+			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownOnly, aInputBindHandler, aInputBind);
 		}
 
-		void RegisterWithStruct(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, LegacyInputBind aInputBind)
+		void RegisterWithStruct(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, InputBindV1 aInputBind)
 		{
 			assert(s_InputBindApi);
-			s_InputBindApi->Register(aIdentifier, EInputBindHandlerType::DownOnly, aInputBindHandler, aInputBind);
+			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownOnly, aInputBindHandler, aInputBind);
 		}
 
 		void RegisterWithString2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, const char* aInputBind)
 		{
 			assert(s_InputBindApi);
-			s_InputBindApi->Register(aIdentifier, EInputBindHandlerType::DownAndRelease, aInputBindHandler, aInputBind);
+			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownAndRelease, aInputBindHandler, aInputBind);
 		}
 
-		void RegisterWithStruct2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, LegacyInputBind aInputBind)
+		void RegisterWithStruct2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, InputBindV1 aInputBind)
 		{
 			assert(s_InputBindApi);
-			s_InputBindApi->Register(aIdentifier, EInputBindHandlerType::DownAndRelease, aInputBindHandler, aInputBind);
+			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownAndRelease, aInputBindHandler, aInputBind);
 		}
 
 		void InvokeInputBind(const char* aIdentifier, bool aIsRelease)

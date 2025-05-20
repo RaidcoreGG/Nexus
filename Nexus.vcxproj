@@ -14,6 +14,7 @@
     <ClCompile Include="src\Context.cpp" />
     <ClCompile Include="src\Inputs\GameBinds\GbApi.cpp" />
     <ClCompile Include="src\Inputs\GameBinds\GbConst.cpp" />
+    <ClCompile Include="src\Inputs\InputBinds\IbConst.cpp" />
     <ClCompile Include="src\Loader\AddonVersion.cpp" />
     <ClCompile Include="src\Loader\API\ApiFunctionMapper.cpp" />
     <ClCompile Include="src\Services\API\ActiveToken.cpp" />
@@ -34,8 +35,8 @@
     <ClCompile Include="src\thirdparty\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\Inputs\InputBinds\InputBind.cpp" />
-    <ClCompile Include="src\Inputs\InputBinds\InputBindHandler.cpp" />
+    <ClCompile Include="src\Inputs\InputBinds\IbBindV2.cpp" />
+    <ClCompile Include="src\Inputs\InputBinds\IbApi.cpp" />
     <ClCompile Include="src\Loader\AddonDefinition.cpp" />
     <ClCompile Include="src\Loader\Loader.cpp" />
     <ClCompile Include="src\Services\Logging\CFileLogger.cpp" />
@@ -98,8 +99,10 @@
     <ClInclude Include="src\Inputs\GameBinds\GbConst.h" />
     <ClInclude Include="src\Inputs\GameBinds\GbFuncDefs.h" />
     <ClInclude Include="src\Inputs\GameBinds\GbApi.h" />
-    <ClInclude Include="src\Inputs\InputBinds\EInputBindHandlerType.h" />
-    <ClInclude Include="src\Inputs\InputBinds\EInputBindType.h" />
+    <ClInclude Include="src\Inputs\InputBinds\IbBind.h" />
+    <ClInclude Include="src\Inputs\InputBinds\IbConst.h" />
+    <ClInclude Include="src\Inputs\InputBinds\IbEnum.h" />
+    <ClInclude Include="src\Inputs\InputBinds\IbMapping.h" />
     <ClInclude Include="src\Loader\AddonVersion.h" />
     <ClInclude Include="src\Loader\API\ApiFunctionMapper.h" />
     <ClInclude Include="src\Remote.h" />
@@ -130,10 +133,9 @@
     <ClInclude Include="src\thirdparty\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\thirdparty\imgui\imstb_textedit.h" />
     <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h" />
-    <ClInclude Include="src\Inputs\InputBinds\ManagedInputBind.h" />
-    <ClInclude Include="src\Inputs\InputBinds\FuncDefs.h" />
-    <ClInclude Include="src\Inputs\InputBinds\InputBind.h" />
-    <ClInclude Include="src\Inputs\InputBinds\InputBindHandler.h" />
+    <ClInclude Include="src\Inputs\InputBinds\IbFuncDefs.h" />
+    <ClInclude Include="src\Inputs\InputBinds\IbBindV2.h" />
+    <ClInclude Include="src\Inputs\InputBinds\IbApi.h" />
     <ClInclude Include="src\Loader\Addon.h" />
     <ClInclude Include="src\Loader\ArcDPS.h" />
     <ClInclude Include="src\Loader\EAddonFlags.h" />
