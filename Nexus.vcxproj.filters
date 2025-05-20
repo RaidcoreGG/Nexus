@@ -103,9 +103,6 @@
     <Filter Include="Inputs\InputBinds">
       <UniqueIdentifier>{f0552fcd-0842-4914-bd35-54f18d11b0cd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Inputs\InputBinds\Enums">
-      <UniqueIdentifier>{5f7a3796-ab71-4979-ace3-8063d007c8b8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="UI">
       <UniqueIdentifier>{82694dd7-d18b-47e2-b118-c0f555122384}</UniqueIdentifier>
     </Filter>
@@ -234,7 +231,7 @@
     <ClCompile Include="src\Events\EventApi.cpp">
       <Filter>Events</Filter>
     </ClCompile>
-    <ClCompile Include="src\Inputs\InputBinds\InputBindHandler.cpp">
+    <ClCompile Include="src\Inputs\InputBinds\IbApi.cpp">
       <Filter>Inputs\InputBinds</Filter>
     </ClCompile>
     <ClCompile Include="src\Index.cpp">
@@ -249,7 +246,7 @@
     <ClCompile Include="src\Shared.cpp">
       <Filter>_GLOBAL</Filter>
     </ClCompile>
-    <ClCompile Include="src\Inputs\InputBinds\InputBind.cpp">
+    <ClCompile Include="src\Inputs\InputBinds\IbBindV2.cpp">
       <Filter>Inputs\InputBinds</Filter>
     </ClCompile>
     <ClCompile Include="src\Loader\Loader.cpp">
@@ -420,6 +417,9 @@
     <ClCompile Include="src\UI\Widgets\MainWindow\Binds\BindSetterModal.cpp">
       <Filter>UI\Widgets\MainWindow\Pages\Binds</Filter>
     </ClCompile>
+    <ClCompile Include="src\Inputs\InputBinds\IbConst.cpp">
+      <Filter>Inputs\InputBinds</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h">
@@ -482,7 +482,7 @@
     <ClInclude Include="src\Events\EventApi.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="src\Inputs\InputBinds\InputBindHandler.h">
+    <ClInclude Include="src\Inputs\InputBinds\IbApi.h">
       <Filter>Inputs\InputBinds</Filter>
     </ClInclude>
     <ClInclude Include="src\State.h">
@@ -500,7 +500,7 @@
     <ClInclude Include="src\Services\Localization\Localization.h">
       <Filter>Services\Localization</Filter>
     </ClInclude>
-    <ClInclude Include="src\Inputs\InputBinds\InputBind.h">
+    <ClInclude Include="src\Inputs\InputBinds\IbBindV2.h">
       <Filter>Inputs\InputBinds</Filter>
     </ClInclude>
     <ClInclude Include="src\thirdparty\imgui\imgui_extensions.h">
@@ -524,7 +524,7 @@
     <ClInclude Include="src\Events\EvtFuncDefs.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="src\Inputs\InputBinds\FuncDefs.h">
+    <ClInclude Include="src\Inputs\InputBinds\IbFuncDefs.h">
       <Filter>Inputs\InputBinds</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\Logging\FuncDefs.h">
@@ -544,9 +544,6 @@
     </ClInclude>
     <ClInclude Include="src\Consts.h">
       <Filter>_GLOBAL</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Inputs\InputBinds\ManagedInputBind.h">
-      <Filter>Inputs\InputBinds</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\Settings\Settings.h">
       <Filter>Services\Settings</Filter>
@@ -1103,12 +1100,6 @@
     <ClInclude Include="src\Util\Memory.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="src\Inputs\InputBinds\EInputBindHandlerType.h">
-      <Filter>Inputs\InputBinds\Enums</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Inputs\InputBinds\EInputBindType.h">
-      <Filter>Inputs\InputBinds\Enums</Filter>
-    </ClInclude>
     <ClInclude Include="src\UI\UiContext.h">
       <Filter>UI</Filter>
     </ClInclude>
@@ -1237,6 +1228,18 @@
     </ClInclude>
     <ClInclude Include="src\UI\Widgets\MainWindow\Binds\BindSetterModal.h">
       <Filter>UI\Widgets\MainWindow\Pages\Binds</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Inputs\InputBinds\IbEnum.h">
+      <Filter>Inputs\InputBinds</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Inputs\InputBinds\IbBind.h">
+      <Filter>Inputs\InputBinds</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Inputs\InputBinds\IbConst.h">
+      <Filter>Inputs\InputBinds</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Inputs\InputBinds\IbMapping.h">
+      <Filter>Inputs\InputBinds</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

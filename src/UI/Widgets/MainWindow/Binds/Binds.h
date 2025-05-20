@@ -14,7 +14,7 @@
 #include <vector>
 
 #include "Inputs/GameBinds/GbEnum.h"
-#include "Inputs/InputBinds/ManagedInputBind.h"
+#include "Inputs/InputBinds/IbMapping.h"
 #include "UI/Controls/CtlSubWindow.h"
 #include "UI/DisplayBinds.h"
 #include "BindSetterModal.h"

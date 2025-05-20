@@ -1,25 +1,26 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  ManagedInputBind.h
-/// Description  :  ManagedInputBind struct definition.
+/// Name         :  IbBind.h
+/// Description  :  InputBind struct definition.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef MANAGEDINPUTBIND_H
-#define MANAGEDINPUTBIND_H
+#ifndef IBBIND_H
+#define IBBIND_H
 
-#include "InputBind.h"
-#include "EInputBindHandlerType.h"
+#include "IbEnum.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// ManagedInputBind Struct
+/// InputBindV1 Struct
+/// 	Old Keybind struct used for backwards compatibility within APIs.
 ///----------------------------------------------------------------------------------------------------
-struct ManagedInputBind
+struct InputBindV1
 {
-	InputBind				Bind;
-	EInputBindHandlerType	HandlerType;
-	void*					Handler;
+	unsigned short Key;
+	bool           Alt;
+	bool           Ctrl;
+	bool           Shift;
 };
 
 #endif

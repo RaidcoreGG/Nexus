@@ -18,7 +18,7 @@
 #include "ERenderType.h"
 #include "Events/EventApi.h"
 #include "FuncDefs.h"
-#include "Inputs/InputBinds/InputBindHandler.h"
+#include "Inputs/InputBinds/IbApi.h"
 #include "Services/DataLink/DlApi.h"
 #include "Services/Localization/Localization.h"
 #include "Services/Logging/LogHandler.h"

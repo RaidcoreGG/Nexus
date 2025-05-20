@@ -16,7 +16,7 @@
 #include "Consts.h"
 #include "Context.h"
 #include "Events/EventApi.h"
-#include "Inputs/InputBinds/InputBindHandler.h"
+#include "Inputs/InputBinds/IbApi.h"
 #include "resource.h"
 #include "Util/MD5.h"
 #include "Util/Strings.h"
@@ -40,7 +40,7 @@ CDebugWindow::CDebugWindow()
 
 	/* bind mumble overlay */
 	CContext* ctx = CContext::GetContext();
-	ctx->GetInputBindApi()->Register(KB_MUMBLEOVERLAY, EInputBindHandlerType::DownOnly, DebugWindow_OnInputBind, NULLSTR);
+	ctx->GetInputBindApi()->Register(KB_MUMBLEOVERLAY, EIbHandlerType::DownOnly, DebugWindow_OnInputBind, NULLSTR);
 	DebugWindow = this;
 }
 
@@ -139,18 +139,33 @@ void CDebugWindow::TabInputBinds()
 
 	if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 	{
-		std::map<std::string, ManagedInputBind> inputBindRegistry = CContext::GetContext()->GetInputBindApi()->GetRegistry();
+		std::map<std::string, IbMapping> inputBindRegistry = CContext::GetContext()->GetInputBindApi()->GetRegistry();
 
 		for (auto& [identifier, inputBind] : inputBindRegistry)
 		{
-			ImGui::Text(identifier.c_str()); ImGui::SameLine();
-			if (inputBind.Handler)
+			if (ImGui::TreeNode(identifier.c_str()))
 			{
-				ImGui::TextDisabled("Handler: %p", inputBind.Handler);
-			}
-			else
-			{
-				ImGui::TextDisabled("Handler: (null)");
+				ImGui::TextDisabled("\tType: %d", inputBind.HandlerType);
+				switch (inputBind.HandlerType)
+				{
+					default:
+					case EIbHandlerType::None:
+					{
+						ImGui::TextDisabled("\tHandler: -");
+						break;
+					}
+					case EIbHandlerType::DownOnly:
+					{
+						ImGui::TextDisabled("\tHandler: %p", inputBind.Handler_DownOnly);
+						break;
+					}
+					case EIbHandlerType::DownAndRelease:
+					{
+						ImGui::TextDisabled("\tHandler: %p", inputBind.Handler_DownAndRelease);
+						break;
+					}
+				}
+				ImGui::TreePop();
 			}
 		}
 	}

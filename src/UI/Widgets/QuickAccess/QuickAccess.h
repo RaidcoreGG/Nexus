@@ -17,7 +17,7 @@
 
 #include "EQAPosition.h"
 #include "EQAVisibility.h"
-#include "Inputs/InputBinds/InputBindHandler.h"
+#include "Inputs/InputBinds/IbApi.h"
 #include "Loader/NexusLinkData.h"
 #include "Services/DataLink/DlApi.h"
 #include "Services/Localization/Localization.h"

@@ -13,19 +13,19 @@
 #include <unordered_map>
 
 #include "Inputs/GameBinds/GbEnum.h"
-#include "Inputs/InputBinds/ManagedInputBind.h"
-#include "Inputs/InputBinds/InputBind.h"
+#include "Inputs/InputBinds/IbMapping.h"
+#include "Inputs/InputBinds/IbBindV2.h"
 
 struct InputBindPacked
 {
-	std::string      KeysText;
-	ManagedInputBind Bind;
+	std::string KeysText;
+	IbMapping   Bind;
 };
 
 struct InputBindCategory
 {
-	std::string                                         Name;
-	std::unordered_map<std::string, InputBindPacked>    InputBinds;
+	std::string                                      Name;
+	std::unordered_map<std::string, InputBindPacked> InputBinds;
 };
 
 struct GameInputBindPacked

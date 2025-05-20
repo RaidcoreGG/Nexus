@@ -1,22 +1,29 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  EInputBindHandlerType.h
-/// Description  :  EInputBindHandlerType enum definition.
+/// Name         :  IbMapping.h
+/// Description  :  Mapped InputBind struct definition.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef INPUTBINDHANDLERTYPE_H
-#define INPUTBINDHANDLERTYPE_H
+#ifndef IBMAPPING_H
+#define IBMAPPING_H
+
+#include "IbBindV2.h"
+#include "IbEnum.h"
+#include "IbFuncDefs.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// EInputBindHandlerType Enum
+/// IbMapping Struct
 ///----------------------------------------------------------------------------------------------------
-typedef enum class EInputBindHandlerType
+struct IbMapping
 {
-	None,
-	DownOnly,
-	DownAndRelease
-} EIBHType;
+	InputBind      Bind;
+	EIbHandlerType HandlerType;
+	union {
+		INPUTBINDS_PROCESS  Handler_DownOnly;
+		INPUTBINDS_PROCESS2 Handler_DownAndRelease;
+	};
+};
 
 #endif

@@ -16,7 +16,7 @@
 #include "GbEnum.h"
 
 #include "Events/EventApi.h"
-#include "Inputs/InputBinds/InputBind.h"
+#include "Inputs/InputBinds/IbBindV2.h"
 #include "Inputs/RawInput/RiApi.h"
 #include "Services/Logging/LogHandler.h"
 #include "Services/Localization/Localization.h"
