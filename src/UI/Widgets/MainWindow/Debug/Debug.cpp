@@ -143,14 +143,26 @@ void CDebugWindow::TabInputBinds()
 
 		for (auto& [identifier, inputBind] : inputBindRegistry)
 		{
-			ImGui::Text(identifier.c_str()); ImGui::SameLine();
-			if (inputBind.Handler_DownOnly)
+			ImGui::Text(identifier.c_str());
+			ImGui::TextDisabled("\tType: %d", inputBind.HandlerType);
+			switch (inputBind.HandlerType)
 			{
-				ImGui::TextDisabled("Handler: %p", inputBind.Handler_DownOnly);
-			}
-			else
-			{
-				ImGui::TextDisabled("Handler: (null)");
+				default:
+				case EIbHandlerType::None:
+				{
+					ImGui::TextDisabled("\tHandler: -");
+					break;
+				}
+				case EIbHandlerType::DownOnly:
+				{
+					ImGui::TextDisabled("\tHandler: %p", inputBind.Handler_DownOnly);
+					break;
+				}
+				case EIbHandlerType::DownAndRelease:
+				{
+					ImGui::TextDisabled("\tHandler: %p", inputBind.Handler_DownAndRelease);
+					break;
+				}
 			}
 		}
 	}
