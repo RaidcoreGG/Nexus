@@ -454,14 +454,11 @@ void CUiContext::Render()
 		{
 			/* license agreement */
 			static CLicenseAgreementModal s_Modal = {};
-			static bool s_OpenedModal = false;
-			
-			if (!s_OpenedModal)
-			{
+			static bool s_Opened = [] {
 				s_Modal.OpenModal();
-				s_OpenedModal = true;
-			}
-
+				return true;
+			}();
+			
 			if (s_Modal.Render())
 			{
 				/* Update state. */
