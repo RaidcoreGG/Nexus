@@ -118,6 +118,7 @@
     <ClInclude Include="src\Consts.h" />
     <ClInclude Include="src\CrashHandler.h" />
     <ClInclude Include="src\Services\DataLink\DlApi.h" />
+    <ClInclude Include="src\Services\DataLink\DlEnum.h" />
     <ClInclude Include="src\Services\DataLink\DlFuncDefs.h" />
     <ClInclude Include="src\Services\DataLink\DlLinkedResource.h" />
     <ClInclude Include="src\Events\EventApi.h" />

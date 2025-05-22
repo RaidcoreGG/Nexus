@@ -1247,6 +1247,9 @@
     <ClInclude Include="src\Inputs\InputBinds\IbCapture.h">
       <Filter>Inputs\InputBinds</Filter>
     </ClInclude>
+    <ClInclude Include="src\Services\DataLink\DlEnum.h">
+      <Filter>Services\DataLink</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\Nexus.rc">
