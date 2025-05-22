@@ -159,14 +159,14 @@ void CInputBindApi::Register(const char* aIdentifier, EIbHandlerType aInputBindH
 		mapping.HandlerType = aInputBindHandlerType;
 		switch (aInputBindHandlerType)
 		{
-			case EIbHandlerType::DownOnly:
+			case EIbHandlerType::DownAsync:
 			{
-				mapping.Handler_DownOnly = (INPUTBINDS_PROCESS)aInputBindHandler;
+				mapping.Handler_DownOnlyAsync = (INPUTBINDS_PROCESS)aInputBindHandler;
 				break;
 			}
-			case EIbHandlerType::DownAndRelease:
+			case EIbHandlerType::DownReleaseAsync:
 			{
-				mapping.Handler_DownAndRelease = (INPUTBINDS_PROCESS2)aInputBindHandler;
+				mapping.Handler_DownReleaseAsync = (INPUTBINDS_PROCESS2)aInputBindHandler;
 				break;
 			}
 		}
@@ -184,14 +184,14 @@ void CInputBindApi::Register(const char* aIdentifier, EIbHandlerType aInputBindH
 		it->second.HandlerType = aInputBindHandlerType;
 		switch (aInputBindHandlerType)
 		{
-			case EIbHandlerType::DownOnly:
+			case EIbHandlerType::DownAsync:
 			{
-				it->second.Handler_DownOnly = (INPUTBINDS_PROCESS)aInputBindHandler;
+				it->second.Handler_DownOnlyAsync = (INPUTBINDS_PROCESS)aInputBindHandler;
 				break;
 			}
-			case EIbHandlerType::DownAndRelease:
+			case EIbHandlerType::DownReleaseAsync:
 			{
-				it->second.Handler_DownAndRelease = (INPUTBINDS_PROCESS2)aInputBindHandler;
+				it->second.Handler_DownReleaseAsync = (INPUTBINDS_PROCESS2)aInputBindHandler;
 				break;
 			}
 		}
@@ -222,14 +222,14 @@ void CInputBindApi::Deregister(const char* aIdentifier)
 	{
 		switch (it->second.HandlerType)
 		{
-			case EIbHandlerType::DownOnly:
+			case EIbHandlerType::DownAsync:
 			{
-				it->second.Handler_DownOnly = nullptr;
+				it->second.Handler_DownOnlyAsync = nullptr;
 				break;
 			}
-			case EIbHandlerType::DownAndRelease:
+			case EIbHandlerType::DownReleaseAsync:
 			{
-				it->second.Handler_DownAndRelease = nullptr;
+				it->second.Handler_DownReleaseAsync = nullptr;
 				break;
 			}
 		}
@@ -270,14 +270,14 @@ bool CInputBindApi::HasHandler(const std::string& aIdentifier)
 	{
 		switch (it->second.HandlerType)
 		{
-			case EIbHandlerType::DownOnly:
+			case EIbHandlerType::DownAsync:
 			{
-				return it->second.Handler_DownOnly != nullptr;
+				return it->second.Handler_DownOnlyAsync != nullptr;
 				break;
 			}
-			case EIbHandlerType::DownAndRelease:
+			case EIbHandlerType::DownReleaseAsync:
 			{
-				return it->second.Handler_DownAndRelease != nullptr;
+				return it->second.Handler_DownReleaseAsync != nullptr;
 				break;
 			}
 		}
@@ -375,11 +375,11 @@ bool CInputBindApi::Invoke(std::string aIdentifier, bool aIsRelease)
 		{
 			return false;
 		}
-		case EIbHandlerType::DownOnly:
+		case EIbHandlerType::DownAsync:
 		{
 			if (!aIsRelease)
 			{
-				INPUTBINDS_PROCESS handler = it->second.Handler_DownOnly;
+				INPUTBINDS_PROCESS handler = it->second.Handler_DownOnlyAsync;
 
 				/* FIXME: https://github.com/RaidcoreGG/Nexus/issues/111 */
 				std::thread([aIdentifier, handler]()
@@ -392,9 +392,9 @@ bool CInputBindApi::Invoke(std::string aIdentifier, bool aIsRelease)
 
 			return false;
 		}
-		case EIbHandlerType::DownAndRelease:
+		case EIbHandlerType::DownReleaseAsync:
 		{
-			INPUTBINDS_PROCESS2 handler = it->second.Handler_DownAndRelease;
+			INPUTBINDS_PROCESS2 handler = it->second.Handler_DownReleaseAsync;
 
 			/* FIXME: https://github.com/RaidcoreGG/Nexus/issues/111 */
 			std::thread([aIdentifier, handler, aIsRelease]()
@@ -403,6 +403,12 @@ bool CInputBindApi::Invoke(std::string aIdentifier, bool aIsRelease)
 			}).detach();
 
 			return true;
+		}
+		case EIbHandlerType::DownRelease:
+		{
+			INPUTBINDS_PROCESS3 handler = it->second.Handler_DownRelease;
+
+			return handler(aIdentifier.c_str(), aIsRelease);
 		}
 	}
 }
@@ -429,20 +435,20 @@ int CInputBindApi::Verify(void* aStartAddress, void* aEndAddress)
 	{
 		switch (mapping.HandlerType)
 		{
-			case EIbHandlerType::DownOnly:
+			case EIbHandlerType::DownAsync:
 			{
-				if (mapping.Handler_DownOnly >= aStartAddress && mapping.Handler_DownOnly <= aEndAddress)
+				if (mapping.Handler_DownOnlyAsync >= aStartAddress && mapping.Handler_DownOnlyAsync <= aEndAddress)
 				{
-					mapping.Handler_DownOnly = nullptr;
+					mapping.Handler_DownOnlyAsync = nullptr;
 					refCounter++;
 				}
 				break;
 			}
-			case EIbHandlerType::DownAndRelease:
+			case EIbHandlerType::DownReleaseAsync:
 			{
-				if (mapping.Handler_DownAndRelease >= aStartAddress && mapping.Handler_DownAndRelease <= aEndAddress)
+				if (mapping.Handler_DownReleaseAsync >= aStartAddress && mapping.Handler_DownReleaseAsync <= aEndAddress)
 				{
-					mapping.Handler_DownAndRelease = nullptr;
+					mapping.Handler_DownReleaseAsync = nullptr;
 					refCounter++;
 				}
 				break;

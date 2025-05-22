@@ -12,12 +12,13 @@
 
 InputBind::InputBind(InputBindV1 aLegacyInputBind)
 {
-	this->Alt    = aLegacyInputBind.Alt;
-	this->Ctrl   = aLegacyInputBind.Ctrl;
-	this->Shift  = aLegacyInputBind.Shift;
+	this->Alt         = aLegacyInputBind.Alt;
+	this->Ctrl        = aLegacyInputBind.Ctrl;
+	this->Shift       = aLegacyInputBind.Shift;
 
-	this->Device = EInputDevice::Keyboard;
-	this->Code   = aLegacyInputBind.Key;
+	this->Device      = EInputDevice::Keyboard;
+	this->Code        = aLegacyInputBind.Key;
+	this->Passthrough = false;
 }
 
 bool InputBind::IsBound() const
@@ -27,11 +28,12 @@ bool InputBind::IsBound() const
 
 bool operator==(const InputBind& lhs, const InputBind& rhs)
 {
-	return lhs.Alt    == rhs.Alt &&
-	       lhs.Ctrl   == rhs.Ctrl &&
-	       lhs.Shift  == rhs.Shift &&
-	       lhs.Device == rhs.Device &&
-	       lhs.Code   == rhs.Code;
+	return lhs.Alt         == rhs.Alt &&
+	       lhs.Ctrl        == rhs.Ctrl &&
+	       lhs.Shift       == rhs.Shift &&
+	       lhs.Device      == rhs.Device &&
+	       lhs.Code        == rhs.Code &&
+	       lhs.Passthrough == rhs.Passthrough;
 }
 
 bool operator!=(const InputBind& lhs, const InputBind& rhs)

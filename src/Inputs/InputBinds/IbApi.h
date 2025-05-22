@@ -93,7 +93,7 @@ class CInputBindApi : public CInputBindCapture
 	///----------------------------------------------------------------------------------------------------
 	/// Invoke:
 	/// 	Invokes the action on the corresponding InputBind handler.
-	/// 	Returns true if the InputBind was dispatched.
+	/// 	Returns true if the InputBind was dispatched and processing should not continue.
 	///----------------------------------------------------------------------------------------------------
 	bool Invoke(std::string aIdentifier, bool aIsRelease = false);
 

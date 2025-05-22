@@ -27,8 +27,9 @@ enum class EInputDevice : uint32_t
 enum class EIbHandlerType : uint32_t
 {
 	None,
-	DownOnly,      /* Type 1 */
-	DownAndRelease /* Type 2 */
+	DownAsync,        /* Type 1 */
+	DownReleaseAsync, /* Type 2 */
+	DownRelease       /* Type 3 */
 };
 
 #endif

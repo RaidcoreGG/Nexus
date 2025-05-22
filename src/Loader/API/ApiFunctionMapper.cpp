@@ -147,25 +147,25 @@ namespace ADDONAPI
 		void RegisterWithString(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, const char* aInputBind)
 		{
 			assert(s_InputBindApi);
-			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownOnly, aInputBindHandler, aInputBind);
+			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownAsync, aInputBindHandler, aInputBind);
 		}
 
 		void RegisterWithStruct(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, InputBindV1 aInputBind)
 		{
 			assert(s_InputBindApi);
-			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownOnly, aInputBindHandler, aInputBind);
+			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownAsync, aInputBindHandler, aInputBind);
 		}
 
 		void RegisterWithString2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, const char* aInputBind)
 		{
 			assert(s_InputBindApi);
-			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownAndRelease, aInputBindHandler, aInputBind);
+			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownReleaseAsync, aInputBindHandler, aInputBind);
 		}
 
 		void RegisterWithStruct2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, InputBindV1 aInputBind)
 		{
 			assert(s_InputBindApi);
-			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownAndRelease, aInputBindHandler, aInputBind);
+			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownReleaseAsync, aInputBindHandler, aInputBind);
 		}
 
 		void InvokeInputBind(const char* aIdentifier, bool aIsRelease)

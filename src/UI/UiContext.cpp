@@ -305,12 +305,12 @@ CUiContext::CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CText
 	//this->MainWindow->AddWindow(aboutWnd);
 
 	/* register InputBinds */
-	this->InputBindApi->Register(KB_MENU,          EIbHandlerType::DownOnly, UIRoot::OnInputBind, "CTRL+O");
-	this->InputBindApi->Register(KB_ADDONS,        EIbHandlerType::DownOnly, UIRoot::OnInputBind, NULLSTR);
-	this->InputBindApi->Register(KB_OPTIONS,       EIbHandlerType::DownOnly, UIRoot::OnInputBind, NULLSTR);
-	this->InputBindApi->Register(KB_LOG,           EIbHandlerType::DownOnly, UIRoot::OnInputBind, NULLSTR);
-	this->InputBindApi->Register(KB_DEBUG,         EIbHandlerType::DownOnly, UIRoot::OnInputBind, NULLSTR);
-	this->InputBindApi->Register(KB_TOGGLEHIDEUI,  EIbHandlerType::DownOnly, UIRoot::OnInputBind, "CTRL+H");
+	this->InputBindApi->Register(KB_MENU,          EIbHandlerType::DownAsync, UIRoot::OnInputBind, "CTRL+O");
+	this->InputBindApi->Register(KB_ADDONS,        EIbHandlerType::DownAsync, UIRoot::OnInputBind, NULLSTR);
+	this->InputBindApi->Register(KB_OPTIONS,       EIbHandlerType::DownAsync, UIRoot::OnInputBind, NULLSTR);
+	this->InputBindApi->Register(KB_LOG,           EIbHandlerType::DownAsync, UIRoot::OnInputBind, NULLSTR);
+	this->InputBindApi->Register(KB_DEBUG,         EIbHandlerType::DownAsync, UIRoot::OnInputBind, NULLSTR);
+	this->InputBindApi->Register(KB_TOGGLEHIDEUI,  EIbHandlerType::DownAsync, UIRoot::OnInputBind, "CTRL+H");
 
 	this->EscapeClose->Register("Nexus", this->MainWindow->GetVisibleStatePtr());
 
@@ -1144,7 +1144,7 @@ void CUiContext::UpdateDisplayInputBinds()
 	/* acquire categories */
 	for (auto& [identifier, inputBind] : InputBindRegistry)
 	{
-		std::string owner = Loader::GetOwner(inputBind.Handler_DownOnly);
+		std::string owner = Loader::GetOwner(inputBind.Handler_DownOnlyAsync);
 
 		auto it = std::find_if(this->DisplayInputBinds.begin(), this->DisplayInputBinds.end(), [owner](InputBindCategory category) { return category.Name == owner; });
 

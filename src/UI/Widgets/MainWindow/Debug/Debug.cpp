@@ -40,7 +40,7 @@ CDebugWindow::CDebugWindow()
 
 	/* bind mumble overlay */
 	CContext* ctx = CContext::GetContext();
-	ctx->GetInputBindApi()->Register(KB_MUMBLEOVERLAY, EIbHandlerType::DownOnly, DebugWindow_OnInputBind, NULLSTR);
+	ctx->GetInputBindApi()->Register(KB_MUMBLEOVERLAY, EIbHandlerType::DownAsync, DebugWindow_OnInputBind, NULLSTR);
 	DebugWindow = this;
 }
 
@@ -154,14 +154,14 @@ void CDebugWindow::TabInputBinds()
 						ImGui::TextDisabled("\tHandler: -");
 						break;
 					}
-					case EIbHandlerType::DownOnly:
+					case EIbHandlerType::DownAsync:
 					{
-						ImGui::TextDisabled("\tHandler: %p", inputBind.Handler_DownOnly);
+						ImGui::TextDisabled("\tHandler: %p", inputBind.Handler_DownOnlyAsync);
 						break;
 					}
-					case EIbHandlerType::DownAndRelease:
+					case EIbHandlerType::DownReleaseAsync:
 					{
-						ImGui::TextDisabled("\tHandler: %p", inputBind.Handler_DownAndRelease);
+						ImGui::TextDisabled("\tHandler: %p", inputBind.Handler_DownReleaseAsync);
 						break;
 					}
 				}
