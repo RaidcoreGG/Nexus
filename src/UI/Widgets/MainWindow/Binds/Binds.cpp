@@ -195,7 +195,7 @@ void CBindsWindow::RenderInputBindsTable(std::unordered_map<std::string, InputBi
 				CInputBindApi* ibapi = ctx->GetInputBindApi();
 				ibapi->SetPassthrough(identifier, inputBind.Bind.Bind.Passthrough);
 			}
-			ImGui::TooltipGeneric("((000115))");
+			ImGui::TooltipGeneric(langApi->Translate("((000115))"));
 
 			ImGui::TableSetColumnIndex(3);
 			/* FIXME: This access the DownAsync union field. */
