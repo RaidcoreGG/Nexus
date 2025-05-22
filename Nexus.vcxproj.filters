@@ -420,6 +420,9 @@
     <ClCompile Include="src\Inputs\InputBinds\IbConst.cpp">
       <Filter>Inputs\InputBinds</Filter>
     </ClCompile>
+    <ClCompile Include="src\Inputs\InputBinds\IbCapture.cpp">
+      <Filter>Inputs\InputBinds</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h">
@@ -1239,6 +1242,9 @@
       <Filter>Inputs\InputBinds</Filter>
     </ClInclude>
     <ClInclude Include="src\Inputs\InputBinds\IbMapping.h">
+      <Filter>Inputs\InputBinds</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Inputs\InputBinds\IbCapture.h">
       <Filter>Inputs\InputBinds</Filter>
     </ClInclude>
   </ItemGroup>

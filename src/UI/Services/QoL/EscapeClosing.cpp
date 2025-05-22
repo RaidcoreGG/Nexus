@@ -32,7 +32,7 @@ UINT CEscapeClosing::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	if (uMsg == WM_KEYDOWN && wParam == VK_ESCAPE)
 	{
-		KeyLParam keylp = LParamToKMF(lParam);
+		KeystrokeMessageFlags keylp = LParamToKMF(lParam);
 
 		if (!keylp.PreviousKeyState)
 		{

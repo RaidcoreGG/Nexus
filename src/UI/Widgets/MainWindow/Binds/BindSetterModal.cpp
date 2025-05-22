@@ -24,7 +24,7 @@ void CBindSetterModal::RenderContent()
 	CLocalization* lang  = ctx->GetLocalization();
 	CInputBindApi* ibapi = ctx->GetInputBindApi();
 
-	this->Capture = ibapi->GetCapturedInputBind();
+	this->Capture = ibapi->GetCapture();
 
 	/* Display current bind text, if no capture yet. */
 	if (this->Capture == InputBind{})

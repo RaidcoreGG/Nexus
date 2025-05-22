@@ -18,6 +18,7 @@
 #include "IbFuncDefs.h"
 #include "IbBindV2.h"
 #include "IbMapping.h"
+#include "IbCapture.h"
 #include "Services/Logging/LogHandler.h"
 
 constexpr const char* CH_INPUTBINDS = "InputBinds";
@@ -25,7 +26,7 @@ constexpr const char* CH_INPUTBINDS = "InputBinds";
 ///----------------------------------------------------------------------------------------------------
 /// CInputBindApi Class
 ///----------------------------------------------------------------------------------------------------
-class CInputBindApi
+class CInputBindApi : public CInputBindCapture
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -107,24 +108,6 @@ class CInputBindApi
 	/// 	Returns a copy of the registry.
 	///----------------------------------------------------------------------------------------------------
 	std::map<std::string, IbMapping> GetRegistry() const;
-
-	///----------------------------------------------------------------------------------------------------
-	/// GetCapturedInputBind:
-	/// 	Gets which InputBind is currently held, regardless of it being mapped or not.
-	///----------------------------------------------------------------------------------------------------
-	InputBind GetCapturedInputBind() const;
-
-	///----------------------------------------------------------------------------------------------------
-	/// StartCapturing:
-	/// 	Starts capturing the held InputBind.
-	///----------------------------------------------------------------------------------------------------
-	void StartCapturing();
-
-	///----------------------------------------------------------------------------------------------------
-	/// EndCapturing:
-	/// 	Ends capturing the held InputBind.
-	///----------------------------------------------------------------------------------------------------
-	void EndCapturing();
 
 	private:
 	CEventApi*                       EventApi = nullptr;

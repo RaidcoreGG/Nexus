@@ -46,7 +46,7 @@ LPARAM& KMFToLParam(KeystrokeMessageFlags& aKmf)
 
 LPARAM GetKeyMessageLPARAM(unsigned aVKey, bool aIsDown, bool aIsSystem)
 {
-	KeyLParam lp;
+	KeystrokeMessageFlags lp;
 
 	UINT sc = MapVirtualKeyA(aVKey, MAPVK_VK_TO_VSC_EX);
 
@@ -63,7 +63,7 @@ LPARAM GetKeyMessageLPARAM(unsigned aVKey, bool aIsDown, bool aIsSystem)
 
 LPARAM GetKeyMessageLPARAM_ScanCode(unsigned short aScanCode, bool aIsDown, bool aIsSystem)
 {
-	KeyLParam lp = GetKeyMessageLPARAM(0, aIsDown, aIsSystem);
+	KeystrokeMessageFlags lp = GetKeyMessageLPARAM(0, aIsDown, aIsSystem);
 	lp.ScanCode = LOBYTE(aScanCode);
 	lp.ExtendedFlag = (HIBYTE(aScanCode) == 0xE0 || HIBYTE(aScanCode) == 0xE1) ? 1 : 0;
 	return KMFToLParam(lp);

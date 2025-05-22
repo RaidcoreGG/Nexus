@@ -79,7 +79,7 @@ InputBind IBFromString(std::string aInputBind)
 			for (long long i = 0; i <= 255; i++)
 			{
 				/* create key msg lparam */
-				KeyLParam key{};
+				KeystrokeMessageFlags key{};
 				key.ScanCode = i;
 
 				/* get the scancode (current i) */

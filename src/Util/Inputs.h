@@ -11,6 +11,9 @@
 
 #include <Windows.h>
 
+///----------------------------------------------------------------------------------------------------
+/// EMouseButtons Enumeration
+///----------------------------------------------------------------------------------------------------
 enum class EMouseButtons
 {
 	None,
@@ -22,17 +25,17 @@ enum class EMouseButtons
 };
 
 ///----------------------------------------------------------------------------------------------------
-/// KeystrokeMessageFlags/KeyLParam struct
+/// KeystrokeMessageFlags struct
 ///----------------------------------------------------------------------------------------------------
-typedef struct KeystrokeMessageFlags
+struct KeystrokeMessageFlags
 {
-	unsigned RepeatCount		: 16;
-	unsigned ScanCode			: 8;
-	unsigned ExtendedFlag		: 1;
-	unsigned Reserved			: 4;
-	unsigned ContextCode		: 1;
-	unsigned PreviousKeyState	: 1;
-	unsigned TransitionState	: 1;
+	unsigned RepeatCount      : 16;
+	unsigned ScanCode         : 8;
+	unsigned ExtendedFlag     : 1;
+	unsigned Reserved         : 4;
+	unsigned ContextCode      : 1;
+	unsigned PreviousKeyState : 1;
+	unsigned TransitionState  : 1;
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetScanCode:
@@ -42,7 +45,7 @@ typedef struct KeystrokeMessageFlags
 
 	KeystrokeMessageFlags() = default;
 	KeystrokeMessageFlags(LPARAM aLParam);
-} KeyLParam;
+};
 
 ///----------------------------------------------------------------------------------------------------
 /// LParamToKMF:
@@ -79,7 +82,6 @@ WPARAM GetMouseMessageWPARAM(EMouseButtons aMouseButton, bool aIsCtrl, bool aIsS
 ///----------------------------------------------------------------------------------------------------
 namespace Inputs
 {
-
 	///----------------------------------------------------------------------------------------------------
 	/// IsCursorHidden:
 	/// 	Returns true if the cursor is hidden.

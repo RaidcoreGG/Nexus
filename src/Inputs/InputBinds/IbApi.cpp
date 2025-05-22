@@ -36,6 +36,11 @@ CInputBindApi::CInputBindApi(CEventApi* aEventApi, CLogHandler* aLogger)
 
 UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	if (this->ProcessInput(uMsg, wParam, lParam))
+	{
+		return 0;
+	}
+
 	bool isModifier = false;
 
 	/* preprocess for modifiers */
@@ -116,7 +121,7 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				ib.Shift = this->IsShiftHeld;
 			}
 
-			KeyLParam keylp = LParamToKMF(lParam);
+			KeystrokeMessageFlags keylp = LParamToKMF(lParam);
 			ib.Device = EInputDevice::Keyboard; // type keyboard, since we're listening to keypresses
 			ib.Code = keylp.GetScanCode();
 
@@ -128,15 +133,6 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (keylp.PreviousKeyState)
 			{
 				break;
-			}
-
-			if (this->IsCapturing)
-			{
-				/* store the currently held bind */
-				this->CapturedInputBind = ib;
-
-				/* send zero to prevent invoking InputBinds and further processing */
-				return 0;
 			}
 
 			/* if something was invoked, send zero to stop further processing */
@@ -161,13 +157,6 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			
 			/* always do this, because even if it's a modifier, it might be a modifier-key bind */
 			this->Release(EInputDevice::Keyboard, LParamToKMF(lParam).GetScanCode());
-
-			/* only check if not currently setting InputBind */
-			if (this->IsCapturing)
-			{
-				/* send non-zero here so key RELEASES get passed through anyway */
-				return uMsg;
-			}
 
 			break;
 		}
@@ -194,15 +183,6 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				ib.Code = (unsigned short)EMouseButtons::M5;
 			}
 
-			if (this->IsCapturing)
-			{
-				/* store the currently held bind */
-				this->CapturedInputBind = ib;
-
-				/* send zero to prevent invoking InputBinds and further processing */
-				return 0;
-			}
-
 			/* if something was invoked, send zero to stop further processing */
 			if (this->Press(ib))
 			{
@@ -225,13 +205,6 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			else if (HIWORD(wParam) == XBUTTON2)
 			{
 				this->Release(EInputDevice::Mouse, (unsigned short)EMouseButtons::M5);
-			}
-
-			/* only check if not currently setting InputBind */
-			if (this->IsCapturing)
-			{
-				/* send non-zero here so mouse RELEASES get passed through anyway */
-				return uMsg;
 			}
 
 			break;
@@ -547,32 +520,6 @@ std::map<std::string, IbMapping> CInputBindApi::GetRegistry() const
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	return this->Registry;
-}
-
-InputBind CInputBindApi::GetCapturedInputBind() const
-{
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	return this->CapturedInputBind;
-}
-
-void CInputBindApi::StartCapturing()
-{
-	if (!this->IsCapturing)
-	{
-		this->ReleaseAll();
-	}
-
-	this->IsCapturing = true;
-}
-
-void CInputBindApi::EndCapturing()
-{
-	this->IsCapturing = false;
-
-	this->ReleaseAll();
-
-	CapturedInputBind = InputBind{};
 }
 
 void CInputBindApi::LoadSafe()

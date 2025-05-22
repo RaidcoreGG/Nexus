@@ -14,6 +14,7 @@
     <ClCompile Include="src\Context.cpp" />
     <ClCompile Include="src\Inputs\GameBinds\GbApi.cpp" />
     <ClCompile Include="src\Inputs\GameBinds\GbConst.cpp" />
+    <ClCompile Include="src\Inputs\InputBinds\IbCapture.cpp" />
     <ClCompile Include="src\Inputs\InputBinds\IbConst.cpp" />
     <ClCompile Include="src\Loader\AddonVersion.cpp" />
     <ClCompile Include="src\Loader\API\ApiFunctionMapper.cpp" />
@@ -100,6 +101,7 @@
     <ClInclude Include="src\Inputs\GameBinds\GbFuncDefs.h" />
     <ClInclude Include="src\Inputs\GameBinds\GbApi.h" />
     <ClInclude Include="src\Inputs\InputBinds\IbBind.h" />
+    <ClInclude Include="src\Inputs\InputBinds\IbCapture.h" />
     <ClInclude Include="src\Inputs\InputBinds\IbConst.h" />
     <ClInclude Include="src\Inputs\InputBinds\IbEnum.h" />
     <ClInclude Include="src\Inputs\InputBinds\IbMapping.h" />
