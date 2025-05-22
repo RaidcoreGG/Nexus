@@ -67,10 +67,6 @@ void CAddonsWindow::Invalidate()
 
 void CAddonsWindow::Invalidate(signed int aAddonID)
 {
-	if (this->HasContent && this->AddonData.NexusAddon->Definitions && this->AddonData.NexusAddon->Definitions->Signature == aAddonID)
-	{
-		this->HasContent = false;
-	}
 	this->IsInvalid = true;
 }
 
@@ -1200,6 +1196,76 @@ void CAddonsWindow::RenderDetails()
 					Loader::SaveAddonConfig();
 				}
 			}
+
+			/* Load/Unload Button */
+			// just check if loaded, if it was not hot-reloadable it would be EAddonState::LoadedLOCKED
+			if (addonData.NexusAddon->State == EAddonState::Loaded)
+			{
+				if (ImGui::Button((addonData.NexusAddon->IsWaitingForUnload ? langApi->Translate("((000078))") : langApi->Translate("((000020))") + sig).c_str()))
+				{
+					if (!addonData.NexusAddon->IsWaitingForUnload)
+					{
+						//Logger->Debug(CH_GUI, "Unload called: %s", it.second->Definitions->Name);
+						Loader::QueueAddon(ELoaderAction::Unload, addonData.NexusAddon->Path);
+					}
+				}
+				if (Loader::HasCustomConfig)
+				{
+					ImGui::TooltipGeneric(langApi->Translate("((000021))"));
+				}
+			}
+			else if (addonData.NexusAddon->State == EAddonState::LoadedLOCKED)
+			{
+				std::string additionalInfo;
+
+				if (Loader::HasCustomConfig)
+				{
+					additionalInfo.append("\n");
+					additionalInfo.append(langApi->Translate("((000021))"));
+				}
+
+				if (ImGui::Button((langApi->Translate(addonData.NexusAddon->IsFlaggedForDisable ? "((000024))" : "((000022))") + sig).c_str()))
+				{
+					addonData.NexusAddon->IsFlaggedForDisable = !addonData.NexusAddon->IsFlaggedForDisable;
+					Loader::SaveAddonConfig();
+				}
+				ImGui::TooltipGeneric(langApi->Translate(addonData.NexusAddon->IsFlaggedForDisable ? "((000025))" : "((000023))"), additionalInfo.c_str());
+			}
+			else if (addonData.NexusAddon->State == EAddonState::NotLoaded && (addonData.NexusAddon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || addonData.NexusAddon->Definitions->Signature == 0xFFF694D1) && !IsGameLaunchSequence)
+			{
+				/* if it's too late to load this addon */
+				if (ImGui::Button((langApi->Translate(addonData.NexusAddon->IsFlaggedForEnable ? "((000020))" : "((000024))") + sig).c_str()))
+				{
+					addonData.NexusAddon->IsFlaggedForEnable = !addonData.NexusAddon->IsFlaggedForEnable;
+
+					if (addonData.NexusAddon->IsFlaggedForEnable)
+					{
+						addonData.NexusAddon->IsDisabledUntilUpdate = false; // explicitly loaded
+						ctx->GetUIContext()->GetAlerts()->Notify(String::Format("%s %s", addonData.NexusAddon->Definitions->Name, langApi->Translate("((000080))")).c_str());
+					}
+
+					Loader::SaveAddonConfig();
+				}
+				if (addonData.NexusAddon->IsFlaggedForEnable)
+				{
+					ImGui::TooltipGeneric(langApi->Translate("((000025))"), "");
+				}
+			}
+			else if (addonData.NexusAddon->State == EAddonState::NotLoaded)
+			{
+				if (ImGui::Button((langApi->Translate("((000026))") + sig).c_str()))
+				{
+					//Logger->Debug(CH_GUI, "Load called: %s", it.second->Definitions->Name);
+					addonData.NexusAddon->IsDisabledUntilUpdate = false; // explicitly loaded
+					Loader::QueueAddon(ELoaderAction::Load, addonData.NexusAddon->Path);
+				}
+				if (Loader::HasCustomConfig)
+				{
+					ImGui::TooltipGeneric(langApi->Translate("((000021))"));
+				}
+			}
+
+			ImGui::SameLine();
 
 			if (ImGui::Button((langApi->Translate("((000018))") + sigid).c_str()))
 			{
