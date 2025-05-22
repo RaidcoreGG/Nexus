@@ -85,6 +85,12 @@ class CInputBindApi : public CInputBindCapture
 	void Set(std::string aIdentifier, InputBind aInputBind);
 
 	///----------------------------------------------------------------------------------------------------
+	/// SetPassthrough:
+	/// 	Sets the passthrough state of an InputBind.
+	///----------------------------------------------------------------------------------------------------
+	void SetPassthrough(std::string aIdentifier, bool aPassthrough);
+
+	///----------------------------------------------------------------------------------------------------
 	/// Invoke:
 	/// 	Invokes the action on the corresponding InputBind handler.
 	/// 	Returns true if the InputBind was dispatched.

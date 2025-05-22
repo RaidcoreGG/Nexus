@@ -334,6 +334,27 @@ void CInputBindApi::Set(std::string aIdentifier, InputBind aInputBind)
 	}).detach();
 }
 
+void CInputBindApi::SetPassthrough(std::string aIdentifier, bool aPassthrough)
+{
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	auto it = this->Registry.find(aIdentifier);
+
+	if (it == this->Registry.end())
+	{
+		return;
+	}
+	
+	it->second.Bind.Passthrough = aPassthrough;
+
+	this->Save();
+
+	/* FIXME: https://github.com/RaidcoreGG/Nexus/issues/111 */
+	std::thread([this]() {
+		this->EventApi->Raise("EV_INPUTBIND_UPDATED");
+	}).detach();
+}
+
 bool CInputBindApi::Invoke(std::string aIdentifier, bool aIsRelease)
 {
 	bool called = false;
@@ -463,9 +484,10 @@ void CInputBindApi::Load()
 			if (binding["Key"].is_null() && binding["Code"].is_null()) { continue; }
 
 			InputBind ib{};
-			ib.Alt   = binding.value("Alt",   false);
-			ib.Ctrl  = binding.value("Ctrl",  false);
-			ib.Shift = binding.value("Shift", false);
+			ib.Alt         = binding.value("Alt",         false);
+			ib.Ctrl        = binding.value("Ctrl",        false);
+			ib.Shift       = binding.value("Shift",       false);
+			ib.Passthrough = binding.value("Passthrough", false);
 
 			/* neither code nor type null -> inputbind */
 			if (!binding["Type"].is_null() && !binding["Code"].is_null())
@@ -530,12 +552,13 @@ void CInputBindApi::Save()
 	{
 		json binding =
 		{
-			{"Identifier", id},
-			{"Alt",        ib.Bind.Alt},
-			{"Ctrl",       ib.Bind.Ctrl},
-			{"Shift",      ib.Bind.Shift},
-			{"Type",       ib.Bind.Device},
-			{"Code",       ib.Bind.Code}
+			{"Identifier",  id                 },
+			{"Alt",         ib.Bind.Alt        },
+			{"Ctrl",        ib.Bind.Ctrl       },
+			{"Shift",       ib.Bind.Shift      },
+			{"Type",        ib.Bind.Device     },
+			{"Code",        ib.Bind.Code       },
+			{"Passthrough", ib.Bind.Passthrough}
 		};
 
 		/* override type */
@@ -563,18 +586,21 @@ bool CInputBindApi::Press(const InputBind& aInputBind)
 
 	if (it == this->Registry.end())
 	{
-		/* return the identifier that's already using this combination */
 		return false;
 	}
 
+	auto heldIt = this->HeldInputBinds.find(it->first);
+
 	/* track the actual bind/id combo */
-	/* FIXME: map lookup/emplacement */
-	this->HeldInputBinds[it->first] = it->second;
+	if (heldIt == this->HeldInputBinds.end())
+	{
+		this->HeldInputBinds.emplace(it->first, it->second);
+	}
 
 	bool invoked = this->Invoke(it->first);
 
 	/* if was invoked -> stop processing (unless it was the togglehideui bind, pass through for multi hide)*/
-	if (invoked && it->first != "KB_TOGGLEHIDEUI")
+	if (invoked && it->second.Bind.Passthrough == false)
 	{
 		return true;
 	}

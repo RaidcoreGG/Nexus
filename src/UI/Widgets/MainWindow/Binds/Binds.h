@@ -32,8 +32,8 @@ class CBindsWindow : public ISubWindow
 	std::vector<InputBindCategory>     IBCategories;
 	std::vector<GameInputBindCategory> GIBCategories;
 
-	void RenderInputBindsTable(const std::unordered_map<std::string, InputBindPacked>& aInputBinds);
-	void RenderGameInputBindsTable(const std::unordered_map<EGameBinds, GameInputBindPacked>& aInputBinds);
+	void RenderInputBindsTable(std::unordered_map<std::string, InputBindPacked>& aInputBinds);
+	void RenderGameInputBindsTable(std::unordered_map<EGameBinds, GameInputBindPacked>& aInputBinds);
 
 	void DeleteStaleBind(const std::string& aIdentifier);
 };
