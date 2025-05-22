@@ -41,57 +41,7 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 
-	bool isModifier = false;
-
-	/* preprocess for modifiers */
-	switch (uMsg)
-	{
-		case WM_SYSKEYDOWN:
-		case WM_KEYDOWN:
-		{
-			if (wParam == VK_MENU)
-			{
-				isModifier = true;
-				this->IsAltHeld = true;
-			}
-			else if (wParam == VK_CONTROL)
-			{
-				isModifier = true;
-				this->IsCtrlHeld = true;
-			}
-			else if (wParam == VK_SHIFT)
-			{
-				isModifier = true;
-				this->IsShiftHeld = true;
-			}
-
-			break;
-		}
-
-		case WM_SYSKEYUP:
-		case WM_KEYUP:
-		{
-			if (wParam == VK_MENU)
-			{
-				isModifier = true;
-				this->IsAltHeld = false;
-			}
-			else if (wParam == VK_CONTROL)
-			{
-				isModifier = true;
-				this->IsCtrlHeld = false;
-			}
-			else if (wParam == VK_SHIFT)
-			{
-				isModifier = true;
-				this->IsShiftHeld = false;
-			}
-
-			break;
-		}
-	}
-
-	InputBind ib{};
+	const InputBind& capture = this->GetCaptureRef();
 
 	/* actual input processing */
 	switch (uMsg)
@@ -107,36 +57,22 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			if (wParam > 255) { break; }
 
-			/* if the pressed key is a modifier, reset all modifiers for the actual bind */
-			if (isModifier)
-			{
-				ib.Alt = false;
-				ib.Ctrl = false;
-				ib.Shift = false;
-			}
-			else
-			{
-				ib.Alt = this->IsAltHeld;
-				ib.Ctrl = this->IsCtrlHeld;
-				ib.Shift = this->IsShiftHeld;
-			}
-
 			KeystrokeMessageFlags keylp = LParamToKMF(lParam);
-			ib.Device = EInputDevice::Keyboard; // type keyboard, since we're listening to keypresses
-			ib.Code = keylp.GetScanCode();
 
-			if (!ib.IsBound())
-			{
-				break;
-			}
-
+			/* Do not listen to repeated keydowns. */
 			if (keylp.PreviousKeyState)
 			{
 				break;
 			}
 
+			/* Do not dispatch null binds. */
+			if (!capture.IsBound())
+			{
+				break;
+			}
+
 			/* if something was invoked, send zero to stop further processing */
-			if (this->Press(ib))
+			if (this->Press(capture))
 			{
 				return 0;
 			}
@@ -149,13 +85,13 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			if (wParam > 255) { break; }
 
-			if (isModifier)
+			/* Additionally send a modifier release, if it is one. */
+			if (wParam == VK_MENU || wParam == VK_CONTROL || wParam == VK_SHIFT)
 			{
-				/* do this, to check all binds that use the modifier */
 				this->Release((unsigned int)wParam);
 			}
 			
-			/* always do this, because even if it's a modifier, it might be a modifier-key bind */
+			/* Release binds matching the passed key. Standalone modifier binds as well. */
 			this->Release(EInputDevice::Keyboard, LParamToKMF(lParam).GetScanCode());
 
 			break;
@@ -164,27 +100,8 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case WM_MBUTTONDOWN:
 		case WM_XBUTTONDOWN:
 		{
-			ib.Alt = this->IsAltHeld;
-			ib.Ctrl = this->IsCtrlHeld;
-			ib.Shift = this->IsShiftHeld;
-
-			ib.Device = EInputDevice::Mouse; // type mouse, since we're listening to mbuttons
-
-			if (uMsg == WM_MBUTTONDOWN)
-			{
-				ib.Code = (unsigned short)EMouseButtons::MMB;
-			} /* else it's implicitly an XBUTTON */
-			else if (HIWORD(wParam) == XBUTTON1)
-			{
-				ib.Code = (unsigned short)EMouseButtons::M4;
-			}
-			else if (HIWORD(wParam) == XBUTTON2)
-			{
-				ib.Code = (unsigned short)EMouseButtons::M5;
-			}
-
 			/* if something was invoked, send zero to stop further processing */
-			if (this->Press(ib))
+			if (this->Press(capture))
 			{
 				return 0;
 			}
@@ -192,13 +109,13 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 		case WM_MBUTTONUP:
+		{
+			this->Release(EInputDevice::Mouse, (unsigned short)EMouseButtons::MMB);
+			break;
+		}
 		case WM_XBUTTONUP:
 		{
-			if (uMsg == WM_MBUTTONUP)
-			{
-				this->Release(EInputDevice::Mouse, (unsigned short)EMouseButtons::MMB);
-			} /* else it's implicitly an XBUTTON */
-			else if (HIWORD(wParam) == XBUTTON1)
+			if (HIWORD(wParam) == XBUTTON1)
 			{
 				this->Release(EInputDevice::Mouse, (unsigned short)EMouseButtons::M4);
 			}
@@ -709,10 +626,6 @@ void CInputBindApi::Release(EInputDevice aDevice, unsigned short aCode)
 
 void CInputBindApi::ReleaseAll()
 {
-	this->IsAltHeld   = false;
-	this->IsCtrlHeld  = false;
-	this->IsShiftHeld = false;
-
 	for (auto& bind : this->HeldInputBinds)
 	{
 		this->Invoke(bind.first, true);

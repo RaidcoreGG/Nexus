@@ -22,9 +22,10 @@ class CInputBindCapture
 	///----------------------------------------------------------------------------------------------------
 	/// StartCapturing:
 	/// 	Starts capturing the held InputBind.
-	/// 	Returns true if capturing was started, false if already capturing.
+	/// 	The bind is continuously captured.
+	/// 	Calling this function merely signals to stop further processing the inputs.
 	///----------------------------------------------------------------------------------------------------
-	bool StartCapturing();
+	void StartCapturing();
 
 	///----------------------------------------------------------------------------------------------------
 	/// EndCapturing:
@@ -44,6 +45,13 @@ class CInputBindCapture
 	/// 	Returns true, if the input should not be further processed.
 	///----------------------------------------------------------------------------------------------------
 	bool ProcessInput(UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetCaptureRef:
+	/// 	Gets which InputBind is currently held.
+	/// 	Not threadsafe. Only use during WndProc.
+	///----------------------------------------------------------------------------------------------------
+	const InputBind& GetCaptureRef() const;
 
 	private:
 	bool      IsCapturing = false;

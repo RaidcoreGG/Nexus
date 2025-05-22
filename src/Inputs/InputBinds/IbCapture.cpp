@@ -10,12 +10,12 @@
 
 #include "Util/Inputs.h"
 
-bool CInputBindCapture::StartCapturing()
+void CInputBindCapture::StartCapturing()
 {
 	/* Already capturing. */
 	if (this->IsCapturing)
 	{
-		return false;
+		return;
 	}
 
 	/* Reset the previously captured bind. */
@@ -23,8 +23,6 @@ bool CInputBindCapture::StartCapturing()
 
 	/* Set the state. */
 	this->IsCapturing = true;
-
-	return true;
 }
 
 void CInputBindCapture::EndCapturing()
@@ -40,16 +38,20 @@ InputBind CInputBindCapture::GetCapture() const
 
 bool CInputBindCapture::ProcessInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	if (!this->IsCapturing)
-	{
-		return false;
-	}
-
 	bool isModifier = false;
+	bool isCapturing = this->IsCapturing;
 
 	/* Preprocess modifiers. */
 	switch (uMsg)
 	{
+		case WM_ACTIVATEAPP:
+		{
+			this->Capture.Alt   = false;
+			this->Capture.Ctrl  = false;
+			this->Capture.Shift = false;
+			return false;
+		}
+
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
 		{
@@ -85,19 +87,16 @@ bool CInputBindCapture::ProcessInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			{
 				case VK_MENU:
 				{
-					isModifier = true;
 					this->IsAltHeld = false;
 					break;
 				}
 				case VK_CONTROL:
 				{
-					isModifier = true;
 					this->IsCtrlHeld = false;
 					break;
 				}
 				case VK_SHIFT:
 				{
-					isModifier = true;
 					this->IsShiftHeld = false;
 					break;
 				}
@@ -121,20 +120,20 @@ bool CInputBindCapture::ProcessInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (keylp.PreviousKeyState)
 			{
 				/* Do not process futher, but also do not override the actual last input. */
-				return true;
+				return false;
 			}
 
 			/* If it's a modifier, ignore all other set modifiers, to allow for the last pressed one to be a standalone bind. */
 			if (isModifier)
 			{
-				this->Capture.Alt = false;
-				this->Capture.Ctrl = false;
+				this->Capture.Alt   = false;
+				this->Capture.Ctrl  = false;
 				this->Capture.Shift = false;
 			}
 			else
 			{
-				this->Capture.Alt = this->IsAltHeld;
-				this->Capture.Ctrl = this->IsCtrlHeld;
+				this->Capture.Alt   = this->IsAltHeld;
+				this->Capture.Ctrl  = this->IsCtrlHeld;
 				this->Capture.Shift = this->IsShiftHeld;
 			}
 
@@ -142,18 +141,24 @@ bool CInputBindCapture::ProcessInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			this->Capture.Device = EInputDevice::Keyboard;
 			this->Capture.Code = keylp.GetScanCode();
 
-			/* Signal to not process further. */
-			return true;
-		}
-
-		case WM_SYSKEYUP:
-		case WM_KEYUP:
-		{
-			/* Let key releases be processed further. */
-			return false;
+			/* Signal to not process further, if capturing. */
+			return isCapturing;
 		}
 
 		case WM_MBUTTONDOWN:
+		{
+			this->Capture.Alt   = this->IsAltHeld;
+			this->Capture.Ctrl  = this->IsCtrlHeld;
+			this->Capture.Shift = this->IsShiftHeld;
+
+			/* Mouse button -> Mouse bind */
+			this->Capture.Device = EInputDevice::Mouse;
+
+			this->Capture.Code = (unsigned short)EMouseButtons::MMB;
+
+			/* Signal to not process further, if capturing. */
+			return isCapturing;
+		}
 		case WM_XBUTTONDOWN:
 		{
 			this->Capture.Alt   = this->IsAltHeld;
@@ -163,11 +168,7 @@ bool CInputBindCapture::ProcessInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			/* Mouse button -> Mouse bind */
 			this->Capture.Device = EInputDevice::Mouse;
 
-			if (uMsg == WM_MBUTTONDOWN)
-			{
-				this->Capture.Code = (unsigned short)EMouseButtons::MMB;
-			} /* else it's implicitly an XBUTTON */
-			else if (HIWORD(wParam) == XBUTTON1)
+			if (HIWORD(wParam) == XBUTTON1)
 			{
 				this->Capture.Code = (unsigned short)EMouseButtons::M4;
 			}
@@ -176,17 +177,16 @@ bool CInputBindCapture::ProcessInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				this->Capture.Code = (unsigned short)EMouseButtons::M5;
 			}
 
-			/* Signal to not process further. */
-			return true;
-		}
-		case WM_MBUTTONUP:
-		case WM_XBUTTONUP:
-		{
-			/* Let mouse releases be processed further. */
-			return false;
+			/* Signal to not process further, if capturing. */
+			return isCapturing;
 		}
 	}
 
 	/* Let any other input be processed further. */
 	return false;
+}
+
+const InputBind& CInputBindCapture::GetCaptureRef() const
+{
+	return this->Capture;
 }

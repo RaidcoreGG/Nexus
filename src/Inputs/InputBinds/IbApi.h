@@ -115,13 +115,6 @@ class CInputBindApi : public CInputBindCapture
 
 	mutable std::mutex               Mutex;
 	std::map<std::string, IbMapping> Registry;
-
-	bool                             IsCapturing;
-	InputBind                        CapturedInputBind;
-
-	bool                             IsAltHeld;
-	bool                             IsCtrlHeld;
-	bool                             IsShiftHeld;
 	std::map<std::string, IbMapping> HeldInputBinds;
 
 	///----------------------------------------------------------------------------------------------------
@@ -169,7 +162,7 @@ class CInputBindApi : public CInputBindCapture
 
 	///----------------------------------------------------------------------------------------------------
 	/// ReleaseAll:
-	/// 	Clears all currently held key states and InputBinds and invokes a release.
+	/// 	Releases all currently held InputBinds and invokes a release.
 	///----------------------------------------------------------------------------------------------------
 	void ReleaseAll();
 };
