@@ -169,6 +169,11 @@ void CInputBindApi::Register(const char* aIdentifier, EIbHandlerType aInputBindH
 				mapping.Handler_DownReleaseAsync = (INPUTBINDS_PROCESS2)aInputBindHandler;
 				break;
 			}
+			case EIbHandlerType::DownRelease:
+			{
+				mapping.Handler_DownRelease = (INPUTBINDS_PROCESS3)aInputBindHandler;
+				break;
+			}
 		}
 
 		/* Force handler type to none, if there's no handler. */
@@ -192,6 +197,11 @@ void CInputBindApi::Register(const char* aIdentifier, EIbHandlerType aInputBindH
 			case EIbHandlerType::DownReleaseAsync:
 			{
 				it->second.Handler_DownReleaseAsync = (INPUTBINDS_PROCESS2)aInputBindHandler;
+				break;
+			}
+			case EIbHandlerType::DownRelease:
+			{
+				it->second.Handler_DownRelease = (INPUTBINDS_PROCESS3)aInputBindHandler;
 				break;
 			}
 		}
@@ -230,6 +240,11 @@ void CInputBindApi::Deregister(const char* aIdentifier)
 			case EIbHandlerType::DownReleaseAsync:
 			{
 				it->second.Handler_DownReleaseAsync = nullptr;
+				break;
+			}
+			case EIbHandlerType::DownRelease:
+			{
+				it->second.Handler_DownRelease = nullptr;
 				break;
 			}
 		}
@@ -278,6 +293,11 @@ bool CInputBindApi::HasHandler(const std::string& aIdentifier)
 			case EIbHandlerType::DownReleaseAsync:
 			{
 				return it->second.Handler_DownReleaseAsync != nullptr;
+				break;
+			}
+			case EIbHandlerType::DownRelease:
+			{
+				return it->second.Handler_DownRelease != nullptr;
 				break;
 			}
 		}
@@ -449,6 +469,15 @@ int CInputBindApi::Verify(void* aStartAddress, void* aEndAddress)
 				if (mapping.Handler_DownReleaseAsync >= aStartAddress && mapping.Handler_DownReleaseAsync <= aEndAddress)
 				{
 					mapping.Handler_DownReleaseAsync = nullptr;
+					refCounter++;
+				}
+				break;
+			}
+			case EIbHandlerType::DownRelease:
+			{
+				if (mapping.Handler_DownRelease >= aStartAddress && mapping.Handler_DownRelease <= aEndAddress)
+				{
+					mapping.Handler_DownRelease = nullptr;
 					refCounter++;
 				}
 				break;
