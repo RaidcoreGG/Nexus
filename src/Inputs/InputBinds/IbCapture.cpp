@@ -46,6 +46,9 @@ bool CInputBindCapture::ProcessInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		case WM_ACTIVATEAPP:
 		{
+			this->IsAltHeld     = false;
+			this->IsCtrlHeld    = false;
+			this->IsShiftHeld   = false;
 			this->Capture.Alt   = false;
 			this->Capture.Ctrl  = false;
 			this->Capture.Shift = false;
