@@ -145,28 +145,31 @@ void CDebugWindow::TabInputBinds()
 		{
 			if (ImGui::TreeNode(identifier.c_str()))
 			{
-				ImGui::TextDisabled("\tType: %d", inputBind.HandlerType);
 				switch (inputBind.HandlerType)
 				{
 					default:
 					case EIbHandlerType::None:
 					{
+						ImGui::TextDisabled("\tType: %d (None)", inputBind.HandlerType);
 						ImGui::TextDisabled("\tHandler: -");
 						break;
 					}
 					case EIbHandlerType::DownAsync:
 					{
-						ImGui::TextDisabled("\tHandler (DownAsync): %p", inputBind.Handler_DownOnlyAsync);
+						ImGui::TextDisabled("\tType: %d (DownAsync)", inputBind.HandlerType);
+						ImGui::TextDisabled("\tHandler: %p", inputBind.Handler_DownOnlyAsync);
 						break;
 					}
 					case EIbHandlerType::DownReleaseAsync:
 					{
-						ImGui::TextDisabled("\tHandler (DownReleaseAsync): %p", inputBind.Handler_DownReleaseAsync);
+						ImGui::TextDisabled("\tType: %d (DownReleaseAsync)", inputBind.HandlerType);
+						ImGui::TextDisabled("\tHandler: %p", inputBind.Handler_DownReleaseAsync);
 						break;
 					}
 					case EIbHandlerType::DownRelease:
 					{
-						ImGui::TextDisabled("\tHandler (DownRelease): %p", inputBind.Handler_DownRelease);
+						ImGui::TextDisabled("\tType: %d (DownRelease)", inputBind.HandlerType);
+						ImGui::TextDisabled("\tHandler: %p", inputBind.Handler_DownRelease);
 						break;
 					}
 				}
