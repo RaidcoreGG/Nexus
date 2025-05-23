@@ -18,8 +18,9 @@
 ///----------------------------------------------------------------------------------------------------
 struct IbMapping
 {
-	InputBind      Bind;
-	EIbHandlerType HandlerType;
+	InputBind      Bind        = {};
+	bool           Passthrough = false;
+	EIbHandlerType HandlerType = EIbHandlerType::None;
 	union {
 		INPUTBINDS_PROCESS  Handler_DownOnlyAsync;
 		INPUTBINDS_PROCESS2 Handler_DownReleaseAsync;

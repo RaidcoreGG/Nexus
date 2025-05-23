@@ -24,8 +24,6 @@ struct InputBind
 	EInputDevice   Device;
 	unsigned short Code;
 
-	bool           Passthrough;
-
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
@@ -34,13 +32,12 @@ struct InputBind
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	InputBind(bool aAlt, bool aCtrl, bool aShift, EInputDevice aDevice, unsigned short aCode, bool aPassthrough = false)
+	InputBind(bool aAlt, bool aCtrl, bool aShift, EInputDevice aDevice, unsigned short aCode)
 		: Alt         { aAlt         }
 		, Ctrl        { aCtrl        }
 		, Shift       { aShift       }
 		, Device      { aDevice      }
 		, Code        { aCode        }
-		, Passthrough { aPassthrough }
 	{}
 
 	///----------------------------------------------------------------------------------------------------

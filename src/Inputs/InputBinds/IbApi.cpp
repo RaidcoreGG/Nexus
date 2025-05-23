@@ -365,7 +365,7 @@ void CInputBindApi::SetPassthrough(std::string aIdentifier, bool aPassthrough)
 		return;
 	}
 	
-	it->second.Bind.Passthrough = aPassthrough;
+	it->second.Passthrough = aPassthrough;
 
 	this->Save();
 
@@ -519,10 +519,10 @@ void CInputBindApi::Load()
 			if (binding["Key"].is_null() && binding["Code"].is_null()) { continue; }
 
 			InputBind ib{};
-			ib.Alt         = binding.value("Alt",         false);
-			ib.Ctrl        = binding.value("Ctrl",        false);
-			ib.Shift       = binding.value("Shift",       false);
-			ib.Passthrough = binding.value("Passthrough", false);
+			ib.Alt           = binding.value("Alt",         false);
+			ib.Ctrl          = binding.value("Ctrl",        false);
+			ib.Shift         = binding.value("Shift",       false);
+			bool passthrough = binding.value("Passthrough", false);
 
 			/* neither code nor type null -> inputbind */
 			if (!binding["Type"].is_null() && !binding["Code"].is_null())
@@ -556,11 +556,13 @@ void CInputBindApi::Load()
 			if (it != this->Registry.end())
 			{
 				it->second.Bind = ib;
+				it->second.Passthrough = passthrough;
 			}
 			else
 			{
 				IbMapping mapping{};
 				mapping.Bind = ib;
+				mapping.Passthrough = passthrough;
 				this->Registry.emplace(identifier, mapping);
 			}
 		}
@@ -593,7 +595,7 @@ void CInputBindApi::Save()
 			{"Shift",       ib.Bind.Shift      },
 			{"Type",        ib.Bind.Device     },
 			{"Code",        ib.Bind.Code       },
-			{"Passthrough", ib.Bind.Passthrough}
+			{"Passthrough", ib.Passthrough     }
 		};
 
 		/* override type */
@@ -635,7 +637,7 @@ bool CInputBindApi::Press(const InputBind& aInputBind)
 	bool invoked = this->Invoke(it->first);
 
 	/* if was invoked -> stop processing (unless it was the togglehideui bind, pass through for multi hide)*/
-	if (invoked && it->second.Bind.Passthrough == false)
+	if (invoked && it->second.Passthrough == false)
 	{
 		return true;
 	}

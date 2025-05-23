@@ -190,10 +190,10 @@ void CBindsWindow::RenderInputBindsTable(std::unordered_map<std::string, InputBi
 			ImGui::PopID();
 
 			ImGui::TableSetColumnIndex(2);
-			if (ImGui::Checkbox(("##Passthrough_" + identifier).c_str(), &inputBind.Bind.Bind.Passthrough))
+			if (ImGui::Checkbox(("##Passthrough_" + identifier).c_str(), &inputBind.Bind.Passthrough))
 			{
 				CInputBindApi* ibapi = ctx->GetInputBindApi();
-				ibapi->SetPassthrough(identifier, inputBind.Bind.Bind.Passthrough);
+				ibapi->SetPassthrough(identifier, inputBind.Bind.Passthrough);
 			}
 			ImGui::TooltipGeneric(langApi->Translate("((000115))"));
 

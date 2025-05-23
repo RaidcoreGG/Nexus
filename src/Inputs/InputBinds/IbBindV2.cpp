@@ -18,7 +18,6 @@ InputBind::InputBind(InputBindV1 aLegacyInputBind)
 
 	this->Device      = EInputDevice::Keyboard;
 	this->Code        = aLegacyInputBind.Key;
-	this->Passthrough = false;
 }
 
 bool InputBind::IsBound() const
@@ -32,8 +31,7 @@ bool operator==(const InputBind& lhs, const InputBind& rhs)
 	       lhs.Ctrl        == rhs.Ctrl &&
 	       lhs.Shift       == rhs.Shift &&
 	       lhs.Device      == rhs.Device &&
-	       lhs.Code        == rhs.Code &&
-	       lhs.Passthrough == rhs.Passthrough;
+	       lhs.Code        == rhs.Code;
 }
 
 bool operator!=(const InputBind& lhs, const InputBind& rhs)
