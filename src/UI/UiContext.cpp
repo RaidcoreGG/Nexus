@@ -46,7 +46,6 @@
 
 namespace UIRoot
 {
-	ImFont* MonospaceFont            = nullptr;
 	ImFont* UserFont                 = nullptr;
 	ImFont* Font                     = nullptr;
 	ImFont* FontBig                  = nullptr;
@@ -75,10 +74,6 @@ namespace UIRoot
 
 			ImGuiIO& io = ImGui::GetIO();
 			io.FontDefault = UserFont;
-		}
-		else if (str == "FONT_DEFAULT")
-		{
-			MonospaceFont = aFont;
 		}
 		else
 		{
@@ -801,7 +796,7 @@ void CUiContext::LoadFonts()
 
 	/* add user font */
 	bool hasUserFont = false;
-	float storedFontSz = settingsctx->Get<float>(OPT_FONTSIZE, 13.0f);
+	float storedFontSz = settingsctx->Get<float>(OPT_FONTSIZE, 15.0f);
 	storedFontSz = min(max(storedFontSz, 1.0f), 50.0f);
 
 	std::string fontFile = settingsctx->Get<std::string>(OPT_USERFONT, "");
@@ -817,7 +812,7 @@ void CUiContext::LoadFonts()
 
 	if (!hasUserFont)
 	{
-		this->FontManager->ResizeFont("FONT_DEFAULT", storedFontSz);
+		this->FontManager->ResizeFont("USER_FONT", storedFontSz);
 	}
 
 	ImFontConfig config;
@@ -885,6 +880,12 @@ void CUiContext::ApplyStyle(EUIStyle aStyle, std::string aValue)
 				CSettings* settingsctx = ctx->GetSettingsCtx();
 
 				std::string b64_style = settingsctx->Get<std::string>(OPT_IMGUISTYLE, {});
+
+				if (b64_style.empty())
+				{
+					this->ApplyStyle(EUIStyle::Nexus);
+					return;
+				}
 				std::string decodeStyle = Base64::Decode(b64_style, b64_style.length());
 				memcpy_s(style, sizeof(ImGuiStyle), &decodeStyle[0], decodeStyle.length());
 			}
@@ -896,16 +897,18 @@ void CUiContext::ApplyStyle(EUIStyle aStyle, std::string aValue)
 		}
 		case EUIStyle::Nexus:
 		{
-			ApplyDefaultStyle();
 			try
 			{
-				static std::string s_NexusColorsDefault = "AACAPwAAgD8AAIA/AACAPwAAAD8AAAA/AAAAPwAAgD+PwnU9j8J1PY/CdT3Xo3A/AAAAAAAAAAAAAAAAAAAAAArXoz0K16M9CtejPdejcD/2KNw+9ijcPgAAAD8AAAA/AAAAAAAAAAAAAAAAAAAAAArXIz7hepQ+j8L1PnE9Cj+4HoU+PQoXP0jhej/NzMw+uB6FPj0KFz9I4Xo/H4UrPwrXIz0K1yM9CtcjPQAAgD8K1yM+4XqUPo/C9T4AAIA/AAAAAAAAAAAAAAAAXI8CPylcDz4pXA8+KVwPPgAAgD8K16M8CtejPArXozwUrgc/UriePlK4nj5SuJ4+AACAP4Xr0T6F69E+hevRPgAAgD9cjwI/XI8CP1yPAj8AAIA/uB6FPj0KFz9I4Xo/AACAP4/CdT64HgU/rkdhPwAAgD+4HoU+PQoXP0jhej8AAIA/uB6FPj0KFz9I4Xo/zczMPrgehT49Chc/SOF6PwAAgD+PwnU9FK4HP0jhej8AAIA/uB6FPj0KFz9I4Xo/UriePrgehT49Chc/SOF6P83MTD+4HoU+PQoXP0jhej8AAIA/9ijcPvYo3D4AAAA/AAAAP83MzD3NzMw+AABAPxSuRz/NzMw9zczMPgAAQD8AAIA/uB6FPj0KFz9I4Xo/zcxMPrgehT49Chc/SOF6Px+FKz+4HoU+PQoXP0jhej8zM3M/61E4PjIzsz7iehQ/CKxcP7gehT49Chc/SOF6P83MTD/MzEw+hOvRPnsULj8AAIA/lkOLPV7l0D1SjRc+Ne94P5RDCz7cJIY+hxbZPgAAgD/2KBw/9igcP/YoHD8AAIA/AACAP/Yo3D4zM7M+AACAP2ZmZj8zMzM/AAAAAAAAgD8AAIA/mpkZPwAAAAAAAIA/XI9CPlyPQj7NzEw+AACAP1K4nj5SuJ4+MzOzPgAAgD8fhWs+H4VrPgAAgD4AAIA/AAAAAAAAAAAAAAAAAAAAAAAAgD8AAIA/AACAP4/CdT24HoU+PQoXP0jhej8zM7M+AACAPwAAgD8AAAAAZmZmP7gehT49Chc/SOF6PwAAgD8AAIA/AACAPwAAgD8zMzM/zcxMP83MTD/NzEw/zcxMPs3MTD/NzEw/zcxMPzMzsz4=";
-				std::string decodeColors = Base64::Decode(s_NexusColorsDefault, s_NexusColorsDefault.length());
-				memcpy_s(&style->Colors[0], sizeof(ImVec4) * ImGuiCol_COUNT, &decodeColors[0], decodeColors.length());
+				CContext* ctx = CContext::GetContext();
+				CSettings* settingsctx = ctx->GetSettingsCtx();
+
+				std::string b64_style = "AACAPwAAoEAAAKBAAADAQAAAgD8AAMBAAACAQAAAAAAAAAA/AAAAAAAAwEAAAIA/AADAQAAAgD8AAMBAAAAAQAAAwEAAAAAAAADAQAAAgEAAAMBAAACAQAAAwEAAAIBAAAAAAAAAAAAAAABCAADAQAAAQEEAAMBAAAAAQgAAwEAAAIBAAADAQAAAAAAAAAAAAQAAAAAAAD8AAAA/AAAAAAAAAAAAAJhBAACYQQAAQEAAAEBAAACAPwEBAQAAAKA/zczMPwAAgD8AAIA/AACAPwAAgD+rqio/q6oqP6uqKj8AAIA/mZiYPbGwsD3h4OA97+5uP5mYmD2xsLA94eDgPYmICD+ZmJg9sbCwPeHg4D3e3V0/gYAAP4GAAD+BgAA/mpkZPwrXIz9SuB4/H4UrPwAAAABSuB4/mpkZP2ZmJj/NzEw+UrgeP5qZGT9mZiY/AABAPylcDz8pXA8/4XoUPwAAQD+ZmJg9sbCwPeHg4D0AAIA/mZiYPbGwsD3h4OA9AACAP5mYmD2xsLA94eDgPQAAgD+ZmJg9sbCwPeHg4D0AAIA/mZiYPbGwsD3h4OA9AACAPx+F6z5mZuY+16PwPhSuRz8fhSs/H4UrP9ejMD8Urkc/FK5HPxSuRz/NzEw/FK5HP83MTD/NzEw/4XpUPylcTz/NzEw/zcxMP+F6VD9SuJ4+j8J1Pc3MTD0pXI89AACAP1K4Hj+amRk/ZmYmP5qZmT5SuB4/mpkZP2ZmJj+amRk/UrgeP5qZGT9mZiY/ZmZmP+xRuD7sUbg+XI/CPjMzMz/sUbg+7FG4PlyPwj4zM7M+7FG4PuxRuD5cj8I+MzMzPwAAAD8AAAA/AAAAP5qZGT+amRk/mpkZPzMzMz8AAIA/MzMzPzMzMz9mZmY/AACAPwAAAAAAAAAAAAAAAAAAAAApXA8/KVwPP+F6FD8AAIA/j8J1Pc3MTD0pXI89AACAPzMzMz97FC4/16MwP83MzD0zMzM/exQuP9ejMD+amZk+MzMzP3sULj/XozA/9ijcPpf/kD6X/5A+4ZwRPyo6Uj+hZ7M+oWezPkLPJj+9UlY/MzMzP3sULj/D9Sg/KVwPPwAAgD4AAIA/AAAAAAAAgD8zMzM/exQuP8P1KD+PwvU+AACAPgAAgD8AAAAAAACAP3E9ij5xPYo+XI/CPgAAgD9SuJ4+UriePmZm5j4AAIA/uB6FPrgehT4pXI8+AACAPwAAAAAAAAAAAAAAAAAAAAAAAIA/AACAPwAAgD8pXI897FG4PuxRuD6uR2E/zcwMPwAAgD8AAIA/AAAAAGZmZj9mZuY+ZmbmPmZmZj/NzEw/AACAPwAAgD8AAIA/MzMzP83MTD/NzEw/zcxMP83MTD7NzEw+zcxMPs3MTD4zM7M+";
+				std::string decodeStyle = Base64::Decode(b64_style, b64_style.length());
+				memcpy_s(style, sizeof(ImGuiStyle), &decodeStyle[0], decodeStyle.length());
 			}
 			catch (...)
 			{
-				this->Logger->Warning(CH_UICONTEXT, "Error applying Nexus default style.");
+				this->Logger->Warning(CH_UICONTEXT, "Error applying user style.");
 			}
 			return;
 		}
@@ -1106,7 +1109,7 @@ void CUiContext::LoadSettings()
 	ImGuiIO& io = ImGui::GetIO();
 	ImGuiStyle* style = &ImGui::GetStyle();
 
-	float storedFontSz = settingsCtx->Get<float>(OPT_FONTSIZE, 13.0f);
+	float storedFontSz = settingsCtx->Get<float>(OPT_FONTSIZE, 15.0f);
 	if (storedFontSz <= 0)
 	{
 		storedFontSz = min(max(storedFontSz, 1.0f), 50.0f);

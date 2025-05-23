@@ -61,8 +61,7 @@ enum class EUIStyle
 ///----------------------------------------------------------------------------------------------------
 namespace UIRoot
 {
-	extern ImFont* MonospaceFont; /* default/monospace/console font */
-	extern ImFont* UserFont;      /* custom user font */
+	extern ImFont* UserFont;      /* custom user font or default font */
 	extern ImFont* Font;          /* Menomonia */
 	extern ImFont* FontBig;       /* Menomonia, but slightly bigger */
 	extern ImFont* FontUI;        /* Trebuchet */

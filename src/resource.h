@@ -10,7 +10,7 @@
 /* Fonts */
 #define RES_FONT_MENOMONIA              101
 #define RES_FONT_TREBUCHET              102
-#define RES_FONT_PROGGYCLEAN            103
+#define RES_FONT_INTER                  103
 
 /* QuickAccess */
 #define RES_ICON_NEXUS                  201

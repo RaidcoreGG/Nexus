@@ -302,7 +302,7 @@ void COptionsWindow::TabStyle()
 			}
 
 			ImGui::Text(langApi->Translate("((000054))"));
-			static float fontSize = settingsctx->Get<float>(OPT_FONTSIZE, 13.0f);
+			static float fontSize = settingsctx->Get<float>(OPT_FONTSIZE, 15.0f);
 			if (ImGui::InputFloat("##FontSizeInput", &fontSize, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_EnterReturnsTrue))
 			{
 				fontSize = min(max(fontSize, 1.0f), 50.0f);
@@ -314,7 +314,6 @@ void COptionsWindow::TabStyle()
 
 				CFontManager* fontMgr = uictx->GetFontManager();
 				fontMgr->ResizeFont("USER_FONT", imguictx->FontSize);
-				fontMgr->ResizeFont("FONT_DEFAULT", imguictx->FontSize);
 			}
 			ImGui::EndGroupPanel();
 
@@ -333,10 +332,10 @@ void COptionsWindow::TabStyle()
 					ImGui::BeginGroupPanel("Presets", ImVec2(-1.0f, 0.0f));
 					if (ImGui::BeginCombo("##PresetSelector", "Select"))
 					{
-						/*if (ImGui::Selectable("Nexus"))
+						if (ImGui::Selectable("Nexus"))
 						{
 							uictx->ApplyStyle(EUIStyle::Nexus);
-						}*/
+						}
 						if (ImGui::Selectable("ArcDPS Default"))
 						{
 							uictx->ApplyStyle(EUIStyle::ArcDPS_Default);

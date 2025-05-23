@@ -43,8 +43,6 @@ void CMumbleOverlay::Render()
 									ImGuiWindowFlags_NoInputs              |
 									ImGuiWindowFlags_NoBringToFrontOnFocus;
 
-	ImGui::PushFont(UIRoot::MonospaceFont);
-
 	ImVec2 pos = ImVec2(16.0f, 16.0f);
 	ImVec2 size = ImVec2(ImGui::CalcTextSize("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx").x, 0.0f);
 
@@ -312,6 +310,4 @@ void CMumbleOverlay::Render()
 		}
 		ImGui::End();
 	}
-
-	ImGui::PopFont();
 }

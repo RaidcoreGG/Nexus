@@ -391,8 +391,8 @@
     <None Include="src\Resources\Locales\ru_Main.json" />
   </ItemGroup>
   <ItemGroup>
+    <Font Include="src\Resources\Fonts\Inter.ttf" />
     <Font Include="src\Resources\Fonts\Menomonia.ttf" />
-    <Font Include="src\Resources\Fonts\ProggyClean.ttf" />
     <Font Include="src\Resources\Fonts\TrebuchetMS.ttf" />
   </ItemGroup>
   <ItemGroup>
@@ -429,7 +429,7 @@
     <Image Include="src\Resources\RaidcoreTag.png" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="src\Resources\THIRDPARTYSOFTWAREREADME.TXT" />
+    <Text Include="THIRDPARTYSOFTWAREREADME.TXT" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
