@@ -1168,6 +1168,21 @@ void CUiContext::UpdateDisplayInputBinds()
 			};
 		}
 	}
+
+	/* sort input binds. */
+	std::sort(this->DisplayInputBinds.begin(), this->DisplayInputBinds.end(), [](InputBindCategory& lhs, InputBindCategory& rhs)
+	{
+		// Nexus first
+		if (lhs.Name == "Nexus") return true;
+		if (rhs.Name == "Nexus") return false;
+
+		// Inactive second
+		if (lhs.Name == "((000088))") return true;
+		if (rhs.Name == "((000088))") return false;
+
+		/* Rest alphabetical */
+		return lhs.Name < rhs.Name;
+	});
 }
 
 void CUiContext::UpdateDisplayGameBinds()
