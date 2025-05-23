@@ -6,8 +6,8 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef EVENTAPI_H
-#define EVENTAPI_H
+#ifndef EVTAPI_H
+#define EVTAPI_H
 
 #include <mutex>
 #include <string>
@@ -15,18 +15,10 @@
 #include <vector>
 
 #include "EvtFuncDefs.h"
+#include "EvtData.h"
 #include "EvtSubscriber.h"
 
 constexpr const char* CH_EVENTS = "Events";
-
-///----------------------------------------------------------------------------------------------------
-/// EventData Struct
-///----------------------------------------------------------------------------------------------------
-struct EventData
-{
-	std::vector<EventSubscriber> Subscribers;
-	unsigned long long           AmountRaises = 0;
-};
 
 ///----------------------------------------------------------------------------------------------------
 /// CEventApi Class
