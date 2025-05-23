@@ -1250,6 +1250,9 @@
     <ClInclude Include="src\Services\DataLink\DlEnum.h">
       <Filter>Services\DataLink</Filter>
     </ClInclude>
+    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\UninstallConfirmationModal.h">
+      <Filter>UI\Widgets\MainWindow\Pages\Addons</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\Nexus.rc">

@@ -15,6 +15,7 @@
 #include "DisplayAddon.h"
 #include "UI/Controls/CtlSubWindow.h"
 #include "UI/Widgets/MainWindow/Binds/BindSetterModal.h"
+#include "UninstallConfirmationModal.h"
 
 constexpr const char* OPT_ISLISTMODE = "IsListMode";
 constexpr const char* OPT_ADDONFILTERS = "AddonFilters";
@@ -38,16 +39,17 @@ class CAddonsWindow : public ISubWindow
 	void Invalidate(signed int aAddonID);
 
 	private:
-	CBindSetterModal           BindSetterModal;
+	CBindSetterModal            BindSetterModal;
+	CUninstallConfirmationModal UninstallConfirmationModal;
 
-	std::string                SearchTerm;
-	EAddonsFilterFlags         Filter;
-	std::vector<AddonItemData> Addons;
+	std::string                 SearchTerm;
+	EAddonsFilterFlags          Filter;
+	std::vector<AddonItemData>  Addons;
 
 	/* Details */
-	std::mutex                 Mutex;
-	bool                       HasContent = false;
-	AddonItemData              AddonData = {};
+	std::mutex                  Mutex;
+	bool                        HasContent = false;
+	AddonItemData               AddonData = {};
 
 	void SetContent(AddonItemData& aAddonData);
 	void ClearContent();

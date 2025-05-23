@@ -1024,6 +1024,12 @@ void CAddonsWindow::RenderSubWindows()
 	{
 		this->Invalidate();
 	}
+
+	if (this->UninstallConfirmationModal.Render() && this->UninstallConfirmationModal.GetResult() == EModalResult::OK)
+	{
+		this->ClearContent();
+		this->Invalidate();
+	}
 }
 
 void CAddonsWindow::RenderDetails()
@@ -1269,11 +1275,7 @@ void CAddonsWindow::RenderDetails()
 
 			if (ImGui::Button((langApi->Translate("((000018))") + sigid).c_str()))
 			{
-				//Logger->Debug(CH_GUI, "Uninstall called: %s", it.second->Definitions->Name);
-				Loader::QueueAddon(ELoaderAction::Uninstall, addonData.NexusAddon->Path);
-				skipOptions = true;
-				this->ClearContent();
-				this->Invalidate();
+				this->UninstallConfirmationModal.SetTarget(addonData.NexusAddon->Definitions->Name, addonData.NexusAddon->Path);
 			}
 			if (addonData.NexusAddon->State == EAddonState::LoadedLOCKED)
 			{
