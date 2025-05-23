@@ -24,7 +24,7 @@
 #include "AddonDefinition.h"
 #include "FuncDefs.h"
 
-#include "Events/EventApi.h"
+#include "Events/EvtApi.h"
 #include "UI/UiContext.h"
 #include "UI/Services/Fonts/FontManager.h"
 #include "UI/Services/QoL/EscapeClosing.h"

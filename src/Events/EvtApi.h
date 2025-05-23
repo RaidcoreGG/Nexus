@@ -1,7 +1,7 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  EventApi.h
+/// Name         :  EvtApi.h
 /// Description  :  Provides functions raise and receive events.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
@@ -34,15 +34,6 @@ struct EventData
 class CEventApi
 {
 	public:
-	///----------------------------------------------------------------------------------------------------
-	/// ctor
-	///----------------------------------------------------------------------------------------------------
-	CEventApi() = default;
-	///----------------------------------------------------------------------------------------------------
-	/// dtor
-	///----------------------------------------------------------------------------------------------------
-	~CEventApi() = default;
-
 	///----------------------------------------------------------------------------------------------------
 	/// Raise:
 	/// 	Raises an event of provided name, passing a pointer to the payload.
@@ -80,7 +71,7 @@ class CEventApi
 	std::unordered_map<std::string, EventData> GetRegistry() const;
 
 	private:
-	mutable std::mutex                         Mutex;
+	mutable std::recursive_mutex               Mutex;
 	std::unordered_map<std::string, EventData> Registry;
 };
 

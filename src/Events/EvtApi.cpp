@@ -6,7 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "EventApi.h"
+#include "EvtApi.h"
 
 #include "Loader/ArcDPS.h"
 #include "Loader/Loader.h"
@@ -15,7 +15,7 @@ void CEventApi::Raise(const char* aIdentifier, void* aEventData)
 {
 	if (aIdentifier == nullptr) { return; }
 
-	const std::lock_guard<std::mutex> lock(this->Mutex);
+	const std::lock_guard<std::recursive_mutex> lock(this->Mutex);
 
 	auto it = this->Registry.find(aIdentifier);
 	
@@ -36,7 +36,7 @@ void CEventApi::Raise(signed int aSignature, const char* aIdentifier, void* aEve
 {
 	if (aIdentifier == nullptr) { return; }
 
-	const std::lock_guard<std::mutex> lock(this->Mutex);
+	const std::lock_guard<std::recursive_mutex> lock(this->Mutex);
 
 	auto it = this->Registry.find(aIdentifier);
 
@@ -62,7 +62,7 @@ void CEventApi::Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCa
 	if (aIdentifier == nullptr)           { return; }
 	if (aConsumeEventCallback == nullptr) { return; }
 
-	const std::lock_guard<std::mutex> lock(this->Mutex);
+	const std::lock_guard<std::recursive_mutex> lock(this->Mutex);
 	
 	EventSubscriber sub{};
 	sub.Callback = aConsumeEventCallback;
@@ -103,8 +103,7 @@ void CEventApi::Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCa
 		it->second.Subscribers.push_back(sub);
 	}
 
-	// TODO / FIXME
-	// Dirty hack to detect ArcDPS below. Do this cleaner later.
+	// FIXME: Dirty hack to detect ArcDPS below. Do this cleaner later. Ideally remove it from the eventapi entirely.
 	if (ArcDPS::IsLoaded)
 	{
 		return;
@@ -122,7 +121,7 @@ void CEventApi::Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEvent
 {
 	if (aIdentifier == nullptr) { return; }
 
-	const std::lock_guard<std::mutex> lock(this->Mutex);
+	const std::lock_guard<std::recursive_mutex> lock(this->Mutex);
 	
 	auto it = this->Registry.find(aIdentifier);
 
@@ -148,7 +147,7 @@ int CEventApi::Verify(void* aStartAddress, void* aEndAddress)
 {
 	int refCounter = 0;
 
-	const std::lock_guard<std::mutex> lock(this->Mutex);
+	const std::lock_guard<std::recursive_mutex> lock(this->Mutex);
 	
 	for (auto& [identifier, ev] : this->Registry)
 	{
@@ -175,7 +174,7 @@ int CEventApi::Verify(void* aStartAddress, void* aEndAddress)
 
 std::unordered_map<std::string, EventData> CEventApi::GetRegistry() const
 {
-	const std::lock_guard<std::mutex> lock(this->Mutex);
+	const std::lock_guard<std::recursive_mutex> lock(this->Mutex);
 
 	return this->Registry;
 }

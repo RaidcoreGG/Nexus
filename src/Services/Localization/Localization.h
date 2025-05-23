@@ -15,7 +15,7 @@
 #include <string>
 
 #include "Services/Logging/LogHandler.h"
-#include "Events/EventApi.h"
+#include "Events/EvtApi.h"
 
 constexpr const char* CH_LOCALIZATION = "Localization";
 

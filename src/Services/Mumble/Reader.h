@@ -12,7 +12,7 @@
 #include <string>
 #include <thread>
 
-#include "Events/EventApi.h"
+#include "Events/EvtApi.h"
 #include "Loader/NexusLinkData.h"
 #include "Services/DataLink/DlApi.h"
 #include "Services/Logging/LogHandler.h"

@@ -28,7 +28,7 @@
     <ClCompile Include="src\Loader\Library.cpp" />
     <ClCompile Include="src\Services\Localization\Localization.cpp" />
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\Events\EventApi.cpp" />
+    <ClCompile Include="src\Events\EvtApi.cpp" />
     <ClCompile Include="src\thirdparty\ImAnimate\ImAnimate.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui_draw.cpp" />
@@ -122,7 +122,7 @@
     <ClInclude Include="src\Services\DataLink\DlEnum.h" />
     <ClInclude Include="src\Services\DataLink\DlFuncDefs.h" />
     <ClInclude Include="src\Services\DataLink\DlLinkedResource.h" />
-    <ClInclude Include="src\Events\EventApi.h" />
+    <ClInclude Include="src\Events\EvtApi.h" />
     <ClInclude Include="src\Events\EvtSubscriber.h" />
     <ClInclude Include="src\Events\EvtFuncDefs.h" />
     <ClInclude Include="src\thirdparty\httplib\httplib.h" />

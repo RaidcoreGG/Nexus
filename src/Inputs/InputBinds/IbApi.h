@@ -14,7 +14,7 @@
 #include <string>
 #include <windows.h>
 
-#include "Events/EventApi.h"
+#include "Events/EvtApi.h"
 #include "IbFuncDefs.h"
 #include "IbBindV2.h"
 #include "IbMapping.h"
