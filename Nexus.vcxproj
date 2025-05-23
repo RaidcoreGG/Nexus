@@ -428,6 +428,9 @@
     <Image Include="src\Resources\QuickAccess\Nexus_Hover.png" />
     <Image Include="src\Resources\RaidcoreTag.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="src\Resources\THIRDPARTYSOFTWAREREADME.TXT" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

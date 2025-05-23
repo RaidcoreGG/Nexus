@@ -28,6 +28,7 @@
 #include "UI/UiContext.h"
 #include "Util/CmdLine.h"
 #include "Util/Strings.h"
+#include "Util/Resources.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -85,7 +86,9 @@ namespace Main
 		//SetUnhandledExceptionFilter(UnhandledExcHandler);
 		
 		Index::BuildIndex(ctx->GetModule());
-		
+
+		Resources::Unpack(ctx->GetModule(), Index::F_THIRDPARTYNOTICES, RES_THIRDPARTYNOTICES, "TXT");
+
 		CLogHandler* logger = ctx->GetLogger();
 		CUpdater* updater = ctx->GetUpdater();
 

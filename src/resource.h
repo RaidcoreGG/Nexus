@@ -3,6 +3,8 @@
 // Used by Nexus.rc
 //
 
+#define RES_THIRDPARTYNOTICES             1
+
 #define RES_ICON_SNOWFLAKE              999
 
 /* Fonts */

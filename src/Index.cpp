@@ -44,6 +44,8 @@ namespace Index
 	std::filesystem::path F_ADDONCONFIG_DEFAULT{};
 	std::filesystem::path F_APIKEYS{};
 
+	std::filesystem::path F_THIRDPARTYNOTICES;
+
 	std::filesystem::path F_LOCALE_EN{};
 	std::filesystem::path F_LOCALE_DE{};
 	std::filesystem::path F_LOCALE_FR{};
@@ -96,6 +98,8 @@ namespace Index
 		F_ADDONCONFIG = D_GW2_ADDONS_NEXUS / "AddonConfig.json";
 		F_ADDONCONFIG_DEFAULT = D_GW2_ADDONS_NEXUS / "AddonConfig.json";
 		F_APIKEYS = D_GW2_ADDONS_COMMON / "APIKeys.json";
+
+		F_THIRDPARTYNOTICES = D_GW2_ADDONS_NEXUS / "THIRDPARTYSOFTWAREREADME.TXT";
 			
 		/* static paths */
 		F_OLD_DLL = F_HOST_DLL.string() + ".old";

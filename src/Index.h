@@ -49,6 +49,8 @@ namespace Index
 	extern std::filesystem::path F_ADDONCONFIG_DEFAULT;
 	extern std::filesystem::path F_APIKEYS;
 
+	extern std::filesystem::path F_THIRDPARTYNOTICES;
+
 	extern std::filesystem::path F_LOCALE_EN;
 	extern std::filesystem::path F_LOCALE_DE;
 	extern std::filesystem::path F_LOCALE_FR;

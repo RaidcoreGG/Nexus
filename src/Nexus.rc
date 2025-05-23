@@ -85,6 +85,8 @@ BEGIN
 	END
 END
 
+RES_THIRDPARTYNOTICES           TXT     "Resources\\THIRDPARTYSOFTWAREREADME.TXT"
+
 RES_ICON_SNOWFLAKE              PNG     "Resources\\icons\\snowflake.png"
 
 /* Fonts */
