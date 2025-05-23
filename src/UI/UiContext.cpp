@@ -293,7 +293,7 @@ CUiContext::CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CText
 	CBindsWindow*   bindsWNd   = new CBindsWindow();
 	CLogWindow*     logWnd     = new CLogWindow();
 	CDebugWindow*   debugWnd   = new CDebugWindow();
-	//CAboutBox*      aboutWnd   = new CAboutBox();
+	CAboutBox*      aboutWnd   = new CAboutBox();
 
 	this->Logger->RegisterLogger(logWnd);
 
@@ -302,7 +302,7 @@ CUiContext::CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CText
 	this->MainWindow->AddWindow(bindsWNd);
 	this->MainWindow->AddWindow(logWnd);
 	this->MainWindow->AddWindow(debugWnd);
-	//this->MainWindow->AddWindow(aboutWnd);
+	this->MainWindow->AddWindow(aboutWnd);
 
 	/* register InputBinds */
 	this->InputBindApi->Register(KB_MENU,          EIbHandlerType::DownAsync, UIRoot::OnInputBind, "CTRL+O");
