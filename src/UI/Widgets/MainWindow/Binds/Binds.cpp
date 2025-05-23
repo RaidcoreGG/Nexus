@@ -198,7 +198,7 @@ void CBindsWindow::RenderInputBindsTable(std::unordered_map<std::string, InputBi
 			ImGui::TooltipGeneric(langApi->Translate("((000115))"));
 
 			ImGui::TableSetColumnIndex(3);
-			/* FIXME: This access the DownAsync union field. */
+			/* FIXME: This accesses the DownAsync union field. */
 			if (inputBind.Bind.Handler_DownOnlyAsync == nullptr)
 			{
 				if (ImGui::SmallButton(("X##" + identifier).c_str()))
