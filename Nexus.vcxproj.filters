@@ -228,9 +228,6 @@
     <ClCompile Include="src\Services\Mumble\Reader.cpp">
       <Filter>Services\Mumble</Filter>
     </ClCompile>
-    <ClCompile Include="src\Events\EventApi.cpp">
-      <Filter>Events</Filter>
-    </ClCompile>
     <ClCompile Include="src\Inputs\InputBinds\IbApi.cpp">
       <Filter>Inputs\InputBinds</Filter>
     </ClCompile>
@@ -423,6 +420,12 @@
     <ClCompile Include="src\Inputs\InputBinds\IbCapture.cpp">
       <Filter>Inputs\InputBinds</Filter>
     </ClCompile>
+    <ClCompile Include="src\UI\Widgets\MainWindow\Addons\UninstallConfirmationModal.cpp">
+      <Filter>UI\Widgets\MainWindow\Pages\Addons</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Events\EvtApi.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h">
@@ -481,9 +484,6 @@
     </ClInclude>
     <ClInclude Include="src\Services\Mumble\Reader.h">
       <Filter>Services\Mumble</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Events\EventApi.h">
-      <Filter>Events</Filter>
     </ClInclude>
     <ClInclude Include="src\Inputs\InputBinds\IbApi.h">
       <Filter>Inputs\InputBinds</Filter>
@@ -1253,6 +1253,12 @@
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\UninstallConfirmationModal.h">
       <Filter>UI\Widgets\MainWindow\Pages\Addons</Filter>
     </ClInclude>
+    <ClInclude Include="src\Events\EvtData.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Events\EvtApi.h">
+      <Filter>Events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\Nexus.rc">
@@ -1304,7 +1310,7 @@
     <Font Include="src\Resources\Fonts\TrebuchetMS.ttf">
       <Filter>Resource Files\Fonts</Filter>
     </Font>
-    <Font Include="src\Resources\Fonts\ProggyClean.ttf">
+    <Font Include="src\Resources\Fonts\Inter.ttf">
       <Filter>Resource Files\Fonts</Filter>
     </Font>
   </ItemGroup>
@@ -1402,5 +1408,8 @@
     <Image Include="src\Resources\icons\favorite.png">
       <Filter>Resource Files\Images\icons</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="THIRDPARTYSOFTWAREREADME.TXT" />
   </ItemGroup>
 </Project>
