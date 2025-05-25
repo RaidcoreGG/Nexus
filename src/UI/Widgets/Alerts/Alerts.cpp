@@ -14,36 +14,45 @@
 
 #include "Renderer.h"
 
+constexpr ImGuiWindowFlags Flags
+	= ImGuiWindowFlags_NoDecoration
+	| ImGuiWindowFlags_NoInputs
+	| ImGuiWindowFlags_NoNav
+	| ImGuiWindowFlags_AlwaysAutoResize
+	| ImGuiWindowFlags_NoResize
+	| ImGuiWindowFlags_NoSavedSettings
+	| ImGuiWindowFlags_NoBackground;
+
 CAlerts::CAlerts(CDataLinkApi* aDataLink)
 {
 	this->NexusLink = (NexusLinkData*)aDataLink->GetResource("DL_NEXUS_LINK");
-}
-
-CAlerts::~CAlerts()
-{
-	this->NexusLink = nullptr;
 }
 
 void CAlerts::Render()
 {
 	if (this->Queue.size() > 0)
 	{
-		Alert& alert = this->Queue.front();
+		AlertMessage& alert = this->Queue.front();
 
 		ImGui::PushFont((ImFont*)this->NexusLink->FontBig);
 		float width = ImGui::CalcTextSize(alert.Message.c_str()).x;
 
 		/* center horizontally */
 		ImGui::SetNextWindowPos(ImVec2((Renderer::Width - width) / 2.0f, 230.0f * Renderer::Scaling));
-		if (ImGui::Begin("##Alerts", (bool*)0, ImGuiWindowFlags_NoDecoration |
-			ImGuiWindowFlags_NoInputs |
-			ImGuiWindowFlags_NoNav |
-			ImGuiWindowFlags_AlwaysAutoResize |
-			ImGuiWindowFlags_NoResize |
-			ImGuiWindowFlags_NoSavedSettings |
-			ImGuiWindowFlags_NoBackground))
+		if (ImGui::Begin("##Alerts", (bool*)0, Flags))
 		{
-			ImGui::TextColoredOutlined(ImVec4(1.0f, 1.0f, 0, this->Opacity), "%s", alert.Message.c_str());
+			ImColor msgCol;
+			switch (alert.Type)
+			{
+				default:
+				case EAlertType::Info:
+					msgCol = ImVec4(1.f, 1.f, 0.f, this->Opacity);
+					break;
+				case EAlertType::Error:
+					msgCol = ImVec4(1.f, 0.f, 0.f, this->Opacity);
+					break;
+			}
+			ImGui::TextColoredOutlined(msgCol, "%s", alert.Message.c_str());
 		}
 		ImGui::End();
 
@@ -66,18 +75,19 @@ void CAlerts::Render()
 	}
 }
 
-void CAlerts::Notify(const char* aMessage)
+void CAlerts::Notify(EAlertType aType, const char* aMessage)
 {
-	std::string message = aMessage;
+	if (aType == EAlertType::None) { return; }
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
+
 	/* reset fade out if it's the same message */
-	if (this->Queue.size() > 0 && this->Queue.front().Message == message)
+	if (this->Queue.size() > 0 && this->Queue.front().Message == aMessage)
 	{
 		this->Opacity = 1.0f;
 	}
 	else /* otherwise add it to the queue */
 	{
-		this->Queue.push_back(Alert{message});
+		this->Queue.push_back(AlertMessage{aType, aMessage });
 	}
 }

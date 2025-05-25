@@ -338,8 +338,10 @@
     <ClInclude Include="src\UI\Services\QoL\EscapeClosing.h" />
     <ClInclude Include="src\UI\Services\QoL\FuncDefs.h" />
     <ClInclude Include="src\UI\UiContext.h" />
+    <ClInclude Include="src\UI\Widgets\Alerts\AlEnum.h" />
     <ClInclude Include="src\UI\Widgets\Alerts\Alerts.h" />
-    <ClInclude Include="src\UI\Widgets\Alerts\FuncDefs.h" />
+    <ClInclude Include="src\UI\Widgets\Alerts\AlFuncDefs.h" />
+    <ClInclude Include="src\UI\Widgets\Alerts\AlMessage.h" />
     <ClInclude Include="src\UI\Widgets\EULA\LicenseAgreementModal.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\About\About.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\Addons.h" />

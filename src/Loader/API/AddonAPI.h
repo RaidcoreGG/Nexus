@@ -19,7 +19,7 @@
 #include "UI/FuncDefs.h"
 #include "UI/Services/Fonts/FuncDefs.h"
 #include "UI/Services/QoL/FuncDefs.h"
-#include "UI/Widgets/Alerts/FuncDefs.h"
+#include "UI/Widgets/Alerts/AlFuncDefs.h"
 #include "UI/Widgets/QuickAccess/FuncDefs.h"
 
 // Base

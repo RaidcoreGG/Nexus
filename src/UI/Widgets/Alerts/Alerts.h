@@ -16,6 +16,8 @@
 #include "Loader/NexusLinkData.h"
 #include "Services/DataLink/DlApi.h"
 #include "UI/Controls/CtlWindow.h"
+#include "AlMessage.h"
+#include "AlEnum.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// CAlerts Class
@@ -29,11 +31,6 @@ class CAlerts : public virtual IWindow
 	CAlerts(CDataLinkApi* aDataLink);
 
 	///----------------------------------------------------------------------------------------------------
-	/// dtor
-	///----------------------------------------------------------------------------------------------------
-	~CAlerts();
-
-	///----------------------------------------------------------------------------------------------------
 	/// Render:
 	/// 	Renders the Alerts.
 	///----------------------------------------------------------------------------------------------------
@@ -43,21 +40,16 @@ class CAlerts : public virtual IWindow
 	/// Notify:
 	/// 	Queues a new alert.
 	///----------------------------------------------------------------------------------------------------
-	void Notify(const char* aMessage);
+	void Notify(EAlertType aType, const char* aMessage);
 
 	private:
-	struct Alert
-	{
-		std::string    Message;
-		double         StartTime  = 0;
-	};
 
-	NexusLinkData*     NexusLink;
+	NexusLinkData*            NexusLink;
 
-	std::mutex         Mutex;
-	std::vector<Alert> Queue;
+	std::mutex                Mutex;
+	std::vector<AlertMessage> Queue;
 
-	float              Opacity    = 1.0f;
+	float                     Opacity = 1.0f;
 };
 
 #endif

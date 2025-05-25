@@ -819,7 +819,7 @@ namespace Loader
 						}
 						else
 						{
-							Alerts->Notify(String::Format("%s %s", addon->Definitions->Name, Language->Translate("((000079))")).c_str());
+							Alerts->Notify(EAlertType::Info, String::Format("%s %s", addon->Definitions->Name, Language->Translate("((000079))")).c_str());
 						}
 					}
 				}
@@ -863,10 +863,10 @@ namespace Loader
 			static bool didNotify = false;
 			if (!didNotify)
 			{
-				Alerts->Notify(String::Format("%s\n%s", Language->Translate("((000001))"), Language->Translate("((000002))")).c_str());
+				Alerts->Notify(EAlertType::Info, String::Format("%s\n%s", Language->Translate("((000001))"), Language->Translate("((000002))")).c_str());
 				didNotify = true;
 			}
-			Alerts->Notify(String::Format("%s %s", addon->Definitions->Name, Language->Translate("((000073))")).c_str());
+			Alerts->Notify(EAlertType::Info, String::Format("%s %s", addon->Definitions->Name, Language->Translate("((000073))")).c_str());
 
 			FreeLibrary(addon->Module);
 			addon->State = EAddonState::NotLoaded;

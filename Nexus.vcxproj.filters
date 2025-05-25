@@ -1145,7 +1145,7 @@
     <ClInclude Include="src\UI\Widgets\QuickAccess\Shortcut.h">
       <Filter>UI\Widgets\QuickAccess</Filter>
     </ClInclude>
-    <ClInclude Include="src\UI\Widgets\Alerts\FuncDefs.h">
+    <ClInclude Include="src\UI\Widgets\Alerts\AlFuncDefs.h">
       <Filter>UI\Widgets\Alerts</Filter>
     </ClInclude>
     <ClInclude Include="src\UI\Widgets\Alerts\Alerts.h">
@@ -1258,6 +1258,12 @@
     </ClInclude>
     <ClInclude Include="src\Events\EvtApi.h">
       <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\Alerts\AlMessage.h">
+      <Filter>UI\Widgets\Alerts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\Alerts\AlEnum.h">
+      <Filter>UI\Widgets\Alerts</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

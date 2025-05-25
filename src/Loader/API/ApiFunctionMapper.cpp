@@ -408,7 +408,7 @@ namespace ADDONAPI
 		void Notify(const char* aMessage)
 		{
 			assert(s_Alerts);
-			s_Alerts->Notify(aMessage);
+			s_Alerts->Notify(EAlertType::Info, aMessage);
 		}
 	}
 

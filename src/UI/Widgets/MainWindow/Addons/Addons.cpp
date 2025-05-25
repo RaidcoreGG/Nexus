@@ -216,7 +216,7 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 						if (aAddonData.NexusAddon->IsFlaggedForEnable)
 						{
 							aAddonData.NexusAddon->IsDisabledUntilUpdate = false; // explicitly loaded
-							alertctx->Notify(String::Format("%s %s", aAddonData.NexusAddon->Definitions->Name, langApi->Translate("((000080))")).c_str());
+							alertctx->Notify(EAlertType::Info, String::Format("%s %s", aAddonData.NexusAddon->Definitions->Name, langApi->Translate("((000080))")).c_str());
 						}
 
 						Loader::SaveAddonConfig();
@@ -963,7 +963,7 @@ void CAddonsWindow::RenderContent()
 							{
 								Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
 
-								alertctx->Notify(
+								alertctx->Notify(EAlertType::Info,
 									String::Format("%s %s",
 									addon->Definitions->Name,
 									addon->State == EAddonState::LoadedLOCKED
@@ -983,7 +983,7 @@ void CAddonsWindow::RenderContent()
 
 								if (updatedCount == 0)
 								{
-									alertctx->Notify(langApi->Translate("((000087))"));
+									alertctx->Notify(EAlertType::Info, langApi->Translate("((000087))"));
 								}
 							}
 						}).detach();
@@ -1132,7 +1132,7 @@ void CAddonsWindow::RenderDetails()
 									{
 										Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
 
-										alertctx->Notify(
+										alertctx->Notify(EAlertType::Info,
 											String::Format("%s %s",
 											addon->Definitions->Name,
 											addon->State == EAddonState::LoadedLOCKED
@@ -1143,7 +1143,7 @@ void CAddonsWindow::RenderDetails()
 									}
 									else
 									{
-										alertctx->Notify(String::Format("%s %s",
+										alertctx->Notify(EAlertType::Info, String::Format("%s %s",
 														 addon->Definitions->Name,
 														 langApi->Translate("((000082))")).c_str());
 									}
@@ -1247,7 +1247,7 @@ void CAddonsWindow::RenderDetails()
 					if (addonData.NexusAddon->IsFlaggedForEnable)
 					{
 						addonData.NexusAddon->IsDisabledUntilUpdate = false; // explicitly loaded
-						ctx->GetUIContext()->GetAlerts()->Notify(String::Format("%s %s", addonData.NexusAddon->Definitions->Name, langApi->Translate("((000080))")).c_str());
+						ctx->GetUIContext()->GetAlerts()->Notify(EAlertType::Info, String::Format("%s %s", addonData.NexusAddon->Definitions->Name, langApi->Translate("((000080))")).c_str());
 					}
 
 					Loader::SaveAddonConfig();

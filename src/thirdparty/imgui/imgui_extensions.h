@@ -104,7 +104,7 @@ namespace ImGui
 		pos.x += 1;
 		pos.y += 1;
 		SetCursorPos(pos);
-		TextColoredV(ImVec4(0, 0, 0, 255), fmt, args);
+		TextColoredV(ImVec4(0, 0, 0, col.w), fmt, args);
 		pos.x -= 1;
 		pos.y -= 1;
 		SetCursorPos(pos);
