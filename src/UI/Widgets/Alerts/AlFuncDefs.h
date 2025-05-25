@@ -11,7 +11,7 @@
 
 #include "AlEnum.h"
 
-typedef void (*ALERTS_NOTIFY) (const char* aMessage);
+typedef void (*ALERTS_NOTIFY)  (const char* aMessage);
 typedef void (*ALERTS_NOTIFY2) (EAlertType aType, const char* aMessage);
 
 #endif
