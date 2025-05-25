@@ -298,34 +298,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 		}
 	}
 
-	/* restore modifiers */
-	if (!ib.Alt && GetAsyncKeyState(VK_MENU))
-	{
-		this->RawInputApi->SendWndProcToGame(
-			0,
-			WM_SYSKEYDOWN,
-			VK_MENU,
-			GetKeyMessageLPARAM(VK_MENU, true, true)
-		);
-	}
-	if (!ib.Ctrl && GetAsyncKeyState(VK_CONTROL))
-	{
-		this->RawInputApi->SendWndProcToGame(
-			0,
-			WM_KEYDOWN,
-			VK_CONTROL,
-			GetKeyMessageLPARAM(VK_CONTROL, true, false)
-		);
-	}
-	if (!ib.Shift && GetAsyncKeyState(VK_SHIFT))
-	{
-		this->RawInputApi->SendWndProcToGame(
-			0,
-			WM_KEYDOWN,
-			VK_SHIFT,
-			GetKeyMessageLPARAM(VK_SHIFT, true, false)
-		);
-	}
+	this->RestoreModifiers();
 }
 
 void CGameBindsApi::Release(EGameBinds aGameBind)
@@ -425,31 +398,102 @@ void CGameBindsApi::Release(EGameBinds aGameBind)
 		}
 	}
 
-	if (ib.Alt && !GetAsyncKeyState(VK_MENU))
+	this->RestoreModifiers();
+}
+
+void CGameBindsApi::RestoreModifiers()
+{
+	if (GetAsyncKeyState(VK_MENU))
 	{
-		this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYUP, VK_MENU, GetKeyMessageLPARAM(VK_MENU, false, true));
+		this->RawInputApi->SendWndProcToGame(
+			0,
+			WM_SYSKEYDOWN,
+			VK_MENU,
+			GetKeyMessageLPARAM(VK_MENU, true, true)
+		);
 	}
-	else if (GetAsyncKeyState(VK_MENU))
+	else
 	{
-		this->RawInputApi->SendWndProcToGame(0, WM_SYSKEYDOWN, VK_MENU, GetKeyMessageLPARAM(VK_MENU, true, true));
+		this->RawInputApi->SendWndProcToGame(
+			0,
+			WM_SYSKEYUP,
+			VK_MENU,
+			GetKeyMessageLPARAM(VK_MENU, false, true)
+		);
 	}
 
-	if (ib.Ctrl && !GetAsyncKeyState(VK_CONTROL))
+	if (GetAsyncKeyState(VK_LCONTROL))
 	{
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, VK_CONTROL, GetKeyMessageLPARAM(VK_CONTROL, false, false));
+		this->RawInputApi->SendWndProcToGame(
+			0,
+			WM_KEYDOWN,
+			VK_LCONTROL,
+			GetKeyMessageLPARAM(VK_LCONTROL, true, false)
+		);
 	}
-	else if (GetAsyncKeyState(VK_CONTROL))
+	else
 	{
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_CONTROL, GetKeyMessageLPARAM(VK_CONTROL, true, false));
+		this->RawInputApi->SendWndProcToGame(
+			0,
+			WM_KEYUP,
+			VK_LCONTROL,
+			GetKeyMessageLPARAM(VK_LCONTROL, false, false)
+		);
+	}
+	if (GetAsyncKeyState(VK_RCONTROL))
+	{
+		this->RawInputApi->SendWndProcToGame(
+			0,
+			WM_KEYDOWN,
+			VK_RCONTROL,
+			GetKeyMessageLPARAM(VK_RCONTROL, true, false)
+		);
+	}
+	else
+	{
+		this->RawInputApi->SendWndProcToGame(
+			0,
+			WM_KEYUP,
+			VK_RCONTROL,
+			GetKeyMessageLPARAM(VK_RCONTROL, false, false)
+		);
 	}
 
-	if (ib.Shift && !GetAsyncKeyState(VK_SHIFT))
+	if (GetAsyncKeyState(VK_LSHIFT))
 	{
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYUP, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, false, false));
+		this->RawInputApi->SendWndProcToGame(
+			0,
+			WM_KEYDOWN,
+			VK_LSHIFT,
+			GetKeyMessageLPARAM(VK_LSHIFT, true, false)
+		);
 	}
-	else if (GetAsyncKeyState(VK_SHIFT))
+	else
 	{
-		this->RawInputApi->SendWndProcToGame(0, WM_KEYDOWN, VK_SHIFT, GetKeyMessageLPARAM(VK_SHIFT, true, false));
+		this->RawInputApi->SendWndProcToGame(
+			0,
+			WM_KEYUP,
+			VK_LSHIFT,
+			GetKeyMessageLPARAM(VK_LSHIFT, false, false)
+		);
+	}
+	if (GetAsyncKeyState(VK_RSHIFT))
+	{
+		this->RawInputApi->SendWndProcToGame(
+			0,
+			WM_KEYDOWN,
+			VK_RSHIFT,
+			GetKeyMessageLPARAM(VK_RSHIFT, true, false)
+		);
+	}
+	else
+	{
+		this->RawInputApi->SendWndProcToGame(
+			0,
+			WM_KEYUP,
+			VK_RSHIFT,
+			GetKeyMessageLPARAM(VK_RSHIFT, false, false)
+		);
 	}
 }
 

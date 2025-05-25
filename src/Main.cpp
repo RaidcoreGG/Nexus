@@ -29,6 +29,7 @@
 #include "Util/CmdLine.h"
 #include "Util/Strings.h"
 #include "Util/Resources.h"
+#include "Util/Inputs.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
