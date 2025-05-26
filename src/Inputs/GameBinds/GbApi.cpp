@@ -234,7 +234,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 			0,
 			WM_KEYDOWN,
 			vk,
-			GetKeyMessageLPARAM_ScanCode(ib.Code, true, false)
+			GetKeyMessageLPARAM_ScanCode(ib.Code, true, ib.Alt)
 		);
 	}
 	else if (ib.Device == EInputDevice::Mouse)
@@ -297,8 +297,6 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 			}
 		}
 	}
-
-	this->RestoreModifiers();
 }
 
 void CGameBindsApi::Release(EGameBinds aGameBind)
@@ -334,7 +332,7 @@ void CGameBindsApi::Release(EGameBinds aGameBind)
 			0,
 			WM_KEYUP,
 			vk,
-			GetKeyMessageLPARAM_ScanCode(ib.Code, false, false)
+			GetKeyMessageLPARAM_ScanCode(ib.Code, false, ib.Alt)
 		);
 	}
 	else if (ib.Device == EInputDevice::Mouse)
@@ -398,6 +396,7 @@ void CGameBindsApi::Release(EGameBinds aGameBind)
 		}
 	}
 
+	
 	this->RestoreModifiers();
 }
 

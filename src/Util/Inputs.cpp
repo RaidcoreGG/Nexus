@@ -54,7 +54,7 @@ LPARAM GetKeyMessageLPARAM(unsigned aVKey, bool aIsDown, bool aIsSystem)
 	lp.ScanCode = LOBYTE(sc);
 	lp.ExtendedFlag = (HIBYTE(sc) == 0xE0 || HIBYTE(sc) == 0xE1) ? 1 : 0;
 	lp.Reserved = 0;
-	lp.ContextCode = 0;//aIsSystem ? 1 : 0;
+	lp.ContextCode = aIsSystem ? 1 : 0;
 	lp.PreviousKeyState = aIsDown ? 0 : 1;
 	lp.TransitionState = aIsDown ? 0 : 1;
 
