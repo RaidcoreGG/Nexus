@@ -226,8 +226,8 @@ void CDebugWindow::TabTextures()
 		return;
 	}
 
-	std::map<std::string, Texture*> texRegistry = CContext::GetContext()->GetTextureService()->GetRegistry();
-	std::vector<QueuedTexture>      texQueued = CContext::GetContext()->GetTextureService()->GetQueuedTextures();
+	std::map<std::string, Texture*>      texRegistry = CContext::GetContext()->GetTextureService()->GetRegistry();
+	std::map<std::string, QueuedTexture> texQueued   = CContext::GetContext()->GetTextureService()->GetQueuedTextures();
 
 	static char texFilter[400] = {};
 	static int displayedTextures = 0;
@@ -353,9 +353,9 @@ void CDebugWindow::TabTextures()
 		}
 		ImGui::Separator();
 		ImGui::Text("Queued Textures:");
-		for (auto& qtexture : texQueued)
+		for (auto& [identifier, qtexture] : texQueued)
 		{
-			if (ImGui::TreeNode(qtexture.Identifier.c_str()))
+			if (ImGui::TreeNode(identifier.c_str()))
 			{
 				ImGui::TextDisabled("Dimensions: %dx%d", qtexture.Width, qtexture.Height);
 				ImGui::TextDisabled("ReceiveCallback: %p", qtexture.Callback);

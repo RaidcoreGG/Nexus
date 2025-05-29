@@ -14,7 +14,7 @@
 #include "Services/DataLink/DlFuncDefs.h"
 #include "Services/Localization/FuncDefs.h"
 #include "Services/Logging/FuncDefs.h"
-#include "Services/Textures/FuncDefs.h"
+#include "Services/Textures/TxFuncDefs.h"
 #include "Services/Updater/FuncDefs.h"
 #include "UI/FuncDefs.h"
 #include "UI/Services/Fonts/FuncDefs.h"

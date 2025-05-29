@@ -12,7 +12,7 @@
 #include <string>
 
 #include "CtlWindow.h"
-#include "Services/Textures/Texture.h"
+#include "Services/Textures/TxTexture.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// ISubWindow Interface Class

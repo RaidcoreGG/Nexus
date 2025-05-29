@@ -16,7 +16,7 @@
 #include "Services/Logging/LogHandler.h"
 #include "Services/Mumble/Reader.h"
 #include "Services/Settings/Settings.h"
-#include "Services/Textures/TextureLoader.h"
+#include "Services/Textures/TxLoader.h"
 #include "Services/Updater/Updater.h"
 #include "UI/UiContext.h"
 

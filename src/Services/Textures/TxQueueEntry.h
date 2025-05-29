@@ -1,24 +1,29 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  Texture.h
-/// Description  :  Contains the Texture data struct definition.
+/// Name         :  TxQueueEntry.h
+/// Description  :  Contains the QueueEntry struct definition.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef TEXTURE_H
-#define TEXTURE_H
+#ifndef TXQUEUEENTRY_H
+#define TXQUEUEENTRY_H
 
-#include <d3d11.h>
+#include "TxEnum.h"
+#include "TxFuncDefs.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// Texture data struct
+/// QueuedTexture Struct
 ///----------------------------------------------------------------------------------------------------
-struct Texture
+struct QueuedTexture
 {
-	unsigned Width;
-	unsigned Height;
-	ID3D11ShaderResourceView* Resource;
+	ETextureStage            Stage;
+	long long                Time;
+
+	unsigned                 Width;
+	unsigned                 Height;
+	unsigned char*           Data;
+	TEXTURES_RECEIVECALLBACK Callback;
 };
 
 #endif

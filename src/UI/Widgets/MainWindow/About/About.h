@@ -10,7 +10,7 @@
 #define MAINWINDOW_ABOUT_H
 
 #include "UI/Controls/CtlSubWindow.h"
-#include "Services/Textures/Texture.h"
+#include "Services/Textures/TxTexture.h"
 
 class CAboutBox : public ISubWindow
 {

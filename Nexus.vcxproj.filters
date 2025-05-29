@@ -252,7 +252,7 @@
     <ClCompile Include="src\Services\DataLink\DlApi.cpp">
       <Filter>Services\DataLink</Filter>
     </ClCompile>
-    <ClCompile Include="src\Services\Textures\TextureLoader.cpp">
+    <ClCompile Include="src\Services\Textures\TxLoader.cpp">
       <Filter>Services\Textures</Filter>
     </ClCompile>
     <ClCompile Include="src\Services\Settings\Settings.cpp">
@@ -518,7 +518,7 @@
     <ClInclude Include="src\Services\DataLink\DlLinkedResource.h">
       <Filter>Services\DataLink</Filter>
     </ClInclude>
-    <ClInclude Include="src\Services\Textures\TextureLoader.h">
+    <ClInclude Include="src\Services\Textures\TxLoader.h">
       <Filter>Services\Textures</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\DataLink\DlFuncDefs.h">
@@ -533,13 +533,13 @@
     <ClInclude Include="src\Services\Logging\FuncDefs.h">
       <Filter>Services\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="src\Services\Textures\FuncDefs.h">
+    <ClInclude Include="src\Services\Textures\TxFuncDefs.h">
       <Filter>Services\Textures</Filter>
     </ClInclude>
-    <ClInclude Include="src\Services\Textures\Texture.h">
+    <ClInclude Include="src\Services\Textures\TxTexture.h">
       <Filter>Services\Textures</Filter>
     </ClInclude>
-    <ClInclude Include="src\Services\Textures\QueuedTexture.h">
+    <ClInclude Include="src\Services\Textures\TxQueueEntry.h">
       <Filter>Services\Textures</Filter>
     </ClInclude>
     <ClInclude Include="src\Loader\FuncDefs.h">
@@ -1264,6 +1264,9 @@
     </ClInclude>
     <ClInclude Include="src\UI\Widgets\Alerts\AlEnum.h">
       <Filter>UI\Widgets\Alerts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Services\Textures\TxEnum.h">
+      <Filter>Services\Textures</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -57,7 +57,7 @@
     <ClCompile Include="src\Services\Settings\Settings.cpp" />
     <ClCompile Include="src\Shared.cpp" />
     <ClCompile Include="src\State.cpp" />
-    <ClCompile Include="src\Services\Textures\TextureLoader.cpp" />
+    <ClCompile Include="src\Services\Textures\TxLoader.cpp" />
     <ClCompile Include="src\Services\Updater\Updater.cpp" />
     <ClCompile Include="src\thirdparty\pugixml\pugixml.cpp" />
     <ClCompile Include="src\UI\Controls\CtlModal.cpp" />
@@ -126,6 +126,7 @@
     <ClInclude Include="src\Events\EvtApi.h" />
     <ClInclude Include="src\Events\EvtSubscriber.h" />
     <ClInclude Include="src\Events\EvtFuncDefs.h" />
+    <ClInclude Include="src\Services\Textures\TxEnum.h" />
     <ClInclude Include="src\thirdparty\httplib\httplib.h" />
     <ClInclude Include="src\thirdparty\ImAnimate\ImAnimate.h" />
     <ClInclude Include="src\thirdparty\imgui\imconfig.h" />
@@ -320,10 +321,10 @@
     <ClInclude Include="src\thirdparty\pugixml\pugiconfig.hpp" />
     <ClInclude Include="src\thirdparty\pugixml\pugixml.hpp" />
     <ClInclude Include="src\thirdparty\stb\stb_image.h" />
-    <ClInclude Include="src\Services\Textures\FuncDefs.h" />
-    <ClInclude Include="src\Services\Textures\QueuedTexture.h" />
-    <ClInclude Include="src\Services\Textures\Texture.h" />
-    <ClInclude Include="src\Services\Textures\TextureLoader.h" />
+    <ClInclude Include="src\Services\Textures\TxFuncDefs.h" />
+    <ClInclude Include="src\Services\Textures\TxQueueEntry.h" />
+    <ClInclude Include="src\Services\Textures\TxTexture.h" />
+    <ClInclude Include="src\Services\Textures\TxLoader.h" />
     <ClInclude Include="src\Services\Updater\FuncDefs.h" />
     <ClInclude Include="src\Services\Updater\Updater.h" />
     <ClInclude Include="src\UI\Controls\CtlModal.h" />

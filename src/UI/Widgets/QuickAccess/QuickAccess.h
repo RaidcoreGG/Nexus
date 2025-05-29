@@ -23,7 +23,7 @@
 #include "Services/Localization/Localization.h"
 #include "Services/Logging/LogHandler.h"
 #include "Services/Mumble/Reader.h"
-#include "Services/Textures/TextureLoader.h"
+#include "Services/Textures/TxLoader.h"
 #include "Shortcut.h"
 #include "UI/Controls/CtlWindow.h"
 #include "UI/FuncDefs.h"

@@ -20,7 +20,7 @@
 #include "Services/DataLink/DlApi.h"
 #include "Services/Localization/Localization.h"
 #include "Services/Logging/LogHandler.h"
-#include "Services/Textures/TextureLoader.h"
+#include "Services/Textures/TxLoader.h"
 #include "Services/Updater/Updater.h"
 #include "UI/Services/Fonts/FontManager.h"
 #include "UI/Services/QoL/EscapeClosing.h"

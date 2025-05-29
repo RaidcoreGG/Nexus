@@ -17,7 +17,7 @@
 #include "Inputs/InputBinds/IbFuncDefs.h"
 #include "Inputs/RawInput/RiFuncDefs.h"
 #include "Services/Logging/ELogLevel.h"
-#include "Services/Textures/FuncDefs.h"
+#include "Services/Textures/TxFuncDefs.h"
 #include "UI/FuncDefs.h"
 #include "UI/Services/Fonts/FuncDefs.h"
 

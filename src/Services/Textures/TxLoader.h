@@ -1,7 +1,7 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  TextureLoader.h
+/// Name         :  TxLoader.h
 /// Description  :  Provides functions to load textures and fetch created textures.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
@@ -15,10 +15,10 @@
 #include <vector>
 #include <Windows.h>
 
-#include "FuncDefs.h"
-#include "QueuedTexture.h"
+#include "TxFuncDefs.h"
+#include "TxQueueEntry.h"
+#include "TxTexture.h"
 #include "Services/Logging/LogHandler.h"
-#include "Texture.h"
 
 constexpr const char* CH_TEXTURES = "Textures";
 
@@ -32,10 +32,11 @@ class CTextureLoader
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
 	CTextureLoader(CLogHandler* aLogger);
+
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
-	~CTextureLoader() = default;
+	~CTextureLoader();
 
 	///----------------------------------------------------------------------------------------------------
 	/// Advance:
@@ -107,7 +108,7 @@ class CTextureLoader
 	/// GetQueuedTextures:
 	/// 	Returns a copy of all currently queued textures.
 	///----------------------------------------------------------------------------------------------------
-	std::vector<QueuedTexture> GetQueuedTextures() const;
+	std::map<std::string, QueuedTexture> GetQueuedTextures() const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Verify:
@@ -116,36 +117,68 @@ class CTextureLoader
 	int Verify(void* aStartAddress, void* aEndAddress);
 
 	private:
-	CLogHandler*                                 Logger         = nullptr;
+	CLogHandler*                         Logger = nullptr;
 
-	mutable std::mutex                           Mutex;
-	std::map<std::string, Texture*>              Registry;
-	std::vector<QueuedTexture>                   QueuedTextures;
+	mutable std::mutex                   Mutex;
+	std::map<std::string, Texture*>      Registry;
+	std::map<std::string, QueuedTexture> QueuedTextures;
 
-	struct StagedTextureCallback
-	{
-		TEXTURES_RECEIVECALLBACK                 Callback;
-		bool                                     IsValid;
-	};
-	std::map<std::string, StagedTextureCallback> PendingCallbacks; /* set to false if no longer valid */
+	///----------------------------------------------------------------------------------------------------
+	/// ProcessRequest:
+	/// 	Processes the load request.
+	/// 	Returns true if request is already ongoing or fulfilled.
+	/// 	Returns false if the load should be cancelled.
+	///----------------------------------------------------------------------------------------------------
+	bool ProcessRequest(const char* aIdentifier, TEXTURES_RECEIVECALLBACK aCallback, bool aIsShadowing);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ShadowTexture:
+	/// 	Renames the given identifier, to an alternative name.
+	///----------------------------------------------------------------------------------------------------
+	void ShadowTexture(const char* aIdentifier);
 
 	///----------------------------------------------------------------------------------------------------
 	/// OverrideTexture:
 	/// 	Internal function to override texture load with custom user texture on disk.
+	/// 	Returns true if an override exists and queues it.
 	///----------------------------------------------------------------------------------------------------
 	bool OverrideTexture(const char* aIdentifier, TEXTURES_RECEIVECALLBACK aCallback);
 
 	///----------------------------------------------------------------------------------------------------
-	/// QueueTexture:
-	/// 	Pushes a texture into the queue to load during the next frame.
+	/// IsQueued:
+	/// 	Returns a true if the given identifier is already queued.
 	///----------------------------------------------------------------------------------------------------
-	void QueueTexture(const char* aIdentifier, unsigned char* aImageData, unsigned aWidth, unsigned aHeight, TEXTURES_RECEIVECALLBACK aCallback);
+	bool IsQueued(const char* aIdentifier);
+
+	///----------------------------------------------------------------------------------------------------
+	/// Enqueue:
+	/// 	Adds a queue to the entry awaiting processing.
+	///----------------------------------------------------------------------------------------------------
+	void Enqueue(const char* aIdentifier, TEXTURES_RECEIVECALLBACK aCallback);
+
+	///----------------------------------------------------------------------------------------------------
+	/// Enqueue:
+	/// 	Adds data to a queue entry.
+	///----------------------------------------------------------------------------------------------------
+	void Enqueue(const char* aIdentifier, unsigned char* aData, int aWidth, int aHeight);
+
+	///----------------------------------------------------------------------------------------------------
+	/// Dequeue:
+	/// 	Drops a queue entry.
+	///----------------------------------------------------------------------------------------------------
+	void Dequeue(const char* aIdentifier);
 
 	///----------------------------------------------------------------------------------------------------
 	/// CreateTexture:
 	/// 	Creates a texture and adds it to the registry.
 	///----------------------------------------------------------------------------------------------------
-	void CreateTexture(QueuedTexture aQueuedTexture);
+	void CreateTexture(const std::string& aIdentifier, QueuedTexture& aQueuedTexture);
+
+	///----------------------------------------------------------------------------------------------------
+	/// DispatchTexture:
+	/// 	Dispatches a texture.
+	///----------------------------------------------------------------------------------------------------
+	void DispatchTexture(const std::string& aIdentifier, Texture* aTexture, TEXTURES_RECEIVECALLBACK aCallback);
 };
 
 #endif

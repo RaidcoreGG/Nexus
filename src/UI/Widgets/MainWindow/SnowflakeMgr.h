@@ -14,7 +14,7 @@
 
 #include "imgui/imgui.h"
 
-#include "Services/Textures/Texture.h"
+#include "Services/Textures/TxTexture.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Snowflake Struct
