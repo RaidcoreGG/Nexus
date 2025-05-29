@@ -74,7 +74,7 @@ bool CFontManager::Advance()
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 	for (auto& font : this->Registry)
 	{
-		if (font.Identifier == "USER_FONT")
+		if (font.Identifier == "FONT_DEFAULT")
 		{
 			font.Pointer = io.Fonts->AddFontFromMemoryTTF(font.Data, static_cast<int>(font.DataSize), font.Size, font.Config, rangesExt.Data);
 		}
@@ -397,7 +397,7 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, void* a
 
 void CFontManager::AddDefaultFont(FONTS_RECEIVECALLBACK aCallback)
 {
-	std::string str = "USER_FONT";
+	std::string str = "FONT_DEFAULT";
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [str](ManagedFont& font) { return font.Identifier == str; });
@@ -424,7 +424,7 @@ void CFontManager::AddDefaultFont(FONTS_RECEIVECALLBACK aCallback)
 		Resources::Get(ctx->GetModule(), MAKEINTRESOURCE(RES_FONT_INTER), RT_FONT, &buffer, (DWORD*)&size);
 
 		/* call AddFontInternal with the memory buffer */
-		this->AddFontInternal("USER_FONT", 15.0f, buffer, size, aCallback, nullptr);
+		this->AddFontInternal("FONT_DEFAULT", 15.0f, buffer, size, aCallback, nullptr);
 	}
 }
 

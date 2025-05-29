@@ -364,9 +364,9 @@ namespace ADDONAPI
 			if (!aCallback) { return; }
 
 			std::string fontId = aIdentifier;
-			if (fontId == "FONT_DEFAULT")
+			if (fontId == "USER_FONT")
 			{
-				fontId = "USER_FONT";
+				fontId = "FONT_DEFAULT";
 			}
 
 			ManagedFont* font = s_FontManager->Get(fontId.c_str());
@@ -382,9 +382,9 @@ namespace ADDONAPI
 			if (!aCallback) { return; }
 
 			std::string fontId = aIdentifier;
-			if (fontId == "FONT_DEFAULT")
+			if (fontId == "USER_FONT")
 			{
-				fontId = "USER_FONT";
+				fontId = "FONT_DEFAULT";
 			}
 
 			s_FontManager->Release(fontId.c_str(), aCallback);
@@ -395,9 +395,9 @@ namespace ADDONAPI
 			assert(s_FontManager);
 
 			std::string fontId = aIdentifier;
-			if (fontId == "FONT_DEFAULT")
+			if (fontId == "USER_FONT")
 			{
-				fontId = "USER_FONT";
+				fontId = "FONT_DEFAULT";
 			}
 
 			s_FontManager->AddFont(fontId.c_str(), aFontSize, aFilename, aCallback, aConfig);
@@ -408,9 +408,9 @@ namespace ADDONAPI
 			assert(s_FontManager);
 
 			std::string fontId = aIdentifier;
-			if (fontId == "FONT_DEFAULT")
+			if (fontId == "USER_FONT")
 			{
-				fontId = "USER_FONT";
+				fontId = "FONT_DEFAULT";
 			}
 
 			s_FontManager->AddFont(fontId.c_str(), aFontSize, aResourceID, aModule, aCallback, aConfig);
@@ -421,9 +421,9 @@ namespace ADDONAPI
 			assert(s_FontManager);
 
 			std::string fontId = aIdentifier;
-			if (fontId == "FONT_DEFAULT")
+			if (fontId == "USER_FONT")
 			{
-				fontId = "USER_FONT";
+				fontId = "FONT_DEFAULT";
 			}
 
 			s_FontManager->AddFont(fontId.c_str(), aFontSize, aData, aSize, aCallback, aConfig);
@@ -434,9 +434,9 @@ namespace ADDONAPI
 			assert(s_FontManager);
 
 			std::string fontId = aIdentifier;
-			if (fontId == "FONT_DEFAULT")
+			if (fontId == "USER_FONT")
 			{
-				fontId = "USER_FONT";
+				fontId = "FONT_DEFAULT";
 			}
 
 			s_FontManager->ResizeFont(fontId.c_str(), aFontSize);

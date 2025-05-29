@@ -313,7 +313,7 @@ void COptionsWindow::TabStyle()
 				imguictx->FontSize = fontSize;
 
 				CFontManager* fontMgr = uictx->GetFontManager();
-				fontMgr->ResizeFont("USER_FONT", imguictx->FontSize);
+				fontMgr->ResizeFont("FONT_DEFAULT", imguictx->FontSize);
 			}
 			ImGui::EndGroupPanel();
 

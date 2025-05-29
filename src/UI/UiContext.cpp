@@ -68,7 +68,7 @@ namespace UIRoot
 	{
 		std::string str = aIdentifier;
 
-		if (str == "USER_FONT")
+		if (str == "FONT_DEFAULT")
 		{
 			UserFont = aFont;
 
@@ -803,7 +803,7 @@ void CUiContext::LoadFonts()
 	if (!fontFile.empty() && std::filesystem::exists(Index::D_GW2_ADDONS_NEXUS_FONTS / fontFile))
 	{
 		fontPath = Index::D_GW2_ADDONS_NEXUS_FONTS / fontFile;
-		this->FontManager->ReplaceFont("USER_FONT", storedFontSz, fontPath.string().c_str(), UIRoot::FontReceiver, nullptr);
+		this->FontManager->ReplaceFont("FONT_DEFAULT", storedFontSz, fontPath.string().c_str(), UIRoot::FontReceiver, nullptr);
 		hasUserFont = true;
 	}
 
@@ -812,7 +812,7 @@ void CUiContext::LoadFonts()
 
 	if (!hasUserFont)
 	{
-		this->FontManager->ResizeFont("USER_FONT", storedFontSz);
+		this->FontManager->ResizeFont("FONT_DEFAULT", storedFontSz);
 	}
 
 	ImFontConfig config;
