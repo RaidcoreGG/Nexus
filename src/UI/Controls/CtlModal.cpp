@@ -32,7 +32,7 @@ bool IModal::Render()
 
 	/* Center the modal. */
 	ImVec2 center(Renderer::Width * 0.5f, Renderer::Height * 0.5f);
-	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+	ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
 
 	float minWidthTitle = (ImGui::GetStyle().WindowPadding.x * 2) + ImGui::CalcTextSize(this->GetDisplayName().c_str()).x;
 
