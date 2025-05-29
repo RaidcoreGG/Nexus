@@ -363,10 +363,16 @@ namespace ADDONAPI
 
 			if (!aCallback) { return; }
 
-			ManagedFont* font = s_FontManager->Get(aIdentifier);
+			std::string fontId = aIdentifier;
+			if (fontId == "FONT_DEFAULT")
+			{
+				fontId = "USER_FONT";
+			}
+
+			ManagedFont* font = s_FontManager->Get(fontId.c_str());
 
 			font->Subscribers.push_back(aCallback);
-			aCallback(aIdentifier, font->Pointer);
+			aCallback(fontId.c_str(), font->Pointer);
 		}
 
 		void Release(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback)
@@ -375,31 +381,65 @@ namespace ADDONAPI
 
 			if (!aCallback) { return; }
 
-			s_FontManager->Release(aIdentifier, aCallback);
+			std::string fontId = aIdentifier;
+			if (fontId == "FONT_DEFAULT")
+			{
+				fontId = "USER_FONT";
+			}
+
+			s_FontManager->Release(fontId.c_str(), aCallback);
 		}
 
 		void AddFontFromFile(const char* aIdentifier, float aFontSize, const char* aFilename, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
 		{
 			assert(s_FontManager);
-			s_FontManager->AddFont(aIdentifier, aFontSize, aFilename, aCallback, aConfig);
+
+			std::string fontId = aIdentifier;
+			if (fontId == "FONT_DEFAULT")
+			{
+				fontId = "USER_FONT";
+			}
+
+			s_FontManager->AddFont(fontId.c_str(), aFontSize, aFilename, aCallback, aConfig);
 		}
 
 		void AddFontFromResource(const char* aIdentifier, float aFontSize, unsigned aResourceID, HMODULE aModule, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
 		{
 			assert(s_FontManager);
-			s_FontManager->AddFont(aIdentifier, aFontSize, aResourceID, aModule, aCallback, aConfig);
+
+			std::string fontId = aIdentifier;
+			if (fontId == "FONT_DEFAULT")
+			{
+				fontId = "USER_FONT";
+			}
+
+			s_FontManager->AddFont(fontId.c_str(), aFontSize, aResourceID, aModule, aCallback, aConfig);
 		}
 
 		void AddFontFromMemory(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
 		{
 			assert(s_FontManager);
-			s_FontManager->AddFont(aIdentifier, aFontSize, aData, aSize, aCallback, aConfig);
+
+			std::string fontId = aIdentifier;
+			if (fontId == "FONT_DEFAULT")
+			{
+				fontId = "USER_FONT";
+			}
+
+			s_FontManager->AddFont(fontId.c_str(), aFontSize, aData, aSize, aCallback, aConfig);
 		}
 
 		void ResizeFont(const char* aIdentifier, float aFontSize)
 		{
 			assert(s_FontManager);
-			s_FontManager->ResizeFont(aIdentifier, aFontSize);
+
+			std::string fontId = aIdentifier;
+			if (fontId == "FONT_DEFAULT")
+			{
+				fontId = "USER_FONT";
+			}
+
+			s_FontManager->ResizeFont(fontId.c_str(), aFontSize);
 		}
 	}
 
