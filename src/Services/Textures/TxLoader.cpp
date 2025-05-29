@@ -273,7 +273,7 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aRemote, const ch
 
 	std::thread([this, identifier, remote, endpoint, aCallback]() {
 		httplib::Client client(remote);
-		client.enable_server_certificate_verification(false);
+		client.enable_server_certificate_verification(true);
 		auto result = client.Get(endpoint);
 
 		if (!result)
