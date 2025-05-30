@@ -548,7 +548,8 @@ CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
       <AdditionalDependencies>Shlwapi.lib;PathCch.lib;Shell32.lib;Psapi.lib;libssl64MT.lib;libcrypto64MT.lib;ws2_32.lib;gdi32.lib;advapi32.lib;crypt32.lib;user32.lib;ntdll.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>CALL $(SolutionDir)Scripts\branch.bat
+      <Command>git submodule update --init --recursive
+CALL $(SolutionDir)Scripts\branch.bat
 CALL $(SolutionDir)Scripts\version.bat
 CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
     </PreBuildEvent>
