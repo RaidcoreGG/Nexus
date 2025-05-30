@@ -12,7 +12,7 @@
 
 #include "Context.h"
 #include "Events/EvtApi.h"
-#include "Index.h"
+#include "Index/Index.h"
 #include "Inputs/GameBinds/GbApi.h"
 #include "Inputs/InputBinds/IbApi.h"
 #include "Inputs/RawInput/RiApi.h"
@@ -139,6 +139,31 @@ namespace ADDONAPI
 		{
 			assert(s_GameBindsApi);
 			return s_GameBindsApi->IsBound(aGameBind);
+		}
+	}
+
+	namespace Paths
+	{
+		const char* GetGameDirectory()
+		{
+			return Index(EPath::DIR_GW2).string().c_str();
+		}
+
+		const char* GetAddonDirectory(const char* aName)
+		{
+			if (aName == nullptr || strcmp(aName, "") == 0)
+			{
+				return Index(EPath::DIR_ADDONS).string().c_str();
+			}
+			else
+			{
+				return (Index(EPath::DIR_ADDONS) / aName).string().c_str();
+			}
+		}
+
+		const char* GetCommonDirectory()
+		{
+			return Index(EPath::DIR_COMMON).string().c_str();
 		}
 	}
 
@@ -534,9 +559,9 @@ namespace ADDONAPI
 				api->RegisterRender = UIRoot::GUI::Register;
 				api->DeregisterRender = UIRoot::GUI::Deregister;
 
-				api->GetGameDirectory = Index::GetGameDirectory;
-				api->GetAddonDirectory = Index::GetAddonDirectory;
-				api->GetCommonDirectory = Index::GetCommonDirectory;
+				api->GetGameDirectory = Paths::GetGameDirectory;
+				api->GetAddonDirectory = Paths::GetAddonDirectory;
+				api->GetCommonDirectory = Paths::GetCommonDirectory;
 
 				api->CreateHook = MH_CreateHook;
 				api->RemoveHook = MH_RemoveHook;
@@ -584,9 +609,9 @@ namespace ADDONAPI
 				api->RegisterRender = UIRoot::GUI::Register;
 				api->DeregisterRender = UIRoot::GUI::Deregister;
 
-				api->GetGameDirectory = Index::GetGameDirectory;
-				api->GetAddonDirectory = Index::GetAddonDirectory;
-				api->GetCommonDirectory = Index::GetCommonDirectory;
+				api->GetGameDirectory = Paths::GetGameDirectory;
+				api->GetAddonDirectory = Paths::GetAddonDirectory;
+				api->GetCommonDirectory = Paths::GetCommonDirectory;
 
 				api->CreateHook = MH_CreateHook;
 				api->RemoveHook = MH_RemoveHook;
@@ -645,9 +670,9 @@ namespace ADDONAPI
 				api->RegisterRender = UIRoot::GUI::Register;
 				api->DeregisterRender = UIRoot::GUI::Deregister;
 
-				api->GetGameDirectory = Index::GetGameDirectory;
-				api->GetAddonDirectory = Index::GetAddonDirectory;
-				api->GetCommonDirectory = Index::GetCommonDirectory;
+				api->GetGameDirectory = Paths::GetGameDirectory;
+				api->GetAddonDirectory = Paths::GetAddonDirectory;
+				api->GetCommonDirectory = Paths::GetCommonDirectory;
 
 				api->CreateHook = MH_CreateHook;
 				api->RemoveHook = MH_RemoveHook;
@@ -712,9 +737,9 @@ namespace ADDONAPI
 
 				api->RequestUpdate = Updater::RequestUpdate;
 
-				api->GetGameDirectory = Index::GetGameDirectory;
-				api->GetAddonDirectory = Index::GetAddonDirectory;
-				api->GetCommonDirectory = Index::GetCommonDirectory;
+				api->GetGameDirectory = Paths::GetGameDirectory;
+				api->GetAddonDirectory = Paths::GetAddonDirectory;
+				api->GetCommonDirectory = Paths::GetCommonDirectory;
 
 				api->CreateHook = MH_CreateHook;
 				api->RemoveHook = MH_RemoveHook;
@@ -785,9 +810,9 @@ namespace ADDONAPI
 
 				api->RequestUpdate = Updater::RequestUpdate;
 
-				api->GetGameDirectory = Index::GetGameDirectory;
-				api->GetAddonDirectory = Index::GetAddonDirectory;
-				api->GetCommonDirectory = Index::GetCommonDirectory;
+				api->GetGameDirectory = Paths::GetGameDirectory;
+				api->GetAddonDirectory = Paths::GetAddonDirectory;
+				api->GetCommonDirectory = Paths::GetCommonDirectory;
 
 				api->CreateHook = MH_CreateHook;
 				api->RemoveHook = MH_RemoveHook;
@@ -867,9 +892,9 @@ namespace ADDONAPI
 				api->UI.RegisterCloseOnEscape = UIRoot::EscapeClosing::Register;
 				api->UI.DeregisterCloseOnEscape = UIRoot::EscapeClosing::Deregister;
 
-				api->Paths.GetGameDirectory = Index::GetGameDirectory;
-				api->Paths.GetAddonDirectory = Index::GetAddonDirectory;
-				api->Paths.GetCommonDirectory = Index::GetCommonDirectory;
+				api->Paths.GetGameDirectory = Paths::GetGameDirectory;
+				api->Paths.GetAddonDirectory = Paths::GetAddonDirectory;
+				api->Paths.GetCommonDirectory = Paths::GetCommonDirectory;
 
 				api->MinHook.Create = MH_CreateHook;
 				api->MinHook.Remove = MH_RemoveHook;

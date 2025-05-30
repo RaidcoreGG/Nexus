@@ -10,7 +10,7 @@
 #include "Inputs/GameBinds/GbFuncDefs.h"
 #include "Inputs/InputBinds/IbFuncDefs.h"
 #include "Inputs/RawInput/RiFuncDefs.h"
-#include "Paths/FuncDefs.h"
+#include "Index/IdxFuncDefs.h"
 #include "Services/DataLink/DlFuncDefs.h"
 #include "Services/Localization/FuncDefs.h"
 #include "Services/Logging/FuncDefs.h"
@@ -36,9 +36,9 @@ struct AddonAPI1 : AddonAPI
 	GUI_REMRENDER				DeregisterRender;
 
 	/* Paths */
-	PATHS_GETGAMEDIR			GetGameDirectory;
-	PATHS_GETADDONDIR			GetAddonDirectory;
-	PATHS_GETCOMMONDIR			GetCommonDirectory;
+	IDX_GETGAMEDIR			GetGameDirectory;
+	IDX_GETADDONDIR			GetAddonDirectory;
+	IDX_GETCOMMONDIR			GetCommonDirectory;
 
 	/* Minhook */
 	MINHOOK_CREATE				CreateHook;
@@ -91,9 +91,9 @@ struct AddonAPI2 : AddonAPI
 	GUI_REMRENDER						DeregisterRender;
 
 	/* Paths */
-	PATHS_GETGAMEDIR					GetGameDirectory;
-	PATHS_GETADDONDIR					GetAddonDirectory;
-	PATHS_GETCOMMONDIR					GetCommonDirectory;
+	IDX_GETGAMEDIR					GetGameDirectory;
+	IDX_GETADDONDIR					GetAddonDirectory;
+	IDX_GETCOMMONDIR					GetCommonDirectory;
 
 	/* Minhook */
 	MINHOOK_CREATE						CreateHook;
@@ -157,9 +157,9 @@ struct AddonAPI3 : AddonAPI
 	GUI_REMRENDER						DeregisterRender;
 
 	/* Paths */
-	PATHS_GETGAMEDIR					GetGameDirectory;
-	PATHS_GETADDONDIR					GetAddonDirectory;
-	PATHS_GETCOMMONDIR					GetCommonDirectory;
+	IDX_GETGAMEDIR					GetGameDirectory;
+	IDX_GETADDONDIR					GetAddonDirectory;
+	IDX_GETCOMMONDIR					GetCommonDirectory;
 
 	/* Minhook */
 	MINHOOK_CREATE						CreateHook;
@@ -232,9 +232,9 @@ struct AddonAPI4 : AddonAPI
 	UPDATER_REQUESTUPDATE				RequestUpdate;
 
 	/* Paths */
-	PATHS_GETGAMEDIR					GetGameDirectory;
-	PATHS_GETADDONDIR					GetAddonDirectory;
-	PATHS_GETCOMMONDIR					GetCommonDirectory;
+	IDX_GETGAMEDIR					GetGameDirectory;
+	IDX_GETADDONDIR					GetAddonDirectory;
+	IDX_GETCOMMONDIR					GetCommonDirectory;
 
 	/* Minhook */
 	MINHOOK_CREATE						CreateHook;
@@ -314,9 +314,9 @@ struct AddonAPI5 : AddonAPI
 	UPDATER_REQUESTUPDATE				RequestUpdate;
 
 	/* Paths */
-	PATHS_GETGAMEDIR					GetGameDirectory;
-	PATHS_GETADDONDIR					GetAddonDirectory;
-	PATHS_GETCOMMONDIR					GetCommonDirectory;
+	IDX_GETGAMEDIR					GetGameDirectory;
+	IDX_GETADDONDIR					GetAddonDirectory;
+	IDX_GETCOMMONDIR					GetCommonDirectory;
 
 	/* Minhook */
 	MINHOOK_CREATE						CreateHook;
@@ -417,9 +417,9 @@ struct AddonAPI6 : AddonAPI
 	/* Paths */
 	struct PathsVT
 	{
-		PATHS_GETGAMEDIR					GetGameDirectory;
-		PATHS_GETADDONDIR					GetAddonDirectory;
-		PATHS_GETCOMMONDIR					GetCommonDirectory;
+		IDX_GETGAMEDIR					GetGameDirectory;
+		IDX_GETADDONDIR					GetAddonDirectory;
+		IDX_GETCOMMONDIR					GetCommonDirectory;
 	};
 	PathsVT									Paths;
 

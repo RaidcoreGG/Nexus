@@ -28,24 +28,25 @@ constexpr const UINT WM_ADDONDIRUPDATE = WM_USER + 101;
 
 namespace Loader
 {
-	extern NexusLinkData*				NexusLink;
+	extern NexusLinkData*          NexusLink;
 
-	extern std::mutex					Mutex;
+	extern std::mutex              Mutex;
 	extern std::unordered_map<
 		std::filesystem::path,
 		ELoaderAction
-	>									QueuedAddons;					/* To be loaded or unloaded addons */
-	extern std::vector<Addon*>			Addons;
-	extern bool							HasCustomConfig;
+	>                              QueuedAddons; /* To be loaded or unloaded addons */
+	extern std::vector<Addon*>     Addons;
+	extern bool                    HasCustomConfig;
+	extern std::filesystem::path   ConfigPath;
 
-	extern int							DirectoryChangeCountdown;
-	extern std::condition_variable		ConVar;
-	extern std::mutex					ThreadMutex;
-	extern std::thread					LoaderThread;
-	extern bool							IsSuspended;
+	extern int                     DirectoryChangeCountdown;
+	extern std::condition_variable ConVar;
+	extern std::mutex              ThreadMutex;
+	extern std::thread             LoaderThread;
+	extern bool                    IsSuspended;
 
-	extern PIDLIST_ABSOLUTE				FSItemList;
-	extern ULONG						FSNotifierID;
+	extern PIDLIST_ABSOLUTE        FSItemList;
+	extern ULONG                   FSNotifierID;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Initialize:

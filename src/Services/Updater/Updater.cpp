@@ -10,7 +10,7 @@
 
 #include <thread>
 
-#include "Index.h"
+#include "Index/Index.h"
 #include "Shared.h"
 #include "Context.h"
 
@@ -31,34 +31,34 @@ void CUpdater::UpdateNexus()
 	AddonVersion currentVersion = CContext::GetContext()->GetVersion();
 
 	// ensure .old path is not claimed
-	if (std::filesystem::exists(Index::F_OLD_DLL))
+	if (std::filesystem::exists(Index(EPath::NexusDLL_Old)))
 	{
 		try
 		{
-			std::filesystem::remove(Index::F_OLD_DLL);
+			std::filesystem::remove(Index(EPath::NexusDLL_Old));
 		}
 		catch (std::filesystem::filesystem_error fErr)
 		{
-			std::filesystem::path fallback = Path::GetUnused(Index::F_OLD_DLL);
-			std::filesystem::rename(Index::F_OLD_DLL, fallback);
+			std::filesystem::path fallback = Path::GetUnused(Index(EPath::NexusDLL_Old));
+			std::filesystem::rename(Index(EPath::NexusDLL_Old), fallback);
 
-			this->Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\". Renamed to \"%s\".", Index::F_OLD_DLL.string().c_str(), fallback.string().c_str());
+			this->Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\". Renamed to \"%s\".", Index(EPath::NexusDLL_Old).string().c_str(), fallback.string().c_str());
 		}
 	}
 
 	// ensure .update path is not claimed
-	if (std::filesystem::exists(Index::F_UPDATE_DLL))
+	if (std::filesystem::exists(Index(EPath::NexusDLL_Update)))
 	{
 		try
 		{
-			std::filesystem::remove(Index::F_UPDATE_DLL);
+			std::filesystem::remove(Index(EPath::NexusDLL_Update));
 		}
 		catch (std::filesystem::filesystem_error fErr)
 		{
-			std::filesystem::path fallback = Path::GetUnused(Index::F_UPDATE_DLL);
-			std::filesystem::rename(Index::F_UPDATE_DLL, fallback);
+			std::filesystem::path fallback = Path::GetUnused(Index(EPath::NexusDLL_Update));
+			std::filesystem::rename(Index(EPath::NexusDLL_Update), fallback);
 
-			this->Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\". Renamed to \"%s\".", Index::F_UPDATE_DLL.string().c_str(), fallback.string().c_str());
+			this->Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\". Renamed to \"%s\".", Index(EPath::NexusDLL_Update).string().c_str(), fallback.string().c_str());
 		}
 	}
 
@@ -93,7 +93,7 @@ void CUpdater::UpdateNexus()
 		downloadClient.enable_server_certificate_verification(true);
 		downloadClient.set_follow_location(true);
 		size_t bytesWritten = 0;
-		std::ofstream file(Index::F_UPDATE_DLL, std::ofstream::binary);
+		std::ofstream file(Index(EPath::NexusDLL_Update), std::ofstream::binary);
 		auto downloadResult = downloadClient.Get(endpointDownload,
 			[&](const char* data, size_t data_length) {
 				file.write(data, data_length);
@@ -108,15 +108,15 @@ void CUpdater::UpdateNexus()
 			this->Logger->Warning(CH_UPDATER, "Error fetching %s%s\nError: %s", downloadBaseUrl.c_str(), endpointDownload.c_str(), httplib::to_string(downloadResult.error()).c_str());
 
 			// try cleaning failed download
-			if (std::filesystem::exists(Index::F_UPDATE_DLL))
+			if (std::filesystem::exists(Index(EPath::NexusDLL_Update)))
 			{
 				try
 				{
-					std::filesystem::remove(Index::F_UPDATE_DLL);
+					std::filesystem::remove(Index(EPath::NexusDLL_Update));
 				}
 				catch (std::filesystem::filesystem_error fErr)
 				{
-					this->Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\".", Index::F_UPDATE_DLL.string().c_str());
+					this->Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\".", Index(EPath::NexusDLL_Update).string().c_str());
 				}
 			}
 
@@ -128,19 +128,19 @@ void CUpdater::UpdateNexus()
 		{
 			this->Logger->Info(CH_UPDATER, "Nexus update via GitHub not possible. Falling back to Raidcore API.");
 			// ensure download successful
-			if (!RaidcoreAPI->Download(Index::F_UPDATE_DLL, "/d3d11.dll"))
+			if (!RaidcoreAPI->Download(Index(EPath::NexusDLL_Update), "/d3d11.dll"))
 			{
 				this->Logger->Warning(CH_UPDATER, "Nexus Update failed: Download failed.");
 				// try cleaning failed download
-				if (std::filesystem::exists(Index::F_UPDATE_DLL))
+				if (std::filesystem::exists(Index(EPath::NexusDLL_Update)))
 				{
 					try
 					{
-						std::filesystem::remove(Index::F_UPDATE_DLL);
+						std::filesystem::remove(Index(EPath::NexusDLL_Update));
 					}
 					catch (std::filesystem::filesystem_error fErr)
 					{
-						this->Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\".", Index::F_UPDATE_DLL.string().c_str());
+						this->Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\".", Index(EPath::NexusDLL_Update).string().c_str());
 						return;
 					}
 				}
@@ -152,27 +152,27 @@ void CUpdater::UpdateNexus()
 		// above is already ensured that .old is not claimed
 		// should it here somehow be claimed anyway, we need to factor that in
 		// this ensures that the update can be done
-		std::filesystem::path oldPath = Path::GetUnused(Index::F_OLD_DLL);
+		std::filesystem::path oldPath = Path::GetUnused(Index(EPath::NexusDLL_Old));
 
 		// try renaming .dll to .old
 		try
 		{
-			std::filesystem::rename(Index::F_HOST_DLL, oldPath);
+			std::filesystem::rename(Index(EPath::NexusDLL), oldPath);
 		}
 		catch (std::filesystem::filesystem_error fErr)
 		{
-			this->Logger->Warning(CH_UPDATER, "Nexus update failed: Couldn't move \"%s\" to \"%s\".", Index::F_HOST_DLL.string().c_str(), oldPath.string().c_str());
+			this->Logger->Warning(CH_UPDATER, "Nexus update failed: Couldn't move \"%s\" to \"%s\".", Index(EPath::NexusDLL).string().c_str(), oldPath.string().c_str());
 			return;
 		}
 
 		// try renaming .update to .dll
 		try
 		{
-			std::filesystem::rename(Index::F_UPDATE_DLL, Index::F_HOST_DLL);
+			std::filesystem::rename(Index(EPath::NexusDLL_Update), Index(EPath::NexusDLL));
 		}
 		catch (std::filesystem::filesystem_error fErr)
 		{
-			this->Logger->Warning(CH_UPDATER, "Nexus update failed: Couldn't move \"%s\" to \"%s\".", Index::F_UPDATE_DLL.string().c_str(), Index::F_HOST_DLL.string().c_str());
+			this->Logger->Warning(CH_UPDATER, "Nexus update failed: Couldn't move \"%s\" to \"%s\".", Index(EPath::NexusDLL_Update).string().c_str(), Index(EPath::NexusDLL).string().c_str());
 			return;
 		}
 
@@ -376,7 +376,7 @@ bool CUpdater::InstallAddon(LibraryAddon* aAddon, bool aIsArcPlugin)
 	};
 
 	std::string filename = String::Normalize(aAddon->Name);
-	std::filesystem::path installPath = Index::D_GW2_ADDONS / (filename + ".dll");
+	std::filesystem::path installPath = Index(EPath::DIR_ADDONS) / (filename + ".dll");
 	installPath = Path::GetUnused(installPath);
 
 	if (this->UpdateAddon(installPath, addonInfo, aIsArcPlugin))

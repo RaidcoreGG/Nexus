@@ -19,7 +19,7 @@
 #include "Shared.h"
 #include "Util/Strings.h"
 
-#include "Index.h"
+#include "Index/Index.h"
 #include "Loader/ArcDPS.h"
 #include "Loader/Library.h"
 #include "Loader/Loader.h"
@@ -900,7 +900,7 @@ void CAddonsWindow::RenderContent()
 	{
 		if (ImGui::Button(langApi->Translate("((000034))")))
 		{
-			std::string strAddons = Index::D_GW2_ADDONS.string();
+			std::string strAddons = Index(EPath::DIR_ADDONS).string();
 			ShellExecuteA(NULL, "explore", strAddons.c_str(), NULL, NULL, SW_SHOW);
 		}
 

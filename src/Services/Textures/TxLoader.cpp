@@ -16,7 +16,7 @@
 #include <filesystem>
 #include <vector>
 
-#include "Index.h"
+#include "Index/Index.h"
 #include "Renderer.h"
 #include "Util/Time.h"
 
@@ -438,7 +438,7 @@ void CTextureLoader::ShadowTexture(const char* aIdentifier)
 
 bool CTextureLoader::OverrideTexture(const char* aIdentifier, TEXTURES_RECEIVECALLBACK aCallback)
 {
-	std::filesystem::path overridepath = Index::D_GW2_ADDONS_NEXUS / "Textures" / (aIdentifier + std::string{ ".png" });
+	std::filesystem::path overridepath = Index(EPath::DIR_NEXUS) / "Textures" / (aIdentifier + std::string{ ".png" });
 
 	if (std::filesystem::exists(overridepath))
 	{

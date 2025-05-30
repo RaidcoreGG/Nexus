@@ -4,7 +4,7 @@
 
 #include "Consts.h"
 #include "Context.h"
-#include "Index.h"
+#include "Index/Index.h"
 #include "Shared.h"
 #include "State.h"
 
@@ -77,9 +77,9 @@ namespace ArcDPS
 
 		// The following code is a bit ugly and repetitive, but this is because for each of these dlls you need to check whether it is arcdps
 
-		if (State::IsChainloading && std::filesystem::exists(Index::F_CHAINLOAD_DLL))
+		if (State::IsChainloading && std::filesystem::exists(Index(EPath::D3D11Chainload)))
 		{
-			HMODULE hModule = GetModuleHandleA(Index::F_CHAINLOAD_DLL.string().c_str());
+			HMODULE hModule = GetModuleHandleA(Index(EPath::D3D11Chainload).string().c_str());
 
 			void* func = nullptr;
 
@@ -98,7 +98,7 @@ namespace ArcDPS
 			}
 		}
 
-		std::filesystem::path alArc = Index::D_GW2_ADDONS / "arcdps" / "gw2addon_arcdps.dll";
+		std::filesystem::path alArc = Index(EPath::DIR_ADDONS) / "arcdps" / "gw2addon_arcdps.dll";
 		if (std::filesystem::exists(alArc))
 		{
 			HMODULE hModule = GetModuleHandleA(alArc.string().c_str());
@@ -120,7 +120,7 @@ namespace ArcDPS
 			}
 		}
 
-		std::filesystem::path proxyArc = Index::D_GW2 / "d3d11.dll";
+		std::filesystem::path proxyArc = Index(EPath::DIR_GW2) / "d3d11.dll";
 		if (std::filesystem::exists(proxyArc))
 		{
 			HMODULE hModule = GetModuleHandleA(proxyArc.string().c_str());
@@ -147,11 +147,11 @@ namespace ArcDPS
 		CContext* ctx = CContext::GetContext();
 		try
 		{
-			Resources::Unpack(ctx->GetModule(), Index::F_ARCDPSINTEGRATION, RES_ARCDPS_INTEGRATION, "DLL", true);
+			Resources::Unpack(ctx->GetModule(), Index(EPath::ArcdpsIntegration), RES_ARCDPS_INTEGRATION, "DLL", true);
 
 			// reload is set to true because the dll is always deployed from resource
 			// and since it's locked it would not load here directly but instead after checking for updates (which does not apply to it)
-			Loader::QueueAddon(ELoaderAction::Reload, Index::F_ARCDPSINTEGRATION);
+			Loader::QueueAddon(ELoaderAction::Reload, Index(EPath::ArcdpsIntegration));
 		}
 		catch (std::filesystem::filesystem_error fErr)
 		{

@@ -16,7 +16,7 @@
 
 #include "Context.h"
 #include "Consts.h"
-#include "Index.h"
+#include "Index/Index.h"
 #include "Renderer.h"
 #include "Shared.h"
 #include "State.h"
@@ -64,30 +64,31 @@ using json = nlohmann::json;
 
 namespace Loader
 {
-	NexusLinkData* NexusLink = nullptr;
-	Mumble::Identity* MumbleIdentity = nullptr;
+	NexusLinkData*          NexusLink = nullptr;
+	Mumble::Identity*       MumbleIdentity = nullptr;
 
-	std::mutex					Mutex;
+	std::mutex              Mutex;
 	std::unordered_map<
 		std::filesystem::path,
 		ELoaderAction
-	>							QueuedAddons;
-	std::vector<Addon*>			Addons;
-	bool						HasCustomConfig = false;
-	std::vector<signed int>		RequestedAddons;
+	>                       QueuedAddons;
+	std::vector<Addon*>     Addons;
+	bool                    HasCustomConfig;
+	std::filesystem::path   ConfigPath;
+	std::vector<signed int> RequestedAddons;
 
-	int							DirectoryChangeCountdown = 0;
-	std::condition_variable		ConVar;
-	std::mutex					ThreadMutex;
-	std::thread					LoaderThread;
-	bool						IsSuspended = false;
+	int                     DirectoryChangeCountdown = 0;
+	std::condition_variable ConVar;
+	std::mutex              ThreadMutex;
+	std::thread             LoaderThread;
+	bool                    IsSuspended = false;
 
-	PIDLIST_ABSOLUTE			FSItemList;
-	ULONG						FSNotifierID;
+	PIDLIST_ABSOLUTE        FSItemList;
+	ULONG                   FSNotifierID;
 
-	std::vector<signed int>		WhitelistedAddons;				/* List of addons that should be loaded on initial startup. */
+	std::vector<signed int> WhitelistedAddons;				/* List of addons that should be loaded on initial startup. */
 
-	bool						DisableVolatileUntilUpdate = false;
+	bool                    DisableVolatileUntilUpdate = false;
 
 	CDataLinkApi*  DataLink = nullptr;
 	CLogHandler*   Logger   = nullptr;
@@ -110,20 +111,22 @@ namespace Loader
 		NexusLink = (NexusLinkData*)DataLink->ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData), "", true);
 		MumbleIdentity = (Mumble::Identity*)DataLink->ShareResource(DL_MUMBLE_LINK_IDENTITY, sizeof(Mumble::Identity), "", false);
 
+		ConfigPath = Index(EPath::AddonConfigDefault);
+
 		if (CmdLine::HasArgument("-ggaddons"))
 		{
-			HasCustomConfig = true;
-
 			std::vector<std::string> idList = String::Split(CmdLine::GetArgumentValue("-ggaddons"), ",");
 
 			/* if -ggaddons param is config path, else it's id list*/
 			if (idList.size() == 1 && String::Contains(idList[0], ".json"))
 			{
 				/* overwrite index path */
-				Index::F_ADDONCONFIG = idList[0];
+				ConfigPath = idList[0];
 			}
 			else
 			{
+				HasCustomConfig = true;
+
 				for (std::string addonId : idList)
 				{
 					try
@@ -145,15 +148,15 @@ namespace Loader
 		
 		if (State::Nexus == ENexusState::LOADED)
 		{
-			if (Index::F_ADDONCONFIG != Index::F_ADDONCONFIG_DEFAULT)
+			if (Index(EPath::AddonConfigDefault) != ConfigPath)
 			{
-				Logger->Info(CH_LOADER, "AddonConfig path specified. Saving to \"%s\"", Index::F_ADDONCONFIG.string().c_str());
+				Logger->Info(CH_LOADER, "AddonConfig path specified. Saving to \"%s\"", ConfigPath.string().c_str());
 			}
 
 			LoadAddonConfig();
 
 			//FSItemList = ILCreateFromPathA(Index::GetAddonDirectory(nullptr));
-			std::wstring addonDirW = String::ToWString(Index::D_GW2_ADDONS.string());
+			std::wstring addonDirW = String::ToWString(Index(EPath::DIR_ADDONS).string());
 			HRESULT hresult = SHParseDisplayName(
 				addonDirW.c_str(),
 				0,
@@ -250,11 +253,11 @@ namespace Loader
 
 	void LoadAddonConfig()
 	{
-		if (std::filesystem::exists(Index::F_ADDONCONFIG))
+		if (std::filesystem::exists(ConfigPath))
 		{
 			try
 			{
-				std::ifstream file(Index::F_ADDONCONFIG);
+				std::ifstream file(ConfigPath);
 
 				json cfg = json::parse(file);
 				for (json addonInfo : cfg)
@@ -377,7 +380,7 @@ namespace Loader
 			cfg.push_back(addonInfo);
 		}
 
-		std::ofstream file(Index::F_ADDONCONFIG);
+		std::ofstream file(ConfigPath);
 		file << cfg.dump(1, '\t') << std::endl;
 		file.close();
 	}
@@ -397,7 +400,7 @@ namespace Loader
 					char path[MAX_PATH];
 					if (SHGetPathFromIDListA(ppidl[0], path))
 					{
-						if (Index::D_GW2_ADDONS == std::string(path))
+						if (Index(EPath::DIR_ADDONS) == std::string(path))
 						{
 							NotifyChanges();
 						}
@@ -525,7 +528,7 @@ namespace Loader
 			}
 
 			// check all other files in the directory
-			for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Index::D_GW2_ADDONS))
+			for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Index(EPath::DIR_ADDONS)))
 			{
 				std::filesystem::path path = entry.path();
 
@@ -875,7 +878,7 @@ namespace Loader
 		}
 
 		/* (effectively duplicate check) if someone wants to do shenanigans and inject a different integration module */
-		if (addon->Definitions->Signature == 0xFED81763 && aPath != Index::F_ARCDPSINTEGRATION)
+		if (addon->Definitions->Signature == 0xFED81763 && aPath != Index(EPath::ArcdpsIntegration))
 		{
 			Logger->Warning(CH_LOADER, "\"%s\" declares signature 0xFED81763 but is not the actual Nexus ArcDPS Integration. Either this was in error or an attempt to tamper with Nexus files. Incompatible.", strFile.c_str());
 			FreeLibrary(addon->Module);

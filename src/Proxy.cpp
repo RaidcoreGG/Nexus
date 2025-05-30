@@ -5,7 +5,7 @@
 
 #include "Main.h"
 #include "Consts.h"
-#include "Index.h"
+#include "Index/Index.h"
 #include "Shared.h"
 #include "State.h"
 #include "Context.h"
@@ -55,15 +55,15 @@ namespace Proxy
 
 			/* attempt to chainload */
 			/* sanity check that the current dll isn't the chainload */
-			if (Index::F_HOST_DLL != Index::F_CHAINLOAD_DLL)
+			if (Index(EPath::NexusDLL) != Index(EPath::D3D11Chainload))
 			{
-				if (std::filesystem::exists(Index::F_CHAINLOAD_DLL))
+				if (std::filesystem::exists(Index(EPath::D3D11Chainload)))
 				{
-					if (MD5Util::FromFile(Index::F_HOST_DLL) == MD5Util::FromFile(Index::F_CHAINLOAD_DLL))
+					if (MD5Util::FromFile(Index(EPath::NexusDLL)) == MD5Util::FromFile(Index(EPath::D3D11Chainload)))
 					{
 						try
 						{
-							std::filesystem::remove(Index::F_CHAINLOAD_DLL);
+							std::filesystem::remove(Index(EPath::D3D11Chainload));
 
 							logger->Info(CH_LOADER, "Removed duplicate Nexus from chainload.");
 						}
@@ -76,7 +76,7 @@ namespace Proxy
 					{
 						State::IsChainloading = true;
 
-						std::string strChainload = Index::F_CHAINLOAD_DLL.string();
+						std::string strChainload = Index(EPath::D3D11Chainload).string();
 						s_D3D11Handle = LoadLibraryA(strChainload.c_str());
 
 						if (s_D3D11Handle)
@@ -95,7 +95,7 @@ namespace Proxy
 					State::IsChainloading = false;
 				}
 
-				std::string strSystem = Index::F_SYSTEM_DLL.string();
+				std::string strSystem = Index(EPath::D3D11).string();
 				s_D3D11Handle = LoadLibraryA(strSystem.c_str());
 
 				assert(s_D3D11Handle && "Could not load system d3d11.dll");
@@ -192,7 +192,7 @@ namespace Proxy
 
 			if (!s_D3D11SystemHandle)
 			{
-				std::string strSystem = Index::F_SYSTEM_DLL.string();
+				std::string strSystem = Index(EPath::D3D11).string();
 				s_D3D11SystemHandle = LoadLibraryA(strSystem.c_str());
 			}
 

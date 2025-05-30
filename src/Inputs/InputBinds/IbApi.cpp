@@ -17,7 +17,7 @@
 using json = nlohmann::json;
 
 #include "Consts.h"
-#include "Index.h"
+#include "Index/Index.h"
 #include "State.h"
 #include "Util/Strings.h"
 #include "Util/Inputs.h"
@@ -503,11 +503,11 @@ void CInputBindApi::LoadSafe()
 
 void CInputBindApi::Load()
 {
-	if (!std::filesystem::exists(Index::F_INPUTBINDS)) { return; }
+	if (!std::filesystem::exists(Index(EPath::InputBinds))) { return; }
 
 	try
 	{
-		std::ifstream file(Index::F_INPUTBINDS);
+		std::ifstream file(Index(EPath::InputBinds));
 
 		json inputBinds = json::parse(file);
 
@@ -607,7 +607,7 @@ void CInputBindApi::Save()
 		bindings.push_back(binding);
 	}
 
-	std::ofstream file(Index::F_INPUTBINDS);
+	std::ofstream file(Index(EPath::InputBinds));
 
 	file << bindings.dump(1, '\t') << std::endl;
 

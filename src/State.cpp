@@ -9,7 +9,7 @@
 
 #include "Consts.h"
 #include "Shared.h"
-#include "Index.h"
+#include "Index/Index.h"
 
 #include "Util/Strings.h"
 #include "Util/CmdLine.h"

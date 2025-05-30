@@ -15,7 +15,7 @@
 
 #include "Consts.h"
 #include "Context.h"
-#include "Index.h"
+#include "Index/Index.h"
 #include "Inputs/InputBinds/IbMapping.h"
 #include "Renderer.h"
 #include "resource.h"
@@ -112,7 +112,7 @@ void CBindsWindow::RenderContent()
 					if (now - lastCheckedBinds > 10)
 					{
 						bindConfigs.clear();
-						for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Index::D_DOCUMENTS_GW2_INPUTBINDS))
+						for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Index(EPath::DIR_GW2_INPUTBINDS)))
 						{
 							std::filesystem::path path = entry.path();
 

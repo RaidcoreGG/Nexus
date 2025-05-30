@@ -11,7 +11,7 @@
 #include <Psapi.h>
 
 #include "Branch.h"
-#include "Index.h"
+#include "Index/Index.h"
 #include "Version.h"
 
 CContext* CContext::GetContext()
@@ -148,7 +148,7 @@ CUiContext* CContext::GetUIContext()
 CSettings* CContext::GetSettingsCtx()
 {
 	static CSettings s_SettingsApi = CSettings(
-		Index::F_SETTINGS,
+		Index(EPath::Settings),
 		this->GetLogger()
 	);
 	return &s_SettingsApi;

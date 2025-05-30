@@ -12,7 +12,7 @@
 
 #include "imgui.h"
 
-#include "Index.h"
+#include "Index/Index.h"
 #include "Context.h"
 
 CExportStyleModal::CExportStyleModal()
@@ -27,7 +27,7 @@ void CExportStyleModal::RenderContent()
 {
 	if (ImGui::InputTextWithHint("##InputFilename", "Style Name", this->PathBuffer, sizeof(this->PathBuffer)))
 	{
-		this->Path = Index::D_GW2_ADDONS_NEXUS_STYLES / this->PathBuffer;
+		this->Path = Index(EPath::DIR_STYLES) / this->PathBuffer;
 		this->Path += ".imstyle180";
 	}
 

@@ -14,7 +14,7 @@
 #include "imgui.h"
 #include "imgui_extensions.h"
 
-#include "Index.h"
+#include "Index/Index.h"
 #include "Context.h"
 #include "Consts.h"
 
@@ -49,7 +49,7 @@ void CLicenseAgreementModal::RenderContent()
 	ImGui::TextWrapped("By clicking \"I do NOT agree\" your game will close and Nexus will attempt to uninstall.");
 	ImGui::TextWrapped("If you see this prompt again after restarting the game, you will have to manually remove");
 	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 0.f, 1.f));
-	ImGui::TextWrapped("%s", Index::F_HOST_DLL.string().c_str());
+	ImGui::TextWrapped("%s", Index(EPath::NexusDLL).string().c_str());
 	ImGui::PopStyleColor();
 	ImGui::TextWrapped("while the game is closed.");
 
@@ -92,7 +92,7 @@ void CLicenseAgreementModal::OnClosing()
 		}
 		case EModalResult::Cancel:
 		{
-			std::string strHost = Index::F_HOST_DLL.string();
+			std::string strHost = Index(EPath::NexusDLL).string();
 
 			SHFILEOPSTRUCT fileOp{};
 			fileOp.hwnd   = NULL;

@@ -22,7 +22,7 @@
 
 #include "Consts.h"
 #include "Context.h"
-#include "Index.h"
+#include "Index/Index.h"
 #include "Renderer.h"
 #include "resource.h"
 #include "Services/Mumble/Reader.h"
@@ -800,9 +800,9 @@ void CUiContext::LoadFonts()
 	storedFontSz = min(max(storedFontSz, 1.0f), 50.0f);
 
 	std::string fontFile = settingsctx->Get<std::string>(OPT_USERFONT, "");
-	if (!fontFile.empty() && std::filesystem::exists(Index::D_GW2_ADDONS_NEXUS_FONTS / fontFile))
+	if (!fontFile.empty() && std::filesystem::exists(Index(EPath::DIR_FONTS) / fontFile))
 	{
-		fontPath = Index::D_GW2_ADDONS_NEXUS_FONTS / fontFile;
+		fontPath = Index(EPath::DIR_FONTS) / fontFile;
 		this->FontManager->ReplaceFont("FONT_DEFAULT", storedFontSz, fontPath.string().c_str(), UIRoot::FontReceiver, nullptr);
 		hasUserFont = true;
 	}
@@ -951,7 +951,7 @@ void CUiContext::ApplyStyle(EUIStyle aStyle, std::string aValue)
 		}
 		case EUIStyle::ArcDPS_Current:
 		{
-			std::filesystem::path arcIniPath = Index::D_GW2_ADDONS / "arcdps/arcdps.ini";
+			std::filesystem::path arcIniPath = Index(EPath::DIR_ADDONS) / "arcdps/arcdps.ini";
 
 			if (std::filesystem::exists(arcIniPath))
 			{
@@ -985,7 +985,7 @@ void CUiContext::ApplyStyle(EUIStyle aStyle, std::string aValue)
 		}
 		case EUIStyle::File:
 		{
-			std::filesystem::path path = Index::D_GW2_ADDONS_NEXUS_STYLES / aValue;
+			std::filesystem::path path = Index(EPath::DIR_STYLES) / aValue;
 
 			if (std::filesystem::is_directory(path)) { return; }
 			if (std::filesystem::file_size(path) == 0) { return; }
@@ -1087,17 +1087,17 @@ void CUiContext::UnpackLocales()
 {
 	CContext* ctx = CContext::GetContext();
 
-	this->Language->SetLocaleDirectory(Index::D_GW2_ADDONS_NEXUS_LOCALES);
-	Resources::Unpack(ctx->GetModule(), Index::F_LOCALE_EN, RES_LOCALE_EN, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index::F_LOCALE_DE, RES_LOCALE_DE, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index::F_LOCALE_FR, RES_LOCALE_FR, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index::F_LOCALE_ES, RES_LOCALE_ES, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index::F_LOCALE_BR, RES_LOCALE_BR, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index::F_LOCALE_CZ, RES_LOCALE_CZ, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index::F_LOCALE_IT, RES_LOCALE_IT, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index::F_LOCALE_PL, RES_LOCALE_PL, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index::F_LOCALE_RU, RES_LOCALE_RU, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index::F_LOCALE_CN, RES_LOCALE_CN, "JSON");
+	this->Language->SetLocaleDirectory(Index(EPath::DIR_LOCALES));
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleEN), RES_LOCALE_EN, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleDE), RES_LOCALE_DE, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleFR), RES_LOCALE_FR, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleES), RES_LOCALE_ES, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleBR), RES_LOCALE_BR, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleCZ), RES_LOCALE_CZ, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleIT), RES_LOCALE_IT, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocalePL), RES_LOCALE_PL, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleRU), RES_LOCALE_RU, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleCN), RES_LOCALE_CN, "JSON");
 	this->Language->Advance();
 }
 

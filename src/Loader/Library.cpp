@@ -14,7 +14,7 @@
 #include "Consts.h"
 #include "Shared.h"
 #include "Context.h"
-#include "Index.h"
+#include "Index/Index.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;

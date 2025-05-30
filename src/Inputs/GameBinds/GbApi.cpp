@@ -15,7 +15,7 @@ using json = nlohmann::json;
 #include "pugixml/pugixml.hpp"
 
 #include "Context.h"
-#include "Index.h"
+#include "Index/Index.h"
 #include "Util/Inputs.h"
 #include "GbConst.h"
 
@@ -107,7 +107,7 @@ CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, C
 	this->EventApi = aEventApi;
 	this->Language = aLocalization;
 
-	this->Load(Index::F_GAMEBINDS);
+	this->Load(Index(EPath::GameBinds));
 	this->AddDefaultBinds();
 
 	this->EventApi->Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
@@ -581,9 +581,7 @@ std::unordered_map<EGameBinds, MultiInputBind> CGameBindsApi::GetRegistry() cons
 
 void CGameBindsApi::Load(std::filesystem::path aPath)
 {
-	this->Migrate();
-
-	if (aPath.empty()) { aPath = Index::F_GAMEBINDS; }
+	if (aPath.empty()) { aPath = Index(EPath::GameBinds); }
 	if (!std::filesystem::exists(aPath)) { return; }
 
 	pugi::xml_document doc;
@@ -1127,64 +1125,6 @@ void CGameBindsApi::AddDefaultBinds()
 	this->Registry.emplace(EGameBinds::GearLoadout9, MultiInputBind{});
 }
 
-void CGameBindsApi::Migrate()
-{
-	if (!std::filesystem::exists(Index::F_GAMEBINDS_LEGACY)) { return; }
-
-	try
-	{
-		const std::lock_guard<std::mutex> lock(this->Mutex);
-
-		std::ifstream file(Index::F_GAMEBINDS_LEGACY);
-
-		json InputBinds = json::parse(file);
-		for (json binding : InputBinds)
-		{
-			if (binding.is_null() || (binding["Key"].is_null() && binding["Code"].is_null()))
-			{
-				continue;
-			}
-
-			MultiInputBind ib{};
-			binding["Alt"].get_to(ib.Primary.Alt);
-			binding["Ctrl"].get_to(ib.Primary.Ctrl);
-			binding["Shift"].get_to(ib.Primary.Shift);
-
-			/* neither code nor type null -> inputbind */
-			if (!binding["Type"].is_null() && !binding["Code"].is_null())
-			{
-				binding["Type"].get_to(ib.Primary.Device);
-				binding["Code"].get_to(ib.Primary.Code);
-			}
-			else /* legacy inputbind */
-			{
-				ib.Primary.Device = EInputDevice::Keyboard;
-				binding["Key"].get_to(ib.Primary.Code);
-			}
-
-			EGameBinds identifier = binding["Identifier"].get<EGameBinds>();
-
-			/* Remove legacy bind that the game removed. */
-			if (identifier == EGameBinds::LEGACY_MoveSwimUp)
-			{
-				continue;
-			}
-
-			this->Registry.emplace(identifier, ib);
-		}
-
-		file.close();
-
-		std::filesystem::remove(Index::F_GAMEBINDS_LEGACY); /* Delete old file. */
-	}
-	catch (json::parse_error& ex)
-	{
-		this->Logger->Warning(CH_GAMEBINDS, "GameBinds.json could not be parsed. Error: %s", ex.what());
-	}
-
-	this->Save(); /* Save as XML. */
-}
-
 void CGameBindsApi::Save()
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
@@ -1305,7 +1245,7 @@ void CGameBindsApi::Save()
 		}
 	}
 
-	if (!doc.save_file(Index::F_GAMEBINDS.string().c_str(), "\t"))
+	if (!doc.save_file(Index(EPath::GameBinds).string().c_str(), "\t"))
 	{
 		this->Logger->Warning(CH_GAMEBINDS, "GameBinds.xml could not be saved.");
 	}

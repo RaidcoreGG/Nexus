@@ -28,9 +28,6 @@
     <Filter Include="Resource Files\Images">
       <UniqueIdentifier>{df3c3a30-d02f-4c04-a27c-cfaafff031bb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Paths">
-      <UniqueIdentifier>{b0fd71ca-41a2-4a72-a523-b30138c9dcef}</UniqueIdentifier>
-    </Filter>
     <Filter Include="_EXTERNAL">
       <UniqueIdentifier>{04d6bcbc-bde2-4787-bd80-0289963e456b}</UniqueIdentifier>
     </Filter>
@@ -175,6 +172,9 @@
     <Filter Include="_EXTERNAL\pugixml">
       <UniqueIdentifier>{7e7f07ea-8da7-4084-a342-489acad48740}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Index">
+      <UniqueIdentifier>{75f7cb08-cd53-44ef-8b11-a868524b57d4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -230,9 +230,6 @@
     </ClCompile>
     <ClCompile Include="src\Inputs\InputBinds\IbApi.cpp">
       <Filter>Inputs\InputBinds</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Index.cpp">
-      <Filter>_GLOBAL</Filter>
     </ClCompile>
     <ClCompile Include="src\State.cpp">
       <Filter>_GLOBAL</Filter>
@@ -426,6 +423,9 @@
     <ClCompile Include="src\Events\EvtApi.cpp">
       <Filter>Events</Filter>
     </ClCompile>
+    <ClCompile Include="src\Index\Index.cpp">
+      <Filter>Index</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h">
@@ -489,9 +489,6 @@
       <Filter>Inputs\InputBinds</Filter>
     </ClInclude>
     <ClInclude Include="src\State.h">
-      <Filter>_GLOBAL</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Index.h">
       <Filter>_GLOBAL</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer.h">
@@ -977,9 +974,6 @@
     <ClInclude Include="src\Branch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Paths\FuncDefs.h">
-      <Filter>Paths</Filter>
-    </ClInclude>
     <ClInclude Include="src\Version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1267,6 +1261,15 @@
     </ClInclude>
     <ClInclude Include="src\Services\Textures\TxEnum.h">
       <Filter>Services\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Index\IdxEnum.h">
+      <Filter>Index</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Index\Index.h">
+      <Filter>Index</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Index\IdxFuncDefs.h">
+      <Filter>Index</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

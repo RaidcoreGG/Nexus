@@ -15,7 +15,7 @@
 
 #include "Consts.h"
 #include "Context.h"
-#include "Index.h"
+#include "Index/Index.h"
 #include "Renderer.h"
 #include "resource.h"
 #include "Util/Base64.h"
@@ -342,7 +342,7 @@ void COptionsWindow::TabStyle()
 							this->HasUnsavedStyle = true;
 						}
 
-						static std::filesystem::path arcIniPath = Index::D_GW2_ADDONS / "arcdps/arcdps.ini";
+						static std::filesystem::path arcIniPath = Index(EPath::DIR_ADDONS) / "arcdps/arcdps.ini";
 						if (std::filesystem::exists(arcIniPath))
 						{
 							if (ImGui::Selectable("ArcDPS Current (Import from arcdps.ini)"))
@@ -706,7 +706,7 @@ void COptionsWindow::TabStyle()
 					/* Open Presets Folder */
 					if (ImGui::Button(langApi->Translate("Open Presets Folder")))
 					{
-						std::string pathStyles = Index::D_GW2_ADDONS_NEXUS_STYLES.string();
+						std::string pathStyles = Index(EPath::DIR_STYLES).string();
 						ShellExecuteA(NULL, "explore", pathStyles.c_str(), NULL, NULL, SW_SHOW);
 					}
 
@@ -732,7 +732,7 @@ void COptionsWindow::PopulateFonts()
 {
 	this->Fonts.clear();
 
-	for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Index::D_GW2_ADDONS_NEXUS_FONTS))
+	for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Index(EPath::DIR_FONTS)))
 	{
 		std::filesystem::path path = entry.path();
 
@@ -750,7 +750,7 @@ void COptionsWindow::PopulateStyles()
 {
 	this->Styles.clear();
 
-	for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Index::D_GW2_ADDONS_NEXUS_STYLES))
+	for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Index(EPath::DIR_STYLES)))
 	{
 		std::filesystem::path path = entry.path();
 

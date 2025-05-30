@@ -6,7 +6,7 @@
 #include <windowsx.h>
 
 #include "Consts.h"
-#include "Index.h"
+#include "Index/Index.h"
 #include "Renderer.h"
 #include "resource.h"
 #include "Shared.h"
@@ -86,9 +86,9 @@ namespace Main
 
 		//SetUnhandledExceptionFilter(UnhandledExcHandler);
 		
-		Index::BuildIndex(ctx->GetModule());
+		CreateIndex(ctx->GetModule());
 
-		Resources::Unpack(ctx->GetModule(), Index::F_THIRDPARTYNOTICES, RES_THIRDPARTYNOTICES, "TXT");
+		Resources::Unpack(ctx->GetModule(), Index(EPath::ThirdPartySoftwareReadme), RES_THIRDPARTYNOTICES, "TXT");
 
 		CLogHandler* logger = ctx->GetLogger();
 		CUpdater* updater = ctx->GetUpdater();
@@ -103,18 +103,18 @@ namespace Main
 
 		if (CmdLine::HasArgument("-mumble"))
 		{
-			logPathOverride = (Index::D_GW2_ADDONS_NEXUS / "Nexus_").string() + CmdLine::GetArgumentValue("-mumble") + ".log";
+			logPathOverride = (Index(EPath::DIR_NEXUS) / "Nexus_").string() + CmdLine::GetArgumentValue("-mumble") + ".log";
 		}
 
-		logger->RegisterLogger(new CFileLogger(ELogLevel::ALL, logPathOverride.empty() ? Index::F_LOG : logPathOverride));
+		logger->RegisterLogger(new CFileLogger(ELogLevel::ALL, logPathOverride.empty() ? Index(EPath::Log) : logPathOverride));
 
 		logger->Info(CH_CORE, GetCommandLineA());
-		logger->Info(CH_CORE, "%s: %s", Index::F_HOST_DLL != Index::F_CHAINLOAD_DLL ? "Proxy" : "Chainload", Index::F_HOST_DLL.string().c_str());
+		logger->Info(CH_CORE, "%s: %s", Index(EPath::NexusDLL) != Index(EPath::D3D11Chainload) ? "Proxy" : "Chainload", Index(EPath::NexusDLL).string().c_str());
 		logger->Info(CH_CORE, "Nexus: %s %s", ctx->GetVersion().string().c_str(), ctx->GetBuild());
 		logger->Info(CH_CORE, "Entry method: %d", aEntryMethod);
 
-		RaidcoreAPI = new CApiClient("https://api.raidcore.gg", true, Index::D_GW2_ADDONS_COMMON_API_RAIDCORE, 30 * 60, 300, 5, 1);//, Certs::Raidcore);
-		GitHubAPI = new CApiClient("https://api.github.com", true, Index::D_GW2_ADDONS_COMMON_API_GITHUB, 30 * 60, 60, 60, 60 * 60);
+		RaidcoreAPI = new CApiClient("https://api.raidcore.gg", true, Index(EPath::DIR_APICACHE_RAIDCORE), 30 * 60, 300, 5, 1);//, Certs::Raidcore);
+		GitHubAPI = new CApiClient("https://api.github.com", true, Index(EPath::DIR_APICACHE_GITHUB), 30 * 60, 60, 60, 60 * 60);
 
 		std::thread([logger, updater]()
 		{
