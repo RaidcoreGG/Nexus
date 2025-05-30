@@ -20,6 +20,7 @@
 #include "resource.h"
 #include "Util/Base64.h"
 #include "Util/Time.h"
+#include "UI/Widgets/QuickAccess/QaConst.h"
 
 COptionsWindow::COptionsWindow()
 {
@@ -157,6 +158,11 @@ void COptionsWindow::TabGeneral()
 			{
 				ImGui::BeginGroupPanel(langApi->Translate("((000045))"), ImVec2(-1.0f, 0.0f));
 
+				/* suppressed icons */
+				static std::vector<std::string> suppressedIcons = settingsctx->Get<std::vector<std::string>>(OPT_QASUPPRESSED);
+				
+
+
 				/* toggle vertical layout */
 				if (ImGui::Checkbox(langApi->Translate("((000046))"), &qactx->VerticalLayout))
 				{
@@ -164,31 +170,31 @@ void COptionsWindow::TabGeneral()
 				}
 
 				/* prefetch currently selected position string */
-				std::string qaVisStr = qactx->EQAVisibilityToString(qactx->Visibility);
-				EQAVisibility newQaVis = qactx->Visibility;
+				std::string qaVisStr = EQaVisibilityToString(qactx->Visibility);
+				EQaVisibility newQaVis = qactx->Visibility;
 
 				ImGui::Text(langApi->Translate("((000097))"));
 				if (ImGui::BeginCombo("##QAVisibilitySelector", langApi->Translate(qaVisStr.c_str())))
 				{
 					if (ImGui::Selectable(langApi->Translate("((000047))"), qaVisStr == "((000047))"))
 					{
-						newQaVis = EQAVisibility::AlwaysShow;
+						newQaVis = EQaVisibility::AlwaysShow;
 					}
 					if (ImGui::Selectable(langApi->Translate("((000093))"), qaVisStr == "((000093))"))
 					{
-						newQaVis = EQAVisibility::Gameplay;
+						newQaVis = EQaVisibility::Gameplay;
 					}
 					if (ImGui::Selectable(langApi->Translate("((000094))"), qaVisStr == "((000094))"))
 					{
-						newQaVis = EQAVisibility::OutOfCombat;
+						newQaVis = EQaVisibility::OutOfCombat;
 					}
 					if (ImGui::Selectable(langApi->Translate("((000095))"), qaVisStr == "((000095))"))
 					{
-						newQaVis = EQAVisibility::InCombat;
+						newQaVis = EQaVisibility::InCombat;
 					}
 					if (ImGui::Selectable(langApi->Translate("((000096))"), qaVisStr == "((000096))"))
 					{
-						newQaVis = EQAVisibility::Hide;
+						newQaVis = EQaVisibility::Hide;
 					}
 
 					ImGui::EndCombo();
@@ -209,8 +215,8 @@ void COptionsWindow::TabGeneral()
 				}
 
 				/* prefetch currently selected position string */
-				std::string qaPosStr = qactx->EQAPositionToString(qactx->Location);
-				EQAPosition newQaPos = qactx->Location;
+				std::string qaPosStr = EQaPositionToString(qactx->Location);
+				EQaPosition newQaPos = qactx->Location;
 
 				/* position/location dropdown */
 				ImGui::Text(langApi->Translate("((000050))"));
@@ -218,19 +224,19 @@ void COptionsWindow::TabGeneral()
 				{
 					if (ImGui::Selectable(langApi->Translate("((000067))"), qaPosStr == "((000067))"))
 					{
-						newQaPos = EQAPosition::Extend;
+						newQaPos = EQaPosition::Extend;
 					}
 					if (ImGui::Selectable(langApi->Translate("((000068))"), qaPosStr == "((000068))"))
 					{
-						newQaPos = EQAPosition::Under;
+						newQaPos = EQaPosition::Under;
 					}
 					if (ImGui::Selectable(langApi->Translate("((000069))"), qaPosStr == "((000069))"))
 					{
-						newQaPos = EQAPosition::Bottom;
+						newQaPos = EQaPosition::Bottom;
 					}
 					if (ImGui::Selectable(langApi->Translate("((000070))"), qaPosStr == "((000070))"))
 					{
-						newQaPos = EQAPosition::Custom;
+						newQaPos = EQaPosition::Custom;
 					}
 
 					ImGui::EndCombo();

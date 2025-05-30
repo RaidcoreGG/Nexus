@@ -426,6 +426,9 @@
     <ClCompile Include="src\Index\Index.cpp">
       <Filter>Index</Filter>
     </ClCompile>
+    <ClCompile Include="src\UI\Widgets\QuickAccess\QaConst.cpp">
+      <Filter>UI\Widgets\QuickAccess</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h">
@@ -1127,16 +1130,10 @@
     <ClInclude Include="src\UI\Widgets\QuickAccess\QuickAccess.h">
       <Filter>UI\Widgets\QuickAccess</Filter>
     </ClInclude>
-    <ClInclude Include="src\UI\Widgets\QuickAccess\EQAPosition.h">
+    <ClInclude Include="src\UI\Widgets\QuickAccess\QaFuncDefs.h">
       <Filter>UI\Widgets\QuickAccess</Filter>
     </ClInclude>
-    <ClInclude Include="src\UI\Widgets\QuickAccess\EQAVisibility.h">
-      <Filter>UI\Widgets\QuickAccess</Filter>
-    </ClInclude>
-    <ClInclude Include="src\UI\Widgets\QuickAccess\FuncDefs.h">
-      <Filter>UI\Widgets\QuickAccess</Filter>
-    </ClInclude>
-    <ClInclude Include="src\UI\Widgets\QuickAccess\Shortcut.h">
+    <ClInclude Include="src\UI\Widgets\QuickAccess\QaShortcut.h">
       <Filter>UI\Widgets\QuickAccess</Filter>
     </ClInclude>
     <ClInclude Include="src\UI\Widgets\Alerts\AlFuncDefs.h">
@@ -1270,6 +1267,12 @@
     </ClInclude>
     <ClInclude Include="src\Index\IdxFuncDefs.h">
       <Filter>Index</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\QuickAccess\QaEnum.h">
+      <Filter>UI\Widgets\QuickAccess</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Widgets\QuickAccess\QaConst.h">
+      <Filter>UI\Widgets\QuickAccess</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

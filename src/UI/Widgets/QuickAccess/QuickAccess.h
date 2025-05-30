@@ -15,8 +15,7 @@
 
 #include "imgui/imgui.h"
 
-#include "EQAPosition.h"
-#include "EQAVisibility.h"
+#include "QaEnum.h"
 #include "Inputs/InputBinds/IbApi.h"
 #include "Loader/NexusLinkData.h"
 #include "Services/DataLink/DlApi.h"
@@ -24,7 +23,7 @@
 #include "Services/Logging/LogHandler.h"
 #include "Services/Mumble/Reader.h"
 #include "Services/Textures/TxLoader.h"
-#include "Shortcut.h"
+#include "QaShortcut.h"
 #include "UI/Controls/CtlWindow.h"
 #include "UI/FuncDefs.h"
 
@@ -39,18 +38,6 @@ class CQuickAccess : public virtual IWindow
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
-	/// EQAVisibilityToString:
-	/// 	Returns a localizable string for a visibility setting.
-	///----------------------------------------------------------------------------------------------------
-	static std::string EQAVisibilityToString(EQAVisibility aQAVisibility);
-
-	///----------------------------------------------------------------------------------------------------
-	/// EQAPositionToString:
-	/// 	Returns a localizable string for a position setting.
-	///----------------------------------------------------------------------------------------------------
-	static std::string EQAPositionToString(EQAPosition aQAPosition);
-
-	///----------------------------------------------------------------------------------------------------
 	/// OnAddonLoaded:
 	/// 	Rechecks invalid shortcuts on addon load.
 	///----------------------------------------------------------------------------------------------------
@@ -59,8 +46,8 @@ class CQuickAccess : public virtual IWindow
 	public:
 	bool                               VerticalLayout     = false;
 	bool                               ShowArcDPSShortcut = true;
-	EQAVisibility                      Visibility         = EQAVisibility::AlwaysShow;
-	EQAPosition                        Location           = EQAPosition::Extend;
+	EQaVisibility                      Visibility         = EQaVisibility::AlwaysShow;
+	EQaPosition                        Location           = EQaPosition::Extend;
 	ImVec2                             Offset             = ImVec2(0, 0);
 
 	///----------------------------------------------------------------------------------------------------

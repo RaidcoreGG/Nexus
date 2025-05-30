@@ -20,7 +20,7 @@
 #include "UI/Services/Fonts/FuncDefs.h"
 #include "UI/Services/QoL/FuncDefs.h"
 #include "UI/Widgets/Alerts/AlFuncDefs.h"
-#include "UI/Widgets/QuickAccess/FuncDefs.h"
+#include "UI/Widgets/QuickAccess/QaFuncDefs.h"
 
 // Base
 struct AddonAPI {};

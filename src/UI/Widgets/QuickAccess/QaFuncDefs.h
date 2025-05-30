@@ -1,5 +1,13 @@
-#ifndef QUICKACCESS_FUNCDEFS_H
-#define QUICKACCESS_FUNCDEFS_H
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  QaFuncDefs.h
+/// Description  :  Function definitions for Quick Access.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
+#ifndef QAFUNCDEFS_H
+#define QAFUNCDEFS_H
 
 #include "UI/FuncDefs.h"
 

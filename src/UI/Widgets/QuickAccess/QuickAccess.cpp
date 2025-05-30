@@ -27,42 +27,6 @@
 
 float size = 32.0f;
 
-std::string CQuickAccess::EQAVisibilityToString(EQAVisibility aQAVisibility)
-{
-	switch (aQAVisibility)
-	{
-		case EQAVisibility::AlwaysShow:
-			return "((000047))";
-		case EQAVisibility::Gameplay:
-			return "((000093))";
-		case EQAVisibility::OutOfCombat:
-			return "((000094))";
-		case EQAVisibility::InCombat:
-			return "((000095))";
-		case EQAVisibility::Hide:
-			return "((000096))";
-		default:
-			return NULLSTR;
-	}
-}
-
-std::string CQuickAccess::EQAPositionToString(EQAPosition aQAPosition)
-{
-	switch (aQAPosition)
-	{
-		case EQAPosition::Extend:
-			return "((000067))";
-		case EQAPosition::Under:
-			return "((000068))";
-		case EQAPosition::Bottom:
-			return "((000069))";
-		case EQAPosition::Custom:
-			return "((000070))";
-		default:
-			return NULLSTR;
-	}
-}
-
 void CQuickAccess::OnAddonLoaded(void* aEventData)
 {
 	CContext* ctx = CContext::GetContext();
@@ -87,10 +51,10 @@ CQuickAccess::CQuickAccess(CDataLinkApi* aDataLink, CLogHandler* aLogger, CInput
 
 	this->VerticalLayout = settingsCtx->Get<bool>(OPT_QAVERTICAL, false);
 	this->ShowArcDPSShortcut = settingsCtx->Get<bool>(OPT_QASHOWARCDPS, true);
-	this->Location = settingsCtx->Get<EQAPosition>(OPT_QALOCATION, EQAPosition::Extend);
+	this->Location = settingsCtx->Get<EQaPosition>(OPT_QALOCATION, EQaPosition::Extend);
 	this->Offset.x = settingsCtx->Get<float>(OPT_QAOFFSETX, 0.0f);
 	this->Offset.y = settingsCtx->Get<float>(OPT_QAOFFSETY, 0.0f);
-	this->Visibility = settingsCtx->Get<EQAVisibility>(OPT_QAVISIBILITY, EQAVisibility::AlwaysShow);
+	this->Visibility = settingsCtx->Get<EQaVisibility>(OPT_QAVISIBILITY, EQaVisibility::AlwaysShow);
 
 	this->EventApi->Subscribe(EV_ADDON_LOADED, CQuickAccess::OnAddonLoaded);
 }
@@ -136,9 +100,9 @@ void CQuickAccess::Render()
 	{
 		/* continue rendering */
 		default:
-		case EQAVisibility::AlwaysShow: { break; }
+		case EQaVisibility::AlwaysShow: { break; }
 
-		case EQAVisibility::Gameplay:
+		case EQaVisibility::Gameplay:
 		{
 			/* don't render if not gameplay */
 			if (!this->NexusLink->IsGameplay)
@@ -148,7 +112,7 @@ void CQuickAccess::Render()
 
 			break;
 		}
-		case EQAVisibility::OutOfCombat:
+		case EQaVisibility::OutOfCombat:
 		{
 			/* don't render if not gameplay */
 			if (!this->NexusLink->IsGameplay)
@@ -164,7 +128,7 @@ void CQuickAccess::Render()
 
 			break;
 		}
-		case EQAVisibility::InCombat:
+		case EQaVisibility::InCombat:
 		{
 			/* don't render if not gameplay */
 			if (!this->NexusLink->IsGameplay)
@@ -182,7 +146,7 @@ void CQuickAccess::Render()
 		}
 
 		/* don't render*/
-		case EQAVisibility::Hide: { return; }
+		case EQaVisibility::Hide: { return; }
 	}
 
 	bool isActive = false;
@@ -193,13 +157,13 @@ void CQuickAccess::Render()
 
 	switch (this->Location)
 	{
-		case EQAPosition::Extend:
+		case EQaPosition::Extend:
 			pos.x += (size * Renderer::Scaling) * GW2_QUICKACCESS_ITEMS;
 			break;
-		case EQAPosition::Under:
+		case EQaPosition::Under:
 			pos.y += size * Renderer::Scaling;
 			break;
-		case EQAPosition::Bottom:
+		case EQaPosition::Bottom:
 			pos.y += Renderer::Height - (size * 2 * Renderer::Scaling);
 			break;
 	}
@@ -334,7 +298,7 @@ void CQuickAccess::Render()
 		}
 
 		bool isHoveringNative = false;
-		if (this->Location == EQAPosition::Extend)
+		if (this->Location == EQaPosition::Extend)
 		{
 			ImVec2 mPos = ImGui::GetMousePos();
 			if (mPos.x != -FLT_MAX && mPos.y != -FLT_MAX && mPos.x < pos.x - this->Offset.x && mPos.y < Renderer::Scaling * size)

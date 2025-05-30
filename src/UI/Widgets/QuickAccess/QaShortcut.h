@@ -1,13 +1,13 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  Shortcut.h
+/// Name         :  QaShortcut.h
 /// Description  :  Contains the structs holding information about a shortcut.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef QUICKACCESS_SHORTCUT_H
-#define QUICKACCESS_SHORTCUT_H
+#ifndef QASHORTCUT_H
+#define QASHORTCUT_H
 
 #include <string>
 #include <map>
