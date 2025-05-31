@@ -15,9 +15,9 @@
 #include "Util/Inputs.h"
 #include "Util/Strings.h"
 
-InputBind IBFromString(std::string aInputBind)
+InputBind_t IBFromString(std::string aInputBind)
 {
-	InputBind ib{};
+	InputBind_t ib{};
 
 	if (String::ToLower(aInputBind) == NULLSTR) { return ib; }
 
@@ -112,7 +112,7 @@ InputBind IBFromString(std::string aInputBind)
 	return ib;
 }
 
-std::string IBToString(const InputBind& aInputBind, bool aPadded)
+std::string IBToString(const InputBind_t& aInputBind, bool aPadded)
 {
 	if (aInputBind.Device == EInputDevice::None)                          { return NULLSTR; }
 	if (aInputBind.Device == EInputDevice::Mouse && aInputBind.Code == 0) { return NULLSTR; }

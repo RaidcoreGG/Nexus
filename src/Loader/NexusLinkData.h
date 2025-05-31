@@ -2,7 +2,7 @@
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
 /// Name         :  NexusLinkData.h
-/// Description  :  Contains the definition for the NexusLinkData struct.
+/// Description  :  Contains the definition for the NexusLinkData_t struct.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
@@ -12,9 +12,9 @@
 constexpr const char* DL_NEXUS_LINK = "DL_NEXUS_LINK";
 
 ///----------------------------------------------------------------------------------------------------
-/// NexusLinkData Struct
+/// NexusLinkData_t Struct
 ///----------------------------------------------------------------------------------------------------
-struct NexusLinkData
+struct NexusLinkData_t
 {
 	unsigned	Width;
 	unsigned	Height;

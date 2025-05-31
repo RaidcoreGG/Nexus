@@ -122,7 +122,7 @@ void CLogWindow::RenderContent()
 		ImGui::Text("Channels");
 
 		const std::lock_guard<std::mutex> lock(Mutex);
-		for (LogChannel& ch : this->Channels)
+		for (LogChannel_t& ch : this->Channels)
 		{
 			calcChWidth = max(calcChWidth, ImGui::CalcTextSize(ch.Name.c_str()).x);
 			float opacity = 0.8f;
@@ -157,10 +157,10 @@ void CLogWindow::RenderContent()
 
 		const std::lock_guard<std::mutex> lock(Mutex);
 		{
-			std::vector<DisplayLogEntry*> displayedEntries;
+			std::vector<DisplayLogEntry_t*> displayedEntries;
 			for (size_t i = 0; i < LogEntries.size(); i++)
 			{
-				DisplayLogEntry* msg = LogEntries[i];
+				DisplayLogEntry_t* msg = LogEntries[i];
 
 				/* Filter level set. */
 				if (this->FilterLevel != ELogLevel::ALL)
@@ -206,7 +206,7 @@ void CLogWindow::RenderContent()
 			{
 				for (size_t i = start; i < displayedEntries.size(); i++)
 				{
-					DisplayLogEntry* msg = displayedEntries[i];
+					DisplayLogEntry_t* msg = displayedEntries[i];
 
 					amtShown++;
 
@@ -256,7 +256,7 @@ void CLogWindow::RenderContent()
 					
 					int colStack = 0;
 
-					for (MessagePart& msgPart : msg->Parts)
+					for (MessagePart_t& msgPart : msg->Parts)
 					{
 						switch (msgPart.Type)
 						{
@@ -324,12 +324,12 @@ void CLogWindow::MsgProc(const LogMsg_t* aLogEntry)
 {
 	const std::lock_guard<std::mutex> lock(Mutex);
 
-	if (std::find_if(this->Channels.begin(), this->Channels.end(), [aLogEntry](LogChannel& channel){ return channel.Name == aLogEntry->Channel;}) == this->Channels.end())
+	if (std::find_if(this->Channels.begin(), this->Channels.end(), [aLogEntry](LogChannel_t& channel){ return channel.Name == aLogEntry->Channel;}) == this->Channels.end())
 	{
-		this->Channels.push_back(LogChannel{false, aLogEntry->Channel });
+		this->Channels.push_back(LogChannel_t{false, aLogEntry->Channel });
 	}
 
-	DisplayLogEntry* displayMsg = nullptr;
+	DisplayLogEntry_t* displayMsg = nullptr;
 
 	if (aLogEntry->RepeatCount > 1)
 	{
@@ -338,17 +338,17 @@ void CLogWindow::MsgProc(const LogMsg_t* aLogEntry)
 	}
 	else
 	{
-		displayMsg = new DisplayLogEntry();
+		displayMsg = new DisplayLogEntry_t();
 		displayMsg->Entry = aLogEntry;
 	}
 
 	if (displayMsg->Entry->RepeatCount > 1)
 	{
-		MessagePart msgPart{};
+		MessagePart_t msgPart{};
 		msgPart.Type = EMessagePartType::Text;
 		msgPart.Text = "(" + std::to_string(displayMsg->Entry->RepeatCount) + ")";
 		displayMsg->Parts.push_back(msgPart);
-		MessagePart msgSpace{};
+		MessagePart_t msgSpace{};
 		msgSpace.Type = EMessagePartType::Text;
 		msgSpace.Text = " ";
 		displayMsg->Parts.push_back(msgSpace);
@@ -361,12 +361,12 @@ void CLogWindow::MsgProc(const LogMsg_t* aLogEntry)
 
 		if (aLogEntry->Message[i] == ' ')
 		{
-			MessagePart msgPart{};
+			MessagePart_t msgPart{};
 			msgPart.Type = EMessagePartType::Text;
 			msgPart.Text = aLogEntry->Message.substr(idxLastWordStart, i - idxLastWordStart);
 			displayMsg->Parts.push_back(msgPart);
 
-			MessagePart msgSpace{};
+			MessagePart_t msgSpace{};
 			msgSpace.Type = EMessagePartType::Text;
 			msgSpace.Text = " ";
 			displayMsg->Parts.push_back(msgSpace);
@@ -375,12 +375,12 @@ void CLogWindow::MsgProc(const LogMsg_t* aLogEntry)
 		}
 		else if (aLogEntry->Message[i] == '\n')
 		{
-			MessagePart msgPartPre{};
+			MessagePart_t msgPartPre{};
 			msgPartPre.Type = EMessagePartType::Text;
 			msgPartPre.Text = aLogEntry->Message.substr(idxLastWordStart, i - idxLastWordStart);
 			displayMsg->Parts.push_back(msgPartPre);
 
-			MessagePart msgPart{};
+			MessagePart_t msgPart{};
 			msgPart.Type = EMessagePartType::LineBreak;
 			displayMsg->Parts.push_back(msgPart);
 
@@ -400,12 +400,12 @@ void CLogWindow::MsgProc(const LogMsg_t* aLogEntry)
 			{
 				ImVec4 col = ImGui::HEXtoIV4(hexCol.c_str());
 
-				MessagePart msgPartPre{};
+				MessagePart_t msgPartPre{};
 				msgPartPre.Type = EMessagePartType::Text;
 				msgPartPre.Text = aLogEntry->Message.substr(idxLastWordStart, i - idxLastWordStart);
 				displayMsg->Parts.push_back(msgPartPre);
 
-				MessagePart msgPart{};
+				MessagePart_t msgPart{};
 				msgPart.Type = EMessagePartType::ColorPush;
 				msgPart.Color = col;
 				displayMsg->Parts.push_back(msgPart);
@@ -421,12 +421,12 @@ void CLogWindow::MsgProc(const LogMsg_t* aLogEntry)
 				 aLogEntry->Message[i + 2] == 'c' &&
 				 aLogEntry->Message[i + 3] == '>')
 		{
-			MessagePart msgPartPre{};
+			MessagePart_t msgPartPre{};
 			msgPartPre.Type = EMessagePartType::Text;
 			msgPartPre.Text = aLogEntry->Message.substr(idxLastWordStart, i - idxLastWordStart);
 			displayMsg->Parts.push_back(msgPartPre);
 
-			MessagePart msgPart{};
+			MessagePart_t msgPart{};
 			msgPart.Type = EMessagePartType::ColorPop;
 			displayMsg->Parts.push_back(msgPart);
 
@@ -435,7 +435,7 @@ void CLogWindow::MsgProc(const LogMsg_t* aLogEntry)
 		}
 		else if (i == aLogEntry->Message.size() - 1)
 		{
-			MessagePart msgPart{};
+			MessagePart_t msgPart{};
 			msgPart.Type = EMessagePartType::Text;
 			msgPart.Text = aLogEntry->Message.substr(idxLastWordStart, i - idxLastWordStart + 1); // +1 because this char is included
 			displayMsg->Parts.push_back(msgPart);

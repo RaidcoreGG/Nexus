@@ -103,7 +103,7 @@ void CDebugWindow::TabEvents()
 
 	if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 	{
-		std::unordered_map<std::string, EventData> eventRegistry = CContext::GetContext()->GetEventApi()->GetRegistry();
+		std::unordered_map<std::string, EventData_t> eventRegistry = CContext::GetContext()->GetEventApi()->GetRegistry();
 
 		for (auto& [identifier, ev] : eventRegistry)
 		{
@@ -116,7 +116,7 @@ void CDebugWindow::TabEvents()
 				else
 				{
 					ImGui::TextDisabled("Subscribers:");
-					for (EventSubscriber sub : ev.Subscribers)
+					for (EventSubscriber_t sub : ev.Subscribers)
 					{
 						ImGui::Text(""); ImGui::SameLine(); ImGui::TextDisabled("Signature: %d | Callback: %p", sub.Signature, sub.Callback);
 					}
@@ -139,7 +139,7 @@ void CDebugWindow::TabInputBinds()
 
 	if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 	{
-		std::map<std::string, IbMapping> inputBindRegistry = CContext::GetContext()->GetInputBindApi()->GetRegistry();
+		std::map<std::string, IbMapping_t> inputBindRegistry = CContext::GetContext()->GetInputBindApi()->GetRegistry();
 
 		for (auto& [identifier, inputBind] : inputBindRegistry)
 		{
@@ -191,7 +191,7 @@ void CDebugWindow::TabDataLink()
 
 	if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 	{
-		std::unordered_map<std::string, LinkedResource>	dataLinkRegistry = CContext::GetContext()->GetDataLink()->GetRegistry();
+		std::unordered_map<std::string, LinkedResource_t>	dataLinkRegistry = CContext::GetContext()->GetDataLink()->GetRegistry();
 
 		for (auto& [identifier, resource] : dataLinkRegistry)
 		{
@@ -226,8 +226,8 @@ void CDebugWindow::TabTextures()
 		return;
 	}
 
-	std::map<std::string, Texture*>      texRegistry = CContext::GetContext()->GetTextureService()->GetRegistry();
-	std::map<std::string, QueuedTexture> texQueued   = CContext::GetContext()->GetTextureService()->GetQueuedTextures();
+	std::map<std::string, Texture_t*>      texRegistry = CContext::GetContext()->GetTextureService()->GetRegistry();
+	std::map<std::string, QueuedTexture_t> texQueued   = CContext::GetContext()->GetTextureService()->GetQueuedTextures();
 
 	static char texFilter[400] = {};
 	static int displayedTextures = 0;
@@ -388,7 +388,7 @@ void CDebugWindow::TabQuickAccess()
 	{
 		ImGui::Text("Items:");
 
-		std::map<std::string, Shortcut> qaRegistry = CContext::GetContext()->GetUIContext()->GetQuickAccess()->GetRegistry();
+		std::map<std::string, Shortcut_t> qaRegistry = CContext::GetContext()->GetUIContext()->GetQuickAccess()->GetRegistry();
 
 		for (auto& [identifier, shortcut] : qaRegistry)
 		{
@@ -418,7 +418,7 @@ void CDebugWindow::TabQuickAccess()
 
 		ImGui::Separator();
 
-		std::map<std::string, ContextItem> orphanage = CContext::GetContext()->GetUIContext()->GetQuickAccess()->GetOrphanage();
+		std::map<std::string, ContextItem_t> orphanage = CContext::GetContext()->GetUIContext()->GetQuickAccess()->GetOrphanage();
 
 		ImGui::Text("Orphaned context menu items:");
 		for (auto& [identifier, shortcut] : orphanage)
@@ -487,7 +487,7 @@ void CDebugWindow::TabLoader()
 						{
 							this->MemoryViewer.Open = true;
 							this->MV_Ptr = addon->Definitions;
-							this->MV_Size = sizeof(AddonDefinition);
+							this->MV_Size = sizeof(AddonDef_t);
 						}
 					}
 

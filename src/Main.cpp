@@ -68,13 +68,13 @@ namespace Hooks
 
 namespace Main
 {
-	static NexusLinkData*  s_NexusLink      = nullptr;
-	static CRawInputApi*   s_RawInputApi    = nullptr;
-	static CInputBindApi*  s_InputBindApi   = nullptr;
-	static CUiContext*     s_UIContext      = nullptr;
-	static CTextureLoader* s_TextureService = nullptr;
-	static CEventApi*      s_EventApi       = nullptr;
-	static CSettings*      s_SettingsCtx    = nullptr;
+	static NexusLinkData_t*  s_NexusLink      = nullptr;
+	static CRawInputApi*     s_RawInputApi    = nullptr;
+	static CInputBindApi*    s_InputBindApi   = nullptr;
+	static CUiContext*       s_UIContext      = nullptr;
+	static CTextureLoader*   s_TextureService = nullptr;
+	static CEventApi*        s_EventApi       = nullptr;
+	static CSettings*        s_SettingsCtx    = nullptr;
 
 	void Initialize(EEntryMethod aEntryMethod)
 	{
@@ -154,7 +154,7 @@ namespace Main
 
 			ctx->GetMumbleReader();
 
-			s_NexusLink = (NexusLinkData*)ctx->GetDataLink()->GetResource(DL_NEXUS_LINK);
+			s_NexusLink = (NexusLinkData_t*)ctx->GetDataLink()->GetResource(DL_NEXUS_LINK);
 			s_RawInputApi = ctx->GetRawInputApi();
 			s_InputBindApi = ctx->GetInputBindApi();
 			s_UIContext = ctx->GetUIContext();

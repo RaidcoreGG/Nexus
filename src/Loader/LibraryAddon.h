@@ -5,7 +5,7 @@
 
 #include "EUpdateProvider.h"
 
-struct LibraryAddon
+struct LibraryAddon_t
 {
 	signed int		Signature;
 	std::string		Name;

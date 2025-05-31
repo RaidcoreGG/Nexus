@@ -38,7 +38,7 @@ void CQuickAccess::OnAddonLoaded(void* aEventData)
 
 CQuickAccess::CQuickAccess(CDataLinkApi* aDataLink, CLogApi* aLogger, CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization, CEventApi* aEventApi)
 {
-	this->NexusLink = (NexusLinkData*)aDataLink->GetResource(DL_NEXUS_LINK);
+	this->NexusLink = (NexusLinkData_t*)aDataLink->GetResource(DL_NEXUS_LINK);
 	this->MumbleLink = (Mumble::Data*)aDataLink->GetResource(DL_MUMBLE_LINK);
 	this->Logger = aLogger;
 	this->InputBindApi = aInputBindApi;
@@ -79,7 +79,7 @@ void CQuickAccess::Render()
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 		for (auto& [identifier, shortcut] : this->Registry)
 		{
-			const InputBind& ib = this->InputBindApi->Get(shortcut.IBIdentifier);
+			const InputBind_t& ib = this->InputBindApi->Get(shortcut.IBIdentifier);
 			if (ib.Device != EInputDevice::None)
 			{
 				shortcut.IBText = IBToString(ib, true);
@@ -323,7 +323,7 @@ void CQuickAccess::Render()
 	ImGui::PopStyleVar();
 }
 
-void CQuickAccess::RenderContextMenu(const std::string& aIdentifier, const Shortcut& aShortcut, bool* aIsActive)
+void CQuickAccess::RenderContextMenu(const std::string& aIdentifier, const Shortcut_t& aShortcut, bool* aIsActive)
 {
 	if (aShortcut.ContextItems.size() > 0)
 	{
@@ -372,16 +372,16 @@ void CQuickAccess::AddShortcut(const char* aIdentifier, const char* aTextureIden
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 		if (this->Registry.find(str) == this->Registry.end())
 		{
-			Texture* normal = this->TextureService->Get(strTexId.c_str());
-			Texture* hover = this->TextureService->Get(strTexHoverId.c_str());
-			Shortcut sh{};
+			Texture_t* normal = this->TextureService->Get(strTexId.c_str());
+			Texture_t* hover = this->TextureService->Get(strTexHoverId.c_str());
+			Shortcut_t sh{};
 			sh.TextureNormalIdentifier = aTextureIdentifier;
 			sh.TextureHoverIdentifier = aTextureHoverIdentifier;
 			sh.TextureNormal = normal;
 			sh.TextureHover = hover;
 			sh.IBIdentifier = aInputBindIdentifier;
 
-			const InputBind& ib = this->InputBindApi->Get(aInputBindIdentifier);
+			const InputBind_t& ib = this->InputBindApi->Get(aInputBindIdentifier);
 			if (ib.Device != EInputDevice::None)
 			{
 				sh.IBText = IBToString(ib, true);
@@ -471,7 +471,7 @@ void CQuickAccess::AddContextItem(const char* aIdentifier, const char* aTargetSh
 	std::string str = aIdentifier;
 	std::string tarShStr = aTargetShortcutIdentifier ? aTargetShortcutIdentifier : QA_MENU;
 
-	ContextItem shortcut{
+	ContextItem_t shortcut{
 		aIdentifier,
 		aShortcutRenderCallback
 	};
@@ -507,14 +507,14 @@ void CQuickAccess::RemoveContextItem(const char* aIdentifier)
 	this->Validate(false);
 }
 
-std::map<std::string, Shortcut> CQuickAccess::GetRegistry() const
+std::map<std::string, Shortcut_t> CQuickAccess::GetRegistry() const
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	return this->Registry;
 }
 
-std::map<std::string, ContextItem> CQuickAccess::GetOrphanage() const
+std::map<std::string, ContextItem_t> CQuickAccess::GetOrphanage() const
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -615,7 +615,7 @@ void CQuickAccess::WhereAreMyParents()
 	}
 }
 
-bool CQuickAccess::IsValid(const Shortcut& aShortcut)
+bool CQuickAccess::IsValid(const Shortcut_t& aShortcut)
 {
 	return aShortcut.ContextItems.size() > 0 || this->InputBindApi->HasHandler(aShortcut.IBIdentifier);
 }

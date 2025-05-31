@@ -21,13 +21,13 @@
 constexpr const char* CH_UPDATER = "Updater";
 
 ///----------------------------------------------------------------------------------------------------
-/// AddonInfo Struct
+/// AddonInfo_t Struct
 ///----------------------------------------------------------------------------------------------------
-struct AddonInfo
+struct AddonInfo_t
 {
 	signed int                 Signature;
 	std::string                Name;
-	AddonVersion               Version;
+	AddonVersion_t             Version;
 	EUpdateProvider            Provider;
 	std::string                UpdateLink;
 	std::vector<unsigned char> MD5;
@@ -59,13 +59,13 @@ class CUpdater
 	/// UpdateAddon:
 	/// 	Checks for an update for an addon.
 	///----------------------------------------------------------------------------------------------------
-	bool UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonInfo, bool aIgnoreTagFormat = false, int aCacheLifetimeOverride = -1);
+	bool UpdateAddon(const std::filesystem::path& aPath, AddonInfo_t aAddonInfo, bool aIgnoreTagFormat = false, int aCacheLifetimeOverride = -1);
 
 	///----------------------------------------------------------------------------------------------------
 	/// InstallAddon:
 	/// 	Installs an addon and notifies the loader.
 	///----------------------------------------------------------------------------------------------------
-	bool InstallAddon(LibraryAddon* aAddon, bool aIsArcPlugin = false);
+	bool InstallAddon(LibraryAddon_t* aAddon, bool aIsArcPlugin = false);
 
 	///----------------------------------------------------------------------------------------------------
 	/// IsUpdateAvailable:
@@ -95,7 +95,7 @@ class CUpdater
 	/// UpdateGitHub:
 	/// 	Downloads the latest addon available at the remote, if it's newer than current.
 	///----------------------------------------------------------------------------------------------------
-	bool UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& aEndpoint, AddonVersion aCurrentVersion, bool aAllowPrereleases, bool aIgnoreTagFormat = false, int aCacheLifetimeOverride = -1);
+	bool UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& aEndpoint, AddonVersion_t aCurrentVersion, bool aAllowPrereleases, bool aIgnoreTagFormat = false, int aCacheLifetimeOverride = -1);
 
 	///----------------------------------------------------------------------------------------------------
 	/// UpdateDirect:

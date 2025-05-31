@@ -41,7 +41,7 @@ UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 
-	const InputBind& capture = this->GetCaptureRef();
+	const InputBind_t& capture = this->GetCaptureRef();
 
 	/* actual input processing */
 	switch (uMsg)
@@ -136,9 +136,9 @@ void CInputBindApi::Register(const char* aIdentifier, EIbHandlerType aInputBindH
 	this->Register(aIdentifier, aInputBindHandlerType, aInputBindHandler, IBFromString(aInputBind));
 }
 
-void CInputBindApi::Register(const char* aIdentifier, EIbHandlerType aInputBindHandlerType, void* aInputBindHandler, InputBind aInputBind)
+void CInputBindApi::Register(const char* aIdentifier, EIbHandlerType aInputBindHandlerType, void* aInputBindHandler, InputBind_t aInputBind)
 {
-	/* check if another identifier, already uses the InputBind */
+	/* check if another identifier, already uses the InputBind_t */
 	std::string usedBy = this->IsInUse(aInputBind);
 
 	/* another identifier uses the same combination */
@@ -151,10 +151,10 @@ void CInputBindApi::Register(const char* aIdentifier, EIbHandlerType aInputBindH
 
 	auto it = this->Registry.find(aIdentifier);
 
-	/* check if this InputBind is not already set */
+	/* check if this InputBind_t is not already set */
 	if (it == Registry.end())
 	{
-		IbMapping mapping{};
+		IbMapping_t mapping{};
 		mapping.Bind = aInputBind;
 		mapping.HandlerType = aInputBindHandlerType;
 		switch (aInputBindHandlerType)
@@ -255,9 +255,9 @@ void CInputBindApi::Deregister(const char* aIdentifier)
 	this->Save();
 }
 
-std::string CInputBindApi::IsInUse(InputBind aInputBind)
+std::string CInputBindApi::IsInUse(InputBind_t aInputBind)
 {
-	if (aInputBind == InputBind{}) { return ""; }
+	if (aInputBind == InputBind_t{}) { return ""; }
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -306,7 +306,7 @@ bool CInputBindApi::HasHandler(const std::string& aIdentifier)
 	return false;
 }
 
-const InputBind& CInputBindApi::Get(const std::string& aIdentifier)
+const InputBind_t& CInputBindApi::Get(const std::string& aIdentifier)
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -320,9 +320,9 @@ const InputBind& CInputBindApi::Get(const std::string& aIdentifier)
 	return {};
 }
 
-void CInputBindApi::Set(std::string aIdentifier, InputBind aInputBind)
+void CInputBindApi::Set(std::string aIdentifier, InputBind_t aInputBind)
 {
-	/* check if another identifier, already uses the InputBind */
+	/* check if another identifier, already uses the InputBind_t */
 	std::string usedBy = this->IsInUse(aInputBind);
 
 	/* another identifier uses the same combination */
@@ -341,7 +341,7 @@ void CInputBindApi::Set(std::string aIdentifier, InputBind aInputBind)
 	}
 	else
 	{
-		IbMapping mapping{};
+		IbMapping_t mapping{};
 		mapping.Bind = aInputBind;
 		this->Registry.emplace(aIdentifier, mapping);
 	}
@@ -488,7 +488,7 @@ int CInputBindApi::Verify(void* aStartAddress, void* aEndAddress)
 	return refCounter;
 }
 
-std::map<std::string, IbMapping> CInputBindApi::GetRegistry() const
+std::map<std::string, IbMapping_t> CInputBindApi::GetRegistry() const
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -518,7 +518,7 @@ void CInputBindApi::Load()
 			if (binding["Identifier"].is_null())                       { continue; }
 			if (binding["Key"].is_null() && binding["Code"].is_null()) { continue; }
 
-			InputBind ib{};
+			InputBind_t ib{};
 			ib.Alt           = binding.value("Alt",         false);
 			ib.Ctrl          = binding.value("Ctrl",        false);
 			ib.Shift         = binding.value("Shift",       false);
@@ -560,7 +560,7 @@ void CInputBindApi::Load()
 			}
 			else
 			{
-				IbMapping mapping{};
+				IbMapping_t mapping{};
 				mapping.Bind = ib;
 				mapping.Passthrough = passthrough;
 				this->Registry.emplace(identifier, mapping);
@@ -614,7 +614,7 @@ void CInputBindApi::Save()
 	file.close();
 }
 
-bool CInputBindApi::Press(const InputBind& aInputBind)
+bool CInputBindApi::Press(const InputBind_t& aInputBind)
 {
 	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [aInputBind](auto& entry)
 	{

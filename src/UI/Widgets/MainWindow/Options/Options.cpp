@@ -391,7 +391,7 @@ void COptionsWindow::TabStyle()
 
 							for (std::filesystem::path& style : this->Styles)
 							{
-								static Texture* s_TexCross = nullptr;
+								static Texture_t* s_TexCross = nullptr;
 
 								if (s_TexCross)
 								{

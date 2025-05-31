@@ -91,11 +91,11 @@ void CTextureLoader::Advance()
 	}
 }
 
-Texture* CTextureLoader::Get(const char* aIdentifier)
+Texture_t* CTextureLoader::Get(const char* aIdentifier)
 {
 	if (!aIdentifier) { return nullptr; }
 
-	Texture* result = nullptr;
+	Texture_t* result = nullptr;
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -109,9 +109,9 @@ Texture* CTextureLoader::Get(const char* aIdentifier)
 	return result;
 }
 
-Texture* CTextureLoader::GetOrCreate(const char* aIdentifier, const char* aFilename)
+Texture_t* CTextureLoader::GetOrCreate(const char* aIdentifier, const char* aFilename)
 {
-	Texture* result = Get(aIdentifier);
+	Texture_t* result = Get(aIdentifier);
 
 	if (!result)
 	{
@@ -121,9 +121,9 @@ Texture* CTextureLoader::GetOrCreate(const char* aIdentifier, const char* aFilen
 	return result;
 }
 
-Texture* CTextureLoader::GetOrCreate(const char* aIdentifier, unsigned aResourceID, HMODULE aModule)
+Texture_t* CTextureLoader::GetOrCreate(const char* aIdentifier, unsigned aResourceID, HMODULE aModule)
 {
-	Texture* result = this->Get(aIdentifier);
+	Texture_t* result = this->Get(aIdentifier);
 
 	if (!result)
 	{
@@ -133,9 +133,9 @@ Texture* CTextureLoader::GetOrCreate(const char* aIdentifier, unsigned aResource
 	return result;
 }
 
-Texture* CTextureLoader::GetOrCreate(const char* aIdentifier, const char* aRemote, const char* aEndpoint)
+Texture_t* CTextureLoader::GetOrCreate(const char* aIdentifier, const char* aRemote, const char* aEndpoint)
 {
-	Texture* result = this->Get(aIdentifier);
+	Texture_t* result = this->Get(aIdentifier);
 
 	if (!result)
 	{
@@ -145,9 +145,9 @@ Texture* CTextureLoader::GetOrCreate(const char* aIdentifier, const char* aRemot
 	return result;
 }
 
-Texture* CTextureLoader::GetOrCreate(const char* aIdentifier, void* aData, size_t aSize)
+Texture_t* CTextureLoader::GetOrCreate(const char* aIdentifier, void* aData, size_t aSize)
 {
-	Texture* result = this->Get(aIdentifier);
+	Texture_t* result = this->Get(aIdentifier);
 
 	if (!result)
 	{
@@ -336,14 +336,14 @@ void CTextureLoader::Load(const char* aIdentifier, void* aData, size_t aSize, TE
 	this->Enqueue(aIdentifier, data, width, height);
 }
 
-std::map<std::string, Texture*> CTextureLoader::GetRegistry() const
+std::map<std::string, Texture_t*> CTextureLoader::GetRegistry() const
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	return this->Registry;
 }
 
-std::map<std::string, QueuedTexture> CTextureLoader::GetQueuedTextures() const
+std::map<std::string, QueuedTexture_t> CTextureLoader::GetQueuedTextures() const
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -379,7 +379,7 @@ bool CTextureLoader::ProcessRequest(const char* aIdentifier, TEXTURES_RECEIVECAL
 		return true;
 	}
 
-	Texture* result = this->Get(aIdentifier);
+	Texture_t* result = this->Get(aIdentifier);
 
 	/* If shadowing any existing texture. */
 	if (aIsShadowing)
@@ -482,7 +482,7 @@ void CTextureLoader::Enqueue(const char* aIdentifier, TEXTURES_RECEIVECALLBACK a
 
 	if (it == this->QueuedTextures.end())
 	{
-		QueuedTexture entry{};
+		QueuedTexture_t entry{};
 		entry.Stage    = ETextureStage::Prepare;
 		entry.Data     = nullptr;
 		entry.Width    = 0;
@@ -511,7 +511,7 @@ void CTextureLoader::Enqueue(const char* aIdentifier, unsigned char* aData, int 
 	}
 	else
 	{
-		QueuedTexture entry{};
+		QueuedTexture_t entry{};
 		entry.Stage = ETextureStage::Ready;
 		entry.Data = aData;
 		entry.Width = aWidth;
@@ -537,7 +537,7 @@ void CTextureLoader::Dequeue(const char* aIdentifier)
 	}
 }
 
-void CTextureLoader::CreateTexture(const std::string& aIdentifier, QueuedTexture& aQueuedTexture)
+void CTextureLoader::CreateTexture(const std::string& aIdentifier, QueuedTexture_t& aQueuedTexture)
 {
 	/* Create texture description. */
 	D3D11_TEXTURE2D_DESC desc{};
@@ -591,7 +591,7 @@ void CTextureLoader::CreateTexture(const std::string& aIdentifier, QueuedTexture
 
 	pTexture->Release();
 
-	Texture* result = new Texture{
+	Texture_t* result = new Texture_t{
 		aQueuedTexture.Width,
 		aQueuedTexture.Height,
 		srv
@@ -610,7 +610,7 @@ void CTextureLoader::CreateTexture(const std::string& aIdentifier, QueuedTexture
 	aQueuedTexture.Stage = ETextureStage::Done;
 }
 
-void CTextureLoader::DispatchTexture(const std::string& aIdentifier, Texture* aTexture, TEXTURES_RECEIVECALLBACK aCallback)
+void CTextureLoader::DispatchTexture(const std::string& aIdentifier, Texture_t* aTexture, TEXTURES_RECEIVECALLBACK aCallback)
 {
 	if (aIdentifier.empty()) { return; }
 	if (!aCallback)          { return; }

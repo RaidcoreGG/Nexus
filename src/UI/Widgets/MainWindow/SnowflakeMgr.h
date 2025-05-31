@@ -17,11 +17,11 @@
 #include "Services/Textures/TxTexture.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// Snowflake Struct
+/// Snowflake_t Struct
 ///----------------------------------------------------------------------------------------------------
-struct Snowflake
+struct Snowflake_t
 {
-	Texture* Texture;
+	Texture_t* Texture_t;
 	float    Size;
 	float    X;
 	float    Y;
@@ -57,7 +57,7 @@ class CSnowflakeMgr
 	private:
 	bool IsItChristmas = false;
 
-	std::unordered_map<ImGuiID, std::vector<Snowflake>> Snowflakes;
+	std::unordered_map<ImGuiID, std::vector<Snowflake_t>> Snowflakes;
 };
 
 #endif

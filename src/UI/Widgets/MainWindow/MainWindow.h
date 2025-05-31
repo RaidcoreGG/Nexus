@@ -38,8 +38,8 @@ class CMainWindow : public virtual IWindow
 	bool                     IsHandleHeld;
 
 	private:
-	Texture*                 Tex_RaidcoreTag;
-	Texture*                 Tex_CloseIcon;
+	Texture_t*                 Tex_RaidcoreTag;
+	Texture_t*                 Tex_CloseIcon;
 };
 
 #endif

@@ -80,7 +80,7 @@ class CMumbleReader
 	std::string       Name;
 	Mumble::Data*     MumbleLink             = nullptr;
 	Mumble::Identity* MumbleIdentity         = nullptr;
-	NexusLinkData*    NexusLink              = nullptr;
+	NexusLinkData_t*    NexusLink              = nullptr;
 
 	bool              Flip                   = false;
 	unsigned          PreviousTick           = 0;

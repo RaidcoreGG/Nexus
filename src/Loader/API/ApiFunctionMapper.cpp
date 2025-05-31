@@ -175,7 +175,7 @@ namespace ADDONAPI
 			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownAsync, aInputBindHandler, aInputBind);
 		}
 
-		void RegisterWithStruct(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, InputBindV1 aInputBind)
+		void RegisterWithStruct(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, InputBindV1_t aInputBind)
 		{
 			assert(s_InputBindApi);
 			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownAsync, aInputBindHandler, aInputBind);
@@ -187,7 +187,7 @@ namespace ADDONAPI
 			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownReleaseAsync, aInputBindHandler, aInputBind);
 		}
 
-		void RegisterWithStruct2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, InputBindV1 aInputBind)
+		void RegisterWithStruct2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, InputBindV1_t aInputBind)
 		{
 			assert(s_InputBindApi);
 			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownReleaseAsync, aInputBindHandler, aInputBind);
@@ -265,31 +265,31 @@ namespace ADDONAPI
 
 	namespace TextureLoader
 	{
-		Texture* Get(const char* aIdentifier)
+		Texture_t* Get(const char* aIdentifier)
 		{
 			assert(s_TextureApi);
 			return s_TextureApi->Get(aIdentifier);
 		}
 
-		Texture* GetOrCreateFromFile(const char* aIdentifier, const char* aFilename)
+		Texture_t* GetOrCreateFromFile(const char* aIdentifier, const char* aFilename)
 		{
 			assert(s_TextureApi);
 			return s_TextureApi->GetOrCreate(aIdentifier, aFilename);
 		}
 
-		Texture* GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule)
+		Texture_t* GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule)
 		{
 			assert(s_TextureApi);
 			return s_TextureApi->GetOrCreate(aIdentifier, aResourceID, aModule);;
 		}
 
-		Texture* GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint)
+		Texture_t* GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint)
 		{
 			assert(s_TextureApi);
 			return s_TextureApi->GetOrCreate(aIdentifier, aRemote, aEndpoint);
 		}
 
-		Texture* GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize)
+		Texture_t* GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize)
 		{
 			assert(s_TextureApi);
 			return s_TextureApi->GetOrCreate(aIdentifier, aData, aSize);
@@ -331,7 +331,7 @@ namespace ADDONAPI
 
 			const std::lock_guard<std::mutex> lock(Loader::Mutex);
 
-			Addon* addon = Loader::FindAddonBySig(aSignature);
+			Addon_t* addon = Loader::FindAddonBySig(aSignature);
 
 			if (!addon) { return; }
 			if (!addon->Definitions) { return; }
@@ -342,13 +342,13 @@ namespace ADDONAPI
 			}
 
 			/* TODO: Add verification */
-			// 1. Addon -> API::RequestUpdate(signature);
+			// 1. Addon_t -> API::RequestUpdate(signature);
 			// 2. Nexus -> Events::RaiseSingle(signature, password123);
-			// 3. Addon -> API::ConfirmUpdate(password123);
+			// 3. Addon_t -> API::ConfirmUpdate(password123);
 
 			std::filesystem::path path = addon->Path;
 
-			AddonInfo addonInfo
+			AddonInfo_t addonInfo
 			{
 				addon->Definitions->Signature,
 				addon->Definitions->Name,
@@ -388,7 +388,7 @@ namespace ADDONAPI
 
 			if (!aCallback) { return; }
 
-			ManagedFont* font = s_FontManager->Get(aIdentifier);
+			ManagedFont_t* font = s_FontManager->Get(aIdentifier);
 
 			if (font)
 			{
@@ -508,7 +508,7 @@ namespace ADDONAPI
 		}
 	}
 
-	AddonAPI* Get(int aVersion)
+	AddonAPI_t* Get(int aVersion)
 	{
 		if (!s_IsInitialized)
 		{
@@ -536,7 +536,7 @@ namespace ADDONAPI
 		assert(s_DataLinkApi);
 
 		std::string dlName = "ADDONAPI_" + std::to_string(aVersion);
-		AddonAPI* defs = (AddonAPI*)s_DataLinkApi->GetResource(dlName.c_str());
+		AddonAPI_t* defs = (AddonAPI_t*)s_DataLinkApi->GetResource(dlName.c_str());
 
 		// API defs with that version already exist, just return them
 		if (defs)
@@ -549,7 +549,7 @@ namespace ADDONAPI
 		{
 			case 1:
 			{
-				AddonAPI1* api = (AddonAPI1*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
+				AddonAPI1_t* api = (AddonAPI1_t*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
 				assert(api);
 
 				api->SwapChain = Renderer::SwapChain;
@@ -599,7 +599,7 @@ namespace ADDONAPI
 			}
 			case 2:
 			{
-				AddonAPI2* api = (AddonAPI2*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
+				AddonAPI2_t* api = (AddonAPI2_t*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
 				assert(api);
 
 				api->SwapChain = Renderer::SwapChain;
@@ -660,7 +660,7 @@ namespace ADDONAPI
 			}
 			case 3:
 			{
-				AddonAPI3* api = (AddonAPI3*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
+				AddonAPI3_t* api = (AddonAPI3_t*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
 				assert(api);
 
 				api->SwapChain = Renderer::SwapChain;
@@ -725,7 +725,7 @@ namespace ADDONAPI
 			}
 			case 4:
 			{
-				AddonAPI4* api = (AddonAPI4*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
+				AddonAPI4_t* api = (AddonAPI4_t*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
 				assert(api);
 
 				api->SwapChain = Renderer::SwapChain;
@@ -798,7 +798,7 @@ namespace ADDONAPI
 			}
 			case 5:
 			{
-				AddonAPI5* api = (AddonAPI5*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
+				AddonAPI5_t* api = (AddonAPI5_t*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
 				assert(api);
 
 				api->SwapChain = Renderer::SwapChain;
@@ -873,7 +873,7 @@ namespace ADDONAPI
 			}
 			case 6:
 			{
-				AddonAPI6* api = (AddonAPI6*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
+				AddonAPI6_t* api = (AddonAPI6_t*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
 				assert(api);
 
 				api->SwapChain = Renderer::SwapChain;
@@ -967,17 +967,17 @@ namespace ADDONAPI
 		switch (aVersion)
 		{
 			case 1:
-				return sizeof(AddonAPI1);
+				return sizeof(AddonAPI1_t);
 			case 2:
-				return sizeof(AddonAPI2);
+				return sizeof(AddonAPI2_t);
 			case 3:
-				return sizeof(AddonAPI3);
+				return sizeof(AddonAPI3_t);
 			case 4:
-				return sizeof(AddonAPI4);
+				return sizeof(AddonAPI4_t);
 			case 5:
-				return sizeof(AddonAPI5);
+				return sizeof(AddonAPI5_t);
 			case 6:
-				return sizeof(AddonAPI6);
+				return sizeof(AddonAPI6_t);
 		}
 
 		return 0;

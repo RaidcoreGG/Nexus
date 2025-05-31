@@ -70,7 +70,7 @@ void CSnowflakeMgr::Update()
 
 	if (!imctx->CurrentWindow) { return; }
 
-	std::vector<Snowflake>& snowflakes = this->Snowflakes[imctx->CurrentWindow->ID];
+	std::vector<Snowflake_t>& snowflakes = this->Snowflakes[imctx->CurrentWindow->ID];
 
 	ImVec2 wndSize = imctx->CurrentWindow->Size;
 	ImVec2 wndPos = imctx->CurrentWindow->Pos;
@@ -82,7 +82,7 @@ void CSnowflakeMgr::Update()
 	{
 		std::srand(std::time(nullptr));
 
-		static Texture* texSnowflake = texapi->GetOrCreate("SNOWFLAKE", RES_ICON_SNOWFLAKE, CContext::GetContext()->GetModule());
+		static Texture_t* texSnowflake = texapi->GetOrCreate("SNOWFLAKE", RES_ICON_SNOWFLAKE, CContext::GetContext()->GetModule());
 
 		if (!texSnowflake)
 		{
@@ -94,7 +94,7 @@ void CSnowflakeMgr::Update()
 
 		while (snowflakes.size() < amtSnowflakes)
 		{
-			snowflakes.push_back(Snowflake{
+			snowflakes.push_back(Snowflake_t{
 				texSnowflake, // texture
 				(float)((ImGui::GetFontSize() / 2) + (std::rand() % (int)ImGui::GetFontSize())), // Size
 				(float)(std::rand() % (int)wndSize.x), //X
@@ -118,13 +118,13 @@ void CSnowflakeMgr::Update()
 	}
 
 	/* rendering logic */
-	for (Snowflake& sf : snowflakes)
+	for (Snowflake_t& sf : snowflakes)
 	{
 		float angleFixed = sf.Angle - 180;
 
 		if (angleFixed < 0) angleFixed += 360;
 
-		ImageRotated(sf.Texture->Resource, ImVec2(wndPos.x + sf.X + sf.SwayOffset, wndPos.y + sf.Y), ImVec2(sf.Size, sf.Size), angleFixed);
+		ImageRotated(sf.Texture_t->Resource, ImVec2(wndPos.x + sf.X + sf.SwayOffset, wndPos.y + sf.Y), ImVec2(sf.Size, sf.Size), angleFixed);
 
 		ImGui::Animate(-sf.Size, wndSize.y + sf.Size, sf.FallDuration, &sf.Y, ImAnimate::ECurve::Linear);
 

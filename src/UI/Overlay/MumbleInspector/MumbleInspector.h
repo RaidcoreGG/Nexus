@@ -23,7 +23,7 @@ class CMumbleOverlay : public virtual IWindow
 	private:
 	Mumble::Data*     MumbleLink;
 	Mumble::Identity* MumbleIdentity;
-	NexusLinkData*    NexusLink;
+	NexusLinkData_t*    NexusLink;
 };
 
 #endif

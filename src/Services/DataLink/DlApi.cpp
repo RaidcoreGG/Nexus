@@ -96,7 +96,7 @@ void* CDataLinkApi::ShareResource(const char* aIdentifier, size_t aResourceSize,
 	}
 
 	/* allocate new resource */
-	LinkedResource resource{};
+	LinkedResource_t resource{};
 	resource.Size = aResourceSize;
 	resource.Type = aIsPublic ? ELinkedResourceType::Public : ELinkedResourceType::Internal;
 
@@ -180,7 +180,7 @@ void* CDataLinkApi::ShareResource(const char* aIdentifier, size_t aResourceSize,
 	return resource.Pointer;
 }
 
-std::unordered_map<std::string, LinkedResource> CDataLinkApi::GetRegistry()
+std::unordered_map<std::string, LinkedResource_t> CDataLinkApi::GetRegistry()
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 

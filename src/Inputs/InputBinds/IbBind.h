@@ -12,10 +12,10 @@
 #include "IbEnum.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// InputBindV1 Struct
+/// InputBindV1_t Struct
 /// 	Old Keybind struct used for backwards compatibility within APIs.
 ///----------------------------------------------------------------------------------------------------
-struct InputBindV1
+struct InputBindV1_t
 {
 	unsigned short Key;
 	bool           Alt;

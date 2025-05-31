@@ -3,6 +3,6 @@
 
 #include "AddonDefinition.h"
 
-typedef AddonDefinition* (*GETADDONDEF)();
+typedef AddonDef_t* (*GETADDONDEF)();
 
 #endif

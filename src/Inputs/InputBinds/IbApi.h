@@ -36,23 +36,23 @@ class CInputBindApi : public CInputBindCapture
 
 	///----------------------------------------------------------------------------------------------------
 	/// WndProc:
-	/// 	Returns 0 if a InputBind was invoked.
+	/// 	Returns 0 if a InputBind_t was invoked.
 	///----------------------------------------------------------------------------------------------------
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Register:
-	/// 	Generates and registers a InputBind from the given string with the given identifier and handler,
+	/// 	Generates and registers a InputBind_t from the given string with the given identifier and handler,
 	/// 	if no bind was previously stored the given one will be used.
 	///----------------------------------------------------------------------------------------------------
 	void Register(const char* aIdentifier, EIbHandlerType aInputBindHandlerType, void* aInputBindHandler, const char* aInputBind);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Register:
-	/// 	Registers a InputBind from the given struct with the given identifier and handler,
+	/// 	Registers a InputBind_t from the given struct with the given identifier and handler,
 	/// 	if no bind was previously stored the given one will be used.
 	///----------------------------------------------------------------------------------------------------
-	void Register(const char* aIdentifier, EIbHandlerType aInputBindHandlerType, void* aInputBindHandler, InputBind aInputBind);
+	void Register(const char* aIdentifier, EIbHandlerType aInputBindHandlerType, void* aInputBindHandler, InputBind_t aInputBind);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Deregister:
@@ -62,44 +62,44 @@ class CInputBindApi : public CInputBindCapture
 
 	///----------------------------------------------------------------------------------------------------
 	/// IsInUse:
-	/// 	Returns an empty string if InputBind is unused or the identifier that uses this InputBind.
+	/// 	Returns an empty string if InputBind_t is unused or the identifier that uses this InputBind_t.
 	///----------------------------------------------------------------------------------------------------
-	std::string IsInUse(InputBind aInputBind);
+	std::string IsInUse(InputBind_t aInputBind);
 	
 	///----------------------------------------------------------------------------------------------------
 	/// HasHandler:
-	/// 	Returns true if the InputBind with the passed identifier has a handler registered.
+	/// 	Returns true if the InputBind_t with the passed identifier has a handler registered.
 	///----------------------------------------------------------------------------------------------------
 	bool HasHandler(const std::string& aIdentifier);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Get:
-	/// 	Gets a InputBind.
+	/// 	Gets a InputBind_t.
 	///----------------------------------------------------------------------------------------------------
-	const InputBind& Get(const std::string& aIdentifier);
+	const InputBind_t& Get(const std::string& aIdentifier);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Set:
-	/// 	Sets a InputBind.
+	/// 	Sets a InputBind_t.
 	///----------------------------------------------------------------------------------------------------
-	void Set(std::string aIdentifier, InputBind aInputBind);
+	void Set(std::string aIdentifier, InputBind_t aInputBind);
 
 	///----------------------------------------------------------------------------------------------------
 	/// SetPassthrough:
-	/// 	Sets the passthrough state of an InputBind.
+	/// 	Sets the passthrough state of an InputBind_t.
 	///----------------------------------------------------------------------------------------------------
 	void SetPassthrough(std::string aIdentifier, bool aPassthrough);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Invoke:
-	/// 	Invokes the action on the corresponding InputBind handler.
-	/// 	Returns true if the InputBind was dispatched and processing should not continue.
+	/// 	Invokes the action on the corresponding InputBind_t handler.
+	/// 	Returns true if the InputBind_t was dispatched and processing should not continue.
 	///----------------------------------------------------------------------------------------------------
 	bool Invoke(std::string aIdentifier, bool aIsRelease = false);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Deletes:
-	/// 	Deletes a InputBind entirely.
+	/// 	Deletes a InputBind_t entirely.
 	///----------------------------------------------------------------------------------------------------
 	void Delete(std::string aIdentifier);
 
@@ -113,15 +113,15 @@ class CInputBindApi : public CInputBindCapture
 	/// GetRegistry:
 	/// 	Returns a copy of the registry.
 	///----------------------------------------------------------------------------------------------------
-	std::map<std::string, IbMapping> GetRegistry() const;
+	std::map<std::string, IbMapping_t> GetRegistry() const;
 
 	private:
-	CEventApi*                       EventApi = nullptr;
-	CLogApi*                         Logger   = nullptr;
+	CEventApi*                         EventApi = nullptr;
+	CLogApi*                           Logger   = nullptr;
 
-	mutable std::mutex               Mutex;
-	std::map<std::string, IbMapping> Registry;
-	std::map<std::string, IbMapping> HeldInputBinds;
+	mutable std::mutex                 Mutex;
+	std::map<std::string, IbMapping_t> Registry;
+	std::map<std::string, IbMapping_t> HeldInputBinds;
 
 	///----------------------------------------------------------------------------------------------------
 	/// LoadSafe:
@@ -149,10 +149,10 @@ class CInputBindApi : public CInputBindCapture
 
 	///----------------------------------------------------------------------------------------------------
 	/// Press:
-	/// 	Invokes an InputBind that matches the pressed inputs.
+	/// 	Invokes an InputBind_t that matches the pressed inputs.
 	/// 	Returns true if a bind was found and invoked.
 	///----------------------------------------------------------------------------------------------------
-	bool Press(const InputBind& aInputBind);
+	bool Press(const InputBind_t& aInputBind);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Release:

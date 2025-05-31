@@ -44,22 +44,22 @@ class CAddonsWindow : public ISubWindow
 
 	std::string                 SearchTerm;
 	EAddonsFilterFlags          Filter;
-	std::vector<AddonItemData>  Addons;
+	std::vector<AddonItemData_t>  Addons;
 
 	/* Details */
 	std::mutex                  Mutex;
 	bool                        HasContent = false;
-	AddonItemData               AddonData = {};
+	AddonItemData_t               AddonData = {};
 
-	void SetContent(AddonItemData& aAddonData);
+	void SetContent(AddonItemData_t& aAddonData);
 	void ClearContent();
 
-	void AddonItem(AddonItemData& aAddonData, float aWidth);
+	void AddonItem(AddonItemData_t& aAddonData, float aWidth);
 
 	void RenderContent() override;
 	void RenderSubWindows() override;
 	void RenderDetails();
-	void RenderInputBindsTable(const std::unordered_map<std::string, InputBindPacked>& aInputBinds);
+	void RenderInputBindsTable(const std::unordered_map<std::string, InputBindPacked_t>& aInputBinds);
 
 	void PopulateAddons();
 };

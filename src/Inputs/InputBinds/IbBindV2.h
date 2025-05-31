@@ -13,9 +13,9 @@
 #include "IbBind.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// InputBind Struct
+/// InputBind_t Struct
 ///----------------------------------------------------------------------------------------------------
-struct InputBind
+struct InputBind_t
 {
 	bool           Alt;
 	bool           Ctrl;
@@ -27,23 +27,23 @@ struct InputBind
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	InputBind() = default;
+	InputBind_t() = default;
 
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	InputBind(bool aAlt, bool aCtrl, bool aShift, EInputDevice aDevice, unsigned short aCode)
-		: Alt         { aAlt         }
-		, Ctrl        { aCtrl        }
-		, Shift       { aShift       }
-		, Device      { aDevice      }
-		, Code        { aCode        }
+	InputBind_t(bool aAlt, bool aCtrl, bool aShift, EInputDevice aDevice, unsigned short aCode)
+		: Alt    { aAlt    }
+		, Ctrl   { aCtrl   }
+		, Shift  { aShift  }
+		, Device { aDevice }
+		, Code   { aCode   }
 	{}
 
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	InputBind(InputBindV1 aLegacyInputBind);
+	InputBind_t(InputBindV1_t aLegacyInputBind);
 
 	///----------------------------------------------------------------------------------------------------
 	/// IsBound:
@@ -52,7 +52,7 @@ struct InputBind
 	bool IsBound() const;
 };
 
-bool operator==(const InputBind& lhs, const InputBind& rhs);
-bool operator!=(const InputBind& lhs, const InputBind& rhs);
+bool operator==(const InputBind_t& lhs, const InputBind_t& rhs);
+bool operator!=(const InputBind_t& lhs, const InputBind_t& rhs);
 
 #endif

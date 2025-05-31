@@ -21,7 +21,7 @@ class CInputBindCapture
 	public:
 	///----------------------------------------------------------------------------------------------------
 	/// StartCapturing:
-	/// 	Starts capturing the held InputBind.
+	/// 	Starts capturing the held InputBind_t.
 	/// 	The bind is continuously captured.
 	/// 	Calling this function merely signals to stop further processing the inputs.
 	///----------------------------------------------------------------------------------------------------
@@ -29,15 +29,15 @@ class CInputBindCapture
 
 	///----------------------------------------------------------------------------------------------------
 	/// EndCapturing:
-	/// 	Ends capturing the held InputBind.
+	/// 	Ends capturing the held InputBind_t.
 	///----------------------------------------------------------------------------------------------------
 	void EndCapturing();
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetCapture:
-	/// 	Gets which InputBind is currently held.
+	/// 	Gets which InputBind_t is currently held.
 	///----------------------------------------------------------------------------------------------------
-	InputBind GetCapture() const;
+	InputBind_t GetCapture() const;
 
 	protected:
 	///----------------------------------------------------------------------------------------------------
@@ -48,14 +48,14 @@ class CInputBindCapture
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetCaptureRef:
-	/// 	Gets which InputBind is currently held.
+	/// 	Gets which InputBind_t is currently held.
 	/// 	Not threadsafe. Only use during WndProc.
 	///----------------------------------------------------------------------------------------------------
-	const InputBind& GetCaptureRef() const;
+	const InputBind_t& GetCaptureRef() const;
 
 	private:
 	bool      IsCapturing = false;
-	InputBind Capture     = {};
+	InputBind_t Capture     = {};
 
 	bool      IsAltHeld   = false;
 	bool      IsCtrlHeld  = false;

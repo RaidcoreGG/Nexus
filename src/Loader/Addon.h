@@ -9,14 +9,14 @@
 #include "AddonDefinition.h"
 
 /* A structure that holds information about a loaded addon. */
-struct Addon
+struct Addon_t
 {
 	EAddonState					State;
 	std::filesystem::path		Path;
 	std::vector<unsigned char>	MD5;
 	HMODULE						Module;
 	DWORD						ModuleSize;
-	AddonDefinition*			Definitions;
+	AddonDef_t*			Definitions;
 
 	/* Saved states */
 	bool						IsPausingUpdates;

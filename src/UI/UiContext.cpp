@@ -54,14 +54,14 @@ namespace UIRoot
 	CLocalization* Language          = nullptr;
 	CFontManager* FontManager        = nullptr;
 	Mumble::Identity* MumbleIdentity = nullptr;
-	NexusLinkData* NexusLink         = nullptr;
+	NexusLinkData_t* NexusLink         = nullptr;
 
 	void Initialize(CLocalization* aLocalization, CDataLinkApi* aDataLink, CFontManager* aFontManager)
 	{
 		Language = aLocalization;
 		FontManager = aFontManager;
 		MumbleIdentity = (Mumble::Identity*)aDataLink->GetResource(DL_MUMBLE_LINK_IDENTITY);
-		NexusLink = (NexusLinkData*)aDataLink->GetResource(DL_NEXUS_LINK);
+		NexusLink = (NexusLinkData_t*)aDataLink->GetResource(DL_NEXUS_LINK);
 	}
 
 	void FontReceiver(const char* aIdentifier, ImFont* aFont)
@@ -697,7 +697,7 @@ void CUiContext::OnInputBind(std::string aIdentifier)
 
 void CUiContext::UpdateScaling()
 {
-	NexusLinkData* nexuslink = (NexusLinkData*)this->DataLink->GetResource(DL_NEXUS_LINK);
+	NexusLinkData_t* nexuslink = (NexusLinkData_t*)this->DataLink->GetResource(DL_NEXUS_LINK);
 	
 	ImGuiIO& io = ImGui::GetIO();
 
@@ -759,18 +759,18 @@ std::vector<GUI_RENDER> CUiContext::GetOptionsCallbacks()
 	return this->RegistryOptionsRender;
 }
 
-std::vector<InputBindCategory> CUiContext::GetInputBinds()
+std::vector<InputBindCategory_t> CUiContext::GetInputBinds()
 {
 	const std::lock_guard<std::mutex> lock(this->DisplayBindsMutex);
 
 	return this->DisplayInputBinds;
 }
 
-std::unordered_map<std::string, InputBindPacked> CUiContext::GetInputBinds(const std::string& aCategory)
+std::unordered_map<std::string, InputBindPacked_t> CUiContext::GetInputBinds(const std::string& aCategory)
 {
 	const std::lock_guard<std::mutex> lock(this->DisplayBindsMutex);
 
-	auto it = std::find_if(this->DisplayInputBinds.begin(), this->DisplayInputBinds.end(), [aCategory](InputBindCategory cat) {return cat.Name == aCategory; });
+	auto it = std::find_if(this->DisplayInputBinds.begin(), this->DisplayInputBinds.end(), [aCategory](InputBindCategory_t cat) {return cat.Name == aCategory; });
 	
 	if (it != this->DisplayInputBinds.end())
 	{
@@ -780,7 +780,7 @@ std::unordered_map<std::string, InputBindPacked> CUiContext::GetInputBinds(const
 	return {};
 }
 
-std::vector<GameInputBindCategory> CUiContext::GetGameBinds()
+std::vector<GameInputBindCategory_t> CUiContext::GetGameBinds()
 {
 	const std::lock_guard<std::mutex> lock(this->DisplayBindsMutex);
 
@@ -1142,18 +1142,18 @@ void CUiContext::UpdateDisplayInputBinds()
 	CInputBindApi* inputBindApi = ctx->GetInputBindApi();
 
 	/* copy of all InputBinds */
-	std::map<std::string, IbMapping> InputBindRegistry = inputBindApi->GetRegistry();
+	std::map<std::string, IbMapping_t> InputBindRegistry = inputBindApi->GetRegistry();
 
 	/* acquire categories */
 	for (auto& [identifier, inputBind] : InputBindRegistry)
 	{
 		std::string owner = Loader::GetOwner(inputBind.Handler_DownOnlyAsync);
 
-		auto it = std::find_if(this->DisplayInputBinds.begin(), this->DisplayInputBinds.end(), [owner](InputBindCategory category) { return category.Name == owner; });
+		auto it = std::find_if(this->DisplayInputBinds.begin(), this->DisplayInputBinds.end(), [owner](InputBindCategory_t category) { return category.Name == owner; });
 
 		if (it == this->DisplayInputBinds.end())
 		{
-			InputBindCategory cat{};
+			InputBindCategory_t cat{};
 			cat.Name = owner;
 			cat.InputBinds[identifier] =
 			{
@@ -1173,7 +1173,7 @@ void CUiContext::UpdateDisplayInputBinds()
 	}
 
 	/* sort input binds. */
-	std::sort(this->DisplayInputBinds.begin(), this->DisplayInputBinds.end(), [](InputBindCategory& lhs, InputBindCategory& rhs)
+	std::sort(this->DisplayInputBinds.begin(), this->DisplayInputBinds.end(), [](InputBindCategory_t& lhs, InputBindCategory_t& rhs)
 	{
 		// Nexus first
 		if (lhs.Name == "Nexus") return true;
@@ -1198,18 +1198,18 @@ void CUiContext::UpdateDisplayGameBinds()
 	CGameBindsApi* gameBindsApi = ctx->GetGameBindsApi();
 
 	/* copy of all InputBinds */
-	std::unordered_map<EGameBinds, MultiInputBind> InputBindRegistry = gameBindsApi->GetRegistry();
+	std::unordered_map<EGameBinds, MultiInputBind_t> InputBindRegistry = gameBindsApi->GetRegistry();
 
 	/* acquire categories */
 	for (auto& [identifier, inputBind] : InputBindRegistry)
 	{
 		std::string catName = CategoryNameFrom(identifier);
 
-		auto it = std::find_if(this->DisplayGameBinds.begin(), this->DisplayGameBinds.end(), [catName](GameInputBindCategory category) { return category.Name == catName; });
+		auto it = std::find_if(this->DisplayGameBinds.begin(), this->DisplayGameBinds.end(), [catName](GameInputBindCategory_t category) { return category.Name == catName; });
 
 		if (it == this->DisplayGameBinds.end())
 		{
-			GameInputBindCategory cat{};
+			GameInputBindCategory_t cat{};
 			cat.Name = catName;
 			cat.GameInputBinds[identifier] =
 			{

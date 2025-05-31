@@ -80,7 +80,7 @@ class CApiClient
 	int							CacheLifetime;
 	std::unordered_map<
 		std::filesystem::path,
-		CachedResponse*
+		CachedResponse_t*
 	>							ResponseCache;
 
 	long long					TimeSinceLastRefill;
@@ -94,7 +94,7 @@ class CApiClient
 	std::condition_variable		ConVar;
 	bool						IsSuspended = false;
 
-	std::vector<APIRequest>		QueuedRequests;
+	std::vector<APIRequest_t>		QueuedRequests;
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetCachedResponse:
@@ -102,7 +102,7 @@ class CApiClient
 	/// 	- aEndpoint should have a prefixed "/"
 	/// 	- aParameters should have a prefixed "?"
 	///----------------------------------------------------------------------------------------------------
-	CachedResponse* GetCachedResponse(const std::string& aQuery);
+	CachedResponse_t* GetCachedResponse(const std::string& aQuery);
 	
 	///----------------------------------------------------------------------------------------------------
 	/// GetNormalizedPath:
@@ -126,7 +126,7 @@ class CApiClient
 	/// HttpGet:
 	/// 	Internal HTTP get.
 	///----------------------------------------------------------------------------------------------------
-	APIResponse HttpGet(APIRequest aRequest);
+	APIResponse_t HttpGet(APIRequest_t aRequest);
 };
 
 #endif

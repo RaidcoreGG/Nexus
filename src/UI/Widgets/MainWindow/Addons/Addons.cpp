@@ -70,7 +70,7 @@ void CAddonsWindow::Invalidate(signed int aAddonID)
 	this->IsInvalid = true;
 }
 
-void CAddonsWindow::SetContent(AddonItemData& aAddonData)
+void CAddonsWindow::SetContent(AddonItemData_t& aAddonData)
 {
 	CContext* ctx = CContext::GetContext();
 	CUiContext* uictx = ctx->GetUIContext();
@@ -86,7 +86,7 @@ void CAddonsWindow::ClearContent()
 	this->HasContent = false;
 }
 
-void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
+void CAddonsWindow::AddonItem(AddonItemData_t& aAddonData, float aWidth)
 {
 	if (aAddonData.Type == EAddonType::Nexus)
 	{
@@ -247,10 +247,10 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 					this->SetContent(aAddonData);
 				}
 
-				static Texture* favoriteTex = nullptr;
-				static Texture* canFavoriteTex = nullptr;
+				static Texture_t* favoriteTex = nullptr;
+				static Texture_t* canFavoriteTex = nullptr;
 
-				Texture* favTex = aAddonData.NexusAddon->IsFavorite ? favoriteTex : canFavoriteTex;
+				Texture_t* favTex = aAddonData.NexusAddon->IsFavorite ? favoriteTex : canFavoriteTex;
 
 				if ((aAddonData.NexusAddon->IsFavorite || aAddonData.IsHovered) && favTex)
 				{
@@ -301,9 +301,9 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 	}
 	else if (aAddonData.Type == EAddonType::Library || aAddonData.Type == EAddonType::Arc || aAddonData.Type == EAddonType::LibraryArc)
 	{
-		if (!aAddonData.LibraryAddon) { return; }
+		if (!aAddonData.LibraryAddon_t) { return; }
 
-		std::string sig = std::to_string(aAddonData.LibraryAddon->Signature);
+		std::string sig = std::to_string(aAddonData.LibraryAddon_t->Signature);
 
 		ImGuiStyle& style = ImGui::GetStyle();
 
@@ -334,11 +334,11 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 
 			if (ImGui::BeginChild("Info", ImVec2(itemSz.x - style.ItemSpacing.x - actionsAreaWidth - (style.WindowPadding.x * 2), innerHeight), false, ImGuiWindowFlags_NoBackground))
 			{
-				ImGui::Text(aAddonData.LibraryAddon->Name.c_str());
-				ImGui::TextDisabled("by %s", aAddonData.LibraryAddon->Author.c_str());
+				ImGui::Text(aAddonData.LibraryAddon_t->Name.c_str());
+				ImGui::TextDisabled("by %s", aAddonData.LibraryAddon_t->Author.c_str());
 
 				/* description */
-				ImGui::TextWrapped(aAddonData.LibraryAddon->Description.c_str());
+				ImGui::TextWrapped(aAddonData.LibraryAddon_t->Description.c_str());
 			}
 			ImGui::EndChild();
 
@@ -355,18 +355,18 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 				float initialX = ImGui::GetCursorPosX();
 
 				static CTextureLoader* textureApi = ctx->GetTextureService();
-				static Texture* T1 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER1", RES_ICON_TIER1, ctx->GetModule());
-				static Texture* T2 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER2", RES_ICON_TIER2, ctx->GetModule());
-				static Texture* T3 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER3", RES_ICON_TIER3, ctx->GetModule());
-				static Texture* TX = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER_UNKNOWN", RES_ICON_TIER_UNKNOWN, ctx->GetModule());
+				static Texture_t* T1 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER1", RES_ICON_TIER1, ctx->GetModule());
+				static Texture_t* T2 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER2", RES_ICON_TIER2, ctx->GetModule());
+				static Texture_t* T3 = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER3", RES_ICON_TIER3, ctx->GetModule());
+				static Texture_t* TX = textureApi->GetOrCreate("ICON_ADDONPOLICY_TIER_UNKNOWN", RES_ICON_TIER_UNKNOWN, ctx->GetModule());
 
-				Texture* noticeIcon = nullptr;
+				Texture_t* noticeIcon = nullptr;
 				std::string noticeURL;
 				std::string noticeTT;
 
-				if (aAddonData.LibraryAddon->PolicyTier != 0)
+				if (aAddonData.LibraryAddon_t->PolicyTier != 0)
 				{
-					switch (aAddonData.LibraryAddon->PolicyTier)
+					switch (aAddonData.LibraryAddon_t->PolicyTier)
 					{
 						case -1:
 						{
@@ -423,14 +423,14 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 						}
 					}
 				}
-				else if (!aAddonData.LibraryAddon->ToSComplianceNotice.empty())
+				else if (!aAddonData.LibraryAddon_t->ToSComplianceNotice.empty())
 				{
 					noticeIcon = T1;
 					noticeURL = "https://help.guildwars2.com/hc/en-us/articles/360013625034-Policy-Third-Party-Programs";
 
 					std::string tosNotice = langApi->Translate("((000074))");
 					tosNotice.append("\n");
-					tosNotice.append(aAddonData.LibraryAddon->ToSComplianceNotice);
+					tosNotice.append(aAddonData.LibraryAddon_t->ToSComplianceNotice);
 
 					noticeTT = tosNotice;
 				}
@@ -453,12 +453,12 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 				ImGui::SetCursorPos(ImVec2(initialX, (ImGui::GetWindowHeight() - (btnTextSz.y * 2) - style.ItemSpacing.y - (style.FramePadding.y * 2)) / 2));
 				if (aAddonData.Type != EAddonType::Arc)
 				{
-					if (ImGui::Button(aAddonData.LibraryAddon->IsInstalling
+					if (ImGui::Button(aAddonData.LibraryAddon_t->IsInstalling
 						? (langApi->Translate("((000027))") + sig).c_str()
 						: (langApi->Translate("((000028))") + sig).c_str(),
 						ImVec2(btnWidth, 0)))
 					{
-						if (!aAddonData.LibraryAddon->IsInstalling)
+						if (!aAddonData.LibraryAddon_t->IsInstalling)
 						{
 							bool isArcPlugin = aAddonData.Type == EAddonType::LibraryArc;
 
@@ -466,11 +466,11 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 							{
 								CContext* ctx = CContext::GetContext();
 								CUpdater* updater = ctx->GetUpdater();
-								updater->InstallAddon(aAddonData.LibraryAddon, isArcPlugin);
+								updater->InstallAddon(aAddonData.LibraryAddon_t, isArcPlugin);
 
 								if (isArcPlugin)
 								{
-									ArcDPS::AddToAtlasBySig(aAddonData.LibraryAddon->Signature);
+									ArcDPS::AddToAtlasBySig(aAddonData.LibraryAddon_t->Signature);
 								}
 								else
 								{
@@ -481,7 +481,7 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 								CUiContext* uictx = ctx->GetUIContext();
 								uictx->Invalidate();
 
-								aAddonData.LibraryAddon->IsInstalling = false;
+								aAddonData.LibraryAddon_t->IsInstalling = false;
 							}).detach();
 
 							//Loader::AddonConfig[aAddon->Signature].IsLoaded = true;
@@ -496,12 +496,12 @@ void CAddonsWindow::AddonItem(AddonItemData& aAddonData, float aWidth)
 				}
 				
 				/* GitHub Button */
-				if (aAddonData.LibraryAddon->Provider == EUpdateProvider::GitHub && !aAddonData.LibraryAddon->DownloadURL.empty())
+				if (aAddonData.LibraryAddon_t->Provider == EUpdateProvider::GitHub && !aAddonData.LibraryAddon_t->DownloadURL.empty())
 				{
 					ImGui::SetCursorPos(ImVec2(initialX, ImGui::GetCursorPosY()));
 					if (ImGui::Button((langApi->Translate("((000030))") + sig).c_str(), ImVec2(btnWidth, 0)))
 					{
-						ShellExecuteA(0, 0, aAddonData.LibraryAddon->DownloadURL.c_str(), 0, 0, SW_SHOW);
+						ShellExecuteA(0, 0, aAddonData.LibraryAddon_t->DownloadURL.c_str(), 0, 0, SW_SHOW);
 					}
 				}
 			}
@@ -584,7 +584,7 @@ void CAddonsWindow::RenderContent()
 		}
 
 		/* clear search term */
-		static Texture* clearSearchTermTex = nullptr;
+		static Texture_t* clearSearchTermTex = nullptr;
 		if (clearSearchTermTex)
 		{
 			ImGui::SameLine();
@@ -603,7 +603,7 @@ void CAddonsWindow::RenderContent()
 		}
 
 		/* view mode */
-		static Texture* viewModeTex = nullptr;
+		static Texture_t* viewModeTex = nullptr;
 		if (viewModeTex)
 		{
 			ImGui::SameLine();
@@ -625,7 +625,7 @@ void CAddonsWindow::RenderContent()
 		/* advanced filters */
 		bool doPopHighlight = false;
 		
-		static Texture* filtersTex = nullptr;
+		static Texture_t* filtersTex = nullptr;
 		if (filtersTex)
 		{
 			static bool showEnabled = (int)this->Filter & (int)EAddonsFilterFlags::ShowEnabled;
@@ -859,7 +859,7 @@ void CAddonsWindow::RenderContent()
 			{
 				int i = 0;
 
-				for (AddonItemData& addon : this->Addons)
+				for (AddonItemData_t& addon : this->Addons)
 				{
 					if (!isListMode && i % 2 == 1)
 					{
@@ -940,7 +940,7 @@ void CAddonsWindow::RenderContent()
 
 						std::thread([this, tmpPath, addon]()
 						{
-							AddonInfo addonInfo
+							AddonInfo_t addonInfo
 							{
 								addon->Definitions->Signature,
 								addon->Definitions->Name,
@@ -993,7 +993,7 @@ void CAddonsWindow::RenderContent()
 		}
 		ImGui::TooltipGeneric(langApi->Translate("((000036))"));
 
-		static Texture* refreshTex = nullptr;
+		static Texture_t* refreshTex = nullptr;
 		if (refreshTex)
 		{
 			ImGui::SameLine();
@@ -1034,13 +1034,13 @@ void CAddonsWindow::RenderSubWindows()
 
 void CAddonsWindow::RenderDetails()
 {
-	AddonItemData addonData = this->AddonData;
+	AddonItemData_t addonData = this->AddonData;
 
 	ImGuiStyle& style = ImGui::GetStyle();
 
 	float btnSz = ImGui::GetFontSize() * 1.5f;
 
-	static Texture* chevronRt = nullptr;
+	static Texture_t* chevronRt = nullptr;
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	if (ImGui::BeginChild("Details_Collapse", ImVec2(btnSz, 0), false, ImGuiWindowFlags_NoBackground))
@@ -1104,12 +1104,12 @@ void CAddonsWindow::RenderDetails()
 							{
 								addonData.NexusAddon->IsCheckingForUpdates = true;
 
-								Addon* addon = addonData.NexusAddon;
+								Addon_t* addon = addonData.NexusAddon;
 
 								std::filesystem::path tmpPath = addon->Path.string();
 								std::thread([addon, tmpPath]()
 								{
-									AddonInfo addonInfo
+									AddonInfo_t addonInfo
 									{
 										addon->Definitions->Signature,
 										addon->Definitions->Name,
@@ -1313,7 +1313,7 @@ void CAddonsWindow::RenderDetails()
 	ImGui::EndChild();
 }
 
-void CAddonsWindow::RenderInputBindsTable(const std::unordered_map<std::string, InputBindPacked>& aInputBinds)
+void CAddonsWindow::RenderInputBindsTable(const std::unordered_map<std::string, InputBindPacked_t>& aInputBinds)
 {
 	if (ImGui::BeginTable("table_inputbinds_addons", 2, ImGuiTableFlags_BordersInnerH))
 	{
@@ -1351,7 +1351,7 @@ void CAddonsWindow::PopulateAddons()
 
 	this->Filter = settingsctx->Get<EAddonsFilterFlags>(OPT_ADDONFILTERS, quickFilter_Installed);
 
-	for (Addon* addon : Loader::Addons)
+	for (Addon_t* addon : Loader::Addons)
 	{
 		if (addon->Path.filename() == "arcdps_integration64.dll") { continue; }
 		if (!addon->Definitions) { continue; }
@@ -1376,7 +1376,7 @@ void CAddonsWindow::PopulateAddons()
 			continue;
 		}
 
-		AddonItemData addonItem{};
+		AddonItemData_t addonItem{};
 		addonItem.Type = EAddonType::Nexus;
 		addonItem.NexusAddon = addon;
 
@@ -1402,13 +1402,13 @@ void CAddonsWindow::PopulateAddons()
 	{
 		const std::lock_guard<std::mutex> lock(Loader::Library::Mutex);
 
-		for (LibraryAddon* addon : Loader::Library::Addons)
+		for (LibraryAddon_t* addon : Loader::Library::Addons)
 		{
 			if (!this->SearchTerm.empty() && !String::Contains(String::ToLower(addon->Name), this->SearchTerm)) { continue; }
 
 			bool installed = false;
 
-			for (Addon* installedAddon : Loader::Addons)
+			for (Addon_t* installedAddon : Loader::Addons)
 			{
 				// filter out already installed
 				if (addon->Signature == installedAddon->MatchSignature && installedAddon->State != EAddonState::None)
@@ -1428,11 +1428,11 @@ void CAddonsWindow::PopulateAddons()
 				continue;
 			}
 
-			AddonItemData addonItem{};
+			AddonItemData_t addonItem{};
 			addonItem.Type = EAddonType::Library;
-			addonItem.LibraryAddon = addon;
+			addonItem.LibraryAddon_t = addon;
 
-			if (ArcDPS::IsLoaded && addonItem.LibraryAddon->Signature == 0xFFF694D1) { continue; }
+			if (ArcDPS::IsLoaded && addonItem.LibraryAddon_t->Signature == 0xFFF694D1) { continue; }
 
 			this->Addons.push_back(addonItem);
 		}
@@ -1441,7 +1441,7 @@ void CAddonsWindow::PopulateAddons()
 	{
 		const std::lock_guard<std::mutex> lockLoader(ArcDPS::Mutex);
 
-		for (LibraryAddon* addon : ArcDPS::PluginLibrary)
+		for (LibraryAddon_t* addon : ArcDPS::PluginLibrary)
 		{
 			if (!this->SearchTerm.empty() && !String::Contains(String::ToLower(addon->Name), this->SearchTerm)) { continue; }
 
@@ -1468,15 +1468,15 @@ void CAddonsWindow::PopulateAddons()
 				continue;
 			}
 
-			AddonItemData addonItem{};
+			AddonItemData_t addonItem{};
 			addonItem.Type = installed ? EAddonType::Arc : EAddonType::LibraryArc;
-			addonItem.LibraryAddon = addon;
+			addonItem.LibraryAddon_t = addon;
 
 			this->Addons.push_back(addonItem);
 		}
 	}
 
-	std::sort(this->Addons.begin(), this->Addons.end(), [](AddonItemData& lhs, AddonItemData& rhs)
+	std::sort(this->Addons.begin(), this->Addons.end(), [](AddonItemData_t& lhs, AddonItemData_t& rhs)
 	{
 		std::string lcmp;
 		std::string rcmp;
@@ -1489,7 +1489,7 @@ void CAddonsWindow::PopulateAddons()
 		}
 		else if (lhs.Type == EAddonType::Library || lhs.Type == EAddonType::Arc || lhs.Type == EAddonType::LibraryArc)
 		{
-			lcmp = String::ToLower(String::Normalize(lhs.LibraryAddon->Name));
+			lcmp = String::ToLower(String::Normalize(lhs.LibraryAddon_t->Name));
 		}
 
 		if (rhs.Type == EAddonType::Nexus)
@@ -1500,7 +1500,7 @@ void CAddonsWindow::PopulateAddons()
 		}
 		else if (rhs.Type == EAddonType::Library || rhs.Type == EAddonType::Arc || rhs.Type == EAddonType::LibraryArc)
 		{
-			rcmp = String::ToLower(String::Normalize(rhs.LibraryAddon->Name));
+			rcmp = String::ToLower(String::Normalize(rhs.LibraryAddon_t->Name));
 		}
 
 		return

@@ -2,7 +2,7 @@
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
 /// Name         :  DlLinkedResource.h
-/// Description  :  Contains the Texture data struct definition.
+/// Description  :  Contains the linked resources data struct definition.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
@@ -15,9 +15,9 @@
 #include "DlEnum.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// LinkedResource Struct
+/// LinkedResource_t Struct
 ///----------------------------------------------------------------------------------------------------
-struct LinkedResource
+struct LinkedResource_t
 {
 	ELinkedResourceType Type;           /* The type of the resource. Public or Internal. */
 	HANDLE              Handle;         /* The handle of the resource.                   */

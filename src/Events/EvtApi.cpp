@@ -26,7 +26,7 @@ void CEventApi::Raise(const char* aIdentifier, void* aEventData)
 
 	it->second.AmountRaises++;
 
-	for (EventSubscriber& sub : it->second.Subscribers)
+	for (EventSubscriber_t& sub : it->second.Subscribers)
 	{
 		sub.Callback(aEventData);
 	}
@@ -47,7 +47,7 @@ void CEventApi::Raise(signed int aSignature, const char* aIdentifier, void* aEve
 
 	it->second.AmountRaises++;
 
-	for (EventSubscriber& sub : it->second.Subscribers)
+	for (EventSubscriber_t& sub : it->second.Subscribers)
 	{
 		if (sub.Signature == aSignature)
 		{
@@ -64,11 +64,11 @@ void CEventApi::Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCa
 
 	const std::lock_guard<std::recursive_mutex> lock(this->Mutex);
 	
-	EventSubscriber sub{};
+	EventSubscriber_t sub{};
 	sub.Callback = aConsumeEventCallback;
 
 	/* Resolve addon signature. */
-	for (Addon* addon : Loader::Addons)
+	for (Addon_t* addon : Loader::Addons)
 	{
 		if (addon->Module == nullptr ||
 			addon->ModuleSize == 0 ||
@@ -93,7 +93,7 @@ void CEventApi::Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCa
 	/* Emplace new event or add subscriber to existing. */
 	if (it == this->Registry.end())
 	{
-		EventData ev{};
+		EventData_t ev{};
 		ev.Subscribers.push_back(sub);
 
 		this->Registry.emplace(aIdentifier, ev);
@@ -134,7 +134,7 @@ void CEventApi::Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEvent
 		std::remove_if(
 			it->second.Subscribers.begin(),
 			it->second.Subscribers.end(),
-			[aConsumeEventCallback](EventSubscriber& sub)
+			[aConsumeEventCallback](EventSubscriber_t& sub)
 			{
 				return aConsumeEventCallback == sub.Callback;
 			}
@@ -155,7 +155,7 @@ int CEventApi::Verify(void* aStartAddress, void* aEndAddress)
 			std::remove_if(
 				ev.Subscribers.begin(),
 				ev.Subscribers.end(),
-				[&refCounter, aStartAddress, aEndAddress](EventSubscriber& sub)
+				[&refCounter, aStartAddress, aEndAddress](EventSubscriber_t& sub)
 				{
 					if (sub.Callback >= aStartAddress && sub.Callback <= aEndAddress)
 					{
@@ -172,7 +172,7 @@ int CEventApi::Verify(void* aStartAddress, void* aEndAddress)
 	return refCounter;
 }
 
-std::unordered_map<std::string, EventData> CEventApi::GetRegistry() const
+std::unordered_map<std::string, EventData_t> CEventApi::GetRegistry() const
 {
 	const std::lock_guard<std::recursive_mutex> lock(this->Mutex);
 

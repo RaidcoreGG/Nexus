@@ -25,12 +25,12 @@ constexpr const char* CH_GAMEBINDS = "GameBinds";
 constexpr const char* EV_UE_KB_CH = "EV_UNOFFICIAL_EXTRAS_KEYBIND_CHANGED";
 
 ///----------------------------------------------------------------------------------------------------
-/// MultiInputBind Struct
+/// MultiInputBind_t Struct
 ///----------------------------------------------------------------------------------------------------
-struct MultiInputBind
+struct MultiInputBind_t
 {
-	InputBind Primary;
-	InputBind Secondary;
+	InputBind_t Primary;
+	InputBind_t Secondary;
 };
 
 ///----------------------------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ class CGameBindsApi
 	// FIXME: this needs to be moved to an evtconn
 	///----------------------------------------------------------------------------------------------------
 	/// OnUEInputBindChanged:
-	/// 	Receives runtime InputBind updates from Unofficial Extras.
+	/// 	Receives runtime InputBind_t updates from Unofficial Extras.
 	///----------------------------------------------------------------------------------------------------
 	static void OnUEInputBindChanged(void* aData);
 
@@ -95,7 +95,7 @@ class CGameBindsApi
 
 	///----------------------------------------------------------------------------------------------------
 	/// IsBound:
-	/// 	Returns whether a game bind has a InputBind set or not.
+	/// 	Returns whether a game bind has a InputBind_t set or not.
 	///----------------------------------------------------------------------------------------------------
 	bool IsBound(EGameBinds aGameBind);
 
@@ -103,19 +103,19 @@ class CGameBindsApi
 	/// Get:
 	/// 	Gets a game bind.
 	///----------------------------------------------------------------------------------------------------
-	const MultiInputBind& Get(EGameBinds aGameBind);
+	const MultiInputBind_t& Get(EGameBinds aGameBind);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Set:
 	/// 	Sets a game bind.
 	///----------------------------------------------------------------------------------------------------
-	void Set(EGameBinds aGameBind, InputBind aInputBind, bool aIsPrimary, bool aIsRuntimeBind);
+	void Set(EGameBinds aGameBind, InputBind_t aInputBind, bool aIsPrimary, bool aIsRuntimeBind);
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetRegistry:
 	/// 	Returns a copy of the registry.
 	///----------------------------------------------------------------------------------------------------
-	std::unordered_map<EGameBinds, MultiInputBind> GetRegistry() const;
+	std::unordered_map<EGameBinds, MultiInputBind_t> GetRegistry() const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Load:
@@ -130,7 +130,7 @@ class CGameBindsApi
 	CLocalization*                                 Language    = nullptr;
 
 	mutable std::mutex                             Mutex;
-	std::unordered_map<EGameBinds, MultiInputBind> Registry;
+	std::unordered_map<EGameBinds, MultiInputBind_t> Registry;
 
 	///----------------------------------------------------------------------------------------------------
 	/// AddDefaultBinds:

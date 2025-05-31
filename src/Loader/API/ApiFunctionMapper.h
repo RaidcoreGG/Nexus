@@ -33,13 +33,13 @@ namespace ADDONAPI
 	{
 		///----------------------------------------------------------------------------------------------------
 		/// GetResource:
-		/// 	Addon API wrapper function for GetResource.
+		/// 	Addon_t API wrapper function for GetResource.
 		///----------------------------------------------------------------------------------------------------
 		void* GetResource(const char* aIdentifier);
 
 		///----------------------------------------------------------------------------------------------------
 		/// ShareResource:
-		/// 	Addon API wrapper function for ShareResource.
+		/// 	Addon_t API wrapper function for ShareResource.
 		///----------------------------------------------------------------------------------------------------
 		void* ShareResource(const char* aIdentifier, size_t aResourceSize);
 	}
@@ -51,37 +51,37 @@ namespace ADDONAPI
 	{
 		///----------------------------------------------------------------------------------------------------
 		/// Subscribe:
-		/// 	Addon API wrapper function for subscribing to events.
+		/// 	Addon_t API wrapper function for subscribing to events.
 		///----------------------------------------------------------------------------------------------------
 		void Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Unsubscribe:
-		/// 	Addon API wrapper function for unsubscribing from events.
+		/// 	Addon_t API wrapper function for unsubscribing from events.
 		///----------------------------------------------------------------------------------------------------
 		void Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
 
 		///----------------------------------------------------------------------------------------------------
 		/// RaiseEvent:
-		/// 	Addon API wrapper function for raising events.
+		/// 	Addon_t API wrapper function for raising events.
 		///----------------------------------------------------------------------------------------------------
 		void RaiseEvent(const char* aIdentifier, void* aEventData);
 
 		///----------------------------------------------------------------------------------------------------
 		/// RaiseNotification:
-		/// 	Addon API wrapper function for raising events without payloads.
+		/// 	Addon_t API wrapper function for raising events without payloads.
 		///----------------------------------------------------------------------------------------------------
 		void RaiseNotification(const char* aIdentifier);
 
 		///----------------------------------------------------------------------------------------------------
 		/// RaiseEventTargeted:
-		/// 	Addon API wrapper function for raising events targeted at a specific subscriber.
+		/// 	Addon_t API wrapper function for raising events targeted at a specific subscriber.
 		///----------------------------------------------------------------------------------------------------
 		void RaiseEventTargeted(signed int aSignature, const char* aIdentifier, void* aEventData);
 
 		///----------------------------------------------------------------------------------------------------
 		/// RaiseNotificationTargeted:
-		/// 	Addon API wrapper function for raising notifications targeted at a specific subscriber.
+		/// 	Addon_t API wrapper function for raising notifications targeted at a specific subscriber.
 		///----------------------------------------------------------------------------------------------------
 		void RaiseNotificationTargeted(signed int aSignature, const char* aIdentifier);
 	}
@@ -124,7 +124,7 @@ namespace ADDONAPI
 
 		///----------------------------------------------------------------------------------------------------
 		/// IsBound:
-		/// 	Returns whether a game bind has a InputBind set or not.
+		/// 	Returns whether a game bind has a InputBind_t set or not.
 		///----------------------------------------------------------------------------------------------------
 		bool IsBound(EGameBinds aGameBind);
 	}
@@ -160,37 +160,37 @@ namespace ADDONAPI
 	{
 		///----------------------------------------------------------------------------------------------------
 		/// RegisterWithString:
-		/// 	[Revision 1] Addon API wrapper function for Register from string.
+		/// 	[Revision 1] Addon_t API wrapper function for Register from string.
 		///----------------------------------------------------------------------------------------------------
 		void RegisterWithString(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, const char* aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// RegisterWithStruct:
-		/// 	[Revision 1] Addon API wrapper function for Register from struct.
+		/// 	[Revision 1] Addon_t API wrapper function for Register from struct.
 		///----------------------------------------------------------------------------------------------------
-		void RegisterWithStruct(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, InputBindV1 aInputBind);
+		void RegisterWithStruct(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, InputBindV1_t aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// RegisterWithString:
-		/// 	[Revision 2] Addon API wrapper function for Register from string.
+		/// 	[Revision 2] Addon_t API wrapper function for Register from string.
 		///----------------------------------------------------------------------------------------------------
 		void RegisterWithString2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, const char* aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// RegisterWithStruct:
-		/// 	[Revision 2] Addon API wrapper function for Register from struct.
+		/// 	[Revision 2] Addon_t API wrapper function for Register from struct.
 		///----------------------------------------------------------------------------------------------------
-		void RegisterWithStruct2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, InputBindV1 aInputBind);
+		void RegisterWithStruct2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, InputBindV1_t aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// InvokeInputBind:
-		/// 	Addon API wrapper function for Invoke.
+		/// 	Addon_t API wrapper function for Invoke.
 		///----------------------------------------------------------------------------------------------------
 		void InvokeInputBind(const char* aIdentifier, bool aIsRelease);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Deregister:
-		/// 	Addon API wrapper function for Deregister.
+		/// 	Addon_t API wrapper function for Deregister.
 		///----------------------------------------------------------------------------------------------------
 		void Deregister(const char* aIdentifier);
 	}
@@ -226,19 +226,19 @@ namespace ADDONAPI
 	{
 		///----------------------------------------------------------------------------------------------------
 		/// Translate:
-		/// 	Addon API wrapper function for Translate. Translates into the currently set language.
+		/// 	Addon_t API wrapper function for Translate. Translates into the currently set language.
 		///----------------------------------------------------------------------------------------------------
 		const char* Translate(const char* aIdentifier);
 
 		///----------------------------------------------------------------------------------------------------
 		/// TranslateTo:
-		/// 	Addon API wrapper function for Translate. Translates into a specific language.
+		/// 	Addon_t API wrapper function for Translate. Translates into a specific language.
 		///----------------------------------------------------------------------------------------------------
 		const char* TranslateTo(const char* aIdentifier, const char* aLanguageIdentifier);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Set:
-		/// 	Addon API wrapper function to set translated strings.
+		/// 	Addon_t API wrapper function to set translated strings.
 		///----------------------------------------------------------------------------------------------------
 		void Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aString);
 	}
@@ -268,55 +268,55 @@ namespace ADDONAPI
 	{
 		///----------------------------------------------------------------------------------------------------
 		/// Get:
-		/// 	Addon API wrapper function for Get.
+		/// 	Addon_t API wrapper function for Get.
 		///----------------------------------------------------------------------------------------------------
-		Texture* Get(const char* aIdentifier);
+		Texture_t* Get(const char* aIdentifier);
 
 		///----------------------------------------------------------------------------------------------------
 		/// GetOrCreateFromFile:
-		/// 	Addon API wrapper function for GetOrCreate from file.
+		/// 	Addon_t API wrapper function for GetOrCreate from file.
 		///----------------------------------------------------------------------------------------------------
-		Texture* GetOrCreateFromFile(const char* aIdentifier, const char* aFilename);
+		Texture_t* GetOrCreateFromFile(const char* aIdentifier, const char* aFilename);
 
 		///----------------------------------------------------------------------------------------------------
 		/// GetOrCreateFromResource:
-		/// 	Addon API wrapper function for GetOrCreate from embedded resource.
+		/// 	Addon_t API wrapper function for GetOrCreate from embedded resource.
 		///----------------------------------------------------------------------------------------------------
-		Texture* GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule);
+		Texture_t* GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule);
 
 		///----------------------------------------------------------------------------------------------------
 		/// GetOrCreateFromURL:
-		/// 	Addon API wrapper function for GetOrCreate from remote URL.
+		/// 	Addon_t API wrapper function for GetOrCreate from remote URL.
 		///----------------------------------------------------------------------------------------------------
-		Texture* GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint);
+		Texture_t* GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint);
 
 		///----------------------------------------------------------------------------------------------------
 		/// GetOrCreateFromMemory:
-		/// 	Addon API wrapper function for GetOrCreate from memory.
+		/// 	Addon_t API wrapper function for GetOrCreate from memory.
 		///----------------------------------------------------------------------------------------------------
-		Texture* GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize);
+		Texture_t* GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize);
 
 		///----------------------------------------------------------------------------------------------------
 		/// LoadFromFile:
-		/// 	Addon API wrapper function for LoadFromFile.
+		/// 	Addon_t API wrapper function for LoadFromFile.
 		///----------------------------------------------------------------------------------------------------
 		void LoadFromFile(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback);
 
 		///----------------------------------------------------------------------------------------------------
 		/// LoadFromResource:
-		/// 	Addon API wrapper function for LoadFromResource.
+		/// 	Addon_t API wrapper function for LoadFromResource.
 		///----------------------------------------------------------------------------------------------------
 		void LoadFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback);
 
 		///----------------------------------------------------------------------------------------------------
 		/// LoadFromURL:
-		/// 	Addon API wrapper function for LoadFromURL.
+		/// 	Addon_t API wrapper function for LoadFromURL.
 		///----------------------------------------------------------------------------------------------------
 		void LoadFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback);
 
 		///----------------------------------------------------------------------------------------------------
 		/// LoadFromMemory:
-		/// 	Addon API wrapper function for LoadFromMemory.
+		/// 	Addon_t API wrapper function for LoadFromMemory.
 		///----------------------------------------------------------------------------------------------------
 		void LoadFromMemory(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback);
 	}
@@ -328,7 +328,7 @@ namespace ADDONAPI
 	{
 		///----------------------------------------------------------------------------------------------------
 		/// RequestUpdate:
-		/// 	Addon API wrapper to self update.
+		/// 	Addon_t API wrapper to self update.
 		///----------------------------------------------------------------------------------------------------
 		void RequestUpdate(signed int aSignature, const char* aUpdateURL);
 	}
@@ -387,7 +387,7 @@ namespace ADDONAPI
 	/// Get:
 	/// 	Gets or creates a pointer to the provided version, or nullptr if no such version exists.
 	///----------------------------------------------------------------------------------------------------
-	AddonAPI* Get(int aVersion);
+	AddonAPI_t* Get(int aVersion);
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetSize:

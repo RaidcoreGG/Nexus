@@ -63,7 +63,7 @@ class CBindSetterModal : public virtual IModal
 	EGameBinds    GameBindID       = (EGameBinds)0;
 	std::string   PreviousBindText = {};
 
-	InputBind     Capture          = {};
+	InputBind_t   Capture          = {};
 	std::string   BindConflict     = {};
 
 	///----------------------------------------------------------------------------------------------------

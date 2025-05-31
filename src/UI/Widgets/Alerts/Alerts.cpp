@@ -25,14 +25,14 @@ constexpr ImGuiWindowFlags Flags
 
 CAlerts::CAlerts(CDataLinkApi* aDataLink)
 {
-	this->NexusLink = (NexusLinkData*)aDataLink->GetResource("DL_NEXUS_LINK");
+	this->NexusLink = (NexusLinkData_t*)aDataLink->GetResource("DL_NEXUS_LINK");
 }
 
 void CAlerts::Render()
 {
 	if (this->Queue.size() > 0)
 	{
-		AlertMessage& alert = this->Queue.front();
+		AlertMessage_t& alert = this->Queue.front();
 
 		ImGui::PushFont((ImFont*)this->NexusLink->FontBig);
 		float width = ImGui::CalcTextSize(alert.Message.c_str()).x;
@@ -88,6 +88,6 @@ void CAlerts::Notify(EAlertType aType, const char* aMessage)
 	}
 	else /* otherwise add it to the queue */
 	{
-		this->Queue.push_back(AlertMessage{aType, aMessage });
+		this->Queue.push_back(AlertMessage_t{aType, aMessage });
 	}
 }

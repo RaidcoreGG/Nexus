@@ -28,7 +28,7 @@ CUpdater::CUpdater(CLogApi* aLogger)
 
 void CUpdater::UpdateNexus()
 {
-	AddonVersion currentVersion = CContext::GetContext()->GetVersion();
+	AddonVersion_t currentVersion = CContext::GetContext()->GetVersion();
 
 	// ensure .old path is not claimed
 	if (std::filesystem::exists(Index(EPath::NexusDLL_Old)))
@@ -72,7 +72,7 @@ void CUpdater::UpdateNexus()
 	}
 
 	// convert to version
-	AddonVersion remoteVersion = resVersion;
+	AddonVersion_t remoteVersion = resVersion;
 
 	// cache changelog for ingame window
 	if (!resVersion["Changelog"].is_null())
@@ -188,7 +188,7 @@ void CUpdater::UpdateNexus()
 	}
 }
 
-bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonInfo, bool aIgnoreTagFormat, int aCacheLifetimeOverride)
+bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo_t aAddonInfo, bool aIgnoreTagFormat, int aCacheLifetimeOverride)
 {
 	/* setup paths */
 	std::filesystem::path pathOld = aPath.string() + ".old";
@@ -334,7 +334,7 @@ bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonI
 		try
 		{
 			std::filesystem::rename(tmpPath, pathUpdate);
-			if (aAddonInfo.Version != AddonVersion{}) // if 0.0.0.0 -> install
+			if (aAddonInfo.Version != AddonVersion_t{}) // if 0.0.0.0 -> install
 			{
 				this->Logger->Info(CH_UPDATER, "Successfully updated %s.", aAddonInfo.Name.c_str());
 			}
@@ -358,16 +358,16 @@ bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo aAddonI
 	return false;
 }
 
-bool CUpdater::InstallAddon(LibraryAddon* aAddon, bool aIsArcPlugin)
+bool CUpdater::InstallAddon(LibraryAddon_t* aAddon, bool aIsArcPlugin)
 {
 	// set state for UI etc
 	aAddon->IsInstalling = true;
 
-	AddonInfo addonInfo
+	AddonInfo_t addonInfo
 	{
 		aAddon->Signature,
 		aAddon->Name,
-		AddonVersion{}, // null version
+		AddonVersion_t{}, // null version
 		aAddon->Provider,
 		!aAddon->DownloadURL.empty()
 			? aAddon->DownloadURL
@@ -421,7 +421,7 @@ bool CUpdater::UpdateRaidcore(int aCacheLifetimeOverride)
 		return false;
 	}
 
-	AddonVersion remoteVersion = resVersion;
+	AddonVersion_t remoteVersion = resVersion;
 
 	if (remoteVersion > aVersion)
 	{
@@ -434,7 +434,7 @@ bool CUpdater::UpdateRaidcore(int aCacheLifetimeOverride)
 	}*/
 }
 
-bool CUpdater::UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& aEndpoint, AddonVersion aCurrentVersion, bool aAllowPrereleases, bool aIgnoreTagFormat, int aCacheLifetimeOverride)
+bool CUpdater::UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& aEndpoint, AddonVersion_t aCurrentVersion, bool aAllowPrereleases, bool aIgnoreTagFormat, int aCacheLifetimeOverride)
 {
 	json response = GitHubAPI->Get(aEndpoint, "", aCacheLifetimeOverride);
 
@@ -445,7 +445,7 @@ bool CUpdater::UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& a
 	}
 
 	std::string targetUrl; // e.g. github.com/RaidcoreGG/GW2-CommandersToolkit/releases/download/20220918-135925/squadmanager.dll
-	AddonVersion targetVersion{};
+	AddonVersion_t targetVersion{};
 
 	for (json& release : response)
 	{
@@ -457,7 +457,7 @@ bool CUpdater::UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& a
 		/* if pre - releases are disabled, but it is one->skip */
 		if (!aAllowPrereleases && release["prerelease"].get<bool>()) { continue; }
 
-		AddonVersion version = !aIgnoreTagFormat ? AddonVersion{ release["tag_name"].get<std::string>() } : AddonVersion{ 9999,9999,9999,9999 }; // explicitly get string, otherwise it tries to parse json
+		AddonVersion_t version = !aIgnoreTagFormat ? AddonVersion_t{ release["tag_name"].get<std::string>() } : AddonVersion_t{ 9999,9999,9999,9999 }; // explicitly get string, otherwise it tries to parse json
 
 		/* skip, if this release we have is the same or older than the one we had found before */
 		if (version <= targetVersion) { continue; }
@@ -478,7 +478,7 @@ bool CUpdater::UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& a
 	}
 
 	/* if we found no version or URL */
-	if (targetVersion == AddonVersion{} ||
+	if (targetVersion == AddonVersion_t{} ||
 		targetUrl.empty())
 	{
 		return false;

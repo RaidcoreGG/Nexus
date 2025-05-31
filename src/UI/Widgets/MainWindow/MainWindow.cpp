@@ -211,7 +211,7 @@ void CMainWindow::Render()
 
 				ImGui::TooltipGeneric(langApi->Translate(window->GetDisplayName().c_str()));
 
-				const Texture* icon = window->GetIcon();
+				const Texture_t* icon = window->GetIcon();
 				if (icon)
 				{
 					ImGui::SetCursorPos(ImVec2(navX, navY));

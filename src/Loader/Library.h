@@ -25,7 +25,7 @@ namespace Loader
 	namespace Library
 	{
 		extern std::mutex					Mutex;
-		extern std::vector<LibraryAddon*>	Addons;
+		extern std::vector<LibraryAddon_t*>	Addons;
 
 		///----------------------------------------------------------------------------------------------------
 		/// Fetch:

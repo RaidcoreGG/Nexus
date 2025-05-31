@@ -28,14 +28,14 @@ constexpr const UINT WM_ADDONDIRUPDATE = WM_USER + 101;
 
 namespace Loader
 {
-	extern NexusLinkData*          NexusLink;
+	extern NexusLinkData_t*          NexusLink;
 
 	extern std::mutex              Mutex;
 	extern std::unordered_map<
 		std::filesystem::path,
 		ELoaderAction
 	>                              QueuedAddons; /* To be loaded or unloaded addons */
-	extern std::vector<Addon*>     Addons;
+	extern std::vector<Addon_t*>     Addons;
 	extern bool                    HasCustomConfig;
 	extern std::filesystem::path   ConfigPath;
 
@@ -117,7 +117,7 @@ namespace Loader
 	///----------------------------------------------------------------------------------------------------
 	/// FreeAddon:
 	/// 	Calls FreeLibrary on the specified addon.
-	/// 	This function should not be invoked manually, but through Addon::Unload + Queue(Free).
+	/// 	This function should not be invoked manually, but through Addon_t::Unload + Queue(Free).
 	///----------------------------------------------------------------------------------------------------
 	void FreeAddon(const std::filesystem::path& aPath);
 
@@ -145,25 +145,25 @@ namespace Loader
 	/// FindAddonBySig:
 	/// 	Returns the addon with a matching signature or nullptr.
 	///----------------------------------------------------------------------------------------------------
-	Addon* FindAddonBySig(signed int aSignature);
+	Addon_t* FindAddonBySig(signed int aSignature);
 
 	///----------------------------------------------------------------------------------------------------
 	/// FindAddonByPath:
 	/// 	Returns the addon with a matching path or nullptr.
 	///----------------------------------------------------------------------------------------------------
-	Addon* FindAddonByPath(const std::filesystem::path& aPath);
+	Addon_t* FindAddonByPath(const std::filesystem::path& aPath);
 
 	///----------------------------------------------------------------------------------------------------
 	/// FindAddonByMatchSig:
 	/// 	Returns the addon with a matching mock signature or nullptr.
 	///----------------------------------------------------------------------------------------------------
-	Addon* FindAddonByMatchSig(signed int aMatchSignature);
+	Addon_t* FindAddonByMatchSig(signed int aMatchSignature);
 
 	///----------------------------------------------------------------------------------------------------
 	/// FindAddonByMD5:
 	/// 	Returns the addon with a matching MD5 or nullptr.
 	///----------------------------------------------------------------------------------------------------
-	Addon* FindAddonByMD5(std::vector<unsigned char> aMD5);
+	Addon_t* FindAddonByMD5(std::vector<unsigned char> aMD5);
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetGameBuild:

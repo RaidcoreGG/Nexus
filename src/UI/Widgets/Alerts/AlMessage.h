@@ -14,9 +14,9 @@
 #include "AlEnum.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// AlertMessage Struct
+/// AlertMessage_t Struct
 ///----------------------------------------------------------------------------------------------------
-struct AlertMessage
+struct AlertMessage_t
 {
 	EAlertType  Type;
 	std::string Message;

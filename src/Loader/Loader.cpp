@@ -64,7 +64,7 @@ using json = nlohmann::json;
 
 namespace Loader
 {
-	NexusLinkData*          NexusLink = nullptr;
+	NexusLinkData_t*          NexusLink = nullptr;
 	Mumble::Identity*       MumbleIdentity = nullptr;
 
 	std::mutex              Mutex;
@@ -72,7 +72,7 @@ namespace Loader
 		std::filesystem::path,
 		ELoaderAction
 	>                       QueuedAddons;
-	std::vector<Addon*>     Addons;
+	std::vector<Addon_t*>     Addons;
 	bool                    HasCustomConfig;
 	std::filesystem::path   ConfigPath;
 	std::vector<signed int> RequestedAddons;
@@ -108,7 +108,7 @@ namespace Loader
 		Alerts = uictx->GetAlerts();
 		Language = ctx->GetLocalization();
 
-		NexusLink = (NexusLinkData*)DataLink->ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData), "", true);
+		NexusLink = (NexusLinkData_t*)DataLink->ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData_t), "", true);
 		MumbleIdentity = (Mumble::Identity*)DataLink->ShareResource(DL_MUMBLE_LINK_IDENTITY, sizeof(Mumble::Identity), "", false);
 
 		ConfigPath = Index(EPath::AddonConfigDefault);
@@ -267,7 +267,7 @@ namespace Loader
 
 					if (signature == 0) { continue; }
 
-					Addon* addon = FindAddonBySig(signature);
+					Addon_t* addon = FindAddonBySig(signature);
 
 					if (!addon)
 					{
@@ -276,7 +276,7 @@ namespace Loader
 
 					if (!addon)
 					{
-						addon = new Addon{};
+						addon = new Addon_t{};
 						addon->State = EAddonState::None;
 						Addons.push_back(addon);
 					}
@@ -502,7 +502,7 @@ namespace Loader
 
 			const std::lock_guard<std::mutex> lock(Mutex);
 			// check all tracked addons
-			for (Addon* addon : Addons)
+			for (Addon_t* addon : Addons)
 			{
 				// if addon no longer on disk (also check if the path is not null, else it's from config)
 				if (!addon->Path.empty() && !std::filesystem::exists(addon->Path))
@@ -538,7 +538,7 @@ namespace Loader
 				}
 
 				// if already tracked
-				Addon* exists = FindAddonByPath(path);
+				Addon_t* exists = FindAddonByPath(path);
 				if (exists)
 				{
 					continue;
@@ -595,7 +595,7 @@ namespace Loader
 		/* used to indicate whether the addon already existed or was newly allocated and has to be merged (possibly) with the config-created one */
 		bool allocNew = false;
 
-		Addon* addon = FindAddonByPath(aPath);
+		Addon_t* addon = FindAddonByPath(aPath);
 
 		if (addon)
 		{
@@ -608,7 +608,7 @@ namespace Loader
 		else
 		{
 			allocNew = true;
-			addon = new Addon{};
+			addon = new Addon_t{};
 			addon->State = EAddonState::None;
 			addon->Path = aPath;
 		}
@@ -650,7 +650,7 @@ namespace Loader
 			return;
 		}
 
-		AddonDefinition* tmpDefs = getAddonDef();
+		AddonDef_t* tmpDefs = getAddonDef();
 
 		/* addon defs are nullptr */
 		if (tmpDefs == nullptr)
@@ -669,19 +669,19 @@ namespace Loader
 		}
 
 		/* free old (if exists) and clone new to show in list */
-		AddonDefinition::Free(&addon->Definitions);
-		AddonDefinition::Copy(tmpDefs, &addon->Definitions);
+		AddonDef_t::Free(&addon->Definitions);
+		AddonDef_t::Copy(tmpDefs, &addon->Definitions);
 
 		/* get stored info about addon and apply to addon */
 		if (allocNew)
 		{
-			Addon* stored = FindAddonByMatchSig(addon->Definitions->Signature);
+			Addon_t* stored = FindAddonByMatchSig(addon->Definitions->Signature);
 
 			// stored exists and is "unclaimed"
 			if (stored && stored->State == EAddonState::None)
 			{
 				/* we have some settings/info stored, we merge and delete the new alloc */
-				Addon* alloc = addon;
+				Addon_t* alloc = addon;
 				addon = stored;
 				addon->Definitions = alloc->Definitions;
 				addon->Path = aPath;
@@ -720,7 +720,7 @@ namespace Loader
 		}
 
 		/* check if duplicate signature */
-		auto duplicate = std::find_if(Addons.begin(), Addons.end(), [addon](Addon* cmpAddon) {
+		auto duplicate = std::find_if(Addons.begin(), Addons.end(), [addon](Addon_t* cmpAddon) {
 			// check if it has definitions and if the signature is the same
 			return	cmpAddon->Path != addon->Path &&
 				cmpAddon->Definitions &&
@@ -729,7 +729,7 @@ namespace Loader
 		if (duplicate != Addons.end()) {
 			Logger->Warning(CH_LOADER, "\"%s\" or another addon with this signature (%d) is already loaded. Duplicate.", strFile.c_str(), addon->Definitions->Signature);
 			FreeLibrary(addon->Module);
-			AddonDefinition::Free(&addon->Definitions);
+			AddonDef_t::Free(&addon->Definitions);
 			addon->State = EAddonState::NotLoadedDuplicate;
 			addon->Module = nullptr;
 			return;
@@ -783,7 +783,7 @@ namespace Loader
 			{
 				bool lShouldLoad = shouldLoad;
 
-				AddonInfo addonInfo
+				AddonInfo_t addonInfo
 				{
 					addon->Definitions->Signature,
 					addon->Definitions->Name,
@@ -887,7 +887,7 @@ namespace Loader
 			return;
 		}
 
-		AddonAPI* api = ADDONAPI::Get(addon->Definitions->APIVersion); // will be nullptr if doesn't exist or APIVersion = 0
+		AddonAPI_t* api = ADDONAPI::Get(addon->Definitions->APIVersion); // will be nullptr if doesn't exist or APIVersion = 0
 
 		// if the api doesn't exist and there was one requested
 		if (api == nullptr && addon->Definitions->APIVersion != 0)
@@ -934,7 +934,7 @@ namespace Loader
 		}
 	}
 
-	void CallUnloadAndVerify(const std::filesystem::path& aPath, Addon* aAddon)
+	void CallUnloadAndVerify(const std::filesystem::path& aPath, Addon_t* aAddon)
 	{
 		bool isShutdown = State::Nexus == ENexusState::SHUTTING_DOWN;
 
@@ -1003,7 +1003,7 @@ namespace Loader
 		std::string path = aPath.string();
 		std::string strFile = aPath.filename().string();
 
-		Addon* addon = FindAddonByPath(aPath);
+		Addon_t* addon = FindAddonByPath(aPath);
 
 		bool isShutdown = State::Nexus == ENexusState::SHUTTING_DOWN;
 
@@ -1019,7 +1019,7 @@ namespace Loader
 					/* attempt freeing the addonDefs if the addon is still in memory */
 					if (addon->Definitions)
 					{
-						AddonDefinition::Free(&addon->Definitions);
+						AddonDef_t::Free(&addon->Definitions);
 					}
 
 					/* remove addon from list, it's no longer on disk*/
@@ -1068,7 +1068,7 @@ namespace Loader
 		std::string path = aPath.string();
 		std::string strFile = aPath.filename().string();
 
-		Addon* addon = FindAddonByPath(aPath);
+		Addon_t* addon = FindAddonByPath(aPath);
 
 		if (!addon)
 		{
@@ -1095,7 +1095,7 @@ namespace Loader
 			{
 				if (addon->Definitions)
 				{
-					AddonDefinition::Free(&addon->Definitions);
+					AddonDef_t::Free(&addon->Definitions);
 				}
 				Addons.erase(it);
 			}
@@ -1109,7 +1109,7 @@ namespace Loader
 	void UninstallAddon(const std::filesystem::path& aPath)
 	{
 		/* check both LoadedLOCKED, but also Loaded as a sanity check */
-		Addon* addon = FindAddonByPath(aPath);
+		Addon_t* addon = FindAddonByPath(aPath);
 
 		/* if it's still loaded due to being locked (or for some obscure other reason)
 		try to move addon.dll to addon.dll.uninstall, so it will be deleted on next restart */
@@ -1145,7 +1145,7 @@ namespace Loader
 				{
 					if (addon && addon->Definitions)
 					{
-						AddonDefinition::Free(&addon->Definitions);
+						AddonDef_t::Free(&addon->Definitions);
 					}
 					Addons.erase(it);
 				}
@@ -1234,9 +1234,9 @@ namespace Loader
 		return NULLSTR;
 	}
 
-	Addon* FindAddonBySig(signed int aSignature)
+	Addon_t* FindAddonBySig(signed int aSignature)
 	{
-		auto it = std::find_if(Addons.begin(), Addons.end(), [aSignature](Addon* addon) { return addon->Definitions && addon->Definitions->Signature == aSignature; });
+		auto it = std::find_if(Addons.begin(), Addons.end(), [aSignature](Addon_t* addon) { return addon->Definitions && addon->Definitions->Signature == aSignature; });
 
 		if (it != Addons.end())
 		{
@@ -1245,9 +1245,9 @@ namespace Loader
 
 		return nullptr;
 	}
-	Addon* FindAddonByPath(const std::filesystem::path& aPath)
+	Addon_t* FindAddonByPath(const std::filesystem::path& aPath)
 	{
-		auto it = std::find_if(Addons.begin(), Addons.end(), [aPath](Addon* addon) { return addon->Path == aPath; });
+		auto it = std::find_if(Addons.begin(), Addons.end(), [aPath](Addon_t* addon) { return addon->Path == aPath; });
 
 		if (it != Addons.end())
 		{
@@ -1256,9 +1256,9 @@ namespace Loader
 
 		return nullptr;
 	}
-	Addon* FindAddonByMatchSig(signed int aMatchSignature)
+	Addon_t* FindAddonByMatchSig(signed int aMatchSignature)
 	{
-		auto it = std::find_if(Addons.begin(), Addons.end(), [aMatchSignature](Addon* addon) { return addon->MatchSignature == aMatchSignature; });
+		auto it = std::find_if(Addons.begin(), Addons.end(), [aMatchSignature](Addon_t* addon) { return addon->MatchSignature == aMatchSignature; });
 
 		if (it != Addons.end())
 		{
@@ -1267,9 +1267,9 @@ namespace Loader
 
 		return nullptr;
 	}
-	Addon* FindAddonByMD5(std::vector<unsigned char> aMD5)
+	Addon_t* FindAddonByMD5(std::vector<unsigned char> aMD5)
 	{
-		auto it = std::find_if(Addons.begin(), Addons.end(), [aMD5](Addon* addon) { return addon->MD5 == aMD5; });
+		auto it = std::find_if(Addons.begin(), Addons.end(), [aMD5](Addon_t* addon) { return addon->MD5 == aMD5; });
 
 		if (it != Addons.end())
 		{

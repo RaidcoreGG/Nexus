@@ -29,11 +29,11 @@ class CBindsWindow : public ISubWindow
 	private:
 	CBindSetterModal                   BindSetterModal;
 
-	std::vector<InputBindCategory>     IBCategories;
-	std::vector<GameInputBindCategory> GIBCategories;
+	std::vector<InputBindCategory_t>     IBCategories;
+	std::vector<GameInputBindCategory_t> GIBCategories;
 
-	void RenderInputBindsTable(std::unordered_map<std::string, InputBindPacked>& aInputBinds);
-	void RenderGameInputBindsTable(std::unordered_map<EGameBinds, GameInputBindPacked>& aInputBinds);
+	void RenderInputBindsTable(std::unordered_map<std::string, InputBindPacked_t>& aInputBinds);
+	void RenderGameInputBindsTable(std::unordered_map<EGameBinds, GameInputBindPacked_t>& aInputBinds);
 
 	void DeleteStaleBind(const std::string& aIdentifier);
 };

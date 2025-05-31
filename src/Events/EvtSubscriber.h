@@ -2,7 +2,7 @@
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
 /// Name         :  EvtSubscriber.h
-/// Description  :  Contains the EventSubscriber data struct definition.
+/// Description  :  Contains the EventSubscriber_t data struct definition.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
@@ -12,20 +12,20 @@
 #include "EvtFuncDefs.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// EventSubscriber Struct
+/// EventSubscriber_t Struct
 ///----------------------------------------------------------------------------------------------------
-struct EventSubscriber
+struct EventSubscriber_t
 {
 	signed int    Signature;
 	EVENT_CONSUME Callback;
 };
 
-inline bool operator==(const EventSubscriber& lhs, const EventSubscriber& rhs)
+inline bool operator==(const EventSubscriber_t& lhs, const EventSubscriber_t& rhs)
 {
 	return lhs.Signature == rhs.Signature && lhs.Callback == rhs.Callback;
 }
 
-inline bool operator!=(const EventSubscriber& lhs, const EventSubscriber& rhs)
+inline bool operator!=(const EventSubscriber_t& lhs, const EventSubscriber_t& rhs)
 {
 	return !(lhs == rhs);
 }

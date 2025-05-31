@@ -15,28 +15,28 @@
 #include "Services/Textures/TxTexture.h"
 #include "UI/FuncDefs.h"
 
-struct ContextItem
+struct ContextItem_t
 {
-	std::string                        TargetShortcut;
-	GUI_RENDER                         Callback;
+	std::string                          TargetShortcut;
+	GUI_RENDER                           Callback;
 };
 
-struct Shortcut
+struct Shortcut_t
 {
-	bool                               IsValid;
+	bool                                 IsValid;
 
-	int                                TextureGetAttempts;
-	std::string                        TextureNormalIdentifier;
-	std::string                        TextureHoverIdentifier;
+	int                                  TextureGetAttempts;
+	std::string                          TextureNormalIdentifier;
+	std::string                          TextureHoverIdentifier;
 
-	Texture*                           TextureNormal;
-	Texture*                           TextureHover;
-	std::string                        IBIdentifier;
-	std::string                        IBText;
-	std::string                        TooltipText;
-	bool                               IsHovering;
-	bool                               HasNotification;
-	std::map<std::string, ContextItem> ContextItems;
+	Texture_t*                           TextureNormal;
+	Texture_t*                           TextureHover;
+	std::string                          IBIdentifier;
+	std::string                          IBText;
+	std::string                          TooltipText;
+	bool                                 IsHovering;
+	bool                                 HasNotification;
+	std::map<std::string, ContextItem_t> ContextItems;
 };
 
 #endif

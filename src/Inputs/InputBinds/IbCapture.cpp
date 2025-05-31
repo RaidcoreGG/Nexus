@@ -19,7 +19,7 @@ void CInputBindCapture::StartCapturing()
 	}
 
 	/* Reset the previously captured bind. */
-	this->Capture = InputBind{};
+	this->Capture = InputBind_t{};
 
 	/* Set the state. */
 	this->IsCapturing = true;
@@ -31,7 +31,7 @@ void CInputBindCapture::EndCapturing()
 	this->IsCapturing = false;
 }
 
-InputBind CInputBindCapture::GetCapture() const
+InputBind_t CInputBindCapture::GetCapture() const
 {
 	return this->Capture;
 }
@@ -189,7 +189,7 @@ bool CInputBindCapture::ProcessInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return false;
 }
 
-const InputBind& CInputBindCapture::GetCaptureRef() const
+const InputBind_t& CInputBindCapture::GetCaptureRef() const
 {
 	return this->Capture;
 }

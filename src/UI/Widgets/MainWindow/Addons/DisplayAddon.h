@@ -26,17 +26,17 @@ enum class EAddonType
 	LibraryArc
 };
 
-struct AddonItemData
+struct AddonItemData_t
 {
-	EAddonType                                       Type;
+	EAddonType                                         Type;
 	union
 	{
-		Addon*                                       NexusAddon;
-		LibraryAddon*                                LibraryAddon;
+		Addon_t*                                       NexusAddon;
+		LibraryAddon_t*                                LibraryAddon_t;
 	};
-	std::unordered_map<std::string, InputBindPacked> InputBinds;
-	GUI_RENDER                                       OptionsRender;
-	bool                                             IsHovered;
+	std::unordered_map<std::string, InputBindPacked_t> InputBinds;
+	GUI_RENDER                                         OptionsRender;
+	bool                                               IsHovered;
 };
 
 #endif

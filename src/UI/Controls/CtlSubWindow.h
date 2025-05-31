@@ -36,7 +36,7 @@ class ISubWindow : public virtual IWindow
 	/// GetIcon:
 	/// 	Returns the icon of the window.
 	///----------------------------------------------------------------------------------------------------
-	const Texture* GetIcon();
+	const Texture_t* GetIcon();
 
 	///----------------------------------------------------------------------------------------------------
 	/// IsPopOut:
@@ -75,8 +75,8 @@ class ISubWindow : public virtual IWindow
 
 	std::string              IconIdentifier;
 	int                      IconID;
-	Texture*                 Tex_Icon;
-	Texture*                 Tex_PopoutIcon;
+	Texture_t*                 Tex_Icon;
+	Texture_t*                 Tex_PopoutIcon;
 
 	///----------------------------------------------------------------------------------------------------
 	/// RenderContent:

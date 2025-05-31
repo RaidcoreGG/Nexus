@@ -79,7 +79,7 @@ json CApiClient::Get(std::string aEndpoint, std::string aParameters, int aOverri
 	std::string query = URL::GetQuery(aEndpoint, aParameters);
 
 	/* override == 0, don't even bother getting the cache */
-	CachedResponse* cachedResponse = aOverrideCacheLifetime == 0 ? nullptr : GetCachedResponse(query);
+	CachedResponse_t* cachedResponse = aOverrideCacheLifetime == 0 ? nullptr : GetCachedResponse(query);
 
 	if (cachedResponse != nullptr)
 	{
@@ -104,7 +104,7 @@ json CApiClient::Get(std::string aEndpoint, std::string aParameters, int aOverri
 	std::condition_variable cv;
 
 	// if not cached, push it into requests queue, so it can be done async
-	APIRequest req{
+	APIRequest_t req{
 		ERequestType::Get,
 		&done,
 		&cv,
@@ -135,7 +135,7 @@ json CApiClient::Post(std::string aEndpoint, std::string aParameters)
 {
 	std::string query = URL::GetQuery(aEndpoint, aParameters);
 
-	CachedResponse* cachedResponse = GetCachedResponse(query);
+	CachedResponse_t* cachedResponse = GetCachedResponse(query);
 
 	if (cachedResponse != nullptr)
 	{
@@ -158,7 +158,7 @@ json CApiClient::Post(std::string aEndpoint, std::string aParameters)
 	std::condition_variable cv;
 
 	// if not cached, push it into requests queue, so it can be done async
-	APIRequest req{
+	APIRequest_t req{
 		ERequestType::Post,
 		&done,
 		&cv,
@@ -207,7 +207,7 @@ bool CApiClient::Download(std::filesystem::path aOutPath, std::string aEndpoint,
 	return true;
 }
 
-CachedResponse* CApiClient::GetCachedResponse(const std::string& aQuery)
+CachedResponse_t* CApiClient::GetCachedResponse(const std::string& aQuery)
 {
 	std::filesystem::path path = GetNormalizedPath(aQuery);
 
@@ -227,7 +227,7 @@ CachedResponse* CApiClient::GetCachedResponse(const std::string& aQuery)
 			json content = json::parse(file);
 			file.close();
 
-			CachedResponse* rResponse = new CachedResponse{};
+			CachedResponse_t* rResponse = new CachedResponse_t{};
 			rResponse->Content = content;
 			rResponse->Timestamp = std::chrono::duration_cast<std::chrono::seconds>(std::filesystem::last_write_time(path).time_since_epoch()).count() + FileTimeOffset;
 
@@ -328,10 +328,10 @@ void CApiClient::ProcessRequests()
 				continue;
 			}
 
-			APIRequest request = QueuedRequests.front();
+			APIRequest_t request = QueuedRequests.front();
 
 			// HttpGet should set last request timestamp
-			APIResponse response = HttpGet(request);
+			APIResponse_t response = HttpGet(request);
 
 			// does the bucket get reduced on unsuccessful requests? we assume it does
 			Bucket--;
@@ -367,7 +367,7 @@ void CApiClient::ProcessRequests()
 			/* no retry is considered successful */
 			if (!retry)
 			{
-				CachedResponse* cached = new CachedResponse{};
+				CachedResponse_t* cached = new CachedResponse_t{};
 				cached->Content = response.Content;
 				cached->Timestamp = Time::GetTimestamp();
 
@@ -419,9 +419,9 @@ void CApiClient::ProcessRequests()
 		IsSuspended = true;
 	}
 }
-APIResponse CApiClient::HttpGet(APIRequest aRequest)
+APIResponse_t CApiClient::HttpGet(APIRequest_t aRequest)
 {
-	APIResponse response{
+	APIResponse_t response{
 		0,
 		nullptr
 	};

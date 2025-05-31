@@ -16,7 +16,7 @@ enum class ERequestType
 	Post
 };
 
-struct APIRequest
+struct APIRequest_t
 {
 	ERequestType				Type;
 	bool*						IsComplete;

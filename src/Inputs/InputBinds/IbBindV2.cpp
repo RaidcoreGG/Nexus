@@ -10,31 +10,31 @@
 
 #include "IbBind.h"
 
-InputBind::InputBind(InputBindV1 aLegacyInputBind)
+InputBind_t::InputBind_t(InputBindV1_t aLegacyInputBind)
 {
-	this->Alt         = aLegacyInputBind.Alt;
-	this->Ctrl        = aLegacyInputBind.Ctrl;
-	this->Shift       = aLegacyInputBind.Shift;
+	this->Alt    = aLegacyInputBind.Alt;
+	this->Ctrl   = aLegacyInputBind.Ctrl;
+	this->Shift  = aLegacyInputBind.Shift;
 
-	this->Device      = EInputDevice::Keyboard;
-	this->Code        = aLegacyInputBind.Key;
+	this->Device = EInputDevice::Keyboard;
+	this->Code   = aLegacyInputBind.Key;
 }
 
-bool InputBind::IsBound() const
+bool InputBind_t::IsBound() const
 {
 	return this->Device != EInputDevice::None && this->Code != 0;
 }
 
-bool operator==(const InputBind& lhs, const InputBind& rhs)
+bool operator==(const InputBind_t& lhs, const InputBind_t& rhs)
 {
-	return lhs.Alt         == rhs.Alt &&
-	       lhs.Ctrl        == rhs.Ctrl &&
-	       lhs.Shift       == rhs.Shift &&
-	       lhs.Device      == rhs.Device &&
-	       lhs.Code        == rhs.Code;
+	return lhs.Alt    == rhs.Alt &&
+	       lhs.Ctrl   == rhs.Ctrl &&
+	       lhs.Shift  == rhs.Shift &&
+	       lhs.Device == rhs.Device &&
+	       lhs.Code   == rhs.Code;
 }
 
-bool operator!=(const InputBind& lhs, const InputBind& rhs)
+bool operator!=(const InputBind_t& lhs, const InputBind_t& rhs)
 {
 	return !(lhs == rhs);
 }

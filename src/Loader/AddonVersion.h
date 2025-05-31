@@ -2,7 +2,7 @@
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
 /// Name         :  AddonVersion.h
-/// Description  :  AddonVersion struct definitions and functions.
+/// Description  :  AddonVersion_t struct definitions and functions.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
@@ -15,33 +15,33 @@
 using json = nlohmann::json;
 
 ///----------------------------------------------------------------------------------------------------
-/// AddonVersion Struct
+/// AddonVersion_t Struct
 ///----------------------------------------------------------------------------------------------------
-struct AddonVersion
+struct AddonVersion_t
 {
 	signed short	Major;
 	signed short	Minor;
 	signed short	Build;
 	signed short	Revision;
 
-	AddonVersion() = default;
-	AddonVersion(signed short aMajor, signed short aMinor, signed short aBuild, signed short aRevision)
+	AddonVersion_t() = default;
+	AddonVersion_t(signed short aMajor, signed short aMinor, signed short aBuild, signed short aRevision)
 		: Major{ aMajor }
 		, Minor{ aMinor }
 		, Build{ aBuild }
 		, Revision{ aRevision }
 	{}
-	AddonVersion(json& aJson);
-	AddonVersion(std::string aVersionString);
+	AddonVersion_t(json& aJson);
+	AddonVersion_t(std::string aVersionString);
 
 	std::string string() const;
 };
 
-bool operator>(AddonVersion lhs, AddonVersion rhs);
-bool operator<(AddonVersion lhs, AddonVersion rhs);
-bool operator==(AddonVersion lhs, AddonVersion rhs);
-bool operator!=(AddonVersion lhs, AddonVersion rhs);
-bool operator<=(AddonVersion lhs, AddonVersion rhs);
-bool operator>=(AddonVersion lhs, AddonVersion rhs);
+bool operator>(AddonVersion_t lhs, AddonVersion_t rhs);
+bool operator<(AddonVersion_t lhs, AddonVersion_t rhs);
+bool operator==(AddonVersion_t lhs, AddonVersion_t rhs);
+bool operator!=(AddonVersion_t lhs, AddonVersion_t rhs);
+bool operator<=(AddonVersion_t lhs, AddonVersion_t rhs);
+bool operator>=(AddonVersion_t lhs, AddonVersion_t rhs);
 
 #endif

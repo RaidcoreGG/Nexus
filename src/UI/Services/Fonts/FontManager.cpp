@@ -95,17 +95,17 @@ bool CFontManager::Advance()
 	return true;
 }
 
-ManagedFont* CFontManager::Get(const char* aIdentifier)
+ManagedFont_t* CFontManager::Get(const char* aIdentifier)
 {
 	std::string str = aIdentifier;
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
-	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [str](ManagedFont& font) { return font.Identifier == str; });
+	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [str](ManagedFont_t& font) { return font.Identifier == str; });
 
 	if (it == this->Registry.end()) { return nullptr; }
 
 	/* get the reference */
-	ManagedFont& font = *it;
+	ManagedFont_t& font = *it;
 
 	return &font;
 }
@@ -117,12 +117,12 @@ void CFontManager::Release(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallb
 	std::string str = aIdentifier;
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
-	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [str](ManagedFont& font) { return font.Identifier == str; });
+	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [str](ManagedFont_t& font) { return font.Identifier == str; });
 
 	if (it == this->Registry.end()) { return; }
 
 	/* get the reference */
-	ManagedFont& font = *it;
+	ManagedFont_t& font = *it;
 
 	for (FONTS_RECEIVECALLBACK callback : font.Subscribers)
 	{
@@ -158,7 +158,7 @@ void CFontManager::AddFont(const char* aIdentifier, float aFontSize, const char*
 
 	std::string str = aIdentifier;
 
-	ManagedFont* font = Get(aIdentifier);
+	ManagedFont_t* font = Get(aIdentifier);
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -191,7 +191,7 @@ void CFontManager::AddFont(const char* aIdentifier, float aFontSize, unsigned aR
 
 	std::string str = aIdentifier;
 
-	ManagedFont* font = this->Get(aIdentifier);
+	ManagedFont_t* font = this->Get(aIdentifier);
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -225,7 +225,7 @@ void CFontManager::AddFont(const char* aIdentifier, float aFontSize, void* aData
 
 	std::string str = aIdentifier;
 
-	ManagedFont* font = this->Get(aIdentifier);
+	ManagedFont_t* font = this->Get(aIdentifier);
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -253,7 +253,7 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, const c
 	std::string str = aIdentifier;
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
-	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [str](ManagedFont& font) { return font.Identifier == str; });
+	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [str](ManagedFont_t& font) { return font.Identifier == str; });
 
 	size_t size = 0;
 	void* buffer = ImFileLoadToMemory(aFilename, "rb", &size, 0);
@@ -261,7 +261,7 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, const c
 	if (it != this->Registry.end()) /* font already exists */
 	{
 		/* get the reference */
-		ManagedFont& oldFont = *it;
+		ManagedFont_t& oldFont = *it;
 
 		/* free the data*/
 		delete oldFont.Data;
@@ -279,7 +279,7 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, const c
 			aConfig = oldFont.Config;
 		}
 
-		ManagedFont font = this->CreateManagedFont(aIdentifier, aFontSize, buffer, size, aConfig);
+		ManagedFont_t font = this->CreateManagedFont(aIdentifier, aFontSize, buffer, size, aConfig);
 		font.Subscribers = oldFont.Subscribers;
 
 		*it = font;
@@ -305,7 +305,7 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, unsigne
 	std::string str = aIdentifier;
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
-	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [str](ManagedFont& font) { return font.Identifier == str; });
+	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [str](ManagedFont_t& font) { return font.Identifier == str; });
 
 	/* out vars */
 	void* buffer = nullptr;
@@ -317,7 +317,7 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, unsigne
 	if (it != this->Registry.end()) /* font already exists */
 	{
 		/* get the reference */
-		ManagedFont& oldFont = *it;
+		ManagedFont_t& oldFont = *it;
 
 		/* free the data*/
 		delete oldFont.Data;
@@ -335,7 +335,7 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, unsigne
 			aConfig = oldFont.Config;
 		}
 
-		ManagedFont font = this->CreateManagedFont(aIdentifier, aFontSize, buffer, size, aConfig);
+		ManagedFont_t font = this->CreateManagedFont(aIdentifier, aFontSize, buffer, size, aConfig);
 		font.Subscribers = oldFont.Subscribers;
 
 		*it = font;
@@ -358,12 +358,12 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, void* a
 	std::string str = aIdentifier;
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
-	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [str](ManagedFont& font) { return font.Identifier == str; });
+	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [str](ManagedFont_t& font) { return font.Identifier == str; });
 
 	if (it != this->Registry.end()) /* font already exists */
 	{
 		/* get the reference */
-		ManagedFont& oldFont = *it;
+		ManagedFont_t& oldFont = *it;
 
 		/* free the data*/
 		delete oldFont.Data;
@@ -381,7 +381,7 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, void* a
 			aConfig = oldFont.Config;
 		}
 
-		ManagedFont font = this->CreateManagedFont(aIdentifier, aFontSize, aData, aSize, aConfig);
+		ManagedFont_t font = this->CreateManagedFont(aIdentifier, aFontSize, aData, aSize, aConfig);
 		font.Subscribers = oldFont.Subscribers;
 
 		*it = font;
@@ -400,12 +400,12 @@ void CFontManager::AddDefaultFont(FONTS_RECEIVECALLBACK aCallback)
 	std::string str = "FONT_DEFAULT";
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
-	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [str](ManagedFont& font) { return font.Identifier == str; });
+	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [str](ManagedFont_t& font) { return font.Identifier == str; });
 
 	if (it != this->Registry.end()) /* font already exists */
 	{
 		/* get the reference */
-		ManagedFont& font = *it;
+		ManagedFont_t& font = *it;
 
 		/* add the callback */
 		if (aCallback)
@@ -435,12 +435,12 @@ void CFontManager::ResizeFont(const char* aIdentifier, float aFontSize)
 	std::string str = aIdentifier;
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
-	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [str](ManagedFont& font) { return font.Identifier == str; });
+	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [str](ManagedFont_t& font) { return font.Identifier == str; });
 
 	if (it != this->Registry.end()) /* font already exists */
 	{
 		/* get the reference */
-		ManagedFont& font = *it;
+		ManagedFont_t& font = *it;
 
 		if (font.Size != aFontSize)
 		{
@@ -492,7 +492,7 @@ void CFontManager::AddFontInternal(const char* aIdentifier, float aFontSize, voi
 
 	std::string str = aIdentifier;
 
-	ManagedFont font = this->CreateManagedFont(aIdentifier, aFontSize, aData, aSize, aConfig);
+	ManagedFont_t font = this->CreateManagedFont(aIdentifier, aFontSize, aData, aSize, aConfig);
 
 	/* add the callback */
 	if (aCallback)
@@ -517,14 +517,14 @@ void CFontManager::NotifyCallbacks(bool aNotifyNull)
 	}
 }
 
-ManagedFont CFontManager::CreateManagedFont(std::string aIdentifier, float aFontSize, void* aData, size_t aSize, ImFontConfig* aConfig)
+ManagedFont_t CFontManager::CreateManagedFont(std::string aIdentifier, float aFontSize, void* aData, size_t aSize, ImFontConfig* aConfig)
 {
 	/* copy the data to the buffer */
 	char* buffer = new char[aSize];
 	memcpy_s(buffer, aSize, aData, aSize);
 
 	/* allocate new managed font */
-	ManagedFont font{};
+	ManagedFont_t font{};
 	font.Identifier = aIdentifier;
 	font.Size = aFontSize;
 	font.Data = buffer;

@@ -70,7 +70,7 @@ class CQuickAccess : public virtual IWindow
 	/// RenderContextMenu:
 	/// 	Renders the context menu for a given shortcut.
 	///----------------------------------------------------------------------------------------------------
-	void RenderContextMenu(const std::string& aIdentifier, const Shortcut& aShortcut, bool* aIsActive);
+	void RenderContextMenu(const std::string& aIdentifier, const Shortcut_t& aShortcut, bool* aIsActive);
 
 	///----------------------------------------------------------------------------------------------------
 	/// AddShortcut:
@@ -118,13 +118,13 @@ class CQuickAccess : public virtual IWindow
 	/// GetRegistry:
 	/// 	Returns a copy of the registry.
 	///----------------------------------------------------------------------------------------------------
-	std::map<std::string, Shortcut> GetRegistry() const;
+	std::map<std::string, Shortcut_t> GetRegistry() const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetOrphanage:
 	/// 	Returns a copy of the orphaned callbacks.
 	///----------------------------------------------------------------------------------------------------
-	std::map<std::string, ContextItem> GetOrphanage() const;
+	std::map<std::string, ContextItem_t> GetOrphanage() const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Verify:
@@ -139,23 +139,23 @@ class CQuickAccess : public virtual IWindow
 	void Validate(bool aLock);
 
 	private:
-	NexusLinkData*                     NexusLink;
-	Mumble::Data*                      MumbleLink;
-	CLogApi*                           Logger;
-	CInputBindApi*                     InputBindApi;
-	CTextureLoader*                    TextureService;
-	CLocalization*                     Language;
-	CEventApi*                         EventApi;
+	NexusLinkData_t*                     NexusLink;
+	Mumble::Data*                        MumbleLink;
+	CLogApi*                             Logger;
+	CInputBindApi*                       InputBindApi;
+	CTextureLoader*                      TextureService;
+	CLocalization*                       Language;
+	CEventApi*                           EventApi;
 
-	mutable std::mutex                 Mutex;
-	std::map<std::string, Shortcut>    Registry;
-	std::map<std::string, ContextItem> OrphanedCallbacks;
+	mutable std::mutex                   Mutex;
+	std::map<std::string, Shortcut_t>    Registry;
+	std::map<std::string, ContextItem_t> OrphanedCallbacks;
 
-	float                              Opacity           = 0.50f;
+	float                                Opacity           = 0.50f;
 
-	Texture*                           IconNotification  = nullptr;
+	Texture_t*                           IconNotification  = nullptr;
 
-	bool                               HasArcDPSShortcut = false;
+	bool                                 HasArcDPSShortcut = false;
 
 	///----------------------------------------------------------------------------------------------------
 	/// WhereAreMyParents:
@@ -167,7 +167,7 @@ class CQuickAccess : public virtual IWindow
 	/// IsValid:
 	/// 	Returns true if the passed shortcut is valid. Not threadsafe.
 	///----------------------------------------------------------------------------------------------------
-	bool IsValid(const Shortcut& aShortcut);
+	bool IsValid(const Shortcut_t& aShortcut);
 };
 
 #endif

@@ -20,18 +20,18 @@
 constexpr const char* CH_LOCALIZATION = "Localization";
 
 ///----------------------------------------------------------------------------------------------------
-/// Locale data struct
+/// Locale_t data struct
 ///----------------------------------------------------------------------------------------------------
-struct Locale
+struct Locale_t
 {
 	std::string DisplayName;
 	std::map<std::string, const char*> Texts;
 };
 
 ///----------------------------------------------------------------------------------------------------
-/// QueuedTranslation data struct
+/// QueuedTranslation_t data struct
 ///----------------------------------------------------------------------------------------------------
-struct QueuedTranslation
+struct QueuedTranslation_t
 {
 	std::string Identifier;
 	std::string LanguageIdentifier;
@@ -121,10 +121,10 @@ class CLocalization
 	std::mutex                     Mutex;
 	std::filesystem::path          Directory;
 	// Identifier (e.g. "EN-GB") maps to object with display name ("English (United Kingdom)") and a map of all its texts
-	std::map<std::string, Locale>  LocaleAtlas;
-	std::vector<QueuedTranslation> Queued;
+	std::map<std::string, Locale_t>  LocaleAtlas;
+	std::vector<QueuedTranslation_t> Queued;
 
-	Locale* ActiveLocale = nullptr;
+	Locale_t* ActiveLocale = nullptr;
 
 	bool IsLocaleDirectorySet = false;
 	bool IsLocaleAtlasBuilt = false;

@@ -13,9 +13,9 @@
 #include "TxFuncDefs.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// QueuedTexture Struct
+/// QueuedTexture_t Struct
 ///----------------------------------------------------------------------------------------------------
-struct QueuedTexture
+struct QueuedTexture_t
 {
 	ETextureStage            Stage;
 	long long                Time;

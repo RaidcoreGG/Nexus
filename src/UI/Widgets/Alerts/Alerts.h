@@ -44,12 +44,12 @@ class CAlerts : public virtual IWindow
 
 	private:
 
-	NexusLinkData*            NexusLink;
+	NexusLinkData_t*            NexusLink;
 
-	std::mutex                Mutex;
-	std::vector<AlertMessage> Queue;
+	std::mutex                  Mutex;
+	std::vector<AlertMessage_t> Queue;
 
-	float                     Opacity = 1.0f;
+	float                       Opacity = 1.0f;
 };
 
 #endif

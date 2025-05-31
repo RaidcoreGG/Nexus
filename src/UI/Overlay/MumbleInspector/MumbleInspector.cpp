@@ -18,7 +18,7 @@ CMumbleOverlay::CMumbleOverlay()
 
 	this->MumbleLink     = (Mumble::Data*)    dlApi->GetResource(DL_MUMBLE_LINK);
 	this->MumbleIdentity = (Mumble::Identity*)dlApi->GetResource(DL_MUMBLE_LINK_IDENTITY);
-	this->NexusLink      = (NexusLinkData*)   dlApi->GetResource(DL_NEXUS_LINK);
+	this->NexusLink      = (NexusLinkData_t*)   dlApi->GetResource(DL_NEXUS_LINK);
 }
 
 void CMumbleOverlay::Render()
@@ -31,7 +31,7 @@ void CMumbleOverlay::Render()
 
 		this->MumbleLink = (Mumble::Data*)dlApi->GetResource(DL_MUMBLE_LINK);
 		this->MumbleIdentity = (Mumble::Identity*)dlApi->GetResource(DL_MUMBLE_LINK_IDENTITY);
-		this->NexusLink = (NexusLinkData*)dlApi->GetResource(DL_NEXUS_LINK);
+		this->NexusLink = (NexusLinkData_t*)dlApi->GetResource(DL_NEXUS_LINK);
 	}
 
 	static ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration          |

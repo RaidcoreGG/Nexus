@@ -225,19 +225,19 @@ class CUiContext
 	/// GetInputBinds:
 	/// 	Returns a copy of the display input binds.
 	///----------------------------------------------------------------------------------------------------
-	std::vector<InputBindCategory> GetInputBinds();
+	std::vector<InputBindCategory_t> GetInputBinds();
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetInputBinds:
 	/// 	Returns a copy of the display input binds.
 	///----------------------------------------------------------------------------------------------------
-	std::unordered_map<std::string, InputBindPacked> GetInputBinds(const std::string& aCategory);
+	std::unordered_map<std::string, InputBindPacked_t> GetInputBinds(const std::string& aCategory);
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetGameBinds:
 	/// 	Returns a copy of the display game input binds.
 	///----------------------------------------------------------------------------------------------------
-	std::vector<GameInputBindCategory> GetGameBinds();
+	std::vector<GameInputBindCategory_t> GetGameBinds();
 
 	///----------------------------------------------------------------------------------------------------
 	/// LoadFonts:
@@ -285,8 +285,8 @@ class CUiContext
 	std::vector<GUI_RENDER>            RegistryOptionsRender;
 
 	mutable std::mutex                 DisplayBindsMutex;
-	std::vector<InputBindCategory>     DisplayInputBinds;
-	std::vector<GameInputBindCategory> DisplayGameBinds;
+	std::vector<InputBindCategory_t>     DisplayInputBinds;
+	std::vector<GameInputBindCategory_t> DisplayGameBinds;
 
 	bool                               IsInitialized = false;
 	bool                               IsVisible = true;

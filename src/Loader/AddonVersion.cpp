@@ -1,8 +1,8 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  AddonVersion.cpp
-/// Description  :  AddonVersion struct definitions and functions.
+/// Name         :  AddonVersion_t.cpp
+/// Description  :  AddonVersion_t struct definitions and functions.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
@@ -10,7 +10,7 @@
 
 #include <regex>
 
-AddonVersion::AddonVersion(json& aJson)
+AddonVersion_t::AddonVersion_t(json& aJson)
 {
 	Major = !aJson["Major"].is_null()
 		? aJson["Major"].get<signed short>()
@@ -28,7 +28,7 @@ AddonVersion::AddonVersion(json& aJson)
 		? aJson["Revision"].get<signed short>()
 		: 0;
 }
-AddonVersion::AddonVersion(std::string aVersionString)
+AddonVersion_t::AddonVersion_t(std::string aVersionString)
 {
 	bool isSemVer = false;
 
@@ -83,7 +83,7 @@ AddonVersion::AddonVersion(std::string aVersionString)
 	}
 }
 
-std::string AddonVersion::string() const
+std::string AddonVersion_t::string() const
 {
 	std::string str;
 	str.append(std::to_string(Major) + ".");
@@ -102,7 +102,7 @@ std::string AddonVersion::string() const
 	return str;
 }
 
-bool operator>(AddonVersion lhs, AddonVersion rhs)
+bool operator>(AddonVersion_t lhs, AddonVersion_t rhs)
 {
 	if ((lhs.Major > rhs.Major) ||
 		(lhs.Major == rhs.Major && lhs.Minor > rhs.Minor) ||
@@ -114,7 +114,7 @@ bool operator>(AddonVersion lhs, AddonVersion rhs)
 
 	return false;
 }
-bool operator<(AddonVersion lhs, AddonVersion rhs)
+bool operator<(AddonVersion_t lhs, AddonVersion_t rhs)
 {
 	if ((lhs.Major < rhs.Major) ||
 		(lhs.Major == rhs.Major && lhs.Minor < rhs.Minor) ||
@@ -126,7 +126,7 @@ bool operator<(AddonVersion lhs, AddonVersion rhs)
 
 	return false;
 }
-bool operator==(AddonVersion lhs, AddonVersion rhs)
+bool operator==(AddonVersion_t lhs, AddonVersion_t rhs)
 {
 	if (lhs.Major == rhs.Major &&
 		lhs.Minor == rhs.Minor &&
@@ -138,15 +138,15 @@ bool operator==(AddonVersion lhs, AddonVersion rhs)
 
 	return false;
 }
-bool operator!=(AddonVersion lhs, AddonVersion rhs)
+bool operator!=(AddonVersion_t lhs, AddonVersion_t rhs)
 {
 	return !(lhs == rhs);
 }
-bool operator<=(AddonVersion lhs, AddonVersion rhs)
+bool operator<=(AddonVersion_t lhs, AddonVersion_t rhs)
 {
 	return lhs < rhs || lhs == rhs;
 }
-bool operator>=(AddonVersion lhs, AddonVersion rhs)
+bool operator>=(AddonVersion_t lhs, AddonVersion_t rhs)
 {
 	return lhs > rhs || lhs == rhs;
 }

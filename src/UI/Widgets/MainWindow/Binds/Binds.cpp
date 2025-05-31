@@ -77,7 +77,7 @@ void CBindsWindow::RenderContent()
 		{
 			if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 			{
-				for (InputBindCategory& cat : this->IBCategories)
+				for (InputBindCategory_t& cat : this->IBCategories)
 				{
 					if (ImGui::CollapsingHeader(
 						cat.Name != NULLSTR
@@ -143,7 +143,7 @@ void CBindsWindow::RenderContent()
 					ImGui::EndCombo();
 				}
 
-				for (GameInputBindCategory& cat : this->GIBCategories)
+				for (GameInputBindCategory_t& cat : this->GIBCategories)
 				{
 					if (ImGui::CollapsingHeader(langApi->Translate(cat.Name.c_str()), ImGuiTreeNodeFlags_DefaultOpen))
 					{
@@ -168,7 +168,7 @@ void CBindsWindow::RenderSubWindows()
 	}
 }
 
-void CBindsWindow::RenderInputBindsTable(std::unordered_map<std::string, InputBindPacked>& aInputBinds)
+void CBindsWindow::RenderInputBindsTable(std::unordered_map<std::string, InputBindPacked_t>& aInputBinds)
 {
 	if (ImGui::BeginTable("table_inputbinds", 4, ImGuiTableFlags_BordersInnerH))
 	{
@@ -214,7 +214,7 @@ void CBindsWindow::RenderInputBindsTable(std::unordered_map<std::string, InputBi
 	}
 }
 
-void CBindsWindow::RenderGameInputBindsTable(std::unordered_map<EGameBinds, GameInputBindPacked>& aInputBinds)
+void CBindsWindow::RenderGameInputBindsTable(std::unordered_map<EGameBinds, GameInputBindPacked_t>& aInputBinds)
 {
 	if (ImGui::BeginTable("table_gameinputbinds", 3, ImGuiTableFlags_BordersInnerH))
 	{

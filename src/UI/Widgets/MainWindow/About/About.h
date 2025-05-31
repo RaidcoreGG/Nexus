@@ -19,8 +19,8 @@ class CAboutBox : public ISubWindow
 	void RenderContent() override;
 
 	private:
-	Texture* Tex_BannerDiscord = nullptr;
-	Texture* Tex_BannerPatreon = nullptr;
+	Texture_t* Tex_BannerDiscord = nullptr;
+	Texture_t* Tex_BannerPatreon = nullptr;
 };
 
 #endif

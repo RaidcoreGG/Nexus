@@ -1,6 +1,6 @@
 #include "AddonDefinition.h"
 
-bool AddonDefinition::HasMinimumRequirements()
+bool AddonDef_t::HasMinimumRequirements()
 {
 	if (Signature != 0 &&
 		Name &&
@@ -15,28 +15,28 @@ bool AddonDefinition::HasMinimumRequirements()
 	return false;
 }
 
-bool AddonDefinition::HasFlag(EAddonFlags aAddonFlag)
+bool AddonDef_t::HasFlag(EAddonFlags aAddonFlag)
 {
 	return (bool)(Flags & aAddonFlag);
 }
 
-void AddonDefinition::Copy(AddonDefinition* aSrc, AddonDefinition** aDst)
+void AddonDef_t::Copy(AddonDef_t* aSrc, AddonDef_t** aDst)
 {
 	if (aSrc == nullptr)
 	{
-		*aDst = new AddonDefinition{};
+		*aDst = new AddonDef_t{};
 		return;
 	}
 
 	// Allocate new memory and copy data, copy strings
-	*aDst = new AddonDefinition(*aSrc);
+	*aDst = new AddonDef_t(*aSrc);
 	(*aDst)->Name = _strdup(aSrc->Name);
 	(*aDst)->Author = _strdup(aSrc->Author);
 	(*aDst)->Description = _strdup(aSrc->Description);
 	(*aDst)->UpdateLink = aSrc->UpdateLink ? _strdup(aSrc->UpdateLink) : nullptr;
 }
 
-void AddonDefinition::Free(AddonDefinition** aDefinitions)
+void AddonDef_t::Free(AddonDef_t** aDefinitions)
 {
 	if (*aDefinitions == nullptr) { return; }
 

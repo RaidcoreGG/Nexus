@@ -55,13 +55,13 @@ class CDataLinkApi
 	/// GetRegistry:
 	/// 	Returns a copy of the registry.
 	///----------------------------------------------------------------------------------------------------
-	std::unordered_map<std::string, LinkedResource> GetRegistry();
+	std::unordered_map<std::string, LinkedResource_t> GetRegistry();
 
 	private:
 	CLogApi*                                        Logger = nullptr;
 
 	std::mutex                                      Mutex;
-	std::unordered_map<std::string, LinkedResource> Registry;
+	std::unordered_map<std::string, LinkedResource_t> Registry;
 };
 
 #endif

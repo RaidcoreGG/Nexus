@@ -20,9 +20,9 @@ CContext* CContext::GetContext()
 	return &s_Context;
 }
 
-AddonVersion const& CContext::GetVersion()
+AddonVersion_t const& CContext::GetVersion()
 {
-	static AddonVersion version =
+	static AddonVersion_t version =
 	{
 		V_MAJOR,
 		V_MINOR,

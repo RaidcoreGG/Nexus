@@ -12,7 +12,7 @@ namespace ArcDPS
 	typedef int (*addextension2)(HINSTANCE);
 	typedef void (*listextension)(void* callback_fn);
 
-	typedef struct arcdps_exports {
+	typedef struct arcdps_exports_t {
 		uint64_t size; // [required]
 		uint32_t sig; // [required]
 		uint32_t imguivers; // [required]
@@ -25,14 +25,14 @@ namespace ArcDPS
 		void* combat_local;
 		void* wnd_filter;
 		void* options_windows;
-	} arcdps_exports;
+	} arcdps_exports_t;
 
 	extern std::mutex					Mutex;
 	extern HMODULE						ModuleHandle;
 	extern bool							IsLoaded;
 	extern bool							IsBridgeDeployed;
 	extern bool							IsPluginAtlasBuilt;
-	extern std::vector<LibraryAddon*>	PluginLibrary;
+	extern std::vector<LibraryAddon_t*>	PluginLibrary;
 	extern std::vector<int>				Plugins;
 
 	extern addextension2				exp_addextension2;
@@ -50,7 +50,7 @@ namespace ArcDPS
 	/* Get plugins from arcdps. */
 	void GetPlugins();
 	/* Callback to receive arcdps plugins. */
-	void AddToAtlas(arcdps_exports* aArcdpsExports);
+	void AddToAtlas(arcdps_exports_t* aArcdpsExports);
 	/* Callback to receive arcdps plugins. */
 	void AddToAtlasBySig(unsigned int aArcSignature);
 	/* Add extension to arcdps. */

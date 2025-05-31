@@ -2,7 +2,7 @@
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
 /// Name         :  IbMapping.h
-/// Description  :  Mapped InputBind struct definition.
+/// Description  :  Mapped InputBind_t struct definition.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
@@ -14,11 +14,11 @@
 #include "IbFuncDefs.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// IbMapping Struct
+/// IbMapping_t Struct
 ///----------------------------------------------------------------------------------------------------
-struct IbMapping
+struct IbMapping_t
 {
-	InputBind      Bind        = {};
+	InputBind_t    Bind        = {};
 	bool           Passthrough = false;
 	EIbHandlerType HandlerType = EIbHandlerType::None;
 	union {

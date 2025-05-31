@@ -4,14 +4,14 @@
 #include <string>
 #include <vector>
 
-struct ActiveToken
+struct ActiveToken_t
 {
 	std::string					Key;
 	std::string					AccountName;
 	std::vector<std::string>	Characters;
 };
 
-bool operator==(const ActiveToken& lhs, const ActiveToken& rhs);
-bool operator!=(const ActiveToken& lhs, const ActiveToken& rhs);
+bool operator==(const ActiveToken_t& lhs, const ActiveToken_t& rhs);
+bool operator!=(const ActiveToken_t& lhs, const ActiveToken_t& rhs);
 
 #endif

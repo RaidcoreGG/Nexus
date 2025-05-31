@@ -23,9 +23,9 @@
 #include "UI/Widgets/QuickAccess/QaFuncDefs.h"
 
 // Base
-struct AddonAPI {};
+struct AddonAPI_t {};
 
-struct AddonAPI1 : AddonAPI
+struct AddonAPI1_t : AddonAPI_t
 {
 	/* Renderer */
 	IDXGISwapChain*				SwapChain;
@@ -80,7 +80,7 @@ struct AddonAPI1 : AddonAPI
 	QUICKACCESS_GENERIC			RemoveSimpleShortcut;
 };
 
-struct AddonAPI2 : AddonAPI
+struct AddonAPI2_t : AddonAPI_t
 {
 	/* Renderer */
 	IDXGISwapChain*						SwapChain;
@@ -146,7 +146,7 @@ struct AddonAPI2 : AddonAPI
 	LOCALIZATION_TRANSLATETO			TranslateTo;
 };
 
-struct AddonAPI3 : AddonAPI
+struct AddonAPI3_t : AddonAPI_t
 {
 	/* Renderer */
 	IDXGISwapChain*						SwapChain;
@@ -218,7 +218,7 @@ struct AddonAPI3 : AddonAPI
 	LOCALIZATION_TRANSLATETO			TranslateTo;
 };
 
-struct AddonAPI4 : AddonAPI
+struct AddonAPI4_t : AddonAPI_t
 {
 	/* Renderer */
 	IDXGISwapChain*						SwapChain;
@@ -300,7 +300,7 @@ struct AddonAPI4 : AddonAPI
 	FONTS_ADDFROMMEMORY					AddFontFromMemory;
 };
 
-struct AddonAPI5 : AddonAPI
+struct AddonAPI5_t : AddonAPI_t
 {
 	/* Renderer */
 	IDXGISwapChain*						SwapChain;
@@ -384,7 +384,7 @@ struct AddonAPI5 : AddonAPI
 	FONTS_ADDFROMMEMORY					AddFontFromMemory;
 };
 
-struct AddonAPI6 : AddonAPI
+struct AddonAPI6_t : AddonAPI_t
 {
 	/* Renderer */
 	IDXGISwapChain*							SwapChain;

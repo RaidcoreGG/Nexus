@@ -16,32 +16,32 @@
 #include "Inputs/InputBinds/IbMapping.h"
 #include "Inputs/InputBinds/IbBindV2.h"
 
-struct InputBindPacked
+struct InputBindPacked_t
 {
 	std::string KeysText;
-	IbMapping   Bind;
+	IbMapping_t Bind;
 };
 
-struct InputBindCategory
+struct InputBindCategory_t
 {
-	std::string                                      Name;
-	std::unordered_map<std::string, InputBindPacked> InputBinds;
+	std::string                                        Name;
+	std::unordered_map<std::string, InputBindPacked_t> InputBinds;
 };
 
-struct GameInputBindPacked
+struct GameInputBindPacked_t
 {
 	std::string Name;
 	std::string KeysText;
-	InputBind   Bind;
+	InputBind_t Bind;
 
 	std::string KeysText2;
-	InputBind   Bind2;
+	InputBind_t Bind2;
 };
 
-struct GameInputBindCategory
+struct GameInputBindCategory_t
 {
-	std::string                                         Name;
-	std::unordered_map<EGameBinds, GameInputBindPacked> GameInputBinds;
+	std::string                                           Name;
+	std::unordered_map<EGameBinds, GameInputBindPacked_t> GameInputBinds;
 };
 
 enum class EBindEditType

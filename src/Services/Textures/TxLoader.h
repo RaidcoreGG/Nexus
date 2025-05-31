@@ -46,33 +46,33 @@ class CTextureLoader
 
 	///----------------------------------------------------------------------------------------------------
 	/// Get:
-	/// 	Returns a Texture* with the given identifier or nullptr.
+	/// 	Returns a Texture_t* with the given identifier or nullptr.
 	///----------------------------------------------------------------------------------------------------
-	Texture* Get(const char* aIdentifier);
+	Texture_t* Get(const char* aIdentifier);
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetOrCreate:
-	/// 	Returns a Texture* with the given identifier or creates it from file path.
+	/// 	Returns a Texture_t* with the given identifier or creates it from file path.
 	///----------------------------------------------------------------------------------------------------
-	Texture* GetOrCreate(const char* aIdentifier, const char* aFilename);
+	Texture_t* GetOrCreate(const char* aIdentifier, const char* aFilename);
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetOrCreate:
-	/// 	Returns a Texture* with the given identifier or creates it from embedded resource.
+	/// 	Returns a Texture_t* with the given identifier or creates it from embedded resource.
 	///----------------------------------------------------------------------------------------------------
-	Texture* GetOrCreate(const char* aIdentifier, unsigned aResourceID, HMODULE aModule);
+	Texture_t* GetOrCreate(const char* aIdentifier, unsigned aResourceID, HMODULE aModule);
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetOrCreate:
-	/// 	Returns a Texture* with the given identifier or creates it from remote URL.
+	/// 	Returns a Texture_t* with the given identifier or creates it from remote URL.
 	///----------------------------------------------------------------------------------------------------
-	Texture* GetOrCreate(const char* aIdentifier, const char* aRemote, const char* aEndpoint);
+	Texture_t* GetOrCreate(const char* aIdentifier, const char* aRemote, const char* aEndpoint);
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetOrCreate:
-	/// 	Returns a Texture* with the given identifier or creates it from memory.
+	/// 	Returns a Texture_t* with the given identifier or creates it from memory.
 	///----------------------------------------------------------------------------------------------------
-	Texture* GetOrCreate(const char* aIdentifier, void* aData, size_t aSize);
+	Texture_t* GetOrCreate(const char* aIdentifier, void* aData, size_t aSize);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Load:
@@ -102,13 +102,13 @@ class CTextureLoader
 	/// GetRegistry:
 	/// 	Returns a copy of the registry.
 	///----------------------------------------------------------------------------------------------------
-	std::map<std::string, Texture*> GetRegistry() const;
+	std::map<std::string, Texture_t*> GetRegistry() const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetQueuedTextures:
 	/// 	Returns a copy of all currently queued textures.
 	///----------------------------------------------------------------------------------------------------
-	std::map<std::string, QueuedTexture> GetQueuedTextures() const;
+	std::map<std::string, QueuedTexture_t> GetQueuedTextures() const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Verify:
@@ -120,8 +120,8 @@ class CTextureLoader
 	CLogApi*                             Logger = nullptr;
 
 	mutable std::mutex                   Mutex;
-	std::map<std::string, Texture*>      Registry;
-	std::map<std::string, QueuedTexture> QueuedTextures;
+	std::map<std::string, Texture_t*>      Registry;
+	std::map<std::string, QueuedTexture_t> QueuedTextures;
 
 	///----------------------------------------------------------------------------------------------------
 	/// ProcessRequest:
@@ -172,13 +172,13 @@ class CTextureLoader
 	/// CreateTexture:
 	/// 	Creates a texture and adds it to the registry.
 	///----------------------------------------------------------------------------------------------------
-	void CreateTexture(const std::string& aIdentifier, QueuedTexture& aQueuedTexture);
+	void CreateTexture(const std::string& aIdentifier, QueuedTexture_t& aQueuedTexture);
 
 	///----------------------------------------------------------------------------------------------------
 	/// DispatchTexture:
 	/// 	Dispatches a texture.
 	///----------------------------------------------------------------------------------------------------
-	void DispatchTexture(const std::string& aIdentifier, Texture* aTexture, TEXTURES_RECEIVECALLBACK aCallback);
+	void DispatchTexture(const std::string& aIdentifier, Texture_t* aTexture, TEXTURES_RECEIVECALLBACK aCallback);
 };
 
 #endif

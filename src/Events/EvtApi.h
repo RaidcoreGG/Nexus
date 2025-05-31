@@ -60,11 +60,11 @@ class CEventApi
 	/// GetRegistry:
 	/// 	Returns a copy of the registry.
 	///----------------------------------------------------------------------------------------------------
-	std::unordered_map<std::string, EventData> GetRegistry() const;
+	std::unordered_map<std::string, EventData_t> GetRegistry() const;
 
 	private:
 	mutable std::recursive_mutex               Mutex;
-	std::unordered_map<std::string, EventData> Registry;
+	std::unordered_map<std::string, EventData_t> Registry;
 };
 
 #endif

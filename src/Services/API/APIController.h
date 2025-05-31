@@ -14,7 +14,7 @@ namespace API
 	extern const char*					BaseURL;
 
 	extern std::mutex					Mutex;
-	extern std::vector<ActiveToken>		Keys;
+	extern std::vector<ActiveToken_t>		Keys;
 
 	extern std::thread					RequestThread;
 	extern std::vector<std::string>		QueuedRequests;
@@ -32,7 +32,7 @@ namespace API
 	/* Remove an API key & save. */
 	void RemoveKey(std::string aApiKey);
 
-	std::string RequestAuthByToken(std::string aEndpoint, std::string aParameters, ActiveToken aApiKey);
+	std::string RequestAuthByToken(std::string aEndpoint, std::string aParameters, ActiveToken_t aApiKey);
 	std::string RequestAuthByAccount(std::string aEndpoint, std::string aParameters, std::string aAccountName);
 	std::string RequestAuthByCharacter(std::string aEndpoint, std::string aParameters, std::string aCharacterName);
 

@@ -84,7 +84,7 @@ void ISubWindow::RenderSubWindows()
 	/* nop */
 }
 
-const Texture* ISubWindow::GetIcon()
+const Texture_t* ISubWindow::GetIcon()
 {
 	if (!this->Tex_Icon && !this->IconIdentifier.empty() && this->IconID)
 	{

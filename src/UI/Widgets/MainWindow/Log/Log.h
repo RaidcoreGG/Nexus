@@ -40,32 +40,32 @@ class CLogWindow : public virtual ISubWindow, public virtual ILogger
 		LineBreak
 	};
 
-	struct MessagePart
+	struct MessagePart_t
 	{
 		EMessagePartType Type;
 		std::string      Text;
 		ImVec4           Color;
 	};
 
-	struct DisplayLogEntry
+	struct DisplayLogEntry_t
 	{
-		const LogMsg_t*          Entry = nullptr;
-		std::vector<MessagePart> Parts;
+		const LogMsg_t*            Entry = nullptr;
+		std::vector<MessagePart_t> Parts;
 	};
 
-	struct LogChannel
+	struct LogChannel_t
 	{
 		bool        IsSelected;
 		std::string Name;
 	};
 
-	int                           MaxShownCount     = 400;
-	ELogLevel                     FilterLevel       = ELogLevel::ALL;
-	bool                          SelectedLevelOnly = false;
+	int                             MaxShownCount     = 400;
+	ELogLevel                       FilterLevel       = ELogLevel::ALL;
+	bool                            SelectedLevelOnly = false;
 
-	std::mutex                    Mutex;
-	std::vector<DisplayLogEntry*> LogEntries;
-	std::vector<LogChannel>       Channels;
+	std::mutex                      Mutex;
+	std::vector<DisplayLogEntry_t*> LogEntries;
+	std::vector<LogChannel_t>       Channels;
 };
 
 #endif

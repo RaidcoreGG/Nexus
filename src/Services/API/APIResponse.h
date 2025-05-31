@@ -4,7 +4,7 @@
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
-struct APIResponse
+struct APIResponse_t
 {
 	int Status;
 	json Content;

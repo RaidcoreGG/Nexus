@@ -15,14 +15,14 @@
 
 ///----------------------------------------------------------------------------------------------------
 /// IBFromString:
-/// 	Helper function to create a InputBind from a string.
+/// 	Helper function to create a InputBind_t from a string.
 ///----------------------------------------------------------------------------------------------------
-InputBind IBFromString(std::string aInputBind);
+InputBind_t IBFromString(std::string aInputBind);
 
 ///----------------------------------------------------------------------------------------------------
 /// IBToString:
-/// 	Helper function to get the display string of a InputBind.
+/// 	Helper function to get the display string of a InputBind_t.
 ///----------------------------------------------------------------------------------------------------
-std::string IBToString(const InputBind& aKebyind, bool aPadded = false);
+std::string IBToString(const InputBind_t& aKebyind, bool aPadded = false);
 
 #endif

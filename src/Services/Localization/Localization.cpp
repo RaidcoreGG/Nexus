@@ -43,7 +43,7 @@ bool CLocalization::Advance()
 
 	while (this->Queued.size() > 0)
 	{
-		QueuedTranslation& item = this->Queued.front();
+		QueuedTranslation_t& item = this->Queued.front();
 		
 		auto atlasIt = this->LocaleAtlas.find(item.LanguageIdentifier);
 
@@ -243,7 +243,7 @@ void CLocalization::BuildLocaleAtlas()
 
 			auto atlasIt = this->LocaleAtlas.find(locId);
 
-			Locale loc{};
+			Locale_t loc{};
 			if (atlasIt != this->LocaleAtlas.end())
 			{
 				loc = atlasIt->second;

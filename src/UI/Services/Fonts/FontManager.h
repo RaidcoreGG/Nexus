@@ -22,9 +22,9 @@
 constexpr const char* CH_FONTMANAGER = "CFontManager";
 
 ///----------------------------------------------------------------------------------------------------
-/// ManagedFont Struct
+/// ManagedFont_t Struct
 ///----------------------------------------------------------------------------------------------------
-struct ManagedFont
+struct ManagedFont_t
 {
 	std::string							Identifier;
 	ImFont*								Pointer;
@@ -66,7 +66,7 @@ class CFontManager
 	/// Get:
 	/// 	Returns a font if it exists or nullptr.
 	///----------------------------------------------------------------------------------------------------
-	ManagedFont* Get(const char* aIdentifier);
+	ManagedFont_t* Get(const char* aIdentifier);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Release:
@@ -132,7 +132,7 @@ class CFontManager
 	CLocalization* Language;
 
 	mutable std::mutex			Mutex;
-	std::vector<ManagedFont>	Registry;
+	std::vector<ManagedFont_t>	Registry;
 	bool						IsFontAtlasBuilt = false;
 
 	///----------------------------------------------------------------------------------------------------
@@ -150,9 +150,9 @@ class CFontManager
 
 	///----------------------------------------------------------------------------------------------------
 	/// CreateManagedFont:
-	/// 	Creates a new ManagedFont for the Registry.
+	/// 	Creates a new ManagedFont_t for the Registry.
 	///----------------------------------------------------------------------------------------------------
-	ManagedFont CreateManagedFont(std::string aIdentifier, float aFontSize, void* aData, size_t aSize, ImFontConfig* aConfig);
+	ManagedFont_t CreateManagedFont(std::string aIdentifier, float aFontSize, void* aData, size_t aSize, ImFontConfig* aConfig);
 };
 
 #endif

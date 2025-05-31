@@ -31,7 +31,7 @@ class CContext
 	CContext(CContext const&)       = delete;
 	void operator=(CContext const&) = delete;
 
-	AddonVersion const& GetVersion();
+	AddonVersion_t const& GetVersion();
 
 	const char* GetBuild();
 
