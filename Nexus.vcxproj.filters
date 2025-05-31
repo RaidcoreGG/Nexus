@@ -210,19 +210,16 @@
     <ClCompile Include="src\thirdparty\minhook\mh_trampoline.cpp">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClCompile>
-    <ClCompile Include="src\Services\Logging\CFileLogger.cpp">
+    <ClCompile Include="src\Services\Logging\LogWriter.cpp">
       <Filter>Services\Logging</Filter>
     </ClCompile>
-    <ClCompile Include="src\Services\Logging\ILogger.cpp">
+    <ClCompile Include="src\Services\Logging\LogBase.cpp">
       <Filter>Services\Logging</Filter>
     </ClCompile>
-    <ClCompile Include="src\Services\Logging\LogEntry.cpp">
+    <ClCompile Include="src\Services\Logging\LogApi.cpp">
       <Filter>Services\Logging</Filter>
     </ClCompile>
-    <ClCompile Include="src\Services\Logging\LogHandler.cpp">
-      <Filter>Services\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Services\Logging\CConsoleLogger.cpp">
+    <ClCompile Include="src\Services\Logging\LogConsole.cpp">
       <Filter>Services\Logging</Filter>
     </ClCompile>
     <ClCompile Include="src\Services\Mumble\Reader.cpp">
@@ -429,6 +426,9 @@
     <ClCompile Include="src\UI\Widgets\QuickAccess\QaConst.cpp">
       <Filter>UI\Widgets\QuickAccess</Filter>
     </ClCompile>
+    <ClCompile Include="src\Services\Logging\LogConst.cpp">
+      <Filter>Services\Logging</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h">
@@ -467,22 +467,19 @@
     <ClInclude Include="src\thirdparty\minhook\mh_buffer.h">
       <Filter>_EXTERNAL\minhook</Filter>
     </ClInclude>
-    <ClInclude Include="src\Services\Logging\CFileLogger.h">
+    <ClInclude Include="src\Services\Logging\LogWriter.h">
       <Filter>Services\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="src\Services\Logging\ILogger.h">
+    <ClInclude Include="src\Services\Logging\LogBase.h">
       <Filter>Services\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="src\Services\Logging\LogEntry.h">
+    <ClInclude Include="src\Services\Logging\LogMsg.h">
       <Filter>Services\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="src\Services\Logging\LogHandler.h">
+    <ClInclude Include="src\Services\Logging\LogApi.h">
       <Filter>Services\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="src\Services\Logging\ELogLevel.h">
-      <Filter>Services\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Services\Logging\CConsoleLogger.h">
+    <ClInclude Include="src\Services\Logging\LogConsole.h">
       <Filter>Services\Logging</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\Mumble\Reader.h">
@@ -530,7 +527,7 @@
     <ClInclude Include="src\Inputs\InputBinds\IbFuncDefs.h">
       <Filter>Inputs\InputBinds</Filter>
     </ClInclude>
-    <ClInclude Include="src\Services\Logging\FuncDefs.h">
+    <ClInclude Include="src\Services\Logging\LogFuncDefs.h">
       <Filter>Services\Logging</Filter>
     </ClInclude>
     <ClInclude Include="src\Services\Textures\TxFuncDefs.h">
@@ -1273,6 +1270,15 @@
     </ClInclude>
     <ClInclude Include="src\UI\Widgets\QuickAccess\QaConst.h">
       <Filter>UI\Widgets\QuickAccess</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\Controls\Control.h">
+      <Filter>UI\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Services\Logging\LogEnum.h">
+      <Filter>Services\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Services\Logging\LogConst.h">
+      <Filter>Services\Logging</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

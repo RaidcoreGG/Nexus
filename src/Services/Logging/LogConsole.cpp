@@ -1,23 +1,25 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  CConsoleLogger.cpp
-/// Description  :  Custom logger to print to a console window.
+/// Name         :  LogConsole.cpp
+/// Description  :  Logger implementation to print to a console window.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "CConsoleLogger.h"
+#include "LogConsole.h"
 
 #include <Windows.h>
 #include <iostream>
 #include <iomanip>
+
+#include "LogConst.h"
 
 HANDLE hConsole;
 FILE* iobuf;
 
 CConsoleLogger::CConsoleLogger(ELogLevel aLogLevel)
 {
-	LogLevel = aLogLevel;
+	this->SetLogLevel(aLogLevel);
 	AllocConsole();
 	freopen_s(&iobuf, "CONIN$", "r", stdin);
 	freopen_s(&iobuf, "CONOUT$", "w", stderr);
@@ -31,13 +33,11 @@ CConsoleLogger::~CConsoleLogger()
 	FreeConsole();
 }
 
-void CConsoleLogger::LogMessage(LogEntry* aLogEntry)
+void CConsoleLogger::MsgProc(const LogMsg_t* aLogEntry)
 {
-	const std::lock_guard<std::mutex> lock(Mutex);
-
 	if (aLogEntry->RepeatCount == 1)
 	{
-		switch (aLogEntry->LogLevel)
+		switch (aLogEntry->Level)
 		{
 			case ELogLevel::CRITICAL:    SetConsoleTextAttribute(hConsole, 12); break;
 			case ELogLevel::WARNING:     SetConsoleTextAttribute(hConsole, 14); break;
@@ -46,6 +46,6 @@ void CConsoleLogger::LogMessage(LogEntry* aLogEntry)
 			default:                     SetConsoleTextAttribute(hConsole, 7); break;
 		}
 
-		std::cout << aLogEntry->ToString(true, true, true);
+		std::cout << ToString(aLogEntry);
 	}
 }

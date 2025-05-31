@@ -96,7 +96,7 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 	uictx->Invalidate();
 }
 
-CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, CEventApi* aEventApi, CLocalization* aLocalization)
+CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogApi* aLogger, CEventApi* aEventApi, CLocalization* aLocalization)
 {
 	assert(aRawInputApi);
 	assert(aLogger);

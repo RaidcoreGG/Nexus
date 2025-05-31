@@ -1,41 +1,43 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  LogEntry.h
-/// Description  :  Contains the LogEntry data struct definition.
+/// Name         :  LogWriter.h
+/// Description  :  Logger implementation to write to a file.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LOGENTRY_H
-#define LOGENTRY_H
+#ifndef FILELOGGER_H
+#define FILELOGGER_H
 
-#include <string>
+#include <fstream>
+#include <filesystem>
 
-#include "ELogLevel.h"
+#include "LogBase.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// LogEntry data struct
+/// CFileLogger Class
 ///----------------------------------------------------------------------------------------------------
-struct LogEntry
+class CFileLogger : public virtual ILogger
 {
-	ELogLevel LogLevel;
-	unsigned long long Timestamp;
-	int TimestampMilliseconds;
-	std::string Channel;
-	std::string Message;
-	int RepeatCount = 1;
+	public:
+	///----------------------------------------------------------------------------------------------------
+	/// ctor
+	///----------------------------------------------------------------------------------------------------
+	CFileLogger(ELogLevel aLogLevel, std::filesystem::path aPath);
 
 	///----------------------------------------------------------------------------------------------------
-	/// TimestampString:
-	/// 	Converts the timestamp of the log message to a string.
+	/// dtor
 	///----------------------------------------------------------------------------------------------------
-	std::string TimestampString(bool aIncludeDate = true, bool aIncludeMs = false);
+	~CFileLogger();
 
 	///----------------------------------------------------------------------------------------------------
-	/// ToString:
-	/// 	Converts the log message to a printable string.
+	/// MsgProc:
+	/// 	Message processing function.
 	///----------------------------------------------------------------------------------------------------
-	std::string ToString(bool aIncludeChannel = true, bool aIncludeDate = true, bool aIncludeMs = false);
+	void MsgProc(const LogMsg_t* aLogEntry) override;
+
+	private:
+	std::ofstream File;
 };
 
 #endif

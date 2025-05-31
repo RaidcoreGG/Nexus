@@ -13,7 +13,7 @@
 #include "Loader/AddonVersion.h"
 #include "Services/DataLink/DlApi.h"
 #include "Services/Localization/Localization.h"
-#include "Services/Logging/LogHandler.h"
+#include "Services/Logging/LogApi.h"
 #include "Services/Mumble/Reader.h"
 #include "Services/Settings/Settings.h"
 #include "Services/Textures/TxLoader.h"
@@ -41,7 +41,7 @@ class CContext
 
 	DWORD GetModuleSize();
 
-	CLogHandler* GetLogger();
+	CLogApi* GetLogger();
 
 	CLocalization* GetLocalization();
 

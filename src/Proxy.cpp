@@ -47,7 +47,7 @@ namespace Proxy
 	bool DxLoad()
 	{
 		CContext* ctx = CContext::GetContext();
-		CLogHandler* logger = ctx->GetLogger();
+		CLogApi* logger = ctx->GetLogger();
 
 		if (State::Directx < EDxState::LOAD)
 		{
@@ -183,7 +183,7 @@ namespace Proxy
 		}
 
 		CContext* ctx = CContext::GetContext();
-		CLogHandler* logger = ctx->GetLogger();
+		CLogApi* logger = ctx->GetLogger();
 
 		/* Check if this is a rebound. */
 		if (State::Directx >= EDxState::LOADED && *aFunction)

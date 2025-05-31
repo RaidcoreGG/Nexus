@@ -11,19 +11,25 @@
 
 #include <vector>
 #include <string>
+#include <mutex>
 
 #include "imgui/imgui.h"
 
-#include "Services/Logging/ILogger.h"
-#include "Services/Logging/LogEntry.h"
+#include "Services/Logging/LogBase.h"
+#include "Services/Logging/LogMsg.h"
 #include "UI/Controls/CtlSubWindow.h"
 
-class CLogWindow : public ISubWindow, public virtual ILogger
+class CLogWindow : public virtual ISubWindow, public virtual ILogger
 {
 	public:
 	CLogWindow();
 	void RenderContent() override;
-	void LogMessage(LogEntry* aLogEntry) override;
+
+	///----------------------------------------------------------------------------------------------------
+	/// MsgProc:
+	/// 	Message processing function.
+	///----------------------------------------------------------------------------------------------------
+	void MsgProc(const LogMsg_t* aLogEntry) override;
 
 	private:
 	enum class EMessagePartType {
@@ -43,7 +49,7 @@ class CLogWindow : public ISubWindow, public virtual ILogger
 
 	struct DisplayLogEntry
 	{
-		LogEntry*                Entry = nullptr;
+		const LogMsg_t*          Entry = nullptr;
 		std::vector<MessagePart> Parts;
 	};
 
@@ -57,6 +63,7 @@ class CLogWindow : public ISubWindow, public virtual ILogger
 	ELogLevel                     FilterLevel       = ELogLevel::ALL;
 	bool                          SelectedLevelOnly = false;
 
+	std::mutex                    Mutex;
 	std::vector<DisplayLogEntry*> LogEntries;
 	std::vector<LogChannel>       Channels;
 };

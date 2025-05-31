@@ -16,7 +16,7 @@
 #include "Loader/AddonDefinition.h"
 #include "Loader/LibraryAddon.h"
 #include "Loader/Loader.h"
-#include "Services/Logging/LogHandler.h"
+#include "Services/Logging/LogApi.h"
 
 constexpr const char* CH_UPDATER = "Updater";
 
@@ -43,7 +43,7 @@ class CUpdater
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CUpdater(CLogHandler* aLogger);
+	CUpdater(CLogApi* aLogger);
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
@@ -80,7 +80,7 @@ class CUpdater
 	const std::string& GetChangelog();
 
 	private:
-	CLogHandler* Logger = nullptr;
+	CLogApi* Logger = nullptr;
 
 	bool UpdateAvailable = false;
 	std::string Changelog;

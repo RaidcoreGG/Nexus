@@ -15,7 +15,7 @@ using json = nlohmann::json;
 
 #include "Consts.h"
 
-CLocalization::CLocalization(CLogHandler* aLogger, CEventApi* aEventApi)
+CLocalization::CLocalization(CLogApi* aLogger, CEventApi* aEventApi)
 {
 	assert(aLogger);
 	assert(aEventApi);

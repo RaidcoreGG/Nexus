@@ -20,7 +20,7 @@
 #include "Renderer.h"
 #include "Util/Time.h"
 
-CTextureLoader::CTextureLoader(CLogHandler* aLogger)
+CTextureLoader::CTextureLoader(CLogApi* aLogger)
 {
 	assert(aLogger);
 

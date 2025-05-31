@@ -10,7 +10,7 @@
 
 #include <assert.h>
 
-CDataLinkApi::CDataLinkApi(CLogHandler* aLogger)
+CDataLinkApi::CDataLinkApi(CLogApi* aLogger)
 {
 	assert(aLogger);
 

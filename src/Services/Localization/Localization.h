@@ -14,7 +14,7 @@
 #include <map>
 #include <string>
 
-#include "Services/Logging/LogHandler.h"
+#include "Services/Logging/LogApi.h"
 #include "Events/EvtApi.h"
 
 constexpr const char* CH_LOCALIZATION = "Localization";
@@ -47,7 +47,7 @@ class CLocalization
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CLocalization(CLogHandler* aLogger, CEventApi* aEventApi);
+	CLocalization(CLogApi* aLogger, CEventApi* aEventApi);
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
@@ -115,8 +115,8 @@ class CLocalization
 	std::vector<const char*> GetAllTexts();
 
 	private:
-	CLogHandler*                   Logger      = nullptr;
-	CEventApi*                     EventApi    = nullptr;
+	CLogApi*                       Logger   = nullptr;
+	CEventApi*                     EventApi = nullptr;
 
 	std::mutex                     Mutex;
 	std::filesystem::path          Directory;

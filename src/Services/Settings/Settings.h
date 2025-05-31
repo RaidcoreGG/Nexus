@@ -15,7 +15,7 @@
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
-#include "Services/Logging/LogHandler.h"
+#include "Services/Logging/LogApi.h"
 
 constexpr const char* CH_SETTINGS = "Settings";
 
@@ -25,7 +25,7 @@ constexpr const char* CH_SETTINGS = "Settings";
 class CSettings
 {
 	public:
-	CSettings(std::filesystem::path aPath, CLogHandler* aLogger);
+	CSettings(std::filesystem::path aPath, CLogApi* aLogger);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Load:
@@ -73,7 +73,7 @@ class CSettings
 	}
 
 	private:
-	CLogHandler*          Logger = nullptr;
+	CLogApi*              Logger = nullptr;
 
 	std::filesystem::path Path;
 

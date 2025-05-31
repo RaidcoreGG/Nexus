@@ -14,7 +14,7 @@
 #include <unordered_map>
 
 #include "DlLinkedResource.h"
-#include "Services/Logging/LogHandler.h"
+#include "Services/Logging/LogApi.h"
 
 constexpr const char* CH_DATALINK = "DataLink";
 
@@ -27,7 +27,7 @@ class CDataLinkApi
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CDataLinkApi(CLogHandler* aLogger);
+	CDataLinkApi(CLogApi* aLogger);
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ class CDataLinkApi
 	std::unordered_map<std::string, LinkedResource> GetRegistry();
 
 	private:
-	CLogHandler*                                    Logger = nullptr;
+	CLogApi*                                        Logger = nullptr;
 
 	std::mutex                                      Mutex;
 	std::unordered_map<std::string, LinkedResource> Registry;

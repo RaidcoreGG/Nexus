@@ -1,15 +1,15 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  CConsoleLogger.h
-/// Description  :  Custom logger to print to a console window.
+/// Name         :  LogConsole.h
+/// Description  :  Logger implementation to print to a console window.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
 #ifndef CONSOLELOGGER_H
 #define CONSOLELOGGER_H
 
-#include "ILogger.h"
+#include "LogBase.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// CConsoleLogger Class
@@ -28,10 +28,10 @@ class CConsoleLogger : public virtual ILogger
 		~CConsoleLogger();
 
 		///----------------------------------------------------------------------------------------------------
-		/// LogMessage:
-		/// 	Overriden function to write to a console window.
+		/// MsgProc:
+		/// 	Message processing function.
 		///----------------------------------------------------------------------------------------------------
-		void LogMessage(LogEntry* aLogEntry);
+		void MsgProc(const LogMsg_t* aLogEntry) override;
 };
 
 #endif

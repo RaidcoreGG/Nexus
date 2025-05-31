@@ -19,7 +19,7 @@
 #include "Renderer.h"
 #include "Services/DataLink/DlApi.h"
 #include "Services/Localization/Localization.h"
-#include "Services/Logging/LogHandler.h"
+#include "Services/Logging/LogApi.h"
 #include "Services/Textures/TxLoader.h"
 #include "Services/Updater/Updater.h"
 #include "UI/Services/Fonts/FontManager.h"
@@ -38,7 +38,7 @@ namespace ADDONAPI
 	static CInputBindApi*  s_InputBindApi  = nullptr;
 	static CRawInputApi*   s_RawInputApi   = nullptr;
 	static CLocalization*  s_Localization  = nullptr;
-	static CLogHandler*    s_Logger        = nullptr;
+	static CLogApi*        s_Logger        = nullptr;
 	static CTextureLoader* s_TextureApi    = nullptr;
 	static CUpdater*       s_Updater       = nullptr;
 
@@ -253,13 +253,13 @@ namespace ADDONAPI
 		void LogMessage(ELogLevel aLogLevel, const char* aStr)
 		{
 			assert(s_Logger);
-			s_Logger->LogMessageUnformatted(aLogLevel, "Addon", aStr);
+			s_Logger->LogUnformatted(aLogLevel, "Addon", aStr);
 		}
 
 		void LogMessage2(ELogLevel aLogLevel, const char* aChannel, const char* aStr)
 		{
 			assert(s_Logger);
-			s_Logger->LogMessageUnformatted(aLogLevel, aChannel, aStr);
+			s_Logger->LogUnformatted(aLogLevel, aChannel, aStr);
 		}
 	}
 

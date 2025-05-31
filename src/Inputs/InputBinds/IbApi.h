@@ -19,7 +19,7 @@
 #include "IbBindV2.h"
 #include "IbMapping.h"
 #include "IbCapture.h"
-#include "Services/Logging/LogHandler.h"
+#include "Services/Logging/LogApi.h"
 
 constexpr const char* CH_INPUTBINDS = "InputBinds";
 
@@ -32,7 +32,7 @@ class CInputBindApi : public CInputBindCapture
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CInputBindApi(CEventApi* aEventApi, CLogHandler* aLogger);
+	CInputBindApi(CEventApi* aEventApi, CLogApi* aLogger);
 
 	///----------------------------------------------------------------------------------------------------
 	/// WndProc:
@@ -117,7 +117,7 @@ class CInputBindApi : public CInputBindCapture
 
 	private:
 	CEventApi*                       EventApi = nullptr;
-	CLogHandler*                     Logger   = nullptr;
+	CLogApi*                         Logger   = nullptr;
 
 	mutable std::mutex               Mutex;
 	std::map<std::string, IbMapping> Registry;

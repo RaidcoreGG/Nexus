@@ -11,7 +11,7 @@
 #include <filesystem>
 #include <fstream>
 
-CSettings::CSettings(std::filesystem::path aPath, CLogHandler* aLogger)
+CSettings::CSettings(std::filesystem::path aPath, CLogApi* aLogger)
 {
 	assert(aLogger);
 

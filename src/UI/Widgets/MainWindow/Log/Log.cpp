@@ -14,14 +14,16 @@
 
 #include "Context.h"
 #include "resource.h"
+#include "Services/Logging/LogConst.h"
 
 CLogWindow::CLogWindow()
 {
+	this->SetLogLevel(ELogLevel::ALL);
+
 	this->Name           = "Log";
 	this->DisplayName    = "((000006))";
 	this->IconIdentifier = "ICON_LOG";
 	this->IconID         = RES_ICON_LOG;
-	this->LogLevel       = ELogLevel::ALL;
 }
 
 void CLogWindow::RenderContent()
@@ -165,14 +167,14 @@ void CLogWindow::RenderContent()
 				{
 					if (this->SelectedLevelOnly)
 					{
-						if (msg->Entry->LogLevel != this->FilterLevel)
+						if (msg->Entry->Level != this->FilterLevel)
 						{
 							continue;
 						}
 					}
 					else
 					{
-						if (msg->Entry->LogLevel > this->FilterLevel)
+						if (msg->Entry->Level > this->FilterLevel)
 						{
 							continue;
 						}
@@ -210,7 +212,7 @@ void CLogWindow::RenderContent()
 
 					const char* level;
 					ImColor levelColor;
-					switch (msg->Entry->LogLevel)
+					switch (msg->Entry->Level)
 					{
 						case ELogLevel::CRITICAL:   level = "[CRITICAL]";   levelColor = IM_COL32(255, 0, 0, 255);     break;
 						case ELogLevel::WARNING:    level = "[WARNING]";    levelColor = IM_COL32(255, 255, 0, 255);   break;
@@ -226,7 +228,7 @@ void CLogWindow::RenderContent()
 
 					/* time */
 					ImGui::TableSetColumnIndex(0);
-					ImGui::TextColored(levelColor, msg->Entry->TimestampString(false, true).c_str());
+					ImGui::TextColored(levelColor, TimestampStr(msg->Entry, false, true).c_str());
 
 					/* channel */
 					ImGui::TableSetColumnIndex(1);
@@ -318,7 +320,7 @@ void CLogWindow::RenderContent()
 	}
 }
 
-void CLogWindow::LogMessage(LogEntry* aLogEntry)
+void CLogWindow::MsgProc(const LogMsg_t* aLogEntry)
 {
 	const std::lock_guard<std::mutex> lock(Mutex);
 
@@ -332,7 +334,6 @@ void CLogWindow::LogMessage(LogEntry* aLogEntry)
 	if (aLogEntry->RepeatCount > 1)
 	{
 		displayMsg = this->LogEntries[this->LogEntries.size() - 1];
-		displayMsg->Entry->RepeatCount = aLogEntry->RepeatCount;
 		displayMsg->Parts.clear();
 	}
 	else

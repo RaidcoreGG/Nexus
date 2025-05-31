@@ -15,7 +15,7 @@
 #include "Events/EvtApi.h"
 #include "Loader/NexusLinkData.h"
 #include "Services/DataLink/DlApi.h"
-#include "Services/Logging/LogHandler.h"
+#include "Services/Logging/LogApi.h"
 #include "Services/Mumble/Definitions/Mumble.h"
 
 constexpr const char* CH_MUMBLE_READER = "MumbleReader";
@@ -50,7 +50,7 @@ class CMumbleReader
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CMumbleReader(CDataLinkApi* aDataLink, CEventApi* aEventApi, CLogHandler* aLogger);
+	CMumbleReader(CDataLinkApi* aDataLink, CEventApi* aEventApi, CLogApi* aLogger);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -72,7 +72,7 @@ class CMumbleReader
 	private:
 	CDataLinkApi*     DataLinkApi            = nullptr;
 	CEventApi*        EventApi               = nullptr;
-	CLogHandler*      Logger                 = nullptr;
+	CLogApi*          Logger                 = nullptr;
 
 	std::thread       Thread;
 	bool              IsRunning              = false;

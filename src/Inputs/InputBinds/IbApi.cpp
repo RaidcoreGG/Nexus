@@ -23,7 +23,7 @@ using json = nlohmann::json;
 #include "Util/Inputs.h"
 #include "IbConst.h"
 
-CInputBindApi::CInputBindApi(CEventApi* aEventApi, CLogHandler* aLogger)
+CInputBindApi::CInputBindApi(CEventApi* aEventApi, CLogApi* aLogger)
 {
 	assert(aEventApi);
 	assert(aLogger);

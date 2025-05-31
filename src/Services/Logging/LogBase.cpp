@@ -1,19 +1,19 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  ILogger.cpp
-/// Description  :  Interface for custom loggers.
+/// Name         :  LogBase.cpp
+/// Description  :  Interface for logger implementations.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "ILogger.h"
+#include "LogBase.h"
 
 ELogLevel ILogger::GetLogLevel()
 {
-	return LogLevel;
+	return this->Level;
 }
 
 void ILogger::SetLogLevel(ELogLevel aLogLevel)
 {
-	LogLevel = aLogLevel;
+	this->Level = aLogLevel;
 }

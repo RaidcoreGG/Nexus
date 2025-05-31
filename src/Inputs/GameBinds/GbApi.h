@@ -18,7 +18,7 @@
 #include "Events/EvtApi.h"
 #include "Inputs/InputBinds/IbBindV2.h"
 #include "Inputs/RawInput/RiApi.h"
-#include "Services/Logging/LogHandler.h"
+#include "Services/Logging/LogApi.h"
 #include "Services/Localization/Localization.h"
 
 constexpr const char* CH_GAMEBINDS = "GameBinds";
@@ -50,7 +50,7 @@ class CGameBindsApi
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, CEventApi* aEventApi, CLocalization* aLocalization);
+	CGameBindsApi(CRawInputApi* aRawInputApi, CLogApi* aLogger, CEventApi* aEventApi, CLocalization* aLocalization);
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
@@ -125,7 +125,7 @@ class CGameBindsApi
 
 	private:
 	CRawInputApi*                                  RawInputApi = nullptr;
-	CLogHandler*                                   Logger      = nullptr;
+	CLogApi*                                       Logger      = nullptr;
 	CEventApi*                                     EventApi    = nullptr;
 	CLocalization*                                 Language    = nullptr;
 

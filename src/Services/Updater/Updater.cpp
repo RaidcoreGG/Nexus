@@ -19,7 +19,7 @@
 #include "Util/Strings.h"
 #include "Util/URL.h"
 
-CUpdater::CUpdater(CLogHandler* aLogger)
+CUpdater::CUpdater(CLogApi* aLogger)
 {
 	assert(aLogger);
 

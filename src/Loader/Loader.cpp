@@ -36,7 +36,7 @@
 #include "minhook/mh_hook.h"
 #include "Services/DataLink/DlApi.h"
 #include "Services/Localization/Localization.h"
-#include "Services/Logging/LogHandler.h"
+#include "Services/Logging/LogApi.h"
 #include "Services/Mumble/Reader.h"
 #include "Services/Settings/Settings.h"
 #include "Services/Textures/TxLoader.h"
@@ -91,7 +91,7 @@ namespace Loader
 	bool                    DisableVolatileUntilUpdate = false;
 
 	CDataLinkApi*  DataLink = nullptr;
-	CLogHandler*   Logger   = nullptr;
+	CLogApi*       Logger   = nullptr;
 	CEventApi*     EventApi = nullptr;
 	CUpdater*      Updater  = nullptr;
 	CAlerts*       Alerts   = nullptr;

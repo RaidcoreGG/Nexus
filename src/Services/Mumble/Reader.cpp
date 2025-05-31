@@ -85,7 +85,7 @@ namespace Mumble
 	}
 }
 
-CMumbleReader::CMumbleReader(CDataLinkApi* aDataLink, CEventApi* aEventApi, CLogHandler* aLogger)
+CMumbleReader::CMumbleReader(CDataLinkApi* aDataLink, CEventApi* aEventApi, CLogApi* aLogger)
 {
 	assert(aDataLink);
 	assert(aEventApi);

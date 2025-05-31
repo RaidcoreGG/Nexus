@@ -6,7 +6,7 @@
 #include <string>
 
 #include "Loader/AddonVersion.h"
-#include "Services/Logging/LogHandler.h"
+#include "Services/Logging/LogApi.h"
 #include "Services/API/ApiClient.h"
 #include "Services/Localization/Localization.h"
 #include "Services/Updater/Updater.h"

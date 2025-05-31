@@ -30,6 +30,7 @@
     <ClCompile Include="src\Services\Localization\Localization.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Events\EvtApi.cpp" />
+    <ClCompile Include="src\Services\Logging\LogConst.cpp" />
     <ClCompile Include="src\thirdparty\ImAnimate\ImAnimate.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui_draw.cpp" />
@@ -41,11 +42,10 @@
     <ClCompile Include="src\Inputs\InputBinds\IbApi.cpp" />
     <ClCompile Include="src\Loader\AddonDefinition.cpp" />
     <ClCompile Include="src\Loader\Loader.cpp" />
-    <ClCompile Include="src\Services\Logging\CFileLogger.cpp" />
-    <ClCompile Include="src\Services\Logging\ILogger.cpp" />
-    <ClCompile Include="src\Services\Logging\LogEntry.cpp" />
-    <ClCompile Include="src\Services\Logging\LogHandler.cpp" />
-    <ClCompile Include="src\Services\Logging\CConsoleLogger.cpp" />
+    <ClCompile Include="src\Services\Logging\LogWriter.cpp" />
+    <ClCompile Include="src\Services\Logging\LogBase.cpp" />
+    <ClCompile Include="src\Services\Logging\LogApi.cpp" />
+    <ClCompile Include="src\Services\Logging\LogConsole.cpp" />
     <ClCompile Include="src\thirdparty\minhook\mh_buffer.cpp" />
     <ClCompile Include="src\thirdparty\minhook\mh_disasm.cpp" />
     <ClCompile Include="src\thirdparty\minhook\mh_hook.cpp" />
@@ -129,6 +129,8 @@
     <ClInclude Include="src\Events\EvtApi.h" />
     <ClInclude Include="src\Events\EvtSubscriber.h" />
     <ClInclude Include="src\Events\EvtFuncDefs.h" />
+    <ClInclude Include="src\Services\Logging\LogConst.h" />
+    <ClInclude Include="src\Services\Logging\LogEnum.h" />
     <ClInclude Include="src\Services\Textures\TxEnum.h" />
     <ClInclude Include="src\thirdparty\httplib\httplib.h" />
     <ClInclude Include="src\thirdparty\ImAnimate\ImAnimate.h" />
@@ -157,7 +159,7 @@
     <ClInclude Include="src\Loader\NexusLinkData.h" />
     <ClInclude Include="src\Services\Localization\FuncDefs.h" />
     <ClInclude Include="src\Services\Localization\Localization.h" />
-    <ClInclude Include="src\Services\Logging\FuncDefs.h" />
+    <ClInclude Include="src\Services\Logging\LogFuncDefs.h" />
     <ClInclude Include="src\Main.h" />
     <ClInclude Include="src\Services\Multibox\Multibox.h" />
     <ClInclude Include="src\Services\Mumble\Definitions\Mumble.h" />
@@ -302,12 +304,11 @@
     <ClInclude Include="src\Loader\AddonDefinition.h" />
     <ClInclude Include="src\Loader\EUpdateProvider.h" />
     <ClInclude Include="src\Loader\API\AddonAPI.h" />
-    <ClInclude Include="src\Services\Logging\CFileLogger.h" />
-    <ClInclude Include="src\Services\Logging\ILogger.h" />
-    <ClInclude Include="src\Services\Logging\LogEntry.h" />
-    <ClInclude Include="src\Services\Logging\LogHandler.h" />
-    <ClInclude Include="src\Services\Logging\ELogLevel.h" />
-    <ClInclude Include="src\Services\Logging\CConsoleLogger.h" />
+    <ClInclude Include="src\Services\Logging\LogWriter.h" />
+    <ClInclude Include="src\Services\Logging\LogBase.h" />
+    <ClInclude Include="src\Services\Logging\LogMsg.h" />
+    <ClInclude Include="src\Services\Logging\LogApi.h" />
+    <ClInclude Include="src\Services\Logging\LogConsole.h" />
     <ClInclude Include="src\thirdparty\minhook\mh_buffer.h" />
     <ClInclude Include="src\thirdparty\minhook\mh_disasm.h" />
     <ClInclude Include="src\thirdparty\minhook\mh_hook.h" />
@@ -329,6 +330,7 @@
     <ClInclude Include="src\Services\Textures\TxLoader.h" />
     <ClInclude Include="src\Services\Updater\FuncDefs.h" />
     <ClInclude Include="src\Services\Updater\Updater.h" />
+    <ClInclude Include="src\UI\Controls\Control.h" />
     <ClInclude Include="src\UI\Controls\CtlModal.h" />
     <ClInclude Include="src\UI\Controls\CtlSubWindow.h" />
     <ClInclude Include="src\UI\Controls\CtlWindow.h" />

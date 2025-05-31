@@ -61,9 +61,9 @@ DWORD CContext::GetModuleSize()
 	return this->ModuleSize;
 }
 
-CLogHandler* CContext::GetLogger()
+CLogApi* CContext::GetLogger()
 {
-	static CLogHandler s_Logger = CLogHandler();
+	static CLogApi s_Logger = CLogApi();
 	return &s_Logger;
 }
 

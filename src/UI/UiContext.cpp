@@ -257,7 +257,7 @@ namespace UIRoot
 	}
 }
 
-CUiContext::CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CTextureLoader* aTextureService, CDataLinkApi* aDataLink, CInputBindApi* aInputBindApi, CEventApi* aEventApi)
+CUiContext::CUiContext(CLogApi* aLogger, CLocalization* aLocalization, CTextureLoader* aTextureService, CDataLinkApi* aDataLink, CInputBindApi* aInputBindApi, CEventApi* aEventApi)
 {
 	this->Logger         = aLogger;
 	this->Language       = aLocalization;
@@ -290,7 +290,7 @@ CUiContext::CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CText
 	CDebugWindow*   debugWnd   = new CDebugWindow();
 	CAboutBox*      aboutWnd   = new CAboutBox();
 
-	this->Logger->RegisterLogger(logWnd);
+	this->Logger->Register(logWnd);
 
 	this->MainWindow->AddWindow(addonsWnd);
 	this->MainWindow->AddWindow(optionsWnd);

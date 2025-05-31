@@ -20,7 +20,7 @@
 #include "Loader/NexusLinkData.h"
 #include "Services/DataLink/DlApi.h"
 #include "Services/Localization/Localization.h"
-#include "Services/Logging/LogHandler.h"
+#include "Services/Logging/LogApi.h"
 #include "Services/Mumble/Reader.h"
 #include "Services/Textures/TxLoader.h"
 #include "QaShortcut.h"
@@ -53,7 +53,7 @@ class CQuickAccess : public virtual IWindow
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CQuickAccess(CDataLinkApi* aDataLink, CLogHandler* aLogger, CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization, CEventApi* aEventApi);
+	CQuickAccess(CDataLinkApi* aDataLink, CLogApi* aLogger, CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization, CEventApi* aEventApi);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -141,7 +141,7 @@ class CQuickAccess : public virtual IWindow
 	private:
 	NexusLinkData*                     NexusLink;
 	Mumble::Data*                      MumbleLink;
-	CLogHandler*                       Logger;
+	CLogApi*                           Logger;
 	CInputBindApi*                     InputBindApi;
 	CTextureLoader*                    TextureService;
 	CLocalization*                     Language;

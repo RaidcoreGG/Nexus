@@ -1,48 +1,44 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  LogHandler.h
+/// Name         :  LogApi.h
 /// Description  :  Provides logging functions and allows for custom logging implementations.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LOGHANDLER_H
-#define LOGHANDLER_H
+#ifndef LOGAPI_H
+#define LOGAPI_H
 
 #include <mutex>
 #include <vector>
 #include <string>
 
-#include "ILogger.h"
-#include "LogEntry.h"
-#include "ELogLevel.h"
+#include "LogBase.h"
+#include "LogMsg.h"
+#include "LogEnum.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// CLogHandler Class
+/// CLogApi Class
 ///----------------------------------------------------------------------------------------------------
-class CLogHandler
+class CLogApi
 {
-public:
-	///----------------------------------------------------------------------------------------------------
-	/// ctor
-	///----------------------------------------------------------------------------------------------------
-	CLogHandler() = default;
+	public:
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
-	~CLogHandler() = default;
+	~CLogApi();
 
 	///----------------------------------------------------------------------------------------------------
-	/// RegisterLogger:
+	/// Register:
 	/// 	Registers a logger.
 	///----------------------------------------------------------------------------------------------------
-	void RegisterLogger(ILogger* aLogger);
+	void Register(ILogger* aLogger);
 
 	///----------------------------------------------------------------------------------------------------
-	/// DeregisterLogger:
+	/// Deregister:
 	/// 	Deregisters a logger.
 	///----------------------------------------------------------------------------------------------------
-	void DeregisterLogger(ILogger* aLogger);
+	void Deregister(ILogger* aLogger);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Critical:
@@ -69,36 +65,33 @@ public:
 	void Debug(const std::string& aChannel, const char* aFmt, ...);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Log:
+	/// Trace:
 	/// 	Logs a message with level Trace.
 	///----------------------------------------------------------------------------------------------------
 	void Trace(const std::string& aChannel, const char* aFmt, ...);
 
 	///----------------------------------------------------------------------------------------------------
-	/// LogMessage:
+	/// Log:
 	/// 	Logs a message to a specific channel.
 	///----------------------------------------------------------------------------------------------------
-	void LogMessage(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, ...);
+	void Log(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, ...);
 
 	///----------------------------------------------------------------------------------------------------
-	/// LogMessageV:
+	/// LogV:
 	/// 	Logs a message to a specific channel with printf-style formatting.
 	///----------------------------------------------------------------------------------------------------
-	void LogMessageV(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, va_list aArgs);
+	void LogV(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, va_list aArgs);
 
 	///----------------------------------------------------------------------------------------------------
-	/// LogMessageUnformatted:
+	/// LogUnformatted:
 	/// 	Logs an unformatted message to a specific channel.
 	///----------------------------------------------------------------------------------------------------
-	void LogMessageUnformatted(ELogLevel aLogLevel, std::string aChannel, const char* aMsg);
+	void LogUnformatted(ELogLevel aLogLevel, std::string aChannel, const char* aMsg);
 
-private:
+	private:
 	std::mutex             Mutex;
 	std::vector<ILogger*>  Registry;
-	std::vector<LogEntry*> LogEntries;
-
-	std::string            LastMessage;
-	ELogLevel              LastMessageLevel;
+	std::vector<LogMsg_t*> Messages;
 };
 
 #endif

@@ -21,7 +21,7 @@
 #include "Inputs/InputBinds/IbApi.h"
 #include "Services/DataLink/DlApi.h"
 #include "Services/Localization/Localization.h"
-#include "Services/Logging/LogHandler.h"
+#include "Services/Logging/LogApi.h"
 #include "Services/Textures/TxLoader.h"
 #include "UI/Services/Fonts/FontManager.h"
 #include "UI/Services/QoL/EscapeClosing.h"
@@ -124,7 +124,7 @@ class CUiContext
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CUiContext(CLogHandler* aLogger, CLocalization* aLocalization, CTextureLoader* aTextureService, CDataLinkApi* aDataLink, CInputBindApi* aInputBindApi, CEventApi* aEventApi);
+	CUiContext(CLogApi* aLogger, CLocalization* aLocalization, CTextureLoader* aTextureService, CDataLinkApi* aDataLink, CInputBindApi* aInputBindApi, CEventApi* aEventApi);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -254,7 +254,7 @@ class CUiContext
 
 	private:
 	/* Services */
-	CLogHandler*                       Logger         = nullptr;
+	CLogApi*                           Logger         = nullptr;
 	CLocalization*                     Language       = nullptr;
 	CTextureLoader*                    TextureService = nullptr;
 	CDataLinkApi*                      DataLink       = nullptr;

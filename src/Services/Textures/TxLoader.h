@@ -18,7 +18,7 @@
 #include "TxFuncDefs.h"
 #include "TxQueueEntry.h"
 #include "TxTexture.h"
-#include "Services/Logging/LogHandler.h"
+#include "Services/Logging/LogApi.h"
 
 constexpr const char* CH_TEXTURES = "Textures";
 
@@ -31,7 +31,7 @@ class CTextureLoader
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CTextureLoader(CLogHandler* aLogger);
+	CTextureLoader(CLogApi* aLogger);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -117,7 +117,7 @@ class CTextureLoader
 	int Verify(void* aStartAddress, void* aEndAddress);
 
 	private:
-	CLogHandler*                         Logger = nullptr;
+	CLogApi*                             Logger = nullptr;
 
 	mutable std::mutex                   Mutex;
 	std::map<std::string, Texture*>      Registry;

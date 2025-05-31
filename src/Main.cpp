@@ -18,9 +18,9 @@
 #include "Loader/Loader.h"
 #include "Services/API/ApiClient.h"
 #include "Services/DataLink/DlApi.h"
-#include "Services/Logging/CConsoleLogger.h"
-#include "Services/Logging/CFileLogger.h"
-#include "Services/Logging/LogHandler.h"
+#include "Services/Logging/LogConsole.h"
+#include "Services/Logging/LogWriter.h"
+#include "Services/Logging/LogApi.h"
 #include "Services/Multibox/Multibox.h"
 #include "Services/Mumble/Reader.h"
 #include "Services/Settings/Settings.h"
@@ -90,13 +90,13 @@ namespace Main
 
 		Resources::Unpack(ctx->GetModule(), Index(EPath::ThirdPartySoftwareReadme), RES_THIRDPARTYNOTICES, "TXT");
 
-		CLogHandler* logger = ctx->GetLogger();
+		CLogApi* logger = ctx->GetLogger();
 		CUpdater* updater = ctx->GetUpdater();
 
 		/* setup default loggers */
 		if (CmdLine::HasArgument("-ggconsole"))
 		{
-			logger->RegisterLogger(new CConsoleLogger(ELogLevel::ALL));
+			logger->Register(new CConsoleLogger(ELogLevel::ALL));
 		}
 
 		std::filesystem::path logPathOverride;
@@ -106,7 +106,7 @@ namespace Main
 			logPathOverride = (Index(EPath::DIR_NEXUS) / "Nexus_").string() + CmdLine::GetArgumentValue("-mumble") + ".log";
 		}
 
-		logger->RegisterLogger(new CFileLogger(ELogLevel::ALL, logPathOverride.empty() ? Index(EPath::Log) : logPathOverride));
+		logger->Register(new CFileLogger(ELogLevel::ALL, logPathOverride.empty() ? Index(EPath::Log) : logPathOverride));
 
 		logger->Info(CH_CORE, GetCommandLineA());
 		logger->Info(CH_CORE, "%s: %s", Index(EPath::NexusDLL) != Index(EPath::D3D11Chainload) ? "Proxy" : "Chainload", Index(EPath::NexusDLL).string().c_str());
@@ -182,7 +182,7 @@ namespace Main
 		}
 
 		CContext* ctx = CContext::GetContext();
-		CLogHandler* logger = ctx->GetLogger();
+		CLogApi* logger = ctx->GetLogger();
 
 		logger->Critical(CH_CORE, String::Format("Main::Shutdown() | Reason: %s", reasonStr).c_str());
 
