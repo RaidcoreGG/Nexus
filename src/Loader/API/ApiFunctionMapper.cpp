@@ -146,24 +146,43 @@ namespace ADDONAPI
 	{
 		const char* GetGameDirectory()
 		{
-			return Index(EPath::DIR_GW2).string().c_str();
+			static const std::string s_GameDir = Index(EPath::DIR_GW2).string();
+			return s_GameDir.c_str();
 		}
 
 		const char* GetAddonDirectory(const char* aName)
 		{
+			static const std::string s_AddonsDir = Index(EPath::DIR_ADDONS).string();
+
 			if (aName == nullptr || strcmp(aName, "") == 0)
 			{
-				return Index(EPath::DIR_ADDONS).string().c_str();
+				return s_AddonsDir.c_str();
 			}
 			else
 			{
-				return (Index(EPath::DIR_ADDONS) / aName).string().c_str();
+				static std::mutex               s_Mutex{};
+				static std::vector<std::string> s_Paths{};
+
+				std::filesystem::path path = Index(EPath::DIR_ADDONS) / aName;
+
+				const std::lock_guard<std::mutex> lock(s_Mutex);
+
+				auto it = std::find(s_Paths.begin(), s_Paths.end(), path.string());
+
+				if (it == s_Paths.end())
+				{
+					s_Paths.push_back(path.string());
+					it = s_Paths.end() - 1;
+				}
+
+				return it->c_str();
 			}
 		}
 
 		const char* GetCommonDirectory()
 		{
-			return Index(EPath::DIR_COMMON).string().c_str();
+			static const std::string s_CommonDir = Index(EPath::DIR_COMMON).string();
+			return s_CommonDir.c_str();
 		}
 	}
 
