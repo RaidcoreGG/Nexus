@@ -19,9 +19,7 @@
     <ClCompile Include="src\Inputs\InputBinds\IbConst.cpp" />
     <ClCompile Include="src\Loader\AddonVersion.cpp" />
     <ClCompile Include="src\Loader\API\ApiFunctionMapper.cpp" />
-    <ClCompile Include="src\Services\API\ActiveToken.cpp" />
     <ClCompile Include="src\Services\API\ApiClient.cpp" />
-    <ClCompile Include="src\Services\API\APIController.cpp" />
     <ClCompile Include="src\CrashHandler.cpp" />
     <ClCompile Include="src\Services\DataLink\DlApi.cpp" />
     <ClCompile Include="src\Loader\ArcDPS.cpp" />
@@ -114,8 +112,6 @@
     <ClInclude Include="src\Loader\API\ApiFunctionMapper.h" />
     <ClInclude Include="src\Remote.h" />
     <ClInclude Include="src\Services\API\ApiClient.h" />
-    <ClInclude Include="src\Services\API\APIController.h" />
-    <ClInclude Include="src\Services\API\ActiveToken.h" />
     <ClInclude Include="src\Services\API\APIRequest.h" />
     <ClInclude Include="src\Services\API\APIResponse.h" />
     <ClInclude Include="src\Services\API\CachedResponse.h" />
