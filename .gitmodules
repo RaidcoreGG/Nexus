@@ -4,9 +4,9 @@
 [submodule "Scripts"]
 	path = Scripts
 	url = https://github.com/RaidcoreGG/RCGG-Scripts
-[submodule "src/Services/Mumble/Definitions"]
-	path = src/Services/Mumble/Definitions
-	url = https://github.com/RaidcoreGG/RCGG-lib-mumble-api
 [submodule "src/thirdparty/ImAnimate"]
 	path = src/thirdparty/ImAnimate
 	url = https://github.com/RaidcoreGG/ImAnimate
+[submodule "src/thirdparty/mumble"]
+	path = src/thirdparty/mumble
+	url = https://github.com/RaidcoreGG/RCGG-lib-mumble-api

@@ -13,8 +13,8 @@
 
 #include "UI/Controls/CtlModal.h"
 #include "UI/DisplayBinds.h"
-#include "Inputs/InputBinds/IbBindV2.h"
-#include "Inputs/GameBinds/GbEnum.h"
+#include "Engine/Inputs/InputBinds/IbBindV2.h"
+#include "GW2/Inputs/GameBinds/GbEnum.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// CBindSetterModal Class

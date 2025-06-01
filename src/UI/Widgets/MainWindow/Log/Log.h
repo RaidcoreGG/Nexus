@@ -15,8 +15,8 @@
 
 #include "imgui/imgui.h"
 
-#include "Services/Logging/LogBase.h"
-#include "Services/Logging/LogMsg.h"
+#include "Engine/Logging/LogBase.h"
+#include "Engine/Logging/LogMsg.h"
 #include "UI/Controls/CtlSubWindow.h"
 
 class CLogWindow : public virtual ISubWindow, public virtual ILogger

@@ -12,8 +12,8 @@
 #include <map>
 #include <string>
 
-#include "Loader/Addon.h"
-#include "Loader/LibraryAddon.h"
+#include "Engine/Loader/Addon.h"
+#include "Engine/Loader/LibraryAddon.h"
 #include "UI/DisplayBinds.h"
 #include "UI/FuncDefs.h"
 

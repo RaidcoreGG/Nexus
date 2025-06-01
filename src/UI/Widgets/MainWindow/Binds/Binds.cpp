@@ -15,11 +15,11 @@
 
 #include "Consts.h"
 #include "Context.h"
-#include "Index/Index.h"
-#include "Inputs/InputBinds/IbMapping.h"
+#include "Engine/Index/Index.h"
+#include "Engine/Inputs/InputBinds/IbMapping.h"
 #include "Renderer.h"
 #include "resource.h"
-#include "Inputs/GameBinds/GbConst.h"
+#include "GW2/Inputs/GameBinds/GbConst.h"
 #include "Util/Time.h"
 
 CBindsWindow::CBindsWindow()

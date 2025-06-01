@@ -14,7 +14,7 @@
 
 #include "UI/Controls/CtlWindow.h"
 #include "UI/Controls/CtlSubWindow.h"
-#include "Services/Textures/TxTexture.h"
+#include "Engine/Textures/TxTexture.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// CMainWindow Class

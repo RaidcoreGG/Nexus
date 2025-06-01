@@ -13,8 +13,8 @@
 #include <string>
 #include <vector>
 
-#include "Loader/NexusLinkData.h"
-#include "Services/DataLink/DlApi.h"
+#include "Engine/Loader/NexusLinkData.h"
+#include "Engine/DataLink/DlApi.h"
 #include "UI/Controls/CtlWindow.h"
 #include "AlMessage.h"
 #include "AlEnum.h"

@@ -12,23 +12,23 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Context.cpp" />
-    <ClCompile Include="src\Index\Index.cpp" />
-    <ClCompile Include="src\Inputs\GameBinds\GbApi.cpp" />
-    <ClCompile Include="src\Inputs\GameBinds\GbConst.cpp" />
-    <ClCompile Include="src\Inputs\InputBinds\IbCapture.cpp" />
-    <ClCompile Include="src\Inputs\InputBinds\IbConst.cpp" />
-    <ClCompile Include="src\Loader\AddonVersion.cpp" />
-    <ClCompile Include="src\Loader\API\ApiFunctionMapper.cpp" />
-    <ClCompile Include="src\Services\API\ApiClient.cpp" />
+    <ClCompile Include="src\Engine\Index\Index.cpp" />
+    <ClCompile Include="src\GW2\Inputs\GameBinds\GbApi.cpp" />
+    <ClCompile Include="src\GW2\Inputs\GameBinds\GbConst.cpp" />
+    <ClCompile Include="src\Engine\Inputs\InputBinds\IbCapture.cpp" />
+    <ClCompile Include="src\Engine\Inputs\InputBinds\IbConst.cpp" />
+    <ClCompile Include="src\Engine\Loader\AddonVersion.cpp" />
+    <ClCompile Include="src\Engine\Loader\API\ApiFunctionMapper.cpp" />
+    <ClCompile Include="src\Engine\API\ApiClient.cpp" />
     <ClCompile Include="src\CrashHandler.cpp" />
-    <ClCompile Include="src\Services\DataLink\DlApi.cpp" />
-    <ClCompile Include="src\Loader\ArcDPS.cpp" />
-    <ClCompile Include="src\Loader\EUpdateProvider.cpp" />
-    <ClCompile Include="src\Loader\Library.cpp" />
-    <ClCompile Include="src\Services\Localization\Localization.cpp" />
+    <ClCompile Include="src\Engine\DataLink\DlApi.cpp" />
+    <ClCompile Include="src\Engine\Loader\ArcDPS.cpp" />
+    <ClCompile Include="src\Engine\Loader\EUpdateProvider.cpp" />
+    <ClCompile Include="src\Engine\Loader\Library.cpp" />
+    <ClCompile Include="src\Engine\Localization\Localization.cpp" />
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\Events\EvtApi.cpp" />
-    <ClCompile Include="src\Services\Logging\LogConst.cpp" />
+    <ClCompile Include="src\Engine\Events\EvtApi.cpp" />
+    <ClCompile Include="src\Engine\Logging\LogConst.cpp" />
     <ClCompile Include="src\thirdparty\ImAnimate\ImAnimate.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui_draw.cpp" />
@@ -36,27 +36,27 @@
     <ClCompile Include="src\thirdparty\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\thirdparty\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\Inputs\InputBinds\IbBindV2.cpp" />
-    <ClCompile Include="src\Inputs\InputBinds\IbApi.cpp" />
-    <ClCompile Include="src\Loader\AddonDefinition.cpp" />
-    <ClCompile Include="src\Loader\Loader.cpp" />
-    <ClCompile Include="src\Services\Logging\LogWriter.cpp" />
-    <ClCompile Include="src\Services\Logging\LogBase.cpp" />
-    <ClCompile Include="src\Services\Logging\LogApi.cpp" />
-    <ClCompile Include="src\Services\Logging\LogConsole.cpp" />
+    <ClCompile Include="src\Engine\Inputs\InputBinds\IbBindV2.cpp" />
+    <ClCompile Include="src\Engine\Inputs\InputBinds\IbApi.cpp" />
+    <ClCompile Include="src\Engine\Loader\AddonDefinition.cpp" />
+    <ClCompile Include="src\Engine\Loader\Loader.cpp" />
+    <ClCompile Include="src\Engine\Logging\LogWriter.cpp" />
+    <ClCompile Include="src\Engine\Logging\LogBase.cpp" />
+    <ClCompile Include="src\Engine\Logging\LogApi.cpp" />
+    <ClCompile Include="src\Engine\Logging\LogConsole.cpp" />
     <ClCompile Include="src\thirdparty\minhook\mh_buffer.cpp" />
     <ClCompile Include="src\thirdparty\minhook\mh_disasm.cpp" />
     <ClCompile Include="src\thirdparty\minhook\mh_hook.cpp" />
     <ClCompile Include="src\thirdparty\minhook\mh_trampoline.cpp" />
-    <ClCompile Include="src\Services\Multibox\Multibox.cpp" />
-    <ClCompile Include="src\Services\Mumble\Reader.cpp" />
+    <ClCompile Include="src\GW2\Multibox\Multibox.cpp" />
+    <ClCompile Include="src\GW2\Mumble\Reader.cpp" />
     <ClCompile Include="src\Proxy.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
-    <ClCompile Include="src\Services\Settings\Settings.cpp" />
+    <ClCompile Include="src\Engine\Settings\Settings.cpp" />
     <ClCompile Include="src\Shared.cpp" />
     <ClCompile Include="src\State.cpp" />
-    <ClCompile Include="src\Services\Textures\TxLoader.cpp" />
-    <ClCompile Include="src\Services\Updater\Updater.cpp" />
+    <ClCompile Include="src\Engine\Textures\TxLoader.cpp" />
+    <ClCompile Include="src\Engine\Updater\Updater.cpp" />
     <ClCompile Include="src\thirdparty\pugixml\pugixml.cpp" />
     <ClCompile Include="src\UI\Controls\CtlModal.cpp" />
     <ClCompile Include="src\UI\Controls\CtlSubWindow.cpp" />
@@ -92,42 +92,42 @@
     <ClCompile Include="src\Util\Strings.cpp" />
     <ClCompile Include="src\Util\Time.cpp" />
     <ClCompile Include="src\Util\Url.cpp" />
-    <ClCompile Include="src\Inputs\RawInput\RiApi.cpp" />
+    <ClCompile Include="src\Engine\Inputs\RawInput\RiApi.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Context.h" />
-    <ClInclude Include="src\Events\EvtData.h" />
-    <ClInclude Include="src\Index\IdxEnum.h" />
-    <ClInclude Include="src\Index\Index.h" />
-    <ClInclude Include="src\Inputs\GameBinds\GbEnum.h" />
-    <ClInclude Include="src\Inputs\GameBinds\GbConst.h" />
-    <ClInclude Include="src\Inputs\GameBinds\GbFuncDefs.h" />
-    <ClInclude Include="src\Inputs\GameBinds\GbApi.h" />
-    <ClInclude Include="src\Inputs\InputBinds\IbBind.h" />
-    <ClInclude Include="src\Inputs\InputBinds\IbCapture.h" />
-    <ClInclude Include="src\Inputs\InputBinds\IbConst.h" />
-    <ClInclude Include="src\Inputs\InputBinds\IbEnum.h" />
-    <ClInclude Include="src\Inputs\InputBinds\IbMapping.h" />
-    <ClInclude Include="src\Loader\AddonVersion.h" />
-    <ClInclude Include="src\Loader\API\ApiFunctionMapper.h" />
+    <ClInclude Include="src\Engine\Events\EvtData.h" />
+    <ClInclude Include="src\Engine\Index\IdxEnum.h" />
+    <ClInclude Include="src\Engine\Index\Index.h" />
+    <ClInclude Include="src\GW2\Inputs\GameBinds\GbEnum.h" />
+    <ClInclude Include="src\GW2\Inputs\GameBinds\GbConst.h" />
+    <ClInclude Include="src\GW2\Inputs\GameBinds\GbFuncDefs.h" />
+    <ClInclude Include="src\GW2\Inputs\GameBinds\GbApi.h" />
+    <ClInclude Include="src\Engine\Inputs\InputBinds\IbBind.h" />
+    <ClInclude Include="src\Engine\Inputs\InputBinds\IbCapture.h" />
+    <ClInclude Include="src\Engine\Inputs\InputBinds\IbConst.h" />
+    <ClInclude Include="src\Engine\Inputs\InputBinds\IbEnum.h" />
+    <ClInclude Include="src\Engine\Inputs\InputBinds\IbMapping.h" />
+    <ClInclude Include="src\Engine\Loader\AddonVersion.h" />
+    <ClInclude Include="src\Engine\Loader\API\ApiFunctionMapper.h" />
     <ClInclude Include="src\Remote.h" />
-    <ClInclude Include="src\Services\API\ApiClient.h" />
-    <ClInclude Include="src\Services\API\APIRequest.h" />
-    <ClInclude Include="src\Services\API\APIResponse.h" />
-    <ClInclude Include="src\Services\API\CachedResponse.h" />
+    <ClInclude Include="src\Engine\API\ApiClient.h" />
+    <ClInclude Include="src\Engine\API\APIRequest.h" />
+    <ClInclude Include="src\Engine\API\APIResponse.h" />
+    <ClInclude Include="src\Engine\API\CachedResponse.h" />
     <ClInclude Include="src\Branch.h" />
     <ClInclude Include="src\Consts.h" />
     <ClInclude Include="src\CrashHandler.h" />
-    <ClInclude Include="src\Services\DataLink\DlApi.h" />
-    <ClInclude Include="src\Services\DataLink\DlEnum.h" />
-    <ClInclude Include="src\Services\DataLink\DlFuncDefs.h" />
-    <ClInclude Include="src\Services\DataLink\DlLinkedResource.h" />
-    <ClInclude Include="src\Events\EvtApi.h" />
-    <ClInclude Include="src\Events\EvtSubscriber.h" />
-    <ClInclude Include="src\Events\EvtFuncDefs.h" />
-    <ClInclude Include="src\Services\Logging\LogConst.h" />
-    <ClInclude Include="src\Services\Logging\LogEnum.h" />
-    <ClInclude Include="src\Services\Textures\TxEnum.h" />
+    <ClInclude Include="src\Engine\DataLink\DlApi.h" />
+    <ClInclude Include="src\Engine\DataLink\DlEnum.h" />
+    <ClInclude Include="src\Engine\DataLink\DlFuncDefs.h" />
+    <ClInclude Include="src\Engine\DataLink\DlLinkedResource.h" />
+    <ClInclude Include="src\Engine\Events\EvtApi.h" />
+    <ClInclude Include="src\Engine\Events\EvtSubscriber.h" />
+    <ClInclude Include="src\Engine\Events\EvtFuncDefs.h" />
+    <ClInclude Include="src\Engine\Logging\LogConst.h" />
+    <ClInclude Include="src\Engine\Logging\LogEnum.h" />
+    <ClInclude Include="src\Engine\Textures\TxEnum.h" />
     <ClInclude Include="src\thirdparty\httplib\httplib.h" />
     <ClInclude Include="src\thirdparty\ImAnimate\ImAnimate.h" />
     <ClInclude Include="src\thirdparty\imgui\imconfig.h" />
@@ -140,25 +140,25 @@
     <ClInclude Include="src\thirdparty\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\thirdparty\imgui\imstb_textedit.h" />
     <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h" />
-    <ClInclude Include="src\Inputs\InputBinds\IbFuncDefs.h" />
-    <ClInclude Include="src\Inputs\InputBinds\IbBindV2.h" />
-    <ClInclude Include="src\Inputs\InputBinds\IbApi.h" />
-    <ClInclude Include="src\Loader\Addon.h" />
-    <ClInclude Include="src\Loader\ArcDPS.h" />
-    <ClInclude Include="src\Loader\EAddonFlags.h" />
-    <ClInclude Include="src\Loader\EAddonState.h" />
-    <ClInclude Include="src\Loader\ELoaderAction.h" />
-    <ClInclude Include="src\Loader\FuncDefs.h" />
-    <ClInclude Include="src\Loader\Library.h" />
-    <ClInclude Include="src\Loader\LibraryAddon.h" />
-    <ClInclude Include="src\Loader\Loader.h" />
-    <ClInclude Include="src\Loader\NexusLinkData.h" />
-    <ClInclude Include="src\Services\Localization\FuncDefs.h" />
-    <ClInclude Include="src\Services\Localization\Localization.h" />
-    <ClInclude Include="src\Services\Logging\LogFuncDefs.h" />
+    <ClInclude Include="src\Engine\Inputs\InputBinds\IbFuncDefs.h" />
+    <ClInclude Include="src\Engine\Inputs\InputBinds\IbBindV2.h" />
+    <ClInclude Include="src\Engine\Inputs\InputBinds\IbApi.h" />
+    <ClInclude Include="src\Engine\Loader\Addon.h" />
+    <ClInclude Include="src\Engine\Loader\ArcDPS.h" />
+    <ClInclude Include="src\Engine\Loader\EAddonFlags.h" />
+    <ClInclude Include="src\Engine\Loader\EAddonState.h" />
+    <ClInclude Include="src\Engine\Loader\ELoaderAction.h" />
+    <ClInclude Include="src\Engine\Loader\FuncDefs.h" />
+    <ClInclude Include="src\Engine\Loader\Library.h" />
+    <ClInclude Include="src\Engine\Loader\LibraryAddon.h" />
+    <ClInclude Include="src\Engine\Loader\Loader.h" />
+    <ClInclude Include="src\Engine\Loader\NexusLinkData.h" />
+    <ClInclude Include="src\Engine\Localization\FuncDefs.h" />
+    <ClInclude Include="src\Engine\Localization\Localization.h" />
+    <ClInclude Include="src\Engine\Logging\LogFuncDefs.h" />
     <ClInclude Include="src\Main.h" />
-    <ClInclude Include="src\Services\Multibox\Multibox.h" />
-    <ClInclude Include="src\Services\Mumble\Definitions\Mumble.h" />
+    <ClInclude Include="src\GW2\Multibox\Multibox.h" />
+    <ClInclude Include="src\thirdparty\mumble\Mumble.h" />
     <ClInclude Include="src\thirdparty\nlohmann\json.hpp" />
     <ClInclude Include="src\thirdparty\openssl\aes.h" />
     <ClInclude Include="src\thirdparty\openssl\asn1.h" />
@@ -297,35 +297,35 @@
     <ClInclude Include="src\thirdparty\openssl\x509_vfy.h" />
     <ClInclude Include="src\thirdparty\openssl\__DECC_INCLUDE_EPILOGUE.H" />
     <ClInclude Include="src\thirdparty\openssl\__DECC_INCLUDE_PROLOGUE.H" />
-    <ClInclude Include="src\Loader\AddonDefinition.h" />
-    <ClInclude Include="src\Loader\EUpdateProvider.h" />
-    <ClInclude Include="src\Loader\API\AddonAPI.h" />
-    <ClInclude Include="src\Services\Logging\LogWriter.h" />
-    <ClInclude Include="src\Services\Logging\LogBase.h" />
-    <ClInclude Include="src\Services\Logging\LogMsg.h" />
-    <ClInclude Include="src\Services\Logging\LogApi.h" />
-    <ClInclude Include="src\Services\Logging\LogConsole.h" />
+    <ClInclude Include="src\Engine\Loader\AddonDefinition.h" />
+    <ClInclude Include="src\Engine\Loader\EUpdateProvider.h" />
+    <ClInclude Include="src\Engine\Loader\API\AddonAPI.h" />
+    <ClInclude Include="src\Engine\Logging\LogWriter.h" />
+    <ClInclude Include="src\Engine\Logging\LogBase.h" />
+    <ClInclude Include="src\Engine\Logging\LogMsg.h" />
+    <ClInclude Include="src\Engine\Logging\LogApi.h" />
+    <ClInclude Include="src\Engine\Logging\LogConsole.h" />
     <ClInclude Include="src\thirdparty\minhook\mh_buffer.h" />
     <ClInclude Include="src\thirdparty\minhook\mh_disasm.h" />
     <ClInclude Include="src\thirdparty\minhook\mh_hook.h" />
     <ClInclude Include="src\thirdparty\minhook\mh_trampoline.h" />
-    <ClInclude Include="src\Services\Mumble\Reader.h" />
-    <ClInclude Include="src\Index\IdxFuncDefs.h" />
+    <ClInclude Include="src\GW2\Mumble\Reader.h" />
+    <ClInclude Include="src\Engine\Index\IdxFuncDefs.h" />
     <ClInclude Include="src\Proxy.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\resource.h" />
-    <ClInclude Include="src\Services\Settings\Settings.h" />
+    <ClInclude Include="src\Engine\Settings\Settings.h" />
     <ClInclude Include="src\Shared.h" />
     <ClInclude Include="src\State.h" />
     <ClInclude Include="src\thirdparty\pugixml\pugiconfig.hpp" />
     <ClInclude Include="src\thirdparty\pugixml\pugixml.hpp" />
     <ClInclude Include="src\thirdparty\stb\stb_image.h" />
-    <ClInclude Include="src\Services\Textures\TxFuncDefs.h" />
-    <ClInclude Include="src\Services\Textures\TxQueueEntry.h" />
-    <ClInclude Include="src\Services\Textures\TxTexture.h" />
-    <ClInclude Include="src\Services\Textures\TxLoader.h" />
-    <ClInclude Include="src\Services\Updater\FuncDefs.h" />
-    <ClInclude Include="src\Services\Updater\Updater.h" />
+    <ClInclude Include="src\Engine\Textures\TxFuncDefs.h" />
+    <ClInclude Include="src\Engine\Textures\TxQueueEntry.h" />
+    <ClInclude Include="src\Engine\Textures\TxTexture.h" />
+    <ClInclude Include="src\Engine\Textures\TxLoader.h" />
+    <ClInclude Include="src\Engine\Updater\FuncDefs.h" />
+    <ClInclude Include="src\Engine\Updater\Updater.h" />
     <ClInclude Include="src\UI\Controls\Control.h" />
     <ClInclude Include="src\UI\Controls\CtlModal.h" />
     <ClInclude Include="src\UI\Controls\CtlSubWindow.h" />
@@ -374,8 +374,8 @@
     <ClInclude Include="src\Util\Time.h" />
     <ClInclude Include="src\Util\Url.h" />
     <ClInclude Include="src\Version.h" />
-    <ClInclude Include="src\Inputs\RawInput\RiFuncDefs.h" />
-    <ClInclude Include="src\Inputs\RawInput\RiApi.h" />
+    <ClInclude Include="src\Engine\Inputs\RawInput\RiFuncDefs.h" />
+    <ClInclude Include="src\Engine\Inputs\RawInput\RiApi.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\Nexus.rc" />
@@ -462,14 +462,6 @@
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="src\GlobalPropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="src\GlobalPropertySheet.props" />
-  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -510,7 +502,8 @@
       <AdditionalDependencies>Shlwapi.lib;PathCch.lib;Shell32.lib;Psapi.lib;libssl64MTd.lib;libcrypto64MTd.lib;ws2_32.lib;gdi32.lib;advapi32.lib;crypt32.lib;user32.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>CALL $(SolutionDir)Scripts\branch.bat
+      <Command>git submodule update --init --recursive
+CALL $(SolutionDir)Scripts\branch.bat
 CALL $(SolutionDir)Scripts\version.bat
 CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
     </PreBuildEvent>

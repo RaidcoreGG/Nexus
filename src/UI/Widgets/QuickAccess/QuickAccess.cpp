@@ -18,10 +18,10 @@
 #include "Context.h"
 #include "Renderer.h"
 #include "resource.h"
-#include "Services/Settings/Settings.h"
+#include "Engine/Settings/Settings.h"
 #include "Shared.h"
 #include "UI/UIContext.h"
-#include "Inputs/InputBinds/IbConst.h"
+#include "Engine/Inputs/InputBinds/IbConst.h"
 
 #define GW2_QUICKACCESS_ITEMS 10;
 

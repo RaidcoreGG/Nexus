@@ -19,10 +19,10 @@
 #include "Shared.h"
 #include "Util/Strings.h"
 
-#include "Index/Index.h"
-#include "Loader/ArcDPS.h"
-#include "Loader/Library.h"
-#include "Loader/Loader.h"
+#include "Engine/Index/Index.h"
+#include "Engine/Loader/ArcDPS.h"
+#include "Engine/Loader/Library.h"
+#include "Engine/Loader/Loader.h"
 
 constexpr ImGuiWindowFlags ModalFlags = ImGuiWindowFlags_AlwaysAutoResize |
 										ImGuiWindowFlags_NoResize |

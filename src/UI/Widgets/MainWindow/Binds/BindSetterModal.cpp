@@ -9,8 +9,8 @@
 #include "BindSetterModal.h"
 
 #include "Context.h"
-#include "Inputs/GameBinds/GbConst.h"
-#include "Inputs/InputBinds/IbConst.h"
+#include "GW2/Inputs/GameBinds/GbConst.h"
+#include "Engine/Inputs/InputBinds/IbConst.h"
 
 CBindSetterModal::CBindSetterModal()
 {

@@ -12,7 +12,7 @@
 #include <string>
 #include <map>
 
-#include "Services/Textures/TxTexture.h"
+#include "Engine/Textures/TxTexture.h"
 #include "UI/FuncDefs.h"
 
 struct ContextItem_t

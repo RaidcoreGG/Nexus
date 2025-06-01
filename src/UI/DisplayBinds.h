@@ -12,9 +12,9 @@
 #include <string>
 #include <unordered_map>
 
-#include "Inputs/GameBinds/GbEnum.h"
-#include "Inputs/InputBinds/IbMapping.h"
-#include "Inputs/InputBinds/IbBindV2.h"
+#include "GW2/Inputs/GameBinds/GbEnum.h"
+#include "Engine/Inputs/InputBinds/IbMapping.h"
+#include "Engine/Inputs/InputBinds/IbBindV2.h"
 
 struct InputBindPacked_t
 {

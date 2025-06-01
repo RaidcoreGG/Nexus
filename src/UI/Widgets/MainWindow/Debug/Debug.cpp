@@ -15,8 +15,8 @@
 
 #include "Consts.h"
 #include "Context.h"
-#include "Events/EvtApi.h"
-#include "Inputs/InputBinds/IbApi.h"
+#include "Engine/Events/EvtApi.h"
+#include "Engine/Inputs/InputBinds/IbApi.h"
 #include "resource.h"
 #include "Util/MD5.h"
 #include "Util/Strings.h"
