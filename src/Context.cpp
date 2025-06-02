@@ -61,6 +61,12 @@ DWORD CContext::GetModuleSize()
 	return this->ModuleSize;
 }
 
+RenderContext_t* CContext::GetRendererCtx()
+{
+	static RenderContext_t s_RendererCtx = RenderContext_t();
+	return &s_RendererCtx;
+}
+
 CLogApi* CContext::GetLogger()
 {
 	static CLogApi s_Logger = CLogApi();

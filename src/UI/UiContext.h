@@ -61,6 +61,8 @@ enum class EUIStyle
 ///----------------------------------------------------------------------------------------------------
 namespace UIRoot
 {
+	extern float   ScalingFactor; /* DPI aware UI scaling factor matching ingame behavior. */
+
 	extern ImFont* UserFont;      /* custom user font or default font */
 	extern ImFont* Font;          /* Menomonia */
 	extern ImFont* FontBig;       /* Menomonia, but slightly bigger */

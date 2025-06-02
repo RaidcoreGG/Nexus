@@ -17,7 +17,6 @@
 #include "Context.h"
 #include "Consts.h"
 #include "Engine/Index/Index.h"
-#include "Renderer.h"
 #include "Shared.h"
 #include "State.h"
 
@@ -107,6 +106,7 @@ namespace Loader
 		CUiContext* uictx = ctx->GetUIContext();
 		Alerts = uictx->GetAlerts();
 		Language = ctx->GetLocalization();
+		RenderContext_t* renderer = ctx->GetRendererCtx();
 
 		NexusLink = (NexusLinkData_t*)DataLink->ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData_t), "", true);
 		MumbleIdentity = (Mumble::Identity*)DataLink->ShareResource(DL_MUMBLE_LINK_IDENTITY, sizeof(Mumble::Identity), "", false);
@@ -174,7 +174,7 @@ namespace Loader
 			changeentry.pidl = FSItemList;
 			changeentry.fRecursive = false;
 			FSNotifierID = SHChangeNotifyRegister(
-				Renderer::WindowHandle,
+				renderer->Window.Handle,
 				SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
 				SHCNE_UPDATEITEM | SHCNE_UPDATEDIR,
 				WM_ADDONDIRUPDATE,

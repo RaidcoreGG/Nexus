@@ -51,7 +51,6 @@
     <ClCompile Include="src\GW2\Multibox\Multibox.cpp" />
     <ClCompile Include="src\GW2\Mumble\Reader.cpp" />
     <ClCompile Include="src\Proxy.cpp" />
-    <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Engine\Settings\Settings.cpp" />
     <ClCompile Include="src\Shared.cpp" />
     <ClCompile Include="src\State.cpp" />
@@ -99,6 +98,9 @@
     <ClInclude Include="src\Engine\Events\EvtData.h" />
     <ClInclude Include="src\Engine\Index\IdxEnum.h" />
     <ClInclude Include="src\Engine\Index\Index.h" />
+    <ClInclude Include="src\Engine\Renderer\RdrContext.h" />
+    <ClInclude Include="src\Engine\Renderer\RdrMetrics.h" />
+    <ClInclude Include="src\Engine\Renderer\RdrWindow.h" />
     <ClInclude Include="src\GW2\Inputs\GameBinds\GbEnum.h" />
     <ClInclude Include="src\GW2\Inputs\GameBinds\GbConst.h" />
     <ClInclude Include="src\GW2\Inputs\GameBinds\GbFuncDefs.h" />
@@ -312,7 +314,6 @@
     <ClInclude Include="src\GW2\Mumble\Reader.h" />
     <ClInclude Include="src\Engine\Index\IdxFuncDefs.h" />
     <ClInclude Include="src\Proxy.h" />
-    <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\resource.h" />
     <ClInclude Include="src\Engine\Settings\Settings.h" />
     <ClInclude Include="src\Shared.h" />

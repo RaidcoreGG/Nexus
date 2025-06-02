@@ -9,7 +9,6 @@
 #include "MumbleInspector.h"
 
 #include "Context.h"
-#include "Renderer.h"
 #include "Engine/DataLink/DlApi.h"
 
 CMumbleOverlay::CMumbleOverlay()
@@ -284,9 +283,6 @@ void CMumbleOverlay::Render()
 			ImGui::Separator();
 			if (ImGui::BeginTable("table_nexus", 2))
 			{
-				ImGui::TableNextRow();
-				ImGui::TableSetColumnIndex(0); ImGui::Text("frame");
-				ImGui::TableSetColumnIndex(1); ImGui::Text("%d", Renderer::FrameCounter);
 				ImGui::TableNextRow();
 				ImGui::TableSetColumnIndex(0); ImGui::Text("isMoving");
 				ImGui::TableSetColumnIndex(1); ImGui::Text("%s", NexusLink->IsMoving ? "true" : "false");

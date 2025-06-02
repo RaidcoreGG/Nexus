@@ -17,7 +17,6 @@
 #include "Context.h"
 #include "Engine/Index/Index.h"
 #include "Engine/Inputs/InputBinds/IbMapping.h"
-#include "Renderer.h"
 #include "resource.h"
 #include "GW2/Inputs/GameBinds/GbConst.h"
 #include "Util/Time.h"

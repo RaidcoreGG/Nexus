@@ -11,8 +11,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_extensions.h"
 #include "ImAnimate/ImAnimate.h"
-
-#include "Renderer.h"
+#include "Context.h"
 
 constexpr ImGuiWindowFlags Flags
 	= ImGuiWindowFlags_NoDecoration
@@ -37,8 +36,11 @@ void CAlerts::Render()
 		ImGui::PushFont((ImFont*)this->NexusLink->FontBig);
 		float width = ImGui::CalcTextSize(alert.Message.c_str()).x;
 
+		CContext*        ctx      = CContext::GetContext();
+		RenderContext_t* renderer = ctx->GetRendererCtx();
+
 		/* center horizontally */
-		ImGui::SetNextWindowPos(ImVec2((Renderer::Width - width) / 2.0f, 230.0f * Renderer::Scaling));
+		ImGui::SetNextWindowPos(ImVec2((renderer->Window.Width - width) / 2.0f, 230.0f * UIRoot::ScalingFactor));
 		if (ImGui::Begin("##Alerts", (bool*)0, Flags))
 		{
 			ImColor msgCol;

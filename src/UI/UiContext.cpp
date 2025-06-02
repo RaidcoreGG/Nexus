@@ -23,7 +23,6 @@
 #include "Consts.h"
 #include "Context.h"
 #include "Engine/Index/Index.h"
-#include "Renderer.h"
 #include "resource.h"
 #include "GW2/Mumble/Reader.h"
 #include "Engine/Settings/Settings.h"
@@ -46,6 +45,8 @@
 
 namespace UIRoot
 {
+	float   ScalingFactor            = 1.f;
+
 	ImFont* UserFont                 = nullptr;
 	ImFont* Font                     = nullptr;
 	ImFont* FontBig                  = nullptr;
@@ -701,8 +702,9 @@ void CUiContext::UpdateScaling()
 	
 	ImGuiIO& io = ImGui::GetIO();
 
-	CContext* ctx = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
+	CContext*        ctx         = CContext::GetContext();
+	CSettings*       settingsctx = ctx->GetSettingsCtx();
+	RenderContext_t* renderer    = ctx->GetRendererCtx();
 
 	if (settingsctx->Get<bool>(OPT_DPISCALING, true))
 	{
@@ -720,15 +722,15 @@ void CUiContext::UpdateScaling()
 		settingsctx->Set<float>(OPT_LASTUISCALE, 1.0f);
 	}
 
-	Renderer::Scaling = 
+	UIRoot::ScalingFactor =
 		settingsctx->Get<float>(OPT_LASTUISCALE, 1.0f) *
 		/* settingsctx->Get<float>(OPT_GLOBALSCALE, 1.0f) * */
 		io.FontGlobalScale *
-		min(min(Renderer::Width, 1024.0) / 1024.0, min(Renderer::Height, 768.0) / 768.0);
+		min(min(renderer->Window.Width, 1024.0) / 1024.0, min(renderer->Window.Height, 768.0) / 768.0);
 
 	if (nexuslink)
 	{
-		nexuslink->Scaling = Renderer::Scaling;
+		nexuslink->Scaling = UIRoot::ScalingFactor;
 	}
 }
 

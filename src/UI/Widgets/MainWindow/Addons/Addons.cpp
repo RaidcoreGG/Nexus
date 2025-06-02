@@ -14,7 +14,6 @@
 #include "imgui/imgui.h"
 
 #include "Context.h"
-#include "Renderer.h"
 #include "resource.h"
 #include "Shared.h"
 #include "Util/Strings.h"

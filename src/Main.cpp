@@ -7,7 +7,6 @@
 
 #include "Consts.h"
 #include "Engine/Index/Index.h"
-#include "Renderer.h"
 #include "resource.h"
 #include "Shared.h"
 #include "State.h"
@@ -48,10 +47,12 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		}
 		case DLL_PROCESS_DETACH:
 		{
+			CContext* ctx = CContext::GetContext();
+
 			/* cleanly remove wndproc hook */
-			if (Renderer::WindowHandle && Hooks::WndProc)
+			if (ctx->GetRendererCtx()->Window.Handle && Hooks::WndProc)
 			{
-				SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)Hooks::WndProc);
+				SetWindowLongPtr(ctx->GetRendererCtx()->Window.Handle, GWLP_WNDPROC, (LONG_PTR)Hooks::WndProc);
 			}
 			break;
 		}
@@ -75,6 +76,7 @@ namespace Main
 	static CTextureLoader*   s_TextureService = nullptr;
 	static CEventApi*        s_EventApi       = nullptr;
 	static CSettings*        s_SettingsCtx    = nullptr;
+	static RenderContext_t*  s_RendererCtx    = nullptr;
 
 	void Initialize(EEntryMethod aEntryMethod)
 	{
@@ -83,6 +85,7 @@ namespace Main
 		State::Nexus = ENexusState::LOAD;
 
 		CContext* ctx = CContext::GetContext();
+		s_RendererCtx = ctx->GetRendererCtx();
 
 		//SetUnhandledExceptionFilter(UnhandledExcHandler);
 		
@@ -343,26 +346,26 @@ namespace Main
 			assert(s_UIContext);
 			assert(s_TextureService);
 
-			if (Renderer::SwapChain != pChain)
+			if (s_RendererCtx->SwapChain != pChain)
 			{
-				Renderer::SwapChain = pChain;
+				s_RendererCtx->SwapChain = pChain;
 
-				if (Renderer::Device)
+				if (s_RendererCtx->Device)
 				{
-					Renderer::DeviceContext->Release();
-					Renderer::DeviceContext = 0;
-					Renderer::Device->Release();
-					Renderer::Device = 0;
+					s_RendererCtx->DeviceContext->Release();
+					s_RendererCtx->DeviceContext = nullptr;
+					s_RendererCtx->Device->Release();
+					s_RendererCtx->Device = nullptr;
 				}
 
-				Renderer::SwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&Renderer::Device);
-				Renderer::Device->GetImmediateContext(&Renderer::DeviceContext);
+				s_RendererCtx->SwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&s_RendererCtx->Device);
+				s_RendererCtx->Device->GetImmediateContext(&s_RendererCtx->DeviceContext);
 
 				DXGI_SWAP_CHAIN_DESC swapChainDesc;
-				Renderer::SwapChain->GetDesc(&swapChainDesc);
+				s_RendererCtx->SwapChain->GetDesc(&swapChainDesc);
 
-				Renderer::WindowHandle = swapChainDesc.OutputWindow;
-				Hooks::WndProc = (WNDPROC)SetWindowLongPtr(Renderer::WindowHandle, GWLP_WNDPROC, (LONG_PTR)hkWndProc);
+				s_RendererCtx->Window.Handle = swapChainDesc.OutputWindow;
+				Hooks::WndProc = (WNDPROC)SetWindowLongPtr(s_RendererCtx->Window.Handle, GWLP_WNDPROC, (LONG_PTR)hkWndProc);
 
 				Loader::Initialize();
 
@@ -370,7 +373,7 @@ namespace Main
 				State::Directx = EDxState::READY; /* acquired swapchain */
 			}
 
-			s_UIContext->Initialize(Renderer::WindowHandle, Renderer::Device, Renderer::DeviceContext, Renderer::SwapChain);
+			s_UIContext->Initialize(s_RendererCtx->Window.Handle, s_RendererCtx->Device, s_RendererCtx->DeviceContext, s_RendererCtx->SwapChain);
 
 			Loader::ProcessQueue();
 
@@ -379,7 +382,7 @@ namespace Main
 			s_UIContext->Render();
 		}
 
-		Renderer::FrameCounter++;
+		s_RendererCtx->Metrics.FrameCount++;
 
 		return Hooks::DXGIPresent(pChain, SyncInterval, Flags);
 	}
@@ -393,8 +396,8 @@ namespace Main
 		s_UIContext->Shutdown();
 
 		/* Cache window dimensions */
-		Renderer::Width = Width;
-		Renderer::Height = Height;
+		s_RendererCtx->Window.Width = Width;
+		s_RendererCtx->Window.Height = Height;
 
 		if (s_NexusLink)
 		{

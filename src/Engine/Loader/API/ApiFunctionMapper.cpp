@@ -16,7 +16,6 @@
 #include "GW2/Inputs/GameBinds/GbApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
-#include "Renderer.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Localization/Localization.h"
 #include "Engine/Logging/LogApi.h"
@@ -30,23 +29,24 @@
 
 namespace ADDONAPI
 {
-	static bool            s_IsInitialized = false;
+	static bool             s_IsInitialized = false;
 
-	static CDataLinkApi*   s_DataLinkApi   = nullptr;
-	static CEventApi*      s_EventApi      = nullptr;
-	static CGameBindsApi*  s_GameBindsApi  = nullptr;
-	static CInputBindApi*  s_InputBindApi  = nullptr;
-	static CRawInputApi*   s_RawInputApi   = nullptr;
-	static CLocalization*  s_Localization  = nullptr;
-	static CLogApi*        s_Logger        = nullptr;
-	static CTextureLoader* s_TextureApi    = nullptr;
-	static CUpdater*       s_Updater       = nullptr;
+	static CDataLinkApi*    s_DataLinkApi   = nullptr;
+	static CEventApi*       s_EventApi      = nullptr;
+	static CGameBindsApi*   s_GameBindsApi  = nullptr;
+	static CInputBindApi*   s_InputBindApi  = nullptr;
+	static CRawInputApi*    s_RawInputApi   = nullptr;
+	static CLocalization*   s_Localization  = nullptr;
+	static CLogApi*         s_Logger        = nullptr;
+	static CTextureLoader*  s_TextureApi    = nullptr;
+	static CUpdater*        s_Updater       = nullptr;
+	static RenderContext_t* s_RenderCtx     = nullptr;
 
-	static CUiContext*     s_UiContext     = nullptr;
-	static CFontManager*   s_FontManager   = nullptr;
-	static CAlerts*        s_Alerts        = nullptr;
-	static CQuickAccess*   s_QuickAccess   = nullptr;
-	static CEscapeClosing* s_EscapeClosing = nullptr;
+	static CUiContext*      s_UiContext     = nullptr;
+	static CFontManager*    s_FontManager   = nullptr;
+	static CAlerts*         s_Alerts        = nullptr;
+	static CQuickAccess*    s_QuickAccess   = nullptr;
+	static CEscapeClosing*  s_EscapeClosing = nullptr;
 
 
 	namespace DataLink
@@ -542,6 +542,7 @@ namespace ADDONAPI
 			s_Logger        = ctx->GetLogger();
 			s_TextureApi    = ctx->GetTextureService();
 			s_Updater       = ctx->GetUpdater();
+			s_RenderCtx     = ctx->GetRendererCtx();
 
 			s_UiContext     = ctx->GetUIContext();
 			s_FontManager   = s_UiContext->GetFontManager();
@@ -571,7 +572,7 @@ namespace ADDONAPI
 				AddonAPI1_t* api = (AddonAPI1_t*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
 				assert(api);
 
-				api->SwapChain = Renderer::SwapChain;
+				api->SwapChain = s_RenderCtx->SwapChain;
 				api->ImguiContext = ImGui::GetCurrentContext();
 				api->ImguiMalloc = ImGui::MemAlloc;
 				api->ImguiFree = ImGui::MemFree;
@@ -621,7 +622,7 @@ namespace ADDONAPI
 				AddonAPI2_t* api = (AddonAPI2_t*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
 				assert(api);
 
-				api->SwapChain = Renderer::SwapChain;
+				api->SwapChain = s_RenderCtx->SwapChain;
 				api->ImguiContext = ImGui::GetCurrentContext();
 				api->ImguiMalloc = ImGui::MemAlloc;
 				api->ImguiFree = ImGui::MemFree;
@@ -682,7 +683,7 @@ namespace ADDONAPI
 				AddonAPI3_t* api = (AddonAPI3_t*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
 				assert(api);
 
-				api->SwapChain = Renderer::SwapChain;
+				api->SwapChain = s_RenderCtx->SwapChain;
 				api->ImguiContext = ImGui::GetCurrentContext();
 				api->ImguiMalloc = ImGui::MemAlloc;
 				api->ImguiFree = ImGui::MemFree;
@@ -747,7 +748,7 @@ namespace ADDONAPI
 				AddonAPI4_t* api = (AddonAPI4_t*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
 				assert(api);
 
-				api->SwapChain = Renderer::SwapChain;
+				api->SwapChain = s_RenderCtx->SwapChain;
 				api->ImguiContext = ImGui::GetCurrentContext();
 				api->ImguiMalloc = ImGui::MemAlloc;
 				api->ImguiFree = ImGui::MemFree;
@@ -820,7 +821,7 @@ namespace ADDONAPI
 				AddonAPI5_t* api = (AddonAPI5_t*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
 				assert(api);
 
-				api->SwapChain = Renderer::SwapChain;
+				api->SwapChain = s_RenderCtx->SwapChain;
 				api->ImguiContext = ImGui::GetCurrentContext();
 				api->ImguiMalloc = ImGui::MemAlloc;
 				api->ImguiFree = ImGui::MemFree;
@@ -895,7 +896,7 @@ namespace ADDONAPI
 				AddonAPI6_t* api = (AddonAPI6_t*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
 				assert(api);
 
-				api->SwapChain = Renderer::SwapChain;
+				api->SwapChain = s_RenderCtx->SwapChain;
 				api->ImguiContext = ImGui::GetCurrentContext();
 				api->ImguiMalloc = ImGui::MemAlloc;
 				api->ImguiFree = ImGui::MemFree;

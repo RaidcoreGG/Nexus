@@ -8,8 +8,8 @@
 
 #include "GW2/Mumble/Reader.h"
 
-#include "Renderer.h"
 #include "Util/CmdLine.h"
+#include "Context.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -138,15 +138,18 @@ void CMumbleReader::Advance()
 {
 	while (this->IsRunning)
 	{
+		CContext*        ctx      = CContext::GetContext();
+		RenderContext_t* renderer = ctx->GetRendererCtx();
+
 		this->Flip = !this->Flip; // every other tick so it gets refreshed every 100ms // FIXME: this is ugly lol
 		if (this->Flip)
 		{
 			this->NexusLink->IsGameplay = this->PreviousTick != this->MumbleLink->UITick ||
-				(this->PreviousFrameCounter == Renderer::FrameCounter && this->NexusLink->IsGameplay);
+				(this->PreviousFrameCounter == renderer->Metrics.FrameCount && this->NexusLink->IsGameplay);
 			this->NexusLink->IsMoving = this->PreviousAvatarPosition != this->MumbleLink->AvatarPosition;
 			this->NexusLink->IsCameraMoving = this->PreviousCameraFront != this->MumbleLink->CameraFront;
 
-			this->PreviousFrameCounter = Renderer::FrameCounter;
+			this->PreviousFrameCounter = renderer->Metrics.FrameCount;
 			this->PreviousTick = this->MumbleLink->UITick;
 			this->PreviousAvatarPosition = this->MumbleLink->AvatarPosition;
 			this->PreviousCameraFront = this->MumbleLink->CameraFront;

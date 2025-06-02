@@ -9,7 +9,6 @@
 #include "Shared.h"
 #include "State.h"
 #include "Context.h"
-#include "Renderer.h"
 
 #include "Util/CmdLine.h"
 #include "Util/DLL.h"

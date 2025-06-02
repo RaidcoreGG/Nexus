@@ -16,7 +16,6 @@
 
 #include "Consts.h"
 #include "Context.h"
-#include "Renderer.h"
 #include "resource.h"
 #include "Engine/Settings/Settings.h"
 #include "Shared.h"
@@ -155,16 +154,19 @@ void CQuickAccess::Render()
 
 	ImVec2 pos = ImVec2(0.0f, 0.0f);
 
+	CContext*        ctx      = CContext::GetContext();
+	RenderContext_t* renderer = ctx->GetRendererCtx();
+
 	switch (this->Location)
 	{
 		case EQaPosition::Extend:
-			pos.x += (size * Renderer::Scaling) * GW2_QUICKACCESS_ITEMS;
+			pos.x += (size * UIRoot::ScalingFactor) * GW2_QUICKACCESS_ITEMS;
 			break;
 		case EQaPosition::Under:
-			pos.y += size * Renderer::Scaling;
+			pos.y += size * UIRoot::ScalingFactor;
 			break;
 		case EQaPosition::Bottom:
-			pos.y += Renderer::Height - (size * 2 * Renderer::Scaling);
+			pos.y += renderer->Window.Height - (size * 2 * UIRoot::ScalingFactor);
 			break;
 	}
 
@@ -191,11 +193,11 @@ void CQuickAccess::Render()
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f }); // smol checkbox
 			if (this->VerticalLayout)
 			{
-				ImGui::SetCursorPos(ImVec2(0, ((size * c) + (c ? 1 : 0)) * Renderer::Scaling));
+				ImGui::SetCursorPos(ImVec2(0, ((size * c) + (c ? 1 : 0)) * UIRoot::ScalingFactor));
 			}
 			else
 			{
-				ImGui::SetCursorPos(ImVec2(((size * c) + (c ? 1 : 0)) * Renderer::Scaling, 0));
+				ImGui::SetCursorPos(ImVec2(((size * c) + (c ? 1 : 0)) * UIRoot::ScalingFactor, 0));
 			}
 
 			ImVec2 pos = ImGui::GetCursorPos();
@@ -206,7 +208,7 @@ void CQuickAccess::Render()
 				shortcut.TextureHover && shortcut.TextureHover->Resource)
 			{
 				ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
-				if (ImGui::IconButton(!shortcut.IsHovering ? shortcut.TextureNormal->Resource : shortcut.TextureHover->Resource, ImVec2(size * Renderer::Scaling, size * Renderer::Scaling)))
+				if (ImGui::IconButton(!shortcut.IsHovering ? shortcut.TextureNormal->Resource : shortcut.TextureHover->Resource, ImVec2(size * UIRoot::ScalingFactor, size * UIRoot::ScalingFactor)))
 				{
 					isActive = true;
 					if (shortcut.IBIdentifier.length() > 0)
@@ -251,7 +253,7 @@ void CQuickAccess::Render()
 			{
 				if (shortcut.HasNotification)
 				{
-					float offIcon = (size * Renderer::Scaling) / 2.0f;
+					float offIcon = (size * UIRoot::ScalingFactor) / 2.0f;
 
 					pos.x += offIcon;
 					pos.y += offIcon;
@@ -301,7 +303,7 @@ void CQuickAccess::Render()
 		if (this->Location == EQaPosition::Extend)
 		{
 			ImVec2 mPos = ImGui::GetMousePos();
-			if (mPos.x != -FLT_MAX && mPos.y != -FLT_MAX && mPos.x < pos.x - this->Offset.x && mPos.y < Renderer::Scaling * size)
+			if (mPos.x != -FLT_MAX && mPos.y != -FLT_MAX && mPos.x < pos.x - this->Offset.x && mPos.y < UIRoot::ScalingFactor * size)
 			{
 				isHoveringNative = true;
 			}

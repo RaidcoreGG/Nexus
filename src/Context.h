@@ -6,18 +6,19 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
+#include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
-#include "GW2/Inputs/GameBinds/GbApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
 #include "Engine/Loader/AddonVersion.h"
-#include "Engine/DataLink/DlApi.h"
 #include "Engine/Localization/Localization.h"
 #include "Engine/Logging/LogApi.h"
-#include "GW2/Mumble/Reader.h"
+#include "Engine/Renderer/RdrContext.h"
 #include "Engine/Settings/Settings.h"
 #include "Engine/Textures/TxLoader.h"
 #include "Engine/Updater/Updater.h"
+#include "GW2/Inputs/GameBinds/GbApi.h"
+#include "GW2/Mumble/Reader.h"
 #include "UI/UiContext.h"
 
 #ifndef CONTEXT_H
@@ -40,6 +41,8 @@ class CContext
 	HMODULE GetModule();
 
 	DWORD GetModuleSize();
+
+	RenderContext_t* GetRendererCtx();
 
 	CLogApi* GetLogger();
 

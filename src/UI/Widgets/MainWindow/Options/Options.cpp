@@ -16,7 +16,6 @@
 #include "Consts.h"
 #include "Context.h"
 #include "Engine/Index/Index.h"
-#include "Renderer.h"
 #include "resource.h"
 #include "Util/Base64.h"
 #include "Util/Time.h"
@@ -248,10 +247,12 @@ void COptionsWindow::TabGeneral()
 					qactx->Location = newQaPos;
 					settingsctx->Set(OPT_QALOCATION, qactx->Location);
 				}
+				
+				RenderContext_t* renderer = ctx->GetRendererCtx();
 
 				/* offset */
 				ImGui::Text(langApi->Translate("((000051))"));
-				if (ImGui::DragFloat2("##QAOffsetInput", (float*)&qactx->Offset, 1.0f, (static_cast<int>(Renderer::Height)) * -1, static_cast<int>(Renderer::Height)))
+				if (ImGui::DragFloat2("##QAOffsetInput", (float*)&qactx->Offset, 1.0f, (static_cast<int>(renderer->Window.Height)) * -1, static_cast<int>(renderer->Window.Height)))
 				{
 					settingsctx->Set(OPT_QAOFFSETX, qactx->Offset.x);
 					settingsctx->Set(OPT_QAOFFSETY, qactx->Offset.y);

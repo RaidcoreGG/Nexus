@@ -17,8 +17,8 @@
 #include <vector>
 
 #include "Engine/Index/Index.h"
-#include "Renderer.h"
 #include "Util/Time.h"
+#include "Context.h"
 
 CTextureLoader::CTextureLoader(CLogApi* aLogger)
 {
@@ -557,8 +557,11 @@ void CTextureLoader::CreateTexture(const std::string& aIdentifier, QueuedTexture
 	subResource.SysMemPitch      = desc.Width * 4;
 	subResource.SysMemSlicePitch = 0;
 
+	CContext*        ctx = CContext::GetContext();
+	RenderContext_t* renderer = ctx->GetRendererCtx();
+
 	ID3D11Texture2D* pTexture = nullptr;
-	Renderer::Device->CreateTexture2D(&desc, &subResource, &pTexture);
+	renderer->Device->CreateTexture2D(&desc, &subResource, &pTexture);
 
 	if (!pTexture)
 	{
@@ -587,7 +590,7 @@ void CTextureLoader::CreateTexture(const std::string& aIdentifier, QueuedTexture
 	srvDesc.Texture2D.MostDetailedMip = 0;
 
 	ID3D11ShaderResourceView* srv = nullptr;
-	Renderer::Device->CreateShaderResourceView(pTexture, &srvDesc, &srv);
+	renderer->Device->CreateShaderResourceView(pTexture, &srvDesc, &srv);
 
 	pTexture->Release();
 
