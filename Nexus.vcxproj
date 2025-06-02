@@ -503,7 +503,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>src\exports.def</ModuleDefinitionFile>
-      <AdditionalDependencies>Shlwapi.lib;PathCch.lib;Shell32.lib;Psapi.lib;libssl64MTd.lib;libcrypto64MTd.lib;ws2_32.lib;gdi32.lib;advapi32.lib;crypt32.lib;user32.lib</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;crypt32.lib;gdi32.lib;ntdll.lib;PathCch.lib;Psapi.lib;shcore.lib;Shell32.lib;Shlwapi.lib;user32.lib;ws2_32.lib;libssl64MTd.lib;libcrypto64MTd.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>git submodule update --init --recursive
@@ -540,7 +540,7 @@ CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>src\exports.def</ModuleDefinitionFile>
-      <AdditionalDependencies>Shlwapi.lib;PathCch.lib;Shell32.lib;Psapi.lib;libssl64MT.lib;libcrypto64MT.lib;ws2_32.lib;gdi32.lib;advapi32.lib;crypt32.lib;user32.lib;ntdll.lib</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;crypt32.lib;gdi32.lib;ntdll.lib;PathCch.lib;Psapi.lib;shcore.lib;Shell32.lib;Shlwapi.lib;user32.lib;ws2_32.lib;libssl64MT.lib;libcrypto64MT.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>git submodule update --init --recursive

@@ -13,7 +13,6 @@
 #include <mutex>
 #include <vector>
 #include <shellscalingapi.h>
-#pragma comment(lib, "shcore.lib")
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_dx11.h"
