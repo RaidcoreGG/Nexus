@@ -80,17 +80,25 @@ void CBindSetterModal::OnOpening()
 	{
 		case EBindEditType::Nexus:
 		{
-			this->PreviousBindText = IBToString(ibapi->Get(this->NexusBindID), true);
+			const InputBind_t* ib = ibapi->Get(this->NexusBindID);
+
+			assert(ib != nullptr);
+
+			this->PreviousBindText = IBToString(*ib, true);
 			break;
 		}
 		case EBindEditType::Game:
 		{
-			this->PreviousBindText = IBToString(gbapi->Get(this->GameBindID).Primary, true);
+			const MultiInputBind_t* gb = gbapi->Get(this->GameBindID);
+
+			assert(gb != nullptr);
+
+			this->PreviousBindText = IBToString(gb->Primary, true);
 			break;
 		}
 		case EBindEditType::Game2:
 		{
-			this->PreviousBindText = IBToString(gbapi->Get(this->GameBindID).Secondary, true);
+			this->PreviousBindText = IBToString(gb->Secondary, true);
 			break;
 		}
 	}

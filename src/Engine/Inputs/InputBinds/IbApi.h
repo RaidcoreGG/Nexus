@@ -74,13 +74,14 @@ class CInputBindApi : public CInputBindCapture
 
 	///----------------------------------------------------------------------------------------------------
 	/// Get:
-	/// 	Gets a InputBind_t.
+	/// 	Gets a InputBind.
+	/// 	Returns nullptr, if it doesn't exist.
 	///----------------------------------------------------------------------------------------------------
-	const InputBind_t& Get(const std::string& aIdentifier);
+	const InputBind_t* Get(const std::string& aIdentifier);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Set:
-	/// 	Sets a InputBind_t.
+	/// 	Sets a InputBind.
 	///----------------------------------------------------------------------------------------------------
 	void Set(std::string aIdentifier, InputBind_t aInputBind);
 

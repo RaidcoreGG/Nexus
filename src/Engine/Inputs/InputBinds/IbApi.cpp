@@ -306,7 +306,7 @@ bool CInputBindApi::HasHandler(const std::string& aIdentifier)
 	return false;
 }
 
-const InputBind_t& CInputBindApi::Get(const std::string& aIdentifier)
+const InputBind_t* CInputBindApi::Get(const std::string& aIdentifier)
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -314,10 +314,10 @@ const InputBind_t& CInputBindApi::Get(const std::string& aIdentifier)
 
 	if (it != this->Registry.end())
 	{
-		return it->second.Bind;
+		return &it->second.Bind;
 	}
 
-	return {};
+	return nullptr;
 }
 
 void CInputBindApi::Set(std::string aIdentifier, InputBind_t aInputBind)

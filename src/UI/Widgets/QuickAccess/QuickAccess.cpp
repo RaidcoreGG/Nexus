@@ -78,7 +78,7 @@ void CQuickAccess::Render()
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 		for (auto& [identifier, shortcut] : this->Registry)
 		{
-			const InputBind_t& ib = this->InputBindApi->Get(shortcut.IBIdentifier);
+			const InputBind_t& ib = *this->InputBindApi->Get(shortcut.IBIdentifier);
 			if (ib.Device != EInputDevice::None)
 			{
 				shortcut.IBText = IBToString(ib, true);
@@ -383,10 +383,13 @@ void CQuickAccess::AddShortcut(const char* aIdentifier, const char* aTextureIden
 			sh.TextureHover = hover;
 			sh.IBIdentifier = aInputBindIdentifier;
 
-			const InputBind_t& ib = this->InputBindApi->Get(aInputBindIdentifier);
-			if (ib.Device != EInputDevice::None)
+			const InputBind_t* ib = this->InputBindApi->Get(aInputBindIdentifier);
+
+			assert(ib != nullptr);
+
+			if (ib->Device != EInputDevice::None)
 			{
-				sh.IBText = IBToString(ib, true);
+				sh.IBText = IBToString(*ib, true);
 			}
 
 			sh.TooltipText = aTooltipText;

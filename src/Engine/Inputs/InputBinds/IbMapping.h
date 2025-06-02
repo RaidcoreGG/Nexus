@@ -24,7 +24,7 @@ struct IbMapping_t
 	union {
 		INPUTBINDS_PROCESS  Handler_DownOnlyAsync;
 		INPUTBINDS_PROCESS2 Handler_DownReleaseAsync;
-		INPUTBINDS_PROCESS3 Handler_DownRelease;
+		INPUTBINDS_PROCESS3 Handler_DownRelease      = nullptr;
 	};
 };
 

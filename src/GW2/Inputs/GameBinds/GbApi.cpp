@@ -152,17 +152,23 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 		aGameBind = EGameBinds::MoveJump_SwimUp_FlyUp;
 	}
 
-	const MultiInputBind_t& bind = this->Get(aGameBind);
+	const MultiInputBind_t* bind = this->Get(aGameBind);
+
+	if (bind == nullptr)
+	{
+		return;
+	}
+
 	InputBind_t ib{};
 
-	if (bind.Primary.IsBound())
+	if (bind->Primary.IsBound())
 	{
-		ib = bind.Primary;
+		ib = bind->Primary;
 	}
 
 	if (!ib.IsBound())
 	{
-		ib = bind.Secondary;
+		ib = bind->Secondary;
 	}
 
 	if (!ib.IsBound())
@@ -307,17 +313,23 @@ void CGameBindsApi::Release(EGameBinds aGameBind)
 		aGameBind = EGameBinds::MoveJump_SwimUp_FlyUp;
 	}
 
-	const MultiInputBind_t& bind = this->Get(aGameBind);
+	const MultiInputBind_t* bind = this->Get(aGameBind);
+
+	if (bind == nullptr)
+	{
+		return;
+	}
+
 	InputBind_t ib{};
 
-	if (bind.Primary.IsBound())
+	if (bind->Primary.IsBound())
 	{
-		ib = bind.Primary;
+		ib = bind->Primary;
 	}
 
 	if (!ib.IsBound())
 	{
-		ib = bind.Secondary;
+		ib = bind->Secondary;
 	}
 
 	if (!ib.IsBound())
@@ -510,18 +522,18 @@ bool CGameBindsApi::IsBound(EGameBinds aGameBind)
 	return it->second.Primary.IsBound() || it->second.Secondary.IsBound();
 }
 
-const MultiInputBind_t& CGameBindsApi::Get(EGameBinds aGameBind)
+const MultiInputBind_t* CGameBindsApi::Get(EGameBinds aGameBind)
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	auto it = this->Registry.find(aGameBind);
 
-	if (it == this->Registry.end())
+	if (it != this->Registry.end())
 	{
-		return MultiInputBind_t{};
+		return &it->second;
 	}
 
-	return it->second;
+	return nullptr;
 }
 
 void CGameBindsApi::Set(EGameBinds aGameBind, InputBind_t aInputBind, bool aIsPrimary, bool aIsRuntimeBind)
