@@ -39,27 +39,7 @@ After accepting you can open the menu using `CTRL+O` by default.
 ### Chainloading
 If you want another proxy d3d11.dll, for example ArcDPS, you can chainload it by naming it `d3d11_chainload.dll` and also putting it in the game directory.
 
-## Third Party Notices
-### [Dear ImGui](https://github.com/ocornut/imgui)
-Licensed under the MIT license.
-
-### [yhirose/cpp-httplib](https://github.com/yhirose/cpp-httplib)
-Licensed under the MIT license.
-
-### [TsudaKageyu/minhook](https://github.com/TsudaKageyu/minhook)
-Licensed under the BSD 2-Clause license.
-
-### [nlohmann/json](https://github.com/nlohmann/json)
-Licensed under the MIT license.
-
-### [nothings/stb_image](https://github.com/nothings/stb)
-Licensed under the MIT license.
-
-### [openssl](https://github.com/openssl/openssl)
-Licensed under the Apache-2.0 license.
-
-### [pugixml](https://pugixml.org/)
-Licensed under the MIT license.
+## [Third Party Notices](https://github.com/RaidcoreGG/Nexus/blob/main/THIRDPARTYSOFTWAREREADME.TXT)
 
 ## Special Thanks
 ### GGDM
