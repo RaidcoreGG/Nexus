@@ -98,6 +98,10 @@ void CBindSetterModal::OnOpening()
 		}
 		case EBindEditType::Game2:
 		{
+			const MultiInputBind_t* gb = gbapi->Get(this->GameBindID);
+
+			assert(gb != nullptr);
+
 			this->PreviousBindText = IBToString(gb->Secondary, true);
 			break;
 		}
