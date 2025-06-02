@@ -36,7 +36,7 @@
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Localization/Localization.h"
 #include "Engine/Logging/LogApi.h"
-#include "GW2/Mumble/Reader.h"
+#include "GW2/Mumble/MblReader.h"
 #include "Engine/Settings/Settings.h"
 #include "Engine/Textures/TxLoader.h"
 #include "Engine/Updater/Updater.h"

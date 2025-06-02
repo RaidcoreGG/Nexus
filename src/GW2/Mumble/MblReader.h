@@ -1,13 +1,13 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  Reader.h
+/// Name         :  MblReader.h
 /// Description  :  Provides Mumble API events and extended data.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef MUMBLE_READER_H
-#define MUMBLE_READER_H
+#ifndef MBLREADER_H
+#define MBLREADER_H
 
 #include <string>
 #include <thread>
@@ -22,24 +22,6 @@ constexpr const char* CH_MUMBLE_READER = "MumbleReader";
 constexpr const char* DL_MUMBLE_LINK = "DL_MUMBLE_LINK";
 constexpr const char* DL_MUMBLE_LINK_IDENTITY = "DL_MUMBLE_LINK_IDENTITY";
 constexpr const char* EV_MUMBLE_IDENTITY_UPDATED = "EV_MUMBLE_IDENTITY_UPDATED";
-
-/* UI Scale */
-constexpr const float SC_SMALL = 0.90f;
-constexpr const float SC_NORMAL = 1.00f;
-constexpr const float SC_LARGE = 1.11f;
-constexpr const float SC_LARGER = 1.22f;
-
-///----------------------------------------------------------------------------------------------------
-/// Mumble Namespace
-///----------------------------------------------------------------------------------------------------
-namespace Mumble
-{
-	///----------------------------------------------------------------------------------------------------
-	/// GetScalingFactor:
-	/// 	Returns the scaling factor for the given the UISize enum.
-	///----------------------------------------------------------------------------------------------------
-	float GetScalingFactor(EUIScale aSize);
-};
 
 ///----------------------------------------------------------------------------------------------------
 /// CMumbleReader Class
@@ -67,7 +49,7 @@ class CMumbleReader
 	/// IsDisabled:
 	/// 	Returns whether the MumbleLink API is explicitly disabled.
 	///----------------------------------------------------------------------------------------------------
-	bool IsDisabled();
+	bool IsDisabled() const;
 
 	private:
 	CDataLinkApi*     DataLinkApi            = nullptr;
@@ -80,7 +62,7 @@ class CMumbleReader
 	std::string       Name;
 	Mumble::Data*     MumbleLink             = nullptr;
 	Mumble::Identity* MumbleIdentity         = nullptr;
-	NexusLinkData_t*    NexusLink              = nullptr;
+	NexusLinkData_t*  NexusLink              = nullptr;
 
 	bool              Flip                   = false;
 	unsigned          PreviousTick           = 0;

@@ -26,6 +26,7 @@
     <ClCompile Include="src\Engine\Loader\EUpdateProvider.cpp" />
     <ClCompile Include="src\Engine\Loader\Library.cpp" />
     <ClCompile Include="src\Engine\Localization\Localization.cpp" />
+    <ClCompile Include="src\GW2\Mumble\MblConst.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Engine\Events\EvtApi.cpp" />
     <ClCompile Include="src\Engine\Logging\LogConst.cpp" />
@@ -49,7 +50,7 @@
     <ClCompile Include="src\thirdparty\minhook\mh_hook.cpp" />
     <ClCompile Include="src\thirdparty\minhook\mh_trampoline.cpp" />
     <ClCompile Include="src\GW2\Multibox\Multibox.cpp" />
-    <ClCompile Include="src\GW2\Mumble\Reader.cpp" />
+    <ClCompile Include="src\GW2\Mumble\MblReader.cpp" />
     <ClCompile Include="src\Proxy.cpp" />
     <ClCompile Include="src\Engine\Settings\Settings.cpp" />
     <ClCompile Include="src\Shared.cpp" />
@@ -112,6 +113,8 @@
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbMapping.h" />
     <ClInclude Include="src\Engine\Loader\AddonVersion.h" />
     <ClInclude Include="src\Engine\Loader\API\ApiFunctionMapper.h" />
+    <ClInclude Include="src\GW2\Mumble\MblConst.h" />
+    <ClInclude Include="src\GW2\Mumble\MblExtensions.h" />
     <ClInclude Include="src\Remote.h" />
     <ClInclude Include="src\Engine\API\ApiClient.h" />
     <ClInclude Include="src\Engine\API\APIRequest.h" />
@@ -311,7 +314,7 @@
     <ClInclude Include="src\thirdparty\minhook\mh_disasm.h" />
     <ClInclude Include="src\thirdparty\minhook\mh_hook.h" />
     <ClInclude Include="src\thirdparty\minhook\mh_trampoline.h" />
-    <ClInclude Include="src\GW2\Mumble\Reader.h" />
+    <ClInclude Include="src\GW2\Mumble\MblReader.h" />
     <ClInclude Include="src\Engine\Index\IdxFuncDefs.h" />
     <ClInclude Include="src\Proxy.h" />
     <ClInclude Include="src\resource.h" />

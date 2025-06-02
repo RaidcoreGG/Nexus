@@ -18,7 +18,7 @@
 #include "Engine/Textures/TxLoader.h"
 #include "Engine/Updater/Updater.h"
 #include "GW2/Inputs/GameBinds/GbApi.h"
-#include "GW2/Mumble/Reader.h"
+#include "GW2/Mumble/MblReader.h"
 #include "UI/UiContext.h"
 
 #ifndef CONTEXT_H

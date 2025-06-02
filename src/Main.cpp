@@ -21,7 +21,7 @@
 #include "Engine/Logging/LogWriter.h"
 #include "Engine/Logging/LogApi.h"
 #include "GW2/Multibox/Multibox.h"
-#include "GW2/Mumble/Reader.h"
+#include "GW2/Mumble/MblReader.h"
 #include "Engine/Settings/Settings.h"
 #include "Engine/Updater/Updater.h"
 #include "UI/UiContext.h"

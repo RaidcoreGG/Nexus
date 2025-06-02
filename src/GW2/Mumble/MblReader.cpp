@@ -1,89 +1,21 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  Reader.cpp
+/// Name         :  MblReader.cpp
 /// Description  :  Provides Mumble API events and extended data.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "GW2/Mumble/Reader.h"
-
-#include "Util/CmdLine.h"
-#include "Context.h"
+#include "GW2/Mumble/MblReader.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
 using namespace Mumble;
 
-namespace Mumble
-{
-	bool operator==(const Identity& lhs, const Identity& rhs)
-	{
-		if (strcmp(lhs.Name, rhs.Name) == 0 &&
-			lhs.Profession == rhs.Profession &&
-			lhs.Specialization == rhs.Specialization &&
-			lhs.Race == rhs.Race &&
-			lhs.MapID == rhs.MapID &&
-			lhs.WorldID == rhs.WorldID &&
-			lhs.TeamColorID == rhs.TeamColorID &&
-			lhs.IsCommander == rhs.IsCommander &&
-			lhs.FOV == rhs.FOV &&
-			lhs.UISize == rhs.UISize)
-		{
-			return true;
-		}
-		return false;
-	}
-
-	bool operator!=(const Identity& lhs, const Identity& rhs)
-	{
-		return !(lhs == rhs);
-	}
-
-	bool operator==(const Vector2& lhs, const Vector2& rhs)
-	{
-		if (trunc(1000. * lhs.X) == trunc(1000. * rhs.X) &&
-			trunc(1000. * lhs.Y) == trunc(1000. * rhs.Y))
-		{
-			return true;
-		}
-		return false;
-	}
-
-	bool operator!=(const Vector2& lhs, const Vector2& rhs)
-	{
-		return !(lhs == rhs);
-	}
-
-	bool operator==(const Vector3& lhs, const Vector3& rhs)
-	{
-		if (trunc(1000. * lhs.X) == trunc(1000. * rhs.X) &&
-			trunc(1000. * lhs.Y) == trunc(1000. * rhs.Y) &&
-			trunc(1000. * lhs.Z) == trunc(1000. * rhs.Z))
-		{
-			return true;
-		}
-		return false;
-	}
-
-	bool operator!=(const Vector3& lhs, const Vector3& rhs)
-	{
-		return !(lhs == rhs);
-	}
-
-	float GetScalingFactor(EUIScale aSize)
-	{
-		switch (aSize)
-		{
-		case EUIScale::Small:	return SC_SMALL;	// Small
-		default:
-		case EUIScale::Normal:	return SC_NORMAL;	// Normal
-		case EUIScale::Large:	return SC_LARGE;	// Large
-		case EUIScale::Larger:	return SC_LARGER;	// Larger
-		}
-	}
-}
+#include "Util/CmdLine.h"
+#include "Context.h"
+#include "MblExtensions.h"
 
 CMumbleReader::CMumbleReader(CDataLinkApi* aDataLink, CEventApi* aEventApi, CLogApi* aLogger)
 {
@@ -129,7 +61,7 @@ std::string CMumbleReader::GetName()
 	return this->Name;
 }
 
-bool CMumbleReader::IsDisabled()
+bool CMumbleReader::IsDisabled() const
 {
 	return !this->IsRunning;
 }
