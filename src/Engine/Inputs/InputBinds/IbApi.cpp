@@ -460,6 +460,7 @@ int CInputBindApi::Verify(void* aStartAddress, void* aEndAddress)
 				if (mapping.Handler_DownOnlyAsync >= aStartAddress && mapping.Handler_DownOnlyAsync <= aEndAddress)
 				{
 					mapping.Handler_DownOnlyAsync = nullptr;
+					mapping.HandlerType = EIbHandlerType::None;
 					refCounter++;
 				}
 				break;
@@ -469,6 +470,7 @@ int CInputBindApi::Verify(void* aStartAddress, void* aEndAddress)
 				if (mapping.Handler_DownReleaseAsync >= aStartAddress && mapping.Handler_DownReleaseAsync <= aEndAddress)
 				{
 					mapping.Handler_DownReleaseAsync = nullptr;
+					mapping.HandlerType = EIbHandlerType::None;
 					refCounter++;
 				}
 				break;
@@ -478,6 +480,7 @@ int CInputBindApi::Verify(void* aStartAddress, void* aEndAddress)
 				if (mapping.Handler_DownRelease >= aStartAddress && mapping.Handler_DownRelease <= aEndAddress)
 				{
 					mapping.Handler_DownRelease = nullptr;
+					mapping.HandlerType = EIbHandlerType::None;
 					refCounter++;
 				}
 				break;
@@ -616,28 +619,35 @@ void CInputBindApi::Save()
 
 bool CInputBindApi::Press(const InputBind_t& aInputBind)
 {
-	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [aInputBind](auto& entry)
-	{
-		return entry.second.Bind == aInputBind;
-	});
+	std::string identifier;
+	bool passthrough = false;
 
-	if (it == this->Registry.end())
 	{
-		return false;
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [aInputBind](auto& entry)
+		{
+			return entry.second.Bind == aInputBind;
+		});
+
+		if (it == this->Registry.end())
+		{
+			return false;
+		}
+
+		identifier = it->first;
+		passthrough = it->second.Passthrough;
 	}
 
-	auto heldIt = this->HeldInputBinds.find(it->first);
+	assert(this->HeldInputBinds.find(identifier) == this->HeldInputBinds.end());
 
 	/* track the actual bind/id combo */
-	if (heldIt == this->HeldInputBinds.end())
-	{
-		this->HeldInputBinds.emplace(it->first, it->second);
-	}
+	this->HeldInputBinds.emplace(identifier, aInputBind);
 
-	bool invoked = this->Invoke(it->first);
+	bool invoked = this->Invoke(identifier);
 
-	/* if was invoked -> stop processing (unless it was the togglehideui bind, pass through for multi hide)*/
-	if (invoked && it->second.Passthrough == false)
+	/* if was invoked -> stop processing (unless it was bind with passthrough flag) */
+	if (invoked && passthrough == false)
 	{
 		return true;
 	}
@@ -649,17 +659,17 @@ void CInputBindApi::Release(unsigned int aModifierVK)
 {
 	for (auto it = this->HeldInputBinds.begin(); it != this->HeldInputBinds.end();)
 	{
-		if (aModifierVK == VK_SHIFT && it->second.Bind.Shift)
+		if (aModifierVK == VK_SHIFT && it->second.Shift)
 		{
 			this->Invoke(it->first, true);
 			it = this->HeldInputBinds.erase(it);
 		}
-		else if (aModifierVK == VK_CONTROL && it->second.Bind.Ctrl)
+		else if (aModifierVK == VK_CONTROL && it->second.Ctrl)
 		{
 			this->Invoke(it->first, true);
 			it = this->HeldInputBinds.erase(it);
 		}
-		else if (aModifierVK == VK_MENU && it->second.Bind.Alt)
+		else if (aModifierVK == VK_MENU && it->second.Alt)
 		{
 			this->Invoke(it->first, true);
 			it = this->HeldInputBinds.erase(it);
@@ -675,7 +685,7 @@ void CInputBindApi::Release(EInputDevice aDevice, unsigned short aCode)
 {
 	for (auto it = this->HeldInputBinds.begin(); it != this->HeldInputBinds.end();)
 	{
-		if (it->second.Bind.Device == aDevice && it->second.Bind.Code == aCode)
+		if (it->second.Device == aDevice && it->second.Code == aCode)
 		{
 			this->Invoke(it->first, true);
 			it = this->HeldInputBinds.erase(it);
