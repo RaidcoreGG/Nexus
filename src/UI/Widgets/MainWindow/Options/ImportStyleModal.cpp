@@ -8,7 +8,7 @@
 
 #include "ImportStyleModal.h"
 
-#include "Context.h"
+#include "Core/Context.h"
 
 CImportStyleModal::CImportStyleModal()
 {

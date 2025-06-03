@@ -8,7 +8,7 @@
 
 #include "RiApi.h"
 
-#include "Context.h"
+#include "Core/Context.h"
 
 UINT CRawInputApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {

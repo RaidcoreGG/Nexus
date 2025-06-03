@@ -6,7 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "Context.h"
+#include "Core/Context.h"
 
 #include <Psapi.h>
 

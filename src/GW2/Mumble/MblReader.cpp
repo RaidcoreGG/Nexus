@@ -14,7 +14,7 @@ using json = nlohmann::json;
 using namespace Mumble;
 
 #include "Util/CmdLine.h"
-#include "Context.h"
+#include "Core/Context.h"
 #include "MblExtensions.h"
 
 CMumbleReader::CMumbleReader(CDataLinkApi* aDataLink, CEventApi* aEventApi, CLogApi* aLogger)

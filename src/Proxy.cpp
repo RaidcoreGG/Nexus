@@ -8,7 +8,7 @@
 #include "Engine/Index/Index.h"
 #include "Shared.h"
 #include "State.h"
-#include "Context.h"
+#include "Core/Context.h"
 
 #include "Util/CmdLine.h"
 #include "Util/DLL.h"

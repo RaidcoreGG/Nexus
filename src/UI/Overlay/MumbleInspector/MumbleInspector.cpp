@@ -8,7 +8,7 @@
 
 #include "MumbleInspector.h"
 
-#include "Context.h"
+#include "Core/Context.h"
 #include "Engine/DataLink/DlApi.h"
 
 CMumbleOverlay::CMumbleOverlay()

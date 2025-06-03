@@ -11,7 +11,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_extensions.h"
 #include "ImAnimate/ImAnimate.h"
-#include "Context.h"
+#include "Core/Context.h"
 
 constexpr ImGuiWindowFlags Flags
 	= ImGuiWindowFlags_NoDecoration

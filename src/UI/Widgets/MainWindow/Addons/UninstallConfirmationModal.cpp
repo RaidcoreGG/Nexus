@@ -8,7 +8,7 @@
 
 #include "UninstallConfirmationModal.h"
 
-#include "Context.h"
+#include "Core/Context.h"
 #include "Engine/Loader/Loader.h"
 
 CUninstallConfirmationModal::CUninstallConfirmationModal()
