@@ -433,13 +433,13 @@ void CGameBindsApi::RestoreModifiers()
 		);
 	}
 
-	if (GetAsyncKeyState(VK_LCONTROL))
+	if (GetAsyncKeyState(VK_CONTROL))
 	{
 		this->RawInputApi->SendWndProcToGame(
 			0,
 			WM_KEYDOWN,
-			VK_LCONTROL,
-			GetKeyMessageLPARAM(VK_LCONTROL, true, false)
+			VK_CONTROL,
+			GetKeyMessageLPARAM(VK_CONTROL, true, false)
 		);
 	}
 	else
@@ -447,36 +447,18 @@ void CGameBindsApi::RestoreModifiers()
 		this->RawInputApi->SendWndProcToGame(
 			0,
 			WM_KEYUP,
-			VK_LCONTROL,
-			GetKeyMessageLPARAM(VK_LCONTROL, false, false)
-		);
-	}
-	if (GetAsyncKeyState(VK_RCONTROL))
-	{
-		this->RawInputApi->SendWndProcToGame(
-			0,
-			WM_KEYDOWN,
-			VK_RCONTROL,
-			GetKeyMessageLPARAM(VK_RCONTROL, true, false)
-		);
-	}
-	else
-	{
-		this->RawInputApi->SendWndProcToGame(
-			0,
-			WM_KEYUP,
-			VK_RCONTROL,
-			GetKeyMessageLPARAM(VK_RCONTROL, false, false)
+			VK_CONTROL,
+			GetKeyMessageLPARAM(VK_CONTROL, false, false)
 		);
 	}
 
-	if (GetAsyncKeyState(VK_LSHIFT))
+	if (GetAsyncKeyState(VK_SHIFT))
 	{
 		this->RawInputApi->SendWndProcToGame(
 			0,
 			WM_KEYDOWN,
-			VK_LSHIFT,
-			GetKeyMessageLPARAM(VK_LSHIFT, true, false)
+			VK_SHIFT,
+			GetKeyMessageLPARAM(VK_SHIFT, true, false)
 		);
 	}
 	else
@@ -484,26 +466,8 @@ void CGameBindsApi::RestoreModifiers()
 		this->RawInputApi->SendWndProcToGame(
 			0,
 			WM_KEYUP,
-			VK_LSHIFT,
-			GetKeyMessageLPARAM(VK_LSHIFT, false, false)
-		);
-	}
-	if (GetAsyncKeyState(VK_RSHIFT))
-	{
-		this->RawInputApi->SendWndProcToGame(
-			0,
-			WM_KEYDOWN,
-			VK_RSHIFT,
-			GetKeyMessageLPARAM(VK_RSHIFT, true, false)
-		);
-	}
-	else
-	{
-		this->RawInputApi->SendWndProcToGame(
-			0,
-			WM_KEYUP,
-			VK_RSHIFT,
-			GetKeyMessageLPARAM(VK_RSHIFT, false, false)
+			VK_SHIFT,
+			GetKeyMessageLPARAM(VK_SHIFT, false, false)
 		);
 	}
 }
