@@ -56,7 +56,8 @@ class CMumbleReader
 	CEventApi*        EventApi               = nullptr;
 	CLogApi*          Logger                 = nullptr;
 
-	std::thread       Thread;
+	std::thread       ThreadIdentity;
+	std::thread       ThreadDerived;
 	bool              IsRunning              = false;
 
 	std::string       Name;
@@ -64,7 +65,6 @@ class CMumbleReader
 	Mumble::Identity* MumbleIdentity         = nullptr;
 	NexusLinkData_t*  NexusLink              = nullptr;
 
-	bool              Flip                   = false;
 	unsigned          PreviousTick           = 0;
 	Vector3           PreviousAvatarPosition = {};
 	Vector3           PreviousCameraFront    = {};
@@ -72,10 +72,16 @@ class CMumbleReader
 	long long         PreviousFrameCounter   = 0;
 
 	///----------------------------------------------------------------------------------------------------
-	/// Advance:
-	/// 	Reader loop function.
+	/// AdvanceIdentity:
+	/// 	Thread function to parse the mumble identity.
 	///----------------------------------------------------------------------------------------------------
-	void Advance();
+	void AdvanceIdentity();
+
+	///----------------------------------------------------------------------------------------------------
+	/// AdvanceDerived:
+	/// 	Thread function to update derived states.
+	///----------------------------------------------------------------------------------------------------
+	void AdvanceDerived();
 };
 
 #endif

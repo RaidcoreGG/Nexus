@@ -35,14 +35,15 @@ CMumbleReader::CMumbleReader(CDataLinkApi* aDataLink, CEventApi* aEventApi, CLog
 	}
 
 	/* share the linked mem regardless whether it's disabled, for dependant addons */
-	this->MumbleLink = (Mumble::Data*)this->DataLinkApi->ShareResource(DL_MUMBLE_LINK, sizeof(Mumble::Data), this->Name.c_str(), true);
-	this->MumbleIdentity = (Mumble::Identity*)this->DataLinkApi->ShareResource(DL_MUMBLE_LINK_IDENTITY, sizeof(Mumble::Identity), "", false);
-	this->NexusLink = (NexusLinkData_t*)this->DataLinkApi->ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData_t), "", true);
+	this->MumbleLink     = (Mumble::Data*)    this->DataLinkApi->ShareResource(DL_MUMBLE_LINK,          sizeof(Mumble::Data),     this->Name.c_str(), true);
+	this->MumbleIdentity = (Mumble::Identity*)this->DataLinkApi->ShareResource(DL_MUMBLE_LINK_IDENTITY, sizeof(Mumble::Identity), "",                 false);
+	this->NexusLink      = (NexusLinkData_t*) this->DataLinkApi->ShareResource(DL_NEXUS_LINK,           sizeof(NexusLinkData_t),  "",                 true);
 
 	if (this->Name != "0")
 	{
 		this->IsRunning = true;
-		this->Thread = std::thread(&CMumbleReader::Advance, this);
+		this->ThreadIdentity = std::thread(&CMumbleReader::AdvanceIdentity, this);
+		this->ThreadDerived = std::thread(&CMumbleReader::AdvanceDerived, this);
 	}
 }
 
@@ -50,9 +51,14 @@ CMumbleReader::~CMumbleReader()
 {
 	this->IsRunning = false;
 
-	if (this->Thread.joinable())
+	if (this->ThreadIdentity.joinable())
 	{
-		this->Thread.join();
+		this->ThreadIdentity.join();
+	}
+
+	if (this->ThreadDerived.joinable())
+	{
+		this->ThreadDerived.join();
 	}
 }
 
@@ -66,27 +72,10 @@ bool CMumbleReader::IsDisabled() const
 	return !this->IsRunning;
 }
 
-void CMumbleReader::Advance()
+void CMumbleReader::AdvanceIdentity()
 {
 	while (this->IsRunning)
 	{
-		CContext*        ctx      = CContext::GetContext();
-		RenderContext_t* renderer = ctx->GetRendererCtx();
-
-		this->Flip = !this->Flip; // every other tick so it gets refreshed every 100ms // FIXME: this is ugly lol
-		if (this->Flip)
-		{
-			this->NexusLink->IsGameplay = this->PreviousTick != this->MumbleLink->UITick ||
-				(this->PreviousFrameCounter == renderer->Metrics.FrameCount && this->NexusLink->IsGameplay);
-			this->NexusLink->IsMoving = this->PreviousAvatarPosition != this->MumbleLink->AvatarPosition;
-			this->NexusLink->IsCameraMoving = this->PreviousCameraFront != this->MumbleLink->CameraFront;
-
-			this->PreviousFrameCounter = renderer->Metrics.FrameCount;
-			this->PreviousTick = this->MumbleLink->UITick;
-			this->PreviousAvatarPosition = this->MumbleLink->AvatarPosition;
-			this->PreviousCameraFront = this->MumbleLink->CameraFront;
-		}
-
 		if (this->MumbleLink->Identity[0])
 		{
 			/* cache identity */
@@ -95,7 +84,7 @@ void CMumbleReader::Advance()
 			try
 			{
 				/* parse and assign current identity */
-				json j = json::parse(MumbleLink->Identity);
+				json j = json::parse(this->MumbleLink->Identity);
 				strcpy(this->MumbleIdentity->Name, j["name"].get<std::string>().c_str());
 				j["profession"].get_to(this->MumbleIdentity->Profession);
 				j["spec"].get_to(this->MumbleIdentity->Specialization);
@@ -127,11 +116,30 @@ void CMumbleReader::Advance()
 			}
 		}
 
-		for (size_t i = 0; i < 50; i++)
-		{
-			if (!this->IsRunning) { return; } // abort if shutdown during sleep
+		Sleep(50);
+	}
+}
 
-			Sleep(1);
-		}
+void CMumbleReader::AdvanceDerived()
+{
+	while (this->IsRunning)
+	{
+		CContext*        ctx      = CContext::GetContext();
+		RenderContext_t* renderer = ctx->GetRendererCtx();
+
+		bool tickChanged  = this->PreviousTick != this->MumbleLink->UITick;
+		bool gameFrozen   = this->PreviousFrameCounter == renderer->Metrics.FrameCount;
+
+		/* Either the ui is ticking or the ui *was* ticking and the game is frozen. */
+		this->NexusLink->IsGameplay     = tickChanged || (gameFrozen && this->NexusLink->IsGameplay);
+		this->NexusLink->IsMoving       = this->PreviousAvatarPosition != this->MumbleLink->AvatarPosition;
+		this->NexusLink->IsCameraMoving = this->PreviousCameraFront != this->MumbleLink->CameraFront;
+
+		this->PreviousFrameCounter   = renderer->Metrics.FrameCount;
+		this->PreviousTick           = this->MumbleLink->UITick;
+		this->PreviousAvatarPosition = this->MumbleLink->AvatarPosition;
+		this->PreviousCameraFront    = this->MumbleLink->CameraFront;
+
+		Sleep(100);
 	}
 }
