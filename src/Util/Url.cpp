@@ -12,6 +12,18 @@
 
 namespace URL
 {
+	bool UsingHTTPS(const std::string& aUrl)
+	{
+		size_t httpsIdx = aUrl.find("https://");
+
+		if (httpsIdx != std::string::npos)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	std::string GetBase(const std::string& aUrl)
 	{
 		size_t httpIdx = aUrl.find("http://");

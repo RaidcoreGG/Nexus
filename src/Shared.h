@@ -7,7 +7,7 @@
 
 #include "Engine/Loader/AddonVersion.h"
 #include "Engine/Logging/LogApi.h"
-#include "Engine/API/ApiClient.h"
+#include "Engine/Networking/WebRequests/WreClient.h"
 #include "Engine/Localization/Localization.h"
 #include "Engine/Updater/Updater.h"
 #include "Engine/Textures/TxLoader.h"
@@ -20,8 +20,8 @@
 
 #include "imgui/imgui.h"
 
-extern CApiClient*					RaidcoreAPI;
-extern CApiClient*					GitHubAPI;
+extern CHttpClient*					RaidcoreAPI;
+extern CHttpClient*					GitHubAPI;
 
 extern bool							IsGameLaunchSequence;
 

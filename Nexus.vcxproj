@@ -19,7 +19,7 @@
     <ClCompile Include="src\Engine\Inputs\InputBinds\IbConst.cpp" />
     <ClCompile Include="src\Engine\Loader\AddonVersion.cpp" />
     <ClCompile Include="src\Engine\Loader\API\ApiFunctionMapper.cpp" />
-    <ClCompile Include="src\Engine\API\ApiClient.cpp" />
+    <ClCompile Include="src\Engine\Networking\WebRequests\WreClient.cpp" />
     <ClCompile Include="src\CrashHandler.cpp" />
     <ClCompile Include="src\Engine\DataLink\DlApi.cpp" />
     <ClCompile Include="src\Engine\Loader\ArcDPS.cpp" />
@@ -99,6 +99,7 @@
     <ClInclude Include="src\Engine\Events\EvtData.h" />
     <ClInclude Include="src\Engine\Index\IdxEnum.h" />
     <ClInclude Include="src\Engine\Index\Index.h" />
+    <ClInclude Include="src\Engine\Networking\NetConst.h" />
     <ClInclude Include="src\Engine\Renderer\RdrContext.h" />
     <ClInclude Include="src\Engine\Renderer\RdrMetrics.h" />
     <ClInclude Include="src\Engine\Renderer\RdrWindow.h" />
@@ -116,10 +117,10 @@
     <ClInclude Include="src\GW2\Mumble\MblConst.h" />
     <ClInclude Include="src\GW2\Mumble\MblExtensions.h" />
     <ClInclude Include="src\Remote.h" />
-    <ClInclude Include="src\Engine\API\ApiClient.h" />
-    <ClInclude Include="src\Engine\API\APIRequest.h" />
-    <ClInclude Include="src\Engine\API\APIResponse.h" />
-    <ClInclude Include="src\Engine\API\CachedResponse.h" />
+    <ClInclude Include="src\Engine\Networking\WebRequests\WreClient.h" />
+    <ClInclude Include="src\Engine\Networking\WebRequests\WreRequest.h" />
+    <ClInclude Include="src\Engine\Networking\WebRequests\WreResponse.h" />
+    <ClInclude Include="src\Engine\Networking\WebRequests\WreCacheEntry.h" />
     <ClInclude Include="src\Branch.h" />
     <ClInclude Include="src\Consts.h" />
     <ClInclude Include="src\CrashHandler.h" />

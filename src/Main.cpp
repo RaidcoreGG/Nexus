@@ -15,7 +15,7 @@
 #include "GW2/Inputs/GameBinds/GbApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Loader/Loader.h"
-#include "Engine/API/ApiClient.h"
+#include "Engine/Networking/WebRequests/WreClient.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Logging/LogConsole.h"
 #include "Engine/Logging/LogWriter.h"
@@ -116,8 +116,8 @@ namespace Main
 		logger->Info(CH_CORE, "Nexus: %s %s", ctx->GetVersion().string().c_str(), ctx->GetBuild());
 		logger->Info(CH_CORE, "Entry method: %d", aEntryMethod);
 
-		RaidcoreAPI = new CApiClient("https://api.raidcore.gg", true, Index(EPath::DIR_APICACHE_RAIDCORE), 30 * 60, 300, 5, 1);//, Certs::Raidcore);
-		GitHubAPI = new CApiClient("https://api.github.com", true, Index(EPath::DIR_APICACHE_GITHUB), 30 * 60, 60, 60, 60 * 60);
+		RaidcoreAPI = new CHttpClient("https://api.raidcore.gg", Index(EPath::DIR_APICACHE_RAIDCORE), 30 * 60, 300, 5, 1);
+		GitHubAPI = new CHttpClient("https://api.github.com", Index(EPath::DIR_APICACHE_GITHUB), 30 * 60, 60, 60, 60 * 60);
 
 		std::thread([logger, updater]()
 		{

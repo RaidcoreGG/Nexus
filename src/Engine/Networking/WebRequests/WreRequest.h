@@ -4,7 +4,7 @@
 #include <string>
 #include <condition_variable>
 
-#include "CachedResponse.h"
+#include "WreCacheEntry.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
@@ -18,11 +18,11 @@ enum class ERequestType
 
 struct APIRequest_t
 {
-	ERequestType				Type;
-	bool*						IsComplete;
-	std::condition_variable*	CV;
-	int							Attempts;
-	std::string					Query;
+	ERequestType             Type;
+	bool*                    IsComplete;
+	std::condition_variable* CV;
+	int                      Attempts;
+	std::string              Query;
 };
 
 #endif

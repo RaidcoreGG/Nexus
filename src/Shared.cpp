@@ -2,7 +2,7 @@
 
 #include "Version.h"
 
-CApiClient*					RaidcoreAPI			= nullptr;
-CApiClient*					GitHubAPI			= nullptr;
+CHttpClient*					RaidcoreAPI			= nullptr;
+CHttpClient*					GitHubAPI			= nullptr;
 
 bool						IsGameLaunchSequence = true;
