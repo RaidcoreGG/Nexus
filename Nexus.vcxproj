@@ -12,7 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Context.cpp" />
-    <ClCompile Include="src\Engine\Functions\FncRegistry.cpp" />
+    <ClCompile Include="src\Engine\Functions\FnRegistry.cpp" />
     <ClCompile Include="src\Engine\Index\Index.cpp" />
     <ClCompile Include="src\GW2\Inputs\GameBinds\GbApi.cpp" />
     <ClCompile Include="src\GW2\Inputs\GameBinds\GbConst.cpp" />
@@ -98,9 +98,8 @@
   <ItemGroup>
     <ClInclude Include="src\Core\Context.h" />
     <ClInclude Include="src\Engine\Events\EvtData.h" />
-    <ClInclude Include="src\Engine\Functions\FncEntry.h" />
-    <ClInclude Include="src\Engine\Functions\FncEnum.h" />
-    <ClInclude Include="src\Engine\Functions\FncRegistry.h" />
+    <ClInclude Include="src\Engine\Functions\FnEntry.h" />
+    <ClInclude Include="src\Engine\Functions\FnRegistry.h" />
     <ClInclude Include="src\Engine\Index\IdxEnum.h" />
     <ClInclude Include="src\Engine\Index\Index.h" />
     <ClInclude Include="src\Engine\Networking\NetConst.h" />
