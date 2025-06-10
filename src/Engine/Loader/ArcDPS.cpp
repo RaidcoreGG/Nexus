@@ -64,7 +64,7 @@ namespace ArcDPS
 		}
 		else
 		{
-			CContext::GetContext()->GetLogger()->Warning(CH_CORE, "Error parsing API response for /arcdpslibrary.");
+			CContext::GetContext()->GetLogger()->Warning(CH_LOADER, "Error parsing API response for /arcdpslibrary.");
 		}
 	}
 

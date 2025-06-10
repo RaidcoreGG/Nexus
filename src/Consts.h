@@ -5,7 +5,6 @@ constexpr const char* NULLSTR = "(null)";
 
 /* Channels */
 constexpr const char* CH_CORE = "Core";
-constexpr const char* CH_LOADER = "Loader";
 
 /* Events */
 constexpr const char* EV_WINDOW_RESIZED = "EV_WINDOW_RESIZED";

@@ -64,11 +64,11 @@ namespace Proxy
 						{
 							std::filesystem::remove(Index(EPath::D3D11Chainload));
 
-							logger->Info(CH_LOADER, "Removed duplicate Nexus from chainload.");
+							logger->Info(CH_CORE, "Removed duplicate Nexus from chainload.");
 						}
 						catch (std::filesystem::filesystem_error fErr)
 						{
-							logger->Debug(CH_LOADER, "%s", fErr.what());
+							logger->Debug(CH_CORE, "%s", fErr.what());
 						}
 					}
 					else

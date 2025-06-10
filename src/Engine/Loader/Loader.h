@@ -25,6 +25,7 @@
 #include "Engine/Loader/NexusLinkData.h"
 
 constexpr const UINT WM_ADDONDIRUPDATE = WM_USER + 101;
+constexpr const char* CH_LOADER = "Loader";
 
 namespace Loader
 {

@@ -137,11 +137,11 @@ namespace Loader
 					}
 					catch (const std::invalid_argument& e)
 					{
-						Logger->Trace(CH_CORE, "Invalid argument (-ggaddons): %s (exc: %s)", addonId.c_str(), e.what());
+						Logger->Trace(CH_LOADER, "Invalid argument (-ggaddons): %s (exc: %s)", addonId.c_str(), e.what());
 					}
 					catch (const std::out_of_range& e)
 					{
-						Logger->Trace(CH_CORE, "Out of range (-ggaddons): %s (exc: %s)", addonId.c_str(), e.what());
+						Logger->Trace(CH_LOADER, "Out of range (-ggaddons): %s (exc: %s)", addonId.c_str(), e.what());
 					}
 				}
 			}
