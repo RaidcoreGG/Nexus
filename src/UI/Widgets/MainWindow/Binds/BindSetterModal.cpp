@@ -21,7 +21,8 @@ CBindSetterModal::CBindSetterModal()
 void CBindSetterModal::RenderContent()
 {
 	CContext*      ctx   = CContext::GetContext();
-	CLocalization* lang  = ctx->GetLocalization();
+	CUiContext*    uictx = ctx->GetUIContext();
+	CLocalization* lang  = uictx->GetLocalization();
 	CInputBindApi* ibapi = ctx->GetInputBindApi();
 
 	this->Capture = ibapi->GetCapture();
@@ -212,8 +213,9 @@ void CBindSetterModal::SetTarget(EGameBinds aBindIdentifier, bool aIsPrimary)
 
 void CBindSetterModal::SetTitle()
 {
-	CContext*      ctx  = CContext::GetContext();
-	CLocalization* lang = ctx->GetLocalization();
+	CContext*      ctx   = CContext::GetContext();
+	CUiContext*    uictx = ctx->GetUIContext();
+	CLocalization* lang  = uictx->GetLocalization();
 
 	/* Override the title before opening the modal. */
 	std::string title = lang->Translate("((000062))");

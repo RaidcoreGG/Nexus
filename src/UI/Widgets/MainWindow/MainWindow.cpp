@@ -185,7 +185,8 @@ void CMainWindow::Render()
 				//navY += navItemSz.y + padding.y;
 			}
 			
-			static CLocalization* langApi = ctx->GetLocalization();
+			static CUiContext* uictx = ctx->GetUIContext();
+			static CLocalization* langApi = uictx->GetLocalization();
 
 			/* Dynamic Nav Items */
 			for (ISubWindow* window : this->Windows)

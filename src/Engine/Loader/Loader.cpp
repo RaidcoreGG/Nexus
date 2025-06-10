@@ -34,7 +34,7 @@
 #include "Engine/Inputs/RawInput/RiApi.h"
 #include "minhook/mh_hook.h"
 #include "Engine/DataLink/DlApi.h"
-#include "Engine/Localization/Localization.h"
+#include "Engine/Localization/LoclApi.h"
 #include "Engine/Logging/LogApi.h"
 #include "GW2/Mumble/MblReader.h"
 #include "Engine/Settings/Settings.h"
@@ -105,7 +105,7 @@ namespace Loader
 		Updater = ctx->GetUpdater();
 		CUiContext* uictx = ctx->GetUIContext();
 		Alerts = uictx->GetAlerts();
-		Language = ctx->GetLocalization();
+		Language = uictx->GetLocalization();
 		RenderContext_t* renderer = ctx->GetRendererCtx();
 
 		NexusLink = (NexusLinkData_t*)DataLink->ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData_t), "", true);

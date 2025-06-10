@@ -20,7 +20,7 @@
 #include "FuncDefs.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/DataLink/DlApi.h"
-#include "Engine/Localization/Localization.h"
+#include "Engine/Localization/LoclApi.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Textures/TxLoader.h"
 #include "UI/Services/Fonts/FontManager.h"
@@ -109,12 +109,6 @@ namespace UIRoot
 	/// 	Reacts to input bind changes, to trigger a UI refresh.
 	///----------------------------------------------------------------------------------------------------
 	void OnInputBindUpdate(void* aEventData);
-
-	///----------------------------------------------------------------------------------------------------
-	/// OnLanguageChanged:
-	/// 	Reacts to translation changes, to trigger a UI refresh.
-	///----------------------------------------------------------------------------------------------------
-	void OnLanguageChanged(void* aEventData);
 }
 
 ///----------------------------------------------------------------------------------------------------
@@ -126,7 +120,7 @@ class CUiContext
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CUiContext(CLogApi* aLogger, CLocalization* aLocalization, CTextureLoader* aTextureService, CDataLinkApi* aDataLink, CInputBindApi* aInputBindApi, CEventApi* aEventApi);
+	CUiContext(CLogApi* aLogger, CTextureLoader* aTextureService, CDataLinkApi* aDataLink, CInputBindApi* aInputBindApi, CEventApi* aEventApi);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -192,6 +186,12 @@ class CUiContext
 	/// 	Updates the UI scaling.
 	///----------------------------------------------------------------------------------------------------
 	void UpdateScaling();
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetLocalization:
+	/// 	Returns the localization component.
+	///----------------------------------------------------------------------------------------------------
+	CLocalization* GetLocalization();
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetAlerts:

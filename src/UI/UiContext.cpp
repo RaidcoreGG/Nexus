@@ -246,22 +246,11 @@ namespace UIRoot
 			uictx->Invalidate();
 		}
 	}
-
-	void OnLanguageChanged(void* aEventData)
-	{
-		CContext* ctx = CContext::GetContext();
-		CUiContext* uictx = ctx->GetUIContext();
-
-		assert(uictx);
-
-		uictx->Invalidate();
-	}
 }
 
-CUiContext::CUiContext(CLogApi* aLogger, CLocalization* aLocalization, CTextureLoader* aTextureService, CDataLinkApi* aDataLink, CInputBindApi* aInputBindApi, CEventApi* aEventApi)
+CUiContext::CUiContext(CLogApi* aLogger, CTextureLoader* aTextureService, CDataLinkApi* aDataLink, CInputBindApi* aInputBindApi, CEventApi* aEventApi)
 {
 	this->Logger         = aLogger;
-	this->Language       = aLocalization;
 	this->TextureService = aTextureService;
 	this->DataLink       = aDataLink;
 	this->InputBindApi   = aInputBindApi;
@@ -269,11 +258,12 @@ CUiContext::CUiContext(CLogApi* aLogger, CLocalization* aLocalization, CTextureL
 
 	this->ImGuiContext   = ImGui::CreateContext();
 
+	this->Language       = new CLocalization(aLogger);
 	this->Alerts         = new CAlerts(aDataLink);
 	this->MainWindow     = new CMainWindow();
-	this->QuickAccess    = new CQuickAccess(aDataLink, aLogger, aInputBindApi, aTextureService, aLocalization, aEventApi);
+	this->QuickAccess    = new CQuickAccess(aDataLink, aLogger, aInputBindApi, aTextureService, this->Language, aEventApi);
 
-	this->FontManager    = new CFontManager(aLocalization);
+	this->FontManager    = new CFontManager(this->Language);
 	this->EscapeClose    = new CEscapeClosing();
 
 	UIRoot::Initialize(this->Language, this->DataLink, this->FontManager);
@@ -282,7 +272,6 @@ CUiContext::CUiContext(CLogApi* aLogger, CLocalization* aLocalization, CTextureL
 	this->EventApi->Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", UIRoot::OnUELanguageChanged);
 	this->EventApi->Subscribe("EV_VOLATILE_ADDON_DISABLED",            UIRoot::OnVolatileAddonsDisabled);
 	this->EventApi->Subscribe("EV_INPUTBIND_UPDATED",                  UIRoot::OnInputBindUpdate);
-	this->EventApi->Subscribe("EV_LANGUAGE_CHANGED",                   UIRoot::OnLanguageChanged);
 
 	CAddonsWindow*  addonsWnd  = new CAddonsWindow();
 	COptionsWindow* optionsWnd = new COptionsWindow();
@@ -393,12 +382,12 @@ void CUiContext::Render()
 	if (this->Language->Advance())
 	{
 		this->FontManager->Reload();
+		this->Invalidate();
 	}
 	if (this->FontManager->Advance())
 	{
-		UIRoot::OnLanguageChanged(nullptr);
 		UIRoot::OnMumbleIdentityChanged(nullptr);
-		Shutdown();
+		this->Shutdown();
 	}
 
 	if (this->IsInvalid)
@@ -732,6 +721,11 @@ void CUiContext::UpdateScaling()
 	{
 		nexuslink->Scaling = UIRoot::ScalingFactor;
 	}
+}
+
+CLocalization* CUiContext::GetLocalization()
+{
+	return this->Language;
 }
 
 CAlerts* CUiContext::GetAlerts()

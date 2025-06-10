@@ -73,9 +73,9 @@ void COptionsWindow::RenderSubWindows()
 void COptionsWindow::TabGeneral()
 {
 	static CContext* ctx = CContext::GetContext();
-	static CLocalization* langApi = ctx->GetLocalization();
 	static CSettings* settingsctx = ctx->GetSettingsCtx();
 	static CUiContext* uictx = ctx->GetUIContext();
+	static CLocalization* langApi = uictx->GetLocalization();
 	static CQuickAccess* qactx = uictx->GetQuickAccess();
 
 	if (ImGui::BeginTabItem(langApi->Translate("((000052))")))
@@ -270,9 +270,9 @@ void COptionsWindow::TabGeneral()
 void COptionsWindow::TabStyle()
 {
 	CContext* ctx = CContext::GetContext();
-	CLocalization* langApi = ctx->GetLocalization();
 	CSettings* settingsctx = ctx->GetSettingsCtx();
 	CUiContext* uictx = ctx->GetUIContext();
+	CLocalization* langApi = uictx->GetLocalization();
 
 	if (ImGui::BeginTabItem(langApi->Translate("((000053))")))
 	{

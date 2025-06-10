@@ -26,7 +26,7 @@
     <ClCompile Include="src\Engine\Loader\ArcDPS.cpp" />
     <ClCompile Include="src\Engine\Loader\EUpdateProvider.cpp" />
     <ClCompile Include="src\Engine\Loader\Library.cpp" />
-    <ClCompile Include="src\Engine\Localization\Localization.cpp" />
+    <ClCompile Include="src\Engine\Localization\LoclApi.cpp" />
     <ClCompile Include="src\GW2\Mumble\MblConst.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Engine\Events\EvtApi.cpp" />
@@ -102,6 +102,8 @@
     <ClInclude Include="src\Engine\Functions\FnRegistry.h" />
     <ClInclude Include="src\Engine\Index\IdxEnum.h" />
     <ClInclude Include="src\Engine\Index\Index.h" />
+    <ClInclude Include="src\Engine\Localization\LoclLocale.h" />
+    <ClInclude Include="src\Engine\Localization\LoclQueuedText.h" />
     <ClInclude Include="src\Engine\Networking\NetConst.h" />
     <ClInclude Include="src\Engine\Renderer\RdrContext.h" />
     <ClInclude Include="src\Engine\Renderer\RdrMetrics.h" />
@@ -162,8 +164,8 @@
     <ClInclude Include="src\Engine\Loader\LibraryAddon.h" />
     <ClInclude Include="src\Engine\Loader\Loader.h" />
     <ClInclude Include="src\Engine\Loader\NexusLinkData.h" />
-    <ClInclude Include="src\Engine\Localization\FuncDefs.h" />
-    <ClInclude Include="src\Engine\Localization\Localization.h" />
+    <ClInclude Include="src\Engine\Localization\LoclFuncDefs.h" />
+    <ClInclude Include="src\Engine\Localization\LoclApi.h" />
     <ClInclude Include="src\Engine\Logging\LogFuncDefs.h" />
     <ClInclude Include="src\Main.h" />
     <ClInclude Include="src\GW2\Multibox\Multibox.h" />

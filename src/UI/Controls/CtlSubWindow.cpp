@@ -28,8 +28,9 @@ void ISubWindow::Render()
 
 	if (popout)
 	{
-		static CContext* ctx = CContext::GetContext();
-		static CLocalization* langApi = ctx->GetLocalization();
+		CContext* ctx = CContext::GetContext();
+		CUiContext* uictx = ctx->GetUIContext();
+		CLocalization* langApi = uictx->GetLocalization();
 
 		std::string wndName = langApi->Translate(this->DisplayName.c_str());
 
@@ -113,7 +114,8 @@ bool ISubWindow::HasSubWindows()
 std::string ISubWindow::GetNameID()
 {
 	static CContext* ctx = CContext::GetContext();
-	static CLocalization* langApi = ctx->GetLocalization();
+	static CUiContext* uictx = ctx->GetUIContext();
+	static CLocalization* langApi = uictx->GetLocalization();
 
 	std::string wndName = langApi->Translate(this->DisplayName.c_str());
 

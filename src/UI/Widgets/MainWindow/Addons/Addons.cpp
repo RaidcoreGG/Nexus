@@ -124,8 +124,9 @@ void CAddonsWindow::AddonItem(AddonItemData_t& aAddonData, float aWidth)
 
 		bool poppedCol = false;
 
-		static CContext* ctx = CContext::GetContext();
-		static CLocalization* langApi = ctx->GetLocalization();
+		static CContext*      ctx     = CContext::GetContext();
+		static CUiContext*    uictx   = ctx->GetUIContext();
+		static CLocalization* langApi = uictx->GetLocalization();
 
 		ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1);
 		if (ImGui::BeginChild(("AddonItem_" + sig).c_str(), itemSz, true))
@@ -327,8 +328,8 @@ void CAddonsWindow::AddonItem(AddonItemData_t& aAddonData, float aWidth)
 		if (ImGui::BeginChild(("AddonItem_" + sig).c_str(), itemSz, true))
 		{
 			static CContext* ctx = CContext::GetContext();
-			static CLocalization* langApi = ctx->GetLocalization();
 			static CUiContext* uictx = ctx->GetUIContext();
+			static CLocalization* langApi = uictx->GetLocalization();
 			static CAlerts* alertctx = uictx->GetAlerts();
 
 			if (ImGui::BeginChild("Info", ImVec2(itemSz.x - style.ItemSpacing.x - actionsAreaWidth - (style.WindowPadding.x * 2), innerHeight), false, ImGuiWindowFlags_NoBackground))
@@ -535,7 +536,8 @@ void CAddonsWindow::RenderContent()
 	static char searchTerm[400] = {};
 	
 	static CContext* ctx = CContext::GetContext();
-	static CLocalization* langApi = ctx->GetLocalization();
+	static CUiContext* uictx = ctx->GetUIContext();
+	static CLocalization* langApi = uictx->GetLocalization();
 	static CSettings* settingsctx = ctx->GetSettingsCtx();
 
 	ImVec2 region = ImGui::GetContentRegionAvail();
@@ -953,9 +955,9 @@ void CAddonsWindow::RenderContent()
 							};
 
 							CContext* ctx = CContext::GetContext();
-							CLocalization* langApi = ctx->GetLocalization();
-							CUpdater* updater = ctx->GetUpdater();
 							CUiContext* uictx = ctx->GetUIContext();
+							CLocalization* langApi = uictx->GetLocalization();
+							CUpdater* updater = ctx->GetUpdater();
 							CAlerts* alertctx = uictx->GetAlerts();
 
 							if (addon->Definitions->Provider != EUpdateProvider::Self && updater->UpdateAddon(tmpPath, addonInfo, false, 5 * 60))
@@ -1071,7 +1073,8 @@ void CAddonsWindow::RenderDetails()
 	if (ImGui::BeginChild("Details_Content", ImVec2(0, 0), false, ImGuiWindowFlags_NoBackground))
 	{
 		static CContext* ctx = CContext::GetContext();
-		static CLocalization* langApi = ctx->GetLocalization();
+		static CUiContext* uictx = ctx->GetUIContext();
+		static CLocalization* langApi = uictx->GetLocalization();
 
 		std::string sig = std::to_string(addonData.NexusAddon->Definitions->Signature);
 		std::string sigid = "##" + sig;
@@ -1125,7 +1128,7 @@ void CAddonsWindow::RenderDetails()
 									CUpdater* updater = ctx->GetUpdater();
 									CUiContext* uictx = ctx->GetUIContext();
 									CAlerts* alertctx = uictx->GetAlerts();
-									CLocalization* langApi = ctx->GetLocalization();
+									CLocalization* langApi = uictx->GetLocalization();
 
 									if (updater->UpdateAddon(tmpPath, addonInfo, false, 5 * 60))
 									{
@@ -1317,7 +1320,8 @@ void CAddonsWindow::RenderInputBindsTable(const std::unordered_map<std::string, 
 	if (ImGui::BeginTable("table_inputbinds_addons", 2, ImGuiTableFlags_BordersInnerH))
 	{
 		CContext* ctx = CContext::GetContext();
-		CLocalization* langApi = ctx->GetLocalization();
+		CUiContext* uictx = ctx->GetUIContext();
+		CLocalization* langApi = uictx->GetLocalization();
 
 		for (auto& [identifier, inputBind] : aInputBinds)
 		{

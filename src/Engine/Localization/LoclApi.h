@@ -1,13 +1,13 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  Localization.h
+/// Name         :  LoclApi.h
 /// Description  :  Handles localization of strings.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LOCALIZATION_H
-#define LOCALIZATION_H
+#ifndef LOCLAPI_H
+#define LOCLAPI_H
 
 #include <mutex>
 #include <filesystem>
@@ -15,28 +15,10 @@
 #include <string>
 
 #include "Engine/Logging/LogApi.h"
-#include "Engine/Events/EvtApi.h"
+#include "LoclLocale.h"
+#include "LoclQueuedText.h"
 
 constexpr const char* CH_LOCALIZATION = "Localization";
-
-///----------------------------------------------------------------------------------------------------
-/// Locale_t data struct
-///----------------------------------------------------------------------------------------------------
-struct Locale_t
-{
-	std::string DisplayName;
-	std::map<std::string, const char*> Texts;
-};
-
-///----------------------------------------------------------------------------------------------------
-/// QueuedTranslation_t data struct
-///----------------------------------------------------------------------------------------------------
-struct QueuedTranslation_t
-{
-	std::string Identifier;
-	std::string LanguageIdentifier;
-	std::string Text;
-};
 
 ///----------------------------------------------------------------------------------------------------
 /// CLocalization Class
@@ -47,7 +29,8 @@ class CLocalization
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CLocalization(CLogApi* aLogger, CEventApi* aEventApi);
+	CLocalization(CLogApi* aLogger);
+
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
@@ -56,6 +39,7 @@ class CLocalization
 	///----------------------------------------------------------------------------------------------------
 	/// Advance:
 	/// 	Processes new strings and adds them to the atlas.
+	/// 	Returns true if the atlas was modified.
 	///----------------------------------------------------------------------------------------------------
 	bool Advance();
 
@@ -70,7 +54,7 @@ class CLocalization
 	/// Set:
 	/// 	Adds or sets/overrides a localized string with a given identifier.
 	///----------------------------------------------------------------------------------------------------
-	void Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aString);
+	void Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aText);
 
 	///----------------------------------------------------------------------------------------------------
 	/// SetLanguage:
@@ -97,6 +81,26 @@ class CLocalization
 	void SetLocaleDirectory(std::filesystem::path aPath);
 
 	///----------------------------------------------------------------------------------------------------
+	/// GetAllTexts:
+	/// 	Returns every single string.
+	///----------------------------------------------------------------------------------------------------
+	std::vector<const char*> GetAllTexts();
+
+	private:
+	CLogApi*                         Logger   = nullptr;
+
+	uint32_t                         ThreadID = 0;
+
+	std::filesystem::path            Directory;
+	bool                             IsLocaleAtlasBuilt = false;
+	std::map<std::string, Locale_t>  LocaleAtlas; /* Identifier(e.g. "EN-GB") maps to object with display name("English (United Kingdom)") and a map of all its texts*/
+
+	Locale_t*                        ActiveLocale = nullptr;
+
+	std::vector<QueuedText_t>        QueuedTexts;
+	std::string                      QueuedLanguage;
+
+	///----------------------------------------------------------------------------------------------------
 	/// BuildLocaleAtlas:
 	/// 	Builds the LocaleAtlas, if the directory is set.
 	///----------------------------------------------------------------------------------------------------
@@ -107,27 +111,6 @@ class CLocalization
 	/// 	Clears the LocaleAtlas.
 	///----------------------------------------------------------------------------------------------------
 	void ClearLocaleAtlas();
-
-	///----------------------------------------------------------------------------------------------------
-	/// GetAllTexts:
-	/// 	Returns every single string.
-	///----------------------------------------------------------------------------------------------------
-	std::vector<const char*> GetAllTexts();
-
-	private:
-	CLogApi*                       Logger   = nullptr;
-	CEventApi*                     EventApi = nullptr;
-
-	std::mutex                     Mutex;
-	std::filesystem::path          Directory;
-	// Identifier (e.g. "EN-GB") maps to object with display name ("English (United Kingdom)") and a map of all its texts
-	std::map<std::string, Locale_t>  LocaleAtlas;
-	std::vector<QueuedTranslation_t> Queued;
-
-	Locale_t* ActiveLocale = nullptr;
-
-	bool IsLocaleDirectorySet = false;
-	bool IsLocaleAtlasBuilt = false;
 };
 
 #endif

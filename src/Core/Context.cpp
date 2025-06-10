@@ -73,15 +73,6 @@ CLogApi* CContext::GetLogger()
 	return &s_Logger;
 }
 
-CLocalization* CContext::GetLocalization()
-{
-	static CLocalization s_LocalizationApi = CLocalization(
-		this->GetLogger(),
-		this->GetEventApi()
-	);
-	return &s_LocalizationApi;
-}
-
 CUpdater* CContext::GetUpdater()
 {
 	static CUpdater s_Upater = CUpdater(
@@ -132,8 +123,7 @@ CGameBindsApi* CContext::GetGameBindsApi()
 	static CGameBindsApi s_GameBindsApi = CGameBindsApi(
 		this->GetRawInputApi(),
 		this->GetLogger(),
-		this->GetEventApi(),
-		this->GetLocalization()
+		this->GetEventApi()
 	);
 	return &s_GameBindsApi;
 }
@@ -142,7 +132,6 @@ CUiContext* CContext::GetUIContext()
 {
 	static CUiContext s_UiContext = CUiContext(
 		this->GetLogger(),
-		this->GetLocalization(),
 		this->GetTextureService(),
 		this->GetDataLink(),
 		this->GetInputBindApi(),

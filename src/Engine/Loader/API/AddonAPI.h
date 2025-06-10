@@ -12,7 +12,7 @@
 #include "Engine/Inputs/RawInput/RiFuncDefs.h"
 #include "Engine/Index/IdxFuncDefs.h"
 #include "Engine/DataLink/DlFuncDefs.h"
-#include "Engine/Localization/FuncDefs.h"
+#include "Engine/Localization/LoclFuncDefs.h"
 #include "Engine/Logging/LogFuncDefs.h"
 #include "Engine/Textures/TxFuncDefs.h"
 #include "Engine/Updater/FuncDefs.h"

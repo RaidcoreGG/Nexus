@@ -17,7 +17,7 @@
 #include "imgui/imgui.h"
 
 #include "FuncDefs.h"
-#include "Engine/Localization/Localization.h"
+#include "Engine/Localization/LoclApi.h"
 
 constexpr const char* CH_FONTMANAGER = "CFontManager";
 

@@ -96,7 +96,7 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 	uictx->Invalidate();
 }
 
-CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogApi* aLogger, CEventApi* aEventApi, CLocalization* aLocalization)
+CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogApi* aLogger, CEventApi* aEventApi)
 {
 	assert(aRawInputApi);
 	assert(aLogger);
@@ -105,7 +105,6 @@ CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogApi* aLogger, CEven
 	this->RawInputApi = aRawInputApi;
 	this->Logger = aLogger;
 	this->EventApi = aEventApi;
-	this->Language = aLocalization;
 
 	this->Load(Index(EPath::GameBinds));
 	this->AddDefaultBinds();
@@ -1144,8 +1143,8 @@ void CGameBindsApi::Save()
 		if (id == EGameBinds::LEGACY_MoveSwimUp) { continue; } /* Do not save legacy binds. */
 
 		pugi::xml_node action = root.append_child("action");
-		action.append_attribute("name") = this->Language->Translate(NameFrom(id).c_str()); // Purely descriptive
-		action.append_attribute("id")   = std::to_string((uint32_t)id);                    // Bind ID
+		action.append_attribute("name") = NameFrom(id);                 // Purely descriptive
+		action.append_attribute("id")   = std::to_string((uint32_t)id); // Bind ID
 
 		switch (ib.Primary.Device)
 		{

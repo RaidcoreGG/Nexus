@@ -34,14 +34,13 @@ CBindsWindow::CBindsWindow()
 
 void CBindsWindow::RenderContent()
 {
-	CContext* ctx = CContext::GetContext();
+	CContext*       ctx      = CContext::GetContext();
+	CUiContext*     uictx    = ctx->GetUIContext();
+	CEscapeClosing* escclose = uictx->GetEscapeClosingService();
+	CLocalization*  langApi  = uictx->GetLocalization();
 
 	if (this->IsInvalid)
 	{
-		static CContext* ctx = CContext::GetContext();
-		static CUiContext* uictx = ctx->GetUIContext();
-		static CEscapeClosing* escclose = uictx->GetEscapeClosingService();
-
 		escclose->Deregister(this->GetVisibleStatePtr());
 		escclose->Register(this->GetNameID().c_str(), this->GetVisibleStatePtr());
 
@@ -67,8 +66,6 @@ void CBindsWindow::RenderContent()
 	}
 
 	ImVec2 initial = ImGui::GetCursorPos();
-
-	CLocalization* langApi = ctx->GetLocalization();
 
 	if (ImGui::BeginTabBar("BindsTabBar", ImGuiTabBarFlags_None))
 	{
@@ -171,8 +168,9 @@ void CBindsWindow::RenderInputBindsTable(std::unordered_map<std::string, InputBi
 {
 	if (ImGui::BeginTable("table_inputbinds", 4, ImGuiTableFlags_BordersInnerH))
 	{
-		CContext* ctx = CContext::GetContext();
-		CLocalization* langApi = ctx->GetLocalization();
+		CContext*      ctx     = CContext::GetContext();
+		CUiContext*    uictx   = ctx->GetUIContext();
+		CLocalization* langApi = uictx->GetLocalization();
 
 		for (auto& [identifier, inputBind] : aInputBinds)
 		{
@@ -217,8 +215,9 @@ void CBindsWindow::RenderGameInputBindsTable(std::unordered_map<EGameBinds, Game
 {
 	if (ImGui::BeginTable("table_gameinputbinds", 3, ImGuiTableFlags_BordersInnerH))
 	{
-		CContext* ctx = CContext::GetContext();
-		CLocalization* langApi = ctx->GetLocalization();
+		CContext*      ctx     = CContext::GetContext();
+		CUiContext*    uictx   = ctx->GetUIContext();
+		CLocalization* langApi = uictx->GetLocalization();
 
 		for (auto& [identifier, inputBind] : aInputBinds)
 		{

@@ -17,7 +17,7 @@
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
 #include "Engine/DataLink/DlApi.h"
-#include "Engine/Localization/Localization.h"
+#include "Engine/Localization/LoclApi.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Textures/TxLoader.h"
 #include "Engine/Updater/Updater.h"
@@ -538,7 +538,6 @@ namespace ADDONAPI
 			s_GameBindsApi  = ctx->GetGameBindsApi();
 			s_InputBindApi  = ctx->GetInputBindApi();
 			s_RawInputApi   = ctx->GetRawInputApi();
-			s_Localization  = ctx->GetLocalization();
 			s_Logger        = ctx->GetLogger();
 			s_TextureApi    = ctx->GetTextureService();
 			s_Updater       = ctx->GetUpdater();
@@ -549,6 +548,7 @@ namespace ADDONAPI
 			s_Alerts        = s_UiContext->GetAlerts();
 			s_QuickAccess   = s_UiContext->GetQuickAccess();
 			s_EscapeClosing = s_UiContext->GetEscapeClosingService();
+			s_Localization  = s_UiContext->GetLocalization();
 
 			s_IsInitialized = true;
 		}

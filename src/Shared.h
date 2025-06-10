@@ -8,7 +8,7 @@
 #include "Engine/Loader/AddonVersion.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
-#include "Engine/Localization/Localization.h"
+#include "Engine/Localization/LoclApi.h"
 #include "Engine/Updater/Updater.h"
 #include "Engine/Textures/TxLoader.h"
 #include "Engine/DataLink/DlApi.h"

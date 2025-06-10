@@ -19,8 +19,9 @@ CUninstallConfirmationModal::CUninstallConfirmationModal()
 
 void CUninstallConfirmationModal::RenderContent()
 {
-	CContext*      ctx = CContext::GetContext();
-	CLocalization* lang = ctx->GetLocalization();
+	CContext*      ctx   = CContext::GetContext();
+	CUiContext*    uictx = ctx->GetUIContext();
+	CLocalization* lang  = uictx->GetLocalization();
 
 	ImGui::Text(lang->Translate("((000116))"));
 
@@ -72,7 +73,8 @@ void CUninstallConfirmationModal::SetTarget(std::string aName, std::filesystem::
 void CUninstallConfirmationModal::SetTitle()
 {
 	CContext* ctx = CContext::GetContext();
-	CLocalization* lang = ctx->GetLocalization();
+	CUiContext* uictx = ctx->GetUIContext();
+	CLocalization* lang = uictx->GetLocalization();
 
 	/* Override the title before opening the modal. */
 	std::string title = lang->Translate("((000117))");

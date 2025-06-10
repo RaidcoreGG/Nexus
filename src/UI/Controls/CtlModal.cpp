@@ -72,8 +72,9 @@ std::string IModal::GetName() const
 	assert(!this->GetID().empty());
 	assert(!this->GetDisplayName().empty());
 
-	CContext* ctx = CContext::GetContext();
-	CLocalization* lang = ctx->GetLocalization();
+	CContext*      ctx   = CContext::GetContext();
+	CUiContext*    uictx = ctx->GetUIContext();
+	CLocalization* lang  = uictx->GetLocalization();
 
 	return std::string{lang->Translate(this->GetDisplayName().c_str())} + "##" + this->ID;
 }

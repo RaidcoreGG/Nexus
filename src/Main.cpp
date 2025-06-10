@@ -43,6 +43,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 			DisableThreadLibraryCalls(hModule);
 			CContext* ctx = CContext::GetContext();
 			ctx->SetModule(hModule);
+			CreateIndex(hModule);
 			break;
 		}
 		case DLL_PROCESS_DETACH:
@@ -89,8 +90,6 @@ namespace Main
 
 		//SetUnhandledExceptionFilter(UnhandledExcHandler);
 		
-		CreateIndex(ctx->GetModule());
-
 		Resources::Unpack(ctx->GetModule(), Index(EPath::ThirdPartySoftwareReadme), RES_THIRDPARTYNOTICES, "TXT");
 
 		CLogApi* logger = ctx->GetLogger();

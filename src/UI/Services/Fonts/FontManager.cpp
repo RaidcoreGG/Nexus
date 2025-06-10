@@ -58,7 +58,7 @@ bool CFontManager::Advance()
 	rbExt.AddRanges(io.Fonts->GetGlyphRangesChineseFull());
 	rbExt.AddRanges(io.Fonts->GetGlyphRangesCyrillic());
 
-	/* add ranges on demand*/
+	/* add ranges on demand */
 	for (const char* str : this->Language->GetAllTexts())
 	{
 		rb.AddText(str);

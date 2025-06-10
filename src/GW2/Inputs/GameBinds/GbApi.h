@@ -19,7 +19,7 @@
 #include "Engine/Inputs/InputBinds/IbBindV2.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
 #include "Engine/Logging/LogApi.h"
-#include "Engine/Localization/Localization.h"
+#include "Engine/Localization/LoclApi.h"
 
 constexpr const char* CH_GAMEBINDS = "GameBinds";
 constexpr const char* EV_UE_KB_CH = "EV_UNOFFICIAL_EXTRAS_KEYBIND_CHANGED";
@@ -50,7 +50,7 @@ class CGameBindsApi
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CGameBindsApi(CRawInputApi* aRawInputApi, CLogApi* aLogger, CEventApi* aEventApi, CLocalization* aLocalization);
+	CGameBindsApi(CRawInputApi* aRawInputApi, CLogApi* aLogger, CEventApi* aEventApi);
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
@@ -128,7 +128,6 @@ class CGameBindsApi
 	CRawInputApi*                                  RawInputApi = nullptr;
 	CLogApi*                                       Logger      = nullptr;
 	CEventApi*                                     EventApi    = nullptr;
-	CLocalization*                                 Language    = nullptr;
 
 	mutable std::mutex                             Mutex;
 	std::unordered_map<EGameBinds, MultiInputBind_t> Registry;
