@@ -17,7 +17,7 @@
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
 #include "Engine/DataLink/DlApi.h"
-#include "Engine/Localization/LoclApi.h"
+#include "UI/Services/Localization/LoclApi.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Textures/TxLoader.h"
 #include "Engine/Updater/Updater.h"

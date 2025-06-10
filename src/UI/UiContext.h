@@ -20,7 +20,7 @@
 #include "FuncDefs.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/DataLink/DlApi.h"
-#include "Engine/Localization/LoclApi.h"
+#include "UI/Services/Localization/LoclApi.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Textures/TxLoader.h"
 #include "UI/Services/Fonts/FontManager.h"

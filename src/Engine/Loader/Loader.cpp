@@ -34,7 +34,7 @@
 #include "Engine/Inputs/RawInput/RiApi.h"
 #include "minhook/mh_hook.h"
 #include "Engine/DataLink/DlApi.h"
-#include "Engine/Localization/LoclApi.h"
+#include "UI/Services/Localization/LoclApi.h"
 #include "Engine/Logging/LogApi.h"
 #include "GW2/Mumble/MblReader.h"
 #include "Engine/Settings/Settings.h"
