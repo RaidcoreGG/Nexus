@@ -90,7 +90,7 @@ namespace ArcDPS
 					ModuleHandle = hModule;
 					IsLoaded = true;
 
-					CContext::GetContext()->GetLogger()->Info("ArcDPS", "ArcDPS is not loaded as Nexus addon but was detected as Chainload.");
+					CContext::GetContext()->GetLogger()->Info(CH_LOADER, "ArcDPS is not loaded as Nexus addon but was detected as Chainload.");
 
 					DeployBridge();
 					return;
@@ -112,7 +112,7 @@ namespace ArcDPS
 					ModuleHandle = hModule;
 					IsLoaded = true;
 
-					CContext::GetContext()->GetLogger()->Info("ArcDPS", "ArcDPS is not loaded as Nexus addon but was detected as Addon-Loader addon.");
+					CContext::GetContext()->GetLogger()->Info(CH_LOADER, "ArcDPS is not loaded as Nexus addon but was detected as Addon-Loader addon.");
 
 					DeployBridge();
 					return;
@@ -134,7 +134,7 @@ namespace ArcDPS
 					ModuleHandle = hModule;
 					IsLoaded = true;
 
-					CContext::GetContext()->GetLogger()->Info("ArcDPS", "ArcDPS is not loaded as Nexus addon but was detected as Proxy.");
+					CContext::GetContext()->GetLogger()->Info(CH_LOADER, "ArcDPS is not loaded as Nexus addon but was detected as Proxy.");
 
 					DeployBridge();
 					return;
@@ -155,7 +155,7 @@ namespace ArcDPS
 		}
 		catch (std::filesystem::filesystem_error fErr)
 		{
-			ctx->GetLogger()->Debug("ArcDPS", "%s", fErr.what());
+			ctx->GetLogger()->Debug(CH_LOADER, "%s", fErr.what());
 			return;
 		}
 	}
@@ -170,21 +170,21 @@ namespace ArcDPS
 		if (DLL::FindFunction(ModuleHandle, &exp_addextension2, "addextension2"))
 		{
 			int result = exp_addextension2(aBridgeModule);
-			CContext::GetContext()->GetLogger()->Info("ArcDPS", "Deployed ArcDPS Integration. Result: %d", result);
+			CContext::GetContext()->GetLogger()->Info(CH_LOADER, "Deployed ArcDPS Integration. Result: %d", result);
 		}
 		else
 		{
-			CContext::GetContext()->GetLogger()->Warning("ArcDPS", "Addon with signature \"0xFFF694D1\" found but \"addextension2\" is not exported. ArcDPS combat events won't be relayed.");
+			CContext::GetContext()->GetLogger()->Warning(CH_LOADER, "Addon with signature \"0xFFF694D1\" found but \"addextension2\" is not exported. ArcDPS combat events won't be relayed.");
 		}
 
 		if (DLL::FindFunction(ModuleHandle, &exp_listextension, "listextension"))
 		{
 			GetPlugins();
-			CContext::GetContext()->GetLogger()->Info("ArcDPS", "Received ArcDPS plugins.");
+			CContext::GetContext()->GetLogger()->Info(CH_LOADER, "Received ArcDPS plugins.");
 		}
 		else
 		{
-			CContext::GetContext()->GetLogger()->Warning("ArcDPS", "Addon with signature \"0xFFF694D1\" found but \"listextension\" is not exported.");
+			CContext::GetContext()->GetLogger()->Warning(CH_LOADER, "Addon with signature \"0xFFF694D1\" found but \"listextension\" is not exported.");
 		}
 
 		IsBridgeDeployed = true;
@@ -237,7 +237,7 @@ namespace ArcDPS
 			int result = exp_addextension2(aModule);
 			if (result != 0)
 			{
-				CContext::GetContext()->GetLogger()->Debug("ArcDPS", "Could not add extension. Error %d", result);
+				CContext::GetContext()->GetLogger()->Debug(CH_LOADER, "Could not add extension. Error %d", result);
 			}
 		}
 	}
