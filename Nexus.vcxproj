@@ -21,7 +21,6 @@
     <ClCompile Include="src\Engine\Loader\AddonVersion.cpp" />
     <ClCompile Include="src\Engine\Loader\API\ApiFunctionMapper.cpp" />
     <ClCompile Include="src\Engine\Networking\WebRequests\WreClient.cpp" />
-    <ClCompile Include="src\CrashHandler.cpp" />
     <ClCompile Include="src\Engine\DataLink\DlApi.cpp" />
     <ClCompile Include="src\Engine\Loader\ArcDPS.cpp" />
     <ClCompile Include="src\Engine\Loader\EUpdateProvider.cpp" />
@@ -130,7 +129,6 @@
     <ClInclude Include="src\Engine\Networking\WebRequests\WreCacheEntry.h" />
     <ClInclude Include="src\Branch.h" />
     <ClInclude Include="src\Consts.h" />
-    <ClInclude Include="src\CrashHandler.h" />
     <ClInclude Include="src\Engine\DataLink\DlApi.h" />
     <ClInclude Include="src\Engine\DataLink\DlEnum.h" />
     <ClInclude Include="src\Engine\DataLink\DlFuncDefs.h" />

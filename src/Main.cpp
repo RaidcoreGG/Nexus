@@ -89,8 +89,6 @@ namespace Main
 		CContext* ctx = CContext::GetContext();
 		s_RendererCtx = ctx->GetRendererCtx();
 
-		//SetUnhandledExceptionFilter(UnhandledExcHandler);
-		
 		Resources::Unpack(ctx->GetModule(), Index(EPath::ThirdPartySoftwareReadme), RES_THIRDPARTYNOTICES, "TXT");
 
 		CLogApi* logger = ctx->GetLogger();
