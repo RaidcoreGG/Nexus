@@ -107,7 +107,14 @@ void CBindsWindow::RenderContent()
 
 					if (now - lastCheckedBinds > 10)
 					{
+						/* Create binds directory. */
+						if (!std::filesystem::exists(Index(EPath::DIR_GW2_INPUTBINDS)))
+						{
+							std::filesystem::create_directories(Index(EPath::DIR_GW2_INPUTBINDS));
+						}
+
 						bindConfigs.clear();
+
 						for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(Index(EPath::DIR_GW2_INPUTBINDS)))
 						{
 							std::filesystem::path path = entry.path();
