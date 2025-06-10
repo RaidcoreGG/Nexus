@@ -97,6 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core\Context.h" />
+    <ClInclude Include="src\Core\PrefConst.h" />
     <ClInclude Include="src\Engine\Events\EvtData.h" />
     <ClInclude Include="src\Engine\Functions\FnEntry.h" />
     <ClInclude Include="src\Engine\Functions\FnRegistry.h" />

@@ -14,6 +14,7 @@
 #include "Core/Context.h"
 #include "Engine/Settings/Settings.h"
 #include "Util/Inputs.h"
+#include "Core/PrefConst.h"
 
 CEscapeClosing::CEscapeClosing()
 {

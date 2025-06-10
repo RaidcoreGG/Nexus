@@ -15,6 +15,7 @@
 #include <Windows.h>
 
 #include "Core/Context.h"
+#include "Core/PrefConst.h"
 #include "Consts.h"
 #include "Engine/Index/Index.h"
 #include "Shared.h"

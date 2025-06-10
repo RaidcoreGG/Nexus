@@ -6,6 +6,9 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
+#ifndef CONTEXT_H
+#define CONTEXT_H
+
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
@@ -20,9 +23,6 @@
 #include "GW2/Inputs/GameBinds/GbApi.h"
 #include "GW2/Mumble/MblReader.h"
 #include "UI/UiContext.h"
-
-#ifndef CONTEXT_H
-#define CONTEXT_H
 
 class CContext
 {

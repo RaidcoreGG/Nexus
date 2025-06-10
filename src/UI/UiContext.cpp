@@ -21,6 +21,7 @@
 
 #include "Consts.h"
 #include "Core/Context.h"
+#include "Core/PrefConst.h"
 #include "Engine/Index/Index.h"
 #include "resource.h"
 #include "GW2/Mumble/MblReader.h"

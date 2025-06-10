@@ -16,6 +16,7 @@
 #include "ImAnimate/ImAnimate.h"
 #include "resource.h"
 #include "Util/Time.h"
+#include "Core/PrefConst.h"
 
 CSnowflakeMgr::CSnowflakeMgr()
 {
