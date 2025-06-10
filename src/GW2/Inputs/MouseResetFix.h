@@ -2,7 +2,7 @@
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
 /// Name         :  MouseResetFix.h
-/// Description  :  Fix for the cursor reseting to 0, 0. Fix for the cursor moving while hidden.
+/// Description  :  Fix for the cursor reseting to (0,0). Fix for the cursor moving while hidden.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
@@ -20,10 +20,10 @@
 ///----------------------------------------------------------------------------------------------------
 inline UINT MouseResetFix(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	static CContext* s_Context = CContext::GetContext();
+	static CContext*  s_Context     = CContext::GetContext();
 	static CSettings* s_SettingsCtx = s_Context->GetSettingsCtx();
 
-	bool lockCursor = s_SettingsCtx ? s_SettingsCtx->Get<bool>(OPT_CAMCTRL_LOCKCURSOR, false) : false;
+	bool lockCursor  = s_SettingsCtx ? s_SettingsCtx->Get<bool>(OPT_CAMCTRL_LOCKCURSOR, false)  : false;
 	bool resetCursor = s_SettingsCtx ? s_SettingsCtx->Get<bool>(OPT_CAMCTRL_RESETCURSOR, false) : false;
 
 	static bool s_IsConfining = false;
