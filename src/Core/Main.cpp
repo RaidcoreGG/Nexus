@@ -8,6 +8,9 @@
 
 #include "Main.h"
 
+#include <thread>
+#include <string>
+
 #include "minhook/mh_hook.h"
 
 /* FIXME: Legacy garbage. Need to refactor. */
@@ -60,6 +63,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
 namespace Main
 {
+	static std::thread s_UpdateThread;
+
 	void Initialize(EProxyFunction aEntryFunction)
 	{
 		static EProxyFunction s_EntryFunction = EProxyFunction::NONE;
@@ -77,15 +82,17 @@ namespace Main
 		CContext* ctx    = CContext::GetContext();
 		CLogApi*  logger = ctx->GetLogger();
 
+		/* Always write the thirdpartysoftwarereadme to disk. */
 		Resources::Unpack(ctx->GetModule(), Index(EPath::ThirdPartySoftwareReadme), RES_THIRDPARTYNOTICES, "TXT");
 
-		/* setup default loggers */
+		/* Allocate console logger, if requested. */
 		if (CmdLine::HasArgument("-ggconsole"))
 		{
 			static CConsoleLogger console = CConsoleLogger(ELogLevel::ALL);
 			logger->Register(&console);
 		}
 
+		/* Multibox-friendly log file. */
 		std::filesystem::path logpath;
 		if (CmdLine::HasArgument("-mumble"))
 		{
@@ -99,9 +106,11 @@ namespace Main
 			logpath = Index(EPath::Log);
 		}
 
+		/* Allocate log writer. */
 		static CFileLogger writer = CFileLogger(ELogLevel::ALL, logpath);
 		logger->Register(&writer);
 
+		/* Environment info. */
 		logger->Info(
 			CH_CORE,
 			"Game: %s\nModule: %s\nNexus %s %s\nEntry method: %d",
@@ -112,11 +121,11 @@ namespace Main
 			aEntryFunction
 		);
 
+		/* FIXME: This needs to be cleaned up. */
 		RaidcoreAPI = new CHttpClient("https://api.raidcore.gg", Index(EPath::DIR_APICACHE_RAIDCORE), 30 * 60, 300, 5, 1);
-		GitHubAPI = new CHttpClient("https://api.github.com", Index(EPath::DIR_APICACHE_GITHUB), 30 * 60, 60, 60, 60 * 60);
+		GitHubAPI   = new CHttpClient("https://api.github.com", Index(EPath::DIR_APICACHE_GITHUB), 30 * 60, 60, 60, 60 * 60);
 
-		std::thread thUpdate = std::thread(Main::UpdateCheck);
-		thUpdate.detach();
+		s_UpdateThread = std::thread(Main::UpdateCheck);
 
 		/* Only initalise if not vanilla */
 		if (!CmdLine::HasArgument("-ggvanilla"))
@@ -149,6 +158,12 @@ namespace Main
 		}
 
 		s_ShutdownReason = aReason;
+
+		/* If the update thread is still running, let it join. */
+		if (s_UpdateThread.joinable())
+		{
+			s_UpdateThread.join();
+		}
 
 		std::string reasonStr;
 		switch (aReason)
