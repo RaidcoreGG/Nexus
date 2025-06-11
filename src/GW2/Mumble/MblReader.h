@@ -18,9 +18,9 @@
 #include "Engine/Logging/LogApi.h"
 #include "thirdparty/mumble/Mumble.h"
 
-constexpr const char* CH_MUMBLE_READER = "MumbleReader";
-constexpr const char* DL_MUMBLE_LINK = "DL_MUMBLE_LINK";
-constexpr const char* DL_MUMBLE_LINK_IDENTITY = "DL_MUMBLE_LINK_IDENTITY";
+constexpr const char* CH_MUMBLE_READER           = "MumbleReader";
+constexpr const char* DL_MUMBLE_LINK             = "DL_MUMBLE_LINK";
+constexpr const char* DL_MUMBLE_LINK_IDENTITY    = "DL_MUMBLE_LINK_IDENTITY";
 constexpr const char* EV_MUMBLE_IDENTITY_UPDATED = "EV_MUMBLE_IDENTITY_UPDATED";
 
 ///----------------------------------------------------------------------------------------------------

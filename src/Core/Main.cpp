@@ -1,41 +1,35 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  Main.cpp
+/// Description  :  Primary Nexus entry point.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #include "Main.h"
 
-#include <filesystem>
-#include <Psapi.h>
-#include <string>
-#include <windowsx.h>
+#include "minhook/mh_hook.h"
 
+/* FIXME: Legacy garbage. Need to refactor. */
 #include "Consts.h"
-#include "Engine/Index/Index.h"
-#include "resource.h"
-#include "Shared.h"
 #include "State.h"
+#include "Shared.h"
 
 #include "Core/Context.h"
 #include "Core/Hooks/Hooks.h"
-#include "GW2/Inputs/GameBinds/GbApi.h"
-#include "Engine/Inputs/InputBinds/IbApi.h"
+#include "Engine/Index/Index.h"
 #include "Engine/Loader/Loader.h"
-#include "Engine/Networking/WebRequests/WreClient.h"
-#include "Engine/DataLink/DlApi.h"
+#include "Engine/Logging/LogApi.h"
 #include "Engine/Logging/LogConsole.h"
 #include "Engine/Logging/LogWriter.h"
-#include "Engine/Logging/LogApi.h"
-#include "GW2/Multibox/Multibox.h"
-#include "GW2/Mumble/MblReader.h"
-#include "GW2/Inputs/MouseResetFix.h"
-#include "Engine/Settings/Settings.h"
 #include "Engine/Updater/Updater.h"
+#include "GW2/Multibox/Multibox.h"
+#include "resource.h"
 #include "UI/UiContext.h"
 #include "Util/CmdLine.h"
-#include "Util/Strings.h"
 #include "Util/Resources.h"
-#include "Util/Inputs.h"
+#include "Util/Strings.h"
 
-#include "nlohmann/json.hpp"
-using json = nlohmann::json;
-
-/* entry */
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
 	switch (ul_reason_for_call)
@@ -66,15 +60,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
 namespace Main
 {
-	static NexusLinkData_t*  s_NexusLink      = nullptr;
-	static CRawInputApi*     s_RawInputApi    = nullptr;
-	static CInputBindApi*    s_InputBindApi   = nullptr;
-	static CUiContext*       s_UIContext      = nullptr;
-	static CTextureLoader*   s_TextureService = nullptr;
-	static CEventApi*        s_EventApi       = nullptr;
-	static CSettings*        s_SettingsCtx    = nullptr;
-	static RenderContext_t*  s_RendererCtx    = nullptr;
-
 	void Initialize(EProxyFunction aEntryFunction)
 	{
 		static EProxyFunction s_EntryFunction = EProxyFunction::NONE;
@@ -87,68 +72,51 @@ namespace Main
 
 		s_EntryFunction = aEntryFunction;
 
-		if (State::Nexus >= ENexusState::LOAD) { return; }
-
 		State::Nexus = ENexusState::LOAD;
 
-		CContext* ctx = CContext::GetContext();
-		s_RendererCtx = ctx->GetRendererCtx();
+		CContext* ctx    = CContext::GetContext();
+		CLogApi*  logger = ctx->GetLogger();
 
 		Resources::Unpack(ctx->GetModule(), Index(EPath::ThirdPartySoftwareReadme), RES_THIRDPARTYNOTICES, "TXT");
-
-		CLogApi* logger = ctx->GetLogger();
-		CUpdater* updater = ctx->GetUpdater();
 
 		/* setup default loggers */
 		if (CmdLine::HasArgument("-ggconsole"))
 		{
-			logger->Register(new CConsoleLogger(ELogLevel::ALL));
+			static CConsoleLogger console = CConsoleLogger(ELogLevel::ALL);
+			logger->Register(&console);
 		}
 
-		std::filesystem::path logPathOverride;
-
+		std::filesystem::path logpath;
 		if (CmdLine::HasArgument("-mumble"))
 		{
-			logPathOverride = (Index(EPath::DIR_NEXUS) / "Nexus_").string() + CmdLine::GetArgumentValue("-mumble") + ".log";
+			std::string filename = "Nexus_";
+			filename.append(CmdLine::GetArgumentValue("-mumble"));
+			filename.append(".log");
+			logpath = Index(EPath::DIR_NEXUS) / filename;
+		}
+		else
+		{
+			logpath = Index(EPath::Log);
 		}
 
-		logger->Register(new CFileLogger(ELogLevel::ALL, logPathOverride.empty() ? Index(EPath::Log) : logPathOverride));
+		static CFileLogger writer = CFileLogger(ELogLevel::ALL, logpath);
+		logger->Register(&writer);
 
-		logger->Info(CH_CORE, GetCommandLineA());
-		logger->Info(CH_CORE, "%s: %s", Index(EPath::NexusDLL) != Index(EPath::D3D11Chainload) ? "Proxy" : "Chainload", Index(EPath::NexusDLL).string().c_str());
-		logger->Info(CH_CORE, "Nexus: %s %s", ctx->GetVersion().string().c_str(), ctx->GetBuild());
-		logger->Info(CH_CORE, "Entry method: %d", aEntryFunction);
+		logger->Info(
+			CH_CORE,
+			"Game: %s\nModule: %s\nNexus %s %s\nEntry method: %d",
+			GetCommandLineA(),
+			Index(EPath::NexusDLL).string().c_str(),
+			ctx->GetVersion().string().c_str(),
+			ctx->GetBuild(),
+			aEntryFunction
+		);
 
 		RaidcoreAPI = new CHttpClient("https://api.raidcore.gg", Index(EPath::DIR_APICACHE_RAIDCORE), 30 * 60, 300, 5, 1);
 		GitHubAPI = new CHttpClient("https://api.github.com", Index(EPath::DIR_APICACHE_GITHUB), 30 * 60, 60, 60, 60 * 60);
 
-		std::thread([logger, updater]()
-		{
-			HANDLE hMutex = CreateMutexA(0, true, "RCGG-Mutex-Patch-Nexus");
-
-			if (GetLastError() == ERROR_ALREADY_EXISTS)
-			{
-				logger->Info(CH_CORE, "Cannot patch Nexus, mutex locked.");
-
-				/* sanity check to make the compiler happy */
-				if (hMutex)
-				{
-					CloseHandle(hMutex);
-				}
-
-				return;
-			}
-
-			/* perform/check for update */
-			updater->UpdateNexus();
-
-			/* sanity check to make the compiler happy */
-			if (hMutex)
-			{
-				ReleaseMutex(hMutex);
-				CloseHandle(hMutex);
-			}
-		}).detach();
+		std::thread thUpdate = std::thread(Main::UpdateCheck);
+		thUpdate.detach();
 
 		/* Only initalise if not vanilla */
 		if (!CmdLine::HasArgument("-ggvanilla"))
@@ -158,15 +126,9 @@ namespace Main
 
 			MH_Initialize();
 
-			ctx->GetMumbleReader();
-
-			s_NexusLink = (NexusLinkData_t*)ctx->GetDataLink()->GetResource(DL_NEXUS_LINK);
-			s_RawInputApi = ctx->GetRawInputApi();
-			s_InputBindApi = ctx->GetInputBindApi();
-			s_UIContext = ctx->GetUIContext();
-			s_TextureService = ctx->GetTextureService();
-			s_EventApi = ctx->GetEventApi();
-			s_SettingsCtx = ctx->GetSettingsCtx();
+			/* only need to grab this, otherwise it won't be allocated right now. */
+			/* FIXME: DI should use THIS instead of DataLink, the components depend on Mumble not on the DataLink. */
+			static CMumbleReader* mr = ctx->GetMumbleReader();
 
 			State::Nexus = ENexusState::LOADED;
 		}
@@ -178,38 +140,68 @@ namespace Main
 
 	void Shutdown(unsigned int aReason)
 	{
+		static unsigned int s_ShutdownReason = 0;
+
+		/* If a shutdown reason is set, we already shut down. */
+		if (s_ShutdownReason != 0)
+		{
+			return;
+		}
+
+		s_ShutdownReason = aReason;
+
 		const char* reasonStr;
 		switch (aReason)
 		{
-			case WM_DESTROY: reasonStr = "WM_DESTROY"; break;
-			case WM_CLOSE:   reasonStr = "WM_CLOSE"; break;
-			case WM_QUIT:    reasonStr = "WM_QUIT"; break;
-			default:         reasonStr = NULLSTR; break;
+			case WM_DESTROY: { reasonStr = "Reason: WM_DESTROY"; break; }
+			case WM_CLOSE:   { reasonStr = "Reason: WM_CLOSE";   break; }
+			case WM_QUIT:    { reasonStr = "Reason: WM_QUIT";    break; }
+			default:
+			{
+				reasonStr = String::Format("Reason: Unknown (%d)", aReason).c_str();
+				break;
+			}
 		}
 
-		CContext* ctx = CContext::GetContext();
-		CLogApi* logger = ctx->GetLogger();
+		CContext*   ctx    = CContext::GetContext();
+		CLogApi*    logger = ctx->GetLogger();
+		CUiContext* uictx  = ctx->GetUIContext();
 
-		logger->Critical(CH_CORE, String::Format("Main::Shutdown() | Reason: %s", reasonStr).c_str());
+		State::Nexus = ENexusState::SHUTTING_DOWN;
 
-		if (State::Nexus < ENexusState::SHUTTING_DOWN)
-		{
-			State::Nexus = ENexusState::SHUTTING_DOWN;
+		logger->Critical(CH_CORE, String::Format("SHUTDOWN BEGIN | %s", reasonStr).c_str());
+		MH_Uninitialize();
+		Loader::Shutdown();
+		uictx->Shutdown();
+		logger->Info(CH_CORE, "SHUTDOWN END");
 
-			// free addons
-			Loader::Shutdown();
+		State::Nexus = ENexusState::SHUTDOWN;
 
-			ctx->GetUIContext()->Shutdown();
-
-			MH_Uninitialize();
-
-			logger->Info(CH_CORE, "Shutdown performed.");
-
-			State::Nexus = ENexusState::SHUTDOWN;
-		}
-
-		/* do not free lib, let the OS handle it. else gw2 crashes on shutdown */
+		/* Let the OS take care of freeing the handles. Ugly, but otherwise crashes due to the addon clownfiesta in GW2. */
 		//if (D3D11Handle) { FreeLibrary(D3D11Handle); }
 		//if (D3D11SystemHandle) { FreeLibrary(D3D11SystemHandle); }
+	}
+
+	void UpdateCheck()
+	{
+		CContext* ctx = CContext::GetContext();
+
+		HANDLE hMutex = CreateMutexA(0, true, "RCGG-Mutex-Patch-Nexus");
+
+		if (hMutex == NULL && GetLastError() == ERROR_ALREADY_EXISTS)
+		{
+			ctx->GetLogger()->Info(CH_CORE, "Cannot patch Nexus, mutex locked.");
+			return;
+		}
+
+		/* Perform/Check for update. */
+		ctx->GetUpdater()->UpdateNexus();
+
+		/* Sanity check before closing handles. */
+		if (hMutex)
+		{
+			ReleaseMutex(hMutex);
+			CloseHandle(hMutex);
+		}
 	}
 }
