@@ -46,6 +46,8 @@ namespace Proxy
 		{
 			State::Directx = EDxState::LOAD;
 
+			bool isChainloading = false;
+
 			/* attempt to chainload */
 			/* sanity check that the current dll isn't the chainload */
 			if (Index(EPath::NexusDLL) != Index(EPath::D3D11Chainload))
@@ -67,7 +69,7 @@ namespace Proxy
 					}
 					else
 					{
-						State::IsChainloading = true;
+						isChainloading = true;
 
 						std::string strChainload = Index(EPath::D3D11Chainload).string();
 						s_D3D11Handle = LoadLibraryA(strChainload.c_str());
@@ -82,10 +84,10 @@ namespace Proxy
 
 			if (!s_D3D11Handle)
 			{
-				if (State::IsChainloading)
+				if (isChainloading)
 				{
 					logger->Warning(CH_CORE, "Chainload failed to load. Last Error: %u", GetLastError());
-					State::IsChainloading = false;
+					isChainloading = false;
 				}
 
 				std::string strSystem = Index(EPath::D3D11).string();

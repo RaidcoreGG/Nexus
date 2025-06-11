@@ -18,6 +18,5 @@ namespace State
 {
 	ENexusState		Nexus						= ENexusState::NONE;
 	EDxState		Directx						= EDxState::NONE;
-	bool			IsChainloading				= false;
 }
 

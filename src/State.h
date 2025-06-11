@@ -30,7 +30,6 @@ namespace State
 	/* internal states */
 	extern ENexusState		Nexus;					/* Nexus state variable */
 	extern EDxState			Directx;				/* DirectX state variable */
-	extern bool				IsChainloading;			/* Is the Nexus chainloading another proxy dll */
 }
 
 #endif

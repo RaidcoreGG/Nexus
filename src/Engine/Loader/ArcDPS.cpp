@@ -77,7 +77,7 @@ namespace ArcDPS
 
 		// The following code is a bit ugly and repetitive, but this is because for each of these dlls you need to check whether it is arcdps
 
-		if (State::IsChainloading && std::filesystem::exists(Index(EPath::D3D11Chainload)))
+		if (std::filesystem::exists(Index(EPath::D3D11Chainload)))
 		{
 			HMODULE hModule = GetModuleHandleA(Index(EPath::D3D11Chainload).string().c_str());
 
