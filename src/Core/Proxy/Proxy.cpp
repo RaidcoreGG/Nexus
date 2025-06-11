@@ -1,43 +1,37 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  Proxy.cpp
+/// Description  :  Implementation of proxy functions.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
 #include "Proxy.h"
 
 #include <filesystem>
 #include <string>
+#include <d3d11.h>
 
-#include "Main.h"
+#include "minhook/mh_hook.h"
+
 #include "Consts.h"
+#include "Core/Context.h"
+#include "Core/Main.h"
 #include "Engine/Index/Index.h"
+#include "PxyEnum.h"
+#include "PxyFuncDefs.h"
 #include "Shared.h"
 #include "State.h"
-#include "Core/Context.h"
-
 #include "Util/CmdLine.h"
 #include "Util/DLL.h"
 #include "Util/MD5.h"
 #include "Util/Memory.h"
-
-#include "minhook/mh_hook.h"
+#include "Core/Hooks/Hooks.h"
 
 namespace Proxy
 {
 	static HMODULE s_D3D11Handle;
 	static HMODULE s_D3D11SystemHandle;
-
-	// CreateDevice defined in d3d11.h
-	// CreateDeviceAndSwapChain defined in d3d11.h
-	typedef HRESULT(WINAPI* PFN_D3D11_CORE_CREATE_DEVICE)(IDXGIFactory*, IDXGIAdapter*, UINT, const D3D_FEATURE_LEVEL*, UINT, ID3D11Device**);
-	typedef HRESULT(WINAPI* PFN_D3D11_CORE_CREATE_LAYERED_DEVICE)(const void*, DWORD, const void*, REFIID, void**);
-	typedef HRESULT(WINAPI* PFN_D3D11_CORE_GET_LAYERED_DEVICE_SIZE)(const void*, DWORD);
-	typedef HRESULT(WINAPI* PFN_D3D11_CORE_REGISTER_LAYERS)(const void*, DWORD);
-
-	namespace Original
-	{
-		static PFN_D3D11_CREATE_DEVICE                s_CreateDevice             = nullptr;
-		static PFN_D3D11_CREATE_DEVICE_AND_SWAP_CHAIN s_CreateDeviceAndSwapChain = nullptr;
-		static PFN_D3D11_CORE_CREATE_DEVICE           s_CoreCreateDevice         = nullptr;
-		static PFN_D3D11_CORE_CREATE_LAYERED_DEVICE   s_CoreCreateLayeredDevice  = nullptr;
-		static PFN_D3D11_CORE_GET_LAYERED_DEVICE_SIZE s_CoreGetLayeredDeviceSize = nullptr;
-		static PFN_D3D11_CORE_REGISTER_LAYERS         s_CoreRegisterLayers       = nullptr;
-	}
 
 	///----------------------------------------------------------------------------------------------------
 	/// DxLoad:
@@ -130,7 +124,7 @@ namespace Proxy
 					ID3D11DeviceContext* context;
 					IDXGISwapChain* swap;
 
-					if (SUCCEEDED(Proxy::D3D11CreateDeviceAndSwapChain(0, D3D_DRIVER_TYPE_HARDWARE, 0, 0, 0, 0, D3D11_SDK_VERSION, &swap_desc, &swap, &device, 0, &context)))
+					if (SUCCEEDED(D3D11CreateDeviceAndSwapChain(0, D3D_DRIVER_TYPE_HARDWARE, 0, 0, 0, 0, D3D11_SDK_VERSION, &swap_desc, &swap, &device, 0, &context)))
 					{
 						LPVOID* vtbl;
 
@@ -139,8 +133,8 @@ namespace Proxy
 						//dxgi_present = hook_vtbl_fn(vtbl, 8, dxgi_present_hook);
 						//dxgi_resize_buffers = hook_vtbl_fn(vtbl, 13, dxgi_resize_buffers_hook);
 
-						MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[8]), (LPVOID)&Main::hkDXGIPresent, (LPVOID*)&Hooks::DXGIPresent);
-						MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[13]), (LPVOID)&Main::hkDXGIResizeBuffers, (LPVOID*)&Hooks::DXGIResizeBuffers);
+						MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[8]), (LPVOID)&Hooks::Detour::DXGIPresent, (LPVOID*)&Hooks::Target::DXGIPresent);
+						MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[13]), (LPVOID)&Hooks::Detour::DXGIResizeBuffers, (LPVOID*)&Hooks::Target::DXGIResizeBuffers);
 						MH_EnableHook(MH_ALL_HOOKS);
 
 						context->Release();
@@ -170,17 +164,8 @@ namespace Proxy
 	/// InitProxyFunc:
 	/// 	Loads the proxy function and returns true on success, false on error.
 	///----------------------------------------------------------------------------------------------------
-	bool InitProxyFunc(EEntryMethod aEntryMethod, void** aFunction, const char* aName)
+	bool InitProxyFunc(void** aFunction, const char* aName)
 	{
-		static EEntryMethod s_EntryMethod = EEntryMethod::NONE;
-
-		/* Set entry method and call Nexus entry. */
-		if (s_EntryMethod == EEntryMethod::NONE)
-		{
-			s_EntryMethod = aEntryMethod;
-			Main::Initialize(aEntryMethod);
-		}
-
 		CContext* ctx = CContext::GetContext();
 		CLogApi* logger = ctx->GetLogger();
 
@@ -220,59 +205,89 @@ namespace Proxy
 
 		return true;
 	}
-
-	HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext)
-	{
-		if (InitProxyFunc(EEntryMethod::CREATEDEVICE, (void**)&Original::s_CreateDevice, "D3D11CreateDevice") == false)
-		{
-			return 0;
-		}
-
-		return Original::s_CreateDevice(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
-	}
-	HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, const DXGI_SWAP_CHAIN_DESC* pSwapChainDesc, IDXGISwapChain** ppSwapChain, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext)
-	{
-		if (InitProxyFunc(EEntryMethod::CREATEDEVICEANDSWAPCHAIN, (void**)&Original::s_CreateDeviceAndSwapChain, "D3D11CreateDeviceAndSwapChain") == false)
-		{
-			return 0;
-		}
-
-		return Original::s_CreateDeviceAndSwapChain(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice, pFeatureLevel, ppImmediateContext);
-	}
-	HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pAdapter, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, ID3D11Device** ppDevice)
-	{
-		if (InitProxyFunc(EEntryMethod::CORE_CREATEDEVICE, (void**)&Original::s_CoreCreateDevice, "D3D11CoreCreateDevice") == false)
-		{
-			return 0;
-		}
-
-		return Original::s_CoreCreateDevice(pFactory, pAdapter, Flags, pFeatureLevels, FeatureLevels, ppDevice);
-	}
-	HRESULT __stdcall D3D11CoreCreateLayeredDevice(const void* unknown0, DWORD unknown1, const void* unknown2, REFIID riid, void** ppvObj)
-	{
-		if (InitProxyFunc(EEntryMethod::CORE_CREATELAYEREDDEVICE, (void**)&Original::s_CoreCreateLayeredDevice, "D3D11CoreCreateLayeredDevice") == false)
-		{
-			return 0;
-		}
-
-		return Original::s_CoreCreateLayeredDevice(unknown0, unknown1, unknown2, riid, ppvObj);
-	}
-	SIZE_T  __stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unknown1)
-	{
-		if (InitProxyFunc(EEntryMethod::CORE_GETLAYEREDDEVICESIZE, (void**)&Original::s_CoreGetLayeredDeviceSize, "D3D11CoreGetLayeredDeviceSize") == false)
-		{
-			return 0;
-		}
-
-		return Original::s_CoreGetLayeredDeviceSize(unknown0, unknown1);
-	}
-	HRESULT __stdcall D3D11CoreRegisterLayers(const void* unknown0, DWORD unknown1)
-	{
-		if (InitProxyFunc(EEntryMethod::CORE_REGISTERLAYERS, (void**)&Original::s_CoreRegisterLayers, "D3D11CoreRegisterLayers") == false)
-		{
-			return 0;
-		}
-
-		return Original::s_CoreRegisterLayers(unknown0, unknown1);
-	}
 }
+#pragma warning( push )
+#pragma warning(disable: 6101)
+PROXY HRESULT __stdcall D3D11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext)
+{
+	Main::Initialize(EProxyFunction::D3D11_CREATEDEVICE);
+
+	static PFN_D3D11_CREATE_DEVICE s_CreateDevice = nullptr;
+	if (Proxy::InitProxyFunc((void**)&s_CreateDevice, "D3D11CreateDevice") == false)
+	{
+		return 0;
+	}
+
+	return s_CreateDevice(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
+}
+
+PROXY HRESULT __stdcall D3D11CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, const DXGI_SWAP_CHAIN_DESC* pSwapChainDesc, IDXGISwapChain** ppSwapChain, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext)
+{
+	Main::Initialize(EProxyFunction::D3D11_CREATEDEVICEANDSWAPCHAIN);
+
+	static PFN_D3D11_CREATE_DEVICE_AND_SWAP_CHAIN s_CreateDeviceAndSwapChain = nullptr;
+
+	if (Proxy::InitProxyFunc((void**)&s_CreateDeviceAndSwapChain, "D3D11CreateDeviceAndSwapChain") == false)
+	{
+		return 0;
+	}
+
+	return s_CreateDeviceAndSwapChain(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice, pFeatureLevel, ppImmediateContext);
+}
+
+PROXY HRESULT __stdcall D3D11CoreCreateDevice(IDXGIFactory* pFactory, IDXGIAdapter* pAdapter, UINT Flags, const D3D_FEATURE_LEVEL* pFeatureLevels, UINT FeatureLevels, ID3D11Device** ppDevice)
+{
+	Main::Initialize(EProxyFunction::D3D11_CORECREATEDEVICE);
+
+	static PFN_D3D11_CORE_CREATE_DEVICE s_CoreCreateDevice = nullptr;
+
+	if (Proxy::InitProxyFunc((void**)&s_CoreCreateDevice, "D3D11CoreCreateDevice") == false)
+	{
+		return 0;
+	}
+
+	return s_CoreCreateDevice(pFactory, pAdapter, Flags, pFeatureLevels, FeatureLevels, ppDevice);
+}
+
+PROXY HRESULT __stdcall D3D11CoreCreateLayeredDevice(const void* unknown0, DWORD unknown1, const void* unknown2, REFIID riid, void** ppvObj)
+{
+	Main::Initialize(EProxyFunction::D3D11_CORECREATELAYEREDDEVICE);
+
+	static PFN_D3D11_CORE_CREATE_LAYERED_DEVICE s_CoreCreateLayeredDevice = nullptr;
+
+	if (Proxy::InitProxyFunc((void**)&s_CoreCreateLayeredDevice, "D3D11CoreCreateLayeredDevice") == false)
+	{
+		return 0;
+	}
+
+	return s_CoreCreateLayeredDevice(unknown0, unknown1, unknown2, riid, ppvObj);
+}
+
+PROXY SIZE_T __stdcall D3D11CoreGetLayeredDeviceSize(const void* unknown0, DWORD unknown1)
+{
+	Main::Initialize(EProxyFunction::D3D11_COREGETLAYEREDDEVICESIZE);
+
+	static PFN_D3D11_CORE_GET_LAYERED_DEVICE_SIZE s_CoreGetLayeredDeviceSize = nullptr;
+
+	if (Proxy::InitProxyFunc((void**)&s_CoreGetLayeredDeviceSize, "D3D11CoreGetLayeredDeviceSize") == false)
+	{
+		return 0;
+	}
+
+	return s_CoreGetLayeredDeviceSize(unknown0, unknown1);
+}
+
+PROXY HRESULT __stdcall D3D11CoreRegisterLayers(const void* unknown0, DWORD unknown1)
+{
+	Main::Initialize(EProxyFunction::D3D11_COREREGISTERLAYERS);
+
+	static PFN_D3D11_CORE_REGISTER_LAYERS s_CoreRegisterLayers = nullptr;
+
+	if (Proxy::InitProxyFunc((void**)&s_CoreRegisterLayers, "D3D11CoreRegisterLayers") == false)
+	{
+		return 0;
+	}
+
+	return s_CoreRegisterLayers(unknown0, unknown1);
+}
+#pragma warning( pop )

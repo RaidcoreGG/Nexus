@@ -12,6 +12,7 @@
 #include "State.h"
 
 #include "Core/Context.h"
+#include "Core/Hooks/Hooks.h"
 #include "GW2/Inputs/GameBinds/GbApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Loader/Loader.h"
@@ -51,22 +52,16 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		{
 			CContext* ctx = CContext::GetContext();
 
-			/* cleanly remove wndproc hook */
-			if (ctx->GetRendererCtx()->Window.Handle && Hooks::WndProc)
+			/* If we have the window handle and we have an original (target) wndproc. */
+			if (ctx->GetRendererCtx()->Window.Handle && Hooks::Target::WndProc)
 			{
-				SetWindowLongPtr(ctx->GetRendererCtx()->Window.Handle, GWLP_WNDPROC, (LONG_PTR)Hooks::WndProc);
+				/* Reset wndproc back to the original target. */
+				SetWindowLongPtr(ctx->GetRendererCtx()->Window.Handle, GWLP_WNDPROC, (LONG_PTR)Hooks::Target::WndProc);
 			}
 			break;
 		}
 	}
 	return true;
-}
-
-namespace Hooks
-{
-	DXPRESENT       DXGIPresent       = nullptr;
-	DXRESIZEBUFFERS DXGIResizeBuffers = nullptr;
-	WNDPROC         WndProc           = nullptr;
 }
 
 namespace Main
@@ -80,8 +75,18 @@ namespace Main
 	static CSettings*        s_SettingsCtx    = nullptr;
 	static RenderContext_t*  s_RendererCtx    = nullptr;
 
-	void Initialize(EEntryMethod aEntryMethod)
+	void Initialize(EProxyFunction aEntryFunction)
 	{
+		static EProxyFunction s_EntryFunction = EProxyFunction::NONE;
+
+		/* If an entry function is set, we already initalized. */
+		if (s_EntryFunction != EProxyFunction::NONE)
+		{
+			return;
+		}
+
+		s_EntryFunction = aEntryFunction;
+
 		if (State::Nexus >= ENexusState::LOAD) { return; }
 
 		State::Nexus = ENexusState::LOAD;
@@ -112,7 +117,7 @@ namespace Main
 		logger->Info(CH_CORE, GetCommandLineA());
 		logger->Info(CH_CORE, "%s: %s", Index(EPath::NexusDLL) != Index(EPath::D3D11Chainload) ? "Proxy" : "Chainload", Index(EPath::NexusDLL).string().c_str());
 		logger->Info(CH_CORE, "Nexus: %s %s", ctx->GetVersion().string().c_str(), ctx->GetBuild());
-		logger->Info(CH_CORE, "Entry method: %d", aEntryMethod);
+		logger->Info(CH_CORE, "Entry method: %d", aEntryFunction);
 
 		RaidcoreAPI = new CHttpClient("https://api.raidcore.gg", Index(EPath::DIR_APICACHE_RAIDCORE), 30 * 60, 300, 5, 1);
 		GitHubAPI = new CHttpClient("https://api.github.com", Index(EPath::DIR_APICACHE_GITHUB), 30 * 60, 60, 60, 60 * 60);
@@ -206,118 +211,5 @@ namespace Main
 		/* do not free lib, let the OS handle it. else gw2 crashes on shutdown */
 		//if (D3D11Handle) { FreeLibrary(D3D11Handle); }
 		//if (D3D11SystemHandle) { FreeLibrary(D3D11SystemHandle); }
-	}
-
-	LRESULT __stdcall hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-	{
-		if (State::Nexus != ENexusState::SHUTDOWN)
-		{
-			assert(s_RawInputApi);
-			assert(s_UIContext);
-			assert(s_InputBindApi);
-
-			// don't pass to game if loader
-			if (Loader::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
-
-			// don't pass to game if wndprocCb or InputBind
-			//if (InputCtx->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return; }
-
-			// don't pass to game if custom wndproc
-			if (s_RawInputApi->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
-
-			// don't pass to game if gui
-			if (s_UIContext->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
-
-			// don't pass to game if InputBind
-			if (s_InputBindApi->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
-
-			if (uMsg == WM_DESTROY || uMsg == WM_QUIT || uMsg == WM_CLOSE)
-			{
-				Main::Shutdown(uMsg);
-			}
-
-			/* offset of 7997, if uMsg in that range it's a nexus game only message */
-			if (uMsg >= WM_PASSTHROUGH_FIRST && uMsg <= WM_PASSTHROUGH_LAST)
-			{
-				/* modify the uMsg code to the original code */
-				uMsg -= WM_PASSTHROUGH_FIRST;
-			}
-
-			MouseResetFix(hWnd, uMsg, wParam, lParam);
-		}
-
-		return CallWindowProcA(Hooks::WndProc, hWnd, uMsg, wParam, lParam);
-	}
-
-	HRESULT __stdcall hkDXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
-	{
-		if (!(State::Nexus == ENexusState::SHUTTING_DOWN || State::Nexus == ENexusState::SHUTDOWN))
-		{
-			assert(s_UIContext);
-			assert(s_TextureService);
-
-			if (s_RendererCtx->SwapChain != pChain)
-			{
-				s_RendererCtx->SwapChain = pChain;
-
-				if (s_RendererCtx->Device)
-				{
-					s_RendererCtx->DeviceContext->Release();
-					s_RendererCtx->DeviceContext = nullptr;
-					s_RendererCtx->Device->Release();
-					s_RendererCtx->Device = nullptr;
-				}
-
-				s_RendererCtx->SwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&s_RendererCtx->Device);
-				s_RendererCtx->Device->GetImmediateContext(&s_RendererCtx->DeviceContext);
-
-				DXGI_SWAP_CHAIN_DESC swapChainDesc;
-				s_RendererCtx->SwapChain->GetDesc(&swapChainDesc);
-
-				s_RendererCtx->Window.Handle = swapChainDesc.OutputWindow;
-				Hooks::WndProc = (WNDPROC)SetWindowLongPtr(s_RendererCtx->Window.Handle, GWLP_WNDPROC, (LONG_PTR)hkWndProc);
-
-				Loader::Initialize();
-
-				State::Nexus = ENexusState::READY;
-				State::Directx = EDxState::READY; /* acquired swapchain */
-			}
-
-			s_UIContext->Initialize(s_RendererCtx->Window.Handle, s_RendererCtx->Device, s_RendererCtx->DeviceContext, s_RendererCtx->SwapChain);
-
-			Loader::ProcessQueue();
-
-			s_TextureService->Advance();
-
-			s_UIContext->Render();
-		}
-
-		s_RendererCtx->Metrics.FrameCount++;
-
-		return Hooks::DXGIPresent(pChain, SyncInterval, Flags);
-	}
-
-	HRESULT __stdcall hkDXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
-	{
-		assert(s_UIContext);
-		assert(s_NexusLink);
-		assert(s_EventApi);
-
-		s_UIContext->Shutdown();
-
-		/* Cache window dimensions */
-		s_RendererCtx->Window.Width = Width;
-		s_RendererCtx->Window.Height = Height;
-
-		if (s_NexusLink)
-		{
-			/* Already write to nexus link, as addons depend on that and the next frame isn't called yet so no update to values */
-			s_NexusLink->Width = Width;
-			s_NexusLink->Height = Height;
-		}
-
-		s_EventApi->Raise(EV_WINDOW_RESIZED);
-
-		return Hooks::DXGIResizeBuffers(pChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
 	}
 }

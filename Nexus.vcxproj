@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Context.cpp" />
+    <ClCompile Include="src\Core\Hooks\Hooks.cpp" />
     <ClCompile Include="src\Engine\Functions\FnRegistry.cpp" />
     <ClCompile Include="src\Engine\Index\Index.cpp" />
     <ClCompile Include="src\GW2\Inputs\GameBinds\GbApi.cpp" />
@@ -27,7 +28,7 @@
     <ClCompile Include="src\Engine\Loader\Library.cpp" />
     <ClCompile Include="src\UI\Services\Localization\LoclApi.cpp" />
     <ClCompile Include="src\GW2\Mumble\MblConst.cpp" />
-    <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\Core\Main.cpp" />
     <ClCompile Include="src\Engine\Events\EvtApi.cpp" />
     <ClCompile Include="src\Engine\Logging\LogConst.cpp" />
     <ClCompile Include="src\thirdparty\ImAnimate\ImAnimate.cpp" />
@@ -51,7 +52,7 @@
     <ClCompile Include="src\thirdparty\minhook\mh_trampoline.cpp" />
     <ClCompile Include="src\GW2\Multibox\Multibox.cpp" />
     <ClCompile Include="src\GW2\Mumble\MblReader.cpp" />
-    <ClCompile Include="src\Proxy.cpp" />
+    <ClCompile Include="src\Core\Proxy\Proxy.cpp" />
     <ClCompile Include="src\Engine\Settings\Settings.cpp" />
     <ClCompile Include="src\Shared.cpp" />
     <ClCompile Include="src\State.cpp" />
@@ -96,7 +97,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core\Context.h" />
+    <ClInclude Include="src\Core\Hooks\HkConst.h" />
+    <ClInclude Include="src\Core\Hooks\HkFuncDefs.h" />
+    <ClInclude Include="src\Core\Hooks\Hooks.h" />
     <ClInclude Include="src\Core\PrefConst.h" />
+    <ClInclude Include="src\Core\Proxy\PxyEnum.h" />
+    <ClInclude Include="src\Core\Proxy\PxyFuncDefs.h" />
     <ClInclude Include="src\Engine\Events\EvtData.h" />
     <ClInclude Include="src\Engine\Functions\FnEntry.h" />
     <ClInclude Include="src\Engine\Functions\FnRegistry.h" />
@@ -167,7 +173,7 @@
     <ClInclude Include="src\UI\Services\Localization\LoclFuncDefs.h" />
     <ClInclude Include="src\UI\Services\Localization\LoclApi.h" />
     <ClInclude Include="src\Engine\Logging\LogFuncDefs.h" />
-    <ClInclude Include="src\Main.h" />
+    <ClInclude Include="src\Core\Main.h" />
     <ClInclude Include="src\GW2\Multibox\Multibox.h" />
     <ClInclude Include="src\thirdparty\mumble\Mumble.h" />
     <ClInclude Include="src\thirdparty\nlohmann\json.hpp" />
@@ -322,7 +328,7 @@
     <ClInclude Include="src\thirdparty\minhook\mh_trampoline.h" />
     <ClInclude Include="src\GW2\Mumble\MblReader.h" />
     <ClInclude Include="src\Engine\Index\IdxFuncDefs.h" />
-    <ClInclude Include="src\Proxy.h" />
+    <ClInclude Include="src\Core\Proxy\Proxy.h" />
     <ClInclude Include="src\resource.h" />
     <ClInclude Include="src\Engine\Settings\Settings.h" />
     <ClInclude Include="src\Shared.h" />
@@ -391,7 +397,6 @@
     <ResourceCompile Include="src\Nexus.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\exports.def" />
     <None Include="src\Resources\bin64\arcdps_integration64.dll" />
     <None Include="src\Resources\Locales\br_Main.json" />
     <None Include="src\Resources\Locales\cn_Main.json" />
@@ -508,7 +513,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <ModuleDefinitionFile>src\exports.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
       <AdditionalDependencies>advapi32.lib;crypt32.lib;gdi32.lib;ntdll.lib;PathCch.lib;Psapi.lib;shcore.lib;Shell32.lib;Shlwapi.lib;user32.lib;ws2_32.lib;libssl64MTd.lib;libcrypto64MTd.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
@@ -545,7 +551,8 @@ CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <ModuleDefinitionFile>src\exports.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
       <AdditionalDependencies>advapi32.lib;crypt32.lib;gdi32.lib;ntdll.lib;PathCch.lib;Psapi.lib;shcore.lib;Shell32.lib;Shlwapi.lib;user32.lib;ws2_32.lib;libssl64MT.lib;libcrypto64MT.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>

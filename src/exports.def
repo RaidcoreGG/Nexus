@@ -1,9 +1,0 @@
-LIBRARY D3D11
-EXPORTS
-	D3D11CreateDevice
-	D3D11CreateDeviceAndSwapChain
-
-	D3D11CoreCreateDevice
-	D3D11CoreCreateLayeredDevice
-	D3D11CoreGetLayeredDeviceSize
-	D3D11CoreRegisterLayers
