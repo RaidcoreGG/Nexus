@@ -150,7 +150,7 @@ namespace Main
 
 		s_ShutdownReason = aReason;
 
-		const char* reasonStr;
+		std::string reasonStr;
 		switch (aReason)
 		{
 			case WM_DESTROY: { reasonStr = "Reason: WM_DESTROY"; break; }
@@ -158,7 +158,7 @@ namespace Main
 			case WM_QUIT:    { reasonStr = "Reason: WM_QUIT";    break; }
 			default:
 			{
-				reasonStr = String::Format("Reason: Unknown (%d)", aReason).c_str();
+				reasonStr = String::Format("Reason: Unknown (%d)", aReason);
 				break;
 			}
 		}
@@ -169,7 +169,7 @@ namespace Main
 
 		State::Nexus = ENexusState::SHUTTING_DOWN;
 
-		logger->Critical(CH_CORE, String::Format("SHUTDOWN BEGIN | %s", reasonStr).c_str());
+		logger->Critical(CH_CORE, "SHUTDOWN BEGIN | %s", reasonStr.c_str());
 		MH_Uninitialize();
 		Loader::Shutdown();
 		uictx->Shutdown();
