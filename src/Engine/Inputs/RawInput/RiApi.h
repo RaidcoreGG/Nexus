@@ -13,6 +13,7 @@
 #include <mutex>
 
 #include "RiFuncDefs.h"
+#include "Engine/Renderer/RdrContext.h"
 
 #define WM_PASSTHROUGH_FIRST WM_USER + 7997
 #define WM_PASSTHROUGH_LAST  WM_USER + 7997 + WM_USER - 1
@@ -26,11 +27,7 @@ class CRawInputApi
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CRawInputApi() = default;
-	///----------------------------------------------------------------------------------------------------
-	/// dtor
-	///----------------------------------------------------------------------------------------------------
-	~CRawInputApi() = default;
+	CRawInputApi(RenderContext_t* aRenderCtx);
 
 	///----------------------------------------------------------------------------------------------------
 	/// WndProc:
@@ -63,6 +60,8 @@ class CRawInputApi
 	int Verify(void* aStartAddress, void* aEndAddress);
 
 	private:
+	RenderContext_t*              RenderContext = nullptr;
+
 	mutable std::mutex            Mutex;
 	std::vector<WNDPROC_CALLBACK> Registry;
 };

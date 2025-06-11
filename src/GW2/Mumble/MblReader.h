@@ -51,6 +51,24 @@ class CMumbleReader
 	///----------------------------------------------------------------------------------------------------
 	bool IsDisabled() const;
 
+	///----------------------------------------------------------------------------------------------------
+	/// GetMumbleData:
+	/// 	Returns a pointer to the mumble link data.
+	///----------------------------------------------------------------------------------------------------
+	Mumble::Data* GetMumbleData() const;
+	
+	///----------------------------------------------------------------------------------------------------
+	/// GetMumbleIdentity:
+	/// 	Returns a pointer to the parsed mumble identity data.
+	///----------------------------------------------------------------------------------------------------
+	Mumble::Identity* GetMumbleIdentity() const;
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetNexusLink:
+	/// 	Returns a pointer to the nexus link data.
+	///----------------------------------------------------------------------------------------------------
+	NexusLinkData_t* GetNexusLink() const;
+
 	private:
 	CDataLinkApi*     DataLinkApi            = nullptr;
 	CEventApi*        EventApi               = nullptr;

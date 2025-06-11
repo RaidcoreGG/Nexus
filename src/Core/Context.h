@@ -14,7 +14,6 @@
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
 #include "Engine/Loader/AddonVersion.h"
-#include "UI/Services/Localization/LoclApi.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Renderer/RdrContext.h"
 #include "Engine/Settings/Settings.h"

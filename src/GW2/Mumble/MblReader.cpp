@@ -72,6 +72,21 @@ bool CMumbleReader::IsDisabled() const
 	return !this->IsRunning;
 }
 
+Mumble::Data* CMumbleReader::GetMumbleData() const
+{
+	return this->MumbleLink;
+}
+
+Mumble::Identity* CMumbleReader::GetMumbleIdentity() const
+{
+	return this->MumbleIdentity;
+}
+
+NexusLinkData_t* CMumbleReader::GetNexusLink() const
+{
+	return this->NexusLink;
+}
+
 void CMumbleReader::AdvanceIdentity()
 {
 	while (this->IsRunning)

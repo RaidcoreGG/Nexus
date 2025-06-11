@@ -15,10 +15,11 @@
 #include <vector>
 #include <Windows.h>
 
+#include "Engine/Logging/LogApi.h"
+#include "Engine/Renderer/RdrContext.h"
 #include "TxFuncDefs.h"
 #include "TxQueueEntry.h"
 #include "TxTexture.h"
-#include "Engine/Logging/LogApi.h"
 
 constexpr const char* CH_TEXTURES = "Textures";
 
@@ -31,7 +32,7 @@ class CTextureLoader
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CTextureLoader(CLogApi* aLogger);
+	CTextureLoader(CLogApi* aLogger, RenderContext_t* aRenderCtx);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -117,9 +118,10 @@ class CTextureLoader
 	int Verify(void* aStartAddress, void* aEndAddress);
 
 	private:
-	CLogApi*                             Logger = nullptr;
+	CLogApi*                               Logger        = nullptr;
+	RenderContext_t*                       RenderContext = nullptr;
 
-	mutable std::mutex                   Mutex;
+	mutable std::mutex                     Mutex;
 	std::map<std::string, Texture_t*>      Registry;
 	std::map<std::string, QueuedTexture_t> QueuedTextures;
 

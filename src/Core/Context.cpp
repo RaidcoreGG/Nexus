@@ -84,7 +84,8 @@ CUpdater* CContext::GetUpdater()
 CTextureLoader* CContext::GetTextureService()
 {
 	static CTextureLoader s_TextureApi = CTextureLoader(
-		this->GetLogger()
+		this->GetLogger(),
+		this->GetRendererCtx()
 	);
 	return &s_TextureApi;
 }
@@ -105,7 +106,9 @@ CEventApi* CContext::GetEventApi()
 
 CRawInputApi* CContext::GetRawInputApi()
 {
-	static CRawInputApi s_RawInputApi = CRawInputApi();
+	static CRawInputApi s_RawInputApi = CRawInputApi(
+		this->GetRendererCtx()
+	);
 	return &s_RawInputApi;
 }
 
@@ -131,11 +134,13 @@ CGameBindsApi* CContext::GetGameBindsApi()
 CUiContext* CContext::GetUIContext()
 {
 	static CUiContext s_UiContext = CUiContext(
+		this->GetRendererCtx(),
 		this->GetLogger(),
 		this->GetTextureService(),
 		this->GetDataLink(),
 		this->GetInputBindApi(),
-		this->GetEventApi()
+		this->GetEventApi(),
+		this->GetMumbleReader()
 	);
 	return &s_UiContext;
 }

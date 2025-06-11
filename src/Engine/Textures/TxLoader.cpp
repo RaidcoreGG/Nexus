@@ -18,13 +18,14 @@
 
 #include "Engine/Index/Index.h"
 #include "Util/Time.h"
-#include "Core/Context.h"
 
-CTextureLoader::CTextureLoader(CLogApi* aLogger)
+CTextureLoader::CTextureLoader(CLogApi* aLogger, RenderContext_t* aRenderCtx)
 {
 	assert(aLogger);
+	assert(aRenderCtx);
 
-	this->Logger = aLogger;
+	this->Logger        = aLogger;
+	this->RenderContext = aRenderCtx;
 }
 
 CTextureLoader::~CTextureLoader()
@@ -557,11 +558,8 @@ void CTextureLoader::CreateTexture(const std::string& aIdentifier, QueuedTexture
 	subResource.SysMemPitch      = desc.Width * 4;
 	subResource.SysMemSlicePitch = 0;
 
-	CContext*        ctx = CContext::GetContext();
-	RenderContext_t* renderer = ctx->GetRendererCtx();
-
 	ID3D11Texture2D* pTexture = nullptr;
-	renderer->Device->CreateTexture2D(&desc, &subResource, &pTexture);
+	this->RenderContext->Device->CreateTexture2D(&desc, &subResource, &pTexture);
 
 	if (!pTexture)
 	{
@@ -590,7 +588,7 @@ void CTextureLoader::CreateTexture(const std::string& aIdentifier, QueuedTexture
 	srvDesc.Texture2D.MostDetailedMip = 0;
 
 	ID3D11ShaderResourceView* srv = nullptr;
-	renderer->Device->CreateShaderResourceView(pTexture, &srvDesc, &srv);
+	this->RenderContext->Device->CreateShaderResourceView(pTexture, &srvDesc, &srv);
 
 	pTexture->Release();
 

@@ -118,8 +118,6 @@ namespace Hooks
 					State::Directx = EDxState::READY;
 				}
 
-				s_UIContext->Initialize(s_RenderCtx->Window.Handle, s_RenderCtx->Device, s_RenderCtx->DeviceContext, s_RenderCtx->SwapChain);
-
 				Loader::ProcessQueue();
 
 				s_TextureLoader->Advance();

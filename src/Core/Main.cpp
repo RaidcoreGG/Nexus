@@ -135,10 +135,6 @@ namespace Main
 
 			MH_Initialize();
 
-			/* only need to grab this, otherwise it won't be allocated right now. */
-			/* FIXME: DI should use THIS instead of DataLink, the components depend on Mumble not on the DataLink. */
-			static CMumbleReader* mr = ctx->GetMumbleReader();
-
 			State::Nexus = ENexusState::LOADED;
 		}
 		else

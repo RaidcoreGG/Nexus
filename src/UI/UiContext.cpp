@@ -249,13 +249,15 @@ namespace UIRoot
 	}
 }
 
-CUiContext::CUiContext(CLogApi* aLogger, CTextureLoader* aTextureService, CDataLinkApi* aDataLink, CInputBindApi* aInputBindApi, CEventApi* aEventApi)
+CUiContext::CUiContext(RenderContext_t* aRenderContext, CLogApi* aLogger, CTextureLoader* aTextureService, CDataLinkApi* aDataLink, CInputBindApi* aInputBindApi, CEventApi* aEventApi, CMumbleReader* aMumbleReader)
 {
+	this->RenderContext  = aRenderContext;
 	this->Logger         = aLogger;
 	this->TextureService = aTextureService;
 	this->DataLink       = aDataLink;
 	this->InputBindApi   = aInputBindApi;
 	this->EventApi       = aEventApi;
+	this->MumbleReader   = aMumbleReader;
 
 	this->ImGuiContext   = ImGui::CreateContext();
 
@@ -315,26 +317,30 @@ CUiContext::~CUiContext()
 	ImGui::DestroyContext();
 }
 
-void CUiContext::Initialize(HWND aWindowHandle, ID3D11Device* aDevice, ID3D11DeviceContext* aDeviceContext, IDXGISwapChain* aSwapChain)
+void CUiContext::Initialize()
 {
 	if (this->IsInitialized)
 	{
 		return;
 	}
 
-	this->WindowHandle = aWindowHandle;
-	this->Device = aDevice;
-	this->DeviceContext = aDeviceContext;
-	this->SwapChain = aSwapChain;
+	if (!(this->RenderContext->Window.Handle &&
+		this->RenderContext->Device &&
+		this->RenderContext->DeviceContext &&
+		this->RenderContext->SwapChain))
+	{
+		this->Logger->Critical(CH_UICONTEXT, "CUiContext::Initialize() failed. A RenderContext component was nullptr.");
+		return;
+	}
 
 	// Init imgui
-	ImGui_ImplWin32_Init(this->WindowHandle);
-	ImGui_ImplDX11_Init(this->Device, this->DeviceContext);
+	ImGui_ImplWin32_Init(this->RenderContext->Window.Handle);
+	ImGui_ImplDX11_Init(this->RenderContext->Device, this->RenderContext->DeviceContext);
 	//ImGui::GetIO().ImeWindowHandle = Renderer::WindowHandle;
 
 	// create buffers
 	ID3D11Texture2D* pBackBuffer;
-	this->SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBackBuffer);
+	this->RenderContext->SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBackBuffer);
 
 	if (!pBackBuffer)
 	{
@@ -342,7 +348,7 @@ void CUiContext::Initialize(HWND aWindowHandle, ID3D11Device* aDevice, ID3D11Dev
 		return;
 	}
 
-	this->Device->CreateRenderTargetView(pBackBuffer, NULL, &this->RenderTargetView);
+	this->RenderContext->Device->CreateRenderTargetView(pBackBuffer, NULL, &this->RenderTargetView);
 	pBackBuffer->Release();
 
 	if (!this->RenderTargetView)
@@ -377,6 +383,8 @@ void CUiContext::Shutdown()
 
 void CUiContext::Render()
 {
+	this->Initialize();
+
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	/* preload localization and font changes */
@@ -458,7 +466,7 @@ void CUiContext::Render()
 				}
 				else
 				{
-					PostMessageA(this->WindowHandle, WM_CLOSE, 0, 0);
+					PostMessageA(this->RenderContext->Window.Handle, WM_CLOSE, 0, 0);
 				}
 			}
 		}
@@ -466,7 +474,7 @@ void CUiContext::Render()
 		/* end frame */
 		ImGui::EndFrame();
 		ImGui::Render();
-		this->DeviceContext->OMSetRenderTargets(1, &this->RenderTargetView, NULL);
+		this->RenderContext->DeviceContext->OMSetRenderTargets(1, &this->RenderTargetView, NULL);
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	}
 
@@ -698,7 +706,7 @@ void CUiContext::UpdateScaling()
 
 	if (settingsctx->Get<bool>(OPT_DPISCALING, true))
 	{
-		UINT dpi = GetDpiForWindow(this->WindowHandle);
+		UINT dpi = GetDpiForWindow(this->RenderContext->Window.Handle);
 
 		io.FontGlobalScale = dpi / 96.f;
 	}

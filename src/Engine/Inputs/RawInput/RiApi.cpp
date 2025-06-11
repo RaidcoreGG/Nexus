@@ -8,7 +8,14 @@
 
 #include "RiApi.h"
 
-#include "Core/Context.h"
+#include <assert.h>
+
+CRawInputApi::CRawInputApi(RenderContext_t* aRenderCtx)
+{
+	assert(aRenderCtx);
+
+	this->RenderContext = aRenderCtx;
+}
 
 UINT CRawInputApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -28,15 +35,12 @@ UINT CRawInputApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 LRESULT CRawInputApi::SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	CContext*        ctx      = CContext::GetContext();
-	RenderContext_t* renderer = ctx->GetRendererCtx();
-
 	if (uMsg < WM_USER)
 	{
-		return PostMessageA(renderer->Window.Handle, uMsg + WM_PASSTHROUGH_FIRST, wParam, lParam);
+		return PostMessageA(this->RenderContext->Window.Handle, uMsg + WM_PASSTHROUGH_FIRST, wParam, lParam);
 	}
 
-	return PostMessageA(renderer->Window.Handle, uMsg, wParam, lParam);
+	return PostMessageA(this->RenderContext->Window.Handle, uMsg, wParam, lParam);
 }
 
 void CRawInputApi::Register(WNDPROC_CALLBACK aWndProcCallback)

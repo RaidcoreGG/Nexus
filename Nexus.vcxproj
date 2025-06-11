@@ -26,7 +26,6 @@
     <ClCompile Include="src\Engine\Loader\ArcDPS.cpp" />
     <ClCompile Include="src\Engine\Loader\EUpdateProvider.cpp" />
     <ClCompile Include="src\Engine\Loader\Library.cpp" />
-    <ClCompile Include="src\UI\Services\Localization\LoclApi.cpp" />
     <ClCompile Include="src\GW2\Mumble\MblConst.cpp" />
     <ClCompile Include="src\Core\Main.cpp" />
     <ClCompile Include="src\Engine\Events\EvtApi.cpp" />
@@ -64,6 +63,7 @@
     <ClCompile Include="src\UI\Controls\CtlWindow.cpp" />
     <ClCompile Include="src\UI\Overlay\MumbleInspector\MumbleInspector.cpp" />
     <ClCompile Include="src\UI\Services\Fonts\FontManager.cpp" />
+    <ClCompile Include="src\UI\Services\Localization\LoclApi.cpp" />
     <ClCompile Include="src\UI\Services\QoL\EscapeClosing.cpp" />
     <ClCompile Include="src\UI\UiContext.cpp" />
     <ClCompile Include="src\UI\Widgets\Alerts\Alerts.cpp" />
@@ -109,8 +109,6 @@
     <ClInclude Include="src\Engine\Index\IdxEnum.h" />
     <ClInclude Include="src\Engine\Index\Index.h" />
     <ClInclude Include="src\GW2\Inputs\MouseResetFix.h" />
-    <ClInclude Include="src\UI\Services\Localization\LoclLocale.h" />
-    <ClInclude Include="src\UI\Services\Localization\LoclQueuedText.h" />
     <ClInclude Include="src\Engine\Networking\NetConst.h" />
     <ClInclude Include="src\Engine\Renderer\RdrContext.h" />
     <ClInclude Include="src\Engine\Renderer\RdrMetrics.h" />
@@ -170,8 +168,6 @@
     <ClInclude Include="src\Engine\Loader\LibraryAddon.h" />
     <ClInclude Include="src\Engine\Loader\Loader.h" />
     <ClInclude Include="src\Engine\Loader\NexusLinkData.h" />
-    <ClInclude Include="src\UI\Services\Localization\LoclFuncDefs.h" />
-    <ClInclude Include="src\UI\Services\Localization\LoclApi.h" />
     <ClInclude Include="src\Engine\Logging\LogFuncDefs.h" />
     <ClInclude Include="src\Core\Main.h" />
     <ClInclude Include="src\GW2\Multibox\Multibox.h" />
@@ -352,6 +348,10 @@
     <ClInclude Include="src\UI\Overlay\MumbleInspector\MumbleInspector.h" />
     <ClInclude Include="src\UI\Services\Fonts\FontManager.h" />
     <ClInclude Include="src\UI\Services\Fonts\FuncDefs.h" />
+    <ClInclude Include="src\UI\Services\Localization\LoclApi.h" />
+    <ClInclude Include="src\UI\Services\Localization\LoclFuncDefs.h" />
+    <ClInclude Include="src\UI\Services\Localization\LoclLocale.h" />
+    <ClInclude Include="src\UI\Services\Localization\LoclQueuedText.h" />
     <ClInclude Include="src\UI\Services\QoL\EscapeClosing.h" />
     <ClInclude Include="src\UI\Services\QoL\FuncDefs.h" />
     <ClInclude Include="src\UI\UiContext.h" />
@@ -373,11 +373,11 @@
     <ClInclude Include="src\UI\Widgets\MainWindow\Options\ImportStyleModal.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Options\Options.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\SnowflakeMgr.h" />
-    <ClInclude Include="src\UI\Widgets\QuickAccess\QaFuncDefs.h" />
     <ClInclude Include="src\UI\Widgets\QuickAccess\QaConst.h" />
     <ClInclude Include="src\UI\Widgets\QuickAccess\QaEnum.h" />
-    <ClInclude Include="src\UI\Widgets\QuickAccess\QuickAccess.h" />
+    <ClInclude Include="src\UI\Widgets\QuickAccess\QaFuncDefs.h" />
     <ClInclude Include="src\UI\Widgets\QuickAccess\QaShortcut.h" />
+    <ClInclude Include="src\UI\Widgets\QuickAccess\QuickAccess.h" />
     <ClInclude Include="src\Util\Base64.h" />
     <ClInclude Include="src\Util\CmdLine.h" />
     <ClInclude Include="src\Util\DLL.h" />

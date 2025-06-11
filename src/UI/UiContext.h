@@ -15,15 +15,17 @@
 #include <Windows.h>
 
 #include "DisplayBinds.h"
-#include "ERenderType.h"
-#include "Engine/Events/EvtApi.h"
-#include "FuncDefs.h"
-#include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/DataLink/DlApi.h"
-#include "UI/Services/Localization/LoclApi.h"
+#include "Engine/Events/EvtApi.h"
+#include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Logging/LogApi.h"
+#include "Engine/Renderer/RdrContext.h"
 #include "Engine/Textures/TxLoader.h"
+#include "ERenderType.h"
+#include "FuncDefs.h"
+#include "GW2/Mumble/MblReader.h"
 #include "UI/Services/Fonts/FontManager.h"
+#include "UI/Services/Localization/LoclApi.h"
 #include "UI/Services/QoL/EscapeClosing.h"
 #include "UI/Widgets/Alerts/Alerts.h"
 #include "UI/Widgets/EULA/LicenseAgreementModal.h"
@@ -120,7 +122,15 @@ class CUiContext
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CUiContext(CLogApi* aLogger, CTextureLoader* aTextureService, CDataLinkApi* aDataLink, CInputBindApi* aInputBindApi, CEventApi* aEventApi);
+	CUiContext(
+		RenderContext_t* aRenderContext,
+		CLogApi*         aLogger,
+		CTextureLoader*  aTextureService,
+		CDataLinkApi*    aDataLink,
+		CInputBindApi*   aInputBindApi,
+		CEventApi*       aEventApi,
+		CMumbleReader*   aMumbleReader
+	);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -131,7 +141,7 @@ class CUiContext
 	/// Initialize:
 	/// 	Initializes the UI context.
 	///----------------------------------------------------------------------------------------------------
-	void Initialize(HWND aWindowHandle, ID3D11Device* aDevice, ID3D11DeviceContext* aDeviceContext, IDXGISwapChain* aSwapChain);
+	void Initialize();
 
 	///----------------------------------------------------------------------------------------------------
 	/// Shutdown:
@@ -256,18 +266,16 @@ class CUiContext
 
 	private:
 	/* Services */
+	RenderContext_t*                   RenderContext  = nullptr;
 	CLogApi*                           Logger         = nullptr;
 	CLocalization*                     Language       = nullptr;
 	CTextureLoader*                    TextureService = nullptr;
 	CDataLinkApi*                      DataLink       = nullptr;
 	CInputBindApi*                     InputBindApi   = nullptr;
 	CEventApi*                         EventApi       = nullptr;
+	CMumbleReader*                     MumbleReader   = nullptr;
 
 	/* Rendering */
-	HWND                               WindowHandle;
-	ID3D11Device*                      Device;
-	ID3D11DeviceContext*               DeviceContext;
-	IDXGISwapChain*                    SwapChain;
 	ID3D11RenderTargetView*            RenderTargetView;
 	ImGuiContext*                      ImGuiContext;
 
