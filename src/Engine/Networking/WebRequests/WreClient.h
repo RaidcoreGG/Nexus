@@ -43,6 +43,7 @@ class CHttpClient
 	/// 	- aRefillInterval: Bucket refill interval in seconds.
 	///----------------------------------------------------------------------------------------------------
 	CHttpClient(
+		CLogApi* aLogger,
 		std::string aBaseURL,
 		std::filesystem::path aCacheDirectory,
 		uint32_t aCacheLifetime,

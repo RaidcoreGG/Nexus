@@ -121,10 +121,6 @@ namespace Main
 			aEntryFunction
 		);
 
-		/* FIXME: This needs to be cleaned up. */
-		RaidcoreAPI = new CHttpClient("https://api.raidcore.gg", Index(EPath::DIR_APICACHE_RAIDCORE), 30 * 60, 300, 5, 1);
-		GitHubAPI   = new CHttpClient("https://api.github.com", Index(EPath::DIR_APICACHE_GITHUB), 30 * 60, 60, 60, 60 * 60);
-
 		s_UpdateThread = std::thread(Main::UpdateCheck);
 
 		/* Only initalise if not vanilla */

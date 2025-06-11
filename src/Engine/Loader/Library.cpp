@@ -30,7 +30,7 @@ namespace Loader
 
 		void Fetch()
 		{
-			json response = RaidcoreAPI->Get("/addonlibrary");
+			json response = CContext::GetContext()->GetRaidcoreApi()->Get("/addonlibrary");
 
 			if (!response.is_null())
 			{

@@ -92,15 +92,15 @@ namespace Hooks
 
 					if (s_RenderCtx->Device)
 					{
-						/* Sanity check. If we have a device, we should also have a context. */
-						if (s_RenderCtx->DeviceContext)
-						{
-							s_RenderCtx->DeviceContext->Release();
-							s_RenderCtx->DeviceContext = nullptr;
-						}
-
 						s_RenderCtx->Device->Release();
 						s_RenderCtx->Device = nullptr;
+					}
+
+					/* Sanity check. If we have a device, we should also have a context. */
+					if (s_RenderCtx->DeviceContext)
+					{
+						s_RenderCtx->DeviceContext->Release();
+						s_RenderCtx->DeviceContext = nullptr;
 					}
 
 					s_RenderCtx->SwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&s_RenderCtx->Device);

@@ -63,7 +63,7 @@ void CUpdater::UpdateNexus()
 	}
 
 	// check for update and bypass cache
-	json resVersion = RaidcoreAPI->Get("/nexusversion", "", 0);
+	json resVersion = CContext::GetContext()->GetRaidcoreApi()->Get("/nexusversion", "", 0);
 
 	if (resVersion.is_null())
 	{
@@ -128,7 +128,7 @@ void CUpdater::UpdateNexus()
 		{
 			this->Logger->Info(CH_UPDATER, "Nexus update via GitHub not possible. Falling back to Raidcore API.");
 			// ensure download successful
-			if (!RaidcoreAPI->Download(Index(EPath::NexusDLL_Update), "/d3d11.dll"))
+			if (!CContext::GetContext()->GetRaidcoreApi()->Download(Index(EPath::NexusDLL_Update), "/d3d11.dll"))
 			{
 				this->Logger->Warning(CH_UPDATER, "Nexus Update failed: Download failed.");
 				// try cleaning failed download
@@ -436,7 +436,7 @@ bool CUpdater::UpdateRaidcore(int aCacheLifetimeOverride)
 
 bool CUpdater::UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& aEndpoint, AddonVersion_t aCurrentVersion, bool aAllowPrereleases, bool aIgnoreTagFormat, int aCacheLifetimeOverride)
 {
-	json response = GitHubAPI->Get(aEndpoint, "", aCacheLifetimeOverride);
+	json response = CContext::GetContext()->GetGitHubApi()->Get(aEndpoint, "", aCacheLifetimeOverride);
 
 	if (response.is_null())
 	{

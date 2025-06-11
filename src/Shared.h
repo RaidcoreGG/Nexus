@@ -20,9 +20,6 @@
 
 #include "imgui/imgui.h"
 
-extern CHttpClient*					RaidcoreAPI;
-extern CHttpClient*					GitHubAPI;
-
 extern bool							IsGameLaunchSequence;
 
 #endif

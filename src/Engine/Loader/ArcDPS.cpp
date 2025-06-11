@@ -30,7 +30,7 @@ namespace ArcDPS
 
 	void GetPluginLibrary()
 	{
-		json response = RaidcoreAPI->Get("/arcdpslibrary");
+		json response = CContext::GetContext()->GetRaidcoreApi()->Get("/arcdpslibrary");
 
 		if (!response.is_null())
 		{

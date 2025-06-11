@@ -6,7 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "Core/Context.h"
+#include "Context.h"
 
 #include <Psapi.h>
 
@@ -75,10 +75,10 @@ CLogApi* CContext::GetLogger()
 
 CUpdater* CContext::GetUpdater()
 {
-	static CUpdater s_Upater = CUpdater(
+	static CUpdater s_Updater = CUpdater(
 		this->GetLogger()
 	);
-	return &s_Upater;
+	return &s_Updater;
 }
 
 CTextureLoader* CContext::GetTextureService()
@@ -162,4 +162,32 @@ CMumbleReader* CContext::GetMumbleReader()
 		this->GetLogger()
 	);
 	return &s_MumbleReader;
+}
+
+CHttpClient* CContext::GetRaidcoreApi()
+{
+	static CHttpClient s_RaidcoreApiCli = CHttpClient(
+		this->GetLogger(),
+		"https://api.raidcore.gg",
+		Index(EPath::DIR_APICACHE_RAIDCORE),
+		30 * 60,
+		300,
+		5,
+		1
+	);
+	return &s_RaidcoreApiCli;
+}
+
+CHttpClient* CContext::GetGitHubApi()
+{
+	static CHttpClient s_GitHubApiCli = CHttpClient(
+		this->GetLogger(),
+		"https://api.github.com",
+		Index(EPath::DIR_APICACHE_GITHUB),
+		30 * 60,
+		60,
+		60,
+		60 * 60
+	);
+	return &s_GitHubApiCli;
 }

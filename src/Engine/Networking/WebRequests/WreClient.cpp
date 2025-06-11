@@ -10,17 +10,16 @@
 
 #include <fstream>
 
-#include "Core/Context.h"
+#include "Engine/Logging/LogApi.h"
+#include "Engine/Networking/NetConst.h"
 #include "Util/Paths.h"
 #include "Util/Strings.h"
 #include "Util/Time.h"
 #include "Util/URL.h"
-#include "Engine/Networking/NetConst.h"
 
-CHttpClient::CHttpClient(std::string aBaseURL, std::filesystem::path aCacheDirectory, uint32_t aCacheLifetime, uint32_t aBucketCapacity, uint32_t aRefillAmount, uint32_t aRefillInterval)
+CHttpClient::CHttpClient(CLogApi* aLogger, std::string aBaseURL, std::filesystem::path aCacheDirectory, uint32_t aCacheLifetime, uint32_t aBucketCapacity, uint32_t aRefillAmount, uint32_t aRefillInterval)
 {
-	CContext* ctx = CContext::GetContext();
-	this->Logger = ctx->GetLogger();
+	this->Logger = aLogger;
 
 	this->BaseURL = URL::GetBase(aBaseURL); // sanitize url just to be sure
 	this->Client = new httplib::Client(this->BaseURL);

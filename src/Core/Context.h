@@ -15,6 +15,7 @@
 #include "Engine/Inputs/RawInput/RiApi.h"
 #include "Engine/Loader/AddonVersion.h"
 #include "Engine/Logging/LogApi.h"
+#include "Engine/Networking/WebRequests/WreClient.h"
 #include "Engine/Renderer/RdrContext.h"
 #include "Engine/Settings/Settings.h"
 #include "Engine/Textures/TxLoader.h"
@@ -64,6 +65,10 @@ class CContext
 	CSettings* GetSettingsCtx();
 
 	CMumbleReader* GetMumbleReader();
+
+	CHttpClient* GetRaidcoreApi();
+
+	CHttpClient* GetGitHubApi();
 
 	private:
 	CContext() = default;
