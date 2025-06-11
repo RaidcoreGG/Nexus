@@ -15,7 +15,6 @@
 
 #include "Core/Context.h"
 #include "resource.h"
-#include "Shared.h"
 #include "Util/Strings.h"
 
 #include "Engine/Index/Index.h"
@@ -206,7 +205,7 @@ void CAddonsWindow::AddonItem(AddonItemData_t& aAddonData, float aWidth)
 					}
 					ImGui::TooltipGeneric(langApi->Translate(aAddonData.NexusAddon->IsFlaggedForDisable ? "((000025))" : "((000023))"), additionalInfo.c_str());
 				}
-				else if (aAddonData.NexusAddon->State == EAddonState::NotLoaded && (aAddonData.NexusAddon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || aAddonData.NexusAddon->Definitions->Signature == 0xFFF694D1) && !IsGameLaunchSequence)
+				else if (aAddonData.NexusAddon->State == EAddonState::NotLoaded && (aAddonData.NexusAddon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || aAddonData.NexusAddon->Definitions->Signature == 0xFFF694D1) && !Loader::IsGameLaunchSequence)
 				{
 					/* if it's too late to load this addon */
 					if (ImGui::Button((langApi->Translate(aAddonData.NexusAddon->IsFlaggedForEnable ? "((000020))" : "((000024))") + sig).c_str(), ImVec2(btnWidth, 0)))
@@ -1239,7 +1238,7 @@ void CAddonsWindow::RenderDetails()
 				}
 				ImGui::TooltipGeneric(langApi->Translate(addonData.NexusAddon->IsFlaggedForDisable ? "((000025))" : "((000023))"), additionalInfo.c_str());
 			}
-			else if (addonData.NexusAddon->State == EAddonState::NotLoaded && (addonData.NexusAddon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || addonData.NexusAddon->Definitions->Signature == 0xFFF694D1) && !IsGameLaunchSequence)
+			else if (addonData.NexusAddon->State == EAddonState::NotLoaded && (addonData.NexusAddon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || addonData.NexusAddon->Definitions->Signature == 0xFFF694D1) && !Loader::IsGameLaunchSequence)
 			{
 				/* if it's too late to load this addon */
 				if (ImGui::Button((langApi->Translate(addonData.NexusAddon->IsFlaggedForEnable ? "((000020))" : "((000024))") + sig).c_str()))

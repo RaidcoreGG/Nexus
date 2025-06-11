@@ -8,25 +8,18 @@
 
 #include "Proxy.h"
 
+#include <d3d11.h>
 #include <filesystem>
 #include <string>
-#include <d3d11.h>
 
-#include "minhook/mh_hook.h"
-
-#include "Consts.h"
 #include "Core/Context.h"
+#include "Core/Hooks/Hooks.h"
 #include "Core/Main.h"
 #include "Engine/Index/Index.h"
 #include "PxyEnum.h"
 #include "PxyFuncDefs.h"
-#include "Shared.h"
-#include "State.h"
-#include "Util/CmdLine.h"
 #include "Util/DLL.h"
 #include "Util/MD5.h"
-#include "Util/Memory.h"
-#include "Core/Hooks/Hooks.h"
 
 namespace Proxy
 {
@@ -39,119 +32,78 @@ namespace Proxy
 	///----------------------------------------------------------------------------------------------------
 	bool DxLoad()
 	{
+		if (s_D3D11Handle)
+		{
+			return true;
+		}
+
+		static bool s_DxLoaded = false;
+
+		/* If DxLoad was already run once, but we reach here, there's no handle. Always return false. */
+		if (s_DxLoaded)
+		{
+			return false;
+		}
+
+		s_DxLoaded = true;
+
 		CContext* ctx = CContext::GetContext();
 		CLogApi* logger = ctx->GetLogger();
 
-		if (State::Directx < EDxState::LOAD)
+		bool isChainloading = false;
+
+		/* attempt to chainload */
+		/* sanity check that the current dll isn't the chainload */
+		if (Index(EPath::NexusDLL) != Index(EPath::D3D11Chainload))
 		{
-			State::Directx = EDxState::LOAD;
-
-			bool isChainloading = false;
-
-			/* attempt to chainload */
-			/* sanity check that the current dll isn't the chainload */
-			if (Index(EPath::NexusDLL) != Index(EPath::D3D11Chainload))
+			if (std::filesystem::exists(Index(EPath::D3D11Chainload)))
 			{
-				if (std::filesystem::exists(Index(EPath::D3D11Chainload)))
+				if (MD5Util::FromFile(Index(EPath::NexusDLL)) == MD5Util::FromFile(Index(EPath::D3D11Chainload)))
 				{
-					if (MD5Util::FromFile(Index(EPath::NexusDLL)) == MD5Util::FromFile(Index(EPath::D3D11Chainload)))
+					try
 					{
-						try
-						{
-							std::filesystem::remove(Index(EPath::D3D11Chainload));
+						std::filesystem::remove(Index(EPath::D3D11Chainload));
 
-							logger->Info(CH_CORE, "Removed duplicate Nexus from chainload.");
-						}
-						catch (std::filesystem::filesystem_error fErr)
-						{
-							logger->Debug(CH_CORE, "%s", fErr.what());
-						}
+						logger->Info(CH_CORE, "Removed duplicate Nexus from chainload.");
 					}
-					else
+					catch (std::filesystem::filesystem_error fErr)
 					{
-						isChainloading = true;
-
-						std::string strChainload = Index(EPath::D3D11Chainload).string();
-						s_D3D11Handle = LoadLibraryA(strChainload.c_str());
-
-						if (s_D3D11Handle)
-						{
-							logger->Info(CH_CORE, "Loaded Chainload DLL: %s", strChainload.c_str());
-						}
+						logger->Debug(CH_CORE, "%s", fErr.what());
 					}
 				}
-			}
-
-			if (!s_D3D11Handle)
-			{
-				if (isChainloading)
+				else
 				{
-					logger->Warning(CH_CORE, "Chainload failed to load. Last Error: %u", GetLastError());
-					isChainloading = false;
-				}
+					isChainloading = true;
 
-				std::string strSystem = Index(EPath::D3D11).string();
-				s_D3D11Handle = LoadLibraryA(strSystem.c_str());
+					std::string strChainload = Index(EPath::D3D11Chainload).string();
+					s_D3D11Handle = LoadLibraryA(strChainload.c_str());
 
-				assert(s_D3D11Handle && "Could not load system d3d11.dll");
-
-				logger->Info(CH_CORE, "Loaded System DLL: %s", strSystem.c_str());
-			}
-
-			State::Directx = EDxState::LOADED;
-
-			if (State::Directx < EDxState::HOOKED && !CmdLine::HasArgument("-ggvanilla"))
-			{
-				WNDCLASSEXA wc;
-				memset(&wc, 0, sizeof(wc));
-				wc.cbSize = sizeof(wc);
-				wc.lpfnWndProc = DefWindowProcA;
-				wc.hInstance = GetModuleHandleA(0);
-				wc.hbrBackground = (HBRUSH)(COLOR_WINDOW);
-				wc.lpszClassName = "Raidcore_Dx_Window_Class";
-				RegisterClassExA(&wc);
-
-				HWND wnd = CreateWindowExA(0, wc.lpszClassName, 0, WS_OVERLAPPED, 0, 0, 1280, 720, 0, 0, wc.hInstance, 0);
-				if (wnd)
-				{
-					DXGI_SWAP_CHAIN_DESC swap_desc = {};
-					swap_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-					swap_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-					swap_desc.BufferCount = 1;
-					swap_desc.SampleDesc.Count = 1;
-					swap_desc.OutputWindow = wnd;
-					swap_desc.Windowed = TRUE;
-
-					ID3D11Device* device;
-					ID3D11DeviceContext* context;
-					IDXGISwapChain* swap;
-
-					if (SUCCEEDED(D3D11CreateDeviceAndSwapChain(0, D3D_DRIVER_TYPE_HARDWARE, 0, 0, 0, 0, D3D11_SDK_VERSION, &swap_desc, &swap, &device, 0, &context)))
+					if (s_D3D11Handle)
 					{
-						LPVOID* vtbl;
-
-						vtbl = *(LPVOID**)swap;
-						//dxgi_release = hook_vtbl_fn(vtbl, 2, dxgi_release_hook);
-						//dxgi_present = hook_vtbl_fn(vtbl, 8, dxgi_present_hook);
-						//dxgi_resize_buffers = hook_vtbl_fn(vtbl, 13, dxgi_resize_buffers_hook);
-
-						MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[8]), (LPVOID)&Hooks::Detour::DXGIPresent, (LPVOID*)&Hooks::Target::DXGIPresent);
-						MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[13]), (LPVOID)&Hooks::Detour::DXGIResizeBuffers, (LPVOID*)&Hooks::Target::DXGIResizeBuffers);
-						MH_EnableHook(MH_ALL_HOOKS);
-
-						context->Release();
-						device->Release();
-						swap->Release();
+						logger->Info(CH_CORE, "Loaded Chainload DLL: %s", strChainload.c_str());
 					}
-
-					DestroyWindow(wnd);
 				}
-
-				UnregisterClassA(wc.lpszClassName, wc.hInstance);
-
-				State::Directx = EDxState::HOOKED;
 			}
 		}
+
+		if (!s_D3D11Handle)
+		{
+			if (isChainloading)
+			{
+				logger->Warning(CH_CORE, "Chainload failed to load. Last Error: %u", GetLastError());
+				isChainloading = false;
+			}
+
+			std::string strSystem = Index(EPath::D3D11).string();
+			s_D3D11Handle = LoadLibraryA(strSystem.c_str());
+
+			assert(s_D3D11Handle && "Could not load system d3d11.dll");
+
+			logger->Info(CH_CORE, "Loaded System DLL: %s", strSystem.c_str());
+		}
+
+		/* Hook present to be able to render. */
+		Hooks::HookIDXGISwapChain();
 
 		if (!s_D3D11Handle)
 		{
@@ -171,8 +123,8 @@ namespace Proxy
 		CContext* ctx = CContext::GetContext();
 		CLogApi* logger = ctx->GetLogger();
 
-		/* Check if this is a rebound. */
-		if (State::Directx >= EDxState::LOADED && *aFunction)
+		/* If the function is already set, this is a rebound. */
+		if (*aFunction)
 		{
 			logger->Warning(CH_CORE, "DirectX entry already called. Chainload bounced back. Redirecting to system D3D11.");
 

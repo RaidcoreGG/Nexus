@@ -49,6 +49,8 @@ namespace Loader
 	extern PIDLIST_ABSOLUTE        FSItemList;
 	extern ULONG                   FSNotifierID;
 
+	extern bool                    IsGameLaunchSequence;
+
 	///----------------------------------------------------------------------------------------------------
 	/// Initialize:
 	/// 	Registers the addon directory update notifications and loads all addons.

@@ -18,7 +18,6 @@ using json = nlohmann::json;
 
 #include "Consts.h"
 #include "Engine/Index/Index.h"
-#include "State.h"
 #include "Util/Strings.h"
 #include "Util/Inputs.h"
 #include "IbConst.h"

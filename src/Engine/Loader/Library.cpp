@@ -12,7 +12,6 @@
 #include "ArcDPS.h"
 
 #include "Consts.h"
-#include "Shared.h"
 #include "Core/Context.h"
 #include "Engine/Index/Index.h"
 

@@ -27,8 +27,6 @@
 #include "GW2/Mumble/MblReader.h"
 #include "GW2/Mumble/MblConst.h"
 #include "Engine/Settings/Settings.h"
-#include "Shared.h"
-#include "State.h"
 #include "Util/Base64.h"
 #include "Util/Inputs.h"
 #include "Util/Resources.h"

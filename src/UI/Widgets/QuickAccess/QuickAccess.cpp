@@ -19,7 +19,6 @@
 #include "Core/Context.h"
 #include "resource.h"
 #include "Engine/Settings/Settings.h"
-#include "Shared.h"
 #include "UI/UIContext.h"
 #include "Engine/Inputs/InputBinds/IbConst.h"
 

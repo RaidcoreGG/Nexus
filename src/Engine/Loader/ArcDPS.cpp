@@ -5,8 +5,6 @@
 #include "Consts.h"
 #include "Core/Context.h"
 #include "Engine/Index/Index.h"
-#include "Shared.h"
-#include "State.h"
 
 #include "resource.h"
 

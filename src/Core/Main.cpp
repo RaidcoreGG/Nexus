@@ -13,11 +13,6 @@
 
 #include "minhook/mh_hook.h"
 
-/* FIXME: Legacy garbage. Need to refactor. */
-#include "Consts.h"
-#include "State.h"
-#include "Shared.h"
-
 #include "Core/Context.h"
 #include "Core/Hooks/Hooks.h"
 #include "Engine/Index/Index.h"
@@ -77,13 +72,21 @@ namespace Main
 
 		s_EntryFunction = aEntryFunction;
 
-		State::Nexus = ENexusState::LOAD;
-
 		CContext* ctx    = CContext::GetContext();
 		CLogApi*  logger = ctx->GetLogger();
 
-		/* Always write the thirdpartysoftwarereadme to disk. */
-		Resources::Unpack(ctx->GetModule(), Index(EPath::ThirdPartySoftwareReadme), RES_THIRDPARTYNOTICES, "TXT");
+		/* Environment info. */
+		logger->Info(
+			CH_CORE,
+			"Game: %s\nModule: %s\nNexus %s %s\nEntry method: %d",
+			GetCommandLineA(),
+			Index(EPath::NexusDLL).string().c_str(),
+			ctx->GetVersion().string().c_str(),
+			ctx->GetBuild(),
+			aEntryFunction
+		);
+
+		s_UpdateThread = std::thread(Main::UpdateCheck);
 
 		/* Allocate console logger, if requested. */
 		if (CmdLine::HasArgument("-ggconsole"))
@@ -110,33 +113,15 @@ namespace Main
 		static CFileLogger writer = CFileLogger(ELogLevel::ALL, logpath);
 		logger->Register(&writer);
 
-		/* Environment info. */
-		logger->Info(
-			CH_CORE,
-			"Game: %s\nModule: %s\nNexus %s %s\nEntry method: %d",
-			GetCommandLineA(),
-			Index(EPath::NexusDLL).string().c_str(),
-			ctx->GetVersion().string().c_str(),
-			ctx->GetBuild(),
-			aEntryFunction
-		);
-
-		s_UpdateThread = std::thread(Main::UpdateCheck);
-
-		/* Only initalise if not vanilla */
-		if (!CmdLine::HasArgument("-ggvanilla"))
+		/* If running vanilla, do not initialize the hooks and leave the mutex unmodified. */
+		if (CmdLine::HasArgument("-ggvanilla"))
 		{
-			Multibox::KillMutex();
-			logger->Info(CH_CORE, "Multibox State: %d", Multibox::GetState());
-
-			MH_Initialize();
-
-			State::Nexus = ENexusState::LOADED;
+			return;
 		}
-		else
-		{
-			State::Nexus = ENexusState::SHUTDOWN;
-		}
+
+		MH_Initialize();
+		Multibox::KillMutex();
+		logger->Info(CH_CORE, "Multibox State: %d", Multibox::GetState());
 	}
 
 	void Shutdown(unsigned int aReason)
@@ -174,15 +159,11 @@ namespace Main
 		CLogApi*    logger = ctx->GetLogger();
 		CUiContext* uictx  = ctx->GetUIContext();
 
-		State::Nexus = ENexusState::SHUTTING_DOWN;
-
 		logger->Critical(CH_CORE, "SHUTDOWN BEGIN | %s", reasonStr.c_str());
 		MH_Uninitialize();
 		Loader::Shutdown();
 		uictx->Shutdown();
 		logger->Info(CH_CORE, "SHUTDOWN END");
-
-		State::Nexus = ENexusState::SHUTDOWN;
 
 		/* Let the OS take care of freeing the handles. Ugly, but otherwise crashes due to the addon clownfiesta in GW2. */
 		//if (D3D11Handle) { FreeLibrary(D3D11Handle); }
@@ -192,6 +173,9 @@ namespace Main
 	void UpdateCheck()
 	{
 		CContext* ctx = CContext::GetContext();
+
+		/* Always write the thirdpartysoftwarereadme to disk. We do this here, because it's in a thread. */
+		Resources::Unpack(ctx->GetModule(), Index(EPath::ThirdPartySoftwareReadme), RES_THIRDPARTYNOTICES, "TXT");
 
 		HANDLE hMutex = CreateMutexA(0, true, "RCGG-Mutex-Patch-Nexus");
 

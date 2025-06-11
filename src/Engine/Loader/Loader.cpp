@@ -18,8 +18,6 @@
 #include "Core/PrefConst.h"
 #include "Consts.h"
 #include "Engine/Index/Index.h"
-#include "Shared.h"
-#include "State.h"
 
 #include "AddonDefinition.h"
 #include "FuncDefs.h"
@@ -88,7 +86,10 @@ namespace Loader
 
 	std::vector<signed int> WhitelistedAddons;				/* List of addons that should be loaded on initial startup. */
 
+	bool                    IsGameLaunchSequence = true;
+
 	bool                    DisableVolatileUntilUpdate = false;
+	bool                    IsShutdown;
 
 	CDataLinkApi*  DataLink = nullptr;
 	CLogApi*       Logger   = nullptr;
@@ -147,107 +148,103 @@ namespace Loader
 			}
 		}
 		
-		if (State::Nexus == ENexusState::LOADED)
+		if (Index(EPath::AddonConfigDefault) != ConfigPath)
 		{
-			if (Index(EPath::AddonConfigDefault) != ConfigPath)
-			{
-				Logger->Info(CH_LOADER, "AddonConfig path specified. Saving to \"%s\"", ConfigPath.string().c_str());
-			}
-
-			LoadAddonConfig();
-
-			//FSItemList = ILCreateFromPathA(Index::GetAddonDirectory(nullptr));
-			std::wstring addonDirW = String::ToWString(Index(EPath::DIR_ADDONS).string());
-			HRESULT hresult = SHParseDisplayName(
-				addonDirW.c_str(),
-				0,
-				&FSItemList,
-				0xFFFFFFFF,
-				0
-			);
-			if (FSItemList == 0)
-			{
-				Logger->Critical(CH_LOADER, "Loader disabled. Reason: SHParseDisplayName(Index::D_GW2_ADDONS) returned %d.", hresult);
-				return;
-			}
-
-			SHChangeNotifyEntry changeentry{};
-			changeentry.pidl = FSItemList;
-			changeentry.fRecursive = false;
-			FSNotifierID = SHChangeNotifyRegister(
-				renderer->Window.Handle,
-				SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
-				SHCNE_UPDATEITEM | SHCNE_UPDATEDIR,
-				WM_ADDONDIRUPDATE,
-				1,
-				&changeentry
-			);
-
-			if (FSNotifierID <= 0)
-			{
-				Logger->Critical(CH_LOADER, "Loader disabled. Reason: SHChangeNotifyRegister(...) returned 0.");
-				return;
-			}
-
-			std::thread(Library::Fetch).detach();
-			std::thread(ArcDPS::GetPluginLibrary).detach();
-
-			std::thread checkLaunchSequence([]()
-			{
-				Sleep(5000);
-				int nothingCounter = 0;
-				while (State::Nexus < ENexusState::SHUTTING_DOWN && !NexusLink->IsGameplay)
-				{
-					/* do nothing */
-					Sleep(1);
-					nothingCounter++;
-
-					if (nothingCounter > 30000)
-					{
-						break;
-					}
-				}
-				IsGameLaunchSequence = false;
-			});
-			checkLaunchSequence.detach();
-
-			LoaderThread = std::thread(ProcessChanges);
-			LoaderThread.detach();
+			Logger->Info(CH_LOADER, "AddonConfig path specified. Saving to \"%s\"", ConfigPath.string().c_str());
 		}
+
+		LoadAddonConfig();
+
+		//FSItemList = ILCreateFromPathA(Index::GetAddonDirectory(nullptr));
+		std::wstring addonDirW = String::ToWString(Index(EPath::DIR_ADDONS).string());
+		HRESULT hresult = SHParseDisplayName(
+			addonDirW.c_str(),
+			0,
+			&FSItemList,
+			0xFFFFFFFF,
+			0
+		);
+		if (FSItemList == 0)
+		{
+			Logger->Critical(CH_LOADER, "Loader disabled. Reason: SHParseDisplayName(Index::D_GW2_ADDONS) returned %d.", hresult);
+			return;
+		}
+
+		SHChangeNotifyEntry changeentry{};
+		changeentry.pidl = FSItemList;
+		changeentry.fRecursive = false;
+		FSNotifierID = SHChangeNotifyRegister(
+			renderer->Window.Handle,
+			SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
+			SHCNE_UPDATEITEM | SHCNE_UPDATEDIR,
+			WM_ADDONDIRUPDATE,
+			1,
+			&changeentry
+		);
+
+		if (FSNotifierID <= 0)
+		{
+			Logger->Critical(CH_LOADER, "Loader disabled. Reason: SHChangeNotifyRegister(...) returned 0.");
+			return;
+		}
+
+		std::thread(Library::Fetch).detach();
+		std::thread(ArcDPS::GetPluginLibrary).detach();
+
+		std::thread checkLaunchSequence([]()
+		{
+			Sleep(5000);
+			int nothingCounter = 0;
+			while (!IsShutdown && !NexusLink->IsGameplay)
+			{
+				/* do nothing */
+				Sleep(1);
+				nothingCounter++;
+
+				if (nothingCounter > 30000)
+				{
+					break;
+				}
+			}
+			IsGameLaunchSequence = false;
+		});
+		checkLaunchSequence.detach();
+
+		LoaderThread = std::thread(ProcessChanges);
+		LoaderThread.detach();
 	}
 	void Shutdown()
 	{
-		if (State::Nexus == ENexusState::SHUTTING_DOWN)
+		IsShutdown = true;
+
+		bool loaderWasWorking = FSNotifierID != 0;
+
+		if (FSNotifierID != 0)
 		{
-			bool loaderWasWorking = FSNotifierID != 0;
+			SHChangeNotifyDeregister(FSNotifierID);
+			FSNotifierID = 0;
+		}
 
-			if (FSNotifierID != 0)
+		if (FSItemList != 0)
+		{
+			ILFree(FSItemList);
+			FSItemList = 0;
+		}
+
+		const std::lock_guard<std::mutex> lock(Mutex);
+		if (loaderWasWorking)
+		{
+			SaveAddonConfig();
+		}
+
+		while (Addons.size() != 0)
+		{
+			UnloadAddon(Addons.front()->Path);
+
+			/* sanity check in case UnloadAddon removes the entry, because the file is no longer on disk. */
+			if (Addons.size() != 0)
 			{
-				SHChangeNotifyDeregister(FSNotifierID);
-				FSNotifierID = 0;
-			}
-
-			if (FSItemList != 0)
-			{
-				ILFree(FSItemList);
-				FSItemList = 0;
-			}
-
-			const std::lock_guard<std::mutex> lock(Mutex);
-			if (loaderWasWorking)
-			{
-				SaveAddonConfig();
-			}
-
-			while (Addons.size() != 0)
-			{
-				UnloadAddon(Addons.front()->Path);
-
-				/* sanity check in case UnloadAddon removes the entry, because the file is no longer on disk. */
-				if (Addons.size() != 0)
-				{
-					Addons.erase(Addons.begin());
-				}
+				Addons.erase(Addons.begin());
 			}
 		}
 	}
@@ -335,7 +332,7 @@ namespace Loader
 		if (RequestedAddons.size() > 0) { return; }
 
 		// don't save state if we're shutting down
-		if (State::Nexus >= ENexusState::SHUTTING_DOWN) { return; }
+		if (IsShutdown) { return; }
 
 		json cfg = json::array();
 
@@ -937,7 +934,7 @@ namespace Loader
 
 	void CallUnloadAndVerify(const std::filesystem::path& aPath, Addon_t* aAddon)
 	{
-		bool isShutdown = State::Nexus == ENexusState::SHUTTING_DOWN;
+		bool isShutdown = IsShutdown;
 
 		if (!isShutdown)
 		{
@@ -1006,7 +1003,7 @@ namespace Loader
 
 		Addon_t* addon = FindAddonByPath(aPath);
 
-		bool isShutdown = State::Nexus == ENexusState::SHUTTING_DOWN;
+		bool isShutdown = IsShutdown;
 
 		/* if the to be unloaded addon does not exist or isn't loaded (or loadedLocked) -> abort */
 		if (!addon || !(addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED))

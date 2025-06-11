@@ -13,6 +13,8 @@
 
 #include "Proxy/PxyEnum.h"
 
+constexpr const char* CH_CORE = "Core";
+
 ///----------------------------------------------------------------------------------------------------
 /// DllMain:
 /// 	Primary DLL entry point.

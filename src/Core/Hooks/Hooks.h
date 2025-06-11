@@ -19,14 +19,23 @@
 namespace Hooks
 {
 	///----------------------------------------------------------------------------------------------------
+	/// HookIDXGISwapChain:
+	/// 	Hooks IDXGISwapChain::Present and IDXGISwapChain::ResizeBuffers.
+	/// 	Checks if:
+	/// 		- the process is not run with "-ggvanilla".
+	/// 		- they are not hooked already.
+	///----------------------------------------------------------------------------------------------------
+	void HookIDXGISwapChain();
+
+	///----------------------------------------------------------------------------------------------------
 	/// Hooks::Target Namespace
 	/// 	Stores the original functions.
 	///----------------------------------------------------------------------------------------------------
 	namespace Target
 	{
+		extern WNDPROC         WndProc;
 		extern DXPRESENT       DXGIPresent;
 		extern DXRESIZEBUFFERS DXGIResizeBuffers;
-		extern WNDPROC         WndProc;
 	}
 
 	///----------------------------------------------------------------------------------------------------

@@ -11,7 +11,6 @@
 #include <thread>
 
 #include "Engine/Index/Index.h"
-#include "Shared.h"
 #include "Core/Context.h"
 
 #include "Util/MD5.h"
