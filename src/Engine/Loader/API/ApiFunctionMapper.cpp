@@ -16,6 +16,8 @@
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
+#include "Engine/Loader/ArcDPS.h"
+#include "Engine/Loader/Loader.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Textures/TxLoader.h"
 #include "Engine/Updater/Updater.h"
@@ -70,6 +72,19 @@ namespace ADDONAPI
 		{
 			assert(s_EventApi);
 			s_EventApi->Subscribe(aIdentifier, aConsumeEventCallback);
+
+			// FIXME: Dirty hack to detect ArcDPS below. Do this cleaner later.
+			if (ArcDPS::IsLoaded)
+			{
+				return;
+			}
+
+			if (!(strcmp("EV_ARCDPS_COMBATEVENT_LOCAL_RAW", aIdentifier) == 0 || strcmp("EV_ARCDPS_COMBATEVENT_SQUAD_RAW", aIdentifier) == 0))
+			{
+				return;
+			}
+
+			ArcDPS::Detect();
 		}
 
 		void Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback)

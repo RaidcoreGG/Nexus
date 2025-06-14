@@ -8,7 +8,6 @@
 
 #include "EvtApi.h"
 
-#include "Engine/Loader/ArcDPS.h"
 #include "Engine/Loader/Loader.h"
 
 void CEventApi::Raise(const char* aIdentifier, void* aEventData)
@@ -102,19 +101,6 @@ void CEventApi::Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCa
 	{
 		it->second.Subscribers.push_back(sub);
 	}
-
-	// FIXME: Dirty hack to detect ArcDPS below. Do this cleaner later. Ideally remove it from the eventapi entirely.
-	if (ArcDPS::IsLoaded)
-	{
-		return;
-	}
-
-	if (!(strcmp("EV_ARCDPS_COMBATEVENT_LOCAL_RAW", aIdentifier) == 0 || strcmp("EV_ARCDPS_COMBATEVENT_SQUAD_RAW", aIdentifier) == 0))
-	{
-		return;
-	}
-
-	ArcDPS::Detect();
 }
 
 void CEventApi::Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback)
