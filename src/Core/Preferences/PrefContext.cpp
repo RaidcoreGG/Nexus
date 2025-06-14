@@ -1,12 +1,12 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  Settings.cpp
+/// Name         :  PrefContext.cpp
 /// Description  :  Provides functions to load and save settings.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "Settings.h"
+#include "PrefContext.h"
 
 #include <filesystem>
 #include <fstream>

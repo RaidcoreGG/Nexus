@@ -9,6 +9,7 @@
 #ifndef CONTEXT_H
 #define CONTEXT_H
 
+#include "Core/Preferences/PrefContext.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
@@ -17,7 +18,6 @@
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
 #include "Engine/Renderer/RdrContext.h"
-#include "Engine/Settings/Settings.h"
 #include "Engine/Textures/TxLoader.h"
 #include "Engine/Updater/Updater.h"
 #include "GW2/Inputs/GameBinds/GbApi.h"

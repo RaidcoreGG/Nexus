@@ -54,7 +54,7 @@
     <ClCompile Include="src\GW2\Multibox\Multibox.cpp" />
     <ClCompile Include="src\GW2\Mumble\MblReader.cpp" />
     <ClCompile Include="src\Core\Proxy\Proxy.cpp" />
-    <ClCompile Include="src\Engine\Settings\Settings.cpp" />
+    <ClCompile Include="src\Core\Preferences\PrefContext.cpp" />
     <ClCompile Include="src\Engine\Textures\TxLoader.cpp" />
     <ClCompile Include="src\Engine\Updater\Updater.cpp" />
     <ClCompile Include="src\thirdparty\pugixml\pugixml.cpp" />
@@ -100,7 +100,7 @@
     <ClInclude Include="src\Core\Hooks\HkConst.h" />
     <ClInclude Include="src\Core\Hooks\HkFuncDefs.h" />
     <ClInclude Include="src\Core\Hooks\Hooks.h" />
-    <ClInclude Include="src\Core\PrefConst.h" />
+    <ClInclude Include="src\Core\Preferences\PrefConst.h" />
     <ClInclude Include="src\Core\Proxy\PxyEnum.h" />
     <ClInclude Include="src\Core\Proxy\PxyFuncDefs.h" />
     <ClInclude Include="src\Engine\Events\EvtData.h" />
@@ -326,7 +326,7 @@
     <ClInclude Include="src\Engine\Index\IdxFuncDefs.h" />
     <ClInclude Include="src\Core\Proxy\Proxy.h" />
     <ClInclude Include="src\resource.h" />
-    <ClInclude Include="src\Engine\Settings\Settings.h" />
+    <ClInclude Include="src\Core\Preferences\PrefContext.h" />
     <ClInclude Include="src\thirdparty\pugixml\pugiconfig.hpp" />
     <ClInclude Include="src\thirdparty\pugixml\pugixml.hpp" />
     <ClInclude Include="src\thirdparty\stb\stb_image.h" />

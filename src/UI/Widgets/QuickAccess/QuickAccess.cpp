@@ -15,10 +15,10 @@
 #include "imgui/imgui_internal.h"
 
 #include "Core/Context.h"
-#include "Core/PrefConst.h"
+#include "Core/Preferences/PrefConst.h"
 #include "Engine/Inputs/InputBinds/IbConst.h"
 #include "Engine/Loader/LdrConst.h"
-#include "Engine/Settings/Settings.h"
+#include "Core/Preferences/PrefContext.h"
 #include "resource.h"
 #include "UI/UIContext.h"
 

@@ -12,7 +12,7 @@
 #include <windows.h>
 
 #include "Core/Context.h"
-#include "Core/PrefConst.h"
+#include "Core/Preferences/PrefConst.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// (WndProc) MouseResetFix:

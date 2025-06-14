@@ -16,7 +16,7 @@
 
 #include "Engine/Index/Index.h"
 #include "Core/Context.h"
-#include "Core/PrefConst.h"
+#include "Core/Preferences/PrefConst.h"
 
 CLicenseAgreementModal::CLicenseAgreementModal()
 {

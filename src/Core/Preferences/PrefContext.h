@@ -1,13 +1,13 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  Settings.h
+/// Name         :  PrefContext.h
 /// Description  :  Provides functions to load and save settings.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#ifndef PREFCONTEXT_H
+#define PREFCONTEXT_H
 
 #include <filesystem>
 #include <mutex>

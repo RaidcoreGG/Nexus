@@ -15,7 +15,7 @@
 #include <Windows.h>
 
 #include "Core/Context.h"
-#include "Core/PrefConst.h"
+#include "Core/Preferences/PrefConst.h"
 #include "LdrConst.h"
 #include "Engine/Index/Index.h"
 
@@ -36,7 +36,7 @@
 #include "UI/Services/Localization/LoclApi.h"
 #include "Engine/Logging/LogApi.h"
 #include "GW2/Mumble/MblReader.h"
-#include "Engine/Settings/Settings.h"
+#include "Core/Preferences/PrefContext.h"
 #include "Engine/Textures/TxLoader.h"
 #include "Engine/Updater/Updater.h"
 #include "API/ApiFunctionMapper.h"

@@ -11,9 +11,9 @@
 #include "imgui/imgui_internal.h"
 
 #include "Core/Context.h"
-#include "Engine/Settings/Settings.h"
+#include "Core/Preferences/PrefContext.h"
 #include "Util/Inputs.h"
-#include "Core/PrefConst.h"
+#include "Core/Preferences/PrefConst.h"
 
 CEscapeClosing::CEscapeClosing()
 {
