@@ -213,7 +213,11 @@ void CQuickAccess::Render()
 					isActive = true;
 					if (shortcut.IBIdentifier.length() > 0)
 					{
-						shortcut.HasNotification = false;
+						// call this async because we're currently iterating the list
+						std::thread([this, identifier]()
+						{
+							this->DenotifyShortcut(identifier.c_str(), "Generic");
+						}).detach();
 						this->InputBindApi->Invoke(shortcut.IBIdentifier);
 					}
 				}
@@ -249,10 +253,49 @@ void CQuickAccess::Render()
 
 			bool notifHovered = false;
 
-			if (this->IconNotification && this->IconNotification->Resource)
+			if (shortcut.Notifications.size() > 0)
 			{
-				if (shortcut.HasNotification)
+				/* ensure all textures */
+				if (!(this->IconNotification1 &&
+					this->IconNotification2 &&
+					this->IconNotification3 &&
+					this->IconNotification4 &&
+					this->IconNotification5 &&
+					this->IconNotification6 &&
+					this->IconNotification7 &&
+					this->IconNotification8 &&
+					this->IconNotification9 &&
+					this->IconNotificationTooMany))
 				{
+					CContext* ctx = CContext::GetContext();
+					this->IconNotification1 = this->TextureService->GetOrCreate("ICON_NOTIFICATION1", RES_ICON_NOTIFICATION1, ctx->GetModule());
+					this->IconNotification2 = this->TextureService->GetOrCreate("ICON_NOTIFICATION2", RES_ICON_NOTIFICATION2, ctx->GetModule());
+					this->IconNotification3 = this->TextureService->GetOrCreate("ICON_NOTIFICATION3", RES_ICON_NOTIFICATION3, ctx->GetModule());
+					this->IconNotification4 = this->TextureService->GetOrCreate("ICON_NOTIFICATION4", RES_ICON_NOTIFICATION4, ctx->GetModule());
+					this->IconNotification5 = this->TextureService->GetOrCreate("ICON_NOTIFICATION5", RES_ICON_NOTIFICATION5, ctx->GetModule());
+					this->IconNotification6 = this->TextureService->GetOrCreate("ICON_NOTIFICATION6", RES_ICON_NOTIFICATION6, ctx->GetModule());
+					this->IconNotification7 = this->TextureService->GetOrCreate("ICON_NOTIFICATION7", RES_ICON_NOTIFICATION7, ctx->GetModule());
+					this->IconNotification8 = this->TextureService->GetOrCreate("ICON_NOTIFICATION8", RES_ICON_NOTIFICATION8, ctx->GetModule());
+					this->IconNotification9 = this->TextureService->GetOrCreate("ICON_NOTIFICATION9", RES_ICON_NOTIFICATION9, ctx->GetModule());
+					this->IconNotificationTooMany = this->TextureService->GetOrCreate("ICON_NOTIFICATIONTOOMANY", RES_ICON_NOTIFICATIONTOOMANY, ctx->GetModule());
+				}
+				else
+				{
+					Texture_t* icon = nullptr;
+					switch (shortcut.Notifications.size())
+					{
+						case 1: icon = this->IconNotification1; break;
+						case 2: icon = this->IconNotification2; break;
+						case 3: icon = this->IconNotification3; break;
+						case 4: icon = this->IconNotification4; break;
+						case 5: icon = this->IconNotification5; break;
+						case 6: icon = this->IconNotification6; break;
+						case 7: icon = this->IconNotification7; break;
+						case 8: icon = this->IconNotification8; break;
+						case 9: icon = this->IconNotification9; break;
+						default: icon = this->IconNotificationTooMany; break;
+					}
+
 					float offIcon = (size * UIRoot::ScalingFactor) / 2.0f;
 
 					pos.x += offIcon;
@@ -260,15 +303,10 @@ void CQuickAccess::Render()
 
 					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 					ImGui::SetCursorPos(pos);
-					ImGui::Image(this->IconNotification->Resource, ImVec2(offIcon, offIcon));
+					ImGui::Image(icon->Resource, ImVec2(offIcon, offIcon));
 					ImGui::PopItemFlag();
+					notifHovered = ImGui::IsItemHovered();
 				}
-				notifHovered = ImGui::IsItemHovered();
-			}
-			else
-			{
-				CContext* ctx = CContext::GetContext();
-				this->IconNotification = this->TextureService->GetOrCreate("ICON_NOTIFICATION", RES_ICON_NOTIFICATION, ctx->GetModule());
 			}
 
 			ImGui::PopStyleVar();
@@ -399,11 +437,6 @@ void CQuickAccess::AddShortcut(const char* aIdentifier, const char* aTextureIden
 			int amt = 0;
 			if (sh.TextureNormal != nullptr) { amt++; }
 			if (sh.TextureHover != nullptr) { amt++; }
-
-			if (str == QA_ARCDPS)
-			{
-				this->HasArcDPSShortcut = true;
-			}
 		}
 	}
 
@@ -422,11 +455,6 @@ void CQuickAccess::RemoveShortcut(const char* aIdentifier)
 
 	if (it != this->Registry.end())
 	{
-		if (strcmp(aIdentifier, QA_ARCDPS) == 0)
-		{
-			this->HasArcDPSShortcut = false;
-		}
-
 		for (auto& orphan : it->second.ContextItems)
 		{
 			this->OrphanedCallbacks[orphan.first] = orphan.second;
@@ -438,31 +466,43 @@ void CQuickAccess::RemoveShortcut(const char* aIdentifier)
 	this->Validate(false);
 }
 
-void CQuickAccess::NotifyShortcut(const char* aIdentifier)
+void CQuickAccess::NotifyShortcut(const char* aIdentifier, const char* aNotificationKey)
 {
-	std::string str = aIdentifier;
+	if (!aIdentifier)      { return; }
+	if (!aNotificationKey) { return; }
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
-	auto it = this->Registry.find(str);
+	auto it = this->Registry.find(aIdentifier);
 
 	if (it != this->Registry.end())
 	{
-		it->second.HasNotification = true;
+		auto notifIt = std::find(it->second.Notifications.begin(), it->second.Notifications.end(), aNotificationKey);
+
+		if (notifIt != it->second.Notifications.end())
+		{
+			it->second.Notifications.push_back(aNotificationKey);
+		}
 	}
 }
 
-void CQuickAccess::SetNotificationShortcut(const char* aIdentifier, bool aState)
+void CQuickAccess::DenotifyShortcut(const char* aIdentifier, const char* aNotificationKey)
 {
-	std::string str = aIdentifier;
+	if (!aIdentifier)      { return; }
+	if (!aNotificationKey) { return; }
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
-	auto it = this->Registry.find(str);
+	auto it = this->Registry.find(aIdentifier);
 
 	if (it != this->Registry.end())
 	{
-		it->second.HasNotification = aState;
+		auto notifIt = std::find(it->second.Notifications.begin(), it->second.Notifications.end(), aNotificationKey);
+
+		if (notifIt != it->second.Notifications.end())
+		{
+			it->second.Notifications.erase(notifIt);
+		}
 	}
 }
 

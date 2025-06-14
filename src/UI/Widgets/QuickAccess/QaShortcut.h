@@ -35,7 +35,7 @@ struct Shortcut_t
 	std::string                          IBText;
 	std::string                          TooltipText;
 	bool                                 IsHovering;
-	bool                                 HasNotification;
+	std::vector<std::string>             Notifications;
 	std::map<std::string, ContextItem_t> ContextItems;
 };
 

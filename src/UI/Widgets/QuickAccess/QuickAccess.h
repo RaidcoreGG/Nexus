@@ -28,8 +28,8 @@
 #include "UI/FuncDefs.h"
 
 constexpr const char* CH_QUICKACCESS = "Quick Access";
-constexpr const char* QA_MENU = "0_QA_MENU";
-constexpr const char* QA_ARCDPS = "QA_ARCDPS";
+constexpr const char* QA_MENU        = "0_QA_MENU";
+constexpr const char* QA_ARCDPS      = "QA_ARCDPS";
 
 ///----------------------------------------------------------------------------------------------------
 /// CQuickAccess Class
@@ -88,13 +88,13 @@ class CQuickAccess : public virtual IWindow
 	/// NotifyShortcut:
 	/// 	Adds a notification to a given shortcut icon.
 	///----------------------------------------------------------------------------------------------------
-	void NotifyShortcut(const char* aIdentifier);
+	void NotifyShortcut(const char* aIdentifier, const char* aNotificationKey);
 
 	///----------------------------------------------------------------------------------------------------
-	/// SetNotificationShortcut:
-	/// 	Sets the notification state of a given shortcut icon.
+	/// DenotifyShortcut:
+	/// 	Removes a notification to a given shortcut icon.
 	///----------------------------------------------------------------------------------------------------
-	void SetNotificationShortcut(const char* aIdentifier, bool aState);
+	void DenotifyShortcut(const char* aIdentifier, const char* aNotificationKey);
 
 	///----------------------------------------------------------------------------------------------------
 	/// AddContextItem:
@@ -151,11 +151,18 @@ class CQuickAccess : public virtual IWindow
 	std::map<std::string, Shortcut_t>    Registry;
 	std::map<std::string, ContextItem_t> OrphanedCallbacks;
 
-	float                                Opacity           = 0.50f;
+	float                                Opacity                  = 0.50f;
 
-	Texture_t*                           IconNotification  = nullptr;
-
-	bool                                 HasArcDPSShortcut = false;
+	Texture_t*                           IconNotification1        = nullptr;
+	Texture_t*                           IconNotification2        = nullptr;
+	Texture_t*                           IconNotification3        = nullptr;
+	Texture_t*                           IconNotification4        = nullptr;
+	Texture_t*                           IconNotification5        = nullptr;
+	Texture_t*                           IconNotification6        = nullptr;
+	Texture_t*                           IconNotification7        = nullptr;
+	Texture_t*                           IconNotification8        = nullptr;
+	Texture_t*                           IconNotification9        = nullptr;
+	Texture_t*                           IconNotificationTooMany  = nullptr;
 
 	///----------------------------------------------------------------------------------------------------
 	/// WhereAreMyParents:

@@ -29,7 +29,16 @@
 #define RES_ICON_GENERIC                207
 #define RES_ICON_GENERIC_HOVER          208
 
-#define RES_ICON_NOTIFICATION           209
+#define RES_ICON_NOTIFICATION1          209
+#define RES_ICON_NOTIFICATION2          210
+#define RES_ICON_NOTIFICATION3          211
+#define RES_ICON_NOTIFICATION4          212
+#define RES_ICON_NOTIFICATION5          213
+#define RES_ICON_NOTIFICATION6          214
+#define RES_ICON_NOTIFICATION7          215
+#define RES_ICON_NOTIFICATION8          216
+#define RES_ICON_NOTIFICATION9          217
+#define RES_ICON_NOTIFICATIONTOOMANY    218
 
 /* MainWindow */
 #define RES_ICON_DASHBOARD              300

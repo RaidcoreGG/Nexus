@@ -481,7 +481,16 @@
     <Image Include="src\Resources\Images\QuickAccess\NexusXmas.png" />
     <Image Include="src\Resources\Images\QuickAccess\NexusXmas_Hover.png" />
     <Image Include="src\Resources\Images\QuickAccess\Nexus_Hover.png" />
-    <Image Include="src\Resources\Images\QuickAccess\Notification.png" />
+    <Image Include="src\Resources\Images\QuickAccess\Notification1.png" />
+    <Image Include="src\Resources\Images\QuickAccess\Notification2.png" />
+    <Image Include="src\Resources\Images\QuickAccess\Notification3.png" />
+    <Image Include="src\Resources\Images\QuickAccess\Notification4.png" />
+    <Image Include="src\Resources\Images\QuickAccess\Notification5.png" />
+    <Image Include="src\Resources\Images\QuickAccess\Notification6.png" />
+    <Image Include="src\Resources\Images\QuickAccess\Notification7.png" />
+    <Image Include="src\Resources\Images\QuickAccess\Notification8.png" />
+    <Image Include="src\Resources\Images\QuickAccess\Notification9.png" />
+    <Image Include="src\Resources\Images\QuickAccess\NotificationTooMany.png" />
     <Image Include="src\Resources\Images\Social\Banners\Discord.png" />
     <Image Include="src\Resources\Images\Social\Banners\Patreon.png" />
     <Image Include="src\Resources\Notification.png" />

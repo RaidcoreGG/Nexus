@@ -105,7 +105,16 @@ RES_ICON_NEXUS_XMAS_HOVER       PNG     "Resources\\Images\\QuickAccess\\NexusXm
 RES_ICON_GENERIC                PNG     "Resources\\Images\\QuickAccess\\Generic.png"
 RES_ICON_GENERIC_HOVER          PNG     "Resources\\Images\\QuickAccess\\Generic_Hover.png"
 
-RES_ICON_NOTIFICATION           PNG     "Resources\\Images\\QuickAccess\\Notification.png"
+RES_ICON_NOTIFICATION1          PNG     "Resources\\Images\\QuickAccess\\Notification1.png"
+RES_ICON_NOTIFICATION2          PNG     "Resources\\Images\\QuickAccess\\Notification2.png"
+RES_ICON_NOTIFICATION3          PNG     "Resources\\Images\\QuickAccess\\Notification3.png"
+RES_ICON_NOTIFICATION4          PNG     "Resources\\Images\\QuickAccess\\Notification4.png"
+RES_ICON_NOTIFICATION5          PNG     "Resources\\Images\\QuickAccess\\Notification5.png"
+RES_ICON_NOTIFICATION6          PNG     "Resources\\Images\\QuickAccess\\Notification6.png"
+RES_ICON_NOTIFICATION7          PNG     "Resources\\Images\\QuickAccess\\Notification7.png"
+RES_ICON_NOTIFICATION8          PNG     "Resources\\Images\\QuickAccess\\Notification8.png"
+RES_ICON_NOTIFICATION9          PNG     "Resources\\Images\\QuickAccess\\Notification9.png"
+RES_ICON_NOTIFICATIONTOOMANY    PNG     "Resources\\Images\\QuickAccess\\NotificationTooMany.png"
 
 /* Menu*/
 RES_ICON_ADDONS                 PNG     "Resources\\Images\\MainWindow\\Pages\\AddonsShaded.png"

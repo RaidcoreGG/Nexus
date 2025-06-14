@@ -499,13 +499,21 @@ namespace ADDONAPI
 		void NotifyShortcut(const char* aIdentifier)
 		{
 			assert(s_QuickAccess);
-			s_QuickAccess->NotifyShortcut(aIdentifier);
+			s_QuickAccess->NotifyShortcut(aIdentifier, "Generic");
 		}
 
 		void SetNotificationShortcut(const char* aIdentifier, bool aState)
 		{
 			assert(s_QuickAccess);
-			s_QuickAccess->SetNotificationShortcut(aIdentifier, aState);
+
+			if (aState)
+			{
+				s_QuickAccess->NotifyShortcut(aIdentifier, "Generic");
+			}
+			else
+			{
+				s_QuickAccess->DenotifyShortcut(aIdentifier, "Generic");
+			}
 		}
 
 		void AddContextItem(const char* aIdentifier, GUI_RENDER aShortcutRenderCallback)
