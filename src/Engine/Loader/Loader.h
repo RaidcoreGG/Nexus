@@ -9,47 +9,63 @@
 #ifndef LOADER_H
 #define LOADER_H
 
-#include <mutex>
-#include <map>
-#include <vector>
-#include <unordered_map>
-#include <thread>
-#include <filesystem>
-#include <Shlobj.h>
 #include <condition_variable>
+#include <filesystem>
+#include <mutex>
+#include <shtypes.h>
+#include <unordered_map>
+#include <vector>
 
-#include "ELoaderAction.h"
 #include "Addon.h"
-#include "API/AddonAPI.h"
+#include "ELoaderAction.h"
+#include "Engine/DataLink/DlApi.h"
+#include "Engine/Events/EvtApi.h"
+#include "Engine/Logging/LogApi.h"
+#include "Engine/Updater/Updater.h"
+#include "NexusLinkData.h"
+#include "thirdparty/mumble/Mumble.h"
+#include "UI/Services/Localization/LoclApi.h"
+#include "UI/Widgets/Alerts/Alerts.h"
 
-#include "Engine/Loader/NexusLinkData.h"
-
-constexpr const UINT WM_ADDONDIRUPDATE = WM_USER + 101;
 constexpr const char* CH_LOADER = "Loader";
 
-namespace Loader
+class CLoader
 {
-	extern NexusLinkData_t*          NexusLink;
+	public:
+	CDataLinkApi*             DataLink = nullptr;
+	CLogApi*                  Logger = nullptr;
+	CEventApi*                EventApi = nullptr;
+	CUpdater*                 Updater = nullptr;
+	CAlerts*                  Alerts = nullptr;
+	CLocalization*            Language = nullptr;
 
-	extern std::mutex              Mutex;
-	extern std::unordered_map<
+	NexusLinkData_t*          NexusLink = nullptr;
+	Mumble::Identity*         MumbleIdentity = nullptr;
+
+	std::mutex                Mutex;
+	std::unordered_map<
 		std::filesystem::path,
 		ELoaderAction
-	>                              QueuedAddons; /* To be loaded or unloaded addons */
-	extern std::vector<Addon_t*>     Addons;
-	extern bool                    HasCustomConfig;
-	extern std::filesystem::path   ConfigPath;
+	>                         QueuedAddons; /* To be loaded or unloaded addons */
+	std::vector<Addon_t*>     Addons;
+	bool                      HasCustomConfig;
+	std::filesystem::path     ConfigPath;
+	std::vector<signed int>   RequestedAddons;
+	std::vector<signed int>   WhitelistedAddons; /* List of addons that should be loaded on initial startup. */
 
-	extern int                     DirectoryChangeCountdown;
-	extern std::condition_variable ConVar;
-	extern std::mutex              ThreadMutex;
-	extern std::thread             LoaderThread;
-	extern bool                    IsSuspended;
+	int                       DirectoryChangeCountdown;
+	std::condition_variable   ConVar;
+	std::mutex                ThreadMutex;
+	std::thread               LoaderThread;
+	bool                      IsSuspended = false;
 
-	extern PIDLIST_ABSOLUTE        FSItemList;
-	extern ULONG                   FSNotifierID;
+	PIDLIST_ABSOLUTE          FSItemList;
+	ULONG                     FSNotifierID;
 
-	extern bool                    IsGameLaunchSequence;
+	bool                      IsGameLaunchSequence = true;
+
+	bool                      DisableVolatileUntilUpdate = false;
+	bool                      IsShutdown;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Initialize:
@@ -112,6 +128,12 @@ namespace Loader
 	void LoadAddon(const std::filesystem::path& aPath, bool aIsReload = false);
 	
 	///----------------------------------------------------------------------------------------------------
+	/// CallUnloadAndVerify:
+	/// 	Calls the addon-defined unload routine and then verifies any remaining references.
+	///----------------------------------------------------------------------------------------------------
+	void CallUnloadAndVerify(const std::filesystem::path& aPath, Addon_t* aAddon);
+
+	///----------------------------------------------------------------------------------------------------
 	/// UnloadAddon:
 	/// 	Unloads an addon and performs a reload as soon as the addon returns, if requested.
 	///----------------------------------------------------------------------------------------------------
@@ -145,6 +167,12 @@ namespace Loader
 	std::string GetOwner(void* aAddress);
 
 	///----------------------------------------------------------------------------------------------------
+	/// GetOwnerSig:
+	/// 	Returns the signature of the addon owning the provided address.
+	///----------------------------------------------------------------------------------------------------
+	signed int GetOwnerSig(void* aAddress);
+
+	///----------------------------------------------------------------------------------------------------
 	/// FindAddonBySig:
 	/// 	Returns the addon with a matching signature or nullptr.
 	///----------------------------------------------------------------------------------------------------
@@ -173,6 +201,6 @@ namespace Loader
 	/// 	Gets the game build and sets the Disable Until Update state.
 	///----------------------------------------------------------------------------------------------------
 	void GetGameBuild();
-}
+};
 
 #endif

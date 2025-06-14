@@ -42,11 +42,14 @@ void CUninstallConfirmationModal::RenderContent()
 
 void CUninstallConfirmationModal::OnClosing()
 {
+	CContext* ctx = CContext::GetContext();
+	CLoader* loader = ctx->GetLoader();
+
 	switch (this->GetResult())
 	{
 		case EModalResult::OK:
 		{
-			Loader::QueueAddon(ELoaderAction::Uninstall, this->Path);
+			loader->QueueAddon(ELoaderAction::Uninstall, this->Path);
 			break;
 		}
 		case EModalResult::Cancel:

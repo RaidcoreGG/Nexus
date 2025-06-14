@@ -8,7 +8,11 @@
 
 #include "EvtApi.h"
 
+/* FIXME: This needs to be removed after the loader is decoupled. */
+#include "Core/Context.h"
+
 #include "Engine/Loader/Loader.h"
+#include "EvtSubscriber.h"
 
 void CEventApi::Raise(const char* aIdentifier, void* aEventData)
 {
@@ -66,26 +70,9 @@ void CEventApi::Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCa
 	EventSubscriber_t sub{};
 	sub.Callback = aConsumeEventCallback;
 
-	/* Resolve addon signature. */
-	for (Addon_t* addon : Loader::Addons)
-	{
-		if (addon->Module == nullptr ||
-			addon->ModuleSize == 0 ||
-			addon->Definitions == nullptr ||
-			addon->Definitions->Signature == 0)
-		{
-			continue;
-		}
+	CContext* ctx = CContext::GetContext();
 
-		void* startAddress = addon->Module;
-		void* endAddress = ((PBYTE)addon->Module) + addon->ModuleSize;
-
-		if (aConsumeEventCallback >= startAddress && aConsumeEventCallback <= endAddress)
-		{
-			sub.Signature = addon->Definitions->Signature;
-			break;
-		}
-	}
+	sub.Signature = ctx->GetLoader()->GetOwnerSig(aConsumeEventCallback);
 
 	auto it = this->Registry.find(aIdentifier);
 

@@ -15,6 +15,7 @@
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
 #include "Engine/Loader/AddonVersion.h"
+#include "Engine/Loader/Loader.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
 #include "Engine/Renderer/RdrContext.h"
@@ -53,6 +54,8 @@ class CContext
 	CDataLinkApi* GetDataLink();
 
 	CEventApi* GetEventApi();
+
+	CLoader* GetLoader();
 
 	CRawInputApi* GetRawInputApi();
 

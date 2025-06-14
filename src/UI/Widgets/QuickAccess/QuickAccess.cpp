@@ -365,6 +365,9 @@ void CQuickAccess::Render()
 
 void CQuickAccess::RenderContextMenu(const std::string& aIdentifier, const Shortcut_t& aShortcut, bool* aIsActive)
 {
+	static CContext* ctx = CContext::GetContext();
+	static CLoader* loader = ctx->GetLoader();
+
 	if (aShortcut.ContextItems.size() > 0)
 	{
 		std::string ctxId = "ShortcutsCtxMenu##" + aIdentifier;
@@ -382,7 +385,7 @@ void CQuickAccess::RenderContextMenu(const std::string& aIdentifier, const Short
 
 				if (cbshortcut.Callback)
 				{
-					ImGui::TextDisabled(Loader::GetOwner(cbshortcut.Callback).c_str());
+					ImGui::TextDisabled(loader->GetOwner(cbshortcut.Callback).c_str());
 					cbshortcut.Callback();
 
 					if (idx != amtItems)

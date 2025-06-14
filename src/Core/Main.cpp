@@ -158,10 +158,11 @@ namespace Main
 		CContext*   ctx    = CContext::GetContext();
 		CLogApi*    logger = ctx->GetLogger();
 		CUiContext* uictx  = ctx->GetUIContext();
+		CLoader*    loader = ctx->GetLoader();
 
 		logger->Critical(CH_CORE, "SHUTDOWN BEGIN | %s", reasonStr.c_str());
 		MH_Uninitialize();
-		Loader::Shutdown();
+		loader->Shutdown();
 		uictx->Shutdown();
 		logger->Info(CH_CORE, "SHUTDOWN END");
 

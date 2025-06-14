@@ -1142,6 +1142,7 @@ void CUiContext::UpdateDisplayInputBinds()
 
 	CContext* ctx = CContext::GetContext();
 	CInputBindApi* inputBindApi = ctx->GetInputBindApi();
+	CLoader* loader = ctx->GetLoader();
 
 	/* copy of all InputBinds */
 	std::map<std::string, IbMapping_t> InputBindRegistry = inputBindApi->GetRegistry();
@@ -1149,7 +1150,7 @@ void CUiContext::UpdateDisplayInputBinds()
 	/* acquire categories */
 	for (auto& [identifier, inputBind] : InputBindRegistry)
 	{
-		std::string owner = Loader::GetOwner(inputBind.Handler_DownOnlyAsync);
+		std::string owner = loader->GetOwner(inputBind.Handler_DownOnlyAsync);
 
 		auto it = std::find_if(this->DisplayInputBinds.begin(), this->DisplayInputBinds.end(), [owner](InputBindCategory_t category) { return category.Name == owner; });
 

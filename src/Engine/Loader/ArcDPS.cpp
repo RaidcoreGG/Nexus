@@ -143,13 +143,14 @@ namespace ArcDPS
 	void DeployBridge()
 	{
 		CContext* ctx = CContext::GetContext();
+		CLoader* loader = ctx->GetLoader();
 		try
 		{
 			Resources::Unpack(ctx->GetModule(), Index(EPath::ArcdpsIntegration), RES_ARCDPS_INTEGRATION, "DLL", true);
 
 			// reload is set to true because the dll is always deployed from resource
 			// and since it's locked it would not load here directly but instead after checking for updates (which does not apply to it)
-			Loader::QueueAddon(ELoaderAction::Reload, Index(EPath::ArcdpsIntegration));
+			loader->QueueAddon(ELoaderAction::Reload, Index(EPath::ArcdpsIntegration));
 		}
 		catch (std::filesystem::filesystem_error fErr)
 		{

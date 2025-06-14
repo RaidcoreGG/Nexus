@@ -17,6 +17,7 @@
 #include "Util/Paths.h"
 #include "Util/Strings.h"
 #include "Util/URL.h"
+#include "Engine/Loader/Loader.h"
 
 CUpdater::CUpdater(CLogApi* aLogger)
 {

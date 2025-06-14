@@ -42,6 +42,7 @@ namespace ADDONAPI
 	static CLogApi*         s_Logger        = nullptr;
 	static CTextureLoader*  s_TextureApi    = nullptr;
 	static CUpdater*        s_Updater       = nullptr;
+	static CLoader*         s_Loader       = nullptr;
 	static RenderContext_t* s_RenderCtx     = nullptr;
 
 	static CUiContext*      s_UiContext     = nullptr;
@@ -359,13 +360,14 @@ namespace ADDONAPI
 		void RequestUpdate(signed int aSignature, const char* aUpdateURL)
 		{
 			assert(s_Updater);
+			assert(s_Loader);
 
 			if (!aSignature) { return; }
 			if (!aUpdateURL) { return; }
 
-			const std::lock_guard<std::mutex> lock(Loader::Mutex);
+			const std::lock_guard<std::mutex> lock(s_Loader->Mutex);
 
-			Addon_t* addon = Loader::FindAddonBySig(aSignature);
+			Addon_t* addon = s_Loader->FindAddonBySig(aSignature);
 
 			if (!addon) { return; }
 			if (!addon->Definitions) { return; }
@@ -564,6 +566,7 @@ namespace ADDONAPI
 			s_Logger        = ctx->GetLogger();
 			s_TextureApi    = ctx->GetTextureService();
 			s_Updater       = ctx->GetUpdater();
+			s_Loader        = ctx->GetLoader();
 			s_RenderCtx     = ctx->GetRendererCtx();
 
 			s_UiContext     = ctx->GetUIContext();

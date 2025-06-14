@@ -125,6 +125,7 @@ void CAddonsWindow::AddonItem(AddonItemData_t& aAddonData, float aWidth)
 		static CContext*      ctx     = CContext::GetContext();
 		static CUiContext*    uictx   = ctx->GetUIContext();
 		static CLocalization* langApi = uictx->GetLocalization();
+		static CLoader* loader = ctx->GetLoader();
 
 		ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1);
 		if (ImGui::BeginChild(("AddonItem_" + sig).c_str(), itemSz, true))
@@ -179,10 +180,10 @@ void CAddonsWindow::AddonItem(AddonItemData_t& aAddonData, float aWidth)
 						if (!aAddonData.NexusAddon->IsWaitingForUnload)
 						{
 							//Logger->Debug(CH_GUI, "Unload called: %s", it.second->Definitions->Name);
-							Loader::QueueAddon(ELoaderAction::Unload, aAddonData.NexusAddon->Path);
+							loader->QueueAddon(ELoaderAction::Unload, aAddonData.NexusAddon->Path);
 						}
 					}
-					if (Loader::HasCustomConfig)
+					if (loader->HasCustomConfig)
 					{
 						ImGui::TooltipGeneric(langApi->Translate("((000021))"));
 					}
@@ -191,7 +192,7 @@ void CAddonsWindow::AddonItem(AddonItemData_t& aAddonData, float aWidth)
 				{
 					std::string additionalInfo;
 
-					if (Loader::HasCustomConfig)
+					if (loader->HasCustomConfig)
 					{
 						additionalInfo.append("\n");
 						additionalInfo.append(langApi->Translate("((000021))"));
@@ -200,11 +201,11 @@ void CAddonsWindow::AddonItem(AddonItemData_t& aAddonData, float aWidth)
 					if (ImGui::Button((langApi->Translate(aAddonData.NexusAddon->IsFlaggedForDisable ? "((000024))" : "((000022))") + sig).c_str(), ImVec2(btnWidth, 0)))
 					{
 						aAddonData.NexusAddon->IsFlaggedForDisable = !aAddonData.NexusAddon->IsFlaggedForDisable;
-						Loader::SaveAddonConfig();
+						loader->SaveAddonConfig();
 					}
 					ImGui::TooltipGeneric(langApi->Translate(aAddonData.NexusAddon->IsFlaggedForDisable ? "((000025))" : "((000023))"), additionalInfo.c_str());
 				}
-				else if (aAddonData.NexusAddon->State == EAddonState::NotLoaded && (aAddonData.NexusAddon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || aAddonData.NexusAddon->Definitions->Signature == 0xFFF694D1) && !Loader::IsGameLaunchSequence)
+				else if (aAddonData.NexusAddon->State == EAddonState::NotLoaded && (aAddonData.NexusAddon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || aAddonData.NexusAddon->Definitions->Signature == 0xFFF694D1) && !loader->IsGameLaunchSequence)
 				{
 					/* if it's too late to load this addon */
 					if (ImGui::Button((langApi->Translate(aAddonData.NexusAddon->IsFlaggedForEnable ? "((000020))" : "((000024))") + sig).c_str(), ImVec2(btnWidth, 0)))
@@ -217,7 +218,7 @@ void CAddonsWindow::AddonItem(AddonItemData_t& aAddonData, float aWidth)
 							alertctx->Notify(EAlertType::Info, String::Format("%s %s", aAddonData.NexusAddon->Definitions->Name, langApi->Translate("((000080))")).c_str());
 						}
 
-						Loader::SaveAddonConfig();
+						loader->SaveAddonConfig();
 					}
 					if (aAddonData.NexusAddon->IsFlaggedForEnable)
 					{
@@ -230,9 +231,9 @@ void CAddonsWindow::AddonItem(AddonItemData_t& aAddonData, float aWidth)
 					{
 						//Logger->Debug(CH_GUI, "Load called: %s", it.second->Definitions->Name);
 						aAddonData.NexusAddon->IsDisabledUntilUpdate = false; // explicitly loaded
-						Loader::QueueAddon(ELoaderAction::Load, aAddonData.NexusAddon->Path);
+						loader->QueueAddon(ELoaderAction::Load, aAddonData.NexusAddon->Path);
 					}
-					if (Loader::HasCustomConfig)
+					if (loader->HasCustomConfig)
 					{
 						ImGui::TooltipGeneric(langApi->Translate("((000021))"));
 					}
@@ -259,7 +260,7 @@ void CAddonsWindow::AddonItem(AddonItemData_t& aAddonData, float aWidth)
 					if (ImGui::IconButton(favTex->Resource, ImVec2(btnSz, btnSz)))
 					{
 						aAddonData.NexusAddon->IsFavorite = !aAddonData.NexusAddon->IsFavorite;
-						Loader::SaveAddonConfig();
+						loader->SaveAddonConfig();
 						this->Invalidate();
 						clickedFavorite = true;
 					}
@@ -464,6 +465,7 @@ void CAddonsWindow::AddonItem(AddonItemData_t& aAddonData, float aWidth)
 							{
 								CContext* ctx = CContext::GetContext();
 								CUpdater* updater = ctx->GetUpdater();
+								CLoader* loader = ctx->GetLoader();
 								updater->InstallAddon(aAddonData.LibraryAddon_t, isArcPlugin);
 
 								if (isArcPlugin)
@@ -472,7 +474,7 @@ void CAddonsWindow::AddonItem(AddonItemData_t& aAddonData, float aWidth)
 								}
 								else
 								{
-									Loader::NotifyChanges();
+									loader->NotifyChanges();
 									//Loader::QueueAddon(ELoaderAction::Reload, installPath);
 								}
 
@@ -537,6 +539,7 @@ void CAddonsWindow::RenderContent()
 	static CUiContext* uictx = ctx->GetUIContext();
 	static CLocalization* langApi = uictx->GetLocalization();
 	static CSettings* settingsctx = ctx->GetSettingsCtx();
+	static CLoader* loader = ctx->GetLoader();
 
 	ImVec2 region = ImGui::GetContentRegionAvail();
 
@@ -913,14 +916,14 @@ void CAddonsWindow::RenderContent()
 		{
 			if (checkedForUpdates == -1)
 			{
-				const std::lock_guard<std::mutex> lock(Loader::Mutex);
+				const std::lock_guard<std::mutex> lock(loader->Mutex);
 				{
 					checkedForUpdates = 0;
 					queuedForCheck = 0;
 					updatedCount = 0;
 
 					/* pre-iterate to get the count of how many need to be checked, else one call might finish before the count can be incremented */
-					for (auto addon : Loader::Addons)
+					for (auto addon : loader->Addons)
 					{
 						if (nullptr == addon->Definitions) { continue; }
 						queuedForCheck++;
@@ -931,7 +934,7 @@ void CAddonsWindow::RenderContent()
 						checkedForUpdates = -1;
 					}
 
-					for (auto addon : Loader::Addons)
+					for (auto addon : loader->Addons)
 					{
 						if (nullptr == addon->Definitions) { continue; }
 
@@ -960,7 +963,7 @@ void CAddonsWindow::RenderContent()
 
 							if (addon->Definitions->Provider != EUpdateProvider::Self && updater->UpdateAddon(tmpPath, addonInfo, false, 5 * 60))
 							{
-								Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
+								loader->QueueAddon(ELoaderAction::Reload, tmpPath);
 
 								alertctx->Notify(EAlertType::Info,
 									String::Format("%s %s",
@@ -999,7 +1002,7 @@ void CAddonsWindow::RenderContent()
 
 			if (ImGui::ImageButton(refreshTex->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
 			{
-				Loader::NotifyChanges();
+				loader->NotifyChanges();
 				std::thread([this]() {
 					Loader::Library::Fetch();
 					this->Invalidate();
@@ -1073,6 +1076,7 @@ void CAddonsWindow::RenderDetails()
 		static CContext* ctx = CContext::GetContext();
 		static CUiContext* uictx = ctx->GetUIContext();
 		static CLocalization* langApi = uictx->GetLocalization();
+		CLoader* loader = ctx->GetLoader();
 
 		std::string sig = std::to_string(addonData.NexusAddon->Definitions->Signature);
 		std::string sigid = "##" + sig;
@@ -1098,7 +1102,7 @@ void CAddonsWindow::RenderDetails()
 				{
 					if (!addonData.NexusAddon->IsCheckingForUpdates)
 					{
-						for (auto addon : Loader::Addons)
+						for (auto addon : loader->Addons)
 						{
 							if (addon->Definitions == addonData.NexusAddon->Definitions)
 							{
@@ -1127,10 +1131,11 @@ void CAddonsWindow::RenderDetails()
 									CUiContext* uictx = ctx->GetUIContext();
 									CAlerts* alertctx = uictx->GetAlerts();
 									CLocalization* langApi = uictx->GetLocalization();
+									CLoader* loader = ctx->GetLoader();
 
 									if (updater->UpdateAddon(tmpPath, addonInfo, false, 5 * 60))
 									{
-										Loader::QueueAddon(ELoaderAction::Reload, tmpPath);
+										loader->QueueAddon(ELoaderAction::Reload, tmpPath);
 
 										alertctx->Notify(EAlertType::Info,
 											String::Format("%s %s",
@@ -1174,19 +1179,19 @@ void CAddonsWindow::RenderDetails()
 
 			if (ImGui::Checkbox((langApi->Translate("((000014))") + sigid).c_str(), &addonData.NexusAddon->IsPausingUpdates))
 			{
-				Loader::SaveAddonConfig();
+				loader->SaveAddonConfig();
 			}
 
 			if (ImGui::Checkbox((langApi->Translate("((000016))") + sigid).c_str(), &addonData.NexusAddon->IsDisabledUntilUpdate))
 			{
 				//Logger->Debug(CH_GUI, "ToggleDUU called: %s", it.second->Definitions->Name);
 
-				Loader::SaveAddonConfig();
+				loader->SaveAddonConfig();
 				this->Invalidate();
 
 				if (addonData.NexusAddon->State == EAddonState::Loaded)
 				{
-					Loader::QueueAddon(ELoaderAction::Unload, addonData.NexusAddon->Path);
+					loader->QueueAddon(ELoaderAction::Unload, addonData.NexusAddon->Path);
 					skipOptions = true;
 				}
 			}
@@ -1199,7 +1204,7 @@ void CAddonsWindow::RenderDetails()
 			{
 				if (ImGui::Checkbox((langApi->Translate("((000084))") + sigid).c_str(), &addonData.NexusAddon->AllowPrereleases))
 				{
-					Loader::SaveAddonConfig();
+					loader->SaveAddonConfig();
 				}
 			}
 
@@ -1212,10 +1217,10 @@ void CAddonsWindow::RenderDetails()
 					if (!addonData.NexusAddon->IsWaitingForUnload)
 					{
 						//Logger->Debug(CH_GUI, "Unload called: %s", it.second->Definitions->Name);
-						Loader::QueueAddon(ELoaderAction::Unload, addonData.NexusAddon->Path);
+						loader->QueueAddon(ELoaderAction::Unload, addonData.NexusAddon->Path);
 					}
 				}
-				if (Loader::HasCustomConfig)
+				if (loader->HasCustomConfig)
 				{
 					ImGui::TooltipGeneric(langApi->Translate("((000021))"));
 				}
@@ -1224,7 +1229,7 @@ void CAddonsWindow::RenderDetails()
 			{
 				std::string additionalInfo;
 
-				if (Loader::HasCustomConfig)
+				if (loader->HasCustomConfig)
 				{
 					additionalInfo.append("\n");
 					additionalInfo.append(langApi->Translate("((000021))"));
@@ -1233,11 +1238,11 @@ void CAddonsWindow::RenderDetails()
 				if (ImGui::Button((langApi->Translate(addonData.NexusAddon->IsFlaggedForDisable ? "((000024))" : "((000022))") + sig).c_str()))
 				{
 					addonData.NexusAddon->IsFlaggedForDisable = !addonData.NexusAddon->IsFlaggedForDisable;
-					Loader::SaveAddonConfig();
+					loader->SaveAddonConfig();
 				}
 				ImGui::TooltipGeneric(langApi->Translate(addonData.NexusAddon->IsFlaggedForDisable ? "((000025))" : "((000023))"), additionalInfo.c_str());
 			}
-			else if (addonData.NexusAddon->State == EAddonState::NotLoaded && (addonData.NexusAddon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || addonData.NexusAddon->Definitions->Signature == 0xFFF694D1) && !Loader::IsGameLaunchSequence)
+			else if (addonData.NexusAddon->State == EAddonState::NotLoaded && (addonData.NexusAddon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || addonData.NexusAddon->Definitions->Signature == 0xFFF694D1) && !loader->IsGameLaunchSequence)
 			{
 				/* if it's too late to load this addon */
 				if (ImGui::Button((langApi->Translate(addonData.NexusAddon->IsFlaggedForEnable ? "((000020))" : "((000024))") + sig).c_str()))
@@ -1250,7 +1255,7 @@ void CAddonsWindow::RenderDetails()
 						ctx->GetUIContext()->GetAlerts()->Notify(EAlertType::Info, String::Format("%s %s", addonData.NexusAddon->Definitions->Name, langApi->Translate("((000080))")).c_str());
 					}
 
-					Loader::SaveAddonConfig();
+					loader->SaveAddonConfig();
 				}
 				if (addonData.NexusAddon->IsFlaggedForEnable)
 				{
@@ -1263,9 +1268,9 @@ void CAddonsWindow::RenderDetails()
 				{
 					//Logger->Debug(CH_GUI, "Load called: %s", it.second->Definitions->Name);
 					addonData.NexusAddon->IsDisabledUntilUpdate = false; // explicitly loaded
-					Loader::QueueAddon(ELoaderAction::Load, addonData.NexusAddon->Path);
+					loader->QueueAddon(ELoaderAction::Load, addonData.NexusAddon->Path);
 				}
-				if (Loader::HasCustomConfig)
+				if (loader->HasCustomConfig)
 				{
 					ImGui::TooltipGeneric(langApi->Translate("((000021))"));
 				}
@@ -1344,15 +1349,16 @@ void CAddonsWindow::PopulateAddons()
 {
 	this->Addons.clear();
 
-	const std::lock_guard<std::mutex> lock(Loader::Mutex);
-
 	CContext* ctx = CContext::GetContext();
 	CUiContext* uictx = ctx->GetUIContext();
 	CSettings* settingsctx = ctx->GetSettingsCtx();
+	CLoader* loader = ctx->GetLoader();
+
+	const std::lock_guard<std::mutex> lock(loader->Mutex);
 
 	this->Filter = settingsctx->Get<EAddonsFilterFlags>(OPT_ADDONFILTERS, quickFilter_Installed);
 
-	for (Addon_t* addon : Loader::Addons)
+	for (Addon_t* addon : loader->Addons)
 	{
 		if (addon->Path.filename() == "arcdps_integration64.dll") { continue; }
 		if (!addon->Definitions) { continue; }
@@ -1383,7 +1389,7 @@ void CAddonsWindow::PopulateAddons()
 
 		for (GUI_RENDER renderCb : uictx->GetOptionsCallbacks())
 		{
-			std::string parent = Loader::GetOwner(renderCb);
+			std::string parent = loader->GetOwner(renderCb);
 			if (addon->Definitions && addon->Definitions->Name == parent)
 			{
 				addonItem.OptionsRender = renderCb;
@@ -1409,7 +1415,7 @@ void CAddonsWindow::PopulateAddons()
 
 			bool installed = false;
 
-			for (Addon_t* installedAddon : Loader::Addons)
+			for (Addon_t* installedAddon : loader->Addons)
 			{
 				// filter out already installed
 				if (addon->Signature == installedAddon->MatchSignature && installedAddon->State != EAddonState::None)

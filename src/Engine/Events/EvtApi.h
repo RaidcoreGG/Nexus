@@ -12,11 +12,9 @@
 #include <mutex>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
-#include "EvtFuncDefs.h"
 #include "EvtData.h"
-#include "EvtSubscriber.h"
+#include "EvtFuncDefs.h"
 
 constexpr const char* CH_EVENTS = "Events";
 
@@ -63,7 +61,7 @@ class CEventApi
 	std::unordered_map<std::string, EventData_t> GetRegistry() const;
 
 	private:
-	mutable std::recursive_mutex               Mutex;
+	mutable std::recursive_mutex                 Mutex;
 	std::unordered_map<std::string, EventData_t> Registry;
 };
 

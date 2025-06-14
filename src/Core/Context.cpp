@@ -105,6 +105,12 @@ CEventApi* CContext::GetEventApi()
 	return &s_EventApi;
 }
 
+CLoader* CContext::GetLoader()
+{
+	static CLoader s_Loader = CLoader();
+	return &s_Loader;
+}
+
 CRawInputApi* CContext::GetRawInputApi()
 {
 	static CRawInputApi s_RawInputApi = CRawInputApi(

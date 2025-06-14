@@ -15,7 +15,6 @@
 
 #include "Engine/Loader/AddonDefinition.h"
 #include "Engine/Loader/LibraryAddon.h"
-#include "Engine/Loader/Loader.h"
 #include "Engine/Logging/LogApi.h"
 
 constexpr const char* CH_UPDATER = "Updater";
