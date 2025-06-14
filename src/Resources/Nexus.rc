@@ -1,7 +1,7 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "Version.h"
-#include "resource.h"
+#include "Resources/ResConst.h"
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 
@@ -85,9 +85,9 @@ BEGIN
 	END
 END
 
-RES_THIRDPARTYNOTICES           TXT     ".\\THIRDPARTYSOFTWAREREADME.TXT"
+RES_THIRDPARTYNOTICES           TXT     "..\\THIRDPARTYSOFTWAREREADME.TXT"
 
-RES_ICON_SNOWFLAKE              PNG     "Resources\\icons\\snowflake.png"
+RES_ICON_SNOWFLAKE              PNG     "Resources\\Images\\MainWindow\\SnowflakeShaded.png"
 
 /* Fonts */
 RES_FONT_MENOMONIA              FONT    "Resources\\Fonts\\Menomonia.ttf"
@@ -95,49 +95,49 @@ RES_FONT_TREBUCHET              FONT    "Resources\\Fonts\\TrebuchetMS.ttf"
 RES_FONT_INTER                  FONT    "Resources\\Fonts\\Inter.ttf"
 
 /* QuickAccess */
-RES_ICON_NEXUS                  PNG     "Resources\\QuickAccess\\Nexus.png"
-RES_ICON_NEXUS_HOVER            PNG     "Resources\\QuickAccess\\Nexus_Hover.png"
-RES_ICON_NEXUS_HALLOWEEN        PNG     "Resources\\QuickAccess\\NexusHalloween.png"
-RES_ICON_NEXUS_HALLOWEEN_HOVER  PNG     "Resources\\QuickAccess\\NexusHalloween_Hover.png"
-RES_ICON_NEXUS_XMAS             PNG     "Resources\\QuickAccess\\NexusXmas.png"
-RES_ICON_NEXUS_XMAS_HOVER       PNG     "Resources\\QuickAccess\\NexusXmas_Hover.png"
+RES_ICON_NEXUS                  PNG     "Resources\\Images\\QuickAccess\\Nexus.png"
+RES_ICON_NEXUS_HOVER            PNG     "Resources\\Images\\QuickAccess\\Nexus_Hover.png"
+RES_ICON_NEXUS_HALLOWEEN        PNG     "Resources\\Images\\QuickAccess\\NexusHalloween.png"
+RES_ICON_NEXUS_HALLOWEEN_HOVER  PNG     "Resources\\Images\\QuickAccess\\NexusHalloween_Hover.png"
+RES_ICON_NEXUS_XMAS             PNG     "Resources\\Images\\QuickAccess\\NexusXmas.png"
+RES_ICON_NEXUS_XMAS_HOVER       PNG     "Resources\\Images\\QuickAccess\\NexusXmas_Hover.png"
 
-RES_ICON_GENERIC                PNG     "Resources\\QuickAccess\\Generic.png"
-RES_ICON_GENERIC_HOVER          PNG     "Resources\\QuickAccess\\Generic_Hover.png"
+RES_ICON_GENERIC                PNG     "Resources\\Images\\QuickAccess\\Generic.png"
+RES_ICON_GENERIC_HOVER          PNG     "Resources\\Images\\QuickAccess\\Generic_Hover.png"
 
-RES_ICON_NOTIFICATION           PNG     "Resources\\QuickAccess\\Notification.png"
+RES_ICON_NOTIFICATION           PNG     "Resources\\Images\\QuickAccess\\Notification.png"
 
 /* Menu*/
-RES_ICON_ADDONS                 PNG     "Resources\\icons\\addons.png"
-RES_ICON_OPTIONS                PNG     "Resources\\icons\\settings.png"
-RES_ICON_BINDS                  PNG     "Resources\\icons\\binds.png"
-RES_ICON_LOG                    PNG     "Resources\\icons\\log.png"
-RES_ICON_DEBUG                  PNG     "Resources\\icons\\debug.png"
-RES_ICON_DASHBOARD              PNG     "Resources\\icons\\home.png"
-RES_ICON_ABOUT                  PNG     "Resources\\icons\\about.png"
+RES_ICON_ADDONS                 PNG     "Resources\\Images\\MainWindow\\Pages\\AddonsShaded.png"
+RES_ICON_OPTIONS                PNG     "Resources\\Images\\MainWindow\\Pages\\SettingsShaded.png"
+RES_ICON_BINDS                  PNG     "Resources\\Images\\MainWindow\\Pages\\BindsShaded.png"
+RES_ICON_LOG                    PNG     "Resources\\Images\\MainWindow\\Pages\\LogShaded.png"
+RES_ICON_DEBUG                  PNG     "Resources\\Images\\MainWindow\\Pages\\DebugShaded.png"
+RES_ICON_DASHBOARD              PNG     "Resources\\Images\\MainWindow\\Pages\\HomeShaded.png"
+RES_ICON_ABOUT                  PNG     "Resources\\Images\\MainWindow\\Pages\\AboutShaded.png"
 
 /* Addon Policy Tiers */
-RES_ICON_TIER_UNKNOWN           PNG     "Resources\\icons\\addonpolicy_notier.png"
-RES_ICON_TIER1                  PNG     "Resources\\icons\\addonpolicy_tier1.png"
-RES_ICON_TIER2                  PNG     "Resources\\icons\\addonpolicy_tier2.png"
-RES_ICON_TIER3                  PNG     "Resources\\icons\\addonpolicy_tier3.png"
+RES_ICON_TIER_UNKNOWN           PNG     "Resources\\Images\\MainWindow\\Pages\\Addons\\PolicyUnknown.png"
+RES_ICON_TIER1                  PNG     "Resources\\Images\\MainWindow\\Pages\\Addons\\PolicyTier1.png"
+RES_ICON_TIER2                  PNG     "Resources\\Images\\MainWindow\\Pages\\Addons\\PolicyTier2.png"
+RES_ICON_TIER3                  PNG     "Resources\\Images\\MainWindow\\Pages\\Addons\\PolicyTier3.png"
 
 /* Generic */
-RES_ICON_RAIDCORE               PNG     "Resources\\RaidcoreTag.png"
-RES_ICON_POPOUT                 PNG     "Resources\\icons\\ext.png"
-RES_ICON_CLOSE                  PNG     "Resources\\icons\\close.png"
-RES_ICON_CHEVRON_RT             PNG     "Resources\\icons\\chevron_rt.png"
-RES_ICON_LIST                   PNG     "Resources\\icons\\list.png"
-RES_ICON_TILES                  PNG     "Resources\\icons\\tiles.png"
-RES_ICON_CANFAVORITE            PNG     "Resources\\icons\\canfavorite.png"
-RES_ICON_FAVORITE               PNG     "Resources\\icons\\favorite.png"
-RES_ICON_REFRESH                PNG     "Resources\\icons\\refresh.png"
-RES_ICON_FILTER                 PNG     "Resources\\icons\\filter.png"
-RES_BANNER_DISCORD              PNG     "Resources\\banners\\discord.png"
-RES_BANNER_PATREON              PNG     "Resources\\banners\\patreon.png"
+RES_ICON_RAIDCORE               PNG     "Resources\\Images\\MainWindow\\RaidcoreTag.png"
+RES_ICON_POPOUT                 PNG     "Resources\\Images\\MainWindow\\ExternalShaded.png"
+RES_ICON_CLOSE                  PNG     "Resources\\Images\\MainWindow\\CloseShaded.png"
+RES_ICON_CHEVRON_RT             PNG     "Resources\\Images\\MainWindow\\ChevronRtShaded.png"
+RES_ICON_LIST                   PNG     "Resources\\Images\\MainWindow\\ListShaded.png"
+RES_ICON_TILES                  PNG     "Resources\\Images\\MainWindow\\TilesShaded.png"
+RES_ICON_CANFAVORITE            PNG     "Resources\\Images\\MainWindow\\CanFavoriteShaded.png"
+RES_ICON_FAVORITE               PNG     "Resources\\Images\\MainWindow\\FavoriteShaded.png"
+RES_ICON_REFRESH                PNG     "Resources\\Images\\MainWindow\\RefreshShaded.png"
+RES_ICON_FILTER                 PNG     "Resources\\Images\\MainWindow\\FilterShaded.png"
+RES_BANNER_DISCORD              PNG     "Resources\\Images\\Social\\Banners\\Discord.png"
+RES_BANNER_PATREON              PNG     "Resources\\Images\\Social\\Banners\\Patreon.png"
 
 /* Binary */
-RES_ARCDPS_INTEGRATION          DLL     "Resources\\bin64\\arcdps_integration64.dll"
+RES_ARCDPS_INTEGRATION          DLL     "Resources\\Binaries\\arcdps_integration64.dll"
 
 /* Locales (primary) */
 RES_LOCALE_EN                   JSON    "Resources\\Locales\\en_Main.json"

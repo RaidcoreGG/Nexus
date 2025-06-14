@@ -13,7 +13,7 @@
 #include "imgui_extensions.h"
 
 #include "Core/Context.h"
-#include "resource.h"
+#include "Resources/ResConst.h"
 #include "Engine/Logging/LogConst.h"
 
 CLogWindow::CLogWindow()

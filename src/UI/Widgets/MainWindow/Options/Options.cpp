@@ -16,7 +16,7 @@
 #include "Core/Context.h"
 #include "Core/Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
-#include "resource.h"
+#include "Resources/ResConst.h"
 #include "UI/Widgets/QuickAccess/QaConst.h"
 #include "Util/Base64.h"
 #include "Util/Time.h"

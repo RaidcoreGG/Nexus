@@ -5,7 +5,7 @@
 #include "Core/Context.h"
 #include "Core/Index/Index.h"
 
-#include "resource.h"
+#include "Resources/ResConst.h"
 
 #include "Loader.h"
 

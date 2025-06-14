@@ -13,7 +13,7 @@
 
 #include "Core/Context.h"
 #include "ImAnimate/ImAnimate.h"
-#include "resource.h"
+#include "Resources/ResConst.h"
 #include "Util/Time.h"
 #include "Core/Preferences/PrefConst.h"
 

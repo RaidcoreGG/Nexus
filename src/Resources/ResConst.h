@@ -1,7 +1,13 @@
-//{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by Nexus.rc
-//
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  ResConst.h
+/// Description  :  Constant data for resources.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
+#ifndef RESCONST_H
+#define RESCONST_H
 
 #define RES_THIRDPARTYNOTICES             1
 
@@ -71,13 +77,4 @@
 #define RES_LOCALE_RU                   709
 #define RES_LOCALE_CN                   710
 
-// Next default values for new objects
-// 
-#ifdef APSTUDIO_INVOKED
-#ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        110
-#define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1001
-#define _APS_NEXT_SYMED_VALUE           101
-#endif
 #endif

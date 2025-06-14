@@ -18,7 +18,7 @@
 #include "Engine/Loader/ArcDPS.h"
 #include "Engine/Loader/Library.h"
 #include "Engine/Loader/Loader.h"
-#include "resource.h"
+#include "Resources/ResConst.h"
 #include "Util/Strings.h"
 
 constexpr ImGuiWindowFlags ModalFlags = ImGuiWindowFlags_AlwaysAutoResize |

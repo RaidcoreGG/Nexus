@@ -19,7 +19,7 @@
 #include "Engine/Inputs/InputBinds/IbConst.h"
 #include "Engine/Loader/LdrConst.h"
 #include "Core/Preferences/PrefContext.h"
-#include "resource.h"
+#include "Resources/ResConst.h"
 #include "UI/UIContext.h"
 
 #define GW2_QUICKACCESS_ITEMS 10;

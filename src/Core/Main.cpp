@@ -22,7 +22,7 @@
 #include "Engine/Logging/LogWriter.h"
 #include "Engine/Updater/Updater.h"
 #include "GW2/Multibox/Multibox.h"
-#include "resource.h"
+#include "Resources/ResConst.h"
 #include "UI/UiContext.h"
 #include "Util/CmdLine.h"
 #include "Util/Resources.h"
