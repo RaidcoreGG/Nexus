@@ -9,8 +9,13 @@
 #ifndef FILELOGGER_H
 #define FILELOGGER_H
 
-#include <fstream>
+#include <condition_variable>
+#include <cstdint>
 #include <filesystem>
+#include <fstream>
+#include <mutex>
+#include <queue>
+#include <thread>
 
 #include "LogBase.h"
 
@@ -23,7 +28,7 @@ class CFileLogger : public virtual ILogger
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CFileLogger(ELogLevel aLogLevel, std::filesystem::path aPath);
+	CFileLogger(ELogLevel aLogLevel, std::filesystem::path aPath, uint32_t aFlushIntervalMs = 1000);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -37,7 +42,20 @@ class CFileLogger : public virtual ILogger
 	void MsgProc(const LogMsg_t* aLogEntry) override;
 
 	private:
-	std::ofstream File;
+	std::ofstream           File;
+	uint32_t                Interval;
+	std::thread             WriterThread;
+	bool                    IsRunning = false;
+
+	std::mutex              Mutex;
+	std::condition_variable ConVar;
+	std::queue<LogMsg_t>    MsgQueue;
+
+	///----------------------------------------------------------------------------------------------------
+	/// Flush:
+	/// 	Periodically flushes the filestream.
+	///----------------------------------------------------------------------------------------------------
+	void Flush();
 };
 
 #endif
