@@ -29,9 +29,10 @@ namespace Loader
 
 		void Fetch()
 		{
-			json response = CContext::GetContext()->GetRaidcoreApi()->Get("/addonlibrary");
+			HttpResponse_t requestResult = CContext::GetContext()->GetRaidcoreApi()->Get("/addonlibrary");
+			json response = requestResult.ContentJSON();
 
-			if (!response.is_null())
+			if (!response.is_null() && requestResult.Success())
 			{
 				const std::lock_guard<std::mutex> lock(Mutex);
 				Addons.clear();

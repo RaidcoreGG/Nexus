@@ -15,6 +15,8 @@
     <ClCompile Include="src\Core\Hooks\Hooks.cpp" />
     <ClCompile Include="src\Engine\Functions\FnRegistry.cpp" />
     <ClCompile Include="src\Engine\Index\Index.cpp" />
+    <ClCompile Include="src\Engine\Networking\WebRequests\WreCache.cpp" />
+    <ClCompile Include="src\Engine\Networking\WebRequests\WreConst.cpp" />
     <ClCompile Include="src\GW2\Inputs\GameBinds\GbApi.cpp" />
     <ClCompile Include="src\GW2\Inputs\GameBinds\GbConst.cpp" />
     <ClCompile Include="src\Engine\Inputs\InputBinds\IbCapture.cpp" />
@@ -106,6 +108,8 @@
     <ClInclude Include="src\Engine\Functions\FnRegistry.h" />
     <ClInclude Include="src\Engine\Index\IdxEnum.h" />
     <ClInclude Include="src\Engine\Index\Index.h" />
+    <ClInclude Include="src\Engine\Networking\WebRequests\WreCache.h" />
+    <ClInclude Include="src\Engine\Networking\WebRequests\WreConst.h" />
     <ClInclude Include="src\GW2\Inputs\MouseResetFix.h" />
     <ClInclude Include="src\Engine\Networking\NetConst.h" />
     <ClInclude Include="src\Engine\Renderer\RdrContext.h" />
@@ -126,9 +130,7 @@
     <ClInclude Include="src\GW2\Mumble\MblExtensions.h" />
     <ClInclude Include="src\Remote.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreClient.h" />
-    <ClInclude Include="src\Engine\Networking\WebRequests\WreRequest.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreResponse.h" />
-    <ClInclude Include="src\Engine\Networking\WebRequests\WreCacheEntry.h" />
     <ClInclude Include="src\Branch.h" />
     <ClInclude Include="src\Consts.h" />
     <ClInclude Include="src\Engine\DataLink\DlApi.h" />

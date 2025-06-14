@@ -1,77 +1,64 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  WreClient.h
-/// Description  :  Provides functions for web requests.
+/// Name         :  WreCache.h
+/// Description  :  Cache implementation for web requests.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef WRECLIENT_H
-#define WRECLIENT_H
+#ifndef WRECACHE_H
+#define WRECACHE_H
 
-#include <cstdint>
-#include <filesystem>
 #include <mutex>
-#include <string>
+#include <filesystem>
+#include <cstdint>
+#include <unordered_map>
 
-#include "httplib/httplib.h"
-
-#include "Engine/Logging/LogApi.h"
-#include "WreCache.h"
 #include "WreResponse.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// CHttpClient Class
+/// CHttpCache Class
 ///----------------------------------------------------------------------------------------------------
-class CHttpClient
+class CHttpCache
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
-	/// 	- aLogger: Logger dependency.
-	/// 	- aBaseURL: URL base for the client.
-	/// 	- aCacheDirectory: Directory which will contain the cached requests.
-	/// 	- aCacheLifetime: Lifetime of a cache entry in seconds.
+	/// 	- aDirectory: Directory which will contain the cached requests.
+	/// 	- aLifetime: Lifetime of a cache entry in seconds.
 	///----------------------------------------------------------------------------------------------------
-	CHttpClient(
-		CLogApi*              aLogger,
-		std::string           aBaseURL,
-		std::filesystem::path aCacheDirectory = {},
-		uint32_t              aCacheLifetime  = 0
-	);
-	
-	///----------------------------------------------------------------------------------------------------
-	/// dtor
-	///----------------------------------------------------------------------------------------------------
-	~CHttpClient();
+	CHttpCache(std::filesystem::path aDirectory, uint32_t aLifetime);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Get:
-	/// 	Sends a http request and fetches the response.
-	/// 	- aOverrideCacheLifetime(seconds) changes the cache lifetime to the given one. -1 means, don't change it.
+	/// Store:
+	/// 	Stores a web request response on disk and runtime cache, if it was successful.
 	///----------------------------------------------------------------------------------------------------
-	HttpResponse_t Get(std::string aEndpoint, std::string aParameters = "", int32_t aOverrideCacheLifetime = -1);
+	void Store(std::string aQuery, const HttpResponse_t& aResponse);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Download:
-	/// 	Downloads a remote resource to disk.
+	/// Retrieve:
+	/// 	Retrieves a web request response, if it exists and has not expired.
+	/// 	aLifetimeOverride: -1 keep default lifetime. 0 >= use parameter lifetime.
 	///----------------------------------------------------------------------------------------------------
-	HttpResponse_t Download(std::filesystem::path aOutPath, std::string aEndpoint, std::string aParameters = "");
+	HttpResponse_t* Retrieve(std::string aQuery, int32_t aLifetimeOverride = -1);
+
+	///----------------------------------------------------------------------------------------------------
+	/// Flush:
+	/// 	Flushes the cache. If specified also deletes the cache on disk.
+	///----------------------------------------------------------------------------------------------------
+	void Flush(bool aCleanupOnDisk = false);
 
 	private:
-	CLogApi*         Logger = nullptr;
-
-	std::string      BaseURL;
-	std::mutex       Mutex;
-	httplib::Client* Client = nullptr;
-
-	CHttpCache*      Cache  = nullptr;
+	std::mutex                                      Mutex;
+	std::filesystem::path                           Directory;
+	uint32_t                                        Lifetime = 300;
+	std::unordered_map<std::string, HttpResponse_t> Entries;
 
 	///----------------------------------------------------------------------------------------------------
-	/// DownloadCleanup:
-	/// 	Cleans up a file after a failed download.
+	/// GetCachePath:
+	/// 	Builds the full cache entry path given a query.
 	///----------------------------------------------------------------------------------------------------
-	void DownloadCleanup(const std::filesystem::path& aOutPath, const std::string& aQuery);
+	std::filesystem::path GetCachePath(const std::string& aQuery);
 };
 
 #endif

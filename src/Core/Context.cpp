@@ -170,10 +170,7 @@ CHttpClient* CContext::GetRaidcoreApi()
 		this->GetLogger(),
 		"https://api.raidcore.gg",
 		Index(EPath::DIR_APICACHE_RAIDCORE),
-		30 * 60,
-		300,
-		5,
-		1
+		5 * 60
 	);
 	return &s_RaidcoreApiCli;
 }
@@ -184,10 +181,7 @@ CHttpClient* CContext::GetGitHubApi()
 		this->GetLogger(),
 		"https://api.github.com",
 		Index(EPath::DIR_APICACHE_GITHUB),
-		30 * 60,
-		60,
-		60,
-		60 * 60
+		30 * 60
 	);
 	return &s_GitHubApiCli;
 }

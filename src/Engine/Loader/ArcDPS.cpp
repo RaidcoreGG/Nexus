@@ -28,9 +28,10 @@ namespace ArcDPS
 
 	void GetPluginLibrary()
 	{
-		json response = CContext::GetContext()->GetRaidcoreApi()->Get("/arcdpslibrary");
+		HttpResponse_t requestResult = CContext::GetContext()->GetRaidcoreApi()->Get("/arcdpslibrary");
+		json response = requestResult.ContentJSON();
 
-		if (!response.is_null())
+		if (!response.is_null() && requestResult.Success())
 		{
 			const std::lock_guard<std::mutex> lock(Mutex);
 			PluginLibrary.clear();

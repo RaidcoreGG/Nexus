@@ -62,9 +62,10 @@ void CUpdater::UpdateNexus()
 	}
 
 	// check for update and bypass cache
-	json resVersion = CContext::GetContext()->GetRaidcoreApi()->Get("/nexusversion", "", 0);
+	HttpResponse_t requestResult = CContext::GetContext()->GetRaidcoreApi()->Get("/nexusversion", "", 0);
+	json resVersion = requestResult.ContentJSON();
 
-	if (resVersion.is_null())
+	if (resVersion.is_null() || !requestResult.Success())
 	{
 		this->Logger->Warning(CH_UPDATER, "Error parsing API response /nexusversion.");
 		return;
@@ -127,7 +128,7 @@ void CUpdater::UpdateNexus()
 		{
 			this->Logger->Info(CH_UPDATER, "Nexus update via GitHub not possible. Falling back to Raidcore API.");
 			// ensure download successful
-			if (!CContext::GetContext()->GetRaidcoreApi()->Download(Index(EPath::NexusDLL_Update), "/d3d11.dll"))
+			if (!CContext::GetContext()->GetRaidcoreApi()->Download(Index(EPath::NexusDLL_Update), "/d3d11.dll").Success())
 			{
 				this->Logger->Warning(CH_UPDATER, "Nexus Update failed: Download failed.");
 				// try cleaning failed download
@@ -435,9 +436,10 @@ bool CUpdater::UpdateRaidcore(int aCacheLifetimeOverride)
 
 bool CUpdater::UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& aEndpoint, AddonVersion_t aCurrentVersion, bool aAllowPrereleases, bool aIgnoreTagFormat, int aCacheLifetimeOverride)
 {
-	json response = CContext::GetContext()->GetGitHubApi()->Get(aEndpoint, "", aCacheLifetimeOverride);
+	HttpResponse_t requestResult = CContext::GetContext()->GetGitHubApi()->Get(aEndpoint, "", aCacheLifetimeOverride);
+	json response = requestResult.ContentJSON();
 
-	if (response.is_null())
+	if (response.is_null() || !requestResult.Success())
 	{
 		this->Logger->Warning(CH_UPDATER, "Error parsing API response.");
 		return false;
