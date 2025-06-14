@@ -10,8 +10,11 @@
 
 #include <assert.h>
 
-CFuncRegistry::CFuncRegistry()
+CFuncRegistry::CFuncRegistry(CLogApi* aLogger)
 {
+	assert(aLogger);
+
+	this->Logger = aLogger;
 }
 
 CFuncRegistry::~CFuncRegistry()
@@ -28,27 +31,15 @@ void CFuncRegistry::Register(std::string& aIdentifier, void* aFunction)
 
 	if (it != this->Registry.end())
 	{
-		auto fbIt = std::find(it->second.Functions.begin(), it->second.Functions.end(), aFunction);
-
-		if (fbIt != it->second.Functions.end())
-		{
-			/* Function already registered. */
-			return;
-		}
-
-		it->second.Functions.push_back(aFunction);
-
-		assert(it->second.ActiveFunction);
+		/* Identifier already registered. */
+		return;
 	}
-	else
-	{
-		FuncEntry_t entry{};
-		entry.RefCount = 0;
-		entry.Functions.push_back(aFunction);
-		entry.ActiveFunction = aFunction;
 
-		this->Registry.emplace(aIdentifier, entry);
-	}
+	FuncEntry_t entry{};
+	entry.RefCount = 0;
+	entry.Function = aFunction;
+
+	this->Registry.emplace(aIdentifier, entry);
 }
 
 void CFuncRegistry::Deregister(std::string& aIdentifier, void* aFunction)
@@ -67,7 +58,7 @@ void* CFuncRegistry::Query(std::string& aIdentifier)
 	if (it != this->Registry.end())
 	{
 		it->second.RefCount++;
-		return it->second.ActiveFunction;
+		return it->second.Function;
 	}
 
 	return nullptr;
@@ -82,5 +73,14 @@ void CFuncRegistry::Release(std::string& aIdentifier)
 	if (it != this->Registry.end())
 	{
 		it->second.RefCount--;
+
+		if (it->second.RefCount < 0)
+		{
+			this->Logger->Critical(
+				CH_FUNCTIONS,
+				"%s reference count less than zero. Query/Release mismatch. Function may be freed prematurely.",
+				aIdentifier.c_str()
+			);
+		}
 	}
 }

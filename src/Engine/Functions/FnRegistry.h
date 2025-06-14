@@ -14,6 +14,9 @@
 #include <string>
 
 #include "FnEntry.h"
+#include "Engine/Logging/LogApi.h"
+
+constexpr const char* CH_FUNCTIONS = "Functions";
 
 ///----------------------------------------------------------------------------------------------------
 /// CFuncRegistry Class
@@ -24,7 +27,7 @@ class CFuncRegistry
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CFuncRegistry();
+	CFuncRegistry(CLogApi* aLogger);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -57,6 +60,8 @@ class CFuncRegistry
 	void Release(std::string& aIdentifier);
 
 	private:
+	CLogApi*                                     Logger;
+
 	std::mutex                                   Mutex;
 	std::unordered_map<std::string, FuncEntry_t> Registry;
 };

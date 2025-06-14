@@ -9,16 +9,15 @@
 #ifndef FNENTRY_H
 #define FNENTRY_H
 
-#include <vector>
+#include <cstdint>
 
 ///----------------------------------------------------------------------------------------------------
 /// FuncEntry_t Struct
 ///----------------------------------------------------------------------------------------------------
 struct FuncEntry_t
 {
-	int                RefCount;
-	void*              ActiveFunction; /* Quick access to this->Functions.first(). */
-	std::vector<void*> Functions;
+	int32_t RefCount;
+	void*   Function;
 };
 
 #endif
