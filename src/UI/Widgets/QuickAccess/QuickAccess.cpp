@@ -14,13 +14,13 @@
 #include "imgui/imgui_extensions.h"
 #include "imgui/imgui_internal.h"
 
-#include "Consts.h"
-#include "Core/PrefConst.h"
 #include "Core/Context.h"
-#include "resource.h"
-#include "Engine/Settings/Settings.h"
-#include "UI/UIContext.h"
+#include "Core/PrefConst.h"
 #include "Engine/Inputs/InputBinds/IbConst.h"
+#include "Engine/Loader/LdrConst.h"
+#include "Engine/Settings/Settings.h"
+#include "resource.h"
+#include "UI/UIContext.h"
 
 #define GW2_QUICKACCESS_ITEMS 10;
 

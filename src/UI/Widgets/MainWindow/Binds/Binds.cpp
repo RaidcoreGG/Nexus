@@ -13,7 +13,6 @@
 #include "imgui/imgui.h"
 #include "imgui_extensions.h"
 
-#include "Consts.h"
 #include "Core/Context.h"
 #include "Engine/Index/Index.h"
 #include "Engine/Inputs/InputBinds/IbMapping.h"
@@ -76,7 +75,7 @@ void CBindsWindow::RenderContent()
 				for (InputBindCategory_t& cat : this->IBCategories)
 				{
 					if (ImGui::CollapsingHeader(
-						cat.Name != NULLSTR
+						cat.Name != "(null)"
 						? cat.Name.c_str()
 						: langApi->Translate("((000088))"),
 						ImGuiTreeNodeFlags_DefaultOpen))

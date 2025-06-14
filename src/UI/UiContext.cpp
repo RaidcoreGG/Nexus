@@ -19,7 +19,6 @@
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_internal.h"
 
-#include "Consts.h"
 #include "Core/Context.h"
 #include "Core/PrefConst.h"
 #include "Engine/Index/Index.h"
@@ -292,10 +291,10 @@ CUiContext::CUiContext(RenderContext_t* aRenderContext, CLogApi* aLogger, CTextu
 
 	/* register InputBinds */
 	this->InputBindApi->Register(KB_MENU,          EIbHandlerType::DownAsync, UIRoot::OnInputBind, "CTRL+O");
-	this->InputBindApi->Register(KB_ADDONS,        EIbHandlerType::DownAsync, UIRoot::OnInputBind, NULLSTR);
-	this->InputBindApi->Register(KB_OPTIONS,       EIbHandlerType::DownAsync, UIRoot::OnInputBind, NULLSTR);
-	this->InputBindApi->Register(KB_LOG,           EIbHandlerType::DownAsync, UIRoot::OnInputBind, NULLSTR);
-	this->InputBindApi->Register(KB_DEBUG,         EIbHandlerType::DownAsync, UIRoot::OnInputBind, NULLSTR);
+	this->InputBindApi->Register(KB_ADDONS,        EIbHandlerType::DownAsync, UIRoot::OnInputBind, "(null)");
+	this->InputBindApi->Register(KB_OPTIONS,       EIbHandlerType::DownAsync, UIRoot::OnInputBind, "(null)");
+	this->InputBindApi->Register(KB_LOG,           EIbHandlerType::DownAsync, UIRoot::OnInputBind, "(null)");
+	this->InputBindApi->Register(KB_DEBUG,         EIbHandlerType::DownAsync, UIRoot::OnInputBind, "(null)");
 	this->InputBindApi->Register(KB_TOGGLEHIDEUI,  EIbHandlerType::DownAsync, UIRoot::OnInputBind, "CTRL+H");
 
 	this->EscapeClose->Register("Nexus", this->MainWindow->GetVisibleStatePtr());

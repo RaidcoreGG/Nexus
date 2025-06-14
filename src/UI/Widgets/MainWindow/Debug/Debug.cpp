@@ -13,7 +13,6 @@
 #include "imgui/imgui.h"
 #include "imgui_extensions.h"
 
-#include "Consts.h"
 #include "Core/Context.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
@@ -40,7 +39,7 @@ CDebugWindow::CDebugWindow()
 
 	/* bind mumble overlay */
 	CContext* ctx = CContext::GetContext();
-	ctx->GetInputBindApi()->Register(KB_MUMBLEOVERLAY, EIbHandlerType::DownAsync, DebugWindow_OnInputBind, NULLSTR);
+	ctx->GetInputBindApi()->Register(KB_MUMBLEOVERLAY, EIbHandlerType::DownAsync, DebugWindow_OnInputBind, "(null)");
 	DebugWindow = this;
 }
 
@@ -396,8 +395,8 @@ void CDebugWindow::TabQuickAccess()
 			{
 				ImGui::TextDisabled("Texture: %p", shortcut.TextureNormal != nullptr ? shortcut.TextureNormal->Resource : nullptr);
 				ImGui::TextDisabled("Texture (Hover): %p", shortcut.TextureHover != nullptr ? shortcut.TextureHover->Resource : nullptr);
-				ImGui::TextDisabled("OnClick (InputBind): %s", shortcut.IBIdentifier.length() != 0 ? shortcut.IBIdentifier.c_str() : NULLSTR);
-				ImGui::TextDisabled("Tooltip: %s", shortcut.TooltipText.length() != 0 ? shortcut.TooltipText.c_str() : NULLSTR);
+				ImGui::TextDisabled("OnClick (InputBind): %s", shortcut.IBIdentifier.length() != 0 ? shortcut.IBIdentifier.c_str() : "(null)");
+				ImGui::TextDisabled("Tooltip: %s", shortcut.TooltipText.length() != 0 ? shortcut.TooltipText.c_str() : "(null)");
 				ImGui::TextDisabled("IsHovering: %s", shortcut.IsHovering ? "true" : "false");
 				if (shortcut.ContextItems.size() > 0)
 				{

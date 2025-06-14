@@ -16,7 +16,7 @@
 
 #include "Core/Context.h"
 #include "Core/PrefConst.h"
-#include "Consts.h"
+#include "LdrConst.h"
 #include "Engine/Index/Index.h"
 
 #include "AddonDefinition.h"
@@ -1200,7 +1200,7 @@ namespace Loader
 	{
 		if (aAddress == nullptr)
 		{
-			return NULLSTR;
+			return "(null)";
 		}
 
 		//const std::lock_guard<std::mutex> lock(Mutex);
@@ -1214,7 +1214,7 @@ namespace Loader
 
 				if (aAddress >= startAddress && aAddress <= endAddress)
 				{
-					return addon->Definitions ? addon->Definitions->Name : NULLSTR;
+					return addon->Definitions ? addon->Definitions->Name : "(null)";
 				}
 			}
 
@@ -1229,7 +1229,7 @@ namespace Loader
 			}
 		}
 
-		return NULLSTR;
+		return "(null)";
 	}
 
 	Addon_t* FindAddonBySig(signed int aSignature)

@@ -11,7 +11,6 @@
 #include <windows.h>
 #include <unordered_map>
 
-#include "Consts.h"
 #include "Util/Inputs.h"
 #include "Util/Strings.h"
 
@@ -19,7 +18,7 @@ InputBind_t IBFromString(std::string aInputBind)
 {
 	InputBind_t ib{};
 
-	if (String::ToLower(aInputBind) == NULLSTR) { return ib; }
+	if (String::ToLower(aInputBind) == "(null)") { return ib; }
 
 	aInputBind = String::ToUpper(aInputBind);
 	std::string delimiter = "+";
@@ -114,15 +113,15 @@ InputBind_t IBFromString(std::string aInputBind)
 
 std::string IBToString(const InputBind_t& aInputBind, bool aPadded)
 {
-	if (aInputBind.Device == EInputDevice::None)                          { return NULLSTR; }
-	if (aInputBind.Device == EInputDevice::Mouse && aInputBind.Code == 0) { return NULLSTR; }
+	if (aInputBind.Device == EInputDevice::None)                          { return "(null)"; }
+	if (aInputBind.Device == EInputDevice::Mouse && aInputBind.Code == 0) { return "(null)"; }
 	if (aInputBind.Device == EInputDevice::Keyboard
 		&& !aInputBind.Code
 		&& !aInputBind.Alt
 		&& !aInputBind.Ctrl
 		&& !aInputBind.Shift)
 	{
-		return NULLSTR;
+		return "(null)";
 	}
 
 	char buff[100]{};

@@ -132,7 +132,7 @@
     <ClInclude Include="src\Engine\Networking\WebRequests\WreClient.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreResponse.h" />
     <ClInclude Include="src\Branch.h" />
-    <ClInclude Include="src\Consts.h" />
+    <ClInclude Include="src\Engine\Loader\LdrConst.h" />
     <ClInclude Include="src\Engine\DataLink\DlApi.h" />
     <ClInclude Include="src\Engine\DataLink\DlEnum.h" />
     <ClInclude Include="src\Engine\DataLink\DlFuncDefs.h" />

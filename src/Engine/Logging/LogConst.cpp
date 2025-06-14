@@ -12,7 +12,6 @@
 #include <iomanip>
 #include <sstream>
 
-#include "Consts.h"
 #include "Util/Strings.h"
 
 std::string StringFrom(ELogLevel aLevel)
@@ -28,7 +27,7 @@ std::string StringFrom(ELogLevel aLevel)
 		case ELogLevel::TRACE:    { return "[TRACE]";    }
 	}
 
-	return NULLSTR;
+	return "(null)";
 }
 
 std::string TimestampStr(const LogMsg_t* aLogMessage, bool aIncludeDate, bool aMsPrecision)
