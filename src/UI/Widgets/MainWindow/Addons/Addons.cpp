@@ -10,17 +10,16 @@
 
 #include <shellapi.h>
 
-#include "imgui_extensions.h"
 #include "imgui/imgui.h"
+#include "imgui_extensions.h"
 
 #include "Core/Context.h"
-#include "resource.h"
-#include "Util/Strings.h"
-
-#include "Engine/Index/Index.h"
+#include "Core/Index/Index.h"
 #include "Engine/Loader/ArcDPS.h"
 #include "Engine/Loader/Library.h"
 #include "Engine/Loader/Loader.h"
+#include "resource.h"
+#include "Util/Strings.h"
 
 constexpr ImGuiWindowFlags ModalFlags = ImGuiWindowFlags_AlwaysAutoResize |
 										ImGuiWindowFlags_NoResize |

@@ -16,18 +16,19 @@
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
-#include "Engine/Index/Index.h"
 #include "Util/Strings.h"
 #include "Util/Inputs.h"
 #include "IbConst.h"
 
-CInputBindApi::CInputBindApi(CEventApi* aEventApi, CLogApi* aLogger)
+CInputBindApi::CInputBindApi(CEventApi* aEventApi, CLogApi* aLogger, std::filesystem::path aConfigPath)
 {
 	assert(aEventApi);
 	assert(aLogger);
 
 	this->EventApi = aEventApi;
 	this->Logger = aLogger;
+
+	this->ConfigPath = aConfigPath;
 
 	this->Load();
 }
@@ -504,11 +505,11 @@ void CInputBindApi::LoadSafe()
 
 void CInputBindApi::Load()
 {
-	if (!std::filesystem::exists(Index(EPath::InputBinds))) { return; }
+	if (!std::filesystem::exists(this->ConfigPath)) { return; }
 
 	try
 	{
-		std::ifstream file(Index(EPath::InputBinds));
+		std::ifstream file(this->ConfigPath);
 
 		json inputBinds = json::parse(file);
 
@@ -608,11 +609,17 @@ void CInputBindApi::Save()
 		bindings.push_back(binding);
 	}
 
-	std::ofstream file(Index(EPath::InputBinds));
+	std::ofstream file(this->ConfigPath);
 
-	file << bindings.dump(1, '\t') << std::endl;
-
-	file.close();
+	if (file.is_open())
+	{
+		file << bindings.dump(1, '\t') << std::endl;
+		file.close();
+	}
+	else
+	{
+		this->Logger->Warning(CH_INPUTBINDS, "Failed to open config file for writing: %s", this->ConfigPath.string().c_str());
+	}
 }
 
 bool CInputBindApi::Press(const InputBind_t& aInputBind)

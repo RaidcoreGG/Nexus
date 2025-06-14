@@ -10,7 +10,7 @@
 #define GBAPI_H
 
 #include <filesystem>
-#include <map>
+#include <unordered_map>
 #include <mutex>
 
 #include "GbEnum.h"
@@ -49,7 +49,7 @@ class CGameBindsApi
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CGameBindsApi(CRawInputApi* aRawInputApi, CLogApi* aLogger, CEventApi* aEventApi);
+	CGameBindsApi(CRawInputApi* aRawInputApi, CLogApi* aLogger, CEventApi* aEventApi, std::filesystem::path aConfigPath);
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
@@ -124,11 +124,13 @@ class CGameBindsApi
 	void Load(std::filesystem::path aPath);
 
 	private:
-	CRawInputApi*                                  RawInputApi = nullptr;
-	CLogApi*                                       Logger      = nullptr;
-	CEventApi*                                     EventApi    = nullptr;
+	CRawInputApi*                                    RawInputApi = nullptr;
+	CLogApi*                                         Logger      = nullptr;
+	CEventApi*                                       EventApi    = nullptr;
 
-	mutable std::mutex                             Mutex;
+	std::filesystem::path                            ConfigPath;
+
+	mutable std::mutex                               Mutex;
 	std::unordered_map<EGameBinds, MultiInputBind_t> Registry;
 
 	///----------------------------------------------------------------------------------------------------

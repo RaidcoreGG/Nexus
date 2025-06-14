@@ -9,17 +9,18 @@
 #ifndef IBAPI_H
 #define IBAPI_H
 
+#include <filesystem>
 #include <map>
 #include <mutex>
 #include <string>
 #include <windows.h>
 
 #include "Engine/Events/EvtApi.h"
-#include "IbFuncDefs.h"
-#include "IbBindV2.h"
-#include "IbMapping.h"
-#include "IbCapture.h"
 #include "Engine/Logging/LogApi.h"
+#include "IbBindV2.h"
+#include "IbCapture.h"
+#include "IbFuncDefs.h"
+#include "IbMapping.h"
 
 constexpr const char* CH_INPUTBINDS = "InputBinds";
 
@@ -32,7 +33,7 @@ class CInputBindApi : public CInputBindCapture
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CInputBindApi(CEventApi* aEventApi, CLogApi* aLogger);
+	CInputBindApi(CEventApi* aEventApi, CLogApi* aLogger, std::filesystem::path aConfigPath);
 
 	///----------------------------------------------------------------------------------------------------
 	/// WndProc:
@@ -119,6 +120,8 @@ class CInputBindApi : public CInputBindCapture
 	private:
 	CEventApi*                         EventApi = nullptr;
 	CLogApi*                           Logger   = nullptr;
+
+	std::filesystem::path              ConfigPath;
 
 	mutable std::mutex                 Mutex;
 	std::map<std::string, IbMapping_t> Registry;

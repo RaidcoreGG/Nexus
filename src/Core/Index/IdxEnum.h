@@ -29,6 +29,7 @@ enum class EPath : uint32_t
 	DIR_FONTS,                /* <GW2>/addons/Nexus/Fonts                        */
 	DIR_LOCALES,              /* <GW2>/addons/Nexus/Locales                      */
 	DIR_STYLES,               /* <GW2>/addons/Nexus/Styles                       */
+	DIR_TEXTURES,             /* <GW2>/addons/Nexus/Textures                     */
 
 	DIR_DOCUMENTS,            /* <DOCUMENTS>                                     */
 	DIR_DOCUMENTS_GW2,        /* <DOCUMENTS>/Guild Wars 2                        */

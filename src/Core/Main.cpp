@@ -8,14 +8,14 @@
 
 #include "Main.h"
 
-#include <thread>
 #include <string>
+#include <thread>
 
 #include "minhook/mh_hook.h"
 
 #include "Core/Context.h"
 #include "Core/Hooks/Hooks.h"
-#include "Engine/Index/Index.h"
+#include "Core/Index/Index.h"
 #include "Engine/Loader/Loader.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Logging/LogConsole.h"

@@ -9,10 +9,10 @@
 #ifndef TEXTURELOADER_H
 #define TEXTURELOADER_H
 
+#include <filesystem>
 #include <map>
 #include <mutex>
 #include <string>
-#include <vector>
 #include <Windows.h>
 
 #include "Engine/Logging/LogApi.h"
@@ -32,7 +32,7 @@ class CTextureLoader
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CTextureLoader(CLogApi* aLogger, RenderContext_t* aRenderCtx);
+	CTextureLoader(CLogApi* aLogger, RenderContext_t* aRenderCtx, std::filesystem::path aOverridesDirectory);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -120,6 +120,8 @@ class CTextureLoader
 	private:
 	CLogApi*                               Logger        = nullptr;
 	RenderContext_t*                       RenderContext = nullptr;
+
+	std::filesystem::path                  OverridesDirectory;
 
 	mutable std::mutex                     Mutex;
 	std::map<std::string, Texture_t*>      Registry;

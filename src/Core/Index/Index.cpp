@@ -45,6 +45,7 @@ void CreateIndex(HMODULE aModule)
 	s_Paths[(int)EPath::DIR_FONTS]             = s_Paths[(int)EPath::DIR_NEXUS] / "Fonts";
 	s_Paths[(int)EPath::DIR_LOCALES]           = s_Paths[(int)EPath::DIR_NEXUS] / "Locales";
 	s_Paths[(int)EPath::DIR_STYLES]            = s_Paths[(int)EPath::DIR_NEXUS] / "Styles";
+	s_Paths[(int)EPath::DIR_TEXTURES]          = s_Paths[(int)EPath::DIR_NEXUS] / "Textures";
 
 	/* Get document based directories. */
 	s_Paths[(int)EPath::DIR_DOCUMENTS_GW2]     = s_Paths[(int)EPath::DIR_DOCUMENTS] / "Guild Wars 2";
@@ -58,6 +59,7 @@ void CreateIndex(HMODULE aModule)
 	std::filesystem::create_directories(s_Paths[(int)EPath::DIR_FONTS]);
 	std::filesystem::create_directories(s_Paths[(int)EPath::DIR_LOCALES]);
 	std::filesystem::create_directories(s_Paths[(int)EPath::DIR_STYLES]);
+	std::filesystem::create_directories(s_Paths[(int)EPath::DIR_TEXTURES]);
 
 	/* Get files. */
 	s_Paths[(int)EPath::Log]                      = s_Paths[(int)EPath::DIR_NEXUS] / "Nexus.log";

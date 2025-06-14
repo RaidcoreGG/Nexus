@@ -14,7 +14,7 @@
     <ClCompile Include="src\Core\Context.cpp" />
     <ClCompile Include="src\Core\Hooks\Hooks.cpp" />
     <ClCompile Include="src\Engine\Functions\FnRegistry.cpp" />
-    <ClCompile Include="src\Engine\Index\Index.cpp" />
+    <ClCompile Include="src\Core\Index\Index.cpp" />
     <ClCompile Include="src\Engine\Networking\WebRequests\WreCache.cpp" />
     <ClCompile Include="src\Engine\Networking\WebRequests\WreConst.cpp" />
     <ClCompile Include="src\GW2\Inputs\GameBinds\GbApi.cpp" />
@@ -106,8 +106,8 @@
     <ClInclude Include="src\Engine\Events\EvtData.h" />
     <ClInclude Include="src\Engine\Functions\FnEntry.h" />
     <ClInclude Include="src\Engine\Functions\FnRegistry.h" />
-    <ClInclude Include="src\Engine\Index\IdxEnum.h" />
-    <ClInclude Include="src\Engine\Index\Index.h" />
+    <ClInclude Include="src\Core\Index\IdxEnum.h" />
+    <ClInclude Include="src\Core\Index\Index.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreCache.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreConst.h" />
     <ClInclude Include="src\GW2\Inputs\MouseResetFix.h" />
@@ -323,7 +323,7 @@
     <ClInclude Include="src\thirdparty\minhook\mh_hook.h" />
     <ClInclude Include="src\thirdparty\minhook\mh_trampoline.h" />
     <ClInclude Include="src\GW2\Mumble\MblReader.h" />
-    <ClInclude Include="src\Engine\Index\IdxFuncDefs.h" />
+    <ClInclude Include="src\Core\Index\IdxFuncDefs.h" />
     <ClInclude Include="src\Core\Proxy\Proxy.h" />
     <ClInclude Include="src\resource.h" />
     <ClInclude Include="src\Core\Preferences\PrefContext.h" />

@@ -14,18 +14,18 @@
 
 #include <d3d11.h>
 #include <filesystem>
-#include <vector>
 
-#include "Engine/Index/Index.h"
 #include "Util/Time.h"
 
-CTextureLoader::CTextureLoader(CLogApi* aLogger, RenderContext_t* aRenderCtx)
+CTextureLoader::CTextureLoader(CLogApi* aLogger, RenderContext_t* aRenderCtx, std::filesystem::path aOverridesDirectory)
 {
 	assert(aLogger);
 	assert(aRenderCtx);
 
 	this->Logger        = aLogger;
 	this->RenderContext = aRenderCtx;
+
+	this->OverridesDirectory = aOverridesDirectory;
 }
 
 CTextureLoader::~CTextureLoader()
@@ -439,7 +439,9 @@ void CTextureLoader::ShadowTexture(const char* aIdentifier)
 
 bool CTextureLoader::OverrideTexture(const char* aIdentifier, TEXTURES_RECEIVECALLBACK aCallback)
 {
-	std::filesystem::path overridepath = Index(EPath::DIR_NEXUS) / "Textures" / (aIdentifier + std::string{ ".png" });
+	if (this->OverridesDirectory.empty()) { return false; }
+
+	std::filesystem::path overridepath = this->OverridesDirectory / (aIdentifier + std::string{ ".png" });
 
 	if (std::filesystem::exists(overridepath))
 	{

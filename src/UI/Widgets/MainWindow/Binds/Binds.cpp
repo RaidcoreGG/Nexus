@@ -14,10 +14,10 @@
 #include "imgui_extensions.h"
 
 #include "Core/Context.h"
-#include "Engine/Index/Index.h"
+#include "Core/Index/Index.h"
 #include "Engine/Inputs/InputBinds/IbMapping.h"
-#include "resource.h"
 #include "GW2/Inputs/GameBinds/GbConst.h"
+#include "resource.h"
 #include "Util/Time.h"
 
 CBindsWindow::CBindsWindow()

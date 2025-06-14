@@ -11,8 +11,8 @@
 #include <filesystem>
 #include <fstream>
 #include <mutex>
-#include <vector>
 #include <shellscalingapi.h>
+#include <vector>
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_dx11.h"
@@ -20,19 +20,19 @@
 #include "imgui/imgui_internal.h"
 
 #include "Core/Context.h"
+#include "Core/Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
-#include "Engine/Index/Index.h"
-#include "resource.h"
-#include "GW2/Mumble/MblReader.h"
-#include "GW2/Mumble/MblConst.h"
 #include "Core/Preferences/PrefContext.h"
+#include "Engine/Inputs/InputBinds/IbConst.h"
+#include "GW2/Inputs/GameBinds/GbConst.h"
+#include "GW2/Mumble/MblConst.h"
+#include "GW2/Mumble/MblReader.h"
+#include "resource.h"
 #include "Util/Base64.h"
 #include "Util/Inputs.h"
 #include "Util/Resources.h"
-#include "Util/Time.h"
 #include "Util/Strings.h"
-#include "GW2/Inputs/GameBinds/GbConst.h"
-#include "Engine/Inputs/InputBinds/IbConst.h"
+#include "Util/Time.h"
 
 #include "UI/Widgets/MainWindow/About/About.h"
 #include "UI/Widgets/MainWindow/Addons/Addons.h"

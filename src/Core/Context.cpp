@@ -11,7 +11,7 @@
 #include <Psapi.h>
 
 #include "Branch.h"
-#include "Engine/Index/Index.h"
+#include "Core/Index/Index.h"
 #include "Version.h"
 
 CContext* CContext::GetContext()
@@ -85,7 +85,8 @@ CTextureLoader* CContext::GetTextureService()
 {
 	static CTextureLoader s_TextureApi = CTextureLoader(
 		this->GetLogger(),
-		this->GetRendererCtx()
+		this->GetRendererCtx(),
+		Index(EPath::DIR_TEXTURES)
 	);
 	return &s_TextureApi;
 }
@@ -116,7 +117,8 @@ CInputBindApi* CContext::GetInputBindApi()
 {
 	static CInputBindApi s_InputBindApi = CInputBindApi(
 		this->GetEventApi(),
-		this->GetLogger()
+		this->GetLogger(),
+		Index(EPath::InputBinds)
 	);
 	return &s_InputBindApi;
 }
@@ -126,7 +128,8 @@ CGameBindsApi* CContext::GetGameBindsApi()
 	static CGameBindsApi s_GameBindsApi = CGameBindsApi(
 		this->GetRawInputApi(),
 		this->GetLogger(),
-		this->GetEventApi()
+		this->GetEventApi(),
+		Index(EPath::GameBinds)
 	);
 	return &s_GameBindsApi;
 }

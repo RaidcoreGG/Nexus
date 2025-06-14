@@ -14,8 +14,8 @@
 
 #include "Core/Context.h"
 #include "Core/Hooks/Hooks.h"
+#include "Core/Index/Index.h"
 #include "Core/Main.h"
-#include "Engine/Index/Index.h"
 #include "PxyEnum.h"
 #include "PxyFuncDefs.h"
 #include "Util/DLL.h"

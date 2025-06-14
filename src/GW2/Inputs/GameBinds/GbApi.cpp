@@ -15,7 +15,6 @@ using json = nlohmann::json;
 #include "pugixml/pugixml.hpp"
 
 #include "Core/Context.h"
-#include "Engine/Index/Index.h"
 #include "Util/Inputs.h"
 #include "GbConst.h"
 
@@ -96,7 +95,7 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 	uictx->Invalidate();
 }
 
-CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogApi* aLogger, CEventApi* aEventApi)
+CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogApi* aLogger, CEventApi* aEventApi, std::filesystem::path aConfigPath)
 {
 	assert(aRawInputApi);
 	assert(aLogger);
@@ -106,7 +105,9 @@ CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogApi* aLogger, CEven
 	this->Logger = aLogger;
 	this->EventApi = aEventApi;
 
-	this->Load(Index(EPath::GameBinds));
+	this->ConfigPath = aConfigPath;
+
+	this->Load(this->ConfigPath);
 	this->AddDefaultBinds();
 
 	this->EventApi->Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
@@ -556,7 +557,7 @@ std::unordered_map<EGameBinds, MultiInputBind_t> CGameBindsApi::GetRegistry() co
 
 void CGameBindsApi::Load(std::filesystem::path aPath)
 {
-	if (aPath.empty()) { aPath = Index(EPath::GameBinds); }
+	if (aPath.empty()) { aPath = this->ConfigPath; }
 	if (!std::filesystem::exists(aPath)) { return; }
 
 	pugi::xml_document doc;
@@ -1237,7 +1238,7 @@ void CGameBindsApi::Save()
 		}
 	}
 
-	if (!doc.save_file(Index(EPath::GameBinds).string().c_str(), "\t"))
+	if (!doc.save_file(this->ConfigPath.string().c_str(), "\t"))
 	{
 		this->Logger->Warning(CH_GAMEBINDS, "GameBinds.xml could not be saved.");
 	}

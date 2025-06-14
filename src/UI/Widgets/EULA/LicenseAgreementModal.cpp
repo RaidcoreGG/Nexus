@@ -9,13 +9,14 @@
 #include "LicenseAgreementModal.h"
 
 #include <windows.h>
+
 #include <shellapi.h>
 
 #include "imgui.h"
 #include "imgui_extensions.h"
 
-#include "Engine/Index/Index.h"
 #include "Core/Context.h"
+#include "Core/Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
 
 CLicenseAgreementModal::CLicenseAgreementModal()

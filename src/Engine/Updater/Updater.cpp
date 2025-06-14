@@ -10,8 +10,8 @@
 
 #include <thread>
 
-#include "Engine/Index/Index.h"
 #include "Core/Context.h"
+#include "Core/Index/Index.h"
 
 #include "Util/MD5.h"
 #include "Util/Paths.h"
