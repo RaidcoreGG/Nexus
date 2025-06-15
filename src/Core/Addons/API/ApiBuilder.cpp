@@ -1,21 +1,21 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  ApiFunctionMapper.cpp
+/// Name         :  ApiBuilder.cpp
 /// Description  :  Contains the logic to map engine functions to the exposed API definitions.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "ApiFunctionMapper.h"
+#include "ApiBuilder.h"
 
 #include <assert.h>
 
-#include "AdoApiV1.h"
-#include "AdoApiV2.h"
-#include "AdoApiV3.h"
-#include "AdoApiV4.h"
-#include "AdoApiV5.h"
-#include "AdoApiV6.h"
+#include "ApiV1.h"
+#include "ApiV2.h"
+#include "ApiV3.h"
+#include "ApiV4.h"
+#include "ApiV5.h"
+#include "ApiV6.h"
 #include "Core/Context.h"
 #include "Core/Index/Index.h"
 #include "Engine/DataLink/DlApi.h"
@@ -558,7 +558,7 @@ namespace ADDONAPI
 		}
 	}
 
-	AddonAPI_t* Get(int aVersion)
+	AddonAPI_t* Get(int aVersion, bool aSetImGuiContext)
 	{
 		if (!s_IsInitialized)
 		{
@@ -585,29 +585,17 @@ namespace ADDONAPI
 			s_IsInitialized = true;
 		}
 
-		assert(s_DataLinkApi);
-
-		std::string dlName = "ADDONAPI_" + std::to_string(aVersion);
-		AddonAPI_t* defs = (AddonAPI_t*)s_DataLinkApi->GetResource(dlName.c_str());
-
-		// API defs with that version already exist, just return them
-		if (defs)
-		{
-			return defs;
-		}
-
-		// create the requested version, add it to the map and return it
+		/* Create the requested version/configuration and return it. */
 		switch (aVersion)
 		{
 			case 1:
 			{
-				AddonAPI1_t* api = (AddonAPI1_t*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
-				assert(api);
-
+				AddonAPI1_t* api = new AddonAPI1_t();
+				
 				api->SwapChain = s_RenderCtx->SwapChain;
-				api->ImguiContext = ImGui::GetCurrentContext();
-				api->ImguiMalloc = ImGui::MemAlloc;
-				api->ImguiFree = ImGui::MemFree;
+				api->ImguiContext = aSetImGuiContext ? ImGui::GetCurrentContext() : nullptr;
+				api->ImguiMalloc = aSetImGuiContext ? ImGui::MemAlloc : nullptr;
+				api->ImguiFree = aSetImGuiContext ? ImGui::MemFree : nullptr;
 				api->RegisterRender = UIRoot::GUI::Register;
 				api->DeregisterRender = UIRoot::GUI::Deregister;
 
@@ -646,18 +634,16 @@ namespace ADDONAPI
 				api->AddSimpleShortcut = UIRoot::QuickAccess::AddContextItem;
 				api->RemoveSimpleShortcut = UIRoot::QuickAccess::RemoveContextItem;
 
-				defs = api;
-				break;
+				return api;
 			}
 			case 2:
 			{
-				AddonAPI2_t* api = (AddonAPI2_t*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
-				assert(api);
+				AddonAPI2_t* api = new AddonAPI2_t();
 
 				api->SwapChain = s_RenderCtx->SwapChain;
-				api->ImguiContext = ImGui::GetCurrentContext();
-				api->ImguiMalloc = ImGui::MemAlloc;
-				api->ImguiFree = ImGui::MemFree;
+				api->ImguiContext = aSetImGuiContext ? ImGui::GetCurrentContext() : nullptr;
+				api->ImguiMalloc = aSetImGuiContext ? ImGui::MemAlloc : nullptr;
+				api->ImguiFree = aSetImGuiContext ? ImGui::MemFree : nullptr;
 				api->RegisterRender = UIRoot::GUI::Register;
 				api->DeregisterRender = UIRoot::GUI::Deregister;
 
@@ -707,18 +693,16 @@ namespace ADDONAPI
 				api->Translate = Localization::Translate;
 				api->TranslateTo = Localization::TranslateTo;
 
-				defs = api;
-				break;
+				return api;
 			}
 			case 3:
 			{
-				AddonAPI3_t* api = (AddonAPI3_t*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
-				assert(api);
+				AddonAPI3_t* api = new AddonAPI3_t();
 
 				api->SwapChain = s_RenderCtx->SwapChain;
-				api->ImguiContext = ImGui::GetCurrentContext();
-				api->ImguiMalloc = ImGui::MemAlloc;
-				api->ImguiFree = ImGui::MemFree;
+				api->ImguiContext = aSetImGuiContext ? ImGui::GetCurrentContext() : nullptr;
+				api->ImguiMalloc = aSetImGuiContext ? ImGui::MemAlloc : nullptr;
+				api->ImguiFree = aSetImGuiContext ? ImGui::MemFree : nullptr;
 				api->RegisterRender = UIRoot::GUI::Register;
 				api->DeregisterRender = UIRoot::GUI::Deregister;
 
@@ -772,18 +756,16 @@ namespace ADDONAPI
 				api->Translate = Localization::Translate;
 				api->TranslateTo = Localization::TranslateTo;
 
-				defs = api;
-				break;
+				return api;
 			}
 			case 4:
 			{
-				AddonAPI4_t* api = (AddonAPI4_t*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
-				assert(api);
+				AddonAPI4_t* api = new AddonAPI4_t();
 
 				api->SwapChain = s_RenderCtx->SwapChain;
-				api->ImguiContext = ImGui::GetCurrentContext();
-				api->ImguiMalloc = ImGui::MemAlloc;
-				api->ImguiFree = ImGui::MemFree;
+				api->ImguiContext = aSetImGuiContext ? ImGui::GetCurrentContext() : nullptr;
+				api->ImguiMalloc = aSetImGuiContext ? ImGui::MemAlloc : nullptr;
+				api->ImguiFree = aSetImGuiContext ? ImGui::MemFree : nullptr;
 				api->RegisterRender = UIRoot::GUI::Register;
 				api->DeregisterRender = UIRoot::GUI::Deregister;
 
@@ -845,18 +827,16 @@ namespace ADDONAPI
 				api->AddFontFromResource = UIRoot::Fonts::AddFontFromResource;
 				api->AddFontFromMemory = UIRoot::Fonts::AddFontFromMemory;
 
-				defs = api;
-				break;
+				return api;
 			}
 			case 5:
 			{
-				AddonAPI5_t* api = (AddonAPI5_t*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
-				assert(api);
+				AddonAPI5_t* api = new AddonAPI5_t();
 
 				api->SwapChain = s_RenderCtx->SwapChain;
-				api->ImguiContext = ImGui::GetCurrentContext();
-				api->ImguiMalloc = ImGui::MemAlloc;
-				api->ImguiFree = ImGui::MemFree;
+				api->ImguiContext = aSetImGuiContext ? ImGui::GetCurrentContext() : nullptr;
+				api->ImguiMalloc = aSetImGuiContext ? ImGui::MemAlloc : nullptr;
+				api->ImguiFree = aSetImGuiContext ? ImGui::MemFree : nullptr;
 				api->RegisterRender = UIRoot::GUI::Register;
 				api->DeregisterRender = UIRoot::GUI::Deregister;
 
@@ -920,18 +900,16 @@ namespace ADDONAPI
 				api->AddFontFromResource = UIRoot::Fonts::AddFontFromResource;
 				api->AddFontFromMemory = UIRoot::Fonts::AddFontFromMemory;
 
-				defs = api;
-				break;
+				return api;
 			}
 			case 6:
 			{
-				AddonAPI6_t* api = (AddonAPI6_t*)s_DataLinkApi->ShareResource(dlName.c_str(), GetSize(aVersion));
-				assert(api);
+				AddonAPI6_t* api = new AddonAPI6_t();
 
 				api->SwapChain = s_RenderCtx->SwapChain;
-				api->ImguiContext = ImGui::GetCurrentContext();
-				api->ImguiMalloc = ImGui::MemAlloc;
-				api->ImguiFree = ImGui::MemFree;
+				api->ImguiContext = aSetImGuiContext ? ImGui::GetCurrentContext() : nullptr;
+				api->ImguiMalloc = aSetImGuiContext ? ImGui::MemAlloc : nullptr;
+				api->ImguiFree = aSetImGuiContext ? ImGui::MemFree : nullptr;
 
 				api->Renderer.Register = UIRoot::GUI::Register;
 				api->Renderer.Deregister = UIRoot::GUI::Deregister;
@@ -1006,12 +984,11 @@ namespace ADDONAPI
 				api->Fonts.AddFromMemory = UIRoot::Fonts::AddFontFromMemory;
 				api->Fonts.Resize = UIRoot::Fonts::ResizeFont;
 
-				defs = api;
-				break;
+				return api;
 			}
 		}
 
-		return defs;
+		return nullptr;
 	}
 
 	size_t GetSize(int aVersion)

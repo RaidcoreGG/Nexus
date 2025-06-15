@@ -1,15 +1,15 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  AdoApiV4.h
-/// Description  :  Addon API Revision 4.
+/// Name         :  AdoApiV5.h
+/// Description  :  Addon API Revision 5.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef ADOAPIV4_H
-#define ADOAPIV4_H
+#ifndef ADOAPIV5_H
+#define ADOAPIV5_H
 
-#include "AdoApiBase.h"
+#include "ApiBase.h"
 
 #include <dxgi.h>
 
@@ -31,9 +31,9 @@
 #include "UI/Widgets/QuickAccess/QaFuncDefs.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// AddonAPI4_t Struct
+/// AddonAPI5_t Struct
 ///----------------------------------------------------------------------------------------------------
-struct AddonAPI4_t : AddonAPI_t
+struct AddonAPI5_t : AddonAPI_t
 {
 	/* Renderer */
 	IDXGISwapChain*                   SwapChain;
@@ -77,6 +77,7 @@ struct AddonAPI4_t : AddonAPI_t
 	WNDPROC_SENDTOGAME                SendWndProcToGameOnly;
 
 	/* InputBinds */
+	INPUTBINDS_INVOKE                 InvokeInputBind;
 	INPUTBINDS_REGISTERWITHSTRING2    RegisterInputBindWithString;
 	INPUTBINDS_REGISTERWITHSTRUCT2    RegisterInputBindWithStruct;
 	INPUTBINDS_DEREGISTER             DeregisterInputBind;
@@ -106,6 +107,7 @@ struct AddonAPI4_t : AddonAPI_t
 	/* Localization */
 	LOCALIZATION_TRANSLATE            Translate;
 	LOCALIZATION_TRANSLATETO          TranslateTo;
+	LOCALIZATION_SET                  SetTranslatedString;
 
 	/* Fonts */
 	FONTS_GETRELEASE                  GetFont;

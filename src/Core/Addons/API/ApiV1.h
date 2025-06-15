@@ -9,7 +9,7 @@
 #ifndef ADOAPIV1_H
 #define ADOAPIV1_H
 
-#include "AdoApiBase.h"
+#include "ApiBase.h"
 
 #include <dxgi.h>
 
