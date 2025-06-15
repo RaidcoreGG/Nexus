@@ -10,7 +10,7 @@
 #define LDRFUNCDEFS_H
 
 #include "AddonDefinition.h"
-#include "API/AddonAPI.h"
+#include "Addons/AdoApiBase.h"
 
 struct AddonDef_t;
 

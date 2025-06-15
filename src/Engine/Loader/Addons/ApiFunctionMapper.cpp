@@ -10,6 +10,12 @@
 
 #include <assert.h>
 
+#include "AdoApiV1.h"
+#include "AdoApiV2.h"
+#include "AdoApiV3.h"
+#include "AdoApiV4.h"
+#include "AdoApiV5.h"
+#include "AdoApiV6.h"
 #include "Core/Context.h"
 #include "Core/Index/Index.h"
 #include "Engine/DataLink/DlApi.h"

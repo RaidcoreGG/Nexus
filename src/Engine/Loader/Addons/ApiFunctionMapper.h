@@ -11,13 +11,13 @@
 
 #include <Windows.h>
 
-#include "AddonAPI.h"
+#include "AdoApiBase.h"
 #include "Engine/Events/EvtFuncDefs.h"
-#include "GW2/Inputs/GameBinds/GbEnum.h"
 #include "Engine/Inputs/InputBinds/IbFuncDefs.h"
 #include "Engine/Inputs/RawInput/RiFuncDefs.h"
 #include "Engine/Logging/LogEnum.h"
 #include "Engine/Textures/TxFuncDefs.h"
+#include "GW2/Inputs/GameBinds/GbEnum.h"
 #include "UI/FuncDefs.h"
 #include "UI/Services/Fonts/FuncDefs.h"
 

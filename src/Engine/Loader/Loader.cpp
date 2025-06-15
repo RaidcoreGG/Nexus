@@ -23,13 +23,13 @@ using json = nlohmann::json;
 #include "Core/Preferences/PrefConst.h"
 #include "LdrConst.h"
 #include "GW2/Mumble/MblReader.h"
-#include "API/AddonAPI.h"
+#include "Addons/AdoApiBase.h"
 #include "Core/Index/Index.h"
 #include "Core/Context.h"
 #include "LdrFuncDefs.h"
 #include "ArcDPS.h"
 #include "Library.h"
-#include "API/ApiFunctionMapper.h"
+#include "Addons/ApiFunctionMapper.h"
 
 #define LOADER_WAITTIME_MS 100
 #define EXT_DLL ".dll"
