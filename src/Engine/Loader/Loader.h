@@ -18,14 +18,15 @@
 #include <unordered_map>
 #include <vector>
 
+#include "thirdparty/mumble/Mumble.h"
+
 #include "Addon.h"
-#include "LdrEnum.h"
+#include "Core/NexusLink.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Updater/Updater.h"
-#include "NexusLinkData.h"
-#include "thirdparty/mumble/Mumble.h"
+#include "LdrEnum.h"
 #include "UI/Services/Localization/LoclApi.h"
 #include "UI/Widgets/Alerts/Alerts.h"
 

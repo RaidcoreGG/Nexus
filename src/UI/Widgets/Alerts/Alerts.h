@@ -13,11 +13,11 @@
 #include <string>
 #include <vector>
 
-#include "Engine/Loader/NexusLinkData.h"
+#include "AlEnum.h"
+#include "AlMessage.h"
+#include "Core/NexusLink.h"
 #include "Engine/DataLink/DlApi.h"
 #include "UI/Controls/CtlWindow.h"
-#include "AlMessage.h"
-#include "AlEnum.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// CAlerts Class

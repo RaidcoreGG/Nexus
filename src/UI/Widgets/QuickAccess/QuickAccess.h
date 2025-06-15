@@ -15,17 +15,17 @@
 
 #include "imgui/imgui.h"
 
-#include "QaEnum.h"
-#include "Engine/Inputs/InputBinds/IbApi.h"
-#include "Engine/Loader/NexusLinkData.h"
+#include "Core/NexusLink.h"
 #include "Engine/DataLink/DlApi.h"
-#include "UI/Services/Localization/LoclApi.h"
+#include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Logging/LogApi.h"
-#include "GW2/Mumble/MblReader.h"
 #include "Engine/Textures/TxLoader.h"
+#include "GW2/Mumble/MblReader.h"
+#include "QaEnum.h"
 #include "QaShortcut.h"
 #include "UI/Controls/CtlWindow.h"
 #include "UI/FuncDefs.h"
+#include "UI/Services/Localization/LoclApi.h"
 
 constexpr const char* CH_QUICKACCESS = "Quick Access";
 constexpr const char* QA_MENU        = "0_QA_MENU";

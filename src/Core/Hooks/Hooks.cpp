@@ -17,7 +17,7 @@
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
 #include "Engine/Loader/Loader.h"
-#include "Engine/Loader/NexusLinkData.h"
+#include "Core/NexusLink.h"
 #include "Engine/Renderer/RdrContext.h"
 #include "Engine/Textures/TxLoader.h"
 #include "GW2/Inputs/MouseResetFix.h"

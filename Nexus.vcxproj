@@ -170,7 +170,7 @@
     <ClInclude Include="src\Engine\Loader\Library.h" />
     <ClInclude Include="src\Engine\Loader\LibraryAddon.h" />
     <ClInclude Include="src\Engine\Loader\Loader.h" />
-    <ClInclude Include="src\Engine\Loader\NexusLinkData.h" />
+    <ClInclude Include="src\Core\NexusLink.h" />
     <ClInclude Include="src\Engine\Logging\LogFuncDefs.h" />
     <ClInclude Include="src\Core\Main.h" />
     <ClInclude Include="src\GW2\Multibox\Multibox.h" />
