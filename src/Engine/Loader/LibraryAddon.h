@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "EUpdateProvider.h"
+#include "LdrEnum.h"
 
 struct LibraryAddon_t
 {

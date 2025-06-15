@@ -9,6 +9,8 @@
 #ifndef LOADER_H
 #define LOADER_H
 
+#include <windows.h>
+
 #include <condition_variable>
 #include <filesystem>
 #include <mutex>
@@ -17,7 +19,7 @@
 #include <vector>
 
 #include "Addon.h"
-#include "ELoaderAction.h"
+#include "LdrEnum.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Logging/LogApi.h"

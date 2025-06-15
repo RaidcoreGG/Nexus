@@ -1,13 +1,9 @@
 #ifndef ADDONDEF_H
 #define ADDONDEF_H
 
-#include "API/AddonAPI.h"
-#include "EAddonFlags.h"
-#include "EUpdateProvider.h"
 #include "AddonVersion.h"
-
-typedef void (*ADDON_LOAD)(AddonAPI_t* aAPI);
-typedef void (*ADDON_UNLOAD)();
+#include "LdrEnum.h"
+#include "LdrFuncDefs.h"
 
 struct AddonDef_t
 {
@@ -15,7 +11,7 @@ struct AddonDef_t
 	signed int      Signature;      /* Raidcore Addon_t ID, set to random unqiue negative integer if not on Raidcore */
 	signed int      APIVersion;     /* Determines which AddonAPI_t struct revision the Loader will pass, use the NEXUS_API_VERSION define from Nexus.h */
 	const char*     Name;           /* Name of the addon as shown in the library */
-	AddonVersion_t    Version;
+	AddonVersion_t  Version;
 	const char*     Author;         /* Author of the addon */
 	const char*     Description;    /* Short description */
 	ADDON_LOAD      Load;           /* Pointer to Load Function of the addon */

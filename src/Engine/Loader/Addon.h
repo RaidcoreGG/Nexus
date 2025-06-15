@@ -5,7 +5,7 @@
 #include <vector>
 #include <filesystem>
 
-#include "EAddonState.h"
+#include "LdrEnum.h"
 #include "AddonDefinition.h"
 
 /* A structure that holds information about a loaded addon. */

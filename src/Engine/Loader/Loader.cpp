@@ -26,7 +26,7 @@ using json = nlohmann::json;
 #include "API/AddonAPI.h"
 #include "Core/Index/Index.h"
 #include "Core/Context.h"
-#include "FuncDefs.h"
+#include "LdrFuncDefs.h"
 #include "ArcDPS.h"
 #include "Library.h"
 #include "API/ApiFunctionMapper.h"
