@@ -359,7 +359,7 @@ bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo_t aAddo
 	return false;
 }
 
-bool CUpdater::InstallAddon(LibraryAddon_t* aAddon, bool aIsArcPlugin)
+bool CUpdater::InstallAddon(LibraryAddonV1_t* aAddon, bool aIsArcPlugin)
 {
 	// set state for UI etc
 	aAddon->IsInstalling = true;

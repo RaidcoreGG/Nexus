@@ -19,7 +19,7 @@ namespace ArcDPS
 	bool						IsLoaded			= false;
 	bool						IsBridgeDeployed	= false;
 	bool						IsPluginAtlasBuilt	= false;
-	std::vector<LibraryAddon_t*>	PluginLibrary;
+	std::vector<LibraryAddonV1_t*>	PluginLibrary;
 	std::vector<int>			Plugins;
 
 	addextension2				exp_addextension2	= nullptr;
@@ -37,7 +37,7 @@ namespace ArcDPS
 
 			for (const auto& addon : response)
 			{
-				LibraryAddon_t* newAddon = new LibraryAddon_t{};
+				LibraryAddonV1_t* newAddon = new LibraryAddonV1_t{};
 				newAddon->Signature = addon["id"];
 				newAddon->Name = addon["name"];
 				newAddon->Author = addon["author"];
@@ -56,7 +56,7 @@ namespace ArcDPS
 				PluginLibrary.push_back(newAddon);
 			}
 
-			std::sort(PluginLibrary.begin(), PluginLibrary.end(), [](LibraryAddon_t* a, LibraryAddon_t* b) {
+			std::sort(PluginLibrary.begin(), PluginLibrary.end(), [](LibraryAddonV1_t* a, LibraryAddonV1_t* b) {
 				return a->Name < b->Name;
 				});
 		}

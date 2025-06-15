@@ -64,7 +64,7 @@ class CUpdater
 	/// InstallAddon:
 	/// 	Installs an addon and notifies the loader.
 	///----------------------------------------------------------------------------------------------------
-	bool InstallAddon(LibraryAddon_t* aAddon, bool aIsArcPlugin = false);
+	bool InstallAddon(LibraryAddonV1_t* aAddon, bool aIsArcPlugin = false);
 
 	///----------------------------------------------------------------------------------------------------
 	/// IsUpdateAvailable:

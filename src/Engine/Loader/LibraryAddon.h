@@ -5,7 +5,7 @@
 
 #include "LdrEnum.h"
 
-struct LibraryAddon_t
+struct LibraryAddonV1_t
 {
 	signed int		Signature;
 	std::string		Name;

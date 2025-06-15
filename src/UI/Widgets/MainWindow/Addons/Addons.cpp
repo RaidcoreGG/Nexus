@@ -1409,7 +1409,7 @@ void CAddonsWindow::PopulateAddons()
 	{
 		const std::lock_guard<std::mutex> lock(Loader::Library::Mutex);
 
-		for (LibraryAddon_t* addon : Loader::Library::Addons)
+		for (LibraryAddonV1_t* addon : Loader::Library::Addons)
 		{
 			if (!this->SearchTerm.empty() && !String::Contains(String::ToLower(addon->Name), this->SearchTerm)) { continue; }
 
@@ -1448,7 +1448,7 @@ void CAddonsWindow::PopulateAddons()
 	{
 		const std::lock_guard<std::mutex> lockLoader(ArcDPS::Mutex);
 
-		for (LibraryAddon_t* addon : ArcDPS::PluginLibrary)
+		for (LibraryAddonV1_t* addon : ArcDPS::PluginLibrary)
 		{
 			if (!this->SearchTerm.empty() && !String::Contains(String::ToLower(addon->Name), this->SearchTerm)) { continue; }
 

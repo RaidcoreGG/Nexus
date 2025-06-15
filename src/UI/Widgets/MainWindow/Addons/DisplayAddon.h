@@ -32,7 +32,7 @@ struct AddonItemData_t
 	union
 	{
 		Addon_t*                                       NexusAddon;
-		LibraryAddon_t*                                LibraryAddon_t;
+		LibraryAddonV1_t*                              LibraryAddon_t;
 	};
 	std::unordered_map<std::string, InputBindPacked_t> InputBinds;
 	GUI_RENDER                                         OptionsRender;

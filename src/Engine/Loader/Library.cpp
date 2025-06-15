@@ -24,7 +24,7 @@ namespace Loader
 	namespace Library
 	{
 		std::mutex					Mutex;
-		std::vector<LibraryAddon_t*>	Addons;
+		std::vector<LibraryAddonV1_t*>	Addons;
 
 		void Fetch()
 		{
@@ -38,7 +38,7 @@ namespace Loader
 
 				for (const auto& addon : response)
 				{
-					LibraryAddon_t* newAddon = new LibraryAddon_t{};
+					LibraryAddonV1_t* newAddon = new LibraryAddonV1_t{};
 					newAddon->Signature = addon["id"];
 					newAddon->Name = addon["name"];
 					newAddon->Author = addon["author"];
@@ -61,7 +61,7 @@ namespace Loader
 					Addons.push_back(newAddon);
 				}
 
-				std::sort(Addons.begin(), Addons.end(), [](LibraryAddon_t* lhs, LibraryAddon_t* rhs)
+				std::sort(Addons.begin(), Addons.end(), [](LibraryAddonV1_t* lhs, LibraryAddonV1_t* rhs)
 					{
 						return lhs->IsNew > rhs->IsNew ||
 							((lhs->IsNew == rhs->IsNew) && lhs->Name < rhs->Name);

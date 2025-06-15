@@ -48,7 +48,7 @@ namespace ADDONAPI
 	static CLogApi*         s_Logger        = nullptr;
 	static CTextureLoader*  s_TextureApi    = nullptr;
 	static CUpdater*        s_Updater       = nullptr;
-	static CLoader*         s_Loader       = nullptr;
+	static CLoader*         s_Loader        = nullptr;
 	static RenderContext_t* s_RenderCtx     = nullptr;
 
 	static CUiContext*      s_UiContext     = nullptr;

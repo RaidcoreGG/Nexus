@@ -32,7 +32,7 @@ namespace ArcDPS
 	extern bool							IsLoaded;
 	extern bool							IsBridgeDeployed;
 	extern bool							IsPluginAtlasBuilt;
-	extern std::vector<LibraryAddon_t*>	PluginLibrary;
+	extern std::vector<LibraryAddonV1_t*>	PluginLibrary;
 	extern std::vector<int>				Plugins;
 
 	extern addextension2				exp_addextension2;

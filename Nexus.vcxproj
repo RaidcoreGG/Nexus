@@ -11,6 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\Addons\Library\LibAddon.cpp" />
+    <ClCompile Include="src\Core\Addons\Library\LibManager.cpp" />
     <ClCompile Include="src\Core\Context.cpp" />
     <ClCompile Include="src\Core\Hooks\Hooks.cpp" />
     <ClCompile Include="src\Engine\Functions\FnRegistry.cpp" />
@@ -95,6 +97,8 @@
     <ClCompile Include="src\Engine\Inputs\RawInput\RiApi.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\Addons\Library\LibAddon.h" />
+    <ClInclude Include="src\Core\Addons\Library\LibManager.h" />
     <ClInclude Include="src\Core\Context.h" />
     <ClInclude Include="src\Core\Hooks\HkConst.h" />
     <ClInclude Include="src\Core\Hooks\HkFuncDefs.h" />
