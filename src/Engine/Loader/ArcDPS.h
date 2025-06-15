@@ -5,7 +5,7 @@
 #include <mutex>
 #include <vector>
 
-#include "LibraryAddon.h"
+#include "Core/Addons/Library/LibAddon.h"
 
 namespace ArcDPS
 {
@@ -32,14 +32,10 @@ namespace ArcDPS
 	extern bool							IsLoaded;
 	extern bool							IsBridgeDeployed;
 	extern bool							IsPluginAtlasBuilt;
-	extern std::vector<LibraryAddonV1_t*>	PluginLibrary;
 	extern std::vector<int>				Plugins;
 
 	extern addextension2				exp_addextension2;
 	extern listextension				exp_listextension;
-
-	/* Fetch ArcDPSLibrary. */
-	void GetPluginLibrary();
 
 	/* Detect if ArcDPS is not loaded as Nexus addon and deploy bridge if found. */
 	void Detect();

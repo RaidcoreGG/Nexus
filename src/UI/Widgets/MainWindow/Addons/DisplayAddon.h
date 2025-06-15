@@ -9,11 +9,11 @@
 #ifndef MAINWINDOW_DISPLAYADDON_H
 #define MAINWINDOW_DISPLAYADDON_H
 
-#include <map>
+#include <unordered_map>
 #include <string>
 
+#include "Core/Addons/Library/LibAddon.h"
 #include "Engine/Loader/Addon.h"
-#include "Engine/Loader/LibraryAddon.h"
 #include "UI/DisplayBinds.h"
 #include "UI/FuncDefs.h"
 
@@ -29,14 +29,15 @@ enum class EAddonType
 struct AddonItemData_t
 {
 	EAddonType                                         Type;
-	union
-	{
-		Addon_t*                                       NexusAddon;
-		LibraryAddonV1_t*                              LibraryAddon_t;
-	};
+	Addon_t*                                           NexusAddon;
+	LibraryAddon_t                                     LibraryAddon;
 	std::unordered_map<std::string, InputBindPacked_t> InputBinds;
 	GUI_RENDER                                         OptionsRender;
 	bool                                               IsHovered;
+	bool                                               IsInstalling;
+
+	AddonItemData_t() = default;
+	~AddonItemData_t() = default;
 };
 
 #endif

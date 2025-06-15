@@ -28,7 +28,6 @@ using json = nlohmann::json;
 #include "Core/Context.h"
 #include "LdrFuncDefs.h"
 #include "ArcDPS.h"
-#include "Library.h"
 #include "Core/Addons/API/ApiBuilder.h"
 
 #define LOADER_WAITTIME_MS 100
@@ -126,9 +125,6 @@ void CLoader::Initialize()
 		this->Logger->Critical(CH_LOADER, "Loader disabled. Reason: SHChangeNotifyRegister(...) returned 0.");
 		return;
 	}
-
-	std::thread(Loader::Library::Fetch).detach();
-	std::thread(ArcDPS::GetPluginLibrary).detach();
 
 	std::thread checkLaunchSequence([this]()
 	{

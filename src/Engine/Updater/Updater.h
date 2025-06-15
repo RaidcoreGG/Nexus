@@ -13,8 +13,8 @@
 #include <string>
 #include <vector>
 
+#include "Core/Addons/Library/LibAddon.h"
 #include "Engine/Loader/AddonDefinition.h"
-#include "Engine/Loader/LibraryAddon.h"
 #include "Engine/Logging/LogApi.h"
 
 constexpr const char* CH_UPDATER = "Updater";
@@ -64,7 +64,7 @@ class CUpdater
 	/// InstallAddon:
 	/// 	Installs an addon and notifies the loader.
 	///----------------------------------------------------------------------------------------------------
-	bool InstallAddon(LibraryAddonV1_t* aAddon, bool aIsArcPlugin = false);
+	bool InstallAddon(LibraryAddon_t aAddon, bool aIsArcPlugin = false);
 
 	///----------------------------------------------------------------------------------------------------
 	/// IsUpdateAvailable:

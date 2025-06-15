@@ -178,6 +178,12 @@ namespace Main
 		/* Always write the thirdpartysoftwarereadme to disk. We do this here, because it's in a thread. */
 		Resources::Unpack(ctx->GetModule(), Index(EPath::ThirdPartySoftwareReadme), RES_THIRDPARTYNOTICES, "TXT");
 
+		/* FIXME: We also abuse this here for the library. */
+		CLibraryMgr* libmgr = ctx->GetAddonLibrary();
+		libmgr->AddSource("https://api.raidcore.gg/addonlibrary");
+		libmgr->AddSource("https://api.raidcore.gg/arcdpslibrary");
+		libmgr->Update();
+
 		HANDLE hMutex = CreateMutexA(0, true, "RCGG-Mutex-Patch-Nexus");
 
 		if (hMutex == NULL && GetLastError() == ERROR_ALREADY_EXISTS)

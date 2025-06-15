@@ -28,6 +28,7 @@ struct LibraryAddon_t
 	int32_t     PolicyTier;
 	std::string FriendlyFilename;
 
+	LibraryAddon_t() = default;
 	LibraryAddon_t(json& aJson);
 };
 

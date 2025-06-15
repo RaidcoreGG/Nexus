@@ -19,52 +19,10 @@ namespace ArcDPS
 	bool						IsLoaded			= false;
 	bool						IsBridgeDeployed	= false;
 	bool						IsPluginAtlasBuilt	= false;
-	std::vector<LibraryAddonV1_t*>	PluginLibrary;
 	std::vector<int>			Plugins;
 
 	addextension2				exp_addextension2	= nullptr;
 	listextension				exp_listextension	= nullptr;
-
-	void GetPluginLibrary()
-	{
-		HttpResponse_t requestResult = CContext::GetContext()->GetRaidcoreApi()->Get("/arcdpslibrary");
-		json response = requestResult.ContentJSON();
-
-		if (!response.is_null() && requestResult.Success())
-		{
-			const std::lock_guard<std::mutex> lock(Mutex);
-			PluginLibrary.clear();
-
-			for (const auto& addon : response)
-			{
-				LibraryAddonV1_t* newAddon = new LibraryAddonV1_t{};
-				newAddon->Signature = addon["id"];
-				newAddon->Name = addon["name"];
-				newAddon->Author = addon["author"];
-				newAddon->Description = addon["description"];
-				newAddon->Provider = GetProvider(addon["download"]);
-				newAddon->DownloadURL = addon["download"];
-				if (addon.contains("tos_compliance") && !addon["tos_compliance"].is_null())
-				{
-					newAddon->ToSComplianceNotice = addon["tos_compliance"];
-				}
-				if (addon.contains("addon_policy_tier") && !addon["addon_policy_tier"].is_null())
-				{
-					newAddon->PolicyTier = addon["addon_policy_tier"];
-				}
-
-				PluginLibrary.push_back(newAddon);
-			}
-
-			std::sort(PluginLibrary.begin(), PluginLibrary.end(), [](LibraryAddonV1_t* a, LibraryAddonV1_t* b) {
-				return a->Name < b->Name;
-				});
-		}
-		else
-		{
-			CContext::GetContext()->GetLogger()->Warning(CH_LOADER, "Error parsing API response for /arcdpslibrary.");
-		}
-	}
 
 	void Detect()
 	{

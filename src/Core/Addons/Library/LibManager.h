@@ -47,10 +47,16 @@ class CLibraryMgr
 	///----------------------------------------------------------------------------------------------------
 	void AddSource(std::string aURL);
 
+	///----------------------------------------------------------------------------------------------------
+	/// GetLibrary:
+	/// 	Returns a copy of the library.
+	///----------------------------------------------------------------------------------------------------
+	std::vector<LibraryAddon_t> GetLibrary() const;
+
 	private:
 	CLogApi*                                      Logger;
 
-	std::mutex                                    Mutex;
+	mutable std::mutex                            Mutex;
 	std::unordered_map<std::string, CHttpClient*> Sources;
 	std::vector<LibraryAddon_t>                   Addons;
 };

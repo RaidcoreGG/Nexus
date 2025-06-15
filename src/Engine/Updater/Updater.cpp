@@ -359,24 +359,24 @@ bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo_t aAddo
 	return false;
 }
 
-bool CUpdater::InstallAddon(LibraryAddonV1_t* aAddon, bool aIsArcPlugin)
+bool CUpdater::InstallAddon(LibraryAddon_t aAddon, bool aIsArcPlugin)
 {
 	// set state for UI etc
-	aAddon->IsInstalling = true;
+	//aAddon->IsInstalling = true;
 
 	AddonInfo_t addonInfo
 	{
-		aAddon->Signature,
-		aAddon->Name,
+		aAddon.Signature,
+		aAddon.Name,
 		AddonVersion_t{}, // null version
-		aAddon->Provider,
-		!aAddon->DownloadURL.empty()
-			? aAddon->DownloadURL
+		GetProvider(aAddon.DownloadURL),
+		!aAddon.DownloadURL.empty()
+			? aAddon.DownloadURL
 			: "",
 		{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0} // null md5
 	};
 
-	std::string filename = String::Normalize(aAddon->Name);
+	std::string filename = String::Normalize(aAddon.Name);
 	std::filesystem::path installPath = Index(EPath::DIR_ADDONS) / (filename + ".dll");
 	installPath = Path::GetUnused(installPath);
 
@@ -392,7 +392,7 @@ bool CUpdater::InstallAddon(LibraryAddonV1_t* aAddon, bool aIsArcPlugin)
 			return false;
 		}
 
-		this->Logger->Info(CH_UPDATER, "Successfully installed %s.", aAddon->Name.c_str());
+		this->Logger->Info(CH_UPDATER, "Successfully installed %s.", aAddon.Name.c_str());
 
 		return true;
 	}

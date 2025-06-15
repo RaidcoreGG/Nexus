@@ -28,7 +28,6 @@
     <ClCompile Include="src\Engine\Networking\WebRequests\WreClient.cpp" />
     <ClCompile Include="src\Engine\DataLink\DlApi.cpp" />
     <ClCompile Include="src\Engine\Loader\ArcDPS.cpp" />
-    <ClCompile Include="src\Engine\Loader\Library.cpp" />
     <ClCompile Include="src\GW2\Mumble\MblConst.cpp" />
     <ClCompile Include="src\Core\Main.cpp" />
     <ClCompile Include="src\Engine\Events\EvtApi.cpp" />
@@ -171,8 +170,6 @@
     <ClInclude Include="src\Engine\Loader\Addon.h" />
     <ClInclude Include="src\Engine\Loader\ArcDPS.h" />
     <ClInclude Include="src\Engine\Loader\LdrFuncDefs.h" />
-    <ClInclude Include="src\Engine\Loader\Library.h" />
-    <ClInclude Include="src\Engine\Loader\LibraryAddon.h" />
     <ClInclude Include="src\Engine\Loader\Loader.h" />
     <ClInclude Include="src\Core\NexusLink.h" />
     <ClInclude Include="src\Engine\Logging\LogFuncDefs.h" />

@@ -49,7 +49,7 @@ class CAddonsWindow : public ISubWindow
 	/* Details */
 	std::mutex                  Mutex;
 	bool                        HasContent = false;
-	AddonItemData_t               AddonData = {};
+	AddonItemData_t             AddonData = {};
 
 	void SetContent(AddonItemData_t& aAddonData);
 	void ClearContent();

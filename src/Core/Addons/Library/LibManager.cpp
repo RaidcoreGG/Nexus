@@ -126,3 +126,10 @@ void CLibraryMgr::AddSource(std::string aURL)
 
 	this->Sources.emplace(aURL, client);
 }
+
+std::vector<LibraryAddon_t> CLibraryMgr::GetLibrary() const
+{
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	return this->Addons;
+}

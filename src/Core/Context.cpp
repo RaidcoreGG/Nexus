@@ -111,6 +111,14 @@ CLoader* CContext::GetLoader()
 	return &s_Loader;
 }
 
+CLibraryMgr* CContext::GetAddonLibrary()
+{
+	static CLibraryMgr s_LibraryMgr = CLibraryMgr(
+		this->GetLogger()
+	);
+	return &s_LibraryMgr;
+}
+
 CRawInputApi* CContext::GetRawInputApi()
 {
 	static CRawInputApi s_RawInputApi = CRawInputApi(

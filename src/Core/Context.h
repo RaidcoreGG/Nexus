@@ -9,6 +9,7 @@
 #ifndef CONTEXT_H
 #define CONTEXT_H
 
+#include "Core/Addons/Library/LibManager.h"
 #include "Core/Preferences/PrefContext.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
@@ -56,6 +57,8 @@ class CContext
 	CEventApi* GetEventApi();
 
 	CLoader* GetLoader();
+
+	CLibraryMgr* GetAddonLibrary();
 
 	CRawInputApi* GetRawInputApi();
 
