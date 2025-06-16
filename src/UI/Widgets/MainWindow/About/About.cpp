@@ -35,9 +35,9 @@ void CAboutBox::RenderContent()
 		this->IsInvalid = false;
 	}
 
-	CContext*       ctx     = CContext::GetContext();
-	CTextureLoader* texapi  = ctx->GetTextureService();
-	CUpdater*       updater = ctx->GetUpdater();
+	CContext*       ctx         = CContext::GetContext();
+	CTextureLoader* texapi      = ctx->GetTextureService();
+	CSelfUpdater*   selfupdater = ctx->GetSelfUpdater();
 
 	if (ImGui::CollapsingHeader("About", ImGuiTreeNodeFlags_DefaultOpen))
 	{
@@ -155,6 +155,6 @@ void CAboutBox::RenderContent()
 
 	if (ImGui::CollapsingHeader("Changelog", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		ImGui::TextWrapped(updater->GetChangelog().c_str());
+		ImGui::TextWrapped(selfupdater->GetChangelog().c_str());
 	}
 }

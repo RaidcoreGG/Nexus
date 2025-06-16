@@ -18,175 +18,14 @@
 #include "Util/Strings.h"
 #include "Util/URL.h"
 #include "Engine/Loader/Loader.h"
+#include "Updater.h"
+#include "Updater.h"
 
 CUpdater::CUpdater(CLogApi* aLogger)
 {
 	assert(aLogger);
 
 	this->Logger = aLogger;
-}
-
-void CUpdater::UpdateNexus()
-{
-	AddonVersion_t currentVersion = CContext::GetContext()->GetVersion();
-
-	// ensure .old path is not claimed
-	if (std::filesystem::exists(Index(EPath::NexusDLL_Old)))
-	{
-		try
-		{
-			std::filesystem::remove(Index(EPath::NexusDLL_Old));
-		}
-		catch (std::filesystem::filesystem_error fErr)
-		{
-			std::filesystem::path fallback = Path::GetUnused(Index(EPath::NexusDLL_Old));
-			std::filesystem::rename(Index(EPath::NexusDLL_Old), fallback);
-
-			this->Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\". Renamed to \"%s\".", Index(EPath::NexusDLL_Old).string().c_str(), fallback.string().c_str());
-		}
-	}
-
-	// ensure .update path is not claimed
-	if (std::filesystem::exists(Index(EPath::NexusDLL_Update)))
-	{
-		try
-		{
-			std::filesystem::remove(Index(EPath::NexusDLL_Update));
-		}
-		catch (std::filesystem::filesystem_error fErr)
-		{
-			std::filesystem::path fallback = Path::GetUnused(Index(EPath::NexusDLL_Update));
-			std::filesystem::rename(Index(EPath::NexusDLL_Update), fallback);
-
-			this->Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\". Renamed to \"%s\".", Index(EPath::NexusDLL_Update).string().c_str(), fallback.string().c_str());
-		}
-	}
-
-	// check for update and bypass cache
-	HttpResponse_t requestResult = CContext::GetContext()->GetRaidcoreApi()->Get("/nexusversion", "", 0);
-	json resVersion = requestResult.ContentJSON();
-
-	if (resVersion.is_null() || !requestResult.Success())
-	{
-		this->Logger->Warning(CH_UPDATER, "Error parsing API response /nexusversion.");
-		return;
-	}
-
-	// convert to version
-	AddonVersion_t remoteVersion = resVersion;
-
-	// cache changelog for ingame window
-	if (!resVersion["Changelog"].is_null())
-	{
-		resVersion["Changelog"].get_to(this->Changelog);
-	}
-
-	if (remoteVersion > currentVersion)
-	{
-		this->Logger->Info(CH_UPDATER, "Outdated: API replied with Version %s but installed is Version %s", remoteVersion.string().c_str(), currentVersion.string().c_str());
-		this->UpdateAvailable = true;
-
-		bool githubFailure = false;
-		/* get from github */
-		std::string downloadBaseUrl = URL::GetBase("https://github.com");
-		std::string endpointDownload = URL::GetEndpoint("/RaidcoreGG/Nexus/releases/latest/download/d3d11.dll");
-		httplib::Client downloadClient(downloadBaseUrl);
-		downloadClient.enable_server_certificate_verification(true);
-		downloadClient.set_follow_location(true);
-		size_t bytesWritten = 0;
-		std::ofstream file(Index(EPath::NexusDLL_Update), std::ofstream::binary);
-		auto downloadResult = downloadClient.Get(endpointDownload,
-			[&](const char* data, size_t data_length) {
-				file.write(data, data_length);
-				bytesWritten += data_length;
-				return true;
-			}
-		);
-		file.close();
-
-		if (!downloadResult || downloadResult->status != 200 || bytesWritten == 0)
-		{
-			this->Logger->Warning(CH_UPDATER, "Error fetching %s%s\nError: %s", downloadBaseUrl.c_str(), endpointDownload.c_str(), httplib::to_string(downloadResult.error()).c_str());
-
-			// try cleaning failed download
-			if (std::filesystem::exists(Index(EPath::NexusDLL_Update)))
-			{
-				try
-				{
-					std::filesystem::remove(Index(EPath::NexusDLL_Update));
-				}
-				catch (std::filesystem::filesystem_error fErr)
-				{
-					this->Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\".", Index(EPath::NexusDLL_Update).string().c_str());
-				}
-			}
-
-			githubFailure = true;
-		}
-
-		/* fallback to raidcore site */
-		if (githubFailure)
-		{
-			this->Logger->Info(CH_UPDATER, "Nexus update via GitHub not possible. Falling back to Raidcore API.");
-			// ensure download successful
-			if (!CContext::GetContext()->GetRaidcoreApi()->Download(Index(EPath::NexusDLL_Update), "/d3d11.dll").Success())
-			{
-				this->Logger->Warning(CH_UPDATER, "Nexus Update failed: Download failed.");
-				// try cleaning failed download
-				if (std::filesystem::exists(Index(EPath::NexusDLL_Update)))
-				{
-					try
-					{
-						std::filesystem::remove(Index(EPath::NexusDLL_Update));
-					}
-					catch (std::filesystem::filesystem_error fErr)
-					{
-						this->Logger->Warning(CH_UPDATER, "Couldn't remove \"%s\".", Index(EPath::NexusDLL_Update).string().c_str());
-						return;
-					}
-				}
-				return;
-			}
-		}
-
-		// absolute redundant sanity check
-		// above is already ensured that .old is not claimed
-		// should it here somehow be claimed anyway, we need to factor that in
-		// this ensures that the update can be done
-		std::filesystem::path oldPath = Path::GetUnused(Index(EPath::NexusDLL_Old));
-
-		// try renaming .dll to .old
-		try
-		{
-			std::filesystem::rename(Index(EPath::NexusDLL), oldPath);
-		}
-		catch (std::filesystem::filesystem_error fErr)
-		{
-			this->Logger->Warning(CH_UPDATER, "Nexus update failed: Couldn't move \"%s\" to \"%s\".", Index(EPath::NexusDLL).string().c_str(), oldPath.string().c_str());
-			return;
-		}
-
-		// try renaming .update to .dll
-		try
-		{
-			std::filesystem::rename(Index(EPath::NexusDLL_Update), Index(EPath::NexusDLL));
-		}
-		catch (std::filesystem::filesystem_error fErr)
-		{
-			this->Logger->Warning(CH_UPDATER, "Nexus update failed: Couldn't move \"%s\" to \"%s\".", Index(EPath::NexusDLL_Update).string().c_str(), Index(EPath::NexusDLL).string().c_str());
-			return;
-		}
-
-		this->Logger->Info(CH_UPDATER, "Successfully updated Nexus. Restart required to take effect. (Current: %s) (New: %s)", currentVersion.string().c_str(), remoteVersion.string().c_str());
-	}
-	else if (remoteVersion < currentVersion)
-	{
-		this->Logger->Info(CH_UPDATER, "Installed Build of Nexus is more up-to-date than remote. (Installed: %s) (Remote: %s)", currentVersion.string().c_str(), remoteVersion.string().c_str());
-	}
-	else
-	{
-		this->Logger->Info(CH_UPDATER, "Installed Build of Nexus is up-to-date.");
-	}
 }
 
 bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo_t aAddonInfo, bool aIgnoreTagFormat, int aCacheLifetimeOverride)
@@ -335,7 +174,7 @@ bool CUpdater::UpdateAddon(const std::filesystem::path& aPath, AddonInfo_t aAddo
 		try
 		{
 			std::filesystem::rename(tmpPath, pathUpdate);
-			if (aAddonInfo.Version != AddonVersion_t{}) // if 0.0.0.0 -> install
+			if (aAddonInfo.Version != MajorMinorBuildRevision_t{}) // if 0.0.0.0 -> install
 			{
 				this->Logger->Info(CH_UPDATER, "Successfully updated %s.", aAddonInfo.Name.c_str());
 			}
@@ -368,7 +207,7 @@ bool CUpdater::InstallAddon(LibraryAddon_t aAddon, bool aIsArcPlugin)
 	{
 		aAddon.Signature,
 		aAddon.Name,
-		AddonVersion_t{}, // null version
+		MajorMinorBuildRevision_t{}, // null version
 		GetProvider(aAddon.DownloadURL),
 		!aAddon.DownloadURL.empty()
 			? aAddon.DownloadURL
@@ -400,16 +239,6 @@ bool CUpdater::InstallAddon(LibraryAddon_t aAddon, bool aIsArcPlugin)
 	return false;
 }
 
-bool CUpdater::IsUpdateAvailable()
-{
-	return this->UpdateAvailable;
-}
-
-const std::string& CUpdater::GetChangelog()
-{
-	return this->Changelog;
-}
-
 bool CUpdater::UpdateRaidcore(int aCacheLifetimeOverride)
 {
 	return false;
@@ -422,7 +251,7 @@ bool CUpdater::UpdateRaidcore(int aCacheLifetimeOverride)
 		return false;
 	}
 
-	AddonVersion_t remoteVersion = resVersion;
+	MajorMinorBuildRevision_t remoteVersion = resVersion;
 
 	if (remoteVersion > aVersion)
 	{
@@ -435,8 +264,10 @@ bool CUpdater::UpdateRaidcore(int aCacheLifetimeOverride)
 	}*/
 }
 
-bool CUpdater::UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& aEndpoint, AddonVersion_t aCurrentVersion, bool aAllowPrereleases, bool aIgnoreTagFormat, int aCacheLifetimeOverride)
+bool CUpdater::UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& aEndpoint, MajorMinorBuildRevision_t aCurrentVersion, bool aAllowPrereleases, bool aIgnoreTagFormat, int aCacheLifetimeOverride)
 {
+	return false;
+
 	HttpResponse_t requestResult = CContext::GetContext()->GetGitHubApi()->Get(aEndpoint, "", aCacheLifetimeOverride);
 	json response = requestResult.ContentJSON();
 
@@ -447,7 +278,7 @@ bool CUpdater::UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& a
 	}
 
 	std::string targetUrl; // e.g. github.com/RaidcoreGG/GW2-CommandersToolkit/releases/download/20220918-135925/squadmanager.dll
-	AddonVersion_t targetVersion{};
+	MajorMinorBuildRevision_t targetVersion{};
 
 	for (json& release : response)
 	{
@@ -459,7 +290,7 @@ bool CUpdater::UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& a
 		/* if pre - releases are disabled, but it is one->skip */
 		if (!aAllowPrereleases && release["prerelease"].get<bool>()) { continue; }
 
-		AddonVersion_t version = !aIgnoreTagFormat ? AddonVersion_t{ release["tag_name"].get<std::string>() } : AddonVersion_t{ 9999,9999,9999,9999 }; // explicitly get string, otherwise it tries to parse json
+		MajorMinorBuildRevision_t version = {};//!aIgnoreTagFormat ? MajorMinorBuildRevision_t{ release["tag_name"].get<std::string>() } : MajorMinorBuildRevision_t{ 9999,9999,9999,9999 }; // explicitly get string, otherwise it tries to parse json
 
 		/* skip, if this release we have is the same or older than the one we had found before */
 		if (version <= targetVersion) { continue; }
@@ -480,7 +311,7 @@ bool CUpdater::UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& a
 	}
 
 	/* if we found no version or URL */
-	if (targetVersion == AddonVersion_t{} ||
+	if (targetVersion == MajorMinorBuildRevision_t{} ||
 		targetUrl.empty())
 	{
 		return false;

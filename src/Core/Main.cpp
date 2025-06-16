@@ -20,7 +20,6 @@
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Logging/LogConsole.h"
 #include "Engine/Logging/LogWriter.h"
-#include "Engine/Updater/Updater.h"
 #include "GW2/Multibox/Multibox.h"
 #include "Resources/ResConst.h"
 #include "UI/UiContext.h"
@@ -58,7 +57,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
 namespace Main
 {
-	static std::thread s_UpdateThread;
+	static std::thread s_LibraryThread;
+	static std::thread s_LicenseThread;
 
 	void Initialize(EProxyFunction aEntryFunction)
 	{
@@ -86,7 +86,23 @@ namespace Main
 			aEntryFunction
 		);
 
-		s_UpdateThread = std::thread(Main::UpdateCheck);
+		/* Initialize self updater here so it can lock this instance and update. */
+		CSelfUpdater* selfupdater = ctx->GetSelfUpdater();
+
+		s_LibraryThread = std::thread([]() {
+
+			CContext* ctx = CContext::GetContext();
+			CLibraryMgr* libmgr = ctx->GetAddonLibrary();
+			libmgr->AddSource("https://api.raidcore.gg/addonlibrary");
+			libmgr->AddSource("https://api.raidcore.gg/arcdpslibrary");
+			libmgr->Update();
+
+		});
+		s_LicenseThread = std::thread([]() {
+
+			CContext* ctx = CContext::GetContext();
+			Resources::Unpack(ctx->GetModule(), Index(EPath::ThirdPartySoftwareReadme), RES_THIRDPARTYNOTICES, "TXT");
+		});
 
 		/* Allocate console logger, if requested. */
 		if (CmdLine::HasArgument("-ggconsole"))
@@ -136,11 +152,9 @@ namespace Main
 
 		s_ShutdownReason = aReason;
 
-		/* If the update thread is still running, let it join. */
-		if (s_UpdateThread.joinable())
-		{
-			s_UpdateThread.join();
-		}
+		/* Join threads. */
+		if (s_LibraryThread.joinable()) { s_LibraryThread.join(); }
+		if (s_LicenseThread.joinable()) { s_LicenseThread.join(); }
 
 		std::string reasonStr;
 		switch (aReason)
@@ -169,37 +183,5 @@ namespace Main
 		/* Let the OS take care of freeing the handles. Ugly, but otherwise crashes due to the addon clownfiesta in GW2. */
 		//if (D3D11Handle) { FreeLibrary(D3D11Handle); }
 		//if (D3D11SystemHandle) { FreeLibrary(D3D11SystemHandle); }
-	}
-
-	void UpdateCheck()
-	{
-		CContext* ctx = CContext::GetContext();
-
-		/* Always write the thirdpartysoftwarereadme to disk. We do this here, because it's in a thread. */
-		Resources::Unpack(ctx->GetModule(), Index(EPath::ThirdPartySoftwareReadme), RES_THIRDPARTYNOTICES, "TXT");
-
-		/* FIXME: We also abuse this here for the library. */
-		CLibraryMgr* libmgr = ctx->GetAddonLibrary();
-		libmgr->AddSource("https://api.raidcore.gg/addonlibrary");
-		libmgr->AddSource("https://api.raidcore.gg/arcdpslibrary");
-		libmgr->Update();
-
-		HANDLE hMutex = CreateMutexA(0, true, "RCGG-Mutex-Patch-Nexus");
-
-		if (hMutex == NULL && GetLastError() == ERROR_ALREADY_EXISTS)
-		{
-			ctx->GetLogger()->Info(CH_CORE, "Cannot patch Nexus, mutex locked.");
-			return;
-		}
-
-		/* Perform/Check for update. */
-		ctx->GetUpdater()->UpdateNexus();
-
-		/* Sanity check before closing handles. */
-		if (hMutex)
-		{
-			ReleaseMutex(hMutex);
-			CloseHandle(hMutex);
-		}
 	}
 }

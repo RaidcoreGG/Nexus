@@ -26,7 +26,9 @@ CHttpClient::CHttpClient(CLogApi* aLogger, std::string aBaseURL, std::filesystem
 		CH_NETWORKING,
 		"CHttpClient(BaseURL: %s, CacheDirectory: %s, CacheLifetime: %d)",
 		this->BaseURL.c_str(),
-		aCacheDirectory.string().c_str(),
+		aCacheDirectory.empty()
+			? "(null)"
+			: aCacheDirectory.string().c_str(),
 		aCacheLifetime
 	);
 

@@ -30,32 +30,32 @@ struct IVersionBase
 
 	inline bool operator<(const IVersionBase& rhs) const
 	{
-		this->CompareTo(rhs) < 0;
+		return this->CompareTo(rhs) < 0;
 	}
 
 	inline bool operator>(const IVersionBase& rhs) const
 	{
-		this->CompareTo(rhs) > 0;
+		return this->CompareTo(rhs) > 0;
 	}
 
 	inline bool operator==(const IVersionBase& rhs) const
 	{
-		this->CompareTo(rhs) == 0;
+		return this->CompareTo(rhs) == 0;
 	}
 
 	inline bool operator!=(const IVersionBase& rhs) const
 	{
-		this->CompareTo(rhs) != 0;
+		return this->CompareTo(rhs) != 0;
 	}
 
 	inline bool operator<=(const IVersionBase& rhs) const
 	{
-		this->CompareTo(rhs) <= 0;
+		return this->CompareTo(rhs) <= 0;
 	}
 
 	inline bool operator>=(const IVersionBase& rhs) const
 	{
-		this->CompareTo(rhs) >= 0;
+		return this->CompareTo(rhs) >= 0;
 	}
 };
 

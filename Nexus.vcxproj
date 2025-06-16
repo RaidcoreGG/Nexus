@@ -15,6 +15,7 @@
     <ClCompile Include="src\Core\Addons\Library\LibManager.cpp" />
     <ClCompile Include="src\Core\Context.cpp" />
     <ClCompile Include="src\Core\Hooks\Hooks.cpp" />
+    <ClCompile Include="src\Core\Updater\SelfUpdater.cpp" />
     <ClCompile Include="src\Engine\Functions\FnRegistry.cpp" />
     <ClCompile Include="src\Core\Index\Index.cpp" />
     <ClCompile Include="src\Engine\Networking\WebRequests\WreCache.cpp" />
@@ -23,7 +24,6 @@
     <ClCompile Include="src\GW2\Inputs\GameBinds\GbConst.cpp" />
     <ClCompile Include="src\Engine\Inputs\InputBinds\IbCapture.cpp" />
     <ClCompile Include="src\Engine\Inputs\InputBinds\IbConst.cpp" />
-    <ClCompile Include="src\Engine\Loader\AddonVersion.cpp" />
     <ClCompile Include="src\Core\Addons\API\ApiBuilder.cpp" />
     <ClCompile Include="src\Engine\Networking\WebRequests\WreClient.cpp" />
     <ClCompile Include="src\Engine\DataLink\DlApi.cpp" />
@@ -105,6 +105,7 @@
     <ClInclude Include="src\Core\Preferences\PrefConst.h" />
     <ClInclude Include="src\Core\Proxy\PxyEnum.h" />
     <ClInclude Include="src\Core\Proxy\PxyFuncDefs.h" />
+    <ClInclude Include="src\Core\Updater\SelfUpdater.h" />
     <ClInclude Include="src\Core\Versioning\VerBase.h" />
     <ClInclude Include="src\Core\Versioning\VerEnum.h" />
     <ClInclude Include="src\Core\Versioning\VerU48_3XS16.h" />
@@ -137,7 +138,6 @@
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbConst.h" />
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbEnum.h" />
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbMapping.h" />
-    <ClInclude Include="src\Engine\Loader\AddonVersion.h" />
     <ClInclude Include="src\Core\Addons\API\ApiBuilder.h" />
     <ClInclude Include="src\GW2\Mumble\MblConst.h" />
     <ClInclude Include="src\GW2\Mumble\MblExtensions.h" />

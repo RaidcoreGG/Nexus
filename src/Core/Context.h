@@ -11,11 +11,12 @@
 
 #include "Core/Addons/Library/LibManager.h"
 #include "Core/Preferences/PrefContext.h"
+#include "Core/Updater/SelfUpdater.h"
+#include "Core/Versioning/VerU64_4XS16.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
-#include "Engine/Loader/AddonVersion.h"
 #include "Engine/Loader/Loader.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
@@ -34,7 +35,7 @@ class CContext
 	CContext(CContext const&)       = delete;
 	void operator=(CContext const&) = delete;
 
-	AddonVersion_t const& GetVersion();
+	MajorMinorBuildRevision_t const& GetVersion();
 
 	const char* GetBuild();
 
@@ -75,6 +76,8 @@ class CContext
 	CHttpClient* GetRaidcoreApi();
 
 	CHttpClient* GetGitHubApi();
+
+	CSelfUpdater* GetSelfUpdater();
 
 	private:
 	CContext() = default;

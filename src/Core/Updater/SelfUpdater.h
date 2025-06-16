@@ -1,93 +1,91 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  Updater.h
-/// Description  :  Handles Nexus & addon updates, as well as addon installation.
+/// Name         :  SelfUpdater.h
+/// Description  :  Implementation of the self updater.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef UPDATER_H
-#define UPDATER_H
+#ifndef SELFUPDATER_H
+#define SELFUPDATER_H
 
-#include <filesystem>
+#include <thread>
 #include <string>
-#include <vector>
+#include <windows.h>
 
-#include "Core/Addons/Library/LibAddon.h"
-#include "Engine/Loader/AddonDefinition.h"
+#include "Core/Versioning/VerU64_4XS16.h"
 #include "Engine/Logging/LogApi.h"
 
-constexpr const char* CH_UPDATER = "Updater";
+constexpr const char* CH_SELFUPDATER = "Updater";
 
 ///----------------------------------------------------------------------------------------------------
-/// AddonInfo_t Struct
+/// CSelfUpdater Class
 ///----------------------------------------------------------------------------------------------------
-struct AddonInfo_t
-{
-	signed int                 Signature;
-	std::string                Name;
-	MajorMinorBuildRevision_t  Version;
-	EUpdateProvider            Provider;
-	std::string                UpdateLink;
-	std::vector<unsigned char> MD5;
-	bool                       AllowPrereleases;
-};
-
-///----------------------------------------------------------------------------------------------------
-/// CUpdater Class
-///----------------------------------------------------------------------------------------------------
-class CUpdater
+class CSelfUpdater
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CUpdater(CLogApi* aLogger);
+	CSelfUpdater(CLogApi* aLogger);
+
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
-	~CUpdater() = default;
+	~CSelfUpdater();
 
 	///----------------------------------------------------------------------------------------------------
-	/// UpdateAddon:
-	/// 	Checks for an update for an addon.
+	/// GetRemoteVersion:
+	/// 	Gets the latest available version.
 	///----------------------------------------------------------------------------------------------------
-	bool UpdateAddon(const std::filesystem::path& aPath, AddonInfo_t aAddonInfo, bool aIgnoreTagFormat = false, int aCacheLifetimeOverride = -1);
+	const MajorMinorBuildRevision_t& GetRemoteVersion();
 
 	///----------------------------------------------------------------------------------------------------
-	/// InstallAddon:
-	/// 	Installs an addon and notifies the loader.
+	/// IsUpdateAvailable:
+	/// 	Returns true if current version is outdated.
 	///----------------------------------------------------------------------------------------------------
-	bool InstallAddon(LibraryAddon_t aAddon, bool aIsArcPlugin = false);
+	bool IsUpdateAvailable();
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetChangelog:
+	/// 	Returns the changelog.
+	///----------------------------------------------------------------------------------------------------
+	const std::string& GetChangelog();
 
 	private:
-	CLogApi* Logger = nullptr;
+	CLogApi*                  Logger = nullptr;
+
+	HANDLE                    UpdateMutex = nullptr;
+	std::thread               UpdateThread;
+
+	MajorMinorBuildRevision_t RemoteVersion;
+	std::string               Changelog;
 
 	///----------------------------------------------------------------------------------------------------
-	/// UpdateRaidcore:
-	/// 	Downloads the latest addon available at the remote, if it's newer than current.
+	/// CreatePatchMutex:
+	/// 	Creates the system-wide mutex that locks the dll file.
+	/// 	Returns true on success, false on failure.
+	/// 	If the creation fails, no patch should be performed.
 	///----------------------------------------------------------------------------------------------------
-	bool UpdateRaidcore(int aCacheLifetimeOverride = -1);
+	bool CreatePatchMutex();
 
 	///----------------------------------------------------------------------------------------------------
-	/// UpdateGitHub:
-	/// 	Downloads the latest addon available at the remote, if it's newer than current.
+	/// CleanupUpdateFiles:
+	/// 	Ensures d3d11.dll.old and d3d11.dll.update are usable.
 	///----------------------------------------------------------------------------------------------------
-	bool UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& aEndpoint, MajorMinorBuildRevision_t aCurrentVersion, bool aAllowPrereleases, bool aIgnoreTagFormat = false, int aCacheLifetimeOverride = -1);
+	void CleanupUpdateFiles();
 
 	///----------------------------------------------------------------------------------------------------
-	/// UpdateDirect:
-	/// 	Downloads the latest addon available at the remote, if it's newer than current.
+	/// DownloadUpdate:
+	/// 	Returns true if the update downloaded successfully.
 	///----------------------------------------------------------------------------------------------------
-	bool UpdateDirect(std::filesystem::path& aDownloadPath, std::string& aBaseURL, std::string& aEndpointDownload, std::vector<unsigned char> aCurrentMD5);
+	bool DownloadUpdate();
 
 	///----------------------------------------------------------------------------------------------------
-	/// UpdateSelf:
-	/// 	Downloads the addon available at remote without checking its version.
-	/// 	The addon already did that.
-	/// 	I hope.
+	/// Runs:
+	/// 	Checks if an update is available and installs it.
 	///----------------------------------------------------------------------------------------------------
-	bool UpdateSelf(std::filesystem::path& aDownloadPath, std::string& aBaseURL, std::string& aEndpointDownload);
+	void Run();
 };
 
 #endif

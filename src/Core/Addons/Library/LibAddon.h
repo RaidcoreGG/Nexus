@@ -20,12 +20,12 @@ using json = nlohmann::json;
 ///----------------------------------------------------------------------------------------------------
 struct LibraryAddon_t
 {
-	int32_t     Signature;
+	int32_t     Signature        = 0;
 	std::string Name;
 	std::string Author;
 	std::string Description;
 	std::string DownloadURL;
-	int32_t     PolicyTier;
+	int32_t     PolicyTier       = 0;
 	std::string FriendlyFilename;
 
 	LibraryAddon_t() = default;

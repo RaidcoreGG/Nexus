@@ -20,9 +20,9 @@ CContext* CContext::GetContext()
 	return &s_Context;
 }
 
-AddonVersion_t const& CContext::GetVersion()
+MajorMinorBuildRevision_t const& CContext::GetVersion()
 {
-	static AddonVersion_t version =
+	static MajorMinorBuildRevision_t version =
 	{
 		V_MAJOR,
 		V_MINOR,
@@ -201,4 +201,12 @@ CHttpClient* CContext::GetGitHubApi()
 		30 * 60
 	);
 	return &s_GitHubApiCli;
+}
+
+CSelfUpdater* CContext::GetSelfUpdater()
+{
+	static CSelfUpdater s_SelfUpdater = CSelfUpdater(
+		this->GetLogger()
+	);
+	return &s_SelfUpdater;
 }

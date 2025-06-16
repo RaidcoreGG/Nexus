@@ -143,7 +143,7 @@ void CAddonsWindow::AddonItem(AddonItemData_t& aAddonData, float aWidth)
 			{
 				ImGui::Text(aAddonData.NexusAddon->Definitions->Name);
 				ImGui::SameLine();
-				ImGui::TextDisabled(aAddonData.NexusAddon->Definitions->Version.string().c_str());
+				ImGui::TextDisabled(MajorMinorBuildRevision_t{ aAddonData.NexusAddon->Definitions->Version }.string().c_str());
 				ImGui::TextDisabled("by %s", aAddonData.NexusAddon->Definitions->Author);
 
 				/* Incompatible notice or description */
