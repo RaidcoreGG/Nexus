@@ -36,6 +36,13 @@ class CRawInputApi
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	///----------------------------------------------------------------------------------------------------
+	/// WndProcGameOnly:
+	/// 	Returns the uMsg shifted back to the normal range.
+	/// 	This should be called after all other window procedures.
+	///----------------------------------------------------------------------------------------------------
+	UINT WndProcGameOnly(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+	///----------------------------------------------------------------------------------------------------
 	/// SendWndProcToGame:
 	/// 	Skips all WndProc callbacks and sends it directly to the original.
 	///----------------------------------------------------------------------------------------------------

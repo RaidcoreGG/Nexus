@@ -33,6 +33,18 @@ UINT CRawInputApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return 1;
 }
 
+UINT CRawInputApi::WndProcGameOnly(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	/* offset of 7997, if uMsg in that range it's a nexus game only message */
+	if (uMsg >= WM_PASSTHROUGH_FIRST && uMsg <= WM_PASSTHROUGH_LAST)
+	{
+		/* modify the uMsg code to the original code */
+		uMsg -= WM_PASSTHROUGH_FIRST;
+	}
+
+	return uMsg;
+}
+
 LRESULT CRawInputApi::SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	if (uMsg < WM_USER)

@@ -133,14 +133,9 @@ namespace Hooks
 				Main::Shutdown(uMsg);
 			}
 
-			/* offset of 7997, if uMsg in that range it's a nexus game only message */
-			if (uMsg >= WM_PASSTHROUGH_FIRST && uMsg <= WM_PASSTHROUGH_LAST)
-			{
-				/* modify the uMsg code to the original code */
-				uMsg -= WM_PASSTHROUGH_FIRST;
-			}
-
 			MouseResetFix(hWnd, uMsg, wParam, lParam);
+
+			uMsg = s_RawInputApi->WndProcGameOnly(hWnd, uMsg, wParam, lParam);
 
 			return CallWindowProcA(Target::WndProc, hWnd, uMsg, wParam, lParam);
 		}
