@@ -42,7 +42,6 @@
     <ClCompile Include="src\thirdparty\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Engine\Inputs\InputBinds\IbBindV2.cpp" />
     <ClCompile Include="src\Engine\Inputs\InputBinds\IbApi.cpp" />
-    <ClCompile Include="src\Engine\Loader\AddonDefinition.cpp" />
     <ClCompile Include="src\Engine\Loader\Loader.cpp" />
     <ClCompile Include="src\Engine\Logging\LogWriter.cpp" />
     <ClCompile Include="src\Engine\Logging\LogBase.cpp" />
@@ -322,7 +321,7 @@
     <ClInclude Include="src\thirdparty\openssl\x509_vfy.h" />
     <ClInclude Include="src\thirdparty\openssl\__DECC_INCLUDE_EPILOGUE.H" />
     <ClInclude Include="src\thirdparty\openssl\__DECC_INCLUDE_PROLOGUE.H" />
-    <ClInclude Include="src\Engine\Loader\AddonDefinition.h" />
+    <ClInclude Include="src\Core\Addons\Definitions\AddonDefV1.h" />
     <ClInclude Include="src\Core\Addons\API\ApiBase.h" />
     <ClInclude Include="src\Engine\Logging\LogWriter.h" />
     <ClInclude Include="src\Engine\Logging\LogBase.h" />

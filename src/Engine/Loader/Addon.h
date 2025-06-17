@@ -6,7 +6,7 @@
 #include <filesystem>
 
 #include "LdrEnum.h"
-#include "AddonDefinition.h"
+#include "Core/Addons/Definitions/AddonDefV1.h"
 
 /* A structure that holds information about a loaded addon. */
 struct Addon_t

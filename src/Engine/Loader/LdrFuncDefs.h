@@ -9,7 +9,7 @@
 #ifndef LDRFUNCDEFS_H
 #define LDRFUNCDEFS_H
 
-#include "AddonDefinition.h"
+#include "Core/Addons/Definitions/AddonDefV1.h"
 #include "Core/Addons/API/ApiBase.h"
 
 struct AddonDef_t;

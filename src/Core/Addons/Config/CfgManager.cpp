@@ -92,6 +92,8 @@ void CConfigMgr::SaveConfigs()
 
 Config_t* CConfigMgr::RegisterConfig(uint32_t aSignature)
 {
+	Config_t* config = nullptr;
+
 	/* Scoping for mutex. */
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
@@ -103,11 +105,13 @@ Config_t* CConfigMgr::RegisterConfig(uint32_t aSignature)
 			return it->second;
 		}
 
-		Config_t* config = new Config_t();
+		config = new Config_t();
 		this->Configs.emplace(aSignature, config);
 	}
 
 	this->SaveConfigs();
+
+	return config;
 }
 
 void CConfigMgr::DeleteConfig(uint32_t aSignature)

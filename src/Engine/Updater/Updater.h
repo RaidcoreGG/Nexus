@@ -14,7 +14,7 @@
 #include <vector>
 
 #include "Core/Addons/Library/LibAddon.h"
-#include "Engine/Loader/AddonDefinition.h"
+#include "Core/Addons/Definitions/AddonDefV1.h"
 #include "Engine/Logging/LogApi.h"
 
 constexpr const char* CH_UPDATER = "Updater";
@@ -24,7 +24,7 @@ constexpr const char* CH_UPDATER = "Updater";
 ///----------------------------------------------------------------------------------------------------
 struct AddonInfo_t
 {
-	signed int                 Signature;
+	uint32_t                   Signature;
 	std::string                Name;
 	MajorMinorBuildRevision_t  Version;
 	EUpdateProvider            Provider;
