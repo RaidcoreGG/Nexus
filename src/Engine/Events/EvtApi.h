@@ -34,7 +34,7 @@ class CEventApi
 	/// Raise:
 	/// 	Raises an event with a payload meant for only a specific subscriber.
 	///----------------------------------------------------------------------------------------------------
-	void Raise(signed int aSignature, const char* aIdentifier, void* aEventData = nullptr);
+	void Raise(uint32_t aSignature, const char* aIdentifier, void* aEventData = nullptr);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Subscribe:

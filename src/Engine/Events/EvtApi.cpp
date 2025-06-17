@@ -35,7 +35,7 @@ void CEventApi::Raise(const char* aIdentifier, void* aEventData)
 	}
 }
 
-void CEventApi::Raise(signed int aSignature, const char* aIdentifier, void* aEventData)
+void CEventApi::Raise(uint32_t aSignature, const char* aIdentifier, void* aEventData)
 {
 	if (aIdentifier == nullptr) { return; }
 
