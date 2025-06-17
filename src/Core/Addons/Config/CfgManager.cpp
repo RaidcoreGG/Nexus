@@ -191,6 +191,11 @@ void CConfigMgr::LoadConfigs()
 				config->UpdateMode = cfgJSON[K_UPDATEMODE].get<EUpdateMode>();
 			}
 
+			if (config->UpdateMode == EUpdateMode::None)
+			{
+				config->UpdateMode = EUpdateMode::Background;
+			}
+
 			/* Migration. */
 			if (!cfgJSON[KM_ISLOADED].is_null())
 			{
