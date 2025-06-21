@@ -210,3 +210,9 @@ CSelfUpdater* CContext::GetSelfUpdater()
 	);
 	return &s_SelfUpdater;
 }
+
+CArcApi* CContext::GetArcApi()
+{
+	static CArcApi s_ArcApi = CArcApi();
+	return &s_ArcApi;
+}

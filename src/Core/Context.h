@@ -23,6 +23,7 @@
 #include "Engine/Renderer/RdrContext.h"
 #include "Engine/Textures/TxLoader.h"
 #include "Engine/Updater/Updater.h"
+#include "GW2/ArcDPS/ArcApi.h"
 #include "GW2/Inputs/GameBinds/GbApi.h"
 #include "GW2/Mumble/MblReader.h"
 #include "UI/UiContext.h"
@@ -78,6 +79,8 @@ class CContext
 	CHttpClient* GetGitHubApi();
 
 	CSelfUpdater* GetSelfUpdater();
+
+	CArcApi* GetArcApi();
 
 	private:
 	CContext() = default;

@@ -77,13 +77,13 @@ namespace ADDONAPI
 		/// RaiseEventTargeted:
 		/// 	Addon API wrapper function for raising events targeted at a specific subscriber.
 		///----------------------------------------------------------------------------------------------------
-		void RaiseEventTargeted(signed int aSignature, const char* aIdentifier, void* aEventData);
+		void RaiseEventTargeted(uint32_t aSignature, const char* aIdentifier, void* aEventData);
 
 		///----------------------------------------------------------------------------------------------------
 		/// RaiseNotificationTargeted:
 		/// 	Addon API wrapper function for raising notifications targeted at a specific subscriber.
 		///----------------------------------------------------------------------------------------------------
-		void RaiseNotificationTargeted(signed int aSignature, const char* aIdentifier);
+		void RaiseNotificationTargeted(uint32_t aSignature, const char* aIdentifier);
 	}
 
 	///----------------------------------------------------------------------------------------------------

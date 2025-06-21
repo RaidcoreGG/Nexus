@@ -21,6 +21,7 @@
     <ClCompile Include="src\Core\Index\Index.cpp" />
     <ClCompile Include="src\Engine\Networking\WebRequests\WreCache.cpp" />
     <ClCompile Include="src\Engine\Networking\WebRequests\WreConst.cpp" />
+    <ClCompile Include="src\GW2\ArcDPS\ArcApi.cpp" />
     <ClCompile Include="src\GW2\Inputs\GameBinds\GbApi.cpp" />
     <ClCompile Include="src\GW2\Inputs\GameBinds\GbConst.cpp" />
     <ClCompile Include="src\Engine\Inputs\InputBinds\IbCapture.cpp" />
@@ -124,9 +125,14 @@
     <ClInclude Include="src\Core\Addons\API\ApiV4.h" />
     <ClInclude Include="src\Core\Addons\API\ApiV5.h" />
     <ClInclude Include="src\Core\Addons\API\ApiV6.h" />
+    <ClInclude Include="src\Engine\Loader\LdrAddonBase.h" />
     <ClInclude Include="src\Engine\Loader\LdrEnum.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreCache.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreConst.h" />
+    <ClInclude Include="src\GW2\ArcDPS\ArcApi.h" />
+    <ClInclude Include="src\GW2\ArcDPS\ArcEnum.h" />
+    <ClInclude Include="src\GW2\ArcDPS\ArcExtensionDef.h" />
+    <ClInclude Include="src\GW2\ArcDPS\ArcFuncDefs.h" />
     <ClInclude Include="src\GW2\Inputs\MouseResetFix.h" />
     <ClInclude Include="src\Engine\Networking\NetConst.h" />
     <ClInclude Include="src\Engine\Renderer\RdrContext.h" />
@@ -159,6 +165,7 @@
     <ClInclude Include="src\Engine\Logging\LogConst.h" />
     <ClInclude Include="src\Engine\Logging\LogEnum.h" />
     <ClInclude Include="src\Engine\Textures\TxEnum.h" />
+    <ClInclude Include="src\thirdparty\arcdps\ArcDPS.h" />
     <ClInclude Include="src\thirdparty\httplib\httplib.h" />
     <ClInclude Include="src\thirdparty\ImAnimate\ImAnimate.h" />
     <ClInclude Include="src\thirdparty\imgui\imconfig.h" />
@@ -416,6 +423,9 @@
     <None Include="src\Resources\Locales\it_Main.json" />
     <None Include="src\Resources\Locales\pl_Main.json" />
     <None Include="src\Resources\Locales\ru_Main.json" />
+    <None Include="src\thirdparty\arcdps\.gitattributes" />
+    <None Include="src\thirdparty\arcdps\.gitignore" />
+    <None Include="src\thirdparty\arcdps\LICENSE" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="src\Resources\Fonts\Inter.ttf" />

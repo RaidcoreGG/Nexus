@@ -112,13 +112,13 @@ namespace ADDONAPI
 			s_EventApi->Raise(aIdentifier, nullptr);
 		}
 
-		void RaiseEventTargeted(signed int aSignature, const char* aIdentifier, void* aEventData)
+		void RaiseEventTargeted(uint32_t aSignature, const char* aIdentifier, void* aEventData)
 		{
 			assert(s_EventApi);
 			s_EventApi->Raise(aSignature, aIdentifier, aEventData);
 		}
 
-		void RaiseNotificationTargeted(signed int aSignature, const char* aIdentifier)
+		void RaiseNotificationTargeted(uint32_t aSignature, const char* aIdentifier)
 		{
 			assert(s_EventApi);
 			s_EventApi->Raise(aSignature, aIdentifier, nullptr);

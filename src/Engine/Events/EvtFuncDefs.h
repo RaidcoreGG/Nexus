@@ -9,6 +9,8 @@
 #ifndef EVTFUNCDEFS_H
 #define EVTFUNCDEFS_H
 
+#include <cstdint>
+
 typedef void (*EVENT_CONSUME)                    (void* aEventArgs);
 typedef void (*EVENTS_RAISE)                     (const char* aIdentifier, void* aEventData);
 typedef void (*EVENTS_RAISENOTIFICATION)         (const char* aIdentifier);
