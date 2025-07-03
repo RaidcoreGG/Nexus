@@ -46,15 +46,19 @@ namespace Path
 		}
 	}
 
-	std::filesystem::path GetUnused(const std::filesystem::path& aPath, bool aOverwriteExtension)
+	std::filesystem::path GetUnused(const std::filesystem::path& aPath)
 	{
 		std::filesystem::path probe = aPath;
+
+		std::filesystem::path dir      = aPath.parent_path();
+		std::string           filename = aPath.stem().string();
+		std::string           ext      = aPath.extension().string();
 
 		int i = 0;
 		while (std::filesystem::exists(probe))
 		{
-			probe = aPath.string() + "_" + std::to_string(i);
 			i++;
+			probe = dir / (filename + std::to_string(i) + ext);
 		}
 
 		return probe;

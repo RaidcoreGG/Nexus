@@ -1,20 +1,26 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  AdoApiBase.h
-/// Description  :  Addon API base.
+/// Name         :  BuildInfo.h
+/// Description  :  Retrieves the game build.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef ADOAPIBASE_H
-#define ADOAPIBASE_H
+#ifndef BUILDINFO_H
+#define BUILDINFO_H
 
-// FIXME: This is just here for compile errors.
-typedef void (*UPDATER_REQUESTUPDATE)(signed int aSignature, const char* aUpdateURL);
+#include <cstdint>
 
 ///----------------------------------------------------------------------------------------------------
-/// AddonAPI_t Struct
+/// GW2 Namespace
 ///----------------------------------------------------------------------------------------------------
-struct AddonAPI_t {};
+namespace GW2
+{
+	///----------------------------------------------------------------------------------------------------
+	/// GetGameBuild:
+	/// 	Returns the current game build.
+	///----------------------------------------------------------------------------------------------------
+	uint32_t GetGameBuild();
+}
 
 #endif

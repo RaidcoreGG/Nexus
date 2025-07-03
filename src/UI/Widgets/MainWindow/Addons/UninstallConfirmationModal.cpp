@@ -9,7 +9,6 @@
 #include "UninstallConfirmationModal.h"
 
 #include "Core/Context.h"
-#include "Engine/Loader/Loader.h"
 
 CUninstallConfirmationModal::CUninstallConfirmationModal()
 {
@@ -42,14 +41,14 @@ void CUninstallConfirmationModal::RenderContent()
 
 void CUninstallConfirmationModal::OnClosing()
 {
-	CContext* ctx = CContext::GetContext();
-	CLoader* loader = ctx->GetLoader();
+	CContext*    ctx    = CContext::GetContext();
+	CLoaderBase* loader = ctx->GetLoaderBase();
 
 	switch (this->GetResult())
 	{
 		case EModalResult::OK:
 		{
-			loader->QueueAddon(ELoaderAction::Uninstall, this->Path);
+			loader->UninstallSafe(this->Path);
 			break;
 		}
 		case EModalResult::Cancel:

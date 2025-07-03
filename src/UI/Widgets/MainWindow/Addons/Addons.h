@@ -12,7 +12,7 @@
 #include <mutex>
 #include <vector>
 
-#include "DisplayAddon.h"
+#include "AddonListing.h"
 #include "UI/Controls/CtlSubWindow.h"
 #include "UI/Widgets/MainWindow/Binds/BindSetterModal.h"
 #include "UninstallConfirmationModal.h"
@@ -27,7 +27,7 @@ enum class EAddonsFilterFlags
 	ShowDisabled         = 1 << 1,
 	ShowDownloadable     = 1 << 2,
 	ShowInstalled_Arc    = 1 << 3,
-	ShowDownloadable_Arc = 1 << 4,
+	ShowDownloadable_Arc = 1 << 4
 };
 
 class CAddonsWindow : public ISubWindow
@@ -44,17 +44,17 @@ class CAddonsWindow : public ISubWindow
 
 	std::string                 SearchTerm;
 	EAddonsFilterFlags          Filter;
-	std::vector<AddonItemData_t>  Addons;
+	std::vector<AddonListing_t> Addons;
 
 	/* Details */
 	std::mutex                  Mutex;
 	bool                        HasContent = false;
-	AddonItemData_t             AddonData = {};
+	AddonListing_t              AddonData = {};
 
-	void SetContent(AddonItemData_t& aAddonData);
+	void SetContent(AddonListing_t& aAddonData);
 	void ClearContent();
 
-	void AddonItem(AddonItemData_t& aAddonData, float aWidth);
+	void AddonItem(AddonListing_t& aAddonData, float aWidth);
 
 	void RenderContent() override;
 	void RenderSubWindows() override;

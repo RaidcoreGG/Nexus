@@ -27,7 +27,7 @@ constexpr const char* K_DISABLEVERSION = "DisableVersion";
 constexpr const char* K_LASTGAMEBUILD  = "LastGameBuild";
 constexpr const char* K_NAME           = "Name";
 
-CConfigMgr::CConfigMgr(CLogApi* aLogger, std::filesystem::path aConfigPath, bool aReadOnly)
+CConfigMgr::CConfigMgr(CLogApi* aLogger, std::filesystem::path aConfigPath, std::vector<uint32_t> aWhitelist)
 {
 	if (aConfigPath.empty())
 	{
@@ -36,8 +36,9 @@ CConfigMgr::CConfigMgr(CLogApi* aLogger, std::filesystem::path aConfigPath, bool
 
 	this->Logger = aLogger;
 
-	this->ReadOnly = aReadOnly;
+	this->ReadOnly = aWhitelist.size() > 0;
 	this->Path = aConfigPath;
+	this->Whitelist = aWhitelist;
 
 	this->LoadConfigs();
 }
@@ -58,6 +59,9 @@ void CConfigMgr::SaveConfigs()
 
 		for (auto& [sig, cfg] : this->Configs)
 		{
+			/* Do not save, if it was uninstalled. */
+			if (!cfg->Persist) { continue; }
+
 			/* Map values. Add signature to identify. */
 			json cfgJSON = json{
 				{ K_SIGNATURE,      sig                   },
@@ -206,6 +210,19 @@ void CConfigMgr::LoadConfigs()
 			if (!cfgJSON[K_SHOULDLOAD].is_null())
 			{
 				config->ShouldLoad = cfgJSON[K_SHOULDLOAD].get<bool>();
+			}
+
+			/* If -ggaddons sig list, compare against that. */
+			if (this->ReadOnly)
+			{
+				config->ShouldLoad = false;
+
+				auto whitelisted = std::find(this->Whitelist.begin(), this->Whitelist.end(), sig);
+
+				if (whitelisted != this->Whitelist.end())
+				{
+					config->ShouldLoad = true;
+				}
 			}
 
 			/* Calling .value() is less writing, but redundant as defaults are set on the struct definition. */

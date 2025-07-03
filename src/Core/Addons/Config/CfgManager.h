@@ -28,7 +28,7 @@ class CConfigMgr
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CConfigMgr(CLogApi* aLogger, std::filesystem::path aConfigPath, bool aReadOnly = false);
+	CConfigMgr(CLogApi* aLogger, std::filesystem::path aConfigPath, std::vector<uint32_t> aWhitelist = {});
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -61,6 +61,7 @@ class CConfigMgr
 
 	std::mutex                              Mutex;
 	std::unordered_map<uint32_t, Config_t*> Configs;
+	std::vector<uint32_t>                   Whitelist;
 
 	///----------------------------------------------------------------------------------------------------
 	/// LoadConfigs:

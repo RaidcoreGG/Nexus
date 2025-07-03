@@ -9,6 +9,10 @@
 #ifndef CONTEXT_H
 #define CONTEXT_H
 
+#include <map>
+#include <mutex>
+
+#include "Core/Addons/Config/CfgManager.h"
 #include "Core/Addons/Library/LibManager.h"
 #include "Core/Preferences/PrefContext.h"
 #include "Core/Updater/SelfUpdater.h"
@@ -17,12 +21,11 @@
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
-#include "Engine/Loader/Loader.h"
+#include "Engine/Loader/LoaderBase.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
 #include "Engine/Renderer/RdrContext.h"
 #include "Engine/Textures/TxLoader.h"
-#include "Engine/Updater/Updater.h"
 #include "GW2/ArcDPS/ArcApi.h"
 #include "GW2/Inputs/GameBinds/GbApi.h"
 #include "GW2/Mumble/MblReader.h"
@@ -50,15 +53,13 @@ class CContext
 
 	CLogApi* GetLogger();
 
-	CUpdater* GetUpdater();
-
 	CTextureLoader* GetTextureService();
 
 	CDataLinkApi* GetDataLink();
 
 	CEventApi* GetEventApi();
 
-	CLoader* GetLoader();
+	CLoaderBase* GetLoaderBase();
 
 	CLibraryMgr* GetAddonLibrary();
 
@@ -74,19 +75,23 @@ class CContext
 
 	CMumbleReader* GetMumbleReader();
 
-	CHttpClient* GetRaidcoreApi();
-
-	CHttpClient* GetGitHubApi();
+	CHttpClient* GetHttpClient(std::string aURL);
 
 	CSelfUpdater* GetSelfUpdater();
 
 	CArcApi* GetArcApi();
 
+	CConfigMgr* GetCfgMgr();
+
 	private:
 	CContext() = default;
+	~CContext();
 
-	HMODULE Module;
-	DWORD   ModuleSize;
+	HMODULE                             Module     = nullptr;
+	DWORD                               ModuleSize = 0;
+
+	std::mutex                          HttpClientMutex;
+	std::map<std::string, CHttpClient*> HttpClients;
 };
 
 #endif

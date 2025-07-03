@@ -387,13 +387,13 @@ namespace ADDONAPI
 	/// Get:
 	/// 	Gets or creates a pointer to the provided version, or nullptr if no such version exists.
 	///----------------------------------------------------------------------------------------------------
-	AddonAPI_t* Get(int aVersion, bool aSetImGuiContext = true);
+	AddonAPI_t* Get(uint32_t aVersion, bool aSetImGuiContext = true);
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetSize:
 	/// 	Returns the size of the provided API version.
 	///----------------------------------------------------------------------------------------------------
-	size_t GetSize(int aVersion);
+	size_t GetSize(uint32_t aVersion);
 }
 
 #endif

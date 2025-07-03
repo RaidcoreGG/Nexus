@@ -486,7 +486,7 @@ void CDebugWindow::TabLoader()
 						{
 							this->MemoryViewer.Open = true;
 							this->MV_Ptr = addon->Definitions;
-							this->MV_Size = sizeof(AddonDef_t);
+							this->MV_Size = sizeof(AddonDefRawV1_t);
 						}
 					}
 

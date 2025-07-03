@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\Addons\Addon.cpp" />
     <ClCompile Include="src\Core\Addons\Config\CfgManager.cpp" />
     <ClCompile Include="src\Core\Addons\Library\LibAddon.cpp" />
     <ClCompile Include="src\Core\Addons\Library\LibManager.cpp" />
@@ -19,9 +20,12 @@
     <ClCompile Include="src\Core\Updater\SelfUpdater.cpp" />
     <ClCompile Include="src\Engine\Functions\FnRegistry.cpp" />
     <ClCompile Include="src\Core\Index\Index.cpp" />
+    <ClCompile Include="src\Engine\Loader\LdrAddonBase.cpp" />
+    <ClCompile Include="src\Engine\Loader\LoaderBase.cpp" />
     <ClCompile Include="src\Engine\Networking\WebRequests\WreCache.cpp" />
     <ClCompile Include="src\Engine\Networking\WebRequests\WreConst.cpp" />
     <ClCompile Include="src\GW2\ArcDPS\ArcApi.cpp" />
+    <ClCompile Include="src\GW2\Build\BuildInfo.cpp" />
     <ClCompile Include="src\GW2\Inputs\GameBinds\GbApi.cpp" />
     <ClCompile Include="src\GW2\Inputs\GameBinds\GbConst.cpp" />
     <ClCompile Include="src\Engine\Inputs\InputBinds\IbCapture.cpp" />
@@ -29,7 +33,6 @@
     <ClCompile Include="src\Core\Addons\API\ApiBuilder.cpp" />
     <ClCompile Include="src\Engine\Networking\WebRequests\WreClient.cpp" />
     <ClCompile Include="src\Engine\DataLink\DlApi.cpp" />
-    <ClCompile Include="src\Engine\Loader\ArcDPS.cpp" />
     <ClCompile Include="src\GW2\Mumble\MblConst.cpp" />
     <ClCompile Include="src\Core\Main.cpp" />
     <ClCompile Include="src\Engine\Events\EvtApi.cpp" />
@@ -43,7 +46,6 @@
     <ClCompile Include="src\thirdparty\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Engine\Inputs\InputBinds\IbBindV2.cpp" />
     <ClCompile Include="src\Engine\Inputs\InputBinds\IbApi.cpp" />
-    <ClCompile Include="src\Engine\Loader\Loader.cpp" />
     <ClCompile Include="src\Engine\Logging\LogWriter.cpp" />
     <ClCompile Include="src\Engine\Logging\LogBase.cpp" />
     <ClCompile Include="src\Engine\Logging\LogApi.cpp" />
@@ -57,7 +59,6 @@
     <ClCompile Include="src\Core\Proxy\Proxy.cpp" />
     <ClCompile Include="src\Core\Preferences\PrefContext.cpp" />
     <ClCompile Include="src\Engine\Textures\TxLoader.cpp" />
-    <ClCompile Include="src\Engine\Updater\Updater.cpp" />
     <ClCompile Include="src\thirdparty\pugixml\pugixml.cpp" />
     <ClCompile Include="src\UI\Controls\CtlModal.cpp" />
     <ClCompile Include="src\UI\Controls\CtlSubWindow.cpp" />
@@ -97,9 +98,12 @@
     <ClCompile Include="src\Engine\Inputs\RawInput\RiApi.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\Addons\AddEnum.h" />
+    <ClInclude Include="src\Core\Addons\Addon.h" />
     <ClInclude Include="src\Core\Addons\Config\CfgEnum.h" />
     <ClInclude Include="src\Core\Addons\Config\CfgManager.h" />
     <ClInclude Include="src\Core\Addons\Config\Config.h" />
+    <ClInclude Include="src\Core\Addons\Definitions\DefEnum.h" />
     <ClInclude Include="src\Core\Addons\Library\LibAddon.h" />
     <ClInclude Include="src\Core\Addons\Library\LibManager.h" />
     <ClInclude Include="src\Core\Context.h" />
@@ -126,13 +130,15 @@
     <ClInclude Include="src\Core\Addons\API\ApiV5.h" />
     <ClInclude Include="src\Core\Addons\API\ApiV6.h" />
     <ClInclude Include="src\Engine\Loader\LdrAddonBase.h" />
-    <ClInclude Include="src\Engine\Loader\LdrEnum.h" />
+    <ClInclude Include="src\Engine\Loader\LdrChecksum.h" />
+    <ClInclude Include="src\Engine\Loader\LoaderBase.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreCache.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreConst.h" />
     <ClInclude Include="src\GW2\ArcDPS\ArcApi.h" />
     <ClInclude Include="src\GW2\ArcDPS\ArcEnum.h" />
     <ClInclude Include="src\GW2\ArcDPS\ArcExtensionDef.h" />
     <ClInclude Include="src\GW2\ArcDPS\ArcFuncDefs.h" />
+    <ClInclude Include="src\GW2\Build\BuildInfo.h" />
     <ClInclude Include="src\GW2\Inputs\MouseResetFix.h" />
     <ClInclude Include="src\Engine\Networking\NetConst.h" />
     <ClInclude Include="src\Engine\Renderer\RdrContext.h" />
@@ -154,7 +160,7 @@
     <ClInclude Include="src\Engine\Networking\WebRequests\WreClient.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreResponse.h" />
     <ClInclude Include="src\Branch.h" />
-    <ClInclude Include="src\Engine\Loader\LdrConst.h" />
+    <ClInclude Include="src\Core\Addons\AddConst.h" />
     <ClInclude Include="src\Engine\DataLink\DlApi.h" />
     <ClInclude Include="src\Engine\DataLink\DlEnum.h" />
     <ClInclude Include="src\Engine\DataLink\DlFuncDefs.h" />
@@ -181,10 +187,6 @@
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbFuncDefs.h" />
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbBindV2.h" />
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbApi.h" />
-    <ClInclude Include="src\Engine\Loader\Addon.h" />
-    <ClInclude Include="src\Engine\Loader\ArcDPS.h" />
-    <ClInclude Include="src\Engine\Loader\LdrFuncDefs.h" />
-    <ClInclude Include="src\Engine\Loader\Loader.h" />
     <ClInclude Include="src\Core\NexusLink.h" />
     <ClInclude Include="src\Engine\Logging\LogFuncDefs.h" />
     <ClInclude Include="src\Core\Main.h" />
@@ -351,8 +353,6 @@
     <ClInclude Include="src\Engine\Textures\TxQueueEntry.h" />
     <ClInclude Include="src\Engine\Textures\TxTexture.h" />
     <ClInclude Include="src\Engine\Textures\TxLoader.h" />
-    <ClInclude Include="src\Engine\Updater\FuncDefs.h" />
-    <ClInclude Include="src\Engine\Updater\Updater.h" />
     <ClInclude Include="src\UI\Controls\Control.h" />
     <ClInclude Include="src\UI\Controls\CtlModal.h" />
     <ClInclude Include="src\UI\Controls\CtlSubWindow.h" />
@@ -376,8 +376,8 @@
     <ClInclude Include="src\UI\Widgets\Alerts\AlMessage.h" />
     <ClInclude Include="src\UI\Widgets\EULA\LicenseAgreementModal.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\About\About.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\AddonListing.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\Addons.h" />
-    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\DisplayAddon.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\UninstallConfirmationModal.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Binds\Binds.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Binds\BindSetterModal.h" />

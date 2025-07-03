@@ -8,10 +8,14 @@
 
 #include "Context.h"
 
-#include <Psapi.h>
+#include <psapi.h>
 
 #include "Branch.h"
+#include "Core/Addons/Addon.h"
 #include "Core/Index/Index.h"
+#include "Util/CmdLine.h"
+#include "Util/Strings.h"
+#include "Util/Url.h"
 #include "Version.h"
 
 CContext* CContext::GetContext()
@@ -73,14 +77,6 @@ CLogApi* CContext::GetLogger()
 	return &s_Logger;
 }
 
-CUpdater* CContext::GetUpdater()
-{
-	static CUpdater s_Updater = CUpdater(
-		this->GetLogger()
-	);
-	return &s_Updater;
-}
-
 CTextureLoader* CContext::GetTextureService()
 {
 	static CTextureLoader s_TextureApi = CTextureLoader(
@@ -101,20 +97,28 @@ CDataLinkApi* CContext::GetDataLink()
 
 CEventApi* CContext::GetEventApi()
 {
-	static CEventApi s_EventApi = CEventApi();
+	static CEventApi s_EventApi = CEventApi(
+		this->GetLoaderBase()
+	);
 	return &s_EventApi;
 }
 
-CLoader* CContext::GetLoader()
+CLoaderBase* CContext::GetLoaderBase()
 {
-	static CLoader s_Loader = CLoader();
+	static CLoaderBase s_Loader = CLoaderBase(
+		this->GetLogger(),
+		this->GetRendererCtx(),
+		IAddonFactory,
+		Index(EPath::DIR_ADDONS)
+	);
 	return &s_Loader;
 }
 
 CLibraryMgr* CContext::GetAddonLibrary()
 {
 	static CLibraryMgr s_LibraryMgr = CLibraryMgr(
-		this->GetLogger()
+		this->GetLogger(),
+		this->GetLoaderBase()
 	);
 	return &s_LibraryMgr;
 }
@@ -181,26 +185,39 @@ CMumbleReader* CContext::GetMumbleReader()
 	return &s_MumbleReader;
 }
 
-CHttpClient* CContext::GetRaidcoreApi()
+CHttpClient* CContext::GetHttpClient(std::string aURL)
 {
-	static CHttpClient s_RaidcoreApiCli = CHttpClient(
-		this->GetLogger(),
-		"https://api.raidcore.gg",
-		Index(EPath::DIR_APICACHE_RAIDCORE),
-		5 * 60
-	);
-	return &s_RaidcoreApiCli;
-}
+	const std::lock_guard<std::mutex> lock(this->HttpClientMutex);
 
-CHttpClient* CContext::GetGitHubApi()
-{
-	static CHttpClient s_GitHubApiCli = CHttpClient(
-		this->GetLogger(),
-		"https://api.github.com",
-		Index(EPath::DIR_APICACHE_GITHUB),
-		30 * 60
-	);
-	return &s_GitHubApiCli;
+	std::string baseurl = URL::GetBase(aURL);
+
+	std::string baseurl_noprotocol = baseurl;
+	baseurl_noprotocol = String::Replace(baseurl_noprotocol, "htts://", "");
+	baseurl_noprotocol = String::Replace(baseurl_noprotocol, "https://", "");
+
+	auto it = this->HttpClients.find(baseurl_noprotocol);
+
+	if (it != this->HttpClients.end())
+	{
+		return it->second;
+	}
+
+	std::filesystem::path cachedir = Index(EPath::DIR_COMMON) / baseurl_noprotocol;
+	uint32_t cacheLifetime = 30 * 60; // 30 minutes
+
+	if (baseurl == "https://api.raidcore.gg")
+	{
+		cacheLifetime = 5 * 60; // 5 minutes
+	}
+	else if (baseurl == "https://api.github.com")
+	{
+		cacheLifetime = 60 * 60; // 60 minutes
+	}
+
+	CHttpClient* client = new CHttpClient(this->GetLogger(), baseurl, cachedir, cacheLifetime);
+	this->HttpClients.emplace(baseurl_noprotocol, client);
+
+	return client;
 }
 
 CSelfUpdater* CContext::GetSelfUpdater()
@@ -215,4 +232,64 @@ CArcApi* CContext::GetArcApi()
 {
 	static CArcApi s_ArcApi = CArcApi();
 	return &s_ArcApi;
+}
+
+CConfigMgr* CContext::GetCfgMgr()
+{
+	static std::filesystem::path cfgpath      = Index(EPath::AddonConfigDefault);
+	static std::vector<uint32_t> cfgwhitelist = {};
+
+	static bool s_CmdLineParsed = [this] {
+		if (CmdLine::HasArgument("-ggaddons"))
+		{
+			std::vector<std::string> idList = String::Split(CmdLine::GetArgumentValue("-ggaddons"), ",");
+
+			/* If only one entry and it contains ".json" it's a custom config. */
+			if (idList.size() == 1 && String::Contains(idList[0], ".json"))
+			{
+				cfgpath = idList[0];
+			}
+			else
+			{
+				for (std::string addonsig : idList)
+				{
+					try
+					{
+						uint32_t sig = std::stoi(addonsig, nullptr, 0);
+						cfgwhitelist.push_back(sig);
+					}
+					catch (const std::invalid_argument& e)
+					{
+						this->GetLogger()->Trace(CH_LOADERBASE, "Invalid argument(-ggaddons) : %s (exc: %s)", addonsig.c_str(), e.what());
+					}
+					catch (const std::out_of_range& e)
+					{
+						this->GetLogger()->Trace(CH_LOADERBASE, "Out of range (-ggaddons): %s (exc: %s)", addonsig.c_str(), e.what());
+					}
+				}
+			}
+		}
+		return true;
+	}();
+
+	static CConfigMgr s_CfgMgr = CConfigMgr(
+		this->GetLogger(),
+		cfgpath,
+		cfgwhitelist
+	);
+	return &s_CfgMgr;
+}
+
+CContext::~CContext()
+{
+	const std::lock_guard<std::mutex> lock(this->HttpClientMutex);
+
+	for (auto it = this->HttpClients.begin(); it != this->HttpClients.end();)
+	{
+		/* Deallocate client. */
+		delete it->second;
+
+		/* Erase entry. */
+		it = this->HttpClients.erase(it);
+	}
 }

@@ -22,11 +22,9 @@
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
-#include "Engine/Loader/ArcDPS.h"
-#include "Engine/Loader/Loader.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Textures/TxLoader.h"
-#include "Engine/Updater/Updater.h"
+#include "GW2/ArcDPS/ArcApi.h"
 #include "GW2/Inputs/GameBinds/GbApi.h"
 #include "UI/Services/Fonts/FontManager.h"
 #include "UI/Services/Localization/LoclApi.h"
@@ -47,9 +45,9 @@ namespace ADDONAPI
 	static CLocalization*   s_Localization  = nullptr;
 	static CLogApi*         s_Logger        = nullptr;
 	static CTextureLoader*  s_TextureApi    = nullptr;
-	static CUpdater*        s_Updater       = nullptr;
-	static CLoader*         s_Loader        = nullptr;
+	static CLoaderBase*     s_Loader        = nullptr;
 	static RenderContext_t* s_RenderCtx     = nullptr;
+	static CArcApi*         s_ArcApi        = nullptr;
 
 	static CUiContext*      s_UiContext     = nullptr;
 	static CFontManager*    s_FontManager   = nullptr;
@@ -69,7 +67,7 @@ namespace ADDONAPI
 		void* ShareResource(const char* aIdentifier, size_t aResourceSize)
 		{
 			assert(s_DataLinkApi);
-			return s_DataLinkApi->ShareResource(aIdentifier, aResourceSize, "", true);
+			return s_DataLinkApi->ShareResource(aIdentifier, aResourceSize, "", false);
 		}
 	}
 
@@ -81,7 +79,7 @@ namespace ADDONAPI
 			s_EventApi->Subscribe(aIdentifier, aConsumeEventCallback);
 
 			// FIXME: Dirty hack to detect ArcDPS below. Do this cleaner later.
-			if (ArcDPS::IsLoaded)
+			if (s_ArcApi->IsInitialized())
 			{
 				return;
 			}
@@ -91,7 +89,7 @@ namespace ADDONAPI
 				return;
 			}
 
-			ArcDPS::Detect();
+			s_ArcApi->TryDetect();
 		}
 
 		void Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback)
@@ -365,7 +363,8 @@ namespace ADDONAPI
 	{
 		void RequestUpdate(signed int aSignature, const char* aUpdateURL)
 		{
-			assert(s_Updater);
+			// FIXME: self updating
+			/*assert(s_Updater);
 			assert(s_Loader);
 
 			if (!aSignature) { return; }
@@ -383,11 +382,6 @@ namespace ADDONAPI
 				return;
 			}
 
-			/* TODO: Add verification */
-			// 1. Addon_t -> API::RequestUpdate(signature);
-			// 2. Nexus -> Events::RaiseSingle(signature, password123);
-			// 3. Addon_t -> API::ConfirmUpdate(password123);
-
 			std::filesystem::path path = addon->Path;
 
 			AddonInfo_t addonInfo
@@ -403,7 +397,7 @@ namespace ADDONAPI
 			std::thread([path, addonInfo]()
 			{
 				s_Updater->UpdateAddon(path, addonInfo);
-			}).detach();
+			}).detach();*/
 		}
 	}
 
@@ -558,7 +552,7 @@ namespace ADDONAPI
 		}
 	}
 
-	AddonAPI_t* Get(int aVersion, bool aSetImGuiContext)
+	AddonAPI_t* Get(uint32_t aVersion, bool aSetImGuiContext)
 	{
 		if (!s_IsInitialized)
 		{
@@ -571,9 +565,9 @@ namespace ADDONAPI
 			s_RawInputApi   = ctx->GetRawInputApi();
 			s_Logger        = ctx->GetLogger();
 			s_TextureApi    = ctx->GetTextureService();
-			s_Updater       = ctx->GetUpdater();
-			s_Loader        = ctx->GetLoader();
+			s_Loader        = ctx->GetLoaderBase();
 			s_RenderCtx     = ctx->GetRendererCtx();
+			s_ArcApi        = ctx->GetArcApi();
 
 			s_UiContext     = ctx->GetUIContext();
 			s_FontManager   = s_UiContext->GetFontManager();
@@ -991,7 +985,7 @@ namespace ADDONAPI
 		return nullptr;
 	}
 
-	size_t GetSize(int aVersion)
+	size_t GetSize(uint32_t aVersion)
 	{
 		switch (aVersion)
 		{

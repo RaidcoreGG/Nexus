@@ -14,11 +14,12 @@
 #include "imgui/imgui_extensions.h"
 #include "imgui/imgui_internal.h"
 
+#include "Core/Addons/AddConst.h"
+#include "Core/Addons/Addon.h"
 #include "Core/Context.h"
 #include "Core/Preferences/PrefConst.h"
-#include "Engine/Inputs/InputBinds/IbConst.h"
-#include "Engine/Loader/LdrConst.h"
 #include "Core/Preferences/PrefContext.h"
+#include "Engine/Inputs/InputBinds/IbConst.h"
 #include "Resources/ResConst.h"
 #include "UI/UIContext.h"
 
@@ -322,7 +323,7 @@ void CQuickAccess::Render()
 					}
 					else
 					{
-						ImGui::Text("%s (%s)", this->Language->Translate(shortcut.TooltipText.c_str()), shortcut.IBText.c_str());
+						ImGui::Text("%s [%s]", this->Language->Translate(shortcut.TooltipText.c_str()), shortcut.IBText.c_str());
 					}
 					if (shortcut.ContextItems.size() > 0)
 					{
@@ -366,7 +367,7 @@ void CQuickAccess::Render()
 void CQuickAccess::RenderContextMenu(const std::string& aIdentifier, const Shortcut_t& aShortcut, bool* aIsActive)
 {
 	static CContext* ctx = CContext::GetContext();
-	static CLoader* loader = ctx->GetLoader();
+	static CLoaderBase* loader = ctx->GetLoaderBase();
 
 	if (aShortcut.ContextItems.size() > 0)
 	{
@@ -385,7 +386,9 @@ void CQuickAccess::RenderContextMenu(const std::string& aIdentifier, const Short
 
 				if (cbshortcut.Callback)
 				{
-					ImGui::TextDisabled(loader->GetOwner(cbshortcut.Callback).c_str());
+					IAddon* iaddon = loader->GetOwner(cbshortcut.Callback);
+					CAddon* addon = dynamic_cast<CAddon*>(iaddon);
+					ImGui::TextDisabled(addon->GetName().c_str());
 					cbshortcut.Callback();
 
 					if (idx != amtItems)

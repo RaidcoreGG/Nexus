@@ -112,8 +112,8 @@ class CArcApi
 		ArcDPS::PFN_LISTEXTENSION    ListExtensions;
 	};
 
-	HMODULE     Module = nullptr;
-	FuncTable_t Functions;
+	HMODULE     Module    = nullptr;
+	FuncTable_t Functions = {};
 
 	///----------------------------------------------------------------------------------------------------
 	/// BuildFunctionTable:

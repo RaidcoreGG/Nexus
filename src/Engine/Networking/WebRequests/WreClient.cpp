@@ -91,7 +91,11 @@ HttpResponse_t CHttpClient::Get(std::string aEndpoint, std::string aParameters, 
 	}
 
 	result.Content = getResult->body;
-	this->Cache->Store(query, result);
+
+	if (this->Cache)
+	{
+		this->Cache->Store(query, result);
+	}
 
 	return result;
 }

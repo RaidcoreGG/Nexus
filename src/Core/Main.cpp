@@ -16,10 +16,10 @@
 #include "Core/Context.h"
 #include "Core/Hooks/Hooks.h"
 #include "Core/Index/Index.h"
-#include "Engine/Loader/Loader.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Logging/LogConsole.h"
 #include "Engine/Logging/LogWriter.h"
+#include "GW2/Build/BuildInfo.h"
 #include "GW2/Multibox/Multibox.h"
 #include "Resources/ResConst.h"
 #include "UI/UiContext.h"
@@ -58,7 +58,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 namespace Main
 {
 	static std::thread s_LibraryThread;
+	static std::thread s_BuildThread;
 	static std::thread s_LicenseThread;
+	static std::thread s_KillMutexThread;
 
 	void Initialize(EProxyFunction aEntryFunction)
 	{
@@ -89,17 +91,7 @@ namespace Main
 		/* Initialize self updater here so it can lock this instance and update. */
 		CSelfUpdater* selfupdater = ctx->GetSelfUpdater();
 
-		s_LibraryThread = std::thread([]() {
-
-			CContext* ctx = CContext::GetContext();
-			CLibraryMgr* libmgr = ctx->GetAddonLibrary();
-			libmgr->AddSource("https://api.raidcore.gg/addonlibrary");
-			libmgr->AddSource("https://api.raidcore.gg/arcdpslibrary");
-			libmgr->Update();
-
-		});
 		s_LicenseThread = std::thread([]() {
-
 			CContext* ctx = CContext::GetContext();
 			Resources::Unpack(ctx->GetModule(), Index(EPath::ThirdPartySoftwareReadme), RES_THIRDPARTYNOTICES, "TXT");
 		});
@@ -135,9 +127,25 @@ namespace Main
 			return;
 		}
 
+		s_LibraryThread = std::thread([]() {
+			CContext* ctx = CContext::GetContext();
+			CLibraryMgr* libmgr = ctx->GetAddonLibrary();
+			libmgr->AddSource("https://api.raidcore.gg/addonlibrary");
+			libmgr->AddSource("https://api.raidcore.gg/arcdpslibrary");
+			libmgr->Update();
+		});
+
+		/* Prefetch game build. */
+		s_BuildThread = std::thread([]() {
+			GW2::GetGameBuild();
+		});
+
 		MH_Initialize();
-		Multibox::KillMutex();
-		logger->Info(CH_CORE, "Multibox State: %d", Multibox::GetState());
+
+		s_KillMutexThread = std::thread([logger]() {
+			Multibox::KillMutex();
+			logger->Info(CH_CORE, "Multibox State: %d", Multibox::GetState());
+		});
 	}
 
 	void Shutdown(unsigned int aReason)
@@ -153,8 +161,10 @@ namespace Main
 		s_ShutdownReason = aReason;
 
 		/* Join threads. */
-		if (s_LibraryThread.joinable()) { s_LibraryThread.join(); }
+		if (s_KillMutexThread.joinable()) { s_KillMutexThread.join(); }
 		if (s_LicenseThread.joinable()) { s_LicenseThread.join(); }
+		if (s_BuildThread.joinable()) { s_BuildThread.join(); }
+		if (s_LibraryThread.joinable()) { s_LibraryThread.join(); }
 
 		std::string reasonStr;
 		switch (aReason)
@@ -172,11 +182,10 @@ namespace Main
 		CContext*   ctx    = CContext::GetContext();
 		CLogApi*    logger = ctx->GetLogger();
 		CUiContext* uictx  = ctx->GetUIContext();
-		CLoader*    loader = ctx->GetLoader();
 
 		logger->Critical(CH_CORE, "SHUTDOWN BEGIN | %s", reasonStr.c_str());
 		MH_Uninitialize();
-		loader->Shutdown();
+		logger->Debug(CH_CORE, "SHUTDOWN MID");
 		uictx->Shutdown();
 		logger->Info(CH_CORE, "SHUTDOWN END");
 

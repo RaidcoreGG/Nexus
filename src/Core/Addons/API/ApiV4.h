@@ -23,7 +23,6 @@
 #include "Engine/Inputs/RawInput/RiFuncDefs.h"
 #include "Engine/Logging/LogFuncDefs.h"
 #include "Engine/Textures/TxFuncDefs.h"
-#include "Engine/Updater/FuncDefs.h"
 #include "UI/FuncDefs.h"
 #include "UI/Services/Fonts/FuncDefs.h"
 #include "UI/Services/Localization/LoclFuncDefs.h"

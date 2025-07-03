@@ -42,7 +42,7 @@ const MajorMinorBuildRevision_t& CSelfUpdater::GetRemoteVersion()
 	}
 
 	/* The client is not dependency injected, as we only create it on demand. */
-	CHttpClient* raidcoreapi = CContext::GetContext()->GetRaidcoreApi();
+	CHttpClient* raidcoreapi = CContext::GetContext()->GetHttpClient("https://api.raidcore.gg");
 
 	/* Request version info, bypass cache. */
 	HttpResponse_t result = raidcoreapi->Get("/nexusversion", "", 0);

@@ -15,6 +15,7 @@
 
 #include "EvtData.h"
 #include "EvtFuncDefs.h"
+#include "Engine/Loader/LoaderBase.h"
 
 constexpr const char* CH_EVENTS = "Events";
 
@@ -24,6 +25,11 @@ constexpr const char* CH_EVENTS = "Events";
 class CEventApi
 {
 	public:
+	///----------------------------------------------------------------------------------------------------
+	/// ctor
+	///----------------------------------------------------------------------------------------------------
+	CEventApi(CLoaderBase* aLoader);
+
 	///----------------------------------------------------------------------------------------------------
 	/// Raise:
 	/// 	Raises an event of provided name, passing a pointer to the payload.
@@ -61,6 +67,8 @@ class CEventApi
 	std::unordered_map<std::string, EventData_t> GetRegistry() const;
 
 	private:
+	CLoaderBase*                                 Loader = nullptr;
+
 	mutable std::recursive_mutex                 Mutex;
 	std::unordered_map<std::string, EventData_t> Registry;
 };
