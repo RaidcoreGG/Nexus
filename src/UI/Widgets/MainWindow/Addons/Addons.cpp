@@ -45,8 +45,12 @@ CAddonsWindow::CAddonsWindow()
 
 	this->Invalidate();
 
-	CContext* ctx = CContext::GetContext();
-	CEventApi* evtapi = ctx->GetEventApi();
+	CContext*  ctx         = CContext::GetContext();
+	CSettings* settingsctx = ctx->GetSettingsCtx();
+	CEventApi* evtapi      = ctx->GetEventApi();
+	
+	this->Filter     = settingsctx->Get(OPT_ADDONFILTERS, FILTER_INSTALLED);
+	this->IsListMode = settingsctx->Get(OPT_ISLISTMODE,   true            );
 
 	evtapi->Subscribe("EV_ADDON_LOADED", OnAddonLoadUnload);
 	evtapi->Subscribe("EV_ADDON_UNLOADED", OnAddonLoadUnload);
@@ -296,8 +300,6 @@ void CAddonsWindow::RenderContent()
 		this->IsInvalid = false;
 	}
 
-	static char searchTerm[400] = {};
-	
 	static CContext* ctx = CContext::GetContext();
 	static CUiContext* uictx = ctx->GetUIContext();
 	static CLocalization* langApi = uictx->GetLocalization();
@@ -306,92 +308,90 @@ void CAddonsWindow::RenderContent()
 
 	ImVec2 region = ImGui::GetContentRegionAvail();
 
-	static float filterAreaEndY = region.y;
-	ImVec2 filterAreaSz = ImVec2(region.x, filterAreaEndY);
+	static ImVec2 s_FilterBarSize  = ImVec2(region.x, region.y);
+	static ImVec2 s_ActionsBarSize = ImVec2(region.x, region.y);
 
 	ImGuiStyle& style = ImGui::GetStyle();
 
 	if (!this->IsPoppedOut)
 	{
 		float btnSz = ImGui::GetFontSize() * 1.5f;
-		filterAreaSz.x = region.x - style.ItemSpacing.x - btnSz - style.ItemSpacing.x;
+		s_FilterBarSize.x = region.x - style.ItemSpacing.x - btnSz - style.ItemSpacing.x;
 	}
-
-	static float actionsAreaEndY = region.y;
-	ImVec2 actionsAreaSz = ImVec2(region.x, actionsAreaEndY);
-
-	//static float detailsAreaWidth = 0;
 
 	bool configuring = this->HasContent;
 
-	/*if (configuring)
-	{
-		detailsAreaWidth = region.x;
-	}
-	else
-	{
-		detailsAreaWidth = 0;
-	}*/
+	ImVec2 listAreaSz = ImVec2(region.x, region.y - s_FilterBarSize.y - s_ActionsBarSize.y - style.ItemSpacing.y - style.ItemSpacing.y);
 
-	//ImVec2 detailsAreaSz = ImVec2(detailsAreaWidth - style.ItemSpacing.x, region.y - filterAreaSz.y - actionsAreaSz.y - style.ItemSpacing.y - style.ItemSpacing.y);
-	ImVec2 listAreaSz = ImVec2(region.x, region.y - filterAreaSz.y - actionsAreaSz.y - style.ItemSpacing.y - style.ItemSpacing.y);
-
-	static bool isListMode = settingsctx->Get<bool>(OPT_ISLISTMODE, false);
+	this->RenderFilterBar(s_FilterBarSize);
 	
-	if (ImGui::BeginChild("Filters", filterAreaSz, false, ImGuiWindowFlags_NoBackground))
+	this->RenderBody(listAreaSz);
+
+	this->RenderActionsBar(s_ActionsBarSize);
+}
+
+void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
+{
+	CContext*       ctx         = CContext::GetContext();
+	CSettings*      settingsctx = ctx->GetSettingsCtx();
+	CTextureLoader* texapi      = ctx->GetTextureService();
+	CUiContext*     uictx       = ctx->GetUIContext();
+	CLocalization*  lang        = uictx->GetLocalization();
+
+	ImGuiStyle& style = ImGui::GetStyle();
+
+	if (ImGui::BeginChild("Filters", aSize, false, ImGuiWindowFlags_NoBackground))
 	{
-		/* search term */
-		if (ImGui::InputTextWithHint("##SearchTerm", langApi->Translate("((000104))"), &searchTerm[0], 400))
+		/* Static assets */
+		static char s_SearchTerm[400] = {};
+		static Texture_t* s_ClearIcon          = texapi->GetOrCreate("ICON_CLOSE",  RES_ICON_CLOSE,  ctx->GetModule());
+		static Texture_t* s_ViewModeIcon_List  = texapi->GetOrCreate("ICON_LIST",   RES_ICON_LIST,   ctx->GetModule());
+		static Texture_t* s_ViewModeIcon_Tiles = texapi->GetOrCreate("ICON_TILES",  RES_ICON_TILES,  ctx->GetModule());
+		static Texture_t* s_FilterIcon         = texapi->GetOrCreate("ICON_FILTER", RES_ICON_FILTER, ctx->GetModule());
+
+		if (!s_ClearIcon)          { s_ClearIcon          = texapi->GetOrCreate("ICON_CLOSE",  RES_ICON_CLOSE,  ctx->GetModule()); }
+		if (!s_ViewModeIcon_List)  { s_ViewModeIcon_List  = texapi->GetOrCreate("ICON_LIST",   RES_ICON_LIST,   ctx->GetModule()); }
+		if (!s_ViewModeIcon_Tiles) { s_ViewModeIcon_Tiles = texapi->GetOrCreate("ICON_TILES",  RES_ICON_TILES,  ctx->GetModule()); }
+		if (!s_FilterIcon)         { s_FilterIcon         = texapi->GetOrCreate("ICON_FILTER", RES_ICON_FILTER, ctx->GetModule()); }
+
+		/* Search Term */
+		if (ImGui::InputTextWithHint("##SearchTerm", lang->Translate("((000104))"), &s_SearchTerm[0], 400))
 		{
-			this->SearchTerm = String::ToLower(searchTerm);
+			this->SearchTerm = String::ToLower(s_SearchTerm);
 			this->Invalidate();
 			this->ClearContent();
 		}
 
-		/* clear search term */
-		static Texture_t* clearSearchTermTex = nullptr;
-		if (clearSearchTermTex)
+		/* Clear Search Term */
+		if (s_ClearIcon)
 		{
 			ImGui::SameLine();
-			if (ImGui::ImageButton(clearSearchTermTex->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
+			if (ImGui::ImageButton(s_ClearIcon->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
 			{
-				memset(searchTerm, 0, 400);
-				this->SearchTerm = String::ToLower(searchTerm);
+				memset(s_SearchTerm, 0, 400);
+				this->SearchTerm = String::ToLower(s_SearchTerm);
 				this->Invalidate();
 				this->ClearContent();
 			}
 		}
-		else
-		{
-			CTextureLoader* texapi = ctx->GetTextureService();
-			clearSearchTermTex = texapi->GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx->GetModule());
-		}
 
-		/* view mode */
-		static Texture_t* viewModeTex = nullptr;
-		if (viewModeTex)
+		/* View Mode */
+		Texture_t* viewModeIcon = this->IsListMode ? s_ViewModeIcon_List : s_ViewModeIcon_Tiles;
+		if (viewModeIcon)
 		{
 			ImGui::SameLine();
-			if (ImGui::ImageButton(viewModeTex->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
+			if (ImGui::ImageButton(viewModeIcon->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
 			{
-				viewModeTex = nullptr;
-				isListMode = !isListMode;
-				settingsctx->Set(OPT_ISLISTMODE, isListMode);
+				viewModeIcon = nullptr;
+				this->IsListMode = !this->IsListMode;
+				settingsctx->Set(OPT_ISLISTMODE, this->IsListMode);
 			}
 		}
-		else
-		{
-			CTextureLoader* texapi = ctx->GetTextureService();
-			viewModeTex = !isListMode
-				? texapi->GetOrCreate("ICON_LIST", RES_ICON_LIST, ctx->GetModule())
-				: texapi->GetOrCreate("ICON_TILES", RES_ICON_TILES, ctx->GetModule());
-		}
 
-		/* advanced filters */
+		/* Advanced Filters */
 		bool doPopHighlight = false;
-		
-		static Texture_t* filtersTex = nullptr;
-		if (filtersTex)
+
+		if (s_FilterIcon)
 		{
 			/* If filter does not match quick filter, highlight manual filter icon. */
 			if (this->Filter != FILTER_INSTALLED && this->Filter != FILTER_LIBRARY)
@@ -400,7 +400,7 @@ void CAddonsWindow::RenderContent()
 				doPopHighlight = true;
 			}
 
-			if (ImGui::ImageButton(filtersTex->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
+			if (ImGui::ImageButton(s_FilterIcon->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
 			{
 				ImGui::OpenPopup("Filters");
 			}
@@ -414,7 +414,7 @@ void CAddonsWindow::RenderContent()
 			if (ImGui::BeginPopupContextItem("Filters"))
 			{
 				bool showEnabled = (this->Filter & EAddonsFilterFlags::ShowEnabled) == EAddonsFilterFlags::ShowEnabled;
-				if (ImGui::Checkbox(langApi->Translate("((000106))"), &showEnabled))
+				if (ImGui::Checkbox(lang->Translate("((000106))"), &showEnabled))
 				{
 					if (showEnabled)
 					{
@@ -430,7 +430,7 @@ void CAddonsWindow::RenderContent()
 				}
 
 				bool showDisabled = (this->Filter & EAddonsFilterFlags::ShowDisabled) == EAddonsFilterFlags::ShowDisabled;
-				if (ImGui::Checkbox(langApi->Translate("((000107))"), &showDisabled))
+				if (ImGui::Checkbox(lang->Translate("((000107))"), &showDisabled))
 				{
 					if (showDisabled)
 					{
@@ -446,7 +446,7 @@ void CAddonsWindow::RenderContent()
 				}
 
 				bool showDownloadable = (this->Filter & EAddonsFilterFlags::ShowDownloadable) == EAddonsFilterFlags::ShowDownloadable;
-				if (ImGui::Checkbox(langApi->Translate("((000108))"), &showDownloadable))
+				if (ImGui::Checkbox(lang->Translate("((000108))"), &showDownloadable))
 				{
 					if (showDownloadable)
 					{
@@ -461,52 +461,13 @@ void CAddonsWindow::RenderContent()
 					this->ClearContent();
 				}
 
-				/*if (ArcDPS::IsLoaded)
-				{
-					if (ImGui::Checkbox(langApi->Translate("((000109))"), &showInstalledArc))
-					{
-						if (showInstalledArc)
-						{
-							this->Filter = (EAddonsFilterFlags)((int)this->Filter | (int)EAddonsFilterFlags::ShowInstalled_Arc);
-						}
-						else
-						{
-							this->Filter = (EAddonsFilterFlags)((int)this->Filter & ~(int)EAddonsFilterFlags::ShowInstalled_Arc);
-						}
-						settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
-						this->Invalidate();
-						this->ClearContent();
-					}
-
-					if (ImGui::Checkbox(langApi->Translate("((000110))"), &showDownloadableArc))
-					{
-						if (showDownloadableArc)
-						{
-							this->Filter = (EAddonsFilterFlags)((int)this->Filter | (int)EAddonsFilterFlags::ShowDownloadable_Arc);
-						}
-						else
-						{
-							this->Filter = (EAddonsFilterFlags)((int)this->Filter & ~(int)EAddonsFilterFlags::ShowDownloadable_Arc);
-						}
-						settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
-						this->Invalidate();
-						this->ClearContent();
-					}
-				}*/
-
 				ImGui::EndPopup();
 			}
-		}
-		else
-		{
-			CTextureLoader* texapi = ctx->GetTextureService();
-			filtersTex = texapi->GetOrCreate("ICON_FILTER", RES_ICON_FILTER, ctx->GetModule());
 		}
 
 		ImGui::SameLine();
 
-		/* quick filters */
-		
+		/* Quick Filter: Installed */
 		if ((this->Filter & FILTER_INSTALLED) == FILTER_INSTALLED &&
 			(this->Filter & ~FILTER_INSTALLED) == EAddonsFilterFlags::None)
 		{
@@ -514,8 +475,7 @@ void CAddonsWindow::RenderContent()
 			doPopHighlight = true;
 		}
 
-		/* Quick Filter: Installed */
-		if (ImGui::Button(langApi->Translate("((000031))")))
+		if (ImGui::Button(lang->Translate("((000031))")))
 		{
 			this->Filter = FILTER_INSTALLED;
 			settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
@@ -531,6 +491,7 @@ void CAddonsWindow::RenderContent()
 
 		ImGui::SameLine();
 
+		/* Quick Filter: Library */
 		if ((this->Filter & FILTER_LIBRARY) == FILTER_LIBRARY &&
 			(this->Filter & ~FILTER_LIBRARY) == EAddonsFilterFlags::None)
 		{
@@ -538,8 +499,7 @@ void CAddonsWindow::RenderContent()
 			doPopHighlight = true;
 		}
 
-		/* Quick Filter: Library */
-		if (ImGui::Button(langApi->Translate("((000032))")))
+		if (ImGui::Button(lang->Translate("((000032))")))
 		{
 			this->Filter = FILTER_LIBRARY;
 			settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
@@ -553,239 +513,57 @@ void CAddonsWindow::RenderContent()
 			doPopHighlight = false;
 		}
 
-		/*if (ArcDPS::IsLoaded)
-		{
-			ImGui::SameLine();
-
-			std::string legacyNotice = langApi->Translate("((000076))");
-			legacyNotice.append("\n");
-			legacyNotice.append(langApi->Translate("((000077))"));
-
-			if (this->Filter == quickFilter_ArcPlugins)
-			{
-				ImGui::PushStyleColor(ImGuiCol_Button, style.Colors[ImGuiCol_ButtonActive]);
-				doPopHighlight = true;
-			}
-
-			if (ImGui::Button(langApi->Translate("((000075))")))
-			{
-				this->Filter = quickFilter_ArcPlugins;
-				settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
-				this->Invalidate();
-				this->ClearContent();
-			}
-
-			if (doPopHighlight)
-			{
-				ImGui::PopStyleColor();
-				doPopHighlight = false;
-			}
-
-			ImGui::TooltipGeneric(legacyNotice.c_str());
-		}*/
-
-		filterAreaEndY = ImGui::GetCursorPos().y;
-	}
-	ImGui::EndChild();
-	
-	float addonItemWidth = isListMode
-		? (region.x - style.ScrollbarSize)
-		: ((region.x - style.ItemSpacing.x - style.ScrollbarSize) / 2);
-
-	/* list */
-	//ImVec2 listP1 = ImGui::GetWindowPos();
-	//ImVec2 listP2 = ImVec2(listP1.x + listAreaSz.x - detailsAreaWidth, listP1.y + listAreaSz.y + filterAreaSz.y + style.ItemSpacing.y);
-
-	//ImVec2 posList = ImGui::GetCursorPos();
-
-	//ImGui::PushClipRect(listP1, listP2, true);
-	if (ImGui::BeginChild("List", listAreaSz, false, ImGuiWindowFlags_NoBackground))
-	{
-		if (configuring)
-		{
-			this->RenderDetails();
-		}
-		else
-		{
-			if (this->Addons.size() == 0)
-			{
-				ImVec2 windowSize = ImGui::GetWindowSize();
-				ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((000098))"));
-				ImVec2 position = ImGui::GetCursorPos();
-				ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-				ImGui::TextDisabled(langApi->Translate("((000098))"));
-			}
-			else
-			{
-				int i = 0;
-
-				for (AddonListing_t& addon : this->Addons)
-				{
-					if (!isListMode && i % 2 == 1)
-					{
-						ImGui::SameLine();
-					}
-
-					AddonItem(addon, addonItemWidth);
-					i++;
-				}
-			}
-		}
-	}
-	ImGui::EndChild();
-	//ImGui::PopClipRect();
-
-	/* details */
-	/*ImGui::SetCursorPos(ImVec2(posList.x + (region.x - detailsAreaWidth) + style.ItemSpacing.x, posList.y));
-	ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1);
-	bool poppedBorder = false;
-	if (ImGui::BeginChild("Details", detailsAreaSz, true))
-	{
-		poppedBorder = true;
-		ImGui::PopStyleVar();
-
-		if (detailsExpanded)
-		{
-			this->RenderDetails();
-		}
-	}
-	ImGui::EndChild();
-
-	if (!poppedBorder)
-	{
-		ImGui::PopStyleVar();
-	}*/
-	
-	if (ImGui::BeginChild("Actions", actionsAreaSz, false, ImGuiWindowFlags_NoBackground))
-	{
-		if (ImGui::Button(langApi->Translate("((000034))")))
-		{
-			std::string strAddons = Index(EPath::DIR_ADDONS).string();
-			ShellExecuteA(NULL, "explore", strAddons.c_str(), NULL, NULL, SW_SHOW);
-		}
-
-		ImGui::SameLine();
-
-		static int checkedForUpdates = -1;
-		static int queuedForCheck = -1;
-		static int updatedCount = -1;
-
-		if (ImGui::Button(checkedForUpdates == -1 ? langApi->Translate("((000035))") : langApi->Translate("((000071))")))
-		{
-			/*if (checkedForUpdates == -1)
-			{
-				const std::lock_guard<std::mutex> lock(loader->Mutex);
-				{
-					checkedForUpdates = 0;
-					queuedForCheck = 0;
-					updatedCount = 0;
-
-					// pre-iterate to get the count of how many need to be checked, else one call might finish before the count can be incremented
-					for (auto addon : loader->Addons)
-					{
-						if (nullptr == addon->Definitions) { continue; }
-						queuedForCheck++;
-					}
-
-					if (queuedForCheck == 0)
-					{
-						checkedForUpdates = -1;
-					}
-
-					for (auto addon : loader->Addons)
-					{
-						if (nullptr == addon->Definitions) { continue; }
-
-						std::filesystem::path tmpPath = addon->Path.string();
-
-						std::thread([this, tmpPath, addon]()
-						{
-							AddonInfo_t addonInfo
-							{
-								addon->Definitions->Signature,
-								addon->Definitions->Name,
-								addon->Definitions->Version,
-								addon->Definitions->Provider,
-								addon->Definitions->UpdateLink != nullptr
-									? addon->Definitions->UpdateLink
-									: "",
-								addon->MD5,
-								addon->AllowPrereleases
-							};
-
-							CContext* ctx = CContext::GetContext();
-							CUiContext* uictx = ctx->GetUIContext();
-							CLocalization* langApi = uictx->GetLocalization();
-							CUpdater* updater = ctx->GetUpdater();
-							CAlerts* alertctx = uictx->GetAlerts();
-
-							if (addon->Definitions->Provider != EUpdateProvider::Self && updater->UpdateAddon(tmpPath, addonInfo, false, 5 * 60))
-							{
-								loader->QueueAddon(ELoaderAction::Reload, tmpPath);
-
-								alertctx->Notify(EAlertType::Info,
-									String::Format("%s %s",
-									addon->Definitions->Name,
-									addon->State == EAddonState::LoadedLOCKED
-									? langApi->Translate("((000079))")
-									: langApi->Translate("((000081))")
-								).c_str()
-								);
-
-								updatedCount++;
-							}
-							checkedForUpdates++;
-
-							if (checkedForUpdates == queuedForCheck)
-							{
-								checkedForUpdates = -1;
-								queuedForCheck = 0;
-
-								if (updatedCount == 0)
-								{
-									alertctx->Notify(EAlertType::Info, langApi->Translate("((000087))"));
-								}
-							}
-						}).detach();
-					}
-				}
-			}*/
-		}
-		ImGui::TooltipGeneric(langApi->Translate("((000036))"));
-
-		static Texture_t* refreshTex = nullptr;
-		if (refreshTex)
-		{
-			ImGui::SameLine();
-
-			if (ImGui::ImageButton(refreshTex->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
-			{
-				loader->NotifyChanges();
-			}
-		}
-		else
-		{
-			CTextureLoader* texapi = ctx->GetTextureService();
-			refreshTex = texapi->GetOrCreate("ICON_REFRESH", RES_ICON_REFRESH, ctx->GetModule());
-		}
-
-		actionsAreaEndY = ImGui::GetCursorPos().y;
+		aSize.y = ImGui::GetCursorPos().y;
 	}
 	ImGui::EndChild();
 }
 
-void CAddonsWindow::RenderSubWindows()
+void CAddonsWindow::RenderBody(ImVec2& aSize)
 {
-	if (this->BindSetterModal.Render() && this->BindSetterModal.GetResult() != EModalResult::None)
-	{
-		this->Invalidate();
-	}
+	CContext*       ctx   = CContext::GetContext();
+	CUiContext*     uictx = ctx->GetUIContext();
+	CLocalization*  lang  = uictx->GetLocalization();
 
-	if (this->UninstallConfirmationModal.Render() && this->UninstallConfirmationModal.GetResult() == EModalResult::OK)
+	ImGuiStyle& style = ImGui::GetStyle();
+
+	if (ImGui::BeginChild("Body", aSize, false, ImGuiWindowFlags_NoBackground))
 	{
-		this->ClearContent();
-		this->Invalidate();
+		if (this->HasContent)
+		{
+			/* Details view */
+			this->RenderDetails();
+		}
+		else if (this->Addons.size() == 0)
+		{
+			/* Nothing matching filter. */
+			ImVec2 windowSize = ImGui::GetWindowSize();
+			ImVec2 textSize = ImGui::CalcTextSize(lang->Translate("((000098))"));
+			ImVec2 position = ImGui::GetCursorPos();
+			ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
+			ImGui::TextDisabled(lang->Translate("((000098))"));
+		}
+		else
+		{
+			/* Addons list */
+			float addonItemWidth = this->IsListMode
+				? (aSize.x - style.ScrollbarSize)
+				: ((aSize.x - style.ItemSpacing.x - style.ScrollbarSize) / 2);
+
+			int i = 0;
+
+			for (AddonListing_t& addon : this->Addons)
+			{
+				if (!this->IsListMode && i % 2 == 1)
+				{
+					ImGui::SameLine();
+				}
+
+				AddonItem(addon, addonItemWidth);
+				i++;
+			}
+		}
 	}
+	ImGui::EndChild();
 }
 
 void CAddonsWindow::RenderDetails()
@@ -920,7 +698,7 @@ void CAddonsWindow::RenderDetails()
 					ImGui::TooltipGeneric(langApi->Translate("((000012))"));
 				}
 			}
-			
+
 			if (!addonData.GithubURL.empty())
 			{
 				ImGui::SameLine();
@@ -1069,6 +847,148 @@ void CAddonsWindow::RenderDetails()
 		}*/
 	}
 	ImGui::EndChild();
+}
+
+void CAddonsWindow::RenderActionsBar(ImVec2& aSize)
+{
+	CContext*       ctx    = CContext::GetContext();
+	CTextureLoader* texapi = ctx->GetTextureService();
+	CLoaderBase*    loader = ctx->GetLoaderBase();
+	CUiContext*     uictx  = ctx->GetUIContext();
+	CLocalization*  lang   = uictx->GetLocalization();
+
+	if (ImGui::BeginChild("Actions", aSize, false, ImGuiWindowFlags_NoBackground))
+	{
+		/* Static assets */
+		static Texture_t* s_ReloadIcon = texapi->GetOrCreate("ICON_REFRESH", RES_ICON_REFRESH, ctx->GetModule());
+		if (!s_ReloadIcon) { s_ReloadIcon = texapi->GetOrCreate("ICON_REFRESH", RES_ICON_REFRESH, ctx->GetModule()); }
+
+		/* Open addons folder */
+		if (ImGui::Button(lang->Translate("((000034))")))
+		{
+			std::string strAddons = Index(EPath::DIR_ADDONS).string();
+			ShellExecuteA(NULL, "explore", strAddons.c_str(), NULL, NULL, SW_SHOW);
+		}
+
+		ImGui::SameLine();
+
+		static int checkedForUpdates = -1;
+		static int queuedForCheck = -1;
+		static int updatedCount = -1;
+
+		/* Update all */
+		if (ImGui::Button(checkedForUpdates == -1 ? lang->Translate("((000035))") : lang->Translate("((000071))")))
+		{
+			throw "Not Implemented";
+			/*if (checkedForUpdates == -1)
+			{
+				const std::lock_guard<std::mutex> lock(loader->Mutex);
+				{
+					checkedForUpdates = 0;
+					queuedForCheck = 0;
+					updatedCount = 0;
+
+					// pre-iterate to get the count of how many need to be checked, else one call might finish before the count can be incremented
+					for (auto addon : loader->Addons)
+					{
+						if (nullptr == addon->Definitions) { continue; }
+						queuedForCheck++;
+					}
+
+					if (queuedForCheck == 0)
+					{
+						checkedForUpdates = -1;
+					}
+
+					for (auto addon : loader->Addons)
+					{
+						if (nullptr == addon->Definitions) { continue; }
+
+						std::filesystem::path tmpPath = addon->Path.string();
+
+						std::thread([this, tmpPath, addon]()
+						{
+							AddonInfo_t addonInfo
+							{
+								addon->Definitions->Signature,
+								addon->Definitions->Name,
+								addon->Definitions->Version,
+								addon->Definitions->Provider,
+								addon->Definitions->UpdateLink != nullptr
+									? addon->Definitions->UpdateLink
+									: "",
+								addon->MD5,
+								addon->AllowPrereleases
+							};
+
+							CContext* ctx = CContext::GetContext();
+							CUiContext* uictx = ctx->GetUIContext();
+							CLocalization* langApi = uictx->GetLocalization();
+							CUpdater* updater = ctx->GetUpdater();
+							CAlerts* alertctx = uictx->GetAlerts();
+
+							if (addon->Definitions->Provider != EUpdateProvider::Self && updater->UpdateAddon(tmpPath, addonInfo, false, 5 * 60))
+							{
+								loader->QueueAddon(ELoaderAction::Reload, tmpPath);
+
+								alertctx->Notify(EAlertType::Info,
+									String::Format("%s %s",
+									addon->Definitions->Name,
+									addon->State == EAddonState::LoadedLOCKED
+									? langApi->Translate("((000079))")
+									: langApi->Translate("((000081))")
+								).c_str()
+								);
+
+								updatedCount++;
+							}
+							checkedForUpdates++;
+
+							if (checkedForUpdates == queuedForCheck)
+							{
+								checkedForUpdates = -1;
+								queuedForCheck = 0;
+
+								if (updatedCount == 0)
+								{
+									alertctx->Notify(EAlertType::Info, langApi->Translate("((000087))"));
+								}
+							}
+						}).detach();
+					}
+				}
+			}*/
+		}
+		ImGui::TooltipGeneric(lang->Translate("((000036))"));
+
+		if (s_ReloadIcon)
+		{
+			ImGui::SameLine();
+
+			/* Poll changes */
+			if (ImGui::ImageButton(s_ReloadIcon->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
+			{
+				loader->NotifyChanges();
+			}
+		}
+
+		aSize.y = ImGui::GetCursorPos().y;
+	}
+	ImGui::EndChild();
+}
+
+void CAddonsWindow::RenderSubWindows()
+{
+	if (this->BindSetterModal.Render() && this->BindSetterModal.GetResult() != EModalResult::None)
+	{
+		this->Invalidate();
+	}
+
+	if (this->UninstallConfirmationModal.Render() && this->UninstallConfirmationModal.GetResult() == EModalResult::OK)
+	{
+		this->ClearContent();
+		this->Invalidate();
+	}
 }
 
 void CAddonsWindow::RenderInputBindsTable(const std::unordered_map<std::string, InputBindPacked_t>& aInputBinds)

@@ -13,6 +13,8 @@
 #include <vector>
 #include <windows.h>
 
+#include "imgui/imgui.h"
+
 #include "AddonListing.h"
 #include "UI/Controls/CtlSubWindow.h"
 #include "UI/Widgets/MainWindow/Binds/BindSetterModal.h"
@@ -44,6 +46,7 @@ class CAddonsWindow : public ISubWindow
 
 	std::string                 SearchTerm;
 	EAddonsFilterFlags          Filter;
+	bool                        IsListMode;
 	std::vector<AddonListing_t> Addons;
 
 	/* Details */
@@ -57,8 +60,34 @@ class CAddonsWindow : public ISubWindow
 	void AddonItem(AddonListing_t& aAddonData, float aWidth);
 
 	void RenderContent() override;
-	void RenderSubWindows() override;
+
+	///----------------------------------------------------------------------------------------------------
+	/// RenderFilterBar:
+	/// 	Renders the filter bar of the addons window.
+	///		aSize parameter is modified to dynamically adjust to window height.
+	///----------------------------------------------------------------------------------------------------
+	void RenderFilterBar(ImVec2& aSize);
+
+	///----------------------------------------------------------------------------------------------------
+	/// RenderBody:
+	/// 	Renders the addons list or details view of the addons window.
+	///----------------------------------------------------------------------------------------------------
+	void RenderBody(ImVec2& aSize);
+
+	///----------------------------------------------------------------------------------------------------
+	/// RenderDetails:
+	/// 	Renders the details view of a target addon.
+	///----------------------------------------------------------------------------------------------------
 	void RenderDetails();
+
+	///----------------------------------------------------------------------------------------------------
+	/// RenderActionsBar:
+	/// 	Renders the actions bar of the addons window.
+	///		aSize parameter is modified to dynamically adjust to window height.
+	///----------------------------------------------------------------------------------------------------
+	void RenderActionsBar(ImVec2& aSize);
+
+	void RenderSubWindows() override;
 	void RenderInputBindsTable(const std::unordered_map<std::string, InputBindPacked_t>& aInputBinds);
 
 	void PopulateAddons();
