@@ -72,7 +72,7 @@ class CAddonsWindow : public ISubWindow
 	/// RenderBody:
 	/// 	Renders the addons list or details view of the addons window.
 	///----------------------------------------------------------------------------------------------------
-	void RenderBody(ImVec2& aSize);
+	void RenderBody(ImVec2 aSize);
 
 	///----------------------------------------------------------------------------------------------------
 	/// RenderDetails:

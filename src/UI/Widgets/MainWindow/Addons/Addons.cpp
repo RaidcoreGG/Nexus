@@ -300,12 +300,6 @@ void CAddonsWindow::RenderContent()
 		this->IsInvalid = false;
 	}
 
-	static CContext* ctx = CContext::GetContext();
-	static CUiContext* uictx = ctx->GetUIContext();
-	static CLocalization* langApi = uictx->GetLocalization();
-	static CSettings* settingsctx = ctx->GetSettingsCtx();
-	static CLoaderBase* loader = ctx->GetLoaderBase();
-
 	ImVec2 region = ImGui::GetContentRegionAvail();
 
 	static ImVec2 s_FilterBarSize  = ImVec2(region.x, region.y);
@@ -319,13 +313,14 @@ void CAddonsWindow::RenderContent()
 		s_FilterBarSize.x = region.x - style.ItemSpacing.x - btnSz - style.ItemSpacing.x;
 	}
 
-	bool configuring = this->HasContent;
-
-	ImVec2 listAreaSz = ImVec2(region.x, region.y - s_FilterBarSize.y - s_ActionsBarSize.y - style.ItemSpacing.y - style.ItemSpacing.y);
-
 	this->RenderFilterBar(s_FilterBarSize);
 	
-	this->RenderBody(listAreaSz);
+	this->RenderBody(
+		ImVec2(
+			region.x,
+			region.y - s_FilterBarSize.y - s_ActionsBarSize.y - style.ItemSpacing.y - style.ItemSpacing.y
+		)
+	);
 
 	this->RenderActionsBar(s_ActionsBarSize);
 }
@@ -518,7 +513,7 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 	ImGui::EndChild();
 }
 
-void CAddonsWindow::RenderBody(ImVec2& aSize)
+void CAddonsWindow::RenderBody(ImVec2 aSize)
 {
 	CContext*       ctx   = CContext::GetContext();
 	CUiContext*     uictx = ctx->GetUIContext();
