@@ -161,6 +161,8 @@ void CLoaderBase::NotifyChanges()
 
 	std::lock_guard<std::mutex> lock(this->Mutex);
 	this->ConVar.notify_one();
+
+	this->Logger->Trace(CH_LOADERBASE, "NotifyChanges()");
 }
 
 void CLoaderBase::Add(std::filesystem::path aPath)
@@ -289,6 +291,8 @@ void CLoaderBase::ProcessChanges()
 	{
 		std::unique_lock<std::mutex> lock(this->Mutex);
 		this->ConVar.wait_for(lock, std::chrono::milliseconds(5000));
+
+		this->Logger->Trace(CH_LOADERBASE, "Processing changes.");
 
 		std::vector<IAddon*> movedOrDeleted;
 

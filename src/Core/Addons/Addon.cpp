@@ -285,7 +285,7 @@ void CAddon::ProcessActions()
 void CAddon::LoadInternal()
 {
 	assert(this->ProcessorThreadID == GetCurrentThreadId());
-	this->Logger->Debug(CH_ADDON, "CAddon::LoadInternal(%s)", this->Location.string().c_str());
+	this->Logger->Trace(CH_ADDON, "CAddon::LoadInternal(%s)", this->Location.string().c_str());
 
 	if (this->IsLoaded())
 	{
@@ -451,7 +451,7 @@ void CAddon::LoadInternal()
 void CAddon::UnloadInternal()
 {
 	assert(this->ProcessorThreadID == GetCurrentThreadId());
-	this->Logger->Debug(CH_ADDON, "CAddon::UnloadInternal(%s)", this->Location.string().c_str());
+	this->Logger->Trace(CH_ADDON, "CAddon::UnloadInternal(%s)", this->Location.string().c_str());
 
 	if (!this->IsLoaded())
 	{
@@ -504,7 +504,7 @@ void CAddon::UnloadInternal()
 void CAddon::UninstallInternal()
 {
 	assert(this->ProcessorThreadID == GetCurrentThreadId());
-	this->Logger->Debug(CH_ADDON, "CAddon::UninstallInternal(%s)", this->Location.string().c_str());
+	this->Logger->Trace(CH_ADDON, "CAddon::UninstallInternal(%s)", this->Location.string().c_str());
 
 	if (this->IsUninstalled())
 	{
@@ -619,7 +619,7 @@ void CAddon::UninstallInternal()
 void CAddon::CheckForUpdateInternal()
 {
 	assert(this->ProcessorThreadID == GetCurrentThreadId());
-	this->Logger->Debug(CH_ADDON, "CAddon::CheckForUpdateInternal(%s)", this->Location.string().c_str());
+	this->Logger->Trace(CH_ADDON, "CAddon::CheckForUpdateInternal(%s)", this->Location.string().c_str());
 
 	return;
 
@@ -629,7 +629,7 @@ void CAddon::CheckForUpdateInternal()
 void CAddon::UpdateInternal()
 {
 	assert(this->ProcessorThreadID == GetCurrentThreadId());
-	this->Logger->Debug(CH_ADDON, "CAddon::UpdateInternal(%s)", this->Location.string().c_str());
+	this->Logger->Trace(CH_ADDON, "CAddon::UpdateInternal(%s)", this->Location.string().c_str());
 
 	return;
 
@@ -639,7 +639,7 @@ void CAddon::UpdateInternal()
 const EAddonInterfaces& CAddon::EnumInterfaces()
 {
 	assert(this->ProcessorThreadID == GetCurrentThreadId());
-	this->Logger->Debug(CH_ADDON, "CAddon::EnumInterfaces(%s)", this->Location.string().c_str());
+	this->Logger->Trace(CH_ADDON, "CAddon::EnumInterfaces(%s)", this->Location.string().c_str());
 
 	if (this->Location.empty()) { return this->ModuleInterfaces; }
 
