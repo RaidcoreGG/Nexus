@@ -348,6 +348,7 @@ void CAddon::LoadInternal()
 		this->Logger->Warning(CH_ADDON, "Cannot load. Addon definition was nullptr. (%s)", this->Location.string().c_str());
 		FreeLibrary(module);
 		this->State = EAddonState::NotLoaded;
+		this->Flags |= EAddonFlags::MissingReqs;
 		return;
 	}
 
@@ -364,8 +365,12 @@ void CAddon::LoadInternal()
 		this->Logger->Warning(CH_ADDON, "Cannot load. Addon definition does not fulfill minimum requirements. (%s)", this->Location.string().c_str());
 		FreeLibrary(module);
 		this->State = EAddonState::NotLoaded;
+		this->Flags |= EAddonFlags::MissingReqs;
 		return;
 	}
+
+	/* Unset requirements flag. */
+	this->Flags &= ~EAddonFlags::MissingReqs;
 
 	if (!this->Config)
 	{
