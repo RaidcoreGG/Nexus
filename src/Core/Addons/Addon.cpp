@@ -172,6 +172,54 @@ void CAddon::Update()
 	this->ConVar.notify_one();
 }
 
+bool CAddon::HasInterface(EAddonInterfaces aInterface) const
+{
+	return (bool)(this->ModuleInterfaces & aInterface);
+}
+
+bool CAddon::IsDuplicate()
+{
+	return this->Loader->IsTrackedSafe(this->GetSignature(), this->GetBase());
+}
+
+bool CAddon::IsLoaded() const
+{
+	switch (this->State)
+	{
+		default:
+		case EAddonState::None:
+		case EAddonState::NotLoaded:
+			return false;
+		case EAddonState::Loaded:
+			return true;
+	}
+}
+
+bool CAddon::IsFileLocked() const
+{
+	return (this->Flags & EAddonFlags::FileLocked) == EAddonFlags::FileLocked;
+}
+
+bool CAddon::IsStateLocked() const
+{
+	return (this->Flags & EAddonFlags::StateLocked) == EAddonFlags::StateLocked;
+}
+
+bool CAddon::IsUpdateAvailable() const
+{
+	return (this->Flags & EAddonFlags::UpdateAvailable) == EAddonFlags::UpdateAvailable;
+}
+
+bool CAddon::IsRunningAction() const
+{
+	return (this->Flags & EAddonFlags::RunningAction) == EAddonFlags::RunningAction;
+}
+
+bool CAddon::IsUninstalled() const
+{
+	return (this->Flags & EAddonFlags::Uninstalled) == EAddonFlags::Uninstalled;
+}
+
 void CAddon::ProcessActions()
 {
 	if (this->ProcessorThreadID == 0)
@@ -278,6 +326,7 @@ void CAddon::LoadInternal()
 			ecnd.message().c_str(),
 			lasterror
 		);
+		this->State = EAddonState::NotLoaded;
 		return;
 	}
 
@@ -288,6 +337,7 @@ void CAddon::LoadInternal()
 		this->Logger->Debug(CH_ADDON, "Cannot load. Interface was set, but is not actually present. (%s)", this->Location.string().c_str());
 		this->ModuleInterfaces &= ~EAddonInterfaces::Nexus;
 		FreeLibrary(module);
+		this->State = EAddonState::NotLoaded;
 		return;
 	}
 
@@ -297,6 +347,7 @@ void CAddon::LoadInternal()
 	{
 		this->Logger->Warning(CH_ADDON, "Cannot load. Addon definition was nullptr. (%s)", this->Location.string().c_str());
 		FreeLibrary(module);
+		this->State = EAddonState::NotLoaded;
 		return;
 	}
 
@@ -312,6 +363,7 @@ void CAddon::LoadInternal()
 	{
 		this->Logger->Warning(CH_ADDON, "Cannot load. Addon definition does not fulfill minimum requirements. (%s)", this->Location.string().c_str());
 		FreeLibrary(module);
+		this->State = EAddonState::NotLoaded;
 		return;
 	}
 
@@ -326,6 +378,7 @@ void CAddon::LoadInternal()
 	{
 		this->Logger->Warning(CH_ADDON, "Canceled load. Addon is a duplicate. (%s)", this->Location.string().c_str());
 		FreeLibrary(module);
+		this->State = EAddonState::NotLoaded;
 		return;
 	}
 
@@ -340,6 +393,7 @@ void CAddon::LoadInternal()
 	{
 		/* Should load prints debug reasons, no need to also print here. */
 		FreeLibrary(module);
+		this->State = EAddonState::NotLoaded;
 		return;
 	}
 
@@ -354,6 +408,7 @@ void CAddon::LoadInternal()
 			this->Location.string().c_str()
 		);
 		FreeLibrary(module);
+		this->State = EAddonState::NotLoaded;
 		return;
 	}
 
@@ -381,7 +436,7 @@ void CAddon::LoadInternal()
 
 	this->Logger->Info(
 		CH_ADDON,
-		"Loaded addon: %s\nSignature: 0x%08X\nAddress Space: %p - %p\nAPI Version: %d\nFlags: %u\nDefFlags: %u\nTook %u ms to load.",
+		"Loaded addon: %s\n\tSignature: 0x%08X\n\tAddress Space: %p - %p\n\tAPI Version: %d\n\tFlags: %u\n\tDefFlags: %u\n\tTook %u microseconds to load.",
 		this->Location.string().c_str(),
 		this->NexusAddonDefV1->Signature,
 		this->Module,
@@ -389,7 +444,7 @@ void CAddon::LoadInternal()
 		this->NexusAddonDefV1->APIVersion,
 		this->Flags,
 		this->NexusAddonDefV1->Flags,
-		time / std::chrono::milliseconds(1)
+		time / std::chrono::microseconds(1)
 	);
 }
 
@@ -419,7 +474,7 @@ void CAddon::UnloadInternal()
 		auto end_time = std::chrono::high_resolution_clock::now();
 		auto time = end_time - start_time;
 
-		strUnloadInfo = String::Format("Took %u ms to unload.", time / std::chrono::milliseconds(1));
+		strUnloadInfo = String::Format("Took %u microseconds to unload.", time / std::chrono::microseconds(1));
 	}
 	else
 	{
@@ -438,14 +493,10 @@ void CAddon::UnloadInternal()
 
 	this->Logger->Info(
 		CH_ADDON,
-		"Unloaded addon: %s\nSignature: 0x%08X\nAddress Space: %p - %p\nAPI Version: %d\nFlags: %u\nDefFlags: %u\n%s",
+		"Unloaded addon: %s\n\tSignature: 0x%08X\n\tFlags: %u\n\t%s",
 		this->Location.string().c_str(),
 		this->NexusAddonDefV1->Signature,
-		this->Module,
-		((PBYTE)this->Module) + this->ModuleSize,
-		this->NexusAddonDefV1->APIVersion,
 		this->Flags,
-		this->NexusAddonDefV1->Flags,
 		strUnloadInfo.c_str()
 	);
 }
@@ -684,10 +735,9 @@ bool CAddon::ShouldLoad()
 
 	bool result = true;
 
-	/* Check the last state as per user prefs. */
-	if (!this->Config->ShouldLoad)
+	/* Check the last state as per user prefs. But also make sure no state set yet -> Autoload. */
+	if (!this->Config->ShouldLoad && this->State == EAddonState::None)
 	{
-		/* TODO: This also needs to check manual launch parameter overrides. */
 		this->Logger->Debug(CH_ADDON, "Canceled load. Config->ShouldLoad: false. (%s)", this->Location.string().c_str());
 		result = false;
 	}
@@ -741,52 +791,4 @@ bool CAddon::ShouldUpdate()
 		case EUpdateMode::Notify:     { return false; }
 		case EUpdateMode::Automatic:  { return true; }
 	}
-}
-
-bool CAddon::HasInterface(EAddonInterfaces aInterface) const
-{
-	return (bool)(this->ModuleInterfaces & aInterface);
-}
-
-bool CAddon::IsDuplicate()
-{
-	return this->Loader->IsTrackedSafe(this->GetSignature(), this->GetBase());
-}
-
-bool CAddon::IsLoaded() const
-{
-	switch (this->State)
-	{
-		default:
-		case EAddonState::None:
-		case EAddonState::NotLoaded:
-			return false;
-		case EAddonState::Loaded:
-			return true;
-	}
-}
-
-bool CAddon::IsFileLocked() const
-{
-	return (this->Flags & EAddonFlags::FileLocked) == EAddonFlags::FileLocked;
-}
-
-bool CAddon::IsStateLocked() const
-{
-	return (this->Flags & EAddonFlags::StateLocked) == EAddonFlags::StateLocked;
-}
-
-bool CAddon::IsUpdateAvailable() const
-{
-	return (this->Flags & EAddonFlags::UpdateAvailable) == EAddonFlags::UpdateAvailable;
-}
-
-bool CAddon::IsRunningAction() const
-{
-	return (this->Flags & EAddonFlags::RunningAction) == EAddonFlags::RunningAction;
-}
-
-bool CAddon::IsUninstalled() const
-{
-	return (this->Flags & EAddonFlags::Uninstalled) == EAddonFlags::Uninstalled;
 }

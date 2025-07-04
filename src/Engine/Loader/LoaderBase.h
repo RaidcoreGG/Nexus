@@ -90,28 +90,34 @@ class CLoaderBase
 	/// GetOwner:
 	/// 	Returns the owner of the passed address, or nullptr.
 	///----------------------------------------------------------------------------------------------------
-	IAddon* GetOwner(void* aAddress);
+	IAddon* GetOwner(void* aAddress) const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// IsTrackedSafe:
-	/// 	Returns true if the provided signature is an already tracked addon.
+	/// 	Returns true, if the provided signature is an already tracked addon.
 	/// 	[optional] aAddon: Do not compare against the provided addon.
 	///----------------------------------------------------------------------------------------------------
-	bool IsTrackedSafe(uint32_t aSignature, IAddon* aAddon = nullptr);
+	bool IsTrackedSafe(uint32_t aSignature, IAddon* aAddon = nullptr) const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// IsTrackedSafe:
-	/// 	Returns true if the provided path is an already tracked addon.
+	/// 	Returns true, if the provided path is an already tracked addon.
 	/// 	[optional] aAddon: Do not compare against the provided addon.
 	///----------------------------------------------------------------------------------------------------
-	bool IsTrackedSafe(std::filesystem::path aPath, IAddon* aAddon = nullptr);
+	bool IsTrackedSafe(std::filesystem::path aPath, IAddon* aAddon = nullptr) const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// IsTrackedSafe:
-	/// 	Returns true if the provided MD5 is an already tracked addon.
+	/// 	Returns true, if the provided MD5 is an already tracked addon.
 	/// 	[optional] aAddon: Do not compare against the provided addon.
 	///----------------------------------------------------------------------------------------------------
-	bool IsTrackedSafe(MD5_t aMD5, IAddon* aAddon = nullptr);
+	bool IsTrackedSafe(MD5_t aMD5, IAddon* aAddon = nullptr) const;
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetAddons:
+	/// 	Returns all tracked addons.
+	///----------------------------------------------------------------------------------------------------
+	std::vector<IAddon*> GetAddons() const;
 
 	private:
 	CLogApi*                Logger        = nullptr;
@@ -126,7 +132,7 @@ class CLoaderBase
 	std::thread             ProcThread;
 	bool                    IsRunning     = false;
 
-	std::mutex              Mutex;
+	mutable std::mutex      Mutex;
 	std::condition_variable ConVar;
 
 	IADDON_FACTORY          CreateAddon;
@@ -162,21 +168,21 @@ class CLoaderBase
 	/// 	Returns true if the provided signature is an already tracked addon.
 	/// 	[optional] aAddon: Do not compare against the provided addon.
 	///----------------------------------------------------------------------------------------------------
-	bool IsTracked(uint32_t aSignature, IAddon* aAddon = nullptr);
+	bool IsTracked(uint32_t aSignature, IAddon* aAddon = nullptr) const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// IsTracked:
 	/// 	Returns true if the provided path is an already tracked addon.
 	/// 	[optional] aAddon: Do not compare against the provided addon.
 	///----------------------------------------------------------------------------------------------------
-	bool IsTracked(std::filesystem::path aPath, IAddon* aAddon = nullptr);
+	bool IsTracked(std::filesystem::path aPath, IAddon* aAddon = nullptr) const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// IsTracked:
 	/// 	Returns true if the provided MD5 is an already tracked addon.
 	/// 	[optional] aAddon: Do not compare against the provided addon.
 	///----------------------------------------------------------------------------------------------------
-	bool IsTracked(MD5_t aMD5, IAddon* aAddon = nullptr);
+	bool IsTracked(MD5_t aMD5, IAddon* aAddon = nullptr) const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Load:

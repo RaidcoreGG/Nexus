@@ -21,32 +21,23 @@ using ArcExtensionDef_t = ArcDPS::ExtensionDef_t;
 
 struct AddonListing_t
 {
-	bool                                               HasNexusDef;
-	bool                                               HasArcDef;
-	bool                                               HasLibDef;
-
 	CAddon*                                            Addon;
-	AddonDefV1_t                                       NexusAddonDefV1;
-	ArcExtensionDef_t                                  ArcExtensionDef;
+
+	bool                                               HasLibDef;
 	LibraryAddon_t                                     LibraryDef;
+	bool                                               IsInstalling;
 
 	std::string                                        GithubURL;
 
 	std::unordered_map<std::string, InputBindPacked_t> InputBinds;
 	GUI_RENDER                                         OptionsRender;
 	bool                                               IsHovered;
-	bool                                               IsInstalling;
 
 	inline uint32_t GetSig() const
 	{
-		if (this->HasNexusDef)
+		if (this->Addon)
 		{
-			return this->NexusAddonDefV1.Signature;
-		}
-
-		if (this->HasArcDef)
-		{
-			return this->ArcExtensionDef.Signature;
+			return this->Addon->GetSignature();
 		}
 
 		if (this->HasLibDef)
@@ -59,14 +50,9 @@ struct AddonListing_t
 
 	inline std::string GetName() const
 	{
-		if (this->HasNexusDef)
+		if (this->Addon)
 		{
-			return this->NexusAddonDefV1.Name;
-		}
-
-		if (this->HasArcDef)
-		{
-			return this->ArcExtensionDef.Name;
+			return this->Addon->GetName();
 		}
 
 		if (this->HasLibDef)
@@ -79,12 +65,10 @@ struct AddonListing_t
 
 	inline std::string GetAuthor() const
 	{
-		if (this->HasNexusDef)
+		if (this->Addon)
 		{
-			return this->NexusAddonDefV1.Author;
+			return this->Addon->GetAuthor();
 		}
-
-		// Arc Extensions don't have authors.
 
 		if (this->HasLibDef)
 		{
@@ -96,12 +80,10 @@ struct AddonListing_t
 
 	inline std::string GetDesc() const
 	{
-		if (this->HasNexusDef)
+		if (this->Addon)
 		{
-			return this->NexusAddonDefV1.Description;
+			return this->Addon->GetDescription();
 		}
-
-		// Arc Extensions don't have descriptions.
 
 		if (this->HasLibDef)
 		{
@@ -113,14 +95,9 @@ struct AddonListing_t
 
 	inline std::string GetVersion() const
 	{
-		if (this->HasNexusDef)
+		if (this->Addon)
 		{
-			return this->NexusAddonDefV1.Version.string();
-		}
-
-		if (this->HasArcDef)
-		{
-			return this->ArcExtensionDef.Build;
+			return this->Addon->GetVersion();
 		}
 
 		return "";

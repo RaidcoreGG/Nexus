@@ -19,13 +19,11 @@
 #include "Resources/ResConst.h"
 #include "Util/Strings.h"
 
-constexpr ImGuiWindowFlags ModalFlags = ImGuiWindowFlags_AlwaysAutoResize |
-										ImGuiWindowFlags_NoResize |
-										ImGuiWindowFlags_NoCollapse;
+constexpr EAddonsFilterFlags FILTER_INSTALLED
+	= EAddonsFilterFlags::ShowEnabled
+	| EAddonsFilterFlags::ShowDisabled;
 
-constexpr EAddonsFilterFlags quickFilter_Installed = (EAddonsFilterFlags)((int)EAddonsFilterFlags::ShowEnabled | (int)EAddonsFilterFlags::ShowDisabled | (int)EAddonsFilterFlags::ShowInstalled_Arc);
-constexpr EAddonsFilterFlags quickFilter_Library = EAddonsFilterFlags::ShowDownloadable;
-constexpr EAddonsFilterFlags quickFilter_ArcPlugins = EAddonsFilterFlags::ShowDownloadable_Arc;
+constexpr EAddonsFilterFlags FILTER_LIBRARY = EAddonsFilterFlags::ShowDownloadable;
 
 static CAddonsWindow* AddonsWindow = nullptr;
 
@@ -86,12 +84,29 @@ void CAddonsWindow::ClearContent()
 	this->HasContent = false;
 }
 
-#ifdef MEME
 void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 {
-	if (aAddonData.GetSig() == 0) { return; }
+	/* Unique id. */
+	std::string id;
 
-	std::string sig = String::Format("0x%08X", aAddonData.GetSig());
+	if (aAddonData.GetSig() != 0)
+	{
+		/* Use addon signature. */
+		id = String::Format("0x%08X", aAddonData.GetSig());
+	}
+	else
+	{
+		if (aAddonData.Addon)
+		{
+			/* Use addon file location. */
+			id = aAddonData.Addon->GetLocation().string();
+		}
+		else
+		{
+			/* This should not be possible. */
+			throw "Unreachable code.";
+		}
+	}
 
 	ImGuiStyle& style = ImGui::GetStyle();
 
@@ -116,9 +131,10 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 	static CUiContext* uictx = ctx->GetUIContext();
 	static CLocalization* langApi = uictx->GetLocalization();
 	static CAlerts* alertctx = uictx->GetAlerts();
+	static CConfigMgr* cfgmgr = ctx->GetCfgMgr();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1);
-	if (ImGui::BeginChild(("Addon_" + sig).c_str(), itemSz, true))
+	if (ImGui::BeginChild(("Addon_" + id).c_str(), itemSz, true))
 	{
 		if (ImGui::BeginChild("Info", ImVec2(itemSz.x - style.ItemSpacing.x - actionsAreaWidth - (style.WindowPadding.x * 2), innerHeight), false, ImGuiWindowFlags_NoBackground))
 		{
@@ -162,13 +178,13 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 			float initialX = ImGui::GetCursorPosX();
 
 			/* If only libdef, show install and github button. */
-			if (aAddonData.HasLibDef && !(aAddonData.HasNexusDef || aAddonData.HasArcDef))
+			if (aAddonData.HasLibDef && !aAddonData.Addon)
 			{
 				/* Install button */
 				ImGui::SetCursorPos(ImVec2(initialX, (ImGui::GetWindowHeight() - (btnTextSz.y * 2) - style.ItemSpacing.y - (style.FramePadding.y * 2)) / 2));
 				if (ImGui::Button(aAddonData.IsInstalling
-					? (langApi->Translate("((000027))") + sig).c_str()
-					: (langApi->Translate("((000028))") + sig).c_str(),
+					? (langApi->Translate("((000027))") + id).c_str()
+					: (langApi->Translate("((000028))") + id).c_str(),
 					ImVec2(btnWidth, 0)))
 				{
 					if (!aAddonData.IsInstalling)
@@ -182,7 +198,7 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 				if (!aAddonData.GithubURL.empty())
 				{
 					ImGui::SetCursorPos(ImVec2(initialX, ImGui::GetCursorPosY()));
-					if (ImGui::Button((langApi->Translate("((000030))") + sig).c_str(), ImVec2(btnWidth, 0)))
+					if (ImGui::Button((langApi->Translate("((000030))") + id).c_str(), ImVec2(btnWidth, 0)))
 					{
 						ShellExecuteA(0, 0, aAddonData.GithubURL.c_str(), 0, 0, SW_SHOW);
 					}
@@ -190,33 +206,26 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 			}
 
 			/* If nexusdef, show load/unload and configure button. */
-			if (aAddonData.HasNexusDef)
+			if (aAddonData.Addon)
 			{
 				std::string buttonText;
 				std::string buttonTT;
 
-				switch (aAddonData.Addon->GetState())
+				if (aAddonData.Addon->IsLoaded())
 				{
-					default:
-					case EAddonState::None: /* None is equivalent to not loaded at this stage. */
-					case EAddonState::NotLoaded:
-					{
-						buttonText = "((Load))";
-						break;
-					}
-					case EAddonState::Loaded:
-					{
-						buttonText = "((Disable))";
-						break;
-					}
+					buttonText = "((Disable))";
+				}
+				else
+				{
+					buttonText = "((Load))";
 				}
 
-				if (aAddonData.Addon->IsLocked())
+				if (aAddonData.Addon->IsStateLocked())
 				{
 					buttonTT = "((Loading or unloading won't take effect until next game start.))";
 				}
 
-				if (aAddonData.Addon->IsPersistent())
+				if (cfgmgr->IsReadOnly())
 				{
 					buttonTT = "((Addon state won't be saved. Game was started with addons via start parameter.))";
 				}
@@ -225,22 +234,16 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 				ImGui::SetCursorPos(ImVec2(initialX, (ImGui::GetWindowHeight() - (btnTextSz.y * 2) - style.ItemSpacing.y - (style.FramePadding.y * 2)) / 2));
 				if (ImGui::Button(buttonText.c_str(), ImVec2(btnWidth, 0)))
 				{
-					if (!aAddonData.Addon->IsLocked())
+					if (!aAddonData.Addon->IsStateLocked())
 					{
-						switch (aAddonData.Addon->GetState())
+						if (aAddonData.Addon->IsLoaded())
 						{
-							default:
-							case EAddonState::None: /* None is equivalent to not loaded at this stage. */
-							case EAddonState::NotLoaded:
-							{
-								aAddonData.Addon->Load();
-								break;
-							}
-							case EAddonState::Loaded:
-							{
-								aAddonData.Addon->Unload();
-								break;
-							}
+							aAddonData.Addon->Unload();
+						}
+						else
+						{
+							aAddonData.Addon->Load();
+							// TODO: Signal to save the ShouldLoad config flag somehow.
 						}
 					}
 				}
@@ -258,12 +261,12 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 			}
 
 			/* If arc extension only, show notice. */
-			if (aAddonData.HasArcDef && !aAddonData.HasNexusDef)
+			/*if (aAddonData.HasArcDef && !aAddonData.HasNexusDef)
 			{
 				float width = ImGui::CalcTextSize("via ArcDPS").x;
 				ImGui::SetCursorPosX((btnWidth - width) / 2);
 				ImGui::Text("via ArcDPS");
-			}
+			}*/
 		}
 		ImGui::EndChild();
 
@@ -299,7 +302,7 @@ void CAddonsWindow::RenderContent()
 	static CUiContext* uictx = ctx->GetUIContext();
 	static CLocalization* langApi = uictx->GetLocalization();
 	static CSettings* settingsctx = ctx->GetSettingsCtx();
-	static CLoader* loader = ctx->GetLoader();
+	static CLoaderBase* loader = ctx->GetLoaderBase();
 
 	ImVec2 region = ImGui::GetContentRegionAvail();
 
@@ -390,15 +393,8 @@ void CAddonsWindow::RenderContent()
 		static Texture_t* filtersTex = nullptr;
 		if (filtersTex)
 		{
-			static bool showEnabled = (int)this->Filter & (int)EAddonsFilterFlags::ShowEnabled;
-			static bool showDisabled = (int)this->Filter & (int)EAddonsFilterFlags::ShowDisabled;
-			static bool showDownloadable = (int)this->Filter & (int)EAddonsFilterFlags::ShowDownloadable;
-			static bool showInstalledArc = (int)this->Filter & (int)EAddonsFilterFlags::ShowInstalled_Arc;
-			static bool showDownloadableArc = (int)this->Filter & (int)EAddonsFilterFlags::ShowDownloadable_Arc;
-
-			if (!(this->Filter == quickFilter_Installed ||
-				this->Filter == quickFilter_Library ||
-				this->Filter == quickFilter_ArcPlugins))
+			/* If filter does not match quick filter, highlight manual filter icon. */
+			if (this->Filter != FILTER_INSTALLED && this->Filter != FILTER_LIBRARY)
 			{
 				ImGui::PushStyleColor(ImGuiCol_Button, style.Colors[ImGuiCol_ButtonActive]);
 				doPopHighlight = true;
@@ -406,11 +402,6 @@ void CAddonsWindow::RenderContent()
 
 			if (ImGui::ImageButton(filtersTex->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
 			{
-				showEnabled = (int)this->Filter & (int)EAddonsFilterFlags::ShowEnabled;
-				showDisabled = (int)this->Filter & (int)EAddonsFilterFlags::ShowDisabled;
-				showDownloadable = (int)this->Filter & (int)EAddonsFilterFlags::ShowDownloadable;
-				showInstalledArc = (int)this->Filter & (int)EAddonsFilterFlags::ShowInstalled_Arc;
-				showDownloadableArc = (int)this->Filter & (int)EAddonsFilterFlags::ShowDownloadable_Arc;
 				ImGui::OpenPopup("Filters");
 			}
 
@@ -422,52 +413,55 @@ void CAddonsWindow::RenderContent()
 
 			if (ImGui::BeginPopupContextItem("Filters"))
 			{
+				bool showEnabled = (this->Filter & EAddonsFilterFlags::ShowEnabled) == EAddonsFilterFlags::ShowEnabled;
 				if (ImGui::Checkbox(langApi->Translate("((000106))"), &showEnabled))
 				{
 					if (showEnabled)
 					{
-						this->Filter = (EAddonsFilterFlags)((int)this->Filter | (int)EAddonsFilterFlags::ShowEnabled);
+						this->Filter |= EAddonsFilterFlags::ShowEnabled;
 					}
 					else
 					{
-						this->Filter = (EAddonsFilterFlags)((int)this->Filter & ~(int)EAddonsFilterFlags::ShowEnabled);
+						this->Filter &= ~EAddonsFilterFlags::ShowEnabled;
 					}
 					settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
 					this->Invalidate();
 					this->ClearContent();
 				}
 
+				bool showDisabled = (this->Filter & EAddonsFilterFlags::ShowDisabled) == EAddonsFilterFlags::ShowDisabled;
 				if (ImGui::Checkbox(langApi->Translate("((000107))"), &showDisabled))
 				{
 					if (showDisabled)
 					{
-						this->Filter = (EAddonsFilterFlags)((int)this->Filter | (int)EAddonsFilterFlags::ShowDisabled);
+						this->Filter |= EAddonsFilterFlags::ShowDisabled;
 					}
 					else
 					{
-						this->Filter = (EAddonsFilterFlags)((int)this->Filter & ~(int)EAddonsFilterFlags::ShowDisabled);
+						this->Filter &= ~EAddonsFilterFlags::ShowDisabled;
 					}
 					settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
 					this->Invalidate();
 					this->ClearContent();
 				}
 
+				bool showDownloadable = (this->Filter & EAddonsFilterFlags::ShowDownloadable) == EAddonsFilterFlags::ShowDownloadable;
 				if (ImGui::Checkbox(langApi->Translate("((000108))"), &showDownloadable))
 				{
 					if (showDownloadable)
 					{
-						this->Filter = (EAddonsFilterFlags)((int)this->Filter | (int)EAddonsFilterFlags::ShowDownloadable);
+						this->Filter |= EAddonsFilterFlags::ShowDownloadable;
 					}
 					else
 					{
-						this->Filter = (EAddonsFilterFlags)((int)this->Filter & ~(int)EAddonsFilterFlags::ShowDownloadable);
+						this->Filter &= ~EAddonsFilterFlags::ShowDownloadable;
 					}
 					settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
 					this->Invalidate();
 					this->ClearContent();
 				}
 
-				if (ArcDPS::IsLoaded)
+				/*if (ArcDPS::IsLoaded)
 				{
 					if (ImGui::Checkbox(langApi->Translate("((000109))"), &showInstalledArc))
 					{
@@ -498,7 +492,7 @@ void CAddonsWindow::RenderContent()
 						this->Invalidate();
 						this->ClearContent();
 					}
-				}
+				}*/
 
 				ImGui::EndPopup();
 			}
@@ -513,15 +507,17 @@ void CAddonsWindow::RenderContent()
 
 		/* quick filters */
 		
-		if (this->Filter == quickFilter_Installed)
+		if ((this->Filter & FILTER_INSTALLED) == FILTER_INSTALLED &&
+			(this->Filter & ~FILTER_INSTALLED) == EAddonsFilterFlags::None)
 		{
 			ImGui::PushStyleColor(ImGuiCol_Button, style.Colors[ImGuiCol_ButtonActive]);
 			doPopHighlight = true;
 		}
 
+		/* Quick Filter: Installed */
 		if (ImGui::Button(langApi->Translate("((000031))")))
 		{
-			this->Filter = quickFilter_Installed;
+			this->Filter = FILTER_INSTALLED;
 			settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
 			this->Invalidate();
 			this->ClearContent();
@@ -535,15 +531,17 @@ void CAddonsWindow::RenderContent()
 
 		ImGui::SameLine();
 
-		if (this->Filter == quickFilter_Library)
+		if ((this->Filter & FILTER_LIBRARY) == FILTER_LIBRARY &&
+			(this->Filter & ~FILTER_LIBRARY) == EAddonsFilterFlags::None)
 		{
 			ImGui::PushStyleColor(ImGuiCol_Button, style.Colors[ImGuiCol_ButtonActive]);
 			doPopHighlight = true;
 		}
 
+		/* Quick Filter: Library */
 		if (ImGui::Button(langApi->Translate("((000032))")))
 		{
-			this->Filter = quickFilter_Library;
+			this->Filter = FILTER_LIBRARY;
 			settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
 			this->Invalidate();
 			this->ClearContent();
@@ -555,7 +553,7 @@ void CAddonsWindow::RenderContent()
 			doPopHighlight = false;
 		}
 
-		if (ArcDPS::IsLoaded)
+		/*if (ArcDPS::IsLoaded)
 		{
 			ImGui::SameLine();
 
@@ -584,7 +582,7 @@ void CAddonsWindow::RenderContent()
 			}
 
 			ImGui::TooltipGeneric(legacyNotice.c_str());
-		}
+		}*/
 
 		filterAreaEndY = ImGui::GetCursorPos().y;
 	}
@@ -674,7 +672,7 @@ void CAddonsWindow::RenderContent()
 
 		if (ImGui::Button(checkedForUpdates == -1 ? langApi->Translate("((000035))") : langApi->Translate("((000071))")))
 		{
-			if (checkedForUpdates == -1)
+			/*if (checkedForUpdates == -1)
 			{
 				const std::lock_guard<std::mutex> lock(loader->Mutex);
 				{
@@ -682,7 +680,7 @@ void CAddonsWindow::RenderContent()
 					queuedForCheck = 0;
 					updatedCount = 0;
 
-					/* pre-iterate to get the count of how many need to be checked, else one call might finish before the count can be incremented */
+					// pre-iterate to get the count of how many need to be checked, else one call might finish before the count can be incremented
 					for (auto addon : loader->Addons)
 					{
 						if (nullptr == addon->Definitions) { continue; }
@@ -751,7 +749,7 @@ void CAddonsWindow::RenderContent()
 						}).detach();
 					}
 				}
-			}
+			}*/
 		}
 		ImGui::TooltipGeneric(langApi->Translate("((000036))"));
 
@@ -847,7 +845,7 @@ void CAddonsWindow::RenderDetails()
 		headerStr.append(" ");
 		headerStr.append(addonData.GetName());
 
-		if (ImGui::CollapsingHeader(headerStr.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+		/*if (ImGui::CollapsingHeader(headerStr.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			if (addonData.NexusAddon->Definitions->Provider != EUpdateProvider::Self)
 			{
@@ -963,7 +961,7 @@ void CAddonsWindow::RenderDetails()
 				}
 			}
 
-			/* Load/Unload Button */
+			// Load/Unload Button
 			// just check if loaded, if it was not hot-reloadable it would be EAddonState::LoadedLOCKED
 			if (addonData.NexusAddon->State == EAddonState::Loaded)
 			{
@@ -999,7 +997,7 @@ void CAddonsWindow::RenderDetails()
 			}
 			else if (addonData.NexusAddon->State == EAddonState::NotLoaded && (addonData.NexusAddon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || addonData.NexusAddon->Definitions->Signature == 0xFFF694D1) && !loader->IsGameLaunchSequence)
 			{
-				/* if it's too late to load this addon */
+				// if it's too late to load this addon
 				if (ImGui::Button((langApi->Translate(addonData.NexusAddon->IsFlaggedForEnable ? "((000020))" : "((000024))") + sig).c_str()))
 				{
 					addonData.NexusAddon->IsFlaggedForEnable = !addonData.NexusAddon->IsFlaggedForEnable;
@@ -1041,9 +1039,9 @@ void CAddonsWindow::RenderDetails()
 			{
 				ImGui::TooltipGeneric(langApi->Translate("((000019))"));
 			}
-		}
+		}*/
 
-		if (!(addonData.NexusAddon->State == EAddonState::Loaded || addonData.NexusAddon->State == EAddonState::LoadedLOCKED))
+		/*if (!(addonData.NexusAddon->State == EAddonState::Loaded || addonData.NexusAddon->State == EAddonState::LoadedLOCKED))
 		{
 			ImVec2 windowSize = ImGui::GetWindowSize();
 			ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((000100))"));
@@ -1068,7 +1066,7 @@ void CAddonsWindow::RenderDetails()
 					addonData.OptionsRender();
 				}
 			}
-		}
+		}*/
 	}
 	ImGui::EndChild();
 }
@@ -1104,114 +1102,121 @@ void CAddonsWindow::PopulateAddons()
 {
 	this->Addons.clear();
 
-	CContext* ctx = CContext::GetContext();
-	CUiContext* uictx = ctx->GetUIContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
-	CLoader* loader = ctx->GetLoader();
+	CContext*    ctx = CContext::GetContext();
+	CUiContext*  uictx = ctx->GetUIContext();
+	CSettings*   settingsctx = ctx->GetSettingsCtx();
+	CLoaderBase* loader = ctx->GetLoaderBase();
+	CLibraryMgr* libMgr = ctx->GetAddonLibrary();
 
-	const std::lock_guard<std::mutex> lock(loader->Mutex);
+	this->Filter = settingsctx->Get<EAddonsFilterFlags>(OPT_ADDONFILTERS, FILTER_INSTALLED);
 
-	this->Filter = settingsctx->Get<EAddonsFilterFlags>(OPT_ADDONFILTERS, quickFilter_Installed);
-
-	for (Addon_t* addon : loader->Addons)
+	for (IAddon* addon : loader->GetAddons())
 	{
-		if (addon->Path.filename() == "arcdps_integration64.dll") { continue; }
-		if (!addon->Definitions) { continue; }
-
-		if (!this->SearchTerm.empty() &&
-			!(String::Contains(String::ToLower(addon->Definitions->Name), this->SearchTerm) ||
-			String::Contains(String::ToLower(addon->Definitions->Description), this->SearchTerm)))
-		{
-			continue;
-		}
-
-		if ((addon->State == EAddonState::Loaded || addon->State == EAddonState::LoadedLOCKED) &&
-			((int)this->Filter & (int)EAddonsFilterFlags::ShowEnabled) == 0)
-		{
-			continue;
-		}
-
-		if ((addon->State == EAddonState::NotLoaded || addon->State == EAddonState::NotLoadedDuplicate ||
-			addon->State == EAddonState::NotLoadedIncompatible || addon->State == EAddonState::NotLoadedIncompatibleAPI) &&
-			((int)this->Filter & (int)EAddonsFilterFlags::ShowDisabled) == 0)
-		{
-			continue;
-		}
-
-		AddonItemData_t addonItem{};
-		addonItem.Type = EAddonType::Nexus;
-		addonItem.NexusAddon = addon;
+		AddonListing_t addonlisting{};
+		addonlisting.Addon = dynamic_cast<CAddon*>(addon);
 
 		for (GUI_RENDER renderCb : uictx->GetOptionsCallbacks())
 		{
-			std::string parent = loader->GetOwner(renderCb);
-			if (addon->Definitions && addon->Definitions->Name == parent)
+			IAddon* owner = loader->GetOwner(renderCb);
+			if (addon == owner)
 			{
-				addonItem.OptionsRender = renderCb;
+				addonlisting.OptionsRender = renderCb;
 				break;
 			}
 		}
 
-		this->Addons.push_back(addonItem);
+		this->Addons.push_back(addonlisting);
 
-		if (this->HasContent && this->AddonData.NexusAddon->Definitions && 
-			this->AddonData.NexusAddon->Definitions->Signature == addon->Definitions->Signature)
+		if (this->HasContent && this->AddonData.GetSig() == addon->GetSignature())
 		{
-			this->SetContent(addonItem);
+			this->SetContent(addonlisting);
 		}
 	}
 
+	for (LibraryAddon_t libaddon : libMgr->GetLibrary())
 	{
-		CLibraryMgr* libMgr = ctx->GetAddonLibrary();
+		bool installed = false;
 
-		for (LibraryAddon_t addon : libMgr->GetLibrary())
+		for (AddonListing_t& addonlisting : this->Addons)
 		{
-			if (!this->SearchTerm.empty() && !String::Contains(String::ToLower(addon.Name), this->SearchTerm)) { continue; }
-
-			bool installed = false;
-
-			for (Addon_t* installedAddon : loader->Addons)
+			if (addonlisting.GetSig() == libaddon.Signature)
 			{
-				// filter out already installed
-				if (addon.Signature == installedAddon->MatchSignature && installedAddon->State != EAddonState::None)
+				installed = true;
+				addonlisting.HasLibDef = true;
+				addonlisting.LibraryDef = libaddon;
+				if (String::Contains(libaddon.DownloadURL, "https://github.com"))
 				{
-					installed = true;
-					break;
+					addonlisting.GithubURL = libaddon.DownloadURL;
 				}
 			}
+		}
 
-			if (installed)
+		if (!installed)
+		{
+			AddonListing_t addonlisting{};
+			addonlisting.HasLibDef = true;
+			addonlisting.LibraryDef = libaddon;
+			if (String::Contains(libaddon.DownloadURL, "https://github.com"))
 			{
-				continue;
+				addonlisting.GithubURL = libaddon.DownloadURL;
 			}
-
-			if (((int)this->Filter & (int)EAddonsFilterFlags::ShowDownloadable) == 0)
-			{
-				continue;
-			}
-
-			AddonItemData_t addonItem{};
-			addonItem.Type = EAddonType::Library;
-			addonItem.LibraryAddon = addon;
-
-			if (ArcDPS::IsLoaded && addonItem.LibraryAddon.Signature == 0xFFF694D1) { continue; }
-
-			this->Addons.push_back(addonItem);
+			this->Addons.push_back(addonlisting);
 		}
 	}
 	
+	for (auto it = this->Addons.begin(); it != this->Addons.end();)
+	{
+		bool matchesFilter = false;
+
+		if ((this->Filter & EAddonsFilterFlags::ShowEnabled) == EAddonsFilterFlags::ShowEnabled)
+		{
+			/* Has local addon and is loaded -> Enabled */
+			if (it->Addon && it->Addon->IsLoaded())
+			{
+				matchesFilter = true;
+			}
+		}
+
+		if ((this->Filter & EAddonsFilterFlags::ShowDisabled) == EAddonsFilterFlags::ShowDisabled)
+		{
+			/* Has local addon and is not loaded -> Disabled */
+			if (it->Addon && !it->Addon->IsLoaded())
+			{
+				matchesFilter = true;
+			}
+		}
+
+		if ((this->Filter & EAddonsFilterFlags::ShowDownloadable) == EAddonsFilterFlags::ShowDownloadable)
+		{
+			/* Has no local addon, but a libdef -> Downloadable */
+			if (!it->Addon && it->HasLibDef)
+			{
+				matchesFilter = true;
+			}
+		}
+
+		if (!matchesFilter)
+		{
+			/* Doesn't match any filter flags -> Remove */
+			it = this->Addons.erase(it);
+		}
+		else if (!this->SearchTerm.empty() &&
+			!(String::Contains(String::ToLower(it->GetName()), this->SearchTerm) ||
+			String::Contains(String::ToLower(it->GetDesc()), this->SearchTerm) ||
+			String::Contains(String::ToLower(it->GetAuthor()), this->SearchTerm)))
+		{
+			/* Term matches name or description or author -> Filter */
+			it = this->Addons.erase(it);
+		}
+		else
+		{
+			/* Continue to next addon listing. */
+			it++;
+		}
+	}
+
 	std::sort(this->Addons.begin(), this->Addons.end(), [](AddonListing_t& lhs, AddonListing_t& rhs)
 	{
-		return lhs.GetName() < rhs.GetName();
+		return String::ToLower(lhs.GetName()) < String::ToLower(rhs.GetName());
 	});
 }
-#else
-void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth) {}
-
-void CAddonsWindow::RenderContent() {}
-void CAddonsWindow::RenderSubWindows() {}
-void CAddonsWindow::RenderDetails() {}
-void CAddonsWindow::RenderInputBindsTable(const std::unordered_map<std::string, InputBindPacked_t>& aInputBinds) {}
-
-void CAddonsWindow::PopulateAddons() {}
-#endif

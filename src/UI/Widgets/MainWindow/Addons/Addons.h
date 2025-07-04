@@ -11,6 +11,7 @@
 
 #include <mutex>
 #include <vector>
+#include <windows.h>
 
 #include "AddonListing.h"
 #include "UI/Controls/CtlSubWindow.h"
@@ -25,10 +26,9 @@ enum class EAddonsFilterFlags
 	None,
 	ShowEnabled          = 1 << 0,
 	ShowDisabled         = 1 << 1,
-	ShowDownloadable     = 1 << 2,
-	ShowInstalled_Arc    = 1 << 3,
-	ShowDownloadable_Arc = 1 << 4
+	ShowDownloadable     = 1 << 2
 };
+DEFINE_ENUM_FLAG_OPERATORS(EAddonsFilterFlags)
 
 class CAddonsWindow : public ISubWindow
 {

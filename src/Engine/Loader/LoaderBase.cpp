@@ -199,7 +199,7 @@ void CLoaderBase::UninstallSafe(std::filesystem::path aPath)
 	this->Uninstall(aPath);
 }
 
-IAddon* CLoaderBase::GetOwner(void* aAddress)
+IAddon* CLoaderBase::GetOwner(void* aAddress) const
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -214,25 +214,32 @@ IAddon* CLoaderBase::GetOwner(void* aAddress)
 	return nullptr;
 }
 
-bool CLoaderBase::IsTrackedSafe(uint32_t aSignature, IAddon* aAddon)
+bool CLoaderBase::IsTrackedSafe(uint32_t aSignature, IAddon* aAddon) const
 {
 	std::lock_guard<std::mutex> lock(this->Mutex);
 
 	return this->IsTracked(aSignature, aAddon);
 }
 
-bool CLoaderBase::IsTrackedSafe(std::filesystem::path aPath, IAddon* aAddon)
+bool CLoaderBase::IsTrackedSafe(std::filesystem::path aPath, IAddon* aAddon) const
 {
 	std::lock_guard<std::mutex> lock(this->Mutex);
 
 	return this->IsTracked(aPath, aAddon);
 }
 
-bool CLoaderBase::IsTrackedSafe(MD5_t aMD5, IAddon* aAddon)
+bool CLoaderBase::IsTrackedSafe(MD5_t aMD5, IAddon* aAddon) const
 {
 	std::lock_guard<std::mutex> lock(this->Mutex);
 
 	return this->IsTracked(aMD5, aAddon);
+}
+
+std::vector<IAddon*> CLoaderBase::GetAddons() const
+{
+	std::lock_guard<std::mutex> lock(this->Mutex);
+
+	return this->Addons;
 }
 
 void CLoaderBase::DeinitDirectoryUpdates()
@@ -394,7 +401,7 @@ void CLoaderBase::Discover()
 	}
 }
 
-bool CLoaderBase::IsTracked(uint32_t aSignature, IAddon* aAddon)
+bool CLoaderBase::IsTracked(uint32_t aSignature, IAddon* aAddon) const
 {
 	for (IAddon* addon : this->Addons)
 	{
@@ -409,7 +416,7 @@ bool CLoaderBase::IsTracked(uint32_t aSignature, IAddon* aAddon)
 	return false;
 }
 
-bool CLoaderBase::IsTracked(std::filesystem::path aPath, IAddon* aAddon)
+bool CLoaderBase::IsTracked(std::filesystem::path aPath, IAddon* aAddon) const
 {
 	for (IAddon* addon : this->Addons)
 	{
@@ -424,7 +431,7 @@ bool CLoaderBase::IsTracked(std::filesystem::path aPath, IAddon* aAddon)
 	return false;
 }
 
-bool CLoaderBase::IsTracked(MD5_t aMD5, IAddon* aAddon)
+bool CLoaderBase::IsTracked(MD5_t aMD5, IAddon* aAddon) const
 {
 	if (aMD5.empty())
 	{

@@ -138,6 +138,11 @@ void CConfigMgr::DeleteConfig(uint32_t aSignature)
 	this->SaveConfigs();
 }
 
+bool CConfigMgr::IsReadOnly() const
+{
+	return this->ReadOnly;
+}
+
 void CConfigMgr::LoadConfigs()
 {
 	if (!std::filesystem::exists(this->Path)) { return; }
