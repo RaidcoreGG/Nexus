@@ -127,6 +127,11 @@ std::string CAddon::GetVersion()
 	return "";
 }
 
+Config_t* CAddon::GetConfig()
+{
+	return this->Config;
+}
+
 void CAddon::Load()
 {
 	if (!this->IsRunning) { return; }
@@ -759,7 +764,7 @@ bool CAddon::ShouldLoad()
 	}
 
 	/* If this version is broken and was disabled. */
-	if (this->Config->DisableVersion == this->NexusAddonDefV1->Version.string())
+	if (this->Config->DisableVersion == this->GetMD5().string())
 	{
 		this->Logger->Debug(CH_ADDON, "Canceled load. This version is disabled. (%s)", this->Location.string().c_str());
 		result = false;

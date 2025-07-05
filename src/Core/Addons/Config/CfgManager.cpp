@@ -96,6 +96,8 @@ void CConfigMgr::SaveConfigs()
 
 Config_t* CConfigMgr::RegisterConfig(uint32_t aSignature)
 {
+	if (aSignature == 0) { return nullptr; }
+
 	Config_t* config = nullptr;
 
 	/* Scoping for mutex. */

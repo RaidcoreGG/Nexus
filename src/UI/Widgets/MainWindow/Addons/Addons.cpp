@@ -251,7 +251,7 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 						}
 					}
 				}
-				if (ImGui::IsItemHovered())
+				if (ImGui::IsItemHovered() && !buttonTT.empty())
 				{
 					ImGui::TooltipGeneric(buttonTT.c_str());
 				}
@@ -563,7 +563,7 @@ void CAddonsWindow::RenderBody(ImVec2 aSize)
 
 void CAddonsWindow::RenderDetails()
 {
-	AddonListing_t& addonData = this->AddonData;
+	assert(this->AddonData.Addon);
 
 	ImGuiStyle& style = ImGui::GetStyle();
 
@@ -600,12 +600,32 @@ void CAddonsWindow::RenderDetails()
 
 	if (ImGui::BeginChild("Details_Content", ImVec2(0, 0), false, ImGuiWindowFlags_NoBackground))
 	{
-		static CContext* ctx = CContext::GetContext();
-		static CUiContext* uictx = ctx->GetUIContext();
-		static CLocalization* langApi = uictx->GetLocalization();
+		CContext*      ctx = CContext::GetContext();
+		CUiContext*    uictx = ctx->GetUIContext();
+		CLocalization* langApi = uictx->GetLocalization();
 
-		std::string sig = std::to_string(addonData.GetSig());
-		std::string sigid = "##" + sig;
+		std::string id;
+
+		if (this->AddonData.GetSig() != 0)
+		{
+			/* Use addon signature. */
+			id = String::Format("0x%08X", this->AddonData.GetSig());
+		}
+		else
+		{
+			if (this->AddonData.Addon)
+			{
+				/* Use addon file location. */
+				id = this->AddonData.Addon->GetLocation().string();
+			}
+			else
+			{
+				/* This should not be possible. */
+				throw "Unreachable code.";
+			}
+		}
+
+		std::string hashid = "##" + id;
 
 		ImGuiStyle& style = ImGui::GetStyle();
 
@@ -616,11 +636,15 @@ void CAddonsWindow::RenderDetails()
 
 		std::string headerStr = langApi->Translate("((000099))");
 		headerStr.append(" ");
-		headerStr.append(addonData.GetName());
+		headerStr.append(this->AddonData.GetName());
 
-		/*if (ImGui::CollapsingHeader(headerStr.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader(headerStr.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			if (addonData.NexusAddon->Definitions->Provider != EUpdateProvider::Self)
+			Config_t*   config = this->AddonData.Addon->GetConfig();
+			CConfigMgr* cfgmgr = ctx->GetCfgMgr();
+
+			/* TODO: Check Update Button */
+			/*if (addonData.NexusAddon->Definitions->Provider != EUpdateProvider::Self)
 			{
 				if (ImGui::Button((!addonData.NexusAddon->IsCheckingForUpdates
 					? langApi->Translate("((000035))")
@@ -692,154 +716,170 @@ void CAddonsWindow::RenderDetails()
 				{
 					ImGui::TooltipGeneric(langApi->Translate("((000012))"));
 				}
+			}*/
+
+			/* Check Updates Button */
+			ImGui::Text("((BTN: Check for Updates))");
+
+			/* Update Button */
+			if (this->AddonData.Addon->IsUpdateAvailable())
+			{
+				ImGui::Text("((BTN: Update))");
 			}
 
-			if (!addonData.GithubURL.empty())
+			/* GitHub Button */
+			if (!this->AddonData.GithubURL.empty())
 			{
 				ImGui::SameLine();
-				if (ImGui::Button((langApi->Translate("((000030))") + sig).c_str()))
+				if (ImGui::Button((langApi->Translate("((000030))") + id).c_str()))
 				{
-					ShellExecuteA(0, 0, addonData.GithubURL.c_str(), 0, 0, SW_SHOW);
+					ShellExecuteA(0, 0, this->AddonData.GithubURL.c_str(), 0, 0, SW_SHOW);
 				}
 			}
 
-			if (ImGui::Checkbox((langApi->Translate("((000014))") + sigid).c_str(), &addonData.NexusAddon->IsPausingUpdates))
+			if (config)
 			{
-				loader->SaveAddonConfig();
-			}
-
-			if (ImGui::Checkbox((langApi->Translate("((000016))") + sigid).c_str(), &addonData.NexusAddon->IsDisabledUntilUpdate))
-			{
-				//Logger->Debug(CH_GUI, "ToggleDUU called: %s", it.second->Definitions->Name);
-
-				loader->SaveAddonConfig();
-				this->Invalidate();
-
-				if (addonData.NexusAddon->State == EAddonState::Loaded)
+				std::string updateMode;
+				
+				switch (config->UpdateMode)
 				{
-					loader->QueueAddon(ELoaderAction::Unload, addonData.NexusAddon->Path);
-					skipOptions = true;
+					default:
+					case EUpdateMode::None:
+						updateMode = "(null)";
+						break;
+					case EUpdateMode::Background:
+						updateMode = "((Background))";
+						break;
+					case EUpdateMode::Notify:
+						updateMode = "((Notify))";
+						break;
+					case EUpdateMode::Automatic:
+						updateMode = "((Automatic))";
+						break;
 				}
-			}
-			if (addonData.NexusAddon->State == EAddonState::LoadedLOCKED)
-			{
-				ImGui::TooltipGeneric(langApi->Translate("((000017))"));
-			}
 
-			if (addonData.NexusAddon->Definitions->Provider == EUpdateProvider::GitHub)
-			{
-				if (ImGui::Checkbox((langApi->Translate("((000084))") + sigid).c_str(), &addonData.NexusAddon->AllowPrereleases))
+				/* Update Mode Combo */
+				if (ImGui::BeginCombo("##UpdateModeSelector", updateMode.c_str()))
 				{
-					loader->SaveAddonConfig();
-				}
-			}
-
-			// Load/Unload Button
-			// just check if loaded, if it was not hot-reloadable it would be EAddonState::LoadedLOCKED
-			if (addonData.NexusAddon->State == EAddonState::Loaded)
-			{
-				if (ImGui::Button((addonData.NexusAddon->IsWaitingForUnload ? langApi->Translate("((000078))") : langApi->Translate("((000020))") + sig).c_str()))
-				{
-					if (!addonData.NexusAddon->IsWaitingForUnload)
+					if (ImGui::Selectable("((Background))", config->UpdateMode == EUpdateMode::Background))
 					{
-						//Logger->Debug(CH_GUI, "Unload called: %s", it.second->Definitions->Name);
-						loader->QueueAddon(ELoaderAction::Unload, addonData.NexusAddon->Path);
-					}
-				}
-				if (loader->HasCustomConfig)
-				{
-					ImGui::TooltipGeneric(langApi->Translate("((000021))"));
-				}
-			}
-			else if (addonData.NexusAddon->State == EAddonState::LoadedLOCKED)
-			{
-				std::string additionalInfo;
-
-				if (loader->HasCustomConfig)
-				{
-					additionalInfo.append("\n");
-					additionalInfo.append(langApi->Translate("((000021))"));
-				}
-
-				if (ImGui::Button((langApi->Translate(addonData.NexusAddon->IsFlaggedForDisable ? "((000024))" : "((000022))") + sig).c_str()))
-				{
-					addonData.NexusAddon->IsFlaggedForDisable = !addonData.NexusAddon->IsFlaggedForDisable;
-					loader->SaveAddonConfig();
-				}
-				ImGui::TooltipGeneric(langApi->Translate(addonData.NexusAddon->IsFlaggedForDisable ? "((000025))" : "((000023))"), additionalInfo.c_str());
-			}
-			else if (addonData.NexusAddon->State == EAddonState::NotLoaded && (addonData.NexusAddon->Definitions->HasFlag(EAddonFlags::OnlyLoadDuringGameLaunchSequence) || addonData.NexusAddon->Definitions->Signature == 0xFFF694D1) && !loader->IsGameLaunchSequence)
-			{
-				// if it's too late to load this addon
-				if (ImGui::Button((langApi->Translate(addonData.NexusAddon->IsFlaggedForEnable ? "((000020))" : "((000024))") + sig).c_str()))
-				{
-					addonData.NexusAddon->IsFlaggedForEnable = !addonData.NexusAddon->IsFlaggedForEnable;
-
-					if (addonData.NexusAddon->IsFlaggedForEnable)
-					{
-						addonData.NexusAddon->IsDisabledUntilUpdate = false; // explicitly loaded
-						ctx->GetUIContext()->GetAlerts()->Notify(EAlertType::Info, String::Format("%s %s", addonData.NexusAddon->Definitions->Name, langApi->Translate("((000080))")).c_str());
+						config->UpdateMode = EUpdateMode::Background;
+						cfgmgr->SaveConfigs();
 					}
 
-					loader->SaveAddonConfig();
-				}
-				if (addonData.NexusAddon->IsFlaggedForEnable)
-				{
-					ImGui::TooltipGeneric(langApi->Translate("((000025))"), "");
-				}
-			}
-			else if (addonData.NexusAddon->State == EAddonState::NotLoaded)
-			{
-				if (ImGui::Button((langApi->Translate("((000026))") + sig).c_str()))
-				{
-					//Logger->Debug(CH_GUI, "Load called: %s", it.second->Definitions->Name);
-					addonData.NexusAddon->IsDisabledUntilUpdate = false; // explicitly loaded
-					loader->QueueAddon(ELoaderAction::Load, addonData.NexusAddon->Path);
-				}
-				if (loader->HasCustomConfig)
-				{
-					ImGui::TooltipGeneric(langApi->Translate("((000021))"));
-				}
-			}
+					if (ImGui::Selectable("((Notify))", config->UpdateMode == EUpdateMode::Notify))
+					{
+						config->UpdateMode = EUpdateMode::Notify;
+						cfgmgr->SaveConfigs();
+					}
 
-			ImGui::SameLine();
+					if (ImGui::Selectable("((Automatic))", config->UpdateMode == EUpdateMode::Automatic))
+					{
+						config->UpdateMode = EUpdateMode::Automatic;
+						cfgmgr->SaveConfigs();
+					}
 
-			if (ImGui::Button((langApi->Translate("((000018))") + sigid).c_str()))
-			{
-				this->UninstallConfirmationModal.SetTarget(addonData.NexusAddon->Definitions->Name, addonData.NexusAddon->Path);
-			}
-			if (addonData.NexusAddon->State == EAddonState::LoadedLOCKED)
-			{
-				ImGui::TooltipGeneric(langApi->Translate("((000019))"));
-			}
-		}*/
+					ImGui::EndCombo();
+				}
 
-		/*if (!(addonData.NexusAddon->State == EAddonState::Loaded || addonData.NexusAddon->State == EAddonState::LoadedLOCKED))
+				/* Pre-releases Checkbox */
+				// TODO: if (addonData.Addon->GetProvider()->SupportsPreReleases())
+				{
+					if (ImGui::Checkbox((langApi->Translate("((000084))") + hashid).c_str(), &config->AllowPreReleases))
+					{
+						cfgmgr->SaveConfigs();
+					}
+				}
+
+				/* Disable until update Checkbox */
+				bool disableUntilUpdate = config->DisableVersion == this->AddonData.Addon->GetMD5().string();
+				if (ImGui::Checkbox((langApi->Translate("((000016))") + hashid).c_str(), &disableUntilUpdate))
+				{
+					this->Invalidate();
+
+					if (disableUntilUpdate)
+					{
+						config->DisableVersion = this->AddonData.Addon->GetMD5().string();
+						this->AddonData.Addon->Unload();
+						skipOptions = true;
+					}
+					else
+					{
+						config->DisableVersion.clear();
+					}
+					cfgmgr->SaveConfigs();
+				}
+				if (this->AddonData.Addon->IsStateLocked())
+				{
+					ImGui::TooltipGeneric(langApi->Translate("((IsStateLocked))"));
+				}
+
+				/* Uninstall Button */
+				if (ImGui::Button((langApi->Translate("((000018))") + hashid).c_str()))
+				{
+					this->UninstallConfirmationModal.SetTarget(this->AddonData.GetName(), this->AddonData.Addon->GetLocation());
+				}
+				if (this->AddonData.Addon->IsStateLocked())
+				{
+					ImGui::TooltipGeneric(langApi->Translate("((IsStateLocked))"));
+				}
+
+				/* Load/Unload Button */
+				if (this->AddonData.Addon->IsLoaded())
+				{
+					if (ImGui::Button((langApi->Translate("((Unload))") + hashid).c_str()))
+					{
+						this->AddonData.Addon->Unload();
+					}
+				}
+				else
+				{
+					if (ImGui::Button((langApi->Translate("((Load))") + hashid).c_str()))
+					{
+						this->AddonData.Addon->Load();
+					}
+				}
+				if (this->AddonData.Addon->IsStateLocked())
+				{
+					ImGui::TooltipGeneric(langApi->Translate("((IsStateLocked))"));
+				}
+			}
+			else
+			{
+				/* This should be in theory unreachable. */
+				ImGui::Text("This addon does not have any configuration options.");
+			}
+		}
+
+		if (this->AddonData.Addon && this->AddonData.Addon->IsLoaded())
 		{
+			/* Addon binds table. */
+			if (this->AddonData.InputBinds.size() != 0)
+			{
+				if (ImGui::CollapsingHeader(langApi->Translate("((000060))"), ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					this->RenderInputBindsTable(this->AddonData.InputBinds);
+				}
+			}
+
+			/* Addon options callback. */
+			if (this->AddonData.OptionsRender && !skipOptions)
+			{
+				if (ImGui::CollapsingHeader(langApi->Translate("((000004))"), ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					this->AddonData.OptionsRender();
+				}
+			}
+		}
+		else
+		{
+			/* Notice to load the addon. */
 			ImVec2 windowSize = ImGui::GetWindowSize();
 			ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((000100))"));
 			ImVec2 position = ImGui::GetCursorPos();
 			ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
 			ImGui::TextDisabled(langApi->Translate("((000100))"));
 		}
-		else
-		{
-			if (addonData.InputBinds.size() != 0)
-			{
-				if (ImGui::CollapsingHeader(langApi->Translate("((000060))"), ImGuiTreeNodeFlags_DefaultOpen))
-				{
-					this->RenderInputBindsTable(addonData.InputBinds);
-				}
-			}
-
-			if (addonData.OptionsRender && !skipOptions)
-			{
-				if (ImGui::CollapsingHeader(langApi->Translate("((000004))"), ImGuiTreeNodeFlags_DefaultOpen))
-				{
-					addonData.OptionsRender();
-				}
-			}
-		}*/
 	}
 	ImGui::EndChild();
 }
