@@ -456,6 +456,8 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 					this->ClearContent();
 				}
 
+				ImGui::TextDisabled("%u / %u", this->Addons.size(), this->AddonsAmtUnfiltered);
+
 				ImGui::EndPopup();
 			}
 		}
@@ -1119,6 +1121,8 @@ void CAddonsWindow::PopulateAddons()
 		}
 	}
 	
+	this->AddonsAmtUnfiltered = this->Addons.size();
+
 	for (auto it = this->Addons.begin(); it != this->Addons.end();)
 	{
 		bool matchesFilter = false;

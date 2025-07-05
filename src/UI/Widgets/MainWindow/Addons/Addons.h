@@ -48,6 +48,7 @@ class CAddonsWindow : public ISubWindow
 	EAddonsFilterFlags          Filter;
 	bool                        IsListMode;
 	std::vector<AddonListing_t> Addons;
+	uint32_t                    AddonsAmtUnfiltered;
 
 	/* Details */
 	std::mutex                  Mutex;
