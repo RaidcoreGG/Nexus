@@ -140,11 +140,11 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 		return;
 	}
 
-	static CContext* ctx = CContext::GetContext();
-	static CUiContext* uictx = ctx->GetUIContext();
-	static CLocalization* langApi = uictx->GetLocalization();
-	static CAlerts* alertctx = uictx->GetAlerts();
-	static CConfigMgr* cfgmgr = ctx->GetCfgMgr();
+	static CContext*      ctx      = CContext::GetContext();
+	static CUiContext*    uictx    = ctx->GetUIContext();
+	static CLocalization* langApi  = uictx->GetLocalization();
+	static CAlerts*       alertctx = uictx->GetAlerts();
+	static CConfigMgr*    cfgmgr   = ctx->GetCfgMgr();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1);
 	if (ImGui::BeginChild(("Addon_" + id).c_str(), itemSz, true))
@@ -251,11 +251,22 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 					if (aAddonData.Addon->IsLoaded())
 					{
 						aAddonData.Addon->Unload();
+						Config_t* config = cfgmgr->RegisterConfig(aAddonData.GetSig());
+						if (config)
+						{
+							config->ShouldLoad = false;
+							cfgmgr->SaveConfigs();
+						}
 					}
 					else
 					{
 						aAddonData.Addon->Load();
-						// TODO: Signal to save the ShouldLoad config flag somehow.
+						Config_t* config = cfgmgr->RegisterConfig(aAddonData.GetSig());
+						if (config)
+						{
+							config->ShouldLoad = true;
+							cfgmgr->SaveConfigs();
+						}
 					}
 				}
 				if (ImGui::IsItemHovered() && !buttonTT.empty())
@@ -835,9 +846,18 @@ void CAddonsWindow::RenderDetails()
 				/* Load/Unload Button */
 				if (this->AddonData.Addon->IsLoaded())
 				{
+					// TODO: Double button logic in details and listing.
+					// TODO: Handle state locked addons.
+
 					if (ImGui::Button((langApi->Translate("((Unload))") + hashid).c_str()))
 					{
 						this->AddonData.Addon->Unload();
+						Config_t* config = cfgmgr->RegisterConfig(this->AddonData.GetSig());
+						if (config)
+						{
+							config->ShouldLoad = false;
+							cfgmgr->SaveConfigs();
+						}
 					}
 				}
 				else
@@ -845,6 +865,12 @@ void CAddonsWindow::RenderDetails()
 					if (ImGui::Button((langApi->Translate("((Load))") + hashid).c_str()))
 					{
 						this->AddonData.Addon->Load();
+						Config_t* config = cfgmgr->RegisterConfig(this->AddonData.GetSig());
+						if (config)
+						{
+							config->ShouldLoad = true;
+							cfgmgr->SaveConfigs();
+						}
 					}
 				}
 				if (this->AddonData.Addon->IsStateLocked())

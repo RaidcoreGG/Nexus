@@ -507,13 +507,9 @@ void CAddon::UnloadInternal()
 		strUnloadInfo = "No unload routine defined.";
 	}
 
-	/* Only free library, if it is hot-loadable. Else let the OS take care. */
-	if ((this->NexusAddonDefV1->Flags & EAddonDefFlags::DisableHotloading) != EAddonDefFlags::DisableHotloading)
-	{
-		FreeLibrary(this->Module);
-		this->Module = nullptr;
-		this->ModuleSize = 0;
-	}
+	FreeLibrary(this->Module);
+	this->Module = nullptr;
+	this->ModuleSize = 0;
 
 	this->State = EAddonState::NotLoaded;
 
