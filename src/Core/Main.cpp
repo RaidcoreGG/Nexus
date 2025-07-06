@@ -43,6 +43,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		{
 			CContext* ctx = CContext::GetContext();
 
+			Main::Shutdown(1);
+
 			/* If we have the window handle and we have an original (target) wndproc. */
 			if (ctx->GetRendererCtx()->Window.Handle && Hooks::Target::WndProc)
 			{
@@ -169,9 +171,10 @@ namespace Main
 		std::string reasonStr;
 		switch (aReason)
 		{
-			case WM_DESTROY: { reasonStr = "Reason: WM_DESTROY"; break; }
-			case WM_CLOSE:   { reasonStr = "Reason: WM_CLOSE";   break; }
-			case WM_QUIT:    { reasonStr = "Reason: WM_QUIT";    break; }
+			case 1:          { reasonStr = "Reason: DLL_PROCESS_DETACH"; break; }
+			case WM_DESTROY: { reasonStr = "Reason: WM_DESTROY";         break; }
+			case WM_CLOSE:   { reasonStr = "Reason: WM_CLOSE";           break; }
+			case WM_QUIT:    { reasonStr = "Reason: WM_QUIT";            break; }
 			default:
 			{
 				reasonStr = String::Format("Reason: Unknown (%d)", aReason);
@@ -181,13 +184,19 @@ namespace Main
 
 		CContext*   ctx    = CContext::GetContext();
 		CLogApi*    logger = ctx->GetLogger();
-		CLoader*    loader = ctx->GetLoader();
-		CUiContext* uictx  = ctx->GetUIContext();
 
 		logger->Critical(CH_CORE, "SHUTDOWN BEGIN | %s", reasonStr.c_str());
-		MH_Uninitialize();
-		loader->Shutdown();
-		uictx->Shutdown();
+
+		if (!CmdLine::HasArgument("-ggvanilla"))
+		{
+			MH_Uninitialize();
+
+			CLoader*    loader = ctx->GetLoader();
+			CUiContext* uictx  = ctx->GetUIContext();
+
+			loader->Shutdown();
+			uictx->Shutdown();
+		}
 		logger->Info(CH_CORE, "SHUTDOWN END");
 
 		/* Let the OS take care of freeing the handles. Ugly, but otherwise crashes due to the addon clownfiesta in GW2. */
