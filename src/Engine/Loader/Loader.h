@@ -44,11 +44,13 @@ class CLoader
 	///----------------------------------------------------------------------------------------------------
 	~CLoader();
 
+	void Shutdown();
+
 	///----------------------------------------------------------------------------------------------------
-	/// InitDirectoryUpdates:
-	/// 	Initializes the necessary resouces to receive directory updates.
+	/// Init:
+	/// 	Initializes the necessary resouces to receive directory updates and the processor thread.
 	///----------------------------------------------------------------------------------------------------
-	void InitDirectoryUpdates();
+	void Init();
 
 	///----------------------------------------------------------------------------------------------------
 	/// WndProc:

@@ -28,7 +28,14 @@ CLoader::CLoader(CLogApi* aLogger, RenderContext_t* aRenderContext, IADDON_FACTO
 
 CLoader::~CLoader()
 {
-	/* Signal shutdown to processing thread. */
+	this->Shutdown();
+}
+
+void CLoader::Shutdown()
+{
+	this->DeinitDirectoryUpdates();
+
+	/* Stop the processor thread to handle the shutdown. */
 	this->IsRunning = false;
 	this->NotifyChanges();
 
@@ -37,11 +44,9 @@ CLoader::~CLoader()
 	{
 		this->ProcThread.join();
 	}
-
-	this->DeinitDirectoryUpdates();
 }
 
-void CLoader::InitDirectoryUpdates()
+void CLoader::Init()
 {
 	const std::lock_guard<std::mutex> lock(this->FSMutex);
 
@@ -156,8 +161,6 @@ UINT CLoader::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void CLoader::NotifyChanges()
 {
-	if (!this->IsRunning) { return; }
-
 	std::lock_guard<std::mutex> lock(this->Mutex);
 	this->ConVar.notify_one();
 
@@ -284,6 +287,7 @@ bool CLoader::IsValid(const std::filesystem::path& aPath)
 
 void CLoader::ProcessChanges()
 {
+	this->Logger->Trace(CH_LOADER, "Init. Discovering addons.");
 	this->Discover();
 
 	while (this->IsRunning)
@@ -292,6 +296,12 @@ void CLoader::ProcessChanges()
 		this->ConVar.wait_for(lock, std::chrono::milliseconds(5000));
 
 		this->Logger->Trace(CH_LOADER, "Processing changes.");
+
+		if (!this->IsRunning)
+		{
+			/* Early break out of the loop. */
+			break;
+		}
 
 		std::vector<IAddon*> movedOrDeleted;
 
@@ -395,6 +405,15 @@ void CLoader::ProcessChanges()
 			}
 		}
 	}
+
+	this->Logger->Trace(CH_LOADER, "Shutdown. Clearing addons.");
+
+	for (IAddon* addon : this->Addons)
+	{
+		delete addon;
+	}
+
+	this->Addons.clear();
 }
 
 void CLoader::Discover()
