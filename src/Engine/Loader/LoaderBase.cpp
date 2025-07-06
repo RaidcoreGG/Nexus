@@ -376,8 +376,16 @@ void CLoaderBase::ProcessChanges()
 		/* If any addons are left in here, they were in fact deleted or moved out of tracking. */
 		for (IAddon* addon : movedOrDeleted)
 		{
-			throw "Not Implemented";
-			// TODO: Unload and then delete.
+			if (addon->IsLoaded())
+			{
+				this->Logger->Debug(CH_LOADERBASE, "Addon no longer tracked. Unloading: %s", addon->GetLocation().string().c_str());
+				addon->Unload();
+			}
+			else
+			{
+				this->Logger->Debug(CH_LOADERBASE, "Addon no longer tracked. Deleting: %s", addon->GetLocation().string().c_str());
+				delete addon;
+			}
 		}
 	}
 }

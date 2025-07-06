@@ -27,8 +27,6 @@ struct AddonListing_t
 	LibraryAddon_t                                     LibraryDef;
 	bool                                               IsInstalling;
 
-	std::string                                        GithubURL;
-
 	std::unordered_map<std::string, InputBindPacked_t> InputBinds;
 	GUI_RENDER                                         OptionsRender;
 	bool                                               IsHovered;

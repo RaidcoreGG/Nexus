@@ -14,8 +14,10 @@
 #include <windows.h>
 
 #include "LdrChecksum.h"
+#include "LdrEnum.h"
 
 class IAddon;
+class CLoaderBase;
 
 typedef IAddon* (*IADDON_FACTORY)(std::filesystem::path aLocation);
 
@@ -32,7 +34,7 @@ class IAddon
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetBase:
-	/// 	Returns the IAddon* of the addon.
+	/// 	Returns the base class of the addon.
 	///----------------------------------------------------------------------------------------------------
 	virtual IAddon* GetBase();
 
@@ -49,16 +51,16 @@ class IAddon
 	std::filesystem::path GetLocation() const;
 
 	///----------------------------------------------------------------------------------------------------
-	/// SetLocation:
-	/// 	Sets a new location for the addon.
-	///----------------------------------------------------------------------------------------------------
-	void SetLocation(std::filesystem::path aLocation);
-
-	///----------------------------------------------------------------------------------------------------
 	/// GetMD5:
 	/// 	Returns the MD5 of the addon.
 	///----------------------------------------------------------------------------------------------------
 	MD5_t GetMD5() const;
+
+	///----------------------------------------------------------------------------------------------------
+	/// IsLoaded:
+	/// 	Returns true, if the addon is loaded.
+	///----------------------------------------------------------------------------------------------------
+	bool IsLoaded() const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Load:
@@ -82,13 +84,22 @@ class IAddon
 	/// OwnsAddress:
 	/// 	Returns true, if the passed aAddress belongs to this addon.
 	///----------------------------------------------------------------------------------------------------
-	bool OwnsAddress(void* aAddress);
+	bool OwnsAddress(void* aAddress) const;
 
 	protected:
+	EAddonState           State       = EAddonState::None;
 	std::filesystem::path Location;
 	MD5_t                 MD5         = {};
 	HMODULE               Module      = nullptr;
 	size_t                ModuleSize  = 0;
+
+	///----------------------------------------------------------------------------------------------------
+	/// SetLocation:
+	/// 	Sets a new location for the addon.
+	///----------------------------------------------------------------------------------------------------
+	void SetLocation(std::filesystem::path aLocation);
+
+	friend class CLoaderBase;
 };
 
 #endif

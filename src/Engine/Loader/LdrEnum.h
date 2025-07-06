@@ -1,38 +1,24 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  PxyEnum.h
-/// Description  :  Enumerations for proxy functions.
+/// Name         :  LdrEnum.h
+/// Description  :  Enumerations for the loader.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef PXYENUM_H
-#define PXYENUM_H
+#ifndef LDRENUM_H
+#define LDRENUM_H
 
 #include <cstdint>
 
 ///----------------------------------------------------------------------------------------------------
-/// EProxyFunction Enumeration
+/// EAddonState Enumeration
 ///----------------------------------------------------------------------------------------------------
-enum class EProxyFunction : uint32_t
+enum class EAddonState : uint32_t
 {
-	NONE,
-
-	/* D3D11 */
-	D3D11_CREATEDEVICE,
-	D3D11_CREATEDEVICEANDSWAPCHAIN,
-	D3D11_CORECREATEDEVICE,
-	D3D11_CORECREATELAYEREDDEVICE,
-	D3D11_COREGETLAYEREDDEVICESIZE,
-	D3D11_COREREGISTERLAYERS,
-
-	/* DXGI */
-	DXGI_CreateDXGIFactory,
-	DXGI_CreateDXGIFactory1,
-	DXGI_CreateDXGIFactory2,
-	DXGI_DXGIGetDebugInterface1,
-	DXGI_CompatValue,
-	DXGI_CompatString
+	None,
+	NotLoaded,
+	Loaded
 };
 
 #endif

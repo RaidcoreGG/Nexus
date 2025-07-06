@@ -199,14 +199,15 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 				}
 
 				/* GitHub button */
-				if (!aAddonData.GithubURL.empty())
+				// TODO: Project page
+				/*if (!aAddonData.GithubURL.empty())
 				{
 					ImGui::SetCursorPos(ImVec2(initialX, ImGui::GetCursorPosY()));
 					if (ImGui::Button((langApi->Translate("((000030))") + id).c_str(), ImVec2(btnWidth, 0)))
 					{
 						ShellExecuteA(0, 0, aAddonData.GithubURL.c_str(), 0, 0, SW_SHOW);
 					}
-				}
+				}*/
 			}
 
 			/* If nexusdef, show load/unload and configure button. */
@@ -238,17 +239,14 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 				ImGui::SetCursorPos(ImVec2(initialX, (ImGui::GetWindowHeight() - (btnTextSz.y * 2) - style.ItemSpacing.y - (style.FramePadding.y * 2)) / 2));
 				if (ImGui::Button(buttonText.c_str(), ImVec2(btnWidth, 0)))
 				{
-					if (!aAddonData.Addon->IsStateLocked())
+					if (aAddonData.Addon->IsLoaded())
 					{
-						if (aAddonData.Addon->IsLoaded())
-						{
-							aAddonData.Addon->Unload();
-						}
-						else
-						{
-							aAddonData.Addon->Load();
-							// TODO: Signal to save the ShouldLoad config flag somehow.
-						}
+						aAddonData.Addon->Unload();
+					}
+					else
+					{
+						aAddonData.Addon->Load();
+						// TODO: Signal to save the ShouldLoad config flag somehow.
 					}
 				}
 				if (ImGui::IsItemHovered() && !buttonTT.empty())
@@ -729,16 +727,6 @@ void CAddonsWindow::RenderDetails()
 				ImGui::Text("((BTN: Update))");
 			}
 
-			/* GitHub Button */
-			if (!this->AddonData.GithubURL.empty())
-			{
-				ImGui::SameLine();
-				if (ImGui::Button((langApi->Translate("((000030))") + id).c_str()))
-				{
-					ShellExecuteA(0, 0, this->AddonData.GithubURL.c_str(), 0, 0, SW_SHOW);
-				}
-			}
-
 			if (config)
 			{
 				std::string updateMode;
@@ -792,6 +780,15 @@ void CAddonsWindow::RenderDetails()
 						cfgmgr->SaveConfigs();
 					}
 				}
+
+				/* GitHub Button */
+				// TODO: if (addonData.Addon->GetProvider()->GetProjectPage())
+				//{
+					//if (ImGui::Button((langApi->Translate("((000030))") + id).c_str()))
+					//{
+					//	ShellExecuteA(0, 0, this->AddonData.GithubURL.c_str(), 0, 0, SW_SHOW);
+					//}
+				//}
 
 				/* Disable until update Checkbox */
 				bool disableUntilUpdate = config->DisableVersion == this->AddonData.Addon->GetMD5().string();
@@ -1101,10 +1098,6 @@ void CAddonsWindow::PopulateAddons()
 				installed = true;
 				addonlisting.HasLibDef = true;
 				addonlisting.LibraryDef = libaddon;
-				if (String::Contains(libaddon.DownloadURL, "https://github.com"))
-				{
-					addonlisting.GithubURL = libaddon.DownloadURL;
-				}
 			}
 		}
 
@@ -1113,15 +1106,11 @@ void CAddonsWindow::PopulateAddons()
 			AddonListing_t addonlisting{};
 			addonlisting.HasLibDef = true;
 			addonlisting.LibraryDef = libaddon;
-			if (String::Contains(libaddon.DownloadURL, "https://github.com"))
-			{
-				addonlisting.GithubURL = libaddon.DownloadURL;
-			}
 			this->Addons.push_back(addonlisting);
 		}
 	}
 	
-	this->AddonsAmtUnfiltered = this->Addons.size();
+	this->AddonsAmtUnfiltered = static_cast<uint32_t>(this->Addons.size());
 
 	for (auto it = this->Addons.begin(); it != this->Addons.end();)
 	{

@@ -123,12 +123,6 @@ class CAddon : public virtual IAddon
 	bool IsDuplicate();
 
 	///----------------------------------------------------------------------------------------------------
-	/// IsLoaded:
-	/// 	Returns true, if the addon is loaded.
-	///----------------------------------------------------------------------------------------------------
-	bool IsLoaded() const;
-
-	///----------------------------------------------------------------------------------------------------
 	/// IsFileLocked:
 	/// 	Returns true, if the file on disk is locked and cannot be removed.
 	///----------------------------------------------------------------------------------------------------
@@ -163,7 +157,6 @@ class CAddon : public virtual IAddon
 	CLoaderBase*             Loader               = nullptr;
 	CConfigMgr*              ConfigMgr            = nullptr;
 
-	EAddonState              State                = EAddonState::None;
 	EAddonInterfaces         ModuleInterfaces     = EAddonInterfaces::None;
 	EAddonFlags              Flags                = EAddonFlags::None;
 

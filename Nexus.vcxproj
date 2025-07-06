@@ -131,6 +131,7 @@
     <ClInclude Include="src\Core\Addons\API\ApiV6.h" />
     <ClInclude Include="src\Engine\Loader\LdrAddonBase.h" />
     <ClInclude Include="src\Engine\Loader\LdrChecksum.h" />
+    <ClInclude Include="src\Engine\Loader\LdrEnum.h" />
     <ClInclude Include="src\Engine\Loader\LoaderBase.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreCache.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreConst.h" />

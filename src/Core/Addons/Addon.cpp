@@ -187,19 +187,6 @@ bool CAddon::IsDuplicate()
 	return this->Loader->IsTrackedSafe(this->GetSignature(), this->GetBase());
 }
 
-bool CAddon::IsLoaded() const
-{
-	switch (this->State)
-	{
-		default:
-		case EAddonState::None:
-		case EAddonState::NotLoaded:
-			return false;
-		case EAddonState::Loaded:
-			return true;
-	}
-}
-
 bool CAddon::IsFileLocked() const
 {
 	return (this->Flags & EAddonFlags::FileLocked) == EAddonFlags::FileLocked;

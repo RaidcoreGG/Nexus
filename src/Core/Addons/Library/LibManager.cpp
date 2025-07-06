@@ -226,7 +226,6 @@ void CLibraryMgr::Install(uint32_t aSignature)
 	}
 	catch (...)
 	{
-		/* TODO: More accurate logging? Error handling? */
 		this->Logger->Warning(
 			CH_LIBRARY,
 			"Failed to move downloaded addon from \"%s\" to \"%s\".",
