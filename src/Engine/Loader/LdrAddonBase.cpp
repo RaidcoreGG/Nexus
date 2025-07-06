@@ -30,9 +30,13 @@ bool IAddon::IsLoaded() const
 		default:
 		case EAddonState::None:
 		case EAddonState::NotLoaded:
+		{
 			return false;
+		}
 		case EAddonState::Loaded:
+		{
 			return true;
+		}
 	}
 }
 

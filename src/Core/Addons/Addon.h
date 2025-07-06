@@ -16,10 +16,12 @@
 #include <queue>
 #include <thread>
 
+#include "AddConst.h"
 #include "AddEnum.h"
 #include "Core/Addons/Config/CfgManager.h"
 #include "Core/Addons/Config/Config.h"
 #include "Core/Addons/Definitions/AddonDefV1.h"
+#include "Engine/Events/EvtApi.h"
 #include "Engine/Loader/LdrAddonBase.h"
 #include "Engine/Loader/Loader.h"
 #include "GW2/ArcDPS/ArcExtensionDef.h"
@@ -155,6 +157,7 @@ class CAddon : public virtual IAddon
 	private:
 	CLogApi*                 Logger               = nullptr;
 	CLoader*                 Loader               = nullptr;
+	CEventApi*               EventApi             = nullptr;
 	CConfigMgr*              ConfigMgr            = nullptr;
 
 	EAddonInterfaces         ModuleInterfaces     = EAddonInterfaces::None;

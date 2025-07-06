@@ -27,11 +27,18 @@ constexpr EAddonsFilterFlags FILTER_LIBRARY = EAddonsFilterFlags::ShowDownloadab
 
 static CAddonsWindow* AddonsWindow = nullptr;
 
-void OnAddonLoadUnload(void* aEventData)
+void OnAddonChanged(void* aEventData)
 {
 	if (!AddonsWindow) { return; }
 
-	AddonsWindow->Invalidate(*(signed int*)aEventData);
+	if (aEventData)
+	{
+		AddonsWindow->Invalidate(*(signed int*)aEventData);
+	}
+	else
+	{
+		AddonsWindow->Invalidate();
+	}
 }
 
 CAddonsWindow::CAddonsWindow()
@@ -52,8 +59,10 @@ CAddonsWindow::CAddonsWindow()
 	this->Filter     = settingsctx->Get(OPT_ADDONFILTERS, FILTER_INSTALLED);
 	this->IsListMode = settingsctx->Get(OPT_ISLISTMODE,   true            );
 
-	evtapi->Subscribe("EV_ADDON_LOADED", OnAddonLoadUnload);
-	evtapi->Subscribe("EV_ADDON_UNLOADED", OnAddonLoadUnload);
+	evtapi->Subscribe("EV_ADDON_LOADED", OnAddonChanged);
+	evtapi->Subscribe("EV_ADDON_UNLOADED", OnAddonChanged);
+	evtapi->Subscribe("EV_ADDON_CREATED", OnAddonChanged);
+	evtapi->Subscribe("EV_ADDON_DESTROYED", OnAddonChanged);
 	AddonsWindow = this;
 }
 

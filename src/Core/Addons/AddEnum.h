@@ -50,6 +50,7 @@ enum class EAddonAction : uint32_t
 	CheckUpdate,
 	Update,
 	EnumInterfaces,
+	Create,
 	Destroy
 };
 

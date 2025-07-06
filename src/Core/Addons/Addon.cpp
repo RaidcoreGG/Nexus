@@ -27,11 +27,13 @@ CAddon::CAddon(std::filesystem::path aLocation)
 	this->MD5 = MD5Util::FromFile(aLocation);
 
 	CContext* ctx = CContext::GetContext();
-	this->Logger = ctx->GetLogger();
-	this->Loader = ctx->GetLoader();
+	this->Logger    = ctx->GetLogger();
+	this->Loader    = ctx->GetLoader();
+	this->EventApi  = ctx->GetEventApi();
 	this->ConfigMgr = ctx->GetCfgMgr();
 
-	this->QueuedActions.push(EAddonAction::EnumInterfaces);
+	/* Does the initial enumerate addon interfaces and raises a create event. */
+	this->QueuedActions.push(EAddonAction::Create);
 
 	this->IsRunning = true;
 	this->ProcessorThread = std::thread(&CAddon::ProcessActions, this);
@@ -39,10 +41,11 @@ CAddon::CAddon(std::filesystem::path aLocation)
 
 CAddon::~CAddon()
 {
-	/* Set thread to cancel. */
-	this->IsRunning = false;
+	/* Clear the entire queue. */
+	std::queue<EAddonAction> empty;
+	std::swap(this->QueuedActions, empty);
 
-	/* Queue at least one action. */
+	/* Unloads, exits the processor thread and raises a destroy event. */
 	this->QueuedActions.push(EAddonAction::Destroy);
 
 	/* Notify the processor thread. */
@@ -275,9 +278,19 @@ void CAddon::ProcessActions()
 				this->EnumInterfaces();
 				break;
 			}
+			case EAddonAction::Create:
+			{
+				this->Logger->Trace(CH_ADDON, "CAddon::Create(): %s", this->Location.string().c_str());
+				this->EnumInterfaces();
+				this->EventApi->Raise(0, EV_ADDON_CREATED);
+				break;
+			}
 			case EAddonAction::Destroy:
 			{
-				this->Logger->Debug(CH_ADDON, "CAddon::Destroy(): %s", this->Location.string().c_str());
+				this->Logger->Trace(CH_ADDON, "CAddon::Destroy(): %s", this->Location.string().c_str());
+				this->UnloadInternal();
+				this->IsRunning = false; /* Just to be sure. */
+				this->EventApi->Raise(0, EV_ADDON_DESTROYED);
 				return; /* Return the thread entirely. */
 			}
 		}
@@ -438,6 +451,8 @@ void CAddon::LoadInternal()
 	auto end_time = std::chrono::high_resolution_clock::now();
 	auto time = end_time - start_time;
 
+	this->EventApi->Raise(EV_ADDON_LOADED, &this->NexusAddonDefV1->Signature);
+
 	this->Config->LastGameBuild = GW2::GetGameBuild();
 	this->Config->LastName = this->NexusAddonDefV1->Name;
 	this->State = EAddonState::Loaded;
@@ -482,6 +497,8 @@ void CAddon::UnloadInternal()
 		this->NexusAddonDefV1->Unload();
 		auto end_time = std::chrono::high_resolution_clock::now();
 		auto time = end_time - start_time;
+
+		this->EventApi->Raise(EV_ADDON_UNLOADED, &this->NexusAddonDefV1->Signature);
 
 		strUnloadInfo = String::Format("Took %u microseconds to unload.", time / std::chrono::microseconds(1));
 	}
@@ -733,7 +750,7 @@ const EAddonInterfaces& CAddon::EnumInterfaces()
 		);
 	}
 
-	this->Logger->Info(CH_ADDON, "Interfaces: %u (%s)", this->ModuleInterfaces, this->Location.string().c_str());
+	this->Logger->Debug(CH_ADDON, "Interfaces: %u (%s)", this->ModuleInterfaces, this->Location.string().c_str());
 
 	return this->ModuleInterfaces;
 }
