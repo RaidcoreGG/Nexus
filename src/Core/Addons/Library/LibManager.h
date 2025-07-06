@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include "Engine/Loader/LoaderBase.h"
+#include "Engine/Loader/Loader.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
 #include "LibAddon.h"
@@ -29,7 +29,7 @@ class CLibraryMgr
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CLibraryMgr(CLogApi* aLogger, CLoaderBase* aLoader);
+	CLibraryMgr(CLogApi* aLogger, CLoader* aLoader);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -62,7 +62,7 @@ class CLibraryMgr
 
 	private:
 	CLogApi*                                      Logger = nullptr;
-	CLoaderBase*                                  Loader = nullptr;
+	CLoader*                                      Loader = nullptr;
 
 	mutable std::mutex                            Mutex;
 	std::unordered_map<std::string, CHttpClient*> Sources;

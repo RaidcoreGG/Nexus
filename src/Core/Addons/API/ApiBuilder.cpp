@@ -45,7 +45,7 @@ namespace ADDONAPI
 	static CLocalization*   s_Localization  = nullptr;
 	static CLogApi*         s_Logger        = nullptr;
 	static CTextureLoader*  s_TextureApi    = nullptr;
-	static CLoaderBase*     s_Loader        = nullptr;
+	static CLoader*         s_Loader        = nullptr;
 	static RenderContext_t* s_RenderCtx     = nullptr;
 	static CArcApi*         s_ArcApi        = nullptr;
 
@@ -565,7 +565,7 @@ namespace ADDONAPI
 			s_RawInputApi   = ctx->GetRawInputApi();
 			s_Logger        = ctx->GetLogger();
 			s_TextureApi    = ctx->GetTextureService();
-			s_Loader        = ctx->GetLoaderBase();
+			s_Loader        = ctx->GetLoader();
 			s_RenderCtx     = ctx->GetRendererCtx();
 			s_ArcApi        = ctx->GetArcApi();
 

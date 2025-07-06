@@ -120,7 +120,7 @@ namespace Hooks
 			static CInputBindApi* s_InputBindApi = s_Context->GetInputBindApi();
 			static CRawInputApi*  s_RawInputApi  = s_Context->GetRawInputApi();
 			static CUiContext*    s_UIContext    = s_Context->GetUIContext();
-			static CLoaderBase*   s_Loader       = s_Context->GetLoaderBase();
+			static CLoader*       s_Loader       = s_Context->GetLoader();
 
 			if (uMsg == WM_DESTROY || uMsg == WM_QUIT || uMsg == WM_CLOSE)
 			{
@@ -152,7 +152,7 @@ namespace Hooks
 			static RenderContext_t* s_RenderCtx     = s_Context->GetRendererCtx();
 			static CTextureLoader*  s_TextureLoader = s_Context->GetTextureService();
 			static CUiContext*      s_UIContext     = s_Context->GetUIContext();
-			static CLoaderBase*     s_Loader        = s_Context->GetLoaderBase();
+			static CLoader*         s_Loader        = s_Context->GetLoader();
 
 			/* Increment count at the beginning of the frame. */
 			s_RenderCtx->Metrics.FrameCount++;

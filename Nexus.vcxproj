@@ -21,7 +21,7 @@
     <ClCompile Include="src\Engine\Functions\FnRegistry.cpp" />
     <ClCompile Include="src\Core\Index\Index.cpp" />
     <ClCompile Include="src\Engine\Loader\LdrAddonBase.cpp" />
-    <ClCompile Include="src\Engine\Loader\LoaderBase.cpp" />
+    <ClCompile Include="src\Engine\Loader\Loader.cpp" />
     <ClCompile Include="src\Engine\Networking\WebRequests\WreCache.cpp" />
     <ClCompile Include="src\Engine\Networking\WebRequests\WreConst.cpp" />
     <ClCompile Include="src\GW2\ArcDPS\ArcApi.cpp" />
@@ -132,7 +132,7 @@
     <ClInclude Include="src\Engine\Loader\LdrAddonBase.h" />
     <ClInclude Include="src\Engine\Loader\LdrChecksum.h" />
     <ClInclude Include="src\Engine\Loader\LdrEnum.h" />
-    <ClInclude Include="src\Engine\Loader\LoaderBase.h" />
+    <ClInclude Include="src\Engine\Loader\Loader.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreCache.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreConst.h" />
     <ClInclude Include="src\GW2\ArcDPS\ArcApi.h" />

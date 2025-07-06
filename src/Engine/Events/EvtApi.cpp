@@ -10,7 +10,7 @@
 
 #include "EvtSubscriber.h"
 
-CEventApi::CEventApi(CLoaderBase* aLoader)
+CEventApi::CEventApi(CLoader* aLoader)
 {
 	this->Loader = aLoader;
 }

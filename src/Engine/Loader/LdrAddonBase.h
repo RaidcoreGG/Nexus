@@ -17,7 +17,7 @@
 #include "LdrEnum.h"
 
 class IAddon;
-class CLoaderBase;
+class CLoader;
 
 typedef IAddon* (*IADDON_FACTORY)(std::filesystem::path aLocation);
 
@@ -99,7 +99,7 @@ class IAddon
 	///----------------------------------------------------------------------------------------------------
 	void SetLocation(std::filesystem::path aLocation);
 
-	friend class CLoaderBase;
+	friend class CLoader;
 };
 
 #endif

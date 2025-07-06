@@ -42,7 +42,7 @@ void CUninstallConfirmationModal::RenderContent()
 void CUninstallConfirmationModal::OnClosing()
 {
 	CContext*    ctx    = CContext::GetContext();
-	CLoaderBase* loader = ctx->GetLoaderBase();
+	CLoader*     loader = ctx->GetLoader();
 
 	switch (this->GetResult())
 	{

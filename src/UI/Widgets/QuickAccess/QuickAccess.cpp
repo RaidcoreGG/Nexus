@@ -367,7 +367,7 @@ void CQuickAccess::Render()
 void CQuickAccess::RenderContextMenu(const std::string& aIdentifier, const Shortcut_t& aShortcut, bool* aIsActive)
 {
 	static CContext* ctx = CContext::GetContext();
-	static CLoaderBase* loader = ctx->GetLoaderBase();
+	static CLoader* loader = ctx->GetLoader();
 
 	if (aShortcut.ContextItems.size() > 0)
 	{

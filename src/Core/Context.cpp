@@ -98,14 +98,14 @@ CDataLinkApi* CContext::GetDataLink()
 CEventApi* CContext::GetEventApi()
 {
 	static CEventApi s_EventApi = CEventApi(
-		this->GetLoaderBase()
+		this->GetLoader()
 	);
 	return &s_EventApi;
 }
 
-CLoaderBase* CContext::GetLoaderBase()
+CLoader* CContext::GetLoader()
 {
-	static CLoaderBase s_Loader = CLoaderBase(
+	static CLoader s_Loader = CLoader(
 		this->GetLogger(),
 		this->GetRendererCtx(),
 		IAddonFactory,
@@ -118,7 +118,7 @@ CLibraryMgr* CContext::GetAddonLibrary()
 {
 	static CLibraryMgr s_LibraryMgr = CLibraryMgr(
 		this->GetLogger(),
-		this->GetLoaderBase()
+		this->GetLoader()
 	);
 	return &s_LibraryMgr;
 }
@@ -260,11 +260,11 @@ CConfigMgr* CContext::GetCfgMgr()
 					}
 					catch (const std::invalid_argument& e)
 					{
-						this->GetLogger()->Trace(CH_LOADERBASE, "Invalid argument(-ggaddons) : %s (exc: %s)", addonsig.c_str(), e.what());
+						this->GetLogger()->Trace(CH_LOADER, "Invalid argument(-ggaddons) : %s (exc: %s)", addonsig.c_str(), e.what());
 					}
 					catch (const std::out_of_range& e)
 					{
-						this->GetLogger()->Trace(CH_LOADERBASE, "Out of range (-ggaddons): %s (exc: %s)", addonsig.c_str(), e.what());
+						this->GetLogger()->Trace(CH_LOADER, "Out of range (-ggaddons): %s (exc: %s)", addonsig.c_str(), e.what());
 					}
 				}
 			}

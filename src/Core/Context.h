@@ -21,7 +21,7 @@
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
-#include "Engine/Loader/LoaderBase.h"
+#include "Engine/Loader/Loader.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
 #include "Engine/Renderer/RdrContext.h"
@@ -59,7 +59,7 @@ class CContext
 
 	CEventApi* GetEventApi();
 
-	CLoaderBase* GetLoaderBase();
+	CLoader* GetLoader();
 
 	CLibraryMgr* GetAddonLibrary();
 

@@ -1142,7 +1142,7 @@ void CUiContext::UpdateDisplayInputBinds()
 
 	CContext* ctx = CContext::GetContext();
 	CInputBindApi* inputBindApi = ctx->GetInputBindApi();
-	CLoaderBase* loader = ctx->GetLoaderBase();
+	CLoader* loader = ctx->GetLoader();
 
 	/* copy of all InputBinds */
 	std::map<std::string, IbMapping_t> InputBindRegistry = inputBindApi->GetRegistry();

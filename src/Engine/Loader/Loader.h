@@ -1,13 +1,13 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  LoaderBase.h
+/// Name         :  Loader.h
 /// Description  :  Addon loader component.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LOADERBASE_H
-#define LOADERBASE_H
+#ifndef LOADER_H
+#define LOADER_H
 
 #include <condition_variable>
 #include <filesystem>
@@ -21,18 +21,18 @@
 #include "LdrAddonBase.h"
 
 constexpr const uint32_t WM_ADDONDIRUPDATE = WM_USER + 101;
-constexpr const char* CH_LOADERBASE = "Loader";
+constexpr const char* CH_LOADER = "Loader";
 
 ///----------------------------------------------------------------------------------------------------
-/// CLoaderBase Class
+/// CLoader Class
 ///----------------------------------------------------------------------------------------------------
-class CLoaderBase
+class CLoader
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
-	CLoaderBase(
+	CLoader(
 		CLogApi*              aLogger,
 		RenderContext_t*      aRenderContext,
 		IADDON_FACTORY        aFactoryFunction,
@@ -42,7 +42,7 @@ class CLoaderBase
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
-	~CLoaderBase();
+	~CLoader();
 
 	///----------------------------------------------------------------------------------------------------
 	/// InitDirectoryUpdates:

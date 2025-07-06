@@ -15,7 +15,7 @@
 #include "Util/Url.h"
 #include "Util/Paths.h"
 
-CLibraryMgr::CLibraryMgr(CLogApi* aLogger, CLoaderBase* aLoader)
+CLibraryMgr::CLibraryMgr(CLogApi* aLogger, CLoader* aLoader)
 {
 	this->Logger = aLogger;
 	this->Loader = aLoader;

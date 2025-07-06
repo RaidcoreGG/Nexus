@@ -21,7 +21,7 @@
 #include "Core/Addons/Config/Config.h"
 #include "Core/Addons/Definitions/AddonDefV1.h"
 #include "Engine/Loader/LdrAddonBase.h"
-#include "Engine/Loader/LoaderBase.h"
+#include "Engine/Loader/Loader.h"
 #include "GW2/ArcDPS/ArcExtensionDef.h"
 
 using ArcExtensionDef_t = ArcDPS::ExtensionDef_t;
@@ -154,7 +154,7 @@ class CAddon : public virtual IAddon
 
 	private:
 	CLogApi*                 Logger               = nullptr;
-	CLoaderBase*             Loader               = nullptr;
+	CLoader*                 Loader               = nullptr;
 	CConfigMgr*              ConfigMgr            = nullptr;
 
 	EAddonInterfaces         ModuleInterfaces     = EAddonInterfaces::None;

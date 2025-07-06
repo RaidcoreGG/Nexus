@@ -1,20 +1,19 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  LoaderBase.cpp
+/// Name         :  Loader.cpp
 /// Description  :  Addon loader component.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "LoaderBase.h"
+#include "Loader.h"
 
 #include <shlobj.h>
 
-#include "Engine/Networking/WebRequests/WreClient.h"
 #include "Util/Strings.h"
 #include "Util/MD5.h"
 
-CLoaderBase::CLoaderBase(CLogApi* aLogger, RenderContext_t* aRenderContext, IADDON_FACTORY aFactoryFunction, std::filesystem::path aDirectory)
+CLoader::CLoader(CLogApi* aLogger, RenderContext_t* aRenderContext, IADDON_FACTORY aFactoryFunction, std::filesystem::path aDirectory)
 {
 	this->Logger = aLogger;
 	this->RenderContext = aRenderContext;
@@ -27,7 +26,7 @@ CLoaderBase::CLoaderBase(CLogApi* aLogger, RenderContext_t* aRenderContext, IADD
 	}
 }
 
-CLoaderBase::~CLoaderBase()
+CLoader::~CLoader()
 {
 	/* Signal shutdown to processing thread. */
 	this->IsRunning = false;
@@ -42,7 +41,7 @@ CLoaderBase::~CLoaderBase()
 	this->DeinitDirectoryUpdates();
 }
 
-void CLoaderBase::InitDirectoryUpdates()
+void CLoader::InitDirectoryUpdates()
 {
 	const std::lock_guard<std::mutex> lock(this->FSMutex);
 
@@ -56,33 +55,33 @@ void CLoaderBase::InitDirectoryUpdates()
 	{
 		if (this->RenderContext->Metrics.FrameCount == 0)
 		{
-			this->Logger->Debug(CH_LOADERBASE, "Window handle is null. Init called before first frame.");
+			this->Logger->Debug(CH_LOADER, "Window handle is null. Init called before first frame.");
 		}
 		else
 		{
-			this->Logger->Warning(CH_LOADERBASE, "Window handle is null at Frame ID %u. Cannot initialize automatic addon loading.", this->RenderContext->Metrics.FrameCount);
+			this->Logger->Warning(CH_LOADER, "Window handle is null at Frame ID %u. Cannot initialize automatic addon loading.", this->RenderContext->Metrics.FrameCount);
 		}
 		return;
 	}
 
 	if (this->RenderContext->Metrics.FrameCount == 1)
 	{
-		this->Logger->Debug(CH_LOADERBASE, "Init called during first frame.");
+		this->Logger->Debug(CH_LOADER, "Init called during first frame.");
 	}
 	else
 	{
-		this->Logger->Debug(CH_LOADERBASE, "Late init. Frame ID: %u", this->RenderContext->Metrics.FrameCount);
+		this->Logger->Debug(CH_LOADER, "Late init. Frame ID: %u", this->RenderContext->Metrics.FrameCount);
 	}
 
 	/* Already start the thread. */
 	if (this->RenderContext->SwapChain && !this->IsRunning)
 	{
 		this->IsRunning = true;
-		this->ProcThread = std::thread(&CLoaderBase::ProcessChanges, this);
+		this->ProcThread = std::thread(&CLoader::ProcessChanges, this);
 	}
 	else
 	{
-		this->Logger->Debug(CH_LOADERBASE, "SwapChain missing, cannot initialize loader thread.");
+		this->Logger->Debug(CH_LOADER, "SwapChain missing, cannot initialize loader thread.");
 	}
 
 	/* Setup wndproc directory updates. */
@@ -97,7 +96,7 @@ void CLoaderBase::InitDirectoryUpdates()
 
 	if (this->FSItemList == 0)
 	{
-		this->Logger->Warning(CH_LOADERBASE, "Automatic addon loading disabled. Reason: SHParseDisplayName(...) returned %d.", hresult);
+		this->Logger->Warning(CH_LOADER, "Automatic addon loading disabled. Reason: SHParseDisplayName(...) returned %d.", hresult);
 		return;
 	}
 
@@ -115,14 +114,14 @@ void CLoaderBase::InitDirectoryUpdates()
 
 	if (this->FSNotifierID == 0)
 	{
-		this->Logger->Warning(CH_LOADERBASE, "Automatic addon loading disabled. Reason: SHChangeNotifyRegister(...) returned 0.");
+		this->Logger->Warning(CH_LOADER, "Automatic addon loading disabled. Reason: SHChangeNotifyRegister(...) returned 0.");
 		return;
 	}
 
-	this->Logger->Info(CH_LOADERBASE, "Automatic addon loading enabled.");
+	this->Logger->Info(CH_LOADER, "Automatic addon loading enabled.");
 }
 
-UINT CLoaderBase::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+UINT CLoader::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	if (uMsg != WM_ADDONDIRUPDATE)
 	{
@@ -155,24 +154,24 @@ UINT CLoaderBase::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void CLoaderBase::NotifyChanges()
+void CLoader::NotifyChanges()
 {
 	if (!this->IsRunning) { return; }
 
 	std::lock_guard<std::mutex> lock(this->Mutex);
 	this->ConVar.notify_one();
 
-	this->Logger->Trace(CH_LOADERBASE, "NotifyChanges()");
+	this->Logger->Trace(CH_LOADER, "NotifyChanges()");
 }
 
-void CLoaderBase::Add(std::filesystem::path aPath)
+void CLoader::Add(std::filesystem::path aPath)
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	/* Ignore, if not valid. */
 	if (!this->IsValid(aPath))
 	{
-		this->Logger->Info(CH_LOADERBASE, "Add(%s) failed. Not a valid path.", aPath.string().c_str());
+		this->Logger->Info(CH_LOADER, "Add(%s) failed. Not a valid path.", aPath.string().c_str());
 		return;
 	}
 
@@ -183,25 +182,25 @@ void CLoaderBase::Add(std::filesystem::path aPath)
 	addon->Load();
 }
 
-void CLoaderBase::LoadSafe(std::filesystem::path aPath)
+void CLoader::LoadSafe(std::filesystem::path aPath)
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 	this->Load(aPath);
 }
 
-void CLoaderBase::UnloadSafe(std::filesystem::path aPath)
+void CLoader::UnloadSafe(std::filesystem::path aPath)
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 	this->Unload(aPath);
 }
 
-void CLoaderBase::UninstallSafe(std::filesystem::path aPath)
+void CLoader::UninstallSafe(std::filesystem::path aPath)
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 	this->Uninstall(aPath);
 }
 
-IAddon* CLoaderBase::GetOwner(void* aAddress) const
+IAddon* CLoader::GetOwner(void* aAddress) const
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -216,35 +215,35 @@ IAddon* CLoaderBase::GetOwner(void* aAddress) const
 	return nullptr;
 }
 
-bool CLoaderBase::IsTrackedSafe(uint32_t aSignature, IAddon* aAddon) const
+bool CLoader::IsTrackedSafe(uint32_t aSignature, IAddon* aAddon) const
 {
 	std::lock_guard<std::mutex> lock(this->Mutex);
 
 	return this->IsTracked(aSignature, aAddon);
 }
 
-bool CLoaderBase::IsTrackedSafe(std::filesystem::path aPath, IAddon* aAddon) const
+bool CLoader::IsTrackedSafe(std::filesystem::path aPath, IAddon* aAddon) const
 {
 	std::lock_guard<std::mutex> lock(this->Mutex);
 
 	return this->IsTracked(aPath, aAddon);
 }
 
-bool CLoaderBase::IsTrackedSafe(MD5_t aMD5, IAddon* aAddon) const
+bool CLoader::IsTrackedSafe(MD5_t aMD5, IAddon* aAddon) const
 {
 	std::lock_guard<std::mutex> lock(this->Mutex);
 
 	return this->IsTracked(aMD5, aAddon);
 }
 
-std::vector<IAddon*> CLoaderBase::GetAddons() const
+std::vector<IAddon*> CLoader::GetAddons() const
 {
 	std::lock_guard<std::mutex> lock(this->Mutex);
 
 	return this->Addons;
 }
 
-void CLoaderBase::DeinitDirectoryUpdates()
+void CLoader::DeinitDirectoryUpdates()
 {
 	const std::lock_guard<std::mutex> lock(this->FSMutex);
 
@@ -262,7 +261,7 @@ void CLoaderBase::DeinitDirectoryUpdates()
 	}
 }
 
-bool CLoaderBase::IsValid(const std::filesystem::path& aPath)
+bool CLoader::IsValid(const std::filesystem::path& aPath)
 {
 	if (aPath.empty()) { return false; }
 
@@ -283,7 +282,7 @@ bool CLoaderBase::IsValid(const std::filesystem::path& aPath)
 	return true;
 }
 
-void CLoaderBase::ProcessChanges()
+void CLoader::ProcessChanges()
 {
 	this->Discover();
 
@@ -292,7 +291,7 @@ void CLoaderBase::ProcessChanges()
 		std::unique_lock<std::mutex> lock(this->Mutex);
 		this->ConVar.wait_for(lock, std::chrono::milliseconds(5000));
 
-		this->Logger->Trace(CH_LOADERBASE, "Processing changes.");
+		this->Logger->Trace(CH_LOADER, "Processing changes.");
 
 		std::vector<IAddon*> movedOrDeleted;
 
@@ -378,19 +377,27 @@ void CLoaderBase::ProcessChanges()
 		{
 			if (addon->IsLoaded())
 			{
-				this->Logger->Debug(CH_LOADERBASE, "Addon no longer tracked. Unloading: %s", addon->GetLocation().string().c_str());
+				this->Logger->Debug(CH_LOADER, "Addon no longer tracked. Unloading: %s", addon->GetLocation().empty() ? "(null)" : addon->GetLocation().string().c_str());
 				addon->Unload();
 			}
 			else
 			{
-				this->Logger->Debug(CH_LOADERBASE, "Addon no longer tracked. Deleting: %s", addon->GetLocation().string().c_str());
+				this->Logger->Debug(CH_LOADER, "Addon no longer tracked. Deleting: %s", addon->GetLocation().empty() ? "(null)" : addon->GetLocation().string().c_str());
+
+				auto it = std::find(this->Addons.begin(), this->Addons.end(), addon);
+
+				if (it != this->Addons.end())
+				{
+					this->Addons.erase(it);
+				}
+
 				delete addon;
 			}
 		}
 	}
 }
 
-void CLoaderBase::Discover()
+void CLoader::Discover()
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -413,7 +420,7 @@ void CLoaderBase::Discover()
 	}
 }
 
-bool CLoaderBase::IsTracked(uint32_t aSignature, IAddon* aAddon) const
+bool CLoader::IsTracked(uint32_t aSignature, IAddon* aAddon) const
 {
 	for (IAddon* addon : this->Addons)
 	{
@@ -428,7 +435,7 @@ bool CLoaderBase::IsTracked(uint32_t aSignature, IAddon* aAddon) const
 	return false;
 }
 
-bool CLoaderBase::IsTracked(std::filesystem::path aPath, IAddon* aAddon) const
+bool CLoader::IsTracked(std::filesystem::path aPath, IAddon* aAddon) const
 {
 	for (IAddon* addon : this->Addons)
 	{
@@ -443,7 +450,7 @@ bool CLoaderBase::IsTracked(std::filesystem::path aPath, IAddon* aAddon) const
 	return false;
 }
 
-bool CLoaderBase::IsTracked(MD5_t aMD5, IAddon* aAddon) const
+bool CLoader::IsTracked(MD5_t aMD5, IAddon* aAddon) const
 {
 	if (aMD5.empty())
 	{
@@ -463,39 +470,39 @@ bool CLoaderBase::IsTracked(MD5_t aMD5, IAddon* aAddon) const
 	return false;
 }
 
-void CLoaderBase::Load(std::filesystem::path aPath)
+void CLoader::Load(std::filesystem::path aPath)
 {
 	for (IAddon* addon : this->Addons)
 	{
 		if (addon->GetLocation() == aPath)
 		{
-			this->Logger->Debug(CH_LOADERBASE, "CLoaderBase::Load(%s)", aPath.string().c_str());
+			this->Logger->Debug(CH_LOADER, "CLoaderBase::Load(%s)", aPath.string().c_str());
 			addon->Load();
 			return;
 		}
 	}
 }
 
-void CLoaderBase::Unload(std::filesystem::path aPath)
+void CLoader::Unload(std::filesystem::path aPath)
 {
 	for (IAddon* addon : this->Addons)
 	{
 		if (addon->GetLocation() == aPath)
 		{
-			this->Logger->Debug(CH_LOADERBASE, "CLoaderBase::Unload(%s)", aPath.string().c_str());
+			this->Logger->Debug(CH_LOADER, "CLoaderBase::Unload(%s)", aPath.string().c_str());
 			addon->Unload();
 			return;
 		}
 	}
 }
 
-void CLoaderBase::Uninstall(std::filesystem::path aPath)
+void CLoader::Uninstall(std::filesystem::path aPath)
 {
 	for (IAddon* addon : this->Addons)
 	{
 		if (addon->GetLocation() == aPath)
 		{
-			this->Logger->Debug(CH_LOADERBASE, "CLoaderBase::Uninstall(%s)", aPath.string().c_str());
+			this->Logger->Debug(CH_LOADER, "CLoaderBase::Uninstall(%s)", aPath.string().c_str());
 			addon->Uninstall();
 			return;
 		}

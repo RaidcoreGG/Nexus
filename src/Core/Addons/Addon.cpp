@@ -28,7 +28,7 @@ CAddon::CAddon(std::filesystem::path aLocation)
 
 	CContext* ctx = CContext::GetContext();
 	this->Logger = ctx->GetLogger();
-	this->Loader = ctx->GetLoaderBase();
+	this->Loader = ctx->GetLoader();
 	this->ConfigMgr = ctx->GetCfgMgr();
 
 	this->QueuedActions.push(EAddonAction::EnumInterfaces);

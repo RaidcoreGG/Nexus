@@ -887,7 +887,7 @@ void CAddonsWindow::RenderActionsBar(ImVec2& aSize)
 {
 	CContext*       ctx    = CContext::GetContext();
 	CTextureLoader* texapi = ctx->GetTextureService();
-	CLoaderBase*    loader = ctx->GetLoaderBase();
+	CLoader*        loader = ctx->GetLoader();
 	CUiContext*     uictx  = ctx->GetUIContext();
 	CLocalization*  lang   = uictx->GetLocalization();
 
@@ -1059,7 +1059,7 @@ void CAddonsWindow::PopulateAddons()
 	CContext*    ctx = CContext::GetContext();
 	CUiContext*  uictx = ctx->GetUIContext();
 	CSettings*   settingsctx = ctx->GetSettingsCtx();
-	CLoaderBase* loader = ctx->GetLoaderBase();
+	CLoader*     loader = ctx->GetLoader();
 	CLibraryMgr* libMgr = ctx->GetAddonLibrary();
 
 	this->Filter = settingsctx->Get<EAddonsFilterFlags>(OPT_ADDONFILTERS, FILTER_INSTALLED);
