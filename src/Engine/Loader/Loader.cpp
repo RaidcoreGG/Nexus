@@ -167,7 +167,7 @@ void CLoader::NotifyChanges()
 	this->Logger->Trace(CH_LOADER, "NotifyChanges()");
 }
 
-void CLoader::Add(std::filesystem::path aPath)
+void CLoader::Track(std::filesystem::path aPath)
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
