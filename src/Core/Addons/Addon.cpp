@@ -39,8 +39,15 @@ CAddon::CAddon(std::filesystem::path aLocation)
 
 CAddon::~CAddon()
 {
+	/* Set thread to cancel. */
 	this->IsRunning = false;
+
+	/* Queue at least one action. */
+	this->QueuedActions.push(EAddonAction::Destroy);
+
+	/* Notify the processor thread. */
 	this->ConVar.notify_one();
+
 	if (this->ProcessorThread.joinable())
 	{
 		this->ProcessorThread.join();
@@ -267,6 +274,11 @@ void CAddon::ProcessActions()
 			{
 				this->EnumInterfaces();
 				break;
+			}
+			case EAddonAction::Destroy:
+			{
+				this->Logger->Debug(CH_ADDON, "CAddon::Destroy(): %s", this->Location.string().c_str());
+				return; /* Return the thread entirely. */
 			}
 		}
 

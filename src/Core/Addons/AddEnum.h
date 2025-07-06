@@ -49,7 +49,8 @@ enum class EAddonAction : uint32_t
 	Uninstall,
 	CheckUpdate,
 	Update,
-	EnumInterfaces
+	EnumInterfaces,
+	Destroy
 };
 
 ///----------------------------------------------------------------------------------------------------
