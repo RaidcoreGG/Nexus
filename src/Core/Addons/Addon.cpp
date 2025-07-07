@@ -287,6 +287,7 @@ void CAddon::ProcessActions()
 			}
 			case EAddonAction::Destroy:
 			{
+				this->Flags |= EAddonFlags::Destroying;
 				this->Logger->Trace(CH_ADDON, "CAddon::Destroy(): %s", this->Location.string().c_str());
 				this->UnloadInternal();
 				this->IsRunning = false; /* Just to be sure. */
@@ -498,7 +499,10 @@ void CAddon::UnloadInternal()
 		auto end_time = std::chrono::high_resolution_clock::now();
 		auto time = end_time - start_time;
 
-		this->EventApi->Raise(EV_ADDON_UNLOADED, &this->NexusAddonDefV1->Signature);
+		if ((this->Flags & EAddonFlags::Destroying) != EAddonFlags::Destroying)
+		{
+			this->EventApi->Raise(EV_ADDON_UNLOADED, &this->NexusAddonDefV1->Signature);
+		}
 
 		strUnloadInfo = String::Format("Took %u microseconds to unload.", time / std::chrono::microseconds(1));
 	}
@@ -770,6 +774,7 @@ bool CAddon::ShouldLoad()
 		/* First launch means, state wasn't set yet. */
 		if (this->State != EAddonState::None)
 		{
+			this->Flags |= EAddonFlags::StateLocked;
 			this->Logger->Debug(CH_ADDON, "Canceled load. Only load on initial load. (%s)", this->Location.string().c_str());
 			result = false;
 		}

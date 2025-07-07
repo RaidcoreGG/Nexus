@@ -16,6 +16,7 @@
 #include "Core/Addons/Library/LibAddon.h"
 #include "Core/Context.h"
 #include "Core/Index/Index.h"
+#include "LoadUnloadButton.h"
 #include "Resources/ResConst.h"
 #include "Util/Strings.h"
 
@@ -196,8 +197,8 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 				/* Install button */
 				ImGui::SetCursorPos(ImVec2(initialX, (ImGui::GetWindowHeight() - (btnTextSz.y * 2) - style.ItemSpacing.y - (style.FramePadding.y * 2)) / 2));
 				if (ImGui::Button(aAddonData.IsInstalling
-					? (langApi->Translate("((000027))") + id).c_str()
-					: (langApi->Translate("((000028))") + id).c_str(),
+					? langApi->Translate("((000027))")
+					: langApi->Translate("((000028))"),
 					ImVec2(btnWidth, 0)))
 				{
 					if (!aAddonData.IsInstalling)
@@ -246,33 +247,7 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 
 				/* Load/Unload button */
 				ImGui::SetCursorPos(ImVec2(initialX, (ImGui::GetWindowHeight() - (btnTextSz.y * 2) - style.ItemSpacing.y - (style.FramePadding.y * 2)) / 2));
-				if (ImGui::Button(buttonText.c_str(), ImVec2(btnWidth, 0)))
-				{
-					if (aAddonData.Addon->IsLoaded())
-					{
-						aAddonData.Addon->Unload();
-						Config_t* config = cfgmgr->RegisterConfig(aAddonData.GetSig());
-						if (config)
-						{
-							config->ShouldLoad = false;
-							cfgmgr->SaveConfigs();
-						}
-					}
-					else
-					{
-						aAddonData.Addon->Load();
-						Config_t* config = cfgmgr->RegisterConfig(aAddonData.GetSig());
-						if (config)
-						{
-							config->ShouldLoad = true;
-							cfgmgr->SaveConfigs();
-						}
-					}
-				}
-				if (ImGui::IsItemHovered() && !buttonTT.empty())
-				{
-					ImGui::TooltipGeneric(buttonTT.c_str());
-				}
+				LoadUnloadButton(aAddonData, btnWidth);
 
 				/* Configure button */
 				ImGui::SetCursorPos(ImVec2(initialX, ImGui::GetCursorPosY()));
@@ -588,6 +563,8 @@ void CAddonsWindow::RenderDetails()
 	ImGuiStyle& style = ImGui::GetStyle();
 
 	float btnSz = ImGui::GetFontSize() * 1.5f;
+	ImVec2 btnTextSz = ImGui::CalcTextSize("############");
+	float btnWidth = btnTextSz.x + (style.FramePadding.x * 2);
 
 	static Texture_t* chevronRt = nullptr;
 
@@ -834,7 +811,7 @@ void CAddonsWindow::RenderDetails()
 				}
 
 				/* Uninstall Button */
-				if (ImGui::Button((langApi->Translate("((000018))") + hashid).c_str()))
+				if (ImGui::Button((langApi->Translate("((000018))") + hashid).c_str(), ImVec2(btnWidth, 0)))
 				{
 					this->UninstallConfirmationModal.SetTarget(this->AddonData.GetName(), this->AddonData.Addon->GetLocation());
 				}
@@ -844,39 +821,7 @@ void CAddonsWindow::RenderDetails()
 				}
 
 				/* Load/Unload Button */
-				if (this->AddonData.Addon->IsLoaded())
-				{
-					// TODO: Double button logic in details and listing.
-					// TODO: Handle state locked addons.
-
-					if (ImGui::Button((langApi->Translate("((Unload))") + hashid).c_str()))
-					{
-						this->AddonData.Addon->Unload();
-						Config_t* config = cfgmgr->RegisterConfig(this->AddonData.GetSig());
-						if (config)
-						{
-							config->ShouldLoad = false;
-							cfgmgr->SaveConfigs();
-						}
-					}
-				}
-				else
-				{
-					if (ImGui::Button((langApi->Translate("((Load))") + hashid).c_str()))
-					{
-						this->AddonData.Addon->Load();
-						Config_t* config = cfgmgr->RegisterConfig(this->AddonData.GetSig());
-						if (config)
-						{
-							config->ShouldLoad = true;
-							cfgmgr->SaveConfigs();
-						}
-					}
-				}
-				if (this->AddonData.Addon->IsStateLocked())
-				{
-					ImGui::TooltipGeneric(langApi->Translate("((IsStateLocked))"));
-				}
+				LoadUnloadButton(this->AddonData, btnWidth);
 			}
 			else
 			{

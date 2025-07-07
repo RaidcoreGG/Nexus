@@ -60,12 +60,13 @@ enum class EAddonAction : uint32_t
 enum class EAddonFlags : uint32_t
 {
 	None            = 0,
-	FileLocked      = 1 << 0,
-	StateLocked     = 1 << 1,
-	UpdateAvailable = 1 << 2,
-	RunningAction   = 1 << 3,
-	Uninstalled     = 1 << 4,
-	MissingReqs     = 1 << 5
+	Destroying      = 1 << 0,
+	FileLocked      = 1 << 1,
+	StateLocked     = 1 << 2,
+	UpdateAvailable = 1 << 3,
+	RunningAction   = 1 << 4,
+	Uninstalled     = 1 << 5,
+	MissingReqs     = 1 << 6
 };
 DEFINE_ENUM_FLAG_OPERATORS(EAddonFlags)
 
