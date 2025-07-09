@@ -248,11 +248,6 @@ void CAddon::ProcessActions()
 
 		switch (action)
 		{
-			case EAddonAction::EnumInterfaces:
-			{
-				this->EnumInterfaces();
-				break;
-			}
 			case EAddonAction::Create:
 			{
 				this->Logger->Trace(CH_ADDON, "CAddon::Create(): %s", this->Location.string().c_str());
@@ -268,6 +263,11 @@ void CAddon::ProcessActions()
 				this->IsRunning = false; /* Just to be sure. */
 				this->EventApi->Raise(0, EV_ADDON_DESTROYED);
 				return; /* Return the thread entirely. */
+			}
+			case EAddonAction::EnumInterfaces:
+			{
+				this->EnumInterfaces();
+				break;
 			}
 			case EAddonAction::Load:
 			{

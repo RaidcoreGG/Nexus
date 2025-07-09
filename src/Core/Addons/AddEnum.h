@@ -44,9 +44,9 @@ enum class EUpdateProvider : uint32_t
 enum class EAddonAction : uint32_t
 {
 	None,
-	EnumInterfaces,
 	Create,
 	Destroy,
+	EnumInterfaces,
 	Load,
 	Unload,
 	Uninstall,
