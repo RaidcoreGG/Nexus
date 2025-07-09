@@ -248,6 +248,27 @@ void CAddon::ProcessActions()
 
 		switch (action)
 		{
+			case EAddonAction::EnumInterfaces:
+			{
+				this->EnumInterfaces();
+				break;
+			}
+			case EAddonAction::Create:
+			{
+				this->Logger->Trace(CH_ADDON, "CAddon::Create(): %s", this->Location.string().c_str());
+				this->EnumInterfaces();
+				this->EventApi->Raise(0, EV_ADDON_CREATED);
+				break;
+			}
+			case EAddonAction::Destroy:
+			{
+				this->Flags |= EAddonFlags::Destroying;
+				this->Logger->Trace(CH_ADDON, "CAddon::Destroy(): %s", this->Location.string().c_str());
+				this->UnloadInternal();
+				this->IsRunning = false; /* Just to be sure. */
+				this->EventApi->Raise(0, EV_ADDON_DESTROYED);
+				return; /* Return the thread entirely. */
+			}
 			case EAddonAction::Load:
 			{
 				this->LoadInternal();
@@ -272,27 +293,6 @@ void CAddon::ProcessActions()
 			{
 				this->UpdateInternal();
 				break;
-			}
-			case EAddonAction::EnumInterfaces:
-			{
-				this->EnumInterfaces();
-				break;
-			}
-			case EAddonAction::Create:
-			{
-				this->Logger->Trace(CH_ADDON, "CAddon::Create(): %s", this->Location.string().c_str());
-				this->EnumInterfaces();
-				this->EventApi->Raise(0, EV_ADDON_CREATED);
-				break;
-			}
-			case EAddonAction::Destroy:
-			{
-				this->Flags |= EAddonFlags::Destroying;
-				this->Logger->Trace(CH_ADDON, "CAddon::Destroy(): %s", this->Location.string().c_str());
-				this->UnloadInternal();
-				this->IsRunning = false; /* Just to be sure. */
-				this->EventApi->Raise(0, EV_ADDON_DESTROYED);
-				return; /* Return the thread entirely. */
 			}
 		}
 
@@ -499,16 +499,16 @@ void CAddon::UnloadInternal()
 		auto end_time = std::chrono::high_resolution_clock::now();
 		auto time = end_time - start_time;
 
-		if ((this->Flags & EAddonFlags::Destroying) != EAddonFlags::Destroying)
-		{
-			this->EventApi->Raise(EV_ADDON_UNLOADED, &this->NexusAddonDefV1->Signature);
-		}
-
 		strUnloadInfo = String::Format("Took %u microseconds to unload.", time / std::chrono::microseconds(1));
 	}
 	else
 	{
 		strUnloadInfo = "No unload routine defined.";
+	}
+
+	if ((this->Flags & EAddonFlags::Destroying) != EAddonFlags::Destroying)
+	{
+		this->EventApi->Raise(EV_ADDON_UNLOADED, &this->NexusAddonDefV1->Signature);
 	}
 
 	FreeLibrary(this->Module);

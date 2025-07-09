@@ -44,14 +44,14 @@ enum class EUpdateProvider : uint32_t
 enum class EAddonAction : uint32_t
 {
 	None,
+	EnumInterfaces,
+	Create,
+	Destroy,
 	Load,
 	Unload,
 	Uninstall,
 	CheckUpdate,
-	Update,
-	EnumInterfaces,
-	Create,
-	Destroy
+	Update
 };
 
 ///----------------------------------------------------------------------------------------------------
@@ -60,13 +60,13 @@ enum class EAddonAction : uint32_t
 enum class EAddonFlags : uint32_t
 {
 	None            = 0,
-	Destroying      = 1 << 0,
-	FileLocked      = 1 << 1,
-	StateLocked     = 1 << 2,
-	UpdateAvailable = 1 << 3,
-	RunningAction   = 1 << 4,
+	RunningAction   = 1 << 0,
+	Destroying      = 1 << 1,
+	FileLocked      = 1 << 2,
+	StateLocked     = 1 << 3,
+	MissingReqs     = 1 << 4,
 	Uninstalled     = 1 << 5,
-	MissingReqs     = 1 << 6
+	UpdateAvailable = 1 << 6
 };
 DEFINE_ENUM_FLAG_OPERATORS(EAddonFlags)
 
