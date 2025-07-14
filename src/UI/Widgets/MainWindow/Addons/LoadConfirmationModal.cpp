@@ -18,9 +18,9 @@ CLoadConfirmationModal::CLoadConfirmationModal()
 
 void CLoadConfirmationModal::RenderContent()
 {
-	CContext* ctx = CContext::GetContext();
-	CUiContext* uictx = ctx->GetUIContext();
-	CLocalization* lang = uictx->GetLocalization();
+	CContext*      ctx   = CContext::GetContext();
+	CUiContext*    uictx = ctx->GetUIContext();
+	CLocalization* lang  = uictx->GetLocalization();
 
 	ImGui::Text(lang->Translate("((000116))"));
 
@@ -81,9 +81,9 @@ void CLoadConfirmationModal::SetTarget(Config_t* aConfig, std::string aName, std
 
 void CLoadConfirmationModal::SetTitle()
 {
-	CContext* ctx = CContext::GetContext();
-	CUiContext* uictx = ctx->GetUIContext();
-	CLocalization* lang = uictx->GetLocalization();
+	CContext*      ctx   = CContext::GetContext();
+	CUiContext*    uictx = ctx->GetUIContext();
+	CLocalization* lang  = uictx->GetLocalization();
 
 	/* Override the title before opening the modal. */
 	std::string title = lang->Translate("((Load addon: ))");
