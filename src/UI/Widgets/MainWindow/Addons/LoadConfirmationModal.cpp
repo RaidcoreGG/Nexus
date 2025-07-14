@@ -13,7 +13,7 @@
 CLoadConfirmationModal::CLoadConfirmationModal()
 {
 	this->SetID("LoadConfirmationModal");
-	this->SetDisplayName("((Load addon:))");
+	this->SetDisplayName("((Load addon: ))");
 }
 
 void CLoadConfirmationModal::RenderContent()
@@ -86,7 +86,7 @@ void CLoadConfirmationModal::SetTitle()
 	CLocalization* lang = uictx->GetLocalization();
 
 	/* Override the title before opening the modal. */
-	std::string title = lang->Translate("((Load addon:))");
+	std::string title = lang->Translate("((Load addon: ))");
 	title.append(this->Name);
 
 	this->SetDisplayName(title);
