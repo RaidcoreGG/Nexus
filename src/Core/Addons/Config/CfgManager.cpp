@@ -15,14 +15,13 @@ using json = nlohmann::json;
 
 /* Config Migration Keys */
 constexpr const char* KM_PAUSEUPDATES  = "IsPausingUpdates";
-constexpr const char* KM_ISLOADED      = "IsLoaded";
 
 /* Config Active Keys */
 constexpr const char* K_SIGNATURE      = "Signature";
 constexpr const char* K_ISFAVORITE     = "IsFavorite";
 constexpr const char* K_UPDATEMODE     = "UpdateMode";
 constexpr const char* K_PRERELEASES    = "AllowPrereleases";
-constexpr const char* K_SHOULDLOAD     = "ShouldLoad";
+constexpr const char* K_ISLOADED       = "IsLoaded";
 constexpr const char* K_DISABLEVERSION = "DisableVersion";
 constexpr const char* K_LASTGAMEBUILD  = "LastGameBuild";
 constexpr const char* K_NAME           = "Name";
@@ -68,7 +67,7 @@ void CConfigMgr::SaveConfigs()
 				{ K_ISFAVORITE,     cfg->IsFavorite       },
 				{ K_UPDATEMODE,     cfg->UpdateMode       },
 				{ K_PRERELEASES,    cfg->AllowPreReleases },
-				{ K_SHOULDLOAD,     cfg->ShouldLoad       },
+				{ K_ISLOADED     ,  cfg->LastLoadState    },
 				{ K_DISABLEVERSION, cfg->DisableVersion   },
 				{ K_LASTGAMEBUILD,  cfg->LastGameBuild    },
 				{ K_NAME,           cfg->LastName         }
@@ -207,37 +206,26 @@ void CConfigMgr::LoadConfigs()
 				config->UpdateMode = EUpdateMode::Background;
 			}
 
-			/* Migration. */
-			if (!cfgJSON[KM_ISLOADED].is_null())
-			{
-				config->ShouldLoad = cfgJSON[KM_ISLOADED].get<bool>();
-			}
-
-			/* Load new key manually, to override migration if both exist. */
-			if (!cfgJSON[K_SHOULDLOAD].is_null())
-			{
-				config->ShouldLoad = cfgJSON[K_SHOULDLOAD].get<bool>();
-			}
+			/* Calling .value() is less writing, but redundant as defaults are set on the struct definition. */
+			config->IsFavorite       = cfgJSON.value(K_ISFAVORITE,     false);
+			config->AllowPreReleases = cfgJSON.value(K_PRERELEASES,    false);
+			config->LastLoadState    = cfgJSON.value(K_ISLOADED,       false);
+			config->DisableVersion   = cfgJSON.value(K_DISABLEVERSION, ""   );
+			config->LastGameBuild    = cfgJSON.value(K_LASTGAMEBUILD,  0    );
+			config->LastName         = cfgJSON.value(K_NAME,           ""   );
 
 			/* If -ggaddons sig list, compare against that. */
 			if (this->ReadOnly)
 			{
-				config->ShouldLoad = false;
+				config->LastLoadState = false;
 
 				auto whitelisted = std::find(this->Whitelist.begin(), this->Whitelist.end(), sig);
 
 				if (whitelisted != this->Whitelist.end())
 				{
-					config->ShouldLoad = true;
+					config->LastLoadState = true;
 				}
 			}
-
-			/* Calling .value() is less writing, but redundant as defaults are set on the struct definition. */
-			config->IsFavorite       = cfgJSON.value(K_ISFAVORITE,     false);
-			config->AllowPreReleases = cfgJSON.value(K_PRERELEASES,    false);
-			config->DisableVersion   = cfgJSON.value(K_DISABLEVERSION, "");
-			config->LastGameBuild    = cfgJSON.value(K_LASTGAMEBUILD,  0);
-			config->LastName         = cfgJSON.value(K_NAME,           "");
 
 			this->Configs.emplace(sig, config);
 		}

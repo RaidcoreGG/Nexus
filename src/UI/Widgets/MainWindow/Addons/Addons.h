@@ -19,6 +19,7 @@
 #include "UI/Controls/CtlSubWindow.h"
 #include "UI/Widgets/MainWindow/Binds/BindSetterModal.h"
 #include "UninstallConfirmationModal.h"
+#include "LoadConfirmationModal.h"
 
 constexpr const char* OPT_ISLISTMODE = "IsListMode";
 constexpr const char* OPT_ADDONFILTERS = "AddonFilters";
@@ -43,6 +44,7 @@ class CAddonsWindow : public ISubWindow
 	private:
 	CBindSetterModal            BindSetterModal;
 	CUninstallConfirmationModal UninstallConfirmationModal;
+	CLoadConfirmationModal      LoadConfirmationModal;
 
 	std::string                 SearchTerm;
 	EAddonsFilterFlags          Filter;

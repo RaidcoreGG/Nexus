@@ -762,9 +762,9 @@ bool CAddon::ShouldLoad()
 	bool result = true;
 
 	/* Check the last state as per user prefs. But also make sure no state set yet -> Autoload. */
-	if (!this->Config->ShouldLoad && this->State == EAddonState::None)
+	if (!this->Config->LastLoadState && this->State == EAddonState::None)
 	{
-		this->Logger->Debug(CH_ADDON, "Canceled load. Config->ShouldLoad: false. (%s)", this->Location.string().c_str());
+		this->Logger->Debug(CH_ADDON, "Canceled load. Config->LastLoadState: false. (%s)", this->Location.string().c_str());
 		result = false;
 	}
 

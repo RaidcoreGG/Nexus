@@ -247,7 +247,12 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 
 				/* Load/Unload button */
 				ImGui::SetCursorPos(ImVec2(initialX, (ImGui::GetWindowHeight() - (btnTextSz.y * 2) - style.ItemSpacing.y - (style.FramePadding.y * 2)) / 2));
-				LoadUnloadButton(aAddonData, btnWidth);
+				if (LoadUnloadButton(aAddonData, btnWidth))
+				{
+					Config_t* config = cfgmgr->RegisterConfig(aAddonData.GetSig());
+
+					this->LoadConfirmationModal.SetTarget(config, aAddonData.GetName(), aAddonData.Addon->GetLocation());
+				}
 
 				/* Configure button */
 				ImGui::SetCursorPos(ImVec2(initialX, ImGui::GetCursorPosY()));
@@ -821,7 +826,12 @@ void CAddonsWindow::RenderDetails()
 				}
 
 				/* Load/Unload Button */
-				LoadUnloadButton(this->AddonData, btnWidth);
+				if (LoadUnloadButton(this->AddonData, btnWidth))
+				{
+					Config_t* config = cfgmgr->RegisterConfig(this->AddonData.GetSig());
+
+					this->LoadConfirmationModal.SetTarget(config, this->AddonData.GetName(), this->AddonData.Addon->GetLocation());
+				}
 			}
 			else
 			{
@@ -1001,6 +1011,11 @@ void CAddonsWindow::RenderSubWindows()
 	if (this->UninstallConfirmationModal.Render() && this->UninstallConfirmationModal.GetResult() == EModalResult::OK)
 	{
 		this->ClearContent();
+		this->Invalidate();
+	}
+
+	if (this->LoadConfirmationModal.Render() && this->LoadConfirmationModal.GetResult() == EModalResult::OK)
+	{
 		this->Invalidate();
 	}
 }

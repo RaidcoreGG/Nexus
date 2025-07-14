@@ -72,6 +72,7 @@
     <ClCompile Include="src\UI\Widgets\EULA\LicenseAgreementModal.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\About\About.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\Addons\Addons.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\Addons\LoadConfirmationModal.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\Addons\UninstallConfirmationModal.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\Binds\Binds.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\Binds\BindSetterModal.cpp" />
@@ -379,6 +380,7 @@
     <ClInclude Include="src\UI\Widgets\MainWindow\About\About.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\AddonListing.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\Addons.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\LoadConfirmationModal.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\LoadUnloadButton.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\UninstallConfirmationModal.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Binds\Binds.h" />
