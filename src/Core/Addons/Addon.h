@@ -154,6 +154,18 @@ class CAddon : public virtual IAddon
 	///----------------------------------------------------------------------------------------------------
 	bool IsUninstalled() const;
 
+	///----------------------------------------------------------------------------------------------------
+	/// IsVersionDisabled:
+	/// 	Returns true, if the specific addon version was disabled.
+	///----------------------------------------------------------------------------------------------------
+	bool IsVersionDisabled() const;
+
+	///----------------------------------------------------------------------------------------------------
+	/// IsVolatileDisabled:
+	/// 	Returns true, if the addon is volatile and game build changed.
+	///----------------------------------------------------------------------------------------------------
+	bool IsVolatileDisabled() const;
+
 	private:
 	CLogApi*                 Logger               = nullptr;
 	CLoader*                 Loader               = nullptr;

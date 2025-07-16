@@ -222,6 +222,37 @@ bool CAddon::IsUninstalled() const
 	return (this->Flags & EAddonFlags::Uninstalled) == EAddonFlags::Uninstalled;
 }
 
+bool CAddon::IsVersionDisabled() const
+{
+	/* Tiny optimization, to not calculate the entire MD5. */
+	if (this->Config->DisableVersion.empty())
+	{
+		return false;
+	}
+
+	return this->Config->DisableVersion == this->GetMD5().string();
+}
+
+bool CAddon::IsVolatileDisabled() const
+{
+	if (!this->NexusAddonDefV1)
+	{
+		return false;
+	}
+
+	if ((this->NexusAddonDefV1->Flags & EAddonDefFlags::IsVolatile) != EAddonDefFlags::IsVolatile)
+	{
+		return false;
+	}
+
+	if (this->Config->LastGameBuild != 0 && GW2::GetGameBuild() - this->Config->LastGameBuild > 350)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 void CAddon::ProcessActions()
 {
 	if (this->ProcessorThreadID == 0)
@@ -781,26 +812,22 @@ bool CAddon::ShouldLoad()
 	}
 
 	/* If this version is broken and was disabled. */
-	if (this->Config->DisableVersion == this->GetMD5().string())
+	if (this->IsVersionDisabled())
 	{
 		this->Logger->Debug(CH_ADDON, "Canceled load. This version is disabled. (%s)", this->Location.string().c_str());
 		result = false;
 	}
 
-	/* If this addon is volatile. */
-	if ((this->NexusAddonDefV1->Flags & EAddonDefFlags::IsVolatile) == EAddonDefFlags::IsVolatile)
+	/* If this addon is volatile and the change difference is greater than 350. */
+	if (this->IsVolatileDisabled())
 	{
-		/* If the change difference is greater than 350. */
-		if (this->Config->LastGameBuild != 0 && GW2::GetGameBuild() - this->Config->LastGameBuild > 350)
-		{
-			this->Logger->Debug(
-				CH_ADDON,
-				"Canceled load. Volatile addon and gamebuild diff is %u. (%s)",
-				GW2::GetGameBuild() - this->Config->LastGameBuild,
-				this->Location.string().c_str()
-			);
-			result = false;
-		}
+		this->Logger->Debug(
+			CH_ADDON,
+			"Canceled load. Volatile addon and gamebuild diff is %u. (%s)",
+			GW2::GetGameBuild() - this->Config->LastGameBuild,
+			this->Location.string().c_str()
+		);
+		result = false;
 	}
 
 	return result;

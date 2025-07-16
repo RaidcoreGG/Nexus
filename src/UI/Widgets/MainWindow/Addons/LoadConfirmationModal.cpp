@@ -49,6 +49,7 @@ void CLoadConfirmationModal::OnClosing()
 	{
 		case EModalResult::OK:
 		{
+			this->Config->LastGameBuild = 0;
 			this->Config->LastLoadState = true;
 			this->Config->DisableVersion = "";
 			cfgmgr->SaveConfigs();
