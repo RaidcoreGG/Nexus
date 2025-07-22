@@ -224,6 +224,8 @@ bool CAddon::IsUninstalled() const
 
 bool CAddon::IsVersionDisabled() const
 {
+	if (!this->Config) { return false; }
+
 	/* Tiny optimization, to not calculate the entire MD5. */
 	if (this->Config->DisableVersion.empty())
 	{
@@ -231,26 +233,6 @@ bool CAddon::IsVersionDisabled() const
 	}
 
 	return this->Config->DisableVersion == this->GetMD5().string();
-}
-
-bool CAddon::IsVolatileDisabled() const
-{
-	if (!this->NexusAddonDefV1)
-	{
-		return false;
-	}
-
-	if ((this->NexusAddonDefV1->Flags & EAddonDefFlags::IsVolatile) != EAddonDefFlags::IsVolatile)
-	{
-		return false;
-	}
-
-	if (this->Config->LastGameBuild != 0 && GW2::GetGameBuild() - this->Config->LastGameBuild > 350)
-	{
-		return true;
-	}
-
-	return false;
 }
 
 bool CAddon::SupportsLoading() const
@@ -850,4 +832,24 @@ bool CAddon::ShouldUpdate()
 		case EUpdateMode::Notify:     { return false; }
 		case EUpdateMode::Automatic:  { return true; }
 	}
+}
+
+bool CAddon::IsVolatileDisabled()
+{
+	if (!this->NexusAddonDefV1)
+	{
+		return false;
+	}
+
+	if ((this->NexusAddonDefV1->Flags & EAddonDefFlags::IsVolatile) != EAddonDefFlags::IsVolatile)
+	{
+		return false;
+	}
+
+	if (this->Config->LastGameBuild != 0 && GW2::GetGameBuild() - this->Config->LastGameBuild > 350)
+	{
+		return true;
+	}
+
+	return false;
 }

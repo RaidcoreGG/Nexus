@@ -161,12 +161,6 @@ class CAddon : public virtual IAddon
 	bool IsVersionDisabled() const;
 
 	///----------------------------------------------------------------------------------------------------
-	/// IsVolatileDisabled:
-	/// 	Returns true, if the addon is volatile and game build changed.
-	///----------------------------------------------------------------------------------------------------
-	bool IsVolatileDisabled() const;
-
-	///----------------------------------------------------------------------------------------------------
 	/// SupportsLoading:
 	/// 	Returns true, if the addon is loadable.
 	///----------------------------------------------------------------------------------------------------
@@ -247,6 +241,13 @@ class CAddon : public virtual IAddon
 	/// 	Determines whether Update should be called.
 	///----------------------------------------------------------------------------------------------------
 	bool ShouldUpdate();
+
+	///----------------------------------------------------------------------------------------------------
+	/// IsVolatileDisabled:
+	/// 	Returns true, if the addon is volatile and game build changed.
+	///----------------------------------------------------------------------------------------------------
+	bool IsVolatileDisabled();
+
 };
 
 static inline IAddon* IAddonFactory(std::filesystem::path aLocation)

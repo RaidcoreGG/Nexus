@@ -63,7 +63,7 @@ inline bool LoadUnloadButton(AddonListing_t& aAddonListing, float aBtnWidth)
 			config->LastLoadState = !config->LastLoadState;
 			cfgmgr->SaveConfigs();
 		}
-		else if (!aAddonListing.Addon->IsLoaded() && (aAddonListing.Addon->IsVersionDisabled() || aAddonListing.Addon->IsVolatileDisabled()))
+		else if (!aAddonListing.Addon->IsLoaded() && aAddonListing.Addon->IsVersionDisabled())
 		{
 			/* Addon is not loaded, but was version disabled -> Prompt to load */
 			/* OR addon is not loaded, but volatile game build disparity -> Prompt to load */

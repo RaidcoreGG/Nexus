@@ -124,7 +124,7 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 
 	ImGuiStyle& style = ImGui::GetStyle();
 
-	ImVec2 itemSz = ImVec2(aWidth, ImGui::GetTextLineHeightWithSpacing() * 5);
+	ImVec2 itemSz = ImVec2(aWidth, ImGui::GetFrameHeightWithSpacing() * 4);
 	float innerHeight = itemSz.y - (style.WindowPadding.y * 2);
 
 	ImVec2 btnTextSz = ImGui::CalcTextSize("############");
@@ -141,15 +141,31 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 		return;
 	}
 
-	static CContext*      ctx      = CContext::GetContext();
-	static CUiContext*    uictx    = ctx->GetUIContext();
-	static CLocalization* langApi  = uictx->GetLocalization();
-	static CAlerts*       alertctx = uictx->GetAlerts();
-	static CConfigMgr*    cfgmgr   = ctx->GetCfgMgr();
+	static CContext*       ctx      = CContext::GetContext();
+	static CUiContext*     uictx    = ctx->GetUIContext();
+	static CConfigMgr*     cfgmgr   = ctx->GetCfgMgr();
+	static CTextureLoader* texapi   = ctx->GetTextureService();
+	static CLocalization*  langApi  = uictx->GetLocalization();
+	static CAlerts*        alertctx = uictx->GetAlerts();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1);
+
+	bool pushBorderCol = false;
+
+	if (aAddonData.Addon && aAddonData.Addon->IsVersionDisabled())
+	{
+		ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(.675f, .349f, .349f, 1.0f));
+		pushBorderCol = true;
+	}
+
 	if (ImGui::BeginChild(("Addon_" + id).c_str(), itemSz, true))
 	{
+		if (pushBorderCol)
+		{
+			ImGui::PopStyleColor();
+			pushBorderCol = false;
+		}
+
 		if (ImGui::BeginChild("Info", ImVec2(itemSz.x - style.ItemSpacing.x - actionsAreaWidth - (style.WindowPadding.x * 2), innerHeight), false, ImGuiWindowFlags_NoBackground))
 		{
 			/* TODO / FIXME : Add error state, like invalid api as a flag/tag. */
@@ -167,7 +183,7 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 			/* Author */
 			if (!aAddonData.GetAuthor().empty())
 			{
-				ImGui::TextDisabled("by %s", aAddonData.GetAuthor().c_str());
+				ImGui::TextDisabled("%s", aAddonData.GetAuthor().c_str());
 			}
 
 			/* Description */
@@ -189,13 +205,87 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 			ImGui::PopStyleVar();
 			poppedActionsPad = true;
 
-			float initialX = ImGui::GetCursorPosX();
+			static Texture_t* s_Tex_GitHub      = nullptr;
+			static Texture_t* s_Tex_CanUpdate   = nullptr;
+			static Texture_t* s_Tex_CanFavorite = nullptr;
+			static Texture_t* s_Tex_Favorite    = nullptr;
+			if (!s_Tex_GitHub)      { s_Tex_GitHub      = texapi->GetOrCreate("ICON_GITHUB",      RES_ICON_GITHUB,      ctx->GetModule()); }
+			if (!s_Tex_CanUpdate)   { s_Tex_CanUpdate   = texapi->GetOrCreate("ICON_UPDATE",      RES_ICON_UPDATE,      ctx->GetModule()); }
+			if (!s_Tex_CanFavorite) { s_Tex_CanFavorite = texapi->GetOrCreate("ICON_CANFAVORITE", RES_ICON_CANFAVORITE, ctx->GetModule()); }
+			if (!s_Tex_Favorite)    { s_Tex_Favorite    = texapi->GetOrCreate("ICON_FAVORITE",    RES_ICON_FAVORITE,    ctx->GetModule()); }
 
-			/* If only libdef, show install and github button. */
+			/* Icon actions */
+			if (s_Tex_CanUpdate && s_Tex_CanFavorite && s_Tex_Favorite)
+			{
+				/* Group icons in a row. */
+				ImGui::BeginGroup();
+				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+				ImVec2 iconSz = ImVec2(ImGui::GetFontSize() * 1.5f, ImGui::GetFontSize() * 1.5f);
+
+				/* Dummy to right-align the icons. */
+				ImGui::Dummy(ImVec2(btnWidth - (iconSz.x * 4), iconSz.x));
+				ImGui::SameLine();
+
+				/* Placeholder */
+				//ImGui::Dummy(iconSz);
+				ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+				if (ImGui::IconButton(s_Tex_GitHub->Resource, iconSz))
+				{
+				}
+				ImGui::PopStyleVar();
+
+				ImGui::SameLine();
+
+				/* Placeholder */
+				ImGui::Dummy(iconSz);
+
+				ImGui::SameLine();
+
+				if (aAddonData.Addon && aAddonData.Addon->IsUpdateAvailable())
+				{
+					ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+					if (ImGui::IconButton(s_Tex_CanUpdate->Resource, iconSz))
+					{
+					}
+					ImGui::PopStyleVar();
+					ImGui::TooltipGeneric("((Update available.))");
+				}
+				else
+				{
+					ImGui::Dummy(iconSz);
+				}
+
+				ImGui::SameLine();
+
+				/* Favorite button */
+				Config_t* config = aAddonData.Addon ? aAddonData.Addon->GetConfig() : nullptr;
+
+				if (config)
+				{
+					/* Switch texture depending on state. */
+					Texture_t* favTex = config->IsFavorite ? s_Tex_Favorite : s_Tex_CanFavorite;
+
+					ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+					if (ImGui::IconButton(favTex->Resource, iconSz))
+					{
+						config->IsFavorite = !config->IsFavorite;
+						cfgmgr->SaveConfigs();
+						this->Invalidate();
+					}
+					ImGui::PopStyleVar();
+				}
+				else
+				{
+					ImGui::Dummy(iconSz);
+				}
+				ImGui::PopStyleVar();
+				ImGui::EndGroup();
+			}
+
+			/* If only libdef, show install button. */
 			if (aAddonData.HasLibDef && !aAddonData.Addon)
 			{
 				/* Install button */
-				ImGui::SetCursorPos(ImVec2(initialX, (ImGui::GetWindowHeight() - (btnTextSz.y * 2) - style.ItemSpacing.y - (style.FramePadding.y * 2)) / 2));
 				if (ImGui::Button(aAddonData.IsInstalling
 					? langApi->Translate("((000027))")
 					: langApi->Translate("((000028))"),
@@ -223,37 +313,6 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 			/* If nexusdef, show load/unload and configure button. */
 			if (aAddonData.Addon)
 			{
-				Config_t* config = aAddonData.Addon->GetConfig();
-
-				static Texture_t* favoriteTex = nullptr;
-				static Texture_t* canFavoriteTex = nullptr;
-
-				if (config)
-				{
-					Texture_t* favTex = config->IsFavorite ? favoriteTex : canFavoriteTex;
-
-					if (favTex)
-					{
-						float btnSz = ImGui::GetFontSize() * 1.5f;
-
-						ImGui::SetCursorPos(ImVec2(initialX + btnWidth - btnSz, 0));
-						ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
-						if (ImGui::IconButton(favTex->Resource, ImVec2(btnSz, btnSz)))
-						{
-							config->IsFavorite = !config->IsFavorite;
-							cfgmgr->SaveConfigs();
-							this->Invalidate();
-						}
-						ImGui::PopStyleVar();
-					}
-					else if (!favTex)
-					{
-						CTextureLoader* texapi = ctx->GetTextureService();
-						favoriteTex = texapi->GetOrCreate("ICON_FAVORITE", RES_ICON_FAVORITE, ctx->GetModule());
-						canFavoriteTex = texapi->GetOrCreate("ICON_CANFAVORITE", RES_ICON_CANFAVORITE, ctx->GetModule());
-					}
-				}
-
 				std::string buttonText;
 				std::string buttonTT;
 
@@ -279,7 +338,6 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 				if (aAddonData.Addon->SupportsLoading())
 				{
 					/* Load/Unload button */
-					ImGui::SetCursorPos(ImVec2(initialX, (ImGui::GetWindowHeight() - (btnTextSz.y * 2) - style.ItemSpacing.y - (style.FramePadding.y * 2)) / 2));
 					if (LoadUnloadButton(aAddonData, btnWidth))
 					{
 						Config_t* config = cfgmgr->RegisterConfig(aAddonData.GetSig());
@@ -290,12 +348,10 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 				else
 				{
 					float width = ImGui::CalcTextSize("Managed externally").x;
-					ImGui::SetCursorPosX((btnWidth - width) / 2);
 					ImGui::Text("Managed externally");
 				}
 
 				/* Configure button */
-				ImGui::SetCursorPos(ImVec2(initialX, ImGui::GetCursorPosY()));
 				if (ImGui::Button(langApi->Translate("((000105))"), ImVec2(btnWidth, 0)))
 				{
 					this->SetContent(aAddonData);
@@ -310,6 +366,12 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 		}
 	}
 	ImGui::EndChild();
+
+	if (pushBorderCol)
+	{
+		ImGui::PopStyleColor();
+		pushBorderCol = false;
+	}
 
 	ImGui::PopStyleVar();
 }

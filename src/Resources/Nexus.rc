@@ -142,6 +142,8 @@ RES_ICON_CANFAVORITE            PNG     "Resources\\Images\\MainWindow\\CanFavor
 RES_ICON_FAVORITE               PNG     "Resources\\Images\\MainWindow\\FavoriteShaded.png"
 RES_ICON_REFRESH                PNG     "Resources\\Images\\MainWindow\\RefreshShaded.png"
 RES_ICON_FILTER                 PNG     "Resources\\Images\\MainWindow\\FilterShaded.png"
+RES_ICON_UPDATE                 PNG     "Resources\\Images\\MainWindow\\UpdateShaded.png"
+RES_ICON_GITHUB                 PNG     "Resources\\Images\\MainWindow\\GitHubShaded.png"
 RES_BANNER_DISCORD              PNG     "Resources\\Images\\Social\\Banners\\Discord.png"
 RES_BANNER_PATREON              PNG     "Resources\\Images\\Social\\Banners\\Patreon.png"
 

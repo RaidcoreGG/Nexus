@@ -66,8 +66,10 @@
 #define RES_ICON_FAVORITE               507
 #define RES_ICON_REFRESH                508
 #define RES_ICON_FILTER                 509
-#define RES_BANNER_DISCORD              510
-#define RES_BANNER_PATREON              511
+#define RES_ICON_UPDATE                 510
+#define RES_ICON_GITHUB                 511
+#define RES_BANNER_DISCORD              512
+#define RES_BANNER_PATREON              513
 
 /* Binary */
 #define RES_ARCDPS_INTEGRATION          601
