@@ -155,6 +155,8 @@ void CLogWindow::RenderContent()
 
 		float maxHeight = ImGui::GetWindowHeight();
 
+		ImDrawList* dl = ImGui::GetWindowDrawList();
+
 		const std::lock_guard<std::mutex> lock(Mutex);
 		{
 			std::vector<DisplayLogEntry_t*> displayedEntries;
@@ -239,7 +241,7 @@ void CLogWindow::RenderContent()
 					ImGui::TextColored(levelColor, level);
 
 					ImGui::TableSetColumnIndex(3);
-					float wrapWidth = ImGui::GetWindowContentRegionWidth() - ImGui::GetCursorPosX() - ImGui::GetStyle().CellPadding.x;
+					float wrapWidth = ImGui::GetWindowContentRegionWidth() - ImGui::GetCursorPosX() - ImGui::GetStyle().CellPadding.x - (style.ItemSpacing.x * 2);
 					float msgHeight = ImGui::CalcTextSize(msg->Entry->Message.c_str(), (const char*)0, false, wrapWidth).y;
 
 					/*  above visible space                        || under visible space */
@@ -252,6 +254,18 @@ void CLogWindow::RenderContent()
 					/* message */
 					float lineHeight = ImGui::GetTextLineHeight();
 					ImVec2 posInitial = ImGui::GetCursorPos();
+
+					ImGuiWindow* wnd = ImGui::GetCurrentWindow();
+
+					dl->AddRectFilled(
+						ImVec2(ImGui::GetCursorScreenPos().x, ImGui::GetCursorScreenPos().y),
+						ImVec2(ImGui::GetCursorScreenPos().x + style.ItemSpacing.x, ImGui::GetCursorScreenPos().y + msgHeight),
+						levelColor,
+						style.FrameRounding
+					);
+
+					posInitial.x += style.ItemSpacing.x * 2;
+
 					ImVec2 pos = posInitial;
 					
 					int colStack = 0;
