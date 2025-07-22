@@ -166,6 +166,12 @@ class CAddon : public virtual IAddon
 	///----------------------------------------------------------------------------------------------------
 	bool IsVolatileDisabled() const;
 
+	///----------------------------------------------------------------------------------------------------
+	/// SupportsLoading:
+	/// 	Returns true, if the addon is loadable.
+	///----------------------------------------------------------------------------------------------------
+	bool SupportsLoading() const;
+
 	private:
 	CLogApi*                 Logger               = nullptr;
 	CLoader*                 Loader               = nullptr;

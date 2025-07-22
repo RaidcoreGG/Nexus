@@ -223,6 +223,37 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 			/* If nexusdef, show load/unload and configure button. */
 			if (aAddonData.Addon)
 			{
+				Config_t* config = aAddonData.Addon->GetConfig();
+
+				static Texture_t* favoriteTex = nullptr;
+				static Texture_t* canFavoriteTex = nullptr;
+
+				if (config)
+				{
+					Texture_t* favTex = config->IsFavorite ? favoriteTex : canFavoriteTex;
+
+					if (favTex)
+					{
+						float btnSz = ImGui::GetFontSize() * 1.5f;
+
+						ImGui::SetCursorPos(ImVec2(initialX + btnWidth - btnSz, 0));
+						ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+						if (ImGui::IconButton(favTex->Resource, ImVec2(btnSz, btnSz)))
+						{
+							config->IsFavorite = !config->IsFavorite;
+							cfgmgr->SaveConfigs();
+							this->Invalidate();
+						}
+						ImGui::PopStyleVar();
+					}
+					else if (!favTex)
+					{
+						CTextureLoader* texapi = ctx->GetTextureService();
+						favoriteTex = texapi->GetOrCreate("ICON_FAVORITE", RES_ICON_FAVORITE, ctx->GetModule());
+						canFavoriteTex = texapi->GetOrCreate("ICON_CANFAVORITE", RES_ICON_CANFAVORITE, ctx->GetModule());
+					}
+				}
+
 				std::string buttonText;
 				std::string buttonTT;
 
@@ -245,13 +276,22 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 					buttonTT = "((Addon state won't be saved. Game was started with addons via start parameter.))";
 				}
 
-				/* Load/Unload button */
-				ImGui::SetCursorPos(ImVec2(initialX, (ImGui::GetWindowHeight() - (btnTextSz.y * 2) - style.ItemSpacing.y - (style.FramePadding.y * 2)) / 2));
-				if (LoadUnloadButton(aAddonData, btnWidth))
+				if (aAddonData.Addon->SupportsLoading())
 				{
-					Config_t* config = cfgmgr->RegisterConfig(aAddonData.GetSig());
+					/* Load/Unload button */
+					ImGui::SetCursorPos(ImVec2(initialX, (ImGui::GetWindowHeight() - (btnTextSz.y * 2) - style.ItemSpacing.y - (style.FramePadding.y * 2)) / 2));
+					if (LoadUnloadButton(aAddonData, btnWidth))
+					{
+						Config_t* config = cfgmgr->RegisterConfig(aAddonData.GetSig());
 
-					this->LoadConfirmationModal.SetTarget(config, aAddonData.GetName(), aAddonData.Addon->GetLocation());
+						this->LoadConfirmationModal.SetTarget(config, aAddonData.GetName(), aAddonData.Addon->GetLocation());
+					}
+				}
+				else
+				{
+					float width = ImGui::CalcTextSize("Managed externally").x;
+					ImGui::SetCursorPosX((btnWidth - width) / 2);
+					ImGui::Text("Managed externally");
 				}
 
 				/* Configure button */
@@ -261,14 +301,6 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 					this->SetContent(aAddonData);
 				}
 			}
-
-			/* If arc extension only, show notice. */
-			/*if (aAddonData.HasArcDef && !aAddonData.HasNexusDef)
-			{
-				float width = ImGui::CalcTextSize("via ArcDPS").x;
-				ImGui::SetCursorPosX((btnWidth - width) / 2);
-				ImGui::Text("via ArcDPS");
-			}*/
 		}
 		ImGui::EndChild();
 
@@ -1160,6 +1192,40 @@ void CAddonsWindow::PopulateAddons()
 
 	std::sort(this->Addons.begin(), this->Addons.end(), [](AddonListing_t& lhs, AddonListing_t& rhs)
 	{
+		Config_t* lhsConfig = lhs.Addon ? lhs.Addon->GetConfig() : nullptr;
+		Config_t* rhsConfig = rhs.Addon ? rhs.Addon->GetConfig() : nullptr;
+
+		// 1. Addons without config first
+		if (lhsConfig == nullptr || rhsConfig == nullptr)
+		{
+			if (lhsConfig == nullptr && rhsConfig != nullptr)
+			{
+				return true;
+			}
+			if (lhsConfig != nullptr && rhsConfig == nullptr)
+			{
+				return false;
+			}
+		}
+
+		// 2. Favorites first
+		if (lhsConfig && rhsConfig)
+		{
+			if (lhsConfig->IsFavorite != rhsConfig->IsFavorite)
+			{
+				return lhsConfig->IsFavorite > rhsConfig->IsFavorite;
+			}
+
+			// 3. Non-empty DisableVersion first
+			const bool lhsHasDisable = !lhsConfig->DisableVersion.empty();
+			const bool rhsHasDisable = !rhsConfig->DisableVersion.empty();
+			if (lhsHasDisable != rhsHasDisable)
+			{
+				return lhsHasDisable > rhsHasDisable;
+			}
+		}
+
+		// 4. Case-insensitive alphabetical order
 		return String::ToLower(lhs.GetName()) < String::ToLower(rhs.GetName());
 	});
 }

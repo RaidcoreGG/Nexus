@@ -253,6 +253,11 @@ bool CAddon::IsVolatileDisabled() const
 	return false;
 }
 
+bool CAddon::SupportsLoading() const
+{
+	return this->HasInterface(EAddonInterfaces::Nexus);
+}
+
 void CAddon::ProcessActions()
 {
 	if (this->ProcessorThreadID == 0)
