@@ -148,232 +148,92 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 	static CLocalization*  langApi  = uictx->GetLocalization();
 	static CAlerts*        alertctx = uictx->GetAlerts();
 
-	ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1);
+	ImDrawList* dl = ImGui::GetWindowDrawList();
 
-	bool pushBorderCol = false;
+	bool pushedBgCol = false;
 
-	if (aAddonData.Addon && aAddonData.Addon->IsVersionDisabled())
+	if (aAddonData.IsHovered)
 	{
-		ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(.675f, .349f, .349f, 1.0f));
-		pushBorderCol = true;
+		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::GetStyleColorVec4(ImGuiCol_ButtonHovered));
+		pushedBgCol = true;
 	}
-
 	if (ImGui::BeginChild(("Addon_" + id).c_str(), itemSz, true))
 	{
-		if (pushBorderCol)
+		if (pushedBgCol)
 		{
 			ImGui::PopStyleColor();
-			pushBorderCol = false;
+			pushedBgCol = false;
 		}
 
-		if (ImGui::BeginChild("Info", ImVec2(itemSz.x - style.ItemSpacing.x - actionsAreaWidth - (style.WindowPadding.x * 2), innerHeight), false, ImGuiWindowFlags_NoBackground))
+		ImGuiWindow* wnd = ImGui::GetCurrentWindow();
+		ImColor col = ImColor(85, 85, 85, 255);
+
+		if (aAddonData.Addon && aAddonData.Addon->IsLoaded())
 		{
-			/* TODO / FIXME : Add error state, like invalid api as a flag/tag. */
-
-			/* Name */
-			ImGui::Text(aAddonData.GetName().c_str());
-
-			/* Version */
-			if (!aAddonData.GetVersion().empty())
-			{
-				ImGui::SameLine();
-				ImGui::TextDisabled(aAddonData.GetVersion().c_str());
-			}
-
-			/* Author */
-			if (!aAddonData.GetAuthor().empty())
-			{
-				ImGui::TextDisabled("%s", aAddonData.GetAuthor().c_str());
-			}
-
-			/* Description */
-			if (!aAddonData.GetDesc().empty())
-			{
-				ImGui::TextWrapped(aAddonData.GetDesc().c_str());
-			}
+			col = ImColor(89, 172, 98, 255);
 		}
-		ImGui::EndChild();
+		else if (aAddonData.Addon && aAddonData.Addon->IsVersionDisabled())
+		{
+			col = ImColor(172, 89, 89, 255);
+			/* TODO: other error states. */
+		}
 
+		ImVec2 pad = ImGui::GetStyle().WindowPadding;
+		float round = ImGui::GetStyle().ChildRounding;
+		float spc = ImGui::GetStyle().ItemSpacing.x;
+
+		dl->AddRectFilled(ImVec2(wnd->Pos.x, wnd->Pos.y), ImVec2(wnd->Pos.x + (ImGui::GetFrameHeight() / 2.f), wnd->Pos.y + wnd->Size.y), col, round);
+
+		ImGui::Dummy(ImVec2(pad.x + (ImGui::GetFrameHeight() / 2.f) - spc, 0));
 		ImGui::SameLine();
 
-		/* Helper to not affect window padding in tooltips. */
-		bool poppedActionsPad = false;
+		ImGui::BeginGroup();
 
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-		if (ImGui::BeginChild("Actions", ImVec2(actionsAreaWidth, innerHeight), false, ImGuiWindowFlags_NoBackground))
+		/* Name */
+		ImGui::Text(aAddonData.GetName().c_str());
+
+		/* Version */
+		if (!aAddonData.GetVersion().empty())
 		{
-			ImGui::PopStyleVar();
-			poppedActionsPad = true;
-
-			static Texture_t* s_Tex_GitHub      = nullptr;
-			static Texture_t* s_Tex_CanUpdate   = nullptr;
-			static Texture_t* s_Tex_CanFavorite = nullptr;
-			static Texture_t* s_Tex_Favorite    = nullptr;
-			if (!s_Tex_GitHub)      { s_Tex_GitHub      = texapi->GetOrCreate("ICON_GITHUB",      RES_ICON_GITHUB,      ctx->GetModule()); }
-			if (!s_Tex_CanUpdate)   { s_Tex_CanUpdate   = texapi->GetOrCreate("ICON_UPDATE",      RES_ICON_UPDATE,      ctx->GetModule()); }
-			if (!s_Tex_CanFavorite) { s_Tex_CanFavorite = texapi->GetOrCreate("ICON_CANFAVORITE", RES_ICON_CANFAVORITE, ctx->GetModule()); }
-			if (!s_Tex_Favorite)    { s_Tex_Favorite    = texapi->GetOrCreate("ICON_FAVORITE",    RES_ICON_FAVORITE,    ctx->GetModule()); }
-
-			/* Icon actions */
-			if (s_Tex_CanUpdate && s_Tex_CanFavorite && s_Tex_Favorite)
-			{
-				/* Group icons in a row. */
-				ImGui::BeginGroup();
-				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-				ImVec2 iconSz = ImVec2(ImGui::GetFontSize() * 1.5f, ImGui::GetFontSize() * 1.5f);
-
-				/* Dummy to right-align the icons. */
-				ImGui::Dummy(ImVec2(btnWidth - (iconSz.x * 4), iconSz.x));
-				ImGui::SameLine();
-
-				/* Placeholder */
-				//ImGui::Dummy(iconSz);
-				ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
-				if (ImGui::IconButton(s_Tex_GitHub->Resource, iconSz))
-				{
-				}
-				ImGui::PopStyleVar();
-
-				ImGui::SameLine();
-
-				/* Placeholder */
-				ImGui::Dummy(iconSz);
-
-				ImGui::SameLine();
-
-				if (aAddonData.Addon && aAddonData.Addon->IsUpdateAvailable())
-				{
-					ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
-					if (ImGui::IconButton(s_Tex_CanUpdate->Resource, iconSz))
-					{
-					}
-					ImGui::PopStyleVar();
-					ImGui::TooltipGeneric("((Update available.))");
-				}
-				else
-				{
-					ImGui::Dummy(iconSz);
-				}
-
-				ImGui::SameLine();
-
-				/* Favorite button */
-				Config_t* config = aAddonData.Addon ? aAddonData.Addon->GetConfig() : nullptr;
-
-				if (config)
-				{
-					/* Switch texture depending on state. */
-					Texture_t* favTex = config->IsFavorite ? s_Tex_Favorite : s_Tex_CanFavorite;
-
-					ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
-					if (ImGui::IconButton(favTex->Resource, iconSz))
-					{
-						config->IsFavorite = !config->IsFavorite;
-						cfgmgr->SaveConfigs();
-						this->Invalidate();
-					}
-					ImGui::PopStyleVar();
-				}
-				else
-				{
-					ImGui::Dummy(iconSz);
-				}
-				ImGui::PopStyleVar();
-				ImGui::EndGroup();
-			}
-
-			/* If only libdef, show install button. */
-			if (aAddonData.HasLibDef && !aAddonData.Addon)
-			{
-				/* Install button */
-				if (ImGui::Button(aAddonData.IsInstalling
-					? langApi->Translate("((000027))")
-					: langApi->Translate("((000028))"),
-					ImVec2(btnWidth, 0)))
-				{
-					if (!aAddonData.IsInstalling)
-					{
-						CLibraryMgr* library = CContext::GetContext()->GetAddonLibrary();
-						library->Install(aAddonData.GetSig());
-					}
-				}
-
-				/* GitHub button */
-				// TODO: Project page
-				/*if (!aAddonData.GithubURL.empty())
-				{
-					ImGui::SetCursorPos(ImVec2(initialX, ImGui::GetCursorPosY()));
-					if (ImGui::Button((langApi->Translate("((000030))") + id).c_str(), ImVec2(btnWidth, 0)))
-					{
-						ShellExecuteA(0, 0, aAddonData.GithubURL.c_str(), 0, 0, SW_SHOW);
-					}
-				}*/
-			}
-
-			/* If nexusdef, show load/unload and configure button. */
-			if (aAddonData.Addon)
-			{
-				std::string buttonText;
-				std::string buttonTT;
-
-				if (aAddonData.Addon->IsLoaded())
-				{
-					buttonText = "((Disable))";
-				}
-				else
-				{
-					buttonText = "((Load))";
-				}
-
-				if (aAddonData.Addon->IsStateLocked())
-				{
-					buttonTT = "((Loading or unloading won't take effect until next game start.))";
-				}
-
-				if (cfgmgr->IsReadOnly())
-				{
-					buttonTT = "((Addon state won't be saved. Game was started with addons via start parameter.))";
-				}
-
-				if (aAddonData.Addon->SupportsLoading())
-				{
-					/* Load/Unload button */
-					if (LoadUnloadButton(aAddonData, btnWidth))
-					{
-						Config_t* config = cfgmgr->RegisterConfig(aAddonData.GetSig());
-
-						this->LoadConfirmationModal.SetTarget(config, aAddonData.GetName(), aAddonData.Addon->GetLocation());
-					}
-				}
-				else
-				{
-					float width = ImGui::CalcTextSize("Managed externally").x;
-					ImGui::Text("Managed externally");
-				}
-
-				/* Configure button */
-				if (ImGui::Button(langApi->Translate("((000105))"), ImVec2(btnWidth, 0)))
-				{
-					this->SetContent(aAddonData);
-				}
-			}
+			ImGui::SameLine();
+			ImGui::TextDisabled(aAddonData.GetVersion().c_str());
 		}
-		ImGui::EndChild();
 
-		if (!poppedActionsPad)
+		/* Author */
+		if (!aAddonData.GetAuthor().empty())
 		{
-			ImGui::PopStyleVar();
+			ImGui::TextDisabled("%s", aAddonData.GetAuthor().c_str());
 		}
+
+		/* Description */
+		if (!aAddonData.GetDesc().empty())
+		{
+			ImGui::TextWrapped(aAddonData.GetDesc().c_str());
+		}
+
+		ImGui::EndGroup();
 	}
 	ImGui::EndChild();
 
-	if (pushBorderCol)
+	if (pushedBgCol)
 	{
 		ImGui::PopStyleColor();
-		pushBorderCol = false;
+		pushedBgCol = false;
 	}
 
-	ImGui::PopStyleVar();
+	aAddonData.IsHovered = ImGui::IsItemHovered();
+	if (ImGui::IsItemClicked())
+	{
+		if (aAddonData.Addon)
+		{
+			this->SetContent(aAddonData);
+		}
+		else if (aAddonData.HasLibDef)
+		{
+			/* TODO */
+		}
+		aAddonData.IsHovered = false;
+	}
 }
 
 void CAddonsWindow::RenderContent()

@@ -30,6 +30,8 @@ struct AddonListing_t
 	std::unordered_map<std::string, InputBindPacked_t> InputBinds;
 	GUI_RENDER                                         OptionsRender;
 
+	bool                                               IsHovered;
+
 	inline uint32_t GetSig() const
 	{
 		if (this->Addon)
