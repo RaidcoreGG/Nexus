@@ -60,6 +60,7 @@
     <ClCompile Include="src\Core\Preferences\PrefContext.cpp" />
     <ClCompile Include="src\Engine\Textures\TxLoader.cpp" />
     <ClCompile Include="src\thirdparty\pugixml\pugixml.cpp" />
+    <ClCompile Include="src\UI\Controls\CtlContextMenu.cpp" />
     <ClCompile Include="src\UI\Controls\CtlModal.cpp" />
     <ClCompile Include="src\UI\Controls\CtlSubWindow.cpp" />
     <ClCompile Include="src\UI\Controls\CtlWindow.cpp" />
@@ -72,6 +73,7 @@
     <ClCompile Include="src\UI\Widgets\EULA\LicenseAgreementModal.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\About\About.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\Addons\Addons.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\Addons\CmAddon.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\Addons\LoadConfirmationModal.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\Addons\UninstallConfirmationModal.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\Binds\Binds.cpp" />
@@ -356,6 +358,7 @@
     <ClInclude Include="src\Engine\Textures\TxTexture.h" />
     <ClInclude Include="src\Engine\Textures\TxLoader.h" />
     <ClInclude Include="src\UI\Controls\Control.h" />
+    <ClInclude Include="src\UI\Controls\CtlContextMenu.h" />
     <ClInclude Include="src\UI\Controls\CtlModal.h" />
     <ClInclude Include="src\UI\Controls\CtlSubWindow.h" />
     <ClInclude Include="src\UI\Controls\CtlWindow.h" />
@@ -380,6 +383,7 @@
     <ClInclude Include="src\UI\Widgets\MainWindow\About\About.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\AddonListing.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\Addons.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\CmAddon.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\LoadConfirmationModal.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\LoadUnloadButton.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\UninstallConfirmationModal.h" />

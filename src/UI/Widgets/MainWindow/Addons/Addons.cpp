@@ -191,6 +191,10 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 
 		/* Name */
 		ImGui::Text(aAddonData.GetName().c_str());
+		if (aAddonData.Addon)
+		{
+			ImGui::TooltipGeneric(aAddonData.Addon->GetLocation().string().c_str());
+		}
 
 		/* Version */
 		if (!aAddonData.GetVersion().empty())
@@ -222,7 +226,7 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 	}
 
 	aAddonData.IsHovered = ImGui::IsItemHovered();
-	if (ImGui::IsItemClicked())
+	if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
 	{
 		if (aAddonData.Addon)
 		{
@@ -233,6 +237,10 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 			/* TODO */
 		}
 		aAddonData.IsHovered = false;
+	}
+	if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+	{
+		this->AddonContextMenu.SetContent(aAddonData);
 	}
 }
 
@@ -972,6 +980,8 @@ void CAddonsWindow::RenderSubWindows()
 	{
 		this->Invalidate();
 	}
+
+	this->AddonContextMenu.Render();
 }
 
 void CAddonsWindow::RenderInputBindsTable(const std::unordered_map<std::string, InputBindPacked_t>& aInputBinds)
