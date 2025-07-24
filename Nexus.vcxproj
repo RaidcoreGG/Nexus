@@ -384,8 +384,8 @@
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\AddonListing.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\Addons.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\CmAddon.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\CtlAddonToggle.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\LoadConfirmationModal.h" />
-    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\LoadUnloadButton.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Addons\UninstallConfirmationModal.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Binds\Binds.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\Binds\BindSetterModal.h" />

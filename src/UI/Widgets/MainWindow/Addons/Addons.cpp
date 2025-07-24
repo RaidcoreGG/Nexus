@@ -16,7 +16,7 @@
 #include "Core/Addons/Library/LibAddon.h"
 #include "Core/Context.h"
 #include "Core/Index/Index.h"
-#include "LoadUnloadButton.h"
+#include "CtlAddonToggle.h"
 #include "Resources/ResConst.h"
 #include "Util/Strings.h"
 
@@ -788,11 +788,15 @@ void CAddonsWindow::RenderDetails()
 				}
 
 				/* Load/Unload Button */
-				if (LoadUnloadButton(this->AddonData, btnWidth))
+				if (ImGui::Button(AddonToggleCtl::GetButtonText(this->AddonData.Addon).c_str()))
 				{
-					Config_t* config = cfgmgr->RegisterConfig(this->AddonData.GetSig());
+					/* Prompt if true, otherwise it already toggled now. */
+					if (AddonToggleCtl::Toggle(this->AddonData.Addon))
+					{
+						Config_t* config = this->AddonData.Addon->GetConfig();
 
-					this->LoadConfirmationModal.SetTarget(config, this->AddonData.GetName(), this->AddonData.Addon->GetLocation());
+						this->LoadConfirmationModal.SetTarget(config, this->AddonData.GetName(), this->AddonData.Addon->GetLocation());
+					}
 				}
 			}
 			else
