@@ -240,6 +240,11 @@ bool CAddon::SupportsLoading() const
 	return this->HasInterface(EAddonInterfaces::Nexus);
 }
 
+bool CAddon::SupportsUpdates() const
+{
+	throw "Not Implemented.";
+}
+
 void CAddon::ProcessActions()
 {
 	if (this->ProcessorThreadID == 0)

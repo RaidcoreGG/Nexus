@@ -166,6 +166,12 @@ class CAddon : public virtual IAddon
 	///----------------------------------------------------------------------------------------------------
 	bool SupportsLoading() const;
 
+	///----------------------------------------------------------------------------------------------------
+	/// SupportsUpdates:
+	/// 	Returns true, if the addon is updatable.
+	///----------------------------------------------------------------------------------------------------
+	bool SupportsUpdates() const;
+
 	private:
 	CLogApi*                 Logger               = nullptr;
 	CLoader*                 Loader               = nullptr;
