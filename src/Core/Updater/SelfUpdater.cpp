@@ -176,19 +176,17 @@ bool CSelfUpdater::DownloadUpdate()
 		"/RaidcoreGG/Nexus/releases/latest/download/d3d11.dll"
 	);
 
-	if (!ghresult.Success())
-	{
-		this->Logger->Warning(
-			CH_SELFUPDATER,
-			"Failed to download Nexus update from GitHub.\n\tStatus: %s\n\tError: %s",
-			ghresult.Status().empty() ? "(null)" : ghresult.Status().c_str(),
-			ghresult.Error.c_str()
-		);
-	}
-	else
+	if (ghresult.Success())
 	{
 		return true;
 	}
+
+	this->Logger->Warning(
+		CH_SELFUPDATER,
+		"Failed to download Nexus update from GitHub.\n\tStatus: %s\n\tError: %s",
+		ghresult.Status().empty() ? "(null)" : ghresult.Status().c_str(),
+		ghresult.Error.c_str()
+	);
 
 	CHttpClient* raidcoreapi = CContext::GetContext()->GetHttpClient("https://api.raidcore.gg");
 
@@ -197,19 +195,19 @@ bool CSelfUpdater::DownloadUpdate()
 		"/d3d11.dll"
 	);
 
-	if (!fbresult.Success())
+	if (fbresult.Success())
 	{
-		this->Logger->Warning(
-			CH_SELFUPDATER,
-			"Failed to download Nexus update from Fallback (Raidcore API).\n\tStatus: %s\n\tError: %s",
-			fbresult.Status().empty() ? "(null)" : fbresult.Status().c_str(),
-			fbresult.Error.c_str()
-		);
-
-		return false;
+		return true;
 	}
 
-	return true;
+	this->Logger->Warning(
+		CH_SELFUPDATER,
+		"Failed to download Nexus update from fallback. (Raidcore API)\n\tStatus: %s\n\tError: %s",
+		fbresult.Status().empty() ? "(null)" : fbresult.Status().c_str(),
+		fbresult.Error.c_str()
+	);
+
+	return false;
 }
 
 void CSelfUpdater::Run()
