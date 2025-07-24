@@ -150,21 +150,8 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 
 	ImDrawList* dl = ImGui::GetWindowDrawList();
 
-	bool pushedBgCol = false;
-
-	if (aAddonData.IsHovered)
-	{
-		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::GetStyleColorVec4(ImGuiCol_ButtonHovered));
-		pushedBgCol = true;
-	}
 	if (ImGui::BeginChild(("Addon_" + id).c_str(), itemSz, true))
 	{
-		if (pushedBgCol)
-		{
-			ImGui::PopStyleColor();
-			pushedBgCol = false;
-		}
-
 		ImGuiWindow* wnd = ImGui::GetCurrentWindow();
 		ImColor col = ImColor(85, 85, 85, 255);
 
@@ -209,35 +196,61 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 			ImGui::TextDisabled("%s", aAddonData.GetAuthor().c_str());
 		}
 
-		/* Description */
-		if (!aAddonData.GetDesc().empty())
+		if (aAddonData.Addon)
 		{
-			ImGui::TextWrapped(aAddonData.GetDesc().c_str());
+			if (ImGui::Button(AddonToggleCtl::GetButtonText(aAddonData.Addon).c_str(), ImVec2(btnWidth, 0)))
+			{
+				/* Prompt if true, otherwise it already toggled now. */
+				if (AddonToggleCtl::Toggle(aAddonData.Addon))
+				{
+					Config_t* config = aAddonData.Addon->GetConfig();
+
+					this->LoadConfirmationModal.SetTarget(config, aAddonData.GetName(), aAddonData.Addon->GetLocation());
+				}
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("((Configure))", ImVec2(btnWidth, 0)))
+			{
+				this->SetContent(aAddonData);
+			}
+		}
+		else if (aAddonData.HasLibDef)
+		{
+			if (aAddonData.IsHovered)
+			{
+				if (ImGui::Button("((Install))", ImVec2(btnWidth, 0)))
+				{
+					
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Button("((GitHub))", ImVec2(btnWidth, 0)))
+				{
+					
+				}
+			}
+			else
+			{
+				/* Description */
+				if (!aAddonData.GetDesc().empty())
+				{
+					ImGui::TextWrapped(aAddonData.GetDesc().c_str());
+				}
+			}
+		}
+		else
+		{
+			throw "Unreachable code.";
 		}
 
 		ImGui::EndGroup();
 	}
 	ImGui::EndChild();
 
-	if (pushedBgCol)
-	{
-		ImGui::PopStyleColor();
-		pushedBgCol = false;
-	}
-
 	aAddonData.IsHovered = ImGui::IsItemHovered();
-	if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
-	{
-		if (aAddonData.Addon)
-		{
-			this->SetContent(aAddonData);
-		}
-		else if (aAddonData.HasLibDef)
-		{
-			/* TODO */
-		}
-		aAddonData.IsHovered = false;
-	}
 	if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
 	{
 		this->AddonContextMenu.SetContent(aAddonData);

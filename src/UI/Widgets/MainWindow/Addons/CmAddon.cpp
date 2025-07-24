@@ -18,18 +18,6 @@ void CAddonContextMenu::RenderContent()
 	{
 		if (this->Data->Addon->SupportsLoading())
 		{
-			if (ImGui::Selectable(AddonToggleCtl::GetButtonText(this->Data->Addon).c_str()))
-			{
-				/* Prompt if true, otherwise it already toggled now. */
-				if (AddonToggleCtl::Toggle(this->Data->Addon))
-				{
-					Config_t* config = this->Data->Addon->GetConfig();
-
-					// TODO: This is a parent object.
-					//this->LoadConfirmationModal.SetTarget(config, this->Data->GetName(), this->Data->Addon->GetLocation());
-				}
-			}
-
 			if (!this->Data->Addon->IsVersionDisabled())
 			{
 				if (ImGui::Selectable("((Disable until Update))"))
@@ -58,7 +46,8 @@ void CAddonContextMenu::RenderContent()
 
 		if (ImGui::Selectable("((Uninstall))"))
 		{
-			this->Data->Addon->Uninstall();
+			// TODO: This is a parent object.
+			//this->UninstallConfirmationModal.SetTarget(config, this->Data->GetName(), this->Data->Addon->GetLocation());
 		}
 	}
 }
