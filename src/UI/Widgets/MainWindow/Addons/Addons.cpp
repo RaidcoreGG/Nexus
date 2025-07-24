@@ -198,22 +198,25 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 
 		if (aAddonData.Addon)
 		{
-			if (ImGui::Button(AddonToggleCtl::GetButtonText(aAddonData.Addon).c_str(), ImVec2(btnWidth, 0)))
+			if (aAddonData.Addon->SupportsLoading())
 			{
-				/* Prompt if true, otherwise it already toggled now. */
-				if (AddonToggleCtl::Toggle(aAddonData.Addon))
+				if (ImGui::Button(AddonToggleCtl::GetButtonText(aAddonData.Addon).c_str(), ImVec2(btnWidth, 0)))
 				{
-					Config_t* config = aAddonData.Addon->GetConfig();
+					/* Prompt if true, otherwise it already toggled now. */
+					if (AddonToggleCtl::Toggle(aAddonData.Addon))
+					{
+						Config_t* config = aAddonData.Addon->GetConfig();
 
-					this->LoadConfirmationModal.SetTarget(config, aAddonData.GetName(), aAddonData.Addon->GetLocation());
+						this->LoadConfirmationModal.SetTarget(config, aAddonData.GetName(), aAddonData.Addon->GetLocation());
+					}
 				}
-			}
 
-			ImGui::SameLine();
+				ImGui::SameLine();
 
-			if (ImGui::Button("((Configure))", ImVec2(btnWidth, 0)))
-			{
-				this->SetContent(aAddonData);
+				if (ImGui::Button("((Configure))", ImVec2(btnWidth, 0)))
+				{
+					this->SetContent(aAddonData);
+				}
 			}
 		}
 		else if (aAddonData.HasLibDef)

@@ -55,6 +55,8 @@ namespace AddonToggleCtl
 	///----------------------------------------------------------------------------------------------------
 	inline bool Toggle(CAddon* aAddon)
 	{
+		assert(aAddon->SupportsLoading());
+
 		bool result = false;
 
 		CContext*   ctx    = CContext::GetContext();
