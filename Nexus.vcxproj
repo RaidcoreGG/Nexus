@@ -18,6 +18,7 @@
     <ClCompile Include="src\Core\Context.cpp" />
     <ClCompile Include="src\Core\Hooks\Hooks.cpp" />
     <ClCompile Include="src\Core\Updater\SelfUpdater.cpp" />
+    <ClCompile Include="src\Engine\Cleanup\RefCleanerContext.cpp" />
     <ClCompile Include="src\Engine\Functions\FnRegistry.cpp" />
     <ClCompile Include="src\Core\Index\Index.cpp" />
     <ClCompile Include="src\Engine\Loader\LdrAddonBase.cpp" />
@@ -121,6 +122,7 @@
     <ClInclude Include="src\Core\Versioning\VerEnum.h" />
     <ClInclude Include="src\Core\Versioning\VerU48_3XS16.h" />
     <ClInclude Include="src\Core\Versioning\VerU64_4XS16.h" />
+    <ClInclude Include="src\Engine\Cleanup\RefCleanerContext.h" />
     <ClInclude Include="src\Engine\Events\EvtData.h" />
     <ClInclude Include="src\Engine\Functions\FnEntry.h" />
     <ClInclude Include="src\Engine\Functions\FnRegistry.h" />
@@ -138,6 +140,8 @@
     <ClInclude Include="src\Engine\Loader\Loader.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreCache.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreConst.h" />
+    <ClInclude Include="src\Engine\Verifier.h" />
+    <ClInclude Include="src\Engine\Cleanup\RefCleanerBase.h" />
     <ClInclude Include="src\GW2\ArcDPS\ArcApi.h" />
     <ClInclude Include="src\GW2\ArcDPS\ArcEnum.h" />
     <ClInclude Include="src\GW2\ArcDPS\ArcExtensionDef.h" />

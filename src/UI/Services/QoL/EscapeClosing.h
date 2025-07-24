@@ -12,12 +12,14 @@
 #include <mutex>
 #include <string>
 #include <unordered_map>
-#include <Windows.h>
+#include <windows.h>
+
+#include "Engine/Cleanup/RefCleanerBase.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// CEscapeClosing Class
 ///----------------------------------------------------------------------------------------------------
-class CEscapeClosing
+class CEscapeClosing : public virtual IRefCleaner
 {
 	public:
 	bool Enabled = true;
@@ -57,10 +59,10 @@ class CEscapeClosing
 	void Deregister(bool* aIsVisible);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Verify:
+	/// CleanupRefs:
 	/// 	Removes all registered close-on-escape hooks that match the address space.
 	///----------------------------------------------------------------------------------------------------
-	int Verify(void* aStartAddress, void* aEndAddress);
+	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	private:
 	std::mutex								Mutex;

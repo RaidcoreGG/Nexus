@@ -15,6 +15,7 @@
 #include "Core/Addons/API/ApiBuilder.h"
 #include "Core/Context.h"
 #include "Core/Index/Index.h"
+#include "Engine/Cleanup/RefCleanerContext.h"
 #include "GW2/Build/BuildInfo.h"
 #include "Util/DLL.h"
 #include "Util/MD5.h"
@@ -527,6 +528,13 @@ void CAddon::UnloadInternal()
 	else
 	{
 		strUnloadInfo = "No unload routine defined.";
+	}
+
+	std::string refcleanup = CRefCleanerContext::Get()->CleanupRefs(this->Module, (PBYTE)this->Module + this->ModuleSize);
+
+	if (!refcleanup.empty())
+	{
+		this->Logger->Warning(CH_ADDON, "(%s) %s", this->Location.string().c_str(), refcleanup.c_str());
 	}
 
 	if ((this->Flags & EAddonFlags::Destroying) != EAddonFlags::Destroying)

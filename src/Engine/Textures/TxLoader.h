@@ -15,6 +15,7 @@
 #include <string>
 #include <Windows.h>
 
+#include "Engine/Cleanup/RefCleanerBase.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Renderer/RdrContext.h"
 #include "TxFuncDefs.h"
@@ -26,7 +27,7 @@ constexpr const char* CH_TEXTURES = "Textures";
 ///----------------------------------------------------------------------------------------------------
 /// CTextureLoader Class
 ///----------------------------------------------------------------------------------------------------
-class CTextureLoader
+class CTextureLoader : public virtual IRefCleaner
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -112,10 +113,10 @@ class CTextureLoader
 	std::map<std::string, QueuedTexture_t> GetQueuedTextures() const;
 
 	///----------------------------------------------------------------------------------------------------
-	/// Verify:
+	/// CleanupRefs:
 	/// 	Removes all TextureReceiver Callbacks that are within the provided address space.
 	///----------------------------------------------------------------------------------------------------
-	int Verify(void* aStartAddress, void* aEndAddress);
+	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	private:
 	CLogApi*                               Logger        = nullptr;

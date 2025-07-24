@@ -10,11 +10,15 @@
 
 #include <assert.h>
 
+#include "Engine/Cleanup/RefCleanerContext.h"
+
 CRawInputApi::CRawInputApi(RenderContext_t* aRenderCtx)
 {
 	assert(aRenderCtx);
 
 	this->RenderContext = aRenderCtx;
+
+	CRefCleanerContext::Get()->Register("CRawInputApi", this);
 }
 
 UINT CRawInputApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -69,7 +73,7 @@ void CRawInputApi::Deregister(WNDPROC_CALLBACK aWndProcCallback)
 	this->Registry.erase(std::remove(this->Registry.begin(), this->Registry.end(), aWndProcCallback), this->Registry.end());
 }
 
-int CRawInputApi::Verify(void* aStartAddress, void* aEndAddress)
+int CRawInputApi::CleanupRefs(void* aStartAddress, void* aEndAddress)
 {
 	int refCounter = 0;
 

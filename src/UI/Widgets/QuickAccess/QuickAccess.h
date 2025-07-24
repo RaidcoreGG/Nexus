@@ -16,6 +16,7 @@
 #include "imgui/imgui.h"
 
 #include "Core/NexusLink.h"
+#include "Engine/Cleanup/RefCleanerBase.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Logging/LogApi.h"
@@ -34,7 +35,7 @@ constexpr const char* QA_ARCDPS      = "QA_ARCDPS";
 ///----------------------------------------------------------------------------------------------------
 /// CQuickAccess Class
 ///----------------------------------------------------------------------------------------------------
-class CQuickAccess : public virtual IWindow
+class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -127,10 +128,10 @@ class CQuickAccess : public virtual IWindow
 	std::map<std::string, ContextItem_t> GetOrphanage() const;
 
 	///----------------------------------------------------------------------------------------------------
-	/// Verify:
+	/// CleanupRefs:
 	/// 	Removes all shortcuts and context items matching the address space.
 	///----------------------------------------------------------------------------------------------------
-	int Verify(void* aStartAddress, void* aEndAddress);
+	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Validate:

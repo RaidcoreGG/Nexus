@@ -19,6 +19,7 @@
 #include "Core/Context.h"
 #include "Core/Preferences/PrefConst.h"
 #include "Core/Preferences/PrefContext.h"
+#include "Engine/Cleanup/RefCleanerContext.h"
 #include "Engine/Inputs/InputBinds/IbConst.h"
 #include "Resources/ResConst.h"
 #include "UI/UIContext.h"
@@ -49,14 +50,16 @@ CQuickAccess::CQuickAccess(CDataLinkApi* aDataLink, CLogApi* aLogger, CInputBind
 	CContext* ctx = CContext::GetContext();
 	CSettings* settingsCtx = ctx->GetSettingsCtx();
 
-	this->VerticalLayout = settingsCtx->Get<bool>(OPT_QAVERTICAL, false);
+	this->VerticalLayout     = settingsCtx->Get<bool>(OPT_QAVERTICAL, false);
 	this->ShowArcDPSShortcut = settingsCtx->Get<bool>(OPT_QASHOWARCDPS, true);
-	this->Location = settingsCtx->Get<EQaPosition>(OPT_QALOCATION, EQaPosition::Extend);
-	this->Offset.x = settingsCtx->Get<float>(OPT_QAOFFSETX, 0.0f);
-	this->Offset.y = settingsCtx->Get<float>(OPT_QAOFFSETY, 0.0f);
-	this->Visibility = settingsCtx->Get<EQaVisibility>(OPT_QAVISIBILITY, EQaVisibility::AlwaysShow);
+	this->Location           = settingsCtx->Get<EQaPosition>(OPT_QALOCATION, EQaPosition::Extend);
+	this->Offset.x           = settingsCtx->Get<float>(OPT_QAOFFSETX, 0.0f);
+	this->Offset.y           = settingsCtx->Get<float>(OPT_QAOFFSETY, 0.0f);
+	this->Visibility         = settingsCtx->Get<EQaVisibility>(OPT_QAVISIBILITY, EQaVisibility::AlwaysShow);
 
 	this->EventApi->Subscribe(EV_ADDON_LOADED, CQuickAccess::OnAddonLoaded);
+
+	CRefCleanerContext::Get()->Register("CQuickAccess", this);
 }
 
 CQuickAccess::~CQuickAccess()
@@ -572,7 +575,7 @@ std::map<std::string, ContextItem_t> CQuickAccess::GetOrphanage() const
 	return this->OrphanedCallbacks;
 }
 
-int CQuickAccess::Verify(void* aStartAddress, void* aEndAddress)
+int CQuickAccess::CleanupRefs(void* aStartAddress, void* aEndAddress)
 {
 	int refCounter = 0;
 

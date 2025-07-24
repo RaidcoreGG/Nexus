@@ -15,6 +15,7 @@
 #include <string>
 #include <windows.h>
 
+#include "Engine/Cleanup/RefCleanerBase.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Logging/LogApi.h"
 #include "IbBindV2.h"
@@ -27,7 +28,7 @@ constexpr const char* CH_INPUTBINDS = "InputBinds";
 ///----------------------------------------------------------------------------------------------------
 /// CInputBindApi Class
 ///----------------------------------------------------------------------------------------------------
-class CInputBindApi : public CInputBindCapture
+class CInputBindApi : public CInputBindCapture, public virtual IRefCleaner
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -106,10 +107,10 @@ class CInputBindApi : public CInputBindCapture
 	void Delete(std::string aIdentifier);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Verify:
+	/// CleanupRefs:
 	/// 	Removes all InputBindHandlers that are within the provided address space.
 	///----------------------------------------------------------------------------------------------------
-	int Verify(void* aStartAddress, void* aEndAddress);
+	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetRegistry:

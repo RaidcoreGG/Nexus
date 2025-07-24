@@ -19,6 +19,7 @@ using json = nlohmann::json;
 #include "Util/Strings.h"
 #include "Util/Inputs.h"
 #include "IbConst.h"
+#include "Engine/Cleanup/RefCleanerContext.h"
 
 CInputBindApi::CInputBindApi(CEventApi* aEventApi, CLogApi* aLogger, std::filesystem::path aConfigPath)
 {
@@ -31,6 +32,8 @@ CInputBindApi::CInputBindApi(CEventApi* aEventApi, CLogApi* aLogger, std::filesy
 	this->ConfigPath = aConfigPath;
 
 	this->Load();
+
+	CRefCleanerContext::Get()->Register("CInputBindApi", this);
 }
 
 UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -444,7 +447,7 @@ void CInputBindApi::Delete(std::string aIdentifier)
 	}).detach();
 }
 
-int CInputBindApi::Verify(void* aStartAddress, void* aEndAddress)
+int CInputBindApi::CleanupRefs(void* aStartAddress, void* aEndAddress)
 {
 	int refCounter = 0;
 

@@ -6,7 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "Engine/Textures/TxLoader.h"
+#include "TxLoader.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
@@ -15,6 +15,7 @@
 #include <d3d11.h>
 #include <filesystem>
 
+#include "Engine/Cleanup/RefCleanerContext.h"
 #include "Util/Time.h"
 
 CTextureLoader::CTextureLoader(CLogApi* aLogger, RenderContext_t* aRenderCtx, std::filesystem::path aOverridesDirectory)
@@ -26,6 +27,8 @@ CTextureLoader::CTextureLoader(CLogApi* aLogger, RenderContext_t* aRenderCtx, st
 	this->RenderContext = aRenderCtx;
 
 	this->OverridesDirectory = aOverridesDirectory;
+
+	CRefCleanerContext::Get()->Register("CTextureLoader", this);
 }
 
 CTextureLoader::~CTextureLoader()
@@ -351,7 +354,7 @@ std::map<std::string, QueuedTexture_t> CTextureLoader::GetQueuedTextures() const
 	return this->QueuedTextures;
 }
 
-int CTextureLoader::Verify(void* aStartAddress, void* aEndAddress)
+int CTextureLoader::CleanupRefs(void* aStartAddress, void* aEndAddress)
 {
 	int refCounter = 0;
 

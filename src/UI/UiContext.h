@@ -15,6 +15,7 @@
 #include <Windows.h>
 
 #include "DisplayBinds.h"
+#include "Engine/Cleanup/RefCleanerBase.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
@@ -116,7 +117,7 @@ namespace UIRoot
 ///----------------------------------------------------------------------------------------------------
 /// CUiContext Class
 ///----------------------------------------------------------------------------------------------------
-class CUiContext
+class CUiContext : public virtual IRefCleaner
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -180,10 +181,10 @@ class CUiContext
 	void Deregister(GUI_RENDER aRenderCallback);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Verify:
+	/// CleanupRefs:
 	/// 	Removes all registered render callbacks and close-on-escape hooks that match the address space.
 	///----------------------------------------------------------------------------------------------------
-	int Verify(void* aStartAddress, void* aEndAddress);
+	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// OnInputBind:

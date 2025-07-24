@@ -11,9 +11,10 @@
 #include "imgui/imgui_internal.h"
 
 #include "Core/Context.h"
-#include "Core/Preferences/PrefContext.h"
-#include "Util/Inputs.h"
 #include "Core/Preferences/PrefConst.h"
+#include "Core/Preferences/PrefContext.h"
+#include "Engine/Cleanup/RefCleanerContext.h"
+#include "Util/Inputs.h"
 
 CEscapeClosing::CEscapeClosing()
 {
@@ -21,6 +22,8 @@ CEscapeClosing::CEscapeClosing()
 	CSettings* settingsCtx = ctx->GetSettingsCtx();
 
 	this->Enabled = settingsCtx->Get<bool>(OPT_CLOSEESCAPE, true);
+
+	CRefCleanerContext::Get()->Register("CEscapeClosing", this);
 }
 
 UINT CEscapeClosing::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -81,7 +84,7 @@ void CEscapeClosing::Deregister(bool* aIsVisible)
 	}
 }
 
-int CEscapeClosing::Verify(void* aStartAddress, void* aEndAddress)
+int CEscapeClosing::CleanupRefs(void* aStartAddress, void* aEndAddress)
 {
 	int refCounter = 0;
 

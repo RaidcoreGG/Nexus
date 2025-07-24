@@ -8,11 +8,14 @@
 
 #include "EvtApi.h"
 
+#include "Engine/Cleanup/RefCleanerContext.h"
 #include "EvtSubscriber.h"
 
 CEventApi::CEventApi(CLoader* aLoader)
 {
 	this->Loader = aLoader;
+
+	CRefCleanerContext::Get()->Register("CEventApi", this);
 }
 
 void CEventApi::Raise(const char* aIdentifier, void* aEventData)
@@ -117,7 +120,7 @@ void CEventApi::Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEvent
 	);
 }
 
-int CEventApi::Verify(void* aStartAddress, void* aEndAddress)
+int CEventApi::CleanupRefs(void* aStartAddress, void* aEndAddress)
 {
 	int refCounter = 0;
 

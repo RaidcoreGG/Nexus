@@ -23,6 +23,7 @@
 #include "Core/Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
 #include "Core/Preferences/PrefContext.h"
+#include "Engine/Cleanup/RefCleanerContext.h"
 #include "Engine/Inputs/InputBinds/IbConst.h"
 #include "GW2/Inputs/GameBinds/GbConst.h"
 #include "GW2/Mumble/MblConst.h"
@@ -303,6 +304,8 @@ CUiContext::CUiContext(RenderContext_t* aRenderContext, CLogApi* aLogger, CTextu
 	this->LoadSettings();
 	this->CreateNexusShortcut();
 	this->LoadFonts();
+
+	CRefCleanerContext::Get()->Register("CUiContext", this);
 }
 
 CUiContext::~CUiContext()
@@ -622,7 +625,7 @@ void CUiContext::Deregister(GUI_RENDER aRenderCallback)
 	this->RegistryOptionsRender.erase(std::remove(this->RegistryOptionsRender.begin(), this->RegistryOptionsRender.end(), aRenderCallback), this->RegistryOptionsRender.end());
 }
 
-int CUiContext::Verify(void* aStartAddress, void* aEndAddress)
+int CUiContext::CleanupRefs(void* aStartAddress, void* aEndAddress)
 {
 	int refCounter = 0;
 

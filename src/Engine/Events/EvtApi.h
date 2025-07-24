@@ -13,16 +13,17 @@
 #include <string>
 #include <unordered_map>
 
+#include "Engine/Cleanup/RefCleanerBase.h"
+#include "Engine/Loader/Loader.h"
 #include "EvtData.h"
 #include "EvtFuncDefs.h"
-#include "Engine/Loader/Loader.h"
 
 constexpr const char* CH_EVENTS = "Events";
 
 ///----------------------------------------------------------------------------------------------------
 /// CEventApi Class
 ///----------------------------------------------------------------------------------------------------
-class CEventApi
+class CEventApi : public virtual IRefCleaner
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -55,10 +56,10 @@ class CEventApi
 	void Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Verify:
+	/// CleanupRefs:
 	/// 	Removes any elements within the provided address space from the Registry.
 	///----------------------------------------------------------------------------------------------------
-	int Verify(void* aStartAddress, void* aEndAddress);
+	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetRegistry:
