@@ -144,6 +144,7 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 	static CContext*       ctx      = CContext::GetContext();
 	static CUiContext*     uictx    = ctx->GetUIContext();
 	static CConfigMgr*     cfgmgr   = ctx->GetCfgMgr();
+	static CLibraryMgr*    libmgr   = ctx->GetAddonLibrary();
 	static CTextureLoader* texapi   = ctx->GetTextureService();
 	static CLocalization*  langApi  = uictx->GetLocalization();
 	static CAlerts*        alertctx = uictx->GetAlerts();
@@ -200,6 +201,7 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 		{
 			if (aAddonData.Addon->SupportsLoading())
 			{
+				/* Toggle Load */
 				if (ImGui::Button(AddonToggleCtl::GetButtonText(aAddonData.Addon).c_str(), ImVec2(btnWidth, 0)))
 				{
 					/* Prompt if true, otherwise it already toggled now. */
@@ -213,7 +215,8 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 
 				ImGui::SameLine();
 
-				if (ImGui::Button("((Configure))", ImVec2(btnWidth, 0)))
+				/* Configure */
+				if (ImGui::Button(langApi->Translate("((000105))"), ImVec2(btnWidth, 0)))
 				{
 					this->SetContent(aAddonData);
 				}
@@ -223,16 +226,18 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 		{
 			if (aAddonData.IsHovered)
 			{
-				if (ImGui::Button("((Install))", ImVec2(btnWidth, 0)))
+				/* Install */
+				if (ImGui::Button(langApi->Translate("((000028))"), ImVec2(btnWidth, 0)))
 				{
-					
+					libmgr->Install(aAddonData.GetSig());
 				}
 
 				ImGui::SameLine();
 
+				/* GitHub */
 				if (ImGui::Button("((GitHub))", ImVec2(btnWidth, 0)))
 				{
-					
+
 				}
 			}
 			else

@@ -171,19 +171,41 @@ bool CSelfUpdater::DownloadUpdate()
 {
 	CHttpClient githubclient = CHttpClient(this->Logger, "https://github.com");
 
-	HttpResponse_t result = githubclient.Download(
+	HttpResponse_t ghresult = githubclient.Download(
 		Index(EPath::NexusDLL_Update),
 		"/RaidcoreGG/Nexus/releases/latest/download/d3d11.dll"
 	);
 
-	if (!result.Success())
+	if (!ghresult.Success())
 	{
 		this->Logger->Warning(
 			CH_SELFUPDATER,
 			"Failed to download Nexus update from GitHub.\n\tStatus: %s\n\tError: %s",
-			result.Status(),
-			result.Error.c_str()
+			ghresult.Status().empty() ? "(null)" : ghresult.Status().c_str(),
+			ghresult.Error.c_str()
 		);
+	}
+	else
+	{
+		return true;
+	}
+
+	CHttpClient* raidcoreapi = CContext::GetContext()->GetHttpClient("https://api.raidcore.gg");
+
+	HttpResponse_t fbresult = raidcoreapi->Download(
+		Index(EPath::NexusDLL_Update),
+		"/d3d11.dll"
+	);
+
+	if (!fbresult.Success())
+	{
+		this->Logger->Warning(
+			CH_SELFUPDATER,
+			"Failed to download Nexus update from Fallback (Raidcore API).\n\tStatus: %s\n\tError: %s",
+			fbresult.Status().empty() ? "(null)" : fbresult.Status().c_str(),
+			fbresult.Error.c_str()
+		);
+
 		return false;
 	}
 
@@ -250,6 +272,23 @@ void CSelfUpdater::Run()
 				Index(EPath::NexusDLL_Update).string().c_str(),
 				Index(EPath::NexusDLL).string().c_str()
 			);
+
+			/* Try reverting .dll.old to .dll. */
+			try
+			{
+				std::filesystem::rename(Index(EPath::NexusDLL_Old), Index(EPath::NexusDLL));
+			}
+			catch (std::filesystem::filesystem_error fErr)
+			{
+				this->Logger->Warning(
+					CH_SELFUPDATER,
+					"Nexus update failed: Couldn't move \"%s\" to \"%s\".",
+					Index(EPath::NexusDLL_Old).string().c_str(),
+					Index(EPath::NexusDLL).string().c_str()
+				);
+				return;
+			}
+
 			return;
 		}
 
