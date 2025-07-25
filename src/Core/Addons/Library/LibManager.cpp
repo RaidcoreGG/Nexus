@@ -45,7 +45,7 @@ void CLibraryMgr::Update()
 				CH_LIBRARY,
 				"Failed to fetch addon library from \"%s\".\n\tStatus: %s\n\tError: %s",
 				url.c_str(),
-				result.Status(),
+				result.Status().c_str(),
 				result.Error.c_str()
 			);
 			continue;
@@ -135,7 +135,7 @@ void CLibraryMgr::Install(uint32_t aSignature)
 				CH_LIBRARY,
 				"Failed to resolve addon download URL for \"%s\".\n\tStatus: %s\n\tError: %s",
 				downloadUrl.c_str(),
-				result.Status(),
+				result.Status().c_str(),
 				result.Error.c_str()
 			);
 			return;
@@ -214,7 +214,7 @@ void CLibraryMgr::Install(uint32_t aSignature)
 			CH_LIBRARY,
 			"Failed to download addon from \"%s\".\n\tStatus: %s\n\tError: %s",
 			downloadUrl.c_str(),
-			result.Status().empty() ? "(null)" : result.Status().c_str(),
+			result.Status().c_str(),
 			result.Error.c_str()
 		);
 		return;
