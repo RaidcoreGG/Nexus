@@ -321,8 +321,13 @@ void CLoader::ProcessChanges()
 			/* If the MD5 has changed, reload the addon. */
 			if (md5 != addon->GetMD5())
 			{
-				addon->Unload();
+				if (addon->IsLoaded())
+				{
+					addon->Unload();
+				}
+
 				addon->Load();
+				
 				continue;
 			}
 		}
