@@ -107,8 +107,8 @@ CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogHandler* aLogger, C
 	this->EventApi = aEventApi;
 	this->Language = aLocalization;
 
-	this->Load(Index::F_GAMEBINDS);
 	this->AddDefaultBinds();
+	this->Load(Index::F_GAMEBINDS);
 
 	this->EventApi->Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
 }
