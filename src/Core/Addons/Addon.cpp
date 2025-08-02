@@ -355,6 +355,9 @@ void CAddon::LoadInternal()
 		this->EnumInterfaces();
 	}
 
+	/* Update MD5. */
+	this->MD5 = md5;
+
 	HMODULE module = LoadLibraryA(this->Location.string().c_str());
 
 	if (!module)
