@@ -92,6 +92,7 @@ void CUpdater::UpdateNexus()
 		httplib::Client downloadClient(downloadBaseUrl);
 		downloadClient.enable_server_certificate_verification(true);
 		downloadClient.set_follow_location(true);
+		downloadClient.set_url_encode(false); // https://github.com/yhirose/cpp-httplib/pull/2184
 		size_t bytesWritten = 0;
 		std::ofstream file(Index(EPath::NexusDLL_Update), std::ofstream::binary);
 		auto downloadResult = downloadClient.Get(endpointDownload,
@@ -496,6 +497,7 @@ bool CUpdater::UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& a
 	httplib::Client downloadClient(downloadBaseUrl);
 	downloadClient.enable_server_certificate_verification(true);
 	downloadClient.set_follow_location(true);
+	downloadClient.set_url_encode(false); // https://github.com/yhirose/cpp-httplib/pull/2184
 
 	size_t bytesWritten = 0;
 	std::ofstream file(aDownloadPath, std::ofstream::binary);
