@@ -442,7 +442,14 @@ bool CUpdater::UpdateGitHub(std::filesystem::path& aDownloadPath, std::string& a
 
 	if (response.is_null() || !requestResult.Success())
 	{
-		this->Logger->Warning(CH_UPDATER, "Error parsing API response.");
+		this->Logger->Warning(
+			CH_UPDATER,
+			"Error fetching %s\nStatus: %s\nResponse: %s",
+			aEndpoint.c_str(),
+			requestResult.Status().c_str(),
+			requestResult.Content.empty() ? "null" : requestResult.Content.c_str()
+		);
+
 		return false;
 	}
 
