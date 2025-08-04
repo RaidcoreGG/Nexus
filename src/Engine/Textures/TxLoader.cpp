@@ -28,17 +28,24 @@ CTextureLoader::CTextureLoader(CLogApi* aLogger, RenderContext_t* aRenderCtx, st
 
 	this->OverridesDirectory = aOverridesDirectory;
 
-	this->DownloadThread = std::thread(&CTextureLoader::ProcessDownloads, this);
+	/* 8 Worker threads. This is disgusting. May I interest you in a threadpool? */
+	for (size_t i = 0; i < 8; i++)
+	{
+		this->DownloadThreads.push_back(std::thread(&CTextureLoader::ProcessDownloads, this));
+	}
 }
 
 CTextureLoader::~CTextureLoader()
 {
 	this->IsRunning = false;
-	this->ConVar.notify_one();
+	this->ConVar.notify_all();
 
-	if (this->DownloadThread.joinable())
+	for (size_t i = 0; i < 8; i++)
 	{
-		this->DownloadThread.join();
+		if (this->DownloadThreads[i].joinable())
+		{
+			this->DownloadThreads[i].join();
+		}
 	}
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
@@ -73,7 +80,8 @@ void CTextureLoader::Advance()
 				if (now - it->second.Time > 60000)
 				{
 					this->Logger->Debug(CH_TEXTURES, "Dropped texture with ID \"%s\" from queue after %dms at stage %d.", it->first.c_str(), now - it->second.Time, it->second.Stage);
-					it = this->QueuedTextures.erase(it);
+					it->second.Stage = ETextureStage::INVALID;
+					++it;
 				}
 				else
 				{
@@ -96,7 +104,8 @@ void CTextureLoader::Advance()
 					it->second.Data = nullptr;
 				}
 
-				if (it->second.Callback)
+				/* Only dispatch invalid textures. Created (Done) already were dispatched. */
+				if (it->second.Stage == ETextureStage::INVALID && it->second.Callback)
 				{
 					this->DispatchTexture(it->first, nullptr, it->second.Callback);
 				}
@@ -635,8 +644,34 @@ void CTextureLoader::ProcessDownloads()
 
 		for (auto& [id, qtex] : queueCpy)
 		{
-			/* Process only empty download textures. */
-			if (qtex.Stage == ETextureStage::Prepare && !qtex.DownloadURL.empty() && qtex.Data == nullptr)
+			std::string downloadUrl = "";
+
+			/* Scope and lock, to verify we're processing this texture on this thread. */
+			{
+				const std::lock_guard<std::mutex> lock(this->Mutex);
+				auto it = this->QueuedTextures.find(id);
+
+				if (it == this->QueuedTextures.end())
+				{
+					/* Already gone again :( */
+					continue;
+				}
+				else if (it->second.DownloadURL.empty())
+				{
+					continue;
+				}
+				else if (it->second.Stage == ETextureStage::Prepare && !it->second.DownloadURL.empty())
+				{
+					std::swap(downloadUrl, it->second.DownloadURL);
+				}
+				else
+				{
+					continue;
+				}
+			}
+
+			/* If we swapped a download URL, download it. */
+			if (!downloadUrl.empty())
 			{
 				std::string remote = URL::GetBase(qtex.DownloadURL);
 				std::string endpoint = URL::GetEndpoint(qtex.DownloadURL);

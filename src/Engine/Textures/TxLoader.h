@@ -15,7 +15,8 @@
 #include <mutex>
 #include <string>
 #include <thread>
-#include <Windows.h>
+#include <vector>
+#include <windows.h>
 
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Renderer/RdrContext.h"
@@ -131,7 +132,7 @@ class CTextureLoader
 
 	std::condition_variable                ConVar;
 	bool                                   IsRunning = true;
-	std::thread                            DownloadThread;
+	std::vector<std::thread>               DownloadThreads;
 
 	///----------------------------------------------------------------------------------------------------
 	/// ProcessRequest:
