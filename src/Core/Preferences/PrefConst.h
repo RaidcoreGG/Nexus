@@ -30,5 +30,7 @@ constexpr const char* OPT_DISABLEFESTIVEFLAIR      = "DisableFestiveFlair";
 constexpr const char* OPT_DPISCALING               = "DPIScaling";
 constexpr const char* OPT_CAMCTRL_LOCKCURSOR       = "CameraControl_LockCursor";
 constexpr const char* OPT_CAMCTRL_RESETCURSOR      = "CameraControl_ResetCursor";
+constexpr const char* OPT_UI_CLICK_MODSONLY        = "UI_ClickingRequiresModifiers";
+constexpr const char* OPT_UI_MODS                  = "UI_Modifiers";
 
 #endif
