@@ -26,12 +26,18 @@ struct MD5_t
 
 	inline MD5_t(const std::vector<uint8_t>& aVector)
 	{
-		if (aVector.size() != 16)
+		if (aVector.size() == 16)
+		{
+			memcpy(this->Data, aVector.data(), 16);
+		}
+		else if (aVector.size() == 0)
+		{
+			memset(this->Data, 0, sizeof(this->Data));
+		}
+		else
 		{
 			throw std::invalid_argument("MD5_t requires a vector of exactly 16 bytes.");
 		}
-
-		memcpy(Data, aVector.data(), 16);
 	}
 
 	inline bool operator==(const MD5_t& other) const
