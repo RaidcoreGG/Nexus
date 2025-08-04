@@ -127,7 +127,7 @@ namespace Hooks
 			// don't pass to game if InputBind
 			if (s_InputBindApi->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
-			if (uMsg == WM_DESTROY || uMsg == WM_QUIT || uMsg == WM_CLOSE)
+			if (uMsg == WM_DESTROY)
 			{
 				Main::Shutdown(uMsg);
 			}
