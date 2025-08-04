@@ -107,8 +107,8 @@ CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogApi* aLogger, CEven
 
 	this->ConfigPath = aConfigPath;
 
-	this->Load(this->ConfigPath);
 	this->AddDefaultBinds();
+	this->Load(this->ConfigPath);
 
 	this->EventApi->Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
 }
