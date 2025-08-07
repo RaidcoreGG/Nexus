@@ -401,19 +401,18 @@ void CQuickAccess::RenderContextMenu(const std::string& aIdentifier, const Short
 
 void CQuickAccess::AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aInputBindIdentifier, const char* aTooltipText)
 {
-	std::string str = aIdentifier;
-	std::string strTexId = aTextureIdentifier;
-	std::string strTexHoverId = aTextureHoverIdentifier;
-	std::string strKbId = aInputBindIdentifier;
-	std::string strTT = aTooltipText;
+	if (!aIdentifier)             { return; }
+	if (!aTextureIdentifier)      { return; }
+	if (!aTextureHoverIdentifier) { return; }
 
 	/* explicit scoping due to this->WhereAreMyParents() below */
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
-		if (this->Registry.find(str) == this->Registry.end())
+
+		if (this->Registry.find(aIdentifier) == this->Registry.end())
 		{
-			Texture_t* normal = this->TextureService->Get(strTexId.c_str());
-			Texture_t* hover = this->TextureService->Get(strTexHoverId.c_str());
+			Texture_t* normal = this->TextureService->Get(aTextureIdentifier);
+			Texture_t* hover = this->TextureService->Get(aTextureHoverIdentifier);
 			Shortcut_t sh{};
 			sh.TextureNormalIdentifier = aTextureIdentifier;
 			sh.TextureHoverIdentifier = aTextureHoverIdentifier;
@@ -423,16 +422,14 @@ void CQuickAccess::AddShortcut(const char* aIdentifier, const char* aTextureIden
 
 			const InputBind_t* ib = this->InputBindApi->Get(aInputBindIdentifier);
 
-			assert(ib != nullptr);
-
-			if (ib->Device != EInputDevice::None)
+			if (ib != nullptr && ib->Device != EInputDevice::None)
 			{
 				sh.IBText = IBToString(*ib, true);
 			}
 
 			sh.TooltipText = aTooltipText;
 			sh.TextureGetAttempts = 0;
-			this->Registry[str] = sh;
+			this->Registry[aIdentifier] = sh;
 
 			int amt = 0;
 			if (sh.TextureNormal != nullptr) { amt++; }
