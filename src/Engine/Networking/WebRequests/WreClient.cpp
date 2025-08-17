@@ -76,19 +76,32 @@ HttpResponse_t CHttpClient::Get(std::string aEndpoint, std::string aParameters, 
 
 	httplib::Result getResult = this->Client->Get(query);
 
-	result.StatusCode = getResult->status;
-
 	if (getResult.error() != httplib::Error::Success)
 	{
 		result.Error = "Lib Error: " + httplib::to_string(getResult.error());
 	}
 
-	if (getResult->status >= 400)
+	if (getResult)
 	{
-		result.Error = StatusCodeToMessage(getResult->status);
+		result.StatusCode = getResult->status;
+		result.Content = getResult->body;
+
+		if (getResult->status >= 400)
+		{
+			result.Error = StatusCodeToMessage(getResult->status);
+		}
+	}
+	else
+	{
+		result.Error = "Lib Result was nullptr.";
+		this->Logger->Critical(
+			CH_NETWORKING,
+			"Lib Result was nullptr for \"%s\". Lib Error: %s",
+			query.c_str(),
+			httplib::to_string(getResult.error()).c_str()
+		);
 	}
 
-	result.Content = getResult->body;
 	this->Cache->Store(query, result);
 
 	return result;
