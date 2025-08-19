@@ -29,20 +29,28 @@ namespace AddonToggleCtl
 	inline std::string GetButtonText(CAddon* aAddon)
 	{
 		std::string buttonText;
-		if (aAddon->IsLoaded())
+		/* If addon is busy. */
+		if (aAddon->IsRunningAction())
 		{
-			buttonText = "((Unload))";
+			buttonText = "((...))";
 		}
-		else
+		else /* Addon is not busy. */
 		{
-			buttonText = "((Load))";
-		}
+			if (aAddon->IsLoaded())
+			{
+				buttonText = "((Unload))";
+			}
+			else
+			{
+				buttonText = "((Load))";
+			}
 
-		Config_t* config = aAddon->GetConfig();
+			Config_t* config = aAddon->GetConfig();
 
-		if (config && aAddon->IsStateLocked() && (config->LastLoadState != aAddon->IsLoaded()))
-		{
-			buttonText.append("*");
+			if (config && aAddon->IsStateLocked() && (config->LastLoadState != aAddon->IsLoaded()))
+			{
+				buttonText.append("*");
+			}
 		}
 
 		return buttonText;
@@ -64,26 +72,34 @@ namespace AddonToggleCtl
 
 		Config_t* config = aAddon->GetConfig();
 
-		if (aAddon->IsLoaded())
+		/* If addon is busy. */
+		if (aAddon->IsRunningAction())
 		{
-			/* Addon is loaded -> Unload */
-			aAddon->Unload();
-			config->LastLoadState = !config->LastLoadState;
-			cfgmgr->SaveConfigs();
+			/* NOP */
 		}
-		else
+		else /* Addon is not busy. */
 		{
-			if (aAddon->IsVersionDisabled())
+			if (aAddon->IsLoaded())
 			{
-				/* Addon is not loaded, but was version disabled -> Prompt to load */
-				result = true;
+				/* Addon is loaded -> Unload */
+				aAddon->Unload();
+				config->LastLoadState = !config->LastLoadState;
+				cfgmgr->SaveConfigs();
 			}
 			else
 			{
-				/* Addon is not loaded -> Load */
-				aAddon->Load();
-				config->LastLoadState = !config->LastLoadState;
-				cfgmgr->SaveConfigs();
+				if (aAddon->IsVersionDisabled())
+				{
+					/* Addon is not loaded, but was version disabled -> Prompt to load */
+					result = true;
+				}
+				else
+				{
+					/* Addon is not loaded -> Load */
+					aAddon->Load();
+					config->LastLoadState = !config->LastLoadState;
+					cfgmgr->SaveConfigs();
+				}
 			}
 		}
 
