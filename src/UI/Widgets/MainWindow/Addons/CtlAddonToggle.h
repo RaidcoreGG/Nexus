@@ -32,7 +32,7 @@ namespace AddonToggleCtl
 		/* If addon is busy. */
 		if (aAddon->IsRunningAction())
 		{
-			buttonText = "((...))";
+			buttonText = "...";
 		}
 		else /* Addon is not busy. */
 		{

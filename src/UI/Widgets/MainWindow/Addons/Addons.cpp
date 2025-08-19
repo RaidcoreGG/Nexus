@@ -101,26 +101,7 @@ void CAddonsWindow::ClearContent()
 void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 {
 	/* Unique id. */
-	std::string id;
-
-	if (aAddonData.GetSig() != 0)
-	{
-		/* Use addon signature. */
-		id = String::Format("0x%08X", aAddonData.GetSig());
-	}
-	else
-	{
-		if (aAddonData.Addon)
-		{
-			/* Use addon file location. */
-			id = aAddonData.Addon->GetLocation().string();
-		}
-		else
-		{
-			/* This should not be possible. */
-			throw "Unreachable code.";
-		}
-	}
+	std::string id = aAddonData.GetUniqueID();
 
 	ImGuiStyle& style = ImGui::GetStyle();
 
@@ -170,11 +151,11 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 
 		dl->AddRectFilled(ImVec2(wnd->Pos.x, wnd->Pos.y), ImVec2(wnd->Pos.x + stateBarWidth, wnd->Pos.y + wnd->Size.y), col, style.ChildRounding);
 
-		ImGui::SetCursorPos(ImVec2(0, 0));
+		ImGui::SetCursorPos(ImVec2(0, style.WindowPadding.y));
 		ImGui::Dummy(ImVec2(stateBarWidth, 0));
 
-		ImGui::SetCursorPos(ImVec2(stateBarWidth + style.ItemSpacing.x, style.WindowPadding.y));
-		ImGui::BeginGroup();
+		ImGui::SameLine();
+		if (ImGui::BeginChild("Info", ImVec2(infoAreaWidth, 0)))
 		{
 			/* Name */
 			ImGui::Text(aAddonData.GetName().c_str());
@@ -203,9 +184,9 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 				ImGui::TextWrapped(aAddonData.GetDesc().c_str());
 			}
 		}
-		ImGui::EndGroup();
+		ImGui::EndChild();
 
-		ImGui::SetCursorPos(ImVec2(stateBarWidth + style.ItemSpacing.x + infoAreaWidth + style.ItemSpacing.x, style.WindowPadding.y));
+		ImGui::SameLine();
 		ImGui::BeginGroup();
 		{
 			if (aAddonData.Addon)

@@ -16,6 +16,7 @@
 #include "Core/Addons/Library/LibAddon.h"
 #include "UI/DisplayBinds.h"
 #include "UI/FuncDefs.h"
+#include "Util/Strings.h"
 
 using ArcExtensionDef_t = ArcDPS::ExtensionDef_t;
 
@@ -31,6 +32,33 @@ struct AddonListing_t
 	GUI_RENDER                                         OptionsRender;
 
 	bool                                               IsHovered;
+
+	inline std::string GetUniqueID() const
+	{
+		/* Unique id. */
+		std::string id;
+
+		if (this->GetSig() != 0)
+		{
+			/* Use addon signature. */
+			id = String::Format("0x%08X", this->GetSig());
+		}
+		else
+		{
+			if (this->Addon)
+			{
+				/* Use addon file location. */
+				id = this->Addon->GetLocation().string();
+			}
+			else
+			{
+				/* This should not be possible. */
+				throw "Unreachable code.";
+			}
+		}
+
+		return id;
+	}
 
 	inline uint32_t GetSig() const
 	{
