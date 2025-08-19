@@ -106,7 +106,8 @@ CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogApi* aLogger, CEven
 	this->EventApi = aEventApi;
 
 	this->ConfigPath = aConfigPath;
-
+	
+	/* FIXME: This is a dirty hack for the UI invalidation. */
 	this->AddDefaultBinds();
 	this->Load(this->ConfigPath);
 
@@ -569,127 +570,140 @@ void CGameBindsApi::Load(std::filesystem::path aPath)
 		return;
 	}
 
-	this->Registry.clear();
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+		this->Registry.clear();
+	}
+
 	this->AddDefaultBinds();
 
-	pugi::xml_node root = doc.child("InputBindings");
-
-	for (pugi::xml_node action : root.children("action"))
 	{
-		if (!action.attribute("id")) { continue; }
-
-		try
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+		pugi::xml_node root = doc.child("InputBindings");
+		for (pugi::xml_node action : root.children("action"))
 		{
-			EGameBinds id = (EGameBinds)strtoul(action.attribute("id").value(), nullptr, 10);
-			MultiInputBind_t bind{};
+			if (!action.attribute("id")) { continue; }
 
-			bool hasPrimary = false;
-			bool hasSecondary = false;
-
-			/* Primary Bind */
-			if (action.attribute("device"))
+			try
 			{
-				hasPrimary = true;
+				EGameBinds id = (EGameBinds)strtoul(action.attribute("id").value(), nullptr, 10);
+				MultiInputBind_t bind{};
 
-				if (action.attribute("mod"))
+				bool hasPrimary = false;
+				bool hasSecondary = false;
+
+				/* Primary Bind */
+				if (action.attribute("device"))
 				{
-					int mods = strtoul(action.attribute("mod").value(), nullptr, 10);
-					bind.Primary.Alt = mods & 0b0100;
-					bind.Primary.Ctrl = mods & 0b0010;
-					bind.Primary.Shift = mods & 0b0001;
+					hasPrimary = true;
+
+					if (action.attribute("mod"))
+					{
+						int mods = strtoul(action.attribute("mod").value(), nullptr, 10);
+						bind.Primary.Alt = mods & 0b0100;
+						bind.Primary.Ctrl = mods & 0b0010;
+						bind.Primary.Shift = mods & 0b0001;
+					}
+
+					std::string device = action.attribute("device").value();
+					if (device == "Keyboard")
+					{
+						bind.Primary.Device = EInputDevice::Keyboard;
+						bind.Primary.Code = GameScanCodeToScanCode(static_cast<unsigned short>(strtoul(action.attribute("button").value(), nullptr, 10)));
+					}
+					else if (device == "Mouse")
+					{
+						bind.Primary.Device = EInputDevice::Mouse;
+						std::string mousebtn = action.attribute("button").value();
+						if (mousebtn == "0") { bind.Primary.Code = (unsigned short)EMouseButtons::LMB; }
+						else if (mousebtn == "2") { bind.Primary.Code = (unsigned short)EMouseButtons::RMB; }
+						else if (mousebtn == "1") { bind.Primary.Code = (unsigned short)EMouseButtons::MMB; }
+						else if (mousebtn == "3") { bind.Primary.Code = (unsigned short)EMouseButtons::M4; }
+						else if (mousebtn == "4") { bind.Primary.Code = (unsigned short)EMouseButtons::M5; }
+					}
+					else if (device == "None")
+					{
+						/* Unbound. Unset mods as well. */
+						bind.Primary.Device = EInputDevice::None;
+						bind.Primary.Alt = false;
+						bind.Primary.Ctrl = false;
+						bind.Primary.Shift = false;
+					}
 				}
 
-				std::string device = action.attribute("device").value();
-				if (device == "Keyboard")
+				/* Secondary Bind */
+				if (action.attribute("device2"))
 				{
-					bind.Primary.Device = EInputDevice::Keyboard;
-					bind.Primary.Code = GameScanCodeToScanCode(static_cast<unsigned short>(strtoul(action.attribute("button").value(), nullptr, 10)));
+					hasSecondary = true;
+
+					if (action.attribute("mod2"))
+					{
+						int mods = strtoul(action.attribute("mod2").value(), nullptr, 10);
+						bind.Secondary.Alt = mods & 0b0100;
+						bind.Secondary.Ctrl = mods & 0b0010;
+						bind.Secondary.Shift = mods & 0b0001;
+					}
+
+					std::string device = action.attribute("device2").value();
+					if (device == "Keyboard")
+					{
+						bind.Secondary.Device = EInputDevice::Keyboard;
+						bind.Secondary.Code = GameScanCodeToScanCode(static_cast<unsigned short>(strtoul(action.attribute("button2").value(), nullptr, 10)));
+					}
+					else if (device == "Mouse")
+					{
+						bind.Secondary.Device = EInputDevice::Mouse;
+						std::string mousebtn = action.attribute("button2").value();
+						if (mousebtn == "0") { bind.Secondary.Code = (unsigned short)EMouseButtons::LMB; }
+						else if (mousebtn == "2") { bind.Secondary.Code = (unsigned short)EMouseButtons::RMB; }
+						else if (mousebtn == "1") { bind.Secondary.Code = (unsigned short)EMouseButtons::MMB; }
+						else if (mousebtn == "3") { bind.Secondary.Code = (unsigned short)EMouseButtons::M4; }
+						else if (mousebtn == "4") { bind.Secondary.Code = (unsigned short)EMouseButtons::M5; }
+					}
+					else if (device == "None")
+					{
+						/* Unbound. Unset mods as well. */
+						bind.Secondary.Device = EInputDevice::None;
+						bind.Secondary.Alt = false;
+						bind.Secondary.Ctrl = false;
+						bind.Secondary.Shift = false;
+					}
 				}
-				else if (device == "Mouse")
+
+				/* Store the bind. */
+				auto it = this->Registry.find(id);
+
+				if (it == this->Registry.end())
 				{
-					bind.Primary.Device = EInputDevice::Mouse;
-					std::string mousebtn = action.attribute("button").value();
-					if      (mousebtn == "0") { bind.Primary.Code = (unsigned short)EMouseButtons::LMB; }
-					else if (mousebtn == "2") { bind.Primary.Code = (unsigned short)EMouseButtons::RMB; }
-					else if (mousebtn == "1") { bind.Primary.Code = (unsigned short)EMouseButtons::MMB; }
-					else if (mousebtn == "3") { bind.Primary.Code = (unsigned short)EMouseButtons::M4; }
-					else if (mousebtn == "4") { bind.Primary.Code = (unsigned short)EMouseButtons::M5; }
+					this->Registry.emplace(id, bind);
 				}
-				else if (device == "None")
+				else
 				{
-					/* Unbound. Unset mods as well. */
-					bind.Primary.Device = EInputDevice::None;
-					bind.Primary.Alt = false;
-					bind.Primary.Ctrl = false;
-					bind.Primary.Shift = false;
+					if (hasPrimary)
+					{
+						it->second.Primary = bind.Primary;
+					}
+
+					if (hasSecondary)
+					{
+						it->second.Secondary = bind.Secondary;
+					}
 				}
 			}
-
-			/* Secondary Bind */
-			if (action.attribute("device2"))
-			{
-				hasSecondary = true;
-
-				if (action.attribute("mod2"))
-				{
-					int mods = strtoul(action.attribute("mod2").value(), nullptr, 10);
-					bind.Secondary.Alt = mods & 0b0100;
-					bind.Secondary.Ctrl = mods & 0b0010;
-					bind.Secondary.Shift = mods & 0b0001;
-				}
-
-				std::string device = action.attribute("device2").value();
-				if (device == "Keyboard")
-				{
-					bind.Secondary.Device = EInputDevice::Keyboard;
-					bind.Secondary.Code = GameScanCodeToScanCode(static_cast<unsigned short>(strtoul(action.attribute("button2").value(), nullptr, 10)));
-				}
-				else if (device == "Mouse")
-				{
-					bind.Secondary.Device = EInputDevice::Mouse;
-					std::string mousebtn = action.attribute("button2").value();
-					if      (mousebtn == "0") { bind.Secondary.Code = (unsigned short)EMouseButtons::LMB; }
-					else if (mousebtn == "2") { bind.Secondary.Code = (unsigned short)EMouseButtons::RMB; }
-					else if (mousebtn == "1") { bind.Secondary.Code = (unsigned short)EMouseButtons::MMB; }
-					else if (mousebtn == "3") { bind.Secondary.Code = (unsigned short)EMouseButtons::M4; }
-					else if (mousebtn == "4") { bind.Secondary.Code = (unsigned short)EMouseButtons::M5; }
-				}
-				else if (device == "None")
-				{
-					/* Unbound. Unset mods as well. */
-					bind.Secondary.Device = EInputDevice::None;
-					bind.Secondary.Alt = false;
-					bind.Secondary.Ctrl = false;
-					bind.Secondary.Shift = false;
-				}
-			}
-
-			/* Store the bind. */
-			auto it = this->Registry.find(id);
-
-			if (it == this->Registry.end())
-			{
-				this->Registry.emplace(id, bind);
-			}
-			else
-			{
-				if (hasPrimary)
-				{
-					it->second.Primary = bind.Primary;
-				}
-
-				if (hasSecondary)
-				{
-					it->second.Secondary = bind.Secondary;
-				}
-			}
+			catch (...) {}
 		}
-		catch(...) {}
+	}
+
+	if (this->ConfigPath != aPath)
+	{
+		this->Save();
 	}
 }
 
 void CGameBindsApi::AddDefaultBinds()
 {
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
 	// Movement
 	this->Registry.emplace(EGameBinds::MoveForward, MultiInputBind_t{
 		InputBind_t{ false, false, false, EInputDevice::Keyboard, GameScanCodeToScanCode(87) },
