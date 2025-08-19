@@ -130,7 +130,9 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 	ImVec2 btnTextSz = ImGui::CalcTextSize("############");
 
 	float btnWidth = btnTextSz.x + (style.FramePadding.x * 2);
-	float actionsAreaWidth = btnWidth;
+	float stateBarWidth = ImGui::GetFrameHeight() / 2.f; /* Half a frame width. */
+	float infoAreaWidth = itemSz.x - stateBarWidth - style.ItemSpacing.x - btnWidth - style.ItemSpacing.x - style.WindowPadding.x; /* Full width minus other elements and spacing. */
+	float actionsAreaWidth = btnWidth; /* As wide as a padded button. */
 
 	ImVec2 curPos = ImGui::GetCursorPos();
 
@@ -166,73 +168,76 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 			/* TODO: other error states. */
 		}
 
-		ImVec2 pad = ImGui::GetStyle().WindowPadding;
-		float round = ImGui::GetStyle().ChildRounding;
-		float spc = ImGui::GetStyle().ItemSpacing.x;
+		dl->AddRectFilled(ImVec2(wnd->Pos.x, wnd->Pos.y), ImVec2(wnd->Pos.x + stateBarWidth, wnd->Pos.y + wnd->Size.y), col, style.ChildRounding);
 
-		dl->AddRectFilled(ImVec2(wnd->Pos.x, wnd->Pos.y), ImVec2(wnd->Pos.x + (ImGui::GetFrameHeight() / 2.f), wnd->Pos.y + wnd->Size.y), col, round);
+		ImGui::SetCursorPos(ImVec2(0, 0));
+		ImGui::Dummy(ImVec2(stateBarWidth, 0));
 
-		ImGui::Dummy(ImVec2(pad.x + (ImGui::GetFrameHeight() / 2.f) - spc, 0));
-		ImGui::SameLine();
-
+		ImGui::SetCursorPos(ImVec2(stateBarWidth + style.ItemSpacing.x, style.WindowPadding.y));
 		ImGui::BeginGroup();
-
-		/* Name */
-		ImGui::Text(aAddonData.GetName().c_str());
-		if (aAddonData.Addon)
 		{
-			ImGui::TooltipGeneric(aAddonData.Addon->GetLocation().string().c_str());
-		}
-
-		/* Version */
-		if (!aAddonData.GetVersion().empty())
-		{
-			ImGui::SameLine();
-			ImGui::TextDisabled(aAddonData.GetVersion().c_str());
-		}
-
-		/* Author */
-		if (!aAddonData.GetAuthor().empty())
-		{
-			ImGui::TextDisabled("%s", aAddonData.GetAuthor().c_str());
-		}
-
-		if (aAddonData.Addon)
-		{
-			if (aAddonData.Addon->SupportsLoading())
+			/* Name */
+			ImGui::Text(aAddonData.GetName().c_str());
+			if (aAddonData.Addon)
 			{
-				/* Toggle Load */
-				if (ImGui::Button(AddonToggleCtl::GetButtonText(aAddonData.Addon).c_str(), ImVec2(btnWidth, 0)))
-				{
-					/* Prompt if true, otherwise it already toggled now. */
-					if (AddonToggleCtl::Toggle(aAddonData.Addon))
-					{
-						Config_t* config = aAddonData.Addon->GetConfig();
+				ImGui::TooltipGeneric(aAddonData.Addon->GetLocation().string().c_str());
+			}
 
-						this->LoadConfirmationModal.SetTarget(config, aAddonData.GetName(), aAddonData.Addon->GetLocation());
-					}
-				}
-
+			/* Version */
+			if (!aAddonData.GetVersion().empty())
+			{
 				ImGui::SameLine();
+				ImGui::TextDisabled(aAddonData.GetVersion().c_str());
+			}
 
-				/* Configure */
-				if (ImGui::Button(langApi->Translate("((000105))"), ImVec2(btnWidth, 0)))
-				{
-					this->SetContent(aAddonData);
-				}
+			/* Author */
+			if (!aAddonData.GetAuthor().empty())
+			{
+				ImGui::TextDisabled("%s", aAddonData.GetAuthor().c_str());
+			}
+
+			/* Description */
+			if (!aAddonData.GetDesc().empty())
+			{
+				ImGui::PushItemWidth(infoAreaWidth);
+				ImGui::TextWrapped(aAddonData.GetDesc().c_str());
 			}
 		}
-		else if (aAddonData.HasLibDef)
+		ImGui::EndGroup();
+
+		ImGui::SetCursorPos(ImVec2(stateBarWidth + style.ItemSpacing.x + infoAreaWidth + style.ItemSpacing.x, style.WindowPadding.y));
+		ImGui::BeginGroup();
 		{
-			if (aAddonData.IsHovered)
+			if (aAddonData.Addon)
+			{
+				if (aAddonData.Addon->SupportsLoading())
+				{
+					/* Toggle Load */
+					if (ImGui::Button(AddonToggleCtl::GetButtonText(aAddonData.Addon).c_str(), ImVec2(btnWidth, 0)))
+					{
+						/* Prompt if true, otherwise it already toggled now. */
+						if (AddonToggleCtl::Toggle(aAddonData.Addon))
+						{
+							Config_t* config = aAddonData.Addon->GetConfig();
+
+							this->LoadConfirmationModal.SetTarget(config, aAddonData.GetName(), aAddonData.Addon->GetLocation());
+						}
+					}
+
+					/* Configure */
+					if (ImGui::Button(langApi->Translate("((000105))"), ImVec2(btnWidth, 0)))
+					{
+						this->SetContent(aAddonData);
+					}
+				}
+			}
+			else if (aAddonData.HasLibDef)
 			{
 				/* Install */
 				if (ImGui::Button(langApi->Translate("((000028))"), ImVec2(btnWidth, 0)))
 				{
 					libmgr->Install(aAddonData.GetSig());
 				}
-
-				ImGui::SameLine();
 
 				/* GitHub */
 				if (ImGui::Button("((GitHub))", ImVec2(btnWidth, 0)))
@@ -242,18 +247,9 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 			}
 			else
 			{
-				/* Description */
-				if (!aAddonData.GetDesc().empty())
-				{
-					ImGui::TextWrapped(aAddonData.GetDesc().c_str());
-				}
+				throw "Unreachable code.";
 			}
 		}
-		else
-		{
-			throw "Unreachable code.";
-		}
-
 		ImGui::EndGroup();
 	}
 	ImGui::EndChild();
