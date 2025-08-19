@@ -864,6 +864,12 @@ bool CAddon::IsVolatileDisabled()
 
 	if (this->Config->LastGameBuild != 0 && GW2::GetGameBuild() - this->Config->LastGameBuild > 350)
 	{
+		/* FIXME: move this elsewhere maybe? rather than the check */
+		if (this->Config->DisableVersion.empty() || this->Config->DisableVersion != this->GetMD5().string())
+		{
+			this->Config->DisableVersion = this->GetMD5().string();
+			this->ConfigMgr->SaveConfigs();
+		}
 		return true;
 	}
 
