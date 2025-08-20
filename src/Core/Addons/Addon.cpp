@@ -341,12 +341,6 @@ void CAddon::LoadInternal()
 		return;
 	}
 
-	if (!this->HasInterface(EAddonInterfaces::Nexus))
-	{
-		this->Logger->Debug(CH_ADDON, "Cannot load. No Nexus addon interface. (%s)", this->Location.string().c_str());
-		return;
-	}
-
 	MD5_t md5 = MD5Util::FromFile(this->Location);
 
 	/* If the file is different, than when it was created, refresh the interfaces. */
@@ -357,6 +351,12 @@ void CAddon::LoadInternal()
 
 	/* Update MD5. */
 	this->MD5 = md5;
+
+	if (!this->HasInterface(EAddonInterfaces::Nexus))
+	{
+		this->Logger->Debug(CH_ADDON, "Cannot load. No Nexus addon interface. (%s)", this->Location.string().c_str());
+		return;
+	}
 
 	HMODULE module = LoadLibraryA(this->Location.string().c_str());
 
