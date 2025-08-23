@@ -324,9 +324,8 @@ void CLoader::ProcessChanges()
 				if (addon->IsLoaded())
 				{
 					addon->Unload();
+					addon->Load();
 				}
-
-				addon->Load();
 				
 				continue;
 			}

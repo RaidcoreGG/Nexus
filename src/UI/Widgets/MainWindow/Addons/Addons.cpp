@@ -132,24 +132,29 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 	static CLocalization*  langApi  = uictx->GetLocalization();
 	static CAlerts*        alertctx = uictx->GetAlerts();
 
-	ImDrawList* dl = ImGui::GetWindowDrawList();
+	/* For the status bar, data will be set within the child.*/
+	bool drawStatusBar = false;
+	ImVec2 statusBarPosBegin;
+	ImVec2 statusBarPosEnd;
+	ImColor statusBarCol;
 
 	if (ImGui::BeginChild(("Addon_" + id).c_str(), itemSz, true))
 	{
 		ImGuiWindow* wnd = ImGui::GetCurrentWindow();
-		ImColor col = ImColor(85, 85, 85, 255);
+		statusBarPosBegin = ImVec2(wnd->Pos.x, wnd->Pos.y);
+		statusBarPosEnd = ImVec2(wnd->Pos.x + stateBarWidth, wnd->Pos.y + wnd->Size.y);
+		statusBarCol = ImColor(85, 85, 85, 255);
+		drawStatusBar = true;
 
 		if (aAddonData.Addon && aAddonData.Addon->IsLoaded())
 		{
-			col = ImColor(89, 172, 98, 255);
+			statusBarCol = ImColor(89, 172, 98, 255);
 		}
 		else if (aAddonData.Addon && aAddonData.Addon->IsVersionDisabled())
 		{
-			col = ImColor(172, 89, 89, 255);
+			statusBarCol = ImColor(172, 89, 89, 255);
 			/* TODO: other error states. */
 		}
-
-		dl->AddRectFilled(ImVec2(wnd->Pos.x, wnd->Pos.y), ImVec2(wnd->Pos.x + stateBarWidth, wnd->Pos.y + wnd->Size.y), col, style.ChildRounding);
 
 		ImGui::SetCursorPos(ImVec2(0, style.WindowPadding.y));
 		ImGui::Dummy(ImVec2(stateBarWidth, 0));
@@ -234,6 +239,13 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 		ImGui::EndGroup();
 	}
 	ImGui::EndChild();
+
+	/* Draw the status bar after the child element, so it is on top. */
+	if (drawStatusBar)
+	{
+		ImDrawList* dl = ImGui::GetWindowDrawList();
+		dl->AddRectFilled(statusBarPosBegin, statusBarPosEnd, statusBarCol, style.ChildRounding);
+	}
 
 	aAddonData.IsHovered = ImGui::IsItemHovered();
 	if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
