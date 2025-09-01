@@ -137,10 +137,12 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 	ImVec2 statusBarPosBegin;
 	ImVec2 statusBarPosEnd;
 	ImColor statusBarCol;
+	ImDrawList* drawlist = nullptr;
 
 	if (ImGui::BeginChild(("Addon_" + id).c_str(), itemSz, true))
 	{
 		ImGuiWindow* wnd = ImGui::GetCurrentWindow();
+		drawlist = wnd->DrawList;
 		statusBarPosBegin = ImVec2(wnd->Pos.x, wnd->Pos.y);
 		statusBarPosEnd = ImVec2(wnd->Pos.x + stateBarWidth, wnd->Pos.y + wnd->Size.y);
 		statusBarCol = ImColor(85, 85, 85, 255);
@@ -243,8 +245,7 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 	/* Draw the status bar after the child element, so it is on top. */
 	if (drawStatusBar)
 	{
-		ImDrawList* dl = ImGui::GetWindowDrawList();
-		dl->AddRectFilled(statusBarPosBegin, statusBarPosEnd, statusBarCol, style.ChildRounding);
+		drawlist->AddRectFilled(statusBarPosBegin, statusBarPosEnd, statusBarCol, style.ChildRounding);
 	}
 
 	aAddonData.IsHovered = ImGui::IsItemHovered();
@@ -747,7 +748,7 @@ void CAddonsWindow::RenderDetails()
 				}
 
 				/* Pre-releases Checkbox */
-				// TODO: if (addonData.Addon->GetProvider()->SupportsPreReleases())
+				if (this->AddonData.Addon->SupportsPreReleases())
 				{
 					if (ImGui::Checkbox((langApi->Translate("((000084))") + hashid).c_str(), &config->AllowPreReleases))
 					{
@@ -756,13 +757,13 @@ void CAddonsWindow::RenderDetails()
 				}
 
 				/* GitHub Button */
-				// TODO: if (addonData.Addon->GetProvider()->GetProjectPage())
-				//{
-					//if (ImGui::Button((langApi->Translate("((000030))") + id).c_str()))
-					//{
-					//	ShellExecuteA(0, 0, this->AddonData.GithubURL.c_str(), 0, 0, SW_SHOW);
-					//}
-				//}
+				if (!this->AddonData.Addon->GetProjectPageURL().empty())
+				{
+					if (ImGui::Button((langApi->Translate("((000030))") + id).c_str()))
+					{
+						ShellExecuteA(0, 0, this->AddonData.Addon->GetProjectPageURL().c_str(), 0, 0, SW_SHOW);
+					}
+				}
 
 				/* Disable until update Checkbox */
 				bool disableUntilUpdate = config->DisableVersion == this->AddonData.Addon->GetMD5().string();

@@ -105,6 +105,8 @@ void CLoader::Init()
 		return;
 	}
 
+	/* FIXME: Fix item updates. */
+
 	SHChangeNotifyEntry changeentry{};
 	changeentry.pidl = this->FSItemList;
 	changeentry.fRecursive = false;
@@ -195,12 +197,6 @@ void CLoader::UnloadSafe(std::filesystem::path aPath)
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 	this->Unload(aPath);
-}
-
-void CLoader::UninstallSafe(std::filesystem::path aPath)
-{
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-	this->Uninstall(aPath);
 }
 
 IAddon* CLoader::GetOwner(void* aAddress) const
@@ -514,19 +510,6 @@ void CLoader::Unload(std::filesystem::path aPath)
 		{
 			this->Logger->Debug(CH_LOADER, "CLoaderBase::Unload(%s)", aPath.string().c_str());
 			addon->Unload();
-			return;
-		}
-	}
-}
-
-void CLoader::Uninstall(std::filesystem::path aPath)
-{
-	for (IAddon* addon : this->Addons)
-	{
-		if (addon->GetLocation() == aPath)
-		{
-			this->Logger->Debug(CH_LOADER, "CLoaderBase::Uninstall(%s)", aPath.string().c_str());
-			addon->Uninstall();
 			return;
 		}
 	}

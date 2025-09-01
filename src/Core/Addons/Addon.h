@@ -36,6 +36,7 @@ constexpr const char* CH_ADDON = "Addon";
 class CAddon : public virtual IAddon
 {
 	public:
+#pragma region(Base)
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
@@ -51,7 +52,9 @@ class CAddon : public virtual IAddon
 	/// 	Returns the unique signature of the addon.
 	///----------------------------------------------------------------------------------------------------
 	uint32_t GetSignature() override;
+#pragma endregion
 
+#pragma region(Details)
 	///----------------------------------------------------------------------------------------------------
 	/// GetName:
 	/// 	Returns the name of the addon.
@@ -75,6 +78,7 @@ class CAddon : public virtual IAddon
 	/// 	Returns the version of the addon.
 	///----------------------------------------------------------------------------------------------------
 	std::string GetVersion();
+#pragma endregion
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetConfig:
@@ -98,7 +102,7 @@ class CAddon : public virtual IAddon
 	/// Uninstall:
 	/// 	Uninstalls the addon.
 	///----------------------------------------------------------------------------------------------------
-	void Uninstall() override;
+	void Uninstall();
 
 	///----------------------------------------------------------------------------------------------------
 	/// CheckForUpdate:
@@ -124,6 +128,19 @@ class CAddon : public virtual IAddon
 	///----------------------------------------------------------------------------------------------------
 	bool IsDuplicate();
 
+#pragma region(Flags)
+	///----------------------------------------------------------------------------------------------------
+	/// IsRunningAction:
+	/// 	Returns true, if the addon is currently performing an action.
+	///----------------------------------------------------------------------------------------------------
+	bool IsRunningAction() const;
+
+	///----------------------------------------------------------------------------------------------------
+	/// IsDestroying:
+	/// 	Returns true, if the addon is currently being destroyed.
+	///----------------------------------------------------------------------------------------------------
+	bool IsDestroying() const;
+
 	///----------------------------------------------------------------------------------------------------
 	/// IsFileLocked:
 	/// 	Returns true, if the file on disk is locked and cannot be removed.
@@ -137,22 +154,23 @@ class CAddon : public virtual IAddon
 	bool IsStateLocked() const;
 
 	///----------------------------------------------------------------------------------------------------
-	/// IsUpdateAvailable:
-	/// 	Returns true, if an update is available.
+	/// IsMissingRequirements:
+	/// 	Returns true, if the addon interface is missing requirements for loading.
 	///----------------------------------------------------------------------------------------------------
-	bool IsUpdateAvailable() const;
-
-	///----------------------------------------------------------------------------------------------------
-	/// IsRunningAction:
-	/// 	Returns true, if the addon is currently performing an action.
-	///----------------------------------------------------------------------------------------------------
-	bool IsRunningAction() const;
+	bool IsMissingRequirements() const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// IsUninstalled:
 	/// 	Returns true, if the addon was uninstalled.
 	///----------------------------------------------------------------------------------------------------
 	bool IsUninstalled() const;
+
+	///----------------------------------------------------------------------------------------------------
+	/// IsUpdateAvailable:
+	/// 	Returns true, if an update is available.
+	///----------------------------------------------------------------------------------------------------
+	bool IsUpdateAvailable() const;
+#pragma endregion
 
 	///----------------------------------------------------------------------------------------------------
 	/// IsVersionDisabled:
@@ -168,9 +186,21 @@ class CAddon : public virtual IAddon
 
 	///----------------------------------------------------------------------------------------------------
 	/// SupportsUpdates:
-	/// 	Returns true, if the addon is updatable.
+	/// 	Returns true, if the addon is updateable.
 	///----------------------------------------------------------------------------------------------------
 	bool SupportsUpdates() const;
+
+	///----------------------------------------------------------------------------------------------------
+	/// SupportsPreReleases:
+	/// 	Returns the true if the set provider supports pre-releases.
+	///----------------------------------------------------------------------------------------------------
+	bool SupportsPreReleases() const;
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetProjectPageURL:
+	/// 	Returns the project page of the set url, if applicable.
+	///----------------------------------------------------------------------------------------------------
+	std::string GetProjectPageURL() const;
 
 	private:
 	CLogApi*                 Logger               = nullptr;
@@ -192,7 +222,6 @@ class CAddon : public virtual IAddon
 	bool                     IsRunning            = false;
 	std::mutex               ProcessorMutex;
 	std::thread              ProcessorThread;
-	uint32_t                 ProcessorThreadID    = 0;
 
 	///----------------------------------------------------------------------------------------------------
 	/// ProcessActions:
@@ -226,9 +255,9 @@ class CAddon : public virtual IAddon
 
 	///----------------------------------------------------------------------------------------------------
 	/// UpdateInternal:
-	/// 	Updates the addon.
+	/// 	Downloads the update, returns true if successful.
 	///----------------------------------------------------------------------------------------------------
-	void UpdateInternal();
+	bool UpdateInternal();
 
 	///----------------------------------------------------------------------------------------------------
 	/// EnumInterfaces:
@@ -254,6 +283,23 @@ class CAddon : public virtual IAddon
 	///----------------------------------------------------------------------------------------------------
 	bool IsVolatileDisabled();
 
+	///----------------------------------------------------------------------------------------------------
+	/// UpdateViaRaidcore:
+	/// 	Updates via Raidcore.
+	///----------------------------------------------------------------------------------------------------
+	bool UpdateViaRaidcore();
+
+	///----------------------------------------------------------------------------------------------------
+	/// UpdateViaGitHub:
+	/// 	Updates via GitHub.
+	///----------------------------------------------------------------------------------------------------
+	bool UpdateViaGitHub();
+
+	///----------------------------------------------------------------------------------------------------
+	/// UpdateViaDirect:
+	/// 	Updates via direct download.
+	///----------------------------------------------------------------------------------------------------
+	bool UpdateViaDirect();
 };
 
 static inline IAddon* IAddonFactory(std::filesystem::path aLocation)

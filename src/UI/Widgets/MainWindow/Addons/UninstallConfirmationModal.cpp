@@ -48,7 +48,7 @@ void CUninstallConfirmationModal::OnClosing()
 	{
 		case EModalResult::OK:
 		{
-			loader->UninstallSafe(this->Path);
+			// FIXME: loader->UninstallSafe(this->Path);
 			break;
 		}
 		case EModalResult::Cancel:
