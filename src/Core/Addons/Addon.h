@@ -223,6 +223,9 @@ class CAddon : public virtual IAddon
 	std::mutex               ProcessorMutex;
 	std::thread              ProcessorThread;
 
+	std::string              UpdateLocal;
+	std::string              UpdateRemote;
+
 	///----------------------------------------------------------------------------------------------------
 	/// ProcessActions:
 	/// 	Performs queued actions.
@@ -248,16 +251,28 @@ class CAddon : public virtual IAddon
 	void UninstallInternal();
 
 	///----------------------------------------------------------------------------------------------------
-	/// CheckForUpdateInternal:
+	/// CheckUpdateInternal:
 	/// 	Checks if an update is available.
 	///----------------------------------------------------------------------------------------------------
-	void CheckForUpdateInternal();
+	void CheckUpdateInternal();
 
 	///----------------------------------------------------------------------------------------------------
 	/// UpdateInternal:
 	/// 	Downloads the update, returns true if successful.
 	///----------------------------------------------------------------------------------------------------
 	bool UpdateInternal();
+
+	///----------------------------------------------------------------------------------------------------
+	/// CheckUpdateViaGitHub:
+	/// 	Updates via GitHub.
+	///----------------------------------------------------------------------------------------------------
+	bool CheckUpdateViaGitHub();
+
+	///----------------------------------------------------------------------------------------------------
+	/// CheckUpdateViaDirect:
+	/// 	Updates via direct download.
+	///----------------------------------------------------------------------------------------------------
+	bool CheckUpdateViaDirect();
 
 	///----------------------------------------------------------------------------------------------------
 	/// EnumInterfaces:
@@ -282,24 +297,6 @@ class CAddon : public virtual IAddon
 	/// 	Returns true, if the addon is volatile and game build changed.
 	///----------------------------------------------------------------------------------------------------
 	bool IsVolatileDisabled();
-
-	///----------------------------------------------------------------------------------------------------
-	/// UpdateViaRaidcore:
-	/// 	Updates via Raidcore.
-	///----------------------------------------------------------------------------------------------------
-	bool UpdateViaRaidcore();
-
-	///----------------------------------------------------------------------------------------------------
-	/// UpdateViaGitHub:
-	/// 	Updates via GitHub.
-	///----------------------------------------------------------------------------------------------------
-	bool UpdateViaGitHub();
-
-	///----------------------------------------------------------------------------------------------------
-	/// UpdateViaDirect:
-	/// 	Updates via direct download.
-	///----------------------------------------------------------------------------------------------------
-	bool UpdateViaDirect();
 };
 
 static inline IAddon* IAddonFactory(std::filesystem::path aLocation)

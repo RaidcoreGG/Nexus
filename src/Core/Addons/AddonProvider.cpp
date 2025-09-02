@@ -40,32 +40,48 @@ std::string CAddon::GetProjectPageURL() const
 	return "";
 }
 
-void CAddon::CheckForUpdateInternal()
+void CAddon::CheckUpdateInternal()
 {
-	if (!this->IsUpdateAvailable())
+	if (this->IsUpdateAvailable())
 	{
+		/* Already checked. */
 		return;
 	}
 
 	return;
 }
 
+bool CAddon::CheckUpdateViaGitHub()
+{
+	if (this->IsUpdateAvailable())
+	{
+		/* Already checked. */
+		return true;
+	}
+
+	return false;
+}
+
+bool CAddon::CheckUpdateViaDirect()
+{
+	if (this->IsUpdateAvailable())
+	{
+		/* Already checked. */
+		return true;
+	}
+
+	return false;
+}
+
 bool CAddon::UpdateInternal()
 {
-	return false;
-}
+	this->Logger->Trace(CH_ADDON, "CAddon::UpdateInternal(%s)", this->Location.string().c_str());
 
-bool CAddon::UpdateViaRaidcore()
-{
-	throw "Not Implemented";
-}
+	if (!this->IsUpdateAvailable())
+	{
+		this->Logger->Debug(CH_ADDON, "Can't update. No update available. (%s)", this->Location.string().c_str());
+		return false;
+	}
 
-bool CAddon::UpdateViaGitHub()
-{
-	return false;
-}
-
-bool CAddon::UpdateViaDirect()
-{
 	return false;
 }

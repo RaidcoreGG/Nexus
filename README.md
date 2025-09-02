@@ -2,11 +2,9 @@
 [![](https://raidcore.gg/Resources/Images/Patreon.png)](https://www.patreon.com/bePatron?u=46163080)
 
 ![](https://img.shields.io/github/v/release/RaidcoreGG/Nexus?style=for-the-badge&labelColor=%23131519&color=%230F79AA)
+![](https://img.shields.io/github/downloads/RaidcoreGG/Nexus/total?style=for-the-badge&labelColor=%23131519&color=%230F79AA&label=Downloads)
 
-![](https://img.shields.io/github/downloads/RaidcoreGG/Nexus/total?style=for-the-badge&labelColor=%23131519&color=%230F79AA&label=Direct%20Downloads)
-![](https://img.shields.io/github/downloads/RaidcoreGG/NexusInstaller/total?style=for-the-badge&labelColor=%23131519&color=%230F79AA&label=Installer%20Downloads)
-
-# Nexus - An addon engine for Guild Wars 2
+# Nexus - An addon overlay for Guild Wars 2
 
 *Host, Loader, Manager, Framework* and *Platform* are all terms describing what Nexus does.
 
@@ -26,8 +24,6 @@ Nexus means focus on developing actual features. **Hot-Loading. Easy Integration
 - **Texture/Image Loader**
 - **Addon Library** for quick discovery & installation.
 - **Auto-Disable on Game Update**
-- **Extended Real-Time APIs**
-- **ArcDPS Integration**
 
 ## Installation
 1. Download `d3d11.dll` found in the [latest release](https://github.com/RaidcoreGG/Nexus/releases).
@@ -46,7 +42,7 @@ If you want another proxy d3d11.dll, for example ArcDPS, you can chainload it by
 For the idea of a proxy dll & hot-loading.
 
 ### [Deltaconnected / ArcDPS](https://www.deltaconnected.com/arcdps/)
-For the idea of an addon loading system.
+For the idea of an addon/plugin loading system.
 
 ### [Thomas McBoyle](https://github.com/TMcBoyle)
 For general guidance & programming help.
