@@ -9,8 +9,9 @@
 #ifndef OVERLAY_MUMBLEINSPECTOR_H
 #define OVERLAY_MUMBLEINSPECTOR_H
 
-#include "Engine/Loader/NexusLinkData.h"
 #include "thirdparty/mumble/Mumble.h"
+
+#include "Core/NexusLink.h"
 #include "UI/Controls/CtlWindow.h"
 
 class CMumbleOverlay : public virtual IWindow

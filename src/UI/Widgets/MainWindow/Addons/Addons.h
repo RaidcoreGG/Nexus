@@ -11,8 +11,13 @@
 
 #include <mutex>
 #include <vector>
+#include <windows.h>
 
-#include "DisplayAddon.h"
+#include "imgui/imgui.h"
+
+#include "AddonListing.h"
+#include "CmAddon.h"
+#include "LoadConfirmationModal.h"
 #include "UI/Controls/CtlSubWindow.h"
 #include "UI/Widgets/MainWindow/Binds/BindSetterModal.h"
 #include "UninstallConfirmationModal.h"
@@ -25,10 +30,9 @@ enum class EAddonsFilterFlags
 	None,
 	ShowEnabled          = 1 << 0,
 	ShowDisabled         = 1 << 1,
-	ShowDownloadable     = 1 << 2,
-	ShowInstalled_Arc    = 1 << 3,
-	ShowDownloadable_Arc = 1 << 4,
+	ShowDownloadable     = 1 << 2
 };
+DEFINE_ENUM_FLAG_OPERATORS(EAddonsFilterFlags)
 
 class CAddonsWindow : public ISubWindow
 {
@@ -41,24 +45,54 @@ class CAddonsWindow : public ISubWindow
 	private:
 	CBindSetterModal            BindSetterModal;
 	CUninstallConfirmationModal UninstallConfirmationModal;
+	CLoadConfirmationModal      LoadConfirmationModal;
+	CAddonContextMenu           AddonContextMenu;
 
 	std::string                 SearchTerm;
 	EAddonsFilterFlags          Filter;
-	std::vector<AddonItemData_t>  Addons;
+	bool                        IsListMode;
+	std::vector<AddonListing_t> Addons;
+	uint32_t                    AddonsAmtUnfiltered;
 
 	/* Details */
 	std::mutex                  Mutex;
 	bool                        HasContent = false;
-	AddonItemData_t               AddonData = {};
+	AddonListing_t              AddonData = {};
 
-	void SetContent(AddonItemData_t& aAddonData);
+	void SetContent(AddonListing_t& aAddonData);
 	void ClearContent();
 
-	void AddonItem(AddonItemData_t& aAddonData, float aWidth);
+	void AddonItem(AddonListing_t& aAddonData, float aWidth);
 
 	void RenderContent() override;
-	void RenderSubWindows() override;
+
+	///----------------------------------------------------------------------------------------------------
+	/// RenderFilterBar:
+	/// 	Renders the filter bar of the addons window.
+	///		aSize parameter is modified to dynamically adjust to window height.
+	///----------------------------------------------------------------------------------------------------
+	void RenderFilterBar(ImVec2& aSize);
+
+	///----------------------------------------------------------------------------------------------------
+	/// RenderBody:
+	/// 	Renders the addons list or details view of the addons window.
+	///----------------------------------------------------------------------------------------------------
+	void RenderBody(ImVec2 aSize);
+
+	///----------------------------------------------------------------------------------------------------
+	/// RenderDetails:
+	/// 	Renders the details view of a target addon.
+	///----------------------------------------------------------------------------------------------------
 	void RenderDetails();
+
+	///----------------------------------------------------------------------------------------------------
+	/// RenderActionsBar:
+	/// 	Renders the actions bar of the addons window.
+	///		aSize parameter is modified to dynamically adjust to window height.
+	///----------------------------------------------------------------------------------------------------
+	void RenderActionsBar(ImVec2& aSize);
+
+	void RenderSubWindows() override;
 	void RenderInputBindsTable(const std::unordered_map<std::string, InputBindPacked_t>& aInputBinds);
 
 	void PopulateAddons();

@@ -13,12 +13,15 @@
 #include "imgui/imgui_internal.h"
 
 #include "Core/Context.h"
+#include "Engine/Cleanup/RefCleanerContext.h"
 #include "Resources/ResConst.h"
 #include "Util/Resources.h"
 
 CFontManager::CFontManager(CLocalization* aLocalization)
 {
 	this->Language = aLocalization;
+
+	CRefCleanerContext::Get()->Register("CFontManager", this);
 }
 
 CFontManager::~CFontManager()
@@ -452,7 +455,7 @@ void CFontManager::ResizeFont(const char* aIdentifier, float aFontSize)
 	}
 }
 
-int CFontManager::Verify(void* aStartAddress, void* aEndAddress)
+int CFontManager::CleanupRefs(void* aStartAddress, void* aEndAddress)
 {
 	int refCounter = 0;
 

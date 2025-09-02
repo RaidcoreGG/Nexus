@@ -9,17 +9,24 @@
 #ifndef CONTEXT_H
 #define CONTEXT_H
 
+#include <map>
+#include <mutex>
+
+#include "Core/Addons/Config/CfgManager.h"
+#include "Core/Addons/Library/LibManager.h"
 #include "Core/Preferences/PrefContext.h"
+#include "Core/Updater/SelfUpdater.h"
+#include "Core/Versioning/VerU64_4XS16.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
-#include "Engine/Loader/AddonVersion.h"
+#include "Engine/Loader/Loader.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
 #include "Engine/Renderer/RdrContext.h"
 #include "Engine/Textures/TxLoader.h"
-#include "Engine/Updater/Updater.h"
+#include "GW2/ArcDPS/ArcApi.h"
 #include "GW2/Inputs/GameBinds/GbApi.h"
 #include "GW2/Mumble/MblReader.h"
 #include "UI/UiContext.h"
@@ -32,7 +39,7 @@ class CContext
 	CContext(CContext const&)       = delete;
 	void operator=(CContext const&) = delete;
 
-	AddonVersion_t const& GetVersion();
+	MajorMinorBuildRevision_t const& GetVersion();
 
 	const char* GetBuild();
 
@@ -46,13 +53,15 @@ class CContext
 
 	CLogApi* GetLogger();
 
-	CUpdater* GetUpdater();
-
 	CTextureLoader* GetTextureService();
 
 	CDataLinkApi* GetDataLink();
 
 	CEventApi* GetEventApi();
+
+	CLoader* GetLoader();
+
+	CLibraryMgr* GetAddonLibrary();
 
 	CRawInputApi* GetRawInputApi();
 
@@ -66,15 +75,23 @@ class CContext
 
 	CMumbleReader* GetMumbleReader();
 
-	CHttpClient* GetRaidcoreApi();
+	CHttpClient* GetHttpClient(std::string aURL);
 
-	CHttpClient* GetGitHubApi();
+	CSelfUpdater* GetSelfUpdater();
+
+	CArcApi* GetArcApi();
+
+	CConfigMgr* GetCfgMgr();
 
 	private:
 	CContext() = default;
+	~CContext();
 
-	HMODULE Module;
-	DWORD   ModuleSize;
+	HMODULE                             Module     = nullptr;
+	DWORD                               ModuleSize = 0;
+
+	std::mutex                          HttpClientMutex;
+	std::map<std::string, CHttpClient*> HttpClients;
 };
 
 #endif

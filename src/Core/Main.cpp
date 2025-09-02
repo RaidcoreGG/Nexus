@@ -16,11 +16,10 @@
 #include "Core/Context.h"
 #include "Core/Hooks/Hooks.h"
 #include "Core/Index/Index.h"
-#include "Engine/Loader/Loader.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Logging/LogConsole.h"
 #include "Engine/Logging/LogWriter.h"
-#include "Engine/Updater/Updater.h"
+#include "GW2/Build/BuildInfo.h"
 #include "GW2/Multibox/Multibox.h"
 #include "Resources/ResConst.h"
 #include "UI/UiContext.h"
@@ -44,6 +43,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		{
 			CContext* ctx = CContext::GetContext();
 
+			Main::Shutdown(1);
+
 			/* If we have the window handle and we have an original (target) wndproc. */
 			if (ctx->GetRendererCtx()->Window.Handle && Hooks::Target::WndProc)
 			{
@@ -58,7 +59,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
 namespace Main
 {
-	static std::thread s_UpdateThread;
+	static std::thread s_LibraryThread;
+	static std::thread s_BuildThread;
+	static std::thread s_LicenseThread;
+	static std::thread s_KillMutexThread;
 
 	void Initialize(EProxyFunction aEntryFunction)
 	{
@@ -86,7 +90,13 @@ namespace Main
 			aEntryFunction
 		);
 
-		s_UpdateThread = std::thread(Main::UpdateCheck);
+		/* Initialize self updater here so it can lock this instance and update. */
+		CSelfUpdater* selfupdater = ctx->GetSelfUpdater();
+
+		s_LicenseThread = std::thread([]() {
+			CContext* ctx = CContext::GetContext();
+			Resources::Unpack(ctx->GetModule(), Index(EPath::ThirdPartySoftwareReadme), RES_THIRDPARTYNOTICES, "TXT");
+		});
 
 		/* Allocate console logger, if requested. */
 		if (CmdLine::HasArgument("-ggconsole"))
@@ -119,9 +129,25 @@ namespace Main
 			return;
 		}
 
+		s_LibraryThread = std::thread([]() {
+			CContext* ctx = CContext::GetContext();
+			CLibraryMgr* libmgr = ctx->GetAddonLibrary();
+			libmgr->AddSource("https://api.raidcore.gg/addonlibrary");
+			libmgr->AddSource("https://api.raidcore.gg/arcdpslibrary");
+			libmgr->Update();
+		});
+
+		/* Prefetch game build. */
+		s_BuildThread = std::thread([]() {
+			GW2::GetGameBuild();
+		});
+
 		MH_Initialize();
-		Multibox::KillMutex();
-		logger->Info(CH_CORE, "Multibox State: %d", Multibox::GetState());
+
+		s_KillMutexThread = std::thread([logger]() {
+			Multibox::KillMutex();
+			logger->Info(CH_CORE, "Multibox State: %d", Multibox::GetState());
+		});
 	}
 
 	void Shutdown(unsigned int aReason)
@@ -136,18 +162,19 @@ namespace Main
 
 		s_ShutdownReason = aReason;
 
-		/* If the update thread is still running, let it join. */
-		if (s_UpdateThread.joinable())
-		{
-			s_UpdateThread.join();
-		}
+		/* Join threads. */
+		if (s_KillMutexThread.joinable()) { s_KillMutexThread.join(); }
+		if (s_LicenseThread.joinable()) { s_LicenseThread.join(); }
+		if (s_BuildThread.joinable()) { s_BuildThread.join(); }
+		if (s_LibraryThread.joinable()) { s_LibraryThread.join(); }
 
 		std::string reasonStr;
 		switch (aReason)
 		{
-			case WM_DESTROY: { reasonStr = "Reason: WM_DESTROY"; break; }
-			case WM_CLOSE:   { reasonStr = "Reason: WM_CLOSE";   break; }
-			case WM_QUIT:    { reasonStr = "Reason: WM_QUIT";    break; }
+			case 1:          { reasonStr = "Reason: DLL_PROCESS_DETACH"; break; }
+			case WM_DESTROY: { reasonStr = "Reason: WM_DESTROY";         break; }
+			case WM_CLOSE:   { reasonStr = "Reason: WM_CLOSE";           break; }
+			case WM_QUIT:    { reasonStr = "Reason: WM_QUIT";            break; }
 			default:
 			{
 				reasonStr = String::Format("Reason: Unknown (%d)", aReason);
@@ -157,42 +184,23 @@ namespace Main
 
 		CContext*   ctx    = CContext::GetContext();
 		CLogApi*    logger = ctx->GetLogger();
-		CUiContext* uictx  = ctx->GetUIContext();
 
 		logger->Critical(CH_CORE, "SHUTDOWN BEGIN | %s", reasonStr.c_str());
-		MH_Uninitialize();
-		Loader::Shutdown();
-		uictx->Shutdown();
+
+		if (!CmdLine::HasArgument("-ggvanilla"))
+		{
+			MH_Uninitialize();
+
+			CLoader*    loader = ctx->GetLoader();
+			CUiContext* uictx  = ctx->GetUIContext();
+
+			loader->Shutdown();
+			uictx->Shutdown();
+		}
 		logger->Info(CH_CORE, "SHUTDOWN END");
 
 		/* Let the OS take care of freeing the handles. Ugly, but otherwise crashes due to the addon clownfiesta in GW2. */
 		//if (D3D11Handle) { FreeLibrary(D3D11Handle); }
 		//if (D3D11SystemHandle) { FreeLibrary(D3D11SystemHandle); }
-	}
-
-	void UpdateCheck()
-	{
-		CContext* ctx = CContext::GetContext();
-
-		/* Always write the thirdpartysoftwarereadme to disk. We do this here, because it's in a thread. */
-		Resources::Unpack(ctx->GetModule(), Index(EPath::ThirdPartySoftwareReadme), RES_THIRDPARTYNOTICES, "TXT");
-
-		HANDLE hMutex = CreateMutexA(0, true, "RCGG-Mutex-Patch-Nexus");
-
-		if (hMutex == NULL && GetLastError() == ERROR_ALREADY_EXISTS)
-		{
-			ctx->GetLogger()->Info(CH_CORE, "Cannot patch Nexus, mutex locked.");
-			return;
-		}
-
-		/* Perform/Check for update. */
-		ctx->GetUpdater()->UpdateNexus();
-
-		/* Sanity check before closing handles. */
-		if (hMutex)
-		{
-			ReleaseMutex(hMutex);
-			CloseHandle(hMutex);
-		}
 	}
 }

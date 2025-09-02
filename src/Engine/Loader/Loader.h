@@ -2,78 +2,56 @@
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
 /// Name         :  Loader.h
-/// Description  :  Handles addon hot-loading, updates etc.
+/// Description  :  Addon loader component.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
 #ifndef LOADER_H
 #define LOADER_H
 
-#include <mutex>
-#include <map>
-#include <vector>
-#include <unordered_map>
-#include <thread>
-#include <filesystem>
-#include <Shlobj.h>
 #include <condition_variable>
+#include <filesystem>
+#include <mutex>
+#include <shtypes.h>
+#include <vector>
+#include <windows.h>
 
-#include "ELoaderAction.h"
-#include "Addon.h"
-#include "API/AddonAPI.h"
+#include "Engine/Logging/LogApi.h"
+#include "Engine/Renderer/RdrContext.h"
+#include "LdrAddonBase.h"
 
-#include "Engine/Loader/NexusLinkData.h"
-
-constexpr const UINT WM_ADDONDIRUPDATE = WM_USER + 101;
+constexpr const uint32_t WM_ADDONDIRUPDATE = WM_USER + 101;
 constexpr const char* CH_LOADER = "Loader";
 
-namespace Loader
+///----------------------------------------------------------------------------------------------------
+/// CLoader Class
+///----------------------------------------------------------------------------------------------------
+class CLoader
 {
-	extern NexusLinkData_t*          NexusLink;
-
-	extern std::mutex              Mutex;
-	extern std::unordered_map<
-		std::filesystem::path,
-		ELoaderAction
-	>                              QueuedAddons; /* To be loaded or unloaded addons */
-	extern std::vector<Addon_t*>     Addons;
-	extern bool                    HasCustomConfig;
-	extern std::filesystem::path   ConfigPath;
-
-	extern int                     DirectoryChangeCountdown;
-	extern std::condition_variable ConVar;
-	extern std::mutex              ThreadMutex;
-	extern std::thread             LoaderThread;
-	extern bool                    IsSuspended;
-
-	extern PIDLIST_ABSOLUTE        FSItemList;
-	extern ULONG                   FSNotifierID;
-
-	extern bool                    IsGameLaunchSequence;
+	public:
+	///----------------------------------------------------------------------------------------------------
+	/// ctor
+	///----------------------------------------------------------------------------------------------------
+	CLoader(
+		CLogApi*              aLogger,
+		RenderContext_t*      aRenderContext,
+		IADDON_FACTORY        aFactoryFunction,
+		std::filesystem::path aDirectory
+	);
+	// FIXME: factor per file ext
 
 	///----------------------------------------------------------------------------------------------------
-	/// Initialize:
-	/// 	Registers the addon directory update notifications and loads all addons.
+	/// dtor
 	///----------------------------------------------------------------------------------------------------
-	void Initialize();
+	~CLoader();
 
-	///----------------------------------------------------------------------------------------------------
-	/// Shutdown:
-	/// 	Deregisters the directory updates and calls unload on all addons.
-	///----------------------------------------------------------------------------------------------------
 	void Shutdown();
 
 	///----------------------------------------------------------------------------------------------------
-	/// LoadAddonConfig:
-	/// 	Load AddonConfig.
+	/// Init:
+	/// 	Initializes the necessary resouces to receive directory updates and the processor thread.
 	///----------------------------------------------------------------------------------------------------
-	void LoadAddonConfig();
-
-	///----------------------------------------------------------------------------------------------------
-	/// SaveAddonConfig:
-	/// 	Save AddonConfig.
-	///----------------------------------------------------------------------------------------------------
-	void SaveAddonConfig();
+	void Init();
 
 	///----------------------------------------------------------------------------------------------------
 	/// WndProc:
@@ -82,22 +60,92 @@ namespace Loader
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	///----------------------------------------------------------------------------------------------------
-	/// ProcessQueue:
-	/// 	Processes all currently queued addons.
-	///----------------------------------------------------------------------------------------------------
-	void ProcessQueue();
-
-	///----------------------------------------------------------------------------------------------------
-	/// QueueAddon:
-	/// 	Pushes an item to the queue.
-	///----------------------------------------------------------------------------------------------------
-	void QueueAddon(ELoaderAction aAction, const std::filesystem::path& aPath);
-
-	///----------------------------------------------------------------------------------------------------
 	/// NotifyChanges:
 	/// 	Notifies that something in the addon directory changed.
 	///----------------------------------------------------------------------------------------------------
 	void NotifyChanges();
+
+	///----------------------------------------------------------------------------------------------------
+	/// Track:
+	/// 	Adds a specific path for addon tracking.
+	///----------------------------------------------------------------------------------------------------
+	void Track(std::filesystem::path aPath);
+
+	///----------------------------------------------------------------------------------------------------
+	/// Load:
+	/// 	Loads the addon matching the signature.
+	///----------------------------------------------------------------------------------------------------
+	void LoadSafe(std::filesystem::path aPath);
+
+	///----------------------------------------------------------------------------------------------------
+	/// Unload:
+	/// 	Unloads the addon matching the signature.
+	///----------------------------------------------------------------------------------------------------
+	void UnloadSafe(std::filesystem::path aPath);
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetOwner:
+	/// 	Returns the owner of the passed address, or nullptr.
+	///----------------------------------------------------------------------------------------------------
+	IAddon* GetOwner(void* aAddress) const;
+
+	///----------------------------------------------------------------------------------------------------
+	/// IsTrackedSafe:
+	/// 	Returns true, if the provided signature is an already tracked addon.
+	/// 	[optional] aAddon: Do not compare against the provided addon.
+	///----------------------------------------------------------------------------------------------------
+	bool IsTrackedSafe(uint32_t aSignature, IAddon* aAddon = nullptr) const;
+
+	///----------------------------------------------------------------------------------------------------
+	/// IsTrackedSafe:
+	/// 	Returns true, if the provided path is an already tracked addon.
+	/// 	[optional] aAddon: Do not compare against the provided addon.
+	///----------------------------------------------------------------------------------------------------
+	bool IsTrackedSafe(std::filesystem::path aPath, IAddon* aAddon = nullptr) const;
+
+	///----------------------------------------------------------------------------------------------------
+	/// IsTrackedSafe:
+	/// 	Returns true, if the provided MD5 is an already tracked addon.
+	/// 	[optional] aAddon: Do not compare against the provided addon.
+	///----------------------------------------------------------------------------------------------------
+	bool IsTrackedSafe(MD5_t aMD5, IAddon* aAddon = nullptr) const;
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetAddons:
+	/// 	Returns all tracked addons.
+	///----------------------------------------------------------------------------------------------------
+	std::vector<IAddon*> GetAddons() const;
+
+	private:
+	CLogApi*                Logger        = nullptr;
+	RenderContext_t*        RenderContext = nullptr;
+
+	std::filesystem::path   Directory;
+
+	std::mutex              FSMutex;
+	PIDLIST_ABSOLUTE        FSItemList    = nullptr;
+	ULONG                   FSNotifierID  = 0;
+
+	std::thread             ProcThread;
+	bool                    IsRunning     = false;
+
+	mutable std::mutex      Mutex;
+	std::condition_variable ConVar;
+
+	IADDON_FACTORY          CreateAddon;
+	std::vector<IAddon*>    Addons;
+
+	///----------------------------------------------------------------------------------------------------
+	/// DeinitDirectoryUpdates:
+	/// 	Deinitializes the necessary resouces to receive directory updates.
+	///----------------------------------------------------------------------------------------------------
+	void DeinitDirectoryUpdates();
+
+	///----------------------------------------------------------------------------------------------------
+	/// IsValid:
+	/// 	Returns true if the provided addon path is valid for loading.
+	///----------------------------------------------------------------------------------------------------
+	bool IsValid(const std::filesystem::path& aPath);
 
 	///----------------------------------------------------------------------------------------------------
 	/// ProcessChanges:
@@ -106,73 +154,44 @@ namespace Loader
 	void ProcessChanges();
 
 	///----------------------------------------------------------------------------------------------------
-	/// LoadAddon:
-	/// 	Loads an addon.
+	/// Discover:
+	/// 	Discovers the addons on disk and creates them if they are valid.
+	/// 	Does not check if the file is already tracked, only call this once for the initial discovery.
 	///----------------------------------------------------------------------------------------------------
-	void LoadAddon(const std::filesystem::path& aPath, bool aIsReload = false);
-	
-	///----------------------------------------------------------------------------------------------------
-	/// UnloadAddon:
-	/// 	Unloads an addon and performs a reload as soon as the addon returns, if requested.
-	///----------------------------------------------------------------------------------------------------
-	void UnloadAddon(const std::filesystem::path& aPath, bool aDoReload = false);
+	void Discover();
 
 	///----------------------------------------------------------------------------------------------------
-	/// FreeAddon:
-	/// 	Calls FreeLibrary on the specified addon.
-	/// 	This function should not be invoked manually, but through Addon_t::Unload + Queue(Free).
+	/// IsTracked:
+	/// 	Returns true if the provided signature is an already tracked addon.
+	/// 	[optional] aAddon: Do not compare against the provided addon.
 	///----------------------------------------------------------------------------------------------------
-	void FreeAddon(const std::filesystem::path& aPath);
+	bool IsTracked(uint32_t aSignature, IAddon* aAddon = nullptr) const;
 
 	///----------------------------------------------------------------------------------------------------
-	/// UninstallAddon:
-	/// 	Uninstalls an addon, or moves it to addon.dll.uninstall to be cleaned up by the loader later.
-	/// 	This function should not be invoked manually, but through Unload + FollowUpAction::Uninstall.
+	/// IsTracked:
+	/// 	Returns true if the provided path is an already tracked addon.
+	/// 	[optional] aAddon: Do not compare against the provided addon.
 	///----------------------------------------------------------------------------------------------------
-	void UninstallAddon(const std::filesystem::path& aPath);
+	bool IsTracked(std::filesystem::path aPath, IAddon* aAddon = nullptr) const;
 
 	///----------------------------------------------------------------------------------------------------
-	/// UpdateSwapAddon:
-	/// 	Swaps addon.dll with addon.dll.update.
-	/// 	Returns true if there was an update dll.
+	/// IsTracked:
+	/// 	Returns true if the provided MD5 is an already tracked addon.
+	/// 	[optional] aAddon: Do not compare against the provided addon.
 	///----------------------------------------------------------------------------------------------------
-	bool UpdateSwapAddon(const std::filesystem::path& aPath);
+	bool IsTracked(MD5_t aMD5, IAddon* aAddon = nullptr) const;
 
 	///----------------------------------------------------------------------------------------------------
-	/// GetOwner:
-	/// 	Returns the name of the addon owning the provided address.
+	/// Load:
+	/// 	Loads the addon matching the signature.
 	///----------------------------------------------------------------------------------------------------
-	std::string GetOwner(void* aAddress);
+	void Load(std::filesystem::path aPath);
 
 	///----------------------------------------------------------------------------------------------------
-	/// FindAddonBySig:
-	/// 	Returns the addon with a matching signature or nullptr.
+	/// Unload:
+	/// 	Unloads the addon matching the signature.
 	///----------------------------------------------------------------------------------------------------
-	Addon_t* FindAddonBySig(signed int aSignature);
-
-	///----------------------------------------------------------------------------------------------------
-	/// FindAddonByPath:
-	/// 	Returns the addon with a matching path or nullptr.
-	///----------------------------------------------------------------------------------------------------
-	Addon_t* FindAddonByPath(const std::filesystem::path& aPath);
-
-	///----------------------------------------------------------------------------------------------------
-	/// FindAddonByMatchSig:
-	/// 	Returns the addon with a matching mock signature or nullptr.
-	///----------------------------------------------------------------------------------------------------
-	Addon_t* FindAddonByMatchSig(signed int aMatchSignature);
-
-	///----------------------------------------------------------------------------------------------------
-	/// FindAddonByMD5:
-	/// 	Returns the addon with a matching MD5 or nullptr.
-	///----------------------------------------------------------------------------------------------------
-	Addon_t* FindAddonByMD5(std::vector<unsigned char> aMD5);
-
-	///----------------------------------------------------------------------------------------------------
-	/// GetGameBuild:
-	/// 	Gets the game build and sets the Disable Until Update state.
-	///----------------------------------------------------------------------------------------------------
-	void GetGameBuild();
-}
+	void Unload(std::filesystem::path aPath);
+};
 
 #endif

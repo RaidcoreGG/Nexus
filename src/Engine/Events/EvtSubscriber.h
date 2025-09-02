@@ -16,7 +16,7 @@
 ///----------------------------------------------------------------------------------------------------
 struct EventSubscriber_t
 {
-	signed int    Signature;
+	uint32_t      Signature;
 	EVENT_CONSUME Callback;
 };
 

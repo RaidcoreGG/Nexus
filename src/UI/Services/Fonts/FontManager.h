@@ -16,6 +16,7 @@
 
 #include "imgui/imgui.h"
 
+#include "Engine/Cleanup/RefCleanerBase.h"
 #include "FuncDefs.h"
 #include "UI/Services/Localization/LoclApi.h"
 
@@ -26,19 +27,19 @@ constexpr const char* CH_FONTMANAGER = "CFontManager";
 ///----------------------------------------------------------------------------------------------------
 struct ManagedFont_t
 {
-	std::string							Identifier;
-	ImFont*								Pointer;
-	std::vector<FONTS_RECEIVECALLBACK>	Subscribers;
-	float								Size;
-	void*								Data;
-	size_t								DataSize;
-	ImFontConfig*						Config;
+	std::string                        Identifier;
+	ImFont*                            Pointer;
+	std::vector<FONTS_RECEIVECALLBACK> Subscribers;
+	float                              Size;
+	void*                              Data;
+	size_t                             DataSize;
+	ImFontConfig*                      Config;
 };
 
 ///----------------------------------------------------------------------------------------------------
 /// CFontManager Class
 ///----------------------------------------------------------------------------------------------------
-class CFontManager
+class CFontManager : public virtual IRefCleaner
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -123,17 +124,17 @@ class CFontManager
 	void ResizeFont(const char* aIdentifier, float aFontSize);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Verify:
+	/// CleanupRefs:
 	/// 	Removes all unreleased references in the given address space.
 	///----------------------------------------------------------------------------------------------------
-	int Verify(void* aStartAddress, void* aEndAddress);
+	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	private:
 	CLocalization* Language;
 
-	mutable std::mutex			Mutex;
-	std::vector<ManagedFont_t>	Registry;
-	bool						IsFontAtlasBuilt = false;
+	mutable std::mutex         Mutex;
+	std::vector<ManagedFont_t> Registry;
+	bool                       IsFontAtlasBuilt = false;
 
 	///----------------------------------------------------------------------------------------------------
 	/// AddFontInternal:

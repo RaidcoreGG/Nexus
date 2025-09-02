@@ -36,10 +36,10 @@ namespace Path
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetUnused:
-	/// 	Returns an unused path based on the passed one. Increments a _# suffix until unused.
-	/// 	aOverWriteExtension = true will append the suffix to the extension rather than the filename.
+	/// 	Returns an unused path based on the passed one.
+	/// 	Increments like: "filename_#.extension".
 	///----------------------------------------------------------------------------------------------------
-	std::filesystem::path GetUnused(const std::filesystem::path& aPath, bool aOverwriteExtension = false);
+	std::filesystem::path GetUnused(const std::filesystem::path& aPath);
 }
 
 #endif

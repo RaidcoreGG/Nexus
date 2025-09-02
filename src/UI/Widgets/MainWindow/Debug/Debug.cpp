@@ -437,7 +437,7 @@ void CDebugWindow::TabQuickAccess()
 
 void CDebugWindow::TabLoader()
 {
-	if (!ImGui::BeginTabItem("Loader"))
+	/*if (!ImGui::BeginTabItem("Loader"))
 	{
 		return;
 	}
@@ -486,7 +486,7 @@ void CDebugWindow::TabLoader()
 						{
 							this->MemoryViewer.Open = true;
 							this->MV_Ptr = addon->Definitions;
-							this->MV_Size = sizeof(AddonDef_t);
+							this->MV_Size = sizeof(AddonDefRawV1_t);
 						}
 					}
 
@@ -495,31 +495,10 @@ void CDebugWindow::TabLoader()
 			}
 			ImGui::TreePop();
 		}
-		if (ImGui::TreeNode("Queued"))
-		{
-			for (const auto& [path, action] : Loader::QueuedAddons)
-			{
-				switch (action)
-				{
-					case ELoaderAction::Load:
-						ImGui::Text("Load");
-						break;
-					case ELoaderAction::Unload:
-						ImGui::Text("Unload");
-						break;
-					case ELoaderAction::Uninstall:
-						ImGui::Text("Uninstall");
-						break;
-				}
-				ImGui::SameLine();
-				ImGui::TextDisabled("%s", path.string().c_str());
-			}
-			ImGui::TreePop();
-		}
 	}
 	ImGui::EndChild();
 
-	ImGui::EndTabItem();
+	ImGui::EndTabItem();*/
 }
 
 void CDebugWindow::TabFonts()

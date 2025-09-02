@@ -23,6 +23,7 @@
 #include "Core/Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
 #include "Core/Preferences/PrefContext.h"
+#include "Engine/Cleanup/RefCleanerContext.h"
 #include "Engine/Inputs/InputBinds/IbConst.h"
 #include "GW2/Inputs/GameBinds/GbConst.h"
 #include "GW2/Mumble/MblConst.h"
@@ -303,6 +304,8 @@ CUiContext::CUiContext(RenderContext_t* aRenderContext, CLogApi* aLogger, CTextu
 	this->LoadSettings();
 	this->CreateNexusShortcut();
 	this->LoadFonts();
+
+	CRefCleanerContext::Get()->Register("CUiContext", this);
 }
 
 CUiContext::~CUiContext()
@@ -661,7 +664,7 @@ void CUiContext::Deregister(GUI_RENDER aRenderCallback)
 	this->RegistryOptionsRender.erase(std::remove(this->RegistryOptionsRender.begin(), this->RegistryOptionsRender.end(), aRenderCallback), this->RegistryOptionsRender.end());
 }
 
-int CUiContext::Verify(void* aStartAddress, void* aEndAddress)
+int CUiContext::CleanupRefs(void* aStartAddress, void* aEndAddress)
 {
 	int refCounter = 0;
 
@@ -760,7 +763,7 @@ void CUiContext::UpdateScaling()
 		settingsctx->Get<float>(OPT_LASTUISCALE, 1.0f) *
 		/* settingsctx->Get<float>(OPT_GLOBALSCALE, 1.0f) * */
 		io.FontGlobalScale *
-		min(min(renderer->Window.Width, 1024.0) / 1024.0, min(renderer->Window.Height, 768.0) / 768.0);
+		min(min(renderer->Window.Width, 1024.0f) / 1024.0f, min(renderer->Window.Height, 768.0f) / 768.0f);
 
 	if (nexuslink)
 	{
@@ -1181,6 +1184,7 @@ void CUiContext::UpdateDisplayInputBinds()
 
 	CContext* ctx = CContext::GetContext();
 	CInputBindApi* inputBindApi = ctx->GetInputBindApi();
+	CLoader* loader = ctx->GetLoader();
 
 	/* copy of all InputBinds */
 	std::map<std::string, IbMapping_t> InputBindRegistry = inputBindApi->GetRegistry();
@@ -1188,7 +1192,23 @@ void CUiContext::UpdateDisplayInputBinds()
 	/* acquire categories */
 	for (auto& [identifier, inputBind] : InputBindRegistry)
 	{
-		std::string owner = Loader::GetOwner(inputBind.Handler_DownOnlyAsync);
+		std::string owner = "(null)";
+
+		IAddon* iaddon = loader->GetOwner(inputBind.Handler_DownOnlyAsync);
+
+		if (iaddon)
+		{
+			CAddon* addon = dynamic_cast<CAddon*>(iaddon);
+			owner = addon->GetName();
+		}
+		else
+		{
+			/* If no owner found, but a pointer is set, we assume Nexus owns it. */
+			if (inputBind.Handler_DownOnlyAsync)
+			{
+				owner = "Nexus";
+			}
+		}
 
 		auto it = std::find_if(this->DisplayInputBinds.begin(), this->DisplayInputBinds.end(), [owner](InputBindCategory_t category) { return category.Name == owner; });
 

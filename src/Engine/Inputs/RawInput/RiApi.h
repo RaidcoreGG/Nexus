@@ -9,11 +9,12 @@
 #ifndef RAWINPUTAPI_H
 #define RAWINPUTAPI_H
 
-#include <vector>
 #include <mutex>
+#include <vector>
 
-#include "RiFuncDefs.h"
+#include "Engine/Cleanup/RefCleanerBase.h"
 #include "Engine/Renderer/RdrContext.h"
+#include "RiFuncDefs.h"
 
 #define WM_PASSTHROUGH_FIRST WM_USER + 7997
 #define WM_PASSTHROUGH_LAST  WM_USER + 7997 + WM_USER - 1
@@ -21,7 +22,7 @@
 ///----------------------------------------------------------------------------------------------------
 /// CRawInputApi Class
 ///----------------------------------------------------------------------------------------------------
-class CRawInputApi
+class CRawInputApi : public virtual IRefCleaner
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -34,6 +35,13 @@ class CRawInputApi
 	/// 	Returns 0 if message was processed or non-zero, if it should be passed to the next callback.
 	///----------------------------------------------------------------------------------------------------
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+	///----------------------------------------------------------------------------------------------------
+	/// WndProcGameOnly:
+	/// 	Returns the uMsg shifted back to the normal range.
+	/// 	This should be called after all other window procedures.
+	///----------------------------------------------------------------------------------------------------
+	UINT WndProcGameOnly(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	///----------------------------------------------------------------------------------------------------
 	/// SendWndProcToGame:
@@ -54,10 +62,10 @@ class CRawInputApi
 	void Deregister(WNDPROC_CALLBACK aWndProcCallback);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Verify:
+	/// CleanupRefs:
 	/// 	Removes all WndProc Callbacks that are within the provided address space.
 	///----------------------------------------------------------------------------------------------------
-	int Verify(void* aStartAddress, void* aEndAddress);
+	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	private:
 	RenderContext_t*              RenderContext = nullptr;

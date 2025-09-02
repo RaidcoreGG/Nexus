@@ -8,7 +8,15 @@
 
 #include "EvtApi.h"
 
-#include "Engine/Loader/Loader.h"
+#include "Engine/Cleanup/RefCleanerContext.h"
+#include "EvtSubscriber.h"
+
+CEventApi::CEventApi(CLoader* aLoader)
+{
+	this->Loader = aLoader;
+
+	CRefCleanerContext::Get()->Register("CEventApi", this);
+}
 
 void CEventApi::Raise(const char* aIdentifier, void* aEventData)
 {
@@ -31,7 +39,7 @@ void CEventApi::Raise(const char* aIdentifier, void* aEventData)
 	}
 }
 
-void CEventApi::Raise(signed int aSignature, const char* aIdentifier, void* aEventData)
+void CEventApi::Raise(uint32_t aSignature, const char* aIdentifier, void* aEventData)
 {
 	if (aIdentifier == nullptr) { return; }
 
@@ -66,26 +74,9 @@ void CEventApi::Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCa
 	EventSubscriber_t sub{};
 	sub.Callback = aConsumeEventCallback;
 
-	/* Resolve addon signature. */
-	for (Addon_t* addon : Loader::Addons)
-	{
-		if (addon->Module == nullptr ||
-			addon->ModuleSize == 0 ||
-			addon->Definitions == nullptr ||
-			addon->Definitions->Signature == 0)
-		{
-			continue;
-		}
+	IAddon* owner = this->Loader->GetOwner(aConsumeEventCallback);
 
-		void* startAddress = addon->Module;
-		void* endAddress = ((PBYTE)addon->Module) + addon->ModuleSize;
-
-		if (aConsumeEventCallback >= startAddress && aConsumeEventCallback <= endAddress)
-		{
-			sub.Signature = addon->Definitions->Signature;
-			break;
-		}
-	}
+	sub.Signature = owner != nullptr ? owner->GetSignature() : 0;
 
 	auto it = this->Registry.find(aIdentifier);
 
@@ -129,7 +120,7 @@ void CEventApi::Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEvent
 	);
 }
 
-int CEventApi::Verify(void* aStartAddress, void* aEndAddress)
+int CEventApi::CleanupRefs(void* aStartAddress, void* aEndAddress)
 {
 	int refCounter = 0;
 
