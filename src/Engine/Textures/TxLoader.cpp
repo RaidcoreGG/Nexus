@@ -329,7 +329,7 @@ std::map<std::string, QueuedTexture_t> CTextureLoader::GetQueuedTextures() const
 	return this->QueuedTextures;
 }
 
-int CTextureLoader::Verify(void* aStartAddress, void* aEndAddress)
+int CTextureLoader::CleanupRefs(void* aStartAddress, void* aEndAddress)
 {
 	int refCounter = 0;
 
