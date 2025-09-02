@@ -283,7 +283,7 @@ bool CAddon::ShouldLoad()
 	}
 
 	/* If first launch only. */
-	if ((this->NexusAddonDefV1->Flags & EAddonDefFlags::OnlyLoadDuringGameLaunchSequence) == EAddonDefFlags::OnlyLoadDuringGameLaunchSequence)
+	if ((this->NexusAddonDefV1->Flags & EAddonDefFlags::LaunchOnly) == EAddonDefFlags::LaunchOnly)
 	{
 		/* First launch means, state wasn't set yet. */
 		if (this->State != EAddonState::None)

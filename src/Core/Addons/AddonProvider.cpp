@@ -57,7 +57,7 @@ bool CAddon::UpdateInternal()
 
 bool CAddon::UpdateViaRaidcore()
 {
-	return false;
+	throw "Not Implemented";
 }
 
 bool CAddon::UpdateViaGitHub()

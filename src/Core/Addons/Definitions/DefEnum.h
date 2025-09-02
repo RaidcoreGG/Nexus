@@ -17,11 +17,11 @@
 ///----------------------------------------------------------------------------------------------------
 enum class EAddonDefFlags : uint32_t
 {
-	None                             = 0,
-	IsVolatile                       = 1 << 0, /* is game build dependant and wants to be disabled after game updates */
-	DisableHotloading                = 1 << 1, /* prevents unloading at runtime, aka. will require a restart if updated, etc. */
-	OnlyLoadDuringGameLaunchSequence = 1 << 2, /* prevents loading the addon later than the initial character select */
-	CanCreateImGuiContext            = 1 << 3  /* addon is capable of receiving nullptr instead of imgui context and allocators and can manage its own */
+	None                  = 0,
+	IsVolatile            = 1 << 0, /* Makes the addon automatically disable, if the game updated. */
+	DisableHotloading     = 1 << 1, /* Prevents the addon from being unloaded at runtime. Unload will still be called on shutdown, if defined. */
+	LaunchOnly            = 1 << 2, /* Prevents the addon from getting loaded at runtime after the initial game launch. */
+	CanCreateImGuiContext = 1 << 3  /* Addon is capable of receiving nullptr instead of imgui context and allocators and can manage its own. (User pref.) */
 };
 DEFINE_ENUM_FLAG_OPERATORS(EAddonDefFlags);
 
