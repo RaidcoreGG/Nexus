@@ -9,11 +9,14 @@
 #ifndef TEXTURELOADER_H
 #define TEXTURELOADER_H
 
+#include <condition_variable>
 #include <filesystem>
 #include <map>
 #include <mutex>
 #include <string>
-#include <Windows.h>
+#include <thread>
+#include <vector>
+#include <windows.h>
 
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include "Engine/Logging/LogApi.h"
@@ -128,6 +131,10 @@ class CTextureLoader : public virtual IRefCleaner
 	std::map<std::string, Texture_t*>      Registry;
 	std::map<std::string, QueuedTexture_t> QueuedTextures;
 
+	std::condition_variable                ConVar;
+	bool                                   IsRunning = true;
+	std::vector<std::thread>               DownloadThreads;
+
 	///----------------------------------------------------------------------------------------------------
 	/// ProcessRequest:
 	/// 	Processes the load request.
@@ -157,9 +164,15 @@ class CTextureLoader : public virtual IRefCleaner
 
 	///----------------------------------------------------------------------------------------------------
 	/// Enqueue:
-	/// 	Adds a queue to the entry awaiting processing.
+	/// 	Adds an entry to the queue awaiting processing.
 	///----------------------------------------------------------------------------------------------------
 	void Enqueue(const char* aIdentifier, TEXTURES_RECEIVECALLBACK aCallback);
+
+	///----------------------------------------------------------------------------------------------------
+	/// Enqueue:
+	/// 	Adds an entry to be downloaded to the queue awaiting processing.
+	///----------------------------------------------------------------------------------------------------
+	void Enqueue(const char* aIdentifier, std::string aDownloadURL, TEXTURES_RECEIVECALLBACK aCallback);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Enqueue:
@@ -184,6 +197,12 @@ class CTextureLoader : public virtual IRefCleaner
 	/// 	Dispatches a texture.
 	///----------------------------------------------------------------------------------------------------
 	void DispatchTexture(const std::string& aIdentifier, Texture_t* aTexture, TEXTURES_RECEIVECALLBACK aCallback);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ProcessDownloads:
+	/// 	Thread function to process downloads.
+	///----------------------------------------------------------------------------------------------------
+	void ProcessDownloads();
 };
 
 #endif

@@ -16,11 +16,11 @@
 ///----------------------------------------------------------------------------------------------------
 enum class ETextureStage : uint32_t
 {
-	None    = 0,
-	Prepare = 1,
-	Ready   = 2,
-	Done    = 3,
-	INVALID = UINT32_MAX
+	None        = 0,
+	Prepare     = 1,
+	Ready       = 2,
+	Done        = 3,
+	INVALID     = UINT32_MAX
 };
 
 #endif

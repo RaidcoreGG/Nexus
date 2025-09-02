@@ -23,6 +23,7 @@ struct QueuedTexture_t
 	unsigned                 Width;
 	unsigned                 Height;
 	unsigned char*           Data;
+	std::string              DownloadURL;
 	TEXTURES_RECEIVECALLBACK Callback;
 };
 

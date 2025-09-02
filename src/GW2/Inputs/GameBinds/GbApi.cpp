@@ -106,9 +106,10 @@ CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogApi* aLogger, CEven
 	this->EventApi = aEventApi;
 
 	this->ConfigPath = aConfigPath;
-
-	this->Load(this->ConfigPath);
+	
+	/* FIXME: This is a dirty hack for the UI invalidation. */
 	this->AddDefaultBinds();
+	this->Load(this->ConfigPath);
 
 	this->EventApi->Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
 }
@@ -569,14 +570,16 @@ void CGameBindsApi::Load(std::filesystem::path aPath)
 		return;
 	}
 
-	this->Registry.clear();
-	this->AddDefaultBinds();
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+		this->Registry.clear();
+	}
 
-	pugi::xml_node root = doc.child("InputBindings");
+	this->AddDefaultBinds();
 
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
-
+		pugi::xml_node root = doc.child("InputBindings");
 		for (pugi::xml_node action : root.children("action"))
 		{
 			if (!action.attribute("id")) { continue; }
@@ -691,8 +694,7 @@ void CGameBindsApi::Load(std::filesystem::path aPath)
 		}
 	}
 
-	// If it was an import. Save.
-	if (this->ConfigPath == aPath)
+	if (this->ConfigPath != aPath)
 	{
 		this->Save();
 	}
@@ -700,6 +702,8 @@ void CGameBindsApi::Load(std::filesystem::path aPath)
 
 void CGameBindsApi::AddDefaultBinds()
 {
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
 	// Movement
 	this->Registry.emplace(EGameBinds::MoveForward, MultiInputBind_t{
 		InputBind_t{ false, false, false, EInputDevice::Keyboard, GameScanCodeToScanCode(87) },

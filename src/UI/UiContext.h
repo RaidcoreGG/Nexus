@@ -32,6 +32,7 @@
 #include "UI/Widgets/EULA/LicenseAgreementModal.h"
 #include "UI/Widgets/MainWindow/MainWindow.h"
 #include "UI/Widgets/QuickAccess/QuickAccess.h"
+#include "Util/Inputs.h"
 
 constexpr const char* CH_UICONTEXT       = "UI Context";
 constexpr const char* ICON_NEXUS         = "ICON_NEXUS";
@@ -302,6 +303,9 @@ class CUiContext : public virtual IRefCleaner
 	bool                               IsInitialized = false;
 	bool                               IsVisible = true;
 	bool                               IsInvalid = true;
+	bool                               ClickingRequiresMods = false;
+	bool                               AreModsDown = false;
+	EModifiers                         Mods = EModifiers::None;
 
 	///----------------------------------------------------------------------------------------------------
 	/// CreateNexusShortcut:

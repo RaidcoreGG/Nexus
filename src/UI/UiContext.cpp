@@ -411,6 +411,22 @@ void CUiContext::Render()
 		this->IsInvalid = false;
 	}
 
+	EModifiers actualMods = EModifiers::None;
+	if (GetAsyncKeyState(VK_MENU))
+	{
+		actualMods |= EModifiers::Alt;
+	}
+	if (GetAsyncKeyState(VK_CONTROL))
+	{
+		actualMods |= EModifiers::Ctrl;
+	}
+	if (GetAsyncKeyState(VK_SHIFT))
+	{
+		actualMods |= EModifiers::Shift;
+	}
+
+	this->AreModsDown = (this->Mods & actualMods) == this->Mods;
+
 	/* pre-render callbacks */
 	for (GUI_RENDER callback : this->RegistryPreRender)
 	{
@@ -488,6 +504,11 @@ void CUiContext::Render()
 void CUiContext::Invalidate()
 {
 	this->IsInvalid = true;
+
+	CSettings* settingsctx = CContext::GetContext()->GetSettingsCtx();
+
+	this->ClickingRequiresMods = settingsctx->Get<bool>(OPT_UI_CLICK_MODSONLY, false);
+	this->Mods = settingsctx->Get<EModifiers>(OPT_UI_MODS, EModifiers::None);
 }
 
 UINT CUiContext::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -514,8 +535,17 @@ UINT CUiContext::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case WM_LBUTTONDOWN:
 			if (io.WantCaptureMouse && !Inputs::IsCursorHidden())
 			{
-				io.MouseDown[0] = true;
-				return 0;
+				if (this->ClickingRequiresMods && this->AreModsDown)
+				{
+					io.MouseDown[0] = true;
+					return 0;
+				}
+				else if (!this->ClickingRequiresMods)
+				{
+					io.MouseDown[0] = true;
+					return 0;
+				}
+				break;
 			}
 			else //if (!io.WantCaptureMouse)
 			{
@@ -526,8 +556,17 @@ UINT CUiContext::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case WM_RBUTTONDOWN:
 			if (io.WantCaptureMouse && !Inputs::IsCursorHidden())
 			{
-				io.MouseDown[1] = true;
-				return 0;
+				if (this->ClickingRequiresMods && this->AreModsDown)
+				{
+					io.MouseDown[1] = true;
+					return 0;
+				}
+				else if (!this->ClickingRequiresMods)
+				{
+					io.MouseDown[1] = true;
+					return 0;
+				}
+				break;
 			}
 			break;
 

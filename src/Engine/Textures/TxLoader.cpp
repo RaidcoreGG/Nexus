@@ -6,7 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "TxLoader.h"
+#include "Engine/Textures/TxLoader.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
@@ -15,8 +15,8 @@
 #include <d3d11.h>
 #include <filesystem>
 
-#include "Engine/Cleanup/RefCleanerContext.h"
 #include "Util/Time.h"
+#include "Util/Url.h"
 
 CTextureLoader::CTextureLoader(CLogApi* aLogger, RenderContext_t* aRenderCtx, std::filesystem::path aOverridesDirectory)
 {
@@ -28,11 +28,26 @@ CTextureLoader::CTextureLoader(CLogApi* aLogger, RenderContext_t* aRenderCtx, st
 
 	this->OverridesDirectory = aOverridesDirectory;
 
-	CRefCleanerContext::Get()->Register("CTextureLoader", this);
+	/* 8 Worker threads. This is disgusting. May I interest you in a threadpool? */
+	for (size_t i = 0; i < 8; i++)
+	{
+		this->DownloadThreads.push_back(std::thread(&CTextureLoader::ProcessDownloads, this));
+	}
 }
 
 CTextureLoader::~CTextureLoader()
 {
+	this->IsRunning = false;
+	this->ConVar.notify_all();
+
+	for (size_t i = 0; i < 8; i++)
+	{
+		if (this->DownloadThreads[i].joinable())
+		{
+			this->DownloadThreads[i].join();
+		}
+	}
+
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	for (auto it = this->Registry.begin(); it != this->Registry.end();)
@@ -65,7 +80,8 @@ void CTextureLoader::Advance()
 				if (now - it->second.Time > 60000)
 				{
 					this->Logger->Debug(CH_TEXTURES, "Dropped texture with ID \"%s\" from queue after %dms at stage %d.", it->first.c_str(), now - it->second.Time, it->second.Stage);
-					it = this->QueuedTextures.erase(it);
+					it->second.Stage = ETextureStage::INVALID;
+					++it;
 				}
 				else
 				{
@@ -86,6 +102,12 @@ void CTextureLoader::Advance()
 				{
 					stbi_image_free(it->second.Data);
 					it->second.Data = nullptr;
+				}
+
+				/* Only dispatch invalid textures. Created (Done) already were dispatched. */
+				if (it->second.Stage == ETextureStage::INVALID && it->second.Callback)
+				{
+					this->DispatchTexture(it->first, nullptr, it->second.Callback);
 				}
 
 				it = this->QueuedTextures.erase(it);
@@ -268,55 +290,8 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aRemote, const ch
 		return;
 	}
 
-	/* Queue the callback. */
-	this->Enqueue(aIdentifier, aCallback);
-
-	std::string identifier = aIdentifier;
-	std::string remote = aRemote;
-	std::string endpoint = aEndpoint;
-
-	std::thread([this, identifier, remote, endpoint, aCallback]() {
-		httplib::Client client(remote);
-		client.enable_server_certificate_verification(true);
-		auto result = client.Get(endpoint);
-
-		if (!result)
-		{
-			this->Logger->Debug(CH_TEXTURES, "Error fetching %s%s (%s)\nError: %s", remote.c_str(), endpoint.c_str(), identifier.c_str(), httplib::to_string(result.error()).c_str());
-
-			/* nullptr response on fail */
-			this->DispatchTexture(identifier, nullptr, aCallback);
-			this->Dequeue(identifier.c_str());
-
-			return;
-		}
-
-		// Status is not HTTP_OK
-		if (result->status != 200)
-		{
-			this->Logger->Debug(CH_TEXTURES, "Status %d when fetching %s%s (%s) | %s", result->status, remote.c_str(), endpoint.c_str(), identifier.c_str(), httplib::to_string(result.error()).c_str());
-			
-			/* nullptr response on fail */
-			this->DispatchTexture(identifier, nullptr, aCallback);
-			this->Dequeue(identifier.c_str());
-
-			return;
-		}
-
-		size_t size = result->body.size();
-		unsigned char* remote_data = new unsigned char[size];
-		std::memcpy(remote_data, result->body.c_str(), size);
-
-		int width = 0;
-		int height = 0;
-		int components;
-
-		stbi_uc* data = stbi_load_from_memory(remote_data, static_cast<int>(size), &width, &height, &components, 4);
-
-		delete[] remote_data;
-
-		this->Enqueue(identifier.c_str(), data, width, height);
-	}).detach();
+	/* Queue the callback and URL. */
+	this->Enqueue(aIdentifier, std::string(aRemote) + std::string(aEndpoint), aCallback);
 }
 
 void CTextureLoader::Load(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback, bool aIsShadowing)
@@ -354,7 +329,7 @@ std::map<std::string, QueuedTexture_t> CTextureLoader::GetQueuedTextures() const
 	return this->QueuedTextures;
 }
 
-int CTextureLoader::CleanupRefs(void* aStartAddress, void* aEndAddress)
+int CTextureLoader::Verify(void* aStartAddress, void* aEndAddress)
 {
 	int refCounter = 0;
 
@@ -500,6 +475,32 @@ void CTextureLoader::Enqueue(const char* aIdentifier, TEXTURES_RECEIVECALLBACK a
 	}
 }
 
+void CTextureLoader::Enqueue(const char* aIdentifier, std::string aDownloadURL, TEXTURES_RECEIVECALLBACK aCallback)
+{
+	if (!aIdentifier) { return; }
+
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	auto it = this->QueuedTextures.find(aIdentifier);
+
+	if (it != this->QueuedTextures.end())
+	{
+		it->second.Stage = ETextureStage::Prepare;
+		it->second.DownloadURL = aDownloadURL;
+		it->second.Callback = aCallback;
+	}
+	else
+	{
+		QueuedTexture_t entry{};
+		entry.Stage = ETextureStage::Prepare;
+		entry.DownloadURL = aDownloadURL;
+		entry.Callback = aCallback;
+		entry.Time = Time::GetTimestampMs();
+
+		this->QueuedTextures.emplace(aIdentifier, entry);
+	}
+}
+
 void CTextureLoader::Enqueue(const char* aIdentifier, unsigned char* aData, int aWidth, int aHeight)
 {
 	if (!aIdentifier) { return; }
@@ -539,7 +540,6 @@ void CTextureLoader::Dequeue(const char* aIdentifier)
 	if (it != this->QueuedTextures.end())
 	{
 		it->second.Stage = ETextureStage::INVALID;
-		it->second.Callback = nullptr;
 	}
 }
 
@@ -571,15 +571,7 @@ void CTextureLoader::CreateTexture(const std::string& aIdentifier, QueuedTexture
 		this->Logger->Debug(CH_TEXTURES, "pTexture was null");
 		stbi_image_free(aQueuedTexture.Data);
 
-		/* nullptr response on fail */
-		this->DispatchTexture(aIdentifier, nullptr, aQueuedTexture.Callback);
-
-		if (aQueuedTexture.Data)
-		{
-			stbi_image_free(aQueuedTexture.Data);
-			aQueuedTexture.Data = nullptr;
-		}
-
+		/* Manual dequeue, because of Mutex lock. */
 		aQueuedTexture.Stage = ETextureStage::INVALID;
 
 		return;
@@ -628,5 +620,105 @@ void CTextureLoader::DispatchTexture(const std::string& aIdentifier, Texture_t* 
 	catch (...)
 	{
 		this->Logger->Debug(CH_TEXTURES, "DispatchTexture() failed with: %s %p %p", aIdentifier.c_str(), aTexture, aCallback);
+	}
+}
+
+void CTextureLoader::ProcessDownloads()
+{
+	while (this->IsRunning)
+	{
+		{
+			std::unique_lock<std::mutex> lock(this->Mutex);
+			this->ConVar.wait_for(lock, std::chrono::milliseconds(5000), [this] {
+				return this->QueuedTextures.size() > 0 || !this->IsRunning;
+			});
+		}
+
+		/* Early exit without processing the remaining textures. */
+		if (!this->IsRunning)
+		{
+			break;
+		}
+
+		std::map<std::string, QueuedTexture_t> queueCpy = GetQueuedTextures();
+
+		for (auto& [id, qtex] : queueCpy)
+		{
+			std::string downloadUrl = "";
+
+			/* Scope and lock, to verify we're processing this texture on this thread. */
+			{
+				const std::lock_guard<std::mutex> lock(this->Mutex);
+				auto it = this->QueuedTextures.find(id);
+
+				if (it == this->QueuedTextures.end())
+				{
+					/* Already gone again :( */
+					continue;
+				}
+				else if (it->second.DownloadURL.empty())
+				{
+					continue;
+				}
+				else if (it->second.Stage == ETextureStage::Prepare && !it->second.DownloadURL.empty())
+				{
+					std::swap(downloadUrl, it->second.DownloadURL);
+				}
+				else
+				{
+					continue;
+				}
+			}
+
+			/* If we swapped a download URL, download it. */
+			if (!downloadUrl.empty())
+			{
+				std::string remote = URL::GetBase(qtex.DownloadURL);
+				std::string endpoint = URL::GetEndpoint(qtex.DownloadURL);
+
+				httplib::Client client(remote);
+				client.enable_server_certificate_verification(true);
+				client.set_follow_location(true);
+				client.set_url_encode(false);
+
+				auto result = client.Get(endpoint);
+
+				if (!result)
+				{
+					this->Logger->Debug(CH_TEXTURES, "Error fetching %s%s (%s)\nError: %s", remote.c_str(), endpoint.c_str(), id.c_str(), httplib::to_string(result.error()).c_str());
+
+					/* nullptr response on fail */
+					this->Dequeue(id.c_str());
+
+					return;
+				}
+
+				// Status is not HTTP_OK
+				if (result->status != 200)
+				{
+					this->Logger->Debug(CH_TEXTURES, "Status %d when fetching %s%s (%s) | %s", result->status, remote.c_str(), endpoint.c_str(), id.c_str(), httplib::to_string(result.error()).c_str());
+
+					/* nullptr response on fail */
+					this->Dequeue(id.c_str());
+
+					return;
+				}
+
+				size_t size = result->body.size();
+				unsigned char* remote_data = new unsigned char[size];
+				std::memcpy(remote_data, result->body.c_str(), size);
+
+				int width = 0;
+				int height = 0;
+				int components;
+
+				stbi_uc* data = stbi_load_from_memory(remote_data, static_cast<int>(size), &width, &height, &components, 4);
+
+				delete[] remote_data;
+
+				/* Enqueue the data. */
+				this->Enqueue(id.c_str(), data, width, height);
+			}
+		}
 	}
 }

@@ -16,7 +16,8 @@
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
-#include "Core/NexusLink.h"
+#include "Engine/Loader/Loader.h"
+#include "Engine/Loader/NexusLinkData.h"
 #include "Engine/Renderer/RdrContext.h"
 #include "Engine/Textures/TxLoader.h"
 #include "GW2/Inputs/MouseResetFix.h"
@@ -75,18 +76,11 @@ namespace Hooks
 		{
 			LPVOID* vtbl = *(LPVOID**)swap;
 
-			CContext* ctx = CContext::GetContext();
-			CLogApi* logger = ctx->GetLogger();
-
-			logger->Debug(CH_CORE, "HOOK BEGIN");
-
 			/* Create and enable VT hooks. */
 			/* Follow the jump chain to work nicely with various other hooks. */
 			MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[8]),  (LPVOID)&Detour::DXGIPresent,       (LPVOID*)&Target::DXGIPresent      );
 			MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[13]), (LPVOID)&Detour::DXGIResizeBuffers, (LPVOID*)&Target::DXGIResizeBuffers);
 			MH_EnableHook(MH_ALL_HOOKS);
-
-			logger->Debug(CH_CORE, "HOOK END");
 
 			/* Release the temporary interfaces. */
 			context->Release();
@@ -120,15 +114,9 @@ namespace Hooks
 			static CInputBindApi* s_InputBindApi = s_Context->GetInputBindApi();
 			static CRawInputApi*  s_RawInputApi  = s_Context->GetRawInputApi();
 			static CUiContext*    s_UIContext    = s_Context->GetUIContext();
-			static CLoader*       s_Loader       = s_Context->GetLoader();
-
-			if (uMsg == WM_DESTROY || uMsg == WM_QUIT || uMsg == WM_CLOSE)
-			{
-				Main::Shutdown(uMsg);
-			}
 
 			// don't pass to game if loader
-			if (s_Loader->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
+			if (Loader::WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
 			// don't pass to game if custom wndproc
 			if (s_RawInputApi->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
@@ -139,9 +127,19 @@ namespace Hooks
 			// don't pass to game if InputBind
 			if (s_InputBindApi->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
-			MouseResetFix(hWnd, uMsg, wParam, lParam);
+			if (uMsg == WM_DESTROY)
+			{
+				Main::Shutdown(uMsg);
+			}
 
-			uMsg = s_RawInputApi->WndProcGameOnly(hWnd, uMsg, wParam, lParam);
+			/* offset of 7997, if uMsg in that range it's a nexus game only message */
+			if (uMsg >= WM_PASSTHROUGH_FIRST && uMsg <= WM_PASSTHROUGH_LAST)
+			{
+				/* modify the uMsg code to the original code */
+				uMsg -= WM_PASSTHROUGH_FIRST;
+			}
+
+			MouseResetFix(hWnd, uMsg, wParam, lParam);
 
 			return CallWindowProcA(Target::WndProc, hWnd, uMsg, wParam, lParam);
 		}
@@ -152,10 +150,6 @@ namespace Hooks
 			static RenderContext_t* s_RenderCtx     = s_Context->GetRendererCtx();
 			static CTextureLoader*  s_TextureLoader = s_Context->GetTextureService();
 			static CUiContext*      s_UIContext     = s_Context->GetUIContext();
-			static CLoader*         s_Loader        = s_Context->GetLoader();
-
-			/* Increment count at the beginning of the frame. */
-			s_RenderCtx->Metrics.FrameCount++;
 
 			/* The swap chain we used to hook is different than the one the game created.
 			 * To be precise, we should have no swapchain at all right now. */
@@ -185,12 +179,16 @@ namespace Hooks
 				s_RenderCtx->Window.Handle = swapChainDesc.OutputWindow;
 				Target::WndProc = (WNDPROC)SetWindowLongPtr(s_RenderCtx->Window.Handle, GWLP_WNDPROC, (LONG_PTR)Detour::WndProc);
 
-				s_Loader->Init();
+				Loader::Initialize();
 			}
+
+			Loader::ProcessQueue();
 
 			s_TextureLoader->Advance();
 
 			s_UIContext->Render();
+
+			s_RenderCtx->Metrics.FrameCount++;
 
 			return Target::DXGIPresent(pChain, SyncInterval, Flags);
 		}

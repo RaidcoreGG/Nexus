@@ -19,6 +19,7 @@
 #include "Resources/ResConst.h"
 #include "UI/Widgets/QuickAccess/QaConst.h"
 #include "Util/Base64.h"
+#include "Util/Inputs.h"
 #include "Util/Time.h"
 
 COptionsWindow::COptionsWindow()
@@ -116,6 +117,67 @@ void COptionsWindow::TabGeneral()
 				{
 					settingsctx->Set(OPT_DPISCALING, dpiScaling);
 					uictx->UpdateScaling();
+				}
+
+				static bool clickingRequiresMods = settingsctx->Get<bool>(OPT_UI_CLICK_MODSONLY, false);
+				if (ImGui::Checkbox(langApi->Translate("((Experimental: Clicking requires modifiers))"), &clickingRequiresMods))
+				{
+					settingsctx->Set(OPT_UI_CLICK_MODSONLY, clickingRequiresMods);
+					CContext::GetContext()->GetUIContext()->Invalidate();
+				}
+
+				if (clickingRequiresMods)
+				{
+					static EModifiers mods = settingsctx->Get<EModifiers>(OPT_UI_MODS, EModifiers::None);
+
+					ImGui::BeginGroup();
+					ImGui::Indent();
+					ImGui::Text("((Modifiers))");
+					static bool modAlt = (mods & EModifiers::Alt) == EModifiers::Alt;
+					if (ImGui::Checkbox(langApi->Translate("((Alt))"), &modAlt))
+					{
+						if (modAlt)
+						{
+							mods |= EModifiers::Alt;
+						}
+						else
+						{
+							mods &= ~EModifiers::Alt;
+						}
+						settingsctx->Set(OPT_UI_MODS, mods);
+						CContext::GetContext()->GetUIContext()->Invalidate();
+					}
+					ImGui::SameLine();
+					static bool modCtrl = (mods & EModifiers::Ctrl) == EModifiers::Ctrl;
+					if (ImGui::Checkbox(langApi->Translate("((Ctrl))"), &modCtrl))
+					{
+						if (modCtrl)
+						{
+							mods |= EModifiers::Ctrl;
+						}
+						else
+						{
+							mods &= ~EModifiers::Ctrl;
+						}
+						settingsctx->Set(OPT_UI_MODS, mods);
+						CContext::GetContext()->GetUIContext()->Invalidate();
+					}
+					ImGui::SameLine();
+					static bool modShift = (mods & EModifiers::Shift) == EModifiers::Shift;
+					if (ImGui::Checkbox(langApi->Translate("((Shift))"), &modShift))
+					{
+						if (modShift)
+						{
+							mods |= EModifiers::Shift;
+						}
+						else
+						{
+							mods &= ~EModifiers::Shift;
+						}
+						settingsctx->Set(OPT_UI_MODS, mods);
+						CContext::GetContext()->GetUIContext()->Invalidate();
+					}
+					ImGui::EndGroup();
 				}
 
 				/* fix gw2's jumping cursor */
