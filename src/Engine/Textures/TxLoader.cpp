@@ -15,6 +15,7 @@
 #include <d3d11.h>
 #include <filesystem>
 
+#include "Engine/Cleanup/RefCleanerContext.h"
 #include "Util/Time.h"
 #include "Util/Url.h"
 
@@ -33,6 +34,8 @@ CTextureLoader::CTextureLoader(CLogApi* aLogger, RenderContext_t* aRenderCtx, st
 	{
 		this->DownloadThreads.push_back(std::thread(&CTextureLoader::ProcessDownloads, this));
 	}
+
+	CRefCleanerContext::Get()->Register("CTextureLoader", this);
 }
 
 CTextureLoader::~CTextureLoader()
@@ -329,7 +332,7 @@ std::map<std::string, QueuedTexture_t> CTextureLoader::GetQueuedTextures() const
 	return this->QueuedTextures;
 }
 
-int CTextureLoader::Verify(void* aStartAddress, void* aEndAddress)
+int CTextureLoader::CleanupRefs(void* aStartAddress, void* aEndAddress)
 {
 	int refCounter = 0;
 
