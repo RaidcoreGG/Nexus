@@ -706,12 +706,27 @@ const EAddonInterfaces& CAddon::EnumInterfaces()
 
 	EAddonInterfaces interfaces = EAddonInterfaces::None;
 
-	void* discard = nullptr;
+	GETADDONDEF getAddonDef = nullptr;
 
-	if (DLL::FindFunction(module, &discard, "GetAddonDef"))
+	if (DLL::FindFunction(module, &getAddonDef, "GetAddonDef"))
 	{
 		interfaces |= EAddonInterfaces::Nexus;
+
+		AddonDefRawV1_t* rawdef = getAddonDef();
+
+		if (rawdef)
+		{
+			if (this->NexusAddonDefV1)
+			{
+				delete this->NexusAddonDefV1;
+				this->NexusAddonDefV1 = nullptr;
+			}
+
+			this->NexusAddonDefV1 = new AddonDefV1_t(*rawdef);
+		}
 	}
+
+	void* discard = nullptr;
 
 	if (DLL::FindFunction(module, &discard, "get_init_addr") &&
 		DLL::FindFunction(module, &discard, "get_release_addr"))
@@ -906,23 +921,11 @@ void CAddon::CheckUpdateInternal()
 
 bool CAddon::CheckUpdateViaGitHub()
 {
-	if (this->IsUpdateAvailable())
-	{
-		/* Already checked. */
-		return true;
-	}
-
 	return false;
 }
 
 bool CAddon::CheckUpdateViaDirect()
 {
-	if (this->IsUpdateAvailable())
-	{
-		/* Already checked. */
-		return true;
-	}
-
 	return false;
 }
 
