@@ -36,7 +36,6 @@ constexpr const char* CH_ADDON = "Addon";
 class CAddon : public virtual IAddon
 {
 	public:
-#pragma region(Base)
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
@@ -52,9 +51,7 @@ class CAddon : public virtual IAddon
 	/// 	Returns the unique signature of the addon.
 	///----------------------------------------------------------------------------------------------------
 	uint32_t GetSignature() override;
-#pragma endregion
 
-#pragma region(Details)
 	///----------------------------------------------------------------------------------------------------
 	/// GetName:
 	/// 	Returns the name of the addon.
@@ -78,7 +75,6 @@ class CAddon : public virtual IAddon
 	/// 	Returns the version of the addon.
 	///----------------------------------------------------------------------------------------------------
 	std::string GetVersion();
-#pragma endregion
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetConfig:
@@ -128,7 +124,6 @@ class CAddon : public virtual IAddon
 	///----------------------------------------------------------------------------------------------------
 	bool IsDuplicate();
 
-#pragma region(Flags)
 	///----------------------------------------------------------------------------------------------------
 	/// IsRunningAction:
 	/// 	Returns true, if the addon is currently performing an action.
@@ -170,7 +165,6 @@ class CAddon : public virtual IAddon
 	/// 	Returns true, if an update is available.
 	///----------------------------------------------------------------------------------------------------
 	bool IsUpdateAvailable() const;
-#pragma endregion
 
 	///----------------------------------------------------------------------------------------------------
 	/// IsVersionDisabled:

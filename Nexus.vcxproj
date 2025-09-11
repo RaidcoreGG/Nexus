@@ -12,14 +12,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Addons\Addon.cpp" />
-    <ClCompile Include="src\Core\Addons\AddonBase.cpp" />
-    <ClCompile Include="src\Core\Addons\AddonDetails.cpp" />
-    <ClCompile Include="src\Core\Addons\AddonFlags.cpp" />
-    <ClCompile Include="src\Core\Addons\AddonProc.cpp" />
     <ClCompile Include="src\Core\Addons\Config\CfgManager.cpp" />
     <ClCompile Include="src\Core\Addons\Library\LibAddon.cpp" />
     <ClCompile Include="src\Core\Addons\Library\LibManager.cpp" />
-    <ClCompile Include="src\Core\Addons\AddonProvider.cpp" />
     <ClCompile Include="src\Core\Context.cpp" />
     <ClCompile Include="src\Core\Hooks\Hooks.cpp" />
     <ClCompile Include="src\Core\Updater\SelfUpdater.cpp" />
