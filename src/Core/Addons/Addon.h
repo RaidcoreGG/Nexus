@@ -217,6 +217,7 @@ class CAddon : public virtual IAddon
 	std::mutex               ProcessorMutex;
 	std::thread              ProcessorThread;
 
+	long long                LastCheckedTimestamp;
 	std::string              UpdateLocal;
 	std::string              UpdateRemote;
 
@@ -248,7 +249,7 @@ class CAddon : public virtual IAddon
 	/// CheckUpdateInternal:
 	/// 	Checks if an update is available.
 	///----------------------------------------------------------------------------------------------------
-	void CheckUpdateInternal();
+	void CheckUpdateInternal(bool aIsScheduled = false);
 
 	///----------------------------------------------------------------------------------------------------
 	/// UpdateInternal:

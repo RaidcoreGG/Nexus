@@ -22,6 +22,7 @@
 #include "Util/MD5.h"
 #include "Util/Paths.h"
 #include "Util/Strings.h"
+#include "Util/Time.h"
 
 CAddon::CAddon(std::filesystem::path aLocation)
 {
@@ -908,7 +909,7 @@ std::string CAddon::GetProjectPageURL() const
 	return "";
 }
 
-void CAddon::CheckUpdateInternal()
+void CAddon::CheckUpdateInternal(bool aIsScheduled)
 {
 	if (this->IsUpdateAvailable())
 	{
@@ -916,16 +917,80 @@ void CAddon::CheckUpdateInternal()
 		return;
 	}
 
-	return;
+	/* Automatic internal checks. */
+	if (aIsScheduled)
+	{
+		long long now = Time::GetTimestamp();
+
+		/// Scheduled checks only run, when 
+		/// - the last scheduled check was 30 minutes ago
+		/// - this version is disabled and the last check was over 5 minutes ago
+
+		// TODO: Make addon thread wake every 5 minutes. Queue update check.
+
+		bool doCheck = false;
+
+		if (this->LastCheckedTimestamp - now >= 30 * 60)
+		{
+			this->Logger->Trace(CH_ADDON, "Scheduled update check: DeltaT > 1800s. (%s)", this->Location.string().c_str());
+			doCheck = true;
+		}
+		else if (this->IsVersionDisabled() && (this->LastCheckedTimestamp - now >= 5 * 60))
+		{
+			this->Logger->Trace(CH_ADDON, "Scheduled update check: Version disabled. DeltaT > 300s. (%s)", this->Location.string().c_str());
+			doCheck = true;
+		}
+
+		if (!doCheck)
+		{
+			return;
+		}
+
+		this->LastCheckedTimestamp = now;
+	}
+
+	if (!this->NexusAddonDefV1)
+	{
+		this->Logger->Warning(CH_ADDON, "Canceled update check. No Nexus addon interface. (%s)", this->Location.string().c_str());
+		return;
+	}
+
+	switch (this->NexusAddonDefV1->Provider)
+	{
+		case EUpdateProvider::Raidcore:
+		{
+			this->Logger->Warning(CH_ADDON, "Using unimplemented provider. (%s)", this->Location.string().c_str());
+			break;
+		}
+		case EUpdateProvider::GitHub:
+		{
+			this->CheckUpdateViaGitHub();
+			break;
+		}
+		case EUpdateProvider::Direct:
+		{
+			this->CheckUpdateViaDirect();
+			break;
+		}
+		case EUpdateProvider::Self:
+		{
+			this->Logger->Trace(CH_ADDON, "Canceled update check. Provider is self. (%s)", this->Location.string().c_str());
+			break;
+		}
+	}
 }
 
 bool CAddon::CheckUpdateViaGitHub()
 {
+	this->Logger->Trace(CH_ADDON, "CheckUpdateViaGitHub (%s)", this->Location.string().c_str());
+
 	return false;
 }
 
 bool CAddon::CheckUpdateViaDirect()
 {
+	this->Logger->Trace(CH_ADDON, "CheckUpdateViaDirect (%s)", this->Location.string().c_str());
+
 	return false;
 }
 
@@ -941,6 +1006,12 @@ bool CAddon::UpdateInternal()
 
 	/* If the update is already locally available, just apply it. */
 	if (!this->UpdateLocal.empty())
+	{
+		//this->Location
+	}
+
+	/* If the update is still on a remote, download it. */
+	if (!this->UpdateRemote.empty())
 	{
 		//this->Location
 	}

@@ -317,6 +317,7 @@ void CLoader::ProcessChanges()
 			/* If the MD5 has changed, reload the addon. */
 			if (md5 != addon->GetMD5())
 			{
+				this->Logger->Debug(CH_LOADER, "File changed. Reloading: %s", addon->GetLocation().empty() ? "(null)" : addon->GetLocation().string().c_str());
 				if (addon->IsLoaded())
 				{
 					addon->Unload();
@@ -378,6 +379,7 @@ void CLoader::ProcessChanges()
 
 				this->Addons.push_back(addon);
 
+				this->Logger->Debug(CH_LOADER, "New addon tracked. Loading: %s", addon->GetLocation().empty() ? "(null)" : addon->GetLocation().string().c_str());
 				addon->Load();
 			}
 		}
