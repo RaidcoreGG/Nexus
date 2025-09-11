@@ -83,5 +83,11 @@ bool CAddon::UpdateInternal()
 		return false;
 	}
 
+	/* If the update is already locally available, just apply it. */
+	if (!this->UpdateLocal.empty())
+	{
+		//this->Location
+	}
+
 	return false;
 }

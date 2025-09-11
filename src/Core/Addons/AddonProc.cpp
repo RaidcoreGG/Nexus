@@ -112,7 +112,7 @@ void CAddon::ProcessActions()
 			}
 			case EAddonAction::CheckUpdate:
 			{
-				this->CheckForUpdateInternal();
+				//this->CheckForUpdateInternal();
 				break;
 			}
 			case EAddonAction::Update:
