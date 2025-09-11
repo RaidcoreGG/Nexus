@@ -35,6 +35,8 @@ After accepting you can open the menu using `CTRL+O` by default.
 ### Chainloading
 If you want another proxy d3d11.dll, for example ArcDPS, you can chainload it by naming it `d3d11_chainload.dll` and also putting it in the game directory.
 
+## [FAQ & Wiki](https://github.com/RaidcoreGG/Nexus/wiki)
+
 ## [Third Party Notices](https://github.com/RaidcoreGG/Nexus/blob/main/THIRDPARTYSOFTWAREREADME.TXT)
 
 ## Special Thanks
