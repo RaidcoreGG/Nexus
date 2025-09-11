@@ -147,9 +147,6 @@ RES_ICON_GITHUB                 PNG     "Resources\\Images\\MainWindow\\GitHubSh
 RES_BANNER_DISCORD              PNG     "Resources\\Images\\Social\\Banners\\Discord.png"
 RES_BANNER_PATREON              PNG     "Resources\\Images\\Social\\Banners\\Patreon.png"
 
-/* Binary */
-RES_ARCDPS_INTEGRATION          DLL     "Resources\\Binaries\\arcdps_integration64.dll"
-
 /* Locales (primary) */
 RES_LOCALE_EN                   JSON    "Resources\\Locales\\en_Main.json"
 RES_LOCALE_DE                   JSON    "Resources\\Locales\\de_Main.json"

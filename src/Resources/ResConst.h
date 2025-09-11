@@ -71,9 +71,6 @@
 #define RES_BANNER_DISCORD              512
 #define RES_BANNER_PATREON              513
 
-/* Binary */
-#define RES_ARCDPS_INTEGRATION          601
-
 /* Locales (primary) */
 #define RES_LOCALE_EN                   701
 #define RES_LOCALE_DE                   702

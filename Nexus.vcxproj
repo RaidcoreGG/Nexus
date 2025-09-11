@@ -429,7 +429,6 @@
     <ResourceCompile Include="src\Resources\Nexus.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\Resources\Binaries\arcdps_integration64.dll" />
     <None Include="src\Resources\Locales\br_Main.json" />
     <None Include="src\Resources\Locales\cn_Main.json" />
     <None Include="src\Resources\Locales\cz_Main.json" />
