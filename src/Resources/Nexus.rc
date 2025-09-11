@@ -91,7 +91,7 @@ RES_ICON_SNOWFLAKE              PNG     "Resources\\Images\\MainWindow\\Snowflak
 
 /* Fonts */
 RES_FONT_MENOMONIA              FONT    "Resources\\Fonts\\Menomonia.ttf"
-RES_FONT_TREBUCHET              FONT    "Resources\\Fonts\\TrebuchetMS.ttf"
+RES_FONT_FIRASANS               FONT    "Resources\\Fonts\\FiraSans.ttf"
 RES_FONT_INTER                  FONT    "Resources\\Fonts\\Inter.ttf"
 
 /* QuickAccess */

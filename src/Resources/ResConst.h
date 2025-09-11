@@ -15,7 +15,7 @@
 
 /* Fonts */
 #define RES_FONT_MENOMONIA              101
-#define RES_FONT_TREBUCHET              102
+#define RES_FONT_FIRASANS               102
 #define RES_FONT_INTER                  103
 
 /* QuickAccess */

@@ -70,7 +70,7 @@ namespace UIRoot
 	extern ImFont* UserFont;      /* custom user font or default font */
 	extern ImFont* Font;          /* Menomonia */
 	extern ImFont* FontBig;       /* Menomonia, but slightly bigger */
-	extern ImFont* FontUI;        /* Trebuchet */
+	extern ImFont* FontUI;        /* Fira Sans */
 
 	///----------------------------------------------------------------------------------------------------
 	/// Initialize:

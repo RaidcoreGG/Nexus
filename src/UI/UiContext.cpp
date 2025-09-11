@@ -84,7 +84,7 @@ namespace UIRoot
 				{
 					if (str == "MENOMONIA_S") { NexusLink->Font = Font = aFont; }
 					else if (str == "MENOMONIA_BIG_S") { NexusLink->FontBig = FontBig = aFont; }
-					else if (str == "TREBUCHET_S") { NexusLink->FontUI = FontUI = aFont; }
+					else if (str == "FIRASANS_S") { NexusLink->FontUI = FontUI = aFont; }
 
 					break;
 				}
@@ -93,7 +93,7 @@ namespace UIRoot
 				{
 					if (str == "MENOMONIA_N") { NexusLink->Font = Font = aFont; }
 					else if (str == "MENOMONIA_BIG_N") { NexusLink->FontBig = FontBig = aFont; }
-					else if (str == "TREBUCHET_N") { NexusLink->FontUI = FontUI = aFont; }
+					else if (str == "FIRASANS_N") { NexusLink->FontUI = FontUI = aFont; }
 
 					break;
 				}
@@ -101,7 +101,7 @@ namespace UIRoot
 				{
 					if (str == "MENOMONIA_L") { NexusLink->Font = Font = aFont; }
 					else if (str == "MENOMONIA_BIG_L") { NexusLink->FontBig = FontBig = aFont; }
-					else if (str == "TREBUCHET_L") { NexusLink->FontUI = FontUI = aFont; }
+					else if (str == "FIRASANS_L") { NexusLink->FontUI = FontUI = aFont; }
 
 					break;
 				}
@@ -109,7 +109,7 @@ namespace UIRoot
 				{
 					if (str == "MENOMONIA_XL") { NexusLink->Font = Font = aFont; }
 					else if (str == "MENOMONIA_BIG_XL") { NexusLink->FontBig = FontBig = aFont; }
-					else if (str == "TREBUCHET_XL") { NexusLink->FontUI = FontUI = aFont; }
+					else if (str == "FIRASANS_XL") { NexusLink->FontUI = FontUI = aFont; }
 
 					break;
 				}
@@ -178,7 +178,7 @@ namespace UIRoot
 			{
 				NexusLink->Font = Font = FontManager->Get("MENOMONIA_S")->Pointer;
 				NexusLink->FontBig = FontBig = FontManager->Get("MENOMONIA_BIG_S")->Pointer;
-				NexusLink->FontUI = FontUI = FontManager->Get("TREBUCHET_S")->Pointer;
+				NexusLink->FontUI = FontUI = FontManager->Get("FIRASANS_S")->Pointer;
 
 				break;
 			}
@@ -187,7 +187,7 @@ namespace UIRoot
 			{
 				NexusLink->Font = Font = FontManager->Get("MENOMONIA_N")->Pointer;
 				NexusLink->FontBig = FontBig = FontManager->Get("MENOMONIA_BIG_N")->Pointer;
-				NexusLink->FontUI = FontUI = FontManager->Get("TREBUCHET_N")->Pointer;
+				NexusLink->FontUI = FontUI = FontManager->Get("FIRASANS_N")->Pointer;
 
 				break;
 			}
@@ -195,7 +195,7 @@ namespace UIRoot
 			{
 				NexusLink->Font = Font = FontManager->Get("MENOMONIA_L")->Pointer;
 				NexusLink->FontBig = FontBig = FontManager->Get("MENOMONIA_BIG_L")->Pointer;
-				NexusLink->FontUI = FontUI = FontManager->Get("TREBUCHET_L")->Pointer;
+				NexusLink->FontUI = FontUI = FontManager->Get("FIRASANS_L")->Pointer;
 
 				break;
 			}
@@ -203,7 +203,7 @@ namespace UIRoot
 			{
 				NexusLink->Font = Font = FontManager->Get("MENOMONIA_XL")->Pointer;
 				NexusLink->FontBig = FontBig = FontManager->Get("MENOMONIA_BIG_XL")->Pointer;
-				NexusLink->FontUI = FontUI = FontManager->Get("TREBUCHET_XL")->Pointer;
+				NexusLink->FontUI = FontUI = FontManager->Get("FIRASANS_XL")->Pointer;
 
 				break;
 			}
@@ -867,32 +867,32 @@ void CUiContext::LoadFonts()
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_S_MERGE", 16.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
 	this->FontManager->ReplaceFont("MENOMONIA_BIG_S", 22.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_S_MERGE", 22.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
-	this->FontManager->ReplaceFont("TREBUCHET_S", 15.0f, RES_FONT_TREBUCHET, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("TREBUCHET_S_MERGE", 15.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
+	this->FontManager->ReplaceFont("FIRASANS_S", 15.0f, RES_FONT_FIRASANS, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_S_MERGE", 15.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
 
 	/* normal UI*/
 	this->FontManager->ReplaceFont("MENOMONIA_N", 18.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_N_MERGE", 18.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
 	this->FontManager->ReplaceFont("MENOMONIA_BIG_N", 24.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_N_MERGE", 24.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
-	this->FontManager->ReplaceFont("TREBUCHET_N", 16.0f, RES_FONT_TREBUCHET, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("TREBUCHET_N_MERGE", 16.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
+	this->FontManager->ReplaceFont("FIRASANS_N", 16.0f, RES_FONT_FIRASANS, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_N_MERGE", 16.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
 
 	/* large UI*/
 	this->FontManager->ReplaceFont("MENOMONIA_L", 20.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_L_MERGE", 20.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
 	this->FontManager->ReplaceFont("MENOMONIA_BIG_L", 26.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_L_MERGE", 26.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
-	this->FontManager->ReplaceFont("TREBUCHET_L", 17.5f, RES_FONT_TREBUCHET, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("TREBUCHET_L_MERGE", 17.5f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
+	this->FontManager->ReplaceFont("FIRASANS_L", 17.5f, RES_FONT_FIRASANS, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_L_MERGE", 17.5f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
 
 	/* larger UI*/
 	this->FontManager->ReplaceFont("MENOMONIA_XL", 22.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_XL_MERGE", 22.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
 	this->FontManager->ReplaceFont("MENOMONIA_BIG_XL", 28.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_XL_MERGE", 28.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
-	this->FontManager->ReplaceFont("TREBUCHET_XL", 19.5f, RES_FONT_TREBUCHET, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("TREBUCHET_XL_MERGE", 19.5f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
+	this->FontManager->ReplaceFont("FIRASANS_XL", 19.5f, RES_FONT_FIRASANS, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_XL_MERGE", 19.5f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
 }
 
 void ApplyDefaultStyle()
