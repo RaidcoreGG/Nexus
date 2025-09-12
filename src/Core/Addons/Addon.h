@@ -101,10 +101,10 @@ class CAddon : public virtual IAddon
 	void Uninstall();
 
 	///----------------------------------------------------------------------------------------------------
-	/// CheckForUpdate:
+	/// CheckUpdate:
 	/// 	Checks if an update is available.
 	///----------------------------------------------------------------------------------------------------
-	void CheckForUpdate();
+	void CheckUpdate(bool aIsScheduled = false);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Update:
@@ -217,7 +217,7 @@ class CAddon : public virtual IAddon
 	std::mutex               ProcessorMutex;
 	std::thread              ProcessorThread;
 
-	long long                LastCheckedTimestamp;
+	long long                LastCheckedTimestamp = 0;
 	std::string              UpdateLocal;
 	std::string              UpdateRemote;
 

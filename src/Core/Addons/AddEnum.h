@@ -51,6 +51,7 @@ enum class EAddonAction : uint32_t
 	Unload,
 	Uninstall,
 	CheckUpdate,
+	CheckUpdateScheduled,
 	Update
 };
 

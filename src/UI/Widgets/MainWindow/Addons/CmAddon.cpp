@@ -37,7 +37,7 @@ void CAddonContextMenu::RenderContent()
 			{
 				if (ImGui::Selectable("((Check for Update))"))
 				{
-					this->Data->Addon->CheckForUpdate();
+					this->Data->Addon->CheckUpdate();
 				}
 			}
 

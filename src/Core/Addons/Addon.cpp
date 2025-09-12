@@ -24,6 +24,9 @@
 #include "Util/Strings.h"
 #include "Util/Time.h"
 
+#define SCHEDULED_UPDATE_TIMEOUT                 3600
+#define SCHEDULED_UPDATE_TIMEOUT_VERSIONDISABLED 300
+
 CAddon::CAddon(std::filesystem::path aLocation)
 {
 	this->Location = aLocation;
@@ -112,12 +115,12 @@ void CAddon::Uninstall()
 	this->ConVar.notify_one();
 }
 
-void CAddon::CheckForUpdate()
+void CAddon::CheckUpdate(bool aIsScheduled)
 {
 	if (!this->IsRunning) { return; }
 
 	std::lock_guard<std::mutex> lock(this->ProcessorMutex);
-	this->QueuedActions.push(EAddonAction::CheckUpdate);
+	this->QueuedActions.push(aIsScheduled ? EAddonAction::CheckUpdateScheduled : EAddonAction::CheckUpdate);
 	this->ConVar.notify_one();
 }
 
@@ -139,12 +142,20 @@ void CAddon::ProcessActions()
 		/* Scope, just to retrieve a queued action. */
 		{
 			std::unique_lock<std::mutex> lockThread(this->ProcessorMutex);
-			this->ConVar.wait(lockThread, [this] { return this->QueuedActions.size() > 0; });
+			bool actionQueued = this->ConVar.wait_for(lockThread, std::chrono::seconds(60), [this] { return this->QueuedActions.size() > 0; });
 
 			if (!this->IsRunning) { return; }
 
-			action = this->QueuedActions.front();
-			this->QueuedActions.pop();
+			/* actionQueued is true if an action was actually queued, otherwise 60s timeout ran out -> do a scheduled update check. */
+			if (actionQueued)
+			{
+				action = this->QueuedActions.front();
+				this->QueuedActions.pop();
+			}
+			else
+			{
+				action = EAddonAction::CheckUpdateScheduled;
+			}
 		}
 
 		this->Flags |= EAddonFlags::RunningAction;
@@ -155,6 +166,7 @@ void CAddon::ProcessActions()
 			{
 				this->Logger->Trace(CH_ADDON, "CAddon::Create(): %s", this->Location.string().c_str());
 				this->EnumInterfaces();
+				this->CheckUpdate(/*scheduled=*/true);
 				this->EventApi->Raise(0, EV_ADDON_CREATED);
 				break;
 			}
@@ -189,7 +201,12 @@ void CAddon::ProcessActions()
 			}
 			case EAddonAction::CheckUpdate:
 			{
-				this->CheckUpdateInternal();
+				this->CheckUpdateInternal(/*scheduled=*/false);
+				break;
+			}
+			case EAddonAction::CheckUpdateScheduled:
+			{
+				this->CheckUpdateInternal(/*scheduled=*/true);
 				break;
 			}
 			case EAddonAction::Update:
@@ -308,13 +325,6 @@ void CAddon::LoadInternal()
 		FreeLibrary(module);
 		this->State = EAddonState::NotLoaded;
 		return;
-	}
-
-	this->CheckForUpdate();
-
-	if (this->IsUpdateAvailable() && this->ShouldUpdate())
-	{
-		this->Update();
 	}
 
 	if (!this->ShouldLoad())
@@ -911,33 +921,46 @@ std::string CAddon::GetProjectPageURL() const
 
 void CAddon::CheckUpdateInternal(bool aIsScheduled)
 {
+	this->Logger->Trace(CH_ADDON, "CAddon::CheckUpdateInternal(%s, %s)", aIsScheduled ? "scheduled" : "manual", this->Location.string().c_str());
+
 	if (this->IsUpdateAvailable())
 	{
 		/* Already checked. */
 		return;
 	}
 
+	long long now = Time::GetTimestamp();
+
 	/* Automatic internal checks. */
 	if (aIsScheduled)
 	{
-		long long now = Time::GetTimestamp();
-
 		/// Scheduled checks only run, when 
 		/// - the last scheduled check was 30 minutes ago
 		/// - this version is disabled and the last check was over 5 minutes ago
 
-		// TODO: Make addon thread wake every 5 minutes. Queue update check.
-
 		bool doCheck = false;
 
-		if (this->LastCheckedTimestamp - now >= 30 * 60)
+		int32_t deltaT = now - this->LastCheckedTimestamp;
+		assert(deltaT >= 0);
+
+		if (deltaT >= SCHEDULED_UPDATE_TIMEOUT)
 		{
-			this->Logger->Trace(CH_ADDON, "Scheduled update check: DeltaT > 1800s. (%s)", this->Location.string().c_str());
+			this->Logger->Trace(
+				CH_ADDON,
+				"Scheduled update check: DeltaT > %us. (%s)",
+				SCHEDULED_UPDATE_TIMEOUT,
+				this->Location.string().c_str()
+			);
 			doCheck = true;
 		}
-		else if (this->IsVersionDisabled() && (this->LastCheckedTimestamp - now >= 5 * 60))
+		else if (this->IsVersionDisabled() && (deltaT >= SCHEDULED_UPDATE_TIMEOUT_VERSIONDISABLED))
 		{
-			this->Logger->Trace(CH_ADDON, "Scheduled update check: Version disabled. DeltaT > 300s. (%s)", this->Location.string().c_str());
+			this->Logger->Trace(
+				CH_ADDON,
+				"Scheduled update check: Version disabled. DeltaT > %us. (%s)",
+				SCHEDULED_UPDATE_TIMEOUT_VERSIONDISABLED,
+				this->Location.string().c_str()
+			);
 			doCheck = true;
 		}
 
@@ -945,8 +968,6 @@ void CAddon::CheckUpdateInternal(bool aIsScheduled)
 		{
 			return;
 		}
-
-		this->LastCheckedTimestamp = now;
 	}
 
 	if (!this->NexusAddonDefV1)
@@ -978,19 +999,22 @@ void CAddon::CheckUpdateInternal(bool aIsScheduled)
 			break;
 		}
 	}
+
+	this->LastCheckedTimestamp = now;
+
+	if (this->ShouldUpdate())
+	{
+		this->Update();
+	}
 }
 
 bool CAddon::CheckUpdateViaGitHub()
 {
-	this->Logger->Trace(CH_ADDON, "CheckUpdateViaGitHub (%s)", this->Location.string().c_str());
-
 	return false;
 }
 
 bool CAddon::CheckUpdateViaDirect()
 {
-	this->Logger->Trace(CH_ADDON, "CheckUpdateViaDirect (%s)", this->Location.string().c_str());
-
 	return false;
 }
 
