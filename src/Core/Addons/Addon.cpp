@@ -1002,7 +1002,7 @@ void CAddon::CheckUpdateInternal(bool aIsScheduled)
 
 	this->LastCheckedTimestamp = now;
 
-	if (this->ShouldUpdate())
+	if (this->IsUpdateAvailable() && this->ShouldUpdate())
 	{
 		this->Update();
 	}
