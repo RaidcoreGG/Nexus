@@ -102,6 +102,7 @@
     <ClCompile Include="src\Engine\Inputs\RawInput\RiApi.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\CommitHash.h" />
     <ClInclude Include="src\Core\Addons\AddEnum.h" />
     <ClInclude Include="src\Core\Addons\Addon.h" />
     <ClInclude Include="src\Core\Addons\Config\CfgEnum.h" />
@@ -599,6 +600,7 @@
     <PreBuildEvent>
       <Command>git submodule update --init --recursive
 CALL $(SolutionDir)Scripts\branch.bat
+CALL $(SolutionDir)Scripts\commithash.bat
 CALL $(SolutionDir)Scripts\version.bat
 CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
     </PreBuildEvent>
@@ -637,6 +639,7 @@ CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
     <PreBuildEvent>
       <Command>git submodule update --init --recursive
 CALL $(SolutionDir)Scripts\branch.bat
+CALL $(SolutionDir)Scripts\commithash.bat
 CALL $(SolutionDir)Scripts\version.bat
 CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
     </PreBuildEvent>
