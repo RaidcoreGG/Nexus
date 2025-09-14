@@ -142,11 +142,11 @@ void CAddon::ProcessActions()
 		/* Scope, just to retrieve a queued action. */
 		{
 			std::unique_lock<std::mutex> lockThread(this->ProcessorMutex);
-			bool actionQueued = this->ConVar.wait_for(lockThread, std::chrono::seconds(60), [this] { return this->QueuedActions.size() > 0; });
+			bool actionQueued = this->ConVar.wait_for(lockThread, std::chrono::seconds(300), [this] { return this->QueuedActions.size() > 0; });
 
 			if (!this->IsRunning) { return; }
 
-			/* actionQueued is true if an action was actually queued, otherwise 60s timeout ran out -> do a scheduled update check. */
+			/* actionQueued is true if an action was actually queued, otherwise 300s timeout ran out -> do a scheduled update check. */
 			if (actionQueued)
 			{
 				action = this->QueuedActions.front();
