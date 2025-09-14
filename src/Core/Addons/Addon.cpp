@@ -1236,7 +1236,7 @@ void CAddon::UpdateInternal()
 
 	this->UpdateLocal.clear();
 	this->UpdateRemote.clear();
-	this->Flags |= ~EAddonFlags::UpdateAvailable;
+	this->Flags &= ~EAddonFlags::UpdateAvailable;
 
 	this->Logger->Info(
 		CH_ADDON,

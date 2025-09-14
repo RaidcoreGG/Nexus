@@ -10,7 +10,7 @@
 
 std::filesystem::path IAddon::GetLocation() const
 {
-    return this->Location;
+	return this->Location;
 }
 
 IAddon* IAddon::GetBase()
