@@ -164,12 +164,12 @@ HttpResponse_t CHttpClient::Download(std::filesystem::path aOutPath, std::string
 	if (downloadResult.value().has_header("Content-Length"))
 	{
 		contentLength = downloadResult.value().get_header_value_u64("Content-Length");
-	}
 
-	if (bytesWritten > 0 && bytesWritten != contentLength)
-	{
-		result.Error = "Content-Length / Bytes Written mismatch.";
-		success = false;
+		if (bytesWritten > 0 && bytesWritten != contentLength)
+		{
+			result.Error = "Content-Length / Bytes Written mismatch.";
+			success = false;
+		}
 	}
 
 	if (downloadResult->status != 200)

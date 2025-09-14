@@ -271,15 +271,15 @@ class CAddon : public virtual IAddon
 
 	///----------------------------------------------------------------------------------------------------
 	/// ApplyLocalUpdate:
-	/// 	Applies the update from local file.
+	/// 	Applies the update from local file, returns true if successful.
 	///----------------------------------------------------------------------------------------------------
-	void ApplyLocalUpdate();
+	bool ApplyLocalUpdate();
 
 	///----------------------------------------------------------------------------------------------------
 	/// DownloadUpdate:
 	/// 	Downloads the update, returns true if successful.
 	///----------------------------------------------------------------------------------------------------
-	void DownloadUpdate();
+	bool DownloadUpdate();
 
 	///----------------------------------------------------------------------------------------------------
 	/// EnumInterfaces:

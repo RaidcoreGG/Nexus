@@ -1011,12 +1011,61 @@ void CAddon::CheckUpdateInternal(bool aIsScheduled)
 
 void CAddon::CheckUpdateViaGitHub()
 {
-	return;
+	
 }
 
 void CAddon::CheckUpdateViaDirect()
 {
-	return;
+	assert(!this->NexusAddonDefV1->UpdateLink.empty());
+
+	CContext* context = CContext::GetContext();
+
+	CHttpClient* client = context->GetHttpClient(this->NexusAddonDefV1->UpdateLink);
+
+	HttpResponse_t response = client->Get(URL::GetEndpoint(this->NexusAddonDefV1->UpdateLink) + ".md5");
+
+	if (!response.Success())
+	{
+		this->Logger->Trace(
+			CH_ADDON,
+			"Update failed: Couldn't get MD5 for \"%s\" from \"%s\".\n\tError: %s\nAttempting with .md5sum.",
+			this->Location.c_str(),
+			this->NexusAddonDefV1->UpdateLink.c_str(),
+			response.Error.c_str()
+		);
+
+		response = client->Get(URL::GetEndpoint(this->NexusAddonDefV1->UpdateLink) + ".md5sum");
+	}
+
+	if (!response.Success())
+	{
+		this->Logger->Warning(
+			CH_ADDON,
+			"Update failed: Couldn't get MD5 for \"%s\" from \"%s\".\n\tError: %s",
+			this->Location.c_str(),
+			this->NexusAddonDefV1->UpdateLink.c_str(),
+			response.Error.c_str()
+		);
+
+		return;
+	}
+
+	assert(response.Content.length() >= MD5_LENGTH);
+
+	std::vector<uint8_t> vmd5;
+
+	for (size_t i = 0; i < 16; i++)
+	{
+		vmd5.push_back(response.Content[i]);
+	}
+
+	MD5_t md5 = vmd5;
+
+	if (md5 != this->GetMD5())
+	{
+		this->UpdateRemote = this->NexusAddonDefV1->UpdateLink;
+		this->Flags |= EAddonFlags::UpdateAvailable;
+	}
 }
 
 void CAddon::UpdateInternal()
@@ -1034,11 +1083,17 @@ void CAddon::UpdateInternal()
 	/* If the update is already locally available, just apply it. */
 	if (!this->UpdateLocal.empty())
 	{
-		this->ApplyLocalUpdate();
+		if (!this->ApplyLocalUpdate())
+		{
+			return;
+		}
 	}
 	else if (!this->UpdateRemote.empty())
 	{
-		this->DownloadUpdate();
+		if (!this->DownloadUpdate())
+		{
+			return;
+		}
 	}
 
 	this->UpdateLocal.clear();
@@ -1052,7 +1107,7 @@ void CAddon::UpdateInternal()
 	);
 }
 
-void CAddon::ApplyLocalUpdate()
+bool CAddon::ApplyLocalUpdate()
 {
 	assert(!this->UpdateLocal.empty());
 
@@ -1072,7 +1127,7 @@ void CAddon::ApplyLocalUpdate()
 			this->Location.string().c_str(),
 			tmpOld.string().c_str()
 		);
-		return;
+		return false;
 	}
 
 	/* Try renaming .dll.update to .dll. */
@@ -1102,14 +1157,16 @@ void CAddon::ApplyLocalUpdate()
 				tmpOld.string().c_str(),
 				this->Location.string().c_str()
 			);
-			return;
+			return false;
 		}
 
-		return;
+		return false;
 	}
+
+	return true;
 }
 
-void CAddon::DownloadUpdate()
+bool CAddon::DownloadUpdate()
 {
 	assert(!this->UpdateRemote.empty());
 
@@ -1118,9 +1175,7 @@ void CAddon::DownloadUpdate()
 
 	CContext* context = CContext::GetContext();
 
-	std::string base = URL::GetBase(this->UpdateRemote);
-
-	CHttpClient* client = context->GetHttpClient(base);
+	CHttpClient* client = context->GetHttpClient(this->UpdateRemote);
 	
 	HttpResponse_t response = client->Download(tmpDownload, URL::GetEndpoint(this->UpdateRemote));
 
@@ -1131,14 +1186,19 @@ void CAddon::DownloadUpdate()
 			"Update failed: Couldn't download \"%s\" to \"%s\".\n\tError: %s",
 			this->UpdateRemote.c_str(),
 			tmpDownload.string().c_str(),
-			response.Error.empty() ? "(null)" : response.Error
+			response.Error.c_str()
 		);
 
-		return;
+		return false;
 	}
 
 	this->UpdateLocal = tmpDownload;
 	this->UpdateRemote.clear();
 
-	this->ApplyLocalUpdate();
+	if (this->ApplyLocalUpdate())
+	{
+		return true;
+	}
+
+	return false;
 }

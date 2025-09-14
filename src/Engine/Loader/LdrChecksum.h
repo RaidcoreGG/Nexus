@@ -15,20 +15,22 @@
 #include <sstream>
 #include <vector>
 
+#define MD5_LENGTH 16
+
 ///----------------------------------------------------------------------------------------------------
 /// MD5_t Struct
 ///----------------------------------------------------------------------------------------------------
 struct MD5_t
 {
-	uint8_t Data[16];
+	uint8_t Data[MD5_LENGTH];
 
 	MD5_t() = default;
 
 	inline MD5_t(const std::vector<uint8_t>& aVector)
 	{
-		if (aVector.size() == 16)
+		if (aVector.size() == MD5_LENGTH)
 		{
-			memcpy(this->Data, aVector.data(), 16);
+			memcpy(this->Data, aVector.data(), MD5_LENGTH);
 		}
 		else if (aVector.size() == 0)
 		{
@@ -66,7 +68,7 @@ struct MD5_t
 	inline std::string string() const
 	{
 		std::ostringstream oss;
-		for (int i = 0; i < 16; ++i)
+		for (int i = 0; i < MD5_LENGTH; ++i)
 		{
 			oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(Data[i]);
 		}
