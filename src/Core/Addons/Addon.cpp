@@ -1026,7 +1026,7 @@ void CAddon::CheckUpdateViaGitHub()
 	{
 		this->Logger->Warning(
 			CH_ADDON,
-			"Update failed: Couldn't fetch releases for \"%s\".\n\tError: %s",
+			"Update check failed: Couldn't fetch releases for \"%s\".\n\tError: %s",
 			this->NexusAddonDefV1->UpdateLink.c_str(),
 			response.Error.c_str()
 		);
@@ -1146,7 +1146,7 @@ void CAddon::CheckUpdateViaDirect()
 	{
 		this->Logger->Trace(
 			CH_ADDON,
-			"Update failed: Couldn't get MD5 for \"%s\" from \"%s\".\n\tError: %s\nAttempting with .md5sum.",
+			"Update check failed: Couldn't get MD5 for \"%s\" from \"%s\".\n\tError: %s\nAttempting with .md5sum.",
 			this->Location.string().c_str(),
 			this->NexusAddonDefV1->UpdateLink.c_str(),
 			response.Error.c_str()
@@ -1159,7 +1159,7 @@ void CAddon::CheckUpdateViaDirect()
 	{
 		this->Logger->Warning(
 			CH_ADDON,
-			"Update failed: Couldn't get MD5 for \"%s\" from \"%s\".\n\tError: %s",
+			"Update check failed: Couldn't get MD5 for \"%s\" from \"%s\".\n\tError: %s",
 			this->Location.string().c_str(),
 			this->NexusAddonDefV1->UpdateLink.c_str(),
 			response.Error.c_str()
