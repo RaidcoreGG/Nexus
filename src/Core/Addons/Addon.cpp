@@ -23,6 +23,7 @@
 #include "Util/Paths.h"
 #include "Util/Strings.h"
 #include "Util/Time.h"
+#include "Util/URL.h"
 
 #define SCHEDULED_UPDATE_TIMEOUT                 3600
 #define SCHEDULED_UPDATE_TIMEOUT_VERSIONDISABLED 300
@@ -1008,37 +1009,136 @@ void CAddon::CheckUpdateInternal(bool aIsScheduled)
 	}
 }
 
-bool CAddon::CheckUpdateViaGitHub()
+void CAddon::CheckUpdateViaGitHub()
 {
-	return false;
+	return;
 }
 
-bool CAddon::CheckUpdateViaDirect()
+void CAddon::CheckUpdateViaDirect()
 {
-	return false;
+	return;
 }
 
-bool CAddon::UpdateInternal()
+void CAddon::UpdateInternal()
 {
 	this->Logger->Trace(CH_ADDON, "CAddon::UpdateInternal(%s)", this->Location.string().c_str());
 
 	if (!this->IsUpdateAvailable())
 	{
 		this->Logger->Debug(CH_ADDON, "Can't update. No update available. (%s)", this->Location.string().c_str());
-		return false;
+		return;
 	}
+
+	assert(!this->UpdateLocal.empty() || !this->UpdateRemote.empty());
 
 	/* If the update is already locally available, just apply it. */
 	if (!this->UpdateLocal.empty())
 	{
-		//this->Location
+		this->ApplyLocalUpdate();
 	}
-
-	/* If the update is still on a remote, download it. */
-	if (!this->UpdateRemote.empty())
+	else if (!this->UpdateRemote.empty())
 	{
-		//this->Location
+		this->DownloadUpdate();
 	}
 
-	return false;
+	this->UpdateLocal.clear();
+	this->UpdateRemote.clear();
+	this->Flags |= ~EAddonFlags::UpdateAvailable;
+
+	this->Logger->Info(
+		CH_ADDON,
+		"Updated addon. (%s)",
+		this->Location.string().c_str()
+	);
+}
+
+void CAddon::ApplyLocalUpdate()
+{
+	assert(!this->UpdateLocal.empty());
+
+	/* <GW2>/addons/Nexus/Temp/<filename>_<random>.dll.old */
+	std::filesystem::path tmpOld = Index(EPath::DIR_TEMP) / (this->Location.stem().string() + String::Format("_%08X", rand()) + ".dll.old");
+
+	/* Try renaming .dll to .dll.old. */
+	try
+	{
+		std::filesystem::rename(this->Location, tmpOld);
+	}
+	catch (std::filesystem::filesystem_error fErr)
+	{
+		this->Logger->Warning(
+			CH_ADDON,
+			"Update failed: Couldn't move \"%s\" to \"%s\".",
+			this->Location.string().c_str(),
+			tmpOld.string().c_str()
+		);
+		return;
+	}
+
+	/* Try renaming .dll.update to .dll. */
+	try
+	{
+		std::filesystem::rename(this->UpdateLocal, this->Location);
+	}
+	catch (std::filesystem::filesystem_error fErr)
+	{
+		this->Logger->Warning(
+			CH_ADDON,
+			"Update failed: Couldn't move \"%s\" to \"%s\".",
+			this->UpdateLocal.string().c_str(),
+			this->Location.string().c_str()
+		);
+
+		/* Try reverting .dll.old to .dll. */
+		try
+		{
+			std::filesystem::rename(tmpOld, this->Location);
+		}
+		catch (std::filesystem::filesystem_error fErr)
+		{
+			this->Logger->Warning(
+				CH_ADDON,
+				"Update failed: Couldn't move \"%s\" to \"%s\".",
+				tmpOld.string().c_str(),
+				this->Location.string().c_str()
+			);
+			return;
+		}
+
+		return;
+	}
+}
+
+void CAddon::DownloadUpdate()
+{
+	assert(!this->UpdateRemote.empty());
+
+	/* <GW2>/addons/Nexus/Temp/<filename>_<random>.dll */
+	std::filesystem::path tmpDownload = Index(EPath::DIR_TEMP) / (this->Location.stem().string() + String::Format("_%08X", rand()) + ".dll");
+
+	CContext* context = CContext::GetContext();
+
+	std::string base = URL::GetBase(this->UpdateRemote);
+
+	CHttpClient* client = context->GetHttpClient(base);
+	
+	HttpResponse_t response = client->Download(tmpDownload, URL::GetEndpoint(this->UpdateRemote));
+
+	if (!response.Success())
+	{
+		this->Logger->Warning(
+			CH_ADDON,
+			"Update failed: Couldn't download \"%s\" to \"%s\".\n\tError: %s",
+			this->UpdateRemote.c_str(),
+			tmpDownload.string().c_str(),
+			response.Error.empty() ? "(null)" : response.Error
+		);
+
+		return;
+	}
+
+	this->UpdateLocal = tmpDownload;
+	this->UpdateRemote.clear();
+
+	this->ApplyLocalUpdate();
 }
