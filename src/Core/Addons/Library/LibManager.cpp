@@ -182,6 +182,7 @@ void CLibraryMgr::Install(uint32_t aSignature)
 
 				downloadUrl = asset["browser_download_url"];
 				found = true;
+				break; /* Download the first result. */
 			}
 
 			if (!found)

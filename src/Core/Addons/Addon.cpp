@@ -11,6 +11,7 @@
 #include <assert.h>
 #include <chrono>
 #include <psapi.h>
+#include <regex>
 #include <windows.h>
 
 #include "Core/Addons/API/ApiBuilder.h"
@@ -941,7 +942,7 @@ void CAddon::CheckUpdateInternal(bool aIsScheduled)
 
 		bool doCheck = false;
 
-		int32_t deltaT = now - this->LastCheckedTimestamp;
+		int64_t deltaT = now - this->LastCheckedTimestamp;
 		assert(deltaT >= 0);
 
 		if (deltaT >= SCHEDULED_UPDATE_TIMEOUT)
@@ -1011,7 +1012,124 @@ void CAddon::CheckUpdateInternal(bool aIsScheduled)
 
 void CAddon::CheckUpdateViaGitHub()
 {
-	
+	assert(!this->NexusAddonDefV1->UpdateLink.empty());
+
+	CContext* context = CContext::GetContext();
+
+	CHttpClient* client = context->GetHttpClient("https://api.github.com");
+
+	HttpResponse_t response = client->Get("/repos" + URL::GetEndpoint(this->NexusAddonDefV1->UpdateLink) + "/releases");
+
+	Config_t* config = this->GetConfig();
+
+	if (!response.Success())
+	{
+		this->Logger->Warning(
+			CH_ADDON,
+			"Update failed: Couldn't fetch releases for \"%s\".\n\tError: %s",
+			this->NexusAddonDefV1->UpdateLink.c_str(),
+			response.Error.c_str()
+		);
+
+		return;
+	}
+
+	std::string               targetUrl;
+	MajorMinorBuildRevision_t targetVersion{};
+
+	for (json& release : response.ContentJSON())
+	{
+		/* sanity checks */
+		if (release["prerelease"].is_null()) { continue; }
+		if (release["tag_name"].is_null()) { continue; }
+		if (release["assets"].is_null()) { continue; }
+
+		/* if pre - releases are disabled, but it is one->skip */
+		if (!config->AllowPreReleases && release["prerelease"].get<bool>()) { continue; }
+
+		std::string tagName = release["tag_name"].get<std::string>();
+		MajorMinorBuildRevision_t version{};
+		bool ignoreRev = false;
+
+		/* Tag version parsing */
+		{
+			if (std::regex_match(tagName, std::regex(R"(v?\d+[.]\d+[.]\d+[.]\d+)")))
+			{
+				ignoreRev = false; // is 4 component version
+			}
+			else if (std::regex_match(tagName, std::regex(R"(v?\d+[.]\d+[.]\d+)")))
+			{
+				ignoreRev = true; // is 3 component version
+			}
+			else
+			{
+				continue;
+			}
+
+			if (String::StartsWith(tagName, "v"))
+			{
+				tagName = tagName.substr(1);
+			}
+
+			size_t pos = 0;
+			int i = 0;
+			while ((pos = tagName.find(".")) != std::string::npos)
+			{
+				switch (i)
+				{
+					case 0: version.Major = static_cast<unsigned short>(std::stoi(tagName.substr(0, pos))); break;
+					case 1: version.Minor = static_cast<unsigned short>(std::stoi(tagName.substr(0, pos))); break;
+					case 2: version.Build = static_cast<unsigned short>(std::stoi(tagName.substr(0, pos))); break;
+					default: break;
+				}
+				i++;
+				tagName.erase(0, pos + 1);
+			}
+			if (!ignoreRev)
+			{
+				version.Revision = static_cast<unsigned short>(std::stoi(tagName));
+			}
+			else
+			{
+				/* this is left over, instead of the revision, so we assign it */
+				version.Build = static_cast<unsigned short>(std::stoi(tagName));
+
+				/* set revision to -1 to omit it */
+				version.Revision = -1;
+			}
+		}
+
+		/* skip, if this release we have is the same or older than the one we had found before */
+		if (version <= targetVersion) { continue; }
+
+		for (json& asset : release["assets"])
+		{
+			/* small sanity check */
+			if (asset["name"].is_null()) { continue; }
+			if (asset["browser_download_url"].is_null()) { continue; }
+
+			if (String::EndsWith(asset["name"].get<std::string>(), ".dll"))
+			{
+				targetUrl = asset["browser_download_url"].get<std::string>();
+				targetVersion = version;
+				break;
+			}
+		}
+	}
+
+	if (targetVersion > this->NexusAddonDefV1->Version)
+	{
+		this->UpdateRemote = targetUrl;
+		this->Flags |= EAddonFlags::UpdateAvailable;
+
+		this->Logger->Trace(
+			CH_ADDON,
+			"Update available for \"%s\".\n\tLocal: %s\n\tRemote: %s",
+			this->Location.string().c_str(),
+			this->NexusAddonDefV1->Version.string().c_str(),
+			targetVersion.string().c_str()
+		);
+	}
 }
 
 void CAddon::CheckUpdateViaDirect()
@@ -1029,7 +1147,7 @@ void CAddon::CheckUpdateViaDirect()
 		this->Logger->Trace(
 			CH_ADDON,
 			"Update failed: Couldn't get MD5 for \"%s\" from \"%s\".\n\tError: %s\nAttempting with .md5sum.",
-			this->Location.c_str(),
+			this->Location.string().c_str(),
 			this->NexusAddonDefV1->UpdateLink.c_str(),
 			response.Error.c_str()
 		);
@@ -1042,7 +1160,7 @@ void CAddon::CheckUpdateViaDirect()
 		this->Logger->Warning(
 			CH_ADDON,
 			"Update failed: Couldn't get MD5 for \"%s\" from \"%s\".\n\tError: %s",
-			this->Location.c_str(),
+			this->Location.string().c_str(),
 			this->NexusAddonDefV1->UpdateLink.c_str(),
 			response.Error.c_str()
 		);
@@ -1054,9 +1172,21 @@ void CAddon::CheckUpdateViaDirect()
 
 	std::vector<uint8_t> vmd5;
 
-	for (size_t i = 0; i < 16; i++)
+	/* Interpret pairs of hex string. */
+	for (size_t i = 0; i < response.Content.length(); i += 2)
 	{
-		vmd5.push_back(response.Content[i]);
+		if (vmd5.size() >= MD5_LENGTH)
+		{
+			break; // this is not md5, we got more bytes than 16 -> abort
+		}
+
+		std::string str{};
+		str += response.Content[i];
+		str += response.Content[i + 1];
+
+		unsigned char byte = (unsigned char)strtol(str.c_str(), NULL, 16);
+
+		vmd5.push_back(byte);
 	}
 
 	MD5_t md5 = vmd5;
@@ -1065,6 +1195,14 @@ void CAddon::CheckUpdateViaDirect()
 	{
 		this->UpdateRemote = this->NexusAddonDefV1->UpdateLink;
 		this->Flags |= EAddonFlags::UpdateAvailable;
+
+		this->Logger->Trace(
+			CH_ADDON,
+			"Update available for \"%s\".\n\tLocal: %s\n\tRemote: %s",
+			this->Location.string().c_str(),
+			this->GetMD5().string().c_str(),
+			md5.string().c_str()
+		);
 	}
 }
 
