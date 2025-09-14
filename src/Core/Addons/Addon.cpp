@@ -1195,10 +1195,10 @@ bool CAddon::DownloadUpdate()
 	this->UpdateLocal = tmpDownload;
 	this->UpdateRemote.clear();
 
-	if (this->ApplyLocalUpdate())
+	if (!this->ApplyLocalUpdate())
 	{
-		return true;
+		return false;
 	}
 
-	return false;
+	return true;
 }
