@@ -37,7 +37,10 @@ If you want another proxy d3d11.dll, for example ArcDPS, you can chainload it by
 
 ## [FAQ & Wiki](https://github.com/RaidcoreGG/Nexus/wiki)
 
-## [Third Party Notices](https://github.com/RaidcoreGG/Nexus/blob/main/THIRDPARTYSOFTWAREREADME.TXT)
+## License
+Copyright (c) 2021 - 2025 Raidcore - All rights reserved.
+
+See [THIRDPARTYSOFTWAREREADME.TXT](./THIRDPARTYSOFTWAREREADME.TXT) for third-party licenses.
 
 ## Special Thanks
 ### GGDM
