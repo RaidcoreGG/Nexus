@@ -21,7 +21,6 @@
 #include "Engine/Logging/LogConsole.h"
 #include "Engine/Logging/LogWriter.h"
 #include "Engine/Updater/Updater.h"
-#include "GW2/Multibox/Multibox.h"
 #include "Resources/ResConst.h"
 #include "UI/UiContext.h"
 #include "Util/CmdLine.h"
@@ -120,8 +119,6 @@ namespace Main
 		}
 
 		MH_Initialize();
-		Multibox::KillMutex();
-		logger->Info(CH_CORE, "Multibox State: %d", Multibox::GetState());
 	}
 
 	void Shutdown(unsigned int aReason)

@@ -51,7 +51,6 @@
     <ClCompile Include="src\thirdparty\minhook\mh_disasm.cpp" />
     <ClCompile Include="src\thirdparty\minhook\mh_hook.cpp" />
     <ClCompile Include="src\thirdparty\minhook\mh_trampoline.cpp" />
-    <ClCompile Include="src\GW2\Multibox\Multibox.cpp" />
     <ClCompile Include="src\GW2\Mumble\MblReader.cpp" />
     <ClCompile Include="src\Core\Proxy\Proxy.cpp" />
     <ClCompile Include="src\Core\Preferences\PrefContext.cpp" />
@@ -170,7 +169,6 @@
     <ClInclude Include="src\Engine\Loader\NexusLinkData.h" />
     <ClInclude Include="src\Engine\Logging\LogFuncDefs.h" />
     <ClInclude Include="src\Core\Main.h" />
-    <ClInclude Include="src\GW2\Multibox\Multibox.h" />
     <ClInclude Include="src\thirdparty\mumble\Mumble.h" />
     <ClInclude Include="src\thirdparty\nlohmann\json.hpp" />
     <ClInclude Include="src\thirdparty\openssl\aes.h" />
