@@ -11,7 +11,10 @@
 
 #define RES_THIRDPARTYNOTICES             1
 
-#define RES_ICON_SNOWFLAKE              999
+#define RES_ICON_SNOWFLAKE              900
+#define RES_ICON_LEAF_VARIANT1          901
+#define RES_ICON_LEAF_VARIANT2          902
+#define RES_ICON_LEAF_VARIANT3          903
 
 /* Fonts */
 #define RES_FONT_MENOMONIA              101

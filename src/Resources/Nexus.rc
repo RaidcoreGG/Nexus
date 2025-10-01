@@ -88,6 +88,9 @@ END
 RES_THIRDPARTYNOTICES           TXT     "..\\THIRDPARTYSOFTWAREREADME.TXT"
 
 RES_ICON_SNOWFLAKE              PNG     "Resources\\Images\\MainWindow\\SnowflakeShaded.png"
+RES_ICON_LEAF_VARIANT1          PNG     "Resources\\Images\\MainWindow\\LeafShaded_Variant1.png"
+RES_ICON_LEAF_VARIANT2          PNG     "Resources\\Images\\MainWindow\\LeafShaded_Variant2.png"
+RES_ICON_LEAF_VARIANT3          PNG     "Resources\\Images\\MainWindow\\LeafShaded_Variant3.png"
 
 /* Fonts */
 RES_FONT_MENOMONIA              FONT    "Resources\\Fonts\\Menomonia.ttf"
