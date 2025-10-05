@@ -56,8 +56,11 @@ struct MajorMinorBuildRevision_t : VerU64_4XS16_t, virtual IVersionBase
 		str.append(std::to_string(this->Minor));
 		str.append(".");
 		str.append(std::to_string(this->Build));
-		str.append(".");
-		str.append(std::to_string(this->Revision));
+		if (this->Revision >= 0)
+		{
+			str.append(".");
+			str.append(std::to_string(this->Revision));
+		}
 		return str;
 	}
 
