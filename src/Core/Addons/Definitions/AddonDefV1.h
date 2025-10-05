@@ -54,7 +54,7 @@ struct AddonDefRawV1_t
 			this->Author &&
 			this->Description &&
 			this->Load &&
-			((bool)(this->Flags & EAddonDefFlags::DisableHotloading) || this->Unload))
+			((this->Flags & EAddonDefFlags::DisableHotloading) == EAddonDefFlags::DisableHotloading || this->Unload))
 		{
 			return true;
 		}
@@ -89,23 +89,27 @@ struct AddonDefV1_t
 	{
 		this->Signature = aRawDef.Signature;
 		this->APIVersion = aRawDef.APIVersion;
-		this->Name = aRawDef.Name
-			? aRawDef.Name
-			: "";
+		if (aRawDef.Name && aRawDef.Name[0])
+		{
+			this->Name = aRawDef.Name;
+		}
 		this->Version = aRawDef.Version;
-		this->Author = aRawDef.Author
-			? aRawDef.Author
-			: "";
-		this->Description = aRawDef.Description
-			? aRawDef.Description
-			: "";
+		if (aRawDef.Author && aRawDef.Author[0])
+		{
+			this->Author = aRawDef.Author;
+		}
+		if (aRawDef.Description && aRawDef.Description[0])
+		{
+			this->Description = aRawDef.Description;
+		}
 		this->Load = aRawDef.Load;
 		this->Unload = aRawDef.Unload;
 		this->Flags = aRawDef.Flags;
 		this->Provider = aRawDef.Provider;
-		this->UpdateLink = aRawDef.UpdateLink
-			? aRawDef.UpdateLink
-			: "";
+		if (aRawDef.UpdateLink && aRawDef.UpdateLink[0])
+		{
+			this->UpdateLink = aRawDef.UpdateLink;
+		}
 	}
 };
 
