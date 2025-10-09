@@ -31,6 +31,8 @@ constexpr const char* CH_QUICKACCESS = "Quick Access";
 constexpr const char* QA_MENU        = "0_QA_MENU";
 constexpr const char* QA_ARCDPS      = "QA_ARCDPS";
 
+constexpr const char* QAKEY_GENERIC  = "Generic";
+
 ///----------------------------------------------------------------------------------------------------
 /// CQuickAccess Class
 ///----------------------------------------------------------------------------------------------------

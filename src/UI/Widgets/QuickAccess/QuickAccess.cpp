@@ -216,7 +216,7 @@ void CQuickAccess::Render()
 						// call this async because we're currently iterating the list
 						std::thread([this, identifier]()
 						{
-							this->DenotifyShortcut(identifier.c_str(), "Generic");
+							this->DenotifyShortcut(identifier.c_str(), QAKEY_GENERIC);
 						}).detach();
 						this->InputBindApi->Invoke(shortcut.IBIdentifier);
 					}
@@ -476,7 +476,7 @@ void CQuickAccess::NotifyShortcut(const char* aIdentifier, const char* aNotifica
 	{
 		auto notifIt = std::find(it->second.Notifications.begin(), it->second.Notifications.end(), aNotificationKey);
 
-		if (notifIt != it->second.Notifications.end())
+		if (notifIt == it->second.Notifications.end())
 		{
 			it->second.Notifications.push_back(aNotificationKey);
 		}

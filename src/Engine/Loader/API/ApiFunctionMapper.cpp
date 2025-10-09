@@ -499,7 +499,7 @@ namespace ADDONAPI
 		void NotifyShortcut(const char* aIdentifier)
 		{
 			assert(s_QuickAccess);
-			s_QuickAccess->NotifyShortcut(aIdentifier, "Generic");
+			s_QuickAccess->NotifyShortcut(aIdentifier, QAKEY_GENERIC);
 		}
 
 		void SetNotificationShortcut(const char* aIdentifier, bool aState)
@@ -508,11 +508,11 @@ namespace ADDONAPI
 
 			if (aState)
 			{
-				s_QuickAccess->NotifyShortcut(aIdentifier, "Generic");
+				s_QuickAccess->NotifyShortcut(aIdentifier, QAKEY_GENERIC);
 			}
 			else
 			{
-				s_QuickAccess->DenotifyShortcut(aIdentifier, "Generic");
+				s_QuickAccess->DenotifyShortcut(aIdentifier, QAKEY_GENERIC);
 			}
 		}
 
