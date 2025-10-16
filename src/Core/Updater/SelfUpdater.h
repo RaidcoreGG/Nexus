@@ -13,7 +13,7 @@
 #include <string>
 #include <windows.h>
 
-#include "Core/Versioning/VerU64_4XS16.h"
+#include "Core/Versioning/MajorMinorBuildRevision.h"
 #include "Engine/Logging/LogApi.h"
 
 constexpr const char* CH_SELFUPDATER = "Updater";

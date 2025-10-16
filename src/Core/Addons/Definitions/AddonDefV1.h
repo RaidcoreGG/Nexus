@@ -14,54 +14,15 @@
 #include "Core/Addons/AddEnum.h"
 #include "Core/Addons/API/ApiBase.h"
 #include "Core/Addons/Definitions/DefEnum.h"
-#include "Core/Versioning/VerU64_4XS16.h"
+#include "Core/Versioning/MajorMinorBuildRevision.h"
 
-struct AddonDefRawV1_t;
+struct AddonDefV1_t;
 
-typedef AddonDefRawV1_t* (*GETADDONDEF) ();
-typedef void             (*ADDON_LOAD)  (AddonAPI_t* aAPI);
-typedef void             (*ADDON_UNLOAD)();
+typedef AddonDefV1_t* (*GETADDONDEF_V1) ();
+typedef void          (*ADDON_LOAD)     (AddonAPI_t* aAPI);
+typedef void          (*ADDON_UNLOAD)   ();
 
-///----------------------------------------------------------------------------------------------------
-/// AddonDefRawV1_t Struct
-/// 	Used for API Revisions 1-6.
-///----------------------------------------------------------------------------------------------------
-struct AddonDefRawV1_t
-{
-	/* Required */
-	uint32_t        Signature;   /* Unique addon identifier.                                                */
-	uint32_t        APIVersion;  /* Which API revision to pass to the load function. Use NEXUS_API_VERSION. */
-	const char*     Name;        /* Name of the addon as shown in the library.                              */
-	VerU64_4XS16_t  Version;
-	const char*     Author;      /* Author of the addon.                                                    */
-	const char*     Description; /* Short description.                                                      */
-	ADDON_LOAD      Load;        /* Load function.                                                          */
-	ADDON_UNLOAD    Unload;      /* Unload function. Optional, if EAddonFlags::DisableHotloading is set.    */
-	EAddonDefFlags  Flags;       /* Additional flags, to modify behavior or enable features.                */
-
-	/* Optional */
-	EUpdateProvider Provider;    /* How to check for updates.                                               */
-	const char*     UpdateLink;  /* Link to the update resource.                                            */
-
-	///----------------------------------------------------------------------------------------------------
-	/// HasMinimumRequirements:
-	/// 	Returns true, if the addon fulfills the minimum requirements.
-	///----------------------------------------------------------------------------------------------------
-	inline bool HasMinimumRequirements()
-	{
-		if (this->Signature != 0 &&
-			this->Name &&
-			this->Author &&
-			this->Description &&
-			this->Load &&
-			((this->Flags & EAddonDefFlags::DisableHotloading) == EAddonDefFlags::DisableHotloading || this->Unload))
-		{
-			return true;
-		}
-
-		return false;
-	}
-};
+typedef MajorMinorBuildRevision_t AddonVersion_t;
 
 ///----------------------------------------------------------------------------------------------------
 /// AddonDefV1_t Struct
@@ -70,46 +31,125 @@ struct AddonDefRawV1_t
 struct AddonDefV1_t
 {
 	/* Required */
-	uint32_t                  Signature;   /* Unique addon identifier.                                                */
-	uint32_t                  APIVersion;  /* Which API revision to pass to the load function. Use NEXUS_API_VERSION. */
-	std::string               Name;        /* Name of the addon as shown in the library.                              */
-	MajorMinorBuildRevision_t Version;
-	std::string               Author;      /* Author of the addon.                                                    */
-	std::string               Description; /* Short description.                                                      */
-	ADDON_LOAD                Load;        /* Load function.                                                          */
-	ADDON_UNLOAD              Unload;      /* Unload function. Optional, if EAddonFlags::DisableHotloading is set.    */
-	EAddonDefFlags            Flags;       /* Additional flags, to modify behavior or enable features.                */
+	uint32_t        Signature;   /* Unique addon identifier.                                                */
+	uint32_t        APIVersion;  /* Which API revision to pass to the load function. Use NEXUS_API_VERSION. */
+	const char*     Name;        /* Name of the addon as shown in the library.                              */
+	AddonVersion_t  Version;
+	const char*     Author;      /* Author of the addon.                                                    */
+	const char*     Description; /* Short description.                                                      */
+	ADDON_LOAD      Load;        /* Load function.                                                          */
+	ADDON_UNLOAD    Unload;      /* Unload function. Optional, if Flags::DisableHotloading is set.          */
+	EAddonDefFlags  Flags;       /* Additional flags, to modify behavior or enable features.                */
 
 	/* Optional */
-	EUpdateProvider           Provider;    /* How to check for updates.                                               */
-	std::string               UpdateLink;  /* Link to the update resource.                                            */
+	EUpdateProvider Provider;    /* How to check for updates.                                               */
+	const char*     UpdateLink;  /* Link to the update resource.                                            */
 
-	AddonDefV1_t() = default;
-	inline AddonDefV1_t(AddonDefRawV1_t aRawDef)
+	inline std::string GetName()
 	{
-		this->Signature = aRawDef.Signature;
-		this->APIVersion = aRawDef.APIVersion;
-		if (aRawDef.Name && aRawDef.Name[0])
+		return this->Name ? this->Name : "";
+	}
+
+	inline std::string GetAuthor()
+	{
+		return this->Author ? this->Author : "";
+	}
+
+	inline std::string GetDescription()
+	{
+		return this->Description ? this->Description : "";
+	}
+
+	inline std::string GetUpdateLink()
+	{
+		return this->UpdateLink ? this->UpdateLink : "";
+	}
+
+	///----------------------------------------------------------------------------------------------------
+	/// ctor (copy)
+	///----------------------------------------------------------------------------------------------------
+	inline AddonDefV1_t(const AddonDefV1_t& aOther)
+	{
+		this->Signature   = aOther.Signature;
+		this->APIVersion  = aOther.APIVersion;
+		this->Name        = nullptr;
+		this->Version     = aOther.Version;
+		this->Author      = nullptr;
+		this->Description = nullptr;
+		this->Load        = aOther.Load;
+		this->Unload      = aOther.Unload;
+		this->Flags       = aOther.Flags;
+		this->Provider    = aOther.Provider;
+		this->UpdateLink  = nullptr;
+
+		if (aOther.Name && aOther.Name[0])
 		{
-			this->Name = aRawDef.Name;
+			this->Name = _strdup(aOther.Name);
 		}
-		this->Version = aRawDef.Version;
-		if (aRawDef.Author && aRawDef.Author[0])
+
+		if (aOther.Author && aOther.Author[0])
 		{
-			this->Author = aRawDef.Author;
+			this->Author = _strdup(aOther.Author);
 		}
-		if (aRawDef.Description && aRawDef.Description[0])
+
+		if (aOther.Description && aOther.Description[0])
 		{
-			this->Description = aRawDef.Description;
+			this->Description = _strdup(aOther.Description);
 		}
-		this->Load = aRawDef.Load;
-		this->Unload = aRawDef.Unload;
-		this->Flags = aRawDef.Flags;
-		this->Provider = aRawDef.Provider;
-		if (aRawDef.UpdateLink && aRawDef.UpdateLink[0])
+
+		if (aOther.UpdateLink && aOther.UpdateLink[0])
 		{
-			this->UpdateLink = aRawDef.UpdateLink;
+			this->UpdateLink = _strdup(aOther.UpdateLink);
 		}
+	}
+
+	///----------------------------------------------------------------------------------------------------
+	/// dtor
+	///----------------------------------------------------------------------------------------------------
+	inline ~AddonDefV1_t()
+	{
+		if (this->Name)
+		{
+			free((void*)this->Name);
+		}
+
+		if (this->Author)
+		{
+			free((void*)this->Author);
+		}
+
+		if (this->Description)
+		{
+			free((void*)this->Description);
+		}
+
+		if (this->UpdateLink)
+		{
+			free((void*)this->UpdateLink);
+		}
+	}
+
+	///----------------------------------------------------------------------------------------------------
+	/// HasMinimumRequirements:
+	/// 	Returns true, if the addon fulfills the minimum requirements.
+	///----------------------------------------------------------------------------------------------------
+	inline bool HasMinimumRequirements()
+	{
+		bool hasUnloadOrDisablesHotloading
+			= (this->Flags & EAddonDefFlags::DisableHotloading) == EAddonDefFlags::DisableHotloading
+			|| this->Unload;
+
+		if (this->Signature
+			&& this->Name
+			&& this->Author
+			&& this->Description
+			&& this->Load
+			&& hasUnloadOrDisablesHotloading)
+		{
+			return true;
+		}
+
+		return false;
 	}
 };
 

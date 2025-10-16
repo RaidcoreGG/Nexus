@@ -272,7 +272,7 @@ void CAddon::LoadInternal()
 		return;
 	}
 
-	GETADDONDEF getAddonDef = nullptr;
+	GETADDONDEF_V1 getAddonDef = nullptr;
 
 	if (!DLL::FindFunction(module, &getAddonDef, "GetAddonDef"))
 	{
@@ -283,7 +283,7 @@ void CAddon::LoadInternal()
 		return;
 	}
 
-	AddonDefRawV1_t* addondef = getAddonDef();
+	AddonDefV1_t* addondef = getAddonDef();
 
 	if (addondef == nullptr)
 	{
@@ -372,13 +372,19 @@ void CAddon::LoadInternal()
 	this->EventApi->Raise(EV_ADDON_LOADED, &this->NexusAddonDefV1->Signature);
 
 	this->Config->LastGameBuild = GW2::GetGameBuild();
-	this->Config->LastName = this->NexusAddonDefV1->Name;
+	this->Config->LastName = this->NexusAddonDefV1->GetName();
 	this->State = EAddonState::Loaded;
 	this->ConfigMgr->SaveConfigs();
 
 	this->Logger->Info(
 		CH_ADDON,
-		"Loaded addon: %s\n\tSignature: 0x%08X\n\tAddress Space: %p - %p\n\tAPI Version: %d\n\tFlags: %u\n\tDefFlags: %u\n\tTook %u microseconds to load.",
+		"Loaded addon: %s\n"
+		"\tSignature: 0x%08X\n"
+		"\tAddress Space: %p - %p\n"
+		"\tAPI Version: %d\n"
+		"\tFlags: %u\n"
+		"\tDefFlags: %u\n"
+		"\tTook %u microseconds to load.",
 		this->Location.string().c_str(),
 		this->NexusAddonDefV1->Signature,
 		this->Module,
@@ -454,7 +460,7 @@ std::string CAddon::GetName()
 {
 	if (this->NexusAddonDefV1)
 	{
-		return this->NexusAddonDefV1->Name;
+		return this->NexusAddonDefV1->GetName();
 	}
 
 	if (this->ArcExtensionDef)
@@ -474,7 +480,7 @@ std::string CAddon::GetAuthor()
 {
 	if (this->NexusAddonDefV1)
 	{
-		return this->NexusAddonDefV1->Author;
+		return this->NexusAddonDefV1->GetAuthor();
 	}
 
 	return "";
@@ -484,7 +490,7 @@ std::string CAddon::GetDescription()
 {
 	if (this->NexusAddonDefV1)
 	{
-		return this->NexusAddonDefV1->Description;
+		return this->NexusAddonDefV1->GetDescription();
 	}
 
 	return "";
@@ -719,15 +725,15 @@ const EAddonInterfaces& CAddon::EnumInterfaces()
 
 	EAddonInterfaces interfaces = EAddonInterfaces::None;
 
-	GETADDONDEF getAddonDef = nullptr;
+	GETADDONDEF_V1 getAddonDef = nullptr;
 
 	if (DLL::FindFunction(module, &getAddonDef, "GetAddonDef"))
 	{
 		interfaces |= EAddonInterfaces::Nexus;
 
-		AddonDefRawV1_t* rawdef = getAddonDef();
+		AddonDefV1_t* addondef = getAddonDef();
 
-		if (rawdef)
+		if (addondef)
 		{
 			if (this->NexusAddonDefV1)
 			{
@@ -735,7 +741,7 @@ const EAddonInterfaces& CAddon::EnumInterfaces()
 				this->NexusAddonDefV1 = nullptr;
 			}
 
-			this->NexusAddonDefV1 = new AddonDefV1_t(*rawdef);
+			this->NexusAddonDefV1 = new AddonDefV1_t(*addondef);
 		}
 	}
 
@@ -1012,13 +1018,13 @@ void CAddon::CheckUpdateInternal(bool aIsScheduled)
 
 void CAddon::CheckUpdateViaGitHub()
 {
-	assert(!this->NexusAddonDefV1->UpdateLink.empty());
+	assert(!this->NexusAddonDefV1->GetUpdateLink().empty());
 
 	CContext* context = CContext::GetContext();
 
 	CHttpClient* client = context->GetHttpClient("https://api.github.com");
 
-	HttpResponse_t response = client->Get("/repos" + URL::GetEndpoint(this->NexusAddonDefV1->UpdateLink) + "/releases");
+	HttpResponse_t response = client->Get("/repos" + URL::GetEndpoint(this->NexusAddonDefV1->GetUpdateLink()) + "/releases");
 
 	Config_t* config = this->GetConfig();
 
@@ -1027,7 +1033,7 @@ void CAddon::CheckUpdateViaGitHub()
 		this->Logger->Warning(
 			CH_ADDON,
 			"Update check failed: Couldn't fetch releases for \"%s\".\n\tError: %s",
-			this->NexusAddonDefV1->UpdateLink.c_str(),
+			this->NexusAddonDefV1->GetUpdateLink().c_str(),
 			response.Error.c_str()
 		);
 
@@ -1134,13 +1140,13 @@ void CAddon::CheckUpdateViaGitHub()
 
 void CAddon::CheckUpdateViaDirect()
 {
-	assert(!this->NexusAddonDefV1->UpdateLink.empty());
+	assert(!this->NexusAddonDefV1->GetUpdateLink().empty());
 
 	CContext* context = CContext::GetContext();
 
-	CHttpClient* client = context->GetHttpClient(this->NexusAddonDefV1->UpdateLink);
+	CHttpClient* client = context->GetHttpClient(this->NexusAddonDefV1->GetUpdateLink());
 
-	HttpResponse_t response = client->Get(URL::GetEndpoint(this->NexusAddonDefV1->UpdateLink) + ".md5");
+	HttpResponse_t response = client->Get(URL::GetEndpoint(this->NexusAddonDefV1->GetUpdateLink()) + ".md5");
 
 	if (!response.Success())
 	{
@@ -1148,11 +1154,11 @@ void CAddon::CheckUpdateViaDirect()
 			CH_ADDON,
 			"Update check failed: Couldn't get MD5 for \"%s\" from \"%s\".\n\tError: %s\nAttempting with .md5sum.",
 			this->Location.string().c_str(),
-			this->NexusAddonDefV1->UpdateLink.c_str(),
+			this->NexusAddonDefV1->GetUpdateLink().c_str(),
 			response.Error.c_str()
 		);
 
-		response = client->Get(URL::GetEndpoint(this->NexusAddonDefV1->UpdateLink) + ".md5sum");
+		response = client->Get(URL::GetEndpoint(this->NexusAddonDefV1->GetUpdateLink()) + ".md5sum");
 	}
 
 	if (!response.Success())
@@ -1161,7 +1167,7 @@ void CAddon::CheckUpdateViaDirect()
 			CH_ADDON,
 			"Update check failed: Couldn't get MD5 for \"%s\" from \"%s\".\n\tError: %s",
 			this->Location.string().c_str(),
-			this->NexusAddonDefV1->UpdateLink.c_str(),
+			this->NexusAddonDefV1->GetUpdateLink().c_str(),
 			response.Error.c_str()
 		);
 

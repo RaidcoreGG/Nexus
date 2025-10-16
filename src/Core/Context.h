@@ -16,7 +16,7 @@
 #include "Core/Addons/Library/LibManager.h"
 #include "Core/Preferences/PrefContext.h"
 #include "Core/Updater/SelfUpdater.h"
-#include "Core/Versioning/VerU64_4XS16.h"
+#include "Core/Versioning/MajorMinorBuildRevision.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"

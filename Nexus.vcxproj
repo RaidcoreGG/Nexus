@@ -119,10 +119,7 @@
     <ClInclude Include="src\Core\Proxy\PxyEnum.h" />
     <ClInclude Include="src\Core\Proxy\PxyFuncDefs.h" />
     <ClInclude Include="src\Core\Updater\SelfUpdater.h" />
-    <ClInclude Include="src\Core\Versioning\VerBase.h" />
-    <ClInclude Include="src\Core\Versioning\VerEnum.h" />
-    <ClInclude Include="src\Core\Versioning\VerU48_3XS16.h" />
-    <ClInclude Include="src\Core\Versioning\VerU64_4XS16.h" />
+    <ClInclude Include="src\Core\Versioning\MajorMinorBuildRevision.h" />
     <ClInclude Include="src\Engine\Cleanup\RefCleanerContext.h" />
     <ClInclude Include="src\Engine\Events\EvtData.h" />
     <ClInclude Include="src\Engine\Functions\FnEntry.h" />
