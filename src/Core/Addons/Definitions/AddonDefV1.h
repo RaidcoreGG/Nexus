@@ -34,7 +34,7 @@ struct AddonDefV1_t
 	uint32_t        Signature;   /* Unique addon identifier.                                                */
 	uint32_t        APIVersion;  /* Which API revision to pass to the load function. Use NEXUS_API_VERSION. */
 	const char*     Name;        /* Name of the addon as shown in the library.                              */
-	AddonVersion_t  Version;
+	AddonVersion_t  Version;     /* Set Revision to -1 to ignore.                                           */
 	const char*     Author;      /* Author of the addon.                                                    */
 	const char*     Description; /* Short description.                                                      */
 	ADDON_LOAD      Load;        /* Load function.                                                          */
@@ -140,6 +140,7 @@ struct AddonDefV1_t
 			|| this->Unload;
 
 		if (this->Signature
+			&& this->APIVersion
 			&& this->Name
 			&& this->Author
 			&& this->Description
