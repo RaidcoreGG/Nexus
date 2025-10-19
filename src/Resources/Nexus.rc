@@ -115,6 +115,7 @@ RES_ICON_NOTIFICATION7          PNG     "Resources\\Images\\QuickAccess\\Notific
 RES_ICON_NOTIFICATION8          PNG     "Resources\\Images\\QuickAccess\\Notification8.png"
 RES_ICON_NOTIFICATION9          PNG     "Resources\\Images\\QuickAccess\\Notification9.png"
 RES_ICON_NOTIFICATIONTOOMANY    PNG     "Resources\\Images\\QuickAccess\\NotificationTooMany.png"
+RES_ICON_CONTEXTMENU_AVAILABLE  PNG     "Resources\\Images\\QuickAccess\\ContextMenu.png"
 
 /* Menu*/
 RES_ICON_ADDONS                 PNG     "Resources\\Images\\MainWindow\\Pages\\AddonsShaded.png"

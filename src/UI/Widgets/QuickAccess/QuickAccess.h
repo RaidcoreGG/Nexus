@@ -9,6 +9,7 @@
 #ifndef QUICKACCESS_H
 #define QUICKACCESS_H
 
+#include <cstdint>
 #include <map>
 #include <mutex>
 #include <string>
@@ -39,17 +40,16 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
-	/// OnAddonLoaded:
-	/// 	Rechecks invalid shortcuts on addon load.
+	/// OnAddonStateChanged:
+	/// 	Rechecks invalid shortcuts on addon state change.
 	///----------------------------------------------------------------------------------------------------
-	static void OnAddonLoaded(void* aEventData);
+	static void OnAddonStateChanged(void* aEventData);
 
 	public:
-	bool                               VerticalLayout     = false;
-	bool                               ShowArcDPSShortcut = true;
-	EQaVisibility                      Visibility         = EQaVisibility::AlwaysShow;
-	EQaPosition                        Location           = EQaPosition::Extend;
-	ImVec2                             Offset             = ImVec2(0, 0);
+	bool                               VerticalLayout = false;
+	EQaVisibility                      Visibility     = EQaVisibility::AlwaysShow;
+	EQaPosition                        Location       = EQaPosition::Extend;
+	ImVec2                             Offset         = ImVec2(0, 0);
 
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
@@ -86,16 +86,16 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	void RemoveShortcut(const char* aIdentifier);
 
 	///----------------------------------------------------------------------------------------------------
-	/// NotifyShortcut:
+	/// PushNotification:
 	/// 	Adds a notification to a given shortcut icon.
 	///----------------------------------------------------------------------------------------------------
-	void NotifyShortcut(const char* aIdentifier, const char* aNotificationKey);
+	void PushNotification(const char* aIdentifier, const char* aNotificationKey);
 
 	///----------------------------------------------------------------------------------------------------
-	/// DenotifyShortcut:
+	/// PopNotification:
 	/// 	Removes a notification to a given shortcut icon.
 	///----------------------------------------------------------------------------------------------------
-	void DenotifyShortcut(const char* aIdentifier, const char* aNotificationKey);
+	void PopNotification(const char* aIdentifier, const char* aNotificationKey);
 
 	///----------------------------------------------------------------------------------------------------
 	/// AddContextItem:
@@ -134,36 +134,45 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	///----------------------------------------------------------------------------------------------------
-	/// Validate:
-	/// 	Validates all shortcuts.
+	/// ValidateSafe:
+	/// 	Validates all shortcuts. Threadsafe.
 	///----------------------------------------------------------------------------------------------------
-	void Validate(bool aLock);
+	void ValidateSafe();
 
 	private:
-	NexusLinkData_t*                     NexusLink;
-	Mumble::Data*                        MumbleLink;
-	CLogApi*                             Logger;
-	CInputBindApi*                       InputBindApi;
-	CTextureLoader*                      TextureService;
-	CLocalization*                       Language;
-	CEventApi*                           EventApi;
+	CLogApi*                             Logger                  = nullptr;
+	CInputBindApi*                       InputBindApi            = nullptr;
+	CTextureLoader*                      TextureService          = nullptr;
+	CLocalization*                       Language                = nullptr;
+	CEventApi*                           EventApi                = nullptr;
+
+	NexusLinkData_t*                     NexusLink               = nullptr;
+	Mumble::Data*                        MumbleLink              = nullptr;
 
 	mutable std::mutex                   Mutex;
 	std::map<std::string, Shortcut_t>    Registry;
 	std::map<std::string, ContextItem_t> OrphanedCallbacks;
 
-	float                                Opacity                  = 0.50f;
+	float                                Opacity                 = 0.50f;
 
-	Texture_t*                           IconNotification1        = nullptr;
-	Texture_t*                           IconNotification2        = nullptr;
-	Texture_t*                           IconNotification3        = nullptr;
-	Texture_t*                           IconNotification4        = nullptr;
-	Texture_t*                           IconNotification5        = nullptr;
-	Texture_t*                           IconNotification6        = nullptr;
-	Texture_t*                           IconNotification7        = nullptr;
-	Texture_t*                           IconNotification8        = nullptr;
-	Texture_t*                           IconNotification9        = nullptr;
-	Texture_t*                           IconNotificationTooMany  = nullptr;
+	enum ETexIdx
+	{
+		Notify1,
+		Notify2,
+		Notify3,
+		Notify4,
+		Notify5,
+		Notify6,
+		Notify7,
+		Notify8,
+		Notify9,
+		NotifyX,
+		HasContextMenu,
+
+		COUNT
+	};
+
+	Texture_t* Textures[ETexIdx::COUNT];
 
 	///----------------------------------------------------------------------------------------------------
 	/// WhereAreMyParents:
@@ -176,6 +185,13 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	/// 	Returns true if the passed shortcut is valid. Not threadsafe.
 	///----------------------------------------------------------------------------------------------------
 	bool IsValid(const Shortcut_t& aShortcut);
+
+	///----------------------------------------------------------------------------------------------------
+	/// Validate:
+	/// 	Validates all shortcuts. Not threadsafe.
+	///----------------------------------------------------------------------------------------------------
+	void Validate();
+
 };
 
 #endif

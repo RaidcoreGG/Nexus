@@ -366,7 +366,7 @@ namespace ADDONAPI
 
 		void RemoveShortcut(const char* aIdentifier);
 
-		void NotifyShortcut(const char* aIdentifier);
+		void PushNotification(const char* aIdentifier);
 
 		void SetNotificationShortcut(const char* aIdentifier, bool aState);
 

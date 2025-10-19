@@ -98,7 +98,7 @@ struct AddonAPI4_t : AddonAPI_t
 	/* Shortcuts */
 	QUICKACCESS_ADDSHORTCUT           AddShortcut;
 	QUICKACCESS_GENERIC               RemoveShortcut;
-	QUICKACCESS_GENERIC               NotifyShortcut;
+	QUICKACCESS_GENERIC               PushNotification;
 	QUICKACCESS_ADDSIMPLE             AddSimpleShortcut;
 	QUICKACCESS_GENERIC               RemoveSimpleShortcut;
 

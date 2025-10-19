@@ -498,10 +498,10 @@ namespace ADDONAPI
 			s_QuickAccess->RemoveShortcut(aIdentifier);
 		}
 
-		void NotifyShortcut(const char* aIdentifier)
+		void PushNotification(const char* aIdentifier)
 		{
 			assert(s_QuickAccess);
-			s_QuickAccess->NotifyShortcut(aIdentifier, "Generic");
+			s_QuickAccess->PushNotification(aIdentifier, "Generic");
 		}
 
 		void SetNotificationShortcut(const char* aIdentifier, bool aState)
@@ -510,11 +510,11 @@ namespace ADDONAPI
 
 			if (aState)
 			{
-				s_QuickAccess->NotifyShortcut(aIdentifier, "Generic");
+				s_QuickAccess->PushNotification(aIdentifier, "Generic");
 			}
 			else
 			{
-				s_QuickAccess->DenotifyShortcut(aIdentifier, "Generic");
+				s_QuickAccess->PopNotification(aIdentifier, "Generic");
 			}
 		}
 
@@ -680,7 +680,7 @@ namespace ADDONAPI
 
 				api->AddShortcut = UIRoot::QuickAccess::AddShortcut;
 				api->RemoveShortcut = UIRoot::QuickAccess::RemoveShortcut;
-				api->NotifyShortcut = UIRoot::QuickAccess::NotifyShortcut;
+				api->PushNotification = UIRoot::QuickAccess::PushNotification;
 				api->AddSimpleShortcut = UIRoot::QuickAccess::AddContextItem;
 				api->RemoveSimpleShortcut = UIRoot::QuickAccess::RemoveContextItem;
 
@@ -743,7 +743,7 @@ namespace ADDONAPI
 
 				api->AddShortcut = UIRoot::QuickAccess::AddShortcut;
 				api->RemoveShortcut = UIRoot::QuickAccess::RemoveShortcut;
-				api->NotifyShortcut = UIRoot::QuickAccess::NotifyShortcut;
+				api->PushNotification = UIRoot::QuickAccess::PushNotification;
 				api->AddSimpleShortcut = UIRoot::QuickAccess::AddContextItem;
 				api->RemoveSimpleShortcut = UIRoot::QuickAccess::RemoveContextItem;
 
@@ -808,7 +808,7 @@ namespace ADDONAPI
 
 				api->AddShortcut = UIRoot::QuickAccess::AddShortcut;
 				api->RemoveShortcut = UIRoot::QuickAccess::RemoveShortcut;
-				api->NotifyShortcut = UIRoot::QuickAccess::NotifyShortcut;
+				api->PushNotification = UIRoot::QuickAccess::PushNotification;
 				api->AddSimpleShortcut = UIRoot::QuickAccess::AddContextItem;
 				api->RemoveSimpleShortcut = UIRoot::QuickAccess::RemoveContextItem;
 
@@ -880,7 +880,7 @@ namespace ADDONAPI
 
 				api->AddShortcut = UIRoot::QuickAccess::AddShortcut;
 				api->RemoveShortcut = UIRoot::QuickAccess::RemoveShortcut;
-				api->NotifyShortcut = UIRoot::QuickAccess::NotifyShortcut;
+				api->PushNotification = UIRoot::QuickAccess::PushNotification;
 				api->AddSimpleShortcut = UIRoot::QuickAccess::AddContextItem;
 				api->RemoveSimpleShortcut = UIRoot::QuickAccess::RemoveContextItem;
 
@@ -963,7 +963,7 @@ namespace ADDONAPI
 
 				api->QuickAccess.Add = UIRoot::QuickAccess::AddShortcut;
 				api->QuickAccess.Remove = UIRoot::QuickAccess::RemoveShortcut;
-				api->QuickAccess.Notify = UIRoot::QuickAccess::NotifyShortcut;
+				api->QuickAccess.Notify = UIRoot::QuickAccess::PushNotification;
 				api->QuickAccess.AddContextMenu = UIRoot::QuickAccess::AddContextItem2;
 				api->QuickAccess.RemoveContextMenu = UIRoot::QuickAccess::RemoveContextItem;
 
