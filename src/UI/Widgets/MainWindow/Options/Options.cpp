@@ -230,6 +230,12 @@ void COptionsWindow::TabGeneral()
 					settingsctx->Set(OPT_QAVERTICAL, qactx->VerticalLayout);
 				}
 
+				/* only show on hover */
+				if (ImGui::Checkbox(langApi->Translate("((Fully hide unless hovered))"), &qactx->OnlyShowOnHover))
+				{
+					settingsctx->Set(OPT_QAONLYSHOWONHOVER, qactx->OnlyShowOnHover);
+				}
+
 				/* prefetch currently selected position string */
 				std::string qaVisStr = EQaVisibilityToString(qactx->Visibility);
 				EQaVisibility newQaVis = qactx->Visibility;

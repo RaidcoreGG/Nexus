@@ -43,11 +43,12 @@ CQuickAccess::CQuickAccess(CDataLinkApi* aDataLink, CLogApi* aLogger, CInputBind
 	CContext*  ctx         = CContext::GetContext();
 	CSettings* settingsctx = ctx->GetSettingsCtx();
 
-	this->VerticalLayout = settingsctx->Get<bool>(OPT_QAVERTICAL, false);
-	this->Location       = settingsctx->Get<EQaPosition>(OPT_QALOCATION, EQaPosition::Extend);
-	this->Offset.x       = settingsctx->Get<float>(OPT_QAOFFSETX, 0.0f);
-	this->Offset.y       = settingsctx->Get<float>(OPT_QAOFFSETY, 0.0f);
-	this->Visibility     = settingsctx->Get<EQaVisibility>(OPT_QAVISIBILITY, EQaVisibility::AlwaysShow);
+	this->VerticalLayout  = settingsctx->Get<bool>(OPT_QAVERTICAL, false);
+	this->Location        = settingsctx->Get<EQaPosition>(OPT_QALOCATION, EQaPosition::Extend);
+	this->Offset.x        = settingsctx->Get<float>(OPT_QAOFFSETX, 0.0f);
+	this->Offset.y        = settingsctx->Get<float>(OPT_QAOFFSETY, 0.0f);
+	this->Visibility      = settingsctx->Get<EQaVisibility>(OPT_QAVISIBILITY, EQaVisibility::AlwaysShow);
+	this->OnlyShowOnHover = settingsctx->Get<bool>(OPT_QAONLYSHOWONHOVER, false);
 
 	this->EventApi->Subscribe(EV_ADDON_LOADED,   CQuickAccess::OnAddonStateChanged);
 	this->EventApi->Subscribe(EV_ADDON_UNLOADED, CQuickAccess::OnAddonStateChanged);
@@ -206,13 +207,21 @@ void CQuickAccess::Render()
 		bool windowHovered = ImGui::IsWindowHovered();
 		bool isHovering = windowHovered || isActive || isHoveringNative;
 
+		float opacityMin = 0.5f;
+		float opacityMax = 1.0f;
+
+		if (this->OnlyShowOnHover)
+		{
+			opacityMin = 0.001f;
+		}
+
 		if (isHovering)
 		{
-			ImGui::Animate(this->OpacityMin, this->OpacityMax, 350, &this->Opacity, ImAnimate::ECurve::Linear);
+			ImGui::Animate(opacityMin, opacityMax, 350, &this->Opacity, ImAnimate::ECurve::Linear);
 		}
 		else
 		{
-			ImGui::Animate(this->OpacityMax, this->OpacityMin, 350, &this->Opacity, ImAnimate::ECurve::Linear);
+			ImGui::Animate(opacityMax, opacityMin, 350, &this->Opacity, ImAnimate::ECurve::Linear);
 		}
 	}
 	ImGui::End();

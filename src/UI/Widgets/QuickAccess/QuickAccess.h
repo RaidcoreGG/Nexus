@@ -48,10 +48,11 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	static void OnAddonStateChanged(void* aEventData);
 
 	public:
-	bool          VerticalLayout = false;
-	EQaVisibility Visibility     = EQaVisibility::AlwaysShow;
-	EQaPosition   Location       = EQaPosition::Extend;
-	ImVec2        Offset         = ImVec2(0, 0);
+	bool          VerticalLayout  = false;
+	EQaVisibility Visibility      = EQaVisibility::AlwaysShow;
+	EQaPosition   Location        = EQaPosition::Extend;
+	ImVec2        Offset          = ImVec2(0, 0);
+	bool          OnlyShowOnHover = false;
 
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
@@ -144,8 +145,6 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	std::map<std::string, ContextItem_t>  OrphanedCallbacks;
 
 	float                                 Opacity           = 0.5f;
-	float                                 OpacityMin        = 0.5f;
-	float                                 OpacityMax        = 1.0f;
 
 	///----------------------------------------------------------------------------------------------------
 	/// WhereAreMyParents:
