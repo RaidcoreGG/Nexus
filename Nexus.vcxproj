@@ -87,6 +87,7 @@
     <ClCompile Include="src\UI\Widgets\MainWindow\Options\Options.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\SnowflakeMgr.cpp" />
     <ClCompile Include="src\UI\Widgets\QuickAccess\QaConst.cpp" />
+    <ClCompile Include="src\UI\Widgets\QuickAccess\QaShortcut.cpp" />
     <ClCompile Include="src\UI\Widgets\QuickAccess\QuickAccess.cpp" />
     <ClCompile Include="src\Util\Base64.cpp" />
     <ClCompile Include="src\Util\CmdLine.cpp" />

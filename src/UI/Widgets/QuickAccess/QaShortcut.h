@@ -9,34 +9,165 @@
 #ifndef QASHORTCUT_H
 #define QASHORTCUT_H
 
-#include <string>
 #include <map>
+#include <mutex>
+#include <string>
+#include <vector>
 
+#include "Engine/Cleanup/RefCleanerBase.h"
+#include "Engine/Inputs/InputBinds/IbApi.h"
+#include "Engine/Loader/Loader.h"
+#include "Engine/Textures/TxLoader.h"
 #include "Engine/Textures/TxTexture.h"
 #include "UI/FuncDefs.h"
+#include "UI/Services/Localization/LoclApi.h"
 
+///----------------------------------------------------------------------------------------------------
+/// ContextItem_t Struct
+///----------------------------------------------------------------------------------------------------
 struct ContextItem_t
 {
-	std::string                          ParentID;
-	GUI_RENDER                           Callback = nullptr;
+	std::string ParentID = "";
+	GUI_RENDER  Callback = nullptr;
 };
 
-struct Shortcut_t
+///----------------------------------------------------------------------------------------------------
+/// CShortcutIcon Class
+///----------------------------------------------------------------------------------------------------
+class CShortcutIcon : public virtual IRefCleaner
 {
-	bool                                 IsValid = false;
+	public:
+	///----------------------------------------------------------------------------------------------------
+	/// ctor
+	///----------------------------------------------------------------------------------------------------
+	CShortcutIcon() = default;
+	
+	///----------------------------------------------------------------------------------------------------
+	/// ctor
+	///----------------------------------------------------------------------------------------------------
+	CShortcutIcon(std::string aIconID, std::string aIconHoverID, std::string aInputBindID, std::string aTooltip);
 
-	int                                  TextureGetAttempts = 0;
-	std::string                          TextureNormalIdentifier;
-	std::string                          TextureHoverIdentifier;
+	///----------------------------------------------------------------------------------------------------
+	/// Invalidate:
+	/// 	Invalidates the UI component, causing it to refresh.
+	///----------------------------------------------------------------------------------------------------
+	void Invalidate();
 
-	Texture_t*                           TextureNormal = nullptr;
-	Texture_t*                           TextureHover = nullptr;
-	std::string                          IBIdentifier;
-	std::string                          IBText;
-	std::string                          TooltipText;
-	bool                                 IsHovering = false;
+	///----------------------------------------------------------------------------------------------------
+	/// Render:
+	/// 	Renders the icon.
+	/// 	Returns true if the icon is active.
+	///----------------------------------------------------------------------------------------------------
+	bool Render();
+
+	///----------------------------------------------------------------------------------------------------
+	/// AddContextItem:
+	/// 	Adds a context menu item.
+	///----------------------------------------------------------------------------------------------------
+	void AddContextItem(std::string aIdentifier, ContextItem_t aContextItem);
+
+	///----------------------------------------------------------------------------------------------------
+	/// RemoveContextItem:
+	/// 	Removes a context menu item.
+	///----------------------------------------------------------------------------------------------------
+	void RemoveContextItem(std::string aIdentifier);
+
+	///----------------------------------------------------------------------------------------------------
+	/// PushNotifcationSafe:
+	/// 	Adds a unique notification key.
+	///----------------------------------------------------------------------------------------------------
+	void PushNotifcationSafe(std::string aKey);
+
+	///----------------------------------------------------------------------------------------------------
+	/// PopNotifcationSafe:
+	/// 	Removes a unique notification key.
+	///----------------------------------------------------------------------------------------------------
+	void PopNotifcationSafe(std::string aKey);
+
+	///----------------------------------------------------------------------------------------------------
+	/// IsActive:
+	/// 	Returns true if the shortcut is active.
+	/// 	Must either have an on-click action or a context menu.
+	///----------------------------------------------------------------------------------------------------
+	bool IsActive() const;
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetNotificationKeys:
+	/// 	Returns a copy of the notification keys.
+	///----------------------------------------------------------------------------------------------------
+	std::vector<std::string> GetNotificationKeys() const;
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetContextMenuItems:
+	/// 	Returns a copy of the context menu items.
+	///----------------------------------------------------------------------------------------------------
+	std::map<std::string, ContextItem_t> GetContextMenuItems() const;
+
+	///----------------------------------------------------------------------------------------------------
+	/// CleanupRefs:
+	/// 	Removes all context items matching the address space.
+	///----------------------------------------------------------------------------------------------------
+	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
+
+	private:
+	CInputBindApi*                       InputBindApi   = nullptr;
+	CTextureLoader*                      TextureService = nullptr;
+	CLoader*                             Loader         = nullptr;
+	CLocalization*                       Language       = nullptr;
+
+	bool                                 IsValid        = false;
+
+	std::string                          IconID         = "";
+	Texture_t*                           Icon           = nullptr;
+	std::string                          IconHoverID    = "";
+	Texture_t*                           IconHover      = nullptr;
+
+	std::string                          InputBindID    = "";
+	std::string                          IBText         = "";
+	std::string                          TooltipText    = "";
+	bool                                 IsHovering     = false;
+
+	mutable std::mutex                   Mutex;
 	std::vector<std::string>             Notifications;
 	std::map<std::string, ContextItem_t> ContextItems;
+
+	enum ETexIdx
+	{
+		Notify1,
+		Notify2,
+		Notify3,
+		Notify4,
+		Notify5,
+		Notify6,
+		Notify7,
+		Notify8,
+		Notify9,
+		NotifyX,
+		HasContextMenu,
+
+		COUNT
+	};
+
+	Texture_t* Textures[ETexIdx::COUNT] = {};
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetNotificationTexture:
+	/// 	Returns the texture for the specified amount of notifications.
+	///----------------------------------------------------------------------------------------------------
+	Texture_t* GetNotificationTexture(uint32_t aAmount);
+
+	///----------------------------------------------------------------------------------------------------
+	/// RenderContextMenu:
+	/// 	Renders the context menu associated with the shortcut.
+	/// 	Returns true if the context menu is active.
+	///----------------------------------------------------------------------------------------------------
+	bool RenderContextMenu();
+
+	///----------------------------------------------------------------------------------------------------
+	/// PopNotifcation:
+	/// 	Removes a unique notification key.
+	///----------------------------------------------------------------------------------------------------
+	void PopNotifcation(std::string aKey);
 };
 
 #endif

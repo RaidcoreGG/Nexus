@@ -33,6 +33,8 @@ constexpr const char* CH_QUICKACCESS = "Quick Access";
 constexpr const char* QA_MENU        = "0_QA_MENU";
 constexpr const char* QA_ARCDPS      = "QA_ARCDPS";
 
+constexpr const char* QAKEY_GENERIC  = "Generic";
+
 ///----------------------------------------------------------------------------------------------------
 /// CQuickAccess Class
 ///----------------------------------------------------------------------------------------------------
@@ -46,10 +48,10 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	static void OnAddonStateChanged(void* aEventData);
 
 	public:
-	bool                               VerticalLayout = false;
-	EQaVisibility                      Visibility     = EQaVisibility::AlwaysShow;
-	EQaPosition                        Location       = EQaPosition::Extend;
-	ImVec2                             Offset         = ImVec2(0, 0);
+	bool          VerticalLayout = false;
+	EQaVisibility Visibility     = EQaVisibility::AlwaysShow;
+	EQaPosition   Location       = EQaPosition::Extend;
+	ImVec2        Offset         = ImVec2(0, 0);
 
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
@@ -66,12 +68,6 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	/// 	Renders the Quick Access.
 	///----------------------------------------------------------------------------------------------------
 	void Render() override;
-
-	///----------------------------------------------------------------------------------------------------
-	/// RenderContextMenu:
-	/// 	Renders the context menu for a given shortcut.
-	///----------------------------------------------------------------------------------------------------
-	void RenderContextMenu(const std::string& aIdentifier, const Shortcut_t& aShortcut, bool* aIsActive);
 
 	///----------------------------------------------------------------------------------------------------
 	/// AddShortcut:
@@ -119,7 +115,7 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	/// GetRegistry:
 	/// 	Returns a copy of the registry.
 	///----------------------------------------------------------------------------------------------------
-	std::map<std::string, Shortcut_t> GetRegistry() const;
+	std::map<std::string, CShortcutIcon*> GetRegistry() const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetOrphanage:
@@ -133,46 +129,23 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	///----------------------------------------------------------------------------------------------------
 	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
-	///----------------------------------------------------------------------------------------------------
-	/// ValidateSafe:
-	/// 	Validates all shortcuts. Threadsafe.
-	///----------------------------------------------------------------------------------------------------
-	void ValidateSafe();
-
 	private:
-	CLogApi*                             Logger                  = nullptr;
-	CInputBindApi*                       InputBindApi            = nullptr;
-	CTextureLoader*                      TextureService          = nullptr;
-	CLocalization*                       Language                = nullptr;
-	CEventApi*                           EventApi                = nullptr;
+	CLogApi*                              Logger            = nullptr;
+	CInputBindApi*                        InputBindApi      = nullptr;
+	CTextureLoader*                       TextureService    = nullptr;
+	CLocalization*                        Language          = nullptr;
+	CEventApi*                            EventApi          = nullptr;
 
-	NexusLinkData_t*                     NexusLink               = nullptr;
-	Mumble::Data*                        MumbleLink              = nullptr;
+	NexusLinkData_t*                      NexusLink         = nullptr;
+	Mumble::Data*                         MumbleLink        = nullptr;
 
-	mutable std::mutex                   Mutex;
-	std::map<std::string, Shortcut_t>    Registry;
-	std::map<std::string, ContextItem_t> OrphanedCallbacks;
+	mutable std::mutex                    Mutex;
+	std::map<std::string, CShortcutIcon*> Registry;
+	std::map<std::string, ContextItem_t>  OrphanedCallbacks;
 
-	float                                Opacity                 = 0.50f;
-
-	enum ETexIdx
-	{
-		Notify1,
-		Notify2,
-		Notify3,
-		Notify4,
-		Notify5,
-		Notify6,
-		Notify7,
-		Notify8,
-		Notify9,
-		NotifyX,
-		HasContextMenu,
-
-		COUNT
-	};
-
-	Texture_t* Textures[ETexIdx::COUNT];
+	float                                 Opacity           = 0.5f;
+	float                                 OpacityMin        = 0.5f;
+	float                                 OpacityMax        = 1.0f;
 
 	///----------------------------------------------------------------------------------------------------
 	/// WhereAreMyParents:
@@ -181,16 +154,10 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	void WhereAreMyParents();
 
 	///----------------------------------------------------------------------------------------------------
-	/// IsValid:
-	/// 	Returns true if the passed shortcut is valid. Not threadsafe.
+	/// UpdateNexusLink:
+	/// 	Updates the nexus link shortcut icon count.
 	///----------------------------------------------------------------------------------------------------
-	bool IsValid(const Shortcut_t& aShortcut);
-
-	///----------------------------------------------------------------------------------------------------
-	/// Validate:
-	/// 	Validates all shortcuts. Not threadsafe.
-	///----------------------------------------------------------------------------------------------------
-	void Validate();
+	void UpdateNexusLink();
 
 };
 

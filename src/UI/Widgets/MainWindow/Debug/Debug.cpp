@@ -378,7 +378,8 @@ void CDebugWindow::TabTextures()
 
 void CDebugWindow::TabQuickAccess()
 {
-	if (!ImGui::BeginTabItem("Quick Access"))
+	/* FIXME: Removed this as the underlying structure changed. */
+	/*if (!ImGui::BeginTabItem("Quick Access"))
 	{
 		return;
 	}
@@ -432,7 +433,7 @@ void CDebugWindow::TabQuickAccess()
 	}
 	ImGui::EndChild();
 
-	ImGui::EndTabItem();
+	ImGui::EndTabItem();*/
 }
 
 void CDebugWindow::TabLoader()
