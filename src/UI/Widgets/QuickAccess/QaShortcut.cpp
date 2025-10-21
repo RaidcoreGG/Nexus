@@ -20,7 +20,7 @@
 #include "Resources/ResConst.h"
 #include "UI/UiContext.h"
 
-CShortcutIcon::CShortcutIcon(std::string aIconID, std::string aIconHoverID, std::string aInputBindID, std::string aTooltip)
+CShortcutIcon::CShortcutIcon(std::string aID, std::string aIconID, std::string aIconHoverID, std::string aInputBindID, std::string aTooltip)
 {
 	/* FIXME: See Render IsInvalid. */
 	CContext* ctx        = CContext::GetContext();
@@ -28,6 +28,7 @@ CShortcutIcon::CShortcutIcon(std::string aIconID, std::string aIconHoverID, std:
 	this->TextureService = ctx->GetTextureService();
 	this->Loader         = ctx->GetLoader();
 
+	this->ID          = aID;
 	this->IconID      = aIconID;
 	this->IconHoverID = aIconHoverID;
 	this->InputBindID = aInputBindID;
@@ -294,11 +295,12 @@ bool CShortcutIcon::RenderContextMenu()
 		return false;
 	}
 
-	static const char* ID_CONTEXTMENU = "QuickAccess::ContextMenu";
+	static const char* ID_CONTEXTMENU = "QuickAccess::ContextMenu::";
+	std::string ctxMenuID = ID_CONTEXTMENU + this->ID;
 
 	bool drawingCtxMenu = false;
 
-	if (ImGui::BeginPopupContextItem(ID_CONTEXTMENU))
+	if (ImGui::BeginPopupContextItem(ctxMenuID.c_str()))
 	{
 		drawingCtxMenu = true;
 
@@ -306,7 +308,7 @@ bool CShortcutIcon::RenderContextMenu()
 		size_t amtItems = this->ContextItems.size();
 		size_t idx = 0;
 
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.f, 0.f }); /* Small checkboxes. */
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.f, 0.f)); /* Small checkboxes. */
 		for (auto& [identifier, contextitem] : this->ContextItems)
 		{
 			idx++;
@@ -331,11 +333,11 @@ bool CShortcutIcon::RenderContextMenu()
 				}
 			}
 		}
-		ImGui::PopStyleVar();
+		ImGui::PopStyleVar(1);
 
 		ImGui::EndPopup();
 	}
-	ImGui::OpenPopupOnItemClick(ID_CONTEXTMENU, 1);
+	ImGui::OpenPopupOnItemClick(ctxMenuID.c_str(), 1);
 
 	return drawingCtxMenu;
 }

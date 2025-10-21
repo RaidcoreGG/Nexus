@@ -45,7 +45,7 @@ class CShortcutIcon : public virtual IRefCleaner
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CShortcutIcon(std::string aIconID, std::string aIconHoverID, std::string aInputBindID, std::string aTooltip);
+	CShortcutIcon(std::string aID, std::string aIconID, std::string aIconHoverID, std::string aInputBindID, std::string aTooltip);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Invalidate:
@@ -110,6 +110,8 @@ class CShortcutIcon : public virtual IRefCleaner
 	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	private:
+	std::string                          ID             = "";
+
 	CInputBindApi*                       InputBindApi   = nullptr;
 	CTextureLoader*                      TextureService = nullptr;
 	CLoader*                             Loader         = nullptr;

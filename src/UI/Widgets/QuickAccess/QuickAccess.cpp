@@ -235,6 +235,7 @@ void CQuickAccess::AddShortcut(const char* aIdentifier, const char* aTextureIden
 	if (this->Registry.find(aIdentifier) == this->Registry.end())
 	{
 		CShortcutIcon* shortcut = new CShortcutIcon(
+			aIdentifier,
 			aTextureIdentifier,
 			aTextureHoverIdentifier,
 			aInputBindIdentifier ? aInputBindIdentifier : "",
