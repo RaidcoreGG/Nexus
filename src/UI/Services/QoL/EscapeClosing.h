@@ -65,8 +65,8 @@ class CEscapeClosing : public virtual IRefCleaner
 	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	private:
-	std::mutex								Mutex;
-	std::unordered_map<std::string, bool*>	Registry;
+	std::mutex                             Mutex;
+	std::unordered_map<std::string, bool*> Registry;
 };
 
 #endif

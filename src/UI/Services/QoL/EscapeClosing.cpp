@@ -33,24 +33,34 @@ UINT CEscapeClosing::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return uMsg;
 	}
 
-	if (uMsg == WM_KEYDOWN && wParam == VK_ESCAPE)
+	if (!(uMsg == WM_KEYDOWN && wParam == VK_ESCAPE))
 	{
-		KeystrokeMessageFlags keylp = LParamToKMF(lParam);
+		return uMsg;
+	}
 
-		if (!keylp.PreviousKeyState)
+	KeystrokeMessageFlags keylp = LParamToKMF(lParam);
+
+	/* If this bit is 1, the key was previously down -> We only react on change, not repeat.*/
+	if (keylp.PreviousKeyState)
+	{
+		return uMsg;
+	}
+
+	ImVector<ImGuiWindow*> windows = ImGui::GetCurrentContext()->Windows;
+
+	/* Iterate over registered window pointers, since they might even be all hidden. */
+	for (auto& [wndName, boolptr] : this->Registry)
+	{
+		if (*boolptr == false) { continue; }
+
+		/* Iterate backwards, as the last one is the topmost. */
+		for (int i = windows.Size - 1; i > 0; i--)
 		{
-			ImVector<ImGuiWindow*> windows = ImGui::GetCurrentContext()->Windows;
-
-			for (int i = windows.Size - 1; i > 0; i--)
+			/* If the registered windowname matches the imgui window name -> hide.*/
+			if (strcmp(windows[i]->Name, wndName.c_str()) == 0)
 			{
-				for (auto& [wndName, boolptr] : this->Registry)
-				{
-					if (strcmp(windows[i]->Name, wndName.c_str()) == 0 && *boolptr)
-					{
-						*boolptr = false;
-						return 0;
-					}
-				}
+				*boolptr = false;
+				return 0;
 			}
 		}
 	}
@@ -62,13 +72,17 @@ void CEscapeClosing::Register(const char* aWindowName, bool* aIsVisible)
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
-	this->Registry[aWindowName] = aIsVisible;
+	auto it = this->Registry.find(aWindowName);
+
+	if (it == this->Registry.end())
+	{
+		this->Registry.emplace(aWindowName, aIsVisible);
+	}
 }
 
 void CEscapeClosing::Deregister(const char* aWindowName)
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
-
 	this->Registry.erase(aWindowName);
 }
 
@@ -90,12 +104,16 @@ int CEscapeClosing::CleanupRefs(void* aStartAddress, void* aEndAddress)
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
-	for (auto& [windowname, boolptr] : this->Registry)
+	for (auto it = this->Registry.begin(); it != this->Registry.end();)
 	{
-		if (boolptr >= aStartAddress && boolptr <= aEndAddress)
+		if (it->second >= aStartAddress && it->second <= aEndAddress)
 		{
-			this->Registry.erase(windowname);
+			it = this->Registry.erase(it);
 			refCounter++;
+		}
+		else
+		{
+			it++;
 		}
 	}
 
