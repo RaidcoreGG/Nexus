@@ -59,7 +59,6 @@ void CEventApi::Raise(uint32_t aSignature, const char* aIdentifier, void* aEvent
 		if (sub.Signature == aSignature)
 		{
 			sub.Callback(aEventData);
-			break;
 		}
 	}
 }
