@@ -8,15 +8,15 @@
 
 #include "IbApi.h"
 
-#include <cstdarg>
 #include <filesystem>
 #include <fstream>
 #include <string>
 
+#pragma warning(push, 0)
 #include "nlohmann/json.hpp"
+#pragma warning(pop)
 using json = nlohmann::json;
 
-#include "Util/Strings.h"
 #include "Util/Inputs.h"
 #include "IbConst.h"
 #include "Engine/Cleanup/RefCleanerContext.h"

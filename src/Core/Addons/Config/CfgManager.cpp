@@ -10,7 +10,9 @@
 
 #include <fstream>
 
+#pragma warning(push, 0)
 #include "nlohmann/json.hpp"
+#pragma warning(pop)
 using json = nlohmann::json;
 
 /* Config Migration Keys */

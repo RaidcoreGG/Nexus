@@ -13,7 +13,9 @@
 #include <string>
 #include <filesystem>
 
+#pragma warning(push, 0)
 #include "httplib/httplib.h"
+#pragma warning(pop)
 
 ///----------------------------------------------------------------------------------------------------
 /// MD5 Namespace

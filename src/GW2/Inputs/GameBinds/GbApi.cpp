@@ -8,10 +8,6 @@
 
 #include "GbApi.h"
 
-#include <fstream>
-
-#include "nlohmann/json.hpp"
-using json = nlohmann::json;
 #include "pugixml/pugixml.hpp"
 
 #include "Core/Context.h"

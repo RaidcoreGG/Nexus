@@ -12,7 +12,9 @@
 #include <string>
 #include <cstdint>
 
+#pragma warning(push, 0)
 #include "nlohmann/json.hpp"
+#pragma warning(pop)
 using json = nlohmann::json;
 
 #include "WreConst.h"

@@ -14,7 +14,9 @@
 #include <mutex>
 #include <string>
 
+#pragma warning(push, 0)
 #include "httplib/httplib.h"
+#pragma warning(pop)
 
 #include "Engine/Logging/LogApi.h"
 #include "WreCache.h"

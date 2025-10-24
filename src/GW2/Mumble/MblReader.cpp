@@ -8,7 +8,9 @@
 
 #include "GW2/Mumble/MblReader.h"
 
+#pragma warning(push, 0)
 #include "nlohmann/json.hpp"
+#pragma warning(pop)
 using json = nlohmann::json;
 
 using namespace Mumble;

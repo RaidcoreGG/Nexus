@@ -8,12 +8,14 @@
 
 #include "Engine/Textures/TxLoader.h"
 
+#include <d3d11.h>
+#include <filesystem>
+
+#pragma warning(push, 0)
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 #include "httplib/httplib.h"
-
-#include <d3d11.h>
-#include <filesystem>
+#pragma warning(pop)
 
 #include "Engine/Cleanup/RefCleanerContext.h"
 #include "Util/Time.h"
