@@ -18,12 +18,12 @@
 ///----------------------------------------------------------------------------------------------------
 struct LogMsg_t
 {
-	ELogLevel   Level;
-	long long   Time;
-	int         TimeMsPrecision;
-	std::string Channel;
-	std::string Message;
-	int         RepeatCount = 1;
+	ELogLevel   Level          {};
+	long long   Time           {};
+	int         TimeMsPrecision{};
+	std::string Channel        {};
+	std::string Message        {};
+	int         RepeatCount    {1};
 };
 
 #endif

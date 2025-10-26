@@ -31,7 +31,7 @@ class CAddonContextMenu : public virtual IContextMenu
 	void SetContent(AddonListing_t& aAddonData);
 
 	private:
-	AddonListing_t* Data;
+	AddonListing_t* Data{};
 };
 
 #endif

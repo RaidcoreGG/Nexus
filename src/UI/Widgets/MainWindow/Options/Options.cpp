@@ -356,7 +356,7 @@ void COptionsWindow::TabGeneral()
 				s_Offset.x = settingsctx->Get<float>(OPT_QAOFFSETX);
 				s_Offset.y = settingsctx->Get<float>(OPT_QAOFFSETY);
 				ImGui::Text(langApi->Translate("((000051))"));
-				if (ImGui::DragFloat2("##QAOffsetInput", (float*)&s_Offset, 1.0f, (static_cast<int>(renderer->Window.Height)) * -1, static_cast<int>(renderer->Window.Height)))
+				if (ImGui::DragFloat2("##QAOffsetInput", (float*)&s_Offset, 1.0f, (static_cast<float>(renderer->Window.Height)) * -1.f, static_cast<float>(renderer->Window.Height)))
 				{
 					settingsctx->Set(OPT_QAOFFSETX, s_Offset.x);
 					settingsctx->Set(OPT_QAOFFSETY, s_Offset.y);

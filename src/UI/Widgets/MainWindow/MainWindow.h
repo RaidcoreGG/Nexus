@@ -32,14 +32,14 @@ class CMainWindow : public virtual IWindow
 	void Activate(const std::string& aWindowName = "");
 
 	private:
-	std::mutex               Mutex;
-	std::vector<ISubWindow*> Windows;
-	ISubWindow*              ActiveContent;
-	bool                     IsHandleHeld;
+	std::mutex               Mutex          {};
+	std::vector<ISubWindow*> Windows        {};
+	ISubWindow*              ActiveContent  {};
+	bool                     IsHandleHeld   {};
 
 	private:
-	Texture_t*                 Tex_RaidcoreTag;
-	Texture_t*                 Tex_CloseIcon;
+	Texture_t*               Tex_RaidcoreTag{};
+	Texture_t*               Tex_CloseIcon  {};
 };
 
 #endif

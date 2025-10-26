@@ -18,30 +18,30 @@
 
 struct InputBindPacked_t
 {
-	std::string KeysText;
-	IbMapping_t Bind;
+	std::string KeysText{};
+	IbMapping_t Bind    {};
 };
 
 struct InputBindCategory_t
 {
-	std::string                                        Name;
-	std::unordered_map<std::string, InputBindPacked_t> InputBinds;
+	std::string                                        Name      {};
+	std::unordered_map<std::string, InputBindPacked_t> InputBinds{};
 };
 
 struct GameInputBindPacked_t
 {
-	std::string Name;
-	std::string KeysText;
-	InputBind_t Bind;
+	std::string Name     {};
+	std::string KeysText {};
+	InputBind_t Bind     {};
 
-	std::string KeysText2;
-	InputBind_t Bind2;
+	std::string KeysText2{};
+	InputBind_t Bind2    {};
 };
 
 struct GameInputBindCategory_t
 {
-	std::string                                           Name;
-	std::unordered_map<EGameBinds, GameInputBindPacked_t> GameInputBinds;
+	std::string                                           Name          {};
+	std::unordered_map<EGameBinds, GameInputBindPacked_t> GameInputBinds{};
 };
 
 enum class EBindEditType

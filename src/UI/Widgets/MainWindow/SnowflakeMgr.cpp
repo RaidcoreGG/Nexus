@@ -80,11 +80,11 @@ void CSnowflakeMgr::Update()
 	ImVec2 wndPos = imctx->CurrentWindow->Pos;
 
 	/* density logic */
-	int amtSnowflakes = wndSize.x / ImGui::GetFontSize() * 0.5f;
+	int amtSnowflakes = static_cast<int>(wndSize.x / ImGui::GetFontSize() * 0.5f);
 
 	if (snowflakes.size() != amtSnowflakes)
 	{
-		std::srand(std::time(nullptr));
+		std::srand(static_cast<int>(std::time(nullptr)));
 
 		static Texture_t* texSnowflake = texapi->GetOrCreate("SNOWFLAKE", RES_ICON_SNOWFLAKE, CContext::GetContext()->GetModule());
 

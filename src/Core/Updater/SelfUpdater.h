@@ -53,13 +53,13 @@ class CSelfUpdater
 	const std::string& GetChangelog();
 
 	private:
-	CLogApi*                  Logger = nullptr;
+	CLogApi*                  Logger       {};
+	
+	HANDLE                    UpdateMutex  {};
+	std::thread               UpdateThread {};
 
-	HANDLE                    UpdateMutex = nullptr;
-	std::thread               UpdateThread;
-
-	MajorMinorBuildRevision_t RemoteVersion;
-	std::string               Changelog;
+	MajorMinorBuildRevision_t RemoteVersion{};
+	std::string               Changelog    {};
 
 	///----------------------------------------------------------------------------------------------------
 	/// CreatePatchMutex:

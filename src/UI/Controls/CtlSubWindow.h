@@ -69,14 +69,14 @@ class ISubWindow : public virtual IWindow
 	bool* GetVisibleStatePtr() override;
 
 	protected:
-	bool                     IsPoppedOut = false;
-	bool                     IsHost = false;
-	bool                     IsAnchored = false;
+	bool                     IsPoppedOut   {false};
+	bool                     IsHost        {false};
+	bool                     IsAnchored    {false};
 
-	std::string              IconIdentifier;
-	int                      IconID;
-	Texture_t*                 Tex_Icon;
-	Texture_t*                 Tex_PopoutIcon;
+	std::string              IconIdentifier{};
+	int                      IconID        {};
+	Texture_t*               Tex_Icon      {};
+	Texture_t*               Tex_PopoutIcon{};
 
 	///----------------------------------------------------------------------------------------------------
 	/// RenderContent:
