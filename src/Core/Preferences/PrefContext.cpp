@@ -35,6 +35,21 @@ void CSettings::Save()
 	this->SaveInternal();
 }
 
+void CSettings::Remove(const std::string& aIdentifier)
+{
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		this->Store.erase(aIdentifier);
+		this->SaveInternal();
+	}
+
+	{
+		const std::lock_guard<std::mutex> lock(this->NotifierMutex);
+		this->Notifiers[aIdentifier].clear();
+	}
+}
+
 void CSettings::LoadInternal()
 {
 	if (!std::filesystem::exists(this->Path))
@@ -65,5 +80,39 @@ void CSettings::SaveInternal()
 	catch (...)
 	{
 		this->Logger->Warning(CH_SETTINGS, "Settings.json could not be saved.");
+	}
+}
+
+void CSettings::NotifyChanged(const std::string& aIdentifier, const json& aNewValue)
+{
+	/* Don't notify if null. */
+	if (aNewValue.is_null())
+	{
+		return;
+	}
+
+	std::vector<OnChangeCallback> callbacksCopy;
+
+	{
+		const std::lock_guard<std::mutex> lock(this->NotifierMutex);
+
+		auto it = this->Notifiers.find(aIdentifier);
+
+		if (it != this->Notifiers.end())
+		{
+			callbacksCopy = it->second;
+		}
+	}
+
+	for (auto& wrappedCallback : callbacksCopy)
+	{
+		try
+		{
+			wrappedCallback(aNewValue);
+		}
+		catch (...)
+		{
+			// TODO: Error handling
+		}
 	}
 }

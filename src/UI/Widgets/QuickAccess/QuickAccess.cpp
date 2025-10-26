@@ -43,12 +43,31 @@ CQuickAccess::CQuickAccess(CDataLinkApi* aDataLink, CLogApi* aLogger, CInputBind
 	CContext*  ctx         = CContext::GetContext();
 	CSettings* settingsctx = ctx->GetSettingsCtx();
 
-	this->VerticalLayout  = settingsctx->Get<bool>(OPT_QAVERTICAL, false);
-	this->Location        = settingsctx->Get<EQaPosition>(OPT_QALOCATION, EQaPosition::Extend);
-	this->Offset.x        = settingsctx->Get<float>(OPT_QAOFFSETX, 0.0f);
-	this->Offset.y        = settingsctx->Get<float>(OPT_QAOFFSETY, 0.0f);
-	this->Visibility      = settingsctx->Get<EQaVisibility>(OPT_QAVISIBILITY, EQaVisibility::AlwaysShow);
-	this->OnlyShowOnHover = settingsctx->Get<bool>(OPT_QAONLYSHOWONHOVER, false);
+	/* Setup notifiers. */
+	settingsctx->Subscribe<bool>(OPT_QAVERTICAL, [&](bool aNewValue)
+	{
+		this->VerticalLayout = aNewValue;
+	});
+	settingsctx->Subscribe<EQaPosition>(OPT_QALOCATION, [&](EQaPosition aNewValue)
+	{
+		this->Location = aNewValue;
+	});
+	settingsctx->Subscribe<float>(OPT_QAOFFSETX, [&](float aNewValue)
+	{
+		this->Offset.x = aNewValue;
+	});
+	settingsctx->Subscribe<float>(OPT_QAOFFSETY, [&](float aNewValue)
+	{
+		this->Offset.y = aNewValue;
+	});
+	settingsctx->Subscribe<EQaVisibility>(OPT_QAVISIBILITY, [&](EQaVisibility aNewValue)
+	{
+		this->Visibility = aNewValue;
+	});
+	settingsctx->Subscribe<bool>(OPT_QAONLYSHOWONHOVER, [&](bool aNewValue)
+	{
+		this->OnlyShowOnHover = aNewValue;
+	});
 
 	this->EventApi->Subscribe(EV_ADDON_LOADED,   CQuickAccess::OnAddonStateChanged);
 	this->EventApi->Subscribe(EV_ADDON_UNLOADED, CQuickAccess::OnAddonStateChanged);

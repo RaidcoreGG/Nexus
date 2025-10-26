@@ -5,6 +5,7 @@
 /// Description  :  Contains the functionality to close windows on escape.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
+
 #include "EscapeClosing.h"
 
 #include "imgui/imgui.h"
@@ -19,9 +20,12 @@
 CEscapeClosing::CEscapeClosing()
 {
 	CContext* ctx = CContext::GetContext();
-	CSettings* settingsCtx = ctx->GetSettingsCtx();
+	CSettings* settingsctx = ctx->GetSettingsCtx();
 
-	this->Enabled = settingsCtx->Get<bool>(OPT_CLOSEESCAPE, true);
+	settingsctx->Subscribe<bool>(OPT_CLOSEESCAPE, [&](bool aNewValue)
+	{
+		this->Enabled = aNewValue;
+	});
 
 	CRefCleanerContext::Get()->Register("CEscapeClosing", this);
 }
@@ -38,7 +42,7 @@ UINT CEscapeClosing::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return uMsg;
 	}
 
-	KeystrokeMessageFlags keylp = LParamToKMF(lParam);
+	KeystrokeMessageFlags& keylp = LParamToKMF(lParam);
 
 	/* If this bit is 1, the key was previously down -> We only react on change, not repeat.*/
 	if (keylp.PreviousKeyState)

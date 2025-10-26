@@ -219,111 +219,104 @@ void COptionsWindow::TabGeneral()
 			{
 				ImGui::BeginGroupPanel(langApi->Translate("((000045))"), ImVec2(-1.0f, 0.0f));
 
-				/* suppressed icons */
+				/* TODO: suppressed icons */
 				static std::vector<std::string> suppressedIcons = settingsctx->Get<std::vector<std::string>>(OPT_QASUPPRESSED);
 				
-
-
 				/* toggle vertical layout */
-				if (ImGui::Checkbox(langApi->Translate("((000046))"), &qactx->VerticalLayout))
+				static bool s_VerticalLayout = settingsctx->Get<bool>(OPT_QAVERTICAL);
+				if (ImGui::Checkbox(langApi->Translate("((000046))"), &s_VerticalLayout))
 				{
-					settingsctx->Set(OPT_QAVERTICAL, qactx->VerticalLayout);
+					settingsctx->Set(OPT_QAVERTICAL, s_VerticalLayout);
 				}
 
 				/* only show on hover */
-				if (ImGui::Checkbox(langApi->Translate("((Fully hide unless hovered))"), &qactx->OnlyShowOnHover))
+				static bool s_OnlyShowOnHover = settingsctx->Get<bool>(OPT_QAONLYSHOWONHOVER);
+				if (ImGui::Checkbox(langApi->Translate("((Fully hide unless hovered))"), &s_OnlyShowOnHover))
 				{
-					settingsctx->Set(OPT_QAONLYSHOWONHOVER, qactx->OnlyShowOnHover);
+					settingsctx->Set(OPT_QAONLYSHOWONHOVER, s_OnlyShowOnHover);
 				}
 
 				/* prefetch currently selected position string */
-				std::string qaVisStr = EQaVisibilityToString(qactx->Visibility);
-				EQaVisibility newQaVis = qactx->Visibility;
-
+				static EQaVisibility s_Visibility = settingsctx->Get<EQaVisibility>(OPT_QAVISIBILITY);
+				std::string qaVisStr = EQaVisibilityToString(s_Visibility);
 				ImGui::Text(langApi->Translate("((000097))"));
 				if (ImGui::BeginCombo("##QAVisibilitySelector", langApi->Translate(qaVisStr.c_str())))
 				{
-					if (ImGui::Selectable(langApi->Translate("((000047))"), qaVisStr == "((000047))"))
+					if (ImGui::Selectable(langApi->Translate("((000047))"), s_Visibility == EQaVisibility::AlwaysShow))
 					{
-						newQaVis = EQaVisibility::AlwaysShow;
+						s_Visibility = EQaVisibility::AlwaysShow;
+						settingsctx->Set(OPT_QAVISIBILITY, s_Visibility);
 					}
-					if (ImGui::Selectable(langApi->Translate("((000093))"), qaVisStr == "((000093))"))
+					if (ImGui::Selectable(langApi->Translate("((000093))"), s_Visibility == EQaVisibility::Gameplay))
 					{
-						newQaVis = EQaVisibility::Gameplay;
+						s_Visibility = EQaVisibility::Gameplay;
+						settingsctx->Set(OPT_QAVISIBILITY, s_Visibility);
 					}
-					if (ImGui::Selectable(langApi->Translate("((000094))"), qaVisStr == "((000094))"))
+					if (ImGui::Selectable(langApi->Translate("((000094))"), s_Visibility == EQaVisibility::OutOfCombat))
 					{
-						newQaVis = EQaVisibility::OutOfCombat;
+						s_Visibility = EQaVisibility::OutOfCombat;
+						settingsctx->Set(OPT_QAVISIBILITY, s_Visibility);
 					}
-					if (ImGui::Selectable(langApi->Translate("((000095))"), qaVisStr == "((000095))"))
+					if (ImGui::Selectable(langApi->Translate("((000095))"), s_Visibility == EQaVisibility::InCombat))
 					{
-						newQaVis = EQaVisibility::InCombat;
+						s_Visibility = EQaVisibility::InCombat;
+						settingsctx->Set(OPT_QAVISIBILITY, s_Visibility);
 					}
-					if (ImGui::Selectable(langApi->Translate("((000096))"), qaVisStr == "((000096))"))
+					if (ImGui::Selectable(langApi->Translate("((000096))"), s_Visibility == EQaVisibility::Hide))
 					{
-						newQaVis = EQaVisibility::Hide;
+						s_Visibility = EQaVisibility::Hide;
+						settingsctx->Set(OPT_QAVISIBILITY, s_Visibility);
 					}
-
 					ImGui::EndCombo();
-				}
-
-				/* save if qaVis was changed */
-				if (qactx->Visibility != newQaVis)
-				{
-					qactx->Visibility = newQaVis;
-					settingsctx->Set(OPT_QAVISIBILITY, qactx->Visibility);
 				}
 
 				/* show notification icon on update */
-				static bool notifyChangelog = settingsctx->Get<bool>(OPT_NOTIFYCHANGELOG, false);
-				if (ImGui::Checkbox(langApi->Translate("((000049))"), &notifyChangelog))
+				static bool s_NotifyChangelog = settingsctx->Get<bool>(OPT_NOTIFYCHANGELOG);
+				if (ImGui::Checkbox(langApi->Translate("((000049))"), &s_NotifyChangelog))
 				{
-					settingsctx->Set(OPT_NOTIFYCHANGELOG, notifyChangelog);
+					settingsctx->Set(OPT_NOTIFYCHANGELOG, s_NotifyChangelog);
 				}
 
-				/* prefetch currently selected position string */
-				std::string qaPosStr = EQaPositionToString(qactx->Location);
-				EQaPosition newQaPos = qactx->Location;
-
 				/* position/location dropdown */
+				static EQaPosition s_Position = settingsctx->Get<EQaPosition>(OPT_QALOCATION);
+				std::string qaPosStr = EQaPositionToString(s_Position);
 				ImGui::Text(langApi->Translate("((000050))"));
 				if (ImGui::BeginCombo("##QALocationSelector", langApi->Translate(qaPosStr.c_str())))
 				{
-					if (ImGui::Selectable(langApi->Translate("((000067))"), qaPosStr == "((000067))"))
+					if (ImGui::Selectable(langApi->Translate("((000067))"), s_Position == EQaPosition::Extend))
 					{
-						newQaPos = EQaPosition::Extend;
+						s_Position = EQaPosition::Extend;
+						settingsctx->Set(OPT_QALOCATION, s_Position);
 					}
-					if (ImGui::Selectable(langApi->Translate("((000068))"), qaPosStr == "((000068))"))
+					if (ImGui::Selectable(langApi->Translate("((000068))"), s_Position == EQaPosition::Under))
 					{
-						newQaPos = EQaPosition::Under;
+						s_Position = EQaPosition::Under;
+						settingsctx->Set(OPT_QALOCATION, s_Position);
 					}
-					if (ImGui::Selectable(langApi->Translate("((000069))"), qaPosStr == "((000069))"))
+					if (ImGui::Selectable(langApi->Translate("((000069))"), s_Position == EQaPosition::Bottom))
 					{
-						newQaPos = EQaPosition::Bottom;
+						s_Position = EQaPosition::Bottom;
+						settingsctx->Set(OPT_QALOCATION, s_Position);
 					}
-					if (ImGui::Selectable(langApi->Translate("((000070))"), qaPosStr == "((000070))"))
+					if (ImGui::Selectable(langApi->Translate("((000070))"), s_Position == EQaPosition::Custom))
 					{
-						newQaPos = EQaPosition::Custom;
+						s_Position = EQaPosition::Custom;
+						settingsctx->Set(OPT_QALOCATION, s_Position);
 					}
-
 					ImGui::EndCombo();
 				}
 
-				/* save if qaPos was changed */
-				if (qactx->Location != newQaPos)
-				{
-					qactx->Location = newQaPos;
-					settingsctx->Set(OPT_QALOCATION, qactx->Location);
-				}
-				
 				RenderContext_t* renderer = ctx->GetRendererCtx();
 
 				/* offset */
+				static ImVec2 s_Offset{};
+				s_Offset.x = settingsctx->Get<float>(OPT_QAOFFSETX);
+				s_Offset.y = settingsctx->Get<float>(OPT_QAOFFSETY);
 				ImGui::Text(langApi->Translate("((000051))"));
-				if (ImGui::DragFloat2("##QAOffsetInput", (float*)&qactx->Offset, 1.0f, (static_cast<int>(renderer->Window.Height)) * -1, static_cast<int>(renderer->Window.Height)))
+				if (ImGui::DragFloat2("##QAOffsetInput", (float*)&s_Offset, 1.0f, (static_cast<int>(renderer->Window.Height)) * -1, static_cast<int>(renderer->Window.Height)))
 				{
-					settingsctx->Set(OPT_QAOFFSETX, qactx->Offset.x);
-					settingsctx->Set(OPT_QAOFFSETY, qactx->Offset.y);
+					settingsctx->Set(OPT_QAOFFSETX, s_Offset.x);
+					settingsctx->Set(OPT_QAOFFSETY, s_Offset.y);
 				}
 				ImGui::EndGroupPanel();
 			}

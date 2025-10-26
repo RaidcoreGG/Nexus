@@ -48,12 +48,6 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	static void OnAddonStateChanged(void* aEventData);
 
 	public:
-	bool          VerticalLayout  = false;
-	EQaVisibility Visibility      = EQaVisibility::AlwaysShow;
-	EQaPosition   Location        = EQaPosition::Extend;
-	ImVec2        Offset          = ImVec2(0, 0);
-	bool          OnlyShowOnHover = false;
-
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
@@ -143,6 +137,12 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	mutable std::mutex                    Mutex;
 	std::map<std::string, CShortcutIcon*> Registry;
 	std::map<std::string, ContextItem_t>  OrphanedCallbacks;
+
+	bool                                  VerticalLayout    = false;
+	EQaVisibility                         Visibility        = EQaVisibility::AlwaysShow;
+	EQaPosition                           Location          = EQaPosition::Extend;
+	ImVec2                                Offset            = ImVec2(0, 0);
+	bool                                  OnlyShowOnHover   = false; // Fully hide unless hovered
 
 	float                                 Opacity           = 0.5f;
 

@@ -55,6 +55,7 @@ class CSnowflakeMgr
 	void Clear();
 
 	private:
+	bool IsPartyPooper = false;
 	bool IsItChristmas = false;
 
 	std::unordered_map<ImGuiID, std::vector<Snowflake_t>> Snowflakes;

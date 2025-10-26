@@ -23,8 +23,21 @@ inline UINT MouseResetFix(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	static CContext*  s_Context     = CContext::GetContext();
 	static CSettings* s_SettingsCtx = s_Context->GetSettingsCtx();
 
-	bool lockCursor  = s_SettingsCtx ? s_SettingsCtx->Get<bool>(OPT_CAMCTRL_LOCKCURSOR, false)  : false;
-	bool resetCursor = s_SettingsCtx ? s_SettingsCtx->Get<bool>(OPT_CAMCTRL_RESETCURSOR, false) : false;
+	static bool s_LockCursor = false;
+	static bool s_ResetCursor = false;
+
+	static bool s_InitSubscribers = [&]{
+		s_SettingsCtx->Subscribe<bool>(OPT_CAMCTRL_LOCKCURSOR, [&](bool aNewValue)
+		{
+			s_LockCursor = aNewValue;
+		});
+
+		s_SettingsCtx->Subscribe<bool>(OPT_CAMCTRL_RESETCURSOR, [&](bool aNewValue)
+		{
+			s_ResetCursor = aNewValue;
+		});
+		return true;
+	}();
 
 	static bool s_IsConfining = false;
 	static POINT s_LastPos = {};
@@ -64,12 +77,12 @@ inline UINT MouseResetFix(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			if (s_IsConfining && (ci.flags != 0))
 			{
-				if (lockCursor)
+				if (s_LockCursor)
 				{
 					ClipCursor(NULL);
 				}
 
-				if (resetCursor)
+				if (s_ResetCursor)
 				{
 					SetCursorPos(s_LastPos.x, s_LastPos.y);
 				}
@@ -85,7 +98,7 @@ inline UINT MouseResetFix(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					s_LastPos.y + 1
 				};
 
-				if (lockCursor)
+				if (s_LockCursor)
 				{
 					ClipCursor(&rect);
 				}
@@ -99,12 +112,12 @@ inline UINT MouseResetFix(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			if (s_IsConfining)
 			{
-				if (lockCursor)
+				if (s_LockCursor)
 				{
 					ClipCursor(NULL);
 				}
 
-				if (resetCursor)
+				if (s_ResetCursor)
 				{
 					SetCursorPos(s_LastPos.x, s_LastPos.y);
 				}

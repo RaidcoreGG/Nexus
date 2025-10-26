@@ -22,8 +22,6 @@
 class CEscapeClosing : public virtual IRefCleaner
 {
 	public:
-	bool Enabled = true;
-
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
@@ -67,6 +65,8 @@ class CEscapeClosing : public virtual IRefCleaner
 	private:
 	std::mutex                             Mutex;
 	std::unordered_map<std::string, bool*> Registry;
+
+	bool                                   Enabled = true;
 };
 
 #endif

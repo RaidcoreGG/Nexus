@@ -22,9 +22,12 @@ CSnowflakeMgr::CSnowflakeMgr()
 	CContext* ctx = CContext::GetContext();
 	CSettings* settingsctx = ctx->GetSettingsCtx();
 
-	bool isPartyPooper = settingsctx->Get<bool>(OPT_DISABLEFESTIVEFLAIR, false);
+	settingsctx->Subscribe<bool>(OPT_DISABLEFESTIVEFLAIR, [&](bool aNewValue)
+	{
+		this->IsPartyPooper = aNewValue;
+	});
 
-	IsItChristmas = Time::GetMonth() == 12 && !isPartyPooper;
+	this->IsItChristmas = Time::GetMonth() == 12;
 }
 
 ImVec2 Rotate(const ImVec2& aPoint, float aCosA, float aSinA)
@@ -61,7 +64,8 @@ void ImageRotated(ImTextureID aTextureIdentifier, ImVec2 aOrigin, ImVec2 aSize, 
 
 void CSnowflakeMgr::Update()
 {
-	if (!IsItChristmas) { return; }
+	if (!this->IsItChristmas) { return; }
+	if (this->IsPartyPooper)  { return; }
 
 	static CContext* ctx = CContext::GetContext();
 	static CTextureLoader* texapi = ctx->GetTextureService();
