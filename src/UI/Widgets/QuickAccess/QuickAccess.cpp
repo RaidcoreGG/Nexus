@@ -68,6 +68,25 @@ CQuickAccess::CQuickAccess(CDataLinkApi* aDataLink, CLogApi* aLogger, CInputBind
 	{
 		this->OnlyShowOnHover = aNewValue;
 	});
+	settingsctx->Subscribe<std::vector<std::string>>(OPT_QASUPPRESSED, [&](std::vector<std::string> aNewValue)
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		for (auto& [id, shortcut] : this->Registry)
+		{
+			auto isSuppressed = std::find(aNewValue.begin(), aNewValue.end(), id);
+
+			/* If the current shortcut ID is in the suppressed list. */
+			if (isSuppressed != aNewValue.end())
+			{
+				shortcut->SetSuppression(true);
+			}
+			else
+			{
+				shortcut->SetSuppression(false);
+			}
+		}
+	});
 
 	this->EventApi->Subscribe(EV_ADDON_LOADED,   CQuickAccess::OnAddonStateChanged);
 	this->EventApi->Subscribe(EV_ADDON_UNLOADED, CQuickAccess::OnAddonStateChanged);
@@ -269,6 +288,22 @@ void CQuickAccess::AddShortcut(const char* aIdentifier, const char* aTextureIden
 			aInputBindIdentifier ? aInputBindIdentifier : "",
 			aTooltipText ? aTooltipText : ""
 		);
+
+		CContext*  ctx         = CContext::GetContext();
+		CSettings* settingsctx = ctx->GetSettingsCtx();
+
+		std::vector<std::string> suppressedIcons = settingsctx->Get<std::vector<std::string>>(OPT_QASUPPRESSED);
+		auto isSuppressed = std::find(suppressedIcons.begin(), suppressedIcons.end(), aIdentifier);
+
+		/* If the current shortcut ID is in the suppressed list. */
+		if (isSuppressed != suppressedIcons.end())
+		{
+			shortcut->SetSuppression(true);
+		}
+		else
+		{
+			shortcut->SetSuppression(false);
+		}
 
 		this->Registry.emplace(aIdentifier, shortcut);
 	}

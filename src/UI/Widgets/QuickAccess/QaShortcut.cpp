@@ -42,7 +42,8 @@ void CShortcutIcon::Invalidate()
 
 bool CShortcutIcon::Render()
 {
-	if (!this->IsActive()) { return false; }
+	if (!this->IsActive())  { return false; }
+	if (this->IsSuppressed) { return false; }
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -209,6 +210,11 @@ bool CShortcutIcon::IsActive() const
 
 	/* Needs to have either a context menu or click handler. */
 	return hasContextMenu || hasClickHandler;
+}
+
+void CShortcutIcon::SetSuppression(bool aSuppress)
+{
+	this->IsSuppressed = aSuppress;
 }
 
 std::vector<std::string> CShortcutIcon::GetNotificationKeys() const

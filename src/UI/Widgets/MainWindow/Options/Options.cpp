@@ -219,9 +219,52 @@ void COptionsWindow::TabGeneral()
 			{
 				ImGui::BeginGroupPanel(langApi->Translate("((000045))"), ImVec2(-1.0f, 0.0f));
 
-				/* TODO: suppressed icons */
-				static std::vector<std::string> suppressedIcons = settingsctx->Get<std::vector<std::string>>(OPT_QASUPPRESSED);
-				
+				/* suppressed icons selector (for addition) */
+				static std::vector<std::string> s_SuppressedIcons = settingsctx->Get<std::vector<std::string>>(OPT_QASUPPRESSED);
+				if (ImGui::BeginCombo("##QASuppressSelector", langApi->Translate("((Select an element to hide))")))
+				{
+					for (auto& [id, shorcut] : qactx->GetRegistry())
+					{
+						if (ImGui::Selectable(id.c_str()))
+						{
+							/* if not already added */
+							if (std::find(s_SuppressedIcons.begin(), s_SuppressedIcons.end(), id) == s_SuppressedIcons.end())
+							{
+								s_SuppressedIcons.push_back(id);
+								settingsctx->Set(OPT_QASUPPRESSED, s_SuppressedIcons);
+							}
+						}
+					}
+					ImGui::EndCombo();
+				}
+				/* suppressed icons list (for removal) */
+				ImGui::Text(langApi->Translate("((Suppressed Icons))"));
+				std::string removeSuppress{};
+				for (std::string& id : s_SuppressedIcons)
+				{
+					ImGui::BeginGroup();
+					ImGui::Indent();
+					if (ImGui::SmallButton(("((Show))##" + id).c_str()))
+					{
+						removeSuppress = id;
+					}
+					ImGui::SameLine();
+					ImGui::Text(id.c_str());
+					ImGui::EndGroup();
+				}
+
+				/* remove the requested icon id */
+				if (!removeSuppress.empty())
+				{
+					auto it = std::find(s_SuppressedIcons.begin(), s_SuppressedIcons.end(), removeSuppress);
+					if (it != s_SuppressedIcons.end())
+					{
+						s_SuppressedIcons.erase(it);
+						settingsctx->Set(OPT_QASUPPRESSED, s_SuppressedIcons);
+					}
+				}
+				ImGui::Separator();
+
 				/* toggle vertical layout */
 				static bool s_VerticalLayout = settingsctx->Get<bool>(OPT_QAVERTICAL);
 				if (ImGui::Checkbox(langApi->Translate("((000046))"), &s_VerticalLayout))
@@ -318,6 +361,7 @@ void COptionsWindow::TabGeneral()
 					settingsctx->Set(OPT_QAOFFSETX, s_Offset.x);
 					settingsctx->Set(OPT_QAOFFSETY, s_Offset.y);
 				}
+
 				ImGui::EndGroupPanel();
 			}
 		}

@@ -92,6 +92,12 @@ class CShortcutIcon : public virtual IRefCleaner
 	bool IsActive() const;
 
 	///----------------------------------------------------------------------------------------------------
+	/// SetSuppression:
+	/// 	Sets whether the icon should be suppressed or not.
+	///----------------------------------------------------------------------------------------------------
+	void SetSuppression(bool aSuppress);
+
+	///----------------------------------------------------------------------------------------------------
 	/// GetNotificationKeys:
 	/// 	Returns a copy of the notification keys.
 	///----------------------------------------------------------------------------------------------------
@@ -118,6 +124,7 @@ class CShortcutIcon : public virtual IRefCleaner
 	CLocalization*                       Language       = nullptr;
 
 	bool                                 IsValid        = false;
+	bool                                 IsSuppressed   = false;
 
 	std::string                          IconID         = "";
 	Texture_t*                           Icon           = nullptr;
