@@ -584,7 +584,7 @@ void CAddonsWindow::RenderDetails()
 		if (this->AddonData.GetSig() != 0)
 		{
 			/* Use addon signature. */
-			id = String::Format("0x%08X", this->AddonData.GetSig());
+			id = std::format("0x{{:08X}}", this->AddonData.GetSig());
 		}
 		else
 		{

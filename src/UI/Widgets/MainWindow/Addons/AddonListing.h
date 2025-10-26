@@ -41,7 +41,7 @@ struct AddonListing_t
 		if (this->GetSig() != 0)
 		{
 			/* Use addon signature. */
-			id = String::Format("0x%08X", this->GetSig());
+			id = std::format("0x{:08X}", this->GetSig());
 		}
 		else
 		{

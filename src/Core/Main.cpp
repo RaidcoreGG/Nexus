@@ -177,7 +177,7 @@ namespace Main
 			case WM_QUIT:    { reasonStr = "Reason: WM_QUIT";            break; }
 			default:
 			{
-				reasonStr = String::Format("Reason: Unknown (%d)", aReason);
+				reasonStr = std::format("Reason: Unknown ({})", aReason);
 				break;
 			}
 		}

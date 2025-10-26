@@ -51,7 +51,12 @@ namespace String
 	/// Format:
 	/// 	Returns a string in printf-style format.
 	///----------------------------------------------------------------------------------------------------
+#if __cplusplus >= 202002L
+	[[deprecated]]
 	std::string Format(std::string aFmt, ...);
+#else
+	std::string Format(std::string aFmt, ...);
+#endif
 
 	///----------------------------------------------------------------------------------------------------
 	/// FormatByteSize:

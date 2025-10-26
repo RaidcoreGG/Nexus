@@ -421,7 +421,7 @@ void CAddon::UnloadInternal()
 		auto end_time = std::chrono::high_resolution_clock::now();
 		auto time = end_time - start_time;
 
-		strUnloadInfo = String::Format("Took %u microseconds to unload.", time / std::chrono::microseconds(1));
+		strUnloadInfo = std::format("Took {} microseconds to unload.", time / std::chrono::microseconds(1));
 	}
 	else
 	{
@@ -1256,7 +1256,7 @@ bool CAddon::ApplyLocalUpdate()
 	assert(!this->UpdateLocal.empty());
 
 	/* <GW2>/addons/Nexus/Temp/<filename>_<random>.dll.old */
-	std::filesystem::path tmpOld = Index(EPath::DIR_TEMP) / (this->Location.stem().string() + String::Format("_%08X", rand()) + ".dll.old");
+	std::filesystem::path tmpOld = Index(EPath::DIR_TEMP) / (this->Location.stem().string() + std::format("_{:08X}", rand()) + ".dll.old");
 
 	/* Try renaming .dll to .dll.old. */
 	try
@@ -1315,7 +1315,7 @@ bool CAddon::DownloadUpdate()
 	assert(!this->UpdateRemote.empty());
 
 	/* <GW2>/addons/Nexus/Temp/<filename>_<random>.dll */
-	std::filesystem::path tmpDownload = Index(EPath::DIR_TEMP) / (this->Location.stem().string() + String::Format("_%08X", rand()) + ".dll");
+	std::filesystem::path tmpDownload = Index(EPath::DIR_TEMP) / (this->Location.stem().string() + std::format("_{:08X}", rand()) + ".dll");
 
 	CContext* context = CContext::GetContext();
 

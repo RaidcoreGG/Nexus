@@ -106,7 +106,7 @@ void CDebugWindow::TabEvents()
 
 		for (auto& [identifier, ev] : eventRegistry)
 		{
-			if (ImGui::TreeNode(String::Format("%s (%d)", identifier.c_str(), ev.AmountRaises).c_str()))
+			if (ImGui::TreeNode(std::format("{} ({})", identifier.c_str(), ev.AmountRaises).c_str()))
 			{
 				if (ev.Subscribers.size() == 0)
 				{

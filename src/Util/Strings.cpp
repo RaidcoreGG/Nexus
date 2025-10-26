@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <cstdarg>
 #include <stringapiset.h>
+#include <format>
 
 namespace String
 {
@@ -117,7 +118,11 @@ namespace String
 			sz /= 1024;
 		}
 
+#if __cplusplus >= 202002L
+		return std::format("{:.2f} {}", sz, sizes[order]);
+#else
 		return Format("%.2f %s", sz, sizes[order]);
+#endif
 	}
 
 	std::string Normalize(const std::string& aString)
