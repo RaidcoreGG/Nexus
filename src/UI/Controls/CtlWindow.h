@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef CONTROLS_WINDOW_H
-#define CONTROLS_WINDOW_H
+#pragma once
 
 #include <string>
 
@@ -53,5 +52,3 @@ class IWindow
 	bool        IsVisible = false;
 	bool        IsInvalid = false;
 };
-
-#endif

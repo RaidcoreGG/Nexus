@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef ARCAPI_H
-#define ARCAPI_H
+#pragma once
 
 #include <filesystem>
 #include <windows.h>
@@ -123,5 +122,3 @@ class CArcApi
 	///----------------------------------------------------------------------------------------------------
 	bool BuildFunctionTable(HMODULE aArcdpsModule);
 };
-
-#endif

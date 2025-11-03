@@ -6,9 +6,6 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef HKCONST_H
-#define HKCONST_H
+#pragma once
 
 constexpr const char* EV_WINDOW_RESIZED = "EV_WINDOW_RESIZED";
-
-#endif

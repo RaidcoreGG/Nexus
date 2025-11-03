@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef CONTROLS_MODAL_H
-#define CONTROLS_MODAL_H
+#pragma once
 
 #include <string>
 
@@ -110,5 +109,3 @@ class IModal
 	EModalResult Result              = EModalResult::None;
 	bool         ShouldOpenNextFrame = false;
 };
-
-#endif

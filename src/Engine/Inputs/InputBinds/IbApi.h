@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef IBAPI_H
-#define IBAPI_H
+#pragma once
 
 #include <filesystem>
 #include <map>
@@ -177,5 +176,3 @@ class CInputBindApi : public CInputBindCapture, public virtual IRefCleaner
 	///----------------------------------------------------------------------------------------------------
 	void ReleaseAll();
 };
-
-#endif

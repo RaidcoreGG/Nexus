@@ -1,5 +1,4 @@
-#ifndef UI_ERENDERTYPE_H
-#define UI_ERENDERTYPE_H
+#pragma once
 
 enum class ERenderType
 {
@@ -8,5 +7,3 @@ enum class ERenderType
 	PostRender,
 	OptionsRender
 };
-
-#endif

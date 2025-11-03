@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef APIBUILDER_H
-#define APIBUILDER_H
+#pragma once
 
 #include <windows.h>
 
@@ -395,5 +394,3 @@ namespace ADDONAPI
 	///----------------------------------------------------------------------------------------------------
 	size_t GetSize(uint32_t aVersion);
 }
-
-#endif

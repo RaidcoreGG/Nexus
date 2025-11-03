@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef PXYENUM_H
-#define PXYENUM_H
+#pragma once
 
 #include <cstdint>
 
@@ -34,5 +33,3 @@ enum class EProxyFunction : uint32_t
 	DXGI_CompatValue,
 	DXGI_CompatString
 };
-
-#endif

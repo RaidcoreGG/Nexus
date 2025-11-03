@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef DLAPI_H
-#define DLAPI_H
+#pragma once
 
 #include <mutex>
 #include <string>
@@ -63,5 +62,3 @@ class CDataLinkApi
 	mutable std::mutex                                Mutex;
 	std::unordered_map<std::string, LinkedResource_t> Registry;
 };
-
-#endif

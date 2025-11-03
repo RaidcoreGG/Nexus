@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef TXFUNCDEFS_H
-#define TXFUNCDEFS_H
+#pragma once
 
 #include "TxTexture.h"
 
@@ -23,5 +22,3 @@ typedef void       (*TEXTURES_LOADFROMRESOURCE)       (const char* aIdentifier, 
 typedef void       (*TEXTURES_LOADFROMURL)            (const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback);
 typedef void       (*TEXTURES_LOADFROMURL2)           (const char* aIdentifier, const char* aURL, TEXTURES_RECEIVECALLBACK aCallback);
 typedef void       (*TEXTURES_LOADFROMMEMORY)         (const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback);
-
-#endif

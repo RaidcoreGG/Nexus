@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LOGMSG_H
-#define LOGMSG_H
+#pragma once
 
 #include <string>
 
@@ -25,5 +24,3 @@ struct LogMsg_t
 	std::string Message        {};
 	int         RepeatCount    {1};
 };
-
-#endif

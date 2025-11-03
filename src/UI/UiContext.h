@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef UICONTEXT_H
-#define UICONTEXT_H
+#pragma once
 
 #include <d3d11.h>
 #include <map>
@@ -337,5 +336,3 @@ class CUiContext : public virtual IRefCleaner
 	///----------------------------------------------------------------------------------------------------
 	void UpdateDisplayGameBinds();
 };
-
-#endif

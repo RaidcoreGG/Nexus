@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef QASHORTCUT_H
-#define QASHORTCUT_H
+#pragma once
 
 #include <map>
 #include <mutex>
@@ -178,5 +177,3 @@ class CShortcutIcon : public virtual IRefCleaner
 	///----------------------------------------------------------------------------------------------------
 	void PopNotifcation(std::string aKey);
 };
-
-#endif

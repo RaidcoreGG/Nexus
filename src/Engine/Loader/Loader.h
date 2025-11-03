@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LOADER_H
-#define LOADER_H
+#pragma once
 
 #include <condition_variable>
 #include <filesystem>
@@ -193,5 +192,3 @@ class CLoader
 	///----------------------------------------------------------------------------------------------------
 	void Unload(std::filesystem::path aPath);
 };
-
-#endif

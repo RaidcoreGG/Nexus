@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef IDXENUM_H
-#define IDXENUM_H
+#pragma once
 
 #include <cstdint>
 
@@ -63,5 +62,3 @@ enum class EPath : uint32_t
 
 	COUNT
 };
-
-#endif

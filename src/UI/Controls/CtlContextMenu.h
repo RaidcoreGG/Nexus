@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef CONTROLS_CONTEXTMENU_H
-#define CONTROLS_CONTEXTMENU_H
+#pragma once
 
 #include <string>
 
@@ -52,5 +51,3 @@ class IContextMenu
 	std::string  ID;
 	bool         ShouldOpenNextFrame = false;
 };
-
-#endif

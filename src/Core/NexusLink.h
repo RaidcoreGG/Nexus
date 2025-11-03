@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef NEXUSLINK_H
-#define NEXUSLINK_H
+#pragma once
 
 #include <cstdint>
 
@@ -34,5 +33,3 @@ struct NexusLinkData_t
 	int32_t  QuickAccessMode;
 	bool     QuickAccessIsVertical;
 };
-
-#endif

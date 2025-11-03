@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef ALERTS_H
-#define ALERTS_H
+#pragma once
 
 #include <mutex>
 #include <string>
@@ -51,5 +50,3 @@ class CAlerts : public virtual IWindow
 
 	float                       Opacity = 1.0f;
 };
-
-#endif

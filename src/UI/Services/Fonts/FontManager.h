@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef FONTMANAGER_H
-#define FONTMANAGER_H
+#pragma once
 
 #include <mutex>
 #include <string>
@@ -155,5 +154,3 @@ class CFontManager : public virtual IRefCleaner
 	///----------------------------------------------------------------------------------------------------
 	ManagedFont_t CreateManagedFont(std::string aIdentifier, float aFontSize, void* aData, size_t aSize, ImFontConfig* aConfig);
 };
-
-#endif

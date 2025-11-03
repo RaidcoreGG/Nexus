@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef UI_ADDONLISTING_H
-#define UI_ADDONLISTING_H
+#pragma once
 
 #include <string>
 #include <unordered_map>
@@ -130,5 +129,3 @@ struct AddonListing_t
 		return "";
 	}
 };
-
-#endif

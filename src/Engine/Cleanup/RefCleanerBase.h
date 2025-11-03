@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef REFCLEANERBASE_H
-#define REFCLEANERBASE_H
+#pragma once
 
 ///----------------------------------------------------------------------------------------------------
 /// IRefCleaner Interface Class
@@ -21,5 +20,3 @@ class IRefCleaner
 	///----------------------------------------------------------------------------------------------------
 	virtual int CleanupRefs(void* aStartAddress, void* aEndAddress) = 0;
 };
-
-#endif

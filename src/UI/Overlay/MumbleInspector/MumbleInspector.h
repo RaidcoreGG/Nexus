@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef OVERLAY_MUMBLEINSPECTOR_H
-#define OVERLAY_MUMBLEINSPECTOR_H
+#pragma once
 
 #include "thirdparty/mumble/Mumble.h"
 
@@ -26,5 +25,3 @@ class CMumbleOverlay : public virtual IWindow
 	Mumble::Identity* MumbleIdentity;
 	NexusLinkData_t*    NexusLink;
 };
-
-#endif

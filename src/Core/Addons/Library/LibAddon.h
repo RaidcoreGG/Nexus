@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LIBADDON_H
-#define LIBADDON_H
+#pragma once
 
 #include <cstdint>
 #include <string>
@@ -33,5 +32,3 @@ struct LibraryAddon_t
 	LibraryAddon_t() = default;
 	LibraryAddon_t(json& aJson);
 };
-
-#endif

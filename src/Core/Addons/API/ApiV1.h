@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef ADOAPIV1_H
-#define ADOAPIV1_H
+#pragma once
 
 #include "ApiBase.h"
 
@@ -83,5 +82,3 @@ struct AddonAPI1_t : AddonAPI_t
 	QUICKACCESS_ADDSIMPLE         AddSimpleShortcut;
 	QUICKACCESS_GENERIC           RemoveSimpleShortcut;
 };
-
-#endif

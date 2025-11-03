@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef WRECLIENT_H
-#define WRECLIENT_H
+#pragma once
 
 #include <cstdint>
 #include <filesystem>
@@ -75,5 +74,3 @@ class CHttpClient
 	///----------------------------------------------------------------------------------------------------
 	void DownloadCleanup(const std::filesystem::path& aOutPath, const std::string& aQuery);
 };
-
-#endif

@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef CFGENUM_H
-#define CFGENUM_H
+#pragma once
 
 #include <cstdint>
 
@@ -21,5 +20,3 @@ enum class EUpdateMode : uint32_t
 	Notify,     /* Automatically check for updates, but prompt to perform. */
 	Automatic,  /* Automatically check and perform updates.                */
 };
-
-#endif

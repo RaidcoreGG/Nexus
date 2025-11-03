@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef PREFCONTEXT_H
-#define PREFCONTEXT_H
+#pragma once
 
 #include <filesystem>
 #include <mutex>
@@ -153,5 +152,3 @@ class CSettings
 	///----------------------------------------------------------------------------------------------------
 	void NotifyChanged(const std::string& aIdentifier, const json& aNewValue);
 };
-
-#endif

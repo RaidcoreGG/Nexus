@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LIBMANAGER_H
-#define LIBMANAGER_H
+#pragma once
 
 #include <mutex>
 #include <string>
@@ -68,5 +67,3 @@ class CLibraryMgr
 	std::unordered_map<std::string, CHttpClient*> Sources;
 	std::vector<LibraryAddon_t>                   Addons;
 };
-
-#endif

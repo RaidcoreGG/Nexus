@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef CONTROLS_SUBWINDOW_H
-#define CONTROLS_SUBWINDOW_H
+#pragma once
 
 #include <string>
 
@@ -84,5 +83,3 @@ class ISubWindow : public virtual IWindow
 	///----------------------------------------------------------------------------------------------------
 	virtual void RenderContent() = 0;
 };
-
-#endif

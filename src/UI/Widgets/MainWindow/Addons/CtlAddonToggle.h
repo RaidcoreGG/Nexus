@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef CTL_ADDONTOGGLE_H
-#define CTL_ADDONTOGGLE_H
+#pragma once
 
 #include <string>
 
@@ -118,5 +117,3 @@ namespace AddonToggleCtl
 		}
 	}
 }
-
-#endif

@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef REFCLEANERCONTEXT_H
-#define REFCLEANERCONTEXT_H
+#pragma once
 
 #include <map>
 #include <mutex>
@@ -50,5 +49,3 @@ class CRefCleanerContext
 	std::mutex                          Mutex;
 	std::map<std::string, IRefCleaner*> Registry;
 };
-
-#endif

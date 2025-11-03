@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LOADCONFIRMATIONMODAL_H
-#define LOADCONFIRMATIONMODAL_H
+#pragma once
 
 #include <string>
 #include <filesystem>
@@ -55,5 +54,3 @@ class CLoadConfirmationModal : public virtual IModal
 	///----------------------------------------------------------------------------------------------------
 	void SetTitle();
 };
-
-#endif

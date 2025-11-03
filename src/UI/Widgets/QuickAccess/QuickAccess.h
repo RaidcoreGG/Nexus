@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef QUICKACCESS_H
-#define QUICKACCESS_H
+#pragma once
 
 #include <cstdint>
 #include <map>
@@ -159,5 +158,3 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	void UpdateNexusLink();
 
 };
-
-#endif

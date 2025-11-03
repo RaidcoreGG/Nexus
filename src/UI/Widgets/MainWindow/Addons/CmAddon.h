@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef CMADDON_H
-#define CMADDON_H
+#pragma once
 
 #include "AddonListing.h"
 #include "UI/Controls/CtlContextMenu.h"
@@ -33,5 +32,3 @@ class CAddonContextMenu : public virtual IContextMenu
 	private:
 	AddonListing_t* Data{};
 };
-
-#endif

@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef DISPLAYBINDS_H
-#define DISPLAYBINDS_H
+#pragma once
 
 #include <string>
 #include <unordered_map>
@@ -51,5 +50,3 @@ enum class EBindEditType
 	Game,
 	Game2
 };
-
-#endif

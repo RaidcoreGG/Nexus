@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef MBLREADER_H
-#define MBLREADER_H
+#pragma once
 
 #include <string>
 #include <thread>
@@ -102,5 +101,3 @@ class CMumbleReader
 	///----------------------------------------------------------------------------------------------------
 	void AdvanceDerived();
 };
-
-#endif

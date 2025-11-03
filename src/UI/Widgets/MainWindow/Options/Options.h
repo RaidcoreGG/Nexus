@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef MAINWINDOW_OPTIONS_H
-#define MAINWINDOW_OPTIONS_H
+#pragma once
 
 #include <vector>
 #include <filesystem>
@@ -38,5 +37,3 @@ class COptionsWindow : public ISubWindow
 	void PopulateFonts();
 	void PopulateStyles();
 };
-
-#endif

@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef FNENTRY_H
-#define FNENTRY_H
+#pragma once
 
 #include <cstdint>
 
@@ -19,5 +18,3 @@ struct FuncEntry_t
 	int32_t RefCount;
 	void*   Function;
 };
-
-#endif

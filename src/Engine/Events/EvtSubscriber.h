@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef EVTSUBSCRIBER_H
-#define EVTSUBSCRIBER_H
+#pragma once
 
 #include "EvtFuncDefs.h"
 
@@ -29,5 +28,3 @@ inline bool operator!=(const EventSubscriber_t& lhs, const EventSubscriber_t& rh
 {
 	return !(lhs == rhs);
 }
-
-#endif

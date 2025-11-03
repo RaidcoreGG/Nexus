@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef ADOAPIBASE_H
-#define ADOAPIBASE_H
+#pragma once
 
 // FIXME: This is just here for compile errors.
 typedef void (*UPDATER_REQUESTUPDATE)(signed int aSignature, const char* aUpdateURL);
@@ -16,5 +15,3 @@ typedef void (*UPDATER_REQUESTUPDATE)(signed int aSignature, const char* aUpdate
 /// AddonAPI_t Struct
 ///----------------------------------------------------------------------------------------------------
 struct AddonAPI_t {};
-
-#endif

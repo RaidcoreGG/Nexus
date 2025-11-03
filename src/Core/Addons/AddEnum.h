@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef ADDENUM_H
-#define ADDENUM_H
+#pragma once
 
 #include <cstdint>
 #include <windows.h>
@@ -70,5 +69,3 @@ enum class EAddonFlags : uint32_t
 	UpdateAvailable = 1 << 6
 };
 DEFINE_ENUM_FLAG_OPERATORS(EAddonFlags)
-
-#endif

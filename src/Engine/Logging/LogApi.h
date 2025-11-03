@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LOGAPI_H
-#define LOGAPI_H
+#pragma once
 
 #include <mutex>
 #include <vector>
@@ -93,5 +92,3 @@ class CLogApi
 	std::vector<ILogger*>  Registry;
 	std::vector<LogMsg_t*> Messages;
 };
-
-#endif

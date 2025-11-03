@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef SNOWFLAKEMGR_H
-#define SNOWFLAKEMGR_H
+#pragma once
 
 #include <unordered_map>
 #include <vector>
@@ -60,5 +59,3 @@ class CSnowflakeMgr
 
 	std::unordered_map<ImGuiID, std::vector<Snowflake_t>> Snowflakes;
 };
-
-#endif

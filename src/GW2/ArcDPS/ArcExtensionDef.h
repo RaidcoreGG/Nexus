@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef ARCEXTENSIONDEF_H
-#define ARCEXTENSIONDEF_H
+#pragma once
 
 #include <cstdint>
 #include <string>
@@ -46,5 +45,3 @@ namespace ArcDPS
 		std::string Build;
 	};
 }
-
-#endif

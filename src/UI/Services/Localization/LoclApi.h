@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LOCLAPI_H
-#define LOCLAPI_H
+#pragma once
 
 #include <mutex>
 #include <filesystem>
@@ -112,5 +111,3 @@ class CLocalization
 	///----------------------------------------------------------------------------------------------------
 	void ClearLocaleAtlas();
 };
-
-#endif

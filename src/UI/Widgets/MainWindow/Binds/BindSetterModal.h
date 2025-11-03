@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef BINDSETTERMODAL_H
-#define BINDSETTERMODAL_H
+#pragma once
 
 #include <string>
 
@@ -72,5 +71,3 @@ class CBindSetterModal : public virtual IModal
 	///----------------------------------------------------------------------------------------------------
 	void SetTitle();
 };
-
-#endif

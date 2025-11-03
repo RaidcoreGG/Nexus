@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef CFGMANAGER_H
-#define CFGMANAGER_H
+#pragma once
 
 #include <cstdint>
 #include <filesystem>
@@ -75,5 +74,3 @@ class CConfigMgr
 	///----------------------------------------------------------------------------------------------------
 	void LoadConfigs();
 };
-
-#endif

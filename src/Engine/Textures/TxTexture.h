@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef TXTEXTURE_H
-#define TXTEXTURE_H
+#pragma once
 
 #include <d3d11.h>
 
@@ -20,5 +19,3 @@ struct Texture_t
 	unsigned                  Height;
 	ID3D11ShaderResourceView* Resource;
 };
-
-#endif

@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef STRINGS_H
-#define STRINGS_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -100,5 +99,3 @@ namespace String
 	///----------------------------------------------------------------------------------------------------
 	std::string ConvertMBToUTF8(std::string aString);
 }
-
-#endif

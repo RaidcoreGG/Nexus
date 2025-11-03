@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef ESCAPECLOSING_H
-#define ESCAPECLOSING_H
+#pragma once
 
 #include <mutex>
 #include <string>
@@ -68,5 +67,3 @@ class CEscapeClosing : public virtual IRefCleaner
 
 	bool                                   Enabled = true;
 };
-
-#endif

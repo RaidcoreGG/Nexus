@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef TXQUEUEENTRY_H
-#define TXQUEUEENTRY_H
+#pragma once
 
 #include "TxEnum.h"
 #include "TxFuncDefs.h"
@@ -26,5 +25,3 @@ struct QueuedTexture_t
 	std::string              DownloadURL;
 	TEXTURES_RECEIVECALLBACK Callback;
 };
-
-#endif

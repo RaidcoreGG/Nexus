@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef MAINWINDOW_LOG_H
-#define MAINWINDOW_LOG_H
+#pragma once
 
 #include <vector>
 #include <string>
@@ -67,5 +66,3 @@ class CLogWindow : public virtual ISubWindow, public virtual ILogger
 	std::vector<DisplayLogEntry_t*> LogEntries;
 	std::vector<LogChannel_t>       Channels;
 };
-
-#endif

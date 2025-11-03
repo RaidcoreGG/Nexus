@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef IBCONST_H
-#define IBCONST_H
+#pragma once
 
 #include <string>
 
@@ -24,5 +23,3 @@ InputBind_t IBFromString(std::string aInputBind);
 /// 	Helper function to get the display string of a InputBind_t.
 ///----------------------------------------------------------------------------------------------------
 std::string IBToString(const InputBind_t& aKebyind, bool aPadded = false);
-
-#endif

@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef QAFUNCDEFS_H
-#define QAFUNCDEFS_H
+#pragma once
 
 #include "UI/FuncDefs.h"
 
@@ -15,5 +14,3 @@ typedef void (*QUICKACCESS_ADDSHORTCUT) (const char* aIdentifier, const char* aT
 typedef void (*QUICKACCESS_ADDSIMPLE)   (const char* aIdentifier, GUI_RENDER aShortcutRenderCallback);
 typedef void (*QUICKACCESS_ADDSIMPLE2)  (const char* aIdentifier, const char* aTargetShortcutIdentifier, GUI_RENDER aShortcutRenderCallback);
 typedef void (*QUICKACCESS_GENERIC)     (const char* aIdentifier);
-
-#endif

@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef MAINWINDOW_BINDS_H
-#define MAINWINDOW_BINDS_H
+#pragma once
 
 #include <map>
 #include <string>
@@ -37,5 +36,3 @@ class CBindsWindow : public ISubWindow
 
 	void DeleteStaleBind(const std::string& aIdentifier);
 };
-
-#endif

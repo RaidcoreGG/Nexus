@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LDRADDONBASE_H
-#define LDRADDONBASE_H
+#pragma once
 
 #include <cstdint>
 #include <filesystem>
@@ -95,5 +94,3 @@ class IAddon
 
 	friend class CLoader;
 };
-
-#endif

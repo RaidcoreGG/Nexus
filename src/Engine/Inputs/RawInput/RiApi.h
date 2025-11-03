@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef RAWINPUTAPI_H
-#define RAWINPUTAPI_H
+#pragma once
 
 #include <mutex>
 #include <vector>
@@ -73,5 +72,3 @@ class CRawInputApi : public virtual IRefCleaner
 	mutable std::mutex            Mutex;
 	std::vector<WNDPROC_CALLBACK> Registry;
 };
-
-#endif

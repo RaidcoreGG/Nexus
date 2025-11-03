@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef TEXTURELOADER_H
-#define TEXTURELOADER_H
+#pragma once
 
 #include <condition_variable>
 #include <filesystem>
@@ -204,5 +203,3 @@ class CTextureLoader : public virtual IRefCleaner
 	///----------------------------------------------------------------------------------------------------
 	void ProcessDownloads();
 };
-
-#endif

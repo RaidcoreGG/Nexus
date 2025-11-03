@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef DLL_H
-#define DLL_H
+#pragma once
 
 #include <Windows.h>
 
@@ -22,5 +21,3 @@ namespace DLL
 	///----------------------------------------------------------------------------------------------------
 	bool FindFunction(HMODULE aModule, LPVOID aFunction, LPCSTR aName);
 }
-
-#endif

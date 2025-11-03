@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef DLENUM_H
-#define DLENUM_H
+#pragma once
 
 #include <cstdint>
 
@@ -20,5 +19,3 @@ enum class ELinkedResourceType : uint32_t
 	Public,
 	Internal
 };
-
-#endif

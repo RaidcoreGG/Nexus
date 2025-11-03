@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef MAJORMINORBUILDREVISION_H
-#define MAJORMINORBUILDREVISION_H
+#pragma once
 
 #include <string>
 #include <cstdint>
@@ -93,5 +92,3 @@ struct MajorMinorBuildRevision_t
 		return *this < rhs || *this == rhs;
 	}
 };
-
-#endif

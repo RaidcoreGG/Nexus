@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef ADOAPIV3_H
-#define ADOAPIV3_H
+#pragma once
 
 #include "ApiBase.h"
 
@@ -102,6 +101,3 @@ struct AddonAPI3_t : AddonAPI_t
 	LOCALIZATION_TRANSLATE            Translate;
 	LOCALIZATION_TRANSLATETO          TranslateTo;
 };
-
-
-#endif

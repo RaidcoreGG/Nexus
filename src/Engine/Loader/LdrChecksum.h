@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LDRCHECKSUM_H
-#define LDRCHECKSUM_H
+#pragma once
 
 #include <cstdint>
 #include <cstring>
@@ -80,5 +79,3 @@ struct MD5_t
 		memset(this, 0, sizeof(MD5_t));
 	}
 };
-
-#endif

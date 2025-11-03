@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef IBBIND_H
-#define IBBIND_H
+#pragma once
 
 #include "IbEnum.h"
 
@@ -22,5 +21,3 @@ struct InputBindV1_t
 	bool           Ctrl;
 	bool           Shift;
 };
-
-#endif

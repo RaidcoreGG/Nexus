@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef QAENUM_H
-#define QAENUM_H
+#pragma once
 
 #include <cstdint>
 
@@ -33,5 +32,3 @@ enum class EQaVisibility : uint32_t
 	InCombat,
 	Hide
 };
-
-#endif

@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef IBFUNCDEFS_H
-#define IBFUNCDEFS_H
+#pragma once
 
 #include "IbBind.h"
 
@@ -29,5 +28,3 @@ typedef void (*INPUTBINDS_REGISTERWITHSTRUCT3)(const char* aIdentifier, INPUTBIN
 typedef bool (*INPUTBINDS_INVOKE2)            (const char* aIdentifier, bool aIsRelease);
 
 typedef void (*INPUTBINDS_DEREGISTER)         (const char* aIdentifier);
-
-#endif

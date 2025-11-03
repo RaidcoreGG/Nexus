@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef WRECACHE_H
-#define WRECACHE_H
+#pragma once
 
 #include <mutex>
 #include <filesystem>
@@ -60,5 +59,3 @@ class CHttpCache
 	///----------------------------------------------------------------------------------------------------
 	std::filesystem::path GetCachePath(const std::string& aQuery);
 };
-
-#endif

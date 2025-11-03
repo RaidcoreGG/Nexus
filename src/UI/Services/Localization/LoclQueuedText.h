@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LOCLQUEUEDTEXT_H
-#define LOCLQUEUEDTEXT_H
+#pragma once
 
 #include <string>
 
@@ -20,5 +19,3 @@ struct QueuedText_t
 	std::string LanguageIdentifier;
 	std::string Text;
 };
-
-#endif

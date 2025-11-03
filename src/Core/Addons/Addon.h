@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef ADDON_H
-#define ADDON_H
+#pragma once
 
 #include <condition_variable>
 #include <cstdint>
@@ -310,5 +309,3 @@ static inline IAddon* IAddonFactory(std::filesystem::path aLocation)
 {
 	return new CAddon(aLocation);
 }
-
-#endif

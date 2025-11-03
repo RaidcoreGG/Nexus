@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef ADOAPIV6_H
-#define ADOAPIV6_H
+#pragma once
 
 #include "ApiBase.h"
 
@@ -181,5 +180,3 @@ struct AddonAPI6_t : AddonAPI_t
 	};
 	FontsVT                               Fonts;
 };
-
-#endif

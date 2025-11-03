@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef ADDONDEFV1_H
-#define ADDONDEFV1_H
+#pragma once
 
 #include <cstdint>
 
@@ -153,5 +152,3 @@ struct AddonDefV1_t
 		return false;
 	}
 };
-
-#endif

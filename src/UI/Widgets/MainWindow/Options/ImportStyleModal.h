@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef IMPORTSTYLEMODAL_H
-#define IMPORTSTYLEMODAL_H
+#pragma once
 
 #include "UI/Controls/CtlModal.h"
 
@@ -37,5 +36,3 @@ class CImportStyleModal : public virtual IModal
 	private:
 	char DataBuffer[4096]; /* Very big buffer, to store the entire Base64 code. */
 };
-
-#endif

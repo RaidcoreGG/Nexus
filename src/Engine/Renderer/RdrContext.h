@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef RDRCONTEXT_H
-#define RDRCONTEXT_H
+#pragma once
 
 #include <dxgi.h>
 #include <d3d11.h>
@@ -28,5 +27,3 @@ struct RenderContext_t
 
 	RenderMetrics_t      Metrics       = {};
 };
-
-#endif

@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef HOOKS_H
-#define HOOKS_H
+#pragma once
 
 #include <windows.h>
 
@@ -60,5 +59,3 @@ namespace Hooks
 		HRESULT __stdcall DXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
 	}
 }
-
-#endif

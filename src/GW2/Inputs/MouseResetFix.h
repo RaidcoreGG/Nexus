@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef MOUSERESETFIX_H
-#define MOUSERESETFIX_H
+#pragma once
 
 #include <windows.h>
 
@@ -132,5 +131,3 @@ inline UINT MouseResetFix(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	/* Never intercept input. */
 	return 1;
 }
-
-#endif

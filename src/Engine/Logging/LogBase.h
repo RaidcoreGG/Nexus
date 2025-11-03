@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef ILOGGER_H
-#define ILOGGER_H
+#pragma once
 
 #include "LogEnum.h"
 #include "LogMsg.h"
@@ -40,5 +39,3 @@ class ILogger
 	private:
 	ELogLevel Level = ELogLevel::ALL;
 };
-
-#endif

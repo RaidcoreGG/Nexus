@@ -6,9 +6,6 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef NETCONST_H
-#define NETCONST_H
+#pragma once
 
 constexpr const char* CH_NETWORKING = "Networking";
-
-#endif

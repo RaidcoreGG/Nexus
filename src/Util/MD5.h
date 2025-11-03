@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef MD5_H
-#define MD5_H
+#pragma once
 
 #include <vector>
 #include <string>
@@ -54,5 +53,3 @@ namespace MD5Util
 	///----------------------------------------------------------------------------------------------------
 	std::string ToString(const std::vector<unsigned char>& aBytes);
 }
-
-#endif

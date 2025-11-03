@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef RDRWINDOW_H
-#define RDRWINDOW_H
+#pragma once
 
 #include <windows.h>
 #include <cstdint>
@@ -21,5 +20,3 @@ struct RenderWindow_t
 	uint32_t Width  = 0;
 	uint32_t Height = 0;
 };
-
-#endif

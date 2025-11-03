@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef EVTAPI_H
-#define EVTAPI_H
+#pragma once
 
 #include <mutex>
 #include <string>
@@ -73,5 +72,3 @@ class CEventApi : public virtual IRefCleaner
 	mutable std::recursive_mutex                 Mutex;
 	std::unordered_map<std::string, EventData_t> Registry;
 };
-
-#endif

@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef ALENUM_H
-#define ALENUM_H
+#pragma once
 
 ///----------------------------------------------------------------------------------------------------
 /// EAlertType Enumeration
@@ -18,5 +17,3 @@ enum class EAlertType
 	Info,  // Yellow
 	Error, // Red
 };
-
-#endif

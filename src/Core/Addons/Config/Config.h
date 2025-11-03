@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#pragma once
 
 #include <cstdint>
 #include <string>
@@ -30,5 +29,3 @@ struct Config_t
 	/* Runtime flag, if an addon was uninstalled, but is state locked. It should not persist, but it cannot be freed yet. */
 	bool        Persist          = true;
 };
-
-#endif

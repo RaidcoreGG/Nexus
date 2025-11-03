@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef WRERESPONSE_H
-#define WRERESPONSE_H
+#pragma once
 
 #include <string>
 #include <cstdint>
@@ -64,5 +63,3 @@ struct HttpResponse_t
 		return json{};
 	}
 };
-
-#endif

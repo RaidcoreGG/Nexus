@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef CONSOLELOGGER_H
-#define CONSOLELOGGER_H
+#pragma once
 
 #include "LogBase.h"
 
@@ -33,5 +32,3 @@ class CConsoleLogger : public virtual ILogger
 		///----------------------------------------------------------------------------------------------------
 		void MsgProc(const LogMsg_t* aLogEntry) override;
 };
-
-#endif

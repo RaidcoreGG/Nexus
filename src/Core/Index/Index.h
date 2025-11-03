@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef INDEX_H
-#define INDEX_H
+#pragma once
 
 #include <windows.h>
 #include <filesystem>
@@ -25,5 +24,3 @@ void CreateIndex(HMODULE aModule);
 /// 	Retrieves a path from the index.
 ///----------------------------------------------------------------------------------------------------
 std::filesystem::path Index(EPath aIndex);
-
-#endif

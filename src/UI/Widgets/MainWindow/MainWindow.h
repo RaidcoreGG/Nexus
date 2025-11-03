@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <mutex>
 #include <vector>
@@ -41,5 +40,3 @@ class CMainWindow : public virtual IWindow
 	Texture_t*               Tex_RaidcoreTag{};
 	Texture_t*               Tex_CloseIcon  {};
 };
-
-#endif

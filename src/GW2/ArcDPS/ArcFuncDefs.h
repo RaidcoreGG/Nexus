@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef ARCFUNCDEFS_H
-#define ARCFUNCDEFS_H
+#pragma once
 
 #include <cstdint>
 #include <windows.h>
@@ -69,5 +68,3 @@ namespace ArcDPS
 	/* listextension */
 	typedef void          (*PFN_LISTEXTENSION)   (PFN_RECEIVEEXTENSION aCallback);
 }
-
-#endif

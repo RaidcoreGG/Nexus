@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef CONTEXT_H
-#define CONTEXT_H
+#pragma once
 
 #include <map>
 #include <mutex>
@@ -93,5 +92,3 @@ class CContext
 	std::mutex                          HttpClientMutex;
 	std::map<std::string, CHttpClient*> HttpClients;
 };
-
-#endif

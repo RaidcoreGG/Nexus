@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef GBAPI_H
-#define GBAPI_H
+#pragma once
 
 #include <filesystem>
 #include <unordered_map>
@@ -145,5 +144,3 @@ class CGameBindsApi
 	///----------------------------------------------------------------------------------------------------
 	void Save();
 };
-
-#endif

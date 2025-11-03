@@ -1,5 +1,4 @@
-#ifndef UI_SERVICES_FONTS_FUNCDEFS_H
-#define UI_SERVICES_FONTS_FUNCDEFS_H
+#pragma once
 
 #include <Windows.h>
 
@@ -11,5 +10,3 @@ typedef void (*FONTS_ADDFROMFILE)(const char* aIdentifier, float aFontSize, cons
 typedef void (*FONTS_ADDFROMRESOURCE)(const char* aIdentifier, float aFontSize, unsigned aResourceID, HMODULE aModule, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
 typedef void (*FONTS_ADDFROMMEMORY)(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
 typedef void (*FONTS_RESIZE)(const char* aIdentifier, float aFontSize);
-
-#endif

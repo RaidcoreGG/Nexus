@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef UNINSTALLCONFIRMATIONMODAL_H
-#define UNINSTALLCONFIRMATIONMODAL_H
+#pragma once
 
 #include <string>
 #include <filesystem>
@@ -53,5 +52,3 @@ class CUninstallConfirmationModal : public virtual IModal
 	///----------------------------------------------------------------------------------------------------
 	void SetTitle();
 };
-
-#endif

@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef SELFUPDATER_H
-#define SELFUPDATER_H
+#pragma once
 
 #include <thread>
 #include <string>
@@ -87,5 +86,3 @@ class CSelfUpdater
 	///----------------------------------------------------------------------------------------------------
 	void Run();
 };
-
-#endif

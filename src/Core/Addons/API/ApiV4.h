@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef ADOAPIV4_H
-#define ADOAPIV4_H
+#pragma once
 
 #include "ApiBase.h"
 
@@ -113,5 +112,3 @@ struct AddonAPI4_t : AddonAPI_t
 	FONTS_ADDFROMRESOURCE             AddFontFromResource;
 	FONTS_ADDFROMMEMORY               AddFontFromMemory;
 };
-
-#endif

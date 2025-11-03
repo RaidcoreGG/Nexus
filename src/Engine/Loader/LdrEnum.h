@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LDRENUM_H
-#define LDRENUM_H
+#pragma once
 
 #include <cstdint>
 
@@ -20,5 +19,3 @@ enum class EAddonState : uint32_t
 	NotLoaded,
 	Loaded
 };
-
-#endif

@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef MAINWINDOW_ADDONS_H
-#define MAINWINDOW_ADDONS_H
+#pragma once
 
 #include <mutex>
 #include <vector>
@@ -97,5 +96,3 @@ class CAddonsWindow : public ISubWindow
 
 	void PopulateAddons();
 };
-
-#endif

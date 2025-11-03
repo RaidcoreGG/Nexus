@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef DEFENUM_H
-#define DEFENUM_H
+#pragma once
 
 #include <cstdint>
 #include <windows.h>
@@ -25,5 +24,3 @@ enum class EAddonDefFlags : uint32_t
 	ForceUpdate           = 1 << 4  /* Addon should always be kept up-to-date. E.g. to avoid exploiting old versions.                                     */
 };
 DEFINE_ENUM_FLAG_OPERATORS(EAddonDefFlags);
-
-#endif

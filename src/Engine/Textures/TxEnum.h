@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef TXENUM_H
-#define TXENUM_H
+#pragma once
 
 #include <cstdint>
 
@@ -22,5 +21,3 @@ enum class ETextureStage : uint32_t
 	Done        = 3,
 	INVALID     = UINT32_MAX
 };
-
-#endif

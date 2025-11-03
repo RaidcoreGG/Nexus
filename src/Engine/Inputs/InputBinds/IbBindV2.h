@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef IBBINDV2_H
-#define IBBINDV2_H
+#pragma once
 
 #include "IbEnum.h"
 #include "IbBind.h"
@@ -54,5 +53,3 @@ struct InputBind_t
 
 bool operator==(const InputBind_t& lhs, const InputBind_t& rhs);
 bool operator!=(const InputBind_t& lhs, const InputBind_t& rhs);
-
-#endif

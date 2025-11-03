@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef EVTDATA_H
-#define EVTDATA_H
+#pragma once
 
 #include <vector>
 
@@ -21,5 +20,3 @@ struct EventData_t
 	std::vector<EventSubscriber_t> Subscribers;
 	unsigned long long             AmountRaises = 0;
 };
-
-#endif

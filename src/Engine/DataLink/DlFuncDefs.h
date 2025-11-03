@@ -6,10 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef DLFUNCDEFS_H
-#define DLFUNCDEFS_H
+#pragma once
 
 typedef void* (*DATALINK_GETRESOURCE)  (const char* aIdentifier);
 typedef void* (*DATALINK_SHARERESOURCE)(const char* aIdentifier, size_t aResourceSize);
-
-#endif

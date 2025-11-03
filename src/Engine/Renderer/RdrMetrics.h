@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef RDRMETRICS_H
-#define RDRMETRICS_H
+#pragma once
 
 #include <cstdint>
 
@@ -18,5 +17,3 @@ struct RenderMetrics_t
 {
 	uint64_t FrameCount = 0;
 };
-
-#endif

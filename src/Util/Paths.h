@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef PATHS_H
-#define PATHS_H
+#pragma once
 
 #include <filesystem>
 
@@ -41,5 +40,3 @@ namespace Path
 	///----------------------------------------------------------------------------------------------------
 	std::filesystem::path GetUnused(const std::filesystem::path& aPath);
 }
-
-#endif

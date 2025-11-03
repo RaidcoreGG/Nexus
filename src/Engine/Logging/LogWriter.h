@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef FILELOGGER_H
-#define FILELOGGER_H
+#pragma once
 
 #include <condition_variable>
 #include <cstdint>
@@ -57,5 +56,3 @@ class CFileLogger : public virtual ILogger
 	///----------------------------------------------------------------------------------------------------
 	void Flush();
 };
-
-#endif

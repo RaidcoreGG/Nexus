@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef MAINWINDOW_ABOUT_H
-#define MAINWINDOW_ABOUT_H
+#pragma once
 
 #include "UI/Controls/CtlSubWindow.h"
 #include "Engine/Textures/TxTexture.h"
@@ -22,5 +21,3 @@ class CAboutBox : public ISubWindow
 	Texture_t* Tex_BannerDiscord = nullptr;
 	Texture_t* Tex_BannerPatreon = nullptr;
 };
-
-#endif

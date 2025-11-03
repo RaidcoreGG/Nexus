@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef ALMESSAGE_H
-#define ALMESSAGE_H
+#pragma once
 
 #include <string>
 
@@ -22,5 +21,3 @@ struct AlertMessage_t
 	std::string Message;
 	double      StartTime = 0;
 };
-
-#endif

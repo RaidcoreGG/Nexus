@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef ARCENUM_H
-#define ARCENUM_H
+#pragma once
 
 #include <cstdint>
 
@@ -32,5 +31,3 @@ namespace ArcDPS
 		LoadLibraryFailed
 	};
 }
-
-#endif

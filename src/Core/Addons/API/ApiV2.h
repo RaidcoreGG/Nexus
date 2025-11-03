@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef ADOAPIV2_H
-#define ADOAPIV2_H
+#pragma once
 
 #include "ApiBase.h"
 
@@ -95,5 +94,3 @@ struct AddonAPI2_t : AddonAPI_t
 	LOCALIZATION_TRANSLATE           Translate;
 	LOCALIZATION_TRANSLATETO         TranslateTo;
 };
-
-#endif

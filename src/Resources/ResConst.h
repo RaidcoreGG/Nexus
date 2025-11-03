@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef RESCONST_H
-#define RESCONST_H
+#pragma once
 
 #define RES_THIRDPARTYNOTICES             1
 
@@ -85,5 +84,3 @@
 #define RES_LOCALE_PL                   708
 #define RES_LOCALE_RU                   709
 #define RES_LOCALE_CN                   710
-
-#endif
