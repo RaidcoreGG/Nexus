@@ -28,11 +28,17 @@
 #include "UI/FuncDefs.h"
 #include "UI/Services/Localization/LoclApi.h"
 
-constexpr const char* CH_QUICKACCESS = "Quick Access";
-constexpr const char* QA_MENU        = "0_QA_MENU";
-constexpr const char* QA_ARCDPS      = "QA_ARCDPS";
-
-constexpr const char* QAKEY_GENERIC  = "Generic";
+constexpr const char* CH_QUICKACCESS             = "Quick Access";
+constexpr const char* QA_MENU                    = "_Nexus";
+constexpr const char* ICON_NEXUS                 = "ICON_NEXUS";
+constexpr const char* ICON_NEXUS_HOVER           = "ICON_NEXUS_HOVER";
+constexpr const char* ICON_NEXUS_HALLOWEEN       = "ICON_NEXUS_HALLOWEEN";
+constexpr const char* ICON_NEXUS_HALLOWEEN_HOVER = "ICON_NEXUS_HALLOWEEN_HOVER";
+constexpr const char* ICON_NEXUS_XMAS            = "ICON_NEXUS_XMAS";
+constexpr const char* ICON_NEXUS_XMAS_HOVER      = "ICON_NEXUS_XMAS_HOVER";
+constexpr const char* ICON_GENERIC               = "ICON_GENERIC";
+constexpr const char* ICON_GENERIC_HOVER         = "ICON_GENERIC_HOVER";
+constexpr const char* QAKEY_GENERIC              = "Generic";
 
 ///----------------------------------------------------------------------------------------------------
 /// CQuickAccess Class
@@ -124,26 +130,27 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	private:
-	CLogApi*                              Logger            = nullptr;
-	CInputBindApi*                        InputBindApi      = nullptr;
-	CTextureLoader*                       TextureService    = nullptr;
-	CLocalization*                        Language          = nullptr;
-	CEventApi*                            EventApi          = nullptr;
+	CLogApi*                              Logger             {};
+	CInputBindApi*                        InputBindApi       {};
+	CTextureLoader*                       TextureService     {};
+	CLocalization*                        Language           {};
+	CEventApi*                            EventApi           {};
 
-	NexusLinkData_t*                      NexusLink         = nullptr;
-	Mumble::Data*                         MumbleLink        = nullptr;
+	NexusLinkData_t*                      NexusLink          {};
+	Mumble::Data*                         MumbleLink         {};
 
-	mutable std::mutex                    Mutex;
-	std::map<std::string, CShortcutIcon*> Registry;
-	std::map<std::string, ContextItem_t>  OrphanedCallbacks;
+	mutable std::mutex                    Mutex              {};
+	std::map<std::string, CShortcutIcon*> Registry           {};
+	std::map<std::string, ContextItem_t>  OrphanedCallbacks  {};
+	std::vector<std::string>              SuppressedShortcuts{};
 
-	bool                                  VerticalLayout    = false;
-	EQaVisibility                         Visibility        = EQaVisibility::AlwaysShow;
-	EQaPosition                           Location          = EQaPosition::Extend;
-	ImVec2                                Offset            = ImVec2(0, 0);
-	bool                                  OnlyShowOnHover   = false; // Fully hide unless hovered
+	bool                                  VerticalLayout     { false };
+	EQaVisibility                         Visibility         { EQaVisibility::AlwaysShow };
+	EQaPosition                           Location           { EQaPosition::Extend };
+	ImVec2                                Offset             { ImVec2{0, 0} };
+	bool                                  OnlyShowOnHover    { false }; // Fully hide unless hovered
 
-	float                                 Opacity           = 0.5f;
+	float                                 Opacity            { 0.5f };
 
 	///----------------------------------------------------------------------------------------------------
 	/// WhereAreMyParents:

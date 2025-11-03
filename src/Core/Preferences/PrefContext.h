@@ -69,6 +69,8 @@ class CSettings
 			this->Store[aIdentifier] = aDefaultValue;
 			this->SaveInternal();
 
+			this->NotifyChanged(aIdentifier, this->Store[aIdentifier]);
+
 			return aDefaultValue;
 		}
 

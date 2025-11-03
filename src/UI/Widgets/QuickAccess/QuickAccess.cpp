@@ -17,7 +17,9 @@
 #include "Core/Preferences/PrefConst.h"
 #include "Core/Preferences/PrefContext.h"
 #include "Engine/Cleanup/RefCleanerContext.h"
+#include "Resources/ResConst.h"
 #include "UI/UIContext.h"
+#include "Util/Time.h"
 
 #define GW2_QUICKACCESS_ITEMS 10;
 
@@ -32,60 +34,101 @@ void CQuickAccess::OnAddonStateChanged(void* aEventData)
 
 CQuickAccess::CQuickAccess(CDataLinkApi* aDataLink, CLogApi* aLogger, CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization, CEventApi* aEventApi)
 {
-	this->NexusLink      = (NexusLinkData_t*)aDataLink->GetResource(DL_NEXUS_LINK);
-	this->MumbleLink     = (Mumble::Data*)aDataLink->GetResource(DL_MUMBLE_LINK);
 	this->Logger         = aLogger;
 	this->InputBindApi   = aInputBindApi;
 	this->TextureService = aTextureService;
 	this->Language       = aLocalization;
 	this->EventApi       = aEventApi;
 
+	this->NexusLink = (NexusLinkData_t*)aDataLink->GetResource(DL_NEXUS_LINK);
+	this->MumbleLink = (Mumble::Data*)aDataLink->GetResource(DL_MUMBLE_LINK);
+
 	CContext*  ctx         = CContext::GetContext();
 	CSettings* settingsctx = ctx->GetSettingsCtx();
 
 	/* Setup notifiers. */
-	settingsctx->Subscribe<bool>(OPT_QAVERTICAL, [&](bool aNewValue)
+	settingsctx->Subscribe<bool>(OPT_QAVERTICAL, [&](bool aVertical)
 	{
-		this->VerticalLayout = aNewValue;
+		this->VerticalLayout = aVertical;
 	});
-	settingsctx->Subscribe<EQaPosition>(OPT_QALOCATION, [&](EQaPosition aNewValue)
+	settingsctx->Subscribe<EQaPosition>(OPT_QALOCATION, [&](EQaPosition aPosition)
 	{
-		this->Location = aNewValue;
+		this->Location = aPosition;
 	});
-	settingsctx->Subscribe<float>(OPT_QAOFFSETX, [&](float aNewValue)
+	settingsctx->Subscribe<float>(OPT_QAOFFSETX, [&](float aOffsetX)
 	{
-		this->Offset.x = aNewValue;
+		this->Offset.x = aOffsetX;
 	});
-	settingsctx->Subscribe<float>(OPT_QAOFFSETY, [&](float aNewValue)
+	settingsctx->Subscribe<float>(OPT_QAOFFSETY, [&](float aOffsetY)
 	{
-		this->Offset.y = aNewValue;
+		this->Offset.y = aOffsetY;
 	});
-	settingsctx->Subscribe<EQaVisibility>(OPT_QAVISIBILITY, [&](EQaVisibility aNewValue)
+	settingsctx->Subscribe<EQaVisibility>(OPT_QAVISIBILITY, [&](EQaVisibility aVisibility)
 	{
-		this->Visibility = aNewValue;
+		this->Visibility = aVisibility;
 	});
-	settingsctx->Subscribe<bool>(OPT_QAONLYSHOWONHOVER, [&](bool aNewValue)
+	settingsctx->Subscribe<bool>(OPT_QAONLYSHOWONHOVER, [&](bool aOnlyShowOnHover)
 	{
-		this->OnlyShowOnHover = aNewValue;
+		this->OnlyShowOnHover = aOnlyShowOnHover;
 	});
-	settingsctx->Subscribe<std::vector<std::string>>(OPT_QASUPPRESSED, [&](std::vector<std::string> aNewValue)
+	settingsctx->Subscribe<std::vector<std::string>>(OPT_QASUPPRESSED, [&](std::vector<std::string> aSuppressedShortcuts)
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
+		this->SuppressedShortcuts = aSuppressedShortcuts;
+
 		for (auto& [id, shortcut] : this->Registry)
 		{
-			auto isSuppressed = std::find(aNewValue.begin(), aNewValue.end(), id);
-
 			/* If the current shortcut ID is in the suppressed list. */
-			if (isSuppressed != aNewValue.end())
+			bool isSuppressed = std::find(this->SuppressedShortcuts.begin(), this->SuppressedShortcuts.end(), id) != this->SuppressedShortcuts.end();
+
+			shortcut->SetSuppression(isSuppressed);
+		}
+	});
+
+	/* Preload default icons. */
+	this->TextureService->Load(ICON_NEXUS,                 RES_ICON_NEXUS,                 ctx->GetModule(), nullptr);
+	this->TextureService->Load(ICON_NEXUS_HOVER,           RES_ICON_NEXUS_HOVER,           ctx->GetModule(), nullptr);
+	this->TextureService->Load(ICON_NEXUS_HALLOWEEN,       RES_ICON_NEXUS_HALLOWEEN,       ctx->GetModule(), nullptr);
+	this->TextureService->Load(ICON_NEXUS_HALLOWEEN_HOVER, RES_ICON_NEXUS_HALLOWEEN_HOVER, ctx->GetModule(), nullptr);
+	this->TextureService->Load(ICON_NEXUS_XMAS,            RES_ICON_NEXUS_XMAS,            ctx->GetModule(), nullptr);
+	this->TextureService->Load(ICON_NEXUS_XMAS_HOVER,      RES_ICON_NEXUS_XMAS_HOVER,      ctx->GetModule(), nullptr);
+
+	/// FIXME: This is kinda hacky.
+	/// It forces the creation of the setting, so that the below subscriber gets executed on a first launch.
+	/// Otherwise the main menu would need to be opened first (static init of snowflakemgr) or the options in the main menu (static init of setting).
+	/// Both is kinda shit.
+	settingsctx->Get<bool>(OPT_DISABLEFESTIVEFLAIR, false);
+
+	settingsctx->Subscribe<bool>(OPT_DISABLEFESTIVEFLAIR, [&](bool aDisableFestiveFlair)
+	{
+		/* Remove existing shortcut. */
+		this->RemoveShortcut(QA_MENU);
+
+		const char* icon      = ICON_NEXUS;
+		const char* iconHover = ICON_NEXUS_HOVER;
+
+		if (!aDisableFestiveFlair)
+		{
+			switch (Time::GetMonth())
 			{
-				shortcut->SetSuppression(true);
-			}
-			else
-			{
-				shortcut->SetSuppression(false);
+				case 10:
+				{
+					icon = ICON_NEXUS_HALLOWEEN;
+					iconHover = ICON_NEXUS_HALLOWEEN_HOVER;
+					break;
+				}
+				case 12:
+				{
+					icon = ICON_NEXUS_XMAS;
+					iconHover = ICON_NEXUS_XMAS_HOVER;
+					break;
+				}
 			}
 		}
+
+		/* Recreate shortcut with appropriate icon. */
+		this->AddShortcut(QA_MENU, icon, iconHover, KB_MENU, "((000009))");
 	});
 
 	this->EventApi->Subscribe(EV_ADDON_LOADED,   CQuickAccess::OnAddonStateChanged);
@@ -292,18 +335,10 @@ void CQuickAccess::AddShortcut(const char* aIdentifier, const char* aTextureIden
 		CContext*  ctx         = CContext::GetContext();
 		CSettings* settingsctx = ctx->GetSettingsCtx();
 
-		std::vector<std::string> suppressedIcons = settingsctx->Get<std::vector<std::string>>(OPT_QASUPPRESSED);
-		auto isSuppressed = std::find(suppressedIcons.begin(), suppressedIcons.end(), aIdentifier);
-
 		/* If the current shortcut ID is in the suppressed list. */
-		if (isSuppressed != suppressedIcons.end())
-		{
-			shortcut->SetSuppression(true);
-		}
-		else
-		{
-			shortcut->SetSuppression(false);
-		}
+		bool isSuppressed = std::find(this->SuppressedShortcuts.begin(), this->SuppressedShortcuts.end(), aIdentifier) != this->SuppressedShortcuts.end();
+
+		shortcut->SetSuppression(isSuppressed);
 
 		this->Registry.emplace(aIdentifier, shortcut);
 	}

@@ -34,10 +34,6 @@
 #include "Util/Inputs.h"
 
 constexpr const char* CH_UICONTEXT       = "UI Context";
-constexpr const char* ICON_NEXUS         = "ICON_NEXUS";
-constexpr const char* ICON_NEXUS_HOVER   = "ICON_NEXUS_HOVER";
-constexpr const char* ICON_GENERIC       = "ICON_GENERIC";
-constexpr const char* ICON_GENERIC_HOVER = "ICON_GENERIC_HOVER";
 constexpr const char* KB_MENU            = "KB_MENU";
 constexpr const char* KB_ADDONS          = "KB_ADDONS";
 constexpr const char* KB_OPTIONS         = "KB_OPTIONS";
@@ -305,12 +301,6 @@ class CUiContext : public virtual IRefCleaner
 	bool                               ClickingRequiresMods = false;
 	bool                               AreModsDown = false;
 	EModifiers                         Mods = EModifiers::None;
-
-	///----------------------------------------------------------------------------------------------------
-	/// CreateNexusShortcut:
-	/// 	Creates Nexus own shortcut icon and adds it to the HUD.
-	///----------------------------------------------------------------------------------------------------
-	void CreateNexusShortcut();
 
 	///----------------------------------------------------------------------------------------------------
 	/// UnpackLocales:

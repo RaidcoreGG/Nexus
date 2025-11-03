@@ -302,7 +302,6 @@ CUiContext::CUiContext(RenderContext_t* aRenderContext, CLogApi* aLogger, CTextu
 
 	this->UnpackLocales();
 	this->LoadSettings();
-	this->CreateNexusShortcut();
 	this->LoadFonts();
 
 	CRefCleanerContext::Get()->Register("CUiContext", this);
@@ -1082,49 +1081,6 @@ void CUiContext::ApplyStyle(EUIStyle aStyle, std::string aValue)
 			break;
 		}
 	}
-}
-
-void CUiContext::CreateNexusShortcut()
-{
-	int month = Time::GetMonth();
-
-	CContext* ctx = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
-
-	bool isPartyPooper = settingsctx->Get<bool>(OPT_DISABLEFESTIVEFLAIR, false);
-
-	if (isPartyPooper)
-	{
-		month = 0;
-	}
-	
-	int resIcon = 0;
-	int resIconHover = 0;
-
-	switch (month)
-	{
-		case 10:
-			resIcon = RES_ICON_NEXUS_HALLOWEEN;
-			resIconHover = RES_ICON_NEXUS_HALLOWEEN_HOVER;
-			break;
-		case 12:
-			resIcon = RES_ICON_NEXUS_XMAS;
-			resIconHover = RES_ICON_NEXUS_XMAS_HOVER;
-			break;
-		default:
-			resIcon = RES_ICON_NEXUS;
-			resIconHover = RES_ICON_NEXUS_HOVER;
-			break;
-	}
-
-	this->TextureService->Load(ICON_NEXUS, resIcon, ctx->GetModule(), nullptr);
-	this->TextureService->Load(ICON_NEXUS_HOVER, resIconHover, ctx->GetModule(), nullptr);
-
-	this->TextureService->Load(ICON_GENERIC, RES_ICON_GENERIC, ctx->GetModule(), nullptr);
-	this->TextureService->Load(ICON_GENERIC_HOVER, RES_ICON_GENERIC_HOVER, ctx->GetModule(), nullptr);
-
-	/* add shortcut */
-	this->QuickAccess->AddShortcut(QA_MENU, ICON_NEXUS, ICON_NEXUS_HOVER, KB_MENU, "((000009))");
 }
 
 void CUiContext::UnpackLocales()
