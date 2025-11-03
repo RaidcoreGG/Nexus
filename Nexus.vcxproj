@@ -503,8 +503,7 @@
     <Image Include="src\Resources\Images\MainWindow\Tiles.png" />
     <Image Include="src\Resources\Images\MainWindow\TilesShaded.png" />
     <Image Include="src\Resources\Images\MainWindow\RaidcoreTag.png" />
-    <Image Include="src\Resources\Images\QuickAccess\Generic.png" />
-    <Image Include="src\Resources\Images\QuickAccess\Generic_Hover.png" />
+    <Image Include="src\Resources\Images\QuickAccess\ContextMenu.png" />
     <Image Include="src\Resources\Images\QuickAccess\Nexus.png" />
     <Image Include="src\Resources\Images\QuickAccess\NexusHalloween.png" />
     <Image Include="src\Resources\Images\QuickAccess\NexusHalloween_Hover.png" />

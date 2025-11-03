@@ -29,15 +29,13 @@
 #include "UI/Services/Localization/LoclApi.h"
 
 constexpr const char* CH_QUICKACCESS             = "Quick Access";
-constexpr const char* QA_MENU                    = "_Nexus";
+constexpr const char* QA_MENU                    = "!Nexus";
 constexpr const char* ICON_NEXUS                 = "ICON_NEXUS";
 constexpr const char* ICON_NEXUS_HOVER           = "ICON_NEXUS_HOVER";
 constexpr const char* ICON_NEXUS_HALLOWEEN       = "ICON_NEXUS_HALLOWEEN";
 constexpr const char* ICON_NEXUS_HALLOWEEN_HOVER = "ICON_NEXUS_HALLOWEEN_HOVER";
 constexpr const char* ICON_NEXUS_XMAS            = "ICON_NEXUS_XMAS";
 constexpr const char* ICON_NEXUS_XMAS_HOVER      = "ICON_NEXUS_XMAS_HOVER";
-constexpr const char* ICON_GENERIC               = "ICON_GENERIC";
-constexpr const char* ICON_GENERIC_HOVER         = "ICON_GENERIC_HOVER";
 constexpr const char* QAKEY_GENERIC              = "Generic";
 
 ///----------------------------------------------------------------------------------------------------

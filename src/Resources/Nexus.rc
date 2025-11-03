@@ -102,9 +102,6 @@ RES_ICON_NEXUS_HALLOWEEN_HOVER  PNG     "Resources\\Images\\QuickAccess\\NexusHa
 RES_ICON_NEXUS_XMAS             PNG     "Resources\\Images\\QuickAccess\\NexusXmas.png"
 RES_ICON_NEXUS_XMAS_HOVER       PNG     "Resources\\Images\\QuickAccess\\NexusXmas_Hover.png"
 
-RES_ICON_GENERIC                PNG     "Resources\\Images\\QuickAccess\\Generic.png"
-RES_ICON_GENERIC_HOVER          PNG     "Resources\\Images\\QuickAccess\\Generic_Hover.png"
-
 RES_ICON_NOTIFICATION1          PNG     "Resources\\Images\\QuickAccess\\Notification1.png"
 RES_ICON_NOTIFICATION2          PNG     "Resources\\Images\\QuickAccess\\Notification2.png"
 RES_ICON_NOTIFICATION3          PNG     "Resources\\Images\\QuickAccess\\Notification3.png"

@@ -25,9 +25,6 @@
 #define RES_ICON_NEXUS_XMAS             205
 #define RES_ICON_NEXUS_XMAS_HOVER       206
 
-#define RES_ICON_GENERIC                207
-#define RES_ICON_GENERIC_HOVER          208
-
 #define RES_ICON_NOTIFICATION1          209
 #define RES_ICON_NOTIFICATION2          210
 #define RES_ICON_NOTIFICATION3          211
