@@ -219,10 +219,10 @@ void CQuickAccess::Render()
 	{
 		case EQaPosition::Extend:
 		{
-			wndPos.x += (s_IconBaseSize * UIRoot::ScalingFactor) * GW2_QUICKACCESS_ITEMS;
+			wndPos.x += (s_IconBaseSize * this->NexusLink->Scaling) * GW2_QUICKACCESS_ITEMS;
 
 			ImVec2 mPos = ImGui::GetMousePos();
-			if (mPos.x != -FLT_MAX && mPos.y != -FLT_MAX && mPos.x < wndPos.x - this->Offset.x && mPos.y < UIRoot::ScalingFactor * s_IconBaseSize)
+			if (mPos.x != -FLT_MAX && mPos.y != -FLT_MAX && mPos.x < wndPos.x - this->Offset.x && mPos.y < this->NexusLink->Scaling * s_IconBaseSize)
 			{
 				isHoveringNative = true;
 			}
@@ -230,14 +230,14 @@ void CQuickAccess::Render()
 		}
 		case EQaPosition::Under:
 		{
-			wndPos.y += s_IconBaseSize * UIRoot::ScalingFactor;
+			wndPos.y += s_IconBaseSize * this->NexusLink->Scaling;
 			break;
 		}
 		case EQaPosition::Bottom:
 		{
 			CContext*        ctx      = CContext::GetContext();
 			RenderContext_t* renderer = ctx->GetRendererCtx();
-			wndPos.y += renderer->Window.Height - (s_IconBaseSize * 2 * UIRoot::ScalingFactor);
+			wndPos.y += renderer->Window.Height - (s_IconBaseSize * 2 * this->NexusLink->Scaling);
 			break;
 		}
 	}
@@ -268,7 +268,7 @@ void CQuickAccess::Render()
 		{
 			isActive += shortcut->Render();
 
-			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(1.f, 1.f) * UIRoot::ScalingFactor);
+			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(1.f, 1.f) * this->NexusLink->Scaling);
 			if (!this->VerticalLayout)
 			{
 				/* If not vertical (aka is horizontal) force SameLine(). */

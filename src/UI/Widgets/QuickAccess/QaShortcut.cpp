@@ -27,6 +27,9 @@ CShortcutIcon::CShortcutIcon(std::string aID, std::string aIconID, std::string a
 	this->InputBindApi   = ctx->GetInputBindApi();
 	this->TextureService = ctx->GetTextureService();
 	this->Loader         = ctx->GetLoader();
+	this->DataLink       = ctx->GetDataLink();
+
+	this->NexusLink = static_cast<NexusLinkData_t*>(this->DataLink->GetResource(DL_NEXUS_LINK));
 
 	this->ID          = aID;
 	this->IconID      = aIconID;
@@ -82,7 +85,7 @@ bool CShortcutIcon::Render()
 	/* Push icon styles. */
 	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.f, 0.f));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(1.f, 1.f) * UIRoot::ScalingFactor);
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(1.f, 1.f) * this->NexusLink->Scaling);
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
@@ -92,15 +95,15 @@ bool CShortcutIcon::Render()
 	ImVec2 ctxSizeUnscaled    = ImVec2(12.f, 12.f); // Context menu available icon
 
 	ImVec2 iconPos   = ImGui::GetCursorPos();
-	ImVec2 notifyPos = iconPos + ((baseSizeUnscaled - notifySizeUnscaled) * UIRoot::ScalingFactor);
+	ImVec2 notifyPos = iconPos + ((baseSizeUnscaled - notifySizeUnscaled) * this->NexusLink->Scaling);
 	ImVec2 ctxPos    = ImVec2(
-		iconPos.x + ((baseSizeUnscaled.x - ctxSizeUnscaled.x) / 2.f * UIRoot::ScalingFactor),
-		iconPos.y + ((baseSizeUnscaled.y - (ctxSizeUnscaled.y / 2.f)) * UIRoot::ScalingFactor)
+		iconPos.x + ((baseSizeUnscaled.x - ctxSizeUnscaled.x) / 2.f * this->NexusLink->Scaling),
+		iconPos.y + ((baseSizeUnscaled.y - (ctxSizeUnscaled.y / 2.f)) * this->NexusLink->Scaling)
 	);
 
 	bool iconActive = false;
 	Texture_t* icon = !this->IsHovering ? this->Icon : this->IconHover;
-	if (ImGui::ImageButton(icon->Resource, baseSizeUnscaled * UIRoot::ScalingFactor))
+	if (ImGui::ImageButton(icon->Resource, baseSizeUnscaled * this->NexusLink->Scaling))
 	{
 		this->PopNotifcation(QAKEY_GENERIC);
 		this->InputBindApi->Invoke(this->InputBindID);
@@ -112,7 +115,7 @@ bool CShortcutIcon::Render()
 	{
 		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 		ImGui::SetCursorPos(notifyPos);
-		ImGui::Image(notificationIcon->Resource, notifySizeUnscaled * UIRoot::ScalingFactor);
+		ImGui::Image(notificationIcon->Resource, notifySizeUnscaled * this->NexusLink->Scaling);
 		ImGui::PopItemFlag();
 	}
 
@@ -128,7 +131,7 @@ bool CShortcutIcon::Render()
 		{
 			ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 			ImGui::SetCursorPos(ctxPos);
-			ImGui::Image(this->Textures[ETexIdx::HasContextMenu]->Resource, ctxSizeUnscaled * UIRoot::ScalingFactor);
+			ImGui::Image(this->Textures[ETexIdx::HasContextMenu]->Resource, ctxSizeUnscaled * this->NexusLink->Scaling);
 			ImGui::PopItemFlag();
 		}
 	}

@@ -42,208 +42,184 @@
 #include "UI/Widgets/MainWindow/Log/Log.h"
 #include "UI/Widgets/MainWindow/Options/Options.h"
 
-namespace UIRoot
+/*static*/ void CUiContext::OnInputBindPressed(const char* aIdentifier)
 {
-	float   ScalingFactor            = 1.f;
+	CContext* ctx = CContext::GetContext();
+	CUiContext* uictx = ctx->GetUIContext();
 
-	ImFont* UserFont                 = nullptr;
-	ImFont* Font                     = nullptr;
-	ImFont* FontBig                  = nullptr;
-	ImFont* FontUI                   = nullptr;
+	uictx->OnInputBind(aIdentifier);
+}
 
-	CLocalization* Language          = nullptr;
-	CFontManager* FontManager        = nullptr;
-	Mumble::Identity* MumbleIdentity = nullptr;
-	NexusLinkData_t* NexusLink         = nullptr;
+/*static*/ void CUiContext::OnFontUpdate(const char* aIdentifier, ImFont* aFont)
+{
+	std::string str = aIdentifier;
 
-	void Initialize(CLocalization* aLocalization, CDataLinkApi* aDataLink, CFontManager* aFontManager)
+	if (str == "FONT_DEFAULT")
 	{
-		Language = aLocalization;
-		FontManager = aFontManager;
-		MumbleIdentity = (Mumble::Identity*)aDataLink->GetResource(DL_MUMBLE_LINK_IDENTITY);
-		NexusLink = (NexusLinkData_t*)aDataLink->GetResource(DL_NEXUS_LINK);
+		ImGuiIO& io = ImGui::GetIO();
+		io.FontDefault = aFont; // TODO: This is kind of not needed? The Atlas[0] is used, if this is set to null.
+
+		return;
 	}
 
-	void FontReceiver(const char* aIdentifier, ImFont* aFont)
+	CContext* ctx = CContext::GetContext();
+	CDataLinkApi* dlapi = ctx->GetDataLink();
+
+	Mumble::Identity* mumbleIdentity = static_cast<Mumble::Identity*>(dlapi->GetResource(DL_MUMBLE_LINK_IDENTITY));
+	NexusLinkData_t* nexusLink = static_cast<NexusLinkData_t*>(dlapi->GetResource(DL_NEXUS_LINK));
+
+	/* directly assign the font */
+	switch (mumbleIdentity->UISize)
 	{
-		std::string str = aIdentifier;
-
-		if (str == "FONT_DEFAULT")
+		case Mumble::EUIScale::Small:
 		{
-			UserFont = aFont;
+			if (str == "MENOMONIA_S") { nexusLink->Font = aFont; }
+			else if (str == "MENOMONIA_BIG_S") { nexusLink->FontBig = aFont; }
+			else if (str == "FIRASANS_S") { nexusLink->FontUI = aFont; }
 
-			ImGuiIO& io = ImGui::GetIO();
-			io.FontDefault = UserFont;
+			break;
 		}
-		else
+		default:
+		case Mumble::EUIScale::Normal:
 		{
-			/* directly assign the font */
-			switch (MumbleIdentity->UISize)
-			{
-				case Mumble::EUIScale::Small:
-				{
-					if (str == "MENOMONIA_S") { NexusLink->Font = Font = aFont; }
-					else if (str == "MENOMONIA_BIG_S") { NexusLink->FontBig = FontBig = aFont; }
-					else if (str == "FIRASANS_S") { NexusLink->FontUI = FontUI = aFont; }
+			if (str == "MENOMONIA_N") { nexusLink->Font = aFont; }
+			else if (str == "MENOMONIA_BIG_N") { nexusLink->FontBig = aFont; }
+			else if (str == "FIRASANS_N") { nexusLink->FontUI = aFont; }
 
-					break;
-				}
-				default:
-				case Mumble::EUIScale::Normal:
-				{
-					if (str == "MENOMONIA_N") { NexusLink->Font = Font = aFont; }
-					else if (str == "MENOMONIA_BIG_N") { NexusLink->FontBig = FontBig = aFont; }
-					else if (str == "FIRASANS_N") { NexusLink->FontUI = FontUI = aFont; }
+			break;
+		}
+		case Mumble::EUIScale::Large:
+		{
+			if (str == "MENOMONIA_L") { nexusLink->Font = aFont; }
+			else if (str == "MENOMONIA_BIG_L") { nexusLink->FontBig = aFont; }
+			else if (str == "FIRASANS_L") { nexusLink->FontUI = aFont; }
 
-					break;
-				}
-				case Mumble::EUIScale::Large:
-				{
-					if (str == "MENOMONIA_L") { NexusLink->Font = Font = aFont; }
-					else if (str == "MENOMONIA_BIG_L") { NexusLink->FontBig = FontBig = aFont; }
-					else if (str == "FIRASANS_L") { NexusLink->FontUI = FontUI = aFont; }
+			break;
+		}
+		case Mumble::EUIScale::Larger:
+		{
+			if (str == "MENOMONIA_XL") { nexusLink->Font = aFont; }
+			else if (str == "MENOMONIA_BIG_XL") { nexusLink->FontBig = aFont; }
+			else if (str == "FIRASANS_XL") { nexusLink->FontUI = aFont; }
 
-					break;
-				}
-				case Mumble::EUIScale::Larger:
-				{
-					if (str == "MENOMONIA_XL") { NexusLink->Font = Font = aFont; }
-					else if (str == "MENOMONIA_BIG_XL") { NexusLink->FontBig = FontBig = aFont; }
-					else if (str == "FIRASANS_XL") { NexusLink->FontUI = FontUI = aFont; }
-
-					break;
-				}
-			}
+			break;
 		}
 	}
+}
 
-	void OnUELanguageChanged(void* aEventArgs)
+/*static*/ void CUiContext::OnUELanguageChanged(uint32_t* aLanguage)
+{
+	if (!aLanguage) { return; }
+
+	CContext* ctx = CContext::GetContext();
+	CUiContext* uictx = ctx->GetUIContext();
+	CLocalization* localization = uictx->GetLocalization();
+
+	switch (*aLanguage)
 	{
-		if (!Language)
+		case 0:
 		{
-			return;
+			localization->SetLanguage("en");
+			break;
 		}
-
-		int langId = *(int*)aEventArgs;
-
-		switch (langId)
+		case 2:
 		{
-			case 0:
-				Language->SetLanguage("en");
-				break;
-			case 2:
-				Language->SetLanguage("fr");
-				break;
-			case 3:
-				Language->SetLanguage("de");
-				break;
-			case 4:
-				Language->SetLanguage("es");
-				break;
-			case 5:
-				Language->SetLanguage("cn");
-				break;
+			localization->SetLanguage("fr");
+			break;
+		}
+		case 3:
+		{
+			localization->SetLanguage("de");
+			break;
+		}
+		case 4:
+		{
+			localization->SetLanguage("es");
+			break;
+		}
+		case 5:
+		{
+			localization->SetLanguage("cn");
+			break;
 		}
 	}
+}
 
-	void OnMumbleIdentityChanged(void* aEventArgs)
+/*static*/ void CUiContext::OnMumbleIdentityChanged(void* aEventArgs)
+{
+	CContext* ctx = CContext::GetContext();
+	CDataLinkApi* dlapi = ctx->GetDataLink();
+	CSettings* settingsctx = ctx->GetSettingsCtx();
+	CUiContext* uictx = ctx->GetUIContext();
+	CFontManager* fontmgr = uictx->GetFontManager();
+
+	Mumble::Identity* mumbleIdentity = static_cast<Mumble::Identity*>(dlapi->GetResource(DL_MUMBLE_LINK_IDENTITY));
+	NexusLinkData_t* nexusLink = static_cast<NexusLinkData_t*>(dlapi->GetResource(DL_NEXUS_LINK));
+
+	float currScaling = Mumble::GetScalingFactor(mumbleIdentity->UISize);
+	if (currScaling != settingsctx->Get<float>(OPT_LASTUISCALE, 1.0f) && nexusLink->IsGameplay)
 	{
-		if (!MumbleIdentity || !NexusLink)
-		{
-			return;
-		}
+		ImGuiIO& io = ImGui::GetIO();
 
-		CContext* ctx = CContext::GetContext();
-		CSettings* settingsctx = ctx->GetSettingsCtx();
+		settingsctx->Set(OPT_LASTUISCALE, currScaling);
 
-		float currScaling = Mumble::GetScalingFactor(MumbleIdentity->UISize);
-		if (currScaling != settingsctx->Get<float>(OPT_LASTUISCALE, 1.0f) && NexusLink->IsGameplay)
-		{
-			ImGuiIO& io = ImGui::GetIO();
-
-			settingsctx->Set(OPT_LASTUISCALE, currScaling);
-
-			CUiContext* uictx = ctx->GetUIContext();
-			uictx->UpdateScaling();
-		}
-
-		if (!FontManager)
-		{
-			return;
-		}
-
-		switch (MumbleIdentity->UISize)
-		{
-			case Mumble::EUIScale::Small:
-			{
-				NexusLink->Font = Font = FontManager->Get("MENOMONIA_S")->Pointer;
-				NexusLink->FontBig = FontBig = FontManager->Get("MENOMONIA_BIG_S")->Pointer;
-				NexusLink->FontUI = FontUI = FontManager->Get("FIRASANS_S")->Pointer;
-
-				break;
-			}
-			default:
-			case Mumble::EUIScale::Normal:
-			{
-				NexusLink->Font = Font = FontManager->Get("MENOMONIA_N")->Pointer;
-				NexusLink->FontBig = FontBig = FontManager->Get("MENOMONIA_BIG_N")->Pointer;
-				NexusLink->FontUI = FontUI = FontManager->Get("FIRASANS_N")->Pointer;
-
-				break;
-			}
-			case Mumble::EUIScale::Large:
-			{
-				NexusLink->Font = Font = FontManager->Get("MENOMONIA_L")->Pointer;
-				NexusLink->FontBig = FontBig = FontManager->Get("MENOMONIA_BIG_L")->Pointer;
-				NexusLink->FontUI = FontUI = FontManager->Get("FIRASANS_L")->Pointer;
-
-				break;
-			}
-			case Mumble::EUIScale::Larger:
-			{
-				NexusLink->Font = Font = FontManager->Get("MENOMONIA_XL")->Pointer;
-				NexusLink->FontBig = FontBig = FontManager->Get("MENOMONIA_BIG_XL")->Pointer;
-				NexusLink->FontUI = FontUI = FontManager->Get("FIRASANS_XL")->Pointer;
-
-				break;
-			}
-		}
+		uictx->UpdateScaling();
 	}
 
-	void OnInputBind(const char* aIdentifier)
+	switch (mumbleIdentity->UISize)
 	{
-		CContext* ctx = CContext::GetContext();
-		CUiContext* uictx = ctx->GetUIContext();
-
-		assert(uictx);
-
-		uictx->OnInputBind(aIdentifier);
-	}
-
-	void OnVolatileAddonsDisabled(void* aEventData)
-	{
-		CContext* ctx = CContext::GetContext();
-		CUiContext* uictx = ctx->GetUIContext();
-		CSettings* settingsctx = ctx->GetSettingsCtx();
-
-		assert(uictx);
-		assert(settingsctx);
-
-		if (settingsctx->Get<bool>(OPT_SHOWADDONSWINDOWAFTERDUU, false))
+		case Mumble::EUIScale::Small:
 		{
-			uictx->OnInputBind(KB_ADDONS);
+			nexusLink->Font = fontmgr->Get("MENOMONIA_S")->Pointer;
+			nexusLink->FontBig = fontmgr->Get("MENOMONIA_BIG_S")->Pointer;
+			nexusLink->FontUI = fontmgr->Get("FIRASANS_S")->Pointer;
+			break;
+		}
+		default:
+		case Mumble::EUIScale::Normal:
+		{
+			nexusLink->Font = fontmgr->Get("MENOMONIA_N")->Pointer;
+			nexusLink->FontBig = fontmgr->Get("MENOMONIA_BIG_N")->Pointer;
+			nexusLink->FontUI = fontmgr->Get("FIRASANS_N")->Pointer;
+			break;
+		}
+		case Mumble::EUIScale::Large:
+		{
+			nexusLink->Font = fontmgr->Get("MENOMONIA_L")->Pointer;
+			nexusLink->FontBig = fontmgr->Get("MENOMONIA_BIG_L")->Pointer;
+			nexusLink->FontUI = fontmgr->Get("FIRASANS_L")->Pointer;
+			break;
+		}
+		case Mumble::EUIScale::Larger:
+		{
+			nexusLink->Font = fontmgr->Get("MENOMONIA_XL")->Pointer;
+			nexusLink->FontBig = fontmgr->Get("MENOMONIA_BIG_XL")->Pointer;
+			nexusLink->FontUI = fontmgr->Get("FIRASANS_XL")->Pointer;
+			break;
 		}
 	}
+}
 
-	void OnInputBindUpdate(void* aEventData)
+/*static*/ void CUiContext::OnVolatileAddonsDisabled(void* aEventData)
+{
+	CContext* ctx = CContext::GetContext();
+	CUiContext* uictx = ctx->GetUIContext();
+	CSettings* settingsctx = ctx->GetSettingsCtx();
+
+	if (settingsctx->Get<bool>(OPT_SHOWADDONSWINDOWAFTERDUU, false))
 	{
-		CContext* ctx = CContext::GetContext();
-		CUiContext* uictx = ctx->GetUIContext();
+		uictx->OnInputBind(KB_ADDONS);
+	}
+}
 
-		if (uictx)
-		{
-			uictx->Invalidate();
-		}
+/*static*/ void CUiContext::OnInputBindUpdate(void* aEventData)
+{
+	CContext* ctx = CContext::GetContext();
+	CUiContext* uictx = ctx->GetUIContext();
+
+	if (uictx)
+	{
+		uictx->Invalidate();
 	}
 }
 
@@ -267,12 +243,10 @@ CUiContext::CUiContext(RenderContext_t* aRenderContext, CLogApi* aLogger, CTextu
 	this->FontManager    = new CFontManager(this->Language);
 	this->EscapeClose    = new CEscapeClosing();
 
-	UIRoot::Initialize(this->Language, this->DataLink, this->FontManager);
-
-	this->EventApi->Subscribe("EV_MUMBLE_IDENTITY_UPDATED",            UIRoot::OnMumbleIdentityChanged);
-	this->EventApi->Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", UIRoot::OnUELanguageChanged);
-	this->EventApi->Subscribe("EV_VOLATILE_ADDON_DISABLED",            UIRoot::OnVolatileAddonsDisabled);
-	this->EventApi->Subscribe("EV_INPUTBIND_UPDATED",                  UIRoot::OnInputBindUpdate);
+	this->EventApi->Subscribe("EV_MUMBLE_IDENTITY_UPDATED",            CUiContext::OnMumbleIdentityChanged);
+	this->EventApi->Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", reinterpret_cast<EVENT_CONSUME>(CUiContext::OnUELanguageChanged));
+	this->EventApi->Subscribe("EV_VOLATILE_ADDON_DISABLED",            CUiContext::OnVolatileAddonsDisabled);
+	this->EventApi->Subscribe("EV_INPUTBIND_UPDATED",                  CUiContext::OnInputBindUpdate);
 
 	CAddonsWindow*  addonsWnd  = new CAddonsWindow();
 	COptionsWindow* optionsWnd = new COptionsWindow();
@@ -291,12 +265,12 @@ CUiContext::CUiContext(RenderContext_t* aRenderContext, CLogApi* aLogger, CTextu
 	this->MainWindow->AddWindow(aboutWnd);
 
 	/* register InputBinds */
-	this->InputBindApi->Register(KB_MENU,          EIbHandlerType::DownAsync, UIRoot::OnInputBind, "CTRL+O");
-	this->InputBindApi->Register(KB_ADDONS,        EIbHandlerType::DownAsync, UIRoot::OnInputBind, "(null)");
-	this->InputBindApi->Register(KB_OPTIONS,       EIbHandlerType::DownAsync, UIRoot::OnInputBind, "(null)");
-	this->InputBindApi->Register(KB_LOG,           EIbHandlerType::DownAsync, UIRoot::OnInputBind, "(null)");
-	this->InputBindApi->Register(KB_DEBUG,         EIbHandlerType::DownAsync, UIRoot::OnInputBind, "(null)");
-	this->InputBindApi->Register(KB_TOGGLEHIDEUI,  EIbHandlerType::DownAsync, UIRoot::OnInputBind, "CTRL+H");
+	this->InputBindApi->Register(KB_MENU,          EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "CTRL+O");
+	this->InputBindApi->Register(KB_ADDONS,        EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "(null)");
+	this->InputBindApi->Register(KB_OPTIONS,       EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "(null)");
+	this->InputBindApi->Register(KB_LOG,           EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "(null)");
+	this->InputBindApi->Register(KB_DEBUG,         EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "(null)");
+	this->InputBindApi->Register(KB_TOGGLEHIDEUI,  EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "CTRL+H");
 
 	this->EscapeClose->Register("Nexus", this->MainWindow->GetVisibleStatePtr());
 
@@ -392,7 +366,7 @@ void CUiContext::Render()
 	}
 	if (this->FontManager->Advance())
 	{
-		UIRoot::OnMumbleIdentityChanged(nullptr);
+		CUiContext::OnMumbleIdentityChanged(nullptr);
 		this->Shutdown();
 	}
 
@@ -660,7 +634,7 @@ void CUiContext::OnInputBind(std::string aIdentifier)
 
 void CUiContext::UpdateScaling()
 {
-	NexusLinkData_t* nexuslink = (NexusLinkData_t*)this->DataLink->GetResource(DL_NEXUS_LINK);
+	NexusLinkData_t* nexuslink = static_cast<NexusLinkData_t*>(this->DataLink->GetResource(DL_NEXUS_LINK));
 	
 	ImGuiIO& io = ImGui::GetIO();
 
@@ -684,16 +658,11 @@ void CUiContext::UpdateScaling()
 		settingsctx->Set<float>(OPT_LASTUISCALE, 1.0f);
 	}
 
-	UIRoot::ScalingFactor =
+	nexuslink->Scaling =
 		settingsctx->Get<float>(OPT_LASTUISCALE, 1.0f) *
 		/* settingsctx->Get<float>(OPT_GLOBALSCALE, 1.0f) * */
 		io.FontGlobalScale *
 		min(min(renderer->Window.Width, 1024.0f) / 1024.0f, min(renderer->Window.Height, 768.0f) / 768.0f);
-
-	if (nexuslink)
-	{
-		nexuslink->Scaling = UIRoot::ScalingFactor;
-	}
 }
 
 CLocalization* CUiContext::GetLocalization()
@@ -765,12 +734,12 @@ void CUiContext::LoadFonts()
 	if (!fontFile.empty() && std::filesystem::exists(Index(EPath::DIR_FONTS) / fontFile))
 	{
 		fontPath = Index(EPath::DIR_FONTS) / fontFile;
-		this->FontManager->ReplaceFont("FONT_DEFAULT", storedFontSz, fontPath.string().c_str(), UIRoot::FontReceiver, nullptr);
+		this->FontManager->ReplaceFont("FONT_DEFAULT", storedFontSz, fontPath.string().c_str(), CUiContext::OnFontUpdate, nullptr);
 		hasUserFont = true;
 	}
 
 	/* add default font for monospace */
-	this->FontManager->AddDefaultFont(UIRoot::FontReceiver);
+	this->FontManager->AddDefaultFont(CUiContext::OnFontUpdate);
 
 	if (!hasUserFont)
 	{
@@ -781,36 +750,36 @@ void CUiContext::LoadFonts()
 	config.MergeMode = true;
 
 	/* small UI*/
-	this->FontManager->ReplaceFont("MENOMONIA_S", 16.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_S_MERGE", 16.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
-	this->FontManager->ReplaceFont("MENOMONIA_BIG_S", 22.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_S_MERGE", 22.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
-	this->FontManager->ReplaceFont("FIRASANS_S", 15.0f, RES_FONT_FIRASANS, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_S_MERGE", 15.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
+	this->FontManager->ReplaceFont("MENOMONIA_S", 16.0f, RES_FONT_MENOMONIA, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_S_MERGE", 16.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
+	this->FontManager->ReplaceFont("MENOMONIA_BIG_S", 22.0f, RES_FONT_MENOMONIA, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_S_MERGE", 22.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
+	this->FontManager->ReplaceFont("FIRASANS_S", 15.0f, RES_FONT_FIRASANS, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_S_MERGE", 15.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
 
 	/* normal UI*/
-	this->FontManager->ReplaceFont("MENOMONIA_N", 18.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_N_MERGE", 18.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
-	this->FontManager->ReplaceFont("MENOMONIA_BIG_N", 24.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_N_MERGE", 24.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
-	this->FontManager->ReplaceFont("FIRASANS_N", 16.0f, RES_FONT_FIRASANS, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_N_MERGE", 16.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
+	this->FontManager->ReplaceFont("MENOMONIA_N", 18.0f, RES_FONT_MENOMONIA, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_N_MERGE", 18.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
+	this->FontManager->ReplaceFont("MENOMONIA_BIG_N", 24.0f, RES_FONT_MENOMONIA, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_N_MERGE", 24.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
+	this->FontManager->ReplaceFont("FIRASANS_N", 16.0f, RES_FONT_FIRASANS, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_N_MERGE", 16.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
 
 	/* large UI*/
-	this->FontManager->ReplaceFont("MENOMONIA_L", 20.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_L_MERGE", 20.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
-	this->FontManager->ReplaceFont("MENOMONIA_BIG_L", 26.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_L_MERGE", 26.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
-	this->FontManager->ReplaceFont("FIRASANS_L", 17.5f, RES_FONT_FIRASANS, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_L_MERGE", 17.5f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
+	this->FontManager->ReplaceFont("MENOMONIA_L", 20.0f, RES_FONT_MENOMONIA, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_L_MERGE", 20.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
+	this->FontManager->ReplaceFont("MENOMONIA_BIG_L", 26.0f, RES_FONT_MENOMONIA, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_L_MERGE", 26.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
+	this->FontManager->ReplaceFont("FIRASANS_L", 17.5f, RES_FONT_FIRASANS, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_L_MERGE", 17.5f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
 
 	/* larger UI*/
-	this->FontManager->ReplaceFont("MENOMONIA_XL", 22.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_XL_MERGE", 22.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
-	this->FontManager->ReplaceFont("MENOMONIA_BIG_XL", 28.0f, RES_FONT_MENOMONIA, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_XL_MERGE", 28.0f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
-	this->FontManager->ReplaceFont("FIRASANS_XL", 19.5f, RES_FONT_FIRASANS, ctx->GetModule(), UIRoot::FontReceiver, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_XL_MERGE", 19.5f, fontPath.string().c_str(), UIRoot::FontReceiver, &config); }
+	this->FontManager->ReplaceFont("MENOMONIA_XL", 22.0f, RES_FONT_MENOMONIA, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_XL_MERGE", 22.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
+	this->FontManager->ReplaceFont("MENOMONIA_BIG_XL", 28.0f, RES_FONT_MENOMONIA, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_XL_MERGE", 28.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
+	this->FontManager->ReplaceFont("FIRASANS_XL", 19.5f, RES_FONT_FIRASANS, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_XL_MERGE", 19.5f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
 }
 
 void ApplyDefaultStyle()

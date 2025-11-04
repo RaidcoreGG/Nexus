@@ -55,66 +55,47 @@ enum class EUIStyle
 };
 
 ///----------------------------------------------------------------------------------------------------
-/// UIRoot Namespace
-///----------------------------------------------------------------------------------------------------
-namespace UIRoot
-{
-	extern float   ScalingFactor; /* DPI aware UI scaling factor matching ingame behavior. */
-
-	extern ImFont* UserFont;      /* custom user font or default font */
-	extern ImFont* Font;          /* Menomonia */
-	extern ImFont* FontBig;       /* Menomonia, but slightly bigger */
-	extern ImFont* FontUI;        /* Fira Sans */
-
-	///----------------------------------------------------------------------------------------------------
-	/// Initialize:
-	/// 	Initializes the UIRoot for static functions.
-	///----------------------------------------------------------------------------------------------------
-	void Initialize(CLocalization* aLocalization, CDataLinkApi* aDataLink, CFontManager* aFontManager);
-
-	///----------------------------------------------------------------------------------------------------
-	/// FontReceiver:
-	/// 	Receives fonts.
-	///----------------------------------------------------------------------------------------------------
-	void FontReceiver(const char* aIdentifier, ImFont* aFont);
-
-	///----------------------------------------------------------------------------------------------------
-	/// OnUELanguageChanged:
-	/// 	Receives runtime language updates from unofficial extras.
-	///----------------------------------------------------------------------------------------------------
-	void OnUELanguageChanged(void* aEventArgs);
-
-	///----------------------------------------------------------------------------------------------------
-	/// OnMumbleIdentityChanged:
-	/// 	Changes fonts and UI scale when the game settings are changed.
-	///----------------------------------------------------------------------------------------------------
-	void OnMumbleIdentityChanged(void* aEventArgs);
-
-	///----------------------------------------------------------------------------------------------------
-	/// OnInputBind:
-	/// 	Receives input bind invocations.
-	///----------------------------------------------------------------------------------------------------
-	void OnInputBind(const char* aIdentifier);
-
-	///----------------------------------------------------------------------------------------------------
-	/// OnVolatileAddonsDisabled:
-	/// 	Receiver for volatile addons disabled event to bring up the addons window.
-	///----------------------------------------------------------------------------------------------------
-	void OnVolatileAddonsDisabled(void* aEventData);
-
-	///----------------------------------------------------------------------------------------------------
-	/// OnInputBindUpdate:
-	/// 	Reacts to input bind changes, to trigger a UI refresh.
-	///----------------------------------------------------------------------------------------------------
-	void OnInputBindUpdate(void* aEventData);
-}
-
-///----------------------------------------------------------------------------------------------------
 /// CUiContext Class
 ///----------------------------------------------------------------------------------------------------
 class CUiContext : public CUiRender
 {
 	public:
+	///----------------------------------------------------------------------------------------------------
+	/// OnInputBindPressed:
+	/// 	Receives input bind invocations.
+	///----------------------------------------------------------------------------------------------------
+	static void OnInputBindPressed(const char* aIdentifier);
+
+	///----------------------------------------------------------------------------------------------------
+	/// OnFontUpdate:
+	/// 	Receives fonts.
+	///----------------------------------------------------------------------------------------------------
+	static void OnFontUpdate(const char* aIdentifier, ImFont* aFont);
+
+	///----------------------------------------------------------------------------------------------------
+	/// OnUELanguageChanged:
+	/// 	Receives runtime language updates from unofficial extras.
+	///----------------------------------------------------------------------------------------------------
+	static void OnUELanguageChanged(uint32_t* aLanguage);
+
+	///----------------------------------------------------------------------------------------------------
+	/// OnMumbleIdentityChanged:
+	/// 	Changes fonts and UI scale when the game settings are changed.
+	///----------------------------------------------------------------------------------------------------
+	static void OnMumbleIdentityChanged(void* aEventArgs);
+
+	///----------------------------------------------------------------------------------------------------
+	/// OnVolatileAddonsDisabled:
+	/// 	Receiver for volatile addons disabled event to bring up the addons window.
+	///----------------------------------------------------------------------------------------------------
+	static void OnVolatileAddonsDisabled(void* aEventData);
+
+	///----------------------------------------------------------------------------------------------------
+	/// OnInputBindUpdate:
+	/// 	Reacts to input bind changes, to trigger a UI refresh.
+	///----------------------------------------------------------------------------------------------------
+	static void OnInputBindUpdate(void* aEventData);
+
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------

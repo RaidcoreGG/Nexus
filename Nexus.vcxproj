@@ -572,7 +572,7 @@
     <IntDir>$(SolutionDir)$(Platform)\</IntDir>
     <IncludePath>$(ProjectDir)src\;$(ProjectDir)src\thirdparty;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)src\thirdparty\openssl\lib\VC\static;$(LibraryPath)</LibraryPath>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

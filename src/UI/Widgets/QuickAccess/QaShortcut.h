@@ -13,13 +13,15 @@
 #include <string>
 #include <vector>
 
+#include "Core/NexusLink.h"
 #include "Engine/Cleanup/RefCleanerBase.h"
+#include "Engine/DataLink/DlApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Loader/Loader.h"
 #include "Engine/Textures/TxLoader.h"
 #include "Engine/Textures/TxTexture.h"
-#include "UI/UiFuncDefs.h"
 #include "UI/Services/Localization/LoclApi.h"
+#include "UI/UiFuncDefs.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// ContextItem_t Struct
@@ -120,7 +122,9 @@ class CShortcutIcon : public virtual IRefCleaner
 	CInputBindApi*                       InputBindApi   = nullptr;
 	CTextureLoader*                      TextureService = nullptr;
 	CLoader*                             Loader         = nullptr;
+	CDataLinkApi*                        DataLink       = nullptr;
 	CLocalization*                       Language       = nullptr;
+	NexusLinkData_t*                     NexusLink      = nullptr;
 
 	bool                                 IsValid        = false;
 	bool                                 IsSuppressed   = false;

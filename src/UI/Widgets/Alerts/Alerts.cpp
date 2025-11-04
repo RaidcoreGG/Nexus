@@ -40,7 +40,7 @@ void CAlerts::Render()
 		RenderContext_t* renderer = ctx->GetRendererCtx();
 
 		/* center horizontally */
-		ImGui::SetNextWindowPos(ImVec2((renderer->Window.Width - width) / 2.0f, 230.0f * UIRoot::ScalingFactor));
+		ImGui::SetNextWindowPos(ImVec2((renderer->Window.Width - width) / 2.0f, 230.0f * this->NexusLink->Scaling));
 		if (ImGui::Begin("##Alerts", (bool*)0, Flags))
 		{
 			ImColor msgCol;
