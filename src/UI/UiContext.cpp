@@ -277,8 +277,6 @@ CUiContext::CUiContext(RenderContext_t* aRenderContext, CLogApi* aLogger, CTextu
 	this->UnpackLocales();
 	this->LoadSettings();
 	this->LoadFonts();
-
-	CRefCleanerContext::Get()->Register("CUiContext", this);
 }
 
 CUiContext::~CUiContext()
