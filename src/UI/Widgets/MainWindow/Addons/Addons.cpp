@@ -1043,7 +1043,7 @@ void CAddonsWindow::PopulateAddons()
 		AddonListing_t addonlisting{};
 		addonlisting.Addon = dynamic_cast<CAddon*>(addon);
 
-		for (GUI_RENDER renderCb : uictx->GetOptionsCallbacks())
+		for (GUI_RENDER renderCb : uictx->GetRenderCallbacks(ERenderType::OptionsRender))
 		{
 			IAddon* owner = loader->GetOwner(renderCb);
 			if (addon == owner)

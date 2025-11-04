@@ -17,7 +17,7 @@
 #include "Engine/Logging/LogEnum.h"
 #include "Engine/Textures/TxFuncDefs.h"
 #include "GW2/Inputs/GameBinds/GbEnum.h"
-#include "UI/FuncDefs.h"
+#include "UI/UiFuncDefs.h"
 #include "UI/Services/Fonts/FuncDefs.h"
 
 ///----------------------------------------------------------------------------------------------------

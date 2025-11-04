@@ -22,7 +22,7 @@
 #include "Engine/Inputs/RawInput/RiFuncDefs.h"
 #include "Engine/Logging/LogFuncDefs.h"
 #include "Engine/Textures/TxFuncDefs.h"
-#include "UI/FuncDefs.h"
+#include "UI/UiFuncDefs.h"
 #include "UI/Widgets/QuickAccess/QaFuncDefs.h"
 
 ///----------------------------------------------------------------------------------------------------

@@ -23,7 +23,7 @@
 #include "Engine/Logging/LogFuncDefs.h"
 #include "Engine/Textures/TxFuncDefs.h"
 #include "GW2/Inputs/GameBinds/GbFuncDefs.h"
-#include "UI/FuncDefs.h"
+#include "UI/UiFuncDefs.h"
 #include "UI/Services/Fonts/FuncDefs.h"
 #include "UI/Services/Localization/LoclFuncDefs.h"
 #include "UI/Services/QoL/FuncDefs.h"

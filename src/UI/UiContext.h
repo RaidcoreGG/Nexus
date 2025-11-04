@@ -21,8 +21,6 @@
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Renderer/RdrContext.h"
 #include "Engine/Textures/TxLoader.h"
-#include "ERenderType.h"
-#include "FuncDefs.h"
 #include "GW2/Mumble/MblReader.h"
 #include "UI/Services/Fonts/FontManager.h"
 #include "UI/Services/Localization/LoclApi.h"
@@ -31,6 +29,7 @@
 #include "UI/Widgets/EULA/LicenseAgreementModal.h"
 #include "UI/Widgets/MainWindow/MainWindow.h"
 #include "UI/Widgets/QuickAccess/QuickAccess.h"
+#include "UiRender.h"
 #include "Util/Inputs.h"
 
 constexpr const char* CH_UICONTEXT       = "UI Context";
@@ -113,7 +112,7 @@ namespace UIRoot
 ///----------------------------------------------------------------------------------------------------
 /// CUiContext Class
 ///----------------------------------------------------------------------------------------------------
-class CUiContext : public virtual IRefCleaner
+class CUiContext : public CUiRender
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -165,24 +164,6 @@ class CUiContext : public virtual IRefCleaner
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Register:
-	/// 	Registers the provided Render callback.
-	///----------------------------------------------------------------------------------------------------
-	void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback);
-
-	///----------------------------------------------------------------------------------------------------
-	/// Deregister:
-	/// 	Deregisters the provided Render callback.
-	///----------------------------------------------------------------------------------------------------
-	void Deregister(GUI_RENDER aRenderCallback);
-
-	///----------------------------------------------------------------------------------------------------
-	/// CleanupRefs:
-	/// 	Removes all registered render callbacks and close-on-escape hooks that match the address space.
-	///----------------------------------------------------------------------------------------------------
-	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
-
-	///----------------------------------------------------------------------------------------------------
 	/// OnInputBind:
 	/// 	Invokes an input bind.
 	///----------------------------------------------------------------------------------------------------
@@ -223,12 +204,6 @@ class CUiContext : public virtual IRefCleaner
 	/// 	Returns the escape-closing service.
 	///----------------------------------------------------------------------------------------------------
 	CEscapeClosing* GetEscapeClosingService();
-
-	///----------------------------------------------------------------------------------------------------
-	/// GetOptionsCallbacks:
-	/// 	Returns a copy of the options callbacks.
-	///----------------------------------------------------------------------------------------------------
-	std::vector<GUI_RENDER> GetOptionsCallbacks();
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetInputBinds:
@@ -284,12 +259,6 @@ class CUiContext : public virtual IRefCleaner
 	/* UI Services */
 	CFontManager*                      FontManager;
 	CEscapeClosing*                    EscapeClose;
-
-	mutable std::mutex                 Mutex;
-	std::vector<GUI_RENDER>            RegistryPreRender;
-	std::vector<GUI_RENDER>            RegistryRender;
-	std::vector<GUI_RENDER>            RegistryPostRender;
-	std::vector<GUI_RENDER>            RegistryOptionsRender;
 
 	mutable std::mutex                 DisplayBindsMutex;
 	std::vector<InputBindCategory_t>     DisplayInputBinds;

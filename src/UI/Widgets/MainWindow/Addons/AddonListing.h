@@ -14,7 +14,7 @@
 #include "Core/Addons/Addon.h"
 #include "Core/Addons/Library/LibAddon.h"
 #include "UI/DisplayBinds.h"
-#include "UI/FuncDefs.h"
+#include "UI/UiFuncDefs.h"
 #include "Util/Strings.h"
 
 using ArcExtensionDef_t = ArcDPS::ExtensionDef_t;

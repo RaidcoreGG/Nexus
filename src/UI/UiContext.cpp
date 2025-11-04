@@ -384,8 +384,6 @@ void CUiContext::Render()
 {
 	this->Initialize();
 
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
 	/* preload localization and font changes */
 	if (this->Language->Advance())
 	{
@@ -426,8 +424,10 @@ void CUiContext::Render()
 
 	this->AreModsDown = (this->Mods & actualMods) == this->Mods;
 
+	const std::lock_guard<std::mutex> lock(this->RenderMutex);
+
 	/* pre-render callbacks */
-	for (GUI_RENDER callback : this->RegistryPreRender)
+	for (GUI_RENDER callback : this->GetRenderCallbacks(ERenderType::PreRender))
 	{
 		if (callback) { callback(); }
 	}
@@ -449,7 +449,7 @@ void CUiContext::Render()
 			if (this->IsVisible)
 			{
 				/* draw addons*/
-				for (GUI_RENDER callback : this->RegistryRender)
+				for (GUI_RENDER callback : this->GetRenderCallbacks(ERenderType::Render))
 				{
 					if (callback) { callback(); }
 				}
@@ -494,7 +494,7 @@ void CUiContext::Render()
 	}
 
 	/* post-render callbacks */
-	for (GUI_RENDER callback : this->RegistryPostRender)
+	for (GUI_RENDER callback : this->GetRenderCallbacks(ERenderType::PostRender))
 	{
 		if (callback) { callback(); }
 	}
@@ -630,80 +630,6 @@ UINT CUiContext::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return uMsg;
 }
 
-void CUiContext::Register(ERenderType aRenderType, GUI_RENDER aRenderCallback)
-{
-	if (!aRenderCallback) { return; }
-
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	switch (aRenderType)
-	{
-		case ERenderType::PreRender:
-			this->RegistryPreRender.push_back(aRenderCallback);
-			break;
-		case ERenderType::Render:
-			this->RegistryRender.push_back(aRenderCallback);
-			break;
-		case ERenderType::PostRender:
-			this->RegistryPostRender.push_back(aRenderCallback);
-			break;
-		case ERenderType::OptionsRender:
-			this->RegistryOptionsRender.push_back(aRenderCallback);
-			break;
-	}
-}
-
-void CUiContext::Deregister(GUI_RENDER aRenderCallback)
-{
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	this->RegistryPreRender.erase(std::remove(this->RegistryPreRender.begin(), this->RegistryPreRender.end(), aRenderCallback), this->RegistryPreRender.end());
-	this->RegistryRender.erase(std::remove(this->RegistryRender.begin(), this->RegistryRender.end(), aRenderCallback), this->RegistryRender.end());
-	this->RegistryPostRender.erase(std::remove(this->RegistryPostRender.begin(), this->RegistryPostRender.end(), aRenderCallback), this->RegistryPostRender.end());
-	this->RegistryOptionsRender.erase(std::remove(this->RegistryOptionsRender.begin(), this->RegistryOptionsRender.end(), aRenderCallback), this->RegistryOptionsRender.end());
-}
-
-int CUiContext::CleanupRefs(void* aStartAddress, void* aEndAddress)
-{
-	int refCounter = 0;
-
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-	for (GUI_RENDER renderCb : this->RegistryPreRender)
-	{
-		if (renderCb >= aStartAddress && renderCb <= aEndAddress)
-		{
-			this->RegistryPreRender.erase(std::remove(this->RegistryPreRender.begin(), this->RegistryPreRender.end(), renderCb), this->RegistryPreRender.end());
-			refCounter++;
-		}
-	}
-	for (GUI_RENDER renderCb : this->RegistryRender)
-	{
-		if (renderCb >= aStartAddress && renderCb <= aEndAddress)
-		{
-			this->RegistryRender.erase(std::remove(this->RegistryRender.begin(), this->RegistryRender.end(), renderCb), this->RegistryRender.end());
-			refCounter++;
-		}
-	}
-	for (GUI_RENDER renderCb : this->RegistryPostRender)
-	{
-		if (renderCb >= aStartAddress && renderCb <= aEndAddress)
-		{
-			RegistryPostRender.erase(std::remove(RegistryPostRender.begin(), RegistryPostRender.end(), renderCb), RegistryPostRender.end());
-			refCounter++;
-		}
-	}
-	for (GUI_RENDER renderCb : RegistryOptionsRender)
-	{
-		if (renderCb >= aStartAddress && renderCb <= aEndAddress)
-		{
-			this->RegistryOptionsRender.erase(std::remove(this->RegistryOptionsRender.begin(), this->RegistryOptionsRender.end(), renderCb), this->RegistryOptionsRender.end());
-			refCounter++;
-		}
-	}
-
-	return refCounter;
-}
-
 void CUiContext::OnInputBind(std::string aIdentifier)
 {
 	if (aIdentifier == KB_TOGGLEHIDEUI)
@@ -793,13 +719,6 @@ CFontManager* CUiContext::GetFontManager()
 CEscapeClosing* CUiContext::GetEscapeClosingService()
 {
 	return this->EscapeClose;
-}
-
-std::vector<GUI_RENDER> CUiContext::GetOptionsCallbacks()
-{
-	// no lock here, only safe to call from within render callbacks
-	//const std::lock_guard<std::mutex> lock(this->Mutex);
-	return this->RegistryOptionsRender;
 }
 
 std::vector<InputBindCategory_t> CUiContext::GetInputBinds()

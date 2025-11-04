@@ -25,7 +25,7 @@
 #include "QaEnum.h"
 #include "QaShortcut.h"
 #include "UI/Controls/CtlWindow.h"
-#include "UI/FuncDefs.h"
+#include "UI/UiFuncDefs.h"
 #include "UI/Services/Localization/LoclApi.h"
 
 constexpr const char* CH_QUICKACCESS             = "Quick Access";

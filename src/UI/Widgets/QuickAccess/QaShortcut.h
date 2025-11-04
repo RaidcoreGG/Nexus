@@ -18,7 +18,7 @@
 #include "Engine/Loader/Loader.h"
 #include "Engine/Textures/TxLoader.h"
 #include "Engine/Textures/TxTexture.h"
-#include "UI/FuncDefs.h"
+#include "UI/UiFuncDefs.h"
 #include "UI/Services/Localization/LoclApi.h"
 
 ///----------------------------------------------------------------------------------------------------
