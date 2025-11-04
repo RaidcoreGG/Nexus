@@ -41,19 +41,6 @@ constexpr const char* KB_DEBUG           = "KB_DEBUG";
 constexpr const char* KB_MUMBLEOVERLAY   = "KB_MUMBLEOVERLAY";
 constexpr const char* KB_TOGGLEHIDEUI    = "KB_TOGGLEHIDEUI";
 
-enum class EUIStyle
-{
-	User,
-	Nexus,
-	ImGui_Classic,
-	ImGui_Light,
-	ImGui_Dark,
-	ArcDPS_Default,
-	ArcDPS_Current, /* If available. */
-	File,
-	Code
-};
-
 ///----------------------------------------------------------------------------------------------------
 /// CUiContext Class
 ///----------------------------------------------------------------------------------------------------
