@@ -114,7 +114,7 @@ class CInputBindApi : public CInputBindCapture, public virtual IRefCleaner
 	/// CleanupRefs:
 	/// 	Removes all InputBindHandlers that are within the provided address space.
 	///----------------------------------------------------------------------------------------------------
-	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
+	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetRegistry:

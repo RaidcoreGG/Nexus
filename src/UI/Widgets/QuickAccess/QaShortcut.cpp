@@ -242,9 +242,9 @@ std::map<std::string, ContextItem_t> CShortcutIcon::GetContextMenuItems() const
 	return this->ContextItems;
 }
 
-int CShortcutIcon::CleanupRefs(void* aStartAddress, void* aEndAddress)
+uint32_t CShortcutIcon::CleanupRefs(void* aStartAddress, void* aEndAddress)
 {
-	int refCounter = 0;
+	uint32_t refCounter = 0;
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 

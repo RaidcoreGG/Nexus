@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <string>
 
 ///----------------------------------------------------------------------------------------------------
@@ -30,5 +31,5 @@ class IRefCleaner
 	/// CleanupRefs:
 	/// 	Removes any reference matching the provided address space.
 	///----------------------------------------------------------------------------------------------------
-	virtual int CleanupRefs(void* aStartAddress, void* aEndAddress) = 0;
+	virtual uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) = 0;
 };

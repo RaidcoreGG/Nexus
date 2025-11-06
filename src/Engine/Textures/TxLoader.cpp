@@ -331,9 +331,9 @@ std::map<std::string, QueuedTexture_t> CTextureLoader::GetQueuedTextures() const
 	return this->QueuedTextures;
 }
 
-int CTextureLoader::CleanupRefs(void* aStartAddress, void* aEndAddress)
+uint32_t CTextureLoader::CleanupRefs(void* aStartAddress, void* aEndAddress)
 {
-	int refCounter = 0;
+	uint32_t refCounter = 0;
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 

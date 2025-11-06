@@ -126,7 +126,7 @@ class CFontManager : public virtual IRefCleaner
 	/// CleanupRefs:
 	/// 	Removes all unreleased references in the given address space.
 	///----------------------------------------------------------------------------------------------------
-	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
+	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	private:
 	CLocalization* Language;

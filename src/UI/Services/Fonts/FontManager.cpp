@@ -452,9 +452,9 @@ void CFontManager::ResizeFont(const char* aIdentifier, float aFontSize)
 	}
 }
 
-int CFontManager::CleanupRefs(void* aStartAddress, void* aEndAddress)
+uint32_t CFontManager::CleanupRefs(void* aStartAddress, void* aEndAddress)
 {
-	int refCounter = 0;
+	uint32_t refCounter = 0;
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 

@@ -47,7 +47,7 @@ class CUiRender : public virtual IRefCleaner
 	/// CleanupRefs:
 	/// 	Removes all registered render callbacks and close-on-escape hooks that match the address space.
 	///----------------------------------------------------------------------------------------------------
-	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
+	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetRenderCallbacks:

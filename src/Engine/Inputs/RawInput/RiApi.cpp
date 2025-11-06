@@ -73,9 +73,9 @@ void CRawInputApi::Deregister(WNDPROC_CALLBACK aWndProcCallback)
 	this->Registry.erase(std::remove(this->Registry.begin(), this->Registry.end(), aWndProcCallback), this->Registry.end());
 }
 
-int CRawInputApi::CleanupRefs(void* aStartAddress, void* aEndAddress)
+uint32_t CRawInputApi::CleanupRefs(void* aStartAddress, void* aEndAddress)
 {
-	int refCounter = 0;
+	uint32_t refCounter = 0;
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 	for (WNDPROC_CALLBACK wndprocCb : this->Registry)

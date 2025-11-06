@@ -120,7 +120,7 @@ class CShortcutIcon : public virtual IRefCleaner
 	/// CleanupRefs:
 	/// 	Removes all context items matching the address space.
 	///----------------------------------------------------------------------------------------------------
-	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
+	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	private:
 	std::string                          ID             = "";

@@ -103,9 +103,9 @@ void CEscapeClosing::Deregister(bool* aIsVisible)
 	}
 }
 
-int CEscapeClosing::CleanupRefs(void* aStartAddress, void* aEndAddress)
+uint32_t CEscapeClosing::CleanupRefs(void* aStartAddress, void* aEndAddress)
 {
-	int refCounter = 0;
+	uint32_t refCounter = 0;
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 

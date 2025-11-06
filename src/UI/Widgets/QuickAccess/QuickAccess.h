@@ -125,7 +125,7 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	/// CleanupRefs:
 	/// 	Removes all shortcuts and context items matching the address space.
 	///----------------------------------------------------------------------------------------------------
-	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
+	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	private:
 	CLogApi*                              Logger             {};

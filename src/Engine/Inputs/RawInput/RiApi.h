@@ -69,7 +69,7 @@ class CRawInputApi : public virtual IRefCleaner
 	/// CleanupRefs:
 	/// 	Removes all WndProc Callbacks that are within the provided address space.
 	///----------------------------------------------------------------------------------------------------
-	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
+	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	private:
 	RenderContext_t*              RenderContext = nullptr;

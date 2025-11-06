@@ -63,7 +63,7 @@ class CEventApi : public virtual IRefCleaner
 	/// CleanupRefs:
 	/// 	Removes any elements within the provided address space from the Registry.
 	///----------------------------------------------------------------------------------------------------
-	int CleanupRefs(void* aStartAddress, void* aEndAddress) override;
+	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetRegistry:

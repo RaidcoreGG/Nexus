@@ -120,9 +120,9 @@ void CEventApi::Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEvent
 	);
 }
 
-int CEventApi::CleanupRefs(void* aStartAddress, void* aEndAddress)
+uint32_t CEventApi::CleanupRefs(void* aStartAddress, void* aEndAddress)
 {
-	int refCounter = 0;
+	uint32_t refCounter = 0;
 
 	const std::lock_guard<std::recursive_mutex> lock(this->Mutex);
 	
