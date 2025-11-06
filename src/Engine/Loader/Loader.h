@@ -15,6 +15,7 @@
 #include <vector>
 #include <windows.h>
 
+#include "Engine/_Concepts/IWndProc.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Renderer/RdrContext.h"
 #include "LdrAddonBase.h"
@@ -25,7 +26,7 @@ constexpr const char* CH_LOADER = "Loader";
 ///----------------------------------------------------------------------------------------------------
 /// CLoader Class
 ///----------------------------------------------------------------------------------------------------
-class CLoader
+class CLoader : public virtual IWndProc
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -56,7 +57,7 @@ class CLoader
 	/// WndProc:
 	/// 	Returns 0 if message was processed.
 	///----------------------------------------------------------------------------------------------------
-	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// NotifyChanges:

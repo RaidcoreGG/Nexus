@@ -10,6 +10,7 @@
 
 #include "Core/NexusLink.h"
 #include "Core/Preferences/PrefContext.h"
+#include "Engine/_Concepts/IWndProc.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Renderer/RdrContext.h"
@@ -18,7 +19,7 @@
 ///----------------------------------------------------------------------------------------------------
 /// CScaling Class
 ///----------------------------------------------------------------------------------------------------
-class CScaling
+class CScaling : public virtual IWndProc
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -52,7 +53,7 @@ class CScaling
 	/// WndProc:
 	/// 	Returns 0 if message was processed.
 	///----------------------------------------------------------------------------------------------------
-	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// UpdateDPI:

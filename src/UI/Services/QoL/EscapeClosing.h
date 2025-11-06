@@ -13,12 +13,13 @@
 #include <unordered_map>
 #include <windows.h>
 
+#include "Engine/_Concepts/IWndProc.h"
 #include "Engine/Cleanup/RefCleanerBase.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// CEscapeClosing Class
 ///----------------------------------------------------------------------------------------------------
-class CEscapeClosing : public virtual IRefCleaner
+class CEscapeClosing : public virtual IRefCleaner, public virtual IWndProc
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -35,7 +36,7 @@ class CEscapeClosing : public virtual IRefCleaner
 	/// WndProc:
 	/// 	Returns 0 if message was processed.
 	///----------------------------------------------------------------------------------------------------
-	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Register:

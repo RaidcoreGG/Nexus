@@ -11,6 +11,7 @@
 #include <mutex>
 #include <vector>
 
+#include "Engine/_Concepts/IWndProc.h"
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include "Engine/Renderer/RdrContext.h"
 #include "RiFuncDefs.h"
@@ -21,7 +22,7 @@
 ///----------------------------------------------------------------------------------------------------
 /// CRawInputApi Class
 ///----------------------------------------------------------------------------------------------------
-class CRawInputApi : public virtual IRefCleaner
+class CRawInputApi : public virtual IRefCleaner, public virtual IWndProc
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -38,7 +39,7 @@ class CRawInputApi : public virtual IRefCleaner
 	/// WndProc:
 	/// 	Returns 0 if message was processed or non-zero, if it should be passed to the next callback.
 	///----------------------------------------------------------------------------------------------------
-	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// WndProcGameOnly:

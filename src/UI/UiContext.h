@@ -14,7 +14,7 @@
 #include <Windows.h>
 
 #include "DisplayBinds.h"
-#include "Engine/Cleanup/RefCleanerBase.h"
+#include "Engine/_Concepts/IWndProc.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
@@ -30,8 +30,8 @@
 #include "UI/Widgets/EULA/LicenseAgreementModal.h"
 #include "UI/Widgets/MainWindow/MainWindow.h"
 #include "UI/Widgets/QuickAccess/QuickAccess.h"
-#include "UiRender.h"
 #include "UiInput.h"
+#include "UiRender.h"
 #include "Util/Inputs.h"
 
 constexpr const char* CH_UICONTEXT       = "UI Context";
@@ -46,7 +46,7 @@ constexpr const char* KB_TOGGLEHIDEUI    = "KB_TOGGLEHIDEUI";
 ///----------------------------------------------------------------------------------------------------
 /// CUiContext Class
 ///----------------------------------------------------------------------------------------------------
-class CUiContext : public CUiRender
+class CUiContext : public CUiRender, public virtual IWndProc
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -131,7 +131,7 @@ class CUiContext : public CUiRender
 	/// WndProc:
 	/// 	Returns 0 if message was processed.
 	///----------------------------------------------------------------------------------------------------
-	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// OnInputBind:
