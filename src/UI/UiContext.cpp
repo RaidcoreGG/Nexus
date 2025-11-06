@@ -233,10 +233,11 @@ CUiContext::CUiContext(RenderContext_t* aRenderContext, CLogApi* aLogger, CTextu
 	this->FontManager    = new CFontManager(this->Language);
 	this->EscapeClose    = new CEscapeClosing();
 	this->Scaling        = new CScaling(aRenderContext, aDataLink, aEventApi, CContext::GetContext()->GetSettingsCtx()); // FIXME: What the fuck, why is the settingsctx not included here?
+	this->Input          = new CUiInput(CContext::GetContext()->GetSettingsCtx());
 
-	this->EventApi->Subscribe("EV_MUMBLE_IDENTITY_UPDATED",            CUiContext::OnMumbleIdentityChanged);
+	this->EventApi->Subscribe(EV_MUMBLE_IDENTITY_UPDATED,              CUiContext::OnMumbleIdentityChanged);
 	this->EventApi->Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", reinterpret_cast<EVENT_CONSUME>(CUiContext::OnUELanguageChanged));
-	this->EventApi->Subscribe("EV_VOLATILE_ADDON_DISABLED",            CUiContext::OnVolatileAddonsDisabled);
+	this->EventApi->Subscribe(EV_VOLATILE_ADDON_DISABLED,              CUiContext::OnVolatileAddonsDisabled);
 	this->EventApi->Subscribe("EV_INPUTBIND_UPDATED",                  CUiContext::OnInputBindUpdate);
 
 	CAddonsWindow*  addonsWnd  = new CAddonsWindow();
@@ -371,28 +372,12 @@ void CUiContext::Render()
 		this->IsInvalid = false;
 	}
 
-	EModifiers actualMods = EModifiers::None;
-	if (GetAsyncKeyState(VK_MENU))
-	{
-		actualMods |= EModifiers::Alt;
-	}
-	if (GetAsyncKeyState(VK_CONTROL))
-	{
-		actualMods |= EModifiers::Ctrl;
-	}
-	if (GetAsyncKeyState(VK_SHIFT))
-	{
-		actualMods |= EModifiers::Shift;
-	}
-
-	this->AreModsDown = (this->Mods & actualMods) == this->Mods;
-
 	const std::lock_guard<std::mutex> lock(this->RenderMutex);
 
 	/* pre-render callbacks */
 	for (GUI_RENDER callback : this->GetRenderCallbacks(ERenderType::PreRender))
 	{
-		if (callback) { callback(); }
+		callback();
 	}
 
 	if (this->IsInitialized)
@@ -414,7 +399,7 @@ void CUiContext::Render()
 				/* draw addons*/
 				for (GUI_RENDER callback : this->GetRenderCallbacks(ERenderType::Render))
 				{
-					if (callback) { callback(); }
+					callback();
 				}
 
 				/* draw nexus windows */
@@ -459,18 +444,13 @@ void CUiContext::Render()
 	/* post-render callbacks */
 	for (GUI_RENDER callback : this->GetRenderCallbacks(ERenderType::PostRender))
 	{
-		if (callback) { callback(); }
+		callback();
 	}
 }
 
 void CUiContext::Invalidate()
 {
 	this->IsInvalid = true;
-
-	CSettings* settingsctx = CContext::GetContext()->GetSettingsCtx();
-
-	this->ClickingRequiresMods = settingsctx->Get<bool>(OPT_UI_CLICK_MODSONLY, false);
-	this->Mods = settingsctx->Get<EModifiers>(OPT_UI_MODS, EModifiers::None);
 }
 
 UINT CUiContext::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -480,106 +460,9 @@ UINT CUiContext::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return uMsg;
 	}
 
-	ImGuiIO& io = ImGui::GetIO();
-
-	switch (uMsg)
+	if (this->Input->WndProc(hWnd, uMsg, wParam, lParam) == 0)
 	{
-		// mouse input
-		case WM_MOUSEMOVE:
-			if (!Inputs::IsCursorHidden())
-			{
-				/* only set cursor pos if cursor is visible */
-				io.MousePos = ImVec2((float)(LOWORD(lParam)), (float)(HIWORD(lParam)));
-			}
-			break;
-
-		case WM_LBUTTONDBLCLK:
-		case WM_LBUTTONDOWN:
-			if (io.WantCaptureMouse && !Inputs::IsCursorHidden())
-			{
-				if (this->ClickingRequiresMods && this->AreModsDown)
-				{
-					io.MouseDown[0] = true;
-					return 0;
-				}
-				else if (!this->ClickingRequiresMods)
-				{
-					io.MouseDown[0] = true;
-					return 0;
-				}
-				break;
-			}
-			else //if (!io.WantCaptureMouse)
-			{
-				ImGui::ClearActiveID();
-			}
-			break;
-		case WM_RBUTTONDBLCLK:
-		case WM_RBUTTONDOWN:
-			if (io.WantCaptureMouse && !Inputs::IsCursorHidden())
-			{
-				if (this->ClickingRequiresMods && this->AreModsDown)
-				{
-					io.MouseDown[1] = true;
-					return 0;
-				}
-				else if (!this->ClickingRequiresMods)
-				{
-					io.MouseDown[1] = true;
-					return 0;
-				}
-				break;
-			}
-			break;
-
-			// doesn't hurt passing these through to the game
-		case WM_LBUTTONUP:
-			io.MouseDown[0] = false;
-			break;
-		case WM_RBUTTONUP:
-			io.MouseDown[1] = false;
-			break;
-
-			// scroll
-		case WM_MOUSEWHEEL:
-			if (io.WantCaptureMouse && !Inputs::IsCursorHidden())
-			{
-				io.MouseWheel += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;
-				return 0;
-			}
-			break;
-		case WM_MOUSEHWHEEL:
-			if (io.WantCaptureMouse && !Inputs::IsCursorHidden())
-			{
-				io.MouseWheelH += (float)GET_WHEEL_DELTA_WPARAM(wParam) / (float)WHEEL_DELTA;
-				return 0;
-			}
-			break;
-
-			// key input
-		case WM_KEYDOWN:
-		case WM_SYSKEYDOWN:
-			if (io.WantTextInput)
-			{
-				if (wParam < 256)
-					io.KeysDown[wParam] = true;
-				return 0;
-			}
-			break;
-		case WM_KEYUP:
-		case WM_SYSKEYUP:
-			if (wParam < 256)
-				io.KeysDown[wParam] = false;
-			break;
-		case WM_CHAR:
-			if (io.WantTextInput)
-			{
-				// You can also use ToAscii()+GetKeyboardState() to retrieve characters.
-				if (wParam > 0 && wParam < 0x10000)
-					io.AddInputCharacterUTF16((unsigned short)wParam);
-				return 0;
-			}
-			break;
+		return 0;
 	}
 
 	if (this->EscapeClose->WndProc(hWnd, uMsg, wParam, lParam) == 0)

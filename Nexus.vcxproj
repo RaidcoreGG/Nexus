@@ -70,6 +70,7 @@
     <ClCompile Include="src\UI\Services\Localization\LoclApi.cpp" />
     <ClCompile Include="src\UI\Services\QoL\EscapeClosing.cpp" />
     <ClCompile Include="src\UI\UiContext.cpp" />
+    <ClCompile Include="src\UI\UiInput.cpp" />
     <ClCompile Include="src\UI\UiRender.cpp" />
     <ClCompile Include="src\UI\Services\Scaling\Scaling.cpp" />
     <ClCompile Include="src\UI\Widgets\Alerts\Alerts.cpp" />
@@ -143,6 +144,7 @@
     <ClInclude Include="src\Engine\Networking\WebRequests\WreConst.h" />
     <ClInclude Include="src\Engine\Verifier.h" />
     <ClInclude Include="src\Engine\Cleanup\RefCleanerBase.h" />
+    <ClInclude Include="src\Engine\_Concepts\IWndProc.h" />
     <ClInclude Include="src\GW2\ArcDPS\ArcApi.h" />
     <ClInclude Include="src\GW2\ArcDPS\ArcEnum.h" />
     <ClInclude Include="src\GW2\ArcDPS\ArcExtensionDef.h" />
@@ -380,6 +382,7 @@
     <ClInclude Include="src\UI\Services\QoL\EscapeClosing.h" />
     <ClInclude Include="src\UI\Services\QoL\FuncDefs.h" />
     <ClInclude Include="src\UI\UiContext.h" />
+    <ClInclude Include="src\UI\UiInput.h" />
     <ClInclude Include="src\UI\UiRender.h" />
     <ClInclude Include="src\UI\Services\Scaling\Scaling.h" />
     <ClInclude Include="src\UI\Widgets\Alerts\AlEnum.h" />

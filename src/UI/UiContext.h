@@ -31,6 +31,7 @@
 #include "UI/Widgets/MainWindow/MainWindow.h"
 #include "UI/Widgets/QuickAccess/QuickAccess.h"
 #include "UiRender.h"
+#include "UiInput.h"
 #include "Util/Inputs.h"
 
 constexpr const char* CH_UICONTEXT       = "UI Context";
@@ -223,6 +224,7 @@ class CUiContext : public CUiRender
 	CFontManager*                      FontManager;
 	CEscapeClosing*                    EscapeClose;
 	CScaling*                          Scaling;
+	CUiInput*                          Input;
 
 	mutable std::mutex                 DisplayBindsMutex;
 	std::vector<InputBindCategory_t>     DisplayInputBinds;
@@ -231,9 +233,6 @@ class CUiContext : public CUiRender
 	bool                               IsInitialized = false;
 	bool                               IsVisible = true;
 	bool                               IsInvalid = true;
-	bool                               ClickingRequiresMods = false;
-	bool                               AreModsDown = false;
-	EModifiers                         Mods = EModifiers::None;
 
 	///----------------------------------------------------------------------------------------------------
 	/// UnpackLocales:
