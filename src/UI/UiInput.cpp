@@ -35,7 +35,6 @@ CUiInput::CUiInput(CSettings* aSettings)
 
 CUiInput::~CUiInput()
 {
-	
 }
 
 UINT CUiInput::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

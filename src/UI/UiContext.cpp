@@ -213,7 +213,15 @@
 	}
 }
 
-CUiContext::CUiContext(RenderContext_t* aRenderContext, CLogApi* aLogger, CTextureLoader* aTextureService, CDataLinkApi* aDataLink, CInputBindApi* aInputBindApi, CEventApi* aEventApi, CMumbleReader* aMumbleReader)
+CUiContext::CUiContext(
+	RenderContext_t* aRenderContext,
+	CLogApi*         aLogger,
+	CTextureLoader*  aTextureService,
+	CDataLinkApi*    aDataLink,
+	CInputBindApi*   aInputBindApi,
+	CEventApi*       aEventApi,
+	CMumbleReader*   aMumbleReader
+) : IRefCleaner("UiContext")
 {
 	this->RenderContext  = aRenderContext;
 	this->Logger         = aLogger;

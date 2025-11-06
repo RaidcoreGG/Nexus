@@ -20,7 +20,13 @@
 #include "Resources/ResConst.h"
 #include "UI/UiContext.h"
 
-CShortcutIcon::CShortcutIcon(std::string aID, std::string aIconID, std::string aIconHoverID, std::string aInputBindID, std::string aTooltip)
+CShortcutIcon::CShortcutIcon(
+	std::string aID,
+	std::string aIconID,
+	std::string aIconHoverID,
+	std::string aInputBindID,
+	std::string aTooltip
+) : IRefCleaner("QuickAccess")
 {
 	/* FIXME: See Render IsInvalid. */
 	CContext* ctx        = CContext::GetContext();
@@ -36,6 +42,10 @@ CShortcutIcon::CShortcutIcon(std::string aID, std::string aIconID, std::string a
 	this->IconHoverID = aIconHoverID;
 	this->InputBindID = aInputBindID;
 	this->TooltipText = aTooltip;
+}
+
+CShortcutIcon::~CShortcutIcon()
+{
 }
 
 void CShortcutIcon::Invalidate()

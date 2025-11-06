@@ -14,10 +14,9 @@
 #include "Core/Context.h"
 #include "Core/Preferences/PrefConst.h"
 #include "Core/Preferences/PrefContext.h"
-#include "Engine/Cleanup/RefCleanerContext.h"
 #include "Util/Inputs.h"
 
-CEscapeClosing::CEscapeClosing()
+CEscapeClosing::CEscapeClosing() : IRefCleaner("EscapeClosing")
 {
 	CContext* ctx = CContext::GetContext();
 	CSettings* settingsctx = ctx->GetSettingsCtx();
@@ -26,8 +25,10 @@ CEscapeClosing::CEscapeClosing()
 	{
 		this->Enabled = aNewValue;
 	});
+}
 
-	CRefCleanerContext::Get()->Register("CEscapeClosing", this);
+CEscapeClosing::~CEscapeClosing()
+{
 }
 
 UINT CEscapeClosing::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

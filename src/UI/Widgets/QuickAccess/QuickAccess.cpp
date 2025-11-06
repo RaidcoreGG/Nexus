@@ -16,7 +16,6 @@
 #include "Core/Context.h"
 #include "Core/Preferences/PrefConst.h"
 #include "Core/Preferences/PrefContext.h"
-#include "Engine/Cleanup/RefCleanerContext.h"
 #include "Resources/ResConst.h"
 #include "UI/UIContext.h"
 #include "Util/Time.h"
@@ -32,7 +31,14 @@ void CQuickAccess::OnAddonStateChanged(void* aEventData)
 	qactx->Invalidate();
 }
 
-CQuickAccess::CQuickAccess(CDataLinkApi* aDataLink, CLogApi* aLogger, CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization, CEventApi* aEventApi)
+CQuickAccess::CQuickAccess(
+	CDataLinkApi*   aDataLink,
+	CLogApi*        aLogger,
+	CInputBindApi*  aInputBindApi,
+	CTextureLoader* aTextureService,
+	CLocalization*  aLocalization,
+	CEventApi*      aEventApi
+) : IRefCleaner("QuickAccess")
 {
 	this->Logger         = aLogger;
 	this->InputBindApi   = aInputBindApi;
@@ -133,8 +139,6 @@ CQuickAccess::CQuickAccess(CDataLinkApi* aDataLink, CLogApi* aLogger, CInputBind
 
 	this->EventApi->Subscribe(EV_ADDON_LOADED,   CQuickAccess::OnAddonStateChanged);
 	this->EventApi->Subscribe(EV_ADDON_UNLOADED, CQuickAccess::OnAddonStateChanged);
-
-	CRefCleanerContext::Get()->Register("CQuickAccess", this);
 }
 
 CQuickAccess::~CQuickAccess()
@@ -485,12 +489,6 @@ int CQuickAccess::CleanupRefs(void* aStartAddress, void* aEndAddress)
 	int refCounter = 0;
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	/* Remove children from parents. */
-	for (auto& [identifier, shortcut] : this->Registry)
-	{
-		refCounter += shortcut->CleanupRefs(aStartAddress, aEndAddress);
-	}
 
 	/* Remove bastard children. */
 	for (auto orphanIt = this->OrphanedCallbacks.begin(); orphanIt != this->OrphanedCallbacks.end();)

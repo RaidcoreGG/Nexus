@@ -17,11 +17,10 @@
 #include "httplib/httplib.h"
 #pragma warning(pop)
 
-#include "Engine/Cleanup/RefCleanerContext.h"
 #include "Util/Time.h"
 #include "Util/Url.h"
 
-CTextureLoader::CTextureLoader(CLogApi* aLogger, RenderContext_t* aRenderCtx, std::filesystem::path aOverridesDirectory)
+CTextureLoader::CTextureLoader(CLogApi* aLogger, RenderContext_t* aRenderCtx, std::filesystem::path aOverridesDirectory) : IRefCleaner("TextureLoader")
 {
 	assert(aLogger);
 	assert(aRenderCtx);
@@ -36,8 +35,6 @@ CTextureLoader::CTextureLoader(CLogApi* aLogger, RenderContext_t* aRenderCtx, st
 	{
 		this->DownloadThreads.push_back(std::thread(&CTextureLoader::ProcessDownloads, this));
 	}
-
-	CRefCleanerContext::Get()->Register("CTextureLoader", this);
 }
 
 CTextureLoader::~CTextureLoader()

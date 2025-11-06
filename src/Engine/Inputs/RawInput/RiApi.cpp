@@ -10,15 +10,15 @@
 
 #include <assert.h>
 
-#include "Engine/Cleanup/RefCleanerContext.h"
-
-CRawInputApi::CRawInputApi(RenderContext_t* aRenderCtx)
+CRawInputApi::CRawInputApi(RenderContext_t* aRenderCtx) : IRefCleaner("RawInputApi")
 {
 	assert(aRenderCtx);
 
 	this->RenderContext = aRenderCtx;
+}
 
-	CRefCleanerContext::Get()->Register("CRawInputApi", this);
+CRawInputApi::~CRawInputApi()
+{
 }
 
 UINT CRawInputApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

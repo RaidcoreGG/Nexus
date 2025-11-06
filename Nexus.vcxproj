@@ -18,6 +18,7 @@
     <ClCompile Include="src\Core\Context.cpp" />
     <ClCompile Include="src\Core\Hooks\Hooks.cpp" />
     <ClCompile Include="src\Core\Updater\SelfUpdater.cpp" />
+    <ClCompile Include="src\Engine\Cleanup\RefCleanerBase.cpp" />
     <ClCompile Include="src\Engine\Cleanup\RefCleanerContext.cpp" />
     <ClCompile Include="src\Engine\Functions\FnRegistry.cpp" />
     <ClCompile Include="src\Core\Index\Index.cpp" />

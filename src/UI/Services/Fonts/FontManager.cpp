@@ -13,15 +13,12 @@
 #include "imgui/imgui_internal.h"
 
 #include "Core/Context.h"
-#include "Engine/Cleanup/RefCleanerContext.h"
 #include "Resources/ResConst.h"
 #include "Util/Resources.h"
 
-CFontManager::CFontManager(CLocalization* aLocalization)
+CFontManager::CFontManager(CLocalization* aLocalization) : IRefCleaner("FontManager")
 {
 	this->Language = aLocalization;
-
-	CRefCleanerContext::Get()->Register("CFontManager", this);
 }
 
 CFontManager::~CFontManager()

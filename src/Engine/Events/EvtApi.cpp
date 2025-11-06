@@ -8,14 +8,15 @@
 
 #include "EvtApi.h"
 
-#include "Engine/Cleanup/RefCleanerContext.h"
 #include "EvtSubscriber.h"
 
-CEventApi::CEventApi(CLoader* aLoader)
+CEventApi::CEventApi(CLoader* aLoader) : IRefCleaner("EventApi")
 {
 	this->Loader = aLoader;
+}
 
-	CRefCleanerContext::Get()->Register("CEventApi", this);
+CEventApi::~CEventApi()
+{
 }
 
 void CEventApi::Raise(const char* aIdentifier, void* aEventData)

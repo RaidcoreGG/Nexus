@@ -41,12 +41,18 @@ class CShortcutIcon : public virtual IRefCleaner
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CShortcutIcon() = default;
-	
+	CShortcutIcon(
+		std::string aID,
+		std::string aIconID,
+		std::string aIconHoverID,
+		std::string aInputBindID,
+		std::string aTooltip
+	);
+
 	///----------------------------------------------------------------------------------------------------
-	/// ctor
+	/// dtor
 	///----------------------------------------------------------------------------------------------------
-	CShortcutIcon(std::string aID, std::string aIconID, std::string aIconHoverID, std::string aInputBindID, std::string aTooltip);
+	~CShortcutIcon();
 
 	///----------------------------------------------------------------------------------------------------
 	/// Invalidate:

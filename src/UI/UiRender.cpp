@@ -8,11 +8,8 @@
 
 #include "UiRender.h"
 
-#include "Engine/Cleanup/RefCleanerContext.h"
-
-CUiRender::CUiRender()
+CUiRender::CUiRender() : IRefCleaner("UiRender")
 {
-	CRefCleanerContext::Get()->Register("CUiRender", this);
 }
 
 CUiRender::~CUiRender()

@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include <map>
 #include <mutex>
 #include <string>
+#include <vector>
 
 #include "RefCleanerBase.h"
 
@@ -36,6 +36,12 @@ class CRefCleanerContext
 	void Register(std::string aComponentName, IRefCleaner* aComponent);
 
 	///----------------------------------------------------------------------------------------------------
+	/// Deregister:
+	/// 	Deregisters a reference cleaner from the context.
+	///----------------------------------------------------------------------------------------------------
+	void Deregister(IRefCleaner* aComponent);
+
+	///----------------------------------------------------------------------------------------------------
 	/// CleanupRefs:
 	/// 	Removes any reference matching the provided address space.
 	/// 	Returns a message with the cleanup results.
@@ -46,6 +52,15 @@ class CRefCleanerContext
 	CRefCleanerContext() = default;
 	~CRefCleanerContext() = default;
 
-	std::mutex                          Mutex;
-	std::map<std::string, IRefCleaner*> Registry;
+	///----------------------------------------------------------------------------------------------------
+	/// RefCleaner_t Struct
+	///----------------------------------------------------------------------------------------------------
+	struct RefCleaner_t
+	{
+		std::string  Name;
+		IRefCleaner* Component;
+	};
+
+	std::mutex                Mutex;
+	std::vector<RefCleaner_t> Registry;
 };
