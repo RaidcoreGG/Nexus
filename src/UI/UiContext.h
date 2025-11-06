@@ -25,6 +25,7 @@
 #include "UI/Services/Fonts/FontManager.h"
 #include "UI/Services/Localization/LoclApi.h"
 #include "UI/Services/QoL/EscapeClosing.h"
+#include "UI/Services/Scaling/Scaling.h"
 #include "UI/Widgets/Alerts/Alerts.h"
 #include "UI/Widgets/EULA/LicenseAgreementModal.h"
 #include "UI/Widgets/MainWindow/MainWindow.h"
@@ -138,12 +139,6 @@ class CUiContext : public CUiRender
 	void OnInputBind(std::string aIdentifier);
 
 	///----------------------------------------------------------------------------------------------------
-	/// UpdateScaling:
-	/// 	Updates the UI scaling.
-	///----------------------------------------------------------------------------------------------------
-	void UpdateScaling();
-
-	///----------------------------------------------------------------------------------------------------
 	/// GetLocalization:
 	/// 	Returns the localization component.
 	///----------------------------------------------------------------------------------------------------
@@ -227,6 +222,7 @@ class CUiContext : public CUiRender
 	/* UI Services */
 	CFontManager*                      FontManager;
 	CEscapeClosing*                    EscapeClose;
+	CScaling*                          Scaling;
 
 	mutable std::mutex                 DisplayBindsMutex;
 	std::vector<InputBindCategory_t>     DisplayInputBinds;

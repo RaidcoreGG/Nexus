@@ -116,7 +116,6 @@ void COptionsWindow::TabGeneral()
 				if (ImGui::Checkbox(langApi->Translate("((000113))"), &dpiScaling))
 				{
 					settingsctx->Set(OPT_DPISCALING, dpiScaling);
-					uictx->UpdateScaling();
 				}
 
 				static bool clickingRequiresMods = settingsctx->Get<bool>(OPT_UI_CLICK_MODSONLY, false);

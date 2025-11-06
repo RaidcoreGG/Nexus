@@ -156,16 +156,6 @@
 	Mumble::Identity* mumbleIdentity = static_cast<Mumble::Identity*>(dlapi->GetResource(DL_MUMBLE_LINK_IDENTITY));
 	NexusLinkData_t* nexusLink = static_cast<NexusLinkData_t*>(dlapi->GetResource(DL_NEXUS_LINK));
 
-	float currScaling = Mumble::GetScalingFactor(mumbleIdentity->UISize);
-	if (currScaling != settingsctx->Get<float>(OPT_LASTUISCALE, 1.0f) && nexusLink->IsGameplay)
-	{
-		ImGuiIO& io = ImGui::GetIO();
-
-		settingsctx->Set(OPT_LASTUISCALE, currScaling);
-
-		uictx->UpdateScaling();
-	}
-
 	switch (mumbleIdentity->UISize)
 	{
 		case Mumble::EUIScale::Small:
@@ -242,6 +232,7 @@ CUiContext::CUiContext(RenderContext_t* aRenderContext, CLogApi* aLogger, CTextu
 
 	this->FontManager    = new CFontManager(this->Language);
 	this->EscapeClose    = new CEscapeClosing();
+	this->Scaling        = new CScaling(aRenderContext, aDataLink, aEventApi, CContext::GetContext()->GetSettingsCtx()); // FIXME: What the fuck, why is the settingsctx not included here?
 
 	this->EventApi->Subscribe("EV_MUMBLE_IDENTITY_UPDATED",            CUiContext::OnMumbleIdentityChanged);
 	this->EventApi->Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", reinterpret_cast<EVENT_CONSUME>(CUiContext::OnUELanguageChanged));
@@ -328,7 +319,7 @@ void CUiContext::Initialize()
 		return;
 	}
 
-	this->UpdateScaling();
+	this->Scaling->UpdateDPI(); // Update DPI, because the HWND is now available.
 
 	this->IsInitialized = true;
 }
@@ -589,9 +580,6 @@ UINT CUiContext::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				return 0;
 			}
 			break;
-		case WM_DPICHANGED:
-			this->UpdateScaling();
-			break;
 	}
 
 	if (this->EscapeClose->WndProc(hWnd, uMsg, wParam, lParam) == 0)
@@ -628,39 +616,6 @@ void CUiContext::OnInputBind(std::string aIdentifier)
 	{
 		this->MainWindow->Activate("Options");
 	}
-}
-
-void CUiContext::UpdateScaling()
-{
-	NexusLinkData_t* nexuslink = static_cast<NexusLinkData_t*>(this->DataLink->GetResource(DL_NEXUS_LINK));
-	
-	ImGuiIO& io = ImGui::GetIO();
-
-	CContext*        ctx         = CContext::GetContext();
-	CSettings*       settingsctx = ctx->GetSettingsCtx();
-	RenderContext_t* renderer    = ctx->GetRendererCtx();
-
-	if (settingsctx->Get<bool>(OPT_DPISCALING, true))
-	{
-		UINT dpi = GetDpiForWindow(this->RenderContext->Window.Handle);
-
-		io.FontGlobalScale = dpi / 96.f;
-	}
-	else
-	{
-		io.FontGlobalScale = 1.0f;
-	}
-
-	if (settingsctx->Get<float>(OPT_LASTUISCALE, 1.0f) <= 0.f)
-	{
-		settingsctx->Set<float>(OPT_LASTUISCALE, 1.0f);
-	}
-
-	nexuslink->Scaling =
-		settingsctx->Get<float>(OPT_LASTUISCALE, 1.0f) *
-		/* settingsctx->Get<float>(OPT_GLOBALSCALE, 1.0f) * */
-		io.FontGlobalScale *
-		min(min(renderer->Window.Width, 1024.0f) / 1024.0f, min(renderer->Window.Height, 768.0f) / 768.0f);
 }
 
 CLocalization* CUiContext::GetLocalization()
@@ -1007,15 +962,6 @@ void CUiContext::LoadSettings()
 	
 	std::string lang = settingsCtx->Get<std::string>(OPT_LANGUAGE, "en");
 	Language->SetLanguage(!lang.empty() ? lang : "en");
-
-	float lastUiScale = settingsCtx->Get<float>(OPT_LASTUISCALE, 1.0f);
-	if (lastUiScale == 0)
-	{
-		lastUiScale = SC_NORMAL;
-		settingsCtx->Set(OPT_LASTUISCALE, SC_NORMAL);
-	}
-	
-	this->UpdateScaling();
 }
 
 void CUiContext::UpdateDisplayInputBinds()
