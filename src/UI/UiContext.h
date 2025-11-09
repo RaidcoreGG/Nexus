@@ -134,12 +134,6 @@ class CUiContext : public CUiRender, public virtual IWndProc
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 	///----------------------------------------------------------------------------------------------------
-	/// OnInputBind:
-	/// 	Invokes an input bind.
-	///----------------------------------------------------------------------------------------------------
-	void OnInputBind(std::string aIdentifier);
-
-	///----------------------------------------------------------------------------------------------------
 	/// GetLocalization:
 	/// 	Returns the localization component.
 	///----------------------------------------------------------------------------------------------------

@@ -19,11 +19,12 @@
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_internal.h"
 
+#include "Core/Addons/AddConst.h"
+#include "Core/Addons/Addon.h"
 #include "Core/Context.h"
 #include "Core/Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
 #include "Core/Preferences/PrefContext.h"
-#include "Engine/Cleanup/RefCleanerContext.h"
 #include "Engine/Inputs/InputBinds/IbConst.h"
 #include "GW2/Inputs/GameBinds/GbConst.h"
 #include "GW2/Mumble/MblConst.h"
@@ -35,19 +36,15 @@
 #include "Util/Strings.h"
 #include "Util/Time.h"
 
-#include "UI/Widgets/MainWindow/About/About.h"
-#include "UI/Widgets/MainWindow/Addons/Addons.h"
-#include "UI/Widgets/MainWindow/Binds/Binds.h"
-#include "UI/Widgets/MainWindow/Debug/Debug.h"
-#include "UI/Widgets/MainWindow/Log/Log.h"
-#include "UI/Widgets/MainWindow/Options/Options.h"
-
 /*static*/ void CUiContext::OnInputBindPressed(const char* aIdentifier)
 {
 	CContext* ctx = CContext::GetContext();
 	CUiContext* uictx = ctx->GetUIContext();
 
-	uictx->OnInputBind(aIdentifier);
+	if (aIdentifier == KB_TOGGLEHIDEUI)
+	{
+		uictx->IsVisible = !uictx->IsVisible;
+	}
 }
 
 /*static*/ void CUiContext::OnFontUpdate(const char* aIdentifier, ImFont* aFont)
@@ -198,7 +195,7 @@
 
 	if (settingsctx->Get<bool>(OPT_SHOWADDONSWINDOWAFTERDUU, false))
 	{
-		uictx->OnInputBind(KB_ADDONS);
+		uictx->MainWindow->Activate();
 	}
 }
 
@@ -248,30 +245,7 @@ CUiContext::CUiContext(
 	this->EventApi->Subscribe(EV_VOLATILE_ADDON_DISABLED,              CUiContext::OnVolatileAddonsDisabled);
 	this->EventApi->Subscribe("EV_INPUTBIND_UPDATED",                  CUiContext::OnInputBindUpdate);
 
-	CAddonsWindow*  addonsWnd  = new CAddonsWindow();
-	COptionsWindow* optionsWnd = new COptionsWindow();
-	CBindsWindow*   bindsWNd   = new CBindsWindow();
-	CLogWindow*     logWnd     = new CLogWindow();
-	CDebugWindow*   debugWnd   = new CDebugWindow();
-	CAboutBox*      aboutWnd   = new CAboutBox();
-
-	this->Logger->Register(logWnd);
-
-	this->MainWindow->AddWindow(addonsWnd);
-	this->MainWindow->AddWindow(optionsWnd);
-	this->MainWindow->AddWindow(bindsWNd);
-	this->MainWindow->AddWindow(logWnd);
-	this->MainWindow->AddWindow(debugWnd);
-	this->MainWindow->AddWindow(aboutWnd);
-
-	/* register InputBinds */
-	this->InputBindApi->Register(KB_MENU,          EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "CTRL+O");
-	this->InputBindApi->Register(KB_ADDONS,        EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "(null)");
-	this->InputBindApi->Register(KB_OPTIONS,       EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "(null)");
-	this->InputBindApi->Register(KB_LOG,           EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "(null)");
-	this->InputBindApi->Register(KB_DEBUG,         EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "(null)");
-	this->InputBindApi->Register(KB_TOGGLEHIDEUI,  EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "CTRL+H");
-
+	this->InputBindApi->Register(KB_TOGGLEHIDEUI, EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "CTRL+H");
 	this->EscapeClose->Register("Nexus", this->MainWindow->GetVisibleStatePtr());
 
 	this->UnpackLocales();
@@ -479,34 +453,6 @@ UINT CUiContext::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 
 	return uMsg;
-}
-
-void CUiContext::OnInputBind(std::string aIdentifier)
-{
-	if (aIdentifier == KB_TOGGLEHIDEUI)
-	{
-		this->IsVisible = !this->IsVisible;
-	}
-	else if (aIdentifier == KB_MENU)
-	{
-		this->MainWindow->Activate();
-	}
-	else if (aIdentifier == KB_ADDONS)
-	{
-		this->MainWindow->Activate("Addons");
-	}
-	else if (aIdentifier == KB_DEBUG)
-	{
-		this->MainWindow->Activate("Debug");
-	}
-	else if (aIdentifier == KB_LOG)
-	{
-		this->MainWindow->Activate("Log");
-	}
-	else if (aIdentifier == KB_OPTIONS)
-	{
-		this->MainWindow->Activate("Options");
-	}
 }
 
 CLocalization* CUiContext::GetLocalization()

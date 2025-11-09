@@ -21,6 +21,16 @@
 class CMainWindow : public virtual IWindow
 {
 	public:
+	///----------------------------------------------------------------------------------------------------
+	/// OnInputBind:
+	/// 	Invokes an input bind.
+	///----------------------------------------------------------------------------------------------------
+	static void OnInputBind(std::string aIdentifier);
+
+	CMainWindow();
+
+	~CMainWindow();
+
 	void AddWindow(ISubWindow* aWindow);
 	void RemoveWindow(ISubWindow* aWindow);
 
