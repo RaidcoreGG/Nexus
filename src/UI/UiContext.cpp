@@ -247,9 +247,8 @@ CUiContext::CUiContext(
 
 	this->InputBindApi->Register(KB_TOGGLEHIDEUI, EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "CTRL+H");
 	this->EscapeClose->Register("Nexus", this->MainWindow->GetVisibleStatePtr());
-
-	this->UnpackLocales();
-	this->LoadSettings();
+	
+	this->ApplyStyle();
 	this->LoadFonts();
 }
 
@@ -727,44 +726,4 @@ void CUiContext::ApplyStyle(EUIStyle aStyle, std::string aValue)
 			break;
 		}
 	}
-}
-
-void CUiContext::UnpackLocales()
-{
-	CContext* ctx = CContext::GetContext();
-
-	this->Language->SetLocaleDirectory(Index(EPath::DIR_LOCALES));
-	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleEN), RES_LOCALE_EN, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleDE), RES_LOCALE_DE, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleFR), RES_LOCALE_FR, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleES), RES_LOCALE_ES, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleBR), RES_LOCALE_BR, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleCZ), RES_LOCALE_CZ, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleIT), RES_LOCALE_IT, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index(EPath::LocalePL), RES_LOCALE_PL, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleRU), RES_LOCALE_RU, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleCN), RES_LOCALE_CN, "JSON");
-	this->Language->Advance();
-}
-
-void CUiContext::LoadSettings()
-{
-	CContext* ctx = CContext::GetContext();
-	CSettings* settingsCtx = ctx->GetSettingsCtx();
-
-	ImGuiIO& io = ImGui::GetIO();
-	ImGuiStyle* style = &ImGui::GetStyle();
-
-	float storedFontSz = settingsCtx->Get<float>(OPT_FONTSIZE, 15.0f);
-	if (storedFontSz <= 0)
-	{
-		storedFontSz = min(max(storedFontSz, 1.0f), 50.0f);
-		settingsCtx->Set(OPT_FONTSIZE, storedFontSz);
-	}
-	ImGui::GetCurrentContext()->FontSize = storedFontSz;
-
-	this->ApplyStyle();
-	
-	std::string lang = settingsCtx->Get<std::string>(OPT_LANGUAGE, "en");
-	Language->SetLanguage(!lang.empty() ? lang : "en");
 }

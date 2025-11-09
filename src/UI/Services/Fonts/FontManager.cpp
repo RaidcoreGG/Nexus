@@ -13,12 +13,24 @@
 #include "imgui/imgui_internal.h"
 
 #include "Core/Context.h"
+#include "Core/Preferences/PrefConst.h"
 #include "Resources/ResConst.h"
 #include "Util/Resources.h"
 
 CFontManager::CFontManager(CLocalization* aLocalization) : IRefCleaner("FontManager")
 {
 	this->Language = aLocalization;
+
+	CContext* ctx = CContext::GetContext();
+	CSettings* settingsctx = ctx->GetSettingsCtx();
+
+	float storedFontSz = settingsctx->Get<float>(OPT_FONTSIZE, 15.0f);
+	if (storedFontSz <= 0)
+	{
+		storedFontSz = min(max(storedFontSz, 1.0f), 50.0f);
+		settingsctx->Set(OPT_FONTSIZE, storedFontSz);
+	}
+	ImGui::GetCurrentContext()->FontSize = storedFontSz;
 }
 
 CFontManager::~CFontManager()

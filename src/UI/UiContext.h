@@ -178,42 +178,30 @@ class CUiContext : public CUiRender, public CUiBinds, public virtual IWndProc
 
 	private:
 	/* Services */
-	RenderContext_t*                   RenderContext  = nullptr;
-	CLogApi*                           Logger         = nullptr;
-	CLocalization*                     Language       = nullptr;
-	CTextureLoader*                    TextureService = nullptr;
-	CDataLinkApi*                      DataLink       = nullptr;
-	CInputBindApi*                     InputBindApi   = nullptr;
-	CEventApi*                         EventApi       = nullptr;
-	CMumbleReader*                     MumbleReader   = nullptr;
+	RenderContext_t*        RenderContext  = nullptr;
+	CLogApi*                Logger         = nullptr;
+	CLocalization*          Language       = nullptr;
+	CTextureLoader*         TextureService = nullptr;
+	CDataLinkApi*           DataLink       = nullptr;
+	CInputBindApi*          InputBindApi   = nullptr;
+	CEventApi*              EventApi       = nullptr;
+	CMumbleReader*          MumbleReader   = nullptr;
 
 	/* Rendering */
-	ID3D11RenderTargetView*            RenderTargetView;
+	ID3D11RenderTargetView* RenderTargetView;
 
 	/* Windows/Widgets */
-	CAlerts*                           Alerts;
-	CMainWindow*                       MainWindow;
-	CQuickAccess*                      QuickAccess;
+	CAlerts*                Alerts;
+	CMainWindow*            MainWindow;
+	CQuickAccess*           QuickAccess;
 
 	/* UI Services */
-	CFontManager*                      FontManager;
-	CEscapeClosing*                    EscapeClose;
-	CScaling*                          Scaling;
-	CUiInput*                          Input;
+	CFontManager*           FontManager;
+	CEscapeClosing*         EscapeClose;
+	CScaling*               Scaling;
+	CUiInput*               Input;
 
-	bool                               IsInitialized = false;
-	bool                               IsVisible = true;
-	bool                               IsInvalid = true;
-
-	///----------------------------------------------------------------------------------------------------
-	/// UnpackLocales:
-	/// 	Unpacks the default locale files.
-	///----------------------------------------------------------------------------------------------------
-	void UnpackLocales();
-
-	///----------------------------------------------------------------------------------------------------
-	/// LoadSettings:
-	/// 	Loads all the UI settings.
-	///----------------------------------------------------------------------------------------------------
-	void LoadSettings();
+	bool                    IsInitialized = false;
+	bool                    IsVisible = true;
+	bool                    IsInvalid = true;
 };

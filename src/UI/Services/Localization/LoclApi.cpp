@@ -8,19 +8,43 @@
 
 #include "LoclApi.h"
 
-#include <windows.h>
 #include <fstream>
+#include <windows.h>
 
 #pragma warning(push, 0)
 #include "nlohmann/json.hpp"
 #pragma warning(pop)
 using json = nlohmann::json;
 
+#include "Util/Resources.h"
+#include "Core/Index/Index.h"
+#include "Resources/ResConst.h"
+#include "Core/Context.h"
+#include "Core/Preferences/PrefConst.h"
+
 CLocalization::CLocalization(CLogApi* aLogger)
 {
 	assert(aLogger);
 
 	this->Logger = aLogger;
+
+	CContext* ctx = CContext::GetContext();
+	CSettings* settingsctx = ctx->GetSettingsCtx();
+
+	this->SetLocaleDirectory(Index(EPath::DIR_LOCALES));
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleEN), RES_LOCALE_EN, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleDE), RES_LOCALE_DE, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleFR), RES_LOCALE_FR, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleES), RES_LOCALE_ES, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleBR), RES_LOCALE_BR, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleCZ), RES_LOCALE_CZ, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleIT), RES_LOCALE_IT, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocalePL), RES_LOCALE_PL, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleRU), RES_LOCALE_RU, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleCN), RES_LOCALE_CN, "JSON");
+
+	std::string lang = settingsctx->Get<std::string>(OPT_LANGUAGE, "en");
+	this->SetLanguage(!lang.empty() ? lang : "en");
 }
 
 CLocalization::~CLocalization()
