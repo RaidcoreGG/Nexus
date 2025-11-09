@@ -207,7 +207,6 @@ class CUiContext : public CUiRender, public virtual IWndProc
 
 	/* Rendering */
 	ID3D11RenderTargetView*            RenderTargetView;
-	ImGuiContext*                      ImGuiContext;
 
 	/* Windows/Widgets */
 	CAlerts*                           Alerts;

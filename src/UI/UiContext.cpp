@@ -228,7 +228,7 @@ CUiContext::CUiContext(
 	this->EventApi       = aEventApi;
 	this->MumbleReader   = aMumbleReader;
 
-	this->ImGuiContext   = ImGui::CreateContext();
+	ImGui::CreateContext();
 
 	this->Language       = new CLocalization(aLogger);
 	this->Alerts         = new CAlerts(aDataLink);
@@ -255,10 +255,6 @@ CUiContext::CUiContext(
 
 CUiContext::~CUiContext()
 {
-	this->Logger = nullptr;
-	this->Language = nullptr;
-
-	this->ImGuiContext = nullptr;
 	ImGui::DestroyContext();
 }
 
@@ -284,7 +280,7 @@ void CUiContext::Initialize()
 	//ImGui::GetIO().ImeWindowHandle = Renderer::WindowHandle;
 
 	// create buffers
-	ID3D11Texture2D* pBackBuffer;
+	ID3D11Texture2D* pBackBuffer{};
 	this->RenderContext->SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBackBuffer);
 
 	if (!pBackBuffer)
@@ -793,7 +789,7 @@ void CUiContext::LoadSettings()
 		storedFontSz = min(max(storedFontSz, 1.0f), 50.0f);
 		settingsCtx->Set(OPT_FONTSIZE, storedFontSz);
 	}
-	this->ImGuiContext->FontSize = storedFontSz;
+	ImGui::GetCurrentContext()->FontSize = storedFontSz;
 
 	this->ApplyStyle();
 	
