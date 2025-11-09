@@ -13,7 +13,6 @@
 #include <vector>
 #include <Windows.h>
 
-#include "DisplayBinds.h"
 #include "Engine/_Concepts/IWndProc.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
@@ -30,6 +29,7 @@
 #include "UI/Widgets/EULA/LicenseAgreementModal.h"
 #include "UI/Widgets/MainWindow/MainWindow.h"
 #include "UI/Widgets/QuickAccess/QuickAccess.h"
+#include "UiBinds.h"
 #include "UiInput.h"
 #include "UiRender.h"
 #include "Util/Inputs.h"
@@ -46,7 +46,7 @@ constexpr const char* KB_TOGGLEHIDEUI    = "KB_TOGGLEHIDEUI";
 ///----------------------------------------------------------------------------------------------------
 /// CUiContext Class
 ///----------------------------------------------------------------------------------------------------
-class CUiContext : public CUiRender, public virtual IWndProc
+class CUiContext : public CUiRender, public CUiBinds, public virtual IWndProc
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -164,24 +164,6 @@ class CUiContext : public CUiRender, public virtual IWndProc
 	CEscapeClosing* GetEscapeClosingService();
 
 	///----------------------------------------------------------------------------------------------------
-	/// GetInputBinds:
-	/// 	Returns a copy of the display input binds.
-	///----------------------------------------------------------------------------------------------------
-	std::vector<InputBindCategory_t> GetInputBinds();
-
-	///----------------------------------------------------------------------------------------------------
-	/// GetInputBinds:
-	/// 	Returns a copy of the display input binds.
-	///----------------------------------------------------------------------------------------------------
-	std::unordered_map<std::string, InputBindPacked_t> GetInputBinds(const std::string& aCategory);
-
-	///----------------------------------------------------------------------------------------------------
-	/// GetGameBinds:
-	/// 	Returns a copy of the display game input binds.
-	///----------------------------------------------------------------------------------------------------
-	std::vector<GameInputBindCategory_t> GetGameBinds();
-
-	///----------------------------------------------------------------------------------------------------
 	/// LoadFonts:
 	/// 	Loads the fonts.
 	///----------------------------------------------------------------------------------------------------
@@ -219,10 +201,6 @@ class CUiContext : public CUiRender, public virtual IWndProc
 	CScaling*                          Scaling;
 	CUiInput*                          Input;
 
-	mutable std::mutex                 DisplayBindsMutex;
-	std::vector<InputBindCategory_t>     DisplayInputBinds;
-	std::vector<GameInputBindCategory_t> DisplayGameBinds;
-
 	bool                               IsInitialized = false;
 	bool                               IsVisible = true;
 	bool                               IsInvalid = true;
@@ -238,16 +216,4 @@ class CUiContext : public CUiRender, public virtual IWndProc
 	/// 	Loads all the UI settings.
 	///----------------------------------------------------------------------------------------------------
 	void LoadSettings();
-
-	///----------------------------------------------------------------------------------------------------
-	/// UpdateDisplayInputBinds:
-	/// 	Refreshes the displayed input binds.
-	///----------------------------------------------------------------------------------------------------
-	void UpdateDisplayInputBinds();
-
-	///----------------------------------------------------------------------------------------------------
-	/// UpdateDisplayGameBinds:
-	/// 	Refreshes the displayed game input binds.
-	///----------------------------------------------------------------------------------------------------
-	void UpdateDisplayGameBinds();
 };

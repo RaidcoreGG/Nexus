@@ -1,73 +1,107 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  BindSetterModal.h
-/// Description  :  Modal for InputBind setter.
+/// Name         :  UiBinds.h
+/// Description  :  Contains the implementation to display InputBinds.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
 #pragma once
 
+#include <mutex>
 #include <string>
+#include <unordered_map>
+#include <vector>
 
-#include "UI/Controls/CtlModal.h"
-#include "UI/UiBinds.h"
 #include "Engine/Inputs/InputBinds/IbBindV2.h"
+#include "Engine/Inputs/InputBinds/IbMapping.h"
 #include "GW2/Inputs/GameBinds/GbEnum.h"
 
+struct InputBindPacked_t
+{
+	std::string KeysText{};
+	IbMapping_t Bind    {};
+};
+
+struct InputBindCategory_t
+{
+	std::string                                        Name      {};
+	std::unordered_map<std::string, InputBindPacked_t> InputBinds{};
+};
+
+struct GameInputBindPacked_t
+{
+	std::string Name     {};
+	std::string KeysText {};
+	InputBind_t Bind     {};
+
+	std::string KeysText2{};
+	InputBind_t Bind2    {};
+};
+
+struct GameInputBindCategory_t
+{
+	std::string                                           Name          {};
+	std::unordered_map<EGameBinds, GameInputBindPacked_t> GameInputBinds{};
+};
+
+enum class EBindEditType
+{
+	None,
+	Nexus,
+	Game,
+	Game2
+};
+
 ///----------------------------------------------------------------------------------------------------
-/// CBindSetterModal Class
+/// CUiBinds Class
 ///----------------------------------------------------------------------------------------------------
-class CBindSetterModal : public virtual IModal
+class CUiBinds
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CBindSetterModal();
+	CUiBinds();
 
 	///----------------------------------------------------------------------------------------------------
-	/// RenderContent:
-	/// 	Render function of modal contents.
+	/// dtor
 	///----------------------------------------------------------------------------------------------------
-	void RenderContent() override;
+	virtual ~CUiBinds();
 
 	///----------------------------------------------------------------------------------------------------
-	/// OnOpening:
-	/// 	Override open to retrieve the bind text of the to be edited bind.
+	/// GetInputBinds:
+	/// 	Returns a copy of the display input binds.
 	///----------------------------------------------------------------------------------------------------
-	void OnOpening() override;
+	std::vector<InputBindCategory_t> GetInputBinds();
 
 	///----------------------------------------------------------------------------------------------------
-	/// OnClosing:
-	/// 	Override close to process result and reset variables.
+	/// GetInputBinds:
+	/// 	Returns a copy of the display input binds.
 	///----------------------------------------------------------------------------------------------------
-	void OnClosing() override;
+	std::unordered_map<std::string, InputBindPacked_t> GetInputBinds(const std::string& aCategory);
 
 	///----------------------------------------------------------------------------------------------------
-	/// SetTarget:
-	/// 	Set Nexus bind as editing target.
+	/// GetGameBinds:
+	/// 	Returns a copy of the display game input binds.
 	///----------------------------------------------------------------------------------------------------
-	void SetTarget(std::string aBindIdentifier);
+	std::vector<GameInputBindCategory_t> GetGameBinds();
+
+	protected:
+	///----------------------------------------------------------------------------------------------------
+	/// UpdateDisplayInputBinds:
+	/// 	Refreshes the displayed input binds.
+	///----------------------------------------------------------------------------------------------------
+	void UpdateDisplayInputBinds();
 
 	///----------------------------------------------------------------------------------------------------
-	/// SetTarget:
-	/// 	Set game bind as editing target.
+	/// UpdateDisplayGameBinds:
+	/// 	Refreshes the displayed game input binds.
 	///----------------------------------------------------------------------------------------------------
-	void SetTarget(EGameBinds aBindIdentifier, bool aIsPrimary = true);
+	void UpdateDisplayGameBinds();
 
 	private:
-	EBindEditType Type             = EBindEditType::None;
-	std::string   NexusBindID      = {};
-	EGameBinds    GameBindID       = (EGameBinds)0;
-	std::string   PreviousBindText = {};
-
-	InputBind_t   Capture          = {};
-	std::string   BindConflict     = {};
-
-	///----------------------------------------------------------------------------------------------------
-	/// SetTitle:
-	/// 	Custom title setting, so that the caption says "Set Input Bind: <KEYNAME>".
-	///----------------------------------------------------------------------------------------------------
-	void SetTitle();
+	mutable std::mutex                   DisplayBindsMutex{};
+	std::vector<InputBindCategory_t>     DisplayInputBinds{};
+	std::vector<GameInputBindCategory_t> DisplayGameBinds{};
 };

@@ -70,6 +70,7 @@
     <ClCompile Include="src\UI\Services\Fonts\FontManager.cpp" />
     <ClCompile Include="src\UI\Services\Localization\LoclApi.cpp" />
     <ClCompile Include="src\UI\Services\QoL\EscapeClosing.cpp" />
+    <ClCompile Include="src\UI\UiBinds.cpp" />
     <ClCompile Include="src\UI\UiContext.cpp" />
     <ClCompile Include="src\UI\UiInput.cpp" />
     <ClCompile Include="src\UI\UiRender.cpp" />
@@ -370,7 +371,7 @@
     <ClInclude Include="src\UI\Controls\CtlModal.h" />
     <ClInclude Include="src\UI\Controls\CtlSubWindow.h" />
     <ClInclude Include="src\UI\Controls\CtlWindow.h" />
-    <ClInclude Include="src\UI\DisplayBinds.h" />
+    <ClInclude Include="src\UI\UiBinds.h" />
     <ClInclude Include="src\UI\UiEnum.h" />
     <ClInclude Include="src\UI\UiFuncDefs.h" />
     <ClInclude Include="src\UI\Overlay\MumbleInspector\MumbleInspector.h" />

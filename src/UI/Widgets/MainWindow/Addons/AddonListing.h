@@ -13,7 +13,7 @@
 
 #include "Core/Addons/Addon.h"
 #include "Core/Addons/Library/LibAddon.h"
-#include "UI/DisplayBinds.h"
+#include "UI/UiBinds.h"
 #include "UI/UiFuncDefs.h"
 #include "Util/Strings.h"
 
