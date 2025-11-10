@@ -43,6 +43,15 @@ class CTextureLoader
 	~CTextureLoader();
 
 	///----------------------------------------------------------------------------------------------------
+	/// Shutdown:
+	/// 	Releases all existing textures.
+	/// 	TODO: This is just a workaround for ReShade compatibility.
+	/// 	In the future either don't have static lifetime for the texloader or release them in another way.
+	/// 	Issue: https://github.com/RaidcoreGG/Nexus/issues/138
+	///----------------------------------------------------------------------------------------------------
+	void Shutdown();
+
+	///----------------------------------------------------------------------------------------------------
 	/// Advance:
 	/// 	Processes all currently queued textures.
 	///----------------------------------------------------------------------------------------------------

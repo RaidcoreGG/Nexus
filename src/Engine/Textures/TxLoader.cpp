@@ -48,6 +48,11 @@ CTextureLoader::~CTextureLoader()
 		}
 	}
 
+	// TODO: Free textures here. Issue: https://github.com/RaidcoreGG/Nexus/issues/138
+}
+
+void CTextureLoader::Shutdown()
+{
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	for (auto it = this->Registry.begin(); it != this->Registry.end();)
