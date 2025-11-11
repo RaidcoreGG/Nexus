@@ -32,6 +32,7 @@
 #include "UiBinds.h"
 #include "UiInput.h"
 #include "UiRender.h"
+#include "UiStyle.h"
 #include "Util/Inputs.h"
 
 constexpr const char* CH_UICONTEXT       = "UI Context";
@@ -46,7 +47,7 @@ constexpr const char* KB_TOGGLEHIDEUI    = "KB_TOGGLEHIDEUI";
 ///----------------------------------------------------------------------------------------------------
 /// CUiContext Class
 ///----------------------------------------------------------------------------------------------------
-class CUiContext : public CUiRender, public CUiBinds, public virtual IWndProc
+class CUiContext : public CUiRender, public CUiBinds, public CUiStyle, public virtual IWndProc
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -168,13 +169,6 @@ class CUiContext : public CUiRender, public CUiBinds, public virtual IWndProc
 	/// 	Loads the fonts.
 	///----------------------------------------------------------------------------------------------------
 	void LoadFonts();
-
-	///----------------------------------------------------------------------------------------------------
-	/// ApplyStyle:
-	/// 	Applies an ImGui style.
-	/// 	aValue is either a filename or a code, if the style is EUIStyle::File or EUIStyle::Code.
-	///----------------------------------------------------------------------------------------------------
-	void ApplyStyle(EUIStyle aStyle = EUIStyle::User, std::string aValue = "");
 
 	private:
 	/* Services */

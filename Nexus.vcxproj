@@ -75,6 +75,7 @@
     <ClCompile Include="src\UI\UiInput.cpp" />
     <ClCompile Include="src\UI\UiRender.cpp" />
     <ClCompile Include="src\UI\Services\Scaling\Scaling.cpp" />
+    <ClCompile Include="src\UI\UiStyle.cpp" />
     <ClCompile Include="src\UI\Widgets\Alerts\Alerts.cpp" />
     <ClCompile Include="src\UI\Widgets\EULA\LicenseAgreementModal.cpp" />
     <ClCompile Include="src\UI\Widgets\MainWindow\About\About.cpp" />
@@ -387,6 +388,7 @@
     <ClInclude Include="src\UI\UiInput.h" />
     <ClInclude Include="src\UI\UiRender.h" />
     <ClInclude Include="src\UI\Services\Scaling\Scaling.h" />
+    <ClInclude Include="src\UI\UiStyle.h" />
     <ClInclude Include="src\UI\Widgets\Alerts\AlEnum.h" />
     <ClInclude Include="src\UI\Widgets\Alerts\Alerts.h" />
     <ClInclude Include="src\UI\Widgets\Alerts\AlFuncDefs.h" />
