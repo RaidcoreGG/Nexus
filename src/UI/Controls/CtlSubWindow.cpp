@@ -13,7 +13,7 @@
 #include "imgui/imgui_internal.h"
 
 #include "Core/Context.h"
-#include "Resources/ResConst.h"
+#include "res/ResConst.h"
 
 void ISubWindow::Render()
 {

@@ -16,7 +16,7 @@
 #include "Core/Context.h"
 #include "Core/Preferences/PrefConst.h"
 #include "Core/Preferences/PrefContext.h"
-#include "Resources/ResConst.h"
+#include "res/ResConst.h"
 #include "UI/UIContext.h"
 #include "Util/Time.h"
 

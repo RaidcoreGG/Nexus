@@ -21,7 +21,7 @@
 #include "Engine/Logging/LogWriter.h"
 #include "GW2/Build/BuildInfo.h"
 #include "GW2/Multibox/Multibox.h"
-#include "Resources/ResConst.h"
+#include "res/ResConst.h"
 #include "UI/UiContext.h"
 #include "Util/CmdLine.h"
 #include "Util/Resources.h"

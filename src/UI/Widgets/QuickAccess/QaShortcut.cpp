@@ -17,7 +17,7 @@
 #include "Core/Addons/Addon.h"
 #include "Core/Context.h"
 #include "Engine/Inputs/InputBinds/IbConst.h"
-#include "Resources/ResConst.h"
+#include "res/ResConst.h"
 #include "UI/UiContext.h"
 
 CShortcutIcon::CShortcutIcon(

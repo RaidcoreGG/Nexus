@@ -358,7 +358,7 @@
     <ClInclude Include="src\GW2\Mumble\MblReader.h" />
     <ClInclude Include="src\Core\Index\IdxFuncDefs.h" />
     <ClInclude Include="src\Core\Proxy\Proxy.h" />
-    <ClInclude Include="src\Resources\ResConst.h" />
+    <ClInclude Include="res\ResConst.h" />
     <ClInclude Include="src\Core\Preferences\PrefContext.h" />
     <ClInclude Include="src\thirdparty\pugixml\pugiconfig.hpp" />
     <ClInclude Include="src\thirdparty\pugixml\pugixml.hpp" />
@@ -431,7 +431,7 @@
     <ClInclude Include="src\Engine\Inputs\RawInput\RiApi.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="src\Resources\Nexus.rc" />
+    <ResourceCompile Include="res\Nexus.rc" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Resources\Locales\br_Main.json" />
@@ -449,8 +449,8 @@
     <None Include="src\thirdparty\arcdps\LICENSE" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="src\Resources\Fonts\Inter.ttf" />
-    <Font Include="src\Resources\Fonts\Menomonia.ttf" />
+    <Font Include="res\Fonts\Inter.ttf" />
+    <Font Include="res\Fonts\Menomonia.ttf" />
     <Font Include="src\Resources\Fonts\TrebuchetMS.ttf" />
   </ItemGroup>
   <ItemGroup>
@@ -475,64 +475,64 @@
     <Image Include="src\Resources\icons\refresh.png" />
     <Image Include="src\Resources\icons\settings.png" />
     <Image Include="src\Resources\icons\tiles.png" />
-    <Image Include="src\Resources\Images\MainWindow\Canfavorite.png" />
-    <Image Include="src\Resources\Images\MainWindow\CanFavoriteShaded.png" />
-    <Image Include="src\Resources\Images\MainWindow\ChevronRt.png" />
-    <Image Include="src\Resources\Images\MainWindow\ChevronRtShaded.png" />
-    <Image Include="src\Resources\Images\MainWindow\Close.png" />
-    <Image Include="src\Resources\Images\MainWindow\CloseShaded.png" />
-    <Image Include="src\Resources\Images\MainWindow\External.png" />
-    <Image Include="src\Resources\Images\MainWindow\ExternalShaded.png" />
-    <Image Include="src\Resources\Images\MainWindow\Favorite.png" />
-    <Image Include="src\Resources\Images\MainWindow\FavoriteShaded.png" />
-    <Image Include="src\Resources\Images\MainWindow\Filter.png" />
-    <Image Include="src\Resources\Images\MainWindow\FilterShaded.png" />
-    <Image Include="src\Resources\Images\MainWindow\List.png" />
-    <Image Include="src\Resources\Images\MainWindow\ListShaded.png" />
-    <Image Include="src\Resources\Images\MainWindow\Pages\About.png" />
-    <Image Include="src\Resources\Images\MainWindow\Pages\AboutShaded.png" />
-    <Image Include="src\Resources\Images\MainWindow\Pages\Addons.png" />
-    <Image Include="src\Resources\Images\MainWindow\Pages\AddonsShaded.png" />
-    <Image Include="src\Resources\Images\MainWindow\Pages\Addons\PolicyTier1.png" />
-    <Image Include="src\Resources\Images\MainWindow\Pages\Addons\PolicyTier2.png" />
-    <Image Include="src\Resources\Images\MainWindow\Pages\Addons\PolicyTier3.png" />
-    <Image Include="src\Resources\Images\MainWindow\Pages\Addons\PolicyUnknown.png" />
-    <Image Include="src\Resources\Images\MainWindow\Pages\Binds.png" />
-    <Image Include="src\Resources\Images\MainWindow\Pages\BindsShaded.png" />
-    <Image Include="src\Resources\Images\MainWindow\Pages\Debug.png" />
-    <Image Include="src\Resources\Images\MainWindow\Pages\DebugShaded.png" />
-    <Image Include="src\Resources\Images\MainWindow\Pages\Home.png" />
-    <Image Include="src\Resources\Images\MainWindow\Pages\HomeShaded.png" />
-    <Image Include="src\Resources\Images\MainWindow\Pages\Log.png" />
-    <Image Include="src\Resources\Images\MainWindow\Pages\LogShaded.png" />
-    <Image Include="src\Resources\Images\MainWindow\Pages\Settings.png" />
-    <Image Include="src\Resources\Images\MainWindow\Pages\SettingsShaded.png" />
-    <Image Include="src\Resources\Images\MainWindow\Refresh.png" />
-    <Image Include="src\Resources\Images\MainWindow\RefreshShaded.png" />
-    <Image Include="src\Resources\Images\MainWindow\Snowflake.png" />
-    <Image Include="src\Resources\Images\MainWindow\SnowflakeShaded.png" />
-    <Image Include="src\Resources\Images\MainWindow\Tiles.png" />
-    <Image Include="src\Resources\Images\MainWindow\TilesShaded.png" />
-    <Image Include="src\Resources\Images\MainWindow\RaidcoreTag.png" />
-    <Image Include="src\Resources\Images\QuickAccess\ContextMenu.png" />
-    <Image Include="src\Resources\Images\QuickAccess\Nexus.png" />
-    <Image Include="src\Resources\Images\QuickAccess\NexusHalloween.png" />
-    <Image Include="src\Resources\Images\QuickAccess\NexusHalloween_Hover.png" />
-    <Image Include="src\Resources\Images\QuickAccess\NexusXmas.png" />
-    <Image Include="src\Resources\Images\QuickAccess\NexusXmas_Hover.png" />
-    <Image Include="src\Resources\Images\QuickAccess\Nexus_Hover.png" />
-    <Image Include="src\Resources\Images\QuickAccess\Notification1.png" />
-    <Image Include="src\Resources\Images\QuickAccess\Notification2.png" />
-    <Image Include="src\Resources\Images\QuickAccess\Notification3.png" />
-    <Image Include="src\Resources\Images\QuickAccess\Notification4.png" />
-    <Image Include="src\Resources\Images\QuickAccess\Notification5.png" />
-    <Image Include="src\Resources\Images\QuickAccess\Notification6.png" />
-    <Image Include="src\Resources\Images\QuickAccess\Notification7.png" />
-    <Image Include="src\Resources\Images\QuickAccess\Notification8.png" />
-    <Image Include="src\Resources\Images\QuickAccess\Notification9.png" />
-    <Image Include="src\Resources\Images\QuickAccess\NotificationTooMany.png" />
-    <Image Include="src\Resources\Images\Social\Banners\Discord.png" />
-    <Image Include="src\Resources\Images\Social\Banners\Patreon.png" />
+    <Image Include="res\Images\MainWindow\Canfavorite.png" />
+    <Image Include="res\Images\MainWindow\CanFavoriteShaded.png" />
+    <Image Include="res\Images\MainWindow\ChevronRt.png" />
+    <Image Include="res\Images\MainWindow\ChevronRtShaded.png" />
+    <Image Include="res\Images\MainWindow\Close.png" />
+    <Image Include="res\Images\MainWindow\CloseShaded.png" />
+    <Image Include="res\Images\MainWindow\External.png" />
+    <Image Include="res\Images\MainWindow\ExternalShaded.png" />
+    <Image Include="res\Images\MainWindow\Favorite.png" />
+    <Image Include="res\Images\MainWindow\FavoriteShaded.png" />
+    <Image Include="res\Images\MainWindow\Filter.png" />
+    <Image Include="res\Images\MainWindow\FilterShaded.png" />
+    <Image Include="res\Images\MainWindow\List.png" />
+    <Image Include="res\Images\MainWindow\ListShaded.png" />
+    <Image Include="res\Images\MainWindow\Pages\About.png" />
+    <Image Include="res\Images\MainWindow\Pages\AboutShaded.png" />
+    <Image Include="res\Images\MainWindow\Pages\Addons.png" />
+    <Image Include="res\Images\MainWindow\Pages\AddonsShaded.png" />
+    <Image Include="res\Images\MainWindow\Pages\Addons\PolicyTier1.png" />
+    <Image Include="res\Images\MainWindow\Pages\Addons\PolicyTier2.png" />
+    <Image Include="res\Images\MainWindow\Pages\Addons\PolicyTier3.png" />
+    <Image Include="res\Images\MainWindow\Pages\Addons\PolicyUnknown.png" />
+    <Image Include="res\Images\MainWindow\Pages\Binds.png" />
+    <Image Include="res\Images\MainWindow\Pages\BindsShaded.png" />
+    <Image Include="res\Images\MainWindow\Pages\Debug.png" />
+    <Image Include="res\Images\MainWindow\Pages\DebugShaded.png" />
+    <Image Include="res\Images\MainWindow\Pages\Home.png" />
+    <Image Include="res\Images\MainWindow\Pages\HomeShaded.png" />
+    <Image Include="res\Images\MainWindow\Pages\Log.png" />
+    <Image Include="res\Images\MainWindow\Pages\LogShaded.png" />
+    <Image Include="res\Images\MainWindow\Pages\Settings.png" />
+    <Image Include="res\Images\MainWindow\Pages\SettingsShaded.png" />
+    <Image Include="res\Images\MainWindow\Refresh.png" />
+    <Image Include="res\Images\MainWindow\RefreshShaded.png" />
+    <Image Include="res\Images\MainWindow\Snowflake.png" />
+    <Image Include="res\Images\MainWindow\SnowflakeShaded.png" />
+    <Image Include="res\Images\MainWindow\Tiles.png" />
+    <Image Include="res\Images\MainWindow\TilesShaded.png" />
+    <Image Include="res\Images\MainWindow\RaidcoreTag.png" />
+    <Image Include="res\Images\QuickAccess\ContextMenu.png" />
+    <Image Include="res\Images\QuickAccess\Nexus.png" />
+    <Image Include="res\Images\QuickAccess\NexusHalloween.png" />
+    <Image Include="res\Images\QuickAccess\NexusHalloween_Hover.png" />
+    <Image Include="res\Images\QuickAccess\NexusXmas.png" />
+    <Image Include="res\Images\QuickAccess\NexusXmas_Hover.png" />
+    <Image Include="res\Images\QuickAccess\Nexus_Hover.png" />
+    <Image Include="res\Images\QuickAccess\Notification1.png" />
+    <Image Include="res\Images\QuickAccess\Notification2.png" />
+    <Image Include="res\Images\QuickAccess\Notification3.png" />
+    <Image Include="res\Images\QuickAccess\Notification4.png" />
+    <Image Include="res\Images\QuickAccess\Notification5.png" />
+    <Image Include="res\Images\QuickAccess\Notification6.png" />
+    <Image Include="res\Images\QuickAccess\Notification7.png" />
+    <Image Include="res\Images\QuickAccess\Notification8.png" />
+    <Image Include="res\Images\QuickAccess\Notification9.png" />
+    <Image Include="res\Images\QuickAccess\NotificationTooMany.png" />
+    <Image Include="res\Images\Social\Banners\Discord.png" />
+    <Image Include="res\Images\Social\Banners\Patreon.png" />
     <Image Include="src\Resources\Notification.png" />
   </ItemGroup>
   <ItemGroup>
@@ -593,7 +593,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\thirdparty\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)res;$(SolutionDir)src;$(SolutionDir)src\thirdparty\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8 /Zc:__cplusplus</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -632,7 +632,7 @@ CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\thirdparty\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)res;$(SolutionDir)src;$(SolutionDir)src\thirdparty\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8 /Zc:__cplusplus</AdditionalOptions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>

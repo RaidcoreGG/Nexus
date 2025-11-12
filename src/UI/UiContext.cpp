@@ -29,7 +29,7 @@
 #include "GW2/Inputs/GameBinds/GbConst.h"
 #include "GW2/Mumble/MblConst.h"
 #include "GW2/Mumble/MblReader.h"
-#include "Resources/ResConst.h"
+#include "res/ResConst.h"
 #include "Util/Base64.h"
 #include "Util/Inputs.h"
 #include "Util/Resources.h"

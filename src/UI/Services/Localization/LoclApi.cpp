@@ -18,7 +18,7 @@ using json = nlohmann::json;
 
 #include "Util/Resources.h"
 #include "Core/Index/Index.h"
-#include "Resources/ResConst.h"
+#include "res/ResConst.h"
 #include "Core/Context.h"
 #include "Core/Preferences/PrefConst.h"
 

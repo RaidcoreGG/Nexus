@@ -17,7 +17,7 @@
 #include "Core/Context.h"
 #include "Core/Index/Index.h"
 #include "CtlAddonToggle.h"
-#include "Resources/ResConst.h"
+#include "res/ResConst.h"
 #include "Util/Strings.h"
 
 constexpr EAddonsFilterFlags FILTER_INSTALLED

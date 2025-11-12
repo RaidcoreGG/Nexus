@@ -14,7 +14,7 @@
 
 #include "Core/Context.h"
 #include "Core/Preferences/PrefConst.h"
-#include "Resources/ResConst.h"
+#include "res/ResConst.h"
 #include "Util/Resources.h"
 
 CFontManager::CFontManager(CLocalization* aLocalization) : IRefCleaner("FontManager")

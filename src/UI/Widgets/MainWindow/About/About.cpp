@@ -14,7 +14,7 @@
 #include "ImAnimate/ImAnimate.h"
 
 #include "Core/Context.h"
-#include "Resources/ResConst.h"
+#include "res/ResConst.h"
 
 CAboutBox::CAboutBox()
 {

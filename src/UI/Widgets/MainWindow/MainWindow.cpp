@@ -15,7 +15,7 @@
 
 #include "Core/Context.h"
 #include "Core/Preferences/PrefConst.h"
-#include "Resources/ResConst.h"
+#include "res/ResConst.h"
 #include "SnowflakeMgr.h"
 #include "UI/Widgets/MainWindow/About/About.h"
 #include "UI/Widgets/MainWindow/Addons/Addons.h"
