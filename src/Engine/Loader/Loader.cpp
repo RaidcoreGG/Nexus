@@ -13,10 +13,9 @@
 #include "Util/Strings.h"
 #include "Util/MD5.h"
 
-CLoader::CLoader(CLogApi* aLogger, RenderContext_t* aRenderContext, IADDON_FACTORY aFactoryFunction, std::filesystem::path aDirectory)
+CLoader::CLoader(CLogApi* aLogger, IADDON_FACTORY aFactoryFunction, std::filesystem::path aDirectory)
 {
 	this->Logger = aLogger;
-	this->RenderContext = aRenderContext;
 	this->CreateAddon = aFactoryFunction;
 	this->Directory = aDirectory;
 
@@ -27,11 +26,6 @@ CLoader::CLoader(CLogApi* aLogger, RenderContext_t* aRenderContext, IADDON_FACTO
 }
 
 CLoader::~CLoader()
-{
-	this->Shutdown();
-}
-
-void CLoader::Shutdown()
 {
 	this->DeinitDirectoryUpdates();
 
@@ -46,8 +40,10 @@ void CLoader::Shutdown()
 	}
 }
 
-void CLoader::Init()
+void CLoader::InitDirectoryUpdates(HWND aWndHandle)
 {
+	assert(aWndHandle);
+
 	const std::lock_guard<std::mutex> lock(this->FSMutex);
 
 	if (this->FSItemList != nullptr && this->FSNotifierID != 0)
@@ -56,38 +52,8 @@ void CLoader::Init()
 		return;
 	}
 
-	if (this->RenderContext->Window.Handle == nullptr)
-	{
-		if (this->RenderContext->Metrics.FrameCount == 0)
-		{
-			this->Logger->Debug(CH_LOADER, "Window handle is null. Init called before first frame.");
-		}
-		else
-		{
-			this->Logger->Warning(CH_LOADER, "Window handle is null at Frame ID %u. Cannot initialize automatic addon loading.", this->RenderContext->Metrics.FrameCount);
-		}
-		return;
-	}
-
-	if (this->RenderContext->Metrics.FrameCount == 1)
-	{
-		this->Logger->Debug(CH_LOADER, "Init called during first frame.");
-	}
-	else
-	{
-		this->Logger->Debug(CH_LOADER, "Late init. Frame ID: %u", this->RenderContext->Metrics.FrameCount);
-	}
-
-	/* Already start the thread. */
-	if (this->RenderContext->SwapChain && !this->IsRunning)
-	{
-		this->IsRunning = true;
-		this->ProcThread = std::thread(&CLoader::ProcessChanges, this);
-	}
-	else
-	{
-		this->Logger->Debug(CH_LOADER, "SwapChain missing, cannot initialize loader thread.");
-	}
+	this->IsRunning = true;
+	this->ProcThread = std::thread(&CLoader::ProcessChanges, this);
 
 	/* Setup wndproc directory updates. */
 	std::wstring addonDirW = String::ToWString(this->Directory.string());
@@ -111,7 +77,7 @@ void CLoader::Init()
 	changeentry.pidl = this->FSItemList;
 	changeentry.fRecursive = false;
 	this->FSNotifierID = SHChangeNotifyRegister(
-		this->RenderContext->Window.Handle,
+		aWndHandle,
 		SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
 		SHCNE_UPDATEITEM | SHCNE_UPDATEDIR,
 		WM_ADDONDIRUPDATE,

@@ -107,7 +107,6 @@ CLoader* CContext::GetLoader()
 {
 	static CLoader s_Loader = CLoader(
 		this->GetLogger(),
-		this->GetRendererCtx(),
 		IAddonFactory,
 		Index(EPath::DIR_ADDONS)
 	);

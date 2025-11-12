@@ -17,7 +17,6 @@
 
 #include "Engine/_Concepts/IWndProc.h"
 #include "Engine/Logging/LogApi.h"
-#include "Engine/Renderer/RdrContext.h"
 #include "LdrAddonBase.h"
 
 constexpr const uint32_t WM_ADDONDIRUPDATE = WM_USER + 101;
@@ -34,24 +33,21 @@ class CLoader : public virtual IWndProc
 	///----------------------------------------------------------------------------------------------------
 	CLoader(
 		CLogApi*              aLogger,
-		RenderContext_t*      aRenderContext,
 		IADDON_FACTORY        aFactoryFunction,
 		std::filesystem::path aDirectory
 	);
-	// FIXME: factor per file ext
+	// TODO: Register factory functions per file extension/type.
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
 	~CLoader();
 
-	void Shutdown();
-
 	///----------------------------------------------------------------------------------------------------
-	/// Init:
+	/// InitDirectoryUpdates:
 	/// 	Initializes the necessary resouces to receive directory updates and the processor thread.
 	///----------------------------------------------------------------------------------------------------
-	void Init();
+	void InitDirectoryUpdates(HWND aWndHandle);
 
 	///----------------------------------------------------------------------------------------------------
 	/// WndProc:
@@ -118,7 +114,6 @@ class CLoader : public virtual IWndProc
 
 	private:
 	CLogApi*                Logger        = nullptr;
-	RenderContext_t*        RenderContext = nullptr;
 
 	std::filesystem::path   Directory;
 

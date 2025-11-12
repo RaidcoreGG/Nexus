@@ -188,7 +188,7 @@ namespace Hooks
 				s_RenderCtx->Window.Handle = swapChainDesc.OutputWindow;
 				Target::WndProc = (WNDPROC)SetWindowLongPtr(s_RenderCtx->Window.Handle, GWLP_WNDPROC, (LONG_PTR)Detour::WndProc);
 
-				s_Loader->Init();
+				s_Loader->InitDirectoryUpdates(s_RenderCtx->Window.Handle);
 			}
 
 			s_TextureLoader->Advance();

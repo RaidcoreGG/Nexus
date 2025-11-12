@@ -194,7 +194,6 @@ namespace Main
 			CLoader*    loader = ctx->GetLoader();
 			CUiContext* uictx  = ctx->GetUIContext();
 
-			loader->Shutdown();
 			uictx->Shutdown();
 		}
 		logger->Info(CH_CORE, "SHUTDOWN END");
