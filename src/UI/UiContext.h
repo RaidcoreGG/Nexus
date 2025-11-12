@@ -63,12 +63,6 @@ class CUiContext : public CUiRender, public CUiBinds, public CUiStyle, public vi
 	static void OnFontUpdate(const char* aIdentifier, ImFont* aFont);
 
 	///----------------------------------------------------------------------------------------------------
-	/// OnUELanguageChanged:
-	/// 	Receives runtime language updates from unofficial extras.
-	///----------------------------------------------------------------------------------------------------
-	static void OnUELanguageChanged(uint32_t* aLanguage);
-
-	///----------------------------------------------------------------------------------------------------
 	/// OnMumbleIdentityChanged:
 	/// 	Changes fonts and UI scale when the game settings are changed.
 	///----------------------------------------------------------------------------------------------------

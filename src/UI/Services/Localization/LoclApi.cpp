@@ -22,6 +22,48 @@ using json = nlohmann::json;
 #include "Core/Context.h"
 #include "Core/Preferences/PrefConst.h"
 
+static CLocalization* s_Localization{};
+
+/*static*/ void CLocalization::OnUELanguageChanged(uint32_t* aLanguage)
+{
+	if (!aLanguage) { return; }
+	if (!s_Localization) { return; }
+
+	switch (*aLanguage)
+	{
+		case 0:
+		{
+			s_Localization->SetLanguage("en");
+			break;
+		}
+		case 1:
+		{
+			s_Localization->SetLanguage("kr");
+			break;
+		}
+		case 2:
+		{
+			s_Localization->SetLanguage("fr");
+			break;
+		}
+		case 3:
+		{
+			s_Localization->SetLanguage("de");
+			break;
+		}
+		case 4:
+		{
+			s_Localization->SetLanguage("es");
+			break;
+		}
+		case 5:
+		{
+			s_Localization->SetLanguage("cn");
+			break;
+		}
+	}
+}
+
 CLocalization::CLocalization(CLogApi* aLogger)
 {
 	assert(aLogger);
@@ -30,6 +72,7 @@ CLocalization::CLocalization(CLogApi* aLogger)
 
 	CContext* ctx = CContext::GetContext();
 	CSettings* settingsctx = ctx->GetSettingsCtx();
+	CEventApi* evtapi = ctx->GetEventApi();
 
 	this->SetLocaleDirectory(Index(EPath::DIR_LOCALES));
 	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleEN), RES_LOCALE_EN, "JSON");
@@ -45,6 +88,10 @@ CLocalization::CLocalization(CLogApi* aLogger)
 
 	std::string lang = settingsctx->Get<std::string>(OPT_LANGUAGE, "en");
 	this->SetLanguage(!lang.empty() ? lang : "en");
+
+	evtapi->Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", reinterpret_cast<EVENT_CONSUME>(CLocalization::OnUELanguageChanged));
+
+	s_Localization = this;
 }
 
 CLocalization::~CLocalization()

@@ -104,44 +104,6 @@
 	}
 }
 
-/*static*/ void CUiContext::OnUELanguageChanged(uint32_t* aLanguage)
-{
-	if (!aLanguage) { return; }
-
-	CContext* ctx = CContext::GetContext();
-	CUiContext* uictx = ctx->GetUIContext();
-	CLocalization* localization = uictx->GetLocalization();
-
-	switch (*aLanguage)
-	{
-		case 0:
-		{
-			localization->SetLanguage("en");
-			break;
-		}
-		case 2:
-		{
-			localization->SetLanguage("fr");
-			break;
-		}
-		case 3:
-		{
-			localization->SetLanguage("de");
-			break;
-		}
-		case 4:
-		{
-			localization->SetLanguage("es");
-			break;
-		}
-		case 5:
-		{
-			localization->SetLanguage("cn");
-			break;
-		}
-	}
-}
-
 /*static*/ void CUiContext::OnMumbleIdentityChanged(void* aEventArgs)
 {
 	CContext* ctx = CContext::GetContext();
@@ -229,7 +191,6 @@ CUiContext::CUiContext(
 	this->Input          = new CUiInput(CContext::GetContext()->GetSettingsCtx());
 
 	this->EventApi->Subscribe(EV_MUMBLE_IDENTITY_UPDATED,              CUiContext::OnMumbleIdentityChanged);
-	this->EventApi->Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", reinterpret_cast<EVENT_CONSUME>(CUiContext::OnUELanguageChanged));
 	this->EventApi->Subscribe("EV_INPUTBIND_UPDATED",                  CUiContext::OnInputBindUpdate);
 
 	this->InputBindApi->Register(KB_TOGGLEHIDEUI, EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "CTRL+H");
