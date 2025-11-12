@@ -25,7 +25,7 @@ class CMainWindow : public virtual IWindow
 	/// OnInputBind:
 	/// 	Invokes an input bind.
 	///----------------------------------------------------------------------------------------------------
-	static void OnInputBind(std::string aIdentifier);
+	static void OnInputBind(const char* aIdentifier);
 
 	///----------------------------------------------------------------------------------------------------
 	/// OnVolatileAddonsDisabled:

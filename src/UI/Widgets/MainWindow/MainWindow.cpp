@@ -32,27 +32,30 @@ constexpr ImGuiWindowFlags Flags
 
 static CMainWindow* s_MainWindow{};
 
-/*static*/ void CMainWindow::OnInputBind(std::string aIdentifier)
+/*static*/ void CMainWindow::OnInputBind(const char* aIdentifier)
 {
+	if (!aIdentifier) { return; }
 	if (!s_MainWindow) { return; }
 
-	if (aIdentifier == KB_MENU)
+	std::string id = aIdentifier;
+
+	if (id == KB_MENU)
 	{
 		s_MainWindow->Activate();
 	}
-	else if (aIdentifier == KB_ADDONS)
+	else if (id == KB_ADDONS)
 	{
 		s_MainWindow->Activate("Addons");
 	}
-	else if (aIdentifier == KB_DEBUG)
+	else if (id == KB_DEBUG)
 	{
 		s_MainWindow->Activate("Debug");
 	}
-	else if (aIdentifier == KB_LOG)
+	else if (id == KB_LOG)
 	{
 		s_MainWindow->Activate("Log");
 	}
-	else if (aIdentifier == KB_OPTIONS)
+	else if (id == KB_OPTIONS)
 	{
 		s_MainWindow->Activate("Options");
 	}
