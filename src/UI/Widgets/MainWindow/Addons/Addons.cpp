@@ -11,7 +11,7 @@
 #include <shellapi.h>
 
 #include "imgui/imgui.h"
-#include "imgui_extensions.h"
+#include "imgui/imgui_extensions.h"
 
 #include "Core/Addons/Library/LibAddon.h"
 #include "Core/Context.h"

@@ -39,29 +39,29 @@
     <ClCompile Include="src\Core\Main.cpp" />
     <ClCompile Include="src\Engine\Events\EvtApi.cpp" />
     <ClCompile Include="src\Engine\Logging\LogConst.cpp" />
-    <ClCompile Include="src\thirdparty\ImAnimate\ImAnimate.cpp" />
-    <ClCompile Include="src\thirdparty\imgui\imgui.cpp" />
-    <ClCompile Include="src\thirdparty\imgui\imgui_draw.cpp" />
-    <ClCompile Include="src\thirdparty\imgui\imgui_impl_dx11.cpp" />
-    <ClCompile Include="src\thirdparty\imgui\imgui_impl_win32.cpp" />
-    <ClCompile Include="src\thirdparty\imgui\imgui_tables.cpp" />
-    <ClCompile Include="src\thirdparty\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="thirdparty\ImAnimate\ImAnimate.cpp" />
+    <ClCompile Include="thirdparty\imgui\imgui.cpp" />
+    <ClCompile Include="thirdparty\imgui\imgui_draw.cpp" />
+    <ClCompile Include="thirdparty\imgui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="thirdparty\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="thirdparty\imgui\imgui_tables.cpp" />
+    <ClCompile Include="thirdparty\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Engine\Inputs\InputBinds\IbBindV2.cpp" />
     <ClCompile Include="src\Engine\Inputs\InputBinds\IbApi.cpp" />
     <ClCompile Include="src\Engine\Logging\LogWriter.cpp" />
     <ClCompile Include="src\Engine\Logging\LogBase.cpp" />
     <ClCompile Include="src\Engine\Logging\LogApi.cpp" />
     <ClCompile Include="src\Engine\Logging\LogConsole.cpp" />
-    <ClCompile Include="src\thirdparty\minhook\mh_buffer.cpp" />
-    <ClCompile Include="src\thirdparty\minhook\mh_disasm.cpp" />
-    <ClCompile Include="src\thirdparty\minhook\mh_hook.cpp" />
-    <ClCompile Include="src\thirdparty\minhook\mh_trampoline.cpp" />
+    <ClCompile Include="thirdparty\minhook\mh_buffer.cpp" />
+    <ClCompile Include="thirdparty\minhook\mh_disasm.cpp" />
+    <ClCompile Include="thirdparty\minhook\mh_hook.cpp" />
+    <ClCompile Include="thirdparty\minhook\mh_trampoline.cpp" />
     <ClCompile Include="src\GW2\Multibox\Multibox.cpp" />
     <ClCompile Include="src\GW2\Mumble\MblReader.cpp" />
     <ClCompile Include="src\Core\Proxy\Proxy.cpp" />
     <ClCompile Include="src\Core\Preferences\PrefContext.cpp" />
     <ClCompile Include="src\Engine\Textures\TxLoader.cpp" />
-    <ClCompile Include="src\thirdparty\pugixml\pugixml.cpp" />
+    <ClCompile Include="thirdparty\pugixml\pugixml.cpp" />
     <ClCompile Include="src\UI\Controls\CtlContextMenu.cpp" />
     <ClCompile Include="src\UI\Controls\CtlModal.cpp" />
     <ClCompile Include="src\UI\Controls\CtlSubWindow.cpp" />
@@ -186,18 +186,18 @@
     <ClInclude Include="src\Engine\Logging\LogEnum.h" />
     <ClInclude Include="src\Engine\Textures\TxEnum.h" />
     <ClInclude Include="src\thirdparty\arcdps\ArcDPS.h" />
-    <ClInclude Include="src\thirdparty\httplib\httplib.h" />
-    <ClInclude Include="src\thirdparty\ImAnimate\ImAnimate.h" />
-    <ClInclude Include="src\thirdparty\imgui\imconfig.h" />
-    <ClInclude Include="src\thirdparty\imgui\imgui.h" />
-    <ClInclude Include="src\thirdparty\imgui\imgui_extensions.h" />
-    <ClInclude Include="src\thirdparty\imgui\imgui_impl_dx11.h" />
-    <ClInclude Include="src\thirdparty\imgui\imgui_impl_win32.h" />
-    <ClInclude Include="src\thirdparty\imgui\imgui_internal.h" />
-    <ClInclude Include="src\thirdparty\imgui\imgui_memory_editor.h" />
-    <ClInclude Include="src\thirdparty\imgui\imstb_rectpack.h" />
-    <ClInclude Include="src\thirdparty\imgui\imstb_textedit.h" />
-    <ClInclude Include="src\thirdparty\imgui\imstb_truetype.h" />
+    <ClInclude Include="thirdparty\httplib\httplib.h" />
+    <ClInclude Include="thirdparty\ImAnimate\ImAnimate.h" />
+    <ClInclude Include="thirdparty\imgui\imconfig.h" />
+    <ClInclude Include="thirdparty\imgui\imgui.h" />
+    <ClInclude Include="thirdparty\imgui\imgui_extensions.h" />
+    <ClInclude Include="thirdparty\imgui\imgui_impl_dx11.h" />
+    <ClInclude Include="thirdparty\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="thirdparty\imgui\imgui_internal.h" />
+    <ClInclude Include="thirdparty\imgui\imgui_memory_editor.h" />
+    <ClInclude Include="thirdparty\imgui\imstb_rectpack.h" />
+    <ClInclude Include="thirdparty\imgui\imstb_textedit.h" />
+    <ClInclude Include="thirdparty\imgui\imstb_truetype.h" />
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbFuncDefs.h" />
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbBindV2.h" />
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbApi.h" />
@@ -205,145 +205,145 @@
     <ClInclude Include="src\Engine\Logging\LogFuncDefs.h" />
     <ClInclude Include="src\Core\Main.h" />
     <ClInclude Include="src\GW2\Multibox\Multibox.h" />
-    <ClInclude Include="src\thirdparty\mumble\Mumble.h" />
-    <ClInclude Include="src\thirdparty\nlohmann\json.hpp" />
-    <ClInclude Include="src\thirdparty\openssl\aes.h" />
-    <ClInclude Include="src\thirdparty\openssl\asn1.h" />
-    <ClInclude Include="src\thirdparty\openssl\asn1err.h" />
-    <ClInclude Include="src\thirdparty\openssl\asn1t.h" />
-    <ClInclude Include="src\thirdparty\openssl\asn1_mac.h" />
-    <ClInclude Include="src\thirdparty\openssl\async.h" />
-    <ClInclude Include="src\thirdparty\openssl\asyncerr.h" />
-    <ClInclude Include="src\thirdparty\openssl\bio.h" />
-    <ClInclude Include="src\thirdparty\openssl\bioerr.h" />
-    <ClInclude Include="src\thirdparty\openssl\blowfish.h" />
-    <ClInclude Include="src\thirdparty\openssl\bn.h" />
-    <ClInclude Include="src\thirdparty\openssl\bnerr.h" />
-    <ClInclude Include="src\thirdparty\openssl\buffer.h" />
-    <ClInclude Include="src\thirdparty\openssl\buffererr.h" />
-    <ClInclude Include="src\thirdparty\openssl\camellia.h" />
-    <ClInclude Include="src\thirdparty\openssl\cast.h" />
-    <ClInclude Include="src\thirdparty\openssl\cmac.h" />
-    <ClInclude Include="src\thirdparty\openssl\cmp.h" />
-    <ClInclude Include="src\thirdparty\openssl\cmperr.h" />
-    <ClInclude Include="src\thirdparty\openssl\cmp_util.h" />
-    <ClInclude Include="src\thirdparty\openssl\cms.h" />
-    <ClInclude Include="src\thirdparty\openssl\cmserr.h" />
-    <ClInclude Include="src\thirdparty\openssl\comp.h" />
-    <ClInclude Include="src\thirdparty\openssl\comperr.h" />
-    <ClInclude Include="src\thirdparty\openssl\conf.h" />
-    <ClInclude Include="src\thirdparty\openssl\conferr.h" />
-    <ClInclude Include="src\thirdparty\openssl\configuration.h" />
-    <ClInclude Include="src\thirdparty\openssl\conftypes.h" />
-    <ClInclude Include="src\thirdparty\openssl\conf_api.h" />
-    <ClInclude Include="src\thirdparty\openssl\core.h" />
-    <ClInclude Include="src\thirdparty\openssl\core_dispatch.h" />
-    <ClInclude Include="src\thirdparty\openssl\core_names.h" />
-    <ClInclude Include="src\thirdparty\openssl\core_object.h" />
-    <ClInclude Include="src\thirdparty\openssl\crmf.h" />
-    <ClInclude Include="src\thirdparty\openssl\crmferr.h" />
-    <ClInclude Include="src\thirdparty\openssl\crypto.h" />
-    <ClInclude Include="src\thirdparty\openssl\cryptoerr.h" />
-    <ClInclude Include="src\thirdparty\openssl\cryptoerr_legacy.h" />
-    <ClInclude Include="src\thirdparty\openssl\ct.h" />
-    <ClInclude Include="src\thirdparty\openssl\cterr.h" />
-    <ClInclude Include="src\thirdparty\openssl\decoder.h" />
-    <ClInclude Include="src\thirdparty\openssl\decodererr.h" />
-    <ClInclude Include="src\thirdparty\openssl\des.h" />
-    <ClInclude Include="src\thirdparty\openssl\dh.h" />
-    <ClInclude Include="src\thirdparty\openssl\dherr.h" />
-    <ClInclude Include="src\thirdparty\openssl\dsa.h" />
-    <ClInclude Include="src\thirdparty\openssl\dsaerr.h" />
-    <ClInclude Include="src\thirdparty\openssl\dtls1.h" />
-    <ClInclude Include="src\thirdparty\openssl\ebcdic.h" />
-    <ClInclude Include="src\thirdparty\openssl\ec.h" />
-    <ClInclude Include="src\thirdparty\openssl\ecdh.h" />
-    <ClInclude Include="src\thirdparty\openssl\ecdsa.h" />
-    <ClInclude Include="src\thirdparty\openssl\ecerr.h" />
-    <ClInclude Include="src\thirdparty\openssl\encoder.h" />
-    <ClInclude Include="src\thirdparty\openssl\encodererr.h" />
-    <ClInclude Include="src\thirdparty\openssl\engine.h" />
-    <ClInclude Include="src\thirdparty\openssl\engineerr.h" />
-    <ClInclude Include="src\thirdparty\openssl\err.h" />
-    <ClInclude Include="src\thirdparty\openssl\ess.h" />
-    <ClInclude Include="src\thirdparty\openssl\esserr.h" />
-    <ClInclude Include="src\thirdparty\openssl\evp.h" />
-    <ClInclude Include="src\thirdparty\openssl\evperr.h" />
-    <ClInclude Include="src\thirdparty\openssl\e_os2.h" />
-    <ClInclude Include="src\thirdparty\openssl\fipskey.h" />
-    <ClInclude Include="src\thirdparty\openssl\fips_names.h" />
-    <ClInclude Include="src\thirdparty\openssl\hmac.h" />
-    <ClInclude Include="src\thirdparty\openssl\http.h" />
-    <ClInclude Include="src\thirdparty\openssl\httperr.h" />
-    <ClInclude Include="src\thirdparty\openssl\idea.h" />
-    <ClInclude Include="src\thirdparty\openssl\kdf.h" />
-    <ClInclude Include="src\thirdparty\openssl\kdferr.h" />
-    <ClInclude Include="src\thirdparty\openssl\lhash.h" />
-    <ClInclude Include="src\thirdparty\openssl\macros.h" />
-    <ClInclude Include="src\thirdparty\openssl\md2.h" />
-    <ClInclude Include="src\thirdparty\openssl\md4.h" />
-    <ClInclude Include="src\thirdparty\openssl\md5.h" />
-    <ClInclude Include="src\thirdparty\openssl\mdc2.h" />
-    <ClInclude Include="src\thirdparty\openssl\modes.h" />
-    <ClInclude Include="src\thirdparty\openssl\objects.h" />
-    <ClInclude Include="src\thirdparty\openssl\objectserr.h" />
-    <ClInclude Include="src\thirdparty\openssl\obj_mac.h" />
-    <ClInclude Include="src\thirdparty\openssl\ocsp.h" />
-    <ClInclude Include="src\thirdparty\openssl\ocsperr.h" />
-    <ClInclude Include="src\thirdparty\openssl\opensslconf.h" />
-    <ClInclude Include="src\thirdparty\openssl\opensslv.h" />
-    <ClInclude Include="src\thirdparty\openssl\ossl_typ.h" />
-    <ClInclude Include="src\thirdparty\openssl\params.h" />
-    <ClInclude Include="src\thirdparty\openssl\param_build.h" />
-    <ClInclude Include="src\thirdparty\openssl\pem.h" />
-    <ClInclude Include="src\thirdparty\openssl\pem2.h" />
-    <ClInclude Include="src\thirdparty\openssl\pemerr.h" />
-    <ClInclude Include="src\thirdparty\openssl\pkcs12.h" />
-    <ClInclude Include="src\thirdparty\openssl\pkcs12err.h" />
-    <ClInclude Include="src\thirdparty\openssl\pkcs7.h" />
-    <ClInclude Include="src\thirdparty\openssl\pkcs7err.h" />
-    <ClInclude Include="src\thirdparty\openssl\proverr.h" />
-    <ClInclude Include="src\thirdparty\openssl\provider.h" />
-    <ClInclude Include="src\thirdparty\openssl\prov_ssl.h" />
-    <ClInclude Include="src\thirdparty\openssl\rand.h" />
-    <ClInclude Include="src\thirdparty\openssl\randerr.h" />
-    <ClInclude Include="src\thirdparty\openssl\rc2.h" />
-    <ClInclude Include="src\thirdparty\openssl\rc4.h" />
-    <ClInclude Include="src\thirdparty\openssl\rc5.h" />
-    <ClInclude Include="src\thirdparty\openssl\ripemd.h" />
-    <ClInclude Include="src\thirdparty\openssl\rsa.h" />
-    <ClInclude Include="src\thirdparty\openssl\rsaerr.h" />
-    <ClInclude Include="src\thirdparty\openssl\safestack.h" />
-    <ClInclude Include="src\thirdparty\openssl\seed.h" />
-    <ClInclude Include="src\thirdparty\openssl\self_test.h" />
-    <ClInclude Include="src\thirdparty\openssl\sha.h" />
-    <ClInclude Include="src\thirdparty\openssl\srp.h" />
-    <ClInclude Include="src\thirdparty\openssl\srtp.h" />
-    <ClInclude Include="src\thirdparty\openssl\ssl.h" />
-    <ClInclude Include="src\thirdparty\openssl\ssl2.h" />
-    <ClInclude Include="src\thirdparty\openssl\ssl3.h" />
-    <ClInclude Include="src\thirdparty\openssl\sslerr.h" />
-    <ClInclude Include="src\thirdparty\openssl\sslerr_legacy.h" />
-    <ClInclude Include="src\thirdparty\openssl\stack.h" />
-    <ClInclude Include="src\thirdparty\openssl\store.h" />
-    <ClInclude Include="src\thirdparty\openssl\storeerr.h" />
-    <ClInclude Include="src\thirdparty\openssl\symhacks.h" />
-    <ClInclude Include="src\thirdparty\openssl\tls1.h" />
-    <ClInclude Include="src\thirdparty\openssl\trace.h" />
-    <ClInclude Include="src\thirdparty\openssl\ts.h" />
-    <ClInclude Include="src\thirdparty\openssl\tserr.h" />
-    <ClInclude Include="src\thirdparty\openssl\txt_db.h" />
-    <ClInclude Include="src\thirdparty\openssl\types.h" />
-    <ClInclude Include="src\thirdparty\openssl\ui.h" />
-    <ClInclude Include="src\thirdparty\openssl\uierr.h" />
-    <ClInclude Include="src\thirdparty\openssl\whrlpool.h" />
-    <ClInclude Include="src\thirdparty\openssl\x509.h" />
-    <ClInclude Include="src\thirdparty\openssl\x509err.h" />
-    <ClInclude Include="src\thirdparty\openssl\x509v3.h" />
-    <ClInclude Include="src\thirdparty\openssl\x509v3err.h" />
-    <ClInclude Include="src\thirdparty\openssl\x509_vfy.h" />
-    <ClInclude Include="src\thirdparty\openssl\__DECC_INCLUDE_EPILOGUE.H" />
-    <ClInclude Include="src\thirdparty\openssl\__DECC_INCLUDE_PROLOGUE.H" />
+    <ClInclude Include="thirdparty\mumble\Mumble.h" />
+    <ClInclude Include="thirdparty\nlohmann\json.hpp" />
+    <ClInclude Include="thirdparty\openssl\aes.h" />
+    <ClInclude Include="thirdparty\openssl\asn1.h" />
+    <ClInclude Include="thirdparty\openssl\asn1err.h" />
+    <ClInclude Include="thirdparty\openssl\asn1t.h" />
+    <ClInclude Include="thirdparty\openssl\asn1_mac.h" />
+    <ClInclude Include="thirdparty\openssl\async.h" />
+    <ClInclude Include="thirdparty\openssl\asyncerr.h" />
+    <ClInclude Include="thirdparty\openssl\bio.h" />
+    <ClInclude Include="thirdparty\openssl\bioerr.h" />
+    <ClInclude Include="thirdparty\openssl\blowfish.h" />
+    <ClInclude Include="thirdparty\openssl\bn.h" />
+    <ClInclude Include="thirdparty\openssl\bnerr.h" />
+    <ClInclude Include="thirdparty\openssl\buffer.h" />
+    <ClInclude Include="thirdparty\openssl\buffererr.h" />
+    <ClInclude Include="thirdparty\openssl\camellia.h" />
+    <ClInclude Include="thirdparty\openssl\cast.h" />
+    <ClInclude Include="thirdparty\openssl\cmac.h" />
+    <ClInclude Include="thirdparty\openssl\cmp.h" />
+    <ClInclude Include="thirdparty\openssl\cmperr.h" />
+    <ClInclude Include="thirdparty\openssl\cmp_util.h" />
+    <ClInclude Include="thirdparty\openssl\cms.h" />
+    <ClInclude Include="thirdparty\openssl\cmserr.h" />
+    <ClInclude Include="thirdparty\openssl\comp.h" />
+    <ClInclude Include="thirdparty\openssl\comperr.h" />
+    <ClInclude Include="thirdparty\openssl\conf.h" />
+    <ClInclude Include="thirdparty\openssl\conferr.h" />
+    <ClInclude Include="thirdparty\openssl\configuration.h" />
+    <ClInclude Include="thirdparty\openssl\conftypes.h" />
+    <ClInclude Include="thirdparty\openssl\conf_api.h" />
+    <ClInclude Include="thirdparty\openssl\core.h" />
+    <ClInclude Include="thirdparty\openssl\core_dispatch.h" />
+    <ClInclude Include="thirdparty\openssl\core_names.h" />
+    <ClInclude Include="thirdparty\openssl\core_object.h" />
+    <ClInclude Include="thirdparty\openssl\crmf.h" />
+    <ClInclude Include="thirdparty\openssl\crmferr.h" />
+    <ClInclude Include="thirdparty\openssl\crypto.h" />
+    <ClInclude Include="thirdparty\openssl\cryptoerr.h" />
+    <ClInclude Include="thirdparty\openssl\cryptoerr_legacy.h" />
+    <ClInclude Include="thirdparty\openssl\ct.h" />
+    <ClInclude Include="thirdparty\openssl\cterr.h" />
+    <ClInclude Include="thirdparty\openssl\decoder.h" />
+    <ClInclude Include="thirdparty\openssl\decodererr.h" />
+    <ClInclude Include="thirdparty\openssl\des.h" />
+    <ClInclude Include="thirdparty\openssl\dh.h" />
+    <ClInclude Include="thirdparty\openssl\dherr.h" />
+    <ClInclude Include="thirdparty\openssl\dsa.h" />
+    <ClInclude Include="thirdparty\openssl\dsaerr.h" />
+    <ClInclude Include="thirdparty\openssl\dtls1.h" />
+    <ClInclude Include="thirdparty\openssl\ebcdic.h" />
+    <ClInclude Include="thirdparty\openssl\ec.h" />
+    <ClInclude Include="thirdparty\openssl\ecdh.h" />
+    <ClInclude Include="thirdparty\openssl\ecdsa.h" />
+    <ClInclude Include="thirdparty\openssl\ecerr.h" />
+    <ClInclude Include="thirdparty\openssl\encoder.h" />
+    <ClInclude Include="thirdparty\openssl\encodererr.h" />
+    <ClInclude Include="thirdparty\openssl\engine.h" />
+    <ClInclude Include="thirdparty\openssl\engineerr.h" />
+    <ClInclude Include="thirdparty\openssl\err.h" />
+    <ClInclude Include="thirdparty\openssl\ess.h" />
+    <ClInclude Include="thirdparty\openssl\esserr.h" />
+    <ClInclude Include="thirdparty\openssl\evp.h" />
+    <ClInclude Include="thirdparty\openssl\evperr.h" />
+    <ClInclude Include="thirdparty\openssl\e_os2.h" />
+    <ClInclude Include="thirdparty\openssl\fipskey.h" />
+    <ClInclude Include="thirdparty\openssl\fips_names.h" />
+    <ClInclude Include="thirdparty\openssl\hmac.h" />
+    <ClInclude Include="thirdparty\openssl\http.h" />
+    <ClInclude Include="thirdparty\openssl\httperr.h" />
+    <ClInclude Include="thirdparty\openssl\idea.h" />
+    <ClInclude Include="thirdparty\openssl\kdf.h" />
+    <ClInclude Include="thirdparty\openssl\kdferr.h" />
+    <ClInclude Include="thirdparty\openssl\lhash.h" />
+    <ClInclude Include="thirdparty\openssl\macros.h" />
+    <ClInclude Include="thirdparty\openssl\md2.h" />
+    <ClInclude Include="thirdparty\openssl\md4.h" />
+    <ClInclude Include="thirdparty\openssl\md5.h" />
+    <ClInclude Include="thirdparty\openssl\mdc2.h" />
+    <ClInclude Include="thirdparty\openssl\modes.h" />
+    <ClInclude Include="thirdparty\openssl\objects.h" />
+    <ClInclude Include="thirdparty\openssl\objectserr.h" />
+    <ClInclude Include="thirdparty\openssl\obj_mac.h" />
+    <ClInclude Include="thirdparty\openssl\ocsp.h" />
+    <ClInclude Include="thirdparty\openssl\ocsperr.h" />
+    <ClInclude Include="thirdparty\openssl\opensslconf.h" />
+    <ClInclude Include="thirdparty\openssl\opensslv.h" />
+    <ClInclude Include="thirdparty\openssl\ossl_typ.h" />
+    <ClInclude Include="thirdparty\openssl\params.h" />
+    <ClInclude Include="thirdparty\openssl\param_build.h" />
+    <ClInclude Include="thirdparty\openssl\pem.h" />
+    <ClInclude Include="thirdparty\openssl\pem2.h" />
+    <ClInclude Include="thirdparty\openssl\pemerr.h" />
+    <ClInclude Include="thirdparty\openssl\pkcs12.h" />
+    <ClInclude Include="thirdparty\openssl\pkcs12err.h" />
+    <ClInclude Include="thirdparty\openssl\pkcs7.h" />
+    <ClInclude Include="thirdparty\openssl\pkcs7err.h" />
+    <ClInclude Include="thirdparty\openssl\proverr.h" />
+    <ClInclude Include="thirdparty\openssl\provider.h" />
+    <ClInclude Include="thirdparty\openssl\prov_ssl.h" />
+    <ClInclude Include="thirdparty\openssl\rand.h" />
+    <ClInclude Include="thirdparty\openssl\randerr.h" />
+    <ClInclude Include="thirdparty\openssl\rc2.h" />
+    <ClInclude Include="thirdparty\openssl\rc4.h" />
+    <ClInclude Include="thirdparty\openssl\rc5.h" />
+    <ClInclude Include="thirdparty\openssl\ripemd.h" />
+    <ClInclude Include="thirdparty\openssl\rsa.h" />
+    <ClInclude Include="thirdparty\openssl\rsaerr.h" />
+    <ClInclude Include="thirdparty\openssl\safestack.h" />
+    <ClInclude Include="thirdparty\openssl\seed.h" />
+    <ClInclude Include="thirdparty\openssl\self_test.h" />
+    <ClInclude Include="thirdparty\openssl\sha.h" />
+    <ClInclude Include="thirdparty\openssl\srp.h" />
+    <ClInclude Include="thirdparty\openssl\srtp.h" />
+    <ClInclude Include="thirdparty\openssl\ssl.h" />
+    <ClInclude Include="thirdparty\openssl\ssl2.h" />
+    <ClInclude Include="thirdparty\openssl\ssl3.h" />
+    <ClInclude Include="thirdparty\openssl\sslerr.h" />
+    <ClInclude Include="thirdparty\openssl\sslerr_legacy.h" />
+    <ClInclude Include="thirdparty\openssl\stack.h" />
+    <ClInclude Include="thirdparty\openssl\store.h" />
+    <ClInclude Include="thirdparty\openssl\storeerr.h" />
+    <ClInclude Include="thirdparty\openssl\symhacks.h" />
+    <ClInclude Include="thirdparty\openssl\tls1.h" />
+    <ClInclude Include="thirdparty\openssl\trace.h" />
+    <ClInclude Include="thirdparty\openssl\ts.h" />
+    <ClInclude Include="thirdparty\openssl\tserr.h" />
+    <ClInclude Include="thirdparty\openssl\txt_db.h" />
+    <ClInclude Include="thirdparty\openssl\types.h" />
+    <ClInclude Include="thirdparty\openssl\ui.h" />
+    <ClInclude Include="thirdparty\openssl\uierr.h" />
+    <ClInclude Include="thirdparty\openssl\whrlpool.h" />
+    <ClInclude Include="thirdparty\openssl\x509.h" />
+    <ClInclude Include="thirdparty\openssl\x509err.h" />
+    <ClInclude Include="thirdparty\openssl\x509v3.h" />
+    <ClInclude Include="thirdparty\openssl\x509v3err.h" />
+    <ClInclude Include="thirdparty\openssl\x509_vfy.h" />
+    <ClInclude Include="thirdparty\openssl\__DECC_INCLUDE_EPILOGUE.H" />
+    <ClInclude Include="thirdparty\openssl\__DECC_INCLUDE_PROLOGUE.H" />
     <ClInclude Include="src\Core\Addons\Definitions\AddonDefV1.h" />
     <ClInclude Include="src\Core\Addons\API\ApiBase.h" />
     <ClInclude Include="src\Engine\Logging\LogWriter.h" />
@@ -351,18 +351,18 @@
     <ClInclude Include="src\Engine\Logging\LogMsg.h" />
     <ClInclude Include="src\Engine\Logging\LogApi.h" />
     <ClInclude Include="src\Engine\Logging\LogConsole.h" />
-    <ClInclude Include="src\thirdparty\minhook\mh_buffer.h" />
-    <ClInclude Include="src\thirdparty\minhook\mh_disasm.h" />
-    <ClInclude Include="src\thirdparty\minhook\mh_hook.h" />
-    <ClInclude Include="src\thirdparty\minhook\mh_trampoline.h" />
+    <ClInclude Include="thirdparty\minhook\mh_buffer.h" />
+    <ClInclude Include="thirdparty\minhook\mh_disasm.h" />
+    <ClInclude Include="thirdparty\minhook\mh_hook.h" />
+    <ClInclude Include="thirdparty\minhook\mh_trampoline.h" />
     <ClInclude Include="src\GW2\Mumble\MblReader.h" />
     <ClInclude Include="src\Core\Index\IdxFuncDefs.h" />
     <ClInclude Include="src\Core\Proxy\Proxy.h" />
     <ClInclude Include="res\ResConst.h" />
     <ClInclude Include="src\Core\Preferences\PrefContext.h" />
-    <ClInclude Include="src\thirdparty\pugixml\pugiconfig.hpp" />
-    <ClInclude Include="src\thirdparty\pugixml\pugixml.hpp" />
-    <ClInclude Include="src\thirdparty\stb\stb_image.h" />
+    <ClInclude Include="thirdparty\pugixml\pugiconfig.hpp" />
+    <ClInclude Include="thirdparty\pugixml\pugixml.hpp" />
+    <ClInclude Include="thirdparty\stb\stb_image.h" />
     <ClInclude Include="src\Engine\Textures\TxFuncDefs.h" />
     <ClInclude Include="src\Engine\Textures\TxQueueEntry.h" />
     <ClInclude Include="src\Engine\Textures\TxTexture.h" />
@@ -571,16 +571,16 @@
     <TargetName>d3d11</TargetName>
     <OutDir>$(SolutionDir)$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)$(Platform)\</IntDir>
-    <IncludePath>$(ProjectDir)src\;$(ProjectDir)src\thirdparty;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)src\thirdparty\openssl\lib\VC\static;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)src\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)thirdparty\openssl\lib\VC\static;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>d3d11</TargetName>
     <OutDir>$(SolutionDir)$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)$(Platform)\</IntDir>
-    <IncludePath>$(ProjectDir)src\;$(ProjectDir)src\thirdparty;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)src\thirdparty\openssl\lib\VC\static;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)src\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)thirdparty\openssl\lib\VC\static;$(LibraryPath)</LibraryPath>
     <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -593,7 +593,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)res;$(SolutionDir)src;$(SolutionDir)src\thirdparty\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)res;$(SolutionDir)src;$(SolutionDir)thirdparty;$(SolutionDir)thirdparty\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8 /Zc:__cplusplus</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -632,7 +632,7 @@ CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)res;$(SolutionDir)src;$(SolutionDir)src\thirdparty\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)res;$(SolutionDir)src;$(SolutionDir)thirdparty;$(SolutionDir)thirdparty\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8 /Zc:__cplusplus</AdditionalOptions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
