@@ -91,6 +91,12 @@ namespace ADDONAPI
 	namespace GameBinds
 	{
 		///----------------------------------------------------------------------------------------------------
+		/// SendWndProcToGame:
+		/// 	Skips all WndProc callbacks and sends it directly to the original.
+		///----------------------------------------------------------------------------------------------------
+		LRESULT SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+		///----------------------------------------------------------------------------------------------------
 		/// PressAsync:
 		/// 	Presses the keys of a game bind.
 		///----------------------------------------------------------------------------------------------------
@@ -199,12 +205,6 @@ namespace ADDONAPI
 	///----------------------------------------------------------------------------------------------------
 	namespace RawInput
 	{
-		///----------------------------------------------------------------------------------------------------
-		/// SendWndProcToGame:
-		/// 	Skips all WndProc callbacks and sends it directly to the original.
-		///----------------------------------------------------------------------------------------------------
-		LRESULT SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
 		///----------------------------------------------------------------------------------------------------
 		/// Register:
 		/// 	Registers the provided WndProcCallback.

@@ -125,6 +125,12 @@ namespace ADDONAPI
 
 	namespace GameBinds
 	{
+		LRESULT SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+		{
+			assert(s_GameBindsApi);
+			return s_GameBindsApi->SendWndProcToGame(hWnd, uMsg, wParam, lParam);
+		}
+
 		void PressAsync(EGameBinds aGameBind)
 		{
 			assert(s_GameBindsApi);
@@ -247,12 +253,6 @@ namespace ADDONAPI
 
 	namespace RawInput
 	{
-		LRESULT SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-		{
-			assert(s_RawInputApi);
-			return s_RawInputApi->SendWndProcToGame(hWnd, uMsg, wParam, lParam);
-		}
-
 		void Register(WNDPROC_CALLBACK aWndProcCallback)
 		{
 			assert(s_RawInputApi);
@@ -659,7 +659,7 @@ namespace ADDONAPI
 
 				api->RegisterWndProc = RawInput::Register;
 				api->DeregisterWndProc = RawInput::Deregister;
-				api->SendWndProcToGameOnly = RawInput::SendWndProcToGame;
+				api->SendWndProcToGameOnly = GameBinds::SendWndProcToGame;
 
 				api->RegisterInputBindWithString = InputBinds::RegisterWithString;
 				api->RegisterInputBindWithStruct = InputBinds::RegisterWithStruct;
@@ -722,7 +722,7 @@ namespace ADDONAPI
 
 				api->RegisterWndProc = RawInput::Register;
 				api->DeregisterWndProc = RawInput::Deregister;
-				api->SendWndProcToGameOnly = RawInput::SendWndProcToGame;
+				api->SendWndProcToGameOnly = GameBinds::SendWndProcToGame;
 
 				api->RegisterInputBindWithString = InputBinds::RegisterWithString;
 				api->RegisterInputBindWithStruct = InputBinds::RegisterWithStruct;
@@ -787,7 +787,7 @@ namespace ADDONAPI
 
 				api->RegisterWndProc = RawInput::Register;
 				api->DeregisterWndProc = RawInput::Deregister;
-				api->SendWndProcToGameOnly = RawInput::SendWndProcToGame;
+				api->SendWndProcToGameOnly = GameBinds::SendWndProcToGame;
 
 				api->RegisterInputBindWithString = InputBinds::RegisterWithString2;
 				api->RegisterInputBindWithStruct = InputBinds::RegisterWithStruct2;
@@ -858,7 +858,7 @@ namespace ADDONAPI
 
 				api->RegisterWndProc = RawInput::Register;
 				api->DeregisterWndProc = RawInput::Deregister;
-				api->SendWndProcToGameOnly = RawInput::SendWndProcToGame;
+				api->SendWndProcToGameOnly = GameBinds::SendWndProcToGame;
 
 				api->InvokeInputBind = InputBinds::InvokeInputBind;
 				api->RegisterInputBindWithString = InputBinds::RegisterWithString2;
@@ -934,7 +934,7 @@ namespace ADDONAPI
 
 				api->WndProc.Register = RawInput::Register;
 				api->WndProc.Deregister = RawInput::Deregister;
-				api->WndProc.SendToGameOnly = RawInput::SendWndProcToGame;
+				api->WndProc.SendToGameOnly = GameBinds::SendWndProcToGame;
 
 				api->InputBinds.Invoke = InputBinds::InvokeInputBind;
 				api->InputBinds.RegisterWithString = InputBinds::RegisterWithString2;

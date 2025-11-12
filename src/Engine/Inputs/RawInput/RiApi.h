@@ -13,11 +13,7 @@
 
 #include "Engine/_Concepts/IWndProc.h"
 #include "Engine/Cleanup/RefCleanerBase.h"
-#include "Engine/Renderer/RdrContext.h"
 #include "RiFuncDefs.h"
-
-#define WM_PASSTHROUGH_FIRST WM_USER + 7997
-#define WM_PASSTHROUGH_LAST  WM_USER + 7997 + WM_USER - 1
 
 ///----------------------------------------------------------------------------------------------------
 /// CRawInputApi Class
@@ -28,7 +24,7 @@ class CRawInputApi : public virtual IRefCleaner, public virtual IWndProc
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CRawInputApi(RenderContext_t* aRenderCtx);
+	CRawInputApi();
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -40,19 +36,6 @@ class CRawInputApi : public virtual IRefCleaner, public virtual IWndProc
 	/// 	Returns 0 if message was processed or non-zero, if it should be passed to the next callback.
 	///----------------------------------------------------------------------------------------------------
 	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-
-	///----------------------------------------------------------------------------------------------------
-	/// WndProcGameOnly:
-	/// 	Returns the uMsg shifted back to the normal range.
-	/// 	This should be called after all other window procedures.
-	///----------------------------------------------------------------------------------------------------
-	UINT WndProcGameOnly(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-	///----------------------------------------------------------------------------------------------------
-	/// SendWndProcToGame:
-	/// 	Skips all WndProc callbacks and sends it directly to the original.
-	///----------------------------------------------------------------------------------------------------
-	LRESULT SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Register:
@@ -73,8 +56,6 @@ class CRawInputApi : public virtual IRefCleaner, public virtual IWndProc
 	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	private:
-	RenderContext_t*              RenderContext = nullptr;
-
 	mutable std::mutex            Mutex;
 	std::vector<WNDPROC_CALLBACK> Registry;
 };

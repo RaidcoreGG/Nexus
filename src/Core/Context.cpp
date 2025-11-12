@@ -125,9 +125,7 @@ CLibraryMgr* CContext::GetAddonLibrary()
 
 CRawInputApi* CContext::GetRawInputApi()
 {
-	static CRawInputApi s_RawInputApi = CRawInputApi(
-		this->GetRendererCtx()
-	);
+	static CRawInputApi s_RawInputApi = CRawInputApi();
 	return &s_RawInputApi;
 }
 
@@ -147,6 +145,7 @@ CGameBindsApi* CContext::GetGameBindsApi()
 		this->GetRawInputApi(),
 		this->GetLogger(),
 		this->GetEventApi(),
+		this->GetRendererCtx(),
 		Index(EPath::GameBinds)
 	);
 	return &s_GameBindsApi;

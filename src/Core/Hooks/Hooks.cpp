@@ -122,6 +122,7 @@ namespace Hooks
 			static CRawInputApi*  s_RawInputApi  = s_Context->GetRawInputApi();
 			static CUiContext*    s_UIContext    = s_Context->GetUIContext();
 			static CLoader*       s_Loader       = s_Context->GetLoader();
+			static CGameBindsApi* s_GameBindsApi = s_Context->GetGameBindsApi();
 
 			// don't pass to game if loader
 			if (s_Loader->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
@@ -140,12 +141,8 @@ namespace Hooks
 				Main::Shutdown(uMsg);
 			}
 
-			/* offset of 7997, if uMsg in that range it's a nexus game only message */
-			if (uMsg >= WM_PASSTHROUGH_FIRST && uMsg <= WM_PASSTHROUGH_LAST)
-			{
-				/* modify the uMsg code to the original code */
-				uMsg -= WM_PASSTHROUGH_FIRST;
-			}
+			// shift game only messages back to normal messages.
+			s_GameBindsApi->RedirectGameOnly(hWnd, uMsg, wParam, lParam);
 
 			MouseResetFix(hWnd, uMsg, wParam, lParam);
 
