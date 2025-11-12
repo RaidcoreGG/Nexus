@@ -1,9 +1,0 @@
-[submodule "Scripts"]
-	path = Scripts
-	url = https://github.com/RaidcoreGG/RCGG-Scripts
-[submodule "thirdparty/Mumble"]
-	path = thirdparty/Mumble
-	url = https://github.com/RaidcoreGG/RCGG-lib-mumble-api
-[submodule "thirdparty/ImAnimate"]
-	path = thirdparty/ImAnimate
-	url = https://github.com/RaidcoreGG/ImAnimate
