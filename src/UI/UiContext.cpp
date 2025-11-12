@@ -187,18 +187,6 @@
 	}
 }
 
-/*static*/ void CUiContext::OnVolatileAddonsDisabled(void* aEventData)
-{
-	CContext* ctx = CContext::GetContext();
-	CUiContext* uictx = ctx->GetUIContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
-
-	if (settingsctx->Get<bool>(OPT_SHOWADDONSWINDOWAFTERDUU, false))
-	{
-		uictx->MainWindow->Activate();
-	}
-}
-
 /*static*/ void CUiContext::OnInputBindUpdate(void* aEventData)
 {
 	CContext* ctx = CContext::GetContext();
@@ -242,7 +230,6 @@ CUiContext::CUiContext(
 
 	this->EventApi->Subscribe(EV_MUMBLE_IDENTITY_UPDATED,              CUiContext::OnMumbleIdentityChanged);
 	this->EventApi->Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", reinterpret_cast<EVENT_CONSUME>(CUiContext::OnUELanguageChanged));
-	this->EventApi->Subscribe(EV_VOLATILE_ADDON_DISABLED,              CUiContext::OnVolatileAddonsDisabled);
 	this->EventApi->Subscribe("EV_INPUTBIND_UPDATED",                  CUiContext::OnInputBindUpdate);
 
 	this->InputBindApi->Register(KB_TOGGLEHIDEUI, EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "CTRL+H");

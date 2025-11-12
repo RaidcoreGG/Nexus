@@ -14,7 +14,9 @@
 #include "imgui/imgui_internal.h"
 
 #include "Core/Context.h"
+#include "Core/Preferences/PrefConst.h"
 #include "Resources/ResConst.h"
+#include "SnowflakeMgr.h"
 #include "UI/Widgets/MainWindow/About/About.h"
 #include "UI/Widgets/MainWindow/Addons/Addons.h"
 #include "UI/Widgets/MainWindow/Binds/Binds.h"
@@ -22,8 +24,6 @@
 #include "UI/Widgets/MainWindow/Log/Log.h"
 #include "UI/Widgets/MainWindow/Options/Options.h"
 #include "Util/Time.h"
-
-#include "SnowflakeMgr.h"
 
 constexpr ImGuiWindowFlags Flags
 	= ImGuiWindowFlags_NoTitleBar
@@ -58,11 +58,25 @@ static CMainWindow* s_MainWindow{};
 	}
 }
 
+/*static*/ void CMainWindow::OnVolatileAddonsDisabled(void* aEventData)
+{
+	if (!s_MainWindow) { return; }
+
+	CContext*  ctx         = CContext::GetContext();
+	CSettings* settingsctx = ctx->GetSettingsCtx();
+
+	if (settingsctx->Get<bool>(OPT_SHOWADDONSWINDOWAFTERDUU, false))
+	{
+		s_MainWindow->Activate("Addons");
+	}
+}
+
 CMainWindow::CMainWindow()
 {
 	CContext*      ctx    = CContext::GetContext();
 	CLogApi*       logger = ctx->GetLogger();
 	CInputBindApi* ibapi  = ctx->GetInputBindApi();
+	CEventApi*     evtapi = ctx->GetEventApi();
 
 	CAddonsWindow*  addonsWnd  = new CAddonsWindow();
 	COptionsWindow* optionsWnd = new COptionsWindow();
@@ -86,6 +100,8 @@ CMainWindow::CMainWindow()
 	ibapi->Register(KB_OPTIONS, EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
 	ibapi->Register(KB_LOG,     EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
 	ibapi->Register(KB_DEBUG,   EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
+
+	evtapi->Subscribe(EV_VOLATILE_ADDON_DISABLED, CMainWindow::OnVolatileAddonsDisabled);
 
 	if (s_MainWindow)
 	{

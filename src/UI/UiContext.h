@@ -75,12 +75,6 @@ class CUiContext : public CUiRender, public CUiBinds, public CUiStyle, public vi
 	static void OnMumbleIdentityChanged(void* aEventArgs);
 
 	///----------------------------------------------------------------------------------------------------
-	/// OnVolatileAddonsDisabled:
-	/// 	Receiver for volatile addons disabled event to bring up the addons window.
-	///----------------------------------------------------------------------------------------------------
-	static void OnVolatileAddonsDisabled(void* aEventData);
-
-	///----------------------------------------------------------------------------------------------------
 	/// OnInputBindUpdate:
 	/// 	Reacts to input bind changes, to trigger a UI refresh.
 	///----------------------------------------------------------------------------------------------------

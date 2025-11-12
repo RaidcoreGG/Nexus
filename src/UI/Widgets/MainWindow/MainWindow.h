@@ -27,6 +27,12 @@ class CMainWindow : public virtual IWindow
 	///----------------------------------------------------------------------------------------------------
 	static void OnInputBind(std::string aIdentifier);
 
+	///----------------------------------------------------------------------------------------------------
+	/// OnVolatileAddonsDisabled:
+	/// 	Receiver for volatile addons disabled event to bring up the addons window.
+	///----------------------------------------------------------------------------------------------------
+	static void OnVolatileAddonsDisabled(void* aEventData);
+
 	CMainWindow();
 
 	~CMainWindow();
