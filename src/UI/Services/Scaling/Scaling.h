@@ -13,8 +13,8 @@
 #include "Engine/_Concepts/IWndProc.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
-#include "Engine/Renderer/RdrContext.h"
 #include "GW2/Mumble/MblReader.h"
+#include "UI/Renderer/RdrContext.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// CScaling Class

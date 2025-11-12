@@ -18,9 +18,9 @@
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Loader/Loader.h"
-#include "Engine/Textures/TxLoader.h"
-#include "Engine/Textures/TxTexture.h"
 #include "UI/Services/Localization/LoclApi.h"
+#include "UI/Textures/TxLoader.h"
+#include "UI/Textures/TxTexture.h"
 #include "UI/UiFuncDefs.h"
 
 ///----------------------------------------------------------------------------------------------------

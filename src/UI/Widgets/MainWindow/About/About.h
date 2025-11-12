@@ -9,7 +9,7 @@
 #pragma once
 
 #include "UI/Controls/CtlSubWindow.h"
-#include "Engine/Textures/TxTexture.h"
+#include "UI/Textures/TxTexture.h"
 
 class CAboutBox : public ISubWindow
 {

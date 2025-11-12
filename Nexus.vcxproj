@@ -60,7 +60,7 @@
     <ClCompile Include="src\GW2\Mumble\MblReader.cpp" />
     <ClCompile Include="src\Core\Proxy\Proxy.cpp" />
     <ClCompile Include="src\Core\Preferences\PrefContext.cpp" />
-    <ClCompile Include="src\Engine\Textures\TxLoader.cpp" />
+    <ClCompile Include="src\UI\Textures\TxLoader.cpp" />
     <ClCompile Include="thirdparty\pugixml\pugixml.cpp" />
     <ClCompile Include="src\UI\Controls\CtlContextMenu.cpp" />
     <ClCompile Include="src\UI\Controls\CtlModal.cpp" />
@@ -155,9 +155,9 @@
     <ClInclude Include="src\GW2\Build\BuildInfo.h" />
     <ClInclude Include="src\GW2\Inputs\MouseResetFix.h" />
     <ClInclude Include="src\Engine\Networking\NetConst.h" />
-    <ClInclude Include="src\Engine\Renderer\RdrContext.h" />
-    <ClInclude Include="src\Engine\Renderer\RdrMetrics.h" />
-    <ClInclude Include="src\Engine\Renderer\RdrWindow.h" />
+    <ClInclude Include="src\UI\Renderer\RdrContext.h" />
+    <ClInclude Include="src\UI\Renderer\RdrMetrics.h" />
+    <ClInclude Include="src\UI\Renderer\RdrWindow.h" />
     <ClInclude Include="src\GW2\Inputs\GameBinds\GbEnum.h" />
     <ClInclude Include="src\GW2\Inputs\GameBinds\GbConst.h" />
     <ClInclude Include="src\GW2\Inputs\GameBinds\GbFuncDefs.h" />
@@ -184,7 +184,7 @@
     <ClInclude Include="src\Engine\Events\EvtFuncDefs.h" />
     <ClInclude Include="src\Engine\Logging\LogConst.h" />
     <ClInclude Include="src\Engine\Logging\LogEnum.h" />
-    <ClInclude Include="src\Engine\Textures\TxEnum.h" />
+    <ClInclude Include="src\UI\Textures\TxEnum.h" />
     <ClInclude Include="src\thirdparty\arcdps\ArcDPS.h" />
     <ClInclude Include="thirdparty\httplib\httplib.h" />
     <ClInclude Include="thirdparty\ImAnimate\ImAnimate.h" />
@@ -363,10 +363,10 @@
     <ClInclude Include="thirdparty\pugixml\pugiconfig.hpp" />
     <ClInclude Include="thirdparty\pugixml\pugixml.hpp" />
     <ClInclude Include="thirdparty\stb\stb_image.h" />
-    <ClInclude Include="src\Engine\Textures\TxFuncDefs.h" />
-    <ClInclude Include="src\Engine\Textures\TxQueueEntry.h" />
-    <ClInclude Include="src\Engine\Textures\TxTexture.h" />
-    <ClInclude Include="src\Engine\Textures\TxLoader.h" />
+    <ClInclude Include="src\UI\Textures\TxFuncDefs.h" />
+    <ClInclude Include="src\UI\Textures\TxQueueEntry.h" />
+    <ClInclude Include="src\UI\Textures\TxTexture.h" />
+    <ClInclude Include="src\UI\Textures\TxLoader.h" />
     <ClInclude Include="src\UI\Controls\Control.h" />
     <ClInclude Include="src\UI\Controls\CtlContextMenu.h" />
     <ClInclude Include="src\UI\Controls\CtlModal.h" />

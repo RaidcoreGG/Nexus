@@ -6,7 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "Engine/Textures/TxLoader.h"
+#include "TxLoader.h"
 
 #include <d3d11.h>
 #include <filesystem>

@@ -15,10 +15,10 @@
 #include "Engine/Inputs/InputBinds/IbFuncDefs.h"
 #include "Engine/Inputs/RawInput/RiFuncDefs.h"
 #include "Engine/Logging/LogEnum.h"
-#include "Engine/Textures/TxFuncDefs.h"
 #include "GW2/Inputs/GameBinds/GbEnum.h"
-#include "UI/UiFuncDefs.h"
 #include "UI/Services/Fonts/FuncDefs.h"
+#include "UI/Textures/TxFuncDefs.h"
+#include "UI/UiFuncDefs.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// ADDONAPI Namespace

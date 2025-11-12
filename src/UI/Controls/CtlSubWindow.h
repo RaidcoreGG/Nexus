@@ -11,7 +11,7 @@
 #include <string>
 
 #include "CtlWindow.h"
-#include "Engine/Textures/TxTexture.h"
+#include "UI/Textures/TxTexture.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// ISubWindow Interface Class

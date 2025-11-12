@@ -23,11 +23,11 @@
 #include "Engine/Loader/Loader.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
-#include "Engine/Renderer/RdrContext.h"
-#include "Engine/Textures/TxLoader.h"
 #include "GW2/ArcDPS/ArcApi.h"
 #include "GW2/Inputs/GameBinds/GbApi.h"
 #include "GW2/Mumble/MblReader.h"
+#include "UI/Renderer/RdrContext.h"
+#include "UI/Textures/TxLoader.h"
 #include "UI/UiContext.h"
 
 class CContext

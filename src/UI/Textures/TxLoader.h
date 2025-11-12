@@ -19,10 +19,10 @@
 
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include "Engine/Logging/LogApi.h"
-#include "Engine/Renderer/RdrContext.h"
 #include "TxFuncDefs.h"
 #include "TxQueueEntry.h"
 #include "TxTexture.h"
+#include "UI/Renderer/RdrContext.h"
 
 constexpr const char* CH_TEXTURES = "Textures";
 

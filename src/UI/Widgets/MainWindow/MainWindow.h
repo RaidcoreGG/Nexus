@@ -11,9 +11,9 @@
 #include <mutex>
 #include <vector>
 
-#include "UI/Controls/CtlWindow.h"
 #include "UI/Controls/CtlSubWindow.h"
-#include "Engine/Textures/TxTexture.h"
+#include "UI/Controls/CtlWindow.h"
+#include "UI/Textures/TxTexture.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// CMainWindow Class
