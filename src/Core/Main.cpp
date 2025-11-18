@@ -16,6 +16,7 @@
 #include "Core/Context.h"
 #include "Core/Hooks/Hooks.h"
 #include "Core/Index/Index.h"
+#include "Engine/CrashHandler/CrashHandler.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Logging/LogConsole.h"
 #include "Engine/Logging/LogWriter.h"

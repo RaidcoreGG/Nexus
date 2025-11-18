@@ -20,6 +20,7 @@
     <ClCompile Include="src\Core\Updater\SelfUpdater.cpp" />
     <ClCompile Include="src\Engine\Cleanup\RefCleanerBase.cpp" />
     <ClCompile Include="src\Engine\Cleanup\RefCleanerContext.cpp" />
+    <ClCompile Include="src\Engine\CrashHandler\CrashHandler.cpp" />
     <ClCompile Include="src\Engine\Functions\FnRegistry.cpp" />
     <ClCompile Include="src\Core\Index\Index.cpp" />
     <ClCompile Include="src\Engine\Loader\LdrAddonBase.cpp" />
@@ -128,6 +129,7 @@
     <ClInclude Include="src\Core\Updater\SelfUpdater.h" />
     <ClInclude Include="src\Core\Versioning\MajorMinorBuildRevision.h" />
     <ClInclude Include="src\Engine\Cleanup\RefCleanerContext.h" />
+    <ClInclude Include="src\Engine\CrashHandler\CrashHandler.h" />
     <ClInclude Include="src\Engine\Events\EvtData.h" />
     <ClInclude Include="src\Engine\Functions\FnEntry.h" />
     <ClInclude Include="src\Engine\Functions\FnRegistry.h" />
@@ -606,7 +608,7 @@
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
-      <AdditionalDependencies>advapi32.lib;crypt32.lib;gdi32.lib;ntdll.lib;PathCch.lib;Psapi.lib;shcore.lib;Shell32.lib;Shlwapi.lib;user32.lib;ws2_32.lib;libssl64MTd.lib;libcrypto64MTd.lib</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;crypt32.lib;DbgHelp.lib;gdi32.lib;ntdll.lib;PathCch.lib;Psapi.lib;shcore.lib;Shell32.lib;Shlwapi.lib;user32.lib;ws2_32.lib;libssl64MTd.lib;libcrypto64MTd.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>git submodule update --init --recursive
@@ -647,7 +649,7 @@ CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
-      <AdditionalDependencies>advapi32.lib;crypt32.lib;gdi32.lib;ntdll.lib;PathCch.lib;Psapi.lib;shcore.lib;Shell32.lib;Shlwapi.lib;user32.lib;ws2_32.lib;libssl64MT.lib;libcrypto64MT.lib</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;crypt32.lib;DbgHelp.lib;gdi32.lib;ntdll.lib;PathCch.lib;Psapi.lib;shcore.lib;Shell32.lib;Shlwapi.lib;user32.lib;ws2_32.lib;libssl64MT.lib;libcrypto64MT.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>git submodule update --init --recursive
