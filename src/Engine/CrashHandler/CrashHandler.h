@@ -14,12 +14,12 @@
 #include <filesystem>
 #include <fstream>
 
-struct FunctionCall
+struct StackEntry_t
 {
-	std::string FunctionName;
-	std::string FileName;
-	uint32_t    LineNumber;
-	uint64_t    ModuleOffset;
+	char     FunctionName[MAX_PATH];
+	char     FileName[MAX_PATH];
+	uint32_t LineNumber;
+	uint64_t ModuleOffset;
 };
 
 class CCrashHandler

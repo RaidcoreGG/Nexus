@@ -208,10 +208,10 @@ namespace Hooks
 			{
 				//throw std::exception("test");
 
-				//int* p = nullptr;
-				//*p = 1;
+				int* p = nullptr;
+				*p = 1;
 
-				//s_Context->GetLogger()->Info(CH_CORE, "Crashing here: %p", p);
+				s_Context->GetLogger()->Info(CH_CORE, "Crashing here: %p", p);
 			}
 
 			return Target::DXGIPresent(pChain, SyncInterval, Flags);

@@ -95,7 +95,8 @@ CCrashHandler::~CCrashHandler()
 		SymInitialize(hProcess, NULL, TRUE);
 	}
 
-	std::vector<FunctionCall> callstack{};
+	size_t callstackSz = 0;
+	StackEntry_t callstack[64]{};
 
 	/* Initialize the stackframe. */
 	STACKFRAME64 sf{};
@@ -129,25 +130,24 @@ CCrashHandler::~CCrashHandler()
 		pSymbol->SizeOfStruct = sizeof(SYMBOL_INFO);
 		pSymbol->MaxNameLen = MAX_SYM_NAME;
 
-		FunctionCall currentCall{};
-
 		IMAGEHLP_MODULE64 moduleInfo{};
 		moduleInfo.SizeOfStruct = sizeof(moduleInfo);
 
+		StackEntry_t& entry = callstack[callstackSz];
+
 		if (SymGetModuleInfo64(hProcess, sf.AddrPC.Offset, &moduleInfo))
 		{
-			currentCall.ModuleOffset = sf.AddrPC.Offset - moduleInfo.BaseOfImage;
+			entry.ModuleOffset = sf.AddrPC.Offset - moduleInfo.BaseOfImage;
 		}
 
 		DWORD64 dwSymDisplacement = 0;
 		if (SymFromAddr(hProcess, sf.AddrPC.Offset, &dwSymDisplacement, pSymbol))
 		{
-			currentCall.FunctionName = pSymbol->Name;
+			strcpy_s(entry.FunctionName, sizeof(entry.FunctionName), pSymbol->Name);
 		}
 		else
 		{
-			/* No symbol, so we log the module offset. */
-			currentCall.FunctionName = std::format("{:#x}", currentCall.ModuleOffset);
+			snprintf(&entry.FunctionName[0], sizeof(entry.FunctionName), "0x%llX", entry.ModuleOffset);
 		}
 
 		/* Get line and module name. */
@@ -156,17 +156,17 @@ CCrashHandler::~CCrashHandler()
 
 		if (SymGetLineFromAddr64(hProcess, sf.AddrPC.Offset, &dwLineDisplacement, &lineInfo))
 		{
-			currentCall.FileName = lineInfo.FileName;
-			currentCall.LineNumber = lineInfo.LineNumber;
+			strcpy_s(entry.FileName, sizeof(entry.FileName), lineInfo.FileName);
+			entry.LineNumber = lineInfo.LineNumber;
 		}
 		else
 		{
-			currentCall.FileName = moduleInfo.ImageName;
-			currentCall.LineNumber = -1;
+			strcpy_s(entry.FileName, sizeof(entry.FileName), moduleInfo.ImageName);
+			entry.LineNumber = -1;
 		}
 
-		/* Store information. */
-		callstack.push_back(currentCall);
+		/* Increment size/index. */
+		callstackSz++;
 	}
 
 	/* Cleanup. */
@@ -206,14 +206,16 @@ CCrashHandler::~CCrashHandler()
 	WriteFile(hFile, p, strlen(p), nullptr, nullptr);
 
 	size_t frameIndex = 0;
-	for (const auto& frame : callstack)
+	for (size_t i = 0; i < callstackSz; i++)
 	{
-		snprintf(p, sizeof(buffer), "%s@%s", frame.FileName.c_str(), frame.FunctionName.c_str());
+		StackEntry_t& entry = callstack[i];
+
+		snprintf(p, sizeof(buffer), "%s@%s", entry.FileName, entry.FunctionName);
 		WriteFile(hFile, p, strlen(p), nullptr, nullptr);
 
-		if (frame.LineNumber != -1)
+		if (entry.LineNumber != -1)
 		{
-			snprintf(p, sizeof(buffer), " on line %u", frame.LineNumber);
+			snprintf(p, sizeof(buffer), " on line %u", entry.LineNumber);
 			WriteFile(hFile, p, strlen(p), nullptr, nullptr);
 		}
 
