@@ -12,12 +12,14 @@
 
 #include <errhandlingapi.h>
 #include <filesystem>
+#include <fstream>
 
 struct FunctionCall
 {
 	std::string FunctionName;
 	std::string FileName;
 	uint32_t    LineNumber;
+	uint64_t    ModuleOffset;
 };
 
 class CCrashHandler
@@ -35,6 +37,7 @@ class CCrashHandler
 
 	private:
 	std::filesystem::path        LogPath;
+	std::ofstream                LogStream;
 	PVOID                        VEH;
 	LPTOP_LEVEL_EXCEPTION_FILTER UEF;
 	SYSTEM_INFO                  SystemInfo;

@@ -202,9 +202,11 @@ namespace Hooks
 
 			uint64_t now = GetTickCount64();
 
+			static CCrashHandler* crashHandler = new CCrashHandler(Index(EPath::LastCrashLog));
+
 			if ((now - s_InitialTick) >= 5000)
 			{
-				static CCrashHandler* crashHandler = new CCrashHandler(Index(EPath::LastCrashLog));
+				//throw std::exception("test");
 
 				//int* p = nullptr;
 				//*p = 1;

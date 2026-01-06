@@ -9,7 +9,6 @@
 #include "CrashHandler.h"
 
 #include <dbghelp.h>
-#include <fstream>
 #include <shellapi.h>
 
 static CCrashHandler* s_CrashHandler{};
@@ -37,6 +36,9 @@ CCrashHandler::CCrashHandler(std::filesystem::path aLogPath)
 	this->VEH = AddVectoredExceptionHandler(1, CCrashHandler::OnVectoredException);
 	this->UEF = SetUnhandledExceptionFilter(CCrashHandler::OnUnhandledException);
 	
+	this->LogPath = aLogPath;
+	this->LogStream = std::ofstream{this->LogPath, std::ios_base::out, SH_DENYWR};
+
 	if (s_CrashHandler)
 	{
 		throw "CCrashHandler already registered.";
@@ -47,6 +49,8 @@ CCrashHandler::CCrashHandler(std::filesystem::path aLogPath)
 
 CCrashHandler::~CCrashHandler()
 {
+	this->LogStream.close();
+
 	if (this->VEH)
 	{
 		RemoveVectoredExceptionHandler(this->VEH);
@@ -72,16 +76,14 @@ CCrashHandler::~CCrashHandler()
 		case EXCEPTION_IN_PAGE_ERROR:
 		case EXCEPTION_GUARD_PAGE:
 		case EXCEPTION_PRIV_INSTRUCTION:
+		//case 0xE06D7363: // C++ exception
 		{
 			OnUnhandledException(aExcPointers);
-			return EXCEPTION_CONTINUE_SEARCH; // DO NOT swallow it
-		}
-
-		default:
-		{
-			return EXCEPTION_CONTINUE_SEARCH;
+			break;
 		}
 	}
+
+	return EXCEPTION_CONTINUE_SEARCH;
 }
 
 
@@ -91,9 +93,8 @@ CCrashHandler::~CCrashHandler()
 
 	if (!SymInitialize(hProcess, NULL, TRUE))
 	{
-		MessageBoxA(0, "Cannot call sym init.", "UEF", 0);
 		SymCleanup(hProcess);
-		return EXCEPTION_EXECUTE_HANDLER;
+		SymInitialize(hProcess, NULL, TRUE);
 	}
 
 	std::vector<FunctionCall> callstack{};
@@ -114,8 +115,6 @@ CCrashHandler::~CCrashHandler()
 	sf.AddrStack.Mode = AddrModeFlat;
 	sf.AddrFrame.Mode = AddrModeFlat;
 
-	MessageBoxA(0, "Before while.", "UEF", 0);
-
 	/* Walk through the stack frames. */
 	HANDLE hThread = GetCurrentThread();
 	while (StackWalk64(s_CrashHandler->MachineType, hProcess, hThread, &sf, aExcPointers->ContextRecord, 0, SymFunctionTableAccess64, SymGetModuleBase64, 0))
@@ -134,10 +133,23 @@ CCrashHandler::~CCrashHandler()
 
 		FunctionCall currentCall{};
 
+		IMAGEHLP_MODULE64 moduleInfo{};
+		moduleInfo.SizeOfStruct = sizeof(moduleInfo);
+
+		if (SymGetModuleInfo64(hProcess, sf.AddrPC.Offset, &moduleInfo))
+		{
+			currentCall.ModuleOffset = sf.AddrPC.Offset - moduleInfo.BaseOfImage;
+		}
+
 		DWORD64 dwSymDisplacement = 0;
 		if (SymFromAddr(hProcess, sf.AddrPC.Offset, &dwSymDisplacement, pSymbol))
 		{
 			currentCall.FunctionName = pSymbol->Name;
+		}
+		else
+		{
+			/* No symbol, so we log the module offset. */
+			currentCall.FunctionName = std::format("{:#x}", currentCall.ModuleOffset);
 		}
 
 		/* Get line and module name. */
@@ -149,42 +161,49 @@ CCrashHandler::~CCrashHandler()
 			currentCall.FileName = lineInfo.FileName;
 			currentCall.LineNumber = lineInfo.LineNumber;
 		}
+		else
+		{
+			currentCall.FileName = moduleInfo.ImageName;
+			currentCall.LineNumber = -1;
+		}
 
 		/* Store information. */
 		callstack.push_back(currentCall);
 	}
 
 	/* Cleanup. */
-	SymCleanup(hProcess);
+	//SymCleanup(hProcess);
 
-	std::ofstream file{};
-	file.open(s_CrashHandler->LogPath, std::ios_base::out, SH_DENYWR);
-
-	if (!file.is_open())
+	if (!s_CrashHandler->LogStream.is_open())
 	{
-		MessageBoxA(0, "File not open.", "UEF", 0);
-
 		return EXCEPTION_EXECUTE_HANDLER;
 	}
 
-	file << "========================\n";
-	file << "Call Stack Dump:\n";
-	file << "========================\n";
+	s_CrashHandler->LogStream << "========================\n";
+	s_CrashHandler->LogStream << "Exception:" << std::hex << aExcPointers->ExceptionRecord->ExceptionCode << "\n";
+	s_CrashHandler->LogStream << "========================\n";
+	s_CrashHandler->LogStream << "Call Stack Dump:\n";
+	s_CrashHandler->LogStream << "========================\n";
 
 	size_t frameIndex = 0;
 	for (const auto& frame : callstack)
 	{
-		file << std::setw(3) << frameIndex++ << ": "
-			<< frame.FunctionName << "  (" << frame.FileName
-			<< ":" << frame.LineNumber << ")\n";
+		s_CrashHandler->LogStream << std::setw(3) << frameIndex++ << ": "
+			<< frame.FileName << "@" << frame.FunctionName;
+
+		if (frame.LineNumber != -1)
+		{
+			s_CrashHandler->LogStream << " on line " << frame.LineNumber;
+		}
+
+		s_CrashHandler->LogStream << "\n";
 	}
 
-	file << "========================\n\n";
+	s_CrashHandler->LogStream << "========================\n\n";
 
-	file.flush();
-	file.close();
+	s_CrashHandler->LogStream.flush();
 
-	MessageBoxA(0, "Opening log.", "UEF", 0);
+	//MessageBoxA(0, "Opening log.", "UEF", 0);
 
 	ShellExecuteA(nullptr, "open", s_CrashHandler->LogPath.string().c_str(), nullptr, nullptr, SW_SHOWNORMAL);
 
