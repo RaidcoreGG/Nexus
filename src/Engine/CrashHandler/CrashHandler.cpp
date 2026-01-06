@@ -36,8 +36,8 @@ CCrashHandler::CCrashHandler(std::filesystem::path aLogPath)
 	this->VEH = AddVectoredExceptionHandler(1, CCrashHandler::OnVectoredException);
 	this->UEF = SetUnhandledExceptionFilter(CCrashHandler::OnUnhandledException);
 	
-	this->LogPath = aLogPath;
-	this->LogStream = std::ofstream{this->LogPath, std::ios_base::out, SH_DENYWR};
+	memset(this->LogPath, 0, MAX_PATH);
+	strcpy_s(this->LogPath, MAX_PATH, aLogPath.string().c_str());
 
 	if (s_CrashHandler)
 	{
@@ -49,8 +49,6 @@ CCrashHandler::CCrashHandler(std::filesystem::path aLogPath)
 
 CCrashHandler::~CCrashHandler()
 {
-	this->LogStream.close();
-
 	if (this->VEH)
 	{
 		RemoveVectoredExceptionHandler(this->VEH);
@@ -86,11 +84,11 @@ CCrashHandler::~CCrashHandler()
 	return EXCEPTION_CONTINUE_SEARCH;
 }
 
-
 /*static*/ LONG WINAPI CCrashHandler::OnUnhandledException(EXCEPTION_POINTERS* aExcPointers)
 {
 	HANDLE hProcess = GetCurrentProcess();
 
+	/* If we cannot initalize, we cleanup and then initialize again. Hooks 'n stuff.. */
 	if (!SymInitialize(hProcess, NULL, TRUE))
 	{
 		SymCleanup(hProcess);
@@ -172,40 +170,63 @@ CCrashHandler::~CCrashHandler()
 	}
 
 	/* Cleanup. */
-	//SymCleanup(hProcess);
+	SymCleanup(hProcess);
 
-	if (!s_CrashHandler->LogStream.is_open())
+	HANDLE hFile = CreateFileA(
+		s_CrashHandler->LogPath,
+		GENERIC_WRITE,
+		FILE_SHARE_READ,
+		nullptr,
+		CREATE_ALWAYS,
+		FILE_ATTRIBUTE_NORMAL,
+		nullptr
+	);
+
+	if (hFile == INVALID_HANDLE_VALUE)
 	{
 		return EXCEPTION_EXECUTE_HANDLER;
 	}
 
-	s_CrashHandler->LogStream << "========================\n";
-	s_CrashHandler->LogStream << "Exception:" << std::hex << aExcPointers->ExceptionRecord->ExceptionCode << "\n";
-	s_CrashHandler->LogStream << "========================\n";
-	s_CrashHandler->LogStream << "Call Stack Dump:\n";
-	s_CrashHandler->LogStream << "========================\n";
+	char buffer[0x200]{};
+	char* p = &buffer[0];
+
+	snprintf(p, sizeof(buffer), "========================\n");
+	WriteFile(hFile, p, strlen(p), nullptr, nullptr);
+
+	snprintf(p, sizeof(buffer), "Exception: 0x%X\n", aExcPointers->ExceptionRecord->ExceptionCode);
+	WriteFile(hFile, p, strlen(p), nullptr, nullptr);
+
+	snprintf(p, sizeof(buffer), "========================\n");
+	WriteFile(hFile, p, strlen(p), nullptr, nullptr);
+
+	snprintf(p, sizeof(buffer), "Stack Trace:\n");
+	WriteFile(hFile, p, strlen(p), nullptr, nullptr);
+
+	snprintf(p, sizeof(buffer), "========================\n");
+	WriteFile(hFile, p, strlen(p), nullptr, nullptr);
 
 	size_t frameIndex = 0;
 	for (const auto& frame : callstack)
 	{
-		s_CrashHandler->LogStream << std::setw(3) << frameIndex++ << ": "
-			<< frame.FileName << "@" << frame.FunctionName;
+		snprintf(p, sizeof(buffer), "%s@%s", frame.FileName.c_str(), frame.FunctionName.c_str());
+		WriteFile(hFile, p, strlen(p), nullptr, nullptr);
 
 		if (frame.LineNumber != -1)
 		{
-			s_CrashHandler->LogStream << " on line " << frame.LineNumber;
+			snprintf(p, sizeof(buffer), " on line %u", frame.LineNumber);
+			WriteFile(hFile, p, strlen(p), nullptr, nullptr);
 		}
 
-		s_CrashHandler->LogStream << "\n";
+		snprintf(p, sizeof(buffer), "\n");
+		WriteFile(hFile, p, strlen(p), nullptr, nullptr);
 	}
 
-	s_CrashHandler->LogStream << "========================\n\n";
+	snprintf(p, sizeof(buffer), "========================\n");
+	WriteFile(hFile, p, strlen(p), nullptr, nullptr);
 
-	s_CrashHandler->LogStream.flush();
+	CloseHandle(hFile);
 
-	//MessageBoxA(0, "Opening log.", "UEF", 0);
-
-	ShellExecuteA(nullptr, "open", s_CrashHandler->LogPath.string().c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+	ShellExecuteA(nullptr, "open", s_CrashHandler->LogPath, nullptr, nullptr, SW_SHOWNORMAL);
 
 	return EXCEPTION_EXECUTE_HANDLER;
 }

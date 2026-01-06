@@ -36,8 +36,7 @@ class CCrashHandler
 	~CCrashHandler();
 
 	private:
-	std::filesystem::path        LogPath;
-	std::ofstream                LogStream;
+	char                         LogPath[MAX_PATH];
 	PVOID                        VEH;
 	LPTOP_LEVEL_EXCEPTION_FILTER UEF;
 	SYSTEM_INFO                  SystemInfo;
