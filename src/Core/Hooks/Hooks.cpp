@@ -15,7 +15,6 @@
 #include "Core/Index/Index.h"
 #include "Core/Main.h"
 #include "Core/NexusLink.h"
-#include "Engine/CrashHandler/CrashHandler.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
@@ -197,22 +196,6 @@ namespace Hooks
 			s_TextureLoader->Advance();
 
 			s_UIContext->Render();
-
-			static uint64_t s_InitialTick = GetTickCount64();
-
-			uint64_t now = GetTickCount64();
-
-			static CCrashHandler* crashHandler = new CCrashHandler(Index(EPath::LastCrashLog));
-
-			if ((now - s_InitialTick) >= 5000)
-			{
-				//throw std::exception("test");
-
-				int* p = nullptr;
-				*p = 1;
-
-				s_Context->GetLogger()->Info(CH_CORE, "Crashing here: %p", p);
-			}
 
 			return Target::DXGIPresent(pChain, SyncInterval, Flags);
 		}

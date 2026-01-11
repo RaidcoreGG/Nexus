@@ -14,9 +14,9 @@
 static CCrashHandler* s_CrashHandler{};
 static PVOID s_VectoredHandlerHandle = nullptr;
 
-CCrashHandler::CCrashHandler(std::filesystem::path aLogPath)
+CCrashHandler::CCrashHandler(std::filesystem::path aCrashLogPath)
 {
-	GetSystemInfo(&this->SystemInfo);
+	::GetSystemInfo(&this->SystemInfo);
 
 	if (this->SystemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
 	{
@@ -33,11 +33,14 @@ CCrashHandler::CCrashHandler(std::filesystem::path aLogPath)
 		throw "Unexpected CPU architecture.";
 	}
 
-	this->VEH = AddVectoredExceptionHandler(1, CCrashHandler::OnVectoredException);
-	this->UEF = SetUnhandledExceptionFilter(CCrashHandler::OnUnhandledException);
+	this->VEH = ::AddVectoredExceptionHandler(1, CCrashHandler::OnVectoredException);
+	this->UEF = ::SetUnhandledExceptionFilter(CCrashHandler::OnUnhandledException);
 	
 	memset(this->LogPath, 0, MAX_PATH);
-	strcpy_s(this->LogPath, MAX_PATH, aLogPath.string().c_str());
+	strcpy_s(this->LogPath, MAX_PATH, aCrashLogPath.string().c_str());
+
+	this->CallstackSize = 0;
+	memset(this->Callstack, 0, sizeof(this->Callstack));
 
 	if (s_CrashHandler)
 	{
@@ -51,12 +54,12 @@ CCrashHandler::~CCrashHandler()
 {
 	if (this->VEH)
 	{
-		RemoveVectoredExceptionHandler(this->VEH);
+		::RemoveVectoredExceptionHandler(this->VEH);
 	}
 
 	if (this->UEF)
 	{
-		SetUnhandledExceptionFilter(this->UEF);
+		::SetUnhandledExceptionFilter(this->UEF);
 	}
 }
 
@@ -76,7 +79,7 @@ CCrashHandler::~CCrashHandler()
 		case EXCEPTION_PRIV_INSTRUCTION:
 		//case 0xE06D7363: // C++ exception
 		{
-			OnUnhandledException(aExcPointers);
+			CCrashHandler::OnUnhandledException(aExcPointers);
 			break;
 		}
 	}
@@ -86,17 +89,18 @@ CCrashHandler::~CCrashHandler()
 
 /*static*/ LONG WINAPI CCrashHandler::OnUnhandledException(EXCEPTION_POINTERS* aExcPointers)
 {
-	HANDLE hProcess = GetCurrentProcess();
+	HANDLE hProcess = ::GetCurrentProcess();
 
 	/* If we cannot initalize, we cleanup and then initialize again. Hooks 'n stuff.. */
-	if (!SymInitialize(hProcess, NULL, TRUE))
+	if (!::SymInitialize(hProcess, NULL, TRUE))
 	{
-		SymCleanup(hProcess);
-		SymInitialize(hProcess, NULL, TRUE);
+		::SymCleanup(hProcess);
+		::SymInitialize(hProcess, NULL, TRUE);
 	}
 
-	size_t callstackSz = 0;
-	StackEntry_t callstack[64]{};
+	/* Reset the callstack. */
+	s_CrashHandler->CallstackSize = 0;
+	memset(s_CrashHandler->Callstack, 0, sizeof(s_CrashHandler->Callstack));
 
 	/* Initialize the stackframe. */
 	STACKFRAME64 sf{};
@@ -115,8 +119,8 @@ CCrashHandler::~CCrashHandler()
 	sf.AddrFrame.Mode = AddrModeFlat;
 
 	/* Walk through the stack frames. */
-	HANDLE hThread = GetCurrentThread();
-	while (StackWalk64(s_CrashHandler->MachineType, hProcess, hThread, &sf, aExcPointers->ContextRecord, 0, SymFunctionTableAccess64, SymGetModuleBase64, 0))
+	HANDLE hThread = ::GetCurrentThread();
+	while (::StackWalk64(s_CrashHandler->MachineType, hProcess, hThread, &sf, aExcPointers->ContextRecord, 0, ::SymFunctionTableAccess64, ::SymGetModuleBase64, 0))
 	{
 		if (sf.AddrFrame.Offset == 0)
 		{
@@ -133,15 +137,15 @@ CCrashHandler::~CCrashHandler()
 		IMAGEHLP_MODULE64 moduleInfo{};
 		moduleInfo.SizeOfStruct = sizeof(moduleInfo);
 
-		StackEntry_t& entry = callstack[callstackSz];
+		StackEntry_t& entry = s_CrashHandler->Callstack[s_CrashHandler->CallstackSize];
 
-		if (SymGetModuleInfo64(hProcess, sf.AddrPC.Offset, &moduleInfo))
+		if (::SymGetModuleInfo64(hProcess, sf.AddrPC.Offset, &moduleInfo))
 		{
 			entry.ModuleOffset = sf.AddrPC.Offset - moduleInfo.BaseOfImage;
 		}
 
 		DWORD64 dwSymDisplacement = 0;
-		if (SymFromAddr(hProcess, sf.AddrPC.Offset, &dwSymDisplacement, pSymbol))
+		if (::SymFromAddr(hProcess, sf.AddrPC.Offset, &dwSymDisplacement, pSymbol))
 		{
 			strcpy_s(entry.FunctionName, sizeof(entry.FunctionName), pSymbol->Name);
 		}
@@ -154,7 +158,7 @@ CCrashHandler::~CCrashHandler()
 		IMAGEHLP_LINE64 lineInfo{};
 		DWORD dwLineDisplacement = 0;
 
-		if (SymGetLineFromAddr64(hProcess, sf.AddrPC.Offset, &dwLineDisplacement, &lineInfo))
+		if (::SymGetLineFromAddr64(hProcess, sf.AddrPC.Offset, &dwLineDisplacement, &lineInfo))
 		{
 			strcpy_s(entry.FileName, sizeof(entry.FileName), lineInfo.FileName);
 			entry.LineNumber = lineInfo.LineNumber;
@@ -166,13 +170,13 @@ CCrashHandler::~CCrashHandler()
 		}
 
 		/* Increment size/index. */
-		callstackSz++;
+		s_CrashHandler->CallstackSize++;
 	}
 
 	/* Cleanup. */
-	SymCleanup(hProcess);
+	::SymCleanup(hProcess);
 
-	HANDLE hFile = CreateFileA(
+	HANDLE hFile = ::CreateFileA(
 		s_CrashHandler->LogPath,
 		GENERIC_WRITE,
 		FILE_SHARE_READ,
@@ -191,44 +195,44 @@ CCrashHandler::~CCrashHandler()
 	char* p = &buffer[0];
 
 	snprintf(p, sizeof(buffer), "========================\n");
-	WriteFile(hFile, p, strlen(p), nullptr, nullptr);
+	::WriteFile(hFile, p, strlen(p), nullptr, nullptr);
 
 	snprintf(p, sizeof(buffer), "Exception: 0x%X\n", aExcPointers->ExceptionRecord->ExceptionCode);
-	WriteFile(hFile, p, strlen(p), nullptr, nullptr);
+	::WriteFile(hFile, p, strlen(p), nullptr, nullptr);
 
 	snprintf(p, sizeof(buffer), "========================\n");
-	WriteFile(hFile, p, strlen(p), nullptr, nullptr);
+	::WriteFile(hFile, p, strlen(p), nullptr, nullptr);
 
 	snprintf(p, sizeof(buffer), "Stack Trace:\n");
-	WriteFile(hFile, p, strlen(p), nullptr, nullptr);
+	::WriteFile(hFile, p, strlen(p), nullptr, nullptr);
 
 	snprintf(p, sizeof(buffer), "========================\n");
-	WriteFile(hFile, p, strlen(p), nullptr, nullptr);
+	::WriteFile(hFile, p, strlen(p), nullptr, nullptr);
 
 	size_t frameIndex = 0;
-	for (size_t i = 0; i < callstackSz; i++)
+	for (size_t i = 0; i < s_CrashHandler->CallstackSize; i++)
 	{
-		StackEntry_t& entry = callstack[i];
+		StackEntry_t& entry = s_CrashHandler->Callstack[i];
 
 		snprintf(p, sizeof(buffer), "%s@%s", entry.FileName, entry.FunctionName);
-		WriteFile(hFile, p, strlen(p), nullptr, nullptr);
+		::WriteFile(hFile, p, strlen(p), nullptr, nullptr);
 
 		if (entry.LineNumber != -1)
 		{
 			snprintf(p, sizeof(buffer), " on line %u", entry.LineNumber);
-			WriteFile(hFile, p, strlen(p), nullptr, nullptr);
+			::WriteFile(hFile, p, strlen(p), nullptr, nullptr);
 		}
 
 		snprintf(p, sizeof(buffer), "\n");
-		WriteFile(hFile, p, strlen(p), nullptr, nullptr);
+		::WriteFile(hFile, p, strlen(p), nullptr, nullptr);
 	}
 
 	snprintf(p, sizeof(buffer), "========================\n");
-	WriteFile(hFile, p, strlen(p), nullptr, nullptr);
+	::WriteFile(hFile, p, strlen(p), nullptr, nullptr);
 
-	CloseHandle(hFile);
+	::CloseHandle(hFile);
 
-	ShellExecuteA(nullptr, "open", s_CrashHandler->LogPath, nullptr, nullptr, SW_SHOWNORMAL);
+	//::ShellExecuteA(nullptr, "open", s_CrashHandler->LogPath, nullptr, nullptr, SW_SHOWNORMAL);
 
 	return EXCEPTION_EXECUTE_HANDLER;
 }

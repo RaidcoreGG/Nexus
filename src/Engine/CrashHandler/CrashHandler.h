@@ -9,10 +9,8 @@
 #pragma once
 
 #include <windows.h>
-
 #include <errhandlingapi.h>
 #include <filesystem>
-#include <fstream>
 
 struct StackEntry_t
 {
@@ -28,7 +26,7 @@ class CCrashHandler
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CCrashHandler(std::filesystem::path aLogPath);
+	CCrashHandler(std::filesystem::path aCrashLogPath);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -41,6 +39,8 @@ class CCrashHandler
 	LPTOP_LEVEL_EXCEPTION_FILTER UEF;
 	SYSTEM_INFO                  SystemInfo;
 	DWORD                        MachineType;
+	StackEntry_t                 Callstack[64];
+	size_t                       CallstackSize;
 
 	///----------------------------------------------------------------------------------------------------
 	/// OnVectoredException:

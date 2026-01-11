@@ -91,6 +91,9 @@ namespace Main
 			aEntryFunction
 		);
 
+		/* Initialize crash handler. */
+		CCrashHandler* crashhandler = ctx->GetCrashHandler();
+
 		/* Initialize self updater here so it can lock this instance and update. */
 		CSelfUpdater* selfupdater = ctx->GetSelfUpdater();
 
