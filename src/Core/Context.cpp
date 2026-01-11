@@ -68,7 +68,8 @@ DWORD CContext::GetModuleSize()
 CCrashHandler* CContext::GetCrashHandler()
 {
 	static CCrashHandler s_CrashHandler = CCrashHandler(
-		Index(EPath::LastCrashLog)
+		Index(EPath::CrashLog),
+		Index(EPath::CrashStack)
 	);
 	return &s_CrashHandler;
 }

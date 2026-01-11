@@ -9,12 +9,27 @@
 #include "CrashHandler.h"
 
 #include <dbghelp.h>
-#include <shellapi.h>
+#include <errhandlingapi.h>
 
 static CCrashHandler* s_CrashHandler{};
-static PVOID s_VectoredHandlerHandle = nullptr;
 
-CCrashHandler::CCrashHandler(std::filesystem::path aCrashLogPath)
+///----------------------------------------------------------------------------------------------------
+/// WriteToFile:
+/// 	Helper function to log to the specified file.
+///----------------------------------------------------------------------------------------------------
+void WriteToFile(HANDLE aFileHandle, const char* aFmt, ...)
+{
+	char buffer[0x1000]{};
+	char* p = &buffer[0];
+
+	va_list args;
+	va_start(args, aFmt);
+	vsnprintf(p, sizeof(buffer), aFmt, args);
+	::WriteFile(aFileHandle, p, static_cast<DWORD>(strlen(p)), nullptr, nullptr);
+	va_end(args);
+}
+
+CCrashHandler::CCrashHandler(std::filesystem::path aCrashLogPath, std::filesystem::path aCrashStackPath)
 {
 	::GetSystemInfo(&this->SystemInfo);
 
@@ -34,10 +49,12 @@ CCrashHandler::CCrashHandler(std::filesystem::path aCrashLogPath)
 	}
 
 	this->VEH = ::AddVectoredExceptionHandler(1, CCrashHandler::OnVectoredException);
-	this->UEF = ::SetUnhandledExceptionFilter(CCrashHandler::OnUnhandledException);
 	
 	memset(this->LogPath, 0, MAX_PATH);
 	strcpy_s(this->LogPath, MAX_PATH, aCrashLogPath.string().c_str());
+
+	memset(this->StackPath, 0, MAX_PATH);
+	strcpy_s(this->StackPath, MAX_PATH, aCrashStackPath.string().c_str());
 
 	this->CallstackSize = 0;
 	memset(this->Callstack, 0, sizeof(this->Callstack));
@@ -56,18 +73,11 @@ CCrashHandler::~CCrashHandler()
 	{
 		::RemoveVectoredExceptionHandler(this->VEH);
 	}
-
-	if (this->UEF)
-	{
-		::SetUnhandledExceptionFilter(this->UEF);
-	}
 }
 
 /*static*/ LONG WINAPI CCrashHandler::OnVectoredException(EXCEPTION_POINTERS* aExcPointers)
 {
-	DWORD code = aExcPointers->ExceptionRecord->ExceptionCode;
-
-	switch (code)
+	switch (aExcPointers->ExceptionRecord->ExceptionCode)
 	{
 		case EXCEPTION_ACCESS_VIOLATION:
 		case EXCEPTION_ILLEGAL_INSTRUCTION:
@@ -79,16 +89,14 @@ CCrashHandler::~CCrashHandler()
 		case EXCEPTION_PRIV_INSTRUCTION:
 		//case 0xE06D7363: // C++ exception
 		{
-			CCrashHandler::OnUnhandledException(aExcPointers);
 			break;
+		}
+		default:
+		{
+			return EXCEPTION_CONTINUE_SEARCH;
 		}
 	}
 
-	return EXCEPTION_CONTINUE_SEARCH;
-}
-
-/*static*/ LONG WINAPI CCrashHandler::OnUnhandledException(EXCEPTION_POINTERS* aExcPointers)
-{
 	HANDLE hProcess = ::GetCurrentProcess();
 
 	/* If we cannot initalize, we cleanup and then initialize again. Hooks 'n stuff.. */
@@ -142,6 +150,7 @@ CCrashHandler::~CCrashHandler()
 		if (::SymGetModuleInfo64(hProcess, sf.AddrPC.Offset, &moduleInfo))
 		{
 			entry.ModuleOffset = sf.AddrPC.Offset - moduleInfo.BaseOfImage;
+			strcpy_s(entry.ModuleName, sizeof(entry.ModuleName), moduleInfo.LoadedImageName);
 		}
 
 		DWORD64 dwSymDisplacement = 0;
@@ -176,7 +185,8 @@ CCrashHandler::~CCrashHandler()
 	/* Cleanup. */
 	::SymCleanup(hProcess);
 
-	HANDLE hFile = ::CreateFileA(
+	/* Write log file, for in depth analysis. */
+	HANDLE hLogFile = ::CreateFileA(
 		s_CrashHandler->LogPath,
 		GENERIC_WRITE,
 		FILE_SHARE_READ,
@@ -186,51 +196,59 @@ CCrashHandler::~CCrashHandler()
 		nullptr
 	);
 
-	if (hFile == INVALID_HANDLE_VALUE)
+	if (hLogFile == INVALID_HANDLE_VALUE)
 	{
 		return EXCEPTION_EXECUTE_HANDLER;
 	}
 
-	char buffer[0x200]{};
-	char* p = &buffer[0];
-
-	snprintf(p, sizeof(buffer), "========================\n");
-	::WriteFile(hFile, p, strlen(p), nullptr, nullptr);
-
-	snprintf(p, sizeof(buffer), "Exception: 0x%X\n", aExcPointers->ExceptionRecord->ExceptionCode);
-	::WriteFile(hFile, p, strlen(p), nullptr, nullptr);
-
-	snprintf(p, sizeof(buffer), "========================\n");
-	::WriteFile(hFile, p, strlen(p), nullptr, nullptr);
-
-	snprintf(p, sizeof(buffer), "Stack Trace:\n");
-	::WriteFile(hFile, p, strlen(p), nullptr, nullptr);
-
-	snprintf(p, sizeof(buffer), "========================\n");
-	::WriteFile(hFile, p, strlen(p), nullptr, nullptr);
+	WriteToFile(hLogFile, "========================\n");
+	WriteToFile(hLogFile, "Exception: 0x%X\n", aExcPointers->ExceptionRecord->ExceptionCode);
+	WriteToFile(hLogFile, "========================\n");
+	WriteToFile(hLogFile, "Stack Trace:\n");
+	WriteToFile(hLogFile, "========================\n");
 
 	size_t frameIndex = 0;
 	for (size_t i = 0; i < s_CrashHandler->CallstackSize; i++)
 	{
 		StackEntry_t& entry = s_CrashHandler->Callstack[i];
 
-		snprintf(p, sizeof(buffer), "%s@%s", entry.FileName, entry.FunctionName);
-		::WriteFile(hFile, p, strlen(p), nullptr, nullptr);
+		WriteToFile(hLogFile, "%s@%s", entry.FileName, entry.FunctionName);
 
 		if (entry.LineNumber != -1)
 		{
-			snprintf(p, sizeof(buffer), " on line %u", entry.LineNumber);
-			::WriteFile(hFile, p, strlen(p), nullptr, nullptr);
+			WriteToFile(hLogFile, " on line %u", entry.LineNumber);
 		}
 
-		snprintf(p, sizeof(buffer), "\n");
-		::WriteFile(hFile, p, strlen(p), nullptr, nullptr);
+		WriteToFile(hLogFile, "\n");
 	}
 
-	snprintf(p, sizeof(buffer), "========================\n");
-	::WriteFile(hFile, p, strlen(p), nullptr, nullptr);
+	WriteToFile(hLogFile, "========================\n");
 
-	::CloseHandle(hFile);
+	::CloseHandle(hLogFile);
+
+	/* Write stack log, to let loader analyze what to disable next launch. */
+	HANDLE hStackFile = ::CreateFileA(
+		s_CrashHandler->StackPath,
+		GENERIC_WRITE,
+		FILE_SHARE_READ,
+		nullptr,
+		CREATE_ALWAYS,
+		FILE_ATTRIBUTE_NORMAL,
+		nullptr
+	);
+
+	if (hStackFile == INVALID_HANDLE_VALUE)
+	{
+		return EXCEPTION_EXECUTE_HANDLER;
+	}
+
+	for (size_t i = 0; i < s_CrashHandler->CallstackSize; i++)
+	{
+		StackEntry_t& entry = s_CrashHandler->Callstack[i];
+		WriteToFile(hStackFile, "%s\n", entry.FileName);
+	}
+
+	::CloseHandle(hStackFile);
 
 	//::ShellExecuteA(nullptr, "open", s_CrashHandler->LogPath, nullptr, nullptr, SW_SHOWNORMAL);
 
