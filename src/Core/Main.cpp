@@ -16,6 +16,7 @@
 #include "Core/Context.h"
 #include "Core/Hooks/Hooks.h"
 #include "Core/Index/Index.h"
+#include "Engine/CrashHandler/CrashHandler.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Logging/LogConsole.h"
 #include "Engine/Logging/LogWriter.h"
@@ -89,6 +90,9 @@ namespace Main
 			ctx->GetBuild(),
 			aEntryFunction
 		);
+
+		/* Initialize crash handler. */
+		CCrashHandler* crashhandler = ctx->GetCrashHandler();
 
 		/* Initialize self updater here so it can lock this instance and update. */
 		CSelfUpdater* selfupdater = ctx->GetSelfUpdater();

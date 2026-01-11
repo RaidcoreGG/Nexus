@@ -11,6 +11,8 @@
 #include "minhook/mh_hook.h"
 
 #include "Core/Context.h"
+#include "Core/Index/IdxEnum.h"
+#include "Core/Index/Index.h"
 #include "Core/Main.h"
 #include "Core/NexusLink.h"
 #include "Engine/DataLink/DlApi.h"

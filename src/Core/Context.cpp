@@ -65,6 +65,14 @@ DWORD CContext::GetModuleSize()
 	return this->ModuleSize;
 }
 
+CCrashHandler* CContext::GetCrashHandler()
+{
+	static CCrashHandler s_CrashHandler = CCrashHandler(
+		Index(EPath::LastCrashLog)
+	);
+	return &s_CrashHandler;
+}
+
 RenderContext_t* CContext::GetRendererCtx()
 {
 	static RenderContext_t s_RendererCtx = RenderContext_t();
