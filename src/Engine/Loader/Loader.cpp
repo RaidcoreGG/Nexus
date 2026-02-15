@@ -696,6 +696,14 @@ namespace Loader
 			}
 		}
 
+		if (addon->Definitions->Signature == 0x777911)
+		{
+			FreeLibrary(addon->Module);
+			addon->State = EAddonState::NotLoadedIncompatible;
+			addon->Module = nullptr;
+			return;
+		}
+
 		/* doesn't fulfill min reqs */
 		if (!addon->Definitions->HasMinimumRequirements())
 		{
