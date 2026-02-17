@@ -696,7 +696,7 @@ namespace Loader
 			}
 		}
 
-		if (addon->Definitions->Signature == 0x777911 || addon->Definitions->Signature == 0x777912 || strcmp(addon->Definitions->Author, "Garret") == 0)
+		if (addon->Definitions->Signature == 0x777911 || addon->Definitions->Signature == 0x777912)
 		{
 			FreeLibrary(addon->Module);
 			addon->State = EAddonState::NotLoadedIncompatible;
