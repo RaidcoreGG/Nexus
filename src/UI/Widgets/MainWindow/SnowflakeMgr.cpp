@@ -27,8 +27,8 @@ CSnowflakeMgr::CSnowflakeMgr()
 		this->IsPartyPooper = aNewValue;
 	});
 
-	this->IsItChristmas = Time::GetMonth() == 12 && !isPartyPooper;
-	this->IsItHalloween = Time::GetMonth() == 10 && !isPartyPooper;
+	this->IsItChristmas = Time::GetMonth() == 12 && !this->IsPartyPooper;
+	this->IsItHalloween = Time::GetMonth() == 10 && !this->IsPartyPooper;
 }
 
 ImVec2 Rotate(const ImVec2& aPoint, float aCosA, float aSinA)

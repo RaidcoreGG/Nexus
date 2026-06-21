@@ -196,7 +196,6 @@ namespace Main
 
 		logger->Critical(CH_CORE, "SHUTDOWN BEGIN | %s", reasonStr.c_str());
 		MH_Uninitialize();
-		Loader::Shutdown();
 		uictx->Shutdown();
 		texapi->Shutdown();
 		logger->Info(CH_CORE, "SHUTDOWN END");
