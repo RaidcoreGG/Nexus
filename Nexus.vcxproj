@@ -131,7 +131,7 @@
     <ClInclude Include="src\Core\Updater\SelfUpdater.h" />
     <ClInclude Include="src\Core\Versioning\MajorMinorBuildRevision.h" />
     <ClInclude Include="src\Engine\Cleanup\RefCleanerContext.h" />
-    <ClInclude Include="src\Engine\Clockwork\CancellationToken.h" />
+    <ClInclude Include="src\Engine\Clockwork\Tasks\CancellationToken.h" />
     <ClInclude Include="src\Engine\Clockwork\Clockwork.h" />
     <ClInclude Include="src\Engine\Clockwork\Tasks\ScheduledTask.h" />
     <ClInclude Include="src\Engine\Clockwork\Tasks\Task.h" />
