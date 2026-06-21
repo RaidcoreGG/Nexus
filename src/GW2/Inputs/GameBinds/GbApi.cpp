@@ -10,6 +10,9 @@
 
 #include "pugixml/pugixml.hpp"
 
+#include "Engine/Clockwork/Clockwork.h"
+namespace Clockwork = Raidcore::Clockwork;
+
 #include "Core/Context.h"
 #include "Util/Inputs.h"
 #include "GbConst.h"
@@ -141,28 +144,31 @@ LRESULT CGameBindsApi::SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 
 void CGameBindsApi::PressAsync(EGameBinds aGameBind)
 {
-	std::thread([this, aGameBind]() {
+	Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this, aGameBind](Clockwork::CancellationToken aToken)
+	{
 		this->Press(aGameBind);
-	}).detach();
+	});
 }
 
 void CGameBindsApi::ReleaseAsync(EGameBinds aGameBind)
 {
-	std::thread([this, aGameBind]() {
+	Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this, aGameBind](Clockwork::CancellationToken aToken)
+	{
 		this->Release(aGameBind);
-	}).detach();
+	});
 }
 
 void CGameBindsApi::InvokeAsync(EGameBinds aGameBind, int aDuration)
 {
-	std::thread([this, aGameBind, aDuration]() {
+	Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this, aGameBind, aDuration](Clockwork::CancellationToken aToken)
+	{
 		this->Press(aGameBind);
 		if (aDuration > 0)
 		{
 			Sleep(aDuration);
 		}
 		this->Release(aGameBind);
-	}).detach();
+	});
 }
 
 void CGameBindsApi::Press(EGameBinds aGameBind)
@@ -562,9 +568,10 @@ void CGameBindsApi::Set(EGameBinds aGameBind, InputBind_t aInputBind, bool aIsPr
 
 	if (!aIsRuntimeBind)
 	{
-		std::thread([this]() {
+		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this, aGameBind](Clockwork::CancellationToken aToken)
+		{
 			this->EventApi->Raise("EV_INPUTBIND_UPDATED");
-		}).detach();
+		});
 		this->Save();
 	}
 }

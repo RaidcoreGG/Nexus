@@ -20,6 +20,8 @@
     <ClCompile Include="src\Core\Updater\SelfUpdater.cpp" />
     <ClCompile Include="src\Engine\Cleanup\RefCleanerBase.cpp" />
     <ClCompile Include="src\Engine\Cleanup\RefCleanerContext.cpp" />
+    <ClCompile Include="src\Engine\Clockwork\Clockwork.cpp" />
+    <ClCompile Include="src\Engine\Clockwork\Tasks\TaskBase.cpp" />
     <ClCompile Include="src\Engine\CrashHandler\CrashHandler.cpp" />
     <ClCompile Include="src\Engine\Functions\FnRegistry.cpp" />
     <ClCompile Include="src\Core\Index\Index.cpp" />
@@ -129,6 +131,13 @@
     <ClInclude Include="src\Core\Updater\SelfUpdater.h" />
     <ClInclude Include="src\Core\Versioning\MajorMinorBuildRevision.h" />
     <ClInclude Include="src\Engine\Cleanup\RefCleanerContext.h" />
+    <ClInclude Include="src\Engine\Clockwork\CancellationToken.h" />
+    <ClInclude Include="src\Engine\Clockwork\Clockwork.h" />
+    <ClInclude Include="src\Engine\Clockwork\Tasks\ScheduledTask.h" />
+    <ClInclude Include="src\Engine\Clockwork\Tasks\Task.h" />
+    <ClInclude Include="src\Engine\Clockwork\Tasks\TaskBase.h" />
+    <ClInclude Include="src\Engine\Clockwork\Tasks\ETaskPriority.h" />
+    <ClInclude Include="src\Engine\Clockwork\Tasks\WorkerTask.h" />
     <ClInclude Include="src\Engine\CrashHandler\CrashHandler.h" />
     <ClInclude Include="src\Engine\Events\EvtData.h" />
     <ClInclude Include="src\Engine\Functions\FnEntry.h" />

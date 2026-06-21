@@ -13,6 +13,9 @@
 
 #include "minhook/mh_hook.h"
 
+#include "Engine/Clockwork/Clockwork.h"
+namespace Clockwork = Raidcore::Clockwork;
+
 #include "Core/Context.h"
 #include "Core/Hooks/Hooks.h"
 #include "Core/Index/Index.h"
@@ -60,11 +63,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
 namespace Main
 {
-	static std::thread s_LibraryThread;
-	static std::thread s_BuildThread;
-	static std::thread s_LicenseThread;
-	static std::thread s_KillMutexThread;
-
 	void Initialize(EProxyFunction aEntryFunction)
 	{
 		static EProxyFunction s_EntryFunction = EProxyFunction::NONE;
@@ -76,6 +74,8 @@ namespace Main
 		}
 
 		s_EntryFunction = aEntryFunction;
+
+		Clockwork::Context::Create();
 
 		CContext* ctx    = CContext::GetContext();
 		CLogApi*  logger = ctx->GetLogger();
@@ -97,7 +97,8 @@ namespace Main
 		/* Initialize self updater here so it can lock this instance and update. */
 		CSelfUpdater* selfupdater = ctx->GetSelfUpdater();
 
-		s_LicenseThread = std::thread([]() {
+		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [](Clockwork::CancellationToken aToken)
+		{
 			CContext* ctx = CContext::GetContext();
 			Resources::Unpack(ctx->GetModule(), Index(EPath::ThirdPartySoftwareReadme), RES_THIRDPARTYNOTICES, "TXT");
 		});
@@ -133,7 +134,8 @@ namespace Main
 			return;
 		}
 
-		s_LibraryThread = std::thread([]() {
+		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Normal, [](Clockwork::CancellationToken aToken)
+		{
 			CContext* ctx = CContext::GetContext();
 			CLibraryMgr* libmgr = ctx->GetAddonLibrary();
 			libmgr->AddSource("https://api.raidcore.gg/addonlibrary");
@@ -142,13 +144,18 @@ namespace Main
 		});
 
 		/* Prefetch game build. */
-		s_BuildThread = std::thread([]() {
+		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Immediate, [](Clockwork::CancellationToken aToken)
+		{
 			GW2::GetGameBuild();
 		});
 
 		MH_Initialize();
 
-		s_KillMutexThread = std::thread([logger]() {
+		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::High, [](Clockwork::CancellationToken aToken)
+		{
+			CContext* ctx = CContext::GetContext();
+			CLogApi* logger = ctx->GetLogger();
+			
 			Multibox::KillMutex();
 			logger->Info(CH_CORE, "Multibox State: %d", Multibox::GetState());
 		});
@@ -166,11 +173,7 @@ namespace Main
 
 		s_ShutdownReason = aReason;
 
-		/* Join threads. */
-		if (s_KillMutexThread.joinable()) { s_KillMutexThread.join(); }
-		if (s_LicenseThread.joinable()) { s_LicenseThread.join(); }
-		if (s_BuildThread.joinable()) { s_BuildThread.join(); }
-		if (s_LibraryThread.joinable()) { s_LibraryThread.join(); }
+		Clockwork::Context::Destroy();
 
 		std::string reasonStr;
 		switch (aReason)
