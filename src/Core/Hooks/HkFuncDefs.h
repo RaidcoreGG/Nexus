@@ -6,12 +6,9 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef HKFUNCDEFS_H
-#define HKFUNCDEFS_H
+#pragma once
 
 #include <dxgi.h>
 
 typedef HRESULT (__stdcall* DXPRESENT)      (IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags);
 typedef HRESULT (__stdcall* DXRESIZEBUFFERS)(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
-
-#endif

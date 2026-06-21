@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LICENSEAGREEMENTMODAL_H
-#define LICENSEAGREEMENTMODAL_H
+#pragma once
 
 #include "UI/Controls/CtlModal.h"
 
@@ -34,5 +33,3 @@ class CLicenseAgreementModal : public virtual IModal
 	///----------------------------------------------------------------------------------------------------
 	void OnClosing() override;
 };
-
-#endif

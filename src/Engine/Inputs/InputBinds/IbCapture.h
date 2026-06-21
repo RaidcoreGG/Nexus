@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef IBCAPTURE_H
-#define IBCAPTURE_H
+#pragma once
 
 #include "IbBindV2.h"
 
@@ -61,5 +60,3 @@ class CInputBindCapture
 	bool      IsCtrlHeld  = false;
 	bool      IsShiftHeld = false;
 };
-
-#endif

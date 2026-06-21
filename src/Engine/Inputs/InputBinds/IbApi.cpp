@@ -8,19 +8,22 @@
 
 #include "IbApi.h"
 
-#include <cstdarg>
 #include <filesystem>
 #include <fstream>
 #include <string>
 
+#pragma warning(push, 0)
 #include "nlohmann/json.hpp"
+#pragma warning(pop)
 using json = nlohmann::json;
 
-#include "Util/Strings.h"
-#include "Util/Inputs.h"
-#include "IbConst.h"
+#include "Engine/Clockwork/Clockwork.h"
+namespace Clockwork = Raidcore::Clockwork;
 
-CInputBindApi::CInputBindApi(CEventApi* aEventApi, CLogApi* aLogger, std::filesystem::path aConfigPath)
+#include "IbConst.h"
+#include "Util/Inputs.h"
+
+CInputBindApi::CInputBindApi(CEventApi* aEventApi, CLogApi* aLogger, std::filesystem::path aConfigPath) : IRefCleaner("InputBindApi")
 {
 	assert(aEventApi);
 	assert(aLogger);
@@ -31,6 +34,10 @@ CInputBindApi::CInputBindApi(CEventApi* aEventApi, CLogApi* aLogger, std::filesy
 	this->ConfigPath = aConfigPath;
 
 	this->Load();
+}
+
+CInputBindApi::~CInputBindApi()
+{
 }
 
 UINT CInputBindApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -214,10 +221,10 @@ void CInputBindApi::Register(const char* aIdentifier, EIbHandlerType aInputBindH
 
 	this->Save();
 
-	/* FIXME: https://github.com/RaidcoreGG/Nexus/issues/111 */
-	std::thread([this]() {
+	Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
+	{
 		this->EventApi->Raise("EV_INPUTBIND_UPDATED");
-	}).detach();
+	});
 }
 
 void CInputBindApi::Deregister(const char* aIdentifier)
@@ -347,10 +354,10 @@ void CInputBindApi::Set(std::string aIdentifier, InputBind_t aInputBind)
 
 	this->Save();
 
-	/* FIXME: https://github.com/RaidcoreGG/Nexus/issues/111 */
-	std::thread([this]() {
+	Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
+	{
 		this->EventApi->Raise("EV_INPUTBIND_UPDATED");
-	}).detach();
+	});
 }
 
 void CInputBindApi::SetPassthrough(std::string aIdentifier, bool aPassthrough)
@@ -368,10 +375,10 @@ void CInputBindApi::SetPassthrough(std::string aIdentifier, bool aPassthrough)
 
 	this->Save();
 
-	/* FIXME: https://github.com/RaidcoreGG/Nexus/issues/111 */
-	std::thread([this]() {
+	Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
+	{
 		this->EventApi->Raise("EV_INPUTBIND_UPDATED");
-	}).detach();
+	});
 }
 
 bool CInputBindApi::Invoke(std::string aIdentifier, bool aIsRelease)
@@ -400,11 +407,10 @@ bool CInputBindApi::Invoke(std::string aIdentifier, bool aIsRelease)
 			{
 				INPUTBINDS_PROCESS handler = it->second.Handler_DownOnlyAsync;
 
-				/* FIXME: https://github.com/RaidcoreGG/Nexus/issues/111 */
-				std::thread([aIdentifier, handler]()
+				Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Immediate, [aIdentifier, handler](Clockwork::CancellationToken aToken)
 				{
 					handler(aIdentifier.c_str());
-				}).detach();
+				});
 
 				return true;
 			}
@@ -415,11 +421,10 @@ bool CInputBindApi::Invoke(std::string aIdentifier, bool aIsRelease)
 		{
 			INPUTBINDS_PROCESS2 handler = it->second.Handler_DownReleaseAsync;
 
-			/* FIXME: https://github.com/RaidcoreGG/Nexus/issues/111 */
-			std::thread([aIdentifier, handler, aIsRelease]()
+			Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Immediate, [aIdentifier, handler, aIsRelease](Clockwork::CancellationToken aToken)
 			{
 				handler(aIdentifier.c_str(), aIsRelease);
-			}).detach();
+			});
 
 			return true;
 		}
@@ -438,15 +443,15 @@ void CInputBindApi::Delete(std::string aIdentifier)
 
 	this->Registry.erase(aIdentifier);
 
-	/* FIXME: https://github.com/RaidcoreGG/Nexus/issues/111 */
-	std::thread([this]() {
+	Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
+	{
 		this->EventApi->Raise("EV_INPUTBIND_UPDATED");
-	}).detach();
+	});
 }
 
-int CInputBindApi::Verify(void* aStartAddress, void* aEndAddress)
+uint32_t CInputBindApi::CleanupRefs(void* aStartAddress, void* aEndAddress)
 {
-	int refCounter = 0;
+	uint32_t refCounter = 0;
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 

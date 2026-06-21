@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef IBMAPPING_H
-#define IBMAPPING_H
+#pragma once
 
 #include "IbBindV2.h"
 #include "IbEnum.h"
@@ -27,5 +26,3 @@ struct IbMapping_t
 		INPUTBINDS_PROCESS3 Handler_DownRelease      = nullptr;
 	};
 };
-
-#endif

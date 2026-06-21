@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef RESOURCES_H
-#define RESOURCES_H
+#pragma once
 
 #include <Windows.h>
 #include <filesystem>
@@ -29,5 +28,3 @@ namespace Resources
 	///----------------------------------------------------------------------------------------------------
 	bool Unpack(HMODULE aModule, std::filesystem::path aPath, unsigned int aResourceID, std::string aResourceType, bool aIsBinary = false);
 }
-
-#endif

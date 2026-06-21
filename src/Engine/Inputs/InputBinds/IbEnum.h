@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef IBENUM_H
-#define IBENUM_H
+#pragma once
 
 #include <cstdint>
 
@@ -31,5 +30,3 @@ enum class EIbHandlerType : uint32_t
 	DownReleaseAsync, /* Type 2 */
 	DownRelease       /* Type 3 */
 };
-
-#endif

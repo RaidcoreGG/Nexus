@@ -6,15 +6,14 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef SNOWFLAKEMGR_H
-#define SNOWFLAKEMGR_H
+#pragma once
 
 #include <unordered_map>
 #include <vector>
 
 #include "imgui/imgui.h"
 
-#include "Engine/Textures/TxTexture.h"
+#include "UI/Textures/TxTexture.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Snowflake_t Struct
@@ -55,10 +54,9 @@ class CSnowflakeMgr
 	void Clear();
 
 	private:
+	bool IsPartyPooper = false;
 	bool IsItChristmas = false;
 	bool IsItHalloween = false;
 
 	std::unordered_map<ImGuiID, std::vector<Snowflake_t>> Snowflakes;
 };
-
-#endif

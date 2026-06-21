@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef EXPORTSTYLEMODAL_H
-#define EXPORTSTYLEMODAL_H
+#pragma once
 
 #include <windows.h>
 #include <string>
@@ -55,5 +54,3 @@ class CExportStyleModal : public virtual IModal
 	///----------------------------------------------------------------------------------------------------
 	void ClearData();
 };
-
-#endif

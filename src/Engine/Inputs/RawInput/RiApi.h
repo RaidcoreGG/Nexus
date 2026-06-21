@@ -6,40 +6,36 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef RAWINPUTAPI_H
-#define RAWINPUTAPI_H
+#pragma once
 
-#include <vector>
 #include <mutex>
+#include <vector>
 
+#include "Engine/_Concepts/IWndProc.h"
+#include "Engine/Cleanup/RefCleanerBase.h"
 #include "RiFuncDefs.h"
-#include "Engine/Renderer/RdrContext.h"
-
-#define WM_PASSTHROUGH_FIRST WM_USER + 7997
-#define WM_PASSTHROUGH_LAST  WM_USER + 7997 + WM_USER - 1
 
 ///----------------------------------------------------------------------------------------------------
 /// CRawInputApi Class
 ///----------------------------------------------------------------------------------------------------
-class CRawInputApi
+class CRawInputApi : public virtual IRefCleaner, public virtual IWndProc
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CRawInputApi(RenderContext_t* aRenderCtx);
+	CRawInputApi();
+
+	///----------------------------------------------------------------------------------------------------
+	/// dtor
+	///----------------------------------------------------------------------------------------------------
+	~CRawInputApi();
 
 	///----------------------------------------------------------------------------------------------------
 	/// WndProc:
 	/// 	Returns 0 if message was processed or non-zero, if it should be passed to the next callback.
 	///----------------------------------------------------------------------------------------------------
-	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-	///----------------------------------------------------------------------------------------------------
-	/// SendWndProcToGame:
-	/// 	Skips all WndProc callbacks and sends it directly to the original.
-	///----------------------------------------------------------------------------------------------------
-	LRESULT SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Register:
@@ -54,16 +50,12 @@ class CRawInputApi
 	void Deregister(WNDPROC_CALLBACK aWndProcCallback);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Verify:
+	/// CleanupRefs:
 	/// 	Removes all WndProc Callbacks that are within the provided address space.
 	///----------------------------------------------------------------------------------------------------
-	int Verify(void* aStartAddress, void* aEndAddress);
+	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	private:
-	RenderContext_t*              RenderContext = nullptr;
-
 	mutable std::mutex            Mutex;
 	std::vector<WNDPROC_CALLBACK> Registry;
 };
-
-#endif

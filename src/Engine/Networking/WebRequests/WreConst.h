@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef WRECONST_H
-#define WRECONST_H
+#pragma once
 
 #include <string>
 #include <cstdint>
@@ -23,5 +22,3 @@ std::string NormalizeQuery(std::string aQuery);
 /// 	Returns an status message given a status code.
 ///----------------------------------------------------------------------------------------------------
 std::string StatusCodeToMessage(uint32_t aStatusCode);
-
-#endif

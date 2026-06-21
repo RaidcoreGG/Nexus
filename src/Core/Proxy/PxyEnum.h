@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef PXYENUM_H
-#define PXYENUM_H
+#pragma once
 
 #include <cstdint>
 
@@ -27,7 +26,10 @@ enum class EProxyFunction : uint32_t
 	D3D11_COREREGISTERLAYERS,
 
 	/* DXGI */
-	/* TODO */
+	DXGI_CreateDXGIFactory,
+	DXGI_CreateDXGIFactory1,
+	DXGI_CreateDXGIFactory2,
+	DXGI_DXGIGetDebugInterface1,
+	DXGI_CompatValue,
+	DXGI_CompatString
 };
-
-#endif

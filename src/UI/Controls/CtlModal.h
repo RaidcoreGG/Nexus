@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef CONTROLS_MODAL_H
-#define CONTROLS_MODAL_H
+#pragma once
 
 #include <string>
 
@@ -38,7 +37,7 @@ class IModal
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetName:
-	/// 	Returns the name of the window.
+	/// 	Returns the name of the modal.
 	///----------------------------------------------------------------------------------------------------
 	std::string GetName() const;
 
@@ -110,5 +109,3 @@ class IModal
 	EModalResult Result              = EModalResult::None;
 	bool         ShouldOpenNextFrame = false;
 };
-
-#endif

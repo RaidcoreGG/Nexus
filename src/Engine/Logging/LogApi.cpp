@@ -55,14 +55,6 @@ void CLogApi::Deregister(ILogger* aLogger)
 	this->Registry.erase(it);
 }
 
-void CLogApi::Trace(const std::string& aChannel, const char* aFmt, ...)
-{
-	va_list args;
-	va_start(args, aFmt);
-	this->LogV(ELogLevel::TRACE, aChannel, aFmt, args);
-	va_end(args);
-}
-
 void CLogApi::Critical(const std::string& aChannel, const char* aFmt, ...)
 {
 	va_list args;
@@ -89,10 +81,22 @@ void CLogApi::Info(const std::string& aChannel, const char* aFmt, ...)
 
 void CLogApi::Debug(const std::string& aChannel, const char* aFmt, ...)
 {
+#ifdef _DEBUG
 	va_list args;
 	va_start(args, aFmt);
 	this->LogV(ELogLevel::DEBUG, aChannel, aFmt, args);
 	va_end(args);
+#endif
+}
+
+void CLogApi::Trace(const std::string& aChannel, const char* aFmt, ...)
+{
+#ifdef _DEBUG
+	va_list args;
+	va_start(args, aFmt);
+	this->LogV(ELogLevel::TRACE, aChannel, aFmt, args);
+	va_end(args);
+#endif
 }
 
 void CLogApi::Log(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, ...)

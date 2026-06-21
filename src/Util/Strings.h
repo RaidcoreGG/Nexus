@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef STRINGS_H
-#define STRINGS_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -51,7 +50,12 @@ namespace String
 	/// Format:
 	/// 	Returns a string in printf-style format.
 	///----------------------------------------------------------------------------------------------------
+#if __cplusplus >= 202002L
+	[[deprecated]]
 	std::string Format(std::string aFmt, ...);
+#else
+	std::string Format(std::string aFmt, ...);
+#endif
 
 	///----------------------------------------------------------------------------------------------------
 	/// FormatByteSize:
@@ -95,5 +99,3 @@ namespace String
 	///----------------------------------------------------------------------------------------------------
 	std::string ConvertMBToUTF8(std::string aString);
 }
-
-#endif

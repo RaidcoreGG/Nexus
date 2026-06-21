@@ -8,20 +8,121 @@
 
 #include "MainWindow.h"
 
-#include "imgui/imgui_extensions.h"
-#include "imgui/imgui.h"
-#include "imgui/imgui_internal.h"
 #include "ImAnimate/ImAnimate.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_extensions.h"
+#include "imgui/imgui_internal.h"
 
 #include "Core/Context.h"
-#include "Resources/ResConst.h"
+#include "Core/Preferences/PrefConst.h"
+#include "res/ResConst.h"
+#include "SnowflakeMgr.h"
+#include "UI/Widgets/MainWindow/About/About.h"
+#include "UI/Widgets/MainWindow/Addons/Addons.h"
+#include "UI/Widgets/MainWindow/Binds/Binds.h"
+#include "UI/Widgets/MainWindow/Debug/Debug.h"
+#include "UI/Widgets/MainWindow/Log/Log.h"
+#include "UI/Widgets/MainWindow/Options/Options.h"
 #include "Util/Time.h"
 
-#include "SnowflakeMgr.h"
+constexpr ImGuiWindowFlags Flags
+	= ImGuiWindowFlags_NoTitleBar
+	| ImGuiWindowFlags_NoCollapse
+	| ImGuiWindowFlags_NoScrollbar;
 
-constexpr ImGuiWindowFlags Flags = ImGuiWindowFlags_NoTitleBar  |
-								   ImGuiWindowFlags_NoCollapse  |
-								   ImGuiWindowFlags_NoScrollbar;
+static CMainWindow* s_MainWindow{};
+
+/*static*/ void CMainWindow::OnInputBind(const char* aIdentifier)
+{
+	if (!aIdentifier) { return; }
+	if (!s_MainWindow) { return; }
+
+	std::string id = aIdentifier;
+
+	if (id == KB_MENU)
+	{
+		s_MainWindow->Activate();
+	}
+	else if (id == KB_ADDONS)
+	{
+		s_MainWindow->Activate("Addons");
+	}
+	else if (id == KB_DEBUG)
+	{
+		s_MainWindow->Activate("Debug");
+	}
+	else if (id == KB_LOG)
+	{
+		s_MainWindow->Activate("Log");
+	}
+	else if (id == KB_OPTIONS)
+	{
+		s_MainWindow->Activate("Options");
+	}
+}
+
+/*static*/ void CMainWindow::OnVolatileAddonsDisabled(void* aEventData)
+{
+	if (!s_MainWindow) { return; }
+
+	CContext*  ctx         = CContext::GetContext();
+	CSettings* settingsctx = ctx->GetSettingsCtx();
+
+	if (settingsctx->Get<bool>(OPT_SHOWADDONSWINDOWAFTERDUU, false))
+	{
+		s_MainWindow->Activate("Addons");
+	}
+}
+
+CMainWindow::CMainWindow()
+{
+	CContext*      ctx    = CContext::GetContext();
+	CLogApi*       logger = ctx->GetLogger();
+	CInputBindApi* ibapi  = ctx->GetInputBindApi();
+	CEventApi*     evtapi = ctx->GetEventApi();
+
+	CAddonsWindow*  addonsWnd  = new CAddonsWindow();
+	COptionsWindow* optionsWnd = new COptionsWindow();
+	CBindsWindow*   bindsWNd   = new CBindsWindow();
+	CLogWindow*     logWnd     = new CLogWindow();
+	CDebugWindow*   debugWnd   = new CDebugWindow();
+	CAboutBox*      aboutWnd   = new CAboutBox();
+
+	logger->Register(logWnd);
+
+	this->AddWindow(addonsWnd);
+	this->AddWindow(optionsWnd);
+	this->AddWindow(bindsWNd);
+	this->AddWindow(logWnd);
+	this->AddWindow(debugWnd);
+	this->AddWindow(aboutWnd);
+
+	/* register InputBinds */
+	ibapi->Register(KB_MENU,    EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "CTRL+O");
+	ibapi->Register(KB_ADDONS,  EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
+	ibapi->Register(KB_OPTIONS, EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
+	ibapi->Register(KB_LOG,     EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
+	ibapi->Register(KB_DEBUG,   EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
+
+	evtapi->Subscribe(EV_VOLATILE_ADDON_DISABLED, CMainWindow::OnVolatileAddonsDisabled);
+
+	if (s_MainWindow)
+	{
+		throw "CMainWindow already registered.";
+	}
+
+	s_MainWindow = this;
+}
+
+CMainWindow::~CMainWindow()
+{
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	for (ISubWindow* window : this->Windows)
+	{
+		delete window;
+	}
+}
 
 void CMainWindow::AddWindow(ISubWindow* aWindow)
 {

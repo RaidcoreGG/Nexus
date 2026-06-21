@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LOGCONST_H
-#define LOGCONST_H
+#pragma once
 
 #include <string>
 
@@ -33,6 +32,3 @@ std::string TimestampStr(const LogMsg_t* aLogMessage, bool aIncludeDate, bool aM
 /// 	Converts the log message to a fixed-width printable string.
 ///----------------------------------------------------------------------------------------------------
 std::string ToString(const LogMsg_t* aLogMessage);
-
-
-#endif

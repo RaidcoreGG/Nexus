@@ -4,6 +4,8 @@ Thank you for your interest in **Nexus**.
 
 Please note that this project is maintained by **Raidcore** under an **"All Rights Reserved"** license. **At the moment external contributions are not accepted**, which includes pull requests, bug fixes, new features, or documentation changes.
 
+If you would like to contribute to Nexus or require licensing, reach out to us.
+
 ---
 
 ## Project Purpose

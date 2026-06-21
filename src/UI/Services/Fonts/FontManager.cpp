@@ -13,12 +13,24 @@
 #include "imgui/imgui_internal.h"
 
 #include "Core/Context.h"
-#include "Resources/ResConst.h"
+#include "Core/Preferences/PrefConst.h"
+#include "res/ResConst.h"
 #include "Util/Resources.h"
 
-CFontManager::CFontManager(CLocalization* aLocalization)
+CFontManager::CFontManager(CLocalization* aLocalization) : IRefCleaner("FontManager")
 {
 	this->Language = aLocalization;
+
+	CContext* ctx = CContext::GetContext();
+	CSettings* settingsctx = ctx->GetSettingsCtx();
+
+	float storedFontSz = settingsctx->Get<float>(OPT_FONTSIZE, 15.0f);
+	if (storedFontSz <= 0)
+	{
+		storedFontSz = min(max(storedFontSz, 1.0f), 50.0f);
+		settingsctx->Set(OPT_FONTSIZE, storedFontSz);
+	}
+	ImGui::GetCurrentContext()->FontSize = storedFontSz;
 }
 
 CFontManager::~CFontManager()
@@ -452,9 +464,9 @@ void CFontManager::ResizeFont(const char* aIdentifier, float aFontSize)
 	}
 }
 
-int CFontManager::Verify(void* aStartAddress, void* aEndAddress)
+uint32_t CFontManager::CleanupRefs(void* aStartAddress, void* aEndAddress)
 {
-	int refCounter = 0;
+	uint32_t refCounter = 0;
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 

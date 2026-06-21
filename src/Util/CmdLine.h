@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef CMDLINE_H
-#define CMDLINE_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -35,5 +34,3 @@ namespace CmdLine
 	///----------------------------------------------------------------------------------------------------
 	std::vector<std::string> Parse();
 }
-
-#endif

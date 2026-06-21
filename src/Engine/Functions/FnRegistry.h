@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef FNREGISTRY_H
-#define FNREGISTRY_H
+#pragma once
 
 #include <mutex>
 #include <unordered_map>
@@ -65,5 +64,3 @@ class CFuncRegistry
 	std::mutex                                   Mutex;
 	std::unordered_map<std::string, FuncEntry_t> Registry;
 };
-
-#endif

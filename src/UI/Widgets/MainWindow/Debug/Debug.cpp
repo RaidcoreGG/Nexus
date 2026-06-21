@@ -11,12 +11,12 @@
 #include <unordered_map>
 
 #include "imgui/imgui.h"
-#include "imgui_extensions.h"
+#include "imgui/imgui_extensions.h"
 
 #include "Core/Context.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
-#include "Resources/ResConst.h"
+#include "res/ResConst.h"
 #include "Util/MD5.h"
 #include "Util/Strings.h"
 
@@ -106,7 +106,7 @@ void CDebugWindow::TabEvents()
 
 		for (auto& [identifier, ev] : eventRegistry)
 		{
-			if (ImGui::TreeNode(String::Format("%s (%d)", identifier.c_str(), ev.AmountRaises).c_str()))
+			if (ImGui::TreeNode(std::format("{} ({})", identifier.c_str(), ev.AmountRaises).c_str()))
 			{
 				if (ev.Subscribers.size() == 0)
 				{
@@ -378,7 +378,8 @@ void CDebugWindow::TabTextures()
 
 void CDebugWindow::TabQuickAccess()
 {
-	if (!ImGui::BeginTabItem("Quick Access"))
+	/* FIXME: Removed this as the underlying structure changed. */
+	/*if (!ImGui::BeginTabItem("Quick Access"))
 	{
 		return;
 	}
@@ -432,12 +433,12 @@ void CDebugWindow::TabQuickAccess()
 	}
 	ImGui::EndChild();
 
-	ImGui::EndTabItem();
+	ImGui::EndTabItem();*/
 }
 
 void CDebugWindow::TabLoader()
 {
-	if (!ImGui::BeginTabItem("Loader"))
+	/*if (!ImGui::BeginTabItem("Loader"))
 	{
 		return;
 	}
@@ -486,7 +487,7 @@ void CDebugWindow::TabLoader()
 						{
 							this->MemoryViewer.Open = true;
 							this->MV_Ptr = addon->Definitions;
-							this->MV_Size = sizeof(AddonDef_t);
+							this->MV_Size = sizeof(AddonDefRawV1_t);
 						}
 					}
 
@@ -495,31 +496,10 @@ void CDebugWindow::TabLoader()
 			}
 			ImGui::TreePop();
 		}
-		if (ImGui::TreeNode("Queued"))
-		{
-			for (const auto& [path, action] : Loader::QueuedAddons)
-			{
-				switch (action)
-				{
-					case ELoaderAction::Load:
-						ImGui::Text("Load");
-						break;
-					case ELoaderAction::Unload:
-						ImGui::Text("Unload");
-						break;
-					case ELoaderAction::Uninstall:
-						ImGui::Text("Uninstall");
-						break;
-				}
-				ImGui::SameLine();
-				ImGui::TextDisabled("%s", path.string().c_str());
-			}
-			ImGui::TreePop();
-		}
 	}
 	ImGui::EndChild();
 
-	ImGui::EndTabItem();
+	ImGui::EndTabItem();*/
 }
 
 void CDebugWindow::TabFonts()

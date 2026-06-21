@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef QACONST_H
-#define QACONST_H
+#pragma once
 
 #include <string>
 
@@ -24,5 +23,3 @@ std::string EQaVisibilityToString(EQaVisibility aQAVisibility);
 /// 	Returns a localizable string for a position setting.
 ///----------------------------------------------------------------------------------------------------
 std::string EQaPositionToString(EQaPosition aQAPosition);
-
-#endif

@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef PXYFUNCDEFS_H
-#define PXYFUNCDEFS_H
+#pragma once
 
 #include <windows.h>
 #include <dxgi.h>
@@ -19,5 +18,3 @@ typedef HRESULT(WINAPI* PFN_D3D11_CORE_CREATE_DEVICE)          (IDXGIFactory*, I
 typedef HRESULT(WINAPI* PFN_D3D11_CORE_CREATE_LAYERED_DEVICE)  (const void*, DWORD, const void*, REFIID, void**);
 typedef HRESULT(WINAPI* PFN_D3D11_CORE_GET_LAYERED_DEVICE_SIZE)(const void*, DWORD);
 typedef HRESULT(WINAPI* PFN_D3D11_CORE_REGISTER_LAYERS)        (const void*, DWORD);
-
-#endif

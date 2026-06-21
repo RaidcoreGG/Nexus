@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef PREFCONST_H
-#define PREFCONST_H
+#pragma once
 
 constexpr const char* OPT_LASTGAMEBUILD            = "LastGameBuild";
 constexpr const char* OPT_ACCEPTEULA               = "AcceptEULA";
@@ -22,6 +21,7 @@ constexpr const char* OPT_QAOFFSETX                = "QAOffsetX";
 constexpr const char* OPT_QAOFFSETY                = "QAOffsetY";
 constexpr const char* OPT_QASHOWARCDPS             = "QAShowArcDPS";
 constexpr const char* OPT_QASUPPRESSED             = "QASuppressedIcons";
+constexpr const char* OPT_QAONLYSHOWONHOVER        = "QAOnlyShowOnHover";
 constexpr const char* OPT_IMGUISTYLE               = "ImGuiStyle";
 constexpr const char* OPT_LANGUAGE                 = "Language";
 constexpr const char* OPT_SHOWADDONSWINDOWAFTERDUU = "ShowAddonsWindowAfterDisableUntilUpdate";
@@ -32,5 +32,3 @@ constexpr const char* OPT_CAMCTRL_LOCKCURSOR       = "CameraControl_LockCursor";
 constexpr const char* OPT_CAMCTRL_RESETCURSOR      = "CameraControl_ResetCursor";
 constexpr const char* OPT_UI_CLICK_MODSONLY        = "UI_ClickingRequiresModifiers";
 constexpr const char* OPT_UI_MODS                  = "UI_Modifiers";
-
-#endif

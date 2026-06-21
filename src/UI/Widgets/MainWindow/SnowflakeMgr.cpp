@@ -13,7 +13,7 @@
 
 #include "Core/Context.h"
 #include "ImAnimate/ImAnimate.h"
-#include "Resources/ResConst.h"
+#include "res/ResConst.h"
 #include "Util/Time.h"
 #include "Core/Preferences/PrefConst.h"
 
@@ -22,7 +22,10 @@ CSnowflakeMgr::CSnowflakeMgr()
 	CContext* ctx = CContext::GetContext();
 	CSettings* settingsctx = ctx->GetSettingsCtx();
 
-	bool isPartyPooper = settingsctx->Get<bool>(OPT_DISABLEFESTIVEFLAIR, false);
+	settingsctx->Subscribe<bool>(OPT_DISABLEFESTIVEFLAIR, [&](bool aNewValue)
+	{
+		this->IsPartyPooper = aNewValue;
+	});
 
 	this->IsItChristmas = Time::GetMonth() == 12 && !isPartyPooper;
 	this->IsItHalloween = Time::GetMonth() == 10 && !isPartyPooper;
@@ -62,6 +65,7 @@ void ImageRotated(ImTextureID aTextureIdentifier, ImVec2 aOrigin, ImVec2 aSize, 
 
 void CSnowflakeMgr::Update()
 {
+
 	if (!(this->IsItChristmas || this->IsItHalloween)) { return; }
 
 	static CContext* ctx = CContext::GetContext();
@@ -77,11 +81,11 @@ void CSnowflakeMgr::Update()
 	ImVec2 wndPos = imctx->CurrentWindow->Pos;
 
 	/* density logic */
-	int amtSnowflakes = wndSize.x / ImGui::GetFontSize() * 0.5f;
+	int amtSnowflakes = static_cast<int>(wndSize.x / ImGui::GetFontSize() * 0.5f);
 
 	if (snowflakes.size() != amtSnowflakes)
 	{
-		std::srand(std::time(nullptr));
+		std::srand(static_cast<int>(std::time(nullptr)));
 
 		snowflakes.clear();
 

@@ -6,15 +6,16 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef WRECLIENT_H
-#define WRECLIENT_H
+#pragma once
 
 #include <cstdint>
 #include <filesystem>
 #include <mutex>
 #include <string>
 
+#pragma warning(push, 0)
 #include "httplib/httplib.h"
+#pragma warning(pop)
 
 #include "Engine/Logging/LogApi.h"
 #include "WreCache.h"
@@ -73,5 +74,3 @@ class CHttpClient
 	///----------------------------------------------------------------------------------------------------
 	void DownloadCleanup(const std::filesystem::path& aOutPath, const std::string& aQuery);
 };
-
-#endif

@@ -8,11 +8,10 @@
 
 #include "GbApi.h"
 
-#include <fstream>
-
-#include "nlohmann/json.hpp"
-using json = nlohmann::json;
 #include "pugixml/pugixml.hpp"
+
+#include "Engine/Clockwork/Clockwork.h"
+namespace Clockwork = Raidcore::Clockwork;
 
 #include "Core/Context.h"
 #include "Util/Inputs.h"
@@ -95,15 +94,17 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 	uictx->Invalidate();
 }
 
-CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogApi* aLogger, CEventApi* aEventApi, std::filesystem::path aConfigPath)
+CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogApi* aLogger, CEventApi* aEventApi, RenderContext_t* aRenderContext, std::filesystem::path aConfigPath)
 {
 	assert(aRawInputApi);
 	assert(aLogger);
 	assert(aEventApi);
+	assert(aRenderContext);
 
 	this->RawInputApi = aRawInputApi;
 	this->Logger = aLogger;
 	this->EventApi = aEventApi;
+	this->RenderContext = aRenderContext;
 
 	this->ConfigPath = aConfigPath;
 	
@@ -119,30 +120,55 @@ CGameBindsApi::~CGameBindsApi()
 	this->EventApi->Unsubscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
 }
 
+UINT CGameBindsApi::RedirectGameOnly(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam)
+{
+	/* offset of 7997, if uMsg in that range it's a nexus game only message */
+	if (uMsg >= WM_PASSTHROUGH_FIRST && uMsg <= WM_PASSTHROUGH_LAST)
+	{
+		/* modify the uMsg code to the original code */
+		uMsg -= WM_PASSTHROUGH_FIRST;
+	}
+
+	return uMsg;
+}
+
+LRESULT CGameBindsApi::SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	if (uMsg < WM_USER)
+	{
+		return PostMessageA(this->RenderContext->Window.Handle, uMsg + WM_PASSTHROUGH_FIRST, wParam, lParam);
+	}
+
+	return PostMessageA(this->RenderContext->Window.Handle, uMsg, wParam, lParam);
+}
+
 void CGameBindsApi::PressAsync(EGameBinds aGameBind)
 {
-	std::thread([this, aGameBind]() {
+	Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this, aGameBind](Clockwork::CancellationToken aToken)
+	{
 		this->Press(aGameBind);
-	}).detach();
+	});
 }
 
 void CGameBindsApi::ReleaseAsync(EGameBinds aGameBind)
 {
-	std::thread([this, aGameBind]() {
+	Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this, aGameBind](Clockwork::CancellationToken aToken)
+	{
 		this->Release(aGameBind);
-	}).detach();
+	});
 }
 
 void CGameBindsApi::InvokeAsync(EGameBinds aGameBind, int aDuration)
 {
-	std::thread([this, aGameBind, aDuration]() {
+	Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this, aGameBind, aDuration](Clockwork::CancellationToken aToken)
+	{
 		this->Press(aGameBind);
 		if (aDuration > 0)
 		{
 			Sleep(aDuration);
 		}
 		this->Release(aGameBind);
-	}).detach();
+	});
 }
 
 void CGameBindsApi::Press(EGameBinds aGameBind)
@@ -179,7 +205,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 
 	if (ib.Alt)
 	{
-		this->RawInputApi->SendWndProcToGame(
+		this->SendWndProcToGame(
 			0,
 			WM_SYSKEYDOWN,
 			VK_MENU,
@@ -188,7 +214,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 	}
 	else if (!ib.Alt && GetAsyncKeyState(VK_MENU))
 	{
-		this->RawInputApi->SendWndProcToGame(
+		this->SendWndProcToGame(
 			0,
 			WM_SYSKEYUP,
 			VK_MENU,
@@ -198,7 +224,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 
 	if (ib.Ctrl)
 	{
-		this->RawInputApi->SendWndProcToGame(
+		this->SendWndProcToGame(
 			0,
 			WM_KEYDOWN,
 			VK_CONTROL,
@@ -207,7 +233,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 	}
 	else if (!ib.Ctrl && GetAsyncKeyState(VK_CONTROL))
 	{
-		this->RawInputApi->SendWndProcToGame(
+		this->SendWndProcToGame(
 			0,
 			WM_KEYUP,
 			VK_CONTROL,
@@ -217,7 +243,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 
 	if (ib.Shift)
 	{
-		this->RawInputApi->SendWndProcToGame(
+		this->SendWndProcToGame(
 			0,
 			WM_KEYDOWN,
 			VK_SHIFT,
@@ -226,7 +252,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 	}
 	else if (!ib.Shift && GetAsyncKeyState(VK_SHIFT))
 	{
-		this->RawInputApi->SendWndProcToGame(
+		this->SendWndProcToGame(
 			0,
 			WM_KEYUP,
 			VK_SHIFT,
@@ -237,7 +263,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 	if (ib.Device == EInputDevice::Keyboard)
 	{
 		UINT vk = MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK_EX);
-		this->RawInputApi->SendWndProcToGame(
+		this->SendWndProcToGame(
 			0,
 			WM_KEYDOWN,
 			vk,
@@ -254,7 +280,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 		{
 			case EMouseButtons::LMB:
 			{
-				this->RawInputApi->SendWndProcToGame(
+				this->SendWndProcToGame(
 					0,
 					WM_LBUTTONDOWN,
 					GetMouseMessageWPARAM(EMouseButtons::LMB, ib.Ctrl, ib.Shift, true),
@@ -264,7 +290,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 			}
 			case EMouseButtons::RMB:
 			{
-				this->RawInputApi->SendWndProcToGame(
+				this->SendWndProcToGame(
 					0,
 					WM_RBUTTONDOWN,
 					GetMouseMessageWPARAM(EMouseButtons::RMB, ib.Ctrl, ib.Shift, true),
@@ -274,7 +300,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 			}
 			case EMouseButtons::MMB:
 			{
-				this->RawInputApi->SendWndProcToGame(
+				this->SendWndProcToGame(
 					0,
 					WM_MBUTTONDOWN,
 					GetMouseMessageWPARAM(EMouseButtons::MMB, ib.Ctrl, ib.Shift, true),
@@ -284,7 +310,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 			}
 			case EMouseButtons::M4:
 			{
-				this->RawInputApi->SendWndProcToGame(
+				this->SendWndProcToGame(
 					0,
 					WM_XBUTTONDOWN,
 					GetMouseMessageWPARAM(EMouseButtons::M4, ib.Ctrl, ib.Shift, true),
@@ -294,7 +320,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 			}
 			case EMouseButtons::M5:
 			{
-				this->RawInputApi->SendWndProcToGame(
+				this->SendWndProcToGame(
 					0,
 					WM_XBUTTONDOWN,
 					GetMouseMessageWPARAM(EMouseButtons::M5, ib.Ctrl, ib.Shift, true),
@@ -341,7 +367,7 @@ void CGameBindsApi::Release(EGameBinds aGameBind)
 	if (ib.Device == EInputDevice::Keyboard)
 	{
 		int vk = MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK_EX);
-		this->RawInputApi->SendWndProcToGame(
+		this->SendWndProcToGame(
 			0,
 			WM_KEYUP,
 			vk,
@@ -358,7 +384,7 @@ void CGameBindsApi::Release(EGameBinds aGameBind)
 		{
 			case EMouseButtons::LMB:
 			{
-				this->RawInputApi->SendWndProcToGame(
+				this->SendWndProcToGame(
 					0,
 					WM_LBUTTONUP,
 					GetMouseMessageWPARAM(EMouseButtons::LMB, ib.Ctrl, ib.Shift, false),
@@ -368,7 +394,7 @@ void CGameBindsApi::Release(EGameBinds aGameBind)
 			}
 			case EMouseButtons::RMB:
 			{
-				this->RawInputApi->SendWndProcToGame(
+				this->SendWndProcToGame(
 					0,
 					WM_RBUTTONUP,
 					GetMouseMessageWPARAM(EMouseButtons::RMB, ib.Ctrl, ib.Shift, false),
@@ -378,7 +404,7 @@ void CGameBindsApi::Release(EGameBinds aGameBind)
 			}
 			case EMouseButtons::MMB:
 			{
-				this->RawInputApi->SendWndProcToGame(
+				this->SendWndProcToGame(
 					0,
 					WM_MBUTTONUP,
 					GetMouseMessageWPARAM(EMouseButtons::MMB, ib.Ctrl, ib.Shift, false),
@@ -388,7 +414,7 @@ void CGameBindsApi::Release(EGameBinds aGameBind)
 			}
 			case EMouseButtons::M4:
 			{
-				this->RawInputApi->SendWndProcToGame(
+				this->SendWndProcToGame(
 					0,
 					WM_XBUTTONUP,
 					GetMouseMessageWPARAM(EMouseButtons::M4, ib.Ctrl, ib.Shift, false),
@@ -398,7 +424,7 @@ void CGameBindsApi::Release(EGameBinds aGameBind)
 			}
 			case EMouseButtons::M5:
 			{
-				this->RawInputApi->SendWndProcToGame(
+				this->SendWndProcToGame(
 					0,
 					WM_XBUTTONUP,
 					GetMouseMessageWPARAM(EMouseButtons::M5, ib.Ctrl, ib.Shift, false),
@@ -417,7 +443,7 @@ void CGameBindsApi::RestoreModifiers()
 {
 	if (GetAsyncKeyState(VK_MENU))
 	{
-		this->RawInputApi->SendWndProcToGame(
+		this->SendWndProcToGame(
 			0,
 			WM_SYSKEYDOWN,
 			VK_MENU,
@@ -426,7 +452,7 @@ void CGameBindsApi::RestoreModifiers()
 	}
 	else
 	{
-		this->RawInputApi->SendWndProcToGame(
+		this->SendWndProcToGame(
 			0,
 			WM_SYSKEYUP,
 			VK_MENU,
@@ -436,7 +462,7 @@ void CGameBindsApi::RestoreModifiers()
 
 	if (GetAsyncKeyState(VK_CONTROL))
 	{
-		this->RawInputApi->SendWndProcToGame(
+		this->SendWndProcToGame(
 			0,
 			WM_KEYDOWN,
 			VK_CONTROL,
@@ -445,7 +471,7 @@ void CGameBindsApi::RestoreModifiers()
 	}
 	else
 	{
-		this->RawInputApi->SendWndProcToGame(
+		this->SendWndProcToGame(
 			0,
 			WM_KEYUP,
 			VK_CONTROL,
@@ -455,7 +481,7 @@ void CGameBindsApi::RestoreModifiers()
 
 	if (GetAsyncKeyState(VK_SHIFT))
 	{
-		this->RawInputApi->SendWndProcToGame(
+		this->SendWndProcToGame(
 			0,
 			WM_KEYDOWN,
 			VK_SHIFT,
@@ -464,7 +490,7 @@ void CGameBindsApi::RestoreModifiers()
 	}
 	else
 	{
-		this->RawInputApi->SendWndProcToGame(
+		this->SendWndProcToGame(
 			0,
 			WM_KEYUP,
 			VK_SHIFT,
@@ -542,9 +568,10 @@ void CGameBindsApi::Set(EGameBinds aGameBind, InputBind_t aInputBind, bool aIsPr
 
 	if (!aIsRuntimeBind)
 	{
-		std::thread([this]() {
+		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this, aGameBind](Clockwork::CancellationToken aToken)
+		{
 			this->EventApi->Raise("EV_INPUTBIND_UPDATED");
-		}).detach();
+		});
 		this->Save();
 	}
 }

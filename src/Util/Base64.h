@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef BASE64_H
-#define BASE64_H
+#pragma once
 
 #include <string>
 
@@ -28,5 +27,3 @@ namespace Base64
 	///----------------------------------------------------------------------------------------------------
 	std::string Decode(std::string aData, size_t aSize);
 }
-
-#endif

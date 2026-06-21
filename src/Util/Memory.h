@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef MEMORY_H
-#define MEMORY_H
+#pragma once
 
 #include <Windows.h>
 
@@ -22,5 +21,3 @@ namespace Memory
 	///----------------------------------------------------------------------------------------------------
 	PBYTE FollowJmpChain(PBYTE aPointer);
 }
-
-#endif

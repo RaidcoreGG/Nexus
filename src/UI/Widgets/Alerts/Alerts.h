@@ -6,18 +6,17 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef ALERTS_H
-#define ALERTS_H
+#pragma once
 
 #include <mutex>
 #include <string>
 #include <vector>
 
-#include "Engine/Loader/NexusLinkData.h"
+#include "AlEnum.h"
+#include "AlMessage.h"
+#include "Core/NexusLink.h"
 #include "Engine/DataLink/DlApi.h"
 #include "UI/Controls/CtlWindow.h"
-#include "AlMessage.h"
-#include "AlEnum.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// CAlerts Class
@@ -51,5 +50,3 @@ class CAlerts : public virtual IWindow
 
 	float                       Opacity = 1.0f;
 };
-
-#endif

@@ -6,17 +6,17 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef MBLREADER_H
-#define MBLREADER_H
+#pragma once
 
 #include <string>
 #include <thread>
 
-#include "Engine/Events/EvtApi.h"
-#include "Engine/Loader/NexusLinkData.h"
-#include "Engine/DataLink/DlApi.h"
-#include "Engine/Logging/LogApi.h"
 #include "thirdparty/mumble/Mumble.h"
+
+#include "Core/NexusLink.h"
+#include "Engine/DataLink/DlApi.h"
+#include "Engine/Events/EvtApi.h"
+#include "Engine/Logging/LogApi.h"
 
 constexpr const char* CH_MUMBLE_READER           = "MumbleReader";
 constexpr const char* DL_MUMBLE_LINK             = "DL_MUMBLE_LINK";
@@ -101,5 +101,3 @@ class CMumbleReader
 	///----------------------------------------------------------------------------------------------------
 	void AdvanceDerived();
 };
-
-#endif

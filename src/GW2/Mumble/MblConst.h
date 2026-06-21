@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef MBLCONST_H
-#define MBLCONST_H
+#pragma once
 
 #include "thirdparty/mumble/Mumble.h"
 
@@ -27,5 +26,3 @@ namespace Mumble
 	///----------------------------------------------------------------------------------------------------
 	float GetScalingFactor(EUIScale aSize);
 };
-
-#endif

@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef IBAPI_H
-#define IBAPI_H
+#pragma once
 
 #include <filesystem>
 #include <map>
@@ -15,6 +14,8 @@
 #include <string>
 #include <windows.h>
 
+#include "Engine/_Concepts/IWndProc.h"
+#include "Engine/Cleanup/RefCleanerBase.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Logging/LogApi.h"
 #include "IbBindV2.h"
@@ -27,7 +28,7 @@ constexpr const char* CH_INPUTBINDS = "InputBinds";
 ///----------------------------------------------------------------------------------------------------
 /// CInputBindApi Class
 ///----------------------------------------------------------------------------------------------------
-class CInputBindApi : public CInputBindCapture
+class CInputBindApi : public CInputBindCapture, public virtual IRefCleaner, public virtual IWndProc
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -36,10 +37,15 @@ class CInputBindApi : public CInputBindCapture
 	CInputBindApi(CEventApi* aEventApi, CLogApi* aLogger, std::filesystem::path aConfigPath);
 
 	///----------------------------------------------------------------------------------------------------
+	/// dtor
+	///----------------------------------------------------------------------------------------------------
+	~CInputBindApi();
+
+	///----------------------------------------------------------------------------------------------------
 	/// WndProc:
 	/// 	Returns 0 if a InputBind_t was invoked.
 	///----------------------------------------------------------------------------------------------------
-	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Register:
@@ -106,10 +112,10 @@ class CInputBindApi : public CInputBindCapture
 	void Delete(std::string aIdentifier);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Verify:
+	/// CleanupRefs:
 	/// 	Removes all InputBindHandlers that are within the provided address space.
 	///----------------------------------------------------------------------------------------------------
-	int Verify(void* aStartAddress, void* aEndAddress);
+	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetRegistry:
@@ -176,5 +182,3 @@ class CInputBindApi : public CInputBindCapture
 	///----------------------------------------------------------------------------------------------------
 	void ReleaseAll();
 };
-
-#endif

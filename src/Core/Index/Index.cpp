@@ -63,7 +63,8 @@ void CreateIndex(HMODULE aModule)
 
 	/* Get files. */
 	s_Paths[(int)EPath::Log]                      = s_Paths[(int)EPath::DIR_NEXUS] / "Nexus.log";
-	s_Paths[(int)EPath::LastCrashLog]             = s_Paths[(int)EPath::DIR_NEXUS] / "Crash.log";
+	s_Paths[(int)EPath::CrashLog]                 = s_Paths[(int)EPath::DIR_NEXUS] / "Crash.log";
+	s_Paths[(int)EPath::CrashStack]               = s_Paths[(int)EPath::DIR_NEXUS] / "CrashStack.log";
 	s_Paths[(int)EPath::InputBinds]               = s_Paths[(int)EPath::DIR_NEXUS] / "InputBinds.json";
 	s_Paths[(int)EPath::GameBinds]                = s_Paths[(int)EPath::DIR_NEXUS] / "GameBinds.xml";
 	s_Paths[(int)EPath::Settings]                 = s_Paths[(int)EPath::DIR_NEXUS] / "Settings.json";

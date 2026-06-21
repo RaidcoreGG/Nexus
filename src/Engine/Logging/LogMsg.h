@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LOGMSG_H
-#define LOGMSG_H
+#pragma once
 
 #include <string>
 
@@ -18,12 +17,10 @@
 ///----------------------------------------------------------------------------------------------------
 struct LogMsg_t
 {
-	ELogLevel   Level;
-	long long   Time;
-	int         TimeMsPrecision;
-	std::string Channel;
-	std::string Message;
-	int         RepeatCount = 1;
+	ELogLevel   Level          {};
+	long long   Time           {};
+	int         TimeMsPrecision{};
+	std::string Channel        {};
+	std::string Message        {};
+	int         RepeatCount    {1};
 };
-
-#endif

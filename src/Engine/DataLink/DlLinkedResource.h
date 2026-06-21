@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef DLLINKEDRESOURCE_H
-#define DLLINKEDRESOURCE_H
+#pragma once
 
 #include <windows.h>
 #include <string>
@@ -25,5 +24,3 @@ struct LinkedResource_t
 	size_t              Size;           /* The size of the resource.                     */
 	std::string         UnderlyingName; /* The real name of the memory mapped file.      */
 };
-
-#endif

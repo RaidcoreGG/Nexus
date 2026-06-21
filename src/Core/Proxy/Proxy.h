@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef PROXY_H
-#define PROXY_H
+#pragma once
 
 #include <Windows.h>
 #include <d3dcommon.h>
@@ -90,5 +89,3 @@ PROXY HRESULT __stdcall D3D11CoreRegisterLayers(
 	const void* unknown0,
 	DWORD       unknown1
 );
-
-#endif

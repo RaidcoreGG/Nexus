@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef DLAPI_H
-#define DLAPI_H
+#pragma once
 
 #include <mutex>
 #include <string>
@@ -55,13 +54,11 @@ class CDataLinkApi
 	/// GetRegistry:
 	/// 	Returns a copy of the registry.
 	///----------------------------------------------------------------------------------------------------
-	std::unordered_map<std::string, LinkedResource_t> GetRegistry();
+	std::unordered_map<std::string, LinkedResource_t> GetRegistry() const;
 
 	private:
-	CLogApi*                                        Logger = nullptr;
+	CLogApi*                                          Logger = nullptr;
 
-	std::mutex                                      Mutex;
+	mutable std::mutex                                Mutex;
 	std::unordered_map<std::string, LinkedResource_t> Registry;
 };
-
-#endif

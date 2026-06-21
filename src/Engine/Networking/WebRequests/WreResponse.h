@@ -6,13 +6,14 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef WRERESPONSE_H
-#define WRERESPONSE_H
+#pragma once
 
 #include <string>
 #include <cstdint>
 
+#pragma warning(push, 0)
 #include "nlohmann/json.hpp"
+#pragma warning(pop)
 using json = nlohmann::json;
 
 #include "WreConst.h"
@@ -62,5 +63,3 @@ struct HttpResponse_t
 		return json{};
 	}
 };
-
-#endif

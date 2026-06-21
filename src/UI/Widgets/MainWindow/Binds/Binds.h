@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef MAINWINDOW_BINDS_H
-#define MAINWINDOW_BINDS_H
+#pragma once
 
 #include <map>
 #include <string>
@@ -16,7 +15,7 @@
 #include "GW2/Inputs/GameBinds/GbEnum.h"
 #include "Engine/Inputs/InputBinds/IbMapping.h"
 #include "UI/Controls/CtlSubWindow.h"
-#include "UI/DisplayBinds.h"
+#include "UI/UiBinds.h"
 #include "BindSetterModal.h"
 
 class CBindsWindow : public ISubWindow
@@ -37,5 +36,3 @@ class CBindsWindow : public ISubWindow
 
 	void DeleteStaleBind(const std::string& aIdentifier);
 };
-
-#endif

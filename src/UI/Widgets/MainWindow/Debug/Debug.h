@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef MAINWINDOW_DEBUG_H
-#define MAINWINDOW_DEBUG_H
+#pragma once
 
 #include "imgui/imgui_memory_editor.h"
 
@@ -39,5 +38,3 @@ class CDebugWindow : public ISubWindow
 	void TabLoader();
 	void TabFonts();
 };
-
-#endif

@@ -6,12 +6,11 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef GBAPI_H
-#define GBAPI_H
+#pragma once
 
 #include <filesystem>
-#include <unordered_map>
 #include <mutex>
+#include <unordered_map>
 
 #include "GbEnum.h"
 
@@ -19,9 +18,13 @@
 #include "Engine/Inputs/InputBinds/IbBindV2.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
 #include "Engine/Logging/LogApi.h"
+#include "UI/Renderer/RdrContext.h"
 
 constexpr const char* CH_GAMEBINDS = "GameBinds";
 constexpr const char* EV_UE_KB_CH = "EV_UNOFFICIAL_EXTRAS_KEYBIND_CHANGED";
+
+#define WM_PASSTHROUGH_FIRST WM_USER + 7997
+#define WM_PASSTHROUGH_LAST  WM_USER + 7997 + WM_USER - 1
 
 ///----------------------------------------------------------------------------------------------------
 /// MultiInputBind_t Struct
@@ -49,11 +52,30 @@ class CGameBindsApi
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CGameBindsApi(CRawInputApi* aRawInputApi, CLogApi* aLogger, CEventApi* aEventApi, std::filesystem::path aConfigPath);
+	CGameBindsApi(
+		CRawInputApi*         aRawInputApi,
+		CLogApi*              aLogger,
+		CEventApi*            aEventApi,
+		RenderContext_t*      aRenderContext,
+		std::filesystem::path aConfigPath
+	);
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
 	~CGameBindsApi();
+
+	///----------------------------------------------------------------------------------------------------
+	/// RedirectGameOnly:
+	/// 	Returns the uMsg shifted back to the normal range.
+	/// 	This should be called after all other window procedures.
+	///----------------------------------------------------------------------------------------------------
+	UINT RedirectGameOnly(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam);
+
+	///----------------------------------------------------------------------------------------------------
+	/// SendWndProcToGame:
+	/// 	Skips all WndProc callbacks and sends it directly to the original.
+	///----------------------------------------------------------------------------------------------------
+	LRESULT SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	///----------------------------------------------------------------------------------------------------
 	/// PressAsync:
@@ -124,9 +146,10 @@ class CGameBindsApi
 	void Load(std::filesystem::path aPath);
 
 	private:
-	CRawInputApi*                                    RawInputApi = nullptr;
-	CLogApi*                                         Logger      = nullptr;
-	CEventApi*                                       EventApi    = nullptr;
+	CRawInputApi*                                    RawInputApi;
+	CLogApi*                                         Logger;
+	CEventApi*                                       EventApi;
+	RenderContext_t*                                 RenderContext;
 
 	std::filesystem::path                            ConfigPath;
 
@@ -145,5 +168,3 @@ class CGameBindsApi
 	///----------------------------------------------------------------------------------------------------
 	void Save();
 };
-
-#endif

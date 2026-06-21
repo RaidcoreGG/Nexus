@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef URL_H
-#define URL_H
+#pragma once
 
 #include <string>
 
@@ -46,5 +45,3 @@ namespace URL
 	///----------------------------------------------------------------------------------------------------
 	std::string GetFilename(const std::string& aUrl);
 }
-
-#endif

@@ -6,13 +6,12 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef CONTROLS_SUBWINDOW_H
-#define CONTROLS_SUBWINDOW_H
+#pragma once
 
 #include <string>
 
 #include "CtlWindow.h"
-#include "Engine/Textures/TxTexture.h"
+#include "UI/Textures/TxTexture.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// ISubWindow Interface Class
@@ -69,14 +68,14 @@ class ISubWindow : public virtual IWindow
 	bool* GetVisibleStatePtr() override;
 
 	protected:
-	bool                     IsPoppedOut = false;
-	bool                     IsHost = false;
-	bool                     IsAnchored = false;
+	bool                     IsPoppedOut   {false};
+	bool                     IsHost        {false};
+	bool                     IsAnchored    {false};
 
-	std::string              IconIdentifier;
-	int                      IconID;
-	Texture_t*                 Tex_Icon;
-	Texture_t*                 Tex_PopoutIcon;
+	std::string              IconIdentifier{};
+	int                      IconID        {};
+	Texture_t*               Tex_Icon      {};
+	Texture_t*               Tex_PopoutIcon{};
 
 	///----------------------------------------------------------------------------------------------------
 	/// RenderContent:
@@ -84,5 +83,3 @@ class ISubWindow : public virtual IWindow
 	///----------------------------------------------------------------------------------------------------
 	virtual void RenderContent() = 0;
 };
-
-#endif

@@ -55,10 +55,7 @@ namespace CmdLine
 				{
 					const std::string& argVal = s_Arguments[i + 1];
 
-					if (!String::StartsWith(argVal, "-"))
-					{
-						return argVal;
-					}
+					return argVal;
 				}
 
 				break;

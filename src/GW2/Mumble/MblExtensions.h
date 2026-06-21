@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef MBLEXTENSIONS_H
-#define MBLEXTENSIONS_H
+#pragma once
 
 #include <string>
 #include <cmath>
@@ -61,5 +60,3 @@ namespace Mumble
 		return !(lhs == rhs);
 	}
 };
-
-#endif

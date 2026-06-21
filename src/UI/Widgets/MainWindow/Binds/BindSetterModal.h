@@ -6,13 +6,12 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef BINDSETTERMODAL_H
-#define BINDSETTERMODAL_H
+#pragma once
 
 #include <string>
 
 #include "UI/Controls/CtlModal.h"
-#include "UI/DisplayBinds.h"
+#include "UI/UiBinds.h"
 #include "Engine/Inputs/InputBinds/IbBindV2.h"
 #include "GW2/Inputs/GameBinds/GbEnum.h"
 
@@ -72,5 +71,3 @@ class CBindSetterModal : public virtual IModal
 	///----------------------------------------------------------------------------------------------------
 	void SetTitle();
 };
-
-#endif

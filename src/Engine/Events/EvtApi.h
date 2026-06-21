@@ -6,26 +6,35 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef EVTAPI_H
-#define EVTAPI_H
+#pragma once
 
 #include <mutex>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
-#include "EvtFuncDefs.h"
+#include "Engine/Cleanup/RefCleanerBase.h"
+#include "Engine/Loader/Loader.h"
 #include "EvtData.h"
-#include "EvtSubscriber.h"
+#include "EvtFuncDefs.h"
 
 constexpr const char* CH_EVENTS = "Events";
 
 ///----------------------------------------------------------------------------------------------------
 /// CEventApi Class
 ///----------------------------------------------------------------------------------------------------
-class CEventApi
+class CEventApi : public virtual IRefCleaner
 {
 	public:
+	///----------------------------------------------------------------------------------------------------
+	/// ctor
+	///----------------------------------------------------------------------------------------------------
+	CEventApi(CLoader* aLoader);
+
+	///----------------------------------------------------------------------------------------------------
+	/// dtor
+	///----------------------------------------------------------------------------------------------------
+	~CEventApi();
+
 	///----------------------------------------------------------------------------------------------------
 	/// Raise:
 	/// 	Raises an event of provided name, passing a pointer to the payload.
@@ -36,7 +45,7 @@ class CEventApi
 	/// Raise:
 	/// 	Raises an event with a payload meant for only a specific subscriber.
 	///----------------------------------------------------------------------------------------------------
-	void Raise(signed int aSignature, const char* aIdentifier, void* aEventData = nullptr);
+	void Raise(uint32_t aSignature, const char* aIdentifier, void* aEventData = nullptr);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Subscribe:
@@ -51,10 +60,10 @@ class CEventApi
 	void Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Verify:
+	/// CleanupRefs:
 	/// 	Removes any elements within the provided address space from the Registry.
 	///----------------------------------------------------------------------------------------------------
-	int Verify(void* aStartAddress, void* aEndAddress);
+	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetRegistry:
@@ -63,8 +72,8 @@ class CEventApi
 	std::unordered_map<std::string, EventData_t> GetRegistry() const;
 
 	private:
-	mutable std::recursive_mutex               Mutex;
+	CLoader*                                     Loader = nullptr;
+
+	mutable std::recursive_mutex                 Mutex;
 	std::unordered_map<std::string, EventData_t> Registry;
 };
-
-#endif

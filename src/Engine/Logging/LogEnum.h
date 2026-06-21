@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LOGENUM_H
-#define LOGENUM_H
+#pragma once
 
 #include <cstdint>
 
@@ -24,5 +23,3 @@ enum class ELogLevel : uint32_t
 	TRACE    = 5,
 	ALL
 };
-
-#endif

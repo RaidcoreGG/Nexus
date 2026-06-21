@@ -8,12 +8,12 @@
 
 #include "CtlSubWindow.h"
 
-#include "imgui_extensions.h"
+#include "imgui/imgui_extensions.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 
 #include "Core/Context.h"
-#include "Resources/ResConst.h"
+#include "res/ResConst.h"
 
 void ISubWindow::Render()
 {

@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef IDXENUM_H
-#define IDXENUM_H
+#pragma once
 
 #include <cstdint>
 
@@ -42,7 +41,8 @@ enum class EPath : uint32_t
 	D3D11Chainload,           /* <GW2>/d3d11_chainload.dll                       */
 
 	Log,                      /* <GW2>/addons/Nexus/Nexus.log                    */
-	LastCrashLog,             /* <GW2>/addons/Nexus/Crash.log                    */
+	CrashLog,                 /* <GW2>/addons/Nexus/Crash.log                    */
+	CrashStack,               /* <GW2>/addons/Nexus/CrashStack.log               */
 	InputBinds,               /* <GW2>/addons/Nexus/InputBinds.json              */
 	GameBinds,                /* <GW2>/addons/Nexus/GameBinds.xml                */
 	Settings,                 /* <GW2>/addons/Nexus/Settings.json                */
@@ -63,5 +63,3 @@ enum class EPath : uint32_t
 
 	COUNT
 };
-
-#endif

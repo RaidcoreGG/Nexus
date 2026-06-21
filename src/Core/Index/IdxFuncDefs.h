@@ -6,11 +6,8 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef IDXFUNCDEFS_H
-#define IDXFUNCDEFS_H
+#pragma once
 
 typedef const char* (*IDX_GETGAMEDIR)  ();
 typedef const char* (*IDX_GETADDONDIR) (const char* aName);
 typedef const char* (*IDX_GETCOMMONDIR)();
-
-#endif

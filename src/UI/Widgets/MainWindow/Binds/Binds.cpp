@@ -11,13 +11,13 @@
 #include <map>
 
 #include "imgui/imgui.h"
-#include "imgui_extensions.h"
+#include "imgui/imgui_extensions.h"
 
 #include "Core/Context.h"
 #include "Core/Index/Index.h"
 #include "Engine/Inputs/InputBinds/IbMapping.h"
 #include "GW2/Inputs/GameBinds/GbConst.h"
-#include "Resources/ResConst.h"
+#include "res/ResConst.h"
 #include "Util/Time.h"
 
 CBindsWindow::CBindsWindow()

@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef UNINSTALLCONFIRMATIONMODAL_H
-#define UNINSTALLCONFIRMATIONMODAL_H
+#pragma once
 
 #include <string>
 #include <filesystem>
@@ -49,9 +48,7 @@ class CUninstallConfirmationModal : public virtual IModal
 
 	///----------------------------------------------------------------------------------------------------
 	/// SetTitle:
-	/// 	Custom title setting, so that the caption says "Uninstalling: <ADDONNAME>".
+	/// 	Custom title setting, so that the caption says "Uninstall addon: <ADDONNAME>".
 	///----------------------------------------------------------------------------------------------------
 	void SetTitle();
 };
-
-#endif

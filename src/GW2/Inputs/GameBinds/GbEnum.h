@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef GBENUM_H
-#define GBENUM_H
+#pragma once
 
 #include <cstdint>
 
@@ -224,5 +223,3 @@ enum class EGameBinds : uint32_t
 	GearLoadout8 = 189,
 	GearLoadout9 = 190
 };
-
-#endif

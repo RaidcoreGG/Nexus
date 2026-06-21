@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef GBCONST_H
-#define GBCONST_H
+#pragma once
 
 #include <string>
 
@@ -36,5 +35,3 @@ unsigned short GameScanCodeToScanCode(unsigned short aGameScanCode);
 /// 	Converts a scan code from the game to a regular scan code.
 ///----------------------------------------------------------------------------------------------------
 unsigned short ScanCodeToGameScanCode(unsigned short aScanCode);
-
-#endif

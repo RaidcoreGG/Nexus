@@ -180,7 +180,7 @@ void* CDataLinkApi::ShareResource(const char* aIdentifier, size_t aResourceSize,
 	return resource.Pointer;
 }
 
-std::unordered_map<std::string, LinkedResource_t> CDataLinkApi::GetRegistry()
+std::unordered_map<std::string, LinkedResource_t> CDataLinkApi::GetRegistry() const
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 

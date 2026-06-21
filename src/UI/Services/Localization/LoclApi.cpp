@@ -8,17 +8,90 @@
 
 #include "LoclApi.h"
 
-#include <windows.h>
 #include <fstream>
+#include <windows.h>
 
+#pragma warning(push, 0)
 #include "nlohmann/json.hpp"
+#pragma warning(pop)
 using json = nlohmann::json;
+
+#include "Util/Resources.h"
+#include "Core/Index/Index.h"
+#include "res/ResConst.h"
+#include "Core/Context.h"
+#include "Core/Preferences/PrefConst.h"
+
+static CLocalization* s_Localization{};
+
+/*static*/ void CLocalization::OnUELanguageChanged(uint32_t* aLanguage)
+{
+	if (!aLanguage) { return; }
+	if (!s_Localization) { return; }
+
+	switch (*aLanguage)
+	{
+		case 0:
+		{
+			s_Localization->SetLanguage("en");
+			break;
+		}
+		case 1:
+		{
+			s_Localization->SetLanguage("kr");
+			break;
+		}
+		case 2:
+		{
+			s_Localization->SetLanguage("fr");
+			break;
+		}
+		case 3:
+		{
+			s_Localization->SetLanguage("de");
+			break;
+		}
+		case 4:
+		{
+			s_Localization->SetLanguage("es");
+			break;
+		}
+		case 5:
+		{
+			s_Localization->SetLanguage("cn");
+			break;
+		}
+	}
+}
 
 CLocalization::CLocalization(CLogApi* aLogger)
 {
 	assert(aLogger);
 
 	this->Logger = aLogger;
+
+	CContext* ctx = CContext::GetContext();
+	CSettings* settingsctx = ctx->GetSettingsCtx();
+	CEventApi* evtapi = ctx->GetEventApi();
+
+	this->SetLocaleDirectory(Index(EPath::DIR_LOCALES));
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleEN), RES_LOCALE_EN, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleDE), RES_LOCALE_DE, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleFR), RES_LOCALE_FR, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleES), RES_LOCALE_ES, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleBR), RES_LOCALE_BR, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleCZ), RES_LOCALE_CZ, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleIT), RES_LOCALE_IT, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocalePL), RES_LOCALE_PL, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleRU), RES_LOCALE_RU, "JSON");
+	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleCN), RES_LOCALE_CN, "JSON");
+
+	std::string lang = settingsctx->Get<std::string>(OPT_LANGUAGE, "en");
+	this->SetLanguage(!lang.empty() ? lang : "en");
+
+	evtapi->Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", reinterpret_cast<EVENT_CONSUME>(CLocalization::OnUELanguageChanged));
+
+	s_Localization = this;
 }
 
 CLocalization::~CLocalization()

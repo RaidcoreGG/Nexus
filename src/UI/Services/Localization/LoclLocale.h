@@ -6,8 +6,7 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#ifndef LOCLLOCALE_H
-#define LOCLLOCALE_H
+#pragma once
 
 #include <string>
 #include <unordered_map>
@@ -20,5 +19,3 @@ struct Locale_t
 	std::string                                  DisplayName;
 	std::unordered_map<std::string, const char*> Texts;
 };
-
-#endif
