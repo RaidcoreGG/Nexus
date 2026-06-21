@@ -151,7 +151,7 @@ namespace Main
 
 		MH_Initialize();
 
-		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::High, [](Clockwork::CancellationToken aToken)
+		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [](Clockwork::CancellationToken aToken)
 		{
 			CContext* ctx = CContext::GetContext();
 			CLogApi* logger = ctx->GetLogger();
