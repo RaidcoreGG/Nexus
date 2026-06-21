@@ -224,7 +224,6 @@ void CQuickAccess::Render()
 		case EQaPosition::Extend:
 		{
 			wndPos.x += (s_IconBaseSize * this->NexusLink->Scaling) * GW2_QUICKACCESS_ITEMS;
-
 			ImVec2 mPos = ImGui::GetMousePos();
 			if (mPos.x != -FLT_MAX && mPos.y != -FLT_MAX && mPos.x < wndPos.x - this->Offset.x && mPos.y < this->NexusLink->Scaling * s_IconBaseSize)
 			{

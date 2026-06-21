@@ -189,20 +189,16 @@ namespace Main
 			}
 		}
 
-		CContext*   ctx    = CContext::GetContext();
-		CLogApi*    logger = ctx->GetLogger();
+		CContext*       ctx    = CContext::GetContext();
+		CLogApi*        logger = ctx->GetLogger();
+		CUiContext*     uictx  = ctx->GetUIContext();
+		CTextureLoader* texapi = ctx->GetTextureService();
 
 		logger->Critical(CH_CORE, "SHUTDOWN BEGIN | %s", reasonStr.c_str());
-
-		if (!CmdLine::HasArgument("-ggvanilla"))
-		{
-			MH_Uninitialize();
-
-			CLoader*    loader = ctx->GetLoader();
-			CUiContext* uictx  = ctx->GetUIContext();
-
-			uictx->Shutdown();
-		}
+		MH_Uninitialize();
+		Loader::Shutdown();
+		uictx->Shutdown();
+		texapi->Shutdown();
 		logger->Info(CH_CORE, "SHUTDOWN END");
 
 		/* Let the OS take care of freeing the handles. Ugly, but otherwise crashes due to the addon clownfiesta in GW2. */

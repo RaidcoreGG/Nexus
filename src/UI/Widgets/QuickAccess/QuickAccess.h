@@ -38,6 +38,8 @@ constexpr const char* ICON_NEXUS_XMAS            = "ICON_NEXUS_XMAS";
 constexpr const char* ICON_NEXUS_XMAS_HOVER      = "ICON_NEXUS_XMAS_HOVER";
 constexpr const char* QAKEY_GENERIC              = "Generic";
 
+constexpr const char* QAKEY_GENERIC  = "Generic";
+
 ///----------------------------------------------------------------------------------------------------
 /// CQuickAccess Class
 ///----------------------------------------------------------------------------------------------------

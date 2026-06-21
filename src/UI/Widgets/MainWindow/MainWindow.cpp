@@ -244,10 +244,8 @@ void CMainWindow::Render()
 			ImGui::SetCursorPos(ImVec2(0, 0));
 			ImGui::Separator();
 
-			float copyrightNoticeWidth = ImGui::CalcTextSize(reinterpret_cast<const char*>(u8"© 2021 - 2025 Raidcore")).x;
-
-			ImGui::SetCursorPos(ImVec2(((contentWidth - copyrightNoticeWidth) / 2) - sidebarWidth, (footerHeight - ImGui::GetFontSize()) / 2));
-			ImGui::Text(reinterpret_cast<const char*>(u8"© 2021 - 2025 Raidcore"));
+			ImGui::SetCursorPos(ImVec2(((contentWidth - ImGui::CalcTextSize(u8"© 2021 - 2026 Raidcore").x) / 2) - sidebarWidth, (footerHeight - ImGui::GetFontSize()) / 2));
+			ImGui::Text(u8"© 2021 - 2026 Raidcore");
 		}
 		ImGui::EndChild();
 

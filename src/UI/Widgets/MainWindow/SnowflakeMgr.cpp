@@ -27,7 +27,8 @@ CSnowflakeMgr::CSnowflakeMgr()
 		this->IsPartyPooper = aNewValue;
 	});
 
-	this->IsItChristmas = Time::GetMonth() == 12;
+	this->IsItChristmas = Time::GetMonth() == 12 && !isPartyPooper;
+	this->IsItHalloween = Time::GetMonth() == 10 && !isPartyPooper;
 }
 
 ImVec2 Rotate(const ImVec2& aPoint, float aCosA, float aSinA)
@@ -64,8 +65,8 @@ void ImageRotated(ImTextureID aTextureIdentifier, ImVec2 aOrigin, ImVec2 aSize, 
 
 void CSnowflakeMgr::Update()
 {
-	if (!this->IsItChristmas) { return; }
-	if (this->IsPartyPooper)  { return; }
+
+	if (!(this->IsItChristmas || this->IsItHalloween)) { return; }
 
 	static CContext* ctx = CContext::GetContext();
 	static CTextureLoader* texapi = ctx->GetTextureService();
@@ -86,20 +87,41 @@ void CSnowflakeMgr::Update()
 	{
 		std::srand(static_cast<int>(std::time(nullptr)));
 
-		static Texture_t* texSnowflake = texapi->GetOrCreate("SNOWFLAKE", RES_ICON_SNOWFLAKE, CContext::GetContext()->GetModule());
-
-		if (!texSnowflake)
-		{
-			texSnowflake = texapi->GetOrCreate("SNOWFLAKE", RES_ICON_SNOWFLAKE, CContext::GetContext()->GetModule());
-			return;
-		}
-
 		snowflakes.clear();
 
 		while (snowflakes.size() < amtSnowflakes)
 		{
+			Texture_t* tex = nullptr;
+
+			if (this->IsItChristmas)
+			{
+				static Texture_t* texSnowflake = nullptr;
+
+				if (!texSnowflake)
+				{
+					texSnowflake = texapi->GetOrCreate("SNOWFLAKE", RES_ICON_SNOWFLAKE, CContext::GetContext()->GetModule());
+					return;
+				}
+
+				tex = texSnowflake;
+			}
+			else if (this->IsItHalloween)
+			{
+				static Texture_t* texLeaves[3];
+
+				if (!(texLeaves[0] && texLeaves[1] && texLeaves[2]))
+				{
+					texLeaves[0] = texapi->GetOrCreate("LEAF_VARIANT1", RES_ICON_LEAF_VARIANT1, CContext::GetContext()->GetModule());
+					texLeaves[1] = texapi->GetOrCreate("LEAF_VARIANT2", RES_ICON_LEAF_VARIANT2, CContext::GetContext()->GetModule());
+					texLeaves[2] = texapi->GetOrCreate("LEAF_VARIANT3", RES_ICON_LEAF_VARIANT3, CContext::GetContext()->GetModule());
+					return;
+				}
+
+				tex = texLeaves[std::rand() % 3];
+			}
+
 			snowflakes.push_back(Snowflake_t{
-				texSnowflake, // texture
+				tex, // texture
 				(float)((ImGui::GetFontSize() / 2) + (std::rand() % (int)ImGui::GetFontSize())), // Size
 				(float)(std::rand() % (int)wndSize.x), //X
 				(float)(std::rand() % (int)wndSize.y), //Y
