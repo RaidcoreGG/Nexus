@@ -83,12 +83,13 @@ void CreateIndex(HMODULE aModule)
 	s_Paths[(int)EPath::LocaleDE] = s_Paths[(int)EPath::DIR_LOCALES] / "de_Main.json";
 	s_Paths[(int)EPath::LocaleFR] = s_Paths[(int)EPath::DIR_LOCALES] / "fr_Main.json";
 	s_Paths[(int)EPath::LocaleES] = s_Paths[(int)EPath::DIR_LOCALES] / "es_Main.json";
+	s_Paths[(int)EPath::LocaleCN] = s_Paths[(int)EPath::DIR_LOCALES] / "cn_Main.json";
+	s_Paths[(int)EPath::LocaleKR] = s_Paths[(int)EPath::DIR_LOCALES] / "kr_Main.json";
 	s_Paths[(int)EPath::LocaleBR] = s_Paths[(int)EPath::DIR_LOCALES] / "br_Main.json";
 	s_Paths[(int)EPath::LocaleCZ] = s_Paths[(int)EPath::DIR_LOCALES] / "cz_Main.json";
 	s_Paths[(int)EPath::LocaleIT] = s_Paths[(int)EPath::DIR_LOCALES] / "it_Main.json";
 	s_Paths[(int)EPath::LocalePL] = s_Paths[(int)EPath::DIR_LOCALES] / "pl_Main.json";
 	s_Paths[(int)EPath::LocaleRU] = s_Paths[(int)EPath::DIR_LOCALES] / "ru_Main.json";
-	s_Paths[(int)EPath::LocaleCN] = s_Paths[(int)EPath::DIR_LOCALES] / "cn_Main.json";
 
 	/* Set the module. */
 	s_Module = aModule;

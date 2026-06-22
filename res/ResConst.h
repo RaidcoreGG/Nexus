@@ -76,11 +76,12 @@
 #define RES_LOCALE_DE                   702
 #define RES_LOCALE_FR                   703
 #define RES_LOCALE_ES                   704
+#define RES_LOCALE_CN                   705
+#define RES_LOCALE_KR                   706
 
 /* Locales (secondary) */
-#define RES_LOCALE_BR                   705
-#define RES_LOCALE_CZ                   706
-#define RES_LOCALE_IT                   707
-#define RES_LOCALE_PL                   708
-#define RES_LOCALE_RU                   709
-#define RES_LOCALE_CN                   710
+#define RES_LOCALE_BR                   707
+#define RES_LOCALE_CZ                   708
+#define RES_LOCALE_IT                   709
+#define RES_LOCALE_PL                   710
+#define RES_LOCALE_RU                   711

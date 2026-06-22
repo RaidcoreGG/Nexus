@@ -54,12 +54,13 @@ enum class EPath : uint32_t
 	LocaleDE,                 /* <GW2>/addons/Nexus/Locales/de_Main.json         */
 	LocaleFR,                 /* <GW2>/addons/Nexus/Locales/fr_Main.json         */
 	LocaleES,                 /* <GW2>/addons/Nexus/Locales/es_Main.json         */
+	LocaleCN,                 /* <GW2>/addons/Nexus/Locales/cn_Main.json         */
+	LocaleKR,                 /* <GW2>/addons/Nexus/Locales/kr_Main.json         */
 	LocaleBR,                 /* <GW2>/addons/Nexus/Locales/br_Main.json         */
 	LocaleCZ,                 /* <GW2>/addons/Nexus/Locales/cz_Main.json         */
 	LocaleIT,                 /* <GW2>/addons/Nexus/Locales/it_Main.json         */
 	LocalePL,                 /* <GW2>/addons/Nexus/Locales/pl_Main.json         */
 	LocaleRU,                 /* <GW2>/addons/Nexus/Locales/ru_Main.json         */
-	LocaleCN,                 /* <GW2>/addons/Nexus/Locales/cn_Main.json         */
 
 	COUNT
 };

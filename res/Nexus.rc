@@ -154,6 +154,8 @@ RES_LOCALE_EN                   JSON    "res\\Locales\\en_Main.json"
 RES_LOCALE_DE                   JSON    "res\\Locales\\de_Main.json"
 RES_LOCALE_FR                   JSON    "res\\Locales\\fr_Main.json"
 RES_LOCALE_ES                   JSON    "res\\Locales\\es_Main.json"
+RES_LOCALE_CN                   JSON    "res\\Locales\\cn_Main.json"
+RES_LOCALE_KR                   JSON    "res\\Locales\\kr_Main.json"
 
 /* Locales (secondary) */
 RES_LOCALE_BR                   JSON    "res\\Locales\\br_Main.json"
@@ -161,7 +163,6 @@ RES_LOCALE_CZ                   JSON    "res\\Locales\\cz_Main.json"
 RES_LOCALE_IT                   JSON    "res\\Locales\\it_Main.json"
 RES_LOCALE_PL                   JSON    "res\\Locales\\pl_Main.json"
 RES_LOCALE_RU                   JSON    "res\\Locales\\ru_Main.json"
-RES_LOCALE_CN                   JSON    "res\\Locales\\cn_Main.json"
 
 #endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
