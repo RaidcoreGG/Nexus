@@ -4,7 +4,7 @@
 ![](https://img.shields.io/github/v/release/RaidcoreGG/Nexus?style=for-the-badge&labelColor=%23131519&color=%230F79AA)
 ![](https://img.shields.io/github/downloads/RaidcoreGG/Nexus/total?style=for-the-badge&labelColor=%23131519&color=%230F79AA&label=Downloads)
 
-# Nexus - An addon overlay for Guild Wars 2
+# Nexus - An addon engine for Guild Wars 2
 
 *Host, Loader, Manager, Framework* and *Platform* are all terms describing what Nexus does.
 
@@ -38,7 +38,7 @@ If you want another proxy d3d11.dll, for example ArcDPS, you can chainload it by
 ## [FAQ & Wiki](https://github.com/RaidcoreGG/Nexus/wiki)
 
 ## License
-Copyright (c) 2021-2025 Raidcore - All rights reserved.
+Copyright (c) 2021-2026 Raidcore - All rights reserved.
 
 See [THIRDPARTYSOFTWAREREADME.TXT](./THIRDPARTYSOFTWAREREADME.TXT) for third-party licenses.
 
