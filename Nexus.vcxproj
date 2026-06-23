@@ -22,6 +22,7 @@
     <ClCompile Include="src\Engine\Cleanup\RefCleanerContext.cpp" />
     <ClCompile Include="src\Engine\Clockwork\Clockwork.cpp" />
     <ClCompile Include="src\Engine\Clockwork\Tasks\TaskBase.cpp" />
+    <ClCompile Include="src\Engine\Clockwork\Tasks\WorkerTask.cpp" />
     <ClCompile Include="src\Engine\CrashHandler\CrashHandler.cpp" />
     <ClCompile Include="src\Engine\Functions\FnRegistry.cpp" />
     <ClCompile Include="src\Core\Index\Index.cpp" />
@@ -562,13 +563,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -621,8 +622,7 @@
       <AdditionalDependencies>advapi32.lib;crypt32.lib;DbgHelp.lib;gdi32.lib;ntdll.lib;PathCch.lib;Psapi.lib;shcore.lib;Shell32.lib;Shlwapi.lib;user32.lib;ws2_32.lib;libssl64MTd.lib;libcrypto64MTd.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>git submodule update --init --recursive
-CALL $(SolutionDir)Scripts\branch.bat
+      <Command>CALL $(SolutionDir)Scripts\branch.bat
 CALL $(SolutionDir)Scripts\commithash.bat
 CALL $(SolutionDir)Scripts\version.bat
 CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
@@ -662,8 +662,7 @@ CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
       <AdditionalDependencies>advapi32.lib;crypt32.lib;DbgHelp.lib;gdi32.lib;ntdll.lib;PathCch.lib;Psapi.lib;shcore.lib;Shell32.lib;Shlwapi.lib;user32.lib;ws2_32.lib;libssl64MT.lib;libcrypto64MT.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>git submodule update --init --recursive
-CALL $(SolutionDir)Scripts\branch.bat
+      <Command>CALL $(SolutionDir)Scripts\branch.bat
 CALL $(SolutionDir)Scripts\commithash.bat
 CALL $(SolutionDir)Scripts\version.bat
 CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
