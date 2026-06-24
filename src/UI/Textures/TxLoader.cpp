@@ -17,7 +17,7 @@
 #include "httplib/httplib.h"
 #pragma warning(pop)
 
-#include "Engine/Clockwork/Clockwork.h"
+#include "Engine/Clockwork/Dispatcher.h"
 namespace Clockwork = Raidcore::Clockwork;
 
 #include "Util/Time.h"
@@ -33,10 +33,10 @@ CTextureLoader::CTextureLoader(CLogApi* aLogger, RenderContext_t* aRenderCtx, st
 
 	this->OverridesDirectory = aOverridesDirectory;
 
-	this->TextureWorker = Clockwork::CreateWorker([this](Clockwork::CancellationToken aToken)
+	this->TextureWorker = Clockwork::Dispatcher<void>{[this](Clockwork::CancellationToken aToken)
 	{
 		this->ProcessDownloads(aToken);
-	});
+	}};
 }
 
 CTextureLoader::~CTextureLoader()
@@ -496,7 +496,7 @@ void CTextureLoader::Enqueue(const char* aIdentifier, std::string aDownloadURL, 
 		entry.Time = Time::GetTimestampMs();
 
 		this->QueuedTextures.emplace(aIdentifier, entry);
-		this->TextureWorker->Dispatch();
+		this->TextureWorker();
 	}
 }
 

@@ -13,11 +13,9 @@
 #include <map>
 #include <mutex>
 #include <string>
-#include <thread>
-#include <vector>
 #include <windows.h>
 
-#include "Engine/Clockwork/Tasks/WorkerTask.h"
+#include "Engine/Clockwork/Dispatcher.h"
 namespace Clockwork = Raidcore::Clockwork;
 
 #include "Engine/Cleanup/RefCleanerBase.h"
@@ -142,7 +140,7 @@ class CTextureLoader : public virtual IRefCleaner
 	std::map<std::string, Texture_t*>      Registry{};
 	std::map<std::string, QueuedTexture_t> QueuedTextures{};
 
-	std::shared_ptr<Clockwork::WorkerTask> TextureWorker{ nullptr };
+	Clockwork::Dispatcher<void>            TextureWorker{};
 
 	///----------------------------------------------------------------------------------------------------
 	/// ProcessRequest:
