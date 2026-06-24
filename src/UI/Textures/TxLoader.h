@@ -17,6 +17,9 @@
 #include <vector>
 #include <windows.h>
 
+#include "Engine/Clockwork/Tasks/WorkerTask.h"
+namespace Clockwork = Raidcore::Clockwork;
+
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include "Engine/Logging/LogApi.h"
 #include "TxFuncDefs.h"
@@ -130,18 +133,16 @@ class CTextureLoader : public virtual IRefCleaner
 	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	private:
-	CLogApi*                               Logger        = nullptr;
-	RenderContext_t*                       RenderContext = nullptr;
+	CLogApi*                               Logger { nullptr };
+	RenderContext_t*                       RenderContext{ nullptr };
 
-	std::filesystem::path                  OverridesDirectory;
+	std::filesystem::path                  OverridesDirectory{};
 
-	mutable std::mutex                     Mutex;
-	std::map<std::string, Texture_t*>      Registry;
-	std::map<std::string, QueuedTexture_t> QueuedTextures;
+	mutable std::mutex                     Mutex{};
+	std::map<std::string, Texture_t*>      Registry{};
+	std::map<std::string, QueuedTexture_t> QueuedTextures{};
 
-	std::condition_variable                ConVar;
-	bool                                   IsRunning = true;
-	std::vector<std::thread>               DownloadThreads;
+	std::shared_ptr<Clockwork::WorkerTask> TextureWorker{ nullptr };
 
 	///----------------------------------------------------------------------------------------------------
 	/// ProcessRequest:
@@ -210,5 +211,5 @@ class CTextureLoader : public virtual IRefCleaner
 	/// ProcessDownloads:
 	/// 	Thread function to process downloads.
 	///----------------------------------------------------------------------------------------------------
-	void ProcessDownloads();
+	void ProcessDownloads(Clockwork::CancellationToken aToken);
 };

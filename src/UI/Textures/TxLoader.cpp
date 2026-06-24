@@ -17,6 +17,9 @@
 #include "httplib/httplib.h"
 #pragma warning(pop)
 
+#include "Engine/Clockwork/Clockwork.h"
+namespace Clockwork = Raidcore::Clockwork;
+
 #include "Util/Time.h"
 #include "Util/Url.h"
 
@@ -30,26 +33,14 @@ CTextureLoader::CTextureLoader(CLogApi* aLogger, RenderContext_t* aRenderCtx, st
 
 	this->OverridesDirectory = aOverridesDirectory;
 
-	/* 8 Worker threads. This is disgusting. May I interest you in a threadpool? */
-	for (size_t i = 0; i < 8; i++)
+	this->TextureWorker = Clockwork::CreateWorker([this](Clockwork::CancellationToken aToken)
 	{
-		this->DownloadThreads.push_back(std::thread(&CTextureLoader::ProcessDownloads, this));
-	}
+		this->ProcessDownloads(aToken);
+	});
 }
 
 CTextureLoader::~CTextureLoader()
 {
-	this->IsRunning = false;
-	this->ConVar.notify_all();
-
-	for (size_t i = 0; i < 8; i++)
-	{
-		if (this->DownloadThreads[i].joinable())
-		{
-			this->DownloadThreads[i].join();
-		}
-	}
-
 	// TODO: Free textures here. Issue: https://github.com/RaidcoreGG/Nexus/issues/138
 }
 
@@ -505,6 +496,7 @@ void CTextureLoader::Enqueue(const char* aIdentifier, std::string aDownloadURL, 
 		entry.Time = Time::GetTimestampMs();
 
 		this->QueuedTextures.emplace(aIdentifier, entry);
+		this->TextureWorker->Dispatch();
 	}
 }
 
@@ -630,102 +622,92 @@ void CTextureLoader::DispatchTexture(const std::string& aIdentifier, Texture_t* 
 	}
 }
 
-void CTextureLoader::ProcessDownloads()
+void CTextureLoader::ProcessDownloads(Clockwork::CancellationToken aToken)
 {
-	while (this->IsRunning)
+	std::map<std::string, QueuedTexture_t> queueCpy = GetQueuedTextures();
+
+	for (auto& [id, qtex] : queueCpy)
 	{
+		if (aToken.IsCancelled())
 		{
-			std::unique_lock<std::mutex> lock(this->Mutex);
-			this->ConVar.wait_for(lock, std::chrono::milliseconds(5000), [this] {
-				return this->QueuedTextures.size() > 0 || !this->IsRunning;
-			});
+			return;
 		}
 
-		/* Early exit without processing the remaining textures. */
-		if (!this->IsRunning)
+		std::string downloadUrl = "";
+
+		/* Scope and lock, to verify we're processing this texture on this thread. */
 		{
-			break;
+			const std::lock_guard<std::mutex> lock(this->Mutex);
+			auto it = this->QueuedTextures.find(id);
+
+			if (it == this->QueuedTextures.end())
+			{
+				/* Already gone again :( */
+				continue;
+			}
+			else if (it->second.DownloadURL.empty())
+			{
+				continue;
+			}
+			else if (it->second.Stage == ETextureStage::Prepare && !it->second.DownloadURL.empty())
+			{
+				std::swap(downloadUrl, it->second.DownloadURL);
+			}
+			else
+			{
+				continue;
+			}
 		}
 
-		std::map<std::string, QueuedTexture_t> queueCpy = GetQueuedTextures();
-
-		for (auto& [id, qtex] : queueCpy)
+		/* If we swapped a download URL, download it. */
+		if (!downloadUrl.empty())
 		{
-			std::string downloadUrl = "";
+			std::string remote = URL::GetBase(qtex.DownloadURL);
+			std::string endpoint = URL::GetEndpoint(qtex.DownloadURL);
 
-			/* Scope and lock, to verify we're processing this texture on this thread. */
+			httplib::Client client(remote);
+			client.enable_server_certificate_verification(true);
+			client.set_follow_location(true);
+			client.set_url_encode(false);
+
+			auto result = client.Get(endpoint);
+
+			if (!result)
 			{
-				const std::lock_guard<std::mutex> lock(this->Mutex);
-				auto it = this->QueuedTextures.find(id);
+				this->Logger->Debug(CH_TEXTURES, "Error fetching %s%s (%s)\nError: %s", remote.c_str(), endpoint.c_str(), id.c_str(), httplib::to_string(result.error()).c_str());
 
-				if (it == this->QueuedTextures.end())
-				{
-					/* Already gone again :( */
-					continue;
-				}
-				else if (it->second.DownloadURL.empty())
-				{
-					continue;
-				}
-				else if (it->second.Stage == ETextureStage::Prepare && !it->second.DownloadURL.empty())
-				{
-					std::swap(downloadUrl, it->second.DownloadURL);
-				}
-				else
-				{
-					continue;
-				}
+				/* nullptr response on fail */
+				this->Dequeue(id.c_str());
+
+				return;
 			}
 
-			/* If we swapped a download URL, download it. */
-			if (!downloadUrl.empty())
+			// Status is not HTTP_OK
+			if (result->status != 200)
 			{
-				std::string remote = URL::GetBase(qtex.DownloadURL);
-				std::string endpoint = URL::GetEndpoint(qtex.DownloadURL);
+				this->Logger->Debug(CH_TEXTURES, "Status %d when fetching %s%s (%s) | %s", result->status, remote.c_str(), endpoint.c_str(), id.c_str(), httplib::to_string(result.error()).c_str());
 
-				httplib::Client client(remote);
-				client.enable_server_certificate_verification(true);
-				client.set_follow_location(true);
-				client.set_url_encode(false);
+				/* nullptr response on fail */
+				this->Dequeue(id.c_str());
 
-				auto result = client.Get(endpoint);
-
-				if (!result)
-				{
-					this->Logger->Debug(CH_TEXTURES, "Error fetching %s%s (%s)\nError: %s", remote.c_str(), endpoint.c_str(), id.c_str(), httplib::to_string(result.error()).c_str());
-
-					/* nullptr response on fail */
-					this->Dequeue(id.c_str());
-
-					return;
-				}
-
-				// Status is not HTTP_OK
-				if (result->status != 200)
-				{
-					this->Logger->Debug(CH_TEXTURES, "Status %d when fetching %s%s (%s) | %s", result->status, remote.c_str(), endpoint.c_str(), id.c_str(), httplib::to_string(result.error()).c_str());
-
-					/* nullptr response on fail */
-					this->Dequeue(id.c_str());
-
-					return;
-				}
-
-				size_t size = result->body.size();
-				unsigned char* remote_data = new unsigned char[size];
-				std::memcpy(remote_data, result->body.c_str(), size);
-
-				int width = 0;
-				int height = 0;
-				int components;
-
-				stbi_uc* data = stbi_load_from_memory(remote_data, static_cast<int>(size), &width, &height, &components, 4);
-
-				delete[] remote_data;
-
-				/* Enqueue the data. */
-				this->Enqueue(id.c_str(), data, width, height);
+				return;
 			}
+
+			size_t size = result->body.size();
+			unsigned char* remote_data = new unsigned char[size];
+			std::memcpy(remote_data, result->body.c_str(), size);
+
+			int width = 0;
+			int height = 0;
+			int components;
+
+			stbi_uc* data = stbi_load_from_memory(remote_data, static_cast<int>(size), &width, &height, &components, 4);
+
+			delete[] remote_data;
+
+			/* Enqueue the data. */
+			this->Enqueue(id.c_str(), data, width, height);
+			return;
 		}
 	}
 }

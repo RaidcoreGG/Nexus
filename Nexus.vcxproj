@@ -139,7 +139,6 @@
     <ClInclude Include="src\Engine\Clockwork\Tasks\TaskBase.h" />
     <ClInclude Include="src\Engine\Clockwork\Tasks\ETaskPriority.h" />
     <ClInclude Include="src\Engine\Clockwork\Tasks\WorkerTask.h" />
-    <ClInclude Include="src\Engine\Clockwork\Threadpool.h" />
     <ClInclude Include="src\Engine\CrashHandler\CrashHandler.h" />
     <ClInclude Include="src\Engine\Events\EvtData.h" />
     <ClInclude Include="src\Engine\Functions\FnEntry.h" />
