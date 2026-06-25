@@ -9,7 +9,6 @@
 #pragma once
 
 #include <string>
-#include <thread>
 
 #include "thirdparty/mumble/Mumble.h"
 
@@ -73,10 +72,6 @@ class CMumbleReader
 	CDataLinkApi*     DataLinkApi            = nullptr;
 	CEventApi*        EventApi               = nullptr;
 	CLogApi*          Logger                 = nullptr;
-
-	std::thread       ThreadIdentity;
-	std::thread       ThreadDerived;
-	bool              IsRunning              = false;
 
 	std::string       Name;
 	Mumble::Data*     MumbleLink             = nullptr;

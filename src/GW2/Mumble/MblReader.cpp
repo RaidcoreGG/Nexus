@@ -6,7 +6,10 @@
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "GW2/Mumble/MblReader.h"
+#include "MblReader.h"
+
+#include "Engine/Clockwork/Clockwork.h"
+namespace Clockwork = Raidcore::Clockwork;
 
 #pragma warning(push, 0)
 #include "nlohmann/json.hpp"
@@ -43,25 +46,19 @@ CMumbleReader::CMumbleReader(CDataLinkApi* aDataLink, CEventApi* aEventApi, CLog
 
 	if (this->Name != "0")
 	{
-		this->IsRunning = true;
-		this->ThreadIdentity = std::thread(&CMumbleReader::AdvanceIdentity, this);
-		this->ThreadDerived = std::thread(&CMumbleReader::AdvanceDerived, this);
+		Clockwork::Schedule(std::chrono::milliseconds{ 50 }, [this](Clockwork::CancellationToken aToken)
+		{
+			this->AdvanceIdentity();
+		});
+		Clockwork::Schedule(std::chrono::milliseconds{ 100 }, [this](Clockwork::CancellationToken aToken)
+		{
+			this->AdvanceDerived();
+		});
 	}
 }
 
 CMumbleReader::~CMumbleReader()
 {
-	this->IsRunning = false;
-
-	if (this->ThreadIdentity.joinable())
-	{
-		this->ThreadIdentity.join();
-	}
-
-	if (this->ThreadDerived.joinable())
-	{
-		this->ThreadDerived.join();
-	}
 }
 
 std::string CMumbleReader::GetName()
@@ -71,7 +68,7 @@ std::string CMumbleReader::GetName()
 
 bool CMumbleReader::IsDisabled() const
 {
-	return !this->IsRunning;
+	return this->Name == "0";
 }
 
 Mumble::Data* CMumbleReader::GetMumbleData() const
@@ -91,72 +88,66 @@ NexusLinkData_t* CMumbleReader::GetNexusLink() const
 
 void CMumbleReader::AdvanceIdentity()
 {
-	while (this->IsRunning)
+	if (this->MumbleLink->Identity[0])
 	{
-		if (this->MumbleLink->Identity[0])
+		/* cache identity */
+		this->PreviousIdentity = *this->MumbleIdentity;
+
+		try
 		{
-			/* cache identity */
-			this->PreviousIdentity = *this->MumbleIdentity;
+			/* parse and assign current identity */
+			json j = json::parse(this->MumbleLink->Identity);
+			strcpy(this->MumbleIdentity->Name, j["name"].get<std::string>().c_str());
+			j["profession"].get_to(this->MumbleIdentity->Profession);
+			j["spec"].get_to(this->MumbleIdentity->Specialization);
+			j["race"].get_to(this->MumbleIdentity->Race);
+			j["map_id"].get_to(this->MumbleIdentity->MapID);
+			j["world_id"].get_to(this->MumbleIdentity->WorldID);
+			j["team_color_id"].get_to(this->MumbleIdentity->TeamColorID);
+			j["commander"].get_to(this->MumbleIdentity->IsCommander);
+			j["fov"].get_to(this->MumbleIdentity->FOV);
+			j["uisz"].get_to(this->MumbleIdentity->UISize);
 
-			try
-			{
-				/* parse and assign current identity */
-				json j = json::parse(this->MumbleLink->Identity);
-				strcpy(this->MumbleIdentity->Name, j["name"].get<std::string>().c_str());
-				j["profession"].get_to(this->MumbleIdentity->Profession);
-				j["spec"].get_to(this->MumbleIdentity->Specialization);
-				j["race"].get_to(this->MumbleIdentity->Race);
-				j["map_id"].get_to(this->MumbleIdentity->MapID);
-				j["world_id"].get_to(this->MumbleIdentity->WorldID);
-				j["team_color_id"].get_to(this->MumbleIdentity->TeamColorID);
-				j["commander"].get_to(this->MumbleIdentity->IsCommander);
-				j["fov"].get_to(this->MumbleIdentity->FOV);
-				j["uisz"].get_to(this->MumbleIdentity->UISize);
-			}
-			catch (json::parse_error& ex)
-			{
-				this->Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
-			}
-			catch (json::type_error& ex)
-			{
-				this->Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Type Error: %s", ex.what());
-			}
-			catch (...)
-			{
-				this->Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Unknown Error.");
-			}
-
-			/* notify (also notifies the GUI to update its scaling factor) */
-			if (*this->MumbleIdentity != this->PreviousIdentity)
-			{
-				this->EventApi->Raise(EV_MUMBLE_IDENTITY_UPDATED, this->MumbleIdentity);
-			}
+			this->Logger->Trace(CH_MUMBLE_READER, "CMumbleReader::AdvanceIdentity()");
+		}
+		catch (json::parse_error& ex)
+		{
+			this->Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
+		}
+		catch (json::type_error& ex)
+		{
+			this->Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Type Error: %s", ex.what());
+		}
+		catch (...)
+		{
+			this->Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Unknown Error.");
 		}
 
-		Sleep(50);
+		/* notify (also notifies the GUI to update its scaling factor) */
+		if (*this->MumbleIdentity != this->PreviousIdentity)
+		{
+			this->EventApi->Raise(EV_MUMBLE_IDENTITY_UPDATED, this->MumbleIdentity);
+		}
 	}
 }
 
 void CMumbleReader::AdvanceDerived()
 {
-	while (this->IsRunning)
-	{
-		CContext*        ctx      = CContext::GetContext();
-		RenderContext_t* renderer = ctx->GetRendererCtx();
+	CContext*        ctx      = CContext::GetContext();
+	RenderContext_t* renderer = ctx->GetRendererCtx();
 
-		bool tickChanged  = this->PreviousTick != this->MumbleLink->UITick;
-		bool gameFrozen   = this->PreviousFrameCounter == renderer->Metrics.FrameCount;
+	bool tickChanged  = this->PreviousTick != this->MumbleLink->UITick;
+	bool gameFrozen   = this->PreviousFrameCounter == renderer->Metrics.FrameCount;
 
-		/* Either the ui is ticking or the ui *was* ticking and the game is frozen. */
-		this->NexusLink->IsGameplay     = tickChanged || (gameFrozen && this->NexusLink->IsGameplay);
-		this->NexusLink->IsMoving       = this->PreviousAvatarPosition != this->MumbleLink->AvatarPosition;
-		this->NexusLink->IsCameraMoving = this->PreviousCameraFront != this->MumbleLink->CameraFront;
+	/* Either the ui is ticking or the ui *was* ticking and the game is frozen. */
+	this->NexusLink->IsGameplay     = tickChanged || (gameFrozen && this->NexusLink->IsGameplay);
+	this->NexusLink->IsMoving       = this->PreviousAvatarPosition != this->MumbleLink->AvatarPosition;
+	this->NexusLink->IsCameraMoving = this->PreviousCameraFront != this->MumbleLink->CameraFront;
 
-		this->PreviousFrameCounter   = renderer->Metrics.FrameCount;
-		this->PreviousTick           = this->MumbleLink->UITick;
-		this->PreviousAvatarPosition = this->MumbleLink->AvatarPosition;
-		this->PreviousCameraFront    = this->MumbleLink->CameraFront;
+	this->PreviousFrameCounter   = renderer->Metrics.FrameCount;
+	this->PreviousTick           = this->MumbleLink->UITick;
+	this->PreviousAvatarPosition = this->MumbleLink->AvatarPosition;
+	this->PreviousCameraFront    = this->MumbleLink->CameraFront;
 
-		Sleep(100);
-	}
+	this->Logger->Trace(CH_MUMBLE_READER, "CMumbleReader::AdvanceDerived()");
 }
