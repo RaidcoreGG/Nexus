@@ -69,9 +69,9 @@ namespace Hooks
 		swapChainDesc.Windowed = TRUE;
 
 		/* Temporary interface pointers used to hook. */
-		ID3D11Device*        device;
-		ID3D11DeviceContext* context;
-		IDXGISwapChain*      swap;
+		ID3D11Device*        device  = nullptr;
+		ID3D11DeviceContext* context = nullptr;
+		IDXGISwapChain*      swap    = nullptr;
 
 		/* Create the swapchain. */
 		if (SUCCEEDED(D3D11CreateDeviceAndSwapChain(0, D3D_DRIVER_TYPE_HARDWARE, 0, 0, 0, 0, D3D11_SDK_VERSION, &swapChainDesc, &swap, &device, 0, &context)))
