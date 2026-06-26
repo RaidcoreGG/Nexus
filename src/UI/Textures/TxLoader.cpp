@@ -569,6 +569,7 @@ void CTextureLoader::CreateTexture(const std::string& aIdentifier, QueuedTexture
 	{
 		this->Logger->Debug(CH_TEXTURES, "pTexture was null");
 		stbi_image_free(aQueuedTexture.Data);
+		aQueuedTexture.Data = nullptr;
 
 		/* Manual dequeue, because of Mutex lock. */
 		aQueuedTexture.Stage = ETextureStage::INVALID;
