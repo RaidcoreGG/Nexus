@@ -185,6 +185,17 @@
     <ClInclude Include="src\Engine\Logging\LogEnum.h" />
     <ClInclude Include="src\UI\Textures\TxEnum.h" />
     <ClInclude Include="src\thirdparty\arcdps\ArcDPS.h" />
+    <ClInclude Include="src\Util\Base64.h" />
+    <ClInclude Include="src\Util\CmdLine.h" />
+    <ClInclude Include="src\Util\DLL.h" />
+    <ClInclude Include="src\Util\Enums.h" />
+    <ClInclude Include="src\Util\Inputs.h" />
+    <ClInclude Include="src\Util\MD5.h" />
+    <ClInclude Include="src\Util\Paths.h" />
+    <ClInclude Include="src\Util\Resources.h" />
+    <ClInclude Include="src\Util\Strings.h" />
+    <ClInclude Include="src\Util\Time.h" />
+    <ClInclude Include="src\Util\Url.h" />
     <ClInclude Include="thirdparty\httplib\httplib.h" />
     <ClInclude Include="thirdparty\ImAnimate\ImAnimate.h" />
     <ClInclude Include="thirdparty\imgui\imconfig.h" />

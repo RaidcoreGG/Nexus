@@ -26,10 +26,41 @@
 #include "UI/Textures/TxLoader.h"
 #include "UI/UiContext.h"
 #include "Util/CmdLine.h"
-#include "Util/Memory.h"
 
 namespace Hooks
 {
+	inline PBYTE FollowJmpChain(PBYTE aPointer)
+	{
+		while (true)
+		{
+			if (aPointer[0] == 0xE9)
+			{
+				/* near jmp */
+				/* address is relative to after jmp */
+				aPointer += 5 + *(__unaligned signed int*) & aPointer[1]; // jmp +imm32
+			}
+			else if (aPointer[0] == 0xFF && aPointer[1] == 0x25)
+			{
+				/* far jmp */
+				/* x64: address is relative to after jmp */
+				/* x86: absolute address can be read directly */
+#ifdef _WIN64
+				aPointer += 6 + *(__unaligned signed int*) & aPointer[2]; // jmp [+imm32]
+#else
+				aPointer = *(__unaligned signed int*) & aPointer[2]; // jmp [imm32]
+#endif
+				/* dereference to get the actual target address */
+				aPointer = *(__unaligned PBYTE*)aPointer;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		return aPointer;
+	}
+
 	void HookIDXGISwapChain()
 	{
 		if (CmdLine::HasArgument("-ggvanilla"))                             { return; }
@@ -85,8 +116,8 @@ namespace Hooks
 
 			/* Create and enable VT hooks. */
 			/* Follow the jump chain to work nicely with various other hooks. */
-			MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[8]),  (LPVOID)&Detour::DXGIPresent,       (LPVOID*)&Target::DXGIPresent      );
-			MH_CreateHook(Memory::FollowJmpChain((PBYTE)vtbl[13]), (LPVOID)&Detour::DXGIResizeBuffers, (LPVOID*)&Target::DXGIResizeBuffers);
+			MH_CreateHook(FollowJmpChain((PBYTE)vtbl[8]),  (LPVOID)&Detour::DXGIPresent,       (LPVOID*)&Target::DXGIPresent      );
+			MH_CreateHook(FollowJmpChain((PBYTE)vtbl[13]), (LPVOID)&Detour::DXGIResizeBuffers, (LPVOID*)&Target::DXGIResizeBuffers);
 			MH_EnableHook(MH_ALL_HOOKS);
 
 			logger->Debug(CH_CORE, "HOOK END");
