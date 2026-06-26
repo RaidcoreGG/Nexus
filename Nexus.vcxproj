@@ -21,7 +21,6 @@
     <ClCompile Include="src\Engine\Cleanup\RefCleanerBase.cpp" />
     <ClCompile Include="src\Engine\Cleanup\RefCleanerContext.cpp" />
     <ClCompile Include="src\Engine\Clockwork\Clockwork.cpp" />
-    <ClCompile Include="src\Engine\Clockwork\Tasks\TaskBase.cpp" />
     <ClCompile Include="src\Engine\CrashHandler\CrashHandler.cpp" />
     <ClCompile Include="src\Engine\Functions\FnRegistry.cpp" />
     <ClCompile Include="src\Core\Index\Index.cpp" />
