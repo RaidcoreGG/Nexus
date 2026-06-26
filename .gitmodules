@@ -13,3 +13,6 @@
 [submodule "src/Engine/Clockwork"]
 	path = src/Engine/Clockwork
 	url = https://github.com/RaidcoreGG/Clockwork
+[submodule "src/Util"]
+	path = src/Util
+	url = https://github.com/RaidcoreGG/cpp-utility
