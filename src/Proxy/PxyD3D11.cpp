@@ -41,7 +41,7 @@ PROXY HRESULT __stdcall D3D11CreateDevice(
 
 	auto fn =  s_ProxyModule.GetFunc<decltype(&D3D11CreateDevice)>("D3D11CreateDevice", s_InProxyCall);
 
-	ProxyCallScope_t _scope(s_InProxyCall);
+	PROTECT_RECURSE(s_InProxyCall);
 
 	return fn(
 		pAdapter,
@@ -79,7 +79,7 @@ PROXY HRESULT __stdcall D3D11CreateDeviceAndSwapChain(
 
 	auto fn = s_ProxyModule.GetFunc<decltype(&D3D11CreateDeviceAndSwapChain)>("D3D11CreateDeviceAndSwapChain", s_InProxyCall);
 
-	ProxyCallScope_t _scope(s_InProxyCall);
+	PROTECT_RECURSE(s_InProxyCall);
 
 	return fn(
 		pAdapter,
@@ -113,7 +113,7 @@ PROXY HRESULT __stdcall D3D11CoreCreateDevice(
 
 	auto fn = s_ProxyModule.GetFunc<decltype(&D3D11CoreCreateDevice)>("D3D11CoreCreateDevice", s_InProxyCall);
 
-	ProxyCallScope_t _scope(s_InProxyCall);
+	PROTECT_RECURSE(s_InProxyCall);
 
 	return fn(
 		pFactory,
@@ -140,7 +140,7 @@ PROXY HRESULT __stdcall D3D11CoreCreateLayeredDevice(
 
 	auto fn = s_ProxyModule.GetFunc<decltype(&D3D11CoreCreateLayeredDevice)>("D3D11CoreCreateLayeredDevice", s_InProxyCall);
 
-	ProxyCallScope_t _scope(s_InProxyCall);
+	PROTECT_RECURSE(s_InProxyCall);
 
 	return fn(
 		unknown0,
@@ -163,7 +163,7 @@ PROXY SIZE_T __stdcall D3D11CoreGetLayeredDeviceSize(
 
 	auto fn = s_ProxyModule.GetFunc<decltype(&D3D11CoreGetLayeredDeviceSize)>("D3D11CoreGetLayeredDeviceSize", s_InProxyCall);
 
-	ProxyCallScope_t _scope(s_InProxyCall);
+	PROTECT_RECURSE(s_InProxyCall);
 
 	return fn(
 		unknown0,
@@ -183,7 +183,7 @@ PROXY HRESULT __stdcall D3D11CoreRegisterLayers(
 
 	auto fn = s_ProxyModule.GetFunc<decltype(&D3D11CoreRegisterLayers)>("D3D11CoreRegisterLayers", s_InProxyCall);
 
-	ProxyCallScope_t _scope(s_InProxyCall);
+	PROTECT_RECURSE(s_InProxyCall);
 
 	return fn(
 		unknown0,

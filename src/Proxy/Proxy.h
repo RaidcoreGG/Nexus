@@ -16,6 +16,10 @@
 #define PROXY extern "C" __declspec(dllexport)
 #endif
 
+#ifndef PROTECT_RECURSE
+#define PROTECT_RECURSE(x) ProxyCallScope_t _scope(x)
+#endif
+
 ///----------------------------------------------------------------------------------------------------
 /// GetSelfModule:
 /// 	Returns the module handle of the current module.

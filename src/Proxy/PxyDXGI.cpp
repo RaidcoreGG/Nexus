@@ -27,7 +27,7 @@ PROXY HRESULT __stdcall CreateDXGIFactory(REFIID riid, void** ppFactory)
 
 	auto fn = s_ProxyModule.GetFunc<decltype(&CreateDXGIFactory)>("CreateDXGIFactory", s_InProxyCall);
 
-	ProxyCallScope_t _scope(s_InProxyCall);
+	PROTECT_RECURSE(s_InProxyCall);
 
 	return fn(
 		riid,
@@ -44,7 +44,7 @@ PROXY HRESULT __stdcall CreateDXGIFactory1(REFIID riid, void** ppFactory)
 
 	auto fn = s_ProxyModule.GetFunc<decltype(&CreateDXGIFactory1)>("CreateDXGIFactory1", s_InProxyCall);
 
-	ProxyCallScope_t _scope(s_InProxyCall);
+	PROTECT_RECURSE(s_InProxyCall);
 
 	return fn(
 		riid,
@@ -61,7 +61,7 @@ PROXY HRESULT __stdcall CreateDXGIFactory2(UINT Flags, REFIID riid, void** ppFac
 
 	auto fn = s_ProxyModule.GetFunc<decltype(&CreateDXGIFactory2)>("CreateDXGIFactory2", s_InProxyCall);
 
-	ProxyCallScope_t _scope(s_InProxyCall);
+	PROTECT_RECURSE(s_InProxyCall);
 
 	return fn(
 		Flags,
@@ -79,7 +79,7 @@ PROXY HRESULT __stdcall DXGIGetDebugInterface1(UINT Flags, REFIID riid, void** p
 
 	auto fn = s_ProxyModule.GetFunc<decltype(&DXGIGetDebugInterface1)>("DXGIGetDebugInterface1", s_InProxyCall);
 
-	ProxyCallScope_t _scope(s_InProxyCall);
+	PROTECT_RECURSE(s_InProxyCall);
 
 	return fn(
 		Flags,
@@ -97,7 +97,7 @@ PROXY HRESULT __stdcall DXGIDeclareAdapterRemovalSupport()
 
 	auto fn = s_ProxyModule.GetFunc<decltype(&DXGIDeclareAdapterRemovalSupport)>("DXGIDeclareAdapterRemovalSupport", s_InProxyCall);
 
-	ProxyCallScope_t _scope(s_InProxyCall);
+	PROTECT_RECURSE(s_InProxyCall);
 
 	return fn();
 }
