@@ -1,18 +1,18 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  Proxy.h
-/// Description  :  Implementation of proxy functions.
+/// Name         :  PxyD3D11.h
+/// Description  :  Implementation of proxy functions for D3D11.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
 #pragma once
 
-#include <Windows.h>
 #include <d3dcommon.h>
 #include <dxgi.h>
+#include <windows.h>
 
-#define PROXY extern "C" __declspec(dllexport)
+#include "Proxy.h"
 
 struct ID3D11Device;
 struct ID3D11DeviceContext;

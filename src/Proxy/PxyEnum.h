@@ -30,6 +30,5 @@ enum class EProxyFunction : uint32_t
 	DXGI_CreateDXGIFactory1,
 	DXGI_CreateDXGIFactory2,
 	DXGI_DXGIGetDebugInterface1,
-	DXGI_CompatValue,
-	DXGI_CompatString
+	DXGI_DXGIDeclareAdapterRemovalSupport
 };

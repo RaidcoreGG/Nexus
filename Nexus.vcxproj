@@ -41,6 +41,7 @@
     <ClCompile Include="src\Core\Main.cpp" />
     <ClCompile Include="src\Engine\Events\EvtApi.cpp" />
     <ClCompile Include="src\Engine\Logging\LogConst.cpp" />
+    <ClCompile Include="src\Proxy\PxyDXGI.cpp" />
     <ClCompile Include="thirdparty\ImAnimate\ImAnimate.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui_draw.cpp" />
@@ -60,7 +61,7 @@
     <ClCompile Include="thirdparty\minhook\mh_trampoline.cpp" />
     <ClCompile Include="src\GW2\Multibox\Multibox.cpp" />
     <ClCompile Include="src\GW2\Mumble\MblReader.cpp" />
-    <ClCompile Include="src\Core\Proxy\Proxy.cpp" />
+    <ClCompile Include="src\Proxy\PxyD3D11.cpp" />
     <ClCompile Include="src\Core\Preferences\PrefContext.cpp" />
     <ClCompile Include="src\UI\Textures\TxLoader.cpp" />
     <ClCompile Include="thirdparty\pugixml\pugixml.cpp" />
@@ -114,8 +115,9 @@
     <ClInclude Include="src\Core\Hooks\HkFuncDefs.h" />
     <ClInclude Include="src\Core\Hooks\Hooks.h" />
     <ClInclude Include="src\Core\Preferences\PrefConst.h" />
-    <ClInclude Include="src\Core\Proxy\PxyEnum.h" />
-    <ClInclude Include="src\Core\Proxy\PxyFuncDefs.h" />
+    <ClInclude Include="src\Proxy\Proxy.h" />
+    <ClInclude Include="src\Proxy\PxyDXGI.h" />
+    <ClInclude Include="src\Proxy\PxyEnum.h" />
     <ClInclude Include="src\Core\Updater\SelfUpdater.h" />
     <ClInclude Include="src\Core\Versioning\MajorMinorBuildRevision.h" />
     <ClInclude Include="src\Engine\Cleanup\RefCleanerContext.h" />
@@ -367,7 +369,7 @@
     <ClInclude Include="thirdparty\minhook\mh_trampoline.h" />
     <ClInclude Include="src\GW2\Mumble\MblReader.h" />
     <ClInclude Include="src\Core\Index\IdxFuncDefs.h" />
-    <ClInclude Include="src\Core\Proxy\Proxy.h" />
+    <ClInclude Include="src\Proxy\PxyD3D11.h" />
     <ClInclude Include="res\ResConst.h" />
     <ClInclude Include="src\Core\Preferences\PrefContext.h" />
     <ClInclude Include="thirdparty\pugixml\pugiconfig.hpp" />

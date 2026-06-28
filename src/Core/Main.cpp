@@ -150,6 +150,7 @@ namespace Main
 		});
 
 		MH_Initialize();
+		Hooks::HookIDXGISwapChain();
 
 		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [](Clockwork::CancellationToken aToken)
 		{
