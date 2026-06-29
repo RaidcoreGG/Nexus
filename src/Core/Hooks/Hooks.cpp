@@ -213,61 +213,7 @@ namespace Hooks
 			return CallWindowProcA(Target::WndProc, hWnd, uMsg, wParam, lParam);
 		}
 
-		void Present_Internal()
-		{
-
-		}
-
-		HRESULT __stdcall DXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
-		{
-			static CContext*        s_Context       = CContext::GetContext();
-			static RenderContext_t* s_RenderCtx     = s_Context->GetRendererCtx();
-			static CTextureLoader*  s_TextureLoader = s_Context->GetTextureService();
-			static CUiContext*      s_UIContext     = s_Context->GetUIContext();
-			static CLoader*         s_Loader        = s_Context->GetLoader();
-
-			/* Increment count at the beginning of the frame. */
-			s_RenderCtx->Metrics.FrameCount++;
-
-			/* The swap chain we used to hook is different than the one the game created.
-			 * To be precise, we should have no swapchain at all right now. */
-			if (s_RenderCtx->SwapChain != pChain)
-			{
-				s_RenderCtx->SwapChain = pChain;
-
-				if (s_RenderCtx->Device)
-				{
-					s_RenderCtx->Device->Release();
-					s_RenderCtx->Device = nullptr;
-				}
-
-				/* Sanity check. If we have a device, we should also have a context. */
-				if (s_RenderCtx->DeviceContext)
-				{
-					s_RenderCtx->DeviceContext->Release();
-					s_RenderCtx->DeviceContext = nullptr;
-				}
-
-				//s_RenderCtx->SwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&s_RenderCtx->Device);
-				//s_RenderCtx->Device->GetImmediateContext(&s_RenderCtx->DeviceContext);
-
-				DXGI_SWAP_CHAIN_DESC swapChainDesc{};
-				s_RenderCtx->SwapChain->GetDesc(&swapChainDesc);
-
-				s_RenderCtx->Window.Handle = swapChainDesc.OutputWindow;
-				Target::WndProc = (WNDPROC)SetWindowLongPtr(s_RenderCtx->Window.Handle, GWLP_WNDPROC, (LONG_PTR)Detour::WndProc);
-
-				s_Loader->InitDirectoryUpdates(s_RenderCtx->Window.Handle);
-			}
-
-			s_TextureLoader->Advance();
-
-			s_UIContext->Render();
-
-			return Target::DXGIPresent(pChain, SyncInterval, Flags);
-		}
-
-		HRESULT __stdcall DXGIPresent1(IDXGISwapChain1* pChain, UINT SyncInterval, UINT PresentFlags, const DXGI_PRESENT_PARAMETERS* pPresentParameters)
+		void Present_Internal(IDXGISwapChain* aSwapChain)
 		{
 			static CContext* s_Context = CContext::GetContext();
 			static RenderContext_t* s_RenderCtx = s_Context->GetRendererCtx();
@@ -280,25 +226,9 @@ namespace Hooks
 
 			/* The swap chain we used to hook is different than the one the game created.
 			 * To be precise, we should have no swapchain at all right now. */
-			if (s_RenderCtx->SwapChain != pChain)
+			if (s_RenderCtx->SwapChain != aSwapChain)
 			{
-				s_RenderCtx->SwapChain = pChain;
-
-				if (s_RenderCtx->Device)
-				{
-					s_RenderCtx->Device->Release();
-					s_RenderCtx->Device = nullptr;
-				}
-
-				/* Sanity check. If we have a device, we should also have a context. */
-				if (s_RenderCtx->DeviceContext)
-				{
-					s_RenderCtx->DeviceContext->Release();
-					s_RenderCtx->DeviceContext = nullptr;
-				}
-
-				//s_RenderCtx->SwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&s_RenderCtx->Device);
-				//s_RenderCtx->Device->GetImmediateContext(&s_RenderCtx->DeviceContext);
+				s_RenderCtx->SwapChain = aSwapChain;
 
 				DXGI_SWAP_CHAIN_DESC swapChainDesc{};
 				s_RenderCtx->SwapChain->GetDesc(&swapChainDesc);
@@ -312,7 +242,17 @@ namespace Hooks
 			s_TextureLoader->Advance();
 
 			s_UIContext->Render();
+		}
 
+		HRESULT __stdcall DXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
+		{
+			Present_Internal(pChain);
+			return Target::DXGIPresent(pChain, SyncInterval, Flags);
+		}
+
+		HRESULT __stdcall DXGIPresent1(IDXGISwapChain1* pChain, UINT SyncInterval, UINT PresentFlags, const DXGI_PRESENT_PARAMETERS* pPresentParameters)
+		{
+			Present_Internal(pChain);
 			return Target::DXGIPresent1(pChain, SyncInterval, PresentFlags, pPresentParameters);
 		}
 
