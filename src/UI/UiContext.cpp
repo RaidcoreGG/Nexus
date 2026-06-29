@@ -212,21 +212,13 @@ void CUiContext::Initialize()
 		return;
 	}
 
-	if (!(this->RenderContext->Window.Handle &&
-		this->RenderContext->Device &&
-		this->RenderContext->DeviceContext &&
-		this->RenderContext->SwapChain))
+	if (!(this->RenderContext->Window.Handle && this->RenderContext->SwapChain))
 	{
 		this->Logger->Critical(CH_UICONTEXT, "CUiContext::Initialize() failed. A RenderContext component was nullptr.");
 		return;
 	}
 
-	// Init imgui
-	ImGui_ImplWin32_Init(this->RenderContext->Window.Handle);
-	ImGui_ImplDX11_Init(this->RenderContext->Device, this->RenderContext->DeviceContext);
-	//ImGui::GetIO().ImeWindowHandle = Renderer::WindowHandle;
-
-	// create buffers
+	/* Retrieve BackBuffer. */
 	ID3D11Texture2D* pBackBuffer{};
 	this->RenderContext->SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBackBuffer);
 
@@ -236,7 +228,17 @@ void CUiContext::Initialize()
 		return;
 	}
 
-	this->RenderContext->Device->CreateRenderTargetView(pBackBuffer, NULL, &this->RenderTargetView);
+	ID3D11Device* bbDevice = nullptr;
+	pBackBuffer->GetDevice(&bbDevice);
+
+	/* Retrieve Device and DeviceContext from BackBuffer. */
+	if (this->RenderContext->Device == nullptr)
+	{
+		this->RenderContext->Device = bbDevice;
+		this->RenderContext->Device->GetImmediateContext(&this->RenderContext->DeviceContext);
+	}
+
+	HRESULT hr = bbDevice->CreateRenderTargetView(pBackBuffer, NULL, &this->RenderTargetView);
 	pBackBuffer->Release();
 
 	if (!this->RenderTargetView)
@@ -246,6 +248,11 @@ void CUiContext::Initialize()
 	}
 
 	this->Scaling->UpdateDPI(); // Update DPI, because the HWND is now available.
+
+	// Init imgui
+	ImGui_ImplWin32_Init(this->RenderContext->Window.Handle);
+	ImGui_ImplDX11_Init(this->RenderContext->Device, this->RenderContext->DeviceContext);
+	//ImGui::GetIO().ImeWindowHandle = Renderer::WindowHandle;
 
 	this->IsInitialized = true;
 }

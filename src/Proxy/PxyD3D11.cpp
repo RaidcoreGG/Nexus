@@ -16,6 +16,7 @@
 #include "Core/Main.h"
 #include "Proxy.h"
 #include "PxyEnum.h"
+#include "Util/CmdLine.h"
 
 static ProxyModule_t s_ProxyModule{};
 
@@ -37,13 +38,7 @@ PROXY HRESULT __stdcall D3D11CreateDevice(
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
 	Main::Initialize(EProxyFunction::D3D11_CREATEDEVICE);
 
-	static thread_local bool s_InProxyCall = false;
-
-	auto fn =  s_ProxyModule.GetFunc<decltype(&D3D11CreateDevice)>("D3D11CreateDevice", s_InProxyCall);
-
-	PROTECT_RECURSE(s_InProxyCall);
-
-	return fn(
+	return D3D11CreateDeviceAndSwapChain(
 		pAdapter,
 		DriverType,
 		Software,
@@ -51,6 +46,8 @@ PROXY HRESULT __stdcall D3D11CreateDevice(
 		pFeatureLevels,
 		FeatureLevels,
 		SDKVersion,
+		nullptr,
+		nullptr,
 		ppDevice,
 		pFeatureLevel,
 		ppImmediateContext
@@ -80,6 +77,11 @@ PROXY HRESULT __stdcall D3D11CreateDeviceAndSwapChain(
 	auto fn = s_ProxyModule.GetFunc<decltype(&D3D11CreateDeviceAndSwapChain)>("D3D11CreateDeviceAndSwapChain", s_InProxyCall);
 
 	PROTECT_RECURSE(s_InProxyCall);
+
+	if (CmdLine::HasArgument("-ggdev"))
+	{
+		Flags |= D3D11_CREATE_DEVICE_DEBUG;
+	}
 
 	return fn(
 		pAdapter,

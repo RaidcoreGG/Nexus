@@ -544,6 +544,12 @@ void CTextureLoader::Dequeue(const char* aIdentifier)
 
 void CTextureLoader::CreateTexture(const std::string& aIdentifier, QueuedTexture_t& aQueuedTexture)
 {
+	if (this->RenderContext->Device == nullptr || this->RenderContext->DeviceContext == nullptr)
+	{
+		this->Logger->Debug(CH_TEXTURES, "RenderContext not ready. Device: %p DeviceContext: %p", this->RenderContext->Device, this->RenderContext->DeviceContext);
+		return;
+	}
+
 	/* Create texture description. */
 	D3D11_TEXTURE2D_DESC desc{};
 	desc.Width            = aQueuedTexture.Width;

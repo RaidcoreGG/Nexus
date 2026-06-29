@@ -9,7 +9,6 @@
 #include "Main.h"
 
 #include <string>
-#include <thread>
 
 #include "minhook/mh_hook.h"
 
@@ -29,7 +28,6 @@ namespace Clockwork = Raidcore::Clockwork;
 #include "UI/UiContext.h"
 #include "Util/CmdLine.h"
 #include "Util/Resources.h"
-#include "Util/Strings.h"
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
@@ -74,6 +72,9 @@ namespace Main
 		}
 
 		s_EntryFunction = aEntryFunction;
+
+		MH_Initialize();
+		Hooks::HookIDXGISwapChain();
 
 		Clockwork::Context::Create();
 
@@ -148,9 +149,6 @@ namespace Main
 		{
 			GW2::GetGameBuild();
 		});
-
-		MH_Initialize();
-		Hooks::HookIDXGISwapChain();
 
 		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [](Clockwork::CancellationToken aToken)
 		{
