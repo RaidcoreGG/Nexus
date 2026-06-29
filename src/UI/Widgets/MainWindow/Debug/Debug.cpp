@@ -237,6 +237,7 @@ void CDebugWindow::TabTextures()
 	ImGui::InputText("##Filter", &texFilter[0], 400);
 
 	std::string texFilterStr = texFilter;
+	texFilterStr = String::ToLower(texFilterStr);
 
 	ImGui::Text("Displaying %d of %d loaded textures:", displayedTextures, texRegistry.size());
 	ImGui::Text("Combined memory usage of displayed: %s", String::FormatByteSize(displayedMemUsage).c_str());
@@ -255,7 +256,7 @@ void CDebugWindow::TabTextures()
 
 		for (auto& [identifier, texture] : texRegistry)
 		{
-			if (!texFilterStr.empty() && !String::Contains(identifier, texFilterStr))
+			if (!texFilterStr.empty() && !String::Contains(String::ToLower(identifier), texFilterStr))
 			{
 				continue;
 			}
