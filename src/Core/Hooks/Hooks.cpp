@@ -140,11 +140,13 @@ namespace Hooks
 			if (vtbl1)
 			{
 				MH_CreateHook(FollowJmpChain((PBYTE)vtbl1[22]), (LPVOID)&Detour::DXGIPresent1, (LPVOID*)&Target::DXGIPresent1);
+				swap1->Release();
 			}
 
 			if (vtbl3)
 			{
 				MH_CreateHook(FollowJmpChain((PBYTE)vtbl3[26]), (LPVOID)&Detour::DXGIResizeBuffers1, (LPVOID*)&Target::DXGIResizeBuffers1);
+				swap3->Release();
 			}
 
 			MH_EnableHook(MH_ALL_HOOKS);
