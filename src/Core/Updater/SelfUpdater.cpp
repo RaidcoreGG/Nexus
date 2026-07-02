@@ -34,9 +34,9 @@ CSelfUpdater::~CSelfUpdater()
 	}
 }
 
-const MajorMinorBuildRevision_t& CSelfUpdater::GetRemoteVersion()
+const Version_t& CSelfUpdater::GetRemoteVersion()
 {
-	if (this->RemoteVersion != MajorMinorBuildRevision_t{})
+	if (this->RemoteVersion != Version_t{})
 	{
 		return this->RemoteVersion;
 	}
@@ -221,7 +221,7 @@ void CSelfUpdater::Run()
 	}
 
 	/* Update check and perform logic below. */
-	const MajorMinorBuildRevision_t& currentVersion = ctx->GetVersion();
+	const Version_t& currentVersion = ctx->GetVersion();
 
 	/* These paths in theory should be protected by the mutex, but we safeguard them anyway. */
 	this->CleanupUpdateFiles();

@@ -13,15 +13,13 @@
 #include "Core/Addons/AddEnum.h"
 #include "Core/Addons/API/ApiBase.h"
 #include "Core/Addons/Definitions/DefEnum.h"
-#include "Core/Versioning/MajorMinorBuildRevision.h"
+#include "Core/Versioning/Version.h"
 
 struct AddonDefV1_t;
 
 typedef AddonDefV1_t* (*GETADDONDEF_V1) ();
 typedef void          (*ADDON_LOAD)     (AddonAPI_t* aAPI);
 typedef void          (*ADDON_UNLOAD)   ();
-
-typedef MajorMinorBuildRevision_t AddonVersion_t;
 
 ///----------------------------------------------------------------------------------------------------
 /// AddonDefV1_t Struct
@@ -33,7 +31,7 @@ struct AddonDefV1_t
 	uint32_t        Signature;   /* Unique addon identifier.                                                */
 	uint32_t        APIVersion;  /* Which API revision to pass to the load function. Use NEXUS_API_VERSION. */
 	const char*     Name;        /* Name of the addon as shown in the library.                              */
-	AddonVersion_t  Version;     /* Set Revision to -1 to ignore.                                           */
+	Version_t       Version;     /* Set Revision to -1 to ignore.                                           */
 	const char*     Author;      /* Author of the addon.                                                    */
 	const char*     Description; /* Short description.                                                      */
 	ADDON_LOAD      Load;        /* Load function.                                                          */
@@ -80,6 +78,12 @@ struct AddonDefV1_t
 		this->Flags       = aOther.Flags;
 		this->Provider    = aOther.Provider;
 		this->UpdateLink  = nullptr;
+
+		/* Upgrade legacy -1 Revision omission to just 0. */
+		if (this->Version.Revision == 0xFFFF)
+		{
+			this->Version.Revision = 0;
+		}
 
 		if (aOther.Name && aOther.Name[0])
 		{

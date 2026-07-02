@@ -12,7 +12,7 @@
 #include <string>
 #include <windows.h>
 
-#include "Core/Versioning/MajorMinorBuildRevision.h"
+#include "Core/Versioning/Version.h"
 #include "Engine/Logging/LogApi.h"
 
 constexpr const char* CH_SELFUPDATER = "Updater";
@@ -37,7 +37,7 @@ class CSelfUpdater
 	/// GetRemoteVersion:
 	/// 	Gets the latest available version.
 	///----------------------------------------------------------------------------------------------------
-	const MajorMinorBuildRevision_t& GetRemoteVersion();
+	const Version_t& GetRemoteVersion();
 
 	///----------------------------------------------------------------------------------------------------
 	/// IsUpdateAvailable:
@@ -57,7 +57,7 @@ class CSelfUpdater
 	HANDLE                    UpdateMutex  {};
 	std::thread               UpdateThread {};
 
-	MajorMinorBuildRevision_t RemoteVersion{};
+	Version_t RemoteVersion{};
 	std::string               Changelog    {};
 
 	///----------------------------------------------------------------------------------------------------

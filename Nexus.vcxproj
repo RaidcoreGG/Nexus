@@ -119,7 +119,7 @@
     <ClInclude Include="src\Proxy\PxyDXGI.h" />
     <ClInclude Include="src\Proxy\PxyEnum.h" />
     <ClInclude Include="src\Core\Updater\SelfUpdater.h" />
-    <ClInclude Include="src\Core\Versioning\MajorMinorBuildRevision.h" />
+    <ClInclude Include="src\Core\Versioning\Version.h" />
     <ClInclude Include="src\Engine\Cleanup\RefCleanerContext.h" />
     <ClInclude Include="src\Engine\Clockwork\Tasks\CancellationToken.h" />
     <ClInclude Include="src\Engine\Clockwork\Clockwork.h" />

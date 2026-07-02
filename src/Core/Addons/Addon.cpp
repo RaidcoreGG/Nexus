@@ -1040,8 +1040,8 @@ void CAddon::CheckUpdateViaGitHub()
 		return;
 	}
 
-	std::string               targetUrl;
-	MajorMinorBuildRevision_t targetVersion{};
+	std::string targetUrl;
+	Version_t targetVersion{};
 
 	for (json& release : response.ContentJSON())
 	{
@@ -1054,55 +1054,15 @@ void CAddon::CheckUpdateViaGitHub()
 		if (!config->AllowPreReleases && release["prerelease"].get<bool>()) { continue; }
 
 		std::string tagName = release["tag_name"].get<std::string>();
-		MajorMinorBuildRevision_t version{};
-		bool ignoreRev = false;
+		Version_t version{};
 
-		/* Tag version parsing */
+		try
 		{
-			if (std::regex_match(tagName, std::regex(R"(v?\d+[.]\d+[.]\d+[.]\d+)")))
-			{
-				ignoreRev = false; // is 4 component version
-			}
-			else if (std::regex_match(tagName, std::regex(R"(v?\d+[.]\d+[.]\d+)")))
-			{
-				ignoreRev = true; // is 3 component version
-			}
-			else
-			{
-				continue;
-			}
-
-			if (String::StartsWith(tagName, "v"))
-			{
-				tagName = tagName.substr(1);
-			}
-
-			size_t pos = 0;
-			int i = 0;
-			while ((pos = tagName.find(".")) != std::string::npos)
-			{
-				switch (i)
-				{
-					case 0: version.Major = static_cast<unsigned short>(std::stoi(tagName.substr(0, pos))); break;
-					case 1: version.Minor = static_cast<unsigned short>(std::stoi(tagName.substr(0, pos))); break;
-					case 2: version.Build = static_cast<unsigned short>(std::stoi(tagName.substr(0, pos))); break;
-					default: break;
-				}
-				i++;
-				tagName.erase(0, pos + 1);
-			}
-			if (!ignoreRev)
-			{
-				version.Revision = static_cast<unsigned short>(std::stoi(tagName));
-			}
-			else
-			{
-				/* this is left over, instead of the revision, so we assign it */
-				version.Build = static_cast<unsigned short>(std::stoi(tagName));
-
-				/* set revision to -1 to omit it */
-				version.Revision = -1;
-			}
+			version = Version_t(tagName);
+		}
+		catch (const std::exception& e)
+		{
+			continue;
 		}
 
 		/* skip, if this release we have is the same or older than the one we had found before */

@@ -15,7 +15,7 @@
 #include "Core/Addons/Library/LibManager.h"
 #include "Core/Preferences/PrefContext.h"
 #include "Core/Updater/SelfUpdater.h"
-#include "Core/Versioning/MajorMinorBuildRevision.h"
+#include "Core/Versioning/Version.h"
 #include "Engine/CrashHandler/CrashHandler.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
@@ -39,7 +39,7 @@ class CContext
 	CContext(CContext const&)       = delete;
 	void operator=(CContext const&) = delete;
 
-	MajorMinorBuildRevision_t const& GetVersion();
+	Version_t const& GetVersion();
 
 	const char* GetBuild();
 

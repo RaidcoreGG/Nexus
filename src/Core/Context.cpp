@@ -24,9 +24,9 @@ CContext* CContext::GetContext()
 	return &s_Context;
 }
 
-MajorMinorBuildRevision_t const& CContext::GetVersion()
+Version_t const& CContext::GetVersion()
 {
-	static MajorMinorBuildRevision_t version =
+	static Version_t version =
 	{
 		V_MAJOR,
 		V_MINOR,
