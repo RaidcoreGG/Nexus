@@ -1060,7 +1060,7 @@ void CAddon::CheckUpdateViaGitHub()
 		{
 			version = Version_t(tagName);
 		}
-		catch (const std::exception& e)
+		catch (...)
 		{
 			continue;
 		}
