@@ -314,6 +314,8 @@ void CUiContext::Render()
 
 	if (this->IsInitialized)
 	{
+		this->Input->FlushInput();
+
 		/* new frame */
 		ImGui_ImplWin32_NewFrame();
 		ImGui_ImplDX11_NewFrame();
