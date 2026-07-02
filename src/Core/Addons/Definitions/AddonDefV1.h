@@ -80,7 +80,7 @@ struct AddonDefV1_t
 		this->UpdateLink  = nullptr;
 
 		/* Upgrade legacy -1 Revision omission to just 0. */
-		if (this->Version.Revision == 0xFFFF)
+		if (static_cast<int16_t>(this->Version.Revision) < static_cast<int16_t>(-1))
 		{
 			this->Version.Revision = 0;
 		}

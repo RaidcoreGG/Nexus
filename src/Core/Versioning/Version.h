@@ -106,16 +106,13 @@ struct Version_t
 		str.append(std::to_string(this->Major));
 		str.append(".");
 		str.append(std::to_string(this->Minor));
-		if (this->Build > 0 || this->Revision > 0)
+		str.append(".");
+		str.append(std::to_string(this->Build));
+
+		if (this->Revision > 0)
 		{
 			str.append(".");
-			str.append(std::to_string(this->Build));
-
-			if (this->Revision > 0)
-			{
-				str.append(".");
-				str.append(std::to_string(this->Revision));
-			}
+			str.append(std::to_string(this->Revision));
 		}
 
 		return str;
