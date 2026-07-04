@@ -108,7 +108,7 @@ void CMumbleReader::AdvanceIdentity()
 			j["fov"].get_to(this->MumbleIdentity->FOV);
 			j["uisz"].get_to(this->MumbleIdentity->UISize);
 
-			this->Logger->Trace(CH_MUMBLE_READER, "CMumbleReader::AdvanceIdentity()");
+			//this->Logger->Trace(CH_MUMBLE_READER, "CMumbleReader::AdvanceIdentity()");
 		}
 		catch (json::parse_error& ex)
 		{
@@ -149,5 +149,5 @@ void CMumbleReader::AdvanceDerived()
 	this->PreviousAvatarPosition = this->MumbleLink->AvatarPosition;
 	this->PreviousCameraFront    = this->MumbleLink->CameraFront;
 
-	this->Logger->Trace(CH_MUMBLE_READER, "CMumbleReader::AdvanceDerived()");
+	//this->Logger->Trace(CH_MUMBLE_READER, "CMumbleReader::AdvanceDerived()");
 }
