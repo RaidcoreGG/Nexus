@@ -26,9 +26,7 @@
 #include "Engine/Loader/Loader.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
-#include "GW2/ArcDPS/ArcApi.h"
-#include "GW2/Inputs/GameBinds/GbApi.h"
-#include "GW2/Mumble/MblReader.h"
+#include "GW2/GameContext.h"
 #include "Proxy/PxyEnum.h"
 #include "UI/Renderer/RdrContext.h"
 #include "UI/Textures/TxLoader.h"
@@ -64,6 +62,8 @@ class Runtime
 
 	DWORD GetModuleSize();
 
+	GameContext& Game();
+
 	CCrashHandler* GetCrashHandler();
 
 	RenderContext_t* GetRendererCtx();
@@ -84,19 +84,13 @@ class Runtime
 
 	CInputBindApi* GetInputBindApi();
 
-	CGameBindsApi* GetGameBindsApi();
-
 	CUiContext* GetUIContext();
 
 	CSettings* GetSettingsCtx();
 
-	CMumbleReader* GetMumbleReader();
-
 	CHttpClient* GetHttpClient(std::string aURL);
 
 	CSelfUpdater* GetSelfUpdater();
-
-	CArcApi* GetArcApi();
 
 	CConfigMgr* GetCfgMgr();
 
@@ -106,6 +100,8 @@ class Runtime
 
 	HMODULE          Module{ nullptr };
 	DWORD            ModuleSize{ 0 };
+
+	std::unique_ptr<GameContext> _GameContext;
 
 	std::mutex                          HttpClientMutex{};
 	std::map<std::string, CHttpClient*> HttpClients{};

@@ -15,7 +15,7 @@
 
 static void s_ReceiveExtension(ArcDPS::ExtensionDefRaw_t* aExtensionDef)
 {
-	Runtime::Get().GetArcApi()->ReceiveExtension(aExtensionDef);
+	Runtime::Get().Game().Arcdps().ReceiveExtension(aExtensionDef);
 }
 
 CArcApi::~CArcApi()

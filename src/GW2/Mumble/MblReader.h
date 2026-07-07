@@ -31,7 +31,7 @@ class CMumbleReader
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CMumbleReader(CDataLinkApi* aDataLink, CEventApi* aEventApi, CLogApi* aLogger);
+	CMumbleReader(CDataLinkApi& aDataLink, CEventApi& aEventApi, CLogApi& aLogger);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -69,9 +69,9 @@ class CMumbleReader
 	NexusLinkData_t* GetNexusLink() const;
 
 	private:
-	CDataLinkApi*     DataLinkApi            = nullptr;
-	CEventApi*        EventApi               = nullptr;
-	CLogApi*          Logger                 = nullptr;
+	CDataLinkApi&     DataLinkApi;
+	CEventApi&        EventApi;
+	CLogApi&          Logger;
 
 	std::string       Name;
 	Mumble::Data*     MumbleLink             = nullptr;

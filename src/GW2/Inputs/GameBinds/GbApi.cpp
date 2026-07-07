@@ -24,7 +24,7 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 	if (!s_GameBindsApi)
 	{
 		Runtime& ctx = Runtime::Get();
-		s_GameBindsApi = ctx.GetGameBindsApi();
+		s_GameBindsApi = &ctx.Game().GameBinds();
 
 		assert(s_GameBindsApi);
 	}
@@ -94,30 +94,24 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 	uictx->Invalidate();
 }
 
-CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogApi* aLogger, CEventApi* aEventApi, RenderContext_t* aRenderContext, std::filesystem::path aConfigPath)
+CGameBindsApi::CGameBindsApi(CRawInputApi& aRawInputApi, CLogApi& aLogger, CEventApi& aEventApi, RenderContext_t& aRenderContext, std::filesystem::path aConfigPath)
+	: RawInputApi(aRawInputApi)
+	, Logger(aLogger)
+	, EventApi(aEventApi)
+	, RenderContext(aRenderContext)
 {
-	assert(aRawInputApi);
-	assert(aLogger);
-	assert(aEventApi);
-	assert(aRenderContext);
-
-	this->RawInputApi = aRawInputApi;
-	this->Logger = aLogger;
-	this->EventApi = aEventApi;
-	this->RenderContext = aRenderContext;
-
 	this->ConfigPath = aConfigPath;
 	
 	/* FIXME: This is a dirty hack for the UI invalidation. */
 	this->AddDefaultBinds();
 	this->Load(this->ConfigPath);
 
-	this->EventApi->Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
+	this->EventApi.Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
 }
 
 CGameBindsApi::~CGameBindsApi()
 {
-	this->EventApi->Unsubscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
+	this->EventApi.Unsubscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
 }
 
 UINT CGameBindsApi::RedirectGameOnly(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam)
@@ -136,10 +130,10 @@ LRESULT CGameBindsApi::SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 {
 	if (uMsg < WM_USER)
 	{
-		return PostMessageA(this->RenderContext->Window.Handle, uMsg + WM_PASSTHROUGH_FIRST, wParam, lParam);
+		return PostMessageA(this->RenderContext.Window.Handle, uMsg + WM_PASSTHROUGH_FIRST, wParam, lParam);
 	}
 
-	return PostMessageA(this->RenderContext->Window.Handle, uMsg, wParam, lParam);
+	return PostMessageA(this->RenderContext.Window.Handle, uMsg, wParam, lParam);
 }
 
 void CGameBindsApi::PressAsync(EGameBinds aGameBind)
@@ -570,7 +564,7 @@ void CGameBindsApi::Set(EGameBinds aGameBind, InputBind_t aInputBind, bool aIsPr
 	{
 		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this, aGameBind](Clockwork::CancellationToken aToken)
 		{
-			this->EventApi->Raise("EV_INPUTBIND_UPDATED");
+			this->EventApi.Raise("EV_INPUTBIND_UPDATED");
 		});
 		this->Save();
 	}
@@ -593,7 +587,7 @@ void CGameBindsApi::Load(std::filesystem::path aPath)
 
 	if (!result)
 	{
-		this->Logger->Warning(CH_GAMEBINDS, "GameBinds.json could not be parsed. Error: %s", result.description());
+		this->Logger.Warning(CH_GAMEBINDS, "GameBinds.json could not be parsed. Error: %s", result.description());
 		return;
 	}
 
@@ -1281,6 +1275,6 @@ void CGameBindsApi::Save()
 
 	if (!doc.save_file(this->ConfigPath.string().c_str(), "\t"))
 	{
-		this->Logger->Warning(CH_GAMEBINDS, "GameBinds.xml could not be saved.");
+		this->Logger.Warning(CH_GAMEBINDS, "GameBinds.xml could not be saved.");
 	}
 }

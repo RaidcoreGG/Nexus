@@ -251,6 +251,11 @@ DWORD Runtime::GetModuleSize()
 	return this->ModuleSize;
 }
 
+GameContext& Runtime::Game()
+{
+	return *this->_GameContext;
+}
+
 CCrashHandler* Runtime::GetCrashHandler()
 {
 	static CCrashHandler s_CrashHandler = CCrashHandler(
@@ -333,18 +338,6 @@ CInputBindApi* Runtime::GetInputBindApi()
 	return &s_InputBindApi;
 }
 
-CGameBindsApi* Runtime::GetGameBindsApi()
-{
-	static CGameBindsApi s_GameBindsApi = CGameBindsApi(
-		this->GetRawInputApi(),
-		this->GetLogger(),
-		this->GetEventApi(),
-		this->GetRendererCtx(),
-		Index(EPath::GameBinds)
-	);
-	return &s_GameBindsApi;
-}
-
 CUiContext* Runtime::GetUIContext()
 {
 	static CUiContext s_UiContext = CUiContext(
@@ -354,7 +347,7 @@ CUiContext* Runtime::GetUIContext()
 		this->GetDataLink(),
 		this->GetInputBindApi(),
 		this->GetEventApi(),
-		this->GetMumbleReader()
+		&this->Game().Mumble()
 	);
 	return &s_UiContext;
 }
@@ -366,16 +359,6 @@ CSettings* Runtime::GetSettingsCtx()
 		this->GetLogger()
 	);
 	return &s_SettingsApi;
-}
-
-CMumbleReader* Runtime::GetMumbleReader()
-{
-	static CMumbleReader s_MumbleReader = CMumbleReader(
-		this->GetDataLink(),
-		this->GetEventApi(),
-		this->GetLogger()
-	);
-	return &s_MumbleReader;
 }
 
 CHttpClient* Runtime::GetHttpClient(std::string aURL)
@@ -419,12 +402,6 @@ CSelfUpdater* Runtime::GetSelfUpdater()
 		this->GetLogger()
 	);
 	return &s_SelfUpdater;
-}
-
-CArcApi* Runtime::GetArcApi()
-{
-	static CArcApi s_ArcApi = CArcApi();
-	return &s_ArcApi;
 }
 
 CConfigMgr* Runtime::GetCfgMgr()
@@ -489,10 +466,25 @@ Runtime::Runtime()
 	this->ModuleSize = moduleInfo.SizeOfImage;
 
 	CreateIndex(this->Module);
+
+	this->_GameContext = std::make_unique<GameContext>(
+		*this->GetDataLink(),
+		*this->GetEventApi(),
+		*this->GetLogger(),
+		*this->GetRawInputApi(),
+		*this->GetRendererCtx(),
+		Index(EPath::GameBinds)
+	);
 }
 
 Runtime::~Runtime()
 {
+	if (this->_GameContext)
+	{
+		this->_GameContext->Shutdown();
+		this->_GameContext.reset();
+	}
+
 	const std::lock_guard<std::mutex> lock(this->HttpClientMutex);
 
 	for (auto it = this->HttpClients.begin(); it != this->HttpClients.end();)

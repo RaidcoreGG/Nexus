@@ -134,7 +134,7 @@ void CBindsWindow::RenderContent()
 						if (ImGui::Selectable(path.filename().string().c_str()))
 						{
 							/* Actually load the binds. */
-							CGameBindsApi* gameBindsApi = ctx.GetGameBindsApi();
+							CGameBindsApi* gameBindsApi = &ctx.Game().GameBinds();
 							gameBindsApi->Load(path);
 
 							/* Trigger refresh for display binds. */

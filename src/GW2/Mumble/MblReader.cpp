@@ -22,16 +22,11 @@ using namespace Mumble;
 #include "Runtime/Runtime.h"
 #include "MblExtensions.h"
 
-CMumbleReader::CMumbleReader(CDataLinkApi* aDataLink, CEventApi* aEventApi, CLogApi* aLogger)
+CMumbleReader::CMumbleReader(CDataLinkApi& aDataLink, CEventApi& aEventApi, CLogApi& aLogger)
+	: DataLinkApi(aDataLink)
+	, EventApi(aEventApi)
+	, Logger(aLogger)
 {
-	assert(aDataLink);
-	assert(aEventApi);
-	assert(aLogger);
-
-	this->DataLinkApi = aDataLink;
-	this->EventApi = aEventApi;
-	this->Logger = aLogger;
-
 	this->Name = CmdLine::GetArgumentValue("-mumble");
 
 	if (this->Name.empty())
@@ -40,9 +35,9 @@ CMumbleReader::CMumbleReader(CDataLinkApi* aDataLink, CEventApi* aEventApi, CLog
 	}
 
 	/* share the linked mem regardless whether it's disabled, for dependant addons */
-	this->MumbleLink     = (Mumble::Data*)    this->DataLinkApi->ShareResource(DL_MUMBLE_LINK,          sizeof(Mumble::Data),     this->Name.c_str(), true);
-	this->MumbleIdentity = (Mumble::Identity*)this->DataLinkApi->ShareResource(DL_MUMBLE_LINK_IDENTITY, sizeof(Mumble::Identity), "",                 false);
-	this->NexusLink      = (NexusLinkData_t*) this->DataLinkApi->ShareResource(DL_NEXUS_LINK,           sizeof(NexusLinkData_t),  "",                 true);
+	this->MumbleLink     = (Mumble::Data*)    this->DataLinkApi.ShareResource(DL_MUMBLE_LINK,          sizeof(Mumble::Data),     this->Name.c_str(), true);
+	this->MumbleIdentity = (Mumble::Identity*)this->DataLinkApi.ShareResource(DL_MUMBLE_LINK_IDENTITY, sizeof(Mumble::Identity), "",                 false);
+	this->NexusLink      = (NexusLinkData_t*) this->DataLinkApi.ShareResource(DL_NEXUS_LINK,           sizeof(NexusLinkData_t),  "",                 true);
 
 	if (this->Name != "0")
 	{
@@ -112,21 +107,21 @@ void CMumbleReader::AdvanceIdentity()
 		}
 		catch (json::parse_error& ex)
 		{
-			this->Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
+			this->Logger.Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
 		}
 		catch (json::type_error& ex)
 		{
-			this->Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Type Error: %s", ex.what());
+			this->Logger.Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Type Error: %s", ex.what());
 		}
 		catch (...)
 		{
-			this->Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Unknown Error.");
+			this->Logger.Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Unknown Error.");
 		}
 
 		/* notify (also notifies the GUI to update its scaling factor) */
 		if (*this->MumbleIdentity != this->PreviousIdentity)
 		{
-			this->EventApi->Raise(EV_MUMBLE_IDENTITY_UPDATED, this->MumbleIdentity);
+			this->EventApi.Raise(EV_MUMBLE_IDENTITY_UPDATED, this->MumbleIdentity);
 		}
 	}
 }

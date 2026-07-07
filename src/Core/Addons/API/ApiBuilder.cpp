@@ -560,14 +560,14 @@ namespace ADDONAPI
 
 			s_DataLinkApi   = ctx.GetDataLink();
 			s_EventApi      = ctx.GetEventApi();
-			s_GameBindsApi  = ctx.GetGameBindsApi();
+			s_GameBindsApi  = &ctx.Game().GameBinds();
 			s_InputBindApi  = ctx.GetInputBindApi();
 			s_RawInputApi   = ctx.GetRawInputApi();
 			s_Logger        = ctx.GetLogger();
 			s_TextureApi    = ctx.GetTextureService();
 			s_Loader        = ctx.GetLoader();
 			s_RenderCtx     = ctx.GetRendererCtx();
-			s_ArcApi        = ctx.GetArcApi();
+			s_ArcApi        = &ctx.Game().Arcdps();
 
 			s_UiContext     = ctx.GetUIContext();
 			s_FontManager   = s_UiContext->GetFontManager();
