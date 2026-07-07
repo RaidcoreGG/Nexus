@@ -1,8 +1,8 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  Context.h
-/// Description  :  Contains the main context.
+/// Name         :  Runtime.h
+/// Description  :  Nexus runtime implementation.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
@@ -10,6 +10,8 @@
 
 #include <map>
 #include <mutex>
+#include <string>
+#include <windows.h>
 
 #include "Core/Addons/Config/CfgManager.h"
 #include "Core/Addons/Library/LibManager.h"
@@ -27,23 +29,36 @@
 #include "GW2/ArcDPS/ArcApi.h"
 #include "GW2/Inputs/GameBinds/GbApi.h"
 #include "GW2/Mumble/MblReader.h"
+#include "Proxy/PxyEnum.h"
 #include "UI/Renderer/RdrContext.h"
 #include "UI/Textures/TxLoader.h"
 #include "UI/UiContext.h"
 
-class CContext
+constexpr const char* CH_CORE = "Core";
+
+class Runtime
 {
 	public:
-	static CContext* GetContext();
+	static Runtime& Get();
 
-	CContext(CContext const&)       = delete;
-	void operator=(CContext const&) = delete;
+	Runtime(Runtime const&)       = delete;
+	void operator=(Runtime const&) = delete;
+
+	///----------------------------------------------------------------------------------------------------
+	/// Initialize:
+	/// 	Initializes the addon engine.
+	///----------------------------------------------------------------------------------------------------
+	void Initialize(EProxyFunction aEntryFunction);
+
+	///----------------------------------------------------------------------------------------------------
+	/// Shutdown:
+	/// 	Shuts down the addon engine.
+	///----------------------------------------------------------------------------------------------------
+	void Shutdown(unsigned int aReason);
 
 	Version_t const& GetVersion();
 
 	const char* GetBuild();
-
-	void SetModule(HMODULE aModule);
 
 	HMODULE GetModule();
 
@@ -86,12 +101,13 @@ class CContext
 	CConfigMgr* GetCfgMgr();
 
 	private:
-	CContext() = default;
-	~CContext();
+	Runtime();
+	~Runtime();
 
-	HMODULE                             Module     = nullptr;
-	DWORD                               ModuleSize = 0;
+	HMODULE          Module{ nullptr };
+	DWORD            ModuleSize{ 0 };
 
-	std::mutex                          HttpClientMutex;
-	std::map<std::string, CHttpClient*> HttpClients;
+	std::mutex                          HttpClientMutex{};
+	std::map<std::string, CHttpClient*> HttpClients{};
+
 };

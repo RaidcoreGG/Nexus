@@ -12,7 +12,7 @@
 
 #include "imgui/imgui.h"
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Core/Index/Index.h"
 
 CExportStyleModal::CExportStyleModal()
@@ -75,8 +75,8 @@ void CExportStyleModal::OnClosing()
 			}
 			catch (...)
 			{
-				CContext* ctx = CContext::GetContext();
-				CLogApi* logger = ctx->GetLogger();
+				Runtime& ctx = Runtime::Get();
+				CLogApi* logger = ctx.GetLogger();
 				logger->Warning(CH_UICONTEXT, "Error saving stylesheet.");
 
 				/* Signal failure, to keep the modal open. */

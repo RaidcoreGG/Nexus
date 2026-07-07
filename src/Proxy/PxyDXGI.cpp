@@ -10,9 +10,9 @@
 
 #include <windows.h>
 
-#include "Core/Main.h"
 #include "Proxy.h"
 #include "PxyEnum.h"
+#include "Runtime/Runtime.h"
 
 static ProxyModule_t s_ProxyModule{};
 
@@ -21,7 +21,7 @@ static ProxyModule_t s_ProxyModule{};
 PROXY HRESULT __stdcall CreateDXGIFactory(REFIID riid, void** ppFactory)
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::DXGI_CreateDXGIFactory);
+	Runtime::Get().Initialize(EProxyFunction::DXGI_CreateDXGIFactory);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -38,7 +38,7 @@ PROXY HRESULT __stdcall CreateDXGIFactory(REFIID riid, void** ppFactory)
 PROXY HRESULT __stdcall CreateDXGIFactory1(REFIID riid, void** ppFactory)
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::DXGI_CreateDXGIFactory1);
+	Runtime::Get().Initialize(EProxyFunction::DXGI_CreateDXGIFactory1);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -55,7 +55,7 @@ PROXY HRESULT __stdcall CreateDXGIFactory1(REFIID riid, void** ppFactory)
 PROXY HRESULT __stdcall CreateDXGIFactory2(UINT Flags, REFIID riid, void** ppFactory)
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::DXGI_CreateDXGIFactory2);
+	Runtime::Get().Initialize(EProxyFunction::DXGI_CreateDXGIFactory2);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -73,7 +73,7 @@ PROXY HRESULT __stdcall CreateDXGIFactory2(UINT Flags, REFIID riid, void** ppFac
 PROXY HRESULT __stdcall DXGIGetDebugInterface1(UINT Flags, REFIID riid, void** ppDebug)
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::DXGI_DXGIGetDebugInterface1);
+	Runtime::Get().Initialize(EProxyFunction::DXGI_DXGIGetDebugInterface1);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -91,7 +91,7 @@ PROXY HRESULT __stdcall DXGIGetDebugInterface1(UINT Flags, REFIID riid, void** p
 PROXY HRESULT __stdcall DXGIDeclareAdapterRemovalSupport()
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::DXGI_DXGIDeclareAdapterRemovalSupport);
+	Runtime::Get().Initialize(EProxyFunction::DXGI_DXGIDeclareAdapterRemovalSupport);
 
 	static thread_local bool s_InProxyCall = false;
 

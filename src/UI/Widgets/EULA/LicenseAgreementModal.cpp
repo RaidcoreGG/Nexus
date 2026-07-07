@@ -15,7 +15,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_extensions.h"
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Core/Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
 
@@ -81,8 +81,8 @@ void CLicenseAgreementModal::RenderContent()
 
 void CLicenseAgreementModal::OnClosing()
 {
-	CContext*  ctx         = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
+	Runtime&  ctx         = Runtime::Get();
+	CSettings* settingsctx = ctx.GetSettingsCtx();
 
 	switch (this->GetResult())
 	{

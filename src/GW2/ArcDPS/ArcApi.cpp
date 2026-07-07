@@ -9,13 +9,13 @@
 #include "ArcApi.h"
 
 #include "ArcExtensionDef.h"
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Core/Index/Index.h"
 #include "Util/DLL.h"
 
 static void s_ReceiveExtension(ArcDPS::ExtensionDefRaw_t* aExtensionDef)
 {
-	CContext::GetContext()->GetArcApi()->ReceiveExtension(aExtensionDef);
+	Runtime::Get().GetArcApi()->ReceiveExtension(aExtensionDef);
 }
 
 CArcApi::~CArcApi()

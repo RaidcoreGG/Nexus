@@ -13,7 +13,7 @@
 #include "imgui/imgui_extensions.h"
 #include "imgui/imgui_internal.h"
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Core/Preferences/PrefConst.h"
 #include "res/ResConst.h"
 #include "SnowflakeMgr.h"
@@ -65,8 +65,8 @@ static CMainWindow* s_MainWindow{};
 {
 	if (!s_MainWindow) { return; }
 
-	CContext*  ctx         = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
+	Runtime&  ctx         = Runtime::Get();
+	CSettings* settingsctx = ctx.GetSettingsCtx();
 
 	if (settingsctx->Get<bool>(OPT_SHOWADDONSWINDOWAFTERDUU, false))
 	{
@@ -76,10 +76,10 @@ static CMainWindow* s_MainWindow{};
 
 CMainWindow::CMainWindow()
 {
-	CContext*      ctx    = CContext::GetContext();
-	CLogApi*       logger = ctx->GetLogger();
-	CInputBindApi* ibapi  = ctx->GetInputBindApi();
-	CEventApi*     evtapi = ctx->GetEventApi();
+	Runtime&      ctx    = Runtime::Get();
+	CLogApi*       logger = ctx.GetLogger();
+	CInputBindApi* ibapi  = ctx.GetInputBindApi();
+	CEventApi*     evtapi = ctx.GetEventApi();
 
 	CAddonsWindow*  addonsWnd  = new CAddonsWindow();
 	COptionsWindow* optionsWnd = new COptionsWindow();
@@ -215,7 +215,7 @@ void CMainWindow::Render()
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(minWidth * .5f, minHeight * .5f));
 	if (ImGui::Begin("Nexus", (bool*)0, Flags | (this->IsHandleHeld ? 0 : ImGuiWindowFlags_NoMove)))
 	{
-		static CContext* ctx = CContext::GetContext();
+		static Runtime& ctx = Runtime::Get();
 
 		float wndWidth = ImGui::GetWindowWidth();
 		float contentHeight = ImGui::GetWindowHeight() - headerHeight;
@@ -286,7 +286,7 @@ void CMainWindow::Render()
 				//navY += navItemSz.y + padding.y;
 			}
 			
-			static CUiContext* uictx = ctx->GetUIContext();
+			static CUiContext* uictx = ctx.GetUIContext();
 			static CLocalization* langApi = uictx->GetLocalization();
 
 			/* Dynamic Nav Items */
@@ -350,7 +350,7 @@ void CMainWindow::Render()
 				ImGui::SetCursorPos(ImVec2(offset + offset + tagWidth, (headerHeight - titleSz.y) / 2.0f));
 				ImGui::Text("Nexus");
 
-				std::string v = ctx->GetVersion().string();
+				std::string v = ctx.GetVersion().string();
 
 				ImVec2 versionSz = ImGui::CalcTextSize(v.c_str());
 
@@ -364,7 +364,7 @@ void CMainWindow::Render()
 			}
 			else
 			{
-				this->Tex_RaidcoreTag = ctx->GetTextureService()->GetOrCreate("RAIDCORE_TAG", RES_ICON_RAIDCORE, ctx->GetModule());
+				this->Tex_RaidcoreTag = ctx.GetTextureService()->GetOrCreate("RAIDCORE_TAG", RES_ICON_RAIDCORE, ctx.GetModule());
 			}
 
 			if (this->Tex_CloseIcon)
@@ -382,7 +382,7 @@ void CMainWindow::Render()
 			}
 			else
 			{
-				this->Tex_CloseIcon = ctx->GetTextureService()->GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx->GetModule());
+				this->Tex_CloseIcon = ctx.GetTextureService()->GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx.GetModule());
 			}
 		}
 		this->IsHandleHeld = ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows);

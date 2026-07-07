@@ -21,7 +21,7 @@
 
 #include "Core/Addons/AddConst.h"
 #include "Core/Addons/Addon.h"
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Core/Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
 #include "Core/Preferences/PrefContext.h"
@@ -38,8 +38,8 @@
 
 /*static*/ void CUiContext::OnInputBindPressed(const char* aIdentifier)
 {
-	CContext* ctx = CContext::GetContext();
-	CUiContext* uictx = ctx->GetUIContext();
+	Runtime& ctx = Runtime::Get();
+	CUiContext* uictx = ctx.GetUIContext();
 
 	if (aIdentifier == KB_TOGGLEHIDEUI)
 	{
@@ -59,8 +59,8 @@
 		return;
 	}
 
-	CContext* ctx = CContext::GetContext();
-	CDataLinkApi* dlapi = ctx->GetDataLink();
+	Runtime& ctx = Runtime::Get();
+	CDataLinkApi* dlapi = ctx.GetDataLink();
 
 	Mumble::Identity* mumbleIdentity = static_cast<Mumble::Identity*>(dlapi->GetResource(DL_MUMBLE_LINK_IDENTITY));
 	NexusLinkData_t* nexusLink = static_cast<NexusLinkData_t*>(dlapi->GetResource(DL_NEXUS_LINK));
@@ -106,10 +106,10 @@
 
 /*static*/ void CUiContext::OnMumbleIdentityChanged(void* aEventArgs)
 {
-	CContext* ctx = CContext::GetContext();
-	CDataLinkApi* dlapi = ctx->GetDataLink();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
-	CUiContext* uictx = ctx->GetUIContext();
+	Runtime& ctx = Runtime::Get();
+	CDataLinkApi* dlapi = ctx.GetDataLink();
+	CSettings* settingsctx = ctx.GetSettingsCtx();
+	CUiContext* uictx = ctx.GetUIContext();
 	CFontManager* fontmgr = uictx->GetFontManager();
 
 	Mumble::Identity* mumbleIdentity = static_cast<Mumble::Identity*>(dlapi->GetResource(DL_MUMBLE_LINK_IDENTITY));
@@ -151,8 +151,8 @@
 
 /*static*/ void CUiContext::OnInputBindUpdate(void* aEventData)
 {
-	CContext* ctx = CContext::GetContext();
-	CUiContext* uictx = ctx->GetUIContext();
+	Runtime& ctx = Runtime::Get();
+	CUiContext* uictx = ctx.GetUIContext();
 
 	if (uictx)
 	{
@@ -187,8 +187,8 @@ CUiContext::CUiContext(
 
 	this->FontManager    = new CFontManager(this->Language);
 	this->EscapeClose    = new CEscapeClosing();
-	this->Scaling        = new CScaling(aRenderContext, aDataLink, aEventApi, CContext::GetContext()->GetSettingsCtx()); // FIXME: What the fuck, why is the settingsctx not included here?
-	this->Input          = new CUiInput(CContext::GetContext()->GetSettingsCtx());
+	this->Scaling        = new CScaling(aRenderContext, aDataLink, aEventApi, Runtime::Get().GetSettingsCtx()); // FIXME: What the fuck, why is the settingsctx not included here?
+	this->Input          = new CUiInput(Runtime::Get().GetSettingsCtx());
 
 	this->EventApi->Subscribe(EV_MUMBLE_IDENTITY_UPDATED,              CUiContext::OnMumbleIdentityChanged);
 	this->EventApi->Subscribe("EV_INPUTBIND_UPDATED",                  CUiContext::OnInputBindUpdate);
@@ -321,8 +321,8 @@ void CUiContext::Render()
 		ImGui_ImplDX11_NewFrame();
 		ImGui::NewFrame();
 
-		static CContext*  s_Context      = CContext::GetContext();
-		static CSettings* s_Settings     = s_Context->GetSettingsCtx();
+		static Runtime&  s_Context      = Runtime::Get();
+		static CSettings* s_Settings     = s_Context.GetSettingsCtx();
 		static bool       s_EulaAccepted = s_Settings->Get<bool>(OPT_ACCEPTEULA, false);
 		
 		if (s_EulaAccepted)
@@ -436,8 +436,8 @@ void CUiContext::LoadFonts()
 {
 	std::filesystem::path fontPath{};
 
-	CContext* ctx = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
+	Runtime& ctx = Runtime::Get();
+	CSettings* settingsctx = ctx.GetSettingsCtx();
 
 	/* add user font */
 	bool hasUserFont = false;
@@ -464,34 +464,34 @@ void CUiContext::LoadFonts()
 	config.MergeMode = true;
 
 	/* small UI*/
-	this->FontManager->ReplaceFont("MENOMONIA_S", 16.0f, RES_FONT_MENOMONIA, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	this->FontManager->ReplaceFont("MENOMONIA_S", 16.0f, RES_FONT_MENOMONIA, ctx.GetModule(), CUiContext::OnFontUpdate, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_S_MERGE", 16.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-	this->FontManager->ReplaceFont("MENOMONIA_BIG_S", 22.0f, RES_FONT_MENOMONIA, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	this->FontManager->ReplaceFont("MENOMONIA_BIG_S", 22.0f, RES_FONT_MENOMONIA, ctx.GetModule(), CUiContext::OnFontUpdate, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_S_MERGE", 22.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-	this->FontManager->ReplaceFont("FIRASANS_S", 15.0f, RES_FONT_FIRASANS, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	this->FontManager->ReplaceFont("FIRASANS_S", 15.0f, RES_FONT_FIRASANS, ctx.GetModule(), CUiContext::OnFontUpdate, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_S_MERGE", 15.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
 
 	/* normal UI*/
-	this->FontManager->ReplaceFont("MENOMONIA_N", 18.0f, RES_FONT_MENOMONIA, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	this->FontManager->ReplaceFont("MENOMONIA_N", 18.0f, RES_FONT_MENOMONIA, ctx.GetModule(), CUiContext::OnFontUpdate, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_N_MERGE", 18.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-	this->FontManager->ReplaceFont("MENOMONIA_BIG_N", 24.0f, RES_FONT_MENOMONIA, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	this->FontManager->ReplaceFont("MENOMONIA_BIG_N", 24.0f, RES_FONT_MENOMONIA, ctx.GetModule(), CUiContext::OnFontUpdate, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_N_MERGE", 24.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-	this->FontManager->ReplaceFont("FIRASANS_N", 16.0f, RES_FONT_FIRASANS, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	this->FontManager->ReplaceFont("FIRASANS_N", 16.0f, RES_FONT_FIRASANS, ctx.GetModule(), CUiContext::OnFontUpdate, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_N_MERGE", 16.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
 
 	/* large UI*/
-	this->FontManager->ReplaceFont("MENOMONIA_L", 20.0f, RES_FONT_MENOMONIA, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	this->FontManager->ReplaceFont("MENOMONIA_L", 20.0f, RES_FONT_MENOMONIA, ctx.GetModule(), CUiContext::OnFontUpdate, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_L_MERGE", 20.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-	this->FontManager->ReplaceFont("MENOMONIA_BIG_L", 26.0f, RES_FONT_MENOMONIA, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	this->FontManager->ReplaceFont("MENOMONIA_BIG_L", 26.0f, RES_FONT_MENOMONIA, ctx.GetModule(), CUiContext::OnFontUpdate, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_L_MERGE", 26.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-	this->FontManager->ReplaceFont("FIRASANS_L", 17.5f, RES_FONT_FIRASANS, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	this->FontManager->ReplaceFont("FIRASANS_L", 17.5f, RES_FONT_FIRASANS, ctx.GetModule(), CUiContext::OnFontUpdate, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_L_MERGE", 17.5f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
 
 	/* larger UI*/
-	this->FontManager->ReplaceFont("MENOMONIA_XL", 22.0f, RES_FONT_MENOMONIA, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	this->FontManager->ReplaceFont("MENOMONIA_XL", 22.0f, RES_FONT_MENOMONIA, ctx.GetModule(), CUiContext::OnFontUpdate, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_XL_MERGE", 22.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-	this->FontManager->ReplaceFont("MENOMONIA_BIG_XL", 28.0f, RES_FONT_MENOMONIA, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	this->FontManager->ReplaceFont("MENOMONIA_BIG_XL", 28.0f, RES_FONT_MENOMONIA, ctx.GetModule(), CUiContext::OnFontUpdate, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_XL_MERGE", 28.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-	this->FontManager->ReplaceFont("FIRASANS_XL", 19.5f, RES_FONT_FIRASANS, ctx->GetModule(), CUiContext::OnFontUpdate, nullptr);
+	this->FontManager->ReplaceFont("FIRASANS_XL", 19.5f, RES_FONT_FIRASANS, ctx.GetModule(), CUiContext::OnFontUpdate, nullptr);
 	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_XL_MERGE", 19.5f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
 }

@@ -19,8 +19,6 @@
 
 #include "minhook/mh_hook.h"
 
-#include "Core/Context.h"
-#include "Core/Main.h"
 #include "Core/NexusLink.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
@@ -32,6 +30,7 @@
 #include "GW2/Inputs/MouseResetFix.h"
 #include "HkConst.h"
 #include "HkFuncDefs.h"
+#include "Runtime/Runtime.h"
 #include "UI/Renderer/RdrContext.h"
 #include "UI/Textures/TxLoader.h"
 #include "UI/UiContext.h"
@@ -93,8 +92,8 @@ namespace Hooks
 		{
 			UnregisterClassA(wc.lpszClassName, wc.hInstance);
 
-			CContext* ctx    = CContext::GetContext();
-			CLogApi*  logger = ctx->GetLogger();
+			Runtime& ctx    = Runtime::Get();
+			CLogApi* logger = ctx.GetLogger();
 
 			logger->Critical(CH_CORE, "Failed creating temporary window.");
 			return;
@@ -127,8 +126,8 @@ namespace Hooks
 			LPVOID* vtbl1 = swap1 ? *reinterpret_cast<LPVOID**>(swap1) : nullptr;
 			LPVOID* vtbl3 = swap3 ? *reinterpret_cast<LPVOID**>(swap3) : nullptr;
 
-			CContext* ctx = CContext::GetContext();
-			CLogApi* logger = ctx->GetLogger();
+			Runtime& ctx = Runtime::Get();
+			CLogApi* logger = ctx.GetLogger();
 
 			logger->Debug(CH_CORE, "HOOK BEGIN");
 
@@ -160,8 +159,8 @@ namespace Hooks
 		}
 		else
 		{
-			CContext* ctx = CContext::GetContext();
-			CLogApi* logger = ctx->GetLogger();
+			Runtime& ctx = Runtime::Get();
+			CLogApi* logger = ctx.GetLogger();
 
 			logger->Critical(CH_CORE, "Failed to create D3D11 device and swapchain.");
 		}
@@ -183,12 +182,12 @@ namespace Hooks
 	{
 		LRESULT __stdcall WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
-			static CContext*      s_Context      = CContext::GetContext();
-			static CInputBindApi* s_InputBindApi = s_Context->GetInputBindApi();
-			static CRawInputApi*  s_RawInputApi  = s_Context->GetRawInputApi();
-			static CUiContext*    s_UIContext    = s_Context->GetUIContext();
-			static CLoader*       s_Loader       = s_Context->GetLoader();
-			static CGameBindsApi* s_GameBindsApi = s_Context->GetGameBindsApi();
+			static Runtime&       s_Context      = Runtime::Get();
+			static CInputBindApi* s_InputBindApi = s_Context.GetInputBindApi();
+			static CRawInputApi*  s_RawInputApi  = s_Context.GetRawInputApi();
+			static CUiContext*    s_UIContext    = s_Context.GetUIContext();
+			static CLoader*       s_Loader       = s_Context.GetLoader();
+			static CGameBindsApi* s_GameBindsApi = s_Context.GetGameBindsApi();
 
 			// don't pass to game if loader
 			if (s_Loader->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
@@ -204,7 +203,7 @@ namespace Hooks
 
 			if (uMsg == WM_DESTROY)
 			{
-				Main::Shutdown(uMsg);
+				Runtime::Get().Shutdown(uMsg);
 			}
 
 			// shift game only messages back to normal messages.
@@ -217,11 +216,11 @@ namespace Hooks
 
 		void Present_Internal(IDXGISwapChain* aSwapChain)
 		{
-			static CContext* s_Context = CContext::GetContext();
-			static RenderContext_t* s_RenderCtx = s_Context->GetRendererCtx();
-			static CTextureLoader* s_TextureLoader = s_Context->GetTextureService();
-			static CUiContext* s_UIContext = s_Context->GetUIContext();
-			static CLoader* s_Loader = s_Context->GetLoader();
+			static Runtime& s_Context = Runtime::Get();
+			static RenderContext_t* s_RenderCtx = s_Context.GetRendererCtx();
+			static CTextureLoader* s_TextureLoader = s_Context.GetTextureService();
+			static CUiContext* s_UIContext = s_Context.GetUIContext();
+			static CLoader* s_Loader = s_Context.GetLoader();
 
 			/* Increment count at the beginning of the frame. */
 			s_RenderCtx->Metrics.FrameCount++;
@@ -260,11 +259,11 @@ namespace Hooks
 
 		void Resize_Internal(uint32_t aWidth, uint32_t aHeight)
 		{
-			static CContext* s_Context = CContext::GetContext();
-			static CDataLinkApi* s_DataLink = s_Context->GetDataLink();
-			static CEventApi* s_EventApi = s_Context->GetEventApi();
-			static RenderContext_t* s_RenderCtx = s_Context->GetRendererCtx();
-			static CUiContext* s_UIContext = s_Context->GetUIContext();
+			static Runtime& s_Context = Runtime::Get();
+			static CDataLinkApi* s_DataLink = s_Context.GetDataLink();
+			static CEventApi* s_EventApi = s_Context.GetEventApi();
+			static RenderContext_t* s_RenderCtx = s_Context.GetRendererCtx();
+			static CUiContext* s_UIContext = s_Context.GetUIContext();
 
 			s_UIContext->Shutdown();
 

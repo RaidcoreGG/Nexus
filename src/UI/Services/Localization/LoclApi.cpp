@@ -19,7 +19,7 @@ using json = nlohmann::json;
 #include "Util/Resources.h"
 #include "Core/Index/Index.h"
 #include "res/ResConst.h"
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Core/Preferences/PrefConst.h"
 
 static CLocalization* s_Localization{};
@@ -70,22 +70,22 @@ CLocalization::CLocalization(CLogApi* aLogger)
 
 	this->Logger = aLogger;
 
-	CContext* ctx = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
-	CEventApi* evtapi = ctx->GetEventApi();
+	Runtime& ctx = Runtime::Get();
+	CSettings* settingsctx = ctx.GetSettingsCtx();
+	CEventApi* evtapi = ctx.GetEventApi();
 
 	this->SetLocaleDirectory(Index(EPath::DIR_LOCALES));
-	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleEN), RES_LOCALE_EN, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleDE), RES_LOCALE_DE, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleFR), RES_LOCALE_FR, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleES), RES_LOCALE_ES, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleCN), RES_LOCALE_CN, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleKR), RES_LOCALE_KR, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleBR), RES_LOCALE_BR, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleCZ), RES_LOCALE_CZ, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleIT), RES_LOCALE_IT, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index(EPath::LocalePL), RES_LOCALE_PL, "JSON");
-	Resources::Unpack(ctx->GetModule(), Index(EPath::LocaleRU), RES_LOCALE_RU, "JSON");
+	Resources::Unpack(ctx.GetModule(), Index(EPath::LocaleEN), RES_LOCALE_EN, "JSON");
+	Resources::Unpack(ctx.GetModule(), Index(EPath::LocaleDE), RES_LOCALE_DE, "JSON");
+	Resources::Unpack(ctx.GetModule(), Index(EPath::LocaleFR), RES_LOCALE_FR, "JSON");
+	Resources::Unpack(ctx.GetModule(), Index(EPath::LocaleES), RES_LOCALE_ES, "JSON");
+	Resources::Unpack(ctx.GetModule(), Index(EPath::LocaleCN), RES_LOCALE_CN, "JSON");
+	Resources::Unpack(ctx.GetModule(), Index(EPath::LocaleKR), RES_LOCALE_KR, "JSON");
+	Resources::Unpack(ctx.GetModule(), Index(EPath::LocaleBR), RES_LOCALE_BR, "JSON");
+	Resources::Unpack(ctx.GetModule(), Index(EPath::LocaleCZ), RES_LOCALE_CZ, "JSON");
+	Resources::Unpack(ctx.GetModule(), Index(EPath::LocaleIT), RES_LOCALE_IT, "JSON");
+	Resources::Unpack(ctx.GetModule(), Index(EPath::LocalePL), RES_LOCALE_PL, "JSON");
+	Resources::Unpack(ctx.GetModule(), Index(EPath::LocaleRU), RES_LOCALE_RU, "JSON");
 
 	std::string lang = settingsctx->Get<std::string>(OPT_LANGUAGE, "en");
 	this->SetLanguage(!lang.empty() ? lang : "en");

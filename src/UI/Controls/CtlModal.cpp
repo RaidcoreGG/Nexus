@@ -10,7 +10,7 @@
 
 #include "imgui/imgui.h"
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 
 bool IModal::Render()
 {
@@ -29,7 +29,7 @@ bool IModal::Render()
 		| ImGuiWindowFlags_NoMove
 		| ImGuiWindowFlags_NoSavedSettings;
 
-	RenderContext_t* renderctx = CContext::GetContext()->GetRendererCtx();
+	RenderContext_t* renderctx = Runtime::Get().GetRendererCtx();
 
 	/* Center the modal. */
 	ImVec2 center(renderctx->Window.Width * 0.5f, renderctx->Window.Height * 0.5f);
@@ -72,8 +72,8 @@ std::string IModal::GetName() const
 	assert(!this->GetID().empty());
 	assert(!this->GetDisplayName().empty());
 
-	CContext*      ctx   = CContext::GetContext();
-	CUiContext*    uictx = ctx->GetUIContext();
+	Runtime&      ctx   = Runtime::Get();
+	CUiContext*    uictx = ctx.GetUIContext();
 	CLocalization* lang  = uictx->GetLocalization();
 
 	return std::string{lang->Translate(this->GetDisplayName().c_str())} + "##" + this->ID;

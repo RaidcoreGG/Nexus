@@ -12,9 +12,9 @@
 #include <d3d9types.h>
 #include <windows.h>
 
-#include "Core/Main.h"
-#include "PxyEnum.h"
 #include "Proxy.h"
+#include "PxyEnum.h"
+#include "Runtime/Runtime.h"
 
 static ProxyModule_t s_ProxyModule{};
 
@@ -25,7 +25,7 @@ PROXY IDirect3D9* WINAPI Direct3DCreate9(
 )
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::D3D9_DIRECT3DCREATE9);
+	Runtime::Get().Initialize(EProxyFunction::D3D9_DIRECT3DCREATE9);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -42,7 +42,7 @@ PROXY HRESULT WINAPI Direct3DCreate9Ex(
 )
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::D3D9_DIRECT3DCREATE9EX);
+	Runtime::Get().Initialize(EProxyFunction::D3D9_DIRECT3DCREATE9EX);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -62,7 +62,7 @@ PROXY int WINAPI D3DPERF_BeginEvent(
 )
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::D3D9_D3DPERF_BEGINEVENT);
+	Runtime::Get().Initialize(EProxyFunction::D3D9_D3DPERF_BEGINEVENT);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -76,7 +76,7 @@ PROXY int WINAPI D3DPERF_BeginEvent(
 PROXY int WINAPI D3DPERF_EndEvent()
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::D3D9_D3DPERF_ENDEVENT);
+	Runtime::Get().Initialize(EProxyFunction::D3D9_D3DPERF_ENDEVENT);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -93,7 +93,7 @@ PROXY void WINAPI D3DPERF_SetMarker(
 )
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::D3D9_D3DPERF_SETMARKER);
+	Runtime::Get().Initialize(EProxyFunction::D3D9_D3DPERF_SETMARKER);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -110,7 +110,7 @@ PROXY void WINAPI D3DPERF_SetRegion(
 )
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::D3D9_D3DPERF_SETREGION);
+	Runtime::Get().Initialize(EProxyFunction::D3D9_D3DPERF_SETREGION);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -124,7 +124,7 @@ PROXY void WINAPI D3DPERF_SetRegion(
 PROXY BOOL WINAPI D3DPERF_QueryRepeatFrame()
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::D3D9_D3DPERF_QUERYREPEATFRAME);
+	Runtime::Get().Initialize(EProxyFunction::D3D9_D3DPERF_QUERYREPEATFRAME);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -140,7 +140,7 @@ PROXY void WINAPI D3DPERF_SetOptions(
 )
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::D3D9_D3DPERF_SETOPTIONS);
+	Runtime::Get().Initialize(EProxyFunction::D3D9_D3DPERF_SETOPTIONS);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -154,7 +154,7 @@ PROXY void WINAPI D3DPERF_SetOptions(
 PROXY DWORD WINAPI D3DPERF_GetStatus()
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::D3D9_D3DPERF_GETSTATUS);
+	Runtime::Get().Initialize(EProxyFunction::D3D9_D3DPERF_GETSTATUS);
 
 	static thread_local bool s_InProxyCall = false;
 

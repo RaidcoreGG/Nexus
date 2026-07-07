@@ -16,7 +16,7 @@
 #include "ApiV4.h"
 #include "ApiV5.h"
 #include "ApiV6.h"
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Core/Index/Index.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
@@ -556,20 +556,20 @@ namespace ADDONAPI
 	{
 		if (!s_IsInitialized)
 		{
-			CContext* ctx   = CContext::GetContext();
+			Runtime& ctx   = Runtime::Get();
 
-			s_DataLinkApi   = ctx->GetDataLink();
-			s_EventApi      = ctx->GetEventApi();
-			s_GameBindsApi  = ctx->GetGameBindsApi();
-			s_InputBindApi  = ctx->GetInputBindApi();
-			s_RawInputApi   = ctx->GetRawInputApi();
-			s_Logger        = ctx->GetLogger();
-			s_TextureApi    = ctx->GetTextureService();
-			s_Loader        = ctx->GetLoader();
-			s_RenderCtx     = ctx->GetRendererCtx();
-			s_ArcApi        = ctx->GetArcApi();
+			s_DataLinkApi   = ctx.GetDataLink();
+			s_EventApi      = ctx.GetEventApi();
+			s_GameBindsApi  = ctx.GetGameBindsApi();
+			s_InputBindApi  = ctx.GetInputBindApi();
+			s_RawInputApi   = ctx.GetRawInputApi();
+			s_Logger        = ctx.GetLogger();
+			s_TextureApi    = ctx.GetTextureService();
+			s_Loader        = ctx.GetLoader();
+			s_RenderCtx     = ctx.GetRendererCtx();
+			s_ArcApi        = ctx.GetArcApi();
 
-			s_UiContext     = ctx->GetUIContext();
+			s_UiContext     = ctx.GetUIContext();
 			s_FontManager   = s_UiContext->GetFontManager();
 			s_Alerts        = s_UiContext->GetAlerts();
 			s_QuickAccess   = s_UiContext->GetQuickAccess();

@@ -13,7 +13,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_extensions.h"
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "res/ResConst.h"
@@ -38,8 +38,8 @@ CDebugWindow::CDebugWindow()
 	this->IsHost         = true; /* set to true to enable RenderSubWindows() call*/
 
 	/* bind mumble overlay */
-	CContext* ctx = CContext::GetContext();
-	ctx->GetInputBindApi()->Register(KB_MUMBLEOVERLAY, EIbHandlerType::DownAsync, DebugWindow_OnInputBind, "(null)");
+	Runtime& ctx = Runtime::Get();
+	ctx.GetInputBindApi()->Register(KB_MUMBLEOVERLAY, EIbHandlerType::DownAsync, DebugWindow_OnInputBind, "(null)");
 	DebugWindow = this;
 }
 
@@ -47,8 +47,8 @@ void CDebugWindow::RenderContent()
 {
 	if (this->IsInvalid)
 	{
-		static CContext* ctx = CContext::GetContext();
-		static CUiContext* uictx = ctx->GetUIContext();
+		static Runtime& ctx = Runtime::Get();
+		static CUiContext* uictx = ctx.GetUIContext();
 		static CEscapeClosing* escclose = uictx->GetEscapeClosingService();
 
 		escclose->Deregister(this->GetVisibleStatePtr());
@@ -102,7 +102,7 @@ void CDebugWindow::TabEvents()
 
 	if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 	{
-		std::unordered_map<std::string, EventData_t> eventRegistry = CContext::GetContext()->GetEventApi()->GetRegistry();
+		std::unordered_map<std::string, EventData_t> eventRegistry = Runtime::Get().GetEventApi()->GetRegistry();
 
 		for (auto& [identifier, ev] : eventRegistry)
 		{
@@ -138,7 +138,7 @@ void CDebugWindow::TabInputBinds()
 
 	if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 	{
-		std::map<std::string, IbMapping_t> inputBindRegistry = CContext::GetContext()->GetInputBindApi()->GetRegistry();
+		std::map<std::string, IbMapping_t> inputBindRegistry = Runtime::Get().GetInputBindApi()->GetRegistry();
 
 		for (auto& [identifier, inputBind] : inputBindRegistry)
 		{
@@ -190,7 +190,7 @@ void CDebugWindow::TabDataLink()
 
 	if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 	{
-		std::unordered_map<std::string, LinkedResource_t>	dataLinkRegistry = CContext::GetContext()->GetDataLink()->GetRegistry();
+		std::unordered_map<std::string, LinkedResource_t>	dataLinkRegistry = Runtime::Get().GetDataLink()->GetRegistry();
 
 		for (auto& [identifier, resource] : dataLinkRegistry)
 		{
@@ -225,8 +225,8 @@ void CDebugWindow::TabTextures()
 		return;
 	}
 
-	std::map<std::string, Texture_t*>      texRegistry = CContext::GetContext()->GetTextureService()->GetRegistry();
-	std::map<std::string, QueuedTexture_t> texQueued   = CContext::GetContext()->GetTextureService()->GetQueuedTextures();
+	std::map<std::string, Texture_t*>      texRegistry = Runtime::Get().GetTextureService()->GetRegistry();
+	std::map<std::string, QueuedTexture_t> texQueued   = Runtime::Get().GetTextureService()->GetQueuedTextures();
 
 	static char texFilter[400] = {};
 	static int displayedTextures = 0;

@@ -8,7 +8,7 @@
 
 #include "SelfUpdater.h"
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Core/Index/Index.h"
 #include "Util/Paths.h"
 
@@ -42,7 +42,7 @@ const Version_t& CSelfUpdater::GetRemoteVersion()
 	}
 
 	/* The client is not dependency injected, as we only create it on demand. */
-	CHttpClient* raidcoreapi = CContext::GetContext()->GetHttpClient("https://api.raidcore.gg");
+	CHttpClient* raidcoreapi = Runtime::Get().GetHttpClient("https://api.raidcore.gg");
 
 	/* Request version info, bypass cache. */
 	HttpResponse_t result = raidcoreapi->Get("/nexusversion", "", 0);
@@ -92,7 +92,7 @@ const Version_t& CSelfUpdater::GetRemoteVersion()
 
 bool CSelfUpdater::IsUpdateAvailable()
 {
-	return this->RemoteVersion > CContext::GetContext()->GetVersion();
+	return this->RemoteVersion > Runtime::Get().GetVersion();
 }
 
 const std::string& CSelfUpdater::GetChangelog()
@@ -188,7 +188,7 @@ bool CSelfUpdater::DownloadUpdate()
 		ghresult.Error.c_str()
 	);
 
-	CHttpClient* raidcoreapi = CContext::GetContext()->GetHttpClient("https://api.raidcore.gg");
+	CHttpClient* raidcoreapi = Runtime::Get().GetHttpClient("https://api.raidcore.gg");
 
 	HttpResponse_t fbresult = raidcoreapi->Download(
 		Index(EPath::NexusDLL_Update),
@@ -212,7 +212,7 @@ bool CSelfUpdater::DownloadUpdate()
 
 void CSelfUpdater::Run()
 {
-	CContext* ctx = CContext::GetContext();
+	Runtime& ctx = Runtime::Get();
 
 	/* If the mutex creation failed, this is a nth game client instance, not the first. */
 	if (this->CreatePatchMutex() == false)
@@ -221,7 +221,7 @@ void CSelfUpdater::Run()
 	}
 
 	/* Update check and perform logic below. */
-	const Version_t& currentVersion = ctx->GetVersion();
+	const Version_t& currentVersion = ctx.GetVersion();
 
 	/* These paths in theory should be protected by the mutex, but we safeguard them anyway. */
 	this->CleanupUpdateFiles();

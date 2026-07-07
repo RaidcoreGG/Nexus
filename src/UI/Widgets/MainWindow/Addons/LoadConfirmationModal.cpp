@@ -8,7 +8,7 @@
 
 #include "LoadConfirmationModal.h"
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 
 CLoadConfirmationModal::CLoadConfirmationModal()
 {
@@ -18,8 +18,8 @@ CLoadConfirmationModal::CLoadConfirmationModal()
 
 void CLoadConfirmationModal::RenderContent()
 {
-	CContext*      ctx   = CContext::GetContext();
-	CUiContext*    uictx = ctx->GetUIContext();
+	Runtime&      ctx   = Runtime::Get();
+	CUiContext*    uictx = ctx.GetUIContext();
 	CLocalization* lang  = uictx->GetLocalization();
 
 	ImGui::Text(lang->Translate("((000116))"));
@@ -41,9 +41,9 @@ void CLoadConfirmationModal::RenderContent()
 
 void CLoadConfirmationModal::OnClosing()
 {
-	CContext*   ctx    = CContext::GetContext();
-	CConfigMgr* cfgmgr = ctx->GetCfgMgr();
-	CLoader*    loader = ctx->GetLoader();
+	Runtime&   ctx    = Runtime::Get();
+	CConfigMgr* cfgmgr = ctx.GetCfgMgr();
+	CLoader*    loader = ctx.GetLoader();
 
 	switch (this->GetResult())
 	{
@@ -82,8 +82,8 @@ void CLoadConfirmationModal::SetTarget(Config_t* aConfig, std::string aName, std
 
 void CLoadConfirmationModal::SetTitle()
 {
-	CContext*      ctx   = CContext::GetContext();
-	CUiContext*    uictx = ctx->GetUIContext();
+	Runtime&      ctx   = Runtime::Get();
+	CUiContext*    uictx = ctx.GetUIContext();
 	CLocalization* lang  = uictx->GetLocalization();
 
 	/* Override the title before opening the modal. */

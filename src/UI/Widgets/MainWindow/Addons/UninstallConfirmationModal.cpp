@@ -8,7 +8,7 @@
 
 #include "UninstallConfirmationModal.h"
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 
 CUninstallConfirmationModal::CUninstallConfirmationModal()
 {
@@ -18,8 +18,8 @@ CUninstallConfirmationModal::CUninstallConfirmationModal()
 
 void CUninstallConfirmationModal::RenderContent()
 {
-	CContext*      ctx   = CContext::GetContext();
-	CUiContext*    uictx = ctx->GetUIContext();
+	Runtime&      ctx   = Runtime::Get();
+	CUiContext*    uictx = ctx.GetUIContext();
 	CLocalization* lang  = uictx->GetLocalization();
 
 	ImGui::Text(lang->Translate("((000116))"));
@@ -41,8 +41,8 @@ void CUninstallConfirmationModal::RenderContent()
 
 void CUninstallConfirmationModal::OnClosing()
 {
-	CContext*    ctx    = CContext::GetContext();
-	CLoader*     loader = ctx->GetLoader();
+	Runtime&    ctx    = Runtime::Get();
+	CLoader*     loader = ctx.GetLoader();
 
 	switch (this->GetResult())
 	{
@@ -74,8 +74,8 @@ void CUninstallConfirmationModal::SetTarget(std::string aName, std::filesystem::
 
 void CUninstallConfirmationModal::SetTitle()
 {
-	CContext* ctx = CContext::GetContext();
-	CUiContext* uictx = ctx->GetUIContext();
+	Runtime& ctx = Runtime::Get();
+	CUiContext* uictx = ctx.GetUIContext();
 	CLocalization* lang = uictx->GetLocalization();
 
 	/* Override the title before opening the modal. */

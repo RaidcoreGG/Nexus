@@ -11,7 +11,7 @@
 #include "imgui/imgui_extensions.h"
 #include "imgui/imgui_internal.h"
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "ImAnimate/ImAnimate.h"
 #include "res/ResConst.h"
 #include "Util/Time.h"
@@ -19,8 +19,8 @@
 
 CSnowflakeMgr::CSnowflakeMgr()
 {
-	CContext* ctx = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
+	Runtime& ctx = Runtime::Get();
+	CSettings* settingsctx = ctx.GetSettingsCtx();
 
 	settingsctx->Subscribe<bool>(OPT_DISABLEFESTIVEFLAIR, [&](bool aNewValue)
 	{
@@ -68,8 +68,8 @@ void CSnowflakeMgr::Update()
 
 	if (!(this->IsItChristmas || this->IsItHalloween)) { return; }
 
-	static CContext* ctx = CContext::GetContext();
-	static CTextureLoader* texapi = ctx->GetTextureService();
+	static Runtime& ctx = Runtime::Get();
+	static CTextureLoader* texapi = ctx.GetTextureService();
 
 	ImGuiContext* imctx = ImGui::GetCurrentContext();
 
@@ -99,7 +99,7 @@ void CSnowflakeMgr::Update()
 
 				if (!texSnowflake)
 				{
-					texSnowflake = texapi->GetOrCreate("SNOWFLAKE", RES_ICON_SNOWFLAKE, CContext::GetContext()->GetModule());
+					texSnowflake = texapi->GetOrCreate("SNOWFLAKE", RES_ICON_SNOWFLAKE, Runtime::Get().GetModule());
 					return;
 				}
 
@@ -111,9 +111,9 @@ void CSnowflakeMgr::Update()
 
 				if (!(texLeaves[0] && texLeaves[1] && texLeaves[2]))
 				{
-					texLeaves[0] = texapi->GetOrCreate("LEAF_VARIANT1", RES_ICON_LEAF_VARIANT1, CContext::GetContext()->GetModule());
-					texLeaves[1] = texapi->GetOrCreate("LEAF_VARIANT2", RES_ICON_LEAF_VARIANT2, CContext::GetContext()->GetModule());
-					texLeaves[2] = texapi->GetOrCreate("LEAF_VARIANT3", RES_ICON_LEAF_VARIANT3, CContext::GetContext()->GetModule());
+					texLeaves[0] = texapi->GetOrCreate("LEAF_VARIANT1", RES_ICON_LEAF_VARIANT1, Runtime::Get().GetModule());
+					texLeaves[1] = texapi->GetOrCreate("LEAF_VARIANT2", RES_ICON_LEAF_VARIANT2, Runtime::Get().GetModule());
+					texLeaves[2] = texapi->GetOrCreate("LEAF_VARIANT3", RES_ICON_LEAF_VARIANT3, Runtime::Get().GetModule());
 					return;
 				}
 

@@ -13,7 +13,7 @@
 #include "Engine/Clockwork/Clockwork.h"
 namespace Clockwork = Raidcore::Clockwork;
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Util/Inputs.h"
 #include "GbConst.h"
 
@@ -23,8 +23,8 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 
 	if (!s_GameBindsApi)
 	{
-		CContext* ctx = CContext::GetContext();
-		s_GameBindsApi = ctx->GetGameBindsApi();
+		Runtime& ctx = Runtime::Get();
+		s_GameBindsApi = ctx.GetGameBindsApi();
 
 		assert(s_GameBindsApi);
 	}
@@ -88,8 +88,8 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 
 	s_GameBindsApi->Set(kbChange->Identifier, ib, kbChange->Index == 0, true);
 
-	CContext* ctx = CContext::GetContext();
-	CUiContext* uictx = ctx->GetUIContext();
+	Runtime& ctx = Runtime::Get();
+	CUiContext* uictx = ctx.GetUIContext();
 
 	uictx->Invalidate();
 }

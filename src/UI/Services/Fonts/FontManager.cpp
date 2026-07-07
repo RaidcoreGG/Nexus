@@ -12,7 +12,7 @@
 
 #include "imgui/imgui_internal.h"
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Core/Preferences/PrefConst.h"
 #include "res/ResConst.h"
 #include "Util/Resources.h"
@@ -21,8 +21,8 @@ CFontManager::CFontManager(CLocalization* aLocalization) : IRefCleaner("FontMana
 {
 	this->Language = aLocalization;
 
-	CContext* ctx = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
+	Runtime& ctx = Runtime::Get();
+	CSettings* settingsctx = ctx.GetSettingsCtx();
 
 	float storedFontSz = settingsctx->Get<float>(OPT_FONTSIZE, 15.0f);
 	if (storedFontSz <= 0)
@@ -432,8 +432,8 @@ void CFontManager::AddDefaultFont(FONTS_RECEIVECALLBACK aCallback)
 		size_t size = 0;
 
 		/* get data */
-		CContext* ctx = CContext::GetContext();
-		Resources::Get(ctx->GetModule(), MAKEINTRESOURCE(RES_FONT_INTER), RT_FONT, &buffer, (DWORD*)&size);
+		Runtime& ctx = Runtime::Get();
+		Resources::Get(ctx.GetModule(), MAKEINTRESOURCE(RES_FONT_INTER), RT_FONT, &buffer, (DWORD*)&size);
 
 		/* call AddFontInternal with the memory buffer */
 		this->AddFontInternal("FONT_DEFAULT", 15.0f, buffer, size, aCallback, nullptr);

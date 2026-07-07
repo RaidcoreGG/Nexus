@@ -13,7 +13,7 @@
 #include "imgui/imgui_internal.h"
 
 #include "Core/Addons/AddConst.h"
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Core/Preferences/PrefConst.h"
 #include "Core/Preferences/PrefContext.h"
 #include "res/ResConst.h"
@@ -24,8 +24,8 @@
 
 void CQuickAccess::OnAddonStateChanged(void* aEventData)
 {
-	CContext*     ctx   = CContext::GetContext();
-	CUiContext*   uictx = ctx->GetUIContext();
+	Runtime&     ctx   = Runtime::Get();
+	CUiContext*   uictx = ctx.GetUIContext();
 	CQuickAccess* qactx = uictx->GetQuickAccess();
 
 	qactx->Invalidate();
@@ -49,8 +49,8 @@ CQuickAccess::CQuickAccess(
 	this->NexusLink = (NexusLinkData_t*)aDataLink->GetResource(DL_NEXUS_LINK);
 	this->MumbleLink = (Mumble::Data*)aDataLink->GetResource(DL_MUMBLE_LINK);
 
-	CContext*  ctx         = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
+	Runtime&  ctx         = Runtime::Get();
+	CSettings* settingsctx = ctx.GetSettingsCtx();
 
 	/* Setup notifiers. */
 	settingsctx->Subscribe<bool>(OPT_QAVERTICAL, [&](bool aVertical)
@@ -93,12 +93,12 @@ CQuickAccess::CQuickAccess(
 	});
 
 	/* Preload default icons. */
-	this->TextureService->Load(ICON_NEXUS,                 RES_ICON_NEXUS,                 ctx->GetModule(), nullptr);
-	this->TextureService->Load(ICON_NEXUS_HOVER,           RES_ICON_NEXUS_HOVER,           ctx->GetModule(), nullptr);
-	this->TextureService->Load(ICON_NEXUS_HALLOWEEN,       RES_ICON_NEXUS_HALLOWEEN,       ctx->GetModule(), nullptr);
-	this->TextureService->Load(ICON_NEXUS_HALLOWEEN_HOVER, RES_ICON_NEXUS_HALLOWEEN_HOVER, ctx->GetModule(), nullptr);
-	this->TextureService->Load(ICON_NEXUS_XMAS,            RES_ICON_NEXUS_XMAS,            ctx->GetModule(), nullptr);
-	this->TextureService->Load(ICON_NEXUS_XMAS_HOVER,      RES_ICON_NEXUS_XMAS_HOVER,      ctx->GetModule(), nullptr);
+	this->TextureService->Load(ICON_NEXUS,                 RES_ICON_NEXUS,                 ctx.GetModule(), nullptr);
+	this->TextureService->Load(ICON_NEXUS_HOVER,           RES_ICON_NEXUS_HOVER,           ctx.GetModule(), nullptr);
+	this->TextureService->Load(ICON_NEXUS_HALLOWEEN,       RES_ICON_NEXUS_HALLOWEEN,       ctx.GetModule(), nullptr);
+	this->TextureService->Load(ICON_NEXUS_HALLOWEEN_HOVER, RES_ICON_NEXUS_HALLOWEEN_HOVER, ctx.GetModule(), nullptr);
+	this->TextureService->Load(ICON_NEXUS_XMAS,            RES_ICON_NEXUS_XMAS,            ctx.GetModule(), nullptr);
+	this->TextureService->Load(ICON_NEXUS_XMAS_HOVER,      RES_ICON_NEXUS_XMAS_HOVER,      ctx.GetModule(), nullptr);
 
 	/// FIXME: This is kinda hacky.
 	/// It forces the creation of the setting, so that the below subscriber gets executed on a first launch.
@@ -238,8 +238,8 @@ void CQuickAccess::Render()
 		}
 		case EQaPosition::Bottom:
 		{
-			CContext*        ctx      = CContext::GetContext();
-			RenderContext_t* renderer = ctx->GetRendererCtx();
+			Runtime&        ctx      = Runtime::Get();
+			RenderContext_t* renderer = ctx.GetRendererCtx();
 			wndPos.y += renderer->Window.Height - (s_IconBaseSize * 2 * this->NexusLink->Scaling);
 			break;
 		}
@@ -335,8 +335,8 @@ void CQuickAccess::AddShortcut(const char* aIdentifier, const char* aTextureIden
 			aTooltipText ? aTooltipText : ""
 		);
 
-		CContext*  ctx         = CContext::GetContext();
-		CSettings* settingsctx = ctx->GetSettingsCtx();
+		Runtime&  ctx         = Runtime::Get();
+		CSettings* settingsctx = ctx.GetSettingsCtx();
 
 		/* If the current shortcut ID is in the suppressed list. */
 		bool isSuppressed = std::find(this->SuppressedShortcuts.begin(), this->SuppressedShortcuts.end(), aIdentifier) != this->SuppressedShortcuts.end();

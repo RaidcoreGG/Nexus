@@ -9,7 +9,7 @@
 #include "UiBinds.h"
 
 #include "Core/Addons/Addon.h"
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Engine/Inputs/InputBinds/IbConst.h"
 #include "GW2/Inputs/GameBinds/GbConst.h"
 
@@ -57,9 +57,9 @@ void CUiBinds::UpdateDisplayInputBinds()
 
 	this->DisplayInputBinds.clear();
 
-	CContext* ctx = CContext::GetContext();
-	CInputBindApi* inputBindApi = ctx->GetInputBindApi();
-	CLoader* loader = ctx->GetLoader();
+	Runtime& ctx = Runtime::Get();
+	CInputBindApi* inputBindApi = ctx.GetInputBindApi();
+	CLoader* loader = ctx.GetLoader();
 
 	/* copy of all InputBinds */
 	std::map<std::string, IbMapping_t> InputBindRegistry = inputBindApi->GetRegistry();
@@ -130,8 +130,8 @@ void CUiBinds::UpdateDisplayGameBinds()
 
 	this->DisplayGameBinds.clear();
 
-	CContext* ctx = CContext::GetContext();
-	CGameBindsApi* gameBindsApi = ctx->GetGameBindsApi();
+	Runtime& ctx = Runtime::Get();
+	CGameBindsApi* gameBindsApi = ctx.GetGameBindsApi();
 
 	/* copy of all InputBinds */
 	std::unordered_map<EGameBinds, MultiInputBind_t> InputBindRegistry = gameBindsApi->GetRegistry();

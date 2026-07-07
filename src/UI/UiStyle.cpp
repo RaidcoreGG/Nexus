@@ -12,7 +12,7 @@
 
 #include "imgui/imgui.h"
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Core/Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
 #include "UiContext.h"
@@ -20,9 +20,9 @@
 
 CUiStyle::CUiStyle()
 {
-	CContext* ctx = CContext::GetContext();
-	this->Logger = ctx->GetLogger();
-	this->Settings = ctx->GetSettingsCtx();
+	Runtime& ctx = Runtime::Get();
+	this->Logger = ctx.GetLogger();
+	this->Settings = ctx.GetSettingsCtx();
 }
 
 CUiStyle::~CUiStyle()
@@ -40,7 +40,7 @@ void ApplyDefaultStyle()
 	}
 	catch (...)
 	{
-		CContext::GetContext()->GetLogger()->Debug(CH_UICONTEXT, "Error applying default style.");
+		Runtime::Get().GetLogger()->Debug(CH_UICONTEXT, "Error applying default style.");
 	}
 }
 

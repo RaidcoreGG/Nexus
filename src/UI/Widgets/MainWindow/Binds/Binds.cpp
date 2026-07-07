@@ -13,7 +13,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_extensions.h"
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Core/Index/Index.h"
 #include "Engine/Inputs/InputBinds/IbMapping.h"
 #include "GW2/Inputs/GameBinds/GbConst.h"
@@ -33,8 +33,8 @@ CBindsWindow::CBindsWindow()
 
 void CBindsWindow::RenderContent()
 {
-	CContext*       ctx      = CContext::GetContext();
-	CUiContext*     uictx    = ctx->GetUIContext();
+	Runtime&       ctx      = Runtime::Get();
+	CUiContext*     uictx    = ctx.GetUIContext();
 	CEscapeClosing* escclose = uictx->GetEscapeClosingService();
 	CLocalization*  langApi  = uictx->GetLocalization();
 
@@ -134,11 +134,11 @@ void CBindsWindow::RenderContent()
 						if (ImGui::Selectable(path.filename().string().c_str()))
 						{
 							/* Actually load the binds. */
-							CGameBindsApi* gameBindsApi = ctx->GetGameBindsApi();
+							CGameBindsApi* gameBindsApi = ctx.GetGameBindsApi();
 							gameBindsApi->Load(path);
 
 							/* Trigger refresh for display binds. */
-							CUiContext* uictx = ctx->GetUIContext();
+							CUiContext* uictx = ctx.GetUIContext();
 							uictx->Invalidate();
 						}
 					}
@@ -174,8 +174,8 @@ void CBindsWindow::RenderInputBindsTable(std::unordered_map<std::string, InputBi
 {
 	if (ImGui::BeginTable("table_inputbinds", 4, ImGuiTableFlags_BordersInnerH))
 	{
-		CContext*      ctx     = CContext::GetContext();
-		CUiContext*    uictx   = ctx->GetUIContext();
+		Runtime&      ctx     = Runtime::Get();
+		CUiContext*    uictx   = ctx.GetUIContext();
 		CLocalization* langApi = uictx->GetLocalization();
 
 		for (auto& [identifier, inputBind] : aInputBinds)
@@ -195,7 +195,7 @@ void CBindsWindow::RenderInputBindsTable(std::unordered_map<std::string, InputBi
 			ImGui::TableSetColumnIndex(2);
 			if (ImGui::Checkbox(("##Passthrough_" + identifier).c_str(), &inputBind.Bind.Passthrough))
 			{
-				CInputBindApi* ibapi = ctx->GetInputBindApi();
+				CInputBindApi* ibapi = ctx.GetInputBindApi();
 				ibapi->SetPassthrough(identifier, inputBind.Bind.Passthrough);
 			}
 			ImGui::TooltipGeneric(langApi->Translate("((000115))"));
@@ -221,8 +221,8 @@ void CBindsWindow::RenderGameInputBindsTable(std::unordered_map<EGameBinds, Game
 {
 	if (ImGui::BeginTable("table_gameinputbinds", 3, ImGuiTableFlags_BordersInnerH))
 	{
-		CContext*      ctx     = CContext::GetContext();
-		CUiContext*    uictx   = ctx->GetUIContext();
+		Runtime&      ctx     = Runtime::Get();
+		CUiContext*    uictx   = ctx.GetUIContext();
 		CLocalization* langApi = uictx->GetLocalization();
 
 		for (auto& [identifier, inputBind] : aInputBinds)
@@ -256,8 +256,8 @@ void CBindsWindow::DeleteStaleBind(const std::string& aIdentifier)
 {
 	if (aIdentifier.empty()) { return; }
 
-	CContext*      ctx          = CContext::GetContext();
-	CInputBindApi* inputBindApi = ctx->GetInputBindApi();
+	Runtime&      ctx          = Runtime::Get();
+	CInputBindApi* inputBindApi = ctx.GetInputBindApi();
 
 	inputBindApi->Delete(aIdentifier);
 }

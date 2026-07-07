@@ -14,7 +14,7 @@
 #include "imgui/imgui_extensions.h"
 
 #include "Core/Addons/Library/LibAddon.h"
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Core/Index/Index.h"
 #include "CtlAddonToggle.h"
 #include "res/ResConst.h"
@@ -53,9 +53,9 @@ CAddonsWindow::CAddonsWindow()
 
 	this->Invalidate();
 
-	CContext*  ctx         = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
-	CEventApi* evtapi      = ctx->GetEventApi();
+	Runtime&  ctx         = Runtime::Get();
+	CSettings* settingsctx = ctx.GetSettingsCtx();
+	CEventApi* evtapi      = ctx.GetEventApi();
 	
 	this->Filter     = settingsctx->Get(OPT_ADDONFILTERS, FILTER_INSTALLED);
 	this->IsListMode = settingsctx->Get(OPT_ISLISTMODE,   true            );
@@ -84,8 +84,8 @@ void CAddonsWindow::Invalidate(signed int aAddonID)
 
 void CAddonsWindow::SetContent(AddonListing_t& aAddonData)
 {
-	CContext* ctx = CContext::GetContext();
-	CUiContext* uictx = ctx->GetUIContext();
+	Runtime& ctx = Runtime::Get();
+	CUiContext* uictx = ctx.GetUIContext();
 
 	this->AddonData = aAddonData;
 	this->AddonData.InputBinds = uictx->GetInputBinds(this->AddonData.GetName());
@@ -124,11 +124,11 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 		return;
 	}
 
-	static CContext*       ctx      = CContext::GetContext();
-	static CUiContext*     uictx    = ctx->GetUIContext();
-	static CConfigMgr*     cfgmgr   = ctx->GetCfgMgr();
-	static CLibraryMgr*    libmgr   = ctx->GetAddonLibrary();
-	static CTextureLoader* texapi   = ctx->GetTextureService();
+	static Runtime&       ctx      = Runtime::Get();
+	static CUiContext*     uictx    = ctx.GetUIContext();
+	static CConfigMgr*     cfgmgr   = ctx.GetCfgMgr();
+	static CLibraryMgr*    libmgr   = ctx.GetAddonLibrary();
+	static CTextureLoader* texapi   = ctx.GetTextureService();
 	static CLocalization*  langApi  = uictx->GetLocalization();
 	static CAlerts*        alertctx = uictx->GetAlerts();
 
@@ -259,8 +259,8 @@ void CAddonsWindow::RenderContent()
 {
 	if (this->IsInvalid)
 	{
-		static CContext* ctx = CContext::GetContext();
-		static CUiContext* uictx = ctx->GetUIContext();
+		static Runtime& ctx = Runtime::Get();
+		static CUiContext* uictx = ctx.GetUIContext();
 		static CEscapeClosing* escclose = uictx->GetEscapeClosingService();
 
 		escclose->Deregister(this->GetVisibleStatePtr());
@@ -298,10 +298,10 @@ void CAddonsWindow::RenderContent()
 
 void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 {
-	CContext*       ctx         = CContext::GetContext();
-	CSettings*      settingsctx = ctx->GetSettingsCtx();
-	CTextureLoader* texapi      = ctx->GetTextureService();
-	CUiContext*     uictx       = ctx->GetUIContext();
+	Runtime&       ctx         = Runtime::Get();
+	CSettings*      settingsctx = ctx.GetSettingsCtx();
+	CTextureLoader* texapi      = ctx.GetTextureService();
+	CUiContext*     uictx       = ctx.GetUIContext();
 	CLocalization*  lang        = uictx->GetLocalization();
 
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -310,15 +310,15 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 	{
 		/* Static assets */
 		static char s_SearchTerm[400] = {};
-		static Texture_t* s_ClearIcon          = texapi->GetOrCreate("ICON_CLOSE",  RES_ICON_CLOSE,  ctx->GetModule());
-		static Texture_t* s_ViewModeIcon_List  = texapi->GetOrCreate("ICON_LIST",   RES_ICON_LIST,   ctx->GetModule());
-		static Texture_t* s_ViewModeIcon_Tiles = texapi->GetOrCreate("ICON_TILES",  RES_ICON_TILES,  ctx->GetModule());
-		static Texture_t* s_FilterIcon         = texapi->GetOrCreate("ICON_FILTER", RES_ICON_FILTER, ctx->GetModule());
+		static Texture_t* s_ClearIcon          = texapi->GetOrCreate("ICON_CLOSE",  RES_ICON_CLOSE,  ctx.GetModule());
+		static Texture_t* s_ViewModeIcon_List  = texapi->GetOrCreate("ICON_LIST",   RES_ICON_LIST,   ctx.GetModule());
+		static Texture_t* s_ViewModeIcon_Tiles = texapi->GetOrCreate("ICON_TILES",  RES_ICON_TILES,  ctx.GetModule());
+		static Texture_t* s_FilterIcon         = texapi->GetOrCreate("ICON_FILTER", RES_ICON_FILTER, ctx.GetModule());
 
-		if (!s_ClearIcon)          { s_ClearIcon          = texapi->GetOrCreate("ICON_CLOSE",  RES_ICON_CLOSE,  ctx->GetModule()); }
-		if (!s_ViewModeIcon_List)  { s_ViewModeIcon_List  = texapi->GetOrCreate("ICON_LIST",   RES_ICON_LIST,   ctx->GetModule()); }
-		if (!s_ViewModeIcon_Tiles) { s_ViewModeIcon_Tiles = texapi->GetOrCreate("ICON_TILES",  RES_ICON_TILES,  ctx->GetModule()); }
-		if (!s_FilterIcon)         { s_FilterIcon         = texapi->GetOrCreate("ICON_FILTER", RES_ICON_FILTER, ctx->GetModule()); }
+		if (!s_ClearIcon)          { s_ClearIcon          = texapi->GetOrCreate("ICON_CLOSE",  RES_ICON_CLOSE,  ctx.GetModule()); }
+		if (!s_ViewModeIcon_List)  { s_ViewModeIcon_List  = texapi->GetOrCreate("ICON_LIST",   RES_ICON_LIST,   ctx.GetModule()); }
+		if (!s_ViewModeIcon_Tiles) { s_ViewModeIcon_Tiles = texapi->GetOrCreate("ICON_TILES",  RES_ICON_TILES,  ctx.GetModule()); }
+		if (!s_FilterIcon)         { s_FilterIcon         = texapi->GetOrCreate("ICON_FILTER", RES_ICON_FILTER, ctx.GetModule()); }
 
 		/* Search Term */
 		if (ImGui::InputTextWithHint("##SearchTerm", lang->Translate("((000104))"), &s_SearchTerm[0], 400))
@@ -488,8 +488,8 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 
 void CAddonsWindow::RenderBody(ImVec2 aSize)
 {
-	CContext*       ctx   = CContext::GetContext();
-	CUiContext*     uictx = ctx->GetUIContext();
+	Runtime&       ctx   = Runtime::Get();
+	CUiContext*     uictx = ctx.GetUIContext();
 	CLocalization*  lang  = uictx->GetLocalization();
 
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -563,9 +563,9 @@ void CAddonsWindow::RenderDetails()
 		}
 		else
 		{
-			CContext* ctx = CContext::GetContext();
-			CTextureLoader* textureApi = ctx->GetTextureService();
-			chevronRt = textureApi->GetOrCreate("ICON_CHEVRON_RT", RES_ICON_CHEVRON_RT, ctx->GetModule());
+			Runtime& ctx = Runtime::Get();
+			CTextureLoader* textureApi = ctx.GetTextureService();
+			chevronRt = textureApi->GetOrCreate("ICON_CHEVRON_RT", RES_ICON_CHEVRON_RT, ctx.GetModule());
 		}
 	}
 	ImGui::EndChild();
@@ -575,8 +575,8 @@ void CAddonsWindow::RenderDetails()
 
 	if (ImGui::BeginChild("Details_Content", ImVec2(0, 0), false, ImGuiWindowFlags_NoBackground))
 	{
-		CContext*      ctx = CContext::GetContext();
-		CUiContext*    uictx = ctx->GetUIContext();
+		Runtime&      ctx = Runtime::Get();
+		CUiContext*    uictx = ctx.GetUIContext();
 		CLocalization* langApi = uictx->GetLocalization();
 
 		std::string id;
@@ -616,7 +616,7 @@ void CAddonsWindow::RenderDetails()
 		if (ImGui::CollapsingHeader(headerStr.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			Config_t*   config = this->AddonData.Addon->GetConfig();
-			CConfigMgr* cfgmgr = ctx->GetCfgMgr();
+			CConfigMgr* cfgmgr = ctx.GetCfgMgr();
 
 			/* TODO: Check Update Button */
 			/*if (addonData.NexusAddon->Definitions->Provider != EUpdateProvider::Self)
@@ -652,11 +652,11 @@ void CAddonsWindow::RenderDetails()
 									};
 
 									CContext* ctx = CContext::GetContext();
-									CUpdater* updater = ctx->GetUpdater();
-									CUiContext* uictx = ctx->GetUIContext();
+									CUpdater* updater = ctx.GetUpdater();
+									CUiContext* uictx = ctx.GetUIContext();
 									CAlerts* alertctx = uictx->GetAlerts();
 									CLocalization* langApi = uictx->GetLocalization();
-									CLoader* loader = ctx->GetLoader();
+									CLoader* loader = ctx.GetLoader();
 
 									if (updater->UpdateAddon(tmpPath, addonInfo, false, 5 * 60))
 									{
@@ -852,17 +852,17 @@ void CAddonsWindow::RenderDetails()
 
 void CAddonsWindow::RenderActionsBar(ImVec2& aSize)
 {
-	CContext*       ctx    = CContext::GetContext();
-	CTextureLoader* texapi = ctx->GetTextureService();
-	CLoader*        loader = ctx->GetLoader();
-	CUiContext*     uictx  = ctx->GetUIContext();
+	Runtime&       ctx    = Runtime::Get();
+	CTextureLoader* texapi = ctx.GetTextureService();
+	CLoader*        loader = ctx.GetLoader();
+	CUiContext*     uictx  = ctx.GetUIContext();
 	CLocalization*  lang   = uictx->GetLocalization();
 
 	if (ImGui::BeginChild("Actions", aSize, false, ImGuiWindowFlags_NoBackground))
 	{
 		/* Static assets */
-		static Texture_t* s_ReloadIcon = texapi->GetOrCreate("ICON_REFRESH", RES_ICON_REFRESH, ctx->GetModule());
-		if (!s_ReloadIcon) { s_ReloadIcon = texapi->GetOrCreate("ICON_REFRESH", RES_ICON_REFRESH, ctx->GetModule()); }
+		static Texture_t* s_ReloadIcon = texapi->GetOrCreate("ICON_REFRESH", RES_ICON_REFRESH, ctx.GetModule());
+		if (!s_ReloadIcon) { s_ReloadIcon = texapi->GetOrCreate("ICON_REFRESH", RES_ICON_REFRESH, ctx.GetModule()); }
 
 		/* Open addons folder */
 		if (ImGui::Button(lang->Translate("((000034))")))
@@ -923,9 +923,9 @@ void CAddonsWindow::RenderActionsBar(ImVec2& aSize)
 							};
 
 							CContext* ctx = CContext::GetContext();
-							CUiContext* uictx = ctx->GetUIContext();
+							CUiContext* uictx = ctx.GetUIContext();
 							CLocalization* langApi = uictx->GetLocalization();
-							CUpdater* updater = ctx->GetUpdater();
+							CUpdater* updater = ctx.GetUpdater();
 							CAlerts* alertctx = uictx->GetAlerts();
 
 							if (addon->Definitions->Provider != EUpdateProvider::Self && updater->UpdateAddon(tmpPath, addonInfo, false, 5 * 60))
@@ -1003,8 +1003,8 @@ void CAddonsWindow::RenderInputBindsTable(const std::unordered_map<std::string, 
 {
 	if (ImGui::BeginTable("table_inputbinds_addons", 2, ImGuiTableFlags_BordersInnerH))
 	{
-		CContext* ctx = CContext::GetContext();
-		CUiContext* uictx = ctx->GetUIContext();
+		Runtime& ctx = Runtime::Get();
+		CUiContext* uictx = ctx.GetUIContext();
 		CLocalization* langApi = uictx->GetLocalization();
 
 		for (auto& [identifier, inputBind] : aInputBinds)
@@ -1030,11 +1030,11 @@ void CAddonsWindow::PopulateAddons()
 {
 	this->Addons.clear();
 
-	CContext*    ctx = CContext::GetContext();
-	CUiContext*  uictx = ctx->GetUIContext();
-	CSettings*   settingsctx = ctx->GetSettingsCtx();
-	CLoader*     loader = ctx->GetLoader();
-	CLibraryMgr* libMgr = ctx->GetAddonLibrary();
+	Runtime&    ctx = Runtime::Get();
+	CUiContext*  uictx = ctx.GetUIContext();
+	CSettings*   settingsctx = ctx.GetSettingsCtx();
+	CLoader*     loader = ctx.GetLoader();
+	CLibraryMgr* libMgr = ctx.GetAddonLibrary();
 
 	this->Filter = settingsctx->Get<EAddonsFilterFlags>(OPT_ADDONFILTERS, FILTER_INSTALLED);
 

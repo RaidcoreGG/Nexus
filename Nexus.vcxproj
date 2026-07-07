@@ -15,7 +15,7 @@
     <ClCompile Include="src\Core\Addons\Config\CfgManager.cpp" />
     <ClCompile Include="src\Core\Addons\Library\LibAddon.cpp" />
     <ClCompile Include="src\Core\Addons\Library\LibManager.cpp" />
-    <ClCompile Include="src\Core\Context.cpp" />
+    <ClCompile Include="src\Runtime\Runtime.cpp" />
     <ClCompile Include="src\Core\Hooks\Hooks.cpp" />
     <ClCompile Include="src\Core\Updater\SelfUpdater.cpp" />
     <ClCompile Include="src\Engine\Cleanup\RefCleanerBase.cpp" />
@@ -38,7 +38,6 @@
     <ClCompile Include="src\Engine\Networking\WebRequests\WreClient.cpp" />
     <ClCompile Include="src\Engine\DataLink\DlApi.cpp" />
     <ClCompile Include="src\GW2\Mumble\MblConst.cpp" />
-    <ClCompile Include="src\Core\Main.cpp" />
     <ClCompile Include="src\Engine\Events\EvtApi.cpp" />
     <ClCompile Include="src\Engine\Logging\LogConst.cpp" />
     <ClCompile Include="src\Proxy\PxyD3D9.cpp" />
@@ -111,7 +110,7 @@
     <ClInclude Include="src\Core\Addons\Definitions\DefEnum.h" />
     <ClInclude Include="src\Core\Addons\Library\LibAddon.h" />
     <ClInclude Include="src\Core\Addons\Library\LibManager.h" />
-    <ClInclude Include="src\Core\Context.h" />
+    <ClInclude Include="src\Runtime\Runtime.h" />
     <ClInclude Include="src\Core\Hooks\HkConst.h" />
     <ClInclude Include="src\Core\Hooks\HkFuncDefs.h" />
     <ClInclude Include="src\Core\Hooks\Hooks.h" />
@@ -218,7 +217,6 @@
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbApi.h" />
     <ClInclude Include="src\Core\NexusLink.h" />
     <ClInclude Include="src\Engine\Logging\LogFuncDefs.h" />
-    <ClInclude Include="src\Core\Main.h" />
     <ClInclude Include="src\GW2\Multibox\Multibox.h" />
     <ClInclude Include="thirdparty\mumble\Mumble.h" />
     <ClInclude Include="thirdparty\nlohmann\json.hpp" />

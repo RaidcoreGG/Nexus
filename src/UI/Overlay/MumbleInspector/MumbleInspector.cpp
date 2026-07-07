@@ -8,12 +8,12 @@
 
 #include "MumbleInspector.h"
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Engine/DataLink/DlApi.h"
 
 CMumbleOverlay::CMumbleOverlay()
 {
-	CDataLinkApi* dlApi = CContext::GetContext()->GetDataLink();
+	CDataLinkApi* dlApi = Runtime::Get().GetDataLink();
 
 	this->MumbleLink     = (Mumble::Data*)    dlApi->GetResource(DL_MUMBLE_LINK);
 	this->MumbleIdentity = (Mumble::Identity*)dlApi->GetResource(DL_MUMBLE_LINK_IDENTITY);
@@ -26,7 +26,7 @@ void CMumbleOverlay::Render()
 
 	if (!this->MumbleLink || !this->MumbleIdentity || !this->NexusLink)
 	{
-		CDataLinkApi* dlApi = CContext::GetContext()->GetDataLink();
+		CDataLinkApi* dlApi = Runtime::Get().GetDataLink();
 
 		this->MumbleLink = (Mumble::Data*)dlApi->GetResource(DL_MUMBLE_LINK);
 		this->MumbleIdentity = (Mumble::Identity*)dlApi->GetResource(DL_MUMBLE_LINK_IDENTITY);

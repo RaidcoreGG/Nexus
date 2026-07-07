@@ -35,6 +35,11 @@ constexpr const char* CH_ADDON = "Addon";
 class CAddon : public virtual IAddon
 {
 	public:
+	static inline IAddon* Factory(std::filesystem::path aLocation)
+	{
+		return new CAddon(aLocation);
+	}
+
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
@@ -304,8 +309,3 @@ class CAddon : public virtual IAddon
 	///----------------------------------------------------------------------------------------------------
 	bool IsVolatileDisabled();
 };
-
-static inline IAddon* IAddonFactory(std::filesystem::path aLocation)
-{
-	return new CAddon(aLocation);
-}

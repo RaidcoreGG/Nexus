@@ -11,15 +11,15 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Core/Preferences/PrefConst.h"
 #include "Core/Preferences/PrefContext.h"
 #include "Util/Inputs.h"
 
 CEscapeClosing::CEscapeClosing() : IRefCleaner("EscapeClosing")
 {
-	CContext* ctx = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
+	Runtime& ctx = Runtime::Get();
+	CSettings* settingsctx = ctx.GetSettingsCtx();
 
 	settingsctx->Subscribe<bool>(OPT_CLOSEESCAPE, [&](bool aNewValue)
 	{

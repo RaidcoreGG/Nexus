@@ -8,7 +8,7 @@
 
 #include "LibManager.h"
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Core/Index/Index.h"
 #include "Core/Addons/AddEnum.h"
 #include "Util/Strings.h"
@@ -91,7 +91,7 @@ void CLibraryMgr::AddSource(std::string aURL)
 		return;
 	}
 
-	this->Sources.emplace(aURL, CContext::GetContext()->GetHttpClient(aURL));
+	this->Sources.emplace(aURL, Runtime::Get().GetHttpClient(aURL));
 }
 
 void CLibraryMgr::Install(uint32_t aSignature)
@@ -125,7 +125,7 @@ void CLibraryMgr::Install(uint32_t aSignature)
 
 	if (String::Contains(downloadUrl, "https://github.com"))
 	{
-		CHttpClient* ghapiclient = CContext::GetContext()->GetHttpClient("https://api.github.com");
+		CHttpClient* ghapiclient = Runtime::Get().GetHttpClient("https://api.github.com");
 
 		HttpResponse_t result = ghapiclient->Get("/repos" + URL::GetEndpoint(downloadUrl) + "/releases/latest");
 

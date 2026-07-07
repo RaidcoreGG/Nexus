@@ -15,7 +15,7 @@
 #include <windows.h>
 
 #include "Core/Addons/API/ApiBuilder.h"
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Core/Index/Index.h"
 #include "Engine/Cleanup/RefCleanerContext.h"
 #include "GW2/Build/BuildInfo.h"
@@ -34,11 +34,11 @@ CAddon::CAddon(std::filesystem::path aLocation)
 	this->Location = aLocation;
 	this->MD5 = MD5Util::FromFile(aLocation);
 
-	CContext* ctx = CContext::GetContext();
-	this->Logger = ctx->GetLogger();
-	this->Loader = ctx->GetLoader();
-	this->EventApi = ctx->GetEventApi();
-	this->ConfigMgr = ctx->GetCfgMgr();
+	Runtime& ctx = Runtime::Get();
+	this->Logger = ctx.GetLogger();
+	this->Loader = ctx.GetLoader();
+	this->EventApi = ctx.GetEventApi();
+	this->ConfigMgr = ctx.GetCfgMgr();
 
 	/* Does the initial enumerate addon interfaces and raises a create event. */
 	this->QueuedActions.push(EAddonAction::Create);
@@ -1020,9 +1020,9 @@ void CAddon::CheckUpdateViaGitHub()
 {
 	assert(!this->NexusAddonDefV1->GetUpdateLink().empty());
 
-	CContext* context = CContext::GetContext();
+	Runtime& context = Runtime::Get();
 
-	CHttpClient* client = context->GetHttpClient("https://api.github.com");
+	CHttpClient* client = context.GetHttpClient("https://api.github.com");
 
 	HttpResponse_t response = client->Get("/repos" + URL::GetEndpoint(this->NexusAddonDefV1->GetUpdateLink()) + "/releases");
 
@@ -1102,9 +1102,9 @@ void CAddon::CheckUpdateViaDirect()
 {
 	assert(!this->NexusAddonDefV1->GetUpdateLink().empty());
 
-	CContext* context = CContext::GetContext();
+	Runtime& context = Runtime::Get();
 
-	CHttpClient* client = context->GetHttpClient(this->NexusAddonDefV1->GetUpdateLink());
+	CHttpClient* client = context.GetHttpClient(this->NexusAddonDefV1->GetUpdateLink());
 
 	HttpResponse_t response = client->Get(URL::GetEndpoint(this->NexusAddonDefV1->GetUpdateLink()) + ".md5");
 
@@ -1277,9 +1277,9 @@ bool CAddon::DownloadUpdate()
 	/* <GW2>/addons/Nexus/Temp/<filename>_<random>.dll */
 	std::filesystem::path tmpDownload = Index(EPath::DIR_TEMP) / (this->Location.stem().string() + std::format("_{:08X}", rand()) + ".dll");
 
-	CContext* context = CContext::GetContext();
+	Runtime& context = Runtime::Get();
 
-	CHttpClient* client = context->GetHttpClient(this->UpdateRemote);
+	CHttpClient* client = context.GetHttpClient(this->UpdateRemote);
 	
 	HttpResponse_t response = client->Download(tmpDownload, URL::GetEndpoint(this->UpdateRemote));
 

@@ -19,7 +19,7 @@ using json = nlohmann::json;
 using namespace Mumble;
 
 #include "Util/CmdLine.h"
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "MblExtensions.h"
 
 CMumbleReader::CMumbleReader(CDataLinkApi* aDataLink, CEventApi* aEventApi, CLogApi* aLogger)
@@ -133,8 +133,8 @@ void CMumbleReader::AdvanceIdentity()
 
 void CMumbleReader::AdvanceDerived()
 {
-	CContext*        ctx      = CContext::GetContext();
-	RenderContext_t* renderer = ctx->GetRendererCtx();
+	Runtime&        ctx      = Runtime::Get();
+	RenderContext_t* renderer = ctx.GetRendererCtx();
 
 	bool tickChanged  = this->PreviousTick != this->MumbleLink->UITick;
 	bool gameFrozen   = this->PreviousFrameCounter == renderer->Metrics.FrameCount;

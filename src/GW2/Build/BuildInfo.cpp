@@ -10,13 +10,13 @@
 
 #include <mutex>
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
 
 uint32_t GW2::GetGameBuild()
 {
 	static uint32_t s_GameBuild = 0;
-	static CLogApi* s_Logger = CContext::GetContext()->GetLogger();
+	static CLogApi* s_Logger = Runtime::Get().GetLogger();
 	static std::mutex s_Mutex;
 
 	const std::lock_guard<std::mutex> lock(s_Mutex);

@@ -13,7 +13,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_extensions.h"
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Core/Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
 #include "res/ResConst.h"
@@ -40,8 +40,8 @@ void COptionsWindow::RenderContent()
 {
 	if (this->IsInvalid)
 	{
-		static CContext* ctx = CContext::GetContext();
-		static CUiContext* uictx = ctx->GetUIContext();
+		static Runtime& ctx = Runtime::Get();
+		static CUiContext* uictx = ctx.GetUIContext();
 		static CEscapeClosing* escclose = uictx->GetEscapeClosingService();
 
 		escclose->Deregister(this->GetVisibleStatePtr());
@@ -73,9 +73,9 @@ void COptionsWindow::RenderSubWindows()
 
 void COptionsWindow::TabGeneral()
 {
-	static CContext* ctx = CContext::GetContext();
-	static CSettings* settingsctx = ctx->GetSettingsCtx();
-	static CUiContext* uictx = ctx->GetUIContext();
+	static Runtime& ctx = Runtime::Get();
+	static CSettings* settingsctx = ctx.GetSettingsCtx();
+	static CUiContext* uictx = ctx.GetUIContext();
 	static CLocalization* langApi = uictx->GetLocalization();
 	static CQuickAccess* qactx = uictx->GetQuickAccess();
 
@@ -122,7 +122,7 @@ void COptionsWindow::TabGeneral()
 				if (ImGui::Checkbox(langApi->Translate("((Experimental: Clicking requires modifiers))"), &clickingRequiresMods))
 				{
 					settingsctx->Set(OPT_UI_CLICK_MODSONLY, clickingRequiresMods);
-					CContext::GetContext()->GetUIContext()->Invalidate();
+					Runtime::Get().GetUIContext()->Invalidate();
 				}
 
 				if (clickingRequiresMods)
@@ -144,7 +144,7 @@ void COptionsWindow::TabGeneral()
 							mods &= ~EModifiers::Alt;
 						}
 						settingsctx->Set(OPT_UI_MODS, mods);
-						CContext::GetContext()->GetUIContext()->Invalidate();
+						Runtime::Get().GetUIContext()->Invalidate();
 					}
 					ImGui::SameLine();
 					static bool modCtrl = (mods & EModifiers::Ctrl) == EModifiers::Ctrl;
@@ -159,7 +159,7 @@ void COptionsWindow::TabGeneral()
 							mods &= ~EModifiers::Ctrl;
 						}
 						settingsctx->Set(OPT_UI_MODS, mods);
-						CContext::GetContext()->GetUIContext()->Invalidate();
+						Runtime::Get().GetUIContext()->Invalidate();
 					}
 					ImGui::SameLine();
 					static bool modShift = (mods & EModifiers::Shift) == EModifiers::Shift;
@@ -174,7 +174,7 @@ void COptionsWindow::TabGeneral()
 							mods &= ~EModifiers::Shift;
 						}
 						settingsctx->Set(OPT_UI_MODS, mods);
-						CContext::GetContext()->GetUIContext()->Invalidate();
+						Runtime::Get().GetUIContext()->Invalidate();
 					}
 					ImGui::EndGroup();
 				}
@@ -348,7 +348,7 @@ void COptionsWindow::TabGeneral()
 					ImGui::EndCombo();
 				}
 
-				RenderContext_t* renderer = ctx->GetRendererCtx();
+				RenderContext_t* renderer = ctx.GetRendererCtx();
 
 				/* offset */
 				static ImVec2 s_Offset{};
@@ -373,9 +373,9 @@ void COptionsWindow::TabGeneral()
 
 void COptionsWindow::TabStyle()
 {
-	CContext* ctx = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
-	CUiContext* uictx = ctx->GetUIContext();
+	Runtime& ctx = Runtime::Get();
+	CSettings* settingsctx = ctx.GetSettingsCtx();
+	CUiContext* uictx = ctx.GetUIContext();
 	CLocalization* langApi = uictx->GetLocalization();
 
 	if (ImGui::BeginTabItem(langApi->Translate("((000053))")))
@@ -519,7 +519,7 @@ void COptionsWindow::TabStyle()
 								}
 								else
 								{
-									s_TexCross = CContext::GetContext()->GetTextureService()->GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx->GetModule());
+									s_TexCross = Runtime::Get().GetTextureService()->GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx.GetModule());
 								}
 
 								/* Display the filename without extension. */

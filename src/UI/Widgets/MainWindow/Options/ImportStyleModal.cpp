@@ -8,7 +8,7 @@
 
 #include "ImportStyleModal.h"
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 
 CImportStyleModal::CImportStyleModal()
 {
@@ -40,8 +40,8 @@ void CImportStyleModal::OnClosing()
 	{
 		case EModalResult::OK:
 		{
-			CContext* ctx = CContext::GetContext();
-			CUiContext* uictx = ctx->GetUIContext();
+			Runtime& ctx = Runtime::Get();
+			CUiContext* uictx = ctx.GetUIContext();
 
 			uictx->ApplyStyle(EUIStyle::Code, this->DataBuffer);
 

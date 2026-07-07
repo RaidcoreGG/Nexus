@@ -8,7 +8,7 @@
 
 #include "BindSetterModal.h"
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "GW2/Inputs/GameBinds/GbConst.h"
 #include "Engine/Inputs/InputBinds/IbConst.h"
 
@@ -20,10 +20,10 @@ CBindSetterModal::CBindSetterModal()
 
 void CBindSetterModal::RenderContent()
 {
-	CContext*      ctx   = CContext::GetContext();
-	CUiContext*    uictx = ctx->GetUIContext();
+	Runtime&      ctx   = Runtime::Get();
+	CUiContext*    uictx = ctx.GetUIContext();
 	CLocalization* lang  = uictx->GetLocalization();
-	CInputBindApi* ibapi = ctx->GetInputBindApi();
+	CInputBindApi* ibapi = ctx.GetInputBindApi();
 
 	this->Capture = ibapi->GetCapture();
 
@@ -72,9 +72,9 @@ void CBindSetterModal::RenderContent()
 
 void CBindSetterModal::OnOpening()
 {
-	CContext*      ctx   = CContext::GetContext();
-	CInputBindApi* ibapi = ctx->GetInputBindApi();
-	CGameBindsApi* gbapi = ctx->GetGameBindsApi();
+	Runtime&      ctx   = Runtime::Get();
+	CInputBindApi* ibapi = ctx.GetInputBindApi();
+	CGameBindsApi* gbapi = ctx.GetGameBindsApi();
 
 	/* Fetch display text. */
 	switch (this->Type)
@@ -113,9 +113,9 @@ void CBindSetterModal::OnOpening()
 
 void CBindSetterModal::OnClosing()
 {
-	CContext*      ctx   = CContext::GetContext();
-	CInputBindApi* ibapi = ctx->GetInputBindApi();
-	CGameBindsApi* gbapi = ctx->GetGameBindsApi();
+	Runtime&      ctx   = Runtime::Get();
+	CInputBindApi* ibapi = ctx.GetInputBindApi();
+	CGameBindsApi* gbapi = ctx.GetGameBindsApi();
 	ibapi->EndCapturing();
 
 	switch (this->GetResult())
@@ -213,8 +213,8 @@ void CBindSetterModal::SetTarget(EGameBinds aBindIdentifier, bool aIsPrimary)
 
 void CBindSetterModal::SetTitle()
 {
-	CContext*      ctx   = CContext::GetContext();
-	CUiContext*    uictx = ctx->GetUIContext();
+	Runtime&      ctx   = Runtime::Get();
+	CUiContext*    uictx = ctx.GetUIContext();
 	CLocalization* lang  = uictx->GetLocalization();
 
 	/* Override the title before opening the modal. */

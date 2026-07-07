@@ -13,9 +13,9 @@
 #include <dxgi.h>
 #include <windows.h>
 
-#include "Core/Main.h"
 #include "Proxy.h"
 #include "PxyEnum.h"
+#include "Runtime/Runtime.h"
 #include "Util/CmdLine.h"
 
 static ProxyModule_t s_ProxyModule{};
@@ -36,7 +36,7 @@ PROXY HRESULT __stdcall D3D11CreateDevice(
 )
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::D3D11_CREATEDEVICE);
+	Runtime::Get().Initialize(EProxyFunction::D3D11_CREATEDEVICE);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -79,7 +79,7 @@ PROXY HRESULT __stdcall D3D11CreateDeviceAndSwapChain(
 )
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::D3D11_CREATEDEVICEANDSWAPCHAIN);
+	Runtime::Get().Initialize(EProxyFunction::D3D11_CREATEDEVICEANDSWAPCHAIN);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -118,7 +118,7 @@ PROXY HRESULT __stdcall D3D11CoreCreateDevice(
 )
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::D3D11_CORECREATEDEVICE);
+	Runtime::Get().Initialize(EProxyFunction::D3D11_CORECREATEDEVICE);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -145,7 +145,7 @@ PROXY HRESULT __stdcall D3D11CoreCreateLayeredDevice(
 )
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::D3D11_CORECREATELAYEREDDEVICE);
+	Runtime::Get().Initialize(EProxyFunction::D3D11_CORECREATELAYEREDDEVICE);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -168,7 +168,7 @@ PROXY SIZE_T __stdcall D3D11CoreGetLayeredDeviceSize(
 )
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::D3D11_COREGETLAYEREDDEVICESIZE);
+	Runtime::Get().Initialize(EProxyFunction::D3D11_COREGETLAYEREDDEVICESIZE);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -188,7 +188,7 @@ PROXY HRESULT __stdcall D3D11CoreRegisterLayers(
 )
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::D3D11_COREREGISTERLAYERS);
+	Runtime::Get().Initialize(EProxyFunction::D3D11_COREREGISTERLAYERS);
 
 	static thread_local bool s_InProxyCall = false;
 

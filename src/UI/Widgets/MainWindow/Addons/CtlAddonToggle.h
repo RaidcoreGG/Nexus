@@ -14,7 +14,7 @@
 #include "imgui/imgui_extensions.h"
 
 #include "Core/Addons/Addon.h"
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// AddonToggleCtl Namespace
@@ -66,8 +66,8 @@ namespace AddonToggleCtl
 
 		bool result = false;
 
-		CContext*   ctx    = CContext::GetContext();
-		CConfigMgr* cfgmgr = ctx->GetCfgMgr();
+		Runtime&   ctx    = Runtime::Get();
+		CConfigMgr* cfgmgr = ctx.GetCfgMgr();
 
 		Config_t* config = aAddon->GetConfig();
 

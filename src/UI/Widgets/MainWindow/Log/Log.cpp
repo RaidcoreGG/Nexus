@@ -12,7 +12,7 @@
 
 #include "imgui/imgui_extensions.h"
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "res/ResConst.h"
 #include "Engine/Logging/LogConst.h"
 
@@ -30,8 +30,8 @@ void CLogWindow::RenderContent()
 {
 	if (this->IsInvalid)
 	{
-		static CContext* ctx = CContext::GetContext();
-		static CUiContext* uictx = ctx->GetUIContext();
+		static Runtime& ctx = Runtime::Get();
+		static CUiContext* uictx = ctx.GetUIContext();
 		static CEscapeClosing* escclose = uictx->GetEscapeClosingService();
 
 		escclose->Deregister(this->GetVisibleStatePtr());

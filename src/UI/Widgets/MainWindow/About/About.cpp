@@ -13,7 +13,7 @@
 #include "imgui/imgui.h"
 #include "ImAnimate/ImAnimate.h"
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "res/ResConst.h"
 
 CAboutBox::CAboutBox()
@@ -35,9 +35,9 @@ void CAboutBox::RenderContent()
 		this->IsInvalid = false;
 	}
 
-	CContext*       ctx         = CContext::GetContext();
-	CTextureLoader* texapi      = ctx->GetTextureService();
-	CSelfUpdater*   selfupdater = ctx->GetSelfUpdater();
+	Runtime&       ctx         = Runtime::Get();
+	CTextureLoader* texapi      = ctx.GetTextureService();
+	CSelfUpdater*   selfupdater = ctx.GetSelfUpdater();
 
 	if (ImGui::CollapsingHeader("About", ImGuiTreeNodeFlags_DefaultOpen))
 	{
@@ -84,7 +84,7 @@ void CAboutBox::RenderContent()
 			}
 			else
 			{
-				this->Tex_BannerDiscord = texapi->GetOrCreate("BANNER_DISCORD", RES_BANNER_DISCORD, ctx->GetModule());
+				this->Tex_BannerDiscord = texapi->GetOrCreate("BANNER_DISCORD", RES_BANNER_DISCORD, ctx.GetModule());
 			}
 		}
 		ImGui::EndChild();
@@ -123,7 +123,7 @@ void CAboutBox::RenderContent()
 			}
 			else
 			{
-				this->Tex_BannerPatreon = texapi->GetOrCreate("BANNER_PATREON", RES_BANNER_PATREON, ctx->GetModule());
+				this->Tex_BannerPatreon = texapi->GetOrCreate("BANNER_PATREON", RES_BANNER_PATREON, ctx.GetModule());
 			}
 		}
 		ImGui::EndChild();

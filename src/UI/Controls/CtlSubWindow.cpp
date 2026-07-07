@@ -12,7 +12,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "res/ResConst.h"
 
 void ISubWindow::Render()
@@ -28,8 +28,8 @@ void ISubWindow::Render()
 
 	if (popout)
 	{
-		CContext* ctx = CContext::GetContext();
-		CUiContext* uictx = ctx->GetUIContext();
+		Runtime& ctx = Runtime::Get();
+		CUiContext* uictx = ctx.GetUIContext();
 		CLocalization* langApi = uictx->GetLocalization();
 
 		std::string wndName = langApi->Translate(this->DisplayName.c_str());
@@ -70,8 +70,8 @@ void ISubWindow::Render()
 	}
 	else
 	{
-		CContext* ctx = CContext::GetContext();
-		this->Tex_PopoutIcon = ctx->GetTextureService()->GetOrCreate("ICON_POPOUT", RES_ICON_POPOUT, ctx->GetModule());
+		Runtime& ctx = Runtime::Get();
+		this->Tex_PopoutIcon = ctx.GetTextureService()->GetOrCreate("ICON_POPOUT", RES_ICON_POPOUT, ctx.GetModule());
 	}
 
 	if (popout)
@@ -89,8 +89,8 @@ const Texture_t* ISubWindow::GetIcon()
 {
 	if (!this->Tex_Icon && !this->IconIdentifier.empty() && this->IconID)
 	{
-		CContext* ctx = CContext::GetContext();
-		this->Tex_Icon = ctx->GetTextureService()->GetOrCreate(this->IconIdentifier.c_str(), this->IconID, ctx->GetModule());
+		Runtime& ctx = Runtime::Get();
+		this->Tex_Icon = ctx.GetTextureService()->GetOrCreate(this->IconIdentifier.c_str(), this->IconID, ctx.GetModule());
 	}
 
 	return this->Tex_Icon;
@@ -113,8 +113,8 @@ bool ISubWindow::HasSubWindows()
 
 std::string ISubWindow::GetNameID()
 {
-	static CContext* ctx = CContext::GetContext();
-	static CUiContext* uictx = ctx->GetUIContext();
+	static Runtime& ctx = Runtime::Get();
+	static CUiContext* uictx = ctx.GetUIContext();
 	static CLocalization* langApi = uictx->GetLocalization();
 
 	std::string wndName = langApi->Translate(this->DisplayName.c_str());

@@ -10,7 +10,7 @@
 
 #include <windows.h>
 
-#include "Core/Context.h"
+#include "Runtime/Runtime.h"
 #include "Core/Preferences/PrefConst.h"
 
 ///----------------------------------------------------------------------------------------------------
@@ -19,8 +19,8 @@
 ///----------------------------------------------------------------------------------------------------
 inline UINT MouseResetFix(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	static CContext*  s_Context     = CContext::GetContext();
-	static CSettings* s_SettingsCtx = s_Context->GetSettingsCtx();
+	static Runtime&  s_Context     = Runtime::Get();
+	static CSettings* s_SettingsCtx = s_Context.GetSettingsCtx();
 
 	static bool s_LockCursor = false;
 	static bool s_ResetCursor = false;
