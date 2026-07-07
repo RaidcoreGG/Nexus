@@ -13,7 +13,7 @@
 #include <windows.h>
 
 #ifndef PROXY
-#define PROXY extern "C" __declspec(dllexport)
+#define PROXY extern "C"
 #endif
 
 #ifndef PROTECT_RECURSE

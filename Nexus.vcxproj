@@ -41,6 +41,7 @@
     <ClCompile Include="src\Core\Main.cpp" />
     <ClCompile Include="src\Engine\Events\EvtApi.cpp" />
     <ClCompile Include="src\Engine\Logging\LogConst.cpp" />
+    <ClCompile Include="src\Proxy\PxyD3D9.cpp" />
     <ClCompile Include="src\Proxy\PxyDXGI.cpp" />
     <ClCompile Include="thirdparty\ImAnimate\ImAnimate.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui.cpp" />
@@ -116,6 +117,8 @@
     <ClInclude Include="src\Core\Hooks\Hooks.h" />
     <ClInclude Include="src\Core\Preferences\PrefConst.h" />
     <ClInclude Include="src\Proxy\Proxy.h" />
+    <ClInclude Include="src\Proxy\PxyD3D11.h" />
+    <ClInclude Include="src\Proxy\PxyD3D9.h" />
     <ClInclude Include="src\Proxy\PxyDXGI.h" />
     <ClInclude Include="src\Proxy\PxyEnum.h" />
     <ClInclude Include="src\Core\Updater\SelfUpdater.h" />
@@ -369,7 +372,6 @@
     <ClInclude Include="thirdparty\minhook\mh_trampoline.h" />
     <ClInclude Include="src\GW2\Mumble\MblReader.h" />
     <ClInclude Include="src\Core\Index\IdxFuncDefs.h" />
-    <ClInclude Include="src\Proxy\PxyD3D11.h" />
     <ClInclude Include="res\ResConst.h" />
     <ClInclude Include="src\Core\Preferences\PrefContext.h" />
     <ClInclude Include="thirdparty\pugixml\pugiconfig.hpp" />
@@ -433,6 +435,9 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="res\Nexus.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Proxy\Proxy.def" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -500,8 +505,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <ModuleDefinitionFile>
-      </ModuleDefinitionFile>
+      <ModuleDefinitionFile>src\Proxy\Proxy.def</ModuleDefinitionFile>
       <AdditionalDependencies>advapi32.lib;crypt32.lib;DbgHelp.lib;gdi32.lib;ntdll.lib;PathCch.lib;Psapi.lib;shcore.lib;Shell32.lib;Shlwapi.lib;user32.lib;ws2_32.lib;libssl64MTd.lib;libcrypto64MTd.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
@@ -540,8 +544,7 @@ CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <ModuleDefinitionFile>
-      </ModuleDefinitionFile>
+      <ModuleDefinitionFile>src\Proxy\Proxy.def</ModuleDefinitionFile>
       <AdditionalDependencies>advapi32.lib;crypt32.lib;DbgHelp.lib;gdi32.lib;ntdll.lib;PathCch.lib;Psapi.lib;shcore.lib;Shell32.lib;Shlwapi.lib;user32.lib;ws2_32.lib;libssl64MT.lib;libcrypto64MT.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>

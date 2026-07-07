@@ -1,0 +1,25 @@
+EXPORTS
+
+; D3D9
+Direct3DCreate9
+Direct3DCreate9Ex
+D3DPERF_BeginEvent
+D3DPERF_EndEvent
+D3DPERF_SetMarker
+D3DPERF_SetRegion
+D3DPERF_QueryRepeatFrame
+D3DPERF_SetOptions
+D3DPERF_GetStatus
+
+; D3D11
+D3D11CreateDevice
+D3D11CreateDeviceAndSwapChain
+D3D11CoreCreateDevice
+D3D11CoreRegisterLayers
+
+; DXGI
+CreateDXGIFactory
+CreateDXGIFactory1
+CreateDXGIFactory2
+DXGIGetDebugInterface1
+DXGIDeclareAdapterRemovalSupport
