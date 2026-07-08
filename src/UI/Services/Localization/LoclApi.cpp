@@ -77,17 +77,17 @@ CLocalization::CLocalization(CLogApi* aLogger)
 	CEventApi* evtapi = ctx.GetEventApi();
 
 	this->SetLocaleDirectory(Index(EPath::DIR_LOCALES));
-	Resources::Unpack(ctx.GetModule(), Index(EPath::LocaleEN), RES_LOCALE_EN, "JSON");
-	Resources::Unpack(ctx.GetModule(), Index(EPath::LocaleDE), RES_LOCALE_DE, "JSON");
-	Resources::Unpack(ctx.GetModule(), Index(EPath::LocaleFR), RES_LOCALE_FR, "JSON");
-	Resources::Unpack(ctx.GetModule(), Index(EPath::LocaleES), RES_LOCALE_ES, "JSON");
-	Resources::Unpack(ctx.GetModule(), Index(EPath::LocaleCN), RES_LOCALE_CN, "JSON");
-	Resources::Unpack(ctx.GetModule(), Index(EPath::LocaleKR), RES_LOCALE_KR, "JSON");
-	Resources::Unpack(ctx.GetModule(), Index(EPath::LocaleBR), RES_LOCALE_BR, "JSON");
-	Resources::Unpack(ctx.GetModule(), Index(EPath::LocaleCZ), RES_LOCALE_CZ, "JSON");
-	Resources::Unpack(ctx.GetModule(), Index(EPath::LocaleIT), RES_LOCALE_IT, "JSON");
-	Resources::Unpack(ctx.GetModule(), Index(EPath::LocalePL), RES_LOCALE_PL, "JSON");
-	Resources::Unpack(ctx.GetModule(), Index(EPath::LocaleRU), RES_LOCALE_RU, "JSON");
+	Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleEN), RES_LOCALE_EN, "JSON");
+	Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleDE), RES_LOCALE_DE, "JSON");
+	Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleFR), RES_LOCALE_FR, "JSON");
+	Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleES), RES_LOCALE_ES, "JSON");
+	Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleCN), RES_LOCALE_CN, "JSON");
+	Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleKR), RES_LOCALE_KR, "JSON");
+	Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleBR), RES_LOCALE_BR, "JSON");
+	Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleCZ), RES_LOCALE_CZ, "JSON");
+	Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleIT), RES_LOCALE_IT, "JSON");
+	Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocalePL), RES_LOCALE_PL, "JSON");
+	Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleRU), RES_LOCALE_RU, "JSON");
 
 	std::string lang = settingsctx->Get<std::string>(OPT_LANGUAGE, "en");
 	this->SetLanguage(!lang.empty() ? lang : "en");

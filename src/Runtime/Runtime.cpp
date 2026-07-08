@@ -27,7 +27,6 @@ namespace Clockwork = Raidcore::Clockwork;
 #include "Runtime/Runtime.h"
 #include "Core/Hooks/Hooks.h"
 #include "Core/Index/Index.h"
-#include "Engine/CrashHandler/CrashHandler.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Logging/LogConsole.h"
 #include "Engine/Logging/LogWriter.h"
@@ -60,7 +59,8 @@ namespace Clockwork = Raidcore::Clockwork;
 #include "Engine/Networking/WebRequests/WreClient.h"
 #include "UI/Renderer/RdrContext.h"
 #include "UI/Textures/TxLoader.h"
-#include "GW2/GameContext.h"
+#include "GW2/Gw2Context.h"
+#include "Platform/PlContext.h"
 #include "Proxy/PxyEnum.h"
 
 namespace Raidcore::Nexus
@@ -103,7 +103,7 @@ namespace Raidcore::Nexus
 		);
 
 		/* Initialize crash handler. */
-		CCrashHandler* crashhandler = ctx.GetCrashHandler();
+		CCrashHandler& crashhandler = ctx.Platform().CrashHandler();
 
 		/* Initialize self updater here so it can lock this instance and update. */
 		CSelfUpdater* selfupdater = ctx.GetSelfUpdater();
@@ -111,7 +111,7 @@ namespace Raidcore::Nexus
 		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [](Clockwork::CancellationToken aToken)
 		{
 			Runtime& ctx = Runtime::Get();
-			Resources::Unpack(ctx.GetModule(), Index(EPath::ThirdPartySoftwareReadme), RES_THIRDPARTYNOTICES, "TXT");
+			Resources::Unpack(ctx.Platform().Module(), Index(EPath::ThirdPartySoftwareReadme), RES_THIRDPARTYNOTICES, "TXT");
 		});
 
 		/* Allocate console logger, if requested. */
@@ -242,28 +242,14 @@ namespace Raidcore::Nexus
 #endif
 	}
 
-	HMODULE Runtime::GetModule()
+	Platform::Context& Runtime::Platform()
 	{
-		return this->Module;
+		return *this->_PlatformContext;
 	}
 
-	DWORD Runtime::GetModuleSize()
-	{
-		return this->ModuleSize;
-	}
-
-	GW2::GameContext& Runtime::Game()
+	GW2::Context& Runtime::Game()
 	{
 		return *this->_GameContext;
-	}
-
-	CCrashHandler* Runtime::GetCrashHandler()
-	{
-		static CCrashHandler s_CrashHandler = CCrashHandler(
-			Index(EPath::CrashLog),
-			Index(EPath::CrashStack)
-		);
-		return &s_CrashHandler;
 	}
 
 	RenderContext_t* Runtime::GetRendererCtx()
@@ -464,22 +450,14 @@ namespace Raidcore::Nexus
 
 	Runtime::Runtime()
 	{
-		HMODULE hmodule = nullptr;
-		GetModuleHandleExA(
-			GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
-			(LPCSTR)&Runtime::Get,
-			&hmodule
+		CreateIndex(GetModuleHandle(NULL));
+
+		this->_PlatformContext = std::make_unique<Platform::Context>(
+			Index(EPath::CrashLog),
+			Index(EPath::CrashStack)
 		);
 
-		MODULEINFO moduleInfo{};
-		GetModuleInformation(GetCurrentProcess(), hmodule, &moduleInfo, sizeof(moduleInfo));
-
-		this->Module = hmodule;
-		this->ModuleSize = moduleInfo.SizeOfImage;
-
-		CreateIndex(this->Module);
-
-		this->_GameContext = std::make_unique<GW2::GameContext>(
+		this->_GameContext = std::make_unique<GW2::Context>(
 			*this->GetDataLink(),
 			*this->GetEventApi(),
 			*this->GetLogger(),
@@ -496,6 +474,12 @@ namespace Raidcore::Nexus
 		{
 			this->_GameContext->Shutdown();
 			this->_GameContext.reset();
+		}
+
+		if (this->_PlatformContext)
+		{
+			this->_PlatformContext->Shutdown();
+			this->_PlatformContext.reset();
 		}
 
 		const std::lock_guard<std::mutex> lock(this->HttpClientMutex);

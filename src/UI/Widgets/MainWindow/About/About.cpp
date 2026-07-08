@@ -86,7 +86,7 @@ void CAboutBox::RenderContent()
 			}
 			else
 			{
-				this->Tex_BannerDiscord = texapi->GetOrCreate("BANNER_DISCORD", RES_BANNER_DISCORD, ctx.GetModule());
+				this->Tex_BannerDiscord = texapi->GetOrCreate("BANNER_DISCORD", RES_BANNER_DISCORD, ctx.Platform().Module());
 			}
 		}
 		ImGui::EndChild();
@@ -125,7 +125,7 @@ void CAboutBox::RenderContent()
 			}
 			else
 			{
-				this->Tex_BannerPatreon = texapi->GetOrCreate("BANNER_PATREON", RES_BANNER_PATREON, ctx.GetModule());
+				this->Tex_BannerPatreon = texapi->GetOrCreate("BANNER_PATREON", RES_BANNER_PATREON, ctx.Platform().Module());
 			}
 		}
 		ImGui::EndChild();

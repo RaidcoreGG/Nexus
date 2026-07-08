@@ -16,14 +16,15 @@
     <ClCompile Include="src\Core\Addons\Library\LibAddon.cpp" />
     <ClCompile Include="src\Core\Addons\Library\LibManager.cpp" />
     <ClCompile Include="src\GW2\BuildInfo\BuildInfoService.cpp" />
-    <ClCompile Include="src\GW2\GameContext.cpp" />
+    <ClCompile Include="src\GW2\Gw2Context.cpp" />
+    <ClCompile Include="src\Platform\PlContext.cpp" />
     <ClCompile Include="src\Runtime\Runtime.cpp" />
     <ClCompile Include="src\Core\Hooks\Hooks.cpp" />
     <ClCompile Include="src\Core\Updater\SelfUpdater.cpp" />
     <ClCompile Include="src\Engine\Cleanup\RefCleanerBase.cpp" />
     <ClCompile Include="src\Engine\Cleanup\RefCleanerContext.cpp" />
     <ClCompile Include="src\Engine\Clockwork\Clockwork.cpp" />
-    <ClCompile Include="src\Engine\CrashHandler\CrashHandler.cpp" />
+    <ClCompile Include="src\Platform\CrashHandler\CrashHandler.cpp" />
     <ClCompile Include="src\Engine\Functions\FnRegistry.cpp" />
     <ClCompile Include="src\Core\Index\Index.cpp" />
     <ClCompile Include="src\Engine\Loader\LdrAddonBase.cpp" />
@@ -112,8 +113,9 @@
     <ClInclude Include="src\Core\Addons\Library\LibAddon.h" />
     <ClInclude Include="src\Core\Addons\Library\LibManager.h" />
     <ClInclude Include="src\GW2\BuildInfo\BuildInfoService.h" />
-    <ClInclude Include="src\GW2\GameContext.h" />
+    <ClInclude Include="src\GW2\Gw2Context.h" />
     <ClInclude Include="src\GW2\Mumble\MblExtensions.h" />
+    <ClInclude Include="src\Platform\PlContext.h" />
     <ClInclude Include="src\Runtime\Runtime.h" />
     <ClInclude Include="src\Core\Hooks\HkConst.h" />
     <ClInclude Include="src\Core\Hooks\HkFuncDefs.h" />
@@ -134,7 +136,7 @@
     <ClInclude Include="src\Engine\Clockwork\Tasks\TaskBase.h" />
     <ClInclude Include="src\Engine\Clockwork\Tasks\ETaskPriority.h" />
     <ClInclude Include="src\Engine\Clockwork\Dispatcher.h" />
-    <ClInclude Include="src\Engine\CrashHandler\CrashHandler.h" />
+    <ClInclude Include="src\Platform\CrashHandler\CrashHandler.h" />
     <ClInclude Include="src\Engine\Events\EvtData.h" />
     <ClInclude Include="src\Engine\Functions\FnEntry.h" />
     <ClInclude Include="src\Engine\Functions\FnRegistry.h" />

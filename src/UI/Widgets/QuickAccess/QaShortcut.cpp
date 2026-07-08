@@ -137,7 +137,7 @@ bool CShortcutIcon::Render()
 		if (!this->Textures[ETexIdx::HasContextMenu])
 		{
 			Runtime& ctx = Runtime::Get();
-			this->Textures[ETexIdx::HasContextMenu] = this->TextureService->GetOrCreate("ICON_CONTEXTMENU", RES_ICON_CONTEXTMENU_AVAILABLE, ctx.GetModule());
+			this->Textures[ETexIdx::HasContextMenu] = this->TextureService->GetOrCreate("ICON_CONTEXTMENU", RES_ICON_CONTEXTMENU_AVAILABLE, ctx.Platform().Module());
 		}
 		else
 		{
@@ -293,16 +293,16 @@ Texture_t* CShortcutIcon::GetNotificationTexture(uint32_t aAmount)
 
 		switch (aAmount)
 		{
-			case 1:  icon = this->Textures[ETexIdx::Notify1] = this->TextureService->GetOrCreate("QA_NOTIFY1", RES_ICON_NOTIFICATION1, ctx.GetModule()); break;
-			case 2:  icon = this->Textures[ETexIdx::Notify2] = this->TextureService->GetOrCreate("QA_NOTIFY2", RES_ICON_NOTIFICATION2, ctx.GetModule()); break;
-			case 3:  icon = this->Textures[ETexIdx::Notify3] = this->TextureService->GetOrCreate("QA_NOTIFY3", RES_ICON_NOTIFICATION3, ctx.GetModule()); break;
-			case 4:  icon = this->Textures[ETexIdx::Notify4] = this->TextureService->GetOrCreate("QA_NOTIFY4", RES_ICON_NOTIFICATION4, ctx.GetModule()); break;
-			case 5:  icon = this->Textures[ETexIdx::Notify5] = this->TextureService->GetOrCreate("QA_NOTIFY5", RES_ICON_NOTIFICATION5, ctx.GetModule()); break;
-			case 6:  icon = this->Textures[ETexIdx::Notify6] = this->TextureService->GetOrCreate("QA_NOTIFY6", RES_ICON_NOTIFICATION6, ctx.GetModule()); break;
-			case 7:  icon = this->Textures[ETexIdx::Notify7] = this->TextureService->GetOrCreate("QA_NOTIFY7", RES_ICON_NOTIFICATION7, ctx.GetModule()); break;
-			case 8:  icon = this->Textures[ETexIdx::Notify8] = this->TextureService->GetOrCreate("QA_NOTIFY8", RES_ICON_NOTIFICATION8, ctx.GetModule()); break;
-			case 9:  icon = this->Textures[ETexIdx::Notify9] = this->TextureService->GetOrCreate("QA_NOTIFY9", RES_ICON_NOTIFICATION9, ctx.GetModule()); break;
-			default: icon = this->Textures[ETexIdx::NotifyX] = this->TextureService->GetOrCreate("QA_NOTIFYX", RES_ICON_NOTIFICATIONX, ctx.GetModule()); break;
+			case 1:  icon = this->Textures[ETexIdx::Notify1] = this->TextureService->GetOrCreate("QA_NOTIFY1", RES_ICON_NOTIFICATION1, ctx.Platform().Module()); break;
+			case 2:  icon = this->Textures[ETexIdx::Notify2] = this->TextureService->GetOrCreate("QA_NOTIFY2", RES_ICON_NOTIFICATION2, ctx.Platform().Module()); break;
+			case 3:  icon = this->Textures[ETexIdx::Notify3] = this->TextureService->GetOrCreate("QA_NOTIFY3", RES_ICON_NOTIFICATION3, ctx.Platform().Module()); break;
+			case 4:  icon = this->Textures[ETexIdx::Notify4] = this->TextureService->GetOrCreate("QA_NOTIFY4", RES_ICON_NOTIFICATION4, ctx.Platform().Module()); break;
+			case 5:  icon = this->Textures[ETexIdx::Notify5] = this->TextureService->GetOrCreate("QA_NOTIFY5", RES_ICON_NOTIFICATION5, ctx.Platform().Module()); break;
+			case 6:  icon = this->Textures[ETexIdx::Notify6] = this->TextureService->GetOrCreate("QA_NOTIFY6", RES_ICON_NOTIFICATION6, ctx.Platform().Module()); break;
+			case 7:  icon = this->Textures[ETexIdx::Notify7] = this->TextureService->GetOrCreate("QA_NOTIFY7", RES_ICON_NOTIFICATION7, ctx.Platform().Module()); break;
+			case 8:  icon = this->Textures[ETexIdx::Notify8] = this->TextureService->GetOrCreate("QA_NOTIFY8", RES_ICON_NOTIFICATION8, ctx.Platform().Module()); break;
+			case 9:  icon = this->Textures[ETexIdx::Notify9] = this->TextureService->GetOrCreate("QA_NOTIFY9", RES_ICON_NOTIFICATION9, ctx.Platform().Module()); break;
+			default: icon = this->Textures[ETexIdx::NotifyX] = this->TextureService->GetOrCreate("QA_NOTIFYX", RES_ICON_NOTIFICATIONX, ctx.Platform().Module()); break;
 		}
 	}
 

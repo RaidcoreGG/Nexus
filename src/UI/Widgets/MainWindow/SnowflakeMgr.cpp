@@ -101,7 +101,7 @@ void CSnowflakeMgr::Update()
 
 				if (!texSnowflake)
 				{
-					texSnowflake = texapi->GetOrCreate("SNOWFLAKE", RES_ICON_SNOWFLAKE, Runtime::Get().GetModule());
+					texSnowflake = texapi->GetOrCreate("SNOWFLAKE", RES_ICON_SNOWFLAKE, Runtime::Get().Platform().Module());
 					return;
 				}
 
@@ -113,9 +113,9 @@ void CSnowflakeMgr::Update()
 
 				if (!(texLeaves[0] && texLeaves[1] && texLeaves[2]))
 				{
-					texLeaves[0] = texapi->GetOrCreate("LEAF_VARIANT1", RES_ICON_LEAF_VARIANT1, Runtime::Get().GetModule());
-					texLeaves[1] = texapi->GetOrCreate("LEAF_VARIANT2", RES_ICON_LEAF_VARIANT2, Runtime::Get().GetModule());
-					texLeaves[2] = texapi->GetOrCreate("LEAF_VARIANT3", RES_ICON_LEAF_VARIANT3, Runtime::Get().GetModule());
+					texLeaves[0] = texapi->GetOrCreate("LEAF_VARIANT1", RES_ICON_LEAF_VARIANT1, Runtime::Get().Platform().Module());
+					texLeaves[1] = texapi->GetOrCreate("LEAF_VARIANT2", RES_ICON_LEAF_VARIANT2, Runtime::Get().Platform().Module());
+					texLeaves[2] = texapi->GetOrCreate("LEAF_VARIANT3", RES_ICON_LEAF_VARIANT3, Runtime::Get().Platform().Module());
 					return;
 				}
 

@@ -19,7 +19,6 @@
 #include "Core/Preferences/PrefContext.h"
 #include "Core/Updater/SelfUpdater.h"
 #include "Core/Versioning/Version.h"
-#include "Engine/CrashHandler/CrashHandler.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
@@ -27,7 +26,8 @@
 #include "Engine/Loader/Loader.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
-#include "GW2/GameContext.h"
+#include "GW2/Gw2Context.h"
+#include "Platform/PlContext.h"
 #include "Proxy/PxyEnum.h"
 #include "UI/Renderer/RdrContext.h"
 #include "UI/Textures/TxLoader.h"
@@ -64,13 +64,9 @@ namespace Raidcore::Nexus
 
 		const char* GetBuild();
 
-		HMODULE GetModule();
+		Platform::Context& Platform();
 
-		DWORD GetModuleSize();
-
-		GW2::GameContext& Game();
-
-		CCrashHandler* GetCrashHandler();
+		GW2::Context& Game();
 
 		RenderContext_t* GetRendererCtx();
 
@@ -104,10 +100,8 @@ namespace Raidcore::Nexus
 		Runtime();
 		~Runtime();
 
-		HMODULE          Module{ nullptr };
-		DWORD            ModuleSize{ 0 };
-
-		std::unique_ptr<GW2::GameContext> _GameContext;
+		std::unique_ptr<Platform::Context> _PlatformContext;
+		std::unique_ptr<GW2::Context>      _GameContext;
 
 		std::mutex                          HttpClientMutex{};
 		std::map<std::string, CHttpClient*> HttpClients{};

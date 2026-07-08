@@ -1,12 +1,12 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  GameContext.cpp
+/// Name         :  Gw2Context.cpp
 /// Description  :  Guild Wars 2 game context implementation.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "GameContext.h"
+#include "Gw2Context.h"
 
 #include <memory>
 
@@ -17,7 +17,7 @@
 
 namespace Raidcore::Nexus::GW2
 {
-	void GameContext::Shutdown()
+	void Context::Shutdown()
 	{
 		this->_Mumble.reset();
 		this->_GameBinds.reset();
@@ -25,7 +25,7 @@ namespace Raidcore::Nexus::GW2
 		this->_Arcdps.reset();
 	}
 
-	CArcApi& GameContext::Arcdps()
+	CArcApi& Context::Arcdps()
 	{
 		if (!this->_Arcdps)
 		{
@@ -35,7 +35,7 @@ namespace Raidcore::Nexus::GW2
 		return *this->_Arcdps;
 	}
 
-	BuildInfoService& GameContext::BuildInfo()
+	BuildInfoService& Context::BuildInfo()
 	{
 		if (!this->_BuildInfo)
 		{
@@ -48,7 +48,7 @@ namespace Raidcore::Nexus::GW2
 		return *this->_BuildInfo;
 	}
 
-	CGameBindsApi& GameContext::GameBinds()
+	CGameBindsApi& Context::GameBinds()
 	{
 		if (!this->_GameBinds)
 		{
@@ -64,7 +64,7 @@ namespace Raidcore::Nexus::GW2
 		return *this->_GameBinds;
 	}
 
-	CMumbleReader& GameContext::Mumble()
+	CMumbleReader& Context::Mumble()
 	{
 		if (!this->_Mumble)
 		{

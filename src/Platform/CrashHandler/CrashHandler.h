@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <windows.h>
 #include <filesystem>
+#include <windows.h>
 
 ///----------------------------------------------------------------------------------------------------
 /// StackEntry_t Struct

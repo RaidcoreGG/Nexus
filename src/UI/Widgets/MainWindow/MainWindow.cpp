@@ -279,7 +279,7 @@ void CMainWindow::Render()
 				//else
 				//{
 				//	CContext* ctx = CContext::GetContext();
-				//	this->Tex_DashboardIcon = ctx->GetTextureService()->GetOrCreate("ICON_DASHBOARD", RES_ICON_DASHBOARD, ctx->GetModule());
+				//	this->Tex_DashboardIcon = ctx->GetTextureService()->GetOrCreate("ICON_DASHBOARD", RES_ICON_DASHBOARD, ctx->Platform().Module());
 				//}
 
 				//ImGui::SetCursorPos(ImVec2(navX + navItemSz.y + padding.x, navY + ((navItemSz.y - ImGui::GetTextLineHeight()) / 2)));
@@ -366,7 +366,7 @@ void CMainWindow::Render()
 			}
 			else
 			{
-				this->Tex_RaidcoreTag = ctx.GetTextureService()->GetOrCreate("RAIDCORE_TAG", RES_ICON_RAIDCORE, ctx.GetModule());
+				this->Tex_RaidcoreTag = ctx.GetTextureService()->GetOrCreate("RAIDCORE_TAG", RES_ICON_RAIDCORE, ctx.Platform().Module());
 			}
 
 			if (this->Tex_CloseIcon)
@@ -384,7 +384,7 @@ void CMainWindow::Render()
 			}
 			else
 			{
-				this->Tex_CloseIcon = ctx.GetTextureService()->GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx.GetModule());
+				this->Tex_CloseIcon = ctx.GetTextureService()->GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx.Platform().Module());
 			}
 		}
 		this->IsHandleHeld = ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows);

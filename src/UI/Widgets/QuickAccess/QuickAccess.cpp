@@ -95,12 +95,12 @@ CQuickAccess::CQuickAccess(
 	});
 
 	/* Preload default icons. */
-	this->TextureService->Load(ICON_NEXUS,                 RES_ICON_NEXUS,                 ctx.GetModule(), nullptr);
-	this->TextureService->Load(ICON_NEXUS_HOVER,           RES_ICON_NEXUS_HOVER,           ctx.GetModule(), nullptr);
-	this->TextureService->Load(ICON_NEXUS_HALLOWEEN,       RES_ICON_NEXUS_HALLOWEEN,       ctx.GetModule(), nullptr);
-	this->TextureService->Load(ICON_NEXUS_HALLOWEEN_HOVER, RES_ICON_NEXUS_HALLOWEEN_HOVER, ctx.GetModule(), nullptr);
-	this->TextureService->Load(ICON_NEXUS_XMAS,            RES_ICON_NEXUS_XMAS,            ctx.GetModule(), nullptr);
-	this->TextureService->Load(ICON_NEXUS_XMAS_HOVER,      RES_ICON_NEXUS_XMAS_HOVER,      ctx.GetModule(), nullptr);
+	this->TextureService->Load(ICON_NEXUS,                 RES_ICON_NEXUS,                 ctx.Platform().Module(), nullptr);
+	this->TextureService->Load(ICON_NEXUS_HOVER,           RES_ICON_NEXUS_HOVER,           ctx.Platform().Module(), nullptr);
+	this->TextureService->Load(ICON_NEXUS_HALLOWEEN,       RES_ICON_NEXUS_HALLOWEEN,       ctx.Platform().Module(), nullptr);
+	this->TextureService->Load(ICON_NEXUS_HALLOWEEN_HOVER, RES_ICON_NEXUS_HALLOWEEN_HOVER, ctx.Platform().Module(), nullptr);
+	this->TextureService->Load(ICON_NEXUS_XMAS,            RES_ICON_NEXUS_XMAS,            ctx.Platform().Module(), nullptr);
+	this->TextureService->Load(ICON_NEXUS_XMAS_HOVER,      RES_ICON_NEXUS_XMAS_HOVER,      ctx.Platform().Module(), nullptr);
 
 	/// FIXME: This is kinda hacky.
 	/// It forces the creation of the setting, so that the below subscriber gets executed on a first launch.

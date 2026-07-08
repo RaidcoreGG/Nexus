@@ -435,7 +435,7 @@ void CFontManager::AddDefaultFont(FONTS_RECEIVECALLBACK aCallback)
 
 		/* get data */
 		Runtime& ctx = Runtime::Get();
-		Resources::Get(ctx.GetModule(), MAKEINTRESOURCE(RES_FONT_INTER), RT_FONT, &buffer, (DWORD*)&size);
+		Resources::Get(ctx.Platform().Module(), MAKEINTRESOURCE(RES_FONT_INTER), RT_FONT, &buffer, (DWORD*)&size);
 
 		/* call AddFontInternal with the memory buffer */
 		this->AddFontInternal("FONT_DEFAULT", 15.0f, buffer, size, aCallback, nullptr);

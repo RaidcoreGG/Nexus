@@ -312,15 +312,15 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 	{
 		/* Static assets */
 		static char s_SearchTerm[400] = {};
-		static Texture_t* s_ClearIcon          = texapi->GetOrCreate("ICON_CLOSE",  RES_ICON_CLOSE,  ctx.GetModule());
-		static Texture_t* s_ViewModeIcon_List  = texapi->GetOrCreate("ICON_LIST",   RES_ICON_LIST,   ctx.GetModule());
-		static Texture_t* s_ViewModeIcon_Tiles = texapi->GetOrCreate("ICON_TILES",  RES_ICON_TILES,  ctx.GetModule());
-		static Texture_t* s_FilterIcon         = texapi->GetOrCreate("ICON_FILTER", RES_ICON_FILTER, ctx.GetModule());
+		static Texture_t* s_ClearIcon          = texapi->GetOrCreate("ICON_CLOSE",  RES_ICON_CLOSE,  ctx.Platform().Module());
+		static Texture_t* s_ViewModeIcon_List  = texapi->GetOrCreate("ICON_LIST",   RES_ICON_LIST,   ctx.Platform().Module());
+		static Texture_t* s_ViewModeIcon_Tiles = texapi->GetOrCreate("ICON_TILES",  RES_ICON_TILES,  ctx.Platform().Module());
+		static Texture_t* s_FilterIcon         = texapi->GetOrCreate("ICON_FILTER", RES_ICON_FILTER, ctx.Platform().Module());
 
-		if (!s_ClearIcon)          { s_ClearIcon          = texapi->GetOrCreate("ICON_CLOSE",  RES_ICON_CLOSE,  ctx.GetModule()); }
-		if (!s_ViewModeIcon_List)  { s_ViewModeIcon_List  = texapi->GetOrCreate("ICON_LIST",   RES_ICON_LIST,   ctx.GetModule()); }
-		if (!s_ViewModeIcon_Tiles) { s_ViewModeIcon_Tiles = texapi->GetOrCreate("ICON_TILES",  RES_ICON_TILES,  ctx.GetModule()); }
-		if (!s_FilterIcon)         { s_FilterIcon         = texapi->GetOrCreate("ICON_FILTER", RES_ICON_FILTER, ctx.GetModule()); }
+		if (!s_ClearIcon)          { s_ClearIcon          = texapi->GetOrCreate("ICON_CLOSE",  RES_ICON_CLOSE,  ctx.Platform().Module()); }
+		if (!s_ViewModeIcon_List)  { s_ViewModeIcon_List  = texapi->GetOrCreate("ICON_LIST",   RES_ICON_LIST,   ctx.Platform().Module()); }
+		if (!s_ViewModeIcon_Tiles) { s_ViewModeIcon_Tiles = texapi->GetOrCreate("ICON_TILES",  RES_ICON_TILES,  ctx.Platform().Module()); }
+		if (!s_FilterIcon)         { s_FilterIcon         = texapi->GetOrCreate("ICON_FILTER", RES_ICON_FILTER, ctx.Platform().Module()); }
 
 		/* Search Term */
 		if (ImGui::InputTextWithHint("##SearchTerm", lang->Translate("((000104))"), &s_SearchTerm[0], 400))
@@ -567,7 +567,7 @@ void CAddonsWindow::RenderDetails()
 		{
 			Runtime& ctx = Runtime::Get();
 			CTextureLoader* textureApi = ctx.GetTextureService();
-			chevronRt = textureApi->GetOrCreate("ICON_CHEVRON_RT", RES_ICON_CHEVRON_RT, ctx.GetModule());
+			chevronRt = textureApi->GetOrCreate("ICON_CHEVRON_RT", RES_ICON_CHEVRON_RT, ctx.Platform().Module());
 		}
 	}
 	ImGui::EndChild();
@@ -863,8 +863,8 @@ void CAddonsWindow::RenderActionsBar(ImVec2& aSize)
 	if (ImGui::BeginChild("Actions", aSize, false, ImGuiWindowFlags_NoBackground))
 	{
 		/* Static assets */
-		static Texture_t* s_ReloadIcon = texapi->GetOrCreate("ICON_REFRESH", RES_ICON_REFRESH, ctx.GetModule());
-		if (!s_ReloadIcon) { s_ReloadIcon = texapi->GetOrCreate("ICON_REFRESH", RES_ICON_REFRESH, ctx.GetModule()); }
+		static Texture_t* s_ReloadIcon = texapi->GetOrCreate("ICON_REFRESH", RES_ICON_REFRESH, ctx.Platform().Module());
+		if (!s_ReloadIcon) { s_ReloadIcon = texapi->GetOrCreate("ICON_REFRESH", RES_ICON_REFRESH, ctx.Platform().Module()); }
 
 		/* Open addons folder */
 		if (ImGui::Button(lang->Translate("((000034))")))

@@ -73,7 +73,7 @@ void ISubWindow::Render()
 	else
 	{
 		Runtime& ctx = Runtime::Get();
-		this->Tex_PopoutIcon = ctx.GetTextureService()->GetOrCreate("ICON_POPOUT", RES_ICON_POPOUT, ctx.GetModule());
+		this->Tex_PopoutIcon = ctx.GetTextureService()->GetOrCreate("ICON_POPOUT", RES_ICON_POPOUT, ctx.Platform().Module());
 	}
 
 	if (popout)
@@ -92,7 +92,7 @@ const Texture_t* ISubWindow::GetIcon()
 	if (!this->Tex_Icon && !this->IconIdentifier.empty() && this->IconID)
 	{
 		Runtime& ctx = Runtime::Get();
-		this->Tex_Icon = ctx.GetTextureService()->GetOrCreate(this->IconIdentifier.c_str(), this->IconID, ctx.GetModule());
+		this->Tex_Icon = ctx.GetTextureService()->GetOrCreate(this->IconIdentifier.c_str(), this->IconID, ctx.Platform().Module());
 	}
 
 	return this->Tex_Icon;

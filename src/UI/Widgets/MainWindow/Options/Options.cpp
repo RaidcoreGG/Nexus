@@ -521,7 +521,7 @@ void COptionsWindow::TabStyle()
 								}
 								else
 								{
-									s_TexCross = Runtime::Get().GetTextureService()->GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx.GetModule());
+									s_TexCross = Runtime::Get().GetTextureService()->GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx.Platform().Module());
 								}
 
 								/* Display the filename without extension. */
