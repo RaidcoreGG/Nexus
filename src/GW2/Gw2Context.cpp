@@ -12,8 +12,10 @@
 
 #include "ArcDPS/ArcApi.h"
 #include "BuildInfo/BuildInfoService.h"
+#include "Engine/Clockwork/Clockwork.h"
 #include "Inputs/GameBinds/GbApi.h"
 #include "Mumble/MblReader.h"
+#include "Multibox/Multibox.h"
 
 namespace Raidcore::Nexus::GW2
 {
@@ -51,6 +53,22 @@ namespace Raidcore::Nexus::GW2
 			this->_EventApi,
 			this->_Logger
 		);
+	}
+
+	void Context::Initialize()
+	{
+		/* Prefetch game build. */
+		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Immediate, [this](Clockwork::CancellationToken aToken)
+		{
+			this->BuildInfo().Build();
+		});
+
+		/* Set up multiboxing. */
+		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
+		{
+			Multibox::KillMutex();
+			this->_Logger.Info(LOG_CHANNEL, "Multibox State: %d", Multibox::GetState());
+		});
 	}
 
 	void Context::Shutdown()

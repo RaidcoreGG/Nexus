@@ -148,20 +148,7 @@ namespace Raidcore::Nexus
 			libmgr->Update();
 		});
 
-		/* Prefetch game build. */
-		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Immediate, [this](Clockwork::CancellationToken aToken)
-		{
-			this->Game().BuildInfo().Build();
-		});
-
-		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [](Clockwork::CancellationToken aToken)
-		{
-			Runtime& ctx = Runtime::Get();
-			CLogApi* logger = ctx.GetLogger();
-
-			Multibox::KillMutex();
-			logger->Info(CH_CORE, "Multibox State: %d", Multibox::GetState());
-		});
+		this->Game().Initialize();
 	}
 
 	void Runtime::Shutdown(unsigned int aReason)
