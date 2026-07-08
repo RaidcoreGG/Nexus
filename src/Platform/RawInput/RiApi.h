@@ -1,19 +1,19 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  PlContext.h
-/// Description  :  Platform context implementation.
+/// Name         :  RiApi.h
+/// Description  :  API for WndProc callbacks/hooks.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
 #pragma once
 
-#include <filesystem>
-#include <memory>
-#include <windows.h>
+#include <mutex>
+#include <vector>
 
-#include "CrashHandler/CrashHandler.h"
-#include "RawInput/RiApi.h"
+#include "Engine/_Concepts/IWndProc.h"
+#include "Engine/Cleanup/RefCleanerBase.h"
+#include "RiFuncDefs.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::Platform Namespace
@@ -21,47 +21,47 @@
 namespace Raidcore::Nexus::Platform
 {
 	///----------------------------------------------------------------------------------------------------
-	/// Context Class
+	/// CRawInputApi Class
 	///----------------------------------------------------------------------------------------------------
-	class Context
+	class CRawInputApi : public virtual IRefCleaner, public virtual IWndProc
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		Context(std::filesystem::path aCrashlog, std::filesystem::path aCrashstack);
+		CRawInputApi() : IRefCleaner("RawInputApi") {};
 
 		///----------------------------------------------------------------------------------------------------
-		/// Shutdown:
-		/// 	Shuts down the game context.
+		/// dtor
 		///----------------------------------------------------------------------------------------------------
-		void Shutdown();
+		~CRawInputApi() = default;
 
 		///----------------------------------------------------------------------------------------------------
-		/// Module:
-		/// 	Returns the module handle of Nexus.
+		/// WndProc:
+		/// 	Returns 0 if message was processed or non-zero, if it should be passed to the next callback.
 		///----------------------------------------------------------------------------------------------------
-		HMODULE Module();
+		UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 		///----------------------------------------------------------------------------------------------------
-		/// CrashHandler:
-		/// 	Returns the crash handler instance.
+		/// Register:
+		/// 	Registers the provided WndProcCallback.
 		///----------------------------------------------------------------------------------------------------
-		CCrashHandler& CrashHandler();
+		void Register(WNDPROC_CALLBACK aWndProcCallback);
 
 		///----------------------------------------------------------------------------------------------------
-		/// RawInput:
-		/// 	Returns the raw input API instance.
+		/// Deregister:
+		/// 	Deregisters the provided WndProcCallback.
 		///----------------------------------------------------------------------------------------------------
-		CRawInputApi& RawInput();
+		void Deregister(WNDPROC_CALLBACK aWndProcCallback);
+
+		///----------------------------------------------------------------------------------------------------
+		/// CleanupRefs:
+		/// 	Removes all WndProc Callbacks that are within the provided address space.
+		///----------------------------------------------------------------------------------------------------
+		uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 		private:
-		HMODULE _Module{ nullptr };
-
-		std::filesystem::path CrashLogPath;
-		std::filesystem::path CrashStackPath;
-
-		std::unique_ptr<CCrashHandler> _CrashHandler{ nullptr };
-		std::unique_ptr<CRawInputApi>  _RawInputApi{ nullptr };
+		mutable std::mutex            Mutex;
+		std::vector<WNDPROC_CALLBACK> Registry;
 	};
 }

@@ -19,9 +19,9 @@
 #include "Engine/DataLink/DlFuncDefs.h"
 #include "Engine/Events/EvtFuncDefs.h"
 #include "Engine/Inputs/InputBinds/IbFuncDefs.h"
-#include "Engine/Inputs/RawInput/RiFuncDefs.h"
 #include "Engine/Logging/LogFuncDefs.h"
 #include "GW2/Inputs/GameBinds/GbFuncDefs.h"
+#include "Platform/RawInput/RiFuncDefs.h"
 #include "UI/Services/Fonts/FuncDefs.h"
 #include "UI/Services/Localization/LoclFuncDefs.h"
 #include "UI/Services/QoL/FuncDefs.h"
@@ -29,6 +29,8 @@
 #include "UI/UiFuncDefs.h"
 #include "UI/Widgets/Alerts/AlFuncDefs.h"
 #include "UI/Widgets/QuickAccess/QaFuncDefs.h"
+
+using namespace Raidcore::Nexus;
 
 ///----------------------------------------------------------------------------------------------------
 /// AddonAPI6_t Struct
@@ -97,9 +99,9 @@ struct AddonAPI6_t : AddonAPI_t
 	/* WndProc */
 	struct WndProcVT
 	{
-		WNDPROC_ADDREM                    Register;
-		WNDPROC_ADDREM                    Deregister;
-		WNDPROC_SENDTOGAME                SendToGameOnly;
+		Platform::WNDPROC_ADDREM          Register;
+		Platform::WNDPROC_ADDREM          Deregister;
+		Platform::WNDPROC_SENDTOGAME      SendToGameOnly;
 	};
 	WndProcVT                             WndProc;
 

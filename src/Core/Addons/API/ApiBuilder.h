@@ -13,12 +13,14 @@
 #include "ApiBase.h"
 #include "Engine/Events/EvtFuncDefs.h"
 #include "Engine/Inputs/InputBinds/IbFuncDefs.h"
-#include "Engine/Inputs/RawInput/RiFuncDefs.h"
 #include "Engine/Logging/LogEnum.h"
 #include "GW2/Inputs/GameBinds/GbEnum.h"
+#include "Platform/RawInput/RiFuncDefs.h"
 #include "UI/Services/Fonts/FuncDefs.h"
 #include "UI/Textures/TxFuncDefs.h"
 #include "UI/UiFuncDefs.h"
+
+using namespace Raidcore::Nexus;
 
 ///----------------------------------------------------------------------------------------------------
 /// ADDONAPI Namespace
@@ -209,13 +211,13 @@ namespace ADDONAPI
 		/// Register:
 		/// 	Registers the provided WndProcCallback.
 		///----------------------------------------------------------------------------------------------------
-		void Register(WNDPROC_CALLBACK aWndProcCallback);
+		void Register(Platform::WNDPROC_CALLBACK aWndProcCallback);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Deregister:
 		/// 	Deregisters the provided WndProcCallback.
 		///----------------------------------------------------------------------------------------------------
-		void Deregister(WNDPROC_CALLBACK aWndProcCallback);
+		void Deregister(Platform::WNDPROC_CALLBACK aWndProcCallback);
 	}
 
 	///----------------------------------------------------------------------------------------------------

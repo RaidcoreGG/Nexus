@@ -16,9 +16,11 @@
 
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbBindV2.h"
-#include "Engine/Inputs/RawInput/RiApi.h"
 #include "Engine/Logging/LogApi.h"
+#include "Platform/RawInput/RiApi.h"
 #include "UI/Renderer/RdrContext.h"
+
+using namespace Raidcore::Nexus;
 
 constexpr const char* CH_GAMEBINDS = "GameBinds";
 constexpr const char* EV_UE_KB_CH = "EV_UNOFFICIAL_EXTRAS_KEYBIND_CHANGED";
@@ -53,11 +55,11 @@ class CGameBindsApi
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
 	CGameBindsApi(
-		CRawInputApi&         aRawInputApi,
-		CLogApi&              aLogger,
-		CEventApi&            aEventApi,
-		RenderContext_t&      aRenderContext,
-		std::filesystem::path aConfigPath
+		Platform::CRawInputApi& aRawInputApi,
+		CLogApi&                aLogger,
+		CEventApi&              aEventApi,
+		RenderContext_t&        aRenderContext,
+		std::filesystem::path   aConfigPath
 	);
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -146,7 +148,7 @@ class CGameBindsApi
 	void Load(std::filesystem::path aPath);
 
 	private:
-	CRawInputApi&                                    RawInputApi;
+	Platform::CRawInputApi&                          RawInputApi;
 	CLogApi&                                         Logger;
 	CEventApi&                                       EventApi;
 	RenderContext_t&                                 RenderContext;

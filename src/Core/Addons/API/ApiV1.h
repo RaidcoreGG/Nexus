@@ -19,11 +19,13 @@
 #include "Engine/DataLink/DlFuncDefs.h"
 #include "Engine/Events/EvtFuncDefs.h"
 #include "Engine/Inputs/InputBinds/IbFuncDefs.h"
-#include "Engine/Inputs/RawInput/RiFuncDefs.h"
 #include "Engine/Logging/LogFuncDefs.h"
+#include "Platform/RawInput/RiFuncDefs.h"
 #include "UI/Textures/TxFuncDefs.h"
 #include "UI/UiFuncDefs.h"
 #include "UI/Widgets/QuickAccess/QaFuncDefs.h"
+
+using namespace Raidcore::Nexus;
 
 ///----------------------------------------------------------------------------------------------------
 /// AddonAPI1_t Struct
@@ -58,8 +60,8 @@ struct AddonAPI1_t : AddonAPI_t
 	EVENTS_SUBSCRIBE              UnsubscribeEvent;
 
 	/* WndProc */
-	WNDPROC_ADDREM                RegisterWndProc;
-	WNDPROC_ADDREM                DeregisterWndProc;
+	Platform::WNDPROC_ADDREM      RegisterWndProc;
+	Platform::WNDPROC_ADDREM      DeregisterWndProc;
 
 	/* InputBinds */
 	INPUTBINDS_REGISTERWITHSTRING RegisterInputBindWithString;

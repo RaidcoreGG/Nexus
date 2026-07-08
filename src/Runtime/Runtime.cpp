@@ -53,7 +53,6 @@ namespace Clockwork = Raidcore::Clockwork;
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
-#include "Engine/Inputs/RawInput/RiApi.h"
 #include "Engine/Loader/Loader.h"
 #include "Engine/Logging/LogEnum.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
@@ -103,10 +102,10 @@ namespace Raidcore::Nexus
 		);
 
 		/* Initialize crash handler. */
-		CCrashHandler& crashhandler = ctx.Platform().CrashHandler();
+		ctx.Platform().CrashHandler();
 
 		/* Initialize self updater here so it can lock this instance and update. */
-		CSelfUpdater* selfupdater = ctx.GetSelfUpdater();
+		ctx.GetSelfUpdater();
 
 		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [](Clockwork::CancellationToken aToken)
 		{
@@ -309,12 +308,6 @@ namespace Raidcore::Nexus
 		return &s_LibraryMgr;
 	}
 
-	CRawInputApi* Runtime::GetRawInputApi()
-	{
-		static CRawInputApi s_RawInputApi = CRawInputApi();
-		return &s_RawInputApi;
-	}
-
 	CInputBindApi* Runtime::GetInputBindApi()
 	{
 		static CInputBindApi s_InputBindApi = CInputBindApi(
@@ -461,7 +454,7 @@ namespace Raidcore::Nexus
 			*this->GetDataLink(),
 			*this->GetEventApi(),
 			*this->GetLogger(),
-			*this->GetRawInputApi(),
+			this->Platform().RawInput(),
 			*this->GetRendererCtx(),
 			*this->GetHttpClient("http://assetcdn.101.arenanetworks.com", /*disablecache=*/ true),
 			Index(EPath::GameBinds)

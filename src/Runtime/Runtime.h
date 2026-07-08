@@ -22,7 +22,6 @@
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
-#include "Engine/Inputs/RawInput/RiApi.h"
 #include "Engine/Loader/Loader.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
@@ -81,8 +80,6 @@ namespace Raidcore::Nexus
 		CLoader* GetLoader();
 
 		CLibraryMgr* GetAddonLibrary();
-
-		CRawInputApi* GetRawInputApi();
 
 		CInputBindApi* GetInputBindApi();
 

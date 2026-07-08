@@ -23,7 +23,7 @@ using namespace Raidcore::Nexus;
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
-#include "Engine/Inputs/RawInput/RiApi.h"
+#include "Platform/RawInput/RiApi.h"
 #include "Engine/Logging/LogApi.h"
 #include "GW2/ArcDPS/ArcApi.h"
 #include "GW2/Inputs/GameBinds/GbApi.h"
@@ -37,25 +37,25 @@ using namespace Raidcore::Nexus;
 
 namespace ADDONAPI
 {
-	static bool             s_IsInitialized = false;
+	static bool                    s_IsInitialized = false;
 
-	static CDataLinkApi*    s_DataLinkApi   = nullptr;
-	static CEventApi*       s_EventApi      = nullptr;
-	static CGameBindsApi*   s_GameBindsApi  = nullptr;
-	static CInputBindApi*   s_InputBindApi  = nullptr;
-	static CRawInputApi*    s_RawInputApi   = nullptr;
-	static CLocalization*   s_Localization  = nullptr;
-	static CLogApi*         s_Logger        = nullptr;
-	static CTextureLoader*  s_TextureApi    = nullptr;
-	static CLoader*         s_Loader        = nullptr;
-	static RenderContext_t* s_RenderCtx     = nullptr;
-	static CArcApi*         s_ArcApi        = nullptr;
+	static CDataLinkApi*           s_DataLinkApi   = nullptr;
+	static CEventApi*              s_EventApi      = nullptr;
+	static CGameBindsApi*          s_GameBindsApi  = nullptr;
+	static CInputBindApi*          s_InputBindApi  = nullptr;
+	static Platform::CRawInputApi* s_RawInputApi   = nullptr;
+	static CLocalization*          s_Localization  = nullptr;
+	static CLogApi*                s_Logger        = nullptr;
+	static CTextureLoader*         s_TextureApi    = nullptr;
+	static CLoader*                s_Loader        = nullptr;
+	static RenderContext_t*        s_RenderCtx     = nullptr;
+	static CArcApi*                s_ArcApi        = nullptr;
 
-	static CUiContext*      s_UiContext     = nullptr;
-	static CFontManager*    s_FontManager   = nullptr;
-	static CAlerts*         s_Alerts        = nullptr;
-	static CQuickAccess*    s_QuickAccess   = nullptr;
-	static CEscapeClosing*  s_EscapeClosing = nullptr;
+	static CUiContext*             s_UiContext     = nullptr;
+	static CFontManager*           s_FontManager   = nullptr;
+	static CAlerts*                s_Alerts        = nullptr;
+	static CQuickAccess*           s_QuickAccess   = nullptr;
+	static CEscapeClosing*         s_EscapeClosing = nullptr;
 
 
 	namespace DataLink
@@ -255,13 +255,13 @@ namespace ADDONAPI
 
 	namespace RawInput
 	{
-		void Register(WNDPROC_CALLBACK aWndProcCallback)
+		void Register(Platform::WNDPROC_CALLBACK aWndProcCallback)
 		{
 			assert(s_RawInputApi);
 			s_RawInputApi->Register(aWndProcCallback);
 		}
 
-		void Deregister(WNDPROC_CALLBACK aWndProcCallback)
+		void Deregister(Platform::WNDPROC_CALLBACK aWndProcCallback)
 		{
 			assert(s_RawInputApi);
 			s_RawInputApi->Deregister(aWndProcCallback);
@@ -564,7 +564,7 @@ namespace ADDONAPI
 			s_EventApi      = ctx.GetEventApi();
 			s_GameBindsApi  = &ctx.Game().GameBinds();
 			s_InputBindApi  = ctx.GetInputBindApi();
-			s_RawInputApi   = ctx.GetRawInputApi();
+			s_RawInputApi   = &ctx.Platform().RawInput();
 			s_Logger        = ctx.GetLogger();
 			s_TextureApi    = ctx.GetTextureService();
 			s_Loader        = ctx.GetLoader();

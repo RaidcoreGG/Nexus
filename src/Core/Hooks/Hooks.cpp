@@ -26,7 +26,6 @@ using namespace Raidcore::Nexus;
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
-#include "Engine/Inputs/RawInput/RiApi.h"
 #include "Engine/Loader/Loader.h"
 #include "Engine/Logging/LogApi.h"
 #include "GW2/Inputs/GameBinds/GbApi.h"
@@ -184,18 +183,18 @@ namespace Hooks
 	{
 		LRESULT __stdcall WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
-			static Runtime&       s_Context      = Runtime::Get();
-			static CInputBindApi* s_InputBindApi = s_Context.GetInputBindApi();
-			static CRawInputApi*  s_RawInputApi  = s_Context.GetRawInputApi();
-			static CUiContext*    s_UIContext    = s_Context.GetUIContext();
-			static CLoader*       s_Loader       = s_Context.GetLoader();
-			static CGameBindsApi* s_GameBindsApi = &s_Context.Game().GameBinds();
+			static Runtime&                s_Context      = Runtime::Get();
+			static CInputBindApi*          s_InputBindApi = s_Context.GetInputBindApi();
+			static Platform::CRawInputApi& s_RawInputApi  = s_Context.Platform().RawInput();
+			static CUiContext*             s_UIContext    = s_Context.GetUIContext();
+			static CLoader*                s_Loader       = s_Context.GetLoader();
+			static CGameBindsApi&          s_GameBindsApi = s_Context.Game().GameBinds();
 
 			// don't pass to game if loader
 			if (s_Loader->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
 			// don't pass to game if custom wndproc
-			if (s_RawInputApi->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
+			if (s_RawInputApi.WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
 			// don't pass to game if gui
 			if (s_UIContext->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
@@ -209,7 +208,7 @@ namespace Hooks
 			}
 
 			// shift game only messages back to normal messages.
-			s_GameBindsApi->RedirectGameOnly(hWnd, uMsg, wParam, lParam);
+			s_GameBindsApi.RedirectGameOnly(hWnd, uMsg, wParam, lParam);
 
 			MouseResetFix(hWnd, uMsg, wParam, lParam);
 

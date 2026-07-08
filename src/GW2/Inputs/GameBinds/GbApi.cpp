@@ -96,7 +96,13 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 	uictx->Invalidate();
 }
 
-CGameBindsApi::CGameBindsApi(CRawInputApi& aRawInputApi, CLogApi& aLogger, CEventApi& aEventApi, RenderContext_t& aRenderContext, std::filesystem::path aConfigPath)
+CGameBindsApi::CGameBindsApi(
+	Platform::CRawInputApi& aRawInputApi,
+	CLogApi&                aLogger,
+	CEventApi&              aEventApi,
+	RenderContext_t&        aRenderContext,
+	std::filesystem::path   aConfigPath
+)
 	: RawInputApi(aRawInputApi)
 	, Logger(aLogger)
 	, EventApi(aEventApi)

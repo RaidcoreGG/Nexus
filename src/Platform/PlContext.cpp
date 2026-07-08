@@ -19,11 +19,19 @@ namespace Raidcore::Nexus::Platform
 	Context::Context(std::filesystem::path aCrashlog, std::filesystem::path aCrashstack)
 		: CrashLogPath(std::move(aCrashlog))
 		, CrashStackPath(std::move(aCrashstack))
-	{ }
+	{
+		this->_CrashHandler = std::make_unique<CCrashHandler>(
+			this->CrashLogPath,
+			this->CrashStackPath
+		);
+
+		this->_RawInputApi = std::make_unique<CRawInputApi>();
+	}
 
 	void Context::Shutdown()
 	{
 		this->_CrashHandler.reset();
+		this->_RawInputApi.reset();
 	}
 
 	HMODULE Context::Module()
@@ -47,14 +55,11 @@ namespace Raidcore::Nexus::Platform
 
 	CCrashHandler& Context::CrashHandler()
 	{
-		if (!this->_CrashHandler)
-		{
-			this->_CrashHandler = std::make_unique<CCrashHandler>(
-				this->CrashLogPath,
-				this->CrashStackPath
-			);
-		}
-
 		return *this->_CrashHandler;
+	}
+
+	CRawInputApi& Context::RawInput()
+	{
+		return *this->_RawInputApi;
 	}
 }

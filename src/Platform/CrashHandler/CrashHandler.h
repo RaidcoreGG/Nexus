@@ -12,45 +12,51 @@
 #include <windows.h>
 
 ///----------------------------------------------------------------------------------------------------
-/// StackEntry_t Struct
+/// Raidcore::Nexus::Platform Namespace
 ///----------------------------------------------------------------------------------------------------
-struct StackEntry_t
+namespace Raidcore::Nexus::Platform
 {
-	char     FileName[MAX_PATH];
-	char     FunctionName[MAX_PATH];
-	uint32_t LineNumber;
-	char     ModuleName[MAX_PATH];
-	uint64_t ModuleOffset;
-};
-
-///----------------------------------------------------------------------------------------------------
-/// CCrashHandler Class
-///----------------------------------------------------------------------------------------------------
-class CCrashHandler
-{
-	public:
 	///----------------------------------------------------------------------------------------------------
-	/// ctor
+	/// StackEntry_t Struct
 	///----------------------------------------------------------------------------------------------------
-	CCrashHandler(std::filesystem::path aCrashLogPath, std::filesystem::path aCrashStackPath);
+	struct StackEntry_t
+	{
+		char     FileName[MAX_PATH];
+		char     FunctionName[MAX_PATH];
+		uint32_t LineNumber;
+		char     ModuleName[MAX_PATH];
+		uint64_t ModuleOffset;
+	};
 
 	///----------------------------------------------------------------------------------------------------
-	/// dtor
+	/// CCrashHandler Class
 	///----------------------------------------------------------------------------------------------------
-	~CCrashHandler();
+	class CCrashHandler
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		CCrashHandler(std::filesystem::path aCrashLogPath, std::filesystem::path aCrashStackPath);
 
-	private:
-	char                         LogPath[MAX_PATH];
-	char                         StackPath[MAX_PATH];
-	PVOID                        VEH;
-	SYSTEM_INFO                  SystemInfo;
-	DWORD                        MachineType;
-	StackEntry_t                 Callstack[64];
-	size_t                       CallstackSize;
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		~CCrashHandler();
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnVectoredException:
-	/// 	Logs the unhandled exception.
-	///----------------------------------------------------------------------------------------------------
-	static LONG WINAPI OnVectoredException(EXCEPTION_POINTERS* aExcPointers);
-};
+		private:
+		char         LogPath[MAX_PATH];
+		char         StackPath[MAX_PATH];
+		PVOID        VEH;
+		SYSTEM_INFO  SystemInfo;
+		DWORD        MachineType;
+		StackEntry_t Callstack[64];
+		size_t       CallstackSize;
+
+		///----------------------------------------------------------------------------------------------------
+		/// OnVectoredException:
+		/// 	Logs the unhandled exception.
+		///----------------------------------------------------------------------------------------------------
+		static LONG WINAPI OnVectoredException(EXCEPTION_POINTERS* aExcPointers);
+	};
+}

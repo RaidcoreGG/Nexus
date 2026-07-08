@@ -14,7 +14,6 @@
 
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
-#include "Engine/Inputs/RawInput/RiApi.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
 #include "GW2/ArcDPS/ArcApi.h"
@@ -38,13 +37,13 @@ namespace Raidcore::Nexus::GW2
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
 		Context(
-			CDataLinkApi&         aDataLink,
-			CEventApi&            aEventApi,
-			CLogApi&              aLogger,
-			CRawInputApi&         aRawInputApi,
-			RenderContext_t&      aRendererCtx,
-			CHttpClient&          aArenaNetAssetCDN,
-			std::filesystem::path aGameBindsPath
+			CDataLinkApi&           aDataLink,
+			CEventApi&              aEventApi,
+			CLogApi&                aLogger,
+			Platform::CRawInputApi& aRawInputApi,
+			RenderContext_t&        aRendererCtx,
+			CHttpClient&            aArenaNetAssetCDN,
+			std::filesystem::path   aGameBindsPath
 		)
 			: _DataLink(aDataLink)
 			, _EventApi(aEventApi)
@@ -87,12 +86,12 @@ namespace Raidcore::Nexus::GW2
 
 		private:
 		/* Dependencies */
-		CDataLinkApi&    _DataLink;
-		CEventApi&       _EventApi;
-		CLogApi&         _Logger;
-		CRawInputApi&    _RawInputApi;
-		RenderContext_t& _RendererCtx;
-		CHttpClient&     _ArenaNetAssetCDN;
+		CDataLinkApi&           _DataLink;
+		CEventApi&              _EventApi;
+		CLogApi&                _Logger;
+		Platform::CRawInputApi& _RawInputApi;
+		RenderContext_t&        _RendererCtx;
+		CHttpClient&            _ArenaNetAssetCDN;
 
 		std::filesystem::path _GameBindsPath;
 
