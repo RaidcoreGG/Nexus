@@ -9,6 +9,7 @@
 #include "LoadConfirmationModal.h"
 
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
 
 CLoadConfirmationModal::CLoadConfirmationModal()
 {

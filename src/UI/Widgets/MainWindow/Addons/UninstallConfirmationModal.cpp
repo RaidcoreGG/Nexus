@@ -9,6 +9,7 @@
 #include "UninstallConfirmationModal.h"
 
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
 
 CUninstallConfirmationModal::CUninstallConfirmationModal()
 {

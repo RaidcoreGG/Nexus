@@ -8,8 +8,10 @@
 
 #include "ArcApi.h"
 
-#include "ArcExtensionDef.h"
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
+#include "ArcExtensionDef.h"
 #include "Core/Index/Index.h"
 #include "Util/DLL.h"
 

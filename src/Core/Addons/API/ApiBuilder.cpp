@@ -10,13 +10,15 @@
 
 #include <assert.h>
 
+#include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
 #include "ApiV1.h"
 #include "ApiV2.h"
 #include "ApiV3.h"
 #include "ApiV4.h"
 #include "ApiV5.h"
 #include "ApiV6.h"
-#include "Runtime/Runtime.h"
 #include "Core/Index/Index.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"

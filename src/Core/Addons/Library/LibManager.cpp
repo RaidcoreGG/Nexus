@@ -9,6 +9,8 @@
 #include "LibManager.h"
 
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
 #include "Core/Index/Index.h"
 #include "Core/Addons/AddEnum.h"
 #include "Util/Strings.h"

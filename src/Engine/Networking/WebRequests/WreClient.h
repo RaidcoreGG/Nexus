@@ -63,7 +63,7 @@ class CHttpClient
 	CLogApi*         Logger = nullptr;
 
 	std::string      BaseURL;
-	std::mutex       Mutex;
+	std::mutex       Mutex{};
 	httplib::Client* Client = nullptr;
 
 	CHttpCache*      Cache  = nullptr;

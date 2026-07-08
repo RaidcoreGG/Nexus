@@ -15,6 +15,7 @@
     <ClCompile Include="src\Core\Addons\Config\CfgManager.cpp" />
     <ClCompile Include="src\Core\Addons\Library\LibAddon.cpp" />
     <ClCompile Include="src\Core\Addons\Library\LibManager.cpp" />
+    <ClCompile Include="src\GW2\BuildInfo\BuildInfoService.cpp" />
     <ClCompile Include="src\GW2\GameContext.cpp" />
     <ClCompile Include="src\Runtime\Runtime.cpp" />
     <ClCompile Include="src\Core\Hooks\Hooks.cpp" />
@@ -30,7 +31,6 @@
     <ClCompile Include="src\Engine\Networking\WebRequests\WreCache.cpp" />
     <ClCompile Include="src\Engine\Networking\WebRequests\WreConst.cpp" />
     <ClCompile Include="src\GW2\ArcDPS\ArcApi.cpp" />
-    <ClCompile Include="src\GW2\Build\BuildInfo.cpp" />
     <ClCompile Include="src\GW2\Inputs\GameBinds\GbApi.cpp" />
     <ClCompile Include="src\GW2\Inputs\GameBinds\GbConst.cpp" />
     <ClCompile Include="src\Engine\Inputs\InputBinds\IbCapture.cpp" />
@@ -111,6 +111,7 @@
     <ClInclude Include="src\Core\Addons\Definitions\DefEnum.h" />
     <ClInclude Include="src\Core\Addons\Library\LibAddon.h" />
     <ClInclude Include="src\Core\Addons\Library\LibManager.h" />
+    <ClInclude Include="src\GW2\BuildInfo\BuildInfoService.h" />
     <ClInclude Include="src\GW2\GameContext.h" />
     <ClInclude Include="src\Runtime\Runtime.h" />
     <ClInclude Include="src\Core\Hooks\HkConst.h" />
@@ -157,7 +158,6 @@
     <ClInclude Include="src\GW2\ArcDPS\ArcEnum.h" />
     <ClInclude Include="src\GW2\ArcDPS\ArcExtensionDef.h" />
     <ClInclude Include="src\GW2\ArcDPS\ArcFuncDefs.h" />
-    <ClInclude Include="src\GW2\Build\BuildInfo.h" />
     <ClInclude Include="src\GW2\Inputs\MouseResetFix.h" />
     <ClInclude Include="src\Engine\Networking\NetConst.h" />
     <ClInclude Include="src\UI\Renderer\RdrContext.h" />

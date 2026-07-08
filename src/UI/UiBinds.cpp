@@ -8,8 +8,10 @@
 
 #include "UiBinds.h"
 
-#include "Core/Addons/Addon.h"
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
+#include "Core/Addons/Addon.h"
 #include "Engine/Inputs/InputBinds/IbConst.h"
 #include "GW2/Inputs/GameBinds/GbConst.h"
 

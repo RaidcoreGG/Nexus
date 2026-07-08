@@ -8,49 +8,73 @@
 
 #include "GameContext.h"
 
-void GameContext::Shutdown()
-{
-	this->_Mumble.reset();
-	this->_GameBinds.reset();
-	this->_Arcdps.reset();
-}
+#include <memory>
 
-CArcApi& GameContext::Arcdps()
+#include "ArcDPS/ArcApi.h"
+#include "BuildInfo/BuildInfoService.h"
+#include "Inputs/GameBinds/GbApi.h"
+#include "Mumble/MblReader.h"
+
+namespace Raidcore::Nexus::GW2
 {
-	if (!this->_Arcdps)
+	void GameContext::Shutdown()
 	{
-		this->_Arcdps = std::make_unique<CArcApi>();
+		this->_Mumble.reset();
+		this->_GameBinds.reset();
+		this->_BuildInfo.reset();
+		this->_Arcdps.reset();
 	}
 
-	return *this->_Arcdps;
-}
-
-CGameBindsApi& GameContext::GameBinds()
-{
-	if (!this->_GameBinds)
+	CArcApi& GameContext::Arcdps()
 	{
-		this->_GameBinds = std::make_unique<CGameBindsApi>(
-			this->_RawInputApi,
-			this->_Logger,
-			this->_EventApi,
-			this->_RendererCtx,
-			this->_GameBindsPath
-		);
+		if (!this->_Arcdps)
+		{
+			this->_Arcdps = std::make_unique<CArcApi>();
+		}
+
+		return *this->_Arcdps;
 	}
 
-	return *this->_GameBinds;
-}
-
-CMumbleReader& GameContext::Mumble()
-{
-	if (!this->_Mumble)
+	BuildInfoService& GameContext::BuildInfo()
 	{
-		this->_Mumble = std::make_unique<CMumbleReader>(
-			this->_DataLink,
-			this->_EventApi,
-			this->_Logger
-		);
+		if (!this->_BuildInfo)
+		{
+			this->_BuildInfo = std::make_unique<BuildInfoService>(
+				this->_ArenaNetAssetCDN,
+				this->_Logger
+			);
+		}
+
+		return *this->_BuildInfo;
 	}
 
-	return *this->_Mumble;
+	CGameBindsApi& GameContext::GameBinds()
+	{
+		if (!this->_GameBinds)
+		{
+			this->_GameBinds = std::make_unique<CGameBindsApi>(
+				this->_RawInputApi,
+				this->_Logger,
+				this->_EventApi,
+				this->_RendererCtx,
+				this->_GameBindsPath
+			);
+		}
+
+		return *this->_GameBinds;
+	}
+
+	CMumbleReader& GameContext::Mumble()
+	{
+		if (!this->_Mumble)
+		{
+			this->_Mumble = std::make_unique<CMumbleReader>(
+				this->_DataLink,
+				this->_EventApi,
+				this->_Logger
+			);
+		}
+
+		return *this->_Mumble;
+	}
 }

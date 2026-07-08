@@ -19,9 +19,11 @@
 #include "imgui/imgui_impl_win32.h"
 #include "imgui/imgui_internal.h"
 
+#include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
 #include "Core/Addons/AddConst.h"
 #include "Core/Addons/Addon.h"
-#include "Runtime/Runtime.h"
 #include "Core/Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
 #include "Core/Preferences/PrefContext.h"

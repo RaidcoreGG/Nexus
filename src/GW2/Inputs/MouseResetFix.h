@@ -11,6 +11,8 @@
 #include <windows.h>
 
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
 #include "Core/Preferences/PrefConst.h"
 
 ///----------------------------------------------------------------------------------------------------

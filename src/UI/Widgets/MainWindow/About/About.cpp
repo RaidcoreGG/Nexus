@@ -14,6 +14,8 @@
 #include "ImAnimate/ImAnimate.h"
 
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
 #include "res/ResConst.h"
 
 CAboutBox::CAboutBox()

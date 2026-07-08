@@ -14,6 +14,8 @@
 namespace Clockwork = Raidcore::Clockwork;
 
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
 #include "Util/Inputs.h"
 #include "GbConst.h"
 

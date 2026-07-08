@@ -11,6 +11,7 @@
 #include "imgui/imgui.h"
 
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
 
 bool IModal::Render()
 {

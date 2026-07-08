@@ -13,6 +13,8 @@
 #include "imgui/imgui.h"
 
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
 #include "Core/Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
 #include "UiContext.h"

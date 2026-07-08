@@ -19,6 +19,9 @@
 
 #include "minhook/mh_hook.h"
 
+#include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
 #include "Core/NexusLink.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
@@ -30,7 +33,6 @@
 #include "GW2/Inputs/MouseResetFix.h"
 #include "HkConst.h"
 #include "HkFuncDefs.h"
-#include "Runtime/Runtime.h"
 #include "UI/Renderer/RdrContext.h"
 #include "UI/Textures/TxLoader.h"
 #include "UI/UiContext.h"

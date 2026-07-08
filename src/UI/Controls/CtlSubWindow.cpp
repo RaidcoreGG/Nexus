@@ -13,6 +13,8 @@
 #include "imgui/imgui_internal.h"
 
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
 #include "res/ResConst.h"
 
 void ISubWindow::Render()

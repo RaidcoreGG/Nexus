@@ -12,6 +12,8 @@
 #include "imgui/imgui_internal.h"
 
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
 #include "Core/Preferences/PrefConst.h"
 #include "Core/Preferences/PrefContext.h"
 #include "Util/Inputs.h"

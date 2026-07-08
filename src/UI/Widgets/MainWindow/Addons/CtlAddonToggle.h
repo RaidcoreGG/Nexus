@@ -13,8 +13,10 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_extensions.h"
 
-#include "Core/Addons/Addon.h"
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
+#include "Core/Addons/Addon.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// AddonToggleCtl Namespace

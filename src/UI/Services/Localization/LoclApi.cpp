@@ -16,10 +16,12 @@
 #pragma warning(pop)
 using json = nlohmann::json;
 
+#include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
 #include "Util/Resources.h"
 #include "Core/Index/Index.h"
 #include "res/ResConst.h"
-#include "Runtime/Runtime.h"
 #include "Core/Preferences/PrefConst.h"
 
 static CLocalization* s_Localization{};

@@ -9,6 +9,8 @@
 #include "BindSetterModal.h"
 
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
 #include "GW2/Inputs/GameBinds/GbConst.h"
 #include "Engine/Inputs/InputBinds/IbConst.h"
 

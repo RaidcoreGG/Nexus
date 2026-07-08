@@ -9,6 +9,8 @@
 #include "MumbleInspector.h"
 
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
 #include "Engine/DataLink/DlApi.h"
 
 CMumbleOverlay::CMumbleOverlay()

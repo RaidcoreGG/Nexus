@@ -12,6 +12,8 @@
 #include "imgui/imgui_internal.h"
 
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
 #include "ImAnimate/ImAnimate.h"
 #include "res/ResConst.h"
 #include "Util/Time.h"

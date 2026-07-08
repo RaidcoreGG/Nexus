@@ -13,9 +13,11 @@
 #include <dxgi.h>
 #include <windows.h>
 
+#include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
 #include "Proxy.h"
 #include "PxyEnum.h"
-#include "Runtime/Runtime.h"
 #include "Util/CmdLine.h"
 
 static ProxyModule_t s_ProxyModule{};

@@ -14,8 +14,10 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui/imgui_internal.h"
 
-#include "Core/Addons/Addon.h"
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
+#include "Core/Addons/Addon.h"
 #include "Engine/Inputs/InputBinds/IbConst.h"
 #include "res/ResConst.h"
 #include "UI/UiContext.h"

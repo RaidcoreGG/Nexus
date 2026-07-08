@@ -14,11 +14,12 @@
 #include <regex>
 #include <windows.h>
 
-#include "Core/Addons/API/ApiBuilder.h"
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
+#include "Core/Addons/API/ApiBuilder.h"
 #include "Core/Index/Index.h"
 #include "Engine/Cleanup/RefCleanerContext.h"
-#include "GW2/Build/BuildInfo.h"
 #include "Util/DLL.h"
 #include "Util/MD5.h"
 #include "Util/Paths.h"
@@ -371,7 +372,7 @@ void CAddon::LoadInternal()
 
 	this->EventApi->Raise(EV_ADDON_LOADED, &this->NexusAddonDefV1->Signature);
 
-	this->Config->LastGameBuild = GW2::GetGameBuild();
+	this->Config->LastGameBuild = Runtime::Get().Game().BuildInfo().Build();
 	this->Config->LastName = this->NexusAddonDefV1->GetName();
 	this->State = EAddonState::Loaded;
 	this->ConfigMgr->SaveConfigs();
@@ -846,7 +847,7 @@ bool CAddon::ShouldLoad()
 		this->Logger->Debug(
 			CH_ADDON,
 			"Canceled load. Volatile addon and gamebuild diff is %u. (%s)",
-			GW2::GetGameBuild() - this->Config->LastGameBuild,
+			Runtime::Get().Game().BuildInfo().Build() - this->Config->LastGameBuild,
 			this->Location.string().c_str()
 		);
 		result = false;
@@ -881,7 +882,7 @@ bool CAddon::IsVolatileDisabled()
 		return false;
 	}
 
-	if (this->Config->LastGameBuild != 0 && GW2::GetGameBuild() - this->Config->LastGameBuild > 350)
+	if (this->Config->LastGameBuild != 0 && Runtime::Get().Game().BuildInfo().Build() - this->Config->LastGameBuild > 350)
 	{
 		/* FIXME: move this elsewhere maybe? rather than the check */
 		if (this->Config->DisableVersion.empty() || this->Config->DisableVersion != this->GetMD5().string())

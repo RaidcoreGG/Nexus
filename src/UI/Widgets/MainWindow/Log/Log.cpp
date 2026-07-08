@@ -13,6 +13,8 @@
 #include "imgui/imgui_extensions.h"
 
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
 #include "res/ResConst.h"
 #include "Engine/Logging/LogConst.h"
 

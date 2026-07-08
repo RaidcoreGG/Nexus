@@ -14,6 +14,8 @@
 #include "imgui/imgui_extensions.h"
 
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "res/ResConst.h"

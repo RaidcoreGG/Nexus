@@ -9,6 +9,7 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <windows.h>
@@ -32,78 +33,83 @@
 #include "UI/Textures/TxLoader.h"
 #include "UI/UiContext.h"
 
-constexpr const char* CH_CORE = "Core";
-
-class Runtime
+///----------------------------------------------------------------------------------------------------
+/// Raidcore::Nexus Namespace
+///----------------------------------------------------------------------------------------------------
+namespace Raidcore::Nexus
 {
-	public:
-	static Runtime& Get();
+	constexpr const char* CH_CORE = "Core";
 
-	Runtime(Runtime const&)       = delete;
-	void operator=(Runtime const&) = delete;
+	class Runtime
+	{
+		public:
+		static Runtime& Get();
 
-	///----------------------------------------------------------------------------------------------------
-	/// Initialize:
-	/// 	Initializes the addon engine.
-	///----------------------------------------------------------------------------------------------------
-	void Initialize(EProxyFunction aEntryFunction);
+		Runtime(Runtime const&) = delete;
+		void operator=(Runtime const&) = delete;
 
-	///----------------------------------------------------------------------------------------------------
-	/// Shutdown:
-	/// 	Shuts down the addon engine.
-	///----------------------------------------------------------------------------------------------------
-	void Shutdown(unsigned int aReason);
+		///----------------------------------------------------------------------------------------------------
+		/// Initialize:
+		/// 	Initializes the addon engine.
+		///----------------------------------------------------------------------------------------------------
+		void Initialize(EProxyFunction aEntryFunction);
 
-	Version_t const& GetVersion();
+		///----------------------------------------------------------------------------------------------------
+		/// Shutdown:
+		/// 	Shuts down the addon engine.
+		///----------------------------------------------------------------------------------------------------
+		void Shutdown(unsigned int aReason);
 
-	const char* GetBuild();
+		Version_t const& GetVersion();
 
-	HMODULE GetModule();
+		const char* GetBuild();
 
-	DWORD GetModuleSize();
+		HMODULE GetModule();
 
-	GameContext& Game();
+		DWORD GetModuleSize();
 
-	CCrashHandler* GetCrashHandler();
+		GW2::GameContext& Game();
 
-	RenderContext_t* GetRendererCtx();
+		CCrashHandler* GetCrashHandler();
 
-	CLogApi* GetLogger();
+		RenderContext_t* GetRendererCtx();
 
-	CTextureLoader* GetTextureService();
+		CLogApi* GetLogger();
 
-	CDataLinkApi* GetDataLink();
+		CTextureLoader* GetTextureService();
 
-	CEventApi* GetEventApi();
+		CDataLinkApi* GetDataLink();
 
-	CLoader* GetLoader();
+		CEventApi* GetEventApi();
 
-	CLibraryMgr* GetAddonLibrary();
+		CLoader* GetLoader();
 
-	CRawInputApi* GetRawInputApi();
+		CLibraryMgr* GetAddonLibrary();
 
-	CInputBindApi* GetInputBindApi();
+		CRawInputApi* GetRawInputApi();
 
-	CUiContext* GetUIContext();
+		CInputBindApi* GetInputBindApi();
 
-	CSettings* GetSettingsCtx();
+		CUiContext* GetUIContext();
 
-	CHttpClient* GetHttpClient(std::string aURL);
+		CSettings* GetSettingsCtx();
 
-	CSelfUpdater* GetSelfUpdater();
+		CHttpClient* GetHttpClient(std::string aURL, bool aDisableCache = false);
 
-	CConfigMgr* GetCfgMgr();
+		CSelfUpdater* GetSelfUpdater();
 
-	private:
-	Runtime();
-	~Runtime();
+		CConfigMgr* GetCfgMgr();
 
-	HMODULE          Module{ nullptr };
-	DWORD            ModuleSize{ 0 };
+		private:
+		Runtime();
+		~Runtime();
 
-	std::unique_ptr<GameContext> _GameContext;
+		HMODULE          Module{ nullptr };
+		DWORD            ModuleSize{ 0 };
 
-	std::mutex                          HttpClientMutex{};
-	std::map<std::string, CHttpClient*> HttpClients{};
+		std::unique_ptr<GW2::GameContext> _GameContext;
 
-};
+		std::mutex                          HttpClientMutex{};
+		std::map<std::string, CHttpClient*> HttpClients{};
+	};
+}

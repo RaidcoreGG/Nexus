@@ -18,8 +18,10 @@ using json = nlohmann::json;
 
 using namespace Mumble;
 
-#include "Util/CmdLine.h"
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
+#include "Util/CmdLine.h"
 #include "MblExtensions.h"
 
 CMumbleReader::CMumbleReader(CDataLinkApi& aDataLink, CEventApi& aEventApi, CLogApi& aLogger)

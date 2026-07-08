@@ -9,6 +9,7 @@
 #include "ImportStyleModal.h"
 
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
 
 CImportStyleModal::CImportStyleModal()
 {

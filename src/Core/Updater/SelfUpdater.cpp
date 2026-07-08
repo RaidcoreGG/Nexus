@@ -9,6 +9,8 @@
 #include "SelfUpdater.h"
 
 #include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
 #include "Core/Index/Index.h"
 #include "Util/Paths.h"
 

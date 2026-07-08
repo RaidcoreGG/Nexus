@@ -8,10 +8,12 @@
 
 #include "Alerts.h"
 
+#include "Runtime/Runtime.h"
+using namespace Raidcore::Nexus;
+
 #include "imgui/imgui.h"
 #include "imgui/imgui_extensions.h"
 #include "ImAnimate/ImAnimate.h"
-#include "Runtime/Runtime.h"
 
 constexpr ImGuiWindowFlags Flags
 	= ImGuiWindowFlags_NoDecoration
