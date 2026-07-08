@@ -85,8 +85,6 @@ namespace Raidcore::Nexus
 		MH_Initialize();
 		Hooks::HookIDXGISwapChain();
 
-		Clockwork::Context::Create();
-
 		Runtime& ctx = Runtime::Get();
 		CLogApi* logger = ctx.GetLogger();
 
@@ -100,9 +98,6 @@ namespace Raidcore::Nexus
 			ctx.GetBuild(),
 			aEntryFunction
 		);
-
-		/* Initialize crash handler. */
-		ctx.Platform().CrashHandler();
 
 		/* Initialize self updater here so it can lock this instance and update. */
 		ctx.GetSelfUpdater();
@@ -181,15 +176,13 @@ namespace Raidcore::Nexus
 
 		s_ShutdownReason = aReason;
 
-		Clockwork::Context::Destroy();
-
 		std::string reasonStr;
 		switch (aReason)
 		{
-			case 1: { reasonStr = "Reason: DLL_PROCESS_DETACH"; break; }
+			case 1:          { reasonStr = "Reason: DLL_PROCESS_DETACH"; break; }
 			case WM_DESTROY: { reasonStr = "Reason: WM_DESTROY";         break; }
-			case WM_CLOSE: { reasonStr = "Reason: WM_CLOSE";           break; }
-			case WM_QUIT: { reasonStr = "Reason: WM_QUIT";            break; }
+			case WM_CLOSE:   { reasonStr = "Reason: WM_CLOSE";           break; }
+			case WM_QUIT:    { reasonStr = "Reason: WM_QUIT";            break; }
 			default:
 			{
 				reasonStr = std::format("Reason: Unknown ({})", aReason);
@@ -443,6 +436,8 @@ namespace Raidcore::Nexus
 
 	Runtime::Runtime()
 	{
+		Clockwork::Context::Create();
+
 		CreateIndex(GetModuleHandle(NULL));
 
 		this->_PlatformContext = std::make_unique<Platform::Context>(
@@ -485,5 +480,7 @@ namespace Raidcore::Nexus
 			/* Erase entry. */
 			it = this->HttpClients.erase(it);
 		}
+
+		Clockwork::Context::Destroy();
 	}
 }

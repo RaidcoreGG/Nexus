@@ -17,6 +17,42 @@
 
 namespace Raidcore::Nexus::GW2
 {
+	Context::Context(
+		CDataLinkApi&           aDataLink,
+		CEventApi&              aEventApi,
+		CLogApi&                aLogger,
+		Platform::CRawInputApi& aRawInputApi,
+		RenderContext_t&        aRendererCtx,
+		CHttpClient&            aArenaNetAssetCDN,
+		std::filesystem::path   aGameBindsPath
+	)
+		: _DataLink(aDataLink)
+		, _EventApi(aEventApi)
+		, _Logger(aLogger)
+		, _RawInputApi(aRawInputApi)
+		, _RendererCtx(aRendererCtx)
+		, _ArenaNetAssetCDN(aArenaNetAssetCDN)
+		, _GameBindsPath(std::move(aGameBindsPath))
+	{
+		this->_Arcdps = std::make_unique<CArcApi>();
+		this->_BuildInfo = std::make_unique<BuildInfoService>(
+			this->_ArenaNetAssetCDN,
+			this->_Logger
+		);
+		this->_GameBinds = std::make_unique<CGameBindsApi>(
+			this->_RawInputApi,
+			this->_Logger,
+			this->_EventApi,
+			this->_RendererCtx,
+			this->_GameBindsPath
+		);
+		this->_Mumble = std::make_unique<CMumbleReader>(
+			this->_DataLink,
+			this->_EventApi,
+			this->_Logger
+		);
+	}
+
 	void Context::Shutdown()
 	{
 		this->_Mumble.reset();
@@ -27,54 +63,21 @@ namespace Raidcore::Nexus::GW2
 
 	CArcApi& Context::Arcdps()
 	{
-		if (!this->_Arcdps)
-		{
-			this->_Arcdps = std::make_unique<CArcApi>();
-		}
-
 		return *this->_Arcdps;
 	}
 
 	BuildInfoService& Context::BuildInfo()
 	{
-		if (!this->_BuildInfo)
-		{
-			this->_BuildInfo = std::make_unique<BuildInfoService>(
-				this->_ArenaNetAssetCDN,
-				this->_Logger
-			);
-		}
-
 		return *this->_BuildInfo;
 	}
 
 	CGameBindsApi& Context::GameBinds()
 	{
-		if (!this->_GameBinds)
-		{
-			this->_GameBinds = std::make_unique<CGameBindsApi>(
-				this->_RawInputApi,
-				this->_Logger,
-				this->_EventApi,
-				this->_RendererCtx,
-				this->_GameBindsPath
-			);
-		}
-
 		return *this->_GameBinds;
 	}
 
 	CMumbleReader& Context::Mumble()
 	{
-		if (!this->_Mumble)
-		{
-			this->_Mumble = std::make_unique<CMumbleReader>(
-				this->_DataLink,
-				this->_EventApi,
-				this->_Logger
-			);
-		}
-
 		return *this->_Mumble;
 	}
 }

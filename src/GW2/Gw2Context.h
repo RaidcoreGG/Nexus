@@ -44,15 +44,7 @@ namespace Raidcore::Nexus::GW2
 			RenderContext_t&        aRendererCtx,
 			CHttpClient&            aArenaNetAssetCDN,
 			std::filesystem::path   aGameBindsPath
-		)
-			: _DataLink(aDataLink)
-			, _EventApi(aEventApi)
-			, _Logger(aLogger)
-			, _RawInputApi(aRawInputApi)
-			, _RendererCtx(aRendererCtx)
-			, _ArenaNetAssetCDN(aArenaNetAssetCDN)
-			, _GameBindsPath(std::move(aGameBindsPath))
-		{}
+		);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Shutdown:
