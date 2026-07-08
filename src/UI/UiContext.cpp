@@ -163,13 +163,13 @@ using namespace Raidcore::Nexus;
 }
 
 CUiContext::CUiContext(
-	RenderContext_t* aRenderContext,
-	CLogApi*         aLogger,
-	CTextureLoader*  aTextureService,
-	CDataLinkApi*    aDataLink,
-	CInputBindApi*   aInputBindApi,
-	CEventApi*       aEventApi,
-	CMumbleReader*   aMumbleReader
+	RenderContext_t*    aRenderContext,
+	CLogApi*            aLogger,
+	CTextureLoader*     aTextureService,
+	CDataLinkApi*       aDataLink,
+	CInputBindApi*      aInputBindApi,
+	CEventApi*          aEventApi,
+	GW2::CMumbleReader* aMumbleReader
 ) : IRefCleaner("UiContext")
 {
 	this->RenderContext  = aRenderContext;

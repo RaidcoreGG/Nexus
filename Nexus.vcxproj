@@ -113,6 +113,7 @@
     <ClInclude Include="src\Core\Addons\Library\LibManager.h" />
     <ClInclude Include="src\GW2\BuildInfo\BuildInfoService.h" />
     <ClInclude Include="src\GW2\GameContext.h" />
+    <ClInclude Include="src\GW2\Mumble\MblExtensions.h" />
     <ClInclude Include="src\Runtime\Runtime.h" />
     <ClInclude Include="src\Core\Hooks\HkConst.h" />
     <ClInclude Include="src\Core\Hooks\HkFuncDefs.h" />
@@ -174,7 +175,6 @@
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbMapping.h" />
     <ClInclude Include="src\Core\Addons\API\ApiBuilder.h" />
     <ClInclude Include="src\GW2\Mumble\MblConst.h" />
-    <ClInclude Include="src\GW2\Mumble\MblExtensions.h" />
     <ClInclude Include="src\Remote.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreClient.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreResponse.h" />

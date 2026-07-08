@@ -8,17 +8,17 @@
 
 #include "MblConst.h"
 
-namespace Mumble
+namespace Raidcore::Nexus::GW2
 {
-	float GetScalingFactor(EUIScale aSize)
+	float GetScalingFactor(Mumble::EUIScale aSize)
 	{
 		switch (aSize)
 		{
-			case EUIScale::Small:  { return SC_SMALL;  }
+			case Mumble::EUIScale::Small:  { return SC_SMALL;  }
 			default:
-			case EUIScale::Normal: { return SC_NORMAL; }
-			case EUIScale::Large:  { return SC_LARGE;  }
-			case EUIScale::Larger: { return SC_LARGER; }
+			case Mumble::EUIScale::Normal: { return SC_NORMAL; }
+			case Mumble::EUIScale::Large:  { return SC_LARGE;  }
+			case Mumble::EUIScale::Larger: { return SC_LARGER; }
 		}
 	}
 };

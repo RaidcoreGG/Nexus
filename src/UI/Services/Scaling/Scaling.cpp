@@ -14,6 +14,8 @@
 #include "Core/Preferences/PrefConst.h"
 #include "GW2/Mumble/MblConst.h"
 
+using namespace Raidcore::Nexus;
+
 static CScaling* s_Scaling{};
 
 /*static*/ void CScaling::OnMumbleIdentityChanged(void* aEventArgs)
@@ -108,7 +110,7 @@ void CScaling::UpdateDPI()
 
 void CScaling::UpdateGameUIScale()
 {
-	float currScaling = Mumble::GetScalingFactor(this->MumbleIdentity->UISize);
+	float currScaling = GW2::GetScalingFactor(this->MumbleIdentity->UISize);
 
 	if (this->GameScalingFactor != currScaling)
 	{

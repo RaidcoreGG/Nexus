@@ -16,13 +16,13 @@ constexpr const float SC_LARGE  = 1.11f;
 constexpr const float SC_LARGER = 1.22f;
 
 ///----------------------------------------------------------------------------------------------------
-/// Mumble Namespace
+/// Raidcore::Nexus::GW2 Namespace
 ///----------------------------------------------------------------------------------------------------
-namespace Mumble
+namespace Raidcore::Nexus::GW2
 {
 	///----------------------------------------------------------------------------------------------------
 	/// GetScalingFactor:
 	/// 	Returns the scaling factor for the given the UISize enum.
 	///----------------------------------------------------------------------------------------------------
-	float GetScalingFactor(EUIScale aSize);
+	float GetScalingFactor(Mumble::EUIScale aSize);
 };

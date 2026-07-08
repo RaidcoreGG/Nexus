@@ -14,11 +14,11 @@
 #include "thirdparty/mumble/Mumble.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// Mumble Namespace
+/// Raidcore::Nexus::GW2 Namespace
 ///----------------------------------------------------------------------------------------------------
-namespace Mumble
+namespace Raidcore::Nexus::GW2
 {
-	inline bool operator==(const Identity& lhs, const Identity& rhs)
+	inline bool operator==(const Mumble::Identity& lhs, const Mumble::Identity& rhs)
 	{
 		return strcmp(lhs.Name, rhs.Name) == 0
 			&& lhs.Profession     == rhs.Profession
@@ -32,30 +32,30 @@ namespace Mumble
 			&& lhs.UISize         == rhs.UISize;
 	}
 
-	inline bool operator!=(const Identity& lhs, const Identity& rhs)
+	inline bool operator!=(const Mumble::Identity& lhs, const Mumble::Identity& rhs)
 	{
 		return !(lhs == rhs);
 	}
 
-	inline bool operator==(const Vector2& lhs, const Vector2& rhs)
+	inline bool operator==(const Mumble::Vector2& lhs, const Mumble::Vector2& rhs)
 	{
 		return trunc(1000. * lhs.X) == trunc(1000. * rhs.X)
 			&& trunc(1000. * lhs.Y) == trunc(1000. * rhs.Y);
 	}
 
-	inline bool operator!=(const Vector2& lhs, const Vector2& rhs)
+	inline bool operator!=(const Mumble::Vector2& lhs, const Mumble::Vector2& rhs)
 	{
 		return !(lhs == rhs);
 	}
 
-	inline bool operator==(const Vector3& lhs, const Vector3& rhs)
+	inline bool operator==(const Mumble::Vector3& lhs, const Mumble::Vector3& rhs)
 	{
 		return trunc(1000. * lhs.X) == trunc(1000. * rhs.X)
 			&& trunc(1000. * lhs.Y) == trunc(1000. * rhs.Y)
 			&& trunc(1000. * lhs.Z) == trunc(1000. * rhs.Z);
 	}
 
-	inline bool operator!=(const Vector3& lhs, const Vector3& rhs)
+	inline bool operator!=(const Mumble::Vector3& lhs, const Mumble::Vector3& rhs)
 	{
 		return !(lhs == rhs);
 	}

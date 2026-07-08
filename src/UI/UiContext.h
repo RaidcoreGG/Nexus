@@ -35,6 +35,8 @@
 #include "UiStyle.h"
 #include "Util/Inputs.h"
 
+using namespace Raidcore::Nexus;
+
 constexpr const char* CH_UICONTEXT       = "UI Context";
 constexpr const char* KB_MENU            = "KB_MENU";
 constexpr const char* KB_ADDONS          = "KB_ADDONS";
@@ -78,13 +80,13 @@ class CUiContext : public CUiRender, public CUiBinds, public CUiStyle, public vi
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
 	CUiContext(
-		RenderContext_t* aRenderContext,
-		CLogApi*         aLogger,
-		CTextureLoader*  aTextureService,
-		CDataLinkApi*    aDataLink,
-		CInputBindApi*   aInputBindApi,
-		CEventApi*       aEventApi,
-		CMumbleReader*   aMumbleReader
+		RenderContext_t*    aRenderContext,
+		CLogApi*            aLogger,
+		CTextureLoader*     aTextureService,
+		CDataLinkApi*       aDataLink,
+		CInputBindApi*      aInputBindApi,
+		CEventApi*          aEventApi,
+		GW2::CMumbleReader* aMumbleReader
 	);
 
 	///----------------------------------------------------------------------------------------------------
@@ -167,7 +169,7 @@ class CUiContext : public CUiRender, public CUiBinds, public CUiStyle, public vi
 	CDataLinkApi*           DataLink       = nullptr;
 	CInputBindApi*          InputBindApi   = nullptr;
 	CEventApi*              EventApi       = nullptr;
-	CMumbleReader*          MumbleReader   = nullptr;
+	GW2::CMumbleReader*     MumbleReader   = nullptr;
 
 	/* Rendering */
 	ID3D11RenderTargetView* RenderTargetView;

@@ -17,82 +17,88 @@
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Logging/LogApi.h"
 
-constexpr const char* CH_MUMBLE_READER           = "MumbleReader";
-constexpr const char* DL_MUMBLE_LINK             = "DL_MUMBLE_LINK";
-constexpr const char* DL_MUMBLE_LINK_IDENTITY    = "DL_MUMBLE_LINK_IDENTITY";
+constexpr const char* DL_MUMBLE_LINK = "DL_MUMBLE_LINK";
+constexpr const char* DL_MUMBLE_LINK_IDENTITY = "DL_MUMBLE_LINK_IDENTITY";
 constexpr const char* EV_MUMBLE_IDENTITY_UPDATED = "EV_MUMBLE_IDENTITY_UPDATED";
 
 ///----------------------------------------------------------------------------------------------------
-/// CMumbleReader Class
+/// Raidcore::Nexus::GW2 Namespace
 ///----------------------------------------------------------------------------------------------------
-class CMumbleReader
+namespace Raidcore::Nexus::GW2
 {
-	public:
+	constexpr const char* CH_MUMBLE_READER = "MumbleReader";
 	///----------------------------------------------------------------------------------------------------
-	/// ctor
+	/// CMumbleReader Class
 	///----------------------------------------------------------------------------------------------------
-	CMumbleReader(CDataLinkApi& aDataLink, CEventApi& aEventApi, CLogApi& aLogger);
+	class CMumbleReader
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		CMumbleReader(CDataLinkApi& aDataLink, CEventApi& aEventApi, CLogApi& aLogger);
 
-	///----------------------------------------------------------------------------------------------------
-	/// dtor
-	///----------------------------------------------------------------------------------------------------
-	~CMumbleReader();
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		~CMumbleReader();
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetName:
-	/// 	Returns the name of the MumbleLink file.
-	///----------------------------------------------------------------------------------------------------
-	std::string GetName();
+		///----------------------------------------------------------------------------------------------------
+		/// GetName:
+		/// 	Returns the name of the MumbleLink file.
+		///----------------------------------------------------------------------------------------------------
+		std::string GetName();
 
-	///----------------------------------------------------------------------------------------------------
-	/// IsDisabled:
-	/// 	Returns whether the MumbleLink API is explicitly disabled.
-	///----------------------------------------------------------------------------------------------------
-	bool IsDisabled() const;
+		///----------------------------------------------------------------------------------------------------
+		/// IsDisabled:
+		/// 	Returns whether the MumbleLink API is explicitly disabled.
+		///----------------------------------------------------------------------------------------------------
+		bool IsDisabled() const;
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetMumbleData:
-	/// 	Returns a pointer to the mumble link data.
-	///----------------------------------------------------------------------------------------------------
-	Mumble::Data* GetMumbleData() const;
-	
-	///----------------------------------------------------------------------------------------------------
-	/// GetMumbleIdentity:
-	/// 	Returns a pointer to the parsed mumble identity data.
-	///----------------------------------------------------------------------------------------------------
-	Mumble::Identity* GetMumbleIdentity() const;
+		///----------------------------------------------------------------------------------------------------
+		/// GetMumbleData:
+		/// 	Returns a pointer to the mumble link data.
+		///----------------------------------------------------------------------------------------------------
+		Mumble::Data* GetMumbleData() const;
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetNexusLink:
-	/// 	Returns a pointer to the nexus link data.
-	///----------------------------------------------------------------------------------------------------
-	NexusLinkData_t* GetNexusLink() const;
+		///----------------------------------------------------------------------------------------------------
+		/// GetMumbleIdentity:
+		/// 	Returns a pointer to the parsed mumble identity data.
+		///----------------------------------------------------------------------------------------------------
+		Mumble::Identity* GetMumbleIdentity() const;
 
-	private:
-	CDataLinkApi&     DataLinkApi;
-	CEventApi&        EventApi;
-	CLogApi&          Logger;
+		///----------------------------------------------------------------------------------------------------
+		/// GetNexusLink:
+		/// 	Returns a pointer to the nexus link data.
+		///----------------------------------------------------------------------------------------------------
+		NexusLinkData_t* GetNexusLink() const;
 
-	std::string       Name;
-	Mumble::Data*     MumbleLink             = nullptr;
-	Mumble::Identity* MumbleIdentity         = nullptr;
-	NexusLinkData_t*  NexusLink              = nullptr;
+		private:
+		CDataLinkApi& DataLinkApi;
+		CEventApi& EventApi;
+		CLogApi& Logger;
 
-	unsigned          PreviousTick           = 0;
-	Vector3           PreviousAvatarPosition = {};
-	Vector3           PreviousCameraFront    = {};
-	Mumble::Identity  PreviousIdentity       = Mumble::Identity{};
-	long long         PreviousFrameCounter   = 0;
+		std::string       Name;
+		Mumble::Data*     MumbleLink = nullptr;
+		Mumble::Identity* MumbleIdentity = nullptr;
+		NexusLinkData_t*  NexusLink = nullptr;
 
-	///----------------------------------------------------------------------------------------------------
-	/// AdvanceIdentity:
-	/// 	Thread function to parse the mumble identity.
-	///----------------------------------------------------------------------------------------------------
-	void AdvanceIdentity();
+		unsigned          PreviousTick = 0;
+		Mumble::Vector3   PreviousAvatarPosition = {};
+		Mumble::Vector3   PreviousCameraFront = {};
+		Mumble::Identity  PreviousIdentity = Mumble::Identity{};
+		long long         PreviousFrameCounter = 0;
 
-	///----------------------------------------------------------------------------------------------------
-	/// AdvanceDerived:
-	/// 	Thread function to update derived states.
-	///----------------------------------------------------------------------------------------------------
-	void AdvanceDerived();
-};
+		///----------------------------------------------------------------------------------------------------
+		/// AdvanceIdentity:
+		/// 	Thread function to parse the mumble identity.
+		///----------------------------------------------------------------------------------------------------
+		void AdvanceIdentity();
+
+		///----------------------------------------------------------------------------------------------------
+		/// AdvanceDerived:
+		/// 	Thread function to update derived states.
+		///----------------------------------------------------------------------------------------------------
+		void AdvanceDerived();
+	};
+}

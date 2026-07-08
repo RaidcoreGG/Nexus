@@ -202,11 +202,13 @@ void CMumbleOverlay::Render()
 				ImGui::TableSetColumnIndex(1); ImGui::Text("%d", MumbleLink->Context.MapType);
 				ImGui::TableNextRow();
 				ImGui::TableSetColumnIndex(0); ImGui::Text("ip");
-				ImGui::TableSetColumnIndex(1); ImGui::Text("%u.%u.%u.%u",
-														   MumbleLink->Context.ServerAddress[4],
-														   MumbleLink->Context.ServerAddress[5],
-														   MumbleLink->Context.ServerAddress[6],
-														   MumbleLink->Context.ServerAddress[7]);
+				ImGui::TableSetColumnIndex(1); ImGui::Text(
+					"%u.%u.%u.%u",
+					MumbleLink->Context.ServerAddress.IPv4.sin_addr.S_un.S_un_b.s_b1,
+					MumbleLink->Context.ServerAddress.IPv4.sin_addr.S_un.S_un_b.s_b2,
+					MumbleLink->Context.ServerAddress.IPv4.sin_addr.S_un.S_un_b.s_b3,
+					MumbleLink->Context.ServerAddress.IPv4.sin_addr.S_un.S_un_b.s_b4
+				);
 				ImGui::TableNextRow();
 				ImGui::TableSetColumnIndex(0); ImGui::Text("shard");
 				ImGui::TableSetColumnIndex(1); ImGui::Text("%u", MumbleLink->Context.ShardID);
