@@ -20,12 +20,12 @@ namespace Raidcore::Nexus::Platform
 		: CrashLogPath(std::move(aCrashlog))
 		, CrashStackPath(std::move(aCrashstack))
 	{
-		this->_CrashHandler = std::make_unique<CCrashHandler>(
+		this->_CrashHandler = std::make_unique<Platform::CrashHandler>(
 			this->CrashLogPath,
 			this->CrashStackPath
 		);
 
-		this->_RawInputApi = std::make_unique<CRawInputApi>();
+		this->_RawInputApi = std::make_unique<RawInputApi>();
 	}
 
 	void Context::Shutdown()
@@ -53,12 +53,12 @@ namespace Raidcore::Nexus::Platform
 		return this->_Module;
 	}
 
-	CCrashHandler& Context::CrashHandler()
+	Platform::CrashHandler& Context::CrashHandler()
 	{
 		return *this->_CrashHandler;
 	}
 
-	CRawInputApi& Context::RawInput()
+	Platform::RawInputApi& Context::RawInput()
 	{
 		return *this->_RawInputApi;
 	}

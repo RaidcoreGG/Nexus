@@ -29,20 +29,20 @@ namespace Raidcore::Nexus::Platform
 	};
 
 	///----------------------------------------------------------------------------------------------------
-	/// CCrashHandler Class
+	/// CrashHandler Class
 	///----------------------------------------------------------------------------------------------------
-	class CCrashHandler
+	class CrashHandler
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		CCrashHandler(std::filesystem::path aCrashLogPath, std::filesystem::path aCrashStackPath);
+		CrashHandler(std::filesystem::path aCrashLogPath, std::filesystem::path aCrashStackPath);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
 		///----------------------------------------------------------------------------------------------------
-		~CCrashHandler();
+		~CrashHandler();
 
 		private:
 		char         LogPath[MAX_PATH];

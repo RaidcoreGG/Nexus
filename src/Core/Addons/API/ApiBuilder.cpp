@@ -43,7 +43,7 @@ namespace ADDONAPI
 	static CEventApi*              s_EventApi      = nullptr;
 	static CGameBindsApi*          s_GameBindsApi  = nullptr;
 	static CInputBindApi*          s_InputBindApi  = nullptr;
-	static Platform::CRawInputApi* s_RawInputApi   = nullptr;
+	static Platform::RawInputApi* s_RawInputApi   = nullptr;
 	static CLocalization*          s_Localization  = nullptr;
 	static CLogApi*                s_Logger        = nullptr;
 	static CTextureLoader*         s_TextureApi    = nullptr;

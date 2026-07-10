@@ -23,7 +23,7 @@ namespace Raidcore::Nexus::GW2
 		CDataLinkApi&           aDataLink,
 		CEventApi&              aEventApi,
 		CLogApi&                aLogger,
-		Platform::CRawInputApi& aRawInputApi,
+		Platform::RawInputApi& aRawInputApi,
 		RenderContext_t&        aRendererCtx,
 		CHttpClient&            aArenaNetAssetCDN,
 		std::filesystem::path   aGameBindsPath

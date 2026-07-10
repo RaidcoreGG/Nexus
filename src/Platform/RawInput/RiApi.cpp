@@ -10,7 +10,7 @@
 
 namespace Raidcore::Nexus::Platform
 {
-	UINT CRawInputApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	UINT RawInputApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		// don't pass to game if addon wndproc
 		const std::lock_guard<std::mutex> lock(this->Mutex);
@@ -26,21 +26,21 @@ namespace Raidcore::Nexus::Platform
 		return 1;
 	}
 
-	void CRawInputApi::Register(WNDPROC_CALLBACK aWndProcCallback)
+	void RawInputApi::Register(WNDPROC_CALLBACK aWndProcCallback)
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
 		this->Registry.push_back(aWndProcCallback);
 	}
 
-	void CRawInputApi::Deregister(WNDPROC_CALLBACK aWndProcCallback)
+	void RawInputApi::Deregister(WNDPROC_CALLBACK aWndProcCallback)
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
 		this->Registry.erase(std::remove(this->Registry.begin(), this->Registry.end(), aWndProcCallback), this->Registry.end());
 	}
 
-	uint32_t CRawInputApi::CleanupRefs(void* aStartAddress, void* aEndAddress)
+	uint32_t RawInputApi::CleanupRefs(void* aStartAddress, void* aEndAddress)
 	{
 		uint32_t refCounter = 0;
 

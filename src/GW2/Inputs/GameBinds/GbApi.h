@@ -55,7 +55,7 @@ class CGameBindsApi
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
 	CGameBindsApi(
-		Platform::CRawInputApi& aRawInputApi,
+		Platform::RawInputApi& aRawInputApi,
 		CLogApi&                aLogger,
 		CEventApi&              aEventApi,
 		RenderContext_t&        aRenderContext,
@@ -148,7 +148,7 @@ class CGameBindsApi
 	void Load(std::filesystem::path aPath);
 
 	private:
-	Platform::CRawInputApi&                          RawInputApi;
+	Platform::RawInputApi&                          RawInputApi;
 	CLogApi&                                         Logger;
 	CEventApi&                                       EventApi;
 	RenderContext_t&                                 RenderContext;

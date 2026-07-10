@@ -97,7 +97,7 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 }
 
 CGameBindsApi::CGameBindsApi(
-	Platform::CRawInputApi& aRawInputApi,
+	Platform::RawInputApi& aRawInputApi,
 	CLogApi&                aLogger,
 	CEventApi&              aEventApi,
 	RenderContext_t&        aRenderContext,

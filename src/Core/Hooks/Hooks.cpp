@@ -185,7 +185,7 @@ namespace Hooks
 		{
 			static Runtime&                s_Context      = Runtime::Get();
 			static CInputBindApi*          s_InputBindApi = s_Context.GetInputBindApi();
-			static Platform::CRawInputApi& s_RawInputApi  = s_Context.Platform().RawInput();
+			static Platform::RawInputApi& s_RawInputApi  = s_Context.Platform().RawInput();
 			static CUiContext*             s_UIContext    = s_Context.GetUIContext();
 			static CLoader&                s_Loader       = s_Context.Host().Loader();
 			static CGameBindsApi&          s_GameBindsApi = s_Context.Game().GameBinds();

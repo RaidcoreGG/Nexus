@@ -47,13 +47,13 @@ namespace Raidcore::Nexus::Platform
 		/// CrashHandler:
 		/// 	Returns the crash handler instance.
 		///----------------------------------------------------------------------------------------------------
-		CCrashHandler& CrashHandler();
+		Platform::CrashHandler& CrashHandler();
 
 		///----------------------------------------------------------------------------------------------------
 		/// RawInput:
 		/// 	Returns the raw input API instance.
 		///----------------------------------------------------------------------------------------------------
-		CRawInputApi& RawInput();
+		Platform::RawInputApi& RawInput();
 
 		private:
 		HMODULE _Module{ nullptr };
@@ -61,7 +61,7 @@ namespace Raidcore::Nexus::Platform
 		std::filesystem::path CrashLogPath;
 		std::filesystem::path CrashStackPath;
 
-		std::unique_ptr<CCrashHandler> _CrashHandler{ nullptr };
-		std::unique_ptr<CRawInputApi>  _RawInputApi{ nullptr };
+		std::unique_ptr<Platform::CrashHandler> _CrashHandler{ nullptr };
+		std::unique_ptr<Platform::RawInputApi>  _RawInputApi{ nullptr };
 	};
 }

@@ -13,7 +13,7 @@
 
 namespace Raidcore::Nexus::Platform
 {
-	static CCrashHandler* s_CrashHandler{};
+	static CrashHandler* s_CrashHandler{};
 
 	///----------------------------------------------------------------------------------------------------
 	/// WriteToFile:
@@ -31,7 +31,7 @@ namespace Raidcore::Nexus::Platform
 		va_end(args);
 	}
 
-	CCrashHandler::CCrashHandler(std::filesystem::path aCrashLogPath, std::filesystem::path aCrashStackPath)
+	CrashHandler::CrashHandler(std::filesystem::path aCrashLogPath, std::filesystem::path aCrashStackPath)
 	{
 		::GetSystemInfo(&this->SystemInfo);
 
@@ -50,7 +50,7 @@ namespace Raidcore::Nexus::Platform
 			throw "Unexpected CPU architecture.";
 		}
 
-		this->VEH = ::AddVectoredExceptionHandler(1, CCrashHandler::OnVectoredException);
+		this->VEH = ::AddVectoredExceptionHandler(1, CrashHandler::OnVectoredException);
 
 		memset(this->LogPath, 0, MAX_PATH);
 		strcpy_s(this->LogPath, MAX_PATH, aCrashLogPath.string().c_str());
@@ -63,13 +63,13 @@ namespace Raidcore::Nexus::Platform
 
 		if (s_CrashHandler)
 		{
-			throw "CCrashHandler already registered.";
+			throw "CrashHandler already registered.";
 		}
 
 		s_CrashHandler = this;
 	}
 
-	CCrashHandler::~CCrashHandler()
+	CrashHandler::~CrashHandler()
 	{
 		if (this->VEH)
 		{
@@ -77,7 +77,7 @@ namespace Raidcore::Nexus::Platform
 		}
 	}
 
-	/*static*/ LONG WINAPI CCrashHandler::OnVectoredException(EXCEPTION_POINTERS* aExcPointers)
+	/*static*/ LONG WINAPI CrashHandler::OnVectoredException(EXCEPTION_POINTERS* aExcPointers)
 	{
 		switch (aExcPointers->ExceptionRecord->ExceptionCode)
 		{
