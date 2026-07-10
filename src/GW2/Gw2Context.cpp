@@ -36,19 +36,19 @@ namespace Raidcore::Nexus::GW2
 		, _ArenaNetAssetCDN(aArenaNetAssetCDN)
 		, _GameBindsPath(std::move(aGameBindsPath))
 	{
-		this->_Arcdps = std::make_unique<CArcApi>();
+		this->_Arcdps = std::make_unique<ArcdpsApi>();
 		this->_BuildInfo = std::make_unique<BuildInfoService>(
 			this->_ArenaNetAssetCDN,
 			this->_Logger
 		);
-		this->_GameBinds = std::make_unique<CGameBindsApi>(
+		this->_GameBinds = std::make_unique<GameBindsApi>(
 			this->_RawInputApi,
 			this->_Logger,
 			this->_EventApi,
 			this->_RendererCtx,
 			this->_GameBindsPath
 		);
-		this->_Mumble = std::make_unique<CMumbleReader>(
+		this->_Mumble = std::make_unique<MumbleReader>(
 			this->_DataLink,
 			this->_EventApi,
 			this->_Logger
@@ -79,7 +79,7 @@ namespace Raidcore::Nexus::GW2
 		this->_Arcdps.reset();
 	}
 
-	CArcApi& Context::Arcdps()
+	ArcdpsApi& Context::Arcdps()
 	{
 		return *this->_Arcdps;
 	}
@@ -89,12 +89,12 @@ namespace Raidcore::Nexus::GW2
 		return *this->_BuildInfo;
 	}
 
-	CGameBindsApi& Context::GameBinds()
+	GameBindsApi& Context::GameBinds()
 	{
 		return *this->_GameBinds;
 	}
 
-	CMumbleReader& Context::Mumble()
+	MumbleReader& Context::Mumble()
 	{
 		return *this->_Mumble;
 	}

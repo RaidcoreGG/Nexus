@@ -76,7 +76,7 @@ void CBindSetterModal::OnOpening()
 {
 	Runtime&      ctx   = Runtime::Get();
 	CInputBindApi* ibapi = ctx.GetInputBindApi();
-	CGameBindsApi* gbapi = &ctx.Game().GameBinds();
+	GameBindsApi* gbapi = &ctx.Game().GameBinds();
 
 	/* Fetch display text. */
 	switch (this->Type)
@@ -117,7 +117,7 @@ void CBindSetterModal::OnClosing()
 {
 	Runtime&      ctx   = Runtime::Get();
 	CInputBindApi* ibapi = ctx.GetInputBindApi();
-	CGameBindsApi* gbapi = &ctx.Game().GameBinds();
+	GameBindsApi* gbapi = &ctx.Game().GameBinds();
 	ibapi->EndCapturing();
 
 	switch (this->GetResult())

@@ -20,7 +20,7 @@ static void s_ReceiveExtension(ArcDPS::ExtensionDefRaw_t* aExtensionDef)
 	Runtime::Get().Game().Arcdps().ReceiveExtension(aExtensionDef);
 }
 
-CArcApi::~CArcApi()
+ArcdpsApi::~ArcdpsApi()
 {
 	this->Functions = {};
 
@@ -30,12 +30,12 @@ CArcApi::~CArcApi()
 	}
 }
 
-bool CArcApi::IsInitialized()
+bool ArcdpsApi::IsInitialized()
 {
 	return this->Module != nullptr;
 }
 
-void CArcApi::Initialize(HMODULE aArcdpsModule)
+void ArcdpsApi::Initialize(HMODULE aArcdpsModule)
 {
 	if (!this->BuildFunctionTable(aArcdpsModule))
 	{
@@ -48,7 +48,7 @@ void CArcApi::Initialize(HMODULE aArcdpsModule)
 	this->Module = LoadLibraryA(path);
 }
 
-bool CArcApi::TryDetect()
+bool ArcdpsApi::TryDetect()
 {
 	if (this->IsInitialized())
 	{
@@ -91,7 +91,7 @@ bool CArcApi::TryDetect()
 	return false;
 }
 
-std::filesystem::path CArcApi::GetArcIniPath()
+std::filesystem::path ArcdpsApi::GetArcIniPath()
 {
 	if (this->IsInitialized()) { return std::filesystem::path(); }
 	
@@ -99,49 +99,49 @@ std::filesystem::path CArcApi::GetArcIniPath()
 	return path;
 }
 
-void CArcApi::LogToFile(char* aMessage)
+void ArcdpsApi::LogToFile(char* aMessage)
 {
 	if (this->IsInitialized()) { return; }
 
 	this->Functions.LogToFile(aMessage);
 }
 
-void CArcApi::LogToWindow(char* aMessage)
+void ArcdpsApi::LogToWindow(char* aMessage)
 {
 	if (this->IsInitialized()) { return; }
 
 	this->Functions.LogToWindow(aMessage);
 }
 
-ArcDPS::UiFlags_t CArcApi::GetUIFlags()
+ArcDPS::UiFlags_t ArcdpsApi::GetUIFlags()
 {
 	if (this->IsInitialized()) { return ArcDPS::UiFlags_t(); }
 
 	return this->Functions.GetUIFlags();
 }
 
-ArcDPS::Modifiers_t CArcApi::GetModifiers()
+ArcDPS::Modifiers_t ArcdpsApi::GetModifiers()
 {
 	if (this->IsInitialized()) { return ArcDPS::Modifiers_t(); }
 
 	return this->Functions.GetModifiers();
 }
 
-ArcDPS::EAddExtResult CArcApi::AddExtension(HMODULE aModule)
+ArcDPS::EAddExtResult ArcdpsApi::AddExtension(HMODULE aModule)
 {
 	if (this->IsInitialized()) { return ArcDPS::EAddExtResult::NotInitialized; }
 
 	return this->Functions.AddExtension(aModule);
 }
 
-void CArcApi::FreeExtension(uint32_t aSignature)
+void ArcdpsApi::FreeExtension(uint32_t aSignature)
 {
 	if (this->IsInitialized()) { return; }
 
 	this->Functions.FreeExtension(aSignature);
 }
 
-void CArcApi::PollExtensions()
+void ArcdpsApi::PollExtensions()
 {
 	if (this->IsInitialized()) { return; }
 
@@ -149,7 +149,7 @@ void CArcApi::PollExtensions()
 	this->Functions.ListExtensions(s_ReceiveExtension);
 }
 
-void CArcApi::ReceiveExtension(ArcDPS::ExtensionDefRaw_t* aExtensionDef)
+void ArcdpsApi::ReceiveExtension(ArcDPS::ExtensionDefRaw_t* aExtensionDef)
 {
 	if (this->IsInitialized()) { return; }
 
@@ -160,7 +160,7 @@ void CArcApi::ReceiveExtension(ArcDPS::ExtensionDefRaw_t* aExtensionDef)
 	/* If they are outside of /addons though, it's nice to track them. */
 }
 
-bool CArcApi::BuildFunctionTable(HMODULE aArcdpsModule)
+bool ArcdpsApi::BuildFunctionTable(HMODULE aArcdpsModule)
 {
 	FuncTable_t funcs{};
 

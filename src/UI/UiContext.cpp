@@ -169,7 +169,7 @@ CUiContext::CUiContext(
 	CDataLinkApi*       aDataLink,
 	CInputBindApi*      aInputBindApi,
 	CEventApi*          aEventApi,
-	GW2::CMumbleReader* aMumbleReader
+	GW2::MumbleReader* aMumbleReader
 ) : IRefCleaner("UiContext")
 {
 	this->RenderContext  = aRenderContext;

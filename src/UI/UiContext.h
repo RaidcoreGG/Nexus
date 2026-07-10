@@ -86,7 +86,7 @@ class CUiContext : public CUiRender, public CUiBinds, public CUiStyle, public vi
 		CDataLinkApi*       aDataLink,
 		CInputBindApi*      aInputBindApi,
 		CEventApi*          aEventApi,
-		GW2::CMumbleReader* aMumbleReader
+		GW2::MumbleReader* aMumbleReader
 	);
 
 	///----------------------------------------------------------------------------------------------------
@@ -169,7 +169,7 @@ class CUiContext : public CUiRender, public CUiBinds, public CUiStyle, public vi
 	CDataLinkApi*           DataLink       = nullptr;
 	CInputBindApi*          InputBindApi   = nullptr;
 	CEventApi*              EventApi       = nullptr;
-	GW2::CMumbleReader*     MumbleReader   = nullptr;
+	GW2::MumbleReader*     MumbleReader   = nullptr;
 
 	/* Rendering */
 	ID3D11RenderTargetView* RenderTargetView;

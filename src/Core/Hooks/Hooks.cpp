@@ -188,7 +188,7 @@ namespace Hooks
 			static Platform::RawInputApi& s_RawInputApi  = s_Context.Platform().RawInput();
 			static CUiContext*             s_UIContext    = s_Context.GetUIContext();
 			static CLoader&                s_Loader       = s_Context.Host().Loader();
-			static CGameBindsApi&          s_GameBindsApi = s_Context.Game().GameBinds();
+			static GameBindsApi&          s_GameBindsApi = s_Context.Game().GameBinds();
 
 			// don't pass to game if loader
 			if (s_Loader.WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }

@@ -64,7 +64,7 @@ namespace Raidcore::Nexus::GW2
 		/// Arcdps:
 		/// 	Returns the ArcDPS API.
 		///----------------------------------------------------------------------------------------------------
-		CArcApi& Arcdps();
+		ArcdpsApi& Arcdps();
 
 		///----------------------------------------------------------------------------------------------------
 		/// Build:
@@ -76,29 +76,29 @@ namespace Raidcore::Nexus::GW2
 		/// GameBinds:
 		/// 	Returns the GameBinds API.
 		///----------------------------------------------------------------------------------------------------
-		CGameBindsApi& GameBinds();
+		GameBindsApi& GameBinds();
 
 		///----------------------------------------------------------------------------------------------------
 		/// Mumble:
 		/// 	Returns the Mumble API.
 		///----------------------------------------------------------------------------------------------------
-		CMumbleReader& Mumble();
+		MumbleReader& Mumble();
 
 		private:
 		/* Dependencies */
-		CDataLinkApi&           _DataLink;
-		CEventApi&              _EventApi;
-		CLogApi&                _Logger;
+		CDataLinkApi&          _DataLink;
+		CEventApi&             _EventApi;
+		CLogApi&               _Logger;
 		Platform::RawInputApi& _RawInputApi;
-		RenderContext_t&        _RendererCtx;
-		CHttpClient&            _ArenaNetAssetCDN;
+		RenderContext_t&       _RendererCtx;
+		CHttpClient&           _ArenaNetAssetCDN;
 
 		std::filesystem::path _GameBindsPath;
 
 		/* Services */
-		std::unique_ptr<CArcApi>          _Arcdps   { nullptr };
+		std::unique_ptr<ArcdpsApi>        _Arcdps   { nullptr };
 		std::unique_ptr<BuildInfoService> _BuildInfo{ nullptr };
-		std::unique_ptr<CGameBindsApi>    _GameBinds{ nullptr };
-		std::unique_ptr<CMumbleReader>    _Mumble   { nullptr };
+		std::unique_ptr<GameBindsApi>     _GameBinds{ nullptr };
+		std::unique_ptr<MumbleReader>     _Mumble   { nullptr };
 	};
 }

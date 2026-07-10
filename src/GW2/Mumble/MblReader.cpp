@@ -26,7 +26,7 @@ using namespace Raidcore::Nexus;
 
 namespace Raidcore::Nexus::GW2
 {
-	CMumbleReader::CMumbleReader(CDataLinkApi& aDataLink, CEventApi& aEventApi, CLogApi& aLogger)
+	MumbleReader::MumbleReader(CDataLinkApi& aDataLink, CEventApi& aEventApi, CLogApi& aLogger)
 		: DataLinkApi(aDataLink)
 		, EventApi(aEventApi)
 		, Logger(aLogger)
@@ -56,35 +56,35 @@ namespace Raidcore::Nexus::GW2
 		}
 	}
 
-	CMumbleReader::~CMumbleReader()
+	MumbleReader::~MumbleReader()
 	{}
 
-	std::string CMumbleReader::GetName()
+	std::string MumbleReader::GetName()
 	{
 		return this->Name;
 	}
 
-	bool CMumbleReader::IsDisabled() const
+	bool MumbleReader::IsDisabled() const
 	{
 		return this->Name == "0";
 	}
 
-	Mumble::Data* CMumbleReader::GetMumbleData() const
+	Mumble::Data* MumbleReader::GetMumbleData() const
 	{
 		return this->MumbleLink;
 	}
 
-	Mumble::Identity* CMumbleReader::GetMumbleIdentity() const
+	Mumble::Identity* MumbleReader::GetMumbleIdentity() const
 	{
 		return this->MumbleIdentity;
 	}
 
-	NexusLinkData_t* CMumbleReader::GetNexusLink() const
+	NexusLinkData_t* MumbleReader::GetNexusLink() const
 	{
 		return this->NexusLink;
 	}
 
-	void CMumbleReader::AdvanceIdentity()
+	void MumbleReader::AdvanceIdentity()
 	{
 		if (this->MumbleLink->Identity[0])
 		{
@@ -106,7 +106,7 @@ namespace Raidcore::Nexus::GW2
 				j["fov"].get_to(this->MumbleIdentity->FOV);
 				j["uisz"].get_to(this->MumbleIdentity->UISize);
 
-				//this->Logger->Trace(CH_MUMBLE_READER, "CMumbleReader::AdvanceIdentity()");
+				//this->Logger->Trace(CH_MUMBLE_READER, "MumbleReader::AdvanceIdentity()");
 			}
 			catch (json::parse_error& ex)
 			{
@@ -129,7 +129,7 @@ namespace Raidcore::Nexus::GW2
 		}
 	}
 
-	void CMumbleReader::AdvanceDerived()
+	void MumbleReader::AdvanceDerived()
 	{
 		Runtime& ctx = Runtime::Get();
 		RenderContext_t* renderer = ctx.GetRendererCtx();
@@ -147,6 +147,6 @@ namespace Raidcore::Nexus::GW2
 		this->PreviousAvatarPosition = this->MumbleLink->AvatarPosition;
 		this->PreviousCameraFront = this->MumbleLink->CameraFront;
 
-		//this->Logger->Trace(CH_MUMBLE_READER, "CMumbleReader::AdvanceDerived()");
+		//this->Logger->Trace(CH_MUMBLE_READER, "MumbleReader::AdvanceDerived()");
 	}
 }

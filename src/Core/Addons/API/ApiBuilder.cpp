@@ -41,7 +41,7 @@ namespace ADDONAPI
 
 	static CDataLinkApi*           s_DataLinkApi   = nullptr;
 	static CEventApi*              s_EventApi      = nullptr;
-	static CGameBindsApi*          s_GameBindsApi  = nullptr;
+	static GameBindsApi*          s_GameBindsApi  = nullptr;
 	static CInputBindApi*          s_InputBindApi  = nullptr;
 	static Platform::RawInputApi* s_RawInputApi   = nullptr;
 	static CLocalization*          s_Localization  = nullptr;
@@ -49,7 +49,7 @@ namespace ADDONAPI
 	static CTextureLoader*         s_TextureApi    = nullptr;
 	static CLoader*                s_Loader        = nullptr;
 	static RenderContext_t*        s_RenderCtx     = nullptr;
-	static CArcApi*                s_ArcApi        = nullptr;
+	static ArcdpsApi*                s_ArcApi        = nullptr;
 
 	static CUiContext*             s_UiContext     = nullptr;
 	static CFontManager*           s_FontManager   = nullptr;

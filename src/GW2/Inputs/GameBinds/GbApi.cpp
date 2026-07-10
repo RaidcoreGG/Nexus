@@ -19,9 +19,9 @@ using namespace Raidcore::Nexus;
 #include "Util/Inputs.h"
 #include "GbConst.h"
 
-void CGameBindsApi::OnUEInputBindChanged(void* aData)
+void GameBindsApi::OnUEInputBindChanged(void* aData)
 {
-	static CGameBindsApi* s_GameBindsApi = nullptr;
+	static GameBindsApi* s_GameBindsApi = nullptr;
 
 	if (!s_GameBindsApi)
 	{
@@ -96,7 +96,7 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 	uictx->Invalidate();
 }
 
-CGameBindsApi::CGameBindsApi(
+GameBindsApi::GameBindsApi(
 	Platform::RawInputApi& aRawInputApi,
 	CLogApi&                aLogger,
 	CEventApi&              aEventApi,
@@ -114,15 +114,15 @@ CGameBindsApi::CGameBindsApi(
 	this->AddDefaultBinds();
 	this->Load(this->ConfigPath);
 
-	this->EventApi.Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
+	this->EventApi.Subscribe(EV_UE_KB_CH, GameBindsApi::OnUEInputBindChanged);
 }
 
-CGameBindsApi::~CGameBindsApi()
+GameBindsApi::~GameBindsApi()
 {
-	this->EventApi.Unsubscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
+	this->EventApi.Unsubscribe(EV_UE_KB_CH, GameBindsApi::OnUEInputBindChanged);
 }
 
-UINT CGameBindsApi::RedirectGameOnly(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam)
+UINT GameBindsApi::RedirectGameOnly(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam)
 {
 	/* offset of 7997, if uMsg in that range it's a nexus game only message */
 	if (uMsg >= WM_PASSTHROUGH_FIRST && uMsg <= WM_PASSTHROUGH_LAST)
@@ -134,7 +134,7 @@ UINT CGameBindsApi::RedirectGameOnly(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPA
 	return uMsg;
 }
 
-LRESULT CGameBindsApi::SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT GameBindsApi::SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	if (uMsg < WM_USER)
 	{
@@ -144,7 +144,7 @@ LRESULT CGameBindsApi::SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 	return PostMessageA(this->RenderContext.Window.Handle, uMsg, wParam, lParam);
 }
 
-void CGameBindsApi::PressAsync(EGameBinds aGameBind)
+void GameBindsApi::PressAsync(EGameBinds aGameBind)
 {
 	Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this, aGameBind](Clockwork::CancellationToken aToken)
 	{
@@ -152,7 +152,7 @@ void CGameBindsApi::PressAsync(EGameBinds aGameBind)
 	});
 }
 
-void CGameBindsApi::ReleaseAsync(EGameBinds aGameBind)
+void GameBindsApi::ReleaseAsync(EGameBinds aGameBind)
 {
 	Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this, aGameBind](Clockwork::CancellationToken aToken)
 	{
@@ -160,7 +160,7 @@ void CGameBindsApi::ReleaseAsync(EGameBinds aGameBind)
 	});
 }
 
-void CGameBindsApi::InvokeAsync(EGameBinds aGameBind, int aDuration)
+void GameBindsApi::InvokeAsync(EGameBinds aGameBind, int aDuration)
 {
 	Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this, aGameBind, aDuration](Clockwork::CancellationToken aToken)
 	{
@@ -173,7 +173,7 @@ void CGameBindsApi::InvokeAsync(EGameBinds aGameBind, int aDuration)
 	});
 }
 
-void CGameBindsApi::Press(EGameBinds aGameBind)
+void GameBindsApi::Press(EGameBinds aGameBind)
 {
 	/* Migrate legacy bind that the game merged. */
 	if (aGameBind == EGameBinds::LEGACY_MoveSwimUp)
@@ -334,7 +334,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 	}
 }
 
-void CGameBindsApi::Release(EGameBinds aGameBind)
+void GameBindsApi::Release(EGameBinds aGameBind)
 {
 	/* Migrate legacy bind that the game merged. */
 	if (aGameBind == EGameBinds::LEGACY_MoveSwimUp)
@@ -441,7 +441,7 @@ void CGameBindsApi::Release(EGameBinds aGameBind)
 	this->RestoreModifiers();
 }
 
-void CGameBindsApi::RestoreModifiers()
+void GameBindsApi::RestoreModifiers()
 {
 	if (GetAsyncKeyState(VK_MENU))
 	{
@@ -501,7 +501,7 @@ void CGameBindsApi::RestoreModifiers()
 	}
 }
 
-bool CGameBindsApi::IsBound(EGameBinds aGameBind)
+bool GameBindsApi::IsBound(EGameBinds aGameBind)
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -515,7 +515,7 @@ bool CGameBindsApi::IsBound(EGameBinds aGameBind)
 	return it->second.Primary.IsBound() || it->second.Secondary.IsBound();
 }
 
-const MultiInputBind_t* CGameBindsApi::Get(EGameBinds aGameBind)
+const MultiInputBind_t* GameBindsApi::Get(EGameBinds aGameBind)
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -529,7 +529,7 @@ const MultiInputBind_t* CGameBindsApi::Get(EGameBinds aGameBind)
 	return nullptr;
 }
 
-void CGameBindsApi::Set(EGameBinds aGameBind, InputBind_t aInputBind, bool aIsPrimary, bool aIsRuntimeBind)
+void GameBindsApi::Set(EGameBinds aGameBind, InputBind_t aInputBind, bool aIsPrimary, bool aIsRuntimeBind)
 {
 	/* Remove legacy bind that the game removed. */
 	if (aGameBind == EGameBinds::LEGACY_MoveSwimUp)
@@ -578,14 +578,14 @@ void CGameBindsApi::Set(EGameBinds aGameBind, InputBind_t aInputBind, bool aIsPr
 	}
 }
 
-std::unordered_map<EGameBinds, MultiInputBind_t> CGameBindsApi::GetRegistry() const
+std::unordered_map<EGameBinds, MultiInputBind_t> GameBindsApi::GetRegistry() const
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	return this->Registry;
 }
 
-void CGameBindsApi::Load(std::filesystem::path aPath)
+void GameBindsApi::Load(std::filesystem::path aPath)
 {
 	if (aPath.empty()) { aPath = this->ConfigPath; }
 	if (!std::filesystem::exists(aPath)) { return; }
@@ -729,7 +729,7 @@ void CGameBindsApi::Load(std::filesystem::path aPath)
 	}
 }
 
-void CGameBindsApi::AddDefaultBinds()
+void GameBindsApi::AddDefaultBinds()
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -1172,7 +1172,7 @@ void CGameBindsApi::AddDefaultBinds()
 	this->Registry.emplace(EGameBinds::GearLoadout9, MultiInputBind_t{});
 }
 
-void CGameBindsApi::Save()
+void GameBindsApi::Save()
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 

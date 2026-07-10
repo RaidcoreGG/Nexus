@@ -133,7 +133,7 @@ void CUiBinds::UpdateDisplayGameBinds()
 	this->DisplayGameBinds.clear();
 
 	Runtime& ctx = Runtime::Get();
-	CGameBindsApi* gameBindsApi = &ctx.Game().GameBinds();
+	GameBindsApi* gameBindsApi = &ctx.Game().GameBinds();
 
 	/* copy of all InputBinds */
 	std::unordered_map<EGameBinds, MultiInputBind_t> InputBindRegistry = gameBindsApi->GetRegistry();
