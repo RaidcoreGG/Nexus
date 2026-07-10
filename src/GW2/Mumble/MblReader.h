@@ -14,7 +14,7 @@
 
 #include "Core/NexusLink.h"
 #include "Engine/DataLink/DlApi.h"
-#include "Engine/Events/EvtApi.h"
+#include "Host/Events/EvtApi.h"
 #include "Engine/Logging/LogApi.h"
 
 constexpr const char* DL_MUMBLE_LINK = "DL_MUMBLE_LINK";

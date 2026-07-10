@@ -12,7 +12,7 @@
 #include <unordered_map>
 
 #include "Core/Addons/Addon.h"
-#include "Core/Addons/Library/LibAddon.h"
+#include "Host/Library/LibAddon.h"
 #include "UI/UiBinds.h"
 #include "UI/UiFuncDefs.h"
 #include "Util/Strings.h"

@@ -13,8 +13,8 @@
   <ItemGroup>
     <ClCompile Include="src\Core\Addons\Addon.cpp" />
     <ClCompile Include="src\Core\Addons\Config\CfgManager.cpp" />
-    <ClCompile Include="src\Core\Addons\Library\LibAddon.cpp" />
-    <ClCompile Include="src\Core\Addons\Library\LibManager.cpp" />
+    <ClCompile Include="src\Host\Library\LibAddon.cpp" />
+    <ClCompile Include="src\Host\Library\LibManager.cpp" />
     <ClCompile Include="src\GW2\BuildInfo\BuildInfoService.cpp" />
     <ClCompile Include="src\GW2\Gw2Context.cpp" />
     <ClCompile Include="src\Host\HoContext.cpp" />
@@ -28,8 +28,8 @@
     <ClCompile Include="src\Platform\CrashHandler\CrashHandler.cpp" />
     <ClCompile Include="src\Engine\Functions\FnRegistry.cpp" />
     <ClCompile Include="src\Core\Index\Index.cpp" />
-    <ClCompile Include="src\Engine\Loader\LdrAddonBase.cpp" />
-    <ClCompile Include="src\Engine\Loader\Loader.cpp" />
+    <ClCompile Include="src\Host\Loader\LdrAddonBase.cpp" />
+    <ClCompile Include="src\Host\Loader\Loader.cpp" />
     <ClCompile Include="src\Engine\Networking\WebRequests\WreCache.cpp" />
     <ClCompile Include="src\Engine\Networking\WebRequests\WreConst.cpp" />
     <ClCompile Include="src\GW2\ArcDPS\ArcApi.cpp" />
@@ -41,7 +41,7 @@
     <ClCompile Include="src\Engine\Networking\WebRequests\WreClient.cpp" />
     <ClCompile Include="src\Engine\DataLink\DlApi.cpp" />
     <ClCompile Include="src\GW2\Mumble\MblConst.cpp" />
-    <ClCompile Include="src\Engine\Events\EvtApi.cpp" />
+    <ClCompile Include="src\Host\Events\EvtApi.cpp" />
     <ClCompile Include="src\Engine\Logging\LogConst.cpp" />
     <ClCompile Include="src\Proxy\PxyD3D9.cpp" />
     <ClCompile Include="src\Proxy\PxyDXGI.cpp" />
@@ -111,8 +111,8 @@
     <ClInclude Include="src\Core\Addons\Config\CfgManager.h" />
     <ClInclude Include="src\Core\Addons\Config\Config.h" />
     <ClInclude Include="src\Core\Addons\Definitions\DefEnum.h" />
-    <ClInclude Include="src\Core\Addons\Library\LibAddon.h" />
-    <ClInclude Include="src\Core\Addons\Library\LibManager.h" />
+    <ClInclude Include="src\Host\Library\LibAddon.h" />
+    <ClInclude Include="src\Host\Library\LibManager.h" />
     <ClInclude Include="src\GW2\BuildInfo\BuildInfoService.h" />
     <ClInclude Include="src\GW2\Gw2Context.h" />
     <ClInclude Include="src\GW2\Mumble\MblExtensions.h" />
@@ -139,7 +139,7 @@
     <ClInclude Include="src\Engine\Clockwork\Tasks\ETaskPriority.h" />
     <ClInclude Include="src\Engine\Clockwork\Dispatcher.h" />
     <ClInclude Include="src\Platform\CrashHandler\CrashHandler.h" />
-    <ClInclude Include="src\Engine\Events\EvtData.h" />
+    <ClInclude Include="src\Host\Events\EvtData.h" />
     <ClInclude Include="src\Engine\Functions\FnEntry.h" />
     <ClInclude Include="src\Engine\Functions\FnRegistry.h" />
     <ClInclude Include="src\Core\Index\IdxEnum.h" />
@@ -150,10 +150,10 @@
     <ClInclude Include="src\Core\Addons\API\ApiV4.h" />
     <ClInclude Include="src\Core\Addons\API\ApiV5.h" />
     <ClInclude Include="src\Core\Addons\API\ApiV6.h" />
-    <ClInclude Include="src\Engine\Loader\LdrAddonBase.h" />
-    <ClInclude Include="src\Engine\Loader\LdrChecksum.h" />
-    <ClInclude Include="src\Engine\Loader\LdrEnum.h" />
-    <ClInclude Include="src\Engine\Loader\Loader.h" />
+    <ClInclude Include="src\Host\Loader\LdrAddonBase.h" />
+    <ClInclude Include="src\Host\Loader\LdrChecksum.h" />
+    <ClInclude Include="src\Host\Loader\LdrEnum.h" />
+    <ClInclude Include="src\Host\Loader\Loader.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreCache.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreConst.h" />
     <ClInclude Include="src\Engine\Verifier.h" />
@@ -188,9 +188,9 @@
     <ClInclude Include="src\Engine\DataLink\DlEnum.h" />
     <ClInclude Include="src\Engine\DataLink\DlFuncDefs.h" />
     <ClInclude Include="src\Engine\DataLink\DlLinkedResource.h" />
-    <ClInclude Include="src\Engine\Events\EvtApi.h" />
-    <ClInclude Include="src\Engine\Events\EvtSubscriber.h" />
-    <ClInclude Include="src\Engine\Events\EvtFuncDefs.h" />
+    <ClInclude Include="src\Host\Events\EvtApi.h" />
+    <ClInclude Include="src\Host\Events\EvtSubscriber.h" />
+    <ClInclude Include="src\Host\Events\EvtFuncDefs.h" />
     <ClInclude Include="src\Engine\Logging\LogConst.h" />
     <ClInclude Include="src\Engine\Logging\LogEnum.h" />
     <ClInclude Include="src\UI\Textures\TxEnum.h" />

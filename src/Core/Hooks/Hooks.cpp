@@ -24,9 +24,9 @@ using namespace Raidcore::Nexus;
 
 #include "Core/NexusLink.h"
 #include "Engine/DataLink/DlApi.h"
-#include "Engine/Events/EvtApi.h"
+#include "Host/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
-#include "Engine/Loader/Loader.h"
+#include "Host/Loader/Loader.h"
 #include "Engine/Logging/LogApi.h"
 #include "GW2/Inputs/GameBinds/GbApi.h"
 #include "GW2/Inputs/MouseResetFix.h"

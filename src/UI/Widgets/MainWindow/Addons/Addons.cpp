@@ -16,7 +16,7 @@
 #include "Runtime/Runtime.h"
 using namespace Raidcore::Nexus;
 
-#include "Core/Addons/Library/LibAddon.h"
+#include "Host/Library/LibAddon.h"
 #include "Core/Index/Index.h"
 #include "CtlAddonToggle.h"
 #include "res/ResConst.h"

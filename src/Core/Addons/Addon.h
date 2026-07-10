@@ -20,9 +20,9 @@
 #include "Core/Addons/Config/CfgManager.h"
 #include "Core/Addons/Config/Config.h"
 #include "Core/Addons/Definitions/AddonDefV1.h"
-#include "Engine/Events/EvtApi.h"
-#include "Engine/Loader/LdrAddonBase.h"
-#include "Engine/Loader/Loader.h"
+#include "Host/Events/EvtApi.h"
+#include "Host/Loader/LdrAddonBase.h"
+#include "Host/Loader/Loader.h"
 #include "GW2/ArcDPS/ArcExtensionDef.h"
 
 using namespace Raidcore::Nexus;

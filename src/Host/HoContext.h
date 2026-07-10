@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "Core/Addons/Library/LibManager.h"
-#include "Engine/Events/EvtApi.h"
-#include "Engine/Loader/Loader.h"
+#include "Host/Library/LibManager.h"
+#include "Host/Events/EvtApi.h"
+#include "Host/Loader/Loader.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::Host Namespace

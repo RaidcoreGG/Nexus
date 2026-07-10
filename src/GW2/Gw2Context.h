@@ -13,7 +13,7 @@
 #include <utility>
 
 #include "Engine/DataLink/DlApi.h"
-#include "Engine/Events/EvtApi.h"
+#include "Host/Events/EvtApi.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
 #include "GW2/ArcDPS/ArcApi.h"

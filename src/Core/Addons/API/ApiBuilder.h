@@ -11,7 +11,7 @@
 #include <windows.h>
 
 #include "ApiBase.h"
-#include "Engine/Events/EvtFuncDefs.h"
+#include "Host/Events/EvtFuncDefs.h"
 #include "Engine/Inputs/InputBinds/IbFuncDefs.h"
 #include "Engine/Logging/LogEnum.h"
 #include "GW2/Inputs/GameBinds/GbEnum.h"
