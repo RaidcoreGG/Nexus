@@ -12,7 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Addons\Addon.cpp" />
-    <ClCompile Include="src\Core\Addons\Config\CfgManager.cpp" />
+    <ClCompile Include="src\Host\Config\CfgManager.cpp" />
     <ClCompile Include="src\Host\Library\LibAddon.cpp" />
     <ClCompile Include="src\Host\Library\LibManager.cpp" />
     <ClCompile Include="src\GW2\BuildInfo\BuildInfoService.cpp" />
@@ -107,9 +107,9 @@
     <ClInclude Include="src\CommitHash.h" />
     <ClInclude Include="src\Core\Addons\AddEnum.h" />
     <ClInclude Include="src\Core\Addons\Addon.h" />
-    <ClInclude Include="src\Core\Addons\Config\CfgEnum.h" />
-    <ClInclude Include="src\Core\Addons\Config\CfgManager.h" />
-    <ClInclude Include="src\Core\Addons\Config\Config.h" />
+    <ClInclude Include="src\Host\Config\CfgEnum.h" />
+    <ClInclude Include="src\Host\Config\CfgManager.h" />
+    <ClInclude Include="src\Host\Config\Config.h" />
     <ClInclude Include="src\Core\Addons\Definitions\DefEnum.h" />
     <ClInclude Include="src\Host\Library\LibAddon.h" />
     <ClInclude Include="src\Host\Library\LibManager.h" />

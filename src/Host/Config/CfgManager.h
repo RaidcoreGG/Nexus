@@ -1,17 +1,22 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  HoContext.h
-/// Description  :  Host context implementation.
+/// Name         :  CfgManager.h
+/// Description  :  Manager for addon configurations.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
 #pragma once
 
-#include "Host/Config/CfgManager.h"
-#include "Host/Events/EvtApi.h"
-#include "Host/Library/LibManager.h"
-#include "Host/Loader/Loader.h"
+#include <cstdint>
+#include <filesystem>
+#include <mutex>
+#include <unordered_map>
+
+#include "Config.h"
+#include "Engine/Logging/LogApi.h"
+
+constexpr const char* CH_CFGMGR = "Config";
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::Host Namespace
@@ -19,59 +24,59 @@
 namespace Raidcore::Nexus::Host
 {
 	///----------------------------------------------------------------------------------------------------
-	/// Context Class
+	/// ConfigMgr Class
 	///----------------------------------------------------------------------------------------------------
-	class Context
+	class ConfigMgr
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		Context(
-			CLogApi&              aLogger,
-			std::filesystem::path aLoaderDirectory,
-			std::filesystem::path aAddonConfigDefaultPath
-		);
+		ConfigMgr(CLogApi* aLogger, std::filesystem::path aConfigPath, std::vector<uint32_t> aWhitelist = {});
 
 		///----------------------------------------------------------------------------------------------------
-		/// Shutdown:
-		/// 	Shuts down the host context.
+		/// dtor
 		///----------------------------------------------------------------------------------------------------
-		void Shutdown();
+		~ConfigMgr();
 
 		///----------------------------------------------------------------------------------------------------
-		/// Config:
-		/// 	Returns the config instance.
+		/// SaveConfigs:
+		/// 	Saves the addon configs to disk.
 		///----------------------------------------------------------------------------------------------------
-		Host::ConfigMgr& Config();
+		void SaveConfigs();
 
 		///----------------------------------------------------------------------------------------------------
-		/// Loader:
-		/// 	Returns the loader instance.
+		/// RegisterConfig:
+		/// 	Returns the config of the given addon signature or registers them, if they don't exist.
 		///----------------------------------------------------------------------------------------------------
-		Host::Loader& Loader();
+		Config_t* RegisterConfig(uint32_t aSignature);
 
 		///----------------------------------------------------------------------------------------------------
-		/// Library:
-		/// 	Returns the library manager instance.
+		/// DeleteConfig:
+		/// 	Deletes the config of the given addon signature, also deletes it from disk.
 		///----------------------------------------------------------------------------------------------------
-		Host::LibraryMgr& Library();
+		void DeleteConfig(uint32_t aSignature);
 
 		///----------------------------------------------------------------------------------------------------
-		/// Events:
-		/// 	Returns the event API instance.
+		/// IsReadOnly:
+		/// 	Returns true, if config changes won't be saved.
 		///----------------------------------------------------------------------------------------------------
-		Host::EventApi& Events();
+		bool IsReadOnly() const;
 
 		private:
-		CLogApi& _Logger;
+		CLogApi* Logger = nullptr;
 
-		std::filesystem::path _LoaderDirectoryPath;
-		std::filesystem::path _AddonConfigDefaultPath;
+		bool                                    ReadOnly = false;
+		std::filesystem::path                   Path;
 
-		std::unique_ptr<Host::ConfigMgr>  _ConfigMgr{ nullptr };
-		std::unique_ptr<Host::Loader>     _Loader{ nullptr };
-		std::unique_ptr<Host::LibraryMgr> _Library{ nullptr };
-		std::unique_ptr<Host::EventApi>   _EventApi{ nullptr };
+		std::mutex                              Mutex;
+		std::unordered_map<uint32_t, Config_t*> Configs;
+		std::vector<uint32_t>                   Whitelist;
+
+		///----------------------------------------------------------------------------------------------------
+		/// LoadConfigs:
+		/// 	Loads the addon configs from disk.
+		///----------------------------------------------------------------------------------------------------
+		void LoadConfigs();
 	};
 }

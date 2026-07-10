@@ -17,13 +17,13 @@
 
 #include "AddConst.h"
 #include "AddEnum.h"
-#include "Core/Addons/Config/CfgManager.h"
-#include "Core/Addons/Config/Config.h"
 #include "Core/Addons/Definitions/AddonDefV1.h"
+#include "GW2/ArcDPS/ArcExtensionDef.h"
+#include "Host/Config/CfgManager.h"
+#include "Host/Config/Config.h"
 #include "Host/Events/EvtApi.h"
 #include "Host/Loader/LdrAddonBase.h"
 #include "Host/Loader/Loader.h"
-#include "GW2/ArcDPS/ArcExtensionDef.h"
 
 using namespace Raidcore::Nexus;
 using ArcExtensionDef_t = GW2::ArcDPS::ExtensionDef_t;
@@ -85,7 +85,7 @@ class CAddon : public virtual Host::IAddon
 	/// GetConfig:
 	/// 	Returns the config of the addon.
 	///----------------------------------------------------------------------------------------------------
-	Config_t* GetConfig();
+	Host::Config_t* GetConfig();
 
 	///----------------------------------------------------------------------------------------------------
 	/// Load:
@@ -203,14 +203,14 @@ class CAddon : public virtual Host::IAddon
 
 	private:
 	CLogApi*                 Logger               = nullptr;
-	Host::Loader*           Loader               = nullptr;
-	Host::EventApi*         EventApi             = nullptr;
-	CConfigMgr*              ConfigMgr            = nullptr;
+	Host::Loader*            Loader               = nullptr;
+	Host::EventApi*          EventApi             = nullptr;
+	Host::ConfigMgr*        ConfigMgr            = nullptr;
 
 	EAddonInterfaces         ModuleInterfaces     = EAddonInterfaces::None;
 	EAddonFlags              Flags                = EAddonFlags::None;
 
-	Config_t*                Config               = nullptr;
+	Host::Config_t*          Config               = nullptr;
 	
 	AddonDefV1_t*            NexusAddonDefV1      = {};
 	ArcExtensionDef_t*       ArcExtensionDef      = {};

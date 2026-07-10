@@ -43,7 +43,7 @@ void CLoadConfirmationModal::RenderContent()
 void CLoadConfirmationModal::OnClosing()
 {
 	Runtime&    ctx    = Runtime::Get();
-	CConfigMgr* cfgmgr = ctx.GetCfgMgr();
+	Host::ConfigMgr& cfgmgr = ctx.Host().Config();
 	Host::Loader&    loader = ctx.Host().Loader();
 
 	switch (this->GetResult())
@@ -53,7 +53,7 @@ void CLoadConfirmationModal::OnClosing()
 			this->Config->LastGameBuild = 0;
 			this->Config->LastLoadState = true;
 			this->Config->DisableVersion = "";
-			cfgmgr->SaveConfigs();
+			cfgmgr.SaveConfigs();
 			loader.LoadSafe(this->Path);
 			break;
 		}
@@ -68,7 +68,7 @@ void CLoadConfirmationModal::OnClosing()
 	this->Path.clear();
 }
 
-void CLoadConfirmationModal::SetTarget(Config_t* aConfig, std::string aName, std::filesystem::path aPath)
+void CLoadConfirmationModal::SetTarget(Host::Config_t* aConfig, std::string aName, std::filesystem::path aPath)
 {
 	assert(aConfig != nullptr);
 

@@ -46,7 +46,7 @@ namespace AddonToggleCtl
 				buttonText = "((Load))";
 			}
 
-			Config_t* config = aAddon->GetConfig();
+			Host::Config_t* config = aAddon->GetConfig();
 
 			if (config && aAddon->IsStateLocked() && (config->LastLoadState != aAddon->IsLoaded()))
 			{
@@ -69,9 +69,9 @@ namespace AddonToggleCtl
 		bool result = false;
 
 		Runtime&   ctx    = Runtime::Get();
-		CConfigMgr* cfgmgr = ctx.GetCfgMgr();
+		Host::ConfigMgr* cfgmgr = &ctx.Host().Config();
 
-		Config_t* config = aAddon->GetConfig();
+		Host::Config_t* config = aAddon->GetConfig();
 
 		/* If addon is busy. */
 		if (aAddon->IsRunningAction())

@@ -42,7 +42,7 @@ namespace Clockwork = Raidcore::Clockwork;
 #include "Util/Strings.h"
 #include "Util/Url.h"
 #include "Version.h"
-#include "Core/Addons/Config/CfgManager.h"
+#include "Host/Config/CfgManager.h"
 #include "Host/Library/LibManager.h"
 #include "Core/Index/IdxEnum.h"
 #include "Core/Preferences/PrefContext.h"
@@ -343,53 +343,6 @@ namespace Raidcore::Nexus
 		return &s_SelfUpdater;
 	}
 
-	CConfigMgr* Runtime::GetCfgMgr()
-	{
-		static std::filesystem::path cfgpath = Index(EPath::AddonConfigDefault);
-		static std::vector<uint32_t> cfgwhitelist = {};
-
-		static bool s_CmdLineParsed = [this]
-		{
-			if (CmdLine::HasArgument("-ggaddons"))
-			{
-				std::vector<std::string> idList = String::Split(CmdLine::GetArgumentValue("-ggaddons"), ",");
-
-				/* If only one entry and it contains ".json" it's a custom config. */
-				if (idList.size() == 1 && String::Contains(idList[0], ".json"))
-				{
-					cfgpath = idList[0];
-				}
-				else
-				{
-					for (std::string addonsig : idList)
-					{
-						try
-						{
-							uint32_t sig = std::stoi(addonsig, nullptr, 0);
-							cfgwhitelist.push_back(sig);
-						}
-						catch (const std::invalid_argument& e)
-						{
-							this->GetLogger()->Trace(CH_LOADER, "Invalid argument(-ggaddons) : %s (exc: %s)", addonsig.c_str(), e.what());
-						}
-						catch (const std::out_of_range& e)
-						{
-							this->GetLogger()->Trace(CH_LOADER, "Out of range (-ggaddons): %s (exc: %s)", addonsig.c_str(), e.what());
-						}
-					}
-				}
-			}
-			return true;
-		}();
-
-		static CConfigMgr s_CfgMgr = CConfigMgr(
-			this->GetLogger(),
-			cfgpath,
-			cfgwhitelist
-		);
-		return &s_CfgMgr;
-	}
-
 	Runtime::Runtime()
 	{
 		Clockwork::Context::Create();
@@ -403,7 +356,8 @@ namespace Raidcore::Nexus
 
 		this->_HostContext = std::make_unique<Host::Context>(
 			*this->GetLogger(),
-			Index(EPath::DIR_ADDONS)
+			Index(EPath::DIR_ADDONS),
+			Index(EPath::AddonConfigDefault)
 		);
 
 		this->_GameContext = std::make_unique<GW2::Context>(

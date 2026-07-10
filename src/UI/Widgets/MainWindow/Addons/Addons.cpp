@@ -128,7 +128,7 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 
 	static Runtime&       ctx      = Runtime::Get();
 	static CUiContext*     uictx    = ctx.GetUIContext();
-	static CConfigMgr*     cfgmgr   = ctx.GetCfgMgr();
+	static Host::ConfigMgr*     cfgmgr   = &ctx.Host().Config();
 	static Host::LibraryMgr&    libmgr   = ctx.Host().Library();
 	static CTextureLoader* texapi   = ctx.GetTextureService();
 	static CLocalization*  langApi  = uictx->GetLocalization();
@@ -208,7 +208,7 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 						/* Prompt if true, otherwise it already toggled now. */
 						if (AddonToggleCtl::Toggle(aAddonData.Addon))
 						{
-							Config_t* config = aAddonData.Addon->GetConfig();
+							Host::Config_t* config = aAddonData.Addon->GetConfig();
 
 							this->LoadConfirmationModal.SetTarget(config, aAddonData.GetName(), aAddonData.Addon->GetLocation());
 						}
@@ -617,8 +617,8 @@ void CAddonsWindow::RenderDetails()
 
 		if (ImGui::CollapsingHeader(headerStr.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			Config_t*   config = this->AddonData.Addon->GetConfig();
-			CConfigMgr* cfgmgr = ctx.GetCfgMgr();
+			Host::Config_t*   config = this->AddonData.Addon->GetConfig();
+			Host::ConfigMgr* cfgmgr = &ctx.Host().Config();
 
 			/* TODO: Check Update Button */
 			/*if (addonData.NexusAddon->Definitions->Provider != EUpdateProvider::Self)
@@ -711,16 +711,16 @@ void CAddonsWindow::RenderDetails()
 				switch (config->UpdateMode)
 				{
 					default:
-					case EUpdateMode::None:
+					case Host::EUpdateMode::None:
 						updateMode = "(null)";
 						break;
-					case EUpdateMode::Background:
+					case Host::EUpdateMode::Background:
 						updateMode = "((Background))";
 						break;
-					case EUpdateMode::Notify:
+					case Host::EUpdateMode::Notify:
 						updateMode = "((Notify))";
 						break;
-					case EUpdateMode::Automatic:
+					case Host::EUpdateMode::Automatic:
 						updateMode = "((Automatic))";
 						break;
 				}
@@ -728,21 +728,21 @@ void CAddonsWindow::RenderDetails()
 				/* Update Mode Combo */
 				if (ImGui::BeginCombo("##UpdateModeSelector", updateMode.c_str()))
 				{
-					if (ImGui::Selectable("((Background))", config->UpdateMode == EUpdateMode::Background))
+					if (ImGui::Selectable("((Background))", config->UpdateMode == Host::EUpdateMode::Background))
 					{
-						config->UpdateMode = EUpdateMode::Background;
+						config->UpdateMode = Host::EUpdateMode::Background;
 						cfgmgr->SaveConfigs();
 					}
 
-					if (ImGui::Selectable("((Notify))", config->UpdateMode == EUpdateMode::Notify))
+					if (ImGui::Selectable("((Notify))", config->UpdateMode == Host::EUpdateMode::Notify))
 					{
-						config->UpdateMode = EUpdateMode::Notify;
+						config->UpdateMode = Host::EUpdateMode::Notify;
 						cfgmgr->SaveConfigs();
 					}
 
-					if (ImGui::Selectable("((Automatic))", config->UpdateMode == EUpdateMode::Automatic))
+					if (ImGui::Selectable("((Automatic))", config->UpdateMode == Host::EUpdateMode::Automatic))
 					{
-						config->UpdateMode = EUpdateMode::Automatic;
+						config->UpdateMode = Host::EUpdateMode::Automatic;
 						cfgmgr->SaveConfigs();
 					}
 
@@ -806,7 +806,7 @@ void CAddonsWindow::RenderDetails()
 					/* Prompt if true, otherwise it already toggled now. */
 					if (AddonToggleCtl::Toggle(this->AddonData.Addon))
 					{
-						Config_t* config = this->AddonData.Addon->GetConfig();
+						Host::Config_t* config = this->AddonData.Addon->GetConfig();
 
 						this->LoadConfirmationModal.SetTarget(config, this->AddonData.GetName(), this->AddonData.Addon->GetLocation());
 					}
@@ -1141,8 +1141,8 @@ void CAddonsWindow::PopulateAddons()
 
 	std::sort(this->Addons.begin(), this->Addons.end(), [](AddonListing_t& lhs, AddonListing_t& rhs)
 	{
-		Config_t* lhsConfig = lhs.Addon ? lhs.Addon->GetConfig() : nullptr;
-		Config_t* rhsConfig = rhs.Addon ? rhs.Addon->GetConfig() : nullptr;
+		Host::Config_t* lhsConfig = lhs.Addon ? lhs.Addon->GetConfig() : nullptr;
+		Host::Config_t* rhsConfig = rhs.Addon ? rhs.Addon->GetConfig() : nullptr;
 
 		// 1. Addons without config first
 		if (lhsConfig == nullptr || rhsConfig == nullptr)

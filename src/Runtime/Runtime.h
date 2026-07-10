@@ -14,7 +14,6 @@
 #include <string>
 #include <windows.h>
 
-#include "Core/Addons/Config/CfgManager.h"
 #include "Core/Preferences/PrefContext.h"
 #include "Core/Updater/SelfUpdater.h"
 #include "Core/Versioning/Version.h"
@@ -23,6 +22,7 @@
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
 #include "GW2/Gw2Context.h"
+#include "Host/Config/CfgManager.h"
 #include "Host/HoContext.h"
 #include "Platform/PlContext.h"
 #include "Proxy/PxyEnum.h"
@@ -84,8 +84,6 @@ namespace Raidcore::Nexus
 		CHttpClient* GetHttpClient(std::string aURL, bool aDisableCache = false);
 
 		CSelfUpdater* GetSelfUpdater();
-
-		CConfigMgr* GetCfgMgr();
 
 		private:
 		Runtime();

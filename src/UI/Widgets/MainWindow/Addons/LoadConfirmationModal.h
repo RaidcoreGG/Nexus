@@ -12,7 +12,9 @@
 #include <filesystem>
 
 #include "UI/Controls/CtlModal.h"
-#include "Core/Addons/Config/Config.h"
+#include "Host/Config/Config.h"
+
+using namespace Raidcore::Nexus;
 
 ///----------------------------------------------------------------------------------------------------
 /// CLoadConfirmationModal Class
@@ -41,10 +43,10 @@ class CLoadConfirmationModal : public virtual IModal
 	/// SetTarget:
 	/// 	Set which addon to load.
 	///----------------------------------------------------------------------------------------------------
-	void SetTarget(Config_t* aConfig, std::string aName, std::filesystem::path aPath);
+	void SetTarget(Host::Config_t* aConfig, std::string aName, std::filesystem::path aPath);
 
 	private:
-	Config_t*             Config = nullptr;
+	Host::Config_t*       Config = nullptr;
 	std::string           Name;
 	std::filesystem::path Path;
 

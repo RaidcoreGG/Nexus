@@ -39,7 +39,7 @@ CAddon::CAddon(std::filesystem::path aLocation)
 	this->Logger = ctx.GetLogger();
 	this->Loader = &ctx.Host().Loader();
 	this->EventApi = &ctx.Host().Events();
-	this->ConfigMgr = ctx.GetCfgMgr();
+	this->ConfigMgr = &ctx.Host().Config();
 
 	/* Does the initial enumerate addon interfaces and raises a create event. */
 	this->QueuedActions.push(EAddonAction::Create);
@@ -512,7 +512,7 @@ std::string CAddon::GetVersion()
 	return "";
 }
 
-Config_t* CAddon::GetConfig()
+Host::Config_t* CAddon::GetConfig()
 {
 	return this->Config;
 }
@@ -863,10 +863,10 @@ bool CAddon::ShouldUpdate()
 	switch (this->Config->UpdateMode)
 	{
 		default:
-		case EUpdateMode::None:       { return false; }
-		case EUpdateMode::Background: { return false; }
-		case EUpdateMode::Notify:     { return false; }
-		case EUpdateMode::Automatic:  { return true; }
+		case Host::EUpdateMode::None:       { return false; }
+		case Host::EUpdateMode::Background: { return false; }
+		case Host::EUpdateMode::Notify:     { return false; }
+		case Host::EUpdateMode::Automatic:  { return true; }
 	}
 }
 
@@ -1027,7 +1027,7 @@ void CAddon::CheckUpdateViaGitHub()
 
 	HttpResponse_t response = client->Get("/repos" + URL::GetEndpoint(this->NexusAddonDefV1->GetUpdateLink()) + "/releases");
 
-	Config_t* config = this->GetConfig();
+	Host::Config_t* config = this->GetConfig();
 
 	if (!response.Success())
 	{
