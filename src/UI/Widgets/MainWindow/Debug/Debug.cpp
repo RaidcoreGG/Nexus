@@ -104,7 +104,7 @@ void CDebugWindow::TabEvents()
 
 	if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 	{
-		std::unordered_map<std::string, EventData_t> eventRegistry = Runtime::Get().GetEventApi()->GetRegistry();
+		std::unordered_map<std::string, EventData_t> eventRegistry = Runtime::Get().Host().Events().GetRegistry();
 
 		for (auto& [identifier, ev] : eventRegistry)
 		{

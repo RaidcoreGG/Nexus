@@ -139,15 +139,6 @@ namespace Raidcore::Nexus
 			return;
 		}
 
-		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Normal, [](Clockwork::CancellationToken aToken)
-		{
-			Runtime& ctx = Runtime::Get();
-			CLibraryMgr* libmgr = ctx.GetAddonLibrary();
-			libmgr->AddSource("https://api.raidcore.gg/addonlibrary");
-			libmgr->AddSource("https://api.raidcore.gg/arcdpslibrary");
-			libmgr->Update();
-		});
-
 		this->Game().Initialize();
 	}
 
@@ -226,6 +217,11 @@ namespace Raidcore::Nexus
 		return *this->_PlatformContext;
 	}
 
+	Host::Context& Runtime::Host()
+	{
+		return *this->_HostContext;
+	}
+
 	GW2::Context& Runtime::Game()
 	{
 		return *this->_GameContext;
@@ -261,37 +257,10 @@ namespace Raidcore::Nexus
 		return &s_DataLinkApi;
 	}
 
-	CEventApi* Runtime::GetEventApi()
-	{
-		static CEventApi s_EventApi = CEventApi(
-			this->GetLoader()
-		);
-		return &s_EventApi;
-	}
-
-	CLoader* Runtime::GetLoader()
-	{
-		static CLoader s_Loader = CLoader(
-			this->GetLogger(),
-			CAddon::Factory,
-			Index(EPath::DIR_ADDONS)
-		);
-		return &s_Loader;
-	}
-
-	CLibraryMgr* Runtime::GetAddonLibrary()
-	{
-		static CLibraryMgr s_LibraryMgr = CLibraryMgr(
-			this->GetLogger(),
-			this->GetLoader()
-		);
-		return &s_LibraryMgr;
-	}
-
 	CInputBindApi* Runtime::GetInputBindApi()
 	{
 		static CInputBindApi s_InputBindApi = CInputBindApi(
-			this->GetEventApi(),
+			&this->Host().Events(),
 			this->GetLogger(),
 			Index(EPath::InputBinds)
 		);
@@ -306,7 +275,7 @@ namespace Raidcore::Nexus
 			this->GetTextureService(),
 			this->GetDataLink(),
 			this->GetInputBindApi(),
-			this->GetEventApi(),
+			&this->Host().Events(),
 			&this->Game().Mumble()
 		);
 		return &s_UiContext;
@@ -432,9 +401,14 @@ namespace Raidcore::Nexus
 			Index(EPath::CrashStack)
 		);
 
+		this->_HostContext = std::make_unique<Host::Context>(
+			*this->GetLogger(),
+			Index(EPath::DIR_ADDONS)
+		);
+
 		this->_GameContext = std::make_unique<GW2::Context>(
 			*this->GetDataLink(),
-			*this->GetEventApi(),
+			this->Host().Events(),
 			*this->GetLogger(),
 			this->Platform().RawInput(),
 			*this->GetRendererCtx(),
@@ -449,6 +423,12 @@ namespace Raidcore::Nexus
 		{
 			this->_GameContext->Shutdown();
 			this->_GameContext.reset();
+		}
+
+		if (this->_HostContext)
+		{
+			this->_HostContext->Shutdown();
+			this->_HostContext.reset();
 		}
 
 		if (this->_PlatformContext)

@@ -57,15 +57,15 @@ CAddonsWindow::CAddonsWindow()
 
 	Runtime&  ctx         = Runtime::Get();
 	CSettings* settingsctx = ctx.GetSettingsCtx();
-	CEventApi* evtapi      = ctx.GetEventApi();
+	CEventApi& evtapi      = ctx.Host().Events();
 	
 	this->Filter     = settingsctx->Get(OPT_ADDONFILTERS, FILTER_INSTALLED);
 	this->IsListMode = settingsctx->Get(OPT_ISLISTMODE,   true            );
 
-	evtapi->Subscribe("EV_ADDON_LOADED", OnAddonChanged);
-	evtapi->Subscribe("EV_ADDON_UNLOADED", OnAddonChanged);
-	evtapi->Subscribe("EV_ADDON_CREATED", OnAddonChanged);
-	evtapi->Subscribe("EV_ADDON_DESTROYED", OnAddonChanged);
+	evtapi.Subscribe("EV_ADDON_LOADED", OnAddonChanged);
+	evtapi.Subscribe("EV_ADDON_UNLOADED", OnAddonChanged);
+	evtapi.Subscribe("EV_ADDON_CREATED", OnAddonChanged);
+	evtapi.Subscribe("EV_ADDON_DESTROYED", OnAddonChanged);
 	AddonsWindow = this;
 }
 
@@ -129,7 +129,7 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 	static Runtime&       ctx      = Runtime::Get();
 	static CUiContext*     uictx    = ctx.GetUIContext();
 	static CConfigMgr*     cfgmgr   = ctx.GetCfgMgr();
-	static CLibraryMgr*    libmgr   = ctx.GetAddonLibrary();
+	static CLibraryMgr&    libmgr   = ctx.Host().Library();
 	static CTextureLoader* texapi   = ctx.GetTextureService();
 	static CLocalization*  langApi  = uictx->GetLocalization();
 	static CAlerts*        alertctx = uictx->GetAlerts();
@@ -226,7 +226,7 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 				/* Install */
 				if (ImGui::Button(langApi->Translate("((000028))"), ImVec2(btnWidth, 0)))
 				{
-					libmgr->Install(aAddonData.GetSig());
+					libmgr.Install(aAddonData.GetSig());
 				}
 
 				/* GitHub */
@@ -856,7 +856,7 @@ void CAddonsWindow::RenderActionsBar(ImVec2& aSize)
 {
 	Runtime&       ctx    = Runtime::Get();
 	CTextureLoader* texapi = ctx.GetTextureService();
-	CLoader*        loader = ctx.GetLoader();
+	CLoader&        loader = ctx.Host().Loader();
 	CUiContext*     uictx  = ctx.GetUIContext();
 	CLocalization*  lang   = uictx->GetLocalization();
 
@@ -971,7 +971,7 @@ void CAddonsWindow::RenderActionsBar(ImVec2& aSize)
 			/* Poll changes */
 			if (ImGui::ImageButton(s_ReloadIcon->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
 			{
-				loader->NotifyChanges();
+				loader.NotifyChanges();
 			}
 		}
 
@@ -1035,19 +1035,19 @@ void CAddonsWindow::PopulateAddons()
 	Runtime&    ctx = Runtime::Get();
 	CUiContext*  uictx = ctx.GetUIContext();
 	CSettings*   settingsctx = ctx.GetSettingsCtx();
-	CLoader*     loader = ctx.GetLoader();
-	CLibraryMgr* libMgr = ctx.GetAddonLibrary();
+	CLoader&     loader = ctx.Host().Loader();
+	CLibraryMgr& libMgr = ctx.Host().Library();
 
 	this->Filter = settingsctx->Get<EAddonsFilterFlags>(OPT_ADDONFILTERS, FILTER_INSTALLED);
 
-	for (IAddon* addon : loader->GetAddons())
+	for (IAddon* addon : loader.GetAddons())
 	{
 		AddonListing_t addonlisting{};
 		addonlisting.Addon = dynamic_cast<CAddon*>(addon);
 
 		for (GUI_RENDER renderCb : uictx->GetRenderCallbacks(ERenderType::OptionsRender))
 		{
-			IAddon* owner = loader->GetOwner(renderCb);
+			IAddon* owner = loader.GetOwner(renderCb);
 			if (addon == owner)
 			{
 				addonlisting.OptionsRender = renderCb;
@@ -1063,7 +1063,7 @@ void CAddonsWindow::PopulateAddons()
 		}
 	}
 
-	for (LibraryAddon_t libaddon : libMgr->GetLibrary())
+	for (LibraryAddon_t libaddon : libMgr.GetLibrary())
 	{
 		bool installed = false;
 

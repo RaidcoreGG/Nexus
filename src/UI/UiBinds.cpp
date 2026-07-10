@@ -61,7 +61,7 @@ void CUiBinds::UpdateDisplayInputBinds()
 
 	Runtime& ctx = Runtime::Get();
 	CInputBindApi* inputBindApi = ctx.GetInputBindApi();
-	CLoader* loader = ctx.GetLoader();
+	CLoader& loader = ctx.Host().Loader();
 
 	/* copy of all InputBinds */
 	std::map<std::string, IbMapping_t> InputBindRegistry = inputBindApi->GetRegistry();
@@ -71,7 +71,7 @@ void CUiBinds::UpdateDisplayInputBinds()
 	{
 		std::string owner = "(null)";
 
-		IAddon* iaddon = loader->GetOwner(inputBind.Handler_DownOnlyAsync);
+		IAddon* iaddon = loader.GetOwner(inputBind.Handler_DownOnlyAsync);
 
 		if (iaddon)
 		{

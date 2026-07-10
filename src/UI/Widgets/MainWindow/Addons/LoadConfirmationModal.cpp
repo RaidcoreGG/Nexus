@@ -42,9 +42,9 @@ void CLoadConfirmationModal::RenderContent()
 
 void CLoadConfirmationModal::OnClosing()
 {
-	Runtime&   ctx    = Runtime::Get();
+	Runtime&    ctx    = Runtime::Get();
 	CConfigMgr* cfgmgr = ctx.GetCfgMgr();
-	CLoader*    loader = ctx.GetLoader();
+	CLoader&    loader = ctx.Host().Loader();
 
 	switch (this->GetResult())
 	{
@@ -54,7 +54,7 @@ void CLoadConfirmationModal::OnClosing()
 			this->Config->LastLoadState = true;
 			this->Config->DisableVersion = "";
 			cfgmgr->SaveConfigs();
-			loader->LoadSafe(this->Path);
+			loader.LoadSafe(this->Path);
 			break;
 		}
 		case EModalResult::Cancel:

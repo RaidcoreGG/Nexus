@@ -17,6 +17,7 @@
     <ClCompile Include="src\Core\Addons\Library\LibManager.cpp" />
     <ClCompile Include="src\GW2\BuildInfo\BuildInfoService.cpp" />
     <ClCompile Include="src\GW2\Gw2Context.cpp" />
+    <ClCompile Include="src\Host\HoContext.cpp" />
     <ClCompile Include="src\Platform\PlContext.cpp" />
     <ClCompile Include="src\Runtime\Runtime.cpp" />
     <ClCompile Include="src\Core\Hooks\Hooks.cpp" />
@@ -115,6 +116,7 @@
     <ClInclude Include="src\GW2\BuildInfo\BuildInfoService.h" />
     <ClInclude Include="src\GW2\Gw2Context.h" />
     <ClInclude Include="src\GW2\Mumble\MblExtensions.h" />
+    <ClInclude Include="src\Host\HoContext.h" />
     <ClInclude Include="src\Platform\PlContext.h" />
     <ClInclude Include="src\Runtime\Runtime.h" />
     <ClInclude Include="src\Core\Hooks\HkConst.h" />

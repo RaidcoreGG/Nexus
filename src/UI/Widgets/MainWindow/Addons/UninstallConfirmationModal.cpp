@@ -43,7 +43,7 @@ void CUninstallConfirmationModal::RenderContent()
 void CUninstallConfirmationModal::OnClosing()
 {
 	Runtime&    ctx    = Runtime::Get();
-	CLoader*     loader = ctx.GetLoader();
+	CLoader&    loader = ctx.Host().Loader();
 
 	switch (this->GetResult())
 	{

@@ -15,17 +15,15 @@
 #include <windows.h>
 
 #include "Core/Addons/Config/CfgManager.h"
-#include "Core/Addons/Library/LibManager.h"
 #include "Core/Preferences/PrefContext.h"
 #include "Core/Updater/SelfUpdater.h"
 #include "Core/Versioning/Version.h"
 #include "Engine/DataLink/DlApi.h"
-#include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
-#include "Engine/Loader/Loader.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
 #include "GW2/Gw2Context.h"
+#include "Host/HoContext.h"
 #include "Platform/PlContext.h"
 #include "Proxy/PxyEnum.h"
 #include "UI/Renderer/RdrContext.h"
@@ -65,6 +63,8 @@ namespace Raidcore::Nexus
 
 		Platform::Context& Platform();
 
+		Host::Context& Host();
+
 		GW2::Context& Game();
 
 		RenderContext_t* GetRendererCtx();
@@ -74,12 +74,6 @@ namespace Raidcore::Nexus
 		CTextureLoader* GetTextureService();
 
 		CDataLinkApi* GetDataLink();
-
-		CEventApi* GetEventApi();
-
-		CLoader* GetLoader();
-
-		CLibraryMgr* GetAddonLibrary();
 
 		CInputBindApi* GetInputBindApi();
 
@@ -97,8 +91,9 @@ namespace Raidcore::Nexus
 		Runtime();
 		~Runtime();
 
-		std::unique_ptr<Platform::Context> _PlatformContext;
-		std::unique_ptr<GW2::Context>      _GameContext;
+		std::unique_ptr<Platform::Context> _PlatformContext{ nullptr };
+		std::unique_ptr<Host::Context>     _HostContext{ nullptr };
+		std::unique_ptr<GW2::Context>      _GameContext{ nullptr };
 
 		std::mutex                          HttpClientMutex{};
 		std::map<std::string, CHttpClient*> HttpClients{};
