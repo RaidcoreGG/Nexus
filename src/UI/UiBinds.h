@@ -17,6 +17,8 @@
 #include "Engine/Inputs/InputBinds/IbMapping.h"
 #include "GW2/Inputs/GameBinds/GbEnum.h"
 
+using namespace Raidcore::Nexus;
+
 struct InputBindPacked_t
 {
 	std::string KeysText{};
@@ -42,7 +44,7 @@ struct GameInputBindPacked_t
 struct GameInputBindCategory_t
 {
 	std::string                                           Name          {};
-	std::unordered_map<EGameBinds, GameInputBindPacked_t> GameInputBinds{};
+	std::unordered_map<GW2::EGameBinds, GameInputBindPacked_t> GameInputBinds{};
 };
 
 enum class EBindEditType

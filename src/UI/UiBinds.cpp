@@ -133,10 +133,10 @@ void CUiBinds::UpdateDisplayGameBinds()
 	this->DisplayGameBinds.clear();
 
 	Runtime& ctx = Runtime::Get();
-	GameBindsApi* gameBindsApi = &ctx.Game().GameBinds();
+	GW2::GameBindsApi* gameBindsApi = &ctx.Game().GameBinds();
 
 	/* copy of all InputBinds */
-	std::unordered_map<EGameBinds, MultiInputBind_t> InputBindRegistry = gameBindsApi->GetRegistry();
+	std::unordered_map<GW2::EGameBinds, GW2::MultiInputBind_t> InputBindRegistry = gameBindsApi->GetRegistry();
 
 	/* acquire categories */
 	for (auto& [identifier, inputBind] : InputBindRegistry)

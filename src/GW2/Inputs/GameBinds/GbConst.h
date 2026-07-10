@@ -13,25 +13,31 @@
 #include "GbEnum.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// NameFrom:
-/// 	Returns the unlocalized identifier of a game bind.
+/// Raidcore::Nexus::GW2 Namespace
 ///----------------------------------------------------------------------------------------------------
-std::string& NameFrom(EGameBinds aGameBind);
+namespace Raidcore::Nexus::GW2
+{
+	///----------------------------------------------------------------------------------------------------
+	/// NameFrom:
+	/// 	Returns the unlocalized identifier of a game bind.
+	///----------------------------------------------------------------------------------------------------
+	std::string& NameFrom(EGameBinds aGameBind);
 
-///----------------------------------------------------------------------------------------------------
-/// CategoryNameFrom:
-/// 	Returns the unlocalized category of a game bind.
-///----------------------------------------------------------------------------------------------------
-std::string& CategoryNameFrom(EGameBinds aGameBind);
+	///----------------------------------------------------------------------------------------------------
+	/// CategoryNameFrom:
+	/// 	Returns the unlocalized category of a game bind.
+	///----------------------------------------------------------------------------------------------------
+	std::string& CategoryNameFrom(EGameBinds aGameBind);
 
-///----------------------------------------------------------------------------------------------------
-/// GameScanCodeToScanCode:
-/// 	Converts a scan code from the game to a regular scan code.
-///----------------------------------------------------------------------------------------------------
-unsigned short GameScanCodeToScanCode(unsigned short aGameScanCode);
+	///----------------------------------------------------------------------------------------------------
+	/// GameScanCodeToScanCode:
+	/// 	Converts a scan code from the game to a regular scan code.
+	///----------------------------------------------------------------------------------------------------
+	unsigned short GameScanCodeToScanCode(unsigned short aGameScanCode);
 
-///----------------------------------------------------------------------------------------------------
-/// ScanCodeToGameScanCode:
-/// 	Converts a scan code from the game to a regular scan code.
-///----------------------------------------------------------------------------------------------------
-unsigned short ScanCodeToGameScanCode(unsigned short aScanCode);
+	///----------------------------------------------------------------------------------------------------
+	/// ScanCodeToGameScanCode:
+	/// 	Converts a scan code from the game to a regular scan code.
+	///----------------------------------------------------------------------------------------------------
+	unsigned short ScanCodeToGameScanCode(unsigned short aScanCode);
+}

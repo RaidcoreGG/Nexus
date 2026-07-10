@@ -25,7 +25,8 @@
 #include "Engine/Loader/Loader.h"
 #include "GW2/ArcDPS/ArcExtensionDef.h"
 
-using ArcExtensionDef_t = ArcDPS::ExtensionDef_t;
+using namespace Raidcore::Nexus;
+using ArcExtensionDef_t = GW2::ArcDPS::ExtensionDef_t;
 
 constexpr const char* CH_ADDON = "Addon";
 

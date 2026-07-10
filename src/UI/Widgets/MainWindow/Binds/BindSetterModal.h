@@ -15,6 +15,8 @@
 #include "Engine/Inputs/InputBinds/IbBindV2.h"
 #include "GW2/Inputs/GameBinds/GbEnum.h"
 
+using namespace Raidcore::Nexus;
+
 ///----------------------------------------------------------------------------------------------------
 /// CBindSetterModal Class
 ///----------------------------------------------------------------------------------------------------
@@ -54,12 +56,12 @@ class CBindSetterModal : public virtual IModal
 	/// SetTarget:
 	/// 	Set game bind as editing target.
 	///----------------------------------------------------------------------------------------------------
-	void SetTarget(EGameBinds aBindIdentifier, bool aIsPrimary = true);
+	void SetTarget(GW2::EGameBinds aBindIdentifier, bool aIsPrimary = true);
 
 	private:
 	EBindEditType Type             = EBindEditType::None;
 	std::string   NexusBindID      = {};
-	EGameBinds    GameBindID       = (EGameBinds)0;
+	GW2::EGameBinds    GameBindID       = (GW2::EGameBinds)0;
 	std::string   PreviousBindText = {};
 
 	InputBind_t   Capture          = {};

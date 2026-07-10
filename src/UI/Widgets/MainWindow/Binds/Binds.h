@@ -18,6 +18,8 @@
 #include "UI/UiBinds.h"
 #include "BindSetterModal.h"
 
+using namespace Raidcore::Nexus;
+
 class CBindsWindow : public ISubWindow
 {
 	public:
@@ -32,7 +34,7 @@ class CBindsWindow : public ISubWindow
 	std::vector<GameInputBindCategory_t> GIBCategories;
 
 	void RenderInputBindsTable(std::unordered_map<std::string, InputBindPacked_t>& aInputBinds);
-	void RenderGameInputBindsTable(std::unordered_map<EGameBinds, GameInputBindPacked_t>& aInputBinds);
+	void RenderGameInputBindsTable(std::unordered_map<GW2::EGameBinds, GameInputBindPacked_t>& aInputBinds);
 
 	void DeleteStaleBind(const std::string& aIdentifier);
 };

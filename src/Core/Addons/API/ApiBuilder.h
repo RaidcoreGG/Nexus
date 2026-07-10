@@ -102,38 +102,38 @@ namespace ADDONAPI
 		/// PressAsync:
 		/// 	Presses the keys of a game bind.
 		///----------------------------------------------------------------------------------------------------
-		void PressAsync(EGameBinds aGameBind);
+		void PressAsync(GW2::EGameBinds aGameBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// ReleaseAsync:
 		/// 	Releases the keys of a game bind.
 		///----------------------------------------------------------------------------------------------------
-		void ReleaseAsync(EGameBinds aGameBind);
+		void ReleaseAsync(GW2::EGameBinds aGameBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// InvokeAsync:
 		/// 	Presses and releases the keys of a game bind.
 		/// 	aDuration is the wait time in milliseconds between press and release.
 		///----------------------------------------------------------------------------------------------------
-		void InvokeAsync(EGameBinds aGameBind, int aDuration);
+		void InvokeAsync(GW2::EGameBinds aGameBind, int aDuration);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Press:
 		/// 	Presses the keys of a game bind.
 		///----------------------------------------------------------------------------------------------------
-		void Press(EGameBinds aGameBind);
+		void Press(GW2::EGameBinds aGameBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Release:
 		/// 	Releases the keys of a game bind.
 		///----------------------------------------------------------------------------------------------------
-		void Release(EGameBinds aGameBind);
+		void Release(GW2::EGameBinds aGameBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// IsBound:
 		/// 	Returns whether a game bind has a InputBind_t set or not.
 		///----------------------------------------------------------------------------------------------------
-		bool IsBound(EGameBinds aGameBind);
+		bool IsBound(GW2::EGameBinds aGameBind);
 	}
 
 	///----------------------------------------------------------------------------------------------------

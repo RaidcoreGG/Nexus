@@ -183,12 +183,12 @@ namespace Hooks
 	{
 		LRESULT __stdcall WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
-			static Runtime&                s_Context      = Runtime::Get();
-			static CInputBindApi*          s_InputBindApi = s_Context.GetInputBindApi();
+			static Runtime&               s_Context      = Runtime::Get();
+			static CInputBindApi*         s_InputBindApi = s_Context.GetInputBindApi();
 			static Platform::RawInputApi& s_RawInputApi  = s_Context.Platform().RawInput();
-			static CUiContext*             s_UIContext    = s_Context.GetUIContext();
-			static CLoader&                s_Loader       = s_Context.Host().Loader();
-			static GameBindsApi&          s_GameBindsApi = s_Context.Game().GameBinds();
+			static CUiContext*            s_UIContext    = s_Context.GetUIContext();
+			static CLoader&               s_Loader       = s_Context.Host().Loader();
+			static GW2::GameBindsApi&     s_GameBindsApi = s_Context.Game().GameBinds();
 
 			// don't pass to game if loader
 			if (s_Loader.WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
@@ -210,7 +210,7 @@ namespace Hooks
 			// shift game only messages back to normal messages.
 			s_GameBindsApi.RedirectGameOnly(hWnd, uMsg, wParam, lParam);
 
-			MouseResetFix(hWnd, uMsg, wParam, lParam);
+			GW2::MouseResetFix(hWnd, uMsg, wParam, lParam);
 
 			return CallWindowProcA(Target::WndProc, hWnd, uMsg, wParam, lParam);
 		}

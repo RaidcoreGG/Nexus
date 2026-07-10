@@ -118,12 +118,12 @@ struct AddonAPI6_t : AddonAPI_t
 	/* GameBinds */
 	struct GameBindsVT
 	{
-		GAMEBINDS_PRESSASYNC              PressAsync;
-		GAMEBINDS_RELEASEASYNC            ReleaseAsync;
-		GAMEBINDS_INVOKEASYNC             InvokeAsync;
-		GAMEBINDS_PRESS                   Press;
-		GAMEBINDS_RELEASE                 Release;
-		GAMEBINDS_ISBOUND                 IsBound;
+		GW2::GAMEBINDS_PRESSASYNC              PressAsync;
+		GW2::GAMEBINDS_RELEASEASYNC            ReleaseAsync;
+		GW2::GAMEBINDS_INVOKEASYNC             InvokeAsync;
+		GW2::GAMEBINDS_PRESS                   Press;
+		GW2::GAMEBINDS_RELEASE                 Release;
+		GW2::GAMEBINDS_ISBOUND                 IsBound;
 	};
 	GameBindsVT                           GameBinds;
 

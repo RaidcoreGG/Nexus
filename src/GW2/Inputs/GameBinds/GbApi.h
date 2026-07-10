@@ -29,144 +29,150 @@ constexpr const char* EV_UE_KB_CH = "EV_UNOFFICIAL_EXTRAS_KEYBIND_CHANGED";
 #define WM_PASSTHROUGH_LAST  WM_USER + 7997 + WM_USER - 1
 
 ///----------------------------------------------------------------------------------------------------
-/// MultiInputBind_t Struct
+/// Raidcore::Nexus::GW2 Namespace
 ///----------------------------------------------------------------------------------------------------
-struct MultiInputBind_t
+namespace Raidcore::Nexus::GW2
 {
-	InputBind_t Primary;
-	InputBind_t Secondary;
-};
-
-///----------------------------------------------------------------------------------------------------
-/// GameBindsApi Class
-///----------------------------------------------------------------------------------------------------
-class GameBindsApi
-{
-	public:
-	// FIXME: this needs to be moved to an evtconn
 	///----------------------------------------------------------------------------------------------------
-	/// OnUEInputBindChanged:
-	/// 	Receives runtime InputBind_t updates from Unofficial Extras.
+	/// MultiInputBind_t Struct
 	///----------------------------------------------------------------------------------------------------
-	static void OnUEInputBindChanged(void* aData);
-
-	public:
-	///----------------------------------------------------------------------------------------------------
-	/// ctor
-	///----------------------------------------------------------------------------------------------------
-	GameBindsApi(
-		Platform::RawInputApi& aRawInputApi,
-		CLogApi&                aLogger,
-		CEventApi&              aEventApi,
-		RenderContext_t&        aRenderContext,
-		std::filesystem::path   aConfigPath
-	);
-	///----------------------------------------------------------------------------------------------------
-	/// dtor
-	///----------------------------------------------------------------------------------------------------
-	~GameBindsApi();
+	struct MultiInputBind_t
+	{
+		InputBind_t Primary;
+		InputBind_t Secondary;
+	};
 
 	///----------------------------------------------------------------------------------------------------
-	/// RedirectGameOnly:
-	/// 	Returns the uMsg shifted back to the normal range.
-	/// 	This should be called after all other window procedures.
+	/// GameBindsApi Class
 	///----------------------------------------------------------------------------------------------------
-	UINT RedirectGameOnly(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam);
+	class GameBindsApi
+	{
+		public:
+		// FIXME: this needs to be moved to an evtconn
+		///----------------------------------------------------------------------------------------------------
+		/// OnUEInputBindChanged:
+		/// 	Receives runtime InputBind_t updates from Unofficial Extras.
+		///----------------------------------------------------------------------------------------------------
+		static void OnUEInputBindChanged(void* aData);
 
-	///----------------------------------------------------------------------------------------------------
-	/// SendWndProcToGame:
-	/// 	Skips all WndProc callbacks and sends it directly to the original.
-	///----------------------------------------------------------------------------------------------------
-	LRESULT SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		GameBindsApi(
+			Platform::RawInputApi& aRawInputApi,
+			CLogApi& aLogger,
+			CEventApi& aEventApi,
+			RenderContext_t& aRenderContext,
+			std::filesystem::path   aConfigPath
+		);
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		~GameBindsApi();
 
-	///----------------------------------------------------------------------------------------------------
-	/// PressAsync:
-	/// 	Presses the keys of a game bind.
-	///----------------------------------------------------------------------------------------------------
-	void PressAsync(EGameBinds aGameBind);
+		///----------------------------------------------------------------------------------------------------
+		/// RedirectGameOnly:
+		/// 	Returns the uMsg shifted back to the normal range.
+		/// 	This should be called after all other window procedures.
+		///----------------------------------------------------------------------------------------------------
+		UINT RedirectGameOnly(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam);
 
-	///----------------------------------------------------------------------------------------------------
-	/// ReleaseAsync:
-	/// 	Releases the keys of a game bind.
-	///----------------------------------------------------------------------------------------------------
-	void ReleaseAsync(EGameBinds aGameBind);
+		///----------------------------------------------------------------------------------------------------
+		/// SendWndProcToGame:
+		/// 	Skips all WndProc callbacks and sends it directly to the original.
+		///----------------------------------------------------------------------------------------------------
+		LRESULT SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	///----------------------------------------------------------------------------------------------------
-	/// InvokeAsync:
-	/// 	Presses and releases the keys of a game bind.
-	/// 	aDuration is the wait time in milliseconds between press and release.
-	///----------------------------------------------------------------------------------------------------
-	void InvokeAsync(EGameBinds aGameBind, int aDuration);
+		///----------------------------------------------------------------------------------------------------
+		/// PressAsync:
+		/// 	Presses the keys of a game bind.
+		///----------------------------------------------------------------------------------------------------
+		void PressAsync(EGameBinds aGameBind);
 
-	///----------------------------------------------------------------------------------------------------
-	/// Press:
-	/// 	Presses the keys of a game bind.
-	///----------------------------------------------------------------------------------------------------
-	void Press(EGameBinds aGameBind);
+		///----------------------------------------------------------------------------------------------------
+		/// ReleaseAsync:
+		/// 	Releases the keys of a game bind.
+		///----------------------------------------------------------------------------------------------------
+		void ReleaseAsync(EGameBinds aGameBind);
 
-	///----------------------------------------------------------------------------------------------------
-	/// Release:
-	/// 	Releases the keys of a game bind.
-	///----------------------------------------------------------------------------------------------------
-	void Release(EGameBinds aGameBind);
+		///----------------------------------------------------------------------------------------------------
+		/// InvokeAsync:
+		/// 	Presses and releases the keys of a game bind.
+		/// 	aDuration is the wait time in milliseconds between press and release.
+		///----------------------------------------------------------------------------------------------------
+		void InvokeAsync(EGameBinds aGameBind, int aDuration);
 
-	///----------------------------------------------------------------------------------------------------
-	/// RestoreModifiers:
-	/// 	Restores the modifiers as polled from the system.
-	///----------------------------------------------------------------------------------------------------
-	void RestoreModifiers();
+		///----------------------------------------------------------------------------------------------------
+		/// Press:
+		/// 	Presses the keys of a game bind.
+		///----------------------------------------------------------------------------------------------------
+		void Press(EGameBinds aGameBind);
 
-	///----------------------------------------------------------------------------------------------------
-	/// IsBound:
-	/// 	Returns whether a game bind has a InputBind_t set or not.
-	///----------------------------------------------------------------------------------------------------
-	bool IsBound(EGameBinds aGameBind);
+		///----------------------------------------------------------------------------------------------------
+		/// Release:
+		/// 	Releases the keys of a game bind.
+		///----------------------------------------------------------------------------------------------------
+		void Release(EGameBinds aGameBind);
 
-	///----------------------------------------------------------------------------------------------------
-	/// Get:
-	/// 	Gets a game bind.
-	/// 	Returns nullptr, if it doesn't exist.
-	///----------------------------------------------------------------------------------------------------
-	const MultiInputBind_t* Get(EGameBinds aGameBind);
+		///----------------------------------------------------------------------------------------------------
+		/// RestoreModifiers:
+		/// 	Restores the modifiers as polled from the system.
+		///----------------------------------------------------------------------------------------------------
+		void RestoreModifiers();
 
-	///----------------------------------------------------------------------------------------------------
-	/// Set:
-	/// 	Sets a game bind.
-	///----------------------------------------------------------------------------------------------------
-	void Set(EGameBinds aGameBind, InputBind_t aInputBind, bool aIsPrimary, bool aIsRuntimeBind);
+		///----------------------------------------------------------------------------------------------------
+		/// IsBound:
+		/// 	Returns whether a game bind has a InputBind_t set or not.
+		///----------------------------------------------------------------------------------------------------
+		bool IsBound(EGameBinds aGameBind);
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetRegistry:
-	/// 	Returns a copy of the registry.
-	///----------------------------------------------------------------------------------------------------
-	std::unordered_map<EGameBinds, MultiInputBind_t> GetRegistry() const;
+		///----------------------------------------------------------------------------------------------------
+		/// Get:
+		/// 	Gets a game bind.
+		/// 	Returns nullptr, if it doesn't exist.
+		///----------------------------------------------------------------------------------------------------
+		const MultiInputBind_t* Get(EGameBinds aGameBind);
 
-	///----------------------------------------------------------------------------------------------------
-	/// Load:
-	/// 	Loads the saved game binds from disk.
-	///----------------------------------------------------------------------------------------------------
-	void Load(std::filesystem::path aPath);
+		///----------------------------------------------------------------------------------------------------
+		/// Set:
+		/// 	Sets a game bind.
+		///----------------------------------------------------------------------------------------------------
+		void Set(EGameBinds aGameBind, InputBind_t aInputBind, bool aIsPrimary, bool aIsRuntimeBind);
 
-	private:
-	Platform::RawInputApi&                          RawInputApi;
-	CLogApi&                                         Logger;
-	CEventApi&                                       EventApi;
-	RenderContext_t&                                 RenderContext;
+		///----------------------------------------------------------------------------------------------------
+		/// GetRegistry:
+		/// 	Returns a copy of the registry.
+		///----------------------------------------------------------------------------------------------------
+		std::unordered_map<EGameBinds, MultiInputBind_t> GetRegistry() const;
 
-	std::filesystem::path                            ConfigPath;
+		///----------------------------------------------------------------------------------------------------
+		/// Load:
+		/// 	Loads the saved game binds from disk.
+		///----------------------------------------------------------------------------------------------------
+		void Load(std::filesystem::path aPath);
 
-	mutable std::mutex                               Mutex;
-	std::unordered_map<EGameBinds, MultiInputBind_t> Registry;
+		private:
+		Platform::RawInputApi& RawInputApi;
+		CLogApi& Logger;
+		CEventApi& EventApi;
+		RenderContext_t& RenderContext;
 
-	///----------------------------------------------------------------------------------------------------
-	/// AddDefaultBinds:
-	/// 	Adds the default binds, if they don't already exist.
-	///----------------------------------------------------------------------------------------------------
-	void AddDefaultBinds();
+		std::filesystem::path                            ConfigPath;
 
-	///----------------------------------------------------------------------------------------------------
-	/// Save:
-	/// 	Saves the game binds to disk.
-	///----------------------------------------------------------------------------------------------------
-	void Save();
-};
+		mutable std::mutex                               Mutex;
+		std::unordered_map<EGameBinds, MultiInputBind_t> Registry;
+
+		///----------------------------------------------------------------------------------------------------
+		/// AddDefaultBinds:
+		/// 	Adds the default binds, if they don't already exist.
+		///----------------------------------------------------------------------------------------------------
+		void AddDefaultBinds();
+
+		///----------------------------------------------------------------------------------------------------
+		/// Save:
+		/// 	Saves the game binds to disk.
+		///----------------------------------------------------------------------------------------------------
+		void Save();
+	};
+}

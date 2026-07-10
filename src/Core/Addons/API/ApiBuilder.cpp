@@ -41,15 +41,15 @@ namespace ADDONAPI
 
 	static CDataLinkApi*           s_DataLinkApi   = nullptr;
 	static CEventApi*              s_EventApi      = nullptr;
-	static GameBindsApi*          s_GameBindsApi  = nullptr;
+	static GW2::GameBindsApi*      s_GameBindsApi  = nullptr;
 	static CInputBindApi*          s_InputBindApi  = nullptr;
-	static Platform::RawInputApi* s_RawInputApi   = nullptr;
+	static Platform::RawInputApi*  s_RawInputApi   = nullptr;
 	static CLocalization*          s_Localization  = nullptr;
 	static CLogApi*                s_Logger        = nullptr;
 	static CTextureLoader*         s_TextureApi    = nullptr;
 	static CLoader*                s_Loader        = nullptr;
 	static RenderContext_t*        s_RenderCtx     = nullptr;
-	static ArcdpsApi*                s_ArcApi        = nullptr;
+	static GW2::ArcdpsApi*         s_ArcApi        = nullptr;
 
 	static CUiContext*             s_UiContext     = nullptr;
 	static CFontManager*           s_FontManager   = nullptr;
@@ -133,37 +133,37 @@ namespace ADDONAPI
 			return s_GameBindsApi->SendWndProcToGame(hWnd, uMsg, wParam, lParam);
 		}
 
-		void PressAsync(EGameBinds aGameBind)
+		void PressAsync(GW2::EGameBinds aGameBind)
 		{
 			assert(s_GameBindsApi);
 			s_GameBindsApi->PressAsync(aGameBind);
 		}
 
-		void ReleaseAsync(EGameBinds aGameBind)
+		void ReleaseAsync(GW2::EGameBinds aGameBind)
 		{
 			assert(s_GameBindsApi);
 			s_GameBindsApi->ReleaseAsync(aGameBind);
 		}
 
-		void InvokeAsync(EGameBinds aGameBind, int aDuration)
+		void InvokeAsync(GW2::EGameBinds aGameBind, int aDuration)
 		{
 			assert(s_GameBindsApi);
 			s_GameBindsApi->InvokeAsync(aGameBind, aDuration);
 		}
 
-		void Press(EGameBinds aGameBind)
+		void Press(GW2::EGameBinds aGameBind)
 		{
 			assert(s_GameBindsApi);
 			s_GameBindsApi->Press(aGameBind);
 		}
 
-		void Release(EGameBinds aGameBind)
+		void Release(GW2::EGameBinds aGameBind)
 		{
 			assert(s_GameBindsApi);
 			s_GameBindsApi->Release(aGameBind);
 		}
 
-		bool IsBound(EGameBinds aGameBind)
+		bool IsBound(GW2::EGameBinds aGameBind)
 		{
 			assert(s_GameBindsApi);
 			return s_GameBindsApi->IsBound(aGameBind);

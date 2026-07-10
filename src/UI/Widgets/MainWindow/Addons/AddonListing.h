@@ -17,7 +17,9 @@
 #include "UI/UiFuncDefs.h"
 #include "Util/Strings.h"
 
-using ArcExtensionDef_t = ArcDPS::ExtensionDef_t;
+using namespace Raidcore::Nexus;
+
+using ArcExtensionDef_t = GW2::ArcDPS::ExtensionDef_t;
 
 struct AddonListing_t
 {

@@ -136,7 +136,7 @@ void CBindsWindow::RenderContent()
 						if (ImGui::Selectable(path.filename().string().c_str()))
 						{
 							/* Actually load the binds. */
-							GameBindsApi* gameBindsApi = &ctx.Game().GameBinds();
+							GW2::GameBindsApi* gameBindsApi = &ctx.Game().GameBinds();
 							gameBindsApi->Load(path);
 
 							/* Trigger refresh for display binds. */
@@ -219,7 +219,7 @@ void CBindsWindow::RenderInputBindsTable(std::unordered_map<std::string, InputBi
 	}
 }
 
-void CBindsWindow::RenderGameInputBindsTable(std::unordered_map<EGameBinds, GameInputBindPacked_t>& aInputBinds)
+void CBindsWindow::RenderGameInputBindsTable(std::unordered_map<GW2::EGameBinds, GameInputBindPacked_t>& aInputBinds)
 {
 	if (ImGui::BeginTable("table_gameinputbinds", 3, ImGuiTableFlags_BordersInnerH))
 	{
@@ -231,7 +231,7 @@ void CBindsWindow::RenderGameInputBindsTable(std::unordered_map<EGameBinds, Game
 		{
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
-			ImGui::Text(langApi->Translate(NameFrom(identifier).c_str())); // get translation here
+			ImGui::Text(langApi->Translate(GW2::NameFrom(identifier).c_str())); // get translation here
 
 			ImGui::TableSetColumnIndex(1);
 			ImGui::PushID((inputBind.Name +"##Primary").c_str());

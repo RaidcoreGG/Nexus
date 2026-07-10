@@ -76,7 +76,7 @@ void CBindSetterModal::OnOpening()
 {
 	Runtime&      ctx   = Runtime::Get();
 	CInputBindApi* ibapi = ctx.GetInputBindApi();
-	GameBindsApi* gbapi = &ctx.Game().GameBinds();
+	GW2::GameBindsApi* gbapi = &ctx.Game().GameBinds();
 
 	/* Fetch display text. */
 	switch (this->Type)
@@ -92,7 +92,7 @@ void CBindSetterModal::OnOpening()
 		}
 		case EBindEditType::Game:
 		{
-			const MultiInputBind_t* gb = gbapi->Get(this->GameBindID);
+			const GW2::MultiInputBind_t* gb = gbapi->Get(this->GameBindID);
 
 			assert(gb != nullptr);
 
@@ -101,7 +101,7 @@ void CBindSetterModal::OnOpening()
 		}
 		case EBindEditType::Game2:
 		{
-			const MultiInputBind_t* gb = gbapi->Get(this->GameBindID);
+			const GW2::MultiInputBind_t* gb = gbapi->Get(this->GameBindID);
 
 			assert(gb != nullptr);
 
@@ -117,7 +117,7 @@ void CBindSetterModal::OnClosing()
 {
 	Runtime&      ctx   = Runtime::Get();
 	CInputBindApi* ibapi = ctx.GetInputBindApi();
-	GameBindsApi* gbapi = &ctx.Game().GameBinds();
+	GW2::GameBindsApi* gbapi = &ctx.Game().GameBinds();
 	ibapi->EndCapturing();
 
 	switch (this->GetResult())
@@ -181,7 +181,7 @@ void CBindSetterModal::OnClosing()
 	/* Reset data. */
 	this->Type = EBindEditType::None;
 	this->NexusBindID.clear();
-	this->GameBindID = (EGameBinds)0;
+	this->GameBindID = (GW2::EGameBinds)0;
 	this->PreviousBindText.clear();
 	this->Capture = {};
 	this->BindConflict.clear();
@@ -199,7 +199,7 @@ void CBindSetterModal::SetTarget(std::string aBindIdentifier)
 	this->OpenModal();
 }
 
-void CBindSetterModal::SetTarget(EGameBinds aBindIdentifier, bool aIsPrimary)
+void CBindSetterModal::SetTarget(GW2::EGameBinds aBindIdentifier, bool aIsPrimary)
 {
 	assert(this->Type == EBindEditType::None);
 
