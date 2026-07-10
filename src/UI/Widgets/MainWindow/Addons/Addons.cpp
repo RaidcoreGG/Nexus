@@ -57,7 +57,7 @@ CAddonsWindow::CAddonsWindow()
 
 	Runtime&  ctx         = Runtime::Get();
 	CSettings* settingsctx = ctx.GetSettingsCtx();
-	Host::CEventApi& evtapi      = ctx.Host().Events();
+	Host::EventApi& evtapi      = ctx.Host().Events();
 	
 	this->Filter     = settingsctx->Get(OPT_ADDONFILTERS, FILTER_INSTALLED);
 	this->IsListMode = settingsctx->Get(OPT_ISLISTMODE,   true            );
@@ -129,7 +129,7 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 	static Runtime&       ctx      = Runtime::Get();
 	static CUiContext*     uictx    = ctx.GetUIContext();
 	static CConfigMgr*     cfgmgr   = ctx.GetCfgMgr();
-	static Host::CLibraryMgr&    libmgr   = ctx.Host().Library();
+	static Host::LibraryMgr&    libmgr   = ctx.Host().Library();
 	static CTextureLoader* texapi   = ctx.GetTextureService();
 	static CLocalization*  langApi  = uictx->GetLocalization();
 	static CAlerts*        alertctx = uictx->GetAlerts();
@@ -658,7 +658,7 @@ void CAddonsWindow::RenderDetails()
 									CUiContext* uictx = ctx.GetUIContext();
 									CAlerts* alertctx = uictx->GetAlerts();
 									CLocalization* langApi = uictx->GetLocalization();
-									CLoader* loader = ctx.GetLoader();
+									Loader* loader = ctx.GetLoader();
 
 									if (updater->UpdateAddon(tmpPath, addonInfo, false, 5 * 60))
 									{
@@ -856,7 +856,7 @@ void CAddonsWindow::RenderActionsBar(ImVec2& aSize)
 {
 	Runtime&       ctx    = Runtime::Get();
 	CTextureLoader* texapi = ctx.GetTextureService();
-	Host::CLoader&        loader = ctx.Host().Loader();
+	Host::Loader&        loader = ctx.Host().Loader();
 	CUiContext*     uictx  = ctx.GetUIContext();
 	CLocalization*  lang   = uictx->GetLocalization();
 
@@ -1035,8 +1035,8 @@ void CAddonsWindow::PopulateAddons()
 	Runtime&    ctx = Runtime::Get();
 	CUiContext*  uictx = ctx.GetUIContext();
 	CSettings*   settingsctx = ctx.GetSettingsCtx();
-	Host::CLoader&     loader = ctx.Host().Loader();
-	Host::CLibraryMgr& libMgr = ctx.Host().Library();
+	Host::Loader&     loader = ctx.Host().Loader();
+	Host::LibraryMgr& libMgr = ctx.Host().Library();
 
 	this->Filter = settingsctx->Get<EAddonsFilterFlags>(OPT_ADDONFILTERS, FILTER_INSTALLED);
 

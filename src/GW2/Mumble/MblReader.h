@@ -36,7 +36,7 @@ namespace Raidcore::Nexus::GW2
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		MumbleReader(CDataLinkApi& aDataLink, Host::CEventApi& aEventApi, CLogApi& aLogger);
+		MumbleReader(CDataLinkApi& aDataLink, Host::EventApi& aEventApi, CLogApi& aLogger);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
@@ -75,7 +75,7 @@ namespace Raidcore::Nexus::GW2
 
 		private:
 		CDataLinkApi& DataLinkApi;
-		Host::CEventApi& EventApi;
+		Host::EventApi& EventApi;
 		CLogApi& Logger;
 
 		std::string       Name;

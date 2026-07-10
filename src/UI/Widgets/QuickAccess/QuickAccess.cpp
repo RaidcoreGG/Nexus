@@ -39,7 +39,7 @@ CQuickAccess::CQuickAccess(
 	CInputBindApi*  aInputBindApi,
 	CTextureLoader* aTextureService,
 	CLocalization*  aLocalization,
-	Host::CEventApi*      aEventApi
+	Host::EventApi*      aEventApi
 ) : IRefCleaner("QuickAccess")
 {
 	this->Logger         = aLogger;

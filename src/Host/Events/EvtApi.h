@@ -25,20 +25,20 @@ constexpr const char* CH_EVENTS = "Events";
 namespace Raidcore::Nexus::Host
 {
 	///----------------------------------------------------------------------------------------------------
-	/// CEventApi Class
+	/// EventApi Class
 	///----------------------------------------------------------------------------------------------------
-	class CEventApi : public virtual IRefCleaner
+	class EventApi : public virtual IRefCleaner
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		CEventApi(CLoader* aLoader);
+		EventApi(Loader* aLoader);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
 		///----------------------------------------------------------------------------------------------------
-		~CEventApi();
+		~EventApi();
 
 		///----------------------------------------------------------------------------------------------------
 		/// Raise:
@@ -77,7 +77,7 @@ namespace Raidcore::Nexus::Host
 		std::unordered_map<std::string, EventData_t> GetRegistry() const;
 
 		private:
-		CLoader* Loader = nullptr;
+		Loader* Loader = nullptr;
 
 		mutable std::recursive_mutex                 Mutex;
 		std::unordered_map<std::string, EventData_t> Registry;

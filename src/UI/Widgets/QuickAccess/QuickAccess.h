@@ -56,7 +56,7 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CQuickAccess(CDataLinkApi* aDataLink, CLogApi* aLogger, CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization, Host::CEventApi* aEventApi);
+	CQuickAccess(CDataLinkApi* aDataLink, CLogApi* aLogger, CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization, Host::EventApi* aEventApi);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -134,7 +134,7 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	CInputBindApi*                        InputBindApi       {};
 	CTextureLoader*                       TextureService     {};
 	CLocalization*                        Language           {};
-	Host::CEventApi*                      EventApi           {};
+	Host::EventApi*                      EventApi           {};
 
 	NexusLinkData_t*                      NexusLink          {};
 	Mumble::Data*                         MumbleLink         {};

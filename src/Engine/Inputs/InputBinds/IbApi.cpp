@@ -23,7 +23,7 @@ namespace Clockwork = Raidcore::Clockwork;
 #include "IbConst.h"
 #include "Util/Inputs.h"
 
-CInputBindApi::CInputBindApi(Host::CEventApi* aEventApi, CLogApi* aLogger, std::filesystem::path aConfigPath) : IRefCleaner("InputBindApi")
+CInputBindApi::CInputBindApi(Host::EventApi* aEventApi, CLogApi* aLogger, std::filesystem::path aConfigPath) : IRefCleaner("InputBindApi")
 {
 	assert(aEventApi);
 	assert(aLogger);

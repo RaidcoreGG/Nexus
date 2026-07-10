@@ -21,7 +21,7 @@ namespace Raidcore::Nexus::GW2
 {
 	Context::Context(
 		CDataLinkApi&           aDataLink,
-		Host::CEventApi&        aEventApi,
+		Host::EventApi&        aEventApi,
 		CLogApi&                aLogger,
 		Platform::RawInputApi& aRawInputApi,
 		RenderContext_t&        aRendererCtx,

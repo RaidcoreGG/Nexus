@@ -38,27 +38,27 @@ namespace Raidcore::Nexus::Host
 		/// Loader:
 		/// 	Returns the loader instance.
 		///----------------------------------------------------------------------------------------------------
-		CLoader& Loader();
+		Host::Loader& Loader();
 
 		///----------------------------------------------------------------------------------------------------
 		/// Library:
 		/// 	Returns the library manager instance.
 		///----------------------------------------------------------------------------------------------------
-		CLibraryMgr& Library();
+		Host::LibraryMgr& Library();
 
 		///----------------------------------------------------------------------------------------------------
 		/// Events:
 		/// 	Returns the event API instance.
 		///----------------------------------------------------------------------------------------------------
-		CEventApi& Events();
+		Host::EventApi& Events();
 
 		private:
 		CLogApi& _Logger;
 
 		std::filesystem::path _LoaderDirectoryPath;
 
-		std::unique_ptr<CLoader>     _Loader{ nullptr };
-		std::unique_ptr<CLibraryMgr> _Library{ nullptr };
-		std::unique_ptr<CEventApi>   _EventApi{ nullptr };
+		std::unique_ptr<Host::Loader>     _Loader{ nullptr };
+		std::unique_ptr<Host::LibraryMgr> _Library{ nullptr };
+		std::unique_ptr<Host::EventApi>   _EventApi{ nullptr };
 	};
 }

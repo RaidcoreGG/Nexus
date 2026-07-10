@@ -21,7 +21,7 @@
 namespace Raidcore::Nexus::Host
 {
 	class IAddon;
-	class CLoader;
+	class Loader;
 
 	typedef IAddon* (*IADDON_FACTORY)(std::filesystem::path aLocation);
 
@@ -97,6 +97,6 @@ namespace Raidcore::Nexus::Host
 		///----------------------------------------------------------------------------------------------------
 		void SetLocation(std::filesystem::path aLocation);
 
-		friend class CLoader;
+		friend class Loader;
 	};
 }

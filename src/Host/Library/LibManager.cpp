@@ -19,19 +19,19 @@ using namespace Raidcore::Nexus;
 
 namespace Raidcore::Nexus::Host
 {
-	CLibraryMgr::CLibraryMgr(CLogApi* aLogger, CLoader* aLoader)
+	LibraryMgr::LibraryMgr(CLogApi* aLogger, Host::Loader* aLoader)
 	{
 		this->Logger = aLogger;
 		this->Loader = aLoader;
 	}
 
-	CLibraryMgr::~CLibraryMgr()
+	LibraryMgr::~LibraryMgr()
 	{
 		this->Logger = nullptr;
 		this->Loader = nullptr;
 	}
 
-	void CLibraryMgr::Update()
+	void LibraryMgr::Update()
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -83,7 +83,7 @@ namespace Raidcore::Nexus::Host
 		}
 	}
 
-	void CLibraryMgr::AddSource(std::string aURL)
+	void LibraryMgr::AddSource(std::string aURL)
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -98,7 +98,7 @@ namespace Raidcore::Nexus::Host
 		this->Sources.emplace(aURL, Runtime::Get().GetHttpClient(aURL));
 	}
 
-	void CLibraryMgr::Install(uint32_t aSignature)
+	void LibraryMgr::Install(uint32_t aSignature)
 	{
 		/* Already installed. */
 		if (this->Loader->IsTrackedSafe(aSignature)) { return; }
@@ -252,7 +252,7 @@ namespace Raidcore::Nexus::Host
 		this->Loader->NotifyChanges();
 	}
 
-	std::vector<LibraryAddon_t> CLibraryMgr::GetLibrary() const
+	std::vector<LibraryAddon_t> LibraryMgr::GetLibrary() const
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 

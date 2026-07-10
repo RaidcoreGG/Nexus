@@ -40,14 +40,14 @@ namespace ADDONAPI
 	static bool                    s_IsInitialized = false;
 
 	static CDataLinkApi*           s_DataLinkApi   = nullptr;
-	static Host::CEventApi*        s_EventApi      = nullptr;
+	static Host::EventApi*        s_EventApi      = nullptr;
 	static GW2::GameBindsApi*      s_GameBindsApi  = nullptr;
 	static CInputBindApi*          s_InputBindApi  = nullptr;
 	static Platform::RawInputApi*  s_RawInputApi   = nullptr;
 	static CLocalization*          s_Localization  = nullptr;
 	static CLogApi*                s_Logger        = nullptr;
 	static CTextureLoader*         s_TextureApi    = nullptr;
-	static Host::CLoader*          s_Loader        = nullptr;
+	static Host::Loader*          s_Loader        = nullptr;
 	static RenderContext_t*        s_RenderCtx     = nullptr;
 	static GW2::ArcdpsApi*         s_ArcApi        = nullptr;
 

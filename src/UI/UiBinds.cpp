@@ -61,7 +61,7 @@ void CUiBinds::UpdateDisplayInputBinds()
 
 	Runtime& ctx = Runtime::Get();
 	CInputBindApi* inputBindApi = ctx.GetInputBindApi();
-	Host::CLoader& loader = ctx.Host().Loader();
+	Host::Loader& loader = ctx.Host().Loader();
 
 	/* copy of all InputBinds */
 	std::map<std::string, IbMapping_t> InputBindRegistry = inputBindApi->GetRegistry();

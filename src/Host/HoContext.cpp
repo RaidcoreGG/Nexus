@@ -17,16 +17,16 @@ namespace Raidcore::Nexus::Host
 		: _Logger(aLogger)
 		, _LoaderDirectoryPath(std::move(aLoaderDirectory))
 	{
-		this->_Loader = std::make_unique<CLoader>(
+		this->_Loader = std::make_unique<Host::Loader>(
 			&this->_Logger,
 			CAddon::Factory, /* FIXME */
 			this->_LoaderDirectoryPath
 		);
-		this->_Library = std::make_unique<CLibraryMgr>(
+		this->_Library = std::make_unique<Host::LibraryMgr>(
 			&this->_Logger,
 			this->_Loader.get()
 		);
-		this->_EventApi = std::make_unique<CEventApi>(
+		this->_EventApi = std::make_unique<Host::EventApi>(
 			this->_Loader.get()
 		);
 
@@ -45,17 +45,17 @@ namespace Raidcore::Nexus::Host
 		this->_EventApi.reset();
 	}
 
-	CLoader& Context::Loader()
+	Host::Loader& Context::Loader()
 	{
 		return *this->_Loader;
 	}
 
-	CLibraryMgr& Context::Library()
+	Host::LibraryMgr& Context::Library()
 	{
 		return *this->_Library;
 	}
 
-	CEventApi& Context::Events()
+	Host::EventApi& Context::Events()
 	{
 		return *this->_EventApi;
 	}

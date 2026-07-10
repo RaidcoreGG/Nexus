@@ -85,7 +85,7 @@ class CUiContext : public CUiRender, public CUiBinds, public CUiStyle, public vi
 		CTextureLoader*    aTextureService,
 		CDataLinkApi*      aDataLink,
 		CInputBindApi*     aInputBindApi,
-		Host::CEventApi*   aEventApi,
+		Host::EventApi*   aEventApi,
 		GW2::MumbleReader* aMumbleReader
 	);
 
@@ -168,7 +168,7 @@ class CUiContext : public CUiRender, public CUiBinds, public CUiStyle, public vi
 	CTextureLoader*    TextureService = nullptr;
 	CDataLinkApi*      DataLink       = nullptr;
 	CInputBindApi*     InputBindApi   = nullptr;
-	Host::CEventApi*   EventApi       = nullptr;
+	Host::EventApi*   EventApi       = nullptr;
 	GW2::MumbleReader* MumbleReader   = nullptr;
 
 	/* Rendering */

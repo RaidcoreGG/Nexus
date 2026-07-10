@@ -168,7 +168,7 @@ CUiContext::CUiContext(
 	CTextureLoader*    aTextureService,
 	CDataLinkApi*      aDataLink,
 	CInputBindApi*     aInputBindApi,
-	Host::CEventApi*   aEventApi,
+	Host::EventApi*   aEventApi,
 	GW2::MumbleReader* aMumbleReader
 ) : IRefCleaner("UiContext")
 {

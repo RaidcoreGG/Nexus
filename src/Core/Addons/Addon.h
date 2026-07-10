@@ -203,8 +203,8 @@ class CAddon : public virtual Host::IAddon
 
 	private:
 	CLogApi*                 Logger               = nullptr;
-	Host::CLoader*           Loader               = nullptr;
-	Host::CEventApi*         EventApi             = nullptr;
+	Host::Loader*           Loader               = nullptr;
+	Host::EventApi*         EventApi             = nullptr;
 	CConfigMgr*              ConfigMgr            = nullptr;
 
 	EAddonInterfaces         ModuleInterfaces     = EAddonInterfaces::None;

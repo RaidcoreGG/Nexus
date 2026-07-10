@@ -15,7 +15,7 @@
 
 namespace Raidcore::Nexus::Host
 {
-	CLoader::CLoader(CLogApi* aLogger, IADDON_FACTORY aFactoryFunction, std::filesystem::path aDirectory)
+	Loader::Loader(CLogApi* aLogger, IADDON_FACTORY aFactoryFunction, std::filesystem::path aDirectory)
 	{
 		this->Logger = aLogger;
 		this->CreateAddon = aFactoryFunction;
@@ -27,7 +27,7 @@ namespace Raidcore::Nexus::Host
 		}
 	}
 
-	CLoader::~CLoader()
+	Loader::~Loader()
 	{
 		this->DeinitDirectoryUpdates();
 
@@ -42,7 +42,7 @@ namespace Raidcore::Nexus::Host
 		}
 	}
 
-	void CLoader::InitDirectoryUpdates(HWND aWndHandle)
+	void Loader::InitDirectoryUpdates(HWND aWndHandle)
 	{
 		assert(aWndHandle);
 
@@ -55,7 +55,7 @@ namespace Raidcore::Nexus::Host
 		}
 
 		this->IsRunning = true;
-		this->ProcThread = std::thread(&CLoader::ProcessChanges, this);
+		this->ProcThread = std::thread(&Loader::ProcessChanges, this);
 
 		/* Setup wndproc directory updates. */
 		std::wstring addonDirW = String::ToWString(this->Directory.string());
@@ -96,7 +96,7 @@ namespace Raidcore::Nexus::Host
 		this->Logger->Info(CH_LOADER, "Automatic addon loading enabled.");
 	}
 
-	UINT CLoader::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	UINT Loader::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		if (uMsg != WM_ADDONDIRUPDATE)
 		{
@@ -129,7 +129,7 @@ namespace Raidcore::Nexus::Host
 		return 0;
 	}
 
-	void CLoader::NotifyChanges()
+	void Loader::NotifyChanges()
 	{
 		std::lock_guard<std::mutex> lock(this->Mutex);
 		this->ConVar.notify_one();
@@ -137,7 +137,7 @@ namespace Raidcore::Nexus::Host
 		this->Logger->Trace(CH_LOADER, "NotifyChanges()");
 	}
 
-	void CLoader::Track(std::filesystem::path aPath)
+	void Loader::Track(std::filesystem::path aPath)
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -155,19 +155,19 @@ namespace Raidcore::Nexus::Host
 		addon->Load();
 	}
 
-	void CLoader::LoadSafe(std::filesystem::path aPath)
+	void Loader::LoadSafe(std::filesystem::path aPath)
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 		this->Load(aPath);
 	}
 
-	void CLoader::UnloadSafe(std::filesystem::path aPath)
+	void Loader::UnloadSafe(std::filesystem::path aPath)
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 		this->Unload(aPath);
 	}
 
-	IAddon* CLoader::GetOwner(void* aAddress) const
+	IAddon* Loader::GetOwner(void* aAddress) const
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -182,35 +182,35 @@ namespace Raidcore::Nexus::Host
 		return nullptr;
 	}
 
-	bool CLoader::IsTrackedSafe(uint32_t aSignature, IAddon* aAddon) const
+	bool Loader::IsTrackedSafe(uint32_t aSignature, IAddon* aAddon) const
 	{
 		std::lock_guard<std::mutex> lock(this->Mutex);
 
 		return this->IsTracked(aSignature, aAddon);
 	}
 
-	bool CLoader::IsTrackedSafe(std::filesystem::path aPath, IAddon* aAddon) const
+	bool Loader::IsTrackedSafe(std::filesystem::path aPath, IAddon* aAddon) const
 	{
 		std::lock_guard<std::mutex> lock(this->Mutex);
 
 		return this->IsTracked(aPath, aAddon);
 	}
 
-	bool CLoader::IsTrackedSafe(MD5_t aMD5, IAddon* aAddon) const
+	bool Loader::IsTrackedSafe(MD5_t aMD5, IAddon* aAddon) const
 	{
 		std::lock_guard<std::mutex> lock(this->Mutex);
 
 		return this->IsTracked(aMD5, aAddon);
 	}
 
-	std::vector<IAddon*> CLoader::GetAddons() const
+	std::vector<IAddon*> Loader::GetAddons() const
 	{
 		std::lock_guard<std::mutex> lock(this->Mutex);
 
 		return this->Addons;
 	}
 
-	void CLoader::DeinitDirectoryUpdates()
+	void Loader::DeinitDirectoryUpdates()
 	{
 		const std::lock_guard<std::mutex> lock(this->FSMutex);
 
@@ -228,7 +228,7 @@ namespace Raidcore::Nexus::Host
 		}
 	}
 
-	bool CLoader::IsValid(const std::filesystem::path& aPath)
+	bool Loader::IsValid(const std::filesystem::path& aPath)
 	{
 		if (aPath.empty()) { return false; }
 
@@ -249,7 +249,7 @@ namespace Raidcore::Nexus::Host
 		return true;
 	}
 
-	void CLoader::ProcessChanges()
+	void Loader::ProcessChanges()
 	{
 		this->Logger->Trace(CH_LOADER, "Init. Discovering addons.");
 		this->Discover();
@@ -386,7 +386,7 @@ namespace Raidcore::Nexus::Host
 		this->Addons.clear();
 	}
 
-	void CLoader::Discover()
+	void Loader::Discover()
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -409,7 +409,7 @@ namespace Raidcore::Nexus::Host
 		}
 	}
 
-	bool CLoader::IsTracked(uint32_t aSignature, IAddon* aAddon) const
+	bool Loader::IsTracked(uint32_t aSignature, IAddon* aAddon) const
 	{
 		for (IAddon* addon : this->Addons)
 		{
@@ -424,7 +424,7 @@ namespace Raidcore::Nexus::Host
 		return false;
 	}
 
-	bool CLoader::IsTracked(std::filesystem::path aPath, IAddon* aAddon) const
+	bool Loader::IsTracked(std::filesystem::path aPath, IAddon* aAddon) const
 	{
 		for (IAddon* addon : this->Addons)
 		{
@@ -439,7 +439,7 @@ namespace Raidcore::Nexus::Host
 		return false;
 	}
 
-	bool CLoader::IsTracked(MD5_t aMD5, IAddon* aAddon) const
+	bool Loader::IsTracked(MD5_t aMD5, IAddon* aAddon) const
 	{
 		if (aMD5.empty())
 		{
@@ -459,7 +459,7 @@ namespace Raidcore::Nexus::Host
 		return false;
 	}
 
-	void CLoader::Load(std::filesystem::path aPath)
+	void Loader::Load(std::filesystem::path aPath)
 	{
 		for (IAddon* addon : this->Addons)
 		{
@@ -472,7 +472,7 @@ namespace Raidcore::Nexus::Host
 		}
 	}
 
-	void CLoader::Unload(std::filesystem::path aPath)
+	void Loader::Unload(std::filesystem::path aPath)
 	{
 		for (IAddon* addon : this->Addons)
 		{

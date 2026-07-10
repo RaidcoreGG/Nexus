@@ -36,7 +36,7 @@ class CInputBindApi : public CInputBindCapture, public virtual IRefCleaner, publ
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CInputBindApi(Host::CEventApi* aEventApi, CLogApi* aLogger, std::filesystem::path aConfigPath);
+	CInputBindApi(Host::EventApi* aEventApi, CLogApi* aLogger, std::filesystem::path aConfigPath);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -126,7 +126,7 @@ class CInputBindApi : public CInputBindCapture, public virtual IRefCleaner, publ
 	std::map<std::string, IbMapping_t> GetRegistry() const;
 
 	private:
-	Host::CEventApi*                   EventApi = nullptr;
+	Host::EventApi*                   EventApi = nullptr;
 	CLogApi*                           Logger   = nullptr;
 
 	std::filesystem::path              ConfigPath;

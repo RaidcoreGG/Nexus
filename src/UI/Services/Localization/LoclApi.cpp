@@ -74,7 +74,7 @@ CLocalization::CLocalization(CLogApi* aLogger)
 
 	Runtime& ctx = Runtime::Get();
 	CSettings* settingsctx = ctx.GetSettingsCtx();
-	Host::CEventApi& evtapi = ctx.Host().Events();
+	Host::EventApi& evtapi = ctx.Host().Events();
 
 	this->SetLocaleDirectory(Index(EPath::DIR_LOCALES));
 	Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleEN), RES_LOCALE_EN, "JSON");

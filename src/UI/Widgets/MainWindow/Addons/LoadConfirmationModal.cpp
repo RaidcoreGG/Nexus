@@ -44,7 +44,7 @@ void CLoadConfirmationModal::OnClosing()
 {
 	Runtime&    ctx    = Runtime::Get();
 	CConfigMgr* cfgmgr = ctx.GetCfgMgr();
-	Host::CLoader&    loader = ctx.Host().Loader();
+	Host::Loader&    loader = ctx.Host().Loader();
 
 	switch (this->GetResult())
 	{

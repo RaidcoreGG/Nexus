@@ -12,15 +12,15 @@
 
 namespace Raidcore::Nexus::Host
 {
-	CEventApi::CEventApi(CLoader* aLoader) : IRefCleaner("EventApi")
+	EventApi::EventApi(Host::Loader* aLoader) : IRefCleaner("EventApi")
 	{
 		this->Loader = aLoader;
 	}
 
-	CEventApi::~CEventApi()
+	EventApi::~EventApi()
 	{}
 
-	void CEventApi::Raise(const char* aIdentifier, void* aEventData)
+	void EventApi::Raise(const char* aIdentifier, void* aEventData)
 	{
 		if (aIdentifier == nullptr) { return; }
 
@@ -41,7 +41,7 @@ namespace Raidcore::Nexus::Host
 		}
 	}
 
-	void CEventApi::Raise(uint32_t aSignature, const char* aIdentifier, void* aEventData)
+	void EventApi::Raise(uint32_t aSignature, const char* aIdentifier, void* aEventData)
 	{
 		if (aIdentifier == nullptr) { return; }
 
@@ -65,7 +65,7 @@ namespace Raidcore::Nexus::Host
 		}
 	}
 
-	void CEventApi::Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback)
+	void EventApi::Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback)
 	{
 		if (aIdentifier == nullptr) { return; }
 		if (aConsumeEventCallback == nullptr) { return; }
@@ -95,7 +95,7 @@ namespace Raidcore::Nexus::Host
 		}
 	}
 
-	void CEventApi::Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback)
+	void EventApi::Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback)
 	{
 		if (aIdentifier == nullptr) { return; }
 
@@ -121,7 +121,7 @@ namespace Raidcore::Nexus::Host
 		);
 	}
 
-	uint32_t CEventApi::CleanupRefs(void* aStartAddress, void* aEndAddress)
+	uint32_t EventApi::CleanupRefs(void* aStartAddress, void* aEndAddress)
 	{
 		uint32_t refCounter = 0;
 
@@ -150,7 +150,7 @@ namespace Raidcore::Nexus::Host
 		return refCounter;
 	}
 
-	std::unordered_map<std::string, EventData_t> CEventApi::GetRegistry() const
+	std::unordered_map<std::string, EventData_t> EventApi::GetRegistry() const
 	{
 		const std::lock_guard<std::recursive_mutex> lock(this->Mutex);
 

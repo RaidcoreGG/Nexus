@@ -25,20 +25,20 @@ constexpr const char* CH_LIBRARY = "Library";
 namespace Raidcore::Nexus::Host
 {
 	///----------------------------------------------------------------------------------------------------
-	/// CLibraryMgr Class
+	/// LibraryMgr Class
 	///----------------------------------------------------------------------------------------------------
-	class CLibraryMgr
+	class LibraryMgr
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		CLibraryMgr(CLogApi* aLogger, CLoader* aLoader);
+		LibraryMgr(CLogApi* aLogger, Loader* aLoader);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
 		///----------------------------------------------------------------------------------------------------
-		~CLibraryMgr();
+		~LibraryMgr();
 
 		///----------------------------------------------------------------------------------------------------
 		/// Update:
@@ -66,7 +66,7 @@ namespace Raidcore::Nexus::Host
 
 		private:
 		CLogApi* Logger = nullptr;
-		CLoader* Loader = nullptr;
+		Loader* Loader = nullptr;
 
 		mutable std::mutex                            Mutex;
 		std::unordered_map<std::string, CHttpClient*> Sources;

@@ -81,7 +81,7 @@ CMainWindow::CMainWindow()
 	Runtime&      ctx    = Runtime::Get();
 	CLogApi*       logger = ctx.GetLogger();
 	CInputBindApi* ibapi  = ctx.GetInputBindApi();
-	Host::CEventApi*     evtapi = &ctx.Host().Events();
+	Host::EventApi*     evtapi = &ctx.Host().Events();
 
 	CAddonsWindow*  addonsWnd  = new CAddonsWindow();
 	COptionsWindow* optionsWnd = new COptionsWindow();

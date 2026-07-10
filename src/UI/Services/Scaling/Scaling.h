@@ -42,7 +42,7 @@ class CScaling : public virtual IWndProc
 	CScaling(
 		RenderContext_t* aRenderCtx,
 		CDataLinkApi*    aDataLink,
-		Host::CEventApi* aEventApi,
+		Host::EventApi* aEventApi,
 		CSettings*       aSettings
 	);
 
@@ -78,7 +78,7 @@ class CScaling : public virtual IWndProc
 	private:
 	RenderContext_t*  RenderContext;
 	CDataLinkApi*     DataLink;
-	Host::CEventApi*  EventApi;
+	Host::EventApi*  EventApi;
 	CSettings*        Settings;
 	Mumble::Identity* MumbleIdentity;
 	NexusLinkData_t*  NexusLink;
