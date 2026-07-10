@@ -239,7 +239,7 @@ void CAddon::LoadInternal()
 		return;
 	}
 
-	MD5_t md5 = MD5Util::FromFile(this->Location);
+	Host::MD5_t md5 = MD5Util::FromFile(this->Location);
 
 	/* If the file is different, than when it was created, refresh the interfaces. */
 	if (md5 != this->GetMD5())
@@ -269,7 +269,7 @@ void CAddon::LoadInternal()
 			ecnd.message().c_str(),
 			lasterror
 		);
-		this->State = EAddonState::NotLoaded;
+		this->State = Host::EAddonState::NotLoaded;
 		return;
 	}
 
@@ -280,7 +280,7 @@ void CAddon::LoadInternal()
 		this->Logger->Debug(CH_ADDON, "Cannot load. Interface was set, but is not actually present. (%s)", this->Location.string().c_str());
 		this->ModuleInterfaces &= ~EAddonInterfaces::Nexus;
 		FreeLibrary(module);
-		this->State = EAddonState::NotLoaded;
+		this->State = Host::EAddonState::NotLoaded;
 		return;
 	}
 
@@ -290,7 +290,7 @@ void CAddon::LoadInternal()
 	{
 		this->Logger->Warning(CH_ADDON, "Cannot load. Addon definition was nullptr. (%s)", this->Location.string().c_str());
 		FreeLibrary(module);
-		this->State = EAddonState::NotLoaded;
+		this->State = Host::EAddonState::NotLoaded;
 		this->Flags |= EAddonFlags::MissingReqs;
 		return;
 	}
@@ -307,7 +307,7 @@ void CAddon::LoadInternal()
 	{
 		this->Logger->Warning(CH_ADDON, "Cannot load. Addon definition does not fulfill minimum requirements. (%s)", this->Location.string().c_str());
 		FreeLibrary(module);
-		this->State = EAddonState::NotLoaded;
+		this->State = Host::EAddonState::NotLoaded;
 		this->Flags |= EAddonFlags::MissingReqs;
 		return;
 	}
@@ -326,7 +326,7 @@ void CAddon::LoadInternal()
 	{
 		this->Logger->Warning(CH_ADDON, "Canceled load. Addon is a duplicate. (%s)", this->Location.string().c_str());
 		FreeLibrary(module);
-		this->State = EAddonState::NotLoaded;
+		this->State = Host::EAddonState::NotLoaded;
 		return;
 	}
 
@@ -334,7 +334,7 @@ void CAddon::LoadInternal()
 	{
 		/* Should load prints debug reasons, no need to also print here. */
 		FreeLibrary(module);
-		this->State = EAddonState::NotLoaded;
+		this->State = Host::EAddonState::NotLoaded;
 		return;
 	}
 
@@ -349,7 +349,7 @@ void CAddon::LoadInternal()
 			this->Location.string().c_str()
 		);
 		FreeLibrary(module);
-		this->State = EAddonState::NotLoaded;
+		this->State = Host::EAddonState::NotLoaded;
 		return;
 	}
 
@@ -374,7 +374,7 @@ void CAddon::LoadInternal()
 
 	this->Config->LastGameBuild = Runtime::Get().Game().BuildInfo().Build();
 	this->Config->LastName = this->NexusAddonDefV1->GetName();
-	this->State = EAddonState::Loaded;
+	this->State = Host::EAddonState::Loaded;
 	this->ConfigMgr->SaveConfigs();
 
 	this->Logger->Info(
@@ -445,7 +445,7 @@ void CAddon::UnloadInternal()
 	this->Module = nullptr;
 	this->ModuleSize = 0;
 
-	this->State = EAddonState::NotLoaded;
+	this->State = Host::EAddonState::NotLoaded;
 
 	this->Logger->Info(
 		CH_ADDON,
@@ -816,7 +816,7 @@ bool CAddon::ShouldLoad()
 	bool result = true;
 
 	/* Check the last state as per user prefs. But also make sure no state set yet -> Autoload. */
-	if (!this->Config->LastLoadState && this->State == EAddonState::None)
+	if (!this->Config->LastLoadState && this->State == Host::EAddonState::None)
 	{
 		this->Logger->Debug(CH_ADDON, "Canceled load. Config->LastLoadState: false. (%s)", this->Location.string().c_str());
 		result = false;
@@ -826,7 +826,7 @@ bool CAddon::ShouldLoad()
 	if ((this->NexusAddonDefV1->Flags & EAddonDefFlags::LaunchOnly) == EAddonDefFlags::LaunchOnly)
 	{
 		/* First launch means, state wasn't set yet. */
-		if (this->State != EAddonState::None)
+		if (this->State != Host::EAddonState::None)
 		{
 			this->Flags |= EAddonFlags::StateLocked;
 			this->Logger->Debug(CH_ADDON, "Canceled load. Only load on initial load. (%s)", this->Location.string().c_str());
@@ -1156,7 +1156,7 @@ void CAddon::CheckUpdateViaDirect()
 		vmd5.push_back(byte);
 	}
 
-	MD5_t md5 = vmd5;
+	Host::MD5_t md5 = vmd5;
 
 	if (md5 != this->GetMD5())
 	{

@@ -80,12 +80,12 @@ class CUiContext : public CUiRender, public CUiBinds, public CUiStyle, public vi
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
 	CUiContext(
-		RenderContext_t*    aRenderContext,
-		CLogApi*            aLogger,
-		CTextureLoader*     aTextureService,
-		CDataLinkApi*       aDataLink,
-		CInputBindApi*      aInputBindApi,
-		CEventApi*          aEventApi,
+		RenderContext_t*   aRenderContext,
+		CLogApi*           aLogger,
+		CTextureLoader*    aTextureService,
+		CDataLinkApi*      aDataLink,
+		CInputBindApi*     aInputBindApi,
+		Host::CEventApi*   aEventApi,
 		GW2::MumbleReader* aMumbleReader
 	);
 
@@ -162,14 +162,14 @@ class CUiContext : public CUiRender, public CUiBinds, public CUiStyle, public vi
 
 	private:
 	/* Services */
-	RenderContext_t*        RenderContext  = nullptr;
-	CLogApi*                Logger         = nullptr;
-	CLocalization*          Language       = nullptr;
-	CTextureLoader*         TextureService = nullptr;
-	CDataLinkApi*           DataLink       = nullptr;
-	CInputBindApi*          InputBindApi   = nullptr;
-	CEventApi*              EventApi       = nullptr;
-	GW2::MumbleReader*     MumbleReader   = nullptr;
+	RenderContext_t*   RenderContext  = nullptr;
+	CLogApi*           Logger         = nullptr;
+	CLocalization*     Language       = nullptr;
+	CTextureLoader*    TextureService = nullptr;
+	CDataLinkApi*      DataLink       = nullptr;
+	CInputBindApi*     InputBindApi   = nullptr;
+	Host::CEventApi*   EventApi       = nullptr;
+	GW2::MumbleReader* MumbleReader   = nullptr;
 
 	/* Rendering */
 	ID3D11RenderTargetView* RenderTargetView;

@@ -336,7 +336,7 @@ bool CShortcutIcon::RenderContextMenu()
 
 			if (contextitem.Callback)
 			{
-				IAddon* iaddon = this->Loader->GetOwner(contextitem.Callback);
+				Host::IAddon* iaddon = this->Loader->GetOwner(contextitem.Callback);
 				CAddon* addon = dynamic_cast<CAddon*>(iaddon);
 
 				assert(addon);

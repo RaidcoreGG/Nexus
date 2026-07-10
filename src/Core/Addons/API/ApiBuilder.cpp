@@ -40,14 +40,14 @@ namespace ADDONAPI
 	static bool                    s_IsInitialized = false;
 
 	static CDataLinkApi*           s_DataLinkApi   = nullptr;
-	static CEventApi*              s_EventApi      = nullptr;
+	static Host::CEventApi*        s_EventApi      = nullptr;
 	static GW2::GameBindsApi*      s_GameBindsApi  = nullptr;
 	static CInputBindApi*          s_InputBindApi  = nullptr;
 	static Platform::RawInputApi*  s_RawInputApi   = nullptr;
 	static CLocalization*          s_Localization  = nullptr;
 	static CLogApi*                s_Logger        = nullptr;
 	static CTextureLoader*         s_TextureApi    = nullptr;
-	static CLoader*                s_Loader        = nullptr;
+	static Host::CLoader*          s_Loader        = nullptr;
 	static RenderContext_t*        s_RenderCtx     = nullptr;
 	static GW2::ArcdpsApi*         s_ArcApi        = nullptr;
 
@@ -75,7 +75,7 @@ namespace ADDONAPI
 
 	namespace Events
 	{
-		void Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback)
+		void Subscribe(const char* aIdentifier, Host::EVENT_CONSUME aConsumeEventCallback)
 		{
 			assert(s_EventApi);
 			s_EventApi->Subscribe(aIdentifier, aConsumeEventCallback);
@@ -94,7 +94,7 @@ namespace ADDONAPI
 			s_ArcApi->TryDetect();
 		}
 
-		void Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback)
+		void Unsubscribe(const char* aIdentifier, Host::EVENT_CONSUME aConsumeEventCallback)
 		{
 			assert(s_EventApi);
 			s_EventApi->Unsubscribe(aIdentifier, aConsumeEventCallback);

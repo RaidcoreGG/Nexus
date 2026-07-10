@@ -62,7 +62,7 @@ namespace Raidcore::Nexus::GW2
 		GameBindsApi(
 			Platform::RawInputApi& aRawInputApi,
 			CLogApi& aLogger,
-			CEventApi& aEventApi,
+			Host::CEventApi& aEventApi,
 			RenderContext_t& aRenderContext,
 			std::filesystem::path   aConfigPath
 		);
@@ -155,7 +155,7 @@ namespace Raidcore::Nexus::GW2
 		private:
 		Platform::RawInputApi& RawInputApi;
 		CLogApi& Logger;
-		CEventApi& EventApi;
+		Host::CEventApi& EventApi;
 		RenderContext_t& RenderContext;
 
 		std::filesystem::path                            ConfigPath;

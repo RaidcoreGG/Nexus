@@ -104,7 +104,7 @@ void CDebugWindow::TabEvents()
 
 	if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 	{
-		std::unordered_map<std::string, EventData_t> eventRegistry = Runtime::Get().Host().Events().GetRegistry();
+		std::unordered_map<std::string, Host::EventData_t> eventRegistry = Runtime::Get().Host().Events().GetRegistry();
 
 		for (auto& [identifier, ev] : eventRegistry)
 		{
@@ -117,7 +117,7 @@ void CDebugWindow::TabEvents()
 				else
 				{
 					ImGui::TextDisabled("Subscribers:");
-					for (EventSubscriber_t sub : ev.Subscribers)
+					for (Host::EventSubscriber_t sub : ev.Subscribers)
 					{
 						ImGui::Text(""); ImGui::SameLine(); ImGui::TextDisabled("Signature: %d | Callback: %p", sub.Signature, sub.Callback);
 					}

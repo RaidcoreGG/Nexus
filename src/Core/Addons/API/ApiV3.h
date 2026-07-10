@@ -60,12 +60,12 @@ struct AddonAPI3_t : AddonAPI_t
 	ALERTS_NOTIFY                     SendAlert;
 
 	/* Events */
-	EVENTS_RAISE                      RaiseEvent;
-	EVENTS_RAISENOTIFICATION          RaiseEventNotification;
-	EVENTS_RAISE_TARGETED             RaiseEventTargeted;
-	EVENTS_RAISENOTIFICATION_TARGETED RaiseEventNotificationTargeted;
-	EVENTS_SUBSCRIBE                  SubscribeEvent;
-	EVENTS_SUBSCRIBE                  UnsubscribeEvent;
+	Host::EVENTS_RAISE                      RaiseEvent;
+	Host::EVENTS_RAISENOTIFICATION          RaiseEventNotification;
+	Host::EVENTS_RAISE_TARGETED             RaiseEventTargeted;
+	Host::EVENTS_RAISENOTIFICATION_TARGETED RaiseEventNotificationTargeted;
+	Host::EVENTS_SUBSCRIBE                  SubscribeEvent;
+	Host::EVENTS_SUBSCRIBE                  UnsubscribeEvent;
 
 	/* WndProc */
 	Platform::WNDPROC_ADDREM          RegisterWndProc;

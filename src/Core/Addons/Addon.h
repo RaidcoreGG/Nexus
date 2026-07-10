@@ -33,10 +33,10 @@ constexpr const char* CH_ADDON = "Addon";
 ///----------------------------------------------------------------------------------------------------
 /// CAddon Class
 ///----------------------------------------------------------------------------------------------------
-class CAddon : public virtual IAddon
+class CAddon : public virtual Host::IAddon
 {
 	public:
-	static inline IAddon* Factory(std::filesystem::path aLocation)
+	static inline Host::IAddon* Factory(std::filesystem::path aLocation)
 	{
 		return new CAddon(aLocation);
 	}
@@ -203,8 +203,8 @@ class CAddon : public virtual IAddon
 
 	private:
 	CLogApi*                 Logger               = nullptr;
-	CLoader*                 Loader               = nullptr;
-	CEventApi*               EventApi             = nullptr;
+	Host::CLoader*           Loader               = nullptr;
+	Host::CEventApi*         EventApi             = nullptr;
 	CConfigMgr*              ConfigMgr            = nullptr;
 
 	EAddonInterfaces         ModuleInterfaces     = EAddonInterfaces::None;

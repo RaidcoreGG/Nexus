@@ -74,7 +74,7 @@ CLocalization::CLocalization(CLogApi* aLogger)
 
 	Runtime& ctx = Runtime::Get();
 	CSettings* settingsctx = ctx.GetSettingsCtx();
-	CEventApi& evtapi = ctx.Host().Events();
+	Host::CEventApi& evtapi = ctx.Host().Events();
 
 	this->SetLocaleDirectory(Index(EPath::DIR_LOCALES));
 	Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleEN), RES_LOCALE_EN, "JSON");
@@ -92,7 +92,7 @@ CLocalization::CLocalization(CLogApi* aLogger)
 	std::string lang = settingsctx->Get<std::string>(OPT_LANGUAGE, "en");
 	this->SetLanguage(!lang.empty() ? lang : "en");
 
-	evtapi.Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", reinterpret_cast<EVENT_CONSUME>(CLocalization::OnUELanguageChanged));
+	evtapi.Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", reinterpret_cast<Host::EVENT_CONSUME>(CLocalization::OnUELanguageChanged));
 
 	s_Localization = this;
 }

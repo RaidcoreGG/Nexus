@@ -17,18 +17,24 @@
 using json = nlohmann::json;
 
 ///----------------------------------------------------------------------------------------------------
-/// LibraryAddon_t Struct
+/// Raidcore::Nexus::Host Namespace
 ///----------------------------------------------------------------------------------------------------
-struct LibraryAddon_t
+namespace Raidcore::Nexus::Host
 {
-	uint32_t    Signature        = 0;
-	std::string Name             = "";
-	std::string Author           = "";
-	std::string Description      = "";
-	std::string DownloadURL      = "";
-	int32_t     PolicyTier       = 0;
-	std::string FriendlyFilename = "";
+	///----------------------------------------------------------------------------------------------------
+	/// LibraryAddon_t Struct
+	///----------------------------------------------------------------------------------------------------
+	struct LibraryAddon_t
+	{
+		uint32_t    Signature = 0;
+		std::string Name = "";
+		std::string Author = "";
+		std::string Description = "";
+		std::string DownloadURL = "";
+		int32_t     PolicyTier = 0;
+		std::string FriendlyFilename = "";
 
-	LibraryAddon_t() = default;
-	LibraryAddon_t(json& aJson);
-};
+		LibraryAddon_t() = default;
+		LibraryAddon_t(json& aJson);
+	};
+}

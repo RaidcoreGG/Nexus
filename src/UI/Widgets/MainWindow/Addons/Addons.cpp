@@ -57,7 +57,7 @@ CAddonsWindow::CAddonsWindow()
 
 	Runtime&  ctx         = Runtime::Get();
 	CSettings* settingsctx = ctx.GetSettingsCtx();
-	CEventApi& evtapi      = ctx.Host().Events();
+	Host::CEventApi& evtapi      = ctx.Host().Events();
 	
 	this->Filter     = settingsctx->Get(OPT_ADDONFILTERS, FILTER_INSTALLED);
 	this->IsListMode = settingsctx->Get(OPT_ISLISTMODE,   true            );
@@ -129,7 +129,7 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 	static Runtime&       ctx      = Runtime::Get();
 	static CUiContext*     uictx    = ctx.GetUIContext();
 	static CConfigMgr*     cfgmgr   = ctx.GetCfgMgr();
-	static CLibraryMgr&    libmgr   = ctx.Host().Library();
+	static Host::CLibraryMgr&    libmgr   = ctx.Host().Library();
 	static CTextureLoader* texapi   = ctx.GetTextureService();
 	static CLocalization*  langApi  = uictx->GetLocalization();
 	static CAlerts*        alertctx = uictx->GetAlerts();
@@ -856,7 +856,7 @@ void CAddonsWindow::RenderActionsBar(ImVec2& aSize)
 {
 	Runtime&       ctx    = Runtime::Get();
 	CTextureLoader* texapi = ctx.GetTextureService();
-	CLoader&        loader = ctx.Host().Loader();
+	Host::CLoader&        loader = ctx.Host().Loader();
 	CUiContext*     uictx  = ctx.GetUIContext();
 	CLocalization*  lang   = uictx->GetLocalization();
 
@@ -1035,19 +1035,19 @@ void CAddonsWindow::PopulateAddons()
 	Runtime&    ctx = Runtime::Get();
 	CUiContext*  uictx = ctx.GetUIContext();
 	CSettings*   settingsctx = ctx.GetSettingsCtx();
-	CLoader&     loader = ctx.Host().Loader();
-	CLibraryMgr& libMgr = ctx.Host().Library();
+	Host::CLoader&     loader = ctx.Host().Loader();
+	Host::CLibraryMgr& libMgr = ctx.Host().Library();
 
 	this->Filter = settingsctx->Get<EAddonsFilterFlags>(OPT_ADDONFILTERS, FILTER_INSTALLED);
 
-	for (IAddon* addon : loader.GetAddons())
+	for (Host::IAddon* addon : loader.GetAddons())
 	{
 		AddonListing_t addonlisting{};
 		addonlisting.Addon = dynamic_cast<CAddon*>(addon);
 
 		for (GUI_RENDER renderCb : uictx->GetRenderCallbacks(ERenderType::OptionsRender))
 		{
-			IAddon* owner = loader.GetOwner(renderCb);
+			Host::IAddon* owner = loader.GetOwner(renderCb);
 			if (addon == owner)
 			{
 				addonlisting.OptionsRender = renderCb;
@@ -1063,7 +1063,7 @@ void CAddonsWindow::PopulateAddons()
 		}
 	}
 
-	for (LibraryAddon_t libaddon : libMgr.GetLibrary())
+	for (Host::LibraryAddon_t libaddon : libMgr.GetLibrary())
 	{
 		bool installed = false;
 

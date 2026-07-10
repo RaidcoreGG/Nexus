@@ -187,7 +187,7 @@ namespace Hooks
 			static CInputBindApi*         s_InputBindApi = s_Context.GetInputBindApi();
 			static Platform::RawInputApi& s_RawInputApi  = s_Context.Platform().RawInput();
 			static CUiContext*            s_UIContext    = s_Context.GetUIContext();
-			static CLoader&               s_Loader       = s_Context.Host().Loader();
+			static Host::CLoader&         s_Loader       = s_Context.Host().Loader();
 			static GW2::GameBindsApi&     s_GameBindsApi = s_Context.Game().GameBinds();
 
 			// don't pass to game if loader
@@ -221,7 +221,7 @@ namespace Hooks
 			static RenderContext_t* s_RenderCtx = s_Context.GetRendererCtx();
 			static CTextureLoader* s_TextureLoader = s_Context.GetTextureService();
 			static CUiContext* s_UIContext = s_Context.GetUIContext();
-			static CLoader& s_Loader = s_Context.Host().Loader();
+			static Host::CLoader& s_Loader = s_Context.Host().Loader();
 
 			/* Increment count at the beginning of the frame. */
 			s_RenderCtx->Metrics.FrameCount++;
@@ -262,7 +262,7 @@ namespace Hooks
 		{
 			static Runtime& s_Context = Runtime::Get();
 			static CDataLinkApi* s_DataLink = s_Context.GetDataLink();
-			static CEventApi& s_EventApi = s_Context.Host().Events();
+			static Host::CEventApi& s_EventApi = s_Context.Host().Events();
 			static RenderContext_t* s_RenderCtx = s_Context.GetRendererCtx();
 			static CUiContext* s_UIContext = s_Context.GetUIContext();
 

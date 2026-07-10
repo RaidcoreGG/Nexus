@@ -26,7 +26,7 @@ struct AddonListing_t
 	CAddon*                                            Addon;
 
 	bool                                               HasLibDef;
-	LibraryAddon_t                                     LibraryDef;
+	Host::LibraryAddon_t                               LibraryDef;
 	bool                                               IsInstalling;
 
 	std::unordered_map<std::string, InputBindPacked_t> InputBinds;

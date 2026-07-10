@@ -30,7 +30,7 @@ static CScaling* s_Scaling{};
 	s_Scaling->UpdateResolution();
 }
 
-CScaling::CScaling(RenderContext_t* aRenderCtx, CDataLinkApi* aDataLink, CEventApi* aEventApi, CSettings* aSettings)
+CScaling::CScaling(RenderContext_t* aRenderCtx, CDataLinkApi* aDataLink, Host::CEventApi* aEventApi, CSettings* aSettings)
 {
 	this->RenderContext = aRenderCtx;
 	this->DataLink      = aDataLink;

@@ -54,13 +54,13 @@ namespace ADDONAPI
 		/// Subscribe:
 		/// 	Addon API wrapper function for subscribing to events.
 		///----------------------------------------------------------------------------------------------------
-		void Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
+		void Subscribe(const char* aIdentifier, Host::EVENT_CONSUME aConsumeEventCallback);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Unsubscribe:
 		/// 	Addon API wrapper function for unsubscribing from events.
 		///----------------------------------------------------------------------------------------------------
-		void Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
+		void Unsubscribe(const char* aIdentifier, Host::EVENT_CONSUME aConsumeEventCallback);
 
 		///----------------------------------------------------------------------------------------------------
 		/// RaiseEvent:

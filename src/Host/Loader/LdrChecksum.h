@@ -17,65 +17,71 @@
 #define MD5_LENGTH 16
 
 ///----------------------------------------------------------------------------------------------------
-/// MD5_t Struct
+/// Raidcore::Nexus::Host Namespace
 ///----------------------------------------------------------------------------------------------------
-struct MD5_t
+namespace Raidcore::Nexus::Host
 {
-	uint8_t Data[MD5_LENGTH];
-
-	MD5_t() = default;
-
-	inline MD5_t(const std::vector<uint8_t>& aVector)
+	///----------------------------------------------------------------------------------------------------
+	/// MD5_t Struct
+	///----------------------------------------------------------------------------------------------------
+	struct MD5_t
 	{
-		if (aVector.size() == MD5_LENGTH)
-		{
-			memcpy(this->Data, aVector.data(), MD5_LENGTH);
-		}
-		else if (aVector.size() == 0)
-		{
-			memset(this->Data, 0, sizeof(this->Data));
-		}
-		else
-		{
-			throw std::invalid_argument("MD5_t requires a vector of exactly 16 bytes.");
-		}
-	}
+		uint8_t Data[MD5_LENGTH];
 
-	inline bool operator==(const MD5_t& other) const
-	{
-		return memcmp(this->Data, other.Data, sizeof(this->Data)) == 0;
-	}
+		MD5_t() = default;
 
-	inline bool operator!=(const MD5_t& other) const
-	{
-		return !(*this == other);
-	}
-
-	inline bool empty() const
-	{
-		for (uint8_t byte : this->Data)
+		inline MD5_t(const std::vector<uint8_t>& aVector)
 		{
-			if (byte != 0)
+			if (aVector.size() == MD5_LENGTH)
 			{
-				return false;
+				memcpy(this->Data, aVector.data(), MD5_LENGTH);
+			}
+			else if (aVector.size() == 0)
+			{
+				memset(this->Data, 0, sizeof(this->Data));
+			}
+			else
+			{
+				throw std::invalid_argument("MD5_t requires a vector of exactly 16 bytes.");
 			}
 		}
 
-		return true;
-	}
-
-	inline std::string string() const
-	{
-		std::ostringstream oss;
-		for (int i = 0; i < MD5_LENGTH; ++i)
+		inline bool operator==(const MD5_t& other) const
 		{
-			oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(Data[i]);
+			return memcmp(this->Data, other.Data, sizeof(this->Data)) == 0;
 		}
-		return oss.str();
-	}
 
-	inline void clear()
-	{
-		memset(this, 0, sizeof(MD5_t));
-	}
-};
+		inline bool operator!=(const MD5_t& other) const
+		{
+			return !(*this == other);
+		}
+
+		inline bool empty() const
+		{
+			for (uint8_t byte : this->Data)
+			{
+				if (byte != 0)
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		inline std::string string() const
+		{
+			std::ostringstream oss;
+			for (int i = 0; i < MD5_LENGTH; ++i)
+			{
+				oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(Data[i]);
+			}
+			return oss.str();
+		}
+
+		inline void clear()
+		{
+			memset(this, 0, sizeof(MD5_t));
+		}
+	};
+}

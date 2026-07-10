@@ -20,60 +20,66 @@
 constexpr const char* CH_EVENTS = "Events";
 
 ///----------------------------------------------------------------------------------------------------
-/// CEventApi Class
+/// Raidcore::Nexus::Host Namespace
 ///----------------------------------------------------------------------------------------------------
-class CEventApi : public virtual IRefCleaner
+namespace Raidcore::Nexus::Host
 {
-	public:
 	///----------------------------------------------------------------------------------------------------
-	/// ctor
+	/// CEventApi Class
 	///----------------------------------------------------------------------------------------------------
-	CEventApi(CLoader* aLoader);
+	class CEventApi : public virtual IRefCleaner
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		CEventApi(CLoader* aLoader);
 
-	///----------------------------------------------------------------------------------------------------
-	/// dtor
-	///----------------------------------------------------------------------------------------------------
-	~CEventApi();
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		~CEventApi();
 
-	///----------------------------------------------------------------------------------------------------
-	/// Raise:
-	/// 	Raises an event of provided name, passing a pointer to the payload.
-	///----------------------------------------------------------------------------------------------------
-	void Raise(const char* aIdentifier, void* aEventData = nullptr);
+		///----------------------------------------------------------------------------------------------------
+		/// Raise:
+		/// 	Raises an event of provided name, passing a pointer to the payload.
+		///----------------------------------------------------------------------------------------------------
+		void Raise(const char* aIdentifier, void* aEventData = nullptr);
 
-	///----------------------------------------------------------------------------------------------------
-	/// Raise:
-	/// 	Raises an event with a payload meant for only a specific subscriber.
-	///----------------------------------------------------------------------------------------------------
-	void Raise(uint32_t aSignature, const char* aIdentifier, void* aEventData = nullptr);
+		///----------------------------------------------------------------------------------------------------
+		/// Raise:
+		/// 	Raises an event with a payload meant for only a specific subscriber.
+		///----------------------------------------------------------------------------------------------------
+		void Raise(uint32_t aSignature, const char* aIdentifier, void* aEventData = nullptr);
 
-	///----------------------------------------------------------------------------------------------------
-	/// Subscribe:
-	/// 	Subscribes the provided ConsumeEventCallback function, to the provided event name.
-	///----------------------------------------------------------------------------------------------------
-	void Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
+		///----------------------------------------------------------------------------------------------------
+		/// Subscribe:
+		/// 	Subscribes the provided ConsumeEventCallback function, to the provided event name.
+		///----------------------------------------------------------------------------------------------------
+		void Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
 
-	///----------------------------------------------------------------------------------------------------
-	/// Unsubscribe:
-	/// 	Unsubscribes the provided ConsumeEventCallback function from the provided event name.
-	///----------------------------------------------------------------------------------------------------
-	void Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
+		///----------------------------------------------------------------------------------------------------
+		/// Unsubscribe:
+		/// 	Unsubscribes the provided ConsumeEventCallback function from the provided event name.
+		///----------------------------------------------------------------------------------------------------
+		void Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
 
-	///----------------------------------------------------------------------------------------------------
-	/// CleanupRefs:
-	/// 	Removes any elements within the provided address space from the Registry.
-	///----------------------------------------------------------------------------------------------------
-	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
+		///----------------------------------------------------------------------------------------------------
+		/// CleanupRefs:
+		/// 	Removes any elements within the provided address space from the Registry.
+		///----------------------------------------------------------------------------------------------------
+		uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetRegistry:
-	/// 	Returns a copy of the registry.
-	///----------------------------------------------------------------------------------------------------
-	std::unordered_map<std::string, EventData_t> GetRegistry() const;
+		///----------------------------------------------------------------------------------------------------
+		/// GetRegistry:
+		/// 	Returns a copy of the registry.
+		///----------------------------------------------------------------------------------------------------
+		std::unordered_map<std::string, EventData_t> GetRegistry() const;
 
-	private:
-	CLoader*                                     Loader = nullptr;
+		private:
+		CLoader* Loader = nullptr;
 
-	mutable std::recursive_mutex                 Mutex;
-	std::unordered_map<std::string, EventData_t> Registry;
-};
+		mutable std::recursive_mutex                 Mutex;
+		std::unordered_map<std::string, EventData_t> Registry;
+	};
+}

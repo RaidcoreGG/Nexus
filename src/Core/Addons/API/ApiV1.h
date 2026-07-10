@@ -55,9 +55,9 @@ struct AddonAPI1_t : AddonAPI_t
 	LOGGER_LOG                    Log;
 
 	/* Events */
-	EVENTS_RAISE                  RaiseEvent;
-	EVENTS_SUBSCRIBE              SubscribeEvent;
-	EVENTS_SUBSCRIBE              UnsubscribeEvent;
+	Host::EVENTS_RAISE            RaiseEvent;
+	Host::EVENTS_SUBSCRIBE        SubscribeEvent;
+	Host::EVENTS_SUBSCRIBE        UnsubscribeEvent;
 
 	/* WndProc */
 	Platform::WNDPROC_ADDREM      RegisterWndProc;

@@ -127,7 +127,7 @@ class CShortcutIcon : public virtual IRefCleaner
 
 	CInputBindApi*                       InputBindApi   = nullptr;
 	CTextureLoader*                      TextureService = nullptr;
-	CLoader*                             Loader         = nullptr;
+	Host::CLoader*                       Loader         = nullptr;
 	CDataLinkApi*                        DataLink       = nullptr;
 	CLocalization*                       Language       = nullptr;
 	NexusLinkData_t*                     NexusLink      = nullptr;

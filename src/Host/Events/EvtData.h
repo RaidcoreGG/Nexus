@@ -13,10 +13,16 @@
 #include "EvtSubscriber.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// EventData_t Struct
+/// Raidcore::Nexus::Host Namespace
 ///----------------------------------------------------------------------------------------------------
-struct EventData_t
+namespace Raidcore::Nexus::Host
 {
-	std::vector<EventSubscriber_t> Subscribers;
-	unsigned long long             AmountRaises = 0;
-};
+	///----------------------------------------------------------------------------------------------------
+	/// EventData_t Struct
+	///----------------------------------------------------------------------------------------------------
+	struct EventData_t
+	{
+		std::vector<EventSubscriber_t> Subscribers;
+		unsigned long long             AmountRaises = 0;
+	};
+}

@@ -87,12 +87,12 @@ struct AddonAPI6_t : AddonAPI_t
 	/* Events */
 	struct EventsVT
 	{
-		EVENTS_RAISE                      Raise;
-		EVENTS_RAISENOTIFICATION          RaiseNotification;
-		EVENTS_RAISE_TARGETED             RaiseTargeted;
-		EVENTS_RAISENOTIFICATION_TARGETED RaiseNotificationTargeted;
-		EVENTS_SUBSCRIBE                  Subscribe;
-		EVENTS_SUBSCRIBE                  Unsubscribe;
+		Host::EVENTS_RAISE                      Raise;
+		Host::EVENTS_RAISENOTIFICATION          RaiseNotification;
+		Host::EVENTS_RAISE_TARGETED             RaiseTargeted;
+		Host::EVENTS_RAISENOTIFICATION_TARGETED RaiseNotificationTargeted;
+		Host::EVENTS_SUBSCRIBE                  Subscribe;
+		Host::EVENTS_SUBSCRIBE                  Unsubscribe;
 	};
 	EventsVT                              Events;
 

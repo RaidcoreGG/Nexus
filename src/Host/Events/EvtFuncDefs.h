@@ -10,9 +10,15 @@
 
 #include <cstdint>
 
-typedef void (*EVENT_CONSUME)                    (void* aEventArgs);
-typedef void (*EVENTS_RAISE)                     (const char* aIdentifier, void* aEventData);
-typedef void (*EVENTS_RAISENOTIFICATION)         (const char* aIdentifier);
-typedef void (*EVENTS_RAISE_TARGETED)            (uint32_t aSignature, const char* aIdentifier, void* aEventData);
-typedef void (*EVENTS_RAISENOTIFICATION_TARGETED)(uint32_t aSignature, const char* aIdentifier);
-typedef void (*EVENTS_SUBSCRIBE)                 (const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
+///----------------------------------------------------------------------------------------------------
+/// Raidcore::Nexus::Host Namespace
+///----------------------------------------------------------------------------------------------------
+namespace Raidcore::Nexus::Host
+{
+	typedef void (*EVENT_CONSUME)                    (void* aEventArgs);
+	typedef void (*EVENTS_RAISE)                     (const char* aIdentifier, void* aEventData);
+	typedef void (*EVENTS_RAISENOTIFICATION)         (const char* aIdentifier);
+	typedef void (*EVENTS_RAISE_TARGETED)            (uint32_t aSignature, const char* aIdentifier, void* aEventData);
+	typedef void (*EVENTS_RAISENOTIFICATION_TARGETED)(uint32_t aSignature, const char* aIdentifier);
+	typedef void (*EVENTS_SUBSCRIBE)                 (const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
+}

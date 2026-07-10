@@ -11,20 +11,26 @@
 #include "EvtFuncDefs.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// EventSubscriber_t Struct
+/// Raidcore::Nexus::Host Namespace
 ///----------------------------------------------------------------------------------------------------
-struct EventSubscriber_t
+namespace Raidcore::Nexus::Host
 {
-	uint32_t      Signature;
-	EVENT_CONSUME Callback;
-};
+	///----------------------------------------------------------------------------------------------------
+	/// EventSubscriber_t Struct
+	///----------------------------------------------------------------------------------------------------
+	struct EventSubscriber_t
+	{
+		uint32_t      Signature;
+		EVENT_CONSUME Callback;
+	};
 
-inline bool operator==(const EventSubscriber_t& lhs, const EventSubscriber_t& rhs)
-{
-	return lhs.Signature == rhs.Signature && lhs.Callback == rhs.Callback;
-}
+	inline bool operator==(const EventSubscriber_t& lhs, const EventSubscriber_t& rhs)
+	{
+		return lhs.Signature == rhs.Signature && lhs.Callback == rhs.Callback;
+	}
 
-inline bool operator!=(const EventSubscriber_t& lhs, const EventSubscriber_t& rhs)
-{
-	return !(lhs == rhs);
+	inline bool operator!=(const EventSubscriber_t& lhs, const EventSubscriber_t& rhs)
+	{
+		return !(lhs == rhs);
+	}
 }

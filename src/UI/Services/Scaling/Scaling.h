@@ -16,6 +16,8 @@
 #include "GW2/Mumble/MblReader.h"
 #include "UI/Renderer/RdrContext.h"
 
+using namespace Raidcore::Nexus;
+
 ///----------------------------------------------------------------------------------------------------
 /// CScaling Class
 ///----------------------------------------------------------------------------------------------------
@@ -40,7 +42,7 @@ class CScaling : public virtual IWndProc
 	CScaling(
 		RenderContext_t* aRenderCtx,
 		CDataLinkApi*    aDataLink,
-		CEventApi*       aEventApi,
+		Host::CEventApi* aEventApi,
 		CSettings*       aSettings
 	);
 
@@ -76,7 +78,7 @@ class CScaling : public virtual IWndProc
 	private:
 	RenderContext_t*  RenderContext;
 	CDataLinkApi*     DataLink;
-	CEventApi*        EventApi;
+	Host::CEventApi*  EventApi;
 	CSettings*        Settings;
 	Mumble::Identity* MumbleIdentity;
 	NexusLinkData_t*  NexusLink;
