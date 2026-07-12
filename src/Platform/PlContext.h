@@ -44,6 +44,12 @@ namespace Raidcore::Nexus::Platform
 		HMODULE Module();
 
 		///----------------------------------------------------------------------------------------------------
+		/// Window:
+		/// 	Returns the window handle.
+		///----------------------------------------------------------------------------------------------------
+		HWND Window();
+
+		///----------------------------------------------------------------------------------------------------
 		/// CrashHandler:
 		/// 	Returns the crash handler instance.
 		///----------------------------------------------------------------------------------------------------
@@ -56,12 +62,13 @@ namespace Raidcore::Nexus::Platform
 		Platform::RawInputApi& RawInput();
 
 		private:
-		HMODULE _Module{ nullptr };
+		HMODULE _Module      { nullptr };
+		HWND    _WindowHandle{ nullptr };
 
-		std::filesystem::path CrashLogPath;
-		std::filesystem::path CrashStackPath;
+		std::filesystem::path CrashLogPath{};
+		std::filesystem::path CrashStackPath{};
 
 		std::unique_ptr<Platform::CrashHandler> _CrashHandler{ nullptr };
-		std::unique_ptr<Platform::RawInputApi>  _RawInputApi{ nullptr };
+		std::unique_ptr<Platform::RawInputApi>  _RawInputApi { nullptr };
 	};
 }

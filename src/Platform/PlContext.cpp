@@ -20,11 +20,45 @@ namespace Raidcore::Nexus::Platform
 		: CrashLogPath(std::move(aCrashlog))
 		, CrashStackPath(std::move(aCrashstack))
 	{
+		static uint32_t s_Dummy = 0;
+
+		HMODULE hmodule = nullptr;
+		GetModuleHandleExA(
+			GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
+			(LPCSTR)&s_Dummy,
+			&hmodule
+		);
+
+		this->_Module = hmodule;
+
+		EnumWindows([](HWND aHandle, LPARAM aOutHandle) -> BOOL
+		{
+			DWORD pid = 0;
+			GetWindowThreadProcessId(aHandle, &pid);
+
+			if (GetCurrentProcessId() != pid)
+			{
+				return TRUE;
+			}
+
+			if (GetWindow(aHandle, GW_OWNER) != nullptr)
+			{
+				return TRUE;
+			}
+
+			if (!IsWindowVisible(aHandle))
+			{
+				return TRUE;
+			}
+
+			*reinterpret_cast<HWND*>(aOutHandle) = aHandle;
+			return FALSE;
+		}, reinterpret_cast<LPARAM>(&this->_WindowHandle));
+
 		this->_CrashHandler = std::make_unique<Platform::CrashHandler>(
 			this->CrashLogPath,
 			this->CrashStackPath
 		);
-
 		this->_RawInputApi = std::make_unique<RawInputApi>();
 	}
 
@@ -36,21 +70,12 @@ namespace Raidcore::Nexus::Platform
 
 	HMODULE Context::Module()
 	{
-		if (!this->_Module)
-		{
-			static uint32_t s_Dummy = 0;
-
-			HMODULE hmodule = nullptr;
-			GetModuleHandleExA(
-				GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
-				(LPCSTR)&s_Dummy,
-				&hmodule
-			);
-
-			this->_Module = hmodule;
-		}
-
 		return this->_Module;
+	}
+
+	HWND Context::Window()
+	{
+		return this->_WindowHandle;
 	}
 
 	Platform::CrashHandler& Context::CrashHandler()
