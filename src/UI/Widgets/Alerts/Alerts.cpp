@@ -38,11 +38,10 @@ void CAlerts::Render()
 		ImGui::PushFont((ImFont*)this->NexusLink->FontBig);
 		float width = ImGui::CalcTextSize(alert.Message.c_str()).x;
 
-		Runtime&        ctx      = Runtime::Get();
-		RenderContext_t* renderer = ctx.GetRendererCtx();
+		Runtime&        ctx      = Runtime::Get(); Graphics::Window_t window = ctx.Graphics().Window();
 
 		/* center horizontally */
-		ImGui::SetNextWindowPos(ImVec2((renderer->Window.Width - width) / 2.0f, 230.0f * this->NexusLink->Scaling));
+		ImGui::SetNextWindowPos(ImVec2((window.Width - width) / 2.0f, 230.0f * this->NexusLink->Scaling));
 		if (ImGui::Begin("##Alerts", (bool*)0, Flags))
 		{
 			ImColor msgCol;

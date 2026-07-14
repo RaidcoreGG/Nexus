@@ -102,13 +102,13 @@ namespace Raidcore::Nexus::GW2
 		Platform::RawInputApi& aRawInputApi,
 		CLogApi& aLogger,
 		Host::EventApi& aEventApi,
-		RenderContext_t& aRenderContext,
+		HWND aGameWindow,
 		std::filesystem::path   aConfigPath
 	)
 		: RawInputApi(aRawInputApi)
 		, Logger(aLogger)
 		, EventApi(aEventApi)
-		, RenderContext(aRenderContext)
+		, GameWindow(aGameWindow)
 	{
 		this->ConfigPath = aConfigPath;
 
@@ -140,10 +140,10 @@ namespace Raidcore::Nexus::GW2
 	{
 		if (uMsg < WM_USER)
 		{
-			return PostMessageA(this->RenderContext.Window.Handle, uMsg + WM_PASSTHROUGH_FIRST, wParam, lParam);
+			return PostMessageA(this->GameWindow, uMsg + WM_PASSTHROUGH_FIRST, wParam, lParam);
 		}
 
-		return PostMessageA(this->RenderContext.Window.Handle, uMsg, wParam, lParam);
+		return PostMessageA(this->GameWindow, uMsg, wParam, lParam);
 	}
 
 	void GameBindsApi::PressAsync(EGameBinds aGameBind)

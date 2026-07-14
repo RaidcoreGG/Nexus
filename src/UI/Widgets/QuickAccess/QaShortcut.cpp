@@ -33,7 +33,7 @@ CShortcutIcon::CShortcutIcon(
 	/* FIXME: See Render IsInvalid. */
 	Runtime& ctx        = Runtime::Get();
 	this->InputBindApi   = ctx.GetInputBindApi();
-	this->TextureService = ctx.GetTextureService();
+	this->TextureService = &ctx.Graphics().Textures();
 	this->Loader         = &ctx.Host().Loader();
 	this->DataLink       = ctx.GetDataLink();
 
@@ -114,7 +114,7 @@ bool CShortcutIcon::Render()
 	);
 
 	bool iconActive = false;
-	Texture_t* icon = !this->IsHovering ? this->Icon : this->IconHover;
+	Graphics::Texture_t* icon = !this->IsHovering ? this->Icon : this->IconHover;
 	if (ImGui::ImageButton(icon->Resource, baseSizeUnscaled * this->NexusLink->Scaling))
 	{
 		this->PopNotifcation(QAKEY_GENERIC);
@@ -122,7 +122,7 @@ bool CShortcutIcon::Render()
 	}
 	iconActive = ImGui::IsItemHovered() || ImGui::IsItemClicked();
 
-	Texture_t* notificationIcon = this->GetNotificationTexture(static_cast<uint32_t>(this->Notifications.size()));
+	Graphics::Texture_t* notificationIcon = this->GetNotificationTexture(static_cast<uint32_t>(this->Notifications.size()));
 	if (notificationIcon)
 	{
 		ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
@@ -267,11 +267,11 @@ uint32_t CShortcutIcon::CleanupRefs(void* aStartAddress, void* aEndAddress)
 	return refCounter;
 }
 
-Texture_t* CShortcutIcon::GetNotificationTexture(uint32_t aAmount)
+Graphics::Texture_t* CShortcutIcon::GetNotificationTexture(uint32_t aAmount)
 {
 	if (aAmount == 0) { return nullptr; }
 
-	Texture_t* icon = nullptr;
+	Graphics::Texture_t* icon = nullptr;
 
 	switch (aAmount)
 	{

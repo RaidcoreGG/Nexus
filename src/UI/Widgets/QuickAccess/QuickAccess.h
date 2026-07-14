@@ -25,7 +25,7 @@
 #include "QaShortcut.h"
 #include "UI/Controls/CtlWindow.h"
 #include "UI/Services/Localization/LoclApi.h"
-#include "UI/Textures/TxLoader.h"
+#include "Graphics/Textures/TxLoader.h"
 #include "UI/UiFuncDefs.h"
 
 using namespace Raidcore::Nexus;
@@ -56,7 +56,7 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CQuickAccess(CDataLinkApi* aDataLink, CLogApi* aLogger, CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization, Host::EventApi* aEventApi);
+	CQuickAccess(CDataLinkApi* aDataLink, CLogApi* aLogger, CInputBindApi* aInputBindApi, Graphics::TextureLoader* aTextureService, CLocalization* aLocalization, Host::EventApi* aEventApi);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -132,7 +132,7 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	private:
 	CLogApi*                              Logger             {};
 	CInputBindApi*                        InputBindApi       {};
-	CTextureLoader*                       TextureService     {};
+	Graphics::TextureLoader*                       TextureService     {};
 	CLocalization*                        Language           {};
 	Host::EventApi*                      EventApi           {};
 

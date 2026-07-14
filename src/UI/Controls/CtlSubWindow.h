@@ -11,7 +11,9 @@
 #include <string>
 
 #include "CtlWindow.h"
-#include "UI/Textures/TxTexture.h"
+#include "Graphics/Textures/TxTexture.h"
+
+using namespace Raidcore::Nexus;
 
 ///----------------------------------------------------------------------------------------------------
 /// ISubWindow Interface Class
@@ -35,7 +37,7 @@ class ISubWindow : public virtual IWindow
 	/// GetIcon:
 	/// 	Returns the icon of the window.
 	///----------------------------------------------------------------------------------------------------
-	const Texture_t* GetIcon();
+	const Graphics::Texture_t* GetIcon();
 
 	///----------------------------------------------------------------------------------------------------
 	/// IsPopOut:
@@ -74,8 +76,8 @@ class ISubWindow : public virtual IWindow
 
 	std::string              IconIdentifier{};
 	int                      IconID        {};
-	Texture_t*               Tex_Icon      {};
-	Texture_t*               Tex_PopoutIcon{};
+	Graphics::Texture_t*     Tex_Icon      {};
+	Graphics::Texture_t*     Tex_PopoutIcon{};
 
 	///----------------------------------------------------------------------------------------------------
 	/// RenderContent:

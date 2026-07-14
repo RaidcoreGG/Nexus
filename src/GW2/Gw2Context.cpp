@@ -20,19 +20,19 @@
 namespace Raidcore::Nexus::GW2
 {
 	Context::Context(
-		CDataLinkApi&           aDataLink,
+		CDataLinkApi&          aDataLink,
 		Host::EventApi&        aEventApi,
-		CLogApi&                aLogger,
+		CLogApi&               aLogger,
 		Platform::RawInputApi& aRawInputApi,
-		RenderContext_t&        aRendererCtx,
-		CHttpClient&            aArenaNetAssetCDN,
-		std::filesystem::path   aGameBindsPath
+		HWND                   aGameWindow,
+		CHttpClient&           aArenaNetAssetCDN,
+		std::filesystem::path  aGameBindsPath
 	)
 		: _DataLink(aDataLink)
 		, _EventApi(aEventApi)
 		, _Logger(aLogger)
 		, _RawInputApi(aRawInputApi)
-		, _RendererCtx(aRendererCtx)
+		, _GameWindow(aGameWindow)
 		, _ArenaNetAssetCDN(aArenaNetAssetCDN)
 		, _GameBindsPath(std::move(aGameBindsPath))
 	{
@@ -45,7 +45,7 @@ namespace Raidcore::Nexus::GW2
 			this->_RawInputApi,
 			this->_Logger,
 			this->_EventApi,
-			this->_RendererCtx,
+			this->_GameWindow,
 			this->_GameBindsPath
 		);
 		this->_Mumble = std::make_unique<MumbleReader>(

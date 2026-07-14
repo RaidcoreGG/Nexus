@@ -227,8 +227,8 @@ void CDebugWindow::TabTextures()
 		return;
 	}
 
-	std::map<std::string, Texture_t*>      texRegistry = Runtime::Get().GetTextureService()->GetRegistry();
-	std::map<std::string, QueuedTexture_t> texQueued   = Runtime::Get().GetTextureService()->GetQueuedTextures();
+	std::map<std::string, Graphics::Texture_t*>      texRegistry = Runtime::Get().Graphics().Textures().GetRegistry();
+	std::map<std::string, Graphics::QueuedTexture_t> texQueued   = Runtime::Get().Graphics().Textures().GetQueuedTextures();
 
 	static char texFilter[400] = {};
 	static int displayedTextures = 0;

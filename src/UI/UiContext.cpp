@@ -163,37 +163,37 @@ using namespace Raidcore::Nexus;
 }
 
 CUiContext::CUiContext(
-	RenderContext_t*   aRenderContext,
-	CLogApi*           aLogger,
-	CTextureLoader*    aTextureService,
-	CDataLinkApi*      aDataLink,
-	CInputBindApi*     aInputBindApi,
-	Host::EventApi*   aEventApi,
-	GW2::MumbleReader* aMumbleReader
-) : IRefCleaner("UiContext")
+	Graphics::Window_t& aGrWindow,
+	CLogApi*            aLogger,
+	Graphics::TextureLoader&     aTextureService,
+	CDataLinkApi*       aDataLink,
+	CInputBindApi*      aInputBindApi,
+	Host::EventApi&     aEventApi,
+	GW2::MumbleReader&  aMumbleReader
+)
+	: IRefCleaner("UiContext")
+	, GrWindow(aGrWindow)
+	, Logger(aLogger)
+	, TextureService(aTextureService)
+	, DataLink(aDataLink)
+	, InputBindApi(aInputBindApi)
+	, EventApi(aEventApi)
+	, MumbleReader(aMumbleReader)
 {
-	this->RenderContext  = aRenderContext;
-	this->Logger         = aLogger;
-	this->TextureService = aTextureService;
-	this->DataLink       = aDataLink;
-	this->InputBindApi   = aInputBindApi;
-	this->EventApi       = aEventApi;
-	this->MumbleReader   = aMumbleReader;
-
 	ImGui::CreateContext();
 
 	this->Language       = new CLocalization(aLogger);
 	this->Alerts         = new CAlerts(aDataLink);
 	this->MainWindow     = new CMainWindow();
-	this->QuickAccess    = new CQuickAccess(aDataLink, aLogger, aInputBindApi, aTextureService, this->Language, aEventApi);
+	this->QuickAccess    = new CQuickAccess(aDataLink, aLogger, aInputBindApi, &aTextureService, this->Language, &aEventApi);
 
 	this->FontManager    = new CFontManager(this->Language);
 	this->EscapeClose    = new CEscapeClosing();
-	this->Scaling        = new CScaling(aRenderContext, aDataLink, aEventApi, Runtime::Get().GetSettingsCtx()); // FIXME: What the fuck, why is the settingsctx not included here?
+	this->Scaling        = new CScaling(Runtime::Get().Platform().Window(), GrWindow, aDataLink, aEventApi, Runtime::Get().GetSettingsCtx()); // FIXME: What the fuck, why is the settingsctx not included here?
 	this->Input          = new CUiInput(Runtime::Get().GetSettingsCtx());
 
-	this->EventApi->Subscribe(EV_MUMBLE_IDENTITY_UPDATED,              CUiContext::OnMumbleIdentityChanged);
-	this->EventApi->Subscribe("EV_INPUTBIND_UPDATED",                  CUiContext::OnInputBindUpdate);
+	this->EventApi.Subscribe(EV_MUMBLE_IDENTITY_UPDATED,              CUiContext::OnMumbleIdentityChanged);
+	this->EventApi.Subscribe("EV_INPUTBIND_UPDATED",                  CUiContext::OnInputBindUpdate);
 
 	this->InputBindApi->Register(KB_TOGGLEHIDEUI, EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "CTRL+H");
 	this->EscapeClose->Register("Nexus", this->MainWindow->GetVisibleStatePtr());
@@ -214,7 +214,7 @@ void CUiContext::Initialize()
 		return;
 	}
 
-	if (!(this->RenderContext->Window.Handle && this->RenderContext->SwapChain))
+	if (!(Runtime::Get().Platform().Window() && this->GrWindow.SwapChain))
 	{
 		this->Logger->Critical(CH_UICONTEXT, "CUiContext::Initialize() failed. A RenderContext component was nullptr.");
 		return;
@@ -222,7 +222,7 @@ void CUiContext::Initialize()
 
 	/* Retrieve BackBuffer. */
 	ID3D11Texture2D* pBackBuffer{};
-	this->RenderContext->SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBackBuffer);
+	this->GrWindow.SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBackBuffer);
 
 	if (!pBackBuffer)
 	{
@@ -234,10 +234,10 @@ void CUiContext::Initialize()
 	pBackBuffer->GetDevice(&bbDevice);
 
 	/* Retrieve Device and DeviceContext from BackBuffer. */
-	if (this->RenderContext->Device == nullptr)
+	if (this->GrWindow.Device == nullptr)
 	{
-		this->RenderContext->Device = bbDevice;
-		this->RenderContext->Device->GetImmediateContext(&this->RenderContext->DeviceContext);
+		this->GrWindow.Device = bbDevice;
+		this->GrWindow.Device->GetImmediateContext(&this->GrWindow.DeviceContext);
 	}
 
 	HRESULT hr = bbDevice->CreateRenderTargetView(pBackBuffer, NULL, &this->RenderTargetView);
@@ -252,8 +252,8 @@ void CUiContext::Initialize()
 	this->Scaling->UpdateDPI(); // Update DPI, because the HWND is now available.
 
 	// Init imgui
-	ImGui_ImplWin32_Init(this->RenderContext->Window.Handle);
-	ImGui_ImplDX11_Init(this->RenderContext->Device, this->RenderContext->DeviceContext);
+	ImGui_ImplWin32_Init(Runtime::Get().Platform().Window());
+	ImGui_ImplDX11_Init(this->GrWindow.Device, this->GrWindow.DeviceContext);
 	//ImGui::GetIO().ImeWindowHandle = Renderer::WindowHandle;
 
 	this->IsInitialized = true;
@@ -365,7 +365,7 @@ void CUiContext::Render()
 				}
 				else
 				{
-					PostMessageA(this->RenderContext->Window.Handle, WM_CLOSE, 0, 0);
+					PostMessageA(Runtime::Get().Platform().Window(), WM_CLOSE, 0, 0);
 				}
 			}
 		}
@@ -373,7 +373,7 @@ void CUiContext::Render()
 		/* end frame */
 		ImGui::EndFrame();
 		ImGui::Render();
-		this->RenderContext->DeviceContext->OMSetRenderTargets(1, &this->RenderTargetView, NULL);
+		this->GrWindow.DeviceContext->OMSetRenderTargets(1, &this->RenderTargetView, NULL);
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	}
 

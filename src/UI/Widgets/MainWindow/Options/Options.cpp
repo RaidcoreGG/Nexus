@@ -350,14 +350,14 @@ void COptionsWindow::TabGeneral()
 					ImGui::EndCombo();
 				}
 
-				RenderContext_t* renderer = ctx.GetRendererCtx();
+				Graphics::Window_t window = ctx.Graphics().Window();
 
 				/* offset */
 				static ImVec2 s_Offset{};
 				s_Offset.x = settingsctx->Get<float>(OPT_QAOFFSETX);
 				s_Offset.y = settingsctx->Get<float>(OPT_QAOFFSETY);
 				ImGui::Text(langApi->Translate("((000051))"));
-				if (ImGui::DragFloat2("##QAOffsetInput", (float*)&s_Offset, 1.0f, (static_cast<float>(renderer->Window.Height)) * -1.f, static_cast<float>(renderer->Window.Height)))
+				if (ImGui::DragFloat2("##QAOffsetInput", (float*)&s_Offset, 1.0f, (static_cast<float>(window.Height)) * -1.f, static_cast<float>(window.Height)))
 				{
 					settingsctx->Set(OPT_QAOFFSETX, s_Offset.x);
 					settingsctx->Set(OPT_QAOFFSETY, s_Offset.y);
@@ -498,7 +498,7 @@ void COptionsWindow::TabStyle()
 
 							for (std::filesystem::path& style : this->Styles)
 							{
-								static Texture_t* s_TexCross = nullptr;
+								static Graphics::Texture_t* s_TexCross = nullptr;
 
 								if (s_TexCross)
 								{
@@ -521,7 +521,7 @@ void COptionsWindow::TabStyle()
 								}
 								else
 								{
-									s_TexCross = Runtime::Get().GetTextureService()->GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx.Platform().Module());
+									s_TexCross = Runtime::Get().Graphics().Textures().GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx.Platform().Module());
 								}
 
 								/* Display the filename without extension. */

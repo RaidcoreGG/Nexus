@@ -9,22 +9,20 @@
 #pragma once
 
 #include <d3d11.h>
-#include <map>
-#include <vector>
-#include <Windows.h>
+#include <windows.h>
 
 #include "Engine/_Concepts/IWndProc.h"
 #include "Engine/DataLink/DlApi.h"
-#include "Host/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Logging/LogApi.h"
+#include "Graphics/GrWindow.h"
+#include "Graphics/Textures/TxLoader.h"
 #include "GW2/Mumble/MblReader.h"
-#include "UI/Renderer/RdrContext.h"
+#include "Host/Events/EvtApi.h"
 #include "UI/Services/Fonts/FontManager.h"
 #include "UI/Services/Localization/LoclApi.h"
 #include "UI/Services/QoL/EscapeClosing.h"
 #include "UI/Services/Scaling/Scaling.h"
-#include "UI/Textures/TxLoader.h"
 #include "UI/Widgets/Alerts/Alerts.h"
 #include "UI/Widgets/EULA/LicenseAgreementModal.h"
 #include "UI/Widgets/MainWindow/MainWindow.h"
@@ -80,13 +78,13 @@ class CUiContext : public CUiRender, public CUiBinds, public CUiStyle, public vi
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
 	CUiContext(
-		RenderContext_t*   aRenderContext,
-		CLogApi*           aLogger,
-		CTextureLoader*    aTextureService,
-		CDataLinkApi*      aDataLink,
-		CInputBindApi*     aInputBindApi,
-		Host::EventApi*   aEventApi,
-		GW2::MumbleReader* aMumbleReader
+		Graphics::Window_t& aGrWindow,
+		CLogApi*            aLogger,
+		Graphics::TextureLoader&     aTextureService,
+		CDataLinkApi*       aDataLink,
+		CInputBindApi*      aInputBindApi,
+		Host::EventApi&     aEventApi,
+		GW2::MumbleReader&  aMumbleReader
 	);
 
 	///----------------------------------------------------------------------------------------------------
@@ -162,14 +160,14 @@ class CUiContext : public CUiRender, public CUiBinds, public CUiStyle, public vi
 
 	private:
 	/* Services */
-	RenderContext_t*   RenderContext  = nullptr;
-	CLogApi*           Logger         = nullptr;
-	CLocalization*     Language       = nullptr;
-	CTextureLoader*    TextureService = nullptr;
-	CDataLinkApi*      DataLink       = nullptr;
-	CInputBindApi*     InputBindApi   = nullptr;
-	Host::EventApi*   EventApi       = nullptr;
-	GW2::MumbleReader* MumbleReader   = nullptr;
+	Graphics::Window_t& GrWindow;
+	CLogApi*            Logger         = nullptr;
+	CLocalization*      Language       = nullptr;
+	Graphics::TextureLoader&     TextureService;
+	CDataLinkApi*       DataLink       = nullptr;
+	CInputBindApi*      InputBindApi   = nullptr;
+	Host::EventApi&     EventApi;
+	GW2::MumbleReader&  MumbleReader;
 
 	/* Rendering */
 	ID3D11RenderTargetView* RenderTargetView;

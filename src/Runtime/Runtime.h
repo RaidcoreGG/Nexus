@@ -21,13 +21,11 @@
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Logging/LogApi.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
+#include "Graphics/GrContext.h"
 #include "GW2/Gw2Context.h"
-#include "Host/Config/CfgManager.h"
 #include "Host/HoContext.h"
 #include "Platform/PlContext.h"
 #include "Proxy/PxyEnum.h"
-#include "UI/Renderer/RdrContext.h"
-#include "UI/Textures/TxLoader.h"
 #include "UI/UiContext.h"
 
 ///----------------------------------------------------------------------------------------------------
@@ -65,13 +63,11 @@ namespace Raidcore::Nexus
 
 		Host::Context& Host();
 
+		Graphics::Context& Graphics();
+
 		GW2::Context& Game();
 
-		RenderContext_t* GetRendererCtx();
-
 		CLogApi* GetLogger();
-
-		CTextureLoader* GetTextureService();
 
 		CDataLinkApi* GetDataLink();
 
@@ -90,8 +86,9 @@ namespace Raidcore::Nexus
 		~Runtime();
 
 		std::unique_ptr<Platform::Context> _PlatformContext{ nullptr };
-		std::unique_ptr<Host::Context>     _HostContext{ nullptr };
-		std::unique_ptr<GW2::Context>      _GameContext{ nullptr };
+		std::unique_ptr<Host::Context>     _HostContext    { nullptr };
+		std::unique_ptr<Graphics::Context> _GraphicsContext{ nullptr };
+		std::unique_ptr<GW2::Context>      _GameContext    { nullptr };
 
 		std::mutex                          HttpClientMutex{};
 		std::map<std::string, CHttpClient*> HttpClients{};

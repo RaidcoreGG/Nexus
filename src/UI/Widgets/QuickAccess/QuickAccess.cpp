@@ -37,7 +37,7 @@ CQuickAccess::CQuickAccess(
 	CDataLinkApi*   aDataLink,
 	CLogApi*        aLogger,
 	CInputBindApi*  aInputBindApi,
-	CTextureLoader* aTextureService,
+	Graphics::TextureLoader* aTextureService,
 	CLocalization*  aLocalization,
 	Host::EventApi*      aEventApi
 ) : IRefCleaner("QuickAccess")
@@ -241,8 +241,8 @@ void CQuickAccess::Render()
 		case EQaPosition::Bottom:
 		{
 			Runtime&        ctx      = Runtime::Get();
-			RenderContext_t* renderer = ctx.GetRendererCtx();
-			wndPos.y += renderer->Window.Height - (s_IconBaseSize * 2 * this->NexusLink->Scaling);
+			Graphics::Window_t& window = ctx.Graphics().Window();
+			wndPos.y += window.Height - (s_IconBaseSize * 2 * this->NexusLink->Scaling);
 			break;
 		}
 	}

@@ -38,7 +38,7 @@ void CAboutBox::RenderContent()
 	}
 
 	Runtime&       ctx         = Runtime::Get();
-	CTextureLoader* texapi      = ctx.GetTextureService();
+	Graphics::TextureLoader& texapi      = ctx.Graphics().Textures();
 	CSelfUpdater*   selfupdater = ctx.GetSelfUpdater();
 
 	if (ImGui::CollapsingHeader("About", ImGuiTreeNodeFlags_DefaultOpen))
@@ -86,7 +86,7 @@ void CAboutBox::RenderContent()
 			}
 			else
 			{
-				this->Tex_BannerDiscord = texapi->GetOrCreate("BANNER_DISCORD", RES_BANNER_DISCORD, ctx.Platform().Module());
+				this->Tex_BannerDiscord = texapi.GetOrCreate("BANNER_DISCORD", RES_BANNER_DISCORD, ctx.Platform().Module());
 			}
 		}
 		ImGui::EndChild();
@@ -125,7 +125,7 @@ void CAboutBox::RenderContent()
 			}
 			else
 			{
-				this->Tex_BannerPatreon = texapi->GetOrCreate("BANNER_PATREON", RES_BANNER_PATREON, ctx.Platform().Module());
+				this->Tex_BannerPatreon = texapi.GetOrCreate("BANNER_PATREON", RES_BANNER_PATREON, ctx.Platform().Module());
 			}
 		}
 		ImGui::EndChild();

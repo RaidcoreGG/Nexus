@@ -13,7 +13,9 @@
 
 #include "UI/Controls/CtlSubWindow.h"
 #include "UI/Controls/CtlWindow.h"
-#include "UI/Textures/TxTexture.h"
+#include "Graphics/Textures/TxTexture.h"
+
+using namespace Raidcore::Nexus;
 
 ///----------------------------------------------------------------------------------------------------
 /// CMainWindow Class
@@ -53,6 +55,6 @@ class CMainWindow : public virtual IWindow
 	bool                     IsHandleHeld   {};
 
 	private:
-	Texture_t*               Tex_RaidcoreTag{};
-	Texture_t*               Tex_CloseIcon  {};
+	Graphics::Texture_t*               Tex_RaidcoreTag{};
+	Graphics::Texture_t*               Tex_CloseIcon  {};
 };

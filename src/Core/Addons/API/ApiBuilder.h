@@ -17,7 +17,7 @@
 #include "GW2/Inputs/GameBinds/GbEnum.h"
 #include "Platform/RawInput/RiFuncDefs.h"
 #include "UI/Services/Fonts/FuncDefs.h"
-#include "UI/Textures/TxFuncDefs.h"
+#include "Graphics/Textures/TxFuncDefs.h"
 #include "UI/UiFuncDefs.h"
 
 using namespace Raidcore::Nexus;
@@ -271,55 +271,55 @@ namespace ADDONAPI
 		/// Get:
 		/// 	Addon API wrapper function for Get.
 		///----------------------------------------------------------------------------------------------------
-		Texture_t* Get(const char* aIdentifier);
+		Graphics::Texture_t* Get(const char* aIdentifier);
 
 		///----------------------------------------------------------------------------------------------------
 		/// GetOrCreateFromFile:
 		/// 	Addon API wrapper function for GetOrCreate from file.
 		///----------------------------------------------------------------------------------------------------
-		Texture_t* GetOrCreateFromFile(const char* aIdentifier, const char* aFilename);
+		Graphics::Texture_t* GetOrCreateFromFile(const char* aIdentifier, const char* aFilename);
 
 		///----------------------------------------------------------------------------------------------------
 		/// GetOrCreateFromResource:
 		/// 	Addon API wrapper function for GetOrCreate from embedded resource.
 		///----------------------------------------------------------------------------------------------------
-		Texture_t* GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule);
+		Graphics::Texture_t* GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule);
 
 		///----------------------------------------------------------------------------------------------------
 		/// GetOrCreateFromURL:
 		/// 	Addon API wrapper function for GetOrCreate from remote URL.
 		///----------------------------------------------------------------------------------------------------
-		Texture_t* GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint);
+		Graphics::Texture_t* GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint);
 
 		///----------------------------------------------------------------------------------------------------
 		/// GetOrCreateFromMemory:
 		/// 	Addon API wrapper function for GetOrCreate from memory.
 		///----------------------------------------------------------------------------------------------------
-		Texture_t* GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize);
+		Graphics::Texture_t* GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize);
 
 		///----------------------------------------------------------------------------------------------------
 		/// LoadFromFile:
 		/// 	Addon API wrapper function for LoadFromFile.
 		///----------------------------------------------------------------------------------------------------
-		void LoadFromFile(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback);
+		void LoadFromFile(const char* aIdentifier, const char* aFilename, Graphics::TEXTURES_RECEIVECALLBACK aCallback);
 
 		///----------------------------------------------------------------------------------------------------
 		/// LoadFromResource:
 		/// 	Addon API wrapper function for LoadFromResource.
 		///----------------------------------------------------------------------------------------------------
-		void LoadFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback);
+		void LoadFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, Graphics::TEXTURES_RECEIVECALLBACK aCallback);
 
 		///----------------------------------------------------------------------------------------------------
 		/// LoadFromURL:
 		/// 	Addon API wrapper function for LoadFromURL.
 		///----------------------------------------------------------------------------------------------------
-		void LoadFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback);
+		void LoadFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint, Graphics::TEXTURES_RECEIVECALLBACK aCallback);
 
 		///----------------------------------------------------------------------------------------------------
 		/// LoadFromMemory:
 		/// 	Addon API wrapper function for LoadFromMemory.
 		///----------------------------------------------------------------------------------------------------
-		void LoadFromMemory(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback);
+		void LoadFromMemory(const char* aIdentifier, void* aData, size_t aSize, Graphics::TEXTURES_RECEIVECALLBACK aCallback);
 	}
 
 	///----------------------------------------------------------------------------------------------------

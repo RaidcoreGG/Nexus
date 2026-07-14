@@ -132,17 +132,17 @@ namespace Raidcore::Nexus::GW2
 	void MumbleReader::AdvanceDerived()
 	{
 		Runtime& ctx = Runtime::Get();
-		RenderContext_t* renderer = ctx.GetRendererCtx();
+		Graphics::Metrics_t& metrics = ctx.Graphics().Metrics();
 
 		bool tickChanged = this->PreviousTick != this->MumbleLink->UITick;
-		bool gameFrozen = this->PreviousFrameCounter == renderer->Metrics.FrameCount;
+		bool gameFrozen = this->PreviousFrameCounter == metrics.FrameCount;
 
 		/* Either the ui is ticking or the ui *was* ticking and the game is frozen. */
 		this->NexusLink->IsGameplay = tickChanged || (gameFrozen && this->NexusLink->IsGameplay);
 		this->NexusLink->IsMoving = this->PreviousAvatarPosition != this->MumbleLink->AvatarPosition;
 		this->NexusLink->IsCameraMoving = this->PreviousCameraFront != this->MumbleLink->CameraFront;
 
-		this->PreviousFrameCounter = renderer->Metrics.FrameCount;
+		this->PreviousFrameCounter = metrics.FrameCount;
 		this->PreviousTick = this->MumbleLink->UITick;
 		this->PreviousAvatarPosition = this->MumbleLink->AvatarPosition;
 		this->PreviousCameraFront = this->MumbleLink->CameraFront;

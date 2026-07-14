@@ -25,7 +25,7 @@
 #include "UI/Services/Fonts/FuncDefs.h"
 #include "UI/Services/Localization/LoclFuncDefs.h"
 #include "UI/Services/QoL/FuncDefs.h"
-#include "UI/Textures/TxFuncDefs.h"
+#include "Graphics/Textures/TxFuncDefs.h"
 #include "UI/UiFuncDefs.h"
 #include "UI/Widgets/Alerts/AlFuncDefs.h"
 #include "UI/Widgets/QuickAccess/QaFuncDefs.h"
@@ -138,15 +138,15 @@ struct AddonAPI6_t : AddonAPI_t
 	/* Textures */
 	struct TexturesVT
 	{
-		TEXTURES_GET                      Get;
-		TEXTURES_GETORCREATEFROMFILE      GetOrCreateFromFile;
-		TEXTURES_GETORCREATEFROMRESOURCE  GetOrCreateFromResource;
-		TEXTURES_GETORCREATEFROMURL       GetOrCreateFromURL;
-		TEXTURES_GETORCREATEFROMMEMORY    GetOrCreateFromMemory;
-		TEXTURES_LOADFROMFILE             LoadFromFile;
-		TEXTURES_LOADFROMRESOURCE         LoadFromResource;
-		TEXTURES_LOADFROMURL              LoadFromURL;
-		TEXTURES_LOADFROMMEMORY           LoadFromMemory;
+		Graphics::TEXTURES_GET                      Get;
+		Graphics::TEXTURES_GETORCREATEFROMFILE      GetOrCreateFromFile;
+		Graphics::TEXTURES_GETORCREATEFROMRESOURCE  GetOrCreateFromResource;
+		Graphics::TEXTURES_GETORCREATEFROMURL       GetOrCreateFromURL;
+		Graphics::TEXTURES_GETORCREATEFROMMEMORY    GetOrCreateFromMemory;
+		Graphics::TEXTURES_LOADFROMFILE             LoadFromFile;
+		Graphics::TEXTURES_LOADFROMRESOURCE         LoadFromResource;
+		Graphics::TEXTURES_LOADFROMURL              LoadFromURL;
+		Graphics::TEXTURES_LOADFROMMEMORY           LoadFromMemory;
 	};
 	TexturesVT                            Textures;
 

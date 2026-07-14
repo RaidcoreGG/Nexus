@@ -14,7 +14,7 @@
 #include "Engine/DataLink/DlApi.h"
 #include "Host/Events/EvtApi.h"
 #include "GW2/Mumble/MblReader.h"
-#include "UI/Renderer/RdrContext.h"
+#include "Graphics/GrWindow.h"
 
 using namespace Raidcore::Nexus;
 
@@ -40,10 +40,11 @@ class CScaling : public virtual IWndProc
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
 	CScaling(
-		RenderContext_t* aRenderCtx,
-		CDataLinkApi*    aDataLink,
-		Host::EventApi* aEventApi,
-		CSettings*       aSettings
+		HWND                aGameWindow,
+		Graphics::Window_t& aGrWindow,
+		CDataLinkApi*       aDataLink,
+		Host::EventApi&     aEventApi,
+		CSettings*          aSettings
 	);
 
 	///----------------------------------------------------------------------------------------------------
@@ -76,18 +77,19 @@ class CScaling : public virtual IWndProc
 	void UpdateResolution();
 
 	private:
-	RenderContext_t*  RenderContext;
-	CDataLinkApi*     DataLink;
-	Host::EventApi*  EventApi;
-	CSettings*        Settings;
-	Mumble::Identity* MumbleIdentity;
-	NexusLinkData_t*  NexusLink;
+	HWND                GameWindow{ nullptr };
+	Graphics::Window_t& GrWindow;
+	CDataLinkApi*       DataLink;
+	Host::EventApi&     EventApi;
+	CSettings*          Settings;
+	Mumble::Identity*   MumbleIdentity;
+	NexusLinkData_t*    NexusLink;
 
-	bool              DpiScalingEnabled;
-	float             DpiScalingFactor;
-	float             EffectiveDpiScalingFactor;
-	float             GameScalingFactor;
-	float             MinResolutionScalingFactor;
+	bool                DpiScalingEnabled;
+	float               DpiScalingFactor;
+	float               EffectiveDpiScalingFactor;
+	float               GameScalingFactor;
+	float               MinResolutionScalingFactor;
 
 	///----------------------------------------------------------------------------------------------------
 	/// UpdateScaling:

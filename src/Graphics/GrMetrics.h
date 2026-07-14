@@ -1,21 +1,25 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  TxTexture.h
-/// Description  :  Contains the Texture data struct definition.
+/// Name         :  GrMetrics.h
+/// Description  :  Definition for the renderer metrics.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
 #pragma once
 
-#include <d3d11.h>
+#include <cstdint>
 
 ///----------------------------------------------------------------------------------------------------
-/// Texture_t Struct
+/// Raidcore::Nexus::Graphics Namespace
 ///----------------------------------------------------------------------------------------------------
-struct Texture_t
+namespace Raidcore::Nexus::Graphics
 {
-	unsigned                  Width;
-	unsigned                  Height;
-	ID3D11ShaderResourceView* Resource;
-};
+	///----------------------------------------------------------------------------------------------------
+	/// Metrics_t Struct
+	///----------------------------------------------------------------------------------------------------
+	struct Metrics_t
+	{
+		uint64_t FrameCount = 0;
+	};
+}

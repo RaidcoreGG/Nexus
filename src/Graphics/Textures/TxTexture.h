@@ -1,29 +1,27 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  RdrContext.h
-/// Description  :  Definition for the renderer context.
+/// Name         :  TxTexture.h
+/// Description  :  Contains the Texture data struct definition.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
 #pragma once
 
-#include <dxgi.h>
 #include <d3d11.h>
 
-#include "RdrWindow.h"
-#include "RdrMetrics.h"
-
 ///----------------------------------------------------------------------------------------------------
-/// RenderContext_t Struct
+/// Raidcore::Nexus::Graphics Namespace
 ///----------------------------------------------------------------------------------------------------
-struct RenderContext_t
+namespace Raidcore::Nexus::Graphics
 {
-	ID3D11Device*        Device        = nullptr;
-	ID3D11DeviceContext* DeviceContext = nullptr;
-	IDXGISwapChain*      SwapChain     = nullptr;
-
-	RenderWindow_t       Window        = {};
-
-	RenderMetrics_t      Metrics       = {};
-};
+	///----------------------------------------------------------------------------------------------------
+	/// Texture_t Struct
+	///----------------------------------------------------------------------------------------------------
+	struct Texture_t
+	{
+		unsigned                  Width;
+		unsigned                  Height;
+		ID3D11ShaderResourceView* Resource;
+	};
+}

@@ -30,7 +30,7 @@ using namespace Raidcore::Nexus;
 #include "UI/Services/Fonts/FontManager.h"
 #include "UI/Services/Localization/LoclApi.h"
 #include "UI/Services/QoL/EscapeClosing.h"
-#include "UI/Textures/TxLoader.h"
+#include "Graphics/Textures/TxLoader.h"
 #include "UI/UiContext.h"
 #include "UI/Widgets/Alerts/Alerts.h"
 #include "UI/Widgets/QuickAccess/QuickAccess.h"
@@ -40,15 +40,15 @@ namespace ADDONAPI
 	static bool                    s_IsInitialized = false;
 
 	static CDataLinkApi*           s_DataLinkApi   = nullptr;
-	static Host::EventApi*        s_EventApi      = nullptr;
+	static Host::EventApi*         s_EventApi      = nullptr;
 	static GW2::GameBindsApi*      s_GameBindsApi  = nullptr;
 	static CInputBindApi*          s_InputBindApi  = nullptr;
 	static Platform::RawInputApi*  s_RawInputApi   = nullptr;
 	static CLocalization*          s_Localization  = nullptr;
 	static CLogApi*                s_Logger        = nullptr;
-	static CTextureLoader*         s_TextureApi    = nullptr;
-	static Host::Loader*          s_Loader        = nullptr;
-	static RenderContext_t*        s_RenderCtx     = nullptr;
+	static Graphics::TextureLoader* s_TextureApi    = nullptr;
+	static Host::Loader*           s_Loader        = nullptr;
+	static Graphics::Window_t*     s_GrWindow      = nullptr;
 	static GW2::ArcdpsApi*         s_ArcApi        = nullptr;
 
 	static CUiContext*             s_UiContext     = nullptr;
@@ -306,55 +306,55 @@ namespace ADDONAPI
 
 	namespace TextureLoader
 	{
-		Texture_t* Get(const char* aIdentifier)
+		Graphics::Texture_t* Get(const char* aIdentifier)
 		{
 			assert(s_TextureApi);
 			return s_TextureApi->Get(aIdentifier);
 		}
 
-		Texture_t* GetOrCreateFromFile(const char* aIdentifier, const char* aFilename)
+		Graphics::Texture_t* GetOrCreateFromFile(const char* aIdentifier, const char* aFilename)
 		{
 			assert(s_TextureApi);
 			return s_TextureApi->GetOrCreate(aIdentifier, aFilename);
 		}
 
-		Texture_t* GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule)
+		Graphics::Texture_t* GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule)
 		{
 			assert(s_TextureApi);
 			return s_TextureApi->GetOrCreate(aIdentifier, aResourceID, aModule);;
 		}
 
-		Texture_t* GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint)
+		Graphics::Texture_t* GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint)
 		{
 			assert(s_TextureApi);
 			return s_TextureApi->GetOrCreate(aIdentifier, aRemote, aEndpoint);
 		}
 
-		Texture_t* GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize)
+		Graphics::Texture_t* GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize)
 		{
 			assert(s_TextureApi);
 			return s_TextureApi->GetOrCreate(aIdentifier, aData, aSize);
 		}
 
-		void LoadFromFile(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback)
+		void LoadFromFile(const char* aIdentifier, const char* aFilename, Graphics::TEXTURES_RECEIVECALLBACK aCallback)
 		{
 			assert(s_TextureApi);
 			s_TextureApi->Load(aIdentifier, aFilename, aCallback, true);
 		}
 
-		void LoadFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback)
+		void LoadFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, Graphics::TEXTURES_RECEIVECALLBACK aCallback)
 		{
 			assert(s_TextureApi);
 			s_TextureApi->Load(aIdentifier, aResourceID, aModule, aCallback, true);
 		}
 
-		void LoadFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback)
+		void LoadFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint, Graphics::TEXTURES_RECEIVECALLBACK aCallback)
 		{
 			assert(s_TextureApi);
 			s_TextureApi->Load(aIdentifier, aRemote, aEndpoint, aCallback, true);
 		}
 
-		void LoadFromMemory(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback)
+		void LoadFromMemory(const char* aIdentifier, void* aData, size_t aSize, Graphics::TEXTURES_RECEIVECALLBACK aCallback)
 		{
 			assert(s_TextureApi);
 			s_TextureApi->Load(aIdentifier, aData, aSize, aCallback, true);
@@ -566,9 +566,9 @@ namespace ADDONAPI
 			s_InputBindApi  = ctx.GetInputBindApi();
 			s_RawInputApi   = &ctx.Platform().RawInput();
 			s_Logger        = ctx.GetLogger();
-			s_TextureApi    = ctx.GetTextureService();
+			s_TextureApi    = &ctx.Graphics().Textures();
 			s_Loader        = &ctx.Host().Loader();
-			s_RenderCtx     = ctx.GetRendererCtx();
+			s_GrWindow      = &ctx.Graphics().Window();
 			s_ArcApi        = &ctx.Game().Arcdps();
 
 			s_UiContext     = ctx.GetUIContext();
@@ -588,7 +588,7 @@ namespace ADDONAPI
 			{
 				AddonAPI1_t* api = new AddonAPI1_t();
 				
-				api->SwapChain = s_RenderCtx->SwapChain;
+				api->SwapChain = s_GrWindow->SwapChain;
 				api->ImguiContext = aSetImGuiContext ? ImGui::GetCurrentContext() : nullptr;
 				api->ImguiMalloc = aSetImGuiContext ? ImGui::MemAlloc : nullptr;
 				api->ImguiFree = aSetImGuiContext ? ImGui::MemFree : nullptr;
@@ -636,7 +636,7 @@ namespace ADDONAPI
 			{
 				AddonAPI2_t* api = new AddonAPI2_t();
 
-				api->SwapChain = s_RenderCtx->SwapChain;
+				api->SwapChain = s_GrWindow->SwapChain;
 				api->ImguiContext = aSetImGuiContext ? ImGui::GetCurrentContext() : nullptr;
 				api->ImguiMalloc = aSetImGuiContext ? ImGui::MemAlloc : nullptr;
 				api->ImguiFree = aSetImGuiContext ? ImGui::MemFree : nullptr;
@@ -695,7 +695,7 @@ namespace ADDONAPI
 			{
 				AddonAPI3_t* api = new AddonAPI3_t();
 
-				api->SwapChain = s_RenderCtx->SwapChain;
+				api->SwapChain = s_GrWindow->SwapChain;
 				api->ImguiContext = aSetImGuiContext ? ImGui::GetCurrentContext() : nullptr;
 				api->ImguiMalloc = aSetImGuiContext ? ImGui::MemAlloc : nullptr;
 				api->ImguiFree = aSetImGuiContext ? ImGui::MemFree : nullptr;
@@ -758,7 +758,7 @@ namespace ADDONAPI
 			{
 				AddonAPI4_t* api = new AddonAPI4_t();
 
-				api->SwapChain = s_RenderCtx->SwapChain;
+				api->SwapChain = s_GrWindow->SwapChain;
 				api->ImguiContext = aSetImGuiContext ? ImGui::GetCurrentContext() : nullptr;
 				api->ImguiMalloc = aSetImGuiContext ? ImGui::MemAlloc : nullptr;
 				api->ImguiFree = aSetImGuiContext ? ImGui::MemFree : nullptr;
@@ -829,7 +829,7 @@ namespace ADDONAPI
 			{
 				AddonAPI5_t* api = new AddonAPI5_t();
 
-				api->SwapChain = s_RenderCtx->SwapChain;
+				api->SwapChain = s_GrWindow->SwapChain;
 				api->ImguiContext = aSetImGuiContext ? ImGui::GetCurrentContext() : nullptr;
 				api->ImguiMalloc = aSetImGuiContext ? ImGui::MemAlloc : nullptr;
 				api->ImguiFree = aSetImGuiContext ? ImGui::MemFree : nullptr;
@@ -902,7 +902,7 @@ namespace ADDONAPI
 			{
 				AddonAPI6_t* api = new AddonAPI6_t();
 
-				api->SwapChain = s_RenderCtx->SwapChain;
+				api->SwapChain = s_GrWindow->SwapChain;
 				api->ImguiContext = aSetImGuiContext ? ImGui::GetCurrentContext() : nullptr;
 				api->ImguiMalloc = aSetImGuiContext ? ImGui::MemAlloc : nullptr;
 				api->ImguiFree = aSetImGuiContext ? ImGui::MemFree : nullptr;

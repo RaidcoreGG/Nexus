@@ -9,7 +9,9 @@
 #pragma once
 
 #include "UI/Controls/CtlSubWindow.h"
-#include "UI/Textures/TxTexture.h"
+#include "Graphics/Textures/TxTexture.h"
+
+using namespace Raidcore::Nexus;
 
 class CAboutBox : public ISubWindow
 {
@@ -18,6 +20,6 @@ class CAboutBox : public ISubWindow
 	void RenderContent() override;
 
 	private:
-	Texture_t* Tex_BannerDiscord = nullptr;
-	Texture_t* Tex_BannerPatreon = nullptr;
+	Graphics::Texture_t* Tex_BannerDiscord = nullptr;
+	Graphics::Texture_t* Tex_BannerPatreon = nullptr;
 };

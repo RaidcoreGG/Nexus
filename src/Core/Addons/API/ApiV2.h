@@ -22,7 +22,7 @@
 #include "Engine/Logging/LogFuncDefs.h"
 #include "Platform/RawInput/RiFuncDefs.h"
 #include "UI/Services/Localization/LoclFuncDefs.h"
-#include "UI/Textures/TxFuncDefs.h"
+#include "Graphics/Textures/TxFuncDefs.h"
 #include "UI/UiFuncDefs.h"
 #include "UI/Widgets/QuickAccess/QaFuncDefs.h"
 
@@ -76,15 +76,15 @@ struct AddonAPI2_t : AddonAPI_t
 	DATALINK_SHARERESOURCE           ShareResource;
 
 	/* Textures */
-	TEXTURES_GET                     GetTexture;
-	TEXTURES_GETORCREATEFROMFILE     GetTextureOrCreateFromFile;
-	TEXTURES_GETORCREATEFROMRESOURCE GetTextureOrCreateFromResource;
-	TEXTURES_GETORCREATEFROMURL      GetTextureOrCreateFromURL;
-	TEXTURES_GETORCREATEFROMMEMORY   GetTextureOrCreateFromMemory;
-	TEXTURES_LOADFROMFILE            LoadTextureFromFile;
-	TEXTURES_LOADFROMRESOURCE        LoadTextureFromResource;
-	TEXTURES_LOADFROMURL             LoadTextureFromURL;
-	TEXTURES_LOADFROMMEMORY          LoadTextureFromMemory;
+	Graphics::TEXTURES_GET                     GetTexture;
+	Graphics::TEXTURES_GETORCREATEFROMFILE     GetTextureOrCreateFromFile;
+	Graphics::TEXTURES_GETORCREATEFROMRESOURCE GetTextureOrCreateFromResource;
+	Graphics::TEXTURES_GETORCREATEFROMURL      GetTextureOrCreateFromURL;
+	Graphics::TEXTURES_GETORCREATEFROMMEMORY   GetTextureOrCreateFromMemory;
+	Graphics::TEXTURES_LOADFROMFILE            LoadTextureFromFile;
+	Graphics::TEXTURES_LOADFROMRESOURCE        LoadTextureFromResource;
+	Graphics::TEXTURES_LOADFROMURL             LoadTextureFromURL;
+	Graphics::TEXTURES_LOADFROMMEMORY          LoadTextureFromMemory;
 
 	/* Shortcuts */
 	QUICKACCESS_ADDSHORTCUT          AddShortcut;

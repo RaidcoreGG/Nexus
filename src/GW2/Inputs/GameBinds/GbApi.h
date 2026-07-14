@@ -18,7 +18,7 @@
 #include "Engine/Inputs/InputBinds/IbBindV2.h"
 #include "Engine/Logging/LogApi.h"
 #include "Platform/RawInput/RiApi.h"
-#include "UI/Renderer/RdrContext.h"
+#include "Graphics/GrContext.h"
 
 using namespace Raidcore::Nexus;
 
@@ -63,7 +63,7 @@ namespace Raidcore::Nexus::GW2
 			Platform::RawInputApi& aRawInputApi,
 			CLogApi& aLogger,
 			Host::EventApi& aEventApi,
-			RenderContext_t& aRenderContext,
+			HWND aGameWindow,
 			std::filesystem::path   aConfigPath
 		);
 		///----------------------------------------------------------------------------------------------------
@@ -156,7 +156,7 @@ namespace Raidcore::Nexus::GW2
 		Platform::RawInputApi& RawInputApi;
 		CLogApi& Logger;
 		Host::EventApi& EventApi;
-		RenderContext_t& RenderContext;
+		HWND GameWindow;
 
 		std::filesystem::path                            ConfigPath;
 

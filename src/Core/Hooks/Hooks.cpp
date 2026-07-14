@@ -32,8 +32,8 @@ using namespace Raidcore::Nexus;
 #include "GW2/Inputs/MouseResetFix.h"
 #include "HkConst.h"
 #include "HkFuncDefs.h"
-#include "UI/Renderer/RdrContext.h"
-#include "UI/Textures/TxLoader.h"
+#include "Graphics/GrContext.h"
+#include "Graphics/Textures/TxLoader.h"
 #include "UI/UiContext.h"
 #include "Util/CmdLine.h"
 
@@ -218,30 +218,30 @@ namespace Hooks
 		void Present_Internal(IDXGISwapChain* aSwapChain)
 		{
 			static Runtime& s_Context = Runtime::Get();
-			static RenderContext_t* s_RenderCtx = s_Context.GetRendererCtx();
-			static CTextureLoader* s_TextureLoader = s_Context.GetTextureService();
+			static Graphics::Metrics_t s_GrMetrics = s_Context.Graphics().Metrics();
+			static Graphics::Window_t& s_GrWindow = s_Context.Graphics().Window();
+			static Graphics::TextureLoader& s_TextureLoader = s_Context.Graphics().Textures();
 			static CUiContext* s_UIContext = s_Context.GetUIContext();
 			static Host::Loader& s_Loader = s_Context.Host().Loader();
 
 			/* Increment count at the beginning of the frame. */
-			s_RenderCtx->Metrics.FrameCount++;
+			s_GrMetrics.FrameCount++;
 
 			/* The swap chain we used to hook is different than the one the game created.
 			 * To be precise, we should have no swapchain at all right now. */
-			if (s_RenderCtx->SwapChain != aSwapChain)
+			if (s_GrWindow.SwapChain != aSwapChain)
 			{
-				s_RenderCtx->SwapChain = aSwapChain;
+				s_GrWindow.SwapChain = aSwapChain;
 
 				DXGI_SWAP_CHAIN_DESC swapChainDesc{};
-				s_RenderCtx->SwapChain->GetDesc(&swapChainDesc);
+				s_GrWindow.SwapChain->GetDesc(&swapChainDesc);
 
-				s_RenderCtx->Window.Handle = swapChainDesc.OutputWindow;
-				Target::WndProc = (WNDPROC)SetWindowLongPtr(s_RenderCtx->Window.Handle, GWLP_WNDPROC, (LONG_PTR)Detour::WndProc);
+				Target::WndProc = (WNDPROC)SetWindowLongPtr(swapChainDesc.OutputWindow, GWLP_WNDPROC, (LONG_PTR)Detour::WndProc);
 
-				s_Loader.InitDirectoryUpdates(s_RenderCtx->Window.Handle);
+				s_Loader.InitDirectoryUpdates(swapChainDesc.OutputWindow);
 			}
 
-			s_TextureLoader->Advance();
+			s_TextureLoader.Advance();
 
 			s_UIContext->Render();
 		}
@@ -263,14 +263,14 @@ namespace Hooks
 			static Runtime& s_Context = Runtime::Get();
 			static CDataLinkApi* s_DataLink = s_Context.GetDataLink();
 			static Host::EventApi& s_EventApi = s_Context.Host().Events();
-			static RenderContext_t* s_RenderCtx = s_Context.GetRendererCtx();
+			static Graphics::Window_t& s_GrWindow = s_Context.Graphics().Window();
 			static CUiContext* s_UIContext = s_Context.GetUIContext();
 
 			s_UIContext->Shutdown();
 
 			/* Cache window dimensions */
-			s_RenderCtx->Window.Width = aWidth;
-			s_RenderCtx->Window.Height = aHeight;
+			s_GrWindow.Width = aWidth;
+			s_GrWindow.Height = aHeight;
 			
 			NexusLinkData_t* nexuslink = (NexusLinkData_t*)s_DataLink->GetResource(DL_NEXUS_LINK);
 

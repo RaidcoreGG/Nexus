@@ -19,8 +19,8 @@
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Host/Loader/Loader.h"
 #include "UI/Services/Localization/LoclApi.h"
-#include "UI/Textures/TxLoader.h"
-#include "UI/Textures/TxTexture.h"
+#include "Graphics/Textures/TxLoader.h"
+#include "Graphics/Textures/TxTexture.h"
 #include "UI/UiFuncDefs.h"
 
 ///----------------------------------------------------------------------------------------------------
@@ -126,7 +126,7 @@ class CShortcutIcon : public virtual IRefCleaner
 	std::string                          ID             = "";
 
 	CInputBindApi*                       InputBindApi   = nullptr;
-	CTextureLoader*                      TextureService = nullptr;
+	Graphics::TextureLoader*                      TextureService = nullptr;
 	Host::Loader*                       Loader         = nullptr;
 	CDataLinkApi*                        DataLink       = nullptr;
 	CLocalization*                       Language       = nullptr;
@@ -136,9 +136,9 @@ class CShortcutIcon : public virtual IRefCleaner
 	bool                                 IsSuppressed   = false;
 
 	std::string                          IconID         = "";
-	Texture_t*                           Icon           = nullptr;
+	Graphics::Texture_t*                           Icon           = nullptr;
 	std::string                          IconHoverID    = "";
-	Texture_t*                           IconHover      = nullptr;
+	Graphics::Texture_t*                           IconHover      = nullptr;
 
 	std::string                          InputBindID    = "";
 	std::string                          IBText         = "";
@@ -166,13 +166,13 @@ class CShortcutIcon : public virtual IRefCleaner
 		COUNT
 	};
 
-	Texture_t* Textures[ETexIdx::COUNT] = {};
+	Graphics::Texture_t* Textures[ETexIdx::COUNT] = {};
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetNotificationTexture:
 	/// 	Returns the texture for the specified amount of notifications.
 	///----------------------------------------------------------------------------------------------------
-	Texture_t* GetNotificationTexture(uint32_t aAmount);
+	Graphics::Texture_t* GetNotificationTexture(uint32_t aAmount);
 
 	///----------------------------------------------------------------------------------------------------
 	/// RenderContextMenu:

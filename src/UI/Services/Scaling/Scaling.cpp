@@ -8,11 +8,21 @@
 
 #include "Scaling.h"
 
+#include <windows.h>
+#include <cassert>
+
 #include "imgui/imgui.h"
 
 #include "Core/Hooks/HkConst.h"
 #include "Core/Preferences/PrefConst.h"
 #include "GW2/Mumble/MblConst.h"
+#include "Core/NexusLink.h"
+#include "Core/Preferences/PrefContext.h"
+#include "Engine/DataLink/DlApi.h"
+#include "Graphics/GrWindow.h"
+#include "GW2/Mumble/MblReader.h"
+#include "Host/Events/EvtApi.h"
+#include "Mumble/Mumble.h"
 
 using namespace Raidcore::Nexus;
 
@@ -30,13 +40,13 @@ static CScaling* s_Scaling{};
 	s_Scaling->UpdateResolution();
 }
 
-CScaling::CScaling(RenderContext_t* aRenderCtx, CDataLinkApi* aDataLink, Host::EventApi* aEventApi, CSettings* aSettings)
+CScaling::CScaling(HWND aGameWindow, Graphics::Window_t& aGrWindow, CDataLinkApi* aDataLink, Host::EventApi& aEventApi, CSettings* aSettings)
+	: GameWindow(aGameWindow)
+	, GrWindow(aGrWindow)
+	, DataLink(aDataLink)
+	, EventApi(aEventApi)
+	, Settings(aSettings)
 {
-	this->RenderContext = aRenderCtx;
-	this->DataLink      = aDataLink;
-	this->EventApi      = aEventApi;
-	this->Settings      = aSettings;
-
 	this->MumbleIdentity = static_cast<Mumble::Identity*>(this->DataLink->GetResource(DL_MUMBLE_LINK_IDENTITY));
 	this->NexusLink      = static_cast<NexusLinkData_t*>(this->DataLink->GetResource(DL_NEXUS_LINK));
 
@@ -52,8 +62,8 @@ CScaling::CScaling(RenderContext_t* aRenderCtx, CDataLinkApi* aDataLink, Host::E
 		this->UpdateDPI();
 	});
 
-	this->EventApi->Subscribe(EV_MUMBLE_IDENTITY_UPDATED, CScaling::OnMumbleIdentityChanged);
-	this->EventApi->Subscribe(EV_WINDOW_RESIZED, CScaling::OnWindowResized);
+	this->EventApi.Subscribe(EV_MUMBLE_IDENTITY_UPDATED, CScaling::OnMumbleIdentityChanged);
+	this->EventApi.Subscribe(EV_WINDOW_RESIZED, CScaling::OnWindowResized);
 
 	if (s_Scaling)
 	{
@@ -65,8 +75,8 @@ CScaling::CScaling(RenderContext_t* aRenderCtx, CDataLinkApi* aDataLink, Host::E
 
 CScaling::~CScaling()
 {
-	this->EventApi->Unsubscribe(EV_MUMBLE_IDENTITY_UPDATED, CScaling::OnMumbleIdentityChanged);
-	this->EventApi->Unsubscribe(EV_WINDOW_RESIZED, CScaling::OnWindowResized);
+	this->EventApi.Unsubscribe(EV_MUMBLE_IDENTITY_UPDATED, CScaling::OnMumbleIdentityChanged);
+	this->EventApi.Unsubscribe(EV_WINDOW_RESIZED, CScaling::OnWindowResized);
 }
 
 UINT CScaling::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -81,7 +91,7 @@ UINT CScaling::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void CScaling::UpdateDPI()
 {
-	UINT dpi = GetDpiForWindow(this->RenderContext->Window.Handle);
+	UINT dpi = GetDpiForWindow(this->GameWindow);
 
 	if (dpi > 0)
 	{
@@ -129,8 +139,8 @@ void CScaling::UpdateResolution()
 	/// If the window size is >= 1024x768, the scaling factor is 1.
 	this->MinResolutionScalingFactor =
 		min(
-			min(this->RenderContext->Window.Width, 1024.0f) / 1024.0f,
-			min(this->RenderContext->Window.Height, 768.0f) / 768.0f
+			min(this->GrWindow.Width, 1024.0f) / 1024.0f,
+			min(this->GrWindow.Height, 768.0f) / 768.0f
 		);
 
 	this->UpdateScaling();

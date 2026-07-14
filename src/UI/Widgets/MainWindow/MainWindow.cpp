@@ -315,7 +315,7 @@ void CMainWindow::Render()
 
 				ImGui::TooltipGeneric(langApi->Translate(window->GetDisplayName().c_str()));
 
-				const Texture_t* icon = window->GetIcon();
+				const Graphics::Texture_t* icon = window->GetIcon();
 				if (icon)
 				{
 					ImGui::SetCursorPos(ImVec2(navX, navY));
@@ -366,7 +366,7 @@ void CMainWindow::Render()
 			}
 			else
 			{
-				this->Tex_RaidcoreTag = ctx.GetTextureService()->GetOrCreate("RAIDCORE_TAG", RES_ICON_RAIDCORE, ctx.Platform().Module());
+				this->Tex_RaidcoreTag = ctx.Graphics().Textures().GetOrCreate("RAIDCORE_TAG", RES_ICON_RAIDCORE, ctx.Platform().Module());
 			}
 
 			if (this->Tex_CloseIcon)
@@ -384,7 +384,7 @@ void CMainWindow::Render()
 			}
 			else
 			{
-				this->Tex_CloseIcon = ctx.GetTextureService()->GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx.Platform().Module());
+				this->Tex_CloseIcon = ctx.Graphics().Textures().GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx.Platform().Module());
 			}
 		}
 		this->IsHandleHeld = ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows);

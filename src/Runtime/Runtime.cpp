@@ -56,8 +56,8 @@ namespace Clockwork = Raidcore::Clockwork;
 #include "Host/Loader/Loader.h"
 #include "Engine/Logging/LogEnum.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
-#include "UI/Renderer/RdrContext.h"
-#include "UI/Textures/TxLoader.h"
+#include "Graphics/GrContext.h"
+#include "Graphics/Textures/TxLoader.h"
 #include "GW2/Gw2Context.h"
 #include "Platform/PlContext.h"
 #include "Proxy/PxyEnum.h"
@@ -171,19 +171,19 @@ namespace Raidcore::Nexus
 		Runtime& ctx = Runtime::Get();
 		CLogApi* logger = ctx.GetLogger();
 		CUiContext* uictx = ctx.GetUIContext();
-		CTextureLoader* texapi = ctx.GetTextureService();
+		Graphics::TextureLoader& texapi = ctx.Graphics().Textures();
 
 		logger->Critical(CH_CORE, "SHUTDOWN BEGIN | %s", reasonStr.c_str());
 		MH_Uninitialize();
 		uictx->Shutdown();
-		texapi->Shutdown();
+		texapi.Shutdown();
 		logger->Info(CH_CORE, "SHUTDOWN END");
 
 		/* If we have the window handle and we have an original (target) wndproc. */
-		if (ctx.GetRendererCtx()->Window.Handle && Hooks::Target::WndProc)
+		if (ctx.Platform().Window() && Hooks::Target::WndProc)
 		{
 			/* Reset wndproc back to the original target. */
-			SetWindowLongPtr(ctx.GetRendererCtx()->Window.Handle, GWLP_WNDPROC, (LONG_PTR)Hooks::Target::WndProc);
+			SetWindowLongPtr(ctx.Platform().Window(), GWLP_WNDPROC, (LONG_PTR)Hooks::Target::WndProc);
 		}
 
 		/* Let the OS take care of freeing the handles. Ugly, but otherwise crashes due to the addon clownfiesta in GW2. */
@@ -222,31 +222,20 @@ namespace Raidcore::Nexus
 		return *this->_HostContext;
 	}
 
+	Graphics::Context& Runtime::Graphics()
+	{
+		return *this->_GraphicsContext;
+	}
+
 	GW2::Context& Runtime::Game()
 	{
 		return *this->_GameContext;
-	}
-
-	RenderContext_t* Runtime::GetRendererCtx()
-	{
-		static RenderContext_t s_RendererCtx = RenderContext_t();
-		return &s_RendererCtx;
 	}
 
 	CLogApi* Runtime::GetLogger()
 	{
 		static CLogApi s_Logger = CLogApi();
 		return &s_Logger;
-	}
-
-	CTextureLoader* Runtime::GetTextureService()
-	{
-		static CTextureLoader s_TextureApi = CTextureLoader(
-			this->GetLogger(),
-			this->GetRendererCtx(),
-			Index(EPath::DIR_TEXTURES)
-		);
-		return &s_TextureApi;
 	}
 
 	CDataLinkApi* Runtime::GetDataLink()
@@ -270,13 +259,13 @@ namespace Raidcore::Nexus
 	CUiContext* Runtime::GetUIContext()
 	{
 		static CUiContext s_UiContext = CUiContext(
-			this->GetRendererCtx(),
+			this->Graphics().Window(),
 			this->GetLogger(),
-			this->GetTextureService(),
+			this->Graphics().Textures(),
 			this->GetDataLink(),
 			this->GetInputBindApi(),
-			&this->Host().Events(),
-			&this->Game().Mumble()
+			this->Host().Events(),
+			this->Game().Mumble()
 		);
 		return &s_UiContext;
 	}
@@ -360,12 +349,17 @@ namespace Raidcore::Nexus
 			Index(EPath::AddonConfigDefault)
 		);
 
+		this->_GraphicsContext = std::make_unique<Graphics::Context>(
+			*this->GetLogger(),
+			Index(EPath::DIR_TEXTURES)
+		);
+
 		this->_GameContext = std::make_unique<GW2::Context>(
 			*this->GetDataLink(),
 			this->Host().Events(),
 			*this->GetLogger(),
 			this->Platform().RawInput(),
-			*this->GetRendererCtx(),
+			this->Platform().Window(),
 			*this->GetHttpClient("http://assetcdn.101.arenanetworks.com", /*disablecache=*/ true),
 			Index(EPath::GameBinds)
 		);

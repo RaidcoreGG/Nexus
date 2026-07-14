@@ -30,10 +30,10 @@ bool IModal::Render()
 		| ImGuiWindowFlags_NoMove
 		| ImGuiWindowFlags_NoSavedSettings;
 
-	RenderContext_t* renderctx = Runtime::Get().GetRendererCtx();
+	Graphics::Window_t& grWindow = Runtime::Get().Graphics().Window();
 
 	/* Center the modal. */
-	ImVec2 center(renderctx->Window.Width * 0.5f, renderctx->Window.Height * 0.5f);
+	ImVec2 center(grWindow.Width * 0.5f, grWindow.Height * 0.5f);
 	ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
 
 	float minWidthTitle = (ImGui::GetStyle().WindowPadding.x * 2) + ImGui::CalcTextSize(this->GetDisplayName().c_str()).x;

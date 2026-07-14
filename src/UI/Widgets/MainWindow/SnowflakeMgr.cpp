@@ -71,7 +71,7 @@ void CSnowflakeMgr::Update()
 	if (!(this->IsItChristmas || this->IsItHalloween)) { return; }
 
 	static Runtime& ctx = Runtime::Get();
-	static CTextureLoader* texapi = ctx.GetTextureService();
+	static Graphics::TextureLoader* texapi = &ctx.Graphics().Textures();
 
 	ImGuiContext* imctx = ImGui::GetCurrentContext();
 
@@ -93,11 +93,11 @@ void CSnowflakeMgr::Update()
 
 		while (snowflakes.size() < amtSnowflakes)
 		{
-			Texture_t* tex = nullptr;
+			Graphics::Texture_t* tex = nullptr;
 
 			if (this->IsItChristmas)
 			{
-				static Texture_t* texSnowflake = nullptr;
+				static Graphics::Texture_t* texSnowflake = nullptr;
 
 				if (!texSnowflake)
 				{
@@ -109,7 +109,7 @@ void CSnowflakeMgr::Update()
 			}
 			else if (this->IsItHalloween)
 			{
-				static Texture_t* texLeaves[3];
+				static Graphics::Texture_t* texLeaves[3];
 
 				if (!(texLeaves[0] && texLeaves[1] && texLeaves[2]))
 				{

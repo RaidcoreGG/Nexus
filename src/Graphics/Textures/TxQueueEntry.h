@@ -12,16 +12,22 @@
 #include "TxFuncDefs.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// QueuedTexture_t Struct
+/// Raidcore::Nexus::Graphics Namespace
 ///----------------------------------------------------------------------------------------------------
-struct QueuedTexture_t
+namespace Raidcore::Nexus::Graphics
 {
-	ETextureStage            Stage;
-	long long                Time;
+	///----------------------------------------------------------------------------------------------------
+	/// QueuedTexture_t Struct
+	///----------------------------------------------------------------------------------------------------
+	struct QueuedTexture_t
+	{
+		ETextureStage            Stage;
+		long long                Time;
 
-	unsigned                 Width;
-	unsigned                 Height;
-	unsigned char*           Data;
-	std::string              DownloadURL;
-	TEXTURES_RECEIVECALLBACK Callback;
-};
+		unsigned                 Width;
+		unsigned                 Height;
+		unsigned char* Data;
+		std::string              DownloadURL;
+		TEXTURES_RECEIVECALLBACK Callback;
+	};
+}

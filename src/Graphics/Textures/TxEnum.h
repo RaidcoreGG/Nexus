@@ -1,8 +1,8 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  RdrMetrics.h
-/// Description  :  Definition for the renderer metrics.
+/// Name         :  TxEnum.h
+/// Description  :  Enumerations for textures.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
@@ -11,9 +11,19 @@
 #include <cstdint>
 
 ///----------------------------------------------------------------------------------------------------
-/// RenderMetrics_t Struct
+/// Raidcore::Nexus::Graphics Namespace
 ///----------------------------------------------------------------------------------------------------
-struct RenderMetrics_t
+namespace Raidcore::Nexus::Graphics
 {
-	uint64_t FrameCount = 0;
-};
+	///----------------------------------------------------------------------------------------------------
+	/// ETextureStage Enumeration
+	///----------------------------------------------------------------------------------------------------
+	enum class ETextureStage : uint32_t
+	{
+		None = 0,
+		Prepare = 1,
+		Ready = 2,
+		Done = 3,
+		INVALID = UINT32_MAX
+	};
+}

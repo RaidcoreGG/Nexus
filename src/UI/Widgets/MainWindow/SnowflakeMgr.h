@@ -13,14 +13,16 @@
 
 #include "imgui/imgui.h"
 
-#include "UI/Textures/TxTexture.h"
+#include "Graphics/Textures/TxTexture.h"
+
+using namespace Raidcore::Nexus;
 
 ///----------------------------------------------------------------------------------------------------
 /// Snowflake_t Struct
 ///----------------------------------------------------------------------------------------------------
 struct Snowflake_t
 {
-	Texture_t* Texture_t;
+	Graphics::Texture_t* Texture_t;
 	float    Size;
 	float    X;
 	float    Y;

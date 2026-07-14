@@ -20,7 +20,7 @@
 #include "GW2/BuildInfo/BuildInfoService.h"
 #include "GW2/Inputs/GameBinds/GbApi.h"
 #include "GW2/Mumble/MblReader.h"
-#include "UI/Renderer/RdrContext.h"
+#include "Graphics/GrContext.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::GW2 Namespace
@@ -40,10 +40,10 @@ namespace Raidcore::Nexus::GW2
 		///----------------------------------------------------------------------------------------------------
 		Context(
 			CDataLinkApi&          aDataLink,
-			Host::EventApi&       aEventApi,
+			Host::EventApi&        aEventApi,
 			CLogApi&               aLogger,
 			Platform::RawInputApi& aRawInputApi,
-			RenderContext_t&       aRendererCtx,
+			HWND                   aGameWindow,
 			CHttpClient&           aArenaNetAssetCDN,
 			std::filesystem::path  aGameBindsPath
 		);
@@ -87,10 +87,10 @@ namespace Raidcore::Nexus::GW2
 		private:
 		/* Dependencies */
 		CDataLinkApi&          _DataLink;
-		Host::EventApi&       _EventApi;
+		Host::EventApi&        _EventApi;
 		CLogApi&               _Logger;
 		Platform::RawInputApi& _RawInputApi;
-		RenderContext_t&       _RendererCtx;
+		HWND                   _GameWindow;
 		CHttpClient&           _ArenaNetAssetCDN;
 
 		std::filesystem::path _GameBindsPath;

@@ -21,7 +21,7 @@
 #include "Engine/Inputs/InputBinds/IbFuncDefs.h"
 #include "Engine/Logging/LogFuncDefs.h"
 #include "Platform/RawInput/RiFuncDefs.h"
-#include "UI/Textures/TxFuncDefs.h"
+#include "Graphics/Textures/TxFuncDefs.h"
 #include "UI/UiFuncDefs.h"
 #include "UI/Widgets/QuickAccess/QaFuncDefs.h"
 
@@ -73,10 +73,10 @@ struct AddonAPI1_t : AddonAPI_t
 	DATALINK_SHARERESOURCE        ShareResource;
 
 	/* Textures */
-	TEXTURES_GET                  GetTexture;
-	TEXTURES_LOADFROMFILE         LoadTextureFromFile;
-	TEXTURES_LOADFROMRESOURCE     LoadTextureFromResource;
-	TEXTURES_LOADFROMURL          LoadTextureFromURL;
+	Graphics::TEXTURES_GET                  GetTexture;
+	Graphics::TEXTURES_LOADFROMFILE         LoadTextureFromFile;
+	Graphics::TEXTURES_LOADFROMRESOURCE     LoadTextureFromResource;
+	Graphics::TEXTURES_LOADFROMURL          LoadTextureFromURL;
 
 	/* Shortcuts */
 	QUICKACCESS_ADDSHORTCUT       AddShortcut;
