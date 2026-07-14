@@ -41,7 +41,7 @@ namespace Raidcore::Nexus::Host
 		{
 			std::string endpoint = URL::GetEndpoint(url);
 
-			HttpResponse_t result = client->Get(endpoint);
+			Network::HttpResponse_t result = client->Get(endpoint);
 
 			if (!result.Success())
 			{
@@ -130,9 +130,9 @@ namespace Raidcore::Nexus::Host
 
 		if (String::Contains(downloadUrl, "https://github.com"))
 		{
-			CHttpClient* ghapiclient = Runtime::Get().GetHttpClient("https://api.github.com");
+			Network::CHttpClient* ghapiclient = Runtime::Get().GetHttpClient("https://api.github.com");
 
-			HttpResponse_t result = ghapiclient->Get("/repos" + URL::GetEndpoint(downloadUrl) + "/releases/latest");
+			Network::HttpResponse_t result = ghapiclient->Get("/repos" + URL::GetEndpoint(downloadUrl) + "/releases/latest");
 
 			if (!result.Success())
 			{
@@ -208,11 +208,11 @@ namespace Raidcore::Nexus::Host
 			filename = String::Normalize(addon.Name) + ".dll";
 		}
 
-		CHttpClient client = CHttpClient(this->Logger, downloadUrl);
+		Network::CHttpClient client = Network::CHttpClient(this->Logger, downloadUrl);
 
 		std::string endpoint = URL::GetEndpoint(downloadUrl);
 
-		HttpResponse_t result = client.Download(tmpPath, endpoint);
+		Network::HttpResponse_t result = client.Download(tmpPath, endpoint);
 
 		if (!result.Success())
 		{

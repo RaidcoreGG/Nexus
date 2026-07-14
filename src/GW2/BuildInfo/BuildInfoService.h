@@ -12,7 +12,7 @@
 #include <mutex>
 
 #include "Engine/Logging/LogApi.h"
-#include "Engine/Networking/WebRequests/WreClient.h"
+#include "Network/WebRequests/WreClient.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::GW2 Namespace
@@ -29,8 +29,8 @@ namespace Raidcore::Nexus::GW2
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
 		BuildInfoService(
-			CHttpClient& aArenaNetAssetCDN,
-			CLogApi& aLogger
+			Network::CHttpClient& aArenaNetAssetCDN,
+			CLogApi&              aLogger
 		);
 
 		///----------------------------------------------------------------------------------------------------
@@ -40,10 +40,10 @@ namespace Raidcore::Nexus::GW2
 		uint32_t Build();
 
 		private:
-		CHttpClient& _ArenaNetAssetCDN;
-		CLogApi&     _Logger;
+		Network::CHttpClient& _ArenaNetAssetCDN;
+		CLogApi&              _Logger;
 
-		std::mutex Mutex{};
-		uint32_t   _Build{ 0 };
+		std::mutex            Mutex{};
+		uint32_t              _Build{ 0 };
 	};
 }

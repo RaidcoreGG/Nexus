@@ -46,7 +46,7 @@ namespace Clockwork = Raidcore::Clockwork;
 #include "Host/Library/LibManager.h"
 #include "Core/Index/IdxEnum.h"
 #include "Core/Preferences/PrefContext.h"
-#include "Core/Updater/SelfUpdater.h"
+#include "Network/Updater/Updater.h"
 #include "Core/Versioning/Version.h"
 #include "Engine/Clockwork/Tasks/CancellationToken.h"
 #include "Engine/Clockwork/Tasks/ETaskPriority.h"
@@ -55,7 +55,7 @@ namespace Clockwork = Raidcore::Clockwork;
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Host/Loader/Loader.h"
 #include "Engine/Logging/LogEnum.h"
-#include "Engine/Networking/WebRequests/WreClient.h"
+#include "Network/WebRequests/WreClient.h"
 #include "Graphics/GrContext.h"
 #include "Graphics/Textures/TxLoader.h"
 #include "GW2/Gw2Context.h"
@@ -279,7 +279,7 @@ namespace Raidcore::Nexus
 		return &s_SettingsApi;
 	}
 
-	CHttpClient* Runtime::GetHttpClient(std::string aURL, bool aDisableCache)
+	Network::CHttpClient* Runtime::GetHttpClient(std::string aURL, bool aDisableCache)
 	{
 		const std::lock_guard<std::mutex> lock(this->HttpClientMutex);
 
@@ -296,11 +296,11 @@ namespace Raidcore::Nexus
 			return it->second;
 		}
 
-		CHttpClient* client = nullptr;
+		Network::CHttpClient* client = nullptr;
 
 		if (aDisableCache)
 		{
-			client = new CHttpClient(this->GetLogger(), baseurl);
+			client = new Network::CHttpClient(this->GetLogger(), baseurl);
 		}
 		else
 		{
@@ -316,7 +316,7 @@ namespace Raidcore::Nexus
 				cacheLifetime = 60 * 60; // 60 minutes
 			}
 
-			client = new CHttpClient(this->GetLogger(), baseurl, cachedir, cacheLifetime);
+			client = new Network::CHttpClient(this->GetLogger(), baseurl, cachedir, cacheLifetime);
 		}
 
 		this->HttpClients.emplace(baseurl_noprotocol, client);
@@ -324,9 +324,9 @@ namespace Raidcore::Nexus
 		return client;
 	}
 
-	CSelfUpdater* Runtime::GetSelfUpdater()
+	Network::Updater* Runtime::GetSelfUpdater()
 	{
-		static CSelfUpdater s_SelfUpdater = CSelfUpdater(
+		static Network::Updater s_SelfUpdater = Network::Updater(
 			this->GetLogger()
 		);
 		return &s_SelfUpdater;

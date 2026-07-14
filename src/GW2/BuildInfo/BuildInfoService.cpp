@@ -2,7 +2,7 @@
 
 namespace Raidcore::Nexus::GW2
 {
-	BuildInfoService::BuildInfoService(CHttpClient& aArenaNetAssetCDN, CLogApi& aLogger)
+	BuildInfoService::BuildInfoService(Network::CHttpClient& aArenaNetAssetCDN, CLogApi& aLogger)
 		: _ArenaNetAssetCDN(aArenaNetAssetCDN)
 		, _Logger(aLogger)
 	{}
@@ -16,7 +16,7 @@ namespace Raidcore::Nexus::GW2
 			return this->_Build;
 		}
 
-		HttpResponse_t result = this->_ArenaNetAssetCDN.Get("/latest64/101");
+		Network::HttpResponse_t result = this->_ArenaNetAssetCDN.Get("/latest64/101");
 
 		if (!result.Success())
 		{

@@ -1,75 +1,67 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  LibManager.h
-/// Description  :  Manager for available addon libraries.
+/// Name         :  WreCache.h
+/// Description  :  Cache implementation for web requests.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
 #pragma once
 
 #include <mutex>
-#include <string>
-#include <vector>
+#include <filesystem>
+#include <cstdint>
+#include <unordered_map>
 
-#include "Host/Loader/Loader.h"
-#include "Engine/Logging/LogApi.h"
-#include "Network/WebRequests/WreClient.h"
-#include "LibAddon.h"
-
-constexpr const char* CH_LIBRARY = "Library";
+#include "WreResponse.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// Raidcore::Nexus::Host Namespace
+/// Raidcore::Nexus::Network Namespace
 ///----------------------------------------------------------------------------------------------------
-namespace Raidcore::Nexus::Host
+namespace Raidcore::Nexus::Network
 {
 	///----------------------------------------------------------------------------------------------------
-	/// LibraryMgr Class
+	/// CHttpCache Class
 	///----------------------------------------------------------------------------------------------------
-	class LibraryMgr
+	class CHttpCache
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
+		/// 	- aDirectory: Directory which will contain the cached requests.
+		/// 	- aLifetime: Lifetime of a cache entry in seconds.
 		///----------------------------------------------------------------------------------------------------
-		LibraryMgr(CLogApi* aLogger, Loader* aLoader);
+		CHttpCache(std::filesystem::path aDirectory, uint32_t aLifetime);
 
 		///----------------------------------------------------------------------------------------------------
-		/// dtor
+		/// Store:
+		/// 	Stores a web request response on disk and runtime cache, if it was successful.
 		///----------------------------------------------------------------------------------------------------
-		~LibraryMgr();
+		void Store(std::string aQuery, const HttpResponse_t& aResponse);
 
 		///----------------------------------------------------------------------------------------------------
-		/// Update:
-		/// 	Updates the library addon definitions from the available sources.
+		/// Retrieve:
+		/// 	Retrieves a web request response, if it exists and has not expired.
+		/// 	aLifetimeOverride: -1 keep default lifetime. 0 >= use parameter lifetime.
 		///----------------------------------------------------------------------------------------------------
-		void Update();
+		HttpResponse_t* Retrieve(std::string aQuery, int32_t aLifetimeOverride = -1);
 
 		///----------------------------------------------------------------------------------------------------
-		/// AddSource:
-		/// 	Adds a source for library addons definitions.
+		/// Flush:
+		/// 	Flushes the cache. If specified also deletes the cache on disk.
 		///----------------------------------------------------------------------------------------------------
-		void AddSource(std::string aURL);
-
-		///----------------------------------------------------------------------------------------------------
-		/// Install:
-		/// 	Installs the addon.
-		///----------------------------------------------------------------------------------------------------
-		void Install(uint32_t aSignature);
-
-		///----------------------------------------------------------------------------------------------------
-		/// GetLibrary:
-		/// 	Returns a copy of the library.
-		///----------------------------------------------------------------------------------------------------
-		std::vector<LibraryAddon_t> GetLibrary() const;
+		void Flush(bool aCleanupOnDisk = false);
 
 		private:
-		CLogApi* Logger = nullptr;
-		Loader* Loader = nullptr;
+		std::mutex                                      Mutex;
+		std::filesystem::path                           Directory;
+		uint32_t                                        Lifetime = 300;
+		std::unordered_map<std::string, HttpResponse_t> Entries;
 
-		mutable std::mutex                                     Mutex;
-		std::unordered_map<std::string, Network::CHttpClient*> Sources;
-		std::vector<LibraryAddon_t>                            Addons;
+		///----------------------------------------------------------------------------------------------------
+		/// GetCachePath:
+		/// 	Builds the full cache entry path given a query.
+		///----------------------------------------------------------------------------------------------------
+		std::filesystem::path GetCachePath(const std::string& aQuery);
 	};
 }

@@ -15,7 +15,7 @@
 #include "Engine/DataLink/DlApi.h"
 #include "Host/Events/EvtApi.h"
 #include "Engine/Logging/LogApi.h"
-#include "Engine/Networking/WebRequests/WreClient.h"
+#include "Network/WebRequests/WreClient.h"
 #include "GW2/ArcDPS/ArcApi.h"
 #include "GW2/BuildInfo/BuildInfoService.h"
 #include "GW2/Inputs/GameBinds/GbApi.h"
@@ -44,7 +44,7 @@ namespace Raidcore::Nexus::GW2
 			CLogApi&               aLogger,
 			Platform::RawInputApi& aRawInputApi,
 			HWND                   aGameWindow,
-			CHttpClient&           aArenaNetAssetCDN,
+			Network::CHttpClient&  aArenaNetAssetCDN,
 			std::filesystem::path  aGameBindsPath
 		);
 
@@ -91,7 +91,7 @@ namespace Raidcore::Nexus::GW2
 		CLogApi&               _Logger;
 		Platform::RawInputApi& _RawInputApi;
 		HWND                   _GameWindow;
-		CHttpClient&           _ArenaNetAssetCDN;
+		Network::CHttpClient&  _ArenaNetAssetCDN;
 
 		std::filesystem::path _GameBindsPath;
 

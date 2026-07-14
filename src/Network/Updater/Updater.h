@@ -1,75 +1,94 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  LibManager.h
-/// Description  :  Manager for available addon libraries.
+/// Name         :  Updater.h
+/// Description  :  Implementation of the updater.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
 #pragma once
 
-#include <mutex>
+#include <thread>
 #include <string>
-#include <vector>
+#include <windows.h>
 
-#include "Host/Loader/Loader.h"
+#include "Core/Versioning/Version.h"
 #include "Engine/Logging/LogApi.h"
-#include "Network/WebRequests/WreClient.h"
-#include "LibAddon.h"
 
-constexpr const char* CH_LIBRARY = "Library";
+constexpr const char* CH_SELFUPDATER = "Updater";
 
 ///----------------------------------------------------------------------------------------------------
-/// Raidcore::Nexus::Host Namespace
+/// Raidcore::Nexus::Network Namespace
 ///----------------------------------------------------------------------------------------------------
-namespace Raidcore::Nexus::Host
+namespace Raidcore::Nexus::Network
 {
 	///----------------------------------------------------------------------------------------------------
-	/// LibraryMgr Class
+	/// Updater Class
 	///----------------------------------------------------------------------------------------------------
-	class LibraryMgr
+	class Updater
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		LibraryMgr(CLogApi* aLogger, Loader* aLoader);
+		Updater(CLogApi* aLogger);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
 		///----------------------------------------------------------------------------------------------------
-		~LibraryMgr();
+		~Updater();
 
 		///----------------------------------------------------------------------------------------------------
-		/// Update:
-		/// 	Updates the library addon definitions from the available sources.
+		/// GetRemoteVersion:
+		/// 	Gets the latest available version.
 		///----------------------------------------------------------------------------------------------------
-		void Update();
+		const Version_t& GetRemoteVersion();
 
 		///----------------------------------------------------------------------------------------------------
-		/// AddSource:
-		/// 	Adds a source for library addons definitions.
+		/// IsUpdateAvailable:
+		/// 	Returns true if current version is outdated.
 		///----------------------------------------------------------------------------------------------------
-		void AddSource(std::string aURL);
+		bool IsUpdateAvailable();
 
 		///----------------------------------------------------------------------------------------------------
-		/// Install:
-		/// 	Installs the addon.
+		/// GetChangelog:
+		/// 	Returns the changelog.
 		///----------------------------------------------------------------------------------------------------
-		void Install(uint32_t aSignature);
-
-		///----------------------------------------------------------------------------------------------------
-		/// GetLibrary:
-		/// 	Returns a copy of the library.
-		///----------------------------------------------------------------------------------------------------
-		std::vector<LibraryAddon_t> GetLibrary() const;
+		const std::string& GetChangelog();
 
 		private:
-		CLogApi* Logger = nullptr;
-		Loader* Loader = nullptr;
+		CLogApi* Logger{};
 
-		mutable std::mutex                                     Mutex;
-		std::unordered_map<std::string, Network::CHttpClient*> Sources;
-		std::vector<LibraryAddon_t>                            Addons;
+		HANDLE                    UpdateMutex{};
+		std::thread               UpdateThread{};
+
+		Version_t RemoteVersion{};
+		std::string               Changelog{};
+
+		///----------------------------------------------------------------------------------------------------
+		/// CreatePatchMutex:
+		/// 	Creates the system-wide mutex that locks the dll file.
+		/// 	Returns true on success, false on failure.
+		/// 	If the creation fails, no patch should be performed.
+		///----------------------------------------------------------------------------------------------------
+		bool CreatePatchMutex();
+
+		///----------------------------------------------------------------------------------------------------
+		/// CleanupUpdateFiles:
+		/// 	Ensures d3d11.dll.old and d3d11.dll.update are usable.
+		///----------------------------------------------------------------------------------------------------
+		void CleanupUpdateFiles();
+
+		///----------------------------------------------------------------------------------------------------
+		/// DownloadUpdate:
+		/// 	Returns true if the update downloaded successfully.
+		///----------------------------------------------------------------------------------------------------
+		bool DownloadUpdate();
+
+		///----------------------------------------------------------------------------------------------------
+		/// Runs:
+		/// 	Checks if an update is available and installs it.
+		///----------------------------------------------------------------------------------------------------
+		void Run();
 	};
 }

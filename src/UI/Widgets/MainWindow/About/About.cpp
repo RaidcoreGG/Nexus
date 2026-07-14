@@ -39,7 +39,7 @@ void CAboutBox::RenderContent()
 
 	Runtime&       ctx         = Runtime::Get();
 	Graphics::TextureLoader& texapi      = ctx.Graphics().Textures();
-	CSelfUpdater*   selfupdater = ctx.GetSelfUpdater();
+	Network::Updater*   selfupdater = ctx.GetSelfUpdater();
 
 	if (ImGui::CollapsingHeader("About", ImGuiTreeNodeFlags_DefaultOpen))
 	{

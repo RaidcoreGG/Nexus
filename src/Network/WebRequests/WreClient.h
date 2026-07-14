@@ -1,75 +1,84 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  LibManager.h
-/// Description  :  Manager for available addon libraries.
+/// Name         :  WreClient.h
+/// Description  :  Provides functions for web requests.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
 #pragma once
 
+#include <cstdint>
+#include <filesystem>
 #include <mutex>
 #include <string>
-#include <vector>
 
-#include "Host/Loader/Loader.h"
+#pragma warning(push, 0)
+#include "httplib/httplib.h"
+#pragma warning(pop)
+
 #include "Engine/Logging/LogApi.h"
-#include "Network/WebRequests/WreClient.h"
-#include "LibAddon.h"
+#include "WreCache.h"
+#include "WreResponse.h"
 
-constexpr const char* CH_LIBRARY = "Library";
+constexpr const char* CH_NETWORKING = "Networking";
 
 ///----------------------------------------------------------------------------------------------------
-/// Raidcore::Nexus::Host Namespace
+/// Raidcore::Nexus::Network Namespace
 ///----------------------------------------------------------------------------------------------------
-namespace Raidcore::Nexus::Host
+namespace Raidcore::Nexus::Network
 {
 	///----------------------------------------------------------------------------------------------------
-	/// LibraryMgr Class
+	/// CHttpClient Class
 	///----------------------------------------------------------------------------------------------------
-	class LibraryMgr
+	class CHttpClient
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
+		/// 	- aLogger: Logger dependency.
+		/// 	- aBaseURL: URL base for the client.
+		/// 	- aCacheDirectory: Directory which will contain the cached requests.
+		/// 	- aCacheLifetime: Lifetime of a cache entry in seconds.
 		///----------------------------------------------------------------------------------------------------
-		LibraryMgr(CLogApi* aLogger, Loader* aLoader);
+		CHttpClient(
+			CLogApi* aLogger,
+			std::string           aBaseURL,
+			std::filesystem::path aCacheDirectory = {},
+			uint32_t              aCacheLifetime = 0
+		);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
 		///----------------------------------------------------------------------------------------------------
-		~LibraryMgr();
+		~CHttpClient();
 
 		///----------------------------------------------------------------------------------------------------
-		/// Update:
-		/// 	Updates the library addon definitions from the available sources.
+		/// Get:
+		/// 	Sends a http request and fetches the response.
+		/// 	- aOverrideCacheLifetime(seconds) changes the cache lifetime to the given one. -1 means, don't change it.
 		///----------------------------------------------------------------------------------------------------
-		void Update();
+		HttpResponse_t Get(std::string aEndpoint, std::string aParameters = "", int32_t aOverrideCacheLifetime = -1);
 
 		///----------------------------------------------------------------------------------------------------
-		/// AddSource:
-		/// 	Adds a source for library addons definitions.
+		/// Download:
+		/// 	Downloads a remote resource to disk.
 		///----------------------------------------------------------------------------------------------------
-		void AddSource(std::string aURL);
-
-		///----------------------------------------------------------------------------------------------------
-		/// Install:
-		/// 	Installs the addon.
-		///----------------------------------------------------------------------------------------------------
-		void Install(uint32_t aSignature);
-
-		///----------------------------------------------------------------------------------------------------
-		/// GetLibrary:
-		/// 	Returns a copy of the library.
-		///----------------------------------------------------------------------------------------------------
-		std::vector<LibraryAddon_t> GetLibrary() const;
+		HttpResponse_t Download(std::filesystem::path aOutPath, std::string aEndpoint, std::string aParameters = "");
 
 		private:
 		CLogApi* Logger = nullptr;
-		Loader* Loader = nullptr;
 
-		mutable std::mutex                                     Mutex;
-		std::unordered_map<std::string, Network::CHttpClient*> Sources;
-		std::vector<LibraryAddon_t>                            Addons;
+		std::string      BaseURL;
+		std::mutex       Mutex{};
+		httplib::Client* Client = nullptr;
+
+		CHttpCache* Cache = nullptr;
+
+		///----------------------------------------------------------------------------------------------------
+		/// DownloadCleanup:
+		/// 	Cleans up a file after a failed download.
+		///----------------------------------------------------------------------------------------------------
+		void DownloadCleanup(const std::filesystem::path& aOutPath, const std::string& aQuery);
 	};
 }

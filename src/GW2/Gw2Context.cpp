@@ -25,7 +25,7 @@ namespace Raidcore::Nexus::GW2
 		CLogApi&               aLogger,
 		Platform::RawInputApi& aRawInputApi,
 		HWND                   aGameWindow,
-		CHttpClient&           aArenaNetAssetCDN,
+		Network::CHttpClient&  aArenaNetAssetCDN,
 		std::filesystem::path  aGameBindsPath
 	)
 		: _DataLink(aDataLink)
