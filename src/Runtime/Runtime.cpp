@@ -99,9 +99,6 @@ namespace Raidcore::Nexus
 			aEntryFunction
 		);
 
-		/* Initialize self updater here so it can lock this instance and update. */
-		ctx.GetSelfUpdater();
-
 		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [](Clockwork::CancellationToken aToken)
 		{
 			Runtime& ctx = Runtime::Get();
@@ -212,6 +209,11 @@ namespace Raidcore::Nexus
 #endif
 	}
 
+	Network::Context& Runtime::Network()
+	{
+		return *this->_NetworkContext;
+	}
+
 	Platform::Context& Runtime::Platform()
 	{
 		return *this->_PlatformContext;
@@ -279,64 +281,16 @@ namespace Raidcore::Nexus
 		return &s_SettingsApi;
 	}
 
-	Network::CHttpClient* Runtime::GetHttpClient(std::string aURL, bool aDisableCache)
-	{
-		const std::lock_guard<std::mutex> lock(this->HttpClientMutex);
-
-		std::string baseurl = URL::GetBase(aURL);
-
-		std::string baseurl_noprotocol = baseurl;
-		baseurl_noprotocol = String::Replace(baseurl_noprotocol, "http://", "");
-		baseurl_noprotocol = String::Replace(baseurl_noprotocol, "https://", "");
-
-		auto it = this->HttpClients.find(baseurl_noprotocol);
-
-		if (it != this->HttpClients.end())
-		{
-			return it->second;
-		}
-
-		Network::CHttpClient* client = nullptr;
-
-		if (aDisableCache)
-		{
-			client = new Network::CHttpClient(this->GetLogger(), baseurl);
-		}
-		else
-		{
-			std::filesystem::path cachedir = Index(EPath::DIR_COMMON) / baseurl_noprotocol;
-			uint32_t cacheLifetime = 30 * 60; // 30 minutes
-
-			if (baseurl == "https://api.raidcore.gg")
-			{
-				cacheLifetime = 5 * 60; // 5 minutes
-			}
-			else if (baseurl == "https://api.github.com")
-			{
-				cacheLifetime = 60 * 60; // 60 minutes
-			}
-
-			client = new Network::CHttpClient(this->GetLogger(), baseurl, cachedir, cacheLifetime);
-		}
-
-		this->HttpClients.emplace(baseurl_noprotocol, client);
-
-		return client;
-	}
-
-	Network::Updater* Runtime::GetSelfUpdater()
-	{
-		static Network::Updater s_SelfUpdater = Network::Updater(
-			this->GetLogger()
-		);
-		return &s_SelfUpdater;
-	}
-
 	Runtime::Runtime()
 	{
 		Clockwork::Context::Create();
 
 		CreateIndex(GetModuleHandle(NULL));
+
+		this->_NetworkContext = std::make_unique<Network::Context>(
+			*this->GetLogger(),
+			Index(EPath::DIR_COMMON)
+		);
 
 		this->_PlatformContext = std::make_unique<Platform::Context>(
 			Index(EPath::CrashLog),
@@ -360,7 +314,7 @@ namespace Raidcore::Nexus
 			*this->GetLogger(),
 			this->Platform().RawInput(),
 			this->Platform().Window(),
-			*this->GetHttpClient("http://assetcdn.101.arenanetworks.com", /*disablecache=*/ true),
+			this->Network().GetHttpClient("http://assetcdn.101.arenanetworks.com", /*disablecache=*/ true),
 			Index(EPath::GameBinds)
 		);
 	}
@@ -383,17 +337,6 @@ namespace Raidcore::Nexus
 		{
 			this->_PlatformContext->Shutdown();
 			this->_PlatformContext.reset();
-		}
-
-		const std::lock_guard<std::mutex> lock(this->HttpClientMutex);
-
-		for (auto it = this->HttpClients.begin(); it != this->HttpClients.end();)
-		{
-			/* Deallocate client. */
-			delete it->second;
-
-			/* Erase entry. */
-			it = this->HttpClients.erase(it);
 		}
 
 		Clockwork::Context::Destroy();

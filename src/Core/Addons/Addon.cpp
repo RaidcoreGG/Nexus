@@ -1023,9 +1023,9 @@ void CAddon::CheckUpdateViaGitHub()
 
 	Runtime& context = Runtime::Get();
 
-	Network::CHttpClient* client = context.GetHttpClient("https://api.github.com");
+	Network::CHttpClient& client = context.Network().GetHttpClient("https://api.github.com");
 
-	Network::HttpResponse_t response = client->Get("/repos" + URL::GetEndpoint(this->NexusAddonDefV1->GetUpdateLink()) + "/releases");
+	Network::HttpResponse_t response = client.Get("/repos" + URL::GetEndpoint(this->NexusAddonDefV1->GetUpdateLink()) + "/releases");
 
 	Host::Config_t* config = this->GetConfig();
 
@@ -1105,9 +1105,9 @@ void CAddon::CheckUpdateViaDirect()
 
 	Runtime& context = Runtime::Get();
 
-	Network::CHttpClient* client = context.GetHttpClient(this->NexusAddonDefV1->GetUpdateLink());
+	Network::CHttpClient& client = context.Network().GetHttpClient(this->NexusAddonDefV1->GetUpdateLink());
 
-	Network::HttpResponse_t response = client->Get(URL::GetEndpoint(this->NexusAddonDefV1->GetUpdateLink()) + ".md5");
+	Network::HttpResponse_t response = client.Get(URL::GetEndpoint(this->NexusAddonDefV1->GetUpdateLink()) + ".md5");
 
 	if (!response.Success())
 	{
@@ -1119,7 +1119,7 @@ void CAddon::CheckUpdateViaDirect()
 			response.Error.c_str()
 		);
 
-		response = client->Get(URL::GetEndpoint(this->NexusAddonDefV1->GetUpdateLink()) + ".md5sum");
+		response = client.Get(URL::GetEndpoint(this->NexusAddonDefV1->GetUpdateLink()) + ".md5sum");
 	}
 
 	if (!response.Success())
@@ -1280,9 +1280,9 @@ bool CAddon::DownloadUpdate()
 
 	Runtime& context = Runtime::Get();
 
-	Network::CHttpClient* client = context.GetHttpClient(this->UpdateRemote);
+	Network::CHttpClient& client = context.Network().GetHttpClient(this->UpdateRemote);
 	
-	Network::HttpResponse_t response = client->Download(tmpDownload, URL::GetEndpoint(this->UpdateRemote));
+	Network::HttpResponse_t response = client.Download(tmpDownload, URL::GetEndpoint(this->UpdateRemote));
 
 	if (!response.Success())
 	{

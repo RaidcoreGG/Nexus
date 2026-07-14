@@ -46,10 +46,10 @@ namespace Raidcore::Nexus::Network
 		}
 
 		/* The client is not dependency injected, as we only create it on demand. */
-		CHttpClient* raidcoreapi = Runtime::Get().GetHttpClient("https://api.raidcore.gg");
+		CHttpClient& raidcoreapi = Runtime::Get().Network().GetHttpClient("https://api.raidcore.gg");
 
 		/* Request version info, bypass cache. */
-		HttpResponse_t result = raidcoreapi->Get("/nexusversion", "", 0);
+		HttpResponse_t result = raidcoreapi.Get("/nexusversion", "", 0);
 
 		if (!result.Success())
 		{
@@ -192,9 +192,9 @@ namespace Raidcore::Nexus::Network
 			ghresult.Error.c_str()
 		);
 
-		CHttpClient* raidcoreapi = Runtime::Get().GetHttpClient("https://api.raidcore.gg");
+		CHttpClient& raidcoreapi = Runtime::Get().Network().GetHttpClient("https://api.raidcore.gg");
 
-		HttpResponse_t fbresult = raidcoreapi->Download(
+		HttpResponse_t fbresult = raidcoreapi.Download(
 			Index(EPath::NexusDLL_Update),
 			"/d3d11.dll"
 		);

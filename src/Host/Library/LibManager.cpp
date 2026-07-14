@@ -95,7 +95,7 @@ namespace Raidcore::Nexus::Host
 			return;
 		}
 
-		this->Sources.emplace(aURL, Runtime::Get().GetHttpClient(aURL));
+		this->Sources.emplace(aURL, &Runtime::Get().Network().GetHttpClient(aURL));
 	}
 
 	void LibraryMgr::Install(uint32_t aSignature)
@@ -130,9 +130,9 @@ namespace Raidcore::Nexus::Host
 
 		if (String::Contains(downloadUrl, "https://github.com"))
 		{
-			Network::CHttpClient* ghapiclient = Runtime::Get().GetHttpClient("https://api.github.com");
+			Network::CHttpClient& ghapiclient = Runtime::Get().Network().GetHttpClient("https://api.github.com");
 
-			Network::HttpResponse_t result = ghapiclient->Get("/repos" + URL::GetEndpoint(downloadUrl) + "/releases/latest");
+			Network::HttpResponse_t result = ghapiclient.Get("/repos" + URL::GetEndpoint(downloadUrl) + "/releases/latest");
 
 			if (!result.Success())
 			{

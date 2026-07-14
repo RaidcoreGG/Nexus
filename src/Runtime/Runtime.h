@@ -22,8 +22,7 @@
 #include "Graphics/GrContext.h"
 #include "GW2/Gw2Context.h"
 #include "Host/HoContext.h"
-#include "Network/Updater/Updater.h"
-#include "Network/WebRequests/WreClient.h"
+#include "Network/NetContext.h"
 #include "Platform/PlContext.h"
 #include "Proxy/PxyEnum.h"
 #include "UI/UiContext.h"
@@ -59,6 +58,8 @@ namespace Raidcore::Nexus
 
 		const char* GetBuild();
 
+		Network::Context& Network();
+
 		Platform::Context& Platform();
 
 		Host::Context& Host();
@@ -77,20 +78,14 @@ namespace Raidcore::Nexus
 
 		CSettings* GetSettingsCtx();
 
-		Network::CHttpClient* GetHttpClient(std::string aURL, bool aDisableCache = false);
-
-		Network::Updater* GetSelfUpdater();
-
 		private:
 		Runtime();
 		~Runtime();
 
+		std::unique_ptr<Network::Context>  _NetworkContext { nullptr };
 		std::unique_ptr<Platform::Context> _PlatformContext{ nullptr };
 		std::unique_ptr<Host::Context>     _HostContext    { nullptr };
 		std::unique_ptr<Graphics::Context> _GraphicsContext{ nullptr };
 		std::unique_ptr<GW2::Context>      _GameContext    { nullptr };
-
-		std::mutex                                   HttpClientMutex{};
-		std::map<std::string, Network::CHttpClient*> HttpClients{};
 	};
 }

@@ -57,13 +57,13 @@ namespace Raidcore::Nexus::Network
 		const std::string& GetChangelog();
 
 		private:
-		CLogApi* Logger{};
+		CLogApi*    Logger{};
 
-		HANDLE                    UpdateMutex{};
-		std::thread               UpdateThread{};
+		HANDLE      UpdateMutex{};
+		std::thread UpdateThread{};
 
-		Version_t RemoteVersion{};
-		std::string               Changelog{};
+		Version_t   RemoteVersion{};
+		std::string Changelog{};
 
 		///----------------------------------------------------------------------------------------------------
 		/// CreatePatchMutex:

@@ -39,7 +39,7 @@ void CAboutBox::RenderContent()
 
 	Runtime&       ctx         = Runtime::Get();
 	Graphics::TextureLoader& texapi      = ctx.Graphics().Textures();
-	Network::Updater*   selfupdater = ctx.GetSelfUpdater();
+	Network::Updater&   selfupdater = ctx.Network().Updater();
 
 	if (ImGui::CollapsingHeader("About", ImGuiTreeNodeFlags_DefaultOpen))
 	{
@@ -157,6 +157,6 @@ void CAboutBox::RenderContent()
 
 	if (ImGui::CollapsingHeader("Changelog", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		ImGui::TextWrapped(selfupdater->GetChangelog().c_str());
+		ImGui::TextWrapped(selfupdater.GetChangelog().c_str());
 	}
 }
