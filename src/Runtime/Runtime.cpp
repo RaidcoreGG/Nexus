@@ -21,7 +21,7 @@
 
 #include "minhook/mh_hook.h"
 
-#include "Engine/Clockwork/Clockwork.h"
+#include "thirdparty/Clockwork/Clockwork.h"
 namespace Clockwork = Raidcore::Clockwork;
 
 #include "Runtime/Runtime.h"
@@ -48,8 +48,8 @@ namespace Clockwork = Raidcore::Clockwork;
 #include "Core/Preferences/PrefContext.h"
 #include "Network/Updater/Updater.h"
 #include "Core/Versioning/Version.h"
-#include "Engine/Clockwork/Tasks/CancellationToken.h"
-#include "Engine/Clockwork/Tasks/ETaskPriority.h"
+#include "thirdparty/Clockwork/Tasks/CancellationToken.h"
+#include "thirdparty/Clockwork/Tasks/ETaskPriority.h"
 #include "Core/DataLink/DlApi.h"
 #include "Host/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"

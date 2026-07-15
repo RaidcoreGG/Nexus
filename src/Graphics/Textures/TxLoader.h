@@ -15,7 +15,7 @@
 #include <string>
 #include <windows.h>
 
-#include "Engine/Clockwork/Dispatcher.h"
+#include "thirdparty/Clockwork/Dispatcher.h"
 namespace Clockwork = Raidcore::Clockwork;
 
 #include "Engine/Cleanup/RefCleanerBase.h"

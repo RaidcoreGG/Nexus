@@ -27,7 +27,6 @@
     <ClCompile Include="src\Network\Updater\Updater.cpp" />
     <ClCompile Include="src\Engine\Cleanup\RefCleanerBase.cpp" />
     <ClCompile Include="src\Engine\Cleanup\RefCleanerContext.cpp" />
-    <ClCompile Include="src\Engine\Clockwork\Clockwork.cpp" />
     <ClCompile Include="src\Platform\CrashHandler\CrashHandler.cpp" />
     <ClCompile Include="src\Core\Functions\FnRegistry.cpp" />
     <ClCompile Include="src\Core\Index\Index.cpp" />
@@ -48,6 +47,7 @@
     <ClCompile Include="src\Core\Logging\LogConst.cpp" />
     <ClCompile Include="src\Proxy\PxyD3D9.cpp" />
     <ClCompile Include="src\Proxy\PxyDXGI.cpp" />
+    <ClCompile Include="thirdparty\Clockwork\Clockwork.cpp" />
     <ClCompile Include="thirdparty\ImAnimate\ImAnimate.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui_draw.cpp" />
@@ -137,13 +137,6 @@
     <ClInclude Include="src\Network\Updater\Updater.h" />
     <ClInclude Include="src\Core\Versioning\Version.h" />
     <ClInclude Include="src\Engine\Cleanup\RefCleanerContext.h" />
-    <ClInclude Include="src\Engine\Clockwork\Tasks\CancellationToken.h" />
-    <ClInclude Include="src\Engine\Clockwork\Clockwork.h" />
-    <ClInclude Include="src\Engine\Clockwork\Tasks\ScheduledTask.h" />
-    <ClInclude Include="src\Engine\Clockwork\Tasks\Task.h" />
-    <ClInclude Include="src\Engine\Clockwork\Tasks\TaskBase.h" />
-    <ClInclude Include="src\Engine\Clockwork\Tasks\ETaskPriority.h" />
-    <ClInclude Include="src\Engine\Clockwork\Dispatcher.h" />
     <ClInclude Include="src\Platform\CrashHandler\CrashHandler.h" />
     <ClInclude Include="src\Host\Events\EvtData.h" />
     <ClInclude Include="src\Core\Functions\FnEntry.h" />
@@ -210,6 +203,13 @@
     <ClInclude Include="src\Util\Strings.h" />
     <ClInclude Include="src\Util\Time.h" />
     <ClInclude Include="src\Util\Url.h" />
+    <ClInclude Include="thirdparty\Clockwork\Clockwork.h" />
+    <ClInclude Include="thirdparty\Clockwork\Dispatcher.h" />
+    <ClInclude Include="thirdparty\Clockwork\Tasks\CancellationToken.h" />
+    <ClInclude Include="thirdparty\Clockwork\Tasks\ETaskPriority.h" />
+    <ClInclude Include="thirdparty\Clockwork\Tasks\ScheduledTask.h" />
+    <ClInclude Include="thirdparty\Clockwork\Tasks\Task.h" />
+    <ClInclude Include="thirdparty\Clockwork\Tasks\TaskBase.h" />
     <ClInclude Include="thirdparty\httplib\httplib.h" />
     <ClInclude Include="thirdparty\ImAnimate\ImAnimate.h" />
     <ClInclude Include="thirdparty\imgui\imconfig.h" />

@@ -17,7 +17,7 @@
 #include "httplib/httplib.h"
 #pragma warning(pop)
 
-#include "Engine/Clockwork/Dispatcher.h"
+#include "thirdparty/Clockwork/Dispatcher.h"
 namespace Clockwork = Raidcore::Clockwork;
 
 #include "Util/Time.h"

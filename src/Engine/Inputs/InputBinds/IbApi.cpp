@@ -17,7 +17,7 @@
 #pragma warning(pop)
 using json = nlohmann::json;
 
-#include "Engine/Clockwork/Clockwork.h"
+#include "thirdparty/Clockwork/Clockwork.h"
 namespace Clockwork = Raidcore::Clockwork;
 
 #include "IbConst.h"

@@ -8,7 +8,7 @@
 
 #include "MblReader.h"
 
-#include "Engine/Clockwork/Clockwork.h"
+#include "thirdparty/Clockwork/Clockwork.h"
 namespace Clockwork = Raidcore::Clockwork;
 
 #pragma warning(push, 0)

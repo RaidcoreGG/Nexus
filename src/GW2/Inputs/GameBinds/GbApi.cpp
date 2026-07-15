@@ -10,7 +10,7 @@
 
 #include "pugixml/pugixml.hpp"
 
-#include "Engine/Clockwork/Clockwork.h"
+#include "thirdparty/Clockwork/Clockwork.h"
 namespace Clockwork = Raidcore::Clockwork;
 
 #include "Runtime/Runtime.h"

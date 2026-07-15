@@ -11,7 +11,7 @@
 	path = thirdparty/ImAnimate
 	url = https://github.com/RaidcoreGG/ImAnimate
 [submodule "src/Engine/Clockwork"]
-	path = src/Engine/Clockwork
+	path = thirdparty/Clockwork
 	url = https://github.com/RaidcoreGG/Clockwork
 [submodule "src/Util"]
 	path = src/Util

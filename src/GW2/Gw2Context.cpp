@@ -12,7 +12,7 @@
 
 #include "ArcDPS/ArcApi.h"
 #include "BuildInfo/BuildInfoService.h"
-#include "Engine/Clockwork/Clockwork.h"
+#include "thirdparty/Clockwork/Clockwork.h"
 #include "Inputs/GameBinds/GbApi.h"
 #include "Mumble/MblReader.h"
 #include "Multibox/Multibox.h"

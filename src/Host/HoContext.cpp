@@ -9,7 +9,7 @@
 #include "HoContext.h"
 
 #include "Host/Addons/Addon.h"
-#include "Engine/Clockwork/Clockwork.h"
+#include "thirdparty/Clockwork/Clockwork.h"
 #include "Util/CmdLine.h"
 #include "Util/Strings.h"
 
