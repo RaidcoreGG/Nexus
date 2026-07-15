@@ -16,10 +16,10 @@
 #include "thirdparty/minhook/mh_hook.h"
 
 #include "Core/Index/IdxFuncDefs.h"
-#include "Engine/DataLink/DlFuncDefs.h"
+#include "Core/DataLink/DlFuncDefs.h"
 #include "Host/Events/EvtFuncDefs.h"
 #include "Engine/Inputs/InputBinds/IbFuncDefs.h"
-#include "Engine/Logging/LogFuncDefs.h"
+#include "Core/Logging/LogFuncDefs.h"
 #include "Platform/RawInput/RiFuncDefs.h"
 #include "UI/Services/Localization/LoclFuncDefs.h"
 #include "Graphics/Textures/TxFuncDefs.h"

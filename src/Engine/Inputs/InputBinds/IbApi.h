@@ -17,7 +17,7 @@
 #include "Engine/_Concepts/IWndProc.h"
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include "Host/Events/EvtApi.h"
-#include "Engine/Logging/LogApi.h"
+#include "Core/Logging/LogApi.h"
 #include "IbBindV2.h"
 #include "IbCapture.h"
 #include "IbFuncDefs.h"

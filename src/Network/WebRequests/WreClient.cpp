@@ -8,7 +8,7 @@
 
 #include "WreClient.h"
 
-#include "Engine/Logging/LogApi.h"
+#include "Core/Logging/LogApi.h"
 #include "Util/URL.h"
 #include "Util/Time.h"
 

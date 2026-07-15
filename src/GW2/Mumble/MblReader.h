@@ -13,9 +13,9 @@
 #include "thirdparty/mumble/Mumble.h"
 
 #include "Core/NexusLink.h"
-#include "Engine/DataLink/DlApi.h"
+#include "Core/DataLink/DlApi.h"
 #include "Host/Events/EvtApi.h"
-#include "Engine/Logging/LogApi.h"
+#include "Core/Logging/LogApi.h"
 
 constexpr const char* DL_MUMBLE_LINK = "DL_MUMBLE_LINK";
 constexpr const char* DL_MUMBLE_LINK_IDENTITY = "DL_MUMBLE_LINK_IDENTITY";

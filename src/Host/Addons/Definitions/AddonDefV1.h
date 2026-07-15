@@ -10,9 +10,9 @@
 
 #include <cstdint>
 
-#include "Core/Addons/AddEnum.h"
-#include "Core/Addons/API/ApiBase.h"
-#include "Core/Addons/Definitions/DefEnum.h"
+#include "Host/Addons/AddEnum.h"
+#include "Host/Addons/API/ApiBase.h"
+#include "Host/Addons/Definitions/DefEnum.h"
 #include "Core/Versioning/Version.h"
 
 struct AddonDefV1_t;

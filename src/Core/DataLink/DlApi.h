@@ -1,66 +1,64 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  FnRegistry.h
-/// Description  :  API for function registry.
+/// Name         :  DlApi.h
+/// Description  :  Provides functions to share data and functions.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
 #pragma once
 
 #include <mutex>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
-#include "FnEntry.h"
-#include "Engine/Logging/LogApi.h"
+#include "DlLinkedResource.h"
+#include "Core/Logging/LogApi.h"
 
-constexpr const char* CH_FUNCTIONS = "Functions";
+constexpr const char* CH_DATALINK = "DataLink";
 
 ///----------------------------------------------------------------------------------------------------
-/// CFuncRegistry Class
+/// CDataLinkApi Class
 ///----------------------------------------------------------------------------------------------------
-class CFuncRegistry
+class CDataLinkApi
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CFuncRegistry(CLogApi* aLogger);
-
+	CDataLinkApi(CLogApi* aLogger);
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
-	~CFuncRegistry();
+	~CDataLinkApi();
 
 	///----------------------------------------------------------------------------------------------------
-	/// Register:
-	/// 	Registers a function with the given identifier.
+	/// GetResource:
+	/// 	Retrieves the resource with the given identifier.
 	///----------------------------------------------------------------------------------------------------
-	void Register(std::string& aIdentifier, void* aFunction);
+	void* GetResource(const char* aIdentifier);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Deregister:
-	/// 	Deregisters a function with the given identifier.
+	/// ShareResource:
+	/// 	Allocates memory of the given size, accessible via the provided identifier,
+	/// 	but with a different internal/underlying name.
 	///----------------------------------------------------------------------------------------------------
-	void Deregister(std::string& aIdentifier, void* aFunction);
+	void* ShareResource(
+		const char* aIdentifier,
+		size_t      aResourceSize,
+		const char* aUnderlyingName = "",
+		bool        aIsPublic       = false
+	);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Query:
-	/// 	Queries for a function with the given identifier and returns it or nullptr.
-	/// 	If a function is returned, the refcount is incremented.
+	/// GetRegistry:
+	/// 	Returns a copy of the registry.
 	///----------------------------------------------------------------------------------------------------
-	void* Query(std::string& aIdentifier);
-
-	///----------------------------------------------------------------------------------------------------
-	/// Release:
-	/// 	Decrements the refcount of the function with the given identifier.
-	///----------------------------------------------------------------------------------------------------
-	void Release(std::string& aIdentifier);
+	std::unordered_map<std::string, LinkedResource_t> GetRegistry() const;
 
 	private:
-	CLogApi*                                     Logger;
+	CLogApi*                                          Logger = nullptr;
 
-	std::mutex                                   Mutex;
-	std::unordered_map<std::string, FuncEntry_t> Registry;
+	mutable std::mutex                                Mutex;
+	std::unordered_map<std::string, LinkedResource_t> Registry;
 };

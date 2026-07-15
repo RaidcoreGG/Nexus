@@ -14,11 +14,9 @@
 #include <string>
 #include <windows.h>
 
-#include "Core/Preferences/PrefContext.h"
+#include "Core/CoContext.h"
 #include "Core/Versioning/Version.h"
-#include "Engine/DataLink/DlApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
-#include "Engine/Logging/LogApi.h"
 #include "Graphics/GrContext.h"
 #include "GW2/Gw2Context.h"
 #include "Host/HoContext.h"
@@ -58,6 +56,8 @@ namespace Raidcore::Nexus
 
 		const char* GetBuild();
 
+		Core::Context& Core();
+
 		Network::Context& Network();
 
 		Platform::Context& Platform();
@@ -68,20 +68,15 @@ namespace Raidcore::Nexus
 
 		GW2::Context& Game();
 
-		CLogApi* GetLogger();
-
-		CDataLinkApi* GetDataLink();
-
 		CInputBindApi* GetInputBindApi();
 
 		CUiContext* GetUIContext();
-
-		CSettings* GetSettingsCtx();
 
 		private:
 		Runtime();
 		~Runtime();
 
+		std::unique_ptr<Core::Context>     _CoreContext    { nullptr };
 		std::unique_ptr<Network::Context>  _NetworkContext { nullptr };
 		std::unique_ptr<Platform::Context> _PlatformContext{ nullptr };
 		std::unique_ptr<Host::Context>     _HostContext    { nullptr };

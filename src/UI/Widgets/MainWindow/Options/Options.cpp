@@ -76,7 +76,7 @@ void COptionsWindow::RenderSubWindows()
 void COptionsWindow::TabGeneral()
 {
 	static Runtime& ctx = Runtime::Get();
-	static CSettings* settingsctx = ctx.GetSettingsCtx();
+	static CSettings* settingsctx = &ctx.Core().Settings();
 	static CUiContext* uictx = ctx.GetUIContext();
 	static CLocalization* langApi = uictx->GetLocalization();
 	static CQuickAccess* qactx = uictx->GetQuickAccess();
@@ -376,7 +376,7 @@ void COptionsWindow::TabGeneral()
 void COptionsWindow::TabStyle()
 {
 	Runtime& ctx = Runtime::Get();
-	CSettings* settingsctx = ctx.GetSettingsCtx();
+	CSettings* settingsctx = &ctx.Core().Settings();
 	CUiContext* uictx = ctx.GetUIContext();
 	CLocalization* langApi = uictx->GetLocalization();
 

@@ -1,64 +1,66 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  DlApi.h
-/// Description  :  Provides functions to share data and functions.
+/// Name         :  FnRegistry.h
+/// Description  :  API for function registry.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
 #pragma once
 
 #include <mutex>
-#include <string>
 #include <unordered_map>
+#include <string>
 
-#include "DlLinkedResource.h"
-#include "Engine/Logging/LogApi.h"
+#include "FnEntry.h"
+#include "Core/Logging/LogApi.h"
 
-constexpr const char* CH_DATALINK = "DataLink";
+constexpr const char* CH_FUNCTIONS = "Functions";
 
 ///----------------------------------------------------------------------------------------------------
-/// CDataLinkApi Class
+/// CFuncRegistry Class
 ///----------------------------------------------------------------------------------------------------
-class CDataLinkApi
+class CFuncRegistry
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CDataLinkApi(CLogApi* aLogger);
+	CFuncRegistry(CLogApi* aLogger);
+
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
-	~CDataLinkApi();
+	~CFuncRegistry();
 
 	///----------------------------------------------------------------------------------------------------
-	/// GetResource:
-	/// 	Retrieves the resource with the given identifier.
+	/// Register:
+	/// 	Registers a function with the given identifier.
 	///----------------------------------------------------------------------------------------------------
-	void* GetResource(const char* aIdentifier);
+	void Register(std::string& aIdentifier, void* aFunction);
 
 	///----------------------------------------------------------------------------------------------------
-	/// ShareResource:
-	/// 	Allocates memory of the given size, accessible via the provided identifier,
-	/// 	but with a different internal/underlying name.
+	/// Deregister:
+	/// 	Deregisters a function with the given identifier.
 	///----------------------------------------------------------------------------------------------------
-	void* ShareResource(
-		const char* aIdentifier,
-		size_t      aResourceSize,
-		const char* aUnderlyingName = "",
-		bool        aIsPublic       = false
-	);
+	void Deregister(std::string& aIdentifier, void* aFunction);
 
 	///----------------------------------------------------------------------------------------------------
-	/// GetRegistry:
-	/// 	Returns a copy of the registry.
+	/// Query:
+	/// 	Queries for a function with the given identifier and returns it or nullptr.
+	/// 	If a function is returned, the refcount is incremented.
 	///----------------------------------------------------------------------------------------------------
-	std::unordered_map<std::string, LinkedResource_t> GetRegistry() const;
+	void* Query(std::string& aIdentifier);
+
+	///----------------------------------------------------------------------------------------------------
+	/// Release:
+	/// 	Decrements the refcount of the function with the given identifier.
+	///----------------------------------------------------------------------------------------------------
+	void Release(std::string& aIdentifier);
 
 	private:
-	CLogApi*                                          Logger = nullptr;
+	CLogApi*                                     Logger;
 
-	mutable std::mutex                                Mutex;
-	std::unordered_map<std::string, LinkedResource_t> Registry;
+	std::mutex                                   Mutex;
+	std::unordered_map<std::string, FuncEntry_t> Registry;
 };

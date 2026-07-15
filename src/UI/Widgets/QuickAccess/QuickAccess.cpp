@@ -15,7 +15,7 @@
 #include "Runtime/Runtime.h"
 using namespace Raidcore::Nexus;
 
-#include "Core/Addons/AddConst.h"
+#include "Host/Addons/AddConst.h"
 #include "Core/Preferences/PrefConst.h"
 #include "Core/Preferences/PrefContext.h"
 #include "res/ResConst.h"
@@ -52,34 +52,34 @@ CQuickAccess::CQuickAccess(
 	this->MumbleLink = (Mumble::Data*)aDataLink->GetResource(DL_MUMBLE_LINK);
 
 	Runtime&  ctx         = Runtime::Get();
-	CSettings* settingsctx = ctx.GetSettingsCtx();
+	CSettings& settingsctx = ctx.Core().Settings();
 
 	/* Setup notifiers. */
-	settingsctx->Subscribe<bool>(OPT_QAVERTICAL, [&](bool aVertical)
+	settingsctx.Subscribe<bool>(OPT_QAVERTICAL, [&](bool aVertical)
 	{
 		this->VerticalLayout = aVertical;
 	});
-	settingsctx->Subscribe<EQaPosition>(OPT_QALOCATION, [&](EQaPosition aPosition)
+	settingsctx.Subscribe<EQaPosition>(OPT_QALOCATION, [&](EQaPosition aPosition)
 	{
 		this->Location = aPosition;
 	});
-	settingsctx->Subscribe<float>(OPT_QAOFFSETX, [&](float aOffsetX)
+	settingsctx.Subscribe<float>(OPT_QAOFFSETX, [&](float aOffsetX)
 	{
 		this->Offset.x = aOffsetX;
 	});
-	settingsctx->Subscribe<float>(OPT_QAOFFSETY, [&](float aOffsetY)
+	settingsctx.Subscribe<float>(OPT_QAOFFSETY, [&](float aOffsetY)
 	{
 		this->Offset.y = aOffsetY;
 	});
-	settingsctx->Subscribe<EQaVisibility>(OPT_QAVISIBILITY, [&](EQaVisibility aVisibility)
+	settingsctx.Subscribe<EQaVisibility>(OPT_QAVISIBILITY, [&](EQaVisibility aVisibility)
 	{
 		this->Visibility = aVisibility;
 	});
-	settingsctx->Subscribe<bool>(OPT_QAONLYSHOWONHOVER, [&](bool aOnlyShowOnHover)
+	settingsctx.Subscribe<bool>(OPT_QAONLYSHOWONHOVER, [&](bool aOnlyShowOnHover)
 	{
 		this->OnlyShowOnHover = aOnlyShowOnHover;
 	});
-	settingsctx->Subscribe<std::vector<std::string>>(OPT_QASUPPRESSED, [&](std::vector<std::string> aSuppressedShortcuts)
+	settingsctx.Subscribe<std::vector<std::string>>(OPT_QASUPPRESSED, [&](std::vector<std::string> aSuppressedShortcuts)
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -106,9 +106,9 @@ CQuickAccess::CQuickAccess(
 	/// It forces the creation of the setting, so that the below subscriber gets executed on a first launch.
 	/// Otherwise the main menu would need to be opened first (static init of snowflakemgr) or the options in the main menu (static init of setting).
 	/// Both is kinda shit.
-	settingsctx->Get<bool>(OPT_DISABLEFESTIVEFLAIR, false);
+	settingsctx.Get<bool>(OPT_DISABLEFESTIVEFLAIR, false);
 
-	settingsctx->Subscribe<bool>(OPT_DISABLEFESTIVEFLAIR, [&](bool aDisableFestiveFlair)
+	settingsctx.Subscribe<bool>(OPT_DISABLEFESTIVEFLAIR, [&](bool aDisableFestiveFlair)
 	{
 		/* Remove existing shortcut. */
 		this->RemoveShortcut(QA_MENU);
@@ -338,7 +338,7 @@ void CQuickAccess::AddShortcut(const char* aIdentifier, const char* aTextureIden
 		);
 
 		Runtime&  ctx         = Runtime::Get();
-		CSettings* settingsctx = ctx.GetSettingsCtx();
+		CSettings& settingsctx = ctx.Core().Settings();
 
 		/* If the current shortcut ID is in the suppressed list. */
 		bool isSuppressed = std::find(this->SuppressedShortcuts.begin(), this->SuppressedShortcuts.end(), aIdentifier) != this->SuppressedShortcuts.end();

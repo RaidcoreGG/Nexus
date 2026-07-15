@@ -78,7 +78,7 @@ void CExportStyleModal::OnClosing()
 			catch (...)
 			{
 				Runtime& ctx = Runtime::Get();
-				CLogApi* logger = ctx.GetLogger();
+				CLogApi* logger = &ctx.Core().Logger();
 				logger->Warning(CH_UICONTEXT, "Error saving stylesheet.");
 
 				/* Signal failure, to keep the modal open. */

@@ -22,8 +22,8 @@
 #include "Runtime/Runtime.h"
 using namespace Raidcore::Nexus;
 
-#include "Core/Addons/AddConst.h"
-#include "Core/Addons/Addon.h"
+#include "Host/Addons/AddConst.h"
+#include "Host/Addons/Addon.h"
 #include "Core/Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
 #include "Core/Preferences/PrefContext.h"
@@ -62,7 +62,7 @@ using namespace Raidcore::Nexus;
 	}
 
 	Runtime& ctx = Runtime::Get();
-	CDataLinkApi* dlapi = ctx.GetDataLink();
+	CDataLinkApi* dlapi = &ctx.Core().DataLink();
 
 	Mumble::Identity* mumbleIdentity = static_cast<Mumble::Identity*>(dlapi->GetResource(DL_MUMBLE_LINK_IDENTITY));
 	NexusLinkData_t* nexusLink = static_cast<NexusLinkData_t*>(dlapi->GetResource(DL_NEXUS_LINK));
@@ -109,8 +109,8 @@ using namespace Raidcore::Nexus;
 /*static*/ void CUiContext::OnMumbleIdentityChanged(void* aEventArgs)
 {
 	Runtime& ctx = Runtime::Get();
-	CDataLinkApi* dlapi = ctx.GetDataLink();
-	CSettings* settingsctx = ctx.GetSettingsCtx();
+	CDataLinkApi* dlapi = &ctx.Core().DataLink();
+	CSettings& settingsctx = ctx.Core().Settings();
 	CUiContext* uictx = ctx.GetUIContext();
 	CFontManager* fontmgr = uictx->GetFontManager();
 
@@ -189,8 +189,8 @@ CUiContext::CUiContext(
 
 	this->FontManager    = new CFontManager(this->Language);
 	this->EscapeClose    = new CEscapeClosing();
-	this->Scaling        = new CScaling(Runtime::Get().Platform().Window(), GrWindow, aDataLink, aEventApi, Runtime::Get().GetSettingsCtx()); // FIXME: What the fuck, why is the settingsctx not included here?
-	this->Input          = new CUiInput(Runtime::Get().GetSettingsCtx());
+	this->Scaling        = new CScaling(Runtime::Get().Platform().Window(), GrWindow, aDataLink, aEventApi, &Runtime::Get().Core().Settings()); // FIXME: What the fuck, why is the settingsctx not included here?
+	this->Input          = new CUiInput(&Runtime::Get().Core().Settings());
 
 	this->EventApi.Subscribe(EV_MUMBLE_IDENTITY_UPDATED,              CUiContext::OnMumbleIdentityChanged);
 	this->EventApi.Subscribe("EV_INPUTBIND_UPDATED",                  CUiContext::OnInputBindUpdate);
@@ -324,8 +324,8 @@ void CUiContext::Render()
 		ImGui::NewFrame();
 
 		static Runtime&  s_Context      = Runtime::Get();
-		static CSettings* s_Settings     = s_Context.GetSettingsCtx();
-		static bool       s_EulaAccepted = s_Settings->Get<bool>(OPT_ACCEPTEULA, false);
+		static CSettings& s_Settings     = s_Context.Core().Settings();
+		static bool       s_EulaAccepted = s_Settings.Get<bool>(OPT_ACCEPTEULA, false);
 		
 		if (s_EulaAccepted)
 		{
@@ -356,7 +356,7 @@ void CUiContext::Render()
 			if (s_Modal.Render())
 			{
 				/* Update state. */
-				s_EulaAccepted = s_Settings->Get<bool>(OPT_ACCEPTEULA, false);
+				s_EulaAccepted = s_Settings.Get<bool>(OPT_ACCEPTEULA, false);
 
 				if (s_EulaAccepted)
 				{
@@ -439,14 +439,14 @@ void CUiContext::LoadFonts()
 	std::filesystem::path fontPath{};
 
 	Runtime& ctx = Runtime::Get();
-	CSettings* settingsctx = ctx.GetSettingsCtx();
+	CSettings& settingsctx = ctx.Core().Settings();
 
 	/* add user font */
 	bool hasUserFont = false;
-	float storedFontSz = settingsctx->Get<float>(OPT_FONTSIZE, 15.0f);
+	float storedFontSz = settingsctx.Get<float>(OPT_FONTSIZE, 15.0f);
 	storedFontSz = min(max(storedFontSz, 1.0f), 50.0f);
 
-	std::string fontFile = settingsctx->Get<std::string>(OPT_USERFONT, "");
+	std::string fontFile = settingsctx.Get<std::string>(OPT_USERFONT, "");
 	if (!fontFile.empty() && std::filesystem::exists(Index(EPath::DIR_FONTS) / fontFile))
 	{
 		fontPath = Index(EPath::DIR_FONTS) / fontFile;

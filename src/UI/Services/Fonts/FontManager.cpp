@@ -24,13 +24,13 @@ CFontManager::CFontManager(CLocalization* aLocalization) : IRefCleaner("FontMana
 	this->Language = aLocalization;
 
 	Runtime& ctx = Runtime::Get();
-	CSettings* settingsctx = ctx.GetSettingsCtx();
+	CSettings& settingsctx = ctx.Core().Settings();
 
-	float storedFontSz = settingsctx->Get<float>(OPT_FONTSIZE, 15.0f);
+	float storedFontSz = settingsctx.Get<float>(OPT_FONTSIZE, 15.0f);
 	if (storedFontSz <= 0)
 	{
 		storedFontSz = min(max(storedFontSz, 1.0f), 50.0f);
-		settingsctx->Set(OPT_FONTSIZE, storedFontSz);
+		settingsctx.Set(OPT_FONTSIZE, storedFontSz);
 	}
 	ImGui::GetCurrentContext()->FontSize = storedFontSz;
 }

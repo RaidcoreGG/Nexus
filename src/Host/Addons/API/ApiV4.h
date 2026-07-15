@@ -1,8 +1,8 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  AdoApiV5.h
-/// Description  :  Addon API Revision 5.
+/// Name         :  AdoApiV4.h
+/// Description  :  Addon API Revision 4.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
@@ -16,10 +16,10 @@
 #include "thirdparty/minhook/mh_hook.h"
 
 #include "Core/Index/IdxFuncDefs.h"
-#include "Engine/DataLink/DlFuncDefs.h"
+#include "Core/DataLink/DlFuncDefs.h"
 #include "Host/Events/EvtFuncDefs.h"
 #include "Engine/Inputs/InputBinds/IbFuncDefs.h"
-#include "Engine/Logging/LogFuncDefs.h"
+#include "Core/Logging/LogFuncDefs.h"
 #include "Platform/RawInput/RiFuncDefs.h"
 #include "UI/Services/Fonts/FuncDefs.h"
 #include "UI/Services/Localization/LoclFuncDefs.h"
@@ -31,9 +31,9 @@
 using namespace Raidcore::Nexus;
 
 ///----------------------------------------------------------------------------------------------------
-/// AddonAPI5_t Struct
+/// AddonAPI4_t Struct
 ///----------------------------------------------------------------------------------------------------
-struct AddonAPI5_t : AddonAPI_t
+struct AddonAPI4_t : AddonAPI_t
 {
 	/* Renderer */
 	IDXGISwapChain*                   SwapChain;
@@ -77,7 +77,6 @@ struct AddonAPI5_t : AddonAPI_t
 	Platform::WNDPROC_SENDTOGAME      SendWndProcToGameOnly;
 
 	/* InputBinds */
-	INPUTBINDS_INVOKE                 InvokeInputBind;
 	INPUTBINDS_REGISTERWITHSTRING2    RegisterInputBindWithString;
 	INPUTBINDS_REGISTERWITHSTRUCT2    RegisterInputBindWithStruct;
 	INPUTBINDS_DEREGISTER             DeregisterInputBind;
@@ -107,7 +106,6 @@ struct AddonAPI5_t : AddonAPI_t
 	/* Localization */
 	LOCALIZATION_TRANSLATE            Translate;
 	LOCALIZATION_TRANSLATETO          TranslateTo;
-	LOCALIZATION_SET                  SetTranslatedString;
 
 	/* Fonts */
 	FONTS_GETRELEASE                  GetFont;

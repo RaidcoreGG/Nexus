@@ -25,18 +25,18 @@
 namespace Clockwork = Raidcore::Clockwork;
 
 #include "Runtime/Runtime.h"
-#include "Core/Hooks/Hooks.h"
+#include "Hooks/Hooks.h"
 #include "Core/Index/Index.h"
-#include "Engine/Logging/LogApi.h"
-#include "Engine/Logging/LogConsole.h"
-#include "Engine/Logging/LogWriter.h"
+#include "Core/Logging/LogApi.h"
+#include "Core/Logging/LogConsole.h"
+#include "Core/Logging/LogWriter.h"
 #include "GW2/Multibox/Multibox.h"
 #include "res/ResConst.h"
 #include "UI/UiContext.h"
 #include "Util/CmdLine.h"
 #include "Util/Resources.h"
 #include "Branch.h"
-#include "Core/Addons/Addon.h"
+#include "Host/Addons/Addon.h"
 #include "Core/Index/Index.h"
 #include "Util/CmdLine.h"
 #include "Util/Strings.h"
@@ -50,11 +50,11 @@ namespace Clockwork = Raidcore::Clockwork;
 #include "Core/Versioning/Version.h"
 #include "Engine/Clockwork/Tasks/CancellationToken.h"
 #include "Engine/Clockwork/Tasks/ETaskPriority.h"
-#include "Engine/DataLink/DlApi.h"
+#include "Core/DataLink/DlApi.h"
 #include "Host/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Host/Loader/Loader.h"
-#include "Engine/Logging/LogEnum.h"
+#include "Core/Logging/LogEnum.h"
 #include "Network/WebRequests/WreClient.h"
 #include "Graphics/GrContext.h"
 #include "Graphics/Textures/TxLoader.h"
@@ -86,10 +86,10 @@ namespace Raidcore::Nexus
 		Hooks::HookIDXGISwapChain();
 
 		Runtime& ctx = Runtime::Get();
-		CLogApi* logger = ctx.GetLogger();
+		CLogApi& logger = ctx.Core().Logger();
 
 		/* Environment info. */
-		logger->Info(
+		logger.Info(
 			CH_CORE,
 			"Game: %s\nModule: %s\nNexus %s %s\nEntry method: %d",
 			GetCommandLineA(),
@@ -109,7 +109,7 @@ namespace Raidcore::Nexus
 		if (CmdLine::HasArgument("-ggconsole"))
 		{
 			static CConsoleLogger console = CConsoleLogger(ELogLevel::ALL);
-			logger->Register(&console);
+			logger.Register(&console);
 		}
 
 		/* Multibox-friendly log file. */
@@ -128,7 +128,7 @@ namespace Raidcore::Nexus
 
 		/* Allocate log writer. */
 		static CFileLogger writer = CFileLogger(ELogLevel::ALL, logpath);
-		logger->Register(&writer);
+		logger.Register(&writer);
 
 		/* If running vanilla, do not initialize the hooks and leave the mutex unmodified. */
 		if (CmdLine::HasArgument("-ggvanilla"))
@@ -166,15 +166,15 @@ namespace Raidcore::Nexus
 		}
 
 		Runtime& ctx = Runtime::Get();
-		CLogApi* logger = ctx.GetLogger();
+		CLogApi& logger = ctx.Core().Logger();
 		CUiContext* uictx = ctx.GetUIContext();
 		Graphics::TextureLoader& texapi = ctx.Graphics().Textures();
 
-		logger->Critical(CH_CORE, "SHUTDOWN BEGIN | %s", reasonStr.c_str());
+		logger.Critical(CH_CORE, "SHUTDOWN BEGIN | %s", reasonStr.c_str());
 		MH_Uninitialize();
 		uictx->Shutdown();
 		texapi.Shutdown();
-		logger->Info(CH_CORE, "SHUTDOWN END");
+		logger.Info(CH_CORE, "SHUTDOWN END");
 
 		/* If we have the window handle and we have an original (target) wndproc. */
 		if (ctx.Platform().Window() && Hooks::Target::WndProc)
@@ -209,6 +209,11 @@ namespace Raidcore::Nexus
 #endif
 	}
 
+	Core::Context& Runtime::Core()
+	{
+		return *this->_CoreContext;
+	}
+
 	Network::Context& Runtime::Network()
 	{
 		return *this->_NetworkContext;
@@ -234,25 +239,11 @@ namespace Raidcore::Nexus
 		return *this->_GameContext;
 	}
 
-	CLogApi* Runtime::GetLogger()
-	{
-		static CLogApi s_Logger = CLogApi();
-		return &s_Logger;
-	}
-
-	CDataLinkApi* Runtime::GetDataLink()
-	{
-		static CDataLinkApi s_DataLinkApi = CDataLinkApi(
-			this->GetLogger()
-		);
-		return &s_DataLinkApi;
-	}
-
 	CInputBindApi* Runtime::GetInputBindApi()
 	{
 		static CInputBindApi s_InputBindApi = CInputBindApi(
 			&this->Host().Events(),
-			this->GetLogger(),
+			&this->Core().Logger(),
 			Index(EPath::InputBinds)
 		);
 		return &s_InputBindApi;
@@ -262,23 +253,14 @@ namespace Raidcore::Nexus
 	{
 		static CUiContext s_UiContext = CUiContext(
 			this->Graphics().Window(),
-			this->GetLogger(),
+			&this->Core().Logger(),
 			this->Graphics().Textures(),
-			this->GetDataLink(),
+			&this->Core().DataLink(),
 			this->GetInputBindApi(),
 			this->Host().Events(),
 			this->Game().Mumble()
 		);
 		return &s_UiContext;
-	}
-
-	CSettings* Runtime::GetSettingsCtx()
-	{
-		static CSettings s_SettingsApi = CSettings(
-			Index(EPath::Settings),
-			this->GetLogger()
-		);
-		return &s_SettingsApi;
 	}
 
 	Runtime::Runtime()
@@ -287,8 +269,12 @@ namespace Raidcore::Nexus
 
 		CreateIndex(GetModuleHandle(NULL));
 
+		this->_CoreContext = std::make_unique<Core::Context>(
+			Index(EPath::Settings)
+		);
+
 		this->_NetworkContext = std::make_unique<Network::Context>(
-			*this->GetLogger(),
+			this->Core().Logger(),
 			Index(EPath::DIR_COMMON)
 		);
 
@@ -298,20 +284,20 @@ namespace Raidcore::Nexus
 		);
 
 		this->_HostContext = std::make_unique<Host::Context>(
-			*this->GetLogger(),
+			this->Core().Logger(),
 			Index(EPath::DIR_ADDONS),
 			Index(EPath::AddonConfigDefault)
 		);
 
 		this->_GraphicsContext = std::make_unique<Graphics::Context>(
-			*this->GetLogger(),
+			this->Core().Logger(),
 			Index(EPath::DIR_TEXTURES)
 		);
 
 		this->_GameContext = std::make_unique<GW2::Context>(
-			*this->GetDataLink(),
+			this->Core().DataLink(),
 			this->Host().Events(),
-			*this->GetLogger(),
+			this->Core().Logger(),
 			this->Platform().RawInput(),
 			this->Platform().Window(),
 			this->Network().GetHttpClient("http://assetcdn.101.arenanetworks.com", /*disablecache=*/ true),

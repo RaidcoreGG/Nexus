@@ -84,13 +84,13 @@ void CLicenseAgreementModal::RenderContent()
 void CLicenseAgreementModal::OnClosing()
 {
 	Runtime&  ctx         = Runtime::Get();
-	CSettings* settingsctx = ctx.GetSettingsCtx();
+	CSettings& settingsctx = ctx.Core().Settings();
 
 	switch (this->GetResult())
 	{
 		case EModalResult::OK:
 		{
-			settingsctx->Set(OPT_ACCEPTEULA, true);
+			settingsctx.Set(OPT_ACCEPTEULA, true);
 			break;
 		}
 		case EModalResult::Cancel:

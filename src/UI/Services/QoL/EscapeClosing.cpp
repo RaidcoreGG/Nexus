@@ -21,9 +21,9 @@ using namespace Raidcore::Nexus;
 CEscapeClosing::CEscapeClosing() : IRefCleaner("EscapeClosing")
 {
 	Runtime& ctx = Runtime::Get();
-	CSettings* settingsctx = ctx.GetSettingsCtx();
+	CSettings& settingsctx = ctx.Core().Settings();
 
-	settingsctx->Subscribe<bool>(OPT_CLOSEESCAPE, [&](bool aNewValue)
+	settingsctx.Subscribe<bool>(OPT_CLOSEESCAPE, [&](bool aNewValue)
 	{
 		this->Enabled = aNewValue;
 	});

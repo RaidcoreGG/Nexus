@@ -13,7 +13,7 @@
 #include "ApiBase.h"
 #include "Host/Events/EvtFuncDefs.h"
 #include "Engine/Inputs/InputBinds/IbFuncDefs.h"
-#include "Engine/Logging/LogEnum.h"
+#include "Core/Logging/LogEnum.h"
 #include "GW2/Inputs/GameBinds/GbEnum.h"
 #include "Platform/RawInput/RiFuncDefs.h"
 #include "UI/Services/Fonts/FuncDefs.h"

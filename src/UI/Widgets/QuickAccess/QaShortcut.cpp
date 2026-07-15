@@ -17,7 +17,7 @@
 #include "Runtime/Runtime.h"
 using namespace Raidcore::Nexus;
 
-#include "Core/Addons/Addon.h"
+#include "Host/Addons/Addon.h"
 #include "Engine/Inputs/InputBinds/IbConst.h"
 #include "res/ResConst.h"
 #include "UI/UiContext.h"
@@ -35,7 +35,7 @@ CShortcutIcon::CShortcutIcon(
 	this->InputBindApi   = ctx.GetInputBindApi();
 	this->TextureService = &ctx.Graphics().Textures();
 	this->Loader         = &ctx.Host().Loader();
-	this->DataLink       = ctx.GetDataLink();
+	this->DataLink       = &ctx.Core().DataLink();
 
 	this->NexusLink = static_cast<NexusLinkData_t*>(this->DataLink->GetResource(DL_NEXUS_LINK));
 

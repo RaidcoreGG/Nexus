@@ -16,7 +16,7 @@
 using namespace Raidcore::Nexus;
 
 #include "res/ResConst.h"
-#include "Engine/Logging/LogConst.h"
+#include "Core/Logging/LogConst.h"
 
 CLogWindow::CLogWindow()
 {

@@ -56,11 +56,11 @@ CAddonsWindow::CAddonsWindow()
 	this->Invalidate();
 
 	Runtime&  ctx         = Runtime::Get();
-	CSettings* settingsctx = ctx.GetSettingsCtx();
+	CSettings& settingsctx = ctx.Core().Settings();
 	Host::EventApi& evtapi      = ctx.Host().Events();
 	
-	this->Filter     = settingsctx->Get(OPT_ADDONFILTERS, FILTER_INSTALLED);
-	this->IsListMode = settingsctx->Get(OPT_ISLISTMODE,   true            );
+	this->Filter     = settingsctx.Get(OPT_ADDONFILTERS, FILTER_INSTALLED);
+	this->IsListMode = settingsctx.Get(OPT_ISLISTMODE,   true            );
 
 	evtapi.Subscribe("EV_ADDON_LOADED", OnAddonChanged);
 	evtapi.Subscribe("EV_ADDON_UNLOADED", OnAddonChanged);
@@ -301,7 +301,7 @@ void CAddonsWindow::RenderContent()
 void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 {
 	Runtime&       ctx         = Runtime::Get();
-	CSettings*      settingsctx = ctx.GetSettingsCtx();
+	CSettings&      settingsctx = ctx.Core().Settings();
 	Graphics::TextureLoader& texapi      = ctx.Graphics().Textures();
 	CUiContext*     uictx       = ctx.GetUIContext();
 	CLocalization*  lang        = uictx->GetLocalization();
@@ -352,7 +352,7 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 			{
 				viewModeIcon = nullptr;
 				this->IsListMode = !this->IsListMode;
-				settingsctx->Set(OPT_ISLISTMODE, this->IsListMode);
+				settingsctx.Set(OPT_ISLISTMODE, this->IsListMode);
 			}
 		}
 
@@ -392,7 +392,7 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 					{
 						this->Filter &= ~EAddonsFilterFlags::ShowEnabled;
 					}
-					settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
+					settingsctx.Set(OPT_ADDONFILTERS, this->Filter);
 					this->Invalidate();
 					this->ClearContent();
 				}
@@ -408,7 +408,7 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 					{
 						this->Filter &= ~EAddonsFilterFlags::ShowDisabled;
 					}
-					settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
+					settingsctx.Set(OPT_ADDONFILTERS, this->Filter);
 					this->Invalidate();
 					this->ClearContent();
 				}
@@ -424,7 +424,7 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 					{
 						this->Filter &= ~EAddonsFilterFlags::ShowDownloadable;
 					}
-					settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
+					settingsctx.Set(OPT_ADDONFILTERS, this->Filter);
 					this->Invalidate();
 					this->ClearContent();
 				}
@@ -448,7 +448,7 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 		if (ImGui::Button(lang->Translate("((000031))")))
 		{
 			this->Filter = FILTER_INSTALLED;
-			settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
+			settingsctx.Set(OPT_ADDONFILTERS, this->Filter);
 			this->Invalidate();
 			this->ClearContent();
 		}
@@ -472,7 +472,7 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 		if (ImGui::Button(lang->Translate("((000032))")))
 		{
 			this->Filter = FILTER_LIBRARY;
-			settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
+			settingsctx.Set(OPT_ADDONFILTERS, this->Filter);
 			this->Invalidate();
 			this->ClearContent();
 		}
@@ -1034,11 +1034,11 @@ void CAddonsWindow::PopulateAddons()
 
 	Runtime&    ctx = Runtime::Get();
 	CUiContext*  uictx = ctx.GetUIContext();
-	CSettings*   settingsctx = ctx.GetSettingsCtx();
+	CSettings&   settingsctx = ctx.Core().Settings();
 	Host::Loader&     loader = ctx.Host().Loader();
 	Host::LibraryMgr& libMgr = ctx.Host().Library();
 
-	this->Filter = settingsctx->Get<EAddonsFilterFlags>(OPT_ADDONFILTERS, FILTER_INSTALLED);
+	this->Filter = settingsctx.Get<EAddonsFilterFlags>(OPT_ADDONFILTERS, FILTER_INSTALLED);
 
 	for (Host::IAddon* addon : loader.GetAddons())
 	{

@@ -17,9 +17,9 @@
 
 #include "Core/NexusLink.h"
 #include "Engine/Cleanup/RefCleanerBase.h"
-#include "Engine/DataLink/DlApi.h"
+#include "Core/DataLink/DlApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
-#include "Engine/Logging/LogApi.h"
+#include "Core/Logging/LogApi.h"
 #include "GW2/Mumble/MblReader.h"
 #include "QaEnum.h"
 #include "QaShortcut.h"

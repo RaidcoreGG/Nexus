@@ -68,9 +68,9 @@ static CMainWindow* s_MainWindow{};
 	if (!s_MainWindow) { return; }
 
 	Runtime&  ctx         = Runtime::Get();
-	CSettings* settingsctx = ctx.GetSettingsCtx();
+	CSettings& settingsctx = ctx.Core().Settings();
 
-	if (settingsctx->Get<bool>(OPT_SHOWADDONSWINDOWAFTERDUU, false))
+	if (settingsctx.Get<bool>(OPT_SHOWADDONSWINDOWAFTERDUU, false))
 	{
 		s_MainWindow->Activate("Addons");
 	}
@@ -79,7 +79,7 @@ static CMainWindow* s_MainWindow{};
 CMainWindow::CMainWindow()
 {
 	Runtime&      ctx    = Runtime::Get();
-	CLogApi*       logger = ctx.GetLogger();
+	CLogApi*       logger = &ctx.Core().Logger();
 	CInputBindApi* ibapi  = ctx.GetInputBindApi();
 	Host::EventApi*     evtapi = &ctx.Host().Events();
 

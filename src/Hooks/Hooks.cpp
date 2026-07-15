@@ -23,11 +23,11 @@
 using namespace Raidcore::Nexus;
 
 #include "Core/NexusLink.h"
-#include "Engine/DataLink/DlApi.h"
+#include "Core/DataLink/DlApi.h"
 #include "Host/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Host/Loader/Loader.h"
-#include "Engine/Logging/LogApi.h"
+#include "Core/Logging/LogApi.h"
 #include "GW2/Inputs/GameBinds/GbApi.h"
 #include "GW2/Inputs/MouseResetFix.h"
 #include "HkConst.h"
@@ -94,9 +94,9 @@ namespace Hooks
 			UnregisterClassA(wc.lpszClassName, wc.hInstance);
 
 			Runtime& ctx    = Runtime::Get();
-			CLogApi* logger = ctx.GetLogger();
+			CLogApi& logger = ctx.Core().Logger();
 
-			logger->Critical(CH_CORE, "Failed creating temporary window.");
+			logger.Critical(CH_CORE, "Failed creating temporary window.");
 			return;
 		}
 
@@ -128,9 +128,9 @@ namespace Hooks
 			LPVOID* vtbl3 = swap3 ? *reinterpret_cast<LPVOID**>(swap3) : nullptr;
 
 			Runtime& ctx = Runtime::Get();
-			CLogApi* logger = ctx.GetLogger();
+			CLogApi& logger = ctx.Core().Logger();
 
-			logger->Debug(CH_CORE, "HOOK BEGIN");
+			logger.Debug(CH_CORE, "HOOK BEGIN");
 
 			/* Create and enable VT hooks. */
 			/* Follow the jump chain to work nicely with various other hooks. */
@@ -151,7 +151,7 @@ namespace Hooks
 
 			MH_EnableHook(MH_ALL_HOOKS);
 
-			logger->Debug(CH_CORE, "HOOK END");
+			logger.Debug(CH_CORE, "HOOK END");
 
 			/* Release the temporary interfaces. */
 			context->Release();
@@ -161,9 +161,9 @@ namespace Hooks
 		else
 		{
 			Runtime& ctx = Runtime::Get();
-			CLogApi* logger = ctx.GetLogger();
+			CLogApi& logger = ctx.Core().Logger();
 
-			logger->Critical(CH_CORE, "Failed to create D3D11 device and swapchain.");
+			logger.Critical(CH_CORE, "Failed to create D3D11 device and swapchain.");
 		}
 
 		/* Destroy the temporary window. */
@@ -261,7 +261,7 @@ namespace Hooks
 		void Resize_Internal(uint32_t aWidth, uint32_t aHeight)
 		{
 			static Runtime& s_Context = Runtime::Get();
-			static CDataLinkApi* s_DataLink = s_Context.GetDataLink();
+			static CDataLinkApi& s_DataLink = s_Context.Core().DataLink();
 			static Host::EventApi& s_EventApi = s_Context.Host().Events();
 			static Graphics::Window_t& s_GrWindow = s_Context.Graphics().Window();
 			static CUiContext* s_UIContext = s_Context.GetUIContext();
@@ -272,7 +272,7 @@ namespace Hooks
 			s_GrWindow.Width = aWidth;
 			s_GrWindow.Height = aHeight;
 			
-			NexusLinkData_t* nexuslink = (NexusLinkData_t*)s_DataLink->GetResource(DL_NEXUS_LINK);
+			NexusLinkData_t* nexuslink = (NexusLinkData_t*)s_DataLink.GetResource(DL_NEXUS_LINK);
 
 			if (nexuslink)
 			{

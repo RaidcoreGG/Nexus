@@ -17,7 +17,7 @@
 #include "Runtime/Runtime.h"
 using namespace Raidcore::Nexus;
 
-#include "Core/Addons/API/ApiBuilder.h"
+#include "Host/Addons/API/ApiBuilder.h"
 #include "Core/Index/Index.h"
 #include "Engine/Cleanup/RefCleanerContext.h"
 #include "Util/DLL.h"
@@ -36,7 +36,7 @@ CAddon::CAddon(std::filesystem::path aLocation)
 	this->MD5 = MD5Util::FromFile(aLocation);
 
 	Runtime& ctx = Runtime::Get();
-	this->Logger = ctx.GetLogger();
+	this->Logger = &ctx.Core().Logger();
 	this->Loader = &ctx.Host().Loader();
 	this->EventApi = &ctx.Host().Events();
 	this->ConfigMgr = &ctx.Host().Config();

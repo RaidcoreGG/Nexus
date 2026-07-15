@@ -11,15 +11,15 @@
 #include "Runtime/Runtime.h"
 using namespace Raidcore::Nexus;
 
-#include "Engine/DataLink/DlApi.h"
+#include "Core/DataLink/DlApi.h"
 
 CMumbleOverlay::CMumbleOverlay()
 {
-	CDataLinkApi* dlApi = Runtime::Get().GetDataLink();
+	CDataLinkApi& dlApi = Runtime::Get().Core().DataLink();
 
-	this->MumbleLink     = (Mumble::Data*)    dlApi->GetResource(DL_MUMBLE_LINK);
-	this->MumbleIdentity = (Mumble::Identity*)dlApi->GetResource(DL_MUMBLE_LINK_IDENTITY);
-	this->NexusLink      = (NexusLinkData_t*)   dlApi->GetResource(DL_NEXUS_LINK);
+	this->MumbleLink     = (Mumble::Data*)    dlApi.GetResource(DL_MUMBLE_LINK);
+	this->MumbleIdentity = (Mumble::Identity*)dlApi.GetResource(DL_MUMBLE_LINK_IDENTITY);
+	this->NexusLink      = (NexusLinkData_t*)   dlApi.GetResource(DL_NEXUS_LINK);
 }
 
 void CMumbleOverlay::Render()
@@ -28,21 +28,22 @@ void CMumbleOverlay::Render()
 
 	if (!this->MumbleLink || !this->MumbleIdentity || !this->NexusLink)
 	{
-		CDataLinkApi* dlApi = Runtime::Get().GetDataLink();
+		CDataLinkApi& dlApi = Runtime::Get().Core().DataLink();
 
-		this->MumbleLink = (Mumble::Data*)dlApi->GetResource(DL_MUMBLE_LINK);
-		this->MumbleIdentity = (Mumble::Identity*)dlApi->GetResource(DL_MUMBLE_LINK_IDENTITY);
-		this->NexusLink = (NexusLinkData_t*)dlApi->GetResource(DL_NEXUS_LINK);
+		this->MumbleLink = (Mumble::Data*)dlApi.GetResource(DL_MUMBLE_LINK);
+		this->MumbleIdentity = (Mumble::Identity*)dlApi.GetResource(DL_MUMBLE_LINK_IDENTITY);
+		this->NexusLink = (NexusLinkData_t*)dlApi.GetResource(DL_NEXUS_LINK);
 	}
 
-	static ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration          |
-									ImGuiWindowFlags_AlwaysAutoResize      |
-									ImGuiWindowFlags_NoSavedSettings       |
-									ImGuiWindowFlags_NoFocusOnAppearing    |
-									ImGuiWindowFlags_NoNav                 |
-									ImGuiWindowFlags_NoMove                |
-									ImGuiWindowFlags_NoInputs              |
-									ImGuiWindowFlags_NoBringToFrontOnFocus;
+	static ImGuiWindowFlags flags
+		= ImGuiWindowFlags_NoDecoration
+		| ImGuiWindowFlags_AlwaysAutoResize
+		| ImGuiWindowFlags_NoSavedSettings
+		| ImGuiWindowFlags_NoFocusOnAppearing
+		| ImGuiWindowFlags_NoNav
+		| ImGuiWindowFlags_NoMove
+		| ImGuiWindowFlags_NoInputs
+		| ImGuiWindowFlags_NoBringToFrontOnFocus;
 
 	ImVec2 pos = ImVec2(16.0f, 16.0f);
 	ImVec2 size = ImVec2(ImGui::CalcTextSize("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx").x, 0.0f);

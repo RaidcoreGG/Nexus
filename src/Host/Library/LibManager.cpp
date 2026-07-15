@@ -12,7 +12,7 @@
 using namespace Raidcore::Nexus;
 
 #include "Core/Index/Index.h"
-#include "Core/Addons/AddEnum.h"
+#include "Host/Addons/AddEnum.h"
 #include "Util/Strings.h"
 #include "Util/Url.h"
 #include "Util/Paths.h"

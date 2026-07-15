@@ -16,7 +16,7 @@
 
 #include "Host/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbBindV2.h"
-#include "Engine/Logging/LogApi.h"
+#include "Core/Logging/LogApi.h"
 #include "Platform/RawInput/RiApi.h"
 #include "Graphics/GrContext.h"
 

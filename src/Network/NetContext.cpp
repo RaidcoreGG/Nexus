@@ -14,7 +14,7 @@
 #include <mutex>
 #include <string>
 
-#include "Engine/Logging/LogApi.h"
+#include "Core/Logging/LogApi.h"
 #include "Updater/Updater.h"
 #include "Util/Strings.h"
 #include "Util/Url.h"

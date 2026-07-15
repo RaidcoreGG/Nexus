@@ -13,7 +13,7 @@
 #include <windows.h>
 
 #include "Core/Versioning/Version.h"
-#include "Engine/Logging/LogApi.h"
+#include "Core/Logging/LogApi.h"
 
 constexpr const char* CH_SELFUPDATER = "Updater";
 

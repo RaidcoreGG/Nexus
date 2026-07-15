@@ -15,7 +15,7 @@
 #include "AlEnum.h"
 #include "AlMessage.h"
 #include "Core/NexusLink.h"
-#include "Engine/DataLink/DlApi.h"
+#include "Core/DataLink/DlApi.h"
 #include "UI/Controls/CtlWindow.h"
 
 ///----------------------------------------------------------------------------------------------------

@@ -11,7 +11,7 @@
 #include "Core/NexusLink.h"
 #include "Core/Preferences/PrefContext.h"
 #include "Engine/_Concepts/IWndProc.h"
-#include "Engine/DataLink/DlApi.h"
+#include "Core/DataLink/DlApi.h"
 #include "Host/Events/EvtApi.h"
 #include "GW2/Mumble/MblReader.h"
 #include "Graphics/GrWindow.h"

@@ -11,7 +11,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "Core/Addons/Addon.h"
+#include "Host/Addons/Addon.h"
 #include "Host/Library/LibAddon.h"
 #include "UI/UiBinds.h"
 #include "UI/UiFuncDefs.h"

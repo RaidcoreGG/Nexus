@@ -23,8 +23,8 @@ using namespace Raidcore::Nexus;
 CUiStyle::CUiStyle()
 {
 	Runtime& ctx = Runtime::Get();
-	this->Logger = ctx.GetLogger();
-	this->Settings = ctx.GetSettingsCtx();
+	this->Logger = &ctx.Core().Logger();
+	this->Settings = &ctx.Core().Settings();
 }
 
 CUiStyle::~CUiStyle()
@@ -42,7 +42,7 @@ void ApplyDefaultStyle()
 	}
 	catch (...)
 	{
-		Runtime::Get().GetLogger()->Debug(CH_UICONTEXT, "Error applying default style.");
+		Runtime::Get().Core().Logger().Debug(CH_UICONTEXT, "Error applying default style.");
 	}
 }
 

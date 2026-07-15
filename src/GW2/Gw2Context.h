@@ -12,9 +12,9 @@
 #include <memory>
 #include <utility>
 
-#include "Engine/DataLink/DlApi.h"
+#include "Core/DataLink/DlApi.h"
 #include "Host/Events/EvtApi.h"
-#include "Engine/Logging/LogApi.h"
+#include "Core/Logging/LogApi.h"
 #include "Network/WebRequests/WreClient.h"
 #include "GW2/ArcDPS/ArcApi.h"
 #include "GW2/BuildInfo/BuildInfoService.h"

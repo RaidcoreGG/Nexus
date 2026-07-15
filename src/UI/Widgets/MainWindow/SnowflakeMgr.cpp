@@ -22,9 +22,9 @@ using namespace Raidcore::Nexus;
 CSnowflakeMgr::CSnowflakeMgr()
 {
 	Runtime& ctx = Runtime::Get();
-	CSettings* settingsctx = ctx.GetSettingsCtx();
+	CSettings& settingsctx = ctx.Core().Settings();
 
-	settingsctx->Subscribe<bool>(OPT_DISABLEFESTIVEFLAIR, [&](bool aNewValue)
+	settingsctx.Subscribe<bool>(OPT_DISABLEFESTIVEFLAIR, [&](bool aNewValue)
 	{
 		this->IsPartyPooper = aNewValue;
 	});

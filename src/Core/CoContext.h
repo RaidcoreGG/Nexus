@@ -1,82 +1,65 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  CfgManager.h
-/// Description  :  Manager for addon configurations.
+/// Name         :  CoContext.h
+/// Description  :  Core context implementation.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
 #pragma once
 
-#include <cstdint>
 #include <filesystem>
-#include <mutex>
-#include <unordered_map>
+#include <memory>
 
-#include "Config.h"
+#include "Core/Preferences/PrefContext.h"
+#include "Core/DataLink/DlApi.h"
 #include "Core/Logging/LogApi.h"
 
-constexpr const char* CH_CFGMGR = "Config";
-
 ///----------------------------------------------------------------------------------------------------
-/// Raidcore::Nexus::Host Namespace
+/// Raidcore::Nexus::Core Namespace
 ///----------------------------------------------------------------------------------------------------
-namespace Raidcore::Nexus::Host
+namespace Raidcore::Nexus::Core
 {
 	///----------------------------------------------------------------------------------------------------
-	/// ConfigMgr Class
+	/// Context Class
 	///----------------------------------------------------------------------------------------------------
-	class ConfigMgr
+	class Context
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		ConfigMgr(CLogApi* aLogger, std::filesystem::path aConfigPath, std::vector<uint32_t> aWhitelist = {});
+		Context(std::filesystem::path aSettingsPath);
 
 		///----------------------------------------------------------------------------------------------------
-		/// dtor
+		/// Shutdown:
+		/// 	Shuts down the host context.
 		///----------------------------------------------------------------------------------------------------
-		~ConfigMgr();
+		void Shutdown();
 
 		///----------------------------------------------------------------------------------------------------
-		/// SaveConfigs:
-		/// 	Saves the addon configs to disk.
+		/// Logger:
+		/// 	Returns the logger instance.
 		///----------------------------------------------------------------------------------------------------
-		void SaveConfigs();
+		CLogApi& Logger();
 
 		///----------------------------------------------------------------------------------------------------
-		/// RegisterConfig:
-		/// 	Returns the config of the given addon signature or registers them, if they don't exist.
+		/// DataLink:
+		/// 	Returns the data link API instance.
 		///----------------------------------------------------------------------------------------------------
-		Config_t* RegisterConfig(uint32_t aSignature);
+		CDataLinkApi& DataLink();
 
 		///----------------------------------------------------------------------------------------------------
-		/// DeleteConfig:
-		/// 	Deletes the config of the given addon signature, also deletes it from disk.
+		/// Settings:
+		/// 	Returns the settings instance.
 		///----------------------------------------------------------------------------------------------------
-		void DeleteConfig(uint32_t aSignature);
-
-		///----------------------------------------------------------------------------------------------------
-		/// IsReadOnly:
-		/// 	Returns true, if config changes won't be saved.
-		///----------------------------------------------------------------------------------------------------
-		bool IsReadOnly() const;
+		CSettings& Settings();
 
 		private:
-		CLogApi* Logger = nullptr;
+		std::filesystem::path _SettingsPath{};
 
-		bool                                    ReadOnly = false;
-		std::filesystem::path                   Path;
-
-		std::mutex                              Mutex;
-		std::unordered_map<uint32_t, Config_t*> Configs;
-		std::vector<uint32_t>                   Whitelist;
-
-		///----------------------------------------------------------------------------------------------------
-		/// LoadConfigs:
-		/// 	Loads the addon configs from disk.
-		///----------------------------------------------------------------------------------------------------
-		void LoadConfigs();
+		std::unique_ptr<CLogApi>      _LogApi{ nullptr };
+		std::unique_ptr<CDataLinkApi> _DataLink{ nullptr };
+		std::unique_ptr<CSettings>    _Settings{ nullptr };
 	};
 }

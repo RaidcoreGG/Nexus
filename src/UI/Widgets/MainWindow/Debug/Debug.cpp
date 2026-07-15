@@ -192,7 +192,7 @@ void CDebugWindow::TabDataLink()
 
 	if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 	{
-		std::unordered_map<std::string, LinkedResource_t>	dataLinkRegistry = Runtime::Get().GetDataLink()->GetRegistry();
+		std::unordered_map<std::string, LinkedResource_t>	dataLinkRegistry = Runtime::Get().Core().DataLink().GetRegistry();
 
 		for (auto& [identifier, resource] : dataLinkRegistry)
 		{

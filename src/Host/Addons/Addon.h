@@ -17,7 +17,7 @@
 
 #include "AddConst.h"
 #include "AddEnum.h"
-#include "Core/Addons/Definitions/AddonDefV1.h"
+#include "Host/Addons/Definitions/AddonDefV1.h"
 #include "GW2/ArcDPS/ArcExtensionDef.h"
 #include "Host/Config/CfgManager.h"
 #include "Host/Config/Config.h"

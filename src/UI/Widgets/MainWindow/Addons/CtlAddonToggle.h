@@ -16,7 +16,7 @@
 #include "Runtime/Runtime.h"
 using namespace Raidcore::Nexus;
 
-#include "Core/Addons/Addon.h"
+#include "Host/Addons/Addon.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// AddonToggleCtl Namespace

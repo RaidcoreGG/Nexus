@@ -20,11 +20,11 @@ using namespace Raidcore::Nexus;
 #include "ApiV5.h"
 #include "ApiV6.h"
 #include "Core/Index/Index.h"
-#include "Engine/DataLink/DlApi.h"
+#include "Core/DataLink/DlApi.h"
 #include "Host/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Platform/RawInput/RiApi.h"
-#include "Engine/Logging/LogApi.h"
+#include "Core/Logging/LogApi.h"
 #include "GW2/ArcDPS/ArcApi.h"
 #include "GW2/Inputs/GameBinds/GbApi.h"
 #include "UI/Services/Fonts/FontManager.h"
@@ -560,12 +560,12 @@ namespace ADDONAPI
 		{
 			Runtime& ctx   = Runtime::Get();
 
-			s_DataLinkApi   = ctx.GetDataLink();
+			s_DataLinkApi   = &ctx.Core().DataLink();
 			s_EventApi      = &ctx.Host().Events();
 			s_GameBindsApi  = &ctx.Game().GameBinds();
 			s_InputBindApi  = ctx.GetInputBindApi();
 			s_RawInputApi   = &ctx.Platform().RawInput();
-			s_Logger        = ctx.GetLogger();
+			s_Logger        = &ctx.Core().Logger();
 			s_TextureApi    = &ctx.Graphics().Textures();
 			s_Loader        = &ctx.Host().Loader();
 			s_GrWindow      = &ctx.Graphics().Window();

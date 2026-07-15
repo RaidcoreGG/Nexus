@@ -13,12 +13,12 @@
 
 #include "imgui/imgui.h"
 
-#include "Core/Hooks/HkConst.h"
+#include "Hooks/HkConst.h"
 #include "Core/Preferences/PrefConst.h"
 #include "GW2/Mumble/MblConst.h"
 #include "Core/NexusLink.h"
 #include "Core/Preferences/PrefContext.h"
-#include "Engine/DataLink/DlApi.h"
+#include "Core/DataLink/DlApi.h"
 #include "Graphics/GrWindow.h"
 #include "GW2/Mumble/MblReader.h"
 #include "Host/Events/EvtApi.h"

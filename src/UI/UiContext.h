@@ -12,9 +12,9 @@
 #include <windows.h>
 
 #include "Engine/_Concepts/IWndProc.h"
-#include "Engine/DataLink/DlApi.h"
+#include "Core/DataLink/DlApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
-#include "Engine/Logging/LogApi.h"
+#include "Core/Logging/LogApi.h"
 #include "Graphics/GrWindow.h"
 #include "Graphics/Textures/TxLoader.h"
 #include "GW2/Mumble/MblReader.h"

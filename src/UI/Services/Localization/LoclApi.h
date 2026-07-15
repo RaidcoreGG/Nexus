@@ -13,7 +13,7 @@
 #include <map>
 #include <string>
 
-#include "Engine/Logging/LogApi.h"
+#include "Core/Logging/LogApi.h"
 #include "LoclLocale.h"
 #include "LoclQueuedText.h"
 

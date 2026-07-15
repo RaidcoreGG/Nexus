@@ -8,7 +8,7 @@
 
 #include "HoContext.h"
 
-#include "Core/Addons/Addon.h"
+#include "Host/Addons/Addon.h"
 #include "Engine/Clockwork/Clockwork.h"
 #include "Util/CmdLine.h"
 #include "Util/Strings.h"
