@@ -240,10 +240,10 @@ void CUiContext::Initialize()
 		this->GrWindow.Device->GetImmediateContext(&this->GrWindow.DeviceContext);
 	}
 
-	HRESULT hr = bbDevice->CreateRenderTargetView(pBackBuffer, NULL, &this->RenderTargetView);
+	HRESULT hr = bbDevice->CreateRenderTargetView(pBackBuffer, NULL, &this->GrWindow.RenderTarget);
 	pBackBuffer->Release();
 
-	if (!this->RenderTargetView)
+	if (!this->GrWindow.RenderTarget)
 	{
 		this->Logger->Critical(CH_UICONTEXT, "CUiContext::Initialize() failed. RenderTargetView could not be created.");
 		return;
@@ -269,10 +269,10 @@ void CUiContext::Shutdown()
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 
-	if (this->RenderTargetView)
+	if (this->GrWindow.RenderTarget)
 	{
-		this->RenderTargetView->Release();
-		this->RenderTargetView = 0;
+		this->GrWindow.RenderTarget->Release();
+		this->GrWindow.RenderTarget = 0;
 	}
 
 	this->IsInitialized = false;
@@ -373,7 +373,7 @@ void CUiContext::Render()
 		/* end frame */
 		ImGui::EndFrame();
 		ImGui::Render();
-		this->GrWindow.DeviceContext->OMSetRenderTargets(1, &this->RenderTargetView, NULL);
+		this->GrWindow.DeviceContext->OMSetRenderTargets(1, &this->GrWindow.RenderTarget, NULL);
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	}
 

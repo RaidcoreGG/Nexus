@@ -169,9 +169,6 @@ class CUiContext : public CUiRender, public CUiBinds, public CUiStyle, public vi
 	Host::EventApi&     EventApi;
 	GW2::MumbleReader&  MumbleReader;
 
-	/* Rendering */
-	ID3D11RenderTargetView* RenderTargetView;
-
 	/* Windows/Widgets */
 	CAlerts*                Alerts;
 	CMainWindow*            MainWindow;
