@@ -158,7 +158,6 @@
     <ClInclude Include="src\Network\WebRequests\WreConst.h" />
     <ClInclude Include="src\Engine\Verifier.h" />
     <ClInclude Include="src\Engine\Cleanup\RefCleanerBase.h" />
-    <ClInclude Include="src\Engine\_Concepts\IWndProc.h" />
     <ClInclude Include="src\GW2\ArcDPS\ArcApi.h" />
     <ClInclude Include="src\GW2\ArcDPS\ArcEnum.h" />
     <ClInclude Include="src\GW2\ArcDPS\ArcExtensionDef.h" />

@@ -13,7 +13,6 @@
 #include <unordered_map>
 #include <windows.h>
 
-#include "Engine/_Concepts/IWndProc.h"
 #include "Engine/Cleanup/RefCleanerBase.h"
 
 ///----------------------------------------------------------------------------------------------------
@@ -24,7 +23,7 @@ namespace Raidcore::Nexus::GUI
 	///----------------------------------------------------------------------------------------------------
 	/// CEscapeClosing Class
 	///----------------------------------------------------------------------------------------------------
-	class CEscapeClosing : public virtual IRefCleaner, public virtual IWndProc
+	class CEscapeClosing : public virtual IRefCleaner
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
@@ -41,7 +40,7 @@ namespace Raidcore::Nexus::GUI
 		/// WndProc:
 		/// 	Returns 0 if message was processed.
 		///----------------------------------------------------------------------------------------------------
-		UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Register:

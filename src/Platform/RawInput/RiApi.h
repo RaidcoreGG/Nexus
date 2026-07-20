@@ -11,7 +11,6 @@
 #include <mutex>
 #include <vector>
 
-#include "Engine/_Concepts/IWndProc.h"
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include "RiFuncDefs.h"
 
@@ -23,7 +22,7 @@ namespace Raidcore::Nexus::Platform
 	///----------------------------------------------------------------------------------------------------
 	/// RawInputApi Class
 	///----------------------------------------------------------------------------------------------------
-	class RawInputApi : public virtual IRefCleaner, public virtual IWndProc
+	class RawInputApi : public virtual IRefCleaner
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
@@ -40,7 +39,7 @@ namespace Raidcore::Nexus::Platform
 		/// WndProc:
 		/// 	Returns 0 if message was processed or non-zero, if it should be passed to the next callback.
 		///----------------------------------------------------------------------------------------------------
-		UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Register:

@@ -14,7 +14,6 @@
 #include <string>
 #include <windows.h>
 
-#include "Engine/_Concepts/IWndProc.h"
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include "Host/Events/EvtApi.h"
 #include "Core/Logging/LogApi.h"
@@ -30,7 +29,7 @@ constexpr const char* CH_INPUTBINDS = "InputBinds";
 ///----------------------------------------------------------------------------------------------------
 /// CInputBindApi Class
 ///----------------------------------------------------------------------------------------------------
-class CInputBindApi : public CInputBindCapture, public virtual IRefCleaner, public virtual IWndProc
+class CInputBindApi : public CInputBindCapture, public virtual IRefCleaner
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -47,7 +46,7 @@ class CInputBindApi : public CInputBindCapture, public virtual IRefCleaner, publ
 	/// WndProc:
 	/// 	Returns 0 if a InputBind_t was invoked.
 	///----------------------------------------------------------------------------------------------------
-	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Register:

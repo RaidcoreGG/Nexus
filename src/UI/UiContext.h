@@ -11,7 +11,6 @@
 #include <d3d11.h>
 #include <windows.h>
 
-#include "Engine/_Concepts/IWndProc.h"
 #include "Core/DataLink/DlApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Core/Logging/LogApi.h"
@@ -52,7 +51,7 @@ namespace Raidcore::Nexus::GUI
 	///----------------------------------------------------------------------------------------------------
 	/// Context Class
 	///----------------------------------------------------------------------------------------------------
-	class Context : public CUiRender, public CUiBinds, public CUiStyle, public virtual IWndProc
+	class Context : public CUiRender, public CUiBinds, public CUiStyle
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
@@ -125,7 +124,7 @@ namespace Raidcore::Nexus::GUI
 		/// WndProc:
 		/// 	Returns 0 if message was processed.
 		///----------------------------------------------------------------------------------------------------
-		UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 		///----------------------------------------------------------------------------------------------------
 		/// GetLocalization:

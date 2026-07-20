@@ -15,7 +15,6 @@
 #include <vector>
 #include <windows.h>
 
-#include "Engine/_Concepts/IWndProc.h"
 #include "Core/Logging/LogApi.h"
 #include "LdrAddonBase.h"
 
@@ -30,7 +29,7 @@ namespace Raidcore::Nexus::Host
 	///----------------------------------------------------------------------------------------------------
 	/// Loader Class
 	///----------------------------------------------------------------------------------------------------
-	class Loader : public virtual IWndProc
+	class Loader
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
@@ -58,7 +57,7 @@ namespace Raidcore::Nexus::Host
 		/// WndProc:
 		/// 	Returns 0 if message was processed.
 		///----------------------------------------------------------------------------------------------------
-		UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 		///----------------------------------------------------------------------------------------------------
 		/// NotifyChanges:

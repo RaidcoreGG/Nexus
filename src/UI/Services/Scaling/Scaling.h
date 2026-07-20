@@ -10,7 +10,6 @@
 
 #include "Core/NexusLink.h"
 #include "Core/Preferences/PrefContext.h"
-#include "Engine/_Concepts/IWndProc.h"
 #include "Core/DataLink/DlApi.h"
 #include "Host/Events/EvtApi.h"
 #include "GW2/Mumble/MblReader.h"
@@ -26,7 +25,7 @@ namespace Raidcore::Nexus::GUI
 	///----------------------------------------------------------------------------------------------------
 	/// CScaling Class
 	///----------------------------------------------------------------------------------------------------
-	class CScaling : public virtual IWndProc
+	class CScaling
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
@@ -61,7 +60,7 @@ namespace Raidcore::Nexus::GUI
 		/// WndProc:
 		/// 	Returns 0 if message was processed.
 		///----------------------------------------------------------------------------------------------------
-		UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 		///----------------------------------------------------------------------------------------------------
 		/// UpdateDPI:

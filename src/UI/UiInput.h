@@ -12,7 +12,6 @@
 #include <cstdint>
 
 #include "Core/Preferences/PrefContext.h"
-#include "Engine/_Concepts/IWndProc.h"
 #include "Util/Inputs.h"
 
 ///----------------------------------------------------------------------------------------------------
@@ -23,7 +22,7 @@ namespace Raidcore::Nexus::GUI
 	///----------------------------------------------------------------------------------------------------
 	/// CUiInput Class
 	///----------------------------------------------------------------------------------------------------
-	class CUiInput : public virtual IWndProc
+	class CUiInput
 	{
 		public:
 		enum class EInputType : uint8_t
@@ -58,7 +57,7 @@ namespace Raidcore::Nexus::GUI
 		/// WndProc:
 		/// 	Returns 0 if message was processed.
 		///----------------------------------------------------------------------------------------------------
-		UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 		///----------------------------------------------------------------------------------------------------
 		/// FlushInput:
