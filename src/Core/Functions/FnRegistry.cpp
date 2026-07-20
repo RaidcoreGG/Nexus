@@ -12,17 +12,17 @@
 
 namespace Raidcore::Nexus::Core
 {
-	CFuncRegistry::CFuncRegistry(LogApi* aLogger)
+	FuncRegistry::FuncRegistry(LogApi* aLogger)
 	{
 		assert(aLogger);
 
 		this->Logger = aLogger;
 	}
 
-	CFuncRegistry::~CFuncRegistry()
+	FuncRegistry::~FuncRegistry()
 	{}
 
-	void CFuncRegistry::Register(std::string& aIdentifier, void* aFunction)
+	void FuncRegistry::Register(std::string& aIdentifier, void* aFunction)
 	{
 		if (aFunction == nullptr) { return; }
 
@@ -43,14 +43,14 @@ namespace Raidcore::Nexus::Core
 		this->Registry.emplace(aIdentifier, entry);
 	}
 
-	void CFuncRegistry::Deregister(std::string& aIdentifier, void* aFunction)
+	void FuncRegistry::Deregister(std::string& aIdentifier, void* aFunction)
 	{
 		if (aFunction == nullptr) { return; }
 
 
 	}
 
-	void* CFuncRegistry::Query(std::string& aIdentifier)
+	void* FuncRegistry::Query(std::string& aIdentifier)
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -65,7 +65,7 @@ namespace Raidcore::Nexus::Core
 		return nullptr;
 	}
 
-	void CFuncRegistry::Release(std::string& aIdentifier)
+	void FuncRegistry::Release(std::string& aIdentifier)
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 

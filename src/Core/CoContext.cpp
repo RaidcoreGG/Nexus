@@ -26,6 +26,10 @@ namespace Raidcore::Nexus::Core
 			this->_LogApi.get()
 		);
 
+		this->_FuncRegistry = std::make_unique<Core::FuncRegistry>(
+			this->_LogApi.get()
+		);
+
 		this->_Settings = std::make_unique<Core::SettingsMgr>(
 			this->_SettingsPath,
 			this->_LogApi.get()
@@ -47,6 +51,11 @@ namespace Raidcore::Nexus::Core
 	Core::DataLinkApi& Context::DataLink()
 	{
 		return *this->_DataLink;
+	}
+
+	Core::FuncRegistry& Context::Function()
+	{
+		return *this->_FuncRegistry;
 	}
 
 	Core::SettingsMgr& Context::Settings()

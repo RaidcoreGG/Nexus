@@ -11,9 +11,10 @@
 #include <filesystem>
 #include <memory>
 
-#include "Core/Preferences/PrefContext.h"
 #include "Core/DataLink/DlApi.h"
+#include "Core/Functions/FnRegistry.h"
 #include "Core/Logging/LogApi.h"
+#include "Core/Preferences/PrefContext.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::Core Namespace
@@ -50,6 +51,12 @@ namespace Raidcore::Nexus::Core
 		Core::DataLinkApi& DataLink();
 
 		///----------------------------------------------------------------------------------------------------
+		/// Function:
+		/// 	Returns the function registry instance.
+		///----------------------------------------------------------------------------------------------------
+		Core::FuncRegistry& Function();
+
+		///----------------------------------------------------------------------------------------------------
 		/// Settings:
 		/// 	Returns the settings instance.
 		///----------------------------------------------------------------------------------------------------
@@ -58,8 +65,9 @@ namespace Raidcore::Nexus::Core
 		private:
 		std::filesystem::path _SettingsPath{};
 
-		std::unique_ptr<Core::LogApi>      _LogApi{ nullptr };
-		std::unique_ptr<Core::DataLinkApi> _DataLink{ nullptr };
-		std::unique_ptr<Core::SettingsMgr>    _Settings{ nullptr };
+		std::unique_ptr<Core::LogApi>       _LogApi      { nullptr };
+		std::unique_ptr<Core::DataLinkApi>  _DataLink    { nullptr };
+		std::unique_ptr<Core::FuncRegistry> _FuncRegistry{ nullptr };
+		std::unique_ptr<Core::SettingsMgr>  _Settings    { nullptr };
 	};
 }

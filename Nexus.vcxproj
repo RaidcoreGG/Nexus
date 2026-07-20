@@ -124,6 +124,7 @@
     <ClInclude Include="src\Host\HoContext.h" />
     <ClInclude Include="src\Network\NetContext.h" />
     <ClInclude Include="src\Platform\PlContext.h" />
+    <ClInclude Include="src\Runtime\IComponent.h" />
     <ClInclude Include="src\Runtime\Runtime.h" />
     <ClInclude Include="src\Hooks\HkConst.h" />
     <ClInclude Include="src\Hooks\HkFuncDefs.h" />
