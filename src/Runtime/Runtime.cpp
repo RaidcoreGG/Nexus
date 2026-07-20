@@ -40,6 +40,7 @@ namespace Clockwork = Raidcore::Clockwork;
 #include "Index/Index.h"
 #include "Util/CmdLine.h"
 #include "Util/Strings.h"
+#include "Util/Dll.h"
 #include "Util/Url.h"
 #include "Version.h"
 #include "Host/Config/CfgManager.h"
@@ -271,7 +272,7 @@ namespace Raidcore::Nexus
 	{
 		Clockwork::Context::Create();
 
-		CreateIndex(GetModuleHandle(NULL));
+		CreateIndex(GetCurrentModule());
 
 		this->_CoreContext = std::make_unique<Core::Context>(
 			Index(EPath::Settings)

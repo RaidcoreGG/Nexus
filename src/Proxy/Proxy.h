@@ -12,6 +12,8 @@
 #include <string>
 #include <windows.h>
 
+#include "Util/Dll.h"
+
 #ifndef PROXY
 #define PROXY extern "C"
 #endif
@@ -19,21 +21,6 @@
 #ifndef PROTECT_RECURSE
 #define PROTECT_RECURSE(x) ProxyCallScope_t _scope(x)
 #endif
-
-///----------------------------------------------------------------------------------------------------
-/// GetSelfModule:
-/// 	Returns the module handle of the current module.
-///----------------------------------------------------------------------------------------------------
-inline HMODULE GetCurrentModule()
-{
-	HMODULE h = nullptr;
-	GetModuleHandleExA(
-		GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
-		(LPCSTR)&GetCurrentModule,
-		&h
-	);
-	return h;
-}
 
 ///----------------------------------------------------------------------------------------------------
 /// ProxyModule_t Struct

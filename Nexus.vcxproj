@@ -11,15 +11,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Host\Addons\Addon.cpp" />
     <ClCompile Include="src\Core\CoContext.cpp" />
     <ClCompile Include="src\Graphics\GrContext.cpp" />
+    <ClCompile Include="src\GW2\Gw2Context.cpp" />
+    <ClCompile Include="src\Host\Addons\Addon.cpp" />
     <ClCompile Include="src\Host\Config\CfgManager.cpp" />
+    <ClCompile Include="src\Host\HoContext.cpp" />
     <ClCompile Include="src\Host\Library\LibAddon.cpp" />
     <ClCompile Include="src\Host\Library\LibManager.cpp" />
     <ClCompile Include="src\GW2\BuildInfo\BuildInfoService.cpp" />
-    <ClCompile Include="src\GW2\Gw2Context.cpp" />
-    <ClCompile Include="src\Host\HoContext.cpp" />
     <ClCompile Include="src\Network\NetContext.cpp" />
     <ClCompile Include="src\Platform\PlContext.cpp" />
     <ClCompile Include="src\Runtime\Runtime.cpp" />
@@ -108,23 +108,22 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\CommitHash.h" />
-    <ClInclude Include="src\Host\Addons\AddEnum.h" />
-    <ClInclude Include="src\Host\Addons\Addon.h" />
     <ClInclude Include="src\Core\CoContext.h" />
     <ClInclude Include="src\Graphics\GrContext.h" />
+    <ClInclude Include="src\GW2\Gw2Context.h" />
+    <ClInclude Include="src\Host\Addons\AddEnum.h" />
+    <ClInclude Include="src\Host\Addons\Addon.h" />
     <ClInclude Include="src\Host\Config\CfgEnum.h" />
     <ClInclude Include="src\Host\Config\CfgManager.h" />
     <ClInclude Include="src\Host\Config\Config.h" />
     <ClInclude Include="src\Host\Addons\Definitions\DefEnum.h" />
+    <ClInclude Include="src\Host\HoContext.h" />
     <ClInclude Include="src\Host\Library\LibAddon.h" />
     <ClInclude Include="src\Host\Library\LibManager.h" />
     <ClInclude Include="src\GW2\BuildInfo\BuildInfoService.h" />
-    <ClInclude Include="src\GW2\Gw2Context.h" />
     <ClInclude Include="src\GW2\Mumble\MblExtensions.h" />
-    <ClInclude Include="src\Host\HoContext.h" />
     <ClInclude Include="src\Network\NetContext.h" />
     <ClInclude Include="src\Platform\PlContext.h" />
-    <ClInclude Include="src\Runtime\IComponent.h" />
     <ClInclude Include="src\Runtime\Runtime.h" />
     <ClInclude Include="src\Hooks\HkConst.h" />
     <ClInclude Include="src\Hooks\HkFuncDefs.h" />
