@@ -41,127 +41,132 @@ constexpr const char* ICON_NEXUS_XMAS_HOVER      = "ICON_NEXUS_XMAS_HOVER";
 constexpr const char* QAKEY_GENERIC              = "Generic";
 
 ///----------------------------------------------------------------------------------------------------
+/// Raidcore::Nexus::GUI Namespace
+///----------------------------------------------------------------------------------------------------
+namespace Raidcore::Nexus::GUI
+{
+///----------------------------------------------------------------------------------------------------
 /// CQuickAccess Class
 ///----------------------------------------------------------------------------------------------------
-class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
-{
-	public:
-	///----------------------------------------------------------------------------------------------------
-	/// OnAddonStateChanged:
-	/// 	Rechecks invalid shortcuts on addon state change.
-	///----------------------------------------------------------------------------------------------------
-	static void OnAddonStateChanged(void* aEventData);
+	class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// OnAddonStateChanged:
+		/// 	Rechecks invalid shortcuts on addon state change.
+		///----------------------------------------------------------------------------------------------------
+		static void OnAddonStateChanged(void* aEventData);
 
-	public:
-	///----------------------------------------------------------------------------------------------------
-	/// ctor
-	///----------------------------------------------------------------------------------------------------
-	CQuickAccess(CDataLinkApi* aDataLink, CLogApi* aLogger, CInputBindApi* aInputBindApi, Graphics::TextureLoader* aTextureService, CLocalization* aLocalization, Host::EventApi* aEventApi);
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		CQuickAccess(CDataLinkApi* aDataLink, CLogApi* aLogger, CInputBindApi* aInputBindApi, Graphics::TextureLoader* aTextureService, CLocalization* aLocalization, Host::EventApi* aEventApi);
 
-	///----------------------------------------------------------------------------------------------------
-	/// dtor
-	///----------------------------------------------------------------------------------------------------
-	~CQuickAccess();
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		~CQuickAccess();
 
-	///----------------------------------------------------------------------------------------------------
-	/// Render:
-	/// 	Renders the Quick Access.
-	///----------------------------------------------------------------------------------------------------
-	void Render() override;
+		///----------------------------------------------------------------------------------------------------
+		/// Render:
+		/// 	Renders the Quick Access.
+		///----------------------------------------------------------------------------------------------------
+		void Render() override;
 
-	///----------------------------------------------------------------------------------------------------
-	/// AddShortcut:
-	/// 	Adds a shortcut icon.
-	///----------------------------------------------------------------------------------------------------
-	void AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aInputBindIdentifier, const char* aTooltipText);
+		///----------------------------------------------------------------------------------------------------
+		/// AddShortcut:
+		/// 	Adds a shortcut icon.
+		///----------------------------------------------------------------------------------------------------
+		void AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aInputBindIdentifier, const char* aTooltipText);
 
-	///----------------------------------------------------------------------------------------------------
-	/// RemoveShortcut:
-	/// 	Removes a shortcut icon.
-	///----------------------------------------------------------------------------------------------------
-	void RemoveShortcut(const char* aIdentifier);
+		///----------------------------------------------------------------------------------------------------
+		/// RemoveShortcut:
+		/// 	Removes a shortcut icon.
+		///----------------------------------------------------------------------------------------------------
+		void RemoveShortcut(const char* aIdentifier);
 
-	///----------------------------------------------------------------------------------------------------
-	/// PushNotification:
-	/// 	Adds a notification to a given shortcut icon.
-	///----------------------------------------------------------------------------------------------------
-	void PushNotification(const char* aIdentifier, const char* aNotificationKey);
+		///----------------------------------------------------------------------------------------------------
+		/// PushNotification:
+		/// 	Adds a notification to a given shortcut icon.
+		///----------------------------------------------------------------------------------------------------
+		void PushNotification(const char* aIdentifier, const char* aNotificationKey);
 
-	///----------------------------------------------------------------------------------------------------
-	/// PopNotification:
-	/// 	Removes a notification to a given shortcut icon.
-	///----------------------------------------------------------------------------------------------------
-	void PopNotification(const char* aIdentifier, const char* aNotificationKey);
+		///----------------------------------------------------------------------------------------------------
+		/// PopNotification:
+		/// 	Removes a notification to a given shortcut icon.
+		///----------------------------------------------------------------------------------------------------
+		void PopNotification(const char* aIdentifier, const char* aNotificationKey);
 
-	///----------------------------------------------------------------------------------------------------
-	/// AddContextItem:
-	/// 	Adds a context item to the Nexus shortcut.
-	///----------------------------------------------------------------------------------------------------
-	void AddContextItem(const char* aIdentifier, GUI_RENDER aShortcutRenderCallback);
+		///----------------------------------------------------------------------------------------------------
+		/// AddContextItem:
+		/// 	Adds a context item to the Nexus shortcut.
+		///----------------------------------------------------------------------------------------------------
+		void AddContextItem(const char* aIdentifier, GUI_RENDER aShortcutRenderCallback);
 
-	///----------------------------------------------------------------------------------------------------
-	/// AddContextItem:
-	/// 	Adds a context item to the given shortcut.
-	///----------------------------------------------------------------------------------------------------
-	void AddContextItem(const char* aIdentifier, const char* aTargetShortcutIdentifier, GUI_RENDER aShortcutRenderCallback);
+		///----------------------------------------------------------------------------------------------------
+		/// AddContextItem:
+		/// 	Adds a context item to the given shortcut.
+		///----------------------------------------------------------------------------------------------------
+		void AddContextItem(const char* aIdentifier, const char* aTargetShortcutIdentifier, GUI_RENDER aShortcutRenderCallback);
 
-	///----------------------------------------------------------------------------------------------------
-	/// RemoveContextItem:
-	/// 	Removes a context item.
-	///----------------------------------------------------------------------------------------------------
-	void RemoveContextItem(const char* aIdentifier);
-	
-	///----------------------------------------------------------------------------------------------------
-	/// GetRegistry:
-	/// 	Returns a copy of the registry.
-	///----------------------------------------------------------------------------------------------------
-	std::map<std::string, CShortcutIcon*> GetRegistry() const;
+		///----------------------------------------------------------------------------------------------------
+		/// RemoveContextItem:
+		/// 	Removes a context item.
+		///----------------------------------------------------------------------------------------------------
+		void RemoveContextItem(const char* aIdentifier);
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetOrphanage:
-	/// 	Returns a copy of the orphaned callbacks.
-	///----------------------------------------------------------------------------------------------------
-	std::map<std::string, ContextItem_t> GetOrphanage() const;
+		///----------------------------------------------------------------------------------------------------
+		/// GetRegistry:
+		/// 	Returns a copy of the registry.
+		///----------------------------------------------------------------------------------------------------
+		std::map<std::string, CShortcutIcon*> GetRegistry() const;
 
-	///----------------------------------------------------------------------------------------------------
-	/// CleanupRefs:
-	/// 	Removes all shortcuts and context items matching the address space.
-	///----------------------------------------------------------------------------------------------------
-	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
+		///----------------------------------------------------------------------------------------------------
+		/// GetOrphanage:
+		/// 	Returns a copy of the orphaned callbacks.
+		///----------------------------------------------------------------------------------------------------
+		std::map<std::string, ContextItem_t> GetOrphanage() const;
 
-	private:
-	CLogApi*                              Logger             {};
-	CInputBindApi*                        InputBindApi       {};
-	Graphics::TextureLoader*                       TextureService     {};
-	CLocalization*                        Language           {};
-	Host::EventApi*                      EventApi           {};
+		///----------------------------------------------------------------------------------------------------
+		/// CleanupRefs:
+		/// 	Removes all shortcuts and context items matching the address space.
+		///----------------------------------------------------------------------------------------------------
+		uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
-	NexusLinkData_t*                      NexusLink          {};
-	Mumble::Data*                         MumbleLink         {};
+		private:
+		CLogApi* Logger{};
+		CInputBindApi* InputBindApi{};
+		Graphics::TextureLoader* TextureService{};
+		CLocalization* Language{};
+		Host::EventApi* EventApi{};
 
-	mutable std::mutex                    Mutex              {};
-	std::map<std::string, CShortcutIcon*> Registry           {};
-	std::map<std::string, ContextItem_t>  OrphanedCallbacks  {};
-	std::vector<std::string>              SuppressedShortcuts{};
+		NexusLinkData_t* NexusLink{};
+		Mumble::Data* MumbleLink{};
 
-	bool                                  VerticalLayout     { false };
-	EQaVisibility                         Visibility         { EQaVisibility::AlwaysShow };
-	EQaPosition                           Location           { EQaPosition::Extend };
-	ImVec2                                Offset             { ImVec2{0, 0} };
-	bool                                  OnlyShowOnHover    { false }; // Fully hide unless hovered
+		mutable std::mutex                    Mutex{};
+		std::map<std::string, CShortcutIcon*> Registry{};
+		std::map<std::string, ContextItem_t>  OrphanedCallbacks{};
+		std::vector<std::string>              SuppressedShortcuts{};
 
-	float                                 Opacity            { 0.5f };
+		bool                                  VerticalLayout{ false };
+		EQaVisibility                         Visibility{ EQaVisibility::AlwaysShow };
+		EQaPosition                           Location{ EQaPosition::Extend };
+		ImVec2                                Offset{ ImVec2{0, 0} };
+		bool                                  OnlyShowOnHover{ false }; // Fully hide unless hovered
 
-	///----------------------------------------------------------------------------------------------------
-	/// WhereAreMyParents:
-	/// 	Returns orphaned context items to their parents.
-	///----------------------------------------------------------------------------------------------------
-	void WhereAreMyParents();
+		float                                 Opacity{ 0.5f };
 
-	///----------------------------------------------------------------------------------------------------
-	/// UpdateNexusLink:
-	/// 	Updates the nexus link shortcut icon count.
-	///----------------------------------------------------------------------------------------------------
-	void UpdateNexusLink();
+		///----------------------------------------------------------------------------------------------------
+		/// WhereAreMyParents:
+		/// 	Returns orphaned context items to their parents.
+		///----------------------------------------------------------------------------------------------------
+		void WhereAreMyParents();
 
-};
+		///----------------------------------------------------------------------------------------------------
+		/// UpdateNexusLink:
+		/// 	Updates the nexus link shortcut icon count.
+		///----------------------------------------------------------------------------------------------------
+		void UpdateNexusLink();
+	};
+}

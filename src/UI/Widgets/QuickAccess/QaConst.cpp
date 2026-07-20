@@ -8,27 +8,30 @@
 
 #include "QaConst.h"
 
-std::string EQaVisibilityToString(EQaVisibility aQAVisibility)
+namespace Raidcore::Nexus::GUI
 {
-	switch (aQAVisibility)
+	std::string EQaVisibilityToString(EQaVisibility aQAVisibility)
 	{
-		case EQaVisibility::AlwaysShow:  return "((000047))";
-		case EQaVisibility::Gameplay:    return "((000093))";
-		case EQaVisibility::OutOfCombat: return "((000094))";
-		case EQaVisibility::InCombat:    return "((000095))";
-		case EQaVisibility::Hide:        return "((000096))";
-		default:                         return "(null)";
+		switch (aQAVisibility)
+		{
+			case EQaVisibility::AlwaysShow:  return "((000047))";
+			case EQaVisibility::Gameplay:    return "((000093))";
+			case EQaVisibility::OutOfCombat: return "((000094))";
+			case EQaVisibility::InCombat:    return "((000095))";
+			case EQaVisibility::Hide:        return "((000096))";
+			default:                         return "(null)";
+		}
 	}
-}
 
-std::string EQaPositionToString(EQaPosition aQAPosition)
-{
-	switch (aQAPosition)
+	std::string EQaPositionToString(EQaPosition aQAPosition)
 	{
-		case EQaPosition::Extend: return "((000067))";
-		case EQaPosition::Under:  return "((000068))";
-		case EQaPosition::Bottom: return "((000069))";
-		case EQaPosition::Custom: return "((000070))";
-		default:                  return "(null)";
+		switch (aQAPosition)
+		{
+			case EQaPosition::Extend: return "((000067))";
+			case EQaPosition::Under:  return "((000068))";
+			case EQaPosition::Bottom: return "((000069))";
+			case EQaPosition::Custom: return "((000070))";
+			default:                  return "(null)";
+		}
 	}
 }

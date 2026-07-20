@@ -17,94 +17,97 @@ using namespace Raidcore::Nexus;
 
 #include "Core/Index/Index.h"
 
-CExportStyleModal::CExportStyleModal()
+namespace Raidcore::Nexus::GUI
 {
-	this->SetID("ExportStyleModal");
-	this->SetDisplayName("Save style preset");
-	this->Data = {};
-	memset(this->PathBuffer, 0, sizeof(this->PathBuffer));
-}
-
-void CExportStyleModal::RenderContent()
-{
-	if (ImGui::InputTextWithHint("##InputFilename", "Style Name", this->PathBuffer, sizeof(this->PathBuffer)))
+	CExportStyleModal::CExportStyleModal()
 	{
-		this->Path = Index(EPath::DIR_STYLES) / this->PathBuffer;
-		this->Path += ".imstyle180";
+		this->SetID("ExportStyleModal");
+		this->SetDisplayName("Save style preset");
+		this->Data = {};
+		memset(this->PathBuffer, 0, sizeof(this->PathBuffer));
 	}
 
-	if (std::filesystem::exists(this->Path))
+	void CExportStyleModal::RenderContent()
 	{
-		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 0.f, 0.f, 1.f));
-		ImGui::TextWrapped("%s already exists and will be overwritten.", this->PathBuffer);
-		ImGui::PopStyleColor();
-	}
-
-	if (ImGui::Button("Save"))
-	{
-		this->SetResult(EModalResult::OK);
-	}
-
-	ImGui::SameLine();
-
-	if (ImGui::Button("Cancel"))
-	{
-		this->SetResult(EModalResult::Cancel);
-	}
-}
-
-void CExportStyleModal::OnClosing()
-{
-	switch (this->GetResult())
-	{
-		case EModalResult::OK:
+		if (ImGui::InputTextWithHint("##InputFilename", "Style Name", this->PathBuffer, sizeof(this->PathBuffer)))
 		{
-			try
-			{
-				std::ofstream file(this->Path);
+			this->Path = Index(EPath::DIR_STYLES) / this->PathBuffer;
+			this->Path += ".imstyle180";
+		}
 
-				if (!file)
+		if (std::filesystem::exists(this->Path))
+		{
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 0.f, 0.f, 1.f));
+			ImGui::TextWrapped("%s already exists and will be overwritten.", this->PathBuffer);
+			ImGui::PopStyleColor();
+		}
+
+		if (ImGui::Button("Save"))
+		{
+			this->SetResult(EModalResult::OK);
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel"))
+		{
+			this->SetResult(EModalResult::Cancel);
+		}
+	}
+
+	void CExportStyleModal::OnClosing()
+	{
+		switch (this->GetResult())
+		{
+			case EModalResult::OK:
+			{
+				try
 				{
+					std::ofstream file(this->Path);
+
+					if (!file)
+					{
+						/* Signal failure, to keep the modal open. */
+						this->SetResult(EModalResult::None);
+						break;
+					}
+
+					file << this->Data;
+					file.close();
+
+					this->ClearData();
+				}
+				catch (...)
+				{
+					Runtime& ctx = Runtime::Get();
+					CLogApi* logger = &ctx.Core().Logger();
+					logger->Warning(CH_UICONTEXT, "Error saving stylesheet.");
+
 					/* Signal failure, to keep the modal open. */
 					this->SetResult(EModalResult::None);
-					break;
 				}
-
-				file << this->Data;
-				file.close();
-
-				this->ClearData();
+				break;
 			}
-			catch (...)
+			case EModalResult::Cancel:
 			{
-				Runtime& ctx = Runtime::Get();
-				CLogApi* logger = &ctx.Core().Logger();
-				logger->Warning(CH_UICONTEXT, "Error saving stylesheet.");
-
-				/* Signal failure, to keep the modal open. */
-				this->SetResult(EModalResult::None);
+				this->ClearData();
+				break;
 			}
-			break;
-		}
-		case EModalResult::Cancel:
-		{
-			this->ClearData();
-			break;
 		}
 	}
-}
 
-void CExportStyleModal::SetData(const std::string& aBase64Style)
-{
-	this->Data = aBase64Style;
+	void CExportStyleModal::SetData(const std::string& aBase64Style)
+	{
+		this->Data = aBase64Style;
 
-	this->OpenModal();
-}
+		this->OpenModal();
+	}
 
-void CExportStyleModal::ClearData()
-{
-	/* Reset data. */
-	this->Data.clear();
-	memset(this->PathBuffer, 0, sizeof(this->PathBuffer));
-	this->Path.clear();
+	void CExportStyleModal::ClearData()
+	{
+		/* Reset data. */
+		this->Data.clear();
+		memset(this->PathBuffer, 0, sizeof(this->PathBuffer));
+		this->Path.clear();
+	}
 }

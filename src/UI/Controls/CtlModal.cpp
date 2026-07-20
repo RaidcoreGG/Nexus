@@ -13,104 +13,107 @@
 #include "Runtime/Runtime.h"
 using namespace Raidcore::Nexus;
 
-bool IModal::Render()
+namespace Raidcore::Nexus::GUI
 {
-	if (this->ShouldOpenNextFrame)
+	bool IModal::Render()
 	{
-		ImGui::OpenPopup(this->GetName().c_str());
-		this->OnOpening();
-		this->ShouldOpenNextFrame = false;
-		this->SetResult(EModalResult::None); /* Reset last result. */
-	}
+		if (this->ShouldOpenNextFrame)
+		{
+			ImGui::OpenPopup(this->GetName().c_str());
+			this->OnOpening();
+			this->ShouldOpenNextFrame = false;
+			this->SetResult(EModalResult::None); /* Reset last result. */
+		}
 
-	constexpr ImGuiWindowFlags ModalFlags
-		= ImGuiWindowFlags_AlwaysAutoResize
-		| ImGuiWindowFlags_NoResize
-		| ImGuiWindowFlags_NoCollapse
-		| ImGuiWindowFlags_NoMove
-		| ImGuiWindowFlags_NoSavedSettings;
+		constexpr ImGuiWindowFlags ModalFlags
+			= ImGuiWindowFlags_AlwaysAutoResize
+			| ImGuiWindowFlags_NoResize
+			| ImGuiWindowFlags_NoCollapse
+			| ImGuiWindowFlags_NoMove
+			| ImGuiWindowFlags_NoSavedSettings;
 
-	Graphics::Window_t& grWindow = Runtime::Get().Graphics().Window();
+		Graphics::Window_t& grWindow = Runtime::Get().Graphics().Window();
 
-	/* Center the modal. */
-	ImVec2 center(grWindow.Width * 0.5f, grWindow.Height * 0.5f);
-	ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+		/* Center the modal. */
+		ImVec2 center(grWindow.Width * 0.5f, grWindow.Height * 0.5f);
+		ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
 
-	float minWidthTitle = (ImGui::GetStyle().WindowPadding.x * 2) + ImGui::CalcTextSize(this->GetDisplayName().c_str()).x;
+		float minWidthTitle = (ImGui::GetStyle().WindowPadding.x * 2) + ImGui::CalcTextSize(this->GetDisplayName().c_str()).x;
 
-	/* Ensure the modal title fits. As the window itself auto resizes, but that does not respect the title length. */
-	ImGui::SetNextWindowSizeConstraints(ImVec2(minWidthTitle, 0.f), ImVec2(FLT_MAX, FLT_MAX));
+		/* Ensure the modal title fits. As the window itself auto resizes, but that does not respect the title length. */
+		ImGui::SetNextWindowSizeConstraints(ImVec2(minWidthTitle, 0.f), ImVec2(FLT_MAX, FLT_MAX));
 
-	if (!ImGui::BeginPopupModal(this->GetName().c_str(), NULL, ModalFlags))
-	{
+		if (!ImGui::BeginPopupModal(this->GetName().c_str(), NULL, ModalFlags))
+		{
+			return false;
+		}
+
+		this->RenderContent();
+
+		/* Notify callback. */
+		if (this->GetResult() != EModalResult::None)
+		{
+			this->OnClosing();
+		}
+
+		/* If there is still a result. Modal can be closed. */
+		/* If the result is EModalResult::None again, the modal failed or similar and should NOT be closed. */
+		if (this->GetResult() != EModalResult::None)
+		{
+			ImGui::CloseCurrentPopup();
+			ImGui::EndPopup();
+			return true;
+		}
+
+		ImGui::EndPopup();
+
 		return false;
 	}
 
-	this->RenderContent();
-
-	/* Notify callback. */
-	if (this->GetResult() != EModalResult::None)
+	std::string IModal::GetName() const
 	{
-		this->OnClosing();
+		assert(!this->GetID().empty());
+		assert(!this->GetDisplayName().empty());
+
+		Runtime& ctx = Runtime::Get();
+		CUiContext* uictx = ctx.GetUIContext();
+		CLocalization* lang = uictx->GetLocalization();
+
+		return std::string{ lang->Translate(this->GetDisplayName().c_str()) } + "##" + this->ID;
 	}
 
-	/* If there is still a result. Modal can be closed. */
-	/* If the result is EModalResult::None again, the modal failed or similar and should NOT be closed. */
-	if (this->GetResult() != EModalResult::None)
+	const std::string& IModal::GetID() const
 	{
-		ImGui::CloseCurrentPopup();
-		ImGui::EndPopup();
-		return true;
+		return this->ID;
 	}
 
-	ImGui::EndPopup();
+	const std::string& IModal::GetDisplayName() const
+	{
+		return this->DisplayName;
+	}
 
-	return false;
-}
+	EModalResult IModal::GetResult() const
+	{
+		return this->Result;
+	}
 
-std::string IModal::GetName() const
-{
-	assert(!this->GetID().empty());
-	assert(!this->GetDisplayName().empty());
+	void IModal::OpenModal()
+	{
+		this->ShouldOpenNextFrame = true;
+	}
 
-	Runtime&      ctx   = Runtime::Get();
-	CUiContext*    uictx = ctx.GetUIContext();
-	CLocalization* lang  = uictx->GetLocalization();
+	void IModal::SetID(std::string aID)
+	{
+		this->ID = aID;
+	}
 
-	return std::string{lang->Translate(this->GetDisplayName().c_str())} + "##" + this->ID;
-}
+	void IModal::SetDisplayName(std::string aDisplayName)
+	{
+		this->DisplayName = aDisplayName;
+	}
 
-const std::string& IModal::GetID() const
-{
-	return this->ID;
-}
-
-const std::string& IModal::GetDisplayName() const
-{
-	return this->DisplayName;
-}
-
-EModalResult IModal::GetResult() const
-{
-	return this->Result;
-}
-
-void IModal::OpenModal()
-{
-	this->ShouldOpenNextFrame = true;
-}
-
-void IModal::SetID(std::string aID)
-{
-	this->ID = aID;
-}
-
-void IModal::SetDisplayName(std::string aDisplayName)
-{
-	this->DisplayName = aDisplayName;
-}
-
-void IModal::SetResult(EModalResult aResult)
-{
-	this->Result = aResult;
+	void IModal::SetResult(EModalResult aResult)
+	{
+		this->Result = aResult;
+	}
 }

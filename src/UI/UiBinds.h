@@ -19,91 +19,97 @@
 
 using namespace Raidcore::Nexus;
 
-struct InputBindPacked_t
-{
-	std::string KeysText{};
-	IbMapping_t Bind    {};
-};
-
-struct InputBindCategory_t
-{
-	std::string                                        Name      {};
-	std::unordered_map<std::string, InputBindPacked_t> InputBinds{};
-};
-
-struct GameInputBindPacked_t
-{
-	std::string Name     {};
-	std::string KeysText {};
-	InputBind_t Bind     {};
-
-	std::string KeysText2{};
-	InputBind_t Bind2    {};
-};
-
-struct GameInputBindCategory_t
-{
-	std::string                                           Name          {};
-	std::unordered_map<GW2::EGameBinds, GameInputBindPacked_t> GameInputBinds{};
-};
-
-enum class EBindEditType
-{
-	None,
-	Nexus,
-	Game,
-	Game2
-};
-
 ///----------------------------------------------------------------------------------------------------
-/// CUiBinds Class
+/// Raidcore::Nexus::GUI Namespace
 ///----------------------------------------------------------------------------------------------------
-class CUiBinds
+namespace Raidcore::Nexus::GUI
 {
-	public:
-	///----------------------------------------------------------------------------------------------------
-	/// ctor
-	///----------------------------------------------------------------------------------------------------
-	CUiBinds();
+	struct InputBindPacked_t
+	{
+		std::string KeysText{};
+		IbMapping_t Bind{};
+	};
+
+	struct InputBindCategory_t
+	{
+		std::string                                        Name{};
+		std::unordered_map<std::string, InputBindPacked_t> InputBinds{};
+	};
+
+	struct GameInputBindPacked_t
+	{
+		std::string Name{};
+		std::string KeysText{};
+		InputBind_t Bind{};
+
+		std::string KeysText2{};
+		InputBind_t Bind2{};
+	};
+
+	struct GameInputBindCategory_t
+	{
+		std::string                                           Name{};
+		std::unordered_map<GW2::EGameBinds, GameInputBindPacked_t> GameInputBinds{};
+	};
+
+	enum class EBindEditType
+	{
+		None,
+		Nexus,
+		Game,
+		Game2
+	};
 
 	///----------------------------------------------------------------------------------------------------
-	/// dtor
+	/// CUiBinds Class
 	///----------------------------------------------------------------------------------------------------
-	virtual ~CUiBinds();
+	class CUiBinds
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		CUiBinds();
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetInputBinds:
-	/// 	Returns a copy of the display input binds.
-	///----------------------------------------------------------------------------------------------------
-	std::vector<InputBindCategory_t> GetInputBinds();
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		virtual ~CUiBinds();
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetInputBinds:
-	/// 	Returns a copy of the display input binds.
-	///----------------------------------------------------------------------------------------------------
-	std::unordered_map<std::string, InputBindPacked_t> GetInputBinds(const std::string& aCategory);
+		///----------------------------------------------------------------------------------------------------
+		/// GetInputBinds:
+		/// 	Returns a copy of the display input binds.
+		///----------------------------------------------------------------------------------------------------
+		std::vector<InputBindCategory_t> GetInputBinds();
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetGameBinds:
-	/// 	Returns a copy of the display game input binds.
-	///----------------------------------------------------------------------------------------------------
-	std::vector<GameInputBindCategory_t> GetGameBinds();
+		///----------------------------------------------------------------------------------------------------
+		/// GetInputBinds:
+		/// 	Returns a copy of the display input binds.
+		///----------------------------------------------------------------------------------------------------
+		std::unordered_map<std::string, InputBindPacked_t> GetInputBinds(const std::string& aCategory);
 
-	protected:
-	///----------------------------------------------------------------------------------------------------
-	/// UpdateDisplayInputBinds:
-	/// 	Refreshes the displayed input binds.
-	///----------------------------------------------------------------------------------------------------
-	void UpdateDisplayInputBinds();
+		///----------------------------------------------------------------------------------------------------
+		/// GetGameBinds:
+		/// 	Returns a copy of the display game input binds.
+		///----------------------------------------------------------------------------------------------------
+		std::vector<GameInputBindCategory_t> GetGameBinds();
 
-	///----------------------------------------------------------------------------------------------------
-	/// UpdateDisplayGameBinds:
-	/// 	Refreshes the displayed game input binds.
-	///----------------------------------------------------------------------------------------------------
-	void UpdateDisplayGameBinds();
+		protected:
+		///----------------------------------------------------------------------------------------------------
+		/// UpdateDisplayInputBinds:
+		/// 	Refreshes the displayed input binds.
+		///----------------------------------------------------------------------------------------------------
+		void UpdateDisplayInputBinds();
 
-	private:
-	mutable std::mutex                   DisplayBindsMutex{};
-	std::vector<InputBindCategory_t>     DisplayInputBinds{};
-	std::vector<GameInputBindCategory_t> DisplayGameBinds{};
-};
+		///----------------------------------------------------------------------------------------------------
+		/// UpdateDisplayGameBinds:
+		/// 	Refreshes the displayed game input binds.
+		///----------------------------------------------------------------------------------------------------
+		void UpdateDisplayGameBinds();
+
+		private:
+		mutable std::mutex                   DisplayBindsMutex{};
+		std::vector<InputBindCategory_t>     DisplayInputBinds{};
+		std::vector<GameInputBindCategory_t> DisplayGameBinds{};
+	};
+}

@@ -11,50 +11,53 @@
 #include "Runtime/Runtime.h"
 using namespace Raidcore::Nexus;
 
-CImportStyleModal::CImportStyleModal()
+namespace Raidcore::Nexus::GUI
 {
-	this->SetID("ImportStyleModal");
-	this->SetDisplayName("Import style preset");
-	memset(this->DataBuffer, 0, sizeof(this->DataBuffer));
-}
-
-void CImportStyleModal::RenderContent()
-{
-	ImGui::InputTextWithHint("##InputStyleCode", "Style Code", this->DataBuffer, sizeof(this->DataBuffer));
-
-	if (ImGui::Button("Apply"))
+	CImportStyleModal::CImportStyleModal()
 	{
-		this->SetResult(EModalResult::OK);
+		this->SetID("ImportStyleModal");
+		this->SetDisplayName("Import style preset");
+		memset(this->DataBuffer, 0, sizeof(this->DataBuffer));
 	}
 
-	ImGui::SameLine();
-
-	if (ImGui::Button("Cancel"))
+	void CImportStyleModal::RenderContent()
 	{
-		this->SetResult(EModalResult::Cancel);
-	}
-}
+		ImGui::InputTextWithHint("##InputStyleCode", "Style Code", this->DataBuffer, sizeof(this->DataBuffer));
 
-void CImportStyleModal::OnClosing()
-{
-	switch (this->GetResult())
-	{
-		case EModalResult::OK:
+		if (ImGui::Button("Apply"))
 		{
-			Runtime& ctx = Runtime::Get();
-			CUiContext* uictx = ctx.GetUIContext();
-
-			uictx->ApplyStyle(EUIStyle::Code, this->DataBuffer);
-
-			/* Reset data. */
-			memset(this->DataBuffer, 0, sizeof(this->DataBuffer));
-			break;
+			this->SetResult(EModalResult::OK);
 		}
-		case EModalResult::Cancel:
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel"))
 		{
-			/* Reset data. */
-			memset(this->DataBuffer, 0, sizeof(this->DataBuffer));
-			break;
+			this->SetResult(EModalResult::Cancel);
+		}
+	}
+
+	void CImportStyleModal::OnClosing()
+	{
+		switch (this->GetResult())
+		{
+			case EModalResult::OK:
+			{
+				Runtime& ctx = Runtime::Get();
+				CUiContext* uictx = ctx.GetUIContext();
+
+				uictx->ApplyStyle(EUIStyle::Code, this->DataBuffer);
+
+				/* Reset data. */
+				memset(this->DataBuffer, 0, sizeof(this->DataBuffer));
+				break;
+			}
+			case EModalResult::Cancel:
+			{
+				/* Reset data. */
+				memset(this->DataBuffer, 0, sizeof(this->DataBuffer));
+				break;
+			}
 		}
 	}
 }

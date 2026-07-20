@@ -8,6 +8,12 @@
 
 #pragma once
 
-typedef const char* (*LOCALIZATION_TRANSLATE)  (const char* aIdentifier);
-typedef const char* (*LOCALIZATION_TRANSLATETO)(const char* aIdentifier, const char* aLanguageIdentifier);
-typedef void        (*LOCALIZATION_SET)        (const char* aIdentifier, const char* aLanguageIdentifier, const char* aString);
+///----------------------------------------------------------------------------------------------------
+/// Raidcore::Nexus::GUI Namespace
+///----------------------------------------------------------------------------------------------------
+namespace Raidcore::Nexus::GUI
+{
+	typedef const char* (*LOCALIZATION_TRANSLATE)  (const char* aIdentifier);
+	typedef const char* (*LOCALIZATION_TRANSLATETO)(const char* aIdentifier, const char* aLanguageIdentifier);
+	typedef void        (*LOCALIZATION_SET)        (const char* aIdentifier, const char* aLanguageIdentifier, const char* aString);
+}

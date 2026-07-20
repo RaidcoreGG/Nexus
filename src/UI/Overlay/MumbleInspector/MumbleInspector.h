@@ -13,15 +13,21 @@
 #include "Core/NexusLink.h"
 #include "UI/Controls/CtlWindow.h"
 
-class CMumbleOverlay : public virtual IWindow
+///----------------------------------------------------------------------------------------------------
+/// Raidcore::Nexus::GUI Namespace
+///----------------------------------------------------------------------------------------------------
+namespace Raidcore::Nexus::GUI
 {
-	public:
-	CMumbleOverlay();
+	class CMumbleOverlay : public virtual IWindow
+	{
+		public:
+		CMumbleOverlay();
 
-	void Render() override;
+		void Render() override;
 
-	private:
-	Mumble::Data*     MumbleLink;
-	Mumble::Identity* MumbleIdentity;
-	NexusLinkData_t*    NexusLink;
-};
+		private:
+		Mumble::Data* MumbleLink;
+		Mumble::Identity* MumbleIdentity;
+		NexusLinkData_t* NexusLink;
+	};
+}

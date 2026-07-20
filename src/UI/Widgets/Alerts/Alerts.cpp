@@ -15,82 +15,88 @@ using namespace Raidcore::Nexus;
 #include "imgui/imgui_extensions.h"
 #include "ImAnimate/ImAnimate.h"
 
-constexpr ImGuiWindowFlags Flags
-	= ImGuiWindowFlags_NoDecoration
-	| ImGuiWindowFlags_NoInputs
-	| ImGuiWindowFlags_NoNav
-	| ImGuiWindowFlags_AlwaysAutoResize
-	| ImGuiWindowFlags_NoResize
-	| ImGuiWindowFlags_NoSavedSettings
-	| ImGuiWindowFlags_NoBackground;
-
-CAlerts::CAlerts(CDataLinkApi* aDataLink)
+///----------------------------------------------------------------------------------------------------
+/// Raidcore::Nexus::GUI Namespace
+///----------------------------------------------------------------------------------------------------
+namespace Raidcore::Nexus::GUI
 {
-	this->NexusLink = (NexusLinkData_t*)aDataLink->GetResource("DL_NEXUS_LINK");
-}
+	constexpr ImGuiWindowFlags Flags
+		= ImGuiWindowFlags_NoDecoration
+		| ImGuiWindowFlags_NoInputs
+		| ImGuiWindowFlags_NoNav
+		| ImGuiWindowFlags_AlwaysAutoResize
+		| ImGuiWindowFlags_NoResize
+		| ImGuiWindowFlags_NoSavedSettings
+		| ImGuiWindowFlags_NoBackground;
 
-void CAlerts::Render()
-{
-	if (this->Queue.size() > 0)
+	CAlerts::CAlerts(CDataLinkApi* aDataLink)
 	{
-		AlertMessage_t& alert = this->Queue.front();
+		this->NexusLink = (NexusLinkData_t*)aDataLink->GetResource("DL_NEXUS_LINK");
+	}
 
-		ImGui::PushFont((ImFont*)this->NexusLink->FontBig);
-		float width = ImGui::CalcTextSize(alert.Message.c_str()).x;
-
-		Runtime&        ctx      = Runtime::Get(); Graphics::Window_t window = ctx.Graphics().Window();
-
-		/* center horizontally */
-		ImGui::SetNextWindowPos(ImVec2((window.Width - width) / 2.0f, 230.0f * this->NexusLink->Scaling));
-		if (ImGui::Begin("##Alerts", (bool*)0, Flags))
+	void CAlerts::Render()
+	{
+		if (this->Queue.size() > 0)
 		{
-			ImColor msgCol;
-			switch (alert.Type)
+			AlertMessage_t& alert = this->Queue.front();
+
+			ImGui::PushFont((ImFont*)this->NexusLink->FontBig);
+			float width = ImGui::CalcTextSize(alert.Message.c_str()).x;
+
+			Runtime& ctx = Runtime::Get(); Graphics::Window_t window = ctx.Graphics().Window();
+
+			/* center horizontally */
+			ImGui::SetNextWindowPos(ImVec2((window.Width - width) / 2.0f, 230.0f * this->NexusLink->Scaling));
+			if (ImGui::Begin("##Alerts", (bool*)0, Flags))
 			{
-				default:
-				case EAlertType::Info:
-					msgCol = ImVec4(1.f, 1.f, 0.f, this->Opacity);
-					break;
-				case EAlertType::Error:
-					msgCol = ImVec4(1.f, 0.f, 0.f, this->Opacity);
-					break;
+				ImColor msgCol;
+				switch (alert.Type)
+				{
+					default:
+					case EAlertType::Info:
+						msgCol = ImVec4(1.f, 1.f, 0.f, this->Opacity);
+						break;
+					case EAlertType::Error:
+						msgCol = ImVec4(1.f, 0.f, 0.f, this->Opacity);
+						break;
+				}
+				ImGui::TextColoredOutlined(msgCol, "%s", alert.Message.c_str());
 			}
-			ImGui::TextColoredOutlined(msgCol, "%s", alert.Message.c_str());
+			ImGui::End();
+
+			ImGui::PopFont();
+
+			if (alert.StartTime == 0)
+			{
+				alert.StartTime = ImGui::GetCurrentContext()->Time * 1000;
+			}
+			else if ((ImGui::GetCurrentContext()->Time * 1000 - alert.StartTime) > 5000)
+			{
+				ImGui::Animate(1, 0, 2500, &this->Opacity, ImAnimate::ECurve::InCubic);
+			}
 		}
-		ImGui::End();
 
-		ImGui::PopFont();
-
-		if (alert.StartTime == 0)
+		if (this->Opacity == 0)
 		{
-			alert.StartTime = ImGui::GetCurrentContext()->Time * 1000;
+			this->Queue.erase(this->Queue.begin());
+			this->Opacity = 1;
 		}
-		else if ((ImGui::GetCurrentContext()->Time * 1000 - alert.StartTime) > 5000)
+	}
+
+	void CAlerts::Notify(EAlertType aType, const char* aMessage)
+	{
+		if (aType == EAlertType::None) { return; }
+
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		/* reset fade out if it's the same message */
+		if (this->Queue.size() > 0 && this->Queue.front().Message == aMessage)
 		{
-			ImGui::Animate(1, 0, 2500, &this->Opacity, ImAnimate::ECurve::InCubic);
+			this->Opacity = 1.0f;
 		}
-	}
-
-	if (this->Opacity == 0)
-	{
-		this->Queue.erase(this->Queue.begin());
-		this->Opacity = 1;
-	}
-}
-
-void CAlerts::Notify(EAlertType aType, const char* aMessage)
-{
-	if (aType == EAlertType::None) { return; }
-
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	/* reset fade out if it's the same message */
-	if (this->Queue.size() > 0 && this->Queue.front().Message == aMessage)
-	{
-		this->Opacity = 1.0f;
-	}
-	else /* otherwise add it to the queue */
-	{
-		this->Queue.push_back(AlertMessage_t{aType, aMessage });
+		else /* otherwise add it to the queue */
+		{
+			this->Queue.push_back(AlertMessage_t{ aType, aMessage });
+		}
 	}
 }

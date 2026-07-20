@@ -11,77 +11,80 @@
 #include "Runtime/Runtime.h"
 using namespace Raidcore::Nexus;
 
-CUninstallConfirmationModal::CUninstallConfirmationModal()
+namespace Raidcore::Nexus::GUI
 {
-	this->SetID("UninstallConfirmationModal");
-	this->SetDisplayName("((000117))");
-}
-
-void CUninstallConfirmationModal::RenderContent()
-{
-	Runtime&      ctx   = Runtime::Get();
-	CUiContext*    uictx = ctx.GetUIContext();
-	CLocalization* lang  = uictx->GetLocalization();
-
-	ImGui::Text(lang->Translate("((000116))"));
-
-	/* Accept */
-	if (ImGui::Button(lang->Translate("((000065))")))
+	CUninstallConfirmationModal::CUninstallConfirmationModal()
 	{
-		this->SetResult(EModalResult::OK);
+		this->SetID("UninstallConfirmationModal");
+		this->SetDisplayName("((000117))");
 	}
 
-	ImGui::SameLine();
-
-	/* Cancel */
-	if (ImGui::Button(lang->Translate("((000066))")))
+	void CUninstallConfirmationModal::RenderContent()
 	{
-		this->SetResult(EModalResult::Cancel);
-	}
-}
+		Runtime& ctx = Runtime::Get();
+		CUiContext* uictx = ctx.GetUIContext();
+		CLocalization* lang = uictx->GetLocalization();
 
-void CUninstallConfirmationModal::OnClosing()
-{
-	Runtime&    ctx    = Runtime::Get();
-	Host::Loader&    loader = ctx.Host().Loader();
+		ImGui::Text(lang->Translate("((000116))"));
 
-	switch (this->GetResult())
-	{
-		case EModalResult::OK:
+		/* Accept */
+		if (ImGui::Button(lang->Translate("((000065))")))
 		{
-			// FIXME: loader->UninstallSafe(this->Path);
-			break;
+			this->SetResult(EModalResult::OK);
 		}
-		case EModalResult::Cancel:
+
+		ImGui::SameLine();
+
+		/* Cancel */
+		if (ImGui::Button(lang->Translate("((000066))")))
 		{
-			break;
+			this->SetResult(EModalResult::Cancel);
 		}
 	}
 
-	/* Reset data. */
-	this->Name.clear();
-	this->Path.clear();
-}
+	void CUninstallConfirmationModal::OnClosing()
+	{
+		Runtime& ctx = Runtime::Get();
+		Host::Loader& loader = ctx.Host().Loader();
 
-void CUninstallConfirmationModal::SetTarget(std::string aName, std::filesystem::path aPath)
-{
-	this->Name = aName;
-	this->Path = aPath;
+		switch (this->GetResult())
+		{
+			case EModalResult::OK:
+			{
+				// FIXME: loader->UninstallSafe(this->Path);
+				break;
+			}
+			case EModalResult::Cancel:
+			{
+				break;
+			}
+		}
 
-	this->SetTitle();
+		/* Reset data. */
+		this->Name.clear();
+		this->Path.clear();
+	}
 
-	this->OpenModal();
-}
+	void CUninstallConfirmationModal::SetTarget(std::string aName, std::filesystem::path aPath)
+	{
+		this->Name = aName;
+		this->Path = aPath;
 
-void CUninstallConfirmationModal::SetTitle()
-{
-	Runtime& ctx = Runtime::Get();
-	CUiContext* uictx = ctx.GetUIContext();
-	CLocalization* lang = uictx->GetLocalization();
+		this->SetTitle();
 
-	/* Override the title before opening the modal. */
-	std::string title = lang->Translate("((000117))");
-	title.append(this->Name);
+		this->OpenModal();
+	}
 
-	this->SetDisplayName(title);
+	void CUninstallConfirmationModal::SetTitle()
+	{
+		Runtime& ctx = Runtime::Get();
+		CUiContext* uictx = ctx.GetUIContext();
+		CLocalization* lang = uictx->GetLocalization();
+
+		/* Override the title before opening the modal. */
+		std::string title = lang->Translate("((000117))");
+		title.append(this->Name);
+
+		this->SetDisplayName(title);
+	}
 }

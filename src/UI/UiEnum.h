@@ -11,30 +11,36 @@
 #include <cstdint>
 
 ///----------------------------------------------------------------------------------------------------
-/// ERenderType Enumeration
+/// Raidcore::Nexus::GUI Namespace
 ///----------------------------------------------------------------------------------------------------
-enum class ERenderType : uint32_t
+namespace Raidcore::Nexus::GUI
 {
-	PreRender,
-	Render,
-	PostRender,
-	OptionsRender,
+	///----------------------------------------------------------------------------------------------------
+	/// ERenderType Enumeration
+	///----------------------------------------------------------------------------------------------------
+	enum class ERenderType : uint32_t
+	{
+		PreRender,
+		Render,
+		PostRender,
+		OptionsRender,
 
-	COUNT
-};
+		COUNT
+	};
 
-///----------------------------------------------------------------------------------------------------
-/// EUIStyle Enumeration
-///----------------------------------------------------------------------------------------------------
-enum class EUIStyle : uint32_t
-{
-	User,
-	Nexus,
-	ImGui_Classic,
-	ImGui_Light,
-	ImGui_Dark,
-	ArcDPS_Default,
-	ArcDPS_Current, /* If available. */
-	File,
-	Code
-};
+	///----------------------------------------------------------------------------------------------------
+	/// EUIStyle Enumeration
+	///----------------------------------------------------------------------------------------------------
+	enum class EUIStyle : uint32_t
+	{
+		User,
+		Nexus,
+		ImGui_Classic,
+		ImGui_Light,
+		ImGui_Dark,
+		ArcDPS_Default,
+		ArcDPS_Current, /* If available. */
+		File,
+		Code
+	};
+}

@@ -13,13 +13,19 @@
 
 using namespace Raidcore::Nexus;
 
-class CAboutBox : public ISubWindow
+///----------------------------------------------------------------------------------------------------
+/// Raidcore::Nexus::GUI Namespace
+///----------------------------------------------------------------------------------------------------
+namespace Raidcore::Nexus::GUI
 {
-	public:
-	CAboutBox();
-	void RenderContent() override;
+	class CAboutBox : public ISubWindow
+	{
+		public:
+		CAboutBox();
+		void RenderContent() override;
 
-	private:
-	Graphics::Texture_t* Tex_BannerDiscord = nullptr;
-	Graphics::Texture_t* Tex_BannerPatreon = nullptr;
-};
+		private:
+		Graphics::Texture_t* Tex_BannerDiscord = nullptr;
+		Graphics::Texture_t* Tex_BannerPatreon = nullptr;
+	};
+}

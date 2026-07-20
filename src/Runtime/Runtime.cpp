@@ -167,7 +167,7 @@ namespace Raidcore::Nexus
 
 		Runtime& ctx = Runtime::Get();
 		CLogApi& logger = ctx.Core().Logger();
-		CUiContext* uictx = ctx.GetUIContext();
+		GUI::CUiContext* uictx = ctx.GetUIContext();
 		Graphics::TextureLoader& texapi = ctx.Graphics().Textures();
 
 		logger.Critical(CH_CORE, "SHUTDOWN BEGIN | %s", reasonStr.c_str());
@@ -249,9 +249,9 @@ namespace Raidcore::Nexus
 		return &s_InputBindApi;
 	}
 
-	CUiContext* Runtime::GetUIContext()
+	GUI::CUiContext* Runtime::GetUIContext()
 	{
-		static CUiContext s_UiContext = CUiContext(
+		static GUI::CUiContext s_UiContext = GUI::CUiContext(
 			this->Graphics().Window(),
 			&this->Core().Logger(),
 			this->Graphics().Textures(),

@@ -70,7 +70,7 @@ namespace Raidcore::Nexus
 
 		CInputBindApi* GetInputBindApi();
 
-		CUiContext* GetUIContext();
+		GUI::CUiContext* GetUIContext();
 
 		private:
 		Runtime();

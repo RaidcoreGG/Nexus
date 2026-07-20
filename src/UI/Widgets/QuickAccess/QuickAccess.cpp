@@ -24,527 +24,530 @@ using namespace Raidcore::Nexus;
 
 #define GW2_QUICKACCESS_ITEMS 10;
 
-void CQuickAccess::OnAddonStateChanged(void* aEventData)
+namespace Raidcore::Nexus::GUI
 {
-	Runtime&     ctx   = Runtime::Get();
-	CUiContext*   uictx = ctx.GetUIContext();
-	CQuickAccess* qactx = uictx->GetQuickAccess();
+	void CQuickAccess::OnAddonStateChanged(void* aEventData)
+	{
+		Runtime& ctx = Runtime::Get();
+		CUiContext* uictx = ctx.GetUIContext();
+		CQuickAccess* qactx = uictx->GetQuickAccess();
 
-	qactx->Invalidate();
-}
+		qactx->Invalidate();
+	}
 
-CQuickAccess::CQuickAccess(
-	CDataLinkApi*   aDataLink,
-	CLogApi*        aLogger,
-	CInputBindApi*  aInputBindApi,
-	Graphics::TextureLoader* aTextureService,
-	CLocalization*  aLocalization,
-	Host::EventApi*      aEventApi
-) : IRefCleaner("QuickAccess")
-{
-	this->Logger         = aLogger;
-	this->InputBindApi   = aInputBindApi;
-	this->TextureService = aTextureService;
-	this->Language       = aLocalization;
-	this->EventApi       = aEventApi;
+	CQuickAccess::CQuickAccess(
+		CDataLinkApi* aDataLink,
+		CLogApi* aLogger,
+		CInputBindApi* aInputBindApi,
+		Graphics::TextureLoader* aTextureService,
+		CLocalization* aLocalization,
+		Host::EventApi* aEventApi
+	) : IRefCleaner("QuickAccess")
+	{
+		this->Logger = aLogger;
+		this->InputBindApi = aInputBindApi;
+		this->TextureService = aTextureService;
+		this->Language = aLocalization;
+		this->EventApi = aEventApi;
 
-	this->NexusLink = (NexusLinkData_t*)aDataLink->GetResource(DL_NEXUS_LINK);
-	this->MumbleLink = (Mumble::Data*)aDataLink->GetResource(DL_MUMBLE_LINK);
+		this->NexusLink = (NexusLinkData_t*)aDataLink->GetResource(DL_NEXUS_LINK);
+		this->MumbleLink = (Mumble::Data*)aDataLink->GetResource(DL_MUMBLE_LINK);
 
-	Runtime&  ctx         = Runtime::Get();
-	CSettings& settingsctx = ctx.Core().Settings();
+		Runtime& ctx = Runtime::Get();
+		CSettings& settingsctx = ctx.Core().Settings();
 
-	/* Setup notifiers. */
-	settingsctx.Subscribe<bool>(OPT_QAVERTICAL, [&](bool aVertical)
+		/* Setup notifiers. */
+		settingsctx.Subscribe<bool>(OPT_QAVERTICAL, [&](bool aVertical)
+		{
+			this->VerticalLayout = aVertical;
+		});
+		settingsctx.Subscribe<EQaPosition>(OPT_QALOCATION, [&](EQaPosition aPosition)
+		{
+			this->Location = aPosition;
+		});
+		settingsctx.Subscribe<float>(OPT_QAOFFSETX, [&](float aOffsetX)
+		{
+			this->Offset.x = aOffsetX;
+		});
+		settingsctx.Subscribe<float>(OPT_QAOFFSETY, [&](float aOffsetY)
+		{
+			this->Offset.y = aOffsetY;
+		});
+		settingsctx.Subscribe<EQaVisibility>(OPT_QAVISIBILITY, [&](EQaVisibility aVisibility)
+		{
+			this->Visibility = aVisibility;
+		});
+		settingsctx.Subscribe<bool>(OPT_QAONLYSHOWONHOVER, [&](bool aOnlyShowOnHover)
+		{
+			this->OnlyShowOnHover = aOnlyShowOnHover;
+		});
+		settingsctx.Subscribe<std::vector<std::string>>(OPT_QASUPPRESSED, [&](std::vector<std::string> aSuppressedShortcuts)
+		{
+			const std::lock_guard<std::mutex> lock(this->Mutex);
+
+			this->SuppressedShortcuts = aSuppressedShortcuts;
+
+			for (auto& [id, shortcut] : this->Registry)
+			{
+				/* If the current shortcut ID is in the suppressed list. */
+				bool isSuppressed = std::find(this->SuppressedShortcuts.begin(), this->SuppressedShortcuts.end(), id) != this->SuppressedShortcuts.end();
+
+				shortcut->SetSuppression(isSuppressed);
+			}
+		});
+
+		/* Preload default icons. */
+		this->TextureService->Load(ICON_NEXUS, RES_ICON_NEXUS, ctx.Platform().Module(), nullptr);
+		this->TextureService->Load(ICON_NEXUS_HOVER, RES_ICON_NEXUS_HOVER, ctx.Platform().Module(), nullptr);
+		this->TextureService->Load(ICON_NEXUS_HALLOWEEN, RES_ICON_NEXUS_HALLOWEEN, ctx.Platform().Module(), nullptr);
+		this->TextureService->Load(ICON_NEXUS_HALLOWEEN_HOVER, RES_ICON_NEXUS_HALLOWEEN_HOVER, ctx.Platform().Module(), nullptr);
+		this->TextureService->Load(ICON_NEXUS_XMAS, RES_ICON_NEXUS_XMAS, ctx.Platform().Module(), nullptr);
+		this->TextureService->Load(ICON_NEXUS_XMAS_HOVER, RES_ICON_NEXUS_XMAS_HOVER, ctx.Platform().Module(), nullptr);
+
+		/// FIXME: This is kinda hacky.
+		/// It forces the creation of the setting, so that the below subscriber gets executed on a first launch.
+		/// Otherwise the main menu would need to be opened first (static init of snowflakemgr) or the options in the main menu (static init of setting).
+		/// Both is kinda shit.
+		settingsctx.Get<bool>(OPT_DISABLEFESTIVEFLAIR, false);
+
+		settingsctx.Subscribe<bool>(OPT_DISABLEFESTIVEFLAIR, [&](bool aDisableFestiveFlair)
+		{
+			/* Remove existing shortcut. */
+			this->RemoveShortcut(QA_MENU);
+
+			const char* icon = ICON_NEXUS;
+			const char* iconHover = ICON_NEXUS_HOVER;
+
+			if (!aDisableFestiveFlair)
+			{
+				switch (Time::GetMonth())
+				{
+					case 10:
+					{
+						icon = ICON_NEXUS_HALLOWEEN;
+						iconHover = ICON_NEXUS_HALLOWEEN_HOVER;
+						break;
+					}
+					case 12:
+					{
+						icon = ICON_NEXUS_XMAS;
+						iconHover = ICON_NEXUS_XMAS_HOVER;
+						break;
+					}
+				}
+			}
+
+			/* Recreate shortcut with appropriate icon. */
+			this->AddShortcut(QA_MENU, icon, iconHover, KB_MENU, "((000009))");
+		});
+
+		this->EventApi->Subscribe(EV_ADDON_LOADED, CQuickAccess::OnAddonStateChanged);
+		this->EventApi->Subscribe(EV_ADDON_UNLOADED, CQuickAccess::OnAddonStateChanged);
+	}
+
+	CQuickAccess::~CQuickAccess()
 	{
-		this->VerticalLayout = aVertical;
-	});
-	settingsctx.Subscribe<EQaPosition>(OPT_QALOCATION, [&](EQaPosition aPosition)
-	{
-		this->Location = aPosition;
-	});
-	settingsctx.Subscribe<float>(OPT_QAOFFSETX, [&](float aOffsetX)
-	{
-		this->Offset.x = aOffsetX;
-	});
-	settingsctx.Subscribe<float>(OPT_QAOFFSETY, [&](float aOffsetY)
-	{
-		this->Offset.y = aOffsetY;
-	});
-	settingsctx.Subscribe<EQaVisibility>(OPT_QAVISIBILITY, [&](EQaVisibility aVisibility)
-	{
-		this->Visibility = aVisibility;
-	});
-	settingsctx.Subscribe<bool>(OPT_QAONLYSHOWONHOVER, [&](bool aOnlyShowOnHover)
-	{
-		this->OnlyShowOnHover = aOnlyShowOnHover;
-	});
-	settingsctx.Subscribe<std::vector<std::string>>(OPT_QASUPPRESSED, [&](std::vector<std::string> aSuppressedShortcuts)
+		this->EventApi->Unsubscribe(EV_ADDON_LOADED, CQuickAccess::OnAddonStateChanged);
+		this->EventApi->Unsubscribe(EV_ADDON_UNLOADED, CQuickAccess::OnAddonStateChanged);
+	}
+
+	void CQuickAccess::Render()
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
-		this->SuppressedShortcuts = aSuppressedShortcuts;
-
-		for (auto& [id, shortcut] : this->Registry)
+		if (this->IsInvalid)
 		{
-			/* If the current shortcut ID is in the suppressed list. */
-			bool isSuppressed = std::find(this->SuppressedShortcuts.begin(), this->SuppressedShortcuts.end(), id) != this->SuppressedShortcuts.end();
-
-			shortcut->SetSuppression(isSuppressed);
+			this->UpdateNexusLink();
+			this->IsInvalid = false;
 		}
-	});
 
-	/* Preload default icons. */
-	this->TextureService->Load(ICON_NEXUS,                 RES_ICON_NEXUS,                 ctx.Platform().Module(), nullptr);
-	this->TextureService->Load(ICON_NEXUS_HOVER,           RES_ICON_NEXUS_HOVER,           ctx.Platform().Module(), nullptr);
-	this->TextureService->Load(ICON_NEXUS_HALLOWEEN,       RES_ICON_NEXUS_HALLOWEEN,       ctx.Platform().Module(), nullptr);
-	this->TextureService->Load(ICON_NEXUS_HALLOWEEN_HOVER, RES_ICON_NEXUS_HALLOWEEN_HOVER, ctx.Platform().Module(), nullptr);
-	this->TextureService->Load(ICON_NEXUS_XMAS,            RES_ICON_NEXUS_XMAS,            ctx.Platform().Module(), nullptr);
-	this->TextureService->Load(ICON_NEXUS_XMAS_HOVER,      RES_ICON_NEXUS_XMAS_HOVER,      ctx.Platform().Module(), nullptr);
+		this->NexusLink->QuickAccessMode = (int)this->Location;
+		this->NexusLink->QuickAccessIsVertical = this->VerticalLayout;
 
-	/// FIXME: This is kinda hacky.
-	/// It forces the creation of the setting, so that the below subscriber gets executed on a first launch.
-	/// Otherwise the main menu would need to be opened first (static init of snowflakemgr) or the options in the main menu (static init of setting).
-	/// Both is kinda shit.
-	settingsctx.Get<bool>(OPT_DISABLEFESTIVEFLAIR, false);
-
-	settingsctx.Subscribe<bool>(OPT_DISABLEFESTIVEFLAIR, [&](bool aDisableFestiveFlair)
-	{
-		/* Remove existing shortcut. */
-		this->RemoveShortcut(QA_MENU);
-
-		const char* icon      = ICON_NEXUS;
-		const char* iconHover = ICON_NEXUS_HOVER;
-
-		if (!aDisableFestiveFlair)
+		switch (this->Visibility)
 		{
-			switch (Time::GetMonth())
+			/* continue rendering */
+			default:
+			case EQaVisibility::AlwaysShow: { break; }
+
+			case EQaVisibility::Gameplay:
 			{
-				case 10:
+				/* don't render if not gameplay */
+				if (!this->NexusLink->IsGameplay)
 				{
-					icon = ICON_NEXUS_HALLOWEEN;
-					iconHover = ICON_NEXUS_HALLOWEEN_HOVER;
-					break;
+					return;
 				}
-				case 12:
+
+				break;
+			}
+			case EQaVisibility::OutOfCombat:
+			{
+				/* don't render if not gameplay */
+				if (!this->NexusLink->IsGameplay)
 				{
-					icon = ICON_NEXUS_XMAS;
-					iconHover = ICON_NEXUS_XMAS_HOVER;
-					break;
+					return;
 				}
+
+				/* don't render if in combat */
+				if (this->MumbleLink->Context.IsInCombat)
+				{
+					return;
+				}
+
+				break;
+			}
+			case EQaVisibility::InCombat:
+			{
+				/* don't render if not gameplay */
+				if (!this->NexusLink->IsGameplay)
+				{
+					return;
+				}
+
+				/* don't render if out of combat */
+				if (!this->MumbleLink->Context.IsInCombat)
+				{
+					return;
+				}
+
+				break;
+			}
+
+			/* don't render*/
+			case EQaVisibility::Hide: { return; }
+		}
+
+		uint32_t isActive = 0;
+
+		ImVec2 wndPos = ImVec2(0.0f, 0.0f);
+
+		bool isHoveringNative = false;
+		static float s_IconBaseSize = 32.f;
+		switch (this->Location)
+		{
+			case EQaPosition::Extend:
+			{
+				wndPos.x += (s_IconBaseSize * this->NexusLink->Scaling) * GW2_QUICKACCESS_ITEMS;
+				ImVec2 mPos = ImGui::GetMousePos();
+				if (mPos.x != -FLT_MAX && mPos.y != -FLT_MAX && mPos.x < wndPos.x - this->Offset.x && mPos.y < this->NexusLink->Scaling * s_IconBaseSize)
+				{
+					isHoveringNative = true;
+				}
+				break;
+			}
+			case EQaPosition::Under:
+			{
+				wndPos.y += s_IconBaseSize * this->NexusLink->Scaling;
+				break;
+			}
+			case EQaPosition::Bottom:
+			{
+				Runtime& ctx = Runtime::Get();
+				Graphics::Window_t& window = ctx.Graphics().Window();
+				wndPos.y += window.Height - (s_IconBaseSize * 2 * this->NexusLink->Scaling);
+				break;
 			}
 		}
 
-		/* Recreate shortcut with appropriate icon. */
-		this->AddShortcut(QA_MENU, icon, iconHover, KB_MENU, "((000009))");
-	});
+		wndPos.x += this->Offset.x;
+		wndPos.y += this->Offset.y;
 
-	this->EventApi->Subscribe(EV_ADDON_LOADED,   CQuickAccess::OnAddonStateChanged);
-	this->EventApi->Subscribe(EV_ADDON_UNLOADED, CQuickAccess::OnAddonStateChanged);
-}
+		ImGuiWindowFlags flags
+			= ImGuiWindowFlags_AlwaysAutoResize
+			| ImGuiWindowFlags_NoResize
+			| ImGuiWindowFlags_NoCollapse
+			| ImGuiWindowFlags_NoBackground
+			| ImGuiWindowFlags_NoTitleBar
+			| ImGuiWindowFlags_NoSavedSettings;
 
-CQuickAccess::~CQuickAccess()
-{
-	this->EventApi->Unsubscribe(EV_ADDON_LOADED,   CQuickAccess::OnAddonStateChanged);
-	this->EventApi->Unsubscribe(EV_ADDON_UNLOADED, CQuickAccess::OnAddonStateChanged);
-}
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, this->Opacity);
 
-void CQuickAccess::Render()
-{
-	const std::lock_guard<std::mutex> lock(this->Mutex);
+		bool poppedStyles = false;
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 
-	if (this->IsInvalid)
-	{
-		this->UpdateNexusLink();
-		this->IsInvalid = false;
-	}
-
-	this->NexusLink->QuickAccessMode = (int)this->Location;
-	this->NexusLink->QuickAccessIsVertical = this->VerticalLayout;
-
-	switch (this->Visibility)
-	{
-		/* continue rendering */
-		default:
-		case EQaVisibility::AlwaysShow: { break; }
-
-		case EQaVisibility::Gameplay:
+		ImGui::SetNextWindowPos(wndPos);
+		if (ImGui::Begin("QuickAccess", 0, flags))
 		{
-			/* don't render if not gameplay */
-			if (!this->NexusLink->IsGameplay)
+			poppedStyles = true;
+			ImGui::PopStyleVar(1); // window padding
+
+			for (auto& [identifier, shortcut] : this->Registry)
 			{
-				return;
+				isActive += shortcut->Render();
+
+				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(1.f, 1.f) * this->NexusLink->Scaling);
+				if (!this->VerticalLayout)
+				{
+					/* If not vertical (aka is horizontal) force SameLine(). */
+					ImGui::SameLine();
+				}
+				else
+				{
+					/// If vertical, force SameLine(), then undo it with NewLine().
+					/// NewLine() alone or no NewLine() at all unsets with the spacing.
+					/// #justimguithings
+					ImGui::SameLine();
+					ImGui::NewLine();
+				}
+				ImGui::PopStyleVar(1);
 			}
 
-			break;
-		}
-		case EQaVisibility::OutOfCombat:
-		{
-			/* don't render if not gameplay */
-			if (!this->NexusLink->IsGameplay)
+			bool windowHovered = ImGui::IsWindowHovered();
+			bool isHovering = windowHovered || isActive || isHoveringNative;
+
+			float opacityMin = 0.5f;
+			float opacityMax = 1.0f;
+
+			if (this->OnlyShowOnHover)
 			{
-				return;
+				opacityMin = 0.001f;
 			}
 
-			/* don't render if in combat */
-			if (this->MumbleLink->Context.IsInCombat)
+			if (isHovering)
 			{
-				return;
-			}
-
-			break;
-		}
-		case EQaVisibility::InCombat:
-		{
-			/* don't render if not gameplay */
-			if (!this->NexusLink->IsGameplay)
-			{
-				return;
-			}
-
-			/* don't render if out of combat */
-			if (!this->MumbleLink->Context.IsInCombat)
-			{
-				return;
-			}
-
-			break;
-		}
-
-		/* don't render*/
-		case EQaVisibility::Hide: { return; }
-	}
-
-	uint32_t isActive = 0;
-
-	ImVec2 wndPos = ImVec2(0.0f, 0.0f);
-
-	bool isHoveringNative = false;
-	static float s_IconBaseSize = 32.f;
-	switch (this->Location)
-	{
-		case EQaPosition::Extend:
-		{
-			wndPos.x += (s_IconBaseSize * this->NexusLink->Scaling) * GW2_QUICKACCESS_ITEMS;
-			ImVec2 mPos = ImGui::GetMousePos();
-			if (mPos.x != -FLT_MAX && mPos.y != -FLT_MAX && mPos.x < wndPos.x - this->Offset.x && mPos.y < this->NexusLink->Scaling * s_IconBaseSize)
-			{
-				isHoveringNative = true;
-			}
-			break;
-		}
-		case EQaPosition::Under:
-		{
-			wndPos.y += s_IconBaseSize * this->NexusLink->Scaling;
-			break;
-		}
-		case EQaPosition::Bottom:
-		{
-			Runtime&        ctx      = Runtime::Get();
-			Graphics::Window_t& window = ctx.Graphics().Window();
-			wndPos.y += window.Height - (s_IconBaseSize * 2 * this->NexusLink->Scaling);
-			break;
-		}
-	}
-
-	wndPos.x += this->Offset.x;
-	wndPos.y += this->Offset.y;
-
-	ImGuiWindowFlags flags
-		= ImGuiWindowFlags_AlwaysAutoResize
-		| ImGuiWindowFlags_NoResize
-		| ImGuiWindowFlags_NoCollapse
-		| ImGuiWindowFlags_NoBackground
-		| ImGuiWindowFlags_NoTitleBar
-		| ImGuiWindowFlags_NoSavedSettings;
-
-	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, this->Opacity);
-
-	bool poppedStyles = false;
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-
-	ImGui::SetNextWindowPos(wndPos);
-	if (ImGui::Begin("QuickAccess", 0, flags))
-	{
-		poppedStyles = true;
-		ImGui::PopStyleVar(1); // window padding
-
-		for (auto& [identifier, shortcut] : this->Registry)
-		{
-			isActive += shortcut->Render();
-
-			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(1.f, 1.f) * this->NexusLink->Scaling);
-			if (!this->VerticalLayout)
-			{
-				/* If not vertical (aka is horizontal) force SameLine(). */
-				ImGui::SameLine();
+				ImGui::Animate(opacityMin, opacityMax, 350, &this->Opacity, ImAnimate::ECurve::Linear);
 			}
 			else
 			{
-				/// If vertical, force SameLine(), then undo it with NewLine().
-				/// NewLine() alone or no NewLine() at all unsets with the spacing.
-				/// #justimguithings
-				ImGui::SameLine();
-				ImGui::NewLine();
+				ImGui::Animate(opacityMax, opacityMin, 350, &this->Opacity, ImAnimate::ECurve::Linear);
 			}
-			ImGui::PopStyleVar(1);
+		}
+		ImGui::End();
+		ImGui::PopStyleVar(); // alpha
+
+		if (!poppedStyles)
+		{
+			ImGui::PopStyleVar(1); // window padding
+		}
+	}
+
+	void CQuickAccess::AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aInputBindIdentifier, const char* aTooltipText)
+	{
+		if (!aIdentifier) { return; }
+		if (!aTextureIdentifier) { return; }
+		if (!aTextureHoverIdentifier) { return; }
+
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		if (this->Registry.find(aIdentifier) == this->Registry.end())
+		{
+			CShortcutIcon* shortcut = new CShortcutIcon(
+				aIdentifier,
+				aTextureIdentifier,
+				aTextureHoverIdentifier,
+				aInputBindIdentifier ? aInputBindIdentifier : "",
+				aTooltipText ? aTooltipText : ""
+			);
+
+			Runtime& ctx = Runtime::Get();
+			CSettings& settingsctx = ctx.Core().Settings();
+
+			/* If the current shortcut ID is in the suppressed list. */
+			bool isSuppressed = std::find(this->SuppressedShortcuts.begin(), this->SuppressedShortcuts.end(), aIdentifier) != this->SuppressedShortcuts.end();
+
+			shortcut->SetSuppression(isSuppressed);
+
+			this->Registry.emplace(aIdentifier, shortcut);
 		}
 
-		bool windowHovered = ImGui::IsWindowHovered();
-		bool isHovering = windowHovered || isActive || isHoveringNative;
+		/* Check if this shortcut can maybe adopt some orphans. */
+		this->WhereAreMyParents();
+		this->Invalidate();
+	}
 
-		float opacityMin = 0.5f;
-		float opacityMax = 1.0f;
+	void CQuickAccess::RemoveShortcut(const char* aIdentifier)
+	{
+		if (!aIdentifier) { return; }
 
-		if (this->OnlyShowOnHover)
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto it = this->Registry.find(aIdentifier);
+
+		if (it != this->Registry.end())
 		{
-			opacityMin = 0.001f;
+			for (auto& [identifier, ctxitem] : it->second->GetContextMenuItems())
+			{
+				auto orphanIt = this->OrphanedCallbacks.find(identifier);
+
+				if (orphanIt == this->OrphanedCallbacks.end())
+				{
+					this->OrphanedCallbacks.emplace(identifier, ctxitem);
+				}
+			}
+
+			delete it->second;
+			this->Registry.erase(it);
 		}
 
-		if (isHovering)
+		this->Invalidate();
+	}
+
+	void CQuickAccess::PushNotification(const char* aIdentifier, const char* aNotificationKey)
+	{
+		if (!aIdentifier) { return; }
+		if (!aNotificationKey) { return; }
+
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto it = this->Registry.find(aIdentifier);
+
+		if (it != this->Registry.end())
 		{
-			ImGui::Animate(opacityMin, opacityMax, 350, &this->Opacity, ImAnimate::ECurve::Linear);
+			it->second->PushNotifcationSafe(aNotificationKey);
+		}
+	}
+
+	void CQuickAccess::PopNotification(const char* aIdentifier, const char* aNotificationKey)
+	{
+		if (!aIdentifier) { return; }
+		if (!aNotificationKey) { return; }
+
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto it = this->Registry.find(aIdentifier);
+
+		if (it != this->Registry.end())
+		{
+			it->second->PopNotifcationSafe(aNotificationKey);
+		}
+	}
+
+	void CQuickAccess::AddContextItem(const char* aIdentifier, GUI_RENDER aShortcutRenderCallback)
+	{
+		this->AddContextItem(aIdentifier, QA_MENU, aShortcutRenderCallback);
+	}
+
+	void CQuickAccess::AddContextItem(const char* aIdentifier, const char* aTargetShortcutIdentifier, GUI_RENDER aShortcutRenderCallback)
+	{
+		if (!aIdentifier) { return; }
+		if (!aTargetShortcutIdentifier) { return; }
+		if (!aShortcutRenderCallback) { return; }
+
+		ContextItem_t contextItem{
+			aTargetShortcutIdentifier,
+			aShortcutRenderCallback
+		};
+
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto parentIt = this->Registry.find(aTargetShortcutIdentifier);
+
+		if (parentIt != this->Registry.end())
+		{
+			parentIt->second->AddContextItem(aIdentifier, contextItem);
 		}
 		else
 		{
-			ImGui::Animate(opacityMax, opacityMin, 350, &this->Opacity, ImAnimate::ECurve::Linear);
-		}
-	}
-	ImGui::End();
-	ImGui::PopStyleVar(); // alpha
-
-	if (!poppedStyles)
-	{
-		ImGui::PopStyleVar(1); // window padding
-	}
-}
-
-void CQuickAccess::AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aInputBindIdentifier, const char* aTooltipText)
-{
-	if (!aIdentifier)             { return; }
-	if (!aTextureIdentifier)      { return; }
-	if (!aTextureHoverIdentifier) { return; }
-
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	if (this->Registry.find(aIdentifier) == this->Registry.end())
-	{
-		CShortcutIcon* shortcut = new CShortcutIcon(
-			aIdentifier,
-			aTextureIdentifier,
-			aTextureHoverIdentifier,
-			aInputBindIdentifier ? aInputBindIdentifier : "",
-			aTooltipText ? aTooltipText : ""
-		);
-
-		Runtime&  ctx         = Runtime::Get();
-		CSettings& settingsctx = ctx.Core().Settings();
-
-		/* If the current shortcut ID is in the suppressed list. */
-		bool isSuppressed = std::find(this->SuppressedShortcuts.begin(), this->SuppressedShortcuts.end(), aIdentifier) != this->SuppressedShortcuts.end();
-
-		shortcut->SetSuppression(isSuppressed);
-
-		this->Registry.emplace(aIdentifier, shortcut);
-	}
-
-	/* Check if this shortcut can maybe adopt some orphans. */
-	this->WhereAreMyParents();
-	this->Invalidate();
-}
-
-void CQuickAccess::RemoveShortcut(const char* aIdentifier)
-{
-	if (!aIdentifier) { return; }
-
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	auto it = this->Registry.find(aIdentifier);
-
-	if (it != this->Registry.end())
-	{
-		for (auto& [identifier, ctxitem] : it->second->GetContextMenuItems())
-		{
-			auto orphanIt = this->OrphanedCallbacks.find(identifier);
+			auto orphanIt = this->OrphanedCallbacks.find(aIdentifier);
 
 			if (orphanIt == this->OrphanedCallbacks.end())
 			{
-				this->OrphanedCallbacks.emplace(identifier, ctxitem);
+
+				this->OrphanedCallbacks.emplace(aIdentifier, contextItem);
+			}
+			else
+			{
+				this->Logger->Warning(
+					CH_QUICKACCESS,
+					"Context menu item already registered: %s (Parent: \"%s\")",
+					aIdentifier,
+					aTargetShortcutIdentifier
+				);
 			}
 		}
 
-		delete it->second;
-		this->Registry.erase(it);
+		this->Invalidate();
 	}
 
-	this->Invalidate();
-}
-
-void CQuickAccess::PushNotification(const char* aIdentifier, const char* aNotificationKey)
-{
-	if (!aIdentifier)      { return; }
-	if (!aNotificationKey) { return; }
-
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	auto it = this->Registry.find(aIdentifier);
-
-	if (it != this->Registry.end())
+	void CQuickAccess::RemoveContextItem(const char* aIdentifier)
 	{
-		it->second->PushNotifcationSafe(aNotificationKey);
-	}
-}
+		if (!aIdentifier) { return; }
 
-void CQuickAccess::PopNotification(const char* aIdentifier, const char* aNotificationKey)
-{
-	if (!aIdentifier)      { return; }
-	if (!aNotificationKey) { return; }
+		const std::lock_guard<std::mutex> lock(this->Mutex);
 
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	auto it = this->Registry.find(aIdentifier);
-
-	if (it != this->Registry.end())
-	{
-		it->second->PopNotifcationSafe(aNotificationKey);
-	}
-}
-
-void CQuickAccess::AddContextItem(const char* aIdentifier, GUI_RENDER aShortcutRenderCallback)
-{
-	this->AddContextItem(aIdentifier, QA_MENU, aShortcutRenderCallback);
-}
-
-void CQuickAccess::AddContextItem(const char* aIdentifier, const char* aTargetShortcutIdentifier, GUI_RENDER aShortcutRenderCallback)
-{
-	if (!aIdentifier)               { return; }
-	if (!aTargetShortcutIdentifier) { return; }
-	if (!aShortcutRenderCallback)   { return; }
-
-	ContextItem_t contextItem{
-		aTargetShortcutIdentifier,
-		aShortcutRenderCallback
-	};
-
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	auto parentIt = this->Registry.find(aTargetShortcutIdentifier);
-
-	if (parentIt != this->Registry.end())
-	{
-		parentIt->second->AddContextItem(aIdentifier, contextItem);
-	}
-	else
-	{
-		auto orphanIt = this->OrphanedCallbacks.find(aIdentifier);
-
-		if (orphanIt == this->OrphanedCallbacks.end())
+		for (auto& [identifier, shortcut] : this->Registry)
 		{
-
-			this->OrphanedCallbacks.emplace(aIdentifier, contextItem);
+			shortcut->RemoveContextItem(aIdentifier);
 		}
-		else
-		{
-			this->Logger->Warning(
-				CH_QUICKACCESS,
-				"Context menu item already registered: %s (Parent: \"%s\")",
-				aIdentifier,
-				aTargetShortcutIdentifier
-			);
-		}
+
+		this->OrphanedCallbacks.erase(aIdentifier);
+
+		this->Invalidate();
 	}
 
-	this->Invalidate();
-}
-
-void CQuickAccess::RemoveContextItem(const char* aIdentifier)
-{
-	if (!aIdentifier) { return; }
-
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	for (auto& [identifier, shortcut] : this->Registry)
+	std::map<std::string, CShortcutIcon*> CQuickAccess::GetRegistry() const
 	{
-		shortcut->RemoveContextItem(aIdentifier);
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+		return this->Registry;
 	}
 
-	this->OrphanedCallbacks.erase(aIdentifier);
-
-	this->Invalidate();
-}
-
-std::map<std::string, CShortcutIcon*> CQuickAccess::GetRegistry() const
-{
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-	return this->Registry;
-}
-
-std::map<std::string, ContextItem_t> CQuickAccess::GetOrphanage() const
-{
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-	return this->OrphanedCallbacks;
-}
-
-uint32_t CQuickAccess::CleanupRefs(void* aStartAddress, void* aEndAddress)
-{
-	uint32_t refCounter = 0;
-
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	/* Remove bastard children. */
-	for (auto orphanIt = this->OrphanedCallbacks.begin(); orphanIt != this->OrphanedCallbacks.end();)
+	std::map<std::string, ContextItem_t> CQuickAccess::GetOrphanage() const
 	{
-		GUI_RENDER callback = orphanIt->second.Callback;
-		if (callback >= aStartAddress && callback <= aEndAddress)
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+		return this->OrphanedCallbacks;
+	}
+
+	uint32_t CQuickAccess::CleanupRefs(void* aStartAddress, void* aEndAddress)
+	{
+		uint32_t refCounter = 0;
+
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		/* Remove bastard children. */
+		for (auto orphanIt = this->OrphanedCallbacks.begin(); orphanIt != this->OrphanedCallbacks.end();)
 		{
-			refCounter++;
-			orphanIt = this->OrphanedCallbacks.erase(orphanIt);
+			GUI_RENDER callback = orphanIt->second.Callback;
+			if (callback >= aStartAddress && callback <= aEndAddress)
+			{
+				refCounter++;
+				orphanIt = this->OrphanedCallbacks.erase(orphanIt);
+			}
+			else
+			{
+				orphanIt++;
+			}
 		}
-		else
+
+		this->Invalidate();
+
+		return refCounter;
+	}
+
+	void CQuickAccess::WhereAreMyParents()
+	{
+		for (auto orphanIt = this->OrphanedCallbacks.begin(); orphanIt != this->OrphanedCallbacks.end();)
 		{
-			orphanIt++;
+			/* Check if a shortcut exists, that matches the orphan's target. */
+			auto parentIt = this->Registry.find(orphanIt->second.ParentID);
+
+			/* If we do have a parent. */
+			if (parentIt != this->Registry.end())
+			{
+				parentIt->second->AddContextItem(orphanIt->first, orphanIt->second);
+
+				/* Annihilate the orphan. */
+				orphanIt = this->OrphanedCallbacks.erase(orphanIt);
+			}
+			else
+			{
+				/* Still an orphan :( */
+				orphanIt++;
+			}
 		}
 	}
 
-	this->Invalidate();
-
-	return refCounter;
-}
-
-void CQuickAccess::WhereAreMyParents()
-{
-	for (auto orphanIt = this->OrphanedCallbacks.begin(); orphanIt != this->OrphanedCallbacks.end();)
+	void CQuickAccess::UpdateNexusLink()
 	{
-		/* Check if a shortcut exists, that matches the orphan's target. */
-		auto parentIt = this->Registry.find(orphanIt->second.ParentID);
+		int amtValid = 0;
 
-		/* If we do have a parent. */
-		if (parentIt != this->Registry.end())
+		for (auto& [identifier, shortcut] : this->Registry)
 		{
-			parentIt->second->AddContextItem(orphanIt->first, orphanIt->second);
+			if (shortcut->IsActive())
+			{
+				amtValid++;
+			}
+		}
 
-			/* Annihilate the orphan. */
-			orphanIt = this->OrphanedCallbacks.erase(orphanIt);
-		}
-		else
-		{
-			/* Still an orphan :( */
-			orphanIt++;
-		}
+		this->NexusLink->QuickAccessIconsCount = amtValid;
 	}
-}
-
-void CQuickAccess::UpdateNexusLink()
-{
-	int amtValid = 0;
-
-	for (auto& [identifier, shortcut] : this->Registry)
-	{
-		if (shortcut->IsActive())
-		{
-			amtValid++;
-		}
-	}
-
-	this->NexusLink->QuickAccessIconsCount = amtValid;
 }

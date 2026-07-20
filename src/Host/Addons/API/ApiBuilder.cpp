@@ -8,7 +8,19 @@
 
 #include "ApiBuilder.h"
 
-#include <assert.h>
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <filesystem>
+#include <mutex>
+#include <string>
+#include <string.h>
+#include <vector>
+#include <windows.h>
+
+
+#include "imgui.h"
+#include "minhook/mh_hook.h"
 
 #include "Runtime/Runtime.h"
 using namespace Raidcore::Nexus;
@@ -19,23 +31,39 @@ using namespace Raidcore::Nexus;
 #include "ApiV4.h"
 #include "ApiV5.h"
 #include "ApiV6.h"
+#include "ApiBase.h"
+#include "Core/Logging/LogEnum.h"
 #include "Core/Index/Index.h"
+#include "Engine/Inputs/InputBinds/IbBind.h"
+#include "Engine/Inputs/InputBinds/IbFuncDefs.h"
+#include "Graphics/Textures/TxFuncDefs.h"
+#include "Graphics/Textures/TxTexture.h"
+#include "GW2/Inputs/GameBinds/GbEnum.h"
+#include "Host/Events/EvtFuncDefs.h"
+#include "Platform/RawInput/RiFuncDefs.h"
 #include "Core/DataLink/DlApi.h"
-#include "Host/Events/EvtApi.h"
-#include "Engine/Inputs/InputBinds/IbApi.h"
-#include "Platform/RawInput/RiApi.h"
 #include "Core/Logging/LogApi.h"
+#include "Engine/Inputs/InputBinds/IbApi.h"
+#include "Engine/Inputs/InputBinds/IbEnum.h"
+#include "Graphics/GrWindow.h"
+#include "Graphics/Textures/TxLoader.h"
 #include "GW2/ArcDPS/ArcApi.h"
 #include "GW2/Inputs/GameBinds/GbApi.h"
-#include "UI/Services/Fonts/FontManager.h"
+#include "Host/Events/EvtApi.h"
+#include "Host/Loader/Loader.h"
+#include "Platform/RawInput/RiApi.h"
 #include "UI/Services/Localization/LoclApi.h"
-#include "UI/Services/QoL/EscapeClosing.h"
-#include "Graphics/Textures/TxLoader.h"
 #include "UI/UiContext.h"
+#include "UI/Services/Fonts/FontManager.h"
+#include "UI/Services/Fonts/FuncDefs.h"
+#include "UI/Services/QoL/EscapeClosing.h"
+#include "UI/UiEnum.h"
+#include "UI/UiFuncDefs.h"
+#include "UI/Widgets/Alerts/AlEnum.h"
 #include "UI/Widgets/Alerts/Alerts.h"
 #include "UI/Widgets/QuickAccess/QuickAccess.h"
 
-namespace ADDONAPI
+namespace Raidcore::Nexus::Host::API
 {
 	static bool                    s_IsInitialized = false;
 
@@ -44,18 +72,18 @@ namespace ADDONAPI
 	static GW2::GameBindsApi*      s_GameBindsApi  = nullptr;
 	static CInputBindApi*          s_InputBindApi  = nullptr;
 	static Platform::RawInputApi*  s_RawInputApi   = nullptr;
-	static CLocalization*          s_Localization  = nullptr;
+	static Nexus::GUI::CLocalization*     s_Localization  = nullptr;
 	static CLogApi*                s_Logger        = nullptr;
 	static Graphics::TextureLoader* s_TextureApi    = nullptr;
 	static Host::Loader*           s_Loader        = nullptr;
 	static Graphics::Window_t*     s_GrWindow      = nullptr;
 	static GW2::ArcdpsApi*         s_ArcApi        = nullptr;
 
-	static CUiContext*             s_UiContext     = nullptr;
-	static CFontManager*           s_FontManager   = nullptr;
-	static CAlerts*                s_Alerts        = nullptr;
-	static CQuickAccess*           s_QuickAccess   = nullptr;
-	static CEscapeClosing*         s_EscapeClosing = nullptr;
+	static Nexus::GUI::CUiContext*             s_UiContext     = nullptr;
+	static Nexus::GUI::CFontManager*           s_FontManager   = nullptr;
+	static Nexus::GUI::CAlerts*                s_Alerts        = nullptr;
+	static Nexus::GUI::CQuickAccess*           s_QuickAccess   = nullptr;
+	static Nexus::GUI::CEscapeClosing*         s_EscapeClosing = nullptr;
 
 
 	namespace DataLink
@@ -403,30 +431,30 @@ namespace ADDONAPI
 		}
 	}
 
-	namespace UIRoot::GUI
+	namespace GUI::Render
 	{
-		void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback)
+		void Register(Nexus::GUI::ERenderType aRenderType, Nexus::GUI::GUI_RENDER aRenderCallback)
 		{
 			assert(s_UiContext);
 			s_UiContext->Register(aRenderType, aRenderCallback);
 		}
 
-		void Deregister(GUI_RENDER aRenderCallback)
+		void Deregister(Nexus::GUI::GUI_RENDER aRenderCallback)
 		{
 			assert(s_UiContext);
 			s_UiContext->Deregister(aRenderCallback);
 		}
 	}
 
-	namespace UIRoot::Fonts
+	namespace GUI::Fonts
 	{
-		void Get(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback)
+		void Get(const char* aIdentifier, Nexus::GUI::FONTS_RECEIVECALLBACK aCallback)
 		{
 			assert(s_FontManager);
 
 			if (!aCallback) { return; }
 
-			ManagedFont_t* font = s_FontManager->Get(aIdentifier);
+			Nexus::GUI::ManagedFont_t* font = s_FontManager->Get(aIdentifier);
 
 			if (font)
 			{
@@ -439,7 +467,7 @@ namespace ADDONAPI
 			}
 		}
 
-		void Release(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback)
+		void Release(const char* aIdentifier, Nexus::GUI::FONTS_RECEIVECALLBACK aCallback)
 		{
 			assert(s_FontManager);
 
@@ -448,21 +476,21 @@ namespace ADDONAPI
 			s_FontManager->Release(aIdentifier, aCallback);
 		}
 
-		void AddFontFromFile(const char* aIdentifier, float aFontSize, const char* aFilename, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
+		void AddFontFromFile(const char* aIdentifier, float aFontSize, const char* aFilename, Nexus::GUI::FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
 		{
 			assert(s_FontManager);
 
 			s_FontManager->AddFont(aIdentifier, aFontSize, aFilename, aCallback, aConfig);
 		}
 
-		void AddFontFromResource(const char* aIdentifier, float aFontSize, unsigned aResourceID, HMODULE aModule, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
+		void AddFontFromResource(const char* aIdentifier, float aFontSize, unsigned aResourceID, HMODULE aModule, Nexus::GUI::FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
 		{
 			assert(s_FontManager);
 
 			s_FontManager->AddFont(aIdentifier, aFontSize, aResourceID, aModule, aCallback, aConfig);
 		}
 
-		void AddFontFromMemory(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
+		void AddFontFromMemory(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, Nexus::GUI::FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
 		{
 			assert(s_FontManager);
 
@@ -477,16 +505,16 @@ namespace ADDONAPI
 		}
 	}
 
-	namespace UIRoot::Alerts
+	namespace GUI::Alerts
 	{
 		void Notify(const char* aMessage)
 		{
 			assert(s_Alerts);
-			s_Alerts->Notify(EAlertType::Info, aMessage);
+			s_Alerts->Notify(Nexus::GUI::EAlertType::Info, aMessage);
 		}
 	}
 
-	namespace UIRoot::QuickAccess
+	namespace GUI::QuickAccess
 	{
 		void AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aInputBindIdentifier, const char* aTooltipText)
 		{
@@ -520,13 +548,13 @@ namespace ADDONAPI
 			}
 		}
 
-		void AddContextItem(const char* aIdentifier, GUI_RENDER aShortcutRenderCallback)
+		void AddContextItem(const char* aIdentifier, Nexus::GUI::GUI_RENDER aShortcutRenderCallback)
 		{
 			assert(s_QuickAccess);
 			s_QuickAccess->AddContextItem(aIdentifier, aShortcutRenderCallback);
 		}
 
-		void AddContextItem2(const char* aIdentifier, const char* aTargetShortcutIdentifier, GUI_RENDER aShortcutRenderCallback)
+		void AddContextItem2(const char* aIdentifier, const char* aTargetShortcutIdentifier, Nexus::GUI::GUI_RENDER aShortcutRenderCallback)
 		{
 			assert(s_QuickAccess);
 			s_QuickAccess->AddContextItem(aIdentifier, aTargetShortcutIdentifier, aShortcutRenderCallback);
@@ -539,7 +567,7 @@ namespace ADDONAPI
 		}
 	}
 
-	namespace UIRoot::EscapeClosing
+	namespace GUI::EscapeClosing
 	{
 		void Register(const char* aWindowName, bool* aIsVisible)
 		{
@@ -592,8 +620,8 @@ namespace ADDONAPI
 				api->ImguiContext = aSetImGuiContext ? ImGui::GetCurrentContext() : nullptr;
 				api->ImguiMalloc = aSetImGuiContext ? ImGui::MemAlloc : nullptr;
 				api->ImguiFree = aSetImGuiContext ? ImGui::MemFree : nullptr;
-				api->RegisterRender = UIRoot::GUI::Register;
-				api->DeregisterRender = UIRoot::GUI::Deregister;
+				api->RegisterRender = GUI::Render::Register;
+				api->DeregisterRender = GUI::Render::Deregister;
 
 				api->GetGameDirectory = Paths::GetGameDirectory;
 				api->GetAddonDirectory = Paths::GetAddonDirectory;
@@ -625,10 +653,10 @@ namespace ADDONAPI
 				api->LoadTextureFromResource = TextureLoader::LoadFromResource;
 				api->LoadTextureFromURL = TextureLoader::LoadFromURL;
 
-				api->AddShortcut = UIRoot::QuickAccess::AddShortcut;
-				api->RemoveShortcut = UIRoot::QuickAccess::RemoveShortcut;
-				api->AddSimpleShortcut = UIRoot::QuickAccess::AddContextItem;
-				api->RemoveSimpleShortcut = UIRoot::QuickAccess::RemoveContextItem;
+				api->AddShortcut = GUI::QuickAccess::AddShortcut;
+				api->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
+				api->AddSimpleShortcut = GUI::QuickAccess::AddContextItem;
+				api->RemoveSimpleShortcut = GUI::QuickAccess::RemoveContextItem;
 
 				return api;
 			}
@@ -640,8 +668,8 @@ namespace ADDONAPI
 				api->ImguiContext = aSetImGuiContext ? ImGui::GetCurrentContext() : nullptr;
 				api->ImguiMalloc = aSetImGuiContext ? ImGui::MemAlloc : nullptr;
 				api->ImguiFree = aSetImGuiContext ? ImGui::MemFree : nullptr;
-				api->RegisterRender = UIRoot::GUI::Register;
-				api->DeregisterRender = UIRoot::GUI::Deregister;
+				api->RegisterRender = GUI::Render::Register;
+				api->DeregisterRender = GUI::Render::Deregister;
 
 				api->GetGameDirectory = Paths::GetGameDirectory;
 				api->GetAddonDirectory = Paths::GetAddonDirectory;
@@ -680,11 +708,11 @@ namespace ADDONAPI
 				api->LoadTextureFromURL = TextureLoader::LoadFromURL;
 				api->LoadTextureFromMemory = TextureLoader::LoadFromMemory;
 
-				api->AddShortcut = UIRoot::QuickAccess::AddShortcut;
-				api->RemoveShortcut = UIRoot::QuickAccess::RemoveShortcut;
-				api->PushNotification = UIRoot::QuickAccess::PushNotification;
-				api->AddSimpleShortcut = UIRoot::QuickAccess::AddContextItem;
-				api->RemoveSimpleShortcut = UIRoot::QuickAccess::RemoveContextItem;
+				api->AddShortcut = GUI::QuickAccess::AddShortcut;
+				api->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
+				api->PushNotification = GUI::QuickAccess::PushNotification;
+				api->AddSimpleShortcut = GUI::QuickAccess::AddContextItem;
+				api->RemoveSimpleShortcut = GUI::QuickAccess::RemoveContextItem;
 
 				api->Translate = Localization::Translate;
 				api->TranslateTo = Localization::TranslateTo;
@@ -699,8 +727,8 @@ namespace ADDONAPI
 				api->ImguiContext = aSetImGuiContext ? ImGui::GetCurrentContext() : nullptr;
 				api->ImguiMalloc = aSetImGuiContext ? ImGui::MemAlloc : nullptr;
 				api->ImguiFree = aSetImGuiContext ? ImGui::MemFree : nullptr;
-				api->RegisterRender = UIRoot::GUI::Register;
-				api->DeregisterRender = UIRoot::GUI::Deregister;
+				api->RegisterRender = GUI::Render::Register;
+				api->DeregisterRender = GUI::Render::Deregister;
 
 				api->GetGameDirectory = Paths::GetGameDirectory;
 				api->GetAddonDirectory = Paths::GetAddonDirectory;
@@ -713,7 +741,7 @@ namespace ADDONAPI
 
 				api->Log = Logger::LogMessage2;
 
-				api->SendAlert = UIRoot::Alerts::Notify;
+				api->SendAlert = GUI::Alerts::Notify;
 
 				api->RaiseEvent = Events::RaiseEvent;
 				api->RaiseEventNotification = Events::RaiseNotification;
@@ -743,11 +771,11 @@ namespace ADDONAPI
 				api->LoadTextureFromURL = TextureLoader::LoadFromURL;
 				api->LoadTextureFromMemory = TextureLoader::LoadFromMemory;
 
-				api->AddShortcut = UIRoot::QuickAccess::AddShortcut;
-				api->RemoveShortcut = UIRoot::QuickAccess::RemoveShortcut;
-				api->PushNotification = UIRoot::QuickAccess::PushNotification;
-				api->AddSimpleShortcut = UIRoot::QuickAccess::AddContextItem;
-				api->RemoveSimpleShortcut = UIRoot::QuickAccess::RemoveContextItem;
+				api->AddShortcut = GUI::QuickAccess::AddShortcut;
+				api->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
+				api->PushNotification = GUI::QuickAccess::PushNotification;
+				api->AddSimpleShortcut = GUI::QuickAccess::AddContextItem;
+				api->RemoveSimpleShortcut = GUI::QuickAccess::RemoveContextItem;
 
 				api->Translate = Localization::Translate;
 				api->TranslateTo = Localization::TranslateTo;
@@ -762,8 +790,8 @@ namespace ADDONAPI
 				api->ImguiContext = aSetImGuiContext ? ImGui::GetCurrentContext() : nullptr;
 				api->ImguiMalloc = aSetImGuiContext ? ImGui::MemAlloc : nullptr;
 				api->ImguiFree = aSetImGuiContext ? ImGui::MemFree : nullptr;
-				api->RegisterRender = UIRoot::GUI::Register;
-				api->DeregisterRender = UIRoot::GUI::Deregister;
+				api->RegisterRender = GUI::Render::Register;
+				api->DeregisterRender = GUI::Render::Deregister;
 
 				api->RequestUpdate = Updater::RequestUpdate;
 
@@ -778,7 +806,7 @@ namespace ADDONAPI
 
 				api->Log = Logger::LogMessage2;
 
-				api->SendAlert = UIRoot::Alerts::Notify;
+				api->SendAlert = GUI::Alerts::Notify;
 
 				api->RaiseEvent = Events::RaiseEvent;
 				api->RaiseEventNotification = Events::RaiseNotification;
@@ -808,20 +836,20 @@ namespace ADDONAPI
 				api->LoadTextureFromURL = TextureLoader::LoadFromURL;
 				api->LoadTextureFromMemory = TextureLoader::LoadFromMemory;
 
-				api->AddShortcut = UIRoot::QuickAccess::AddShortcut;
-				api->RemoveShortcut = UIRoot::QuickAccess::RemoveShortcut;
-				api->PushNotification = UIRoot::QuickAccess::PushNotification;
-				api->AddSimpleShortcut = UIRoot::QuickAccess::AddContextItem;
-				api->RemoveSimpleShortcut = UIRoot::QuickAccess::RemoveContextItem;
+				api->AddShortcut = GUI::QuickAccess::AddShortcut;
+				api->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
+				api->PushNotification = GUI::QuickAccess::PushNotification;
+				api->AddSimpleShortcut = GUI::QuickAccess::AddContextItem;
+				api->RemoveSimpleShortcut = GUI::QuickAccess::RemoveContextItem;
 
 				api->Translate = Localization::Translate;
 				api->TranslateTo = Localization::TranslateTo;
 
-				api->GetFont = UIRoot::Fonts::Get;
-				api->ReleaseFont = UIRoot::Fonts::Release;
-				api->AddFontFromFile = UIRoot::Fonts::AddFontFromFile;
-				api->AddFontFromResource = UIRoot::Fonts::AddFontFromResource;
-				api->AddFontFromMemory = UIRoot::Fonts::AddFontFromMemory;
+				api->GetFont = GUI::Fonts::Get;
+				api->ReleaseFont = GUI::Fonts::Release;
+				api->AddFontFromFile = GUI::Fonts::AddFontFromFile;
+				api->AddFontFromResource = GUI::Fonts::AddFontFromResource;
+				api->AddFontFromMemory = GUI::Fonts::AddFontFromMemory;
 
 				return api;
 			}
@@ -833,8 +861,8 @@ namespace ADDONAPI
 				api->ImguiContext = aSetImGuiContext ? ImGui::GetCurrentContext() : nullptr;
 				api->ImguiMalloc = aSetImGuiContext ? ImGui::MemAlloc : nullptr;
 				api->ImguiFree = aSetImGuiContext ? ImGui::MemFree : nullptr;
-				api->RegisterRender = UIRoot::GUI::Register;
-				api->DeregisterRender = UIRoot::GUI::Deregister;
+				api->RegisterRender = GUI::Render::Register;
+				api->DeregisterRender = GUI::Render::Deregister;
 
 				api->RequestUpdate = Updater::RequestUpdate;
 
@@ -849,7 +877,7 @@ namespace ADDONAPI
 
 				api->Log = Logger::LogMessage2;
 
-				api->SendAlert = UIRoot::Alerts::Notify;
+				api->SendAlert = GUI::Alerts::Notify;
 
 				api->RaiseEvent = Events::RaiseEvent;
 				api->RaiseEventNotification = Events::RaiseNotification;
@@ -880,21 +908,21 @@ namespace ADDONAPI
 				api->LoadTextureFromURL = TextureLoader::LoadFromURL;
 				api->LoadTextureFromMemory = TextureLoader::LoadFromMemory;
 
-				api->AddShortcut = UIRoot::QuickAccess::AddShortcut;
-				api->RemoveShortcut = UIRoot::QuickAccess::RemoveShortcut;
-				api->PushNotification = UIRoot::QuickAccess::PushNotification;
-				api->AddSimpleShortcut = UIRoot::QuickAccess::AddContextItem;
-				api->RemoveSimpleShortcut = UIRoot::QuickAccess::RemoveContextItem;
+				api->AddShortcut = GUI::QuickAccess::AddShortcut;
+				api->RemoveShortcut = GUI::QuickAccess::RemoveShortcut;
+				api->PushNotification = GUI::QuickAccess::PushNotification;
+				api->AddSimpleShortcut = GUI::QuickAccess::AddContextItem;
+				api->RemoveSimpleShortcut = GUI::QuickAccess::RemoveContextItem;
 
 				api->Translate = Localization::Translate;
 				api->TranslateTo = Localization::TranslateTo;
 				api->SetTranslatedString = Localization::Set;
 
-				api->GetFont = UIRoot::Fonts::Get;
-				api->ReleaseFont = UIRoot::Fonts::Release;
-				api->AddFontFromFile = UIRoot::Fonts::AddFontFromFile;
-				api->AddFontFromResource = UIRoot::Fonts::AddFontFromResource;
-				api->AddFontFromMemory = UIRoot::Fonts::AddFontFromMemory;
+				api->GetFont = GUI::Fonts::Get;
+				api->ReleaseFont = GUI::Fonts::Release;
+				api->AddFontFromFile = GUI::Fonts::AddFontFromFile;
+				api->AddFontFromResource = GUI::Fonts::AddFontFromResource;
+				api->AddFontFromMemory = GUI::Fonts::AddFontFromMemory;
 
 				return api;
 			}
@@ -907,16 +935,16 @@ namespace ADDONAPI
 				api->ImguiMalloc = aSetImGuiContext ? ImGui::MemAlloc : nullptr;
 				api->ImguiFree = aSetImGuiContext ? ImGui::MemFree : nullptr;
 
-				api->Renderer.Register = UIRoot::GUI::Register;
-				api->Renderer.Deregister = UIRoot::GUI::Deregister;
+				api->Renderer.Register = GUI::Render::Register;
+				api->Renderer.Deregister = GUI::Render::Deregister;
 
 				api->RequestUpdate = Updater::RequestUpdate;
 
 				api->Log = Logger::LogMessage2;
 
-				api->UI.SendAlert = UIRoot::Alerts::Notify;
-				api->UI.RegisterCloseOnEscape = UIRoot::EscapeClosing::Register;
-				api->UI.DeregisterCloseOnEscape = UIRoot::EscapeClosing::Deregister;
+				api->UI.SendAlert = GUI::Alerts::Notify;
+				api->UI.RegisterCloseOnEscape = GUI::EscapeClosing::Register;
+				api->UI.DeregisterCloseOnEscape = GUI::EscapeClosing::Deregister;
 
 				api->Paths.GetGameDirectory = Paths::GetGameDirectory;
 				api->Paths.GetAddonDirectory = Paths::GetAddonDirectory;
@@ -963,22 +991,22 @@ namespace ADDONAPI
 				api->Textures.LoadFromURL = TextureLoader::LoadFromURL;
 				api->Textures.LoadFromMemory = TextureLoader::LoadFromMemory;
 
-				api->QuickAccess.Add = UIRoot::QuickAccess::AddShortcut;
-				api->QuickAccess.Remove = UIRoot::QuickAccess::RemoveShortcut;
-				api->QuickAccess.Notify = UIRoot::QuickAccess::PushNotification;
-				api->QuickAccess.AddContextMenu = UIRoot::QuickAccess::AddContextItem2;
-				api->QuickAccess.RemoveContextMenu = UIRoot::QuickAccess::RemoveContextItem;
+				api->QuickAccess.Add = GUI::QuickAccess::AddShortcut;
+				api->QuickAccess.Remove = GUI::QuickAccess::RemoveShortcut;
+				api->QuickAccess.Notify = GUI::QuickAccess::PushNotification;
+				api->QuickAccess.AddContextMenu = GUI::QuickAccess::AddContextItem2;
+				api->QuickAccess.RemoveContextMenu = GUI::QuickAccess::RemoveContextItem;
 
 				api->Localization.Translate = Localization::Translate;
 				api->Localization.TranslateTo = Localization::TranslateTo;
 				api->Localization.SetTranslatedString = Localization::Set;
 
-				api->Fonts.Get = UIRoot::Fonts::Get;
-				api->Fonts.Release = UIRoot::Fonts::Release;
-				api->Fonts.AddFromFile = UIRoot::Fonts::AddFontFromFile;
-				api->Fonts.AddFromResource = UIRoot::Fonts::AddFontFromResource;
-				api->Fonts.AddFromMemory = UIRoot::Fonts::AddFontFromMemory;
-				api->Fonts.Resize = UIRoot::Fonts::ResizeFont;
+				api->Fonts.Get = GUI::Fonts::Get;
+				api->Fonts.Release = GUI::Fonts::Release;
+				api->Fonts.AddFromFile = GUI::Fonts::AddFontFromFile;
+				api->Fonts.AddFromResource = GUI::Fonts::AddFontFromResource;
+				api->Fonts.AddFromMemory = GUI::Fonts::AddFontFromMemory;
+				api->Fonts.Resize = GUI::Fonts::ResizeFont;
 
 				return api;
 			}

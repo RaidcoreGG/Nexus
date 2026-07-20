@@ -45,142 +45,148 @@ constexpr const char* KB_MUMBLEOVERLAY   = "KB_MUMBLEOVERLAY";
 constexpr const char* KB_TOGGLEHIDEUI    = "KB_TOGGLEHIDEUI";
 
 ///----------------------------------------------------------------------------------------------------
-/// CUiContext Class
+/// Raidcore::Nexus::GUI Namespace
 ///----------------------------------------------------------------------------------------------------
-class CUiContext : public CUiRender, public CUiBinds, public CUiStyle, public virtual IWndProc
+namespace Raidcore::Nexus::GUI
 {
-	public:
 	///----------------------------------------------------------------------------------------------------
-	/// OnInputBindPressed:
-	/// 	Receives input bind invocations.
+	/// CUiContext Class
 	///----------------------------------------------------------------------------------------------------
-	static void OnInputBindPressed(const char* aIdentifier);
+	class CUiContext : public CUiRender, public CUiBinds, public CUiStyle, public virtual IWndProc
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// OnInputBindPressed:
+		/// 	Receives input bind invocations.
+		///----------------------------------------------------------------------------------------------------
+		static void OnInputBindPressed(const char* aIdentifier);
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnFontUpdate:
-	/// 	Receives fonts.
-	///----------------------------------------------------------------------------------------------------
-	static void OnFontUpdate(const char* aIdentifier, ImFont* aFont);
+		///----------------------------------------------------------------------------------------------------
+		/// OnFontUpdate:
+		/// 	Receives fonts.
+		///----------------------------------------------------------------------------------------------------
+		static void OnFontUpdate(const char* aIdentifier, ImFont* aFont);
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnMumbleIdentityChanged:
-	/// 	Changes fonts and UI scale when the game settings are changed.
-	///----------------------------------------------------------------------------------------------------
-	static void OnMumbleIdentityChanged(void* aEventArgs);
+		///----------------------------------------------------------------------------------------------------
+		/// OnMumbleIdentityChanged:
+		/// 	Changes fonts and UI scale when the game settings are changed.
+		///----------------------------------------------------------------------------------------------------
+		static void OnMumbleIdentityChanged(void* aEventArgs);
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnInputBindUpdate:
-	/// 	Reacts to input bind changes, to trigger a UI refresh.
-	///----------------------------------------------------------------------------------------------------
-	static void OnInputBindUpdate(void* aEventData);
+		///----------------------------------------------------------------------------------------------------
+		/// OnInputBindUpdate:
+		/// 	Reacts to input bind changes, to trigger a UI refresh.
+		///----------------------------------------------------------------------------------------------------
+		static void OnInputBindUpdate(void* aEventData);
 
-	///----------------------------------------------------------------------------------------------------
-	/// ctor
-	///----------------------------------------------------------------------------------------------------
-	CUiContext(
-		Graphics::Window_t& aGrWindow,
-		CLogApi*            aLogger,
-		Graphics::TextureLoader&     aTextureService,
-		CDataLinkApi*       aDataLink,
-		CInputBindApi*      aInputBindApi,
-		Host::EventApi&     aEventApi,
-		GW2::MumbleReader&  aMumbleReader
-	);
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		CUiContext(
+			Graphics::Window_t& aGrWindow,
+			CLogApi* aLogger,
+			Graphics::TextureLoader& aTextureService,
+			CDataLinkApi* aDataLink,
+			CInputBindApi* aInputBindApi,
+			Host::EventApi& aEventApi,
+			GW2::MumbleReader& aMumbleReader
+		);
 
-	///----------------------------------------------------------------------------------------------------
-	/// dtor
-	///----------------------------------------------------------------------------------------------------
-	~CUiContext();
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		~CUiContext();
 
-	///----------------------------------------------------------------------------------------------------
-	/// Initialize:
-	/// 	Initializes the UI context.
-	///----------------------------------------------------------------------------------------------------
-	void Initialize();
+		///----------------------------------------------------------------------------------------------------
+		/// Initialize:
+		/// 	Initializes the UI context.
+		///----------------------------------------------------------------------------------------------------
+		void Initialize();
 
-	///----------------------------------------------------------------------------------------------------
-	/// Shutdown:
-	/// 	Shuts down the UI context.
-	///----------------------------------------------------------------------------------------------------
-	void Shutdown();
+		///----------------------------------------------------------------------------------------------------
+		/// Shutdown:
+		/// 	Shuts down the UI context.
+		///----------------------------------------------------------------------------------------------------
+		void Shutdown();
 
-	///----------------------------------------------------------------------------------------------------
-	/// Render:
-	/// 	Renders the UI and executes callbacks.
-	///----------------------------------------------------------------------------------------------------
-	void Render();
+		///----------------------------------------------------------------------------------------------------
+		/// Render:
+		/// 	Renders the UI and executes callbacks.
+		///----------------------------------------------------------------------------------------------------
+		void Render();
 
-	///----------------------------------------------------------------------------------------------------
-	/// Invalidate:
-	/// 	Calls all UI children's invalidate function, causing them to refresh.
-	///----------------------------------------------------------------------------------------------------
-	void Invalidate();
+		///----------------------------------------------------------------------------------------------------
+		/// Invalidate:
+		/// 	Calls all UI children's invalidate function, causing them to refresh.
+		///----------------------------------------------------------------------------------------------------
+		void Invalidate();
 
-	///----------------------------------------------------------------------------------------------------
-	/// WndProc:
-	/// 	Returns 0 if message was processed.
-	///----------------------------------------------------------------------------------------------------
-	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		///----------------------------------------------------------------------------------------------------
+		/// WndProc:
+		/// 	Returns 0 if message was processed.
+		///----------------------------------------------------------------------------------------------------
+		UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetLocalization:
-	/// 	Returns the localization component.
-	///----------------------------------------------------------------------------------------------------
-	CLocalization* GetLocalization();
+		///----------------------------------------------------------------------------------------------------
+		/// GetLocalization:
+		/// 	Returns the localization component.
+		///----------------------------------------------------------------------------------------------------
+		CLocalization* GetLocalization();
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetAlerts:
-	/// 	Returns the alerts component.
-	///----------------------------------------------------------------------------------------------------
-	CAlerts* GetAlerts();
+		///----------------------------------------------------------------------------------------------------
+		/// GetAlerts:
+		/// 	Returns the alerts component.
+		///----------------------------------------------------------------------------------------------------
+		CAlerts* GetAlerts();
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetQuickAccess:
-	/// 	Returns the quick access component.
-	///----------------------------------------------------------------------------------------------------
-	CQuickAccess* GetQuickAccess();
+		///----------------------------------------------------------------------------------------------------
+		/// GetQuickAccess:
+		/// 	Returns the quick access component.
+		///----------------------------------------------------------------------------------------------------
+		CQuickAccess* GetQuickAccess();
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetFontManager:
-	/// 	Returns the font manager.
-	///----------------------------------------------------------------------------------------------------
-	CFontManager* GetFontManager();
+		///----------------------------------------------------------------------------------------------------
+		/// GetFontManager:
+		/// 	Returns the font manager.
+		///----------------------------------------------------------------------------------------------------
+		CFontManager* GetFontManager();
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetEscapeClosingService:
-	/// 	Returns the escape-closing service.
-	///----------------------------------------------------------------------------------------------------
-	CEscapeClosing* GetEscapeClosingService();
+		///----------------------------------------------------------------------------------------------------
+		/// GetEscapeClosingService:
+		/// 	Returns the escape-closing service.
+		///----------------------------------------------------------------------------------------------------
+		CEscapeClosing* GetEscapeClosingService();
 
-	///----------------------------------------------------------------------------------------------------
-	/// LoadFonts:
-	/// 	Loads the fonts.
-	///----------------------------------------------------------------------------------------------------
-	void LoadFonts();
+		///----------------------------------------------------------------------------------------------------
+		/// LoadFonts:
+		/// 	Loads the fonts.
+		///----------------------------------------------------------------------------------------------------
+		void LoadFonts();
 
-	private:
-	/* Services */
-	Graphics::Window_t& GrWindow;
-	CLogApi*            Logger         = nullptr;
-	CLocalization*      Language       = nullptr;
-	Graphics::TextureLoader&     TextureService;
-	CDataLinkApi*       DataLink       = nullptr;
-	CInputBindApi*      InputBindApi   = nullptr;
-	Host::EventApi&     EventApi;
-	GW2::MumbleReader&  MumbleReader;
+		private:
+		/* Services */
+		Graphics::Window_t& GrWindow;
+		CLogApi* Logger = nullptr;
+		CLocalization* Language = nullptr;
+		Graphics::TextureLoader& TextureService;
+		CDataLinkApi* DataLink = nullptr;
+		CInputBindApi* InputBindApi = nullptr;
+		Host::EventApi& EventApi;
+		GW2::MumbleReader& MumbleReader;
 
-	/* Windows/Widgets */
-	CAlerts*                Alerts;
-	CMainWindow*            MainWindow;
-	CQuickAccess*           QuickAccess;
+		/* Windows/Widgets */
+		CAlerts* Alerts;
+		CMainWindow* MainWindow;
+		CQuickAccess* QuickAccess;
 
-	/* UI Services */
-	CFontManager*           FontManager;
-	CEscapeClosing*         EscapeClose;
-	CScaling*               Scaling;
-	CUiInput*               Input;
+		/* UI Services */
+		CFontManager* FontManager;
+		CEscapeClosing* EscapeClose;
+		CScaling* Scaling;
+		CUiInput* Input;
 
-	bool                    IsInitialized = false;
-	bool                    IsVisible = true;
-	bool                    IsInvalid = true;
-};
+		bool                    IsInitialized = false;
+		bool                    IsVisible = true;
+		bool                    IsInvalid = true;
+	};
+}

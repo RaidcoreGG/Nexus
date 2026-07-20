@@ -93,7 +93,7 @@ namespace Raidcore::Nexus::GW2
 		s_GameBindsApi->Set(kbChange->Identifier, ib, kbChange->Index == 0, true);
 
 		Runtime& ctx = Runtime::Get();
-		CUiContext* uictx = ctx.GetUIContext();
+		GUI::CUiContext* uictx = ctx.GetUIContext();
 
 		uictx->Invalidate();
 	}

@@ -21,90 +21,93 @@ using namespace Raidcore::Nexus;
 #include "Core/Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
 
-CLicenseAgreementModal::CLicenseAgreementModal()
+namespace Raidcore::Nexus::GUI
 {
-	this->SetID("LicenseAgreementModal");
-	this->SetDisplayName("License Agreement");
-}
-
-void CLicenseAgreementModal::RenderContent()
-{
-	ImGui::TextWrapped("This is an unofficial library and Raidcore is in no way associated with ArenaNet nor with any of its partners.");
-	ImGui::TextWrapped("Modifying Guild Wars 2 through any third party software is not supported by ArenaNet.");
-
-	ImGui::NewLine();
-
-	ImGui::TextWrapped("You are using this program at your own risk.");
-
-	ImGui::NewLine();
-
-	ImGui::TextWrapped("By using this software you are agreeing to the terms and conditions as laid out on:");
-
-	if (ImGui::TextURL("https://raidcore.gg/Legal", false, false))
+	CLicenseAgreementModal::CLicenseAgreementModal()
 	{
-		ShellExecuteA(0, 0, "https://raidcore.gg/Legal", 0, 0, SW_SHOW);
+		this->SetID("LicenseAgreementModal");
+		this->SetDisplayName("License Agreement");
 	}
 
-	ImGui::Text("If you do not agree to these terms or do not understand them, do not use the software.");
-
-	ImGui::NewLine();
-
-	ImGui::TextWrapped("By clicking \"I do NOT agree\" your game will close and Nexus will attempt to uninstall.");
-	ImGui::TextWrapped("If you see this prompt again after restarting the game, you will have to manually remove");
-	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 0.f, 1.f));
-	ImGui::TextWrapped("%s", Index(EPath::NexusDLL).string().c_str());
-	ImGui::PopStyleColor();
-	ImGui::TextWrapped("while the game is closed.");
-
-	ImGuiStyle& style = ImGui::GetStyle();
-	ImVec2 pos = ImGui::GetCursorPos();
-
-	float btnWidth = ImGui::CalcTextSize("I do NOT agree").x + (style.FramePadding.x * 2);
-	float wndWidth = ImGui::GetWindowWidth();
-
-	if (wndWidth > (btnWidth * 2) + style.ItemSpacing.x + (style.WindowPadding.x * 2))
+	void CLicenseAgreementModal::RenderContent()
 	{
-		btnWidth = wndWidth - style.ItemSpacing.x - (style.WindowPadding.x * 2);
-		btnWidth /= 2;
-	}
+		ImGui::TextWrapped("This is an unofficial library and Raidcore is in no way associated with ArenaNet nor with any of its partners.");
+		ImGui::TextWrapped("Modifying Guild Wars 2 through any third party software is not supported by ArenaNet.");
 
-	if (ImGui::Button("I agree", ImVec2(btnWidth, 0)))
-	{
-		this->SetResult(EModalResult::OK);
-	}
+		ImGui::NewLine();
 
-	ImGui::SameLine();
+		ImGui::TextWrapped("You are using this program at your own risk.");
 
-	if (ImGui::Button("I do NOT agree", ImVec2(btnWidth, 0)))
-	{
-		this->SetResult(EModalResult::Cancel);
-	}
-}
+		ImGui::NewLine();
 
-void CLicenseAgreementModal::OnClosing()
-{
-	Runtime&  ctx         = Runtime::Get();
-	CSettings& settingsctx = ctx.Core().Settings();
+		ImGui::TextWrapped("By using this software you are agreeing to the terms and conditions as laid out on:");
 
-	switch (this->GetResult())
-	{
-		case EModalResult::OK:
+		if (ImGui::TextURL("https://raidcore.gg/Legal", false, false))
 		{
-			settingsctx.Set(OPT_ACCEPTEULA, true);
-			break;
+			ShellExecuteA(0, 0, "https://raidcore.gg/Legal", 0, 0, SW_SHOW);
 		}
-		case EModalResult::Cancel:
-		{
-			std::string strHost = Index(EPath::NexusDLL).string();
 
-			SHFILEOPSTRUCT fileOp{};
-			fileOp.hwnd   = NULL;
-			fileOp.wFunc  = FO_DELETE;
-			fileOp.pFrom  = strHost.c_str();
-			fileOp.pTo    = NULL;
-			fileOp.fFlags = FOF_ALLOWUNDO | FOF_NOERRORUI | FOF_NOCONFIRMATION | FOF_SILENT;
-			int result = SHFileOperationA(&fileOp);
-			break;
+		ImGui::Text("If you do not agree to these terms or do not understand them, do not use the software.");
+
+		ImGui::NewLine();
+
+		ImGui::TextWrapped("By clicking \"I do NOT agree\" your game will close and Nexus will attempt to uninstall.");
+		ImGui::TextWrapped("If you see this prompt again after restarting the game, you will have to manually remove");
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 0.f, 1.f));
+		ImGui::TextWrapped("%s", Index(EPath::NexusDLL).string().c_str());
+		ImGui::PopStyleColor();
+		ImGui::TextWrapped("while the game is closed.");
+
+		ImGuiStyle& style = ImGui::GetStyle();
+		ImVec2 pos = ImGui::GetCursorPos();
+
+		float btnWidth = ImGui::CalcTextSize("I do NOT agree").x + (style.FramePadding.x * 2);
+		float wndWidth = ImGui::GetWindowWidth();
+
+		if (wndWidth > (btnWidth * 2) + style.ItemSpacing.x + (style.WindowPadding.x * 2))
+		{
+			btnWidth = wndWidth - style.ItemSpacing.x - (style.WindowPadding.x * 2);
+			btnWidth /= 2;
+		}
+
+		if (ImGui::Button("I agree", ImVec2(btnWidth, 0)))
+		{
+			this->SetResult(EModalResult::OK);
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("I do NOT agree", ImVec2(btnWidth, 0)))
+		{
+			this->SetResult(EModalResult::Cancel);
+		}
+	}
+
+	void CLicenseAgreementModal::OnClosing()
+	{
+		Runtime& ctx = Runtime::Get();
+		CSettings& settingsctx = ctx.Core().Settings();
+
+		switch (this->GetResult())
+		{
+			case EModalResult::OK:
+			{
+				settingsctx.Set(OPT_ACCEPTEULA, true);
+				break;
+			}
+			case EModalResult::Cancel:
+			{
+				std::string strHost = Index(EPath::NexusDLL).string();
+
+				SHFILEOPSTRUCT fileOp{};
+				fileOp.hwnd = NULL;
+				fileOp.wFunc = FO_DELETE;
+				fileOp.pFrom = strHost.c_str();
+				fileOp.pTo = NULL;
+				fileOp.fFlags = FOF_ALLOWUNDO | FOF_NOERRORUI | FOF_NOCONFIRMATION | FOF_SILENT;
+				int result = SHFileOperationA(&fileOp);
+				break;
+			}
 		}
 	}
 }

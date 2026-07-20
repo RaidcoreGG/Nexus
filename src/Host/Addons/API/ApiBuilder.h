@@ -8,24 +8,30 @@
 
 #pragma once
 
+#include <cstdint>
 #include <windows.h>
 
+#include "imgui.h"
+
 #include "ApiBase.h"
-#include "Host/Events/EvtFuncDefs.h"
-#include "Engine/Inputs/InputBinds/IbFuncDefs.h"
 #include "Core/Logging/LogEnum.h"
+#include "Engine/Inputs/InputBinds/IbBind.h"
+#include "Engine/Inputs/InputBinds/IbFuncDefs.h"
+#include "Graphics/Textures/TxFuncDefs.h"
+#include "Graphics/Textures/TxTexture.h"
 #include "GW2/Inputs/GameBinds/GbEnum.h"
+#include "Host/Events/EvtFuncDefs.h"
 #include "Platform/RawInput/RiFuncDefs.h"
 #include "UI/Services/Fonts/FuncDefs.h"
-#include "Graphics/Textures/TxFuncDefs.h"
+#include "UI/UiEnum.h"
 #include "UI/UiFuncDefs.h"
 
 using namespace Raidcore::Nexus;
 
 ///----------------------------------------------------------------------------------------------------
-/// ADDONAPI Namespace
+/// Raidcore::Nexus::Host::API Namespace
 ///----------------------------------------------------------------------------------------------------
-namespace ADDONAPI
+namespace Raidcore::Nexus::Host::API
 {
 	///----------------------------------------------------------------------------------------------------
 	/// DataLink Namespace
@@ -334,34 +340,34 @@ namespace ADDONAPI
 		void RequestUpdate(signed int aSignature, const char* aUpdateURL);
 	}
 
-	namespace UIRoot::GUI
+	namespace GUI::Render
 	{
-		void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback);
+		void Register(Nexus::GUI::ERenderType aRenderType, Nexus::GUI::GUI_RENDER aRenderCallback);
 
-		void Deregister(GUI_RENDER aRenderCallback);
+		void Deregister(Nexus::GUI::GUI_RENDER aRenderCallback);
 	}
 
-	namespace UIRoot::Fonts
+	namespace GUI::Fonts
 	{
-		void Get(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback);
+		void Get(const char* aIdentifier, Nexus::GUI::FONTS_RECEIVECALLBACK aCallback);
 
-		void Release(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback);
+		void Release(const char* aIdentifier, Nexus::GUI::FONTS_RECEIVECALLBACK aCallback);
 
-		void AddFontFromFile(const char* aIdentifier, float aFontSize, const char* aFilename, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
+		void AddFontFromFile(const char* aIdentifier, float aFontSize, const char* aFilename, Nexus::GUI::FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
 
-		void AddFontFromResource(const char* aIdentifier, float aFontSize, unsigned aResourceID, HMODULE aModule, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
+		void AddFontFromResource(const char* aIdentifier, float aFontSize, unsigned aResourceID, HMODULE aModule, Nexus::GUI::FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
 
-		void AddFontFromMemory(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
+		void AddFontFromMemory(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, Nexus::GUI::FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
 
 		void ResizeFont(const char* aIdentifier, float aFontSize);
 	}
 
-	namespace UIRoot::Alerts
+	namespace GUI::Alerts
 	{
 		void Notify(const char* aMessage);
 	}
 
-	namespace UIRoot::QuickAccess
+	namespace GUI::QuickAccess
 	{
 		void AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aInputBindIdentifier, const char* aTooltipText);
 
@@ -371,13 +377,13 @@ namespace ADDONAPI
 
 		void SetNotificationShortcut(const char* aIdentifier, bool aState);
 
-		void AddContextItem(const char* aIdentifier, GUI_RENDER aShortcutRenderCallback);
+		void AddContextItem(const char* aIdentifier, Nexus::GUI::GUI_RENDER aShortcutRenderCallback);
 
-		void AddContextItem2(const char* aIdentifier, const char* aTargetShortcutIdentifier, GUI_RENDER aShortcutRenderCallback);
+		void AddContextItem2(const char* aIdentifier, const char* aTargetShortcutIdentifier, Nexus::GUI::GUI_RENDER aShortcutRenderCallback);
 
 		void RemoveContextItem(const char* aIdentifier);
 	}
-	namespace UIRoot::EscapeClosing
+	namespace GUI::EscapeClosing
 	{
 		void Register(const char* aWindowName, bool* aIsVisible);
 

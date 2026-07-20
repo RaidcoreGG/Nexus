@@ -12,10 +12,16 @@
 #include <unordered_map>
 
 ///----------------------------------------------------------------------------------------------------
-/// Locale_t Struct
+/// Raidcore::Nexus::GUI Namespace
 ///----------------------------------------------------------------------------------------------------
-struct Locale_t
+namespace Raidcore::Nexus::GUI
 {
-	std::string                                  DisplayName;
-	std::unordered_map<std::string, const char*> Texts;
-};
+	///----------------------------------------------------------------------------------------------------
+	/// Locale_t Struct
+	///----------------------------------------------------------------------------------------------------
+	struct Locale_t
+	{
+		std::string                                  DisplayName;
+		std::unordered_map<std::string, const char*> Texts;
+	};
+}

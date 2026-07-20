@@ -45,8 +45,8 @@ struct AddonAPI6_t : AddonAPI_t
 
 	struct RendererVT
 	{
-		GUI_ADDRENDER                     Register;
-		GUI_REMRENDER                     Deregister;
+		GUI::GUI_ADDRENDER                     Register;
+		GUI::GUI_REMRENDER                     Deregister;
 	};
 	RendererVT                            Renderer;
 
@@ -59,9 +59,9 @@ struct AddonAPI6_t : AddonAPI_t
 	/* User Interface */
 	struct UIVT
 	{
-		ALERTS_NOTIFY                     SendAlert;
-		GUI_REGISTERCLOSEONESCAPE         RegisterCloseOnEscape;
-		GUI_DEREGISTERCLOSEONESCAPE       DeregisterCloseOnEscape;
+		GUI::ALERTS_NOTIFY                     SendAlert;
+		GUI::GUI_REGISTERCLOSEONESCAPE         RegisterCloseOnEscape;
+		GUI::GUI_DEREGISTERCLOSEONESCAPE       DeregisterCloseOnEscape;
 	};
 	UIVT                                  UI;
 
@@ -153,32 +153,32 @@ struct AddonAPI6_t : AddonAPI_t
 	/* Shortcuts */
 	struct QuickAccessVT
 	{
-		QUICKACCESS_ADDSHORTCUT           Add;
-		QUICKACCESS_GENERIC               Remove;
-		QUICKACCESS_GENERIC               Notify;
-		QUICKACCESS_ADDSIMPLE2            AddContextMenu;
-		QUICKACCESS_GENERIC               RemoveContextMenu;
+		GUI::QUICKACCESS_ADDSHORTCUT           Add;
+		GUI::QUICKACCESS_GENERIC               Remove;
+		GUI::QUICKACCESS_GENERIC               Notify;
+		GUI::QUICKACCESS_ADDSIMPLE2            AddContextMenu;
+		GUI::QUICKACCESS_GENERIC               RemoveContextMenu;
 	};
 	QuickAccessVT                         QuickAccess;
 
 	/* Localization */
 	struct LocalizationVT
 	{
-		LOCALIZATION_TRANSLATE            Translate;
-		LOCALIZATION_TRANSLATETO          TranslateTo;
-		LOCALIZATION_SET                  SetTranslatedString;
-	};
+		GUI::LOCALIZATION_TRANSLATE            Translate;
+		GUI::LOCALIZATION_TRANSLATETO          TranslateTo;
+		GUI::LOCALIZATION_SET                  SetTranslatedString;
+	 };
 	LocalizationVT                        Localization;
 
 	/* Fonts */
 	struct FontsVT
 	{
-		FONTS_GETRELEASE                  Get;
-		FONTS_GETRELEASE                  Release;
-		FONTS_ADDFROMFILE                 AddFromFile;
-		FONTS_ADDFROMRESOURCE             AddFromResource;
-		FONTS_ADDFROMMEMORY               AddFromMemory;
-		FONTS_RESIZE                      Resize;
+		GUI::FONTS_GETRELEASE                  Get;
+		GUI::FONTS_GETRELEASE                  Release;
+		GUI::FONTS_ADDFROMFILE                 AddFromFile;
+		GUI::FONTS_ADDFROMRESOURCE             AddFromResource;
+		GUI::FONTS_ADDFROMMEMORY               AddFromMemory;
+		GUI::FONTS_RESIZE                      Resize;
 	};
 	FontsVT                               Fonts;
 };

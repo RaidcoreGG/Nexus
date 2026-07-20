@@ -38,8 +38,8 @@ struct AddonAPI2_t : AddonAPI_t
 	ImGuiContext*                    ImguiContext;
 	void*                            ImguiMalloc;
 	void*                            ImguiFree;
-	GUI_ADDRENDER                    RegisterRender;
-	GUI_REMRENDER                    DeregisterRender;
+	GUI::GUI_ADDRENDER                    RegisterRender;
+	GUI::GUI_REMRENDER                    DeregisterRender;
 
 	/* Paths */
 	IDX_GETGAMEDIR                   GetGameDirectory;
@@ -87,12 +87,12 @@ struct AddonAPI2_t : AddonAPI_t
 	Graphics::TEXTURES_LOADFROMMEMORY          LoadTextureFromMemory;
 
 	/* Shortcuts */
-	QUICKACCESS_ADDSHORTCUT          AddShortcut;
-	QUICKACCESS_GENERIC              RemoveShortcut;
-	QUICKACCESS_GENERIC              PushNotification;
-	QUICKACCESS_ADDSIMPLE            AddSimpleShortcut;
-	QUICKACCESS_GENERIC              RemoveSimpleShortcut;
+	GUI::QUICKACCESS_ADDSHORTCUT          AddShortcut;
+	GUI::QUICKACCESS_GENERIC              RemoveShortcut;
+	GUI::QUICKACCESS_GENERIC              PushNotification;
+	GUI::QUICKACCESS_ADDSIMPLE            AddSimpleShortcut;
+	GUI::QUICKACCESS_GENERIC              RemoveSimpleShortcut;
 
-	LOCALIZATION_TRANSLATE           Translate;
-	LOCALIZATION_TRANSLATETO         TranslateTo;
+	GUI::LOCALIZATION_TRANSLATE           Translate;
+	GUI::LOCALIZATION_TRANSLATETO         TranslateTo;
 };

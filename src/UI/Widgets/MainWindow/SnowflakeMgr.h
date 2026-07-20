@@ -18,47 +18,53 @@
 using namespace Raidcore::Nexus;
 
 ///----------------------------------------------------------------------------------------------------
-/// Snowflake_t Struct
+/// Raidcore::Nexus::GUI Namespace
 ///----------------------------------------------------------------------------------------------------
-struct Snowflake_t
+namespace Raidcore::Nexus::GUI
 {
-	Graphics::Texture_t* Texture_t;
-	float    Size;
-	float    X;
-	float    Y;
+	///----------------------------------------------------------------------------------------------------
+	/// Snowflake_t Struct
+	///----------------------------------------------------------------------------------------------------
+	struct Snowflake_t
+	{
+		Graphics::Texture_t* Texture_t;
+		float    Size;
+		float    X;
+		float    Y;
 
-	float    FallDuration;
+		float    FallDuration;
 
-	/* Sway: left to right motion */
-	bool     Sway;
-	float    SwayDuration;
-	float    SwayOffset;
-	float    SwayStart;
-	float    SwayEnd;
-	
-	/* Tilt: slight shake */
-	bool     Tilt;
-	float    TiltDuration;
-	float    Angle;
-	float    AngleStart;
-	float    AngleEnd;
-};
+		/* Sway: left to right motion */
+		bool     Sway;
+		float    SwayDuration;
+		float    SwayOffset;
+		float    SwayStart;
+		float    SwayEnd;
 
-///----------------------------------------------------------------------------------------------------
-/// CSnowflakeMgr Class
-///----------------------------------------------------------------------------------------------------
-class CSnowflakeMgr
-{
-	public:
-	CSnowflakeMgr();
+		/* Tilt: slight shake */
+		bool     Tilt;
+		float    TiltDuration;
+		float    Angle;
+		float    AngleStart;
+		float    AngleEnd;
+	};
 
-	void Update();
-	void Clear();
+	///----------------------------------------------------------------------------------------------------
+	/// CSnowflakeMgr Class
+	///----------------------------------------------------------------------------------------------------
+	class CSnowflakeMgr
+	{
+		public:
+		CSnowflakeMgr();
 
-	private:
-	bool IsPartyPooper = false;
-	bool IsItChristmas = false;
-	bool IsItHalloween = false;
+		void Update();
+		void Clear();
 
-	std::unordered_map<ImGuiID, std::vector<Snowflake_t>> Snowflakes;
-};
+		private:
+		bool IsPartyPooper = false;
+		bool IsItChristmas = false;
+		bool IsItHalloween = false;
+
+		std::unordered_map<ImGuiID, std::vector<Snowflake_t>> Snowflakes;
+	};
+}

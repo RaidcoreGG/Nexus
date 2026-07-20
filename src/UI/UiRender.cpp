@@ -8,124 +8,125 @@
 
 #include "UiRender.h"
 
-CUiRender::CUiRender() : IRefCleaner("UiRender")
+namespace Raidcore::Nexus::GUI
 {
-}
+	CUiRender::CUiRender() : IRefCleaner("UiRender")
+	{}
 
-CUiRender::~CUiRender()
-{
-}
+	CUiRender::~CUiRender()
+	{}
 
-void CUiRender::Register(ERenderType aRenderType, GUI_RENDER aRenderCallback)
-{
-	if (!aRenderCallback) { return; }
-
-	const std::lock_guard<std::mutex> lock(this->RenderMutex);
-
-	std::vector<GUI_RENDER>* targetRegistry{};
-
-	switch (aRenderType)
+	void CUiRender::Register(ERenderType aRenderType, GUI_RENDER aRenderCallback)
 	{
-		case ERenderType::PreRender:
+		if (!aRenderCallback) { return; }
+
+		const std::lock_guard<std::mutex> lock(this->RenderMutex);
+
+		std::vector<GUI_RENDER>* targetRegistry{};
+
+		switch (aRenderType)
 		{
-			targetRegistry = &this->Registry[static_cast<uint32_t>(ERenderType::PreRender)];
-			break;
-		}
-		case ERenderType::Render:
-		{
-			targetRegistry = &this->Registry[static_cast<uint32_t>(ERenderType::Render)];
-			break;
-		}
-		case ERenderType::PostRender:
-		{
-			targetRegistry = &this->Registry[static_cast<uint32_t>(ERenderType::PostRender)];
-			break;
-		}
-		case ERenderType::OptionsRender:
-		{
-			targetRegistry = &this->Registry[static_cast<uint32_t>(ERenderType::OptionsRender)];
-			break;
-		}
-		default:
-		{
-			// TODO: This should be a macro for a "no default case".
-			throw "No valid case for switch variable 'aRenderType'";
-		}
-	}
-
-	/* Sanity check. */
-	if (!targetRegistry)
-	{
-		return;
-	}
-
-	/* Only add if it doesn't already exist. */
-	if (std::find(targetRegistry->begin(), targetRegistry->end(), aRenderCallback) != targetRegistry->end())
-	{
-		return;
-	}
-
-	targetRegistry->push_back(aRenderCallback);
-}
-
-void CUiRender::Deregister(GUI_RENDER aRenderCallback)
-{
-	if (!aRenderCallback) { return; }
-
-	const std::lock_guard<std::mutex> lock(this->RenderMutex);
-
-	for (size_t i = 0; i < static_cast<uint32_t>(ERenderType::COUNT); i++)
-	{
-		std::vector<GUI_RENDER>& registry = this->Registry[i];
-		registry.erase(std::remove(registry.begin(), registry.end(), aRenderCallback), registry.end());
-	}
-}
-
-uint32_t CUiRender::CleanupRefs(void* aStartAddress, void* aEndAddress)
-{
-	uint32_t refCounter = 0;
-
-	const std::lock_guard<std::mutex> lock(this->RenderMutex);
-
-	for (size_t i = 0; i < static_cast<uint32_t>(ERenderType::COUNT); i++)
-	{
-		for (GUI_RENDER renderCb : this->Registry[i])
-		{
-			if (renderCb >= aStartAddress && renderCb <= aEndAddress)
+			case ERenderType::PreRender:
 			{
-				this->Registry[i].erase(std::remove(this->Registry[i].begin(), this->Registry[i].end(), renderCb), this->Registry[i].end());
-				refCounter++;
+				targetRegistry = &this->Registry[static_cast<uint32_t>(ERenderType::PreRender)];
+				break;
+			}
+			case ERenderType::Render:
+			{
+				targetRegistry = &this->Registry[static_cast<uint32_t>(ERenderType::Render)];
+				break;
+			}
+			case ERenderType::PostRender:
+			{
+				targetRegistry = &this->Registry[static_cast<uint32_t>(ERenderType::PostRender)];
+				break;
+			}
+			case ERenderType::OptionsRender:
+			{
+				targetRegistry = &this->Registry[static_cast<uint32_t>(ERenderType::OptionsRender)];
+				break;
+			}
+			default:
+			{
+				// TODO: This should be a macro for a "no default case".
+				throw "No valid case for switch variable 'aRenderType'";
 			}
 		}
+
+		/* Sanity check. */
+		if (!targetRegistry)
+		{
+			return;
+		}
+
+		/* Only add if it doesn't already exist. */
+		if (std::find(targetRegistry->begin(), targetRegistry->end(), aRenderCallback) != targetRegistry->end())
+		{
+			return;
+		}
+
+		targetRegistry->push_back(aRenderCallback);
 	}
 
-	return refCounter;
-}
-
-const std::vector<GUI_RENDER>& CUiRender::GetRenderCallbacks(ERenderType aRenderType) const
-{
-	switch (aRenderType)
+	void CUiRender::Deregister(GUI_RENDER aRenderCallback)
 	{
-		case ERenderType::PreRender:
+		if (!aRenderCallback) { return; }
+
+		const std::lock_guard<std::mutex> lock(this->RenderMutex);
+
+		for (size_t i = 0; i < static_cast<uint32_t>(ERenderType::COUNT); i++)
 		{
-			return this->Registry[static_cast<uint32_t>(ERenderType::PreRender)];
+			std::vector<GUI_RENDER>& registry = this->Registry[i];
+			registry.erase(std::remove(registry.begin(), registry.end(), aRenderCallback), registry.end());
 		}
-		case ERenderType::Render:
+	}
+
+	uint32_t CUiRender::CleanupRefs(void* aStartAddress, void* aEndAddress)
+	{
+		uint32_t refCounter = 0;
+
+		const std::lock_guard<std::mutex> lock(this->RenderMutex);
+
+		for (size_t i = 0; i < static_cast<uint32_t>(ERenderType::COUNT); i++)
 		{
-			return this->Registry[static_cast<uint32_t>(ERenderType::Render)];
+			for (GUI_RENDER renderCb : this->Registry[i])
+			{
+				if (renderCb >= aStartAddress && renderCb <= aEndAddress)
+				{
+					this->Registry[i].erase(std::remove(this->Registry[i].begin(), this->Registry[i].end(), renderCb), this->Registry[i].end());
+					refCounter++;
+				}
+			}
 		}
-		case ERenderType::PostRender:
+
+		return refCounter;
+	}
+
+	const std::vector<GUI_RENDER>& CUiRender::GetRenderCallbacks(ERenderType aRenderType) const
+	{
+		switch (aRenderType)
 		{
-			return this->Registry[static_cast<uint32_t>(ERenderType::PostRender)];
-		}
-		case ERenderType::OptionsRender:
-		{
-			return this->Registry[static_cast<uint32_t>(ERenderType::OptionsRender)];
-		}
-		default:
-		{
-			// TODO: This should be a macro for a "no default case".
-			throw "No valid case for switch variable 'aRenderType'";
+			case ERenderType::PreRender:
+			{
+				return this->Registry[static_cast<uint32_t>(ERenderType::PreRender)];
+			}
+			case ERenderType::Render:
+			{
+				return this->Registry[static_cast<uint32_t>(ERenderType::Render)];
+			}
+			case ERenderType::PostRender:
+			{
+				return this->Registry[static_cast<uint32_t>(ERenderType::PostRender)];
+			}
+			case ERenderType::OptionsRender:
+			{
+				return this->Registry[static_cast<uint32_t>(ERenderType::OptionsRender)];
+			}
+			default:
+			{
+				// TODO: This should be a macro for a "no default case".
+				throw "No valid case for switch variable 'aRenderType'";
+			}
 		}
 	}
 }

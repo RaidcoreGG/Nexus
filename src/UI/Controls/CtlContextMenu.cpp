@@ -10,38 +10,41 @@
 
 #include "imgui/imgui.h"
 
-void IContextMenu::Render()
+namespace Raidcore::Nexus::GUI
 {
-	if (this->ShouldOpenNextFrame)
+	void IContextMenu::Render()
 	{
-		ImGui::OpenPopup(this->GetID().c_str());
-		this->ShouldOpenNextFrame = false;
+		if (this->ShouldOpenNextFrame)
+		{
+			ImGui::OpenPopup(this->GetID().c_str());
+			this->ShouldOpenNextFrame = false;
+		}
+
+		constexpr ImGuiWindowFlags ContextMenuFlags
+			= ImGuiWindowFlags_NoMove;
+
+		if (!ImGui::BeginPopup(this->GetID().c_str(), ContextMenuFlags))
+		{
+			return;
+		}
+
+		this->RenderContent();
+
+		ImGui::EndPopup();
 	}
 
-	constexpr ImGuiWindowFlags ContextMenuFlags
-		= ImGuiWindowFlags_NoMove;
-
-	if (!ImGui::BeginPopup(this->GetID().c_str(), ContextMenuFlags))
+	const std::string& IContextMenu::GetID() const
 	{
-		return;
+		return this->ID;
 	}
 
-	this->RenderContent();
+	void IContextMenu::OpenContextMenu()
+	{
+		this->ShouldOpenNextFrame = true;
+	}
 
-	ImGui::EndPopup();
-}
-
-const std::string& IContextMenu::GetID() const
-{
-	return this->ID;
-}
-
-void IContextMenu::OpenContextMenu()
-{
-	this->ShouldOpenNextFrame = true;
-}
-
-void IContextMenu::SetID(std::string aID)
-{
-	this->ID = aID;
+	void IContextMenu::SetID(std::string aID)
+	{
+		this->ID = aID;
+	}
 }

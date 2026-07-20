@@ -338,7 +338,7 @@ void CAddon::LoadInternal()
 		return;
 	}
 
-	AddonAPI_t* api = ADDONAPI::Get(this->NexusAddonDefV1->APIVersion);
+	AddonAPI_t* api = Host::API::Get(this->NexusAddonDefV1->APIVersion);
 
 	if (api == nullptr && this->NexusAddonDefV1->APIVersion > 0)
 	{

@@ -186,7 +186,7 @@ namespace Hooks
 			static Runtime&               s_Context      = Runtime::Get();
 			static CInputBindApi*         s_InputBindApi = s_Context.GetInputBindApi();
 			static Platform::RawInputApi& s_RawInputApi  = s_Context.Platform().RawInput();
-			static CUiContext*            s_UIContext    = s_Context.GetUIContext();
+			static GUI::CUiContext*            s_UIContext    = s_Context.GetUIContext();
 			static Host::Loader&         s_Loader       = s_Context.Host().Loader();
 			static GW2::GameBindsApi&     s_GameBindsApi = s_Context.Game().GameBinds();
 
@@ -221,7 +221,7 @@ namespace Hooks
 			static Graphics::Metrics_t s_GrMetrics = s_Context.Graphics().Metrics();
 			static Graphics::Window_t& s_GrWindow = s_Context.Graphics().Window();
 			static Graphics::TextureLoader& s_TextureLoader = s_Context.Graphics().Textures();
-			static CUiContext* s_UIContext = s_Context.GetUIContext();
+			static GUI::CUiContext* s_UIContext = s_Context.GetUIContext();
 			static Host::Loader& s_Loader = s_Context.Host().Loader();
 
 			/* Increment count at the beginning of the frame. */
@@ -264,7 +264,7 @@ namespace Hooks
 			static CDataLinkApi& s_DataLink = s_Context.Core().DataLink();
 			static Host::EventApi& s_EventApi = s_Context.Host().Events();
 			static Graphics::Window_t& s_GrWindow = s_Context.Graphics().Window();
-			static CUiContext* s_UIContext = s_Context.GetUIContext();
+			static GUI::CUiContext* s_UIContext = s_Context.GetUIContext();
 
 			s_UIContext->Shutdown();
 

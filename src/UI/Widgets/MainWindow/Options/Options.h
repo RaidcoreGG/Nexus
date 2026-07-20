@@ -15,25 +15,31 @@
 #include "ExportStyleModal.h"
 #include "ImportStyleModal.h"
 
-class COptionsWindow : public ISubWindow
+///----------------------------------------------------------------------------------------------------
+/// Raidcore::Nexus::GUI Namespace
+///----------------------------------------------------------------------------------------------------
+namespace Raidcore::Nexus::GUI
 {
-	public:
-	COptionsWindow();
-	void RenderContent() override;
-	void RenderSubWindows() override;
+	class COptionsWindow : public ISubWindow
+	{
+		public:
+		COptionsWindow();
+		void RenderContent() override;
+		void RenderSubWindows() override;
 
-	private:
-	CExportStyleModal ExportModal;
-	CImportStyleModal ImportModal;
+		private:
+		CExportStyleModal ExportModal;
+		CImportStyleModal ImportModal;
 
-	std::vector<std::filesystem::path> Fonts;
-	std::vector<std::filesystem::path> Styles;
+		std::vector<std::filesystem::path> Fonts;
+		std::vector<std::filesystem::path> Styles;
 
-	bool HasUnsavedStyle = false;
+		bool HasUnsavedStyle = false;
 
-	void TabGeneral();
-	void TabStyle();
+		void TabGeneral();
+		void TabStyle();
 
-	void PopulateFonts();
-	void PopulateStyles();
-};
+		void PopulateFonts();
+		void PopulateStyles();
+	};
+}

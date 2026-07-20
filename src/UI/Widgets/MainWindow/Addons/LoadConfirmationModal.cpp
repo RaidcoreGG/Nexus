@@ -11,85 +11,89 @@
 #include "Runtime/Runtime.h"
 using namespace Raidcore::Nexus;
 
-CLoadConfirmationModal::CLoadConfirmationModal()
+
+namespace Raidcore::Nexus::GUI
 {
-	this->SetID("LoadConfirmationModal");
-	this->SetDisplayName("((Load addon: ))");
-}
-
-void CLoadConfirmationModal::RenderContent()
-{
-	Runtime&      ctx   = Runtime::Get();
-	CUiContext*    uictx = ctx.GetUIContext();
-	CLocalization* lang  = uictx->GetLocalization();
-
-	ImGui::Text(lang->Translate("((000116))"));
-
-	/* Accept */
-	if (ImGui::Button(lang->Translate("((000065))")))
+	CLoadConfirmationModal::CLoadConfirmationModal()
 	{
-		this->SetResult(EModalResult::OK);
+		this->SetID("LoadConfirmationModal");
+		this->SetDisplayName("((Load addon: ))");
 	}
 
-	ImGui::SameLine();
-
-	/* Cancel */
-	if (ImGui::Button(lang->Translate("((000066))")))
+	void CLoadConfirmationModal::RenderContent()
 	{
-		this->SetResult(EModalResult::Cancel);
-	}
-}
+		Runtime& ctx = Runtime::Get();
+		CUiContext* uictx = ctx.GetUIContext();
+		CLocalization* lang = uictx->GetLocalization();
 
-void CLoadConfirmationModal::OnClosing()
-{
-	Runtime&    ctx    = Runtime::Get();
-	Host::ConfigMgr& cfgmgr = ctx.Host().Config();
-	Host::Loader&    loader = ctx.Host().Loader();
+		ImGui::Text(lang->Translate("((000116))"));
 
-	switch (this->GetResult())
-	{
-		case EModalResult::OK:
+		/* Accept */
+		if (ImGui::Button(lang->Translate("((000065))")))
 		{
-			this->Config->LastGameBuild = 0;
-			this->Config->LastLoadState = true;
-			this->Config->DisableVersion = "";
-			cfgmgr.SaveConfigs();
-			loader.LoadSafe(this->Path);
-			break;
+			this->SetResult(EModalResult::OK);
 		}
-		case EModalResult::Cancel:
+
+		ImGui::SameLine();
+
+		/* Cancel */
+		if (ImGui::Button(lang->Translate("((000066))")))
 		{
-			break;
+			this->SetResult(EModalResult::Cancel);
 		}
 	}
 
-	/* Reset data. */
-	this->Name.clear();
-	this->Path.clear();
-}
+	void CLoadConfirmationModal::OnClosing()
+	{
+		Runtime& ctx = Runtime::Get();
+		Host::ConfigMgr& cfgmgr = ctx.Host().Config();
+		Host::Loader& loader = ctx.Host().Loader();
 
-void CLoadConfirmationModal::SetTarget(Host::Config_t* aConfig, std::string aName, std::filesystem::path aPath)
-{
-	assert(aConfig != nullptr);
+		switch (this->GetResult())
+		{
+			case EModalResult::OK:
+			{
+				this->Config->LastGameBuild = 0;
+				this->Config->LastLoadState = true;
+				this->Config->DisableVersion = "";
+				cfgmgr.SaveConfigs();
+				loader.LoadSafe(this->Path);
+				break;
+			}
+			case EModalResult::Cancel:
+			{
+				break;
+			}
+		}
 
-	this->Config = aConfig;
-	this->Name = aName;
-	this->Path = aPath;
+		/* Reset data. */
+		this->Name.clear();
+		this->Path.clear();
+	}
 
-	this->SetTitle();
+	void CLoadConfirmationModal::SetTarget(Host::Config_t* aConfig, std::string aName, std::filesystem::path aPath)
+	{
+		assert(aConfig != nullptr);
 
-	this->OpenModal();
-}
+		this->Config = aConfig;
+		this->Name = aName;
+		this->Path = aPath;
 
-void CLoadConfirmationModal::SetTitle()
-{
-	Runtime&      ctx   = Runtime::Get();
-	CUiContext*    uictx = ctx.GetUIContext();
-	CLocalization* lang  = uictx->GetLocalization();
+		this->SetTitle();
 
-	/* Override the title before opening the modal. */
-	std::string title = lang->Translate("((Load addon: ))");
-	title.append(this->Name);
+		this->OpenModal();
+	}
 
-	this->SetDisplayName(title);
+	void CLoadConfirmationModal::SetTitle()
+	{
+		Runtime& ctx = Runtime::Get();
+		CUiContext* uictx = ctx.GetUIContext();
+		CLocalization* lang = uictx->GetLocalization();
+
+		/* Override the title before opening the modal. */
+		std::string title = lang->Translate("((Load addon: ))");
+		title.append(this->Name);
+
+		this->SetDisplayName(title);
+	}
 }

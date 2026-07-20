@@ -21,113 +21,119 @@ using namespace Raidcore::Nexus;
 
 using ArcExtensionDef_t = GW2::ArcDPS::ExtensionDef_t;
 
-struct AddonListing_t
+///----------------------------------------------------------------------------------------------------
+/// Raidcore::Nexus::GUI Namespace
+///----------------------------------------------------------------------------------------------------
+namespace Raidcore::Nexus::GUI
 {
-	CAddon*                                            Addon;
-
-	bool                                               HasLibDef;
-	Host::LibraryAddon_t                               LibraryDef;
-	bool                                               IsInstalling;
-
-	std::unordered_map<std::string, InputBindPacked_t> InputBinds;
-	GUI_RENDER                                         OptionsRender;
-
-	bool                                               IsHovered;
-
-	inline std::string GetUniqueID() const
+	struct AddonListing_t
 	{
-		/* Unique id. */
-		std::string id;
+		CAddon* Addon;
 
-		if (this->GetSig() != 0)
+		bool                                               HasLibDef;
+		Host::LibraryAddon_t                               LibraryDef;
+		bool                                               IsInstalling;
+
+		std::unordered_map<std::string, InputBindPacked_t> InputBinds;
+		GUI_RENDER                                         OptionsRender;
+
+		bool                                               IsHovered;
+
+		inline std::string GetUniqueID() const
 		{
-			/* Use addon signature. */
-			id = std::format("0x{:08X}", this->GetSig());
-		}
-		else
-		{
-			if (this->Addon)
+			/* Unique id. */
+			std::string id;
+
+			if (this->GetSig() != 0)
 			{
-				/* Use addon file location. */
-				id = this->Addon->GetLocation().string();
+				/* Use addon signature. */
+				id = std::format("0x{:08X}", this->GetSig());
 			}
 			else
 			{
-				/* This should not be possible. */
-				throw "Unreachable code.";
+				if (this->Addon)
+				{
+					/* Use addon file location. */
+					id = this->Addon->GetLocation().string();
+				}
+				else
+				{
+					/* This should not be possible. */
+					throw "Unreachable code.";
+				}
 			}
+
+			return id;
 		}
 
-		return id;
-	}
-
-	inline uint32_t GetSig() const
-	{
-		if (this->Addon)
+		inline uint32_t GetSig() const
 		{
-			return this->Addon->GetSignature();
+			if (this->Addon)
+			{
+				return this->Addon->GetSignature();
+			}
+
+			if (this->HasLibDef)
+			{
+				return this->LibraryDef.Signature;
+			}
+
+			return 0;
 		}
 
-		if (this->HasLibDef)
+		inline std::string GetName() const
 		{
-			return this->LibraryDef.Signature;
+			if (this->Addon)
+			{
+				return this->Addon->GetName();
+			}
+
+			if (this->HasLibDef)
+			{
+				return this->LibraryDef.Name;
+			}
+
+			return "";
 		}
 
-		return 0;
-	}
-
-	inline std::string GetName() const
-	{
-		if (this->Addon)
+		inline std::string GetAuthor() const
 		{
-			return this->Addon->GetName();
+			if (this->Addon)
+			{
+				return this->Addon->GetAuthor();
+			}
+
+			if (this->HasLibDef)
+			{
+				return this->LibraryDef.Author;
+			}
+
+			return "";
 		}
 
-		if (this->HasLibDef)
+		inline std::string GetDesc() const
 		{
-			return this->LibraryDef.Name;
+			if (this->Addon)
+			{
+				return this->Addon->GetDescription();
+			}
+
+			if (this->HasLibDef)
+			{
+				return this->LibraryDef.Description;
+			}
+
+			return "";
 		}
 
-		return "";
-	}
-
-	inline std::string GetAuthor() const
-	{
-		if (this->Addon)
+		inline std::string GetVersion() const
 		{
-			return this->Addon->GetAuthor();
+			if (this->Addon)
+			{
+				return this->Addon->GetVersion();
+			}
+
+			return "";
 		}
-
-		if (this->HasLibDef)
-		{
-			return this->LibraryDef.Author;
-		}
-
-		return "";
-	}
-
-	inline std::string GetDesc() const
-	{
-		if (this->Addon)
-		{
-			return this->Addon->GetDescription();
-		}
-
-		if (this->HasLibDef)
-		{
-			return this->LibraryDef.Description;
-		}
-
-		return "";
-	}
-
-	inline std::string GetVersion() const
-	{
-		if (this->Addon)
-		{
-			return this->Addon->GetVersion();
-		}
-
-		return "";
-	}
-};
+	};
+}

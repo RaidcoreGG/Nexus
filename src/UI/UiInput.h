@@ -16,74 +16,80 @@
 #include "Util/Inputs.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// CUiInput Class
+/// Raidcore::Nexus::GUI Namespace
 ///----------------------------------------------------------------------------------------------------
-class CUiInput : public virtual IWndProc
+namespace Raidcore::Nexus::GUI
 {
-	public:
-	enum class EInputType : uint8_t
+	///----------------------------------------------------------------------------------------------------
+	/// CUiInput Class
+	///----------------------------------------------------------------------------------------------------
+	class CUiInput : public virtual IWndProc
 	{
-		Char,
-		MouseWheel,
-		MouseHWheel
-	};
-
-	struct InputEvent_t
-	{
-		EInputType Type;
-		union
+		public:
+		enum class EInputType : uint8_t
 		{
-			uint32_t Character;
-			float WheelX;
-			float WheelY;
+			Char,
+			MouseWheel,
+			MouseHWheel
 		};
+
+		struct InputEvent_t
+		{
+			EInputType Type;
+			union
+			{
+				uint32_t Character;
+				float WheelX;
+				float WheelY;
+			};
+		};
+
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		CUiInput(CSettings* aSettings);
+
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		~CUiInput();
+
+		///----------------------------------------------------------------------------------------------------
+		/// WndProc:
+		/// 	Returns 0 if message was processed.
+		///----------------------------------------------------------------------------------------------------
+		UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+
+		///----------------------------------------------------------------------------------------------------
+		/// FlushInput:
+		/// 	Flushes the input ring buffer to ImGui.
+		///----------------------------------------------------------------------------------------------------
+		void FlushInput();
+
+		private:
+		CSettings* Settings;
+
+		EModifiers RequiredModifiers;
+		bool       FilterClicks;
+
+#define RING_SIZE 2048u
+#define RING_MASK RING_SIZE - 1
+
+		InputEvent_t Ring[RING_SIZE];
+
+		std::atomic<uint32_t> WriteIndex{ 0 };
+		std::atomic<uint32_t> ReadIndex{ 0 };
+
+		///----------------------------------------------------------------------------------------------------
+		/// PushInput:
+		/// 	Pushes an input event to the ring buffer.
+		///----------------------------------------------------------------------------------------------------
+		bool PushInput(const InputEvent_t& aEvent);
+
+		///----------------------------------------------------------------------------------------------------
+		/// PopInput:
+		/// 	Pops an input event from the ring buffer.
+		///----------------------------------------------------------------------------------------------------
+		bool PopInput(InputEvent_t& aEvent);
 	};
-
-	///----------------------------------------------------------------------------------------------------
-	/// ctor
-	///----------------------------------------------------------------------------------------------------
-	CUiInput(CSettings* aSettings);
-
-	///----------------------------------------------------------------------------------------------------
-	/// dtor
-	///----------------------------------------------------------------------------------------------------
-	~CUiInput();
-
-	///----------------------------------------------------------------------------------------------------
-	/// WndProc:
-	/// 	Returns 0 if message was processed.
-	///----------------------------------------------------------------------------------------------------
-	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-
-	///----------------------------------------------------------------------------------------------------
-	/// FlushInput:
-	/// 	Flushes the input ring buffer to ImGui.
-	///----------------------------------------------------------------------------------------------------
-	void FlushInput();
-
-	private:
-	CSettings* Settings;
-
-	EModifiers RequiredModifiers;
-	bool       FilterClicks;
-
-	#define RING_SIZE 2048u
-	#define RING_MASK RING_SIZE - 1
-
-	InputEvent_t Ring[RING_SIZE];
-
-	std::atomic<uint32_t> WriteIndex{ 0 };
-	std::atomic<uint32_t> ReadIndex{ 0 };
-
-	///----------------------------------------------------------------------------------------------------
-	/// PushInput:
-	/// 	Pushes an input event to the ring buffer.
-	///----------------------------------------------------------------------------------------------------
-	bool PushInput(const InputEvent_t& aEvent);
-	
-	///----------------------------------------------------------------------------------------------------
-	/// PopInput:
-	/// 	Pops an input event from the ring buffer.
-	///----------------------------------------------------------------------------------------------------
-	bool PopInput(InputEvent_t& aEvent);
-};
+}

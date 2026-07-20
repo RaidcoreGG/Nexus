@@ -11,11 +11,17 @@
 #include <string>
 
 ///----------------------------------------------------------------------------------------------------
-/// QueuedText_t Struct
+/// Raidcore::Nexus::GUI Namespace
 ///----------------------------------------------------------------------------------------------------
-struct QueuedText_t
+namespace Raidcore::Nexus::GUI
 {
-	std::string Identifier;
-	std::string LanguageIdentifier;
-	std::string Text;
-};
+	///----------------------------------------------------------------------------------------------------
+	/// QueuedText_t Struct
+	///----------------------------------------------------------------------------------------------------
+	struct QueuedText_t
+	{
+		std::string Identifier;
+		std::string LanguageIdentifier;
+		std::string Text;
+	};
+}

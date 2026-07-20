@@ -8,22 +8,25 @@
 
 #include "CtlWindow.h"
 
-const std::string& IWindow::GetName()
+namespace Raidcore::Nexus::GUI
 {
-	return this->Name;
-}
+	const std::string& IWindow::GetName()
+	{
+		return this->Name;
+	}
 
-const std::string& IWindow::GetDisplayName()
-{
-	return this->DisplayName;
-}
+	const std::string& IWindow::GetDisplayName()
+	{
+		return this->DisplayName;
+	}
 
-void IWindow::Invalidate()
-{
-	this->IsInvalid = true;
-}
+	void IWindow::Invalidate()
+	{
+		this->IsInvalid = true;
+	}
 
-bool* IWindow::GetVisibleStatePtr()
-{
-	return &this->IsVisible;
+	bool* IWindow::GetVisibleStatePtr()
+	{
+		return &this->IsVisible;
+	}
 }

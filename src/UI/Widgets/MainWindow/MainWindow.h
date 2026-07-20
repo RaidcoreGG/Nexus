@@ -18,43 +18,49 @@
 using namespace Raidcore::Nexus;
 
 ///----------------------------------------------------------------------------------------------------
-/// CMainWindow Class
+/// Raidcore::Nexus::GUI Namespace
 ///----------------------------------------------------------------------------------------------------
-class CMainWindow : public virtual IWindow
+namespace Raidcore::Nexus::GUI
 {
-	public:
 	///----------------------------------------------------------------------------------------------------
-	/// OnInputBind:
-	/// 	Invokes an input bind.
+	/// CMainWindow Class
 	///----------------------------------------------------------------------------------------------------
-	static void OnInputBind(const char* aIdentifier);
+	class CMainWindow : public virtual IWindow
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// OnInputBind:
+		/// 	Invokes an input bind.
+		///----------------------------------------------------------------------------------------------------
+		static void OnInputBind(const char* aIdentifier);
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnVolatileAddonsDisabled:
-	/// 	Receiver for volatile addons disabled event to bring up the addons window.
-	///----------------------------------------------------------------------------------------------------
-	static void OnVolatileAddonsDisabled(void* aEventData);
+		///----------------------------------------------------------------------------------------------------
+		/// OnVolatileAddonsDisabled:
+		/// 	Receiver for volatile addons disabled event to bring up the addons window.
+		///----------------------------------------------------------------------------------------------------
+		static void OnVolatileAddonsDisabled(void* aEventData);
 
-	CMainWindow();
+		CMainWindow();
 
-	~CMainWindow();
+		~CMainWindow();
 
-	void AddWindow(ISubWindow* aWindow);
-	void RemoveWindow(ISubWindow* aWindow);
+		void AddWindow(ISubWindow* aWindow);
+		void RemoveWindow(ISubWindow* aWindow);
 
-	void Render() override;
+		void Render() override;
 
-	void Invalidate() override;
+		void Invalidate() override;
 
-	void Activate(const std::string& aWindowName = "");
+		void Activate(const std::string& aWindowName = "");
 
-	private:
-	std::mutex               Mutex          {};
-	std::vector<ISubWindow*> Windows        {};
-	ISubWindow*              ActiveContent  {};
-	bool                     IsHandleHeld   {};
+		private:
+		std::mutex               Mutex{};
+		std::vector<ISubWindow*> Windows{};
+		ISubWindow* ActiveContent{};
+		bool                     IsHandleHeld{};
 
-	private:
-	Graphics::Texture_t*               Tex_RaidcoreTag{};
-	Graphics::Texture_t*               Tex_CloseIcon  {};
-};
+		private:
+		Graphics::Texture_t* Tex_RaidcoreTag{};
+		Graphics::Texture_t* Tex_CloseIcon{};
+	};
+}

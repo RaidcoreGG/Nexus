@@ -12,23 +12,29 @@
 #include "UI/Controls/CtlContextMenu.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// CLoadConfirmationModal Class
+/// Raidcore::Nexus::GUI Namespace
 ///----------------------------------------------------------------------------------------------------
-class CAddonContextMenu : public virtual IContextMenu
+namespace Raidcore::Nexus::GUI
 {
-	public:
 	///----------------------------------------------------------------------------------------------------
-	/// Render:
-	/// 	Callback for the context menu contents.
+	/// CLoadConfirmationModal Class
 	///----------------------------------------------------------------------------------------------------
-	void RenderContent() override;
+	class CAddonContextMenu : public virtual IContextMenu
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// Render:
+		/// 	Callback for the context menu contents.
+		///----------------------------------------------------------------------------------------------------
+		void RenderContent() override;
 
-	///----------------------------------------------------------------------------------------------------
-	/// SetContent:
-	/// 	Sets the underlying context menu data.
-	///----------------------------------------------------------------------------------------------------
-	void SetContent(AddonListing_t& aAddonData);
+		///----------------------------------------------------------------------------------------------------
+		/// SetContent:
+		/// 	Sets the underlying context menu data.
+		///----------------------------------------------------------------------------------------------------
+		void SetContent(AddonListing_t& aAddonData);
 
-	private:
-	AddonListing_t* Data{};
-};
+		private:
+		AddonListing_t* Data{};
+	};
+}

@@ -13,11 +13,17 @@
 #include "AlEnum.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// AlertMessage_t Struct
+/// Raidcore::Nexus::GUI Namespace
 ///----------------------------------------------------------------------------------------------------
-struct AlertMessage_t
+namespace Raidcore::Nexus::GUI
 {
-	EAlertType  Type;
-	std::string Message;
-	double      StartTime = 0;
-};
+	///----------------------------------------------------------------------------------------------------
+	/// AlertMessage_t Struct
+	///----------------------------------------------------------------------------------------------------
+	struct AlertMessage_t
+	{
+		EAlertType  Type;
+		std::string Message;
+		double      StartTime = 0;
+	};
+}

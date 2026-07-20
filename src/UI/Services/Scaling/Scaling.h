@@ -19,81 +19,87 @@
 using namespace Raidcore::Nexus;
 
 ///----------------------------------------------------------------------------------------------------
-/// CScaling Class
+/// Raidcore::Nexus::GUI Namespace
 ///----------------------------------------------------------------------------------------------------
-class CScaling : public virtual IWndProc
+namespace Raidcore::Nexus::GUI
 {
-	public:
 	///----------------------------------------------------------------------------------------------------
-	/// OnMumbleIdentityChanged:
-	/// 	Update game base scale.
+	/// CScaling Class
 	///----------------------------------------------------------------------------------------------------
-	static void OnMumbleIdentityChanged(void* aEventArgs);
+	class CScaling : public virtual IWndProc
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// OnMumbleIdentityChanged:
+		/// 	Update game base scale.
+		///----------------------------------------------------------------------------------------------------
+		static void OnMumbleIdentityChanged(void* aEventArgs);
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnWindowResized:
-	/// 	Update game base scale.
-	///----------------------------------------------------------------------------------------------------
-	static void OnWindowResized(void* aEventArgs);
+		///----------------------------------------------------------------------------------------------------
+		/// OnWindowResized:
+		/// 	Update game base scale.
+		///----------------------------------------------------------------------------------------------------
+		static void OnWindowResized(void* aEventArgs);
 
-	///----------------------------------------------------------------------------------------------------
-	/// ctor
-	///----------------------------------------------------------------------------------------------------
-	CScaling(
-		HWND                aGameWindow,
-		Graphics::Window_t& aGrWindow,
-		CDataLinkApi*       aDataLink,
-		Host::EventApi&     aEventApi,
-		CSettings*          aSettings
-	);
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		CScaling(
+			HWND                aGameWindow,
+			Graphics::Window_t& aGrWindow,
+			CDataLinkApi* aDataLink,
+			Host::EventApi& aEventApi,
+			CSettings* aSettings
+		);
 
-	///----------------------------------------------------------------------------------------------------
-	/// dtor
-	///----------------------------------------------------------------------------------------------------
-	~CScaling();
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		~CScaling();
 
-	///----------------------------------------------------------------------------------------------------
-	/// WndProc:
-	/// 	Returns 0 if message was processed.
-	///----------------------------------------------------------------------------------------------------
-	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		///----------------------------------------------------------------------------------------------------
+		/// WndProc:
+		/// 	Returns 0 if message was processed.
+		///----------------------------------------------------------------------------------------------------
+		UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
-	///----------------------------------------------------------------------------------------------------
-	/// UpdateDPI:
-	/// 	Updates the DPI factor of the UI.
-	///----------------------------------------------------------------------------------------------------
-	void UpdateDPI();
+		///----------------------------------------------------------------------------------------------------
+		/// UpdateDPI:
+		/// 	Updates the DPI factor of the UI.
+		///----------------------------------------------------------------------------------------------------
+		void UpdateDPI();
 
-	///----------------------------------------------------------------------------------------------------
-	/// UpdateGameUIScale:
-	/// 	Updates the game dependant UI scaling.
-	///----------------------------------------------------------------------------------------------------
-	void UpdateGameUIScale();
+		///----------------------------------------------------------------------------------------------------
+		/// UpdateGameUIScale:
+		/// 	Updates the game dependant UI scaling.
+		///----------------------------------------------------------------------------------------------------
+		void UpdateGameUIScale();
 
-	///----------------------------------------------------------------------------------------------------
-	/// UpdateResolution:
-	/// 	Updates the minimum resolution scaling.
-	///----------------------------------------------------------------------------------------------------
-	void UpdateResolution();
+		///----------------------------------------------------------------------------------------------------
+		/// UpdateResolution:
+		/// 	Updates the minimum resolution scaling.
+		///----------------------------------------------------------------------------------------------------
+		void UpdateResolution();
 
-	private:
-	HWND                GameWindow{ nullptr };
-	Graphics::Window_t& GrWindow;
-	CDataLinkApi*       DataLink;
-	Host::EventApi&     EventApi;
-	CSettings*          Settings;
-	Mumble::Identity*   MumbleIdentity;
-	NexusLinkData_t*    NexusLink;
+		private:
+		HWND                GameWindow{ nullptr };
+		Graphics::Window_t& GrWindow;
+		CDataLinkApi* DataLink;
+		Host::EventApi& EventApi;
+		CSettings* Settings;
+		Mumble::Identity* MumbleIdentity;
+		NexusLinkData_t* NexusLink;
 
-	bool                DpiScalingEnabled;
-	float               DpiScalingFactor;
-	float               EffectiveDpiScalingFactor;
-	float               GameScalingFactor;
-	float               MinResolutionScalingFactor;
+		bool                DpiScalingEnabled;
+		float               DpiScalingFactor;
+		float               EffectiveDpiScalingFactor;
+		float               GameScalingFactor;
+		float               MinResolutionScalingFactor;
 
-	///----------------------------------------------------------------------------------------------------
-	/// UpdateScaling:
-	/// 	Updates the scaling factor of the UI.
-	///----------------------------------------------------------------------------------------------------
-	void UpdateScaling();
-};
+		///----------------------------------------------------------------------------------------------------
+		/// UpdateScaling:
+		/// 	Updates the scaling factor of the UI.
+		///----------------------------------------------------------------------------------------------------
+		void UpdateScaling();
+	};
+}

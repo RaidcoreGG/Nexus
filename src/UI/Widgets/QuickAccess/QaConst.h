@@ -13,13 +13,19 @@
 #include "QaEnum.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// EQaVisibilityToString:
-/// 	Returns a localizable string for a visibility setting.
+/// Raidcore::Nexus::GUI Namespace
 ///----------------------------------------------------------------------------------------------------
-std::string EQaVisibilityToString(EQaVisibility aQAVisibility);
+namespace Raidcore::Nexus::GUI
+{
+	///----------------------------------------------------------------------------------------------------
+	/// EQaVisibilityToString:
+	/// 	Returns a localizable string for a visibility setting.
+	///----------------------------------------------------------------------------------------------------
+	std::string EQaVisibilityToString(EQaVisibility aQAVisibility);
 
-///----------------------------------------------------------------------------------------------------
-/// EQaPositionToString:
-/// 	Returns a localizable string for a position setting.
-///----------------------------------------------------------------------------------------------------
-std::string EQaPositionToString(EQaPosition aQAPosition);
+	///----------------------------------------------------------------------------------------------------
+	/// EQaPositionToString:
+	/// 	Returns a localizable string for a position setting.
+	///----------------------------------------------------------------------------------------------------
+	std::string EQaPositionToString(EQaPosition aQAPosition);
+}

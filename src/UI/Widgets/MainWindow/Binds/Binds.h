@@ -20,21 +20,27 @@
 
 using namespace Raidcore::Nexus;
 
-class CBindsWindow : public ISubWindow
+///----------------------------------------------------------------------------------------------------
+/// Raidcore::Nexus::GUI Namespace
+///----------------------------------------------------------------------------------------------------
+namespace Raidcore::Nexus::GUI
 {
-	public:
-	CBindsWindow();
-	void RenderContent() override;
-	void RenderSubWindows() override;
+	class CBindsWindow : public ISubWindow
+	{
+		public:
+		CBindsWindow();
+		void RenderContent() override;
+		void RenderSubWindows() override;
 
-	private:
-	CBindSetterModal                   BindSetterModal;
+		private:
+		CBindSetterModal                   BindSetterModal;
 
-	std::vector<InputBindCategory_t>     IBCategories;
-	std::vector<GameInputBindCategory_t> GIBCategories;
+		std::vector<InputBindCategory_t>     IBCategories;
+		std::vector<GameInputBindCategory_t> GIBCategories;
 
-	void RenderInputBindsTable(std::unordered_map<std::string, InputBindPacked_t>& aInputBinds);
-	void RenderGameInputBindsTable(std::unordered_map<GW2::EGameBinds, GameInputBindPacked_t>& aInputBinds);
+		void RenderInputBindsTable(std::unordered_map<std::string, InputBindPacked_t>& aInputBinds);
+		void RenderGameInputBindsTable(std::unordered_map<GW2::EGameBinds, GameInputBindPacked_t>& aInputBinds);
 
-	void DeleteStaleBind(const std::string& aIdentifier);
-};
+		void DeleteStaleBind(const std::string& aIdentifier);
+	};
+}

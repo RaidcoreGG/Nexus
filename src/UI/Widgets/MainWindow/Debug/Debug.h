@@ -13,28 +13,34 @@
 #include "UI/Controls/CtlSubWindow.h"
 #include "UI/Overlay/MumbleInspector/MumbleInspector.h"
 
-class CDebugWindow : public ISubWindow
+///----------------------------------------------------------------------------------------------------
+/// Raidcore::Nexus::GUI Namespace
+///----------------------------------------------------------------------------------------------------
+namespace Raidcore::Nexus::GUI
 {
-	public:
-	CDebugWindow();
-	void RenderContent() override;
-	void RenderSubWindows() override;
+	class CDebugWindow : public ISubWindow
+	{
+		public:
+		CDebugWindow();
+		void RenderContent() override;
+		void RenderSubWindows() override;
 
-	void ToggleMumbleOverlay();
+		void ToggleMumbleOverlay();
 
-	private:
-	CMumbleOverlay*     MumbleWindow           = new CMumbleOverlay();
-	bool                IsMetricsWindowVisible = false;
+		private:
+		CMumbleOverlay* MumbleWindow = new CMumbleOverlay();
+		bool                IsMetricsWindowVisible = false;
 
-	ImGui::MemoryEditor MemoryViewer;
-	void*               MV_Ptr                 = nullptr;
-	size_t              MV_Size                = 0;
+		ImGui::MemoryEditor MemoryViewer;
+		void* MV_Ptr = nullptr;
+		size_t              MV_Size = 0;
 
-	void TabEvents();
-	void TabInputBinds();
-	void TabDataLink();
-	void TabTextures();
-	void TabQuickAccess();
-	void TabLoader();
-	void TabFonts();
-};
+		void TabEvents();
+		void TabInputBinds();
+		void TabDataLink();
+		void TabTextures();
+		void TabQuickAccess();
+		void TabLoader();
+		void TabFonts();
+	};
+}
