@@ -29,7 +29,7 @@ namespace Raidcore::Nexus::Platform
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		Context(std::filesystem::path aCrashlog, std::filesystem::path aCrashstack);
+		Context();
 
 		///----------------------------------------------------------------------------------------------------
 		/// Shutdown:
@@ -64,9 +64,6 @@ namespace Raidcore::Nexus::Platform
 		private:
 		HMODULE _Module      { nullptr };
 		HWND    _WindowHandle{ nullptr };
-
-		std::filesystem::path CrashLogPath{};
-		std::filesystem::path CrashStackPath{};
 
 		std::unique_ptr<Platform::CrashHandler> _CrashHandler{ nullptr };
 		std::unique_ptr<Platform::RawInputApi>  _RawInputApi { nullptr };

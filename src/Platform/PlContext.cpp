@@ -13,12 +13,12 @@
 #include <windows.h>
 
 #include "CrashHandler/CrashHandler.h"
+#include "Index/IdxEnum.h"
+#include "Index/Index.h"
 
 namespace Raidcore::Nexus::Platform
 {
-	Context::Context(std::filesystem::path aCrashlog, std::filesystem::path aCrashstack)
-		: CrashLogPath(std::move(aCrashlog))
-		, CrashStackPath(std::move(aCrashstack))
+	Context::Context()
 	{
 		static uint32_t s_Dummy = 0;
 
@@ -56,8 +56,8 @@ namespace Raidcore::Nexus::Platform
 		}, reinterpret_cast<LPARAM>(&this->_WindowHandle));
 
 		this->_CrashHandler = std::make_unique<Platform::CrashHandler>(
-			this->CrashLogPath,
-			this->CrashStackPath
+			Index(EPath::CrashLog),
+			Index(EPath::CrashStack)
 		);
 		this->_RawInputApi = std::make_unique<RawInputApi>();
 	}

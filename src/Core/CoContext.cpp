@@ -8,17 +8,17 @@
 
 #include "CoContext.h"
 
-#include <filesystem>
-#include <memory>
 
-#include "Core/Preferences/PrefContext.h"
 #include "Core/DataLink/DlApi.h"
 #include "Core/Logging/LogApi.h"
+#include "Core/Preferences/PrefContext.h"
+#include "Functions/FnRegistry.h"
+#include "Index/IdxEnum.h"
+#include "Index/Index.h"
 
 namespace Raidcore::Nexus::Core
 {
-	Context::Context(std::filesystem::path aSettingsPath)
-		: _SettingsPath(aSettingsPath)
+	Context::Context()
 	{
 		this->_LogApi = std::make_unique<Core::LogApi>();
 
@@ -31,7 +31,7 @@ namespace Raidcore::Nexus::Core
 		);
 
 		this->_Settings = std::make_unique<Core::SettingsMgr>(
-			this->_SettingsPath,
+			Index(EPath::Settings),
 			this->_LogApi.get()
 		);
 	}

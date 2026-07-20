@@ -32,10 +32,7 @@ namespace Raidcore::Nexus::Network
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		Context(
-			Core::LogApi& aLogger,
-			std::filesystem::path aCommonDir
-		);
+		Context(Core::LogApi& aLogger);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Shutdown:
@@ -62,6 +59,5 @@ namespace Raidcore::Nexus::Network
 
 		std::mutex                                   HttpClientMutex{};
 		std::map<std::string, Network::CHttpClient*> HttpClients{};
-		std::filesystem::path                        HttpCacheDir{};
 	};
 }

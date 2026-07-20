@@ -27,11 +27,7 @@ namespace Raidcore::Nexus::Host
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		Context(
-			Core::LogApi&        aLogger,
-			std::filesystem::path aLoaderDirectory,
-			std::filesystem::path aAddonConfigDefaultPath
-		);
+		Context(Core::LogApi& aLogger);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Shutdown:
@@ -65,9 +61,6 @@ namespace Raidcore::Nexus::Host
 
 		private:
 		Core::LogApi& _Logger;
-
-		std::filesystem::path _LoaderDirectoryPath;
-		std::filesystem::path _AddonConfigDefaultPath;
 
 		std::unique_ptr<Host::ConfigMgr>  _ConfigMgr{ nullptr };
 		std::unique_ptr<Host::Loader>     _Loader{ nullptr };

@@ -9,7 +9,6 @@
 #include "NetContext.h"
 
 #include <cstdint>
-#include <filesystem>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -19,12 +18,13 @@
 #include "Util/Strings.h"
 #include "Util/Url.h"
 #include "WebRequests/WreClient.h"
+#include "Index/IdxEnum.h"
+#include "Index/Index.h"
 
 namespace Raidcore::Nexus::Network
 {
-	Context::Context(Core::LogApi& aLogger, std::filesystem::path aCommonDir)
+	Context::Context(Core::LogApi& aLogger)
 		: _Logger(aLogger)
-		, HttpCacheDir(aCommonDir)
 	{
 		this->_Updater = std::make_unique<Network::Updater>(&this->_Logger);
 	}
@@ -70,7 +70,7 @@ namespace Raidcore::Nexus::Network
 		}
 		else
 		{
-			std::filesystem::path cachedir = this->HttpCacheDir / baseurl_noprotocol;
+			std::filesystem::path cachedir = Index(EPath::DIR_COMMON) / baseurl_noprotocol;
 			uint32_t cacheLifetime = 30 * 60; // 30 minutes
 
 			if (baseurl == "https://api.raidcore.gg")

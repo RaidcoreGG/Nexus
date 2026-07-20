@@ -256,29 +256,20 @@ namespace Raidcore::Nexus
 
 		CreateIndex(GetCurrentModule());
 
-		this->_CoreContext = std::make_unique<Core::Context>(
-			Index(EPath::Settings)
-		);
+		this->_CoreContext = std::make_unique<Core::Context>();
 
 		this->_NetworkContext = std::make_unique<Network::Context>(
-			this->Core().Logger(),
-			Index(EPath::DIR_COMMON)
+			this->Core().Logger()
 		);
 
-		this->_PlatformContext = std::make_unique<Platform::Context>(
-			Index(EPath::CrashLog),
-			Index(EPath::CrashStack)
-		);
+		this->_PlatformContext = std::make_unique<Platform::Context>();
 
 		this->_HostContext = std::make_unique<Host::Context>(
-			this->Core().Logger(),
-			Index(EPath::DIR_ADDONS),
-			Index(EPath::AddonConfigDefault)
+			this->Core().Logger()
 		);
 
 		this->_GraphicsContext = std::make_unique<Graphics::Context>(
-			this->Core().Logger(),
-			Index(EPath::DIR_TEXTURES)
+			this->Core().Logger()
 		);
 
 		this->_GameContext = std::make_unique<GW2::Context>(
@@ -287,8 +278,7 @@ namespace Raidcore::Nexus
 			this->Core().Logger(),
 			this->Platform().RawInput(),
 			this->Platform().Window(),
-			this->Network().GetHttpClient("http://assetcdn.101.arenanetworks.com", /*disablecache=*/ true),
-			Index(EPath::GameBinds)
+			this->Network().GetHttpClient("http://assetcdn.101.arenanetworks.com", /*disablecache=*/ true)
 		);
 	}
 

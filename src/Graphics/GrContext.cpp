@@ -8,11 +8,13 @@
 
 #include "GrContext.h"
 
+#include "Index/IdxEnum.h"
+#include "Index/Index.h"
+
 namespace Raidcore::Nexus::Graphics
 {
-	Context::Context(Core::LogApi& aLogger, std::filesystem::path aTextureOverrideDirectory)
+	Context::Context(Core::LogApi& aLogger)
 		: _Logger(aLogger)
-		, _TextureOverridesPath(aTextureOverrideDirectory)
 	{
 
 		this->_Metrics = std::make_unique<Metrics_t>();
@@ -21,7 +23,7 @@ namespace Raidcore::Nexus::Graphics
 		this->_TextureLoader = std::make_unique<Graphics::TextureLoader>(
 			&this->_Logger,
 			*this->_Window,
-			_TextureOverridesPath
+			Index(EPath::DIR_TEXTURES)
 		);
 	}
 

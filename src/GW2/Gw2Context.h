@@ -44,8 +44,7 @@ namespace Raidcore::Nexus::GW2
 			Core::LogApi&         aLogger,
 			Platform::RawInputApi& aRawInputApi,
 			HWND                   aGameWindow,
-			Network::CHttpClient&  aArenaNetAssetCDN,
-			std::filesystem::path  aGameBindsPath
+			Network::CHttpClient&  aArenaNetAssetCDN
 		);
 
 		///----------------------------------------------------------------------------------------------------
@@ -92,8 +91,6 @@ namespace Raidcore::Nexus::GW2
 		Platform::RawInputApi& _RawInputApi;
 		HWND                   _GameWindow;
 		Network::CHttpClient&  _ArenaNetAssetCDN;
-
-		std::filesystem::path _GameBindsPath;
 
 		/* Services */
 		std::unique_ptr<ArcdpsApi>        _Arcdps   { nullptr };

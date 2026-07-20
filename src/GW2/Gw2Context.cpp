@@ -16,6 +16,8 @@
 #include "Inputs/GameBinds/GbApi.h"
 #include "Mumble/MblReader.h"
 #include "Multibox/Multibox.h"
+#include "Index/IdxEnum.h"
+#include "Index/Index.h"
 
 namespace Raidcore::Nexus::GW2
 {
@@ -25,8 +27,7 @@ namespace Raidcore::Nexus::GW2
 		Core::LogApi&               aLogger,
 		Platform::RawInputApi& aRawInputApi,
 		HWND                   aGameWindow,
-		Network::CHttpClient&  aArenaNetAssetCDN,
-		std::filesystem::path  aGameBindsPath
+		Network::CHttpClient&  aArenaNetAssetCDN
 	)
 		: _DataLink(aDataLink)
 		, _EventApi(aEventApi)
@@ -34,7 +35,6 @@ namespace Raidcore::Nexus::GW2
 		, _RawInputApi(aRawInputApi)
 		, _GameWindow(aGameWindow)
 		, _ArenaNetAssetCDN(aArenaNetAssetCDN)
-		, _GameBindsPath(std::move(aGameBindsPath))
 	{
 		this->_Arcdps = std::make_unique<ArcdpsApi>();
 		this->_BuildInfo = std::make_unique<BuildInfoService>(
@@ -46,7 +46,7 @@ namespace Raidcore::Nexus::GW2
 			this->_Logger,
 			this->_EventApi,
 			this->_GameWindow,
-			this->_GameBindsPath
+			Index(EPath::GameBinds)
 		);
 		this->_Mumble = std::make_unique<MumbleReader>(
 			this->_DataLink,

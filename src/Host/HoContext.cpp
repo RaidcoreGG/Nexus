@@ -8,24 +8,20 @@
 
 #include "HoContext.h"
 
-#include "Host/Addons/Addon.h"
 #include "thirdparty/Clockwork/Clockwork.h"
+
+#include "Host/Addons/Addon.h"
 #include "Util/CmdLine.h"
 #include "Util/Strings.h"
+#include "Index/IdxEnum.h"
+#include "Index/Index.h"
 
 namespace Raidcore::Nexus::Host
 {
-	Context::Context(
-		Core::LogApi&        aLogger,
-		std::filesystem::path aLoaderDirectory,
-		std::filesystem::path aAddonConfigDefaultPath
-	)
+	Context::Context(Core::LogApi& aLogger)
 		: _Logger(aLogger)
-		, _LoaderDirectoryPath(std::move(aLoaderDirectory))
-		, _AddonConfigDefaultPath(std::move(aAddonConfigDefaultPath))
 	{
-
-		std::filesystem::path cfgpath = this->_AddonConfigDefaultPath;
+		std::filesystem::path cfgpath = Index(EPath::AddonConfigDefault);
 		std::vector<uint32_t> cfgwhitelist = {};
 
 		if (CmdLine::HasArgument("-ggaddons"))
@@ -66,7 +62,7 @@ namespace Raidcore::Nexus::Host
 		this->_Loader = std::make_unique<Host::Loader>(
 			&this->_Logger,
 			CAddon::Factory, /* FIXME */
-			this->_LoaderDirectoryPath
+			Index(EPath::DIR_ADDONS)
 		);
 		this->_Library = std::make_unique<Host::LibraryMgr>(
 			&this->_Logger,

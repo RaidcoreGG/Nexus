@@ -30,7 +30,7 @@ namespace Raidcore::Nexus::Graphics
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		Context(Core::LogApi& aLogger, std::filesystem::path aTextureOverrideDirectory);
+		Context(Core::LogApi& aLogger);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Shutdown:
@@ -59,10 +59,8 @@ namespace Raidcore::Nexus::Graphics
 		private:
 		Core::LogApi& _Logger;
 
-		std::filesystem::path _TextureOverridesPath{};
-
-		std::unique_ptr<Graphics::TextureLoader>      _TextureLoader{ nullptr };
-		std::unique_ptr<Graphics::Window_t>  _Window       { nullptr };
-		std::unique_ptr<Graphics::Metrics_t> _Metrics      { nullptr };
+		std::unique_ptr<Graphics::TextureLoader> _TextureLoader{ nullptr };
+		std::unique_ptr<Graphics::Window_t>      _Window       { nullptr };
+		std::unique_ptr<Graphics::Metrics_t>     _Metrics      { nullptr };
 	};
 }

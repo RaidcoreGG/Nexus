@@ -30,7 +30,7 @@ namespace Raidcore::Nexus::Core
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		Context(std::filesystem::path aSettingsPath);
+		Context();
 
 		///----------------------------------------------------------------------------------------------------
 		/// Shutdown:
@@ -63,8 +63,6 @@ namespace Raidcore::Nexus::Core
 		Core::SettingsMgr& Settings();
 
 		private:
-		std::filesystem::path _SettingsPath{};
-
 		std::unique_ptr<Core::LogApi>       _LogApi      { nullptr };
 		std::unique_ptr<Core::DataLinkApi>  _DataLink    { nullptr };
 		std::unique_ptr<Core::FuncRegistry> _FuncRegistry{ nullptr };
