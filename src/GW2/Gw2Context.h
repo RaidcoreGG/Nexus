@@ -39,9 +39,9 @@ namespace Raidcore::Nexus::GW2
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
 		Context(
-			CDataLinkApi&          aDataLink,
+			Core::DataLinkApi&    aDataLink,
 			Host::EventApi&        aEventApi,
-			CLogApi&               aLogger,
+			Core::LogApi&         aLogger,
 			Platform::RawInputApi& aRawInputApi,
 			HWND                   aGameWindow,
 			Network::CHttpClient&  aArenaNetAssetCDN,
@@ -86,9 +86,9 @@ namespace Raidcore::Nexus::GW2
 
 		private:
 		/* Dependencies */
-		CDataLinkApi&          _DataLink;
+		Core::DataLinkApi&    _DataLink;
 		Host::EventApi&        _EventApi;
-		CLogApi&               _Logger;
+		Core::LogApi&         _Logger;
 		Platform::RawInputApi& _RawInputApi;
 		HWND                   _GameWindow;
 		Network::CHttpClient&  _ArenaNetAssetCDN;

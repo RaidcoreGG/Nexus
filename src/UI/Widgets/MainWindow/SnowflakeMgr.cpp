@@ -24,7 +24,7 @@ namespace Raidcore::Nexus::GUI
 	CSnowflakeMgr::CSnowflakeMgr()
 	{
 		Runtime& ctx = Runtime::Get();
-		CSettings& settingsctx = ctx.Core().Settings();
+		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
 
 		settingsctx.Subscribe<bool>(OPT_DISABLEFESTIVEFLAIR, [&](bool aNewValue)
 		{

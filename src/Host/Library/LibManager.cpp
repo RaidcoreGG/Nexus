@@ -19,7 +19,7 @@ using namespace Raidcore::Nexus;
 
 namespace Raidcore::Nexus::Host
 {
-	LibraryMgr::LibraryMgr(CLogApi* aLogger, Host::Loader* aLoader)
+	LibraryMgr::LibraryMgr(Core::LogApi* aLogger, Host::Loader* aLoader)
 	{
 		this->Logger = aLogger;
 		this->Loader = aLoader;

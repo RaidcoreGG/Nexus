@@ -84,9 +84,9 @@ namespace Raidcore::Nexus::GUI
 		///----------------------------------------------------------------------------------------------------
 		CUiContext(
 			Graphics::Window_t& aGrWindow,
-			CLogApi* aLogger,
+			Core::LogApi* aLogger,
 			Graphics::TextureLoader& aTextureService,
-			CDataLinkApi* aDataLink,
+			Core::DataLinkApi* aDataLink,
 			CInputBindApi* aInputBindApi,
 			Host::EventApi& aEventApi,
 			GW2::MumbleReader& aMumbleReader
@@ -166,10 +166,10 @@ namespace Raidcore::Nexus::GUI
 		private:
 		/* Services */
 		Graphics::Window_t& GrWindow;
-		CLogApi* Logger = nullptr;
+		Core::LogApi* Logger = nullptr;
 		CLocalization* Language = nullptr;
 		Graphics::TextureLoader& TextureService;
-		CDataLinkApi* DataLink = nullptr;
+		Core::DataLinkApi* DataLink = nullptr;
 		CInputBindApi* InputBindApi = nullptr;
 		Host::EventApi& EventApi;
 		GW2::MumbleReader& MumbleReader;

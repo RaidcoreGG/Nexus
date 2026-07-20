@@ -52,7 +52,7 @@ struct AddonAPI1_t : AddonAPI_t
 	MINHOOK_DISABLE               DisableHook;
 
 	/* Logging */
-	LOGGER_LOG                    Log;
+	Core::LOGGER_LOG                    Log;
 
 	/* Events */
 	Host::EVENTS_RAISE            RaiseEvent;
@@ -69,8 +69,8 @@ struct AddonAPI1_t : AddonAPI_t
 	INPUTBINDS_DEREGISTER         DeregisterInputBind;
 
 	/* DataLink */
-	DATALINK_GETRESOURCE          GetResource;
-	DATALINK_SHARERESOURCE        ShareResource;
+	Core::DATALINK_GETRESOURCE          GetResource;
+	Core::DATALINK_SHARERESOURCE        ShareResource;
 
 	/* Textures */
 	Graphics::TEXTURES_GET                  GetTexture;

@@ -100,7 +100,7 @@ namespace Raidcore::Nexus::GW2
 
 	GameBindsApi::GameBindsApi(
 		Platform::RawInputApi& aRawInputApi,
-		CLogApi& aLogger,
+		Core::LogApi& aLogger,
 		Host::EventApi& aEventApi,
 		HWND aGameWindow,
 		std::filesystem::path   aConfigPath

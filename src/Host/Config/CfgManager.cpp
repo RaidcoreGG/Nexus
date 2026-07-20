@@ -30,7 +30,7 @@ namespace Raidcore::Nexus::Host
 	constexpr const char* K_LASTGAMEBUILD = "LastGameBuild";
 	constexpr const char* K_NAME = "Name";
 
-	ConfigMgr::ConfigMgr(CLogApi* aLogger, std::filesystem::path aConfigPath, std::vector<uint32_t> aWhitelist)
+	ConfigMgr::ConfigMgr(Core::LogApi* aLogger, std::filesystem::path aConfigPath, std::vector<uint32_t> aWhitelist)
 	{
 		if (aConfigPath.empty())
 		{

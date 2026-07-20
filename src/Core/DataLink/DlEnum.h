@@ -11,11 +11,17 @@
 #include <cstdint>
 
 ///----------------------------------------------------------------------------------------------------
-/// ELinkedResourceType Enumeration
+/// Raidcore::Nexus::Core Namespace
 ///----------------------------------------------------------------------------------------------------
-enum class ELinkedResourceType : uint32_t
+namespace Raidcore::Nexus::Core
 {
-	None,
-	Public,
-	Internal
-};
+	///----------------------------------------------------------------------------------------------------
+	/// ELinkedResourceType Enumeration
+	///----------------------------------------------------------------------------------------------------
+	enum class ELinkedResourceType : uint32_t
+	{
+		None,
+		Public,
+		Internal
+	};
+}

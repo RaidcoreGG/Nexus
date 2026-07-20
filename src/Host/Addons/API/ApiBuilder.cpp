@@ -65,19 +65,19 @@ using namespace Raidcore::Nexus;
 
 namespace Raidcore::Nexus::Host::API
 {
-	static bool                    s_IsInitialized = false;
+	static bool                       s_IsInitialized = false;
 
-	static CDataLinkApi*           s_DataLinkApi   = nullptr;
-	static Host::EventApi*         s_EventApi      = nullptr;
-	static GW2::GameBindsApi*      s_GameBindsApi  = nullptr;
-	static CInputBindApi*          s_InputBindApi  = nullptr;
-	static Platform::RawInputApi*  s_RawInputApi   = nullptr;
-	static Nexus::GUI::CLocalization*     s_Localization  = nullptr;
-	static CLogApi*                s_Logger        = nullptr;
-	static Graphics::TextureLoader* s_TextureApi    = nullptr;
-	static Host::Loader*           s_Loader        = nullptr;
-	static Graphics::Window_t*     s_GrWindow      = nullptr;
-	static GW2::ArcdpsApi*         s_ArcApi        = nullptr;
+	static Core::DataLinkApi*        s_DataLinkApi   = nullptr;
+	static Host::EventApi*            s_EventApi      = nullptr;
+	static GW2::GameBindsApi*         s_GameBindsApi  = nullptr;
+	static CInputBindApi*             s_InputBindApi  = nullptr;
+	static Platform::RawInputApi*     s_RawInputApi   = nullptr;
+	static Nexus::GUI::CLocalization* s_Localization  = nullptr;
+	static Core::LogApi*             s_Logger        = nullptr;
+	static Graphics::TextureLoader*   s_TextureApi    = nullptr;
+	static Host::Loader*              s_Loader        = nullptr;
+	static Graphics::Window_t*        s_GrWindow      = nullptr;
+	static GW2::ArcdpsApi*            s_ArcApi        = nullptr;
 
 	static Nexus::GUI::CUiContext*             s_UiContext     = nullptr;
 	static Nexus::GUI::CFontManager*           s_FontManager   = nullptr;
@@ -319,13 +319,13 @@ namespace Raidcore::Nexus::Host::API
 
 	namespace Logger
 	{
-		void LogMessage(ELogLevel aLogLevel, const char* aStr)
+		void LogMessage(Core::ELogLevel aLogLevel, const char* aStr)
 		{
 			assert(s_Logger);
 			s_Logger->LogUnformatted(aLogLevel, "Addon", aStr);
 		}
 
-		void LogMessage2(ELogLevel aLogLevel, const char* aChannel, const char* aStr)
+		void LogMessage2(Core::ELogLevel aLogLevel, const char* aChannel, const char* aStr)
 		{
 			assert(s_Logger);
 			s_Logger->LogUnformatted(aLogLevel, aChannel, aStr);

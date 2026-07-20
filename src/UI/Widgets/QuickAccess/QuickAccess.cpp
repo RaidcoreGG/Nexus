@@ -36,8 +36,8 @@ namespace Raidcore::Nexus::GUI
 	}
 
 	CQuickAccess::CQuickAccess(
-		CDataLinkApi* aDataLink,
-		CLogApi* aLogger,
+		Core::DataLinkApi* aDataLink,
+		Core::LogApi* aLogger,
 		CInputBindApi* aInputBindApi,
 		Graphics::TextureLoader* aTextureService,
 		CLocalization* aLocalization,
@@ -54,7 +54,7 @@ namespace Raidcore::Nexus::GUI
 		this->MumbleLink = (Mumble::Data*)aDataLink->GetResource(DL_MUMBLE_LINK);
 
 		Runtime& ctx = Runtime::Get();
-		CSettings& settingsctx = ctx.Core().Settings();
+		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
 
 		/* Setup notifiers. */
 		settingsctx.Subscribe<bool>(OPT_QAVERTICAL, [&](bool aVertical)
@@ -340,7 +340,7 @@ namespace Raidcore::Nexus::GUI
 			);
 
 			Runtime& ctx = Runtime::Get();
-			CSettings& settingsctx = ctx.Core().Settings();
+			Core::SettingsMgr& settingsctx = ctx.Core().Settings();
 
 			/* If the current shortcut ID is in the suppressed list. */
 			bool isSuppressed = std::find(this->SuppressedShortcuts.begin(), this->SuppressedShortcuts.end(), aIdentifier) != this->SuppressedShortcuts.end();

@@ -61,7 +61,7 @@ namespace Raidcore::Nexus::GUI
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		CQuickAccess(CDataLinkApi* aDataLink, CLogApi* aLogger, CInputBindApi* aInputBindApi, Graphics::TextureLoader* aTextureService, CLocalization* aLocalization, Host::EventApi* aEventApi);
+		CQuickAccess(Core::DataLinkApi* aDataLink, Core::LogApi* aLogger, CInputBindApi* aInputBindApi, Graphics::TextureLoader* aTextureService, CLocalization* aLocalization, Host::EventApi* aEventApi);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
@@ -135,7 +135,7 @@ namespace Raidcore::Nexus::GUI
 		uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 		private:
-		CLogApi* Logger{};
+		Core::LogApi* Logger{};
 		CInputBindApi* InputBindApi{};
 		Graphics::TextureLoader* TextureService{};
 		CLocalization* Language{};

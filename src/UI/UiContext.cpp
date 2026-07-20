@@ -64,7 +64,7 @@ namespace Raidcore::Nexus::GUI
 		}
 
 		Runtime& ctx = Runtime::Get();
-		CDataLinkApi* dlapi = &ctx.Core().DataLink();
+		Core::DataLinkApi* dlapi = &ctx.Core().DataLink();
 
 		Mumble::Identity* mumbleIdentity = static_cast<Mumble::Identity*>(dlapi->GetResource(DL_MUMBLE_LINK_IDENTITY));
 		NexusLinkData_t* nexusLink = static_cast<NexusLinkData_t*>(dlapi->GetResource(DL_NEXUS_LINK));
@@ -111,8 +111,8 @@ namespace Raidcore::Nexus::GUI
 	/*static*/ void CUiContext::OnMumbleIdentityChanged(void* aEventArgs)
 	{
 		Runtime& ctx = Runtime::Get();
-		CDataLinkApi* dlapi = &ctx.Core().DataLink();
-		CSettings& settingsctx = ctx.Core().Settings();
+		Core::DataLinkApi* dlapi = &ctx.Core().DataLink();
+		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
 		CUiContext* uictx = ctx.GetUIContext();
 		CFontManager* fontmgr = uictx->GetFontManager();
 
@@ -166,9 +166,9 @@ namespace Raidcore::Nexus::GUI
 
 	CUiContext::CUiContext(
 		Graphics::Window_t& aGrWindow,
-		CLogApi* aLogger,
+		Core::LogApi* aLogger,
 		Graphics::TextureLoader& aTextureService,
-		CDataLinkApi* aDataLink,
+		Core::DataLinkApi* aDataLink,
 		CInputBindApi* aInputBindApi,
 		Host::EventApi& aEventApi,
 		GW2::MumbleReader& aMumbleReader
@@ -326,7 +326,7 @@ namespace Raidcore::Nexus::GUI
 			ImGui::NewFrame();
 
 			static Runtime& s_Context = Runtime::Get();
-			static CSettings& s_Settings = s_Context.Core().Settings();
+			static Core::SettingsMgr& s_Settings = s_Context.Core().Settings();
 			static bool       s_EulaAccepted = s_Settings.Get<bool>(OPT_ACCEPTEULA, false);
 
 			if (s_EulaAccepted)
@@ -442,7 +442,7 @@ namespace Raidcore::Nexus::GUI
 		std::filesystem::path fontPath{};
 
 		Runtime& ctx = Runtime::Get();
-		CSettings& settingsctx = ctx.Core().Settings();
+		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
 
 		/* add user font */
 		bool hasUserFont = false;

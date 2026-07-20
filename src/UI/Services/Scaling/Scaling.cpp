@@ -42,7 +42,7 @@ namespace Raidcore::Nexus::GUI
 		s_Scaling->UpdateResolution();
 	}
 
-	CScaling::CScaling(HWND aGameWindow, Graphics::Window_t& aGrWindow, CDataLinkApi* aDataLink, Host::EventApi& aEventApi, CSettings* aSettings)
+	CScaling::CScaling(HWND aGameWindow, Graphics::Window_t& aGrWindow, Core::DataLinkApi* aDataLink, Host::EventApi& aEventApi, Core::SettingsMgr* aSettings)
 		: GameWindow(aGameWindow)
 		, GrWindow(aGrWindow)
 		, DataLink(aDataLink)

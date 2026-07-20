@@ -43,7 +43,7 @@ namespace Raidcore::Nexus::Graphics
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		TextureLoader(CLogApi* aLogger, Graphics::Window_t& aGrWindow, std::filesystem::path aOverridesDirectory);
+		TextureLoader(Core::LogApi* aLogger, Graphics::Window_t& aGrWindow, std::filesystem::path aOverridesDirectory);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
@@ -138,7 +138,7 @@ namespace Raidcore::Nexus::Graphics
 		uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 		private:
-		CLogApi* Logger;
+		Core::LogApi* Logger;
 		Graphics::Window_t& GrWindow;
 
 		std::filesystem::path                  OverridesDirectory{};

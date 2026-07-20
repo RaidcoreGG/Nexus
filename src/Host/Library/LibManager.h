@@ -33,7 +33,7 @@ namespace Raidcore::Nexus::Host
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		LibraryMgr(CLogApi* aLogger, Loader* aLoader);
+		LibraryMgr(Core::LogApi* aLogger, Loader* aLoader);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
@@ -65,7 +65,7 @@ namespace Raidcore::Nexus::Host
 		std::vector<LibraryAddon_t> GetLibrary() const;
 
 		private:
-		CLogApi* Logger = nullptr;
+		Core::LogApi* Logger = nullptr;
 		Loader* Loader = nullptr;
 
 		mutable std::mutex                                     Mutex;

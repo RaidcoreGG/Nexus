@@ -202,10 +202,10 @@ class CAddon : public virtual Host::IAddon
 	std::string GetProjectPageURL() const;
 
 	private:
-	CLogApi*                 Logger               = nullptr;
+	Core::LogApi*           Logger               = nullptr;
 	Host::Loader*            Loader               = nullptr;
 	Host::EventApi*          EventApi             = nullptr;
-	Host::ConfigMgr*        ConfigMgr            = nullptr;
+	Host::ConfigMgr*         ConfigMgr            = nullptr;
 
 	EAddonInterfaces         ModuleInterfaces     = EAddonInterfaces::None;
 	EAddonFlags              Flags                = EAddonFlags::None;

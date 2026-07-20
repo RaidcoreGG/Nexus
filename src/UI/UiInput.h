@@ -47,7 +47,7 @@ namespace Raidcore::Nexus::GUI
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		CUiInput(CSettings* aSettings);
+		CUiInput(Core::SettingsMgr* aSettings);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
@@ -67,7 +67,7 @@ namespace Raidcore::Nexus::GUI
 		void FlushInput();
 
 		private:
-		CSettings* Settings;
+		Core::SettingsMgr* Settings;
 
 		EModifiers RequiredModifiers;
 		bool       FilterClicks;

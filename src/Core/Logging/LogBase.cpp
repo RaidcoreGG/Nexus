@@ -8,12 +8,15 @@
 
 #include "LogBase.h"
 
-ELogLevel ILogger::GetLogLevel()
+namespace Raidcore::Nexus::Core
 {
-	return this->Level;
-}
+	ELogLevel ILogger::GetLogLevel()
+	{
+		return this->Level;
+	}
 
-void ILogger::SetLogLevel(ELogLevel aLogLevel)
-{
-	this->Level = aLogLevel;
+	void ILogger::SetLogLevel(ELogLevel aLogLevel)
+	{
+		this->Level = aLogLevel;
+	}
 }

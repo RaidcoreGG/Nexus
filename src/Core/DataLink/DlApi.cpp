@@ -10,179 +10,182 @@
 
 #include <assert.h>
 
-CDataLinkApi::CDataLinkApi(CLogApi* aLogger)
+namespace Raidcore::Nexus::Core
 {
-	assert(aLogger);
-
-	this->Logger = aLogger;
-}
-
-CDataLinkApi::~CDataLinkApi()
-{
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	while (this->Registry.size() > 0)
+	DataLinkApi::DataLinkApi(LogApi* aLogger)
 	{
-		const auto& it = this->Registry.begin();
+		assert(aLogger);
 
-		switch (it->second.Type)
+		this->Logger = aLogger;
+	}
+
+	DataLinkApi::~DataLinkApi()
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		while (this->Registry.size() > 0)
 		{
-			case ELinkedResourceType::Public:
-				if (it->second.Pointer)
-				{
-					UnmapViewOfFile((LPVOID)it->second.Pointer);
-					it->second.Pointer = nullptr;
-				}
+			const auto& it = this->Registry.begin();
 
-				if (it->second.Handle)
-				{
-					CloseHandle(it->second.Handle);
-					it->second.Handle = nullptr;
-				}
-				break;
+			switch (it->second.Type)
+			{
+				case ELinkedResourceType::Public:
+					if (it->second.Pointer)
+					{
+						UnmapViewOfFile((LPVOID)it->second.Pointer);
+						it->second.Pointer = nullptr;
+					}
 
-			case ELinkedResourceType::Internal:
-				if (it->second.Pointer)
-				{
-					delete it->second.Pointer;
-					it->second.Pointer = nullptr;
-				}
-				break;
+					if (it->second.Handle)
+					{
+						CloseHandle(it->second.Handle);
+						it->second.Handle = nullptr;
+					}
+					break;
+
+				case ELinkedResourceType::Internal:
+					if (it->second.Pointer)
+					{
+						delete it->second.Pointer;
+						it->second.Pointer = nullptr;
+					}
+					break;
+			}
+
+			this->Logger->Info(CH_DATALINK, "Freed shared resource: \"%s\"", it->first.c_str());
+
+			this->Registry.erase(it);
 		}
-
-		this->Logger->Info(CH_DATALINK, "Freed shared resource: \"%s\"", it->first.c_str());
-
-		this->Registry.erase(it);
-	}
-}
-
-void* CDataLinkApi::GetResource(const char* aIdentifier)
-{
-	if (aIdentifier == nullptr) { return nullptr; }
-
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	auto it = this->Registry.find(aIdentifier);
-
-	if (it != this->Registry.end())
-	{
-		return it->second.Pointer;
 	}
 
-	return nullptr;
-}
-
-void* CDataLinkApi::ShareResource(const char* aIdentifier, size_t aResourceSize, const char* aUnderlyingName, bool aIsPublic)
-{
-	if (aIdentifier == nullptr) { return nullptr; }
-	if (aResourceSize == 0)     { return nullptr; }
-
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	auto it = this->Registry.find(aIdentifier);
-
-	/* resource already exists */
-	if (it != this->Registry.end())
+	void* DataLinkApi::GetResource(const char* aIdentifier)
 	{
-		if (it->second.Size == aResourceSize)
+		if (aIdentifier == nullptr) { return nullptr; }
+
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto it = this->Registry.find(aIdentifier);
+
+		if (it != this->Registry.end())
 		{
 			return it->second.Pointer;
 		}
-		else /* size mismatch */
-		{
-			this->Logger->Warning(CH_DATALINK, "Resource with name \"%s\" already exists with size %u but size %u was requested.", aIdentifier, it->second.Size, aResourceSize);
-			return nullptr;
-		}
+
+		return nullptr;
 	}
 
-	/* allocate new resource */
-	LinkedResource_t resource{};
-	resource.Size = aResourceSize;
-	resource.Type = aIsPublic ? ELinkedResourceType::Public : ELinkedResourceType::Internal;
-
-	switch (resource.Type)
+	void* DataLinkApi::ShareResource(const char* aIdentifier, size_t aResourceSize, const char* aUnderlyingName, bool aIsPublic)
 	{
-		default:
-		case ELinkedResourceType::None:
+		if (aIdentifier == nullptr) { return nullptr; }
+		if (aResourceSize == 0) { return nullptr; }
+
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto it = this->Registry.find(aIdentifier);
+
+		/* resource already exists */
+		if (it != this->Registry.end())
 		{
-			return nullptr;
-		}
-		case ELinkedResourceType::Public:
-		{
-			resource.UnderlyingName = aUnderlyingName;
-
-			/* If no name override is set, use identifier + process ID. */
-			if (resource.UnderlyingName.empty())
+			if (it->second.Size == aResourceSize)
 			{
-				resource.UnderlyingName = aIdentifier;
-				resource.UnderlyingName.append("_");
-				resource.UnderlyingName.append(std::to_string(GetCurrentProcessId()));
+				return it->second.Pointer;
 			}
-
-			/* acquire handle */
-			resource.Handle = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, resource.UnderlyingName.c_str());
-
-			if (!resource.Handle)
+			else /* size mismatch */
 			{
-				resource.Handle = CreateFileMappingA(
-					INVALID_HANDLE_VALUE,
-					0,
-					PAGE_READWRITE,
-					0,
-					static_cast<DWORD>(aResourceSize),
-					resource.UnderlyingName.c_str()
-				);
-			}
-
-			/* still no resource handle */
-			if (!resource.Handle)
-			{
-				this->Logger->Warning(
-					CH_DATALINK,
-					"Failed to create resource \"%s\". OpenFileMapping failed. CreateFileMapping failed. GetLastError: %d",
-					aIdentifier,
-					GetLastError()
-				);
+				this->Logger->Warning(CH_DATALINK, "Resource with name \"%s\" already exists with size %u but size %u was requested.", aIdentifier, it->second.Size, aResourceSize);
 				return nullptr;
 			}
+		}
 
-			resource.Pointer = MapViewOfFile(resource.Handle, FILE_MAP_ALL_ACCESS, 0, 0, static_cast<DWORD>(aResourceSize));
+		/* allocate new resource */
+		LinkedResource_t resource{};
+		resource.Size = aResourceSize;
+		resource.Type = aIsPublic ? ELinkedResourceType::Public : ELinkedResourceType::Internal;
 
-			/* sanity check */
-			if (!resource.Pointer)
+		switch (resource.Type)
+		{
+			default:
+			case ELinkedResourceType::None:
 			{
-				this->Logger->Warning(
-					CH_DATALINK,
-					"Failed to create resource \"%s\". MapViewOfFile failed. GetLastError: %d",
-					aIdentifier,
-					GetLastError()
-				);
 				return nullptr;
 			}
+			case ELinkedResourceType::Public:
+			{
+				resource.UnderlyingName = aUnderlyingName;
 
-			memset(resource.Pointer, 0, resource.Size);
+				/* If no name override is set, use identifier + process ID. */
+				if (resource.UnderlyingName.empty())
+				{
+					resource.UnderlyingName = aIdentifier;
+					resource.UnderlyingName.append("_");
+					resource.UnderlyingName.append(std::to_string(GetCurrentProcessId()));
+				}
 
-			this->Logger->Info(CH_DATALINK, "Created public shared resource: \"%s\" (Underlying name: \"%s\")", aIdentifier, resource.UnderlyingName.c_str());
-			break;
+				/* acquire handle */
+				resource.Handle = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, resource.UnderlyingName.c_str());
+
+				if (!resource.Handle)
+				{
+					resource.Handle = CreateFileMappingA(
+						INVALID_HANDLE_VALUE,
+						0,
+						PAGE_READWRITE,
+						0,
+						static_cast<DWORD>(aResourceSize),
+						resource.UnderlyingName.c_str()
+					);
+				}
+
+				/* still no resource handle */
+				if (!resource.Handle)
+				{
+					this->Logger->Warning(
+						CH_DATALINK,
+						"Failed to create resource \"%s\". OpenFileMapping failed. CreateFileMapping failed. GetLastError: %d",
+						aIdentifier,
+						GetLastError()
+					);
+					return nullptr;
+				}
+
+				resource.Pointer = MapViewOfFile(resource.Handle, FILE_MAP_ALL_ACCESS, 0, 0, static_cast<DWORD>(aResourceSize));
+
+				/* sanity check */
+				if (!resource.Pointer)
+				{
+					this->Logger->Warning(
+						CH_DATALINK,
+						"Failed to create resource \"%s\". MapViewOfFile failed. GetLastError: %d",
+						aIdentifier,
+						GetLastError()
+					);
+					return nullptr;
+				}
+
+				memset(resource.Pointer, 0, resource.Size);
+
+				this->Logger->Info(CH_DATALINK, "Created public shared resource: \"%s\" (Underlying name: \"%s\")", aIdentifier, resource.UnderlyingName.c_str());
+				break;
+			}
+			case ELinkedResourceType::Internal:
+			{
+				resource.Pointer = new char[resource.Size];
+
+				this->Logger->Info(CH_DATALINK, "Created internal shared resource: \"%s\"", aIdentifier);
+				break;
+			}
 		}
-		case ELinkedResourceType::Internal:
-		{
-			resource.Pointer = new char[resource.Size];
 
-			this->Logger->Info(CH_DATALINK, "Created internal shared resource: \"%s\"", aIdentifier);
-			break;
-		}
+		/* store linkedresource */
+		this->Registry.emplace(aIdentifier, resource);
+
+		return resource.Pointer;
 	}
 
-	/* store linkedresource */
-	this->Registry.emplace(aIdentifier, resource);
+	std::unordered_map<std::string, LinkedResource_t> DataLinkApi::GetRegistry() const
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
 
-	return resource.Pointer;
-}
-
-std::unordered_map<std::string, LinkedResource_t> CDataLinkApi::GetRegistry() const
-{
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	return this->Registry;
+		return this->Registry;
+	}
 }

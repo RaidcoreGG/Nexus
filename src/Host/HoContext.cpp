@@ -16,7 +16,7 @@
 namespace Raidcore::Nexus::Host
 {
 	Context::Context(
-		CLogApi&              aLogger,
+		Core::LogApi&        aLogger,
 		std::filesystem::path aLoaderDirectory,
 		std::filesystem::path aAddonConfigDefaultPath
 	)

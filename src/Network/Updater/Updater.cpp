@@ -16,7 +16,7 @@ using namespace Raidcore::Nexus;
 
 namespace Raidcore::Nexus::Network
 {
-	Updater::Updater(CLogApi* aLogger)
+	Updater::Updater(Core::LogApi* aLogger)
 	{
 		this->Logger = aLogger;
 

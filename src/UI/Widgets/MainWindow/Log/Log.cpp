@@ -22,7 +22,7 @@ namespace Raidcore::Nexus::GUI
 {
 	CLogWindow::CLogWindow()
 	{
-		this->SetLogLevel(ELogLevel::ALL);
+		this->SetLogLevel(Core::ELogLevel::ALL);
 
 		this->Name = "Log";
 		this->DisplayName = "((000006))";
@@ -70,37 +70,37 @@ namespace Raidcore::Nexus::GUI
 			if (ImGui::Selectable("Critical"))
 			{
 				levelPreview = "Critical";
-				this->FilterLevel = ELogLevel::CRITICAL;
+				this->FilterLevel = Core::ELogLevel::CRITICAL;
 			}
 
 			if (ImGui::Selectable("Warning"))
 			{
 				levelPreview = "Warning";
-				this->FilterLevel = ELogLevel::WARNING;
+				this->FilterLevel = Core::ELogLevel::WARNING;
 			}
 
 			if (ImGui::Selectable("Info"))
 			{
 				levelPreview = "Info";
-				this->FilterLevel = ELogLevel::INFO;
+				this->FilterLevel = Core::ELogLevel::INFO;
 			}
 
 			if (ImGui::Selectable("Debug"))
 			{
 				levelPreview = "Debug";
-				this->FilterLevel = ELogLevel::DEBUG;
+				this->FilterLevel = Core::ELogLevel::DEBUG;
 			}
 
 			if (ImGui::Selectable("Trace"))
 			{
 				levelPreview = "Trace";
-				this->FilterLevel = ELogLevel::TRACE;
+				this->FilterLevel = Core::ELogLevel::TRACE;
 			}
 
 			if (ImGui::Selectable("All"))
 			{
 				levelPreview = "All";
-				this->FilterLevel = ELogLevel::ALL;
+				this->FilterLevel = Core::ELogLevel::ALL;
 			}
 
 			ImGui::EndCombo();
@@ -169,7 +169,7 @@ namespace Raidcore::Nexus::GUI
 					DisplayLogEntry_t* msg = LogEntries[i];
 
 					/* Filter level set. */
-					if (this->FilterLevel != ELogLevel::ALL)
+					if (this->FilterLevel != Core::ELogLevel::ALL)
 					{
 						if (this->SelectedLevelOnly)
 						{
@@ -220,10 +220,10 @@ namespace Raidcore::Nexus::GUI
 						ImColor levelColor;
 						switch (msg->Entry->Level)
 						{
-							case ELogLevel::CRITICAL:   level = "[CRITICAL]";   levelColor = IM_COL32(255, 0, 0, 255);     break;
-							case ELogLevel::WARNING:    level = "[WARNING]";    levelColor = IM_COL32(255, 255, 0, 255);   break;
-							case ELogLevel::INFO:       level = "[INFO]";       levelColor = IM_COL32(0, 255, 0, 255);     break;
-							case ELogLevel::DEBUG:      level = "[DEBUG]";      levelColor = IM_COL32(0, 148, 255, 255);   break;
+							case Core::ELogLevel::CRITICAL:   level = "[CRITICAL]";   levelColor = IM_COL32(255, 0, 0, 255);     break;
+							case Core::ELogLevel::WARNING:    level = "[WARNING]";    levelColor = IM_COL32(255, 255, 0, 255);   break;
+							case Core::ELogLevel::INFO:       level = "[INFO]";       levelColor = IM_COL32(0, 255, 0, 255);     break;
+							case Core::ELogLevel::DEBUG:      level = "[DEBUG]";      levelColor = IM_COL32(0, 148, 255, 255);   break;
 
 							default:                    level = "[TRACE]";      levelColor = IM_COL32(220, 220, 220, 255); break;
 						}
@@ -338,7 +338,7 @@ namespace Raidcore::Nexus::GUI
 		}
 	}
 
-	void CLogWindow::MsgProc(const LogMsg_t* aLogEntry)
+	void CLogWindow::MsgProc(const Core::LogMsg_t* aLogEntry)
 	{
 		const std::lock_guard<std::mutex> lock(Mutex);
 

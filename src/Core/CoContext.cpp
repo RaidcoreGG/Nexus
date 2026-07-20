@@ -20,13 +20,13 @@ namespace Raidcore::Nexus::Core
 	Context::Context(std::filesystem::path aSettingsPath)
 		: _SettingsPath(aSettingsPath)
 	{
-		this->_LogApi = std::make_unique<CLogApi>();
+		this->_LogApi = std::make_unique<Core::LogApi>();
 
-		this->_DataLink = std::make_unique<CDataLinkApi>(
+		this->_DataLink = std::make_unique<Core::DataLinkApi>(
 			this->_LogApi.get()
 		);
 
-		this->_Settings = std::make_unique<CSettings>(
+		this->_Settings = std::make_unique<Core::SettingsMgr>(
 			this->_SettingsPath,
 			this->_LogApi.get()
 		);
@@ -39,17 +39,17 @@ namespace Raidcore::Nexus::Core
 		this->_Settings.reset();
 	}
 
-	CLogApi& Context::Logger()
+	Core::LogApi& Context::Logger()
 	{
 		return *this->_LogApi;
 	}
 
-	CDataLinkApi& Context::DataLink()
+	Core::DataLinkApi& Context::DataLink()
 	{
 		return *this->_DataLink;
 	}
 
-	CSettings& Context::Settings()
+	Core::SettingsMgr& Context::Settings()
 	{
 		return *this->_Settings;
 	}

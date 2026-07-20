@@ -259,13 +259,13 @@ namespace Raidcore::Nexus::Host::API
 		/// LogMessage:
 		/// 	[Revision 1] Logs a message.
 		///----------------------------------------------------------------------------------------------------
-		void LogMessage(ELogLevel aLogLevel, const char* aStr);
+		void LogMessage(Core::ELogLevel aLogLevel, const char* aStr);
 
 		///----------------------------------------------------------------------------------------------------
 		/// LogMessage2:
 		/// 	[Revision 2] Logs a message with a custom channel.
 		///----------------------------------------------------------------------------------------------------
-		void LogMessage2(ELogLevel aLogLevel, const char* aChannel, const char* aStr);
+		void LogMessage2(Core::ELogLevel aLogLevel, const char* aChannel, const char* aStr);
 	}
 
 	///----------------------------------------------------------------------------------------------------

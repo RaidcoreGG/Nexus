@@ -42,7 +42,7 @@ namespace Raidcore::Nexus::Network
 		/// 	- aCacheLifetime: Lifetime of a cache entry in seconds.
 		///----------------------------------------------------------------------------------------------------
 		CHttpClient(
-			CLogApi* aLogger,
+			Core::LogApi* aLogger,
 			std::string           aBaseURL,
 			std::filesystem::path aCacheDirectory = {},
 			uint32_t              aCacheLifetime = 0
@@ -67,7 +67,7 @@ namespace Raidcore::Nexus::Network
 		HttpResponse_t Download(std::filesystem::path aOutPath, std::string aEndpoint, std::string aParameters = "");
 
 		private:
-		CLogApi* Logger = nullptr;
+		Core::LogApi* Logger = nullptr;
 
 		std::string      BaseURL;
 		std::mutex       Mutex{};

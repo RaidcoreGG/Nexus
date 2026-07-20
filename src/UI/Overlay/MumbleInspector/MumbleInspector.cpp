@@ -20,7 +20,7 @@ namespace Raidcore::Nexus::GUI
 {
 	CMumbleOverlay::CMumbleOverlay()
 	{
-		CDataLinkApi& dlApi = Runtime::Get().Core().DataLink();
+		Core::DataLinkApi& dlApi = Runtime::Get().Core().DataLink();
 
 		this->MumbleLink = (Mumble::Data*)dlApi.GetResource(DL_MUMBLE_LINK);
 		this->MumbleIdentity = (Mumble::Identity*)dlApi.GetResource(DL_MUMBLE_LINK_IDENTITY);
@@ -33,7 +33,7 @@ namespace Raidcore::Nexus::GUI
 
 		if (!this->MumbleLink || !this->MumbleIdentity || !this->NexusLink)
 		{
-			CDataLinkApi& dlApi = Runtime::Get().Core().DataLink();
+			Core::DataLinkApi& dlApi = Runtime::Get().Core().DataLink();
 
 			this->MumbleLink = (Mumble::Data*)dlApi.GetResource(DL_MUMBLE_LINK);
 			this->MumbleIdentity = (Mumble::Identity*)dlApi.GetResource(DL_MUMBLE_LINK_IDENTITY);

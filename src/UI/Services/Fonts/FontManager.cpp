@@ -26,7 +26,7 @@ namespace Raidcore::Nexus::GUI
 		this->Language = aLocalization;
 
 		Runtime& ctx = Runtime::Get();
-		CSettings& settingsctx = ctx.Core().Settings();
+		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
 
 		float storedFontSz = settingsctx.Get<float>(OPT_FONTSIZE, 15.0f);
 		if (storedFontSz <= 0)

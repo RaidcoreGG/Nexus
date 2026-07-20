@@ -17,7 +17,7 @@
 
 namespace Raidcore::Nexus::GUI
 {
-	CUiInput::CUiInput(CSettings* aSettings)
+	CUiInput::CUiInput(Core::SettingsMgr* aSettings)
 	{
 		this->Settings = aSettings;
 

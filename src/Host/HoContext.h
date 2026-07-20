@@ -28,7 +28,7 @@ namespace Raidcore::Nexus::Host
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
 		Context(
-			CLogApi&              aLogger,
+			Core::LogApi&        aLogger,
 			std::filesystem::path aLoaderDirectory,
 			std::filesystem::path aAddonConfigDefaultPath
 		);
@@ -64,7 +64,7 @@ namespace Raidcore::Nexus::Host
 		Host::EventApi& Events();
 
 		private:
-		CLogApi& _Logger;
+		Core::LogApi& _Logger;
 
 		std::filesystem::path _LoaderDirectoryPath;
 		std::filesystem::path _AddonConfigDefaultPath;

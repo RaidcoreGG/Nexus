@@ -41,25 +41,25 @@ namespace Raidcore::Nexus::Core
 		/// Logger:
 		/// 	Returns the logger instance.
 		///----------------------------------------------------------------------------------------------------
-		CLogApi& Logger();
+		Core::LogApi& Logger();
 
 		///----------------------------------------------------------------------------------------------------
 		/// DataLink:
 		/// 	Returns the data link API instance.
 		///----------------------------------------------------------------------------------------------------
-		CDataLinkApi& DataLink();
+		Core::DataLinkApi& DataLink();
 
 		///----------------------------------------------------------------------------------------------------
 		/// Settings:
 		/// 	Returns the settings instance.
 		///----------------------------------------------------------------------------------------------------
-		CSettings& Settings();
+		Core::SettingsMgr& Settings();
 
 		private:
 		std::filesystem::path _SettingsPath{};
 
-		std::unique_ptr<CLogApi>      _LogApi{ nullptr };
-		std::unique_ptr<CDataLinkApi> _DataLink{ nullptr };
-		std::unique_ptr<CSettings>    _Settings{ nullptr };
+		std::unique_ptr<Core::LogApi>      _LogApi{ nullptr };
+		std::unique_ptr<Core::DataLinkApi> _DataLink{ nullptr };
+		std::unique_ptr<Core::SettingsMgr>    _Settings{ nullptr };
 	};
 }

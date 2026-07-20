@@ -32,7 +32,7 @@ namespace Raidcore::Nexus::Host
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		ConfigMgr(CLogApi* aLogger, std::filesystem::path aConfigPath, std::vector<uint32_t> aWhitelist = {});
+		ConfigMgr(Core::LogApi* aLogger, std::filesystem::path aConfigPath, std::vector<uint32_t> aWhitelist = {});
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
@@ -64,7 +64,7 @@ namespace Raidcore::Nexus::Host
 		bool IsReadOnly() const;
 
 		private:
-		CLogApi* Logger = nullptr;
+		Core::LogApi* Logger = nullptr;
 
 		bool                                    ReadOnly = false;
 		std::filesystem::path                   Path;

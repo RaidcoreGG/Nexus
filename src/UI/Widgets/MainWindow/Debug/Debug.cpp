@@ -194,7 +194,7 @@ namespace Raidcore::Nexus::GUI
 
 		if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 		{
-			std::unordered_map<std::string, LinkedResource_t>	dataLinkRegistry = Runtime::Get().Core().DataLink().GetRegistry();
+			std::unordered_map<std::string, Core::LinkedResource_t>	dataLinkRegistry = Runtime::Get().Core().DataLink().GetRegistry();
 
 			for (auto& [identifier, resource] : dataLinkRegistry)
 			{

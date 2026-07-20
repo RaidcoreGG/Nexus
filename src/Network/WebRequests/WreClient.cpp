@@ -14,7 +14,7 @@
 
 namespace Raidcore::Nexus::Network
 {
-	CHttpClient::CHttpClient(CLogApi* aLogger, std::string aBaseURL, std::filesystem::path aCacheDirectory, uint32_t aCacheLifetime)
+	CHttpClient::CHttpClient(Core::LogApi* aLogger, std::string aBaseURL, std::filesystem::path aCacheDirectory, uint32_t aCacheLifetime)
 	{
 		this->Logger = aLogger;
 

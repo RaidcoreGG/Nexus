@@ -30,7 +30,7 @@ namespace Raidcore::Nexus::GW2
 		///----------------------------------------------------------------------------------------------------
 		BuildInfoService(
 			Network::CHttpClient& aArenaNetAssetCDN,
-			CLogApi&              aLogger
+			Core::LogApi&        aLogger
 		);
 
 		///----------------------------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ namespace Raidcore::Nexus::GW2
 
 		private:
 		Network::CHttpClient& _ArenaNetAssetCDN;
-		CLogApi&              _Logger;
+		Core::LogApi&        _Logger;
 
 		std::mutex            Mutex{};
 		uint32_t              _Build{ 0 };

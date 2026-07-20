@@ -10,7 +10,7 @@
 
 namespace Raidcore::Nexus::Graphics
 {
-	Context::Context(CLogApi& aLogger, std::filesystem::path aTextureOverrideDirectory)
+	Context::Context(Core::LogApi& aLogger, std::filesystem::path aTextureOverrideDirectory)
 		: _Logger(aLogger)
 		, _TextureOverridesPath(aTextureOverrideDirectory)
 	{

@@ -22,7 +22,7 @@
 
 namespace Raidcore::Nexus::Network
 {
-	Context::Context(CLogApi& aLogger, std::filesystem::path aCommonDir)
+	Context::Context(Core::LogApi& aLogger, std::filesystem::path aCommonDir)
 		: _Logger(aLogger)
 		, HttpCacheDir(aCommonDir)
 	{

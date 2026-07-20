@@ -15,7 +15,7 @@
 
 namespace Raidcore::Nexus::Host
 {
-	Loader::Loader(CLogApi* aLogger, IADDON_FACTORY aFactoryFunction, std::filesystem::path aDirectory)
+	Loader::Loader(Core::LogApi* aLogger, IADDON_FACTORY aFactoryFunction, std::filesystem::path aDirectory)
 	{
 		this->Logger = aLogger;
 		this->CreateAddon = aFactoryFunction;

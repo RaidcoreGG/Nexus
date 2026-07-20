@@ -54,7 +54,7 @@ struct AddonAPI6_t : AddonAPI_t
 	UPDATER_REQUESTUPDATE                 RequestUpdate;
 
 	/* Logging */
-	LOGGER_LOG2                           Log;
+	Core::LOGGER_LOG2                           Log;
 
 	/* User Interface */
 	struct UIVT
@@ -130,8 +130,8 @@ struct AddonAPI6_t : AddonAPI_t
 	/* DataLink */
 	struct DataLinkVT
 	{
-		DATALINK_GETRESOURCE              Get;
-		DATALINK_SHARERESOURCE            Share;
+		Core::DATALINK_GETRESOURCE              Get;
+		Core::DATALINK_SHARERESOURCE            Share;
 	};
 	DataLinkVT                            DataLink;
 

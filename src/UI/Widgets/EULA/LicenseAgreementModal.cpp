@@ -86,7 +86,7 @@ namespace Raidcore::Nexus::GUI
 	void CLicenseAgreementModal::OnClosing()
 	{
 		Runtime& ctx = Runtime::Get();
-		CSettings& settingsctx = ctx.Core().Settings();
+		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
 
 		switch (this->GetResult())
 		{

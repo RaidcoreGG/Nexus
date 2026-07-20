@@ -33,7 +33,7 @@ namespace Raidcore::Nexus::Network
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
 		Context(
-			CLogApi& aLogger,
+			Core::LogApi& aLogger,
 			std::filesystem::path aCommonDir
 		);
 
@@ -56,7 +56,7 @@ namespace Raidcore::Nexus::Network
 		Network::Updater& Updater();
 
 		private:
-		CLogApi& _Logger;
+		Core::LogApi& _Logger;
 
 		std::unique_ptr<Network::Updater> _Updater{ nullptr };
 

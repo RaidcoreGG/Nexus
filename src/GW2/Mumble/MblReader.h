@@ -36,7 +36,7 @@ namespace Raidcore::Nexus::GW2
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		MumbleReader(CDataLinkApi& aDataLink, Host::EventApi& aEventApi, CLogApi& aLogger);
+		MumbleReader(Core::DataLinkApi& aDataLink, Host::EventApi& aEventApi, Core::LogApi& aLogger);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
@@ -74,9 +74,9 @@ namespace Raidcore::Nexus::GW2
 		NexusLinkData_t* GetNexusLink() const;
 
 		private:
-		CDataLinkApi& DataLinkApi;
+		Core::DataLinkApi& DataLinkApi;
 		Host::EventApi& EventApi;
-		CLogApi& Logger;
+		Core::LogApi& Logger;
 
 		std::string       Name;
 		Mumble::Data*     MumbleLink = nullptr;

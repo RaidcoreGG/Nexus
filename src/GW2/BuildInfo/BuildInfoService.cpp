@@ -2,7 +2,7 @@
 
 namespace Raidcore::Nexus::GW2
 {
-	BuildInfoService::BuildInfoService(Network::CHttpClient& aArenaNetAssetCDN, CLogApi& aLogger)
+	BuildInfoService::BuildInfoService(Network::CHttpClient& aArenaNetAssetCDN, Core::LogApi& aLogger)
 		: _ArenaNetAssetCDN(aArenaNetAssetCDN)
 		, _Logger(aLogger)
 	{}

@@ -25,7 +25,7 @@ namespace Clockwork = Raidcore::Clockwork;
 
 namespace Raidcore::Nexus::Graphics
 {
-	TextureLoader::TextureLoader(CLogApi* aLogger, Graphics::Window_t& aGrWindow, std::filesystem::path aOverridesDirectory)
+	TextureLoader::TextureLoader(Core::LogApi* aLogger, Graphics::Window_t& aGrWindow, std::filesystem::path aOverridesDirectory)
 		: IRefCleaner("TextureLoader")
 		, Logger(aLogger)
 		, GrWindow(aGrWindow)

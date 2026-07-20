@@ -20,9 +20,9 @@
 namespace Raidcore::Nexus::GW2
 {
 	Context::Context(
-		CDataLinkApi&          aDataLink,
+		Core::DataLinkApi&          aDataLink,
 		Host::EventApi&        aEventApi,
-		CLogApi&               aLogger,
+		Core::LogApi&               aLogger,
 		Platform::RawInputApi& aRawInputApi,
 		HWND                   aGameWindow,
 		Network::CHttpClient&  aArenaNetAssetCDN,

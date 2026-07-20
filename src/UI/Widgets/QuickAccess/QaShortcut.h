@@ -133,7 +133,7 @@ namespace Raidcore::Nexus::GUI
 		CInputBindApi* InputBindApi = nullptr;
 		Graphics::TextureLoader* TextureService = nullptr;
 		Host::Loader* Loader = nullptr;
-		CDataLinkApi* DataLink = nullptr;
+		Core::DataLinkApi* DataLink = nullptr;
 		CLocalization* Language = nullptr;
 		NexusLinkData_t* NexusLink = nullptr;
 

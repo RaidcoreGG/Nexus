@@ -26,7 +26,7 @@ using namespace Raidcore::Nexus;
 
 namespace Raidcore::Nexus::GW2
 {
-	MumbleReader::MumbleReader(CDataLinkApi& aDataLink, Host::EventApi& aEventApi, CLogApi& aLogger)
+	MumbleReader::MumbleReader(Core::DataLinkApi& aDataLink, Host::EventApi& aEventApi, Core::LogApi& aLogger)
 		: DataLinkApi(aDataLink)
 		, EventApi(aEventApi)
 		, Logger(aLogger)

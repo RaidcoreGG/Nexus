@@ -58,7 +58,7 @@ namespace Raidcore::Nexus::GUI
 		this->Invalidate();
 
 		Runtime& ctx = Runtime::Get();
-		CSettings& settingsctx = ctx.Core().Settings();
+		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
 		Host::EventApi& evtapi = ctx.Host().Events();
 
 		this->Filter = settingsctx.Get(OPT_ADDONFILTERS, FILTER_INSTALLED);
@@ -303,7 +303,7 @@ namespace Raidcore::Nexus::GUI
 	void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 	{
 		Runtime& ctx = Runtime::Get();
-		CSettings& settingsctx = ctx.Core().Settings();
+		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
 		Graphics::TextureLoader& texapi = ctx.Graphics().Textures();
 		CUiContext* uictx = ctx.GetUIContext();
 		CLocalization* lang = uictx->GetLocalization();
@@ -1036,7 +1036,7 @@ namespace Raidcore::Nexus::GUI
 
 		Runtime& ctx = Runtime::Get();
 		CUiContext* uictx = ctx.GetUIContext();
-		CSettings& settingsctx = ctx.Core().Settings();
+		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
 		Host::Loader& loader = ctx.Host().Loader();
 		Host::LibraryMgr& libMgr = ctx.Host().Library();
 

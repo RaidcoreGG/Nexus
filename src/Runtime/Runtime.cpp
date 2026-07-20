@@ -86,7 +86,7 @@ namespace Raidcore::Nexus
 		Hooks::HookIDXGISwapChain();
 
 		Runtime& ctx = Runtime::Get();
-		CLogApi& logger = ctx.Core().Logger();
+		Core::LogApi& logger = ctx.Core().Logger();
 
 		/* Environment info. */
 		logger.Info(
@@ -108,7 +108,7 @@ namespace Raidcore::Nexus
 		/* Allocate console logger, if requested. */
 		if (CmdLine::HasArgument("-ggconsole"))
 		{
-			static CConsoleLogger console = CConsoleLogger(ELogLevel::ALL);
+			static Core::CConsoleLogger console = Core::CConsoleLogger(Core::ELogLevel::ALL);
 			logger.Register(&console);
 		}
 
@@ -127,7 +127,7 @@ namespace Raidcore::Nexus
 		}
 
 		/* Allocate log writer. */
-		static CFileLogger writer = CFileLogger(ELogLevel::ALL, logpath);
+		static Core::CFileLogger writer = Core::CFileLogger(Core::ELogLevel::ALL, logpath);
 		logger.Register(&writer);
 
 		/* If running vanilla, do not initialize the hooks and leave the mutex unmodified. */
@@ -166,7 +166,7 @@ namespace Raidcore::Nexus
 		}
 
 		Runtime& ctx = Runtime::Get();
-		CLogApi& logger = ctx.Core().Logger();
+		Core::LogApi& logger = ctx.Core().Logger();
 		GUI::CUiContext* uictx = ctx.GetUIContext();
 		Graphics::TextureLoader& texapi = ctx.Graphics().Textures();
 

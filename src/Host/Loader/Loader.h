@@ -37,7 +37,7 @@ namespace Raidcore::Nexus::Host
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
 		Loader(
-			CLogApi* aLogger,
+			Core::LogApi* aLogger,
 			IADDON_FACTORY        aFactoryFunction,
 			std::filesystem::path aDirectory
 		);
@@ -118,7 +118,7 @@ namespace Raidcore::Nexus::Host
 		std::vector<IAddon*> GetAddons() const;
 
 		private:
-		CLogApi* Logger = nullptr;
+		Core::LogApi* Logger = nullptr;
 
 		std::filesystem::path   Directory;
 

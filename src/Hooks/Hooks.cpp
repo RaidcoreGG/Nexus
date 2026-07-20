@@ -94,7 +94,7 @@ namespace Hooks
 			UnregisterClassA(wc.lpszClassName, wc.hInstance);
 
 			Runtime& ctx    = Runtime::Get();
-			CLogApi& logger = ctx.Core().Logger();
+			Core::LogApi& logger = ctx.Core().Logger();
 
 			logger.Critical(CH_CORE, "Failed creating temporary window.");
 			return;
@@ -128,7 +128,7 @@ namespace Hooks
 			LPVOID* vtbl3 = swap3 ? *reinterpret_cast<LPVOID**>(swap3) : nullptr;
 
 			Runtime& ctx = Runtime::Get();
-			CLogApi& logger = ctx.Core().Logger();
+			Core::LogApi& logger = ctx.Core().Logger();
 
 			logger.Debug(CH_CORE, "HOOK BEGIN");
 
@@ -161,7 +161,7 @@ namespace Hooks
 		else
 		{
 			Runtime& ctx = Runtime::Get();
-			CLogApi& logger = ctx.Core().Logger();
+			Core::LogApi& logger = ctx.Core().Logger();
 
 			logger.Critical(CH_CORE, "Failed to create D3D11 device and swapchain.");
 		}
@@ -261,7 +261,7 @@ namespace Hooks
 		void Resize_Internal(uint32_t aWidth, uint32_t aHeight)
 		{
 			static Runtime& s_Context = Runtime::Get();
-			static CDataLinkApi& s_DataLink = s_Context.Core().DataLink();
+			static Core::DataLinkApi& s_DataLink = s_Context.Core().DataLink();
 			static Host::EventApi& s_EventApi = s_Context.Host().Events();
 			static Graphics::Window_t& s_GrWindow = s_Context.Graphics().Window();
 			static GUI::CUiContext* s_UIContext = s_Context.GetUIContext();

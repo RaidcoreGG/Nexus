@@ -23,7 +23,7 @@
 ///----------------------------------------------------------------------------------------------------
 namespace Raidcore::Nexus::GUI
 {
-	class CLogWindow : public virtual ISubWindow, public virtual ILogger
+	class CLogWindow : public virtual ISubWindow, public virtual Core::ILogger
 	{
 		public:
 		CLogWindow();
@@ -33,7 +33,7 @@ namespace Raidcore::Nexus::GUI
 		/// MsgProc:
 		/// 	Message processing function.
 		///----------------------------------------------------------------------------------------------------
-		void MsgProc(const LogMsg_t* aLogEntry) override;
+		void MsgProc(const Core::LogMsg_t* aLogEntry) override;
 
 		private:
 		enum class EMessagePartType
@@ -54,7 +54,7 @@ namespace Raidcore::Nexus::GUI
 
 		struct DisplayLogEntry_t
 		{
-			const LogMsg_t* Entry = nullptr;
+			const Core::LogMsg_t* Entry = nullptr;
 			std::vector<MessagePart_t> Parts;
 		};
 
@@ -65,7 +65,7 @@ namespace Raidcore::Nexus::GUI
 		};
 
 		int                             MaxShownCount = 400;
-		ELogLevel                       FilterLevel = ELogLevel::ALL;
+		Core::ELogLevel                 FilterLevel = Core::ELogLevel::ALL;
 		bool                            SelectedLevelOnly = false;
 
 		std::mutex                      Mutex;

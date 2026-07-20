@@ -39,7 +39,7 @@ namespace Raidcore::Nexus::GUI
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		CLocalization(CLogApi* aLogger);
+		CLocalization(Core::LogApi* aLogger);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
@@ -97,7 +97,7 @@ namespace Raidcore::Nexus::GUI
 		std::vector<const char*> GetAllTexts();
 
 		private:
-		CLogApi* Logger = nullptr;
+		Core::LogApi* Logger = nullptr;
 
 		uint32_t                         ThreadID = 0;
 

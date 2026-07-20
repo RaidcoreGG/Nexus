@@ -68,14 +68,14 @@ namespace Raidcore::Nexus::GUI
 		}
 	}
 
-	CLocalization::CLocalization(CLogApi* aLogger)
+	CLocalization::CLocalization(Core::LogApi* aLogger)
 	{
 		assert(aLogger);
 
 		this->Logger = aLogger;
 
 		Runtime& ctx = Runtime::Get();
-		CSettings& settingsctx = ctx.Core().Settings();
+		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
 		Host::EventApi& evtapi = ctx.Host().Events();
 
 		this->SetLocaleDirectory(Index(EPath::DIR_LOCALES));
