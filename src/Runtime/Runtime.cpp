@@ -8,60 +8,42 @@
 
 #include "Runtime.h"
 
-#include <cstdint>
 #include <filesystem>
 #include <format>
 #include <memory>
-#include <mutex>
-#include <psapi.h>
-#include <stdexcept>
 #include <string>
-#include <vector>
 #include <windows.h>
 
 #include "minhook/mh_hook.h"
 
 #include "thirdparty/Clockwork/Clockwork.h"
-namespace Clockwork = Raidcore::Clockwork;
-
-#include "Runtime/Runtime.h"
-#include "Hooks/Hooks.h"
-#include "Index/Index.h"
-#include "Core/Logging/LogApi.h"
-#include "Core/Logging/LogConsole.h"
-#include "Core/Logging/LogWriter.h"
-#include "GW2/Multibox/Multibox.h"
-#include "res/ResConst.h"
-#include "UI/UiContext.h"
-#include "Util/CmdLine.h"
-#include "Util/Resources.h"
-#include "Branch.h"
-#include "Host/Addons/Addon.h"
-#include "Index/Index.h"
-#include "Util/CmdLine.h"
-#include "Util/Strings.h"
-#include "Util/Dll.h"
-#include "Util/Url.h"
-#include "Version.h"
-#include "Host/Config/CfgManager.h"
-#include "Host/Library/LibManager.h"
-#include "Index/IdxEnum.h"
-#include "Core/Preferences/PrefContext.h"
-#include "Network/Updater/Updater.h"
-#include "Core/Versioning/Version.h"
 #include "thirdparty/Clockwork/Tasks/CancellationToken.h"
 #include "thirdparty/Clockwork/Tasks/ETaskPriority.h"
-#include "Core/DataLink/DlApi.h"
-#include "Host/Events/EvtApi.h"
-#include "Engine/Inputs/InputBinds/IbApi.h"
-#include "Host/Loader/Loader.h"
+
+#include "Branch.h"
+#include "Core/CoContext.h"
+#include "Core/Logging/LogApi.h"
+#include "Core/Logging/LogConsole.h"
 #include "Core/Logging/LogEnum.h"
-#include "Network/WebRequests/WreClient.h"
+#include "Core/Logging/LogWriter.h"
+#include "Core/Versioning/Version.h"
+#include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Graphics/GrContext.h"
 #include "Graphics/Textures/TxLoader.h"
 #include "GW2/Gw2Context.h"
+#include "Hooks/Hooks.h"
+#include "Host/HoContext.h"
+#include "Index/IdxEnum.h"
+#include "Index/Index.h"
+#include "Network/NetContext.h"
 #include "Platform/PlContext.h"
 #include "Proxy/PxyEnum.h"
+#include "res/ResConst.h"
+#include "UI/UiContext.h"
+#include "Util/CmdLine.h"
+#include "Util/Dll.h"
+#include "Util/Resources.h"
+#include "Version.h"
 
 namespace Raidcore::Nexus
 {
@@ -155,10 +137,10 @@ namespace Raidcore::Nexus
 		std::string reasonStr;
 		switch (aReason)
 		{
-			case 1:          { reasonStr = "Reason: DLL_PROCESS_DETACH"; break; }
+			case 1: { reasonStr = "Reason: DLL_PROCESS_DETACH"; break; }
 			case WM_DESTROY: { reasonStr = "Reason: WM_DESTROY";         break; }
-			case WM_CLOSE:   { reasonStr = "Reason: WM_CLOSE";           break; }
-			case WM_QUIT:    { reasonStr = "Reason: WM_QUIT";            break; }
+			case WM_CLOSE: { reasonStr = "Reason: WM_CLOSE";           break; }
+			case WM_QUIT: { reasonStr = "Reason: WM_QUIT";            break; }
 			default:
 			{
 				reasonStr = std::format("Reason: Unknown ({})", aReason);
