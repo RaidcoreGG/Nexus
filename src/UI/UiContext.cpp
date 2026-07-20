@@ -27,7 +27,7 @@ using namespace Raidcore::Nexus;
 #include "Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
 #include "Core/Preferences/PrefContext.h"
-#include "Engine/Inputs/InputBinds/IbConst.h"
+#include "Inputs/InputBinds/IbConst.h"
 #include "GW2/Inputs/GameBinds/GbConst.h"
 #include "GW2/Mumble/MblConst.h"
 #include "GW2/Mumble/MblReader.h"

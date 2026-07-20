@@ -15,8 +15,8 @@
 
 #include "ApiBase.h"
 #include "Core/Logging/LogEnum.h"
-#include "Engine/Inputs/InputBinds/IbBind.h"
-#include "Engine/Inputs/InputBinds/IbFuncDefs.h"
+#include "Inputs/InputBinds/IbBind.h"
+#include "Inputs/InputBinds/IbFuncDefs.h"
 #include "Graphics/Textures/TxFuncDefs.h"
 #include "Graphics/Textures/TxTexture.h"
 #include "GW2/Inputs/GameBinds/GbEnum.h"

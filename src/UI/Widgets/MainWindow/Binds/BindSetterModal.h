@@ -12,7 +12,7 @@
 
 #include "UI/Controls/CtlModal.h"
 #include "UI/UiBinds.h"
-#include "Engine/Inputs/InputBinds/IbBindV2.h"
+#include "Inputs/InputBinds/IbBindV2.h"
 #include "GW2/Inputs/GameBinds/GbEnum.h"
 
 using namespace Raidcore::Nexus;

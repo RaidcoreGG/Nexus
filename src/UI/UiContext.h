@@ -12,7 +12,7 @@
 #include <windows.h>
 
 #include "Core/DataLink/DlApi.h"
-#include "Engine/Inputs/InputBinds/IbApi.h"
+#include "Inputs/InputBinds/IbApi.h"
 #include "Core/Logging/LogApi.h"
 #include "Graphics/GrWindow.h"
 #include "Graphics/Textures/TxLoader.h"

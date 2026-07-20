@@ -13,8 +13,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "Engine/Inputs/InputBinds/IbBindV2.h"
-#include "Engine/Inputs/InputBinds/IbMapping.h"
+#include "Inputs/InputBinds/IbBindV2.h"
+#include "Inputs/InputBinds/IbMapping.h"
 #include "GW2/Inputs/GameBinds/GbEnum.h"
 
 using namespace Raidcore::Nexus;

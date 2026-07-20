@@ -17,7 +17,7 @@
 using namespace Raidcore::Nexus;
 
 #include "Index/Index.h"
-#include "Engine/Inputs/InputBinds/IbMapping.h"
+#include "Inputs/InputBinds/IbMapping.h"
 #include "GW2/Inputs/GameBinds/GbConst.h"
 #include "res/ResConst.h"
 #include "Util/Time.h"

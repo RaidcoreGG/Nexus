@@ -25,7 +25,7 @@ using namespace Raidcore::Nexus;
 #include "Core/NexusLink.h"
 #include "Core/DataLink/DlApi.h"
 #include "Host/Events/EvtApi.h"
-#include "Engine/Inputs/InputBinds/IbApi.h"
+#include "Inputs/InputBinds/IbApi.h"
 #include "Host/Loader/Loader.h"
 #include "Core/Logging/LogApi.h"
 #include "GW2/Inputs/GameBinds/GbApi.h"

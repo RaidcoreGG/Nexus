@@ -18,7 +18,7 @@
 #include "Index/IdxFuncDefs.h"
 #include "Core/DataLink/DlFuncDefs.h"
 #include "Host/Events/EvtFuncDefs.h"
-#include "Engine/Inputs/InputBinds/IbFuncDefs.h"
+#include "Inputs/InputBinds/IbFuncDefs.h"
 #include "Core/Logging/LogFuncDefs.h"
 #include "Platform/RawInput/RiFuncDefs.h"
 #include "Graphics/Textures/TxFuncDefs.h"

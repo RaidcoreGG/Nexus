@@ -17,7 +17,7 @@
 using namespace Raidcore::Nexus;
 
 #include "Host/Events/EvtApi.h"
-#include "Engine/Inputs/InputBinds/IbApi.h"
+#include "Inputs/InputBinds/IbApi.h"
 #include "res/ResConst.h"
 #include "Util/MD5.h"
 #include "Util/Strings.h"

@@ -12,7 +12,7 @@
 using namespace Raidcore::Nexus;
 
 #include "GW2/Inputs/GameBinds/GbConst.h"
-#include "Engine/Inputs/InputBinds/IbConst.h"
+#include "Inputs/InputBinds/IbConst.h"
 
 namespace Raidcore::Nexus::GUI
 {

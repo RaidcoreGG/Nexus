@@ -8,18 +8,14 @@
 
 #pragma once
 
-#include <map>
 #include <memory>
-#include <mutex>
-#include <string>
-#include <windows.h>
 
 #include "Core/CoContext.h"
 #include "Core/Versioning/Version.h"
-#include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Graphics/GrContext.h"
 #include "GW2/Gw2Context.h"
 #include "Host/HoContext.h"
+#include "Inputs/InputBinds/IbApi.h"
 #include "Network/NetContext.h"
 #include "Platform/PlContext.h"
 #include "Proxy/PxyEnum.h"
@@ -76,12 +72,12 @@ namespace Raidcore::Nexus
 		Runtime();
 		~Runtime();
 
-		std::unique_ptr<Core::Context>     _CoreContext    { nullptr };
-		std::unique_ptr<Network::Context>  _NetworkContext { nullptr };
+		std::unique_ptr<Core::Context>     _CoreContext{ nullptr };
+		std::unique_ptr<Network::Context>  _NetworkContext{ nullptr };
 		std::unique_ptr<Platform::Context> _PlatformContext{ nullptr };
-		std::unique_ptr<Host::Context>     _HostContext    { nullptr };
+		std::unique_ptr<Host::Context>     _HostContext{ nullptr };
 		std::unique_ptr<Graphics::Context> _GraphicsContext{ nullptr };
-		std::unique_ptr<GW2::Context>      _GameContext    { nullptr };
-		std::unique_ptr<GUI::Context>      _UiContext      { nullptr };
+		std::unique_ptr<GW2::Context>      _GameContext{ nullptr };
+		std::unique_ptr<GUI::Context>      _UiContext{ nullptr };
 	};
 }

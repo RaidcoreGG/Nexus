@@ -16,7 +16,7 @@
 #include "Core/NexusLink.h"
 #include "Memory/IRefCleaner.h"
 #include "Core/DataLink/DlApi.h"
-#include "Engine/Inputs/InputBinds/IbApi.h"
+#include "Inputs/InputBinds/IbApi.h"
 #include "Host/Loader/Loader.h"
 #include "UI/Services/Localization/LoclApi.h"
 #include "Graphics/Textures/TxLoader.h"
