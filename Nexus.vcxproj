@@ -29,7 +29,7 @@
     <ClCompile Include="src\Engine\Cleanup\RefCleanerContext.cpp" />
     <ClCompile Include="src\Platform\CrashHandler\CrashHandler.cpp" />
     <ClCompile Include="src\Core\Functions\FnRegistry.cpp" />
-    <ClCompile Include="src\Core\Index\Index.cpp" />
+    <ClCompile Include="src\Index\Index.cpp" />
     <ClCompile Include="src\Host\Loader\LdrAddonBase.cpp" />
     <ClCompile Include="src\Host\Loader\Loader.cpp" />
     <ClCompile Include="src\Network\WebRequests\WreCache.cpp" />
@@ -142,8 +142,8 @@
     <ClInclude Include="src\Host\Events\EvtData.h" />
     <ClInclude Include="src\Core\Functions\FnEntry.h" />
     <ClInclude Include="src\Core\Functions\FnRegistry.h" />
-    <ClInclude Include="src\Core\Index\IdxEnum.h" />
-    <ClInclude Include="src\Core\Index\Index.h" />
+    <ClInclude Include="src\Index\IdxEnum.h" />
+    <ClInclude Include="src\Index\Index.h" />
     <ClInclude Include="src\Host\Addons\API\ApiV1.h" />
     <ClInclude Include="src\Host\Addons\API\ApiV2.h" />
     <ClInclude Include="src\Host\Addons\API\ApiV3.h" />
@@ -380,7 +380,7 @@
     <ClInclude Include="thirdparty\minhook\mh_hook.h" />
     <ClInclude Include="thirdparty\minhook\mh_trampoline.h" />
     <ClInclude Include="src\GW2\Mumble\MblReader.h" />
-    <ClInclude Include="src\Core\Index\IdxFuncDefs.h" />
+    <ClInclude Include="src\Index\IdxFuncDefs.h" />
     <ClInclude Include="res\ResConst.h" />
     <ClInclude Include="src\Core\Preferences\PrefContext.h" />
     <ClInclude Include="thirdparty\pugixml\pugiconfig.hpp" />

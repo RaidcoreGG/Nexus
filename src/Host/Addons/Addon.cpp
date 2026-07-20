@@ -18,7 +18,7 @@
 using namespace Raidcore::Nexus;
 
 #include "Host/Addons/API/ApiBuilder.h"
-#include "Core/Index/Index.h"
+#include "Index/Index.h"
 #include "Engine/Cleanup/RefCleanerContext.h"
 #include "Util/DLL.h"
 #include "Util/MD5.h"

@@ -16,7 +16,7 @@
 #include "Runtime/Runtime.h"
 using namespace Raidcore::Nexus;
 
-#include "Core/Index/Index.h"
+#include "Index/Index.h"
 #include "Engine/Inputs/InputBinds/IbMapping.h"
 #include "GW2/Inputs/GameBinds/GbConst.h"
 #include "res/ResConst.h"

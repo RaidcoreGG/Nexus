@@ -24,7 +24,7 @@ using namespace Raidcore::Nexus;
 
 #include "Host/Addons/AddConst.h"
 #include "Host/Addons/Addon.h"
-#include "Core/Index/Index.h"
+#include "Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
 #include "Core/Preferences/PrefContext.h"
 #include "Engine/Inputs/InputBinds/IbConst.h"

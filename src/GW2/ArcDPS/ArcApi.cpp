@@ -11,7 +11,7 @@
 #include "Runtime/Runtime.h"
 
 #include "ArcExtensionDef.h"
-#include "Core/Index/Index.h"
+#include "Index/Index.h"
 #include "Util/DLL.h"
 
 namespace Raidcore::Nexus::GW2

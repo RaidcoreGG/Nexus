@@ -11,7 +11,7 @@
 #include "Runtime/Runtime.h"
 using namespace Raidcore::Nexus;
 
-#include "Core/Index/Index.h"
+#include "Index/Index.h"
 #include "Util/Paths.h"
 
 namespace Raidcore::Nexus::Network

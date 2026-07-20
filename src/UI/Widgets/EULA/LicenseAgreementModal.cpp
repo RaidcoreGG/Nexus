@@ -18,7 +18,7 @@
 #include "Runtime/Runtime.h"
 using namespace Raidcore::Nexus;
 
-#include "Core/Index/Index.h"
+#include "Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
 
 namespace Raidcore::Nexus::GUI

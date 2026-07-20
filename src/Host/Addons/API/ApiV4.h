@@ -15,7 +15,7 @@
 #include "thirdparty/imgui/imgui.h"
 #include "thirdparty/minhook/mh_hook.h"
 
-#include "Core/Index/IdxFuncDefs.h"
+#include "Index/IdxFuncDefs.h"
 #include "Core/DataLink/DlFuncDefs.h"
 #include "Host/Events/EvtFuncDefs.h"
 #include "Engine/Inputs/InputBinds/IbFuncDefs.h"

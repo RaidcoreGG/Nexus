@@ -17,7 +17,7 @@
 using namespace Raidcore::Nexus;
 
 #include "Host/Library/LibAddon.h"
-#include "Core/Index/Index.h"
+#include "Index/Index.h"
 #include "CtlAddonToggle.h"
 #include "res/ResConst.h"
 #include "Util/Strings.h"

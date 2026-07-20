@@ -33,7 +33,7 @@ using namespace Raidcore::Nexus;
 #include "ApiV6.h"
 #include "ApiBase.h"
 #include "Core/Logging/LogEnum.h"
-#include "Core/Index/Index.h"
+#include "Index/Index.h"
 #include "Engine/Inputs/InputBinds/IbBind.h"
 #include "Engine/Inputs/InputBinds/IbFuncDefs.h"
 #include "Graphics/Textures/TxFuncDefs.h"
