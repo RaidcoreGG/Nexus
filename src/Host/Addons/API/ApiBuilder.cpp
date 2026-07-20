@@ -67,19 +67,19 @@ namespace Raidcore::Nexus::Host::API
 {
 	static bool                       s_IsInitialized = false;
 
-	static Core::DataLinkApi*        s_DataLinkApi   = nullptr;
+	static Core::DataLinkApi*         s_DataLinkApi   = nullptr;
 	static Host::EventApi*            s_EventApi      = nullptr;
 	static GW2::GameBindsApi*         s_GameBindsApi  = nullptr;
 	static CInputBindApi*             s_InputBindApi  = nullptr;
 	static Platform::RawInputApi*     s_RawInputApi   = nullptr;
 	static Nexus::GUI::CLocalization* s_Localization  = nullptr;
-	static Core::LogApi*             s_Logger        = nullptr;
+	static Core::LogApi*              s_Logger        = nullptr;
 	static Graphics::TextureLoader*   s_TextureApi    = nullptr;
 	static Host::Loader*              s_Loader        = nullptr;
 	static Graphics::Window_t*        s_GrWindow      = nullptr;
 	static GW2::ArcdpsApi*            s_ArcApi        = nullptr;
 
-	static Nexus::GUI::CUiContext*             s_UiContext     = nullptr;
+	static Nexus::GUI::Context*             s_UiContext     = nullptr;
 	static Nexus::GUI::CFontManager*           s_FontManager   = nullptr;
 	static Nexus::GUI::CAlerts*                s_Alerts        = nullptr;
 	static Nexus::GUI::CQuickAccess*           s_QuickAccess   = nullptr;
@@ -591,7 +591,7 @@ namespace Raidcore::Nexus::Host::API
 			s_DataLinkApi   = &ctx.Core().DataLink();
 			s_EventApi      = &ctx.Host().Events();
 			s_GameBindsApi  = &ctx.Game().GameBinds();
-			s_InputBindApi  = ctx.GetInputBindApi();
+			s_InputBindApi  = ctx.InputBinds();
 			s_RawInputApi   = &ctx.Platform().RawInput();
 			s_Logger        = &ctx.Core().Logger();
 			s_TextureApi    = &ctx.Graphics().Textures();
@@ -599,7 +599,7 @@ namespace Raidcore::Nexus::Host::API
 			s_GrWindow      = &ctx.Graphics().Window();
 			s_ArcApi        = &ctx.Game().Arcdps();
 
-			s_UiContext     = ctx.GetUIContext();
+			s_UiContext     = &ctx.UI();
 			s_FontManager   = s_UiContext->GetFontManager();
 			s_Alerts        = s_UiContext->GetAlerts();
 			s_QuickAccess   = s_UiContext->GetQuickAccess();

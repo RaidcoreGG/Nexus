@@ -23,8 +23,8 @@ namespace Raidcore::Nexus::GUI
 	void CLoadConfirmationModal::RenderContent()
 	{
 		Runtime& ctx = Runtime::Get();
-		CUiContext* uictx = ctx.GetUIContext();
-		CLocalization* lang = uictx->GetLocalization();
+		Context& uictx = ctx.UI();
+		CLocalization* lang = uictx.GetLocalization();
 
 		ImGui::Text(lang->Translate("((000116))"));
 
@@ -87,8 +87,8 @@ namespace Raidcore::Nexus::GUI
 	void CLoadConfirmationModal::SetTitle()
 	{
 		Runtime& ctx = Runtime::Get();
-		CUiContext* uictx = ctx.GetUIContext();
-		CLocalization* lang = uictx->GetLocalization();
+		Context& uictx = ctx.UI();
+		CLocalization* lang = uictx.GetLocalization();
 
 		/* Override the title before opening the modal. */
 		std::string title = lang->Translate("((Load addon: ))");

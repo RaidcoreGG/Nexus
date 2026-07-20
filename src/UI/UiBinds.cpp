@@ -61,7 +61,7 @@ namespace Raidcore::Nexus::GUI
 		this->DisplayInputBinds.clear();
 
 		Runtime& ctx = Runtime::Get();
-		CInputBindApi* inputBindApi = ctx.GetInputBindApi();
+		CInputBindApi* inputBindApi = ctx.InputBinds();
 		Host::Loader& loader = ctx.Host().Loader();
 
 		/* copy of all InputBinds */

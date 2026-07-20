@@ -82,7 +82,7 @@ namespace Raidcore::Nexus::GUI
 	{
 		Runtime& ctx = Runtime::Get();
 		Core::LogApi* logger = &ctx.Core().Logger();
-		CInputBindApi* ibapi = ctx.GetInputBindApi();
+		CInputBindApi* ibapi = ctx.InputBinds();
 		Host::EventApi* evtapi = &ctx.Host().Events();
 
 		CAddonsWindow* addonsWnd = new CAddonsWindow();
@@ -290,8 +290,8 @@ namespace Raidcore::Nexus::GUI
 					//navY += navItemSz.y + padding.y;
 				}
 
-				static CUiContext* uictx = ctx.GetUIContext();
-				static CLocalization* langApi = uictx->GetLocalization();
+				static Context& uictx = ctx.UI();
+				static CLocalization* langApi = uictx.GetLocalization();
 
 				/* Dynamic Nav Items */
 				for (ISubWindow* window : this->Windows)

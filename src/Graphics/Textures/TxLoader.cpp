@@ -32,7 +32,6 @@ namespace Raidcore::Nexus::Graphics
 		, OverridesDirectory(aOverridesDirectory)
 	{
 		assert(aLogger);
-		assert(aRenderCtx);
 
 		this->TextureWorker = Clockwork::Dispatcher<void>{[this](Clockwork::CancellationToken aToken)
 		{

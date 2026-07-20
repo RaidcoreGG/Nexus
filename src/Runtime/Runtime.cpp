@@ -167,12 +167,12 @@ namespace Raidcore::Nexus
 
 		Runtime& ctx = Runtime::Get();
 		Core::LogApi& logger = ctx.Core().Logger();
-		GUI::CUiContext* uictx = ctx.GetUIContext();
+		GUI::Context& uictx = ctx.UI();
 		Graphics::TextureLoader& texapi = ctx.Graphics().Textures();
 
 		logger.Critical(CH_CORE, "SHUTDOWN BEGIN | %s", reasonStr.c_str());
 		MH_Uninitialize();
-		uictx->Shutdown();
+		uictx.Shutdown();
 		texapi.Shutdown();
 		logger.Info(CH_CORE, "SHUTDOWN END");
 
@@ -239,7 +239,7 @@ namespace Raidcore::Nexus
 		return *this->_GameContext;
 	}
 
-	CInputBindApi* Runtime::GetInputBindApi()
+	CInputBindApi* Runtime::InputBinds()
 	{
 		static CInputBindApi s_InputBindApi = CInputBindApi(
 			&this->Host().Events(),
@@ -249,18 +249,22 @@ namespace Raidcore::Nexus
 		return &s_InputBindApi;
 	}
 
-	GUI::CUiContext* Runtime::GetUIContext()
+	GUI::Context& Runtime::UI()
 	{
-		static GUI::CUiContext s_UiContext = GUI::CUiContext(
-			this->Graphics().Window(),
-			&this->Core().Logger(),
-			this->Graphics().Textures(),
-			&this->Core().DataLink(),
-			this->GetInputBindApi(),
-			this->Host().Events(),
-			this->Game().Mumble()
-		);
-		return &s_UiContext;
+		if (!this->_UiContext)
+		{
+			this->_UiContext = std::make_unique<GUI::Context>(
+				this->Graphics().Window(),
+				&this->Core().Logger(),
+				this->Graphics().Textures(),
+				&this->Core().DataLink(),
+				this->InputBinds(),
+				this->Host().Events(),
+				this->Game().Mumble()
+			);
+		}
+
+		return *this->_UiContext;
 	}
 
 	Runtime::Runtime()

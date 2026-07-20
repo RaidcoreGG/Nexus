@@ -93,9 +93,9 @@ namespace Raidcore::Nexus::GW2
 		s_GameBindsApi->Set(kbChange->Identifier, ib, kbChange->Index == 0, true);
 
 		Runtime& ctx = Runtime::Get();
-		GUI::CUiContext* uictx = ctx.GetUIContext();
+		GUI::Context& uictx = ctx.UI();
 
-		uictx->Invalidate();
+		uictx.Invalidate();
 	}
 
 	GameBindsApi::GameBindsApi(

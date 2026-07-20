@@ -76,8 +76,8 @@ namespace Raidcore::Nexus::GUI
 		assert(!this->GetDisplayName().empty());
 
 		Runtime& ctx = Runtime::Get();
-		CUiContext* uictx = ctx.GetUIContext();
-		CLocalization* lang = uictx->GetLocalization();
+		Context& uictx = ctx.UI();
+		CLocalization* lang = uictx.GetLocalization();
 
 		return std::string{ lang->Translate(this->GetDisplayName().c_str()) } + "##" + this->ID;
 	}

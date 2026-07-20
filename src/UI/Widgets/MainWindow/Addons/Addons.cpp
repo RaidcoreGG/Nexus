@@ -89,10 +89,10 @@ namespace Raidcore::Nexus::GUI
 	void CAddonsWindow::SetContent(AddonListing_t& aAddonData)
 	{
 		Runtime& ctx = Runtime::Get();
-		CUiContext* uictx = ctx.GetUIContext();
+		Context& uictx = ctx.UI();
 
 		this->AddonData = aAddonData;
-		this->AddonData.InputBinds = uictx->GetInputBinds(this->AddonData.GetName());
+		this->AddonData.InputBinds = uictx.GetInputBinds(this->AddonData.GetName());
 		this->HasContent = true;
 	}
 
@@ -129,12 +129,12 @@ namespace Raidcore::Nexus::GUI
 		}
 
 		static Runtime& ctx = Runtime::Get();
-		static CUiContext* uictx = ctx.GetUIContext();
+		static Context& uictx = ctx.UI();
 		static Host::ConfigMgr& cfgmgr = ctx.Host().Config();
 		static Host::LibraryMgr& libmgr = ctx.Host().Library();
 		static Graphics::TextureLoader& texapi = ctx.Graphics().Textures();
-		static CLocalization* langApi = uictx->GetLocalization();
-		static CAlerts* alertctx = uictx->GetAlerts();
+		static CLocalization* langApi = uictx.GetLocalization();
+		static CAlerts* alertctx = uictx.GetAlerts();
 
 		/* For the status bar, data will be set within the child.*/
 		bool drawStatusBar = false;
@@ -264,8 +264,8 @@ namespace Raidcore::Nexus::GUI
 		if (this->IsInvalid)
 		{
 			static Runtime& ctx = Runtime::Get();
-			static CUiContext* uictx = ctx.GetUIContext();
-			static CEscapeClosing* escclose = uictx->GetEscapeClosingService();
+			static Context& uictx = ctx.UI();
+			static CEscapeClosing* escclose = uictx.GetEscapeClosingService();
 
 			escclose->Deregister(this->GetVisibleStatePtr());
 			escclose->Register(this->GetNameID().c_str(), this->GetVisibleStatePtr());
@@ -305,8 +305,8 @@ namespace Raidcore::Nexus::GUI
 		Runtime& ctx = Runtime::Get();
 		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
 		Graphics::TextureLoader& texapi = ctx.Graphics().Textures();
-		CUiContext* uictx = ctx.GetUIContext();
-		CLocalization* lang = uictx->GetLocalization();
+		Context& uictx = ctx.UI();
+		CLocalization* lang = uictx.GetLocalization();
 
 		ImGuiStyle& style = ImGui::GetStyle();
 
@@ -493,8 +493,8 @@ namespace Raidcore::Nexus::GUI
 	void CAddonsWindow::RenderBody(ImVec2 aSize)
 	{
 		Runtime& ctx = Runtime::Get();
-		CUiContext* uictx = ctx.GetUIContext();
-		CLocalization* lang = uictx->GetLocalization();
+		Context& uictx = ctx.UI();
+		CLocalization* lang = uictx.GetLocalization();
 
 		ImGuiStyle& style = ImGui::GetStyle();
 
@@ -580,8 +580,8 @@ namespace Raidcore::Nexus::GUI
 		if (ImGui::BeginChild("Details_Content", ImVec2(0, 0), false, ImGuiWindowFlags_NoBackground))
 		{
 			Runtime& ctx = Runtime::Get();
-			CUiContext* uictx = ctx.GetUIContext();
-			CLocalization* langApi = uictx->GetLocalization();
+			Context& uictx = ctx.UI();
+			CLocalization* langApi = uictx.GetLocalization();
 
 			std::string id;
 
@@ -657,7 +657,7 @@ namespace Raidcore::Nexus::GUI
 
 										CContext* ctx = CContext::GetContext();
 										CUpdater* updater = ctx.GetUpdater();
-										CUiContext* uictx = ctx.GetUIContext();
+										Context* uictx = ctx.UI();
 										CAlerts* alertctx = uictx->GetAlerts();
 										CLocalization* langApi = uictx->GetLocalization();
 										Loader* loader = ctx.GetLoader();
@@ -859,8 +859,8 @@ namespace Raidcore::Nexus::GUI
 		Runtime& ctx = Runtime::Get();
 		Graphics::TextureLoader& texapi = ctx.Graphics().Textures();
 		Host::Loader& loader = ctx.Host().Loader();
-		CUiContext* uictx = ctx.GetUIContext();
-		CLocalization* lang = uictx->GetLocalization();
+		Context& uictx = ctx.UI();
+		CLocalization* lang = uictx.GetLocalization();
 
 		if (ImGui::BeginChild("Actions", aSize, false, ImGuiWindowFlags_NoBackground))
 		{
@@ -927,7 +927,7 @@ namespace Raidcore::Nexus::GUI
 								};
 
 								CContext* ctx = CContext::GetContext();
-								CUiContext* uictx = ctx.GetUIContext();
+								Context* uictx = ctx.UI();
 								CLocalization* langApi = uictx->GetLocalization();
 								CUpdater* updater = ctx.GetUpdater();
 								CAlerts* alertctx = uictx->GetAlerts();
@@ -1008,8 +1008,8 @@ namespace Raidcore::Nexus::GUI
 		if (ImGui::BeginTable("table_inputbinds_addons", 2, ImGuiTableFlags_BordersInnerH))
 		{
 			Runtime& ctx = Runtime::Get();
-			CUiContext* uictx = ctx.GetUIContext();
-			CLocalization* langApi = uictx->GetLocalization();
+			Context& uictx = ctx.UI();
+			CLocalization* langApi = uictx.GetLocalization();
 
 			for (auto& [identifier, inputBind] : aInputBinds)
 			{
@@ -1035,7 +1035,7 @@ namespace Raidcore::Nexus::GUI
 		this->Addons.clear();
 
 		Runtime& ctx = Runtime::Get();
-		CUiContext* uictx = ctx.GetUIContext();
+		Context& uictx = ctx.UI();
 		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
 		Host::Loader& loader = ctx.Host().Loader();
 		Host::LibraryMgr& libMgr = ctx.Host().Library();
@@ -1047,7 +1047,7 @@ namespace Raidcore::Nexus::GUI
 			AddonListing_t addonlisting{};
 			addonlisting.Addon = dynamic_cast<CAddon*>(addon);
 
-			for (GUI_RENDER renderCb : uictx->GetRenderCallbacks(ERenderType::OptionsRender))
+			for (GUI_RENDER renderCb : uictx.GetRenderCallbacks(ERenderType::OptionsRender))
 			{
 				Host::IAddon* owner = loader.GetOwner(renderCb);
 				if (addon == owner)

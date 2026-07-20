@@ -38,17 +38,17 @@ namespace Raidcore::Nexus::GUI
 	void CBindsWindow::RenderContent()
 	{
 		Runtime& ctx = Runtime::Get();
-		CUiContext* uictx = ctx.GetUIContext();
-		CEscapeClosing* escclose = uictx->GetEscapeClosingService();
-		CLocalization* langApi = uictx->GetLocalization();
+		Context& uictx = ctx.UI();
+		CEscapeClosing* escclose = uictx.GetEscapeClosingService();
+		CLocalization* langApi = uictx.GetLocalization();
 
 		if (this->IsInvalid)
 		{
 			escclose->Deregister(this->GetVisibleStatePtr());
 			escclose->Register(this->GetNameID().c_str(), this->GetVisibleStatePtr());
 
-			this->IBCategories = uictx->GetInputBinds();
-			this->GIBCategories = uictx->GetGameBinds();
+			this->IBCategories = uictx.GetInputBinds();
+			this->GIBCategories = uictx.GetGameBinds();
 
 			this->IsInvalid = false;
 		}
@@ -142,8 +142,8 @@ namespace Raidcore::Nexus::GUI
 								gameBindsApi->Load(path);
 
 								/* Trigger refresh for display binds. */
-								CUiContext* uictx = ctx.GetUIContext();
-								uictx->Invalidate();
+								Context& uictx = ctx.UI();
+								uictx.Invalidate();
 							}
 						}
 						ImGui::EndCombo();
@@ -179,8 +179,8 @@ namespace Raidcore::Nexus::GUI
 		if (ImGui::BeginTable("table_inputbinds", 4, ImGuiTableFlags_BordersInnerH))
 		{
 			Runtime& ctx = Runtime::Get();
-			CUiContext* uictx = ctx.GetUIContext();
-			CLocalization* langApi = uictx->GetLocalization();
+			Context& uictx = ctx.UI();
+			CLocalization* langApi = uictx.GetLocalization();
 
 			for (auto& [identifier, inputBind] : aInputBinds)
 			{
@@ -199,7 +199,7 @@ namespace Raidcore::Nexus::GUI
 				ImGui::TableSetColumnIndex(2);
 				if (ImGui::Checkbox(("##Passthrough_" + identifier).c_str(), &inputBind.Bind.Passthrough))
 				{
-					CInputBindApi* ibapi = ctx.GetInputBindApi();
+					CInputBindApi* ibapi = ctx.InputBinds();
 					ibapi->SetPassthrough(identifier, inputBind.Bind.Passthrough);
 				}
 				ImGui::TooltipGeneric(langApi->Translate("((000115))"));
@@ -226,8 +226,8 @@ namespace Raidcore::Nexus::GUI
 		if (ImGui::BeginTable("table_gameinputbinds", 3, ImGuiTableFlags_BordersInnerH))
 		{
 			Runtime& ctx = Runtime::Get();
-			CUiContext* uictx = ctx.GetUIContext();
-			CLocalization* langApi = uictx->GetLocalization();
+			Context& uictx = ctx.UI();
+			CLocalization* langApi = uictx.GetLocalization();
 
 			for (auto& [identifier, inputBind] : aInputBinds)
 			{
@@ -261,7 +261,7 @@ namespace Raidcore::Nexus::GUI
 		if (aIdentifier.empty()) { return; }
 
 		Runtime& ctx = Runtime::Get();
-		CInputBindApi* inputBindApi = ctx.GetInputBindApi();
+		CInputBindApi* inputBindApi = ctx.InputBinds();
 
 		inputBindApi->Delete(aIdentifier);
 	}

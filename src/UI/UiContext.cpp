@@ -40,18 +40,18 @@ using namespace Raidcore::Nexus;
 
 namespace Raidcore::Nexus::GUI
 {
-	/*static*/ void CUiContext::OnInputBindPressed(const char* aIdentifier)
+	/*static*/ void Context::OnInputBindPressed(const char* aIdentifier)
 	{
 		Runtime& ctx = Runtime::Get();
-		CUiContext* uictx = ctx.GetUIContext();
+		Context& uictx = ctx.UI();
 
 		if (aIdentifier == KB_TOGGLEHIDEUI)
 		{
-			uictx->IsVisible = !uictx->IsVisible;
+			uictx.IsVisible = !uictx.IsVisible;
 		}
 	}
 
-	/*static*/ void CUiContext::OnFontUpdate(const char* aIdentifier, ImFont* aFont)
+	/*static*/ void Context::OnFontUpdate(const char* aIdentifier, ImFont* aFont)
 	{
 		std::string str = aIdentifier;
 
@@ -108,13 +108,13 @@ namespace Raidcore::Nexus::GUI
 		}
 	}
 
-	/*static*/ void CUiContext::OnMumbleIdentityChanged(void* aEventArgs)
+	/*static*/ void Context::OnMumbleIdentityChanged(void* aEventArgs)
 	{
 		Runtime& ctx = Runtime::Get();
 		Core::DataLinkApi* dlapi = &ctx.Core().DataLink();
 		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
-		CUiContext* uictx = ctx.GetUIContext();
-		CFontManager* fontmgr = uictx->GetFontManager();
+		Context& uictx = ctx.UI();
+		CFontManager* fontmgr = uictx.GetFontManager();
 
 		Mumble::Identity* mumbleIdentity = static_cast<Mumble::Identity*>(dlapi->GetResource(DL_MUMBLE_LINK_IDENTITY));
 		NexusLinkData_t* nexusLink = static_cast<NexusLinkData_t*>(dlapi->GetResource(DL_NEXUS_LINK));
@@ -153,18 +153,15 @@ namespace Raidcore::Nexus::GUI
 		}
 	}
 
-	/*static*/ void CUiContext::OnInputBindUpdate(void* aEventData)
+	/*static*/ void Context::OnInputBindUpdate(void* aEventData)
 	{
 		Runtime& ctx = Runtime::Get();
-		CUiContext* uictx = ctx.GetUIContext();
+		Context& uictx = ctx.UI();
 
-		if (uictx)
-		{
-			uictx->Invalidate();
-		}
+		uictx.Invalidate();
 	}
 
-	CUiContext::CUiContext(
+	Context::Context(
 		Graphics::Window_t& aGrWindow,
 		Core::LogApi* aLogger,
 		Graphics::TextureLoader& aTextureService,
@@ -194,22 +191,22 @@ namespace Raidcore::Nexus::GUI
 		this->Scaling = new CScaling(Runtime::Get().Platform().Window(), GrWindow, aDataLink, aEventApi, &Runtime::Get().Core().Settings()); // FIXME: What the fuck, why is the settingsctx not included here?
 		this->Input = new CUiInput(&Runtime::Get().Core().Settings());
 
-		this->EventApi.Subscribe(EV_MUMBLE_IDENTITY_UPDATED, CUiContext::OnMumbleIdentityChanged);
-		this->EventApi.Subscribe("EV_INPUTBIND_UPDATED", CUiContext::OnInputBindUpdate);
+		this->EventApi.Subscribe(EV_MUMBLE_IDENTITY_UPDATED, Context::OnMumbleIdentityChanged);
+		this->EventApi.Subscribe("EV_INPUTBIND_UPDATED", Context::OnInputBindUpdate);
 
-		this->InputBindApi->Register(KB_TOGGLEHIDEUI, EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "CTRL+H");
+		this->InputBindApi->Register(KB_TOGGLEHIDEUI, EIbHandlerType::DownAsync, Context::OnInputBindPressed, "CTRL+H");
 		this->EscapeClose->Register("Nexus", this->MainWindow->GetVisibleStatePtr());
 
 		this->ApplyStyle();
 		this->LoadFonts();
 	}
 
-	CUiContext::~CUiContext()
+	Context::~Context()
 	{
 		ImGui::DestroyContext();
 	}
 
-	void CUiContext::Initialize()
+	void Context::Initialize()
 	{
 		if (this->IsInitialized)
 		{
@@ -218,7 +215,7 @@ namespace Raidcore::Nexus::GUI
 
 		if (!(Runtime::Get().Platform().Window() && this->GrWindow.SwapChain))
 		{
-			this->Logger->Critical(CH_UICONTEXT, "CUiContext::Initialize() failed. A RenderContext component was nullptr.");
+			this->Logger->Critical(CH_UICONTEXT, "Context::Initialize() failed. A RenderContext component was nullptr.");
 			return;
 		}
 
@@ -228,7 +225,7 @@ namespace Raidcore::Nexus::GUI
 
 		if (!pBackBuffer)
 		{
-			this->Logger->Critical(CH_UICONTEXT, "CUiContext::Initialize() failed. BackBuffer was nullptr.");
+			this->Logger->Critical(CH_UICONTEXT, "Context::Initialize() failed. BackBuffer was nullptr.");
 			return;
 		}
 
@@ -247,7 +244,7 @@ namespace Raidcore::Nexus::GUI
 
 		if (!this->GrWindow.RenderTarget)
 		{
-			this->Logger->Critical(CH_UICONTEXT, "CUiContext::Initialize() failed. RenderTargetView could not be created.");
+			this->Logger->Critical(CH_UICONTEXT, "Context::Initialize() failed. RenderTargetView could not be created.");
 			return;
 		}
 
@@ -261,7 +258,7 @@ namespace Raidcore::Nexus::GUI
 		this->IsInitialized = true;
 	}
 
-	void CUiContext::Shutdown()
+	void Context::Shutdown()
 	{
 		if (!this->IsInitialized)
 		{
@@ -280,7 +277,7 @@ namespace Raidcore::Nexus::GUI
 		this->IsInitialized = false;
 	}
 
-	void CUiContext::Render()
+	void Context::Render()
 	{
 		this->Initialize();
 
@@ -292,7 +289,7 @@ namespace Raidcore::Nexus::GUI
 		}
 		if (this->FontManager->Advance())
 		{
-			CUiContext::OnMumbleIdentityChanged(nullptr);
+			Context::OnMumbleIdentityChanged(nullptr);
 			this->Shutdown();
 		}
 
@@ -387,12 +384,12 @@ namespace Raidcore::Nexus::GUI
 		}
 	}
 
-	void CUiContext::Invalidate()
+	void Context::Invalidate()
 	{
 		this->IsInvalid = true;
 	}
 
-	UINT CUiContext::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	UINT Context::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		if (!this->IsInitialized)
 		{
@@ -412,32 +409,32 @@ namespace Raidcore::Nexus::GUI
 		return uMsg;
 	}
 
-	CLocalization* CUiContext::GetLocalization()
+	CLocalization* Context::GetLocalization()
 	{
 		return this->Language;
 	}
 
-	CAlerts* CUiContext::GetAlerts()
+	CAlerts* Context::GetAlerts()
 	{
 		return this->Alerts;
 	}
 
-	CQuickAccess* CUiContext::GetQuickAccess()
+	CQuickAccess* Context::GetQuickAccess()
 	{
 		return this->QuickAccess;
 	}
 
-	CFontManager* CUiContext::GetFontManager()
+	CFontManager* Context::GetFontManager()
 	{
 		return this->FontManager;
 	}
 
-	CEscapeClosing* CUiContext::GetEscapeClosingService()
+	CEscapeClosing* Context::GetEscapeClosingService()
 	{
 		return this->EscapeClose;
 	}
 
-	void CUiContext::LoadFonts()
+	void Context::LoadFonts()
 	{
 		std::filesystem::path fontPath{};
 
@@ -453,12 +450,12 @@ namespace Raidcore::Nexus::GUI
 		if (!fontFile.empty() && std::filesystem::exists(Index(EPath::DIR_FONTS) / fontFile))
 		{
 			fontPath = Index(EPath::DIR_FONTS) / fontFile;
-			this->FontManager->ReplaceFont("FONT_DEFAULT", storedFontSz, fontPath.string().c_str(), CUiContext::OnFontUpdate, nullptr);
+			this->FontManager->ReplaceFont("FONT_DEFAULT", storedFontSz, fontPath.string().c_str(), Context::OnFontUpdate, nullptr);
 			hasUserFont = true;
 		}
 
 		/* add default font for monospace */
-		this->FontManager->AddDefaultFont(CUiContext::OnFontUpdate);
+		this->FontManager->AddDefaultFont(Context::OnFontUpdate);
 
 		if (!hasUserFont)
 		{
@@ -469,35 +466,35 @@ namespace Raidcore::Nexus::GUI
 		config.MergeMode = true;
 
 		/* small UI*/
-		this->FontManager->ReplaceFont("MENOMONIA_S", 16.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), CUiContext::OnFontUpdate, nullptr);
-		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_S_MERGE", 16.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-		this->FontManager->ReplaceFont("MENOMONIA_BIG_S", 22.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), CUiContext::OnFontUpdate, nullptr);
-		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_S_MERGE", 22.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-		this->FontManager->ReplaceFont("FIRASANS_S", 15.0f, RES_FONT_FIRASANS, ctx.Platform().Module(), CUiContext::OnFontUpdate, nullptr);
-		if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_S_MERGE", 15.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
+		this->FontManager->ReplaceFont("MENOMONIA_S", 16.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_S_MERGE", 16.0f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
+		this->FontManager->ReplaceFont("MENOMONIA_BIG_S", 22.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_S_MERGE", 22.0f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
+		this->FontManager->ReplaceFont("FIRASANS_S", 15.0f, RES_FONT_FIRASANS, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_S_MERGE", 15.0f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
 
 		/* normal UI*/
-		this->FontManager->ReplaceFont("MENOMONIA_N", 18.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), CUiContext::OnFontUpdate, nullptr);
-		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_N_MERGE", 18.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-		this->FontManager->ReplaceFont("MENOMONIA_BIG_N", 24.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), CUiContext::OnFontUpdate, nullptr);
-		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_N_MERGE", 24.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-		this->FontManager->ReplaceFont("FIRASANS_N", 16.0f, RES_FONT_FIRASANS, ctx.Platform().Module(), CUiContext::OnFontUpdate, nullptr);
-		if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_N_MERGE", 16.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
+		this->FontManager->ReplaceFont("MENOMONIA_N", 18.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_N_MERGE", 18.0f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
+		this->FontManager->ReplaceFont("MENOMONIA_BIG_N", 24.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_N_MERGE", 24.0f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
+		this->FontManager->ReplaceFont("FIRASANS_N", 16.0f, RES_FONT_FIRASANS, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_N_MERGE", 16.0f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
 
 		/* large UI*/
-		this->FontManager->ReplaceFont("MENOMONIA_L", 20.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), CUiContext::OnFontUpdate, nullptr);
-		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_L_MERGE", 20.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-		this->FontManager->ReplaceFont("MENOMONIA_BIG_L", 26.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), CUiContext::OnFontUpdate, nullptr);
-		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_L_MERGE", 26.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-		this->FontManager->ReplaceFont("FIRASANS_L", 17.5f, RES_FONT_FIRASANS, ctx.Platform().Module(), CUiContext::OnFontUpdate, nullptr);
-		if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_L_MERGE", 17.5f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
+		this->FontManager->ReplaceFont("MENOMONIA_L", 20.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_L_MERGE", 20.0f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
+		this->FontManager->ReplaceFont("MENOMONIA_BIG_L", 26.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_L_MERGE", 26.0f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
+		this->FontManager->ReplaceFont("FIRASANS_L", 17.5f, RES_FONT_FIRASANS, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_L_MERGE", 17.5f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
 
 		/* larger UI*/
-		this->FontManager->ReplaceFont("MENOMONIA_XL", 22.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), CUiContext::OnFontUpdate, nullptr);
-		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_XL_MERGE", 22.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-		this->FontManager->ReplaceFont("MENOMONIA_BIG_XL", 28.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), CUiContext::OnFontUpdate, nullptr);
-		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_XL_MERGE", 28.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-		this->FontManager->ReplaceFont("FIRASANS_XL", 19.5f, RES_FONT_FIRASANS, ctx.Platform().Module(), CUiContext::OnFontUpdate, nullptr);
-		if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_XL_MERGE", 19.5f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
+		this->FontManager->ReplaceFont("MENOMONIA_XL", 22.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_XL_MERGE", 22.0f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
+		this->FontManager->ReplaceFont("MENOMONIA_BIG_XL", 28.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_XL_MERGE", 28.0f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
+		this->FontManager->ReplaceFont("FIRASANS_XL", 19.5f, RES_FONT_FIRASANS, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_XL_MERGE", 19.5f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
 	}
 }

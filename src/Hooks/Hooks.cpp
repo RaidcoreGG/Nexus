@@ -184,10 +184,10 @@ namespace Hooks
 		LRESULT __stdcall WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			static Runtime&               s_Context      = Runtime::Get();
-			static CInputBindApi*         s_InputBindApi = s_Context.GetInputBindApi();
+			static CInputBindApi*         s_InputBindApi = s_Context.InputBinds();
 			static Platform::RawInputApi& s_RawInputApi  = s_Context.Platform().RawInput();
-			static GUI::CUiContext*            s_UIContext    = s_Context.GetUIContext();
-			static Host::Loader&         s_Loader       = s_Context.Host().Loader();
+			static GUI::Context&          s_UIContext    = s_Context.UI();
+			static Host::Loader&          s_Loader       = s_Context.Host().Loader();
 			static GW2::GameBindsApi&     s_GameBindsApi = s_Context.Game().GameBinds();
 
 			// don't pass to game if loader
@@ -197,7 +197,7 @@ namespace Hooks
 			if (s_RawInputApi.WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
 			// don't pass to game if gui
-			if (s_UIContext->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
+			if (s_UIContext.WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
 			// don't pass to game if InputBind
 			if (s_InputBindApi->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
@@ -221,7 +221,7 @@ namespace Hooks
 			static Graphics::Metrics_t s_GrMetrics = s_Context.Graphics().Metrics();
 			static Graphics::Window_t& s_GrWindow = s_Context.Graphics().Window();
 			static Graphics::TextureLoader& s_TextureLoader = s_Context.Graphics().Textures();
-			static GUI::CUiContext* s_UIContext = s_Context.GetUIContext();
+			static GUI::Context& s_UIContext = s_Context.UI();
 			static Host::Loader& s_Loader = s_Context.Host().Loader();
 
 			/* Increment count at the beginning of the frame. */
@@ -243,7 +243,7 @@ namespace Hooks
 
 			s_TextureLoader.Advance();
 
-			s_UIContext->Render();
+			s_UIContext.Render();
 		}
 
 		HRESULT __stdcall DXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
@@ -264,9 +264,9 @@ namespace Hooks
 			static Core::DataLinkApi& s_DataLink = s_Context.Core().DataLink();
 			static Host::EventApi& s_EventApi = s_Context.Host().Events();
 			static Graphics::Window_t& s_GrWindow = s_Context.Graphics().Window();
-			static GUI::CUiContext* s_UIContext = s_Context.GetUIContext();
+			static GUI::Context& s_UIContext = s_Context.UI();
 
-			s_UIContext->Shutdown();
+			s_UIContext.Shutdown();
 
 			/* Cache window dimensions */
 			s_GrWindow.Width = aWidth;

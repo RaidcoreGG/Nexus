@@ -35,8 +35,8 @@ namespace Raidcore::Nexus::GUI
 		if (this->IsInvalid)
 		{
 			static Runtime& ctx = Runtime::Get();
-			static CUiContext* uictx = ctx.GetUIContext();
-			static CEscapeClosing* escclose = uictx->GetEscapeClosingService();
+			static Context& uictx = ctx.UI();
+			static CEscapeClosing* escclose = uictx.GetEscapeClosingService();
 
 			escclose->Deregister(this->GetVisibleStatePtr());
 			escclose->Register(this->GetNameID().c_str(), this->GetVisibleStatePtr());

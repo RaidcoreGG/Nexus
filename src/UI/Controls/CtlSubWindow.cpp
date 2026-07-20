@@ -33,8 +33,8 @@ namespace Raidcore::Nexus::GUI
 		if (popout)
 		{
 			Runtime& ctx = Runtime::Get();
-			CUiContext* uictx = ctx.GetUIContext();
-			CLocalization* langApi = uictx->GetLocalization();
+			Context& uictx = ctx.UI();
+			CLocalization* langApi = uictx.GetLocalization();
 
 			std::string wndName = langApi->Translate(this->DisplayName.c_str());
 
@@ -118,8 +118,8 @@ namespace Raidcore::Nexus::GUI
 	std::string ISubWindow::GetNameID()
 	{
 		static Runtime& ctx = Runtime::Get();
-		static CUiContext* uictx = ctx.GetUIContext();
-		static CLocalization* langApi = uictx->GetLocalization();
+		static Context& uictx = ctx.UI();
+		static CLocalization* langApi = uictx.GetLocalization();
 
 		std::string wndName = langApi->Translate(this->DisplayName.c_str());
 

@@ -25,9 +25,9 @@ namespace Raidcore::Nexus::GUI
 	void CBindSetterModal::RenderContent()
 	{
 		Runtime& ctx = Runtime::Get();
-		CUiContext* uictx = ctx.GetUIContext();
-		CLocalization* lang = uictx->GetLocalization();
-		CInputBindApi* ibapi = ctx.GetInputBindApi();
+		Context& uictx = ctx.UI();
+		CLocalization* lang = uictx.GetLocalization();
+		CInputBindApi* ibapi = ctx.InputBinds();
 
 		this->Capture = ibapi->GetCapture();
 
@@ -77,7 +77,7 @@ namespace Raidcore::Nexus::GUI
 	void CBindSetterModal::OnOpening()
 	{
 		Runtime& ctx = Runtime::Get();
-		CInputBindApi* ibapi = ctx.GetInputBindApi();
+		CInputBindApi* ibapi = ctx.InputBinds();
 		GW2::GameBindsApi* gbapi = &ctx.Game().GameBinds();
 
 		/* Fetch display text. */
@@ -118,7 +118,7 @@ namespace Raidcore::Nexus::GUI
 	void CBindSetterModal::OnClosing()
 	{
 		Runtime& ctx = Runtime::Get();
-		CInputBindApi* ibapi = ctx.GetInputBindApi();
+		CInputBindApi* ibapi = ctx.InputBinds();
 		GW2::GameBindsApi* gbapi = &ctx.Game().GameBinds();
 		ibapi->EndCapturing();
 
@@ -218,8 +218,8 @@ namespace Raidcore::Nexus::GUI
 	void CBindSetterModal::SetTitle()
 	{
 		Runtime& ctx = Runtime::Get();
-		CUiContext* uictx = ctx.GetUIContext();
-		CLocalization* lang = uictx->GetLocalization();
+		Context& uictx = ctx.UI();
+		CLocalization* lang = uictx.GetLocalization();
 
 		/* Override the title before opening the modal. */
 		std::string title = lang->Translate("((000062))");

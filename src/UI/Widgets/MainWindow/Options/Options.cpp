@@ -45,8 +45,8 @@ namespace Raidcore::Nexus::GUI
 		if (this->IsInvalid)
 		{
 			static Runtime& ctx = Runtime::Get();
-			static CUiContext* uictx = ctx.GetUIContext();
-			static CEscapeClosing* escclose = uictx->GetEscapeClosingService();
+			static Context& uictx = ctx.UI();
+			static CEscapeClosing* escclose = uictx.GetEscapeClosingService();
 
 			escclose->Deregister(this->GetVisibleStatePtr());
 			escclose->Register(this->GetNameID().c_str(), this->GetVisibleStatePtr());
@@ -79,9 +79,9 @@ namespace Raidcore::Nexus::GUI
 	{
 		static Runtime& ctx = Runtime::Get();
 		static Core::SettingsMgr* settingsctx = &ctx.Core().Settings();
-		static CUiContext* uictx = ctx.GetUIContext();
-		static CLocalization* langApi = uictx->GetLocalization();
-		static CQuickAccess* qactx = uictx->GetQuickAccess();
+		static Context& uictx = ctx.UI();
+		static CLocalization* langApi = uictx.GetLocalization();
+		static CQuickAccess* qactx = uictx.GetQuickAccess();
 
 		if (ImGui::BeginTabItem(langApi->Translate("((000052))")))
 		{
@@ -126,7 +126,7 @@ namespace Raidcore::Nexus::GUI
 					if (ImGui::Checkbox(langApi->Translate("((Experimental: Clicking requires modifiers))"), &clickingRequiresMods))
 					{
 						settingsctx->Set(OPT_UI_CLICK_MODSONLY, clickingRequiresMods);
-						Runtime::Get().GetUIContext()->Invalidate();
+						Runtime::Get().UI().Invalidate();
 					}
 
 					if (clickingRequiresMods)
@@ -148,7 +148,7 @@ namespace Raidcore::Nexus::GUI
 								mods &= ~EModifiers::Alt;
 							}
 							settingsctx->Set(OPT_UI_MODS, mods);
-							Runtime::Get().GetUIContext()->Invalidate();
+							Runtime::Get().UI().Invalidate();
 						}
 						ImGui::SameLine();
 						static bool modCtrl = (mods & EModifiers::Ctrl) == EModifiers::Ctrl;
@@ -163,7 +163,7 @@ namespace Raidcore::Nexus::GUI
 								mods &= ~EModifiers::Ctrl;
 							}
 							settingsctx->Set(OPT_UI_MODS, mods);
-							Runtime::Get().GetUIContext()->Invalidate();
+							Runtime::Get().UI().Invalidate();
 						}
 						ImGui::SameLine();
 						static bool modShift = (mods & EModifiers::Shift) == EModifiers::Shift;
@@ -178,7 +178,7 @@ namespace Raidcore::Nexus::GUI
 								mods &= ~EModifiers::Shift;
 							}
 							settingsctx->Set(OPT_UI_MODS, mods);
-							Runtime::Get().GetUIContext()->Invalidate();
+							Runtime::Get().UI().Invalidate();
 						}
 						ImGui::EndGroup();
 					}
@@ -379,8 +379,8 @@ namespace Raidcore::Nexus::GUI
 	{
 		Runtime& ctx = Runtime::Get();
 		Core::SettingsMgr* settingsctx = &ctx.Core().Settings();
-		CUiContext* uictx = ctx.GetUIContext();
-		CLocalization* langApi = uictx->GetLocalization();
+		Context& uictx = ctx.UI();
+		CLocalization* langApi = uictx.GetLocalization();
 
 		if (ImGui::BeginTabItem(langApi->Translate("((000053))")))
 		{
@@ -409,7 +409,7 @@ namespace Raidcore::Nexus::GUI
 								fontFile = font.filename().string();
 
 								settingsctx->Set(OPT_USERFONT, fontFile);
-								uictx->LoadFonts();
+								uictx.LoadFonts();
 							}
 						}
 					}
@@ -427,7 +427,7 @@ namespace Raidcore::Nexus::GUI
 					ImGuiContext* imguictx = ImGui::GetCurrentContext();
 					imguictx->FontSize = fontSize;
 
-					CFontManager* fontMgr = uictx->GetFontManager();
+					CFontManager* fontMgr = uictx.GetFontManager();
 					fontMgr->ResizeFont("FONT_DEFAULT", imguictx->FontSize);
 				}
 				ImGui::EndGroupPanel();
@@ -449,11 +449,11 @@ namespace Raidcore::Nexus::GUI
 						{
 							if (ImGui::Selectable("Nexus"))
 							{
-								uictx->ApplyStyle(EUIStyle::Nexus);
+								uictx.ApplyStyle(EUIStyle::Nexus);
 							}
 							if (ImGui::Selectable("ArcDPS Default"))
 							{
-								uictx->ApplyStyle(EUIStyle::ArcDPS_Default);
+								uictx.ApplyStyle(EUIStyle::ArcDPS_Default);
 								this->HasUnsavedStyle = true;
 							}
 
@@ -462,7 +462,7 @@ namespace Raidcore::Nexus::GUI
 							{
 								if (ImGui::Selectable("ArcDPS Current (Import from arcdps.ini)"))
 								{
-									uictx->ApplyStyle(EUIStyle::ArcDPS_Current);
+									uictx.ApplyStyle(EUIStyle::ArcDPS_Current);
 									this->HasUnsavedStyle = true;
 								}
 							}
@@ -471,17 +471,17 @@ namespace Raidcore::Nexus::GUI
 
 							if (ImGui::Selectable("ImGui Classic"))
 							{
-								uictx->ApplyStyle(EUIStyle::ImGui_Classic);
+								uictx.ApplyStyle(EUIStyle::ImGui_Classic);
 								this->HasUnsavedStyle = true;
 							}
 							if (ImGui::Selectable("ImGui Light"))
 							{
-								uictx->ApplyStyle(EUIStyle::ImGui_Light);
+								uictx.ApplyStyle(EUIStyle::ImGui_Light);
 								this->HasUnsavedStyle = true;
 							}
 							if (ImGui::Selectable("ImGui Dark"))
 							{
-								uictx->ApplyStyle(EUIStyle::ImGui_Dark);
+								uictx.ApplyStyle(EUIStyle::ImGui_Dark);
 								this->HasUnsavedStyle = true;
 							}
 
@@ -530,7 +530,7 @@ namespace Raidcore::Nexus::GUI
 									if (ImGui::Selectable(style.stem().string().c_str()))
 									{
 										/* Pass the filename with extension. */
-										uictx->ApplyStyle(EUIStyle::File, style.filename().string());
+										uictx.ApplyStyle(EUIStyle::File, style.filename().string());
 										this->HasUnsavedStyle = true;
 									}
 								}
@@ -796,7 +796,7 @@ namespace Raidcore::Nexus::GUI
 						/* Revert */
 						if (ImGui::Button(langApi->Translate("((000059))")))
 						{
-							uictx->ApplyStyle();
+							uictx.ApplyStyle();
 							this->HasUnsavedStyle = false;
 						}
 

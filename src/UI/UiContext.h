@@ -50,9 +50,9 @@ constexpr const char* KB_TOGGLEHIDEUI    = "KB_TOGGLEHIDEUI";
 namespace Raidcore::Nexus::GUI
 {
 	///----------------------------------------------------------------------------------------------------
-	/// CUiContext Class
+	/// Context Class
 	///----------------------------------------------------------------------------------------------------
-	class CUiContext : public CUiRender, public CUiBinds, public CUiStyle, public virtual IWndProc
+	class Context : public CUiRender, public CUiBinds, public CUiStyle, public virtual IWndProc
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ namespace Raidcore::Nexus::GUI
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		CUiContext(
+		Context(
 			Graphics::Window_t& aGrWindow,
 			Core::LogApi* aLogger,
 			Graphics::TextureLoader& aTextureService,
@@ -95,7 +95,7 @@ namespace Raidcore::Nexus::GUI
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
 		///----------------------------------------------------------------------------------------------------
-		~CUiContext();
+		~Context();
 
 		///----------------------------------------------------------------------------------------------------
 		/// Initialize:

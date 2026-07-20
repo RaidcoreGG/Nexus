@@ -68,9 +68,9 @@ namespace Raidcore::Nexus
 
 		GW2::Context& Game();
 
-		CInputBindApi* GetInputBindApi();
+		CInputBindApi* InputBinds();
 
-		GUI::CUiContext* GetUIContext();
+		GUI::Context& UI();
 
 		private:
 		Runtime();
@@ -82,5 +82,6 @@ namespace Raidcore::Nexus
 		std::unique_ptr<Host::Context>     _HostContext    { nullptr };
 		std::unique_ptr<Graphics::Context> _GraphicsContext{ nullptr };
 		std::unique_ptr<GW2::Context>      _GameContext    { nullptr };
+		std::unique_ptr<GUI::Context>      _UiContext      { nullptr };
 	};
 }

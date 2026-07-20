@@ -44,9 +44,9 @@ namespace Raidcore::Nexus::GUI
 			case EModalResult::OK:
 			{
 				Runtime& ctx = Runtime::Get();
-				CUiContext* uictx = ctx.GetUIContext();
+				Context& uictx = ctx.UI();
 
-				uictx->ApplyStyle(EUIStyle::Code, this->DataBuffer);
+				uictx.ApplyStyle(EUIStyle::Code, this->DataBuffer);
 
 				/* Reset data. */
 				memset(this->DataBuffer, 0, sizeof(this->DataBuffer));

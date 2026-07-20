@@ -34,7 +34,7 @@ namespace Raidcore::Nexus::GUI
 	{
 		/* FIXME: See Render IsInvalid. */
 		Runtime& ctx = Runtime::Get();
-		this->InputBindApi = ctx.GetInputBindApi();
+		this->InputBindApi = ctx.InputBinds();
 		this->TextureService = &ctx.Graphics().Textures();
 		this->Loader = &ctx.Host().Loader();
 		this->DataLink = &ctx.Core().DataLink();
@@ -68,8 +68,8 @@ namespace Raidcore::Nexus::GUI
 			/* FIXME: Since QuickAccess is created within UiContext ctor, the first shorcut is also created within that ctor.
 			 * Thus deadlocking. Hence we move the UIctx init into here. */
 			Runtime& ctx = Runtime::Get();
-			CUiContext* uictx = ctx.GetUIContext();
-			this->Language = uictx->GetLocalization();
+			Context& uictx = ctx.UI();
+			this->Language = uictx.GetLocalization();
 
 			if (!this->InputBindID.empty())
 			{

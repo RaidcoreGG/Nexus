@@ -43,7 +43,7 @@ namespace Raidcore::Nexus::GUI
 
 		/* bind mumble overlay */
 		Runtime& ctx = Runtime::Get();
-		ctx.GetInputBindApi()->Register(KB_MUMBLEOVERLAY, EIbHandlerType::DownAsync, DebugWindow_OnInputBind, "(null)");
+		ctx.InputBinds()->Register(KB_MUMBLEOVERLAY, EIbHandlerType::DownAsync, DebugWindow_OnInputBind, "(null)");
 		DebugWindow = this;
 	}
 
@@ -52,8 +52,8 @@ namespace Raidcore::Nexus::GUI
 		if (this->IsInvalid)
 		{
 			static Runtime& ctx = Runtime::Get();
-			static CUiContext* uictx = ctx.GetUIContext();
-			static CEscapeClosing* escclose = uictx->GetEscapeClosingService();
+			static Context& uictx = ctx.UI();
+			static CEscapeClosing* escclose = uictx.GetEscapeClosingService();
 
 			escclose->Deregister(this->GetVisibleStatePtr());
 			escclose->Register(this->GetNameID().c_str(), this->GetVisibleStatePtr());
@@ -142,7 +142,7 @@ namespace Raidcore::Nexus::GUI
 
 		if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 		{
-			std::map<std::string, IbMapping_t> inputBindRegistry = Runtime::Get().GetInputBindApi()->GetRegistry();
+			std::map<std::string, IbMapping_t> inputBindRegistry = Runtime::Get().InputBinds()->GetRegistry();
 
 			for (auto& [identifier, inputBind] : inputBindRegistry)
 			{
@@ -393,7 +393,7 @@ namespace Raidcore::Nexus::GUI
 		{
 			ImGui::Text("Items:");
 
-			std::map<std::string, Shortcut_t> qaRegistry = CContext::GetContext()->GetUIContext()->GetQuickAccess()->GetRegistry();
+			std::map<std::string, Shortcut_t> qaRegistry = CContext::GetContext()->UI()->GetQuickAccess()->GetRegistry();
 
 			for (auto& [identifier, shortcut] : qaRegistry)
 			{
@@ -423,7 +423,7 @@ namespace Raidcore::Nexus::GUI
 
 			ImGui::Separator();
 
-			std::map<std::string, ContextItem_t> orphanage = CContext::GetContext()->GetUIContext()->GetQuickAccess()->GetOrphanage();
+			std::map<std::string, ContextItem_t> orphanage = CContext::GetContext()->UI()->GetQuickAccess()->GetOrphanage();
 
 			ImGui::Text("Orphaned context menu items:");
 			for (auto& [identifier, shortcut] : orphanage)

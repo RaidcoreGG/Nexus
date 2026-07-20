@@ -29,8 +29,8 @@ namespace Raidcore::Nexus::GUI
 	void CQuickAccess::OnAddonStateChanged(void* aEventData)
 	{
 		Runtime& ctx = Runtime::Get();
-		CUiContext* uictx = ctx.GetUIContext();
-		CQuickAccess* qactx = uictx->GetQuickAccess();
+		Context& uictx = ctx.UI();
+		CQuickAccess* qactx = uictx.GetQuickAccess();
 
 		qactx->Invalidate();
 	}

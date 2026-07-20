@@ -22,8 +22,8 @@ namespace Raidcore::Nexus::GUI
 	void CUninstallConfirmationModal::RenderContent()
 	{
 		Runtime& ctx = Runtime::Get();
-		CUiContext* uictx = ctx.GetUIContext();
-		CLocalization* lang = uictx->GetLocalization();
+		Context& uictx = ctx.UI();
+		CLocalization* lang = uictx.GetLocalization();
 
 		ImGui::Text(lang->Translate("((000116))"));
 
@@ -78,8 +78,8 @@ namespace Raidcore::Nexus::GUI
 	void CUninstallConfirmationModal::SetTitle()
 	{
 		Runtime& ctx = Runtime::Get();
-		CUiContext* uictx = ctx.GetUIContext();
-		CLocalization* lang = uictx->GetLocalization();
+		Context& uictx = ctx.UI();
+		CLocalization* lang = uictx.GetLocalization();
 
 		/* Override the title before opening the modal. */
 		std::string title = lang->Translate("((000117))");
