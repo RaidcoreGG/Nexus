@@ -14,7 +14,7 @@
 #include <vector>
 
 #include "Core/NexusLink.h"
-#include "Engine/Cleanup/RefCleanerBase.h"
+#include "Memory/IRefCleaner.h"
 #include "Core/DataLink/DlApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Host/Loader/Loader.h"
@@ -40,7 +40,7 @@ namespace Raidcore::Nexus::GUI
 	///----------------------------------------------------------------------------------------------------
 	/// CShortcutIcon Class
 	///----------------------------------------------------------------------------------------------------
-	class CShortcutIcon : public virtual IRefCleaner
+	class CShortcutIcon : public virtual Memory::IRefCleaner
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------

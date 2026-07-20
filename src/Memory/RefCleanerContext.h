@@ -1,67 +1,72 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  UiRender.h
-/// Description  :  Contains the implementation for render callbacks.
+/// Name         :  RefCleanerContext.h
+/// Description  :  RefCleaner interface implementation.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
 #pragma once
 
 #include <mutex>
+#include <string>
 #include <vector>
 
-#include "Memory/IRefCleaner.h"
-#include "UiEnum.h"
-#include "UiFuncDefs.h"
+#include "IRefCleaner.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// Raidcore::Nexus::GUI Namespace
+/// Raidcore::Nexus::Memory Namespace
 ///----------------------------------------------------------------------------------------------------
-namespace Raidcore::Nexus::GUI
+namespace Raidcore::Nexus::Memory
 {
 	///----------------------------------------------------------------------------------------------------
-	/// CUiRender Class
+	/// RefCleanerContext Class
 	///----------------------------------------------------------------------------------------------------
-	class CUiRender : public virtual Memory::IRefCleaner
+	class RefCleanerContext
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
-		/// ctor
+		/// Get:
+		/// 	Returns the reference cleaner context.
 		///----------------------------------------------------------------------------------------------------
-		CUiRender();
+		static RefCleanerContext* Get();
 
-		///----------------------------------------------------------------------------------------------------
-		/// dtor
-		///----------------------------------------------------------------------------------------------------
-		virtual ~CUiRender();
+		RefCleanerContext(RefCleanerContext const&) = delete;
+		void operator=(RefCleanerContext const&) = delete;
 
 		///----------------------------------------------------------------------------------------------------
 		/// Register:
-		/// 	Registers the provided Render callback.
+		/// 	Registers a reference cleaner with the context.
 		///----------------------------------------------------------------------------------------------------
-		void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback);
+		void Register(std::string aComponentName, IRefCleaner* aComponent);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Deregister:
-		/// 	Deregisters the provided Render callback.
+		/// 	Deregisters a reference cleaner from the context.
 		///----------------------------------------------------------------------------------------------------
-		void Deregister(GUI_RENDER aRenderCallback);
+		void Deregister(IRefCleaner* aComponent);
 
 		///----------------------------------------------------------------------------------------------------
 		/// CleanupRefs:
-		/// 	Removes all registered render callbacks and close-on-escape hooks that match the address space.
+		/// 	Removes any reference matching the provided address space.
+		/// 	Returns a message with the cleanup results.
 		///----------------------------------------------------------------------------------------------------
-		uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
+		std::string CleanupRefs(void* aStartAddress, void* aEndAddress);
+
+		private:
+		RefCleanerContext() = default;
+		~RefCleanerContext() = default;
 
 		///----------------------------------------------------------------------------------------------------
-		/// GetRenderCallbacks:
-		/// 	Returns a copy of the specified callbacks.
+		/// RefCleaner_t Struct
 		///----------------------------------------------------------------------------------------------------
-		const std::vector<GUI_RENDER>& GetRenderCallbacks(ERenderType aRenderType) const;
+		struct RefCleaner_t
+		{
+			std::string  Name;
+			IRefCleaner* Component;
+		};
 
-		protected:
-		std::mutex              RenderMutex;
-		std::vector<GUI_RENDER> Registry[static_cast<uint32_t>(ERenderType::COUNT)];
+		std::mutex                Mutex;
+		std::vector<RefCleaner_t> Registry;
 	};
 }

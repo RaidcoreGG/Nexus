@@ -25,8 +25,8 @@
     <ClCompile Include="src\Runtime\Runtime.cpp" />
     <ClCompile Include="src\Hooks\Hooks.cpp" />
     <ClCompile Include="src\Network\Updater\Updater.cpp" />
-    <ClCompile Include="src\Engine\Cleanup\RefCleanerBase.cpp" />
-    <ClCompile Include="src\Engine\Cleanup\RefCleanerContext.cpp" />
+    <ClCompile Include="src\Memory\IRefCleaner.cpp" />
+    <ClCompile Include="src\Memory\RefCleanerContext.cpp" />
     <ClCompile Include="src\Platform\CrashHandler\CrashHandler.cpp" />
     <ClCompile Include="src\Core\Functions\FnRegistry.cpp" />
     <ClCompile Include="src\Index\Index.cpp" />
@@ -137,7 +137,7 @@
     <ClInclude Include="src\Proxy\PxyEnum.h" />
     <ClInclude Include="src\Network\Updater\Updater.h" />
     <ClInclude Include="src\Core\Versioning\Version.h" />
-    <ClInclude Include="src\Engine\Cleanup\RefCleanerContext.h" />
+    <ClInclude Include="src\Memory\RefCleanerContext.h" />
     <ClInclude Include="src\Platform\CrashHandler\CrashHandler.h" />
     <ClInclude Include="src\Host\Events\EvtData.h" />
     <ClInclude Include="src\Core\Functions\FnEntry.h" />
@@ -157,7 +157,7 @@
     <ClInclude Include="src\Network\WebRequests\WreCache.h" />
     <ClInclude Include="src\Network\WebRequests\WreConst.h" />
     <ClInclude Include="src\Engine\Verifier.h" />
-    <ClInclude Include="src\Engine\Cleanup\RefCleanerBase.h" />
+    <ClInclude Include="src\Memory\IRefCleaner.h" />
     <ClInclude Include="src\GW2\ArcDPS\ArcApi.h" />
     <ClInclude Include="src\GW2\ArcDPS\ArcEnum.h" />
     <ClInclude Include="src\GW2\ArcDPS\ArcExtensionDef.h" />

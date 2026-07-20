@@ -18,7 +18,7 @@
 #include "thirdparty/Clockwork/Dispatcher.h"
 namespace Clockwork = Raidcore::Clockwork;
 
-#include "Engine/Cleanup/RefCleanerBase.h"
+#include "Memory/IRefCleaner.h"
 #include "Core/Logging/LogApi.h"
 #include "TxFuncDefs.h"
 #include "TxQueueEntry.h"
@@ -37,7 +37,7 @@ namespace Raidcore::Nexus::Graphics
 	///----------------------------------------------------------------------------------------------------
 	/// TextureLoader Class
 	///----------------------------------------------------------------------------------------------------
-	class TextureLoader : public virtual IRefCleaner
+	class TextureLoader : public virtual Memory::IRefCleaner
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------

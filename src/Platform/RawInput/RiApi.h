@@ -11,7 +11,7 @@
 #include <mutex>
 #include <vector>
 
-#include "Engine/Cleanup/RefCleanerBase.h"
+#include "Memory/IRefCleaner.h"
 #include "RiFuncDefs.h"
 
 ///----------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ namespace Raidcore::Nexus::Platform
 	///----------------------------------------------------------------------------------------------------
 	/// RawInputApi Class
 	///----------------------------------------------------------------------------------------------------
-	class RawInputApi : public virtual IRefCleaner
+	class RawInputApi : public virtual Memory::IRefCleaner
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------

@@ -14,7 +14,7 @@
 #include <string>
 #include <windows.h>
 
-#include "Engine/Cleanup/RefCleanerBase.h"
+#include "Memory/IRefCleaner.h"
 #include "Host/Events/EvtApi.h"
 #include "Core/Logging/LogApi.h"
 #include "IbBindV2.h"
@@ -29,7 +29,7 @@ constexpr const char* CH_INPUTBINDS = "InputBinds";
 ///----------------------------------------------------------------------------------------------------
 /// CInputBindApi Class
 ///----------------------------------------------------------------------------------------------------
-class CInputBindApi : public CInputBindCapture, public virtual IRefCleaner
+class CInputBindApi : public CInputBindCapture, public virtual Memory::IRefCleaner
 {
 	public:
 	///----------------------------------------------------------------------------------------------------

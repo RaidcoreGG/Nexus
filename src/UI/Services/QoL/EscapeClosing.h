@@ -13,7 +13,7 @@
 #include <unordered_map>
 #include <windows.h>
 
-#include "Engine/Cleanup/RefCleanerBase.h"
+#include "Memory/IRefCleaner.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::GUI Namespace
@@ -23,7 +23,7 @@ namespace Raidcore::Nexus::GUI
 	///----------------------------------------------------------------------------------------------------
 	/// CEscapeClosing Class
 	///----------------------------------------------------------------------------------------------------
-	class CEscapeClosing : public virtual IRefCleaner
+	class CEscapeClosing : public virtual Memory::IRefCleaner
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------

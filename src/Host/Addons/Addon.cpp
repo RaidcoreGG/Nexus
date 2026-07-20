@@ -19,7 +19,7 @@ using namespace Raidcore::Nexus;
 
 #include "Host/Addons/API/ApiBuilder.h"
 #include "Index/Index.h"
-#include "Engine/Cleanup/RefCleanerContext.h"
+#include "Memory/RefCleanerContext.h"
 #include "Util/DLL.h"
 #include "Util/MD5.h"
 #include "Util/Paths.h"
@@ -429,7 +429,7 @@ void CAddon::UnloadInternal()
 		strUnloadInfo = "No unload routine defined.";
 	}
 
-	std::string refcleanup = CRefCleanerContext::Get()->CleanupRefs(this->Module, (PBYTE)this->Module + this->ModuleSize);
+	std::string refcleanup = Memory::RefCleanerContext::Get()->CleanupRefs(this->Module, (PBYTE)this->Module + this->ModuleSize);
 
 	if (!refcleanup.empty())
 	{

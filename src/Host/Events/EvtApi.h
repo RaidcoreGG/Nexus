@@ -12,7 +12,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "Engine/Cleanup/RefCleanerBase.h"
+#include "Memory/IRefCleaner.h"
 #include "Host/Loader/Loader.h"
 #include "EvtData.h"
 #include "EvtFuncDefs.h"
@@ -27,7 +27,7 @@ namespace Raidcore::Nexus::Host
 	///----------------------------------------------------------------------------------------------------
 	/// EventApi Class
 	///----------------------------------------------------------------------------------------------------
-	class EventApi : public virtual IRefCleaner
+	class EventApi : public virtual Memory::IRefCleaner
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------

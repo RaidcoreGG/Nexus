@@ -16,7 +16,7 @@
 #include "imgui/imgui.h"
 
 #include "Core/NexusLink.h"
-#include "Engine/Cleanup/RefCleanerBase.h"
+#include "Memory/IRefCleaner.h"
 #include "Core/DataLink/DlApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Core/Logging/LogApi.h"
@@ -48,7 +48,7 @@ namespace Raidcore::Nexus::GUI
 ///----------------------------------------------------------------------------------------------------
 /// CQuickAccess Class
 ///----------------------------------------------------------------------------------------------------
-	class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
+	class CQuickAccess : public virtual IWindow, public virtual Memory::IRefCleaner
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------

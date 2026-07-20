@@ -1,21 +1,24 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  RefCleanerBase.cpp
+/// Name         :  IRefCleaner.cpp
 /// Description  :  RefCleaner interface implementation.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "RefCleanerBase.h"
+#include "IRefCleaner.h"
 
 #include "RefCleanerContext.h"
 
-IRefCleaner::IRefCleaner(std::string aComponentName)
+namespace Raidcore::Nexus::Memory
 {
-	CRefCleanerContext::Get()->Register(aComponentName, this);
-}
+	IRefCleaner::IRefCleaner(std::string aComponentName)
+	{
+		RefCleanerContext::Get()->Register(aComponentName, this);
+	}
 
-IRefCleaner::~IRefCleaner()
-{
-	CRefCleanerContext::Get()->Deregister(this);
+	IRefCleaner::~IRefCleaner()
+	{
+		RefCleanerContext::Get()->Deregister(this);
+	}
 }

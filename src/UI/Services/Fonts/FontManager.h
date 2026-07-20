@@ -15,7 +15,7 @@
 
 #include "imgui/imgui.h"
 
-#include "Engine/Cleanup/RefCleanerBase.h"
+#include "Memory/IRefCleaner.h"
 #include "FuncDefs.h"
 #include "UI/Services/Localization/LoclApi.h"
 
@@ -43,7 +43,7 @@ namespace Raidcore::Nexus::GUI
 	///----------------------------------------------------------------------------------------------------
 	/// CFontManager Class
 	///----------------------------------------------------------------------------------------------------
-	class CFontManager : public virtual IRefCleaner
+	class CFontManager : public virtual Memory::IRefCleaner
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
