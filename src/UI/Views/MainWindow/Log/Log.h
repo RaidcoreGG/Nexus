@@ -1,0 +1,75 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  Log.h
+/// Description  :  Contains the content of the log window.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
+#pragma once
+
+#include <vector>
+#include <string>
+#include <mutex>
+
+#include "imgui/imgui.h"
+
+#include "Core/Logging/LogBase.h"
+#include "Core/Logging/LogMsg.h"
+#include "UI/Controls/CtlSubWindow.h"
+
+///----------------------------------------------------------------------------------------------------
+/// Raidcore::Nexus::GUI Namespace
+///----------------------------------------------------------------------------------------------------
+namespace Raidcore::Nexus::GUI
+{
+	class CLogWindow : public virtual ISubWindow, public virtual Core::ILogger
+	{
+		public:
+		CLogWindow();
+		void RenderContent() override;
+
+		///----------------------------------------------------------------------------------------------------
+		/// MsgProc:
+		/// 	Message processing function.
+		///----------------------------------------------------------------------------------------------------
+		void MsgProc(const Core::LogMsg_t* aLogEntry) override;
+
+		private:
+		enum class EMessagePartType
+		{
+			None,
+			Text,
+			ColorPush,
+			ColorPop,
+			LineBreak
+		};
+
+		struct MessagePart_t
+		{
+			EMessagePartType Type;
+			std::string      Text;
+			ImVec4           Color;
+		};
+
+		struct DisplayLogEntry_t
+		{
+			const Core::LogMsg_t* Entry = nullptr;
+			std::vector<MessagePart_t> Parts;
+		};
+
+		struct LogChannel_t
+		{
+			bool        IsSelected;
+			std::string Name;
+		};
+
+		int                             MaxShownCount = 400;
+		Core::ELogLevel                 FilterLevel = Core::ELogLevel::ALL;
+		bool                            SelectedLevelOnly = false;
+
+		std::mutex                      Mutex;
+		std::vector<DisplayLogEntry_t*> LogEntries;
+		std::vector<LogChannel_t>       Channels;
+	};
+}
