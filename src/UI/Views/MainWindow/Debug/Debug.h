@@ -11,7 +11,7 @@
 #include "imgui/imgui_memory_editor.h"
 
 #include "UI/Controls/CtlSubWindow.h"
-#include "UI/Overlay/MumbleInspector/MumbleInspector.h"
+#include "UI/Views/MumbleInspector/MumbleInspector.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::GUI Namespace

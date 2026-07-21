@@ -18,7 +18,7 @@
 #include "CmAddon.h"
 #include "LoadConfirmationModal.h"
 #include "UI/Controls/CtlSubWindow.h"
-#include "UI/Widgets/MainWindow/Binds/BindSetterModal.h"
+#include "UI/Views/MainWindow/Binds/BindSetterModal.h"
 #include "UninstallConfirmationModal.h"
 
 constexpr const char* OPT_ISLISTMODE = "IsListMode";

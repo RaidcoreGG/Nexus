@@ -23,7 +23,7 @@
 #include "Platform/RawInput/RiFuncDefs.h"
 #include "Graphics/Textures/TxFuncDefs.h"
 #include "UI/UiFuncDefs.h"
-#include "UI/Widgets/QuickAccess/QaFuncDefs.h"
+#include "UI/Views/QuickAccess/QaFuncDefs.h"
 
 using namespace Raidcore::Nexus;
 

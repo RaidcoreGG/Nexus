@@ -19,7 +19,7 @@ using namespace Raidcore::Nexus;
 #include "Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
 #include "res/ResConst.h"
-#include "UI/Widgets/QuickAccess/QaConst.h"
+#include "UI/Views/QuickAccess/QaConst.h"
 #include "Util/Base64.h"
 #include "Util/Inputs.h"
 #include "Util/Time.h"

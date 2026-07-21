@@ -19,12 +19,12 @@ using namespace Raidcore::Nexus;
 #include "Core/Preferences/PrefConst.h"
 #include "res/ResConst.h"
 #include "SnowflakeMgr.h"
-#include "UI/Widgets/MainWindow/About/About.h"
-#include "UI/Widgets/MainWindow/Addons/Addons.h"
-#include "UI/Widgets/MainWindow/Binds/Binds.h"
-#include "UI/Widgets/MainWindow/Debug/Debug.h"
-#include "UI/Widgets/MainWindow/Log/Log.h"
-#include "UI/Widgets/MainWindow/Options/Options.h"
+#include "UI/Views/MainWindow/About/About.h"
+#include "UI/Views/MainWindow/Addons/Addons.h"
+#include "UI/Views/MainWindow/Binds/Binds.h"
+#include "UI/Views/MainWindow/Debug/Debug.h"
+#include "UI/Views/MainWindow/Log/Log.h"
+#include "UI/Views/MainWindow/Options/Options.h"
 #include "Util/Time.h"
 
 namespace Raidcore::Nexus::GUI

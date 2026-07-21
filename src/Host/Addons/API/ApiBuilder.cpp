@@ -59,9 +59,9 @@ using namespace Raidcore::Nexus;
 #include "UI/Services/QoL/EscapeClosing.h"
 #include "UI/UiEnum.h"
 #include "UI/UiFuncDefs.h"
-#include "UI/Widgets/Alerts/AlEnum.h"
-#include "UI/Widgets/Alerts/Alerts.h"
-#include "UI/Widgets/QuickAccess/QuickAccess.h"
+#include "UI/Views/Alerts/AlEnum.h"
+#include "UI/Views/Alerts/Alerts.h"
+#include "UI/Views/QuickAccess/QuickAccess.h"
 
 namespace Raidcore::Nexus::Host::API
 {
