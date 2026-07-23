@@ -449,11 +449,11 @@ namespace Raidcore::Nexus::GUI
 						{
 							if (ImGui::Selectable("Nexus"))
 							{
-								uictx.ApplyStyle(EUIStyle::Nexus);
+								uictx.GetStyleMgr()->ApplyStyle(EUIStyle::Nexus);
 							}
 							if (ImGui::Selectable("ArcDPS Default"))
 							{
-								uictx.ApplyStyle(EUIStyle::ArcDPS_Default);
+								uictx.GetStyleMgr()->ApplyStyle(EUIStyle::ArcDPS_Default);
 								this->HasUnsavedStyle = true;
 							}
 
@@ -462,7 +462,7 @@ namespace Raidcore::Nexus::GUI
 							{
 								if (ImGui::Selectable("ArcDPS Current (Import from arcdps.ini)"))
 								{
-									uictx.ApplyStyle(EUIStyle::ArcDPS_Current);
+									uictx.GetStyleMgr()->ApplyStyle(EUIStyle::ArcDPS_Current);
 									this->HasUnsavedStyle = true;
 								}
 							}
@@ -471,17 +471,17 @@ namespace Raidcore::Nexus::GUI
 
 							if (ImGui::Selectable("ImGui Classic"))
 							{
-								uictx.ApplyStyle(EUIStyle::ImGui_Classic);
+								uictx.GetStyleMgr()->ApplyStyle(EUIStyle::ImGui_Classic);
 								this->HasUnsavedStyle = true;
 							}
 							if (ImGui::Selectable("ImGui Light"))
 							{
-								uictx.ApplyStyle(EUIStyle::ImGui_Light);
+								uictx.GetStyleMgr()->ApplyStyle(EUIStyle::ImGui_Light);
 								this->HasUnsavedStyle = true;
 							}
 							if (ImGui::Selectable("ImGui Dark"))
 							{
-								uictx.ApplyStyle(EUIStyle::ImGui_Dark);
+								uictx.GetStyleMgr()->ApplyStyle(EUIStyle::ImGui_Dark);
 								this->HasUnsavedStyle = true;
 							}
 
@@ -530,7 +530,7 @@ namespace Raidcore::Nexus::GUI
 									if (ImGui::Selectable(style.stem().string().c_str()))
 									{
 										/* Pass the filename with extension. */
-										uictx.ApplyStyle(EUIStyle::File, style.filename().string());
+										uictx.GetStyleMgr()->ApplyStyle(EUIStyle::File, style.filename().string());
 										this->HasUnsavedStyle = true;
 									}
 								}
@@ -796,7 +796,7 @@ namespace Raidcore::Nexus::GUI
 						/* Revert */
 						if (ImGui::Button(langApi->Translate("((000059))")))
 						{
-							uictx.ApplyStyle();
+							uictx.GetStyleMgr()->ApplyStyle();
 							this->HasUnsavedStyle = false;
 						}
 

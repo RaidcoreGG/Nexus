@@ -46,7 +46,7 @@ namespace Raidcore::Nexus::GUI
 				Runtime& ctx = Runtime::Get();
 				Context& uictx = ctx.UI();
 
-				uictx.ApplyStyle(EUIStyle::Code, this->DataBuffer);
+				uictx.GetStyleMgr()->ApplyStyle(EUIStyle::Code, this->DataBuffer);
 
 				/* Reset data. */
 				memset(this->DataBuffer, 0, sizeof(this->DataBuffer));

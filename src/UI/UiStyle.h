@@ -27,12 +27,18 @@ namespace Raidcore::Nexus::GUI
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		CUiStyle();
+		CUiStyle(Core::LogApi& aLogger, Core::SettingsMgr& aSettings);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
 		///----------------------------------------------------------------------------------------------------
-		virtual ~CUiStyle();
+		~CUiStyle() = default;
+
+		///----------------------------------------------------------------------------------------------------
+		/// ApplyDefault:
+		/// 	Applies the default UI style to the current ImGui context.
+		///----------------------------------------------------------------------------------------------------
+		void ApplyDefault();
 
 		///----------------------------------------------------------------------------------------------------
 		/// ApplyStyle:
@@ -42,7 +48,7 @@ namespace Raidcore::Nexus::GUI
 		void ApplyStyle(EUIStyle aStyle = EUIStyle::User, std::string aValue = "");
 
 		private:
-		Core::LogApi* Logger;
-		Core::SettingsMgr* Settings;
+		Core::LogApi&      Logger;
+		Core::SettingsMgr& Settings;
 	};
 }

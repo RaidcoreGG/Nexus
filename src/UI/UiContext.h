@@ -51,7 +51,7 @@ namespace Raidcore::Nexus::GUI
 	///----------------------------------------------------------------------------------------------------
 	/// Context Class
 	///----------------------------------------------------------------------------------------------------
-	class Context : public CUiRender, public CUiBinds, public CUiStyle
+	class Context : public CUiRender, public CUiBinds
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
@@ -157,6 +157,12 @@ namespace Raidcore::Nexus::GUI
 		CEscapeClosing* GetEscapeClosingService();
 
 		///----------------------------------------------------------------------------------------------------
+		/// GetStyleMgr:
+		/// 	Returns the style manager.
+		///----------------------------------------------------------------------------------------------------
+		CUiStyle* GetStyleMgr();
+
+		///----------------------------------------------------------------------------------------------------
 		/// LoadFonts:
 		/// 	Loads the fonts.
 		///----------------------------------------------------------------------------------------------------
@@ -183,6 +189,7 @@ namespace Raidcore::Nexus::GUI
 		CEscapeClosing* EscapeClose;
 		CScaling* Scaling;
 		CUiInput* Input;
+		CUiStyle* StyleMgr;
 
 		bool                    IsInitialized = false;
 		bool                    IsVisible = true;

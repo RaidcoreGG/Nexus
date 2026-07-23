@@ -25,17 +25,12 @@ using namespace Raidcore::Nexus;
 ///----------------------------------------------------------------------------------------------------
 namespace Raidcore::Nexus::GUI
 {
-	CUiStyle::CUiStyle()
-	{
-		Runtime& ctx = Runtime::Get();
-		this->Logger = &ctx.Core().Logger();
-		this->Settings = &ctx.Core().Settings();
-	}
-
-	CUiStyle::~CUiStyle()
+	CUiStyle::CUiStyle(Core::LogApi& aLogger, Core::SettingsMgr& aSettings)
+		: Logger(aLogger)
+		, Settings(aSettings)
 	{}
 
-	void ApplyDefaultStyle()
+	void CUiStyle::ApplyDefault()
 	{
 		try
 		{
@@ -46,7 +41,7 @@ namespace Raidcore::Nexus::GUI
 		}
 		catch (...)
 		{
-			Runtime::Get().Core().Logger().Debug(CH_UICONTEXT, "Error applying default style.");
+			this->Logger.Debug(CH_UICONTEXT, "Error applying default style.");
 		}
 	}
 
@@ -60,7 +55,7 @@ namespace Raidcore::Nexus::GUI
 			{
 				try
 				{
-					std::string b64_style = this->Settings->Get<std::string>(OPT_IMGUISTYLE, {});
+					std::string b64_style = this->Settings.Get<std::string>(OPT_IMGUISTYLE, {});
 
 					if (b64_style.empty())
 					{
@@ -72,7 +67,7 @@ namespace Raidcore::Nexus::GUI
 				}
 				catch (...)
 				{
-					this->Logger->Warning(CH_UICONTEXT, "Error applying user style.");
+					this->Logger.Warning(CH_UICONTEXT, "Error applying user style.");
 				}
 				return;
 			}
@@ -86,26 +81,26 @@ namespace Raidcore::Nexus::GUI
 				}
 				catch (...)
 				{
-					this->Logger->Warning(CH_UICONTEXT, "Error applying user style.");
+					this->Logger.Warning(CH_UICONTEXT, "Error applying user style.");
 				}
 				return;
 			}
 			case EUIStyle::ImGui_Classic:
 			{
 
-				ApplyDefaultStyle();
+				this->ApplyDefault();
 				ImGui::StyleColorsClassic();
 				return;
 			}
 			case EUIStyle::ImGui_Light:
 			{
-				ApplyDefaultStyle();
+				this->ApplyDefault();
 				ImGui::StyleColorsLight();
 				return;
 			}
 			case EUIStyle::ImGui_Dark:
 			{
-				ApplyDefaultStyle();
+				this->ApplyDefault();
 				ImGui::StyleColorsDark();
 				return;
 			}
@@ -123,7 +118,7 @@ namespace Raidcore::Nexus::GUI
 				}
 				catch (...)
 				{
-					this->Logger->Warning(CH_UICONTEXT, "Error applying ArcDPS default style.");
+					this->Logger.Warning(CH_UICONTEXT, "Error applying ArcDPS default style.");
 				}
 				return;
 			}
@@ -152,12 +147,12 @@ namespace Raidcore::Nexus::GUI
 					}
 					catch (...)
 					{
-						this->Logger->Warning(CH_UICONTEXT, "Couldn't parse ArcDPS style.");
+						this->Logger.Warning(CH_UICONTEXT, "Couldn't parse ArcDPS style.");
 					}
 				}
 				else
 				{
-					this->Logger->Warning(CH_UICONTEXT, "Tried importing ArcDPS style, with no config present.");
+					this->Logger.Warning(CH_UICONTEXT, "Tried importing ArcDPS style, with no config present.");
 				}
 				return;
 			}
@@ -185,7 +180,7 @@ namespace Raidcore::Nexus::GUI
 
 						if (decodeStyle.size() != sizeof(ImGuiStyle))
 						{
-							this->Logger->Warning(CH_UICONTEXT, "Error applying stylesheet. Not ImGui 1.80 compatible.");
+							this->Logger.Warning(CH_UICONTEXT, "Error applying stylesheet. Not ImGui 1.80 compatible.");
 							return;
 						}
 
@@ -194,7 +189,7 @@ namespace Raidcore::Nexus::GUI
 				}
 				catch (...)
 				{
-					this->Logger->Warning(CH_UICONTEXT, "Error applying stylesheet.");
+					this->Logger.Warning(CH_UICONTEXT, "Error applying stylesheet.");
 				}
 
 				break;
@@ -205,7 +200,7 @@ namespace Raidcore::Nexus::GUI
 
 				if (decodeStyle.size() != sizeof(ImGuiStyle))
 				{
-					this->Logger->Warning(CH_UICONTEXT, "Error applying stylesheet. Not ImGui 1.80 compatible.");
+					this->Logger.Warning(CH_UICONTEXT, "Error applying stylesheet. Not ImGui 1.80 compatible.");
 					return;
 				}
 
