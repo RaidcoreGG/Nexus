@@ -29,7 +29,6 @@
 #include "UI/Views/QuickAccess/QuickAccess.h"
 #include "UiBinds.h"
 #include "UiInput.h"
-#include "UiRender.h"
 #include "Util/Inputs.h"
 
 using namespace Raidcore::Nexus;
@@ -51,7 +50,7 @@ namespace Raidcore::Nexus::GUI
 	///----------------------------------------------------------------------------------------------------
 	/// Context Class
 	///----------------------------------------------------------------------------------------------------
-	class Context : public CUiRender, public CUiBinds
+	class Context : public CUiBinds, public virtual Memory::IRefCleaner
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
@@ -113,6 +112,30 @@ namespace Raidcore::Nexus::GUI
 		/// 	Renders the UI and executes callbacks.
 		///----------------------------------------------------------------------------------------------------
 		void Render();
+
+		///----------------------------------------------------------------------------------------------------
+		/// Register:
+		/// 	Registers the provided Render callback.
+		///----------------------------------------------------------------------------------------------------
+		void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback);
+
+		///----------------------------------------------------------------------------------------------------
+		/// Deregister:
+		/// 	Deregisters the provided Render callback.
+		///----------------------------------------------------------------------------------------------------
+		void Deregister(GUI_RENDER aRenderCallback);
+
+		///----------------------------------------------------------------------------------------------------
+		/// CleanupRefs:
+		/// 	Removes all registered render callbacks and close-on-escape hooks that match the address space.
+		///----------------------------------------------------------------------------------------------------
+		uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
+
+		///----------------------------------------------------------------------------------------------------
+		/// GetRenderCallbacks:
+		/// 	Returns a copy of the specified callbacks.
+		///----------------------------------------------------------------------------------------------------
+		const std::vector<GUI_RENDER>& GetRenderCallbacks(ERenderType aRenderType) const;
 
 		///----------------------------------------------------------------------------------------------------
 		/// Invalidate:
@@ -194,5 +217,8 @@ namespace Raidcore::Nexus::GUI
 		bool                    IsInitialized = false;
 		bool                    IsVisible = true;
 		bool                    IsInvalid = true;
+
+		std::mutex              RenderMutex;
+		std::vector<GUI_RENDER> Registry[static_cast<uint32_t>(ERenderType::COUNT)];
 	};
 }

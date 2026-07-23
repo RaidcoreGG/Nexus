@@ -82,7 +82,6 @@
     <ClCompile Include="src\UI\UiBinds.cpp" />
     <ClCompile Include="src\UI\UiContext.cpp" />
     <ClCompile Include="src\UI\UiInput.cpp" />
-    <ClCompile Include="src\UI\UiRender.cpp" />
     <ClCompile Include="src\UI\Services\Scaling\Scaling.cpp" />
     <ClCompile Include="src\UI\Services\Styles\StyleMgr.cpp" />
     <ClCompile Include="src\UI\Views\Alerts\Alerts.cpp" />
@@ -408,7 +407,6 @@
     <ClInclude Include="src\UI\Services\QoL\FuncDefs.h" />
     <ClInclude Include="src\UI\UiContext.h" />
     <ClInclude Include="src\UI\UiInput.h" />
-    <ClInclude Include="src\UI\UiRender.h" />
     <ClInclude Include="src\UI\Services\Scaling\Scaling.h" />
     <ClInclude Include="src\UI\Services\Styles\StyleMgr.h" />
     <ClInclude Include="src\UI\Views\Alerts\AlEnum.h" />
