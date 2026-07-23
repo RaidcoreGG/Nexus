@@ -84,7 +84,7 @@
     <ClCompile Include="src\UI\UiInput.cpp" />
     <ClCompile Include="src\UI\UiRender.cpp" />
     <ClCompile Include="src\UI\Services\Scaling\Scaling.cpp" />
-    <ClCompile Include="src\UI\UiStyle.cpp" />
+    <ClCompile Include="src\UI\Services\Styles\StyleMgr.cpp" />
     <ClCompile Include="src\UI\Views\Alerts\Alerts.cpp" />
     <ClCompile Include="src\UI\Views\EULA\LicenseAgreementModal.cpp" />
     <ClCompile Include="src\UI\Views\MainWindow\About\About.cpp" />
@@ -191,6 +191,7 @@
     <ClInclude Include="src\Core\Logging\LogEnum.h" />
     <ClInclude Include="src\Graphics\Textures\TxEnum.h" />
     <ClInclude Include="src\thirdparty\arcdps\ArcDPS.h" />
+    <ClInclude Include="src\UI\Services\Styles\StyleEnum.h" />
     <ClInclude Include="src\Util\Base64.h" />
     <ClInclude Include="src\Util\CmdLine.h" />
     <ClInclude Include="src\Util\DLL.h" />
@@ -409,7 +410,7 @@
     <ClInclude Include="src\UI\UiInput.h" />
     <ClInclude Include="src\UI\UiRender.h" />
     <ClInclude Include="src\UI\Services\Scaling\Scaling.h" />
-    <ClInclude Include="src\UI\UiStyle.h" />
+    <ClInclude Include="src\UI\Services\Styles\StyleMgr.h" />
     <ClInclude Include="src\UI\Views\Alerts\AlEnum.h" />
     <ClInclude Include="src\UI\Views\Alerts\Alerts.h" />
     <ClInclude Include="src\UI\Views\Alerts\AlFuncDefs.h" />

@@ -1,12 +1,12 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  UiStyle.cpp
+/// Name         :  StyleMgr.cpp
 /// Description  :  Contains the implementation for UI styles.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "UiStyle.h"
+#include "StyleMgr.h"
 
 #include <string>
 
@@ -17,7 +17,6 @@ using namespace Raidcore::Nexus;
 
 #include "Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
-#include "UiContext.h"
 #include "Util/Base64.h"
 
 ///----------------------------------------------------------------------------------------------------
@@ -25,12 +24,12 @@ using namespace Raidcore::Nexus;
 ///----------------------------------------------------------------------------------------------------
 namespace Raidcore::Nexus::GUI
 {
-	CUiStyle::CUiStyle(Core::LogApi& aLogger, Core::SettingsMgr& aSettings)
+	StyleManager::StyleManager(Core::LogApi& aLogger, Core::SettingsMgr& aSettings)
 		: Logger(aLogger)
 		, Settings(aSettings)
 	{}
 
-	void CUiStyle::ApplyDefault()
+	void StyleManager::ApplyDefault()
 	{
 		try
 		{
@@ -45,7 +44,7 @@ namespace Raidcore::Nexus::GUI
 		}
 	}
 
-	void CUiStyle::ApplyStyle(EUIStyle aStyle, std::string aValue)
+	void StyleManager::ApplyStyle(EUIStyle aStyle, std::string aValue)
 	{
 		ImGuiStyle* style = &ImGui::GetStyle();
 

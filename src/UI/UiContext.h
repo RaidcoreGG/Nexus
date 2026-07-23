@@ -12,16 +12,17 @@
 #include <windows.h>
 
 #include "Core/DataLink/DlApi.h"
-#include "Inputs/InputBinds/IbApi.h"
 #include "Core/Logging/LogApi.h"
 #include "Graphics/GrWindow.h"
 #include "Graphics/Textures/TxLoader.h"
 #include "GW2/Mumble/MblReader.h"
 #include "Host/Events/EvtApi.h"
+#include "Inputs/InputBinds/IbApi.h"
 #include "UI/Services/Fonts/FontManager.h"
 #include "UI/Services/Localization/LoclApi.h"
 #include "UI/Services/QoL/EscapeClosing.h"
 #include "UI/Services/Scaling/Scaling.h"
+#include "UI/Services/Styles/StyleMgr.h"
 #include "UI/Views/Alerts/Alerts.h"
 #include "UI/Views/EULA/LicenseAgreementModal.h"
 #include "UI/Views/MainWindow/MainWindow.h"
@@ -29,7 +30,6 @@
 #include "UiBinds.h"
 #include "UiInput.h"
 #include "UiRender.h"
-#include "UiStyle.h"
 #include "Util/Inputs.h"
 
 using namespace Raidcore::Nexus;
@@ -160,7 +160,7 @@ namespace Raidcore::Nexus::GUI
 		/// GetStyleMgr:
 		/// 	Returns the style manager.
 		///----------------------------------------------------------------------------------------------------
-		CUiStyle* GetStyleMgr();
+		StyleManager* GetStyleMgr();
 
 		///----------------------------------------------------------------------------------------------------
 		/// LoadFonts:
@@ -189,7 +189,7 @@ namespace Raidcore::Nexus::GUI
 		CEscapeClosing* EscapeClose;
 		CScaling* Scaling;
 		CUiInput* Input;
-		CUiStyle* StyleMgr;
+		StyleManager* StyleMgr;
 
 		bool                    IsInitialized = false;
 		bool                    IsVisible = true;

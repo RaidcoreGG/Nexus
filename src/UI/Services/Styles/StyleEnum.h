@@ -1,8 +1,8 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  UiEnum.h
-/// Description  :  Enumerations for the UI.
+/// Name         :  StyleEnum.h
+/// Description  :  Enumerations for the UI styles.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
@@ -16,15 +16,18 @@
 namespace Raidcore::Nexus::GUI
 {
 	///----------------------------------------------------------------------------------------------------
-	/// ERenderType Enumeration
+	/// EUIStyle Enumeration
 	///----------------------------------------------------------------------------------------------------
-	enum class ERenderType : uint32_t
+	enum class EUIStyle : uint32_t
 	{
-		PreRender,
-		Render,
-		PostRender,
-		OptionsRender,
-
-		COUNT
+		User,
+		Nexus,
+		ImGui_Classic,
+		ImGui_Light,
+		ImGui_Dark,
+		ArcDPS_Default,
+		ArcDPS_Current, /* If available. */
+		File,
+		Code
 	};
 }

@@ -1,14 +1,14 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  UiStyle.h
+/// Name         :  StyleMgr.h
 /// Description  :  Contains the implementation for UI styles.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
 #pragma once
 
-#include "UiEnum.h"
+#include "StyleEnum.h"
 
 #include "Core/Logging/LogApi.h"
 #include "Core/Preferences/PrefContext.h"
@@ -19,20 +19,20 @@
 namespace Raidcore::Nexus::GUI
 {
 	///----------------------------------------------------------------------------------------------------
-	/// CUiStyle Class
+	/// StyleManager Class
 	///----------------------------------------------------------------------------------------------------
-	class CUiStyle
+	class StyleManager
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		CUiStyle(Core::LogApi& aLogger, Core::SettingsMgr& aSettings);
+		StyleManager(Core::LogApi& aLogger, Core::SettingsMgr& aSettings);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
 		///----------------------------------------------------------------------------------------------------
-		~CUiStyle() = default;
+		~StyleManager() = default;
 
 		///----------------------------------------------------------------------------------------------------
 		/// ApplyDefault:

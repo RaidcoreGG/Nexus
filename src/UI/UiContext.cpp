@@ -190,7 +190,7 @@ namespace Raidcore::Nexus::GUI
 		this->EscapeClose = new CEscapeClosing();
 		this->Scaling = new CScaling(Runtime::Get().Platform().Window(), GrWindow, aDataLink, aEventApi, &Runtime::Get().Core().Settings()); // FIXME: What the fuck, why is the settingsctx not included here?
 		this->Input = new CUiInput(&Runtime::Get().Core().Settings());
-		this->StyleMgr = new CUiStyle(*aLogger, Runtime::Get().Core().Settings());
+		this->StyleMgr = new StyleManager(*aLogger, Runtime::Get().Core().Settings());
 
 		this->EventApi.Subscribe(EV_MUMBLE_IDENTITY_UPDATED, Context::OnMumbleIdentityChanged);
 		this->EventApi.Subscribe("EV_INPUTBIND_UPDATED", Context::OnInputBindUpdate);
@@ -435,7 +435,7 @@ namespace Raidcore::Nexus::GUI
 		return this->EscapeClose;
 	}
 
-	CUiStyle* Context::GetStyleMgr()
+	StyleManager* Context::GetStyleMgr()
 	{
 		return this->StyleMgr;
 	}
