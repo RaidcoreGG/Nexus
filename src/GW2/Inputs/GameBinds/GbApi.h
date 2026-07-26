@@ -38,8 +38,8 @@ namespace Raidcore::Nexus::GW2
 	///----------------------------------------------------------------------------------------------------
 	struct MultiInputBind_t
 	{
-		InputBind_t Primary;
-		InputBind_t Secondary;
+		Input::InputBind_t Primary;
+		Input::InputBind_t Secondary;
 	};
 
 	///----------------------------------------------------------------------------------------------------
@@ -138,7 +138,7 @@ namespace Raidcore::Nexus::GW2
 		/// Set:
 		/// 	Sets a game bind.
 		///----------------------------------------------------------------------------------------------------
-		void Set(EGameBinds aGameBind, InputBind_t aInputBind, bool aIsPrimary, bool aIsRuntimeBind);
+		void Set(EGameBinds aGameBind, Input::InputBind_t aInputBind, bool aIsPrimary, bool aIsRuntimeBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// GetRegistry:

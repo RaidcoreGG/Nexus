@@ -199,7 +199,7 @@ namespace Raidcore::Nexus::GUI
 				ImGui::TableSetColumnIndex(2);
 				if (ImGui::Checkbox(("##Passthrough_" + identifier).c_str(), &inputBind.Bind.Passthrough))
 				{
-					CInputBindApi* ibapi = ctx.InputBinds();
+					Input::CInputBindApi* ibapi = ctx.InputBinds();
 					ibapi->SetPassthrough(identifier, inputBind.Bind.Passthrough);
 				}
 				ImGui::TooltipGeneric(langApi->Translate("((000115))"));
@@ -261,7 +261,7 @@ namespace Raidcore::Nexus::GUI
 		if (aIdentifier.empty()) { return; }
 
 		Runtime& ctx = Runtime::Get();
-		CInputBindApi* inputBindApi = ctx.InputBinds();
+		Input::CInputBindApi* inputBindApi = ctx.InputBinds();
 
 		inputBindApi->Delete(aIdentifier);
 	}

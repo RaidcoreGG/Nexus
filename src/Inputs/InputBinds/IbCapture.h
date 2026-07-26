@@ -13,50 +13,56 @@
 #include <windows.h>
 
 ///----------------------------------------------------------------------------------------------------
-/// CInputBindCapture Class
+/// Raidcore::Nexus::Input Namespace
 ///----------------------------------------------------------------------------------------------------
-class CInputBindCapture
+namespace Raidcore::Nexus::Input
 {
-	public:
 	///----------------------------------------------------------------------------------------------------
-	/// StartCapturing:
-	/// 	Starts capturing the held InputBind_t.
-	/// 	The bind is continuously captured.
-	/// 	Calling this function merely signals to stop further processing the inputs.
+	/// CInputBindCapture Class
 	///----------------------------------------------------------------------------------------------------
-	void StartCapturing();
+	class CInputBindCapture
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// StartCapturing:
+		/// 	Starts capturing the held InputBind_t.
+		/// 	The bind is continuously captured.
+		/// 	Calling this function merely signals to stop further processing the inputs.
+		///----------------------------------------------------------------------------------------------------
+		void StartCapturing();
 
-	///----------------------------------------------------------------------------------------------------
-	/// EndCapturing:
-	/// 	Ends capturing the held InputBind_t.
-	///----------------------------------------------------------------------------------------------------
-	void EndCapturing();
+		///----------------------------------------------------------------------------------------------------
+		/// EndCapturing:
+		/// 	Ends capturing the held InputBind_t.
+		///----------------------------------------------------------------------------------------------------
+		void EndCapturing();
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetCapture:
-	/// 	Gets which InputBind_t is currently held.
-	///----------------------------------------------------------------------------------------------------
-	InputBind_t GetCapture() const;
+		///----------------------------------------------------------------------------------------------------
+		/// GetCapture:
+		/// 	Gets which InputBind_t is currently held.
+		///----------------------------------------------------------------------------------------------------
+		InputBind_t GetCapture() const;
 
-	protected:
-	///----------------------------------------------------------------------------------------------------
-	/// ProcessInput:
-	/// 	Returns true, if the input should not be further processed.
-	///----------------------------------------------------------------------------------------------------
-	bool ProcessInput(UINT uMsg, WPARAM wParam, LPARAM lParam);
+		protected:
+		///----------------------------------------------------------------------------------------------------
+		/// ProcessInput:
+		/// 	Returns true, if the input should not be further processed.
+		///----------------------------------------------------------------------------------------------------
+		bool ProcessInput(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetCaptureRef:
-	/// 	Gets which InputBind_t is currently held.
-	/// 	Not threadsafe. Only use during WndProc.
-	///----------------------------------------------------------------------------------------------------
-	const InputBind_t& GetCaptureRef() const;
+		///----------------------------------------------------------------------------------------------------
+		/// GetCaptureRef:
+		/// 	Gets which InputBind_t is currently held.
+		/// 	Not threadsafe. Only use during WndProc.
+		///----------------------------------------------------------------------------------------------------
+		const InputBind_t& GetCaptureRef() const;
 
-	private:
-	bool      IsCapturing = false;
-	InputBind_t Capture     = {};
+		private:
+		bool        IsCapturing{ false };
+		InputBind_t Capture;
 
-	bool      IsAltHeld   = false;
-	bool      IsCtrlHeld  = false;
-	bool      IsShiftHeld = false;
-};
+		bool        IsAltHeld{ false };
+		bool        IsCtrlHeld{ false };
+		bool        IsShiftHeld{ false };
+	};
+}

@@ -69,7 +69,7 @@ namespace Raidcore::Nexus::GUI
 		GW2::EGameBinds    GameBindID = (GW2::EGameBinds)0;
 		std::string   PreviousBindText = {};
 
-		InputBind_t   Capture = {};
+		Input::InputBind_t   Capture = {};
 		std::string   BindConflict = {};
 
 		///----------------------------------------------------------------------------------------------------

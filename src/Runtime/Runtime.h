@@ -64,7 +64,7 @@ namespace Raidcore::Nexus
 
 		GW2::Context& Game();
 
-		CInputBindApi* InputBinds();
+		Input::CInputBindApi* InputBinds();
 
 		GUI::Context& UI();
 

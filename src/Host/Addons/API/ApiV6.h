@@ -108,10 +108,10 @@ struct AddonAPI6_t : AddonAPI_t
 	/* InputBinds */
 	struct InputBindsVT
 	{
-		INPUTBINDS_INVOKE                 Invoke;
-		INPUTBINDS_REGISTERWITHSTRING2    RegisterWithString;
-		INPUTBINDS_REGISTERWITHSTRUCT2    RegisterWithStruct;
-		INPUTBINDS_DEREGISTER             Deregister;
+		Input::INPUTBINDS_INVOKE                 Invoke;
+		Input::INPUTBINDS_REGISTERWITHSTRING2    RegisterWithString;
+		Input::INPUTBINDS_REGISTERWITHSTRUCT2    RegisterWithStruct;
+		Input::INPUTBINDS_DEREGISTER             Deregister;
 	};
 	InputBindsVT                          InputBinds;
 

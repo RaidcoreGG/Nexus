@@ -83,7 +83,7 @@ namespace Raidcore::Nexus::GUI
 	{
 		Runtime& ctx = Runtime::Get();
 		Core::LogApi* logger = &ctx.Core().Logger();
-		CInputBindApi* ibapi = ctx.InputBinds();
+		Input::CInputBindApi* ibapi = ctx.InputBinds();
 		Host::EventApi* evtapi = &ctx.Host().Events();
 
 		CAddonsWindow* addonsWnd = new CAddonsWindow();
@@ -103,11 +103,11 @@ namespace Raidcore::Nexus::GUI
 		this->AddWindow(aboutWnd);
 
 		/* register InputBinds */
-		ibapi->Register(KB_MENU, EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "CTRL+O");
-		ibapi->Register(KB_ADDONS, EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
-		ibapi->Register(KB_OPTIONS, EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
-		ibapi->Register(KB_LOG, EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
-		ibapi->Register(KB_DEBUG, EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
+		ibapi->Register(KB_MENU, Input::EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "CTRL+O");
+		ibapi->Register(KB_ADDONS, Input::EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
+		ibapi->Register(KB_OPTIONS, Input::EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
+		ibapi->Register(KB_LOG, Input::EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
+		ibapi->Register(KB_DEBUG, Input::EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
 
 		evtapi->Subscribe(EV_VOLATILE_ADDON_DISABLED, CMainWindow::OnVolatileAddonsDisabled);
 

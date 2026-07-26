@@ -64,9 +64,9 @@ struct AddonAPI1_t : AddonAPI_t
 	Platform::WNDPROC_ADDREM      DeregisterWndProc;
 
 	/* InputBinds */
-	INPUTBINDS_REGISTERWITHSTRING RegisterInputBindWithString;
-	INPUTBINDS_REGISTERWITHSTRUCT RegisterInputBindWithStruct;
-	INPUTBINDS_DEREGISTER         DeregisterInputBind;
+	Input::INPUTBINDS_REGISTERWITHSTRING RegisterInputBindWithString;
+	Input::INPUTBINDS_REGISTERWITHSTRUCT RegisterInputBindWithStruct;
+	Input::INPUTBINDS_DEREGISTER         DeregisterInputBind;
 
 	/* DataLink */
 	Core::DATALINK_GETRESOURCE          GetResource;

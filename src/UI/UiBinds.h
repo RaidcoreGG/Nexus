@@ -27,7 +27,7 @@ namespace Raidcore::Nexus::GUI
 	struct InputBindPacked_t
 	{
 		std::string KeysText{};
-		IbMapping_t Bind{};
+		Input::IbMapping_t Bind{};
 	};
 
 	struct InputBindCategory_t
@@ -40,10 +40,10 @@ namespace Raidcore::Nexus::GUI
 	{
 		std::string Name{};
 		std::string KeysText{};
-		InputBind_t Bind{};
+		Input::InputBind_t Bind{};
 
 		std::string KeysText2{};
-		InputBind_t Bind2{};
+		Input::InputBind_t Bind2{};
 	};
 
 	struct GameInputBindCategory_t

@@ -27,12 +27,12 @@ namespace Raidcore::Nexus::GUI
 		Runtime& ctx = Runtime::Get();
 		Context& uictx = ctx.UI();
 		Localization* lang = uictx.GetLocalization();
-		CInputBindApi* ibapi = ctx.InputBinds();
+		Input::CInputBindApi* ibapi = ctx.InputBinds();
 
 		this->Capture = ibapi->GetCapture();
 
 		/* Display current bind text, if no capture yet. */
-		if (this->Capture == InputBind_t{})
+		if (this->Capture == Input::InputBind_t{})
 		{
 			ImGui::Text(this->PreviousBindText.c_str());
 		}
@@ -77,7 +77,7 @@ namespace Raidcore::Nexus::GUI
 	void CBindSetterModal::OnOpening()
 	{
 		Runtime& ctx = Runtime::Get();
-		CInputBindApi* ibapi = ctx.InputBinds();
+		Input::CInputBindApi* ibapi = ctx.InputBinds();
 		GW2::GameBindsApi* gbapi = &ctx.Game().GameBinds();
 
 		/* Fetch display text. */
@@ -85,11 +85,11 @@ namespace Raidcore::Nexus::GUI
 		{
 			case EBindEditType::Nexus:
 			{
-				const InputBind_t* ib = ibapi->Get(this->NexusBindID);
+				const Input::InputBind_t* ib = ibapi->Get(this->NexusBindID);
 
 				assert(ib != nullptr);
 
-				this->PreviousBindText = IBToString(*ib, true);
+				this->PreviousBindText = Input::IBToString(*ib, true);
 				break;
 			}
 			case EBindEditType::Game:
@@ -118,7 +118,7 @@ namespace Raidcore::Nexus::GUI
 	void CBindSetterModal::OnClosing()
 	{
 		Runtime& ctx = Runtime::Get();
-		CInputBindApi* ibapi = ctx.InputBinds();
+		Input::CInputBindApi* ibapi = ctx.InputBinds();
 		GW2::GameBindsApi* gbapi = &ctx.Game().GameBinds();
 		ibapi->EndCapturing();
 
@@ -134,7 +134,7 @@ namespace Raidcore::Nexus::GUI
 						if (!this->BindConflict.empty())
 						{
 							/* unset the bind that's currently using this wombo combo */
-							ibapi->Set(this->BindConflict, InputBind_t{});
+							ibapi->Set(this->BindConflict, Input::InputBind_t{});
 						}
 
 						ibapi->Set(this->NexusBindID, this->Capture);
@@ -161,17 +161,17 @@ namespace Raidcore::Nexus::GUI
 				{
 					case EBindEditType::Nexus:
 					{
-						ibapi->Set(this->NexusBindID, InputBind_t{});
+						ibapi->Set(this->NexusBindID, Input::InputBind_t{});
 						break;
 					}
 					case EBindEditType::Game:
 					{
-						gbapi->Set(this->GameBindID, InputBind_t{}, true, false);
+						gbapi->Set(this->GameBindID, Input::InputBind_t{}, true, false);
 						break;
 					}
 					case EBindEditType::Game2:
 					{
-						gbapi->Set(this->GameBindID, InputBind_t{}, false, false);
+						gbapi->Set(this->GameBindID, Input::InputBind_t{}, false, false);
 						break;
 					}
 				}

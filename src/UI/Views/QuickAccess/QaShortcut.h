@@ -130,7 +130,7 @@ namespace Raidcore::Nexus::GUI
 		private:
 		std::string                          ID = "";
 
-		CInputBindApi* InputBindApi = nullptr;
+		Input::CInputBindApi* InputBindApi = nullptr;
 		Graphics::TextureLoader* TextureService = nullptr;
 		Host::Loader* Loader = nullptr;
 		Core::DataLinkApi* DataLink = nullptr;

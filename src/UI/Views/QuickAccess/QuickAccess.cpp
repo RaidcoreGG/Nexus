@@ -39,7 +39,7 @@ namespace Raidcore::Nexus::GUI
 	CQuickAccess::CQuickAccess(
 		Core::DataLinkApi* aDataLink,
 		Core::LogApi* aLogger,
-		CInputBindApi* aInputBindApi,
+		Input::CInputBindApi* aInputBindApi,
 		Graphics::TextureLoader* aTextureService,
 		Localization* aLocalization,
 		Host::EventApi* aEventApi

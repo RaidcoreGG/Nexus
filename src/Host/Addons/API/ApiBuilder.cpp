@@ -70,9 +70,9 @@ namespace Raidcore::Nexus::Host::API
 	static Core::DataLinkApi*         s_DataLinkApi   = nullptr;
 	static Host::EventApi*            s_EventApi      = nullptr;
 	static GW2::GameBindsApi*         s_GameBindsApi  = nullptr;
-	static CInputBindApi*             s_InputBindApi  = nullptr;
+	static Input::CInputBindApi*      s_InputBindApi  = nullptr;
 	static Platform::RawInputApi*     s_RawInputApi   = nullptr;
-	static Nexus::GUI::Localization* s_Localization  = nullptr;
+	static Nexus::GUI::Localization*  s_Localization  = nullptr;
 	static Core::LogApi*              s_Logger        = nullptr;
 	static Graphics::TextureLoader*   s_TextureApi    = nullptr;
 	static Host::Loader*              s_Loader        = nullptr;
@@ -244,28 +244,28 @@ namespace Raidcore::Nexus::Host::API
 
 	namespace InputBinds
 	{
-		void RegisterWithString(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, const char* aInputBind)
+		void RegisterWithString(const char* aIdentifier, Input::INPUTBINDS_PROCESS aInputBindHandler, const char* aInputBind)
 		{
 			assert(s_InputBindApi);
-			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownAsync, aInputBindHandler, aInputBind);
+			s_InputBindApi->Register(aIdentifier, Input::EIbHandlerType::DownAsync, aInputBindHandler, aInputBind);
 		}
 
-		void RegisterWithStruct(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, InputBindV1_t aInputBind)
+		void RegisterWithStruct(const char* aIdentifier, Input::INPUTBINDS_PROCESS aInputBindHandler, Input::InputBindV1_t aInputBind)
 		{
 			assert(s_InputBindApi);
-			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownAsync, aInputBindHandler, aInputBind);
+			s_InputBindApi->Register(aIdentifier, Input::EIbHandlerType::DownAsync, aInputBindHandler, aInputBind);
 		}
 
-		void RegisterWithString2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, const char* aInputBind)
+		void RegisterWithString2(const char* aIdentifier, Input::INPUTBINDS_PROCESS2 aInputBindHandler, const char* aInputBind)
 		{
 			assert(s_InputBindApi);
-			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownReleaseAsync, aInputBindHandler, aInputBind);
+			s_InputBindApi->Register(aIdentifier, Input::EIbHandlerType::DownReleaseAsync, aInputBindHandler, aInputBind);
 		}
 
-		void RegisterWithStruct2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, InputBindV1_t aInputBind)
+		void RegisterWithStruct2(const char* aIdentifier, Input::INPUTBINDS_PROCESS2 aInputBindHandler, Input::InputBindV1_t aInputBind)
 		{
 			assert(s_InputBindApi);
-			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownReleaseAsync, aInputBindHandler, aInputBind);
+			s_InputBindApi->Register(aIdentifier, Input::EIbHandlerType::DownReleaseAsync, aInputBindHandler, aInputBind);
 		}
 
 		void InvokeInputBind(const char* aIdentifier, bool aIsRelease)

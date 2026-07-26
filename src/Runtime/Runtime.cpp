@@ -222,9 +222,9 @@ namespace Raidcore::Nexus
 		return *this->_GameContext;
 	}
 
-	CInputBindApi* Runtime::InputBinds()
+	Input::CInputBindApi* Runtime::InputBinds()
 	{
-		static CInputBindApi s_InputBindApi = CInputBindApi(
+		static Input::CInputBindApi s_InputBindApi = Input::CInputBindApi(
 			&this->Host().Events(),
 			&this->Core().Logger(),
 			Index(EPath::InputBinds)

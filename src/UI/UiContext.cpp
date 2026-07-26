@@ -167,7 +167,7 @@ namespace Raidcore::Nexus::GUI
 		Core::LogApi* aLogger,
 		Graphics::TextureLoader& aTextureService,
 		Core::DataLinkApi* aDataLink,
-		CInputBindApi* aInputBindApi,
+		Input::CInputBindApi* aInputBindApi,
 		Host::EventApi& aEventApi,
 		GW2::MumbleReader& aMumbleReader
 	)
@@ -196,7 +196,7 @@ namespace Raidcore::Nexus::GUI
 		this->EventApi.Subscribe(EV_MUMBLE_IDENTITY_UPDATED, Context::OnMumbleIdentityChanged);
 		this->EventApi.Subscribe("EV_INPUTBIND_UPDATED", Context::OnInputBindUpdate);
 
-		this->InputBindApi->Register(KB_TOGGLEHIDEUI, EIbHandlerType::DownAsync, Context::OnInputBindPressed, "CTRL+H");
+		this->InputBindApi->Register(KB_TOGGLEHIDEUI, Input::EIbHandlerType::DownAsync, Context::OnInputBindPressed, "CTRL+H");
 		this->EscapeClose->Register("Nexus", this->MainWindow->GetVisibleStatePtr());
 
 		this->StyleMgr->ApplyStyle();

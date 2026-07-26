@@ -85,7 +85,7 @@ namespace Raidcore::Nexus::GUI
 			Core::LogApi* aLogger,
 			Graphics::TextureLoader& aTextureService,
 			Core::DataLinkApi* aDataLink,
-			CInputBindApi* aInputBindApi,
+			Input::CInputBindApi* aInputBindApi,
 			Host::EventApi& aEventApi,
 			GW2::MumbleReader& aMumbleReader
 		);
@@ -198,7 +198,7 @@ namespace Raidcore::Nexus::GUI
 		Localization* Language = nullptr;
 		Graphics::TextureLoader& TextureService;
 		Core::DataLinkApi* DataLink = nullptr;
-		CInputBindApi* InputBindApi = nullptr;
+		Input::CInputBindApi* InputBindApi = nullptr;
 		Host::EventApi& EventApi;
 		GW2::MumbleReader& MumbleReader;
 

@@ -77,9 +77,9 @@ struct AddonAPI4_t : AddonAPI_t
 	Platform::WNDPROC_SENDTOGAME      SendWndProcToGameOnly;
 
 	/* InputBinds */
-	INPUTBINDS_REGISTERWITHSTRING2    RegisterInputBindWithString;
-	INPUTBINDS_REGISTERWITHSTRUCT2    RegisterInputBindWithStruct;
-	INPUTBINDS_DEREGISTER             DeregisterInputBind;
+	Input::INPUTBINDS_REGISTERWITHSTRING2    RegisterInputBindWithString;
+	Input::INPUTBINDS_REGISTERWITHSTRUCT2    RegisterInputBindWithStruct;
+	Input::INPUTBINDS_DEREGISTER             DeregisterInputBind;
 
 	/* DataLink */
 	Core::DATALINK_GETRESOURCE              GetResource;

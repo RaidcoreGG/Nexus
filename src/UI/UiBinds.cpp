@@ -61,11 +61,11 @@ namespace Raidcore::Nexus::GUI
 		this->DisplayInputBinds.clear();
 
 		Runtime& ctx = Runtime::Get();
-		CInputBindApi* inputBindApi = ctx.InputBinds();
+		Input::CInputBindApi* inputBindApi = ctx.InputBinds();
 		Host::Loader& loader = ctx.Host().Loader();
 
 		/* copy of all InputBinds */
-		std::map<std::string, IbMapping_t> InputBindRegistry = inputBindApi->GetRegistry();
+		std::map<std::string, Input::IbMapping_t> InputBindRegistry = inputBindApi->GetRegistry();
 
 		/* acquire categories */
 		for (auto& [identifier, inputBind] : InputBindRegistry)
@@ -96,7 +96,7 @@ namespace Raidcore::Nexus::GUI
 				cat.Name = owner;
 				cat.InputBinds[identifier] =
 				{
-					IBToString(inputBind.Bind, true),
+					Input::IBToString(inputBind.Bind, true),
 					inputBind
 				};
 				this->DisplayInputBinds.push_back(cat);
@@ -105,7 +105,7 @@ namespace Raidcore::Nexus::GUI
 			{
 				it->InputBinds[identifier] =
 				{
-					IBToString(inputBind.Bind, true),
+					Input::IBToString(inputBind.Bind, true),
 					inputBind
 				};
 			}

@@ -43,7 +43,7 @@ namespace Raidcore::Nexus::GUI
 
 		/* bind mumble overlay */
 		Runtime& ctx = Runtime::Get();
-		ctx.InputBinds()->Register(KB_MUMBLEOVERLAY, EIbHandlerType::DownAsync, DebugWindow_OnInputBind, "(null)");
+		ctx.InputBinds()->Register(KB_MUMBLEOVERLAY, Input::EIbHandlerType::DownAsync, DebugWindow_OnInputBind, "(null)");
 		DebugWindow = this;
 	}
 
@@ -142,7 +142,7 @@ namespace Raidcore::Nexus::GUI
 
 		if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 		{
-			std::map<std::string, IbMapping_t> inputBindRegistry = Runtime::Get().InputBinds()->GetRegistry();
+			std::map<std::string, Input::IbMapping_t> inputBindRegistry = Runtime::Get().InputBinds()->GetRegistry();
 
 			for (auto& [identifier, inputBind] : inputBindRegistry)
 			{
@@ -151,25 +151,25 @@ namespace Raidcore::Nexus::GUI
 					switch (inputBind.HandlerType)
 					{
 						default:
-						case EIbHandlerType::None:
+						case Input::EIbHandlerType::None:
 						{
 							ImGui::TextDisabled("\tType: %d (None)", inputBind.HandlerType);
 							ImGui::TextDisabled("\tHandler: -");
 							break;
 						}
-						case EIbHandlerType::DownAsync:
+						case Input::EIbHandlerType::DownAsync:
 						{
 							ImGui::TextDisabled("\tType: %d (DownAsync)", inputBind.HandlerType);
 							ImGui::TextDisabled("\tHandler: %p", inputBind.Handler_DownOnlyAsync);
 							break;
 						}
-						case EIbHandlerType::DownReleaseAsync:
+						case Input::EIbHandlerType::DownReleaseAsync:
 						{
 							ImGui::TextDisabled("\tType: %d (DownReleaseAsync)", inputBind.HandlerType);
 							ImGui::TextDisabled("\tHandler: %p", inputBind.Handler_DownReleaseAsync);
 							break;
 						}
-						case EIbHandlerType::DownRelease:
+						case Input::EIbHandlerType::DownRelease:
 						{
 							ImGui::TextDisabled("\tType: %d (DownRelease)", inputBind.HandlerType);
 							ImGui::TextDisabled("\tHandler: %p", inputBind.Handler_DownRelease);

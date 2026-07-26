@@ -14,178 +14,182 @@
 #include "Util/Inputs.h"
 #include "Util/Strings.h"
 
-InputBind_t IBFromString(std::string aInputBind)
+namespace Raidcore::Nexus::Input
 {
-	InputBind_t ib{};
-
-	if (String::ToLower(aInputBind) == "(null)") { return ib; }
-
-	aInputBind = String::ToUpper(aInputBind);
-	std::string delimiter = "+";
-
-	size_t pos = 0;
-	std::string token;
-	while ((pos = aInputBind.find(delimiter)) != std::string::npos)
+	InputBind_t IBFromString(std::string aInputBind)
 	{
-		token = aInputBind.substr(0, pos);
-		aInputBind.erase(0, pos + delimiter.length());
+		InputBind_t ib{};
 
-		if (token == "ALT")
+		if (String::ToLower(aInputBind) == "(null)") { return ib; }
+
+		aInputBind = String::ToUpper(aInputBind);
+		std::string delimiter = "+";
+
+		size_t pos = 0;
+		std::string token;
+		while ((pos = aInputBind.find(delimiter)) != std::string::npos)
 		{
-			ib.Alt = true;
-		}
-		else if (token == "CTRL")
-		{
-			ib.Ctrl = true;
-		}
-		else if (token == "SHIFT")
-		{
-			ib.Shift = true;
-		}
-	}
+			token = aInputBind.substr(0, pos);
+			aInputBind.erase(0, pos + delimiter.length());
 
-	if (aInputBind == "LMB")
-	{
-		ib.Device = EInputDevice::Mouse;
-		ib.Code = (unsigned short)EMouseButtons::LMB;
-	}
-	else if (aInputBind == "RMB")
-	{
-		ib.Device = EInputDevice::Mouse;
-		ib.Code = (unsigned short)EMouseButtons::RMB;
-	}
-	else if (aInputBind == "MMB")
-	{
-		ib.Device = EInputDevice::Mouse;
-		ib.Code = (unsigned short)EMouseButtons::MMB;
-	}
-	else if (aInputBind == "M4")
-	{
-		ib.Device = EInputDevice::Mouse;
-		ib.Code = (unsigned short)EMouseButtons::M4;
-	}
-	else if (aInputBind == "M5")
-	{
-		ib.Device = EInputDevice::Mouse;
-		ib.Code = (unsigned short)EMouseButtons::M5;
-	}
-	else
-	{
-		ib.Device = EInputDevice::Keyboard;
-
-		static std::unordered_map<std::string, unsigned short> s_ScancodeLUT;
-		static bool s_IsLUTBuilt = [] {
-			for (long long i = 0; i <= 255; i++)
+			if (token == "ALT")
 			{
-				/* create key msg lparam */
-				KeystrokeMessageFlags key{};
-				key.ScanCode = i;
+				ib.Alt = true;
+			}
+			else if (token == "CTRL")
+			{
+				ib.Ctrl = true;
+			}
+			else if (token == "SHIFT")
+			{
+				ib.Shift = true;
+			}
+		}
 
-				/* get the scancode (current i) */
+		if (aInputBind == "LMB")
+		{
+			ib.Device = EInputDevice::Mouse;
+			ib.Code = (unsigned short)EMouseButtons::LMB;
+		}
+		else if (aInputBind == "RMB")
+		{
+			ib.Device = EInputDevice::Mouse;
+			ib.Code = (unsigned short)EMouseButtons::RMB;
+		}
+		else if (aInputBind == "MMB")
+		{
+			ib.Device = EInputDevice::Mouse;
+			ib.Code = (unsigned short)EMouseButtons::MMB;
+		}
+		else if (aInputBind == "M4")
+		{
+			ib.Device = EInputDevice::Mouse;
+			ib.Code = (unsigned short)EMouseButtons::M4;
+		}
+		else if (aInputBind == "M5")
+		{
+			ib.Device = EInputDevice::Mouse;
+			ib.Code = (unsigned short)EMouseButtons::M5;
+		}
+		else
+		{
+			ib.Device = EInputDevice::Keyboard;
+
+			static std::unordered_map<std::string, unsigned short> s_ScancodeLUT;
+			static bool s_IsLUTBuilt = []
+			{
+				for (long long i = 0; i <= 255; i++)
 				{
-					char buff[256]{};
-					GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, sizeof(buff));
-					s_ScancodeLUT.emplace(buff, key.GetScanCode());
-				}
+					/* create key msg lparam */
+					KeystrokeMessageFlags key{};
+					key.ScanCode = i;
 
-				key.ExtendedFlag = 1;
+					/* get the scancode (current i) */
+					{
+						char buff[256]{};
+						GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, sizeof(buff));
+						s_ScancodeLUT.emplace(buff, key.GetScanCode());
+					}
 
-				/* get the scancode again, but this time with the extended flag */
+					key.ExtendedFlag = 1;
+
+					/* get the scancode again, but this time with the extended flag */
+					{
+						char buff[256]{};
+						GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, sizeof(buff));
+						s_ScancodeLUT.emplace(buff, key.GetScanCode());
+					}
+				};
+				return true;
+			}();
+
+			auto it = s_ScancodeLUT.find(aInputBind);
+
+			if (it != s_ScancodeLUT.end())
+			{
+				ib.Code = it->second;
+			}
+		}
+
+		return ib;
+	}
+
+	std::string IBToString(const InputBind_t& aInputBind, bool aPadded)
+	{
+		if (aInputBind.Device == EInputDevice::None) { return "(null)"; }
+		if (aInputBind.Device == EInputDevice::Mouse && aInputBind.Code == 0) { return "(null)"; }
+		if (aInputBind.Device == EInputDevice::Keyboard
+			&& !aInputBind.Code
+			&& !aInputBind.Alt
+			&& !aInputBind.Ctrl
+			&& !aInputBind.Shift)
+		{
+			return "(null)";
+		}
+
+		char buff[100]{};
+		std::string str;
+
+		if (aInputBind.Alt)
+		{
+			GetKeyNameTextA(MapVirtualKeyA(VK_MENU, MAPVK_VK_TO_VSC) << 16, buff, 100);
+			str.append(buff);
+			str.append(aPadded ? " + " : "+");
+		}
+
+		if (aInputBind.Ctrl)
+		{
+			GetKeyNameTextA(MapVirtualKeyA(VK_CONTROL, MAPVK_VK_TO_VSC) << 16, buff, 100);
+			str.append(buff);
+			str.append(aPadded ? " + " : "+");
+		}
+
+		if (aInputBind.Shift)
+		{
+			GetKeyNameTextA(MapVirtualKeyA(VK_SHIFT, MAPVK_VK_TO_VSC) << 16, buff, 100);
+			str.append(buff);
+			str.append(aPadded ? " + " : "+");
+		}
+
+		if (aInputBind.Device == EInputDevice::Keyboard)
+		{
+			GetKeyNameTextA(static_cast<LONG>(GetKeyMessageLPARAM_ScanCode(aInputBind.Code, false, false)), buff, 100);
+			str.append(buff);
+		}
+		else if (aInputBind.Device == EInputDevice::Mouse)
+		{
+			switch ((EMouseButtons)aInputBind.Code)
+			{
+				case EMouseButtons::LMB:
 				{
-					char buff[256]{};
-					GetKeyNameTextA(static_cast<LONG>(KMFToLParam(key)), buff, sizeof(buff));
-					s_ScancodeLUT.emplace(buff, key.GetScanCode());
+					str.append("LMB");
+					break;
 				}
-			};
-			return true;
-		}();
-
-		auto it = s_ScancodeLUT.find(aInputBind);
-
-		if (it != s_ScancodeLUT.end())
-		{
-			ib.Code = it->second;
-		}
-	}
-
-	return ib;
-}
-
-std::string IBToString(const InputBind_t& aInputBind, bool aPadded)
-{
-	if (aInputBind.Device == EInputDevice::None)                          { return "(null)"; }
-	if (aInputBind.Device == EInputDevice::Mouse && aInputBind.Code == 0) { return "(null)"; }
-	if (aInputBind.Device == EInputDevice::Keyboard
-		&& !aInputBind.Code
-		&& !aInputBind.Alt
-		&& !aInputBind.Ctrl
-		&& !aInputBind.Shift)
-	{
-		return "(null)";
-	}
-
-	char buff[100]{};
-	std::string str;
-
-	if (aInputBind.Alt)
-	{
-		GetKeyNameTextA(MapVirtualKeyA(VK_MENU, MAPVK_VK_TO_VSC) << 16, buff, 100);
-		str.append(buff);
-		str.append(aPadded ? " + " : "+");
-	}
-
-	if (aInputBind.Ctrl)
-	{
-		GetKeyNameTextA(MapVirtualKeyA(VK_CONTROL, MAPVK_VK_TO_VSC) << 16, buff, 100);
-		str.append(buff);
-		str.append(aPadded ? " + " : "+");
-	}
-
-	if (aInputBind.Shift)
-	{
-		GetKeyNameTextA(MapVirtualKeyA(VK_SHIFT, MAPVK_VK_TO_VSC) << 16, buff, 100);
-		str.append(buff);
-		str.append(aPadded ? " + " : "+");
-	}
-
-	if (aInputBind.Device == EInputDevice::Keyboard)
-	{
-		GetKeyNameTextA(static_cast<LONG>(GetKeyMessageLPARAM_ScanCode(aInputBind.Code, false, false)), buff, 100);
-		str.append(buff);
-	}
-	else if (aInputBind.Device == EInputDevice::Mouse)
-	{
-		switch ((EMouseButtons)aInputBind.Code)
-		{
-			case EMouseButtons::LMB:
-			{
-				str.append("LMB");
-				break;
-			}
-			case EMouseButtons::RMB:
-			{
-				str.append("RMB");
-				break;
-			}
-			case EMouseButtons::MMB:
-			{
-				str.append("MMB");
-				break;
-			}
-			case EMouseButtons::M4:
-			{
-				str.append("M4");
-				break;
-			}
-			case EMouseButtons::M5:
-			{
-				str.append("M5");
-				break;
+				case EMouseButtons::RMB:
+				{
+					str.append("RMB");
+					break;
+				}
+				case EMouseButtons::MMB:
+				{
+					str.append("MMB");
+					break;
+				}
+				case EMouseButtons::M4:
+				{
+					str.append("M4");
+					break;
+				}
+				case EMouseButtons::M5:
+				{
+					str.append("M5");
+					break;
+				}
 			}
 		}
+
+		str = String::ToUpper(str);
+
+		return String::ConvertMBToUTF8(str);
 	}
-
-	str = String::ToUpper(str);
-
-	return String::ConvertMBToUTF8(str);
 }

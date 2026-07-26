@@ -11,13 +11,19 @@
 #include "IbEnum.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// InputBindV1_t Struct
-/// 	Old Keybind struct used for backwards compatibility within APIs.
+/// Raidcore::Nexus::Input Namespace
 ///----------------------------------------------------------------------------------------------------
-struct InputBindV1_t
+namespace Raidcore::Nexus::Input
 {
-	unsigned short Key;
-	bool           Alt;
-	bool           Ctrl;
-	bool           Shift;
-};
+	///----------------------------------------------------------------------------------------------------
+	/// InputBindV1_t Struct
+	/// 	Old Keybind struct used for backwards compatibility within APIs.
+	///----------------------------------------------------------------------------------------------------
+	struct InputBindV1_t
+	{
+		unsigned short Key;
+		bool           Alt;
+		bool           Ctrl;
+		bool           Shift;
+	};
+}

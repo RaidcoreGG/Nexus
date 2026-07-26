@@ -61,7 +61,7 @@ namespace Raidcore::Nexus::GUI
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		CQuickAccess(Core::DataLinkApi* aDataLink, Core::LogApi* aLogger, CInputBindApi* aInputBindApi, Graphics::TextureLoader* aTextureService, Localization* aLocalization, Host::EventApi* aEventApi);
+		CQuickAccess(Core::DataLinkApi* aDataLink, Core::LogApi* aLogger, Input::CInputBindApi* aInputBindApi, Graphics::TextureLoader* aTextureService, Localization* aLocalization, Host::EventApi* aEventApi);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
@@ -136,7 +136,7 @@ namespace Raidcore::Nexus::GUI
 
 		private:
 		Core::LogApi* Logger{};
-		CInputBindApi* InputBindApi{};
+		Input::CInputBindApi* InputBindApi{};
 		Graphics::TextureLoader* TextureService{};
 		Localization* Language{};
 		Host::EventApi* EventApi{};

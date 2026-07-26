@@ -74,11 +74,11 @@ namespace Raidcore::Nexus::GUI
 
 			if (!this->InputBindID.empty())
 			{
-				const InputBind_t* ib = this->InputBindApi->Get(this->InputBindID);
+				const Input::InputBind_t* ib = this->InputBindApi->Get(this->InputBindID);
 
-				if (ib != nullptr && ib->Device != EInputDevice::None)
+				if (ib != nullptr && ib->Device != Input::EInputDevice::None)
 				{
-					this->IBText = IBToString(*ib, true);
+					this->IBText = Input::IBToString(*ib, true);
 				}
 			}
 
