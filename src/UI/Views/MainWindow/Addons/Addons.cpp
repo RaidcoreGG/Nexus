@@ -20,6 +20,7 @@ using namespace Raidcore::Nexus;
 #include "Index/Index.h"
 #include "CtlAddonToggle.h"
 #include "res/ResConst.h"
+#include "Util/DLL.h"
 #include "Util/Strings.h"
 
 namespace Raidcore::Nexus::GUI
@@ -133,7 +134,7 @@ namespace Raidcore::Nexus::GUI
 		static Host::ConfigMgr& cfgmgr = ctx.Host().Config();
 		static Host::LibraryMgr& libmgr = ctx.Host().Library();
 		static Graphics::TextureLoader& texapi = ctx.Graphics().Textures();
-		static CLocalization* langApi = uictx.GetLocalization();
+		static Localization* langApi = uictx.GetLocalization();
 		static CAlerts* alertctx = uictx.GetAlerts();
 
 		/* For the status bar, data will be set within the child.*/
@@ -306,7 +307,7 @@ namespace Raidcore::Nexus::GUI
 		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
 		Graphics::TextureLoader& texapi = ctx.Graphics().Textures();
 		Context& uictx = ctx.UI();
-		CLocalization* lang = uictx.GetLocalization();
+		Localization* lang = uictx.GetLocalization();
 
 		ImGuiStyle& style = ImGui::GetStyle();
 
@@ -314,15 +315,15 @@ namespace Raidcore::Nexus::GUI
 		{
 			/* Static assets */
 			static char s_SearchTerm[400] = {};
-			static Graphics::Texture_t* s_ClearIcon = texapi.GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx.Platform().Module());
-			static Graphics::Texture_t* s_ViewModeIcon_List = texapi.GetOrCreate("ICON_LIST", RES_ICON_LIST, ctx.Platform().Module());
-			static Graphics::Texture_t* s_ViewModeIcon_Tiles = texapi.GetOrCreate("ICON_TILES", RES_ICON_TILES, ctx.Platform().Module());
-			static Graphics::Texture_t* s_FilterIcon = texapi.GetOrCreate("ICON_FILTER", RES_ICON_FILTER, ctx.Platform().Module());
+			static Graphics::Texture_t* s_ClearIcon = texapi.GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, GetCurrentModule());
+			static Graphics::Texture_t* s_ViewModeIcon_List = texapi.GetOrCreate("ICON_LIST", RES_ICON_LIST, GetCurrentModule());
+			static Graphics::Texture_t* s_ViewModeIcon_Tiles = texapi.GetOrCreate("ICON_TILES", RES_ICON_TILES, GetCurrentModule());
+			static Graphics::Texture_t* s_FilterIcon = texapi.GetOrCreate("ICON_FILTER", RES_ICON_FILTER, GetCurrentModule());
 
-			if (!s_ClearIcon) { s_ClearIcon = texapi.GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx.Platform().Module()); }
-			if (!s_ViewModeIcon_List) { s_ViewModeIcon_List = texapi.GetOrCreate("ICON_LIST", RES_ICON_LIST, ctx.Platform().Module()); }
-			if (!s_ViewModeIcon_Tiles) { s_ViewModeIcon_Tiles = texapi.GetOrCreate("ICON_TILES", RES_ICON_TILES, ctx.Platform().Module()); }
-			if (!s_FilterIcon) { s_FilterIcon = texapi.GetOrCreate("ICON_FILTER", RES_ICON_FILTER, ctx.Platform().Module()); }
+			if (!s_ClearIcon) { s_ClearIcon = texapi.GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, GetCurrentModule()); }
+			if (!s_ViewModeIcon_List) { s_ViewModeIcon_List = texapi.GetOrCreate("ICON_LIST", RES_ICON_LIST, GetCurrentModule()); }
+			if (!s_ViewModeIcon_Tiles) { s_ViewModeIcon_Tiles = texapi.GetOrCreate("ICON_TILES", RES_ICON_TILES, GetCurrentModule()); }
+			if (!s_FilterIcon) { s_FilterIcon = texapi.GetOrCreate("ICON_FILTER", RES_ICON_FILTER, GetCurrentModule()); }
 
 			/* Search Term */
 			if (ImGui::InputTextWithHint("##SearchTerm", lang->Translate("((000104))"), &s_SearchTerm[0], 400))
@@ -494,7 +495,7 @@ namespace Raidcore::Nexus::GUI
 	{
 		Runtime& ctx = Runtime::Get();
 		Context& uictx = ctx.UI();
-		CLocalization* lang = uictx.GetLocalization();
+		Localization* lang = uictx.GetLocalization();
 
 		ImGuiStyle& style = ImGui::GetStyle();
 
@@ -569,7 +570,7 @@ namespace Raidcore::Nexus::GUI
 			{
 				Runtime& ctx = Runtime::Get();
 				Graphics::TextureLoader& textureApi = ctx.Graphics().Textures();
-				chevronRt = textureApi.GetOrCreate("ICON_CHEVRON_RT", RES_ICON_CHEVRON_RT, ctx.Platform().Module());
+				chevronRt = textureApi.GetOrCreate("ICON_CHEVRON_RT", RES_ICON_CHEVRON_RT, GetCurrentModule());
 			}
 		}
 		ImGui::EndChild();
@@ -581,7 +582,7 @@ namespace Raidcore::Nexus::GUI
 		{
 			Runtime& ctx = Runtime::Get();
 			Context& uictx = ctx.UI();
-			CLocalization* langApi = uictx.GetLocalization();
+			Localization* langApi = uictx.GetLocalization();
 
 			std::string id;
 
@@ -659,7 +660,7 @@ namespace Raidcore::Nexus::GUI
 										CUpdater* updater = ctx.GetUpdater();
 										Context* uictx = ctx.UI();
 										CAlerts* alertctx = uictx->GetAlerts();
-										CLocalization* langApi = uictx->GetLocalization();
+										Localization* langApi = uictx->GetLocalization();
 										Loader* loader = ctx.GetLoader();
 
 										if (updater->UpdateAddon(tmpPath, addonInfo, false, 5 * 60))
@@ -860,13 +861,13 @@ namespace Raidcore::Nexus::GUI
 		Graphics::TextureLoader& texapi = ctx.Graphics().Textures();
 		Host::Loader& loader = ctx.Host().Loader();
 		Context& uictx = ctx.UI();
-		CLocalization* lang = uictx.GetLocalization();
+		Localization* lang = uictx.GetLocalization();
 
 		if (ImGui::BeginChild("Actions", aSize, false, ImGuiWindowFlags_NoBackground))
 		{
 			/* Static assets */
-			static Graphics::Texture_t* s_ReloadIcon = texapi.GetOrCreate("ICON_REFRESH", RES_ICON_REFRESH, ctx.Platform().Module());
-			if (!s_ReloadIcon) { s_ReloadIcon = texapi.GetOrCreate("ICON_REFRESH", RES_ICON_REFRESH, ctx.Platform().Module()); }
+			static Graphics::Texture_t* s_ReloadIcon = texapi.GetOrCreate("ICON_REFRESH", RES_ICON_REFRESH, GetCurrentModule());
+			if (!s_ReloadIcon) { s_ReloadIcon = texapi.GetOrCreate("ICON_REFRESH", RES_ICON_REFRESH, GetCurrentModule()); }
 
 			/* Open addons folder */
 			if (ImGui::Button(lang->Translate("((000034))")))
@@ -928,7 +929,7 @@ namespace Raidcore::Nexus::GUI
 
 								CContext* ctx = CContext::GetContext();
 								Context* uictx = ctx.UI();
-								CLocalization* langApi = uictx->GetLocalization();
+								Localization* langApi = uictx->GetLocalization();
 								CUpdater* updater = ctx.GetUpdater();
 								CAlerts* alertctx = uictx->GetAlerts();
 
@@ -1009,7 +1010,7 @@ namespace Raidcore::Nexus::GUI
 		{
 			Runtime& ctx = Runtime::Get();
 			Context& uictx = ctx.UI();
-			CLocalization* langApi = uictx.GetLocalization();
+			Localization* langApi = uictx.GetLocalization();
 
 			for (auto& [identifier, inputBind] : aInputBinds)
 			{

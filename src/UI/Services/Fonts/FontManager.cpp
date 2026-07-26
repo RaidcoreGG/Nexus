@@ -18,10 +18,11 @@ using namespace Raidcore::Nexus;
 #include "Core/Preferences/PrefConst.h"
 #include "res/ResConst.h"
 #include "Util/Resources.h"
+#include "Util/DLL.h"
 
 namespace Raidcore::Nexus::GUI
 {
-	CFontManager::CFontManager(CLocalization* aLocalization) : IRefCleaner("FontManager")
+	CFontManager::CFontManager(Localization* aLocalization) : IRefCleaner("FontManager")
 	{
 		this->Language = aLocalization;
 
@@ -437,7 +438,7 @@ namespace Raidcore::Nexus::GUI
 
 			/* get data */
 			Runtime& ctx = Runtime::Get();
-			Resources::Get(ctx.Platform().Module(), MAKEINTRESOURCE(RES_FONT_INTER), RT_FONT, &buffer, (DWORD*)&size);
+			Resources::Get(GetCurrentModule(), MAKEINTRESOURCE(RES_FONT_INTER), RT_FONT, &buffer, (DWORD*)&size);
 
 			/* call AddFontInternal with the memory buffer */
 			this->AddFontInternal("FONT_DEFAULT", 15.0f, buffer, size, aCallback, nullptr);

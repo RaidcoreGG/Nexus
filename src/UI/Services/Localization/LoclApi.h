@@ -8,12 +8,14 @@
 
 #pragma once
 
-#include <mutex>
 #include <filesystem>
 #include <map>
+#include <mutex>
 #include <string>
 
 #include "Core/Logging/LogApi.h"
+#include "Core/Preferences/PrefContext.h"
+#include "Host/Events/EvtApi.h"
 #include "LoclLocale.h"
 #include "LoclQueuedText.h"
 
@@ -25,9 +27,9 @@ constexpr const char* CH_LOCALIZATION = "Localization";
 namespace Raidcore::Nexus::GUI
 {
 	///----------------------------------------------------------------------------------------------------
-	/// CLocalization Class
+	/// Localization Class
 	///----------------------------------------------------------------------------------------------------
-	class CLocalization
+	class Localization
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
@@ -39,12 +41,12 @@ namespace Raidcore::Nexus::GUI
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		CLocalization(Core::LogApi* aLogger);
+		Localization(Core::LogApi& aLogger, Core::SettingsMgr& aSettings, Host::EventApi& aEventApi);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
 		///----------------------------------------------------------------------------------------------------
-		~CLocalization();
+		~Localization();
 
 		///----------------------------------------------------------------------------------------------------
 		/// Advance:
@@ -97,7 +99,9 @@ namespace Raidcore::Nexus::GUI
 		std::vector<const char*> GetAllTexts();
 
 		private:
-		Core::LogApi* Logger = nullptr;
+		Core::LogApi&      Logger;
+		Core::SettingsMgr& Settings;
+		Host::EventApi&    EventApi;
 
 		uint32_t                         ThreadID = 0;
 

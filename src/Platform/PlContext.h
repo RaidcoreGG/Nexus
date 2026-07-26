@@ -38,12 +38,6 @@ namespace Raidcore::Nexus::Platform
 		void Shutdown();
 
 		///----------------------------------------------------------------------------------------------------
-		/// Module:
-		/// 	Returns the module handle of Nexus.
-		///----------------------------------------------------------------------------------------------------
-		HMODULE Module();
-
-		///----------------------------------------------------------------------------------------------------
 		/// Window:
 		/// 	Returns the window handle.
 		///----------------------------------------------------------------------------------------------------
@@ -62,8 +56,7 @@ namespace Raidcore::Nexus::Platform
 		Platform::RawInputApi& RawInput();
 
 		private:
-		HMODULE _Module      { nullptr };
-		HWND    _WindowHandle{ nullptr };
+		HWND _WindowHandle{ nullptr };
 
 		std::unique_ptr<Platform::CrashHandler> _CrashHandler{ nullptr };
 		std::unique_ptr<Platform::RawInputApi>  _RawInputApi { nullptr };

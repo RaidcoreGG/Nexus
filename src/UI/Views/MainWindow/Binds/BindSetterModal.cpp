@@ -26,7 +26,7 @@ namespace Raidcore::Nexus::GUI
 	{
 		Runtime& ctx = Runtime::Get();
 		Context& uictx = ctx.UI();
-		CLocalization* lang = uictx.GetLocalization();
+		Localization* lang = uictx.GetLocalization();
 		CInputBindApi* ibapi = ctx.InputBinds();
 
 		this->Capture = ibapi->GetCapture();
@@ -219,7 +219,7 @@ namespace Raidcore::Nexus::GUI
 	{
 		Runtime& ctx = Runtime::Get();
 		Context& uictx = ctx.UI();
-		CLocalization* lang = uictx.GetLocalization();
+		Localization* lang = uictx.GetLocalization();
 
 		/* Override the title before opening the modal. */
 		std::string title = lang->Translate("((000062))");

@@ -21,6 +21,7 @@ using namespace Raidcore::Nexus;
 #include "res/ResConst.h"
 #include "UI/Views/QuickAccess/QaConst.h"
 #include "Util/Base64.h"
+#include "Util/DLL.h"
 #include "Util/Inputs.h"
 #include "Util/Time.h"
 
@@ -80,7 +81,7 @@ namespace Raidcore::Nexus::GUI
 		static Runtime& ctx = Runtime::Get();
 		static Core::SettingsMgr* settingsctx = &ctx.Core().Settings();
 		static Context& uictx = ctx.UI();
-		static CLocalization* langApi = uictx.GetLocalization();
+		static Localization* langApi = uictx.GetLocalization();
 		static CQuickAccess* qactx = uictx.GetQuickAccess();
 
 		if (ImGui::BeginTabItem(langApi->Translate("((000052))")))
@@ -380,7 +381,7 @@ namespace Raidcore::Nexus::GUI
 		Runtime& ctx = Runtime::Get();
 		Core::SettingsMgr* settingsctx = &ctx.Core().Settings();
 		Context& uictx = ctx.UI();
-		CLocalization* langApi = uictx.GetLocalization();
+		Localization* langApi = uictx.GetLocalization();
 
 		if (ImGui::BeginTabItem(langApi->Translate("((000053))")))
 		{
@@ -523,7 +524,7 @@ namespace Raidcore::Nexus::GUI
 									}
 									else
 									{
-										s_TexCross = Runtime::Get().Graphics().Textures().GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx.Platform().Module());
+										s_TexCross = Runtime::Get().Graphics().Textures().GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, GetCurrentModule());
 									}
 
 									/* Display the filename without extension. */

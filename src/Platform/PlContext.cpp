@@ -20,17 +20,6 @@ namespace Raidcore::Nexus::Platform
 {
 	Context::Context()
 	{
-		static uint32_t s_Dummy = 0;
-
-		HMODULE hmodule = nullptr;
-		GetModuleHandleExA(
-			GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
-			(LPCSTR)&s_Dummy,
-			&hmodule
-		);
-
-		this->_Module = hmodule;
-
 		EnumWindows([](HWND aHandle, LPARAM aOutHandle) -> BOOL
 		{
 			DWORD pid = 0;
@@ -66,11 +55,6 @@ namespace Raidcore::Nexus::Platform
 	{
 		this->_CrashHandler.reset();
 		this->_RawInputApi.reset();
-	}
-
-	HMODULE Context::Module()
-	{
-		return this->_Module;
 	}
 
 	HWND Context::Window()

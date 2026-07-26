@@ -153,7 +153,7 @@ namespace Raidcore::Nexus::GUI
 		/// GetLocalization:
 		/// 	Returns the localization component.
 		///----------------------------------------------------------------------------------------------------
-		CLocalization* GetLocalization();
+		Localization* GetLocalization();
 
 		///----------------------------------------------------------------------------------------------------
 		/// GetAlerts:
@@ -195,7 +195,7 @@ namespace Raidcore::Nexus::GUI
 		/* Services */
 		Graphics::Window_t& GrWindow;
 		Core::LogApi* Logger = nullptr;
-		CLocalization* Language = nullptr;
+		Localization* Language = nullptr;
 		Graphics::TextureLoader& TextureService;
 		Core::DataLinkApi* DataLink = nullptr;
 		CInputBindApi* InputBindApi = nullptr;

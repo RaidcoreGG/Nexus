@@ -85,7 +85,7 @@ namespace Raidcore::Nexus
 		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [](Clockwork::CancellationToken aToken)
 		{
 			Runtime& ctx = Runtime::Get();
-			Resources::Unpack(ctx.Platform().Module(), Index(EPath::ThirdPartySoftwareReadme), RES_THIRDPARTYNOTICES, "TXT");
+			Resources::Unpack(GetCurrentModule(), Index(EPath::ThirdPartySoftwareReadme), RES_THIRDPARTYNOTICES, "TXT");
 		});
 
 		/* Allocate console logger, if requested. */

@@ -23,7 +23,7 @@ namespace Raidcore::Nexus::GUI
 	{
 		Runtime& ctx = Runtime::Get();
 		Context& uictx = ctx.UI();
-		CLocalization* lang = uictx.GetLocalization();
+		Localization* lang = uictx.GetLocalization();
 
 		ImGui::Text(lang->Translate("((000116))"));
 
@@ -79,7 +79,7 @@ namespace Raidcore::Nexus::GUI
 	{
 		Runtime& ctx = Runtime::Get();
 		Context& uictx = ctx.UI();
-		CLocalization* lang = uictx.GetLocalization();
+		Localization* lang = uictx.GetLocalization();
 
 		/* Override the title before opening the modal. */
 		std::string title = lang->Translate("((000117))");

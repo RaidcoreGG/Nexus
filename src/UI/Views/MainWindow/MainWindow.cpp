@@ -25,6 +25,7 @@ using namespace Raidcore::Nexus;
 #include "UI/Views/MainWindow/Debug/Debug.h"
 #include "UI/Views/MainWindow/Log/Log.h"
 #include "UI/Views/MainWindow/Options/Options.h"
+#include "Util/DLL.h"
 #include "Util/Time.h"
 
 namespace Raidcore::Nexus::GUI
@@ -291,7 +292,7 @@ namespace Raidcore::Nexus::GUI
 				}
 
 				static Context& uictx = ctx.UI();
-				static CLocalization* langApi = uictx.GetLocalization();
+				static Localization* langApi = uictx.GetLocalization();
 
 				/* Dynamic Nav Items */
 				for (ISubWindow* window : this->Windows)
@@ -368,7 +369,7 @@ namespace Raidcore::Nexus::GUI
 				}
 				else
 				{
-					this->Tex_RaidcoreTag = ctx.Graphics().Textures().GetOrCreate("RAIDCORE_TAG", RES_ICON_RAIDCORE, ctx.Platform().Module());
+					this->Tex_RaidcoreTag = ctx.Graphics().Textures().GetOrCreate("RAIDCORE_TAG", RES_ICON_RAIDCORE, GetCurrentModule());
 				}
 
 				if (this->Tex_CloseIcon)
@@ -386,7 +387,7 @@ namespace Raidcore::Nexus::GUI
 				}
 				else
 				{
-					this->Tex_CloseIcon = ctx.Graphics().Textures().GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx.Platform().Module());
+					this->Tex_CloseIcon = ctx.Graphics().Textures().GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, GetCurrentModule());
 				}
 			}
 			this->IsHandleHeld = ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows);

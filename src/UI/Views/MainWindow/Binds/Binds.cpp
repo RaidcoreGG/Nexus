@@ -40,7 +40,7 @@ namespace Raidcore::Nexus::GUI
 		Runtime& ctx = Runtime::Get();
 		Context& uictx = ctx.UI();
 		CEscapeClosing* escclose = uictx.GetEscapeClosingService();
-		CLocalization* langApi = uictx.GetLocalization();
+		Localization* langApi = uictx.GetLocalization();
 
 		if (this->IsInvalid)
 		{
@@ -180,7 +180,7 @@ namespace Raidcore::Nexus::GUI
 		{
 			Runtime& ctx = Runtime::Get();
 			Context& uictx = ctx.UI();
-			CLocalization* langApi = uictx.GetLocalization();
+			Localization* langApi = uictx.GetLocalization();
 
 			for (auto& [identifier, inputBind] : aInputBinds)
 			{
@@ -227,7 +227,7 @@ namespace Raidcore::Nexus::GUI
 		{
 			Runtime& ctx = Runtime::Get();
 			Context& uictx = ctx.UI();
-			CLocalization* langApi = uictx.GetLocalization();
+			Localization* langApi = uictx.GetLocalization();
 
 			for (auto& [identifier, inputBind] : aInputBinds)
 			{

@@ -72,7 +72,7 @@ namespace Raidcore::Nexus::Host::API
 	static GW2::GameBindsApi*         s_GameBindsApi  = nullptr;
 	static CInputBindApi*             s_InputBindApi  = nullptr;
 	static Platform::RawInputApi*     s_RawInputApi   = nullptr;
-	static Nexus::GUI::CLocalization* s_Localization  = nullptr;
+	static Nexus::GUI::Localization* s_Localization  = nullptr;
 	static Core::LogApi*              s_Logger        = nullptr;
 	static Graphics::TextureLoader*   s_TextureApi    = nullptr;
 	static Host::Loader*              s_Loader        = nullptr;

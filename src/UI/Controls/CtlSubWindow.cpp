@@ -16,6 +16,7 @@
 using namespace Raidcore::Nexus;
 
 #include "res/ResConst.h"
+#include "Util/DLL.h"
 
 namespace Raidcore::Nexus::GUI
 {
@@ -34,7 +35,7 @@ namespace Raidcore::Nexus::GUI
 		{
 			Runtime& ctx = Runtime::Get();
 			Context& uictx = ctx.UI();
-			CLocalization* langApi = uictx.GetLocalization();
+			Localization* langApi = uictx.GetLocalization();
 
 			std::string wndName = langApi->Translate(this->DisplayName.c_str());
 
@@ -75,7 +76,7 @@ namespace Raidcore::Nexus::GUI
 		else
 		{
 			Runtime& ctx = Runtime::Get();
-			this->Tex_PopoutIcon = ctx.Graphics().Textures().GetOrCreate("ICON_POPOUT", RES_ICON_POPOUT, ctx.Platform().Module());
+			this->Tex_PopoutIcon = ctx.Graphics().Textures().GetOrCreate("ICON_POPOUT", RES_ICON_POPOUT, GetCurrentModule());
 		}
 
 		if (popout)
@@ -94,7 +95,7 @@ namespace Raidcore::Nexus::GUI
 		if (!this->Tex_Icon && !this->IconIdentifier.empty() && this->IconID)
 		{
 			Runtime& ctx = Runtime::Get();
-			this->Tex_Icon = ctx.Graphics().Textures().GetOrCreate(this->IconIdentifier.c_str(), this->IconID, ctx.Platform().Module());
+			this->Tex_Icon = ctx.Graphics().Textures().GetOrCreate(this->IconIdentifier.c_str(), this->IconID, GetCurrentModule());
 		}
 
 		return this->Tex_Icon;
@@ -119,7 +120,7 @@ namespace Raidcore::Nexus::GUI
 	{
 		static Runtime& ctx = Runtime::Get();
 		static Context& uictx = ctx.UI();
-		static CLocalization* langApi = uictx.GetLocalization();
+		static Localization* langApi = uictx.GetLocalization();
 
 		std::string wndName = langApi->Translate(this->DisplayName.c_str());
 

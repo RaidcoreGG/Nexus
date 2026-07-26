@@ -134,7 +134,7 @@ namespace Raidcore::Nexus::GUI
 		Graphics::TextureLoader* TextureService = nullptr;
 		Host::Loader* Loader = nullptr;
 		Core::DataLinkApi* DataLink = nullptr;
-		CLocalization* Language = nullptr;
+		Localization* Language = nullptr;
 		NexusLinkData_t* NexusLink = nullptr;
 
 		bool                                 IsValid = false;

@@ -61,7 +61,7 @@ namespace Raidcore::Nexus::GUI
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		CQuickAccess(Core::DataLinkApi* aDataLink, Core::LogApi* aLogger, CInputBindApi* aInputBindApi, Graphics::TextureLoader* aTextureService, CLocalization* aLocalization, Host::EventApi* aEventApi);
+		CQuickAccess(Core::DataLinkApi* aDataLink, Core::LogApi* aLogger, CInputBindApi* aInputBindApi, Graphics::TextureLoader* aTextureService, Localization* aLocalization, Host::EventApi* aEventApi);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
@@ -138,7 +138,7 @@ namespace Raidcore::Nexus::GUI
 		Core::LogApi* Logger{};
 		CInputBindApi* InputBindApi{};
 		Graphics::TextureLoader* TextureService{};
-		CLocalization* Language{};
+		Localization* Language{};
 		Host::EventApi* EventApi{};
 
 		NexusLinkData_t* NexusLink{};

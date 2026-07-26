@@ -33,6 +33,7 @@ using namespace Raidcore::Nexus;
 #include "GW2/Mumble/MblReader.h"
 #include "res/ResConst.h"
 #include "Util/Base64.h"
+#include "Util/DLL.h"
 #include "Util/Inputs.h"
 #include "Util/Resources.h"
 #include "Util/Strings.h"
@@ -181,7 +182,7 @@ namespace Raidcore::Nexus::GUI
 	{
 		ImGui::CreateContext();
 
-		this->Language = new CLocalization(aLogger);
+		this->Language = new Localization(*aLogger, Runtime::Get().Core().Settings(), aEventApi);
 		this->Alerts = new CAlerts(aDataLink);
 		this->MainWindow = new CMainWindow();
 		this->QuickAccess = new CQuickAccess(aDataLink, aLogger, aInputBindApi, &aTextureService, this->Language, &aEventApi);
@@ -524,7 +525,7 @@ namespace Raidcore::Nexus::GUI
 		return uMsg;
 	}
 
-	CLocalization* Context::GetLocalization()
+	Localization* Context::GetLocalization()
 	{
 		return this->Language;
 	}
@@ -586,35 +587,35 @@ namespace Raidcore::Nexus::GUI
 		config.MergeMode = true;
 
 		/* small UI*/
-		this->FontManager->ReplaceFont("MENOMONIA_S", 16.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		this->FontManager->ReplaceFont("MENOMONIA_S", 16.0f, RES_FONT_MENOMONIA, GetCurrentModule(), Context::OnFontUpdate, nullptr);
 		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_S_MERGE", 16.0f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
-		this->FontManager->ReplaceFont("MENOMONIA_BIG_S", 22.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		this->FontManager->ReplaceFont("MENOMONIA_BIG_S", 22.0f, RES_FONT_MENOMONIA, GetCurrentModule(), Context::OnFontUpdate, nullptr);
 		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_S_MERGE", 22.0f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
-		this->FontManager->ReplaceFont("FIRASANS_S", 15.0f, RES_FONT_FIRASANS, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		this->FontManager->ReplaceFont("FIRASANS_S", 15.0f, RES_FONT_FIRASANS, GetCurrentModule(), Context::OnFontUpdate, nullptr);
 		if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_S_MERGE", 15.0f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
 
 		/* normal UI*/
-		this->FontManager->ReplaceFont("MENOMONIA_N", 18.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		this->FontManager->ReplaceFont("MENOMONIA_N", 18.0f, RES_FONT_MENOMONIA, GetCurrentModule(), Context::OnFontUpdate, nullptr);
 		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_N_MERGE", 18.0f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
-		this->FontManager->ReplaceFont("MENOMONIA_BIG_N", 24.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		this->FontManager->ReplaceFont("MENOMONIA_BIG_N", 24.0f, RES_FONT_MENOMONIA, GetCurrentModule(), Context::OnFontUpdate, nullptr);
 		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_N_MERGE", 24.0f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
-		this->FontManager->ReplaceFont("FIRASANS_N", 16.0f, RES_FONT_FIRASANS, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		this->FontManager->ReplaceFont("FIRASANS_N", 16.0f, RES_FONT_FIRASANS, GetCurrentModule(), Context::OnFontUpdate, nullptr);
 		if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_N_MERGE", 16.0f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
 
 		/* large UI*/
-		this->FontManager->ReplaceFont("MENOMONIA_L", 20.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		this->FontManager->ReplaceFont("MENOMONIA_L", 20.0f, RES_FONT_MENOMONIA, GetCurrentModule(), Context::OnFontUpdate, nullptr);
 		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_L_MERGE", 20.0f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
-		this->FontManager->ReplaceFont("MENOMONIA_BIG_L", 26.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		this->FontManager->ReplaceFont("MENOMONIA_BIG_L", 26.0f, RES_FONT_MENOMONIA, GetCurrentModule(), Context::OnFontUpdate, nullptr);
 		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_L_MERGE", 26.0f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
-		this->FontManager->ReplaceFont("FIRASANS_L", 17.5f, RES_FONT_FIRASANS, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		this->FontManager->ReplaceFont("FIRASANS_L", 17.5f, RES_FONT_FIRASANS, GetCurrentModule(), Context::OnFontUpdate, nullptr);
 		if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_L_MERGE", 17.5f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
 
 		/* larger UI*/
-		this->FontManager->ReplaceFont("MENOMONIA_XL", 22.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		this->FontManager->ReplaceFont("MENOMONIA_XL", 22.0f, RES_FONT_MENOMONIA, GetCurrentModule(), Context::OnFontUpdate, nullptr);
 		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_XL_MERGE", 22.0f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
-		this->FontManager->ReplaceFont("MENOMONIA_BIG_XL", 28.0f, RES_FONT_MENOMONIA, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		this->FontManager->ReplaceFont("MENOMONIA_BIG_XL", 28.0f, RES_FONT_MENOMONIA, GetCurrentModule(), Context::OnFontUpdate, nullptr);
 		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_XL_MERGE", 28.0f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
-		this->FontManager->ReplaceFont("FIRASANS_XL", 19.5f, RES_FONT_FIRASANS, ctx.Platform().Module(), Context::OnFontUpdate, nullptr);
+		this->FontManager->ReplaceFont("FIRASANS_XL", 19.5f, RES_FONT_FIRASANS, GetCurrentModule(), Context::OnFontUpdate, nullptr);
 		if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_XL_MERGE", 19.5f, fontPath.string().c_str(), Context::OnFontUpdate, &config); }
 	}
 }

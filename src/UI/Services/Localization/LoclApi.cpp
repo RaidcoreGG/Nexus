@@ -16,9 +16,7 @@
 #pragma warning(pop)
 using json = nlohmann::json;
 
-#include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
-
+#include "Util/Dll.h"
 #include "Util/Resources.h"
 #include "Index/Index.h"
 #include "res/ResConst.h"
@@ -26,9 +24,9 @@ using namespace Raidcore::Nexus;
 
 namespace Raidcore::Nexus::GUI
 {
-	static CLocalization* s_Localization{};
+	static Localization* s_Localization{};
 
-	/*static*/ void CLocalization::OnUELanguageChanged(uint32_t* aLanguage)
+	/*static*/ void Localization::OnUELanguageChanged(uint32_t* aLanguage)
 	{
 		if (!aLanguage) { return; }
 		if (!s_Localization) { return; }
@@ -68,43 +66,40 @@ namespace Raidcore::Nexus::GUI
 		}
 	}
 
-	CLocalization::CLocalization(Core::LogApi* aLogger)
+	Localization::Localization(Core::LogApi& aLogger, Core::SettingsMgr& aSettings, Host::EventApi& aEventApi)
+		: Logger(aLogger)
+		, Settings(aSettings)
+		, EventApi(aEventApi)
 	{
 		assert(aLogger);
 
-		this->Logger = aLogger;
-
-		Runtime& ctx = Runtime::Get();
-		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
-		Host::EventApi& evtapi = ctx.Host().Events();
-
 		this->SetLocaleDirectory(Index(EPath::DIR_LOCALES));
-		Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleEN), RES_LOCALE_EN, "JSON");
-		Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleDE), RES_LOCALE_DE, "JSON");
-		Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleFR), RES_LOCALE_FR, "JSON");
-		Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleES), RES_LOCALE_ES, "JSON");
-		Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleCN), RES_LOCALE_CN, "JSON");
-		Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleKR), RES_LOCALE_KR, "JSON");
-		Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleBR), RES_LOCALE_BR, "JSON");
-		Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleCZ), RES_LOCALE_CZ, "JSON");
-		Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleIT), RES_LOCALE_IT, "JSON");
-		Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocalePL), RES_LOCALE_PL, "JSON");
-		Resources::Unpack(ctx.Platform().Module(), Index(EPath::LocaleRU), RES_LOCALE_RU, "JSON");
+		Resources::Unpack(GetCurrentModule(), Index(EPath::LocaleEN), RES_LOCALE_EN, "JSON");
+		Resources::Unpack(GetCurrentModule(), Index(EPath::LocaleDE), RES_LOCALE_DE, "JSON");
+		Resources::Unpack(GetCurrentModule(), Index(EPath::LocaleFR), RES_LOCALE_FR, "JSON");
+		Resources::Unpack(GetCurrentModule(), Index(EPath::LocaleES), RES_LOCALE_ES, "JSON");
+		Resources::Unpack(GetCurrentModule(), Index(EPath::LocaleCN), RES_LOCALE_CN, "JSON");
+		Resources::Unpack(GetCurrentModule(), Index(EPath::LocaleKR), RES_LOCALE_KR, "JSON");
+		Resources::Unpack(GetCurrentModule(), Index(EPath::LocaleBR), RES_LOCALE_BR, "JSON");
+		Resources::Unpack(GetCurrentModule(), Index(EPath::LocaleCZ), RES_LOCALE_CZ, "JSON");
+		Resources::Unpack(GetCurrentModule(), Index(EPath::LocaleIT), RES_LOCALE_IT, "JSON");
+		Resources::Unpack(GetCurrentModule(), Index(EPath::LocalePL), RES_LOCALE_PL, "JSON");
+		Resources::Unpack(GetCurrentModule(), Index(EPath::LocaleRU), RES_LOCALE_RU, "JSON");
 
-		std::string lang = settingsctx.Get<std::string>(OPT_LANGUAGE, "en");
-		this->SetLanguage(!lang.empty() ? lang : "en");
+		std::string lang = this->Settings.Get<std::string>(OPT_LANGUAGE, "en");
+		this->SetLanguage(lang);
 
-		evtapi.Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", reinterpret_cast<Host::EVENT_CONSUME>(CLocalization::OnUELanguageChanged));
+		this->EventApi.Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", reinterpret_cast<Host::EVENT_CONSUME>(Localization::OnUELanguageChanged));
 
 		s_Localization = this;
 	}
 
-	CLocalization::~CLocalization()
+	Localization::~Localization()
 	{
 		this->ClearLocaleAtlas();
 	}
 
-	bool CLocalization::Advance()
+	bool Localization::Advance()
 	{
 		bool didModify = false;
 
@@ -185,7 +180,7 @@ namespace Raidcore::Nexus::GUI
 		return didModify;
 	}
 
-	const char* CLocalization::Translate(const char* aIdentifier, const char* aLanguageIdentifier)
+	const char* Localization::Translate(const char* aIdentifier, const char* aLanguageIdentifier)
 	{
 		if (aIdentifier == nullptr) { return aIdentifier; }
 
@@ -246,7 +241,7 @@ namespace Raidcore::Nexus::GUI
 		return aIdentifier;
 	}
 
-	void CLocalization::Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aText)
+	void Localization::Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aText)
 	{
 		if (!aIdentifier) { return; }
 		if (!aLanguageIdentifier) { return; }
@@ -255,12 +250,12 @@ namespace Raidcore::Nexus::GUI
 		this->QueuedTexts.push_back({ aIdentifier, aLanguageIdentifier, aText });
 	}
 
-	void CLocalization::SetLanguage(const std::string& aIdentifier)
+	void Localization::SetLanguage(const std::string& aIdentifier)
 	{
 		this->QueuedLanguage = aIdentifier;
 	}
 
-	std::vector<std::string> CLocalization::GetLanguages()
+	std::vector<std::string> Localization::GetLanguages()
 	{
 		std::vector<std::string> langs;
 
@@ -272,19 +267,19 @@ namespace Raidcore::Nexus::GUI
 		return langs;
 	}
 
-	const std::string& CLocalization::GetActiveLanguage()
+	const std::string& Localization::GetActiveLanguage()
 	{
 		assert(this->ActiveLocale);
 		return this->ActiveLocale->DisplayName;
 	}
 
-	void CLocalization::SetLocaleDirectory(std::filesystem::path aPath)
+	void Localization::SetLocaleDirectory(std::filesystem::path aPath)
 	{
 		this->Directory = aPath;
 		this->IsLocaleAtlasBuilt = false;
 	}
 
-	std::vector<const char*> CLocalization::GetAllTexts()
+	std::vector<const char*> Localization::GetAllTexts()
 	{
 		std::vector<const char*> allTexts;
 
@@ -299,7 +294,7 @@ namespace Raidcore::Nexus::GUI
 		return allTexts;
 	}
 
-	void CLocalization::BuildLocaleAtlas()
+	void Localization::BuildLocaleAtlas()
 	{
 		/* Directory not set. */
 		if (this->Directory.empty())
@@ -399,14 +394,14 @@ namespace Raidcore::Nexus::GUI
 			}
 			catch (json::parse_error& ex)
 			{
-				Logger->Warning(CH_LOCALIZATION, "%s could not be parsed. Error: %s", path.filename().string().c_str(), ex.what());
+				this->Logger.Warning(CH_LOCALIZATION, "%s could not be parsed. Error: %s", path.filename().string().c_str(), ex.what());
 			}
 		}
 
 		this->IsLocaleAtlasBuilt = true;
 	}
 
-	void CLocalization::ClearLocaleAtlas()
+	void Localization::ClearLocaleAtlas()
 	{
 		if (!this->IsLocaleAtlasBuilt)
 		{

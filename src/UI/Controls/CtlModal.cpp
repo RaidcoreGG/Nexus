@@ -77,7 +77,7 @@ namespace Raidcore::Nexus::GUI
 
 		Runtime& ctx = Runtime::Get();
 		Context& uictx = ctx.UI();
-		CLocalization* lang = uictx.GetLocalization();
+		Localization* lang = uictx.GetLocalization();
 
 		return std::string{ lang->Translate(this->GetDisplayName().c_str()) } + "##" + this->ID;
 	}

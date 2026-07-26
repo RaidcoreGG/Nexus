@@ -17,6 +17,7 @@
 using namespace Raidcore::Nexus;
 
 #include "res/ResConst.h"
+#include "Util/DLL.h"
 
 namespace Raidcore::Nexus::GUI
 {
@@ -88,7 +89,7 @@ namespace Raidcore::Nexus::GUI
 				}
 				else
 				{
-					this->Tex_BannerDiscord = texapi.GetOrCreate("BANNER_DISCORD", RES_BANNER_DISCORD, ctx.Platform().Module());
+					this->Tex_BannerDiscord = texapi.GetOrCreate("BANNER_DISCORD", RES_BANNER_DISCORD, GetCurrentModule());
 				}
 			}
 			ImGui::EndChild();
@@ -127,7 +128,7 @@ namespace Raidcore::Nexus::GUI
 				}
 				else
 				{
-					this->Tex_BannerPatreon = texapi.GetOrCreate("BANNER_PATREON", RES_BANNER_PATREON, ctx.Platform().Module());
+					this->Tex_BannerPatreon = texapi.GetOrCreate("BANNER_PATREON", RES_BANNER_PATREON, GetCurrentModule());
 				}
 			}
 			ImGui::EndChild();

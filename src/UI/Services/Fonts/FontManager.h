@@ -49,7 +49,7 @@ namespace Raidcore::Nexus::GUI
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		CFontManager(CLocalization* aLocalization);
+		CFontManager(Localization* aLocalization);
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
 		///----------------------------------------------------------------------------------------------------
@@ -134,7 +134,7 @@ namespace Raidcore::Nexus::GUI
 		uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 		private:
-		CLocalization* Language;
+		Localization* Language;
 
 		mutable std::mutex         Mutex;
 		std::vector<ManagedFont_t> Registry;

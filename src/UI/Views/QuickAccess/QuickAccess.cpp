@@ -20,6 +20,7 @@ using namespace Raidcore::Nexus;
 #include "Core/Preferences/PrefContext.h"
 #include "res/ResConst.h"
 #include "UI/UIContext.h"
+#include "Util/DLL.h"
 #include "Util/Time.h"
 
 #define GW2_QUICKACCESS_ITEMS 10;
@@ -40,7 +41,7 @@ namespace Raidcore::Nexus::GUI
 		Core::LogApi* aLogger,
 		CInputBindApi* aInputBindApi,
 		Graphics::TextureLoader* aTextureService,
-		CLocalization* aLocalization,
+		Localization* aLocalization,
 		Host::EventApi* aEventApi
 	) : IRefCleaner("QuickAccess")
 	{
@@ -97,12 +98,12 @@ namespace Raidcore::Nexus::GUI
 		});
 
 		/* Preload default icons. */
-		this->TextureService->Load(ICON_NEXUS, RES_ICON_NEXUS, ctx.Platform().Module(), nullptr);
-		this->TextureService->Load(ICON_NEXUS_HOVER, RES_ICON_NEXUS_HOVER, ctx.Platform().Module(), nullptr);
-		this->TextureService->Load(ICON_NEXUS_HALLOWEEN, RES_ICON_NEXUS_HALLOWEEN, ctx.Platform().Module(), nullptr);
-		this->TextureService->Load(ICON_NEXUS_HALLOWEEN_HOVER, RES_ICON_NEXUS_HALLOWEEN_HOVER, ctx.Platform().Module(), nullptr);
-		this->TextureService->Load(ICON_NEXUS_XMAS, RES_ICON_NEXUS_XMAS, ctx.Platform().Module(), nullptr);
-		this->TextureService->Load(ICON_NEXUS_XMAS_HOVER, RES_ICON_NEXUS_XMAS_HOVER, ctx.Platform().Module(), nullptr);
+		this->TextureService->Load(ICON_NEXUS, RES_ICON_NEXUS, GetCurrentModule(), nullptr);
+		this->TextureService->Load(ICON_NEXUS_HOVER, RES_ICON_NEXUS_HOVER, GetCurrentModule(), nullptr);
+		this->TextureService->Load(ICON_NEXUS_HALLOWEEN, RES_ICON_NEXUS_HALLOWEEN, GetCurrentModule(), nullptr);
+		this->TextureService->Load(ICON_NEXUS_HALLOWEEN_HOVER, RES_ICON_NEXUS_HALLOWEEN_HOVER, GetCurrentModule(), nullptr);
+		this->TextureService->Load(ICON_NEXUS_XMAS, RES_ICON_NEXUS_XMAS, GetCurrentModule(), nullptr);
+		this->TextureService->Load(ICON_NEXUS_XMAS_HOVER, RES_ICON_NEXUS_XMAS_HOVER, GetCurrentModule(), nullptr);
 
 		/// FIXME: This is kinda hacky.
 		/// It forces the creation of the setting, so that the below subscriber gets executed on a first launch.
