@@ -83,8 +83,8 @@ struct AddonAPI5_t : AddonAPI_t
 	Input::INPUTBINDS_DEREGISTER             DeregisterInputBind;
 
 	/* DataLink */
-	Core::DATALINK_GETRESOURCE              GetResource;
-	Core::DATALINK_SHARERESOURCE            ShareResource;
+	Core::DATALINK_GETRESOURCE              Get;
+	Core::DATALINK_SHARERESOURCE            Share;
 
 	/* Textures */
 	Graphics::TEXTURES_GET                      GetTexture;

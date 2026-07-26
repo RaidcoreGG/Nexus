@@ -15,8 +15,6 @@
 #include "DlLinkedResource.h"
 #include "Core/Logging/LogApi.h"
 
-constexpr const char* CH_DATALINK = "DataLink";
-
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::Core Namespace
 ///----------------------------------------------------------------------------------------------------
@@ -31,24 +29,24 @@ namespace Raidcore::Nexus::Core
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		DataLinkApi(LogApi* aLogger);
+		DataLinkApi(LogApi& aLogger);
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
 		///----------------------------------------------------------------------------------------------------
 		~DataLinkApi();
 
 		///----------------------------------------------------------------------------------------------------
-		/// GetResource:
+		/// Get:
 		/// 	Retrieves the resource with the given identifier.
 		///----------------------------------------------------------------------------------------------------
-		void* GetResource(const char* aIdentifier);
+		void* Get(const char* aIdentifier);
 
 		///----------------------------------------------------------------------------------------------------
-		/// ShareResource:
+		/// Share:
 		/// 	Allocates memory of the given size, accessible via the provided identifier,
 		/// 	but with a different internal/underlying name.
 		///----------------------------------------------------------------------------------------------------
-		void* ShareResource(
+		void* Share(
 			const char* aIdentifier,
 			size_t      aResourceSize,
 			const char* aUnderlyingName = "",
@@ -62,7 +60,7 @@ namespace Raidcore::Nexus::Core
 		std::unordered_map<std::string, LinkedResource_t> GetRegistry() const;
 
 		private:
-		LogApi* Logger = nullptr;
+		LogApi& Logger;
 
 		mutable std::mutex                                Mutex;
 		std::unordered_map<std::string, LinkedResource_t> Registry;

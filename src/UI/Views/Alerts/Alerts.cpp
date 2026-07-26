@@ -31,7 +31,7 @@ namespace Raidcore::Nexus::GUI
 
 	CAlerts::CAlerts(Core::DataLinkApi* aDataLink)
 	{
-		this->NexusLink = (NexusLinkData_t*)aDataLink->GetResource("DL_NEXUS_LINK");
+		this->NexusLink = (NexusLinkData_t*)aDataLink->Get("DL_NEXUS_LINK");
 	}
 
 	void CAlerts::Render()

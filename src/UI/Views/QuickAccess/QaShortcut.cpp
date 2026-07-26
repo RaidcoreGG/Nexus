@@ -40,7 +40,7 @@ namespace Raidcore::Nexus::GUI
 		this->Loader = &ctx.Host().Loader();
 		this->DataLink = &ctx.Core().DataLink();
 
-		this->NexusLink = static_cast<NexusLinkData_t*>(this->DataLink->GetResource(DL_NEXUS_LINK));
+		this->NexusLink = static_cast<NexusLinkData_t*>(this->DataLink->Get(DL_NEXUS_LINK));
 
 		this->ID = aID;
 		this->IconID = aIconID;

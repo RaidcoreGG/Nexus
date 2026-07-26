@@ -39,9 +39,9 @@ namespace Raidcore::Nexus::GW2
 		}
 
 		/* share the linked mem regardless whether it's disabled, for dependant addons */
-		this->MumbleLink = (Mumble::Data*)this->DataLinkApi.ShareResource(DL_MUMBLE_LINK, sizeof(Mumble::Data), this->Name.c_str(), true);
-		this->MumbleIdentity = (Mumble::Identity*)this->DataLinkApi.ShareResource(DL_MUMBLE_LINK_IDENTITY, sizeof(Mumble::Identity), "", false);
-		this->NexusLink = (NexusLinkData_t*)this->DataLinkApi.ShareResource(DL_NEXUS_LINK, sizeof(NexusLinkData_t), "", true);
+		this->MumbleLink = (Mumble::Data*)this->DataLinkApi.Share(DL_MUMBLE_LINK, sizeof(Mumble::Data), this->Name.c_str(), true);
+		this->MumbleIdentity = (Mumble::Identity*)this->DataLinkApi.Share(DL_MUMBLE_LINK_IDENTITY, sizeof(Mumble::Identity), "", false);
+		this->NexusLink = (NexusLinkData_t*)this->DataLinkApi.Share(DL_NEXUS_LINK, sizeof(NexusLinkData_t), "", true);
 
 		if (this->Name != "0")
 		{

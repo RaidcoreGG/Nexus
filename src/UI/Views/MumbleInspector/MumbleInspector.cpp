@@ -22,9 +22,9 @@ namespace Raidcore::Nexus::GUI
 	{
 		Core::DataLinkApi& dlApi = Runtime::Get().Core().DataLink();
 
-		this->MumbleLink = (Mumble::Data*)dlApi.GetResource(DL_MUMBLE_LINK);
-		this->MumbleIdentity = (Mumble::Identity*)dlApi.GetResource(DL_MUMBLE_LINK_IDENTITY);
-		this->NexusLink = (NexusLinkData_t*)dlApi.GetResource(DL_NEXUS_LINK);
+		this->MumbleLink = (Mumble::Data*)dlApi.Get(DL_MUMBLE_LINK);
+		this->MumbleIdentity = (Mumble::Identity*)dlApi.Get(DL_MUMBLE_LINK_IDENTITY);
+		this->NexusLink = (NexusLinkData_t*)dlApi.Get(DL_NEXUS_LINK);
 	}
 
 	void CMumbleOverlay::Render()
@@ -35,9 +35,9 @@ namespace Raidcore::Nexus::GUI
 		{
 			Core::DataLinkApi& dlApi = Runtime::Get().Core().DataLink();
 
-			this->MumbleLink = (Mumble::Data*)dlApi.GetResource(DL_MUMBLE_LINK);
-			this->MumbleIdentity = (Mumble::Identity*)dlApi.GetResource(DL_MUMBLE_LINK_IDENTITY);
-			this->NexusLink = (NexusLinkData_t*)dlApi.GetResource(DL_NEXUS_LINK);
+			this->MumbleLink = (Mumble::Data*)dlApi.Get(DL_MUMBLE_LINK);
+			this->MumbleIdentity = (Mumble::Identity*)dlApi.Get(DL_MUMBLE_LINK_IDENTITY);
+			this->NexusLink = (NexusLinkData_t*)dlApi.Get(DL_NEXUS_LINK);
 		}
 
 		static ImGuiWindowFlags flags

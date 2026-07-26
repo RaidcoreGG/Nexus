@@ -272,7 +272,7 @@ namespace Hooks
 			s_GrWindow.Width = aWidth;
 			s_GrWindow.Height = aHeight;
 			
-			NexusLinkData_t* nexuslink = (NexusLinkData_t*)s_DataLink.GetResource(DL_NEXUS_LINK);
+			NexusLinkData_t* nexuslink = (NexusLinkData_t*)s_DataLink.Get(DL_NEXUS_LINK);
 
 			if (nexuslink)
 			{

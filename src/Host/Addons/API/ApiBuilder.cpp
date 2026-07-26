@@ -88,16 +88,16 @@ namespace Raidcore::Nexus::Host::API
 
 	namespace DataLink
 	{
-		void* GetResource(const char* aIdentifier)
+		void* Get(const char* aIdentifier)
 		{
 			assert(s_DataLinkApi);
-			return s_DataLinkApi->GetResource(aIdentifier);
+			return s_DataLinkApi->Get(aIdentifier);
 		}
 
-		void* ShareResource(const char* aIdentifier, size_t aResourceSize)
+		void* Share(const char* aIdentifier, size_t aResourceSize)
 		{
 			assert(s_DataLinkApi);
-			return s_DataLinkApi->ShareResource(aIdentifier, aResourceSize, "", false);
+			return s_DataLinkApi->Share(aIdentifier, aResourceSize, "", false);
 		}
 	}
 
@@ -645,8 +645,8 @@ namespace Raidcore::Nexus::Host::API
 				api->RegisterInputBindWithStruct = InputBinds::RegisterWithStruct;
 				api->DeregisterInputBind = InputBinds::Deregister;
 
-				api->GetResource = DataLink::GetResource;
-				api->ShareResource = DataLink::ShareResource;
+				api->Get = DataLink::Get;
+				api->Share = DataLink::Share;
 
 				api->GetTexture = TextureLoader::Get;
 				api->LoadTextureFromFile = TextureLoader::LoadFromFile;
@@ -695,8 +695,8 @@ namespace Raidcore::Nexus::Host::API
 				api->RegisterInputBindWithStruct = InputBinds::RegisterWithStruct;
 				api->DeregisterInputBind = InputBinds::Deregister;
 
-				api->GetResource = DataLink::GetResource;
-				api->ShareResource = DataLink::ShareResource;
+				api->Get = DataLink::Get;
+				api->Share = DataLink::Share;
 
 				api->GetTexture = TextureLoader::Get;
 				api->GetTextureOrCreateFromFile = TextureLoader::GetOrCreateFromFile;
@@ -758,8 +758,8 @@ namespace Raidcore::Nexus::Host::API
 				api->RegisterInputBindWithStruct = InputBinds::RegisterWithStruct;
 				api->DeregisterInputBind = InputBinds::Deregister;
 
-				api->GetResource = DataLink::GetResource;
-				api->ShareResource = DataLink::ShareResource;
+				api->Get = DataLink::Get;
+				api->Share = DataLink::Share;
 
 				api->GetTexture = TextureLoader::Get;
 				api->GetTextureOrCreateFromFile = TextureLoader::GetOrCreateFromFile;
@@ -823,8 +823,8 @@ namespace Raidcore::Nexus::Host::API
 				api->RegisterInputBindWithStruct = InputBinds::RegisterWithStruct2;
 				api->DeregisterInputBind = InputBinds::Deregister;
 
-				api->GetResource = DataLink::GetResource;
-				api->ShareResource = DataLink::ShareResource;
+				api->Get = DataLink::Get;
+				api->Share = DataLink::Share;
 
 				api->GetTexture = TextureLoader::Get;
 				api->GetTextureOrCreateFromFile = TextureLoader::GetOrCreateFromFile;
@@ -895,8 +895,8 @@ namespace Raidcore::Nexus::Host::API
 				api->RegisterInputBindWithStruct = InputBinds::RegisterWithStruct2;
 				api->DeregisterInputBind = InputBinds::Deregister;
 
-				api->GetResource = DataLink::GetResource;
-				api->ShareResource = DataLink::ShareResource;
+				api->Get = DataLink::Get;
+				api->Share = DataLink::Share;
 
 				api->GetTexture = TextureLoader::Get;
 				api->GetTextureOrCreateFromFile = TextureLoader::GetOrCreateFromFile;
@@ -978,8 +978,8 @@ namespace Raidcore::Nexus::Host::API
 				api->GameBinds.Release = GameBinds::Release;
 				api->GameBinds.IsBound = GameBinds::IsBound;
 
-				api->DataLink.Get = DataLink::GetResource;
-				api->DataLink.Share = DataLink::ShareResource;
+				api->DataLink.Get = DataLink::Get;
+				api->DataLink.Share = DataLink::Share;
 
 				api->Textures.Get = TextureLoader::Get;
 				api->Textures.GetOrCreateFromFile = TextureLoader::GetOrCreateFromFile;

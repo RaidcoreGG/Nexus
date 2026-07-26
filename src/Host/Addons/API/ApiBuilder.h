@@ -39,16 +39,16 @@ namespace Raidcore::Nexus::Host::API
 	namespace DataLink
 	{
 		///----------------------------------------------------------------------------------------------------
-		/// GetResource:
-		/// 	Addon API wrapper function for GetResource.
+		/// Get:
+		/// 	Addon API wrapper function for Get.
 		///----------------------------------------------------------------------------------------------------
-		void* GetResource(const char* aIdentifier);
+		void* Get(const char* aIdentifier);
 
 		///----------------------------------------------------------------------------------------------------
-		/// ShareResource:
-		/// 	Addon API wrapper function for ShareResource.
+		/// Share:
+		/// 	Addon API wrapper function for Share.
 		///----------------------------------------------------------------------------------------------------
-		void* ShareResource(const char* aIdentifier, size_t aResourceSize);
+		void* Share(const char* aIdentifier, size_t aResourceSize);
 	}
 
 	///----------------------------------------------------------------------------------------------------

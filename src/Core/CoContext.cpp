@@ -23,7 +23,7 @@ namespace Raidcore::Nexus::Core
 		this->_LogApi = std::make_unique<Core::LogApi>();
 
 		this->_DataLink = std::make_unique<Core::DataLinkApi>(
-			this->_LogApi.get()
+			*this->_LogApi.get()
 		);
 
 		this->_FuncRegistry = std::make_unique<Core::FuncRegistry>(

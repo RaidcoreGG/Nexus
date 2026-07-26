@@ -8,16 +8,13 @@
 
 #include "DlApi.h"
 
-#include <assert.h>
-
 namespace Raidcore::Nexus::Core
 {
-	DataLinkApi::DataLinkApi(LogApi* aLogger)
-	{
-		assert(aLogger);
+	constexpr const char* LOG_CHANNEL = "DataLink";
 
-		this->Logger = aLogger;
-	}
+	DataLinkApi::DataLinkApi(LogApi& aLogger)
+		: Logger(aLogger)
+	{}
 
 	DataLinkApi::~DataLinkApi()
 	{
@@ -52,13 +49,13 @@ namespace Raidcore::Nexus::Core
 					break;
 			}
 
-			this->Logger->Info(CH_DATALINK, "Freed shared resource: \"%s\"", it->first.c_str());
+			this->Logger.Info(LOG_CHANNEL, "Freed shared resource: \"%s\"", it->first.c_str());
 
 			this->Registry.erase(it);
 		}
 	}
 
-	void* DataLinkApi::GetResource(const char* aIdentifier)
+	void* DataLinkApi::Get(const char* aIdentifier)
 	{
 		if (aIdentifier == nullptr) { return nullptr; }
 
@@ -74,7 +71,7 @@ namespace Raidcore::Nexus::Core
 		return nullptr;
 	}
 
-	void* DataLinkApi::ShareResource(const char* aIdentifier, size_t aResourceSize, const char* aUnderlyingName, bool aIsPublic)
+	void* DataLinkApi::Share(const char* aIdentifier, size_t aResourceSize, const char* aUnderlyingName, bool aIsPublic)
 	{
 		if (aIdentifier == nullptr) { return nullptr; }
 		if (aResourceSize == 0) { return nullptr; }
@@ -92,13 +89,13 @@ namespace Raidcore::Nexus::Core
 			}
 			else /* size mismatch */
 			{
-				this->Logger->Warning(CH_DATALINK, "Resource with name \"%s\" already exists with size %u but size %u was requested.", aIdentifier, it->second.Size, aResourceSize);
+				this->Logger.Warning(LOG_CHANNEL, "Resource with name \"%s\" already exists with size %u but size %u was requested.", aIdentifier, it->second.Size, aResourceSize);
 				return nullptr;
 			}
 		}
 
 		/* allocate new resource */
-		LinkedResource_t resource{};
+		LinkedResource_t resource;
 		resource.Size = aResourceSize;
 		resource.Type = aIsPublic ? ELinkedResourceType::Public : ELinkedResourceType::Internal;
 
@@ -139,8 +136,8 @@ namespace Raidcore::Nexus::Core
 				/* still no resource handle */
 				if (!resource.Handle)
 				{
-					this->Logger->Warning(
-						CH_DATALINK,
+					this->Logger.Warning(
+						LOG_CHANNEL,
 						"Failed to create resource \"%s\". OpenFileMapping failed. CreateFileMapping failed. GetLastError: %d",
 						aIdentifier,
 						GetLastError()
@@ -153,8 +150,8 @@ namespace Raidcore::Nexus::Core
 				/* sanity check */
 				if (!resource.Pointer)
 				{
-					this->Logger->Warning(
-						CH_DATALINK,
+					this->Logger.Warning(
+						LOG_CHANNEL,
 						"Failed to create resource \"%s\". MapViewOfFile failed. GetLastError: %d",
 						aIdentifier,
 						GetLastError()
@@ -162,16 +159,16 @@ namespace Raidcore::Nexus::Core
 					return nullptr;
 				}
 
-				memset(resource.Pointer, 0, resource.Size);
+				std::memset(resource.Pointer, 0, resource.Size);
 
-				this->Logger->Info(CH_DATALINK, "Created public shared resource: \"%s\" (Underlying name: \"%s\")", aIdentifier, resource.UnderlyingName.c_str());
+				this->Logger.Info(LOG_CHANNEL, "Created public shared resource: \"%s\" (Underlying name: \"%s\")", aIdentifier, resource.UnderlyingName.c_str());
 				break;
 			}
 			case ELinkedResourceType::Internal:
 			{
 				resource.Pointer = new char[resource.Size];
 
-				this->Logger->Info(CH_DATALINK, "Created internal shared resource: \"%s\"", aIdentifier);
+				this->Logger.Info(LOG_CHANNEL, "Created internal shared resource: \"%s\"", aIdentifier);
 				break;
 			}
 		}

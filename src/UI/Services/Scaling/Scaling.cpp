@@ -49,8 +49,8 @@ namespace Raidcore::Nexus::GUI
 		, EventApi(aEventApi)
 		, Settings(aSettings)
 	{
-		this->MumbleIdentity = static_cast<Mumble::Identity*>(this->DataLink->GetResource(DL_MUMBLE_LINK_IDENTITY));
-		this->NexusLink = static_cast<NexusLinkData_t*>(this->DataLink->GetResource(DL_NEXUS_LINK));
+		this->MumbleIdentity = static_cast<Mumble::Identity*>(this->DataLink->Get(DL_MUMBLE_LINK_IDENTITY));
+		this->NexusLink = static_cast<NexusLinkData_t*>(this->DataLink->Get(DL_NEXUS_LINK));
 
 		this->DpiScalingEnabled = this->Settings->Get<bool>(OPT_DPISCALING, true);
 		this->DpiScalingFactor = 1.0f;

@@ -67,8 +67,8 @@ namespace Raidcore::Nexus::GUI
 		Runtime& ctx = Runtime::Get();
 		Core::DataLinkApi* dlapi = &ctx.Core().DataLink();
 
-		Mumble::Identity* mumbleIdentity = static_cast<Mumble::Identity*>(dlapi->GetResource(DL_MUMBLE_LINK_IDENTITY));
-		NexusLinkData_t* nexusLink = static_cast<NexusLinkData_t*>(dlapi->GetResource(DL_NEXUS_LINK));
+		Mumble::Identity* mumbleIdentity = static_cast<Mumble::Identity*>(dlapi->Get(DL_MUMBLE_LINK_IDENTITY));
+		NexusLinkData_t* nexusLink = static_cast<NexusLinkData_t*>(dlapi->Get(DL_NEXUS_LINK));
 
 		/* directly assign the font */
 		switch (mumbleIdentity->UISize)
@@ -117,8 +117,8 @@ namespace Raidcore::Nexus::GUI
 		Context& uictx = ctx.UI();
 		CFontManager* fontmgr = uictx.GetFontManager();
 
-		Mumble::Identity* mumbleIdentity = static_cast<Mumble::Identity*>(dlapi->GetResource(DL_MUMBLE_LINK_IDENTITY));
-		NexusLinkData_t* nexusLink = static_cast<NexusLinkData_t*>(dlapi->GetResource(DL_NEXUS_LINK));
+		Mumble::Identity* mumbleIdentity = static_cast<Mumble::Identity*>(dlapi->Get(DL_MUMBLE_LINK_IDENTITY));
+		NexusLinkData_t* nexusLink = static_cast<NexusLinkData_t*>(dlapi->Get(DL_NEXUS_LINK));
 
 		switch (mumbleIdentity->UISize)
 		{

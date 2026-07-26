@@ -51,8 +51,8 @@ namespace Raidcore::Nexus::GUI
 		this->Language = aLocalization;
 		this->EventApi = aEventApi;
 
-		this->NexusLink = (NexusLinkData_t*)aDataLink->GetResource(DL_NEXUS_LINK);
-		this->MumbleLink = (Mumble::Data*)aDataLink->GetResource(DL_MUMBLE_LINK);
+		this->NexusLink = (NexusLinkData_t*)aDataLink->Get(DL_NEXUS_LINK);
+		this->MumbleLink = (Mumble::Data*)aDataLink->Get(DL_MUMBLE_LINK);
 
 		Runtime& ctx = Runtime::Get();
 		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
