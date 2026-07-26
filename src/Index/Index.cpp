@@ -8,22 +8,22 @@
 
 #include "Index.h"
 
-#include <assert.h>
 #include <shlobj.h>
+
+#include "Util/DLL.h"
 
 namespace Raidcore::Nexus
 {
-	static HMODULE               s_Module = nullptr;
 	static std::filesystem::path s_Paths[(int)EPath::COUNT];
 
-	void CreateIndex(HMODULE aModule)
+	void CreateIndex()
 	{
-		assert(!s_Module);
+		HMODULE module = GetCurrentModule();
 
 		/* Self DLL path. */
-		char module[MAX_PATH]{};
-		GetModuleFileNameA(aModule, module, MAX_PATH);
-		s_Paths[(int)EPath::NexusDLL] = module;
+		char moduleName[MAX_PATH]{};
+		GetModuleFileNameA(module, moduleName, MAX_PATH);
+		s_Paths[(int)EPath::NexusDLL] = moduleName;
 
 		/* Get system directory. */
 		char system[MAX_PATH]{};
@@ -92,14 +92,16 @@ namespace Raidcore::Nexus
 		s_Paths[(int)EPath::LocaleIT] = s_Paths[(int)EPath::DIR_LOCALES] / "it_Main.json";
 		s_Paths[(int)EPath::LocalePL] = s_Paths[(int)EPath::DIR_LOCALES] / "pl_Main.json";
 		s_Paths[(int)EPath::LocaleRU] = s_Paths[(int)EPath::DIR_LOCALES] / "ru_Main.json";
-
-		/* Set the module. */
-		s_Module = aModule;
 	}
 
 	std::filesystem::path Index(EPath aIndex)
 	{
-		assert(s_Module);
+		/* Run once on access. */
+		static bool s_Created = []
+		{
+			CreateIndex();
+			return true;
+		}();
 
 		return s_Paths[(int)aIndex];
 	}

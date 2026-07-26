@@ -256,8 +256,6 @@ namespace Raidcore::Nexus
 	{
 		Clockwork::Context::Create();
 
-		CreateIndex(GetCurrentModule());
-
 		this->_CoreContext = std::make_unique<Core::Context>();
 
 		this->_NetworkContext = std::make_unique<Network::Context>(
