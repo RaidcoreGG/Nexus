@@ -1,7 +1,7 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  LogBase.h
+/// Name         :  ILogger.h
 /// Description  :  Interface for logger implementations.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------

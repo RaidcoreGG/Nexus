@@ -16,7 +16,7 @@
 #include <queue>
 #include <thread>
 
-#include "LogBase.h"
+#include "ILogger.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::Core Namespace

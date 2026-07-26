@@ -25,8 +25,8 @@ namespace Raidcore::Nexus::Core
 		ELogLevel   Level{};
 		long long   Time{};
 		int         TimeMsPrecision{};
-		std::string Channel{};
-		std::string Message{};
+		std::string Channel;
+		std::string Message;
 		int         RepeatCount{ 1 };
 	};
 }

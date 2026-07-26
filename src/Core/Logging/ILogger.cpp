@@ -1,12 +1,12 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  LogBase.cpp
+/// Name         :  ILogger.cpp
 /// Description  :  Interface for logger implementations.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "LogBase.h"
+#include "ILogger.h"
 
 namespace Raidcore::Nexus::Core
 {

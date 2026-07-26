@@ -58,7 +58,7 @@
     <ClCompile Include="src\Inputs\InputBinds\IbBindV2.cpp" />
     <ClCompile Include="src\Inputs\InputBinds\IbApi.cpp" />
     <ClCompile Include="src\Core\Logging\LogWriter.cpp" />
-    <ClCompile Include="src\Core\Logging\LogBase.cpp" />
+    <ClCompile Include="src\Core\Logging\ILogger.cpp" />
     <ClCompile Include="src\Core\Logging\LogApi.cpp" />
     <ClCompile Include="src\Core\Logging\LogConsole.cpp" />
     <ClCompile Include="thirdparty\minhook\mh_buffer.cpp" />
@@ -369,7 +369,7 @@
     <ClInclude Include="src\Host\Addons\Definitions\AddonDefV1.h" />
     <ClInclude Include="src\Host\Addons\API\ApiBase.h" />
     <ClInclude Include="src\Core\Logging\LogWriter.h" />
-    <ClInclude Include="src\Core\Logging\LogBase.h" />
+    <ClInclude Include="src\Core\Logging\ILogger.h" />
     <ClInclude Include="src\Core\Logging\LogMsg.h" />
     <ClInclude Include="src\Core\Logging\LogApi.h" />
     <ClInclude Include="src\Core\Logging\LogConsole.h" />

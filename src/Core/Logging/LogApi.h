@@ -12,7 +12,7 @@
 #include <vector>
 #include <string>
 
-#include "LogBase.h"
+#include "ILogger.h"
 #include "LogMsg.h"
 #include "LogEnum.h"
 

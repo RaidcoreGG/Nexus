@@ -14,7 +14,7 @@
 
 #include "imgui/imgui.h"
 
-#include "Core/Logging/LogBase.h"
+#include "Core/Logging/ILogger.h"
 #include "Core/Logging/LogMsg.h"
 #include "UI/Controls/CtlSubWindow.h"
 
