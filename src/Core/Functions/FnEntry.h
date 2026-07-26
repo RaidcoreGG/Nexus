@@ -21,6 +21,7 @@ namespace Raidcore::Nexus::Core
 	struct FuncEntry_t
 	{
 		int32_t RefCount;
-		void* Function;
+		bool    ShouldDelete;
+		void*   Function;
 	};
 }

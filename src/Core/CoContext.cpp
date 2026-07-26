@@ -27,7 +27,7 @@ namespace Raidcore::Nexus::Core
 		);
 
 		this->_FuncRegistry = std::make_unique<Core::FuncRegistry>(
-			this->_LogApi.get()
+			*this->_LogApi.get()
 		);
 
 		this->_Settings = std::make_unique<Core::SettingsMgr>(

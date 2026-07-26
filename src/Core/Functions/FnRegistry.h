@@ -29,40 +29,41 @@ namespace Raidcore::Nexus::Core
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		FuncRegistry(LogApi* aLogger);
+		FuncRegistry(LogApi& aLogger);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
 		///----------------------------------------------------------------------------------------------------
-		~FuncRegistry();
+		~FuncRegistry() = default;
 
 		///----------------------------------------------------------------------------------------------------
 		/// Register:
 		/// 	Registers a function with the given identifier.
+		/// 	Returns true on success.
 		///----------------------------------------------------------------------------------------------------
-		void Register(std::string& aIdentifier, void* aFunction);
+		bool Register(const char* aIdentifier, void* aFunction);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Deregister:
 		/// 	Deregisters a function with the given identifier.
 		///----------------------------------------------------------------------------------------------------
-		void Deregister(std::string& aIdentifier, void* aFunction);
+		void Deregister(const char* aIdentifier, void* aFunction);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Query:
 		/// 	Queries for a function with the given identifier and returns it or nullptr.
 		/// 	If a function is returned, the refcount is incremented.
 		///----------------------------------------------------------------------------------------------------
-		void* Query(std::string& aIdentifier);
+		void* Query(const char* aIdentifier);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Release:
 		/// 	Decrements the refcount of the function with the given identifier.
 		///----------------------------------------------------------------------------------------------------
-		void Release(std::string& aIdentifier);
+		void Release(const char* aIdentifier);
 
 		private:
-		LogApi* Logger;
+		LogApi& Logger;
 
 		std::mutex                                   Mutex;
 		std::unordered_map<std::string, FuncEntry_t> Registry;
