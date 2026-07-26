@@ -16,15 +16,9 @@
 #include "ApiBase.h"
 #include "Core/Logging/LogEnum.h"
 #include "Inputs/InputBinds/IbBind.h"
-#include "Inputs/InputBinds/IbFuncDefs.h"
-#include "Graphics/Textures/TxFuncDefs.h"
 #include "Graphics/Textures/TxTexture.h"
 #include "GW2/Inputs/GameBinds/GbEnum.h"
-#include "Host/Events/EvtFuncDefs.h"
-#include "Platform/RawInput/RiFuncDefs.h"
-#include "UI/Services/Fonts/FuncDefs.h"
 #include "UI/UiEnum.h"
-#include "UI/UiFuncDefs.h"
 
 using namespace Raidcore::Nexus;
 

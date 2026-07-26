@@ -14,7 +14,6 @@
 #include "Host/Addons/Addon.h"
 #include "Host/Library/LibAddon.h"
 #include "UI/UiBinds.h"
-#include "UI/UiFuncDefs.h"
 #include "Util/Strings.h"
 
 using namespace Raidcore::Nexus;

@@ -8,17 +8,20 @@
 
 #pragma once
 
+#include <cstdint>
 #include <mutex>
 #include <vector>
+#include <windows.h>
 
 #include "Memory/IRefCleaner.h"
-#include "RiFuncDefs.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::Platform Namespace
 ///----------------------------------------------------------------------------------------------------
 namespace Raidcore::Nexus::Platform
 {
+	typedef UINT(*WNDPROC_CALLBACK)(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
 	///----------------------------------------------------------------------------------------------------
 	/// RawInputApi Class
 	///----------------------------------------------------------------------------------------------------

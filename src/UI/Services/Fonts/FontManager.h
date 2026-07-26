@@ -13,10 +13,9 @@
 #include <vector>
 #include <Windows.h>
 
-#include "imgui/imgui.h"
+#include "thirdparty/imgui/imgui.h"
 
 #include "Memory/IRefCleaner.h"
-#include "FuncDefs.h"
 #include "UI/Services/Localization/LoclApi.h"
 
 ///----------------------------------------------------------------------------------------------------
@@ -24,18 +23,20 @@
 ///----------------------------------------------------------------------------------------------------
 namespace Raidcore::Nexus::GUI
 {
-///----------------------------------------------------------------------------------------------------
-/// ManagedFont_t Struct
-///----------------------------------------------------------------------------------------------------
+	typedef void (*FONTS_RECEIVECALLBACK) (const char* aIdentifier, ImFont* aFont);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ManagedFont_t Struct
+	///----------------------------------------------------------------------------------------------------
 	struct ManagedFont_t
 	{
 		std::string                        Identifier;
-		ImFont* Pointer;
+		ImFont*                            Pointer;
 		std::vector<FONTS_RECEIVECALLBACK> Subscribers;
 		float                              Size;
-		void* Data;
+		void*                              Data;
 		size_t                             DataSize;
-		ImFontConfig* Config;
+		ImFontConfig*                      Config;
 	};
 
 	///----------------------------------------------------------------------------------------------------

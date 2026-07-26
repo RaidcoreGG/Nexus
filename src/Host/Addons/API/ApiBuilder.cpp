@@ -35,12 +35,8 @@ using namespace Raidcore::Nexus;
 #include "Core/Logging/LogEnum.h"
 #include "Index/Index.h"
 #include "Inputs/InputBinds/IbBind.h"
-#include "Inputs/InputBinds/IbFuncDefs.h"
-#include "Graphics/Textures/TxFuncDefs.h"
 #include "Graphics/Textures/TxTexture.h"
 #include "GW2/Inputs/GameBinds/GbEnum.h"
-#include "Host/Events/EvtFuncDefs.h"
-#include "Platform/RawInput/RiFuncDefs.h"
 #include "Core/DataLink/DlApi.h"
 #include "Core/Logging/LogApi.h"
 #include "Inputs/InputBinds/IbApi.h"
@@ -55,35 +51,38 @@ using namespace Raidcore::Nexus;
 #include "UI/Services/Localization/LoclApi.h"
 #include "UI/UiContext.h"
 #include "UI/Services/Fonts/FontManager.h"
-#include "UI/Services/Fonts/FuncDefs.h"
 #include "UI/Services/QoL/EscapeClosing.h"
 #include "UI/UiEnum.h"
 #include "UI/UiFuncDefs.h"
 #include "UI/Views/Alerts/AlEnum.h"
 #include "UI/Views/Alerts/Alerts.h"
 #include "UI/Views/QuickAccess/QuickAccess.h"
+#include "Graphics/Textures/TxQueueEntry.h"
+#include "Host/Events/EvtSubscriber.h"
+#include "Index/IdxEnum.h"
+#include "Inputs/InputBinds/IbMapping.h"
 
 namespace Raidcore::Nexus::Host::API
 {
 	static bool                       s_IsInitialized = false;
 
-	static Core::DataLinkApi*         s_DataLinkApi   = nullptr;
-	static Host::EventApi*            s_EventApi      = nullptr;
-	static GW2::GameBindsApi*         s_GameBindsApi  = nullptr;
-	static Input::CInputBindApi*      s_InputBindApi  = nullptr;
-	static Platform::RawInputApi*     s_RawInputApi   = nullptr;
-	static Nexus::GUI::Localization*  s_Localization  = nullptr;
-	static Core::LogApi*              s_Logger        = nullptr;
-	static Graphics::TextureLoader*   s_TextureApi    = nullptr;
-	static Host::Loader*              s_Loader        = nullptr;
-	static Graphics::Window_t*        s_GrWindow      = nullptr;
-	static GW2::ArcdpsApi*            s_ArcApi        = nullptr;
+	static Core::DataLinkApi* s_DataLinkApi = nullptr;
+	static Host::EventApi* s_EventApi = nullptr;
+	static GW2::GameBindsApi* s_GameBindsApi = nullptr;
+	static Input::CInputBindApi* s_InputBindApi = nullptr;
+	static Platform::RawInputApi* s_RawInputApi = nullptr;
+	static Nexus::GUI::Localization* s_Localization = nullptr;
+	static Core::LogApi* s_Logger = nullptr;
+	static Graphics::TextureLoader* s_TextureApi = nullptr;
+	static Host::Loader* s_Loader = nullptr;
+	static Graphics::Window_t* s_GrWindow = nullptr;
+	static GW2::ArcdpsApi* s_ArcApi = nullptr;
 
-	static Nexus::GUI::Context*             s_UiContext     = nullptr;
-	static Nexus::GUI::CFontManager*           s_FontManager   = nullptr;
-	static Nexus::GUI::CAlerts*                s_Alerts        = nullptr;
-	static Nexus::GUI::CQuickAccess*           s_QuickAccess   = nullptr;
-	static Nexus::GUI::CEscapeClosing*         s_EscapeClosing = nullptr;
+	static Nexus::GUI::Context* s_UiContext = nullptr;
+	static Nexus::GUI::CFontManager* s_FontManager = nullptr;
+	static Nexus::GUI::CAlerts* s_Alerts = nullptr;
+	static Nexus::GUI::CQuickAccess* s_QuickAccess = nullptr;
+	static Nexus::GUI::CEscapeClosing* s_EscapeClosing = nullptr;
 
 
 	namespace DataLink
@@ -586,25 +585,25 @@ namespace Raidcore::Nexus::Host::API
 	{
 		if (!s_IsInitialized)
 		{
-			Runtime& ctx   = Runtime::Get();
+			Runtime& ctx = Runtime::Get();
 
-			s_DataLinkApi   = &ctx.Core().DataLink();
-			s_EventApi      = &ctx.Host().Events();
-			s_GameBindsApi  = &ctx.Game().GameBinds();
-			s_InputBindApi  = ctx.InputBinds();
-			s_RawInputApi   = &ctx.Platform().RawInput();
-			s_Logger        = &ctx.Core().Logger();
-			s_TextureApi    = &ctx.Graphics().Textures();
-			s_Loader        = &ctx.Host().Loader();
-			s_GrWindow      = &ctx.Graphics().Window();
-			s_ArcApi        = &ctx.Game().Arcdps();
+			s_DataLinkApi = &ctx.Core().DataLink();
+			s_EventApi = &ctx.Host().Events();
+			s_GameBindsApi = &ctx.Game().GameBinds();
+			s_InputBindApi = ctx.InputBinds();
+			s_RawInputApi = &ctx.Platform().RawInput();
+			s_Logger = &ctx.Core().Logger();
+			s_TextureApi = &ctx.Graphics().Textures();
+			s_Loader = &ctx.Host().Loader();
+			s_GrWindow = &ctx.Graphics().Window();
+			s_ArcApi = &ctx.Game().Arcdps();
 
-			s_UiContext     = &ctx.UI();
-			s_FontManager   = s_UiContext->GetFontManager();
-			s_Alerts        = s_UiContext->GetAlerts();
-			s_QuickAccess   = s_UiContext->GetQuickAccess();
+			s_UiContext = &ctx.UI();
+			s_FontManager = s_UiContext->GetFontManager();
+			s_Alerts = s_UiContext->GetAlerts();
+			s_QuickAccess = s_UiContext->GetQuickAccess();
 			s_EscapeClosing = s_UiContext->GetEscapeClosingService();
-			s_Localization  = s_UiContext->GetLocalization();
+			s_Localization = s_UiContext->GetLocalization();
 
 			s_IsInitialized = true;
 		}
@@ -615,7 +614,7 @@ namespace Raidcore::Nexus::Host::API
 			case 1:
 			{
 				AddonAPI1_t* api = new AddonAPI1_t();
-				
+
 				api->SwapChain = s_GrWindow->SwapChain;
 				api->ImguiContext = aSetImGuiContext ? ImGui::GetCurrentContext() : nullptr;
 				api->ImguiMalloc = aSetImGuiContext ? ImGui::MemAlloc : nullptr;
@@ -1020,17 +1019,17 @@ namespace Raidcore::Nexus::Host::API
 		switch (aVersion)
 		{
 			case 1:
-				return sizeof(AddonAPI1_t);
+			return sizeof(AddonAPI1_t);
 			case 2:
-				return sizeof(AddonAPI2_t);
+			return sizeof(AddonAPI2_t);
 			case 3:
-				return sizeof(AddonAPI3_t);
+			return sizeof(AddonAPI3_t);
 			case 4:
-				return sizeof(AddonAPI4_t);
+			return sizeof(AddonAPI4_t);
 			case 5:
-				return sizeof(AddonAPI5_t);
+			return sizeof(AddonAPI5_t);
 			case 6:
-				return sizeof(AddonAPI6_t);
+			return sizeof(AddonAPI6_t);
 		}
 
 		return 0;

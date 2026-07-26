@@ -15,16 +15,6 @@
 #include "thirdparty/imgui/imgui.h"
 #include "thirdparty/minhook/mh_hook.h"
 
-#include "Index/IdxFuncDefs.h"
-#include "Core/DataLink/DlFuncDefs.h"
-#include "Host/Events/EvtFuncDefs.h"
-#include "Inputs/InputBinds/IbFuncDefs.h"
-#include "Core/Logging/LogFuncDefs.h"
-#include "Platform/RawInput/RiFuncDefs.h"
-#include "Graphics/Textures/TxFuncDefs.h"
-#include "UI/UiFuncDefs.h"
-#include "UI/Views/QuickAccess/QaFuncDefs.h"
-
 using namespace Raidcore::Nexus;
 
 ///----------------------------------------------------------------------------------------------------
@@ -33,12 +23,12 @@ using namespace Raidcore::Nexus;
 struct AddonAPI1_t : AddonAPI_t
 {
 	/* Renderer */
-	IDXGISwapChain*               SwapChain;
-	ImGuiContext*                 ImguiContext;
-	void*                         ImguiMalloc;
-	void*                         ImguiFree;
-	GUI::GUI_ADDRENDER                 RegisterRender;
-	GUI::GUI_REMRENDER                 DeregisterRender;
+	IDXGISwapChain* SwapChain;
+	ImGuiContext* ImguiContext;
+	void* ImguiMalloc;
+	void* ImguiFree;
+	GUI_ADDRENDER                 RegisterRender;
+	GUI_REMRENDER                 DeregisterRender;
 
 	/* Paths */
 	IDX_GETGAMEDIR                GetGameDirectory;
@@ -52,35 +42,35 @@ struct AddonAPI1_t : AddonAPI_t
 	MINHOOK_DISABLE               DisableHook;
 
 	/* Logging */
-	Core::LOGGER_LOG                    Log;
+	LOGGER_LOG                    Log;
 
 	/* Events */
-	Host::EVENTS_RAISE            RaiseEvent;
-	Host::EVENTS_SUBSCRIBE        SubscribeEvent;
-	Host::EVENTS_SUBSCRIBE        UnsubscribeEvent;
+	EVENTS_RAISE            RaiseEvent;
+	EVENTS_SUBSCRIBE        SubscribeEvent;
+	EVENTS_SUBSCRIBE        UnsubscribeEvent;
 
 	/* WndProc */
-	Platform::WNDPROC_ADDREM      RegisterWndProc;
-	Platform::WNDPROC_ADDREM      DeregisterWndProc;
+	WNDPROC_ADDREM      RegisterWndProc;
+	WNDPROC_ADDREM      DeregisterWndProc;
 
 	/* InputBinds */
-	Input::INPUTBINDS_REGISTERWITHSTRING RegisterInputBindWithString;
-	Input::INPUTBINDS_REGISTERWITHSTRUCT RegisterInputBindWithStruct;
-	Input::INPUTBINDS_DEREGISTER         DeregisterInputBind;
+	INPUTBINDS_REGISTERWITHSTRING RegisterInputBindWithString;
+	INPUTBINDS_REGISTERWITHSTRUCT RegisterInputBindWithStruct;
+	INPUTBINDS_DEREGISTER         DeregisterInputBind;
 
 	/* DataLink */
-	Core::DATALINK_GETRESOURCE          Get;
-	Core::DATALINK_SHARERESOURCE        Share;
+	DATALINK_GETRESOURCE          Get;
+	DATALINK_SHARERESOURCE        Share;
 
 	/* Textures */
-	Graphics::TEXTURES_GET                  GetTexture;
-	Graphics::TEXTURES_LOADFROMFILE         LoadTextureFromFile;
-	Graphics::TEXTURES_LOADFROMRESOURCE     LoadTextureFromResource;
-	Graphics::TEXTURES_LOADFROMURL          LoadTextureFromURL;
+	TEXTURES_GET                  GetTexture;
+	TEXTURES_LOADFROMFILE         LoadTextureFromFile;
+	TEXTURES_LOADFROMRESOURCE     LoadTextureFromResource;
+	TEXTURES_LOADFROMURL          LoadTextureFromURL;
 
 	/* Shortcuts */
-	GUI::QUICKACCESS_ADDSHORTCUT       AddShortcut;
-	GUI::QUICKACCESS_GENERIC           RemoveShortcut;
-	GUI::QUICKACCESS_ADDSIMPLE         AddSimpleShortcut;
-	GUI::QUICKACCESS_GENERIC           RemoveSimpleShortcut;
+	QUICKACCESS_ADDSHORTCUT       AddShortcut;
+	QUICKACCESS_GENERIC           RemoveShortcut;
+	QUICKACCESS_ADDSIMPLE         AddSimpleShortcut;
+	QUICKACCESS_GENERIC           RemoveSimpleShortcut;
 };

@@ -19,7 +19,6 @@
 #include "Core/Logging/LogApi.h"
 #include "IbBindV2.h"
 #include "IbCapture.h"
-#include "IbFuncDefs.h"
 #include "IbMapping.h"
 
 ///----------------------------------------------------------------------------------------------------

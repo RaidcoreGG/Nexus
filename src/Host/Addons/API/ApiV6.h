@@ -15,21 +15,6 @@
 #include "thirdparty/imgui/imgui.h"
 #include "thirdparty/minhook/mh_hook.h"
 
-#include "Index/IdxFuncDefs.h"
-#include "Core/DataLink/DlFuncDefs.h"
-#include "Host/Events/EvtFuncDefs.h"
-#include "Inputs/InputBinds/IbFuncDefs.h"
-#include "Core/Logging/LogFuncDefs.h"
-#include "GW2/Inputs/GameBinds/GbFuncDefs.h"
-#include "Platform/RawInput/RiFuncDefs.h"
-#include "UI/Services/Fonts/FuncDefs.h"
-#include "UI/Services/Localization/LoclFuncDefs.h"
-#include "UI/Services/QoL/FuncDefs.h"
-#include "Graphics/Textures/TxFuncDefs.h"
-#include "UI/UiFuncDefs.h"
-#include "UI/Views/Alerts/AlFuncDefs.h"
-#include "UI/Views/QuickAccess/QaFuncDefs.h"
-
 using namespace Raidcore::Nexus;
 
 ///----------------------------------------------------------------------------------------------------
@@ -38,15 +23,15 @@ using namespace Raidcore::Nexus;
 struct AddonAPI6_t : AddonAPI_t
 {
 	/* Renderer */
-	IDXGISwapChain*                       SwapChain;
-	ImGuiContext*                         ImguiContext;
-	void*                                 ImguiMalloc;
-	void*                                 ImguiFree;
+	IDXGISwapChain* SwapChain;
+	ImGuiContext* ImguiContext;
+	void* ImguiMalloc;
+	void* ImguiFree;
 
 	struct RendererVT
 	{
-		GUI::GUI_ADDRENDER                     Register;
-		GUI::GUI_REMRENDER                     Deregister;
+		GUI_ADDRENDER                     Register;
+		GUI_REMRENDER                     Deregister;
 	};
 	RendererVT                            Renderer;
 
@@ -54,14 +39,14 @@ struct AddonAPI6_t : AddonAPI_t
 	UPDATER_REQUESTUPDATE                 RequestUpdate;
 
 	/* Logging */
-	Core::LOGGER_LOG2                           Log;
+	LOGGER_LOG2                           Log;
 
 	/* User Interface */
 	struct UIVT
 	{
-		GUI::ALERTS_NOTIFY                     SendAlert;
-		GUI::GUI_REGISTERCLOSEONESCAPE         RegisterCloseOnEscape;
-		GUI::GUI_DEREGISTERCLOSEONESCAPE       DeregisterCloseOnEscape;
+		ALERTS_NOTIFY                     SendAlert;
+		GUI_REGISTERCLOSEONESCAPE         RegisterCloseOnEscape;
+		GUI_DEREGISTERCLOSEONESCAPE       DeregisterCloseOnEscape;
 	};
 	UIVT                                  UI;
 
@@ -87,98 +72,98 @@ struct AddonAPI6_t : AddonAPI_t
 	/* Events */
 	struct EventsVT
 	{
-		Host::EVENTS_RAISE                      Raise;
-		Host::EVENTS_RAISENOTIFICATION          RaiseNotification;
-		Host::EVENTS_RAISE_TARGETED             RaiseTargeted;
-		Host::EVENTS_RAISENOTIFICATION_TARGETED RaiseNotificationTargeted;
-		Host::EVENTS_SUBSCRIBE                  Subscribe;
-		Host::EVENTS_SUBSCRIBE                  Unsubscribe;
+		EVENTS_RAISE                      Raise;
+		EVENTS_RAISENOTIFICATION          RaiseNotification;
+		EVENTS_RAISE_TARGETED             RaiseTargeted;
+		EVENTS_RAISENOTIFICATION_TARGETED RaiseNotificationTargeted;
+		EVENTS_SUBSCRIBE                  Subscribe;
+		EVENTS_SUBSCRIBE                  Unsubscribe;
 	};
 	EventsVT                              Events;
 
 	/* WndProc */
 	struct WndProcVT
 	{
-		Platform::WNDPROC_ADDREM          Register;
-		Platform::WNDPROC_ADDREM          Deregister;
-		Platform::WNDPROC_SENDTOGAME      SendToGameOnly;
+		WNDPROC_ADDREM          Register;
+		WNDPROC_ADDREM          Deregister;
+		WNDPROC_SENDTOGAME      SendToGameOnly;
 	};
 	WndProcVT                             WndProc;
 
 	/* InputBinds */
 	struct InputBindsVT
 	{
-		Input::INPUTBINDS_INVOKE                 Invoke;
-		Input::INPUTBINDS_REGISTERWITHSTRING2    RegisterWithString;
-		Input::INPUTBINDS_REGISTERWITHSTRUCT2    RegisterWithStruct;
-		Input::INPUTBINDS_DEREGISTER             Deregister;
+		INPUTBINDS_INVOKE                 Invoke;
+		INPUTBINDS_REGISTERWITHSTRING2    RegisterWithString;
+		INPUTBINDS_REGISTERWITHSTRUCT2    RegisterWithStruct;
+		INPUTBINDS_DEREGISTER             Deregister;
 	};
 	InputBindsVT                          InputBinds;
 
 	/* GameBinds */
 	struct GameBindsVT
 	{
-		GW2::GAMEBINDS_PRESSASYNC              PressAsync;
-		GW2::GAMEBINDS_RELEASEASYNC            ReleaseAsync;
-		GW2::GAMEBINDS_INVOKEASYNC             InvokeAsync;
-		GW2::GAMEBINDS_PRESS                   Press;
-		GW2::GAMEBINDS_RELEASE                 Release;
-		GW2::GAMEBINDS_ISBOUND                 IsBound;
+		GAMEBINDS_PRESSASYNC              PressAsync;
+		GAMEBINDS_RELEASEASYNC            ReleaseAsync;
+		GAMEBINDS_INVOKEASYNC             InvokeAsync;
+		GAMEBINDS_PRESS                   Press;
+		GAMEBINDS_RELEASE                 Release;
+		GAMEBINDS_ISBOUND                 IsBound;
 	};
 	GameBindsVT                           GameBinds;
 
 	/* DataLink */
 	struct DataLinkVT
 	{
-		Core::DATALINK_GETRESOURCE              Get;
-		Core::DATALINK_SHARERESOURCE            Share;
+		DATALINK_GETRESOURCE              Get;
+		DATALINK_SHARERESOURCE            Share;
 	};
 	DataLinkVT                            DataLink;
 
 	/* Textures */
 	struct TexturesVT
 	{
-		Graphics::TEXTURES_GET                      Get;
-		Graphics::TEXTURES_GETORCREATEFROMFILE      GetOrCreateFromFile;
-		Graphics::TEXTURES_GETORCREATEFROMRESOURCE  GetOrCreateFromResource;
-		Graphics::TEXTURES_GETORCREATEFROMURL       GetOrCreateFromURL;
-		Graphics::TEXTURES_GETORCREATEFROMMEMORY    GetOrCreateFromMemory;
-		Graphics::TEXTURES_LOADFROMFILE             LoadFromFile;
-		Graphics::TEXTURES_LOADFROMRESOURCE         LoadFromResource;
-		Graphics::TEXTURES_LOADFROMURL              LoadFromURL;
-		Graphics::TEXTURES_LOADFROMMEMORY           LoadFromMemory;
+		TEXTURES_GET                      Get;
+		TEXTURES_GETORCREATEFROMFILE      GetOrCreateFromFile;
+		TEXTURES_GETORCREATEFROMRESOURCE  GetOrCreateFromResource;
+		TEXTURES_GETORCREATEFROMURL       GetOrCreateFromURL;
+		TEXTURES_GETORCREATEFROMMEMORY    GetOrCreateFromMemory;
+		TEXTURES_LOADFROMFILE             LoadFromFile;
+		TEXTURES_LOADFROMRESOURCE         LoadFromResource;
+		TEXTURES_LOADFROMURL              LoadFromURL;
+		TEXTURES_LOADFROMMEMORY           LoadFromMemory;
 	};
 	TexturesVT                            Textures;
 
 	/* Shortcuts */
 	struct QuickAccessVT
 	{
-		GUI::QUICKACCESS_ADDSHORTCUT           Add;
-		GUI::QUICKACCESS_GENERIC               Remove;
-		GUI::QUICKACCESS_GENERIC               Notify;
-		GUI::QUICKACCESS_ADDSIMPLE2            AddContextMenu;
-		GUI::QUICKACCESS_GENERIC               RemoveContextMenu;
+		QUICKACCESS_ADDSHORTCUT           Add;
+		QUICKACCESS_GENERIC               Remove;
+		QUICKACCESS_GENERIC               Notify;
+		QUICKACCESS_ADDSIMPLE2            AddContextMenu;
+		QUICKACCESS_GENERIC               RemoveContextMenu;
 	};
 	QuickAccessVT                         QuickAccess;
 
 	/* Localization */
 	struct LocalizationVT
 	{
-		GUI::LOCALIZATION_TRANSLATE            Translate;
-		GUI::LOCALIZATION_TRANSLATETO          TranslateTo;
-		GUI::LOCALIZATION_SET                  SetTranslatedString;
-	 };
+		LOCALIZATION_TRANSLATE            Translate;
+		LOCALIZATION_TRANSLATETO          TranslateTo;
+		LOCALIZATION_SET                  SetTranslatedString;
+	};
 	LocalizationVT                        Localization;
 
 	/* Fonts */
 	struct FontsVT
 	{
-		GUI::FONTS_GETRELEASE                  Get;
-		GUI::FONTS_GETRELEASE                  Release;
-		GUI::FONTS_ADDFROMFILE                 AddFromFile;
-		GUI::FONTS_ADDFROMRESOURCE             AddFromResource;
-		GUI::FONTS_ADDFROMMEMORY               AddFromMemory;
-		GUI::FONTS_RESIZE                      Resize;
+		FONTS_GETRELEASE                  Get;
+		FONTS_GETRELEASE                  Release;
+		FONTS_ADDFROMFILE                 AddFromFile;
+		FONTS_ADDFROMRESOURCE             AddFromResource;
+		FONTS_ADDFROMMEMORY               AddFromMemory;
+		FONTS_RESIZE                      Resize;
 	};
 	FontsVT                               Fonts;
 };

@@ -8,6 +8,10 @@
 
 #include "RiApi.h"
 
+#include <cstdint>
+#include <memory>
+#include <mutex>
+
 namespace Raidcore::Nexus::Platform
 {
 	UINT RawInputApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

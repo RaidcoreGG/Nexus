@@ -10,13 +10,16 @@
 
 #include "IbBindV2.h"
 #include "IbEnum.h"
-#include "IbFuncDefs.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::Input Namespace
 ///----------------------------------------------------------------------------------------------------
 namespace Raidcore::Nexus::Input
 {
+	typedef void (*INPUTBINDS_PROCESS)  (const char* aIdentifier);
+	typedef void (*INPUTBINDS_PROCESS2) (const char* aIdentifier, bool aIsRelease);
+	typedef bool (*INPUTBINDS_PROCESS3) (const char* aIdentifier, bool aIsRelease);
+
 	///----------------------------------------------------------------------------------------------------
 	/// IbMapping_t Struct
 	///----------------------------------------------------------------------------------------------------

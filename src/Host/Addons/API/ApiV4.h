@@ -15,19 +15,6 @@
 #include "thirdparty/imgui/imgui.h"
 #include "thirdparty/minhook/mh_hook.h"
 
-#include "Index/IdxFuncDefs.h"
-#include "Core/DataLink/DlFuncDefs.h"
-#include "Host/Events/EvtFuncDefs.h"
-#include "Inputs/InputBinds/IbFuncDefs.h"
-#include "Core/Logging/LogFuncDefs.h"
-#include "Platform/RawInput/RiFuncDefs.h"
-#include "UI/Services/Fonts/FuncDefs.h"
-#include "UI/Services/Localization/LoclFuncDefs.h"
-#include "Graphics/Textures/TxFuncDefs.h"
-#include "UI/UiFuncDefs.h"
-#include "UI/Views/Alerts/AlFuncDefs.h"
-#include "UI/Views/QuickAccess/QaFuncDefs.h"
-
 using namespace Raidcore::Nexus;
 
 ///----------------------------------------------------------------------------------------------------
@@ -36,12 +23,12 @@ using namespace Raidcore::Nexus;
 struct AddonAPI4_t : AddonAPI_t
 {
 	/* Renderer */
-	IDXGISwapChain*                   SwapChain;
-	ImGuiContext*                     ImguiContext;
-	void*                             ImguiMalloc;
-	void*                             ImguiFree;
-	GUI::GUI_ADDRENDER                     RegisterRender;
-	GUI::GUI_REMRENDER                     DeregisterRender;
+	IDXGISwapChain* SwapChain;
+	ImGuiContext* ImguiContext;
+	void* ImguiMalloc;
+	void* ImguiFree;
+	GUI_ADDRENDER                     RegisterRender;
+	GUI_REMRENDER                     DeregisterRender;
 
 	/* Updater */
 	UPDATER_REQUESTUPDATE             RequestUpdate;
@@ -58,59 +45,59 @@ struct AddonAPI4_t : AddonAPI_t
 	MINHOOK_DISABLE                   DisableHook;
 
 	/* Logging */
-	Core::LOGGER_LOG2                       Log;
+	LOGGER_LOG2                       Log;
 
 	/* GUI Alerts */
-	GUI::ALERTS_NOTIFY                     SendAlert;
+	ALERTS_NOTIFY                     SendAlert;
 
 	/* Events */
-	Host::EVENTS_RAISE                      RaiseEvent;
-	Host::EVENTS_RAISENOTIFICATION          RaiseEventNotification;
-	Host::EVENTS_RAISE_TARGETED             RaiseEventTargeted;
-	Host::EVENTS_RAISENOTIFICATION_TARGETED RaiseEventNotificationTargeted;
-	Host::EVENTS_SUBSCRIBE                  SubscribeEvent;
-	Host::EVENTS_SUBSCRIBE                  UnsubscribeEvent;
+	EVENTS_RAISE                      RaiseEvent;
+	EVENTS_RAISENOTIFICATION          RaiseEventNotification;
+	EVENTS_RAISE_TARGETED             RaiseEventTargeted;
+	EVENTS_RAISENOTIFICATION_TARGETED RaiseEventNotificationTargeted;
+	EVENTS_SUBSCRIBE                  SubscribeEvent;
+	EVENTS_SUBSCRIBE                  UnsubscribeEvent;
 
 	/* WndProc */
-	Platform::WNDPROC_ADDREM          RegisterWndProc;
-	Platform::WNDPROC_ADDREM          DeregisterWndProc;
-	Platform::WNDPROC_SENDTOGAME      SendWndProcToGameOnly;
+	WNDPROC_ADDREM          RegisterWndProc;
+	WNDPROC_ADDREM          DeregisterWndProc;
+	WNDPROC_SENDTOGAME      SendWndProcToGameOnly;
 
 	/* InputBinds */
-	Input::INPUTBINDS_REGISTERWITHSTRING2    RegisterInputBindWithString;
-	Input::INPUTBINDS_REGISTERWITHSTRUCT2    RegisterInputBindWithStruct;
-	Input::INPUTBINDS_DEREGISTER             DeregisterInputBind;
+	INPUTBINDS_REGISTERWITHSTRING2    RegisterInputBindWithString;
+	INPUTBINDS_REGISTERWITHSTRUCT2    RegisterInputBindWithStruct;
+	INPUTBINDS_DEREGISTER             DeregisterInputBind;
 
 	/* DataLink */
-	Core::DATALINK_GETRESOURCE              Get;
-	Core::DATALINK_SHARERESOURCE            Share;
+	DATALINK_GETRESOURCE              Get;
+	DATALINK_SHARERESOURCE            Share;
 
 	/* Textures */
-	Graphics::TEXTURES_GET                      GetTexture;
-	Graphics::TEXTURES_GETORCREATEFROMFILE      GetTextureOrCreateFromFile;
-	Graphics::TEXTURES_GETORCREATEFROMRESOURCE  GetTextureOrCreateFromResource;
-	Graphics::TEXTURES_GETORCREATEFROMURL       GetTextureOrCreateFromURL;
-	Graphics::TEXTURES_GETORCREATEFROMMEMORY    GetTextureOrCreateFromMemory;
-	Graphics::TEXTURES_LOADFROMFILE             LoadTextureFromFile;
-	Graphics::TEXTURES_LOADFROMRESOURCE         LoadTextureFromResource;
-	Graphics::TEXTURES_LOADFROMURL              LoadTextureFromURL;
-	Graphics::TEXTURES_LOADFROMMEMORY           LoadTextureFromMemory;
+	TEXTURES_GET                      GetTexture;
+	TEXTURES_GETORCREATEFROMFILE      GetTextureOrCreateFromFile;
+	TEXTURES_GETORCREATEFROMRESOURCE  GetTextureOrCreateFromResource;
+	TEXTURES_GETORCREATEFROMURL       GetTextureOrCreateFromURL;
+	TEXTURES_GETORCREATEFROMMEMORY    GetTextureOrCreateFromMemory;
+	TEXTURES_LOADFROMFILE             LoadTextureFromFile;
+	TEXTURES_LOADFROMRESOURCE         LoadTextureFromResource;
+	TEXTURES_LOADFROMURL              LoadTextureFromURL;
+	TEXTURES_LOADFROMMEMORY           LoadTextureFromMemory;
 
 	/* Shortcuts */
-	GUI::QUICKACCESS_ADDSHORTCUT           AddShortcut;
-	GUI::QUICKACCESS_GENERIC               RemoveShortcut;
-	GUI::QUICKACCESS_GENERIC               PushNotification;
-	GUI::QUICKACCESS_ADDSIMPLE             AddSimpleShortcut;
-	GUI::QUICKACCESS_GENERIC               RemoveSimpleShortcut;
+	QUICKACCESS_ADDSHORTCUT           AddShortcut;
+	QUICKACCESS_GENERIC               RemoveShortcut;
+	QUICKACCESS_GENERIC               PushNotification;
+	QUICKACCESS_ADDSIMPLE             AddSimpleShortcut;
+	QUICKACCESS_GENERIC               RemoveSimpleShortcut;
 
 	/* Localization */
-	GUI::LOCALIZATION_TRANSLATE            Translate;
-	GUI::LOCALIZATION_TRANSLATETO          TranslateTo;
+	LOCALIZATION_TRANSLATE            Translate;
+	LOCALIZATION_TRANSLATETO          TranslateTo;
 
 	/* Fonts */
-	GUI::FONTS_GETRELEASE                  GetFont;
-	GUI::FONTS_GETRELEASE                  ReleaseFont;
-	GUI::FONTS_ADDFROMFILE                 AddFontFromFile;
-	GUI::FONTS_ADDFROMRESOURCE             AddFontFromResource;
-	GUI::FONTS_ADDFROMMEMORY               AddFontFromMemory;
+	FONTS_GETRELEASE                  GetFont;
+	FONTS_GETRELEASE                  ReleaseFont;
+	FONTS_ADDFROMFILE                 AddFontFromFile;
+	FONTS_ADDFROMRESOURCE             AddFontFromResource;
+	FONTS_ADDFROMMEMORY               AddFontFromMemory;
 };

@@ -8,25 +8,30 @@
 
 #pragma once
 
+#include <cstdint>
+#include <string>
+
 #include "TxEnum.h"
-#include "TxFuncDefs.h"
+#include "TxTexture.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::Graphics Namespace
 ///----------------------------------------------------------------------------------------------------
 namespace Raidcore::Nexus::Graphics
 {
+	typedef void (*TEXTURES_RECEIVECALLBACK) (const char* aIdentifier, Texture_t* aTexture);
+
 	///----------------------------------------------------------------------------------------------------
 	/// QueuedTexture_t Struct
 	///----------------------------------------------------------------------------------------------------
 	struct QueuedTexture_t
 	{
 		ETextureStage            Stage;
-		long long                Time;
+		uint64_t                 Time;
 
-		unsigned                 Width;
-		unsigned                 Height;
-		unsigned char* Data;
+		uint32_t                 Width;
+		uint32_t                 Height;
+		uint8_t*                 Data;
 		std::string              DownloadURL;
 		TEXTURES_RECEIVECALLBACK Callback;
 	};

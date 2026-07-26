@@ -12,10 +12,10 @@
 #include <string>
 #include <unordered_map>
 
-#include "Memory/IRefCleaner.h"
-#include "Host/Loader/Loader.h"
 #include "EvtData.h"
-#include "EvtFuncDefs.h"
+#include "EvtSubscriber.h"
+#include "Host/Loader/Loader.h"
+#include "Memory/IRefCleaner.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::Host Namespace
