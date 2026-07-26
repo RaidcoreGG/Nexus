@@ -47,6 +47,8 @@
 
 namespace Raidcore::Nexus
 {
+	constexpr const char* LOG_CHANNEL = "Runtime";
+
 	Runtime& Runtime::Get()
 	{
 		static Runtime s_Context;
@@ -73,7 +75,7 @@ namespace Raidcore::Nexus
 
 		/* Environment info. */
 		logger.Info(
-			CH_CORE,
+			LOG_CHANNEL,
 			"Game: %s\nModule: %s\nNexus %s %s\nEntry method: %d",
 			GetCommandLineA(),
 			Index(EPath::NexusDLL).string().c_str(),
@@ -153,11 +155,11 @@ namespace Raidcore::Nexus
 		GUI::Context& uictx = ctx.UI();
 		Graphics::TextureLoader& texapi = ctx.Graphics().Textures();
 
-		logger.Critical(CH_CORE, "SHUTDOWN BEGIN | %s", reasonStr.c_str());
+		logger.Critical(LOG_CHANNEL, "SHUTDOWN BEGIN | %s", reasonStr.c_str());
 		MH_Uninitialize();
 		uictx.Shutdown();
 		texapi.Shutdown();
-		logger.Info(CH_CORE, "SHUTDOWN END");
+		logger.Info(LOG_CHANNEL, "SHUTDOWN END");
 
 		/* If we have the window handle and we have an original (target) wndproc. */
 		if (ctx.Platform().Window() && Hooks::Target::WndProc)

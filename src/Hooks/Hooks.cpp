@@ -39,6 +39,8 @@ using namespace Raidcore::Nexus;
 
 namespace Hooks
 {
+	constexpr const char* LOG_CHANNEL = "Hooks";
+
 	inline PBYTE FollowJmpChain(PBYTE aPointer)
 	{
 		while (true)
@@ -96,7 +98,7 @@ namespace Hooks
 			Runtime& ctx    = Runtime::Get();
 			Core::LogApi& logger = ctx.Core().Logger();
 
-			logger.Critical(CH_CORE, "Failed creating temporary window.");
+			logger.Critical(LOG_CHANNEL, "Failed creating temporary window.");
 			return;
 		}
 
@@ -130,7 +132,7 @@ namespace Hooks
 			Runtime& ctx = Runtime::Get();
 			Core::LogApi& logger = ctx.Core().Logger();
 
-			logger.Debug(CH_CORE, "HOOK BEGIN");
+			logger.Debug(LOG_CHANNEL, "HOOK BEGIN");
 
 			/* Create and enable VT hooks. */
 			/* Follow the jump chain to work nicely with various other hooks. */
@@ -151,7 +153,7 @@ namespace Hooks
 
 			MH_EnableHook(MH_ALL_HOOKS);
 
-			logger.Debug(CH_CORE, "HOOK END");
+			logger.Debug(LOG_CHANNEL, "HOOK END");
 
 			/* Release the temporary interfaces. */
 			context->Release();
@@ -163,7 +165,7 @@ namespace Hooks
 			Runtime& ctx = Runtime::Get();
 			Core::LogApi& logger = ctx.Core().Logger();
 
-			logger.Critical(CH_CORE, "Failed to create D3D11 device and swapchain.");
+			logger.Critical(LOG_CHANNEL, "Failed to create D3D11 device and swapchain.");
 		}
 
 		/* Destroy the temporary window. */

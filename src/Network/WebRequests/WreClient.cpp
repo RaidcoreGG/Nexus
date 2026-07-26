@@ -14,6 +14,8 @@
 
 namespace Raidcore::Nexus::Network
 {
+	constexpr const char* LOG_CHANNEL = "Networking";
+
 	CHttpClient::CHttpClient(Core::LogApi* aLogger, std::string aBaseURL, std::filesystem::path aCacheDirectory, uint32_t aCacheLifetime)
 	{
 		this->Logger = aLogger;
@@ -24,7 +26,7 @@ namespace Raidcore::Nexus::Network
 		this->Client->set_follow_location(true);
 
 		this->Logger->Debug(
-			CH_NETWORKING,
+			LOG_CHANNEL,
 			"CHttpClient(BaseURL: %s, CacheDirectory: %s, CacheLifetime: %d)",
 			this->BaseURL.c_str(),
 			aCacheDirectory.string().c_str(),
@@ -50,7 +52,7 @@ namespace Raidcore::Nexus::Network
 		delete this->Client;
 		this->Client = nullptr;
 
-		this->Logger->Debug(CH_NETWORKING, "~CHttpClient(%s)", this->BaseURL.c_str());
+		this->Logger->Debug(LOG_CHANNEL, "~CHttpClient(%s)", this->BaseURL.c_str());
 	}
 
 	HttpResponse_t CHttpClient::Get(std::string aEndpoint, std::string aParameters, int32_t aOverrideCacheLifetime)
@@ -64,7 +66,7 @@ namespace Raidcore::Nexus::Network
 			if (HttpResponse_t* cachedResult = this->Cache->Retrieve(query, aOverrideCacheLifetime))
 			{
 				this->Logger->Debug(
-					CH_NETWORKING,
+					LOG_CHANNEL,
 					"Returning cached result for \"%s\".",
 					query.c_str()
 				);
@@ -96,7 +98,7 @@ namespace Raidcore::Nexus::Network
 		{
 			result.Error = "Lib Result was nullptr.";
 			this->Logger->Critical(
-				CH_NETWORKING,
+				LOG_CHANNEL,
 				"Lib Result was nullptr for \"%s\". Lib Error: %s",
 				query.c_str(),
 				httplib::to_string(getResult.error()).c_str()
@@ -126,7 +128,7 @@ namespace Raidcore::Nexus::Network
 		if (!file.is_open())
 		{
 			this->Logger->Warning(
-				CH_NETWORKING,
+				LOG_CHANNEL,
 				"[%s] Error downloading from \"%s\" to \"%s\". Could not open file.",
 				this->BaseURL.c_str(),
 				query.c_str(),
@@ -191,7 +193,7 @@ namespace Raidcore::Nexus::Network
 	void CHttpClient::DownloadCleanup(const std::filesystem::path& aOutPath, const std::string& aQuery)
 	{
 		this->Logger->Warning(
-			CH_NETWORKING,
+			LOG_CHANNEL,
 			"[%s] Error downloading from \"%s\" to \"%s\".",
 			this->BaseURL.c_str(),
 			aQuery.c_str(),
@@ -208,7 +210,7 @@ namespace Raidcore::Nexus::Network
 		catch (...)
 		{
 			this->Logger->Warning(
-				CH_NETWORKING,
+				LOG_CHANNEL,
 				"[%s] Subsequently failed deleting \"%s.\" for failed download \"%s\".",
 				this->BaseURL.c_str(),
 				aOutPath.string().c_str(),

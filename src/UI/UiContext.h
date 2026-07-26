@@ -33,7 +33,6 @@
 
 using namespace Raidcore::Nexus;
 
-constexpr const char* CH_UICONTEXT       = "UI Context";
 constexpr const char* KB_MENU            = "KB_MENU";
 constexpr const char* KB_ADDONS          = "KB_ADDONS";
 constexpr const char* KB_OPTIONS         = "KB_OPTIONS";

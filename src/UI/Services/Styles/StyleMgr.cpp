@@ -24,6 +24,8 @@ using namespace Raidcore::Nexus;
 ///----------------------------------------------------------------------------------------------------
 namespace Raidcore::Nexus::GUI
 {
+	constexpr const char* LOG_CHANNEL = "Styles";
+
 	StyleManager::StyleManager(Core::LogApi& aLogger, Core::SettingsMgr& aSettings)
 		: Logger(aLogger)
 		, Settings(aSettings)
@@ -40,7 +42,7 @@ namespace Raidcore::Nexus::GUI
 		}
 		catch (...)
 		{
-			this->Logger.Debug(CH_UICONTEXT, "Error applying default style.");
+			this->Logger.Debug(LOG_CHANNEL, "Error applying default style.");
 		}
 	}
 
@@ -66,7 +68,7 @@ namespace Raidcore::Nexus::GUI
 				}
 				catch (...)
 				{
-					this->Logger.Warning(CH_UICONTEXT, "Error applying user style.");
+					this->Logger.Warning(LOG_CHANNEL, "Error applying user style.");
 				}
 				return;
 			}
@@ -80,7 +82,7 @@ namespace Raidcore::Nexus::GUI
 				}
 				catch (...)
 				{
-					this->Logger.Warning(CH_UICONTEXT, "Error applying user style.");
+					this->Logger.Warning(LOG_CHANNEL, "Error applying user style.");
 				}
 				return;
 			}
@@ -117,7 +119,7 @@ namespace Raidcore::Nexus::GUI
 				}
 				catch (...)
 				{
-					this->Logger.Warning(CH_UICONTEXT, "Error applying ArcDPS default style.");
+					this->Logger.Warning(LOG_CHANNEL, "Error applying ArcDPS default style.");
 				}
 				return;
 			}
@@ -146,12 +148,12 @@ namespace Raidcore::Nexus::GUI
 					}
 					catch (...)
 					{
-						this->Logger.Warning(CH_UICONTEXT, "Couldn't parse ArcDPS style.");
+						this->Logger.Warning(LOG_CHANNEL, "Couldn't parse ArcDPS style.");
 					}
 				}
 				else
 				{
-					this->Logger.Warning(CH_UICONTEXT, "Tried importing ArcDPS style, with no config present.");
+					this->Logger.Warning(LOG_CHANNEL, "Tried importing ArcDPS style, with no config present.");
 				}
 				return;
 			}
@@ -179,7 +181,7 @@ namespace Raidcore::Nexus::GUI
 
 						if (decodeStyle.size() != sizeof(ImGuiStyle))
 						{
-							this->Logger.Warning(CH_UICONTEXT, "Error applying stylesheet. Not ImGui 1.80 compatible.");
+							this->Logger.Warning(LOG_CHANNEL, "Error applying stylesheet. Not ImGui 1.80 compatible.");
 							return;
 						}
 
@@ -188,7 +190,7 @@ namespace Raidcore::Nexus::GUI
 				}
 				catch (...)
 				{
-					this->Logger.Warning(CH_UICONTEXT, "Error applying stylesheet.");
+					this->Logger.Warning(LOG_CHANNEL, "Error applying stylesheet.");
 				}
 
 				break;
@@ -199,7 +201,7 @@ namespace Raidcore::Nexus::GUI
 
 				if (decodeStyle.size() != sizeof(ImGuiStyle))
 				{
-					this->Logger.Warning(CH_UICONTEXT, "Error applying stylesheet. Not ImGui 1.80 compatible.");
+					this->Logger.Warning(LOG_CHANNEL, "Error applying stylesheet. Not ImGui 1.80 compatible.");
 					return;
 				}
 

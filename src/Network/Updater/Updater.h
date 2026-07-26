@@ -15,8 +15,6 @@
 #include "Core/Versioning/Version.h"
 #include "Core/Logging/LogApi.h"
 
-constexpr const char* CH_SELFUPDATER = "Updater";
-
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::Network Namespace
 ///----------------------------------------------------------------------------------------------------

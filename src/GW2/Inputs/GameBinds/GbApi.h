@@ -22,7 +22,6 @@
 
 using namespace Raidcore::Nexus;
 
-constexpr const char* CH_GAMEBINDS = "GameBinds";
 constexpr const char* EV_UE_KB_CH = "EV_UNOFFICIAL_EXTRAS_KEYBIND_CHANGED";
 
 #define WM_PASSTHROUGH_FIRST WM_USER + 7997

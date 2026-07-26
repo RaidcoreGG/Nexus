@@ -25,6 +25,8 @@ namespace Clockwork = Raidcore::Clockwork;
 
 namespace Raidcore::Nexus::Input
 {
+	constexpr const char* LOG_CHANNEL = "InputBinds";
+
 	CInputBindApi::CInputBindApi(Host::EventApi* aEventApi, Core::LogApi* aLogger, std::filesystem::path aConfigPath) : IRefCleaner("InputBindApi")
 	{
 		assert(aEventApi);
@@ -579,7 +581,7 @@ namespace Raidcore::Nexus::Input
 		}
 		catch (json::parse_error& ex)
 		{
-			Logger->Warning(CH_INPUTBINDS, "InputBinds.json could not be parsed. Error: %s", ex.what());
+			Logger->Warning(LOG_CHANNEL, "InputBinds.json could not be parsed. Error: %s", ex.what());
 		}
 	}
 
@@ -624,7 +626,7 @@ namespace Raidcore::Nexus::Input
 		}
 		else
 		{
-			this->Logger->Warning(CH_INPUTBINDS, "Failed to open config file for writing: %s", this->ConfigPath.string().c_str());
+			this->Logger->Warning(LOG_CHANNEL, "Failed to open config file for writing: %s", this->ConfigPath.string().c_str());
 		}
 	}
 

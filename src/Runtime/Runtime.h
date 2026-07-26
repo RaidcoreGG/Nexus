@@ -26,8 +26,6 @@
 ///----------------------------------------------------------------------------------------------------
 namespace Raidcore::Nexus
 {
-	constexpr const char* CH_CORE = "Core";
-
 	class Runtime
 	{
 		public:

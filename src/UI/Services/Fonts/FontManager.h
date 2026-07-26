@@ -19,8 +19,6 @@
 #include "FuncDefs.h"
 #include "UI/Services/Localization/LoclApi.h"
 
-constexpr const char* CH_FONTMANAGER = "CFontManager";
-
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::GUI Namespace
 ///----------------------------------------------------------------------------------------------------

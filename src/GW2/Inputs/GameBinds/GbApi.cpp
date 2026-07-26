@@ -21,6 +21,8 @@ using namespace Raidcore::Nexus;
 
 namespace Raidcore::Nexus::GW2
 {
+	constexpr const char* LOG_CHANNEL = "GameBinds";
+
 	void GameBindsApi::OnUEInputBindChanged(void* aData)
 	{
 		static GameBindsApi* s_GameBindsApi = nullptr;
@@ -597,7 +599,7 @@ namespace Raidcore::Nexus::GW2
 
 		if (!result)
 		{
-			this->Logger.Warning(CH_GAMEBINDS, "GameBinds.json could not be parsed. Error: %s", result.description());
+			this->Logger.Warning(LOG_CHANNEL, "GameBinds.json could not be parsed. Error: %s", result.description());
 			return;
 		}
 
@@ -1285,7 +1287,7 @@ namespace Raidcore::Nexus::GW2
 
 		if (!doc.save_file(this->ConfigPath.string().c_str(), "\t"))
 		{
-			this->Logger.Warning(CH_GAMEBINDS, "GameBinds.xml could not be saved.");
+			this->Logger.Warning(LOG_CHANNEL, "GameBinds.xml could not be saved.");
 		}
 	}
 }

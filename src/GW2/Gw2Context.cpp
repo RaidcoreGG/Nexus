@@ -21,6 +21,8 @@
 
 namespace Raidcore::Nexus::GW2
 {
+	constexpr const char* LOG_CHANNEL = "GW2 Context";
+
 	Context::Context(
 		Core::DataLinkApi&          aDataLink,
 		Host::EventApi&        aEventApi,

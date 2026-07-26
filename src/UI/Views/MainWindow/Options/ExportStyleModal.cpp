@@ -79,10 +79,6 @@ namespace Raidcore::Nexus::GUI
 				}
 				catch (...)
 				{
-					Runtime& ctx = Runtime::Get();
-					Core::LogApi* logger = &ctx.Core().Logger();
-					logger->Warning(CH_UICONTEXT, "Error saving stylesheet.");
-
 					/* Signal failure, to keep the modal open. */
 					this->SetResult(EModalResult::None);
 				}

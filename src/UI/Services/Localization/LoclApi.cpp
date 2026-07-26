@@ -24,6 +24,8 @@ using json = nlohmann::json;
 
 namespace Raidcore::Nexus::GUI
 {
+	constexpr const char* LOG_CHANNEL = "Localization";
+
 	static Localization* s_Localization{};
 
 	/*static*/ void Localization::OnUELanguageChanged(uint32_t* aLanguage)
@@ -394,7 +396,7 @@ namespace Raidcore::Nexus::GUI
 			}
 			catch (json::parse_error& ex)
 			{
-				this->Logger.Warning(CH_LOCALIZATION, "%s could not be parsed. Error: %s", path.filename().string().c_str(), ex.what());
+				this->Logger.Warning(LOG_CHANNEL, "%s could not be parsed. Error: %s", path.filename().string().c_str(), ex.what());
 			}
 		}
 

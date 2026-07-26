@@ -30,7 +30,6 @@
 
 using namespace Raidcore::Nexus;
 
-constexpr const char* CH_QUICKACCESS             = "Quick Access";
 constexpr const char* QA_MENU                    = "!Nexus";
 constexpr const char* ICON_NEXUS                 = "ICON_NEXUS";
 constexpr const char* ICON_NEXUS_HOVER           = "ICON_NEXUS_HOVER";

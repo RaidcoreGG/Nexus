@@ -12,6 +12,8 @@
 
 namespace Raidcore::Nexus::Core
 {
+	constexpr const char* LOG_CHANNEL = "Functions";
+
 	FuncRegistry::FuncRegistry(LogApi* aLogger)
 	{
 		assert(aLogger);
@@ -78,7 +80,7 @@ namespace Raidcore::Nexus::Core
 			if (it->second.RefCount < 0)
 			{
 				this->Logger->Critical(
-					CH_FUNCTIONS,
+					LOG_CHANNEL,
 					"%s reference count less than zero. Query/Release mismatch. Function may be freed prematurely.",
 					aIdentifier.c_str()
 				);

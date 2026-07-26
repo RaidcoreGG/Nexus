@@ -27,8 +27,6 @@ namespace Clockwork = Raidcore::Clockwork;
 
 using namespace Raidcore::Nexus;
 
-constexpr const char* CH_TEXTURES = "Textures";
-
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::Graphics Namespace
 ///----------------------------------------------------------------------------------------------------

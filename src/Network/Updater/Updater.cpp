@@ -16,6 +16,8 @@ using namespace Raidcore::Nexus;
 
 namespace Raidcore::Nexus::Network
 {
+	constexpr const char* LOG_CHANNEL = "Updater";
+
 	Updater::Updater(Core::LogApi* aLogger)
 	{
 		this->Logger = aLogger;
@@ -54,7 +56,7 @@ namespace Raidcore::Nexus::Network
 		if (!result.Success())
 		{
 			this->Logger->Warning(
-				CH_SELFUPDATER,
+				LOG_CHANNEL,
 				"Failed to fetch Nexus version.\n\tStatus: %s\n\tError: %s",
 				result.Status(),
 				result.Error.c_str()
@@ -66,7 +68,7 @@ namespace Raidcore::Nexus::Network
 
 		if (versionJSON.is_null())
 		{
-			this->Logger->Warning(CH_SELFUPDATER, "Failed to fetch Nexus version. JSON was null.");
+			this->Logger->Warning(LOG_CHANNEL, "Failed to fetch Nexus version. JSON was null.");
 			return this->RemoteVersion;
 		}
 
@@ -76,7 +78,7 @@ namespace Raidcore::Nexus::Network
 			versionJSON["Build"].is_null() ||
 			versionJSON["Revision"].is_null())
 		{
-			this->Logger->Warning(CH_SELFUPDATER, "Failed to fetch Nexus version. Incomplete version info.");
+			this->Logger->Warning(LOG_CHANNEL, "Failed to fetch Nexus version. Incomplete version info.");
 			return this->RemoteVersion;
 		}
 
@@ -119,7 +121,7 @@ namespace Raidcore::Nexus::Network
 				this->UpdateMutex = NULL;
 			}
 
-			this->Logger->Info(CH_SELFUPDATER, "Cannot patch Nexus, mutex locked.");
+			this->Logger->Info(LOG_CHANNEL, "Cannot patch Nexus, mutex locked.");
 			return false;
 		}
 
@@ -141,7 +143,7 @@ namespace Raidcore::Nexus::Network
 				std::filesystem::rename(Index(EPath::NexusDLL_Old), fallback);
 
 				this->Logger->Warning(
-					CH_SELFUPDATER,
+					LOG_CHANNEL,
 					"Couldn't remove \"%s\". Renamed to \"%s\".",
 					Index(EPath::NexusDLL_Old).string().c_str(),
 					fallback.string().c_str()
@@ -162,7 +164,7 @@ namespace Raidcore::Nexus::Network
 				std::filesystem::rename(Index(EPath::NexusDLL_Update), fallback);
 
 				this->Logger->Warning(
-					CH_SELFUPDATER,
+					LOG_CHANNEL,
 					"Couldn't remove \"%s\". Renamed to \"%s\".",
 					Index(EPath::NexusDLL_Update).string().c_str(),
 					fallback.string().c_str()
@@ -186,7 +188,7 @@ namespace Raidcore::Nexus::Network
 		}
 
 		this->Logger->Warning(
-			CH_SELFUPDATER,
+			LOG_CHANNEL,
 			"Failed to download Nexus update from GitHub.\n\tStatus: %s\n\tError: %s",
 			ghresult.Status().empty() ? "(null)" : ghresult.Status().c_str(),
 			ghresult.Error.c_str()
@@ -205,7 +207,7 @@ namespace Raidcore::Nexus::Network
 		}
 
 		this->Logger->Warning(
-			CH_SELFUPDATER,
+			LOG_CHANNEL,
 			"Failed to download Nexus update from fallback. (Raidcore API)\n\tStatus: %s\n\tError: %s",
 			fbresult.Status().empty() ? "(null)" : fbresult.Status().c_str(),
 			fbresult.Error.c_str()
@@ -236,7 +238,7 @@ namespace Raidcore::Nexus::Network
 		if (this->RemoteVersion > currentVersion)
 		{
 			this->Logger->Info(
-				CH_SELFUPDATER,
+				LOG_CHANNEL,
 				"Update available. (Current: %s) (Remote: %s)",
 				currentVersion.string().c_str(),
 				this->RemoteVersion.string().c_str()
@@ -253,7 +255,7 @@ namespace Raidcore::Nexus::Network
 			catch (std::filesystem::filesystem_error fErr)
 			{
 				this->Logger->Warning(
-					CH_SELFUPDATER,
+					LOG_CHANNEL,
 					"Nexus update failed: Couldn't move \"%s\" to \"%s\".",
 					Index(EPath::NexusDLL).string().c_str(),
 					Index(EPath::NexusDLL_Old).string().c_str()
@@ -269,7 +271,7 @@ namespace Raidcore::Nexus::Network
 			catch (std::filesystem::filesystem_error fErr)
 			{
 				this->Logger->Warning(
-					CH_SELFUPDATER,
+					LOG_CHANNEL,
 					"Nexus update failed: Couldn't move \"%s\" to \"%s\".",
 					Index(EPath::NexusDLL_Update).string().c_str(),
 					Index(EPath::NexusDLL).string().c_str()
@@ -283,7 +285,7 @@ namespace Raidcore::Nexus::Network
 				catch (std::filesystem::filesystem_error fErr)
 				{
 					this->Logger->Warning(
-						CH_SELFUPDATER,
+						LOG_CHANNEL,
 						"Nexus update failed: Couldn't move \"%s\" to \"%s\".",
 						Index(EPath::NexusDLL_Old).string().c_str(),
 						Index(EPath::NexusDLL).string().c_str()
@@ -295,7 +297,7 @@ namespace Raidcore::Nexus::Network
 			}
 
 			this->Logger->Info(
-				CH_SELFUPDATER,
+				LOG_CHANNEL,
 				"Successfully updated Nexus. Restart required to take effect. (Current: %s) (Remote: %s)",
 				currentVersion.string().c_str(),
 				this->RemoteVersion.string().c_str()
@@ -306,7 +308,7 @@ namespace Raidcore::Nexus::Network
 		if (this->RemoteVersion < currentVersion)
 		{
 			this->Logger->Info(
-				CH_SELFUPDATER,
+				LOG_CHANNEL,
 				"Installed Build of Nexus is more up-to-date than remote. (Current: %s) (Remote: %s)",
 				currentVersion.string().c_str(),
 				this->RemoteVersion.string().c_str()
@@ -314,6 +316,6 @@ namespace Raidcore::Nexus::Network
 			return;
 		}
 
-		this->Logger->Info(CH_SELFUPDATER, "Installed Build of Nexus is up-to-date.");
+		this->Logger->Info(LOG_CHANNEL, "Installed Build of Nexus is up-to-date.");
 	}
 }

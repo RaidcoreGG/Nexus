@@ -28,8 +28,6 @@
 using namespace Raidcore::Nexus;
 using ArcExtensionDef_t = GW2::ArcDPS::ExtensionDef_t;
 
-constexpr const char* CH_ADDON = "Addon";
-
 ///----------------------------------------------------------------------------------------------------
 /// CAddon Class
 ///----------------------------------------------------------------------------------------------------

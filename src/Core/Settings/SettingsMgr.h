@@ -18,8 +18,6 @@ using json = nlohmann::json;
 
 #include "Core/Logging/LogApi.h"
 
-constexpr const char* CH_SETTINGS = "Settings";
-
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::Core Namespace
 ///----------------------------------------------------------------------------------------------------

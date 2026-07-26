@@ -27,6 +27,8 @@ using namespace Raidcore::Nexus;
 
 namespace Raidcore::Nexus::GUI
 {
+	constexpr const char* LOG_CHANNEL = "Quick Access";
+
 	void CQuickAccess::OnAddonStateChanged(void* aEventData)
 	{
 		Runtime& ctx = Runtime::Get();
@@ -449,7 +451,7 @@ namespace Raidcore::Nexus::GUI
 			else
 			{
 				this->Logger->Warning(
-					CH_QUICKACCESS,
+					LOG_CHANNEL,
 					"Context menu item already registered: %s (Parent: \"%s\")",
 					aIdentifier,
 					aTargetShortcutIdentifier

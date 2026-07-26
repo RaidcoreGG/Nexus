@@ -19,7 +19,6 @@
 #include "LdrAddonBase.h"
 
 constexpr const uint32_t WM_ADDONDIRUPDATE = WM_USER + 101;
-constexpr const char* CH_LOADER = "Loader";
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::Host Namespace

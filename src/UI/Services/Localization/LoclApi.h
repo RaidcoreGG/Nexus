@@ -19,8 +19,6 @@
 #include "LoclLocale.h"
 #include "LoclQueuedText.h"
 
-constexpr const char* CH_LOCALIZATION = "Localization";
-
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::GUI Namespace
 ///----------------------------------------------------------------------------------------------------

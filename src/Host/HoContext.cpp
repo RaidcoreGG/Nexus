@@ -18,6 +18,8 @@
 
 namespace Raidcore::Nexus::Host
 {
+	constexpr const char* LOG_CHANNEL = "HostContext";
+
 	Context::Context(Core::LogApi& aLogger)
 		: _Logger(aLogger)
 	{
@@ -44,11 +46,11 @@ namespace Raidcore::Nexus::Host
 					}
 					catch (const std::invalid_argument& e)
 					{
-						this->_Logger.Trace(CH_LOADER, "Invalid argument(-ggaddons) : %s (exc: %s)", addonsig.c_str(), e.what());
+						this->_Logger.Trace(LOG_CHANNEL, "Invalid argument(-ggaddons) : %s (exc: %s)", addonsig.c_str(), e.what());
 					}
 					catch (const std::out_of_range& e)
 					{
-						this->_Logger.Trace(CH_LOADER, "Out of range (-ggaddons): %s (exc: %s)", addonsig.c_str(), e.what());
+						this->_Logger.Trace(LOG_CHANNEL, "Out of range (-ggaddons): %s (exc: %s)", addonsig.c_str(), e.what());
 					}
 				}
 			}

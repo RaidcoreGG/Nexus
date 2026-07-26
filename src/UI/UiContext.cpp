@@ -41,6 +41,8 @@ using namespace Raidcore::Nexus;
 
 namespace Raidcore::Nexus::GUI
 {
+	constexpr const char* LOG_CHANNEL = "GUI";
+
 	/*static*/ void Context::OnInputBindPressed(const char* aIdentifier)
 	{
 		Runtime& ctx = Runtime::Get();
@@ -217,7 +219,7 @@ namespace Raidcore::Nexus::GUI
 
 		if (!(Runtime::Get().Platform().Window() && this->GrWindow.SwapChain))
 		{
-			this->Logger->Critical(CH_UICONTEXT, "Context::Initialize() failed. A RenderContext component was nullptr.");
+			this->Logger->Critical(LOG_CHANNEL, "Context::Initialize() failed. A RenderContext component was nullptr.");
 			return;
 		}
 
@@ -227,7 +229,7 @@ namespace Raidcore::Nexus::GUI
 
 		if (!pBackBuffer)
 		{
-			this->Logger->Critical(CH_UICONTEXT, "Context::Initialize() failed. BackBuffer was nullptr.");
+			this->Logger->Critical(LOG_CHANNEL, "Context::Initialize() failed. BackBuffer was nullptr.");
 			return;
 		}
 
@@ -246,7 +248,7 @@ namespace Raidcore::Nexus::GUI
 
 		if (!this->GrWindow.RenderTarget)
 		{
-			this->Logger->Critical(CH_UICONTEXT, "Context::Initialize() failed. RenderTargetView could not be created.");
+			this->Logger->Critical(LOG_CHANNEL, "Context::Initialize() failed. RenderTargetView could not be created.");
 			return;
 		}
 

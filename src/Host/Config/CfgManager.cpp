@@ -17,6 +17,8 @@ using json = nlohmann::json;
 
 namespace Raidcore::Nexus::Host
 {
+	constexpr const char* LOG_CHANNEL = "Config";
+
 	/* Config Migration Keys */
 	constexpr const char* KM_PAUSEUPDATES = "IsPausingUpdates";
 
@@ -86,7 +88,7 @@ namespace Raidcore::Nexus::Host
 		if (!file.is_open())
 		{
 			this->Logger->Warning(
-				CH_CFGMGR,
+				LOG_CHANNEL,
 				"Failed to open \"%s\" for writing.",
 				this->Path.string().c_str()
 			);
@@ -162,7 +164,7 @@ namespace Raidcore::Nexus::Host
 			if (!file.is_open())
 			{
 				this->Logger->Warning(
-					CH_CFGMGR,
+					LOG_CHANNEL,
 					"Failed to open \"%s\" for reading.",
 					this->Path.string().c_str()
 				);
@@ -174,7 +176,7 @@ namespace Raidcore::Nexus::Host
 			if (cfgPack.is_null())
 			{
 				this->Logger->Warning(
-					CH_CFGMGR,
+					LOG_CHANNEL,
 					"Failed to parse \"%s\". Config was null.",
 					this->Path.string().c_str()
 				);
@@ -239,7 +241,7 @@ namespace Raidcore::Nexus::Host
 		catch (json::parse_error& ex)
 		{
 			this->Logger->Warning(
-				CH_CFGMGR,
+				LOG_CHANNEL,
 				"Failed to parse \"%s\". Error: %s",
 				this->Path.filename().string().c_str(),
 				ex.what()

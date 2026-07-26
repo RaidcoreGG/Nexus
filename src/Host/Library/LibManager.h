@@ -17,8 +17,6 @@
 #include "Network/WebRequests/WreClient.h"
 #include "LibAddon.h"
 
-constexpr const char* CH_LIBRARY = "Library";
-
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::Host Namespace
 ///----------------------------------------------------------------------------------------------------

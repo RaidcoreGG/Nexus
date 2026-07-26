@@ -26,6 +26,8 @@ using namespace Raidcore::Nexus;
 
 namespace Raidcore::Nexus::GW2
 {
+	constexpr const char* LOG_CHANNEL = "Mumble";
+
 	MumbleReader::MumbleReader(Core::DataLinkApi& aDataLink, Host::EventApi& aEventApi, Core::LogApi& aLogger)
 		: DataLinkApi(aDataLink)
 		, EventApi(aEventApi)
@@ -106,19 +108,19 @@ namespace Raidcore::Nexus::GW2
 				j["fov"].get_to(this->MumbleIdentity->FOV);
 				j["uisz"].get_to(this->MumbleIdentity->UISize);
 
-				//this->Logger->Trace(CH_MUMBLE_READER, "MumbleReader::AdvanceIdentity()");
+				//this->Logger->Trace(LOG_CHANNEL, "MumbleReader::AdvanceIdentity()");
 			}
 			catch (json::parse_error& ex)
 			{
-				this->Logger.Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
+				this->Logger.Trace(LOG_CHANNEL, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
 			}
 			catch (json::type_error& ex)
 			{
-				this->Logger.Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Type Error: %s", ex.what());
+				this->Logger.Trace(LOG_CHANNEL, "MumbleLink could not be parsed. Type Error: %s", ex.what());
 			}
 			catch (...)
 			{
-				this->Logger.Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Unknown Error.");
+				this->Logger.Trace(LOG_CHANNEL, "MumbleLink could not be parsed. Unknown Error.");
 			}
 
 			/* notify (also notifies the GUI to update its scaling factor) */
@@ -147,6 +149,6 @@ namespace Raidcore::Nexus::GW2
 		this->PreviousAvatarPosition = this->MumbleLink->AvatarPosition;
 		this->PreviousCameraFront = this->MumbleLink->CameraFront;
 
-		//this->Logger->Trace(CH_MUMBLE_READER, "MumbleReader::AdvanceDerived()");
+		//this->Logger->Trace(LOG_CHANNEL, "MumbleReader::AdvanceDerived()");
 	}
 }
