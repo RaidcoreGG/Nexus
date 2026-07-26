@@ -14,8 +14,8 @@
 #include "Runtime/Runtime.h"
 using namespace Raidcore::Nexus;
 
-#include "Core/Preferences/PrefConst.h"
-#include "Core/Preferences/PrefContext.h"
+#include "Core/Settings/SettingsConst.h"
+#include "Core/Settings/SettingsMgr.h"
 #include "Util/Inputs.h"
 
 namespace Raidcore::Nexus::GUI

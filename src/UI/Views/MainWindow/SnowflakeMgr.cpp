@@ -18,7 +18,7 @@ using namespace Raidcore::Nexus;
 #include "res/ResConst.h"
 #include "Util/DLL.h"
 #include "Util/Time.h"
-#include "Core/Preferences/PrefConst.h"
+#include "Core/Settings/SettingsConst.h"
 
 namespace Raidcore::Nexus::GUI
 {

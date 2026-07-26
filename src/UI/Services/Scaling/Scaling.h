@@ -9,7 +9,7 @@
 #pragma once
 
 #include "Core/NexusLink.h"
-#include "Core/Preferences/PrefContext.h"
+#include "Core/Settings/SettingsMgr.h"
 #include "Core/DataLink/DlApi.h"
 #include "Host/Events/EvtApi.h"
 #include "GW2/Mumble/MblReader.h"

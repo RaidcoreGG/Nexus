@@ -13,7 +13,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 
-#include "Core/Preferences/PrefConst.h"
+#include "Core/Settings/SettingsConst.h"
 
 namespace Raidcore::Nexus::GUI
 {

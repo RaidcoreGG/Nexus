@@ -1,7 +1,7 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  PrefConst.h
+/// Name         :  SettingsConst.h
 /// Description  :  Constant data for user preferences.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------

@@ -14,7 +14,7 @@
 #include "Core/DataLink/DlApi.h"
 #include "Core/Functions/FnRegistry.h"
 #include "Core/Logging/LogApi.h"
-#include "Core/Preferences/PrefContext.h"
+#include "Core/Settings/SettingsMgr.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::Core Namespace

@@ -1,7 +1,7 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  PrefContext.h
+/// Name         :  SettingsMgr.h
 /// Description  :  Provides functions to load and save settings.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------

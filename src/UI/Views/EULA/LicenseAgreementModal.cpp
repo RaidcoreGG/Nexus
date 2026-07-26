@@ -19,7 +19,7 @@
 using namespace Raidcore::Nexus;
 
 #include "Index/Index.h"
-#include "Core/Preferences/PrefConst.h"
+#include "Core/Settings/SettingsConst.h"
 
 namespace Raidcore::Nexus::GUI
 {

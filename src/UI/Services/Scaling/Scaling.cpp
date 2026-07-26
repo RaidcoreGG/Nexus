@@ -14,10 +14,10 @@
 #include "imgui/imgui.h"
 
 #include "Hooks/HkConst.h"
-#include "Core/Preferences/PrefConst.h"
+#include "Core/Settings/SettingsConst.h"
 #include "GW2/Mumble/MblConst.h"
 #include "Core/NexusLink.h"
-#include "Core/Preferences/PrefContext.h"
+#include "Core/Settings/SettingsMgr.h"
 #include "Core/DataLink/DlApi.h"
 #include "Graphics/GrWindow.h"
 #include "GW2/Mumble/MblReader.h"

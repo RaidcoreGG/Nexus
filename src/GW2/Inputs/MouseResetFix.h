@@ -13,7 +13,7 @@
 #include "Runtime/Runtime.h"
 using namespace Raidcore::Nexus;
 
-#include "Core/Preferences/PrefConst.h"
+#include "Core/Settings/SettingsConst.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::GW2 Namespace

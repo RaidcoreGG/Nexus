@@ -11,7 +11,7 @@
 #include "StyleEnum.h"
 
 #include "Core/Logging/LogApi.h"
-#include "Core/Preferences/PrefContext.h"
+#include "Core/Settings/SettingsMgr.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::GUI Namespace

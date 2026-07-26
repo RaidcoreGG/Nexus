@@ -11,7 +11,7 @@
 
 #include "Core/DataLink/DlApi.h"
 #include "Core/Logging/LogApi.h"
-#include "Core/Preferences/PrefContext.h"
+#include "Core/Settings/SettingsMgr.h"
 #include "Functions/FnRegistry.h"
 #include "Index/IdxEnum.h"
 #include "Index/Index.h"

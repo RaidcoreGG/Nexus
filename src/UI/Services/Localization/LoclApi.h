@@ -14,7 +14,7 @@
 #include <string>
 
 #include "Core/Logging/LogApi.h"
-#include "Core/Preferences/PrefContext.h"
+#include "Core/Settings/SettingsMgr.h"
 #include "Host/Events/EvtApi.h"
 #include "LoclLocale.h"
 #include "LoclQueuedText.h"

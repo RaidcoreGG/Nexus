@@ -16,8 +16,8 @@
 using namespace Raidcore::Nexus;
 
 #include "Host/Addons/AddConst.h"
-#include "Core/Preferences/PrefConst.h"
-#include "Core/Preferences/PrefContext.h"
+#include "Core/Settings/SettingsConst.h"
+#include "Core/Settings/SettingsMgr.h"
 #include "res/ResConst.h"
 #include "UI/UIContext.h"
 #include "Util/DLL.h"

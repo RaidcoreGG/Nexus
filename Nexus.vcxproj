@@ -68,7 +68,7 @@
     <ClCompile Include="src\GW2\Multibox\Multibox.cpp" />
     <ClCompile Include="src\GW2\Mumble\MblReader.cpp" />
     <ClCompile Include="src\Proxy\PxyD3D11.cpp" />
-    <ClCompile Include="src\Core\Preferences\PrefContext.cpp" />
+    <ClCompile Include="src\Core\Settings\SettingsMgr.cpp" />
     <ClCompile Include="src\Graphics\Textures\TxLoader.cpp" />
     <ClCompile Include="thirdparty\pugixml\pugixml.cpp" />
     <ClCompile Include="src\UI\Controls\CtlContextMenu.cpp" />
@@ -127,7 +127,7 @@
     <ClInclude Include="src\Hooks\HkConst.h" />
     <ClInclude Include="src\Hooks\HkFuncDefs.h" />
     <ClInclude Include="src\Hooks\Hooks.h" />
-    <ClInclude Include="src\Core\Preferences\PrefConst.h" />
+    <ClInclude Include="src\Core\Settings\SettingsConst.h" />
     <ClInclude Include="src\Proxy\Proxy.h" />
     <ClInclude Include="src\Proxy\PxyD3D11.h" />
     <ClInclude Include="src\Proxy\PxyD3D9.h" />
@@ -380,7 +380,7 @@
     <ClInclude Include="src\GW2\Mumble\MblReader.h" />
     <ClInclude Include="src\Index\IdxFuncDefs.h" />
     <ClInclude Include="res\ResConst.h" />
-    <ClInclude Include="src\Core\Preferences\PrefContext.h" />
+    <ClInclude Include="src\Core\Settings\SettingsMgr.h" />
     <ClInclude Include="thirdparty\pugixml\pugiconfig.hpp" />
     <ClInclude Include="thirdparty\pugixml\pugixml.hpp" />
     <ClInclude Include="thirdparty\stb\stb_image.h" />

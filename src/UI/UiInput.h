@@ -11,7 +11,7 @@
 #include <atomic>
 #include <cstdint>
 
-#include "Core/Preferences/PrefContext.h"
+#include "Core/Settings/SettingsMgr.h"
 #include "Util/Inputs.h"
 
 ///----------------------------------------------------------------------------------------------------

@@ -20,7 +20,7 @@ using json = nlohmann::json;
 #include "Util/Resources.h"
 #include "Index/Index.h"
 #include "res/ResConst.h"
-#include "Core/Preferences/PrefConst.h"
+#include "Core/Settings/SettingsConst.h"
 
 namespace Raidcore::Nexus::GUI
 {

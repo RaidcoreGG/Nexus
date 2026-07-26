@@ -16,7 +16,7 @@
 using namespace Raidcore::Nexus;
 
 #include "Index/Index.h"
-#include "Core/Preferences/PrefConst.h"
+#include "Core/Settings/SettingsConst.h"
 #include "Util/Base64.h"
 
 ///----------------------------------------------------------------------------------------------------
