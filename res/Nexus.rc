@@ -147,7 +147,6 @@ RES_ICON_FILTER                 PNG     "res\\Images\\MainWindow\\FilterShaded.p
 RES_ICON_UPDATE                 PNG     "res\\Images\\MainWindow\\UpdateShaded.png"
 RES_ICON_GITHUB                 PNG     "res\\Images\\MainWindow\\GitHubShaded.png"
 RES_BANNER_DISCORD              PNG     "res\\Images\\Social\\Banners\\Discord.png"
-RES_BANNER_PATREON              PNG     "res\\Images\\Social\\Banners\\Patreon.png"
 
 /* Locales (primary) */
 RES_LOCALE_EN                   JSON    "res\\Locales\\en_Main.json"

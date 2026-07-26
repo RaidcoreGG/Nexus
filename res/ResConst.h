@@ -69,7 +69,6 @@
 #define RES_ICON_UPDATE                 510
 #define RES_ICON_GITHUB                 511
 #define RES_BANNER_DISCORD              512
-#define RES_BANNER_PATREON              513
 
 /* Locales (primary) */
 #define RES_LOCALE_EN                   701
