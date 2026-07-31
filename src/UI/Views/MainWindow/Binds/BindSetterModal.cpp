@@ -78,7 +78,7 @@ namespace Raidcore::Nexus::GUI
 	{
 		Runtime& ctx = Runtime::Get();
 		Input::CInputBindApi* ibapi = ctx.InputBinds();
-		GW2::GameBindsApi* gbapi = &ctx.Game().GameBinds();
+		GW2::GameBindsApi* gbapi = &ctx.GameBinds();
 
 		/* Fetch display text. */
 		switch (this->Type)
@@ -119,7 +119,7 @@ namespace Raidcore::Nexus::GUI
 	{
 		Runtime& ctx = Runtime::Get();
 		Input::CInputBindApi* ibapi = ctx.InputBinds();
-		GW2::GameBindsApi* gbapi = &ctx.Game().GameBinds();
+		GW2::GameBindsApi* gbapi = &ctx.GameBinds();
 		ibapi->EndCapturing();
 
 		switch (this->GetResult())

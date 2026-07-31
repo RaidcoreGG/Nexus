@@ -134,7 +134,7 @@ namespace Raidcore::Nexus::GUI
 		this->DisplayGameBinds.clear();
 
 		Runtime& ctx = Runtime::Get();
-		GW2::GameBindsApi* gameBindsApi = &ctx.Game().GameBinds();
+		GW2::GameBindsApi* gameBindsApi = &ctx.GameBinds();
 
 		/* copy of all InputBinds */
 		std::unordered_map<GW2::EGameBinds, GW2::MultiInputBind_t> InputBindRegistry = gameBindsApi->GetRegistry();

@@ -17,7 +17,10 @@
 #include "Core/Versioning/Version.h"
 #include "Graphics/GrMetrics.h"
 #include "Graphics/GrWindow.h"
-#include "GW2/Gw2Context.h"
+#include "GW2/ArcDPS/ArcApi.h"
+#include "GW2/BuildInfo/BuildInfoService.h"
+#include "GW2/Inputs/GameBinds/GbApi.h"
+#include "GW2/Mumble/MblReader.h"
 #include "Host/HoContext.h"
 #include "Inputs/InputBinds/IbApi.h"
 #include "Network/NetContext.h"
@@ -102,7 +105,29 @@ namespace Raidcore::Nexus
 		///----------------------------------------------------------------------------------------------------
 		Graphics::Window_t& GrWindow();
 
-		GW2::Context& Game();
+		///----------------------------------------------------------------------------------------------------
+		/// Arcdps:
+		/// 	Returns the ArcDPS API.
+		///----------------------------------------------------------------------------------------------------
+		GW2::ArcdpsApi& Arcdps();
+
+		///----------------------------------------------------------------------------------------------------
+		/// Build:
+		/// 	Returns the current game build information.
+		///----------------------------------------------------------------------------------------------------
+		GW2::BuildInfoService& BuildInfo();
+
+		///----------------------------------------------------------------------------------------------------
+		/// GameBinds:
+		/// 	Returns the GameBinds API.
+		///----------------------------------------------------------------------------------------------------
+		GW2::GameBindsApi& GameBinds();
+
+		///----------------------------------------------------------------------------------------------------
+		/// Mumble:
+		/// 	Returns the Mumble API.
+		///----------------------------------------------------------------------------------------------------
+		GW2::MumbleReader& Mumble();
 
 		Input::CInputBindApi* InputBinds();
 
@@ -115,7 +140,6 @@ namespace Raidcore::Nexus
 		std::unique_ptr<Network::Context>  _NetworkContext{ nullptr };
 		std::unique_ptr<Platform::Context> _PlatformContext{ nullptr };
 		std::unique_ptr<Host::Context>     _HostContext{ nullptr };
-		std::unique_ptr<GW2::Context>      _GameContext{ nullptr };
 		std::unique_ptr<GUI::Context>      _UiContext{ nullptr };
 	};
 }

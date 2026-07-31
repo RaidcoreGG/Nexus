@@ -589,14 +589,14 @@ namespace Raidcore::Nexus::Host::API
 
 			s_DataLinkApi = &ctx.DataLink();
 			s_EventApi = &ctx.Host().Events();
-			s_GameBindsApi = &ctx.Game().GameBinds();
+			s_GameBindsApi = &ctx.GameBinds();
 			s_InputBindApi = ctx.InputBinds();
 			s_RawInputApi = &ctx.Platform().RawInput();
 			s_Logger = &ctx.Logger();
 			s_TextureApi = &ctx.TextureLoader();
 			s_Loader = &ctx.Host().Loader();
 			s_GrWindow = &ctx.GrWindow();
-			s_ArcApi = &ctx.Game().Arcdps();
+			s_ArcApi = &ctx.Arcdps();
 
 			s_UiContext = &ctx.UI();
 			s_FontManager = s_UiContext->GetFontManager();

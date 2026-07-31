@@ -374,7 +374,7 @@ void CAddon::LoadInternal()
 
 	this->EventApi->Raise(EV_ADDON_LOADED, &this->NexusAddonDefV1->Signature);
 
-	this->Config->LastGameBuild = Runtime::Get().Game().BuildInfo().Build();
+	this->Config->LastGameBuild = Runtime::Get().BuildInfo().Build();
 	this->Config->LastName = this->NexusAddonDefV1->GetName();
 	this->State = Host::EAddonState::Loaded;
 	this->ConfigMgr->SaveConfigs();
@@ -849,7 +849,7 @@ bool CAddon::ShouldLoad()
 		this->Logger->Debug(
 			LOG_CHANNEL,
 			"Canceled load. Volatile addon and gamebuild diff is %u. (%s)",
-			Runtime::Get().Game().BuildInfo().Build() - this->Config->LastGameBuild,
+			Runtime::Get().BuildInfo().Build() - this->Config->LastGameBuild,
 			this->Location.string().c_str()
 		);
 		result = false;
@@ -884,7 +884,7 @@ bool CAddon::IsVolatileDisabled()
 		return false;
 	}
 
-	if (this->Config->LastGameBuild != 0 && Runtime::Get().Game().BuildInfo().Build() - this->Config->LastGameBuild > 350)
+	if (this->Config->LastGameBuild != 0 && Runtime::Get().BuildInfo().Build() - this->Config->LastGameBuild > 350)
 	{
 		/* FIXME: move this elsewhere maybe? rather than the check */
 		if (this->Config->DisableVersion.empty() || this->Config->DisableVersion != this->GetMD5().string())

@@ -27,7 +27,7 @@
 #include "Core/Logging/LogWriter.h"
 #include "Core/Versioning/Version.h"
 #include "Graphics/Textures/TxLoader.h"
-#include "GW2/Gw2Context.h"
+#include "GW2/Multibox/Multibox.h"
 #include "Hooks/Hooks.h"
 #include "Host/HoContext.h"
 #include "Index/IdxEnum.h"
@@ -119,7 +119,18 @@ namespace Raidcore::Nexus
 			return;
 		}
 
-		this->Game().Initialize();
+		/* Prefetch game build. */
+		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Immediate, [this](Clockwork::CancellationToken aToken)
+		{
+			this->BuildInfo().Build();
+		});
+
+		/* Set up multiboxing. */
+		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
+		{
+			Multibox::KillMutex();
+			this->Logger().Info(LOG_CHANNEL, "Multibox State: %d", Multibox::GetState());
+		});
 	}
 
 	void Runtime::Shutdown(unsigned int aReason)
@@ -260,9 +271,41 @@ namespace Raidcore::Nexus
 		return s_Window;
 	}
 
-	GW2::Context& Runtime::Game()
+	GW2::ArcdpsApi& Runtime::Arcdps()
 	{
-		return *this->_GameContext;
+		static GW2::ArcdpsApi s_ArcdpsApi{};
+		return s_ArcdpsApi;
+	}
+
+	GW2::BuildInfoService& Runtime::BuildInfo()
+	{
+		static GW2::BuildInfoService s_BuildInfo{
+			this->Network().GetHttpClient("http://assetcdn.101.arenanetworks.com", /*disablecache=*/ true),
+			this->Logger()
+		};
+		return s_BuildInfo;
+	}
+
+	GW2::GameBindsApi& Runtime::GameBinds()
+	{
+		static GW2::GameBindsApi s_GameBinds{
+			this->Platform().RawInput(),
+			this->Logger(),
+			this->Host().Events(),
+			this->Platform().Window(),
+			Index(EPath::GameBinds)
+		};
+		return s_GameBinds;
+	}
+
+	GW2::MumbleReader& Runtime::Mumble()
+	{
+		static GW2::MumbleReader s_Mumble{
+			this->DataLink(),
+			this->Host().Events(),
+			this->Logger()
+		};
+		return s_Mumble;
 	}
 
 	Input::CInputBindApi* Runtime::InputBinds()
@@ -287,7 +330,7 @@ namespace Raidcore::Nexus
 				this->TextureLoader(),
 				*this->InputBinds(),
 				this->Host().Events(),
-				this->Game().Mumble()
+				this->Mumble()
 			);
 		}
 
@@ -307,25 +350,10 @@ namespace Raidcore::Nexus
 		this->_HostContext = std::make_unique<Host::Context>(
 			this->Logger()
 		);
-
-		this->_GameContext = std::make_unique<GW2::Context>(
-			this->DataLink(),
-			this->Host().Events(),
-			this->Logger(),
-			this->Platform().RawInput(),
-			this->Platform().Window(),
-			this->Network().GetHttpClient("http://assetcdn.101.arenanetworks.com", /*disablecache=*/ true)
-		);
 	}
 
 	Runtime::~Runtime()
 	{
-		if (this->_GameContext)
-		{
-			this->_GameContext->Shutdown();
-			this->_GameContext.reset();
-		}
-
 		if (this->_HostContext)
 		{
 			this->_HostContext->Shutdown();

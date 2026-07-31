@@ -30,7 +30,7 @@ namespace Raidcore::Nexus::GW2
 		if (!s_GameBindsApi)
 		{
 			Runtime& ctx = Runtime::Get();
-			s_GameBindsApi = &ctx.Game().GameBinds();
+			s_GameBindsApi = &ctx.GameBinds();
 
 			assert(s_GameBindsApi);
 		}

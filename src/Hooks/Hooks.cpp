@@ -189,7 +189,7 @@ namespace Hooks
 			static Platform::RawInputApi& s_RawInputApi  = s_Context.Platform().RawInput();
 			static GUI::Context&          s_UIContext    = s_Context.UI();
 			static Host::Loader&          s_Loader       = s_Context.Host().Loader();
-			static GW2::GameBindsApi&     s_GameBindsApi = s_Context.Game().GameBinds();
+			static GW2::GameBindsApi&     s_GameBindsApi = s_Context.GameBinds();
 
 			// don't pass to game if loader
 			if (s_Loader.WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }

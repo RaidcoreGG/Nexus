@@ -138,7 +138,7 @@ namespace Raidcore::Nexus::GUI
 							if (ImGui::Selectable(path.filename().string().c_str()))
 							{
 								/* Actually load the binds. */
-								GW2::GameBindsApi* gameBindsApi = &ctx.Game().GameBinds();
+								GW2::GameBindsApi* gameBindsApi = &ctx.GameBinds();
 								gameBindsApi->Load(path);
 
 								/* Trigger refresh for display binds. */

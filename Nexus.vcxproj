@@ -11,7 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\GW2\Gw2Context.cpp" />
     <ClCompile Include="src\Host\Addons\Addon.cpp" />
     <ClCompile Include="src\Host\Config\CfgManager.cpp" />
     <ClCompile Include="src\Host\HoContext.cpp" />
@@ -105,7 +104,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\CommitHash.h" />
-    <ClInclude Include="src\GW2\Gw2Context.h" />
     <ClInclude Include="src\Host\Addons\AddEnum.h" />
     <ClInclude Include="src\Host\Addons\Addon.h" />
     <ClInclude Include="src\Host\Config\CfgEnum.h" />

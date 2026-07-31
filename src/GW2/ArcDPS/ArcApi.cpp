@@ -18,7 +18,7 @@ namespace Raidcore::Nexus::GW2
 {
 	static void s_ReceiveExtension(ArcDPS::ExtensionDefRaw_t* aExtensionDef)
 	{
-		Runtime::Get().Game().Arcdps().ReceiveExtension(aExtensionDef);
+		Runtime::Get().Arcdps().ReceiveExtension(aExtensionDef);
 	}
 
 	ArcdpsApi::~ArcdpsApi()
