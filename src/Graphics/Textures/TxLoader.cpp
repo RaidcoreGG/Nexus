@@ -25,16 +25,18 @@ namespace Clockwork = Raidcore::Clockwork;
 
 namespace Raidcore::Nexus::Graphics
 {
-	constexpr const char* LOG_CHANNEL = "Textures";
+	constexpr const char* LOG_CHANNEL = "TextureLoader";
 
-	TextureLoader::TextureLoader(Core::LogApi* aLogger, Graphics::Window_t& aGrWindow, std::filesystem::path aOverridesDirectory)
+	TextureLoader::TextureLoader(
+		Core::LogApi&         aLogger,
+		Graphics::Window_t&   aGrWindow,
+		std::filesystem::path aOverridesDirectory
+	)
 		: IRefCleaner("TextureLoader")
 		, Logger(aLogger)
 		, GrWindow(aGrWindow)
 		, OverridesDirectory(aOverridesDirectory)
 	{
-		assert(aLogger);
-
 		this->TextureWorker = Clockwork::Dispatcher<void>{[this](Clockwork::CancellationToken aToken)
 		{
 			this->ProcessDownloads(aToken);
@@ -79,7 +81,7 @@ namespace Raidcore::Nexus::Graphics
 				{
 					if (now - it->second.Time > 60000)
 					{
-						this->Logger->Debug(LOG_CHANNEL, "Dropped texture with ID \"%s\" from queue after %dms at stage %d.", it->first.c_str(), now - it->second.Time, it->second.Stage);
+						this->Logger.Debug(LOG_CHANNEL, "Dropped texture with ID \"%s\" from queue after %dms at stage %d.", it->first.c_str(), now - it->second.Time, it->second.Stage);
 						it->second.Stage = ETextureStage::INVALID;
 						++it;
 					}
@@ -196,7 +198,7 @@ namespace Raidcore::Nexus::Graphics
 
 		if (!std::filesystem::exists(aFilename))
 		{
-			this->Logger->Warning(LOG_CHANNEL, "File provided does not exist: %s (%s)", aFilename, aIdentifier);
+			this->Logger.Warning(LOG_CHANNEL, "File provided does not exist: %s (%s)", aFilename, aIdentifier);
 
 			/* nullptr response on fail */
 			this->DispatchTexture(aIdentifier, nullptr, aCallback);
@@ -227,7 +229,7 @@ namespace Raidcore::Nexus::Graphics
 		HRSRC imageResHandle = FindResourceA(aModule, MAKEINTRESOURCEA(aResourceID), "PNG");
 		if (!imageResHandle)
 		{
-			this->Logger->Debug(LOG_CHANNEL, "Resource not found ResID: %u (%s)", aResourceID, aIdentifier);
+			this->Logger.Debug(LOG_CHANNEL, "Resource not found ResID: %u (%s)", aResourceID, aIdentifier);
 
 			/* nullptr response on fail */
 			this->DispatchTexture(aIdentifier, nullptr, aCallback);
@@ -239,7 +241,7 @@ namespace Raidcore::Nexus::Graphics
 		HGLOBAL imageResDataHandle = LoadResource(aModule, imageResHandle);
 		if (!imageResDataHandle)
 		{
-			this->Logger->Debug(LOG_CHANNEL, "Failed loading resource: %u (%s)", aResourceID, aIdentifier);
+			this->Logger.Debug(LOG_CHANNEL, "Failed loading resource: %u (%s)", aResourceID, aIdentifier);
 
 			/* nullptr response on fail */
 			this->DispatchTexture(aIdentifier, nullptr, aCallback);
@@ -251,7 +253,7 @@ namespace Raidcore::Nexus::Graphics
 		LPVOID imageFile = LockResource(imageResDataHandle);
 		if (!imageFile)
 		{
-			this->Logger->Debug(LOG_CHANNEL, "Failed locking resource: %u (%s)", aResourceID, aIdentifier);
+			this->Logger.Debug(LOG_CHANNEL, "Failed locking resource: %u (%s)", aResourceID, aIdentifier);
 
 			/* nullptr response on fail */
 			this->DispatchTexture(aIdentifier, nullptr, aCallback);
@@ -263,7 +265,7 @@ namespace Raidcore::Nexus::Graphics
 		DWORD imageFileSize = SizeofResource(aModule, imageResHandle);
 		if (!imageFileSize)
 		{
-			this->Logger->Debug(LOG_CHANNEL, "Failed getting size of resource: %u (%s)", aResourceID, aIdentifier);
+			this->Logger.Debug(LOG_CHANNEL, "Failed getting size of resource: %u (%s)", aResourceID, aIdentifier);
 
 			/* nullptr response on fail */
 			this->DispatchTexture(aIdentifier, nullptr, aCallback);
@@ -548,7 +550,7 @@ namespace Raidcore::Nexus::Graphics
 	{
 		if (this->GrWindow.Device == nullptr || this->GrWindow.DeviceContext == nullptr)
 		{
-			this->Logger->Debug(LOG_CHANNEL, "RenderContext not ready. Device: %p DeviceContext: %p", this->GrWindow.Device, this->GrWindow.DeviceContext);
+			this->Logger.Debug(LOG_CHANNEL, "RenderContext not ready. Device: %p DeviceContext: %p", this->GrWindow.Device, this->GrWindow.DeviceContext);
 			return;
 		}
 
@@ -575,7 +577,7 @@ namespace Raidcore::Nexus::Graphics
 
 		if (!pTexture)
 		{
-			this->Logger->Debug(LOG_CHANNEL, "pTexture was null");
+			this->Logger.Debug(LOG_CHANNEL, "pTexture was null");
 			stbi_image_free(aQueuedTexture.Data);
 			aQueuedTexture.Data = nullptr;
 
@@ -627,7 +629,7 @@ namespace Raidcore::Nexus::Graphics
 		}
 		catch (...)
 		{
-			this->Logger->Debug(LOG_CHANNEL, "DispatchTexture() failed with: %s %p %p", aIdentifier.c_str(), aTexture, aCallback);
+			this->Logger.Debug(LOG_CHANNEL, "DispatchTexture() failed with: %s %p %p", aIdentifier.c_str(), aTexture, aCallback);
 		}
 	}
 
@@ -683,7 +685,7 @@ namespace Raidcore::Nexus::Graphics
 
 				if (!result)
 				{
-					this->Logger->Debug(LOG_CHANNEL, "Error fetching %s%s (%s)\nError: %s", remote.c_str(), endpoint.c_str(), id.c_str(), httplib::to_string(result.error()).c_str());
+					this->Logger.Debug(LOG_CHANNEL, "Error fetching %s%s (%s)\nError: %s", remote.c_str(), endpoint.c_str(), id.c_str(), httplib::to_string(result.error()).c_str());
 
 					/* nullptr response on fail */
 					this->Dequeue(id.c_str());
@@ -694,7 +696,7 @@ namespace Raidcore::Nexus::Graphics
 				// Status is not HTTP_OK
 				if (result->status != 200)
 				{
-					this->Logger->Debug(LOG_CHANNEL, "Status %d when fetching %s%s (%s) | %s", result->status, remote.c_str(), endpoint.c_str(), id.c_str(), httplib::to_string(result.error()).c_str());
+					this->Logger.Debug(LOG_CHANNEL, "Status %d when fetching %s%s (%s) | %s", result->status, remote.c_str(), endpoint.c_str(), id.c_str(), httplib::to_string(result.error()).c_str());
 
 					/* nullptr response on fail */
 					this->Dequeue(id.c_str());

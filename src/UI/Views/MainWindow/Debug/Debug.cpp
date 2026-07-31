@@ -229,8 +229,8 @@ namespace Raidcore::Nexus::GUI
 			return;
 		}
 
-		std::map<std::string, Graphics::Texture_t*>      texRegistry = Runtime::Get().Graphics().Textures().GetRegistry();
-		std::map<std::string, Graphics::QueuedTexture_t> texQueued = Runtime::Get().Graphics().Textures().GetQueuedTextures();
+		std::map<std::string, Graphics::Texture_t*>      texRegistry = Runtime::Get().TextureLoader().GetRegistry();
+		std::map<std::string, Graphics::QueuedTexture_t> texQueued = Runtime::Get().TextureLoader().GetQueuedTextures();
 
 		static char texFilter[400] = {};
 		static int displayedTextures = 0;

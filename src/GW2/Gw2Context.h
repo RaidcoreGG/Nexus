@@ -20,7 +20,6 @@
 #include "GW2/BuildInfo/BuildInfoService.h"
 #include "GW2/Inputs/GameBinds/GbApi.h"
 #include "GW2/Mumble/MblReader.h"
-#include "Graphics/GrContext.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::GW2 Namespace

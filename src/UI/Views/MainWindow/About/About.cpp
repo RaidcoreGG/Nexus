@@ -41,7 +41,7 @@ namespace Raidcore::Nexus::GUI
 		}
 
 		Runtime& ctx = Runtime::Get();
-		Graphics::TextureLoader& texapi = ctx.Graphics().Textures();
+		Graphics::TextureLoader& texapi = ctx.TextureLoader();
 		Network::Updater& selfupdater = ctx.Network().Updater();
 
 		if (ImGui::CollapsingHeader("About", ImGuiTreeNodeFlags_DefaultOpen))

@@ -593,9 +593,9 @@ namespace Raidcore::Nexus::Host::API
 			s_InputBindApi = ctx.InputBinds();
 			s_RawInputApi = &ctx.Platform().RawInput();
 			s_Logger = &ctx.Logger();
-			s_TextureApi = &ctx.Graphics().Textures();
+			s_TextureApi = &ctx.TextureLoader();
 			s_Loader = &ctx.Host().Loader();
-			s_GrWindow = &ctx.Graphics().Window();
+			s_GrWindow = &ctx.GrWindow();
 			s_ArcApi = &ctx.Game().Arcdps();
 
 			s_UiContext = &ctx.UI();
@@ -980,15 +980,15 @@ namespace Raidcore::Nexus::Host::API
 				api->DataLink.Get = DataLink::Get;
 				api->DataLink.Share = DataLink::Share;
 
-				api->Textures.Get = TextureLoader::Get;
-				api->Textures.GetOrCreateFromFile = TextureLoader::GetOrCreateFromFile;
-				api->Textures.GetOrCreateFromResource = TextureLoader::GetOrCreateFromResource;
-				api->Textures.GetOrCreateFromURL = TextureLoader::GetOrCreateFromURL;
-				api->Textures.GetOrCreateFromMemory = TextureLoader::GetOrCreateFromMemory;
-				api->Textures.LoadFromFile = TextureLoader::LoadFromFile;
-				api->Textures.LoadFromResource = TextureLoader::LoadFromResource;
-				api->Textures.LoadFromURL = TextureLoader::LoadFromURL;
-				api->Textures.LoadFromMemory = TextureLoader::LoadFromMemory;
+				api->TextureLoader.Get = TextureLoader::Get;
+				api->TextureLoader.GetOrCreateFromFile = TextureLoader::GetOrCreateFromFile;
+				api->TextureLoader.GetOrCreateFromResource = TextureLoader::GetOrCreateFromResource;
+				api->TextureLoader.GetOrCreateFromURL = TextureLoader::GetOrCreateFromURL;
+				api->TextureLoader.GetOrCreateFromMemory = TextureLoader::GetOrCreateFromMemory;
+				api->TextureLoader.LoadFromFile = TextureLoader::LoadFromFile;
+				api->TextureLoader.LoadFromResource = TextureLoader::LoadFromResource;
+				api->TextureLoader.LoadFromURL = TextureLoader::LoadFromURL;
+				api->TextureLoader.LoadFromMemory = TextureLoader::LoadFromMemory;
 
 				api->QuickAccess.Add = GUI::QuickAccess::AddShortcut;
 				api->QuickAccess.Remove = GUI::QuickAccess::RemoveShortcut;

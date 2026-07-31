@@ -246,7 +246,7 @@ namespace Raidcore::Nexus::GUI
 			case EQaPosition::Bottom:
 			{
 				Runtime& ctx = Runtime::Get();
-				Graphics::Window_t& window = ctx.Graphics().Window();
+				Graphics::Window_t& window = ctx.GrWindow();
 				wndPos.y += window.Height - (s_IconBaseSize * 2 * this->NexusLink->Scaling);
 				break;
 			}

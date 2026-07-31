@@ -133,7 +133,7 @@ struct AddonAPI6_t : AddonAPI_t
 		TEXTURES_LOADFROMURL              LoadFromURL;
 		TEXTURES_LOADFROMMEMORY           LoadFromMemory;
 	};
-	TexturesVT                            Textures;
+	TexturesVT                            TextureLoader;
 
 	/* Shortcuts */
 	struct QuickAccessVT

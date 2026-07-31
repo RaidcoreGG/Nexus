@@ -353,7 +353,7 @@ namespace Raidcore::Nexus::GUI
 						ImGui::EndCombo();
 					}
 
-					Graphics::Window_t window = ctx.Graphics().Window();
+					Graphics::Window_t window = ctx.GrWindow();
 
 					/* offset */
 					static ImVec2 s_Offset{};
@@ -524,7 +524,7 @@ namespace Raidcore::Nexus::GUI
 									}
 									else
 									{
-										s_TexCross = Runtime::Get().Graphics().Textures().GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, GetCurrentModule());
+										s_TexCross = Runtime::Get().TextureLoader().GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, GetCurrentModule());
 									}
 
 									/* Display the filename without extension. */

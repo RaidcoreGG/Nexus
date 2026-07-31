@@ -32,7 +32,7 @@ namespace Raidcore::Nexus::GUI
 			| ImGuiWindowFlags_NoMove
 			| ImGuiWindowFlags_NoSavedSettings;
 
-		Graphics::Window_t& grWindow = Runtime::Get().Graphics().Window();
+		Graphics::Window_t& grWindow = Runtime::Get().GrWindow();
 
 		/* Center the modal. */
 		ImVec2 center(grWindow.Width * 0.5f, grWindow.Height * 0.5f);

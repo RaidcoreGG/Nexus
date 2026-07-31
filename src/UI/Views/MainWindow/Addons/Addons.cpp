@@ -133,7 +133,7 @@ namespace Raidcore::Nexus::GUI
 		static Context& uictx = ctx.UI();
 		static Host::ConfigMgr& cfgmgr = ctx.Host().Config();
 		static Host::LibraryMgr& libmgr = ctx.Host().Library();
-		static Graphics::TextureLoader& texapi = ctx.Graphics().Textures();
+		static Graphics::TextureLoader& texapi = ctx.TextureLoader();
 		static Localization* langApi = uictx.GetLocalization();
 		static CAlerts* alertctx = uictx.GetAlerts();
 
@@ -305,7 +305,7 @@ namespace Raidcore::Nexus::GUI
 	{
 		Runtime& ctx = Runtime::Get();
 		Core::SettingsMgr& settingsctx = ctx.Settings();
-		Graphics::TextureLoader& texapi = ctx.Graphics().Textures();
+		Graphics::TextureLoader& texapi = ctx.TextureLoader();
 		Context& uictx = ctx.UI();
 		Localization* lang = uictx.GetLocalization();
 
@@ -569,7 +569,7 @@ namespace Raidcore::Nexus::GUI
 			else
 			{
 				Runtime& ctx = Runtime::Get();
-				Graphics::TextureLoader& textureApi = ctx.Graphics().Textures();
+				Graphics::TextureLoader& textureApi = ctx.TextureLoader();
 				chevronRt = textureApi.GetOrCreate("ICON_CHEVRON_RT", RES_ICON_CHEVRON_RT, GetCurrentModule());
 			}
 		}
@@ -858,7 +858,7 @@ namespace Raidcore::Nexus::GUI
 	void CAddonsWindow::RenderActionsBar(ImVec2& aSize)
 	{
 		Runtime& ctx = Runtime::Get();
-		Graphics::TextureLoader& texapi = ctx.Graphics().Textures();
+		Graphics::TextureLoader& texapi = ctx.TextureLoader();
 		Host::Loader& loader = ctx.Host().Loader();
 		Context& uictx = ctx.UI();
 		Localization* lang = uictx.GetLocalization();

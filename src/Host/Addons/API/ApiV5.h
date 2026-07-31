@@ -73,7 +73,7 @@ struct AddonAPI5_t : AddonAPI_t
 	DATALINK_GETRESOURCE              Get;
 	DATALINK_SHARERESOURCE            Share;
 
-	/* Textures */
+	/* TextureLoader */
 	TEXTURES_GET                      GetTexture;
 	TEXTURES_GETORCREATEFROMFILE      GetTextureOrCreateFromFile;
 	TEXTURES_GETORCREATEFROMRESOURCE  GetTextureOrCreateFromResource;

@@ -134,7 +134,7 @@ namespace Raidcore::Nexus::GW2
 	void MumbleReader::AdvanceDerived()
 	{
 		Runtime& ctx = Runtime::Get();
-		Graphics::Metrics_t& metrics = ctx.Graphics().Metrics();
+		Graphics::Metrics_t& metrics = ctx.GrMetrics();
 
 		bool tickChanged = this->PreviousTick != this->MumbleLink->UITick;
 		bool gameFrozen = this->PreviousFrameCounter == metrics.FrameCount;

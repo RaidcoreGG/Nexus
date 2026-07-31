@@ -32,7 +32,6 @@ using namespace Raidcore::Nexus;
 #include "GW2/Inputs/MouseResetFix.h"
 #include "HkConst.h"
 #include "HkFuncDefs.h"
-#include "Graphics/GrContext.h"
 #include "Graphics/Textures/TxLoader.h"
 #include "UI/UiContext.h"
 #include "Util/CmdLine.h"
@@ -220,9 +219,9 @@ namespace Hooks
 		void Present_Internal(IDXGISwapChain* aSwapChain)
 		{
 			static Runtime& s_Context = Runtime::Get();
-			static Graphics::Metrics_t s_GrMetrics = s_Context.Graphics().Metrics();
-			static Graphics::Window_t& s_GrWindow = s_Context.Graphics().Window();
-			static Graphics::TextureLoader& s_TextureLoader = s_Context.Graphics().Textures();
+			static Graphics::Metrics_t s_GrMetrics = s_Context.GrMetrics();
+			static Graphics::Window_t& s_GrWindow = s_Context.GrWindow();
+			static Graphics::TextureLoader& s_TextureLoader = s_Context.TextureLoader();
 			static GUI::Context& s_UIContext = s_Context.UI();
 			static Host::Loader& s_Loader = s_Context.Host().Loader();
 
@@ -265,7 +264,7 @@ namespace Hooks
 			static Runtime& s_Context = Runtime::Get();
 			static Core::DataLinkApi& s_DataLink = s_Context.DataLink();
 			static Host::EventApi& s_EventApi = s_Context.Host().Events();
-			static Graphics::Window_t& s_GrWindow = s_Context.Graphics().Window();
+			static Graphics::Window_t& s_GrWindow = s_Context.GrWindow();
 			static GUI::Context& s_UIContext = s_Context.UI();
 
 			s_UIContext.Shutdown();

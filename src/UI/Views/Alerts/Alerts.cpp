@@ -44,7 +44,8 @@ namespace Raidcore::Nexus::GUI
 			ImGui::PushFont((ImFont*)this->NexusLink->FontBig);
 			float width = ImGui::CalcTextSize(alert.Message.c_str()).x;
 
-			Runtime& ctx = Runtime::Get(); Graphics::Window_t window = ctx.Graphics().Window();
+			Runtime& ctx = Runtime::Get();
+			Graphics::Window_t window = ctx.GrWindow();
 
 			/* center horizontally */
 			ImGui::SetNextWindowPos(ImVec2((window.Width - width) / 2.0f, 230.0f * this->NexusLink->Scaling));

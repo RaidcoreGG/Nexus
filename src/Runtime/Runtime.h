@@ -15,7 +15,8 @@
 #include "Core/Logging/LogApi.h"
 #include "Core/Settings/SettingsMgr.h"
 #include "Core/Versioning/Version.h"
-#include "Graphics/GrContext.h"
+#include "Graphics/GrMetrics.h"
+#include "Graphics/GrWindow.h"
 #include "GW2/Gw2Context.h"
 #include "Host/HoContext.h"
 #include "Inputs/InputBinds/IbApi.h"
@@ -83,7 +84,23 @@ namespace Raidcore::Nexus
 
 		Host::Context& Host();
 
-		Graphics::Context& Graphics();
+		///----------------------------------------------------------------------------------------------------
+		/// TextureLoader:
+		/// 	Returns the texture loader instance.
+		///----------------------------------------------------------------------------------------------------
+		Graphics::TextureLoader& TextureLoader();
+
+		///----------------------------------------------------------------------------------------------------
+		/// GrMetrics:
+		/// 	Returns the metrics.
+		///----------------------------------------------------------------------------------------------------
+		Graphics::Metrics_t& GrMetrics();
+
+		///----------------------------------------------------------------------------------------------------
+		/// GrWindow:
+		/// 	Returns the window data.
+		///----------------------------------------------------------------------------------------------------
+		Graphics::Window_t& GrWindow();
 
 		GW2::Context& Game();
 
@@ -98,7 +115,6 @@ namespace Raidcore::Nexus
 		std::unique_ptr<Network::Context>  _NetworkContext{ nullptr };
 		std::unique_ptr<Platform::Context> _PlatformContext{ nullptr };
 		std::unique_ptr<Host::Context>     _HostContext{ nullptr };
-		std::unique_ptr<Graphics::Context> _GraphicsContext{ nullptr };
 		std::unique_ptr<GW2::Context>      _GameContext{ nullptr };
 		std::unique_ptr<GUI::Context>      _UiContext{ nullptr };
 	};

@@ -26,7 +26,6 @@
 #include "Core/Logging/LogEnum.h"
 #include "Core/Logging/LogWriter.h"
 #include "Core/Versioning/Version.h"
-#include "Graphics/GrContext.h"
 #include "Graphics/Textures/TxLoader.h"
 #include "GW2/Gw2Context.h"
 #include "Hooks/Hooks.h"
@@ -152,7 +151,7 @@ namespace Raidcore::Nexus
 		Runtime& ctx = Runtime::Get();
 		Core::LogApi& logger = ctx.Logger();
 		GUI::Context& uictx = ctx.UI();
-		Graphics::TextureLoader& texapi = ctx.Graphics().Textures();
+		Graphics::TextureLoader& texapi = ctx.TextureLoader();
 
 		logger.Critical(LOG_CHANNEL, "SHUTDOWN BEGIN | %s", reasonStr.c_str());
 		MH_Uninitialize();
@@ -239,9 +238,26 @@ namespace Raidcore::Nexus
 		return *this->_HostContext;
 	}
 
-	Graphics::Context& Runtime::Graphics()
+	Graphics::TextureLoader& Runtime::TextureLoader()
 	{
-		return *this->_GraphicsContext;
+		static Graphics::TextureLoader s_TextureLoader{
+			this->Logger(),
+			this->GrWindow(),
+			Index(EPath::DIR_TEXTURES)
+		};
+		return s_TextureLoader;
+	}
+
+	Graphics::Metrics_t& Runtime::GrMetrics()
+	{
+		static Graphics::Metrics_t s_Metrics{};
+		return s_Metrics;
+	}
+
+	Graphics::Window_t& Runtime::GrWindow()
+	{
+		static Graphics::Window_t s_Window{};
+		return s_Window;
 	}
 
 	GW2::Context& Runtime::Game()
@@ -267,8 +283,8 @@ namespace Raidcore::Nexus
 				this->Logger(),
 				this->DataLink(),
 				this->Settings(),
-				this->Graphics().Window(),
-				this->Graphics().Textures(),
+				this->GrWindow(),
+				this->TextureLoader(),
 				*this->InputBinds(),
 				this->Host().Events(),
 				this->Game().Mumble()
@@ -289,10 +305,6 @@ namespace Raidcore::Nexus
 		this->_PlatformContext = std::make_unique<Platform::Context>();
 
 		this->_HostContext = std::make_unique<Host::Context>(
-			this->Logger()
-		);
-
-		this->_GraphicsContext = std::make_unique<Graphics::Context>(
 			this->Logger()
 		);
 

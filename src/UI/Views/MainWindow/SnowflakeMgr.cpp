@@ -74,7 +74,7 @@ namespace Raidcore::Nexus::GUI
 		if (!(this->IsItChristmas || this->IsItHalloween)) { return; }
 
 		static Runtime& ctx = Runtime::Get();
-		static Graphics::TextureLoader* texapi = &ctx.Graphics().Textures();
+		static Graphics::TextureLoader* texapi = &ctx.TextureLoader();
 
 		ImGuiContext* imctx = ImGui::GetCurrentContext();
 
