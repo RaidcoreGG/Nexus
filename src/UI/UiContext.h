@@ -8,38 +8,42 @@
 
 #pragma once
 
-#include <d3d11.h>
+#include <cstdint>
+#include <mutex>
+#include <vector>
 #include <windows.h>
 
 #include "Core/DataLink/DlApi.h"
 #include "Core/Logging/LogApi.h"
+#include "Core/Settings/SettingsMgr.h"
 #include "Graphics/GrWindow.h"
 #include "Graphics/Textures/TxLoader.h"
 #include "GW2/Mumble/MblReader.h"
 #include "Host/Events/EvtApi.h"
 #include "Inputs/InputBinds/IbApi.h"
+#include "Memory/IRefCleaner.h"
 #include "UI/Services/Fonts/FontManager.h"
 #include "UI/Services/Localization/LoclApi.h"
 #include "UI/Services/QoL/EscapeClosing.h"
 #include "UI/Services/Scaling/Scaling.h"
 #include "UI/Services/Styles/StyleMgr.h"
 #include "UI/Views/Alerts/Alerts.h"
-#include "UI/Views/EULA/LicenseAgreementModal.h"
 #include "UI/Views/MainWindow/MainWindow.h"
 #include "UI/Views/QuickAccess/QuickAccess.h"
 #include "UiBinds.h"
+#include "UiEnum.h"
+#include "UiFuncDefs.h"
 #include "UiInput.h"
-#include "Util/Inputs.h"
 
 using namespace Raidcore::Nexus;
 
-constexpr const char* KB_MENU            = "KB_MENU";
-constexpr const char* KB_ADDONS          = "KB_ADDONS";
-constexpr const char* KB_OPTIONS         = "KB_OPTIONS";
-constexpr const char* KB_LOG             = "KB_LOG";
-constexpr const char* KB_DEBUG           = "KB_DEBUG";
-constexpr const char* KB_MUMBLEOVERLAY   = "KB_MUMBLEOVERLAY";
-constexpr const char* KB_TOGGLEHIDEUI    = "KB_TOGGLEHIDEUI";
+constexpr const char* KB_MENU = "KB_MENU";
+constexpr const char* KB_ADDONS = "KB_ADDONS";
+constexpr const char* KB_OPTIONS = "KB_OPTIONS";
+constexpr const char* KB_LOG = "KB_LOG";
+constexpr const char* KB_DEBUG = "KB_DEBUG";
+constexpr const char* KB_MUMBLEOVERLAY = "KB_MUMBLEOVERLAY";
+constexpr const char* KB_TOGGLEHIDEUI = "KB_TOGGLEHIDEUI";
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::GUI Namespace
@@ -80,13 +84,14 @@ namespace Raidcore::Nexus::GUI
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
 		Context(
-			Graphics::Window_t& aGrWindow,
-			Core::LogApi* aLogger,
+			Core::LogApi&            aLogger,
+			Core::DataLinkApi&       aDataLink,
+			Core::SettingsMgr&       aSettings,
+			Graphics::Window_t&      aGrWindow,
 			Graphics::TextureLoader& aTextureService,
-			Core::DataLinkApi* aDataLink,
-			Input::CInputBindApi* aInputBindApi,
-			Host::EventApi& aEventApi,
-			GW2::MumbleReader& aMumbleReader
+			Input::CInputBindApi&    aInputBindApi,
+			Host::EventApi&          aEventApi,
+			GW2::MumbleReader&       aMumbleReader
 		);
 
 		///----------------------------------------------------------------------------------------------------
@@ -192,12 +197,12 @@ namespace Raidcore::Nexus::GUI
 
 		private:
 		/* Services */
+		Core::LogApi& Logger;
+		Core::DataLinkApi& DataLink;
+		Core::SettingsMgr& Settings;
 		Graphics::Window_t& GrWindow;
-		Core::LogApi* Logger = nullptr;
-		Localization* Language = nullptr;
 		Graphics::TextureLoader& TextureService;
-		Core::DataLinkApi* DataLink = nullptr;
-		Input::CInputBindApi* InputBindApi = nullptr;
+		Input::CInputBindApi& InputBindApi;
 		Host::EventApi& EventApi;
 		GW2::MumbleReader& MumbleReader;
 
@@ -212,6 +217,7 @@ namespace Raidcore::Nexus::GUI
 		CScaling* Scaling;
 		CUiInput* Input;
 		StyleManager* StyleMgr;
+		Localization* Language = nullptr;
 
 		bool                    IsInitialized = false;
 		bool                    IsVisible = true;

@@ -29,7 +29,7 @@ namespace Raidcore::Nexus::Core
 	class SettingsMgr
 	{
 		public:
-		SettingsMgr(std::filesystem::path aPath, LogApi* aLogger);
+		SettingsMgr(std::filesystem::path aPath, LogApi& aLogger);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Load:
@@ -126,7 +126,7 @@ namespace Raidcore::Nexus::Core
 		void Remove(const std::string& aIdentifier);
 
 		private:
-		LogApi* Logger = nullptr;
+		LogApi& Logger;
 
 		std::filesystem::path                                          Path;
 

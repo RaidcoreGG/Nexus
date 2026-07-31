@@ -8,36 +8,50 @@
 
 #include "UiContext.h"
 
+#include <algorithm>
+#include <cstdint>
+#include <d3d11.h>
 #include <filesystem>
-#include <fstream>
+#include <memory>
 #include <mutex>
-#include <shellscalingapi.h>
+#include <string>
 #include <vector>
+#include <windows.h>
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_dx11.h"
 #include "imgui/imgui_impl_win32.h"
-#include "imgui/imgui_internal.h"
 
-#include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
-
-#include "Host/Addons/AddConst.h"
-#include "Host/Addons/Addon.h"
-#include "Index/Index.h"
+#include "Core/DataLink/DlApi.h"
+#include "Core/Logging/LogApi.h"
+#include "Core/NexusLink.h"
 #include "Core/Settings/SettingsConst.h"
 #include "Core/Settings/SettingsMgr.h"
-#include "Inputs/InputBinds/IbConst.h"
-#include "GW2/Inputs/GameBinds/GbConst.h"
-#include "GW2/Mumble/MblConst.h"
+#include "Graphics/GrWindow.h"
+#include "Graphics/Textures/TxLoader.h"
 #include "GW2/Mumble/MblReader.h"
+#include "Host/Events/EvtApi.h"
+#include "Index/IdxEnum.h"
+#include "Index/Index.h"
+#include "Inputs/InputBinds/IbApi.h"
+#include "Inputs/InputBinds/IbEnum.h"
+#include "Memory/IRefCleaner.h"
+#include "Mumble/Mumble.h"
 #include "res/ResConst.h"
-#include "Util/Base64.h"
+#include "Runtime/Runtime.h"
+#include "Services/Fonts/FontManager.h"
+#include "Services/Localization/LoclApi.h"
+#include "Services/QoL/EscapeClosing.h"
+#include "Services/Scaling/Scaling.h"
+#include "Services/Styles/StyleMgr.h"
+#include "UiEnum.h"
+#include "UiFuncDefs.h"
+#include "UiInput.h"
 #include "Util/DLL.h"
-#include "Util/Inputs.h"
-#include "Util/Resources.h"
-#include "Util/Strings.h"
-#include "Util/Time.h"
+#include "Views/Alerts/Alerts.h"
+#include "Views/MainWindow/MainWindow.h"
+#include "Views/QuickAccess/QuickAccess.h"
+#include "Views/EULA/LicenseAgreementModal.h"
 
 namespace Raidcore::Nexus::GUI
 {
@@ -67,7 +81,7 @@ namespace Raidcore::Nexus::GUI
 		}
 
 		Runtime& ctx = Runtime::Get();
-		Core::DataLinkApi* dlapi = &ctx.Core().DataLink();
+		Core::DataLinkApi* dlapi = &ctx.DataLink();
 
 		Mumble::Identity* mumbleIdentity = static_cast<Mumble::Identity*>(dlapi->Get(DL_MUMBLE_LINK_IDENTITY));
 		NexusLinkData_t* nexusLink = static_cast<NexusLinkData_t*>(dlapi->Get(DL_NEXUS_LINK));
@@ -114,8 +128,8 @@ namespace Raidcore::Nexus::GUI
 	/*static*/ void Context::OnMumbleIdentityChanged(void* aEventArgs)
 	{
 		Runtime& ctx = Runtime::Get();
-		Core::DataLinkApi* dlapi = &ctx.Core().DataLink();
-		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
+		Core::DataLinkApi* dlapi = &ctx.DataLink();
+		Core::SettingsMgr& settingsctx = ctx.Settings();
 		Context& uictx = ctx.UI();
 		CFontManager* fontmgr = uictx.GetFontManager();
 
@@ -165,40 +179,42 @@ namespace Raidcore::Nexus::GUI
 	}
 
 	Context::Context(
-		Graphics::Window_t& aGrWindow,
-		Core::LogApi* aLogger,
+		Core::LogApi&            aLogger,
+		Core::DataLinkApi&       aDataLink,
+		Core::SettingsMgr&       aSettings,
+		Graphics::Window_t&      aGrWindow,
 		Graphics::TextureLoader& aTextureService,
-		Core::DataLinkApi* aDataLink,
-		Input::CInputBindApi* aInputBindApi,
-		Host::EventApi& aEventApi,
-		GW2::MumbleReader& aMumbleReader
+		Input::CInputBindApi&    aInputBindApi,
+		Host::EventApi&          aEventApi,
+		GW2::MumbleReader&       aMumbleReader
 	)
 		: IRefCleaner("UiContext")
-		, GrWindow(aGrWindow)
 		, Logger(aLogger)
-		, TextureService(aTextureService)
 		, DataLink(aDataLink)
+		, Settings(aSettings)
+		, GrWindow(aGrWindow)
+		, TextureService(aTextureService)
 		, InputBindApi(aInputBindApi)
 		, EventApi(aEventApi)
 		, MumbleReader(aMumbleReader)
 	{
 		ImGui::CreateContext();
 
-		this->Language = new Localization(*aLogger, Runtime::Get().Core().Settings(), aEventApi);
+		this->Language = new Localization(aLogger, aSettings, aEventApi);
 		this->Alerts = new CAlerts(aDataLink);
 		this->MainWindow = new CMainWindow();
-		this->QuickAccess = new CQuickAccess(aDataLink, aLogger, aInputBindApi, &aTextureService, this->Language, &aEventApi);
+		this->QuickAccess = new CQuickAccess(aDataLink, aLogger, aSettings, aInputBindApi, aTextureService, aEventApi, *this->Language);
 
-		this->FontManager = new CFontManager(this->Language);
-		this->EscapeClose = new CEscapeClosing();
-		this->Scaling = new CScaling(Runtime::Get().Platform().Window(), GrWindow, aDataLink, aEventApi, &Runtime::Get().Core().Settings()); // FIXME: What the fuck, why is the settingsctx not included here?
-		this->Input = new CUiInput(&Runtime::Get().Core().Settings());
-		this->StyleMgr = new StyleManager(*aLogger, Runtime::Get().Core().Settings());
+		this->FontManager = new CFontManager(aSettings, *this->Language);
+		this->EscapeClose = new CEscapeClosing(aSettings);
+		this->Scaling = new CScaling(Runtime::Get().Platform().Window(), GrWindow, aDataLink, aEventApi, aSettings);
+		this->Input = new CUiInput(aSettings);
+		this->StyleMgr = new StyleManager(aLogger, aSettings);
 
 		this->EventApi.Subscribe(EV_MUMBLE_IDENTITY_UPDATED, Context::OnMumbleIdentityChanged);
 		this->EventApi.Subscribe("EV_INPUTBIND_UPDATED", Context::OnInputBindUpdate);
 
-		this->InputBindApi->Register(KB_TOGGLEHIDEUI, Input::EIbHandlerType::DownAsync, Context::OnInputBindPressed, "CTRL+H");
+		this->InputBindApi.Register(KB_TOGGLEHIDEUI, Input::EIbHandlerType::DownAsync, Context::OnInputBindPressed, "CTRL+H");
 		this->EscapeClose->Register("Nexus", this->MainWindow->GetVisibleStatePtr());
 
 		this->StyleMgr->ApplyStyle();
@@ -219,7 +235,7 @@ namespace Raidcore::Nexus::GUI
 
 		if (!(Runtime::Get().Platform().Window() && this->GrWindow.SwapChain))
 		{
-			this->Logger->Critical(LOG_CHANNEL, "Context::Initialize() failed. A RenderContext component was nullptr.");
+			this->Logger.Critical(LOG_CHANNEL, "Context::Initialize() failed. A RenderContext component was nullptr.");
 			return;
 		}
 
@@ -229,7 +245,7 @@ namespace Raidcore::Nexus::GUI
 
 		if (!pBackBuffer)
 		{
-			this->Logger->Critical(LOG_CHANNEL, "Context::Initialize() failed. BackBuffer was nullptr.");
+			this->Logger.Critical(LOG_CHANNEL, "Context::Initialize() failed. BackBuffer was nullptr.");
 			return;
 		}
 
@@ -248,7 +264,7 @@ namespace Raidcore::Nexus::GUI
 
 		if (!this->GrWindow.RenderTarget)
 		{
-			this->Logger->Critical(LOG_CHANNEL, "Context::Initialize() failed. RenderTargetView could not be created.");
+			this->Logger.Critical(LOG_CHANNEL, "Context::Initialize() failed. RenderTargetView could not be created.");
 			return;
 		}
 
@@ -327,7 +343,7 @@ namespace Raidcore::Nexus::GUI
 			ImGui::NewFrame();
 
 			static Runtime& s_Context = Runtime::Get();
-			static Core::SettingsMgr& s_Settings = s_Context.Core().Settings();
+			static Core::SettingsMgr& s_Settings = s_Context.Settings();
 			static bool       s_EulaAccepted = s_Settings.Get<bool>(OPT_ACCEPTEULA, false);
 
 			if (s_EulaAccepted)
@@ -562,7 +578,7 @@ namespace Raidcore::Nexus::GUI
 		std::filesystem::path fontPath{};
 
 		Runtime& ctx = Runtime::Get();
-		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
+		Core::SettingsMgr& settingsctx = ctx.Settings();
 
 		/* add user font */
 		bool hasUserFont = false;

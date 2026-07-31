@@ -32,7 +32,7 @@ namespace Raidcore::Nexus::GUI
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		CAlerts(Core::DataLinkApi* aDataLink);
+		CAlerts(Core::DataLinkApi& aDataLink);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Render:
@@ -47,8 +47,9 @@ namespace Raidcore::Nexus::GUI
 		void Notify(EAlertType aType, const char* aMessage);
 
 		private:
+		Core::DataLinkApi&          DataLink;
 
-		NexusLinkData_t* NexusLink;
+		NexusLinkData_t*            NexusLink;
 
 		std::mutex                  Mutex;
 		std::vector<AlertMessage_t> Queue;

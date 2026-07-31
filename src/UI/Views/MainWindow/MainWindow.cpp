@@ -71,7 +71,7 @@ namespace Raidcore::Nexus::GUI
 		if (!s_MainWindow) { return; }
 
 		Runtime& ctx = Runtime::Get();
-		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
+		Core::SettingsMgr& settingsctx = ctx.Settings();
 
 		if (settingsctx.Get<bool>(OPT_SHOWADDONSWINDOWAFTERDUU, false))
 		{
@@ -82,7 +82,7 @@ namespace Raidcore::Nexus::GUI
 	CMainWindow::CMainWindow()
 	{
 		Runtime& ctx = Runtime::Get();
-		Core::LogApi* logger = &ctx.Core().Logger();
+		Core::LogApi* logger = &ctx.Logger();
 		Input::CInputBindApi* ibapi = ctx.InputBinds();
 		Host::EventApi* evtapi = &ctx.Host().Events();
 

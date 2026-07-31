@@ -21,7 +21,6 @@
 #include "thirdparty/Clockwork/Tasks/ETaskPriority.h"
 
 #include "Branch.h"
-#include "Core/CoContext.h"
 #include "Core/Logging/LogApi.h"
 #include "Core/Logging/LogConsole.h"
 #include "Core/Logging/LogEnum.h"
@@ -71,7 +70,7 @@ namespace Raidcore::Nexus
 		Hooks::HookIDXGISwapChain();
 
 		Runtime& ctx = Runtime::Get();
-		Core::LogApi& logger = ctx.Core().Logger();
+		Core::LogApi& logger = ctx.Logger();
 
 		/* Environment info. */
 		logger.Info(
@@ -151,7 +150,7 @@ namespace Raidcore::Nexus
 		}
 
 		Runtime& ctx = Runtime::Get();
-		Core::LogApi& logger = ctx.Core().Logger();
+		Core::LogApi& logger = ctx.Logger();
 		GUI::Context& uictx = ctx.UI();
 		Graphics::TextureLoader& texapi = ctx.Graphics().Textures();
 
@@ -194,9 +193,35 @@ namespace Raidcore::Nexus
 #endif
 	}
 
-	Core::Context& Runtime::Core()
+	Core::LogApi& Runtime::Logger()
 	{
-		return *this->_CoreContext;
+		static Core::LogApi s_LogApi{};
+		return s_LogApi;
+	}
+
+	Core::DataLinkApi& Runtime::DataLink()
+	{
+		static Core::DataLinkApi s_DataLink{
+			this->Logger()
+		};
+		return s_DataLink;
+	}
+
+	Core::FuncRegistry& Runtime::FunctionRegistry()
+	{
+		static Core::FuncRegistry s_FuncRegistry{
+			this->Logger()
+		};
+		return s_FuncRegistry;
+	}
+
+	Core::SettingsMgr& Runtime::Settings()
+	{
+		static Core::SettingsMgr s_Settings{
+			Index(EPath::Settings),
+			this->Logger()
+		};
+		return s_Settings;
 	}
 
 	Network::Context& Runtime::Network()
@@ -228,7 +253,7 @@ namespace Raidcore::Nexus
 	{
 		static Input::CInputBindApi s_InputBindApi = Input::CInputBindApi(
 			&this->Host().Events(),
-			&this->Core().Logger(),
+			&this->Logger(),
 			Index(EPath::InputBinds)
 		);
 		return &s_InputBindApi;
@@ -239,11 +264,12 @@ namespace Raidcore::Nexus
 		if (!this->_UiContext)
 		{
 			this->_UiContext = std::make_unique<GUI::Context>(
+				this->Logger(),
+				this->DataLink(),
+				this->Settings(),
 				this->Graphics().Window(),
-				&this->Core().Logger(),
 				this->Graphics().Textures(),
-				&this->Core().DataLink(),
-				this->InputBinds(),
+				*this->InputBinds(),
 				this->Host().Events(),
 				this->Game().Mumble()
 			);
@@ -256,26 +282,24 @@ namespace Raidcore::Nexus
 	{
 		Clockwork::Context::Create();
 
-		this->_CoreContext = std::make_unique<Core::Context>();
-
 		this->_NetworkContext = std::make_unique<Network::Context>(
-			this->Core().Logger()
+			this->Logger()
 		);
 
 		this->_PlatformContext = std::make_unique<Platform::Context>();
 
 		this->_HostContext = std::make_unique<Host::Context>(
-			this->Core().Logger()
+			this->Logger()
 		);
 
 		this->_GraphicsContext = std::make_unique<Graphics::Context>(
-			this->Core().Logger()
+			this->Logger()
 		);
 
 		this->_GameContext = std::make_unique<GW2::Context>(
-			this->Core().DataLink(),
+			this->DataLink(),
 			this->Host().Events(),
-			this->Core().Logger(),
+			this->Logger(),
 			this->Platform().RawInput(),
 			this->Platform().Window(),
 			this->Network().GetHttpClient("http://assetcdn.101.arenanetworks.com", /*disablecache=*/ true)

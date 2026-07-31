@@ -20,12 +20,11 @@ using namespace Raidcore::Nexus;
 
 namespace Raidcore::Nexus::GUI
 {
-	CEscapeClosing::CEscapeClosing() : IRefCleaner("EscapeClosing")
+	CEscapeClosing::CEscapeClosing(Core::SettingsMgr& aSettings)
+		: IRefCleaner("EscapeClosing")
+		, Settings(aSettings)
 	{
-		Runtime& ctx = Runtime::Get();
-		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
-
-		settingsctx.Subscribe<bool>(OPT_CLOSEESCAPE, [&](bool aNewValue)
+		this->Settings.Subscribe<bool>(OPT_CLOSEESCAPE, [&](bool aNewValue)
 		{
 			this->Enabled = aNewValue;
 		});

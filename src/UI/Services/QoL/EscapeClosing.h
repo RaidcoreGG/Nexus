@@ -8,11 +8,13 @@
 
 #pragma once
 
+#include <cstdint>
 #include <mutex>
 #include <string>
 #include <unordered_map>
 #include <windows.h>
 
+#include "Core/Settings/SettingsMgr.h"
 #include "Memory/IRefCleaner.h"
 
 ///----------------------------------------------------------------------------------------------------
@@ -29,7 +31,7 @@ namespace Raidcore::Nexus::GUI
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		CEscapeClosing();
+		CEscapeClosing(Core::SettingsMgr& aSettings);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
@@ -67,6 +69,8 @@ namespace Raidcore::Nexus::GUI
 		uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 		private:
+		Core::SettingsMgr& Settings;
+
 		std::mutex                             Mutex;
 		std::unordered_map<std::string, bool*> Registry;
 

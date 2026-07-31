@@ -42,23 +42,29 @@ namespace Raidcore::Nexus::GUI
 		s_Scaling->UpdateResolution();
 	}
 
-	CScaling::CScaling(HWND aGameWindow, Graphics::Window_t& aGrWindow, Core::DataLinkApi* aDataLink, Host::EventApi& aEventApi, Core::SettingsMgr* aSettings)
+	CScaling::CScaling(
+		HWND                aGameWindow,
+		Graphics::Window_t& aGrWindow,
+		Core::DataLinkApi&  aDataLink,
+		Host::EventApi&     aEventApi,
+		Core::SettingsMgr&  aSettings
+	)
 		: GameWindow(aGameWindow)
 		, GrWindow(aGrWindow)
 		, DataLink(aDataLink)
 		, EventApi(aEventApi)
 		, Settings(aSettings)
 	{
-		this->MumbleIdentity = static_cast<Mumble::Identity*>(this->DataLink->Get(DL_MUMBLE_LINK_IDENTITY));
-		this->NexusLink = static_cast<NexusLinkData_t*>(this->DataLink->Get(DL_NEXUS_LINK));
+		this->MumbleIdentity = static_cast<Mumble::Identity*>(this->DataLink.Get(DL_MUMBLE_LINK_IDENTITY));
+		this->NexusLink = static_cast<NexusLinkData_t*>(this->DataLink.Get(DL_NEXUS_LINK));
 
-		this->DpiScalingEnabled = this->Settings->Get<bool>(OPT_DPISCALING, true);
+		this->DpiScalingEnabled = this->Settings.Get<bool>(OPT_DPISCALING, true);
 		this->DpiScalingFactor = 1.0f;
 		this->EffectiveDpiScalingFactor = 1.0f;
-		this->GameScalingFactor = this->Settings->Get<float>(OPT_LASTUISCALE, SC_NORMAL);
+		this->GameScalingFactor = this->Settings.Get<float>(OPT_LASTUISCALE, SC_NORMAL);
 		this->MinResolutionScalingFactor = 1.0f;
 
-		this->Settings->Subscribe<bool>(OPT_DPISCALING, [&](bool aEnabled)
+		this->Settings.Subscribe<bool>(OPT_DPISCALING, [&](bool aEnabled)
 		{
 			this->DpiScalingEnabled = aEnabled;
 			this->UpdateDPI();
@@ -126,7 +132,7 @@ namespace Raidcore::Nexus::GUI
 
 		if (this->GameScalingFactor != currScaling)
 		{
-			this->Settings->Set(OPT_LASTUISCALE, currScaling);
+			this->Settings.Set(OPT_LASTUISCALE, currScaling);
 			this->GameScalingFactor = currScaling;
 			this->UpdateScaling();
 		}

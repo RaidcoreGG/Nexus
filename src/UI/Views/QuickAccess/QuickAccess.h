@@ -60,7 +60,15 @@ namespace Raidcore::Nexus::GUI
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		CQuickAccess(Core::DataLinkApi* aDataLink, Core::LogApi* aLogger, Input::CInputBindApi* aInputBindApi, Graphics::TextureLoader* aTextureService, Localization* aLocalization, Host::EventApi* aEventApi);
+		CQuickAccess(
+			Core::DataLinkApi&       aDataLink,
+			Core::LogApi&            aLogger,
+			Core::SettingsMgr&       aSettings,
+			Input::CInputBindApi&    aInputBindApi,
+			Graphics::TextureLoader& aTextureService,
+			Host::EventApi&          aEventApi,
+			Localization&            aLocalization
+		);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
@@ -134,24 +142,26 @@ namespace Raidcore::Nexus::GUI
 		uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 		private:
-		Core::LogApi* Logger{};
-		Input::CInputBindApi* InputBindApi{};
-		Graphics::TextureLoader* TextureService{};
-		Localization* Language{};
-		Host::EventApi* EventApi{};
+		Core::DataLinkApi&                    DataLink;
+		Core::LogApi&                         Logger;
+		Core::SettingsMgr&                    Settings;
+		Input::CInputBindApi&                 InputBindApi;
+		Graphics::TextureLoader&              TextureService;
+		Host::EventApi&                       EventApi;
+		Localization&                         Language;
 
-		NexusLinkData_t* NexusLink{};
-		Mumble::Data* MumbleLink{};
+		NexusLinkData_t*                      NexusLink{};
+		Mumble::Data*                         MumbleLink{};
 
 		mutable std::mutex                    Mutex{};
 		std::map<std::string, CShortcutIcon*> Registry{};
 		std::map<std::string, ContextItem_t>  OrphanedCallbacks{};
 		std::vector<std::string>              SuppressedShortcuts{};
 
-		bool                                  VerticalLayout{ false };
-		EQaVisibility                         Visibility{ EQaVisibility::AlwaysShow };
-		EQaPosition                           Location{ EQaPosition::Extend };
-		ImVec2                                Offset{ ImVec2{0, 0} };
+		bool                                  VerticalLayout { false };
+		EQaVisibility                         Visibility     { EQaVisibility::AlwaysShow };
+		EQaPosition                           Location       { EQaPosition::Extend };
+		ImVec2                                Offset         { ImVec2{0, 0} };
 		bool                                  OnlyShowOnHover{ false }; // Fully hide unless hovered
 
 		float                                 Opacity{ 0.5f };

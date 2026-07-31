@@ -22,25 +22,18 @@ using namespace Raidcore::Nexus;
 
 namespace Raidcore::Nexus::GUI
 {
-	CFontManager::CFontManager(Localization* aLocalization) : IRefCleaner("FontManager")
+	CFontManager::CFontManager(Core::SettingsMgr& aSettings, Localization& aLocalization)
+		: IRefCleaner("FontManager")
+		, Settings(aSettings)
+		, Language(aLocalization)
 	{
-		this->Language = aLocalization;
-
-		Runtime& ctx = Runtime::Get();
-		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
-
-		float storedFontSz = settingsctx.Get<float>(OPT_FONTSIZE, 15.0f);
+		float storedFontSz = this->Settings.Get<float>(OPT_FONTSIZE, 15.0f);
 		if (storedFontSz <= 0)
 		{
 			storedFontSz = min(max(storedFontSz, 1.0f), 50.0f);
-			settingsctx.Set(OPT_FONTSIZE, storedFontSz);
+			this->Settings.Set(OPT_FONTSIZE, storedFontSz);
 		}
 		ImGui::GetCurrentContext()->FontSize = storedFontSz;
-	}
-
-	CFontManager::~CFontManager()
-	{
-		this->Language = nullptr;
 	}
 
 	void CFontManager::Reload()
@@ -76,7 +69,7 @@ namespace Raidcore::Nexus::GUI
 		rbExt.AddRanges(io.Fonts->GetGlyphRangesCyrillic());
 
 		/* add ranges on demand */
-		for (const char* str : this->Language->GetAllTexts())
+		for (const char* str : this->Language.GetAllTexts())
 		{
 			rb.AddText(str);
 			rbExt.AddText(str);

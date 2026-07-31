@@ -10,7 +10,10 @@
 
 #include <memory>
 
-#include "Core/CoContext.h"
+#include "Core/DataLink/DlApi.h"
+#include "Core/Functions/FnRegistry.h"
+#include "Core/Logging/LogApi.h"
+#include "Core/Settings/SettingsMgr.h"
 #include "Core/Versioning/Version.h"
 #include "Graphics/GrContext.h"
 #include "GW2/Gw2Context.h"
@@ -50,7 +53,29 @@ namespace Raidcore::Nexus
 
 		const char* GetBuild();
 
-		Core::Context& Core();
+		///----------------------------------------------------------------------------------------------------
+		/// Logger:
+		/// 	Returns the logger instance.
+		///----------------------------------------------------------------------------------------------------
+		Core::LogApi& Logger();
+
+		///----------------------------------------------------------------------------------------------------
+		/// DataLink:
+		/// 	Returns the data link API instance.
+		///----------------------------------------------------------------------------------------------------
+		Core::DataLinkApi& DataLink();
+
+		///----------------------------------------------------------------------------------------------------
+		/// FunctionRegistry:
+		/// 	Returns the function registry instance.
+		///----------------------------------------------------------------------------------------------------
+		Core::FuncRegistry& FunctionRegistry();
+
+		///----------------------------------------------------------------------------------------------------
+		/// Settings:
+		/// 	Returns the settings instance.
+		///----------------------------------------------------------------------------------------------------
+		Core::SettingsMgr& Settings();
 
 		Network::Context& Network();
 
@@ -70,7 +95,6 @@ namespace Raidcore::Nexus
 		Runtime();
 		~Runtime();
 
-		std::unique_ptr<Core::Context>     _CoreContext{ nullptr };
 		std::unique_ptr<Network::Context>  _NetworkContext{ nullptr };
 		std::unique_ptr<Platform::Context> _PlatformContext{ nullptr };
 		std::unique_ptr<Host::Context>     _HostContext{ nullptr };

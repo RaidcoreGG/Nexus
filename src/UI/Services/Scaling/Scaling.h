@@ -46,9 +46,9 @@ namespace Raidcore::Nexus::GUI
 		CScaling(
 			HWND                aGameWindow,
 			Graphics::Window_t& aGrWindow,
-			Core::DataLinkApi* aDataLink,
-			Host::EventApi& aEventApi,
-			Core::SettingsMgr* aSettings
+			Core::DataLinkApi&  aDataLink,
+			Host::EventApi&     aEventApi,
+			Core::SettingsMgr&  aSettings
 		);
 
 		///----------------------------------------------------------------------------------------------------
@@ -83,11 +83,12 @@ namespace Raidcore::Nexus::GUI
 		private:
 		HWND                GameWindow{ nullptr };
 		Graphics::Window_t& GrWindow;
-		Core::DataLinkApi* DataLink;
-		Host::EventApi& EventApi;
-		Core::SettingsMgr* Settings;
-		Mumble::Identity* MumbleIdentity;
-		NexusLinkData_t* NexusLink;
+		Core::DataLinkApi&  DataLink;
+		Host::EventApi&     EventApi;
+		Core::SettingsMgr&  Settings;
+
+		Mumble::Identity*   MumbleIdentity;
+		NexusLinkData_t*    NexusLink;
 
 		bool                DpiScalingEnabled;
 		float               DpiScalingFactor;

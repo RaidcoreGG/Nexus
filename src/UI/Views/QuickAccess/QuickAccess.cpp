@@ -39,52 +39,52 @@ namespace Raidcore::Nexus::GUI
 	}
 
 	CQuickAccess::CQuickAccess(
-		Core::DataLinkApi* aDataLink,
-		Core::LogApi* aLogger,
-		Input::CInputBindApi* aInputBindApi,
-		Graphics::TextureLoader* aTextureService,
-		Localization* aLocalization,
-		Host::EventApi* aEventApi
-	) : IRefCleaner("QuickAccess")
+		Core::DataLinkApi&       aDataLink,
+		Core::LogApi&            aLogger,
+		Core::SettingsMgr&       aSettings,
+		Input::CInputBindApi&    aInputBindApi,
+		Graphics::TextureLoader& aTextureService,
+		Host::EventApi&          aEventApi,
+		Localization&            aLocalization
+	)
+		: IRefCleaner("QuickAccess")
+		, DataLink(aDataLink)
+		, Logger(aLogger)
+		, Settings(aSettings)
+		, InputBindApi(aInputBindApi)
+		, TextureService(aTextureService)
+		, EventApi(aEventApi)
+		, Language(aLocalization)
 	{
-		this->Logger = aLogger;
-		this->InputBindApi = aInputBindApi;
-		this->TextureService = aTextureService;
-		this->Language = aLocalization;
-		this->EventApi = aEventApi;
-
-		this->NexusLink = (NexusLinkData_t*)aDataLink->Get(DL_NEXUS_LINK);
-		this->MumbleLink = (Mumble::Data*)aDataLink->Get(DL_MUMBLE_LINK);
-
-		Runtime& ctx = Runtime::Get();
-		Core::SettingsMgr& settingsctx = ctx.Core().Settings();
+		this->NexusLink = static_cast<NexusLinkData_t*>(this->DataLink.Get(DL_NEXUS_LINK));
+		this->MumbleLink = static_cast<Mumble::Data*>(this->DataLink.Get(DL_MUMBLE_LINK));
 
 		/* Setup notifiers. */
-		settingsctx.Subscribe<bool>(OPT_QAVERTICAL, [&](bool aVertical)
+		this->Settings.Subscribe<bool>(OPT_QAVERTICAL, [&](bool aVertical)
 		{
 			this->VerticalLayout = aVertical;
 		});
-		settingsctx.Subscribe<EQaPosition>(OPT_QALOCATION, [&](EQaPosition aPosition)
+		this->Settings.Subscribe<EQaPosition>(OPT_QALOCATION, [&](EQaPosition aPosition)
 		{
 			this->Location = aPosition;
 		});
-		settingsctx.Subscribe<float>(OPT_QAOFFSETX, [&](float aOffsetX)
+		this->Settings.Subscribe<float>(OPT_QAOFFSETX, [&](float aOffsetX)
 		{
 			this->Offset.x = aOffsetX;
 		});
-		settingsctx.Subscribe<float>(OPT_QAOFFSETY, [&](float aOffsetY)
+		this->Settings.Subscribe<float>(OPT_QAOFFSETY, [&](float aOffsetY)
 		{
 			this->Offset.y = aOffsetY;
 		});
-		settingsctx.Subscribe<EQaVisibility>(OPT_QAVISIBILITY, [&](EQaVisibility aVisibility)
+		this->Settings.Subscribe<EQaVisibility>(OPT_QAVISIBILITY, [&](EQaVisibility aVisibility)
 		{
 			this->Visibility = aVisibility;
 		});
-		settingsctx.Subscribe<bool>(OPT_QAONLYSHOWONHOVER, [&](bool aOnlyShowOnHover)
+		this->Settings.Subscribe<bool>(OPT_QAONLYSHOWONHOVER, [&](bool aOnlyShowOnHover)
 		{
 			this->OnlyShowOnHover = aOnlyShowOnHover;
 		});
-		settingsctx.Subscribe<std::vector<std::string>>(OPT_QASUPPRESSED, [&](std::vector<std::string> aSuppressedShortcuts)
+		this->Settings.Subscribe<std::vector<std::string>>(OPT_QASUPPRESSED, [&](std::vector<std::string> aSuppressedShortcuts)
 		{
 			const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -100,20 +100,20 @@ namespace Raidcore::Nexus::GUI
 		});
 
 		/* Preload default icons. */
-		this->TextureService->Load(ICON_NEXUS, RES_ICON_NEXUS, GetCurrentModule(), nullptr);
-		this->TextureService->Load(ICON_NEXUS_HOVER, RES_ICON_NEXUS_HOVER, GetCurrentModule(), nullptr);
-		this->TextureService->Load(ICON_NEXUS_HALLOWEEN, RES_ICON_NEXUS_HALLOWEEN, GetCurrentModule(), nullptr);
-		this->TextureService->Load(ICON_NEXUS_HALLOWEEN_HOVER, RES_ICON_NEXUS_HALLOWEEN_HOVER, GetCurrentModule(), nullptr);
-		this->TextureService->Load(ICON_NEXUS_XMAS, RES_ICON_NEXUS_XMAS, GetCurrentModule(), nullptr);
-		this->TextureService->Load(ICON_NEXUS_XMAS_HOVER, RES_ICON_NEXUS_XMAS_HOVER, GetCurrentModule(), nullptr);
+		this->TextureService.Load(ICON_NEXUS, RES_ICON_NEXUS, GetCurrentModule(), nullptr);
+		this->TextureService.Load(ICON_NEXUS_HOVER, RES_ICON_NEXUS_HOVER, GetCurrentModule(), nullptr);
+		this->TextureService.Load(ICON_NEXUS_HALLOWEEN, RES_ICON_NEXUS_HALLOWEEN, GetCurrentModule(), nullptr);
+		this->TextureService.Load(ICON_NEXUS_HALLOWEEN_HOVER, RES_ICON_NEXUS_HALLOWEEN_HOVER, GetCurrentModule(), nullptr);
+		this->TextureService.Load(ICON_NEXUS_XMAS, RES_ICON_NEXUS_XMAS, GetCurrentModule(), nullptr);
+		this->TextureService.Load(ICON_NEXUS_XMAS_HOVER, RES_ICON_NEXUS_XMAS_HOVER, GetCurrentModule(), nullptr);
 
 		/// FIXME: This is kinda hacky.
 		/// It forces the creation of the setting, so that the below subscriber gets executed on a first launch.
 		/// Otherwise the main menu would need to be opened first (static init of snowflakemgr) or the options in the main menu (static init of setting).
 		/// Both is kinda shit.
-		settingsctx.Get<bool>(OPT_DISABLEFESTIVEFLAIR, false);
+		this->Settings.Get<bool>(OPT_DISABLEFESTIVEFLAIR, false);
 
-		settingsctx.Subscribe<bool>(OPT_DISABLEFESTIVEFLAIR, [&](bool aDisableFestiveFlair)
+		this->Settings.Subscribe<bool>(OPT_DISABLEFESTIVEFLAIR, [&](bool aDisableFestiveFlair)
 		{
 			/* Remove existing shortcut. */
 			this->RemoveShortcut(QA_MENU);
@@ -144,14 +144,14 @@ namespace Raidcore::Nexus::GUI
 			this->AddShortcut(QA_MENU, icon, iconHover, KB_MENU, "((000009))");
 		});
 
-		this->EventApi->Subscribe(EV_ADDON_LOADED, CQuickAccess::OnAddonStateChanged);
-		this->EventApi->Subscribe(EV_ADDON_UNLOADED, CQuickAccess::OnAddonStateChanged);
+		this->EventApi.Subscribe(EV_ADDON_LOADED, CQuickAccess::OnAddonStateChanged);
+		this->EventApi.Subscribe(EV_ADDON_UNLOADED, CQuickAccess::OnAddonStateChanged);
 	}
 
 	CQuickAccess::~CQuickAccess()
 	{
-		this->EventApi->Unsubscribe(EV_ADDON_LOADED, CQuickAccess::OnAddonStateChanged);
-		this->EventApi->Unsubscribe(EV_ADDON_UNLOADED, CQuickAccess::OnAddonStateChanged);
+		this->EventApi.Unsubscribe(EV_ADDON_LOADED, CQuickAccess::OnAddonStateChanged);
+		this->EventApi.Unsubscribe(EV_ADDON_UNLOADED, CQuickAccess::OnAddonStateChanged);
 	}
 
 	void CQuickAccess::Render()
@@ -342,9 +342,6 @@ namespace Raidcore::Nexus::GUI
 				aTooltipText ? aTooltipText : ""
 			);
 
-			Runtime& ctx = Runtime::Get();
-			Core::SettingsMgr& settingsctx = ctx.Core().Settings();
-
 			/* If the current shortcut ID is in the suppressed list. */
 			bool isSuppressed = std::find(this->SuppressedShortcuts.begin(), this->SuppressedShortcuts.end(), aIdentifier) != this->SuppressedShortcuts.end();
 
@@ -450,7 +447,7 @@ namespace Raidcore::Nexus::GUI
 			}
 			else
 			{
-				this->Logger->Warning(
+				this->Logger.Warning(
 					LOG_CHANNEL,
 					"Context menu item already registered: %s (Parent: \"%s\")",
 					aIdentifier,

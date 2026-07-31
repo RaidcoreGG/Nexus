@@ -29,9 +29,10 @@ namespace Raidcore::Nexus::GUI
 		| ImGuiWindowFlags_NoSavedSettings
 		| ImGuiWindowFlags_NoBackground;
 
-	CAlerts::CAlerts(Core::DataLinkApi* aDataLink)
+	CAlerts::CAlerts(Core::DataLinkApi& aDataLink)
+		: DataLink(aDataLink)
 	{
-		this->NexusLink = (NexusLinkData_t*)aDataLink->Get("DL_NEXUS_LINK");
+		this->NexusLink = (NexusLinkData_t*)this->DataLink.Get("DL_NEXUS_LINK");
 	}
 
 	void CAlerts::Render()

@@ -27,7 +27,7 @@ namespace Raidcore::Nexus::GW2
 	inline UINT MouseResetFix(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		static Runtime& s_Context = Runtime::Get();
-		static Core::SettingsMgr& s_SettingsCtx = s_Context.Core().Settings();
+		static Core::SettingsMgr& s_SettingsCtx = s_Context.Settings();
 
 		static bool s_LockCursor = false;
 		static bool s_ResetCursor = false;

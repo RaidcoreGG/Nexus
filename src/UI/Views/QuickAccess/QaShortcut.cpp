@@ -38,7 +38,7 @@ namespace Raidcore::Nexus::GUI
 		this->InputBindApi = ctx.InputBinds();
 		this->TextureService = &ctx.Graphics().Textures();
 		this->Loader = &ctx.Host().Loader();
-		this->DataLink = &ctx.Core().DataLink();
+		this->DataLink = &ctx.DataLink();
 
 		this->NexusLink = static_cast<NexusLinkData_t*>(this->DataLink->Get(DL_NEXUS_LINK));
 

@@ -38,7 +38,7 @@ CAddon::CAddon(std::filesystem::path aLocation)
 	this->MD5 = MD5Util::FromFile(aLocation);
 
 	Runtime& ctx = Runtime::Get();
-	this->Logger = &ctx.Core().Logger();
+	this->Logger = &ctx.Logger();
 	this->Loader = &ctx.Host().Loader();
 	this->EventApi = &ctx.Host().Events();
 	this->ConfigMgr = &ctx.Host().Config();

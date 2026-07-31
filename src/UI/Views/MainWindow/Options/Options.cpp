@@ -79,7 +79,7 @@ namespace Raidcore::Nexus::GUI
 	void COptionsWindow::TabGeneral()
 	{
 		static Runtime& ctx = Runtime::Get();
-		static Core::SettingsMgr* settingsctx = &ctx.Core().Settings();
+		static Core::SettingsMgr* settingsctx = &ctx.Settings();
 		static Context& uictx = ctx.UI();
 		static Localization* langApi = uictx.GetLocalization();
 		static CQuickAccess* qactx = uictx.GetQuickAccess();
@@ -379,7 +379,7 @@ namespace Raidcore::Nexus::GUI
 	void COptionsWindow::TabStyle()
 	{
 		Runtime& ctx = Runtime::Get();
-		Core::SettingsMgr* settingsctx = &ctx.Core().Settings();
+		Core::SettingsMgr* settingsctx = &ctx.Settings();
 		Context& uictx = ctx.UI();
 		Localization* langApi = uictx.GetLocalization();
 

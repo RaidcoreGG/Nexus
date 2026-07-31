@@ -17,19 +17,18 @@
 
 namespace Raidcore::Nexus::GUI
 {
-	CUiInput::CUiInput(Core::SettingsMgr* aSettings)
+	CUiInput::CUiInput(Core::SettingsMgr& aSettings)
+		: Settings(aSettings)
 	{
-		this->Settings = aSettings;
+		this->RequiredModifiers = this->Settings.Get<EModifiers>(OPT_UI_MODS, EModifiers::None);
+		this->FilterClicks = this->Settings.Get<bool>(OPT_UI_CLICK_MODSONLY, false);
 
-		this->RequiredModifiers = this->Settings->Get<EModifiers>(OPT_UI_MODS, EModifiers::None);
-		this->FilterClicks = this->Settings->Get<bool>(OPT_UI_CLICK_MODSONLY, false);
-
-		this->Settings->Subscribe<EModifiers>(OPT_UI_MODS, [&](EModifiers aModifiers)
+		this->Settings.Subscribe<EModifiers>(OPT_UI_MODS, [&](EModifiers aModifiers)
 		{
 			this->RequiredModifiers = aModifiers;
 		});
 
-		this->Settings->Subscribe<bool>(OPT_UI_CLICK_MODSONLY, [&](bool aFilterClicks)
+		this->Settings.Subscribe<bool>(OPT_UI_CLICK_MODSONLY, [&](bool aFilterClicks)
 		{
 			this->FilterClicks = aFilterClicks;
 		});

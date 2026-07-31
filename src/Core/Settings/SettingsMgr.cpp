@@ -15,12 +15,9 @@ namespace Raidcore::Nexus::Core
 {
 	constexpr const char* LOG_CHANNEL = "Settings";
 
-	SettingsMgr::SettingsMgr(std::filesystem::path aPath, LogApi* aLogger)
+	SettingsMgr::SettingsMgr(std::filesystem::path aPath, LogApi& aLogger)
+		: Logger(aLogger)
 	{
-		assert(aLogger);
-
-		this->Logger = aLogger;
-
 		this->Path = aPath;
 		this->Load();
 	}
@@ -69,7 +66,7 @@ namespace Raidcore::Nexus::Core
 		}
 		catch (json::parse_error& ex)
 		{
-			this->Logger->Warning(LOG_CHANNEL, "Settings.json could not be parsed. Error: %s", ex.what());
+			this->Logger.Warning(LOG_CHANNEL, "Settings.json could not be parsed. Error: %s", ex.what());
 		}
 	}
 
@@ -83,7 +80,7 @@ namespace Raidcore::Nexus::Core
 		}
 		catch (...)
 		{
-			this->Logger->Warning(LOG_CHANNEL, "Settings.json could not be saved.");
+			this->Logger.Warning(LOG_CHANNEL, "Settings.json could not be saved.");
 		}
 	}
 
