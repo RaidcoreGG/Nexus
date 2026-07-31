@@ -29,7 +29,7 @@
 #include "Graphics/Textures/TxLoader.h"
 #include "GW2/Multibox/Multibox.h"
 #include "Hooks/Hooks.h"
-#include "Host/HoContext.h"
+#include "Host/Addons/Addon.h"
 #include "Index/IdxEnum.h"
 #include "Index/Index.h"
 #include "Inputs/InputBinds/IbApi.h"
@@ -118,6 +118,13 @@ namespace Raidcore::Nexus
 		{
 			return;
 		}
+
+		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Normal, [this](Clockwork::CancellationToken aToken)
+		{
+			this->Library().AddSource("https://api.raidcore.gg/addonlibrary");
+			this->Library().AddSource("https://api.raidcore.gg/arcdpslibrary");
+			this->Library().Update();
+		});
 
 		/* Prefetch game build. */
 		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Immediate, [this](Clockwork::CancellationToken aToken)
@@ -244,9 +251,40 @@ namespace Raidcore::Nexus
 		return *this->_PlatformContext;
 	}
 
-	Host::Context& Runtime::Host()
+	Host::ConfigMgr& Runtime::Config()
 	{
-		return *this->_HostContext;
+		static Host::ConfigMgr s_ConfigMgr{
+			this->Logger(),
+			Index(EPath::AddonConfigDefault)
+		};
+		return s_ConfigMgr;
+	}
+
+	Host::Loader& Runtime::Loader()
+	{
+		static Host::Loader s_Loader{
+			this->Logger(),
+			CAddon::Factory, /* FIXME: Register mapping. */
+			Index(EPath::DIR_ADDONS)
+		};
+		return s_Loader;
+	}
+
+	Host::LibraryMgr& Runtime::Library()
+	{
+		static Host::LibraryMgr s_Library{
+			this->Logger(),
+			this->Loader()
+		};
+		return s_Library;
+	}
+
+	Host::EventApi& Runtime::Events()
+	{
+		static Host::EventApi s_EventApi{
+			this->Loader()
+		};
+		return s_EventApi;
 	}
 
 	Graphics::TextureLoader& Runtime::TextureLoader()
@@ -291,7 +329,7 @@ namespace Raidcore::Nexus
 		static GW2::GameBindsApi s_GameBinds{
 			this->Platform().RawInput(),
 			this->Logger(),
-			this->Host().Events(),
+			this->Events(),
 			this->Platform().Window(),
 			Index(EPath::GameBinds)
 		};
@@ -302,7 +340,7 @@ namespace Raidcore::Nexus
 	{
 		static GW2::MumbleReader s_Mumble{
 			this->DataLink(),
-			this->Host().Events(),
+			this->Events(),
 			this->Logger()
 		};
 		return s_Mumble;
@@ -311,7 +349,7 @@ namespace Raidcore::Nexus
 	Input::CInputBindApi* Runtime::InputBinds()
 	{
 		static Input::CInputBindApi s_InputBindApi = Input::CInputBindApi(
-			&this->Host().Events(),
+			&this->Events(),
 			&this->Logger(),
 			Index(EPath::InputBinds)
 		);
@@ -329,7 +367,7 @@ namespace Raidcore::Nexus
 				this->GrWindow(),
 				this->TextureLoader(),
 				*this->InputBinds(),
-				this->Host().Events(),
+				this->Events(),
 				this->Mumble()
 			);
 		}
@@ -346,20 +384,10 @@ namespace Raidcore::Nexus
 		);
 
 		this->_PlatformContext = std::make_unique<Platform::Context>();
-
-		this->_HostContext = std::make_unique<Host::Context>(
-			this->Logger()
-		);
 	}
 
 	Runtime::~Runtime()
 	{
-		if (this->_HostContext)
-		{
-			this->_HostContext->Shutdown();
-			this->_HostContext.reset();
-		}
-
 		if (this->_PlatformContext)
 		{
 			this->_PlatformContext->Shutdown();

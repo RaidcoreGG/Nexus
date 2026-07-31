@@ -45,7 +45,7 @@ namespace Raidcore::Nexus::GUI
 	void CUninstallConfirmationModal::OnClosing()
 	{
 		Runtime& ctx = Runtime::Get();
-		Host::Loader& loader = ctx.Host().Loader();
+		Host::Loader& loader = ctx.Loader();
 
 		switch (this->GetResult())
 		{

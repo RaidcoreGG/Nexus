@@ -46,8 +46,8 @@ namespace Raidcore::Nexus::GUI
 	void CLoadConfirmationModal::OnClosing()
 	{
 		Runtime& ctx = Runtime::Get();
-		Host::ConfigMgr& cfgmgr = ctx.Host().Config();
-		Host::Loader& loader = ctx.Host().Loader();
+		Host::ConfigMgr& cfgmgr = ctx.Config();
+		Host::Loader& loader = ctx.Loader();
 
 		switch (this->GetResult())
 		{

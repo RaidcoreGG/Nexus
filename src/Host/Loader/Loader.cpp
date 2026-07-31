@@ -17,9 +17,9 @@ namespace Raidcore::Nexus::Host
 {
 	constexpr const char* LOG_CHANNEL = "Loader";
 
-	Loader::Loader(Core::LogApi* aLogger, IADDON_FACTORY aFactoryFunction, std::filesystem::path aDirectory)
+	Loader::Loader(Core::LogApi& aLogger, IADDON_FACTORY aFactoryFunction, std::filesystem::path aDirectory)
+		: Logger(aLogger)
 	{
-		this->Logger = aLogger;
 		this->CreateAddon = aFactoryFunction;
 		this->Directory = aDirectory;
 
@@ -71,7 +71,7 @@ namespace Raidcore::Nexus::Host
 
 		if (this->FSItemList == 0)
 		{
-			this->Logger->Warning(LOG_CHANNEL, "Automatic addon loading disabled. Reason: SHParseDisplayName(...) returned %d.", hresult);
+			this->Logger.Warning(LOG_CHANNEL, "Automatic addon loading disabled. Reason: SHParseDisplayName(...) returned %d.", hresult);
 			return;
 		}
 
@@ -91,11 +91,11 @@ namespace Raidcore::Nexus::Host
 
 		if (this->FSNotifierID == 0)
 		{
-			this->Logger->Warning(LOG_CHANNEL, "Automatic addon loading disabled. Reason: SHChangeNotifyRegister(...) returned 0.");
+			this->Logger.Warning(LOG_CHANNEL, "Automatic addon loading disabled. Reason: SHChangeNotifyRegister(...) returned 0.");
 			return;
 		}
 
-		this->Logger->Info(LOG_CHANNEL, "Automatic addon loading enabled.");
+		this->Logger.Info(LOG_CHANNEL, "Automatic addon loading enabled.");
 	}
 
 	UINT Loader::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -136,7 +136,7 @@ namespace Raidcore::Nexus::Host
 		std::lock_guard<std::mutex> lock(this->Mutex);
 		this->ConVar.notify_one();
 
-		this->Logger->Trace(LOG_CHANNEL, "NotifyChanges()");
+		this->Logger.Trace(LOG_CHANNEL, "NotifyChanges()");
 	}
 
 	void Loader::Track(std::filesystem::path aPath)
@@ -146,7 +146,7 @@ namespace Raidcore::Nexus::Host
 		/* Ignore, if not valid. */
 		if (!this->IsValid(aPath))
 		{
-			this->Logger->Info(LOG_CHANNEL, "Add(%s) failed. Not a valid path.", aPath.string().c_str());
+			this->Logger.Info(LOG_CHANNEL, "Add(%s) failed. Not a valid path.", aPath.string().c_str());
 			return;
 		}
 
@@ -253,7 +253,7 @@ namespace Raidcore::Nexus::Host
 
 	void Loader::ProcessChanges()
 	{
-		this->Logger->Trace(LOG_CHANNEL, "Init. Discovering addons.");
+		this->Logger.Trace(LOG_CHANNEL, "Init. Discovering addons.");
 		this->Discover();
 
 		while (this->IsRunning)
@@ -261,7 +261,7 @@ namespace Raidcore::Nexus::Host
 			std::unique_lock<std::mutex> lock(this->Mutex);
 			this->ConVar.wait_for(lock, std::chrono::milliseconds(5000));
 
-			this->Logger->Trace(LOG_CHANNEL, "Processing changes.");
+			this->Logger.Trace(LOG_CHANNEL, "Processing changes.");
 
 			if (!this->IsRunning)
 			{
@@ -287,7 +287,7 @@ namespace Raidcore::Nexus::Host
 				/* If the MD5 has changed, reload the addon. */
 				if (md5 != addon->GetMD5())
 				{
-					this->Logger->Debug(LOG_CHANNEL, "File changed. Reloading: %s", addon->GetLocation().empty() ? "(null)" : addon->GetLocation().string().c_str());
+					this->Logger.Debug(LOG_CHANNEL, "File changed. Reloading: %s", addon->GetLocation().empty() ? "(null)" : addon->GetLocation().string().c_str());
 					if (addon->IsLoaded())
 					{
 						addon->Unload();
@@ -349,7 +349,7 @@ namespace Raidcore::Nexus::Host
 
 					this->Addons.push_back(addon);
 
-					this->Logger->Debug(LOG_CHANNEL, "New addon tracked. Loading: %s", addon->GetLocation().empty() ? "(null)" : addon->GetLocation().string().c_str());
+					this->Logger.Debug(LOG_CHANNEL, "New addon tracked. Loading: %s", addon->GetLocation().empty() ? "(null)" : addon->GetLocation().string().c_str());
 					addon->Load();
 				}
 			}
@@ -359,12 +359,12 @@ namespace Raidcore::Nexus::Host
 			{
 				if (addon->IsLoaded())
 				{
-					this->Logger->Debug(LOG_CHANNEL, "Addon no longer tracked. Unloading: %s", addon->GetLocation().empty() ? "(null)" : addon->GetLocation().string().c_str());
+					this->Logger.Debug(LOG_CHANNEL, "Addon no longer tracked. Unloading: %s", addon->GetLocation().empty() ? "(null)" : addon->GetLocation().string().c_str());
 					addon->Unload();
 				}
 				else
 				{
-					this->Logger->Debug(LOG_CHANNEL, "Addon no longer tracked. Deleting: %s", addon->GetLocation().empty() ? "(null)" : addon->GetLocation().string().c_str());
+					this->Logger.Debug(LOG_CHANNEL, "Addon no longer tracked. Deleting: %s", addon->GetLocation().empty() ? "(null)" : addon->GetLocation().string().c_str());
 
 					auto it = std::find(this->Addons.begin(), this->Addons.end(), addon);
 
@@ -378,7 +378,7 @@ namespace Raidcore::Nexus::Host
 			}
 		}
 
-		this->Logger->Trace(LOG_CHANNEL, "Shutdown. Clearing addons.");
+		this->Logger.Trace(LOG_CHANNEL, "Shutdown. Clearing addons.");
 
 		for (IAddon* addon : this->Addons)
 		{
@@ -467,7 +467,7 @@ namespace Raidcore::Nexus::Host
 		{
 			if (addon->GetLocation() == aPath)
 			{
-				this->Logger->Debug(LOG_CHANNEL, "CLoaderBase::Load(%s)", aPath.string().c_str());
+				this->Logger.Debug(LOG_CHANNEL, "CLoaderBase::Load(%s)", aPath.string().c_str());
 				addon->Load();
 				return;
 			}
@@ -480,7 +480,7 @@ namespace Raidcore::Nexus::Host
 		{
 			if (addon->GetLocation() == aPath)
 			{
-				this->Logger->Debug(LOG_CHANNEL, "CLoaderBase::Unload(%s)", aPath.string().c_str());
+				this->Logger.Debug(LOG_CHANNEL, "CLoaderBase::Unload(%s)", aPath.string().c_str());
 				addon->Unload();
 				return;
 			}

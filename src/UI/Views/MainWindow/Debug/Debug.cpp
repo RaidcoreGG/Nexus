@@ -106,7 +106,7 @@ namespace Raidcore::Nexus::GUI
 
 		if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 		{
-			std::unordered_map<std::string, Host::EventData_t> eventRegistry = Runtime::Get().Host().Events().GetRegistry();
+			std::unordered_map<std::string, Host::EventData_t> eventRegistry = Runtime::Get().Events().GetRegistry();
 
 			for (auto& [identifier, ev] : eventRegistry)
 			{

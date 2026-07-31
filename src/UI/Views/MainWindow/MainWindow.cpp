@@ -84,7 +84,7 @@ namespace Raidcore::Nexus::GUI
 		Runtime& ctx = Runtime::Get();
 		Core::LogApi* logger = &ctx.Logger();
 		Input::CInputBindApi* ibapi = ctx.InputBinds();
-		Host::EventApi* evtapi = &ctx.Host().Events();
+		Host::EventApi* evtapi = &ctx.Events();
 
 		CAddonsWindow* addonsWnd = new CAddonsWindow();
 		COptionsWindow* optionsWnd = new COptionsWindow();

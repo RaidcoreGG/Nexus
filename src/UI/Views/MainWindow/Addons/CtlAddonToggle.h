@@ -74,7 +74,7 @@ namespace Raidcore::Nexus::GUI
 			bool result = false;
 
 			Runtime& ctx = Runtime::Get();
-			Host::ConfigMgr* cfgmgr = &ctx.Host().Config();
+			Host::ConfigMgr* cfgmgr = &ctx.Config();
 
 			Host::Config_t* config = aAddon->GetConfig();
 

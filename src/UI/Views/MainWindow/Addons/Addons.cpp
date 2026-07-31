@@ -60,7 +60,7 @@ namespace Raidcore::Nexus::GUI
 
 		Runtime& ctx = Runtime::Get();
 		Core::SettingsMgr& settingsctx = ctx.Settings();
-		Host::EventApi& evtapi = ctx.Host().Events();
+		Host::EventApi& evtapi = ctx.Events();
 
 		this->Filter = settingsctx.Get(OPT_ADDONFILTERS, FILTER_INSTALLED);
 		this->IsListMode = settingsctx.Get(OPT_ISLISTMODE, true);
@@ -131,8 +131,8 @@ namespace Raidcore::Nexus::GUI
 
 		static Runtime& ctx = Runtime::Get();
 		static Context& uictx = ctx.UI();
-		static Host::ConfigMgr& cfgmgr = ctx.Host().Config();
-		static Host::LibraryMgr& libmgr = ctx.Host().Library();
+		static Host::ConfigMgr& cfgmgr = ctx.Config();
+		static Host::LibraryMgr& libmgr = ctx.Library();
 		static Graphics::TextureLoader& texapi = ctx.TextureLoader();
 		static Localization* langApi = uictx.GetLocalization();
 		static CAlerts* alertctx = uictx.GetAlerts();
@@ -621,7 +621,7 @@ namespace Raidcore::Nexus::GUI
 			if (ImGui::CollapsingHeader(headerStr.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				Host::Config_t* config = this->AddonData.Addon->GetConfig();
-				Host::ConfigMgr* cfgmgr = &ctx.Host().Config();
+				Host::ConfigMgr* cfgmgr = &ctx.Config();
 
 				/* TODO: Check Update Button */
 				/*if (addonData.NexusAddon->Definitions->Provider != EUpdateProvider::Self)
@@ -859,7 +859,7 @@ namespace Raidcore::Nexus::GUI
 	{
 		Runtime& ctx = Runtime::Get();
 		Graphics::TextureLoader& texapi = ctx.TextureLoader();
-		Host::Loader& loader = ctx.Host().Loader();
+		Host::Loader& loader = ctx.Loader();
 		Context& uictx = ctx.UI();
 		Localization* lang = uictx.GetLocalization();
 
@@ -1038,8 +1038,8 @@ namespace Raidcore::Nexus::GUI
 		Runtime& ctx = Runtime::Get();
 		Context& uictx = ctx.UI();
 		Core::SettingsMgr& settingsctx = ctx.Settings();
-		Host::Loader& loader = ctx.Host().Loader();
-		Host::LibraryMgr& libMgr = ctx.Host().Library();
+		Host::Loader& loader = ctx.Loader();
+		Host::LibraryMgr& libMgr = ctx.Library();
 
 		this->Filter = settingsctx.Get<EAddonsFilterFlags>(OPT_ADDONFILTERS, FILTER_INSTALLED);
 

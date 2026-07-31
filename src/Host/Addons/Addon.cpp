@@ -39,9 +39,9 @@ CAddon::CAddon(std::filesystem::path aLocation)
 
 	Runtime& ctx = Runtime::Get();
 	this->Logger = &ctx.Logger();
-	this->Loader = &ctx.Host().Loader();
-	this->EventApi = &ctx.Host().Events();
-	this->ConfigMgr = &ctx.Host().Config();
+	this->Loader = &ctx.Loader();
+	this->EventApi = &ctx.Events();
+	this->ConfigMgr = &ctx.Config();
 
 	/* Does the initial enumerate addon interfaces and raises a create event. */
 	this->QueuedActions.push(EAddonAction::Create);

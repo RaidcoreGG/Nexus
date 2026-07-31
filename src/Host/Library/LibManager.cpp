@@ -21,17 +21,10 @@ namespace Raidcore::Nexus::Host
 {
 	constexpr const char* LOG_CHANNEL = "Library";
 
-	LibraryMgr::LibraryMgr(Core::LogApi* aLogger, Host::Loader* aLoader)
-	{
-		this->Logger = aLogger;
-		this->Loader = aLoader;
-	}
-
-	LibraryMgr::~LibraryMgr()
-	{
-		this->Logger = nullptr;
-		this->Loader = nullptr;
-	}
+	LibraryMgr::LibraryMgr(Core::LogApi& aLogger, Host::Loader& aLoader)
+		: Logger(aLogger)
+		, Loader(aLoader)
+	{}
 
 	void LibraryMgr::Update()
 	{
@@ -47,7 +40,7 @@ namespace Raidcore::Nexus::Host
 
 			if (!result.Success())
 			{
-				this->Logger->Warning(
+				this->Logger.Warning(
 					LOG_CHANNEL,
 					"Failed to fetch addon library from \"%s\".\n\tStatus: %s\n\tError: %s",
 					url.c_str(),
@@ -63,13 +56,13 @@ namespace Raidcore::Nexus::Host
 
 				if (libJSON.is_null())
 				{
-					this->Logger->Warning(LOG_CHANNEL, "\"%s\" had an empty response.", url.c_str());
+					this->Logger.Warning(LOG_CHANNEL, "\"%s\" had an empty response.", url.c_str());
 					continue;
 				}
 
 				if (!libJSON.is_array())
 				{
-					this->Logger->Warning(LOG_CHANNEL, "\"%s\" does not conform to library specification.", url.c_str());
+					this->Logger.Warning(LOG_CHANNEL, "\"%s\" does not conform to library specification.", url.c_str());
 					continue;
 				}
 
@@ -80,7 +73,7 @@ namespace Raidcore::Nexus::Host
 			}
 			catch (...)
 			{
-				this->Logger->Warning(LOG_CHANNEL, "Unknown error processing \"%s\".", url.c_str());
+				this->Logger.Warning(LOG_CHANNEL, "Unknown error processing \"%s\".", url.c_str());
 			}
 		}
 	}
@@ -93,7 +86,7 @@ namespace Raidcore::Nexus::Host
 
 		if (it != this->Sources.end())
 		{
-			this->Logger->Info(LOG_CHANNEL, "Source already exists: %s", aURL.c_str());
+			this->Logger.Info(LOG_CHANNEL, "Source already exists: %s", aURL.c_str());
 			return;
 		}
 
@@ -103,7 +96,7 @@ namespace Raidcore::Nexus::Host
 	void LibraryMgr::Install(uint32_t aSignature)
 	{
 		/* Already installed. */
-		if (this->Loader->IsTrackedSafe(aSignature)) { return; }
+		if (this->Loader.IsTrackedSafe(aSignature)) { return; }
 
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -138,7 +131,7 @@ namespace Raidcore::Nexus::Host
 
 			if (!result.Success())
 			{
-				this->Logger->Warning(
+				this->Logger.Warning(
 					LOG_CHANNEL,
 					"Failed to resolve addon download URL for \"%s\".\n\tStatus: %s\n\tError: %s",
 					downloadUrl.c_str(),
@@ -154,19 +147,19 @@ namespace Raidcore::Nexus::Host
 
 				if (releaseJSON.is_null())
 				{
-					this->Logger->Warning(LOG_CHANNEL, "\"%s\" had an empty response when resolving.", downloadUrl.c_str());
+					this->Logger.Warning(LOG_CHANNEL, "\"%s\" had an empty response when resolving.", downloadUrl.c_str());
 					return;
 				}
 
 				if (releaseJSON["assets"].is_null())
 				{
-					this->Logger->Warning(LOG_CHANNEL, "\"%s\" had no assets when resolving.", downloadUrl.c_str());
+					this->Logger.Warning(LOG_CHANNEL, "\"%s\" had no assets when resolving.", downloadUrl.c_str());
 					return;
 				}
 
 				if (!releaseJSON["assets"].is_array())
 				{
-					this->Logger->Warning(LOG_CHANNEL, "\"%s\" had assets was not an array when resolving.", downloadUrl.c_str());
+					this->Logger.Warning(LOG_CHANNEL, "\"%s\" had assets was not an array when resolving.", downloadUrl.c_str());
 					return;
 				}
 
@@ -194,13 +187,13 @@ namespace Raidcore::Nexus::Host
 
 				if (!found)
 				{
-					this->Logger->Warning(LOG_CHANNEL, "No asset found for \"%s\".", downloadUrl.c_str());
+					this->Logger.Warning(LOG_CHANNEL, "No asset found for \"%s\".", downloadUrl.c_str());
 					return;
 				}
 			}
 			catch (...)
 			{
-				this->Logger->Warning(LOG_CHANNEL, "Unknown error processing resolution of \"%s\".", downloadUrl.c_str());
+				this->Logger.Warning(LOG_CHANNEL, "Unknown error processing resolution of \"%s\".", downloadUrl.c_str());
 			}
 		}
 
@@ -210,7 +203,7 @@ namespace Raidcore::Nexus::Host
 			filename = String::Normalize(addon.Name) + ".dll";
 		}
 
-		Network::CHttpClient client = Network::CHttpClient(this->Logger, downloadUrl);
+		Network::CHttpClient client = Network::CHttpClient(&this->Logger, downloadUrl);
 
 		std::string endpoint = URL::GetEndpoint(downloadUrl);
 
@@ -218,7 +211,7 @@ namespace Raidcore::Nexus::Host
 
 		if (!result.Success())
 		{
-			this->Logger->Warning(
+			this->Logger.Warning(
 				LOG_CHANNEL,
 				"Failed to download addon from \"%s\".\n\tStatus: %s\n\tError: %s",
 				downloadUrl.c_str(),
@@ -234,7 +227,7 @@ namespace Raidcore::Nexus::Host
 		}
 		catch (...)
 		{
-			this->Logger->Warning(
+			this->Logger.Warning(
 				LOG_CHANNEL,
 				"Failed to move downloaded addon from \"%s\" to \"%s\".",
 				tmpPath.string().c_str(),
@@ -243,7 +236,7 @@ namespace Raidcore::Nexus::Host
 			return;
 		}
 
-		this->Logger->Info(
+		this->Logger.Info(
 			LOG_CHANNEL,
 			"Successfully installed \"%s\" (0x%08X) to \"%s\".",
 			addon.Name.c_str(),
@@ -251,7 +244,7 @@ namespace Raidcore::Nexus::Host
 			targetPath.string().c_str()
 		);
 
-		this->Loader->NotifyChanges();
+		this->Loader.NotifyChanges();
 	}
 
 	std::vector<LibraryAddon_t> LibraryMgr::GetLibrary() const

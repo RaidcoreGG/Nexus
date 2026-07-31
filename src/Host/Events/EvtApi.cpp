@@ -12,12 +12,9 @@
 
 namespace Raidcore::Nexus::Host
 {
-	EventApi::EventApi(Host::Loader* aLoader) : IRefCleaner("EventApi")
-	{
-		this->Loader = aLoader;
-	}
-
-	EventApi::~EventApi()
+	EventApi::EventApi(Host::Loader& aLoader)
+		: IRefCleaner("EventApi")
+		, Loader(aLoader)
 	{}
 
 	void EventApi::Raise(const char* aIdentifier, void* aEventData)
@@ -75,7 +72,7 @@ namespace Raidcore::Nexus::Host
 		EventSubscriber_t sub{};
 		sub.Callback = aConsumeEventCallback;
 
-		IAddon* owner = this->Loader->GetOwner(aConsumeEventCallback);
+		IAddon* owner = this->Loader.GetOwner(aConsumeEventCallback);
 
 		sub.Signature = owner != nullptr ? owner->GetSignature() : 0;
 

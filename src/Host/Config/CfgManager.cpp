@@ -15,6 +15,9 @@
 #pragma warning(pop)
 using json = nlohmann::json;
 
+#include "Util/CmdLine.h"
+#include "Util/Strings.h"
+
 namespace Raidcore::Nexus::Host
 {
 	constexpr const char* LOG_CHANNEL = "Config";
@@ -32,25 +35,52 @@ namespace Raidcore::Nexus::Host
 	constexpr const char* K_LASTGAMEBUILD = "LastGameBuild";
 	constexpr const char* K_NAME = "Name";
 
-	ConfigMgr::ConfigMgr(Core::LogApi* aLogger, std::filesystem::path aConfigPath, std::vector<uint32_t> aWhitelist)
+	ConfigMgr::ConfigMgr(Core::LogApi& aLogger, std::filesystem::path aDefaultConfigPath)
+		: Logger(aLogger)
 	{
-		if (aConfigPath.empty())
+		std::filesystem::path cfgpath = aDefaultConfigPath;
+		std::vector<uint32_t> cfgwhitelist = {};
+
+		if (CmdLine::HasArgument("-ggaddons"))
+		{
+			std::vector<std::string> idList = String::Split(CmdLine::GetArgumentValue("-ggaddons"), ",");
+
+			/* If only one entry and it contains ".json" it's a custom config. */
+			if (idList.size() == 1 && String::Contains(idList[0], ".json"))
+			{
+				cfgpath = idList[0];
+			}
+			else
+			{
+				for (std::string addonsig : idList)
+				{
+					try
+					{
+						uint32_t sig = std::stoi(addonsig, nullptr, 0);
+						cfgwhitelist.push_back(sig);
+					}
+					catch (const std::invalid_argument& e)
+					{
+						this->Logger.Trace(LOG_CHANNEL, "Invalid argument(-ggaddons) : %s (exc: %s)", addonsig.c_str(), e.what());
+					}
+					catch (const std::out_of_range& e)
+					{
+						this->Logger.Trace(LOG_CHANNEL, "Out of range (-ggaddons): %s (exc: %s)", addonsig.c_str(), e.what());
+					}
+				}
+			}
+		}
+
+		if (cfgpath.empty())
 		{
 			throw "Config path can't be empty.";
 		}
 
-		this->Logger = aLogger;
-
-		this->ReadOnly = aWhitelist.size() > 0;
-		this->Path = aConfigPath;
-		this->Whitelist = aWhitelist;
+		this->ReadOnly = cfgwhitelist.size() > 0;
+		this->Path = cfgpath;
+		this->Whitelist = cfgwhitelist;
 
 		this->LoadConfigs();
-	}
-
-	ConfigMgr::~ConfigMgr()
-	{
-		this->Logger = nullptr;
 	}
 
 	void ConfigMgr::SaveConfigs()
@@ -87,7 +117,7 @@ namespace Raidcore::Nexus::Host
 
 		if (!file.is_open())
 		{
-			this->Logger->Warning(
+			this->Logger.Warning(
 				LOG_CHANNEL,
 				"Failed to open \"%s\" for writing.",
 				this->Path.string().c_str()
@@ -163,7 +193,7 @@ namespace Raidcore::Nexus::Host
 
 			if (!file.is_open())
 			{
-				this->Logger->Warning(
+				this->Logger.Warning(
 					LOG_CHANNEL,
 					"Failed to open \"%s\" for reading.",
 					this->Path.string().c_str()
@@ -175,7 +205,7 @@ namespace Raidcore::Nexus::Host
 
 			if (cfgPack.is_null())
 			{
-				this->Logger->Warning(
+				this->Logger.Warning(
 					LOG_CHANNEL,
 					"Failed to parse \"%s\". Config was null.",
 					this->Path.string().c_str()
@@ -240,7 +270,7 @@ namespace Raidcore::Nexus::Host
 		}
 		catch (json::parse_error& ex)
 		{
-			this->Logger->Warning(
+			this->Logger.Warning(
 				LOG_CHANNEL,
 				"Failed to parse \"%s\". Error: %s",
 				this->Path.filename().string().c_str(),

@@ -17,11 +17,15 @@
 #include "Core/Versioning/Version.h"
 #include "Graphics/GrMetrics.h"
 #include "Graphics/GrWindow.h"
+#include "Graphics/Textures/TxLoader.h"
 #include "GW2/ArcDPS/ArcApi.h"
 #include "GW2/BuildInfo/BuildInfoService.h"
 #include "GW2/Inputs/GameBinds/GbApi.h"
 #include "GW2/Mumble/MblReader.h"
-#include "Host/HoContext.h"
+#include "Host/Config/CfgManager.h"
+#include "Host/Events/EvtApi.h"
+#include "Host/Library/LibManager.h"
+#include "Host/Loader/Loader.h"
 #include "Inputs/InputBinds/IbApi.h"
 #include "Network/NetContext.h"
 #include "Platform/PlContext.h"
@@ -85,7 +89,29 @@ namespace Raidcore::Nexus
 
 		Platform::Context& Platform();
 
-		Host::Context& Host();
+		///----------------------------------------------------------------------------------------------------
+		/// Config:
+		/// 	Returns the config instance.
+		///----------------------------------------------------------------------------------------------------
+		Host::ConfigMgr& Config();
+
+		///----------------------------------------------------------------------------------------------------
+		/// Loader:
+		/// 	Returns the loader instance.
+		///----------------------------------------------------------------------------------------------------
+		Host::Loader& Loader();
+
+		///----------------------------------------------------------------------------------------------------
+		/// Library:
+		/// 	Returns the library manager instance.
+		///----------------------------------------------------------------------------------------------------
+		Host::LibraryMgr& Library();
+
+		///----------------------------------------------------------------------------------------------------
+		/// Events:
+		/// 	Returns the event API instance.
+		///----------------------------------------------------------------------------------------------------
+		Host::EventApi& Events();
 
 		///----------------------------------------------------------------------------------------------------
 		/// TextureLoader:
@@ -139,7 +165,6 @@ namespace Raidcore::Nexus
 
 		std::unique_ptr<Network::Context>  _NetworkContext{ nullptr };
 		std::unique_ptr<Platform::Context> _PlatformContext{ nullptr };
-		std::unique_ptr<Host::Context>     _HostContext{ nullptr };
 		std::unique_ptr<GUI::Context>      _UiContext{ nullptr };
 	};
 }

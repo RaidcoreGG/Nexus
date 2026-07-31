@@ -31,12 +31,12 @@ namespace Raidcore::Nexus::Host
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		LibraryMgr(Core::LogApi* aLogger, Loader* aLoader);
+		LibraryMgr(Core::LogApi& aLogger, Loader& aLoader);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
 		///----------------------------------------------------------------------------------------------------
-		~LibraryMgr();
+		~LibraryMgr() = default;
 
 		///----------------------------------------------------------------------------------------------------
 		/// Update:
@@ -63,8 +63,8 @@ namespace Raidcore::Nexus::Host
 		std::vector<LibraryAddon_t> GetLibrary() const;
 
 		private:
-		Core::LogApi* Logger = nullptr;
-		Loader* Loader = nullptr;
+		Core::LogApi&                                          Logger;
+		Loader&                                                Loader;
 
 		mutable std::mutex                                     Mutex;
 		std::unordered_map<std::string, Network::CHttpClient*> Sources;

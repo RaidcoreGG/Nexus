@@ -31,12 +31,12 @@ namespace Raidcore::Nexus::Host
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		EventApi(Loader* aLoader);
+		EventApi(Loader& aLoader);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
 		///----------------------------------------------------------------------------------------------------
-		~EventApi();
+		~EventApi() = default;
 
 		///----------------------------------------------------------------------------------------------------
 		/// Raise:
@@ -75,7 +75,7 @@ namespace Raidcore::Nexus::Host
 		std::unordered_map<std::string, EventData_t> GetRegistry() const;
 
 		private:
-		Loader* Loader = nullptr;
+		Loader&                                      Loader;
 
 		mutable std::recursive_mutex                 Mutex;
 		std::unordered_map<std::string, EventData_t> Registry;
