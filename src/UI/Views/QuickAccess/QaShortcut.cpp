@@ -35,7 +35,7 @@ namespace Raidcore::Nexus::GUI
 	{
 		/* FIXME: See Render IsInvalid. */
 		Runtime& ctx = Runtime::Get();
-		this->InputBindApi = ctx.InputBinds();
+		this->InputBindApi = &ctx.InputBinds();
 		this->TextureService = &ctx.TextureLoader();
 		this->Loader = &ctx.Loader();
 		this->DataLink = &ctx.DataLink();

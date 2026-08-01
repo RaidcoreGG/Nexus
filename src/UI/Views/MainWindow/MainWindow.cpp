@@ -82,9 +82,9 @@ namespace Raidcore::Nexus::GUI
 	CMainWindow::CMainWindow()
 	{
 		Runtime& ctx = Runtime::Get();
-		Core::LogApi* logger = &ctx.Logger();
-		Input::CInputBindApi* ibapi = ctx.InputBinds();
-		Host::EventApi* evtapi = &ctx.Events();
+		Core::LogApi& logger = ctx.Logger();
+		Input::CInputBindApi& ibapi = ctx.InputBinds();
+		Host::EventApi& evtapi = ctx.Events();
 
 		CAddonsWindow* addonsWnd = new CAddonsWindow();
 		COptionsWindow* optionsWnd = new COptionsWindow();
@@ -93,7 +93,7 @@ namespace Raidcore::Nexus::GUI
 		CDebugWindow* debugWnd = new CDebugWindow();
 		CAboutBox* aboutWnd = new CAboutBox();
 
-		logger->Register(logWnd);
+		logger.Register(logWnd);
 
 		this->AddWindow(addonsWnd);
 		this->AddWindow(optionsWnd);
@@ -103,13 +103,13 @@ namespace Raidcore::Nexus::GUI
 		this->AddWindow(aboutWnd);
 
 		/* register InputBinds */
-		ibapi->Register(KB_MENU, Input::EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "CTRL+O");
-		ibapi->Register(KB_ADDONS, Input::EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
-		ibapi->Register(KB_OPTIONS, Input::EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
-		ibapi->Register(KB_LOG, Input::EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
-		ibapi->Register(KB_DEBUG, Input::EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
+		ibapi.Register(KB_MENU, Input::EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "CTRL+O");
+		ibapi.Register(KB_ADDONS, Input::EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
+		ibapi.Register(KB_OPTIONS, Input::EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
+		ibapi.Register(KB_LOG, Input::EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
+		ibapi.Register(KB_DEBUG, Input::EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
 
-		evtapi->Subscribe(EV_VOLATILE_ADDON_DISABLED, CMainWindow::OnVolatileAddonsDisabled);
+		evtapi.Subscribe(EV_VOLATILE_ADDON_DISABLED, CMainWindow::OnVolatileAddonsDisabled);
 
 		if (s_MainWindow)
 		{

@@ -27,9 +27,9 @@ namespace Raidcore::Nexus::GUI
 		Runtime& ctx = Runtime::Get();
 		Context& uictx = ctx.UI();
 		Localization* lang = uictx.GetLocalization();
-		Input::CInputBindApi* ibapi = ctx.InputBinds();
+		Input::CInputBindApi& ibapi = ctx.InputBinds();
 
-		this->Capture = ibapi->GetCapture();
+		this->Capture = ibapi.GetCapture();
 
 		/* Display current bind text, if no capture yet. */
 		if (this->Capture == Input::InputBind_t{})
@@ -43,7 +43,7 @@ namespace Raidcore::Nexus::GUI
 
 		if (this->Type == EBindEditType::Nexus)
 		{
-			this->BindConflict = ibapi->IsInUse(this->Capture);
+			this->BindConflict = ibapi.IsInUse(this->Capture);
 
 			if (!this->BindConflict.empty() && this->BindConflict != this->NexusBindID)
 			{
@@ -77,15 +77,15 @@ namespace Raidcore::Nexus::GUI
 	void CBindSetterModal::OnOpening()
 	{
 		Runtime& ctx = Runtime::Get();
-		Input::CInputBindApi* ibapi = ctx.InputBinds();
-		GW2::GameBindsApi* gbapi = &ctx.GameBinds();
+		Input::CInputBindApi& ibapi = ctx.InputBinds();
+		GW2::GameBindsApi& gbapi = ctx.GameBinds();
 
 		/* Fetch display text. */
 		switch (this->Type)
 		{
 			case EBindEditType::Nexus:
 			{
-				const Input::InputBind_t* ib = ibapi->Get(this->NexusBindID);
+				const Input::InputBind_t* ib = ibapi.Get(this->NexusBindID);
 
 				assert(ib != nullptr);
 
@@ -94,7 +94,7 @@ namespace Raidcore::Nexus::GUI
 			}
 			case EBindEditType::Game:
 			{
-				const GW2::MultiInputBind_t* gb = gbapi->Get(this->GameBindID);
+				const GW2::MultiInputBind_t* gb = gbapi.Get(this->GameBindID);
 
 				assert(gb != nullptr);
 
@@ -103,7 +103,7 @@ namespace Raidcore::Nexus::GUI
 			}
 			case EBindEditType::Game2:
 			{
-				const GW2::MultiInputBind_t* gb = gbapi->Get(this->GameBindID);
+				const GW2::MultiInputBind_t* gb = gbapi.Get(this->GameBindID);
 
 				assert(gb != nullptr);
 
@@ -112,15 +112,15 @@ namespace Raidcore::Nexus::GUI
 			}
 		}
 
-		ibapi->StartCapturing();
+		ibapi.StartCapturing();
 	}
 
 	void CBindSetterModal::OnClosing()
 	{
 		Runtime& ctx = Runtime::Get();
-		Input::CInputBindApi* ibapi = ctx.InputBinds();
-		GW2::GameBindsApi* gbapi = &ctx.GameBinds();
-		ibapi->EndCapturing();
+		Input::CInputBindApi& ibapi = ctx.InputBinds();
+		GW2::GameBindsApi& gbapi = ctx.GameBinds();
+		ibapi.EndCapturing();
 
 		switch (this->GetResult())
 		{
@@ -134,20 +134,20 @@ namespace Raidcore::Nexus::GUI
 						if (!this->BindConflict.empty())
 						{
 							/* unset the bind that's currently using this wombo combo */
-							ibapi->Set(this->BindConflict, Input::InputBind_t{});
+							ibapi.Set(this->BindConflict, Input::InputBind_t{});
 						}
 
-						ibapi->Set(this->NexusBindID, this->Capture);
+						ibapi.Set(this->NexusBindID, this->Capture);
 						break;
 					}
 					case EBindEditType::Game:
 					{
-						gbapi->Set(this->GameBindID, this->Capture, true, false);
+						gbapi.Set(this->GameBindID, this->Capture, true, false);
 						break;
 					}
 					case EBindEditType::Game2:
 					{
-						gbapi->Set(this->GameBindID, this->Capture, false, false);
+						gbapi.Set(this->GameBindID, this->Capture, false, false);
 						break;
 					}
 				}
@@ -161,17 +161,17 @@ namespace Raidcore::Nexus::GUI
 				{
 					case EBindEditType::Nexus:
 					{
-						ibapi->Set(this->NexusBindID, Input::InputBind_t{});
+						ibapi.Set(this->NexusBindID, Input::InputBind_t{});
 						break;
 					}
 					case EBindEditType::Game:
 					{
-						gbapi->Set(this->GameBindID, Input::InputBind_t{}, true, false);
+						gbapi.Set(this->GameBindID, Input::InputBind_t{}, true, false);
 						break;
 					}
 					case EBindEditType::Game2:
 					{
-						gbapi->Set(this->GameBindID, Input::InputBind_t{}, false, false);
+						gbapi.Set(this->GameBindID, Input::InputBind_t{}, false, false);
 						break;
 					}
 				}

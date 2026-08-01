@@ -355,14 +355,14 @@ namespace Raidcore::Nexus
 		return s_Mumble;
 	}
 
-	Input::CInputBindApi* Runtime::InputBinds()
+	Input::CInputBindApi& Runtime::InputBinds()
 	{
 		static Input::CInputBindApi s_InputBindApi = Input::CInputBindApi(
 			&this->Events(),
 			&this->Logger(),
 			Index(EPath::InputBinds)
 		);
-		return &s_InputBindApi;
+		return s_InputBindApi;
 	}
 
 	Network::Updater& Runtime::Updater()
@@ -383,21 +383,18 @@ namespace Raidcore::Nexus
 
 	GUI::Context& Runtime::UI()
 	{
-		if (!this->_UiContext)
-		{
-			this->_UiContext = std::make_unique<GUI::Context>(
-				this->Logger(),
-				this->DataLink(),
-				this->Settings(),
-				this->GrWindow(),
-				this->TextureLoader(),
-				*this->InputBinds(),
-				this->Events(),
-				this->Mumble()
-			);
-		}
+		static GUI::Context s_UiContext{
+			this->Logger(),
+			this->DataLink(),
+			this->Settings(),
+			this->GrWindow(),
+			this->TextureLoader(),
+			this->InputBinds(),
+			this->Events(),
+			this->Mumble()
+		};
 
-		return *this->_UiContext;
+		return s_UiContext;
 	}
 
 	Runtime::Runtime()

@@ -158,7 +158,7 @@ namespace Raidcore::Nexus
 		/// InputBinds:
 		/// 	Returns the InputBinds API.
 		///----------------------------------------------------------------------------------------------------
-		Input::CInputBindApi* InputBinds();
+		Input::CInputBindApi& InputBinds();
 
 		///----------------------------------------------------------------------------------------------------
 		/// Updater:

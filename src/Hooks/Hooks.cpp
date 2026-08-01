@@ -185,7 +185,7 @@ namespace Hooks
 		LRESULT __stdcall WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			static Runtime&               s_Context      = Runtime::Get();
-			static Input::CInputBindApi*  s_InputBindApi = s_Context.InputBinds();
+			static Input::CInputBindApi&  s_InputBindApi = s_Context.InputBinds();
 			static Platform::RawInputApi& s_RawInputApi  = s_Context.Platform().RawInput();
 			static GUI::Context&          s_UIContext    = s_Context.UI();
 			static Host::Loader&          s_Loader       = s_Context.Loader();
@@ -201,7 +201,7 @@ namespace Hooks
 			if (s_UIContext.WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
 			// don't pass to game if InputBind
-			if (s_InputBindApi->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
+			if (s_InputBindApi.WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
 
 			if (uMsg == WM_DESTROY)
 			{

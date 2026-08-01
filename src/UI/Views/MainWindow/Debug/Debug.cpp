@@ -43,7 +43,7 @@ namespace Raidcore::Nexus::GUI
 
 		/* bind mumble overlay */
 		Runtime& ctx = Runtime::Get();
-		ctx.InputBinds()->Register(KB_MUMBLEOVERLAY, Input::EIbHandlerType::DownAsync, DebugWindow_OnInputBind, "(null)");
+		ctx.InputBinds().Register(KB_MUMBLEOVERLAY, Input::EIbHandlerType::DownAsync, DebugWindow_OnInputBind, "(null)");
 		DebugWindow = this;
 	}
 
@@ -142,7 +142,7 @@ namespace Raidcore::Nexus::GUI
 
 		if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 		{
-			std::map<std::string, Input::IbMapping_t> inputBindRegistry = Runtime::Get().InputBinds()->GetRegistry();
+			std::map<std::string, Input::IbMapping_t> inputBindRegistry = Runtime::Get().InputBinds().GetRegistry();
 
 			for (auto& [identifier, inputBind] : inputBindRegistry)
 			{

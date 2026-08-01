@@ -590,7 +590,7 @@ namespace Raidcore::Nexus::Host::API
 			s_DataLinkApi = &ctx.DataLink();
 			s_EventApi = &ctx.Events();
 			s_GameBindsApi = &ctx.GameBinds();
-			s_InputBindApi = ctx.InputBinds();
+			s_InputBindApi = &ctx.InputBinds();
 			s_RawInputApi = &ctx.Platform().RawInput();
 			s_Logger = &ctx.Logger();
 			s_TextureApi = &ctx.TextureLoader();
