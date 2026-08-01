@@ -29,7 +29,7 @@ namespace Raidcore::Nexus::Network
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		Updater(Core::LogApi* aLogger);
+		Updater(Core::LogApi& aLogger);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
@@ -55,13 +55,13 @@ namespace Raidcore::Nexus::Network
 		const std::string& GetChangelog();
 
 		private:
-		Core::LogApi*    Logger{};
+		Core::LogApi& Logger;
 
-		HANDLE      UpdateMutex{};
-		std::thread UpdateThread{};
+		HANDLE        UpdateMutex{};
+		std::thread   UpdateThread{};
 
-		Version_t   RemoteVersion{};
-		std::string Changelog{};
+		Version_t     RemoteVersion{};
+		std::string   Changelog{};
 
 		///----------------------------------------------------------------------------------------------------
 		/// CreatePatchMutex:

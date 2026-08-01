@@ -27,7 +27,8 @@
 #include "Host/Library/LibManager.h"
 #include "Host/Loader/Loader.h"
 #include "Inputs/InputBinds/IbApi.h"
-#include "Network/NetContext.h"
+#include "Network/Updater/Updater.h"
+#include "Network/WebRequests/WreStorage.h"
 #include "Platform/PlContext.h"
 #include "Proxy/PxyEnum.h"
 #include "UI/UiContext.h"
@@ -84,8 +85,6 @@ namespace Raidcore::Nexus
 		/// 	Returns the settings instance.
 		///----------------------------------------------------------------------------------------------------
 		Core::SettingsMgr& Settings();
-
-		Network::Context& Network();
 
 		Platform::Context& Platform();
 
@@ -155,7 +154,23 @@ namespace Raidcore::Nexus
 		///----------------------------------------------------------------------------------------------------
 		GW2::MumbleReader& Mumble();
 
+		///----------------------------------------------------------------------------------------------------
+		/// InputBinds:
+		/// 	Returns the InputBinds API.
+		///----------------------------------------------------------------------------------------------------
 		Input::CInputBindApi* InputBinds();
+
+		///----------------------------------------------------------------------------------------------------
+		/// Updater:
+		/// 	Returns the updater instance.
+		///----------------------------------------------------------------------------------------------------
+		Network::Updater& Updater();
+
+		///----------------------------------------------------------------------------------------------------
+		/// HttpClientStorage:
+		/// 	Returns the HTTP client storage instance.
+		///----------------------------------------------------------------------------------------------------
+		Network::ClientStorage& HttpClientStorage();
 
 		GUI::Context& UI();
 
@@ -163,7 +178,6 @@ namespace Raidcore::Nexus
 		Runtime();
 		~Runtime();
 
-		std::unique_ptr<Network::Context>  _NetworkContext{ nullptr };
 		std::unique_ptr<Platform::Context> _PlatformContext{ nullptr };
 		std::unique_ptr<GUI::Context>      _UiContext{ nullptr };
 	};

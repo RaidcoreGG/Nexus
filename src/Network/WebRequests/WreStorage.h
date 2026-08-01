@@ -1,8 +1,8 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  NetContext.h
-/// Description  :  Network context implementation.
+/// Name         :  WreStorage.h
+/// Description  :  HttpClient factory and storage.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
@@ -26,19 +26,18 @@ namespace Raidcore::Nexus::Network
 	///----------------------------------------------------------------------------------------------------
 	/// Context Class
 	///----------------------------------------------------------------------------------------------------
-	class Context
+	class ClientStorage
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		Context(Core::LogApi& aLogger);
+		ClientStorage(Core::LogApi& aLogger);
 
 		///----------------------------------------------------------------------------------------------------
-		/// Shutdown:
-		/// 	Shuts down the host context.
+		/// dtor
 		///----------------------------------------------------------------------------------------------------
-		void Shutdown();
+		~ClientStorage() = default;
 
 		///----------------------------------------------------------------------------------------------------
 		/// GetHttpClient:
@@ -46,18 +45,10 @@ namespace Raidcore::Nexus::Network
 		///----------------------------------------------------------------------------------------------------
 		Network::CHttpClient& GetHttpClient(std::string aURL, bool aDisableCache = false);
 
-		///----------------------------------------------------------------------------------------------------
-		/// Updater:
-		/// 	Returns the updater instance.
-		///----------------------------------------------------------------------------------------------------
-		Network::Updater& Updater();
-
 		private:
-		Core::LogApi& _Logger;
+		Core::LogApi&                                                Logger;
 
-		std::unique_ptr<Network::Updater> _Updater{ nullptr };
-
-		std::mutex                                   HttpClientMutex{};
-		std::map<std::string, Network::CHttpClient*> HttpClients{};
+		std::mutex                                                   HttpClientMutex;
+		std::map<std::string, std::unique_ptr<Network::CHttpClient>> HttpClients;
 	};
 }

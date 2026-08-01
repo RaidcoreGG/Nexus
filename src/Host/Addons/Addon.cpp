@@ -1025,7 +1025,7 @@ void CAddon::CheckUpdateViaGitHub()
 
 	Runtime& context = Runtime::Get();
 
-	Network::CHttpClient& client = context.Network().GetHttpClient("https://api.github.com");
+	Network::CHttpClient& client = context.HttpClientStorage().GetHttpClient("https://api.github.com");
 
 	Network::HttpResponse_t response = client.Get("/repos" + URL::GetEndpoint(this->NexusAddonDefV1->GetUpdateLink()) + "/releases");
 
@@ -1107,7 +1107,7 @@ void CAddon::CheckUpdateViaDirect()
 
 	Runtime& context = Runtime::Get();
 
-	Network::CHttpClient& client = context.Network().GetHttpClient(this->NexusAddonDefV1->GetUpdateLink());
+	Network::CHttpClient& client = context.HttpClientStorage().GetHttpClient(this->NexusAddonDefV1->GetUpdateLink());
 
 	Network::HttpResponse_t response = client.Get(URL::GetEndpoint(this->NexusAddonDefV1->GetUpdateLink()) + ".md5");
 
@@ -1282,7 +1282,7 @@ bool CAddon::DownloadUpdate()
 
 	Runtime& context = Runtime::Get();
 
-	Network::CHttpClient& client = context.Network().GetHttpClient(this->UpdateRemote);
+	Network::CHttpClient& client = context.HttpClientStorage().GetHttpClient(this->UpdateRemote);
 	
 	Network::HttpResponse_t response = client.Download(tmpDownload, URL::GetEndpoint(this->UpdateRemote));
 

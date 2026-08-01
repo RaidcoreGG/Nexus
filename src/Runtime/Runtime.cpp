@@ -21,19 +21,33 @@
 #include "thirdparty/Clockwork/Tasks/ETaskPriority.h"
 
 #include "Branch.h"
+#include "Core/DataLink/DlApi.h"
+#include "Core/Functions/FnRegistry.h"
 #include "Core/Logging/LogApi.h"
 #include "Core/Logging/LogConsole.h"
 #include "Core/Logging/LogEnum.h"
 #include "Core/Logging/LogWriter.h"
+#include "Core/Settings/SettingsMgr.h"
 #include "Core/Versioning/Version.h"
+#include "Graphics/GrMetrics.h"
+#include "Graphics/GrWindow.h"
 #include "Graphics/Textures/TxLoader.h"
+#include "GW2/ArcDPS/ArcApi.h"
+#include "GW2/BuildInfo/BuildInfoService.h"
+#include "GW2/Inputs/GameBinds/GbApi.h"
 #include "GW2/Multibox/Multibox.h"
+#include "GW2/Mumble/MblReader.h"
 #include "Hooks/Hooks.h"
 #include "Host/Addons/Addon.h"
+#include "Host/Config/CfgManager.h"
+#include "Host/Events/EvtApi.h"
+#include "Host/Library/LibManager.h"
+#include "Host/Loader/Loader.h"
 #include "Index/IdxEnum.h"
 #include "Index/Index.h"
 #include "Inputs/InputBinds/IbApi.h"
-#include "Network/NetContext.h"
+#include "Network/Updater/Updater.h"
+#include "Network/WebRequests/WreStorage.h"
 #include "Platform/PlContext.h"
 #include "Proxy/PxyEnum.h"
 #include "res/ResConst.h"
@@ -241,11 +255,6 @@ namespace Raidcore::Nexus
 		return s_Settings;
 	}
 
-	Network::Context& Runtime::Network()
-	{
-		return *this->_NetworkContext;
-	}
-
 	Platform::Context& Runtime::Platform()
 	{
 		return *this->_PlatformContext;
@@ -318,7 +327,7 @@ namespace Raidcore::Nexus
 	GW2::BuildInfoService& Runtime::BuildInfo()
 	{
 		static GW2::BuildInfoService s_BuildInfo{
-			this->Network().GetHttpClient("http://assetcdn.101.arenanetworks.com", /*disablecache=*/ true),
+			this->HttpClientStorage().GetHttpClient("http://assetcdn.101.arenanetworks.com", /*disablecache=*/ true),
 			this->Logger()
 		};
 		return s_BuildInfo;
@@ -356,6 +365,22 @@ namespace Raidcore::Nexus
 		return &s_InputBindApi;
 	}
 
+	Network::Updater& Runtime::Updater()
+	{
+		static Network::Updater s_Updater{
+			this->Logger()
+		};
+		return s_Updater;
+	}
+
+	Network::ClientStorage& Runtime::HttpClientStorage()
+	{
+		static Network::ClientStorage s_ClientStorage{
+			this->Logger()
+		};
+		return s_ClientStorage;
+	}
+
 	GUI::Context& Runtime::UI()
 	{
 		if (!this->_UiContext)
@@ -378,10 +403,6 @@ namespace Raidcore::Nexus
 	Runtime::Runtime()
 	{
 		Clockwork::Context::Create();
-
-		this->_NetworkContext = std::make_unique<Network::Context>(
-			this->Logger()
-		);
 
 		this->_PlatformContext = std::make_unique<Platform::Context>();
 	}

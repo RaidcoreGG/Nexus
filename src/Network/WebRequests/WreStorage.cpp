@@ -1,51 +1,34 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  NetContext.cpp
-/// Description  :  Network context implementation.
+/// Name         :  WreStorage.cpp
+/// Description  :  HttpClient factory and storage implementation.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
-#include "NetContext.h"
+#include "WreStorage.h"
 
 #include <cstdint>
+#include <filesystem>
 #include <memory>
 #include <mutex>
 #include <string>
 
 #include "Core/Logging/LogApi.h"
-#include "Updater/Updater.h"
-#include "Util/Strings.h"
-#include "Util/Url.h"
-#include "WebRequests/WreClient.h"
 #include "Index/IdxEnum.h"
 #include "Index/Index.h"
+#include "Network/Updater/Updater.h"
+#include "Util/Strings.h"
+#include "Util/Url.h"
+#include "WreClient.h"
 
 namespace Raidcore::Nexus::Network
 {
-	Context::Context(Core::LogApi& aLogger)
-		: _Logger(aLogger)
-	{
-		this->_Updater = std::make_unique<Network::Updater>(&this->_Logger);
-	}
+	ClientStorage::ClientStorage(Core::LogApi& aLogger)
+		: Logger(aLogger)
+	{}
 
-	void Context::Shutdown()
-	{
-		this->_Updater.reset();
-
-		const std::lock_guard<std::mutex> lock(this->HttpClientMutex);
-
-		for (auto it = this->HttpClients.begin(); it != this->HttpClients.end();)
-		{
-			/* Deallocate client. */
-			delete it->second;
-
-			/* Erase entry. */
-			it = this->HttpClients.erase(it);
-		}
-	}
-
-	Network::CHttpClient& Context::GetHttpClient(std::string aURL, bool aDisableCache)
+	Network::CHttpClient& ClientStorage::GetHttpClient(std::string aURL, bool aDisableCache)
 	{
 		const std::lock_guard<std::mutex> lock(this->HttpClientMutex);
 
@@ -62,11 +45,11 @@ namespace Raidcore::Nexus::Network
 			return *it->second;
 		}
 
-		Network::CHttpClient* client = nullptr;
+		std::unique_ptr<Network::CHttpClient> client = nullptr;
 
 		if (aDisableCache)
 		{
-			client = new Network::CHttpClient(&this->_Logger, baseurl);
+			client = std::make_unique<Network::CHttpClient>(&this->Logger, baseurl);
 		}
 		else
 		{
@@ -82,16 +65,11 @@ namespace Raidcore::Nexus::Network
 				cacheLifetime = 60 * 60; // 60 minutes
 			}
 
-			client = new Network::CHttpClient(&this->_Logger, baseurl, cachedir, cacheLifetime);
+			client = std::make_unique<Network::CHttpClient>(&this->Logger, baseurl, cachedir, cacheLifetime);
 		}
 
-		this->HttpClients.emplace(baseurl_noprotocol, client);
+		this->HttpClients.emplace(baseurl_noprotocol, std::move(client));
 
-		return *client;
-	}
-
-	Network::Updater& Context::Updater()
-	{
-		return *this->_Updater;
+		return *this->HttpClients.at(baseurl_noprotocol).get();
 	}
 }

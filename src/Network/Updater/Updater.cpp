@@ -18,10 +18,9 @@ namespace Raidcore::Nexus::Network
 {
 	constexpr const char* LOG_CHANNEL = "Updater";
 
-	Updater::Updater(Core::LogApi* aLogger)
+	Updater::Updater(Core::LogApi& aLogger)
+		: Logger(aLogger)
 	{
-		this->Logger = aLogger;
-
 		this->UpdateThread = std::thread(&Updater::Run, this);
 	}
 
@@ -48,14 +47,14 @@ namespace Raidcore::Nexus::Network
 		}
 
 		/* The client is not dependency injected, as we only create it on demand. */
-		CHttpClient& raidcoreapi = Runtime::Get().Network().GetHttpClient("https://api.raidcore.gg");
+		CHttpClient& raidcoreapi = Runtime::Get().HttpClientStorage().GetHttpClient("https://api.raidcore.gg");
 
 		/* Request version info, bypass cache. */
 		HttpResponse_t result = raidcoreapi.Get("/nexusversion", "", 0);
 
 		if (!result.Success())
 		{
-			this->Logger->Warning(
+			this->Logger.Warning(
 				LOG_CHANNEL,
 				"Failed to fetch Nexus version.\n\tStatus: %s\n\tError: %s",
 				result.Status(),
@@ -68,7 +67,7 @@ namespace Raidcore::Nexus::Network
 
 		if (versionJSON.is_null())
 		{
-			this->Logger->Warning(LOG_CHANNEL, "Failed to fetch Nexus version. JSON was null.");
+			this->Logger.Warning(LOG_CHANNEL, "Failed to fetch Nexus version. JSON was null.");
 			return this->RemoteVersion;
 		}
 
@@ -78,7 +77,7 @@ namespace Raidcore::Nexus::Network
 			versionJSON["Build"].is_null() ||
 			versionJSON["Revision"].is_null())
 		{
-			this->Logger->Warning(LOG_CHANNEL, "Failed to fetch Nexus version. Incomplete version info.");
+			this->Logger.Warning(LOG_CHANNEL, "Failed to fetch Nexus version. Incomplete version info.");
 			return this->RemoteVersion;
 		}
 
@@ -121,7 +120,7 @@ namespace Raidcore::Nexus::Network
 				this->UpdateMutex = NULL;
 			}
 
-			this->Logger->Info(LOG_CHANNEL, "Cannot patch Nexus, mutex locked.");
+			this->Logger.Info(LOG_CHANNEL, "Cannot patch Nexus, mutex locked.");
 			return false;
 		}
 
@@ -142,7 +141,7 @@ namespace Raidcore::Nexus::Network
 				std::filesystem::path fallback = Path::GetUnused(Index(EPath::DIR_TEMP) / "d3d11.dll.old");
 				std::filesystem::rename(Index(EPath::NexusDLL_Old), fallback);
 
-				this->Logger->Warning(
+				this->Logger.Warning(
 					LOG_CHANNEL,
 					"Couldn't remove \"%s\". Renamed to \"%s\".",
 					Index(EPath::NexusDLL_Old).string().c_str(),
@@ -163,7 +162,7 @@ namespace Raidcore::Nexus::Network
 				std::filesystem::path fallback = Path::GetUnused(Index(EPath::DIR_TEMP) / "d3d11.dll.update");
 				std::filesystem::rename(Index(EPath::NexusDLL_Update), fallback);
 
-				this->Logger->Warning(
+				this->Logger.Warning(
 					LOG_CHANNEL,
 					"Couldn't remove \"%s\". Renamed to \"%s\".",
 					Index(EPath::NexusDLL_Update).string().c_str(),
@@ -175,7 +174,7 @@ namespace Raidcore::Nexus::Network
 
 	bool Updater::DownloadUpdate()
 	{
-		CHttpClient githubclient = CHttpClient(this->Logger, "https://github.com");
+		CHttpClient githubclient = CHttpClient(&this->Logger, "https://github.com");
 
 		HttpResponse_t ghresult = githubclient.Download(
 			Index(EPath::NexusDLL_Update),
@@ -187,14 +186,14 @@ namespace Raidcore::Nexus::Network
 			return true;
 		}
 
-		this->Logger->Warning(
+		this->Logger.Warning(
 			LOG_CHANNEL,
 			"Failed to download Nexus update from GitHub.\n\tStatus: %s\n\tError: %s",
 			ghresult.Status().empty() ? "(null)" : ghresult.Status().c_str(),
 			ghresult.Error.c_str()
 		);
 
-		CHttpClient& raidcoreapi = Runtime::Get().Network().GetHttpClient("https://api.raidcore.gg");
+		CHttpClient& raidcoreapi = Runtime::Get().HttpClientStorage().GetHttpClient("https://api.raidcore.gg");
 
 		HttpResponse_t fbresult = raidcoreapi.Download(
 			Index(EPath::NexusDLL_Update),
@@ -206,7 +205,7 @@ namespace Raidcore::Nexus::Network
 			return true;
 		}
 
-		this->Logger->Warning(
+		this->Logger.Warning(
 			LOG_CHANNEL,
 			"Failed to download Nexus update from fallback. (Raidcore API)\n\tStatus: %s\n\tError: %s",
 			fbresult.Status().empty() ? "(null)" : fbresult.Status().c_str(),
@@ -237,7 +236,7 @@ namespace Raidcore::Nexus::Network
 
 		if (this->RemoteVersion > currentVersion)
 		{
-			this->Logger->Info(
+			this->Logger.Info(
 				LOG_CHANNEL,
 				"Update available. (Current: %s) (Remote: %s)",
 				currentVersion.string().c_str(),
@@ -254,7 +253,7 @@ namespace Raidcore::Nexus::Network
 			}
 			catch (std::filesystem::filesystem_error fErr)
 			{
-				this->Logger->Warning(
+				this->Logger.Warning(
 					LOG_CHANNEL,
 					"Nexus update failed: Couldn't move \"%s\" to \"%s\".",
 					Index(EPath::NexusDLL).string().c_str(),
@@ -270,7 +269,7 @@ namespace Raidcore::Nexus::Network
 			}
 			catch (std::filesystem::filesystem_error fErr)
 			{
-				this->Logger->Warning(
+				this->Logger.Warning(
 					LOG_CHANNEL,
 					"Nexus update failed: Couldn't move \"%s\" to \"%s\".",
 					Index(EPath::NexusDLL_Update).string().c_str(),
@@ -284,7 +283,7 @@ namespace Raidcore::Nexus::Network
 				}
 				catch (std::filesystem::filesystem_error fErr)
 				{
-					this->Logger->Warning(
+					this->Logger.Warning(
 						LOG_CHANNEL,
 						"Nexus update failed: Couldn't move \"%s\" to \"%s\".",
 						Index(EPath::NexusDLL_Old).string().c_str(),
@@ -296,7 +295,7 @@ namespace Raidcore::Nexus::Network
 				return;
 			}
 
-			this->Logger->Info(
+			this->Logger.Info(
 				LOG_CHANNEL,
 				"Successfully updated Nexus. Restart required to take effect. (Current: %s) (Remote: %s)",
 				currentVersion.string().c_str(),
@@ -307,7 +306,7 @@ namespace Raidcore::Nexus::Network
 
 		if (this->RemoteVersion < currentVersion)
 		{
-			this->Logger->Info(
+			this->Logger.Info(
 				LOG_CHANNEL,
 				"Installed Build of Nexus is more up-to-date than remote. (Current: %s) (Remote: %s)",
 				currentVersion.string().c_str(),
@@ -316,6 +315,6 @@ namespace Raidcore::Nexus::Network
 			return;
 		}
 
-		this->Logger->Info(LOG_CHANNEL, "Installed Build of Nexus is up-to-date.");
+		this->Logger.Info(LOG_CHANNEL, "Installed Build of Nexus is up-to-date.");
 	}
 }
