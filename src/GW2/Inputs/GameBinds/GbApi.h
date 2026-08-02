@@ -12,11 +12,10 @@
 #include <mutex>
 #include <unordered_map>
 
+#include "Core/Logging/LogApi.h"
 #include "GbEnum.h"
-
 #include "Host/Events/EvtApi.h"
 #include "Inputs/InputBinds/IbBindV2.h"
-#include "Core/Logging/LogApi.h"
 #include "Platform/RawInput/RiApi.h"
 
 using namespace Raidcore::Nexus;
@@ -59,10 +58,9 @@ namespace Raidcore::Nexus::GW2
 		///----------------------------------------------------------------------------------------------------
 		GameBindsApi(
 			Platform::RawInputApi& aRawInputApi,
-			Core::LogApi& aLogger,
-			Host::EventApi& aEventApi,
-			HWND aGameWindow,
-			std::filesystem::path   aConfigPath
+			Core::LogApi&          aLogger,
+			Host::EventApi&        aEventApi,
+			std::filesystem::path  aConfigPath
 		);
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
@@ -151,10 +149,9 @@ namespace Raidcore::Nexus::GW2
 		void Load(std::filesystem::path aPath);
 
 		private:
-		Platform::RawInputApi& RawInputApi;
-		Core::LogApi& Logger;
-		Host::EventApi& EventApi;
-		HWND GameWindow;
+		Platform::RawInputApi&                           RawInputApi;
+		Core::LogApi&                                    Logger;
+		Host::EventApi&                                  EventApi;
 
 		std::filesystem::path                            ConfigPath;
 

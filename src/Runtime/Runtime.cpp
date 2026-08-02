@@ -10,7 +10,6 @@
 
 #include <filesystem>
 #include <format>
-#include <memory>
 #include <string>
 #include <windows.h>
 
@@ -48,7 +47,8 @@
 #include "Inputs/InputBinds/IbApi.h"
 #include "Network/Updater/Updater.h"
 #include "Network/WebRequests/WreStorage.h"
-#include "Platform/PlContext.h"
+#include "Platform/RawInput/RiApi.h"
+#include "Platform/CrashHandler/CrashHandler.h"
 #include "Proxy/PxyEnum.h"
 #include "res/ResConst.h"
 #include "UI/UiContext.h"
@@ -192,10 +192,10 @@ namespace Raidcore::Nexus
 		logger.Info(LOG_CHANNEL, "SHUTDOWN END");
 
 		/* If we have the window handle and we have an original (target) wndproc. */
-		if (ctx.Platform().Window() && Hooks::Target::WndProc)
+		if (ctx.WindowHandle && Hooks::Target::WndProc)
 		{
 			/* Reset wndproc back to the original target. */
-			SetWindowLongPtr(ctx.Platform().Window(), GWLP_WNDPROC, (LONG_PTR)Hooks::Target::WndProc);
+			SetWindowLongPtr(ctx.WindowHandle, GWLP_WNDPROC, (LONG_PTR)Hooks::Target::WndProc);
 		}
 
 		/* Let the OS take care of freeing the handles. Ugly, but otherwise crashes due to the addon clownfiesta in GW2. */
@@ -255,9 +255,19 @@ namespace Raidcore::Nexus
 		return s_Settings;
 	}
 
-	Platform::Context& Runtime::Platform()
+	Platform::CrashHandler& Runtime::CrashHandler()
 	{
-		return *this->_PlatformContext;
+		static Platform::CrashHandler s_CrashHandler{
+			Index(EPath::CrashLog),
+			Index(EPath::CrashStack)
+		};
+		return s_CrashHandler;
+	}
+
+	Platform::RawInputApi& Runtime::RawInput()
+	{
+		static Platform::RawInputApi s_RawInputApi{};
+		return s_RawInputApi;
 	}
 
 	Host::ConfigMgr& Runtime::Config()
@@ -336,10 +346,9 @@ namespace Raidcore::Nexus
 	GW2::GameBindsApi& Runtime::GameBinds()
 	{
 		static GW2::GameBindsApi s_GameBinds{
-			this->Platform().RawInput(),
+			this->RawInput(),
 			this->Logger(),
 			this->Events(),
-			this->Platform().Window(),
 			Index(EPath::GameBinds)
 		};
 		return s_GameBinds;
@@ -400,18 +409,10 @@ namespace Raidcore::Nexus
 	Runtime::Runtime()
 	{
 		Clockwork::Context::Create();
-
-		this->_PlatformContext = std::make_unique<Platform::Context>();
 	}
 
 	Runtime::~Runtime()
 	{
-		if (this->_PlatformContext)
-		{
-			this->_PlatformContext->Shutdown();
-			this->_PlatformContext.reset();
-		}
-
 		Clockwork::Context::Destroy();
 	}
 }

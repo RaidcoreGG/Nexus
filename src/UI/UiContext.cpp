@@ -207,7 +207,7 @@ namespace Raidcore::Nexus::GUI
 
 		this->FontManager = new CFontManager(aSettings, *this->Language);
 		this->EscapeClose = new CEscapeClosing(aSettings);
-		this->Scaling = new CScaling(Runtime::Get().Platform().Window(), GrWindow, aDataLink, aEventApi, aSettings);
+		this->Scaling = new CScaling(Runtime::Get().WindowHandle, GrWindow, aDataLink, aEventApi, aSettings);
 		this->Input = new CUiInput(aSettings);
 		this->StyleMgr = new StyleManager(aLogger, aSettings);
 
@@ -233,7 +233,7 @@ namespace Raidcore::Nexus::GUI
 			return;
 		}
 
-		if (!(Runtime::Get().Platform().Window() && this->GrWindow.SwapChain))
+		if (!(Runtime::Get().WindowHandle && this->GrWindow.SwapChain))
 		{
 			this->Logger.Critical(LOG_CHANNEL, "Context::Initialize() failed. A RenderContext component was nullptr.");
 			return;
@@ -271,7 +271,7 @@ namespace Raidcore::Nexus::GUI
 		this->Scaling->UpdateDPI(); // Update DPI, because the HWND is now available.
 
 		// Init imgui
-		ImGui_ImplWin32_Init(Runtime::Get().Platform().Window());
+		ImGui_ImplWin32_Init(Runtime::Get().WindowHandle);
 		ImGui_ImplDX11_Init(this->GrWindow.Device, this->GrWindow.DeviceContext);
 		//ImGui::GetIO().ImeWindowHandle = Renderer::WindowHandle;
 
@@ -385,7 +385,7 @@ namespace Raidcore::Nexus::GUI
 					}
 					else
 					{
-						PostMessageA(Runtime::Get().Platform().Window(), WM_CLOSE, 0, 0);
+						PostMessageA(Runtime::Get().WindowHandle, WM_CLOSE, 0, 0);
 					}
 				}
 			}

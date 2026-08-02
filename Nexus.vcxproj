@@ -17,7 +17,6 @@
     <ClCompile Include="src\Host\Library\LibManager.cpp" />
     <ClCompile Include="src\GW2\BuildInfo\BuildInfoService.cpp" />
     <ClCompile Include="src\Network\WebRequests\WreStorage.cpp" />
-    <ClCompile Include="src\Platform\PlContext.cpp" />
     <ClCompile Include="src\Runtime\Runtime.cpp" />
     <ClCompile Include="src\Hooks\Hooks.cpp" />
     <ClCompile Include="src\Network\Updater\Updater.cpp" />
@@ -114,7 +113,6 @@
     <ClInclude Include="src\GW2\BuildInfo\BuildInfoService.h" />
     <ClInclude Include="src\GW2\Mumble\MblExtensions.h" />
     <ClInclude Include="src\Network\WebRequests\WreStorage.h" />
-    <ClInclude Include="src\Platform\PlContext.h" />
     <ClInclude Include="src\Runtime\Runtime.h" />
     <ClInclude Include="src\Hooks\HkConst.h" />
     <ClInclude Include="src\Hooks\HkFuncDefs.h" />

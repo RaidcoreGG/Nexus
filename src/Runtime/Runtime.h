@@ -9,6 +9,7 @@
 #pragma once
 
 #include <memory>
+#include <windows.h>
 
 #include "Core/DataLink/DlApi.h"
 #include "Core/Functions/FnRegistry.h"
@@ -29,7 +30,8 @@
 #include "Inputs/InputBinds/IbApi.h"
 #include "Network/Updater/Updater.h"
 #include "Network/WebRequests/WreStorage.h"
-#include "Platform/PlContext.h"
+#include "Platform/CrashHandler/CrashHandler.h"
+#include "Platform/RawInput/RiApi.h"
 #include "Proxy/PxyEnum.h"
 #include "UI/UiContext.h"
 
@@ -45,6 +47,8 @@ namespace Raidcore::Nexus
 
 		Runtime(Runtime const&) = delete;
 		void operator=(Runtime const&) = delete;
+
+		HWND WindowHandle{ nullptr };
 
 		///----------------------------------------------------------------------------------------------------
 		/// Initialize:
@@ -86,7 +90,17 @@ namespace Raidcore::Nexus
 		///----------------------------------------------------------------------------------------------------
 		Core::SettingsMgr& Settings();
 
-		Platform::Context& Platform();
+		///----------------------------------------------------------------------------------------------------
+		/// CrashHandler:
+		/// 	Returns the crash handler instance.
+		///----------------------------------------------------------------------------------------------------
+		Platform::CrashHandler& CrashHandler();
+
+		///----------------------------------------------------------------------------------------------------
+		/// RawInput:
+		/// 	Returns the raw input API instance.
+		///----------------------------------------------------------------------------------------------------
+		Platform::RawInputApi& RawInput();
 
 		///----------------------------------------------------------------------------------------------------
 		/// Config:
@@ -178,7 +192,6 @@ namespace Raidcore::Nexus
 		Runtime();
 		~Runtime();
 
-		std::unique_ptr<Platform::Context> _PlatformContext{ nullptr };
 		std::unique_ptr<GUI::Context>      _UiContext{ nullptr };
 	};
 }

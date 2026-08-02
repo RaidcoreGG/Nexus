@@ -591,7 +591,7 @@ namespace Raidcore::Nexus::Host::API
 			s_EventApi = &ctx.Events();
 			s_GameBindsApi = &ctx.GameBinds();
 			s_InputBindApi = &ctx.InputBinds();
-			s_RawInputApi = &ctx.Platform().RawInput();
+			s_RawInputApi = &ctx.RawInput();
 			s_Logger = &ctx.Logger();
 			s_TextureApi = &ctx.TextureLoader();
 			s_Loader = &ctx.Loader();

@@ -186,7 +186,7 @@ namespace Hooks
 		{
 			static Runtime&               s_Context      = Runtime::Get();
 			static Input::CInputBindApi&  s_InputBindApi = s_Context.InputBinds();
-			static Platform::RawInputApi& s_RawInputApi  = s_Context.Platform().RawInput();
+			static Platform::RawInputApi& s_RawInputApi  = s_Context.RawInput();
 			static GUI::Context&          s_UIContext    = s_Context.UI();
 			static Host::Loader&          s_Loader       = s_Context.Loader();
 			static GW2::GameBindsApi&     s_GameBindsApi = s_Context.GameBinds();
@@ -237,8 +237,10 @@ namespace Hooks
 				DXGI_SWAP_CHAIN_DESC swapChainDesc{};
 				s_GrWindow.SwapChain->GetDesc(&swapChainDesc);
 
-				Target::WndProc = (WNDPROC)SetWindowLongPtr(swapChainDesc.OutputWindow, GWLP_WNDPROC, (LONG_PTR)Detour::WndProc);
+				s_Context.WindowHandle = swapChainDesc.OutputWindow;
 
+				Target::WndProc = (WNDPROC)SetWindowLongPtr(swapChainDesc.OutputWindow, GWLP_WNDPROC, (LONG_PTR)Detour::WndProc);
+				
 				s_Loader.InitDirectoryUpdates(swapChainDesc.OutputWindow);
 			}
 

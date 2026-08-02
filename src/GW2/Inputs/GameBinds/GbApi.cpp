@@ -8,16 +8,12 @@
 
 #include "GbApi.h"
 
-#include "pugixml/pugixml.hpp"
-
 #include "thirdparty/Clockwork/Clockwork.h"
-namespace Clockwork = Raidcore::Clockwork;
+#include "thirdparty/pugixml/pugixml.hpp"
 
-#include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
-
-#include "Util/Inputs.h"
 #include "GbConst.h"
+#include "Runtime/Runtime.h"
+#include "Util/Inputs.h"
 
 namespace Raidcore::Nexus::GW2
 {
@@ -102,15 +98,13 @@ namespace Raidcore::Nexus::GW2
 
 	GameBindsApi::GameBindsApi(
 		Platform::RawInputApi& aRawInputApi,
-		Core::LogApi& aLogger,
-		Host::EventApi& aEventApi,
-		HWND aGameWindow,
-		std::filesystem::path   aConfigPath
+		Core::LogApi&          aLogger,
+		Host::EventApi&        aEventApi,
+		std::filesystem::path  aConfigPath
 	)
 		: RawInputApi(aRawInputApi)
 		, Logger(aLogger)
 		, EventApi(aEventApi)
-		, GameWindow(aGameWindow)
 	{
 		this->ConfigPath = aConfigPath;
 
@@ -142,10 +136,10 @@ namespace Raidcore::Nexus::GW2
 	{
 		if (uMsg < WM_USER)
 		{
-			return PostMessageA(this->GameWindow, uMsg + WM_PASSTHROUGH_FIRST, wParam, lParam);
+			return PostMessageA(Runtime::Get().WindowHandle, uMsg + WM_PASSTHROUGH_FIRST, wParam, lParam);
 		}
 
-		return PostMessageA(this->GameWindow, uMsg, wParam, lParam);
+		return PostMessageA(Runtime::Get().WindowHandle, uMsg, wParam, lParam);
 	}
 
 	void GameBindsApi::PressAsync(EGameBinds aGameBind)
