@@ -97,7 +97,7 @@ namespace Raidcore::Nexus::Network
 
 	bool Updater::IsUpdateAvailable()
 	{
-		return this->RemoteVersion > Runtime::Get().GetVersion();
+		return this->RemoteVersion > Runtime::Version;
 	}
 
 	const std::string& Updater::GetChangelog()
@@ -226,7 +226,7 @@ namespace Raidcore::Nexus::Network
 		}
 
 		/* Update check and perform logic below. */
-		const Version_t& currentVersion = ctx.GetVersion();
+		const Version_t& currentVersion = Runtime::Version;
 
 		/* These paths in theory should be protected by the mutex, but we safeguard them anyway. */
 		this->CleanupUpdateFiles();

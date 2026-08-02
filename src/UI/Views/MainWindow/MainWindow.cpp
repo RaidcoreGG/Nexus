@@ -355,7 +355,7 @@ namespace Raidcore::Nexus::GUI
 					ImGui::SetCursorPos(ImVec2(offset + offset + tagWidth, (headerHeight - titleSz.y) / 2.0f));
 					ImGui::Text("Nexus");
 
-					std::string v = ctx.GetVersion().string();
+					std::string v = Runtime::Version.string();
 
 					ImVec2 versionSz = ImGui::CalcTextSize(v.c_str());
 

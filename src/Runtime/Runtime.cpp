@@ -19,7 +19,6 @@
 #include "thirdparty/Clockwork/Tasks/CancellationToken.h"
 #include "thirdparty/Clockwork/Tasks/ETaskPriority.h"
 
-#include "Branch.h"
 #include "Core/DataLink/DlApi.h"
 #include "Core/Functions/FnRegistry.h"
 #include "Core/Logging/LogApi.h"
@@ -55,7 +54,6 @@
 #include "Util/CmdLine.h"
 #include "Util/Dll.h"
 #include "Util/Resources.h"
-#include "Version.h"
 
 namespace Raidcore::Nexus
 {
@@ -91,8 +89,8 @@ namespace Raidcore::Nexus
 			"Game: %s\nModule: %s\nNexus %s %s\nEntry method: %d",
 			GetCommandLineA(),
 			Index(EPath::NexusDLL).string().c_str(),
-			ctx.GetVersion().string().c_str(),
-			ctx.GetBuild(),
+			Runtime::Version.string().c_str(),
+			Runtime::Build.c_str(),
 			aEntryFunction
 		);
 
@@ -201,27 +199,6 @@ namespace Raidcore::Nexus
 		/* Let the OS take care of freeing the handles. Ugly, but otherwise crashes due to the addon clownfiesta in GW2. */
 		//if (D3D11Handle) { FreeLibrary(D3D11Handle); }
 		//if (D3D11SystemHandle) { FreeLibrary(D3D11SystemHandle); }
-	}
-
-	Version_t const& Runtime::GetVersion()
-	{
-		static Version_t version =
-		{
-			V_MAJOR,
-			V_MINOR,
-			V_BUILD,
-			V_REVISION
-		};
-		return version;
-	}
-
-	const char* Runtime::GetBuild()
-	{
-#ifdef _DEBUG
-		return "debug/" BRANCH_NAME;
-#else
-		return "release/" BRANCH_NAME;
-#endif
 	}
 
 	Core::LogApi& Runtime::Logger()

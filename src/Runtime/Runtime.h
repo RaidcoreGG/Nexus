@@ -11,6 +11,7 @@
 #include <memory>
 #include <windows.h>
 
+#include "Branch.h"
 #include "Core/DataLink/DlApi.h"
 #include "Core/Functions/FnRegistry.h"
 #include "Core/Logging/LogApi.h"
@@ -34,6 +35,7 @@
 #include "Platform/RawInput/RiApi.h"
 #include "Proxy/PxyEnum.h"
 #include "UI/UiContext.h"
+#include "Version.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus Namespace
@@ -43,12 +45,25 @@ namespace Raidcore::Nexus
 	class Runtime
 	{
 		public:
+		inline static const Version_t Version{
+			V_MAJOR,
+			V_MINOR,
+			V_BUILD,
+			V_REVISION
+		};
+
+#ifdef _DEBUG
+		inline static const std::string Build{"debug/" BRANCH_NAME};
+#else
+		inline static const std::string Build{"release/" BRANCH_NAME};
+#endif
+
+		HWND WindowHandle{ nullptr };
+
 		static Runtime& Get();
 
 		Runtime(Runtime const&) = delete;
 		void operator=(Runtime const&) = delete;
-
-		HWND WindowHandle{ nullptr };
 
 		///----------------------------------------------------------------------------------------------------
 		/// Initialize:
@@ -61,10 +76,6 @@ namespace Raidcore::Nexus
 		/// 	Shuts down the addon engine.
 		///----------------------------------------------------------------------------------------------------
 		void Shutdown(unsigned int aReason);
-
-		Version_t const& GetVersion();
-
-		const char* GetBuild();
 
 		///----------------------------------------------------------------------------------------------------
 		/// Logger:
@@ -186,12 +197,14 @@ namespace Raidcore::Nexus
 		///----------------------------------------------------------------------------------------------------
 		Network::ClientStorage& HttpClientStorage();
 
+		///----------------------------------------------------------------------------------------------------
+		/// UI:
+		/// 	Returns the UI context instance.
+		///----------------------------------------------------------------------------------------------------
 		GUI::Context& UI();
 
 		private:
 		Runtime();
 		~Runtime();
-
-		std::unique_ptr<GUI::Context>      _UiContext{ nullptr };
 	};
 }
