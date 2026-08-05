@@ -19,24 +19,22 @@
 
 #include "minhook/mh_hook.h"
 
-#include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
-
-#include "Core/NexusLink.h"
 #include "Core/DataLink/DlApi.h"
-#include "Host/Events/EvtApi.h"
-#include "Inputs/InputBinds/IbApi.h"
-#include "Host/Loader/Loader.h"
 #include "Core/Logging/LogApi.h"
+#include "Core/NexusLink.h"
+#include "Graphics/Textures/TxLoader.h"
 #include "GW2/Inputs/GameBinds/GbApi.h"
 #include "GW2/Inputs/MouseResetFix.h"
 #include "HkConst.h"
 #include "HkFuncDefs.h"
-#include "Graphics/Textures/TxLoader.h"
+#include "Host/Events/EvtApi.h"
+#include "Host/Loader/Loader.h"
+#include "Inputs/InputBinds/IbApi.h"
+#include "Runtime/Runtime.h"
 #include "UI/UiContext.h"
 #include "Util/CmdLine.h"
 
-namespace Hooks
+namespace Raidcore::Nexus::Hooks
 {
 	constexpr const char* LOG_CHANNEL = "Hooks";
 

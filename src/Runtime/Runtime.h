@@ -53,9 +53,9 @@ namespace Raidcore::Nexus
 		};
 
 #ifdef _DEBUG
-		inline static const std::string Build{"debug/" BRANCH_NAME};
+		inline static const std::string Build{ "debug/" BRANCH_NAME };
 #else
-		inline static const std::string Build{"release/" BRANCH_NAME};
+		inline static const std::string Build{ "release/" BRANCH_NAME };
 #endif
 
 		HWND WindowHandle{ nullptr };
