@@ -10,8 +10,8 @@
 
 #include <shlobj.h>
 
-#include "Util/Strings.h"
-#include "Util/MD5.h"
+#include "thirdparty/Util/Strings.h"
+#include "thirdparty/Util/MD5.h"
 
 namespace Raidcore::Nexus::Host
 {

@@ -13,15 +13,12 @@
 
 #pragma warning(push, 0)
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb/stb_image.h"
-#include "httplib/httplib.h"
+#include "thirdparty/stb/stb_image.h"
+#include "thirdparty/httplib/httplib.h"
 #pragma warning(pop)
-
 #include "thirdparty/Clockwork/Dispatcher.h"
-namespace Clockwork = Raidcore::Clockwork;
-
-#include "Util/Time.h"
-#include "Util/Url.h"
+#include "thirdparty/Util/Time.h"
+#include "thirdparty/Util/Url.h"
 
 namespace Raidcore::Nexus::Graphics
 {

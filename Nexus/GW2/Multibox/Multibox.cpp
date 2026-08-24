@@ -9,15 +9,15 @@
 #include "Multibox.h"
 
 #define UMDF_USING_NTSTATUS
-#include <Windows.h>
+#include <windows.h>
 #include <winternl.h>
 #include <ntstatus.h>
 #include <vector>
 #include <string>
 
-#include "Util/Strings.h"
-#include "Util/DLL.h"
-#include "Util/CmdLine.h"
+#include "thirdparty/Util/Strings.h"
+#include "thirdparty/Util/DLL.h"
+#include "thirdparty/Util/CmdLine.h"
 
 typedef struct _SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX
 {

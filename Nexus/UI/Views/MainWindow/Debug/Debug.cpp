@@ -10,17 +10,15 @@
 
 #include <unordered_map>
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_extensions.h"
+#include "thirdparty/imgui/imgui.h"
+#include "thirdparty/imgui/imgui_extensions.h"
+#include "thirdparty/Util/MD5.h"
+#include "thirdparty/Util/Strings.h"
 
 #include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
-
 #include "Host/Events/EvtApi.h"
 #include "Inputs/InputBinds/IbApi.h"
 #include "res/ResConst.h"
-#include "Util/MD5.h"
-#include "Util/Strings.h"
 
 namespace Raidcore::Nexus::GUI
 {

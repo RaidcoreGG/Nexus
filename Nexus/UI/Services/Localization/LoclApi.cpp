@@ -12,12 +12,12 @@
 #include <windows.h>
 
 #pragma warning(push, 0)
-#include "nlohmann/json.hpp"
+#include "thirdparty/nlohmann/json.hpp"
 #pragma warning(pop)
 using json = nlohmann::json;
+#include "thirdparty/Util/Dll.h"
+#include "thirdparty/Util/Resources.h"
 
-#include "Util/Dll.h"
-#include "Util/Resources.h"
 #include "Index/Index.h"
 #include "res/ResConst.h"
 #include "Core/Settings/SettingsConst.h"

@@ -10,14 +10,12 @@
 
 #include <shellapi.h>
 
-#include "imgui/imgui.h"
-#include "ImAnimate/ImAnimate.h"
+#include "thirdparty/imgui/imgui.h"
+#include "thirdparty/ImAnimate/ImAnimate.h"
+#include "thirdparty/Util/DLL.h"
 
 #include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
-
 #include "res/ResConst.h"
-#include "Util/DLL.h"
 
 namespace Raidcore::Nexus::GUI
 {

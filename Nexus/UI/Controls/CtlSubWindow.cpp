@@ -8,15 +8,13 @@
 
 #include "CtlSubWindow.h"
 
-#include "imgui/imgui_extensions.h"
-#include "imgui/imgui.h"
-#include "imgui/imgui_internal.h"
+#include "thirdparty/imgui/imgui_extensions.h"
+#include "thirdparty/imgui/imgui.h"
+#include "thirdparty/imgui/imgui_internal.h"
+#include "thirdparty/Util/DLL.h"
 
 #include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
-
 #include "res/ResConst.h"
-#include "Util/DLL.h"
 
 namespace Raidcore::Nexus::GUI
 {

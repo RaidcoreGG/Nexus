@@ -13,15 +13,13 @@
 #include <string>
 
 #pragma warning(push, 0)
-#include "nlohmann/json.hpp"
+#include "thirdparty/nlohmann/json.hpp"
 #pragma warning(pop)
 using json = nlohmann::json;
-
 #include "thirdparty/Clockwork/Clockwork.h"
-namespace Clockwork = Raidcore::Clockwork;
+#include "thirdparty/Util/Inputs.h"
 
 #include "IbConst.h"
-#include "Util/Inputs.h"
 
 namespace Raidcore::Nexus::Input
 {

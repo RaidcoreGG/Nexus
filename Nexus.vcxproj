@@ -143,7 +143,6 @@
     <ClInclude Include="Nexus\Host\Loader\Loader.h" />
     <ClInclude Include="Nexus\Network\WebRequests\WreCache.h" />
     <ClInclude Include="Nexus\Network\WebRequests\WreConst.h" />
-    <ClInclude Include="Nexus\Engine\Verifier.h" />
     <ClInclude Include="Nexus\Memory\IRefCleaner.h" />
     <ClInclude Include="Nexus\GW2\ArcDPS\ArcApi.h" />
     <ClInclude Include="Nexus\GW2\ArcDPS\ArcEnum.h" />
@@ -473,7 +472,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)thirdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)thirdparty\;$(SolutionDir)thirdparty\imgui\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8 /Zc:__cplusplus</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -510,7 +509,7 @@ CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)thirdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)thirdparty\;$(SolutionDir)thirdparty\imgui\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8 /Zc:__cplusplus</AdditionalOptions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>

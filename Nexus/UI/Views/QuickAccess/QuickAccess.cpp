@@ -8,20 +8,18 @@
 
 #include "QuickAccess.h"
 
-#include "ImAnimate/ImAnimate.h"
+#include "thirdparty/ImAnimate/ImAnimate.h"
 #define IMGUI_DEFINE_MATH_OPERATORS
-#include "imgui/imgui_internal.h"
+#include "thirdparty/imgui/imgui_internal.h"
+#include "thirdparty/Util/DLL.h"
+#include "thirdparty/Util/Time.h"
 
 #include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
-
 #include "Host/Addons/AddConst.h"
 #include "Core/Settings/SettingsConst.h"
 #include "Core/Settings/SettingsMgr.h"
 #include "res/ResConst.h"
 #include "UI/UIContext.h"
-#include "Util/DLL.h"
-#include "Util/Time.h"
 
 #define GW2_QUICKACCESS_ITEMS 10;
 

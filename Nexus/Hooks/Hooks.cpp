@@ -17,7 +17,8 @@
 #include <dxgiformat.h>
 #include <windows.h>
 
-#include "minhook/mh_hook.h"
+#include "thirdparty/minhook/mh_hook.h"
+#include "thirdparty/Util/CmdLine.h"
 
 #include "Core/DataLink/DlApi.h"
 #include "Core/Logging/LogApi.h"
@@ -32,7 +33,6 @@
 #include "Inputs/InputBinds/IbApi.h"
 #include "Runtime/Runtime.h"
 #include "UI/UiContext.h"
-#include "Util/CmdLine.h"
 
 namespace Raidcore::Nexus::Hooks
 {

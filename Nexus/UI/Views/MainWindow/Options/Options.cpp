@@ -10,20 +10,18 @@
 
 #include <shellapi.h>
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_extensions.h"
+#include "thirdparty/imgui/imgui.h"
+#include "thirdparty/imgui/imgui_extensions.h"
+#include "thirdparty/Util/Base64.h"
+#include "thirdparty/Util/DLL.h"
+#include "thirdparty/Util/Inputs.h"
+#include "thirdparty/Util/Time.h"
 
 #include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
-
 #include "Index/Index.h"
 #include "Core/Settings/SettingsConst.h"
 #include "res/ResConst.h"
 #include "UI/Views/QuickAccess/QaConst.h"
-#include "Util/Base64.h"
-#include "Util/DLL.h"
-#include "Util/Inputs.h"
-#include "Util/Time.h"
 
 namespace Raidcore::Nexus::GUI
 {

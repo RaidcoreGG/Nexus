@@ -11,12 +11,11 @@
 #include <fstream>
 
 #pragma warning(push, 0)
-#include "nlohmann/json.hpp"
+#include "thirdparty/nlohmann/json.hpp"
 #pragma warning(pop)
 using json = nlohmann::json;
-
-#include "Util/CmdLine.h"
-#include "Util/Strings.h"
+#include "thirdparty/Util/CmdLine.h"
+#include "thirdparty/Util/Strings.h"
 
 namespace Raidcore::Nexus::Host
 {

@@ -12,7 +12,7 @@
 #include <string>
 #include <windows.h>
 
-#include "Util/Dll.h"
+#include "thirdparty/Util/Dll.h"
 
 #ifndef PROXY
 #define PROXY extern "C"

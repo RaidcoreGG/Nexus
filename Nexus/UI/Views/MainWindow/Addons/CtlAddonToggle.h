@@ -10,12 +10,10 @@
 
 #include <string>
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_extensions.h"
+#include "thirdparty/imgui/imgui.h"
+#include "thirdparty/imgui/imgui_extensions.h"
 
 #include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
-
 #include "Host/Addons/Addon.h"
 
 ///----------------------------------------------------------------------------------------------------

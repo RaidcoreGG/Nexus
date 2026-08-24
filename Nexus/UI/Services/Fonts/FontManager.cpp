@@ -10,15 +10,13 @@
 
 #include <filesystem>
 
-#include "imgui/imgui_internal.h"
+#include "thirdparty/imgui/imgui_internal.h"
+#include "thirdparty/Util/Resources.h"
+#include "thirdparty/Util/DLL.h"
 
 #include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
-
 #include "Core/Settings/SettingsConst.h"
 #include "res/ResConst.h"
-#include "Util/Resources.h"
-#include "Util/DLL.h"
 
 namespace Raidcore::Nexus::GUI
 {

@@ -10,14 +10,12 @@
 
 #include <string>
 
-#include "imgui/imgui.h"
+#include "thirdparty/imgui/imgui.h"
+#include "thirdparty/Util/Base64.h"
 
 #include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
-
 #include "Index/Index.h"
 #include "Core/Settings/SettingsConst.h"
-#include "Util/Base64.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::GUI Namespace

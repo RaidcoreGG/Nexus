@@ -10,18 +10,16 @@
 
 #include <shellapi.h>
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_extensions.h"
+#include "thirdparty/imgui/imgui.h"
+#include "thirdparty/imgui/imgui_extensions.h"
+#include "thirdparty/Util/DLL.h"
+#include "thirdparty/Util/Strings.h"
 
 #include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
-
 #include "Host/Library/LibAddon.h"
 #include "Index/Index.h"
 #include "CtlAddonToggle.h"
 #include "res/ResConst.h"
-#include "Util/DLL.h"
-#include "Util/Strings.h"
 
 namespace Raidcore::Nexus::GUI
 {

@@ -9,8 +9,9 @@
 #pragma once
 
 #include <cstdint>
-#include <imgui.h>
 #include <windows.h>
+
+#include "thirdparty/imgui/imgui.h"
 
 #include "Core/Logging/LogEnum.h"
 #include "Graphics/Textures/TxQueueEntry.h"

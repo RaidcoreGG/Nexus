@@ -11,8 +11,8 @@
 #include <windows.h>
 #include <unordered_map>
 
-#include "Util/Inputs.h"
-#include "Util/Strings.h"
+#include "thirdparty/Util/Inputs.h"
+#include "thirdparty/Util/Strings.h"
 
 namespace Raidcore::Nexus::Input
 {

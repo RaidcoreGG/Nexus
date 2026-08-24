@@ -10,11 +10,9 @@
 
 #include <fstream>
 
-#include "imgui/imgui.h"
+#include "thirdparty/imgui/imgui.h"
 
 #include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
-
 #include "Index/Index.h"
 
 namespace Raidcore::Nexus::GUI

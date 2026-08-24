@@ -10,17 +10,15 @@
 
 #include <map>
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_extensions.h"
+#include "thirdparty/imgui/imgui.h"
+#include "thirdparty/imgui/imgui_extensions.h"
+#include "thirdparty/Util/Time.h"
 
 #include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
-
 #include "Index/Index.h"
 #include "Inputs/InputBinds/IbMapping.h"
 #include "GW2/Inputs/GameBinds/GbConst.h"
 #include "res/ResConst.h"
-#include "Util/Time.h"
 
 namespace Raidcore::Nexus::GUI
 {

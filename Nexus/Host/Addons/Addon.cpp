@@ -14,18 +14,17 @@
 #include <regex>
 #include <windows.h>
 
-#include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
+#include "thirdparty/Util/DLL.h"
+#include "thirdparty/Util/MD5.h"
+#include "thirdparty/Util/Paths.h"
+#include "thirdparty/Util/Strings.h"
+#include "thirdparty/Util/Time.h"
+#include "thirdparty/Util/URL.h"
 
+#include "Runtime/Runtime.h"
 #include "Host/Addons/API/ApiBuilder.h"
 #include "Index/Index.h"
 #include "Memory/RefCleanerContext.h"
-#include "Util/DLL.h"
-#include "Util/MD5.h"
-#include "Util/Paths.h"
-#include "Util/Strings.h"
-#include "Util/Time.h"
-#include "Util/URL.h"
 
 #define SCHEDULED_UPDATE_TIMEOUT                 3600
 #define SCHEDULED_UPDATE_TIMEOUT_VERSIONDISABLED 300

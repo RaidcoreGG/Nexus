@@ -8,7 +8,7 @@
 
 #include "IbCapture.h"
 
-#include "Util/Inputs.h"
+#include "thirdparty/Util/Inputs.h"
 
 namespace Raidcore::Nexus::Input
 {

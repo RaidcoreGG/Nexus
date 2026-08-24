@@ -10,18 +10,16 @@
 
 #include <assert.h>
 
-#include "imgui/imgui.h"
+#include "thirdparty/imgui/imgui.h"
 #define IMGUI_DEFINE_MATH_OPERATORS
-#include "imgui/imgui_internal.h"
+#include "thirdparty/imgui/imgui_internal.h"
+#include "thirdparty/Util/DLL.h"
 
 #include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
-
 #include "Host/Addons/Addon.h"
 #include "Inputs/InputBinds/IbConst.h"
 #include "res/ResConst.h"
 #include "UI/UiContext.h"
-#include "Util/DLL.h"
 
 namespace Raidcore::Nexus::GUI
 {

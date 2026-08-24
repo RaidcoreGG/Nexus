@@ -9,19 +9,15 @@
 #include "MblReader.h"
 
 #include "thirdparty/Clockwork/Clockwork.h"
-namespace Clockwork = Raidcore::Clockwork;
-
 #pragma warning(push, 0)
-#include "nlohmann/json.hpp"
+#include "thirdparty/nlohmann/json.hpp"
 #pragma warning(pop)
 using json = nlohmann::json;
+#include "thirdparty/Util/CmdLine.h"
 
 using namespace Mumble;
 
 #include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
-
-#include "Util/CmdLine.h"
 #include "MblExtensions.h"
 
 namespace Raidcore::Nexus::GW2

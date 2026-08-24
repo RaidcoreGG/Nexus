@@ -10,8 +10,8 @@
 
 #include <cstdint>
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_internal.h"
+#include "thirdparty/imgui/imgui.h"
+#include "thirdparty/imgui/imgui_internal.h"
 
 #include "Core/Settings/SettingsConst.h"
 

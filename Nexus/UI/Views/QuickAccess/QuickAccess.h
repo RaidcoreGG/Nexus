@@ -13,7 +13,7 @@
 #include <mutex>
 #include <string>
 
-#include "imgui/imgui.h"
+#include "thirdparty/imgui/imgui.h"
 
 #include "Core/NexusLink.h"
 #include "Memory/IRefCleaner.h"

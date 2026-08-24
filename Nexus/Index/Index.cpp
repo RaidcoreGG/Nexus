@@ -10,7 +10,7 @@
 
 #include <shlobj.h>
 
-#include "Util/DLL.h"
+#include "thirdparty/Util/DLL.h"
 
 namespace Raidcore::Nexus
 {

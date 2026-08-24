@@ -8,16 +8,14 @@
 
 #include "SnowflakeMgr.h"
 
-#include "imgui/imgui_extensions.h"
-#include "imgui/imgui_internal.h"
+#include "thirdparty/imgui/imgui_extensions.h"
+#include "thirdparty/imgui/imgui_internal.h"
+#include "thirdparty/ImAnimate/ImAnimate.h"
+#include "thirdparty/Util/DLL.h"
+#include "thirdparty/Util/Time.h"
 
 #include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
-
-#include "ImAnimate/ImAnimate.h"
 #include "res/ResConst.h"
-#include "Util/DLL.h"
-#include "Util/Time.h"
 #include "Core/Settings/SettingsConst.h"
 
 namespace Raidcore::Nexus::GUI

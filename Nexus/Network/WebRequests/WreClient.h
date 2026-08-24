@@ -14,7 +14,7 @@
 #include <string>
 
 #pragma warning(push, 0)
-#include "httplib/httplib.h"
+#include "thirdparty/httplib/httplib.h"
 #pragma warning(pop)
 
 #include "Core/Logging/LogApi.h"

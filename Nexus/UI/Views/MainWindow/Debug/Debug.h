@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "imgui/imgui_memory_editor.h"
+#include "thirdparty/imgui/imgui_memory_editor.h"
 
 #include "UI/Controls/CtlSubWindow.h"
 #include "UI/Views/MumbleInspector/MumbleInspector.h"

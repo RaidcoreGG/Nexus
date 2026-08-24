@@ -11,7 +11,8 @@
 #include <windows.h>
 #include <cassert>
 
-#include "imgui/imgui.h"
+#include "thirdparty/imgui/imgui.h"
+#include "thirdparty/Mumble/Mumble.h"
 
 #include "Hooks/HkConst.h"
 #include "Core/Settings/SettingsConst.h"
@@ -22,7 +23,6 @@
 #include "Graphics/GrWindow.h"
 #include "GW2/Mumble/MblReader.h"
 #include "Host/Events/EvtApi.h"
-#include "Mumble/Mumble.h"
 
 using namespace Raidcore::Nexus;
 

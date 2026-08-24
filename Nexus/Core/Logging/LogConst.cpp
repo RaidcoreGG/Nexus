@@ -12,7 +12,7 @@
 #include <iomanip>
 #include <sstream>
 
-#include "Util/Strings.h"
+#include "thirdparty/Util/Strings.h"
 
 namespace Raidcore::Nexus::Core
 {

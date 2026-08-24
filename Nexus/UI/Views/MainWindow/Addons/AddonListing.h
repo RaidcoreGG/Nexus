@@ -11,12 +11,11 @@
 #include <string>
 #include <unordered_map>
 
+#include "thirdparty/Util/Strings.h"
+
 #include "Host/Addons/Addon.h"
 #include "Host/Library/LibAddon.h"
 #include "UI/UiBinds.h"
-#include "Util/Strings.h"
-
-using namespace Raidcore::Nexus;
 
 using ArcExtensionDef_t = GW2::ArcDPS::ExtensionDef_t;
 

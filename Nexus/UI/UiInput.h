@@ -11,8 +11,9 @@
 #include <atomic>
 #include <cstdint>
 
+#include "thirdparty/Util/Inputs.h"
+
 #include "Core/Settings/SettingsMgr.h"
-#include "Util/Inputs.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus::GUI Namespace

@@ -8,10 +8,9 @@
 
 #include "CtlModal.h"
 
-#include "imgui/imgui.h"
+#include "thirdparty/imgui/imgui.h"
 
 #include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
 
 namespace Raidcore::Nexus::GUI
 {

@@ -18,9 +18,11 @@
 #include <vector>
 #include <windows.h>
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_dx11.h"
-#include "imgui/imgui_impl_win32.h"
+#include "thirdparty/imgui/imgui.h"
+#include "thirdparty/imgui/imgui_impl_dx11.h"
+#include "thirdparty/imgui/imgui_impl_win32.h"
+#include "thirdparty/Util/DLL.h"
+#include "thirdparty/Mumble/Mumble.h"
 
 #include "Core/DataLink/DlApi.h"
 #include "Core/Logging/LogApi.h"
@@ -36,7 +38,6 @@
 #include "Inputs/InputBinds/IbApi.h"
 #include "Inputs/InputBinds/IbEnum.h"
 #include "Memory/IRefCleaner.h"
-#include "Mumble/Mumble.h"
 #include "res/ResConst.h"
 #include "Runtime/Runtime.h"
 #include "Services/Fonts/FontManager.h"
@@ -47,7 +48,6 @@
 #include "UiEnum.h"
 #include "UiFuncDefs.h"
 #include "UiInput.h"
-#include "Util/DLL.h"
 #include "Views/Alerts/Alerts.h"
 #include "Views/MainWindow/MainWindow.h"
 #include "Views/QuickAccess/QuickAccess.h"

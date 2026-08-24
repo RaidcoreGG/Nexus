@@ -18,13 +18,10 @@
 #include <vector>
 #include <windows.h>
 
-
-#include "imgui.h"
-#include "minhook/mh_hook.h"
+#include "thirdparty/imgui/imgui.h"
+#include "thirdparty/minhook/mh_hook.h"
 
 #include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
-
 #include "ApiV1.h"
 #include "ApiV2.h"
 #include "ApiV3.h"

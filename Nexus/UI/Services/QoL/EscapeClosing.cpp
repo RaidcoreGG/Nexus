@@ -8,15 +8,13 @@
 
 #include "EscapeClosing.h"
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_internal.h"
+#include "thirdparty/imgui/imgui.h"
+#include "thirdparty/imgui/imgui_internal.h"
+#include "thirdparty/Util/Inputs.h"
 
 #include "Runtime/Runtime.h"
-using namespace Raidcore::Nexus;
-
 #include "Core/Settings/SettingsConst.h"
 #include "Core/Settings/SettingsMgr.h"
-#include "Util/Inputs.h"
 
 namespace Raidcore::Nexus::GUI
 {
