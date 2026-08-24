@@ -11,37 +11,37 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Host\Addons\Addon.cpp" />
-    <ClCompile Include="src\Host\Config\CfgManager.cpp" />
-    <ClCompile Include="src\Host\Library\LibAddon.cpp" />
-    <ClCompile Include="src\Host\Library\LibManager.cpp" />
-    <ClCompile Include="src\GW2\BuildInfo\BuildInfoService.cpp" />
-    <ClCompile Include="src\Network\WebRequests\WreStorage.cpp" />
-    <ClCompile Include="src\Runtime\Runtime.cpp" />
-    <ClCompile Include="src\Hooks\Hooks.cpp" />
-    <ClCompile Include="src\Network\Updater\Updater.cpp" />
-    <ClCompile Include="src\Memory\IRefCleaner.cpp" />
-    <ClCompile Include="src\Memory\RefCleanerContext.cpp" />
-    <ClCompile Include="src\Platform\CrashHandler\CrashHandler.cpp" />
-    <ClCompile Include="src\Core\Functions\FnRegistry.cpp" />
-    <ClCompile Include="src\Index\Index.cpp" />
-    <ClCompile Include="src\Host\Loader\LdrAddonBase.cpp" />
-    <ClCompile Include="src\Host\Loader\Loader.cpp" />
-    <ClCompile Include="src\Network\WebRequests\WreCache.cpp" />
-    <ClCompile Include="src\Network\WebRequests\WreConst.cpp" />
-    <ClCompile Include="src\GW2\ArcDPS\ArcApi.cpp" />
-    <ClCompile Include="src\GW2\Inputs\GameBinds\GbApi.cpp" />
-    <ClCompile Include="src\GW2\Inputs\GameBinds\GbConst.cpp" />
-    <ClCompile Include="src\Inputs\InputBinds\IbCapture.cpp" />
-    <ClCompile Include="src\Inputs\InputBinds\IbConst.cpp" />
-    <ClCompile Include="src\Host\Addons\API\ApiBuilder.cpp" />
-    <ClCompile Include="src\Network\WebRequests\WreClient.cpp" />
-    <ClCompile Include="src\Core\DataLink\DlApi.cpp" />
-    <ClCompile Include="src\GW2\Mumble\MblConst.cpp" />
-    <ClCompile Include="src\Host\Events\EvtApi.cpp" />
-    <ClCompile Include="src\Core\Logging\LogConst.cpp" />
-    <ClCompile Include="src\Proxy\PxyD3D9.cpp" />
-    <ClCompile Include="src\Proxy\PxyDXGI.cpp" />
+    <ClCompile Include="Nexus\Host\Addons\Addon.cpp" />
+    <ClCompile Include="Nexus\Host\Config\CfgManager.cpp" />
+    <ClCompile Include="Nexus\Host\Library\LibAddon.cpp" />
+    <ClCompile Include="Nexus\Host\Library\LibManager.cpp" />
+    <ClCompile Include="Nexus\GW2\BuildInfo\BuildInfoService.cpp" />
+    <ClCompile Include="Nexus\Network\WebRequests\WreStorage.cpp" />
+    <ClCompile Include="Nexus\Runtime\Runtime.cpp" />
+    <ClCompile Include="Nexus\Hooks\Hooks.cpp" />
+    <ClCompile Include="Nexus\Network\Updater\Updater.cpp" />
+    <ClCompile Include="Nexus\Memory\IRefCleaner.cpp" />
+    <ClCompile Include="Nexus\Memory\RefCleanerContext.cpp" />
+    <ClCompile Include="Nexus\Platform\CrashHandler\CrashHandler.cpp" />
+    <ClCompile Include="Nexus\Core\Functions\FnRegistry.cpp" />
+    <ClCompile Include="Nexus\Index\Index.cpp" />
+    <ClCompile Include="Nexus\Host\Loader\LdrAddonBase.cpp" />
+    <ClCompile Include="Nexus\Host\Loader\Loader.cpp" />
+    <ClCompile Include="Nexus\Network\WebRequests\WreCache.cpp" />
+    <ClCompile Include="Nexus\Network\WebRequests\WreConst.cpp" />
+    <ClCompile Include="Nexus\GW2\ArcDPS\ArcApi.cpp" />
+    <ClCompile Include="Nexus\GW2\Inputs\GameBinds\GbApi.cpp" />
+    <ClCompile Include="Nexus\GW2\Inputs\GameBinds\GbConst.cpp" />
+    <ClCompile Include="Nexus\Inputs\InputBinds\IbCapture.cpp" />
+    <ClCompile Include="Nexus\Inputs\InputBinds\IbConst.cpp" />
+    <ClCompile Include="Nexus\Host\Addons\API\ApiBuilder.cpp" />
+    <ClCompile Include="Nexus\Network\WebRequests\WreClient.cpp" />
+    <ClCompile Include="Nexus\Core\DataLink\DlApi.cpp" />
+    <ClCompile Include="Nexus\GW2\Mumble\MblConst.cpp" />
+    <ClCompile Include="Nexus\Host\Events\EvtApi.cpp" />
+    <ClCompile Include="Nexus\Core\Logging\LogConst.cpp" />
+    <ClCompile Include="Nexus\Proxy\PxyD3D9.cpp" />
+    <ClCompile Include="Nexus\Proxy\PxyDXGI.cpp" />
     <ClCompile Include="thirdparty\Clockwork\Clockwork.cpp" />
     <ClCompile Include="thirdparty\ImAnimate\ImAnimate.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui.cpp" />
@@ -50,146 +50,143 @@
     <ClCompile Include="thirdparty\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui_tables.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\Inputs\InputBinds\IbBindV2.cpp" />
-    <ClCompile Include="src\Inputs\InputBinds\IbApi.cpp" />
-    <ClCompile Include="src\Core\Logging\LogWriter.cpp" />
-    <ClCompile Include="src\Core\Logging\ILogger.cpp" />
-    <ClCompile Include="src\Core\Logging\LogApi.cpp" />
-    <ClCompile Include="src\Core\Logging\LogConsole.cpp" />
+    <ClCompile Include="Nexus\Inputs\InputBinds\IbBindV2.cpp" />
+    <ClCompile Include="Nexus\Inputs\InputBinds\IbApi.cpp" />
+    <ClCompile Include="Nexus\Core\Logging\LogWriter.cpp" />
+    <ClCompile Include="Nexus\Core\Logging\ILogger.cpp" />
+    <ClCompile Include="Nexus\Core\Logging\LogApi.cpp" />
+    <ClCompile Include="Nexus\Core\Logging\LogConsole.cpp" />
     <ClCompile Include="thirdparty\minhook\mh_buffer.cpp" />
     <ClCompile Include="thirdparty\minhook\mh_disasm.cpp" />
     <ClCompile Include="thirdparty\minhook\mh_hook.cpp" />
     <ClCompile Include="thirdparty\minhook\mh_trampoline.cpp" />
-    <ClCompile Include="src\GW2\Multibox\Multibox.cpp" />
-    <ClCompile Include="src\GW2\Mumble\MblReader.cpp" />
-    <ClCompile Include="src\Proxy\PxyD3D11.cpp" />
-    <ClCompile Include="src\Core\Settings\SettingsMgr.cpp" />
-    <ClCompile Include="src\Graphics\Textures\TxLoader.cpp" />
+    <ClCompile Include="Nexus\GW2\Multibox\Multibox.cpp" />
+    <ClCompile Include="Nexus\GW2\Mumble\MblReader.cpp" />
+    <ClCompile Include="Nexus\Proxy\PxyD3D11.cpp" />
+    <ClCompile Include="Nexus\Core\Settings\SettingsMgr.cpp" />
+    <ClCompile Include="Nexus\Graphics\Textures\TxLoader.cpp" />
     <ClCompile Include="thirdparty\pugixml\pugixml.cpp" />
-    <ClCompile Include="src\UI\Controls\CtlContextMenu.cpp" />
-    <ClCompile Include="src\UI\Controls\CtlModal.cpp" />
-    <ClCompile Include="src\UI\Controls\CtlSubWindow.cpp" />
-    <ClCompile Include="src\UI\Controls\CtlWindow.cpp" />
-    <ClCompile Include="src\UI\Views\MumbleInspector\MumbleInspector.cpp" />
-    <ClCompile Include="src\UI\Services\Fonts\FontManager.cpp" />
-    <ClCompile Include="src\UI\Services\Localization\LoclApi.cpp" />
-    <ClCompile Include="src\UI\Services\QoL\EscapeClosing.cpp" />
-    <ClCompile Include="src\UI\UiBinds.cpp" />
-    <ClCompile Include="src\UI\UiContext.cpp" />
-    <ClCompile Include="src\UI\UiInput.cpp" />
-    <ClCompile Include="src\UI\Services\Scaling\Scaling.cpp" />
-    <ClCompile Include="src\UI\Services\Styles\StyleMgr.cpp" />
-    <ClCompile Include="src\UI\Views\Alerts\Alerts.cpp" />
-    <ClCompile Include="src\UI\Views\EULA\LicenseAgreementModal.cpp" />
-    <ClCompile Include="src\UI\Views\MainWindow\About\About.cpp" />
-    <ClCompile Include="src\UI\Views\MainWindow\Addons\Addons.cpp" />
-    <ClCompile Include="src\UI\Views\MainWindow\Addons\CmAddon.cpp" />
-    <ClCompile Include="src\UI\Views\MainWindow\Addons\LoadConfirmationModal.cpp" />
-    <ClCompile Include="src\UI\Views\MainWindow\Addons\UninstallConfirmationModal.cpp" />
-    <ClCompile Include="src\UI\Views\MainWindow\Binds\Binds.cpp" />
-    <ClCompile Include="src\UI\Views\MainWindow\Binds\BindSetterModal.cpp" />
-    <ClCompile Include="src\UI\Views\MainWindow\Debug\Debug.cpp" />
-    <ClCompile Include="src\UI\Views\MainWindow\Log\Log.cpp" />
-    <ClCompile Include="src\UI\Views\MainWindow\MainWindow.cpp" />
-    <ClCompile Include="src\UI\Views\MainWindow\Options\ExportStyleModal.cpp" />
-    <ClCompile Include="src\UI\Views\MainWindow\Options\ImportStyleModal.cpp" />
-    <ClCompile Include="src\UI\Views\MainWindow\Options\Options.cpp" />
-    <ClCompile Include="src\UI\Views\MainWindow\SnowflakeMgr.cpp" />
-    <ClCompile Include="src\UI\Views\QuickAccess\QaConst.cpp" />
-    <ClCompile Include="src\UI\Views\QuickAccess\QaShortcut.cpp" />
-    <ClCompile Include="src\UI\Views\QuickAccess\QuickAccess.cpp" />
-    <ClCompile Include="src\Platform\RawInput\RiApi.cpp" />
+    <ClCompile Include="Nexus\UI\Controls\CtlContextMenu.cpp" />
+    <ClCompile Include="Nexus\UI\Controls\CtlModal.cpp" />
+    <ClCompile Include="Nexus\UI\Controls\CtlSubWindow.cpp" />
+    <ClCompile Include="Nexus\UI\Controls\CtlWindow.cpp" />
+    <ClCompile Include="Nexus\UI\Views\MumbleInspector\MumbleInspector.cpp" />
+    <ClCompile Include="Nexus\UI\Services\Fonts\FontManager.cpp" />
+    <ClCompile Include="Nexus\UI\Services\Localization\LoclApi.cpp" />
+    <ClCompile Include="Nexus\UI\Services\QoL\EscapeClosing.cpp" />
+    <ClCompile Include="Nexus\UI\UiBinds.cpp" />
+    <ClCompile Include="Nexus\UI\UiContext.cpp" />
+    <ClCompile Include="Nexus\UI\UiInput.cpp" />
+    <ClCompile Include="Nexus\UI\Services\Scaling\Scaling.cpp" />
+    <ClCompile Include="Nexus\UI\Services\Styles\StyleMgr.cpp" />
+    <ClCompile Include="Nexus\UI\Views\Alerts\Alerts.cpp" />
+    <ClCompile Include="Nexus\UI\Views\EULA\LicenseAgreementModal.cpp" />
+    <ClCompile Include="Nexus\UI\Views\MainWindow\About\About.cpp" />
+    <ClCompile Include="Nexus\UI\Views\MainWindow\Addons\Addons.cpp" />
+    <ClCompile Include="Nexus\UI\Views\MainWindow\Addons\CmAddon.cpp" />
+    <ClCompile Include="Nexus\UI\Views\MainWindow\Addons\LoadConfirmationModal.cpp" />
+    <ClCompile Include="Nexus\UI\Views\MainWindow\Addons\UninstallConfirmationModal.cpp" />
+    <ClCompile Include="Nexus\UI\Views\MainWindow\Binds\Binds.cpp" />
+    <ClCompile Include="Nexus\UI\Views\MainWindow\Binds\BindSetterModal.cpp" />
+    <ClCompile Include="Nexus\UI\Views\MainWindow\Debug\Debug.cpp" />
+    <ClCompile Include="Nexus\UI\Views\MainWindow\Log\Log.cpp" />
+    <ClCompile Include="Nexus\UI\Views\MainWindow\MainWindow.cpp" />
+    <ClCompile Include="Nexus\UI\Views\MainWindow\Options\ExportStyleModal.cpp" />
+    <ClCompile Include="Nexus\UI\Views\MainWindow\Options\ImportStyleModal.cpp" />
+    <ClCompile Include="Nexus\UI\Views\MainWindow\Options\Options.cpp" />
+    <ClCompile Include="Nexus\UI\Views\MainWindow\SnowflakeMgr.cpp" />
+    <ClCompile Include="Nexus\UI\Views\QuickAccess\QaConst.cpp" />
+    <ClCompile Include="Nexus\UI\Views\QuickAccess\QaShortcut.cpp" />
+    <ClCompile Include="Nexus\UI\Views\QuickAccess\QuickAccess.cpp" />
+    <ClCompile Include="Nexus\Platform\RawInput\RiApi.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\CommitHash.h" />
-    <ClInclude Include="src\Host\Addons\AddEnum.h" />
-    <ClInclude Include="src\Host\Addons\Addon.h" />
-    <ClInclude Include="src\Host\Config\CfgEnum.h" />
-    <ClInclude Include="src\Host\Config\CfgManager.h" />
-    <ClInclude Include="src\Host\Config\Config.h" />
-    <ClInclude Include="src\Host\Addons\Definitions\DefEnum.h" />
-    <ClInclude Include="src\Host\Library\LibAddon.h" />
-    <ClInclude Include="src\Host\Library\LibManager.h" />
-    <ClInclude Include="src\GW2\BuildInfo\BuildInfoService.h" />
-    <ClInclude Include="src\GW2\Mumble\MblExtensions.h" />
-    <ClInclude Include="src\Network\WebRequests\WreStorage.h" />
-    <ClInclude Include="src\Runtime\Runtime.h" />
-    <ClInclude Include="src\Hooks\HkConst.h" />
-    <ClInclude Include="src\Hooks\HkFuncDefs.h" />
-    <ClInclude Include="src\Hooks\Hooks.h" />
-    <ClInclude Include="src\Core\Settings\SettingsConst.h" />
-    <ClInclude Include="src\Proxy\Proxy.h" />
-    <ClInclude Include="src\Proxy\PxyD3D11.h" />
-    <ClInclude Include="src\Proxy\PxyD3D9.h" />
-    <ClInclude Include="src\Proxy\PxyDXGI.h" />
-    <ClInclude Include="src\Proxy\PxyEnum.h" />
-    <ClInclude Include="src\Network\Updater\Updater.h" />
-    <ClInclude Include="src\Core\Versioning\Version.h" />
-    <ClInclude Include="src\Memory\RefCleanerContext.h" />
-    <ClInclude Include="src\Platform\CrashHandler\CrashHandler.h" />
-    <ClInclude Include="src\Host\Events\EvtData.h" />
-    <ClInclude Include="src\Core\Functions\FnEntry.h" />
-    <ClInclude Include="src\Core\Functions\FnRegistry.h" />
-    <ClInclude Include="src\Index\IdxEnum.h" />
-    <ClInclude Include="src\Index\Index.h" />
-    <ClInclude Include="src\Host\Addons\API\ApiV1.h" />
-    <ClInclude Include="src\Host\Addons\API\ApiV2.h" />
-    <ClInclude Include="src\Host\Addons\API\ApiV3.h" />
-    <ClInclude Include="src\Host\Addons\API\ApiV4.h" />
-    <ClInclude Include="src\Host\Addons\API\ApiV5.h" />
-    <ClInclude Include="src\Host\Addons\API\ApiV6.h" />
-    <ClInclude Include="src\Host\Loader\LdrAddonBase.h" />
-    <ClInclude Include="src\Host\Loader\LdrChecksum.h" />
-    <ClInclude Include="src\Host\Loader\LdrEnum.h" />
-    <ClInclude Include="src\Host\Loader\Loader.h" />
-    <ClInclude Include="src\Network\WebRequests\WreCache.h" />
-    <ClInclude Include="src\Network\WebRequests\WreConst.h" />
-    <ClInclude Include="src\Engine\Verifier.h" />
-    <ClInclude Include="src\Memory\IRefCleaner.h" />
-    <ClInclude Include="src\GW2\ArcDPS\ArcApi.h" />
-    <ClInclude Include="src\GW2\ArcDPS\ArcEnum.h" />
-    <ClInclude Include="src\GW2\ArcDPS\ArcExtensionDef.h" />
-    <ClInclude Include="src\GW2\ArcDPS\ArcFuncDefs.h" />
-    <ClInclude Include="src\GW2\Inputs\MouseResetFix.h" />
-    <ClInclude Include="src\Graphics\GrMetrics.h" />
-    <ClInclude Include="src\Graphics\GrWindow.h" />
-    <ClInclude Include="src\GW2\Inputs\GameBinds\GbEnum.h" />
-    <ClInclude Include="src\GW2\Inputs\GameBinds\GbConst.h" />
-    <ClInclude Include="src\GW2\Inputs\GameBinds\GbApi.h" />
-    <ClInclude Include="src\Inputs\InputBinds\IbBind.h" />
-    <ClInclude Include="src\Inputs\InputBinds\IbCapture.h" />
-    <ClInclude Include="src\Inputs\InputBinds\IbConst.h" />
-    <ClInclude Include="src\Inputs\InputBinds\IbEnum.h" />
-    <ClInclude Include="src\Inputs\InputBinds\IbMapping.h" />
-    <ClInclude Include="src\Host\Addons\API\ApiBuilder.h" />
-    <ClInclude Include="src\GW2\Mumble\MblConst.h" />
-    <ClInclude Include="src\Remote.h" />
-    <ClInclude Include="src\Network\WebRequests\WreClient.h" />
-    <ClInclude Include="src\Network\WebRequests\WreResponse.h" />
-    <ClInclude Include="src\Branch.h" />
-    <ClInclude Include="src\Host\Addons\AddConst.h" />
-    <ClInclude Include="src\Core\DataLink\DlApi.h" />
-    <ClInclude Include="src\Core\DataLink\DlEnum.h" />
-    <ClInclude Include="src\Core\DataLink\DlLinkedResource.h" />
-    <ClInclude Include="src\Host\Events\EvtApi.h" />
-    <ClInclude Include="src\Host\Events\EvtSubscriber.h" />
-    <ClInclude Include="src\Core\Logging\LogConst.h" />
-    <ClInclude Include="src\Core\Logging\LogEnum.h" />
-    <ClInclude Include="src\Graphics\Textures\TxEnum.h" />
-    <ClInclude Include="src\thirdparty\arcdps\ArcDPS.h" />
-    <ClInclude Include="src\UI\Services\Styles\StyleEnum.h" />
-    <ClInclude Include="src\UI\UiFuncDefs.h" />
-    <ClInclude Include="src\Util\Base64.h" />
-    <ClInclude Include="src\Util\CmdLine.h" />
-    <ClInclude Include="src\Util\DLL.h" />
-    <ClInclude Include="src\Util\Enums.h" />
-    <ClInclude Include="src\Util\Inputs.h" />
-    <ClInclude Include="src\Util\MD5.h" />
-    <ClInclude Include="src\Util\Paths.h" />
-    <ClInclude Include="src\Util\Resources.h" />
-    <ClInclude Include="src\Util\Strings.h" />
-    <ClInclude Include="src\Util\Time.h" />
-    <ClInclude Include="src\Util\Url.h" />
+    <ClInclude Include="Nexus\Host\Addons\AddEnum.h" />
+    <ClInclude Include="Nexus\Host\Addons\Addon.h" />
+    <ClInclude Include="Nexus\Host\Config\CfgEnum.h" />
+    <ClInclude Include="Nexus\Host\Config\CfgManager.h" />
+    <ClInclude Include="Nexus\Host\Config\Config.h" />
+    <ClInclude Include="Nexus\Host\Addons\Definitions\DefEnum.h" />
+    <ClInclude Include="Nexus\Host\Library\LibAddon.h" />
+    <ClInclude Include="Nexus\Host\Library\LibManager.h" />
+    <ClInclude Include="Nexus\GW2\BuildInfo\BuildInfoService.h" />
+    <ClInclude Include="Nexus\GW2\Mumble\MblExtensions.h" />
+    <ClInclude Include="Nexus\Network\WebRequests\WreStorage.h" />
+    <ClInclude Include="Nexus\Runtime\Runtime.h" />
+    <ClInclude Include="Nexus\Hooks\HkConst.h" />
+    <ClInclude Include="Nexus\Hooks\HkFuncDefs.h" />
+    <ClInclude Include="Nexus\Hooks\Hooks.h" />
+    <ClInclude Include="Nexus\Core\Settings\SettingsConst.h" />
+    <ClInclude Include="Nexus\Proxy\Proxy.h" />
+    <ClInclude Include="Nexus\Proxy\PxyD3D11.h" />
+    <ClInclude Include="Nexus\Proxy\PxyD3D9.h" />
+    <ClInclude Include="Nexus\Proxy\PxyDXGI.h" />
+    <ClInclude Include="Nexus\Proxy\PxyEnum.h" />
+    <ClInclude Include="Nexus\Network\Updater\Updater.h" />
+    <ClInclude Include="Nexus\Core\Versioning\Version.h" />
+    <ClInclude Include="Nexus\Memory\RefCleanerContext.h" />
+    <ClInclude Include="Nexus\Platform\CrashHandler\CrashHandler.h" />
+    <ClInclude Include="Nexus\Host\Events\EvtData.h" />
+    <ClInclude Include="Nexus\Core\Functions\FnEntry.h" />
+    <ClInclude Include="Nexus\Core\Functions\FnRegistry.h" />
+    <ClInclude Include="Nexus\Index\IdxEnum.h" />
+    <ClInclude Include="Nexus\Index\Index.h" />
+    <ClInclude Include="Nexus\Host\Addons\API\ApiV1.h" />
+    <ClInclude Include="Nexus\Host\Addons\API\ApiV2.h" />
+    <ClInclude Include="Nexus\Host\Addons\API\ApiV3.h" />
+    <ClInclude Include="Nexus\Host\Addons\API\ApiV4.h" />
+    <ClInclude Include="Nexus\Host\Addons\API\ApiV5.h" />
+    <ClInclude Include="Nexus\Host\Addons\API\ApiV6.h" />
+    <ClInclude Include="Nexus\Host\Loader\LdrAddonBase.h" />
+    <ClInclude Include="Nexus\Host\Loader\LdrChecksum.h" />
+    <ClInclude Include="Nexus\Host\Loader\LdrEnum.h" />
+    <ClInclude Include="Nexus\Host\Loader\Loader.h" />
+    <ClInclude Include="Nexus\Network\WebRequests\WreCache.h" />
+    <ClInclude Include="Nexus\Network\WebRequests\WreConst.h" />
+    <ClInclude Include="Nexus\Engine\Verifier.h" />
+    <ClInclude Include="Nexus\Memory\IRefCleaner.h" />
+    <ClInclude Include="Nexus\GW2\ArcDPS\ArcApi.h" />
+    <ClInclude Include="Nexus\GW2\ArcDPS\ArcEnum.h" />
+    <ClInclude Include="Nexus\GW2\ArcDPS\ArcExtensionDef.h" />
+    <ClInclude Include="Nexus\GW2\ArcDPS\ArcFuncDefs.h" />
+    <ClInclude Include="Nexus\GW2\Inputs\MouseResetFix.h" />
+    <ClInclude Include="Nexus\Graphics\GrMetrics.h" />
+    <ClInclude Include="Nexus\Graphics\GrWindow.h" />
+    <ClInclude Include="Nexus\GW2\Inputs\GameBinds\GbEnum.h" />
+    <ClInclude Include="Nexus\GW2\Inputs\GameBinds\GbConst.h" />
+    <ClInclude Include="Nexus\GW2\Inputs\GameBinds\GbApi.h" />
+    <ClInclude Include="Nexus\Inputs\InputBinds\IbBind.h" />
+    <ClInclude Include="Nexus\Inputs\InputBinds\IbCapture.h" />
+    <ClInclude Include="Nexus\Inputs\InputBinds\IbConst.h" />
+    <ClInclude Include="Nexus\Inputs\InputBinds\IbEnum.h" />
+    <ClInclude Include="Nexus\Inputs\InputBinds\IbMapping.h" />
+    <ClInclude Include="Nexus\Host\Addons\API\ApiBuilder.h" />
+    <ClInclude Include="Nexus\GW2\Mumble\MblConst.h" />
+    <ClInclude Include="Nexus\Network\WebRequests\WreClient.h" />
+    <ClInclude Include="Nexus\Network\WebRequests\WreResponse.h" />
+    <ClInclude Include="Nexus\Host\Addons\AddConst.h" />
+    <ClInclude Include="Nexus\Core\DataLink\DlApi.h" />
+    <ClInclude Include="Nexus\Core\DataLink\DlEnum.h" />
+    <ClInclude Include="Nexus\Core\DataLink\DlLinkedResource.h" />
+    <ClInclude Include="Nexus\Host\Events\EvtApi.h" />
+    <ClInclude Include="Nexus\Host\Events\EvtSubscriber.h" />
+    <ClInclude Include="Nexus\Core\Logging\LogConst.h" />
+    <ClInclude Include="Nexus\Core\Logging\LogEnum.h" />
+    <ClInclude Include="Nexus\Graphics\Textures\TxEnum.h" />
+    <ClInclude Include="Nexus\thirdparty\arcdps\ArcDPS.h" />
+    <ClInclude Include="Nexus\UI\Services\Styles\StyleEnum.h" />
+    <ClInclude Include="Nexus\UI\UiFuncDefs.h" />
+    <ClInclude Include="Nexus\Util\Base64.h" />
+    <ClInclude Include="Nexus\Util\CmdLine.h" />
+    <ClInclude Include="Nexus\Util\DLL.h" />
+    <ClInclude Include="Nexus\Util\Enums.h" />
+    <ClInclude Include="Nexus\Util\Inputs.h" />
+    <ClInclude Include="Nexus\Util\MD5.h" />
+    <ClInclude Include="Nexus\Util\Paths.h" />
+    <ClInclude Include="Nexus\Util\Resources.h" />
+    <ClInclude Include="Nexus\Util\Strings.h" />
+    <ClInclude Include="Nexus\Util\Time.h" />
+    <ClInclude Include="Nexus\Util\Url.h" />
     <ClInclude Include="thirdparty\Clockwork\Clockwork.h" />
     <ClInclude Include="thirdparty\Clockwork\Dispatcher.h" />
     <ClInclude Include="thirdparty\Clockwork\Tasks\CancellationToken.h" />
@@ -209,10 +206,10 @@
     <ClInclude Include="thirdparty\imgui\imstb_rectpack.h" />
     <ClInclude Include="thirdparty\imgui\imstb_textedit.h" />
     <ClInclude Include="thirdparty\imgui\imstb_truetype.h" />
-    <ClInclude Include="src\Inputs\InputBinds\IbBindV2.h" />
-    <ClInclude Include="src\Inputs\InputBinds\IbApi.h" />
-    <ClInclude Include="src\Core\NexusLink.h" />
-    <ClInclude Include="src\GW2\Multibox\Multibox.h" />
+    <ClInclude Include="Nexus\Inputs\InputBinds\IbBindV2.h" />
+    <ClInclude Include="Nexus\Inputs\InputBinds\IbApi.h" />
+    <ClInclude Include="Nexus\Core\NexusLink.h" />
+    <ClInclude Include="Nexus\GW2\Multibox\Multibox.h" />
     <ClInclude Include="thirdparty\mumble\Mumble.h" />
     <ClInclude Include="thirdparty\nlohmann\json.hpp" />
     <ClInclude Include="thirdparty\openssl\aes.h" />
@@ -352,75 +349,74 @@
     <ClInclude Include="thirdparty\openssl\x509_vfy.h" />
     <ClInclude Include="thirdparty\openssl\__DECC_INCLUDE_EPILOGUE.H" />
     <ClInclude Include="thirdparty\openssl\__DECC_INCLUDE_PROLOGUE.H" />
-    <ClInclude Include="src\Host\Addons\Definitions\AddonDefV1.h" />
-    <ClInclude Include="src\Host\Addons\API\ApiBase.h" />
-    <ClInclude Include="src\Core\Logging\LogWriter.h" />
-    <ClInclude Include="src\Core\Logging\ILogger.h" />
-    <ClInclude Include="src\Core\Logging\LogMsg.h" />
-    <ClInclude Include="src\Core\Logging\LogApi.h" />
-    <ClInclude Include="src\Core\Logging\LogConsole.h" />
+    <ClInclude Include="Nexus\Host\Addons\Definitions\AddonDefV1.h" />
+    <ClInclude Include="Nexus\Host\Addons\API\ApiBase.h" />
+    <ClInclude Include="Nexus\Core\Logging\LogWriter.h" />
+    <ClInclude Include="Nexus\Core\Logging\ILogger.h" />
+    <ClInclude Include="Nexus\Core\Logging\LogMsg.h" />
+    <ClInclude Include="Nexus\Core\Logging\LogApi.h" />
+    <ClInclude Include="Nexus\Core\Logging\LogConsole.h" />
     <ClInclude Include="thirdparty\minhook\mh_buffer.h" />
     <ClInclude Include="thirdparty\minhook\mh_disasm.h" />
     <ClInclude Include="thirdparty\minhook\mh_hook.h" />
     <ClInclude Include="thirdparty\minhook\mh_trampoline.h" />
-    <ClInclude Include="src\GW2\Mumble\MblReader.h" />
+    <ClInclude Include="Nexus\GW2\Mumble\MblReader.h" />
     <ClInclude Include="res\ResConst.h" />
-    <ClInclude Include="src\Core\Settings\SettingsMgr.h" />
+    <ClInclude Include="Nexus\Core\Settings\SettingsMgr.h" />
     <ClInclude Include="thirdparty\pugixml\pugiconfig.hpp" />
     <ClInclude Include="thirdparty\pugixml\pugixml.hpp" />
     <ClInclude Include="thirdparty\stb\stb_image.h" />
-    <ClInclude Include="src\Graphics\Textures\TxQueueEntry.h" />
-    <ClInclude Include="src\Graphics\Textures\TxTexture.h" />
-    <ClInclude Include="src\Graphics\Textures\TxLoader.h" />
-    <ClInclude Include="src\UI\Controls\Control.h" />
-    <ClInclude Include="src\UI\Controls\CtlContextMenu.h" />
-    <ClInclude Include="src\UI\Controls\CtlModal.h" />
-    <ClInclude Include="src\UI\Controls\CtlSubWindow.h" />
-    <ClInclude Include="src\UI\Controls\CtlWindow.h" />
-    <ClInclude Include="src\UI\UiBinds.h" />
-    <ClInclude Include="src\UI\UiEnum.h" />
-    <ClInclude Include="src\UI\Views\MumbleInspector\MumbleInspector.h" />
-    <ClInclude Include="src\UI\Services\Fonts\FontManager.h" />
-    <ClInclude Include="src\UI\Services\Localization\LoclApi.h" />
-    <ClInclude Include="src\UI\Services\Localization\LoclLocale.h" />
-    <ClInclude Include="src\UI\Services\Localization\LoclQueuedText.h" />
-    <ClInclude Include="src\UI\Services\QoL\EscapeClosing.h" />
-    <ClInclude Include="src\UI\UiContext.h" />
-    <ClInclude Include="src\UI\UiInput.h" />
-    <ClInclude Include="src\UI\Services\Scaling\Scaling.h" />
-    <ClInclude Include="src\UI\Services\Styles\StyleMgr.h" />
-    <ClInclude Include="src\UI\Views\Alerts\AlEnum.h" />
-    <ClInclude Include="src\UI\Views\Alerts\Alerts.h" />
-    <ClInclude Include="src\UI\Views\Alerts\AlMessage.h" />
-    <ClInclude Include="src\UI\Views\EULA\LicenseAgreementModal.h" />
-    <ClInclude Include="src\UI\Views\MainWindow\About\About.h" />
-    <ClInclude Include="src\UI\Views\MainWindow\Addons\AddonListing.h" />
-    <ClInclude Include="src\UI\Views\MainWindow\Addons\Addons.h" />
-    <ClInclude Include="src\UI\Views\MainWindow\Addons\CmAddon.h" />
-    <ClInclude Include="src\UI\Views\MainWindow\Addons\CtlAddonToggle.h" />
-    <ClInclude Include="src\UI\Views\MainWindow\Addons\LoadConfirmationModal.h" />
-    <ClInclude Include="src\UI\Views\MainWindow\Addons\UninstallConfirmationModal.h" />
-    <ClInclude Include="src\UI\Views\MainWindow\Binds\Binds.h" />
-    <ClInclude Include="src\UI\Views\MainWindow\Binds\BindSetterModal.h" />
-    <ClInclude Include="src\UI\Views\MainWindow\Debug\Debug.h" />
-    <ClInclude Include="src\UI\Views\MainWindow\Log\Log.h" />
-    <ClInclude Include="src\UI\Views\MainWindow\MainWindow.h" />
-    <ClInclude Include="src\UI\Views\MainWindow\Options\ExportStyleModal.h" />
-    <ClInclude Include="src\UI\Views\MainWindow\Options\ImportStyleModal.h" />
-    <ClInclude Include="src\UI\Views\MainWindow\Options\Options.h" />
-    <ClInclude Include="src\UI\Views\MainWindow\SnowflakeMgr.h" />
-    <ClInclude Include="src\UI\Views\QuickAccess\QaConst.h" />
-    <ClInclude Include="src\UI\Views\QuickAccess\QaEnum.h" />
-    <ClInclude Include="src\UI\Views\QuickAccess\QaShortcut.h" />
-    <ClInclude Include="src\UI\Views\QuickAccess\QuickAccess.h" />
-    <ClInclude Include="src\Version.h" />
-    <ClInclude Include="src\Platform\RawInput\RiApi.h" />
+    <ClInclude Include="Nexus\Graphics\Textures\TxQueueEntry.h" />
+    <ClInclude Include="Nexus\Graphics\Textures\TxTexture.h" />
+    <ClInclude Include="Nexus\Graphics\Textures\TxLoader.h" />
+    <ClInclude Include="Nexus\UI\Controls\Control.h" />
+    <ClInclude Include="Nexus\UI\Controls\CtlContextMenu.h" />
+    <ClInclude Include="Nexus\UI\Controls\CtlModal.h" />
+    <ClInclude Include="Nexus\UI\Controls\CtlSubWindow.h" />
+    <ClInclude Include="Nexus\UI\Controls\CtlWindow.h" />
+    <ClInclude Include="Nexus\UI\UiBinds.h" />
+    <ClInclude Include="Nexus\UI\UiEnum.h" />
+    <ClInclude Include="Nexus\UI\Views\MumbleInspector\MumbleInspector.h" />
+    <ClInclude Include="Nexus\UI\Services\Fonts\FontManager.h" />
+    <ClInclude Include="Nexus\UI\Services\Localization\LoclApi.h" />
+    <ClInclude Include="Nexus\UI\Services\Localization\LoclLocale.h" />
+    <ClInclude Include="Nexus\UI\Services\Localization\LoclQueuedText.h" />
+    <ClInclude Include="Nexus\UI\Services\QoL\EscapeClosing.h" />
+    <ClInclude Include="Nexus\UI\UiContext.h" />
+    <ClInclude Include="Nexus\UI\UiInput.h" />
+    <ClInclude Include="Nexus\UI\Services\Scaling\Scaling.h" />
+    <ClInclude Include="Nexus\UI\Services\Styles\StyleMgr.h" />
+    <ClInclude Include="Nexus\UI\Views\Alerts\AlEnum.h" />
+    <ClInclude Include="Nexus\UI\Views\Alerts\Alerts.h" />
+    <ClInclude Include="Nexus\UI\Views\Alerts\AlMessage.h" />
+    <ClInclude Include="Nexus\UI\Views\EULA\LicenseAgreementModal.h" />
+    <ClInclude Include="Nexus\UI\Views\MainWindow\About\About.h" />
+    <ClInclude Include="Nexus\UI\Views\MainWindow\Addons\AddonListing.h" />
+    <ClInclude Include="Nexus\UI\Views\MainWindow\Addons\Addons.h" />
+    <ClInclude Include="Nexus\UI\Views\MainWindow\Addons\CmAddon.h" />
+    <ClInclude Include="Nexus\UI\Views\MainWindow\Addons\CtlAddonToggle.h" />
+    <ClInclude Include="Nexus\UI\Views\MainWindow\Addons\LoadConfirmationModal.h" />
+    <ClInclude Include="Nexus\UI\Views\MainWindow\Addons\UninstallConfirmationModal.h" />
+    <ClInclude Include="Nexus\UI\Views\MainWindow\Binds\Binds.h" />
+    <ClInclude Include="Nexus\UI\Views\MainWindow\Binds\BindSetterModal.h" />
+    <ClInclude Include="Nexus\UI\Views\MainWindow\Debug\Debug.h" />
+    <ClInclude Include="Nexus\UI\Views\MainWindow\Log\Log.h" />
+    <ClInclude Include="Nexus\UI\Views\MainWindow\MainWindow.h" />
+    <ClInclude Include="Nexus\UI\Views\MainWindow\Options\ExportStyleModal.h" />
+    <ClInclude Include="Nexus\UI\Views\MainWindow\Options\ImportStyleModal.h" />
+    <ClInclude Include="Nexus\UI\Views\MainWindow\Options\Options.h" />
+    <ClInclude Include="Nexus\UI\Views\MainWindow\SnowflakeMgr.h" />
+    <ClInclude Include="Nexus\UI\Views\QuickAccess\QaConst.h" />
+    <ClInclude Include="Nexus\UI\Views\QuickAccess\QaEnum.h" />
+    <ClInclude Include="Nexus\UI\Views\QuickAccess\QaShortcut.h" />
+    <ClInclude Include="Nexus\UI\Views\QuickAccess\QuickAccess.h" />
+    <ClInclude Include="Nexus\Platform\RawInput\RiApi.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="res\Nexus.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\Proxy\Proxy.def" />
+    <None Include="Nexus\Proxy\Proxy.def" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -455,7 +451,7 @@
     <TargetName>d3d11</TargetName>
     <OutDir>$(SolutionDir)$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)$(Platform)\</IntDir>
-    <IncludePath>$(ProjectDir)src\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)Nexus\;$(ProjectDir)Installer\;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)thirdparty\openssl\lib\VC\static;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -463,7 +459,7 @@
     <TargetName>d3d11</TargetName>
     <OutDir>$(SolutionDir)$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)$(Platform)\</IntDir>
-    <IncludePath>$(ProjectDir)src\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)Nexus\;$(ProjectDir)Installer\;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)thirdparty\openssl\lib\VC\static;$(LibraryPath)</LibraryPath>
     <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
@@ -477,7 +473,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)res;$(SolutionDir)src;$(SolutionDir)thirdparty;$(SolutionDir)thirdparty\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)thirdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8 /Zc:__cplusplus</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -488,7 +484,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <ModuleDefinitionFile>src\Proxy\Proxy.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>Nexus\Proxy\Proxy.def</ModuleDefinitionFile>
       <AdditionalDependencies>advapi32.lib;crypt32.lib;DbgHelp.lib;gdi32.lib;ntdll.lib;PathCch.lib;Psapi.lib;shcore.lib;Shell32.lib;Shlwapi.lib;user32.lib;ws2_32.lib;libssl64MTd.lib;libcrypto64MTd.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
@@ -514,7 +510,7 @@ CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)res;$(SolutionDir)src;$(SolutionDir)thirdparty;$(SolutionDir)thirdparty\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)thirdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8 /Zc:__cplusplus</AdditionalOptions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -527,7 +523,7 @@ CALL $(SolutionDir)Scripts\remoteurl.bat</Command>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <ModuleDefinitionFile>src\Proxy\Proxy.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>Nexus\Proxy\Proxy.def</ModuleDefinitionFile>
       <AdditionalDependencies>advapi32.lib;crypt32.lib;DbgHelp.lib;gdi32.lib;ntdll.lib;PathCch.lib;Psapi.lib;shcore.lib;Shell32.lib;Shlwapi.lib;user32.lib;ws2_32.lib;libssl64MT.lib;libcrypto64MT.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>

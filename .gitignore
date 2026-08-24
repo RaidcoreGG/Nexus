@@ -13,8 +13,8 @@ bld/
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 
-src/Branch.h
-src/CommitHash.h
-src/Version.h
-src/Remote.h
+Branch.h
+CommitHash.h
+Version.h
+Remote.h
 *.user
