@@ -1,0 +1,548 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Host\Addons\Addon.cpp" />
+    <ClCompile Include="Host\Config\CfgManager.cpp" />
+    <ClCompile Include="Host\Library\LibAddon.cpp" />
+    <ClCompile Include="Host\Library\LibManager.cpp" />
+    <ClCompile Include="GW2\BuildInfo\BuildInfoService.cpp" />
+    <ClCompile Include="Network\WebRequests\WreStorage.cpp" />
+    <ClCompile Include="Runtime\Runtime.cpp" />
+    <ClCompile Include="Hooks\Hooks.cpp" />
+    <ClCompile Include="Network\Updater\Updater.cpp" />
+    <ClCompile Include="Memory\IRefCleaner.cpp" />
+    <ClCompile Include="Memory\RefCleanerContext.cpp" />
+    <ClCompile Include="Platform\CrashHandler\CrashHandler.cpp" />
+    <ClCompile Include="Core\Functions\FnRegistry.cpp" />
+    <ClCompile Include="Index\Index.cpp" />
+    <ClCompile Include="Host\Loader\LdrAddonBase.cpp" />
+    <ClCompile Include="Host\Loader\Loader.cpp" />
+    <ClCompile Include="Network\WebRequests\WreCache.cpp" />
+    <ClCompile Include="Network\WebRequests\WreConst.cpp" />
+    <ClCompile Include="GW2\ArcDPS\ArcApi.cpp" />
+    <ClCompile Include="GW2\Inputs\GameBinds\GbApi.cpp" />
+    <ClCompile Include="GW2\Inputs\GameBinds\GbConst.cpp" />
+    <ClCompile Include="Inputs\InputBinds\IbCapture.cpp" />
+    <ClCompile Include="Inputs\InputBinds\IbConst.cpp" />
+    <ClCompile Include="Host\Addons\API\ApiBuilder.cpp" />
+    <ClCompile Include="Network\WebRequests\WreClient.cpp" />
+    <ClCompile Include="Core\DataLink\DlApi.cpp" />
+    <ClCompile Include="GW2\Mumble\MblConst.cpp" />
+    <ClCompile Include="Host\Events\EvtApi.cpp" />
+    <ClCompile Include="Core\Logging\LogConst.cpp" />
+    <ClCompile Include="Proxy\PxyD3D9.cpp" />
+    <ClCompile Include="Proxy\PxyDXGI.cpp" />
+    <ClCompile Include="$(SolutionDir)thirdparty\Clockwork\Clockwork.cpp" />
+    <ClCompile Include="$(SolutionDir)thirdparty\ImAnimate\ImAnimate.cpp" />
+    <ClCompile Include="$(SolutionDir)thirdparty\imgui\imgui.cpp" />
+    <ClCompile Include="$(SolutionDir)thirdparty\imgui\imgui_draw.cpp" />
+    <ClCompile Include="$(SolutionDir)thirdparty\imgui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="$(SolutionDir)thirdparty\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="$(SolutionDir)thirdparty\imgui\imgui_tables.cpp" />
+    <ClCompile Include="$(SolutionDir)thirdparty\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="Inputs\InputBinds\IbBindV2.cpp" />
+    <ClCompile Include="Inputs\InputBinds\IbApi.cpp" />
+    <ClCompile Include="Core\Logging\LogWriter.cpp" />
+    <ClCompile Include="Core\Logging\ILogger.cpp" />
+    <ClCompile Include="Core\Logging\LogApi.cpp" />
+    <ClCompile Include="Core\Logging\LogConsole.cpp" />
+    <ClCompile Include="$(SolutionDir)thirdparty\minhook\mh_buffer.cpp" />
+    <ClCompile Include="$(SolutionDir)thirdparty\minhook\mh_disasm.cpp" />
+    <ClCompile Include="$(SolutionDir)thirdparty\minhook\mh_hook.cpp" />
+    <ClCompile Include="$(SolutionDir)thirdparty\minhook\mh_trampoline.cpp" />
+    <ClCompile Include="GW2\Multibox\Multibox.cpp" />
+    <ClCompile Include="GW2\Mumble\MblReader.cpp" />
+    <ClCompile Include="Proxy\PxyD3D11.cpp" />
+    <ClCompile Include="Core\Settings\SettingsMgr.cpp" />
+    <ClCompile Include="Graphics\Textures\TxLoader.cpp" />
+    <ClCompile Include="$(SolutionDir)thirdparty\pugixml\pugixml.cpp" />
+    <ClCompile Include="UI\Controls\CtlContextMenu.cpp" />
+    <ClCompile Include="UI\Controls\CtlModal.cpp" />
+    <ClCompile Include="UI\Controls\CtlSubWindow.cpp" />
+    <ClCompile Include="UI\Controls\CtlWindow.cpp" />
+    <ClCompile Include="UI\Views\MumbleInspector\MumbleInspector.cpp" />
+    <ClCompile Include="UI\Services\Fonts\FontManager.cpp" />
+    <ClCompile Include="UI\Services\Localization\LoclApi.cpp" />
+    <ClCompile Include="UI\Services\QoL\EscapeClosing.cpp" />
+    <ClCompile Include="UI\UiBinds.cpp" />
+    <ClCompile Include="UI\UiContext.cpp" />
+    <ClCompile Include="UI\UiInput.cpp" />
+    <ClCompile Include="UI\Services\Scaling\Scaling.cpp" />
+    <ClCompile Include="UI\Services\Styles\StyleMgr.cpp" />
+    <ClCompile Include="UI\Views\Alerts\Alerts.cpp" />
+    <ClCompile Include="UI\Views\EULA\LicenseAgreementModal.cpp" />
+    <ClCompile Include="UI\Views\MainWindow\About\About.cpp" />
+    <ClCompile Include="UI\Views\MainWindow\Addons\Addons.cpp" />
+    <ClCompile Include="UI\Views\MainWindow\Addons\CmAddon.cpp" />
+    <ClCompile Include="UI\Views\MainWindow\Addons\LoadConfirmationModal.cpp" />
+    <ClCompile Include="UI\Views\MainWindow\Addons\UninstallConfirmationModal.cpp" />
+    <ClCompile Include="UI\Views\MainWindow\Binds\Binds.cpp" />
+    <ClCompile Include="UI\Views\MainWindow\Binds\BindSetterModal.cpp" />
+    <ClCompile Include="UI\Views\MainWindow\Debug\Debug.cpp" />
+    <ClCompile Include="UI\Views\MainWindow\Log\Log.cpp" />
+    <ClCompile Include="UI\Views\MainWindow\MainWindow.cpp" />
+    <ClCompile Include="UI\Views\MainWindow\Options\ExportStyleModal.cpp" />
+    <ClCompile Include="UI\Views\MainWindow\Options\ImportStyleModal.cpp" />
+    <ClCompile Include="UI\Views\MainWindow\Options\Options.cpp" />
+    <ClCompile Include="UI\Views\MainWindow\SnowflakeMgr.cpp" />
+    <ClCompile Include="UI\Views\QuickAccess\QaConst.cpp" />
+    <ClCompile Include="UI\Views\QuickAccess\QaShortcut.cpp" />
+    <ClCompile Include="UI\Views\QuickAccess\QuickAccess.cpp" />
+    <ClCompile Include="Platform\RawInput\RiApi.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Build\Branch.h" />
+    <ClInclude Include="..\Build\CommitHash.h" />
+    <ClInclude Include="..\Build\Remote.h" />
+    <ClInclude Include="..\Build\Version.h" />
+    <ClInclude Include="Host\Addons\AddEnum.h" />
+    <ClInclude Include="Host\Addons\Addon.h" />
+    <ClInclude Include="Host\Config\CfgEnum.h" />
+    <ClInclude Include="Host\Config\CfgManager.h" />
+    <ClInclude Include="Host\Config\Config.h" />
+    <ClInclude Include="Host\Addons\Definitions\DefEnum.h" />
+    <ClInclude Include="Host\Library\LibAddon.h" />
+    <ClInclude Include="Host\Library\LibManager.h" />
+    <ClInclude Include="GW2\BuildInfo\BuildInfoService.h" />
+    <ClInclude Include="GW2\Mumble\MblExtensions.h" />
+    <ClInclude Include="Network\WebRequests\WreStorage.h" />
+    <ClInclude Include="Runtime\Runtime.h" />
+    <ClInclude Include="Hooks\HkConst.h" />
+    <ClInclude Include="Hooks\HkFuncDefs.h" />
+    <ClInclude Include="Hooks\Hooks.h" />
+    <ClInclude Include="Core\Settings\SettingsConst.h" />
+    <ClInclude Include="Proxy\Proxy.h" />
+    <ClInclude Include="Proxy\PxyD3D11.h" />
+    <ClInclude Include="Proxy\PxyD3D9.h" />
+    <ClInclude Include="Proxy\PxyDXGI.h" />
+    <ClInclude Include="Proxy\PxyEnum.h" />
+    <ClInclude Include="Network\Updater\Updater.h" />
+    <ClInclude Include="Core\Versioning\Version.h" />
+    <ClInclude Include="Memory\RefCleanerContext.h" />
+    <ClInclude Include="Platform\CrashHandler\CrashHandler.h" />
+    <ClInclude Include="Host\Events\EvtData.h" />
+    <ClInclude Include="Core\Functions\FnEntry.h" />
+    <ClInclude Include="Core\Functions\FnRegistry.h" />
+    <ClInclude Include="Index\IdxEnum.h" />
+    <ClInclude Include="Index\Index.h" />
+    <ClInclude Include="Host\Addons\API\ApiV1.h" />
+    <ClInclude Include="Host\Addons\API\ApiV2.h" />
+    <ClInclude Include="Host\Addons\API\ApiV3.h" />
+    <ClInclude Include="Host\Addons\API\ApiV4.h" />
+    <ClInclude Include="Host\Addons\API\ApiV5.h" />
+    <ClInclude Include="Host\Addons\API\ApiV6.h" />
+    <ClInclude Include="Host\Loader\LdrAddonBase.h" />
+    <ClInclude Include="Host\Loader\LdrChecksum.h" />
+    <ClInclude Include="Host\Loader\LdrEnum.h" />
+    <ClInclude Include="Host\Loader\Loader.h" />
+    <ClInclude Include="Network\WebRequests\WreCache.h" />
+    <ClInclude Include="Network\WebRequests\WreConst.h" />
+    <ClInclude Include="Memory\IRefCleaner.h" />
+    <ClInclude Include="GW2\ArcDPS\ArcApi.h" />
+    <ClInclude Include="GW2\ArcDPS\ArcEnum.h" />
+    <ClInclude Include="GW2\ArcDPS\ArcExtensionDef.h" />
+    <ClInclude Include="GW2\ArcDPS\ArcFuncDefs.h" />
+    <ClInclude Include="GW2\Inputs\MouseResetFix.h" />
+    <ClInclude Include="Graphics\GrMetrics.h" />
+    <ClInclude Include="Graphics\GrWindow.h" />
+    <ClInclude Include="GW2\Inputs\GameBinds\GbEnum.h" />
+    <ClInclude Include="GW2\Inputs\GameBinds\GbConst.h" />
+    <ClInclude Include="GW2\Inputs\GameBinds\GbApi.h" />
+    <ClInclude Include="Inputs\InputBinds\IbBind.h" />
+    <ClInclude Include="Inputs\InputBinds\IbCapture.h" />
+    <ClInclude Include="Inputs\InputBinds\IbConst.h" />
+    <ClInclude Include="Inputs\InputBinds\IbEnum.h" />
+    <ClInclude Include="Inputs\InputBinds\IbMapping.h" />
+    <ClInclude Include="Host\Addons\API\ApiBuilder.h" />
+    <ClInclude Include="GW2\Mumble\MblConst.h" />
+    <ClInclude Include="Network\WebRequests\WreClient.h" />
+    <ClInclude Include="Network\WebRequests\WreResponse.h" />
+    <ClInclude Include="Host\Addons\AddConst.h" />
+    <ClInclude Include="Core\DataLink\DlApi.h" />
+    <ClInclude Include="Core\DataLink\DlEnum.h" />
+    <ClInclude Include="Core\DataLink\DlLinkedResource.h" />
+    <ClInclude Include="Host\Events\EvtApi.h" />
+    <ClInclude Include="Host\Events\EvtSubscriber.h" />
+    <ClInclude Include="Core\Logging\LogConst.h" />
+    <ClInclude Include="Core\Logging\LogEnum.h" />
+    <ClInclude Include="Graphics\Textures\TxEnum.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\arcdps\ArcDPS.h" />
+    <ClInclude Include="UI\Services\Styles\StyleEnum.h" />
+    <ClInclude Include="UI\UiFuncDefs.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\Util\Base64.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\Util\CmdLine.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\Util\DLL.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\Util\Enums.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\Util\Inputs.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\Util\MD5.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\Util\Paths.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\Util\Resources.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\Util\Strings.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\Util\Time.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\Util\Url.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\Clockwork\Clockwork.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\Clockwork\Dispatcher.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\Clockwork\Tasks\CancellationToken.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\Clockwork\Tasks\ETaskPriority.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\Clockwork\Tasks\ScheduledTask.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\Clockwork\Tasks\Task.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\Clockwork\Tasks\TaskBase.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\httplib\httplib.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\ImAnimate\ImAnimate.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\imgui\imconfig.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\imgui\imgui.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\imgui\imgui_extensions.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\imgui\imgui_impl_dx11.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\imgui\imgui_internal.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\imgui\imgui_memory_editor.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\imgui\imstb_rectpack.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\imgui\imstb_textedit.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\imgui\imstb_truetype.h" />
+    <ClInclude Include="Inputs\InputBinds\IbBindV2.h" />
+    <ClInclude Include="Inputs\InputBinds\IbApi.h" />
+    <ClInclude Include="Core\NexusLink.h" />
+    <ClInclude Include="GW2\Multibox\Multibox.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\mumble\Mumble.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\nlohmann\json.hpp" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\aes.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\asn1.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\asn1err.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\asn1t.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\asn1_mac.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\async.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\asyncerr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\bio.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\bioerr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\blowfish.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\bn.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\bnerr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\buffer.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\buffererr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\camellia.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\cast.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\cmac.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\cmp.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\cmperr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\cmp_util.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\cms.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\cmserr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\comp.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\comperr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\conf.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\conferr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\configuration.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\conftypes.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\conf_api.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\core.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\core_dispatch.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\core_names.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\core_object.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\crmf.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\crmferr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\crypto.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\cryptoerr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\cryptoerr_legacy.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\ct.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\cterr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\decoder.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\decodererr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\des.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\dh.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\dherr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\dsa.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\dsaerr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\dtls1.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\ebcdic.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\ec.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\ecdh.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\ecdsa.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\ecerr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\encoder.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\encodererr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\engine.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\engineerr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\err.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\ess.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\esserr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\evp.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\evperr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\e_os2.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\fipskey.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\fips_names.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\hmac.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\http.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\httperr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\idea.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\kdf.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\kdferr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\lhash.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\macros.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\md2.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\md4.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\md5.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\mdc2.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\modes.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\objects.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\objectserr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\obj_mac.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\ocsp.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\ocsperr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\opensslconf.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\opensslv.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\ossl_typ.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\params.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\param_build.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\pem.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\pem2.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\pemerr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\pkcs12.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\pkcs12err.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\pkcs7.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\pkcs7err.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\proverr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\provider.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\prov_ssl.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\rand.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\randerr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\rc2.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\rc4.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\rc5.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\ripemd.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\rsa.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\rsaerr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\safestack.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\seed.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\self_test.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\sha.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\srp.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\srtp.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\ssl.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\ssl2.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\ssl3.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\sslerr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\sslerr_legacy.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\stack.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\store.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\storeerr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\symhacks.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\tls1.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\trace.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\ts.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\tserr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\txt_db.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\types.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\ui.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\uierr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\whrlpool.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\x509.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\x509err.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\x509v3.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\x509v3err.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\x509_vfy.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\__DECC_INCLUDE_EPILOGUE.H" />
+    <ClInclude Include="$(SolutionDir)thirdparty\openssl\__DECC_INCLUDE_PROLOGUE.H" />
+    <ClInclude Include="Host\Addons\Definitions\AddonDefV1.h" />
+    <ClInclude Include="Host\Addons\API\ApiBase.h" />
+    <ClInclude Include="Core\Logging\LogWriter.h" />
+    <ClInclude Include="Core\Logging\ILogger.h" />
+    <ClInclude Include="Core\Logging\LogMsg.h" />
+    <ClInclude Include="Core\Logging\LogApi.h" />
+    <ClInclude Include="Core\Logging\LogConsole.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\minhook\mh_buffer.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\minhook\mh_disasm.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\minhook\mh_hook.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\minhook\mh_trampoline.h" />
+    <ClInclude Include="GW2\Mumble\MblReader.h" />
+    <ClInclude Include="res\ResConst.h" />
+    <ClInclude Include="Core\Settings\SettingsMgr.h" />
+    <ClInclude Include="$(SolutionDir)thirdparty\pugixml\pugiconfig.hpp" />
+    <ClInclude Include="$(SolutionDir)thirdparty\pugixml\pugixml.hpp" />
+    <ClInclude Include="$(SolutionDir)thirdparty\stb\stb_image.h" />
+    <ClInclude Include="Graphics\Textures\TxQueueEntry.h" />
+    <ClInclude Include="Graphics\Textures\TxTexture.h" />
+    <ClInclude Include="Graphics\Textures\TxLoader.h" />
+    <ClInclude Include="UI\Controls\Control.h" />
+    <ClInclude Include="UI\Controls\CtlContextMenu.h" />
+    <ClInclude Include="UI\Controls\CtlModal.h" />
+    <ClInclude Include="UI\Controls\CtlSubWindow.h" />
+    <ClInclude Include="UI\Controls\CtlWindow.h" />
+    <ClInclude Include="UI\UiBinds.h" />
+    <ClInclude Include="UI\UiEnum.h" />
+    <ClInclude Include="UI\Views\MumbleInspector\MumbleInspector.h" />
+    <ClInclude Include="UI\Services\Fonts\FontManager.h" />
+    <ClInclude Include="UI\Services\Localization\LoclApi.h" />
+    <ClInclude Include="UI\Services\Localization\LoclLocale.h" />
+    <ClInclude Include="UI\Services\Localization\LoclQueuedText.h" />
+    <ClInclude Include="UI\Services\QoL\EscapeClosing.h" />
+    <ClInclude Include="UI\UiContext.h" />
+    <ClInclude Include="UI\UiInput.h" />
+    <ClInclude Include="UI\Services\Scaling\Scaling.h" />
+    <ClInclude Include="UI\Services\Styles\StyleMgr.h" />
+    <ClInclude Include="UI\Views\Alerts\AlEnum.h" />
+    <ClInclude Include="UI\Views\Alerts\Alerts.h" />
+    <ClInclude Include="UI\Views\Alerts\AlMessage.h" />
+    <ClInclude Include="UI\Views\EULA\LicenseAgreementModal.h" />
+    <ClInclude Include="UI\Views\MainWindow\About\About.h" />
+    <ClInclude Include="UI\Views\MainWindow\Addons\AddonListing.h" />
+    <ClInclude Include="UI\Views\MainWindow\Addons\Addons.h" />
+    <ClInclude Include="UI\Views\MainWindow\Addons\CmAddon.h" />
+    <ClInclude Include="UI\Views\MainWindow\Addons\CtlAddonToggle.h" />
+    <ClInclude Include="UI\Views\MainWindow\Addons\LoadConfirmationModal.h" />
+    <ClInclude Include="UI\Views\MainWindow\Addons\UninstallConfirmationModal.h" />
+    <ClInclude Include="UI\Views\MainWindow\Binds\Binds.h" />
+    <ClInclude Include="UI\Views\MainWindow\Binds\BindSetterModal.h" />
+    <ClInclude Include="UI\Views\MainWindow\Debug\Debug.h" />
+    <ClInclude Include="UI\Views\MainWindow\Log\Log.h" />
+    <ClInclude Include="UI\Views\MainWindow\MainWindow.h" />
+    <ClInclude Include="UI\Views\MainWindow\Options\ExportStyleModal.h" />
+    <ClInclude Include="UI\Views\MainWindow\Options\ImportStyleModal.h" />
+    <ClInclude Include="UI\Views\MainWindow\Options\Options.h" />
+    <ClInclude Include="UI\Views\MainWindow\SnowflakeMgr.h" />
+    <ClInclude Include="UI\Views\QuickAccess\QaConst.h" />
+    <ClInclude Include="UI\Views\QuickAccess\QaEnum.h" />
+    <ClInclude Include="UI\Views\QuickAccess\QaShortcut.h" />
+    <ClInclude Include="UI\Views\QuickAccess\QuickAccess.h" />
+    <ClInclude Include="Platform\RawInput\RiApi.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res\Nexus.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Proxy\Proxy.def" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{70b0e807-04cf-46a6-b838-7904e154581e}</ProjectGuid>
+    <RootNamespace>Nexus</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Nexus</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>d3d11</TargetName>
+    <OutDir>$(SolutionDir)$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)$(Platform)\</IntDir>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)thirdparty\openssl\lib\VC\static;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>d3d11</TargetName>
+    <OutDir>$(SolutionDir)$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)$(Platform)\</IntDir>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)thirdparty\openssl\lib\VC\static;$(LibraryPath)</LibraryPath>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;NEXUS_EXPORTS;_WINDOWS;_USRDLL;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)thirdparty\;$(SolutionDir)thirdparty\imgui\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/utf-8 /Zc:__cplusplus</AdditionalOptions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <UseStandardPreprocessor>
+      </UseStandardPreprocessor>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <ModuleDefinitionFile>Proxy\Proxy.def</ModuleDefinitionFile>
+      <AdditionalDependencies>advapi32.lib;crypt32.lib;DbgHelp.lib;gdi32.lib;ntdll.lib;PathCch.lib;Psapi.lib;shcore.lib;Shell32.lib;Shlwapi.lib;user32.lib;ws2_32.lib;libssl64MTd.lib;libcrypto64MTd.lib</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;NEXUS_EXPORTS;_WINDOWS;_USRDLL;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)thirdparty\;$(SolutionDir)thirdparty\imgui\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/utf-8 /Zc:__cplusplus</AdditionalOptions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <UseStandardPreprocessor>
+      </UseStandardPreprocessor>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <ModuleDefinitionFile>Proxy\Proxy.def</ModuleDefinitionFile>
+      <AdditionalDependencies>advapi32.lib;crypt32.lib;DbgHelp.lib;gdi32.lib;ntdll.lib;PathCch.lib;Psapi.lib;shcore.lib;Shell32.lib;Shlwapi.lib;user32.lib;ws2_32.lib;libssl64MT.lib;libcrypto64MT.lib</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

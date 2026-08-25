@@ -12,8 +12,8 @@ bld/
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 
-Branch.h
-CommitHash.h
-Version.h
-Remote.h
+Build/Branch.h
+Build/CommitHash.h
+Build/Version.h
+Build/Remote.h
 *.user

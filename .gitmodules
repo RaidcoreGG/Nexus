@@ -1,8 +1,8 @@
 [submodule "Scripts"]
 	path = Scripts
 	url = https://github.com/RaidcoreGG/RCGG-Scripts
-[submodule "res/Locales"]
-	path = res/Locales
+[submodule "Nexus/res/Locales"]
+	path = Nexus/res/Locales
 	url = https://github.com/RaidcoreGG/Nexus-Translations
 [submodule "thirdparty/Mumble"]
 	path = thirdparty/Mumble
@@ -14,5 +14,5 @@
 	path = thirdparty/Clockwork
 	url = https://github.com/RaidcoreGG/Clockwork
 [submodule "thirdparty/Util"]
-	path = src/Util
+	path = thirdparty/Util
 	url = https://github.com/RaidcoreGG/cpp-utility

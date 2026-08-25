@@ -1,6 +1,6 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include "Version.h"
+#include "Build/Version.h"
 #include "ResConst.h"
 
 #define STRINGIFY(x) #x

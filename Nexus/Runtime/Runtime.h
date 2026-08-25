@@ -11,7 +11,8 @@
 #include <memory>
 #include <windows.h>
 
-#include "Branch.h"
+#include "Build/Branch.h"
+#include "Build/Version.h"
 #include "Core/DataLink/DlApi.h"
 #include "Core/Functions/FnRegistry.h"
 #include "Core/Logging/LogApi.h"
@@ -35,7 +36,6 @@
 #include "Platform/RawInput/RiApi.h"
 #include "Proxy/PxyEnum.h"
 #include "UI/UiContext.h"
-#include "Version.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// Raidcore::Nexus Namespace
