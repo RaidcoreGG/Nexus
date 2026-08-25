@@ -214,9 +214,6 @@
     <Filter Include="UI\Views\QuickAccess">
       <UniqueIdentifier>{CD48CE83-6FF8-4D65-AA8C-062E7DF0C264}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Build">
-      <UniqueIdentifier>{c80b5c53-6fe1-470b-b2fa-08fc26d06d99}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Host\Addons\Addon.cpp">
@@ -1416,19 +1413,5 @@
     <None Include="Proxy\Proxy.def">
       <Filter>Proxy</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\Build\Branch.h">
-      <Filter>Build</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Build\CommitHash.h">
-      <Filter>Build</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Build\Remote.h">
-      <Filter>Build</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Build\Version.h">
-      <Filter>Build</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

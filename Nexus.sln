@@ -3,12 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.9.12112.369
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Nexus", "Nexus/Nexus.vcxproj", "{70B0E807-04CF-46A6-B838-7904E154581E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Nexus", "Nexus\Nexus.vcxproj", "{70B0E807-04CF-46A6-B838-7904E154581E}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B815E406-20F3-4466-8E33-033B094187FA} = {B815E406-20F3-4466-8E33-033B094187FA}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Build", "Build/Build.vcxproj", "{B815E406-20F3-4466-8E33-033B094187FA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Build", "Build\Build.vcxproj", "{B815E406-20F3-4466-8E33-033B094187FA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Installer", "Installer\Installer.vcxproj", "{DB5C9E86-F077-4C8D-BC11-EA0A4EDA0F85}"
+	ProjectSection(ProjectDependencies) = postProject
+		{70B0E807-04CF-46A6-B838-7904E154581E} = {70B0E807-04CF-46A6-B838-7904E154581E}
+		{B815E406-20F3-4466-8E33-033B094187FA} = {B815E406-20F3-4466-8E33-033B094187FA}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,6 +30,10 @@ Global
 		{B815E406-20F3-4466-8E33-033B094187FA}.Debug|x64.Build.0 = Debug|x64
 		{B815E406-20F3-4466-8E33-033B094187FA}.Release|x64.ActiveCfg = Release|x64
 		{B815E406-20F3-4466-8E33-033B094187FA}.Release|x64.Build.0 = Release|x64
+		{DB5C9E86-F077-4C8D-BC11-EA0A4EDA0F85}.Debug|x64.ActiveCfg = Debug|x64
+		{DB5C9E86-F077-4C8D-BC11-EA0A4EDA0F85}.Debug|x64.Build.0 = Debug|x64
+		{DB5C9E86-F077-4C8D-BC11-EA0A4EDA0F85}.Release|x64.ActiveCfg = Release|x64
+		{DB5C9E86-F077-4C8D-BC11-EA0A4EDA0F85}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

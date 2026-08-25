@@ -101,10 +101,6 @@
     <ClCompile Include="Platform\RawInput\RiApi.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Build\Branch.h" />
-    <ClInclude Include="..\Build\CommitHash.h" />
-    <ClInclude Include="..\Build\Remote.h" />
-    <ClInclude Include="..\Build\Version.h" />
     <ClInclude Include="Host\Addons\AddEnum.h" />
     <ClInclude Include="Host\Addons\Addon.h" />
     <ClInclude Include="Host\Config\CfgEnum.h" />
@@ -452,16 +448,16 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>d3d11</TargetName>
-    <OutDir>$(SolutionDir)$(Platform)\</OutDir>
-    <IntDir>$(SolutionDir)$(Platform)\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(Platform)\Nexus\</OutDir>
+    <IntDir>$(SolutionDir)obj\$(Platform)\Nexus\</IntDir>
     <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)thirdparty\openssl\lib\VC\static;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>d3d11</TargetName>
-    <OutDir>$(SolutionDir)$(Platform)\</OutDir>
-    <IntDir>$(SolutionDir)$(Platform)\</IntDir>
+    <OutDir>$(SolutionDir)bin\$(Platform)\Nexus\</OutDir>
+    <IntDir>$(SolutionDir)obj\$(Platform)\Nexus\</IntDir>
     <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)thirdparty\openssl\lib\VC\static;$(LibraryPath)</LibraryPath>
     <RunCodeAnalysis>false</RunCodeAnalysis>
