@@ -4,7 +4,7 @@
 ![](https://img.shields.io/github/v/release/RaidcoreGG/Nexus?style=for-the-badge&labelColor=%23131519&color=%230F79AA)
 ![](https://img.shields.io/github/downloads/RaidcoreGG/Nexus/total?style=for-the-badge&labelColor=%23131519&color=%230F79AA&label=Downloads)
 
-# Nexus - An addon engine for Guild Wars 2
+# Nexus - *The* addon manager for Guild Wars 2
 
 *Host, Loader, Manager, Framework* and *Platform* are all terms describing what Nexus does.
 
