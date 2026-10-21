@@ -51,7 +51,6 @@ class CSnowflakeMgr
 	CSnowflakeMgr();
 
 	void Update();
-	void Clear();
 
 	private:
 	bool IsPartyPooper = false;

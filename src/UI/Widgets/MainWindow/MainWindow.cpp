@@ -167,7 +167,6 @@ void CMainWindow::Render()
 	/* don't continue if not visible */
 	if (!this->IsVisible)
 	{
-		s_SnowflakeMgr.Clear();
 		return;
 	}
 

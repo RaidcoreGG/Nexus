@@ -186,8 +186,3 @@ void CSnowflakeMgr::Update()
 		}
 	}
 }
-
-void CSnowflakeMgr::Clear()
-{
-	this->Snowflakes.clear();
-}
