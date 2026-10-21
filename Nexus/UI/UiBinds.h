@@ -11,6 +11,7 @@
 #include <mutex>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "Inputs/InputBinds/IbBindV2.h"
@@ -32,8 +33,8 @@ namespace Raidcore::Nexus::GUI
 
 	struct InputBindCategory_t
 	{
-		std::string                                        Name{};
-		std::unordered_map<std::string, InputBindPacked_t> InputBinds{};
+		std::string                                            Name{};
+		std::vector<std::pair<std::string, InputBindPacked_t>> InputBinds{};
 	};
 
 	struct GameInputBindPacked_t
@@ -86,7 +87,7 @@ namespace Raidcore::Nexus::GUI
 		/// GetInputBinds:
 		/// 	Returns a copy of the display input binds.
 		///----------------------------------------------------------------------------------------------------
-		std::unordered_map<std::string, InputBindPacked_t> GetInputBinds(const std::string& aCategory);
+		std::vector<std::pair<std::string, InputBindPacked_t>> GetInputBinds(const std::string& aCategory);
 
 		///----------------------------------------------------------------------------------------------------
 		/// GetGameBinds:

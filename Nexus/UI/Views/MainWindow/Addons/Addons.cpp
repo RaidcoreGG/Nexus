@@ -1002,7 +1002,7 @@ namespace Raidcore::Nexus::GUI
 		this->AddonContextMenu.Render();
 	}
 
-	void CAddonsWindow::RenderInputBindsTable(const std::unordered_map<std::string, InputBindPacked_t>& aInputBinds)
+	void CAddonsWindow::RenderInputBindsTable(const std::vector<std::pair<std::string, InputBindPacked_t>>& aInputBinds)
 	{
 		if (ImGui::BeginTable("table_inputbinds_addons", 2, ImGuiTableFlags_BordersInnerH))
 		{

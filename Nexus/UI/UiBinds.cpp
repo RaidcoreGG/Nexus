@@ -30,7 +30,7 @@ namespace Raidcore::Nexus::GUI
 		return this->DisplayInputBinds;
 	}
 
-	std::unordered_map<std::string, InputBindPacked_t> CUiBinds::GetInputBinds(const std::string& aCategory)
+	std::vector<std::pair<std::string, InputBindPacked_t>> CUiBinds::GetInputBinds(const std::string& aCategory)
 	{
 		const std::lock_guard<std::mutex> lock(this->DisplayBindsMutex);
 
@@ -94,24 +94,33 @@ namespace Raidcore::Nexus::GUI
 			{
 				InputBindCategory_t cat{};
 				cat.Name = owner;
-				cat.InputBinds[identifier] =
+				cat.InputBinds.push_back({ identifier,
 				{
 					Input::IBToString(inputBind.Bind, true),
 					inputBind
-				};
+				} });
 				this->DisplayInputBinds.push_back(cat);
 			}
 			else
 			{
-				it->InputBinds[identifier] =
+				it->InputBinds.push_back({ identifier,
 				{
 					Input::IBToString(inputBind.Bind, true),
 					inputBind
-				};
+				} });
 			}
 		}
 
-		/* sort input binds. */
+		/* sort binds within each category in registration order, unregistered ones stay alphabetical. */
+		for (InputBindCategory_t& cat : this->DisplayInputBinds)
+		{
+			std::stable_sort(cat.InputBinds.begin(), cat.InputBinds.end(), [](const auto& lhs, const auto& rhs)
+			{
+				return lhs.second.Bind.RegisterOrder < rhs.second.Bind.RegisterOrder;
+			});
+		}
+
+		/* sort categories. */
 		std::sort(this->DisplayInputBinds.begin(), this->DisplayInputBinds.end(), [](InputBindCategory_t& lhs, InputBindCategory_t& rhs)
 		{
 			// Nexus first

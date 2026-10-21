@@ -133,6 +133,7 @@ namespace Raidcore::Nexus::Input
 		mutable std::mutex                 Mutex;
 		std::map<std::string, IbMapping_t> Registry;
 		std::map<std::string, InputBind_t> HeldInputBinds;
+		uint64_t                           NextRegisterOrder = 1;
 
 		///----------------------------------------------------------------------------------------------------
 		/// LoadSafe:
