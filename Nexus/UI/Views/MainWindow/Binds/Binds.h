@@ -38,7 +38,7 @@ namespace Raidcore::Nexus::GUI
 		std::vector<InputBindCategory_t>     IBCategories;
 		std::vector<GameInputBindCategory_t> GIBCategories;
 
-		void RenderInputBindsTable(std::unordered_map<std::string, InputBindPacked_t>& aInputBinds);
+		void RenderInputBindsTable(std::vector<std::pair<std::string, InputBindPacked_t>>& aInputBinds);
 		void RenderGameInputBindsTable(std::unordered_map<GW2::EGameBinds, GameInputBindPacked_t>& aInputBinds);
 
 		void DeleteStaleBind(const std::string& aIdentifier);

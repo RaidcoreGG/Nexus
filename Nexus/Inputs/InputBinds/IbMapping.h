@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include "IbBindV2.h"
 #include "IbEnum.h"
 
@@ -28,6 +30,7 @@ namespace Raidcore::Nexus::Input
 		InputBind_t    Bind = {};
 		bool           Passthrough = false;
 		EIbHandlerType HandlerType = EIbHandlerType::None;
+		uint64_t       RegisterOrder = 0; /* Sequence number of the last Register call. 0 if not registered this session. */
 		union
 		{
 			INPUTBINDS_PROCESS  Handler_DownOnlyAsync;

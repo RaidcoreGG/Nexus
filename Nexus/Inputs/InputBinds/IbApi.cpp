@@ -189,10 +189,13 @@ namespace Raidcore::Nexus::Input
 				mapping.HandlerType = EIbHandlerType::None;
 			}
 
+			mapping.RegisterOrder = this->NextRegisterOrder++;
+
 			this->Registry.emplace(aIdentifier, mapping);
 		}
 		else
 		{
+			it->second.RegisterOrder = this->NextRegisterOrder++;
 			it->second.HandlerType = aInputBindHandlerType;
 			switch (aInputBindHandlerType)
 			{

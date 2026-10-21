@@ -172,7 +172,7 @@ namespace Raidcore::Nexus::GUI
 		}
 	}
 
-	void CBindsWindow::RenderInputBindsTable(std::unordered_map<std::string, InputBindPacked_t>& aInputBinds)
+	void CBindsWindow::RenderInputBindsTable(std::vector<std::pair<std::string, InputBindPacked_t>>& aInputBinds)
 	{
 		if (ImGui::BeginTable("table_inputbinds", 4, ImGuiTableFlags_BordersInnerH))
 		{

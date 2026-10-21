@@ -9,7 +9,6 @@
 #pragma once
 
 #include <string>
-#include <unordered_map>
 
 #include "thirdparty/Util/Strings.h"
 
@@ -28,14 +27,14 @@ namespace Raidcore::Nexus::GUI
 	{
 		CAddon* Addon;
 
-		bool                                               HasLibDef;
-		Host::LibraryAddon_t                               LibraryDef;
-		bool                                               IsInstalling;
+		bool                                                   HasLibDef;
+		Host::LibraryAddon_t                                   LibraryDef;
+		bool                                                   IsInstalling;
 
-		std::unordered_map<std::string, InputBindPacked_t> InputBinds;
-		GUI_RENDER                                         OptionsRender;
+		std::vector<std::pair<std::string, InputBindPacked_t>> InputBinds;
+		GUI_RENDER                                             OptionsRender;
 
-		bool                                               IsHovered;
+		bool                                                   IsHovered;
 
 		inline std::string GetUniqueID() const
 		{

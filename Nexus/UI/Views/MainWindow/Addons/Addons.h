@@ -97,7 +97,7 @@ namespace Raidcore::Nexus::GUI
 		void RenderActionsBar(ImVec2& aSize);
 
 		void RenderSubWindows() override;
-		void RenderInputBindsTable(const std::unordered_map<std::string, InputBindPacked_t>& aInputBinds);
+		void RenderInputBindsTable(const std::vector<std::pair<std::string, InputBindPacked_t>>& aInputBinds);
 
 		void PopulateAddons();
 	};
