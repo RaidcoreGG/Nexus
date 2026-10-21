@@ -1,8 +1,8 @@
 [submodule "Scripts"]
 	path = Scripts
 	url = https://github.com/RaidcoreGG/RCGG-Scripts
-[submodule "Nexus/res/Locales"]
-	path = Nexus/res/Locales
+[submodule "res/Locales"]
+	path = res/Locales
 	url = https://github.com/RaidcoreGG/Nexus-Translations
 [submodule "thirdparty/Mumble"]
 	path = thirdparty/Mumble
@@ -10,9 +10,9 @@
 [submodule "thirdparty/ImAnimate"]
 	path = thirdparty/ImAnimate
 	url = https://github.com/RaidcoreGG/ImAnimate
-[submodule "thirdparty/Clockwork"]
-	path = thirdparty/Clockwork
+[submodule "src/Engine/Clockwork"]
+	path = src/Engine/Clockwork
 	url = https://github.com/RaidcoreGG/Clockwork
-[submodule "thirdparty/Util"]
-	path = thirdparty/Util
+[submodule "src/Util"]
+	path = src/Util
 	url = https://github.com/RaidcoreGG/cpp-utility

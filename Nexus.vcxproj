@@ -1,0 +1,564 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Core\Addons\Addon.cpp" />
+    <ClCompile Include="src\Core\Addons\Config\CfgManager.cpp" />
+    <ClCompile Include="src\Core\Addons\Library\LibAddon.cpp" />
+    <ClCompile Include="src\Core\Addons\Library\LibManager.cpp" />
+    <ClCompile Include="src\Core\Context.cpp" />
+    <ClCompile Include="src\Core\Hooks\Hooks.cpp" />
+    <ClCompile Include="src\Core\Updater\SelfUpdater.cpp" />
+    <ClCompile Include="src\Engine\Cleanup\RefCleanerBase.cpp" />
+    <ClCompile Include="src\Engine\Cleanup\RefCleanerContext.cpp" />
+    <ClCompile Include="src\Engine\Clockwork\Clockwork.cpp" />
+    <ClCompile Include="src\Engine\CrashHandler\CrashHandler.cpp" />
+    <ClCompile Include="src\Engine\Functions\FnRegistry.cpp" />
+    <ClCompile Include="src\Core\Index\Index.cpp" />
+    <ClCompile Include="src\Engine\Loader\LdrAddonBase.cpp" />
+    <ClCompile Include="src\Engine\Loader\Loader.cpp" />
+    <ClCompile Include="src\Engine\Networking\WebRequests\WreCache.cpp" />
+    <ClCompile Include="src\Engine\Networking\WebRequests\WreConst.cpp" />
+    <ClCompile Include="src\GW2\ArcDPS\ArcApi.cpp" />
+    <ClCompile Include="src\GW2\Build\BuildInfo.cpp" />
+    <ClCompile Include="src\GW2\Inputs\GameBinds\GbApi.cpp" />
+    <ClCompile Include="src\GW2\Inputs\GameBinds\GbConst.cpp" />
+    <ClCompile Include="src\Engine\Inputs\InputBinds\IbCapture.cpp" />
+    <ClCompile Include="src\Engine\Inputs\InputBinds\IbConst.cpp" />
+    <ClCompile Include="src\Core\Addons\API\ApiBuilder.cpp" />
+    <ClCompile Include="src\Engine\Networking\WebRequests\WreClient.cpp" />
+    <ClCompile Include="src\Engine\DataLink\DlApi.cpp" />
+    <ClCompile Include="src\GW2\Mumble\MblConst.cpp" />
+    <ClCompile Include="src\Core\Main.cpp" />
+    <ClCompile Include="src\Engine\Events\EvtApi.cpp" />
+    <ClCompile Include="src\Engine\Logging\LogConst.cpp" />
+    <ClCompile Include="src\Proxy\PxyD3D9.cpp" />
+    <ClCompile Include="src\Proxy\PxyDXGI.cpp" />
+    <ClCompile Include="thirdparty\ImAnimate\ImAnimate.cpp" />
+    <ClCompile Include="thirdparty\imgui\imgui.cpp" />
+    <ClCompile Include="thirdparty\imgui\imgui_draw.cpp" />
+    <ClCompile Include="thirdparty\imgui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="thirdparty\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="thirdparty\imgui\imgui_tables.cpp" />
+    <ClCompile Include="thirdparty\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\Engine\Inputs\InputBinds\IbBindV2.cpp" />
+    <ClCompile Include="src\Engine\Inputs\InputBinds\IbApi.cpp" />
+    <ClCompile Include="src\Engine\Logging\LogWriter.cpp" />
+    <ClCompile Include="src\Engine\Logging\LogBase.cpp" />
+    <ClCompile Include="src\Engine\Logging\LogApi.cpp" />
+    <ClCompile Include="src\Engine\Logging\LogConsole.cpp" />
+    <ClCompile Include="thirdparty\minhook\mh_buffer.cpp" />
+    <ClCompile Include="thirdparty\minhook\mh_disasm.cpp" />
+    <ClCompile Include="thirdparty\minhook\mh_hook.cpp" />
+    <ClCompile Include="thirdparty\minhook\mh_trampoline.cpp" />
+    <ClCompile Include="src\GW2\Multibox\Multibox.cpp" />
+    <ClCompile Include="src\GW2\Mumble\MblReader.cpp" />
+    <ClCompile Include="src\Proxy\PxyD3D11.cpp" />
+    <ClCompile Include="src\Core\Preferences\PrefContext.cpp" />
+    <ClCompile Include="src\UI\Textures\TxLoader.cpp" />
+    <ClCompile Include="thirdparty\pugixml\pugixml.cpp" />
+    <ClCompile Include="src\UI\Controls\CtlContextMenu.cpp" />
+    <ClCompile Include="src\UI\Controls\CtlModal.cpp" />
+    <ClCompile Include="src\UI\Controls\CtlSubWindow.cpp" />
+    <ClCompile Include="src\UI\Controls\CtlWindow.cpp" />
+    <ClCompile Include="src\UI\Overlay\MumbleInspector\MumbleInspector.cpp" />
+    <ClCompile Include="src\UI\Services\Fonts\FontManager.cpp" />
+    <ClCompile Include="src\UI\Services\Localization\LoclApi.cpp" />
+    <ClCompile Include="src\UI\Services\QoL\EscapeClosing.cpp" />
+    <ClCompile Include="src\UI\UiBinds.cpp" />
+    <ClCompile Include="src\UI\UiContext.cpp" />
+    <ClCompile Include="src\UI\UiInput.cpp" />
+    <ClCompile Include="src\UI\UiRender.cpp" />
+    <ClCompile Include="src\UI\Services\Scaling\Scaling.cpp" />
+    <ClCompile Include="src\UI\UiStyle.cpp" />
+    <ClCompile Include="src\UI\Widgets\Alerts\Alerts.cpp" />
+    <ClCompile Include="src\UI\Widgets\EULA\LicenseAgreementModal.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\About\About.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\Addons\Addons.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\Addons\CmAddon.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\Addons\LoadConfirmationModal.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\Addons\UninstallConfirmationModal.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\Binds\Binds.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\Binds\BindSetterModal.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\Log\Log.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\MainWindow.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\Options\ExportStyleModal.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\Options\ImportStyleModal.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\Options\Options.cpp" />
+    <ClCompile Include="src\UI\Widgets\MainWindow\SnowflakeMgr.cpp" />
+    <ClCompile Include="src\UI\Widgets\QuickAccess\QaConst.cpp" />
+    <ClCompile Include="src\UI\Widgets\QuickAccess\QaShortcut.cpp" />
+    <ClCompile Include="src\UI\Widgets\QuickAccess\QuickAccess.cpp" />
+    <ClCompile Include="src\Engine\Inputs\RawInput\RiApi.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\CommitHash.h" />
+    <ClInclude Include="src\Core\Addons\AddEnum.h" />
+    <ClInclude Include="src\Core\Addons\Addon.h" />
+    <ClInclude Include="src\Core\Addons\Config\CfgEnum.h" />
+    <ClInclude Include="src\Core\Addons\Config\CfgManager.h" />
+    <ClInclude Include="src\Core\Addons\Config\Config.h" />
+    <ClInclude Include="src\Core\Addons\Definitions\DefEnum.h" />
+    <ClInclude Include="src\Core\Addons\Library\LibAddon.h" />
+    <ClInclude Include="src\Core\Addons\Library\LibManager.h" />
+    <ClInclude Include="src\Core\Context.h" />
+    <ClInclude Include="src\Core\Hooks\HkConst.h" />
+    <ClInclude Include="src\Core\Hooks\HkFuncDefs.h" />
+    <ClInclude Include="src\Core\Hooks\Hooks.h" />
+    <ClInclude Include="src\Core\Hooks\HkNotify.h" />
+    <ClInclude Include="src\Core\Preferences\PrefConst.h" />
+    <ClInclude Include="src\Proxy\Proxy.h" />
+    <ClInclude Include="src\Proxy\PxyD3D11.h" />
+    <ClInclude Include="src\Proxy\PxyD3D9.h" />
+    <ClInclude Include="src\Proxy\PxyDXGI.h" />
+    <ClInclude Include="src\Proxy\PxyEnum.h" />
+    <ClInclude Include="src\Core\Updater\SelfUpdater.h" />
+    <ClInclude Include="src\Core\Versioning\Version.h" />
+    <ClInclude Include="src\Engine\Cleanup\RefCleanerContext.h" />
+    <ClInclude Include="src\Engine\Clockwork\Tasks\CancellationToken.h" />
+    <ClInclude Include="src\Engine\Clockwork\Clockwork.h" />
+    <ClInclude Include="src\Engine\Clockwork\Tasks\ScheduledTask.h" />
+    <ClInclude Include="src\Engine\Clockwork\Tasks\Task.h" />
+    <ClInclude Include="src\Engine\Clockwork\Tasks\TaskBase.h" />
+    <ClInclude Include="src\Engine\Clockwork\Tasks\ETaskPriority.h" />
+    <ClInclude Include="src\Engine\Clockwork\Dispatcher.h" />
+    <ClInclude Include="src\Engine\CrashHandler\CrashHandler.h" />
+    <ClInclude Include="src\Engine\Events\EvtData.h" />
+    <ClInclude Include="src\Engine\Functions\FnEntry.h" />
+    <ClInclude Include="src\Engine\Functions\FnRegistry.h" />
+    <ClInclude Include="src\Core\Index\IdxEnum.h" />
+    <ClInclude Include="src\Core\Index\Index.h" />
+    <ClInclude Include="src\Core\Addons\API\ApiV1.h" />
+    <ClInclude Include="src\Core\Addons\API\ApiV2.h" />
+    <ClInclude Include="src\Core\Addons\API\ApiV3.h" />
+    <ClInclude Include="src\Core\Addons\API\ApiV4.h" />
+    <ClInclude Include="src\Core\Addons\API\ApiV5.h" />
+    <ClInclude Include="src\Core\Addons\API\ApiV6.h" />
+    <ClInclude Include="src\Engine\Loader\LdrAddonBase.h" />
+    <ClInclude Include="src\Engine\Loader\LdrChecksum.h" />
+    <ClInclude Include="src\Engine\Loader\LdrEnum.h" />
+    <ClInclude Include="src\Engine\Loader\Loader.h" />
+    <ClInclude Include="src\Engine\Networking\WebRequests\WreCache.h" />
+    <ClInclude Include="src\Engine\Networking\WebRequests\WreConst.h" />
+    <ClInclude Include="src\Engine\Verifier.h" />
+    <ClInclude Include="src\Engine\Cleanup\RefCleanerBase.h" />
+    <ClInclude Include="src\GW2\ArcDPS\ArcApi.h" />
+    <ClInclude Include="src\GW2\ArcDPS\ArcEnum.h" />
+    <ClInclude Include="src\GW2\ArcDPS\ArcExtensionDef.h" />
+    <ClInclude Include="src\GW2\ArcDPS\ArcFuncDefs.h" />
+    <ClInclude Include="src\GW2\Build\BuildInfo.h" />
+    <ClInclude Include="src\GW2\Inputs\MouseResetFix.h" />
+    <ClInclude Include="src\Engine\Networking\NetConst.h" />
+    <ClInclude Include="src\UI\Renderer\RdrContext.h" />
+    <ClInclude Include="src\UI\Renderer\RdrMetrics.h" />
+    <ClInclude Include="src\UI\Renderer\RdrWindow.h" />
+    <ClInclude Include="src\GW2\Inputs\GameBinds\GbEnum.h" />
+    <ClInclude Include="src\GW2\Inputs\GameBinds\GbConst.h" />
+    <ClInclude Include="src\GW2\Inputs\GameBinds\GbFuncDefs.h" />
+    <ClInclude Include="src\GW2\Inputs\GameBinds\GbApi.h" />
+    <ClInclude Include="src\Engine\Inputs\InputBinds\IbBind.h" />
+    <ClInclude Include="src\Engine\Inputs\InputBinds\IbCapture.h" />
+    <ClInclude Include="src\Engine\Inputs\InputBinds\IbConst.h" />
+    <ClInclude Include="src\Engine\Inputs\InputBinds\IbEnum.h" />
+    <ClInclude Include="src\Engine\Inputs\InputBinds\IbMapping.h" />
+    <ClInclude Include="src\Core\Addons\API\ApiBuilder.h" />
+    <ClInclude Include="src\GW2\Mumble\MblConst.h" />
+    <ClInclude Include="src\GW2\Mumble\MblExtensions.h" />
+    <ClInclude Include="src\Remote.h" />
+    <ClInclude Include="src\Engine\Networking\WebRequests\WreClient.h" />
+    <ClInclude Include="src\Engine\Networking\WebRequests\WreResponse.h" />
+    <ClInclude Include="src\Branch.h" />
+    <ClInclude Include="src\Core\Addons\AddConst.h" />
+    <ClInclude Include="src\Engine\DataLink\DlApi.h" />
+    <ClInclude Include="src\Engine\DataLink\DlEnum.h" />
+    <ClInclude Include="src\Engine\DataLink\DlFuncDefs.h" />
+    <ClInclude Include="src\Engine\DataLink\DlLinkedResource.h" />
+    <ClInclude Include="src\Engine\Events\EvtApi.h" />
+    <ClInclude Include="src\Engine\Events\EvtSubscriber.h" />
+    <ClInclude Include="src\Engine\Events\EvtFuncDefs.h" />
+    <ClInclude Include="src\Engine\Logging\LogConst.h" />
+    <ClInclude Include="src\Engine\Logging\LogEnum.h" />
+    <ClInclude Include="src\UI\Textures\TxEnum.h" />
+    <ClInclude Include="src\thirdparty\arcdps\ArcDPS.h" />
+    <ClInclude Include="src\Util\Base64.h" />
+    <ClInclude Include="src\Util\CmdLine.h" />
+    <ClInclude Include="src\Util\DLL.h" />
+    <ClInclude Include="src\Util\Enums.h" />
+    <ClInclude Include="src\Util\Inputs.h" />
+    <ClInclude Include="src\Util\MD5.h" />
+    <ClInclude Include="src\Util\Paths.h" />
+    <ClInclude Include="src\Util\Resources.h" />
+    <ClInclude Include="src\Util\Strings.h" />
+    <ClInclude Include="src\Util\Time.h" />
+    <ClInclude Include="src\Util\Url.h" />
+    <ClInclude Include="thirdparty\httplib\httplib.h" />
+    <ClInclude Include="thirdparty\ImAnimate\ImAnimate.h" />
+    <ClInclude Include="thirdparty\imgui\imconfig.h" />
+    <ClInclude Include="thirdparty\imgui\imgui.h" />
+    <ClInclude Include="thirdparty\imgui\imgui_extensions.h" />
+    <ClInclude Include="thirdparty\imgui\imgui_impl_dx11.h" />
+    <ClInclude Include="thirdparty\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="thirdparty\imgui\imgui_internal.h" />
+    <ClInclude Include="thirdparty\imgui\imgui_memory_editor.h" />
+    <ClInclude Include="thirdparty\imgui\imstb_rectpack.h" />
+    <ClInclude Include="thirdparty\imgui\imstb_textedit.h" />
+    <ClInclude Include="thirdparty\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\Engine\Inputs\InputBinds\IbFuncDefs.h" />
+    <ClInclude Include="src\Engine\Inputs\InputBinds\IbBindV2.h" />
+    <ClInclude Include="src\Engine\Inputs\InputBinds\IbApi.h" />
+    <ClInclude Include="src\Core\NexusLink.h" />
+    <ClInclude Include="src\Engine\Logging\LogFuncDefs.h" />
+    <ClInclude Include="src\Core\Main.h" />
+    <ClInclude Include="src\GW2\Multibox\Multibox.h" />
+    <ClInclude Include="thirdparty\mumble\Mumble.h" />
+    <ClInclude Include="thirdparty\nlohmann\json.hpp" />
+    <ClInclude Include="thirdparty\openssl\aes.h" />
+    <ClInclude Include="thirdparty\openssl\asn1.h" />
+    <ClInclude Include="thirdparty\openssl\asn1err.h" />
+    <ClInclude Include="thirdparty\openssl\asn1t.h" />
+    <ClInclude Include="thirdparty\openssl\asn1_mac.h" />
+    <ClInclude Include="thirdparty\openssl\async.h" />
+    <ClInclude Include="thirdparty\openssl\asyncerr.h" />
+    <ClInclude Include="thirdparty\openssl\bio.h" />
+    <ClInclude Include="thirdparty\openssl\bioerr.h" />
+    <ClInclude Include="thirdparty\openssl\blowfish.h" />
+    <ClInclude Include="thirdparty\openssl\bn.h" />
+    <ClInclude Include="thirdparty\openssl\bnerr.h" />
+    <ClInclude Include="thirdparty\openssl\buffer.h" />
+    <ClInclude Include="thirdparty\openssl\buffererr.h" />
+    <ClInclude Include="thirdparty\openssl\camellia.h" />
+    <ClInclude Include="thirdparty\openssl\cast.h" />
+    <ClInclude Include="thirdparty\openssl\cmac.h" />
+    <ClInclude Include="thirdparty\openssl\cmp.h" />
+    <ClInclude Include="thirdparty\openssl\cmperr.h" />
+    <ClInclude Include="thirdparty\openssl\cmp_util.h" />
+    <ClInclude Include="thirdparty\openssl\cms.h" />
+    <ClInclude Include="thirdparty\openssl\cmserr.h" />
+    <ClInclude Include="thirdparty\openssl\comp.h" />
+    <ClInclude Include="thirdparty\openssl\comperr.h" />
+    <ClInclude Include="thirdparty\openssl\conf.h" />
+    <ClInclude Include="thirdparty\openssl\conferr.h" />
+    <ClInclude Include="thirdparty\openssl\configuration.h" />
+    <ClInclude Include="thirdparty\openssl\conftypes.h" />
+    <ClInclude Include="thirdparty\openssl\conf_api.h" />
+    <ClInclude Include="thirdparty\openssl\core.h" />
+    <ClInclude Include="thirdparty\openssl\core_dispatch.h" />
+    <ClInclude Include="thirdparty\openssl\core_names.h" />
+    <ClInclude Include="thirdparty\openssl\core_object.h" />
+    <ClInclude Include="thirdparty\openssl\crmf.h" />
+    <ClInclude Include="thirdparty\openssl\crmferr.h" />
+    <ClInclude Include="thirdparty\openssl\crypto.h" />
+    <ClInclude Include="thirdparty\openssl\cryptoerr.h" />
+    <ClInclude Include="thirdparty\openssl\cryptoerr_legacy.h" />
+    <ClInclude Include="thirdparty\openssl\ct.h" />
+    <ClInclude Include="thirdparty\openssl\cterr.h" />
+    <ClInclude Include="thirdparty\openssl\decoder.h" />
+    <ClInclude Include="thirdparty\openssl\decodererr.h" />
+    <ClInclude Include="thirdparty\openssl\des.h" />
+    <ClInclude Include="thirdparty\openssl\dh.h" />
+    <ClInclude Include="thirdparty\openssl\dherr.h" />
+    <ClInclude Include="thirdparty\openssl\dsa.h" />
+    <ClInclude Include="thirdparty\openssl\dsaerr.h" />
+    <ClInclude Include="thirdparty\openssl\dtls1.h" />
+    <ClInclude Include="thirdparty\openssl\ebcdic.h" />
+    <ClInclude Include="thirdparty\openssl\ec.h" />
+    <ClInclude Include="thirdparty\openssl\ecdh.h" />
+    <ClInclude Include="thirdparty\openssl\ecdsa.h" />
+    <ClInclude Include="thirdparty\openssl\ecerr.h" />
+    <ClInclude Include="thirdparty\openssl\encoder.h" />
+    <ClInclude Include="thirdparty\openssl\encodererr.h" />
+    <ClInclude Include="thirdparty\openssl\engine.h" />
+    <ClInclude Include="thirdparty\openssl\engineerr.h" />
+    <ClInclude Include="thirdparty\openssl\err.h" />
+    <ClInclude Include="thirdparty\openssl\ess.h" />
+    <ClInclude Include="thirdparty\openssl\esserr.h" />
+    <ClInclude Include="thirdparty\openssl\evp.h" />
+    <ClInclude Include="thirdparty\openssl\evperr.h" />
+    <ClInclude Include="thirdparty\openssl\e_os2.h" />
+    <ClInclude Include="thirdparty\openssl\fipskey.h" />
+    <ClInclude Include="thirdparty\openssl\fips_names.h" />
+    <ClInclude Include="thirdparty\openssl\hmac.h" />
+    <ClInclude Include="thirdparty\openssl\http.h" />
+    <ClInclude Include="thirdparty\openssl\httperr.h" />
+    <ClInclude Include="thirdparty\openssl\idea.h" />
+    <ClInclude Include="thirdparty\openssl\kdf.h" />
+    <ClInclude Include="thirdparty\openssl\kdferr.h" />
+    <ClInclude Include="thirdparty\openssl\lhash.h" />
+    <ClInclude Include="thirdparty\openssl\macros.h" />
+    <ClInclude Include="thirdparty\openssl\md2.h" />
+    <ClInclude Include="thirdparty\openssl\md4.h" />
+    <ClInclude Include="thirdparty\openssl\md5.h" />
+    <ClInclude Include="thirdparty\openssl\mdc2.h" />
+    <ClInclude Include="thirdparty\openssl\modes.h" />
+    <ClInclude Include="thirdparty\openssl\objects.h" />
+    <ClInclude Include="thirdparty\openssl\objectserr.h" />
+    <ClInclude Include="thirdparty\openssl\obj_mac.h" />
+    <ClInclude Include="thirdparty\openssl\ocsp.h" />
+    <ClInclude Include="thirdparty\openssl\ocsperr.h" />
+    <ClInclude Include="thirdparty\openssl\opensslconf.h" />
+    <ClInclude Include="thirdparty\openssl\opensslv.h" />
+    <ClInclude Include="thirdparty\openssl\ossl_typ.h" />
+    <ClInclude Include="thirdparty\openssl\params.h" />
+    <ClInclude Include="thirdparty\openssl\param_build.h" />
+    <ClInclude Include="thirdparty\openssl\pem.h" />
+    <ClInclude Include="thirdparty\openssl\pem2.h" />
+    <ClInclude Include="thirdparty\openssl\pemerr.h" />
+    <ClInclude Include="thirdparty\openssl\pkcs12.h" />
+    <ClInclude Include="thirdparty\openssl\pkcs12err.h" />
+    <ClInclude Include="thirdparty\openssl\pkcs7.h" />
+    <ClInclude Include="thirdparty\openssl\pkcs7err.h" />
+    <ClInclude Include="thirdparty\openssl\proverr.h" />
+    <ClInclude Include="thirdparty\openssl\provider.h" />
+    <ClInclude Include="thirdparty\openssl\prov_ssl.h" />
+    <ClInclude Include="thirdparty\openssl\rand.h" />
+    <ClInclude Include="thirdparty\openssl\randerr.h" />
+    <ClInclude Include="thirdparty\openssl\rc2.h" />
+    <ClInclude Include="thirdparty\openssl\rc4.h" />
+    <ClInclude Include="thirdparty\openssl\rc5.h" />
+    <ClInclude Include="thirdparty\openssl\ripemd.h" />
+    <ClInclude Include="thirdparty\openssl\rsa.h" />
+    <ClInclude Include="thirdparty\openssl\rsaerr.h" />
+    <ClInclude Include="thirdparty\openssl\safestack.h" />
+    <ClInclude Include="thirdparty\openssl\seed.h" />
+    <ClInclude Include="thirdparty\openssl\self_test.h" />
+    <ClInclude Include="thirdparty\openssl\sha.h" />
+    <ClInclude Include="thirdparty\openssl\srp.h" />
+    <ClInclude Include="thirdparty\openssl\srtp.h" />
+    <ClInclude Include="thirdparty\openssl\ssl.h" />
+    <ClInclude Include="thirdparty\openssl\ssl2.h" />
+    <ClInclude Include="thirdparty\openssl\ssl3.h" />
+    <ClInclude Include="thirdparty\openssl\sslerr.h" />
+    <ClInclude Include="thirdparty\openssl\sslerr_legacy.h" />
+    <ClInclude Include="thirdparty\openssl\stack.h" />
+    <ClInclude Include="thirdparty\openssl\store.h" />
+    <ClInclude Include="thirdparty\openssl\storeerr.h" />
+    <ClInclude Include="thirdparty\openssl\symhacks.h" />
+    <ClInclude Include="thirdparty\openssl\tls1.h" />
+    <ClInclude Include="thirdparty\openssl\trace.h" />
+    <ClInclude Include="thirdparty\openssl\ts.h" />
+    <ClInclude Include="thirdparty\openssl\tserr.h" />
+    <ClInclude Include="thirdparty\openssl\txt_db.h" />
+    <ClInclude Include="thirdparty\openssl\types.h" />
+    <ClInclude Include="thirdparty\openssl\ui.h" />
+    <ClInclude Include="thirdparty\openssl\uierr.h" />
+    <ClInclude Include="thirdparty\openssl\whrlpool.h" />
+    <ClInclude Include="thirdparty\openssl\x509.h" />
+    <ClInclude Include="thirdparty\openssl\x509err.h" />
+    <ClInclude Include="thirdparty\openssl\x509v3.h" />
+    <ClInclude Include="thirdparty\openssl\x509v3err.h" />
+    <ClInclude Include="thirdparty\openssl\x509_vfy.h" />
+    <ClInclude Include="thirdparty\openssl\__DECC_INCLUDE_EPILOGUE.H" />
+    <ClInclude Include="thirdparty\openssl\__DECC_INCLUDE_PROLOGUE.H" />
+    <ClInclude Include="src\Core\Addons\Definitions\AddonDefV1.h" />
+    <ClInclude Include="src\Core\Addons\API\ApiBase.h" />
+    <ClInclude Include="src\Engine\Logging\LogWriter.h" />
+    <ClInclude Include="src\Engine\Logging\LogBase.h" />
+    <ClInclude Include="src\Engine\Logging\LogMsg.h" />
+    <ClInclude Include="src\Engine\Logging\LogApi.h" />
+    <ClInclude Include="src\Engine\Logging\LogConsole.h" />
+    <ClInclude Include="thirdparty\minhook\mh_buffer.h" />
+    <ClInclude Include="thirdparty\minhook\mh_disasm.h" />
+    <ClInclude Include="thirdparty\minhook\mh_hook.h" />
+    <ClInclude Include="thirdparty\minhook\mh_trampoline.h" />
+    <ClInclude Include="src\GW2\Mumble\MblReader.h" />
+    <ClInclude Include="src\Core\Index\IdxFuncDefs.h" />
+    <ClInclude Include="res\ResConst.h" />
+    <ClInclude Include="src\Core\Preferences\PrefContext.h" />
+    <ClInclude Include="thirdparty\pugixml\pugiconfig.hpp" />
+    <ClInclude Include="thirdparty\pugixml\pugixml.hpp" />
+    <ClInclude Include="thirdparty\stb\stb_image.h" />
+    <ClInclude Include="src\UI\Textures\TxFuncDefs.h" />
+    <ClInclude Include="src\UI\Textures\TxQueueEntry.h" />
+    <ClInclude Include="src\UI\Textures\TxTexture.h" />
+    <ClInclude Include="src\UI\Textures\TxLoader.h" />
+    <ClInclude Include="src\UI\Controls\Control.h" />
+    <ClInclude Include="src\UI\Controls\CtlContextMenu.h" />
+    <ClInclude Include="src\UI\Controls\CtlModal.h" />
+    <ClInclude Include="src\UI\Controls\CtlSubWindow.h" />
+    <ClInclude Include="src\UI\Controls\CtlWindow.h" />
+    <ClInclude Include="src\UI\UiBinds.h" />
+    <ClInclude Include="src\UI\UiEnum.h" />
+    <ClInclude Include="src\UI\UiFuncDefs.h" />
+    <ClInclude Include="src\UI\Overlay\MumbleInspector\MumbleInspector.h" />
+    <ClInclude Include="src\UI\Services\Fonts\FontManager.h" />
+    <ClInclude Include="src\UI\Services\Fonts\FuncDefs.h" />
+    <ClInclude Include="src\UI\Services\Localization\LoclApi.h" />
+    <ClInclude Include="src\UI\Services\Localization\LoclFuncDefs.h" />
+    <ClInclude Include="src\UI\Services\Localization\LoclLocale.h" />
+    <ClInclude Include="src\UI\Services\Localization\LoclQueuedText.h" />
+    <ClInclude Include="src\UI\Services\QoL\EscapeClosing.h" />
+    <ClInclude Include="src\UI\Services\QoL\FuncDefs.h" />
+    <ClInclude Include="src\UI\UiContext.h" />
+    <ClInclude Include="src\UI\UiInput.h" />
+    <ClInclude Include="src\UI\UiRender.h" />
+    <ClInclude Include="src\UI\Services\Scaling\Scaling.h" />
+    <ClInclude Include="src\UI\UiStyle.h" />
+    <ClInclude Include="src\UI\Widgets\Alerts\AlEnum.h" />
+    <ClInclude Include="src\UI\Widgets\Alerts\Alerts.h" />
+    <ClInclude Include="src\UI\Widgets\Alerts\AlFuncDefs.h" />
+    <ClInclude Include="src\UI\Widgets\Alerts\AlMessage.h" />
+    <ClInclude Include="src\UI\Widgets\EULA\LicenseAgreementModal.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\About\About.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\AddonListing.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\Addons.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\CmAddon.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\CtlAddonToggle.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\LoadConfirmationModal.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Addons\UninstallConfirmationModal.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Binds\Binds.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Binds\BindSetterModal.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Log\Log.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\MainWindow.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Options\ExportStyleModal.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Options\ImportStyleModal.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\Options\Options.h" />
+    <ClInclude Include="src\UI\Widgets\MainWindow\SnowflakeMgr.h" />
+    <ClInclude Include="src\UI\Widgets\QuickAccess\QaConst.h" />
+    <ClInclude Include="src\UI\Widgets\QuickAccess\QaEnum.h" />
+    <ClInclude Include="src\UI\Widgets\QuickAccess\QaFuncDefs.h" />
+    <ClInclude Include="src\UI\Widgets\QuickAccess\QaShortcut.h" />
+    <ClInclude Include="src\UI\Widgets\QuickAccess\QuickAccess.h" />
+    <ClInclude Include="src\Version.h" />
+    <ClInclude Include="src\Engine\Inputs\RawInput\RiFuncDefs.h" />
+    <ClInclude Include="src\Engine\Inputs\RawInput\RiApi.h" />
+    <ClInclude Include="src\Engine\Inputs\RawInput\WndProcNotify.h" />
+    <ClInclude Include="src\Engine\Notifier\Notifier.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res\Nexus.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Proxy\Proxy.def" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{70b0e807-04cf-46a6-b838-7904e154581e}</ProjectGuid>
+    <RootNamespace>Nexus</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Nexus</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>d3d11</TargetName>
+    <OutDir>$(SolutionDir)$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)$(Platform)\</IntDir>
+    <IncludePath>$(ProjectDir)src\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)thirdparty\openssl\lib\VC\static;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>d3d11</TargetName>
+    <OutDir>$(SolutionDir)$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)$(Platform)\</IntDir>
+    <IncludePath>$(ProjectDir)src\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)thirdparty\openssl\lib\VC\static;$(LibraryPath)</LibraryPath>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;NEXUS_EXPORTS;_WINDOWS;_USRDLL;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)res;$(SolutionDir)src;$(SolutionDir)thirdparty;$(SolutionDir)thirdparty\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/utf-8 /Zc:__cplusplus</AdditionalOptions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <UseStandardPreprocessor>
+      </UseStandardPreprocessor>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <ModuleDefinitionFile>src\Proxy\Proxy.def</ModuleDefinitionFile>
+      <AdditionalDependencies>advapi32.lib;crypt32.lib;DbgHelp.lib;gdi32.lib;ntdll.lib;PathCch.lib;Psapi.lib;shcore.lib;Shell32.lib;Shlwapi.lib;user32.lib;ws2_32.lib;libssl64MTd.lib;libcrypto64MTd.lib</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>CALL "$(SolutionDir)Scripts\branch.bat" "$(SolutionDir)src"
+CALL "$(SolutionDir)Scripts\commithash.bat" "$(SolutionDir)src"
+CALL "$(SolutionDir)Scripts\version.bat" "$(SolutionDir)src"
+CALL "$(SolutionDir)Scripts\remoteurl.bat" "$(SolutionDir)src"</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;NEXUS_EXPORTS;_WINDOWS;_USRDLL;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)res;$(SolutionDir)src;$(SolutionDir)thirdparty;$(SolutionDir)thirdparty\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/utf-8 /Zc:__cplusplus</AdditionalOptions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <UseStandardPreprocessor>
+      </UseStandardPreprocessor>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <ModuleDefinitionFile>src\Proxy\Proxy.def</ModuleDefinitionFile>
+      <AdditionalDependencies>advapi32.lib;crypt32.lib;DbgHelp.lib;gdi32.lib;ntdll.lib;PathCch.lib;Psapi.lib;shcore.lib;Shell32.lib;Shlwapi.lib;user32.lib;ws2_32.lib;libssl64MT.lib;libcrypto64MT.lib</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>CALL "$(SolutionDir)Scripts\branch.bat" "$(SolutionDir)src"
+CALL "$(SolutionDir)Scripts\commithash.bat" "$(SolutionDir)src"
+CALL "$(SolutionDir)Scripts\version.bat" "$(SolutionDir)src"
+CALL "$(SolutionDir)Scripts\remoteurl.bat" "$(SolutionDir)src"</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
