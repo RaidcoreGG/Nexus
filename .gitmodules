@@ -3,7 +3,7 @@
 	url = https://github.com/RaidcoreGG/Nexus-Translations
 [submodule "Scripts"]
 	path = Scripts
-	url = https://github.com/RaidcoreGG/RCGG-Scripts
+	url = https://github.com/RaidcoreGG/build-scripts
 [submodule "src/thirdparty/ImAnimate"]
 	path = src/thirdparty/ImAnimate
 	url = https://github.com/RaidcoreGG/ImAnimate

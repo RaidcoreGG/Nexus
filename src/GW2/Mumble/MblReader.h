@@ -84,8 +84,8 @@ class CMumbleReader
 	NexusLinkData_t*  NexusLink              = nullptr;
 
 	unsigned          PreviousTick           = 0;
-	Vector3           PreviousAvatarPosition = {};
-	Vector3           PreviousCameraFront    = {};
+	Mumble::Vector3   PreviousAvatarPosition = {};
+	Mumble::Vector3   PreviousCameraFront    = {};
 	Mumble::Identity  PreviousIdentity       = Mumble::Identity{};
 	long long         PreviousFrameCounter   = 0;
 

@@ -38,9 +38,9 @@ void CLicenseAgreementModal::RenderContent()
 
 	ImGui::TextWrapped("By using this software you are agreeing to the terms and conditions as laid out on:");
 
-	if (ImGui::TextURL("https://raidcore.gg/Legal", false, false))
+	if (ImGui::TextURL("https://raidcore.gg/legal/user-agreement", false, false))
 	{
-		ShellExecuteA(0, 0, "https://raidcore.gg/Legal", 0, 0, SW_SHOW);
+		ShellExecuteA(0, 0, "https://raidcore.gg/legal/user-agreement", 0, 0, SW_SHOW);
 	}
 
 	ImGui::Text("If you do not agree to these terms or do not understand them, do not use the software.");

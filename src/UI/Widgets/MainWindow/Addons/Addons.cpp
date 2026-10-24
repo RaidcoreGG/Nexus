@@ -369,7 +369,7 @@ void CAddonsWindow::AddonItem(AddonItemData_t& aAddonData, float aWidth)
 						case -1:
 						{
 							noticeIcon = TX;
-							noticeURL = "https://raidcore.gg/Legal#addon-policy";
+							noticeURL = "https://raidcore.gg/gw2/addon-policy";
 							noticeTT = langApi->Translate("((000090))");
 
 							if (!TX)
@@ -383,7 +383,7 @@ void CAddonsWindow::AddonItem(AddonItemData_t& aAddonData, float aWidth)
 						case 1:
 						{
 							noticeIcon = T1;
-							noticeURL = "https://raidcore.gg/Legal#addon-policy";
+							noticeURL = "https://raidcore.gg/gw2/addon-policy";
 							noticeTT = String::Format(langApi->Translate("((000089))"), 1);
 
 							if (!T1)
@@ -396,7 +396,7 @@ void CAddonsWindow::AddonItem(AddonItemData_t& aAddonData, float aWidth)
 						case 2:
 						{
 							noticeIcon = T2;
-							noticeURL = "https://raidcore.gg/Legal#addon-policy";
+							noticeURL = "https://raidcore.gg/gw2/addon-policy";
 							noticeTT = String::Format(langApi->Translate("((000089))"), 2);
 
 							if (!T2)
@@ -409,7 +409,7 @@ void CAddonsWindow::AddonItem(AddonItemData_t& aAddonData, float aWidth)
 						case 3:
 						{
 							noticeIcon = T3;
-							noticeURL = "https://raidcore.gg/Legal#addon-policy";
+							noticeURL = "https://raidcore.gg/gw2/addon-policy";
 							noticeTT = String::Format(langApi->Translate("((000089))"), 3);
 
 							if (!T3)
