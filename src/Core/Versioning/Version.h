@@ -2,7 +2,7 @@
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
 /// Name         :  MajorMinorBuildRevision.h
-/// Description  :  Implementation of 64 Bit version format with 4x unsigned 16 Bit components.
+/// Description  :  Implementation of 64 Bit version format with 4x signed 16 Bit components.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
@@ -11,20 +11,21 @@
 #include <array>
 #include <cstdint>
 #include <regex>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 
-const std::regex VERSION_REGEX(R"(v?\d+\.\d+(?:\.\d+){0,2})");
+const inline std::regex VERSION_REGEX(R"(v?\d+\.\d+(?:\.\d+){0,2})");
 
 ///----------------------------------------------------------------------------------------------------
 /// Version_t Struct
 ///----------------------------------------------------------------------------------------------------
 struct Version_t
 {
-	uint16_t Major;
-	uint16_t Minor;
-	uint16_t Build;
-	uint16_t Revision;
+	int16_t Major;
+	int16_t Minor;
+	int16_t Build;
+	int16_t Revision;
 
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
@@ -34,7 +35,7 @@ struct Version_t
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	Version_t(uint16_t aMajor, uint16_t aMinor, uint16_t aBuild, uint16_t aRevision)
+	Version_t(int16_t aMajor, int16_t aMinor, int16_t aBuild, int16_t aRevision)
 		: Major(aMajor)
 		, Minor(aMinor)
 		, Build(aBuild)
@@ -61,44 +62,40 @@ struct Version_t
 			aVersionStr.remove_prefix(1);
 		}
 
-		std::array<uint16_t, 4> parts{};
+		/* Omitted components stay 0, so "1.2" equals "1.2.0.0". */
+		std::array<int16_t, 4> parts{};
 		size_t count = 0;
 
 		while (!aVersionStr.empty() && count < parts.size())
 		{
 			const size_t pos = aVersionStr.find('.');
+			const long value = std::stol(std::string(aVersionStr.substr(0, pos)));
+
+			if (value > INT16_MAX)
+			{
+				throw std::out_of_range("Version component out of range: " + std::string(aVersionStr));
+			}
+
+			parts[count++] = static_cast<int16_t>(value);
+
 			if (pos == std::string_view::npos)
 			{
-				parts[count++] = static_cast<uint16_t>(std::stoul(std::string(aVersionStr)));
 				break;
 			}
 
-			parts[count++] = static_cast<uint16_t>(std::stoul(std::string(aVersionStr.substr(0, pos))));
 			aVersionStr.remove_prefix(pos + 1);
 		}
 
-		this->Major = parts[0];
-		this->Minor = parts[1];
-
-		if (count == 3)
-		{
-			this->Build = parts[2];
-		}
-		else if (count == 4)
-		{
-			this->Build = parts[2];
-			this->Revision = parts[3];
-		}
-		else
-		{
-			throw std::invalid_argument("Unreachable code. Invalid version string format: " + std::string(aVersionStr));
-		}
+		this->Major    = parts[0];
+		this->Minor    = parts[1];
+		this->Build    = parts[2];
+		this->Revision = parts[3];
 	}
 
 	///----------------------------------------------------------------------------------------------------
 	/// string:
 	/// 	Builds a string representation of the version in the format "Major.Minor.Build.Revision".
-	/// 	If Build or Revision are 0, they will be omitted from the string.
+	/// 	Revision is omitted if it is 0 or negative.
 	///----------------------------------------------------------------------------------------------------
 	inline std::string string() const
 	{
@@ -118,48 +115,30 @@ struct Version_t
 		return str;
 	}
 
-	inline bool operator>(const Version_t& rhs)
+	///----------------------------------------------------------------------------------------------------
+	/// Compare:
+	/// 	Returns <0, 0 or >0. Negative components (legacy -1 "omitted") compare as 0.
+	///----------------------------------------------------------------------------------------------------
+	inline int Compare(const Version_t& rhs) const
 	{
-		if (this->Major    != rhs.Major)    { return this->Major    > rhs.Major;    }
-		if (this->Minor    != rhs.Minor)    { return this->Minor    > rhs.Minor;    }
-		if (this->Build    != rhs.Build)    { return this->Build    > rhs.Build;    }
-		if (this->Revision != rhs.Revision) { return this->Revision > rhs.Revision; }
+		const std::array<int16_t, 4> lhsParts{ this->Major, this->Minor, this->Build, this->Revision };
+		const std::array<int16_t, 4> rhsParts{ rhs.Major, rhs.Minor, rhs.Build, rhs.Revision };
 
-		return false;
+		for (size_t i = 0; i < lhsParts.size(); i++)
+		{
+			const int lhsVal = lhsParts[i] < 0 ? 0 : lhsParts[i];
+			const int rhsVal = rhsParts[i] < 0 ? 0 : rhsParts[i];
+
+			if (lhsVal != rhsVal) { return lhsVal - rhsVal; }
+		}
+
+		return 0;
 	}
 
-	inline bool operator<(const Version_t& rhs)
-	{
-		if (this->Major    != rhs.Major)    { return this->Major    < rhs.Major;    }
-		if (this->Minor    != rhs.Minor)    { return this->Minor    < rhs.Minor;    }
-		if (this->Build    != rhs.Build)    { return this->Build    < rhs.Build;    }
-		if (this->Revision != rhs.Revision) { return this->Revision < rhs.Revision; }
-
-		return false;
-	}
-
-	inline bool operator==(const Version_t& rhs)
-	{
-		if (this->Major    != rhs.Major)    { return false; }
-		if (this->Minor    != rhs.Minor)    { return false; }
-		if (this->Build    != rhs.Build)    { return false; }
-		if (this->Revision != rhs.Revision) { return false; }
-
-		return true;
-	}
-
-	inline bool operator!=(const Version_t& rhs)
-	{
-		return !(*this == rhs);
-	}
-
-	inline bool operator>=(const Version_t& rhs)
-	{
-		return *this > rhs || *this == rhs;
-	}
-
-	inline bool operator<=(const Version_t& rhs)
-	{
-		return *this < rhs || *this == rhs;
-	}
+	inline bool operator> (const Version_t& rhs) const { return this->Compare(rhs) >  0; }
+	inline bool operator< (const Version_t& rhs) const { return this->Compare(rhs) <  0; }
+	inline bool operator==(const Version_t& rhs) const { return this->Compare(rhs) == 0; }
+	inline bool operator!=(const Version_t& rhs) const { return this->Compare(rhs) != 0; }
+	inline bool operator>=(const Version_t& rhs) const { return this->Compare(rhs) >= 0; }
+	inline bool operator<=(const Version_t& rhs) const { return this->Compare(rhs) <= 0; }
 };
