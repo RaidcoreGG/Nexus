@@ -16,12 +16,12 @@
 ///----------------------------------------------------------------------------------------------------
 enum class EAddonInterfaces : uint32_t
 {
-	None        = 0,
-	Nexus       = 1 << 0,
-	ArcDPS      = 1 << 1,
-	AddonLoader = 1 << 2,
-	D3D11Proxy  = 1 << 3,
-	DXGIProxy   = 1 << 4
+	None       = 0,
+	Nexus      = 1 << 0,
+	ArcDPS     = 1 << 1,
+	UOAOM      = 1 << 2,
+	D3D11Proxy = 1 << 3,
+	DXGIProxy  = 1 << 4
 };
 DEFINE_ENUM_FLAG_OPERATORS(EAddonInterfaces)
 

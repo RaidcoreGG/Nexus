@@ -763,7 +763,7 @@ const EAddonInterfaces& CAddon::EnumInterfaces()
 		DLL::FindFunction(module, &discard, "gw2addon_load") &&
 		DLL::FindFunction(module, &discard, "gw2addon_unload"))
 	{
-		interfaces |= EAddonInterfaces::AddonLoader;
+		interfaces |= EAddonInterfaces::UOAOM;
 	}
 
 	if (DLL::FindFunction(module, &discard, "D3D11CreateDevice") &&
