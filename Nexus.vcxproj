@@ -25,6 +25,7 @@
     <ClCompile Include="src\Engine\Functions\FnRegistry.cpp" />
     <ClCompile Include="src\Core\Index\Index.cpp" />
     <ClCompile Include="src\Engine\Loader\LdrAddonBase.cpp" />
+    <ClCompile Include="src\Core\Platform\Windows\Exe\ExeExports.cpp" />
     <ClCompile Include="src\Engine\Loader\Loader.cpp" />
     <ClCompile Include="src\Engine\Networking\WebRequests\WreCache.cpp" />
     <ClCompile Include="src\Engine\Networking\WebRequests\WreConst.cpp" />
@@ -146,6 +147,8 @@
     <ClInclude Include="src\Engine\Loader\LdrAddonBase.h" />
     <ClInclude Include="src\Engine\Loader\LdrChecksum.h" />
     <ClInclude Include="src\Engine\Loader\LdrEnum.h" />
+    <ClInclude Include="src\Core\Platform\Windows\Exe\ExeEnum.h" />
+    <ClInclude Include="src\Core\Platform\Windows\Exe\ExeExports.h" />
     <ClInclude Include="src\Engine\Loader\Loader.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreCache.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreConst.h" />

@@ -18,6 +18,7 @@
 #include "Core/Context.h"
 #include "Core/Index/Index.h"
 #include "Engine/Cleanup/RefCleanerContext.h"
+#include "Core/Platform/Windows/Exe/ExeExports.h"
 #include "GW2/Build/BuildInfo.h"
 #include "Util/DLL.h"
 #include "Util/MD5.h"
@@ -714,6 +715,80 @@ const EAddonInterfaces& CAddon::EnumInterfaces()
 
 	if (this->Location.empty()) { return this->ModuleInterfaces; }
 
+	using namespace Raidcore::Core::Platform::Windows;
+
+	const Exports_t exports = ReadExports(this->Location);
+
+	if (exports.Architecture == EArchitecture::None)
+	{
+		this->Logger->Warning(CH_ADDON, "Cannot enumerate addon interfaces. Not a readable DLL. (%s)", this->Location.string().c_str());
+		return this->ModuleInterfaces;
+	}
+
+	if (exports.Architecture != ARCH_CURRENT)
+	{
+		this->Logger->Warning(CH_ADDON, "Cannot enumerate addon interfaces. DLL is built for a different architecture. (%s)", this->Location.string().c_str());
+		return this->ModuleInterfaces;
+	}
+
+	EAddonInterfaces interfaces = EAddonInterfaces::None;
+
+	/* Only Nexus addons are loaded here, the definition cannot be read without running the module. */
+	if (exports.Has("GetAddonDef") && this->ReadAddonDef())
+	{
+		interfaces |= EAddonInterfaces::Nexus;
+	}
+
+	if (exports.Has("get_init_addr") &&
+		exports.Has("get_release_addr"))
+	{
+		interfaces |= EAddonInterfaces::ArcDPS;
+	}
+
+	if (exports.Has("gw2addon_get_description") &&
+		exports.Has("gw2addon_load") &&
+		exports.Has("gw2addon_unload"))
+	{
+		interfaces |= EAddonInterfaces::UOAOM;
+	}
+
+	if (exports.Has("D3D11CreateDevice") &&
+		exports.Has("D3D11CreateDeviceAndSwapChain"))
+	{
+		if (!(exports.Has("D3D11CoreCreateDevice") &&
+			exports.Has("D3D11CoreCreateLayeredDevice") &&
+			exports.Has("D3D11CoreGetLayeredDeviceSize") &&
+			exports.Has("D3D11CoreRegisterLayers")))
+		{
+			this->Logger->Debug(CH_ADDON, "Stub D3D11. (%s)", this->Location.string().c_str());
+		}
+
+		interfaces |= EAddonInterfaces::D3D11Proxy;
+	}
+
+	if (exports.Has("CreateDXGIFactory") &&
+		exports.Has("CreateDXGIFactory1") &&
+		exports.Has("CreateDXGIFactory2"))
+	{
+		if (!(exports.Has("DXGIGetDebugInterface1") &&
+			exports.Has("CompatValue") &&
+			exports.Has("CompatString")))
+		{
+			this->Logger->Debug(CH_ADDON, "Stub DXGI. (%s)", this->Location.string().c_str());
+		}
+
+		interfaces |= EAddonInterfaces::DXGIProxy;
+	}
+
+	this->ModuleInterfaces = interfaces;
+
+	this->Logger->Debug(CH_ADDON, "Interfaces: %u (%s)", this->ModuleInterfaces, this->Location.string().c_str());
+
+	return this->ModuleInterfaces;
+}
+
+bool CAddon::ReadAddonDef()
+{
 	HMODULE module = LoadLibraryA(this->Location.string().c_str());
 
 	if (!module)
@@ -722,22 +797,20 @@ const EAddonInterfaces& CAddon::EnumInterfaces()
 		const std::error_condition ecnd = std::system_category().default_error_condition(lasterror);
 		this->Logger->Warning(
 			CH_ADDON,
-			"Cannot enumerate addon interfaces. LoadLibrary(%s) failed: %s (%d)",
+			"Cannot read addon definition. LoadLibrary(%s) failed: %s (%d)",
 			this->Location.string().c_str(),
 			ecnd.message().c_str(),
 			lasterror
 		);
-		return this->ModuleInterfaces;
+		return false;
 	}
-
-	EAddonInterfaces interfaces = EAddonInterfaces::None;
 
 	GETADDONDEF_V1 getAddonDef = nullptr;
 
-	if (DLL::FindFunction(module, &getAddonDef, "GetAddonDef"))
-	{
-		interfaces |= EAddonInterfaces::Nexus;
+	bool found = DLL::FindFunction(module, &getAddonDef, "GetAddonDef");
 
+	if (found)
+	{
 		AddonDefV1_t* addondef = getAddonDef();
 
 		if (addondef)
@@ -752,67 +825,20 @@ const EAddonInterfaces& CAddon::EnumInterfaces()
 		}
 	}
 
-	void* discard = nullptr;
-
-	if (DLL::FindFunction(module, &discard, "get_init_addr") &&
-		DLL::FindFunction(module, &discard, "get_release_addr"))
-	{
-		interfaces |= EAddonInterfaces::ArcDPS;
-	}
-
-	if (DLL::FindFunction(module, &discard, "gw2addon_get_description") &&
-		DLL::FindFunction(module, &discard, "gw2addon_load") &&
-		DLL::FindFunction(module, &discard, "gw2addon_unload"))
-	{
-		interfaces |= EAddonInterfaces::UOAOM;
-	}
-
-	if (DLL::FindFunction(module, &discard, "D3D11CreateDevice") &&
-		DLL::FindFunction(module, &discard, "D3D11CreateDeviceAndSwapChain"))
-	{
-		if (!(DLL::FindFunction(module, &discard, "D3D11CoreCreateDevice") &&
-			DLL::FindFunction(module, &discard, "D3D11CoreCreateLayeredDevice") &&
-			DLL::FindFunction(module, &discard, "D3D11CoreGetLayeredDeviceSize") &&
-			DLL::FindFunction(module, &discard, "D3D11CoreRegisterLayers")))
-		{
-			this->Logger->Debug(CH_ADDON, "Stub D3D11. (%s)", this->Location.string().c_str());
-		}
-
-		interfaces |= EAddonInterfaces::D3D11Proxy;
-	}
-
-	if (DLL::FindFunction(module, &discard, "CreateDXGIFactory") &&
-		DLL::FindFunction(module, &discard, "CreateDXGIFactory1") &&
-		DLL::FindFunction(module, &discard, "CreateDXGIFactory2"))
-	{
-		if (!(DLL::FindFunction(module, &discard, "DXGIGetDebugInterface1") &&
-			DLL::FindFunction(module, &discard, "CompatValue") &&
-			DLL::FindFunction(module, &discard, "CompatString")))
-		{
-			this->Logger->Debug(CH_ADDON, "Stub DXGI. (%s)", this->Location.string().c_str());
-		}
-
-		interfaces |= EAddonInterfaces::DXGIProxy;
-	}
-
-	this->ModuleInterfaces = interfaces;
-
 	if (!FreeLibrary(module))
 	{
 		DWORD lasterror = GetLastError();
 		const std::error_condition ecnd = std::system_category().default_error_condition(lasterror);
 		this->Logger->Warning(
 			CH_ADDON,
-			"Cannot free library after enumerating interfaces. FreeLibrary(%s) failed: %s (%d)",
+			"Cannot free library after reading addon definition. FreeLibrary(%s) failed: %s (%d)",
 			this->Location.string().c_str(),
 			ecnd.message().c_str(),
 			lasterror
 		);
 	}
 
-	this->Logger->Debug(CH_ADDON, "Interfaces: %u (%s)", this->ModuleInterfaces, this->Location.string().c_str());
-
-	return this->ModuleInterfaces;
+	return found;
 }
 
 bool CAddon::ShouldLoad()

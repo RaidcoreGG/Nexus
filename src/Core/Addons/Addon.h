@@ -287,6 +287,13 @@ class CAddon : public virtual IAddon
 	const EAddonInterfaces& EnumInterfaces();
 
 	///----------------------------------------------------------------------------------------------------
+	/// ReadAddonDef:
+	/// 	Loads the module to copy its Nexus addon definition.
+	/// 	Returns false if the module could not be loaded or does not provide GetAddonDef.
+	///----------------------------------------------------------------------------------------------------
+	bool ReadAddonDef();
+
+	///----------------------------------------------------------------------------------------------------
 	/// ShouldLoad:
 	/// 	Determines whether Load should be called.
 	///----------------------------------------------------------------------------------------------------
