@@ -352,7 +352,8 @@ void CAddon::LoadInternal()
 		return;
 	}
 
-	if ((this->NexusAddonDefV1->Flags & EAddonDefFlags::DisableHotloading) == EAddonDefFlags::DisableHotloading)
+	if ((this->NexusAddonDefV1->Flags & EAddonDefFlags::DisableHotloading) == EAddonDefFlags::DisableHotloading
+		|| this->NexusAddonDefV1->Unload == nullptr)
 	{
 		this->Flags |= EAddonFlags::StateLocked;
 		this->Flags |= EAddonFlags::FileLocked;
