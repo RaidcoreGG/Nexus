@@ -13,10 +13,10 @@
 
 #include "Core/Addons/Config/CfgManager.h"
 #include "Core/Addons/Library/LibManager.h"
+#include "Core/Platform/Windows/Exe/ExeCrashHandler.h"
 #include "Core/Preferences/PrefContext.h"
 #include "Core/Updater/SelfUpdater.h"
 #include "Core/Versioning/Version.h"
-#include "Engine/CrashHandler/CrashHandler.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"

@@ -1,7 +1,7 @@
 ///----------------------------------------------------------------------------------------------------
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
-/// Name         :  CrashHandler.h
+/// Name         :  ExeCrashHandler.h
 /// Description  :  Unhandled exception crash logger.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
