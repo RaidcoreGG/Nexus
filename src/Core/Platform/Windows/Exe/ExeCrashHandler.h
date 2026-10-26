@@ -39,18 +39,32 @@ class CCrashHandler
 	///----------------------------------------------------------------------------------------------------
 	~CCrashHandler();
 
+	///----------------------------------------------------------------------------------------------------
+	/// Reattach:
+	/// 	Re-enables the SetUnhandledExceptionFilter hook after all hooks were disabled.
+	///----------------------------------------------------------------------------------------------------
+	void Reattach();
+
 	private:
 	char                         LogPath[MAX_PATH];
 	char                         StackPath[MAX_PATH];
-	PVOID                        VEH;
+	LPTOP_LEVEL_EXCEPTION_FILTER PrevFilter;        /* Runs after ours: set before us, or the latest set after us. */
+	LPVOID                       SetFilterTarget;
+	LPVOID                       SetFilterOriginal;
 	SYSTEM_INFO                  SystemInfo;
 	DWORD                        MachineType;
 	StackEntry_t                 Callstack[64];
 	size_t                       CallstackSize;
 
 	///----------------------------------------------------------------------------------------------------
-	/// OnVectoredException:
-	/// 	Logs the unhandled exception.
+	/// OnUnhandledException:
+	/// 	Logs the unhandled exception, then passes it to the previous filter.
 	///----------------------------------------------------------------------------------------------------
-	static LONG WINAPI OnVectoredException(EXCEPTION_POINTERS* aExcPointers);
+	static LONG WINAPI OnUnhandledException(EXCEPTION_POINTERS* aExcPointers);
+
+	///----------------------------------------------------------------------------------------------------
+	/// OnSetUnhandledExceptionFilter:
+	/// 	Detour that keeps our filter installed and stores the new one to run after ours.
+	///----------------------------------------------------------------------------------------------------
+	static LPTOP_LEVEL_EXCEPTION_FILTER WINAPI OnSetUnhandledExceptionFilter(LPTOP_LEVEL_EXCEPTION_FILTER aFilter);
 };

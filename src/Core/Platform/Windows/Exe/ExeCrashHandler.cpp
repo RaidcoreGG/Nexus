@@ -11,6 +11,10 @@
 #include <dbghelp.h>
 #include <errhandlingapi.h>
 
+#include "minhook/mh_hook.h"
+
+typedef LPTOP_LEVEL_EXCEPTION_FILTER (WINAPI* SETUNHANDLEDEXCEPTIONFILTER)(LPTOP_LEVEL_EXCEPTION_FILTER aFilter);
+
 static CCrashHandler* s_CrashHandler{};
 
 ///----------------------------------------------------------------------------------------------------
@@ -25,7 +29,8 @@ void WriteToFile(HANDLE aFileHandle, const char* aFmt, ...)
 	va_list args;
 	va_start(args, aFmt);
 	vsnprintf(p, sizeof(buffer), aFmt, args);
-	::WriteFile(aFileHandle, p, static_cast<DWORD>(strlen(p)), nullptr, nullptr);
+	DWORD written = 0;
+	::WriteFile(aFileHandle, p, static_cast<DWORD>(strlen(p)), &written, nullptr);
 	va_end(args);
 }
 
@@ -48,8 +53,6 @@ CCrashHandler::CCrashHandler(std::filesystem::path aCrashLogPath, std::filesyste
 		throw "Unexpected CPU architecture.";
 	}
 
-	this->VEH = ::AddVectoredExceptionHandler(1, CCrashHandler::OnVectoredException);
-	
 	memset(this->LogPath, 0, MAX_PATH);
 	strcpy_s(this->LogPath, MAX_PATH, aCrashLogPath.string().c_str());
 
@@ -65,62 +68,99 @@ CCrashHandler::CCrashHandler(std::filesystem::path aCrashLogPath, std::filesyste
 	}
 
 	s_CrashHandler = this;
+
+	/* Filters set later, e.g. by ArcDPS, would replace ours. The hook keeps ours first and runs theirs after it. */
+	HMODULE kernelBase = ::GetModuleHandleW(L"kernelbase.dll");
+	this->SetFilterTarget   = kernelBase ? ::GetProcAddress(kernelBase, "SetUnhandledExceptionFilter") : nullptr;
+	this->SetFilterOriginal = nullptr;
+
+	if (!this->SetFilterTarget ||
+		MH_CreateHook(this->SetFilterTarget, (LPVOID)&CCrashHandler::OnSetUnhandledExceptionFilter, &this->SetFilterOriginal) != EMHStatus::MH_OK ||
+		MH_EnableHook(this->SetFilterTarget) != EMHStatus::MH_OK)
+	{
+		this->SetFilterTarget   = nullptr;
+		this->SetFilterOriginal = nullptr;
+	}
+
+	SETUNHANDLEDEXCEPTIONFILTER setFilter = this->SetFilterOriginal
+		? (SETUNHANDLEDEXCEPTIONFILTER)this->SetFilterOriginal
+		: ::SetUnhandledExceptionFilter;
+
+	/* Only reached by exceptions nobody handled. The previous filter, e.g. the game's, runs after ours. */
+	this->PrevFilter = setFilter(CCrashHandler::OnUnhandledException);
 }
 
 CCrashHandler::~CCrashHandler()
 {
-	if (this->VEH)
+	SETUNHANDLEDEXCEPTIONFILTER setFilter = this->SetFilterOriginal
+		? (SETUNHANDLEDEXCEPTIONFILTER)this->SetFilterOriginal
+		: ::SetUnhandledExceptionFilter;
+
+	setFilter(this->PrevFilter);
+}
+
+void CCrashHandler::Reattach()
+{
+	if (this->SetFilterTarget)
 	{
-		::RemoveVectoredExceptionHandler(this->VEH);
+		MH_EnableHook(this->SetFilterTarget);
 	}
 }
 
-/*static*/ LONG WINAPI CCrashHandler::OnVectoredException(EXCEPTION_POINTERS* aExcPointers)
+/*static*/ LPTOP_LEVEL_EXCEPTION_FILTER WINAPI CCrashHandler::OnSetUnhandledExceptionFilter(LPTOP_LEVEL_EXCEPTION_FILTER aFilter)
 {
-	switch (aExcPointers->ExceptionRecord->ExceptionCode)
+	if (aFilter == CCrashHandler::OnUnhandledException)
 	{
-		case EXCEPTION_ACCESS_VIOLATION:
-		case EXCEPTION_ILLEGAL_INSTRUCTION:
-		case EXCEPTION_INT_DIVIDE_BY_ZERO:
-		case EXCEPTION_STACK_OVERFLOW:
-		case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:
-		case EXCEPTION_IN_PAGE_ERROR:
-		case EXCEPTION_GUARD_PAGE:
-		case EXCEPTION_PRIV_INSTRUCTION:
-		//case 0xE06D7363: // C++ exception
-		{
-			break;
-		}
-		default:
-		{
-			return EXCEPTION_CONTINUE_SEARCH;
-		}
+		return s_CrashHandler->PrevFilter;
 	}
 
-	HANDLE hProcess = ::GetCurrentProcess();
+	/* Returns the one stored before, never ours: a caller that chains to it would call back into us. */
+	return (LPTOP_LEVEL_EXCEPTION_FILTER)::InterlockedExchangePointer((PVOID volatile*)&s_CrashHandler->PrevFilter, (PVOID)aFilter);
+}
 
-	/* If we cannot initalize, we cleanup and then initialize again. Hooks 'n stuff.. */
-	if (!::SymInitialize(hProcess, NULL, TRUE))
+/*static*/ LONG WINAPI CCrashHandler::OnUnhandledException(EXCEPTION_POINTERS* aExcPointers)
+{
+	/* Write log file, for in depth analysis. Opened first, so the exception is logged even if symbol lookup fails. */
+	HANDLE hLogFile = ::CreateFileA(
+		s_CrashHandler->LogPath,
+		GENERIC_WRITE,
+		FILE_SHARE_READ,
+		nullptr,
+		CREATE_ALWAYS,
+		FILE_ATTRIBUTE_NORMAL,
+		nullptr
+	);
+
+	if (hLogFile != INVALID_HANDLE_VALUE)
 	{
-		::SymCleanup(hProcess);
-		::SymInitialize(hProcess, NULL, TRUE);
+		WriteToFile(hLogFile, "========================\n");
+		WriteToFile(hLogFile, "Exception: 0x%X at 0x%p\n", aExcPointers->ExceptionRecord->ExceptionCode, aExcPointers->ExceptionRecord->ExceptionAddress);
+		WriteToFile(hLogFile, "========================\n");
 	}
+
+	/* Own handle, so this dbghelp session does not collide with one the game or an addon opened. */
+	HANDLE hProcess = nullptr;
+	::DuplicateHandle(::GetCurrentProcess(), ::GetCurrentProcess(), ::GetCurrentProcess(), &hProcess, 0, FALSE, DUPLICATE_SAME_ACCESS);
+	::SymInitialize(hProcess, NULL, TRUE);
 
 	/* Reset the callstack. */
 	s_CrashHandler->CallstackSize = 0;
 	memset(s_CrashHandler->Callstack, 0, sizeof(s_CrashHandler->Callstack));
 
+	/* StackWalk64 modifies the context, the original is still needed by the next filter. */
+	CONTEXT context = *aExcPointers->ContextRecord;
+
 	/* Initialize the stackframe. */
 	STACKFRAME64 sf{};
 
 #if defined(_WIN64)
-	sf.AddrPC.Offset = aExcPointers->ContextRecord->Rip;
-	sf.AddrStack.Offset = aExcPointers->ContextRecord->Rsp;
-	sf.AddrFrame.Offset = aExcPointers->ContextRecord->Rbp;
+	sf.AddrPC.Offset = context.Rip;
+	sf.AddrStack.Offset = context.Rsp;
+	sf.AddrFrame.Offset = context.Rbp;
 #elif defined(WIN32)
-	sf.AddrPC.Offset = aExcPointers->ContextRecord->Eip;
-	sf.AddrStack.Offset = aExcPointers->ContextRecord->Esp;
-	sf.AddrFrame.Offset = aExcPointers->ContextRecord->Ebp;
+	sf.AddrPC.Offset = context.Eip;
+	sf.AddrStack.Offset = context.Esp;
+	sf.AddrFrame.Offset = context.Ebp;
 #endif
 	sf.AddrPC.Mode = AddrModeFlat;
 	sf.AddrStack.Mode = AddrModeFlat;
@@ -128,9 +168,11 @@ CCrashHandler::~CCrashHandler()
 
 	/* Walk through the stack frames. */
 	HANDLE hThread = ::GetCurrentThread();
-	while (::StackWalk64(s_CrashHandler->MachineType, hProcess, hThread, &sf, aExcPointers->ContextRecord, 0, ::SymFunctionTableAccess64, ::SymGetModuleBase64, 0))
+	while (s_CrashHandler->CallstackSize < _countof(s_CrashHandler->Callstack) &&
+		::StackWalk64(s_CrashHandler->MachineType, hProcess, hThread, &sf, &context, 0, ::SymFunctionTableAccess64, ::SymGetModuleBase64, 0))
 	{
-		if (sf.AddrFrame.Offset == 0)
+		/* The frame pointer is often 0 on x64, the end of the stack is a 0 program counter. */
+		if (sf.AddrPC.Offset == 0)
 		{
 			break;
 		}
@@ -165,6 +207,7 @@ CCrashHandler::~CCrashHandler()
 
 		/* Get line and module name. */
 		IMAGEHLP_LINE64 lineInfo{};
+		lineInfo.SizeOfStruct = sizeof(lineInfo);
 		DWORD dwLineDisplacement = 0;
 
 		if (::SymGetLineFromAddr64(hProcess, sf.AddrPC.Offset, &dwLineDisplacement, &lineInfo))
@@ -184,47 +227,31 @@ CCrashHandler::~CCrashHandler()
 
 	/* Cleanup. */
 	::SymCleanup(hProcess);
+	::CloseHandle(hProcess);
 
-	/* Write log file, for in depth analysis. */
-	HANDLE hLogFile = ::CreateFileA(
-		s_CrashHandler->LogPath,
-		GENERIC_WRITE,
-		FILE_SHARE_READ,
-		nullptr,
-		CREATE_ALWAYS,
-		FILE_ATTRIBUTE_NORMAL,
-		nullptr
-	);
-
-	if (hLogFile == INVALID_HANDLE_VALUE)
+	if (hLogFile != INVALID_HANDLE_VALUE)
 	{
-		return EXCEPTION_EXECUTE_HANDLER;
-	}
+		WriteToFile(hLogFile, "Stack Trace:\n");
+		WriteToFile(hLogFile, "========================\n");
 
-	WriteToFile(hLogFile, "========================\n");
-	WriteToFile(hLogFile, "Exception: 0x%X\n", aExcPointers->ExceptionRecord->ExceptionCode);
-	WriteToFile(hLogFile, "========================\n");
-	WriteToFile(hLogFile, "Stack Trace:\n");
-	WriteToFile(hLogFile, "========================\n");
-
-	size_t frameIndex = 0;
-	for (size_t i = 0; i < s_CrashHandler->CallstackSize; i++)
-	{
-		StackEntry_t& entry = s_CrashHandler->Callstack[i];
-
-		WriteToFile(hLogFile, "%s@%s", entry.FileName, entry.FunctionName);
-
-		if (entry.LineNumber != -1)
+		for (size_t i = 0; i < s_CrashHandler->CallstackSize; i++)
 		{
-			WriteToFile(hLogFile, " on line %u", entry.LineNumber);
+			StackEntry_t& entry = s_CrashHandler->Callstack[i];
+
+			WriteToFile(hLogFile, "%s@%s", entry.FileName, entry.FunctionName);
+
+			if (entry.LineNumber != -1)
+			{
+				WriteToFile(hLogFile, " on line %u", entry.LineNumber);
+			}
+
+			WriteToFile(hLogFile, "\n");
 		}
 
-		WriteToFile(hLogFile, "\n");
+		WriteToFile(hLogFile, "========================\n");
+
+		::CloseHandle(hLogFile);
 	}
-
-	WriteToFile(hLogFile, "========================\n");
-
-	::CloseHandle(hLogFile);
 
 	/* Write stack log, to let loader analyze what to disable next launch. */
 	HANDLE hStackFile = ::CreateFileA(
@@ -237,20 +264,32 @@ CCrashHandler::~CCrashHandler()
 		nullptr
 	);
 
-	if (hStackFile == INVALID_HANDLE_VALUE)
+	if (hStackFile != INVALID_HANDLE_VALUE)
 	{
-		return EXCEPTION_EXECUTE_HANDLER;
-	}
+		for (size_t i = 0; i < s_CrashHandler->CallstackSize; i++)
+		{
+			StackEntry_t& entry = s_CrashHandler->Callstack[i];
 
-	for (size_t i = 0; i < s_CrashHandler->CallstackSize; i++)
-	{
-		StackEntry_t& entry = s_CrashHandler->Callstack[i];
-		WriteToFile(hStackFile, "%s\n", entry.FileName);
-	}
+			/* The module, not the source file, identifies the addon. */
+			if (entry.ModuleName[0])
+			{
+				WriteToFile(hStackFile, "%s\n", entry.ModuleName);
+			}
+		}
 
-	::CloseHandle(hStackFile);
+		::CloseHandle(hStackFile);
+	}
 
 	//::ShellExecuteA(nullptr, "open", s_CrashHandler->LogPath, nullptr, nullptr, SW_SHOWNORMAL);
 
-	return EXCEPTION_EXECUTE_HANDLER;
+	LPTOP_LEVEL_EXCEPTION_FILTER next = s_CrashHandler->PrevFilter;
+
+	/* Skip the filter of an addon that was unloaded without restoring the previous one. */
+	HMODULE nextModule = nullptr;
+	if (next && ::GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, (LPCWSTR)next, &nextModule))
+	{
+		return next(aExcPointers);
+	}
+
+	return EXCEPTION_CONTINUE_SEARCH;
 }
