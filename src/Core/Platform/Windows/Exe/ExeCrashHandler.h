@@ -21,6 +21,8 @@ struct StackEntry_t
 	uint32_t LineNumber;
 	char     ModuleName[MAX_PATH];
 	uint64_t ModuleOffset;
+	uint64_t Address;
+	uint64_t Frame;
 };
 
 ///----------------------------------------------------------------------------------------------------
