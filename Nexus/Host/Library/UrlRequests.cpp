@@ -167,6 +167,9 @@ namespace Raidcore::Nexus::Host
 			std::ofstream out(tmpPath, std::ios::binary | std::ios::trunc);
 			out.write(embedded.data(), embedded.size());
 
+			// close and flush so the rename works
+			out.close();
+
 			if (!out)
 			{
 				this->Logger.Warning(LOG_CHANNEL, "Failed to write \"%s\".", tmpPath.string().c_str());
@@ -179,8 +182,10 @@ namespace Raidcore::Nexus::Host
 		{
 			this->Logger.Warning(LOG_CHANNEL, "Failed to unpack URL handler: %s", ex.what());
 
-			// return true if old version exists
-			return std::filesystem::exists(this->HandlerPath);
+			// return true if old version exists.
+			// ec overload to avoid throwing inside the catch handler
+			std::error_code ec;
+			return std::filesystem::exists(this->HandlerPath, ec);
 		}
 
 		this->Logger.Info(LOG_CHANNEL, "Unpacked URL handler to \"%s\".", this->HandlerPath.string().c_str());
