@@ -372,6 +372,7 @@ void CAddon::LoadInternal()
 	auto time = end_time - start_time;
 
 	this->EventApi->Raise(EV_ADDON_LOADED, &this->NexusAddonDefV1->Signature);
+	this->EventApi->Raise(this->NexusAddonDefV1->Signature, EV_MUMBLE_IDENTITY_UPDATED, static_cast<void*>(CContext::GetContext()->GetMumbleReader()->GetMumbleIdentity()));
 
 	this->Config->LastGameBuild = GW2::GetGameBuild();
 	this->Config->LastName = this->NexusAddonDefV1->GetName();
