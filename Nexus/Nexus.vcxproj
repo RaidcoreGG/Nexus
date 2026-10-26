@@ -15,6 +15,7 @@
     <ClCompile Include="Host\Config\CfgManager.cpp" />
     <ClCompile Include="Host\Library\LibAddon.cpp" />
     <ClCompile Include="Host\Library\LibManager.cpp" />
+    <ClCompile Include="Host\Library\UrlRequests.cpp" />
     <ClCompile Include="GW2\BuildInfo\BuildInfoService.cpp" />
     <ClCompile Include="Network\WebRequests\WreStorage.cpp" />
     <ClCompile Include="Runtime\Runtime.cpp" />
@@ -109,6 +110,7 @@
     <ClInclude Include="Host\Addons\Definitions\DefEnum.h" />
     <ClInclude Include="Host\Library\LibAddon.h" />
     <ClInclude Include="Host\Library\LibManager.h" />
+    <ClInclude Include="Host\Library\UrlRequests.h" />
     <ClInclude Include="GW2\BuildInfo\BuildInfoService.h" />
     <ClInclude Include="GW2\Mumble\MblExtensions.h" />
     <ClInclude Include="Network\WebRequests\WreStorage.h" />

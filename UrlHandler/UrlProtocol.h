@@ -25,6 +25,9 @@ namespace Raidcore::Nexus::UrlProtocol
 
 	constexpr const char* QUEUE_FILENAME  = "pending_installs.json";
 
+	// Must match the TargetName in UrlHandler.vcxproj.
+	constexpr const char* HANDLER_FILENAME = "NexusUrl.exe";
+
 	// Max queue size to prevent malicious link spamming.
 	constexpr size_t      QUEUE_MAX       = 32;
 

@@ -228,6 +228,9 @@
     <ClCompile Include="Host\Library\LibManager.cpp">
       <Filter>Host\Library</Filter>
     </ClCompile>
+    <ClCompile Include="Host\Library\UrlRequests.cpp">
+      <Filter>Host\Library</Filter>
+    </ClCompile>
     <ClCompile Include="GW2\BuildInfo\BuildInfoService.cpp">
       <Filter>GW2\BuildInfo</Filter>
     </ClCompile>
@@ -502,6 +505,9 @@
       <Filter>Host\Library</Filter>
     </ClInclude>
     <ClInclude Include="Host\Library\LibManager.h">
+      <Filter>Host\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Host\Library\UrlRequests.h">
       <Filter>Host\Library</Filter>
     </ClInclude>
     <ClInclude Include="GW2\BuildInfo\BuildInfoService.h">

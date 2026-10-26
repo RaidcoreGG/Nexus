@@ -87,6 +87,7 @@ BEGIN
 END
 
 RES_THIRDPARTYNOTICES           TXT     "..\\THIRDPARTYSOFTWAREREADME.TXT"
+RES_URLHANDLER                  EXE     "..\\bin\\x64\\UrlHandler\\NexusUrl.exe"
 
 RES_ICON_SNOWFLAKE              PNG     "res\\Images\\MainWindow\\SnowflakeShaded.png"
 RES_ICON_LEAF_VARIANT1          PNG     "res\\Images\\MainWindow\\LeafShaded_Variant1.png"
