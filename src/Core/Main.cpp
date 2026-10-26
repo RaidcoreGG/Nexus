@@ -59,21 +59,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	return true;
 }
 
-
-static __declspec(noinline) void CrashTest_Fault()
-{
-	volatile int* p = nullptr;
-	*p = 42; /* Access violation, 0xC0000005. */
-}
-
-static DWORD WINAPI CrashTest_Thread(LPVOID)
-{
-	Sleep(10000); /* Let startup finish, so the game's own filter is installed too. */
-	CrashTest_Fault();
-	return 0;
-}
-
-
 namespace Main
 {
 	static bool s_IsInitialized = false;
@@ -176,9 +161,6 @@ namespace Main
 			Multibox::KillMutex();
 			logger->Info(CH_CORE, "Multibox State: %d", Multibox::GetState());
 		});
-
-		/* Temporarily in Main::Initialize, after ctx->GetCrashHandler(): */
-		CloseHandle(CreateThread(nullptr, 0, CrashTest_Thread, nullptr, 0, nullptr));
 	}
 
 	void Shutdown(unsigned int aReason)
