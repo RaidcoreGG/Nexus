@@ -65,9 +65,9 @@ DWORD CContext::GetModuleSize()
 	return this->ModuleSize;
 }
 
-CCrashHandler* CContext::GetCrashHandler()
+Raidcore::Core::Platform::Windows::CCrashHandler* CContext::GetCrashHandler()
 {
-	static CCrashHandler s_CrashHandler = CCrashHandler(
+	static Raidcore::Core::Platform::Windows::CCrashHandler s_CrashHandler = Raidcore::Core::Platform::Windows::CCrashHandler(
 		Index(EPath::CrashLog),
 		Index(EPath::CrashStack)
 	);

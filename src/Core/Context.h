@@ -49,7 +49,7 @@ class CContext
 
 	DWORD GetModuleSize();
 
-	CCrashHandler* GetCrashHandler();
+	Raidcore::Core::Platform::Windows::CCrashHandler* GetCrashHandler();
 
 	RenderContext_t* GetRendererCtx();
 
