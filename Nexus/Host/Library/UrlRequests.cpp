@@ -300,7 +300,12 @@ namespace Raidcore::Nexus::Host
 			this->Logger.Warning(LOG_CHANNEL, "Error parsing URL request queue.");
 		}
 
-		std::filesystem::remove(this->QueuePath);
+		// ec for noexcept, something went wrong, but not wrong enough to crash the game
+		std::error_code ec;
+		if (!std::filesystem::remove(this->QueuePath, ec) && ec)
+		{
+			this->Logger.Warning(LOG_CHANNEL, "Failed to delete URL request queue: %s", ec.message().c_str());
+		}
 
 		ReleaseMutex(mutex);
 		CloseHandle(mutex);
