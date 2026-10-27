@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Nexus", "Nexus\Nexus.vcxproj", "{70B0E807-04CF-46A6-B838-7904E154581E}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B815E406-20F3-4466-8E33-033B094187FA} = {B815E406-20F3-4466-8E33-033B094187FA}
+		{7380862D-1BF7-455A-B028-06427F4AB31B} = {7380862D-1BF7-455A-B028-06427F4AB31B}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Build", "Build\Build.vcxproj", "{B815E406-20F3-4466-8E33-033B094187FA}"
@@ -15,6 +16,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Installer", "Installer\Inst
 		{70B0E807-04CF-46A6-B838-7904E154581E} = {70B0E807-04CF-46A6-B838-7904E154581E}
 		{B815E406-20F3-4466-8E33-033B094187FA} = {B815E406-20F3-4466-8E33-033B094187FA}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UrlHandler", "UrlHandler\UrlHandler.vcxproj", "{7380862D-1BF7-455A-B028-06427F4AB31B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +37,10 @@ Global
 		{DB5C9E86-F077-4C8D-BC11-EA0A4EDA0F85}.Debug|x64.Build.0 = Debug|x64
 		{DB5C9E86-F077-4C8D-BC11-EA0A4EDA0F85}.Release|x64.ActiveCfg = Release|x64
 		{DB5C9E86-F077-4C8D-BC11-EA0A4EDA0F85}.Release|x64.Build.0 = Release|x64
+		{7380862D-1BF7-455A-B028-06427F4AB31B}.Debug|x64.ActiveCfg = Debug|x64
+		{7380862D-1BF7-455A-B028-06427F4AB31B}.Debug|x64.Build.0 = Debug|x64
+		{7380862D-1BF7-455A-B028-06427F4AB31B}.Release|x64.ActiveCfg = Release|x64
+		{7380862D-1BF7-455A-B028-06427F4AB31B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

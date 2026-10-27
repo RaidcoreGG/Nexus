@@ -52,6 +52,7 @@
 #include "Views/MainWindow/MainWindow.h"
 #include "Views/QuickAccess/QuickAccess.h"
 #include "Views/EULA/LicenseAgreementModal.h"
+#include "Views/InstallRequest/InstallRequestWindow.h"
 
 namespace Raidcore::Nexus::GUI
 {
@@ -361,6 +362,10 @@ namespace Raidcore::Nexus::GUI
 					this->Alerts->Render();
 					this->MainWindow->Render();
 					this->QuickAccess->Render();
+					
+					// TODO: add as member?
+					static CInstallRequestWindow s_InstallRequestWindow {};
+					s_InstallRequestWindow.Render();
 				}
 			}
 			else

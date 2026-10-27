@@ -25,6 +25,7 @@
 #include "Core/Logging/LogConsole.h"
 #include "Core/Logging/LogEnum.h"
 #include "Core/Logging/LogWriter.h"
+#include "Core/Settings/SettingsConst.h"
 #include "Core/Settings/SettingsMgr.h"
 #include "Core/Versioning/Version.h"
 #include "Graphics/GrMetrics.h"
@@ -136,6 +137,15 @@ namespace Raidcore::Nexus
 			this->Library().AddSource("https://api.raidcore.gg/addonlibrary");
 			this->Library().AddSource("https://api.raidcore.gg/arcdpslibrary");
 			this->Library().Update();
+
+			this->Settings().Subscribe<bool>(OPT_URLPROTOCOL, [this](bool aEnabled)
+			{
+				Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
+				{
+					// not captured to get latest value
+					this->UrlRequests().SetEnabled(GetCurrentModule(), this->Settings().Get<bool>(OPT_URLPROTOCOL, true));
+				});
+			});
 		});
 
 		/* Prefetch game build. */
@@ -273,6 +283,17 @@ namespace Raidcore::Nexus
 			this->Loader()
 		};
 		return s_Library;
+	}
+
+	Host::UrlRequestMgr& Runtime::UrlRequests()
+	{
+		static Host::UrlRequestMgr s_UrlRequests{
+			this->Logger(),
+			this->Library(),
+			this->Loader(),
+			Index(EPath::DIR_NEXUS)
+		};
+		return s_UrlRequests;
 	}
 
 	Host::EventApi& Runtime::Events()

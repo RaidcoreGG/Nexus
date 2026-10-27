@@ -187,6 +187,9 @@
     <Filter Include="UI\Views\EULA">
       <UniqueIdentifier>{70D307EB-E2C0-4322-8C71-206DD7245144}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI\Views\InstallRequest">
+      <UniqueIdentifier>{5B0C3F0E-8D2A-4C61-9E57-3A4D6F1B2C80}</UniqueIdentifier>
+    </Filter>
     <Filter Include="UI\Views\MainWindow">
       <UniqueIdentifier>{63E4CE19-B38E-45D6-AEFB-21CE46F65C11}</UniqueIdentifier>
     </Filter>
@@ -226,6 +229,9 @@
       <Filter>Host\Library</Filter>
     </ClCompile>
     <ClCompile Include="Host\Library\LibManager.cpp">
+      <Filter>Host\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Host\Library\UrlRequests.cpp">
       <Filter>Host\Library</Filter>
     </ClCompile>
     <ClCompile Include="GW2\BuildInfo\BuildInfoService.cpp">
@@ -426,6 +432,9 @@
     <ClCompile Include="UI\Views\EULA\LicenseAgreementModal.cpp">
       <Filter>UI\Views\EULA</Filter>
     </ClCompile>
+    <ClCompile Include="UI\Views\InstallRequest\InstallRequestWindow.cpp">
+      <Filter>UI\Views\InstallRequest</Filter>
+    </ClCompile>
     <ClCompile Include="UI\Views\MainWindow\About\About.cpp">
       <Filter>UI\Views\MainWindow\About</Filter>
     </ClCompile>
@@ -502,6 +511,9 @@
       <Filter>Host\Library</Filter>
     </ClInclude>
     <ClInclude Include="Host\Library\LibManager.h">
+      <Filter>Host\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Host\Library\UrlRequests.h">
       <Filter>Host\Library</Filter>
     </ClInclude>
     <ClInclude Include="GW2\BuildInfo\BuildInfoService.h">
@@ -1343,6 +1355,9 @@
     </ClInclude>
     <ClInclude Include="UI\Views\EULA\LicenseAgreementModal.h">
       <Filter>UI\Views\EULA</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Views\InstallRequest\InstallRequestWindow.h">
+      <Filter>UI\Views\InstallRequest</Filter>
     </ClInclude>
     <ClInclude Include="UI\Views\MainWindow\About\About.h">
       <Filter>UI\Views\MainWindow\About</Filter>

@@ -28,6 +28,7 @@
 #include "Host/Config/CfgManager.h"
 #include "Host/Events/EvtApi.h"
 #include "Host/Library/LibManager.h"
+#include "Host/Library/UrlRequests.h"
 #include "Host/Loader/Loader.h"
 #include "Inputs/InputBinds/IbApi.h"
 #include "Network/Updater/Updater.h"
@@ -130,6 +131,12 @@ namespace Raidcore::Nexus
 		/// 	Returns the library manager instance.
 		///----------------------------------------------------------------------------------------------------
 		Host::LibraryMgr& Library();
+
+		///----------------------------------------------------------------------------------------------------
+		/// UrlRequests:
+		/// 	Returns the nexus:// install request receiver.
+		///----------------------------------------------------------------------------------------------------
+		Host::UrlRequestMgr& UrlRequests();
 
 		///----------------------------------------------------------------------------------------------------
 		/// Events:

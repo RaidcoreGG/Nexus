@@ -215,6 +215,12 @@ namespace Raidcore::Nexus::GUI
 						settingsctx->Set(OPT_DISABLEFESTIVEFLAIR, disableFestiveFlair);
 					}
 
+					static bool urlProtocol = settingsctx->Get<bool>(OPT_URLPROTOCOL, true);
+					if (ImGui::Checkbox(langApi->Translate("((Open nexus:// links))"), &urlProtocol))
+					{
+						settingsctx->Set(OPT_URLPROTOCOL, urlProtocol);
+					}
+
 					ImGui::EndGroupPanel();
 				}
 

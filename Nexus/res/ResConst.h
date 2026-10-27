@@ -9,6 +9,7 @@
 #pragma once
 
 #define RES_THIRDPARTYNOTICES             1
+#define RES_URLHANDLER                    2
 
 #define RES_ICON_SNOWFLAKE              900
 #define RES_ICON_LEAF_VARIANT1          901
