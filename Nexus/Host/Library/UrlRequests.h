@@ -33,12 +33,9 @@ namespace Raidcore::Nexus::Host
 
 		~UrlRequestMgr();
 		
-		// unpacks the exe and registers the protocol, or unregisters if disabled
-		void Setup(HMODULE aModule, bool aEnabled);
-		
-		// Drains the queue and starts the listener thread
-		void Start();
-		void Stop();
+		// Settings toggle, calls setup and start/stop
+		// Safe to call from any thread
+		void SetEnabled(HMODULE aModule, bool aEnabled);
 
 		std::vector<LibraryAddon_t> GetPending() const;
 
@@ -51,6 +48,7 @@ namespace Raidcore::Nexus::Host
 		std::filesystem::path       HandlerPath;
 		std::filesystem::path       QueuePath;
 
+		std::mutex                  LifecycleMutex;
 		HANDLE                      RequestEvent{ nullptr };
 		HANDLE                      StopEvent{ nullptr };
 		std::thread                 ListenerThread;
@@ -58,6 +56,13 @@ namespace Raidcore::Nexus::Host
 		mutable std::mutex          Mutex;
 		std::vector<LibraryAddon_t> Pending;
 		
+		// unpacks the exe and registers the protocol, or unregisters if disabled
+		void Setup(HMODULE aModule, bool aEnabled);
+
+		// Drains the queue and starts the listener thread
+		void Start();
+		void Stop();
+
 		// unpacks the exe if changed
 		bool UnpackHandler(HMODULE aModule);
 		

@@ -138,10 +138,14 @@ namespace Raidcore::Nexus
 			this->Library().AddSource("https://api.raidcore.gg/arcdpslibrary");
 			this->Library().Update();
 
-			Host::UrlRequestMgr& urlRequests = this->UrlRequests();
-			bool enabled = this->Settings().Get<bool>(OPT_URLPROTOCOL, true);
-			urlRequests.Setup(GetCurrentModule(), enabled);
-			if (enabled) { urlRequests.Start(); }
+			this->Settings().Subscribe<bool>(OPT_URLPROTOCOL, [this](bool aEnabled)
+			{
+				Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
+				{
+					// not captured to get latest value
+					this->UrlRequests().SetEnabled(GetCurrentModule(), this->Settings().Get<bool>(OPT_URLPROTOCOL, true));
+				});
+			});
 		});
 
 		/* Prefetch game build. */

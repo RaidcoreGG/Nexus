@@ -64,6 +64,22 @@ namespace Raidcore::Nexus::Host
 		this->Stop();
 	}
 
+	void UrlRequestMgr::SetEnabled(HMODULE aModule, bool aEnabled)
+	{
+		const std::lock_guard<std::mutex> lock(this->LifecycleMutex);
+
+		this->Setup(aModule, aEnabled);
+
+		if (aEnabled)
+		{
+			this->Start();
+		}
+		else
+		{
+			this->Stop();
+		}
+	}
+
 	void UrlRequestMgr::Setup(HMODULE aModule, bool aEnabled)
 	{
 		if (!aEnabled)

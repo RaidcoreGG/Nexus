@@ -82,6 +82,7 @@
     <ClCompile Include="UI\Services\Styles\StyleMgr.cpp" />
     <ClCompile Include="UI\Views\Alerts\Alerts.cpp" />
     <ClCompile Include="UI\Views\EULA\LicenseAgreementModal.cpp" />
+    <ClCompile Include="UI\Views\InstallRequest\InstallRequestWindow.cpp" />
     <ClCompile Include="UI\Views\MainWindow\About\About.cpp" />
     <ClCompile Include="UI\Views\MainWindow\Addons\Addons.cpp" />
     <ClCompile Include="UI\Views\MainWindow\Addons\CmAddon.cpp" />
@@ -391,6 +392,7 @@
     <ClInclude Include="UI\Views\Alerts\Alerts.h" />
     <ClInclude Include="UI\Views\Alerts\AlMessage.h" />
     <ClInclude Include="UI\Views\EULA\LicenseAgreementModal.h" />
+    <ClInclude Include="UI\Views\InstallRequest\InstallRequestWindow.h" />
     <ClInclude Include="UI\Views\MainWindow\About\About.h" />
     <ClInclude Include="UI\Views\MainWindow\Addons\AddonListing.h" />
     <ClInclude Include="UI\Views\MainWindow\Addons\Addons.h" />
