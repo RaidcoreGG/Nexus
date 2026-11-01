@@ -13,8 +13,8 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_extensions.h"
 
-#include "Core/Addons/Addon.h"
-#include "Core/Context.h"
+#include "Host/GW2/Addons/Addon.h"
+#include "Host/GW2/Context.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// AddonToggleCtl Namespace

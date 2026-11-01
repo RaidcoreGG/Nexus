@@ -12,8 +12,8 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui/imgui_internal.h"
 
-#include "Core/Addons/AddConst.h"
-#include "Core/Context.h"
+#include "Host/GW2/Addons/AddConst.h"
+#include "Host/GW2/Context.h"
 #include "Core/Preferences/PrefConst.h"
 #include "Core/Preferences/PrefContext.h"
 #include "res/Resources.h"

@@ -11,7 +11,7 @@
 #include "imgui/imgui_extensions.h"
 #include "imgui/imgui_internal.h"
 
-#include "Core/Context.h"
+#include "Host/GW2/Context.h"
 #include "ImAnimate/ImAnimate.h"
 #include "res/Resources.h"
 #include "Util/Time.h"

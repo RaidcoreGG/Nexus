@@ -12,7 +12,7 @@
 #include <d3d9types.h>
 #include <windows.h>
 
-#include "Core/Main.h"
+#include "Host/GW2/Main.h"
 #include "PxyEnum.h"
 #include "Proxy.h"
 

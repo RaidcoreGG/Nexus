@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include "Core/NexusLink.h"
+#include "Host/GW2/Addons/API/NexusLink.h"
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"

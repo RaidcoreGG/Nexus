@@ -10,9 +10,9 @@
 
 #include "imgui/imgui.h"
 
-#include "Core/Hooks/HkConst.h"
+#include "Host/GW2/Hooks/HkConst.h"
 #include "Core/Preferences/PrefConst.h"
-#include "GW2/Mumble/MblConst.h"
+#include "Host/GW2/Mumble/MblConst.h"
 
 static CScaling* s_Scaling{};
 

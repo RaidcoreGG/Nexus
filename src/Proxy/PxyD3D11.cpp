@@ -13,7 +13,7 @@
 #include <dxgi.h>
 #include <windows.h>
 
-#include "Core/Main.h"
+#include "Host/GW2/Main.h"
 #include "Proxy.h"
 #include "PxyEnum.h"
 #include "Util/CmdLine.h"

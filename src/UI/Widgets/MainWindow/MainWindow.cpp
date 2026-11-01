@@ -13,7 +13,7 @@
 #include "imgui/imgui_extensions.h"
 #include "imgui/imgui_internal.h"
 
-#include "Core/Context.h"
+#include "Host/GW2/Context.h"
 #include "Core/Preferences/PrefConst.h"
 #include "res/Resources.h"
 #include "SnowflakeMgr.h"

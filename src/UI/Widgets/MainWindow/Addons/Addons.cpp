@@ -13,9 +13,9 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_extensions.h"
 
-#include "Core/Addons/Library/LibAddon.h"
-#include "Core/Context.h"
-#include "Core/Index/Index.h"
+#include "Host/GW2/Addons/Library/LibAddon.h"
+#include "Host/GW2/Context.h"
+#include "Host/GW2/Index/Index.h"
 #include "CtlAddonToggle.h"
 #include "res/Resources.h"
 #include "Util/Strings.h"

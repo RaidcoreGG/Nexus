@@ -8,10 +8,10 @@
 
 #include "UiBinds.h"
 
-#include "Core/Addons/Addon.h"
-#include "Core/Context.h"
+#include "Host/GW2/Addons/Addon.h"
+#include "Host/GW2/Context.h"
 #include "Engine/Inputs/InputBinds/IbConst.h"
-#include "GW2/Inputs/GameBinds/GbConst.h"
+#include "Host/GW2/Inputs/GameBinds/GbConst.h"
 
 CUiBinds::CUiBinds()
 {

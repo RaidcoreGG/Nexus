@@ -8,7 +8,7 @@
 
 #include "ImportStyleModal.h"
 
-#include "Core/Context.h"
+#include "Host/GW2/Context.h"
 
 CImportStyleModal::CImportStyleModal()
 {

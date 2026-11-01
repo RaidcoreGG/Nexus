@@ -16,7 +16,7 @@
 #include <string>
 #include <windows.h>
 
-#include "Core/Hooks/HkNotify.h"
+#include "Host/GW2/Hooks/HkNotify.h"
 #include "Core/Platform/Windows/Exe/ExePackFile.h"
 #include "Engine/Clockwork/Dispatcher.h"
 namespace Clockwork = Raidcore::Clockwork;

@@ -12,7 +12,7 @@
 #include <filesystem>
 
 #include "UI/Controls/CtlModal.h"
-#include "Core/Addons/Config/Config.h"
+#include "Host/GW2/Addons/Config/Config.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// CLoadConfirmationModal Class

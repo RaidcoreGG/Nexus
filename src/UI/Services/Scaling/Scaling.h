@@ -8,12 +8,12 @@
 
 #pragma once
 
-#include "Core/NexusLink.h"
+#include "Host/GW2/Addons/API/NexusLink.h"
 #include "Core/Preferences/PrefContext.h"
 #include <windows.h>
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
-#include "GW2/Mumble/MblReader.h"
+#include "Host/GW2/Mumble/MblReader.h"
 #include "UI/Renderer/RdrContext.h"
 
 ///----------------------------------------------------------------------------------------------------

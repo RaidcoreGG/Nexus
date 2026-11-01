@@ -8,7 +8,7 @@
 
 #include "UninstallConfirmationModal.h"
 
-#include "Core/Context.h"
+#include "Host/GW2/Context.h"
 
 CUninstallConfirmationModal::CUninstallConfirmationModal()
 {

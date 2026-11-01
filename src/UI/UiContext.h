@@ -14,12 +14,12 @@
 #include <Windows.h>
 
 #include "Engine/Inputs/RawInput/WndProcNotify.h"
-#include "Core/Hooks/HkNotify.h"
+#include "Host/GW2/Hooks/HkNotify.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Core/Logging/LogApi.h"
-#include "GW2/Mumble/MblReader.h"
+#include "Host/GW2/Mumble/MblReader.h"
 #include "UI/Renderer/RdrContext.h"
 #include "UI/Services/Fonts/FontManager.h"
 #include "UI/Services/Localization/LoclApi.h"

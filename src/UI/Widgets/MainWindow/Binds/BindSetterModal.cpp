@@ -8,8 +8,8 @@
 
 #include "BindSetterModal.h"
 
-#include "Core/Context.h"
-#include "GW2/Inputs/GameBinds/GbConst.h"
+#include "Host/GW2/Context.h"
+#include "Host/GW2/Inputs/GameBinds/GbConst.h"
 #include "Engine/Inputs/InputBinds/IbConst.h"
 
 CBindSetterModal::CBindSetterModal()

@@ -12,8 +12,8 @@
 
 #include "imgui/imgui.h"
 
-#include "Core/Context.h"
-#include "Core/Index/Index.h"
+#include "Host/GW2/Context.h"
+#include "Host/GW2/Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
 #include "UiContext.h"
 #include "Util/Base64.h"

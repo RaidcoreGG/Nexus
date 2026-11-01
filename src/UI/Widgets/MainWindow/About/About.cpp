@@ -13,7 +13,7 @@
 #include "imgui/imgui.h"
 #include "ImAnimate/ImAnimate.h"
 
-#include "Core/Context.h"
+#include "Host/GW2/Context.h"
 #include "res/Resources.h"
 
 CAboutBox::CAboutBox()

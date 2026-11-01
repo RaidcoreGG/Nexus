@@ -15,8 +15,8 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_extensions.h"
 
-#include "Core/Context.h"
-#include "Core/Index/Index.h"
+#include "Host/GW2/Context.h"
+#include "Host/GW2/Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
 
 CLicenseAgreementModal::CLicenseAgreementModal()

@@ -10,7 +10,7 @@
 
 #include "thirdparty/mumble/Mumble.h"
 
-#include "Core/NexusLink.h"
+#include "Host/GW2/Addons/API/NexusLink.h"
 #include "UI/Controls/CtlWindow.h"
 
 class CMumbleOverlay : public virtual IWindow

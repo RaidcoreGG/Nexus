@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-#include "GW2/Inputs/GameBinds/GbEnum.h"
+#include "Host/GW2/Inputs/GameBinds/GbEnum.h"
 #include "Engine/Inputs/InputBinds/IbMapping.h"
 #include "UI/Controls/CtlSubWindow.h"
 #include "UI/UiBinds.h"

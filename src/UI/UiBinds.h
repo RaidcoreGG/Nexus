@@ -15,7 +15,7 @@
 
 #include "Engine/Inputs/InputBinds/IbBindV2.h"
 #include "Engine/Inputs/InputBinds/IbMapping.h"
-#include "GW2/Inputs/GameBinds/GbEnum.h"
+#include "Host/GW2/Inputs/GameBinds/GbEnum.h"
 
 struct InputBindPacked_t
 {
