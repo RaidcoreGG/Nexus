@@ -13,10 +13,8 @@
 #include "Util/URL.h"
 #include "Util/Time.h"
 
-CHttpClient::CHttpClient(CLogApi* aLogger, std::string aBaseURL, std::filesystem::path aCacheDirectory, uint32_t aCacheLifetime)
+CHttpClient::CHttpClient(std::string aBaseURL, std::filesystem::path aCacheDirectory, uint32_t aCacheLifetime)
 {
-	this->Logger = aLogger;
-
 	this->BaseURL = URL::GetBase(aBaseURL); /* Sanitize the URL. */
 	this->Client = new httplib::Client(this->BaseURL);
 	this->Client->enable_server_certificate_verification(URL::UsingHTTPS(this->BaseURL));
@@ -25,7 +23,7 @@ CHttpClient::CHttpClient(CLogApi* aLogger, std::string aBaseURL, std::filesystem
 	this->Client->set_read_timeout(HTTP_READ_TIMEOUT_SEC);
 	this->Client->set_write_timeout(HTTP_WRITE_TIMEOUT_SEC);
 
-	this->Logger->Debug(
+	LogDebug(
 		CH_NETWORKING,
 		"CHttpClient(BaseURL: %s, CacheDirectory: %s, CacheLifetime: %d)",
 		this->BaseURL.c_str(),
@@ -52,7 +50,7 @@ CHttpClient::~CHttpClient()
 	delete this->Client;
 	this->Client = nullptr;
 
-	this->Logger->Debug(CH_NETWORKING, "~CHttpClient(%s)", this->BaseURL.c_str());
+	LogDebug(CH_NETWORKING, "~CHttpClient(%s)", this->BaseURL.c_str());
 }
 
 void CHttpClient::Stop()
@@ -78,7 +76,7 @@ HttpResponse_t CHttpClient::Get(std::string aEndpoint, std::string aParameters, 
 	{
 		if (HttpResponse_t* cachedResult = this->Cache->Retrieve(query, aOverrideCacheLifetime))
 		{
-			this->Logger->Debug(
+			LogDebug(
 				CH_NETWORKING,
 				"Returning cached result for \"%s\".",
 				query.c_str()
@@ -110,7 +108,7 @@ HttpResponse_t CHttpClient::Get(std::string aEndpoint, std::string aParameters, 
 	else
 	{
 		result.Error = "Lib Result was nullptr.";
-		this->Logger->Critical(
+		LogCritical(
 			CH_NETWORKING,
 			"Lib Result was nullptr for \"%s\". Lib Error: %s",
 			query.c_str(),
@@ -146,7 +144,7 @@ HttpResponse_t CHttpClient::Download(std::filesystem::path aOutPath, std::string
 
 	if (!file.is_open())
 	{
-		this->Logger->Warning(
+		LogWarning(
 			CH_NETWORKING,
 			"[%s] Error downloading from \"%s\" to \"%s\". Could not open file.",
 			this->BaseURL.c_str(),
@@ -217,7 +215,7 @@ HttpResponse_t CHttpClient::Download(std::filesystem::path aOutPath, std::string
 
 void CHttpClient::DownloadCleanup(const std::filesystem::path& aOutPath, const std::string& aQuery)
 {
-	this->Logger->Warning(
+	LogWarning(
 		CH_NETWORKING,
 		"[%s] Error downloading from \"%s\" to \"%s\".",
 		this->BaseURL.c_str(),
@@ -234,7 +232,7 @@ void CHttpClient::DownloadCleanup(const std::filesystem::path& aOutPath, const s
 	}
 	catch (...)
 	{
-		this->Logger->Warning(
+		LogWarning(
 			CH_NETWORKING,
 			"[%s] Subsequently failed deleting \"%s.\" for failed download \"%s\".",
 			this->BaseURL.c_str(),

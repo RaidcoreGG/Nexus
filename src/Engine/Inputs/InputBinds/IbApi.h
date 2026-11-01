@@ -34,7 +34,7 @@ class CInputBindApi : public CInputBindCapture, public virtual IRefCleaner, publ
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CInputBindApi(CEventApi* aEventApi, CLogApi* aLogger, std::filesystem::path aConfigPath);
+	CInputBindApi(CEventApi* aEventApi, std::filesystem::path aConfigPath);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -125,7 +125,6 @@ class CInputBindApi : public CInputBindCapture, public virtual IRefCleaner, publ
 
 	private:
 	CEventApi*                         EventApi = nullptr;
-	CLogApi*                           Logger   = nullptr;
 
 	std::filesystem::path              ConfigPath;
 

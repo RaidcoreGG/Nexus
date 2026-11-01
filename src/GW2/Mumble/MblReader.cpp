@@ -22,15 +22,13 @@ using namespace Mumble;
 #include "Core/Context.h"
 #include "MblExtensions.h"
 
-CMumbleReader::CMumbleReader(CDataLinkApi* aDataLink, CEventApi* aEventApi, CLogApi* aLogger)
+CMumbleReader::CMumbleReader(CDataLinkApi* aDataLink, CEventApi* aEventApi)
 {
 	assert(aDataLink);
 	assert(aEventApi);
-	assert(aLogger);
 
 	this->DataLinkApi = aDataLink;
 	this->EventApi = aEventApi;
-	this->Logger = aLogger;
 
 	this->Name = CmdLine::GetArgumentValue("-mumble");
 
@@ -108,19 +106,19 @@ void CMumbleReader::AdvanceIdentity()
 			j["fov"].get_to(this->MumbleIdentity->FOV);
 			j["uisz"].get_to(this->MumbleIdentity->UISize);
 
-			//this->Logger->Trace(CH_MUMBLE_READER, "CMumbleReader::AdvanceIdentity()");
+			//LogTrace(CH_MUMBLE_READER, "CMumbleReader::AdvanceIdentity()");
 		}
 		catch (json::parse_error& ex)
 		{
-			this->Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
+			LogTrace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
 		}
 		catch (json::type_error& ex)
 		{
-			this->Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Type Error: %s", ex.what());
+			LogTrace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Type Error: %s", ex.what());
 		}
 		catch (...)
 		{
-			this->Logger->Trace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Unknown Error.");
+			LogTrace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Unknown Error.");
 		}
 
 		/* notify (also notifies the GUI to update its scaling factor) */
@@ -149,5 +147,5 @@ void CMumbleReader::AdvanceDerived()
 	this->PreviousAvatarPosition = this->MumbleLink->AvatarPosition;
 	this->PreviousCameraFront    = this->MumbleLink->CameraFront;
 
-	//this->Logger->Trace(CH_MUMBLE_READER, "CMumbleReader::AdvanceDerived()");
+	//LogTrace(CH_MUMBLE_READER, "CMumbleReader::AdvanceDerived()");
 }

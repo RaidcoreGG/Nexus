@@ -32,7 +32,6 @@ class CLoader : public IWndProcNotifyHandler
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
 	CLoader(
-		CLogApi*              aLogger,
 		IADDON_FACTORY        aFactoryFunction,
 		std::filesystem::path aDirectory
 	);
@@ -119,8 +118,6 @@ class CLoader : public IWndProcNotifyHandler
 	std::vector<IAddon*> GetAddons() const;
 
 	private:
-	CLogApi*                Logger        = nullptr;
-
 	std::filesystem::path   Directory;
 
 	std::mutex              FSMutex;

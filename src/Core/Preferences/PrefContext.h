@@ -26,7 +26,7 @@ constexpr const char* CH_SETTINGS = "Settings";
 class CSettings
 {
 	public:
-	CSettings(std::filesystem::path aPath, CLogApi* aLogger);
+	CSettings(std::filesystem::path aPath);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Load:
@@ -123,8 +123,6 @@ class CSettings
 	void Remove(const std::string& aIdentifier);
 
 	private:
-	CLogApi*                                                       Logger = nullptr;
-
 	std::filesystem::path                                          Path;
 
 	/* Settings */

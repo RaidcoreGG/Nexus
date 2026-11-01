@@ -53,8 +53,6 @@ class CContext
 
 	RenderContext_t* GetRendererCtx();
 
-	CLogApi* GetLogger();
-
 	CTextureLoader* GetTextureService();
 
 	CDataLinkApi* GetDataLink();

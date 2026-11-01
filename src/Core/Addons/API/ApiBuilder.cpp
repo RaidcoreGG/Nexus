@@ -54,7 +54,6 @@ namespace ADDONAPI
 	static CInputBindApi*   s_InputBindApi  = nullptr;
 	static CRawInputApi*    s_RawInputApi   = nullptr;
 	static CLocalization*   s_Localization  = nullptr;
-	static CLogApi*         s_Logger        = nullptr;
 	static CTextureLoader*  s_TextureApi    = nullptr;
 	static CLoader*         s_Loader        = nullptr;
 	static RenderContext_t* s_RenderCtx     = nullptr;
@@ -302,14 +301,12 @@ namespace ADDONAPI
 	{
 		void LogMessage(ELogLevel aLogLevel, const char* aStr)
 		{
-			assert(s_Logger);
-			s_Logger->LogUnformatted(aLogLevel, "Addon", aStr);
+			CLogApi::Get()->LogUnformatted(aLogLevel, "Addon", aStr);
 		}
 
 		void LogMessage2(ELogLevel aLogLevel, const char* aChannel, const char* aStr)
 		{
-			assert(s_Logger);
-			s_Logger->LogUnformatted(aLogLevel, aChannel, aStr);
+			CLogApi::Get()->LogUnformatted(aLogLevel, aChannel, aStr);
 		}
 	}
 
@@ -389,7 +386,7 @@ namespace ADDONAPI
 			if (!addon->Definitions) { return; }
 			if (addon->Definitions->Provider != EUpdateProvider::Self)
 			{
-				s_Logger->Warning(CH_UPDATER, "Update requested for %s but provider is not EUpdateProvider::Self. Cancelling.", addon->Definitions->Name);
+				LogWarning(CH_UPDATER, "Update requested for %s but provider is not EUpdateProvider::Self. Cancelling.", addon->Definitions->Name);
 				return;
 			}
 
@@ -574,7 +571,6 @@ namespace ADDONAPI
 			s_GameBindsApi  = ctx->GetGameBindsApi();
 			s_InputBindApi  = ctx->GetInputBindApi();
 			s_RawInputApi   = ctx->GetRawInputApi();
-			s_Logger        = ctx->GetLogger();
 			s_TextureApi    = ctx->GetTextureService();
 			s_Loader        = ctx->GetLoader();
 			s_RenderCtx     = ctx->GetRendererCtx();

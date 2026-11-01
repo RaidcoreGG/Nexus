@@ -34,7 +34,7 @@ class CLocalization
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CLocalization(CLogApi* aLogger);
+	CLocalization();
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -92,8 +92,6 @@ class CLocalization
 	std::vector<const char*> GetAllTexts();
 
 	private:
-	CLogApi*                         Logger   = nullptr;
-
 	uint32_t                         ThreadID = 0;
 
 	std::filesystem::path            Directory;

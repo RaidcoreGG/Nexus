@@ -37,6 +37,5 @@ class CUiStyle
 	void ApplyStyle(EUIStyle aStyle = EUIStyle::User, std::string aValue = "");
 
 	private:
-	CLogApi*   Logger;
 	CSettings* Settings;
 };

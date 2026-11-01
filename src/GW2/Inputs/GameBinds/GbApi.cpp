@@ -94,15 +94,13 @@ void CGameBindsApi::OnUEInputBindChanged(void* aData)
 	uictx->Invalidate();
 }
 
-CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CLogApi* aLogger, CEventApi* aEventApi, RenderContext_t* aRenderContext, std::filesystem::path aConfigPath)
+CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CEventApi* aEventApi, RenderContext_t* aRenderContext, std::filesystem::path aConfigPath)
 {
 	assert(aRawInputApi);
-	assert(aLogger);
 	assert(aEventApi);
 	assert(aRenderContext);
 
 	this->RawInputApi = aRawInputApi;
-	this->Logger = aLogger;
 	this->EventApi = aEventApi;
 	this->RenderContext = aRenderContext;
 
@@ -593,7 +591,7 @@ void CGameBindsApi::Load(std::filesystem::path aPath)
 
 	if (!result)
 	{
-		this->Logger->Warning(CH_GAMEBINDS, "GameBinds.json could not be parsed. Error: %s", result.description());
+		LogWarning(CH_GAMEBINDS, "GameBinds.json could not be parsed. Error: %s", result.description());
 		return;
 	}
 
@@ -1281,6 +1279,6 @@ void CGameBindsApi::Save()
 
 	if (!doc.save_file(this->ConfigPath.string().c_str(), "\t"))
 	{
-		this->Logger->Warning(CH_GAMEBINDS, "GameBinds.xml could not be saved.");
+		LogWarning(CH_GAMEBINDS, "GameBinds.xml could not be saved.");
 	}
 }

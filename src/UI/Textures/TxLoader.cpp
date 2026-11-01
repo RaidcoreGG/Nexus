@@ -26,12 +26,10 @@ using namespace Raidcore::Core::Platform::Windows;
 #include "Util/Time.h"
 #include "Util/Url.h"
 
-CTextureLoader::CTextureLoader(CLogApi* aLogger, RenderContext_t* aRenderCtx, std::filesystem::path aOverridesDirectory) : IRefCleaner("TextureLoader")
+CTextureLoader::CTextureLoader(RenderContext_t* aRenderCtx, std::filesystem::path aOverridesDirectory) : IRefCleaner("TextureLoader")
 {
-	assert(aLogger);
 	assert(aRenderCtx);
 
-	this->Logger        = aLogger;
 	this->RenderContext = aRenderCtx;
 
 	this->OverridesDirectory = aOverridesDirectory;
@@ -88,7 +86,7 @@ void CTextureLoader::Advance()
 			{
 				if (now - it->second.Time > 60000)
 				{
-					this->Logger->Debug(CH_TEXTURES, "Dropped texture with ID \"%s\" from queue after %dms at stage %d.", it->first.c_str(), now - it->second.Time, it->second.Stage);
+					LogDebug(CH_TEXTURES, "Dropped texture with ID \"%s\" from queue after %dms at stage %d.", it->first.c_str(), now - it->second.Time, it->second.Stage);
 					it->second.Stage = ETextureStage::INVALID;
 					++it;
 				}
@@ -217,7 +215,7 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aFilename, TEXTUR
 
 	if (!std::filesystem::exists(aFilename))
 	{
-		this->Logger->Warning(CH_TEXTURES, "File provided does not exist: %s (%s)", aFilename, aIdentifier);
+		LogWarning(CH_TEXTURES, "File provided does not exist: %s (%s)", aFilename, aIdentifier);
 
 		/* nullptr response on fail */
 		this->DispatchTexture(aIdentifier, nullptr, aCallback);
@@ -280,7 +278,7 @@ void CTextureLoader::Load(const char* aIdentifier, std::span<const uint8_t> aDat
 
 	if (!data)
 	{
-		this->Logger->Debug(CH_TEXTURES, "Failed to decode texture from memory (%s)", aIdentifier);
+		LogDebug(CH_TEXTURES, "Failed to decode texture from memory (%s)", aIdentifier);
 
 		/* nullptr response on fail */
 		this->DispatchTexture(aIdentifier, nullptr, aCallback);
@@ -526,7 +524,7 @@ void CTextureLoader::CreateTexture(const std::string& aIdentifier, QueuedTexture
 {
 	if (this->RenderContext->Device == nullptr || this->RenderContext->DeviceContext == nullptr)
 	{
-		this->Logger->Debug(CH_TEXTURES, "RenderContext not ready. Device: %p DeviceContext: %p", this->RenderContext->Device, this->RenderContext->DeviceContext);
+		LogDebug(CH_TEXTURES, "RenderContext not ready. Device: %p DeviceContext: %p", this->RenderContext->Device, this->RenderContext->DeviceContext);
 		return;
 	}
 
@@ -553,7 +551,7 @@ void CTextureLoader::CreateTexture(const std::string& aIdentifier, QueuedTexture
 
 	if (!pTexture)
 	{
-		this->Logger->Debug(CH_TEXTURES, "pTexture was null");
+		LogDebug(CH_TEXTURES, "pTexture was null");
 		stbi_image_free(aQueuedTexture.Data);
 		aQueuedTexture.Data = nullptr;
 
@@ -605,7 +603,7 @@ void CTextureLoader::DispatchTexture(const std::string& aIdentifier, Texture_t* 
 	}
 	catch (...)
 	{
-		this->Logger->Debug(CH_TEXTURES, "DispatchTexture() failed with: %s %p %p", aIdentifier.c_str(), aTexture, aCallback);
+		LogDebug(CH_TEXTURES, "DispatchTexture() failed with: %s %p %p", aIdentifier.c_str(), aTexture, aCallback);
 	}
 }
 
@@ -664,7 +662,7 @@ void CTextureLoader::ProcessDownloads(Clockwork::CancellationToken aToken)
 
 			if (!result)
 			{
-				this->Logger->Debug(CH_TEXTURES, "Error fetching %s%s (%s)\nError: %s", remote.c_str(), endpoint.c_str(), id.c_str(), httplib::to_string(result.error()).c_str());
+				LogDebug(CH_TEXTURES, "Error fetching %s%s (%s)\nError: %s", remote.c_str(), endpoint.c_str(), id.c_str(), httplib::to_string(result.error()).c_str());
 
 				/* nullptr response on fail */
 				this->Dequeue(id.c_str());
@@ -675,7 +673,7 @@ void CTextureLoader::ProcessDownloads(Clockwork::CancellationToken aToken)
 			// Status is not HTTP_OK
 			if (result->status != 200)
 			{
-				this->Logger->Debug(CH_TEXTURES, "Status %d when fetching %s%s (%s) | %s", result->status, remote.c_str(), endpoint.c_str(), id.c_str(), httplib::to_string(result.error()).c_str());
+				LogDebug(CH_TEXTURES, "Status %d when fetching %s%s (%s) | %s", result->status, remote.c_str(), endpoint.c_str(), id.c_str(), httplib::to_string(result.error()).c_str());
 
 				/* nullptr response on fail */
 				this->Dequeue(id.c_str());

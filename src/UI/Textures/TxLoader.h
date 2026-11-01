@@ -39,7 +39,7 @@ class CTextureLoader : public virtual IRefCleaner, public IDxgiPresentNotifyHand
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CTextureLoader(CLogApi* aLogger, RenderContext_t* aRenderCtx, std::filesystem::path aOverridesDirectory);
+	CTextureLoader(RenderContext_t* aRenderCtx, std::filesystem::path aOverridesDirectory);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -152,7 +152,6 @@ class CTextureLoader : public virtual IRefCleaner, public IDxgiPresentNotifyHand
 	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	private:
-	CLogApi*                               Logger { nullptr };
 	RenderContext_t*                       RenderContext{ nullptr };
 
 	std::filesystem::path                  OverridesDirectory{};

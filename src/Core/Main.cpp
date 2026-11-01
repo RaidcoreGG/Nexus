@@ -79,6 +79,9 @@ namespace Main
 			return;
 		}
 
+		/* Created first so it is destroyed last: services log from their destructors. */
+		CLogApi::Get();
+
 		MH_Initialize();
 		Hooks::HookIDXGISwapChain();
 
@@ -86,11 +89,10 @@ namespace Main
 
 		s_IsInitialized = true;
 
-		CContext* ctx    = CContext::GetContext();
-		CLogApi*  logger = ctx->GetLogger();
+		CContext* ctx = CContext::GetContext();
 
 		/* Environment info. */
-		logger->Info(
+		LogInfo(
 			CH_CORE,
 			"Game: %s\nModule: %s\nNexus %s %s\nEntry method: %d",
 			GetCommandLineA(),
@@ -115,7 +117,7 @@ namespace Main
 		if (CmdLine::HasArgument("-ggconsole"))
 		{
 			static CConsoleLogger console = CConsoleLogger(ELogLevel::ALL);
-			logger->Register(&console);
+			CLogApi::Get()->Register(&console);
 		}
 
 		/* Multibox-friendly log file. */
@@ -138,7 +140,7 @@ namespace Main
 #else
 		static CFileLogger writer = CFileLogger(ELogLevel::INFO, logpath);
 #endif
-		logger->Register(&writer);
+		CLogApi::Get()->Register(&writer);
 
 		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Normal, [](Clockwork::CancellationToken aToken)
 		{
@@ -157,11 +159,8 @@ namespace Main
 
 		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [](Clockwork::CancellationToken aToken)
 		{
-			CContext* ctx = CContext::GetContext();
-			CLogApi* logger = ctx->GetLogger();
-			
 			Multibox::KillMutex();
-			logger->Info(CH_CORE, "Multibox State: %d", Multibox::GetState());
+			LogInfo(CH_CORE, "Multibox State: %d", Multibox::GetState());
 		});
 	}
 
@@ -197,11 +196,10 @@ namespace Main
 		}
 
 		CContext*       ctx    = CContext::GetContext();
-		CLogApi*        logger = ctx->GetLogger();
 		CUiContext*     uictx  = ctx->GetUIContext();
 		CTextureLoader* texapi = ctx->GetTextureService();
 
-		logger->Critical(CH_CORE, "SHUTDOWN BEGIN | %s", reasonStr.c_str());
+		LogCritical(CH_CORE, "SHUTDOWN BEGIN | %s", reasonStr.c_str());
 
 		/* Disabled, not uninitialized: the render thread may still be inside a hook. */
 		MH_DisableHook(MH_ALL_HOOKS);
@@ -221,7 +219,7 @@ namespace Main
 
 		uictx->Shutdown();
 		texapi->Shutdown();
-		logger->Info(CH_CORE, "SHUTDOWN END");
+		LogInfo(CH_CORE, "SHUTDOWN END");
 
 		/* Let the OS take care of freeing the handles. Ugly, but otherwise crashes due to the addon clownfiesta in GW2. */
 		//if (D3D11Handle) { FreeLibrary(D3D11Handle); }

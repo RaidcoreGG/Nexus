@@ -34,13 +34,11 @@ class CHttpClient
 	public:
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
-	/// 	- aLogger: Logger dependency.
 	/// 	- aBaseURL: URL base for the client.
 	/// 	- aCacheDirectory: Directory which will contain the cached requests.
 	/// 	- aCacheLifetime: Lifetime of a cache entry in seconds.
 	///----------------------------------------------------------------------------------------------------
 	CHttpClient(
-		CLogApi*              aLogger,
 		std::string           aBaseURL,
 		std::filesystem::path aCacheDirectory = {},
 		uint32_t              aCacheLifetime  = 0
@@ -71,8 +69,6 @@ class CHttpClient
 	void Stop();
 
 	private:
-	CLogApi*         Logger = nullptr;
-
 	std::string      BaseURL;
 	std::mutex       Mutex;
 	httplib::Client* Client = nullptr;

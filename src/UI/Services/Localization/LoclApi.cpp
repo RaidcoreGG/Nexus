@@ -63,12 +63,8 @@ static CLocalization* s_Localization{};
 	}
 }
 
-CLocalization::CLocalization(CLogApi* aLogger)
+CLocalization::CLocalization()
 {
-	assert(aLogger);
-
-	this->Logger = aLogger;
-
 	CContext* ctx = CContext::GetContext();
 	CSettings* settingsctx = ctx->GetSettingsCtx();
 	CEventApi* evtapi = ctx->GetEventApi();
@@ -394,7 +390,7 @@ void CLocalization::BuildLocaleAtlas()
 		}
 		catch (json::parse_error& ex)
 		{
-			Logger->Warning(CH_LOCALIZATION, "%s could not be parsed. Error: %s", path.filename().string().c_str(), ex.what());
+			LogWarning(CH_LOCALIZATION, "%s could not be parsed. Error: %s", path.filename().string().c_str(), ex.what());
 		}
 	}
 

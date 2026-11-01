@@ -54,7 +54,6 @@ class CGameBindsApi
 	///----------------------------------------------------------------------------------------------------
 	CGameBindsApi(
 		CRawInputApi*         aRawInputApi,
-		CLogApi*              aLogger,
 		CEventApi*            aEventApi,
 		RenderContext_t*      aRenderContext,
 		std::filesystem::path aConfigPath
@@ -147,7 +146,6 @@ class CGameBindsApi
 
 	private:
 	CRawInputApi*                                    RawInputApi;
-	CLogApi*                                         Logger;
 	CEventApi*                                       EventApi;
 	RenderContext_t*                                 RenderContext;
 

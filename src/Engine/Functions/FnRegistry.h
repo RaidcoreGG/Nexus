@@ -26,7 +26,7 @@ class CFuncRegistry
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CFuncRegistry(CLogApi* aLogger);
+	CFuncRegistry();
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -59,8 +59,6 @@ class CFuncRegistry
 	void Release(const char* aIdentifier);
 
 	private:
-	CLogApi*                                     Logger;
-
 	std::mutex                                   Mutex;
 	std::unordered_map<std::string, FuncEntry_t> Registry;
 };

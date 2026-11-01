@@ -54,7 +54,7 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CQuickAccess(CDataLinkApi* aDataLink, CLogApi* aLogger, CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization, CEventApi* aEventApi);
+	CQuickAccess(CDataLinkApi* aDataLink, CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization, CEventApi* aEventApi);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -128,7 +128,6 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
 	private:
-	CLogApi*                              Logger             {};
 	CInputBindApi*                        InputBindApi       {};
 	CTextureLoader*                       TextureService     {};
 	CLocalization*                        Language           {};

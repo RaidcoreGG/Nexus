@@ -11,12 +11,8 @@
 #include <filesystem>
 #include <fstream>
 
-CSettings::CSettings(std::filesystem::path aPath, CLogApi* aLogger)
+CSettings::CSettings(std::filesystem::path aPath)
 {
-	assert(aLogger);
-
-	this->Logger = aLogger;
-
 	this->Path = aPath;
 	this->Load();
 }
@@ -65,7 +61,7 @@ void CSettings::LoadInternal()
 	}
 	catch (json::parse_error& ex)
 	{
-		this->Logger->Warning(CH_SETTINGS, "Settings.json could not be parsed. Error: %s", ex.what());
+		LogWarning(CH_SETTINGS, "Settings.json could not be parsed. Error: %s", ex.what());
 	}
 }
 
@@ -79,7 +75,7 @@ void CSettings::SaveInternal()
 	}
 	catch (...)
 	{
-		this->Logger->Warning(CH_SETTINGS, "Settings.json could not be saved.");
+		LogWarning(CH_SETTINGS, "Settings.json could not be saved.");
 	}
 }
 

@@ -161,7 +161,6 @@
 
 CUiContext::CUiContext(
 	RenderContext_t* aRenderContext,
-	CLogApi*         aLogger,
 	CTextureLoader*  aTextureService,
 	CDataLinkApi*    aDataLink,
 	CInputBindApi*   aInputBindApi,
@@ -170,7 +169,6 @@ CUiContext::CUiContext(
 ) : IRefCleaner("UiContext")
 {
 	this->RenderContext  = aRenderContext;
-	this->Logger         = aLogger;
 	this->TextureService = aTextureService;
 	this->DataLink       = aDataLink;
 	this->InputBindApi   = aInputBindApi;
@@ -179,10 +177,10 @@ CUiContext::CUiContext(
 
 	ImGui::CreateContext();
 
-	this->Language       = new CLocalization(aLogger);
+	this->Language       = new CLocalization();
 	this->Alerts         = new CAlerts(aDataLink);
 	this->MainWindow     = new CMainWindow();
-	this->QuickAccess    = new CQuickAccess(aDataLink, aLogger, aInputBindApi, aTextureService, this->Language, aEventApi);
+	this->QuickAccess    = new CQuickAccess(aDataLink, aInputBindApi, aTextureService, this->Language, aEventApi);
 
 	this->FontManager    = new CFontManager(this->Language);
 	this->EscapeClose    = new CEscapeClosing();
@@ -220,7 +218,7 @@ void CUiContext::Initialize()
 
 	if (!(this->RenderContext->Window.Handle && this->RenderContext->SwapChain))
 	{
-		this->Logger->Critical(CH_UICONTEXT, "CUiContext::Initialize() failed. A RenderContext component was nullptr.");
+		LogCritical(CH_UICONTEXT, "CUiContext::Initialize() failed. A RenderContext component was nullptr.");
 		return;
 	}
 
@@ -230,7 +228,7 @@ void CUiContext::Initialize()
 
 	if (!pBackBuffer)
 	{
-		this->Logger->Critical(CH_UICONTEXT, "CUiContext::Initialize() failed. BackBuffer was nullptr.");
+		LogCritical(CH_UICONTEXT, "CUiContext::Initialize() failed. BackBuffer was nullptr.");
 		return;
 	}
 
@@ -249,7 +247,7 @@ void CUiContext::Initialize()
 
 	if (!this->RenderTargetView)
 	{
-		this->Logger->Critical(CH_UICONTEXT, "CUiContext::Initialize() failed. RenderTargetView could not be created.");
+		LogCritical(CH_UICONTEXT, "CUiContext::Initialize() failed. RenderTargetView could not be created.");
 		return;
 	}
 

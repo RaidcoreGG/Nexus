@@ -36,7 +36,6 @@ CAddon::CAddon(std::filesystem::path aLocation)
 	this->MD5 = MD5Util::FromFile(aLocation);
 
 	CContext* ctx = CContext::GetContext();
-	this->Logger = ctx->GetLogger();
 	this->Loader = ctx->GetLoader();
 	this->EventApi = ctx->GetEventApi();
 	this->ConfigMgr = ctx->GetCfgMgr();
@@ -167,7 +166,7 @@ void CAddon::ProcessActions()
 		{
 			case EAddonAction::Create:
 			{
-				this->Logger->Trace(CH_ADDON, "CAddon::Create(): %s", this->Location.string().c_str());
+				LogTrace(CH_ADDON, "CAddon::Create(): %s", this->Location.string().c_str());
 				this->EnumInterfaces();
 				this->CheckUpdate(/*scheduled=*/true);
 				this->EventApi->Raise(0, EV_ADDON_CREATED);
@@ -176,7 +175,7 @@ void CAddon::ProcessActions()
 			case EAddonAction::Destroy:
 			{
 				this->Flags |= EAddonFlags::Destroying;
-				this->Logger->Trace(CH_ADDON, "CAddon::Destroy(): %s", this->Location.string().c_str());
+				LogTrace(CH_ADDON, "CAddon::Destroy(): %s", this->Location.string().c_str());
 				this->UnloadInternal();
 				this->IsRunning = false; /* Just to be sure. */
 				this->EventApi->Raise(0, EV_ADDON_DESTROYED);
@@ -225,17 +224,17 @@ void CAddon::ProcessActions()
 
 void CAddon::LoadInternal()
 {
-	this->Logger->Trace(CH_ADDON, "CAddon::LoadInternal(%s)", this->Location.string().c_str());
+	LogTrace(CH_ADDON, "CAddon::LoadInternal(%s)", this->Location.string().c_str());
 
 	if (this->IsLoaded())
 	{
-		this->Logger->Debug(CH_ADDON, "Cannot load. Already loaded. (%s)", this->Location.string().c_str());
+		LogDebug(CH_ADDON, "Cannot load. Already loaded. (%s)", this->Location.string().c_str());
 		return;
 	}
 
 	if (this->IsStateLocked())
 	{
-		this->Logger->Debug(CH_ADDON, "Cannot load. State is locked. (%s)", this->Location.string().c_str());
+		LogDebug(CH_ADDON, "Cannot load. State is locked. (%s)", this->Location.string().c_str());
 		return;
 	}
 
@@ -252,7 +251,7 @@ void CAddon::LoadInternal()
 
 	if (!this->HasInterface(EAddonInterfaces::Nexus))
 	{
-		this->Logger->Debug(CH_ADDON, "Cannot load. No Nexus addon interface. (%s)", this->Location.string().c_str());
+		LogDebug(CH_ADDON, "Cannot load. No Nexus addon interface. (%s)", this->Location.string().c_str());
 		return;
 	}
 
@@ -262,7 +261,7 @@ void CAddon::LoadInternal()
 	{
 		DWORD lasterror = GetLastError();
 		const std::error_condition ecnd = std::system_category().default_error_condition(lasterror);
-		this->Logger->Warning(
+		LogWarning(
 			CH_ADDON,
 			"Cannot load. LoadLibrary(%s) failed: %s (%d)",
 			this->Location.string().c_str(),
@@ -277,7 +276,7 @@ void CAddon::LoadInternal()
 
 	if (!DLL::FindFunction(module, &getAddonDef, "GetAddonDef"))
 	{
-		this->Logger->Debug(CH_ADDON, "Cannot load. Interface was set, but is not actually present. (%s)", this->Location.string().c_str());
+		LogDebug(CH_ADDON, "Cannot load. Interface was set, but is not actually present. (%s)", this->Location.string().c_str());
 		this->ModuleInterfaces &= ~EAddonInterfaces::Nexus;
 		FreeLibrary(module);
 		this->State = EAddonState::NotLoaded;
@@ -288,7 +287,7 @@ void CAddon::LoadInternal()
 
 	if (addondef == nullptr)
 	{
-		this->Logger->Warning(CH_ADDON, "Cannot load. Addon definition was nullptr. (%s)", this->Location.string().c_str());
+		LogWarning(CH_ADDON, "Cannot load. Addon definition was nullptr. (%s)", this->Location.string().c_str());
 		FreeLibrary(module);
 		this->State = EAddonState::NotLoaded;
 		this->Flags |= EAddonFlags::MissingReqs;
@@ -305,7 +304,7 @@ void CAddon::LoadInternal()
 
 	if (!addondef->HasMinimumRequirements())
 	{
-		this->Logger->Warning(CH_ADDON, "Cannot load. Addon definition does not fulfill minimum requirements. (%s)", this->Location.string().c_str());
+		LogWarning(CH_ADDON, "Cannot load. Addon definition does not fulfill minimum requirements. (%s)", this->Location.string().c_str());
 		FreeLibrary(module);
 		this->State = EAddonState::NotLoaded;
 		this->Flags |= EAddonFlags::MissingReqs;
@@ -324,7 +323,7 @@ void CAddon::LoadInternal()
 
 	if (this->IsDuplicate())
 	{
-		this->Logger->Warning(CH_ADDON, "Canceled load. Addon is a duplicate. (%s)", this->Location.string().c_str());
+		LogWarning(CH_ADDON, "Canceled load. Addon is a duplicate. (%s)", this->Location.string().c_str());
 		FreeLibrary(module);
 		this->State = EAddonState::NotLoaded;
 		return;
@@ -342,7 +341,7 @@ void CAddon::LoadInternal()
 
 	if (api == nullptr && this->NexusAddonDefV1->APIVersion > 0)
 	{
-		this->Logger->Warning(
+		LogWarning(
 			CH_ADDON,
 			"Canceled load. Addon requested an API revision that doesn't exist (%u). (%s)",
 			this->NexusAddonDefV1->APIVersion,
@@ -379,7 +378,7 @@ void CAddon::LoadInternal()
 	this->State = EAddonState::Loaded;
 	this->ConfigMgr->SaveConfigs();
 
-	this->Logger->Info(
+	LogInfo(
 		CH_ADDON,
 		"Loaded addon: %s\n"
 		"\tSignature: 0x%08X\n"
@@ -401,17 +400,17 @@ void CAddon::LoadInternal()
 
 void CAddon::UnloadInternal()
 {
-	this->Logger->Trace(CH_ADDON, "CAddon::UnloadInternal(%s)", this->Location.string().c_str());
+	LogTrace(CH_ADDON, "CAddon::UnloadInternal(%s)", this->Location.string().c_str());
 
 	if (!this->IsLoaded())
 	{
-		this->Logger->Debug(CH_ADDON, "Already unloaded. (%s)", this->Location.string().c_str());
+		LogDebug(CH_ADDON, "Already unloaded. (%s)", this->Location.string().c_str());
 		return;
 	}
 
 	if (this->IsStateLocked() && !this->IsDestroying())
 	{
-		this->Logger->Debug(CH_ADDON, "Cannot unload. State is locked. (%s)", this->Location.string().c_str());
+		LogDebug(CH_ADDON, "Cannot unload. State is locked. (%s)", this->Location.string().c_str());
 		return;
 	}
 
@@ -435,7 +434,7 @@ void CAddon::UnloadInternal()
 
 	if (!refcleanup.empty())
 	{
-		this->Logger->Warning(CH_ADDON, "(%s) %s", this->Location.string().c_str(), refcleanup.c_str());
+		LogWarning(CH_ADDON, "(%s) %s", this->Location.string().c_str(), refcleanup.c_str());
 	}
 
 	if ((this->Flags & EAddonFlags::Destroying) != EAddonFlags::Destroying)
@@ -455,7 +454,7 @@ void CAddon::UnloadInternal()
 
 	this->State = EAddonState::NotLoaded;
 
-	this->Logger->Info(
+	LogInfo(
 		CH_ADDON,
 		"Unloaded addon: %s\n\tSignature: 0x%08X\n\tFlags: %u\n\t%s",
 		this->Location.string().c_str(),
@@ -595,18 +594,18 @@ bool CAddon::SupportsUpdates() const
 
 void CAddon::UninstallInternal()
 {
-	this->Logger->Trace(CH_ADDON, "CAddon::UninstallInternal(%s)", this->Location.string().c_str());
+	LogTrace(CH_ADDON, "CAddon::UninstallInternal(%s)", this->Location.string().c_str());
 
 	if (this->IsUninstalled())
 	{
-		this->Logger->Debug(CH_ADDON, "Already uninstalled. (%s)", this->Location.string().c_str());
+		LogDebug(CH_ADDON, "Already uninstalled. (%s)", this->Location.string().c_str());
 		return;
 	}
 
 	/* If still loaded but state isn't locked, unload first. */
 	if (this->IsLoaded() && !this->IsStateLocked())
 	{
-		this->Logger->Debug(CH_ADDON, "Still loaded but state isn't locked requeing with unload. (%s)", this->Location.string().c_str());
+		LogDebug(CH_ADDON, "Still loaded but state isn't locked requeing with unload. (%s)", this->Location.string().c_str());
 
 		/* Queue unload. */
 		this->Unload();
@@ -624,7 +623,7 @@ void CAddon::UninstallInternal()
 	/* If it's statelocked and still loaded, keep the config in memory, but remove from disk. */
 	if (this->IsLoaded() && this->IsStateLocked())
 	{
-		this->Logger->Debug(
+		LogDebug(
 			CH_ADDON,
 			"Addon is still loaded, config already removed: %s",
 			this->Location.string().c_str()
@@ -650,7 +649,7 @@ void CAddon::UninstallInternal()
 
 	if (this->IsFileLocked())
 	{
-		this->Logger->Warning(
+		LogWarning(
 			CH_ADDON,
 			"Addon is still loaded, it will be uninstalled the next time the game is started: %s",
 			this->Location.string().c_str()
@@ -662,7 +661,7 @@ void CAddon::UninstallInternal()
 			std::filesystem::path targetLocation = Path::GetUnused(Index(EPath::DIR_TEMP) / this->Location.filename().string().append(".uninstall"));
 			std::filesystem::rename(this->Location, targetLocation);
 
-			this->Logger->Debug(
+			LogDebug(
 				CH_ADDON,
 				"Addon uninstall.\n\tOld Location: %s\n\tNew Location: %s",
 				this->Location.string().c_str(),
@@ -674,7 +673,7 @@ void CAddon::UninstallInternal()
 		catch (std::filesystem::filesystem_error fErr)
 		{
 			this->Flags |= EAddonFlags::FileLocked;
-			this->Logger->Critical(
+			LogCritical(
 				CH_ADDON,
 				"Error while trying to uninstall(move) locked addon: %s (%s)",
 				fErr.what(),
@@ -687,7 +686,7 @@ void CAddon::UninstallInternal()
 		/* File is not locked, we try to remove it. */
 		try
 		{
-			Logger->Info(CH_ADDON, "Uninstalled addon: %s", this->Location.string().c_str());
+			LogInfo(CH_ADDON, "Uninstalled addon: %s", this->Location.string().c_str());
 			std::filesystem::remove(this->Location);
 			this->Location.clear();
 			this->MD5.clear();
@@ -695,7 +694,7 @@ void CAddon::UninstallInternal()
 		catch (std::filesystem::filesystem_error fErr)
 		{
 			this->Flags |= EAddonFlags::FileLocked;
-			Logger->Warning(
+			LogWarning(
 				CH_ADDON,
 				"Cannot remove addon from disk: %s (%s)",
 				fErr.what(),
@@ -709,7 +708,7 @@ void CAddon::UninstallInternal()
 
 const EAddonInterfaces& CAddon::EnumInterfaces()
 {
-	this->Logger->Trace(CH_ADDON, "CAddon::EnumInterfaces(%s)", this->Location.string().c_str());
+	LogTrace(CH_ADDON, "CAddon::EnumInterfaces(%s)", this->Location.string().c_str());
 
 	/* Reset interfaces. */
 	this->ModuleInterfaces = EAddonInterfaces::None;
@@ -722,13 +721,13 @@ const EAddonInterfaces& CAddon::EnumInterfaces()
 
 	if (exports.Architecture == EArchitecture::None)
 	{
-		this->Logger->Warning(CH_ADDON, "Cannot enumerate addon interfaces. Not a readable DLL. (%s)", this->Location.string().c_str());
+		LogWarning(CH_ADDON, "Cannot enumerate addon interfaces. Not a readable DLL. (%s)", this->Location.string().c_str());
 		return this->ModuleInterfaces;
 	}
 
 	if (exports.Architecture != ARCH_CURRENT)
 	{
-		this->Logger->Warning(CH_ADDON, "Cannot enumerate addon interfaces. DLL is built for a different architecture. (%s)", this->Location.string().c_str());
+		LogWarning(CH_ADDON, "Cannot enumerate addon interfaces. DLL is built for a different architecture. (%s)", this->Location.string().c_str());
 		return this->ModuleInterfaces;
 	}
 
@@ -761,7 +760,7 @@ const EAddonInterfaces& CAddon::EnumInterfaces()
 			exports.Has("D3D11CoreGetLayeredDeviceSize") &&
 			exports.Has("D3D11CoreRegisterLayers")))
 		{
-			this->Logger->Debug(CH_ADDON, "Stub D3D11. (%s)", this->Location.string().c_str());
+			LogDebug(CH_ADDON, "Stub D3D11. (%s)", this->Location.string().c_str());
 		}
 
 		interfaces |= EAddonInterfaces::D3D11Proxy;
@@ -775,7 +774,7 @@ const EAddonInterfaces& CAddon::EnumInterfaces()
 			exports.Has("CompatValue") &&
 			exports.Has("CompatString")))
 		{
-			this->Logger->Debug(CH_ADDON, "Stub DXGI. (%s)", this->Location.string().c_str());
+			LogDebug(CH_ADDON, "Stub DXGI. (%s)", this->Location.string().c_str());
 		}
 
 		interfaces |= EAddonInterfaces::DXGIProxy;
@@ -783,7 +782,7 @@ const EAddonInterfaces& CAddon::EnumInterfaces()
 
 	this->ModuleInterfaces = interfaces;
 
-	this->Logger->Debug(CH_ADDON, "Interfaces: %u (%s)", this->ModuleInterfaces, this->Location.string().c_str());
+	LogDebug(CH_ADDON, "Interfaces: %u (%s)", this->ModuleInterfaces, this->Location.string().c_str());
 
 	return this->ModuleInterfaces;
 }
@@ -796,7 +795,7 @@ bool CAddon::ReadAddonDef()
 	{
 		DWORD lasterror = GetLastError();
 		const std::error_condition ecnd = std::system_category().default_error_condition(lasterror);
-		this->Logger->Warning(
+		LogWarning(
 			CH_ADDON,
 			"Cannot read addon definition. LoadLibrary(%s) failed: %s (%d)",
 			this->Location.string().c_str(),
@@ -830,7 +829,7 @@ bool CAddon::ReadAddonDef()
 	{
 		DWORD lasterror = GetLastError();
 		const std::error_condition ecnd = std::system_category().default_error_condition(lasterror);
-		this->Logger->Warning(
+		LogWarning(
 			CH_ADDON,
 			"Cannot free library after reading addon definition. FreeLibrary(%s) failed: %s (%d)",
 			this->Location.string().c_str(),
@@ -851,7 +850,7 @@ bool CAddon::ShouldLoad()
 	/* Check the last state as per user prefs. But also make sure no state set yet -> Autoload. */
 	if (!this->Config->LastLoadState && this->State == EAddonState::None)
 	{
-		this->Logger->Debug(CH_ADDON, "Canceled load. Config->LastLoadState: false. (%s)", this->Location.string().c_str());
+		LogDebug(CH_ADDON, "Canceled load. Config->LastLoadState: false. (%s)", this->Location.string().c_str());
 		result = false;
 	}
 
@@ -862,7 +861,7 @@ bool CAddon::ShouldLoad()
 		if (this->State != EAddonState::None)
 		{
 			this->Flags |= EAddonFlags::StateLocked;
-			this->Logger->Debug(CH_ADDON, "Canceled load. Only load on initial load. (%s)", this->Location.string().c_str());
+			LogDebug(CH_ADDON, "Canceled load. Only load on initial load. (%s)", this->Location.string().c_str());
 			result = false;
 		}
 	}
@@ -870,14 +869,14 @@ bool CAddon::ShouldLoad()
 	/* If this version is broken and was disabled. */
 	if (this->IsVersionDisabled())
 	{
-		this->Logger->Debug(CH_ADDON, "Canceled load. This version is disabled. (%s)", this->Location.string().c_str());
+		LogDebug(CH_ADDON, "Canceled load. This version is disabled. (%s)", this->Location.string().c_str());
 		result = false;
 	}
 
 	/* If this addon is volatile and the change difference is greater than 350. */
 	if (this->IsVolatileDisabled())
 	{
-		this->Logger->Debug(
+		LogDebug(
 			CH_ADDON,
 			"Canceled load. Volatile addon and gamebuild diff is %u. (%s)",
 			GW2::GetGameBuild() - this->Config->LastGameBuild,
@@ -963,7 +962,7 @@ std::string CAddon::GetProjectPageURL() const
 
 void CAddon::CheckUpdateInternal(bool aIsScheduled)
 {
-	this->Logger->Trace(CH_ADDON, "CAddon::CheckUpdateInternal(%s, %s)", aIsScheduled ? "scheduled" : "manual", this->Location.string().c_str());
+	LogTrace(CH_ADDON, "CAddon::CheckUpdateInternal(%s, %s)", aIsScheduled ? "scheduled" : "manual", this->Location.string().c_str());
 
 	if (this->IsUpdateAvailable())
 	{
@@ -987,7 +986,7 @@ void CAddon::CheckUpdateInternal(bool aIsScheduled)
 
 		if (deltaT >= SCHEDULED_UPDATE_TIMEOUT)
 		{
-			this->Logger->Trace(
+			LogTrace(
 				CH_ADDON,
 				"Scheduled update check: DeltaT > %us. (%s)",
 				SCHEDULED_UPDATE_TIMEOUT,
@@ -997,7 +996,7 @@ void CAddon::CheckUpdateInternal(bool aIsScheduled)
 		}
 		else if (this->IsVersionDisabled() && (deltaT >= SCHEDULED_UPDATE_TIMEOUT_VERSIONDISABLED))
 		{
-			this->Logger->Trace(
+			LogTrace(
 				CH_ADDON,
 				"Scheduled update check: Version disabled. DeltaT > %us. (%s)",
 				SCHEDULED_UPDATE_TIMEOUT_VERSIONDISABLED,
@@ -1014,7 +1013,7 @@ void CAddon::CheckUpdateInternal(bool aIsScheduled)
 
 	if (!this->NexusAddonDefV1)
 	{
-		this->Logger->Warning(CH_ADDON, "Canceled update check. No Nexus addon interface. (%s)", this->Location.string().c_str());
+		LogWarning(CH_ADDON, "Canceled update check. No Nexus addon interface. (%s)", this->Location.string().c_str());
 		return;
 	}
 
@@ -1022,7 +1021,7 @@ void CAddon::CheckUpdateInternal(bool aIsScheduled)
 	{
 		case EUpdateProvider::Raidcore:
 		{
-			this->Logger->Warning(CH_ADDON, "Using unimplemented provider. (%s)", this->Location.string().c_str());
+			LogWarning(CH_ADDON, "Using unimplemented provider. (%s)", this->Location.string().c_str());
 			break;
 		}
 		case EUpdateProvider::GitHub:
@@ -1037,7 +1036,7 @@ void CAddon::CheckUpdateInternal(bool aIsScheduled)
 		}
 		case EUpdateProvider::Self:
 		{
-			this->Logger->Trace(CH_ADDON, "Canceled update check. Provider is self. (%s)", this->Location.string().c_str());
+			LogTrace(CH_ADDON, "Canceled update check. Provider is self. (%s)", this->Location.string().c_str());
 			break;
 		}
 	}
@@ -1064,7 +1063,7 @@ void CAddon::CheckUpdateViaGitHub()
 
 	if (!response.Success())
 	{
-		this->Logger->Warning(
+		LogWarning(
 			CH_ADDON,
 			"Update check failed: Couldn't fetch releases for \"%s\".\n\tError: %s",
 			this->NexusAddonDefV1->GetUpdateLink().c_str(),
@@ -1122,7 +1121,7 @@ void CAddon::CheckUpdateViaGitHub()
 		this->UpdateRemote = targetUrl;
 		this->Flags |= EAddonFlags::UpdateAvailable;
 
-		this->Logger->Trace(
+		LogTrace(
 			CH_ADDON,
 			"Update available for \"%s\".\n\tLocal: %s\n\tRemote: %s",
 			this->Location.string().c_str(),
@@ -1144,7 +1143,7 @@ void CAddon::CheckUpdateViaDirect()
 
 	if (!response.Success())
 	{
-		this->Logger->Trace(
+		LogTrace(
 			CH_ADDON,
 			"Update check failed: Couldn't get MD5 for \"%s\" from \"%s\".\n\tError: %s\nAttempting with .md5sum.",
 			this->Location.string().c_str(),
@@ -1157,7 +1156,7 @@ void CAddon::CheckUpdateViaDirect()
 
 	if (!response.Success())
 	{
-		this->Logger->Warning(
+		LogWarning(
 			CH_ADDON,
 			"Update check failed: Couldn't get MD5 for \"%s\" from \"%s\".\n\tError: %s",
 			this->Location.string().c_str(),
@@ -1196,7 +1195,7 @@ void CAddon::CheckUpdateViaDirect()
 		this->UpdateRemote = this->NexusAddonDefV1->UpdateLink;
 		this->Flags |= EAddonFlags::UpdateAvailable;
 
-		this->Logger->Trace(
+		LogTrace(
 			CH_ADDON,
 			"Update available for \"%s\".\n\tLocal: %s\n\tRemote: %s",
 			this->Location.string().c_str(),
@@ -1208,11 +1207,11 @@ void CAddon::CheckUpdateViaDirect()
 
 void CAddon::UpdateInternal()
 {
-	this->Logger->Trace(CH_ADDON, "CAddon::UpdateInternal(%s)", this->Location.string().c_str());
+	LogTrace(CH_ADDON, "CAddon::UpdateInternal(%s)", this->Location.string().c_str());
 
 	if (!this->IsUpdateAvailable())
 	{
-		this->Logger->Debug(CH_ADDON, "Can't update. No update available. (%s)", this->Location.string().c_str());
+		LogDebug(CH_ADDON, "Can't update. No update available. (%s)", this->Location.string().c_str());
 		return;
 	}
 
@@ -1238,7 +1237,7 @@ void CAddon::UpdateInternal()
 	this->UpdateRemote.clear();
 	this->Flags &= ~EAddonFlags::UpdateAvailable;
 
-	this->Logger->Info(
+	LogInfo(
 		CH_ADDON,
 		"Updated addon. (%s)",
 		this->Location.string().c_str()
@@ -1259,7 +1258,7 @@ bool CAddon::ApplyLocalUpdate()
 	}
 	catch (std::filesystem::filesystem_error fErr)
 	{
-		this->Logger->Warning(
+		LogWarning(
 			CH_ADDON,
 			"Update failed: Couldn't move \"%s\" to \"%s\".",
 			this->Location.string().c_str(),
@@ -1275,7 +1274,7 @@ bool CAddon::ApplyLocalUpdate()
 	}
 	catch (std::filesystem::filesystem_error fErr)
 	{
-		this->Logger->Warning(
+		LogWarning(
 			CH_ADDON,
 			"Update failed: Couldn't move \"%s\" to \"%s\".",
 			this->UpdateLocal.string().c_str(),
@@ -1289,7 +1288,7 @@ bool CAddon::ApplyLocalUpdate()
 		}
 		catch (std::filesystem::filesystem_error fErr)
 		{
-			this->Logger->Warning(
+			LogWarning(
 				CH_ADDON,
 				"Update failed: Couldn't move \"%s\" to \"%s\".",
 				tmpOld.string().c_str(),
@@ -1319,7 +1318,7 @@ bool CAddon::DownloadUpdate()
 
 	if (!response.Success())
 	{
-		this->Logger->Warning(
+		LogWarning(
 			CH_ADDON,
 			"Update failed: Couldn't download \"%s\" to \"%s\".\n\tError: %s",
 			this->UpdateRemote.c_str(),

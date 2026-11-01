@@ -76,7 +76,6 @@ static CMainWindow* s_MainWindow{};
 CMainWindow::CMainWindow()
 {
 	CContext*      ctx    = CContext::GetContext();
-	CLogApi*       logger = ctx->GetLogger();
 	CInputBindApi* ibapi  = ctx->GetInputBindApi();
 	CEventApi*     evtapi = ctx->GetEventApi();
 
@@ -86,7 +85,7 @@ CMainWindow::CMainWindow()
 	CLogWindow*     logWnd     = new CLogWindow();
 	CAboutBox*      aboutWnd   = new CAboutBox();
 
-	logger->Register(logWnd);
+	CLogApi::Get()->Register(logWnd);
 
 	this->AddWindow(addonsWnd);
 	this->AddWindow(optionsWnd);

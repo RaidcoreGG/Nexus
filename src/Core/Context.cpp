@@ -80,15 +80,9 @@ RenderContext_t* CContext::GetRendererCtx()
 	return &s_RendererCtx;
 }
 
-CLogApi* CContext::GetLogger()
-{
-	return CLogApi::Get();
-}
-
 CTextureLoader* CContext::GetTextureService()
 {
 	static CTextureLoader s_TextureApi = CTextureLoader(
-		this->GetLogger(),
 		this->GetRendererCtx(),
 		Index(EPath::DIR_TEXTURES)
 	);
@@ -97,9 +91,7 @@ CTextureLoader* CContext::GetTextureService()
 
 CDataLinkApi* CContext::GetDataLink()
 {
-	static CDataLinkApi s_DataLinkApi = CDataLinkApi(
-		this->GetLogger()
-	);
+	static CDataLinkApi s_DataLinkApi = CDataLinkApi();
 	return &s_DataLinkApi;
 }
 
@@ -114,7 +106,6 @@ CEventApi* CContext::GetEventApi()
 CLoader* CContext::GetLoader()
 {
 	static CLoader s_Loader = CLoader(
-		this->GetLogger(),
 		IAddonFactory,
 		Index(EPath::DIR_ADDONS)
 	);
@@ -124,7 +115,6 @@ CLoader* CContext::GetLoader()
 CLibraryMgr* CContext::GetAddonLibrary()
 {
 	static CLibraryMgr s_LibraryMgr = CLibraryMgr(
-		this->GetLogger(),
 		this->GetLoader()
 	);
 	return &s_LibraryMgr;
@@ -140,7 +130,6 @@ CInputBindApi* CContext::GetInputBindApi()
 {
 	static CInputBindApi s_InputBindApi = CInputBindApi(
 		this->GetEventApi(),
-		this->GetLogger(),
 		Index(EPath::InputBinds)
 	);
 	return &s_InputBindApi;
@@ -150,7 +139,6 @@ CGameBindsApi* CContext::GetGameBindsApi()
 {
 	static CGameBindsApi s_GameBindsApi = CGameBindsApi(
 		this->GetRawInputApi(),
-		this->GetLogger(),
 		this->GetEventApi(),
 		this->GetRendererCtx(),
 		Index(EPath::GameBinds)
@@ -162,7 +150,6 @@ CUiContext* CContext::GetUIContext()
 {
 	static CUiContext s_UiContext = CUiContext(
 		this->GetRendererCtx(),
-		this->GetLogger(),
 		this->GetTextureService(),
 		this->GetDataLink(),
 		this->GetInputBindApi(),
@@ -175,8 +162,7 @@ CUiContext* CContext::GetUIContext()
 CSettings* CContext::GetSettingsCtx()
 {
 	static CSettings s_SettingsApi = CSettings(
-		Index(EPath::Settings),
-		this->GetLogger()
+		Index(EPath::Settings)
 	);
 	return &s_SettingsApi;
 }
@@ -185,8 +171,7 @@ CMumbleReader* CContext::GetMumbleReader()
 {
 	static CMumbleReader s_MumbleReader = CMumbleReader(
 		this->GetDataLink(),
-		this->GetEventApi(),
-		this->GetLogger()
+		this->GetEventApi()
 	);
 	return &s_MumbleReader;
 }
@@ -221,8 +206,8 @@ CHttpClient* CContext::GetHttpClient(std::string aURL, bool aDisableCache)
 	}
 
 	CHttpClient* client = aDisableCache
-		? new CHttpClient(this->GetLogger(), baseurl)
-		: new CHttpClient(this->GetLogger(), baseurl, cachedir, cacheLifetime);
+		? new CHttpClient(baseurl)
+		: new CHttpClient(baseurl, cachedir, cacheLifetime);
 
 	if (this->IsHttpStopped)
 	{
@@ -236,9 +221,7 @@ CHttpClient* CContext::GetHttpClient(std::string aURL, bool aDisableCache)
 
 CSelfUpdater* CContext::GetSelfUpdater()
 {
-	static CSelfUpdater s_SelfUpdater = CSelfUpdater(
-		this->GetLogger()
-	);
+	static CSelfUpdater s_SelfUpdater = CSelfUpdater();
 	return &s_SelfUpdater;
 }
 
@@ -274,11 +257,11 @@ CConfigMgr* CContext::GetCfgMgr()
 					}
 					catch (const std::invalid_argument& e)
 					{
-						this->GetLogger()->Trace(CH_LOADER, "Invalid argument(-ggaddons) : %s (exc: %s)", addonsig.c_str(), e.what());
+						LogTrace(CH_LOADER, "Invalid argument(-ggaddons) : %s (exc: %s)", addonsig.c_str(), e.what());
 					}
 					catch (const std::out_of_range& e)
 					{
-						this->GetLogger()->Trace(CH_LOADER, "Out of range (-ggaddons): %s (exc: %s)", addonsig.c_str(), e.what());
+						LogTrace(CH_LOADER, "Out of range (-ggaddons): %s (exc: %s)", addonsig.c_str(), e.what());
 					}
 				}
 			}
@@ -287,7 +270,6 @@ CConfigMgr* CContext::GetCfgMgr()
 	}();
 
 	static CConfigMgr s_CfgMgr = CConfigMgr(
-		this->GetLogger(),
 		cfgpath,
 		cfgwhitelist
 	);

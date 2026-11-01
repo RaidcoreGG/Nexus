@@ -21,7 +21,6 @@
 CUiStyle::CUiStyle()
 {
 	CContext* ctx = CContext::GetContext();
-	this->Logger = ctx->GetLogger();
 	this->Settings = ctx->GetSettingsCtx();
 }
 
@@ -40,7 +39,7 @@ void ApplyDefaultStyle()
 	}
 	catch (...)
 	{
-		CContext::GetContext()->GetLogger()->Debug(CH_UICONTEXT, "Error applying default style.");
+		LogDebug(CH_UICONTEXT, "Error applying default style.");
 	}
 }
 
@@ -66,7 +65,7 @@ void CUiStyle::ApplyStyle(EUIStyle aStyle, std::string aValue)
 			}
 			catch (...)
 			{
-				this->Logger->Warning(CH_UICONTEXT, "Error applying user style.");
+				LogWarning(CH_UICONTEXT, "Error applying user style.");
 			}
 			return;
 		}
@@ -80,7 +79,7 @@ void CUiStyle::ApplyStyle(EUIStyle aStyle, std::string aValue)
 			}
 			catch (...)
 			{
-				this->Logger->Warning(CH_UICONTEXT, "Error applying user style.");
+				LogWarning(CH_UICONTEXT, "Error applying user style.");
 			}
 			return;
 		}
@@ -117,7 +116,7 @@ void CUiStyle::ApplyStyle(EUIStyle aStyle, std::string aValue)
 			}
 			catch (...)
 			{
-				this->Logger->Warning(CH_UICONTEXT, "Error applying ArcDPS default style.");
+				LogWarning(CH_UICONTEXT, "Error applying ArcDPS default style.");
 			}
 			return;
 		}
@@ -146,12 +145,12 @@ void CUiStyle::ApplyStyle(EUIStyle aStyle, std::string aValue)
 				}
 				catch (...)
 				{
-					this->Logger->Warning(CH_UICONTEXT, "Couldn't parse ArcDPS style.");
+					LogWarning(CH_UICONTEXT, "Couldn't parse ArcDPS style.");
 				}
 			}
 			else
 			{
-				this->Logger->Warning(CH_UICONTEXT, "Tried importing ArcDPS style, with no config present.");
+				LogWarning(CH_UICONTEXT, "Tried importing ArcDPS style, with no config present.");
 			}
 			return;
 		}
@@ -179,7 +178,7 @@ void CUiStyle::ApplyStyle(EUIStyle aStyle, std::string aValue)
 
 					if (decodeStyle.size() != sizeof(ImGuiStyle))
 					{
-						this->Logger->Warning(CH_UICONTEXT, "Error applying stylesheet. Not ImGui 1.80 compatible.");
+						LogWarning(CH_UICONTEXT, "Error applying stylesheet. Not ImGui 1.80 compatible.");
 						return;
 					}
 
@@ -188,7 +187,7 @@ void CUiStyle::ApplyStyle(EUIStyle aStyle, std::string aValue)
 			}
 			catch (...)
 			{
-				this->Logger->Warning(CH_UICONTEXT, "Error applying stylesheet.");
+				LogWarning(CH_UICONTEXT, "Error applying stylesheet.");
 			}
 
 			break;
@@ -199,7 +198,7 @@ void CUiStyle::ApplyStyle(EUIStyle aStyle, std::string aValue)
 
 			if (decodeStyle.size() != sizeof(ImGuiStyle))
 			{
-				this->Logger->Warning(CH_UICONTEXT, "Error applying stylesheet. Not ImGui 1.80 compatible.");
+				LogWarning(CH_UICONTEXT, "Error applying stylesheet. Not ImGui 1.80 compatible.");
 				return;
 			}
 

@@ -27,7 +27,7 @@ class CConfigMgr
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CConfigMgr(CLogApi* aLogger, std::filesystem::path aConfigPath, std::vector<uint32_t> aWhitelist = {});
+	CConfigMgr(std::filesystem::path aConfigPath, std::vector<uint32_t> aWhitelist = {});
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -59,8 +59,6 @@ class CConfigMgr
 	bool IsReadOnly() const;
 
 	private:
-	CLogApi*                                Logger = nullptr;
-
 	bool                                    ReadOnly = false;
 	std::filesystem::path                   Path;
 

@@ -26,7 +26,7 @@ class CDataLinkApi
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CDataLinkApi(CLogApi* aLogger);
+	CDataLinkApi();
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
@@ -57,8 +57,6 @@ class CDataLinkApi
 	std::unordered_map<std::string, LinkedResource_t> GetRegistry() const;
 
 	private:
-	CLogApi*                                          Logger = nullptr;
-
 	mutable std::mutex                                Mutex;
 	std::unordered_map<std::string, LinkedResource_t> Registry;
 };

@@ -196,7 +196,6 @@ class CAddon : public virtual IAddon
 	std::string GetProjectPageURL() const;
 
 	private:
-	CLogApi*                 Logger               = nullptr;
 	CLoader*                 Loader               = nullptr;
 	CEventApi*               EventApi             = nullptr;
 	CConfigMgr*              ConfigMgr            = nullptr;

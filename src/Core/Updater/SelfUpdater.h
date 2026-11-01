@@ -25,7 +25,7 @@ class CSelfUpdater
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CSelfUpdater(CLogApi* aLogger);
+	CSelfUpdater();
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -51,8 +51,6 @@ class CSelfUpdater
 	const std::string& GetChangelog();
 
 	private:
-	CLogApi*                  Logger       {};
-	
 	HANDLE                    UpdateMutex  {};
 
 	Version_t RemoteVersion{};

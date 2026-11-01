@@ -10,11 +10,8 @@
 
 #include <assert.h>
 
-CDataLinkApi::CDataLinkApi(CLogApi* aLogger)
+CDataLinkApi::CDataLinkApi()
 {
-	assert(aLogger);
-
-	this->Logger = aLogger;
 }
 
 CDataLinkApi::~CDataLinkApi()
@@ -50,7 +47,7 @@ CDataLinkApi::~CDataLinkApi()
 				break;
 		}
 
-		this->Logger->Info(CH_DATALINK, "Freed shared resource: \"%s\"", it->first.c_str());
+		LogInfo(CH_DATALINK, "Freed shared resource: \"%s\"", it->first.c_str());
 
 		this->Registry.erase(it);
 	}
@@ -90,7 +87,7 @@ void* CDataLinkApi::ShareResource(const char* aIdentifier, size_t aResourceSize,
 		}
 		else /* size mismatch */
 		{
-			this->Logger->Warning(CH_DATALINK, "Resource with name \"%s\" already exists with size %u but size %u was requested.", aIdentifier, it->second.Size, aResourceSize);
+			LogWarning(CH_DATALINK, "Resource with name \"%s\" already exists with size %u but size %u was requested.", aIdentifier, it->second.Size, aResourceSize);
 			return nullptr;
 		}
 	}
@@ -137,7 +134,7 @@ void* CDataLinkApi::ShareResource(const char* aIdentifier, size_t aResourceSize,
 			/* still no resource handle */
 			if (!resource.Handle)
 			{
-				this->Logger->Warning(
+				LogWarning(
 					CH_DATALINK,
 					"Failed to create resource \"%s\". OpenFileMapping failed. CreateFileMapping failed. GetLastError: %d",
 					aIdentifier,
@@ -151,7 +148,7 @@ void* CDataLinkApi::ShareResource(const char* aIdentifier, size_t aResourceSize,
 			/* sanity check */
 			if (!resource.Pointer)
 			{
-				this->Logger->Warning(
+				LogWarning(
 					CH_DATALINK,
 					"Failed to create resource \"%s\". MapViewOfFile failed. GetLastError: %d",
 					aIdentifier,
@@ -162,14 +159,14 @@ void* CDataLinkApi::ShareResource(const char* aIdentifier, size_t aResourceSize,
 
 			memset(resource.Pointer, 0, resource.Size);
 
-			this->Logger->Info(CH_DATALINK, "Created public shared resource: \"%s\" (Underlying name: \"%s\")", aIdentifier, resource.UnderlyingName.c_str());
+			LogInfo(CH_DATALINK, "Created public shared resource: \"%s\" (Underlying name: \"%s\")", aIdentifier, resource.UnderlyingName.c_str());
 			break;
 		}
 		case ELinkedResourceType::Internal:
 		{
 			resource.Pointer = new char[resource.Size];
 
-			this->Logger->Info(CH_DATALINK, "Created internal shared resource: \"%s\"", aIdentifier);
+			LogInfo(CH_DATALINK, "Created internal shared resource: \"%s\"", aIdentifier);
 			break;
 		}
 	}

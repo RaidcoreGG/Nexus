@@ -33,14 +33,12 @@ void CQuickAccess::OnAddonStateChanged(void* aEventData)
 
 CQuickAccess::CQuickAccess(
 	CDataLinkApi*   aDataLink,
-	CLogApi*        aLogger,
 	CInputBindApi*  aInputBindApi,
 	CTextureLoader* aTextureService,
 	CLocalization*  aLocalization,
 	CEventApi*      aEventApi
 ) : IRefCleaner("QuickAccess")
 {
-	this->Logger         = aLogger;
 	this->InputBindApi   = aInputBindApi;
 	this->TextureService = aTextureService;
 	this->Language       = aLocalization;
@@ -443,7 +441,7 @@ void CQuickAccess::AddContextItem(const char* aIdentifier, const char* aTargetSh
 		}
 		else
 		{
-			this->Logger->Warning(
+			LogWarning(
 				CH_QUICKACCESS,
 				"Context menu item already registered: %s (Parent: \"%s\")",
 				aIdentifier,

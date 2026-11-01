@@ -28,7 +28,7 @@ class CLibraryMgr
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CLibraryMgr(CLogApi* aLogger, CLoader* aLoader);
+	CLibraryMgr(CLoader* aLoader);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -60,7 +60,6 @@ class CLibraryMgr
 	std::vector<LibraryAddon_t> GetLibrary() const;
 
 	private:
-	CLogApi*                                      Logger = nullptr;
 	CLoader*                                      Loader = nullptr;
 
 	mutable std::mutex                            Mutex;

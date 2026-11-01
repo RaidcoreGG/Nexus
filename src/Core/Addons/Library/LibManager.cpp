@@ -15,15 +15,13 @@
 #include "Util/Url.h"
 #include "Util/Paths.h"
 
-CLibraryMgr::CLibraryMgr(CLogApi* aLogger, CLoader* aLoader)
+CLibraryMgr::CLibraryMgr(CLoader* aLoader)
 {
-	this->Logger = aLogger;
 	this->Loader = aLoader;
 }
 
 CLibraryMgr::~CLibraryMgr()
 {
-	this->Logger = nullptr;
 	this->Loader = nullptr;
 }
 
@@ -41,7 +39,7 @@ void CLibraryMgr::Update()
 
 		if (!result.Success())
 		{
-			this->Logger->Warning(
+			LogWarning(
 				CH_LIBRARY,
 				"Failed to fetch addon library from \"%s\".\n\tStatus: %s\n\tError: %s",
 				url.c_str(),
@@ -57,13 +55,13 @@ void CLibraryMgr::Update()
 
 			if (libJSON.is_null())
 			{
-				this->Logger->Warning(CH_LIBRARY, "\"%s\" had an empty response.", url.c_str());
+				LogWarning(CH_LIBRARY, "\"%s\" had an empty response.", url.c_str());
 				continue;
 			}
 
 			if (!libJSON.is_array())
 			{
-				this->Logger->Warning(CH_LIBRARY, "\"%s\" does not conform to library specification.", url.c_str());
+				LogWarning(CH_LIBRARY, "\"%s\" does not conform to library specification.", url.c_str());
 				continue;
 			}
 
@@ -74,7 +72,7 @@ void CLibraryMgr::Update()
 		}
 		catch (...)
 		{
-			this->Logger->Warning(CH_LIBRARY, "Unknown error processing \"%s\".", url.c_str());
+			LogWarning(CH_LIBRARY, "Unknown error processing \"%s\".", url.c_str());
 		}
 	}
 }
@@ -87,7 +85,7 @@ void CLibraryMgr::AddSource(std::string aURL)
 
 	if (it != this->Sources.end())
 	{
-		this->Logger->Info(CH_LIBRARY, "Source already exists: %s", aURL.c_str());
+		LogInfo(CH_LIBRARY, "Source already exists: %s", aURL.c_str());
 		return;
 	}
 
@@ -131,7 +129,7 @@ void CLibraryMgr::Install(uint32_t aSignature)
 
 		if (!result.Success())
 		{
-			this->Logger->Warning(
+			LogWarning(
 				CH_LIBRARY,
 				"Failed to resolve addon download URL for \"%s\".\n\tStatus: %s\n\tError: %s",
 				downloadUrl.c_str(),
@@ -147,19 +145,19 @@ void CLibraryMgr::Install(uint32_t aSignature)
 
 			if (releaseJSON.is_null())
 			{
-				this->Logger->Warning(CH_LIBRARY, "\"%s\" had an empty response when resolving.", downloadUrl.c_str());
+				LogWarning(CH_LIBRARY, "\"%s\" had an empty response when resolving.", downloadUrl.c_str());
 				return;
 			}
 
 			if (releaseJSON["assets"].is_null())
 			{
-				this->Logger->Warning(CH_LIBRARY, "\"%s\" had no assets when resolving.", downloadUrl.c_str());
+				LogWarning(CH_LIBRARY, "\"%s\" had no assets when resolving.", downloadUrl.c_str());
 				return;
 			}
 
 			if (!releaseJSON["assets"].is_array())
 			{
-				this->Logger->Warning(CH_LIBRARY, "\"%s\" had assets was not an array when resolving.", downloadUrl.c_str());
+				LogWarning(CH_LIBRARY, "\"%s\" had assets was not an array when resolving.", downloadUrl.c_str());
 				return;
 			}
 
@@ -187,13 +185,13 @@ void CLibraryMgr::Install(uint32_t aSignature)
 
 			if (!found)
 			{
-				this->Logger->Warning(CH_LIBRARY, "No asset found for \"%s\".", downloadUrl.c_str());
+				LogWarning(CH_LIBRARY, "No asset found for \"%s\".", downloadUrl.c_str());
 				return;
 			}
 		}
 		catch (...)
 		{
-			this->Logger->Warning(CH_LIBRARY, "Unknown error processing resolution of \"%s\".", downloadUrl.c_str());
+			LogWarning(CH_LIBRARY, "Unknown error processing resolution of \"%s\".", downloadUrl.c_str());
 		}
 	}
 
@@ -211,7 +209,7 @@ void CLibraryMgr::Install(uint32_t aSignature)
 
 	if (!result.Success())
 	{
-		this->Logger->Warning(
+		LogWarning(
 			CH_LIBRARY,
 			"Failed to download addon from \"%s\".\n\tStatus: %s\n\tError: %s",
 			downloadUrl.c_str(),
@@ -227,7 +225,7 @@ void CLibraryMgr::Install(uint32_t aSignature)
 	}
 	catch (...)
 	{
-		this->Logger->Warning(
+		LogWarning(
 			CH_LIBRARY,
 			"Failed to move downloaded addon from \"%s\" to \"%s\".",
 			tmpPath.string().c_str(),
@@ -236,7 +234,7 @@ void CLibraryMgr::Install(uint32_t aSignature)
 		return;
 	}
 
-	this->Logger->Info(
+	LogInfo(
 		CH_LIBRARY,
 		"Successfully installed \"%s\" (0x%08X) to \"%s\".",
 		addon.Name.c_str(),

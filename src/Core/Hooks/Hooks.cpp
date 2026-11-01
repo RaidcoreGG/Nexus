@@ -112,10 +112,7 @@ namespace Hooks
 		{
 			UnregisterClassA(wc.lpszClassName, wc.hInstance);
 
-			CContext* ctx    = CContext::GetContext();
-			CLogApi*  logger = ctx->GetLogger();
-
-			logger->Critical(CH_CORE, "Failed creating temporary window.");
+			LogCritical(CH_CORE, "Failed creating temporary window.");
 			return;
 		}
 
@@ -146,10 +143,7 @@ namespace Hooks
 			LPVOID* vtbl1 = swap1 ? *reinterpret_cast<LPVOID**>(swap1) : nullptr;
 			LPVOID* vtbl3 = swap3 ? *reinterpret_cast<LPVOID**>(swap3) : nullptr;
 
-			CContext* ctx = CContext::GetContext();
-			CLogApi* logger = ctx->GetLogger();
-
-			logger->Debug(CH_CORE, "HOOK BEGIN");
+			LogDebug(CH_CORE, "HOOK BEGIN");
 
 			/* Create and enable VT hooks. */
 			/* Follow the jump chain to work nicely with various other hooks. */
@@ -170,7 +164,7 @@ namespace Hooks
 
 			MH_EnableHook(MH_ALL_HOOKS);
 
-			logger->Debug(CH_CORE, "HOOK END");
+			LogDebug(CH_CORE, "HOOK END");
 
 			/* Release the temporary interfaces. */
 			context->Release();
@@ -179,10 +173,7 @@ namespace Hooks
 		}
 		else
 		{
-			CContext* ctx = CContext::GetContext();
-			CLogApi* logger = ctx->GetLogger();
-
-			logger->Critical(CH_CORE, "Failed to create D3D11 device and swapchain.");
+			LogCritical(CH_CORE, "Failed to create D3D11 device and swapchain.");
 		}
 
 		/* Destroy the temporary window. */

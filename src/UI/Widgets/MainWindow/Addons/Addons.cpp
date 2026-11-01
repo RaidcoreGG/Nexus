@@ -681,7 +681,7 @@ void CAddonsWindow::RenderDetails()
 									addon->IsCheckingForUpdates = false;
 								}).detach();
 
-								//Logger->Debug(CH_GUI, "Update called: %s", it.second->Definitions->Name);
+								//LogDebug(CH_GUI, "Update called: %s", it.second->Definitions->Name);
 								break;
 							}
 						}

@@ -86,7 +86,6 @@ class CUiContext
 	///----------------------------------------------------------------------------------------------------
 	CUiContext(
 		RenderContext_t* aRenderContext,
-		CLogApi*         aLogger,
 		CTextureLoader*  aTextureService,
 		CDataLinkApi*    aDataLink,
 		CInputBindApi*   aInputBindApi,
@@ -180,7 +179,6 @@ class CUiContext
 	private:
 	/* Services */
 	RenderContext_t*        RenderContext  = nullptr;
-	CLogApi*                Logger         = nullptr;
 	CLocalization*          Language       = nullptr;
 	CTextureLoader*         TextureService = nullptr;
 	CDataLinkApi*           DataLink       = nullptr;
