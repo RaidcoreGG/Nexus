@@ -13,6 +13,12 @@
 
 #include "Util/Time.h"
 
+CLogApi* CLogApi::Get()
+{
+	static CLogApi s_LogApi = CLogApi();
+	return &s_LogApi;
+}
+
 CLogApi::~CLogApi()
 {
 	const std::lock_guard<std::mutex> lock(this->Mutex);
@@ -155,4 +161,44 @@ void CLogApi::LogUnformatted(ELogLevel aLogLevel, std::string aChannel, const ch
 			logger->MsgProc(msg);
 		}
 	}
+}
+
+void LogCritical(const std::string& aChannel, const char* aFmt, ...)
+{
+	va_list args;
+	va_start(args, aFmt);
+	CLogApi::Get()->LogV(ELogLevel::CRITICAL, aChannel, aFmt, args);
+	va_end(args);
+}
+
+void LogWarning(const std::string& aChannel, const char* aFmt, ...)
+{
+	va_list args;
+	va_start(args, aFmt);
+	CLogApi::Get()->LogV(ELogLevel::WARNING, aChannel, aFmt, args);
+	va_end(args);
+}
+
+void LogInfo(const std::string& aChannel, const char* aFmt, ...)
+{
+	va_list args;
+	va_start(args, aFmt);
+	CLogApi::Get()->LogV(ELogLevel::INFO, aChannel, aFmt, args);
+	va_end(args);
+}
+
+void LogDebug(const std::string& aChannel, const char* aFmt, ...)
+{
+	va_list args;
+	va_start(args, aFmt);
+	CLogApi::Get()->LogV(ELogLevel::DEBUG, aChannel, aFmt, args);
+	va_end(args);
+}
+
+void LogTrace(const std::string& aChannel, const char* aFmt, ...)
+{
+	va_list args;
+	va_start(args, aFmt);
+	CLogApi::Get()->LogV(ELogLevel::TRACE, aChannel, aFmt, args);
+	va_end(args);
 }

@@ -82,8 +82,7 @@ RenderContext_t* CContext::GetRendererCtx()
 
 CLogApi* CContext::GetLogger()
 {
-	static CLogApi s_Logger = CLogApi();
-	return &s_Logger;
+	return CLogApi::Get();
 }
 
 CTextureLoader* CContext::GetTextureService()
