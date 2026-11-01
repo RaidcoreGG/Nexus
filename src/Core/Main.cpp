@@ -133,7 +133,11 @@ namespace Main
 		}
 
 		/* Allocate log writer. */
+#ifdef _DEBUG
 		static CFileLogger writer = CFileLogger(ELogLevel::ALL, logpath);
+#else
+		static CFileLogger writer = CFileLogger(ELogLevel::INFO, logpath);
+#endif
 		logger->Register(&writer);
 
 		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Normal, [](Clockwork::CancellationToken aToken)
