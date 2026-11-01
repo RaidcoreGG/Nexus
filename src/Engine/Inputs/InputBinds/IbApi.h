@@ -17,7 +17,7 @@
 #include "Engine/Inputs/RawInput/WndProcNotify.h"
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include "Engine/Events/EvtApi.h"
-#include "Engine/Logging/LogApi.h"
+#include "Core/Logging/LogApi.h"
 #include "IbBindV2.h"
 #include "IbCapture.h"
 #include "IbFuncDefs.h"

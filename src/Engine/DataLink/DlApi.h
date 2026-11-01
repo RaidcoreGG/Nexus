@@ -13,7 +13,7 @@
 #include <unordered_map>
 
 #include "DlLinkedResource.h"
-#include "Engine/Logging/LogApi.h"
+#include "Core/Logging/LogApi.h"
 
 constexpr const char* CH_DATALINK = "DataLink";
 

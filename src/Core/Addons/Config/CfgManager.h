@@ -14,7 +14,7 @@
 #include <unordered_map>
 
 #include "Config.h"
-#include "Engine/Logging/LogApi.h"
+#include "Core/Logging/LogApi.h"
 
 constexpr const char* CH_CFGMGR = "Config";
 

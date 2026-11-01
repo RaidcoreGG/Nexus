@@ -11,7 +11,7 @@
 #include <windows.h>
 #include <iostream>
 
-#include "LogConst.h"
+#include "Core/Logging/LogConst.h"
 
 CConsoleLogger::CConsoleLogger(ELogLevel aLogLevel)
 {

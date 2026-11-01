@@ -11,7 +11,7 @@
 #include <cstdio>
 #include <windows.h>
 
-#include "LogBase.h"
+#include "Core/Logging/LogBase.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// CConsoleLogger Class

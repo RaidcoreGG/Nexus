@@ -13,7 +13,7 @@
 #include <vector>
 
 #include "Engine/Loader/Loader.h"
-#include "Engine/Logging/LogApi.h"
+#include "Core/Logging/LogApi.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
 #include "LibAddon.h"
 

@@ -14,7 +14,7 @@
 
 #include "Core/Context.h"
 #include "res/Resources.h"
-#include "Engine/Logging/LogConst.h"
+#include "Core/Logging/LogConst.h"
 
 CLogWindow::CLogWindow()
 {

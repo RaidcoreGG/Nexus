@@ -20,7 +20,7 @@
 #include "Engine/Events/EvtFuncDefs.h"
 #include "Engine/Inputs/InputBinds/IbFuncDefs.h"
 #include "Engine/Inputs/RawInput/RiFuncDefs.h"
-#include "Engine/Logging/LogFuncDefs.h"
+#include "Core/Logging/LogFuncDefs.h"
 #include "UI/Services/Fonts/FuncDefs.h"
 #include "UI/Services/Localization/LoclFuncDefs.h"
 #include "UI/Textures/TxFuncDefs.h"

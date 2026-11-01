@@ -16,7 +16,7 @@
 #include <windows.h>
 
 #include "Engine/Inputs/RawInput/WndProcNotify.h"
-#include "Engine/Logging/LogApi.h"
+#include "Core/Logging/LogApi.h"
 #include "LdrAddonBase.h"
 
 constexpr const uint32_t WM_ADDONDIRUPDATE = WM_USER + 101;

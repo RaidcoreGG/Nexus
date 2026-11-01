@@ -18,7 +18,7 @@
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
-#include "Engine/Logging/LogApi.h"
+#include "Core/Logging/LogApi.h"
 #include "GW2/Mumble/MblReader.h"
 #include "UI/Renderer/RdrContext.h"
 #include "UI/Services/Fonts/FontManager.h"

@@ -17,7 +17,7 @@
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbBindV2.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
-#include "Engine/Logging/LogApi.h"
+#include "Core/Logging/LogApi.h"
 #include "UI/Renderer/RdrContext.h"
 
 constexpr const char* CH_GAMEBINDS = "GameBinds";

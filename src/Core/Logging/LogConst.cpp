@@ -71,7 +71,7 @@ std::string ToString(const LogMsg_t* aLogMessage)
 	{
 	}
 
-	channelLength = std::max(channelLength, aLogMessage->Channel.length());
+	channelLength = (std::max)(channelLength, aLogMessage->Channel.length());
 
 	std::stringstream oss;
 	oss << std::left << std::setw(s_TimestampLength)                  << TimestampStr(aLogMessage, true, true);

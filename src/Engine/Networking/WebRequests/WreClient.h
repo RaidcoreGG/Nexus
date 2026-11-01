@@ -18,7 +18,7 @@
 #include "httplib/httplib.h"
 #pragma warning(pop)
 
-#include "Engine/Logging/LogApi.h"
+#include "Core/Logging/LogApi.h"
 #include "WreCache.h"
 #include "WreResponse.h"
 

@@ -16,7 +16,7 @@
 #pragma warning(pop)
 using json = nlohmann::json;
 
-#include "Engine/Logging/LogApi.h"
+#include "Core/Logging/LogApi.h"
 
 constexpr const char* CH_SETTINGS = "Settings";
 
