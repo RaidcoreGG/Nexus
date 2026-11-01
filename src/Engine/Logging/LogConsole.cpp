@@ -8,24 +8,20 @@
 
 #include "LogConsole.h"
 
-#include <Windows.h>
+#include <windows.h>
 #include <iostream>
-#include <iomanip>
 
 #include "LogConst.h"
-
-HANDLE hConsole;
-FILE* iobuf;
 
 CConsoleLogger::CConsoleLogger(ELogLevel aLogLevel)
 {
 	this->SetLogLevel(aLogLevel);
 	AllocConsole();
-	freopen_s(&iobuf, "CONIN$", "r", stdin);
-	freopen_s(&iobuf, "CONOUT$", "w", stderr);
-	freopen_s(&iobuf, "CONOUT$", "w", stdout);
+	freopen_s(&this->IOBuf, "CONIN$", "r", stdin);
+	freopen_s(&this->IOBuf, "CONOUT$", "w", stderr);
+	freopen_s(&this->IOBuf, "CONOUT$", "w", stdout);
 	SetConsoleOutputCP(CP_UTF8);
-	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	this->ConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 }
 
 CConsoleLogger::~CConsoleLogger()
@@ -39,11 +35,11 @@ void CConsoleLogger::MsgProc(const LogMsg_t* aLogEntry)
 	{
 		switch (aLogEntry->Level)
 		{
-			case ELogLevel::CRITICAL:    SetConsoleTextAttribute(hConsole, 12); break;
-			case ELogLevel::WARNING:     SetConsoleTextAttribute(hConsole, 14); break;
-			case ELogLevel::INFO:        SetConsoleTextAttribute(hConsole, 10); break;
-			case ELogLevel::DEBUG:       SetConsoleTextAttribute(hConsole, 11); break;
-			default:                     SetConsoleTextAttribute(hConsole, 7); break;
+			case ELogLevel::CRITICAL: SetConsoleTextAttribute(this->ConsoleHandle, 12); break;
+			case ELogLevel::WARNING:  SetConsoleTextAttribute(this->ConsoleHandle, 14); break;
+			case ELogLevel::INFO:     SetConsoleTextAttribute(this->ConsoleHandle, 10); break;
+			case ELogLevel::DEBUG:    SetConsoleTextAttribute(this->ConsoleHandle, 11); break;
+			default:                  SetConsoleTextAttribute(this->ConsoleHandle, 7); break;
 		}
 
 		std::cout << ToString(aLogEntry);

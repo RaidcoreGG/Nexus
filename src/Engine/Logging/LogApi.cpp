@@ -8,6 +8,7 @@
 
 #include "LogApi.h"
 
+#include <algorithm>
 #include <cstdarg>
 
 #include "Util/Time.h"
@@ -51,6 +52,8 @@ void CLogApi::Deregister(ILogger* aLogger)
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	auto it = std::find(this->Registry.begin(), this->Registry.end(), aLogger);
+
+	if (it == this->Registry.end()) { return; }
 
 	this->Registry.erase(it);
 }

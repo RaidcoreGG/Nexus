@@ -8,13 +8,14 @@
 
 #pragma once
 
+#include <cstdarg>
 #include <mutex>
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "LogBase.h"
-#include "LogMsg.h"
 #include "LogEnum.h"
+#include "LogMsg.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// CLogApi Class
