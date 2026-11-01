@@ -16,7 +16,7 @@
 #include "Core/Context.h"
 #include "Core/Index/Index.h"
 #include "Core/Preferences/PrefConst.h"
-#include "res/ResConst.h"
+#include "res/Resources.h"
 #include "UI/Widgets/QuickAccess/QaConst.h"
 #include "Util/Base64.h"
 #include "Util/Inputs.h"
@@ -27,7 +27,7 @@ COptionsWindow::COptionsWindow()
 	this->Name           = "Options";
 	this->DisplayName    = "((000004))";
 	this->IconIdentifier = "ICON_OPTIONS";
-	this->IconID         = RES_ICON_OPTIONS;
+	this->IconEntry      = &Resources::IconOptions;
 	this->IsHost         = true;
 
 	this->ExportModal    = {};
@@ -519,7 +519,7 @@ void COptionsWindow::TabStyle()
 								}
 								else
 								{
-									s_TexCross = CContext::GetContext()->GetTextureService()->GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx->GetModule());
+									s_TexCross = CContext::GetContext()->GetTextureService()->GetOrCreate("ICON_CLOSE", Resources::IconClose);
 								}
 
 								/* Display the filename without extension. */

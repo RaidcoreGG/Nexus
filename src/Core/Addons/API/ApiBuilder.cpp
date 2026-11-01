@@ -33,6 +33,17 @@
 #include "UI/Widgets/Alerts/Alerts.h"
 #include "UI/Widgets/QuickAccess/QuickAccess.h"
 
+///----------------------------------------------------------------------------------------------------
+/// ToSpan:
+/// 	Wraps an addon provided buffer. A null pointer yields an empty span regardless of size.
+///----------------------------------------------------------------------------------------------------
+static std::span<const uint8_t> ToSpan(void* aData, size_t aSize)
+{
+	if (!aData) { return {}; }
+
+	return { static_cast<const uint8_t*>(aData), aSize };
+}
+
 namespace ADDONAPI
 {
 	static bool             s_IsInitialized = false;
@@ -331,7 +342,7 @@ namespace ADDONAPI
 		Texture_t* GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize)
 		{
 			assert(s_TextureApi);
-			return s_TextureApi->GetOrCreate(aIdentifier, aData, aSize);
+			return s_TextureApi->GetOrCreate(aIdentifier, ToSpan(aData, aSize));
 		}
 
 		void LoadFromFile(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback)
@@ -355,7 +366,7 @@ namespace ADDONAPI
 		void LoadFromMemory(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback)
 		{
 			assert(s_TextureApi);
-			s_TextureApi->Load(aIdentifier, aData, aSize, aCallback, true);
+			s_TextureApi->Load(aIdentifier, ToSpan(aData, aSize), aCallback, true);
 		}
 	}
 
@@ -464,7 +475,7 @@ namespace ADDONAPI
 		{
 			assert(s_FontManager);
 
-			s_FontManager->AddFont(aIdentifier, aFontSize, aData, aSize, aCallback, aConfig);
+			s_FontManager->AddFont(aIdentifier, aFontSize, ToSpan(aData, aSize), aCallback, aConfig);
 		}
 
 		void ResizeFont(const char* aIdentifier, float aFontSize)

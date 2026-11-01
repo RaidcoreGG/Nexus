@@ -14,8 +14,9 @@
 
 #include "Core/Context.h"
 #include "Core/Preferences/PrefConst.h"
-#include "res/ResConst.h"
-#include "Util/Resources.h"
+#include "res/Resources.h"
+
+using namespace Raidcore::Core::Platform::Windows;
 
 CFontManager::CFontManager(CLocalization* aLocalization) : IRefCleaner("FontManager")
 {
@@ -149,7 +150,7 @@ void CFontManager::Release(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallb
 	/* refCount reached 0, "mark" this font for deletion by freeing its underlying buffer */
 	if (font.Subscribers.size() == 0)
 	{
-		delete font.Data;
+		delete[] static_cast<char*>(font.Data);
 		font.Data = nullptr;
 		font.DataSize = 0;
 
@@ -186,12 +187,13 @@ void CFontManager::AddFont(const char* aIdentifier, float aFontSize, const char*
 	{
 		size_t size = 0;
 		void* buffer = ImFileLoadToMemory(aFilename, "rb", &size, 0);
+		std::span<const uint8_t> data{ static_cast<const uint8_t*>(buffer), size };
 
 		/* call AddFontInternal with the memory buffer */
-		this->AddFontInternal(aIdentifier, aFontSize, buffer, size, aCallback, aConfig);
+		this->AddFontInternal(aIdentifier, aFontSize, data, aCallback, aConfig);
 
 		/* delete buffer, because it was copied in AddFont */
-		delete[] buffer;
+		IM_FREE(buffer);
 	}
 }
 
@@ -217,23 +219,18 @@ void CFontManager::AddFont(const char* aIdentifier, float aFontSize, unsigned aR
 	}
 	else /* create new font */
 	{
-		/* out vars */
-		void* buffer = nullptr;
-		size_t size = 0;
-
 		/* get data */
-		Resources::Get(aModule, MAKEINTRESOURCE(aResourceID), RT_FONT, &buffer, (DWORD*)&size);
+		std::span<const uint8_t> data = CPackFile(aResourceID, RT_FONT, aModule).GetBytes();
 
 		/* call AddFontInternal with the memory buffer */
-		this->AddFontInternal(aIdentifier, aFontSize, buffer, size, aCallback, aConfig);
+		this->AddFontInternal(aIdentifier, aFontSize, data, aCallback, aConfig);
 	}
 }
 
-void CFontManager::AddFont(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
+void CFontManager::AddFont(const char* aIdentifier, float aFontSize, std::span<const uint8_t> aData, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
 {
 	if (aFontSize < 1.0f) { return; }
-	if (!aData) { return; }
-	if (aSize == 0) { return; }
+	if (aData.empty()) { return; }
 
 	std::string str = aIdentifier;
 
@@ -252,7 +249,7 @@ void CFontManager::AddFont(const char* aIdentifier, float aFontSize, void* aData
 	else /* create new font */
 	{
 		/* call AddFontInternal with the memory buffer */
-		this->AddFontInternal(aIdentifier, aFontSize, aData, aSize, aCallback, aConfig);
+		this->AddFontInternal(aIdentifier, aFontSize, aData, aCallback, aConfig);
 	}
 }
 
@@ -269,6 +266,7 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, const c
 
 	size_t size = 0;
 	void* buffer = ImFileLoadToMemory(aFilename, "rb", &size, 0);
+	std::span<const uint8_t> data{ static_cast<const uint8_t*>(buffer), size };
 
 	if (it != this->Registry.end()) /* font already exists */
 	{
@@ -276,7 +274,7 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, const c
 		ManagedFont_t& oldFont = *it;
 
 		/* free the data*/
-		delete oldFont.Data;
+		delete[] static_cast<char*>(oldFont.Data);
 		oldFont.Data = nullptr;
 		oldFont.DataSize = 0;
 
@@ -291,7 +289,7 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, const c
 			aConfig = oldFont.Config;
 		}
 
-		ManagedFont_t font = this->CreateManagedFont(aIdentifier, aFontSize, buffer, size, aConfig);
+		ManagedFont_t font = this->CreateManagedFont(aIdentifier, aFontSize, data, aConfig);
 		font.Subscribers = oldFont.Subscribers;
 
 		*it = font;
@@ -301,11 +299,11 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, const c
 	else
 	{
 		/* call AddFontInternal with the memory buffer */
-		this->AddFontInternal(aIdentifier, aFontSize, buffer, size, aCallback, aConfig);
+		this->AddFontInternal(aIdentifier, aFontSize, data, aCallback, aConfig);
 	}
 
 	/* delete buffer, because it was copied in AddFont */
-	delete[] buffer;
+	IM_FREE(buffer);
 }
 
 void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, unsigned aResourceID, HMODULE aModule, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
@@ -319,12 +317,8 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, unsigne
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [str](ManagedFont_t& font) { return font.Identifier == str; });
 
-	/* out vars */
-	void* buffer = nullptr;
-	size_t size = 0;
-
 	/* get data */
-	Resources::Get(aModule, MAKEINTRESOURCE(aResourceID), RT_FONT, &buffer, (DWORD*)&size);
+	std::span<const uint8_t> data = CPackFile(aResourceID, RT_FONT, aModule).GetBytes();
 
 	if (it != this->Registry.end()) /* font already exists */
 	{
@@ -332,7 +326,7 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, unsigne
 		ManagedFont_t& oldFont = *it;
 
 		/* free the data*/
-		delete oldFont.Data;
+		delete[] static_cast<char*>(oldFont.Data);
 		oldFont.Data = nullptr;
 		oldFont.DataSize = 0;
 
@@ -347,7 +341,7 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, unsigne
 			aConfig = oldFont.Config;
 		}
 
-		ManagedFont_t font = this->CreateManagedFont(aIdentifier, aFontSize, buffer, size, aConfig);
+		ManagedFont_t font = this->CreateManagedFont(aIdentifier, aFontSize, data, aConfig);
 		font.Subscribers = oldFont.Subscribers;
 
 		*it = font;
@@ -357,15 +351,19 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, unsigne
 	else
 	{
 		/* call AddFontInternal with the memory buffer */
-		this->AddFontInternal(aIdentifier, aFontSize, buffer, size, aCallback, aConfig);
+		this->AddFontInternal(aIdentifier, aFontSize, data, aCallback, aConfig);
 	}
 }
 
-void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
+void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, const CPackFile& aPackFile, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
+{
+	this->ReplaceFont(aIdentifier, aFontSize, aPackFile.GetBytes(), aCallback, aConfig);
+}
+
+void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, std::span<const uint8_t> aData, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
 {
 	if (aFontSize < 1.0f) { return; }
-	if (!aData) { return; }
-	if (aSize == 0) { return; }
+	if (aData.empty()) { return; }
 
 	std::string str = aIdentifier;
 
@@ -378,7 +376,7 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, void* a
 		ManagedFont_t& oldFont = *it;
 
 		/* free the data*/
-		delete oldFont.Data;
+		delete[] static_cast<char*>(oldFont.Data);
 		oldFont.Data = nullptr;
 		oldFont.DataSize = 0;
 
@@ -393,7 +391,7 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, void* a
 			aConfig = oldFont.Config;
 		}
 
-		ManagedFont_t font = this->CreateManagedFont(aIdentifier, aFontSize, aData, aSize, aConfig);
+		ManagedFont_t font = this->CreateManagedFont(aIdentifier, aFontSize, aData, aConfig);
 		font.Subscribers = oldFont.Subscribers;
 
 		*it = font;
@@ -403,7 +401,7 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, void* a
 	else
 	{
 		/* call AddFontInternal with the memory buffer */
-		this->AddFontInternal(aIdentifier, aFontSize, aData, aSize, aCallback, aConfig);
+		this->AddFontInternal(aIdentifier, aFontSize, aData, aCallback, aConfig);
 	}
 }
 
@@ -427,16 +425,11 @@ void CFontManager::AddDefaultFont(FONTS_RECEIVECALLBACK aCallback)
 	}
 	else /* create new font */
 	{
-		/* out vars */
-		void* buffer = nullptr;
-		size_t size = 0;
-
 		/* get data */
-		CContext* ctx = CContext::GetContext();
-		Resources::Get(ctx->GetModule(), MAKEINTRESOURCE(RES_FONT_INTER), RT_FONT, &buffer, (DWORD*)&size);
+		std::span<const uint8_t> data = Resources::FontInter.GetBytes();
 
 		/* call AddFontInternal with the memory buffer */
-		this->AddFontInternal("FONT_DEFAULT", 15.0f, buffer, size, aCallback, nullptr);
+		this->AddFontInternal("FONT_DEFAULT", 15.0f, data, aCallback, nullptr);
 	}
 }
 
@@ -483,7 +476,7 @@ uint32_t CFontManager::CleanupRefs(void* aStartAddress, void* aEndAddress)
 
 		if (font.Subscribers.size() == 0)
 		{
-			delete font.Data;
+			delete[] static_cast<char*>(font.Data);
 			font.Data = nullptr;
 			font.DataSize = 0;
 
@@ -497,14 +490,13 @@ uint32_t CFontManager::CleanupRefs(void* aStartAddress, void* aEndAddress)
 	return refCounter;
 }
 
-void CFontManager::AddFontInternal(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
+void CFontManager::AddFontInternal(const char* aIdentifier, float aFontSize, std::span<const uint8_t> aData, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
 {
-	if (!aData) { return; }
-	if (aSize == 0) { return; }
+	if (aData.empty()) { return; }
 
 	std::string str = aIdentifier;
 
-	ManagedFont_t font = this->CreateManagedFont(aIdentifier, aFontSize, aData, aSize, aConfig);
+	ManagedFont_t font = this->CreateManagedFont(aIdentifier, aFontSize, aData, aConfig);
 
 	/* add the callback */
 	if (aCallback)
@@ -529,18 +521,18 @@ void CFontManager::NotifyCallbacks(bool aNotifyNull)
 	}
 }
 
-ManagedFont_t CFontManager::CreateManagedFont(std::string aIdentifier, float aFontSize, void* aData, size_t aSize, ImFontConfig* aConfig)
+ManagedFont_t CFontManager::CreateManagedFont(std::string aIdentifier, float aFontSize, std::span<const uint8_t> aData, ImFontConfig* aConfig)
 {
 	/* copy the data to the buffer */
-	char* buffer = new char[aSize];
-	memcpy_s(buffer, aSize, aData, aSize);
+	char* buffer = new char[aData.size()];
+	memcpy_s(buffer, aData.size(), aData.data(), aData.size());
 
 	/* allocate new managed font */
 	ManagedFont_t font{};
 	font.Identifier = aIdentifier;
 	font.Size = aFontSize;
 	font.Data = buffer;
-	font.DataSize = aSize;
+	font.DataSize = aData.size();
 
 	/* allocate font config */
 	ImFontConfig* config = new ImFontConfig();

@@ -17,7 +17,7 @@
 #include "Core/Context.h"
 #include "Core/Index/Index.h"
 #include "CtlAddonToggle.h"
-#include "res/ResConst.h"
+#include "res/Resources.h"
 #include "Util/Strings.h"
 
 constexpr EAddonsFilterFlags FILTER_INSTALLED
@@ -47,7 +47,7 @@ CAddonsWindow::CAddonsWindow()
 	this->Name           = "Addons";
 	this->DisplayName    = "((000003))";
 	this->IconIdentifier = "ICON_ADDONS";
-	this->IconID         = RES_ICON_ADDONS;
+	this->IconEntry      = &Resources::IconAddons;
 	this->IsHost         = true;
 	this->IsAnchored     = true;
 
@@ -310,15 +310,15 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 	{
 		/* Static assets */
 		static char s_SearchTerm[400] = {};
-		static Texture_t* s_ClearIcon          = texapi->GetOrCreate("ICON_CLOSE",  RES_ICON_CLOSE,  ctx->GetModule());
-		static Texture_t* s_ViewModeIcon_List  = texapi->GetOrCreate("ICON_LIST",   RES_ICON_LIST,   ctx->GetModule());
-		static Texture_t* s_ViewModeIcon_Tiles = texapi->GetOrCreate("ICON_TILES",  RES_ICON_TILES,  ctx->GetModule());
-		static Texture_t* s_FilterIcon         = texapi->GetOrCreate("ICON_FILTER", RES_ICON_FILTER, ctx->GetModule());
+		static Texture_t* s_ClearIcon          = texapi->GetOrCreate("ICON_CLOSE",  Resources::IconClose);
+		static Texture_t* s_ViewModeIcon_List  = texapi->GetOrCreate("ICON_LIST",   Resources::IconList);
+		static Texture_t* s_ViewModeIcon_Tiles = texapi->GetOrCreate("ICON_TILES",  Resources::IconTiles);
+		static Texture_t* s_FilterIcon         = texapi->GetOrCreate("ICON_FILTER", Resources::IconFilter);
 
-		if (!s_ClearIcon)          { s_ClearIcon          = texapi->GetOrCreate("ICON_CLOSE",  RES_ICON_CLOSE,  ctx->GetModule()); }
-		if (!s_ViewModeIcon_List)  { s_ViewModeIcon_List  = texapi->GetOrCreate("ICON_LIST",   RES_ICON_LIST,   ctx->GetModule()); }
-		if (!s_ViewModeIcon_Tiles) { s_ViewModeIcon_Tiles = texapi->GetOrCreate("ICON_TILES",  RES_ICON_TILES,  ctx->GetModule()); }
-		if (!s_FilterIcon)         { s_FilterIcon         = texapi->GetOrCreate("ICON_FILTER", RES_ICON_FILTER, ctx->GetModule()); }
+		if (!s_ClearIcon)          { s_ClearIcon          = texapi->GetOrCreate("ICON_CLOSE",  Resources::IconClose); }
+		if (!s_ViewModeIcon_List)  { s_ViewModeIcon_List  = texapi->GetOrCreate("ICON_LIST",   Resources::IconList); }
+		if (!s_ViewModeIcon_Tiles) { s_ViewModeIcon_Tiles = texapi->GetOrCreate("ICON_TILES",  Resources::IconTiles); }
+		if (!s_FilterIcon)         { s_FilterIcon         = texapi->GetOrCreate("ICON_FILTER", Resources::IconFilter); }
 
 		/* Search Term */
 		if (ImGui::InputTextWithHint("##SearchTerm", lang->Translate("((000104))"), &s_SearchTerm[0], 400))
@@ -565,7 +565,7 @@ void CAddonsWindow::RenderDetails()
 		{
 			CContext* ctx = CContext::GetContext();
 			CTextureLoader* textureApi = ctx->GetTextureService();
-			chevronRt = textureApi->GetOrCreate("ICON_CHEVRON_RT", RES_ICON_CHEVRON_RT, ctx->GetModule());
+			chevronRt = textureApi->GetOrCreate("ICON_CHEVRON_RT", Resources::IconChevronRt);
 		}
 	}
 	ImGui::EndChild();
@@ -861,8 +861,8 @@ void CAddonsWindow::RenderActionsBar(ImVec2& aSize)
 	if (ImGui::BeginChild("Actions", aSize, false, ImGuiWindowFlags_NoBackground))
 	{
 		/* Static assets */
-		static Texture_t* s_ReloadIcon = texapi->GetOrCreate("ICON_REFRESH", RES_ICON_REFRESH, ctx->GetModule());
-		if (!s_ReloadIcon) { s_ReloadIcon = texapi->GetOrCreate("ICON_REFRESH", RES_ICON_REFRESH, ctx->GetModule()); }
+		static Texture_t* s_ReloadIcon = texapi->GetOrCreate("ICON_REFRESH", Resources::IconRefresh);
+		if (!s_ReloadIcon) { s_ReloadIcon = texapi->GetOrCreate("ICON_REFRESH", Resources::IconRefresh); }
 
 		/* Open addons folder */
 		if (ImGui::Button(lang->Translate("((000034))")))

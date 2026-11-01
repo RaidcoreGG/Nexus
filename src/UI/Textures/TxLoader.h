@@ -12,10 +12,12 @@
 #include <filesystem>
 #include <map>
 #include <mutex>
+#include <span>
 #include <string>
 #include <windows.h>
 
 #include "Core/Hooks/HkNotify.h"
+#include "Core/Platform/Windows/Exe/ExePackFile.h"
 #include "Engine/Clockwork/Dispatcher.h"
 namespace Clockwork = Raidcore::Clockwork;
 
@@ -85,6 +87,12 @@ class CTextureLoader : public virtual IRefCleaner, public IDxgiPresentNotifyHand
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetOrCreate:
+	/// 	Returns a Texture_t* with the given identifier or creates it from a Nexus embedded file.
+	///----------------------------------------------------------------------------------------------------
+	Texture_t* GetOrCreate(const char* aIdentifier, const Raidcore::Core::Platform::Windows::CPackFile& aPackFile);
+
+	///----------------------------------------------------------------------------------------------------
+	/// GetOrCreate:
 	/// 	Returns a Texture_t* with the given identifier or creates it from remote URL.
 	///----------------------------------------------------------------------------------------------------
 	Texture_t* GetOrCreate(const char* aIdentifier, const char* aRemote, const char* aEndpoint);
@@ -93,7 +101,7 @@ class CTextureLoader : public virtual IRefCleaner, public IDxgiPresentNotifyHand
 	/// GetOrCreate:
 	/// 	Returns a Texture_t* with the given identifier or creates it from memory.
 	///----------------------------------------------------------------------------------------------------
-	Texture_t* GetOrCreate(const char* aIdentifier, void* aData, size_t aSize);
+	Texture_t* GetOrCreate(const char* aIdentifier, std::span<const uint8_t> aData);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Load:
@@ -109,6 +117,12 @@ class CTextureLoader : public virtual IRefCleaner, public IDxgiPresentNotifyHand
 
 	///----------------------------------------------------------------------------------------------------
 	/// Load:
+	/// 	Requests to load a texture from a Nexus embedded file and returns to the given callback.
+	///----------------------------------------------------------------------------------------------------
+	void Load(const char* aIdentifier, const Raidcore::Core::Platform::Windows::CPackFile& aPackFile, TEXTURES_RECEIVECALLBACK aCallback, bool aIsShadowing = false);
+
+	///----------------------------------------------------------------------------------------------------
+	/// Load:
 	/// 	Requests to load a texture from remote URL and returns to the given callback.
 	///----------------------------------------------------------------------------------------------------
 	void Load(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback, bool aIsShadowing = false);
@@ -117,7 +131,7 @@ class CTextureLoader : public virtual IRefCleaner, public IDxgiPresentNotifyHand
 	/// Load:
 	/// 	Requests to load a texture from memory and returns to the given callback.
 	///----------------------------------------------------------------------------------------------------
-	void Load(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback, bool aIsShadowing = false);
+	void Load(const char* aIdentifier, std::span<const uint8_t> aData, TEXTURES_RECEIVECALLBACK aCallback, bool aIsShadowing = false);
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetRegistry:

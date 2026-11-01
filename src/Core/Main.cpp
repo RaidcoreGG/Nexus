@@ -24,10 +24,9 @@ namespace Clockwork = Raidcore::Clockwork;
 #include "Engine/Logging/LogWriter.h"
 #include "GW2/Build/BuildInfo.h"
 #include "GW2/Multibox/Multibox.h"
-#include "res/ResConst.h"
+#include "res/Resources.h"
 #include "UI/UiContext.h"
 #include "Util/CmdLine.h"
-#include "Util/Resources.h"
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
@@ -109,8 +108,7 @@ namespace Main
 
 		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [](Clockwork::CancellationToken aToken)
 		{
-			CContext* ctx = CContext::GetContext();
-			Resources::Unpack(ctx->GetModule(), Index(EPath::ThirdPartySoftwareReadme), RES_THIRDPARTYNOTICES, "TXT");
+			Resources::ThirdPartyNotices.Unpack(Index(EPath::ThirdPartySoftwareReadme));
 		});
 
 		/* Allocate console logger, if requested. */

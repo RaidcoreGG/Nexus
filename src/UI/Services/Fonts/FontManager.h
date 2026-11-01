@@ -9,12 +9,14 @@
 #pragma once
 
 #include <mutex>
+#include <span>
 #include <string>
 #include <vector>
 #include <Windows.h>
 
 #include "imgui/imgui.h"
 
+#include "Core/Platform/Windows/Exe/ExePackFile.h"
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include "FuncDefs.h"
 #include "UI/Services/Localization/LoclApi.h"
@@ -90,7 +92,7 @@ class CFontManager : public virtual IRefCleaner
 	/// AddFont:
 	/// 	Adds a font from memory and sends updates to the callback.
 	///----------------------------------------------------------------------------------------------------
-	void AddFont(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
+	void AddFont(const char* aIdentifier, float aFontSize, std::span<const uint8_t> aData, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
 
 	///----------------------------------------------------------------------------------------------------
 	/// ReplaceFont:
@@ -106,9 +108,15 @@ class CFontManager : public virtual IRefCleaner
 
 	///----------------------------------------------------------------------------------------------------
 	/// ReplaceFont:
+	/// 	Replaces a font from a Nexus embedded file and sends updates to the callback.
+	///----------------------------------------------------------------------------------------------------
+	void ReplaceFont(const char* aIdentifier, float aFontSize, const Raidcore::Core::Platform::Windows::CPackFile& aPackFile, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
+
+	///----------------------------------------------------------------------------------------------------
+	/// ReplaceFont:
 	/// 	Replaces a font from memory and sends updates to the callback.
 	///----------------------------------------------------------------------------------------------------
-	void ReplaceFont(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
+	void ReplaceFont(const char* aIdentifier, float aFontSize, std::span<const uint8_t> aData, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
 
 	///----------------------------------------------------------------------------------------------------
 	/// AddDefaultFont:
@@ -139,7 +147,7 @@ class CFontManager : public virtual IRefCleaner
 	/// AddFontInternal:
 	/// 	Adds a font from memory and registers the callback.
 	///----------------------------------------------------------------------------------------------------
-	void AddFontInternal(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
+	void AddFontInternal(const char* aIdentifier, float aFontSize, std::span<const uint8_t> aData, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
 
 	///----------------------------------------------------------------------------------------------------
 	/// NotifyCallbacks:
@@ -152,5 +160,5 @@ class CFontManager : public virtual IRefCleaner
 	/// CreateManagedFont:
 	/// 	Creates a new ManagedFont_t for the Registry.
 	///----------------------------------------------------------------------------------------------------
-	ManagedFont_t CreateManagedFont(std::string aIdentifier, float aFontSize, void* aData, size_t aSize, ImFontConfig* aConfig);
+	ManagedFont_t CreateManagedFont(std::string aIdentifier, float aFontSize, std::span<const uint8_t> aData, ImFontConfig* aConfig);
 };

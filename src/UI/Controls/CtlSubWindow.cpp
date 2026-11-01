@@ -13,7 +13,7 @@
 #include "imgui/imgui_internal.h"
 
 #include "Core/Context.h"
-#include "res/ResConst.h"
+#include "res/Resources.h"
 
 void ISubWindow::Render()
 {
@@ -71,7 +71,7 @@ void ISubWindow::Render()
 	else
 	{
 		CContext* ctx = CContext::GetContext();
-		this->Tex_PopoutIcon = ctx->GetTextureService()->GetOrCreate("ICON_POPOUT", RES_ICON_POPOUT, ctx->GetModule());
+		this->Tex_PopoutIcon = ctx->GetTextureService()->GetOrCreate("ICON_POPOUT", Resources::IconPopout);
 	}
 
 	if (popout)
@@ -87,10 +87,10 @@ void ISubWindow::RenderSubWindows()
 
 const Texture_t* ISubWindow::GetIcon()
 {
-	if (!this->Tex_Icon && !this->IconIdentifier.empty() && this->IconID)
+	if (!this->Tex_Icon && !this->IconIdentifier.empty() && this->IconEntry)
 	{
 		CContext* ctx = CContext::GetContext();
-		this->Tex_Icon = ctx->GetTextureService()->GetOrCreate(this->IconIdentifier.c_str(), this->IconID, ctx->GetModule());
+		this->Tex_Icon = ctx->GetTextureService()->GetOrCreate(this->IconIdentifier.c_str(), *this->IconEntry);
 	}
 
 	return this->Tex_Icon;

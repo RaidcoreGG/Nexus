@@ -11,6 +11,7 @@
 #include <string>
 
 #include "CtlWindow.h"
+#include "Core/Platform/Windows/Exe/ExePackFile.h"
 #include "UI/Textures/TxTexture.h"
 
 ///----------------------------------------------------------------------------------------------------
@@ -73,7 +74,7 @@ class ISubWindow : public virtual IWindow
 	bool                     IsAnchored    {false};
 
 	std::string              IconIdentifier{};
-	int                      IconID        {};
+	const Raidcore::Core::Platform::Windows::CPackFile* IconEntry{};
 	Texture_t*               Tex_Icon      {};
 	Texture_t*               Tex_PopoutIcon{};
 

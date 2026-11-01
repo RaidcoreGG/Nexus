@@ -26,6 +26,7 @@
     <ClCompile Include="src\Core\Index\Index.cpp" />
     <ClCompile Include="src\Engine\Loader\LdrAddonBase.cpp" />
     <ClCompile Include="src\Core\Platform\Windows\Exe\ExeExports.cpp" />
+    <ClCompile Include="src\Core\Platform\Windows\Exe\ExePackFile.cpp" />
     <ClCompile Include="src\Engine\Loader\Loader.cpp" />
     <ClCompile Include="src\Engine\Networking\WebRequests\WreCache.cpp" />
     <ClCompile Include="src\Engine\Networking\WebRequests\WreConst.cpp" />
@@ -149,6 +150,7 @@
     <ClInclude Include="src\Engine\Loader\LdrEnum.h" />
     <ClInclude Include="src\Core\Platform\Windows\Exe\ExeEnum.h" />
     <ClInclude Include="src\Core\Platform\Windows\Exe\ExeExports.h" />
+    <ClInclude Include="src\Core\Platform\Windows\Exe\ExePackFile.h" />
     <ClInclude Include="src\Engine\Loader\Loader.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreCache.h" />
     <ClInclude Include="src\Engine\Networking\WebRequests\WreConst.h" />
@@ -374,7 +376,7 @@
     <ClInclude Include="thirdparty\minhook\mh_trampoline.h" />
     <ClInclude Include="src\GW2\Mumble\MblReader.h" />
     <ClInclude Include="src\Core\Index\IdxFuncDefs.h" />
-    <ClInclude Include="res\ResConst.h" />
+    <ClInclude Include="res\Resources.h" />
     <ClInclude Include="src\Core\Preferences\PrefContext.h" />
     <ClInclude Include="thirdparty\pugixml\pugiconfig.hpp" />
     <ClInclude Include="thirdparty\pugixml\pugixml.hpp" />
@@ -440,6 +442,7 @@
     <ResourceCompile Include="res\Nexus.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\Resources.inc" />
     <None Include="src\Proxy\Proxy.def" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

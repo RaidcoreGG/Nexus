@@ -14,14 +14,14 @@
 #include "ImAnimate/ImAnimate.h"
 
 #include "Core/Context.h"
-#include "res/ResConst.h"
+#include "res/Resources.h"
 
 CAboutBox::CAboutBox()
 {
 	this->Name           = "About";
 	this->DisplayName    = "((000008))";
 	this->IconIdentifier = "ICON_ABOUT";
-	this->IconID         = RES_ICON_ABOUT;
+	this->IconEntry      = &Resources::IconAbout;
 	this->IsAnchored     = true;
 	this->IsHost         = true;
 }
@@ -75,7 +75,7 @@ void CAboutBox::RenderContent()
 		}
 		else
 		{
-			this->Tex_BannerDiscord = texapi->GetOrCreate("BANNER_DISCORD", RES_BANNER_DISCORD, ctx->GetModule());
+			this->Tex_BannerDiscord = texapi->GetOrCreate("BANNER_DISCORD", Resources::BannerDiscord);
 		}
 
 		ImGui::SameLine();

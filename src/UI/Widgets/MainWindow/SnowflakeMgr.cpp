@@ -13,7 +13,7 @@
 
 #include "Core/Context.h"
 #include "ImAnimate/ImAnimate.h"
-#include "res/ResConst.h"
+#include "res/Resources.h"
 #include "Util/Time.h"
 #include "Core/Preferences/PrefConst.h"
 
@@ -99,7 +99,7 @@ void CSnowflakeMgr::Update()
 
 				if (!texSnowflake)
 				{
-					texSnowflake = texapi->GetOrCreate("SNOWFLAKE", RES_ICON_SNOWFLAKE, CContext::GetContext()->GetModule());
+					texSnowflake = texapi->GetOrCreate("SNOWFLAKE", Resources::IconSnowflake);
 					return;
 				}
 
@@ -111,9 +111,9 @@ void CSnowflakeMgr::Update()
 
 				if (!(texLeaves[0] && texLeaves[1] && texLeaves[2]))
 				{
-					texLeaves[0] = texapi->GetOrCreate("LEAF_VARIANT1", RES_ICON_LEAF_VARIANT1, CContext::GetContext()->GetModule());
-					texLeaves[1] = texapi->GetOrCreate("LEAF_VARIANT2", RES_ICON_LEAF_VARIANT2, CContext::GetContext()->GetModule());
-					texLeaves[2] = texapi->GetOrCreate("LEAF_VARIANT3", RES_ICON_LEAF_VARIANT3, CContext::GetContext()->GetModule());
+					texLeaves[0] = texapi->GetOrCreate("LEAF_VARIANT1", Resources::IconLeafVariant1);
+					texLeaves[1] = texapi->GetOrCreate("LEAF_VARIANT2", Resources::IconLeafVariant2);
+					texLeaves[2] = texapi->GetOrCreate("LEAF_VARIANT3", Resources::IconLeafVariant3);
 					return;
 				}
 

@@ -21,6 +21,8 @@
 #include "Engine/Networking/WebRequests/WreClient.h"
 namespace Clockwork = Raidcore::Clockwork;
 
+using namespace Raidcore::Core::Platform::Windows;
+
 #include "Util/Time.h"
 #include "Util/Url.h"
 
@@ -166,6 +168,18 @@ Texture_t* CTextureLoader::GetOrCreate(const char* aIdentifier, unsigned aResour
 	return result;
 }
 
+Texture_t* CTextureLoader::GetOrCreate(const char* aIdentifier, const CPackFile& aPackFile)
+{
+	Texture_t* result = this->Get(aIdentifier);
+
+	if (!result)
+	{
+		this->Load(aIdentifier, aPackFile, nullptr);
+	}
+
+	return result;
+}
+
 Texture_t* CTextureLoader::GetOrCreate(const char* aIdentifier, const char* aRemote, const char* aEndpoint)
 {
 	Texture_t* result = this->Get(aIdentifier);
@@ -178,13 +192,13 @@ Texture_t* CTextureLoader::GetOrCreate(const char* aIdentifier, const char* aRem
 	return result;
 }
 
-Texture_t* CTextureLoader::GetOrCreate(const char* aIdentifier, void* aData, size_t aSize)
+Texture_t* CTextureLoader::GetOrCreate(const char* aIdentifier, std::span<const uint8_t> aData)
 {
 	Texture_t* result = this->Get(aIdentifier);
 
 	if (!result)
 	{
-		this->Load(aIdentifier, aData, aSize, nullptr);
+		this->Load(aIdentifier, aData, nullptr);
 	}
 
 	return result;
@@ -222,71 +236,12 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aFilename, TEXTUR
 
 void CTextureLoader::Load(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback, bool aIsShadowing)
 {
-	/* Preprocess the request to determine, if we should load. */
-	if (this->ProcessRequest(aIdentifier, aCallback, aIsShadowing))
-	{
-		return;
-	}
+	this->Load(aIdentifier, CPackFile(aResourceID, "PNG", aModule).GetBytes(), aCallback, aIsShadowing);
+}
 
-	/* Queue the callback. */
-	this->Enqueue(aIdentifier, aCallback);
-
-	HRSRC imageResHandle = FindResourceA(aModule, MAKEINTRESOURCEA(aResourceID), "PNG");
-	if (!imageResHandle)
-	{
-		this->Logger->Debug(CH_TEXTURES, "Resource not found ResID: %u (%s)", aResourceID, aIdentifier);
-
-		/* nullptr response on fail */
-		this->DispatchTexture(aIdentifier, nullptr, aCallback);
-		this->Dequeue(aIdentifier);
-
-		return;
-	}
-
-	HGLOBAL imageResDataHandle = LoadResource(aModule, imageResHandle);
-	if (!imageResDataHandle)
-	{
-		this->Logger->Debug(CH_TEXTURES, "Failed loading resource: %u (%s)", aResourceID, aIdentifier);
-
-		/* nullptr response on fail */
-		this->DispatchTexture(aIdentifier, nullptr, aCallback);
-		this->Dequeue(aIdentifier);
-
-		return;
-	}
-
-	LPVOID imageFile = LockResource(imageResDataHandle);
-	if (!imageFile)
-	{
-		this->Logger->Debug(CH_TEXTURES, "Failed locking resource: %u (%s)", aResourceID, aIdentifier);
-
-		/* nullptr response on fail */
-		this->DispatchTexture(aIdentifier, nullptr, aCallback);
-		this->Dequeue(aIdentifier);
-
-		return;
-	}
-
-	DWORD imageFileSize = SizeofResource(aModule, imageResHandle);
-	if (!imageFileSize)
-	{
-		this->Logger->Debug(CH_TEXTURES, "Failed getting size of resource: %u (%s)", aResourceID, aIdentifier);
-
-		/* nullptr response on fail */
-		this->DispatchTexture(aIdentifier, nullptr, aCallback);
-		this->Dequeue(aIdentifier);
-
-		return;
-	}
-
-	/* Load the texture. */
-	int width = 0;
-	int height = 0;
-	int copmonents = 0;
-	unsigned char* data = stbi_load_from_memory((const stbi_uc*)imageFile, imageFileSize, &width, &height, &copmonents, 4);
-
-	/* Queue the data. */
-	this->Enqueue(aIdentifier, data, width, height);
+void CTextureLoader::Load(const char* aIdentifier, const CPackFile& aPackFile, TEXTURES_RECEIVECALLBACK aCallback, bool aIsShadowing)
+{
+	this->Load(aIdentifier, aPackFile.GetBytes(), aCallback, aIsShadowing);
 }
 
 void CTextureLoader::Load(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback, bool aIsShadowing)
@@ -301,7 +256,7 @@ void CTextureLoader::Load(const char* aIdentifier, const char* aRemote, const ch
 	this->Enqueue(aIdentifier, std::string(aRemote) + std::string(aEndpoint), aCallback);
 }
 
-void CTextureLoader::Load(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback, bool aIsShadowing)
+void CTextureLoader::Load(const char* aIdentifier, std::span<const uint8_t> aData, TEXTURES_RECEIVECALLBACK aCallback, bool aIsShadowing)
 {
 	/* Preprocess the request to determine, if we should load. */
 	if (this->ProcessRequest(aIdentifier, aCallback, aIsShadowing))
@@ -316,7 +271,23 @@ void CTextureLoader::Load(const char* aIdentifier, void* aData, size_t aSize, TE
 	int width = 0;
 	int height = 0;
 	int components = 0;
-	unsigned char* data = stbi_load_from_memory((const stbi_uc*)aData, static_cast<int>(aSize), &width, &height, &components, 4);
+	unsigned char* data = nullptr;
+
+	if (!aData.empty())
+	{
+		data = stbi_load_from_memory(aData.data(), static_cast<int>(aData.size()), &width, &height, &components, 4);
+	}
+
+	if (!data)
+	{
+		this->Logger->Debug(CH_TEXTURES, "Failed to decode texture from memory (%s)", aIdentifier);
+
+		/* nullptr response on fail */
+		this->DispatchTexture(aIdentifier, nullptr, aCallback);
+		this->Dequeue(aIdentifier);
+
+		return;
+	}
 
 	/* Queue the data. */
 	this->Enqueue(aIdentifier, data, width, height);

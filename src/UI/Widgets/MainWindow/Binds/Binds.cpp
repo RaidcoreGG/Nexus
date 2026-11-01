@@ -17,7 +17,7 @@
 #include "Core/Index/Index.h"
 #include "Engine/Inputs/InputBinds/IbMapping.h"
 #include "GW2/Inputs/GameBinds/GbConst.h"
-#include "res/ResConst.h"
+#include "res/Resources.h"
 #include "Util/Time.h"
 
 CBindsWindow::CBindsWindow()
@@ -25,7 +25,7 @@ CBindsWindow::CBindsWindow()
 	this->Name           = "Binds";
 	this->DisplayName    = "((000060))";
 	this->IconIdentifier = "ICON_BINDS";
-	this->IconID         = RES_ICON_BINDS;
+	this->IconEntry      = &Resources::IconBinds;
 	this->IsHost         = true;
 
 	this->Invalidate();

@@ -15,7 +15,7 @@
 
 #include "Core/Context.h"
 #include "Core/Preferences/PrefConst.h"
-#include "res/ResConst.h"
+#include "res/Resources.h"
 #include "SnowflakeMgr.h"
 #include "UI/Widgets/MainWindow/About/About.h"
 #include "UI/Widgets/MainWindow/Addons/Addons.h"
@@ -273,7 +273,7 @@ void CMainWindow::Render()
 				//else
 				//{
 				//	CContext* ctx = CContext::GetContext();
-				//	this->Tex_DashboardIcon = ctx->GetTextureService()->GetOrCreate("ICON_DASHBOARD", RES_ICON_DASHBOARD, ctx->GetModule());
+				//	this->Tex_DashboardIcon = ctx->GetTextureService()->GetOrCreate("ICON_DASHBOARD", Resources::IconDashboard);
 				//}
 
 				//ImGui::SetCursorPos(ImVec2(navX + navItemSz.y + padding.x, navY + ((navItemSz.y - ImGui::GetTextLineHeight()) / 2)));
@@ -360,7 +360,7 @@ void CMainWindow::Render()
 			}
 			else
 			{
-				this->Tex_RaidcoreTag = ctx->GetTextureService()->GetOrCreate("RAIDCORE_TAG", RES_ICON_RAIDCORE, ctx->GetModule());
+				this->Tex_RaidcoreTag = ctx->GetTextureService()->GetOrCreate("RAIDCORE_TAG", Resources::IconRaidcore);
 			}
 
 			if (this->Tex_CloseIcon)
@@ -378,7 +378,7 @@ void CMainWindow::Render()
 			}
 			else
 			{
-				this->Tex_CloseIcon = ctx->GetTextureService()->GetOrCreate("ICON_CLOSE", RES_ICON_CLOSE, ctx->GetModule());
+				this->Tex_CloseIcon = ctx->GetTextureService()->GetOrCreate("ICON_CLOSE", Resources::IconClose);
 			}
 		}
 		this->IsHandleHeld = ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows);

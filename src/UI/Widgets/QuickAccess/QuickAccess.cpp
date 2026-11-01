@@ -16,7 +16,7 @@
 #include "Core/Context.h"
 #include "Core/Preferences/PrefConst.h"
 #include "Core/Preferences/PrefContext.h"
-#include "res/ResConst.h"
+#include "res/Resources.h"
 #include "UI/UIContext.h"
 #include "Util/Time.h"
 
@@ -93,12 +93,12 @@ CQuickAccess::CQuickAccess(
 	});
 
 	/* Preload default icons. */
-	this->TextureService->Load(ICON_NEXUS,                 RES_ICON_NEXUS,                 ctx->GetModule(), nullptr);
-	this->TextureService->Load(ICON_NEXUS_HOVER,           RES_ICON_NEXUS_HOVER,           ctx->GetModule(), nullptr);
-	this->TextureService->Load(ICON_NEXUS_HALLOWEEN,       RES_ICON_NEXUS_HALLOWEEN,       ctx->GetModule(), nullptr);
-	this->TextureService->Load(ICON_NEXUS_HALLOWEEN_HOVER, RES_ICON_NEXUS_HALLOWEEN_HOVER, ctx->GetModule(), nullptr);
-	this->TextureService->Load(ICON_NEXUS_XMAS,            RES_ICON_NEXUS_XMAS,            ctx->GetModule(), nullptr);
-	this->TextureService->Load(ICON_NEXUS_XMAS_HOVER,      RES_ICON_NEXUS_XMAS_HOVER,      ctx->GetModule(), nullptr);
+	this->TextureService->Load(ICON_NEXUS,                 Resources::IconNexus, nullptr);
+	this->TextureService->Load(ICON_NEXUS_HOVER,           Resources::IconNexusHover, nullptr);
+	this->TextureService->Load(ICON_NEXUS_HALLOWEEN,       Resources::IconNexusHalloween, nullptr);
+	this->TextureService->Load(ICON_NEXUS_HALLOWEEN_HOVER, Resources::IconNexusHalloweenHover, nullptr);
+	this->TextureService->Load(ICON_NEXUS_XMAS,            Resources::IconNexusXmas, nullptr);
+	this->TextureService->Load(ICON_NEXUS_XMAS_HOVER,      Resources::IconNexusXmasHover, nullptr);
 
 	/// FIXME: This is kinda hacky.
 	/// It forces the creation of the setting, so that the below subscriber gets executed on a first launch.

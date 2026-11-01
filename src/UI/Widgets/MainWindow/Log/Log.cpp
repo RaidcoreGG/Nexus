@@ -13,7 +13,7 @@
 #include "imgui/imgui_extensions.h"
 
 #include "Core/Context.h"
-#include "res/ResConst.h"
+#include "res/Resources.h"
 #include "Engine/Logging/LogConst.h"
 
 CLogWindow::CLogWindow()
@@ -23,7 +23,7 @@ CLogWindow::CLogWindow()
 	this->Name           = "Log";
 	this->DisplayName    = "((000006))";
 	this->IconIdentifier = "ICON_LOG";
-	this->IconID         = RES_ICON_LOG;
+	this->IconEntry      = &Resources::IconLog;
 }
 
 void CLogWindow::RenderContent()
