@@ -99,7 +99,7 @@ namespace String
 		va_list args;
 		va_start(args, aFmt);
 		char buffer[MAX_STRING_FORMAT_LENGTH];
-		vsprintf_s(buffer, MAX_STRING_FORMAT_LENGTH - 1, aFmt.c_str(), args);
+		_vsnprintf_s(buffer, sizeof(buffer), _TRUNCATE, aFmt.c_str(), args);
 		va_end(args);
 
 		return buffer;

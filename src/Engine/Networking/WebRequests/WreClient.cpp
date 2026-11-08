@@ -141,6 +141,13 @@ HttpResponse_t CHttpClient::Download(std::filesystem::path aOutPath, std::string
 	});
 	file.close();
 
+	if (!downloadResult)
+	{
+		result.Error = "Lib Error: " + httplib::to_string(downloadResult.error());
+		this->DownloadCleanup(aOutPath, query);
+		return result;
+	}
+
 	bool success = true;
 
 	result.StatusCode = downloadResult->status;
