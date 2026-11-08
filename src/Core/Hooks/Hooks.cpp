@@ -170,8 +170,8 @@ namespace Hooks
 					s_RenderCtx->DeviceContext = nullptr;
 				}
 
-				s_RenderCtx->SwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&s_RenderCtx->Device);
-				s_RenderCtx->Device->GetImmediateContext(&s_RenderCtx->DeviceContext);
+				/* Device and DeviceContext are taken from the BackBuffer in CUiContext::Initialize().
+				 * SwapChain::GetDevice() returns the driver's device under frame generation (e.g. Nvidia Smooth Motion). */
 
 				DXGI_SWAP_CHAIN_DESC swapChainDesc{};
 				s_RenderCtx->SwapChain->GetDesc(&swapChainDesc);
