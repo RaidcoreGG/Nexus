@@ -121,7 +121,8 @@ void CLogApi::Log(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, .
 void CLogApi::LogV(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, va_list aArgs)
 {
 	char buffer[4096]{};
-	vsprintf_s(buffer, 4095, aFmt, aArgs); // 4096-1 for guaranteed null terminator
+	/* vsprintf_s invokes the invalid parameter handler (process termination) on overflow, _TRUNCATE does not. */
+	_vsnprintf_s(buffer, sizeof(buffer), _TRUNCATE, aFmt, aArgs);
 
 	this->LogUnformatted(aLogLevel, aChannel, &buffer[0]);
 }
