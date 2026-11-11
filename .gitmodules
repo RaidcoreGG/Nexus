@@ -1,12 +1,12 @@
 [submodule "Scripts"]
 	path = Scripts
-	url = https://github.com/RaidcoreGG/RCGG-Scripts
+	url = https://github.com/RaidcoreGG/build-scripts
 [submodule "res/Locales"]
 	path = res/Locales
 	url = https://github.com/RaidcoreGG/Nexus-Translations
 [submodule "thirdparty/Mumble"]
 	path = thirdparty/Mumble
-	url = https://github.com/RaidcoreGG/RCGG-lib-mumble-api
+	url = https://github.com/RaidcoreGG/gw2-mumble-cpp
 [submodule "thirdparty/ImAnimate"]
 	path = thirdparty/ImAnimate
 	url = https://github.com/RaidcoreGG/ImAnimate
