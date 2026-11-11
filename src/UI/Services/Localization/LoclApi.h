@@ -11,6 +11,7 @@
 #include <mutex>
 #include <filesystem>
 #include <map>
+#include <span>
 #include <string>
 
 #include "Core/Logging/LogApi.h"
@@ -106,9 +107,15 @@ class CLocalization
 
 	///----------------------------------------------------------------------------------------------------
 	/// BuildLocaleAtlas:
-	/// 	Builds the LocaleAtlas, if the directory is set.
+	/// 	Builds the LocaleAtlas from the embedded locales and the locale directory, if set.
 	///----------------------------------------------------------------------------------------------------
 	void BuildLocaleAtlas();
+
+	///----------------------------------------------------------------------------------------------------
+	/// MergeLocale:
+	/// 	Parses a locale json buffer and merges it into the LocaleAtlas.
+	///----------------------------------------------------------------------------------------------------
+	void MergeLocale(std::span<const uint8_t> aData, const std::string& aSourceName);
 
 	///----------------------------------------------------------------------------------------------------
 	/// ClearLocaleAtlas:

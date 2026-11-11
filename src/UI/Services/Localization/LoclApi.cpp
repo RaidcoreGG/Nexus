@@ -20,6 +20,8 @@ using json = nlohmann::json;
 #include "res/Resources.h"
 #include "Host/GW2/Context.h"
 
+using Raidcore::Core::Platform::Windows::CPackFile;
+
 static CLocalization* s_Localization{};
 
 /*static*/ void CLocalization::OnUELanguageChanged(uint32_t* aLanguage)
@@ -67,18 +69,15 @@ CLocalization::CLocalization()
 	CContext* ctx = CContext::GetContext();
 	CEventApi* evtapi = ctx->GetEventApi();
 
+	/* Older versions unpacked the embedded locales to disk. Remove them so stale copies do not override the embedded ones. */
+	for (EPath legacy : { EPath::LocaleEN, EPath::LocaleDE, EPath::LocaleFR, EPath::LocaleES, EPath::LocaleCN, EPath::LocaleKR,
+	                      EPath::LocaleBR, EPath::LocaleCZ, EPath::LocaleIT, EPath::LocalePL, EPath::LocaleRU })
+	{
+		std::error_code ec;
+		std::filesystem::remove(Index(legacy), ec);
+	}
+
 	this->SetLocaleDirectory(Index(EPath::DIR_LOCALES));
-	Resources::LocaleEN.Unpack(Index(EPath::LocaleEN));
-	Resources::LocaleDE.Unpack(Index(EPath::LocaleDE));
-	Resources::LocaleFR.Unpack(Index(EPath::LocaleFR));
-	Resources::LocaleES.Unpack(Index(EPath::LocaleES));
-	Resources::LocaleCN.Unpack(Index(EPath::LocaleCN));
-	Resources::LocaleKR.Unpack(Index(EPath::LocaleKR));
-	Resources::LocaleBR.Unpack(Index(EPath::LocaleBR));
-	Resources::LocaleCZ.Unpack(Index(EPath::LocaleCZ));
-	Resources::LocaleIT.Unpack(Index(EPath::LocaleIT));
-	Resources::LocalePL.Unpack(Index(EPath::LocalePL));
-	Resources::LocaleRU.Unpack(Index(EPath::LocaleRU));
 
 	std::string lang = this->Language.Get();
 	this->SetLanguage(!lang.empty() ? lang : "en");
@@ -290,109 +289,140 @@ std::vector<const char*> CLocalization::GetAllTexts()
 
 void CLocalization::BuildLocaleAtlas()
 {
-	/* Directory not set. */
-	if (this->Directory.empty())
-	{
-		return;
-	}
-
 	/* Clear existing atlas. */
 	this->ClearLocaleAtlas();
 
-	/* find files, merge files, alloc strings */
-	for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(this->Directory))
+	static constexpr std::pair<const char*, const CPackFile*> s_EmbeddedLocales[] = {
+		{ "en/DisplayStrings", &Resources::LocaleDisplayStringsEN }, { "en/GameBinds", &Resources::LocaleGameBindsEN }, { "en/InputBinds", &Resources::LocaleInputBindsEN },
+		{ "de/DisplayStrings", &Resources::LocaleDisplayStringsDE }, { "de/GameBinds", &Resources::LocaleGameBindsDE }, { "de/InputBinds", &Resources::LocaleInputBindsDE },
+		{ "fr/DisplayStrings", &Resources::LocaleDisplayStringsFR }, { "fr/GameBinds", &Resources::LocaleGameBindsFR }, { "fr/InputBinds", &Resources::LocaleInputBindsFR },
+		{ "es/DisplayStrings", &Resources::LocaleDisplayStringsES }, { "es/GameBinds", &Resources::LocaleGameBindsES }, { "es/InputBinds", &Resources::LocaleInputBindsES },
+		{ "cn/DisplayStrings", &Resources::LocaleDisplayStringsCN }, { "cn/GameBinds", &Resources::LocaleGameBindsCN }, { "cn/InputBinds", &Resources::LocaleInputBindsCN },
+		{ "kr/DisplayStrings", &Resources::LocaleDisplayStringsKR }, { "kr/GameBinds", &Resources::LocaleGameBindsKR }, { "kr/InputBinds", &Resources::LocaleInputBindsKR },
+		{ "br/DisplayStrings", &Resources::LocaleDisplayStringsBR },                                                               { "br/InputBinds", &Resources::LocaleInputBindsBR },
+		{ "cz/DisplayStrings", &Resources::LocaleDisplayStringsCZ },                                                               { "cz/InputBinds", &Resources::LocaleInputBindsCZ },
+		{ "it/DisplayStrings", &Resources::LocaleDisplayStringsIT }, { "it/GameBinds", &Resources::LocaleGameBindsIT }, { "it/InputBinds", &Resources::LocaleInputBindsIT },
+		{ "pl/DisplayStrings", &Resources::LocaleDisplayStringsPL },                                                               { "pl/InputBinds", &Resources::LocaleInputBindsPL },
+		{ "ru/DisplayStrings", &Resources::LocaleDisplayStringsRU },                                                               { "ru/InputBinds", &Resources::LocaleInputBindsRU }
+	};
+
+	for (const auto& [name, packFile] : s_EmbeddedLocales)
 	{
-		std::filesystem::path path = entry.path();
+		std::span<const uint8_t> data = packFile->GetBytes();
 
-		if (path.extension() != ".json")
+		if (data.empty())
 		{
+			LogWarning(CH_LOCALIZATION, "Embedded locale \"%s\" could not be loaded.", name);
 			continue;
 		}
 
-		if (std::filesystem::file_size(path) == 0)
-		{
-			continue;
-		}
+		this->MergeLocale(data, std::string("Embedded locale ") + name);
+	}
 
-		try
+	/* Files on disk are merged after the embedded locales, so they can add languages or override texts. */
+	if (!this->Directory.empty() && std::filesystem::exists(this->Directory))
+	{
+		for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(this->Directory))
 		{
-			std::ifstream file(path);
-			json localeJson = json::parse(file);
+			std::filesystem::path path = entry.path();
+
+			if (path.extension() != ".json")
+			{
+				continue;
+			}
+
+			if (std::filesystem::file_size(path) == 0)
+			{
+				continue;
+			}
+
+			std::ifstream file(path, std::ios::binary);
+			std::vector<uint8_t> content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 			file.close();
 
-			if (localeJson.is_null())
-			{
-				continue;
-			}
-
-			if (localeJson["Identifier"].is_null())
-			{
-				continue;
-			}
-
-			if (localeJson["Texts"].is_null())
-			{
-				continue;
-			}
-
-			std::string locId = localeJson["Identifier"].get<std::string>();;
-
-			auto atlasIt = this->LocaleAtlas.find(locId);
-
-			Locale_t loc{};
-			if (atlasIt != this->LocaleAtlas.end())
-			{
-				loc = atlasIt->second;
-			}
-
-			/* DisplayName can be null, hopefully *any* of the files have it set, if not fallback to identifier */
-			if (!localeJson["DisplayName"].is_null() && loc.DisplayName.empty())
-			{
-				localeJson["DisplayName"].get_to(loc.DisplayName);
-			}
-
-			for (auto& [key, value] : localeJson["Texts"].items())
-			{
-				if (value.is_null() || !value.is_string())
-				{
-					continue;
-				}
-
-				auto textIt = loc.Texts.find(key);
-
-				/* if a value is already set, clear it. only used when merging */
-				if (textIt != loc.Texts.end())
-				{
-					/* Sanity check. Free the existing string. */
-					if (textIt->second != nullptr)
-					{
-						free((void*)textIt->second);
-					}
-
-					textIt->second = _strdup(value.get<std::string>().c_str());
-				}
-				else
-				{
-					loc.Texts.emplace(key, _strdup(value.get<std::string>().c_str()));
-				}
-			}
-
-			if (atlasIt != this->LocaleAtlas.end())
-			{
-				atlasIt->second = loc;
-			}
-			else
-			{
-				this->LocaleAtlas.emplace(locId, loc);
-			}
-		}
-		catch (json::parse_error& ex)
-		{
-			LogWarning(CH_LOCALIZATION, "%s could not be parsed. Error: %s", path.filename().string().c_str(), ex.what());
+			this->MergeLocale(content, path.filename().string());
 		}
 	}
 
 	this->IsLocaleAtlasBuilt = true;
+}
+
+void CLocalization::MergeLocale(std::span<const uint8_t> aData, const std::string& aSourceName)
+{
+	try
+	{
+		json localeJson = json::parse(aData.begin(), aData.end());
+
+		if (localeJson.is_null())
+		{
+			return;
+		}
+
+		if (localeJson["Identifier"].is_null())
+		{
+			return;
+		}
+
+		if (localeJson["Texts"].is_null())
+		{
+			return;
+		}
+
+		std::string locId = localeJson["Identifier"].get<std::string>();
+
+		auto atlasIt = this->LocaleAtlas.find(locId);
+
+		Locale_t loc{};
+		if (atlasIt != this->LocaleAtlas.end())
+		{
+			loc = atlasIt->second;
+		}
+
+		/* DisplayName can be null, hopefully *any* of the files have it set, if not fallback to identifier */
+		if (!localeJson["DisplayName"].is_null() && loc.DisplayName.empty())
+		{
+			localeJson["DisplayName"].get_to(loc.DisplayName);
+		}
+
+		for (auto& [key, value] : localeJson["Texts"].items())
+		{
+			if (value.is_null() || !value.is_string())
+			{
+				continue;
+			}
+
+			auto textIt = loc.Texts.find(key);
+
+			/* if a value is already set, clear it. only used when merging */
+			if (textIt != loc.Texts.end())
+			{
+				/* Sanity check. Free the existing string. */
+				if (textIt->second != nullptr)
+				{
+					free((void*)textIt->second);
+				}
+
+				textIt->second = _strdup(value.get<std::string>().c_str());
+			}
+			else
+			{
+				loc.Texts.emplace(key, _strdup(value.get<std::string>().c_str()));
+			}
+		}
+
+		if (atlasIt != this->LocaleAtlas.end())
+		{
+			atlasIt->second = loc;
+		}
+		else
+		{
+			this->LocaleAtlas.emplace(locId, loc);
+		}
+	}
+	catch (json::exception& ex)
+	{
+		LogWarning(CH_LOCALIZATION, "%s could not be parsed. Error: %s", aSourceName.c_str(), ex.what());
+	}
 }
 
 void CLocalization::ClearLocaleAtlas()
