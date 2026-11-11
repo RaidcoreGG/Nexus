@@ -13,6 +13,7 @@
 #include <unordered_map>
 #include <windows.h>
 
+#include "Core/Preferences/PrefSetting.h"
 #include "Engine/Cleanup/RefCleanerBase.h"
 
 ///----------------------------------------------------------------------------------------------------
@@ -65,5 +66,6 @@ class CEscapeClosing : public virtual IRefCleaner
 	std::mutex                             Mutex;
 	std::unordered_map<std::string, bool*> Registry;
 
-	bool                                   Enabled = true;
+	public:
+	CSetting<bool>                         Enabled{ "CloseOnEscape", true };
 };

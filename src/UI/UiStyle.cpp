@@ -14,14 +14,11 @@
 
 #include "Host/GW2/Context.h"
 #include "Host/GW2/Index/Index.h"
-#include "Core/Preferences/PrefConst.h"
 #include "UiContext.h"
 #include "Util/Base64.h"
 
 CUiStyle::CUiStyle()
 {
-	CContext* ctx = CContext::GetContext();
-	this->Settings = ctx->GetSettingsCtx();
 }
 
 CUiStyle::~CUiStyle()
@@ -53,7 +50,7 @@ void CUiStyle::ApplyStyle(EUIStyle aStyle, std::string aValue)
 		{
 			try
 			{
-				std::string b64_style = this->Settings->Get<std::string>(OPT_IMGUISTYLE, {});
+				std::string b64_style = this->UserStyle.Get();
 
 				if (b64_style.empty())
 				{

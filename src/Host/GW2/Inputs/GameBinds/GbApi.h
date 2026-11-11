@@ -38,7 +38,7 @@ struct MultiInputBind_t
 ///----------------------------------------------------------------------------------------------------
 /// CGameBindsApi Class
 ///----------------------------------------------------------------------------------------------------
-class CGameBindsApi
+class CGameBindsApi : public IWndProcNotifyHandler
 {
 	public:
 	// FIXME: this needs to be moved to an evtconn
@@ -64,11 +64,10 @@ class CGameBindsApi
 	~CGameBindsApi();
 
 	///----------------------------------------------------------------------------------------------------
-	/// RedirectGameOnly:
-	/// 	Returns the uMsg shifted back to the normal range.
-	/// 	This should be called after all other window procedures.
+	/// OnWndProcNotify:
+	/// 	Shifts game only messages back to the normal range. Never consumes.
 	///----------------------------------------------------------------------------------------------------
-	UINT RedirectGameOnly(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam);
+	UINT OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// SendWndProcToGame:

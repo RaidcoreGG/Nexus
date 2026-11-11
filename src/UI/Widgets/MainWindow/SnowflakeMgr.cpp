@@ -15,17 +15,11 @@
 #include "ImAnimate/ImAnimate.h"
 #include "res/Resources.h"
 #include "Util/Time.h"
-#include "Core/Preferences/PrefConst.h"
+#include "UI/UiContext.h"
 
 CSnowflakeMgr::CSnowflakeMgr()
 {
-	CContext* ctx = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
-
-	settingsctx->Subscribe<bool>(OPT_DISABLEFESTIVEFLAIR, [&](bool aNewValue)
-	{
-		this->IsPartyPooper = aNewValue;
-	});
+	this->IsPartyPooper = CContext::GetContext()->GetUIContext()->GetQuickAccess()->DisableFestiveFlair.Get();
 
 	this->IsItChristmas = Time::GetMonth() == 12 && !this->IsPartyPooper;
 	this->IsItHalloween = Time::GetMonth() == 10 && !this->IsPartyPooper;

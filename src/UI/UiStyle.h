@@ -11,7 +11,7 @@
 #include "UiEnum.h"
 
 #include "Core/Logging/LogApi.h"
-#include "Core/Preferences/PrefContext.h"
+#include "Core/Preferences/PrefSetting.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// CUiStyle Class
@@ -36,6 +36,5 @@ class CUiStyle
 	///----------------------------------------------------------------------------------------------------
 	void ApplyStyle(EUIStyle aStyle = EUIStyle::User, std::string aValue = "");
 
-	private:
-	CSettings* Settings;
+	CSetting<std::string> UserStyle{ "ImGuiStyle", "" };
 };

@@ -11,7 +11,6 @@
 #include "imgui/imgui.h"
 
 #include "Host/GW2/Hooks/HkConst.h"
-#include "Core/Preferences/PrefConst.h"
 #include "Host/GW2/Mumble/MblConst.h"
 
 static CScaling* s_Scaling{};
@@ -28,27 +27,18 @@ static CScaling* s_Scaling{};
 	s_Scaling->UpdateResolution();
 }
 
-CScaling::CScaling(RenderContext_t* aRenderCtx, CDataLinkApi* aDataLink, CEventApi* aEventApi, CSettings* aSettings)
+CScaling::CScaling(RenderContext_t* aRenderCtx, CDataLinkApi* aDataLink, CEventApi* aEventApi)
 {
 	this->RenderContext = aRenderCtx;
 	this->DataLink      = aDataLink;
 	this->EventApi      = aEventApi;
-	this->Settings      = aSettings;
 
 	this->MumbleIdentity = static_cast<Mumble::Identity*>(this->DataLink->GetResource(DL_MUMBLE_LINK_IDENTITY));
 	this->NexusLink      = static_cast<NexusLinkData_t*>(this->DataLink->GetResource(DL_NEXUS_LINK));
 
-	this->DpiScalingEnabled          = this->Settings->Get<bool>(OPT_DPISCALING, true);
 	this->DpiScalingFactor           = 1.0f;
 	this->EffectiveDpiScalingFactor  = 1.0f;
-	this->GameScalingFactor          = this->Settings->Get<float>(OPT_LASTUISCALE, SC_NORMAL);
 	this->MinResolutionScalingFactor = 1.0f;
-
-	this->Settings->Subscribe<bool>(OPT_DPISCALING, [&](bool aEnabled)
-	{
-		this->DpiScalingEnabled = aEnabled;
-		this->UpdateDPI();
-	});
 
 	this->EventApi->Subscribe(EV_MUMBLE_IDENTITY_UPDATED, CScaling::OnMumbleIdentityChanged);
 	this->EventApi->Subscribe(EV_WINDOW_RESIZED, CScaling::OnWindowResized);
@@ -90,7 +80,7 @@ void CScaling::UpdateDPI()
 		this->DpiScalingFactor = 1.0f;
 	}
 
-	if (this->DpiScalingEnabled)
+	if (this->DpiScaling.Get())
 	{
 		this->EffectiveDpiScalingFactor = this->DpiScalingFactor;
 	}
@@ -110,10 +100,9 @@ void CScaling::UpdateGameUIScale()
 {
 	float currScaling = Mumble::GetScalingFactor(this->MumbleIdentity->UISize);
 
-	if (this->GameScalingFactor != currScaling)
+	if (this->LastUIScale.Get() != currScaling)
 	{
-		this->Settings->Set(OPT_LASTUISCALE, currScaling);
-		this->GameScalingFactor = currScaling;
+		this->LastUIScale.Set(currScaling);
 		this->UpdateScaling();
 	}
 }
@@ -137,7 +126,7 @@ void CScaling::UpdateResolution()
 void CScaling::UpdateScaling()
 {
 	this->NexusLink->Scaling
-		= this->GameScalingFactor
+		= this->LastUIScale.Get()
 		* this->EffectiveDpiScalingFactor
 		* this->MinResolutionScalingFactor;
 }

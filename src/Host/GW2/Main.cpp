@@ -22,6 +22,7 @@ namespace Clockwork = Raidcore::Clockwork;
 #include "Core/Logging/LogApi.h"
 #include "Core/Logging/Windows/LogConsole.h"
 #include "Core/Logging/LogWriter.h"
+#include "Core/Preferences/PrefContext.h"
 #include "Host/GW2/Build/BuildInfo.h"
 #include "Host/GW2/Multibox/Multibox.h"
 #include "res/Resources.h"
@@ -81,6 +82,9 @@ namespace Main
 
 		/* Created first so it is destroyed last: services log from their destructors. */
 		CLogApi::Get();
+
+		/* Loaded before the services that own settings exist; namespace-scope settings take the values here. */
+		CPreferences::Get()->Init(Index(EPath::Settings));
 
 		MH_Initialize();
 		Hooks::HookIDXGISwapChain();
@@ -219,6 +223,7 @@ namespace Main
 
 		uictx->Shutdown();
 		texapi->Shutdown();
+
 		LogInfo(CH_CORE, "SHUTDOWN END");
 
 		/* Let the OS take care of freeing the handles. Ugly, but otherwise crashes due to the addon clownfiesta in GW2. */

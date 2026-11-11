@@ -14,6 +14,7 @@
 #include <string>
 
 #include "Core/Logging/LogApi.h"
+#include "Core/Preferences/PrefSetting.h"
 #include "LoclLocale.h"
 #include "LoclQueuedText.h"
 
@@ -114,4 +115,10 @@ class CLocalization
 	/// 	Clears the LocaleAtlas.
 	///----------------------------------------------------------------------------------------------------
 	void ClearLocaleAtlas();
+
+	public:
+	CSetting<std::string> Language{ "Language", "en", [this](const std::string& aLanguage)
+	{
+		this->SetLanguage(!aLanguage.empty() ? aLanguage : "en");
+	} };
 };

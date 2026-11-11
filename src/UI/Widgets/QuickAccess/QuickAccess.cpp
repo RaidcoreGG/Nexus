@@ -14,8 +14,7 @@
 
 #include "Host/GW2/Addons/AddConst.h"
 #include "Host/GW2/Context.h"
-#include "Core/Preferences/PrefConst.h"
-#include "Core/Preferences/PrefContext.h"
+#include "UI/Widgets/QuickAccess/QaConst.h"
 #include "res/Resources.h"
 #include "UI/UIContext.h"
 #include "Util/Time.h"
@@ -47,49 +46,6 @@ CQuickAccess::CQuickAccess(
 	this->NexusLink = (NexusLinkData_t*)aDataLink->GetResource(DL_NEXUS_LINK);
 	this->MumbleLink = (Mumble::Data*)aDataLink->GetResource(DL_MUMBLE_LINK);
 
-	CContext*  ctx         = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
-
-	/* Setup notifiers. */
-	settingsctx->Subscribe<bool>(OPT_QAVERTICAL, [&](bool aVertical)
-	{
-		this->VerticalLayout = aVertical;
-	});
-	settingsctx->Subscribe<EQaPosition>(OPT_QALOCATION, [&](EQaPosition aPosition)
-	{
-		this->Location = aPosition;
-	});
-	settingsctx->Subscribe<float>(OPT_QAOFFSETX, [&](float aOffsetX)
-	{
-		this->Offset.x = aOffsetX;
-	});
-	settingsctx->Subscribe<float>(OPT_QAOFFSETY, [&](float aOffsetY)
-	{
-		this->Offset.y = aOffsetY;
-	});
-	settingsctx->Subscribe<EQaVisibility>(OPT_QAVISIBILITY, [&](EQaVisibility aVisibility)
-	{
-		this->Visibility = aVisibility;
-	});
-	settingsctx->Subscribe<bool>(OPT_QAONLYSHOWONHOVER, [&](bool aOnlyShowOnHover)
-	{
-		this->OnlyShowOnHover = aOnlyShowOnHover;
-	});
-	settingsctx->Subscribe<std::vector<std::string>>(OPT_QASUPPRESSED, [&](std::vector<std::string> aSuppressedShortcuts)
-	{
-		const std::lock_guard<std::mutex> lock(this->Mutex);
-
-		this->SuppressedShortcuts = aSuppressedShortcuts;
-
-		for (auto& [id, shortcut] : this->Registry)
-		{
-			/* If the current shortcut ID is in the suppressed list. */
-			bool isSuppressed = std::find(this->SuppressedShortcuts.begin(), this->SuppressedShortcuts.end(), id) != this->SuppressedShortcuts.end();
-
-			shortcut->SetSuppression(isSuppressed);
-		}
-	});
-
 	/* Preload default icons. */
 	this->TextureService->Load(ICON_NEXUS,                 Resources::IconNexus, nullptr);
 	this->TextureService->Load(ICON_NEXUS_HOVER,           Resources::IconNexusHover, nullptr);
@@ -98,42 +54,7 @@ CQuickAccess::CQuickAccess(
 	this->TextureService->Load(ICON_NEXUS_XMAS,            Resources::IconNexusXmas, nullptr);
 	this->TextureService->Load(ICON_NEXUS_XMAS_HOVER,      Resources::IconNexusXmasHover, nullptr);
 
-	/// FIXME: This is kinda hacky.
-	/// It forces the creation of the setting, so that the below subscriber gets executed on a first launch.
-	/// Otherwise the main menu would need to be opened first (static init of snowflakemgr) or the options in the main menu (static init of setting).
-	/// Both is kinda shit.
-	settingsctx->Get<bool>(OPT_DISABLEFESTIVEFLAIR, false);
-
-	settingsctx->Subscribe<bool>(OPT_DISABLEFESTIVEFLAIR, [&](bool aDisableFestiveFlair)
-	{
-		/* Remove existing shortcut. */
-		this->RemoveShortcut(QA_MENU);
-
-		const char* icon      = ICON_NEXUS;
-		const char* iconHover = ICON_NEXUS_HOVER;
-
-		if (!aDisableFestiveFlair)
-		{
-			switch (Time::GetMonth())
-			{
-				case 10:
-				{
-					icon = ICON_NEXUS_HALLOWEEN;
-					iconHover = ICON_NEXUS_HALLOWEEN_HOVER;
-					break;
-				}
-				case 12:
-				{
-					icon = ICON_NEXUS_XMAS;
-					iconHover = ICON_NEXUS_XMAS_HOVER;
-					break;
-				}
-			}
-		}
-
-		/* Recreate shortcut with appropriate icon. */
-		this->AddShortcut(QA_MENU, icon, iconHover, KB_MENU, "((000009))");
-	});
+	this->UpdateMenuIcon(this->DisableFestiveFlair.Get());
 
 	this->EventApi->Subscribe(EV_ADDON_LOADED,   CQuickAccess::OnAddonStateChanged);
 	this->EventApi->Subscribe(EV_ADDON_UNLOADED, CQuickAccess::OnAddonStateChanged);
@@ -155,10 +76,10 @@ void CQuickAccess::Render()
 		this->IsInvalid = false;
 	}
 
-	this->NexusLink->QuickAccessMode = (int)this->Location;
-	this->NexusLink->QuickAccessIsVertical = this->VerticalLayout;
+	this->NexusLink->QuickAccessMode = (int)this->Location.Get();
+	this->NexusLink->QuickAccessIsVertical = this->VerticalLayout.Get();
 
-	switch (this->Visibility)
+	switch (this->Visibility.Get())
 	{
 		/* continue rendering */
 		default:
@@ -217,13 +138,13 @@ void CQuickAccess::Render()
 
 	bool isHoveringNative = false;
 	static float s_IconBaseSize = 32.f;
-	switch (this->Location)
+	switch (this->Location.Get())
 	{
 		case EQaPosition::Extend:
 		{
 			wndPos.x += (s_IconBaseSize * this->NexusLink->Scaling) * GW2_QUICKACCESS_ITEMS;
 			ImVec2 mPos = ImGui::GetMousePos();
-			if (mPos.x != -FLT_MAX && mPos.y != -FLT_MAX && mPos.x < wndPos.x - this->Offset.x && mPos.y < this->NexusLink->Scaling * s_IconBaseSize)
+			if (mPos.x != -FLT_MAX && mPos.y != -FLT_MAX && mPos.x < wndPos.x - this->OffsetX.Get() && mPos.y < this->NexusLink->Scaling * s_IconBaseSize)
 			{
 				isHoveringNative = true;
 			}
@@ -243,8 +164,8 @@ void CQuickAccess::Render()
 		}
 	}
 
-	wndPos.x += this->Offset.x;
-	wndPos.y += this->Offset.y;
+	wndPos.x += this->OffsetX.Get();
+	wndPos.y += this->OffsetY.Get();
 
 	ImGuiWindowFlags flags
 		= ImGuiWindowFlags_AlwaysAutoResize
@@ -270,7 +191,7 @@ void CQuickAccess::Render()
 			isActive += shortcut->Render();
 
 			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(1.f, 1.f) * this->NexusLink->Scaling);
-			if (!this->VerticalLayout)
+			if (!this->VerticalLayout.Get())
 			{
 				/* If not vertical (aka is horizontal) force SameLine(). */
 				ImGui::SameLine();
@@ -292,7 +213,7 @@ void CQuickAccess::Render()
 		float opacityMin = 0.5f;
 		float opacityMax = 1.0f;
 
-		if (this->OnlyShowOnHover)
+		if (this->OnlyShowOnHover.Get())
 		{
 			opacityMin = 0.001f;
 		}
@@ -333,11 +254,9 @@ void CQuickAccess::AddShortcut(const char* aIdentifier, const char* aTextureIden
 			aTooltipText ? aTooltipText : ""
 		);
 
-		CContext*  ctx         = CContext::GetContext();
-		CSettings* settingsctx = ctx->GetSettingsCtx();
-
 		/* If the current shortcut ID is in the suppressed list. */
-		bool isSuppressed = std::find(this->SuppressedShortcuts.begin(), this->SuppressedShortcuts.end(), aIdentifier) != this->SuppressedShortcuts.end();
+		const std::vector<std::string> suppressed = this->SuppressedShortcuts.Get();
+		bool isSuppressed = std::find(suppressed.begin(), suppressed.end(), aIdentifier) != suppressed.end();
 
 		shortcut->SetSuppression(isSuppressed);
 
@@ -527,6 +446,50 @@ void CQuickAccess::WhereAreMyParents()
 			/* Still an orphan :( */
 			orphanIt++;
 		}
+	}
+}
+
+void CQuickAccess::UpdateMenuIcon(bool aDisableFestiveFlair)
+{
+	/* Remove existing shortcut. */
+	this->RemoveShortcut(QA_MENU);
+
+	const char* icon      = ICON_NEXUS;
+	const char* iconHover = ICON_NEXUS_HOVER;
+
+	if (!aDisableFestiveFlair)
+	{
+		switch (Time::GetMonth())
+		{
+			case 10:
+			{
+				icon = ICON_NEXUS_HALLOWEEN;
+				iconHover = ICON_NEXUS_HALLOWEEN_HOVER;
+				break;
+			}
+			case 12:
+			{
+				icon = ICON_NEXUS_XMAS;
+				iconHover = ICON_NEXUS_XMAS_HOVER;
+				break;
+			}
+		}
+	}
+
+	/* Recreate shortcut with appropriate icon. */
+	this->AddShortcut(QA_MENU, icon, iconHover, KB_MENU, "((000009))");
+}
+
+void CQuickAccess::ApplySuppression(const std::vector<std::string>& aSuppressedShortcuts)
+{
+	const std::lock_guard<std::mutex> lock(this->Mutex);
+
+	for (auto& [id, shortcut] : this->Registry)
+	{
+		/* If the current shortcut ID is in the suppressed list. */
+		bool isSuppressed = std::find(aSuppressedShortcuts.begin(), aSuppressedShortcuts.end(), id) != aSuppressedShortcuts.end();
+
+		shortcut->SetSuppression(isSuppressed);
 	}
 }
 

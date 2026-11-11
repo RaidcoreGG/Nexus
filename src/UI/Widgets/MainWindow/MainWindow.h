@@ -11,6 +11,7 @@
 #include <mutex>
 #include <vector>
 
+#include "Core/Preferences/PrefSetting.h"
 #include "UI/Controls/CtlSubWindow.h"
 #include "UI/Controls/CtlWindow.h"
 #include "UI/Textures/TxTexture.h"
@@ -55,4 +56,7 @@ class CMainWindow : public virtual IWindow
 	private:
 	Texture_t*               Tex_RaidcoreTag{};
 	Texture_t*               Tex_CloseIcon  {};
+
+	public:
+	CSetting<bool>           ShowAddonsAfterGameUpdate{ "ShowAddonsWindowAfterDisableUntilUpdate", false };
 };

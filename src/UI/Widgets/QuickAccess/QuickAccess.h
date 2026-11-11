@@ -12,6 +12,7 @@
 #include <map>
 #include <mutex>
 #include <string>
+#include <vector>
 
 #include "imgui/imgui.h"
 
@@ -20,6 +21,7 @@
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Core/Logging/LogApi.h"
+#include "Core/Preferences/PrefSetting.h"
 #include "Host/GW2/Mumble/MblReader.h"
 #include "QaEnum.h"
 #include "QaShortcut.h"
@@ -139,13 +141,6 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	mutable std::mutex                    Mutex              {};
 	std::map<std::string, CShortcutIcon*> Registry           {};
 	std::map<std::string, ContextItem_t>  OrphanedCallbacks  {};
-	std::vector<std::string>              SuppressedShortcuts{};
-
-	bool                                  VerticalLayout     { false };
-	EQaVisibility                         Visibility         { EQaVisibility::AlwaysShow };
-	EQaPosition                           Location           { EQaPosition::Extend };
-	ImVec2                                Offset             { ImVec2{0, 0} };
-	bool                                  OnlyShowOnHover    { false }; // Fully hide unless hovered
 
 	float                                 Opacity            { 0.5f };
 
@@ -161,4 +156,33 @@ class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
 	///----------------------------------------------------------------------------------------------------
 	void UpdateNexusLink();
 
+	///----------------------------------------------------------------------------------------------------
+	/// ApplySuppression:
+	/// 	Applies the suppressed shortcut list to the registered shortcuts.
+	///----------------------------------------------------------------------------------------------------
+	void ApplySuppression(const std::vector<std::string>& aSuppressedShortcuts);
+
+	///----------------------------------------------------------------------------------------------------
+	/// UpdateMenuIcon:
+	/// 	Recreates the menu shortcut with the seasonal or the default icon.
+	///----------------------------------------------------------------------------------------------------
+	void UpdateMenuIcon(bool aDisableFestiveFlair);
+
+	public:
+	/* Declared last: they are destroyed first, before the state their change handlers touch. */
+	CSetting<bool>                     VerticalLayout     { "QAVertical", false };
+	CSetting<EQaVisibility>            Visibility         { "QAVisibility", EQaVisibility::AlwaysShow };
+	CSetting<EQaPosition>              Location           { "QALocation", EQaPosition::Extend };
+	CSetting<float>                    OffsetX            { "QAOffsetX", 0.0f };
+	CSetting<float>                    OffsetY            { "QAOffsetY", 0.0f };
+	CSetting<bool>                     OnlyShowOnHover    { "QAOnlyShowOnHover", false };
+	CSetting<std::vector<std::string>> SuppressedShortcuts{ "QASuppressedIcons", {}, [this](const std::vector<std::string>& aSuppressedShortcuts)
+	{
+		this->ApplySuppression(aSuppressedShortcuts);
+	} };
+	CSetting<bool>                     NotifyChangelog    { "NotifyChangelog", false };
+	CSetting<bool>                     DisableFestiveFlair{ "DisableFestiveFlair", false, [this](const bool& aDisableFestiveFlair)
+	{
+		this->UpdateMenuIcon(aDisableFestiveFlair);
+	} };
 };

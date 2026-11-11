@@ -17,6 +17,7 @@
 #include "imgui/imgui.h"
 
 #include "Core/Platform/Windows/Exe/ExePackFile.h"
+#include "Core/Preferences/PrefSetting.h"
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include "FuncDefs.h"
 #include "UI/Services/Localization/LoclApi.h"
@@ -161,4 +162,8 @@ class CFontManager : public virtual IRefCleaner
 	/// 	Creates a new ManagedFont_t for the Registry.
 	///----------------------------------------------------------------------------------------------------
 	ManagedFont_t CreateManagedFont(std::string aIdentifier, float aFontSize, std::span<const uint8_t> aData, ImFontConfig* aConfig);
+
+	public:
+	CSetting<float>       FontSize{ "FontSize", 15.0f };
+	CSetting<std::string> UserFont{ "UserFont", "" };
 };

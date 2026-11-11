@@ -14,6 +14,7 @@
 
 #include "imgui/imgui.h"
 
+#include "Core/Preferences/PrefSetting.h"
 #include "AddonListing.h"
 #include "CmAddon.h"
 #include "LoadConfirmationModal.h"
@@ -21,8 +22,6 @@
 #include "UI/Widgets/MainWindow/Binds/BindSetterModal.h"
 #include "UninstallConfirmationModal.h"
 
-constexpr const char* OPT_ISLISTMODE = "IsListMode";
-constexpr const char* OPT_ADDONFILTERS = "AddonFilters";
 
 enum class EAddonsFilterFlags
 {
@@ -32,6 +31,12 @@ enum class EAddonsFilterFlags
 	ShowDownloadable     = 1 << 2
 };
 DEFINE_ENUM_FLAG_OPERATORS(EAddonsFilterFlags)
+
+constexpr EAddonsFilterFlags FILTER_INSTALLED
+	= EAddonsFilterFlags::ShowEnabled
+	| EAddonsFilterFlags::ShowDisabled;
+
+constexpr EAddonsFilterFlags FILTER_LIBRARY = EAddonsFilterFlags::ShowDownloadable;
 
 class CAddonsWindow : public ISubWindow
 {
@@ -48,8 +53,6 @@ class CAddonsWindow : public ISubWindow
 	CAddonContextMenu           AddonContextMenu;
 
 	std::string                 SearchTerm;
-	EAddonsFilterFlags          Filter;
-	bool                        IsListMode;
 	std::vector<AddonListing_t> Addons;
 	uint32_t                    AddonsAmtUnfiltered;
 
@@ -95,4 +98,12 @@ class CAddonsWindow : public ISubWindow
 	void RenderInputBindsTable(const std::unordered_map<std::string, InputBindPacked_t>& aInputBinds);
 
 	void PopulateAddons();
+
+	/* Declared last: they are destroyed first, before the state their change handlers touch. */
+	CSetting<EAddonsFilterFlags> Filter    { "AddonFilters", FILTER_INSTALLED, [this](const EAddonsFilterFlags&)
+	{
+		this->Invalidate();
+		this->ClearContent();
+	} };
+	CSetting<bool>               IsListMode{ "IsListMode", true };
 };

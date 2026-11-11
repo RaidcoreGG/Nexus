@@ -15,7 +15,6 @@
 
 #include "Host/GW2/Context.h"
 #include "Host/GW2/Index/Index.h"
-#include "Core/Preferences/PrefConst.h"
 #include "res/Resources.h"
 #include "UI/Widgets/QuickAccess/QaConst.h"
 #include "Util/Base64.h"
@@ -74,7 +73,6 @@ void COptionsWindow::RenderSubWindows()
 void COptionsWindow::TabGeneral()
 {
 	static CContext* ctx = CContext::GetContext();
-	static CSettings* settingsctx = ctx->GetSettingsCtx();
 	static CUiContext* uictx = ctx->GetUIContext();
 	static CLocalization* langApi = uictx->GetLocalization();
 	static CQuickAccess* qactx = uictx->GetQuickAccess();
@@ -99,7 +97,7 @@ void COptionsWindow::TabGeneral()
 							if (lang != activeLang)
 							{
 								langApi->SetLanguage(lang);
-								settingsctx->Set(OPT_LANGUAGE, lang);
+								langApi->Language.Set(lang);
 							}
 						}
 					}
@@ -112,27 +110,29 @@ void COptionsWindow::TabGeneral()
 			{
 				ImGui::BeginGroupPanel(langApi->Translate("((000042))"), ImVec2(-1.0f, 0.0f));
 
-				static bool dpiScaling = settingsctx->Get<bool>(OPT_DPISCALING, true);
+				CScaling* scaling = uictx->GetScaling();
+				bool dpiScaling = scaling->DpiScaling.Get();
 				if (ImGui::Checkbox(langApi->Translate("((000113))"), &dpiScaling))
 				{
-					settingsctx->Set(OPT_DPISCALING, dpiScaling);
+					scaling->DpiScaling.Set(dpiScaling);
 				}
 
-				static bool clickingRequiresMods = settingsctx->Get<bool>(OPT_UI_CLICK_MODSONLY, false);
+				CUiInput* uiInput = uictx->GetInput();
+				bool clickingRequiresMods = uiInput->FilterClicks.Get();
 				if (ImGui::Checkbox(langApi->Translate("((Experimental: Clicking requires modifiers))"), &clickingRequiresMods))
 				{
-					settingsctx->Set(OPT_UI_CLICK_MODSONLY, clickingRequiresMods);
+					uiInput->FilterClicks.Set(clickingRequiresMods);
 					CContext::GetContext()->GetUIContext()->Invalidate();
 				}
 
 				if (clickingRequiresMods)
 				{
-					static EModifiers mods = settingsctx->Get<EModifiers>(OPT_UI_MODS, EModifiers::None);
+					EModifiers mods = uiInput->RequiredModifiers.Get();
 
 					ImGui::BeginGroup();
 					ImGui::Indent();
 					ImGui::Text("((Modifiers))");
-					static bool modAlt = (mods & EModifiers::Alt) == EModifiers::Alt;
+					bool modAlt = (mods & EModifiers::Alt) == EModifiers::Alt;
 					if (ImGui::Checkbox(langApi->Translate("((Alt))"), &modAlt))
 					{
 						if (modAlt)
@@ -143,11 +143,11 @@ void COptionsWindow::TabGeneral()
 						{
 							mods &= ~EModifiers::Alt;
 						}
-						settingsctx->Set(OPT_UI_MODS, mods);
+						uiInput->RequiredModifiers.Set(mods);
 						CContext::GetContext()->GetUIContext()->Invalidate();
 					}
 					ImGui::SameLine();
-					static bool modCtrl = (mods & EModifiers::Ctrl) == EModifiers::Ctrl;
+					bool modCtrl = (mods & EModifiers::Ctrl) == EModifiers::Ctrl;
 					if (ImGui::Checkbox(langApi->Translate("((Ctrl))"), &modCtrl))
 					{
 						if (modCtrl)
@@ -158,11 +158,11 @@ void COptionsWindow::TabGeneral()
 						{
 							mods &= ~EModifiers::Ctrl;
 						}
-						settingsctx->Set(OPT_UI_MODS, mods);
+						uiInput->RequiredModifiers.Set(mods);
 						CContext::GetContext()->GetUIContext()->Invalidate();
 					}
 					ImGui::SameLine();
-					static bool modShift = (mods & EModifiers::Shift) == EModifiers::Shift;
+					bool modShift = (mods & EModifiers::Shift) == EModifiers::Shift;
 					if (ImGui::Checkbox(langApi->Translate("((Shift))"), &modShift))
 					{
 						if (modShift)
@@ -173,43 +173,47 @@ void COptionsWindow::TabGeneral()
 						{
 							mods &= ~EModifiers::Shift;
 						}
-						settingsctx->Set(OPT_UI_MODS, mods);
+						uiInput->RequiredModifiers.Set(mods);
 						CContext::GetContext()->GetUIContext()->Invalidate();
 					}
 					ImGui::EndGroup();
 				}
 
 				/* fix gw2's jumping cursor */
-				static bool lockHiddenCursor = settingsctx->Get<bool>(OPT_CAMCTRL_LOCKCURSOR, false);
+				CMouseResetFix* mouseResetFix = CContext::GetContext()->GetMouseResetFix();
+
+				bool lockHiddenCursor = mouseResetFix->LockCursor.Get();
 				if (ImGui::Checkbox(langApi->Translate("((000112))"), &lockHiddenCursor))
 				{
-					settingsctx->Set(OPT_CAMCTRL_LOCKCURSOR, lockHiddenCursor);
+					mouseResetFix->LockCursor.Set(lockHiddenCursor);
 				}
 
-				static bool resetHiddenCursor = settingsctx->Get<bool>(OPT_CAMCTRL_RESETCURSOR, false);
+				bool resetHiddenCursor = mouseResetFix->ResetCursor.Get();
 				if (ImGui::Checkbox(langApi->Translate("((000114))"), &resetHiddenCursor))
 				{
-					settingsctx->Set(OPT_CAMCTRL_RESETCURSOR, resetHiddenCursor);
+					mouseResetFix->ResetCursor.Set(resetHiddenCursor);
 				}
 
 				/* close windows on escape */
-				static bool closeOnEscape = settingsctx->Get<bool>(OPT_CLOSEESCAPE, true);
+				CEscapeClosing* escapeClosing = uictx->GetEscapeClosingService();
+				bool closeOnEscape = escapeClosing->Enabled.Get();
 				if (ImGui::Checkbox(langApi->Translate("((000044))"), &closeOnEscape))
 				{
-					settingsctx->Set(OPT_CLOSEESCAPE, closeOnEscape);
+					escapeClosing->Enabled.Set(closeOnEscape);
 				}
 
 				/* show addons window after after addons were disabled because of an update */
-				static bool showAddonsWindowOnGameUpdate = settingsctx->Get<bool>(OPT_SHOWADDONSWINDOWAFTERDUU, false);
+				CMainWindow* mainWindow = uictx->GetMainWindow();
+				bool showAddonsWindowOnGameUpdate = mainWindow->ShowAddonsAfterGameUpdate.Get();
 				if (ImGui::Checkbox(langApi->Translate("((000086))"), &showAddonsWindowOnGameUpdate))
 				{
-					settingsctx->Set(OPT_SHOWADDONSWINDOWAFTERDUU, showAddonsWindowOnGameUpdate);
+					mainWindow->ShowAddonsAfterGameUpdate.Set(showAddonsWindowOnGameUpdate);
 				}
 
-				static bool disableFestiveFlair = settingsctx->Get<bool>(OPT_DISABLEFESTIVEFLAIR, false);
+				bool disableFestiveFlair = qactx->DisableFestiveFlair.Get();
 				if (ImGui::Checkbox(langApi->Translate("((000101))"), &disableFestiveFlair))
 				{
-					settingsctx->Set(OPT_DISABLEFESTIVEFLAIR, disableFestiveFlair);
+					qactx->DisableFestiveFlair.Set(disableFestiveFlair);
 				}
 
 				ImGui::EndGroupPanel();
@@ -219,7 +223,7 @@ void COptionsWindow::TabGeneral()
 				ImGui::BeginGroupPanel(langApi->Translate("((000045))"), ImVec2(-1.0f, 0.0f));
 
 				/* suppressed icons selector (for addition) */
-				static std::vector<std::string> s_SuppressedIcons = settingsctx->Get<std::vector<std::string>>(OPT_QASUPPRESSED);
+				std::vector<std::string> suppressedIcons = qactx->SuppressedShortcuts.Get();
 				if (ImGui::BeginCombo("##QASuppressSelector", langApi->Translate("((Select an element to hide))")))
 				{
 					for (auto& [id, shorcut] : qactx->GetRegistry())
@@ -227,10 +231,10 @@ void COptionsWindow::TabGeneral()
 						if (ImGui::Selectable(id.c_str()))
 						{
 							/* if not already added */
-							if (std::find(s_SuppressedIcons.begin(), s_SuppressedIcons.end(), id) == s_SuppressedIcons.end())
+							if (std::find(suppressedIcons.begin(), suppressedIcons.end(), id) == suppressedIcons.end())
 							{
-								s_SuppressedIcons.push_back(id);
-								settingsctx->Set(OPT_QASUPPRESSED, s_SuppressedIcons);
+								suppressedIcons.push_back(id);
+								qactx->SuppressedShortcuts.Set(suppressedIcons);
 							}
 						}
 					}
@@ -239,7 +243,7 @@ void COptionsWindow::TabGeneral()
 				/* suppressed icons list (for removal) */
 				ImGui::Text(langApi->Translate("((Suppressed Icons))"));
 				std::string removeSuppress{};
-				for (std::string& id : s_SuppressedIcons)
+				for (std::string& id : suppressedIcons)
 				{
 					ImGui::BeginGroup();
 					ImGui::Indent();
@@ -255,95 +259,86 @@ void COptionsWindow::TabGeneral()
 				/* remove the requested icon id */
 				if (!removeSuppress.empty())
 				{
-					auto it = std::find(s_SuppressedIcons.begin(), s_SuppressedIcons.end(), removeSuppress);
-					if (it != s_SuppressedIcons.end())
+					auto it = std::find(suppressedIcons.begin(), suppressedIcons.end(), removeSuppress);
+					if (it != suppressedIcons.end())
 					{
-						s_SuppressedIcons.erase(it);
-						settingsctx->Set(OPT_QASUPPRESSED, s_SuppressedIcons);
+						suppressedIcons.erase(it);
+						qactx->SuppressedShortcuts.Set(suppressedIcons);
 					}
 				}
 				ImGui::Separator();
 
 				/* toggle vertical layout */
-				static bool s_VerticalLayout = settingsctx->Get<bool>(OPT_QAVERTICAL);
-				if (ImGui::Checkbox(langApi->Translate("((000046))"), &s_VerticalLayout))
+				bool verticalLayout = qactx->VerticalLayout.Get();
+				if (ImGui::Checkbox(langApi->Translate("((000046))"), &verticalLayout))
 				{
-					settingsctx->Set(OPT_QAVERTICAL, s_VerticalLayout);
+					qactx->VerticalLayout.Set(verticalLayout);
 				}
 
 				/* only show on hover */
-				static bool s_OnlyShowOnHover = settingsctx->Get<bool>(OPT_QAONLYSHOWONHOVER);
-				if (ImGui::Checkbox(langApi->Translate("((Fully hide unless hovered))"), &s_OnlyShowOnHover))
+				bool onlyShowOnHover = qactx->OnlyShowOnHover.Get();
+				if (ImGui::Checkbox(langApi->Translate("((Fully hide unless hovered))"), &onlyShowOnHover))
 				{
-					settingsctx->Set(OPT_QAONLYSHOWONHOVER, s_OnlyShowOnHover);
+					qactx->OnlyShowOnHover.Set(onlyShowOnHover);
 				}
 
 				/* prefetch currently selected position string */
-				static EQaVisibility s_Visibility = settingsctx->Get<EQaVisibility>(OPT_QAVISIBILITY);
-				std::string qaVisStr = EQaVisibilityToString(s_Visibility);
+				EQaVisibility visibility = qactx->Visibility.Get();
+				std::string qaVisStr = EQaVisibilityToString(visibility);
 				ImGui::Text(langApi->Translate("((000097))"));
 				if (ImGui::BeginCombo("##QAVisibilitySelector", langApi->Translate(qaVisStr.c_str())))
 				{
-					if (ImGui::Selectable(langApi->Translate("((000047))"), s_Visibility == EQaVisibility::AlwaysShow))
+					if (ImGui::Selectable(langApi->Translate("((000047))"), visibility == EQaVisibility::AlwaysShow))
 					{
-						s_Visibility = EQaVisibility::AlwaysShow;
-						settingsctx->Set(OPT_QAVISIBILITY, s_Visibility);
+						qactx->Visibility.Set(EQaVisibility::AlwaysShow);
 					}
-					if (ImGui::Selectable(langApi->Translate("((000093))"), s_Visibility == EQaVisibility::Gameplay))
+					if (ImGui::Selectable(langApi->Translate("((000093))"), visibility == EQaVisibility::Gameplay))
 					{
-						s_Visibility = EQaVisibility::Gameplay;
-						settingsctx->Set(OPT_QAVISIBILITY, s_Visibility);
+						qactx->Visibility.Set(EQaVisibility::Gameplay);
 					}
-					if (ImGui::Selectable(langApi->Translate("((000094))"), s_Visibility == EQaVisibility::OutOfCombat))
+					if (ImGui::Selectable(langApi->Translate("((000094))"), visibility == EQaVisibility::OutOfCombat))
 					{
-						s_Visibility = EQaVisibility::OutOfCombat;
-						settingsctx->Set(OPT_QAVISIBILITY, s_Visibility);
+						qactx->Visibility.Set(EQaVisibility::OutOfCombat);
 					}
-					if (ImGui::Selectable(langApi->Translate("((000095))"), s_Visibility == EQaVisibility::InCombat))
+					if (ImGui::Selectable(langApi->Translate("((000095))"), visibility == EQaVisibility::InCombat))
 					{
-						s_Visibility = EQaVisibility::InCombat;
-						settingsctx->Set(OPT_QAVISIBILITY, s_Visibility);
+						qactx->Visibility.Set(EQaVisibility::InCombat);
 					}
-					if (ImGui::Selectable(langApi->Translate("((000096))"), s_Visibility == EQaVisibility::Hide))
+					if (ImGui::Selectable(langApi->Translate("((000096))"), visibility == EQaVisibility::Hide))
 					{
-						s_Visibility = EQaVisibility::Hide;
-						settingsctx->Set(OPT_QAVISIBILITY, s_Visibility);
+						qactx->Visibility.Set(EQaVisibility::Hide);
 					}
 					ImGui::EndCombo();
 				}
 
 				/* show notification icon on update */
-				static bool s_NotifyChangelog = settingsctx->Get<bool>(OPT_NOTIFYCHANGELOG);
-				if (ImGui::Checkbox(langApi->Translate("((000049))"), &s_NotifyChangelog))
+				bool notifyChangelog = qactx->NotifyChangelog.Get();
+				if (ImGui::Checkbox(langApi->Translate("((000049))"), &notifyChangelog))
 				{
-					settingsctx->Set(OPT_NOTIFYCHANGELOG, s_NotifyChangelog);
+					qactx->NotifyChangelog.Set(notifyChangelog);
 				}
 
 				/* position/location dropdown */
-				static EQaPosition s_Position = settingsctx->Get<EQaPosition>(OPT_QALOCATION);
-				std::string qaPosStr = EQaPositionToString(s_Position);
+				EQaPosition position = qactx->Location.Get();
+				std::string qaPosStr = EQaPositionToString(position);
 				ImGui::Text(langApi->Translate("((000050))"));
 				if (ImGui::BeginCombo("##QALocationSelector", langApi->Translate(qaPosStr.c_str())))
 				{
-					if (ImGui::Selectable(langApi->Translate("((000067))"), s_Position == EQaPosition::Extend))
+					if (ImGui::Selectable(langApi->Translate("((000067))"), position == EQaPosition::Extend))
 					{
-						s_Position = EQaPosition::Extend;
-						settingsctx->Set(OPT_QALOCATION, s_Position);
+						qactx->Location.Set(EQaPosition::Extend);
 					}
-					if (ImGui::Selectable(langApi->Translate("((000068))"), s_Position == EQaPosition::Under))
+					if (ImGui::Selectable(langApi->Translate("((000068))"), position == EQaPosition::Under))
 					{
-						s_Position = EQaPosition::Under;
-						settingsctx->Set(OPT_QALOCATION, s_Position);
+						qactx->Location.Set(EQaPosition::Under);
 					}
-					if (ImGui::Selectable(langApi->Translate("((000069))"), s_Position == EQaPosition::Bottom))
+					if (ImGui::Selectable(langApi->Translate("((000069))"), position == EQaPosition::Bottom))
 					{
-						s_Position = EQaPosition::Bottom;
-						settingsctx->Set(OPT_QALOCATION, s_Position);
+						qactx->Location.Set(EQaPosition::Bottom);
 					}
-					if (ImGui::Selectable(langApi->Translate("((000070))"), s_Position == EQaPosition::Custom))
+					if (ImGui::Selectable(langApi->Translate("((000070))"), position == EQaPosition::Custom))
 					{
-						s_Position = EQaPosition::Custom;
-						settingsctx->Set(OPT_QALOCATION, s_Position);
+						qactx->Location.Set(EQaPosition::Custom);
 					}
 					ImGui::EndCombo();
 				}
@@ -351,14 +346,12 @@ void COptionsWindow::TabGeneral()
 				RenderContext_t* renderer = ctx->GetRendererCtx();
 
 				/* offset */
-				static ImVec2 s_Offset{};
-				s_Offset.x = settingsctx->Get<float>(OPT_QAOFFSETX);
-				s_Offset.y = settingsctx->Get<float>(OPT_QAOFFSETY);
+				ImVec2 offset{ qactx->OffsetX.Get(), qactx->OffsetY.Get() };
 				ImGui::Text(langApi->Translate("((000051))"));
-				if (ImGui::DragFloat2("##QAOffsetInput", (float*)&s_Offset, 1.0f, (static_cast<float>(renderer->Window.Height)) * -1.f, static_cast<float>(renderer->Window.Height)))
+				if (ImGui::DragFloat2("##QAOffsetInput", (float*)&offset, 1.0f, (static_cast<float>(renderer->Window.Height)) * -1.f, static_cast<float>(renderer->Window.Height)))
 				{
-					settingsctx->Set(OPT_QAOFFSETX, s_Offset.x);
-					settingsctx->Set(OPT_QAOFFSETY, s_Offset.y);
+					qactx->OffsetX.Set(offset.x);
+					qactx->OffsetY.Set(offset.y);
 				}
 
 				ImGui::EndGroupPanel();
@@ -374,16 +367,16 @@ void COptionsWindow::TabGeneral()
 void COptionsWindow::TabStyle()
 {
 	CContext* ctx = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
 	CUiContext* uictx = ctx->GetUIContext();
 	CLocalization* langApi = uictx->GetLocalization();
+	CFontManager* fontMgr = uictx->GetFontManager();
 
 	if (ImGui::BeginTabItem(langApi->Translate("((000053))")))
 	{
 		if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 		{
 			ImGui::BeginGroupPanel(langApi->Translate("((000092))"), ImVec2(-1.0f, 0.0f));
-			static std::string fontFile = settingsctx->Get<std::string>(OPT_USERFONT, "");
+			std::string fontFile = fontMgr->UserFont.Get();
 			if (fontFile.empty()) { fontFile = "Default"; }
 			if (ImGui::BeginCombo("##FontSelector", fontFile.c_str()))
 			{
@@ -404,7 +397,7 @@ void COptionsWindow::TabStyle()
 						{
 							fontFile = font.filename().string();
 
-							settingsctx->Set(OPT_USERFONT, fontFile);
+							fontMgr->UserFont.Set(fontFile);
 							uictx->LoadFonts();
 						}
 					}
@@ -413,17 +406,16 @@ void COptionsWindow::TabStyle()
 			}
 
 			ImGui::Text(langApi->Translate("((000054))"));
-			static float fontSize = settingsctx->Get<float>(OPT_FONTSIZE, 15.0f);
+			float fontSize = fontMgr->FontSize.Get();
 			if (ImGui::InputFloat("##FontSizeInput", &fontSize, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_EnterReturnsTrue))
 			{
 				fontSize = min(max(fontSize, 1.0f), 50.0f);
 
-				settingsctx->Set(OPT_FONTSIZE, fontSize);
+				fontMgr->FontSize.Set(fontSize);
 
 				ImGuiContext* imguictx = ImGui::GetCurrentContext();
 				imguictx->FontSize = fontSize;
 
-				CFontManager* fontMgr = uictx->GetFontManager();
 				fontMgr->ResizeFont("FONT_DEFAULT", imguictx->FontSize);
 			}
 			ImGui::EndGroupPanel();
@@ -783,7 +775,7 @@ void COptionsWindow::TabStyle()
 					/* Save */
 					if (ImGui::Button(langApi->Translate("((000058))")))
 					{
-						settingsctx->Set(OPT_IMGUISTYLE, Base64::Encode((unsigned char*)&style, sizeof(ImGuiStyle)));
+						uictx->UserStyle.Set(Base64::Encode((unsigned char*)&style, sizeof(ImGuiStyle)));
 						this->HasUnsavedStyle = false;
 					}
 

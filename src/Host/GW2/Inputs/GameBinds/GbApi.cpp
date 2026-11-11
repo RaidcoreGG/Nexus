@@ -111,14 +111,19 @@ CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CEventApi* aEventApi, R
 	this->Load(this->ConfigPath);
 
 	this->EventApi->Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
+
+	/* After the input binds, so they never see game only messages as regular input. */
+	this->Attach(WNDPROC_PRIO_GAMEBINDS);
 }
 
 CGameBindsApi::~CGameBindsApi()
 {
+	this->Detach();
+
 	this->EventApi->Unsubscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
 }
 
-UINT CGameBindsApi::RedirectGameOnly(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam)
+UINT CGameBindsApi::OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam)
 {
 	/* offset of 7997, if uMsg in that range it's a nexus game only message */
 	if (uMsg >= WM_PASSTHROUGH_FIRST && uMsg <= WM_PASSTHROUGH_LAST)
@@ -127,7 +132,7 @@ UINT CGameBindsApi::RedirectGameOnly(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPA
 		uMsg -= WM_PASSTHROUGH_FIRST;
 	}
 
-	return uMsg;
+	return 1;
 }
 
 LRESULT CGameBindsApi::SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

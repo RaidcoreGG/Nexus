@@ -20,12 +20,6 @@
 #include "res/Resources.h"
 #include "Util/Strings.h"
 
-constexpr EAddonsFilterFlags FILTER_INSTALLED
-	= EAddonsFilterFlags::ShowEnabled
-	| EAddonsFilterFlags::ShowDisabled;
-
-constexpr EAddonsFilterFlags FILTER_LIBRARY = EAddonsFilterFlags::ShowDownloadable;
-
 static CAddonsWindow* AddonsWindow = nullptr;
 
 void OnAddonChanged(void* aEventData)
@@ -54,11 +48,7 @@ CAddonsWindow::CAddonsWindow()
 	this->Invalidate();
 
 	CContext*  ctx         = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
 	CEventApi* evtapi      = ctx->GetEventApi();
-	
-	this->Filter     = settingsctx->Get(OPT_ADDONFILTERS, FILTER_INSTALLED);
-	this->IsListMode = settingsctx->Get(OPT_ISLISTMODE,   true            );
 
 	evtapi->Subscribe("EV_ADDON_LOADED", OnAddonChanged);
 	evtapi->Subscribe("EV_ADDON_UNLOADED", OnAddonChanged);
@@ -299,7 +289,6 @@ void CAddonsWindow::RenderContent()
 void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 {
 	CContext*       ctx         = CContext::GetContext();
-	CSettings*      settingsctx = ctx->GetSettingsCtx();
 	CTextureLoader* texapi      = ctx->GetTextureService();
 	CUiContext*     uictx       = ctx->GetUIContext();
 	CLocalization*  lang        = uictx->GetLocalization();
@@ -342,25 +331,26 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 		}
 
 		/* View Mode */
-		Texture_t* viewModeIcon = this->IsListMode ? s_ViewModeIcon_List : s_ViewModeIcon_Tiles;
+		Texture_t* viewModeIcon = this->IsListMode.Get() ? s_ViewModeIcon_List : s_ViewModeIcon_Tiles;
 		if (viewModeIcon)
 		{
 			ImGui::SameLine();
 			if (ImGui::ImageButton(viewModeIcon->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
 			{
 				viewModeIcon = nullptr;
-				this->IsListMode = !this->IsListMode;
-				settingsctx->Set(OPT_ISLISTMODE, this->IsListMode);
+				this->IsListMode.Set(!this->IsListMode.Get());
 			}
 		}
 
 		/* Advanced Filters */
 		bool doPopHighlight = false;
 
+		const EAddonsFilterFlags filter = this->Filter.Get();
+
 		if (s_FilterIcon)
 		{
 			/* If filter does not match quick filter, highlight manual filter icon. */
-			if (this->Filter != FILTER_INSTALLED && this->Filter != FILTER_LIBRARY)
+			if (filter != FILTER_INSTALLED && filter != FILTER_LIBRARY)
 			{
 				ImGui::PushStyleColor(ImGuiCol_Button, style.Colors[ImGuiCol_ButtonActive]);
 				doPopHighlight = true;
@@ -379,52 +369,22 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 
 			if (ImGui::BeginPopupContextItem("Filters"))
 			{
-				bool showEnabled = (this->Filter & EAddonsFilterFlags::ShowEnabled) == EAddonsFilterFlags::ShowEnabled;
+				bool showEnabled = (filter & EAddonsFilterFlags::ShowEnabled) == EAddonsFilterFlags::ShowEnabled;
 				if (ImGui::Checkbox(lang->Translate("((000106))"), &showEnabled))
 				{
-					if (showEnabled)
-					{
-						this->Filter |= EAddonsFilterFlags::ShowEnabled;
-					}
-					else
-					{
-						this->Filter &= ~EAddonsFilterFlags::ShowEnabled;
-					}
-					settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
-					this->Invalidate();
-					this->ClearContent();
+					this->Filter.Set(showEnabled ? (filter | EAddonsFilterFlags::ShowEnabled) : (filter & ~EAddonsFilterFlags::ShowEnabled));
 				}
 
-				bool showDisabled = (this->Filter & EAddonsFilterFlags::ShowDisabled) == EAddonsFilterFlags::ShowDisabled;
+				bool showDisabled = (filter & EAddonsFilterFlags::ShowDisabled) == EAddonsFilterFlags::ShowDisabled;
 				if (ImGui::Checkbox(lang->Translate("((000107))"), &showDisabled))
 				{
-					if (showDisabled)
-					{
-						this->Filter |= EAddonsFilterFlags::ShowDisabled;
-					}
-					else
-					{
-						this->Filter &= ~EAddonsFilterFlags::ShowDisabled;
-					}
-					settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
-					this->Invalidate();
-					this->ClearContent();
+					this->Filter.Set(showDisabled ? (filter | EAddonsFilterFlags::ShowDisabled) : (filter & ~EAddonsFilterFlags::ShowDisabled));
 				}
 
-				bool showDownloadable = (this->Filter & EAddonsFilterFlags::ShowDownloadable) == EAddonsFilterFlags::ShowDownloadable;
+				bool showDownloadable = (filter & EAddonsFilterFlags::ShowDownloadable) == EAddonsFilterFlags::ShowDownloadable;
 				if (ImGui::Checkbox(lang->Translate("((000108))"), &showDownloadable))
 				{
-					if (showDownloadable)
-					{
-						this->Filter |= EAddonsFilterFlags::ShowDownloadable;
-					}
-					else
-					{
-						this->Filter &= ~EAddonsFilterFlags::ShowDownloadable;
-					}
-					settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
-					this->Invalidate();
-					this->ClearContent();
+					this->Filter.Set(showDownloadable ? (filter | EAddonsFilterFlags::ShowDownloadable) : (filter & ~EAddonsFilterFlags::ShowDownloadable));
 				}
 
 				ImGui::TextDisabled("%u / %u", this->Addons.size(), this->AddonsAmtUnfiltered);
@@ -436,8 +396,8 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 		ImGui::SameLine();
 
 		/* Quick Filter: Installed */
-		if ((this->Filter & FILTER_INSTALLED) == FILTER_INSTALLED &&
-			(this->Filter & ~FILTER_INSTALLED) == EAddonsFilterFlags::None)
+		if ((filter & FILTER_INSTALLED) == FILTER_INSTALLED &&
+			(filter & ~FILTER_INSTALLED) == EAddonsFilterFlags::None)
 		{
 			ImGui::PushStyleColor(ImGuiCol_Button, style.Colors[ImGuiCol_ButtonActive]);
 			doPopHighlight = true;
@@ -445,10 +405,7 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 
 		if (ImGui::Button(lang->Translate("((000031))")))
 		{
-			this->Filter = FILTER_INSTALLED;
-			settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
-			this->Invalidate();
-			this->ClearContent();
+			this->Filter.Set(FILTER_INSTALLED);
 		}
 
 		if (doPopHighlight)
@@ -460,8 +417,8 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 		ImGui::SameLine();
 
 		/* Quick Filter: Library */
-		if ((this->Filter & FILTER_LIBRARY) == FILTER_LIBRARY &&
-			(this->Filter & ~FILTER_LIBRARY) == EAddonsFilterFlags::None)
+		if ((filter & FILTER_LIBRARY) == FILTER_LIBRARY &&
+			(filter & ~FILTER_LIBRARY) == EAddonsFilterFlags::None)
 		{
 			ImGui::PushStyleColor(ImGuiCol_Button, style.Colors[ImGuiCol_ButtonActive]);
 			doPopHighlight = true;
@@ -469,10 +426,7 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 
 		if (ImGui::Button(lang->Translate("((000032))")))
 		{
-			this->Filter = FILTER_LIBRARY;
-			settingsctx->Set(OPT_ADDONFILTERS, this->Filter);
-			this->Invalidate();
-			this->ClearContent();
+			this->Filter.Set(FILTER_LIBRARY);
 		}
 
 		if (doPopHighlight)
@@ -513,7 +467,7 @@ void CAddonsWindow::RenderBody(ImVec2 aSize)
 		else
 		{
 			/* Addons list */
-			float addonItemWidth = this->IsListMode
+			float addonItemWidth = this->IsListMode.Get()
 				? (aSize.x - style.ScrollbarSize)
 				: ((aSize.x - style.ItemSpacing.x - style.ScrollbarSize) / 2);
 
@@ -521,7 +475,7 @@ void CAddonsWindow::RenderBody(ImVec2 aSize)
 
 			for (AddonListing_t& addon : this->Addons)
 			{
-				if (!this->IsListMode && i % 2 == 1)
+				if (!this->IsListMode.Get() && i % 2 == 1)
 				{
 					ImGui::SameLine();
 				}
@@ -1032,11 +986,10 @@ void CAddonsWindow::PopulateAddons()
 
 	CContext*    ctx = CContext::GetContext();
 	CUiContext*  uictx = ctx->GetUIContext();
-	CSettings*   settingsctx = ctx->GetSettingsCtx();
 	CLoader*     loader = ctx->GetLoader();
 	CLibraryMgr* libMgr = ctx->GetAddonLibrary();
 
-	this->Filter = settingsctx->Get<EAddonsFilterFlags>(OPT_ADDONFILTERS, FILTER_INSTALLED);
+	const EAddonsFilterFlags filter = this->Filter.Get();
 
 	for (IAddon* addon : loader->GetAddons())
 	{
@@ -1090,7 +1043,7 @@ void CAddonsWindow::PopulateAddons()
 	{
 		bool matchesFilter = false;
 
-		if ((this->Filter & EAddonsFilterFlags::ShowEnabled) == EAddonsFilterFlags::ShowEnabled)
+		if ((filter & EAddonsFilterFlags::ShowEnabled) == EAddonsFilterFlags::ShowEnabled)
 		{
 			/* Has local addon and is loaded -> Enabled */
 			if (it->Addon && it->Addon->IsLoaded())
@@ -1099,7 +1052,7 @@ void CAddonsWindow::PopulateAddons()
 			}
 		}
 
-		if ((this->Filter & EAddonsFilterFlags::ShowDisabled) == EAddonsFilterFlags::ShowDisabled)
+		if ((filter & EAddonsFilterFlags::ShowDisabled) == EAddonsFilterFlags::ShowDisabled)
 		{
 			/* Has local addon and is not loaded -> Disabled */
 			if (it->Addon && !it->Addon->IsLoaded())
@@ -1108,7 +1061,7 @@ void CAddonsWindow::PopulateAddons()
 			}
 		}
 
-		if ((this->Filter & EAddonsFilterFlags::ShowDownloadable) == EAddonsFilterFlags::ShowDownloadable)
+		if ((filter & EAddonsFilterFlags::ShowDownloadable) == EAddonsFilterFlags::ShowDownloadable)
 		{
 			/* Has no local addon, but a libdef -> Downloadable */
 			if (!it->Addon && it->HasLibDef)

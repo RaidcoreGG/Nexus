@@ -146,6 +146,23 @@ CGameBindsApi* CContext::GetGameBindsApi()
 	return &s_GameBindsApi;
 }
 
+CMouseResetFix* CContext::GetMouseResetFix()
+{
+	static CMouseResetFix s_MouseResetFix = CMouseResetFix();
+	return &s_MouseResetFix;
+}
+
+CGameWindow* CContext::GetGameWindow()
+{
+	static CGameWindow s_GameWindow = CGameWindow(
+		this->GetRendererCtx(),
+		this->GetLoader(),
+		this->GetDataLink(),
+		this->GetEventApi()
+	);
+	return &s_GameWindow;
+}
+
 CUiContext* CContext::GetUIContext()
 {
 	static CUiContext s_UiContext = CUiContext(
@@ -157,14 +174,6 @@ CUiContext* CContext::GetUIContext()
 		this->GetMumbleReader()
 	);
 	return &s_UiContext;
-}
-
-CSettings* CContext::GetSettingsCtx()
-{
-	static CSettings s_SettingsApi = CSettings(
-		Index(EPath::Settings)
-	);
-	return &s_SettingsApi;
 }
 
 CMumbleReader* CContext::GetMumbleReader()

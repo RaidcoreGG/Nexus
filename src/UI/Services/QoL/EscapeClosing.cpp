@@ -11,20 +11,10 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 
-#include "Host/GW2/Context.h"
-#include "Core/Preferences/PrefConst.h"
-#include "Core/Preferences/PrefContext.h"
 #include "Util/Inputs.h"
 
 CEscapeClosing::CEscapeClosing() : IRefCleaner("EscapeClosing")
 {
-	CContext* ctx = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
-
-	settingsctx->Subscribe<bool>(OPT_CLOSEESCAPE, [&](bool aNewValue)
-	{
-		this->Enabled = aNewValue;
-	});
 }
 
 CEscapeClosing::~CEscapeClosing()
@@ -33,7 +23,7 @@ CEscapeClosing::~CEscapeClosing()
 
 UINT CEscapeClosing::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	if (!this->Enabled)
+	if (!this->Enabled.Get())
 	{
 		return uMsg;
 	}

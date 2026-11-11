@@ -23,8 +23,6 @@
 #include "Host/GW2/Addons/Addon.h"
 #include "Host/GW2/Context.h"
 #include "Host/GW2/Index/Index.h"
-#include "Core/Preferences/PrefConst.h"
-#include "Core/Preferences/PrefContext.h"
 #include "Engine/Inputs/InputBinds/IbConst.h"
 #include "Host/GW2/Inputs/GameBinds/GbConst.h"
 #include "Host/GW2/Mumble/MblConst.h"
@@ -107,7 +105,6 @@
 {
 	CContext* ctx = CContext::GetContext();
 	CDataLinkApi* dlapi = ctx->GetDataLink();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
 	CUiContext* uictx = ctx->GetUIContext();
 	CFontManager* fontmgr = uictx->GetFontManager();
 
@@ -184,8 +181,8 @@ CUiContext::CUiContext(
 
 	this->FontManager    = new CFontManager(this->Language);
 	this->EscapeClose    = new CEscapeClosing();
-	this->Scaling        = new CScaling(aRenderContext, aDataLink, aEventApi, CContext::GetContext()->GetSettingsCtx()); // FIXME: What the fuck, why is the settingsctx not included here?
-	this->Input          = new CUiInput(CContext::GetContext()->GetSettingsCtx());
+	this->Scaling        = new CScaling(aRenderContext, aDataLink, aEventApi);
+	this->Input          = new CUiInput();
 
 	this->EventApi->Subscribe(EV_MUMBLE_IDENTITY_UPDATED,              CUiContext::OnMumbleIdentityChanged);
 	this->EventApi->Subscribe("EV_INPUTBIND_UPDATED",                  CUiContext::OnInputBindUpdate);
@@ -325,11 +322,7 @@ void CUiContext::Render()
 		ImGui_ImplDX11_NewFrame();
 		ImGui::NewFrame();
 
-		static CContext*  s_Context      = CContext::GetContext();
-		static CSettings* s_Settings     = s_Context->GetSettingsCtx();
-		static bool       s_EulaAccepted = s_Settings->Get<bool>(OPT_ACCEPTEULA, false);
-		
-		if (s_EulaAccepted)
+		if (this->EulaAccepted.Get())
 		{
 			/* normal overlay */
 			if (this->IsVisible)
@@ -357,10 +350,7 @@ void CUiContext::Render()
 			
 			if (s_Modal.Render())
 			{
-				/* Update state. */
-				s_EulaAccepted = s_Settings->Get<bool>(OPT_ACCEPTEULA, false);
-
-				if (s_EulaAccepted)
+				if (this->EulaAccepted.Get())
 				{
 					/* activate main window for the first time */
 					this->MainWindow->Activate();
@@ -441,6 +431,21 @@ CFontManager* CUiContext::GetFontManager()
 	return this->FontManager;
 }
 
+CMainWindow* CUiContext::GetMainWindow()
+{
+	return this->MainWindow;
+}
+
+CScaling* CUiContext::GetScaling()
+{
+	return this->Scaling;
+}
+
+CUiInput* CUiContext::GetInput()
+{
+	return this->Input;
+}
+
 CEscapeClosing* CUiContext::GetEscapeClosingService()
 {
 	return this->EscapeClose;
@@ -450,15 +455,12 @@ void CUiContext::LoadFonts()
 {
 	std::filesystem::path fontPath{};
 
-	CContext* ctx = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
-
 	/* add user font */
 	bool hasUserFont = false;
-	float storedFontSz = settingsctx->Get<float>(OPT_FONTSIZE, 15.0f);
+	float storedFontSz = this->FontManager->FontSize.Get();
 	storedFontSz = min(max(storedFontSz, 1.0f), 50.0f);
 
-	std::string fontFile = settingsctx->Get<std::string>(OPT_USERFONT, "");
+	std::string fontFile = this->FontManager->UserFont.Get();
 	if (!fontFile.empty() && std::filesystem::exists(Index(EPath::DIR_FONTS) / fontFile))
 	{
 		fontPath = Index(EPath::DIR_FONTS) / fontFile;

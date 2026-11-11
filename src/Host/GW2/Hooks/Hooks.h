@@ -39,9 +39,7 @@ namespace Hooks
 	{
 		extern WNDPROC          WndProc;
 		extern DXPRESENT        DXGIPresent;
-		extern DXPRESENT1       DXGIPresent1;
 		extern DXRESIZEBUFFERS  DXGIResizeBuffers;
-		extern DXRESIZEBUFFERS1 DXGIResizeBuffers1;
 	}
 
 	///----------------------------------------------------------------------------------------------------
@@ -65,16 +63,6 @@ namespace Hooks
 		);
 
 		///----------------------------------------------------------------------------------------------------
-		/// (DETOUR) IDXGISwapChain1::Present1
-		///----------------------------------------------------------------------------------------------------
-		HRESULT __stdcall DXGIPresent1(
-			IDXGISwapChain1*               pChain,
-			UINT                           SyncInterval,
-			UINT                           PresentFlags,
-			const DXGI_PRESENT_PARAMETERS* pPresentParameters
-		);
-
-		///----------------------------------------------------------------------------------------------------
 		/// (DETOUR) IDXGISwapChain::ResizeBuffers
 		///----------------------------------------------------------------------------------------------------
 		HRESULT __stdcall DXGIResizeBuffers(
@@ -84,20 +72,6 @@ namespace Hooks
 			UINT            Height,
 			DXGI_FORMAT     NewFormat,
 			UINT            SwapChainFlags
-		);
-
-		///----------------------------------------------------------------------------------------------------
-		/// (DETOUR) IDXGISwapChain3::ResizeBuffers1
-		///----------------------------------------------------------------------------------------------------
-		HRESULT __stdcall DXGIResizeBuffers1(
-			IDXGISwapChain3* pChain,
-			UINT             BufferCount,
-			UINT             Width,
-			UINT             Height,
-			DXGI_FORMAT      Format,
-			UINT             SwapChainFlags,
-			const UINT*      pCreationNodeMask,
-			IUnknown* const* ppPresentQueue
 		);
 	}
 }

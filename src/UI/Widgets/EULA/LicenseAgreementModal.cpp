@@ -17,7 +17,7 @@
 
 #include "Host/GW2/Context.h"
 #include "Host/GW2/Index/Index.h"
-#include "Core/Preferences/PrefConst.h"
+#include "UI/UiContext.h"
 
 CLicenseAgreementModal::CLicenseAgreementModal()
 {
@@ -81,14 +81,11 @@ void CLicenseAgreementModal::RenderContent()
 
 void CLicenseAgreementModal::OnClosing()
 {
-	CContext*  ctx         = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
-
 	switch (this->GetResult())
 	{
 		case EModalResult::OK:
 		{
-			settingsctx->Set(OPT_ACCEPTEULA, true);
+			CContext::GetContext()->GetUIContext()->EulaAccepted.Set(true);
 			break;
 		}
 		case EModalResult::Cancel:

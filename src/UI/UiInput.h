@@ -11,7 +11,7 @@
 #include <atomic>
 #include <cstdint>
 
-#include "Core/Preferences/PrefContext.h"
+#include "Core/Preferences/PrefSetting.h"
 #include <windows.h>
 #include "Util/Inputs.h"
 
@@ -42,7 +42,7 @@ class CUiInput
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CUiInput(CSettings* aSettings);
+	CUiInput();
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -61,11 +61,10 @@ class CUiInput
 	///----------------------------------------------------------------------------------------------------
 	void FlushInput();
 
-	private:
-	CSettings* Settings;
+	CSetting<EModifiers> RequiredModifiers{ "UI_Modifiers", EModifiers::None };
+	CSetting<bool>       FilterClicks     { "UI_ClickingRequiresModifiers", false };
 
-	EModifiers RequiredModifiers;
-	bool       FilterClicks;
+	private:
 
 	#define RING_SIZE 2048u
 	#define RING_MASK RING_SIZE - 1

@@ -9,10 +9,11 @@
 #pragma once
 
 #include "Host/GW2/Addons/API/NexusLink.h"
-#include "Core/Preferences/PrefContext.h"
+#include "Core/Preferences/PrefSetting.h"
 #include <windows.h>
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
+#include "Host/GW2/Mumble/MblConst.h"
 #include "Host/GW2/Mumble/MblReader.h"
 #include "UI/Renderer/RdrContext.h"
 
@@ -40,8 +41,7 @@ class CScaling
 	CScaling(
 		RenderContext_t* aRenderCtx,
 		CDataLinkApi*    aDataLink,
-		CEventApi*       aEventApi,
-		CSettings*       aSettings
+		CEventApi*       aEventApi
 	);
 
 	///----------------------------------------------------------------------------------------------------
@@ -77,14 +77,11 @@ class CScaling
 	RenderContext_t*  RenderContext;
 	CDataLinkApi*     DataLink;
 	CEventApi*        EventApi;
-	CSettings*        Settings;
 	Mumble::Identity* MumbleIdentity;
 	NexusLinkData_t*  NexusLink;
 
-	bool              DpiScalingEnabled;
 	float             DpiScalingFactor;
 	float             EffectiveDpiScalingFactor;
-	float             GameScalingFactor;
 	float             MinResolutionScalingFactor;
 
 	///----------------------------------------------------------------------------------------------------
@@ -92,4 +89,7 @@ class CScaling
 	/// 	Updates the scaling factor of the UI.
 	///----------------------------------------------------------------------------------------------------
 	void UpdateScaling();
+	public:
+	CSetting<bool>    DpiScaling { "DPIScaling", true, [this](const bool&) { this->UpdateDPI(); } };
+	CSetting<float>   LastUIScale{ "LastUIScale", SC_NORMAL };
 };

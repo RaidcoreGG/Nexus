@@ -10,30 +10,29 @@
 
 CRawInputApi::CRawInputApi() : IRefCleaner("RawInputApi")
 {
+	this->Attach(WNDPROC_PRIO_ADDONS);
 }
 
 CRawInputApi::~CRawInputApi()
 {
+	this->Detach();
 }
 
-UINT CRawInputApi::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+UINT CRawInputApi::OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam)
 {
+	const std::lock_guard<std::recursive_mutex> lock(this->Mutex);
+
+	std::shared_ptr<const std::vector<WNDPROC_CALLBACK>> registry = this->Registry;
+
+	for (WNDPROC_CALLBACK wndprocCb : *registry)
 	{
-		const std::lock_guard<std::recursive_mutex> lock(this->Mutex);
-
-		std::shared_ptr<const std::vector<WNDPROC_CALLBACK>> registry = this->Registry;
-
-		/* Addons first, before any native subscriber. */
-		for (WNDPROC_CALLBACK wndprocCb : *registry)
+		if (wndprocCb(hWnd, uMsg, wParam, lParam) == 0)
 		{
-			if (wndprocCb(hWnd, uMsg, wParam, lParam) == 0)
-			{
-				return 0;
-			}
+			return NOTIFY_CONSUMED;
 		}
 	}
 
-	return this->NotifyWndProc(hWnd, uMsg, wParam, lParam);
+	return 1;
 }
 
 void CRawInputApi::Register(WNDPROC_CALLBACK aWndProcCallback)

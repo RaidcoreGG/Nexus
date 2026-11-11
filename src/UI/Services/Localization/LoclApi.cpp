@@ -19,7 +19,6 @@ using json = nlohmann::json;
 #include "Host/GW2/Index/Index.h"
 #include "res/Resources.h"
 #include "Host/GW2/Context.h"
-#include "Core/Preferences/PrefConst.h"
 
 static CLocalization* s_Localization{};
 
@@ -66,7 +65,6 @@ static CLocalization* s_Localization{};
 CLocalization::CLocalization()
 {
 	CContext* ctx = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
 	CEventApi* evtapi = ctx->GetEventApi();
 
 	this->SetLocaleDirectory(Index(EPath::DIR_LOCALES));
@@ -82,7 +80,7 @@ CLocalization::CLocalization()
 	Resources::LocalePL.Unpack(Index(EPath::LocalePL));
 	Resources::LocaleRU.Unpack(Index(EPath::LocaleRU));
 
-	std::string lang = settingsctx->Get<std::string>(OPT_LANGUAGE, "en");
+	std::string lang = this->Language.Get();
 	this->SetLanguage(!lang.empty() ? lang : "en");
 
 	evtapi->Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", reinterpret_cast<EVENT_CONSUME>(CLocalization::OnUELanguageChanged));

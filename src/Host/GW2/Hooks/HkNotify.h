@@ -13,10 +13,12 @@
 
 #include "Engine/Notifier/Notifier.h"
 
+constexpr int32_t DXGIPRESENT_PRIO_WINDOW   = 0;
 constexpr int32_t DXGIPRESENT_PRIO_TEXTURES = 200;
 constexpr int32_t DXGIPRESENT_PRIO_UI       = 300;
 
 constexpr int32_t DXGIRESIZE_PRIO_UI        = 100;
+constexpr int32_t DXGIRESIZE_PRIO_WINDOW    = 200;
 
 ///----------------------------------------------------------------------------------------------------
 /// IDxgiPresentNotifyHandler Interface

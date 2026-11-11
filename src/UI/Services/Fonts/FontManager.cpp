@@ -12,8 +12,6 @@
 
 #include "imgui/imgui_internal.h"
 
-#include "Host/GW2/Context.h"
-#include "Core/Preferences/PrefConst.h"
 #include "res/Resources.h"
 
 using namespace Raidcore::Core::Platform::Windows;
@@ -22,14 +20,11 @@ CFontManager::CFontManager(CLocalization* aLocalization) : IRefCleaner("FontMana
 {
 	this->Language = aLocalization;
 
-	CContext* ctx = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
-
-	float storedFontSz = settingsctx->Get<float>(OPT_FONTSIZE, 15.0f);
+	float storedFontSz = this->FontSize.Get();
 	if (storedFontSz <= 0)
 	{
 		storedFontSz = min(max(storedFontSz, 1.0f), 50.0f);
-		settingsctx->Set(OPT_FONTSIZE, storedFontSz);
+		this->FontSize.Set(storedFontSz);
 	}
 	ImGui::GetCurrentContext()->FontSize = storedFontSz;
 }

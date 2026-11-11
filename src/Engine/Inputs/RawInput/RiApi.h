@@ -19,7 +19,7 @@
 ///----------------------------------------------------------------------------------------------------
 /// CRawInputApi Class
 ///----------------------------------------------------------------------------------------------------
-class CRawInputApi : public virtual IRefCleaner, public IWndProcNotifier
+class CRawInputApi : public virtual IRefCleaner, public IWndProcNotifyHandler
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -33,11 +33,10 @@ class CRawInputApi : public virtual IRefCleaner, public IWndProcNotifier
 	~CRawInputApi();
 
 	///----------------------------------------------------------------------------------------------------
-	/// WndProc:
-	/// 	Passes the message to the addon callbacks, then to the native subscribers.
-	/// 	Returns 0 if message was processed or non-zero, if it should be passed to the game.
+	/// OnWndProcNotify:
+	/// 	Passes the message to the addon callbacks. Returns 0 if one of them consumed it.
 	///----------------------------------------------------------------------------------------------------
-	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	UINT OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Register:

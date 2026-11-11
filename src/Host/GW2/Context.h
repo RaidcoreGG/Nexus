@@ -14,7 +14,6 @@
 #include "Host/GW2/Addons/Config/CfgManager.h"
 #include "Host/GW2/Addons/Library/LibManager.h"
 #include "Core/Platform/Windows/Exe/ExeCrashHandler.h"
-#include "Core/Preferences/PrefContext.h"
 #include "Host/GW2/Updater/SelfUpdater.h"
 #include "Core/Versioning/Version.h"
 #include "Engine/DataLink/DlApi.h"
@@ -25,7 +24,9 @@
 #include "Core/Logging/LogApi.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
 #include "Host/GW2/ArcDPS/ArcApi.h"
+#include "Host/GW2/Hooks/HkGameWindow.h"
 #include "Host/GW2/Inputs/GameBinds/GbApi.h"
+#include "Host/GW2/Inputs/MouseResetFix.h"
 #include "Host/GW2/Mumble/MblReader.h"
 #include "UI/Renderer/RdrContext.h"
 #include "UI/Textures/TxLoader.h"
@@ -69,9 +70,11 @@ class CContext
 
 	CGameBindsApi* GetGameBindsApi();
 
-	CUiContext* GetUIContext();
+	CMouseResetFix* GetMouseResetFix();
 
-	CSettings* GetSettingsCtx();
+	CGameWindow* GetGameWindow();
+
+	CUiContext* GetUIContext();
 
 	CMumbleReader* GetMumbleReader();
 

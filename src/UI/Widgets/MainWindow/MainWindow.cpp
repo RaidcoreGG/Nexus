@@ -14,7 +14,6 @@
 #include "imgui/imgui_internal.h"
 
 #include "Host/GW2/Context.h"
-#include "Core/Preferences/PrefConst.h"
 #include "res/Resources.h"
 #include "SnowflakeMgr.h"
 #include "UI/Widgets/MainWindow/About/About.h"
@@ -64,10 +63,7 @@ static CMainWindow* s_MainWindow{};
 {
 	if (!s_MainWindow) { return; }
 
-	CContext*  ctx         = CContext::GetContext();
-	CSettings* settingsctx = ctx->GetSettingsCtx();
-
-	if (settingsctx->Get<bool>(OPT_SHOWADDONSWINDOWAFTERDUU, false))
+	if (s_MainWindow->ShowAddonsAfterGameUpdate.Get())
 	{
 		s_MainWindow->Activate("Addons");
 	}

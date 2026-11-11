@@ -17,6 +17,7 @@
     <ClCompile Include="src\Host\GW2\Addons\Library\LibManager.cpp" />
     <ClCompile Include="src\Host\GW2\Context.cpp" />
     <ClCompile Include="src\Host\GW2\Hooks\Hooks.cpp" />
+    <ClCompile Include="src\Host\GW2\Hooks\HkGameWindow.cpp" />
     <ClCompile Include="src\Host\GW2\Updater\SelfUpdater.cpp" />
     <ClCompile Include="src\Engine\Cleanup\RefCleanerBase.cpp" />
     <ClCompile Include="src\Engine\Cleanup\RefCleanerContext.cpp" />
@@ -33,6 +34,7 @@
     <ClCompile Include="src\Host\GW2\ArcDPS\ArcApi.cpp" />
     <ClCompile Include="src\Host\GW2\Build\BuildInfo.cpp" />
     <ClCompile Include="src\Host\GW2\Inputs\GameBinds\GbApi.cpp" />
+    <ClCompile Include="src\Host\GW2\Inputs\MouseResetFix.cpp" />
     <ClCompile Include="src\Host\GW2\Inputs\GameBinds\GbConst.cpp" />
     <ClCompile Include="src\Engine\Inputs\InputBinds\IbCapture.cpp" />
     <ClCompile Include="src\Engine\Inputs\InputBinds\IbConst.cpp" />
@@ -117,7 +119,7 @@
     <ClInclude Include="src\Host\GW2\Hooks\HkFuncDefs.h" />
     <ClInclude Include="src\Host\GW2\Hooks\Hooks.h" />
     <ClInclude Include="src\Host\GW2\Hooks\HkNotify.h" />
-    <ClInclude Include="src\Core\Preferences\PrefConst.h" />
+    <ClInclude Include="src\Host\GW2\Hooks\HkGameWindow.h" />
     <ClInclude Include="src\Proxy\Proxy.h" />
     <ClInclude Include="src\Proxy\PxyD3D11.h" />
     <ClInclude Include="src\Proxy\PxyD3D9.h" />
@@ -378,6 +380,8 @@
     <ClInclude Include="src\Host\GW2\Index\IdxFuncDefs.h" />
     <ClInclude Include="res\Resources.h" />
     <ClInclude Include="src\Core\Preferences\PrefContext.h" />
+    <ClInclude Include="src\Core\Preferences\PrefSetting.h" />
+    <ClInclude Include="src\Core\Preferences\PrefSettingBase.h" />
     <ClInclude Include="thirdparty\pugixml\pugiconfig.hpp" />
     <ClInclude Include="thirdparty\pugixml\pugixml.hpp" />
     <ClInclude Include="thirdparty\stb\stb_image.h" />

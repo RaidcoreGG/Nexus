@@ -21,19 +21,13 @@
 
 #include "Host/GW2/Context.h"
 #include "Host/GW2/Main.h"
-#include "Host/GW2/Addons/API/NexusLink.h"
-#include "Engine/DataLink/DlApi.h"
-#include "Engine/Events/EvtApi.h"
-#include "Engine/Inputs/InputBinds/IbApi.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
-#include "Engine/Loader/Loader.h"
 #include "Core/Logging/LogApi.h"
 #include "Host/GW2/Inputs/GameBinds/GbApi.h"
 #include "Host/GW2/Inputs/MouseResetFix.h"
-#include "HkConst.h"
 #include "HkFuncDefs.h"
+#include "HkGameWindow.h"
 #include "HkNotify.h"
-#include "UI/Renderer/RdrContext.h"
 #include "UI/Textures/TxLoader.h"
 #include "UI/UiContext.h"
 
@@ -58,6 +52,21 @@ namespace Hooks
 	};
 
 	static CDxgiNotifier s_DxgiNotifier;
+
+	///----------------------------------------------------------------------------------------------------
+	/// CWndProcNotifier Class
+	/// 	Source of the window message notification raised by the window procedure detour.
+	///----------------------------------------------------------------------------------------------------
+	class CWndProcNotifier : public IWndProcNotifier
+	{
+		public:
+		UINT WndProc(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam)
+		{
+			return this->NotifyWndProc(hWnd, uMsg, wParam, lParam);
+		}
+	};
+
+	static CWndProcNotifier s_WndProcNotifier;
 
 	inline PBYTE FollowJmpChain(PBYTE aPointer)
 	{
@@ -147,20 +156,24 @@ namespace Hooks
 
 			/* Create and enable VT hooks. */
 			/* Follow the jump chain to work nicely with various other hooks. */
-			MH_CreateHook(FollowJmpChain((PBYTE)vtbl[8]),  (LPVOID)&Detour::DXGIPresent,       (LPVOID*)&Target::DXGIPresent      );
-			MH_CreateHook(FollowJmpChain((PBYTE)vtbl[13]), (LPVOID)&Detour::DXGIResizeBuffers, (LPVOID*)&Target::DXGIResizeBuffers);
+			
+			if (vtbl)
+			{
+				MH_CreateHook(FollowJmpChain((PBYTE)vtbl[8]), (LPVOID)&Detour::DXGIPresent, (LPVOID*)&Target::DXGIPresent);
+				MH_CreateHook(FollowJmpChain((PBYTE)vtbl[13]), (LPVOID)&Detour::DXGIResizeBuffers, (LPVOID*)&Target::DXGIResizeBuffers);
+			}
 
-			if (vtbl1)
+			/*if (vtbl1)
 			{
 				MH_CreateHook(FollowJmpChain((PBYTE)vtbl1[22]), (LPVOID)&Detour::DXGIPresent1, (LPVOID*)&Target::DXGIPresent1);
 				swap1->Release();
-			}
+			}*/
 
-			if (vtbl3)
+			/*if (vtbl3)
 			{
 				MH_CreateHook(FollowJmpChain((PBYTE)vtbl3[26]), (LPVOID)&Detour::DXGIResizeBuffers1, (LPVOID*)&Target::DXGIResizeBuffers1);
 				swap3->Release();
-			}
+			}*/
 
 			MH_EnableHook(MH_ALL_HOOKS);
 
@@ -184,113 +197,47 @@ namespace Hooks
 	{
 		WNDPROC          WndProc            = nullptr;
 		DXPRESENT        DXGIPresent        = nullptr;
-		DXPRESENT1       DXGIPresent1       = nullptr;
 		DXRESIZEBUFFERS  DXGIResizeBuffers  = nullptr;
-		DXRESIZEBUFFERS1 DXGIResizeBuffers1 = nullptr;
 	}
 
 	namespace Detour
 	{
 		LRESULT __stdcall WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
-			static CContext*      s_Context      = CContext::GetContext();
-			static CRawInputApi*  s_RawInputApi  = s_Context->GetRawInputApi();
-			static CGameBindsApi* s_GameBindsApi = s_Context->GetGameBindsApi();
+			static CContext* s_Context = CContext::GetContext();
 
-			/* Addon callbacks, then loader, UI and input binds by priority. */
-			if (s_RawInputApi->WndProc(hWnd, uMsg, wParam, lParam) == 0) { return 0; }
+			/* Created here, so they are subscribed before the first message is notified. */
+			static CRawInputApi*   s_RawInputApi   = s_Context->GetRawInputApi();
+			static CGameBindsApi*  s_GameBindsApi  = s_Context->GetGameBindsApi();
+			static CMouseResetFix* s_MouseResetFix = s_Context->GetMouseResetFix();
 
-			if (uMsg == WM_DESTROY)
-			{
-				Main::Shutdown(uMsg);
-			}
-
-			// shift game only messages back to normal messages.
-			s_GameBindsApi->RedirectGameOnly(hWnd, uMsg, wParam, lParam);
-
-			MouseResetFix(hWnd, uMsg, wParam, lParam);
+			if (s_WndProcNotifier.WndProc(hWnd, uMsg, wParam, lParam) == NOTIFY_CONSUMED) { return 0; }
 
 			return CallWindowProcA(Target::WndProc, hWnd, uMsg, wParam, lParam);
 		}
 
-		void Present_Internal(IDXGISwapChain* aSwapChain)
+		HRESULT __stdcall DXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
 		{
 			static CContext* s_Context = CContext::GetContext();
-			static RenderContext_t* s_RenderCtx = s_Context->GetRendererCtx();
-			static CLoader* s_Loader = s_Context->GetLoader();
 
 			/* Created here, so they are subscribed before the first present is notified. */
+			static CGameWindow* s_GameWindow = s_Context->GetGameWindow();
 			static CTextureLoader* s_TextureLoader = s_Context->GetTextureService();
 			static CUiContext* s_UIContext = s_Context->GetUIContext();
 
-			/* Increment count at the beginning of the frame. */
-			s_RenderCtx->Metrics.FrameCount++;
+			s_DxgiNotifier.Present(pChain);
 
-			/* The swap chain we used to hook is different than the one the game created.
-			 * To be precise, we should have no swapchain at all right now. */
-			if (s_RenderCtx->SwapChain != aSwapChain)
-			{
-				s_RenderCtx->SwapChain = aSwapChain;
-
-				DXGI_SWAP_CHAIN_DESC swapChainDesc{};
-				s_RenderCtx->SwapChain->GetDesc(&swapChainDesc);
-
-				s_RenderCtx->Window.Handle = swapChainDesc.OutputWindow;
-				Target::WndProc = (WNDPROC)SetWindowLongPtr(s_RenderCtx->Window.Handle, GWLP_WNDPROC, (LONG_PTR)Detour::WndProc);
-
-				s_Loader->InitDirectoryUpdates(s_RenderCtx->Window.Handle);
-			}
-
-			s_DxgiNotifier.Present(aSwapChain);
-		}
-
-		HRESULT __stdcall DXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
-		{
-			Present_Internal(pChain);
 			return Target::DXGIPresent(pChain, SyncInterval, Flags);
-		}
-
-		HRESULT __stdcall DXGIPresent1(IDXGISwapChain1* pChain, UINT SyncInterval, UINT PresentFlags, const DXGI_PRESENT_PARAMETERS* pPresentParameters)
-		{
-			Present_Internal(pChain);
-			return Target::DXGIPresent1(pChain, SyncInterval, PresentFlags, pPresentParameters);
-		}
-
-		void Resize_Internal(IDXGISwapChain* aSwapChain, uint32_t aWidth, uint32_t aHeight)
-		{
-			static CContext* s_Context = CContext::GetContext();
-			static CDataLinkApi* s_DataLink = s_Context->GetDataLink();
-			static CEventApi* s_EventApi = s_Context->GetEventApi();
-			static RenderContext_t* s_RenderCtx = s_Context->GetRendererCtx();
-
-			s_DxgiNotifier.Resize(aSwapChain, aWidth, aHeight);
-
-			/* Cache window dimensions */
-			s_RenderCtx->Window.Width = aWidth;
-			s_RenderCtx->Window.Height = aHeight;
-			
-			NexusLinkData_t* nexuslink = (NexusLinkData_t*)s_DataLink->GetResource(DL_NEXUS_LINK);
-
-			if (nexuslink)
-			{
-				/* Already write to nexus link, as addons depend on that and the next frame isn't called yet so no update to values */
-				nexuslink->Width = aWidth;
-				nexuslink->Height = aHeight;
-			}
-
-			s_EventApi->Raise(EV_WINDOW_RESIZED);
 		}
 
 		HRESULT __stdcall DXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
 		{
-			Resize_Internal(pChain, Width, Height);
-			return Target::DXGIResizeBuffers(pChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
-		}
+			/* The game may resize before its first present. */
+			static CGameWindow* s_GameWindow = CContext::GetContext()->GetGameWindow();
 
-		HRESULT __stdcall DXGIResizeBuffers1(IDXGISwapChain3* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT Format, UINT SwapChainFlags, const UINT* pCreationNodeMask, IUnknown* const* ppPresentQueue)
-		{
-			Resize_Internal(pChain, Width, Height);
-			return Target::DXGIResizeBuffers1(pChain, BufferCount, Width, Height, Format, SwapChainFlags, pCreationNodeMask, ppPresentQueue);
+			s_DxgiNotifier.Resize(pChain, Width, Height);
+
+			return Target::DXGIResizeBuffers(pChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
 		}
 	}
 }

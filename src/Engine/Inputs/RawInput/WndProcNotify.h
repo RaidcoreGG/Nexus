@@ -13,9 +13,13 @@
 
 #include "Engine/Notifier/Notifier.h"
 
+constexpr int32_t WNDPROC_PRIO_ADDONS     = 0;
 constexpr int32_t WNDPROC_PRIO_LOADER     = 100;
 constexpr int32_t WNDPROC_PRIO_UI         = 300;
 constexpr int32_t WNDPROC_PRIO_INPUTBINDS = 400;
+constexpr int32_t WNDPROC_PRIO_GAMEBINDS  = 500;
+constexpr int32_t WNDPROC_PRIO_MOUSEFIX   = 600;
+constexpr int32_t WNDPROC_PRIO_SHUTDOWN   = 1000;
 
 ///----------------------------------------------------------------------------------------------------
 /// IWndProcNotifyHandler Interface

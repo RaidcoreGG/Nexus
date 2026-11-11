@@ -13,24 +13,9 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 
-#include "Core/Preferences/PrefConst.h"
 
-CUiInput::CUiInput(CSettings* aSettings)
+CUiInput::CUiInput()
 {
-	this->Settings = aSettings;
-
-	this->RequiredModifiers = this->Settings->Get<EModifiers>(OPT_UI_MODS, EModifiers::None);
-	this->FilterClicks      = this->Settings->Get<bool>(OPT_UI_CLICK_MODSONLY, false);
-
-	this->Settings->Subscribe<EModifiers>(OPT_UI_MODS, [&](EModifiers aModifiers)
-	{
-		this->RequiredModifiers = aModifiers;
-	});
-
-	this->Settings->Subscribe<bool>(OPT_UI_CLICK_MODSONLY, [&](bool aFilterClicks)
-	{
-		this->FilterClicks = aFilterClicks;
-	});
 }
 
 CUiInput::~CUiInput()
@@ -55,7 +40,10 @@ UINT CUiInput::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		activeModifiers |= EModifiers::Shift;
 	}
 
-	bool reqModsDown = (this->RequiredModifiers & activeModifiers) == this->RequiredModifiers;
+	const EModifiers requiredModifiers = this->RequiredModifiers.Get();
+	const bool       filterClicks      = this->FilterClicks.Get();
+
+	bool reqModsDown = (requiredModifiers & activeModifiers) == requiredModifiers;
 
 	switch (uMsg)
 	{
@@ -75,12 +63,12 @@ UINT CUiInput::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			if (io.WantCaptureMouse && !Inputs::IsCursorHidden())
 			{
-				if (!this->FilterClicks)
+				if (!filterClicks)
 				{
 					io.MouseDown[0] = true;
 					return 0;
 				}
-				else if (this->FilterClicks && reqModsDown)
+				else if (filterClicks && reqModsDown)
 				{
 					io.MouseDown[0] = true;
 					return 0;
@@ -98,12 +86,12 @@ UINT CUiInput::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			if (io.WantCaptureMouse && !Inputs::IsCursorHidden())
 			{
-				if (!this->FilterClicks)
+				if (!filterClicks)
 				{
 					io.MouseDown[1] = true;
 					return 0;
 				}
-				else if (this->FilterClicks && reqModsDown)
+				else if (filterClicks && reqModsDown)
 				{
 					io.MouseDown[1] = true;
 					return 0;

@@ -8,147 +8,89 @@
 
 #pragma once
 
+#include <chrono>
+#include <condition_variable>
 #include <filesystem>
 #include <mutex>
-
-#pragma warning(push, 0)
-#include "nlohmann/json.hpp"
-#pragma warning(pop)
-using json = nlohmann::json;
+#include <string>
+#include <thread>
+#include <unordered_map>
 
 #include "Core/Logging/LogApi.h"
+#include "PrefSettingBase.h"
 
-constexpr const char* CH_SETTINGS = "Settings";
+constexpr const char*               CH_SETTINGS = "Settings";
+constexpr std::chrono::milliseconds FLUSH_DELAY = std::chrono::seconds(1);
 
 ///----------------------------------------------------------------------------------------------------
-/// CSettings Class
+/// CPreferences Class
 ///----------------------------------------------------------------------------------------------------
-class CSettings
+class CPreferences
 {
 	public:
-	CSettings(std::filesystem::path aPath);
-
-	///----------------------------------------------------------------------------------------------------
-	/// Load:
-	/// 	Loads the settings.
-	///----------------------------------------------------------------------------------------------------
-	void Load();
-
-	///----------------------------------------------------------------------------------------------------
-	/// Save:
-	/// 	Saves the settings.
-	///----------------------------------------------------------------------------------------------------
-	void Save();
-
-	///----------------------------------------------------------------------------------------------------
-	/// Set:
-	/// 	Stores a setting.
-	///----------------------------------------------------------------------------------------------------
-	template <typename T>
-	void Set(const std::string& aIdentifier, T aValue)
-	{
-		const std::lock_guard<std::mutex> lock(this->Mutex);
-
-		this->Store[aIdentifier] = aValue;
-		this->SaveInternal();
-
-		this->NotifyChanged(aIdentifier, this->Store[aIdentifier]);
-	}
-
 	///----------------------------------------------------------------------------------------------------
 	/// Get:
-	/// 	Retrieves a setting.
+	/// 	Returns the process-wide settings store.
 	///----------------------------------------------------------------------------------------------------
-	template <typename T>
-	T Get(const std::string& aIdentifier, T aDefaultValue = {})
-	{
-		const std::lock_guard<std::mutex> lock(this->Mutex);
-
-		if (this->Store[aIdentifier].is_null())
-		{
-			this->Store[aIdentifier] = aDefaultValue;
-			this->SaveInternal();
-
-			this->NotifyChanged(aIdentifier, this->Store[aIdentifier]);
-
-			return aDefaultValue;
-		}
-
-		return this->Store[aIdentifier].get<T>();
-	}
+	static CPreferences* Get();
 
 	///----------------------------------------------------------------------------------------------------
-	/// Subscribe:
-	/// 	Subscribes to updates when a setting is changed.
-	/// 	Immediately notifies the subscribed callback with the value.
+	/// Init:
+	/// 	Sets the settings file, loads it and starts saving changes. Call exactly once, before any write.
+	/// 	Settings registered before take the loaded values.
 	///----------------------------------------------------------------------------------------------------
-	template <typename T>
-	void Subscribe(const std::string& aIdentifier, std::function<void(T)> aCallback)
-	{
-		OnChangeCallback wrapperCb = [callback = std::move(aCallback)](const json& aValue)
-		{
-			try
-			{
-				callback(aValue.get<T>());
-			}
-			catch (...)
-			{
-				// TODO: Error handling
-			}
-		};
-
-		{
-			const std::lock_guard<std::mutex> lock(this->NotifierMutex);
-
-			std::vector<OnChangeCallback>& notifiers = this->Notifiers[aIdentifier];
-			notifiers.push_back(wrapperCb);
-		}
-
-		/* Notify the new subscriber. */
-		{
-			const std::lock_guard<std::mutex> lock(this->Mutex);
-
-			/* Only notify, if not null. */
-			if (!this->Store[aIdentifier].is_null())
-			{
-				wrapperCb(this->Store[aIdentifier]);
-			}
-		}
-	}
+	void Init(std::filesystem::path aPath);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Remove:
-	/// 	Removes a setting entirely.
+	/// Register:
+	/// 	Registers a setting and gives it the stored value. Each key has exactly one owner.
 	///----------------------------------------------------------------------------------------------------
-	void Remove(const std::string& aIdentifier);
+	void Register(ISetting* aSetting);
+
+	///----------------------------------------------------------------------------------------------------
+	/// Deregister:
+	/// 	Unregisters a setting.
+	///----------------------------------------------------------------------------------------------------
+	void Deregister(ISetting* aSetting);
+
+	///----------------------------------------------------------------------------------------------------
+	/// Write:
+	/// 	Persists the value of a registered setting.
+	///----------------------------------------------------------------------------------------------------
+	void Write(const std::string& aKey, json aValue);
+
+	~CPreferences();
 
 	private:
-	std::filesystem::path                                          Path;
+	CPreferences();
 
-	/* Settings */
-	std::mutex                                                     Mutex;
-	json                                                           Store;
+	std::filesystem::path                      Path;
 
-	/* Notifiers */
-	using OnChangeCallback = std::function<void(const json&)>;
-	std::mutex                                                     NotifierMutex;
-	std::unordered_map<std::string, std::vector<OnChangeCallback>> Notifiers;
+	std::mutex                                 Mutex;
+	json                                       Store;
+	std::unordered_map<std::string, ISetting*> Registry;
+	bool                                       IsInitialized = false;
+	bool                                       IsDirty       = false;
+	bool                                       IsRunning     = false;
 
-	///----------------------------------------------------------------------------------------------------
-	/// Load:
-	/// 	Loads the settings without locking the mutex.
-	///----------------------------------------------------------------------------------------------------
-	void LoadInternal();
+	std::condition_variable                    FlushCondition;
+	std::thread                                FlushThread;
 
 	///----------------------------------------------------------------------------------------------------
-	/// Save:
-	/// 	Saves the settings without locking the mutex.
+	/// LoadInternal:
+	/// 	Loads the settings without locking the mutex. Returns false if the file must not be overwritten.
 	///----------------------------------------------------------------------------------------------------
-	void SaveInternal();
+	bool LoadInternal();
 
 	///----------------------------------------------------------------------------------------------------
-	/// NotifyChanged:
-	/// 	Calls the notifiers of a given settings identifier with the new value.
+	/// SaveInternal:
+	/// 	Writes the given settings to the file.
 	///----------------------------------------------------------------------------------------------------
-	void NotifyChanged(const std::string& aIdentifier, const json& aNewValue);
+	void SaveInternal(const json& aStore);
+
+	///----------------------------------------------------------------------------------------------------
+	/// FlushLoop:
+	/// 	Sleeps until a change, then saves FLUSH_DELAY after it, together with the changes made meanwhile.
+	///----------------------------------------------------------------------------------------------------
+	void FlushLoop();
 };
