@@ -162,7 +162,7 @@ void* CDataLinkApi::ShareResource(const char* aIdentifier, size_t aResourceSize,
 		}
 		case ELinkedResourceType::Internal:
 		{
-			resource.Pointer = new char[resource.Size];
+			resource.Pointer = new char[resource.Size]{};
 
 			this->LogInfo("Created internal shared resource: \"%s\"", aIdentifier);
 			break;
