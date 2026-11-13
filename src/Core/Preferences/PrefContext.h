@@ -16,16 +16,15 @@
 #include <thread>
 #include <unordered_map>
 
-#include "Core/Logging/LogApi.h"
+#include "Core/Logging/LogChannel.h"
 #include "PrefSettingBase.h"
 
-constexpr const char*               CH_SETTINGS = "Settings";
 constexpr std::chrono::milliseconds FLUSH_DELAY = std::chrono::seconds(1);
 
 ///----------------------------------------------------------------------------------------------------
 /// CPreferences Class
 ///----------------------------------------------------------------------------------------------------
-class CPreferences
+class CPreferences : public ILogChannel
 {
 	public:
 	///----------------------------------------------------------------------------------------------------

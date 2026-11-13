@@ -13,7 +13,7 @@
 #include "Util/Strings.h"
 #include "Util/MD5.h"
 
-CLoader::CLoader(IADDON_FACTORY aFactoryFunction, std::filesystem::path aDirectory)
+CLoader::CLoader(IADDON_FACTORY aFactoryFunction, std::filesystem::path aDirectory) : ILogChannel("Loader")
 {
 	this->CreateAddon = aFactoryFunction;
 	this->Directory = aDirectory;
@@ -74,7 +74,7 @@ void CLoader::InitDirectoryUpdates(HWND aWndHandle)
 
 	if (this->FSItemList == 0)
 	{
-		LogWarning(CH_LOADER, "Automatic addon loading disabled. Reason: SHParseDisplayName(...) returned %d.", hresult);
+		this->LogWarning("Automatic addon loading disabled. Reason: SHParseDisplayName(...) returned %d.", hresult);
 		return;
 	}
 
@@ -94,11 +94,11 @@ void CLoader::InitDirectoryUpdates(HWND aWndHandle)
 
 	if (this->FSNotifierID == 0)
 	{
-		LogWarning(CH_LOADER, "Automatic addon loading disabled. Reason: SHChangeNotifyRegister(...) returned 0.");
+		this->LogWarning("Automatic addon loading disabled. Reason: SHChangeNotifyRegister(...) returned 0.");
 		return;
 	}
 
-	LogInfo(CH_LOADER, "Automatic addon loading enabled.");
+	this->LogInfo("Automatic addon loading enabled.");
 }
 
 UINT CLoader::OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam)
@@ -139,7 +139,7 @@ void CLoader::NotifyChanges()
 	std::lock_guard<std::mutex> lock(this->Mutex);
 	this->ConVar.notify_one();
 
-	LogTrace(CH_LOADER, "NotifyChanges()");
+	this->LogTrace("NotifyChanges()");
 }
 
 void CLoader::Track(std::filesystem::path aPath)
@@ -149,7 +149,7 @@ void CLoader::Track(std::filesystem::path aPath)
 	/* Ignore, if not valid. */
 	if (!this->IsValid(aPath))
 	{
-		LogInfo(CH_LOADER, "Add(%s) failed. Not a valid path.", aPath.string().c_str());
+		this->LogInfo("Add(%s) failed. Not a valid path.", aPath.string().c_str());
 		return;
 	}
 
@@ -256,7 +256,7 @@ bool CLoader::IsValid(const std::filesystem::path& aPath)
 
 void CLoader::ProcessChanges()
 {
-	LogTrace(CH_LOADER, "Init. Discovering addons.");
+	this->LogTrace("Init. Discovering addons.");
 	this->Discover();
 
 	while (this->IsRunning)
@@ -264,7 +264,7 @@ void CLoader::ProcessChanges()
 		std::unique_lock<std::mutex> lock(this->Mutex);
 		this->ConVar.wait_for(lock, std::chrono::milliseconds(5000));
 
-		LogTrace(CH_LOADER, "Processing changes.");
+		this->LogTrace("Processing changes.");
 
 		if (!this->IsRunning)
 		{
@@ -290,7 +290,7 @@ void CLoader::ProcessChanges()
 			/* If the MD5 has changed, reload the addon. */
 			if (md5 != addon->GetMD5())
 			{
-				LogDebug(CH_LOADER, "File changed. Reloading: %s", addon->GetLocation().empty() ? "(null)" : addon->GetLocation().string().c_str());
+				this->LogDebug("File changed. Reloading: %s", addon->GetLocation().empty() ? "(null)" : addon->GetLocation().string().c_str());
 				if (addon->IsLoaded())
 				{
 					addon->Unload();
@@ -352,7 +352,7 @@ void CLoader::ProcessChanges()
 
 				this->Addons.push_back(addon);
 
-				LogDebug(CH_LOADER, "New addon tracked. Loading: %s", addon->GetLocation().empty() ? "(null)" : addon->GetLocation().string().c_str());
+				this->LogDebug("New addon tracked. Loading: %s", addon->GetLocation().empty() ? "(null)" : addon->GetLocation().string().c_str());
 				addon->Load();
 			}
 		}
@@ -362,12 +362,12 @@ void CLoader::ProcessChanges()
 		{
 			if (addon->IsLoaded())
 			{
-				LogDebug(CH_LOADER, "Addon no longer tracked. Unloading: %s", addon->GetLocation().empty() ? "(null)" : addon->GetLocation().string().c_str());
+				this->LogDebug("Addon no longer tracked. Unloading: %s", addon->GetLocation().empty() ? "(null)" : addon->GetLocation().string().c_str());
 				addon->Unload();
 			}
 			else
 			{
-				LogDebug(CH_LOADER, "Addon no longer tracked. Deleting: %s", addon->GetLocation().empty() ? "(null)" : addon->GetLocation().string().c_str());
+				this->LogDebug("Addon no longer tracked. Deleting: %s", addon->GetLocation().empty() ? "(null)" : addon->GetLocation().string().c_str());
 
 				auto it = std::find(this->Addons.begin(), this->Addons.end(), addon);
 
@@ -381,7 +381,7 @@ void CLoader::ProcessChanges()
 		}
 	}
 
-	LogTrace(CH_LOADER, "Shutdown. Clearing addons.");
+	this->LogTrace("Shutdown. Clearing addons.");
 
 	for (IAddon* addon : this->Addons)
 	{
@@ -470,7 +470,7 @@ void CLoader::Load(std::filesystem::path aPath)
 	{
 		if (addon->GetLocation() == aPath)
 		{
-			LogDebug(CH_LOADER, "CLoaderBase::Load(%s)", aPath.string().c_str());
+			this->LogDebug("CLoaderBase::Load(%s)", aPath.string().c_str());
 			addon->Load();
 			return;
 		}
@@ -483,7 +483,7 @@ void CLoader::Unload(std::filesystem::path aPath)
 	{
 		if (addon->GetLocation() == aPath)
 		{
-			LogDebug(CH_LOADER, "CLoaderBase::Unload(%s)", aPath.string().c_str());
+			this->LogDebug("CLoaderBase::Unload(%s)", aPath.string().c_str());
 			addon->Unload();
 			return;
 		}

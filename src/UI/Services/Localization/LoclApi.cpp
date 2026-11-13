@@ -25,7 +25,7 @@ static CLocalization* s_Localization{};
 /// LoadFiles:
 /// 	Loads the embedded locale files, then the user's files from the directory on top. Runs on a worker.
 ///----------------------------------------------------------------------------------------------------
-static std::shared_ptr<const LocaleAtlas_t> LoadFiles(const std::filesystem::path& aDirectory)
+static std::shared_ptr<const LocaleAtlas_t> LoadFiles(const std::filesystem::path& aDirectory, const std::string& aLogChannel)
 {
 	static constexpr std::pair<const char*, const CPackFile*> s_EmbeddedLocales[] = {
 		{ "en/DisplayStrings", &Resources::LocaleDisplayStringsEN }, { "en/GameBinds", &Resources::LocaleGameBindsEN }, { "en/InputBinds", &Resources::LocaleInputBindsEN },
@@ -49,11 +49,11 @@ static std::shared_ptr<const LocaleAtlas_t> LoadFiles(const std::filesystem::pat
 
 		if (data.empty())
 		{
-			LogWarning(CH_LOCALIZATION, "Embedded locale \"%s\" could not be loaded.", name);
+			LogWarning(aLogChannel, "Embedded locale \"%s\" could not be loaded.", name);
 			continue;
 		}
 
-		MergeLocaleFile(*atlas, data, std::string("Embedded locale ") + name);
+		MergeLocaleFile(*atlas, data, std::string("Embedded locale ") + name, aLogChannel);
 	}
 
 	/* User files are merged after the embedded ones, so they can add languages or override texts. */
@@ -73,7 +73,7 @@ static std::shared_ptr<const LocaleAtlas_t> LoadFiles(const std::filesystem::pat
 			std::ifstream file(path, std::ios::binary);
 			std::vector<uint8_t> content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
-			MergeLocaleFile(*atlas, content, path.filename().string());
+			MergeLocaleFile(*atlas, content, path.filename().string(), aLogChannel);
 		}
 	}
 
@@ -93,7 +93,7 @@ static std::shared_ptr<const LocaleAtlas_t> LoadFiles(const std::filesystem::pat
 	}
 }
 
-CLocalization::CLocalization() : IRefCleaner("Localization")
+CLocalization::CLocalization() : IRefCleaner("Localization"), ILogChannel("Localization")
 {
 	CContext* ctx = CContext::GetContext();
 	CEventApi* evtapi = ctx->GetEventApi();
@@ -167,9 +167,9 @@ bool CLocalization::Advance()
 	{
 		this->IsFilesDirty = false;
 
-		this->NextFiles = Clockwork::Run<std::shared_ptr<const LocaleAtlas_t>>(Clockwork::ETaskPriority::Normal, [directory = this->Directory](Clockwork::CancellationToken aToken)
+		this->NextFiles = Clockwork::Run<std::shared_ptr<const LocaleAtlas_t>>(Clockwork::ETaskPriority::Normal, [directory = this->Directory, logChannel = this->GetLogChannel()](Clockwork::CancellationToken aToken)
 		{
-			return LoadFiles(directory);
+			return LoadFiles(directory, logChannel);
 		});
 	}
 

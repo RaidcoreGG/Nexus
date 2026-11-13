@@ -76,7 +76,7 @@ void CExportStyleModal::OnClosing()
 			catch (...)
 			{
 				CContext* ctx = CContext::GetContext();
-				LogWarning(CH_UICONTEXT, "Error saving stylesheet.");
+				LogWarning("UI Context", "Error saving stylesheet.");
 
 				/* Signal failure, to keep the modal open. */
 				this->SetResult(EModalResult::None);

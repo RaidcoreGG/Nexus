@@ -22,18 +22,17 @@
 namespace Clockwork = Raidcore::Clockwork;
 
 #include "Engine/Cleanup/RefCleanerBase.h"
-#include "Core/Logging/LogApi.h"
+#include "Core/Logging/LogChannel.h"
 #include "TxFuncDefs.h"
 #include "TxQueueEntry.h"
 #include "TxTexture.h"
 #include "UI/Renderer/RdrContext.h"
 
-constexpr const char* CH_TEXTURES = "Textures";
 
 ///----------------------------------------------------------------------------------------------------
 /// CTextureLoader Class
 ///----------------------------------------------------------------------------------------------------
-class CTextureLoader : public virtual IRefCleaner, public IDxgiPresentNotifyHandler
+class CTextureLoader : public ILogChannel, public virtual IRefCleaner, public IDxgiPresentNotifyHandler
 {
 	public:
 	///----------------------------------------------------------------------------------------------------

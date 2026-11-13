@@ -17,18 +17,17 @@
 #include "Engine/Inputs/RawInput/WndProcNotify.h"
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include "Engine/Events/EvtApi.h"
-#include "Core/Logging/LogApi.h"
+#include "Core/Logging/LogChannel.h"
 #include "IbBindV2.h"
 #include "IbCapture.h"
 #include "IbFuncDefs.h"
 #include "IbMapping.h"
 
-constexpr const char* CH_INPUTBINDS = "InputBinds";
 
 ///----------------------------------------------------------------------------------------------------
 /// CInputBindApi Class
 ///----------------------------------------------------------------------------------------------------
-class CInputBindApi : public CInputBindCapture, public virtual IRefCleaner, public IWndProcNotifyHandler
+class CInputBindApi : public ILogChannel, public CInputBindCapture, public virtual IRefCleaner, public IWndProcNotifyHandler
 {
 	public:
 	///----------------------------------------------------------------------------------------------------

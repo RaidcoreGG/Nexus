@@ -20,7 +20,7 @@ CPreferences* CPreferences::Get()
 	return &s_Preferences;
 }
 
-CPreferences::CPreferences()
+CPreferences::CPreferences() : ILogChannel("Settings")
 {
 	/* Constructed after the logger, so it is destroyed before it: the final save may log. */
 	CLogApi::Get();
@@ -55,7 +55,7 @@ void CPreferences::Init(std::filesystem::path aPath)
 
 		if (this->IsInitialized)
 		{
-			LogCritical(CH_SETTINGS, "Preferences were already initialized.");
+			this->LogCritical("Preferences were already initialized.");
 			assert(false && "CPreferences::Init may only be called once.");
 			return;
 		}
@@ -104,7 +104,7 @@ void CPreferences::Register(ISetting* aSetting)
 
 	if (this->Registry.find(key) != this->Registry.end())
 	{
-		LogCritical(CH_SETTINGS, "Setting \"%s\" is already owned by another instance.", key.c_str());
+		this->LogCritical("Setting \"%s\" is already owned by another instance.", key.c_str());
 		assert(false && "A setting key may only have one owner.");
 		return;
 	}
@@ -138,7 +138,7 @@ void CPreferences::Write(const std::string& aKey, json aValue)
 	/* Init replaces the store with the file, so an earlier write would be lost. */
 	if (!this->IsInitialized)
 	{
-		LogCritical(CH_SETTINGS, "Setting \"%s\" was written before the preferences were initialized.", aKey.c_str());
+		this->LogCritical("Setting \"%s\" was written before the preferences were initialized.", aKey.c_str());
 		assert(false && "CPreferences::Write called before Init.");
 		return;
 	}
@@ -196,11 +196,11 @@ bool CPreferences::LoadInternal()
 			return true;
 		}
 
-		LogWarning(CH_SETTINGS, "Settings.json does not contain an object.");
+		this->LogWarning("Settings.json does not contain an object.");
 	}
 	catch (const json::parse_error& ex)
 	{
-		LogWarning(CH_SETTINGS, "Settings.json could not be parsed. Error: %s", ex.what());
+		this->LogWarning("Settings.json could not be parsed. Error: %s", ex.what());
 	}
 
 	/* Kept aside, otherwise the first save replaces it with only the values changed since. */
@@ -213,11 +213,11 @@ bool CPreferences::LoadInternal()
 
 	if (ec)
 	{
-		LogCritical(CH_SETTINGS, "Settings.json could not be backed up. Changes will not be saved this session.");
+		this->LogCritical("Settings.json could not be backed up. Changes will not be saved this session.");
 		return false;
 	}
 
-	LogWarning(CH_SETTINGS, "Settings.json was moved to Settings.json.bak. Defaults are used.");
+	this->LogWarning("Settings.json was moved to Settings.json.bak. Defaults are used.");
 	return true;
 }
 
@@ -231,6 +231,6 @@ void CPreferences::SaveInternal(const json& aStore)
 	}
 	catch (...)
 	{
-		LogWarning(CH_SETTINGS, "Settings.json could not be saved.");
+		this->LogWarning("Settings.json could not be saved.");
 	}
 }

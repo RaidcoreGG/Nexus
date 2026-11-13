@@ -13,14 +13,13 @@
 #include <unordered_map>
 
 #include "DlLinkedResource.h"
-#include "Core/Logging/LogApi.h"
+#include "Core/Logging/LogChannel.h"
 
-constexpr const char* CH_DATALINK = "DataLink";
 
 ///----------------------------------------------------------------------------------------------------
 /// CDataLinkApi Class
 ///----------------------------------------------------------------------------------------------------
-class CDataLinkApi
+class CDataLinkApi : public ILogChannel
 {
 	public:
 	///----------------------------------------------------------------------------------------------------

@@ -20,7 +20,7 @@
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
-#include "Core/Logging/LogApi.h"
+#include "Core/Logging/LogChannel.h"
 #include "Core/Preferences/PrefSetting.h"
 #include "Host/GW2/Mumble/MblReader.h"
 #include "QaEnum.h"
@@ -30,7 +30,6 @@
 #include "UI/Textures/TxLoader.h"
 #include "UI/UiFuncDefs.h"
 
-constexpr const char* CH_QUICKACCESS             = "Quick Access";
 constexpr const char* QA_MENU                    = "!Nexus";
 constexpr const char* ICON_NEXUS                 = "ICON_NEXUS";
 constexpr const char* ICON_NEXUS_HOVER           = "ICON_NEXUS_HOVER";
@@ -43,7 +42,7 @@ constexpr const char* QAKEY_GENERIC              = "Generic";
 ///----------------------------------------------------------------------------------------------------
 /// CQuickAccess Class
 ///----------------------------------------------------------------------------------------------------
-class CQuickAccess : public virtual IWindow, public virtual IRefCleaner
+class CQuickAccess : public ILogChannel, public virtual IWindow, public virtual IRefCleaner
 {
 	public:
 	///----------------------------------------------------------------------------------------------------

@@ -16,16 +16,15 @@
 #include <windows.h>
 
 #include "Engine/Inputs/RawInput/WndProcNotify.h"
-#include "Core/Logging/LogApi.h"
+#include "Core/Logging/LogChannel.h"
 #include "LdrAddonBase.h"
 
 constexpr const uint32_t WM_ADDONDIRUPDATE = WM_USER + 101;
-constexpr const char* CH_LOADER = "Loader";
 
 ///----------------------------------------------------------------------------------------------------
 /// CLoader Class
 ///----------------------------------------------------------------------------------------------------
-class CLoader : public IWndProcNotifyHandler
+class CLoader : public ILogChannel, public IWndProcNotifyHandler
 {
 	public:
 	///----------------------------------------------------------------------------------------------------

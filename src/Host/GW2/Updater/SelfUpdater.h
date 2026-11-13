@@ -12,14 +12,13 @@
 #include <windows.h>
 
 #include "Core/Versioning/Version.h"
-#include "Core/Logging/LogApi.h"
+#include "Core/Logging/LogChannel.h"
 
-constexpr const char* CH_SELFUPDATER = "Updater";
 
 ///----------------------------------------------------------------------------------------------------
 /// CSelfUpdater Class
 ///----------------------------------------------------------------------------------------------------
-class CSelfUpdater
+class CSelfUpdater : public ILogChannel
 {
 	public:
 	///----------------------------------------------------------------------------------------------------

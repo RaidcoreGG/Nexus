@@ -13,14 +13,13 @@
 #include <string>
 
 #include "FnEntry.h"
-#include "Core/Logging/LogApi.h"
+#include "Core/Logging/LogChannel.h"
 
-constexpr const char* CH_FUNCTIONS = "Functions";
 
 ///----------------------------------------------------------------------------------------------------
 /// CFuncRegistry Class
 ///----------------------------------------------------------------------------------------------------
-class CFuncRegistry
+class CFuncRegistry : public ILogChannel
 {
 	public:
 	///----------------------------------------------------------------------------------------------------

@@ -18,7 +18,7 @@
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
-#include "Core/Logging/LogApi.h"
+#include "Core/Logging/LogChannel.h"
 #include "Host/GW2/Mumble/MblReader.h"
 #include "UI/Renderer/RdrContext.h"
 #include "UI/Services/Fonts/FontManager.h"
@@ -36,7 +36,6 @@
 #include "UiStyle.h"
 #include "Util/Inputs.h"
 
-constexpr const char* CH_UICONTEXT       = "UI Context";
 constexpr const char* KB_MENU            = "KB_MENU";
 constexpr const char* KB_ADDONS          = "KB_ADDONS";
 constexpr const char* KB_OPTIONS         = "KB_OPTIONS";
@@ -49,7 +48,8 @@ constexpr const char* KB_TOGGLEHIDEUI    = "KB_TOGGLEHIDEUI";
 /// CUiContext Class
 ///----------------------------------------------------------------------------------------------------
 class CUiContext
-	: public CUiRender
+	: public ILogChannel
+	, public CUiRender
 	, public CUiBinds
 	, public CUiStyle
 	, public IWndProcNotifyHandler

@@ -15,9 +15,8 @@
 #include "Host/GW2/Addons/API/NexusLink.h"
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
-#include "Core/Logging/LogApi.h"
+#include "Core/Logging/LogChannel.h"
 
-constexpr const char* CH_MUMBLE_READER           = "MumbleReader";
 constexpr const char* DL_MUMBLE_LINK             = "DL_MUMBLE_LINK";
 constexpr const char* DL_MUMBLE_LINK_IDENTITY    = "DL_MUMBLE_LINK_IDENTITY";
 constexpr const char* EV_MUMBLE_IDENTITY_UPDATED = "EV_MUMBLE_IDENTITY_UPDATED";
@@ -25,7 +24,7 @@ constexpr const char* EV_MUMBLE_IDENTITY_UPDATED = "EV_MUMBLE_IDENTITY_UPDATED";
 ///----------------------------------------------------------------------------------------------------
 /// CMumbleReader Class
 ///----------------------------------------------------------------------------------------------------
-class CMumbleReader
+class CMumbleReader : public ILogChannel
 {
 	public:
 	///----------------------------------------------------------------------------------------------------

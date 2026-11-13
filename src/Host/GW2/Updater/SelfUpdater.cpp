@@ -14,7 +14,7 @@ namespace Clockwork = Raidcore::Clockwork;
 #include "Host/GW2/Index/Index.h"
 #include "Util/Paths.h"
 
-CSelfUpdater::CSelfUpdater()
+CSelfUpdater::CSelfUpdater() : ILogChannel("Updater")
 {
 	Clockwork::Run<void>(Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
 	{
@@ -47,10 +47,9 @@ const Version_t& CSelfUpdater::GetRemoteVersion()
 
 	if (!result.Success())
 	{
-		LogWarning(
-			CH_SELFUPDATER,
+		this->LogWarning(
 			"Failed to fetch Nexus version.\n\tStatus: %s\n\tError: %s",
-			result.Status(),
+			result.Status().c_str(),
 			result.Error.c_str()
 		);
 		return this->RemoteVersion;
@@ -60,7 +59,7 @@ const Version_t& CSelfUpdater::GetRemoteVersion()
 
 	if (versionJSON.is_null())
 	{
-		LogWarning(CH_SELFUPDATER, "Failed to fetch Nexus version. JSON was null.");
+		this->LogWarning("Failed to fetch Nexus version. JSON was null.");
 		return this->RemoteVersion;
 	}
 
@@ -70,7 +69,7 @@ const Version_t& CSelfUpdater::GetRemoteVersion()
 		versionJSON["Build"].is_null() ||
 		versionJSON["Revision"].is_null())
 	{
-		LogWarning(CH_SELFUPDATER, "Failed to fetch Nexus version. Incomplete version info.");
+		this->LogWarning("Failed to fetch Nexus version. Incomplete version info.");
 		return this->RemoteVersion;
 	}
 
@@ -113,7 +112,7 @@ bool CSelfUpdater::CreatePatchMutex()
 			this->UpdateMutex = NULL;
 		}
 
-		LogInfo(CH_SELFUPDATER, "Cannot patch Nexus, mutex locked.");
+		this->LogInfo("Cannot patch Nexus, mutex locked.");
 		return false;
 	}
 
@@ -134,8 +133,7 @@ void CSelfUpdater::CleanupUpdateFiles()
 			std::filesystem::path fallback = Path::GetUnused(Index(EPath::DIR_TEMP) / "d3d11.dll.old");
 			std::filesystem::rename(Index(EPath::NexusDLL_Old), fallback);
 
-			LogWarning(
-				CH_SELFUPDATER,
+			this->LogWarning(
 				"Couldn't remove \"%s\". Renamed to \"%s\".",
 				Index(EPath::NexusDLL_Old).string().c_str(),
 				fallback.string().c_str()
@@ -155,8 +153,7 @@ void CSelfUpdater::CleanupUpdateFiles()
 			std::filesystem::path fallback = Path::GetUnused(Index(EPath::DIR_TEMP) / "d3d11.dll.update");
 			std::filesystem::rename(Index(EPath::NexusDLL_Update), fallback);
 
-			LogWarning(
-				CH_SELFUPDATER,
+			this->LogWarning(
 				"Couldn't remove \"%s\". Renamed to \"%s\".",
 				Index(EPath::NexusDLL_Update).string().c_str(),
 				fallback.string().c_str()
@@ -179,8 +176,7 @@ bool CSelfUpdater::DownloadUpdate()
 		return true;
 	}
 
-	LogWarning(
-		CH_SELFUPDATER,
+	this->LogWarning(
 		"Failed to download Nexus update from GitHub.\n\tStatus: %s\n\tError: %s",
 		ghresult.Status().empty() ? "(null)" : ghresult.Status().c_str(),
 		ghresult.Error.c_str()
@@ -198,8 +194,7 @@ bool CSelfUpdater::DownloadUpdate()
 		return true;
 	}
 
-	LogWarning(
-		CH_SELFUPDATER,
+	this->LogWarning(
 		"Failed to download Nexus update from fallback. (Raidcore API)\n\tStatus: %s\n\tError: %s",
 		fbresult.Status().empty() ? "(null)" : fbresult.Status().c_str(),
 		fbresult.Error.c_str()
@@ -229,8 +224,7 @@ void CSelfUpdater::Run()
 
 	if (this->RemoteVersion > currentVersion)
 	{
-		LogInfo(
-			CH_SELFUPDATER,
+		this->LogInfo(
 			"Update available. (Current: %s) (Remote: %s)",
 			currentVersion.string().c_str(),
 			this->RemoteVersion.string().c_str()
@@ -246,8 +240,7 @@ void CSelfUpdater::Run()
 		}
 		catch (std::filesystem::filesystem_error fErr)
 		{
-			LogWarning(
-				CH_SELFUPDATER,
+			this->LogWarning(
 				"Nexus update failed: Couldn't move \"%s\" to \"%s\".",
 				Index(EPath::NexusDLL).string().c_str(),
 				Index(EPath::NexusDLL_Old).string().c_str()
@@ -262,8 +255,7 @@ void CSelfUpdater::Run()
 		}
 		catch (std::filesystem::filesystem_error fErr)
 		{
-			LogWarning(
-				CH_SELFUPDATER,
+			this->LogWarning(
 				"Nexus update failed: Couldn't move \"%s\" to \"%s\".",
 				Index(EPath::NexusDLL_Update).string().c_str(),
 				Index(EPath::NexusDLL).string().c_str()
@@ -276,8 +268,7 @@ void CSelfUpdater::Run()
 			}
 			catch (std::filesystem::filesystem_error fErr)
 			{
-				LogWarning(
-					CH_SELFUPDATER,
+				this->LogWarning(
 					"Nexus update failed: Couldn't move \"%s\" to \"%s\".",
 					Index(EPath::NexusDLL_Old).string().c_str(),
 					Index(EPath::NexusDLL).string().c_str()
@@ -288,8 +279,7 @@ void CSelfUpdater::Run()
 			return;
 		}
 
-		LogInfo(
-			CH_SELFUPDATER,
+		this->LogInfo(
 			"Successfully updated Nexus. Restart required to take effect. (Current: %s) (Remote: %s)",
 			currentVersion.string().c_str(),
 			this->RemoteVersion.string().c_str()
@@ -299,8 +289,7 @@ void CSelfUpdater::Run()
 
 	if (this->RemoteVersion < currentVersion)
 	{
-		LogInfo(
-			CH_SELFUPDATER,
+		this->LogInfo(
 			"Installed Build of Nexus is more up-to-date than remote. (Current: %s) (Remote: %s)",
 			currentVersion.string().c_str(),
 			this->RemoteVersion.string().c_str()
@@ -308,5 +297,5 @@ void CSelfUpdater::Run()
 		return;
 	}
 
-	LogInfo(CH_SELFUPDATER, "Installed Build of Nexus is up-to-date.");
+	this->LogInfo("Installed Build of Nexus is up-to-date.");
 }

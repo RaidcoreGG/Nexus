@@ -22,7 +22,7 @@ using namespace Mumble;
 #include "Host/GW2/Context.h"
 #include "MblExtensions.h"
 
-CMumbleReader::CMumbleReader(CDataLinkApi* aDataLink, CEventApi* aEventApi)
+CMumbleReader::CMumbleReader(CDataLinkApi* aDataLink, CEventApi* aEventApi) : ILogChannel("MumbleReader")
 {
 	assert(aDataLink);
 	assert(aEventApi);
@@ -106,19 +106,19 @@ void CMumbleReader::AdvanceIdentity()
 			j["fov"].get_to(this->MumbleIdentity->FOV);
 			j["uisz"].get_to(this->MumbleIdentity->UISize);
 
-			//LogTrace(CH_MUMBLE_READER, "CMumbleReader::AdvanceIdentity()");
+			//this->LogTrace("CMumbleReader::AdvanceIdentity()");
 		}
 		catch (json::parse_error& ex)
 		{
-			LogTrace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Parse Error: %s", ex.what());
+			this->LogTrace("MumbleLink could not be parsed. Parse Error: %s", ex.what());
 		}
 		catch (json::type_error& ex)
 		{
-			LogTrace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Type Error: %s", ex.what());
+			this->LogTrace("MumbleLink could not be parsed. Type Error: %s", ex.what());
 		}
 		catch (...)
 		{
-			LogTrace(CH_MUMBLE_READER, "MumbleLink could not be parsed. Unknown Error.");
+			this->LogTrace("MumbleLink could not be parsed. Unknown Error.");
 		}
 
 		/* notify (also notifies the GUI to update its scaling factor) */
@@ -147,5 +147,5 @@ void CMumbleReader::AdvanceDerived()
 	this->PreviousAvatarPosition = this->MumbleLink->AvatarPosition;
 	this->PreviousCameraFront    = this->MumbleLink->CameraFront;
 
-	//LogTrace(CH_MUMBLE_READER, "CMumbleReader::AdvanceDerived()");
+	//this->LogTrace("CMumbleReader::AdvanceDerived()");
 }

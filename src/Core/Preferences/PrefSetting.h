@@ -106,7 +106,7 @@ class CSetting : public ISetting
 		}
 		catch (const json::exception&)
 		{
-			LogWarning(CH_SETTINGS, "Setting \"%s\" has an invalid stored value, keeping the current one.", this->Key.c_str());
+			LogWarning("Settings", "Setting \"%s\" has an invalid stored value, keeping the current one.", this->Key.c_str());
 			return false;
 		}
 

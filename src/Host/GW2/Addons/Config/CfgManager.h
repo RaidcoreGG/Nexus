@@ -14,14 +14,13 @@
 #include <unordered_map>
 
 #include "Config.h"
-#include "Core/Logging/LogApi.h"
+#include "Core/Logging/LogChannel.h"
 
-constexpr const char* CH_CFGMGR = "Config";
 
 ///----------------------------------------------------------------------------------------------------
 /// CConfigMgr Class
 ///----------------------------------------------------------------------------------------------------
-class CConfigMgr
+class CConfigMgr : public ILogChannel
 {
 	public:
 	///----------------------------------------------------------------------------------------------------

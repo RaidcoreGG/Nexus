@@ -18,7 +18,7 @@
 #include "httplib/httplib.h"
 #pragma warning(pop)
 
-#include "Core/Logging/LogApi.h"
+#include "Core/Logging/LogChannel.h"
 #include "WreCache.h"
 #include "WreResponse.h"
 
@@ -29,7 +29,7 @@ constexpr time_t HTTP_WRITE_TIMEOUT_SEC      = 10;
 ///----------------------------------------------------------------------------------------------------
 /// CHttpClient Class
 ///----------------------------------------------------------------------------------------------------
-class CHttpClient
+class CHttpClient : public ILogChannel
 {
 	public:
 	///----------------------------------------------------------------------------------------------------

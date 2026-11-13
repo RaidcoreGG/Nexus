@@ -33,7 +33,7 @@ static void MergeTexts(LocaleTexts_t& aLanguage, const json& aNode, const std::s
 	}
 }
 
-bool MergeLocaleFile(LocaleAtlas_t& aAtlas, std::span<const uint8_t> aData, const std::string& aSourceName)
+bool MergeLocaleFile(LocaleAtlas_t& aAtlas, std::span<const uint8_t> aData, const std::string& aSourceName, const std::string& aLogChannel)
 {
 	try
 	{
@@ -41,7 +41,7 @@ bool MergeLocaleFile(LocaleAtlas_t& aAtlas, std::span<const uint8_t> aData, cons
 
 		if (!file.is_object() || !file["Identifier"].is_string() || !file["Texts"].is_object())
 		{
-			LogWarning(CH_LOCALIZATION, "%s is not a locale file: \"Identifier\" or \"Texts\" is missing.", aSourceName.c_str());
+			LogWarning(aLogChannel, "%s is not a locale file: \"Identifier\" or \"Texts\" is missing.", aSourceName.c_str());
 			return false;
 		}
 
@@ -59,7 +59,7 @@ bool MergeLocaleFile(LocaleAtlas_t& aAtlas, std::span<const uint8_t> aData, cons
 	}
 	catch (const json::exception& ex)
 	{
-		LogWarning(CH_LOCALIZATION, "%s could not be parsed. Error: %s", aSourceName.c_str(), ex.what());
+		LogWarning(aLogChannel, "%s could not be parsed. Error: %s", aSourceName.c_str(), ex.what());
 		return false;
 	}
 }

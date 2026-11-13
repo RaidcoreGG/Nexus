@@ -17,10 +17,9 @@
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbBindV2.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
-#include "Core/Logging/LogApi.h"
+#include "Core/Logging/LogChannel.h"
 #include "UI/Renderer/RdrContext.h"
 
-constexpr const char* CH_GAMEBINDS = "GameBinds";
 constexpr const char* EV_UE_KB_CH = "EV_UNOFFICIAL_EXTRAS_KEYBIND_CHANGED";
 
 #define WM_PASSTHROUGH_FIRST WM_USER + 7997
@@ -38,7 +37,7 @@ struct MultiInputBind_t
 ///----------------------------------------------------------------------------------------------------
 /// CGameBindsApi Class
 ///----------------------------------------------------------------------------------------------------
-class CGameBindsApi : public IWndProcNotifyHandler
+class CGameBindsApi : public ILogChannel, public IWndProcNotifyHandler
 {
 	public:
 	// FIXME: this needs to be moved to an evtconn

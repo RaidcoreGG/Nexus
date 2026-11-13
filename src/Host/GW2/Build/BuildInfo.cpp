@@ -34,7 +34,7 @@ uint32_t GW2::GetGameBuild()
 		LogWarning(
 			"GW2 BuildInfo",
 			"Failed to fetch game build.\n\tStatus: %s\n\tError: %s",
-			result.Status(),
+			result.Status().c_str(),
 			result.Error.c_str()
 		);
 		return s_GameBuild;
@@ -47,7 +47,7 @@ uint32_t GW2::GetGameBuild()
 	}
 	catch (...)
 	{
-		LogWarning("GW2 BuildInfo", "Unknown error processing \"%s\".");
+		LogWarning("GW2 BuildInfo", "Unknown error processing \"%s\".", result.Content.c_str());
 	}
 
 	return s_GameBuild;

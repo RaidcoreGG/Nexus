@@ -28,7 +28,7 @@ constexpr const char* K_DISABLEVERSION = "DisableVersion";
 constexpr const char* K_LASTGAMEBUILD  = "LastGameBuild";
 constexpr const char* K_NAME           = "Name";
 
-CConfigMgr::CConfigMgr(std::filesystem::path aConfigPath, std::vector<uint32_t> aWhitelist)
+CConfigMgr::CConfigMgr(std::filesystem::path aConfigPath, std::vector<uint32_t> aWhitelist) : ILogChannel("Config")
 {
 	if (aConfigPath.empty())
 	{
@@ -80,8 +80,7 @@ void CConfigMgr::SaveConfigs()
 
 	if (!file.is_open())
 	{
-		LogWarning(
-			CH_CFGMGR,
+		this->LogWarning(
 			"Failed to open \"%s\" for writing.",
 			this->Path.string().c_str()
 		);
@@ -156,8 +155,7 @@ void CConfigMgr::LoadConfigs()
 
 		if (!file.is_open())
 		{
-			LogWarning(
-				CH_CFGMGR,
+			this->LogWarning(
 				"Failed to open \"%s\" for reading.",
 				this->Path.string().c_str()
 			);
@@ -168,8 +166,7 @@ void CConfigMgr::LoadConfigs()
 
 		if (cfgPack.is_null())
 		{
-			LogWarning(
-				CH_CFGMGR,
+			this->LogWarning(
 				"Failed to parse \"%s\". Config was null.",
 				this->Path.string().c_str()
 			);
@@ -233,8 +230,7 @@ void CConfigMgr::LoadConfigs()
 	}
 	catch (json::parse_error& ex)
 	{
-		LogWarning(
-			CH_CFGMGR,
+		this->LogWarning(
 			"Failed to parse \"%s\". Error: %s",
 			this->Path.filename().string().c_str(),
 			ex.what()

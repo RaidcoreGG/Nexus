@@ -24,15 +24,14 @@
 #include "Engine/Loader/LdrAddonBase.h"
 #include "Engine/Loader/Loader.h"
 #include "Host/GW2/ArcDPS/ArcExtensionDef.h"
+#include "Core/Logging/LogChannel.h"
 
 using ArcExtensionDef_t = ArcDPS::ExtensionDef_t;
-
-constexpr const char* CH_ADDON = "Addon";
 
 ///----------------------------------------------------------------------------------------------------
 /// CAddon Class
 ///----------------------------------------------------------------------------------------------------
-class CAddon : public virtual IAddon
+class CAddon : public ILogChannel, public virtual IAddon
 {
 	public:
 	///----------------------------------------------------------------------------------------------------

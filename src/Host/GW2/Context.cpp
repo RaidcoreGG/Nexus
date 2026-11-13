@@ -266,11 +266,11 @@ CConfigMgr* CContext::GetCfgMgr()
 					}
 					catch (const std::invalid_argument& e)
 					{
-						LogTrace(CH_LOADER, "Invalid argument(-ggaddons) : %s (exc: %s)", addonsig.c_str(), e.what());
+						LogTrace("Loader", "Invalid argument(-ggaddons) : %s (exc: %s)", addonsig.c_str(), e.what());
 					}
 					catch (const std::out_of_range& e)
 					{
-						LogTrace(CH_LOADER, "Out of range (-ggaddons): %s (exc: %s)", addonsig.c_str(), e.what());
+						LogTrace("Loader", "Out of range (-ggaddons): %s (exc: %s)", addonsig.c_str(), e.what());
 					}
 				}
 			}

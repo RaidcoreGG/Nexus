@@ -36,4 +36,4 @@ using LocaleAtlas_t = std::map<std::string, LocaleTexts_t, std::less<>>;
 /// 	Nested objects become dotted keys: { "QuickAccess": { "Visibility": ... } } is "QuickAccess.Visibility".
 /// 	Logs and returns false if the file cannot be parsed.
 ///----------------------------------------------------------------------------------------------------
-bool MergeLocaleFile(LocaleAtlas_t& aAtlas, std::span<const uint8_t> aData, const std::string& aSourceName);
+bool MergeLocaleFile(LocaleAtlas_t& aAtlas, std::span<const uint8_t> aData, const std::string& aSourceName, const std::string& aLogChannel);

@@ -15,7 +15,7 @@
 #include "Util/Url.h"
 #include "Util/Paths.h"
 
-CLibraryMgr::CLibraryMgr(CLoader* aLoader)
+CLibraryMgr::CLibraryMgr(CLoader* aLoader) : ILogChannel("Library")
 {
 	this->Loader = aLoader;
 }
@@ -39,8 +39,7 @@ void CLibraryMgr::Update()
 
 		if (!result.Success())
 		{
-			LogWarning(
-				CH_LIBRARY,
+			this->LogWarning(
 				"Failed to fetch addon library from \"%s\".\n\tStatus: %s\n\tError: %s",
 				url.c_str(),
 				result.Status().c_str(),
@@ -55,13 +54,13 @@ void CLibraryMgr::Update()
 
 			if (libJSON.is_null())
 			{
-				LogWarning(CH_LIBRARY, "\"%s\" had an empty response.", url.c_str());
+				this->LogWarning("\"%s\" had an empty response.", url.c_str());
 				continue;
 			}
 
 			if (!libJSON.is_array())
 			{
-				LogWarning(CH_LIBRARY, "\"%s\" does not conform to library specification.", url.c_str());
+				this->LogWarning("\"%s\" does not conform to library specification.", url.c_str());
 				continue;
 			}
 
@@ -72,7 +71,7 @@ void CLibraryMgr::Update()
 		}
 		catch (...)
 		{
-			LogWarning(CH_LIBRARY, "Unknown error processing \"%s\".", url.c_str());
+			this->LogWarning("Unknown error processing \"%s\".", url.c_str());
 		}
 	}
 }
@@ -85,7 +84,7 @@ void CLibraryMgr::AddSource(std::string aURL)
 
 	if (it != this->Sources.end())
 	{
-		LogInfo(CH_LIBRARY, "Source already exists: %s", aURL.c_str());
+		this->LogInfo("Source already exists: %s", aURL.c_str());
 		return;
 	}
 
@@ -129,8 +128,7 @@ void CLibraryMgr::Install(uint32_t aSignature)
 
 		if (!result.Success())
 		{
-			LogWarning(
-				CH_LIBRARY,
+			this->LogWarning(
 				"Failed to resolve addon download URL for \"%s\".\n\tStatus: %s\n\tError: %s",
 				downloadUrl.c_str(),
 				result.Status().c_str(),
@@ -145,19 +143,19 @@ void CLibraryMgr::Install(uint32_t aSignature)
 
 			if (releaseJSON.is_null())
 			{
-				LogWarning(CH_LIBRARY, "\"%s\" had an empty response when resolving.", downloadUrl.c_str());
+				this->LogWarning("\"%s\" had an empty response when resolving.", downloadUrl.c_str());
 				return;
 			}
 
 			if (releaseJSON["assets"].is_null())
 			{
-				LogWarning(CH_LIBRARY, "\"%s\" had no assets when resolving.", downloadUrl.c_str());
+				this->LogWarning("\"%s\" had no assets when resolving.", downloadUrl.c_str());
 				return;
 			}
 
 			if (!releaseJSON["assets"].is_array())
 			{
-				LogWarning(CH_LIBRARY, "\"%s\" had assets was not an array when resolving.", downloadUrl.c_str());
+				this->LogWarning("\"%s\" had assets was not an array when resolving.", downloadUrl.c_str());
 				return;
 			}
 
@@ -185,13 +183,13 @@ void CLibraryMgr::Install(uint32_t aSignature)
 
 			if (!found)
 			{
-				LogWarning(CH_LIBRARY, "No asset found for \"%s\".", downloadUrl.c_str());
+				this->LogWarning("No asset found for \"%s\".", downloadUrl.c_str());
 				return;
 			}
 		}
 		catch (...)
 		{
-			LogWarning(CH_LIBRARY, "Unknown error processing resolution of \"%s\".", downloadUrl.c_str());
+			this->LogWarning("Unknown error processing resolution of \"%s\".", downloadUrl.c_str());
 		}
 	}
 
@@ -209,8 +207,7 @@ void CLibraryMgr::Install(uint32_t aSignature)
 
 	if (!result.Success())
 	{
-		LogWarning(
-			CH_LIBRARY,
+		this->LogWarning(
 			"Failed to download addon from \"%s\".\n\tStatus: %s\n\tError: %s",
 			downloadUrl.c_str(),
 			result.Status().c_str(),
@@ -225,8 +222,7 @@ void CLibraryMgr::Install(uint32_t aSignature)
 	}
 	catch (...)
 	{
-		LogWarning(
-			CH_LIBRARY,
+		this->LogWarning(
 			"Failed to move downloaded addon from \"%s\" to \"%s\".",
 			tmpPath.string().c_str(),
 			targetPath.string().c_str()
@@ -234,8 +230,7 @@ void CLibraryMgr::Install(uint32_t aSignature)
 		return;
 	}
 
-	LogInfo(
-		CH_LIBRARY,
+	this->LogInfo(
 		"Successfully installed \"%s\" (0x%08X) to \"%s\".",
 		addon.Name.c_str(),
 		addon.Signature,

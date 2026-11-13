@@ -10,7 +10,7 @@
 
 #include <assert.h>
 
-CFuncRegistry::CFuncRegistry()
+CFuncRegistry::CFuncRegistry() : ILogChannel("Functions")
 {
 }
 
@@ -29,7 +29,7 @@ bool CFuncRegistry::Register(const char* aIdentifier, void* aFunction)
 
 	if (it != this->Registry.end())
 	{
-		LogDebug(CH_FUNCTIONS, "\"%s\" already registered.", aIdentifier);
+		this->LogDebug("\"%s\" already registered.", aIdentifier);
 		return false;
 	}
 
@@ -61,13 +61,13 @@ void CFuncRegistry::Deregister(const char* aIdentifier, void* aFunction)
 	{
 		this->Registry.erase(it);
 
-		LogDebug(CH_FUNCTIONS, "\"%s\" already at reference count zero. Deleted.", aIdentifier);
+		this->LogDebug("\"%s\" already at reference count zero. Deleted.", aIdentifier);
 	}
 	else
 	{
 		it->second.ShouldDelete = true;
 
-		LogDebug(CH_FUNCTIONS, "\"%s\" flagged for deletion. Will be deleted when reaching a reference count of zero.", aIdentifier);
+		this->LogDebug("\"%s\" flagged for deletion. Will be deleted when reaching a reference count of zero.", aIdentifier);
 	}
 }
 
@@ -108,8 +108,7 @@ void CFuncRegistry::Release(const char* aIdentifier)
 
 		if (it->second.RefCount < 0)
 		{
-			LogCritical(
-				CH_FUNCTIONS,
+			this->LogCritical(
 				"\"%s\" reference count less than zero. Query/Release mismatch. Function may be freed prematurely.",
 				aIdentifier
 			);
@@ -119,7 +118,7 @@ void CFuncRegistry::Release(const char* aIdentifier)
 		{
 			this->Registry.erase(it);
 
-			LogDebug(CH_FUNCTIONS, "\"%s\" deleted after reaching reference count zero.", aIdentifier);
+			this->LogDebug("\"%s\" deleted after reaching reference count zero.", aIdentifier);
 		}
 	}
 }

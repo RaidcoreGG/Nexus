@@ -13,16 +13,15 @@
 #include <vector>
 
 #include "Engine/Loader/Loader.h"
-#include "Core/Logging/LogApi.h"
+#include "Core/Logging/LogChannel.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
 #include "LibAddon.h"
 
-constexpr const char* CH_LIBRARY = "Library";
 
 ///----------------------------------------------------------------------------------------------------
 /// CLibraryMgr Class
 ///----------------------------------------------------------------------------------------------------
-class CLibraryMgr
+class CLibraryMgr : public ILogChannel
 {
 	public:
 	///----------------------------------------------------------------------------------------------------

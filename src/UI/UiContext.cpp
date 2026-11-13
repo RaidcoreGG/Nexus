@@ -163,7 +163,7 @@ CUiContext::CUiContext(
 	CInputBindApi*   aInputBindApi,
 	CEventApi*       aEventApi,
 	CMumbleReader*   aMumbleReader
-) : IRefCleaner("UiContext")
+) : IRefCleaner("UiContext"), ILogChannel("UI Context")
 {
 	this->RenderContext  = aRenderContext;
 	this->TextureService = aTextureService;
@@ -215,7 +215,7 @@ void CUiContext::Initialize()
 
 	if (!(this->RenderContext->Window.Handle && this->RenderContext->SwapChain))
 	{
-		LogCritical(CH_UICONTEXT, "CUiContext::Initialize() failed. A RenderContext component was nullptr.");
+		this->LogCritical("CUiContext::Initialize() failed. A RenderContext component was nullptr.");
 		return;
 	}
 
@@ -225,7 +225,7 @@ void CUiContext::Initialize()
 
 	if (!pBackBuffer)
 	{
-		LogCritical(CH_UICONTEXT, "CUiContext::Initialize() failed. BackBuffer was nullptr.");
+		this->LogCritical("CUiContext::Initialize() failed. BackBuffer was nullptr.");
 		return;
 	}
 
@@ -244,7 +244,7 @@ void CUiContext::Initialize()
 
 	if (!this->RenderTargetView)
 	{
-		LogCritical(CH_UICONTEXT, "CUiContext::Initialize() failed. RenderTargetView could not be created.");
+		this->LogCritical("CUiContext::Initialize() failed. RenderTargetView could not be created.");
 		return;
 	}
 

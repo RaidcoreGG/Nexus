@@ -15,7 +15,7 @@
 #include <utility>
 #include <vector>
 
-#include "Core/Logging/LogApi.h"
+#include "Core/Logging/LogChannel.h"
 #include "Core/Preferences/PrefSetting.h"
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include "Engine/Clockwork/Clockwork.h"
@@ -24,14 +24,13 @@
 #include "LoclText.h"
 #include "LoclView.h"
 
-constexpr const char* CH_LOCALIZATION = "Localization";
 
 ///----------------------------------------------------------------------------------------------------
 /// CLocalization Class
 /// 	Sources: the locale files, then one atlas per addon that set texts, in the order they first did.
 /// 	A view merges them; it is built on a worker and replaces the current one in Advance when ready.
 ///----------------------------------------------------------------------------------------------------
-class CLocalization : public virtual IRefCleaner
+class CLocalization : public ILogChannel, public virtual IRefCleaner
 {
 	public:
 	///----------------------------------------------------------------------------------------------------

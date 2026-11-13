@@ -23,7 +23,7 @@ namespace Clockwork = Raidcore::Clockwork;
 #include "IbConst.h"
 #include "Util/Inputs.h"
 
-CInputBindApi::CInputBindApi(CEventApi* aEventApi, std::filesystem::path aConfigPath) : IRefCleaner("InputBindApi")
+CInputBindApi::CInputBindApi(CEventApi* aEventApi, std::filesystem::path aConfigPath) : IRefCleaner("InputBindApi"), ILogChannel("InputBinds")
 {
 	assert(aEventApi);
 
@@ -579,7 +579,7 @@ void CInputBindApi::Load()
 	}
 	catch (json::parse_error& ex)
 	{
-		LogWarning(CH_INPUTBINDS, "InputBinds.json could not be parsed. Error: %s", ex.what());
+		this->LogWarning("InputBinds.json could not be parsed. Error: %s", ex.what());
 	}
 }
 
@@ -624,7 +624,7 @@ void CInputBindApi::Save()
 	}
 	else
 	{
-		LogWarning(CH_INPUTBINDS, "Failed to open config file for writing: %s", this->ConfigPath.string().c_str());
+		this->LogWarning("Failed to open config file for writing: %s", this->ConfigPath.string().c_str());
 	}
 }
 

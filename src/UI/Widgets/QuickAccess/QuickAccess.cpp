@@ -36,7 +36,7 @@ CQuickAccess::CQuickAccess(
 	CTextureLoader* aTextureService,
 	CLocalization*  aLocalization,
 	CEventApi*      aEventApi
-) : IRefCleaner("QuickAccess")
+) : IRefCleaner("QuickAccess"), ILogChannel("Quick Access")
 {
 	this->InputBindApi   = aInputBindApi;
 	this->TextureService = aTextureService;
@@ -360,8 +360,7 @@ void CQuickAccess::AddContextItem(const char* aIdentifier, const char* aTargetSh
 		}
 		else
 		{
-			LogWarning(
-				CH_QUICKACCESS,
+			this->LogWarning(
 				"Context menu item already registered: %s (Parent: \"%s\")",
 				aIdentifier,
 				aTargetShortcutIdentifier

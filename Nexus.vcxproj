@@ -168,7 +168,6 @@
     <ClInclude Include="src\Host\GW2\ArcDPS\ArcFuncDefs.h" />
     <ClInclude Include="src\Host\GW2\Build\BuildInfo.h" />
     <ClInclude Include="src\Host\GW2\Inputs\MouseResetFix.h" />
-    <ClInclude Include="src\Engine\Networking\NetConst.h" />
     <ClInclude Include="src\UI\Renderer\RdrContext.h" />
     <ClInclude Include="src\UI\Renderer\RdrMetrics.h" />
     <ClInclude Include="src\UI\Renderer\RdrWindow.h" />
@@ -375,6 +374,7 @@
     <ClInclude Include="src\Core\Logging\LogBase.h" />
     <ClInclude Include="src\Core\Logging\LogMsg.h" />
     <ClInclude Include="src\Core\Logging\LogApi.h" />
+    <ClInclude Include="src\Core\Logging\LogChannel.h" />
     <ClInclude Include="src\Core\Logging\Windows\LogConsole.h" />
     <ClInclude Include="thirdparty\minhook\mh_buffer.h" />
     <ClInclude Include="thirdparty\minhook\mh_disasm.h" />
