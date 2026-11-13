@@ -18,14 +18,14 @@
 CExportStyleModal::CExportStyleModal()
 {
 	this->SetID("ExportStyleModal");
-	this->SetDisplayName("Save style preset");
+	this->SetDisplayName(Lang::Options::StyleSavePresetTitle);
 	this->Data = {};
 	memset(this->PathBuffer, 0, sizeof(this->PathBuffer));
 }
 
 void CExportStyleModal::RenderContent()
 {
-	if (ImGui::InputTextWithHint("##InputFilename", "Style Name", this->PathBuffer, sizeof(this->PathBuffer)))
+	if (ImGui::InputTextWithHint("##InputFilename", Lang::Options::StyleEditor::Name.Text(), this->PathBuffer, sizeof(this->PathBuffer)))
 	{
 		this->Path = Index(EPath::DIR_STYLES) / this->PathBuffer;
 		this->Path += ".imstyle180";
@@ -34,18 +34,18 @@ void CExportStyleModal::RenderContent()
 	if (std::filesystem::exists(this->Path))
 	{
 		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 0.f, 0.f, 1.f));
-		ImGui::TextWrapped("%s already exists and will be overwritten.", this->PathBuffer);
+		ImGui::TextWrapped(Lang::Options::StyleEditor::Overwrite.Text(), this->PathBuffer);
 		ImGui::PopStyleColor();
 	}
 
-	if (ImGui::Button("Save"))
+	if (ImGui::Button(Lang::Common::Save.Text()))
 	{
 		this->SetResult(EModalResult::OK);
 	}
 
 	ImGui::SameLine();
 
-	if (ImGui::Button("Cancel"))
+	if (ImGui::Button(Lang::Common::Cancel.Text()))
 	{
 		this->SetResult(EModalResult::Cancel);
 	}

@@ -25,6 +25,7 @@
     <ClCompile Include="src\Core\Platform\Windows\Exe\ExeCrashHandler.cpp" />
     <ClCompile Include="src\Engine\Functions\FnRegistry.cpp" />
     <ClCompile Include="src\Host\GW2\Index\Index.cpp" />
+    <ClCompile Include="src\Migrations\Migrations.cpp" />
     <ClCompile Include="src\Engine\Loader\LdrAddonBase.cpp" />
     <ClCompile Include="src\Core\Platform\Windows\Exe\ExeExports.cpp" />
     <ClCompile Include="src\Core\Platform\Windows\Exe\ExePackFile.cpp" />
@@ -77,6 +78,8 @@
     <ClCompile Include="src\UI\Overlay\MumbleInspector\MumbleInspector.cpp" />
     <ClCompile Include="src\UI\Services\Fonts\FontManager.cpp" />
     <ClCompile Include="src\UI\Services\Localization\LoclApi.cpp" />
+    <ClCompile Include="src\UI\Services\Localization\LoclAtlas.cpp" />
+    <ClCompile Include="src\UI\Services\Localization\LoclView.cpp" />
     <ClCompile Include="src\UI\Services\QoL\EscapeClosing.cpp" />
     <ClCompile Include="src\UI\UiBinds.cpp" />
     <ClCompile Include="src\UI\UiContext.cpp" />
@@ -141,6 +144,7 @@
     <ClInclude Include="src\Engine\Functions\FnRegistry.h" />
     <ClInclude Include="src\Host\GW2\Index\IdxEnum.h" />
     <ClInclude Include="src\Host\GW2\Index\Index.h" />
+    <ClInclude Include="src\Migrations\Migrations.h" />
     <ClInclude Include="src\Host\GW2\Addons\API\ApiV1.h" />
     <ClInclude Include="src\Host\GW2\Addons\API\ApiV2.h" />
     <ClInclude Include="src\Host\GW2\Addons\API\ApiV3.h" />
@@ -402,7 +406,10 @@
     <ClInclude Include="src\UI\Services\Fonts\FuncDefs.h" />
     <ClInclude Include="src\UI\Services\Localization\LoclApi.h" />
     <ClInclude Include="src\UI\Services\Localization\LoclFuncDefs.h" />
-    <ClInclude Include="src\UI\Services\Localization\LoclLocale.h" />
+    <ClInclude Include="src\UI\Services\Localization\LoclAtlas.h" />
+    <ClInclude Include="src\UI\Services\Localization\LoclView.h" />
+    <ClInclude Include="src\UI\Services\Localization\LoclText.h" />
+    <ClInclude Include="src\UI\Services\Localization\LoclTextIds.h" />
     <ClInclude Include="src\UI\Services\Localization\LoclQueuedText.h" />
     <ClInclude Include="src\UI\Services\QoL\EscapeClosing.h" />
     <ClInclude Include="src\UI\Services\QoL\FuncDefs.h" />
@@ -522,7 +529,8 @@
       <Command>CALL "$(SolutionDir)Scripts\branch.bat" "$(SolutionDir)src"
 CALL "$(SolutionDir)Scripts\commithash.bat" "$(SolutionDir)src"
 CALL "$(SolutionDir)Scripts\version.bat" "$(SolutionDir)src"
-CALL "$(SolutionDir)Scripts\remoteurl.bat" "$(SolutionDir)src"</Command>
+CALL "$(SolutionDir)Scripts\remoteurl.bat" "$(SolutionDir)src"
+powershell -NoProfile -ExecutionPolicy Bypass -File "$(SolutionDir)tools\generate-locale-ids.ps1"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -561,7 +569,8 @@ CALL "$(SolutionDir)Scripts\remoteurl.bat" "$(SolutionDir)src"</Command>
       <Command>CALL "$(SolutionDir)Scripts\branch.bat" "$(SolutionDir)src"
 CALL "$(SolutionDir)Scripts\commithash.bat" "$(SolutionDir)src"
 CALL "$(SolutionDir)Scripts\version.bat" "$(SolutionDir)src"
-CALL "$(SolutionDir)Scripts\remoteurl.bat" "$(SolutionDir)src"</Command>
+CALL "$(SolutionDir)Scripts\remoteurl.bat" "$(SolutionDir)src"
+powershell -NoProfile -ExecutionPolicy Bypass -File "$(SolutionDir)tools\generate-locale-ids.ps1"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>

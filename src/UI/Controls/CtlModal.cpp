@@ -70,13 +70,9 @@ bool IModal::Render()
 std::string IModal::GetName() const
 {
 	assert(!this->GetID().empty());
-	assert(!this->GetDisplayName().empty());
+	assert(!this->DisplayName.IsEmpty());
 
-	CContext*      ctx   = CContext::GetContext();
-	CUiContext*    uictx = ctx->GetUIContext();
-	CLocalization* lang  = uictx->GetLocalization();
-
-	return std::string{lang->Translate(this->GetDisplayName().c_str())} + "##" + this->ID;
+	return this->GetDisplayName() + "##" + this->ID;
 }
 
 const std::string& IModal::GetID() const
@@ -84,9 +80,9 @@ const std::string& IModal::GetID() const
 	return this->ID;
 }
 
-const std::string& IModal::GetDisplayName() const
+std::string IModal::GetDisplayName() const
 {
-	return this->DisplayName;
+	return this->DisplayName.Text() + this->DisplayNameSuffix;
 }
 
 EModalResult IModal::GetResult() const
@@ -104,9 +100,10 @@ void IModal::SetID(std::string aID)
 	this->ID = aID;
 }
 
-void IModal::SetDisplayName(std::string aDisplayName)
+void IModal::SetDisplayName(CText aDisplayName, std::string aSuffix)
 {
-	this->DisplayName = aDisplayName;
+	this->DisplayName       = aDisplayName;
+	this->DisplayNameSuffix = std::move(aSuffix);
 }
 
 void IModal::SetResult(EModalResult aResult)

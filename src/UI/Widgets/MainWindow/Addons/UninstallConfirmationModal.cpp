@@ -13,19 +13,15 @@
 CUninstallConfirmationModal::CUninstallConfirmationModal()
 {
 	this->SetID("UninstallConfirmationModal");
-	this->SetDisplayName("((000117))");
+	this->SetDisplayName(Lang::Addons::UninstallConfirm);
 }
 
 void CUninstallConfirmationModal::RenderContent()
 {
-	CContext*      ctx   = CContext::GetContext();
-	CUiContext*    uictx = ctx->GetUIContext();
-	CLocalization* lang  = uictx->GetLocalization();
-
-	ImGui::Text(lang->Translate("((000116))"));
+	ImGui::Text(Lang::Common::AreYouSure.Text());
 
 	/* Accept */
-	if (ImGui::Button(lang->Translate("((000065))")))
+	if (ImGui::Button(Lang::Common::Accept.Text()))
 	{
 		this->SetResult(EModalResult::OK);
 	}
@@ -33,7 +29,7 @@ void CUninstallConfirmationModal::RenderContent()
 	ImGui::SameLine();
 
 	/* Cancel */
-	if (ImGui::Button(lang->Translate("((000066))")))
+	if (ImGui::Button(Lang::Common::Cancel.Text()))
 	{
 		this->SetResult(EModalResult::Cancel);
 	}
@@ -74,13 +70,6 @@ void CUninstallConfirmationModal::SetTarget(std::string aName, std::filesystem::
 
 void CUninstallConfirmationModal::SetTitle()
 {
-	CContext* ctx = CContext::GetContext();
-	CUiContext* uictx = ctx->GetUIContext();
-	CLocalization* lang = uictx->GetLocalization();
-
 	/* Override the title before opening the modal. */
-	std::string title = lang->Translate("((000117))");
-	title.append(this->Name);
-
-	this->SetDisplayName(title);
+	this->SetDisplayName(Lang::Addons::UninstallConfirm, this->Name);
 }

@@ -28,11 +28,7 @@ void ISubWindow::Render()
 
 	if (popout)
 	{
-		CContext* ctx = CContext::GetContext();
-		CUiContext* uictx = ctx->GetUIContext();
-		CLocalization* langApi = uictx->GetLocalization();
-
-		std::string wndName = langApi->Translate(this->DisplayName.c_str());
+		std::string wndName = this->GetDisplayName();
 
 		static float minWidth = 1000.f;
 		static float minHeight = 600.f + ImGui::GetFontSize() * 2;
@@ -66,7 +62,7 @@ void ISubWindow::Render()
 		{
 			this->IsPoppedOut = !this->IsPoppedOut;
 		}
-		ImGui::TooltipGeneric("Click to pop-out into separate window.");
+		ImGui::TooltipGeneric(Lang::Window::PopOutHint.Text());
 	}
 	else
 	{
@@ -113,13 +109,7 @@ bool ISubWindow::HasSubWindows()
 
 std::string ISubWindow::GetNameID()
 {
-	static CContext* ctx = CContext::GetContext();
-	static CUiContext* uictx = ctx->GetUIContext();
-	static CLocalization* langApi = uictx->GetLocalization();
-
-	std::string wndName = langApi->Translate(this->DisplayName.c_str());
-
-	return wndName + "##" + this->Name;
+	return std::string{ this->GetDisplayName() } + "##" + this->Name;
 }
 
 bool* ISubWindow::GetVisibleStatePtr()

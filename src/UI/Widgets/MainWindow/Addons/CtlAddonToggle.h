@@ -37,11 +37,11 @@ namespace AddonToggleCtl
 		{
 			if (aAddon->IsLoaded())
 			{
-				buttonText = "((Unload))";
+				buttonText = Lang::Addons::Unload.Text();
 			}
 			else
 			{
-				buttonText = "((Load))";
+				buttonText = Lang::Addons::Load.Text();
 			}
 
 			Config_t* config = aAddon->GetConfig();
@@ -113,7 +113,7 @@ namespace AddonToggleCtl
 	{
 		if (aAddon->IsStateLocked())
 		{
-			ImGui::TooltipGeneric("((IsStateLocked))");
+			ImGui::TooltipGeneric(Lang::Addons::LockedStateRestart.Text());
 		}
 	}
 }

@@ -18,6 +18,7 @@ namespace Clockwork = Raidcore::Clockwork;
 #include "Host/GW2/Context.h"
 #include "Host/GW2/Hooks/Hooks.h"
 #include "Host/GW2/Index/Index.h"
+#include "Migrations/Migrations.h"
 #include "Core/Platform/Windows/Exe/ExeCrashHandler.h"
 #include "Core/Logging/LogApi.h"
 #include "Core/Logging/Windows/LogConsole.h"
@@ -82,6 +83,8 @@ namespace Main
 
 		/* Created first so it is destroyed last: services log from their destructors. */
 		CLogApi::Get();
+
+		Migrations::Run();
 
 		/* Loaded before the services that own settings exist; namespace-scope settings take the values here. */
 		CPreferences::Get()->Init(Index(EPath::Settings));

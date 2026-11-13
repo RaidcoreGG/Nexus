@@ -116,8 +116,8 @@ void CUiBinds::UpdateDisplayInputBinds()
 		if (rhs.Name == "Nexus") return false;
 
 		// Inactive second
-		if (lhs.Name == "((000088))") return true;
-		if (rhs.Name == "((000088))") return false;
+		if (lhs.Name == "(null)") return true;
+		if (rhs.Name == "(null)") return false;
 
 		/* Rest alphabetical */
 		return lhs.Name < rhs.Name;

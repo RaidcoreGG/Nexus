@@ -15,14 +15,12 @@
 CBindSetterModal::CBindSetterModal()
 {
 	this->SetID("BindSetterModal");
-	this->SetDisplayName("((000062))");
+	this->SetDisplayName(Lang::Binds::SetKeybind);
 }
 
 void CBindSetterModal::RenderContent()
 {
 	CContext*      ctx   = CContext::GetContext();
-	CUiContext*    uictx = ctx->GetUIContext();
-	CLocalization* lang  = uictx->GetLocalization();
 	CInputBindApi* ibapi = ctx->GetInputBindApi();
 
 	this->Capture = ibapi->GetCapture();
@@ -43,12 +41,12 @@ void CBindSetterModal::RenderContent()
 
 		if (!this->BindConflict.empty() && this->BindConflict != this->NexusBindID)
 		{
-			ImGui::TextColored(ImVec4(255, 0, 0, 255), (lang->Translate("((000063))") + this->BindConflict + ".").c_str());
+			ImGui::TextColored(ImVec4(255, 0, 0, 255), (Lang::Binds::WillOverwrite.Text() + this->BindConflict + ".").c_str());
 		}
 	}
 
 	/* Unbind */
-	if (ImGui::Button(lang->Translate("((000064))")))
+	if (ImGui::Button(Lang::Binds::Unbind.Text()))
 	{
 		this->SetResult(EModalResult::Secondary);
 	}
@@ -56,7 +54,7 @@ void CBindSetterModal::RenderContent()
 	ImGui::SameLine();
 
 	/* Accept */
-	if (ImGui::Button(lang->Translate("((000065))")))
+	if (ImGui::Button(Lang::Common::Accept.Text()))
 	{
 		this->SetResult(EModalResult::Primary);
 	}
@@ -64,7 +62,7 @@ void CBindSetterModal::RenderContent()
 	ImGui::SameLine();
 
 	/* Cancel */
-	if (ImGui::Button(lang->Translate("((000066))")))
+	if (ImGui::Button(Lang::Common::Cancel.Text()))
 	{
 		this->SetResult(EModalResult::Cancel);
 	}
@@ -218,22 +216,22 @@ void CBindSetterModal::SetTitle()
 	CLocalization* lang  = uictx->GetLocalization();
 
 	/* Override the title before opening the modal. */
-	std::string title = lang->Translate("((000062))");
+	std::string bindName;
 
 	switch (this->Type)
 	{
 		case EBindEditType::Nexus:
 		{
-			title.append(lang->Translate(this->NexusBindID.c_str()));
+			bindName = lang->Translate(this->NexusBindID.c_str());
 			break;
 		}
 		case EBindEditType::Game:
 		case EBindEditType::Game2:
 		{
-			title.append(lang->Translate(NameFrom(this->GameBindID).c_str()));
+			bindName = lang->Translate(NameFrom(this->GameBindID).c_str());
 			break;
 		}
 	}
 
-	this->SetDisplayName(title);
+	this->SetDisplayName(Lang::Binds::SetKeybind, bindName);
 }

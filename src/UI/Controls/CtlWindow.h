@@ -10,6 +10,8 @@
 
 #include <string>
 
+#include "UI/Services/Localization/LoclText.h"
+
 ///----------------------------------------------------------------------------------------------------
 /// IWindow Interface Class
 ///----------------------------------------------------------------------------------------------------
@@ -30,9 +32,9 @@ class IWindow
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetDisplayName:
-	/// 	Returns the display name of the window.
+	/// 	Returns the translated display name of the window.
 	///----------------------------------------------------------------------------------------------------
-	const std::string& GetDisplayName();
+	const char* GetDisplayName();
 
 	///----------------------------------------------------------------------------------------------------
 	/// Invalidate:
@@ -48,7 +50,7 @@ class IWindow
 
 	protected:
 	std::string Name;
-	std::string DisplayName;
+	CText       DisplayName;
 	bool        IsVisible = false;
 	bool        IsInvalid = false;
 };

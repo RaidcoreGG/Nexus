@@ -166,7 +166,7 @@ bool CShortcutIcon::Render()
 		}
 		if (this->ContextItems.size() > 0)
 		{
-			ImGui::TextDisabled(this->Language->Translate("((000102))"));
+			ImGui::TextDisabled(Lang::QuickAccess::RightClickHint.Text());
 		}
 		ImGui::EndTooltip();
 	}

@@ -13,9 +13,9 @@ const std::string& IWindow::GetName()
 	return this->Name;
 }
 
-const std::string& IWindow::GetDisplayName()
+const char* IWindow::GetDisplayName()
 {
-	return this->DisplayName;
+	return this->DisplayName.Text();
 }
 
 void IWindow::Invalidate()

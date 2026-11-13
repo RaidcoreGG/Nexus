@@ -17,4 +17,5 @@ src/Branch.h
 src/CommitHash.h
 src/Version.h
 src/Remote.h
+src/UI/Services/Localization/LoclTextIds.h
 *.user

@@ -23,7 +23,7 @@
 CBindsWindow::CBindsWindow()
 {
 	this->Name           = "Binds";
-	this->DisplayName    = "((000060))";
+	this->DisplayName    = Lang::Binds::Keybinds;
 	this->IconIdentifier = "ICON_BINDS";
 	this->IconEntry      = &Resources::IconBinds;
 	this->IsHost         = true;
@@ -77,7 +77,7 @@ void CBindsWindow::RenderContent()
 					if (ImGui::CollapsingHeader(
 						cat.Name != "(null)"
 						? cat.Name.c_str()
-						: langApi->Translate("((000088))"),
+						: Lang::Binds::Inactive.Text(),
 						ImGuiTreeNodeFlags_DefaultOpen))
 					{
 						RenderInputBindsTable(cat.InputBinds);
@@ -93,14 +93,14 @@ void CBindsWindow::RenderContent()
 		{
 			if (ImGui::BeginChild("Content", ImVec2(ImGui::GetWindowContentRegionWidth(), 0.0f), false, ImGuiWindowFlags_NoBackground))
 			{
-				ImGui::Text("Info:");
-				ImGui::TextWrapped("These binds are used by addons to emulate key presses for you in order to execute macros or similar.");
-				ImGui::TextWrapped("The binds you set here should match the ones you use in-game.");
+				ImGui::TextUnformatted(Lang::Binds::GameBindsInfo.Text());
+				ImGui::TextWrapped("%s", Lang::Binds::GameBindsUsage.Text());
+				ImGui::TextWrapped("%s", Lang::Binds::GameBindsMatch.Text());
 
 				static long long lastCheckedBinds = 0;
 				static std::vector<std::filesystem::path> bindConfigs;
 
-				if (ImGui::BeginCombo("##ImportGameBinds", "Import"))
+				if (ImGui::BeginCombo("##ImportGameBinds", Lang::Binds::Import.Text()))
 				{
 					long long now = Time::GetTimestamp();
 
@@ -198,7 +198,7 @@ void CBindsWindow::RenderInputBindsTable(std::unordered_map<std::string, InputBi
 				CInputBindApi* ibapi = ctx->GetInputBindApi();
 				ibapi->SetPassthrough(identifier, inputBind.Bind.Passthrough);
 			}
-			ImGui::TooltipGeneric(langApi->Translate("((000115))"));
+			ImGui::TooltipGeneric(Lang::Binds::PassThrough.Text());
 
 			ImGui::TableSetColumnIndex(3);
 			/* FIXME: This accesses the DownAsync union field. */
@@ -209,7 +209,7 @@ void CBindsWindow::RenderInputBindsTable(std::unordered_map<std::string, InputBi
 					DeleteStaleBind(identifier);
 				}
 				ImGui::SameLine();
-				ImGui::TextDisabled(langApi->Translate("((000061))"));
+				ImGui::TextDisabled(Lang::Binds::NotInUse.Text());
 			}
 		}
 

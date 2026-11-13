@@ -8,74 +8,95 @@
 
 #include "LoclApi.h"
 
+#include <algorithm>
 #include <fstream>
 #include <windows.h>
-
-#pragma warning(push, 0)
-#include "nlohmann/json.hpp"
-#pragma warning(pop)
-using json = nlohmann::json;
 
 #include "Host/GW2/Index/Index.h"
 #include "res/Resources.h"
 #include "Host/GW2/Context.h"
 
+namespace Clockwork = Raidcore::Clockwork;
 using Raidcore::Core::Platform::Windows::CPackFile;
 
 static CLocalization* s_Localization{};
+
+///----------------------------------------------------------------------------------------------------
+/// LoadFiles:
+/// 	Loads the embedded locale files, then the user's files from the directory on top. Runs on a worker.
+///----------------------------------------------------------------------------------------------------
+static std::shared_ptr<const LocaleAtlas_t> LoadFiles(const std::filesystem::path& aDirectory)
+{
+	static constexpr std::pair<const char*, const CPackFile*> s_EmbeddedLocales[] = {
+		{ "en/DisplayStrings", &Resources::LocaleDisplayStringsEN }, { "en/GameBinds", &Resources::LocaleGameBindsEN }, { "en/InputBinds", &Resources::LocaleInputBindsEN },
+		{ "de/DisplayStrings", &Resources::LocaleDisplayStringsDE }, { "de/GameBinds", &Resources::LocaleGameBindsDE }, { "de/InputBinds", &Resources::LocaleInputBindsDE },
+		{ "fr/DisplayStrings", &Resources::LocaleDisplayStringsFR }, { "fr/GameBinds", &Resources::LocaleGameBindsFR }, { "fr/InputBinds", &Resources::LocaleInputBindsFR },
+		{ "es/DisplayStrings", &Resources::LocaleDisplayStringsES }, { "es/GameBinds", &Resources::LocaleGameBindsES }, { "es/InputBinds", &Resources::LocaleInputBindsES },
+		{ "cn/DisplayStrings", &Resources::LocaleDisplayStringsCN }, { "cn/GameBinds", &Resources::LocaleGameBindsCN }, { "cn/InputBinds", &Resources::LocaleInputBindsCN },
+		{ "kr/DisplayStrings", &Resources::LocaleDisplayStringsKR }, { "kr/GameBinds", &Resources::LocaleGameBindsKR }, { "kr/InputBinds", &Resources::LocaleInputBindsKR },
+		{ "br/DisplayStrings", &Resources::LocaleDisplayStringsBR }, { "br/GameBinds", &Resources::LocaleGameBindsBR }, { "br/InputBinds", &Resources::LocaleInputBindsBR },
+		{ "cz/DisplayStrings", &Resources::LocaleDisplayStringsCZ }, { "cz/GameBinds", &Resources::LocaleGameBindsCZ }, { "cz/InputBinds", &Resources::LocaleInputBindsCZ },
+		{ "it/DisplayStrings", &Resources::LocaleDisplayStringsIT }, { "it/GameBinds", &Resources::LocaleGameBindsIT }, { "it/InputBinds", &Resources::LocaleInputBindsIT },
+		{ "pl/DisplayStrings", &Resources::LocaleDisplayStringsPL }, { "pl/GameBinds", &Resources::LocaleGameBindsPL }, { "pl/InputBinds", &Resources::LocaleInputBindsPL },
+		{ "ru/DisplayStrings", &Resources::LocaleDisplayStringsRU }, { "ru/GameBinds", &Resources::LocaleGameBindsRU }, { "ru/InputBinds", &Resources::LocaleInputBindsRU }
+	};
+
+	std::shared_ptr<LocaleAtlas_t> atlas = std::make_shared<LocaleAtlas_t>();
+
+	for (const auto& [name, packFile] : s_EmbeddedLocales)
+	{
+		std::span<const uint8_t> data = packFile->GetBytes();
+
+		if (data.empty())
+		{
+			LogWarning(CH_LOCALIZATION, "Embedded locale \"%s\" could not be loaded.", name);
+			continue;
+		}
+
+		MergeLocaleFile(*atlas, data, std::string("Embedded locale ") + name);
+	}
+
+	/* User files are merged after the embedded ones, so they can add languages or override texts. */
+	std::error_code ec;
+
+	if (!aDirectory.empty() && std::filesystem::exists(aDirectory, ec))
+	{
+		for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(aDirectory, ec))
+		{
+			const std::filesystem::path& path = entry.path();
+
+			if (path.extension() != ".json" || entry.file_size(ec) == 0)
+			{
+				continue;
+			}
+
+			std::ifstream file(path, std::ios::binary);
+			std::vector<uint8_t> content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+			MergeLocaleFile(*atlas, content, path.filename().string());
+		}
+	}
+
+	return atlas;
+}
 
 /*static*/ void CLocalization::OnUELanguageChanged(uint32_t* aLanguage)
 {
 	if (!aLanguage) { return; }
 	if (!s_Localization) { return; }
 
-	switch (*aLanguage)
+	static constexpr const char* s_Languages[] = { "en", "kr", "fr", "de", "es", "cn" };
+
+	if (*aLanguage < std::size(s_Languages))
 	{
-		case 0:
-		{
-			s_Localization->SetLanguage("en");
-			break;
-		}
-		case 1:
-		{
-			s_Localization->SetLanguage("kr");
-			break;
-		}
-		case 2:
-		{
-			s_Localization->SetLanguage("fr");
-			break;
-		}
-		case 3:
-		{
-			s_Localization->SetLanguage("de");
-			break;
-		}
-		case 4:
-		{
-			s_Localization->SetLanguage("es");
-			break;
-		}
-		case 5:
-		{
-			s_Localization->SetLanguage("cn");
-			break;
-		}
+		s_Localization->SetLanguage(s_Languages[*aLanguage]);
 	}
 }
 
-CLocalization::CLocalization()
+CLocalization::CLocalization() : IRefCleaner("Localization")
 {
 	CContext* ctx = CContext::GetContext();
 	CEventApi* evtapi = ctx->GetEventApi();
-
-	/* Older versions unpacked the embedded locales to disk. Remove them so stale copies do not override the embedded ones. */
-	for (EPath legacy : { EPath::LocaleEN, EPath::LocaleDE, EPath::LocaleFR, EPath::LocaleES, EPath::LocaleCN, EPath::LocaleKR,
-	                      EPath::LocaleBR, EPath::LocaleCZ, EPath::LocaleIT, EPath::LocalePL, EPath::LocaleRU })
-	{
-		std::error_code ec;
-		std::filesystem::remove(Index(legacy), ec);
-	}
 
 	this->SetLocaleDirectory(Index(EPath::DIR_LOCALES));
 
@@ -89,13 +110,16 @@ CLocalization::CLocalization()
 
 CLocalization::~CLocalization()
 {
-	this->ClearLocaleAtlas();
+	if (s_Localization == this)
+	{
+		s_Localization = nullptr;
+	}
+
+	this->ActiveLanguage = nullptr;
 }
 
 bool CLocalization::Advance()
 {
-	bool didModify = false;
-
 	/* Set thread ID. We may only call Advance from the UI thread. */
 	if (this->ThreadID == 0)
 	{
@@ -104,346 +128,299 @@ bool CLocalization::Advance()
 
 	assert(this->ThreadID == GetCurrentThreadId());
 
-	if (!this->IsLocaleAtlasBuilt)
+	std::vector<LocaleChange_t> changes;
+	std::string newLanguage;
 	{
-		this->BuildLocaleAtlas();
-		didModify = true;
+		const std::lock_guard<std::mutex> lock(this->ChangesMutex);
+		changes.swap(this->Changes);
+		newLanguage.swap(this->QueuedLanguage);
 	}
 
-	/* Process queued texts. */
-	while (this->QueuedTexts.size() > 0)
+	this->IsViewDirty |= this->ApplyChanges(changes);
+
+	bool textsChanged = false;
+
+	if (!newLanguage.empty() && newLanguage != this->ActiveLanguageId)
 	{
-		QueuedText_t& item = this->QueuedTexts.front();
-		
-		auto atlasIt = this->LocaleAtlas.find(item.LanguageIdentifier);
-
-		if (atlasIt != this->LocaleAtlas.end())
-		{
-			auto textIt = atlasIt->second.Texts.find(item.Identifier);
-
-			if (textIt != atlasIt->second.Texts.end())
-			{
-				/* Sanity check. Free the existing string. */
-				if (textIt->second != nullptr)
-				{
-					free((void*)textIt->second);
-				}
-
-				textIt->second = _strdup(item.Text.c_str());
-			}
-			else
-			{
-				atlasIt->second.Texts.emplace(item.Identifier, _strdup(item.Text.c_str()));
-			}
-		}
-
-		this->QueuedTexts.erase(this->QueuedTexts.begin());
-
-		didModify = true;
+		this->ActiveLanguageId = newLanguage;
+		this->SelectActiveLanguage();
+		textsChanged = true;
 	}
 
-	/* Process queued language. */
-	if (!this->QueuedLanguage.empty())
+	if (this->NextFiles && this->NextFiles->Completed())
 	{
-		std::string newlang = this->QueuedLanguage;
-		this->QueuedLanguage.clear();
-
-		auto atlasIt = this->LocaleAtlas.find(newlang);
-
-		/* Find it via short identifier. */
-		if (atlasIt != this->LocaleAtlas.end())
-		{
-			this->ActiveLocale = &atlasIt->second;
-		}
-		else /* Find it via display name. */
-		{
-			for (auto& it : this->LocaleAtlas)
-			{
-				if (it.second.DisplayName == newlang)
-				{
-					this->ActiveLocale = &it.second;
-					break;
-				}
-			}
-		}
-
-		assert(this->ActiveLocale);
+		this->Files = this->NextFiles->Result();
+		this->NextFiles.reset();
+		this->IsViewDirty = true;
 	}
 
-	return didModify;
+	if (this->NextView && this->NextView->Completed())
+	{
+		this->CurrentView = this->NextView->Result();
+		this->NextView.reset();
+		this->SelectActiveLanguage();
+		textsChanged = true;
+	}
+
+	/* One task of each kind at a time; changes made meanwhile start the next one when it is done. */
+	if (this->IsFilesDirty && !this->NextFiles)
+	{
+		this->IsFilesDirty = false;
+
+		this->NextFiles = Clockwork::Run<std::shared_ptr<const LocaleAtlas_t>>(Clockwork::ETaskPriority::Normal, [directory = this->Directory](Clockwork::CancellationToken aToken)
+		{
+			return LoadFiles(directory);
+		});
+	}
+
+	/* A view built while files are loading would be replaced right away, so it waits for them. */
+	if (this->IsViewDirty && !this->NextView && !this->NextFiles && this->Files)
+	{
+		this->IsViewDirty = false;
+
+		std::vector<std::shared_ptr<const LocaleAtlas_t>> sources;
+		sources.push_back(this->Files);
+
+		for (const AddonAtlas_t& addon : this->AddonAtlases)
+		{
+			sources.push_back(addon.second);
+		}
+
+		this->NextView = Clockwork::Run<std::shared_ptr<const LocaleView_t>>(Clockwork::ETaskPriority::Normal, [sources = std::move(sources)](Clockwork::CancellationToken aToken) mutable
+		{
+			return BuildLocaleView(std::move(sources));
+		});
+	}
+
+	return textsChanged;
+}
+
+bool CLocalization::ApplyChanges(std::vector<LocaleChange_t>& aChanges)
+{
+	if (aChanges.empty())
+	{
+		return false;
+	}
+
+	/* Copies of the atlases changed in this batch; shared atlases are never modified. */
+	std::vector<std::pair<void*, std::shared_ptr<LocaleAtlas_t>>> edits;
+
+	auto editable = [&](void* aOwner) -> LocaleAtlas_t&
+	{
+		for (auto& [owner, atlas] : edits)
+		{
+			if (owner == aOwner) { return *atlas; }
+		}
+
+		auto it = std::find_if(this->AddonAtlases.begin(), this->AddonAtlases.end(), [aOwner](const AddonAtlas_t& aEntry) { return aEntry.first == aOwner; });
+
+		if (it == this->AddonAtlases.end())
+		{
+			this->AddonAtlases.emplace_back(aOwner, nullptr);
+			it = std::prev(this->AddonAtlases.end());
+		}
+
+		auto copy = it->second ? std::make_shared<LocaleAtlas_t>(*it->second) : std::make_shared<LocaleAtlas_t>();
+		edits.emplace_back(aOwner, copy);
+		return *copy;
+	};
+
+	for (LocaleChange_t& change : aChanges)
+	{
+		if (QueuedText_t* text = std::get_if<QueuedText_t>(&change))
+		{
+			editable(text->Owner)[text->LanguageIdentifier].Texts.insert_or_assign(std::move(text->Identifier), std::move(text->Text));
+		}
+		else
+		{
+			const QueuedCleanup_t& cleanup = std::get<QueuedCleanup_t>(change);
+
+			auto inRange = [&cleanup](void* aOwner)
+			{
+				return aOwner && aOwner >= cleanup.StartAddress && aOwner <= cleanup.EndAddress;
+			};
+
+			std::erase_if(this->AddonAtlases, [&](const AddonAtlas_t& aEntry) { return inRange(aEntry.first); });
+			std::erase_if(edits, [&](const auto& aEntry) { return inRange(aEntry.first); });
+		}
+	}
+
+	for (auto& [owner, atlas] : edits)
+	{
+		for (AddonAtlas_t& entry : this->AddonAtlases)
+		{
+			if (entry.first == owner)
+			{
+				entry.second = std::move(atlas);
+				break;
+			}
+		}
+	}
+
+	return true;
+}
+
+void CLocalization::SelectActiveLanguage()
+{
+	const LocaleView_t* view = this->CurrentView.get();
+	const LocaleViewLanguage_t* language = nullptr;
+
+	if (view)
+	{
+		language = view->Find(this->ActiveLanguageId);
+
+		if (!language)
+		{
+			language = view->Find("en");
+		}
+	}
+
+	this->ActiveLanguage = language;
 }
 
 const char* CLocalization::Translate(const char* aIdentifier, const char* aLanguageIdentifier)
 {
+	/* Advance swaps the view on the UI thread; ThreadID is set by the first Advance. */
+	assert((this->ThreadID == 0 || this->ThreadID == GetCurrentThreadId()) && "Translate is UI thread only.");
+
 	if (aIdentifier == nullptr) { return aIdentifier; }
 
-	if (!this->IsLocaleAtlasBuilt)
+	const LocaleView_t* view = this->CurrentView.get();
+
+	if (!view)
 	{
-		/* Cannot translate, if atlas was never built. */
 		return aIdentifier;
 	}
 
-	std::string identifier = aIdentifier;
+	const std::string_view identifier = aIdentifier;
 
-	/* If language identifier was passed, translate from that. */
+	/* The requested language's own texts first, so a text of the active language still wins over English. */
 	if (aLanguageIdentifier)
 	{
-		std::string languageIdentifier = aLanguageIdentifier;
+		auto langIt = view->Languages.find(std::string_view{ aLanguageIdentifier });
 
-		auto atlasIt = this->LocaleAtlas.find(languageIdentifier);
-
-		if (atlasIt != this->LocaleAtlas.end())
+		if (langIt != view->Languages.end())
 		{
-			auto it = atlasIt->second.Texts.find(identifier);
+			auto it = langIt->second.Own.find(identifier);
 
-			if (it != atlasIt->second.Texts.end())
+			if (it != langIt->second.Own.end())
 			{
 				return it->second;
 			}
 		}
 	}
 
-	/* If no language identifier was passed, or the text does not exist in it, search active locale. */
-	if (this->ActiveLocale)
-	{
-		auto it = this->ActiveLocale->Texts.find(identifier);
+	/* Lookup already holds the English fallback, so one search covers both. */
+	const LocaleViewLanguage_t* language = this->ActiveLanguage;
 
-		if (it != this->ActiveLocale->Texts.end())
+	if (!language)
+	{
+		language = view->Find("en");
+	}
+
+	if (language)
+	{
+		auto it = language->Lookup.find(identifier);
+
+		if (it != language->Lookup.end())
 		{
 			return it->second;
 		}
 	}
 
-	/* If not found in active locale, and active locale is not english, try to search in English. */
-	if (!this->ActiveLocale || this->ActiveLocale->DisplayName != "English")
-	{
-		auto atlasIt = this->LocaleAtlas.find("en");
-
-		if (atlasIt != this->LocaleAtlas.end())
-		{
-			auto it = atlasIt->second.Texts.find(identifier);
-
-			if (it != atlasIt->second.Texts.end())
-			{
-				return it->second;
-			}
-		}
-	}
-
-	/* Text not found in specified language, active locale or English. */
 	return aIdentifier;
 }
 
-void CLocalization::Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aText)
+void CLocalization::Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aText, void* aCaller)
 {
 	if (!aIdentifier)         { return; }
 	if (!aLanguageIdentifier) { return; }
 	if (!aText)               { return; }
 
-	this->QueuedTexts.push_back({ aIdentifier, aLanguageIdentifier, aText });
+	/* The module base matches the range CleanupRefs receives when that module unloads. */
+	HMODULE owner = nullptr;
+
+	if (aCaller)
+	{
+		GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, static_cast<LPCWSTR>(aCaller), &owner);
+	}
+
+	const std::lock_guard<std::mutex> lock(this->ChangesMutex);
+	this->Changes.push_back(QueuedText_t{ aIdentifier, aLanguageIdentifier, aText, owner });
 }
 
 void CLocalization::SetLanguage(const std::string& aIdentifier)
 {
+	const std::lock_guard<std::mutex> lock(this->ChangesMutex);
 	this->QueuedLanguage = aIdentifier;
+}
+
+const char* CText::Text() const
+{
+	if (!this->KeyStr)
+	{
+		return "";
+	}
+
+	return s_Localization ? s_Localization->Translate(this->KeyStr) : this->KeyStr;
+}
+
+uint32_t CLocalization::CleanupRefs(void* aStartAddress, void* aEndAddress)
+{
+	const std::lock_guard<std::mutex> lock(this->ChangesMutex);
+	this->Changes.push_back(QueuedCleanup_t{ aStartAddress, aEndAddress });
+
+	return 0;
 }
 
 std::vector<std::string> CLocalization::GetLanguages()
 {
-	std::vector<std::string> langs;
+	std::vector<std::string> languages;
 
-	for (auto& it : this->LocaleAtlas)
+	if (this->CurrentView)
 	{
-		langs.push_back(it.second.DisplayName);
+		for (const auto& [id, language] : this->CurrentView->Languages)
+		{
+			languages.push_back(language.DisplayName);
+		}
 	}
 
-	return langs;
+	return languages;
 }
 
 const std::string& CLocalization::GetActiveLanguage()
 {
-	assert(this->ActiveLocale);
-	return this->ActiveLocale->DisplayName;
+	static const std::string s_None;
+
+	const LocaleViewLanguage_t* language = this->ActiveLanguage;
+	return language ? language->DisplayName : s_None;
 }
 
 void CLocalization::SetLocaleDirectory(std::filesystem::path aPath)
 {
-	this->Directory = aPath;
-	this->IsLocaleAtlasBuilt = false;
+	this->Directory = std::move(aPath);
+	this->IsFilesDirty = true;
 }
 
 std::vector<const char*> CLocalization::GetAllTexts()
 {
 	std::vector<const char*> allTexts;
 
-	for (auto& [atlasId, atlasLocale] : this->LocaleAtlas)
+	if (!this->CurrentView)
 	{
-		for (auto& [textId, textVal] : atlasLocale.Texts)
+		return allTexts;
+	}
+
+	for (const auto& [id, language] : this->CurrentView->Languages)
+	{
+		/* The language picker shows every display name, so their glyphs are needed even if the language is not active. */
+		allTexts.push_back(language.DisplayName.c_str());
+
+		for (const auto& [key, text] : language.Own)
 		{
-			allTexts.push_back(textVal);
+			allTexts.push_back(text);
 		}
 	}
 
 	return allTexts;
-}
-
-void CLocalization::BuildLocaleAtlas()
-{
-	/* Clear existing atlas. */
-	this->ClearLocaleAtlas();
-
-	static constexpr std::pair<const char*, const CPackFile*> s_EmbeddedLocales[] = {
-		{ "en/DisplayStrings", &Resources::LocaleDisplayStringsEN }, { "en/GameBinds", &Resources::LocaleGameBindsEN }, { "en/InputBinds", &Resources::LocaleInputBindsEN },
-		{ "de/DisplayStrings", &Resources::LocaleDisplayStringsDE }, { "de/GameBinds", &Resources::LocaleGameBindsDE }, { "de/InputBinds", &Resources::LocaleInputBindsDE },
-		{ "fr/DisplayStrings", &Resources::LocaleDisplayStringsFR }, { "fr/GameBinds", &Resources::LocaleGameBindsFR }, { "fr/InputBinds", &Resources::LocaleInputBindsFR },
-		{ "es/DisplayStrings", &Resources::LocaleDisplayStringsES }, { "es/GameBinds", &Resources::LocaleGameBindsES }, { "es/InputBinds", &Resources::LocaleInputBindsES },
-		{ "cn/DisplayStrings", &Resources::LocaleDisplayStringsCN }, { "cn/GameBinds", &Resources::LocaleGameBindsCN }, { "cn/InputBinds", &Resources::LocaleInputBindsCN },
-		{ "kr/DisplayStrings", &Resources::LocaleDisplayStringsKR }, { "kr/GameBinds", &Resources::LocaleGameBindsKR }, { "kr/InputBinds", &Resources::LocaleInputBindsKR },
-		{ "br/DisplayStrings", &Resources::LocaleDisplayStringsBR },                                                               { "br/InputBinds", &Resources::LocaleInputBindsBR },
-		{ "cz/DisplayStrings", &Resources::LocaleDisplayStringsCZ },                                                               { "cz/InputBinds", &Resources::LocaleInputBindsCZ },
-		{ "it/DisplayStrings", &Resources::LocaleDisplayStringsIT }, { "it/GameBinds", &Resources::LocaleGameBindsIT }, { "it/InputBinds", &Resources::LocaleInputBindsIT },
-		{ "pl/DisplayStrings", &Resources::LocaleDisplayStringsPL },                                                               { "pl/InputBinds", &Resources::LocaleInputBindsPL },
-		{ "ru/DisplayStrings", &Resources::LocaleDisplayStringsRU },                                                               { "ru/InputBinds", &Resources::LocaleInputBindsRU }
-	};
-
-	for (const auto& [name, packFile] : s_EmbeddedLocales)
-	{
-		std::span<const uint8_t> data = packFile->GetBytes();
-
-		if (data.empty())
-		{
-			LogWarning(CH_LOCALIZATION, "Embedded locale \"%s\" could not be loaded.", name);
-			continue;
-		}
-
-		this->MergeLocale(data, std::string("Embedded locale ") + name);
-	}
-
-	/* Files on disk are merged after the embedded locales, so they can add languages or override texts. */
-	if (!this->Directory.empty() && std::filesystem::exists(this->Directory))
-	{
-		for (const std::filesystem::directory_entry entry : std::filesystem::directory_iterator(this->Directory))
-		{
-			std::filesystem::path path = entry.path();
-
-			if (path.extension() != ".json")
-			{
-				continue;
-			}
-
-			if (std::filesystem::file_size(path) == 0)
-			{
-				continue;
-			}
-
-			std::ifstream file(path, std::ios::binary);
-			std::vector<uint8_t> content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-			file.close();
-
-			this->MergeLocale(content, path.filename().string());
-		}
-	}
-
-	this->IsLocaleAtlasBuilt = true;
-}
-
-void CLocalization::MergeLocale(std::span<const uint8_t> aData, const std::string& aSourceName)
-{
-	try
-	{
-		json localeJson = json::parse(aData.begin(), aData.end());
-
-		if (localeJson.is_null())
-		{
-			return;
-		}
-
-		if (localeJson["Identifier"].is_null())
-		{
-			return;
-		}
-
-		if (localeJson["Texts"].is_null())
-		{
-			return;
-		}
-
-		std::string locId = localeJson["Identifier"].get<std::string>();
-
-		auto atlasIt = this->LocaleAtlas.find(locId);
-
-		Locale_t loc{};
-		if (atlasIt != this->LocaleAtlas.end())
-		{
-			loc = atlasIt->second;
-		}
-
-		/* DisplayName can be null, hopefully *any* of the files have it set, if not fallback to identifier */
-		if (!localeJson["DisplayName"].is_null() && loc.DisplayName.empty())
-		{
-			localeJson["DisplayName"].get_to(loc.DisplayName);
-		}
-
-		for (auto& [key, value] : localeJson["Texts"].items())
-		{
-			if (value.is_null() || !value.is_string())
-			{
-				continue;
-			}
-
-			auto textIt = loc.Texts.find(key);
-
-			/* if a value is already set, clear it. only used when merging */
-			if (textIt != loc.Texts.end())
-			{
-				/* Sanity check. Free the existing string. */
-				if (textIt->second != nullptr)
-				{
-					free((void*)textIt->second);
-				}
-
-				textIt->second = _strdup(value.get<std::string>().c_str());
-			}
-			else
-			{
-				loc.Texts.emplace(key, _strdup(value.get<std::string>().c_str()));
-			}
-		}
-
-		if (atlasIt != this->LocaleAtlas.end())
-		{
-			atlasIt->second = loc;
-		}
-		else
-		{
-			this->LocaleAtlas.emplace(locId, loc);
-		}
-	}
-	catch (json::exception& ex)
-	{
-		LogWarning(CH_LOCALIZATION, "%s could not be parsed. Error: %s", aSourceName.c_str(), ex.what());
-	}
-}
-
-void CLocalization::ClearLocaleAtlas()
-{
-	if (!this->IsLocaleAtlasBuilt)
-	{
-		return;
-	}
-
-	/* delete strings */
-	for (auto& locale : this->LocaleAtlas)
-	{
-		for (auto& text : locale.second.Texts)
-		{
-			/* Sanity check. Free the existing string. */
-			if (text.second != nullptr)
-			{
-				free((void*)text.second);
-			}
-		}
-	}
-
-	this->IsLocaleAtlasBuilt = false;
 }

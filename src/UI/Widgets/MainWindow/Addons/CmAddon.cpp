@@ -20,7 +20,7 @@ void CAddonContextMenu::RenderContent()
 		{
 			if (!this->Data->Addon->IsVersionDisabled())
 			{
-				if (ImGui::Selectable("((Disable until Update))"))
+				if (ImGui::Selectable(Lang::Addons::DisableUntilUpdate.Text()))
 				{
 					// TODO: Config disable version
 				}
@@ -28,14 +28,14 @@ void CAddonContextMenu::RenderContent()
 
 			if (this->Data->Addon->IsUpdateAvailable())
 			{
-				if (ImGui::Selectable("((Update))"))
+				if (ImGui::Selectable(Lang::Addons::Update.Text()))
 				{
 					this->Data->Addon->Update();
 				}
 			}
 			else
 			{
-				if (ImGui::Selectable("((Check for Update))"))
+				if (ImGui::Selectable(Lang::Addons::CheckForUpdates.Text()))
 				{
 					this->Data->Addon->CheckUpdate();
 				}
@@ -44,7 +44,7 @@ void CAddonContextMenu::RenderContent()
 			ImGui::Separator();
 		}
 
-		if (ImGui::Selectable("((Uninstall))"))
+		if (ImGui::Selectable(Lang::Addons::Uninstall.Text()))
 		{
 			// TODO: This is a parent object.
 			//this->UninstallConfirmationModal.SetTarget(config, this->Data->GetName(), this->Data->Addon->GetLocation());

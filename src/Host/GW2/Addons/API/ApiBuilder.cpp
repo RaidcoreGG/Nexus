@@ -9,6 +9,7 @@
 #include "ApiBuilder.h"
 
 #include <assert.h>
+#include <intrin.h>
 
 #include "ApiV1.h"
 #include "ApiV2.h"
@@ -290,10 +291,11 @@ namespace ADDONAPI
 			return s_Localization->Translate(aIdentifier, aLanguageIdentifier);
 		}
 
-		void Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aString)
+		/* Not inlined: the return address must be the addon's call site, so the text is removed when it unloads. */
+		__declspec(noinline) void Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aString)
 		{
 			assert(s_Localization);
-			s_Localization->Set(aIdentifier, aLanguageIdentifier, aString);
+			s_Localization->Set(aIdentifier, aLanguageIdentifier, aString, _ReturnAddress());
 		}
 	}
 

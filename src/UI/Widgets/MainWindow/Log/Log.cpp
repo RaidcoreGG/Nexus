@@ -21,7 +21,7 @@ CLogWindow::CLogWindow()
 	this->SetLogLevel(ELogLevel::ALL);
 
 	this->Name           = "Log";
-	this->DisplayName    = "((000006))";
+	this->DisplayName    = Lang::Nav::Log;
 	this->IconIdentifier = "ICON_LOG";
 	this->IconEntry      = &Resources::IconLog;
 }
@@ -41,7 +41,7 @@ void CLogWindow::RenderContent()
 	}
 
 	ImGui::AlignTextToFramePadding();
-	ImGui::Text("Shown messages");
+	ImGui::TextUnformatted(Lang::Log::ShownMessages.Text());
 	ImGui::SameLine();
 
 	ImGui::SetNextItemWidth(ImGui::CalcTextSize("######").x);
@@ -53,58 +53,49 @@ void CLogWindow::RenderContent()
 			this->MaxShownCount = 99999;
 		}
 	}
-	ImGui::TooltipGeneric("Set to 0 to show all messages.");
+	ImGui::TooltipGeneric(Lang::Log::ShownMessagesHint.Text());
 
 	ImGui::AlignTextToFramePadding();
 	ImGui::SameLine();
-	ImGui::Text("Log Level");
+	ImGui::TextUnformatted(Lang::Log::Level.Text());
 	ImGui::SameLine();
 	ImGui::SetNextItemWidth(ImGui::CalcTextSize("##########").x);
-	static std::string levelPreview = "All";
-	if (ImGui::BeginCombo("##Filter_LogLevel", levelPreview.c_str()))
+
+	static constexpr std::pair<ELogLevel, CText> s_Levels[] = {
+		{ ELogLevel::CRITICAL, Lang::Log::LevelCritical },
+		{ ELogLevel::WARNING,  Lang::Log::LevelWarning  },
+		{ ELogLevel::INFO,     Lang::Log::LevelInfo     },
+		{ ELogLevel::DEBUG,    Lang::Log::LevelDebug    },
+		{ ELogLevel::TRACE,    Lang::Log::LevelTrace    },
+		{ ELogLevel::ALL,      Lang::Log::LevelAll      }
+	};
+
+	const char* levelPreview = Lang::Log::LevelAll.Text();
+
+	for (const auto& [level, text] : s_Levels)
 	{
-		if (ImGui::Selectable("Critical"))
+		if (level == this->FilterLevel)
 		{
-			levelPreview = "Critical";
-			this->FilterLevel = ELogLevel::CRITICAL;
+			levelPreview = text.Text();
 		}
+	}
 
-		if (ImGui::Selectable("Warning"))
+	if (ImGui::BeginCombo("##Filter_LogLevel", levelPreview))
+	{
+		for (const auto& [level, text] : s_Levels)
 		{
-			levelPreview = "Warning";
-			this->FilterLevel = ELogLevel::WARNING;
-		}
-
-		if (ImGui::Selectable("Info"))
-		{
-			levelPreview = "Info";
-			this->FilterLevel = ELogLevel::INFO;
-		}
-
-		if (ImGui::Selectable("Debug"))
-		{
-			levelPreview = "Debug";
-			this->FilterLevel = ELogLevel::DEBUG;
-		}
-
-		if (ImGui::Selectable("Trace"))
-		{
-			levelPreview = "Trace";
-			this->FilterLevel = ELogLevel::TRACE;
-		}
-
-		if (ImGui::Selectable("All"))
-		{
-			levelPreview = "All";
-			this->FilterLevel = ELogLevel::ALL;
+			if (ImGui::Selectable(text.Text(), level == this->FilterLevel))
+			{
+				this->FilterLevel = level;
+			}
 		}
 
 		ImGui::EndCombo();
 	}
 
 	ImGui::SameLine();
-	ImGui::Checkbox("Selected level only", &this->SelectedLevelOnly);
-	ImGui::TooltipGeneric("If selected only messages with the specific log level are shown.\nIf not selected, all messages with a log level higher or equal to the filter are shown.");
+	ImGui::Checkbox(Lang::Log::SelectedLevelOnly.Text(), &this->SelectedLevelOnly);
+	ImGui::TooltipGeneric(Lang::Log::SelectedLevelOnlyHint.Text());
 
 	ImGuiStyle& style = ImGui::GetStyle();
 
@@ -119,7 +110,7 @@ void CLogWindow::RenderContent()
 	{
 		ImGui::BeginChild("Channels", ImVec2(widthChannels, 0.0f), false, ImGuiWindowFlags_NoBackground);
 
-		ImGui::Text("Channels");
+		ImGui::TextUnformatted(Lang::Log::Channels.Text());
 
 		const std::lock_guard<std::mutex> lock(Mutex);
 		for (LogChannel_t& ch : this->Channels)

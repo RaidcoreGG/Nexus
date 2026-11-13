@@ -10,6 +10,8 @@
 
 #include <string>
 
+#include "UI/Services/Localization/LoclText.h"
+
 ///----------------------------------------------------------------------------------------------------
 /// EModalResult Enumeration
 ///----------------------------------------------------------------------------------------------------
@@ -49,9 +51,9 @@ class IModal
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetDisplayName:
-	/// 	Gets the display name of the modal.
+	/// 	Gets the translated display name of the modal, including its suffix.
 	///----------------------------------------------------------------------------------------------------
-	const std::string& GetDisplayName() const;
+	std::string GetDisplayName() const;
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetResult:
@@ -74,9 +76,9 @@ class IModal
 
 	///----------------------------------------------------------------------------------------------------
 	/// SetDisplayName:
-	/// 	Sets the display name of the modal.
+	/// 	Sets the display name of the modal. The suffix is shown untranslated after it, e.g. an addon name.
 	///----------------------------------------------------------------------------------------------------
-	void SetDisplayName(std::string aDisplayName);
+	void SetDisplayName(CText aDisplayName, std::string aSuffix = {});
 
 	///----------------------------------------------------------------------------------------------------
 	/// SetResult:
@@ -105,7 +107,8 @@ class IModal
 
 	private:
 	std::string  ID;
-	std::string  DisplayName;
+	CText        DisplayName;
+	std::string  DisplayNameSuffix;
 	EModalResult Result              = EModalResult::None;
 	bool         ShouldOpenNextFrame = false;
 };

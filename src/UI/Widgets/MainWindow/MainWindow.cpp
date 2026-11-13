@@ -276,9 +276,6 @@ void CMainWindow::Render()
 
 				//navY += navItemSz.y + padding.y;
 			}
-			
-			static CUiContext* uictx = ctx->GetUIContext();
-			static CLocalization* langApi = uictx->GetLocalization();
 
 			/* Dynamic Nav Items */
 			for (ISubWindow* window : this->Windows)
@@ -296,13 +293,13 @@ void CMainWindow::Render()
 					}
 					else
 					{
-						std::string wndName = langApi->Translate(window->GetDisplayName().c_str());
+						std::string wndName = window->GetDisplayName();
 						ImGui::SetWindowFocus((wndName + "##" + window->GetName()).c_str());
 					}
 				}
 				ImGui::PopStyleVar();
 
-				ImGui::TooltipGeneric(langApi->Translate(window->GetDisplayName().c_str()));
+				ImGui::TooltipGeneric(window->GetDisplayName());
 
 				const Texture_t* icon = window->GetIcon();
 				if (icon)

@@ -13,19 +13,15 @@
 CLoadConfirmationModal::CLoadConfirmationModal()
 {
 	this->SetID("LoadConfirmationModal");
-	this->SetDisplayName("((Load addon: ))");
+	this->SetDisplayName(Lang::Addons::LoadConfirm);
 }
 
 void CLoadConfirmationModal::RenderContent()
 {
-	CContext*      ctx   = CContext::GetContext();
-	CUiContext*    uictx = ctx->GetUIContext();
-	CLocalization* lang  = uictx->GetLocalization();
-
-	ImGui::Text(lang->Translate("((000116))"));
+	ImGui::Text(Lang::Common::AreYouSure.Text());
 
 	/* Accept */
-	if (ImGui::Button(lang->Translate("((000065))")))
+	if (ImGui::Button(Lang::Common::Accept.Text()))
 	{
 		this->SetResult(EModalResult::OK);
 	}
@@ -33,7 +29,7 @@ void CLoadConfirmationModal::RenderContent()
 	ImGui::SameLine();
 
 	/* Cancel */
-	if (ImGui::Button(lang->Translate("((000066))")))
+	if (ImGui::Button(Lang::Common::Cancel.Text()))
 	{
 		this->SetResult(EModalResult::Cancel);
 	}
@@ -82,13 +78,6 @@ void CLoadConfirmationModal::SetTarget(Config_t* aConfig, std::string aName, std
 
 void CLoadConfirmationModal::SetTitle()
 {
-	CContext*      ctx   = CContext::GetContext();
-	CUiContext*    uictx = ctx->GetUIContext();
-	CLocalization* lang  = uictx->GetLocalization();
-
 	/* Override the title before opening the modal. */
-	std::string title = lang->Translate("((Load addon: ))");
-	title.append(this->Name);
-
-	this->SetDisplayName(title);
+	this->SetDisplayName(Lang::Addons::LoadConfirm, this->Name);
 }

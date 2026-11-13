@@ -8,23 +8,30 @@
 
 #pragma once
 
-#include <mutex>
 #include <filesystem>
-#include <map>
-#include <span>
+#include <memory>
+#include <mutex>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "Core/Logging/LogApi.h"
 #include "Core/Preferences/PrefSetting.h"
-#include "LoclLocale.h"
+#include "Engine/Cleanup/RefCleanerBase.h"
+#include "Engine/Clockwork/Clockwork.h"
+#include "LoclAtlas.h"
 #include "LoclQueuedText.h"
+#include "LoclText.h"
+#include "LoclView.h"
 
 constexpr const char* CH_LOCALIZATION = "Localization";
 
 ///----------------------------------------------------------------------------------------------------
 /// CLocalization Class
+/// 	Sources: the locale files, then one atlas per addon that set texts, in the order they first did.
+/// 	A view merges them; it is built on a worker and replaces the current one in Advance when ready.
 ///----------------------------------------------------------------------------------------------------
-class CLocalization
+class CLocalization : public virtual IRefCleaner
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -45,8 +52,8 @@ class CLocalization
 
 	///----------------------------------------------------------------------------------------------------
 	/// Advance:
-	/// 	Processes new strings and adds them to the atlas.
-	/// 	Returns true if the atlas was modified.
+	/// 	Applies queued changes, swaps in finished files and views and starts the next load or build. UI thread only.
+	/// 	Returns true if the texts changed.
 	///----------------------------------------------------------------------------------------------------
 	bool Advance();
 
@@ -60,68 +67,86 @@ class CLocalization
 	///----------------------------------------------------------------------------------------------------
 	/// Set:
 	/// 	Adds or sets/overrides a localized string with a given identifier.
+	/// 	aCaller is an address inside the calling module; its texts are removed when that module unloads.
 	///----------------------------------------------------------------------------------------------------
-	void Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aText);
+	void Set(const char* aIdentifier, const char* aLanguageIdentifier, const char* aText, void* aCaller = nullptr);
 
 	///----------------------------------------------------------------------------------------------------
 	/// SetLanguage:
-	/// 	Sets the currently active language.
+	/// 	Sets the currently active language, by id or display name.
 	///----------------------------------------------------------------------------------------------------
 	void SetLanguage(const std::string& aIdentifier);
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetLanguages:
-	/// 	Gets the all available languages.
+	/// 	Gets the display names of all available languages. UI thread only.
 	///----------------------------------------------------------------------------------------------------
 	std::vector<std::string> GetLanguages();
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetActiveLanguage:
-	/// 	Get the currently active language.
+	/// 	Gets the display name of the active language. UI thread only.
 	///----------------------------------------------------------------------------------------------------
 	const std::string& GetActiveLanguage();
 
 	///----------------------------------------------------------------------------------------------------
 	/// SetLocaleDirectory:
-	/// 	Sets the directory from which the LocaleAtlas is built.
+	/// 	Sets the directory with the user's locale files and reloads the files.
 	///----------------------------------------------------------------------------------------------------
 	void SetLocaleDirectory(std::filesystem::path aPath);
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetAllTexts:
-	/// 	Returns every single string.
+	/// 	Returns every text and every language display name, e.g. to collect the glyphs the fonts need.
+	/// 	UI thread only; valid until the next Advance that returns true.
 	///----------------------------------------------------------------------------------------------------
 	std::vector<const char*> GetAllTexts();
 
+	///----------------------------------------------------------------------------------------------------
+	/// CleanupRefs:
+	/// 	Removes the texts set by a module in the address range with the next Advance.
+	/// 	Returns 0: addons cannot remove their texts themselves, so they are no leftover references.
+	///----------------------------------------------------------------------------------------------------
+	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
+
 	private:
-	uint32_t                         ThreadID = 0;
+	using AddonAtlas_t = std::pair<void*, std::shared_ptr<const LocaleAtlas_t>>;
 
-	std::filesystem::path            Directory;
-	bool                             IsLocaleAtlasBuilt = false;
-	std::map<std::string, Locale_t>  LocaleAtlas; /* Identifier(e.g. "EN-GB") maps to object with display name("English (United Kingdom)") and a map of all its texts*/
+	template <typename T>
+	using CTask = std::shared_ptr<Raidcore::Clockwork::Task<std::shared_ptr<const T>>>;
 
-	Locale_t*                        ActiveLocale = nullptr;
+	uint32_t                             ThreadID = 0;
 
-	std::vector<QueuedText_t>        QueuedTexts;
-	std::string                      QueuedLanguage;
+	/* Written from any thread, applied in Advance. */
+	std::mutex                           ChangesMutex;
+	std::vector<LocaleChange_t>          Changes;
+	std::string                          QueuedLanguage;
+
+	/* Sources. UI thread only; immutable once shared, changes replace them. */
+	std::filesystem::path                Directory;
+	std::shared_ptr<const LocaleAtlas_t> Files;
+	CTask<LocaleAtlas_t>                 NextFiles;
+	bool                                 IsFilesDirty = false; /* Files must be loaded again. */
+	std::vector<AddonAtlas_t>            AddonAtlases;
+	bool                                 IsViewDirty = false;  /* Files or addon atlases changed, the view must be built again. */
+
+	/* Lookups read CurrentView while a frame is drawn; Advance swaps in NextView before rendering. */
+	std::shared_ptr<const LocaleView_t>  CurrentView;
+	CTask<LocaleView_t>                  NextView;
+	const LocaleViewLanguage_t*          ActiveLanguage = nullptr;
+	std::string                          ActiveLanguageId;
 
 	///----------------------------------------------------------------------------------------------------
-	/// BuildLocaleAtlas:
-	/// 	Builds the LocaleAtlas from the embedded locales and the locale directory, if set.
+	/// ApplyChanges:
+	/// 	Applies the queued texts and cleanups to the addon atlases. Returns true if one changed.
 	///----------------------------------------------------------------------------------------------------
-	void BuildLocaleAtlas();
+	bool ApplyChanges(std::vector<LocaleChange_t>& aChanges);
 
 	///----------------------------------------------------------------------------------------------------
-	/// MergeLocale:
-	/// 	Parses a locale json buffer and merges it into the LocaleAtlas.
+	/// SelectActiveLanguage:
+	/// 	Points ActiveLanguage at the active language of the current view, else English.
 	///----------------------------------------------------------------------------------------------------
-	void MergeLocale(std::span<const uint8_t> aData, const std::string& aSourceName);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ClearLocaleAtlas:
-	/// 	Clears the LocaleAtlas.
-	///----------------------------------------------------------------------------------------------------
-	void ClearLocaleAtlas();
+	void SelectActiveLanguage();
 
 	public:
 	CSetting<std::string> Language{ "Language", "en", [this](const std::string& aLanguage)

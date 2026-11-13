@@ -477,7 +477,7 @@ void CQuickAccess::UpdateMenuIcon(bool aDisableFestiveFlair)
 	}
 
 	/* Recreate shortcut with appropriate icon. */
-	this->AddShortcut(QA_MENU, icon, iconHover, KB_MENU, "((000009))");
+	this->AddShortcut(QA_MENU, icon, iconHover, KB_MENU, Lang::QuickAccess::NexusMenu.Key());
 }
 
 void CQuickAccess::ApplySuppression(const std::vector<std::string>& aSuppressedShortcuts)

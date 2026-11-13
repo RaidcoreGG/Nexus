@@ -39,7 +39,7 @@ void OnAddonChanged(void* aEventData)
 CAddonsWindow::CAddonsWindow()
 {
 	this->Name           = "Addons";
-	this->DisplayName    = "((000003))";
+	this->DisplayName    = Lang::Nav::Addons;
 	this->IconIdentifier = "ICON_ADDONS";
 	this->IconEntry      = &Resources::IconAddons;
 	this->IsHost         = true;
@@ -119,7 +119,6 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 	static CConfigMgr*     cfgmgr   = ctx->GetCfgMgr();
 	static CLibraryMgr*    libmgr   = ctx->GetAddonLibrary();
 	static CTextureLoader* texapi   = ctx->GetTextureService();
-	static CLocalization*  langApi  = uictx->GetLocalization();
 	static CAlerts*        alertctx = uictx->GetAlerts();
 
 	/* For the status bar, data will be set within the child.*/
@@ -203,7 +202,7 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 					}
 
 					/* Configure */
-					if (ImGui::Button(langApi->Translate("((000105))"), ImVec2(btnWidth, 0)))
+					if (ImGui::Button(Lang::Addons::Configure.Text(), ImVec2(btnWidth, 0)))
 					{
 						this->SetContent(aAddonData);
 					}
@@ -212,13 +211,13 @@ void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
 			else if (aAddonData.HasLibDef)
 			{
 				/* Install */
-				if (ImGui::Button(langApi->Translate("((000028))"), ImVec2(btnWidth, 0)))
+				if (ImGui::Button(Lang::Library::Install.Text(), ImVec2(btnWidth, 0)))
 				{
 					libmgr->Install(aAddonData.GetSig());
 				}
 
 				/* GitHub */
-				if (ImGui::Button("((GitHub))", ImVec2(btnWidth, 0)))
+				if (ImGui::Button(Lang::Library::GitHub.Text(), ImVec2(btnWidth, 0)))
 				{
 
 				}
@@ -290,8 +289,6 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 {
 	CContext*       ctx         = CContext::GetContext();
 	CTextureLoader* texapi      = ctx->GetTextureService();
-	CUiContext*     uictx       = ctx->GetUIContext();
-	CLocalization*  lang        = uictx->GetLocalization();
 
 	ImGuiStyle& style = ImGui::GetStyle();
 
@@ -310,7 +307,7 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 		if (!s_FilterIcon)         { s_FilterIcon         = texapi->GetOrCreate("ICON_FILTER", Resources::IconFilter); }
 
 		/* Search Term */
-		if (ImGui::InputTextWithHint("##SearchTerm", lang->Translate("((000104))"), &s_SearchTerm[0], 400))
+		if (ImGui::InputTextWithHint("##SearchTerm", Lang::Addons::Search.Text(), &s_SearchTerm[0], 400))
 		{
 			this->SearchTerm = String::ToLower(s_SearchTerm);
 			this->Invalidate();
@@ -370,19 +367,19 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 			if (ImGui::BeginPopupContextItem("Filters"))
 			{
 				bool showEnabled = (filter & EAddonsFilterFlags::ShowEnabled) == EAddonsFilterFlags::ShowEnabled;
-				if (ImGui::Checkbox(lang->Translate("((000106))"), &showEnabled))
+				if (ImGui::Checkbox(Lang::Addons::ShowEnabled.Text(), &showEnabled))
 				{
 					this->Filter.Set(showEnabled ? (filter | EAddonsFilterFlags::ShowEnabled) : (filter & ~EAddonsFilterFlags::ShowEnabled));
 				}
 
 				bool showDisabled = (filter & EAddonsFilterFlags::ShowDisabled) == EAddonsFilterFlags::ShowDisabled;
-				if (ImGui::Checkbox(lang->Translate("((000107))"), &showDisabled))
+				if (ImGui::Checkbox(Lang::Addons::ShowDisabled.Text(), &showDisabled))
 				{
 					this->Filter.Set(showDisabled ? (filter | EAddonsFilterFlags::ShowDisabled) : (filter & ~EAddonsFilterFlags::ShowDisabled));
 				}
 
 				bool showDownloadable = (filter & EAddonsFilterFlags::ShowDownloadable) == EAddonsFilterFlags::ShowDownloadable;
-				if (ImGui::Checkbox(lang->Translate("((000108))"), &showDownloadable))
+				if (ImGui::Checkbox(Lang::Addons::ShowDownloadable.Text(), &showDownloadable))
 				{
 					this->Filter.Set(showDownloadable ? (filter | EAddonsFilterFlags::ShowDownloadable) : (filter & ~EAddonsFilterFlags::ShowDownloadable));
 				}
@@ -403,7 +400,7 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 			doPopHighlight = true;
 		}
 
-		if (ImGui::Button(lang->Translate("((000031))")))
+		if (ImGui::Button(Lang::Addons::Installed.Text()))
 		{
 			this->Filter.Set(FILTER_INSTALLED);
 		}
@@ -424,7 +421,7 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 			doPopHighlight = true;
 		}
 
-		if (ImGui::Button(lang->Translate("((000032))")))
+		if (ImGui::Button(Lang::Addons::Library.Text()))
 		{
 			this->Filter.Set(FILTER_LIBRARY);
 		}
@@ -442,10 +439,6 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 
 void CAddonsWindow::RenderBody(ImVec2 aSize)
 {
-	CContext*       ctx   = CContext::GetContext();
-	CUiContext*     uictx = ctx->GetUIContext();
-	CLocalization*  lang  = uictx->GetLocalization();
-
 	ImGuiStyle& style = ImGui::GetStyle();
 
 	if (ImGui::BeginChild("Body", aSize, false, ImGuiWindowFlags_NoBackground))
@@ -459,10 +452,10 @@ void CAddonsWindow::RenderBody(ImVec2 aSize)
 		{
 			/* Nothing matching filter. */
 			ImVec2 windowSize = ImGui::GetWindowSize();
-			ImVec2 textSize = ImGui::CalcTextSize(lang->Translate("((000098))"));
+			ImVec2 textSize = ImGui::CalcTextSize(Lang::Addons::NoMatches.Text());
 			ImVec2 position = ImGui::GetCursorPos();
 			ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-			ImGui::TextDisabled(lang->Translate("((000098))"));
+			ImGui::TextDisabled(Lang::Addons::NoMatches.Text());
 		}
 		else
 		{
@@ -530,8 +523,6 @@ void CAddonsWindow::RenderDetails()
 	if (ImGui::BeginChild("Details_Content", ImVec2(0, 0), false, ImGuiWindowFlags_NoBackground))
 	{
 		CContext*      ctx = CContext::GetContext();
-		CUiContext*    uictx = ctx->GetUIContext();
-		CLocalization* langApi = uictx->GetLocalization();
 
 		std::string id;
 
@@ -554,8 +545,6 @@ void CAddonsWindow::RenderDetails()
 			}
 		}
 
-		std::string hashid = "##" + id;
-
 		ImGuiStyle& style = ImGui::GetStyle();
 
 		float btnSz = ImGui::GetFontSize() * 1.5f;
@@ -563,9 +552,12 @@ void CAddonsWindow::RenderDetails()
 		// helper variable in case we unload or do anything else that might modify the callback before ->Invalidate() is invoked
 		bool skipOptions = false;
 
-		std::string headerStr = langApi->Translate("((000099))");
+		std::string headerStr = Lang::Addons::Configuring.Text();
 		headerStr.append(" ");
 		headerStr.append(this->AddonData.GetName());
+
+		/* Not around the addon's own options below, their ids must stay as they are. */
+		ImGui::PushID(id.c_str());
 
 		if (ImGui::CollapsingHeader(headerStr.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 		{
@@ -576,8 +568,8 @@ void CAddonsWindow::RenderDetails()
 			/*if (addonData.NexusAddon->Definitions->Provider != EUpdateProvider::Self)
 			{
 				if (ImGui::Button((!addonData.NexusAddon->IsCheckingForUpdates
-					? langApi->Translate("((000035))")
-					: langApi->Translate("((000071))") + sigid).c_str()))
+					? Lang::Addons::CheckForUpdates.Text()
+					: Lang::Addons::CheckingForUpdates.Text() + sigid).c_str()))
 				{
 					if (!addonData.NexusAddon->IsCheckingForUpdates)
 					{
@@ -609,7 +601,6 @@ void CAddonsWindow::RenderDetails()
 									CUpdater* updater = ctx->GetUpdater();
 									CUiContext* uictx = ctx->GetUIContext();
 									CAlerts* alertctx = uictx->GetAlerts();
-									CLocalization* langApi = uictx->GetLocalization();
 									CLoader* loader = ctx->GetLoader();
 
 									if (updater->UpdateAddon(tmpPath, addonInfo, false, 5 * 60))
@@ -620,8 +611,8 @@ void CAddonsWindow::RenderDetails()
 											String::Format("%s %s",
 											addon->Definitions->Name,
 											addon->State == EAddonState::LoadedLOCKED
-											? langApi->Translate("((000079))")
-											: langApi->Translate("((000081))")
+											? Lang::Addons::UpdatedRestart.Text()
+											: Lang::Addons::Updated.Text()
 										).c_str()
 										);
 									}
@@ -629,7 +620,7 @@ void CAddonsWindow::RenderDetails()
 									{
 										alertctx->Notify(EAlertType::Info, String::Format("%s %s",
 														 addon->Definitions->Name,
-														 langApi->Translate("((000082))")).c_str());
+														 Lang::Addons::UpToDate.Text()).c_str());
 									}
 									Sleep(1000); // arbitrary sleep otherwise the user never even sees "is checking..."
 									addon->IsCheckingForUpdates = false;
@@ -643,17 +634,17 @@ void CAddonsWindow::RenderDetails()
 				}
 				if (addonData.NexusAddon->State == EAddonState::LoadedLOCKED)
 				{
-					ImGui::TooltipGeneric(langApi->Translate("((000012))"));
+					ImGui::TooltipGeneric(Lang::Addons::LockedUpdateRestart.Text());
 				}
 			}*/
 
 			/* Check Updates Button */
-			ImGui::Text("((BTN: Check for Updates))");
+			ImGui::Text(Lang::Addons::CheckForUpdates.Text());
 
 			/* Update Button */
 			if (this->AddonData.Addon->IsUpdateAvailable())
 			{
-				ImGui::Text("((BTN: Update))");
+				ImGui::Text(Lang::Addons::Update.Text());
 			}
 
 			if (config)
@@ -667,32 +658,32 @@ void CAddonsWindow::RenderDetails()
 						updateMode = "(null)";
 						break;
 					case EUpdateMode::Background:
-						updateMode = "((Background))";
+						updateMode = Lang::Addons::UpdateModeBackground.Text();
 						break;
 					case EUpdateMode::Notify:
-						updateMode = "((Notify))";
+						updateMode = Lang::Addons::UpdateModeNotify.Text();
 						break;
 					case EUpdateMode::Automatic:
-						updateMode = "((Automatic))";
+						updateMode = Lang::Addons::UpdateModeAutomatic.Text();
 						break;
 				}
 
 				/* Update Mode Combo */
 				if (ImGui::BeginCombo("##UpdateModeSelector", updateMode.c_str()))
 				{
-					if (ImGui::Selectable("((Background))", config->UpdateMode == EUpdateMode::Background))
+					if (ImGui::Selectable(Lang::Addons::UpdateModeBackground.Text(), config->UpdateMode == EUpdateMode::Background))
 					{
 						config->UpdateMode = EUpdateMode::Background;
 						cfgmgr->SaveConfigs();
 					}
 
-					if (ImGui::Selectable("((Notify))", config->UpdateMode == EUpdateMode::Notify))
+					if (ImGui::Selectable(Lang::Addons::UpdateModeNotify.Text(), config->UpdateMode == EUpdateMode::Notify))
 					{
 						config->UpdateMode = EUpdateMode::Notify;
 						cfgmgr->SaveConfigs();
 					}
 
-					if (ImGui::Selectable("((Automatic))", config->UpdateMode == EUpdateMode::Automatic))
+					if (ImGui::Selectable(Lang::Addons::UpdateModeAutomatic.Text(), config->UpdateMode == EUpdateMode::Automatic))
 					{
 						config->UpdateMode = EUpdateMode::Automatic;
 						cfgmgr->SaveConfigs();
@@ -704,7 +695,7 @@ void CAddonsWindow::RenderDetails()
 				/* Pre-releases Checkbox */
 				if (this->AddonData.Addon->SupportsPreReleases())
 				{
-					if (ImGui::Checkbox((langApi->Translate("((000084))") + hashid).c_str(), &config->AllowPreReleases))
+					if (ImGui::Checkbox(Lang::Addons::AllowPreRelease.Text(), &config->AllowPreReleases))
 					{
 						cfgmgr->SaveConfigs();
 					}
@@ -713,7 +704,7 @@ void CAddonsWindow::RenderDetails()
 				/* GitHub Button */
 				if (!this->AddonData.Addon->GetProjectPageURL().empty())
 				{
-					if (ImGui::Button((langApi->Translate("((000030))") + id).c_str()))
+					if (ImGui::Button(Lang::Library::GitHub.Text()))
 					{
 						ShellExecuteA(0, 0, this->AddonData.Addon->GetProjectPageURL().c_str(), 0, 0, SW_SHOW);
 					}
@@ -721,7 +712,7 @@ void CAddonsWindow::RenderDetails()
 
 				/* Disable until update Checkbox */
 				bool disableUntilUpdate = config->DisableVersion == this->AddonData.Addon->GetMD5().string();
-				if (ImGui::Checkbox((langApi->Translate("((000016))") + hashid).c_str(), &disableUntilUpdate))
+				if (ImGui::Checkbox(Lang::Addons::DisableUntilUpdate.Text(), &disableUntilUpdate))
 				{
 					this->Invalidate();
 
@@ -739,17 +730,17 @@ void CAddonsWindow::RenderDetails()
 				}
 				if (this->AddonData.Addon->IsStateLocked())
 				{
-					ImGui::TooltipGeneric(langApi->Translate("((IsStateLocked))"));
+					ImGui::TooltipGeneric(Lang::Addons::LockedStateRestart.Text());
 				}
 
 				/* Uninstall Button */
-				if (ImGui::Button((langApi->Translate("((000018))") + hashid).c_str(), ImVec2(btnWidth, 0)))
+				if (ImGui::Button(Lang::Addons::Uninstall.Text(), ImVec2(btnWidth, 0)))
 				{
 					this->UninstallConfirmationModal.SetTarget(this->AddonData.GetName(), this->AddonData.Addon->GetLocation());
 				}
 				if (this->AddonData.Addon->IsStateLocked())
 				{
-					ImGui::TooltipGeneric(langApi->Translate("((IsStateLocked))"));
+					ImGui::TooltipGeneric(Lang::Addons::LockedStateRestart.Text());
 				}
 
 				/* Load/Unload Button */
@@ -767,16 +758,18 @@ void CAddonsWindow::RenderDetails()
 			else
 			{
 				/* This should be in theory unreachable. */
-				ImGui::Text("This addon does not have any configuration options.");
+				ImGui::TextUnformatted(Lang::Addons::NoConfigOptions.Text());
 			}
 		}
+
+		ImGui::PopID();
 
 		if (this->AddonData.Addon && this->AddonData.Addon->IsLoaded())
 		{
 			/* Addon binds table. */
 			if (this->AddonData.InputBinds.size() != 0)
 			{
-				if (ImGui::CollapsingHeader(langApi->Translate("((000060))"), ImGuiTreeNodeFlags_DefaultOpen))
+				if (ImGui::CollapsingHeader(Lang::Binds::Keybinds.Text(), ImGuiTreeNodeFlags_DefaultOpen))
 				{
 					this->RenderInputBindsTable(this->AddonData.InputBinds);
 				}
@@ -785,7 +778,7 @@ void CAddonsWindow::RenderDetails()
 			/* Addon options callback. */
 			if (this->AddonData.OptionsRender && !skipOptions)
 			{
-				if (ImGui::CollapsingHeader(langApi->Translate("((000004))"), ImGuiTreeNodeFlags_DefaultOpen))
+				if (ImGui::CollapsingHeader(Lang::Nav::Options.Text(), ImGuiTreeNodeFlags_DefaultOpen))
 				{
 					this->AddonData.OptionsRender();
 				}
@@ -795,10 +788,10 @@ void CAddonsWindow::RenderDetails()
 		{
 			/* Notice to load the addon. */
 			ImVec2 windowSize = ImGui::GetWindowSize();
-			ImVec2 textSize = ImGui::CalcTextSize(langApi->Translate("((000100))"));
+			ImVec2 textSize = ImGui::CalcTextSize(Lang::Addons::LoadToConfigure.Text());
 			ImVec2 position = ImGui::GetCursorPos();
 			ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-			ImGui::TextDisabled(langApi->Translate("((000100))"));
+			ImGui::TextDisabled(Lang::Addons::LoadToConfigure.Text());
 		}
 	}
 	ImGui::EndChild();
@@ -809,8 +802,6 @@ void CAddonsWindow::RenderActionsBar(ImVec2& aSize)
 	CContext*       ctx    = CContext::GetContext();
 	CTextureLoader* texapi = ctx->GetTextureService();
 	CLoader*        loader = ctx->GetLoader();
-	CUiContext*     uictx  = ctx->GetUIContext();
-	CLocalization*  lang   = uictx->GetLocalization();
 
 	if (ImGui::BeginChild("Actions", aSize, false, ImGuiWindowFlags_NoBackground))
 	{
@@ -819,7 +810,7 @@ void CAddonsWindow::RenderActionsBar(ImVec2& aSize)
 		if (!s_ReloadIcon) { s_ReloadIcon = texapi->GetOrCreate("ICON_REFRESH", Resources::IconRefresh); }
 
 		/* Open addons folder */
-		if (ImGui::Button(lang->Translate("((000034))")))
+		if (ImGui::Button(Lang::Addons::OpenFolder.Text()))
 		{
 			std::string strAddons = Index(EPath::DIR_ADDONS).string();
 			ShellExecuteA(NULL, "explore", strAddons.c_str(), NULL, NULL, SW_SHOW);
@@ -832,7 +823,7 @@ void CAddonsWindow::RenderActionsBar(ImVec2& aSize)
 		static int updatedCount = -1;
 
 		/* Update all */
-		if (ImGui::Button(checkedForUpdates == -1 ? lang->Translate("((000035))") : lang->Translate("((000071))")))
+		if (ImGui::Button(checkedForUpdates == -1 ? Lang::Addons::CheckForUpdates.Text() : Lang::Addons::CheckingForUpdates.Text()))
 		{
 			throw "Not Implemented";
 			/*if (checkedForUpdates == -1)
@@ -878,7 +869,6 @@ void CAddonsWindow::RenderActionsBar(ImVec2& aSize)
 
 							CContext* ctx = CContext::GetContext();
 							CUiContext* uictx = ctx->GetUIContext();
-							CLocalization* langApi = uictx->GetLocalization();
 							CUpdater* updater = ctx->GetUpdater();
 							CAlerts* alertctx = uictx->GetAlerts();
 
@@ -890,8 +880,8 @@ void CAddonsWindow::RenderActionsBar(ImVec2& aSize)
 									String::Format("%s %s",
 									addon->Definitions->Name,
 									addon->State == EAddonState::LoadedLOCKED
-									? langApi->Translate("((000079))")
-									: langApi->Translate("((000081))")
+									? Lang::Addons::UpdatedRestart.Text()
+									: Lang::Addons::Updated.Text()
 								).c_str()
 								);
 
@@ -906,7 +896,7 @@ void CAddonsWindow::RenderActionsBar(ImVec2& aSize)
 
 								if (updatedCount == 0)
 								{
-									alertctx->Notify(EAlertType::Info, langApi->Translate("((000087))"));
+									alertctx->Notify(EAlertType::Info, Lang::Addons::AllUpToDate.Text());
 								}
 							}
 						}).detach();
@@ -914,7 +904,7 @@ void CAddonsWindow::RenderActionsBar(ImVec2& aSize)
 				}
 			}*/
 		}
-		ImGui::TooltipGeneric(lang->Translate("((000036))"));
+		ImGui::TooltipGeneric(Lang::Addons::CheckForUpdatesHint.Text());
 
 		if (s_ReloadIcon)
 		{

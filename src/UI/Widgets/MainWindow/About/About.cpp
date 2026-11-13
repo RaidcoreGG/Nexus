@@ -19,7 +19,7 @@
 CAboutBox::CAboutBox()
 {
 	this->Name           = "About";
-	this->DisplayName    = "((000008))";
+	this->DisplayName    = Lang::Nav::About;
 	this->IconIdentifier = "ICON_ABOUT";
 	this->IconEntry      = &Resources::IconAbout;
 	this->IsAnchored     = true;
@@ -39,7 +39,7 @@ void CAboutBox::RenderContent()
 	CTextureLoader* texapi      = ctx->GetTextureService();
 	CSelfUpdater*   selfupdater = ctx->GetSelfUpdater();
 
-	if (ImGui::CollapsingHeader("About", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader(Lang::Nav::About.Text(), ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		/* banner is 640x152 size relative ot that */
 		float btnHeight = ImGui::GetFontSize() * 3.5f;
@@ -80,12 +80,12 @@ void CAboutBox::RenderContent()
 
 		ImGui::SameLine();
 
-		ImGui::TextWrapped("The discord server is the perfect place for feedback, discussions or getting help with Nexus. Or you can simply hang out!");
+		ImGui::TextWrapped("%s", Lang::About::DiscordHint.Text());
 
 		ImGui::EndGroup();
 	}
 
-	if (ImGui::CollapsingHeader("Changelog", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader(Lang::Nav::Changelog.Text(), ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::TextWrapped(selfupdater->GetChangelog().c_str());
 	}

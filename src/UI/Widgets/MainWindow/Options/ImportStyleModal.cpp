@@ -13,22 +13,22 @@
 CImportStyleModal::CImportStyleModal()
 {
 	this->SetID("ImportStyleModal");
-	this->SetDisplayName("Import style preset");
+	this->SetDisplayName(Lang::Options::StyleImportPresetTitle);
 	memset(this->DataBuffer, 0, sizeof(this->DataBuffer));
 }
 
 void CImportStyleModal::RenderContent()
 {
-	ImGui::InputTextWithHint("##InputStyleCode", "Style Code", this->DataBuffer, sizeof(this->DataBuffer));
+	ImGui::InputTextWithHint("##InputStyleCode", Lang::Options::StyleEditor::Code.Text(), this->DataBuffer, sizeof(this->DataBuffer));
 
-	if (ImGui::Button("Apply"))
+	if (ImGui::Button(Lang::Common::Apply.Text()))
 	{
 		this->SetResult(EModalResult::OK);
 	}
 
 	ImGui::SameLine();
 
-	if (ImGui::Button("Cancel"))
+	if (ImGui::Button(Lang::Common::Cancel.Text()))
 	{
 		this->SetResult(EModalResult::Cancel);
 	}

@@ -8,27 +8,27 @@
 
 #include "QaConst.h"
 
-std::string EQaVisibilityToString(EQaVisibility aQAVisibility)
+CText EQaVisibilityToText(EQaVisibility aQAVisibility)
 {
 	switch (aQAVisibility)
 	{
-		case EQaVisibility::AlwaysShow:  return "((000047))";
-		case EQaVisibility::Gameplay:    return "((000093))";
-		case EQaVisibility::OutOfCombat: return "((000094))";
-		case EQaVisibility::InCombat:    return "((000095))";
-		case EQaVisibility::Hide:        return "((000096))";
-		default:                         return "(null)";
+		case EQaVisibility::AlwaysShow:  return Lang::QuickAccess::AlwaysShow;
+		case EQaVisibility::Gameplay:    return Lang::QuickAccess::DuringGameplay;
+		case EQaVisibility::OutOfCombat: return Lang::QuickAccess::OutOfCombat;
+		case EQaVisibility::InCombat:    return Lang::QuickAccess::InCombat;
+		case EQaVisibility::Hide:        return Lang::QuickAccess::NeverShow;
+		default:                         return CText{};
 	}
 }
 
-std::string EQaPositionToString(EQaPosition aQAPosition)
+CText EQaPositionToText(EQaPosition aQAPosition)
 {
 	switch (aQAPosition)
 	{
-		case EQaPosition::Extend: return "((000067))";
-		case EQaPosition::Under:  return "((000068))";
-		case EQaPosition::Bottom: return "((000069))";
-		case EQaPosition::Custom: return "((000070))";
-		default:                  return "(null)";
+		case EQaPosition::Extend: return Lang::QuickAccess::PosExtend;
+		case EQaPosition::Under:  return Lang::QuickAccess::PosUnder;
+		case EQaPosition::Bottom: return Lang::QuickAccess::PosBottom;
+		case EQaPosition::Custom: return Lang::QuickAccess::PosCustom;
+		default:                  return CText{};
 	}
 }

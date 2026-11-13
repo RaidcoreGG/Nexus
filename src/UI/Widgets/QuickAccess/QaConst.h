@@ -8,18 +8,17 @@
 
 #pragma once
 
-#include <string>
-
 #include "QaEnum.h"
+#include "UI/Services/Localization/LoclText.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// EQaVisibilityToString:
-/// 	Returns a localizable string for a visibility setting.
+/// EQaVisibilityToText:
+/// 	Returns the display string of a visibility setting.
 ///----------------------------------------------------------------------------------------------------
-std::string EQaVisibilityToString(EQaVisibility aQAVisibility);
+CText EQaVisibilityToText(EQaVisibility aQAVisibility);
 
 ///----------------------------------------------------------------------------------------------------
-/// EQaPositionToString:
-/// 	Returns a localizable string for a position setting.
+/// EQaPositionToText:
+/// 	Returns the display string of a position setting.
 ///----------------------------------------------------------------------------------------------------
-std::string EQaPositionToString(EQaPosition aQAPosition);
+CText EQaPositionToText(EQaPosition aQAPosition);
