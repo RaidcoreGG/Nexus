@@ -225,6 +225,7 @@ namespace Main
 		Clockwork::Context::Destroy();
 
 		uictx->Shutdown();
+		uictx->GetFontManager()->InvalidateDeviceObjects();
 		texapi->Shutdown();
 
 		LogInfo(CH_CORE, "SHUTDOWN END");

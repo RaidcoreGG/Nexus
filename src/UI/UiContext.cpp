@@ -57,92 +57,21 @@
 	}
 
 	CContext* ctx = CContext::GetContext();
-	CDataLinkApi* dlapi = ctx->GetDataLink();
+	NexusLinkData_t* nexusLink = static_cast<NexusLinkData_t*>(ctx->GetDataLink()->GetResource(DL_NEXUS_LINK));
 
-	Mumble::Identity* mumbleIdentity = static_cast<Mumble::Identity*>(dlapi->GetResource(DL_MUMBLE_LINK_IDENTITY));
-	NexusLinkData_t* nexusLink = static_cast<NexusLinkData_t*>(dlapi->GetResource(DL_NEXUS_LINK));
+	if (!nexusLink) { return; }
 
-	/* directly assign the font */
-	switch (mumbleIdentity->UISize)
-	{
-		case Mumble::EUIScale::Small:
-		{
-			if (str == "MENOMONIA_S") { nexusLink->Font = aFont; }
-			else if (str == "MENOMONIA_BIG_S") { nexusLink->FontBig = aFont; }
-			else if (str == "FIRASANS_S") { nexusLink->FontUI = aFont; }
-
-			break;
-		}
-		default:
-		case Mumble::EUIScale::Normal:
-		{
-			if (str == "MENOMONIA_N") { nexusLink->Font = aFont; }
-			else if (str == "MENOMONIA_BIG_N") { nexusLink->FontBig = aFont; }
-			else if (str == "FIRASANS_N") { nexusLink->FontUI = aFont; }
-
-			break;
-		}
-		case Mumble::EUIScale::Large:
-		{
-			if (str == "MENOMONIA_L") { nexusLink->Font = aFont; }
-			else if (str == "MENOMONIA_BIG_L") { nexusLink->FontBig = aFont; }
-			else if (str == "FIRASANS_L") { nexusLink->FontUI = aFont; }
-
-			break;
-		}
-		case Mumble::EUIScale::Larger:
-		{
-			if (str == "MENOMONIA_XL") { nexusLink->Font = aFont; }
-			else if (str == "MENOMONIA_BIG_XL") { nexusLink->FontBig = aFont; }
-			else if (str == "FIRASANS_XL") { nexusLink->FontUI = aFont; }
-
-			break;
-		}
-	}
+	if (str == "MENOMONIA") { nexusLink->Font = aFont; }
+	else if (str == "MENOMONIA_BIG") { nexusLink->FontBig = aFont; }
+	else if (str == "FIRASANS") { nexusLink->FontUI = aFont; }
 }
 
 /*static*/ void CUiContext::OnMumbleIdentityChanged(void* aEventArgs)
 {
 	CContext* ctx = CContext::GetContext();
-	CDataLinkApi* dlapi = ctx->GetDataLink();
 	CUiContext* uictx = ctx->GetUIContext();
-	CFontManager* fontmgr = uictx->GetFontManager();
 
-	Mumble::Identity* mumbleIdentity = static_cast<Mumble::Identity*>(dlapi->GetResource(DL_MUMBLE_LINK_IDENTITY));
-	NexusLinkData_t* nexusLink = static_cast<NexusLinkData_t*>(dlapi->GetResource(DL_NEXUS_LINK));
-
-	switch (mumbleIdentity->UISize)
-	{
-		case Mumble::EUIScale::Small:
-		{
-			nexusLink->Font = fontmgr->Get("MENOMONIA_S")->Pointer;
-			nexusLink->FontBig = fontmgr->Get("MENOMONIA_BIG_S")->Pointer;
-			nexusLink->FontUI = fontmgr->Get("FIRASANS_S")->Pointer;
-			break;
-		}
-		default:
-		case Mumble::EUIScale::Normal:
-		{
-			nexusLink->Font = fontmgr->Get("MENOMONIA_N")->Pointer;
-			nexusLink->FontBig = fontmgr->Get("MENOMONIA_BIG_N")->Pointer;
-			nexusLink->FontUI = fontmgr->Get("FIRASANS_N")->Pointer;
-			break;
-		}
-		case Mumble::EUIScale::Large:
-		{
-			nexusLink->Font = fontmgr->Get("MENOMONIA_L")->Pointer;
-			nexusLink->FontBig = fontmgr->Get("MENOMONIA_BIG_L")->Pointer;
-			nexusLink->FontUI = fontmgr->Get("FIRASANS_L")->Pointer;
-			break;
-		}
-		case Mumble::EUIScale::Larger:
-		{
-			nexusLink->Font = fontmgr->Get("MENOMONIA_XL")->Pointer;
-			nexusLink->FontBig = fontmgr->Get("MENOMONIA_BIG_XL")->Pointer;
-			nexusLink->FontUI = fontmgr->Get("FIRASANS_XL")->Pointer;
-			break;
-		}
-	}
+	uictx->ApplyFontScale();
 }
 
 /*static*/ void CUiContext::OnInputBindUpdate(void* aEventData)
@@ -179,7 +108,7 @@ CUiContext::CUiContext(
 	this->MainWindow     = new CMainWindow();
 	this->QuickAccess    = new CQuickAccess(aDataLink, aInputBindApi, aTextureService, this->Language, aEventApi);
 
-	this->FontManager    = new CFontManager(this->Language);
+	this->FontManager    = new CFontManager();
 	this->EscapeClose    = new CEscapeClosing();
 	this->Scaling        = new CScaling(aRenderContext, aDataLink, aEventApi);
 	this->Input          = new CUiInput();
@@ -253,6 +182,7 @@ void CUiContext::Initialize()
 	// Init imgui
 	ImGui_ImplWin32_Init(this->RenderContext->Window.Handle);
 	ImGui_ImplDX11_Init(this->RenderContext->Device, this->RenderContext->DeviceContext);
+	this->FontManager->CreateDeviceObjects(this->RenderContext->Device);
 	//ImGui::GetIO().ImeWindowHandle = Renderer::WindowHandle;
 
 	this->IsInitialized = true;
@@ -284,13 +214,20 @@ void CUiContext::Render()
 	/* preload localization and font changes */
 	if (this->Language->Advance())
 	{
-		this->FontManager->Reload();
+		this->FontManager->SetTexts(this->Language->GetActiveTexts());
 		this->Invalidate();
 	}
-	if (this->FontManager->Advance())
+	EFontsUpdate fontsUpdate = this->FontManager->Advance();
+	if (fontsUpdate != EFontsUpdate::None)
 	{
-		CUiContext::OnMumbleIdentityChanged(nullptr);
-		this->Shutdown();
+		if (fontsUpdate == EFontsUpdate::DefaultAtlas)
+		{
+			this->Shutdown();
+		}
+		else if (this->IsInitialized)
+		{
+			this->FontManager->CreateDeviceObjects(this->RenderContext->Device);
+		}
 	}
 
 	if (this->IsInvalid)
@@ -313,7 +250,7 @@ void CUiContext::Render()
 		callback();
 	}
 
-	if (this->IsInitialized)
+	if (this->IsInitialized && this->FontManager->IsReady())
 	{
 		this->Input->FlushInput();
 
@@ -365,6 +302,7 @@ void CUiContext::Render()
 		/* end frame */
 		ImGui::EndFrame();
 		ImGui::Render();
+		this->FontManager->CollectMissingGlyphs(ImGui::GetDrawData());
 		this->RenderContext->DeviceContext->OMSetRenderTargets(1, &this->RenderTargetView, NULL);
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	}
@@ -451,9 +389,54 @@ CEscapeClosing* CUiContext::GetEscapeClosingService()
 	return this->EscapeClose;
 }
 
+/* Per UI scale: Font, FontBig, FontUI. The user font merged into each has the same size. */
+static constexpr float s_ScaleFontSizes[4][3] =
+{
+	{ 16.0f, 22.0f, 15.0f }, /* Small */
+	{ 18.0f, 24.0f, 16.0f }, /* Normal */
+	{ 20.0f, 26.0f, 17.5f }, /* Large */
+	{ 22.0f, 28.0f, 19.5f }  /* Larger */
+};
+
+static size_t GetScaleIndex(Mumble::Identity* aIdentity)
+{
+	if (!aIdentity) { return 1; }
+
+	switch (aIdentity->UISize)
+	{
+		case Mumble::EUIScale::Small:  { return 0; }
+		case Mumble::EUIScale::Large:  { return 2; }
+		case Mumble::EUIScale::Larger: { return 3; }
+		default:                       { return 1; }
+	}
+}
+
+void CUiContext::ApplyFontScale()
+{
+	const float* sizes = s_ScaleFontSizes[GetScaleIndex(static_cast<Mumble::Identity*>(this->DataLink->GetResource(DL_MUMBLE_LINK_IDENTITY)))];
+
+	this->FontManager->ResizeFont("MENOMONIA",           sizes[0]);
+	this->FontManager->ResizeFont("MENOMONIA_MERGE",     sizes[0]);
+	this->FontManager->ResizeFont("MENOMONIA_BIG",       sizes[1]);
+	this->FontManager->ResizeFont("MENOMONIA_BIG_MERGE", sizes[1]);
+	this->FontManager->ResizeFont("FIRASANS",            sizes[2]);
+	this->FontManager->ResizeFont("FIRASANS_MERGE",      sizes[2]);
+}
+
 void CUiContext::LoadFonts()
 {
 	std::filesystem::path fontPath{};
+
+	this->FontManager->SetGlyphCache(Index(EPath::GlyphCache));
+
+	/* None of the embedded fonts has CJK glyphs. System fonts are not redistributed and add nothing to the binary. */
+	wchar_t windowsDir[MAX_PATH]{};
+	if (GetWindowsDirectoryW(windowsDir, MAX_PATH))
+	{
+		std::filesystem::path systemFonts = std::filesystem::path(windowsDir) / "Fonts";
+		this->FontManager->AddFallbackFont(systemFonts / "msyh.ttc");   /* Microsoft YaHei: Chinese, kana */
+		this->FontManager->AddFallbackFont(systemFonts / "malgun.ttf"); /* Malgun Gothic: Hangul */
+	}
 
 	/* add user font */
 	bool hasUserFont = false;
@@ -479,35 +462,13 @@ void CUiContext::LoadFonts()
 	ImFontConfig config;
 	config.MergeMode = true;
 
-	/* small UI*/
-	this->FontManager->ReplaceFont("MENOMONIA_S", 16.0f, Resources::FontMenomonia, CUiContext::OnFontUpdate, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_S_MERGE", 16.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-	this->FontManager->ReplaceFont("MENOMONIA_BIG_S", 22.0f, Resources::FontMenomonia, CUiContext::OnFontUpdate, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_S_MERGE", 22.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-	this->FontManager->ReplaceFont("FIRASANS_S", 15.0f, Resources::FontFiraSans, CUiContext::OnFontUpdate, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_S_MERGE", 15.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
+	const float* sizes = s_ScaleFontSizes[GetScaleIndex(static_cast<Mumble::Identity*>(this->DataLink->GetResource(DL_MUMBLE_LINK_IDENTITY)))];
 
-	/* normal UI*/
-	this->FontManager->ReplaceFont("MENOMONIA_N", 18.0f, Resources::FontMenomonia, CUiContext::OnFontUpdate, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_N_MERGE", 18.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-	this->FontManager->ReplaceFont("MENOMONIA_BIG_N", 24.0f, Resources::FontMenomonia, CUiContext::OnFontUpdate, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_N_MERGE", 24.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-	this->FontManager->ReplaceFont("FIRASANS_N", 16.0f, Resources::FontFiraSans, CUiContext::OnFontUpdate, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_N_MERGE", 16.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-
-	/* large UI*/
-	this->FontManager->ReplaceFont("MENOMONIA_L", 20.0f, Resources::FontMenomonia, CUiContext::OnFontUpdate, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_L_MERGE", 20.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-	this->FontManager->ReplaceFont("MENOMONIA_BIG_L", 26.0f, Resources::FontMenomonia, CUiContext::OnFontUpdate, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_L_MERGE", 26.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-	this->FontManager->ReplaceFont("FIRASANS_L", 17.5f, Resources::FontFiraSans, CUiContext::OnFontUpdate, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_L_MERGE", 17.5f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-
-	/* larger UI*/
-	this->FontManager->ReplaceFont("MENOMONIA_XL", 22.0f, Resources::FontMenomonia, CUiContext::OnFontUpdate, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_XL_MERGE", 22.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-	this->FontManager->ReplaceFont("MENOMONIA_BIG_XL", 28.0f, Resources::FontMenomonia, CUiContext::OnFontUpdate, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_XL_MERGE", 28.0f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-	this->FontManager->ReplaceFont("FIRASANS_XL", 19.5f, Resources::FontFiraSans, CUiContext::OnFontUpdate, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_XL_MERGE", 19.5f, fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
+	this->FontManager->ReplaceFont("MENOMONIA", sizes[0], Resources::FontMenomonia, CUiContext::OnFontUpdate, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_MERGE", sizes[0], fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
+	this->FontManager->ReplaceFont("MENOMONIA_BIG", sizes[1], Resources::FontMenomonia, CUiContext::OnFontUpdate, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_MERGE", sizes[1], fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
+	this->FontManager->ReplaceFont("FIRASANS", sizes[2], Resources::FontFiraSans, CUiContext::OnFontUpdate, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_MERGE", sizes[2], fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
 }
+

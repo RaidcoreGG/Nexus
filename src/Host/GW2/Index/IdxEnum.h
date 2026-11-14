@@ -49,6 +49,7 @@ enum class EPath : uint32_t
 	AddonConfigDefault,       /* <GW2>/addons/Nexus/AddonConfig.json             */
 	ArcdpsIntegration,        /* <GW2>/addons/Nexus/arcdps_integration64.dll     */
 	ThirdPartySoftwareReadme, /* <GW2>/addons/Nexus/THIRDPARTYSOFTWAREREADME.TXT */
+	GlyphCache,               /* <GW2>/addons/Nexus/GlyphCache.txt               */
 
 	COUNT
 };

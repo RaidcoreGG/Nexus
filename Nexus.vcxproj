@@ -77,6 +77,7 @@
     <ClCompile Include="src\UI\Controls\CtlWindow.cpp" />
     <ClCompile Include="src\UI\Overlay\MumbleInspector\MumbleInspector.cpp" />
     <ClCompile Include="src\UI\Services\Fonts\FontManager.cpp" />
+    <ClCompile Include="src\UI\Services\Fonts\FontGlyphs.cpp" />
     <ClCompile Include="src\UI\Services\Localization\LoclApi.cpp" />
     <ClCompile Include="src\UI\Services\Localization\LoclAtlas.cpp" />
     <ClCompile Include="src\UI\Services\Localization\LoclView.cpp" />
@@ -403,6 +404,7 @@
     <ClInclude Include="src\UI\UiFuncDefs.h" />
     <ClInclude Include="src\UI\Overlay\MumbleInspector\MumbleInspector.h" />
     <ClInclude Include="src\UI\Services\Fonts\FontManager.h" />
+    <ClInclude Include="src\UI\Services\Fonts\FontGlyphs.h" />
     <ClInclude Include="src\UI\Services\Fonts\FuncDefs.h" />
     <ClInclude Include="src\UI\Services\Localization\LoclApi.h" />
     <ClInclude Include="src\UI\Services\Localization\LoclFuncDefs.h" />

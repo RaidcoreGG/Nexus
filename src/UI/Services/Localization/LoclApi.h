@@ -95,11 +95,12 @@ class CLocalization : public ILogChannel, public virtual IRefCleaner
 	void SetLocaleDirectory(std::filesystem::path aPath);
 
 	///----------------------------------------------------------------------------------------------------
-	/// GetAllTexts:
-	/// 	Returns every text and every language display name, e.g. to collect the glyphs the fonts need.
+	/// GetActiveTexts:
+	/// 	Returns the texts shown in the active language (with their English fallbacks) and every language
+	/// 	display name, e.g. to collect the glyphs the fonts need.
 	/// 	UI thread only; valid until the next Advance that returns true.
 	///----------------------------------------------------------------------------------------------------
-	std::vector<const char*> GetAllTexts();
+	std::vector<const char*> GetActiveTexts();
 
 	///----------------------------------------------------------------------------------------------------
 	/// CleanupRefs:

@@ -402,25 +402,28 @@ void CLocalization::SetLocaleDirectory(std::filesystem::path aPath)
 	this->IsFilesDirty = true;
 }
 
-std::vector<const char*> CLocalization::GetAllTexts()
+std::vector<const char*> CLocalization::GetActiveTexts()
 {
-	std::vector<const char*> allTexts;
+	std::vector<const char*> texts;
 
 	if (!this->CurrentView)
 	{
-		return allTexts;
+		return texts;
 	}
 
+	/* The language picker shows every display name, so their glyphs are needed even if the language is not active. */
 	for (const auto& [id, language] : this->CurrentView->Languages)
 	{
-		/* The language picker shows every display name, so their glyphs are needed even if the language is not active. */
-		allTexts.push_back(language.DisplayName.c_str());
+		texts.push_back(language.DisplayName.c_str());
+	}
 
-		for (const auto& [key, text] : language.Own)
+	if (this->ActiveLanguage)
+	{
+		for (const auto& [key, text] : this->ActiveLanguage->Lookup)
 		{
-			allTexts.push_back(text);
+			texts.push_back(text);
 		}
 	}
 
-	return allTexts;
+	return texts;
 }

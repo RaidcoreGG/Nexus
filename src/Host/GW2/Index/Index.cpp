@@ -71,6 +71,7 @@ void CreateIndex(HMODULE aModule)
 	s_Paths[(int)EPath::AddonConfigDefault]       = s_Paths[(int)EPath::DIR_NEXUS] / "AddonConfig.json";
 	s_Paths[(int)EPath::ArcdpsIntegration]        = s_Paths[(int)EPath::DIR_NEXUS] / "arcdps_integration64.dll";
 	s_Paths[(int)EPath::ThirdPartySoftwareReadme] = s_Paths[(int)EPath::DIR_NEXUS] / "THIRDPARTYSOFTWAREREADME.TXT";
+	s_Paths[(int)EPath::GlyphCache]               = s_Paths[(int)EPath::DIR_NEXUS] / "GlyphCache.txt";
 
 	/* DLL paths. */
 	s_Paths[(int)EPath::NexusDLL_Old]    = s_Paths[(int)EPath::NexusDLL].string() + ".old";

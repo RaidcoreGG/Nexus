@@ -194,6 +194,13 @@ class CUiContext
 	///----------------------------------------------------------------------------------------------------
 	void LoadFonts();
 
+	///----------------------------------------------------------------------------------------------------
+	/// ApplyFontScale:
+	/// 	Resizes the Nexus fonts to the game's UI scale. NexusLink keeps the previous fonts until the
+	/// 	resized ones are built.
+	///----------------------------------------------------------------------------------------------------
+	void ApplyFontScale();
+
 	private:
 	/* Services */
 	RenderContext_t*        RenderContext  = nullptr;
