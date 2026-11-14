@@ -219,7 +219,9 @@ namespace Hooks
 		{
 			static CContext* s_Context = CContext::GetContext();
 
-			/* Created here, so they are subscribed before the first present is notified. */
+			/* Created here, so they are subscribed before the first present is notified. The event router
+			 * comes before the game window, which starts loading addons. */
+			static CEventRouter* s_EventRouter = s_Context->GetEventRouter();
 			static CGameWindow* s_GameWindow = s_Context->GetGameWindow();
 			static CTextureLoader* s_TextureLoader = s_Context->GetTextureService();
 			static CUiContext* s_UIContext = s_Context->GetUIContext();

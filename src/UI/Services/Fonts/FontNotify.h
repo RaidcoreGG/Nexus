@@ -8,13 +8,9 @@
 
 #pragma once
 
-#include <cstdint>
-
 #include "imgui/imgui.h"
 
 #include "Engine/Notifier/Notifier.h"
-
-constexpr int32_t FONTUPDATE_PRIO_UI = 0;
 
 ///----------------------------------------------------------------------------------------------------
 /// IFontUpdateNotifyHandler Interface

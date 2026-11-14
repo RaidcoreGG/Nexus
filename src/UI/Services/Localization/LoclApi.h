@@ -20,6 +20,7 @@
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include "Engine/Clockwork/Clockwork.h"
 #include "LoclAtlas.h"
+#include "LoclNotify.h"
 #include "LoclQueuedText.h"
 #include "LoclText.h"
 #include "LoclView.h"
@@ -30,15 +31,9 @@
 /// 	Sources: the locale files, then one atlas per addon that set texts, in the order they first did.
 /// 	A view merges them; it is built on a worker and replaces the current one in Advance when ready.
 ///----------------------------------------------------------------------------------------------------
-class CLocalization : public ILogChannel, public virtual IRefCleaner
+class CLocalization : public ILogChannel, public virtual IRefCleaner, public IGameLanguageNotifyHandler
 {
 	public:
-	///----------------------------------------------------------------------------------------------------
-	/// OnUELanguageChanged:
-	/// 	Receives runtime language updates from unofficial extras.
-	///----------------------------------------------------------------------------------------------------
-	static void OnUELanguageChanged(uint32_t* aLanguage);
-
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
@@ -48,6 +43,12 @@ class CLocalization : public ILogChannel, public virtual IRefCleaner
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
 	~CLocalization();
+
+	///----------------------------------------------------------------------------------------------------
+	/// OnGameLanguageNotify:
+	/// 	Switches to the game language.
+	///----------------------------------------------------------------------------------------------------
+	void OnGameLanguageNotify(const char* aLanguage) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// Advance:

@@ -80,8 +80,8 @@ CUiContext::CUiContext(
 	this->INotifyHandler<IDxgiPresentNotifyHandler>::Attach(DXGIPRESENT_PRIO_UI);
 	this->INotifyHandler<IDxgiResizeNotifyHandler>::Attach(DXGIRESIZE_PRIO_UI);
 	this->INotifyHandler<IMumbleIdentityNotifyHandler>::Attach(MUMBLEIDENTITY_PRIO_UI);
-	this->INotifyHandler<IInputBindUpdateNotifyHandler>::Attach(INPUTBINDUPDATE_PRIO_UI);
-	this->INotifyHandler<IFontUpdateNotifyHandler>::Attach(FONTUPDATE_PRIO_UI);
+	this->INotifyHandler<IInputBindUpdateNotifyHandler>::Attach();
+	this->INotifyHandler<IFontUpdateNotifyHandler>::Attach();
 }
 
 CUiContext::~CUiContext()

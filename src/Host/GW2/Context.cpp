@@ -103,6 +103,14 @@ CEventApi* CContext::GetEventApi()
 	return &s_EventApi;
 }
 
+CEventRouter* CContext::GetEventRouter()
+{
+	static CEventRouter s_EventRouter = CEventRouter(
+		this->GetEventApi()
+	);
+	return &s_EventRouter;
+}
+
 CLoader* CContext::GetLoader()
 {
 	static CLoader s_Loader = CLoader(

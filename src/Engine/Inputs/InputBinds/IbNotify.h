@@ -8,11 +8,7 @@
 
 #pragma once
 
-#include <cstdint>
-
 #include "Engine/Notifier/Notifier.h"
-
-constexpr int32_t INPUTBINDUPDATE_PRIO_UI = 0;
 
 ///----------------------------------------------------------------------------------------------------
 /// IInputBindUpdateNotifyHandler Interface

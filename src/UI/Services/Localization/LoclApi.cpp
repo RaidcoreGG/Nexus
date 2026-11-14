@@ -80,36 +80,22 @@ static std::shared_ptr<const LocaleAtlas_t> LoadFiles(const std::filesystem::pat
 	return atlas;
 }
 
-/*static*/ void CLocalization::OnUELanguageChanged(uint32_t* aLanguage)
-{
-	if (!aLanguage) { return; }
-	if (!s_Localization) { return; }
-
-	static constexpr const char* s_Languages[] = { "en", "kr", "fr", "de", "es", "cn" };
-
-	if (*aLanguage < std::size(s_Languages))
-	{
-		s_Localization->SetLanguage(s_Languages[*aLanguage]);
-	}
-}
-
 CLocalization::CLocalization() : IRefCleaner("Localization"), ILogChannel("Localization")
 {
-	CContext* ctx = CContext::GetContext();
-	CEventApi* evtapi = ctx->GetEventApi();
-
 	this->SetLocaleDirectory(Index(EPath::DIR_LOCALES));
 
 	std::string lang = this->Language.Get();
 	this->SetLanguage(!lang.empty() ? lang : "en");
 
-	evtapi->Subscribe("EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED", reinterpret_cast<EVENT_CONSUME>(CLocalization::OnUELanguageChanged));
-
 	s_Localization = this;
+
+	this->Attach();
 }
 
 CLocalization::~CLocalization()
 {
+	this->Detach();
+
 	if (s_Localization == this)
 	{
 		s_Localization = nullptr;
@@ -347,6 +333,11 @@ void CLocalization::Set(const char* aIdentifier, const char* aLanguageIdentifier
 
 	const std::lock_guard<std::mutex> lock(this->ChangesMutex);
 	this->Changes.push_back(QueuedText_t{ aIdentifier, aLanguageIdentifier, aText, owner });
+}
+
+void CLocalization::OnGameLanguageNotify(const char* aLanguage)
+{
+	this->SetLanguage(aLanguage);
 }
 
 void CLocalization::SetLanguage(const std::string& aIdentifier)

@@ -17,11 +17,10 @@
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbBindV2.h"
 #include "Engine/Inputs/InputBinds/IbNotify.h"
+#include "GbNotify.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
 #include "Core/Logging/LogChannel.h"
 #include "UI/Renderer/RdrContext.h"
-
-constexpr const char* EV_UE_KB_CH = "EV_UNOFFICIAL_EXTRAS_KEYBIND_CHANGED";
 
 #define WM_PASSTHROUGH_FIRST WM_USER + 7997
 #define WM_PASSTHROUGH_LAST  WM_USER + 7997 + WM_USER - 1
@@ -38,16 +37,12 @@ struct MultiInputBind_t
 ///----------------------------------------------------------------------------------------------------
 /// CGameBindsApi Class
 ///----------------------------------------------------------------------------------------------------
-class CGameBindsApi : public ILogChannel, public IWndProcNotifyHandler, public IInputBindUpdateNotifier
+class CGameBindsApi
+	: public ILogChannel
+	, public IWndProcNotifyHandler
+	, public IGameBindChangedNotifyHandler
+	, public IInputBindUpdateNotifier
 {
-	public:
-	// FIXME: this needs to be moved to an evtconn
-	///----------------------------------------------------------------------------------------------------
-	/// OnUEInputBindChanged:
-	/// 	Receives runtime InputBind_t updates from Unofficial Extras.
-	///----------------------------------------------------------------------------------------------------
-	static void OnUEInputBindChanged(void* aData);
-
 	public:
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
@@ -68,6 +63,12 @@ class CGameBindsApi : public ILogChannel, public IWndProcNotifyHandler, public I
 	/// 	Shifts game only messages back to the normal range. Never consumes.
 	///----------------------------------------------------------------------------------------------------
 	UINT OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam) override;
+
+	///----------------------------------------------------------------------------------------------------
+	/// OnGameBindChangedNotify:
+	/// 	Applies a game bind changed in the game as a runtime bind and refreshes the UI.
+	///----------------------------------------------------------------------------------------------------
+	void OnGameBindChangedNotify(EGameBinds aGameBind, const InputBind_t& aInputBind, bool aIsPrimary) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// SendWndProcToGame:

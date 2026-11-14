@@ -17,83 +17,6 @@ namespace Clockwork = Raidcore::Clockwork;
 #include "Util/Inputs.h"
 #include "GbConst.h"
 
-void CGameBindsApi::OnUEInputBindChanged(void* aData)
-{
-	static CGameBindsApi* s_GameBindsApi = nullptr;
-
-	if (!s_GameBindsApi)
-	{
-		CContext* ctx = CContext::GetContext();
-		s_GameBindsApi = ctx->GetGameBindsApi();
-
-		assert(s_GameBindsApi);
-	}
-
-	struct UEKey_t
-	{
-		unsigned DeviceType; // 0 = Unset, 1 = Mouse, 2 = Keyboard
-		signed   Code; // Custom ArenaNet Scancode
-		signed   Modifiers; // Bit 1 = Shfit, Bit 2 = Ctrl, Bit 3 = Alt
-	};
-
-	struct UEInputBindChanged_t
-	{
-		EGameBinds Identifier;
-		unsigned   Index; // 0 = Primary, 1 = Secondary
-		UEKey_t    Bind;
-	};
-
-	UEInputBindChanged_t* kbChange = (UEInputBindChanged_t*)aData;
-
-	InputBind_t ib{};
-
-	/* if key was bound (keyboard) */
-	if (kbChange->Bind.DeviceType == 2)
-	{
-		ib.Alt = kbChange->Bind.Modifiers & 0b0100;
-		ib.Ctrl = kbChange->Bind.Modifiers & 0b0010;
-		ib.Shift = kbChange->Bind.Modifiers & 0b0001;
-
-		ib.Device = EInputDevice::Keyboard;
-		ib.Code = GameScanCodeToScanCode(kbChange->Bind.Code);
-	}
-	else if (kbChange->Bind.DeviceType == 1) /* (mouse) */
-	{
-		ib.Alt = kbChange->Bind.Modifiers & 0b0100;
-		ib.Ctrl = kbChange->Bind.Modifiers & 0b0010;
-		ib.Shift = kbChange->Bind.Modifiers & 0b0001;
-
-		ib.Device = EInputDevice::Mouse;
-		if (kbChange->Bind.Code == 0)
-		{
-			ib.Code = (unsigned short)EMouseButtons::LMB;
-		}
-		else if (kbChange->Bind.Code == 2)
-		{
-			ib.Code = (unsigned short)EMouseButtons::RMB;
-		}
-		else if (kbChange->Bind.Code == 1)
-		{
-			ib.Code = (unsigned short)EMouseButtons::MMB;
-		}
-		else if (kbChange->Bind.Code == 3)
-		{
-			ib.Code = (unsigned short)EMouseButtons::M4;
-		}
-		else if (kbChange->Bind.Code == 4)
-		{
-			ib.Code = (unsigned short)EMouseButtons::M5;
-		}
-	}
-
-	s_GameBindsApi->Set(kbChange->Identifier, ib, kbChange->Index == 0, true);
-
-	CContext* ctx = CContext::GetContext();
-	CUiContext* uictx = ctx->GetUIContext();
-
-	uictx->Invalidate();
-}
-
 CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CEventApi* aEventApi, RenderContext_t* aRenderContext, std::filesystem::path aConfigPath) : ILogChannel("GameBinds")
 {
 	assert(aRawInputApi);
@@ -105,22 +28,25 @@ CGameBindsApi::CGameBindsApi(CRawInputApi* aRawInputApi, CEventApi* aEventApi, R
 	this->RenderContext = aRenderContext;
 
 	this->ConfigPath = aConfigPath;
-	
-	/* FIXME: This is a dirty hack for the UI invalidation. */
+
 	this->AddDefaultBinds();
 	this->Load(this->ConfigPath);
 
-	this->EventApi->Subscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
-
 	/* After the input binds, so they never see game only messages as regular input. */
-	this->Attach(WNDPROC_PRIO_GAMEBINDS);
+	this->INotifyHandler<IWndProcNotifyHandler>::Attach(WNDPROC_PRIO_GAMEBINDS);
+	this->INotifyHandler<IGameBindChangedNotifyHandler>::Attach();
 }
 
 CGameBindsApi::~CGameBindsApi()
 {
-	this->Detach();
+	this->INotifyHandler<IGameBindChangedNotifyHandler>::Detach();
+	this->INotifyHandler<IWndProcNotifyHandler>::Detach();
+}
 
-	this->EventApi->Unsubscribe(EV_UE_KB_CH, CGameBindsApi::OnUEInputBindChanged);
+void CGameBindsApi::OnGameBindChangedNotify(EGameBinds aGameBind, const InputBind_t& aInputBind, bool aIsPrimary)
+{
+	this->Set(aGameBind, aInputBind, aIsPrimary, true);
+	this->NotifyInputBindUpdate();
 }
 
 UINT CGameBindsApi::OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam)

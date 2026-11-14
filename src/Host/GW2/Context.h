@@ -24,6 +24,7 @@
 #include "Core/Logging/LogApi.h"
 #include "Engine/Networking/WebRequests/WreClient.h"
 #include "Host/GW2/ArcDPS/ArcApi.h"
+#include "Host/GW2/Events/EvtRouter.h"
 #include "Host/GW2/Hooks/HkGameWindow.h"
 #include "Host/GW2/Inputs/GameBinds/GbApi.h"
 #include "Host/GW2/Inputs/MouseResetFix.h"
@@ -59,6 +60,8 @@ class CContext
 	CDataLinkApi* GetDataLink();
 
 	CEventApi* GetEventApi();
+
+	CEventRouter* GetEventRouter();
 
 	CLoader* GetLoader();
 
