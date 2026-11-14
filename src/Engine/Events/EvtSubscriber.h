@@ -8,7 +8,9 @@
 
 #pragma once
 
-#include "EvtFuncDefs.h"
+#include <cstdint>
+
+typedef void (*EVENT_CONSUME)(void* aEventArgs);
 
 ///----------------------------------------------------------------------------------------------------
 /// EventSubscriber_t Struct

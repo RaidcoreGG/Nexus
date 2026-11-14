@@ -15,18 +15,16 @@
 #include "thirdparty/imgui/imgui.h"
 #include "thirdparty/minhook/mh_hook.h"
 
-#include "Host/GW2/Index/IdxFuncDefs.h"
-#include "Engine/DataLink/DlFuncDefs.h"
-#include "Engine/Events/EvtFuncDefs.h"
-#include "Engine/Inputs/InputBinds/IbFuncDefs.h"
-#include "Engine/Inputs/RawInput/RiFuncDefs.h"
-#include "Host/GW2/Addons/API/LogFuncDefs.h"
-#include "UI/Services/Fonts/FuncDefs.h"
-#include "UI/Services/Localization/LoclFuncDefs.h"
-#include "UI/Textures/TxFuncDefs.h"
-#include "UI/UiFuncDefs.h"
-#include "UI/Widgets/Alerts/AlFuncDefs.h"
-#include "UI/Widgets/QuickAccess/QaFuncDefs.h"
+#include "ApiV3.h"
+#include "UI/Services/Fonts/FontManager.h"
+
+typedef void (*INPUTBINDS_REGISTERWITHSTRING2)(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, const char* aInputBind);
+typedef void (*INPUTBINDS_REGISTERWITHSTRUCT2)(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, InputBindV1_t aInputBind);
+
+typedef void (*FONTS_GETRELEASE)     (const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback);
+typedef void (*FONTS_ADDFROMFILE)    (const char* aIdentifier, float aFontSize, const char* aFilename, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
+typedef void (*FONTS_ADDFROMRESOURCE)(const char* aIdentifier, float aFontSize, unsigned aResourceID, HMODULE aModule, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
+typedef void (*FONTS_ADDFROMMEMORY)  (const char* aIdentifier, float aFontSize, void* aData, size_t aSize, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
 
 ///----------------------------------------------------------------------------------------------------
 /// AddonAPI4_t Struct

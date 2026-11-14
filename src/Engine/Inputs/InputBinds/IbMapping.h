@@ -10,7 +10,15 @@
 
 #include "IbBindV2.h"
 #include "IbEnum.h"
-#include "IbFuncDefs.h"
+
+/* Input Handler Down Only */
+typedef void (*INPUTBINDS_PROCESS) (const char* aIdentifier);
+
+/* Input Handler Down and Release */
+typedef void (*INPUTBINDS_PROCESS2)(const char* aIdentifier, bool aIsRelease);
+
+/* Input Handler Down and Release also return whether input should not be processed further. */
+typedef bool (*INPUTBINDS_PROCESS3)(const char* aIdentifier, bool aIsRelease);
 
 ///----------------------------------------------------------------------------------------------------
 /// IbMapping_t Struct

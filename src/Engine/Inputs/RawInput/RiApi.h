@@ -14,7 +14,9 @@
 
 #include "Engine/Inputs/RawInput/WndProcNotify.h"
 #include "Engine/Cleanup/RefCleanerBase.h"
-#include "RiFuncDefs.h"
+#include <windows.h>
+
+typedef UINT (*WNDPROC_CALLBACK)(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 ///----------------------------------------------------------------------------------------------------
 /// CRawInputApi Class

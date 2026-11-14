@@ -28,7 +28,7 @@
 #include "UI/Controls/CtlWindow.h"
 #include "UI/Services/Localization/LoclApi.h"
 #include "UI/Textures/TxLoader.h"
-#include "UI/UiFuncDefs.h"
+#include "UI/UiRender.h"
 
 constexpr const char* QA_MENU                    = "!Nexus";
 constexpr const char* ICON_NEXUS                 = "ICON_NEXUS";

@@ -11,14 +11,14 @@
 #include <windows.h>
 
 #include "ApiBase.h"
-#include "Engine/Events/EvtFuncDefs.h"
-#include "Engine/Inputs/InputBinds/IbFuncDefs.h"
-#include "Engine/Inputs/RawInput/RiFuncDefs.h"
+#include "Engine/Events/EvtSubscriber.h"
+#include "Engine/Inputs/InputBinds/IbMapping.h"
+#include "Engine/Inputs/RawInput/RiApi.h"
 #include "Core/Logging/LogEnum.h"
 #include "Host/GW2/Inputs/GameBinds/GbEnum.h"
-#include "UI/Services/Fonts/FuncDefs.h"
-#include "UI/Textures/TxFuncDefs.h"
-#include "UI/UiFuncDefs.h"
+#include "UI/Services/Fonts/FontManager.h"
+#include "UI/Textures/TxQueueEntry.h"
+#include "UI/UiRender.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// ADDONAPI Namespace

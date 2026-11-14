@@ -15,15 +15,42 @@
 #include "thirdparty/imgui/imgui.h"
 #include "thirdparty/minhook/mh_hook.h"
 
-#include "Host/GW2/Index/IdxFuncDefs.h"
-#include "Engine/DataLink/DlFuncDefs.h"
-#include "Engine/Events/EvtFuncDefs.h"
-#include "Engine/Inputs/InputBinds/IbFuncDefs.h"
-#include "Engine/Inputs/RawInput/RiFuncDefs.h"
-#include "Host/GW2/Addons/API/LogFuncDefs.h"
-#include "UI/Textures/TxFuncDefs.h"
-#include "UI/UiFuncDefs.h"
-#include "UI/Widgets/QuickAccess/QaFuncDefs.h"
+#include "Core/Logging/LogEnum.h"
+#include "Engine/Events/EvtSubscriber.h"
+#include "Engine/Inputs/InputBinds/IbMapping.h"
+#include "Engine/Inputs/RawInput/RiApi.h"
+#include "UI/Textures/TxQueueEntry.h"
+#include "UI/UiRender.h"
+
+typedef void* (*DATALINK_GETRESOURCE)  (const char* aIdentifier);
+typedef void* (*DATALINK_SHARERESOURCE)(const char* aIdentifier, size_t aResourceSize);
+
+typedef void (*EVENTS_RAISE)    (const char* aIdentifier, void* aEventData);
+typedef void (*EVENTS_SUBSCRIBE)(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
+
+typedef void (*INPUTBINDS_REGISTERWITHSTRING)(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, const char* aInputBind);
+typedef void (*INPUTBINDS_REGISTERWITHSTRUCT)(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, InputBindV1_t aInputBind);
+typedef void (*INPUTBINDS_DEREGISTER)        (const char* aIdentifier);
+
+typedef void (*WNDPROC_ADDREM)(WNDPROC_CALLBACK aWndProcCallback);
+
+typedef const char* (*IDX_GETGAMEDIR)  ();
+typedef const char* (*IDX_GETADDONDIR) (const char* aName);
+typedef const char* (*IDX_GETCOMMONDIR)();
+
+typedef Texture_t* (*TEXTURES_GET)             (const char* aIdentifier);
+typedef void       (*TEXTURES_LOADFROMFILE)    (const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback);
+typedef void       (*TEXTURES_LOADFROMRESOURCE)(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback);
+typedef void       (*TEXTURES_LOADFROMURL)     (const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback);
+
+typedef void (*GUI_ADDRENDER)(ERenderType aRenderType, GUI_RENDER aRenderCallback);
+typedef void (*GUI_REMRENDER)(GUI_RENDER aRenderCallback);
+
+typedef void (*QUICKACCESS_ADDSHORTCUT)(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aInputBindIdentifier, const char* aTooltipText);
+typedef void (*QUICKACCESS_ADDSIMPLE)  (const char* aIdentifier, GUI_RENDER aShortcutRenderCallback);
+typedef void (*QUICKACCESS_GENERIC)    (const char* aIdentifier);
+
+typedef void (*LOGGER_LOG)(ELogLevel aLogLevel, const char* aStr);
 
 ///----------------------------------------------------------------------------------------------------
 /// AddonAPI1_t Struct

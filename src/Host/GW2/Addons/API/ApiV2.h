@@ -15,16 +15,22 @@
 #include "thirdparty/imgui/imgui.h"
 #include "thirdparty/minhook/mh_hook.h"
 
-#include "Host/GW2/Index/IdxFuncDefs.h"
-#include "Engine/DataLink/DlFuncDefs.h"
-#include "Engine/Events/EvtFuncDefs.h"
-#include "Engine/Inputs/InputBinds/IbFuncDefs.h"
-#include "Engine/Inputs/RawInput/RiFuncDefs.h"
-#include "Host/GW2/Addons/API/LogFuncDefs.h"
-#include "UI/Services/Localization/LoclFuncDefs.h"
-#include "UI/Textures/TxFuncDefs.h"
-#include "UI/UiFuncDefs.h"
-#include "UI/Widgets/QuickAccess/QaFuncDefs.h"
+#include "ApiV1.h"
+
+typedef void (*EVENTS_RAISENOTIFICATION)(const char* aIdentifier);
+
+typedef LRESULT (*WNDPROC_SENDTOGAME)(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+typedef const char* (*LOCALIZATION_TRANSLATE)  (const char* aIdentifier);
+typedef const char* (*LOCALIZATION_TRANSLATETO)(const char* aIdentifier, const char* aLanguageIdentifier);
+
+typedef Texture_t* (*TEXTURES_GETORCREATEFROMFILE)    (const char* aIdentifier, const char* aFilename);
+typedef Texture_t* (*TEXTURES_GETORCREATEFROMRESOURCE)(const char* aIdentifier, unsigned aResourceID, HMODULE aModule);
+typedef Texture_t* (*TEXTURES_GETORCREATEFROMURL)     (const char* aIdentifier, const char* aRemote, const char* aEndpoint);
+typedef Texture_t* (*TEXTURES_GETORCREATEFROMMEMORY)  (const char* aIdentifier, void* aData, size_t aSize);
+typedef void       (*TEXTURES_LOADFROMMEMORY)         (const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback);
+
+typedef void (*LOGGER_LOG2)(ELogLevel aLogLevel, const char* aChannel, const char* aStr);
 
 ///----------------------------------------------------------------------------------------------------
 /// AddonAPI2_t Struct

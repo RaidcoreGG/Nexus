@@ -13,7 +13,8 @@
 
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include "UiEnum.h"
-#include "UiFuncDefs.h"
+
+typedef void (*GUI_RENDER)();
 
 ///----------------------------------------------------------------------------------------------------
 /// CUiRender Class

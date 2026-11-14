@@ -9,7 +9,9 @@
 #pragma once
 
 #include "TxEnum.h"
-#include "TxFuncDefs.h"
+#include "TxTexture.h"
+
+typedef void (*TEXTURES_RECEIVECALLBACK)(const char* aIdentifier, Texture_t* aTexture);
 
 ///----------------------------------------------------------------------------------------------------
 /// QueuedTexture_t Struct

@@ -15,7 +15,7 @@
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include "Engine/Loader/Loader.h"
 #include "EvtData.h"
-#include "EvtFuncDefs.h"
+#include "EvtSubscriber.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// CEventApi Class

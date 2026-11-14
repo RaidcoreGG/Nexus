@@ -23,7 +23,6 @@ namespace Clockwork = Raidcore::Clockwork;
 
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include "Core/Logging/LogChannel.h"
-#include "TxFuncDefs.h"
 #include "TxQueueEntry.h"
 #include "TxTexture.h"
 #include "UI/Renderer/RdrContext.h"

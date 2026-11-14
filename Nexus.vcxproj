@@ -120,7 +120,6 @@
     <ClInclude Include="src\Host\GW2\Addons\Library\LibManager.h" />
     <ClInclude Include="src\Host\GW2\Context.h" />
     <ClInclude Include="src\Host\GW2\Hooks\HkConst.h" />
-    <ClInclude Include="src\Host\GW2\Hooks\HkFuncDefs.h" />
     <ClInclude Include="src\Host\GW2\Hooks\Hooks.h" />
     <ClInclude Include="src\Host\GW2\Hooks\HkNotify.h" />
     <ClInclude Include="src\Host\GW2\Hooks\HkGameWindow.h" />
@@ -152,6 +151,7 @@
     <ClInclude Include="src\Host\GW2\Addons\API\ApiV4.h" />
     <ClInclude Include="src\Host\GW2\Addons\API\ApiV5.h" />
     <ClInclude Include="src\Host\GW2\Addons\API\ApiV6.h" />
+    <ClInclude Include="src\Host\GW2\Addons\API\ApiNext.h" />
     <ClInclude Include="src\Engine\Loader\LdrAddonBase.h" />
     <ClInclude Include="src\Engine\Loader\LdrChecksum.h" />
     <ClInclude Include="src\Engine\Loader\LdrEnum.h" />
@@ -166,7 +166,6 @@
     <ClInclude Include="src\Host\GW2\ArcDPS\ArcApi.h" />
     <ClInclude Include="src\Host\GW2\ArcDPS\ArcEnum.h" />
     <ClInclude Include="src\Host\GW2\ArcDPS\ArcExtensionDef.h" />
-    <ClInclude Include="src\Host\GW2\ArcDPS\ArcFuncDefs.h" />
     <ClInclude Include="src\Host\GW2\Build\BuildInfo.h" />
     <ClInclude Include="src\Host\GW2\Inputs\MouseResetFix.h" />
     <ClInclude Include="src\UI\Renderer\RdrContext.h" />
@@ -174,7 +173,6 @@
     <ClInclude Include="src\UI\Renderer\RdrWindow.h" />
     <ClInclude Include="src\Host\GW2\Inputs\GameBinds\GbEnum.h" />
     <ClInclude Include="src\Host\GW2\Inputs\GameBinds\GbConst.h" />
-    <ClInclude Include="src\Host\GW2\Inputs\GameBinds\GbFuncDefs.h" />
     <ClInclude Include="src\Host\GW2\Inputs\GameBinds\GbApi.h" />
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbBind.h" />
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbCapture.h" />
@@ -191,11 +189,9 @@
     <ClInclude Include="src\Host\GW2\Addons\AddConst.h" />
     <ClInclude Include="src\Engine\DataLink\DlApi.h" />
     <ClInclude Include="src\Engine\DataLink\DlEnum.h" />
-    <ClInclude Include="src\Engine\DataLink\DlFuncDefs.h" />
     <ClInclude Include="src\Engine\DataLink\DlLinkedResource.h" />
     <ClInclude Include="src\Engine\Events\EvtApi.h" />
     <ClInclude Include="src\Engine\Events\EvtSubscriber.h" />
-    <ClInclude Include="src\Engine\Events\EvtFuncDefs.h" />
     <ClInclude Include="src\Core\Logging\LogConst.h" />
     <ClInclude Include="src\Core\Logging\LogEnum.h" />
     <ClInclude Include="src\UI\Textures\TxEnum.h" />
@@ -223,11 +219,9 @@
     <ClInclude Include="thirdparty\imgui\imstb_rectpack.h" />
     <ClInclude Include="thirdparty\imgui\imstb_textedit.h" />
     <ClInclude Include="thirdparty\imgui\imstb_truetype.h" />
-    <ClInclude Include="src\Engine\Inputs\InputBinds\IbFuncDefs.h" />
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbBindV2.h" />
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbApi.h" />
     <ClInclude Include="src\Host\GW2\Addons\API\NexusLink.h" />
-    <ClInclude Include="src\Host\GW2\Addons\API\LogFuncDefs.h" />
     <ClInclude Include="src\Host\GW2\Main.h" />
     <ClInclude Include="src\Host\GW2\Multibox\Multibox.h" />
     <ClInclude Include="thirdparty\mumble\Mumble.h" />
@@ -382,7 +376,6 @@
     <ClInclude Include="thirdparty\minhook\mh_hook.h" />
     <ClInclude Include="thirdparty\minhook\mh_trampoline.h" />
     <ClInclude Include="src\Host\GW2\Mumble\MblReader.h" />
-    <ClInclude Include="src\Host\GW2\Index\IdxFuncDefs.h" />
     <ClInclude Include="res\Resources.h" />
     <ClInclude Include="src\Core\Preferences\PrefContext.h" />
     <ClInclude Include="src\Core\Preferences\PrefSetting.h" />
@@ -390,7 +383,6 @@
     <ClInclude Include="thirdparty\pugixml\pugiconfig.hpp" />
     <ClInclude Include="thirdparty\pugixml\pugixml.hpp" />
     <ClInclude Include="thirdparty\stb\stb_image.h" />
-    <ClInclude Include="src\UI\Textures\TxFuncDefs.h" />
     <ClInclude Include="src\UI\Textures\TxQueueEntry.h" />
     <ClInclude Include="src\UI\Textures\TxTexture.h" />
     <ClInclude Include="src\UI\Textures\TxLoader.h" />
@@ -401,20 +393,16 @@
     <ClInclude Include="src\UI\Controls\CtlWindow.h" />
     <ClInclude Include="src\UI\UiBinds.h" />
     <ClInclude Include="src\UI\UiEnum.h" />
-    <ClInclude Include="src\UI\UiFuncDefs.h" />
     <ClInclude Include="src\UI\Overlay\MumbleInspector\MumbleInspector.h" />
     <ClInclude Include="src\UI\Services\Fonts\FontManager.h" />
     <ClInclude Include="src\UI\Services\Fonts\FontGlyphs.h" />
-    <ClInclude Include="src\UI\Services\Fonts\FuncDefs.h" />
     <ClInclude Include="src\UI\Services\Localization\LoclApi.h" />
-    <ClInclude Include="src\UI\Services\Localization\LoclFuncDefs.h" />
     <ClInclude Include="src\UI\Services\Localization\LoclAtlas.h" />
     <ClInclude Include="src\UI\Services\Localization\LoclView.h" />
     <ClInclude Include="src\UI\Services\Localization\LoclText.h" />
     <ClInclude Include="src\UI\Services\Localization\LoclTextIds.h" />
     <ClInclude Include="src\UI\Services\Localization\LoclQueuedText.h" />
     <ClInclude Include="src\UI\Services\QoL\EscapeClosing.h" />
-    <ClInclude Include="src\UI\Services\QoL\FuncDefs.h" />
     <ClInclude Include="src\UI\UiContext.h" />
     <ClInclude Include="src\UI\UiInput.h" />
     <ClInclude Include="src\UI\UiRender.h" />
@@ -422,7 +410,6 @@
     <ClInclude Include="src\UI\UiStyle.h" />
     <ClInclude Include="src\UI\Widgets\Alerts\AlEnum.h" />
     <ClInclude Include="src\UI\Widgets\Alerts\Alerts.h" />
-    <ClInclude Include="src\UI\Widgets\Alerts\AlFuncDefs.h" />
     <ClInclude Include="src\UI\Widgets\Alerts\AlMessage.h" />
     <ClInclude Include="src\UI\Widgets\EULA\LicenseAgreementModal.h" />
     <ClInclude Include="src\UI\Widgets\MainWindow\About\About.h" />
@@ -442,11 +429,9 @@
     <ClInclude Include="src\UI\Widgets\MainWindow\SnowflakeMgr.h" />
     <ClInclude Include="src\UI\Widgets\QuickAccess\QaConst.h" />
     <ClInclude Include="src\UI\Widgets\QuickAccess\QaEnum.h" />
-    <ClInclude Include="src\UI\Widgets\QuickAccess\QaFuncDefs.h" />
     <ClInclude Include="src\UI\Widgets\QuickAccess\QaShortcut.h" />
     <ClInclude Include="src\UI\Widgets\QuickAccess\QuickAccess.h" />
     <ClInclude Include="src\Version.h" />
-    <ClInclude Include="src\Engine\Inputs\RawInput\RiFuncDefs.h" />
     <ClInclude Include="src\Engine\Inputs\RawInput\RiApi.h" />
     <ClInclude Include="src\Engine\Inputs\RawInput\WndProcNotify.h" />
     <ClInclude Include="src\Engine\Notifier\Notifier.h" />

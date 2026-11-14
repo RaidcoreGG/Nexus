@@ -21,7 +21,7 @@
 #include "UI/Services/Localization/LoclApi.h"
 #include "UI/Textures/TxLoader.h"
 #include "UI/Textures/TxTexture.h"
-#include "UI/UiFuncDefs.h"
+#include "UI/UiRender.h"
 
 ///----------------------------------------------------------------------------------------------------
 /// ContextItem_t Struct

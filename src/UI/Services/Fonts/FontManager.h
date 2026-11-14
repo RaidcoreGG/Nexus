@@ -25,7 +25,8 @@
 #include "Core/Platform/Windows/Exe/ExePackFile.h"
 #include "Core/Preferences/PrefSetting.h"
 #include "Engine/Cleanup/RefCleanerBase.h"
-#include "FuncDefs.h"
+
+typedef void (*FONTS_RECEIVECALLBACK)(const char* aIdentifier, ImFont* aFont);
 
 ///----------------------------------------------------------------------------------------------------
 /// ManagedFont_t Struct

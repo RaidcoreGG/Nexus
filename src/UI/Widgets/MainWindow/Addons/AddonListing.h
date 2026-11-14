@@ -14,7 +14,7 @@
 #include "Host/GW2/Addons/Addon.h"
 #include "Host/GW2/Addons/Library/LibAddon.h"
 #include "UI/UiBinds.h"
-#include "UI/UiFuncDefs.h"
+#include "UI/UiRender.h"
 #include "Util/Strings.h"
 
 using ArcExtensionDef_t = ArcDPS::ExtensionDef_t;

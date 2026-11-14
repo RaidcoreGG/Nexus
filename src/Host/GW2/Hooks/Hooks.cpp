@@ -25,7 +25,6 @@
 #include "Core/Logging/LogApi.h"
 #include "Host/GW2/Inputs/GameBinds/GbApi.h"
 #include "Host/GW2/Inputs/MouseResetFix.h"
-#include "HkFuncDefs.h"
 #include "HkGameWindow.h"
 #include "HkNotify.h"
 #include "UI/Textures/TxLoader.h"

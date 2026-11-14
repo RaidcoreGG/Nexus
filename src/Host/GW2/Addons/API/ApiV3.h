@@ -15,17 +15,12 @@
 #include "thirdparty/imgui/imgui.h"
 #include "thirdparty/minhook/mh_hook.h"
 
-#include "Host/GW2/Index/IdxFuncDefs.h"
-#include "Engine/DataLink/DlFuncDefs.h"
-#include "Engine/Events/EvtFuncDefs.h"
-#include "Engine/Inputs/InputBinds/IbFuncDefs.h"
-#include "Engine/Inputs/RawInput/RiFuncDefs.h"
-#include "Host/GW2/Addons/API/LogFuncDefs.h"
-#include "UI/Services/Localization/LoclFuncDefs.h"
-#include "UI/Textures/TxFuncDefs.h"
-#include "UI/UiFuncDefs.h"
-#include "UI/Widgets/Alerts/AlFuncDefs.h"
-#include "UI/Widgets/QuickAccess/QaFuncDefs.h"
+#include "ApiV2.h"
+
+typedef void (*EVENTS_RAISE_TARGETED)            (uint32_t aSignature, const char* aIdentifier, void* aEventData);
+typedef void (*EVENTS_RAISENOTIFICATION_TARGETED)(uint32_t aSignature, const char* aIdentifier);
+
+typedef void (*ALERTS_NOTIFY)(const char* aMessage);
 
 ///----------------------------------------------------------------------------------------------------
 /// AddonAPI3_t Struct

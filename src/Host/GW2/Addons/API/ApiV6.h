@@ -15,20 +15,22 @@
 #include "thirdparty/imgui/imgui.h"
 #include "thirdparty/minhook/mh_hook.h"
 
-#include "Host/GW2/Index/IdxFuncDefs.h"
-#include "Engine/DataLink/DlFuncDefs.h"
-#include "Engine/Events/EvtFuncDefs.h"
-#include "Engine/Inputs/InputBinds/IbFuncDefs.h"
-#include "Engine/Inputs/RawInput/RiFuncDefs.h"
-#include "Host/GW2/Addons/API/LogFuncDefs.h"
-#include "Host/GW2/Inputs/GameBinds/GbFuncDefs.h"
-#include "UI/Services/Fonts/FuncDefs.h"
-#include "UI/Services/Localization/LoclFuncDefs.h"
-#include "UI/Services/QoL/FuncDefs.h"
-#include "UI/Textures/TxFuncDefs.h"
-#include "UI/UiFuncDefs.h"
-#include "UI/Widgets/Alerts/AlFuncDefs.h"
-#include "UI/Widgets/QuickAccess/QaFuncDefs.h"
+#include "ApiV5.h"
+#include "Host/GW2/Inputs/GameBinds/GbEnum.h"
+
+typedef void (*GAMEBINDS_PRESSASYNC)  (EGameBinds aGameBind);
+typedef void (*GAMEBINDS_RELEASEASYNC)(EGameBinds aGameBind);
+typedef void (*GAMEBINDS_INVOKEASYNC) (EGameBinds aGameBind, int aDuration);
+typedef void (*GAMEBINDS_PRESS)       (EGameBinds aGameBind);
+typedef void (*GAMEBINDS_RELEASE)     (EGameBinds aGameBind);
+typedef bool (*GAMEBINDS_ISBOUND)     (EGameBinds aGameBind);
+
+typedef void (*FONTS_RESIZE)(const char* aIdentifier, float aFontSize);
+
+typedef void (*GUI_REGISTERCLOSEONESCAPE)  (const char* aWindowName, bool* aIsVisible);
+typedef void (*GUI_DEREGISTERCLOSEONESCAPE)(const char* aWindowName);
+
+typedef void (*QUICKACCESS_ADDSIMPLE2)(const char* aIdentifier, const char* aTargetShortcutIdentifier, GUI_RENDER aShortcutRenderCallback);
 
 ///----------------------------------------------------------------------------------------------------
 /// AddonAPI6_t Struct
