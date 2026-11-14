@@ -59,13 +59,13 @@ static CMainWindow* s_MainWindow{};
 	}
 }
 
-/*static*/ void CMainWindow::OnVolatileAddonsDisabled(void* aEventData)
+void CMainWindow::OnAddonStateNotify(EAddonStateNotify aState, uint32_t aSignature)
 {
-	if (!s_MainWindow) { return; }
+	if (aState != EAddonStateNotify::VolatileDisabled) { return; }
 
-	if (s_MainWindow->ShowAddonsAfterGameUpdate.Get())
+	if (this->ShowAddonsAfterGameUpdate.Get())
 	{
-		s_MainWindow->Activate("Addons");
+		this->Activate("Addons");
 	}
 }
 
@@ -73,7 +73,6 @@ CMainWindow::CMainWindow()
 {
 	CContext*      ctx    = CContext::GetContext();
 	CInputBindApi* ibapi  = ctx->GetInputBindApi();
-	CEventApi*     evtapi = ctx->GetEventApi();
 
 	CAddonsWindow*  addonsWnd  = new CAddonsWindow();
 	COptionsWindow* optionsWnd = new COptionsWindow();
@@ -96,18 +95,20 @@ CMainWindow::CMainWindow()
 	ibapi->Register(KB_LOG,     EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
 	ibapi->Register(KB_DEBUG,   EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
 
-	evtapi->Subscribe(EV_VOLATILE_ADDON_DISABLED, CMainWindow::OnVolatileAddonsDisabled);
-
 	if (s_MainWindow)
 	{
 		throw "CMainWindow already registered.";
 	}
 
 	s_MainWindow = this;
+
+	this->Attach(ADDONSTATE_PRIO_MAINWINDOW);
 }
 
 CMainWindow::~CMainWindow()
 {
+	this->Detach();
+
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
 	for (ISubWindow* window : this->Windows)

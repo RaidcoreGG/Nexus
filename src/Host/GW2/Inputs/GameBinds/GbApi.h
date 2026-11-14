@@ -16,6 +16,7 @@
 
 #include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbBindV2.h"
+#include "Engine/Inputs/InputBinds/IbNotify.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
 #include "Core/Logging/LogChannel.h"
 #include "UI/Renderer/RdrContext.h"
@@ -37,7 +38,7 @@ struct MultiInputBind_t
 ///----------------------------------------------------------------------------------------------------
 /// CGameBindsApi Class
 ///----------------------------------------------------------------------------------------------------
-class CGameBindsApi : public ILogChannel, public IWndProcNotifyHandler
+class CGameBindsApi : public ILogChannel, public IWndProcNotifyHandler, public IInputBindUpdateNotifier
 {
 	public:
 	// FIXME: this needs to be moved to an evtconn

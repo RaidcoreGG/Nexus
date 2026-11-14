@@ -169,6 +169,7 @@ void CAddon::ProcessActions()
 				this->LogTrace("CAddon::Create(): %s", this->Location.string().c_str());
 				this->EnumInterfaces();
 				this->CheckUpdate(/*scheduled=*/true);
+				this->NotifyAddonState(EAddonStateNotify::Created, this->GetSignature());
 				this->EventApi->Raise(0, EV_ADDON_CREATED);
 				break;
 			}
@@ -178,6 +179,7 @@ void CAddon::ProcessActions()
 				this->LogTrace("CAddon::Destroy(): %s", this->Location.string().c_str());
 				this->UnloadInternal();
 				this->IsRunning = false; /* Just to be sure. */
+				this->NotifyAddonState(EAddonStateNotify::Destroyed, this->GetSignature());
 				this->EventApi->Raise(0, EV_ADDON_DESTROYED);
 				return; /* Return the thread entirely. */
 			}
@@ -368,6 +370,7 @@ void CAddon::LoadInternal()
 	auto end_time = std::chrono::high_resolution_clock::now();
 	auto time = end_time - start_time;
 
+	this->NotifyAddonState(EAddonStateNotify::Loaded, this->NexusAddonDefV1->Signature);
 	this->EventApi->Raise(EV_ADDON_LOADED, &this->NexusAddonDefV1->Signature);
 	this->EventApi->Raise(this->NexusAddonDefV1->Signature, EV_MUMBLE_IDENTITY_UPDATED, static_cast<void*>(CContext::GetContext()->GetMumbleReader()->GetMumbleIdentity()));
 
@@ -436,6 +439,7 @@ void CAddon::UnloadInternal()
 
 	if ((this->Flags & EAddonFlags::Destroying) != EAddonFlags::Destroying)
 	{
+		this->NotifyAddonState(EAddonStateNotify::Unloaded, this->NexusAddonDefV1->Signature);
 		this->EventApi->Raise(EV_ADDON_UNLOADED, &this->NexusAddonDefV1->Signature);
 	}
 
@@ -870,6 +874,8 @@ bool CAddon::ShouldLoad()
 			GW2::GetGameBuild() - this->Config->LastGameBuild,
 			this->Location.string().c_str()
 		);
+		this->NotifyAddonState(EAddonStateNotify::VolatileDisabled, this->NexusAddonDefV1->Signature);
+		this->EventApi->Raise(EV_VOLATILE_ADDON_DISABLED, &this->NexusAddonDefV1->Signature);
 		result = false;
 	}
 

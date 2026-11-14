@@ -224,6 +224,7 @@ void CInputBindApi::Register(const char* aIdentifier, EIbHandlerType aInputBindH
 
 	Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
 	{
+		this->NotifyInputBindUpdate();
 		this->EventApi->Raise("EV_INPUTBIND_UPDATED");
 	});
 }
@@ -357,6 +358,7 @@ void CInputBindApi::Set(std::string aIdentifier, InputBind_t aInputBind)
 
 	Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
 	{
+		this->NotifyInputBindUpdate();
 		this->EventApi->Raise("EV_INPUTBIND_UPDATED");
 	});
 }
@@ -378,6 +380,7 @@ void CInputBindApi::SetPassthrough(std::string aIdentifier, bool aPassthrough)
 
 	Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
 	{
+		this->NotifyInputBindUpdate();
 		this->EventApi->Raise("EV_INPUTBIND_UPDATED");
 	});
 }
@@ -446,6 +449,7 @@ void CInputBindApi::Delete(std::string aIdentifier)
 
 	Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
 	{
+		this->NotifyInputBindUpdate();
 		this->EventApi->Raise("EV_INPUTBIND_UPDATED");
 	});
 }

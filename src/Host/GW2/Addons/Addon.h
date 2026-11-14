@@ -17,6 +17,7 @@
 
 #include "AddConst.h"
 #include "AddEnum.h"
+#include "AddNotify.h"
 #include "Host/GW2/Addons/Config/CfgManager.h"
 #include "Host/GW2/Addons/Config/Config.h"
 #include "Host/GW2/Addons/Definitions/AddonDefV1.h"
@@ -31,7 +32,7 @@ using ArcExtensionDef_t = ArcDPS::ExtensionDef_t;
 ///----------------------------------------------------------------------------------------------------
 /// CAddon Class
 ///----------------------------------------------------------------------------------------------------
-class CAddon : public ILogChannel, public virtual IAddon
+class CAddon : public ILogChannel, public virtual IAddon, public IAddonStateNotifier
 {
 	public:
 	///----------------------------------------------------------------------------------------------------

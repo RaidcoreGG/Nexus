@@ -124,6 +124,7 @@ void CMumbleReader::AdvanceIdentity()
 		/* notify (also notifies the GUI to update its scaling factor) */
 		if (*this->MumbleIdentity != this->PreviousIdentity)
 		{
+			this->NotifyMumbleIdentity(*this->MumbleIdentity);
 			this->EventApi->Raise(EV_MUMBLE_IDENTITY_UPDATED, this->MumbleIdentity);
 		}
 	}

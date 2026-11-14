@@ -10,28 +10,12 @@
 
 #include "imgui/imgui.h"
 
-#include "Host/GW2/Hooks/HkConst.h"
 #include "Host/GW2/Mumble/MblConst.h"
 
-static CScaling* s_Scaling{};
-
-/*static*/ void CScaling::OnMumbleIdentityChanged(void* aEventArgs)
-{
-	assert(s_Scaling);
-	s_Scaling->UpdateGameUIScale();
-}
-
-/*static*/ void CScaling::OnWindowResized(void* aEventArgs)
-{
-	assert(s_Scaling);
-	s_Scaling->UpdateResolution();
-}
-
-CScaling::CScaling(RenderContext_t* aRenderCtx, CDataLinkApi* aDataLink, CEventApi* aEventApi)
+CScaling::CScaling(RenderContext_t* aRenderCtx, CDataLinkApi* aDataLink)
 {
 	this->RenderContext = aRenderCtx;
 	this->DataLink      = aDataLink;
-	this->EventApi      = aEventApi;
 
 	this->MumbleIdentity = static_cast<Mumble::Identity*>(this->DataLink->GetResource(DL_MUMBLE_LINK_IDENTITY));
 	this->NexusLink      = static_cast<NexusLinkData_t*>(this->DataLink->GetResource(DL_NEXUS_LINK));
@@ -40,21 +24,24 @@ CScaling::CScaling(RenderContext_t* aRenderCtx, CDataLinkApi* aDataLink, CEventA
 	this->EffectiveDpiScalingFactor  = 1.0f;
 	this->MinResolutionScalingFactor = 1.0f;
 
-	this->EventApi->Subscribe(EV_MUMBLE_IDENTITY_UPDATED, CScaling::OnMumbleIdentityChanged);
-	this->EventApi->Subscribe(EV_WINDOW_RESIZED, CScaling::OnWindowResized);
-
-	if (s_Scaling)
-	{
-		throw "An instance of UI Scaling already exists.";
-	}
-
-	s_Scaling = this;
+	this->INotifyHandler<IMumbleIdentityNotifyHandler>::Attach(MUMBLEIDENTITY_PRIO_SCALING);
+	this->INotifyHandler<IDxgiResizeNotifyHandler>::Attach(DXGIRESIZE_PRIO_SCALING);
 }
 
 CScaling::~CScaling()
 {
-	this->EventApi->Unsubscribe(EV_MUMBLE_IDENTITY_UPDATED, CScaling::OnMumbleIdentityChanged);
-	this->EventApi->Unsubscribe(EV_WINDOW_RESIZED, CScaling::OnWindowResized);
+	this->INotifyHandler<IDxgiResizeNotifyHandler>::Detach();
+	this->INotifyHandler<IMumbleIdentityNotifyHandler>::Detach();
+}
+
+void CScaling::OnMumbleIdentityNotify(const Mumble::Identity& aIdentity)
+{
+	this->UpdateGameUIScale();
+}
+
+void CScaling::OnDxgiResizeNotify(IDXGISwapChain* aSwapChain, UINT aWidth, UINT aHeight)
+{
+	this->UpdateResolution(aWidth, aHeight);
 }
 
 UINT CScaling::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -107,7 +94,7 @@ void CScaling::UpdateGameUIScale()
 	}
 }
 
-void CScaling::UpdateResolution()
+void CScaling::UpdateResolution(UINT aWidth, UINT aHeight)
 {
 	/// Takes the window width or 1024, whichever is smaller.
 	/// Divides it by 1024, to get a relative scaling factor to that.
@@ -116,8 +103,8 @@ void CScaling::UpdateResolution()
 	/// If the window size is >= 1024x768, the scaling factor is 1.
 	this->MinResolutionScalingFactor =
 		min(
-			min(this->RenderContext->Window.Width, 1024.0f) / 1024.0f,
-			min(this->RenderContext->Window.Height, 768.0f) / 768.0f
+			min(static_cast<float>(aWidth), 1024.0f) / 1024.0f,
+			min(static_cast<float>(aHeight), 768.0f) / 768.0f
 		);
 
 	this->UpdateScaling();

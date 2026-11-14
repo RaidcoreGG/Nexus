@@ -18,6 +18,7 @@ constexpr int32_t DXGIPRESENT_PRIO_TEXTURES = 200;
 constexpr int32_t DXGIPRESENT_PRIO_UI       = 300;
 
 constexpr int32_t DXGIRESIZE_PRIO_UI        = 100;
+constexpr int32_t DXGIRESIZE_PRIO_SCALING   = 150;
 constexpr int32_t DXGIRESIZE_PRIO_WINDOW    = 200;
 
 ///----------------------------------------------------------------------------------------------------

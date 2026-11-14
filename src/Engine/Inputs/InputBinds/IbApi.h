@@ -17,6 +17,7 @@
 #include "Engine/Inputs/RawInput/WndProcNotify.h"
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include "Engine/Events/EvtApi.h"
+#include "IbNotify.h"
 #include "Core/Logging/LogChannel.h"
 #include "IbBindV2.h"
 #include "IbCapture.h"
@@ -26,7 +27,7 @@
 ///----------------------------------------------------------------------------------------------------
 /// CInputBindApi Class
 ///----------------------------------------------------------------------------------------------------
-class CInputBindApi : public ILogChannel, public CInputBindCapture, public virtual IRefCleaner, public IWndProcNotifyHandler
+class CInputBindApi : public ILogChannel, public CInputBindCapture, public virtual IRefCleaner, public IWndProcNotifyHandler, public IInputBindUpdateNotifier
 {
 	public:
 	///----------------------------------------------------------------------------------------------------

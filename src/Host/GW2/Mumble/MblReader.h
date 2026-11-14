@@ -16,6 +16,7 @@
 #include "Engine/DataLink/DlApi.h"
 #include "Engine/Events/EvtApi.h"
 #include "Core/Logging/LogChannel.h"
+#include "MblNotify.h"
 
 constexpr const char* DL_MUMBLE_LINK             = "DL_MUMBLE_LINK";
 constexpr const char* DL_MUMBLE_LINK_IDENTITY    = "DL_MUMBLE_LINK_IDENTITY";
@@ -24,7 +25,7 @@ constexpr const char* EV_MUMBLE_IDENTITY_UPDATED = "EV_MUMBLE_IDENTITY_UPDATED";
 ///----------------------------------------------------------------------------------------------------
 /// CMumbleReader Class
 ///----------------------------------------------------------------------------------------------------
-class CMumbleReader : public ILogChannel
+class CMumbleReader : public ILogChannel, public IMumbleIdentityNotifier
 {
 	public:
 	///----------------------------------------------------------------------------------------------------

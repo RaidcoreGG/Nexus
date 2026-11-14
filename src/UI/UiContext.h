@@ -16,12 +16,14 @@
 #include "Engine/Inputs/RawInput/WndProcNotify.h"
 #include "Host/GW2/Hooks/HkNotify.h"
 #include "Engine/DataLink/DlApi.h"
-#include "Engine/Events/EvtApi.h"
 #include "Engine/Inputs/InputBinds/IbApi.h"
+#include "Engine/Inputs/InputBinds/IbNotify.h"
 #include "Core/Logging/LogChannel.h"
+#include "Host/GW2/Mumble/MblNotify.h"
 #include "Host/GW2/Mumble/MblReader.h"
 #include "UI/Renderer/RdrContext.h"
 #include "UI/Services/Fonts/FontManager.h"
+#include "UI/Services/Fonts/FontNotify.h"
 #include "UI/Services/Localization/LoclApi.h"
 #include "UI/Services/QoL/EscapeClosing.h"
 #include "UI/Services/Scaling/Scaling.h"
@@ -55,6 +57,9 @@ class CUiContext
 	, public IWndProcNotifyHandler
 	, public IDxgiPresentNotifyHandler
 	, public IDxgiResizeNotifyHandler
+	, public IMumbleIdentityNotifyHandler
+	, public IInputBindUpdateNotifyHandler
+	, public IFontUpdateNotifyHandler
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -64,24 +69,6 @@ class CUiContext
 	static void OnInputBindPressed(const char* aIdentifier);
 
 	///----------------------------------------------------------------------------------------------------
-	/// OnFontUpdate:
-	/// 	Receives fonts.
-	///----------------------------------------------------------------------------------------------------
-	static void OnFontUpdate(const char* aIdentifier, ImFont* aFont);
-
-	///----------------------------------------------------------------------------------------------------
-	/// OnMumbleIdentityChanged:
-	/// 	Changes fonts and UI scale when the game settings are changed.
-	///----------------------------------------------------------------------------------------------------
-	static void OnMumbleIdentityChanged(void* aEventArgs);
-
-	///----------------------------------------------------------------------------------------------------
-	/// OnInputBindUpdate:
-	/// 	Reacts to input bind changes, to trigger a UI refresh.
-	///----------------------------------------------------------------------------------------------------
-	static void OnInputBindUpdate(void* aEventData);
-
-	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
 	CUiContext(
@@ -89,7 +76,6 @@ class CUiContext
 		CTextureLoader*  aTextureService,
 		CDataLinkApi*    aDataLink,
 		CInputBindApi*   aInputBindApi,
-		CEventApi*       aEventApi,
 		CMumbleReader*   aMumbleReader
 	);
 
@@ -139,6 +125,24 @@ class CUiContext
 	/// 	Shuts the UI down before the buffers are resized.
 	///----------------------------------------------------------------------------------------------------
 	void OnDxgiResizeNotify(IDXGISwapChain* aSwapChain, UINT aWidth, UINT aHeight) override;
+
+	///----------------------------------------------------------------------------------------------------
+	/// OnMumbleIdentityNotify:
+	/// 	Resizes the fonts when the game UI size changed.
+	///----------------------------------------------------------------------------------------------------
+	void OnMumbleIdentityNotify(const Mumble::Identity& aIdentity) override;
+
+	///----------------------------------------------------------------------------------------------------
+	/// OnInputBindUpdateNotify:
+	/// 	Refreshes the UI.
+	///----------------------------------------------------------------------------------------------------
+	void OnInputBindUpdateNotify() override;
+
+	///----------------------------------------------------------------------------------------------------
+	/// OnFontUpdateNotify:
+	/// 	Applies the Nexus fonts to ImGui and NexusLink.
+	///----------------------------------------------------------------------------------------------------
+	void OnFontUpdateNotify(const char* aIdentifier, ImFont* aFont) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetLocalization:
@@ -208,7 +212,6 @@ class CUiContext
 	CTextureLoader*         TextureService = nullptr;
 	CDataLinkApi*           DataLink       = nullptr;
 	CInputBindApi*          InputBindApi   = nullptr;
-	CEventApi*              EventApi       = nullptr;
 	CMumbleReader*          MumbleReader   = nullptr;
 
 	/* Rendering */

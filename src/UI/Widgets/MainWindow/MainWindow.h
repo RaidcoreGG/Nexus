@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "Core/Preferences/PrefSetting.h"
+#include "Host/GW2/Addons/AddNotify.h"
 #include "UI/Controls/CtlSubWindow.h"
 #include "UI/Controls/CtlWindow.h"
 #include "UI/Textures/TxTexture.h"
@@ -19,7 +20,7 @@
 ///----------------------------------------------------------------------------------------------------
 /// CMainWindow Class
 ///----------------------------------------------------------------------------------------------------
-class CMainWindow : public virtual IWindow
+class CMainWindow : public virtual IWindow, public IAddonStateNotifyHandler
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -29,10 +30,10 @@ class CMainWindow : public virtual IWindow
 	static void OnInputBind(const char* aIdentifier);
 
 	///----------------------------------------------------------------------------------------------------
-	/// OnVolatileAddonsDisabled:
-	/// 	Receiver for volatile addons disabled event to bring up the addons window.
+	/// OnAddonStateNotify:
+	/// 	Brings up the addons window when a volatile addon was disabled.
 	///----------------------------------------------------------------------------------------------------
-	static void OnVolatileAddonsDisabled(void* aEventData);
+	void OnAddonStateNotify(EAddonStateNotify aState, uint32_t aSignature) override;
 
 	CMainWindow();
 

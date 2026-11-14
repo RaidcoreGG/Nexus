@@ -12,6 +12,7 @@
 #include <fstream>
 #include <mutex>
 #include <shellscalingapi.h>
+#include <string_view>
 #include <vector>
 
 #include "imgui/imgui.h"
@@ -44,53 +45,11 @@
 	}
 }
 
-/*static*/ void CUiContext::OnFontUpdate(const char* aIdentifier, ImFont* aFont)
-{
-	std::string str = aIdentifier;
-
-	if (str == "FONT_DEFAULT")
-	{
-		ImGuiIO& io = ImGui::GetIO();
-		io.FontDefault = aFont; // TODO: This is kind of not needed? The Atlas[0] is used, if this is set to null.
-
-		return;
-	}
-
-	CContext* ctx = CContext::GetContext();
-	NexusLinkData_t* nexusLink = static_cast<NexusLinkData_t*>(ctx->GetDataLink()->GetResource(DL_NEXUS_LINK));
-
-	if (!nexusLink) { return; }
-
-	if (str == "MENOMONIA") { nexusLink->Font = aFont; }
-	else if (str == "MENOMONIA_BIG") { nexusLink->FontBig = aFont; }
-	else if (str == "FIRASANS") { nexusLink->FontUI = aFont; }
-}
-
-/*static*/ void CUiContext::OnMumbleIdentityChanged(void* aEventArgs)
-{
-	CContext* ctx = CContext::GetContext();
-	CUiContext* uictx = ctx->GetUIContext();
-
-	uictx->ApplyFontScale();
-}
-
-/*static*/ void CUiContext::OnInputBindUpdate(void* aEventData)
-{
-	CContext* ctx = CContext::GetContext();
-	CUiContext* uictx = ctx->GetUIContext();
-
-	if (uictx)
-	{
-		uictx->Invalidate();
-	}
-}
-
 CUiContext::CUiContext(
 	RenderContext_t* aRenderContext,
 	CTextureLoader*  aTextureService,
 	CDataLinkApi*    aDataLink,
 	CInputBindApi*   aInputBindApi,
-	CEventApi*       aEventApi,
 	CMumbleReader*   aMumbleReader
 ) : IRefCleaner("UiContext"), ILogChannel("UI Context")
 {
@@ -98,7 +57,6 @@ CUiContext::CUiContext(
 	this->TextureService = aTextureService;
 	this->DataLink       = aDataLink;
 	this->InputBindApi   = aInputBindApi;
-	this->EventApi       = aEventApi;
 	this->MumbleReader   = aMumbleReader;
 
 	ImGui::CreateContext();
@@ -106,15 +64,12 @@ CUiContext::CUiContext(
 	this->Language       = new CLocalization();
 	this->Alerts         = new CAlerts(aDataLink);
 	this->MainWindow     = new CMainWindow();
-	this->QuickAccess    = new CQuickAccess(aDataLink, aInputBindApi, aTextureService, this->Language, aEventApi);
+	this->QuickAccess    = new CQuickAccess(aDataLink, aInputBindApi, aTextureService, this->Language);
 
 	this->FontManager    = new CFontManager();
 	this->EscapeClose    = new CEscapeClosing();
-	this->Scaling        = new CScaling(aRenderContext, aDataLink, aEventApi);
+	this->Scaling        = new CScaling(aRenderContext, aDataLink);
 	this->Input          = new CUiInput();
-
-	this->EventApi->Subscribe(EV_MUMBLE_IDENTITY_UPDATED,              CUiContext::OnMumbleIdentityChanged);
-	this->EventApi->Subscribe("EV_INPUTBIND_UPDATED",                  CUiContext::OnInputBindUpdate);
 
 	this->InputBindApi->Register(KB_TOGGLEHIDEUI, EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "CTRL+H");
 	this->EscapeClose->Register("Nexus", this->MainWindow->GetVisibleStatePtr());
@@ -124,10 +79,16 @@ CUiContext::CUiContext(
 	this->INotifyHandler<IWndProcNotifyHandler>::Attach(WNDPROC_PRIO_UI);
 	this->INotifyHandler<IDxgiPresentNotifyHandler>::Attach(DXGIPRESENT_PRIO_UI);
 	this->INotifyHandler<IDxgiResizeNotifyHandler>::Attach(DXGIRESIZE_PRIO_UI);
+	this->INotifyHandler<IMumbleIdentityNotifyHandler>::Attach(MUMBLEIDENTITY_PRIO_UI);
+	this->INotifyHandler<IInputBindUpdateNotifyHandler>::Attach(INPUTBINDUPDATE_PRIO_UI);
+	this->INotifyHandler<IFontUpdateNotifyHandler>::Attach(FONTUPDATE_PRIO_UI);
 }
 
 CUiContext::~CUiContext()
 {
+	this->INotifyHandler<IFontUpdateNotifyHandler>::Detach();
+	this->INotifyHandler<IInputBindUpdateNotifyHandler>::Detach();
+	this->INotifyHandler<IMumbleIdentityNotifyHandler>::Detach();
 	this->INotifyHandler<IDxgiResizeNotifyHandler>::Detach();
 	this->INotifyHandler<IDxgiPresentNotifyHandler>::Detach();
 	this->INotifyHandler<IWndProcNotifyHandler>::Detach();
@@ -329,6 +290,35 @@ void CUiContext::OnDxgiResizeNotify(IDXGISwapChain* aSwapChain, UINT aWidth, UIN
 	this->Shutdown();
 }
 
+void CUiContext::OnMumbleIdentityNotify(const Mumble::Identity& aIdentity)
+{
+	this->ApplyFontScale();
+}
+
+void CUiContext::OnInputBindUpdateNotify()
+{
+	this->Invalidate();
+}
+
+void CUiContext::OnFontUpdateNotify(const char* aIdentifier, ImFont* aFont)
+{
+	std::string_view id = aIdentifier;
+
+	if (id == "FONT_DEFAULT")
+	{
+		ImGui::GetIO().FontDefault = aFont;
+		return;
+	}
+
+	NexusLinkData_t* nexusLink = static_cast<NexusLinkData_t*>(this->DataLink->GetResource(DL_NEXUS_LINK));
+
+	if (!nexusLink) { return; }
+
+	if (id == "MENOMONIA")          { nexusLink->Font    = aFont; }
+	else if (id == "MENOMONIA_BIG") { nexusLink->FontBig = aFont; }
+	else if (id == "FIRASANS")      { nexusLink->FontUI  = aFont; }
+}
+
 UINT CUiContext::OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam)
 {
 	if (!this->IsInitialized)
@@ -447,12 +437,12 @@ void CUiContext::LoadFonts()
 	if (!fontFile.empty() && std::filesystem::exists(Index(EPath::DIR_FONTS) / fontFile))
 	{
 		fontPath = Index(EPath::DIR_FONTS) / fontFile;
-		this->FontManager->ReplaceFont("FONT_DEFAULT", storedFontSz, fontPath.string().c_str(), CUiContext::OnFontUpdate, nullptr);
+		this->FontManager->ReplaceFont("FONT_DEFAULT", storedFontSz, fontPath.string().c_str(), nullptr);
 		hasUserFont = true;
 	}
 
 	/* add default font for monospace */
-	this->FontManager->AddDefaultFont(CUiContext::OnFontUpdate);
+	this->FontManager->AddDefaultFont();
 
 	if (!hasUserFont)
 	{
@@ -464,11 +454,11 @@ void CUiContext::LoadFonts()
 
 	const float* sizes = s_ScaleFontSizes[GetScaleIndex(static_cast<Mumble::Identity*>(this->DataLink->GetResource(DL_MUMBLE_LINK_IDENTITY)))];
 
-	this->FontManager->ReplaceFont("MENOMONIA", sizes[0], Resources::FontMenomonia, CUiContext::OnFontUpdate, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_MERGE", sizes[0], fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-	this->FontManager->ReplaceFont("MENOMONIA_BIG", sizes[1], Resources::FontMenomonia, CUiContext::OnFontUpdate, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_MERGE", sizes[1], fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
-	this->FontManager->ReplaceFont("FIRASANS", sizes[2], Resources::FontFiraSans, CUiContext::OnFontUpdate, nullptr);
-	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_MERGE", sizes[2], fontPath.string().c_str(), CUiContext::OnFontUpdate, &config); }
+	this->FontManager->ReplaceFont("MENOMONIA", sizes[0], Resources::FontMenomonia, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_MERGE", sizes[0], fontPath.string().c_str(), &config); }
+	this->FontManager->ReplaceFont("MENOMONIA_BIG", sizes[1], Resources::FontMenomonia, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_MERGE", sizes[1], fontPath.string().c_str(), &config); }
+	this->FontManager->ReplaceFont("FIRASANS", sizes[2], Resources::FontFiraSans, nullptr);
+	if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_MERGE", sizes[2], fontPath.string().c_str(), &config); }
 }
 

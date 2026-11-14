@@ -12,7 +12,6 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui/imgui_internal.h"
 
-#include "Host/GW2/Addons/AddConst.h"
 #include "Host/GW2/Context.h"
 #include "UI/Widgets/QuickAccess/QaConst.h"
 #include "res/Resources.h"
@@ -21,27 +20,16 @@
 
 #define GW2_QUICKACCESS_ITEMS 10;
 
-void CQuickAccess::OnAddonStateChanged(void* aEventData)
-{
-	CContext*     ctx   = CContext::GetContext();
-	CUiContext*   uictx = ctx->GetUIContext();
-	CQuickAccess* qactx = uictx->GetQuickAccess();
-
-	qactx->Invalidate();
-}
-
 CQuickAccess::CQuickAccess(
 	CDataLinkApi*   aDataLink,
 	CInputBindApi*  aInputBindApi,
 	CTextureLoader* aTextureService,
-	CLocalization*  aLocalization,
-	CEventApi*      aEventApi
+	CLocalization*  aLocalization
 ) : IRefCleaner("QuickAccess"), ILogChannel("Quick Access")
 {
 	this->InputBindApi   = aInputBindApi;
 	this->TextureService = aTextureService;
 	this->Language       = aLocalization;
-	this->EventApi       = aEventApi;
 
 	this->NexusLink = (NexusLinkData_t*)aDataLink->GetResource(DL_NEXUS_LINK);
 	this->MumbleLink = (Mumble::Data*)aDataLink->GetResource(DL_MUMBLE_LINK);
@@ -56,14 +44,20 @@ CQuickAccess::CQuickAccess(
 
 	this->UpdateMenuIcon(this->DisableFestiveFlair.Get());
 
-	this->EventApi->Subscribe(EV_ADDON_LOADED,   CQuickAccess::OnAddonStateChanged);
-	this->EventApi->Subscribe(EV_ADDON_UNLOADED, CQuickAccess::OnAddonStateChanged);
+	this->Attach(ADDONSTATE_PRIO_QUICKACCESS);
 }
 
 CQuickAccess::~CQuickAccess()
 {
-	this->EventApi->Unsubscribe(EV_ADDON_LOADED,   CQuickAccess::OnAddonStateChanged);
-	this->EventApi->Unsubscribe(EV_ADDON_UNLOADED, CQuickAccess::OnAddonStateChanged);
+	this->Detach();
+}
+
+void CQuickAccess::OnAddonStateNotify(EAddonStateNotify aState, uint32_t aSignature)
+{
+	if (aState == EAddonStateNotify::Loaded || aState == EAddonStateNotify::Unloaded)
+	{
+		this->Invalidate();
+	}
 }
 
 void CQuickAccess::Render()

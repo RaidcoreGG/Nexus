@@ -25,6 +25,7 @@
 #include "Core/Platform/Windows/Exe/ExePackFile.h"
 #include "Core/Preferences/PrefSetting.h"
 #include "Engine/Cleanup/RefCleanerBase.h"
+#include "FontNotify.h"
 
 typedef void (*FONTS_RECEIVECALLBACK)(const char* aIdentifier, ImFont* aFont);
 
@@ -40,6 +41,7 @@ struct ManagedFont_t
 	std::shared_ptr<const std::vector<uint8_t>> Data;        /* Shared with the atlas builds that use it. */
 	ImFontConfig*                               Config;
 	std::shared_ptr<const std::vector<ImWchar>> GlyphRanges; /* Declared by an addon. Null for Nexus fonts. */
+	bool                                        IsHostFont;  /* Added by Nexus, kept without subscribers. */
 };
 
 ///----------------------------------------------------------------------------------------------------
@@ -84,7 +86,7 @@ enum class EFontsUpdate
 ///----------------------------------------------------------------------------------------------------
 /// CFontManager Class
 ///----------------------------------------------------------------------------------------------------
-class CFontManager : public virtual IRefCleaner, public ILogChannel
+class CFontManager : public virtual IRefCleaner, public ILogChannel, public IFontUpdateNotifier
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -99,7 +101,8 @@ class CFontManager : public virtual IRefCleaner, public ILogChannel
 	///----------------------------------------------------------------------------------------------------
 	/// Advance:
 	/// 	Starts a rebuild of the font atlases on worker threads if a font changed, and applies a finished
-	/// 	one: swaps the atlases and notifies the callbacks of the fonts that changed. The previous atlases
+	/// 	one: swaps the atlases and notifies the callbacks of the fonts that changed and the font update
+	/// 	subscribers. The previous atlases
 	/// 	stay in use until then. Only atlases whose fonts, sizes, glyph ranges or fallbacks changed are built.
 	/// 	Each font gets its own atlas, merged fonts join the atlas of the font before them.
 	/// 	Glyphs: every font gets the glyph set, fonts added through AddFont also the ranges they declare.
@@ -191,33 +194,28 @@ class CFontManager : public virtual IRefCleaner, public ILogChannel
 
 	///----------------------------------------------------------------------------------------------------
 	/// ReplaceFont:
-	/// 	Replaces a font from disk and sends updates to the callback.
+	/// 	Adds or replaces a Nexus font from disk, keeping its subscribers. Nexus fonts stay registered
+	/// 	without subscribers; Nexus receives them through the font update notification.
 	///----------------------------------------------------------------------------------------------------
-	void ReplaceFont(const char* aIdentifier, float aFontSize, const char* aFilename, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
+	void ReplaceFont(const char* aIdentifier, float aFontSize, const char* aFilename, ImFontConfig* aConfig);
 
 	///----------------------------------------------------------------------------------------------------
 	/// ReplaceFont:
-	/// 	Replaces a font from an embedded resource and sends updates to the callback.
+	/// 	Adds or replaces a Nexus font from a Nexus embedded file. See above.
 	///----------------------------------------------------------------------------------------------------
-	void ReplaceFont(const char* aIdentifier, float aFontSize, unsigned aResourceID, HMODULE aModule, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
+	void ReplaceFont(const char* aIdentifier, float aFontSize, const Raidcore::Core::Platform::Windows::CPackFile& aPackFile, ImFontConfig* aConfig);
 
 	///----------------------------------------------------------------------------------------------------
 	/// ReplaceFont:
-	/// 	Replaces a font from a Nexus embedded file and sends updates to the callback.
+	/// 	Adds or replaces a Nexus font from memory. See above.
 	///----------------------------------------------------------------------------------------------------
-	void ReplaceFont(const char* aIdentifier, float aFontSize, const Raidcore::Core::Platform::Windows::CPackFile& aPackFile, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
-
-	///----------------------------------------------------------------------------------------------------
-	/// ReplaceFont:
-	/// 	Replaces a font from memory and sends updates to the callback.
-	///----------------------------------------------------------------------------------------------------
-	void ReplaceFont(const char* aIdentifier, float aFontSize, std::span<const uint8_t> aData, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
+	void ReplaceFont(const char* aIdentifier, float aFontSize, std::span<const uint8_t> aData, ImFontConfig* aConfig);
 
 	///----------------------------------------------------------------------------------------------------
 	/// AddDefaultFont:
-	/// 	Adds a the default ImGui font.
+	/// 	Adds the default font as a Nexus font, unless FONT_DEFAULT already exists.
 	///----------------------------------------------------------------------------------------------------
-	void AddDefaultFont(FONTS_RECEIVECALLBACK aCallback = nullptr);
+	void AddDefaultFont();
 
 	///----------------------------------------------------------------------------------------------------
 	/// ResizeFont:

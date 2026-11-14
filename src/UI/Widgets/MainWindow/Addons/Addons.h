@@ -15,6 +15,7 @@
 #include "imgui/imgui.h"
 
 #include "Core/Preferences/PrefSetting.h"
+#include "Host/GW2/Addons/AddNotify.h"
 #include "AddonListing.h"
 #include "CmAddon.h"
 #include "LoadConfirmationModal.h"
@@ -38,13 +39,16 @@ constexpr EAddonsFilterFlags FILTER_INSTALLED
 
 constexpr EAddonsFilterFlags FILTER_LIBRARY = EAddonsFilterFlags::ShowDownloadable;
 
-class CAddonsWindow : public ISubWindow
+class CAddonsWindow : public ISubWindow, public IAddonStateNotifyHandler
 {
 	public:
 	CAddonsWindow();
+	~CAddonsWindow();
 	void Invalidate() override;
 
 	void Invalidate(signed int aAddonID);
+
+	void OnAddonStateNotify(EAddonStateNotify aState, uint32_t aSignature) override;
 
 	private:
 	CBindSetterModal            BindSetterModal;

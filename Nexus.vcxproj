@@ -187,6 +187,7 @@
     <ClInclude Include="src\Engine\Networking\WebRequests\WreResponse.h" />
     <ClInclude Include="src\Branch.h" />
     <ClInclude Include="src\Host\GW2\Addons\AddConst.h" />
+    <ClInclude Include="src\Host\GW2\Addons\AddNotify.h" />
     <ClInclude Include="src\Engine\DataLink\DlApi.h" />
     <ClInclude Include="src\Engine\DataLink\DlEnum.h" />
     <ClInclude Include="src\Engine\DataLink\DlLinkedResource.h" />
@@ -221,6 +222,7 @@
     <ClInclude Include="thirdparty\imgui\imstb_truetype.h" />
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbBindV2.h" />
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbApi.h" />
+    <ClInclude Include="src\Engine\Inputs\InputBinds\IbNotify.h" />
     <ClInclude Include="src\Host\GW2\Addons\API\NexusLink.h" />
     <ClInclude Include="src\Host\GW2\Main.h" />
     <ClInclude Include="src\Host\GW2\Multibox\Multibox.h" />
@@ -376,6 +378,7 @@
     <ClInclude Include="thirdparty\minhook\mh_hook.h" />
     <ClInclude Include="thirdparty\minhook\mh_trampoline.h" />
     <ClInclude Include="src\Host\GW2\Mumble\MblReader.h" />
+    <ClInclude Include="src\Host\GW2\Mumble\MblNotify.h" />
     <ClInclude Include="res\Resources.h" />
     <ClInclude Include="src\Core\Preferences\PrefContext.h" />
     <ClInclude Include="src\Core\Preferences\PrefSetting.h" />
@@ -395,6 +398,7 @@
     <ClInclude Include="src\UI\UiEnum.h" />
     <ClInclude Include="src\UI\Overlay\MumbleInspector\MumbleInspector.h" />
     <ClInclude Include="src\UI\Services\Fonts\FontManager.h" />
+    <ClInclude Include="src\UI\Services\Fonts\FontNotify.h" />
     <ClInclude Include="src\UI\Services\Fonts\FontGlyphs.h" />
     <ClInclude Include="src\UI\Services\Localization\LoclApi.h" />
     <ClInclude Include="src\UI\Services\Localization\LoclAtlas.h" />

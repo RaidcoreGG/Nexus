@@ -170,7 +170,6 @@ CUiContext* CContext::GetUIContext()
 		this->GetTextureService(),
 		this->GetDataLink(),
 		this->GetInputBindApi(),
-		this->GetEventApi(),
 		this->GetMumbleReader()
 	);
 	return &s_UiContext;

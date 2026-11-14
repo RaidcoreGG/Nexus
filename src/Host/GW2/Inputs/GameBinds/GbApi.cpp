@@ -573,6 +573,7 @@ void CGameBindsApi::Set(EGameBinds aGameBind, InputBind_t aInputBind, bool aIsPr
 	{
 		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this, aGameBind](Clockwork::CancellationToken aToken)
 		{
+			this->NotifyInputBindUpdate();
 			this->EventApi->Raise("EV_INPUTBIND_UPDATED");
 		});
 		this->Save();

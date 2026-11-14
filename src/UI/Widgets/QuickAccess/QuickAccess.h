@@ -16,6 +16,7 @@
 
 #include "imgui/imgui.h"
 
+#include "Host/GW2/Addons/AddNotify.h"
 #include "Host/GW2/Addons/API/NexusLink.h"
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include "Engine/DataLink/DlApi.h"
@@ -42,20 +43,13 @@ constexpr const char* QAKEY_GENERIC              = "Generic";
 ///----------------------------------------------------------------------------------------------------
 /// CQuickAccess Class
 ///----------------------------------------------------------------------------------------------------
-class CQuickAccess : public ILogChannel, public virtual IWindow, public virtual IRefCleaner
+class CQuickAccess : public ILogChannel, public virtual IWindow, public virtual IRefCleaner, public IAddonStateNotifyHandler
 {
-	public:
-	///----------------------------------------------------------------------------------------------------
-	/// OnAddonStateChanged:
-	/// 	Rechecks invalid shortcuts on addon state change.
-	///----------------------------------------------------------------------------------------------------
-	static void OnAddonStateChanged(void* aEventData);
-
 	public:
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CQuickAccess(CDataLinkApi* aDataLink, CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization, CEventApi* aEventApi);
+	CQuickAccess(CDataLinkApi* aDataLink, CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -128,11 +122,16 @@ class CQuickAccess : public ILogChannel, public virtual IWindow, public virtual 
 	///----------------------------------------------------------------------------------------------------
 	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
+	///----------------------------------------------------------------------------------------------------
+	/// OnAddonStateNotify:
+	/// 	Rechecks invalid shortcuts on addon state change.
+	///----------------------------------------------------------------------------------------------------
+	void OnAddonStateNotify(EAddonStateNotify aState, uint32_t aSignature) override;
+
 	private:
 	CInputBindApi*                        InputBindApi       {};
 	CTextureLoader*                       TextureService     {};
 	CLocalization*                        Language           {};
-	CEventApi*                            EventApi           {};
 
 	NexusLinkData_t*                      NexusLink          {};
 	Mumble::Data*                         MumbleLink         {};

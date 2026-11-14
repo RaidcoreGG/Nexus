@@ -12,8 +12,9 @@
 #include "Core/Preferences/PrefSetting.h"
 #include <windows.h>
 #include "Engine/DataLink/DlApi.h"
-#include "Engine/Events/EvtApi.h"
+#include "Host/GW2/Hooks/HkNotify.h"
 #include "Host/GW2/Mumble/MblConst.h"
+#include "Host/GW2/Mumble/MblNotify.h"
 #include "Host/GW2/Mumble/MblReader.h"
 #include "UI/Renderer/RdrContext.h"
 
@@ -21,33 +22,34 @@
 /// CScaling Class
 ///----------------------------------------------------------------------------------------------------
 class CScaling
+	: public IMumbleIdentityNotifyHandler
+	, public IDxgiResizeNotifyHandler
 {
 	public:
-	///----------------------------------------------------------------------------------------------------
-	/// OnMumbleIdentityChanged:
-	/// 	Update game base scale.
-	///----------------------------------------------------------------------------------------------------
-	static void OnMumbleIdentityChanged(void* aEventArgs);
-
-	///----------------------------------------------------------------------------------------------------
-	/// OnWindowResized:
-	/// 	Update game base scale.
-	///----------------------------------------------------------------------------------------------------
-	static void OnWindowResized(void* aEventArgs);
-
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
 	CScaling(
 		RenderContext_t* aRenderCtx,
-		CDataLinkApi*    aDataLink,
-		CEventApi*       aEventApi
+		CDataLinkApi*    aDataLink
 	);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
 	///----------------------------------------------------------------------------------------------------
 	~CScaling();
+
+	///----------------------------------------------------------------------------------------------------
+	/// OnMumbleIdentityNotify:
+	/// 	Updates the game UI scale.
+	///----------------------------------------------------------------------------------------------------
+	void OnMumbleIdentityNotify(const Mumble::Identity& aIdentity) override;
+
+	///----------------------------------------------------------------------------------------------------
+	/// OnDxgiResizeNotify:
+	/// 	Updates the minimum resolution scaling before the game window raises EV_WINDOW_RESIZED.
+	///----------------------------------------------------------------------------------------------------
+	void OnDxgiResizeNotify(IDXGISwapChain* aSwapChain, UINT aWidth, UINT aHeight) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// WndProc:
@@ -71,12 +73,11 @@ class CScaling
 	/// UpdateResolution:
 	/// 	Updates the minimum resolution scaling.
 	///----------------------------------------------------------------------------------------------------
-	void UpdateResolution();
+	void UpdateResolution(UINT aWidth, UINT aHeight);
 
 	private:
 	RenderContext_t*  RenderContext;
 	CDataLinkApi*     DataLink;
-	CEventApi*        EventApi;
 	Mumble::Identity* MumbleIdentity;
 	NexusLinkData_t*  NexusLink;
 

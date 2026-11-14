@@ -20,22 +20,6 @@
 #include "res/Resources.h"
 #include "Util/Strings.h"
 
-static CAddonsWindow* AddonsWindow = nullptr;
-
-void OnAddonChanged(void* aEventData)
-{
-	if (!AddonsWindow) { return; }
-
-	if (aEventData)
-	{
-		AddonsWindow->Invalidate(*(signed int*)aEventData);
-	}
-	else
-	{
-		AddonsWindow->Invalidate();
-	}
-}
-
 CAddonsWindow::CAddonsWindow()
 {
 	this->Name           = "Addons";
@@ -47,14 +31,17 @@ CAddonsWindow::CAddonsWindow()
 
 	this->Invalidate();
 
-	CContext*  ctx         = CContext::GetContext();
-	CEventApi* evtapi      = ctx->GetEventApi();
+	this->Attach(ADDONSTATE_PRIO_ADDONSWINDOW);
+}
 
-	evtapi->Subscribe("EV_ADDON_LOADED", OnAddonChanged);
-	evtapi->Subscribe("EV_ADDON_UNLOADED", OnAddonChanged);
-	evtapi->Subscribe("EV_ADDON_CREATED", OnAddonChanged);
-	evtapi->Subscribe("EV_ADDON_DESTROYED", OnAddonChanged);
-	AddonsWindow = this;
+CAddonsWindow::~CAddonsWindow()
+{
+	this->Detach();
+}
+
+void CAddonsWindow::OnAddonStateNotify(EAddonStateNotify aState, uint32_t aSignature)
+{
+	this->Invalidate(static_cast<signed int>(aSignature));
 }
 
 void CAddonsWindow::Invalidate()

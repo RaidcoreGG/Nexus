@@ -18,6 +18,8 @@
 class IWindow
 {
 	public:
+	virtual ~IWindow() = default;
+
 	///----------------------------------------------------------------------------------------------------
 	/// Render:
 	/// 	Renders the given window.

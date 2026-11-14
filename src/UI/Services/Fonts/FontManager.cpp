@@ -446,6 +446,8 @@ EFontsUpdate CFontManager::Apply(FontBuild_t aBuild)
 	/* Subscribers drop the old pointers before their atlases are freed. */
 	for (const Change_t& change : changes)
 	{
+		this->NotifyFontUpdate(change.Identifier.c_str(), nullptr);
+
 		for (FONTS_RECEIVECALLBACK callback : change.Subscribers)
 		{
 			callback(change.Identifier.c_str(), nullptr);
@@ -480,6 +482,8 @@ EFontsUpdate CFontManager::Apply(FontBuild_t aBuild)
 
 	for (const Change_t& change : changes)
 	{
+		this->NotifyFontUpdate(change.Identifier.c_str(), change.Pointer);
+
 		for (FONTS_RECEIVECALLBACK callback : change.Subscribers)
 		{
 			callback(change.Identifier.c_str(), change.Pointer);
@@ -734,7 +738,7 @@ void CFontManager::Release(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallb
 	}
 
 	/* refCount reached 0, "mark" this font for deletion by freeing its underlying buffer */
-	if (font.Subscribers.size() == 0)
+	if (font.Subscribers.size() == 0 && !font.IsHostFont)
 	{
 		font.Data.reset();
 
@@ -837,110 +841,25 @@ void CFontManager::AddFont(const char* aIdentifier, float aFontSize, std::span<c
 	}
 }
 
-void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, const char* aFilename, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
+void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, const char* aFilename, ImFontConfig* aConfig)
 {
-	if (aFontSize < 1.0f) { return; }
 	if (!aFilename) { return; }
 	if (!std::filesystem::exists(aFilename)) { return; }
 
-	std::string str = aIdentifier;
-
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [str](ManagedFont_t& font) { return font.Identifier == str; });
-
 	size_t size = 0;
 	void* buffer = ImFileLoadToMemory(aFilename, "rb", &size, 0);
-	std::span<const uint8_t> data{ static_cast<const uint8_t*>(buffer), size };
 
-	if (it != this->Registry.end()) /* font already exists */
-	{
-		/* get the reference */
-		ManagedFont_t& oldFont = *it;
+	this->ReplaceFont(aIdentifier, aFontSize, std::span<const uint8_t>{ static_cast<const uint8_t*>(buffer), size }, aConfig);
 
-		/* free the data*/
-		oldFont.Data.reset();
-
-		/* overwrite config if one was passed */
-		if (aConfig)
-		{
-			delete oldFont.Config;
-			oldFont.Config = nullptr;
-		}
-		else
-		{
-			aConfig = oldFont.Config;
-		}
-
-		ManagedFont_t font = this->CreateManagedFont(aIdentifier, aFontSize, data, aConfig, false);
-		font.Subscribers = oldFont.Subscribers;
-
-		*it = font;
-
-		this->IsFontAtlasBuilt = false;
-	}
-	else
-	{
-		/* call AddFontInternal with the memory buffer */
-		this->AddFontInternal(aIdentifier, aFontSize, data, aCallback, aConfig, false);
-	}
-
-	/* delete buffer, because it was copied in AddFont */
 	IM_FREE(buffer);
 }
 
-void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, unsigned aResourceID, HMODULE aModule, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
+void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, const CPackFile& aPackFile, ImFontConfig* aConfig)
 {
-	if (aFontSize < 1.0f) { return; }
-	if (aResourceID == 0) { return; }
-	if (!aModule) { return; }
-
-	std::string str = aIdentifier;
-
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [str](ManagedFont_t& font) { return font.Identifier == str; });
-
-	/* get data */
-	std::span<const uint8_t> data = CPackFile(aResourceID, RT_FONT, aModule).GetBytes();
-
-	if (it != this->Registry.end()) /* font already exists */
-	{
-		/* get the reference */
-		ManagedFont_t& oldFont = *it;
-
-		/* free the data*/
-		oldFont.Data.reset();
-
-		/* overwrite config if one was passed */
-		if (aConfig)
-		{
-			delete oldFont.Config;
-			oldFont.Config = nullptr;
-		}
-		else
-		{
-			aConfig = oldFont.Config;
-		}
-
-		ManagedFont_t font = this->CreateManagedFont(aIdentifier, aFontSize, data, aConfig, false);
-		font.Subscribers = oldFont.Subscribers;
-
-		*it = font;
-
-		this->IsFontAtlasBuilt = false;
-	}
-	else
-	{
-		/* call AddFontInternal with the memory buffer */
-		this->AddFontInternal(aIdentifier, aFontSize, data, aCallback, aConfig, false);
-	}
+	this->ReplaceFont(aIdentifier, aFontSize, aPackFile.GetBytes(), aConfig);
 }
 
-void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, const CPackFile& aPackFile, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
-{
-	this->ReplaceFont(aIdentifier, aFontSize, aPackFile.GetBytes(), aCallback, aConfig);
-}
-
-void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, std::span<const uint8_t> aData, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
+void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, std::span<const uint8_t> aData, ImFontConfig* aConfig)
 {
 	if (aFontSize < 1.0f) { return; }
 	if (aData.empty()) { return; }
@@ -950,65 +869,35 @@ void CFontManager::ReplaceFont(const char* aIdentifier, float aFontSize, std::sp
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [str](ManagedFont_t& font) { return font.Identifier == str; });
 
-	if (it != this->Registry.end()) /* font already exists */
+	ImFontConfig* previousConfig = it != this->Registry.end() ? it->Config : nullptr;
+
+	ManagedFont_t font = this->CreateManagedFont(aIdentifier, aFontSize, aData, aConfig ? aConfig : previousConfig, false);
+	font.IsHostFont = true;
+
+	if (it != this->Registry.end())
 	{
-		/* get the reference */
-		ManagedFont_t& oldFont = *it;
-
-		/* free the data*/
-		oldFont.Data.reset();
-
-		/* overwrite config if one was passed */
-		if (aConfig)
-		{
-			delete oldFont.Config;
-			oldFont.Config = nullptr;
-		}
-		else
-		{
-			aConfig = oldFont.Config;
-		}
-
-		ManagedFont_t font = this->CreateManagedFont(aIdentifier, aFontSize, aData, aConfig, false);
-		font.Subscribers = oldFont.Subscribers;
-
+		font.Subscribers = it->Subscribers;
 		*it = font;
-
-		this->IsFontAtlasBuilt = false;
+		delete previousConfig;
 	}
 	else
 	{
-		/* call AddFontInternal with the memory buffer */
-		this->AddFontInternal(aIdentifier, aFontSize, aData, aCallback, aConfig, false);
+		this->Registry.push_back(font);
 	}
+
+	this->IsFontAtlasBuilt = false;
 }
 
-void CFontManager::AddDefaultFont(FONTS_RECEIVECALLBACK aCallback)
+void CFontManager::AddDefaultFont()
 {
-	std::string str = "FONT_DEFAULT";
-
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [str](ManagedFont_t& font) { return font.Identifier == str; });
-
-	if (it != this->Registry.end()) /* font already exists */
 	{
-		/* get the reference */
-		ManagedFont_t& font = *it;
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+		auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [](ManagedFont_t& font) { return font.Identifier == "FONT_DEFAULT"; });
 
-		/* add the callback */
-		if (aCallback)
-		{
-			font.Subscribers.push_back(aCallback);
-		}
+		if (it != this->Registry.end()) { return; }
 	}
-	else /* create new font */
-	{
-		/* get data */
-		std::span<const uint8_t> data = Resources::FontInter.GetBytes();
 
-		/* call AddFontInternal with the memory buffer */
-		this->AddFontInternal("FONT_DEFAULT", 15.0f, data, aCallback, nullptr, false);
-	}
+	this->ReplaceFont("FONT_DEFAULT", 15.0f, Resources::FontInter, nullptr);
 }
 
 void CFontManager::ResizeFont(const char* aIdentifier, float aFontSize)
@@ -1041,27 +930,23 @@ uint32_t CFontManager::CleanupRefs(void* aStartAddress, void* aEndAddress)
 
 	const std::lock_guard<std::mutex> lock(this->Mutex);
 
-	for (auto& font : this->Registry)
+	std::erase_if(this->Registry, [&](ManagedFont_t& font)
 	{
-		for (FONTS_RECEIVECALLBACK callback : font.Subscribers)
+		size_t removed = std::erase_if(font.Subscribers, [&](FONTS_RECEIVECALLBACK aCallback)
 		{
-			if (callback >= aStartAddress && callback <= aEndAddress)
-			{
-				font.Subscribers.erase(std::remove(font.Subscribers.begin(), font.Subscribers.end(), callback), font.Subscribers.end());
-				refCounter++;
-			}
-		}
+			return aCallback >= aStartAddress && aCallback <= aEndAddress;
+		});
 
-		if (font.Subscribers.size() == 0)
-		{
-			font.Data.reset();
+		refCounter += static_cast<uint32_t>(removed);
 
-			delete font.Config;
-			font.Config = nullptr;
+		if (removed == 0 || !font.Subscribers.empty() || font.IsHostFont) { return false; }
 
-			this->IsFontAtlasBuilt = false;
-		}
-	}
+		delete font.Config;
+		font.Config = nullptr;
+
+		this->IsFontAtlasBuilt = false;
+		return true;
+	});
 
 	return refCounter;
 }
