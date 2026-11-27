@@ -535,14 +535,20 @@ namespace Engine::Input
 				ib.Modifiers |= binding.value("Alt", false) ? EModifiers::Alt : EModifiers::None;
 				ib.Modifiers |= binding.value("Ctrl", false) ? EModifiers::Ctrl : EModifiers::None;
 				ib.Modifiers |= binding.value("Shift", false) ? EModifiers::Shift : EModifiers::None;
-				ib.Modifiers = binding.value("Modifiers", EModifiers::None);
+				ib.Modifiers = binding.value("Modifiers", ib.Modifiers);
 				bool passthrough = binding.value("Passthrough", false);
 
-				/* neither code nor type null -> inputbind */
-				if (!(binding["Type"].is_null() || binding["Device"].is_null()) && !binding["Code"].is_null())
+				/* code and either device or legacy type set -> inputbind */
+				if (!(binding["Type"].is_null() && binding["Device"].is_null()) && !binding["Code"].is_null())
 				{
-					binding["Type"].get_to(ib.Device);
-					binding["Device"].get_to(ib.Device);
+					if (!binding["Device"].is_null())
+					{
+						binding["Device"].get_to(ib.Device);
+					}
+					else if (!binding["Type"].is_null())
+					{
+						binding["Type"].get_to(ib.Device);
+					}
 					binding["Code"].get_to(ib.Code);
 				}
 				else if (!binding["Key"].is_null()) /* legacy inputbind */

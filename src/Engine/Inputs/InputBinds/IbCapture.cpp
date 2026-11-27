@@ -67,13 +67,13 @@ namespace Engine::Input
 					case VK_CONTROL:
 					{
 						isModifier = true;
-						this->ModifiersHeld = EModifiers::Ctrl;
+						this->ModifiersHeld |= EModifiers::Ctrl;
 						break;
 					}
 					case VK_SHIFT:
 					{
 						isModifier = true;
-						this->ModifiersHeld = EModifiers::Shift;
+						this->ModifiersHeld |= EModifiers::Shift;
 						break;
 					}
 				}
@@ -93,12 +93,12 @@ namespace Engine::Input
 					}
 					case VK_CONTROL:
 					{
-						this->ModifiersHeld &= EModifiers::Ctrl;
+						this->ModifiersHeld &= ~EModifiers::Ctrl;
 						break;
 					}
 					case VK_SHIFT:
 					{
-						this->ModifiersHeld &= EModifiers::Shift;
+						this->ModifiersHeld &= ~EModifiers::Shift;
 						break;
 					}
 				}
