@@ -539,9 +539,10 @@ namespace Engine::Input
 				bool passthrough = binding.value("Passthrough", false);
 
 				/* neither code nor type null -> inputbind */
-				if (!binding["Type"].is_null() && !binding["Code"].is_null())
+				if (!(binding["Type"].is_null() || binding["Device"].is_null()) && !binding["Code"].is_null())
 				{
 					binding["Type"].get_to(ib.Device);
+					binding["Device"].get_to(ib.Device);
 					binding["Code"].get_to(ib.Code);
 				}
 				else if (!binding["Key"].is_null()) /* legacy inputbind */
@@ -603,7 +604,7 @@ namespace Engine::Input
 			{
 				{"Identifier",  id                                      },
 				{"Modifiers",   static_cast<uint16_t>(ib.Bind.Modifiers)},
-				{"Type",        ib.Bind.Device                          },
+				{"Device",      ib.Bind.Device                          },
 				{"Code",        ib.Bind.Code                            },
 				{"Passthrough", ib.Passthrough                          }
 			};
@@ -611,7 +612,7 @@ namespace Engine::Input
 			/* override type */
 			if (!ib.Bind.Code)
 			{
-				binding["Type"] = EDevice::None;
+				binding["Device"] = EDevice::None;
 			}
 
 			bindings.push_back(binding);
