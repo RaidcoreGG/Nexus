@@ -12,226 +12,229 @@
 #include "Host/GW2/Inputs/GameBinds/GbConst.h"
 #include "Engine/Inputs/InputBinds/IbConst.h"
 
-CBindSetterModal::CBindSetterModal()
+namespace Raidcore::UI
 {
-	this->SetID("BindSetterModal");
-	this->SetDisplayName(Lang::Binds::SetKeybind);
-}
-
-void CBindSetterModal::RenderContent()
-{
-	CContext*             ctx   = CContext::GetContext();
-	Input::CInputBindApi* ibapi = ctx->GetInputBindApi();
-
-	this->Capture = ibapi->GetCapture();
-
-	/* Display current bind text, if no capture yet. */
-	if (this->Capture == Input::Bind_t{})
+	CBindSetterModal::CBindSetterModal()
 	{
-		ImGui::Text(this->PreviousBindText.c_str());
-	}
-	else
-	{
-		ImGui::Text(IBToString(this->Capture, true).c_str());
+		this->SetID("BindSetterModal");
+		this->SetDisplayName(Lang::Binds::SetKeybind);
 	}
 
-	if (this->Type == EBindEditType::Nexus)
+	void CBindSetterModal::RenderContent()
 	{
-		this->BindConflict = ibapi->IsInUse(this->Capture);
+		GW2::CContext*             ctx   = GW2::CContext::GetContext();
+		Engine::Input::CInputBindApi* ibapi = ctx->GetInputBindApi();
 
-		if (!this->BindConflict.empty() && this->BindConflict != this->NexusBindID)
+		this->Capture = ibapi->GetCapture();
+
+		/* Display current bind text, if no capture yet. */
+		if (this->Capture == Engine::Input::Bind_t{})
 		{
-			ImGui::TextColored(ImVec4(255, 0, 0, 255), (Lang::Binds::WillOverwrite.Text() + this->BindConflict + ".").c_str());
+			ImGui::Text(this->PreviousBindText.c_str());
 		}
-	}
-
-	/* Unbind */
-	if (ImGui::Button(Lang::Binds::Unbind.Text()))
-	{
-		this->SetResult(EModalResult::Secondary);
-	}
-
-	ImGui::SameLine();
-
-	/* Accept */
-	if (ImGui::Button(Lang::Common::Accept.Text()))
-	{
-		this->SetResult(EModalResult::Primary);
-	}
-
-	ImGui::SameLine();
-
-	/* Cancel */
-	if (ImGui::Button(Lang::Common::Cancel.Text()))
-	{
-		this->SetResult(EModalResult::Cancel);
-	}
-}
-
-void CBindSetterModal::OnOpening()
-{
-	CContext*             ctx   = CContext::GetContext();
-	Input::CInputBindApi* ibapi = ctx->GetInputBindApi();
-	CGameBindsApi*        gbapi = ctx->GetGameBindsApi();
-
-	/* Fetch display text. */
-	switch (this->Type)
-	{
-		case EBindEditType::Nexus:
+		else
 		{
-			const Input::Bind_t* ib = ibapi->Get(this->NexusBindID);
-
-			assert(ib != nullptr);
-
-			this->PreviousBindText = Input::IBToString(*ib, true);
-			break;
+			ImGui::Text(IBToString(this->Capture, true).c_str());
 		}
-		case EBindEditType::Game:
+
+		if (this->Type == UI::EBindEditType::Nexus)
 		{
-			const MultiInputBind_t* gb = gbapi->Get(this->GameBindID);
+			this->BindConflict = ibapi->IsInUse(this->Capture);
 
-			assert(gb != nullptr);
-
-			this->PreviousBindText = Input::IBToString(gb->Primary, true);
-			break;
-		}
-		case EBindEditType::Game2:
-		{
-			const MultiInputBind_t* gb = gbapi->Get(this->GameBindID);
-
-			assert(gb != nullptr);
-
-			this->PreviousBindText = Input::IBToString(gb->Secondary, true);
-			break;
-		}
-	}
-
-	ibapi->StartCapturing();
-}
-
-void CBindSetterModal::OnClosing()
-{
-	CContext*             ctx   = CContext::GetContext();
-	Input::CInputBindApi* ibapi = ctx->GetInputBindApi();
-	CGameBindsApi*        gbapi = ctx->GetGameBindsApi();
-	ibapi->EndCapturing();
-
-	switch (this->GetResult())
-	{
-		/* New bind. */
-		case EModalResult::Primary:
-		{
-			switch (this->Type)
+			if (!this->BindConflict.empty() && this->BindConflict != this->NexusBindID)
 			{
-				case EBindEditType::Nexus:
+				ImGui::TextColored(ImVec4(255, 0, 0, 255), (Lang::Binds::WillOverwrite.Text() + this->BindConflict + ".").c_str());
+			}
+		}
+
+		/* Unbind */
+		if (ImGui::Button(Lang::Binds::Unbind.Text()))
+		{
+			this->SetResult(UI::EModalResult::Secondary);
+		}
+
+		ImGui::SameLine();
+
+		/* Accept */
+		if (ImGui::Button(Lang::Common::Accept.Text()))
+		{
+			this->SetResult(UI::EModalResult::Primary);
+		}
+
+		ImGui::SameLine();
+
+		/* Cancel */
+		if (ImGui::Button(Lang::Common::Cancel.Text()))
+		{
+			this->SetResult(UI::EModalResult::Cancel);
+		}
+	}
+
+	void CBindSetterModal::OnOpening()
+	{
+		GW2::CContext*             ctx   = GW2::CContext::GetContext();
+		Engine::Input::CInputBindApi* ibapi = ctx->GetInputBindApi();
+		GW2::CGameBindsApi*        gbapi = ctx->GetGameBindsApi();
+
+		/* Fetch display text. */
+		switch (this->Type)
+		{
+			case UI::EBindEditType::Nexus:
+			{
+				const Engine::Input::Bind_t* ib = ibapi->Get(this->NexusBindID);
+
+				assert(ib != nullptr);
+
+				this->PreviousBindText = Engine::Input::IBToString(*ib, true);
+				break;
+			}
+			case UI::EBindEditType::Game:
+			{
+				const GW2::MultiInputBind_t* gb = gbapi->Get(this->GameBindID);
+
+				assert(gb != nullptr);
+
+				this->PreviousBindText = Engine::Input::IBToString(gb->Primary, true);
+				break;
+			}
+			case UI::EBindEditType::Game2:
+			{
+				const GW2::MultiInputBind_t* gb = gbapi->Get(this->GameBindID);
+
+				assert(gb != nullptr);
+
+				this->PreviousBindText = Engine::Input::IBToString(gb->Secondary, true);
+				break;
+			}
+		}
+
+		ibapi->StartCapturing();
+	}
+
+	void CBindSetterModal::OnClosing()
+	{
+		GW2::CContext*             ctx   = GW2::CContext::GetContext();
+		Engine::Input::CInputBindApi* ibapi = ctx->GetInputBindApi();
+		GW2::CGameBindsApi*        gbapi = ctx->GetGameBindsApi();
+		ibapi->EndCapturing();
+
+		switch (this->GetResult())
+		{
+			/* New bind. */
+			case UI::EModalResult::Primary:
+			{
+				switch (this->Type)
 				{
-					if (!this->BindConflict.empty())
+					case UI::EBindEditType::Nexus:
 					{
-						/* unset the bind that's currently using this wombo combo */
-						ibapi->Set(this->BindConflict, Input::Bind_t{});
+						if (!this->BindConflict.empty())
+						{
+							/* unset the bind that's currently using this wombo combo */
+							ibapi->Set(this->BindConflict, Engine::Input::Bind_t{});
+						}
+
+						ibapi->Set(this->NexusBindID, this->Capture);
+						break;
 					}
+					case UI::EBindEditType::Game:
+					{
+						gbapi->Set(this->GameBindID, this->Capture, true, false);
+						break;
+					}
+					case UI::EBindEditType::Game2:
+					{
+						gbapi->Set(this->GameBindID, this->Capture, false, false);
+						break;
+					}
+				}
 
-					ibapi->Set(this->NexusBindID, this->Capture);
-					break;
-				}
-				case EBindEditType::Game:
-				{
-					gbapi->Set(this->GameBindID, this->Capture, true, false);
-					break;
-				}
-				case EBindEditType::Game2:
-				{
-					gbapi->Set(this->GameBindID, this->Capture, false, false);
-					break;
-				}
+				break;
 			}
-
-			break;
-		}
-		/* Unbind. */
-		case EModalResult::Secondary:
-		{
-			switch (this->Type)
+			/* Unbind. */
+			case UI::EModalResult::Secondary:
 			{
-				case EBindEditType::Nexus:
+				switch (this->Type)
 				{
-					ibapi->Set(this->NexusBindID, Input::Bind_t{});
-					break;
+					case UI::EBindEditType::Nexus:
+					{
+						ibapi->Set(this->NexusBindID, Engine::Input::Bind_t{});
+						break;
+					}
+					case UI::EBindEditType::Game:
+					{
+						gbapi->Set(this->GameBindID, Engine::Input::Bind_t{}, true, false);
+						break;
+					}
+					case UI::EBindEditType::Game2:
+					{
+						gbapi->Set(this->GameBindID, Engine::Input::Bind_t{}, false, false);
+						break;
+					}
 				}
-				case EBindEditType::Game:
-				{
-					gbapi->Set(this->GameBindID, Input::Bind_t{}, true, false);
-					break;
-				}
-				case EBindEditType::Game2:
-				{
-					gbapi->Set(this->GameBindID, Input::Bind_t{}, false, false);
-					break;
-				}
+
+				break;
 			}
-
-			break;
 		}
+
+		/* Reset data. */
+		this->Type = UI::EBindEditType::None;
+		this->NexusBindID.clear();
+		this->GameBindID = (GW2::EGameBinds)0;
+		this->PreviousBindText.clear();
+		this->Capture = {};
+		this->BindConflict.clear();
 	}
 
-	/* Reset data. */
-	this->Type = EBindEditType::None;
-	this->NexusBindID.clear();
-	this->GameBindID = (EGameBinds)0;
-	this->PreviousBindText.clear();
-	this->Capture = {};
-	this->BindConflict.clear();
-}
-
-void CBindSetterModal::SetTarget(std::string aBindIdentifier)
-{
-	assert(this->Type == EBindEditType::None);
-
-	this->Type = EBindEditType::Nexus;
-	this->NexusBindID = aBindIdentifier;
-
-	this->SetTitle();
-
-	this->OpenModal();
-}
-
-void CBindSetterModal::SetTarget(EGameBinds aBindIdentifier, bool aIsPrimary)
-{
-	assert(this->Type == EBindEditType::None);
-
-	this->Type = aIsPrimary
-		? EBindEditType::Game
-		: EBindEditType::Game2;
-	this->GameBindID = aBindIdentifier;
-
-	this->SetTitle();
-
-	this->OpenModal();
-}
-
-void CBindSetterModal::SetTitle()
-{
-	CContext*      ctx   = CContext::GetContext();
-	CUiContext*    uictx = ctx->GetUIContext();
-	CLocalization* lang  = uictx->GetLocalization();
-
-	/* Override the title before opening the modal. */
-	std::string bindName;
-
-	switch (this->Type)
+	void CBindSetterModal::SetTarget(std::string aBindIdentifier)
 	{
-		case EBindEditType::Nexus:
-		{
-			bindName = lang->Translate(this->NexusBindID.c_str());
-			break;
-		}
-		case EBindEditType::Game:
-		case EBindEditType::Game2:
-		{
-			bindName = lang->Translate(NameFrom(this->GameBindID).c_str());
-			break;
-		}
+		assert(this->Type == UI::EBindEditType::None);
+
+		this->Type = UI::EBindEditType::Nexus;
+		this->NexusBindID = aBindIdentifier;
+
+		this->SetTitle();
+
+		this->OpenModal();
 	}
 
-	this->SetDisplayName(Lang::Binds::SetKeybind, bindName);
+	void CBindSetterModal::SetTarget(GW2::EGameBinds aBindIdentifier, bool aIsPrimary)
+	{
+		assert(this->Type == UI::EBindEditType::None);
+
+		this->Type = aIsPrimary
+			? UI::EBindEditType::Game
+			: UI::EBindEditType::Game2;
+		this->GameBindID = aBindIdentifier;
+
+		this->SetTitle();
+
+		this->OpenModal();
+	}
+
+	void CBindSetterModal::SetTitle()
+	{
+		GW2::CContext*      ctx   = GW2::CContext::GetContext();
+		UI::CUiContext*    uictx = ctx->GetUIContext();
+		UI::CLocalization* lang  = uictx->GetLocalization();
+
+		/* Override the title before opening the modal. */
+		std::string bindName;
+
+		switch (this->Type)
+		{
+			case UI::EBindEditType::Nexus:
+			{
+				bindName = lang->Translate(this->NexusBindID.c_str());
+				break;
+			}
+			case UI::EBindEditType::Game:
+			case UI::EBindEditType::Game2:
+			{
+				bindName = lang->Translate(GW2::NameFrom(this->GameBindID).c_str());
+				break;
+			}
+		}
+
+		this->SetDisplayName(Lang::Binds::SetKeybind, bindName);
+	}
 }

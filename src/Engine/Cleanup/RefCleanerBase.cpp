@@ -10,12 +10,15 @@
 
 #include "RefCleanerContext.h"
 
-IRefCleaner::IRefCleaner(std::string aComponentName)
+namespace Raidcore::Engine
 {
-	CRefCleanerContext::Get()->Register(aComponentName, this);
-}
+	IRefCleaner::IRefCleaner(std::string aComponentName)
+	{
+		CRefCleanerContext::Get()->Register(aComponentName, this);
+	}
 
-IRefCleaner::~IRefCleaner()
-{
-	CRefCleanerContext::Get()->Deregister(this);
+	IRefCleaner::~IRefCleaner()
+	{
+		CRefCleanerContext::Get()->Deregister(this);
+	}
 }

@@ -18,21 +18,24 @@
 #include "UI/UiBinds.h"
 #include "BindSetterModal.h"
 
-class CBindsWindow : public ISubWindow
+namespace Raidcore::UI
 {
-	public:
-	CBindsWindow();
-	void RenderContent() override;
-	void RenderSubWindows() override;
+	class CBindsWindow : public UI::ISubWindow
+	{
+		public:
+		CBindsWindow();
+		void RenderContent() override;
+		void RenderSubWindows() override;
 
-	private:
-	CBindSetterModal                   BindSetterModal;
+		private:
+		CBindSetterModal                   BindSetterModal;
 
-	std::vector<InputBindCategory_t>     IBCategories;
-	std::vector<GameInputBindCategory_t> GIBCategories;
+		std::vector<UI::InputBindCategory_t>     IBCategories;
+		std::vector<UI::GameInputBindCategory_t> GIBCategories;
 
-	void RenderInputBindsTable(std::unordered_map<std::string, InputBindPacked_t>& aInputBinds);
-	void RenderGameInputBindsTable(std::unordered_map<EGameBinds, GameInputBindPacked_t>& aInputBinds);
+		void RenderInputBindsTable(std::unordered_map<std::string, UI::InputBindPacked_t>& aInputBinds);
+		void RenderGameInputBindsTable(std::unordered_map<GW2::EGameBinds, UI::GameInputBindPacked_t>& aInputBinds);
 
-	void DeleteStaleBind(const std::string& aIdentifier);
-};
+		void DeleteStaleBind(const std::string& aIdentifier);
+	};
+}

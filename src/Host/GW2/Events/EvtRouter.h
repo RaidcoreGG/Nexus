@@ -13,44 +13,45 @@
 #include "Host/GW2/Inputs/GameBinds/GbNotify.h"
 #include "UI/Services/Localization/LoclNotify.h"
 
-namespace Input = Engine::Input;
-
-constexpr const char* EV_UE_KB_CH       = "EV_UNOFFICIAL_EXTRAS_KEYBIND_CHANGED";
-constexpr const char* EV_UE_LANGUAGE_CH = "EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED";
-
-///----------------------------------------------------------------------------------------------------
-/// CEventRouter Class
-/// 	Owns every subscription to events from other addons. Validates their payloads and forwards them
-/// 	as notifications, so components never subscribe to external events themselves.
-///----------------------------------------------------------------------------------------------------
-class CEventRouter
-	: public ILogChannel
-	, public IGameBindChangedNotifier
-	, public IGameLanguageNotifier
+namespace Raidcore::GW2
 {
-	public:
-	///----------------------------------------------------------------------------------------------------
-	/// ctor
-	///----------------------------------------------------------------------------------------------------
-	CEventRouter(CEventApi* aEventApi);
+	constexpr const char* EV_UE_KB_CH       = "EV_UNOFFICIAL_EXTRAS_KEYBIND_CHANGED";
+	constexpr const char* EV_UE_LANGUAGE_CH = "EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED";
 
 	///----------------------------------------------------------------------------------------------------
-	/// dtor
+	/// CEventRouter Class
+	/// 	Owns every subscription to events from other addons. Validates their payloads and forwards them
+	/// 	as notifications, so components never subscribe to external events themselves.
 	///----------------------------------------------------------------------------------------------------
-	~CEventRouter();
+	class CEventRouter
+		: public Core::ILogChannel
+		, public GW2::IGameBindChangedNotifier
+		, public UI::IGameLanguageNotifier
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		CEventRouter(Engine::CEventApi* aEventApi);
 
-	private:
-	CEventApi* EventApi = nullptr;
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		~CEventRouter();
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnUEKeybindChanged:
-	/// 	Unofficial Extras: a game bind was changed in the game.
-	///----------------------------------------------------------------------------------------------------
-	static void OnUEKeybindChanged(void* aEventData);
+		private:
+		Engine::CEventApi* EventApi = nullptr;
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnUELanguageChanged:
-	/// 	Unofficial Extras: the game language changed.
-	///----------------------------------------------------------------------------------------------------
-	static void OnUELanguageChanged(void* aEventData);
-};
+		///----------------------------------------------------------------------------------------------------
+		/// OnUEKeybindChanged:
+		/// 	Unofficial Extras: a game bind was changed in the game.
+		///----------------------------------------------------------------------------------------------------
+		static void OnUEKeybindChanged(void* aEventData);
+
+		///----------------------------------------------------------------------------------------------------
+		/// OnUELanguageChanged:
+		/// 	Unofficial Extras: the game language changed.
+		///----------------------------------------------------------------------------------------------------
+		static void OnUELanguageChanged(void* aEventData);
+	};
+}

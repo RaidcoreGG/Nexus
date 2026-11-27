@@ -34,37 +34,37 @@
 #include "UI/Widgets/Alerts/Alerts.h"
 #include "UI/Widgets/QuickAccess/QuickAccess.h"
 
-///----------------------------------------------------------------------------------------------------
-/// ToSpan:
-/// 	Wraps an addon provided buffer. A null pointer yields an empty span regardless of size.
-///----------------------------------------------------------------------------------------------------
-static std::span<const uint8_t> ToSpan(void* aData, size_t aSize)
+namespace Raidcore::GW2::API
 {
-	if (!aData) { return {}; }
+	///----------------------------------------------------------------------------------------------------
+	/// ToSpan:
+	/// 	Wraps an addon provided buffer. A null pointer yields an empty span regardless of size.
+	///----------------------------------------------------------------------------------------------------
+	static std::span<const uint8_t> ToSpan(void* aData, size_t aSize)
+	{
+		if (!aData) { return {}; }
 
-	return { static_cast<const uint8_t*>(aData), aSize };
-}
+		return { static_cast<const uint8_t*>(aData), aSize };
+	}
 
-namespace ADDONAPI
-{
 	static bool                  s_IsInitialized = false;
 
-	static CDataLinkApi*         s_DataLinkApi   = nullptr;
-	static CEventApi*            s_EventApi      = nullptr;
-	static CGameBindsApi*        s_GameBindsApi  = nullptr;
-	static Input::CInputBindApi* s_InputBindApi  = nullptr;
-	static CRawInputApi*         s_RawInputApi   = nullptr;
-	static CLocalization*        s_Localization  = nullptr;
-	static CTextureLoader*       s_TextureApi    = nullptr;
-	static CLoader*              s_Loader        = nullptr;
-	static RenderContext_t*      s_RenderCtx     = nullptr;
-	static CArcApi*              s_ArcApi        = nullptr;
+	static Engine::CDataLinkApi*         s_DataLinkApi   = nullptr;
+	static Engine::CEventApi*            s_EventApi      = nullptr;
+	static GW2::CGameBindsApi*        s_GameBindsApi  = nullptr;
+	static Engine::Input::CInputBindApi* s_InputBindApi  = nullptr;
+	static Engine::Input::CRawInputApi*         s_RawInputApi   = nullptr;
+	static UI::CLocalization*        s_Localization  = nullptr;
+	static UI::CTextureLoader*       s_TextureApi    = nullptr;
+	static Engine::CLoader*              s_Loader        = nullptr;
+	static UI::RenderContext_t*      s_RenderCtx     = nullptr;
+	static GW2::ArcDPS::CArcApi*              s_ArcApi        = nullptr;
 
-	static CUiContext*           s_UiContext     = nullptr;
-	static CFontManager*         s_FontManager   = nullptr;
-	static CAlerts*              s_Alerts        = nullptr;
-	static CQuickAccess*         s_QuickAccess   = nullptr;
-	static CEscapeClosing*       s_EscapeClosing = nullptr;
+	static UI::CUiContext*           s_UiContext     = nullptr;
+	static UI::CFontManager*         s_FontManager   = nullptr;
+	static UI::CAlerts*              s_Alerts        = nullptr;
+	static UI::CQuickAccess*         s_QuickAccess   = nullptr;
+	static UI::CEscapeClosing*       s_EscapeClosing = nullptr;
 
 	namespace DataLink
 	{
@@ -83,7 +83,7 @@ namespace ADDONAPI
 
 	namespace Events
 	{
-		void Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback)
+		void Subscribe(const char* aIdentifier, Engine::EVENT_CONSUME aConsumeEventCallback)
 		{
 			assert(s_EventApi);
 			s_EventApi->Subscribe(aIdentifier, aConsumeEventCallback);
@@ -102,7 +102,7 @@ namespace ADDONAPI
 			s_ArcApi->TryDetect();
 		}
 
-		void Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback)
+		void Unsubscribe(const char* aIdentifier, Engine::EVENT_CONSUME aConsumeEventCallback)
 		{
 			assert(s_EventApi);
 			s_EventApi->Unsubscribe(aIdentifier, aConsumeEventCallback);
@@ -182,13 +182,13 @@ namespace ADDONAPI
 	{
 		const char* GetGameDirectory()
 		{
-			static const std::string s_GameDir = Index(EPath::DIR_GW2).string();
+			static const std::string s_GameDir = GW2::Index(GW2::EPath::DIR_GW2).string();
 			return s_GameDir.c_str();
 		}
 
 		const char* GetAddonDirectory(const char* aName)
 		{
-			static const std::string s_AddonsDir = Index(EPath::DIR_ADDONS).string();
+			static const std::string s_AddonsDir = GW2::Index(GW2::EPath::DIR_ADDONS).string();
 
 			if (aName == nullptr || strcmp(aName, "") == 0)
 			{
@@ -199,7 +199,7 @@ namespace ADDONAPI
 				static std::mutex               s_Mutex{};
 				static std::vector<std::string> s_Paths{};
 
-				std::filesystem::path path = Index(EPath::DIR_ADDONS) / aName;
+				std::filesystem::path path = GW2::Index(GW2::EPath::DIR_ADDONS) / aName;
 
 				const std::lock_guard<std::mutex> lock(s_Mutex);
 
@@ -217,54 +217,54 @@ namespace ADDONAPI
 
 		const char* GetCommonDirectory()
 		{
-			static const std::string s_CommonDir = Index(EPath::DIR_COMMON).string();
+			static const std::string s_CommonDir = GW2::Index(GW2::EPath::DIR_COMMON).string();
 			return s_CommonDir.c_str();
 		}
 	}
 
 	namespace InputBinds
 	{
-		void RegisterWithString(const char* aIdentifier, Input::IB_CALLBACK_V1 aInputBindHandler, const char* aInputBind)
+		void RegisterWithString(const char* aIdentifier, Engine::Input::IB_CALLBACK_V1 aInputBindHandler, const char* aInputBind)
 		{
 			assert(s_InputBindApi);
-			s_InputBindApi->Register(aIdentifier, Input::EIbHandlerType::DownAsync, aInputBindHandler, aInputBind);
+			s_InputBindApi->Register(aIdentifier, Engine::Input::EIbHandlerType::DownAsync, aInputBindHandler, aInputBind);
 		}
 
-		void RegisterWithStruct(const char* aIdentifier, Input::IB_CALLBACK_V1 aInputBindHandler, InputBindV1_t aInputBind)
+		void RegisterWithStruct(const char* aIdentifier, Engine::Input::IB_CALLBACK_V1 aInputBindHandler, InputBindV1_t aInputBind)
 		{
 			assert(s_InputBindApi);
 			s_InputBindApi->Register(
 				aIdentifier,
-				Input::EIbHandlerType::DownAsync,
+				Engine::Input::EIbHandlerType::DownAsync,
 				aInputBindHandler,
-				Input::Bind_t{
+				Engine::Input::Bind_t{
 					aInputBind.Alt,
 					aInputBind.Ctrl,
 					aInputBind.Shift,
-					Input::EDevice::Keyboard,
+					Engine::Input::EDevice::Keyboard,
 					aInputBind.Key
 				}
 			);
 		}
 
-		void RegisterWithString2(const char* aIdentifier, Input::IB_CALLBACK_V2 aInputBindHandler, const char* aInputBind)
+		void RegisterWithString2(const char* aIdentifier, Engine::Input::IB_CALLBACK_V2 aInputBindHandler, const char* aInputBind)
 		{
 			assert(s_InputBindApi);
-			s_InputBindApi->Register(aIdentifier, Input::EIbHandlerType::DownReleaseAsync, aInputBindHandler, aInputBind);
+			s_InputBindApi->Register(aIdentifier, Engine::Input::EIbHandlerType::DownReleaseAsync, aInputBindHandler, aInputBind);
 		}
 
-		void RegisterWithStruct2(const char* aIdentifier, Input::IB_CALLBACK_V2 aInputBindHandler, InputBindV1_t aInputBind)
+		void RegisterWithStruct2(const char* aIdentifier, Engine::Input::IB_CALLBACK_V2 aInputBindHandler, InputBindV1_t aInputBind)
 		{
 			assert(s_InputBindApi);
 			s_InputBindApi->Register(
 				aIdentifier,
-				Input::EIbHandlerType::DownReleaseAsync,
+				Engine::Input::EIbHandlerType::DownReleaseAsync,
 				aInputBindHandler,
-				Input::Bind_t{
+				Engine::Input::Bind_t{
 					aInputBind.Alt,
 					aInputBind.Ctrl,
 					aInputBind.Shift,
-					Input::EDevice::Keyboard,
+					Engine::Input::EDevice::Keyboard,
 					aInputBind.Key
 				}
 			);
@@ -285,13 +285,13 @@ namespace ADDONAPI
 
 	namespace RawInput
 	{
-		void Register(WNDPROC_CALLBACK aWndProcCallback)
+		void Register(Engine::Input::WNDPROC_CALLBACK aWndProcCallback)
 		{
 			assert(s_RawInputApi);
 			s_RawInputApi->Register(aWndProcCallback);
 		}
 
-		void Deregister(WNDPROC_CALLBACK aWndProcCallback)
+		void Deregister(Engine::Input::WNDPROC_CALLBACK aWndProcCallback)
 		{
 			assert(s_RawInputApi);
 			s_RawInputApi->Deregister(aWndProcCallback);
@@ -322,68 +322,68 @@ namespace ADDONAPI
 
 	namespace Logger
 	{
-		void LogMessage(ELogLevel aLogLevel, const char* aStr)
+		void LogMessage(Core::ELogLevel aLogLevel, const char* aStr)
 		{
-			CLogApi::Get()->LogUnformatted(aLogLevel, "Addon", aStr);
+			Core::CLogApi::Get()->LogUnformatted(aLogLevel, "Addon", aStr);
 		}
 
-		void LogMessage2(ELogLevel aLogLevel, const char* aChannel, const char* aStr)
+		void LogMessage2(Core::ELogLevel aLogLevel, const char* aChannel, const char* aStr)
 		{
-			CLogApi::Get()->LogUnformatted(aLogLevel, aChannel, aStr);
+			Core::CLogApi::Get()->LogUnformatted(aLogLevel, aChannel, aStr);
 		}
 	}
 
 	namespace TextureLoader
 	{
-		Texture_t* Get(const char* aIdentifier)
+		UI::Texture_t* Get(const char* aIdentifier)
 		{
 			assert(s_TextureApi);
 			return s_TextureApi->Get(aIdentifier);
 		}
 
-		Texture_t* GetOrCreateFromFile(const char* aIdentifier, const char* aFilename)
+		UI::Texture_t* GetOrCreateFromFile(const char* aIdentifier, const char* aFilename)
 		{
 			assert(s_TextureApi);
 			return s_TextureApi->GetOrCreate(aIdentifier, aFilename);
 		}
 
-		Texture_t* GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule)
+		UI::Texture_t* GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule)
 		{
 			assert(s_TextureApi);
 			return s_TextureApi->GetOrCreate(aIdentifier, aResourceID, aModule);;
 		}
 
-		Texture_t* GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint)
+		UI::Texture_t* GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint)
 		{
 			assert(s_TextureApi);
 			return s_TextureApi->GetOrCreate(aIdentifier, aRemote, aEndpoint);
 		}
 
-		Texture_t* GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize)
+		UI::Texture_t* GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize)
 		{
 			assert(s_TextureApi);
 			return s_TextureApi->GetOrCreate(aIdentifier, ToSpan(aData, aSize));
 		}
 
-		void LoadFromFile(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback)
+		void LoadFromFile(const char* aIdentifier, const char* aFilename, UI::TEXTURES_RECEIVECALLBACK aCallback)
 		{
 			assert(s_TextureApi);
 			s_TextureApi->Load(aIdentifier, aFilename, aCallback, true);
 		}
 
-		void LoadFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback)
+		void LoadFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, UI::TEXTURES_RECEIVECALLBACK aCallback)
 		{
 			assert(s_TextureApi);
 			s_TextureApi->Load(aIdentifier, aResourceID, aModule, aCallback, true);
 		}
 
-		void LoadFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback)
+		void LoadFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint, UI::TEXTURES_RECEIVECALLBACK aCallback)
 		{
 			assert(s_TextureApi);
 			s_TextureApi->Load(aIdentifier, aRemote, aEndpoint, aCallback, true);
 		}
 
-		void LoadFromMemory(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback)
+		void LoadFromMemory(const char* aIdentifier, void* aData, size_t aSize, UI::TEXTURES_RECEIVECALLBACK aCallback)
 		{
 			assert(s_TextureApi);
 			s_TextureApi->Load(aIdentifier, ToSpan(aData, aSize), aCallback, true);
@@ -434,13 +434,13 @@ namespace ADDONAPI
 
 	namespace UIRoot::GUI
 	{
-		void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback)
+		void Register(UI::ERenderType aRenderType, UI::GUI_RENDER aRenderCallback)
 		{
 			assert(s_UiContext);
 			s_UiContext->Register(aRenderType, aRenderCallback);
 		}
 
-		void Deregister(GUI_RENDER aRenderCallback)
+		void Deregister(UI::GUI_RENDER aRenderCallback)
 		{
 			assert(s_UiContext);
 			s_UiContext->Deregister(aRenderCallback);
@@ -449,13 +449,13 @@ namespace ADDONAPI
 
 	namespace UIRoot::Fonts
 	{
-		void Get(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback)
+		void Get(const char* aIdentifier, UI::FONTS_RECEIVECALLBACK aCallback)
 		{
 			assert(s_FontManager);
 
 			if (!aCallback) { return; }
 
-			ManagedFont_t* font = s_FontManager->Get(aIdentifier);
+			UI::ManagedFont_t* font = s_FontManager->Get(aIdentifier);
 
 			if (font)
 			{
@@ -468,7 +468,7 @@ namespace ADDONAPI
 			}
 		}
 
-		void Release(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback)
+		void Release(const char* aIdentifier, UI::FONTS_RECEIVECALLBACK aCallback)
 		{
 			assert(s_FontManager);
 
@@ -477,21 +477,21 @@ namespace ADDONAPI
 			s_FontManager->Release(aIdentifier, aCallback);
 		}
 
-		void AddFontFromFile(const char* aIdentifier, float aFontSize, const char* aFilename, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
+		void AddFontFromFile(const char* aIdentifier, float aFontSize, const char* aFilename, UI::FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
 		{
 			assert(s_FontManager);
 
 			s_FontManager->AddFont(aIdentifier, aFontSize, aFilename, aCallback, aConfig);
 		}
 
-		void AddFontFromResource(const char* aIdentifier, float aFontSize, unsigned aResourceID, HMODULE aModule, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
+		void AddFontFromResource(const char* aIdentifier, float aFontSize, unsigned aResourceID, HMODULE aModule, UI::FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
 		{
 			assert(s_FontManager);
 
 			s_FontManager->AddFont(aIdentifier, aFontSize, aResourceID, aModule, aCallback, aConfig);
 		}
 
-		void AddFontFromMemory(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
+		void AddFontFromMemory(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, UI::FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig)
 		{
 			assert(s_FontManager);
 
@@ -511,7 +511,7 @@ namespace ADDONAPI
 		void Notify(const char* aMessage)
 		{
 			assert(s_Alerts);
-			s_Alerts->Notify(EAlertType::Info, aMessage);
+			s_Alerts->Notify(UI::EAlertType::Info, aMessage);
 		}
 	}
 
@@ -549,13 +549,13 @@ namespace ADDONAPI
 			}
 		}
 
-		void AddContextItem(const char* aIdentifier, GUI_RENDER aShortcutRenderCallback)
+		void AddContextItem(const char* aIdentifier, UI::GUI_RENDER aShortcutRenderCallback)
 		{
 			assert(s_QuickAccess);
 			s_QuickAccess->AddContextItem(aIdentifier, aShortcutRenderCallback);
 		}
 
-		void AddContextItem2(const char* aIdentifier, const char* aTargetShortcutIdentifier, GUI_RENDER aShortcutRenderCallback)
+		void AddContextItem2(const char* aIdentifier, const char* aTargetShortcutIdentifier, UI::GUI_RENDER aShortcutRenderCallback)
 		{
 			assert(s_QuickAccess);
 			s_QuickAccess->AddContextItem(aIdentifier, aTargetShortcutIdentifier, aShortcutRenderCallback);
@@ -587,7 +587,7 @@ namespace ADDONAPI
 	{
 		if (!s_IsInitialized)
 		{
-			CContext* ctx   = CContext::GetContext();
+			GW2::CContext* ctx   = GW2::CContext::GetContext();
 
 			s_DataLinkApi   = ctx->GetDataLink();
 			s_EventApi      = ctx->GetEventApi();

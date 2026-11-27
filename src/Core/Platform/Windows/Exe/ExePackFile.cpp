@@ -13,7 +13,7 @@
 /* Linker-provided base of the module this code is linked into, so no handle has to be stored. */
 extern "C" IMAGE_DOS_HEADER __ImageBase;
 
-namespace Raidcore::Core::Platform::Windows
+namespace Raidcore::Core::Windows
 {
 	///----------------------------------------------------------------------------------------------------
 	/// GetResourceType:

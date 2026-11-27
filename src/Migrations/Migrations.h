@@ -8,7 +8,7 @@
 
 #pragma once
 
-namespace Migrations
+namespace Raidcore::Migrations
 {
 	///----------------------------------------------------------------------------------------------------
 	/// Run:

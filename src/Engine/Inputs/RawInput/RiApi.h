@@ -16,50 +16,53 @@
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include <windows.h>
 
-typedef UINT (*WNDPROC_CALLBACK)(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-///----------------------------------------------------------------------------------------------------
-/// CRawInputApi Class
-///----------------------------------------------------------------------------------------------------
-class CRawInputApi : public virtual IRefCleaner, public IWndProcNotifyHandler
+namespace Raidcore::Engine::Input
 {
-	public:
-	///----------------------------------------------------------------------------------------------------
-	/// ctor
-	///----------------------------------------------------------------------------------------------------
-	CRawInputApi();
+	typedef UINT (*WNDPROC_CALLBACK)(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	///----------------------------------------------------------------------------------------------------
-	/// dtor
+	/// CRawInputApi Class
 	///----------------------------------------------------------------------------------------------------
-	~CRawInputApi();
+	class CRawInputApi : public virtual Engine::IRefCleaner, public IWndProcNotifyHandler
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		CRawInputApi();
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnWndProcNotify:
-	/// 	Passes the message to the addon callbacks. Returns 0 if one of them consumed it.
-	///----------------------------------------------------------------------------------------------------
-	UINT OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam) override;
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		~CRawInputApi();
 
-	///----------------------------------------------------------------------------------------------------
-	/// Register:
-	/// 	Registers the provided WndProcCallback.
-	///----------------------------------------------------------------------------------------------------
-	void Register(WNDPROC_CALLBACK aWndProcCallback);
+		///----------------------------------------------------------------------------------------------------
+		/// OnWndProcNotify:
+		/// 	Passes the message to the addon callbacks. Returns 0 if one of them consumed it.
+		///----------------------------------------------------------------------------------------------------
+		UINT OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam) override;
 
-	///----------------------------------------------------------------------------------------------------
-	/// Deregister:
-	/// 	Deregisters the provided WndProcCallback.
-	///----------------------------------------------------------------------------------------------------
-	void Deregister(WNDPROC_CALLBACK aWndProcCallback);
+		///----------------------------------------------------------------------------------------------------
+		/// Register:
+		/// 	Registers the provided WndProcCallback.
+		///----------------------------------------------------------------------------------------------------
+		void Register(WNDPROC_CALLBACK aWndProcCallback);
 
-	///----------------------------------------------------------------------------------------------------
-	/// CleanupRefs:
-	/// 	Removes all WndProc Callbacks that are within the provided address space.
-	///----------------------------------------------------------------------------------------------------
-	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
+		///----------------------------------------------------------------------------------------------------
+		/// Deregister:
+		/// 	Deregisters the provided WndProcCallback.
+		///----------------------------------------------------------------------------------------------------
+		void Deregister(WNDPROC_CALLBACK aWndProcCallback);
 
-	private:
-	/* Recursive and a snapshot is iterated, so a callback may (de)register itself. */
-	std::recursive_mutex                                 Mutex;
-	std::shared_ptr<const std::vector<WNDPROC_CALLBACK>> Registry = std::make_shared<const std::vector<WNDPROC_CALLBACK>>();
-};
+		///----------------------------------------------------------------------------------------------------
+		/// CleanupRefs:
+		/// 	Removes all WndProc Callbacks that are within the provided address space.
+		///----------------------------------------------------------------------------------------------------
+		uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
+
+		private:
+		/* Recursive and a snapshot is iterated, so a callback may (de)register itself. */
+		std::recursive_mutex                                 Mutex;
+		std::shared_ptr<const std::vector<WNDPROC_CALLBACK>> Registry = std::make_shared<const std::vector<WNDPROC_CALLBACK>>();
+	};
+}

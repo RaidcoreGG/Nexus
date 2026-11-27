@@ -22,63 +22,66 @@
 #include "WreCache.h"
 #include "WreResponse.h"
 
-constexpr time_t HTTP_CONNECTION_TIMEOUT_SEC = 5;
-constexpr time_t HTTP_READ_TIMEOUT_SEC       = 10;
-constexpr time_t HTTP_WRITE_TIMEOUT_SEC      = 10;
-
-///----------------------------------------------------------------------------------------------------
-/// CHttpClient Class
-///----------------------------------------------------------------------------------------------------
-class CHttpClient : public ILogChannel
+namespace Raidcore::Engine::Networking
 {
-	public:
-	///----------------------------------------------------------------------------------------------------
-	/// ctor
-	/// 	- aBaseURL: URL base for the client.
-	/// 	- aCacheDirectory: Directory which will contain the cached requests.
-	/// 	- aCacheLifetime: Lifetime of a cache entry in seconds.
-	///----------------------------------------------------------------------------------------------------
-	CHttpClient(
-		std::string           aBaseURL,
-		std::filesystem::path aCacheDirectory = {},
-		uint32_t              aCacheLifetime  = 0
-	);
-	
-	///----------------------------------------------------------------------------------------------------
-	/// dtor
-	///----------------------------------------------------------------------------------------------------
-	~CHttpClient();
+	constexpr time_t HTTP_CONNECTION_TIMEOUT_SEC = 5;
+	constexpr time_t HTTP_READ_TIMEOUT_SEC       = 10;
+	constexpr time_t HTTP_WRITE_TIMEOUT_SEC      = 10;
 
 	///----------------------------------------------------------------------------------------------------
-	/// Get:
-	/// 	Sends a http request and fetches the response.
-	/// 	- aOverrideCacheLifetime(seconds) changes the cache lifetime to the given one. -1 means, don't change it.
+	/// CHttpClient Class
 	///----------------------------------------------------------------------------------------------------
-	HttpResponse_t Get(std::string aEndpoint, std::string aParameters = "", int32_t aOverrideCacheLifetime = -1);
+	class CHttpClient : public Core::ILogChannel
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		/// 	- aBaseURL: URL base for the client.
+		/// 	- aCacheDirectory: Directory which will contain the cached requests.
+		/// 	- aCacheLifetime: Lifetime of a cache entry in seconds.
+		///----------------------------------------------------------------------------------------------------
+		CHttpClient(
+			std::string           aBaseURL,
+			std::filesystem::path aCacheDirectory = {},
+			uint32_t              aCacheLifetime  = 0
+		);
 
-	///----------------------------------------------------------------------------------------------------
-	/// Download:
-	/// 	Downloads a remote resource to disk.
-	///----------------------------------------------------------------------------------------------------
-	HttpResponse_t Download(std::filesystem::path aOutPath, std::string aEndpoint, std::string aParameters = "");
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		~CHttpClient();
 
-	///----------------------------------------------------------------------------------------------------
-	/// Stop:
-	/// 	Aborts the request in flight and fails every later request. Safe to call from another thread.
-	///----------------------------------------------------------------------------------------------------
-	void Stop();
+		///----------------------------------------------------------------------------------------------------
+		/// Get:
+		/// 	Sends a http request and fetches the response.
+		/// 	- aOverrideCacheLifetime(seconds) changes the cache lifetime to the given one. -1 means, don't change it.
+		///----------------------------------------------------------------------------------------------------
+		HttpResponse_t Get(std::string aEndpoint, std::string aParameters = "", int32_t aOverrideCacheLifetime = -1);
 
-	private:
-	std::string      BaseURL;
-	std::mutex       Mutex;
-	httplib::Client* Client = nullptr;
-	std::atomic_bool IsStopped = false;
+		///----------------------------------------------------------------------------------------------------
+		/// Download:
+		/// 	Downloads a remote resource to disk.
+		///----------------------------------------------------------------------------------------------------
+		HttpResponse_t Download(std::filesystem::path aOutPath, std::string aEndpoint, std::string aParameters = "");
 
-	CHttpCache*      Cache  = nullptr;
+		///----------------------------------------------------------------------------------------------------
+		/// Stop:
+		/// 	Aborts the request in flight and fails every later request. Safe to call from another thread.
+		///----------------------------------------------------------------------------------------------------
+		void Stop();
 
-	///----------------------------------------------------------------------------------------------------
-	/// DownloadCleanup:
-	/// 	Cleans up a file after a failed download.
-	///----------------------------------------------------------------------------------------------------
-	void DownloadCleanup(const std::filesystem::path& aOutPath, const std::string& aQuery);
-};
+		private:
+		std::string      BaseURL;
+		std::mutex       Mutex;
+		httplib::Client* Client = nullptr;
+		std::atomic_bool IsStopped = false;
+
+		CHttpCache*      Cache  = nullptr;
+
+		///----------------------------------------------------------------------------------------------------
+		/// DownloadCleanup:
+		/// 	Cleans up a file after a failed download.
+		///----------------------------------------------------------------------------------------------------
+		void DownloadCleanup(const std::filesystem::path& aOutPath, const std::string& aQuery);
+	};
+}

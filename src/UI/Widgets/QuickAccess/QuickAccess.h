@@ -31,158 +31,159 @@
 #include "UI/Textures/TxLoader.h"
 #include "UI/UiRender.h"
 
-namespace Input = Engine::Input;
-
-constexpr const char* QA_MENU                    = "!Nexus";
-constexpr const char* ICON_NEXUS                 = "ICON_NEXUS";
-constexpr const char* ICON_NEXUS_HOVER           = "ICON_NEXUS_HOVER";
-constexpr const char* ICON_NEXUS_HALLOWEEN       = "ICON_NEXUS_HALLOWEEN";
-constexpr const char* ICON_NEXUS_HALLOWEEN_HOVER = "ICON_NEXUS_HALLOWEEN_HOVER";
-constexpr const char* ICON_NEXUS_XMAS            = "ICON_NEXUS_XMAS";
-constexpr const char* ICON_NEXUS_XMAS_HOVER      = "ICON_NEXUS_XMAS_HOVER";
-constexpr const char* QAKEY_GENERIC              = "Generic";
-
-///----------------------------------------------------------------------------------------------------
-/// CQuickAccess Class
-///----------------------------------------------------------------------------------------------------
-class CQuickAccess : public ILogChannel, public virtual IWindow, public virtual IRefCleaner, public IAddonStateNotifyHandler
+namespace Raidcore::UI
 {
-	public:
-	///----------------------------------------------------------------------------------------------------
-	/// ctor
-	///----------------------------------------------------------------------------------------------------
-	CQuickAccess(CDataLinkApi* aDataLink, Input::CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization);
+	constexpr const char* QA_MENU                    = "!Nexus";
+	constexpr const char* ICON_NEXUS                 = "ICON_NEXUS";
+	constexpr const char* ICON_NEXUS_HOVER           = "ICON_NEXUS_HOVER";
+	constexpr const char* ICON_NEXUS_HALLOWEEN       = "ICON_NEXUS_HALLOWEEN";
+	constexpr const char* ICON_NEXUS_HALLOWEEN_HOVER = "ICON_NEXUS_HALLOWEEN_HOVER";
+	constexpr const char* ICON_NEXUS_XMAS            = "ICON_NEXUS_XMAS";
+	constexpr const char* ICON_NEXUS_XMAS_HOVER      = "ICON_NEXUS_XMAS_HOVER";
+	constexpr const char* QAKEY_GENERIC              = "Generic";
 
 	///----------------------------------------------------------------------------------------------------
-	/// dtor
+	/// CQuickAccess Class
 	///----------------------------------------------------------------------------------------------------
-	~CQuickAccess();
-
-	///----------------------------------------------------------------------------------------------------
-	/// Render:
-	/// 	Renders the Quick Access.
-	///----------------------------------------------------------------------------------------------------
-	void Render() override;
-
-	///----------------------------------------------------------------------------------------------------
-	/// AddShortcut:
-	/// 	Adds a shortcut icon.
-	///----------------------------------------------------------------------------------------------------
-	void AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aInputBindIdentifier, const char* aTooltipText);
-
-	///----------------------------------------------------------------------------------------------------
-	/// RemoveShortcut:
-	/// 	Removes a shortcut icon.
-	///----------------------------------------------------------------------------------------------------
-	void RemoveShortcut(const char* aIdentifier);
-
-	///----------------------------------------------------------------------------------------------------
-	/// PushNotification:
-	/// 	Adds a notification to a given shortcut icon.
-	///----------------------------------------------------------------------------------------------------
-	void PushNotification(const char* aIdentifier, const char* aNotificationKey);
-
-	///----------------------------------------------------------------------------------------------------
-	/// PopNotification:
-	/// 	Removes a notification to a given shortcut icon.
-	///----------------------------------------------------------------------------------------------------
-	void PopNotification(const char* aIdentifier, const char* aNotificationKey);
-
-	///----------------------------------------------------------------------------------------------------
-	/// AddContextItem:
-	/// 	Adds a context item to the Nexus shortcut.
-	///----------------------------------------------------------------------------------------------------
-	void AddContextItem(const char* aIdentifier, GUI_RENDER aShortcutRenderCallback);
-
-	///----------------------------------------------------------------------------------------------------
-	/// AddContextItem:
-	/// 	Adds a context item to the given shortcut.
-	///----------------------------------------------------------------------------------------------------
-	void AddContextItem(const char* aIdentifier, const char* aTargetShortcutIdentifier, GUI_RENDER aShortcutRenderCallback);
-
-	///----------------------------------------------------------------------------------------------------
-	/// RemoveContextItem:
-	/// 	Removes a context item.
-	///----------------------------------------------------------------------------------------------------
-	void RemoveContextItem(const char* aIdentifier);
-	
-	///----------------------------------------------------------------------------------------------------
-	/// GetRegistry:
-	/// 	Returns a copy of the registry.
-	///----------------------------------------------------------------------------------------------------
-	std::map<std::string, CShortcutIcon*> GetRegistry() const;
-
-	///----------------------------------------------------------------------------------------------------
-	/// GetOrphanage:
-	/// 	Returns a copy of the orphaned callbacks.
-	///----------------------------------------------------------------------------------------------------
-	std::map<std::string, ContextItem_t> GetOrphanage() const;
-
-	///----------------------------------------------------------------------------------------------------
-	/// CleanupRefs:
-	/// 	Removes all shortcuts and context items matching the address space.
-	///----------------------------------------------------------------------------------------------------
-	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
-
-	///----------------------------------------------------------------------------------------------------
-	/// OnAddonStateNotify:
-	/// 	Rechecks invalid shortcuts on addon state change.
-	///----------------------------------------------------------------------------------------------------
-	void OnAddonStateNotify(EAddonStateNotify aState, uint32_t aSignature) override;
-
-	private:
-	Input::CInputBindApi*                 InputBindApi       {};
-	CTextureLoader*                       TextureService     {};
-	CLocalization*                        Language           {};
-
-	NexusLinkData_t*                      NexusLink          {};
-	Mumble::Data*                         MumbleLink         {};
-
-	mutable std::mutex                    Mutex              {};
-	std::map<std::string, CShortcutIcon*> Registry           {};
-	std::map<std::string, ContextItem_t>  OrphanedCallbacks  {};
-
-	float                                 Opacity            { 0.5f };
-
-	///----------------------------------------------------------------------------------------------------
-	/// WhereAreMyParents:
-	/// 	Returns orphaned context items to their parents.
-	///----------------------------------------------------------------------------------------------------
-	void WhereAreMyParents();
-
-	///----------------------------------------------------------------------------------------------------
-	/// UpdateNexusLink:
-	/// 	Updates the nexus link shortcut icon count.
-	///----------------------------------------------------------------------------------------------------
-	void UpdateNexusLink();
-
-	///----------------------------------------------------------------------------------------------------
-	/// ApplySuppression:
-	/// 	Applies the suppressed shortcut list to the registered shortcuts.
-	///----------------------------------------------------------------------------------------------------
-	void ApplySuppression(const std::vector<std::string>& aSuppressedShortcuts);
-
-	///----------------------------------------------------------------------------------------------------
-	/// UpdateMenuIcon:
-	/// 	Recreates the menu shortcut with the seasonal or the default icon.
-	///----------------------------------------------------------------------------------------------------
-	void UpdateMenuIcon(bool aDisableFestiveFlair);
-
-	public:
-	/* Declared last: they are destroyed first, before the state their change handlers touch. */
-	CSetting<bool>                     VerticalLayout     { "QAVertical", false };
-	CSetting<EQaVisibility>            Visibility         { "QAVisibility", EQaVisibility::AlwaysShow };
-	CSetting<EQaPosition>              Location           { "QALocation", EQaPosition::Extend };
-	CSetting<float>                    OffsetX            { "QAOffsetX", 0.0f };
-	CSetting<float>                    OffsetY            { "QAOffsetY", 0.0f };
-	CSetting<bool>                     OnlyShowOnHover    { "QAOnlyShowOnHover", false };
-	CSetting<std::vector<std::string>> SuppressedShortcuts{ "QASuppressedIcons", {}, [this](const std::vector<std::string>& aSuppressedShortcuts)
+	class CQuickAccess : public Core::ILogChannel, public virtual UI::IWindow, public virtual Engine::IRefCleaner, public GW2::IAddonStateNotifyHandler
 	{
-		this->ApplySuppression(aSuppressedShortcuts);
-	} };
-	CSetting<bool>                     NotifyChangelog    { "NotifyChangelog", false };
-	CSetting<bool>                     DisableFestiveFlair{ "DisableFestiveFlair", false, [this](const bool& aDisableFestiveFlair)
-	{
-		this->UpdateMenuIcon(aDisableFestiveFlair);
-	} };
-};
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		CQuickAccess(Engine::CDataLinkApi* aDataLink, Engine::Input::CInputBindApi* aInputBindApi, UI::CTextureLoader* aTextureService, UI::CLocalization* aLocalization);
+
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		~CQuickAccess();
+
+		///----------------------------------------------------------------------------------------------------
+		/// Render:
+		/// 	Renders the Quick Access.
+		///----------------------------------------------------------------------------------------------------
+		void Render() override;
+
+		///----------------------------------------------------------------------------------------------------
+		/// AddShortcut:
+		/// 	Adds a shortcut icon.
+		///----------------------------------------------------------------------------------------------------
+		void AddShortcut(const char* aIdentifier, const char* aTextureIdentifier, const char* aTextureHoverIdentifier, const char* aInputBindIdentifier, const char* aTooltipText);
+
+		///----------------------------------------------------------------------------------------------------
+		/// RemoveShortcut:
+		/// 	Removes a shortcut icon.
+		///----------------------------------------------------------------------------------------------------
+		void RemoveShortcut(const char* aIdentifier);
+
+		///----------------------------------------------------------------------------------------------------
+		/// PushNotification:
+		/// 	Adds a notification to a given shortcut icon.
+		///----------------------------------------------------------------------------------------------------
+		void PushNotification(const char* aIdentifier, const char* aNotificationKey);
+
+		///----------------------------------------------------------------------------------------------------
+		/// PopNotification:
+		/// 	Removes a notification to a given shortcut icon.
+		///----------------------------------------------------------------------------------------------------
+		void PopNotification(const char* aIdentifier, const char* aNotificationKey);
+
+		///----------------------------------------------------------------------------------------------------
+		/// AddContextItem:
+		/// 	Adds a context item to the Nexus shortcut.
+		///----------------------------------------------------------------------------------------------------
+		void AddContextItem(const char* aIdentifier, UI::GUI_RENDER aShortcutRenderCallback);
+
+		///----------------------------------------------------------------------------------------------------
+		/// AddContextItem:
+		/// 	Adds a context item to the given shortcut.
+		///----------------------------------------------------------------------------------------------------
+		void AddContextItem(const char* aIdentifier, const char* aTargetShortcutIdentifier, UI::GUI_RENDER aShortcutRenderCallback);
+
+		///----------------------------------------------------------------------------------------------------
+		/// RemoveContextItem:
+		/// 	Removes a context item.
+		///----------------------------------------------------------------------------------------------------
+		void RemoveContextItem(const char* aIdentifier);
+
+		///----------------------------------------------------------------------------------------------------
+		/// GetRegistry:
+		/// 	Returns a copy of the registry.
+		///----------------------------------------------------------------------------------------------------
+		std::map<std::string, CShortcutIcon*> GetRegistry() const;
+
+		///----------------------------------------------------------------------------------------------------
+		/// GetOrphanage:
+		/// 	Returns a copy of the orphaned callbacks.
+		///----------------------------------------------------------------------------------------------------
+		std::map<std::string, ContextItem_t> GetOrphanage() const;
+
+		///----------------------------------------------------------------------------------------------------
+		/// CleanupRefs:
+		/// 	Removes all shortcuts and context items matching the address space.
+		///----------------------------------------------------------------------------------------------------
+		uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
+
+		///----------------------------------------------------------------------------------------------------
+		/// OnAddonStateNotify:
+		/// 	Rechecks invalid shortcuts on addon state change.
+		///----------------------------------------------------------------------------------------------------
+		void OnAddonStateNotify(GW2::EAddonStateNotify aState, uint32_t aSignature) override;
+
+		private:
+		Engine::Input::CInputBindApi*                 InputBindApi       {};
+		UI::CTextureLoader*                       TextureService     {};
+		UI::CLocalization*                        Language           {};
+
+		GW2::NexusLinkData_t*                      NexusLink          {};
+		Mumble::Data*                         MumbleLink         {};
+
+		mutable std::mutex                    Mutex              {};
+		std::map<std::string, CShortcutIcon*> Registry           {};
+		std::map<std::string, ContextItem_t>  OrphanedCallbacks  {};
+
+		float                                 Opacity            { 0.5f };
+
+		///----------------------------------------------------------------------------------------------------
+		/// WhereAreMyParents:
+		/// 	Returns orphaned context items to their parents.
+		///----------------------------------------------------------------------------------------------------
+		void WhereAreMyParents();
+
+		///----------------------------------------------------------------------------------------------------
+		/// UpdateNexusLink:
+		/// 	Updates the nexus link shortcut icon count.
+		///----------------------------------------------------------------------------------------------------
+		void UpdateNexusLink();
+
+		///----------------------------------------------------------------------------------------------------
+		/// ApplySuppression:
+		/// 	Applies the suppressed shortcut list to the registered shortcuts.
+		///----------------------------------------------------------------------------------------------------
+		void ApplySuppression(const std::vector<std::string>& aSuppressedShortcuts);
+
+		///----------------------------------------------------------------------------------------------------
+		/// UpdateMenuIcon:
+		/// 	Recreates the menu shortcut with the seasonal or the default icon.
+		///----------------------------------------------------------------------------------------------------
+		void UpdateMenuIcon(bool aDisableFestiveFlair);
+
+		public:
+		/* Declared last: they are destroyed first, before the state their change handlers touch. */
+		Core::CSetting<bool>                     VerticalLayout     { "QAVertical", false };
+		Core::CSetting<EQaVisibility>            Visibility         { "QAVisibility", EQaVisibility::AlwaysShow };
+		Core::CSetting<EQaPosition>              Location           { "QALocation", EQaPosition::Extend };
+		Core::CSetting<float>                    OffsetX            { "QAOffsetX", 0.0f };
+		Core::CSetting<float>                    OffsetY            { "QAOffsetY", 0.0f };
+		Core::CSetting<bool>                     OnlyShowOnHover    { "QAOnlyShowOnHover", false };
+		Core::CSetting<std::vector<std::string>> SuppressedShortcuts{ "QASuppressedIcons", {}, [this](const std::vector<std::string>& aSuppressedShortcuts)
+		{
+			this->ApplySuppression(aSuppressedShortcuts);
+		} };
+		Core::CSetting<bool>                     NotifyChangelog    { "NotifyChangelog", false };
+		Core::CSetting<bool>                     DisableFestiveFlair{ "DisableFestiveFlair", false, [this](const bool& aDisableFestiveFlair)
+		{
+			this->UpdateMenuIcon(aDisableFestiveFlair);
+		} };
+	};
+}

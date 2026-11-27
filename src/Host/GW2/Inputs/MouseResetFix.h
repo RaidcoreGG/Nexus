@@ -13,38 +13,41 @@
 #include "Core/Preferences/PrefSetting.h"
 #include "Engine/Inputs/RawInput/WndProcNotify.h"
 
-///----------------------------------------------------------------------------------------------------
-/// CMouseResetFix Class
-///----------------------------------------------------------------------------------------------------
-class CMouseResetFix : public IWndProcNotifyHandler
+namespace Raidcore::GW2
 {
-	public:
 	///----------------------------------------------------------------------------------------------------
-	/// ctor
+	/// CMouseResetFix Class
 	///----------------------------------------------------------------------------------------------------
-	CMouseResetFix();
+	class CMouseResetFix : public Engine::Input::IWndProcNotifyHandler
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		CMouseResetFix();
 
-	///----------------------------------------------------------------------------------------------------
-	/// dtor
-	///----------------------------------------------------------------------------------------------------
-	~CMouseResetFix();
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		~CMouseResetFix();
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnWndProcNotify:
-	/// 	Tracks the camera drag. Never consumes.
-	///----------------------------------------------------------------------------------------------------
-	UINT OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam) override;
+		///----------------------------------------------------------------------------------------------------
+		/// OnWndProcNotify:
+		/// 	Tracks the camera drag. Never consumes.
+		///----------------------------------------------------------------------------------------------------
+		UINT OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam) override;
 
-	CSetting<bool> LockCursor { "CameraControl_LockCursor", false };
-	CSetting<bool> ResetCursor{ "CameraControl_ResetCursor", false };
+		Core::CSetting<bool> LockCursor { "CameraControl_LockCursor", false };
+		Core::CSetting<bool> ResetCursor{ "CameraControl_ResetCursor", false };
 
-	private:
-	bool  IsConfining = false;
-	POINT LastPos     = {};
+		private:
+		bool  IsConfining = false;
+		POINT LastPos     = {};
 
-	///----------------------------------------------------------------------------------------------------
-	/// Release:
-	/// 	Ends the confinement and restores the cursor to where the drag started.
-	///----------------------------------------------------------------------------------------------------
-	void Release();
-};
+		///----------------------------------------------------------------------------------------------------
+		/// Release:
+		/// 	Ends the confinement and restores the cursor to where the drag started.
+		///----------------------------------------------------------------------------------------------------
+		void Release();
+	};
+}

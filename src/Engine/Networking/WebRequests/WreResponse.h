@@ -18,48 +18,51 @@ using json = nlohmann::json;
 
 #include "WreConst.h"
 
-///----------------------------------------------------------------------------------------------------
-/// HttpResponse_t Struct
-///----------------------------------------------------------------------------------------------------
-struct HttpResponse_t
+namespace Raidcore::Engine::Networking
 {
-	long long   Time       = 0;
-	uint32_t    StatusCode = 0;
-	std::string Error;
-	std::string Content;
-	//std::unordered_map<std::string, std::string> Headers;
-
 	///----------------------------------------------------------------------------------------------------
-	/// Status:
-	/// 	Returns a status string of the response.
+	/// HttpResponse_t Struct
 	///----------------------------------------------------------------------------------------------------
-	inline std::string Status() const
+	struct HttpResponse_t
 	{
-		return std::to_string(this->StatusCode) + " " + StatusCodeToMessage(this->StatusCode);
-	}
+		long long   Time       = 0;
+		uint32_t    StatusCode = 0;
+		std::string Error;
+		std::string Content;
+		//std::unordered_map<std::string, std::string> Headers;
 
-	///----------------------------------------------------------------------------------------------------
-	/// Success:
-	/// 	Returns true if the request was successful.
-	///----------------------------------------------------------------------------------------------------
-	inline bool Success() const
-	{
-		return this->Error.empty();
-	}
-
-	///----------------------------------------------------------------------------------------------------
-	/// ContentJSON:
-	/// 	Attempts to parse the content to json.
-	///----------------------------------------------------------------------------------------------------
-	inline json ContentJSON() const
-	{
-		try
+		///----------------------------------------------------------------------------------------------------
+		/// Status:
+		/// 	Returns a status string of the response.
+		///----------------------------------------------------------------------------------------------------
+		inline std::string Status() const
 		{
-			json j = json::parse(this->Content);
-			return j;
+			return std::to_string(this->StatusCode) + " " + StatusCodeToMessage(this->StatusCode);
 		}
-		catch(...) {}
 
-		return json{};
-	}
-};
+		///----------------------------------------------------------------------------------------------------
+		/// Success:
+		/// 	Returns true if the request was successful.
+		///----------------------------------------------------------------------------------------------------
+		inline bool Success() const
+		{
+			return this->Error.empty();
+		}
+
+		///----------------------------------------------------------------------------------------------------
+		/// ContentJSON:
+		/// 	Attempts to parse the content to json.
+		///----------------------------------------------------------------------------------------------------
+		inline json ContentJSON() const
+		{
+			try
+			{
+				json j = json::parse(this->Content);
+				return j;
+			}
+			catch(...) {}
+
+			return json{};
+		}
+	};
+}

@@ -10,12 +10,12 @@
 
 #include "Engine/Notifier/Notifier.h"
 
-namespace Engine::Input
+namespace Raidcore::Engine::Input
 {
 	///----------------------------------------------------------------------------------------------------
 	/// IInputBindUpdateNotifyHandler Interface
 	///----------------------------------------------------------------------------------------------------
-	class IInputBindUpdateNotifyHandler : public INotifyHandler<IInputBindUpdateNotifyHandler>
+	class IInputBindUpdateNotifyHandler : public Engine::INotifyHandler<IInputBindUpdateNotifyHandler>
 	{
 		public:
 		///----------------------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ namespace Engine::Input
 	///----------------------------------------------------------------------------------------------------
 	/// IInputBindUpdateNotifier Interface
 	///----------------------------------------------------------------------------------------------------
-	class IInputBindUpdateNotifier : public INotifier<IInputBindUpdateNotifyHandler>
+	class IInputBindUpdateNotifier : public Engine::INotifier<IInputBindUpdateNotifyHandler>
 	{
 		protected:
 		void NotifyInputBindUpdate()

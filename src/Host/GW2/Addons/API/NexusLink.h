@@ -10,26 +10,29 @@
 
 #include <cstdint>
 
-constexpr const char* DL_NEXUS_LINK = "DL_NEXUS_LINK";
-
-///----------------------------------------------------------------------------------------------------
-/// NexusLinkData_t Struct
-///----------------------------------------------------------------------------------------------------
-struct NexusLinkData_t
+namespace Raidcore::GW2
 {
-	uint32_t Width;
-	uint32_t Height;
-	float    Scaling;
+	constexpr const char* DL_NEXUS_LINK = "DL_NEXUS_LINK";
 
-	bool     IsMoving;
-	bool     IsCameraMoving;
-	bool     IsGameplay;
+	///----------------------------------------------------------------------------------------------------
+	/// NexusLinkData_t Struct
+	///----------------------------------------------------------------------------------------------------
+	struct NexusLinkData_t
+	{
+		uint32_t Width;
+		uint32_t Height;
+		float    Scaling;
 
-	void*    Font;    /* ImFont* */
-	void*    FontBig; /* ImFont* */
-	void*    FontUI;  /* ImFont* */
+		bool     IsMoving;
+		bool     IsCameraMoving;
+		bool     IsGameplay;
 
-	int32_t  QuickAccessIconsCount;
-	int32_t  QuickAccessMode;
-	bool     QuickAccessIsVertical;
-};
+		void*    Font;    /* ImFont* */
+		void*    FontBig; /* ImFont* */
+		void*    FontUI;  /* ImFont* */
+
+		int32_t  QuickAccessIconsCount;
+		int32_t  QuickAccessMode;
+		bool     QuickAccessIsVertical;
+	};
+}

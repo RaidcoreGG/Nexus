@@ -17,115 +17,118 @@
 #include "LogEnum.h"
 #include "LogMsg.h"
 
-///----------------------------------------------------------------------------------------------------
-/// CLogApi Class
-///----------------------------------------------------------------------------------------------------
-class CLogApi
+namespace Raidcore::Core
 {
-	public:
 	///----------------------------------------------------------------------------------------------------
-	/// Get:
-	/// 	Returns the process-wide log api instance.
+	/// CLogApi Class
 	///----------------------------------------------------------------------------------------------------
-	static CLogApi* Get();
+	class CLogApi
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// Get:
+		/// 	Returns the process-wide log api instance.
+		///----------------------------------------------------------------------------------------------------
+		static CLogApi* Get();
+
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		~CLogApi();
+
+		///----------------------------------------------------------------------------------------------------
+		/// Register:
+		/// 	Registers a logger.
+		///----------------------------------------------------------------------------------------------------
+		void Register(ILogger* aLogger);
+
+		///----------------------------------------------------------------------------------------------------
+		/// Deregister:
+		/// 	Deregisters a logger.
+		///----------------------------------------------------------------------------------------------------
+		void Deregister(ILogger* aLogger);
+
+		///----------------------------------------------------------------------------------------------------
+		/// Critical:
+		/// 	Logs a message with level Critical.
+		///----------------------------------------------------------------------------------------------------
+		void Critical(const std::string& aChannel, const char* aFmt, ...);
+
+		///----------------------------------------------------------------------------------------------------
+		/// Warning:
+		/// 	Logs a message with level Warning.
+		///----------------------------------------------------------------------------------------------------
+		void Warning(const std::string& aChannel, const char* aFmt, ...);
+
+		///----------------------------------------------------------------------------------------------------
+		/// Info:
+		/// 	Logs a message with level Info.
+		///----------------------------------------------------------------------------------------------------
+		void Info(const std::string& aChannel, const char* aFmt, ...);
+
+		///----------------------------------------------------------------------------------------------------
+		/// Debug:
+		/// 	Logs a message with level Debug.
+		///----------------------------------------------------------------------------------------------------
+		void Debug(const std::string& aChannel, const char* aFmt, ...);
+
+		///----------------------------------------------------------------------------------------------------
+		/// Trace:
+		/// 	Logs a message with level Trace.
+		///----------------------------------------------------------------------------------------------------
+		void Trace(const std::string& aChannel, const char* aFmt, ...);
+
+		///----------------------------------------------------------------------------------------------------
+		/// Log:
+		/// 	Logs a message to a specific channel.
+		///----------------------------------------------------------------------------------------------------
+		void Log(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, ...);
+
+		///----------------------------------------------------------------------------------------------------
+		/// LogV:
+		/// 	Logs a message to a specific channel with printf-style formatting.
+		///----------------------------------------------------------------------------------------------------
+		void LogV(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, va_list aArgs);
+
+		///----------------------------------------------------------------------------------------------------
+		/// LogUnformatted:
+		/// 	Logs an unformatted message to a specific channel.
+		///----------------------------------------------------------------------------------------------------
+		void LogUnformatted(ELogLevel aLogLevel, std::string aChannel, const char* aMsg);
+
+		private:
+		std::mutex             Mutex;
+		std::vector<ILogger*>  Registry;
+		std::vector<LogMsg_t*> Messages;
+	};
 
 	///----------------------------------------------------------------------------------------------------
-	/// dtor
+	/// LogCritical:
+	/// 	Logs a message with level Critical to the process-wide log api.
 	///----------------------------------------------------------------------------------------------------
-	~CLogApi();
+	void LogCritical(const std::string& aChannel, const char* aFmt, ...);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Register:
-	/// 	Registers a logger.
+	/// LogWarning:
+	/// 	Logs a message with level Warning to the process-wide log api.
 	///----------------------------------------------------------------------------------------------------
-	void Register(ILogger* aLogger);
+	void LogWarning(const std::string& aChannel, const char* aFmt, ...);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Deregister:
-	/// 	Deregisters a logger.
+	/// LogInfo:
+	/// 	Logs a message with level Info to the process-wide log api.
 	///----------------------------------------------------------------------------------------------------
-	void Deregister(ILogger* aLogger);
+	void LogInfo(const std::string& aChannel, const char* aFmt, ...);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Critical:
-	/// 	Logs a message with level Critical.
+	/// LogDebug:
+	/// 	Logs a message with level Debug to the process-wide log api.
 	///----------------------------------------------------------------------------------------------------
-	void Critical(const std::string& aChannel, const char* aFmt, ...);
+	void LogDebug(const std::string& aChannel, const char* aFmt, ...);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Warning:
-	/// 	Logs a message with level Warning.
+	/// LogTrace:
+	/// 	Logs a message with level Trace to the process-wide log api.
 	///----------------------------------------------------------------------------------------------------
-	void Warning(const std::string& aChannel, const char* aFmt, ...);
-
-	///----------------------------------------------------------------------------------------------------
-	/// Info:
-	/// 	Logs a message with level Info.
-	///----------------------------------------------------------------------------------------------------
-	void Info(const std::string& aChannel, const char* aFmt, ...);
-
-	///----------------------------------------------------------------------------------------------------
-	/// Debug:
-	/// 	Logs a message with level Debug.
-	///----------------------------------------------------------------------------------------------------
-	void Debug(const std::string& aChannel, const char* aFmt, ...);
-
-	///----------------------------------------------------------------------------------------------------
-	/// Trace:
-	/// 	Logs a message with level Trace.
-	///----------------------------------------------------------------------------------------------------
-	void Trace(const std::string& aChannel, const char* aFmt, ...);
-
-	///----------------------------------------------------------------------------------------------------
-	/// Log:
-	/// 	Logs a message to a specific channel.
-	///----------------------------------------------------------------------------------------------------
-	void Log(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, ...);
-
-	///----------------------------------------------------------------------------------------------------
-	/// LogV:
-	/// 	Logs a message to a specific channel with printf-style formatting.
-	///----------------------------------------------------------------------------------------------------
-	void LogV(ELogLevel aLogLevel, std::string aChannel, const char* aFmt, va_list aArgs);
-
-	///----------------------------------------------------------------------------------------------------
-	/// LogUnformatted:
-	/// 	Logs an unformatted message to a specific channel.
-	///----------------------------------------------------------------------------------------------------
-	void LogUnformatted(ELogLevel aLogLevel, std::string aChannel, const char* aMsg);
-
-	private:
-	std::mutex             Mutex;
-	std::vector<ILogger*>  Registry;
-	std::vector<LogMsg_t*> Messages;
-};
-
-///----------------------------------------------------------------------------------------------------
-/// LogCritical:
-/// 	Logs a message with level Critical to the process-wide log api.
-///----------------------------------------------------------------------------------------------------
-void LogCritical(const std::string& aChannel, const char* aFmt, ...);
-
-///----------------------------------------------------------------------------------------------------
-/// LogWarning:
-/// 	Logs a message with level Warning to the process-wide log api.
-///----------------------------------------------------------------------------------------------------
-void LogWarning(const std::string& aChannel, const char* aFmt, ...);
-
-///----------------------------------------------------------------------------------------------------
-/// LogInfo:
-/// 	Logs a message with level Info to the process-wide log api.
-///----------------------------------------------------------------------------------------------------
-void LogInfo(const std::string& aChannel, const char* aFmt, ...);
-
-///----------------------------------------------------------------------------------------------------
-/// LogDebug:
-/// 	Logs a message with level Debug to the process-wide log api.
-///----------------------------------------------------------------------------------------------------
-void LogDebug(const std::string& aChannel, const char* aFmt, ...);
-
-///----------------------------------------------------------------------------------------------------
-/// LogTrace:
-/// 	Logs a message with level Trace to the process-wide log api.
-///----------------------------------------------------------------------------------------------------
-void LogTrace(const std::string& aChannel, const char* aFmt, ...);
+	void LogTrace(const std::string& aChannel, const char* aFmt, ...);
+}

@@ -20,14 +20,14 @@
 		"Migration " #aFunction " is due for removal (" #aRemoveYear "-" #aRemoveMonth ").");        \
 	aFunction()
 
-namespace Migrations
+namespace Raidcore::Migrations
 {
 	static void RemoveUnpackedLocales()
 	{
 		for (const char* lang : { "en", "de", "fr", "es", "cn", "kr", "br", "cz", "it", "pl", "ru" })
 		{
 			std::error_code ec;
-			std::filesystem::remove(Index(EPath::DIR_LOCALES) / (std::string(lang) + "_Main.json"), ec);
+			std::filesystem::remove(GW2::Index(GW2::EPath::DIR_LOCALES) / (std::string(lang) + "_Main.json"), ec);
 		}
 	}
 

@@ -12,7 +12,7 @@
 
 #include <windows.h>
 
-namespace Engine::Input
+namespace Raidcore::Engine::Input
 {
 	///----------------------------------------------------------------------------------------------------
 	/// CInputBindCapture Class

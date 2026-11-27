@@ -13,160 +13,163 @@
 #include "Engine/Inputs/InputBinds/IbConst.h"
 #include "Host/GW2/Inputs/GameBinds/GbConst.h"
 
-CUiBinds::CUiBinds()
+namespace Raidcore::UI
 {
-}
-
-CUiBinds::~CUiBinds()
-{
-}
-
-std::vector<InputBindCategory_t> CUiBinds::GetInputBinds()
-{
-	const std::lock_guard<std::mutex> lock(this->DisplayBindsMutex);
-
-	return this->DisplayInputBinds;
-}
-
-std::unordered_map<std::string, InputBindPacked_t> CUiBinds::GetInputBinds(const std::string& aCategory)
-{
-	const std::lock_guard<std::mutex> lock(this->DisplayBindsMutex);
-
-	auto it = std::find_if(this->DisplayInputBinds.begin(), this->DisplayInputBinds.end(), [aCategory](InputBindCategory_t cat) {
-		return cat.Name == aCategory;
-	});
-
-	if (it != this->DisplayInputBinds.end())
+	CUiBinds::CUiBinds()
 	{
-		return it->InputBinds;
 	}
 
-	return {};
-}
-
-std::vector<GameInputBindCategory_t> CUiBinds::GetGameBinds()
-{
-	const std::lock_guard<std::mutex> lock(this->DisplayBindsMutex);
-
-	return this->DisplayGameBinds;
-}
-
-void CUiBinds::UpdateDisplayInputBinds()
-{
-	const std::lock_guard<std::mutex> lock(this->DisplayBindsMutex);
-
-	this->DisplayInputBinds.clear();
-
-	CContext*             ctx          = CContext::GetContext();
-	Input::CInputBindApi* inputBindApi = ctx->GetInputBindApi();
-	CLoader*              loader       = ctx->GetLoader();
-
-	/* copy of all InputBinds */
-	std::map<std::string, Input::IbMapping_t> InputBindRegistry = inputBindApi->GetRegistry();
-
-	/* acquire categories */
-	for (auto& [identifier, inputBind] : InputBindRegistry)
+	CUiBinds::~CUiBinds()
 	{
-		std::string owner = "(null)";
+	}
 
-		IAddon* iaddon = loader->GetOwner(inputBind.Handler_DownOnlyAsync);
+	std::vector<InputBindCategory_t> CUiBinds::GetInputBinds()
+	{
+		const std::lock_guard<std::mutex> lock(this->DisplayBindsMutex);
 
-		if (iaddon)
+		return this->DisplayInputBinds;
+	}
+
+	std::unordered_map<std::string, InputBindPacked_t> CUiBinds::GetInputBinds(const std::string& aCategory)
+	{
+		const std::lock_guard<std::mutex> lock(this->DisplayBindsMutex);
+
+		auto it = std::find_if(this->DisplayInputBinds.begin(), this->DisplayInputBinds.end(), [aCategory](InputBindCategory_t cat) {
+			return cat.Name == aCategory;
+		});
+
+		if (it != this->DisplayInputBinds.end())
 		{
-			CAddon* addon = dynamic_cast<CAddon*>(iaddon);
-			owner = addon->GetName();
+			return it->InputBinds;
 		}
-		else
+
+		return {};
+	}
+
+	std::vector<GameInputBindCategory_t> CUiBinds::GetGameBinds()
+	{
+		const std::lock_guard<std::mutex> lock(this->DisplayBindsMutex);
+
+		return this->DisplayGameBinds;
+	}
+
+	void CUiBinds::UpdateDisplayInputBinds()
+	{
+		const std::lock_guard<std::mutex> lock(this->DisplayBindsMutex);
+
+		this->DisplayInputBinds.clear();
+
+		GW2::CContext*             ctx          = GW2::CContext::GetContext();
+		Engine::Input::CInputBindApi* inputBindApi = ctx->GetInputBindApi();
+		Engine::CLoader*              loader       = ctx->GetLoader();
+
+		/* copy of all InputBinds */
+		std::map<std::string, Engine::Input::IbMapping_t> InputBindRegistry = inputBindApi->GetRegistry();
+
+		/* acquire categories */
+		for (auto& [identifier, inputBind] : InputBindRegistry)
 		{
-			/* If no owner found, but a pointer is set, we assume Nexus owns it. */
-			if (inputBind.Handler_DownOnlyAsync)
+			std::string owner = "(null)";
+
+			Engine::IAddon* iaddon = loader->GetOwner(inputBind.Handler_DownOnlyAsync);
+
+			if (iaddon)
 			{
-				owner = "Nexus";
+				GW2::CAddon* addon = dynamic_cast<GW2::CAddon*>(iaddon);
+				owner = addon->GetName();
+			}
+			else
+			{
+				/* If no owner found, but a pointer is set, we assume Nexus owns it. */
+				if (inputBind.Handler_DownOnlyAsync)
+				{
+					owner = "Nexus";
+				}
+			}
+
+			auto it = std::find_if(this->DisplayInputBinds.begin(), this->DisplayInputBinds.end(), [owner](InputBindCategory_t category) { return category.Name == owner; });
+
+			if (it == this->DisplayInputBinds.end())
+			{
+				InputBindCategory_t cat{};
+				cat.Name = owner;
+				cat.InputBinds[identifier] =
+				{
+					Engine::Input::IBToString(inputBind.Bind, true),
+					inputBind
+				};
+				this->DisplayInputBinds.push_back(cat);
+			}
+			else
+			{
+				it->InputBinds[identifier] =
+				{
+					Engine::Input::IBToString(inputBind.Bind, true),
+					inputBind
+				};
 			}
 		}
 
-		auto it = std::find_if(this->DisplayInputBinds.begin(), this->DisplayInputBinds.end(), [owner](InputBindCategory_t category) { return category.Name == owner; });
+		/* sort input binds. */
+		std::sort(this->DisplayInputBinds.begin(), this->DisplayInputBinds.end(), [](InputBindCategory_t& lhs, InputBindCategory_t& rhs)
+		{
+			// Nexus first
+			if (lhs.Name == "Nexus") return true;
+			if (rhs.Name == "Nexus") return false;
 
-		if (it == this->DisplayInputBinds.end())
-		{
-			InputBindCategory_t cat{};
-			cat.Name = owner;
-			cat.InputBinds[identifier] =
-			{
-				Input::IBToString(inputBind.Bind, true),
-				inputBind
-			};
-			this->DisplayInputBinds.push_back(cat);
-		}
-		else
-		{
-			it->InputBinds[identifier] =
-			{
-				Input::IBToString(inputBind.Bind, true),
-				inputBind
-			};
-		}
+			// Inactive second
+			if (lhs.Name == "(null)") return true;
+			if (rhs.Name == "(null)") return false;
+
+			/* Rest alphabetical */
+			return lhs.Name < rhs.Name;
+		});
 	}
 
-	/* sort input binds. */
-	std::sort(this->DisplayInputBinds.begin(), this->DisplayInputBinds.end(), [](InputBindCategory_t& lhs, InputBindCategory_t& rhs)
+	void CUiBinds::UpdateDisplayGameBinds()
 	{
-		// Nexus first
-		if (lhs.Name == "Nexus") return true;
-		if (rhs.Name == "Nexus") return false;
+		const std::lock_guard<std::mutex> lock(this->DisplayBindsMutex);
 
-		// Inactive second
-		if (lhs.Name == "(null)") return true;
-		if (rhs.Name == "(null)") return false;
+		this->DisplayGameBinds.clear();
 
-		/* Rest alphabetical */
-		return lhs.Name < rhs.Name;
-	});
-}
+		GW2::CContext* ctx = GW2::CContext::GetContext();
+		GW2::CGameBindsApi* gameBindsApi = ctx->GetGameBindsApi();
 
-void CUiBinds::UpdateDisplayGameBinds()
-{
-	const std::lock_guard<std::mutex> lock(this->DisplayBindsMutex);
+		/* copy of all InputBinds */
+		std::unordered_map<GW2::EGameBinds, GW2::MultiInputBind_t> InputBindRegistry = gameBindsApi->GetRegistry();
 
-	this->DisplayGameBinds.clear();
-
-	CContext* ctx = CContext::GetContext();
-	CGameBindsApi* gameBindsApi = ctx->GetGameBindsApi();
-
-	/* copy of all InputBinds */
-	std::unordered_map<EGameBinds, MultiInputBind_t> InputBindRegistry = gameBindsApi->GetRegistry();
-
-	/* acquire categories */
-	for (auto& [identifier, inputBind] : InputBindRegistry)
-	{
-		std::string catName = CategoryNameFrom(identifier);
-
-		auto it = std::find_if(this->DisplayGameBinds.begin(), this->DisplayGameBinds.end(), [catName](GameInputBindCategory_t category) { return category.Name == catName; });
-
-		if (it == this->DisplayGameBinds.end())
+		/* acquire categories */
+		for (auto& [identifier, inputBind] : InputBindRegistry)
 		{
-			GameInputBindCategory_t cat{};
-			cat.Name = catName;
-			cat.GameInputBinds[identifier] =
+			std::string catName = GW2::CategoryNameFrom(identifier);
+
+			auto it = std::find_if(this->DisplayGameBinds.begin(), this->DisplayGameBinds.end(), [catName](GameInputBindCategory_t category) { return category.Name == catName; });
+
+			if (it == this->DisplayGameBinds.end())
 			{
-				NameFrom(identifier),
-				Input::IBToString(inputBind.Primary, true),
-				inputBind.Primary,
-				Input::IBToString(inputBind.Secondary, true),
-				inputBind.Secondary
-			};
-			this->DisplayGameBinds.push_back(cat);
-		}
-		else
-		{
-			it->GameInputBinds[identifier] =
+				GameInputBindCategory_t cat{};
+				cat.Name = catName;
+				cat.GameInputBinds[identifier] =
+				{
+					GW2::NameFrom(identifier),
+					Engine::Input::IBToString(inputBind.Primary, true),
+					inputBind.Primary,
+					Engine::Input::IBToString(inputBind.Secondary, true),
+					inputBind.Secondary
+				};
+				this->DisplayGameBinds.push_back(cat);
+			}
+			else
 			{
-				NameFrom(identifier),
-				Input::IBToString(inputBind.Primary, true),
-				inputBind.Primary,
-				Input::IBToString(inputBind.Secondary, true),
-				inputBind.Secondary
-			};
+				it->GameInputBinds[identifier] =
+				{
+					GW2::NameFrom(identifier),
+					Engine::Input::IBToString(inputBind.Primary, true),
+					inputBind.Primary,
+					Engine::Input::IBToString(inputBind.Secondary, true),
+					inputBind.Secondary
+				};
+			}
 		}
 	}
 }

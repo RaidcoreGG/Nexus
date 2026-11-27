@@ -14,16 +14,19 @@
 #include "RdrWindow.h"
 #include "RdrMetrics.h"
 
-///----------------------------------------------------------------------------------------------------
-/// RenderContext_t Struct
-///----------------------------------------------------------------------------------------------------
-struct RenderContext_t
+namespace Raidcore::UI
 {
-	ID3D11Device*        Device        = nullptr;
-	ID3D11DeviceContext* DeviceContext = nullptr;
-	IDXGISwapChain*      SwapChain     = nullptr;
+	///----------------------------------------------------------------------------------------------------
+	/// RenderContext_t Struct
+	///----------------------------------------------------------------------------------------------------
+	struct RenderContext_t
+	{
+		ID3D11Device*        Device        = nullptr;
+		ID3D11DeviceContext* DeviceContext = nullptr;
+		IDXGISwapChain*      SwapChain     = nullptr;
 
-	RenderWindow_t       Window        = {};
+		RenderWindow_t       Window        = {};
 
-	RenderMetrics_t      Metrics       = {};
-};
+		RenderMetrics_t      Metrics       = {};
+	};
+}

@@ -14,7 +14,7 @@
 #include "Util/Inputs.h"
 #include "Util/Strings.h"
 
-namespace Engine::Input
+namespace Raidcore::Engine::Input
 {
 	Bind_t IBFromString(std::string aInputBind)
 	{

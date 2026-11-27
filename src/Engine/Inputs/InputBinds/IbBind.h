@@ -11,7 +11,7 @@
 #include "IbEnum.h"
 #include "IbBind.h"
 
-namespace Engine::Input
+namespace Raidcore::Engine::Input
 {
 	///----------------------------------------------------------------------------------------------------
 	/// Bind_t Struct

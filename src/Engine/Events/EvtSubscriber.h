@@ -10,23 +10,26 @@
 
 #include <cstdint>
 
-typedef void (*EVENT_CONSUME)(void* aEventArgs);
-
-///----------------------------------------------------------------------------------------------------
-/// EventSubscriber_t Struct
-///----------------------------------------------------------------------------------------------------
-struct EventSubscriber_t
+namespace Raidcore::Engine
 {
-	uint32_t      Signature;
-	EVENT_CONSUME Callback;
-};
+	typedef void (*EVENT_CONSUME)(void* aEventArgs);
 
-inline bool operator==(const EventSubscriber_t& lhs, const EventSubscriber_t& rhs)
-{
-	return lhs.Signature == rhs.Signature && lhs.Callback == rhs.Callback;
-}
+	///----------------------------------------------------------------------------------------------------
+	/// EventSubscriber_t Struct
+	///----------------------------------------------------------------------------------------------------
+	struct EventSubscriber_t
+	{
+		uint32_t      Signature;
+		EVENT_CONSUME Callback;
+	};
 
-inline bool operator!=(const EventSubscriber_t& lhs, const EventSubscriber_t& rhs)
-{
-	return !(lhs == rhs);
+	inline bool operator==(const EventSubscriber_t& lhs, const EventSubscriber_t& rhs)
+	{
+		return lhs.Signature == rhs.Signature && lhs.Callback == rhs.Callback;
+	}
+
+	inline bool operator!=(const EventSubscriber_t& lhs, const EventSubscriber_t& rhs)
+	{
+		return !(lhs == rhs);
+	}
 }

@@ -17,9 +17,9 @@
 #include "ExeEnum.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// Raidcore::Core::Platform::Windows Namespace
+/// Raidcore::Core::Windows Namespace
 ///----------------------------------------------------------------------------------------------------
-namespace Raidcore::Core::Platform::Windows
+namespace Raidcore::Core::Windows
 {
 	///----------------------------------------------------------------------------------------------------
 	/// Exports_t Struct

@@ -10,74 +10,77 @@
 
 #include "Host/GW2/Context.h"
 
-CLoadConfirmationModal::CLoadConfirmationModal()
+namespace Raidcore::UI
 {
-	this->SetID("LoadConfirmationModal");
-	this->SetDisplayName(Lang::Addons::LoadConfirm);
-}
-
-void CLoadConfirmationModal::RenderContent()
-{
-	ImGui::Text(Lang::Common::AreYouSure.Text());
-
-	/* Accept */
-	if (ImGui::Button(Lang::Common::Accept.Text()))
+	CLoadConfirmationModal::CLoadConfirmationModal()
 	{
-		this->SetResult(EModalResult::OK);
+		this->SetID("LoadConfirmationModal");
+		this->SetDisplayName(Lang::Addons::LoadConfirm);
 	}
 
-	ImGui::SameLine();
-
-	/* Cancel */
-	if (ImGui::Button(Lang::Common::Cancel.Text()))
+	void CLoadConfirmationModal::RenderContent()
 	{
-		this->SetResult(EModalResult::Cancel);
-	}
-}
+		ImGui::Text(Lang::Common::AreYouSure.Text());
 
-void CLoadConfirmationModal::OnClosing()
-{
-	CContext*   ctx    = CContext::GetContext();
-	CConfigMgr* cfgmgr = ctx->GetCfgMgr();
-	CLoader*    loader = ctx->GetLoader();
-
-	switch (this->GetResult())
-	{
-		case EModalResult::OK:
+		/* Accept */
+		if (ImGui::Button(Lang::Common::Accept.Text()))
 		{
-			this->Config->LastGameBuild = 0;
-			this->Config->LastLoadState = true;
-			this->Config->DisableVersion = "";
-			cfgmgr->SaveConfigs();
-			loader->LoadSafe(this->Path);
-			break;
+			this->SetResult(UI::EModalResult::OK);
 		}
-		case EModalResult::Cancel:
+
+		ImGui::SameLine();
+
+		/* Cancel */
+		if (ImGui::Button(Lang::Common::Cancel.Text()))
 		{
-			break;
+			this->SetResult(UI::EModalResult::Cancel);
 		}
 	}
 
-	/* Reset data. */
-	this->Name.clear();
-	this->Path.clear();
-}
+	void CLoadConfirmationModal::OnClosing()
+	{
+		GW2::CContext*   ctx    = GW2::CContext::GetContext();
+		GW2::CConfigMgr* cfgmgr = ctx->GetCfgMgr();
+		Engine::CLoader*    loader = ctx->GetLoader();
 
-void CLoadConfirmationModal::SetTarget(Config_t* aConfig, std::string aName, std::filesystem::path aPath)
-{
-	assert(aConfig != nullptr);
+		switch (this->GetResult())
+		{
+			case UI::EModalResult::OK:
+			{
+				this->Config->LastGameBuild = 0;
+				this->Config->LastLoadState = true;
+				this->Config->DisableVersion = "";
+				cfgmgr->SaveConfigs();
+				loader->LoadSafe(this->Path);
+				break;
+			}
+			case UI::EModalResult::Cancel:
+			{
+				break;
+			}
+		}
 
-	this->Config = aConfig;
-	this->Name = aName;
-	this->Path = aPath;
+		/* Reset data. */
+		this->Name.clear();
+		this->Path.clear();
+	}
 
-	this->SetTitle();
+	void CLoadConfirmationModal::SetTarget(GW2::Config_t* aConfig, std::string aName, std::filesystem::path aPath)
+	{
+		assert(aConfig != nullptr);
 
-	this->OpenModal();
-}
+		this->Config = aConfig;
+		this->Name = aName;
+		this->Path = aPath;
 
-void CLoadConfirmationModal::SetTitle()
-{
-	/* Override the title before opening the modal. */
-	this->SetDisplayName(Lang::Addons::LoadConfirm, this->Name);
+		this->SetTitle();
+
+		this->OpenModal();
+	}
+
+	void CLoadConfirmationModal::SetTitle()
+	{
+		/* Override the title before opening the modal. */
+		this->SetDisplayName(Lang::Addons::LoadConfirm, this->Name);
+	}
 }

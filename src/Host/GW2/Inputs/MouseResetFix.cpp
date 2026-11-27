@@ -8,100 +8,103 @@
 
 #include "MouseResetFix.h"
 
-CMouseResetFix::CMouseResetFix()
+namespace Raidcore::GW2
 {
-	/* After the game binds, so game only messages arrive in the normal range. */
-	this->Attach(WNDPROC_PRIO_MOUSEFIX);
-}
-
-CMouseResetFix::~CMouseResetFix()
-{
-	this->Detach();
-}
-
-UINT CMouseResetFix::OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam)
-{
-	CURSORINFO ci{};
-	ci.cbSize = sizeof(CURSORINFO);
-	GetCursorInfo(&ci);
-
-	/* Store last visible pos on first click. */
-	switch (uMsg)
+	CMouseResetFix::CMouseResetFix()
 	{
-		case WM_LBUTTONDOWN:
-		{
-			if (ci.flags != 0 && (wParam & MK_RBUTTON) != MK_RBUTTON)
-			{
-				this->LastPos = ci.ptScreenPos;
-			}
-			break;
-		}
-		case WM_RBUTTONDOWN:
-		{
-			if (ci.flags != 0 && (wParam & MK_LBUTTON) != MK_LBUTTON)
-			{
-				this->LastPos = ci.ptScreenPos;
-			}
-			break;
-		}
+		/* After the game binds, so game only messages arrive in the normal range. */
+		this->Attach(Engine::Input::WNDPROC_PRIO_MOUSEFIX);
 	}
 
-	switch (uMsg)
+	CMouseResetFix::~CMouseResetFix()
 	{
-		case WM_LBUTTONDOWN:
-		case WM_RBUTTONDOWN:
-		case WM_LBUTTONUP:
-		case WM_RBUTTONUP:
-		case WM_MOUSEMOVE:
-		{
-			if (this->IsConfining && (ci.flags != 0))
-			{
-				this->Release();
-			}
-			else if (!this->IsConfining && (ci.flags == 0) && ((wParam & MK_LBUTTON) || (wParam & MK_RBUTTON)))
-			{
-				RECT rect{
-					this->LastPos.x,
-					this->LastPos.y,
-					this->LastPos.x + 1,
-					this->LastPos.y + 1
-				};
+		this->Detach();
+	}
 
-				if (this->LockCursor.Get())
+	UINT CMouseResetFix::OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam)
+	{
+		CURSORINFO ci{};
+		ci.cbSize = sizeof(CURSORINFO);
+		GetCursorInfo(&ci);
+
+		/* Store last visible pos on first click. */
+		switch (uMsg)
+		{
+			case WM_LBUTTONDOWN:
+			{
+				if (ci.flags != 0 && (wParam & MK_RBUTTON) != MK_RBUTTON)
 				{
-					ClipCursor(&rect);
+					this->LastPos = ci.ptScreenPos;
+				}
+				break;
+			}
+			case WM_RBUTTONDOWN:
+			{
+				if (ci.flags != 0 && (wParam & MK_LBUTTON) != MK_LBUTTON)
+				{
+					this->LastPos = ci.ptScreenPos;
+				}
+				break;
+			}
+		}
+
+		switch (uMsg)
+		{
+			case WM_LBUTTONDOWN:
+			case WM_RBUTTONDOWN:
+			case WM_LBUTTONUP:
+			case WM_RBUTTONUP:
+			case WM_MOUSEMOVE:
+			{
+				if (this->IsConfining && (ci.flags != 0))
+				{
+					this->Release();
+				}
+				else if (!this->IsConfining && (ci.flags == 0) && ((wParam & MK_LBUTTON) || (wParam & MK_RBUTTON)))
+				{
+					RECT rect{
+						this->LastPos.x,
+						this->LastPos.y,
+						this->LastPos.x + 1,
+						this->LastPos.y + 1
+					};
+
+					if (this->LockCursor.Get())
+					{
+						ClipCursor(&rect);
+					}
+
+					this->IsConfining = true;
 				}
 
-				this->IsConfining = true;
+				break;
 			}
-
-			break;
-		}
-		case WM_ACTIVATEAPP:
-		{
-			if (this->IsConfining)
+			case WM_ACTIVATEAPP:
 			{
-				this->Release();
+				if (this->IsConfining)
+				{
+					this->Release();
+				}
+
+				break;
 			}
-
-			break;
 		}
+
+		return 1;
 	}
 
-	return 1;
-}
-
-void CMouseResetFix::Release()
-{
-	if (this->LockCursor.Get())
+	void CMouseResetFix::Release()
 	{
-		ClipCursor(NULL);
-	}
+		if (this->LockCursor.Get())
+		{
+			ClipCursor(NULL);
+		}
 
-	if (this->ResetCursor.Get())
-	{
-		SetCursorPos(this->LastPos.x, this->LastPos.y);
-	}
+		if (this->ResetCursor.Get())
+		{
+			SetCursorPos(this->LastPos.x, this->LastPos.y);
+		}
 
-	this->IsConfining = false;
+		this->IsConfining = false;
+	}
 }

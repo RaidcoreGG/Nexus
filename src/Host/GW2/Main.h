@@ -12,24 +12,21 @@
 
 #include "Proxy/PxyEnum.h"
 
-constexpr const char* CH_CORE = "Core";
-
 ///----------------------------------------------------------------------------------------------------
 /// DllMain:
 /// 	Primary DLL entry point.
 ///----------------------------------------------------------------------------------------------------
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved);
 
-///----------------------------------------------------------------------------------------------------
-/// Main Namespace
-///----------------------------------------------------------------------------------------------------
-namespace Main
+namespace Raidcore::GW2
 {
+	constexpr const char* CH_CORE = "Core";
+
 	///----------------------------------------------------------------------------------------------------
 	/// Initialize:
 	/// 	Initializes the addon engine.
 	///----------------------------------------------------------------------------------------------------
-	void Initialize(EProxyFunction aEntryFunction);
+	void Initialize(Proxy::EProxyFunction aEntryFunction);
 
 	///----------------------------------------------------------------------------------------------------
 	/// Shutdown:

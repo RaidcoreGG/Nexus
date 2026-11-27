@@ -15,72 +15,75 @@
 #include "HkConst.h"
 #include "Hooks.h"
 
-CGameWindow::CGameWindow(RenderContext_t* aRenderContext, CLoader* aLoader, CDataLinkApi* aDataLink, CEventApi* aEventApi)
+namespace Raidcore::GW2::Hooks
 {
-	assert(aRenderContext);
-	assert(aLoader);
-	assert(aDataLink);
-	assert(aEventApi);
-
-	this->RenderContext = aRenderContext;
-	this->Loader        = aLoader;
-	this->DataLink      = aDataLink;
-	this->EventApi      = aEventApi;
-
-	this->INotifyHandler<IDxgiPresentNotifyHandler>::Attach(DXGIPRESENT_PRIO_WINDOW);
-	this->INotifyHandler<IDxgiResizeNotifyHandler>::Attach(DXGIRESIZE_PRIO_WINDOW);
-	this->INotifyHandler<IWndProcNotifyHandler>::Attach(WNDPROC_PRIO_SHUTDOWN);
-}
-
-CGameWindow::~CGameWindow()
-{
-	this->INotifyHandler<IWndProcNotifyHandler>::Detach();
-	this->INotifyHandler<IDxgiResizeNotifyHandler>::Detach();
-	this->INotifyHandler<IDxgiPresentNotifyHandler>::Detach();
-}
-
-void CGameWindow::OnDxgiPresentNotify(IDXGISwapChain* aSwapChain)
-{
-	this->RenderContext->Metrics.FrameCount++;
-
-	/* The swap chain used to hook is not the one the game created. */
-	if (this->RenderContext->SwapChain != aSwapChain)
+	CGameWindow::CGameWindow(UI::RenderContext_t* aRenderContext, Engine::CLoader* aLoader, Engine::CDataLinkApi* aDataLink, Engine::CEventApi* aEventApi)
 	{
-		this->RenderContext->SwapChain = aSwapChain;
+		assert(aRenderContext);
+		assert(aLoader);
+		assert(aDataLink);
+		assert(aEventApi);
 
-		DXGI_SWAP_CHAIN_DESC swapChainDesc{};
-		this->RenderContext->SwapChain->GetDesc(&swapChainDesc);
+		this->RenderContext = aRenderContext;
+		this->Loader        = aLoader;
+		this->DataLink      = aDataLink;
+		this->EventApi      = aEventApi;
 
-		this->RenderContext->Window.Handle = swapChainDesc.OutputWindow;
-		Hooks::Target::WndProc = (WNDPROC)SetWindowLongPtr(this->RenderContext->Window.Handle, GWLP_WNDPROC, (LONG_PTR)Hooks::Detour::WndProc);
-
-		this->Loader->InitDirectoryUpdates(this->RenderContext->Window.Handle);
-	}
-}
-
-void CGameWindow::OnDxgiResizeNotify(IDXGISwapChain* aSwapChain, UINT aWidth, UINT aHeight)
-{
-	this->RenderContext->Window.Width  = aWidth;
-	this->RenderContext->Window.Height = aHeight;
-
-	NexusLinkData_t* nexuslink = (NexusLinkData_t*)this->DataLink->GetResource(DL_NEXUS_LINK);
-
-	/* Written now, as addons read it on the resize event before the next frame updates it. */
-	if (nexuslink)
-	{
-		nexuslink->Width  = aWidth;
-		nexuslink->Height = aHeight;
+		this->INotifyHandler<IDxgiPresentNotifyHandler>::Attach(DXGIPRESENT_PRIO_WINDOW);
+		this->INotifyHandler<IDxgiResizeNotifyHandler>::Attach(DXGIRESIZE_PRIO_WINDOW);
+		this->INotifyHandler<Engine::Input::IWndProcNotifyHandler>::Attach(Engine::Input::WNDPROC_PRIO_SHUTDOWN);
 	}
 
-	this->EventApi->Raise(EV_WINDOW_RESIZED);
-}
-
-UINT CGameWindow::OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam)
-{
-	if (uMsg == WM_DESTROY)
+	CGameWindow::~CGameWindow()
 	{
-		Main::Shutdown(uMsg);
+		this->INotifyHandler<Engine::Input::IWndProcNotifyHandler>::Detach();
+		this->INotifyHandler<IDxgiResizeNotifyHandler>::Detach();
+		this->INotifyHandler<IDxgiPresentNotifyHandler>::Detach();
 	}
 
-	return 1;
+	void CGameWindow::OnDxgiPresentNotify(IDXGISwapChain* aSwapChain)
+	{
+		this->RenderContext->Metrics.FrameCount++;
+
+		/* The swap chain used to hook is not the one the game created. */
+		if (this->RenderContext->SwapChain != aSwapChain)
+		{
+			this->RenderContext->SwapChain = aSwapChain;
+
+			DXGI_SWAP_CHAIN_DESC swapChainDesc{};
+			this->RenderContext->SwapChain->GetDesc(&swapChainDesc);
+
+			this->RenderContext->Window.Handle = swapChainDesc.OutputWindow;
+			Hooks::Target::WndProc = (WNDPROC)SetWindowLongPtr(this->RenderContext->Window.Handle, GWLP_WNDPROC, (LONG_PTR)Hooks::Detour::WndProc);
+
+			this->Loader->InitDirectoryUpdates(this->RenderContext->Window.Handle);
+		}
+	}
+
+	void CGameWindow::OnDxgiResizeNotify(IDXGISwapChain* aSwapChain, UINT aWidth, UINT aHeight)
+	{
+		this->RenderContext->Window.Width  = aWidth;
+		this->RenderContext->Window.Height = aHeight;
+
+		NexusLinkData_t* nexuslink = (NexusLinkData_t*)this->DataLink->GetResource(DL_NEXUS_LINK);
+
+		/* Written now, as addons read it on the resize event before the next frame updates it. */
+		if (nexuslink)
+		{
+			nexuslink->Width  = aWidth;
+			nexuslink->Height = aHeight;
+		}
+
+		this->EventApi->Raise(EV_WINDOW_RESIZED);
+	}
+
+	UINT CGameWindow::OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam)
+	{
+		if (uMsg == WM_DESTROY)
+		{
+			GW2::Shutdown(uMsg);
+		}
+
+		return 1;
+	}
 }

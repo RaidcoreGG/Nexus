@@ -8,79 +8,82 @@
 
 #include "LoclView.h"
 
-const LocaleViewLanguage_t* LocaleView_t::Find(std::string_view aIdOrName) const
+namespace Raidcore::UI
 {
-	auto it = this->Languages.find(aIdOrName);
-
-	if (it != this->Languages.end())
+	const LocaleViewLanguage_t* LocaleView_t::Find(std::string_view aIdOrName) const
 	{
-		return &it->second;
-	}
+		auto it = this->Languages.find(aIdOrName);
 
-	for (const auto& [id, language] : this->Languages)
-	{
-		if (language.DisplayName == aIdOrName)
+		if (it != this->Languages.end())
 		{
-			return &language;
-		}
-	}
-
-	return nullptr;
-}
-
-std::shared_ptr<const LocaleView_t> BuildLocaleView(std::vector<std::shared_ptr<const LocaleAtlas_t>> aSources)
-{
-	auto view = std::make_shared<LocaleView_t>();
-	view->Sources = std::move(aSources);
-
-	if (view->Sources.empty() || !view->Sources.front())
-	{
-		return view;
-	}
-
-	for (const auto& [id, texts] : *view->Sources.front())
-	{
-		view->Languages[id].DisplayName = !texts.DisplayName.empty() ? texts.DisplayName : id;
-	}
-
-	for (const std::shared_ptr<const LocaleAtlas_t>& source : view->Sources)
-	{
-		if (!source)
-		{
-			continue;
+			return &it->second;
 		}
 
-		for (const auto& [id, texts] : *source)
+		for (const auto& [id, language] : this->Languages)
 		{
-			auto langIt = view->Languages.find(id);
+			if (language.DisplayName == aIdOrName)
+			{
+				return &language;
+			}
+		}
 
-			if (langIt == view->Languages.end())
+		return nullptr;
+	}
+
+	std::shared_ptr<const LocaleView_t> BuildLocaleView(std::vector<std::shared_ptr<const LocaleAtlas_t>> aSources)
+	{
+		auto view = std::make_shared<LocaleView_t>();
+		view->Sources = std::move(aSources);
+
+		if (view->Sources.empty() || !view->Sources.front())
+		{
+			return view;
+		}
+
+		for (const auto& [id, texts] : *view->Sources.front())
+		{
+			view->Languages[id].DisplayName = !texts.DisplayName.empty() ? texts.DisplayName : id;
+		}
+
+		for (const std::shared_ptr<const LocaleAtlas_t>& source : view->Sources)
+		{
+			if (!source)
 			{
 				continue;
 			}
 
-			for (const auto& [key, text] : texts.Texts)
+			for (const auto& [id, texts] : *source)
 			{
-				langIt->second.Own.insert_or_assign(std::string_view{ key }, text.c_str());
+				auto langIt = view->Languages.find(id);
+
+				if (langIt == view->Languages.end())
+				{
+					continue;
+				}
+
+				for (const auto& [key, text] : texts.Texts)
+				{
+					langIt->second.Own.insert_or_assign(std::string_view{ key }, text.c_str());
+				}
 			}
 		}
-	}
 
-	auto englishIt = view->Languages.find(std::string_view{ "en" });
-	const LocaleViewLanguage_t* english = englishIt != view->Languages.end() ? &englishIt->second : nullptr;
+		auto englishIt = view->Languages.find(std::string_view{ "en" });
+		const LocaleViewLanguage_t* english = englishIt != view->Languages.end() ? &englishIt->second : nullptr;
 
-	for (auto& [id, language] : view->Languages)
-	{
-		language.Lookup = language.Own;
-
-		if (english && english != &language)
+		for (auto& [id, language] : view->Languages)
 		{
-			for (const auto& [key, text] : english->Own)
+			language.Lookup = language.Own;
+
+			if (english && english != &language)
 			{
-				language.Lookup.emplace(key, text);
+				for (const auto& [key, text] : english->Own)
+				{
+					language.Lookup.emplace(key, text);
+				}
 			}
 		}
-	}
 
-	return view;
+		return view;
+	}
 }

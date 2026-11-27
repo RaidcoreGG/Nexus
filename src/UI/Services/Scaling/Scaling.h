@@ -18,79 +18,82 @@
 #include "Host/GW2/Mumble/MblReader.h"
 #include "UI/Renderer/RdrContext.h"
 
-///----------------------------------------------------------------------------------------------------
-/// CScaling Class
-///----------------------------------------------------------------------------------------------------
-class CScaling
-	: public IMumbleIdentityNotifyHandler
-	, public IDxgiResizeNotifyHandler
+namespace Raidcore::UI
 {
-	public:
 	///----------------------------------------------------------------------------------------------------
-	/// ctor
+	/// CScaling Class
 	///----------------------------------------------------------------------------------------------------
-	CScaling(
-		RenderContext_t* aRenderCtx,
-		CDataLinkApi*    aDataLink
-	);
+	class CScaling
+		: public GW2::IMumbleIdentityNotifyHandler
+		, public GW2::Hooks::IDxgiResizeNotifyHandler
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		CScaling(
+			UI::RenderContext_t* aRenderCtx,
+			Engine::CDataLinkApi*    aDataLink
+		);
 
-	///----------------------------------------------------------------------------------------------------
-	/// dtor
-	///----------------------------------------------------------------------------------------------------
-	~CScaling();
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		~CScaling();
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnMumbleIdentityNotify:
-	/// 	Updates the game UI scale.
-	///----------------------------------------------------------------------------------------------------
-	void OnMumbleIdentityNotify(const Mumble::Identity& aIdentity) override;
+		///----------------------------------------------------------------------------------------------------
+		/// OnMumbleIdentityNotify:
+		/// 	Updates the game UI scale.
+		///----------------------------------------------------------------------------------------------------
+		void OnMumbleIdentityNotify(const Mumble::Identity& aIdentity) override;
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnDxgiResizeNotify:
-	/// 	Updates the minimum resolution scaling before the game window raises EV_WINDOW_RESIZED.
-	///----------------------------------------------------------------------------------------------------
-	void OnDxgiResizeNotify(IDXGISwapChain* aSwapChain, UINT aWidth, UINT aHeight) override;
+		///----------------------------------------------------------------------------------------------------
+		/// OnDxgiResizeNotify:
+		/// 	Updates the minimum resolution scaling before the game window raises EV_WINDOW_RESIZED.
+		///----------------------------------------------------------------------------------------------------
+		void OnDxgiResizeNotify(IDXGISwapChain* aSwapChain, UINT aWidth, UINT aHeight) override;
 
-	///----------------------------------------------------------------------------------------------------
-	/// WndProc:
-	/// 	Returns 0 if message was processed.
-	///----------------------------------------------------------------------------------------------------
-	UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+		///----------------------------------------------------------------------------------------------------
+		/// WndProc:
+		/// 	Returns 0 if message was processed.
+		///----------------------------------------------------------------------------------------------------
+		UINT WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	///----------------------------------------------------------------------------------------------------
-	/// UpdateDPI:
-	/// 	Updates the DPI factor of the UI.
-	///----------------------------------------------------------------------------------------------------
-	void UpdateDPI();
+		///----------------------------------------------------------------------------------------------------
+		/// UpdateDPI:
+		/// 	Updates the DPI factor of the UI.
+		///----------------------------------------------------------------------------------------------------
+		void UpdateDPI();
 
-	///----------------------------------------------------------------------------------------------------
-	/// UpdateGameUIScale:
-	/// 	Updates the game dependant UI scaling.
-	///----------------------------------------------------------------------------------------------------
-	void UpdateGameUIScale();
+		///----------------------------------------------------------------------------------------------------
+		/// UpdateGameUIScale:
+		/// 	Updates the game dependant UI scaling.
+		///----------------------------------------------------------------------------------------------------
+		void UpdateGameUIScale();
 
-	///----------------------------------------------------------------------------------------------------
-	/// UpdateResolution:
-	/// 	Updates the minimum resolution scaling.
-	///----------------------------------------------------------------------------------------------------
-	void UpdateResolution(UINT aWidth, UINT aHeight);
+		///----------------------------------------------------------------------------------------------------
+		/// UpdateResolution:
+		/// 	Updates the minimum resolution scaling.
+		///----------------------------------------------------------------------------------------------------
+		void UpdateResolution(UINT aWidth, UINT aHeight);
 
-	private:
-	RenderContext_t*  RenderContext;
-	CDataLinkApi*     DataLink;
-	Mumble::Identity* MumbleIdentity;
-	NexusLinkData_t*  NexusLink;
+		private:
+		UI::RenderContext_t*  RenderContext;
+		Engine::CDataLinkApi*     DataLink;
+		Mumble::Identity* MumbleIdentity;
+		GW2::NexusLinkData_t*  NexusLink;
 
-	float             DpiScalingFactor;
-	float             EffectiveDpiScalingFactor;
-	float             MinResolutionScalingFactor;
+		float             DpiScalingFactor;
+		float             EffectiveDpiScalingFactor;
+		float             MinResolutionScalingFactor;
 
-	///----------------------------------------------------------------------------------------------------
-	/// UpdateScaling:
-	/// 	Updates the scaling factor of the UI.
-	///----------------------------------------------------------------------------------------------------
-	void UpdateScaling();
-	public:
-	CSetting<bool>    DpiScaling { "DPIScaling", true, [this](const bool&) { this->UpdateDPI(); } };
-	CSetting<float>   LastUIScale{ "LastUIScale", SC_NORMAL };
-};
+		///----------------------------------------------------------------------------------------------------
+		/// UpdateScaling:
+		/// 	Updates the scaling factor of the UI.
+		///----------------------------------------------------------------------------------------------------
+		void UpdateScaling();
+		public:
+		Core::CSetting<bool>    DpiScaling { "DPIScaling", true, [this](const bool&) { this->UpdateDPI(); } };
+		Core::CSetting<float>   LastUIScale{ "LastUIScale", GW2::SC_NORMAL };
+	};
+}

@@ -11,11 +11,14 @@
 #include "ApiV6.h"
 #include "UI/Widgets/Alerts/AlEnum.h"
 
-typedef void (*INPUTBINDS_REGISTERWITHSTRING3)(const char* aIdentifier, IB_CALLBACK_V3 aInputBindHandler, const char* aInputBind);
-typedef void (*INPUTBINDS_REGISTERWITHSTRUCT3)(const char* aIdentifier, IB_CALLBACK_V3 aInputBindHandler, InputBindV1_t aInputBind);
-typedef bool (*INPUTBINDS_INVOKE2)            (const char* aIdentifier, bool aIsRelease);
+namespace Raidcore::GW2
+{
+	typedef void (*INPUTBINDS_REGISTERWITHSTRING3)(const char* aIdentifier, Engine::Input::IB_CALLBACK_V3 aInputBindHandler, const char* aInputBind);
+	typedef void (*INPUTBINDS_REGISTERWITHSTRUCT3)(const char* aIdentifier, Engine::Input::IB_CALLBACK_V3 aInputBindHandler, InputBindV1_t aInputBind);
+	typedef bool (*INPUTBINDS_INVOKE2)            (const char* aIdentifier, bool aIsRelease);
 
-typedef Texture_t* (*TEXTURES_GETORCREATEFROMURL2)(const char* aIdentifier, const char* aURL);
-typedef void       (*TEXTURES_LOADFROMURL2)       (const char* aIdentifier, const char* aURL, TEXTURES_RECEIVECALLBACK aCallback);
+	typedef UI::Texture_t* (*TEXTURES_GETORCREATEFROMURL2)(const char* aIdentifier, const char* aURL);
+	typedef void       (*TEXTURES_LOADFROMURL2)       (const char* aIdentifier, const char* aURL, UI::TEXTURES_RECEIVECALLBACK aCallback);
 
-typedef void (*ALERTS_NOTIFY2)(EAlertType aType, const char* aMessage);
+	typedef void (*ALERTS_NOTIFY2)(UI::EAlertType aType, const char* aMessage);
+}

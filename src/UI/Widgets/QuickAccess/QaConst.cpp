@@ -8,27 +8,30 @@
 
 #include "QaConst.h"
 
-CText EQaVisibilityToText(EQaVisibility aQAVisibility)
+namespace Raidcore::UI
 {
-	switch (aQAVisibility)
+	UI::CText EQaVisibilityToText(EQaVisibility aQAVisibility)
 	{
-		case EQaVisibility::AlwaysShow:  return Lang::QuickAccess::AlwaysShow;
-		case EQaVisibility::Gameplay:    return Lang::QuickAccess::DuringGameplay;
-		case EQaVisibility::OutOfCombat: return Lang::QuickAccess::OutOfCombat;
-		case EQaVisibility::InCombat:    return Lang::QuickAccess::InCombat;
-		case EQaVisibility::Hide:        return Lang::QuickAccess::NeverShow;
-		default:                         return CText{};
+		switch (aQAVisibility)
+		{
+			case EQaVisibility::AlwaysShow:  return Lang::QuickAccess::AlwaysShow;
+			case EQaVisibility::Gameplay:    return Lang::QuickAccess::DuringGameplay;
+			case EQaVisibility::OutOfCombat: return Lang::QuickAccess::OutOfCombat;
+			case EQaVisibility::InCombat:    return Lang::QuickAccess::InCombat;
+			case EQaVisibility::Hide:        return Lang::QuickAccess::NeverShow;
+			default:                         return UI::CText{};
+		}
 	}
-}
 
-CText EQaPositionToText(EQaPosition aQAPosition)
-{
-	switch (aQAPosition)
+	UI::CText EQaPositionToText(EQaPosition aQAPosition)
 	{
-		case EQaPosition::Extend: return Lang::QuickAccess::PosExtend;
-		case EQaPosition::Under:  return Lang::QuickAccess::PosUnder;
-		case EQaPosition::Bottom: return Lang::QuickAccess::PosBottom;
-		case EQaPosition::Custom: return Lang::QuickAccess::PosCustom;
-		default:                  return CText{};
+		switch (aQAPosition)
+		{
+			case EQaPosition::Extend: return Lang::QuickAccess::PosExtend;
+			case EQaPosition::Under:  return Lang::QuickAccess::PosUnder;
+			case EQaPosition::Bottom: return Lang::QuickAccess::PosBottom;
+			case EQaPosition::Custom: return Lang::QuickAccess::PosCustom;
+			default:                  return UI::CText{};
+		}
 	}
 }

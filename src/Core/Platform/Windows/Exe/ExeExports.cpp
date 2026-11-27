@@ -14,7 +14,7 @@
 #include <vector>
 #include <windows.h>
 
-namespace Raidcore::Core::Platform::Windows
+namespace Raidcore::Core::Windows
 {
 	///----------------------------------------------------------------------------------------------------
 	/// LoadFile:

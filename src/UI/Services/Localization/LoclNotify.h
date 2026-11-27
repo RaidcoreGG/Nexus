@@ -10,30 +10,33 @@
 
 #include "Engine/Notifier/Notifier.h"
 
-///----------------------------------------------------------------------------------------------------
-/// IGameLanguageNotifyHandler Interface
-///----------------------------------------------------------------------------------------------------
-class IGameLanguageNotifyHandler : public INotifyHandler<IGameLanguageNotifyHandler>
+namespace Raidcore::UI
 {
-	public:
 	///----------------------------------------------------------------------------------------------------
-	/// OnGameLanguageNotify:
-	/// 	An external source reports the game language, as a locale identifier (e.g. "en").
+	/// IGameLanguageNotifyHandler Interface
 	///----------------------------------------------------------------------------------------------------
-	virtual void OnGameLanguageNotify(const char* aLanguage) = 0;
-};
-
-///----------------------------------------------------------------------------------------------------
-/// IGameLanguageNotifier Interface
-///----------------------------------------------------------------------------------------------------
-class IGameLanguageNotifier : public INotifier<IGameLanguageNotifyHandler>
-{
-	protected:
-	void NotifyGameLanguage(const char* aLanguage)
+	class IGameLanguageNotifyHandler : public Engine::INotifyHandler<IGameLanguageNotifyHandler>
 	{
-		for (const auto& entry : this->Subscribers())
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// OnGameLanguageNotify:
+		/// 	An external source reports the game language, as a locale identifier (e.g. "en").
+		///----------------------------------------------------------------------------------------------------
+		virtual void OnGameLanguageNotify(const char* aLanguage) = 0;
+	};
+
+	///----------------------------------------------------------------------------------------------------
+	/// IGameLanguageNotifier Interface
+	///----------------------------------------------------------------------------------------------------
+	class IGameLanguageNotifier : public Engine::INotifier<IGameLanguageNotifyHandler>
+	{
+		protected:
+		void NotifyGameLanguage(const char* aLanguage)
 		{
-			entry.Subscriber->OnGameLanguageNotify(aLanguage);
+			for (const auto& entry : this->Subscribers())
+			{
+				entry.Subscriber->OnGameLanguageNotify(aLanguage);
+			}
 		}
-	}
-};
+	};
+}

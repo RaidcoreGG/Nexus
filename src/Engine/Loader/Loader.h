@@ -19,174 +19,177 @@
 #include "Core/Logging/LogChannel.h"
 #include "LdrAddonBase.h"
 
-constexpr const uint32_t WM_ADDONDIRUPDATE = WM_USER + 101;
-
-///----------------------------------------------------------------------------------------------------
-/// CLoader Class
-///----------------------------------------------------------------------------------------------------
-class CLoader : public ILogChannel, public IWndProcNotifyHandler
+namespace Raidcore::Engine
 {
-	public:
-	///----------------------------------------------------------------------------------------------------
-	/// ctor
-	///----------------------------------------------------------------------------------------------------
-	CLoader(
-		IADDON_FACTORY        aFactoryFunction,
-		std::filesystem::path aDirectory
-	);
-	// TODO: Register factory functions per file extension/type.
+	constexpr const uint32_t WM_ADDONDIRUPDATE = WM_USER + 101;
 
 	///----------------------------------------------------------------------------------------------------
-	/// dtor
+	/// CLoader Class
 	///----------------------------------------------------------------------------------------------------
-	~CLoader();
+	class CLoader : public Core::ILogChannel, public Engine::Input::IWndProcNotifyHandler
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		CLoader(
+			IADDON_FACTORY        aFactoryFunction,
+			std::filesystem::path aDirectory
+		);
+		// TODO: Register factory functions per file extension/type.
 
-	///----------------------------------------------------------------------------------------------------
-	/// Shutdown:
-	/// 	Stops the processor thread, which destroys and thereby unloads every addon.
-	///----------------------------------------------------------------------------------------------------
-	void Shutdown();
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		~CLoader();
 
-	///----------------------------------------------------------------------------------------------------
-	/// InitDirectoryUpdates:
-	/// 	Initializes the necessary resouces to receive directory updates and the processor thread.
-	///----------------------------------------------------------------------------------------------------
-	void InitDirectoryUpdates(HWND aWndHandle);
+		///----------------------------------------------------------------------------------------------------
+		/// Shutdown:
+		/// 	Stops the processor thread, which destroys and thereby unloads every addon.
+		///----------------------------------------------------------------------------------------------------
+		void Shutdown();
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnWndProcNotify:
-	/// 	Returns 0 if message was processed.
-	///----------------------------------------------------------------------------------------------------
-	UINT OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam) override;
+		///----------------------------------------------------------------------------------------------------
+		/// InitDirectoryUpdates:
+		/// 	Initializes the necessary resouces to receive directory updates and the processor thread.
+		///----------------------------------------------------------------------------------------------------
+		void InitDirectoryUpdates(HWND aWndHandle);
 
-	///----------------------------------------------------------------------------------------------------
-	/// NotifyChanges:
-	/// 	Notifies that something in the addon directory changed.
-	///----------------------------------------------------------------------------------------------------
-	void NotifyChanges();
+		///----------------------------------------------------------------------------------------------------
+		/// OnWndProcNotify:
+		/// 	Returns 0 if message was processed.
+		///----------------------------------------------------------------------------------------------------
+		UINT OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam) override;
 
-	///----------------------------------------------------------------------------------------------------
-	/// Track:
-	/// 	Adds a specific path for addon tracking.
-	///----------------------------------------------------------------------------------------------------
-	void Track(std::filesystem::path aPath);
+		///----------------------------------------------------------------------------------------------------
+		/// NotifyChanges:
+		/// 	Notifies that something in the addon directory changed.
+		///----------------------------------------------------------------------------------------------------
+		void NotifyChanges();
 
-	///----------------------------------------------------------------------------------------------------
-	/// Load:
-	/// 	Loads the addon matching the signature.
-	///----------------------------------------------------------------------------------------------------
-	void LoadSafe(std::filesystem::path aPath);
+		///----------------------------------------------------------------------------------------------------
+		/// Track:
+		/// 	Adds a specific path for addon tracking.
+		///----------------------------------------------------------------------------------------------------
+		void Track(std::filesystem::path aPath);
 
-	///----------------------------------------------------------------------------------------------------
-	/// Unload:
-	/// 	Unloads the addon matching the signature.
-	///----------------------------------------------------------------------------------------------------
-	void UnloadSafe(std::filesystem::path aPath);
+		///----------------------------------------------------------------------------------------------------
+		/// Load:
+		/// 	Loads the addon matching the signature.
+		///----------------------------------------------------------------------------------------------------
+		void LoadSafe(std::filesystem::path aPath);
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetOwner:
-	/// 	Returns the owner of the passed address, or nullptr.
-	///----------------------------------------------------------------------------------------------------
-	IAddon* GetOwner(void* aAddress) const;
+		///----------------------------------------------------------------------------------------------------
+		/// Unload:
+		/// 	Unloads the addon matching the signature.
+		///----------------------------------------------------------------------------------------------------
+		void UnloadSafe(std::filesystem::path aPath);
 
-	///----------------------------------------------------------------------------------------------------
-	/// IsTrackedSafe:
-	/// 	Returns true, if the provided signature is an already tracked addon.
-	/// 	[optional] aAddon: Do not compare against the provided addon.
-	///----------------------------------------------------------------------------------------------------
-	bool IsTrackedSafe(uint32_t aSignature, IAddon* aAddon = nullptr) const;
+		///----------------------------------------------------------------------------------------------------
+		/// GetOwner:
+		/// 	Returns the owner of the passed address, or nullptr.
+		///----------------------------------------------------------------------------------------------------
+		IAddon* GetOwner(void* aAddress) const;
 
-	///----------------------------------------------------------------------------------------------------
-	/// IsTrackedSafe:
-	/// 	Returns true, if the provided path is an already tracked addon.
-	/// 	[optional] aAddon: Do not compare against the provided addon.
-	///----------------------------------------------------------------------------------------------------
-	bool IsTrackedSafe(std::filesystem::path aPath, IAddon* aAddon = nullptr) const;
+		///----------------------------------------------------------------------------------------------------
+		/// IsTrackedSafe:
+		/// 	Returns true, if the provided signature is an already tracked addon.
+		/// 	[optional] aAddon: Do not compare against the provided addon.
+		///----------------------------------------------------------------------------------------------------
+		bool IsTrackedSafe(uint32_t aSignature, IAddon* aAddon = nullptr) const;
 
-	///----------------------------------------------------------------------------------------------------
-	/// IsTrackedSafe:
-	/// 	Returns true, if the provided MD5 is an already tracked addon.
-	/// 	[optional] aAddon: Do not compare against the provided addon.
-	///----------------------------------------------------------------------------------------------------
-	bool IsTrackedSafe(MD5_t aMD5, IAddon* aAddon = nullptr) const;
+		///----------------------------------------------------------------------------------------------------
+		/// IsTrackedSafe:
+		/// 	Returns true, if the provided path is an already tracked addon.
+		/// 	[optional] aAddon: Do not compare against the provided addon.
+		///----------------------------------------------------------------------------------------------------
+		bool IsTrackedSafe(std::filesystem::path aPath, IAddon* aAddon = nullptr) const;
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetAddons:
-	/// 	Returns all tracked addons.
-	///----------------------------------------------------------------------------------------------------
-	std::vector<IAddon*> GetAddons() const;
+		///----------------------------------------------------------------------------------------------------
+		/// IsTrackedSafe:
+		/// 	Returns true, if the provided MD5 is an already tracked addon.
+		/// 	[optional] aAddon: Do not compare against the provided addon.
+		///----------------------------------------------------------------------------------------------------
+		bool IsTrackedSafe(MD5_t aMD5, IAddon* aAddon = nullptr) const;
 
-	private:
-	std::filesystem::path   Directory;
+		///----------------------------------------------------------------------------------------------------
+		/// GetAddons:
+		/// 	Returns all tracked addons.
+		///----------------------------------------------------------------------------------------------------
+		std::vector<IAddon*> GetAddons() const;
 
-	std::mutex              FSMutex;
-	PIDLIST_ABSOLUTE        FSItemList    = nullptr;
-	ULONG                   FSNotifierID  = 0;
+		private:
+		std::filesystem::path   Directory;
 
-	std::thread             ProcThread;
-	bool                    IsRunning     = false;
+		std::mutex              FSMutex;
+		PIDLIST_ABSOLUTE        FSItemList    = nullptr;
+		ULONG                   FSNotifierID  = 0;
 
-	mutable std::mutex      Mutex;
-	std::condition_variable ConVar;
+		std::thread             ProcThread;
+		bool                    IsRunning     = false;
 
-	IADDON_FACTORY          CreateAddon;
-	std::vector<IAddon*>    Addons;
+		mutable std::mutex      Mutex;
+		std::condition_variable ConVar;
 
-	///----------------------------------------------------------------------------------------------------
-	/// DeinitDirectoryUpdates:
-	/// 	Deinitializes the necessary resouces to receive directory updates.
-	///----------------------------------------------------------------------------------------------------
-	void DeinitDirectoryUpdates();
+		IADDON_FACTORY          CreateAddon;
+		std::vector<IAddon*>    Addons;
 
-	///----------------------------------------------------------------------------------------------------
-	/// IsValid:
-	/// 	Returns true if the provided addon path is valid for loading.
-	///----------------------------------------------------------------------------------------------------
-	bool IsValid(const std::filesystem::path& aPath);
+		///----------------------------------------------------------------------------------------------------
+		/// DeinitDirectoryUpdates:
+		/// 	Deinitializes the necessary resouces to receive directory updates.
+		///----------------------------------------------------------------------------------------------------
+		void DeinitDirectoryUpdates();
 
-	///----------------------------------------------------------------------------------------------------
-	/// ProcessChanges:
-	/// 	Detects and processes any changes to addons.
-	///----------------------------------------------------------------------------------------------------
-	void ProcessChanges();
+		///----------------------------------------------------------------------------------------------------
+		/// IsValid:
+		/// 	Returns true if the provided addon path is valid for loading.
+		///----------------------------------------------------------------------------------------------------
+		bool IsValid(const std::filesystem::path& aPath);
 
-	///----------------------------------------------------------------------------------------------------
-	/// Discover:
-	/// 	Discovers the addons on disk and creates them if they are valid.
-	/// 	Does not check if the file is already tracked, only call this once for the initial discovery.
-	///----------------------------------------------------------------------------------------------------
-	void Discover();
+		///----------------------------------------------------------------------------------------------------
+		/// ProcessChanges:
+		/// 	Detects and processes any changes to addons.
+		///----------------------------------------------------------------------------------------------------
+		void ProcessChanges();
 
-	///----------------------------------------------------------------------------------------------------
-	/// IsTracked:
-	/// 	Returns true if the provided signature is an already tracked addon.
-	/// 	[optional] aAddon: Do not compare against the provided addon.
-	///----------------------------------------------------------------------------------------------------
-	bool IsTracked(uint32_t aSignature, IAddon* aAddon = nullptr) const;
+		///----------------------------------------------------------------------------------------------------
+		/// Discover:
+		/// 	Discovers the addons on disk and creates them if they are valid.
+		/// 	Does not check if the file is already tracked, only call this once for the initial discovery.
+		///----------------------------------------------------------------------------------------------------
+		void Discover();
 
-	///----------------------------------------------------------------------------------------------------
-	/// IsTracked:
-	/// 	Returns true if the provided path is an already tracked addon.
-	/// 	[optional] aAddon: Do not compare against the provided addon.
-	///----------------------------------------------------------------------------------------------------
-	bool IsTracked(std::filesystem::path aPath, IAddon* aAddon = nullptr) const;
+		///----------------------------------------------------------------------------------------------------
+		/// IsTracked:
+		/// 	Returns true if the provided signature is an already tracked addon.
+		/// 	[optional] aAddon: Do not compare against the provided addon.
+		///----------------------------------------------------------------------------------------------------
+		bool IsTracked(uint32_t aSignature, IAddon* aAddon = nullptr) const;
 
-	///----------------------------------------------------------------------------------------------------
-	/// IsTracked:
-	/// 	Returns true if the provided MD5 is an already tracked addon.
-	/// 	[optional] aAddon: Do not compare against the provided addon.
-	///----------------------------------------------------------------------------------------------------
-	bool IsTracked(MD5_t aMD5, IAddon* aAddon = nullptr) const;
+		///----------------------------------------------------------------------------------------------------
+		/// IsTracked:
+		/// 	Returns true if the provided path is an already tracked addon.
+		/// 	[optional] aAddon: Do not compare against the provided addon.
+		///----------------------------------------------------------------------------------------------------
+		bool IsTracked(std::filesystem::path aPath, IAddon* aAddon = nullptr) const;
 
-	///----------------------------------------------------------------------------------------------------
-	/// Load:
-	/// 	Loads the addon matching the signature.
-	///----------------------------------------------------------------------------------------------------
-	void Load(std::filesystem::path aPath);
+		///----------------------------------------------------------------------------------------------------
+		/// IsTracked:
+		/// 	Returns true if the provided MD5 is an already tracked addon.
+		/// 	[optional] aAddon: Do not compare against the provided addon.
+		///----------------------------------------------------------------------------------------------------
+		bool IsTracked(MD5_t aMD5, IAddon* aAddon = nullptr) const;
 
-	///----------------------------------------------------------------------------------------------------
-	/// Unload:
-	/// 	Unloads the addon matching the signature.
-	///----------------------------------------------------------------------------------------------------
-	void Unload(std::filesystem::path aPath);
-};
+		///----------------------------------------------------------------------------------------------------
+		/// Load:
+		/// 	Loads the addon matching the signature.
+		///----------------------------------------------------------------------------------------------------
+		void Load(std::filesystem::path aPath);
+
+		///----------------------------------------------------------------------------------------------------
+		/// Unload:
+		/// 	Unloads the addon matching the signature.
+		///----------------------------------------------------------------------------------------------------
+		void Unload(std::filesystem::path aPath);
+	};
+}

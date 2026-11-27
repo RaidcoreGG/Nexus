@@ -14,9 +14,9 @@
 #include <span>
 
 ///----------------------------------------------------------------------------------------------------
-/// Raidcore::Core::Platform::Windows Namespace
+/// Raidcore::Core::Windows Namespace
 ///----------------------------------------------------------------------------------------------------
-namespace Raidcore::Core::Platform::Windows
+namespace Raidcore::Core::Windows
 {
 	///----------------------------------------------------------------------------------------------------
 	/// EPackFileType Enumeration

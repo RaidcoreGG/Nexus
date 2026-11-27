@@ -82,13 +82,13 @@ foreach ($text in $texts)
 
 foreach ($ns in $groups.Keys)
 {
-	[void]$sb.Append("$($nl)namespace Lang::$ns$nl{$nl")
+	[void]$sb.Append("$($nl)namespace Raidcore::Lang::$ns$nl{$nl")
 	foreach ($text in $groups[$ns])
 	{
 		## A trailing backslash would continue the comment onto the constant.
 		$comment = ($text.Text -replace '[\r\n]+', ' ').Trim().TrimEnd('\')
 		[void]$sb.Append("`t/// $comment$nl")
-		[void]$sb.Append("`tinline constexpr CText $($text.Path[-1]){ `"$($text.Path -join '.')`" };$nl")
+		[void]$sb.Append("`tinline constexpr UI::CText $($text.Path[-1]){ `"$($text.Path -join '.')`" };$nl")
 	}
 	[void]$sb.Append("}$nl")
 }

@@ -12,32 +12,33 @@
 #include "Engine/Notifier/Notifier.h"
 #include "GbEnum.h"
 
-namespace Input = Engine::Input;
-
-///----------------------------------------------------------------------------------------------------
-/// IGameBindChangedNotifyHandler Interface
-///----------------------------------------------------------------------------------------------------
-class IGameBindChangedNotifyHandler : public INotifyHandler<IGameBindChangedNotifyHandler>
+namespace Raidcore::GW2
 {
-	public:
 	///----------------------------------------------------------------------------------------------------
-	/// OnGameBindChangedNotify:
-	/// 	An external source reports that a game bind was changed in the game.
+	/// IGameBindChangedNotifyHandler Interface
 	///----------------------------------------------------------------------------------------------------
-	virtual void OnGameBindChangedNotify(EGameBinds aGameBind, const Input::Bind_t& aInputBind, bool aIsPrimary) = 0;
-};
-
-///----------------------------------------------------------------------------------------------------
-/// IGameBindChangedNotifier Interface
-///----------------------------------------------------------------------------------------------------
-class IGameBindChangedNotifier : public INotifier<IGameBindChangedNotifyHandler>
-{
-	protected:
-	void NotifyGameBindChanged(EGameBinds aGameBind, const Input::Bind_t& aInputBind, bool aIsPrimary)
+	class IGameBindChangedNotifyHandler : public Engine::INotifyHandler<IGameBindChangedNotifyHandler>
 	{
-		for (const auto& entry : this->Subscribers())
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// OnGameBindChangedNotify:
+		/// 	An external source reports that a game bind was changed in the game.
+		///----------------------------------------------------------------------------------------------------
+		virtual void OnGameBindChangedNotify(EGameBinds aGameBind, const Engine::Input::Bind_t& aInputBind, bool aIsPrimary) = 0;
+	};
+
+	///----------------------------------------------------------------------------------------------------
+	/// IGameBindChangedNotifier Interface
+	///----------------------------------------------------------------------------------------------------
+	class IGameBindChangedNotifier : public Engine::INotifier<IGameBindChangedNotifyHandler>
+	{
+		protected:
+		void NotifyGameBindChanged(EGameBinds aGameBind, const Engine::Input::Bind_t& aInputBind, bool aIsPrimary)
 		{
-			entry.Subscriber->OnGameBindChangedNotify(aGameBind, aInputBind, aIsPrimary);
+			for (const auto& entry : this->Subscribers())
+			{
+				entry.Subscriber->OnGameBindChangedNotify(aGameBind, aInputBind, aIsPrimary);
+			}
 		}
-	}
-};
+	};
+}

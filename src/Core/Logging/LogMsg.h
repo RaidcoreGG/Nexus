@@ -12,15 +12,18 @@
 
 #include "LogEnum.h"
 
-///----------------------------------------------------------------------------------------------------
-/// LogMsg_t Struct
-///----------------------------------------------------------------------------------------------------
-struct LogMsg_t
+namespace Raidcore::Core
 {
-	ELogLevel   Level          {};
-	long long   Time           {};
-	int         TimeMsPrecision{};
-	std::string Channel        {};
-	std::string Message        {};
-	int         RepeatCount    {1};
-};
+	///----------------------------------------------------------------------------------------------------
+	/// LogMsg_t Struct
+	///----------------------------------------------------------------------------------------------------
+	struct LogMsg_t
+	{
+		ELogLevel   Level          {};
+		long long   Time           {};
+		int         TimeMsPrecision{};
+		std::string Channel        {};
+		std::string Message        {};
+		int         RepeatCount    {1};
+	};
+}

@@ -19,77 +19,80 @@
 #include "Core/Logging/LogChannel.h"
 #include "PrefSettingBase.h"
 
-constexpr std::chrono::milliseconds FLUSH_DELAY = std::chrono::seconds(1);
-
-///----------------------------------------------------------------------------------------------------
-/// CPreferences Class
-///----------------------------------------------------------------------------------------------------
-class CPreferences : public ILogChannel
+namespace Raidcore::Core
 {
-	public:
-	///----------------------------------------------------------------------------------------------------
-	/// Get:
-	/// 	Returns the process-wide settings store.
-	///----------------------------------------------------------------------------------------------------
-	static CPreferences* Get();
+	constexpr std::chrono::milliseconds FLUSH_DELAY = std::chrono::seconds(1);
 
 	///----------------------------------------------------------------------------------------------------
-	/// Init:
-	/// 	Sets the settings file, loads it and starts saving changes. Call exactly once, before any write.
-	/// 	Settings registered before take the loaded values.
+	/// CPreferences Class
 	///----------------------------------------------------------------------------------------------------
-	void Init(std::filesystem::path aPath);
+	class CPreferences : public Core::ILogChannel
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// Get:
+		/// 	Returns the process-wide settings store.
+		///----------------------------------------------------------------------------------------------------
+		static CPreferences* Get();
 
-	///----------------------------------------------------------------------------------------------------
-	/// Register:
-	/// 	Registers a setting and gives it the stored value. Each key has exactly one owner.
-	///----------------------------------------------------------------------------------------------------
-	void Register(ISetting* aSetting);
+		///----------------------------------------------------------------------------------------------------
+		/// Init:
+		/// 	Sets the settings file, loads it and starts saving changes. Call exactly once, before any write.
+		/// 	Settings registered before take the loaded values.
+		///----------------------------------------------------------------------------------------------------
+		void Init(std::filesystem::path aPath);
 
-	///----------------------------------------------------------------------------------------------------
-	/// Deregister:
-	/// 	Unregisters a setting.
-	///----------------------------------------------------------------------------------------------------
-	void Deregister(ISetting* aSetting);
+		///----------------------------------------------------------------------------------------------------
+		/// Register:
+		/// 	Registers a setting and gives it the stored value. Each key has exactly one owner.
+		///----------------------------------------------------------------------------------------------------
+		void Register(ISetting* aSetting);
 
-	///----------------------------------------------------------------------------------------------------
-	/// Write:
-	/// 	Persists the value of a registered setting.
-	///----------------------------------------------------------------------------------------------------
-	void Write(const std::string& aKey, json aValue);
+		///----------------------------------------------------------------------------------------------------
+		/// Deregister:
+		/// 	Unregisters a setting.
+		///----------------------------------------------------------------------------------------------------
+		void Deregister(ISetting* aSetting);
 
-	~CPreferences();
+		///----------------------------------------------------------------------------------------------------
+		/// Write:
+		/// 	Persists the value of a registered setting.
+		///----------------------------------------------------------------------------------------------------
+		void Write(const std::string& aKey, json aValue);
 
-	private:
-	CPreferences();
+		~CPreferences();
 
-	std::filesystem::path                      Path;
+		private:
+		CPreferences();
 
-	std::mutex                                 Mutex;
-	json                                       Store;
-	std::unordered_map<std::string, ISetting*> Registry;
-	bool                                       IsInitialized = false;
-	bool                                       IsDirty       = false;
-	bool                                       IsRunning     = false;
+		std::filesystem::path                      Path;
 
-	std::condition_variable                    FlushCondition;
-	std::thread                                FlushThread;
+		std::mutex                                 Mutex;
+		json                                       Store;
+		std::unordered_map<std::string, ISetting*> Registry;
+		bool                                       IsInitialized = false;
+		bool                                       IsDirty       = false;
+		bool                                       IsRunning     = false;
 
-	///----------------------------------------------------------------------------------------------------
-	/// LoadInternal:
-	/// 	Loads the settings without locking the mutex. Returns false if the file must not be overwritten.
-	///----------------------------------------------------------------------------------------------------
-	bool LoadInternal();
+		std::condition_variable                    FlushCondition;
+		std::thread                                FlushThread;
 
-	///----------------------------------------------------------------------------------------------------
-	/// SaveInternal:
-	/// 	Writes the given settings to the file.
-	///----------------------------------------------------------------------------------------------------
-	void SaveInternal(const json& aStore);
+		///----------------------------------------------------------------------------------------------------
+		/// LoadInternal:
+		/// 	Loads the settings without locking the mutex. Returns false if the file must not be overwritten.
+		///----------------------------------------------------------------------------------------------------
+		bool LoadInternal();
 
-	///----------------------------------------------------------------------------------------------------
-	/// FlushLoop:
-	/// 	Sleeps until a change, then saves FLUSH_DELAY after it, together with the changes made meanwhile.
-	///----------------------------------------------------------------------------------------------------
-	void FlushLoop();
-};
+		///----------------------------------------------------------------------------------------------------
+		/// SaveInternal:
+		/// 	Writes the given settings to the file.
+		///----------------------------------------------------------------------------------------------------
+		void SaveInternal(const json& aStore);
+
+		///----------------------------------------------------------------------------------------------------
+		/// FlushLoop:
+		/// 	Sleeps until a change, then saves FLUSH_DELAY after it, together with the changes made meanwhile.
+		///----------------------------------------------------------------------------------------------------
+		void FlushLoop();
+	};
+}

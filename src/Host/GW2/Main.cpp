@@ -13,7 +13,6 @@
 #include "minhook/mh_hook.h"
 
 #include "Engine/Clockwork/Clockwork.h"
-namespace Clockwork = Raidcore::Clockwork;
 
 #include "Host/GW2/Context.h"
 #include "Host/GW2/Hooks/Hooks.h"
@@ -37,22 +36,22 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		case DLL_PROCESS_ATTACH:
 		{
 			DisableThreadLibraryCalls(hModule);
-			CContext* ctx = CContext::GetContext();
+			Raidcore::GW2::CContext* ctx = Raidcore::GW2::CContext::GetContext();
 			ctx->SetModule(hModule);
-			CreateIndex(hModule);
+			Raidcore::GW2::CreateIndex(hModule);
 			break;
 		}
 		case DLL_PROCESS_DETACH:
 		{
-			CContext* ctx = CContext::GetContext();
+			Raidcore::GW2::CContext* ctx = Raidcore::GW2::CContext::GetContext();
 
-			Main::Shutdown(1);
+			Raidcore::GW2::Shutdown(1);
 
 			/* If we have the window handle and we have an original (target) wndproc. */
-			if (ctx->GetRendererCtx()->Window.Handle && Hooks::Target::WndProc)
+			if (ctx->GetRendererCtx()->Window.Handle && Raidcore::GW2::Hooks::Target::WndProc)
 			{
 				/* Reset wndproc back to the original target. */
-				SetWindowLongPtr(ctx->GetRendererCtx()->Window.Handle, GWLP_WNDPROC, (LONG_PTR)Hooks::Target::WndProc);
+				SetWindowLongPtr(ctx->GetRendererCtx()->Window.Handle, GWLP_WNDPROC, (LONG_PTR)Raidcore::GW2::Hooks::Target::WndProc);
 			}
 			break;
 		}
@@ -60,16 +59,16 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	return true;
 }
 
-namespace Main
+namespace Raidcore::GW2
 {
 	static bool s_IsInitialized = false;
 
-	void Initialize(EProxyFunction aEntryFunction)
+	void Initialize(Proxy::EProxyFunction aEntryFunction)
 	{
-		static EProxyFunction s_EntryFunction = EProxyFunction::NONE;
+		static Proxy::EProxyFunction s_EntryFunction = Proxy::EProxyFunction::NONE;
 
 		/* If an entry function is set, we already initalized. */
-		if (s_EntryFunction != EProxyFunction::NONE)
+		if (s_EntryFunction != Proxy::EProxyFunction::NONE)
 		{
 			return;
 		}
@@ -82,49 +81,49 @@ namespace Main
 		}
 
 		/* Created first so it is destroyed last: services log from their destructors. */
-		CLogApi::Get();
+		Core::CLogApi::Get();
 
 		Migrations::Run();
 
 		/* Loaded before the services that own settings exist; namespace-scope settings take the values here. */
-		CPreferences::Get()->Init(Index(EPath::Settings));
+		Core::CPreferences::Get()->Init(GW2::Index(GW2::EPath::Settings));
 
 		MH_Initialize();
-		Hooks::HookIDXGISwapChain();
+		GW2::Hooks::HookIDXGISwapChain();
 
 		Clockwork::Context::Create();
 
 		s_IsInitialized = true;
 
-		CContext* ctx = CContext::GetContext();
+		GW2::CContext* ctx = GW2::CContext::GetContext();
 
 		/* Environment info. */
-		LogInfo(
-			CH_CORE,
+		Core::LogInfo(
+			GW2::CH_CORE,
 			"Game: %s\nModule: %s\nNexus %s %s\nEntry method: %d",
 			GetCommandLineA(),
-			Index(EPath::NexusDLL).string().c_str(),
+			GW2::Index(GW2::EPath::NexusDLL).string().c_str(),
 			ctx->GetVersion().string().c_str(),
 			ctx->GetBuild(),
 			aEntryFunction
 		);
 
 		/* Initialize crash handler. */
-		Raidcore::Core::Platform::Windows::CCrashHandler* crashhandler = ctx->GetCrashHandler();
+		Core::Windows::CCrashHandler* crashhandler = ctx->GetCrashHandler();
 
 		/* Initialize self updater here so it can lock this instance and update. */
-		CSelfUpdater* selfupdater = ctx->GetSelfUpdater();
+		GW2::CSelfUpdater* selfupdater = ctx->GetSelfUpdater();
 
-		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [](Clockwork::CancellationToken aToken)
+		Clockwork::Run<void>(Clockwork::ETaskPriority::Low, [](Clockwork::CancellationToken aToken)
 		{
-			Resources::ThirdPartyNotices.Unpack(Index(EPath::ThirdPartySoftwareReadme));
+			Resources::ThirdPartyNotices.Unpack(GW2::Index(GW2::EPath::ThirdPartySoftwareReadme));
 		});
 
 		/* Allocate console logger, if requested. */
 		if (CmdLine::HasArgument("-ggconsole"))
 		{
-			static CConsoleLogger console = CConsoleLogger(ELogLevel::ALL);
-			CLogApi::Get()->Register(&console);
+			static Core::CConsoleLogger console = Core::CConsoleLogger(Core::ELogLevel::ALL);
+			Core::CLogApi::Get()->Register(&console);
 		}
 
 		/* Multibox-friendly log file. */
@@ -134,40 +133,40 @@ namespace Main
 			std::string filename = "Nexus_";
 			filename.append(CmdLine::GetArgumentValue("-mumble"));
 			filename.append(".log");
-			logpath = Index(EPath::DIR_NEXUS) / filename;
+			logpath = GW2::Index(GW2::EPath::DIR_NEXUS) / filename;
 		}
 		else
 		{
-			logpath = Index(EPath::Log);
+			logpath = GW2::Index(GW2::EPath::Log);
 		}
 
 		/* Allocate log writer. */
 #ifdef _DEBUG
-		static CFileLogger writer = CFileLogger(ELogLevel::ALL, logpath);
+		static Core::CFileLogger writer = Core::CFileLogger(Core::ELogLevel::ALL, logpath);
 #else
-		static CFileLogger writer = CFileLogger(ELogLevel::INFO, logpath);
+		static Core::CFileLogger writer = Core::CFileLogger(Core::ELogLevel::INFO, logpath);
 #endif
-		CLogApi::Get()->Register(&writer);
+		Core::CLogApi::Get()->Register(&writer);
 
-		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Normal, [](Clockwork::CancellationToken aToken)
+		Clockwork::Run<void>(Clockwork::ETaskPriority::Normal, [](Clockwork::CancellationToken aToken)
 		{
-			CContext* ctx = CContext::GetContext();
-			CLibraryMgr* libmgr = ctx->GetAddonLibrary();
+			GW2::CContext* ctx = GW2::CContext::GetContext();
+			GW2::CLibraryMgr* libmgr = ctx->GetAddonLibrary();
 			libmgr->AddSource("https://api.raidcore.gg/addonlibrary");
 			libmgr->AddSource("https://api.raidcore.gg/arcdpslibrary");
 			libmgr->Update();
 		});
 
 		/* Prefetch game build. */
-		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Immediate, [](Clockwork::CancellationToken aToken)
+		Clockwork::Run<void>(Clockwork::ETaskPriority::Immediate, [](Clockwork::CancellationToken aToken)
 		{
 			GW2::GetGameBuild();
 		});
 
-		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [](Clockwork::CancellationToken aToken)
+		Clockwork::Run<void>(Clockwork::ETaskPriority::Low, [](Clockwork::CancellationToken aToken)
 		{
-			Multibox::KillMutex();
-			LogInfo(CH_CORE, "Multibox State: %d", Multibox::GetState());
+			GW2::Multibox::KillMutex();
+			Core::LogInfo(GW2::CH_CORE, "Multibox State: %d", GW2::Multibox::GetState());
 		});
 	}
 
@@ -202,11 +201,11 @@ namespace Main
 			}
 		}
 
-		CContext*       ctx    = CContext::GetContext();
-		CUiContext*     uictx  = ctx->GetUIContext();
-		CTextureLoader* texapi = ctx->GetTextureService();
+		GW2::CContext*       ctx    = GW2::CContext::GetContext();
+		UI::CUiContext*     uictx  = ctx->GetUIContext();
+		UI::CTextureLoader* texapi = ctx->GetTextureService();
 
-		LogCritical(CH_CORE, "SHUTDOWN BEGIN | %s", reasonStr.c_str());
+		Core::LogCritical(GW2::CH_CORE, "SHUTDOWN BEGIN | %s", reasonStr.c_str());
 
 		/* Disabled, not uninitialized: the render thread may still be inside a hook. */
 		MH_DisableHook(MH_ALL_HOOKS);
@@ -228,7 +227,7 @@ namespace Main
 		uictx->GetFontManager()->InvalidateDeviceObjects();
 		texapi->Shutdown();
 
-		LogInfo(CH_CORE, "SHUTDOWN END");
+		Core::LogInfo(GW2::CH_CORE, "SHUTDOWN END");
 
 		/* Let the OS take care of freeing the handles. Ugly, but otherwise crashes due to the addon clownfiesta in GW2. */
 		//if (D3D11Handle) { FreeLibrary(D3D11Handle); }

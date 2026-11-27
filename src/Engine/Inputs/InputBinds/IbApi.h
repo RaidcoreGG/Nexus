@@ -23,15 +23,15 @@
 #include "IbCapture.h"
 #include "IbMapping.h"
 
-namespace Engine::Input
+namespace Raidcore::Engine::Input
 {
 	///----------------------------------------------------------------------------------------------------
 	/// CInputBindApi Class
 	///----------------------------------------------------------------------------------------------------
 	class CInputBindApi
-		: public ILogChannel
+		: public Core::ILogChannel
 		, public CInputBindCapture
-		, public virtual IRefCleaner
+		, public virtual Engine::IRefCleaner
 		, public IWndProcNotifyHandler
 		, public IInputBindUpdateNotifier
 	{
@@ -39,7 +39,7 @@ namespace Engine::Input
 		///----------------------------------------------------------------------------------------------------
 		/// ctor
 		///----------------------------------------------------------------------------------------------------
-		CInputBindApi(CEventApi* aEventApi, std::filesystem::path aConfigPath);
+		CInputBindApi(Engine::CEventApi* aEventApi, std::filesystem::path aConfigPath);
 
 		///----------------------------------------------------------------------------------------------------
 		/// dtor
@@ -129,7 +129,7 @@ namespace Engine::Input
 		std::map<std::string, IbMapping_t> GetRegistry() const;
 
 		private:
-		CEventApi* EventApi = nullptr;
+		Engine::CEventApi* EventApi = nullptr;
 
 		std::filesystem::path              ConfigPath;
 

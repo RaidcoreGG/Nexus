@@ -17,82 +17,85 @@
 
 #include "ApiV2.h"
 
-typedef void (*EVENTS_RAISE_TARGETED)            (uint32_t aSignature, const char* aIdentifier, void* aEventData);
-typedef void (*EVENTS_RAISENOTIFICATION_TARGETED)(uint32_t aSignature, const char* aIdentifier);
-
-typedef void (*ALERTS_NOTIFY)(const char* aMessage);
-
-///----------------------------------------------------------------------------------------------------
-/// AddonAPI3_t Struct
-///----------------------------------------------------------------------------------------------------
-struct AddonAPI3_t : AddonAPI_t
+namespace Raidcore::GW2
 {
-	/* Renderer */
-	IDXGISwapChain*                   SwapChain;
-	ImGuiContext*                     ImguiContext;
-	void*                             ImguiMalloc;
-	void*                             ImguiFree;
-	GUI_ADDRENDER                     RegisterRender;
-	GUI_REMRENDER                     DeregisterRender;
+	typedef void (*EVENTS_RAISE_TARGETED)            (uint32_t aSignature, const char* aIdentifier, void* aEventData);
+	typedef void (*EVENTS_RAISENOTIFICATION_TARGETED)(uint32_t aSignature, const char* aIdentifier);
 
-	/* Paths */
-	IDX_GETGAMEDIR                    GetGameDirectory;
-	IDX_GETADDONDIR                   GetAddonDirectory;
-	IDX_GETCOMMONDIR                  GetCommonDirectory;
+	typedef void (*ALERTS_NOTIFY)(const char* aMessage);
 
-	/* Minhook */
-	MINHOOK_CREATE                    CreateHook;
-	MINHOOK_REMOVE                    RemoveHook;
-	MINHOOK_ENABLE                    EnableHook;
-	MINHOOK_DISABLE                   DisableHook;
+	///----------------------------------------------------------------------------------------------------
+	/// AddonAPI3_t Struct
+	///----------------------------------------------------------------------------------------------------
+	struct AddonAPI3_t : AddonAPI_t
+	{
+		/* Renderer */
+		IDXGISwapChain*                   SwapChain;
+		ImGuiContext*                     ImguiContext;
+		void*                             ImguiMalloc;
+		void*                             ImguiFree;
+		GUI_ADDRENDER                     RegisterRender;
+		GUI_REMRENDER                     DeregisterRender;
 
-	/* Logging */
-	LOGGER_LOG2                       Log;
+		/* Paths */
+		IDX_GETGAMEDIR                    GetGameDirectory;
+		IDX_GETADDONDIR                   GetAddonDirectory;
+		IDX_GETCOMMONDIR                  GetCommonDirectory;
 
-	/* GUI Alerts */
-	ALERTS_NOTIFY                     SendAlert;
+		/* Minhook */
+		MINHOOK_CREATE                    CreateHook;
+		MINHOOK_REMOVE                    RemoveHook;
+		MINHOOK_ENABLE                    EnableHook;
+		MINHOOK_DISABLE                   DisableHook;
 
-	/* Events */
-	EVENTS_RAISE                      RaiseEvent;
-	EVENTS_RAISENOTIFICATION          RaiseEventNotification;
-	EVENTS_RAISE_TARGETED             RaiseEventTargeted;
-	EVENTS_RAISENOTIFICATION_TARGETED RaiseEventNotificationTargeted;
-	EVENTS_SUBSCRIBE                  SubscribeEvent;
-	EVENTS_SUBSCRIBE                  UnsubscribeEvent;
+		/* Logging */
+		LOGGER_LOG2                       Log;
 
-	/* WndProc */
-	WNDPROC_ADDREM                    RegisterWndProc;
-	WNDPROC_ADDREM                    DeregisterWndProc;
-	WNDPROC_SENDTOGAME                SendWndProcToGameOnly;
+		/* GUI Alerts */
+		ALERTS_NOTIFY                     SendAlert;
 
-	/* InputBinds */
-	INPUTBINDS_REGISTERWITHSTRING     RegisterInputBindWithString;
-	INPUTBINDS_REGISTERWITHSTRUCT     RegisterInputBindWithStruct;
-	INPUTBINDS_DEREGISTER             DeregisterInputBind;
+		/* Events */
+		EVENTS_RAISE                      RaiseEvent;
+		EVENTS_RAISENOTIFICATION          RaiseEventNotification;
+		EVENTS_RAISE_TARGETED             RaiseEventTargeted;
+		EVENTS_RAISENOTIFICATION_TARGETED RaiseEventNotificationTargeted;
+		EVENTS_SUBSCRIBE                  SubscribeEvent;
+		EVENTS_SUBSCRIBE                  UnsubscribeEvent;
 
-	/* DataLink */
-	DATALINK_GETRESOURCE              GetResource;
-	DATALINK_SHARERESOURCE            ShareResource;
+		/* WndProc */
+		WNDPROC_ADDREM                    RegisterWndProc;
+		WNDPROC_ADDREM                    DeregisterWndProc;
+		WNDPROC_SENDTOGAME                SendWndProcToGameOnly;
 
-	/* Textures */
-	TEXTURES_GET                      GetTexture;
-	TEXTURES_GETORCREATEFROMFILE      GetTextureOrCreateFromFile;
-	TEXTURES_GETORCREATEFROMRESOURCE  GetTextureOrCreateFromResource;
-	TEXTURES_GETORCREATEFROMURL       GetTextureOrCreateFromURL;
-	TEXTURES_GETORCREATEFROMMEMORY    GetTextureOrCreateFromMemory;
-	TEXTURES_LOADFROMFILE             LoadTextureFromFile;
-	TEXTURES_LOADFROMRESOURCE         LoadTextureFromResource;
-	TEXTURES_LOADFROMURL              LoadTextureFromURL;
-	TEXTURES_LOADFROMMEMORY           LoadTextureFromMemory;
+		/* InputBinds */
+		INPUTBINDS_REGISTERWITHSTRING     RegisterInputBindWithString;
+		INPUTBINDS_REGISTERWITHSTRUCT     RegisterInputBindWithStruct;
+		INPUTBINDS_DEREGISTER             DeregisterInputBind;
 
-	/* Shortcuts */
-	QUICKACCESS_ADDSHORTCUT           AddShortcut;
-	QUICKACCESS_GENERIC               RemoveShortcut;
-	QUICKACCESS_GENERIC               PushNotification;
-	QUICKACCESS_ADDSIMPLE             AddSimpleShortcut;
-	QUICKACCESS_GENERIC               RemoveSimpleShortcut;
+		/* DataLink */
+		DATALINK_GETRESOURCE              GetResource;
+		DATALINK_SHARERESOURCE            ShareResource;
 
-	/* Localization */
-	LOCALIZATION_TRANSLATE            Translate;
-	LOCALIZATION_TRANSLATETO          TranslateTo;
-};
+		/* Textures */
+		TEXTURES_GET                      GetTexture;
+		TEXTURES_GETORCREATEFROMFILE      GetTextureOrCreateFromFile;
+		TEXTURES_GETORCREATEFROMRESOURCE  GetTextureOrCreateFromResource;
+		TEXTURES_GETORCREATEFROMURL       GetTextureOrCreateFromURL;
+		TEXTURES_GETORCREATEFROMMEMORY    GetTextureOrCreateFromMemory;
+		TEXTURES_LOADFROMFILE             LoadTextureFromFile;
+		TEXTURES_LOADFROMRESOURCE         LoadTextureFromResource;
+		TEXTURES_LOADFROMURL              LoadTextureFromURL;
+		TEXTURES_LOADFROMMEMORY           LoadTextureFromMemory;
+
+		/* Shortcuts */
+		QUICKACCESS_ADDSHORTCUT           AddShortcut;
+		QUICKACCESS_GENERIC               RemoveShortcut;
+		QUICKACCESS_GENERIC               PushNotification;
+		QUICKACCESS_ADDSIMPLE             AddSimpleShortcut;
+		QUICKACCESS_GENERIC               RemoveSimpleShortcut;
+
+		/* Localization */
+		LOCALIZATION_TRANSLATE            Translate;
+		LOCALIZATION_TRANSLATETO          TranslateTo;
+	};
+}

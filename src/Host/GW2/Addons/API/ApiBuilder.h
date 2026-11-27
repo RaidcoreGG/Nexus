@@ -21,12 +21,10 @@
 #include "UI/Textures/TxQueueEntry.h"
 #include "UI/UiRender.h"
 
-namespace Input = Engine::Input;
-
 ///----------------------------------------------------------------------------------------------------
-/// ADDONAPI Namespace
+/// Raidcore::GW2::API Namespace
 ///----------------------------------------------------------------------------------------------------
-namespace ADDONAPI
+namespace Raidcore::GW2::API
 {
 	///----------------------------------------------------------------------------------------------------
 	/// DataLink Namespace
@@ -55,13 +53,13 @@ namespace ADDONAPI
 		/// Subscribe:
 		/// 	Addon API wrapper function for subscribing to events.
 		///----------------------------------------------------------------------------------------------------
-		void Subscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
+		void Subscribe(const char* aIdentifier, Engine::EVENT_CONSUME aConsumeEventCallback);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Unsubscribe:
 		/// 	Addon API wrapper function for unsubscribing from events.
 		///----------------------------------------------------------------------------------------------------
-		void Unsubscribe(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
+		void Unsubscribe(const char* aIdentifier, Engine::EVENT_CONSUME aConsumeEventCallback);
 
 		///----------------------------------------------------------------------------------------------------
 		/// RaiseEvent:
@@ -170,25 +168,25 @@ namespace ADDONAPI
 		/// RegisterWithString:
 		/// 	[Revision 1] Addon API wrapper function for Register from string.
 		///----------------------------------------------------------------------------------------------------
-		void RegisterWithString(const char* aIdentifier, Input::IB_CALLBACK_V1 aInputBindHandler, const char* aInputBind);
+		void RegisterWithString(const char* aIdentifier, Engine::Input::IB_CALLBACK_V1 aInputBindHandler, const char* aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// RegisterWithStruct:
 		/// 	[Revision 1] Addon API wrapper function for Register from struct.
 		///----------------------------------------------------------------------------------------------------
-		void RegisterWithStruct(const char* aIdentifier, Input::IB_CALLBACK_V1 aInputBindHandler, InputBindV1_t aInputBind);
+		void RegisterWithStruct(const char* aIdentifier, Engine::Input::IB_CALLBACK_V1 aInputBindHandler, InputBindV1_t aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// RegisterWithString:
 		/// 	[Revision 2] Addon API wrapper function for Register from string.
 		///----------------------------------------------------------------------------------------------------
-		void RegisterWithString2(const char* aIdentifier, Input::IB_CALLBACK_V2 aInputBindHandler, const char* aInputBind);
+		void RegisterWithString2(const char* aIdentifier, Engine::Input::IB_CALLBACK_V2 aInputBindHandler, const char* aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// RegisterWithStruct:
 		/// 	[Revision 2] Addon API wrapper function for Register from struct.
 		///----------------------------------------------------------------------------------------------------
-		void RegisterWithStruct2(const char* aIdentifier, Input::IB_CALLBACK_V2 aInputBindHandler, InputBindV1_t aInputBind);
+		void RegisterWithStruct2(const char* aIdentifier, Engine::Input::IB_CALLBACK_V2 aInputBindHandler, InputBindV1_t aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// InvokeInputBind:
@@ -212,13 +210,13 @@ namespace ADDONAPI
 		/// Register:
 		/// 	Registers the provided WndProcCallback.
 		///----------------------------------------------------------------------------------------------------
-		void Register(WNDPROC_CALLBACK aWndProcCallback);
+		void Register(Engine::Input::WNDPROC_CALLBACK aWndProcCallback);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Deregister:
 		/// 	Deregisters the provided WndProcCallback.
 		///----------------------------------------------------------------------------------------------------
-		void Deregister(WNDPROC_CALLBACK aWndProcCallback);
+		void Deregister(Engine::Input::WNDPROC_CALLBACK aWndProcCallback);
 	}
 
 	///----------------------------------------------------------------------------------------------------
@@ -254,13 +252,13 @@ namespace ADDONAPI
 		/// LogMessage:
 		/// 	[Revision 1] Logs a message.
 		///----------------------------------------------------------------------------------------------------
-		void LogMessage(ELogLevel aLogLevel, const char* aStr);
+		void LogMessage(Core::ELogLevel aLogLevel, const char* aStr);
 
 		///----------------------------------------------------------------------------------------------------
 		/// LogMessage2:
 		/// 	[Revision 2] Logs a message with a custom channel.
 		///----------------------------------------------------------------------------------------------------
-		void LogMessage2(ELogLevel aLogLevel, const char* aChannel, const char* aStr);
+		void LogMessage2(Core::ELogLevel aLogLevel, const char* aChannel, const char* aStr);
 	}
 
 	///----------------------------------------------------------------------------------------------------
@@ -272,55 +270,55 @@ namespace ADDONAPI
 		/// Get:
 		/// 	Addon API wrapper function for Get.
 		///----------------------------------------------------------------------------------------------------
-		Texture_t* Get(const char* aIdentifier);
+		UI::Texture_t* Get(const char* aIdentifier);
 
 		///----------------------------------------------------------------------------------------------------
 		/// GetOrCreateFromFile:
 		/// 	Addon API wrapper function for GetOrCreate from file.
 		///----------------------------------------------------------------------------------------------------
-		Texture_t* GetOrCreateFromFile(const char* aIdentifier, const char* aFilename);
+		UI::Texture_t* GetOrCreateFromFile(const char* aIdentifier, const char* aFilename);
 
 		///----------------------------------------------------------------------------------------------------
 		/// GetOrCreateFromResource:
 		/// 	Addon API wrapper function for GetOrCreate from embedded resource.
 		///----------------------------------------------------------------------------------------------------
-		Texture_t* GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule);
+		UI::Texture_t* GetOrCreateFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule);
 
 		///----------------------------------------------------------------------------------------------------
 		/// GetOrCreateFromURL:
 		/// 	Addon API wrapper function for GetOrCreate from remote URL.
 		///----------------------------------------------------------------------------------------------------
-		Texture_t* GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint);
+		UI::Texture_t* GetOrCreateFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint);
 
 		///----------------------------------------------------------------------------------------------------
 		/// GetOrCreateFromMemory:
 		/// 	Addon API wrapper function for GetOrCreate from memory.
 		///----------------------------------------------------------------------------------------------------
-		Texture_t* GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize);
+		UI::Texture_t* GetOrCreateFromMemory(const char* aIdentifier, void* aData, size_t aSize);
 
 		///----------------------------------------------------------------------------------------------------
 		/// LoadFromFile:
 		/// 	Addon API wrapper function for LoadFromFile.
 		///----------------------------------------------------------------------------------------------------
-		void LoadFromFile(const char* aIdentifier, const char* aFilename, TEXTURES_RECEIVECALLBACK aCallback);
+		void LoadFromFile(const char* aIdentifier, const char* aFilename, UI::TEXTURES_RECEIVECALLBACK aCallback);
 
 		///----------------------------------------------------------------------------------------------------
 		/// LoadFromResource:
 		/// 	Addon API wrapper function for LoadFromResource.
 		///----------------------------------------------------------------------------------------------------
-		void LoadFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, TEXTURES_RECEIVECALLBACK aCallback);
+		void LoadFromResource(const char* aIdentifier, unsigned aResourceID, HMODULE aModule, UI::TEXTURES_RECEIVECALLBACK aCallback);
 
 		///----------------------------------------------------------------------------------------------------
 		/// LoadFromURL:
 		/// 	Addon API wrapper function for LoadFromURL.
 		///----------------------------------------------------------------------------------------------------
-		void LoadFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint, TEXTURES_RECEIVECALLBACK aCallback);
+		void LoadFromURL(const char* aIdentifier, const char* aRemote, const char* aEndpoint, UI::TEXTURES_RECEIVECALLBACK aCallback);
 
 		///----------------------------------------------------------------------------------------------------
 		/// LoadFromMemory:
 		/// 	Addon API wrapper function for LoadFromMemory.
 		///----------------------------------------------------------------------------------------------------
-		void LoadFromMemory(const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback);
+		void LoadFromMemory(const char* aIdentifier, void* aData, size_t aSize, UI::TEXTURES_RECEIVECALLBACK aCallback);
 	}
 
 	///----------------------------------------------------------------------------------------------------
@@ -337,22 +335,22 @@ namespace ADDONAPI
 
 	namespace UIRoot::GUI
 	{
-		void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback);
+		void Register(UI::ERenderType aRenderType, UI::GUI_RENDER aRenderCallback);
 
-		void Deregister(GUI_RENDER aRenderCallback);
+		void Deregister(UI::GUI_RENDER aRenderCallback);
 	}
 
 	namespace UIRoot::Fonts
 	{
-		void Get(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback);
+		void Get(const char* aIdentifier, UI::FONTS_RECEIVECALLBACK aCallback);
 
-		void Release(const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback);
+		void Release(const char* aIdentifier, UI::FONTS_RECEIVECALLBACK aCallback);
 
-		void AddFontFromFile(const char* aIdentifier, float aFontSize, const char* aFilename, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
+		void AddFontFromFile(const char* aIdentifier, float aFontSize, const char* aFilename, UI::FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
 
-		void AddFontFromResource(const char* aIdentifier, float aFontSize, unsigned aResourceID, HMODULE aModule, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
+		void AddFontFromResource(const char* aIdentifier, float aFontSize, unsigned aResourceID, HMODULE aModule, UI::FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
 
-		void AddFontFromMemory(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
+		void AddFontFromMemory(const char* aIdentifier, float aFontSize, void* aData, size_t aSize, UI::FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);
 
 		void ResizeFont(const char* aIdentifier, float aFontSize);
 	}
@@ -372,9 +370,9 @@ namespace ADDONAPI
 
 		void SetNotificationShortcut(const char* aIdentifier, bool aState);
 
-		void AddContextItem(const char* aIdentifier, GUI_RENDER aShortcutRenderCallback);
+		void AddContextItem(const char* aIdentifier, UI::GUI_RENDER aShortcutRenderCallback);
 
-		void AddContextItem2(const char* aIdentifier, const char* aTargetShortcutIdentifier, GUI_RENDER aShortcutRenderCallback);
+		void AddContextItem2(const char* aIdentifier, const char* aTargetShortcutIdentifier, UI::GUI_RENDER aShortcutRenderCallback);
 
 		void RemoveContextItem(const char* aIdentifier);
 	}

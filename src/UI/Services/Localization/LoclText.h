@@ -8,49 +8,52 @@
 
 #pragma once
 
-///----------------------------------------------------------------------------------------------------
-/// CText Class
-/// 	A display string, identified by its key (e.g. "Common.Accept"). The Lang:: constants are CText.
-/// 	Default constructed it is empty: no text.
-///----------------------------------------------------------------------------------------------------
-class CText
+namespace Raidcore::UI
 {
-	public:
 	///----------------------------------------------------------------------------------------------------
-	/// ctor
+	/// CText Class
+	/// 	A display string, identified by its key (e.g. "Common.Accept"). The Raidcore::Lang:: constants are CText.
+	/// 	Default constructed it is empty: no text.
 	///----------------------------------------------------------------------------------------------------
-	constexpr CText() = default;
-
-	///----------------------------------------------------------------------------------------------------
-	/// ctor
-	///----------------------------------------------------------------------------------------------------
-	constexpr explicit CText(const char* aKey)
-		: KeyStr(aKey)
-	{}
-
-	///----------------------------------------------------------------------------------------------------
-	/// Text:
-	/// 	Returns the text in the active language, else English, else the key. "" if empty.
-	///----------------------------------------------------------------------------------------------------
-	const char* Text() const;
-
-	///----------------------------------------------------------------------------------------------------
-	/// Key:
-	/// 	Returns the key, e.g. "Common.Accept", for APIs that take keys. nullptr if empty.
-	///----------------------------------------------------------------------------------------------------
-	constexpr const char* Key() const
+	class CText
 	{
-		return this->KeyStr;
-	}
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		constexpr CText() = default;
 
-	constexpr bool IsEmpty() const
-	{
-		return this->KeyStr == nullptr;
-	}
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		constexpr explicit CText(const char* aKey)
+			: KeyStr(aKey)
+		{}
 
-	private:
-	const char* KeyStr = nullptr;
-};
+		///----------------------------------------------------------------------------------------------------
+		/// Text:
+		/// 	Returns the text in the active language, else English, else the key. "" if empty.
+		///----------------------------------------------------------------------------------------------------
+		const char* Text() const;
 
-/* Generated from res/Locales/en/DisplayStrings.json: the Lang::Area::Name constants. Needs CText above. */
+		///----------------------------------------------------------------------------------------------------
+		/// Key:
+		/// 	Returns the key, e.g. "Common.Accept", for APIs that take keys. nullptr if empty.
+		///----------------------------------------------------------------------------------------------------
+		constexpr const char* Key() const
+		{
+			return this->KeyStr;
+		}
+
+		constexpr bool IsEmpty() const
+		{
+			return this->KeyStr == nullptr;
+		}
+
+		private:
+		const char* KeyStr = nullptr;
+	};
+}
+
+/* Generated from res/Locales/en/DisplayStrings.json: the Raidcore::Lang::Area::Name constants. Needs CText above. */
 #include "LoclTextIds.h"

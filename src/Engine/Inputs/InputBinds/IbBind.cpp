@@ -8,7 +8,7 @@
 
 #include "IbBind.h"
 
-namespace Engine::Input
+namespace Raidcore::Engine::Input
 {
 	bool Bind_t::IsBound() const
 	{

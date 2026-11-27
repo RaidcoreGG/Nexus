@@ -12,7 +12,7 @@
 
 #include "IbBind.h"
 
-namespace Engine::Input
+namespace Raidcore::Engine::Input
 {
 	///----------------------------------------------------------------------------------------------------
 	/// IBFromString:

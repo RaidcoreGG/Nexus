@@ -18,51 +18,54 @@
 #include "Core/Logging/LogMsg.h"
 #include "UI/Controls/CtlSubWindow.h"
 
-class CLogWindow : public virtual ISubWindow, public virtual ILogger
+namespace Raidcore::UI
 {
-	public:
-	CLogWindow();
-	void RenderContent() override;
-
-	///----------------------------------------------------------------------------------------------------
-	/// MsgProc:
-	/// 	Message processing function.
-	///----------------------------------------------------------------------------------------------------
-	void MsgProc(const LogMsg_t* aLogEntry) override;
-
-	private:
-	enum class EMessagePartType {
-		None,
-		Text,
-		ColorPush,
-		ColorPop,
-		LineBreak
-	};
-
-	struct MessagePart_t
+	class CLogWindow : public virtual UI::ISubWindow, public virtual Core::ILogger
 	{
-		EMessagePartType Type;
-		std::string      Text;
-		ImVec4           Color;
+		public:
+		CLogWindow();
+		void RenderContent() override;
+
+		///----------------------------------------------------------------------------------------------------
+		/// MsgProc:
+		/// 	Message processing function.
+		///----------------------------------------------------------------------------------------------------
+		void MsgProc(const Core::LogMsg_t* aLogEntry) override;
+
+		private:
+		enum class EMessagePartType {
+			None,
+			Text,
+			ColorPush,
+			ColorPop,
+			LineBreak
+		};
+
+		struct MessagePart_t
+		{
+			EMessagePartType Type;
+			std::string      Text;
+			ImVec4           Color;
+		};
+
+		struct DisplayLogEntry_t
+		{
+			const Core::LogMsg_t*            Entry = nullptr;
+			std::vector<MessagePart_t> Parts;
+		};
+
+		struct LogChannel_t
+		{
+			bool        IsSelected;
+			std::string Name;
+		};
+
+		int                             MaxShownCount     = 400;
+		Core::ELogLevel                       FilterLevel       = Core::ELogLevel::ALL;
+		bool                            SelectedLevelOnly = false;
+
+		std::mutex                      Mutex;
+		std::vector<DisplayLogEntry_t*> LogEntries;
+		std::vector<LogChannel_t>       Channels;
 	};
-
-	struct DisplayLogEntry_t
-	{
-		const LogMsg_t*            Entry = nullptr;
-		std::vector<MessagePart_t> Parts;
-	};
-
-	struct LogChannel_t
-	{
-		bool        IsSelected;
-		std::string Name;
-	};
-
-	int                             MaxShownCount     = 400;
-	ELogLevel                       FilterLevel       = ELogLevel::ALL;
-	bool                            SelectedLevelOnly = false;
-
-	std::mutex                      Mutex;
-	std::vector<DisplayLogEntry_t*> LogEntries;
-	std::vector<LogChannel_t>       Channels;
-};
+}

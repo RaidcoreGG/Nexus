@@ -13,15 +13,18 @@
 #include "Host/GW2/Addons/API/NexusLink.h"
 #include "UI/Controls/CtlWindow.h"
 
-class CMumbleOverlay : public virtual IWindow
+namespace Raidcore::UI
 {
-	public:
-	CMumbleOverlay();
+	class CMumbleOverlay : public virtual UI::IWindow
+	{
+		public:
+		CMumbleOverlay();
 
-	void Render() override;
+		void Render() override;
 
-	private:
-	Mumble::Data*     MumbleLink;
-	Mumble::Identity* MumbleIdentity;
-	NexusLinkData_t*    NexusLink;
-};
+		private:
+		Mumble::Data*     MumbleLink;
+		Mumble::Identity* MumbleIdentity;
+		GW2::NexusLinkData_t*    NexusLink;
+	};
+}

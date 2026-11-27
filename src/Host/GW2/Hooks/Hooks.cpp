@@ -30,7 +30,7 @@
 #include "UI/Textures/TxLoader.h"
 #include "UI/UiContext.h"
 
-namespace Hooks
+namespace Raidcore::GW2::Hooks
 {
 	///----------------------------------------------------------------------------------------------------
 	/// CDxgiNotifier Class
@@ -56,7 +56,7 @@ namespace Hooks
 	/// CWndProcNotifier Class
 	/// 	Source of the window message notification raised by the window procedure detour.
 	///----------------------------------------------------------------------------------------------------
-	class CWndProcNotifier : public IWndProcNotifier
+	class CWndProcNotifier : public Engine::Input::IWndProcNotifier
 	{
 		public:
 		UINT WndProc(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam)
@@ -120,7 +120,7 @@ namespace Hooks
 		{
 			UnregisterClassA(wc.lpszClassName, wc.hInstance);
 
-			LogCritical(CH_CORE, "Failed creating temporary window.");
+			Core::LogCritical(GW2::CH_CORE, "Failed creating temporary window.");
 			return;
 		}
 
@@ -151,11 +151,11 @@ namespace Hooks
 			LPVOID* vtbl1 = swap1 ? *reinterpret_cast<LPVOID**>(swap1) : nullptr;
 			LPVOID* vtbl3 = swap3 ? *reinterpret_cast<LPVOID**>(swap3) : nullptr;
 
-			LogDebug(CH_CORE, "HOOK BEGIN");
+			Core::LogDebug(GW2::CH_CORE, "HOOK BEGIN");
 
 			/* Create and enable VT hooks. */
 			/* Follow the jump chain to work nicely with various other hooks. */
-			
+
 			if (vtbl)
 			{
 				MH_CreateHook(FollowJmpChain((PBYTE)vtbl[8]), (LPVOID)&Detour::DXGIPresent, (LPVOID*)&Target::DXGIPresent);
@@ -176,7 +176,7 @@ namespace Hooks
 
 			MH_EnableHook(MH_ALL_HOOKS);
 
-			LogDebug(CH_CORE, "HOOK END");
+			Core::LogDebug(GW2::CH_CORE, "HOOK END");
 
 			/* Release the temporary interfaces. */
 			context->Release();
@@ -185,7 +185,7 @@ namespace Hooks
 		}
 		else
 		{
-			LogCritical(CH_CORE, "Failed to create D3D11 device and swapchain.");
+			Core::LogCritical(GW2::CH_CORE, "Failed to create D3D11 device and swapchain.");
 		}
 
 		/* Destroy the temporary window. */
@@ -203,12 +203,12 @@ namespace Hooks
 	{
 		LRESULT __stdcall WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
-			static CContext* s_Context = CContext::GetContext();
+			static GW2::CContext* s_Context = GW2::CContext::GetContext();
 
 			/* Created here, so they are subscribed before the first message is notified. */
-			static CRawInputApi*   s_RawInputApi   = s_Context->GetRawInputApi();
-			static CGameBindsApi*  s_GameBindsApi  = s_Context->GetGameBindsApi();
-			static CMouseResetFix* s_MouseResetFix = s_Context->GetMouseResetFix();
+			static Engine::Input::CRawInputApi*   s_RawInputApi   = s_Context->GetRawInputApi();
+			static GW2::CGameBindsApi*  s_GameBindsApi  = s_Context->GetGameBindsApi();
+			static GW2::CMouseResetFix* s_MouseResetFix = s_Context->GetMouseResetFix();
 
 			if (s_WndProcNotifier.WndProc(hWnd, uMsg, wParam, lParam) == NOTIFY_CONSUMED) { return 0; }
 
@@ -217,14 +217,14 @@ namespace Hooks
 
 		HRESULT __stdcall DXGIPresent(IDXGISwapChain* pChain, UINT SyncInterval, UINT Flags)
 		{
-			static CContext* s_Context = CContext::GetContext();
+			static GW2::CContext* s_Context = GW2::CContext::GetContext();
 
 			/* Created here, so they are subscribed before the first present is notified. The event router
 			 * comes before the game window, which starts loading addons. */
-			static CEventRouter* s_EventRouter = s_Context->GetEventRouter();
+			static GW2::CEventRouter* s_EventRouter = s_Context->GetEventRouter();
 			static CGameWindow* s_GameWindow = s_Context->GetGameWindow();
-			static CTextureLoader* s_TextureLoader = s_Context->GetTextureService();
-			static CUiContext* s_UIContext = s_Context->GetUIContext();
+			static UI::CTextureLoader* s_TextureLoader = s_Context->GetTextureService();
+			static UI::CUiContext* s_UIContext = s_Context->GetUIContext();
 
 			s_DxgiNotifier.Present(pChain);
 
@@ -234,7 +234,7 @@ namespace Hooks
 		HRESULT __stdcall DXGIResizeBuffers(IDXGISwapChain* pChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
 		{
 			/* The game may resize before its first present. */
-			static CGameWindow* s_GameWindow = CContext::GetContext()->GetGameWindow();
+			static CGameWindow* s_GameWindow = GW2::CContext::GetContext()->GetGameWindow();
 
 			s_DxgiNotifier.Resize(pChain, Width, Height);
 

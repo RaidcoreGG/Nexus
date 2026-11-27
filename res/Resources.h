@@ -11,11 +11,11 @@
 #include "Core/Platform/Windows/Exe/ExePackFile.h"
 
 ///----------------------------------------------------------------------------------------------------
-/// Resources Namespace
+/// Raidcore::Resources Namespace
 ///----------------------------------------------------------------------------------------------------
-namespace Resources
+namespace Raidcore::Resources
 {
-#define PACK_FILE(name, type, path) inline constexpr Raidcore::Core::Platform::Windows::CPackFile name{ #name, Raidcore::Core::Platform::Windows::EPackFileType::type };
+#define PACK_FILE(name, type, path) inline constexpr Raidcore::Core::Windows::CPackFile name{ #name, Raidcore::Core::Windows::EPackFileType::type };
 #include "Resources.inc"
 #undef PACK_FILE
 }

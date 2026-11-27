@@ -10,50 +10,53 @@
 
 #include "Host/GW2/Context.h"
 
-CImportStyleModal::CImportStyleModal()
+namespace Raidcore::UI
 {
-	this->SetID("ImportStyleModal");
-	this->SetDisplayName(Lang::Options::StyleImportPresetTitle);
-	memset(this->DataBuffer, 0, sizeof(this->DataBuffer));
-}
-
-void CImportStyleModal::RenderContent()
-{
-	ImGui::InputTextWithHint("##InputStyleCode", Lang::Options::StyleEditor::Code.Text(), this->DataBuffer, sizeof(this->DataBuffer));
-
-	if (ImGui::Button(Lang::Common::Apply.Text()))
+	CImportStyleModal::CImportStyleModal()
 	{
-		this->SetResult(EModalResult::OK);
+		this->SetID("ImportStyleModal");
+		this->SetDisplayName(Lang::Options::StyleImportPresetTitle);
+		memset(this->DataBuffer, 0, sizeof(this->DataBuffer));
 	}
 
-	ImGui::SameLine();
-
-	if (ImGui::Button(Lang::Common::Cancel.Text()))
+	void CImportStyleModal::RenderContent()
 	{
-		this->SetResult(EModalResult::Cancel);
-	}
-}
+		ImGui::InputTextWithHint("##InputStyleCode", Lang::Options::StyleEditor::Code.Text(), this->DataBuffer, sizeof(this->DataBuffer));
 
-void CImportStyleModal::OnClosing()
-{
-	switch (this->GetResult())
-	{
-		case EModalResult::OK:
+		if (ImGui::Button(Lang::Common::Apply.Text()))
 		{
-			CContext* ctx = CContext::GetContext();
-			CUiContext* uictx = ctx->GetUIContext();
-
-			uictx->ApplyStyle(EUIStyle::Code, this->DataBuffer);
-
-			/* Reset data. */
-			memset(this->DataBuffer, 0, sizeof(this->DataBuffer));
-			break;
+			this->SetResult(UI::EModalResult::OK);
 		}
-		case EModalResult::Cancel:
+
+		ImGui::SameLine();
+
+		if (ImGui::Button(Lang::Common::Cancel.Text()))
 		{
-			/* Reset data. */
-			memset(this->DataBuffer, 0, sizeof(this->DataBuffer));
-			break;
+			this->SetResult(UI::EModalResult::Cancel);
+		}
+	}
+
+	void CImportStyleModal::OnClosing()
+	{
+		switch (this->GetResult())
+		{
+			case UI::EModalResult::OK:
+			{
+				GW2::CContext* ctx = GW2::CContext::GetContext();
+				UI::CUiContext* uictx = ctx->GetUIContext();
+
+				uictx->ApplyStyle(UI::EUIStyle::Code, this->DataBuffer);
+
+				/* Reset data. */
+				memset(this->DataBuffer, 0, sizeof(this->DataBuffer));
+				break;
+			}
+			case UI::EModalResult::Cancel:
+			{
+				/* Reset data. */
+				memset(this->DataBuffer, 0, sizeof(this->DataBuffer));
+				break;
+			}
 		}
 	}
 }

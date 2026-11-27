@@ -12,67 +12,70 @@
 
 #include "LogConst.h"
 
-CFileLogger::CFileLogger(ELogLevel aLogLevel, std::filesystem::path aPath, uint32_t aFlushIntervalMs)
-	: Interval(aFlushIntervalMs > 0 ? aFlushIntervalMs : 1000)
+namespace Raidcore::Core
 {
-	this->SetLogLevel(aLogLevel);
-	this->File.open(aPath, std::ios_base::out, SH_DENYWR);
-
-	if (this->File.is_open())
+	CFileLogger::CFileLogger(ELogLevel aLogLevel, std::filesystem::path aPath, uint32_t aFlushIntervalMs)
+		: Interval(aFlushIntervalMs > 0 ? aFlushIntervalMs : 1000)
 	{
-		this->IsRunning    = true;
-		this->WriterThread = std::thread(&CFileLogger::Flush, this);
-	}
-}
+		this->SetLogLevel(aLogLevel);
+		this->File.open(aPath, std::ios_base::out, SH_DENYWR);
 
-CFileLogger::~CFileLogger()
-{
-	{
-		const std::lock_guard<std::mutex> lock(this->Mutex);
-		this->IsRunning = false;
+		if (this->File.is_open())
+		{
+			this->IsRunning    = true;
+			this->WriterThread = std::thread(&CFileLogger::Flush, this);
+		}
 	}
 
-	this->ConVar.notify_one();
-
-	if (this->WriterThread.joinable())
+	CFileLogger::~CFileLogger()
 	{
-		this->WriterThread.join();
-	}
+		{
+			const std::lock_guard<std::mutex> lock(this->Mutex);
+			this->IsRunning = false;
+		}
 
-	/* Messages queued between the last write and the join. */
-	this->WriteQueue();
-	this->File.close();
-}
+		this->ConVar.notify_one();
 
-void CFileLogger::MsgProc(const LogMsg_t* aLogEntry)
-{
-	if (!this->IsRunning) { return; }
+		if (this->WriterThread.joinable())
+		{
+			this->WriterThread.join();
+		}
 
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-	this->MsgQueue.push(*aLogEntry);
-	this->ConVar.notify_one();
-}
-
-void CFileLogger::Flush()
-{
-	while (this->IsRunning)
-	{
-		std::unique_lock<std::mutex> lock(this->Mutex);
-		this->ConVar.wait_for(lock, std::chrono::milliseconds(this->Interval), [this] {
-			return !this->MsgQueue.empty() || !this->IsRunning;
-		});
-
+		/* Messages queued between the last write and the join. */
 		this->WriteQueue();
+		this->File.close();
 	}
-}
 
-void CFileLogger::WriteQueue()
-{
-	while (!this->MsgQueue.empty())
+	void CFileLogger::MsgProc(const LogMsg_t* aLogEntry)
 	{
-		this->File << ToString(&this->MsgQueue.front());
-		this->MsgQueue.pop();
+		if (!this->IsRunning) { return; }
+
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+		this->MsgQueue.push(*aLogEntry);
+		this->ConVar.notify_one();
 	}
 
-	this->File.flush();
+	void CFileLogger::Flush()
+	{
+		while (this->IsRunning)
+		{
+			std::unique_lock<std::mutex> lock(this->Mutex);
+			this->ConVar.wait_for(lock, std::chrono::milliseconds(this->Interval), [this] {
+				return !this->MsgQueue.empty() || !this->IsRunning;
+			});
+
+			this->WriteQueue();
+		}
+	}
+
+	void CFileLogger::WriteQueue()
+	{
+		while (!this->MsgQueue.empty())
+		{
+			this->File << ToString(&this->MsgQueue.front());
+			this->MsgQueue.pop();
+		}
+
+		this->File.flush();
+	}
 }

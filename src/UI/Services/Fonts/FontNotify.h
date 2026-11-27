@@ -12,31 +12,34 @@
 
 #include "Engine/Notifier/Notifier.h"
 
-///----------------------------------------------------------------------------------------------------
-/// IFontUpdateNotifyHandler Interface
-///----------------------------------------------------------------------------------------------------
-class IFontUpdateNotifyHandler : public INotifyHandler<IFontUpdateNotifyHandler>
+namespace Raidcore::UI
 {
-	public:
 	///----------------------------------------------------------------------------------------------------
-	/// OnFontUpdateNotify:
-	/// 	Called on the render thread for every font whose pointer changed, for any font, including
-	/// 	addon fonts. First with nullptr before the previous atlases are freed, then with the new font.
+	/// IFontUpdateNotifyHandler Interface
 	///----------------------------------------------------------------------------------------------------
-	virtual void OnFontUpdateNotify(const char* aIdentifier, ImFont* aFont) = 0;
-};
-
-///----------------------------------------------------------------------------------------------------
-/// IFontUpdateNotifier Interface
-///----------------------------------------------------------------------------------------------------
-class IFontUpdateNotifier : public INotifier<IFontUpdateNotifyHandler>
-{
-	protected:
-	void NotifyFontUpdate(const char* aIdentifier, ImFont* aFont)
+	class IFontUpdateNotifyHandler : public Engine::INotifyHandler<IFontUpdateNotifyHandler>
 	{
-		for (const auto& entry : this->Subscribers())
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// OnFontUpdateNotify:
+		/// 	Called on the render thread for every font whose pointer changed, for any font, including
+		/// 	addon fonts. First with nullptr before the previous atlases are freed, then with the new font.
+		///----------------------------------------------------------------------------------------------------
+		virtual void OnFontUpdateNotify(const char* aIdentifier, ImFont* aFont) = 0;
+	};
+
+	///----------------------------------------------------------------------------------------------------
+	/// IFontUpdateNotifier Interface
+	///----------------------------------------------------------------------------------------------------
+	class IFontUpdateNotifier : public Engine::INotifier<IFontUpdateNotifyHandler>
+	{
+		protected:
+		void NotifyFontUpdate(const char* aIdentifier, ImFont* aFont)
 		{
-			entry.Subscriber->OnFontUpdateNotify(aIdentifier, aFont);
+			for (const auto& entry : this->Subscribers())
+			{
+				entry.Subscriber->OnFontUpdateNotify(aIdentifier, aFont);
+			}
 		}
-	}
-};
+	};
+}

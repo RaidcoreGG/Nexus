@@ -15,47 +15,49 @@
 #include "DlLinkedResource.h"
 #include "Core/Logging/LogChannel.h"
 
-
-///----------------------------------------------------------------------------------------------------
-/// CDataLinkApi Class
-///----------------------------------------------------------------------------------------------------
-class CDataLinkApi : public ILogChannel
+namespace Raidcore::Engine
 {
-	public:
 	///----------------------------------------------------------------------------------------------------
-	/// ctor
+	/// CDataLinkApi Class
 	///----------------------------------------------------------------------------------------------------
-	CDataLinkApi();
-	///----------------------------------------------------------------------------------------------------
-	/// dtor
-	///----------------------------------------------------------------------------------------------------
-	~CDataLinkApi();
+	class CDataLinkApi : public Core::ILogChannel
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		CDataLinkApi();
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		~CDataLinkApi();
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetResource:
-	/// 	Retrieves the resource with the given identifier.
-	///----------------------------------------------------------------------------------------------------
-	void* GetResource(const char* aIdentifier);
+		///----------------------------------------------------------------------------------------------------
+		/// GetResource:
+		/// 	Retrieves the resource with the given identifier.
+		///----------------------------------------------------------------------------------------------------
+		void* GetResource(const char* aIdentifier);
 
-	///----------------------------------------------------------------------------------------------------
-	/// ShareResource:
-	/// 	Allocates memory of the given size, accessible via the provided identifier,
-	/// 	but with a different internal/underlying name.
-	///----------------------------------------------------------------------------------------------------
-	void* ShareResource(
-		const char* aIdentifier,
-		size_t      aResourceSize,
-		const char* aUnderlyingName = "",
-		bool        aIsPublic       = false
-	);
+		///----------------------------------------------------------------------------------------------------
+		/// ShareResource:
+		/// 	Allocates memory of the given size, accessible via the provided identifier,
+		/// 	but with a different internal/underlying name.
+		///----------------------------------------------------------------------------------------------------
+		void* ShareResource(
+			const char* aIdentifier,
+			size_t      aResourceSize,
+			const char* aUnderlyingName = "",
+			bool        aIsPublic       = false
+		);
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetRegistry:
-	/// 	Returns a copy of the registry.
-	///----------------------------------------------------------------------------------------------------
-	std::unordered_map<std::string, LinkedResource_t> GetRegistry() const;
+		///----------------------------------------------------------------------------------------------------
+		/// GetRegistry:
+		/// 	Returns a copy of the registry.
+		///----------------------------------------------------------------------------------------------------
+		std::unordered_map<std::string, LinkedResource_t> GetRegistry() const;
 
-	private:
-	mutable std::mutex                                Mutex;
-	std::unordered_map<std::string, LinkedResource_t> Registry;
-};
+		private:
+		mutable std::mutex                                Mutex;
+		std::unordered_map<std::string, LinkedResource_t> Registry;
+	};
+}

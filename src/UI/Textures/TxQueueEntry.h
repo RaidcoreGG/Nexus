@@ -11,19 +11,22 @@
 #include "TxEnum.h"
 #include "TxTexture.h"
 
-typedef void (*TEXTURES_RECEIVECALLBACK)(const char* aIdentifier, Texture_t* aTexture);
-
-///----------------------------------------------------------------------------------------------------
-/// QueuedTexture_t Struct
-///----------------------------------------------------------------------------------------------------
-struct QueuedTexture_t
+namespace Raidcore::UI
 {
-	ETextureStage            Stage;
-	long long                Time;
+	typedef void (*TEXTURES_RECEIVECALLBACK)(const char* aIdentifier, Texture_t* aTexture);
 
-	unsigned                 Width;
-	unsigned                 Height;
-	unsigned char*           Data;
-	std::string              DownloadURL;
-	TEXTURES_RECEIVECALLBACK Callback;
-};
+	///----------------------------------------------------------------------------------------------------
+	/// QueuedTexture_t Struct
+	///----------------------------------------------------------------------------------------------------
+	struct QueuedTexture_t
+	{
+		ETextureStage            Stage;
+		long long                Time;
+
+		unsigned                 Width;
+		unsigned                 Height;
+		unsigned char*           Data;
+		std::string              DownloadURL;
+		TEXTURES_RECEIVECALLBACK Callback;
+	};
+}

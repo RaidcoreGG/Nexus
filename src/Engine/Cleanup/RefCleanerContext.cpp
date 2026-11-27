@@ -10,73 +10,76 @@
 
 #include <map>
 
-/*static*/ CRefCleanerContext* CRefCleanerContext::Get()
+namespace Raidcore::Engine
 {
-	static CRefCleanerContext s_Context{};
-	return &s_Context;
-}
-
-void CRefCleanerContext::Register(std::string aComponentName, IRefCleaner* aComponent)
-{
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [aComponent](const RefCleaner_t& entry)
+	/*static*/ CRefCleanerContext* CRefCleanerContext::Get()
 	{
-		return entry.Component == aComponent;
-	});
-
-	/* If already registered. */
-	if (it != this->Registry.end())
-	{
-		return;
+		static CRefCleanerContext s_Context{};
+		return &s_Context;
 	}
 
-	this->Registry.push_back(RefCleaner_t{ aComponentName, aComponent });
-}
-
-void CRefCleanerContext::Deregister(IRefCleaner* aComponent)
-{
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [aComponent](const RefCleaner_t& entry) {
-		return entry.Component == aComponent;
-	});
-
-	if (it != this->Registry.end())
+	void CRefCleanerContext::Register(std::string aComponentName, IRefCleaner* aComponent)
 	{
-		this->Registry.erase(it);
-	}
-}
+		const std::lock_guard<std::mutex> lock(this->Mutex);
 
-std::string CRefCleanerContext::CleanupRefs(void* aStartAddress, void* aEndAddress)
-{
-	std::string result;
+		auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [aComponent](const RefCleaner_t& entry)
+		{
+			return entry.Component == aComponent;
+		});
 
-	std::map<std::string, uint32_t> leftoverRefs;
+		/* If already registered. */
+		if (it != this->Registry.end())
+		{
+			return;
+		}
 
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	for (const RefCleaner_t& entry : this->Registry)
-	{
-		leftoverRefs[entry.Name] += entry.Component->CleanupRefs(aStartAddress, aEndAddress);
+		this->Registry.push_back(RefCleaner_t{ aComponentName, aComponent });
 	}
 
-	for (auto& [id, count] : leftoverRefs)
+	void CRefCleanerContext::Deregister(IRefCleaner* aComponent)
 	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [aComponent](const RefCleaner_t& entry) {
+			return entry.Component == aComponent;
+		});
+
+		if (it != this->Registry.end())
+		{
+			this->Registry.erase(it);
+		}
+	}
+
+	std::string CRefCleanerContext::CleanupRefs(void* aStartAddress, void* aEndAddress)
+	{
+		std::string result;
+
+		std::map<std::string, uint32_t> leftoverRefs;
+
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		for (const RefCleaner_t& entry : this->Registry)
+		{
+			leftoverRefs[entry.Name] += entry.Component->CleanupRefs(aStartAddress, aEndAddress);
+		}
+
+		for (auto& [id, count] : leftoverRefs)
+		{
 #ifndef _DEBUG
-		if (count == 0) { continue; }
+			if (count == 0) { continue; }
 #endif
-		result.append("\t");
-		result.append(id);
-		result.append(": ");
-		result.append(std::to_string(count));
-		result.append("\n");
-	}
+			result.append("\t");
+			result.append(id);
+			result.append(": ");
+			result.append(std::to_string(count));
+			result.append("\n");
+		}
 
-	if (!result.empty())
-	{
-		result = "Cleaned leftover references for\n" + result;
-	}
+		if (!result.empty())
+		{
+			result = "Cleaned leftover references for\n" + result;
+		}
 
-	return result;
+		return result;
+	}
 }

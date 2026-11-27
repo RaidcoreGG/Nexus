@@ -17,7 +17,7 @@
 
 #include "minhook/mh_hook.h"
 
-namespace Raidcore::Core::Platform::Windows
+namespace Raidcore::Core::Windows
 {
 	typedef LPTOP_LEVEL_EXCEPTION_FILTER(WINAPI* SETUNHANDLEDEXCEPTIONFILTER)(LPTOP_LEVEL_EXCEPTION_FILTER aFilter);
 	typedef LONG(WINAPI* RTLGETVERSION)(PRTL_OSVERSIONINFOW aVersionInfo);

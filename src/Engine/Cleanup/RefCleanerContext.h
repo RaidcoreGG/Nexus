@@ -14,53 +14,56 @@
 
 #include "RefCleanerBase.h"
 
-///----------------------------------------------------------------------------------------------------
-/// CRefCleanerContext Class
-///----------------------------------------------------------------------------------------------------
-class CRefCleanerContext
+namespace Raidcore::Engine
 {
-	public:
 	///----------------------------------------------------------------------------------------------------
-	/// Get:
-	/// 	Returns the reference cleaner context.
+	/// CRefCleanerContext Class
 	///----------------------------------------------------------------------------------------------------
-	static CRefCleanerContext* Get();
-
-	CRefCleanerContext(CRefCleanerContext const&) = delete;
-	void operator=(CRefCleanerContext const&)     = delete;
-
-	///----------------------------------------------------------------------------------------------------
-	/// Register:
-	/// 	Registers a reference cleaner with the context.
-	///----------------------------------------------------------------------------------------------------
-	void Register(std::string aComponentName, IRefCleaner* aComponent);
-
-	///----------------------------------------------------------------------------------------------------
-	/// Deregister:
-	/// 	Deregisters a reference cleaner from the context.
-	///----------------------------------------------------------------------------------------------------
-	void Deregister(IRefCleaner* aComponent);
-
-	///----------------------------------------------------------------------------------------------------
-	/// CleanupRefs:
-	/// 	Removes any reference matching the provided address space.
-	/// 	Returns a message with the cleanup results.
-	///----------------------------------------------------------------------------------------------------
-	std::string CleanupRefs(void* aStartAddress, void* aEndAddress);
-
-	private:
-	CRefCleanerContext() = default;
-	~CRefCleanerContext() = default;
-
-	///----------------------------------------------------------------------------------------------------
-	/// RefCleaner_t Struct
-	///----------------------------------------------------------------------------------------------------
-	struct RefCleaner_t
+	class CRefCleanerContext
 	{
-		std::string  Name;
-		IRefCleaner* Component;
-	};
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// Get:
+		/// 	Returns the reference cleaner context.
+		///----------------------------------------------------------------------------------------------------
+		static CRefCleanerContext* Get();
 
-	std::mutex                Mutex;
-	std::vector<RefCleaner_t> Registry;
-};
+		CRefCleanerContext(CRefCleanerContext const&) = delete;
+		void operator=(CRefCleanerContext const&)     = delete;
+
+		///----------------------------------------------------------------------------------------------------
+		/// Register:
+		/// 	Registers a reference cleaner with the context.
+		///----------------------------------------------------------------------------------------------------
+		void Register(std::string aComponentName, IRefCleaner* aComponent);
+
+		///----------------------------------------------------------------------------------------------------
+		/// Deregister:
+		/// 	Deregisters a reference cleaner from the context.
+		///----------------------------------------------------------------------------------------------------
+		void Deregister(IRefCleaner* aComponent);
+
+		///----------------------------------------------------------------------------------------------------
+		/// CleanupRefs:
+		/// 	Removes any reference matching the provided address space.
+		/// 	Returns a message with the cleanup results.
+		///----------------------------------------------------------------------------------------------------
+		std::string CleanupRefs(void* aStartAddress, void* aEndAddress);
+
+		private:
+		CRefCleanerContext() = default;
+		~CRefCleanerContext() = default;
+
+		///----------------------------------------------------------------------------------------------------
+		/// RefCleaner_t Struct
+		///----------------------------------------------------------------------------------------------------
+		struct RefCleaner_t
+		{
+			std::string  Name;
+			IRefCleaner* Component;
+		};
+
+		std::mutex                Mutex;
+		std::vector<RefCleaner_t> Registry;
+	};
+}

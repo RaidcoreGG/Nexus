@@ -15,61 +15,62 @@
 #include "Engine/Inputs/InputBinds/IbBind.h"
 #include "Host/GW2/Inputs/GameBinds/GbEnum.h"
 
-namespace Input = Engine::Input;
-
-///----------------------------------------------------------------------------------------------------
-/// CBindSetterModal Class
-///----------------------------------------------------------------------------------------------------
-class CBindSetterModal : public virtual IModal
+namespace Raidcore::UI
 {
-	public:
 	///----------------------------------------------------------------------------------------------------
-	/// ctor
+	/// CBindSetterModal Class
 	///----------------------------------------------------------------------------------------------------
-	CBindSetterModal();
+	class CBindSetterModal : public virtual UI::IModal
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		CBindSetterModal();
 
-	///----------------------------------------------------------------------------------------------------
-	/// RenderContent:
-	/// 	Render function of modal contents.
-	///----------------------------------------------------------------------------------------------------
-	void RenderContent() override;
+		///----------------------------------------------------------------------------------------------------
+		/// RenderContent:
+		/// 	Render function of modal contents.
+		///----------------------------------------------------------------------------------------------------
+		void RenderContent() override;
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnOpening:
-	/// 	Override open to retrieve the bind text of the to be edited bind.
-	///----------------------------------------------------------------------------------------------------
-	void OnOpening() override;
+		///----------------------------------------------------------------------------------------------------
+		/// OnOpening:
+		/// 	Override open to retrieve the bind text of the to be edited bind.
+		///----------------------------------------------------------------------------------------------------
+		void OnOpening() override;
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnClosing:
-	/// 	Override close to process result and reset variables.
-	///----------------------------------------------------------------------------------------------------
-	void OnClosing() override;
+		///----------------------------------------------------------------------------------------------------
+		/// OnClosing:
+		/// 	Override close to process result and reset variables.
+		///----------------------------------------------------------------------------------------------------
+		void OnClosing() override;
 
-	///----------------------------------------------------------------------------------------------------
-	/// SetTarget:
-	/// 	Set Nexus bind as editing target.
-	///----------------------------------------------------------------------------------------------------
-	void SetTarget(std::string aBindIdentifier);
+		///----------------------------------------------------------------------------------------------------
+		/// SetTarget:
+		/// 	Set Nexus bind as editing target.
+		///----------------------------------------------------------------------------------------------------
+		void SetTarget(std::string aBindIdentifier);
 
-	///----------------------------------------------------------------------------------------------------
-	/// SetTarget:
-	/// 	Set game bind as editing target.
-	///----------------------------------------------------------------------------------------------------
-	void SetTarget(EGameBinds aBindIdentifier, bool aIsPrimary = true);
+		///----------------------------------------------------------------------------------------------------
+		/// SetTarget:
+		/// 	Set game bind as editing target.
+		///----------------------------------------------------------------------------------------------------
+		void SetTarget(GW2::EGameBinds aBindIdentifier, bool aIsPrimary = true);
 
-	private:
-	EBindEditType      Type             = EBindEditType::None;
-	std::string        NexusBindID      = {};
-	EGameBinds         GameBindID       = (EGameBinds)0;
-	std::string        PreviousBindText = {};
+		private:
+		UI::EBindEditType      Type             = UI::EBindEditType::None;
+		std::string        NexusBindID      = {};
+		GW2::EGameBinds         GameBindID       = (GW2::EGameBinds)0;
+		std::string        PreviousBindText = {};
 
-	Input::Bind_t Capture          = {};
-	std::string        BindConflict     = {};
+		Engine::Input::Bind_t Capture          = {};
+		std::string        BindConflict     = {};
 
-	///----------------------------------------------------------------------------------------------------
-	/// SetTitle:
-	/// 	Custom title setting, so that the caption says "Set Input Bind: <KEYNAME>".
-	///----------------------------------------------------------------------------------------------------
-	void SetTitle();
-};
+		///----------------------------------------------------------------------------------------------------
+		/// SetTitle:
+		/// 	Custom title setting, so that the caption says "Set Input Bind: <KEYNAME>".
+		///----------------------------------------------------------------------------------------------------
+		void SetTitle();
+	};
+}

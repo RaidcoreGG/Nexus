@@ -10,115 +10,118 @@
 
 #include <assert.h>
 
-CFuncRegistry::CFuncRegistry() : ILogChannel("Functions")
+namespace Raidcore::Engine
 {
-}
-
-CFuncRegistry::~CFuncRegistry()
-{
-}
-
-bool CFuncRegistry::Register(const char* aIdentifier, void* aFunction)
-{
-	if (aIdentifier == nullptr) { return false; }
-	if (aFunction == nullptr) { return false; }
-
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	auto it = this->Registry.find(aIdentifier);
-
-	if (it != this->Registry.end())
+	CFuncRegistry::CFuncRegistry() : Core::ILogChannel("Functions")
 	{
-		this->LogDebug("\"%s\" already registered.", aIdentifier);
-		return false;
 	}
 
-	FuncEntry_t entry{};
-	entry.RefCount = 0;
-	entry.Function = aFunction;
-
-	this->Registry.emplace(aIdentifier, entry);
-
-	return true;
-}
-
-void CFuncRegistry::Deregister(const char* aIdentifier, void* aFunction)
-{
-	if (aIdentifier == nullptr) { return; }
-	if (aFunction == nullptr) { return; }
-
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	auto it = this->Registry.find(aIdentifier);
-
-	if (it == this->Registry.end())
+	CFuncRegistry::~CFuncRegistry()
 	{
-		/* Identifier not registered. */
-		return;
 	}
 
-	if (it->second.RefCount == 0)
+	bool CFuncRegistry::Register(const char* aIdentifier, void* aFunction)
 	{
-		this->Registry.erase(it);
+		if (aIdentifier == nullptr) { return false; }
+		if (aFunction == nullptr) { return false; }
 
-		this->LogDebug("\"%s\" already at reference count zero. Deleted.", aIdentifier);
-	}
-	else
-	{
-		it->second.ShouldDelete = true;
+		const std::lock_guard<std::mutex> lock(this->Mutex);
 
-		this->LogDebug("\"%s\" flagged for deletion. Will be deleted when reaching a reference count of zero.", aIdentifier);
-	}
-}
+		auto it = this->Registry.find(aIdentifier);
 
-void* CFuncRegistry::Query(const char* aIdentifier)
-{
-	if (aIdentifier == nullptr) { return nullptr; }
-
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	auto it = this->Registry.find(aIdentifier);
-
-	if (it != this->Registry.end())
-	{
-		/* Do not allow new references to function flagged for deletion. */
-		if (it->second.ShouldDelete)
+		if (it != this->Registry.end())
 		{
-			return nullptr;
+			this->LogDebug("\"%s\" already registered.", aIdentifier);
+			return false;
 		}
 
-		it->second.RefCount++;
-		return it->second.Function;
+		FuncEntry_t entry{};
+		entry.RefCount = 0;
+		entry.Function = aFunction;
+
+		this->Registry.emplace(aIdentifier, entry);
+
+		return true;
 	}
 
-	return nullptr;
-}
-
-void CFuncRegistry::Release(const char* aIdentifier)
-{
-	if (aIdentifier == nullptr) { return; }
-
-	const std::lock_guard<std::mutex> lock(this->Mutex);
-
-	auto it = this->Registry.find(aIdentifier);
-
-	if (it != this->Registry.end())
+	void CFuncRegistry::Deregister(const char* aIdentifier, void* aFunction)
 	{
-		it->second.RefCount--;
+		if (aIdentifier == nullptr) { return; }
+		if (aFunction == nullptr) { return; }
 
-		if (it->second.RefCount < 0)
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto it = this->Registry.find(aIdentifier);
+
+		if (it == this->Registry.end())
 		{
-			this->LogCritical(
-				"\"%s\" reference count less than zero. Query/Release mismatch. Function may be freed prematurely.",
-				aIdentifier
-			);
+			/* Identifier not registered. */
+			return;
 		}
 
-		if (it->second.RefCount == 0 && it->second.ShouldDelete == true)
+		if (it->second.RefCount == 0)
 		{
 			this->Registry.erase(it);
 
-			this->LogDebug("\"%s\" deleted after reaching reference count zero.", aIdentifier);
+			this->LogDebug("\"%s\" already at reference count zero. Deleted.", aIdentifier);
+		}
+		else
+		{
+			it->second.ShouldDelete = true;
+
+			this->LogDebug("\"%s\" flagged for deletion. Will be deleted when reaching a reference count of zero.", aIdentifier);
+		}
+	}
+
+	void* CFuncRegistry::Query(const char* aIdentifier)
+	{
+		if (aIdentifier == nullptr) { return nullptr; }
+
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto it = this->Registry.find(aIdentifier);
+
+		if (it != this->Registry.end())
+		{
+			/* Do not allow new references to function flagged for deletion. */
+			if (it->second.ShouldDelete)
+			{
+				return nullptr;
+			}
+
+			it->second.RefCount++;
+			return it->second.Function;
+		}
+
+		return nullptr;
+	}
+
+	void CFuncRegistry::Release(const char* aIdentifier)
+	{
+		if (aIdentifier == nullptr) { return; }
+
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto it = this->Registry.find(aIdentifier);
+
+		if (it != this->Registry.end())
+		{
+			it->second.RefCount--;
+
+			if (it->second.RefCount < 0)
+			{
+				this->LogCritical(
+					"\"%s\" reference count less than zero. Query/Release mismatch. Function may be freed prematurely.",
+					aIdentifier
+				);
+			}
+
+			if (it->second.RefCount == 0 && it->second.ShouldDelete == true)
+			{
+				this->Registry.erase(it);
+
+				this->LogDebug("\"%s\" deleted after reaching reference count zero.", aIdentifier);
+			}
 		}
 	}
 }

@@ -11,7 +11,7 @@
 #include "IbBind.h"
 #include "IbEnum.h"
 
-namespace Engine::Input
+namespace Raidcore::Engine::Input
 {
 	/* Input Handler Down Only */
 	typedef void (*IB_CALLBACK_V1)(const char* aIdentifier);

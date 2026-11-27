@@ -8,63 +8,66 @@
 
 #include "RiApi.h"
 
-CRawInputApi::CRawInputApi() : IRefCleaner("RawInputApi")
+namespace Raidcore::Engine::Input
 {
-	this->Attach(WNDPROC_PRIO_ADDONS);
-}
-
-CRawInputApi::~CRawInputApi()
-{
-	this->Detach();
-}
-
-UINT CRawInputApi::OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam)
-{
-	const std::lock_guard<std::recursive_mutex> lock(this->Mutex);
-
-	std::shared_ptr<const std::vector<WNDPROC_CALLBACK>> registry = this->Registry;
-
-	for (WNDPROC_CALLBACK wndprocCb : *registry)
+	CRawInputApi::CRawInputApi() : Engine::IRefCleaner("RawInputApi")
 	{
-		if (wndprocCb(hWnd, uMsg, wParam, lParam) == 0)
-		{
-			return NOTIFY_CONSUMED;
-		}
+		this->Attach(WNDPROC_PRIO_ADDONS);
 	}
 
-	return 1;
-}
-
-void CRawInputApi::Register(WNDPROC_CALLBACK aWndProcCallback)
-{
-	const std::lock_guard<std::recursive_mutex> lock(this->Mutex);
-
-	std::shared_ptr<std::vector<WNDPROC_CALLBACK>> registry = std::make_shared<std::vector<WNDPROC_CALLBACK>>(*this->Registry);
-	registry->push_back(aWndProcCallback);
-	this->Registry = registry;
-}
-
-void CRawInputApi::Deregister(WNDPROC_CALLBACK aWndProcCallback)
-{
-	const std::lock_guard<std::recursive_mutex> lock(this->Mutex);
-
-	std::shared_ptr<std::vector<WNDPROC_CALLBACK>> registry = std::make_shared<std::vector<WNDPROC_CALLBACK>>(*this->Registry);
-	std::erase(*registry, aWndProcCallback);
-	this->Registry = registry;
-}
-
-uint32_t CRawInputApi::CleanupRefs(void* aStartAddress, void* aEndAddress)
-{
-	const std::lock_guard<std::recursive_mutex> lock(this->Mutex);
-
-	std::shared_ptr<std::vector<WNDPROC_CALLBACK>> registry = std::make_shared<std::vector<WNDPROC_CALLBACK>>(*this->Registry);
-
-	size_t removed = std::erase_if(*registry, [aStartAddress, aEndAddress](WNDPROC_CALLBACK aCallback)
+	CRawInputApi::~CRawInputApi()
 	{
-		return aCallback >= aStartAddress && aCallback <= aEndAddress;
-	});
+		this->Detach();
+	}
 
-	this->Registry = registry;
+	UINT CRawInputApi::OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam)
+	{
+		const std::lock_guard<std::recursive_mutex> lock(this->Mutex);
 
-	return static_cast<uint32_t>(removed);
+		std::shared_ptr<const std::vector<WNDPROC_CALLBACK>> registry = this->Registry;
+
+		for (WNDPROC_CALLBACK wndprocCb : *registry)
+		{
+			if (wndprocCb(hWnd, uMsg, wParam, lParam) == 0)
+			{
+				return NOTIFY_CONSUMED;
+			}
+		}
+
+		return 1;
+	}
+
+	void CRawInputApi::Register(WNDPROC_CALLBACK aWndProcCallback)
+	{
+		const std::lock_guard<std::recursive_mutex> lock(this->Mutex);
+
+		std::shared_ptr<std::vector<WNDPROC_CALLBACK>> registry = std::make_shared<std::vector<WNDPROC_CALLBACK>>(*this->Registry);
+		registry->push_back(aWndProcCallback);
+		this->Registry = registry;
+	}
+
+	void CRawInputApi::Deregister(WNDPROC_CALLBACK aWndProcCallback)
+	{
+		const std::lock_guard<std::recursive_mutex> lock(this->Mutex);
+
+		std::shared_ptr<std::vector<WNDPROC_CALLBACK>> registry = std::make_shared<std::vector<WNDPROC_CALLBACK>>(*this->Registry);
+		std::erase(*registry, aWndProcCallback);
+		this->Registry = registry;
+	}
+
+	uint32_t CRawInputApi::CleanupRefs(void* aStartAddress, void* aEndAddress)
+	{
+		const std::lock_guard<std::recursive_mutex> lock(this->Mutex);
+
+		std::shared_ptr<std::vector<WNDPROC_CALLBACK>> registry = std::make_shared<std::vector<WNDPROC_CALLBACK>>(*this->Registry);
+
+		size_t removed = std::erase_if(*registry, [aStartAddress, aEndAddress](WNDPROC_CALLBACK aCallback)
+		{
+			return aCallback >= aStartAddress && aCallback <= aEndAddress;
+		});
+
+		this->Registry = registry;
+
+		return static_cast<uint32_t>(removed);
+	}
 }

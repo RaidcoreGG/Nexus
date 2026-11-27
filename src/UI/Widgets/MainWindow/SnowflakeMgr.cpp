@@ -17,166 +17,169 @@
 #include "Util/Time.h"
 #include "UI/UiContext.h"
 
-CSnowflakeMgr::CSnowflakeMgr()
+namespace Raidcore::UI
 {
-	this->IsPartyPooper = CContext::GetContext()->GetUIContext()->GetQuickAccess()->DisableFestiveFlair.Get();
-
-	this->IsItChristmas = Time::GetMonth() == 12 && !this->IsPartyPooper;
-	this->IsItHalloween = Time::GetMonth() == 10 && !this->IsPartyPooper;
-}
-
-ImVec2 Rotate(const ImVec2& aPoint, float aCosA, float aSinA)
-{
-	return ImVec2(aPoint.x * aCosA - aPoint.y * aSinA, aPoint.x * aSinA + aPoint.y * aCosA);
-}
-
-void ImageRotated(ImTextureID aTextureIdentifier, ImVec2 aOrigin, ImVec2 aSize, float aAngle)
-{
-	ImDrawList* draw_list = ImGui::GetWindowDrawList();
-
-	// convert degrees to radians
-	aAngle *= 3.14159f / 180.0f;
-
-	float cos_a = cosf(aAngle);
-	float sin_a = sinf(aAngle);
-	ImVec2 pos[4] =
+	CSnowflakeMgr::CSnowflakeMgr()
 	{
-		aOrigin + Rotate(ImVec2(-aSize.x * 0.5f, -aSize.y * 0.5f), cos_a, sin_a),
-		aOrigin + Rotate(ImVec2(+aSize.x * 0.5f, -aSize.y * 0.5f), cos_a, sin_a),
-		aOrigin + Rotate(ImVec2(+aSize.x * 0.5f, +aSize.y * 0.5f), cos_a, sin_a),
-		aOrigin + Rotate(ImVec2(-aSize.x * 0.5f, +aSize.y * 0.5f), cos_a, sin_a)
-	};
-	ImVec2 uvs[4] =
-	{
-		ImVec2(0.0f, 0.0f),
-		ImVec2(1.0f, 0.0f),
-		ImVec2(1.0f, 1.0f),
-		ImVec2(0.0f, 1.0f)
-	};
+		this->IsPartyPooper = GW2::CContext::GetContext()->GetUIContext()->GetQuickAccess()->DisableFestiveFlair.Get();
 
-	draw_list->AddImageQuad(aTextureIdentifier, pos[0], pos[1], pos[2], pos[3], uvs[0], uvs[1], uvs[2], uvs[3], (ImColor)ImVec4(1.f, 1.f, 1.f, 0.7f));
-}
-
-void CSnowflakeMgr::Update()
-{
-
-	if (!(this->IsItChristmas || this->IsItHalloween)) { return; }
-
-	static CContext* ctx = CContext::GetContext();
-	static CTextureLoader* texapi = ctx->GetTextureService();
-
-	ImGuiContext* imctx = ImGui::GetCurrentContext();
-
-	if (!imctx->CurrentWindow) { return; }
-
-	std::vector<Snowflake_t>& snowflakes = this->Snowflakes[imctx->CurrentWindow->ID];
-
-	ImVec2 wndSize = imctx->CurrentWindow->Size;
-	ImVec2 wndPos = imctx->CurrentWindow->Pos;
-
-	/* density logic */
-	int amtSnowflakes = static_cast<int>(wndSize.x / ImGui::GetFontSize() * 0.5f);
-
-	if (snowflakes.size() != amtSnowflakes)
-	{
-		std::srand(static_cast<int>(std::time(nullptr)));
-
-		snowflakes.clear();
-
-		while (snowflakes.size() < amtSnowflakes)
-		{
-			Texture_t* tex = nullptr;
-
-			if (this->IsItChristmas)
-			{
-				static Texture_t* texSnowflake = nullptr;
-
-				if (!texSnowflake)
-				{
-					texSnowflake = texapi->GetOrCreate("SNOWFLAKE", Resources::IconSnowflake);
-					return;
-				}
-
-				tex = texSnowflake;
-			}
-			else if (this->IsItHalloween)
-			{
-				static Texture_t* texLeaves[3];
-
-				if (!(texLeaves[0] && texLeaves[1] && texLeaves[2]))
-				{
-					texLeaves[0] = texapi->GetOrCreate("LEAF_VARIANT1", Resources::IconLeafVariant1);
-					texLeaves[1] = texapi->GetOrCreate("LEAF_VARIANT2", Resources::IconLeafVariant2);
-					texLeaves[2] = texapi->GetOrCreate("LEAF_VARIANT3", Resources::IconLeafVariant3);
-					return;
-				}
-
-				tex = texLeaves[std::rand() % 3];
-			}
-
-			snowflakes.push_back(Snowflake_t{
-				tex, // texture
-				(float)((ImGui::GetFontSize() / 2) + (std::rand() % (int)ImGui::GetFontSize())), // Size
-				(float)(std::rand() % (int)wndSize.x), //X
-				(float)(std::rand() % (int)wndSize.y), //Y
-
-				(float)(10000 + (std::rand() % 10000)), // FallDuration
-
-				std::rand() % 10 > 5, // swaydir
-				(float)(2000 + (std::rand() % 1000)), //SwayDuration;
-				0,
-				(float)(-1 * ( 10 + (std::rand() % 90))), //SwayStart;
-				(float)(1 * (10 + (std::rand() % 90))), //SwayEnd;
-
-				std::rand() % 10 > 5, // tiltdir
-				(float)(1000 + (std::rand() % 1000)), //TiltDuration;
-				180, // Angle
-				(float)(120 + (std::rand() % 30)), //AngleStart;
-				(float)(210 + (std::rand() % 30)) //AngleEnd;
-			});
-		}
+		this->IsItChristmas = Time::GetMonth() == 12 && !this->IsPartyPooper;
+		this->IsItHalloween = Time::GetMonth() == 10 && !this->IsPartyPooper;
 	}
 
-	/* rendering logic */
-	for (Snowflake_t& sf : snowflakes)
+	ImVec2 Rotate(const ImVec2& aPoint, float aCosA, float aSinA)
 	{
-		float angleFixed = sf.Angle - 180;
+		return ImVec2(aPoint.x * aCosA - aPoint.y * aSinA, aPoint.x * aSinA + aPoint.y * aCosA);
+	}
 
-		if (angleFixed < 0) angleFixed += 360;
+	void ImageRotated(ImTextureID aTextureIdentifier, ImVec2 aOrigin, ImVec2 aSize, float aAngle)
+	{
+		ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-		ImageRotated(sf.Texture_t->Resource, ImVec2(wndPos.x + sf.X + sf.SwayOffset, wndPos.y + sf.Y), ImVec2(sf.Size, sf.Size), angleFixed);
+		// convert degrees to radians
+		aAngle *= 3.14159f / 180.0f;
 
-		ImGui::Animate(-sf.Size, wndSize.y + sf.Size, sf.FallDuration, &sf.Y, ImAnimate::ECurve::Linear);
-
-		if (sf.Tilt)
+		float cos_a = cosf(aAngle);
+		float sin_a = sinf(aAngle);
+		ImVec2 pos[4] =
 		{
-			ImGui::Animate(sf.AngleStart, sf.AngleEnd, sf.TiltDuration, &sf.Angle, ImAnimate::ECurve::InOutQuad);
+			aOrigin + Rotate(ImVec2(-aSize.x * 0.5f, -aSize.y * 0.5f), cos_a, sin_a),
+			aOrigin + Rotate(ImVec2(+aSize.x * 0.5f, -aSize.y * 0.5f), cos_a, sin_a),
+			aOrigin + Rotate(ImVec2(+aSize.x * 0.5f, +aSize.y * 0.5f), cos_a, sin_a),
+			aOrigin + Rotate(ImVec2(-aSize.x * 0.5f, +aSize.y * 0.5f), cos_a, sin_a)
+		};
+		ImVec2 uvs[4] =
+		{
+			ImVec2(0.0f, 0.0f),
+			ImVec2(1.0f, 0.0f),
+			ImVec2(1.0f, 1.0f),
+			ImVec2(0.0f, 1.0f)
+		};
 
-			if (sf.Angle == sf.AngleEnd) { sf.Tilt = false; }
+		draw_list->AddImageQuad(aTextureIdentifier, pos[0], pos[1], pos[2], pos[3], uvs[0], uvs[1], uvs[2], uvs[3], (ImColor)ImVec4(1.f, 1.f, 1.f, 0.7f));
+	}
+
+	void CSnowflakeMgr::Update()
+	{
+
+		if (!(this->IsItChristmas || this->IsItHalloween)) { return; }
+
+		static GW2::CContext* ctx = GW2::CContext::GetContext();
+		static UI::CTextureLoader* texapi = ctx->GetTextureService();
+
+		ImGuiContext* imctx = ImGui::GetCurrentContext();
+
+		if (!imctx->CurrentWindow) { return; }
+
+		std::vector<Snowflake_t>& snowflakes = this->Snowflakes[imctx->CurrentWindow->ID];
+
+		ImVec2 wndSize = imctx->CurrentWindow->Size;
+		ImVec2 wndPos = imctx->CurrentWindow->Pos;
+
+		/* density logic */
+		int amtSnowflakes = static_cast<int>(wndSize.x / ImGui::GetFontSize() * 0.5f);
+
+		if (snowflakes.size() != amtSnowflakes)
+		{
+			std::srand(static_cast<int>(std::time(nullptr)));
+
+			snowflakes.clear();
+
+			while (snowflakes.size() < amtSnowflakes)
+			{
+				Texture_t* tex = nullptr;
+
+				if (this->IsItChristmas)
+				{
+					static Texture_t* texSnowflake = nullptr;
+
+					if (!texSnowflake)
+					{
+						texSnowflake = texapi->GetOrCreate("SNOWFLAKE", Resources::IconSnowflake);
+						return;
+					}
+
+					tex = texSnowflake;
+				}
+				else if (this->IsItHalloween)
+				{
+					static Texture_t* texLeaves[3];
+
+					if (!(texLeaves[0] && texLeaves[1] && texLeaves[2]))
+					{
+						texLeaves[0] = texapi->GetOrCreate("LEAF_VARIANT1", Resources::IconLeafVariant1);
+						texLeaves[1] = texapi->GetOrCreate("LEAF_VARIANT2", Resources::IconLeafVariant2);
+						texLeaves[2] = texapi->GetOrCreate("LEAF_VARIANT3", Resources::IconLeafVariant3);
+						return;
+					}
+
+					tex = texLeaves[std::rand() % 3];
+				}
+
+				snowflakes.push_back(Snowflake_t{
+					tex, // texture
+					(float)((ImGui::GetFontSize() / 2) + (std::rand() % (int)ImGui::GetFontSize())), // Size
+					(float)(std::rand() % (int)wndSize.x), //X
+					(float)(std::rand() % (int)wndSize.y), //Y
+
+					(float)(10000 + (std::rand() % 10000)), // FallDuration
+
+					std::rand() % 10 > 5, // swaydir
+					(float)(2000 + (std::rand() % 1000)), //SwayDuration;
+					0,
+					(float)(-1 * ( 10 + (std::rand() % 90))), //SwayStart;
+					(float)(1 * (10 + (std::rand() % 90))), //SwayEnd;
+
+					std::rand() % 10 > 5, // tiltdir
+					(float)(1000 + (std::rand() % 1000)), //TiltDuration;
+					180, // Angle
+					(float)(120 + (std::rand() % 30)), //AngleStart;
+					(float)(210 + (std::rand() % 30)) //AngleEnd;
+				});
+			}
 		}
-		else
+
+		/* rendering logic */
+		for (Snowflake_t& sf : snowflakes)
 		{
-			ImGui::Animate(sf.AngleEnd, sf.AngleStart, sf.TiltDuration, &sf.Angle, ImAnimate::ECurve::InOutQuad);
+			float angleFixed = sf.Angle - 180;
 
-			if (sf.Angle == sf.AngleStart) { sf.Tilt = true; }
-		}
+			if (angleFixed < 0) angleFixed += 360;
 
-		if (sf.Sway)
-		{
-			ImGui::Animate(sf.SwayStart, sf.SwayEnd, sf.SwayDuration, &sf.SwayOffset, ImAnimate::ECurve::InOutQuad);
+			ImageRotated(sf.Texture_t->Resource, ImVec2(wndPos.x + sf.X + sf.SwayOffset, wndPos.y + sf.Y), ImVec2(sf.Size, sf.Size), angleFixed);
 
-			if (sf.SwayOffset == sf.SwayEnd) { sf.Sway = false; }
-		}
-		else
-		{
-			ImGui::Animate(sf.SwayEnd, sf.SwayStart, sf.SwayDuration, &sf.SwayOffset, ImAnimate::ECurve::InOutQuad);
+			ImGui::Animate(-sf.Size, wndSize.y + sf.Size, sf.FallDuration, &sf.Y, ImAnimate::ECurve::Linear);
 
-			if (sf.SwayOffset == sf.SwayStart) { sf.Sway = true; }
-		}
+			if (sf.Tilt)
+			{
+				ImGui::Animate(sf.AngleStart, sf.AngleEnd, sf.TiltDuration, &sf.Angle, ImAnimate::ECurve::InOutQuad);
 
-		if (sf.Y == wndSize.y + sf.Size)
-		{
-			sf.Y = -sf.Size;
+				if (sf.Angle == sf.AngleEnd) { sf.Tilt = false; }
+			}
+			else
+			{
+				ImGui::Animate(sf.AngleEnd, sf.AngleStart, sf.TiltDuration, &sf.Angle, ImAnimate::ECurve::InOutQuad);
+
+				if (sf.Angle == sf.AngleStart) { sf.Tilt = true; }
+			}
+
+			if (sf.Sway)
+			{
+				ImGui::Animate(sf.SwayStart, sf.SwayEnd, sf.SwayDuration, &sf.SwayOffset, ImAnimate::ECurve::InOutQuad);
+
+				if (sf.SwayOffset == sf.SwayEnd) { sf.Sway = false; }
+			}
+			else
+			{
+				ImGui::Animate(sf.SwayEnd, sf.SwayStart, sf.SwayDuration, &sf.SwayOffset, ImAnimate::ECurve::InOutQuad);
+
+				if (sf.SwayOffset == sf.SwayStart) { sf.Sway = true; }
+			}
+
+			if (sf.Y == wndSize.y + sf.Size)
+			{
+				sf.Y = -sf.Size;
+			}
 		}
 	}
 }

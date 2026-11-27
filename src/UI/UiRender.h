@@ -14,49 +14,52 @@
 #include "Engine/Cleanup/RefCleanerBase.h"
 #include "UiEnum.h"
 
-typedef void (*GUI_RENDER)();
-
-///----------------------------------------------------------------------------------------------------
-/// CUiRender Class
-///----------------------------------------------------------------------------------------------------
-class CUiRender : public virtual IRefCleaner
+namespace Raidcore::UI
 {
-	public:
-	///----------------------------------------------------------------------------------------------------
-	/// ctor
-	///----------------------------------------------------------------------------------------------------
-	CUiRender();
+	typedef void (*GUI_RENDER)();
 
 	///----------------------------------------------------------------------------------------------------
-	/// dtor
+	/// CUiRender Class
 	///----------------------------------------------------------------------------------------------------
-	virtual ~CUiRender();
+	class CUiRender : public virtual Engine::IRefCleaner
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		CUiRender();
 
-	///----------------------------------------------------------------------------------------------------
-	/// Register:
-	/// 	Registers the provided Render callback.
-	///----------------------------------------------------------------------------------------------------
-	void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback);
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		virtual ~CUiRender();
 
-	///----------------------------------------------------------------------------------------------------
-	/// Deregister:
-	/// 	Deregisters the provided Render callback.
-	///----------------------------------------------------------------------------------------------------
-	void Deregister(GUI_RENDER aRenderCallback);
+		///----------------------------------------------------------------------------------------------------
+		/// Register:
+		/// 	Registers the provided Render callback.
+		///----------------------------------------------------------------------------------------------------
+		void Register(ERenderType aRenderType, GUI_RENDER aRenderCallback);
 
-	///----------------------------------------------------------------------------------------------------
-	/// CleanupRefs:
-	/// 	Removes all registered render callbacks and close-on-escape hooks that match the address space.
-	///----------------------------------------------------------------------------------------------------
-	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
+		///----------------------------------------------------------------------------------------------------
+		/// Deregister:
+		/// 	Deregisters the provided Render callback.
+		///----------------------------------------------------------------------------------------------------
+		void Deregister(GUI_RENDER aRenderCallback);
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetRenderCallbacks:
-	/// 	Returns a copy of the specified callbacks.
-	///----------------------------------------------------------------------------------------------------
-	const std::vector<GUI_RENDER>& GetRenderCallbacks(ERenderType aRenderType) const;
+		///----------------------------------------------------------------------------------------------------
+		/// CleanupRefs:
+		/// 	Removes all registered render callbacks and close-on-escape hooks that match the address space.
+		///----------------------------------------------------------------------------------------------------
+		uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
-	protected:
-	std::mutex              RenderMutex;
-	std::vector<GUI_RENDER> Registry[static_cast<uint32_t>(ERenderType::COUNT)];
-};
+		///----------------------------------------------------------------------------------------------------
+		/// GetRenderCallbacks:
+		/// 	Returns a copy of the specified callbacks.
+		///----------------------------------------------------------------------------------------------------
+		const std::vector<GUI_RENDER>& GetRenderCallbacks(ERenderType aRenderType) const;
+
+		protected:
+		std::mutex              RenderMutex;
+		std::vector<GUI_RENDER> Registry[static_cast<uint32_t>(ERenderType::COUNT)];
+	};
+}

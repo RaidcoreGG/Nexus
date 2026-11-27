@@ -38,202 +38,203 @@
 #include "UiStyle.h"
 #include "Util/Inputs.h"
 
-namespace Input = Engine::Input;
-
-constexpr const char* KB_MENU            = "KB_MENU";
-constexpr const char* KB_ADDONS          = "KB_ADDONS";
-constexpr const char* KB_OPTIONS         = "KB_OPTIONS";
-constexpr const char* KB_LOG             = "KB_LOG";
-constexpr const char* KB_DEBUG           = "KB_DEBUG";
-constexpr const char* KB_MUMBLEOVERLAY   = "KB_MUMBLEOVERLAY";
-constexpr const char* KB_TOGGLEHIDEUI    = "KB_TOGGLEHIDEUI";
-
-///----------------------------------------------------------------------------------------------------
-/// CUiContext Class
-///----------------------------------------------------------------------------------------------------
-class CUiContext
-	: public ILogChannel
-	, public CUiRender
-	, public CUiBinds
-	, public CUiStyle
-	, public IWndProcNotifyHandler
-	, public IDxgiPresentNotifyHandler
-	, public IDxgiResizeNotifyHandler
-	, public IMumbleIdentityNotifyHandler
-	, public Input::IInputBindUpdateNotifyHandler
-	, public IFontUpdateNotifyHandler
+namespace Raidcore::UI
 {
-	public:
-	///----------------------------------------------------------------------------------------------------
-	/// OnInputBindPressed:
-	/// 	Receives input bind invocations.
-	///----------------------------------------------------------------------------------------------------
-	static void OnInputBindPressed(const char* aIdentifier);
+	constexpr const char* KB_MENU            = "KB_MENU";
+	constexpr const char* KB_ADDONS          = "KB_ADDONS";
+	constexpr const char* KB_OPTIONS         = "KB_OPTIONS";
+	constexpr const char* KB_LOG             = "KB_LOG";
+	constexpr const char* KB_DEBUG           = "KB_DEBUG";
+	constexpr const char* KB_MUMBLEOVERLAY   = "KB_MUMBLEOVERLAY";
+	constexpr const char* KB_TOGGLEHIDEUI    = "KB_TOGGLEHIDEUI";
 
 	///----------------------------------------------------------------------------------------------------
-	/// ctor
+	/// CUiContext Class
 	///----------------------------------------------------------------------------------------------------
-	CUiContext(
-		RenderContext_t*      aRenderContext,
-		CTextureLoader*       aTextureService,
-		CDataLinkApi*         aDataLink,
-		Input::CInputBindApi* aInputBindApi,
-		CMumbleReader*        aMumbleReader
-	);
+	class CUiContext
+		: public Core::ILogChannel
+		, public CUiRender
+		, public CUiBinds
+		, public CUiStyle
+		, public Engine::Input::IWndProcNotifyHandler
+		, public GW2::Hooks::IDxgiPresentNotifyHandler
+		, public GW2::Hooks::IDxgiResizeNotifyHandler
+		, public GW2::IMumbleIdentityNotifyHandler
+		, public Engine::Input::IInputBindUpdateNotifyHandler
+		, public UI::IFontUpdateNotifyHandler
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// OnInputBindPressed:
+		/// 	Receives input bind invocations.
+		///----------------------------------------------------------------------------------------------------
+		static void OnInputBindPressed(const char* aIdentifier);
 
-	///----------------------------------------------------------------------------------------------------
-	/// dtor
-	///----------------------------------------------------------------------------------------------------
-	~CUiContext();
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		CUiContext(
+			UI::RenderContext_t*      aRenderContext,
+			UI::CTextureLoader*       aTextureService,
+			Engine::CDataLinkApi*         aDataLink,
+			Engine::Input::CInputBindApi* aInputBindApi,
+			GW2::CMumbleReader*        aMumbleReader
+		);
 
-	///----------------------------------------------------------------------------------------------------
-	/// Initialize:
-	/// 	Initializes the UI context.
-	///----------------------------------------------------------------------------------------------------
-	void Initialize();
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		~CUiContext();
 
-	///----------------------------------------------------------------------------------------------------
-	/// Shutdown:
-	/// 	Shuts down the UI context.
-	///----------------------------------------------------------------------------------------------------
-	void Shutdown();
+		///----------------------------------------------------------------------------------------------------
+		/// Initialize:
+		/// 	Initializes the UI context.
+		///----------------------------------------------------------------------------------------------------
+		void Initialize();
 
-	///----------------------------------------------------------------------------------------------------
-	/// Render:
-	/// 	Renders the UI and executes callbacks.
-	///----------------------------------------------------------------------------------------------------
-	void Render();
+		///----------------------------------------------------------------------------------------------------
+		/// Shutdown:
+		/// 	Shuts down the UI context.
+		///----------------------------------------------------------------------------------------------------
+		void Shutdown();
 
-	///----------------------------------------------------------------------------------------------------
-	/// Invalidate:
-	/// 	Calls all UI children's invalidate function, causing them to refresh.
-	///----------------------------------------------------------------------------------------------------
-	void Invalidate();
+		///----------------------------------------------------------------------------------------------------
+		/// Render:
+		/// 	Renders the UI and executes callbacks.
+		///----------------------------------------------------------------------------------------------------
+		void Render();
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnWndProcNotify:
-	/// 	Returns 0 if message was processed.
-	///----------------------------------------------------------------------------------------------------
-	UINT OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam) override;
+		///----------------------------------------------------------------------------------------------------
+		/// Invalidate:
+		/// 	Calls all UI children's invalidate function, causing them to refresh.
+		///----------------------------------------------------------------------------------------------------
+		void Invalidate();
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnDxgiPresentNotify:
-	/// 	Renders the UI.
-	///----------------------------------------------------------------------------------------------------
-	void OnDxgiPresentNotify(IDXGISwapChain* aSwapChain) override;
+		///----------------------------------------------------------------------------------------------------
+		/// OnWndProcNotify:
+		/// 	Returns 0 if message was processed.
+		///----------------------------------------------------------------------------------------------------
+		UINT OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam) override;
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnDxgiResizeNotify:
-	/// 	Shuts the UI down before the buffers are resized.
-	///----------------------------------------------------------------------------------------------------
-	void OnDxgiResizeNotify(IDXGISwapChain* aSwapChain, UINT aWidth, UINT aHeight) override;
+		///----------------------------------------------------------------------------------------------------
+		/// OnDxgiPresentNotify:
+		/// 	Renders the UI.
+		///----------------------------------------------------------------------------------------------------
+		void OnDxgiPresentNotify(IDXGISwapChain* aSwapChain) override;
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnMumbleIdentityNotify:
-	/// 	Resizes the fonts when the game UI size changed.
-	///----------------------------------------------------------------------------------------------------
-	void OnMumbleIdentityNotify(const Mumble::Identity& aIdentity) override;
+		///----------------------------------------------------------------------------------------------------
+		/// OnDxgiResizeNotify:
+		/// 	Shuts the UI down before the buffers are resized.
+		///----------------------------------------------------------------------------------------------------
+		void OnDxgiResizeNotify(IDXGISwapChain* aSwapChain, UINT aWidth, UINT aHeight) override;
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnInputBindUpdateNotify:
-	/// 	Refreshes the UI.
-	///----------------------------------------------------------------------------------------------------
-	void OnInputBindUpdateNotify() override;
+		///----------------------------------------------------------------------------------------------------
+		/// OnMumbleIdentityNotify:
+		/// 	Resizes the fonts when the game UI size changed.
+		///----------------------------------------------------------------------------------------------------
+		void OnMumbleIdentityNotify(const Mumble::Identity& aIdentity) override;
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnFontUpdateNotify:
-	/// 	Applies the Nexus fonts to ImGui and NexusLink.
-	///----------------------------------------------------------------------------------------------------
-	void OnFontUpdateNotify(const char* aIdentifier, ImFont* aFont) override;
+		///----------------------------------------------------------------------------------------------------
+		/// OnInputBindUpdateNotify:
+		/// 	Refreshes the UI.
+		///----------------------------------------------------------------------------------------------------
+		void OnInputBindUpdateNotify() override;
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetLocalization:
-	/// 	Returns the localization component.
-	///----------------------------------------------------------------------------------------------------
-	CLocalization* GetLocalization();
+		///----------------------------------------------------------------------------------------------------
+		/// OnFontUpdateNotify:
+		/// 	Applies the Nexus fonts to ImGui and NexusLink.
+		///----------------------------------------------------------------------------------------------------
+		void OnFontUpdateNotify(const char* aIdentifier, ImFont* aFont) override;
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetAlerts:
-	/// 	Returns the alerts component.
-	///----------------------------------------------------------------------------------------------------
-	CAlerts* GetAlerts();
+		///----------------------------------------------------------------------------------------------------
+		/// GetLocalization:
+		/// 	Returns the localization component.
+		///----------------------------------------------------------------------------------------------------
+		UI::CLocalization* GetLocalization();
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetQuickAccess:
-	/// 	Returns the quick access component.
-	///----------------------------------------------------------------------------------------------------
-	CQuickAccess* GetQuickAccess();
+		///----------------------------------------------------------------------------------------------------
+		/// GetAlerts:
+		/// 	Returns the alerts component.
+		///----------------------------------------------------------------------------------------------------
+		UI::CAlerts* GetAlerts();
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetFontManager:
-	/// 	Returns the font manager.
-	///----------------------------------------------------------------------------------------------------
-	CFontManager* GetFontManager();
+		///----------------------------------------------------------------------------------------------------
+		/// GetQuickAccess:
+		/// 	Returns the quick access component.
+		///----------------------------------------------------------------------------------------------------
+		UI::CQuickAccess* GetQuickAccess();
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetEscapeClosingService:
-	/// 	Returns the escape-closing service.
-	///----------------------------------------------------------------------------------------------------
-	CEscapeClosing* GetEscapeClosingService();
+		///----------------------------------------------------------------------------------------------------
+		/// GetFontManager:
+		/// 	Returns the font manager.
+		///----------------------------------------------------------------------------------------------------
+		UI::CFontManager* GetFontManager();
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetMainWindow:
-	/// 	Returns the main window.
-	///----------------------------------------------------------------------------------------------------
-	CMainWindow* GetMainWindow();
+		///----------------------------------------------------------------------------------------------------
+		/// GetEscapeClosingService:
+		/// 	Returns the escape-closing service.
+		///----------------------------------------------------------------------------------------------------
+		UI::CEscapeClosing* GetEscapeClosingService();
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetScaling:
-	/// 	Returns the scaling service.
-	///----------------------------------------------------------------------------------------------------
-	CScaling* GetScaling();
+		///----------------------------------------------------------------------------------------------------
+		/// GetMainWindow:
+		/// 	Returns the main window.
+		///----------------------------------------------------------------------------------------------------
+		UI::CMainWindow* GetMainWindow();
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetInput:
-	/// 	Returns the UI input service.
-	///----------------------------------------------------------------------------------------------------
-	CUiInput* GetInput();
+		///----------------------------------------------------------------------------------------------------
+		/// GetScaling:
+		/// 	Returns the scaling service.
+		///----------------------------------------------------------------------------------------------------
+		UI::CScaling* GetScaling();
 
-	///----------------------------------------------------------------------------------------------------
-	/// LoadFonts:
-	/// 	Loads the fonts.
-	///----------------------------------------------------------------------------------------------------
-	void LoadFonts();
+		///----------------------------------------------------------------------------------------------------
+		/// GetInput:
+		/// 	Returns the UI input service.
+		///----------------------------------------------------------------------------------------------------
+		CUiInput* GetInput();
 
-	///----------------------------------------------------------------------------------------------------
-	/// ApplyFontScale:
-	/// 	Resizes the Nexus fonts to the game's UI scale. NexusLink keeps the previous fonts until the
-	/// 	resized ones are built.
-	///----------------------------------------------------------------------------------------------------
-	void ApplyFontScale();
+		///----------------------------------------------------------------------------------------------------
+		/// LoadFonts:
+		/// 	Loads the fonts.
+		///----------------------------------------------------------------------------------------------------
+		void LoadFonts();
 
-	private:
-	/* Services */
-	RenderContext_t*        RenderContext  = nullptr;
-	CLocalization*          Language       = nullptr;
-	CTextureLoader*         TextureService = nullptr;
-	CDataLinkApi*           DataLink       = nullptr;
-	Input::CInputBindApi*   InputBindApi   = nullptr;
-	CMumbleReader*          MumbleReader   = nullptr;
+		///----------------------------------------------------------------------------------------------------
+		/// ApplyFontScale:
+		/// 	Resizes the Nexus fonts to the game's UI scale. NexusLink keeps the previous fonts until the
+		/// 	resized ones are built.
+		///----------------------------------------------------------------------------------------------------
+		void ApplyFontScale();
 
-	/* Rendering */
-	ID3D11RenderTargetView* RenderTargetView;
+		private:
+		/* Services */
+		UI::RenderContext_t*        RenderContext  = nullptr;
+		UI::CLocalization*          Language       = nullptr;
+		UI::CTextureLoader*         TextureService = nullptr;
+		Engine::CDataLinkApi*           DataLink       = nullptr;
+		Engine::Input::CInputBindApi*   InputBindApi   = nullptr;
+		GW2::CMumbleReader*          MumbleReader   = nullptr;
 
-	/* Windows/Widgets */
-	CAlerts*                Alerts;
-	CMainWindow*            MainWindow;
-	CQuickAccess*           QuickAccess;
+		/* Rendering */
+		ID3D11RenderTargetView* RenderTargetView;
 
-	/* UI Services */
-	CFontManager*           FontManager;
-	CEscapeClosing*         EscapeClose;
-	CScaling*               Scaling;
-	CUiInput*               Input;
+		/* Windows/Widgets */
+		UI::CAlerts*                Alerts;
+		UI::CMainWindow*            MainWindow;
+		UI::CQuickAccess*           QuickAccess;
 
-	bool                    IsInitialized = false;
-	bool                    IsVisible = true;
-	bool                    IsInvalid = true;
+		/* UI Services */
+		UI::CFontManager*           FontManager;
+		UI::CEscapeClosing*         EscapeClose;
+		UI::CScaling*               Scaling;
+		CUiInput*               Input;
 
-	public:
-	CSetting<bool>          EulaAccepted{ "AcceptEULA", false };
-};
+		bool                    IsInitialized = false;
+		bool                    IsVisible = true;
+		bool                    IsInvalid = true;
+
+		public:
+		Core::CSetting<bool>          EulaAccepted{ "AcceptEULA", false };
+	};
+}

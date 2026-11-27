@@ -10,7 +10,7 @@
 
 #include "Util/Inputs.h"
 
-namespace Engine::Input
+namespace Raidcore::Engine::Input
 {
 	void CInputBindCapture::StartCapturing()
 	{

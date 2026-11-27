@@ -18,14 +18,13 @@
 using json = nlohmann::json;
 
 #include "Engine/Clockwork/Clockwork.h"
-namespace Clockwork = Raidcore::Clockwork;
 
 #include "IbConst.h"
 #include "Util/Inputs.h"
 
-namespace Engine::Input
+namespace Raidcore::Engine::Input
 {
-	CInputBindApi::CInputBindApi(CEventApi* aEventApi, std::filesystem::path aConfigPath) : IRefCleaner("InputBindApi"), ILogChannel("InputBinds")
+	CInputBindApi::CInputBindApi(Engine::CEventApi* aEventApi, std::filesystem::path aConfigPath) : Engine::IRefCleaner("InputBindApi"), Core::ILogChannel("InputBinds")
 	{
 		assert(aEventApi);
 
@@ -223,7 +222,7 @@ namespace Engine::Input
 
 		this->Save();
 
-		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
+		Clockwork::Run<void>(Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
 		{
 			this->NotifyInputBindUpdate();
 			this->EventApi->Raise("EV_INPUTBIND_UPDATED");
@@ -357,7 +356,7 @@ namespace Engine::Input
 
 		this->Save();
 
-		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
+		Clockwork::Run<void>(Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
 		{
 			this->NotifyInputBindUpdate();
 			this->EventApi->Raise("EV_INPUTBIND_UPDATED");
@@ -379,7 +378,7 @@ namespace Engine::Input
 
 		this->Save();
 
-		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
+		Clockwork::Run<void>(Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
 		{
 			this->NotifyInputBindUpdate();
 			this->EventApi->Raise("EV_INPUTBIND_UPDATED");
@@ -412,7 +411,7 @@ namespace Engine::Input
 				{
 					IB_CALLBACK_V1 handler = it->second.Handler_DownOnlyAsync;
 
-					Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Immediate, [aIdentifier, handler](Clockwork::CancellationToken aToken)
+					Clockwork::Run<void>(Clockwork::ETaskPriority::Immediate, [aIdentifier, handler](Clockwork::CancellationToken aToken)
 					{
 						handler(aIdentifier.c_str());
 					});
@@ -426,7 +425,7 @@ namespace Engine::Input
 			{
 				IB_CALLBACK_V2 handler = it->second.Handler_DownReleaseAsync;
 
-				Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Immediate, [aIdentifier, handler, aIsRelease](Clockwork::CancellationToken aToken)
+				Clockwork::Run<void>(Clockwork::ETaskPriority::Immediate, [aIdentifier, handler, aIsRelease](Clockwork::CancellationToken aToken)
 				{
 					handler(aIdentifier.c_str(), aIsRelease);
 				});
@@ -448,7 +447,7 @@ namespace Engine::Input
 
 		this->Registry.erase(aIdentifier);
 
-		Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
+		Clockwork::Run<void>(Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
 		{
 			this->NotifyInputBindUpdate();
 			this->EventApi->Raise("EV_INPUTBIND_UPDATED");

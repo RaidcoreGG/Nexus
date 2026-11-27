@@ -14,125 +14,128 @@
 
 #include "PrefContext.h"
 
-///----------------------------------------------------------------------------------------------------
-/// CSetting Class
-///----------------------------------------------------------------------------------------------------
-template <typename T>
-class CSetting : public ISetting
+namespace Raidcore::Core
 {
-	public:
-	using OnChange_t = std::function<void(const T&)>;
-
-	CSetting(std::string aKey, T aDefault, OnChange_t aOnChange = nullptr)
-		: Key(std::move(aKey))
-		, Default(aDefault)
-		, Value(std::move(aDefault))
-		, OnChange(std::move(aOnChange))
+	///----------------------------------------------------------------------------------------------------
+	/// CSetting Class
+	///----------------------------------------------------------------------------------------------------
+	template <typename T>
+	class CSetting : public ISetting
 	{
-		CPreferences::Get()->Register(this);
-	}
+		public:
+		using OnChange_t = std::function<void(const T&)>;
 
-	~CSetting() override
-	{
-		CPreferences::Get()->Deregister(this);
-	}
+		CSetting(std::string aKey, T aDefault, OnChange_t aOnChange = nullptr)
+			: Key(std::move(aKey))
+			, Default(aDefault)
+			, Value(std::move(aDefault))
+			, OnChange(std::move(aOnChange))
+		{
+			CPreferences::Get()->Register(this);
+		}
 
-	CSetting(const CSetting&) = delete;
-	CSetting& operator=(const CSetting&) = delete;
+		~CSetting() override
+		{
+			CPreferences::Get()->Deregister(this);
+		}
 
-	///----------------------------------------------------------------------------------------------------
-	/// Get:
-	/// 	Returns the current value.
-	///----------------------------------------------------------------------------------------------------
-	T Get() const
-	{
-		const std::lock_guard<std::mutex> lock(this->Mutex);
-		return this->Value;
-	}
+		CSetting(const CSetting&) = delete;
+		CSetting& operator=(const CSetting&) = delete;
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetDefault:
-	/// 	Returns the default value.
-	///----------------------------------------------------------------------------------------------------
-	const T& GetDefault() const
-	{
-		return this->Default;
-	}
-
-	///----------------------------------------------------------------------------------------------------
-	/// Set:
-	/// 	Stores and persists a new value. Does nothing if the value is unchanged.
-	///----------------------------------------------------------------------------------------------------
-	void Set(T aValue)
-	{
+		///----------------------------------------------------------------------------------------------------
+		/// Get:
+		/// 	Returns the current value.
+		///----------------------------------------------------------------------------------------------------
+		T Get() const
 		{
 			const std::lock_guard<std::mutex> lock(this->Mutex);
+			return this->Value;
+		}
 
-			if (this->Value == aValue)
+		///----------------------------------------------------------------------------------------------------
+		/// GetDefault:
+		/// 	Returns the default value.
+		///----------------------------------------------------------------------------------------------------
+		const T& GetDefault() const
+		{
+			return this->Default;
+		}
+
+		///----------------------------------------------------------------------------------------------------
+		/// Set:
+		/// 	Stores and persists a new value. Does nothing if the value is unchanged.
+		///----------------------------------------------------------------------------------------------------
+		void Set(T aValue)
+		{
 			{
-				return;
+				const std::lock_guard<std::mutex> lock(this->Mutex);
+
+				if (this->Value == aValue)
+				{
+					return;
+				}
+
+				this->Value = aValue;
 			}
 
-			this->Value = aValue;
+			/* Outside the lock: the store locks before the setting when it applies loaded values. */
+			CPreferences::Get()->Write(this->Key, aValue);
+
+			this->NotifyChanged();
 		}
 
-		/* Outside the lock: the store locks before the setting when it applies loaded values. */
-		CPreferences::Get()->Write(this->Key, aValue);
-
-		this->NotifyChanged();
-	}
-
-	///----------------------------------------------------------------------------------------------------
-	/// Reset:
-	/// 	Sets the default value.
-	///----------------------------------------------------------------------------------------------------
-	void Reset()
-	{
-		this->Set(this->Default);
-	}
-
-	const std::string& GetKey() const override
-	{
-		return this->Key;
-	}
-
-	bool Apply(const json& aValue) override
-	{
-		T value;
-
-		try
+		///----------------------------------------------------------------------------------------------------
+		/// Reset:
+		/// 	Sets the default value.
+		///----------------------------------------------------------------------------------------------------
+		void Reset()
 		{
-			value = aValue.get<T>();
+			this->Set(this->Default);
 		}
-		catch (const json::exception&)
+
+		const std::string& GetKey() const override
 		{
-			LogWarning("Settings", "Setting \"%s\" has an invalid stored value, keeping the current one.", this->Key.c_str());
-			return false;
+			return this->Key;
 		}
 
-		const std::lock_guard<std::mutex> lock(this->Mutex);
-
-		if (this->Value == value)
+		bool Apply(const json& aValue) override
 		{
-			return false;
+			T value;
+
+			try
+			{
+				value = aValue.get<T>();
+			}
+			catch (const json::exception&)
+			{
+				Core::LogWarning("Settings", "Setting \"%s\" has an invalid stored value, keeping the current one.", this->Key.c_str());
+				return false;
+			}
+
+			const std::lock_guard<std::mutex> lock(this->Mutex);
+
+			if (this->Value == value)
+			{
+				return false;
+			}
+
+			this->Value = std::move(value);
+			return true;
 		}
 
-		this->Value = std::move(value);
-		return true;
-	}
-
-	void NotifyChanged() override
-	{
-		if (this->OnChange)
+		void NotifyChanged() override
 		{
-			this->OnChange(this->Get());
+			if (this->OnChange)
+			{
+				this->OnChange(this->Get());
+			}
 		}
-	}
 
-	private:
-	const std::string  Key;
-	const T            Default;
-	mutable std::mutex Mutex;
-	T                  Value;
-	OnChange_t         OnChange;
-};
+		private:
+		const std::string  Key;
+		const T            Default;
+		mutable std::mutex Mutex;
+		T                  Value;
+		OnChange_t         OnChange;
+	};
+}

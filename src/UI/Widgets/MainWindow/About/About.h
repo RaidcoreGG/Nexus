@@ -11,12 +11,15 @@
 #include "UI/Controls/CtlSubWindow.h"
 #include "UI/Textures/TxTexture.h"
 
-class CAboutBox : public ISubWindow
+namespace Raidcore::UI
 {
-	public:
-	CAboutBox();
-	void RenderContent() override;
+	class CAboutBox : public UI::ISubWindow
+	{
+		public:
+		CAboutBox();
+		void RenderContent() override;
 
-	private:
-	Texture_t* Tex_BannerDiscord = nullptr;
-};
+		private:
+		Texture_t* Tex_BannerDiscord = nullptr;
+	};
+}

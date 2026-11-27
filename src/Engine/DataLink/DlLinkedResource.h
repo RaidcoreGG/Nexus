@@ -13,14 +13,17 @@
 
 #include "DlEnum.h"
 
-///----------------------------------------------------------------------------------------------------
-/// LinkedResource_t Struct
-///----------------------------------------------------------------------------------------------------
-struct LinkedResource_t
+namespace Raidcore::Engine
 {
-	ELinkedResourceType Type;           /* The type of the resource. Public or Internal. */
-	HANDLE              Handle;         /* The handle of the resource.                   */
-	void*               Pointer;        /* The pointer to the resource.                  */
-	size_t              Size;           /* The size of the resource.                     */
-	std::string         UnderlyingName; /* The real name of the memory mapped file.      */
-};
+	///----------------------------------------------------------------------------------------------------
+	/// LinkedResource_t Struct
+	///----------------------------------------------------------------------------------------------------
+	struct LinkedResource_t
+	{
+		ELinkedResourceType Type;           /* The type of the resource. Public or Internal. */
+		HANDLE              Handle;         /* The handle of the resource.                   */
+		void*               Pointer;        /* The pointer to the resource.                  */
+		size_t              Size;           /* The size of the resource.                     */
+		std::string         UnderlyingName; /* The real name of the memory mapped file.      */
+	};
+}

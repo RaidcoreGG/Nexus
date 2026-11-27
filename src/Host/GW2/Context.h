@@ -33,78 +33,79 @@
 #include "UI/Textures/TxLoader.h"
 #include "UI/UiContext.h"
 
-namespace Input = Engine::Input;
-
-class CContext
+namespace Raidcore::GW2
 {
-	public:
-	static CContext* GetContext();
+	class CContext
+	{
+		public:
+		static CContext* GetContext();
 
-	CContext(CContext const&)       = delete;
-	void operator=(CContext const&) = delete;
+		CContext(CContext const&)       = delete;
+		void operator=(CContext const&) = delete;
 
-	Version_t const& GetVersion();
+		Core::Version_t const& GetVersion();
 
-	const char* GetBuild();
+		const char* GetBuild();
 
-	void SetModule(HMODULE aModule);
+		void SetModule(HMODULE aModule);
 
-	HMODULE GetModule();
+		HMODULE GetModule();
 
-	DWORD GetModuleSize();
+		DWORD GetModuleSize();
 
-	Raidcore::Core::Platform::Windows::CCrashHandler* GetCrashHandler();
+		Core::Windows::CCrashHandler* GetCrashHandler();
 
-	RenderContext_t* GetRendererCtx();
+		UI::RenderContext_t* GetRendererCtx();
 
-	CTextureLoader* GetTextureService();
+		UI::CTextureLoader* GetTextureService();
 
-	CDataLinkApi* GetDataLink();
+		Engine::CDataLinkApi* GetDataLink();
 
-	CEventApi* GetEventApi();
+		Engine::CEventApi* GetEventApi();
 
-	CEventRouter* GetEventRouter();
+		GW2::CEventRouter* GetEventRouter();
 
-	CLoader* GetLoader();
+		Engine::CLoader* GetLoader();
 
-	CLibraryMgr* GetAddonLibrary();
+		GW2::CLibraryMgr* GetAddonLibrary();
 
-	CRawInputApi* GetRawInputApi();
+		Engine::Input::CRawInputApi* GetRawInputApi();
 
-	Input::CInputBindApi* GetInputBindApi();
+		Engine::Input::CInputBindApi* GetInputBindApi();
 
-	CGameBindsApi* GetGameBindsApi();
+		GW2::CGameBindsApi* GetGameBindsApi();
 
-	CMouseResetFix* GetMouseResetFix();
+		GW2::CMouseResetFix* GetMouseResetFix();
 
-	CGameWindow* GetGameWindow();
+		GW2::Hooks::CGameWindow* GetGameWindow();
 
-	CUiContext* GetUIContext();
+		UI::CUiContext* GetUIContext();
 
-	CMumbleReader* GetMumbleReader();
+		GW2::CMumbleReader* GetMumbleReader();
 
-	CHttpClient* GetHttpClient(std::string aURL, bool aDisableCache = false);
+		Engine::Networking::CHttpClient* GetHttpClient(std::string aURL, bool aDisableCache = false);
 
-	///----------------------------------------------------------------------------------------------------
-	/// StopHttpClients:
-	/// 	Stops every HTTP client, including ones created afterwards, so no request blocks shutdown.
-	///----------------------------------------------------------------------------------------------------
-	void StopHttpClients();
+		///----------------------------------------------------------------------------------------------------
+		/// StopHttpClients:
+		/// 	Stops every HTTP client, including ones created afterwards, so no request blocks shutdown.
+		///----------------------------------------------------------------------------------------------------
+		void StopHttpClients();
 
-	CSelfUpdater* GetSelfUpdater();
+		GW2::CSelfUpdater* GetSelfUpdater();
 
-	CArcApi* GetArcApi();
+		GW2::ArcDPS::CArcApi* GetArcApi();
 
-	CConfigMgr* GetCfgMgr();
+		GW2::CConfigMgr* GetCfgMgr();
 
-	private:
-	CContext() = default;
-	~CContext();
+		private:
+		CContext() = default;
+		~CContext();
 
-	HMODULE                             Module     = nullptr;
-	DWORD                               ModuleSize = 0;
+		HMODULE                             Module     = nullptr;
+		DWORD                               ModuleSize = 0;
 
-	std::mutex                          HttpClientMutex;
-	std::map<std::string, CHttpClient*> HttpClients;
-	bool                                IsHttpStopped = false;
-};
+		std::mutex                          HttpClientMutex;
+		std::map<std::string, Engine::Networking::CHttpClient*> HttpClients;
+		bool                                IsHttpStopped = false;
+	};
+}

@@ -18,7 +18,7 @@
 #include "PxyEnum.h"
 #include "Util/CmdLine.h"
 
-static ProxyModule_t s_ProxyModule{};
+static Raidcore::Proxy::ProxyModule_t s_ProxyModule{};
 
 #define PROXY_MODULE_NAME "d3d11.dll"
 
@@ -36,7 +36,7 @@ PROXY HRESULT __stdcall D3D11CreateDevice(
 )
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::D3D11_CREATEDEVICE);
+	Raidcore::GW2::Initialize(Raidcore::Proxy::EProxyFunction::D3D11_CREATEDEVICE);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -79,7 +79,7 @@ PROXY HRESULT __stdcall D3D11CreateDeviceAndSwapChain(
 )
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::D3D11_CREATEDEVICEANDSWAPCHAIN);
+	Raidcore::GW2::Initialize(Raidcore::Proxy::EProxyFunction::D3D11_CREATEDEVICEANDSWAPCHAIN);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -118,7 +118,7 @@ PROXY HRESULT __stdcall D3D11CoreCreateDevice(
 )
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::D3D11_CORECREATEDEVICE);
+	Raidcore::GW2::Initialize(Raidcore::Proxy::EProxyFunction::D3D11_CORECREATEDEVICE);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -145,7 +145,7 @@ PROXY HRESULT __stdcall D3D11CoreCreateLayeredDevice(
 )
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::D3D11_CORECREATELAYEREDDEVICE);
+	Raidcore::GW2::Initialize(Raidcore::Proxy::EProxyFunction::D3D11_CORECREATELAYEREDDEVICE);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -168,7 +168,7 @@ PROXY SIZE_T __stdcall D3D11CoreGetLayeredDeviceSize(
 )
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::D3D11_COREGETLAYEREDDEVICESIZE);
+	Raidcore::GW2::Initialize(Raidcore::Proxy::EProxyFunction::D3D11_COREGETLAYEREDDEVICESIZE);
 
 	static thread_local bool s_InProxyCall = false;
 
@@ -188,7 +188,7 @@ PROXY HRESULT __stdcall D3D11CoreRegisterLayers(
 )
 {
 	s_ProxyModule.Init(PROXY_MODULE_NAME);
-	Main::Initialize(EProxyFunction::D3D11_COREREGISTERLAYERS);
+	Raidcore::GW2::Initialize(Raidcore::Proxy::EProxyFunction::D3D11_COREREGISTERLAYERS);
 
 	static thread_local bool s_InProxyCall = false;
 

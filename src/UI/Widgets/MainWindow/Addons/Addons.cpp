@@ -20,329 +20,378 @@
 #include "res/Resources.h"
 #include "Util/Strings.h"
 
-CAddonsWindow::CAddonsWindow()
+namespace Raidcore::UI
 {
-	this->Name           = "Addons";
-	this->DisplayName    = Lang::Nav::Addons;
-	this->IconIdentifier = "ICON_ADDONS";
-	this->IconEntry      = &Resources::IconAddons;
-	this->IsHost         = true;
-	this->IsAnchored     = true;
-
-	this->Invalidate();
-
-	this->Attach(ADDONSTATE_PRIO_ADDONSWINDOW);
-}
-
-CAddonsWindow::~CAddonsWindow()
-{
-	this->Detach();
-}
-
-void CAddonsWindow::OnAddonStateNotify(EAddonStateNotify aState, uint32_t aSignature)
-{
-	this->Invalidate(static_cast<signed int>(aSignature));
-}
-
-void CAddonsWindow::Invalidate()
-{
-	this->IsInvalid = true;
-}
-
-void CAddonsWindow::Invalidate(signed int aAddonID)
-{
-	this->IsInvalid = true;
-
-	if (this->AddonData.GetSig() == aAddonID)
+	CAddonsWindow::CAddonsWindow()
 	{
-		this->AddonData.OptionsRender = nullptr;
-	}
-}
+		this->Name           = "Addons";
+		this->DisplayName    = Lang::Nav::Addons;
+		this->IconIdentifier = "ICON_ADDONS";
+		this->IconEntry      = &Resources::IconAddons;
+		this->IsHost         = true;
+		this->IsAnchored     = true;
 
-void CAddonsWindow::SetContent(AddonListing_t& aAddonData)
-{
-	CContext* ctx = CContext::GetContext();
-	CUiContext* uictx = ctx->GetUIContext();
+		this->Invalidate();
 
-	this->AddonData = aAddonData;
-	this->AddonData.InputBinds = uictx->GetInputBinds(this->AddonData.GetName());
-	this->HasContent = true;
-}
-
-void CAddonsWindow::ClearContent()
-{
-	this->AddonData.InputBinds.clear();
-	this->HasContent = false;
-}
-
-void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
-{
-	/* Unique id. */
-	std::string id = aAddonData.GetUniqueID();
-
-	ImGuiStyle& style = ImGui::GetStyle();
-
-	ImVec2 itemSz = ImVec2(aWidth, ImGui::GetFrameHeightWithSpacing() * 4);
-	float innerHeight = itemSz.y - (style.WindowPadding.y * 2);
-
-	ImVec2 btnTextSz = ImGui::CalcTextSize("############");
-
-	float btnWidth = btnTextSz.x + (style.FramePadding.x * 2);
-	float stateBarWidth = ImGui::GetFrameHeight() / 2.f; /* Half a frame width. */
-	float infoAreaWidth = itemSz.x - stateBarWidth - style.ItemSpacing.x - btnWidth - style.ItemSpacing.x - style.WindowPadding.x; /* Full width minus other elements and spacing. */
-	float actionsAreaWidth = btnWidth; /* As wide as a padded button. */
-
-	ImVec2 curPos = ImGui::GetCursorPos();
-
-	/* above visible space                        || under visible space */
-	if (curPos.y < ImGui::GetScrollY() - itemSz.y || curPos.y > ImGui::GetScrollY() + ImGui::GetWindowHeight())
-	{
-		ImGui::Dummy(itemSz);
-		return;
+		this->Attach(GW2::ADDONSTATE_PRIO_ADDONSWINDOW);
 	}
 
-	static CContext*       ctx      = CContext::GetContext();
-	static CUiContext*     uictx    = ctx->GetUIContext();
-	static CConfigMgr*     cfgmgr   = ctx->GetCfgMgr();
-	static CLibraryMgr*    libmgr   = ctx->GetAddonLibrary();
-	static CTextureLoader* texapi   = ctx->GetTextureService();
-	static CAlerts*        alertctx = uictx->GetAlerts();
-
-	/* For the status bar, data will be set within the child.*/
-	bool drawStatusBar = false;
-	ImVec2 statusBarPosBegin;
-	ImVec2 statusBarPosEnd;
-	ImColor statusBarCol;
-	ImDrawList* drawlist = nullptr;
-
-	if (ImGui::BeginChild(("Addon_" + id).c_str(), itemSz, true))
+	CAddonsWindow::~CAddonsWindow()
 	{
-		ImGuiWindow* wnd = ImGui::GetCurrentWindow();
-		drawlist = wnd->DrawList;
-		statusBarPosBegin = ImVec2(wnd->Pos.x, wnd->Pos.y);
-		statusBarPosEnd = ImVec2(wnd->Pos.x + stateBarWidth, wnd->Pos.y + wnd->Size.y);
-		statusBarCol = ImColor(85, 85, 85, 255);
-		drawStatusBar = true;
+		this->Detach();
+	}
 
-		if (aAddonData.Addon && aAddonData.Addon->IsLoaded())
+	void CAddonsWindow::OnAddonStateNotify(GW2::EAddonStateNotify aState, uint32_t aSignature)
+	{
+		this->Invalidate(static_cast<signed int>(aSignature));
+	}
+
+	void CAddonsWindow::Invalidate()
+	{
+		this->IsInvalid = true;
+	}
+
+	void CAddonsWindow::Invalidate(signed int aAddonID)
+	{
+		this->IsInvalid = true;
+
+		if (this->AddonData.GetSig() == aAddonID)
 		{
-			statusBarCol = ImColor(89, 172, 98, 255);
+			this->AddonData.OptionsRender = nullptr;
 		}
-		else if (aAddonData.Addon && aAddonData.Addon->IsVersionDisabled())
+	}
+
+	void CAddonsWindow::SetContent(AddonListing_t& aAddonData)
+	{
+		GW2::CContext* ctx = GW2::CContext::GetContext();
+		UI::CUiContext* uictx = ctx->GetUIContext();
+
+		this->AddonData = aAddonData;
+		this->AddonData.InputBinds = uictx->GetInputBinds(this->AddonData.GetName());
+		this->HasContent = true;
+	}
+
+	void CAddonsWindow::ClearContent()
+	{
+		this->AddonData.InputBinds.clear();
+		this->HasContent = false;
+	}
+
+	void CAddonsWindow::AddonItem(AddonListing_t& aAddonData, float aWidth)
+	{
+		/* Unique id. */
+		std::string id = aAddonData.GetUniqueID();
+
+		ImGuiStyle& style = ImGui::GetStyle();
+
+		ImVec2 itemSz = ImVec2(aWidth, ImGui::GetFrameHeightWithSpacing() * 4);
+		float innerHeight = itemSz.y - (style.WindowPadding.y * 2);
+
+		ImVec2 btnTextSz = ImGui::CalcTextSize("############");
+
+		float btnWidth = btnTextSz.x + (style.FramePadding.x * 2);
+		float stateBarWidth = ImGui::GetFrameHeight() / 2.f; /* Half a frame width. */
+		float infoAreaWidth = itemSz.x - stateBarWidth - style.ItemSpacing.x - btnWidth - style.ItemSpacing.x - style.WindowPadding.x; /* Full width minus other elements and spacing. */
+		float actionsAreaWidth = btnWidth; /* As wide as a padded button. */
+
+		ImVec2 curPos = ImGui::GetCursorPos();
+
+		/* above visible space                        || under visible space */
+		if (curPos.y < ImGui::GetScrollY() - itemSz.y || curPos.y > ImGui::GetScrollY() + ImGui::GetWindowHeight())
 		{
-			statusBarCol = ImColor(172, 89, 89, 255);
-			/* TODO: other error states. */
+			ImGui::Dummy(itemSz);
+			return;
 		}
 
-		ImGui::SetCursorPos(ImVec2(0, style.WindowPadding.y));
-		ImGui::Dummy(ImVec2(stateBarWidth, 0));
+		static GW2::CContext*       ctx      = GW2::CContext::GetContext();
+		static UI::CUiContext*     uictx    = ctx->GetUIContext();
+		static GW2::CConfigMgr*     cfgmgr   = ctx->GetCfgMgr();
+		static GW2::CLibraryMgr*    libmgr   = ctx->GetAddonLibrary();
+		static UI::CTextureLoader* texapi   = ctx->GetTextureService();
+		static CAlerts*        alertctx = uictx->GetAlerts();
 
-		ImGui::SameLine();
-		if (ImGui::BeginChild("Info", ImVec2(infoAreaWidth, 0)))
+		/* For the status bar, data will be set within the child.*/
+		bool drawStatusBar = false;
+		ImVec2 statusBarPosBegin;
+		ImVec2 statusBarPosEnd;
+		ImColor statusBarCol;
+		ImDrawList* drawlist = nullptr;
+
+		if (ImGui::BeginChild(("Addon_" + id).c_str(), itemSz, true))
 		{
-			/* Name */
-			ImGui::Text(aAddonData.GetName().c_str());
-			if (aAddonData.Addon)
+			ImGuiWindow* wnd = ImGui::GetCurrentWindow();
+			drawlist = wnd->DrawList;
+			statusBarPosBegin = ImVec2(wnd->Pos.x, wnd->Pos.y);
+			statusBarPosEnd = ImVec2(wnd->Pos.x + stateBarWidth, wnd->Pos.y + wnd->Size.y);
+			statusBarCol = ImColor(85, 85, 85, 255);
+			drawStatusBar = true;
+
+			if (aAddonData.Addon && aAddonData.Addon->IsLoaded())
 			{
-				ImGui::TooltipGeneric(aAddonData.Addon->GetLocation().string().c_str());
+				statusBarCol = ImColor(89, 172, 98, 255);
+			}
+			else if (aAddonData.Addon && aAddonData.Addon->IsVersionDisabled())
+			{
+				statusBarCol = ImColor(172, 89, 89, 255);
+				/* TODO: other error states. */
 			}
 
-			/* Version */
-			if (!aAddonData.GetVersion().empty())
-			{
-				ImGui::SameLine();
-				ImGui::TextDisabled(aAddonData.GetVersion().c_str());
-			}
+			ImGui::SetCursorPos(ImVec2(0, style.WindowPadding.y));
+			ImGui::Dummy(ImVec2(stateBarWidth, 0));
 
-			/* Author */
-			if (!aAddonData.GetAuthor().empty())
+			ImGui::SameLine();
+			if (ImGui::BeginChild("Info", ImVec2(infoAreaWidth, 0)))
 			{
-				ImGui::TextDisabled("%s", aAddonData.GetAuthor().c_str());
-			}
+				/* Name */
+				ImGui::Text(aAddonData.GetName().c_str());
+				if (aAddonData.Addon)
+				{
+					ImGui::TooltipGeneric(aAddonData.Addon->GetLocation().string().c_str());
+				}
 
-			/* Description */
-			if (!aAddonData.GetDesc().empty())
-			{
-				ImGui::PushItemWidth(infoAreaWidth);
-				ImGui::TextWrapped(aAddonData.GetDesc().c_str());
+				/* Version */
+				if (!aAddonData.GetVersion().empty())
+				{
+					ImGui::SameLine();
+					ImGui::TextDisabled(aAddonData.GetVersion().c_str());
+				}
+
+				/* Author */
+				if (!aAddonData.GetAuthor().empty())
+				{
+					ImGui::TextDisabled("%s", aAddonData.GetAuthor().c_str());
+				}
+
+				/* Description */
+				if (!aAddonData.GetDesc().empty())
+				{
+					ImGui::PushItemWidth(infoAreaWidth);
+					ImGui::TextWrapped(aAddonData.GetDesc().c_str());
+				}
 			}
+			ImGui::EndChild();
+
+			ImGui::SameLine();
+			ImGui::BeginGroup();
+			{
+				if (aAddonData.Addon)
+				{
+					if (aAddonData.Addon->SupportsLoading())
+					{
+						/* Toggle Load */
+						if (ImGui::Button(AddonToggleCtl::GetButtonText(aAddonData.Addon).c_str(), ImVec2(btnWidth, 0)))
+						{
+							/* Prompt if true, otherwise it already toggled now. */
+							if (AddonToggleCtl::Toggle(aAddonData.Addon))
+							{
+								GW2::Config_t* config = aAddonData.Addon->GetConfig();
+
+								this->LoadConfirmationModal.SetTarget(config, aAddonData.GetName(), aAddonData.Addon->GetLocation());
+							}
+						}
+
+						/* Configure */
+						if (ImGui::Button(Lang::Addons::Configure.Text(), ImVec2(btnWidth, 0)))
+						{
+							this->SetContent(aAddonData);
+						}
+					}
+				}
+				else if (aAddonData.HasLibDef)
+				{
+					/* Install */
+					if (ImGui::Button(Lang::Library::Install.Text(), ImVec2(btnWidth, 0)))
+					{
+						libmgr->Install(aAddonData.GetSig());
+					}
+
+					/* GitHub */
+					if (ImGui::Button(Lang::Library::GitHub.Text(), ImVec2(btnWidth, 0)))
+					{
+
+					}
+				}
+				else
+				{
+					throw "Unreachable code.";
+				}
+			}
+			ImGui::EndGroup();
 		}
 		ImGui::EndChild();
 
-		ImGui::SameLine();
-		ImGui::BeginGroup();
+		/* Draw the status bar after the child element, so it is on top. */
+		if (drawStatusBar)
 		{
-			if (aAddonData.Addon)
-			{
-				if (aAddonData.Addon->SupportsLoading())
-				{
-					/* Toggle Load */
-					if (ImGui::Button(AddonToggleCtl::GetButtonText(aAddonData.Addon).c_str(), ImVec2(btnWidth, 0)))
-					{
-						/* Prompt if true, otherwise it already toggled now. */
-						if (AddonToggleCtl::Toggle(aAddonData.Addon))
-						{
-							Config_t* config = aAddonData.Addon->GetConfig();
-
-							this->LoadConfirmationModal.SetTarget(config, aAddonData.GetName(), aAddonData.Addon->GetLocation());
-						}
-					}
-
-					/* Configure */
-					if (ImGui::Button(Lang::Addons::Configure.Text(), ImVec2(btnWidth, 0)))
-					{
-						this->SetContent(aAddonData);
-					}
-				}
-			}
-			else if (aAddonData.HasLibDef)
-			{
-				/* Install */
-				if (ImGui::Button(Lang::Library::Install.Text(), ImVec2(btnWidth, 0)))
-				{
-					libmgr->Install(aAddonData.GetSig());
-				}
-
-				/* GitHub */
-				if (ImGui::Button(Lang::Library::GitHub.Text(), ImVec2(btnWidth, 0)))
-				{
-
-				}
-			}
-			else
-			{
-				throw "Unreachable code.";
-			}
-		}
-		ImGui::EndGroup();
-	}
-	ImGui::EndChild();
-
-	/* Draw the status bar after the child element, so it is on top. */
-	if (drawStatusBar)
-	{
-		drawlist->AddRectFilled(statusBarPosBegin, statusBarPosEnd, statusBarCol, style.ChildRounding);
-	}
-
-	aAddonData.IsHovered = ImGui::IsItemHovered();
-	if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
-	{
-		this->AddonContextMenu.SetContent(aAddonData);
-	}
-}
-
-void CAddonsWindow::RenderContent()
-{
-	if (this->IsInvalid)
-	{
-		static CContext* ctx = CContext::GetContext();
-		static CUiContext* uictx = ctx->GetUIContext();
-		static CEscapeClosing* escclose = uictx->GetEscapeClosingService();
-
-		escclose->Deregister(this->GetVisibleStatePtr());
-		escclose->Register(this->GetNameID().c_str(), this->GetVisibleStatePtr());
-
-		this->PopulateAddons();
-
-		this->IsInvalid = false;
-	}
-
-	ImVec2 region = ImGui::GetContentRegionAvail();
-
-	static ImVec2 s_FilterBarSize  = ImVec2(region.x, region.y);
-	static ImVec2 s_ActionsBarSize = ImVec2(region.x, region.y);
-
-	ImGuiStyle& style = ImGui::GetStyle();
-
-	if (!this->IsPoppedOut)
-	{
-		float btnSz = ImGui::GetFontSize() * 1.5f;
-		s_FilterBarSize.x = region.x - style.ItemSpacing.x - btnSz - style.ItemSpacing.x;
-	}
-
-	this->RenderFilterBar(s_FilterBarSize);
-	
-	this->RenderBody(
-		ImVec2(
-			region.x,
-			region.y - s_FilterBarSize.y - s_ActionsBarSize.y - style.ItemSpacing.y - style.ItemSpacing.y
-		)
-	);
-
-	this->RenderActionsBar(s_ActionsBarSize);
-}
-
-void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
-{
-	CContext*       ctx         = CContext::GetContext();
-	CTextureLoader* texapi      = ctx->GetTextureService();
-
-	ImGuiStyle& style = ImGui::GetStyle();
-
-	if (ImGui::BeginChild("Filters", aSize, false, ImGuiWindowFlags_NoBackground))
-	{
-		/* Static assets */
-		static char s_SearchTerm[400] = {};
-		static Texture_t* s_ClearIcon          = texapi->GetOrCreate("ICON_CLOSE",  Resources::IconClose);
-		static Texture_t* s_ViewModeIcon_List  = texapi->GetOrCreate("ICON_LIST",   Resources::IconList);
-		static Texture_t* s_ViewModeIcon_Tiles = texapi->GetOrCreate("ICON_TILES",  Resources::IconTiles);
-		static Texture_t* s_FilterIcon         = texapi->GetOrCreate("ICON_FILTER", Resources::IconFilter);
-
-		if (!s_ClearIcon)          { s_ClearIcon          = texapi->GetOrCreate("ICON_CLOSE",  Resources::IconClose); }
-		if (!s_ViewModeIcon_List)  { s_ViewModeIcon_List  = texapi->GetOrCreate("ICON_LIST",   Resources::IconList); }
-		if (!s_ViewModeIcon_Tiles) { s_ViewModeIcon_Tiles = texapi->GetOrCreate("ICON_TILES",  Resources::IconTiles); }
-		if (!s_FilterIcon)         { s_FilterIcon         = texapi->GetOrCreate("ICON_FILTER", Resources::IconFilter); }
-
-		/* Search Term */
-		if (ImGui::InputTextWithHint("##SearchTerm", Lang::Addons::Search.Text(), &s_SearchTerm[0], 400))
-		{
-			this->SearchTerm = String::ToLower(s_SearchTerm);
-			this->Invalidate();
-			this->ClearContent();
+			drawlist->AddRectFilled(statusBarPosBegin, statusBarPosEnd, statusBarCol, style.ChildRounding);
 		}
 
-		/* Clear Search Term */
-		if (s_ClearIcon)
+		aAddonData.IsHovered = ImGui::IsItemHovered();
+		if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
 		{
-			ImGui::SameLine();
-			if (ImGui::ImageButton(s_ClearIcon->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
+			this->AddonContextMenu.SetContent(aAddonData);
+		}
+	}
+
+	void CAddonsWindow::RenderContent()
+	{
+		if (this->IsInvalid)
+		{
+			static GW2::CContext* ctx = GW2::CContext::GetContext();
+			static UI::CUiContext* uictx = ctx->GetUIContext();
+			static UI::CEscapeClosing* escclose = uictx->GetEscapeClosingService();
+
+			escclose->Deregister(this->GetVisibleStatePtr());
+			escclose->Register(this->GetNameID().c_str(), this->GetVisibleStatePtr());
+
+			this->PopulateAddons();
+
+			this->IsInvalid = false;
+		}
+
+		ImVec2 region = ImGui::GetContentRegionAvail();
+
+		static ImVec2 s_FilterBarSize  = ImVec2(region.x, region.y);
+		static ImVec2 s_ActionsBarSize = ImVec2(region.x, region.y);
+
+		ImGuiStyle& style = ImGui::GetStyle();
+
+		if (!this->IsPoppedOut)
+		{
+			float btnSz = ImGui::GetFontSize() * 1.5f;
+			s_FilterBarSize.x = region.x - style.ItemSpacing.x - btnSz - style.ItemSpacing.x;
+		}
+
+		this->RenderFilterBar(s_FilterBarSize);
+
+		this->RenderBody(
+			ImVec2(
+				region.x,
+				region.y - s_FilterBarSize.y - s_ActionsBarSize.y - style.ItemSpacing.y - style.ItemSpacing.y
+			)
+		);
+
+		this->RenderActionsBar(s_ActionsBarSize);
+	}
+
+	void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
+	{
+		GW2::CContext*       ctx         = GW2::CContext::GetContext();
+		UI::CTextureLoader* texapi      = ctx->GetTextureService();
+
+		ImGuiStyle& style = ImGui::GetStyle();
+
+		if (ImGui::BeginChild("Filters", aSize, false, ImGuiWindowFlags_NoBackground))
+		{
+			/* Static assets */
+			static char s_SearchTerm[400] = {};
+			static Texture_t* s_ClearIcon          = texapi->GetOrCreate("ICON_CLOSE",  Resources::IconClose);
+			static Texture_t* s_ViewModeIcon_List  = texapi->GetOrCreate("ICON_LIST",   Resources::IconList);
+			static Texture_t* s_ViewModeIcon_Tiles = texapi->GetOrCreate("ICON_TILES",  Resources::IconTiles);
+			static Texture_t* s_FilterIcon         = texapi->GetOrCreate("ICON_FILTER", Resources::IconFilter);
+
+			if (!s_ClearIcon)          { s_ClearIcon          = texapi->GetOrCreate("ICON_CLOSE",  Resources::IconClose); }
+			if (!s_ViewModeIcon_List)  { s_ViewModeIcon_List  = texapi->GetOrCreate("ICON_LIST",   Resources::IconList); }
+			if (!s_ViewModeIcon_Tiles) { s_ViewModeIcon_Tiles = texapi->GetOrCreate("ICON_TILES",  Resources::IconTiles); }
+			if (!s_FilterIcon)         { s_FilterIcon         = texapi->GetOrCreate("ICON_FILTER", Resources::IconFilter); }
+
+			/* Search Term */
+			if (ImGui::InputTextWithHint("##SearchTerm", Lang::Addons::Search.Text(), &s_SearchTerm[0], 400))
 			{
-				memset(s_SearchTerm, 0, 400);
 				this->SearchTerm = String::ToLower(s_SearchTerm);
 				this->Invalidate();
 				this->ClearContent();
 			}
-		}
 
-		/* View Mode */
-		Texture_t* viewModeIcon = this->IsListMode.Get() ? s_ViewModeIcon_List : s_ViewModeIcon_Tiles;
-		if (viewModeIcon)
-		{
-			ImGui::SameLine();
-			if (ImGui::ImageButton(viewModeIcon->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
+			/* Clear Search Term */
+			if (s_ClearIcon)
 			{
-				viewModeIcon = nullptr;
-				this->IsListMode.Set(!this->IsListMode.Get());
+				ImGui::SameLine();
+				if (ImGui::ImageButton(s_ClearIcon->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
+				{
+					memset(s_SearchTerm, 0, 400);
+					this->SearchTerm = String::ToLower(s_SearchTerm);
+					this->Invalidate();
+					this->ClearContent();
+				}
 			}
-		}
 
-		/* Advanced Filters */
-		bool doPopHighlight = false;
+			/* View Mode */
+			Texture_t* viewModeIcon = this->IsListMode.Get() ? s_ViewModeIcon_List : s_ViewModeIcon_Tiles;
+			if (viewModeIcon)
+			{
+				ImGui::SameLine();
+				if (ImGui::ImageButton(viewModeIcon->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
+				{
+					viewModeIcon = nullptr;
+					this->IsListMode.Set(!this->IsListMode.Get());
+				}
+			}
 
-		const EAddonsFilterFlags filter = this->Filter.Get();
+			/* Advanced Filters */
+			bool doPopHighlight = false;
 
-		if (s_FilterIcon)
-		{
-			/* If filter does not match quick filter, highlight manual filter icon. */
-			if (filter != FILTER_INSTALLED && filter != FILTER_LIBRARY)
+			const EAddonsFilterFlags filter = this->Filter.Get();
+
+			if (s_FilterIcon)
+			{
+				/* If filter does not match quick filter, highlight manual filter icon. */
+				if (filter != FILTER_INSTALLED && filter != FILTER_LIBRARY)
+				{
+					ImGui::PushStyleColor(ImGuiCol_Button, style.Colors[ImGuiCol_ButtonActive]);
+					doPopHighlight = true;
+				}
+
+				if (ImGui::ImageButton(s_FilterIcon->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
+				{
+					ImGui::OpenPopup("Filters");
+				}
+
+				if (doPopHighlight)
+				{
+					ImGui::PopStyleColor();
+					doPopHighlight = false;
+				}
+
+				if (ImGui::BeginPopupContextItem("Filters"))
+				{
+					bool showEnabled = (filter & EAddonsFilterFlags::ShowEnabled) == EAddonsFilterFlags::ShowEnabled;
+					if (ImGui::Checkbox(Lang::Addons::ShowEnabled.Text(), &showEnabled))
+					{
+						this->Filter.Set(showEnabled ? (filter | EAddonsFilterFlags::ShowEnabled) : (filter & ~EAddonsFilterFlags::ShowEnabled));
+					}
+
+					bool showDisabled = (filter & EAddonsFilterFlags::ShowDisabled) == EAddonsFilterFlags::ShowDisabled;
+					if (ImGui::Checkbox(Lang::Addons::ShowDisabled.Text(), &showDisabled))
+					{
+						this->Filter.Set(showDisabled ? (filter | EAddonsFilterFlags::ShowDisabled) : (filter & ~EAddonsFilterFlags::ShowDisabled));
+					}
+
+					bool showDownloadable = (filter & EAddonsFilterFlags::ShowDownloadable) == EAddonsFilterFlags::ShowDownloadable;
+					if (ImGui::Checkbox(Lang::Addons::ShowDownloadable.Text(), &showDownloadable))
+					{
+						this->Filter.Set(showDownloadable ? (filter | EAddonsFilterFlags::ShowDownloadable) : (filter & ~EAddonsFilterFlags::ShowDownloadable));
+					}
+
+					ImGui::TextDisabled("%u / %u", this->Addons.size(), this->AddonsAmtUnfiltered);
+
+					ImGui::EndPopup();
+				}
+			}
+
+			ImGui::SameLine();
+
+			/* Quick Filter: Installed */
+			if ((filter & FILTER_INSTALLED) == FILTER_INSTALLED &&
+				(filter & ~FILTER_INSTALLED) == EAddonsFilterFlags::None)
 			{
 				ImGui::PushStyleColor(ImGuiCol_Button, style.Colors[ImGuiCol_ButtonActive]);
 				doPopHighlight = true;
 			}
 
-			if (ImGui::ImageButton(s_FilterIcon->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
+			if (ImGui::Button(Lang::Addons::Installed.Text()))
 			{
-				ImGui::OpenPopup("Filters");
+				this->Filter.Set(FILTER_INSTALLED);
 			}
 
 			if (doPopHighlight)
@@ -351,758 +400,712 @@ void CAddonsWindow::RenderFilterBar(ImVec2& aSize)
 				doPopHighlight = false;
 			}
 
-			if (ImGui::BeginPopupContextItem("Filters"))
+			ImGui::SameLine();
+
+			/* Quick Filter: Library */
+			if ((filter & FILTER_LIBRARY) == FILTER_LIBRARY &&
+				(filter & ~FILTER_LIBRARY) == EAddonsFilterFlags::None)
 			{
-				bool showEnabled = (filter & EAddonsFilterFlags::ShowEnabled) == EAddonsFilterFlags::ShowEnabled;
-				if (ImGui::Checkbox(Lang::Addons::ShowEnabled.Text(), &showEnabled))
-				{
-					this->Filter.Set(showEnabled ? (filter | EAddonsFilterFlags::ShowEnabled) : (filter & ~EAddonsFilterFlags::ShowEnabled));
-				}
-
-				bool showDisabled = (filter & EAddonsFilterFlags::ShowDisabled) == EAddonsFilterFlags::ShowDisabled;
-				if (ImGui::Checkbox(Lang::Addons::ShowDisabled.Text(), &showDisabled))
-				{
-					this->Filter.Set(showDisabled ? (filter | EAddonsFilterFlags::ShowDisabled) : (filter & ~EAddonsFilterFlags::ShowDisabled));
-				}
-
-				bool showDownloadable = (filter & EAddonsFilterFlags::ShowDownloadable) == EAddonsFilterFlags::ShowDownloadable;
-				if (ImGui::Checkbox(Lang::Addons::ShowDownloadable.Text(), &showDownloadable))
-				{
-					this->Filter.Set(showDownloadable ? (filter | EAddonsFilterFlags::ShowDownloadable) : (filter & ~EAddonsFilterFlags::ShowDownloadable));
-				}
-
-				ImGui::TextDisabled("%u / %u", this->Addons.size(), this->AddonsAmtUnfiltered);
-
-				ImGui::EndPopup();
+				ImGui::PushStyleColor(ImGuiCol_Button, style.Colors[ImGuiCol_ButtonActive]);
+				doPopHighlight = true;
 			}
-		}
 
-		ImGui::SameLine();
-
-		/* Quick Filter: Installed */
-		if ((filter & FILTER_INSTALLED) == FILTER_INSTALLED &&
-			(filter & ~FILTER_INSTALLED) == EAddonsFilterFlags::None)
-		{
-			ImGui::PushStyleColor(ImGuiCol_Button, style.Colors[ImGuiCol_ButtonActive]);
-			doPopHighlight = true;
-		}
-
-		if (ImGui::Button(Lang::Addons::Installed.Text()))
-		{
-			this->Filter.Set(FILTER_INSTALLED);
-		}
-
-		if (doPopHighlight)
-		{
-			ImGui::PopStyleColor();
-			doPopHighlight = false;
-		}
-
-		ImGui::SameLine();
-
-		/* Quick Filter: Library */
-		if ((filter & FILTER_LIBRARY) == FILTER_LIBRARY &&
-			(filter & ~FILTER_LIBRARY) == EAddonsFilterFlags::None)
-		{
-			ImGui::PushStyleColor(ImGuiCol_Button, style.Colors[ImGuiCol_ButtonActive]);
-			doPopHighlight = true;
-		}
-
-		if (ImGui::Button(Lang::Addons::Library.Text()))
-		{
-			this->Filter.Set(FILTER_LIBRARY);
-		}
-
-		if (doPopHighlight)
-		{
-			ImGui::PopStyleColor();
-			doPopHighlight = false;
-		}
-
-		aSize.y = ImGui::GetCursorPos().y;
-	}
-	ImGui::EndChild();
-}
-
-void CAddonsWindow::RenderBody(ImVec2 aSize)
-{
-	ImGuiStyle& style = ImGui::GetStyle();
-
-	if (ImGui::BeginChild("Body", aSize, false, ImGuiWindowFlags_NoBackground))
-	{
-		if (this->HasContent)
-		{
-			/* Details view */
-			this->RenderDetails();
-		}
-		else if (this->Addons.size() == 0)
-		{
-			/* Nothing matching filter. */
-			ImVec2 windowSize = ImGui::GetWindowSize();
-			ImVec2 textSize = ImGui::CalcTextSize(Lang::Addons::NoMatches.Text());
-			ImVec2 position = ImGui::GetCursorPos();
-			ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-			ImGui::TextDisabled(Lang::Addons::NoMatches.Text());
-		}
-		else
-		{
-			/* Addons list */
-			float addonItemWidth = this->IsListMode.Get()
-				? (aSize.x - style.ScrollbarSize)
-				: ((aSize.x - style.ItemSpacing.x - style.ScrollbarSize) / 2);
-
-			int i = 0;
-
-			for (AddonListing_t& addon : this->Addons)
+			if (ImGui::Button(Lang::Addons::Library.Text()))
 			{
-				if (!this->IsListMode.Get() && i % 2 == 1)
-				{
-					ImGui::SameLine();
-				}
-
-				AddonItem(addon, addonItemWidth);
-				i++;
+				this->Filter.Set(FILTER_LIBRARY);
 			}
-		}
-	}
-	ImGui::EndChild();
-}
 
-void CAddonsWindow::RenderDetails()
-{
-	assert(this->AddonData.Addon);
-
-	ImGuiStyle& style = ImGui::GetStyle();
-
-	float btnSz = ImGui::GetFontSize() * 1.5f;
-	ImVec2 btnTextSz = ImGui::CalcTextSize("############");
-	float btnWidth = btnTextSz.x + (style.FramePadding.x * 2);
-
-	static Texture_t* chevronRt = nullptr;
-
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-	if (ImGui::BeginChild("Details_Collapse", ImVec2(btnSz, 0), false, ImGuiWindowFlags_NoBackground))
-	{
-		ImVec2 initial = ImGui::GetCursorPos();
-
-		if (ImGui::Button("##ClearDetails", ImGui::GetWindowSize()))
-		{
-			this->ClearContent();
-		}
-
-		if (chevronRt)
-		{
-			ImGui::SetCursorPos(ImVec2(initial.x, (ImGui::GetWindowHeight() - btnSz) / 2));
-			ImGui::Image(chevronRt->Resource, ImVec2(btnSz, btnSz));
-		}
-		else
-		{
-			CContext* ctx = CContext::GetContext();
-			CTextureLoader* textureApi = ctx->GetTextureService();
-			chevronRt = textureApi->GetOrCreate("ICON_CHEVRON_RT", Resources::IconChevronRt);
-		}
-	}
-	ImGui::EndChild();
-	ImGui::PopStyleVar();
-
-	ImGui::SameLine();
-
-	if (ImGui::BeginChild("Details_Content", ImVec2(0, 0), false, ImGuiWindowFlags_NoBackground))
-	{
-		CContext*      ctx = CContext::GetContext();
-
-		std::string id;
-
-		if (this->AddonData.GetSig() != 0)
-		{
-			/* Use addon signature. */
-			id = std::format("0x{{:08X}}", this->AddonData.GetSig());
-		}
-		else
-		{
-			if (this->AddonData.Addon)
+			if (doPopHighlight)
 			{
-				/* Use addon file location. */
-				id = this->AddonData.Addon->GetLocation().string();
+				ImGui::PopStyleColor();
+				doPopHighlight = false;
+			}
+
+			aSize.y = ImGui::GetCursorPos().y;
+		}
+		ImGui::EndChild();
+	}
+
+	void CAddonsWindow::RenderBody(ImVec2 aSize)
+	{
+		ImGuiStyle& style = ImGui::GetStyle();
+
+		if (ImGui::BeginChild("Body", aSize, false, ImGuiWindowFlags_NoBackground))
+		{
+			if (this->HasContent)
+			{
+				/* Details view */
+				this->RenderDetails();
+			}
+			else if (this->Addons.size() == 0)
+			{
+				/* Nothing matching filter. */
+				ImVec2 windowSize = ImGui::GetWindowSize();
+				ImVec2 textSize = ImGui::CalcTextSize(Lang::Addons::NoMatches.Text());
+				ImVec2 position = ImGui::GetCursorPos();
+				ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
+				ImGui::TextDisabled(Lang::Addons::NoMatches.Text());
 			}
 			else
 			{
-				/* This should not be possible. */
-				throw "Unreachable code.";
+				/* Addons list */
+				float addonItemWidth = this->IsListMode.Get()
+					? (aSize.x - style.ScrollbarSize)
+					: ((aSize.x - style.ItemSpacing.x - style.ScrollbarSize) / 2);
+
+				int i = 0;
+
+				for (AddonListing_t& addon : this->Addons)
+				{
+					if (!this->IsListMode.Get() && i % 2 == 1)
+					{
+						ImGui::SameLine();
+					}
+
+					AddonItem(addon, addonItemWidth);
+					i++;
+				}
 			}
 		}
+		ImGui::EndChild();
+	}
+
+	void CAddonsWindow::RenderDetails()
+	{
+		assert(this->AddonData.Addon);
 
 		ImGuiStyle& style = ImGui::GetStyle();
 
 		float btnSz = ImGui::GetFontSize() * 1.5f;
+		ImVec2 btnTextSz = ImGui::CalcTextSize("############");
+		float btnWidth = btnTextSz.x + (style.FramePadding.x * 2);
 
-		// helper variable in case we unload or do anything else that might modify the callback before ->Invalidate() is invoked
-		bool skipOptions = false;
+		static Texture_t* chevronRt = nullptr;
 
-		std::string headerStr = Lang::Addons::Configuring.Text();
-		headerStr.append(" ");
-		headerStr.append(this->AddonData.GetName());
-
-		/* Not around the addon's own options below, their ids must stay as they are. */
-		ImGui::PushID(id.c_str());
-
-		if (ImGui::CollapsingHeader(headerStr.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+		if (ImGui::BeginChild("Details_Collapse", ImVec2(btnSz, 0), false, ImGuiWindowFlags_NoBackground))
 		{
-			Config_t*   config = this->AddonData.Addon->GetConfig();
-			CConfigMgr* cfgmgr = ctx->GetCfgMgr();
+			ImVec2 initial = ImGui::GetCursorPos();
 
-			/* TODO: Check Update Button */
-			/*if (addonData.NexusAddon->Definitions->Provider != EUpdateProvider::Self)
+			if (ImGui::Button("##ClearDetails", ImGui::GetWindowSize()))
 			{
-				if (ImGui::Button((!addonData.NexusAddon->IsCheckingForUpdates
-					? Lang::Addons::CheckForUpdates.Text()
-					: Lang::Addons::CheckingForUpdates.Text() + sigid).c_str()))
+				this->ClearContent();
+			}
+
+			if (chevronRt)
+			{
+				ImGui::SetCursorPos(ImVec2(initial.x, (ImGui::GetWindowHeight() - btnSz) / 2));
+				ImGui::Image(chevronRt->Resource, ImVec2(btnSz, btnSz));
+			}
+			else
+			{
+				GW2::CContext* ctx = GW2::CContext::GetContext();
+				UI::CTextureLoader* textureApi = ctx->GetTextureService();
+				chevronRt = textureApi->GetOrCreate("ICON_CHEVRON_RT", Resources::IconChevronRt);
+			}
+		}
+		ImGui::EndChild();
+		ImGui::PopStyleVar();
+
+		ImGui::SameLine();
+
+		if (ImGui::BeginChild("Details_Content", ImVec2(0, 0), false, ImGuiWindowFlags_NoBackground))
+		{
+			GW2::CContext*      ctx = GW2::CContext::GetContext();
+
+			std::string id;
+
+			if (this->AddonData.GetSig() != 0)
+			{
+				/* Use addon signature. */
+				id = std::format("0x{{:08X}}", this->AddonData.GetSig());
+			}
+			else
+			{
+				if (this->AddonData.Addon)
 				{
-					if (!addonData.NexusAddon->IsCheckingForUpdates)
+					/* Use addon file location. */
+					id = this->AddonData.Addon->GetLocation().string();
+				}
+				else
+				{
+					/* This should not be possible. */
+					throw "Unreachable code.";
+				}
+			}
+
+			ImGuiStyle& style = ImGui::GetStyle();
+
+			float btnSz = ImGui::GetFontSize() * 1.5f;
+
+			// helper variable in case we unload or do anything else that might modify the callback before ->Invalidate() is invoked
+			bool skipOptions = false;
+
+			std::string headerStr = Lang::Addons::Configuring.Text();
+			headerStr.append(" ");
+			headerStr.append(this->AddonData.GetName());
+
+			/* Not around the addon's own options below, their ids must stay as they are. */
+			ImGui::PushID(id.c_str());
+
+			if (ImGui::CollapsingHeader(headerStr.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				GW2::Config_t*   config = this->AddonData.Addon->GetConfig();
+				GW2::CConfigMgr* cfgmgr = ctx->GetCfgMgr();
+
+				/* TODO: Check Update Button */
+				/*if (addonData.NexusAddon->Definitions->Provider != EUpdateProvider::Self)
+				{
+					if (ImGui::Button((!addonData.NexusAddon->IsCheckingForUpdates
+						? Lang::Addons::CheckForUpdates.Text()
+						: Lang::Addons::CheckingForUpdates.Text() + sigid).c_str()))
 					{
-						for (auto addon : loader->Addons)
+						if (!addonData.NexusAddon->IsCheckingForUpdates)
 						{
-							if (addon->Definitions == addonData.NexusAddon->Definitions)
+							for (auto addon : loader->Addons)
 							{
-								addonData.NexusAddon->IsCheckingForUpdates = true;
-
-								Addon_t* addon = addonData.NexusAddon;
-
-								std::filesystem::path tmpPath = addon->Path.string();
-								std::thread([addon, tmpPath]()
+								if (addon->Definitions == addonData.NexusAddon->Definitions)
 								{
-									AddonInfo_t addonInfo
+									addonData.NexusAddon->IsCheckingForUpdates = true;
+
+									Addon_t* addon = addonData.NexusAddon;
+
+									std::filesystem::path tmpPath = addon->Path.string();
+									std::thread([addon, tmpPath]()
 									{
-										addon->Definitions->Signature,
-										addon->Definitions->Name,
-										addon->Definitions->Version,
-										addon->Definitions->Provider,
-										addon->Definitions->UpdateLink != nullptr
-											? addon->Definitions->UpdateLink
-											: "",
-										addon->MD5,
-										addon->AllowPrereleases
-									};
-
-									CContext* ctx = CContext::GetContext();
-									CUpdater* updater = ctx->GetUpdater();
-									CUiContext* uictx = ctx->GetUIContext();
-									CAlerts* alertctx = uictx->GetAlerts();
-									CLoader* loader = ctx->GetLoader();
-
-									if (updater->UpdateAddon(tmpPath, addonInfo, false, 5 * 60))
-									{
-										loader->QueueAddon(ELoaderAction::Reload, tmpPath);
-
-										alertctx->Notify(EAlertType::Info,
-											String::Format("%s %s",
+										AddonInfo_t addonInfo
+										{
+											addon->Definitions->Signature,
 											addon->Definitions->Name,
-											addon->State == EAddonState::LoadedLOCKED
-											? Lang::Addons::UpdatedRestart.Text()
-											: Lang::Addons::Updated.Text()
-										).c_str()
-										);
-									}
-									else
-									{
-										alertctx->Notify(EAlertType::Info, String::Format("%s %s",
-														 addon->Definitions->Name,
-														 Lang::Addons::UpToDate.Text()).c_str());
-									}
-									Sleep(1000); // arbitrary sleep otherwise the user never even sees "is checking..."
-									addon->IsCheckingForUpdates = false;
-								}).detach();
+											addon->Definitions->Version,
+											addon->Definitions->Provider,
+											addon->Definitions->UpdateLink != nullptr
+												? addon->Definitions->UpdateLink
+												: "",
+											addon->MD5,
+											addon->AllowPrereleases
+										};
 
-								//LogDebug(CH_GUI, "Update called: %s", it.second->Definitions->Name);
-								break;
+										CContext* ctx = CContext::GetContext();
+										CUpdater* updater = ctx->GetUpdater();
+										CUiContext* uictx = ctx->GetUIContext();
+										CAlerts* alertctx = uictx->GetAlerts();
+										CLoader* loader = ctx->GetLoader();
+
+										if (updater->UpdateAddon(tmpPath, addonInfo, false, 5 * 60))
+										{
+											loader->QueueAddon(ELoaderAction::Reload, tmpPath);
+
+											alertctx->Notify(EAlertType::Info,
+												String::Format("%s %s",
+												addon->Definitions->Name,
+												addon->State == EAddonState::LoadedLOCKED
+												? Lang::Addons::UpdatedRestart.Text()
+												: Lang::Addons::Updated.Text()
+											).c_str()
+											);
+										}
+										else
+										{
+											alertctx->Notify(EAlertType::Info, String::Format("%s %s",
+															 addon->Definitions->Name,
+															 Lang::Addons::UpToDate.Text()).c_str());
+										}
+										Sleep(1000); // arbitrary sleep otherwise the user never even sees "is checking..."
+										addon->IsCheckingForUpdates = false;
+									}).detach();
+
+									//LogDebug(CH_GUI, "Update called: %s", it.second->Definitions->Name);
+									break;
+								}
 							}
 						}
 					}
-				}
-				if (addonData.NexusAddon->State == EAddonState::LoadedLOCKED)
+					if (addonData.NexusAddon->State == EAddonState::LoadedLOCKED)
+					{
+						ImGui::TooltipGeneric(Lang::Addons::LockedUpdateRestart.Text());
+					}
+				}*/
+
+				/* Check Updates Button */
+				ImGui::Text(Lang::Addons::CheckForUpdates.Text());
+
+				/* Update Button */
+				if (this->AddonData.Addon->IsUpdateAvailable())
 				{
-					ImGui::TooltipGeneric(Lang::Addons::LockedUpdateRestart.Text());
+					ImGui::Text(Lang::Addons::Update.Text());
 				}
-			}*/
 
-			/* Check Updates Button */
-			ImGui::Text(Lang::Addons::CheckForUpdates.Text());
+				if (config)
+				{
+					std::string updateMode;
 
-			/* Update Button */
-			if (this->AddonData.Addon->IsUpdateAvailable())
-			{
-				ImGui::Text(Lang::Addons::Update.Text());
+					switch (config->UpdateMode)
+					{
+						default:
+						case GW2::EUpdateMode::None:
+							updateMode = "(null)";
+							break;
+						case GW2::EUpdateMode::Background:
+							updateMode = Lang::Addons::UpdateModeBackground.Text();
+							break;
+						case GW2::EUpdateMode::Notify:
+							updateMode = Lang::Addons::UpdateModeNotify.Text();
+							break;
+						case GW2::EUpdateMode::Automatic:
+							updateMode = Lang::Addons::UpdateModeAutomatic.Text();
+							break;
+					}
+
+					/* Update Mode Combo */
+					if (ImGui::BeginCombo("##UpdateModeSelector", updateMode.c_str()))
+					{
+						if (ImGui::Selectable(Lang::Addons::UpdateModeBackground.Text(), config->UpdateMode == GW2::EUpdateMode::Background))
+						{
+							config->UpdateMode = GW2::EUpdateMode::Background;
+							cfgmgr->SaveConfigs();
+						}
+
+						if (ImGui::Selectable(Lang::Addons::UpdateModeNotify.Text(), config->UpdateMode == GW2::EUpdateMode::Notify))
+						{
+							config->UpdateMode = GW2::EUpdateMode::Notify;
+							cfgmgr->SaveConfigs();
+						}
+
+						if (ImGui::Selectable(Lang::Addons::UpdateModeAutomatic.Text(), config->UpdateMode == GW2::EUpdateMode::Automatic))
+						{
+							config->UpdateMode = GW2::EUpdateMode::Automatic;
+							cfgmgr->SaveConfigs();
+						}
+
+						ImGui::EndCombo();
+					}
+
+					/* Pre-releases Checkbox */
+					if (this->AddonData.Addon->SupportsPreReleases())
+					{
+						if (ImGui::Checkbox(Lang::Addons::AllowPreRelease.Text(), &config->AllowPreReleases))
+						{
+							cfgmgr->SaveConfigs();
+						}
+					}
+
+					/* GitHub Button */
+					if (!this->AddonData.Addon->GetProjectPageURL().empty())
+					{
+						if (ImGui::Button(Lang::Library::GitHub.Text()))
+						{
+							ShellExecuteA(0, 0, this->AddonData.Addon->GetProjectPageURL().c_str(), 0, 0, SW_SHOW);
+						}
+					}
+
+					/* Disable until update Checkbox */
+					bool disableUntilUpdate = config->DisableVersion == this->AddonData.Addon->GetMD5().string();
+					if (ImGui::Checkbox(Lang::Addons::DisableUntilUpdate.Text(), &disableUntilUpdate))
+					{
+						this->Invalidate();
+
+						if (disableUntilUpdate)
+						{
+							config->DisableVersion = this->AddonData.Addon->GetMD5().string();
+							this->AddonData.Addon->Unload();
+							skipOptions = true;
+						}
+						else
+						{
+							config->DisableVersion.clear();
+						}
+						cfgmgr->SaveConfigs();
+					}
+					if (this->AddonData.Addon->IsStateLocked())
+					{
+						ImGui::TooltipGeneric(Lang::Addons::LockedStateRestart.Text());
+					}
+
+					/* Uninstall Button */
+					if (ImGui::Button(Lang::Addons::Uninstall.Text(), ImVec2(btnWidth, 0)))
+					{
+						this->UninstallConfirmationModal.SetTarget(this->AddonData.GetName(), this->AddonData.Addon->GetLocation());
+					}
+					if (this->AddonData.Addon->IsStateLocked())
+					{
+						ImGui::TooltipGeneric(Lang::Addons::LockedStateRestart.Text());
+					}
+
+					/* Load/Unload Button */
+					if (ImGui::Button(AddonToggleCtl::GetButtonText(this->AddonData.Addon).c_str()))
+					{
+						/* Prompt if true, otherwise it already toggled now. */
+						if (AddonToggleCtl::Toggle(this->AddonData.Addon))
+						{
+							GW2::Config_t* config = this->AddonData.Addon->GetConfig();
+
+							this->LoadConfirmationModal.SetTarget(config, this->AddonData.GetName(), this->AddonData.Addon->GetLocation());
+						}
+					}
+				}
+				else
+				{
+					/* This should be in theory unreachable. */
+					ImGui::TextUnformatted(Lang::Addons::NoConfigOptions.Text());
+				}
 			}
 
-			if (config)
+			ImGui::PopID();
+
+			if (this->AddonData.Addon && this->AddonData.Addon->IsLoaded())
 			{
-				std::string updateMode;
-				
-				switch (config->UpdateMode)
+				/* Addon binds table. */
+				if (this->AddonData.InputBinds.size() != 0)
 				{
-					default:
-					case EUpdateMode::None:
-						updateMode = "(null)";
-						break;
-					case EUpdateMode::Background:
-						updateMode = Lang::Addons::UpdateModeBackground.Text();
-						break;
-					case EUpdateMode::Notify:
-						updateMode = Lang::Addons::UpdateModeNotify.Text();
-						break;
-					case EUpdateMode::Automatic:
-						updateMode = Lang::Addons::UpdateModeAutomatic.Text();
-						break;
-				}
-
-				/* Update Mode Combo */
-				if (ImGui::BeginCombo("##UpdateModeSelector", updateMode.c_str()))
-				{
-					if (ImGui::Selectable(Lang::Addons::UpdateModeBackground.Text(), config->UpdateMode == EUpdateMode::Background))
+					if (ImGui::CollapsingHeader(Lang::Binds::Keybinds.Text(), ImGuiTreeNodeFlags_DefaultOpen))
 					{
-						config->UpdateMode = EUpdateMode::Background;
-						cfgmgr->SaveConfigs();
-					}
-
-					if (ImGui::Selectable(Lang::Addons::UpdateModeNotify.Text(), config->UpdateMode == EUpdateMode::Notify))
-					{
-						config->UpdateMode = EUpdateMode::Notify;
-						cfgmgr->SaveConfigs();
-					}
-
-					if (ImGui::Selectable(Lang::Addons::UpdateModeAutomatic.Text(), config->UpdateMode == EUpdateMode::Automatic))
-					{
-						config->UpdateMode = EUpdateMode::Automatic;
-						cfgmgr->SaveConfigs();
-					}
-
-					ImGui::EndCombo();
-				}
-
-				/* Pre-releases Checkbox */
-				if (this->AddonData.Addon->SupportsPreReleases())
-				{
-					if (ImGui::Checkbox(Lang::Addons::AllowPreRelease.Text(), &config->AllowPreReleases))
-					{
-						cfgmgr->SaveConfigs();
+						this->RenderInputBindsTable(this->AddonData.InputBinds);
 					}
 				}
 
-				/* GitHub Button */
-				if (!this->AddonData.Addon->GetProjectPageURL().empty())
+				/* Addon options callback. */
+				if (this->AddonData.OptionsRender && !skipOptions)
 				{
-					if (ImGui::Button(Lang::Library::GitHub.Text()))
+					if (ImGui::CollapsingHeader(Lang::Nav::Options.Text(), ImGuiTreeNodeFlags_DefaultOpen))
 					{
-						ShellExecuteA(0, 0, this->AddonData.Addon->GetProjectPageURL().c_str(), 0, 0, SW_SHOW);
-					}
-				}
-
-				/* Disable until update Checkbox */
-				bool disableUntilUpdate = config->DisableVersion == this->AddonData.Addon->GetMD5().string();
-				if (ImGui::Checkbox(Lang::Addons::DisableUntilUpdate.Text(), &disableUntilUpdate))
-				{
-					this->Invalidate();
-
-					if (disableUntilUpdate)
-					{
-						config->DisableVersion = this->AddonData.Addon->GetMD5().string();
-						this->AddonData.Addon->Unload();
-						skipOptions = true;
-					}
-					else
-					{
-						config->DisableVersion.clear();
-					}
-					cfgmgr->SaveConfigs();
-				}
-				if (this->AddonData.Addon->IsStateLocked())
-				{
-					ImGui::TooltipGeneric(Lang::Addons::LockedStateRestart.Text());
-				}
-
-				/* Uninstall Button */
-				if (ImGui::Button(Lang::Addons::Uninstall.Text(), ImVec2(btnWidth, 0)))
-				{
-					this->UninstallConfirmationModal.SetTarget(this->AddonData.GetName(), this->AddonData.Addon->GetLocation());
-				}
-				if (this->AddonData.Addon->IsStateLocked())
-				{
-					ImGui::TooltipGeneric(Lang::Addons::LockedStateRestart.Text());
-				}
-
-				/* Load/Unload Button */
-				if (ImGui::Button(AddonToggleCtl::GetButtonText(this->AddonData.Addon).c_str()))
-				{
-					/* Prompt if true, otherwise it already toggled now. */
-					if (AddonToggleCtl::Toggle(this->AddonData.Addon))
-					{
-						Config_t* config = this->AddonData.Addon->GetConfig();
-
-						this->LoadConfirmationModal.SetTarget(config, this->AddonData.GetName(), this->AddonData.Addon->GetLocation());
+						this->AddonData.OptionsRender();
 					}
 				}
 			}
 			else
 			{
-				/* This should be in theory unreachable. */
-				ImGui::TextUnformatted(Lang::Addons::NoConfigOptions.Text());
+				/* Notice to load the addon. */
+				ImVec2 windowSize = ImGui::GetWindowSize();
+				ImVec2 textSize = ImGui::CalcTextSize(Lang::Addons::LoadToConfigure.Text());
+				ImVec2 position = ImGui::GetCursorPos();
+				ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
+				ImGui::TextDisabled(Lang::Addons::LoadToConfigure.Text());
 			}
 		}
-
-		ImGui::PopID();
-
-		if (this->AddonData.Addon && this->AddonData.Addon->IsLoaded())
-		{
-			/* Addon binds table. */
-			if (this->AddonData.InputBinds.size() != 0)
-			{
-				if (ImGui::CollapsingHeader(Lang::Binds::Keybinds.Text(), ImGuiTreeNodeFlags_DefaultOpen))
-				{
-					this->RenderInputBindsTable(this->AddonData.InputBinds);
-				}
-			}
-
-			/* Addon options callback. */
-			if (this->AddonData.OptionsRender && !skipOptions)
-			{
-				if (ImGui::CollapsingHeader(Lang::Nav::Options.Text(), ImGuiTreeNodeFlags_DefaultOpen))
-				{
-					this->AddonData.OptionsRender();
-				}
-			}
-		}
-		else
-		{
-			/* Notice to load the addon. */
-			ImVec2 windowSize = ImGui::GetWindowSize();
-			ImVec2 textSize = ImGui::CalcTextSize(Lang::Addons::LoadToConfigure.Text());
-			ImVec2 position = ImGui::GetCursorPos();
-			ImGui::SetCursorPos(ImVec2((position.x + (windowSize.x - textSize.x)) / 2, (position.y + (windowSize.y - textSize.y)) / 2));
-			ImGui::TextDisabled(Lang::Addons::LoadToConfigure.Text());
-		}
+		ImGui::EndChild();
 	}
-	ImGui::EndChild();
-}
 
-void CAddonsWindow::RenderActionsBar(ImVec2& aSize)
-{
-	CContext*       ctx    = CContext::GetContext();
-	CTextureLoader* texapi = ctx->GetTextureService();
-	CLoader*        loader = ctx->GetLoader();
-
-	if (ImGui::BeginChild("Actions", aSize, false, ImGuiWindowFlags_NoBackground))
+	void CAddonsWindow::RenderActionsBar(ImVec2& aSize)
 	{
-		/* Static assets */
-		static Texture_t* s_ReloadIcon = texapi->GetOrCreate("ICON_REFRESH", Resources::IconRefresh);
-		if (!s_ReloadIcon) { s_ReloadIcon = texapi->GetOrCreate("ICON_REFRESH", Resources::IconRefresh); }
+		GW2::CContext*       ctx    = GW2::CContext::GetContext();
+		UI::CTextureLoader* texapi = ctx->GetTextureService();
+		Engine::CLoader*        loader = ctx->GetLoader();
 
-		/* Open addons folder */
-		if (ImGui::Button(Lang::Addons::OpenFolder.Text()))
+		if (ImGui::BeginChild("Actions", aSize, false, ImGuiWindowFlags_NoBackground))
 		{
-			std::string strAddons = Index(EPath::DIR_ADDONS).string();
-			ShellExecuteA(NULL, "explore", strAddons.c_str(), NULL, NULL, SW_SHOW);
-		}
+			/* Static assets */
+			static Texture_t* s_ReloadIcon = texapi->GetOrCreate("ICON_REFRESH", Resources::IconRefresh);
+			if (!s_ReloadIcon) { s_ReloadIcon = texapi->GetOrCreate("ICON_REFRESH", Resources::IconRefresh); }
 
-		ImGui::SameLine();
-
-		static int checkedForUpdates = -1;
-		static int queuedForCheck = -1;
-		static int updatedCount = -1;
-
-		/* Update all */
-		if (ImGui::Button(checkedForUpdates == -1 ? Lang::Addons::CheckForUpdates.Text() : Lang::Addons::CheckingForUpdates.Text()))
-		{
-			throw "Not Implemented";
-			/*if (checkedForUpdates == -1)
+			/* Open addons folder */
+			if (ImGui::Button(Lang::Addons::OpenFolder.Text()))
 			{
-				const std::lock_guard<std::mutex> lock(loader->Mutex);
-				{
-					checkedForUpdates = 0;
-					queuedForCheck = 0;
-					updatedCount = 0;
+				std::string strAddons = GW2::Index(GW2::EPath::DIR_ADDONS).string();
+				ShellExecuteA(NULL, "explore", strAddons.c_str(), NULL, NULL, SW_SHOW);
+			}
 
-					// pre-iterate to get the count of how many need to be checked, else one call might finish before the count can be incremented
-					for (auto addon : loader->Addons)
-					{
-						if (nullptr == addon->Definitions) { continue; }
-						queuedForCheck++;
-					}
-
-					if (queuedForCheck == 0)
-					{
-						checkedForUpdates = -1;
-					}
-
-					for (auto addon : loader->Addons)
-					{
-						if (nullptr == addon->Definitions) { continue; }
-
-						std::filesystem::path tmpPath = addon->Path.string();
-
-						std::thread([this, tmpPath, addon]()
-						{
-							AddonInfo_t addonInfo
-							{
-								addon->Definitions->Signature,
-								addon->Definitions->Name,
-								addon->Definitions->Version,
-								addon->Definitions->Provider,
-								addon->Definitions->UpdateLink != nullptr
-									? addon->Definitions->UpdateLink
-									: "",
-								addon->MD5,
-								addon->AllowPrereleases
-							};
-
-							CContext* ctx = CContext::GetContext();
-							CUiContext* uictx = ctx->GetUIContext();
-							CUpdater* updater = ctx->GetUpdater();
-							CAlerts* alertctx = uictx->GetAlerts();
-
-							if (addon->Definitions->Provider != EUpdateProvider::Self && updater->UpdateAddon(tmpPath, addonInfo, false, 5 * 60))
-							{
-								loader->QueueAddon(ELoaderAction::Reload, tmpPath);
-
-								alertctx->Notify(EAlertType::Info,
-									String::Format("%s %s",
-									addon->Definitions->Name,
-									addon->State == EAddonState::LoadedLOCKED
-									? Lang::Addons::UpdatedRestart.Text()
-									: Lang::Addons::Updated.Text()
-								).c_str()
-								);
-
-								updatedCount++;
-							}
-							checkedForUpdates++;
-
-							if (checkedForUpdates == queuedForCheck)
-							{
-								checkedForUpdates = -1;
-								queuedForCheck = 0;
-
-								if (updatedCount == 0)
-								{
-									alertctx->Notify(EAlertType::Info, Lang::Addons::AllUpToDate.Text());
-								}
-							}
-						}).detach();
-					}
-				}
-			}*/
-		}
-		ImGui::TooltipGeneric(Lang::Addons::CheckForUpdatesHint.Text());
-
-		if (s_ReloadIcon)
-		{
 			ImGui::SameLine();
 
-			/* Poll changes */
-			if (ImGui::ImageButton(s_ReloadIcon->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
+			static int checkedForUpdates = -1;
+			static int queuedForCheck = -1;
+			static int updatedCount = -1;
+
+			/* Update all */
+			if (ImGui::Button(checkedForUpdates == -1 ? Lang::Addons::CheckForUpdates.Text() : Lang::Addons::CheckingForUpdates.Text()))
 			{
-				loader->NotifyChanges();
+				throw "Not Implemented";
+				/*if (checkedForUpdates == -1)
+				{
+					const std::lock_guard<std::mutex> lock(loader->Mutex);
+					{
+						checkedForUpdates = 0;
+						queuedForCheck = 0;
+						updatedCount = 0;
+
+						// pre-iterate to get the count of how many need to be checked, else one call might finish before the count can be incremented
+						for (auto addon : loader->Addons)
+						{
+							if (nullptr == addon->Definitions) { continue; }
+							queuedForCheck++;
+						}
+
+						if (queuedForCheck == 0)
+						{
+							checkedForUpdates = -1;
+						}
+
+						for (auto addon : loader->Addons)
+						{
+							if (nullptr == addon->Definitions) { continue; }
+
+							std::filesystem::path tmpPath = addon->Path.string();
+
+							std::thread([this, tmpPath, addon]()
+							{
+								AddonInfo_t addonInfo
+								{
+									addon->Definitions->Signature,
+									addon->Definitions->Name,
+									addon->Definitions->Version,
+									addon->Definitions->Provider,
+									addon->Definitions->UpdateLink != nullptr
+										? addon->Definitions->UpdateLink
+										: "",
+									addon->MD5,
+									addon->AllowPrereleases
+								};
+
+								CContext* ctx = CContext::GetContext();
+								CUiContext* uictx = ctx->GetUIContext();
+								CUpdater* updater = ctx->GetUpdater();
+								CAlerts* alertctx = uictx->GetAlerts();
+
+								if (addon->Definitions->Provider != EUpdateProvider::Self && updater->UpdateAddon(tmpPath, addonInfo, false, 5 * 60))
+								{
+									loader->QueueAddon(ELoaderAction::Reload, tmpPath);
+
+									alertctx->Notify(EAlertType::Info,
+										String::Format("%s %s",
+										addon->Definitions->Name,
+										addon->State == EAddonState::LoadedLOCKED
+										? Lang::Addons::UpdatedRestart.Text()
+										: Lang::Addons::Updated.Text()
+									).c_str()
+									);
+
+									updatedCount++;
+								}
+								checkedForUpdates++;
+
+								if (checkedForUpdates == queuedForCheck)
+								{
+									checkedForUpdates = -1;
+									queuedForCheck = 0;
+
+									if (updatedCount == 0)
+									{
+										alertctx->Notify(EAlertType::Info, Lang::Addons::AllUpToDate.Text());
+									}
+								}
+							}).detach();
+						}
+					}
+				}*/
 			}
-		}
+			ImGui::TooltipGeneric(Lang::Addons::CheckForUpdatesHint.Text());
 
-		aSize.y = ImGui::GetCursorPos().y;
-	}
-	ImGui::EndChild();
-}
-
-void CAddonsWindow::RenderSubWindows()
-{
-	if (this->BindSetterModal.Render() && this->BindSetterModal.GetResult() != EModalResult::None)
-	{
-		this->Invalidate();
-	}
-
-	if (this->UninstallConfirmationModal.Render() && this->UninstallConfirmationModal.GetResult() == EModalResult::OK)
-	{
-		this->ClearContent();
-		this->Invalidate();
-	}
-
-	if (this->LoadConfirmationModal.Render() && this->LoadConfirmationModal.GetResult() == EModalResult::OK)
-	{
-		this->Invalidate();
-	}
-
-	this->AddonContextMenu.Render();
-}
-
-void CAddonsWindow::RenderInputBindsTable(const std::unordered_map<std::string, InputBindPacked_t>& aInputBinds)
-{
-	if (ImGui::BeginTable("table_inputbinds_addons", 2, ImGuiTableFlags_BordersInnerH))
-	{
-		CContext* ctx = CContext::GetContext();
-		CUiContext* uictx = ctx->GetUIContext();
-		CLocalization* langApi = uictx->GetLocalization();
-
-		for (auto& [identifier, inputBind] : aInputBinds)
-		{
-			ImGui::TableNextRow();
-			ImGui::TableSetColumnIndex(0);
-			ImGui::Text(langApi->Translate(identifier.c_str()));
-
-			ImGui::TableSetColumnIndex(1);
-			ImGui::PushID(identifier.c_str());
-			if (ImGui::Button(inputBind.KeysText.c_str(), ImVec2(ImGui::CalcTextSize("XXXXXXXXXXXXXXXXXXXXXXXX").x, 0.0f)))
+			if (s_ReloadIcon)
 			{
-				this->BindSetterModal.SetTarget(identifier);
+				ImGui::SameLine();
+
+				/* Poll changes */
+				if (ImGui::ImageButton(s_ReloadIcon->Resource, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize())))
+				{
+					loader->NotifyChanges();
+				}
 			}
-			ImGui::PopID();
+
+			aSize.y = ImGui::GetCursorPos().y;
 		}
-
-		ImGui::EndTable();
-	}
-}
-
-void CAddonsWindow::PopulateAddons()
-{
-	this->Addons.clear();
-
-	CContext*    ctx = CContext::GetContext();
-	CUiContext*  uictx = ctx->GetUIContext();
-	CLoader*     loader = ctx->GetLoader();
-	CLibraryMgr* libMgr = ctx->GetAddonLibrary();
-
-	const EAddonsFilterFlags filter = this->Filter.Get();
-
-	for (IAddon* addon : loader->GetAddons())
-	{
-		AddonListing_t addonlisting{};
-		addonlisting.Addon = dynamic_cast<CAddon*>(addon);
-
-		for (GUI_RENDER renderCb : uictx->GetRenderCallbacks(ERenderType::OptionsRender))
-		{
-			IAddon* owner = loader->GetOwner(renderCb);
-			if (addon == owner)
-			{
-				addonlisting.OptionsRender = renderCb;
-				break;
-			}
-		}
-
-		this->Addons.push_back(addonlisting);
-
-		if (this->HasContent && this->AddonData.GetSig() == addon->GetSignature())
-		{
-			this->SetContent(addonlisting);
-		}
+		ImGui::EndChild();
 	}
 
-	for (LibraryAddon_t libaddon : libMgr->GetLibrary())
+	void CAddonsWindow::RenderSubWindows()
 	{
-		bool installed = false;
-
-		for (AddonListing_t& addonlisting : this->Addons)
+		if (this->BindSetterModal.Render() && this->BindSetterModal.GetResult() != UI::EModalResult::None)
 		{
-			if (addonlisting.GetSig() == libaddon.Signature)
-			{
-				installed = true;
-				addonlisting.HasLibDef = true;
-				addonlisting.LibraryDef = libaddon;
-			}
+			this->Invalidate();
 		}
 
-		if (!installed)
+		if (this->UninstallConfirmationModal.Render() && this->UninstallConfirmationModal.GetResult() == UI::EModalResult::OK)
+		{
+			this->ClearContent();
+			this->Invalidate();
+		}
+
+		if (this->LoadConfirmationModal.Render() && this->LoadConfirmationModal.GetResult() == UI::EModalResult::OK)
+		{
+			this->Invalidate();
+		}
+
+		this->AddonContextMenu.Render();
+	}
+
+	void CAddonsWindow::RenderInputBindsTable(const std::unordered_map<std::string, UI::InputBindPacked_t>& aInputBinds)
+	{
+		if (ImGui::BeginTable("table_inputbinds_addons", 2, ImGuiTableFlags_BordersInnerH))
+		{
+			GW2::CContext* ctx = GW2::CContext::GetContext();
+			UI::CUiContext* uictx = ctx->GetUIContext();
+			UI::CLocalization* langApi = uictx->GetLocalization();
+
+			for (auto& [identifier, inputBind] : aInputBinds)
+			{
+				ImGui::TableNextRow();
+				ImGui::TableSetColumnIndex(0);
+				ImGui::Text(langApi->Translate(identifier.c_str()));
+
+				ImGui::TableSetColumnIndex(1);
+				ImGui::PushID(identifier.c_str());
+				if (ImGui::Button(inputBind.KeysText.c_str(), ImVec2(ImGui::CalcTextSize("XXXXXXXXXXXXXXXXXXXXXXXX").x, 0.0f)))
+				{
+					this->BindSetterModal.SetTarget(identifier);
+				}
+				ImGui::PopID();
+			}
+
+			ImGui::EndTable();
+		}
+	}
+
+	void CAddonsWindow::PopulateAddons()
+	{
+		this->Addons.clear();
+
+		GW2::CContext*    ctx = GW2::CContext::GetContext();
+		UI::CUiContext*  uictx = ctx->GetUIContext();
+		Engine::CLoader*     loader = ctx->GetLoader();
+		GW2::CLibraryMgr* libMgr = ctx->GetAddonLibrary();
+
+		const EAddonsFilterFlags filter = this->Filter.Get();
+
+		for (Engine::IAddon* addon : loader->GetAddons())
 		{
 			AddonListing_t addonlisting{};
-			addonlisting.HasLibDef = true;
-			addonlisting.LibraryDef = libaddon;
+			addonlisting.Addon = dynamic_cast<GW2::CAddon*>(addon);
+
+			for (UI::GUI_RENDER renderCb : uictx->GetRenderCallbacks(ERenderType::OptionsRender))
+			{
+				Engine::IAddon* owner = loader->GetOwner(renderCb);
+				if (addon == owner)
+				{
+					addonlisting.OptionsRender = renderCb;
+					break;
+				}
+			}
+
 			this->Addons.push_back(addonlisting);
+
+			if (this->HasContent && this->AddonData.GetSig() == addon->GetSignature())
+			{
+				this->SetContent(addonlisting);
+			}
 		}
+
+		for (GW2::LibraryAddon_t libaddon : libMgr->GetLibrary())
+		{
+			bool installed = false;
+
+			for (AddonListing_t& addonlisting : this->Addons)
+			{
+				if (addonlisting.GetSig() == libaddon.Signature)
+				{
+					installed = true;
+					addonlisting.HasLibDef = true;
+					addonlisting.LibraryDef = libaddon;
+				}
+			}
+
+			if (!installed)
+			{
+				AddonListing_t addonlisting{};
+				addonlisting.HasLibDef = true;
+				addonlisting.LibraryDef = libaddon;
+				this->Addons.push_back(addonlisting);
+			}
+		}
+
+		this->AddonsAmtUnfiltered = static_cast<uint32_t>(this->Addons.size());
+
+		for (auto it = this->Addons.begin(); it != this->Addons.end();)
+		{
+			bool matchesFilter = false;
+
+			if ((filter & EAddonsFilterFlags::ShowEnabled) == EAddonsFilterFlags::ShowEnabled)
+			{
+				/* Has local addon and is loaded -> Enabled */
+				if (it->Addon && it->Addon->IsLoaded())
+				{
+					matchesFilter = true;
+				}
+			}
+
+			if ((filter & EAddonsFilterFlags::ShowDisabled) == EAddonsFilterFlags::ShowDisabled)
+			{
+				/* Has local addon and is not loaded -> Disabled */
+				if (it->Addon && !it->Addon->IsLoaded())
+				{
+					matchesFilter = true;
+				}
+			}
+
+			if ((filter & EAddonsFilterFlags::ShowDownloadable) == EAddonsFilterFlags::ShowDownloadable)
+			{
+				/* Has no local addon, but a libdef -> Downloadable */
+				if (!it->Addon && it->HasLibDef)
+				{
+					matchesFilter = true;
+				}
+			}
+
+			if (!matchesFilter)
+			{
+				/* Doesn't match any filter flags -> Remove */
+				it = this->Addons.erase(it);
+			}
+			else if (!this->SearchTerm.empty() &&
+				!(String::Contains(String::ToLower(it->GetName()), this->SearchTerm) ||
+				String::Contains(String::ToLower(it->GetDesc()), this->SearchTerm) ||
+				String::Contains(String::ToLower(it->GetAuthor()), this->SearchTerm)))
+			{
+				/* Term matches name or description or author -> Filter */
+				it = this->Addons.erase(it);
+			}
+			else
+			{
+				/* Continue to next addon listing. */
+				it++;
+			}
+		}
+
+		std::sort(this->Addons.begin(), this->Addons.end(), [](AddonListing_t& lhs, AddonListing_t& rhs)
+		{
+			GW2::Config_t* lhsConfig = lhs.Addon ? lhs.Addon->GetConfig() : nullptr;
+			GW2::Config_t* rhsConfig = rhs.Addon ? rhs.Addon->GetConfig() : nullptr;
+
+			// 1. Addons without config first
+			if (lhsConfig == nullptr || rhsConfig == nullptr)
+			{
+				if (lhsConfig == nullptr && rhsConfig != nullptr)
+				{
+					return true;
+				}
+				if (lhsConfig != nullptr && rhsConfig == nullptr)
+				{
+					return false;
+				}
+			}
+
+			// 2. Favorites first
+			if (lhsConfig && rhsConfig)
+			{
+				if (lhsConfig->IsFavorite != rhsConfig->IsFavorite)
+				{
+					return lhsConfig->IsFavorite > rhsConfig->IsFavorite;
+				}
+
+				// 3. Non-empty DisableVersion first
+				const bool lhsHasDisable = !lhsConfig->DisableVersion.empty();
+				const bool rhsHasDisable = !rhsConfig->DisableVersion.empty();
+				if (lhsHasDisable != rhsHasDisable)
+				{
+					return lhsHasDisable > rhsHasDisable;
+				}
+			}
+
+			// 4. Case-insensitive alphabetical order
+			return String::ToLower(lhs.GetName()) < String::ToLower(rhs.GetName());
+		});
 	}
-	
-	this->AddonsAmtUnfiltered = static_cast<uint32_t>(this->Addons.size());
-
-	for (auto it = this->Addons.begin(); it != this->Addons.end();)
-	{
-		bool matchesFilter = false;
-
-		if ((filter & EAddonsFilterFlags::ShowEnabled) == EAddonsFilterFlags::ShowEnabled)
-		{
-			/* Has local addon and is loaded -> Enabled */
-			if (it->Addon && it->Addon->IsLoaded())
-			{
-				matchesFilter = true;
-			}
-		}
-
-		if ((filter & EAddonsFilterFlags::ShowDisabled) == EAddonsFilterFlags::ShowDisabled)
-		{
-			/* Has local addon and is not loaded -> Disabled */
-			if (it->Addon && !it->Addon->IsLoaded())
-			{
-				matchesFilter = true;
-			}
-		}
-
-		if ((filter & EAddonsFilterFlags::ShowDownloadable) == EAddonsFilterFlags::ShowDownloadable)
-		{
-			/* Has no local addon, but a libdef -> Downloadable */
-			if (!it->Addon && it->HasLibDef)
-			{
-				matchesFilter = true;
-			}
-		}
-
-		if (!matchesFilter)
-		{
-			/* Doesn't match any filter flags -> Remove */
-			it = this->Addons.erase(it);
-		}
-		else if (!this->SearchTerm.empty() &&
-			!(String::Contains(String::ToLower(it->GetName()), this->SearchTerm) ||
-			String::Contains(String::ToLower(it->GetDesc()), this->SearchTerm) ||
-			String::Contains(String::ToLower(it->GetAuthor()), this->SearchTerm)))
-		{
-			/* Term matches name or description or author -> Filter */
-			it = this->Addons.erase(it);
-		}
-		else
-		{
-			/* Continue to next addon listing. */
-			it++;
-		}
-	}
-
-	std::sort(this->Addons.begin(), this->Addons.end(), [](AddonListing_t& lhs, AddonListing_t& rhs)
-	{
-		Config_t* lhsConfig = lhs.Addon ? lhs.Addon->GetConfig() : nullptr;
-		Config_t* rhsConfig = rhs.Addon ? rhs.Addon->GetConfig() : nullptr;
-
-		// 1. Addons without config first
-		if (lhsConfig == nullptr || rhsConfig == nullptr)
-		{
-			if (lhsConfig == nullptr && rhsConfig != nullptr)
-			{
-				return true;
-			}
-			if (lhsConfig != nullptr && rhsConfig == nullptr)
-			{
-				return false;
-			}
-		}
-
-		// 2. Favorites first
-		if (lhsConfig && rhsConfig)
-		{
-			if (lhsConfig->IsFavorite != rhsConfig->IsFavorite)
-			{
-				return lhsConfig->IsFavorite > rhsConfig->IsFavorite;
-			}
-
-			// 3. Non-empty DisableVersion first
-			const bool lhsHasDisable = !lhsConfig->DisableVersion.empty();
-			const bool rhsHasDisable = !rhsConfig->DisableVersion.empty();
-			if (lhsHasDisable != rhsHasDisable)
-			{
-				return lhsHasDisable > rhsHasDisable;
-			}
-		}
-
-		// 4. Case-insensitive alphabetical order
-		return String::ToLower(lhs.GetName()) < String::ToLower(rhs.GetName());
-	});
 }

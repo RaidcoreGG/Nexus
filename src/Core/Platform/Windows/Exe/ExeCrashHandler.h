@@ -12,9 +12,9 @@
 #include <filesystem>
 
 ///----------------------------------------------------------------------------------------------------
-/// Raidcore::Core::Platform::Windows Namespace
+/// Raidcore::Core::Windows Namespace
 ///----------------------------------------------------------------------------------------------------
-namespace Raidcore::Core::Platform::Windows
+namespace Raidcore::Core::Windows
 {
 	///----------------------------------------------------------------------------------------------------
 	/// StackEntry_t Struct

@@ -17,86 +17,89 @@
 
 #include "ApiV1.h"
 
-typedef void (*EVENTS_RAISENOTIFICATION)(const char* aIdentifier);
-
-typedef LRESULT (*WNDPROC_SENDTOGAME)(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-typedef const char* (*LOCALIZATION_TRANSLATE)  (const char* aIdentifier);
-typedef const char* (*LOCALIZATION_TRANSLATETO)(const char* aIdentifier, const char* aLanguageIdentifier);
-
-typedef Texture_t* (*TEXTURES_GETORCREATEFROMFILE)    (const char* aIdentifier, const char* aFilename);
-typedef Texture_t* (*TEXTURES_GETORCREATEFROMRESOURCE)(const char* aIdentifier, unsigned aResourceID, HMODULE aModule);
-typedef Texture_t* (*TEXTURES_GETORCREATEFROMURL)     (const char* aIdentifier, const char* aRemote, const char* aEndpoint);
-typedef Texture_t* (*TEXTURES_GETORCREATEFROMMEMORY)  (const char* aIdentifier, void* aData, size_t aSize);
-typedef void       (*TEXTURES_LOADFROMMEMORY)         (const char* aIdentifier, void* aData, size_t aSize, TEXTURES_RECEIVECALLBACK aCallback);
-
-typedef void (*LOGGER_LOG2)(ELogLevel aLogLevel, const char* aChannel, const char* aStr);
-
-///----------------------------------------------------------------------------------------------------
-/// AddonAPI2_t Struct
-///----------------------------------------------------------------------------------------------------
-struct AddonAPI2_t : AddonAPI_t
+namespace Raidcore::GW2
 {
-	/* Renderer */
-	IDXGISwapChain*                  SwapChain;
-	ImGuiContext*                    ImguiContext;
-	void*                            ImguiMalloc;
-	void*                            ImguiFree;
-	GUI_ADDRENDER                    RegisterRender;
-	GUI_REMRENDER                    DeregisterRender;
+	typedef void (*EVENTS_RAISENOTIFICATION)(const char* aIdentifier);
 
-	/* Paths */
-	IDX_GETGAMEDIR                   GetGameDirectory;
-	IDX_GETADDONDIR                  GetAddonDirectory;
-	IDX_GETCOMMONDIR                 GetCommonDirectory;
+	typedef LRESULT (*WNDPROC_SENDTOGAME)(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	/* Minhook */
-	MINHOOK_CREATE                   CreateHook;
-	MINHOOK_REMOVE                   RemoveHook;
-	MINHOOK_ENABLE                   EnableHook;
-	MINHOOK_DISABLE                  DisableHook;
+	typedef const char* (*LOCALIZATION_TRANSLATE)  (const char* aIdentifier);
+	typedef const char* (*LOCALIZATION_TRANSLATETO)(const char* aIdentifier, const char* aLanguageIdentifier);
 
-	/* Logging */
-	LOGGER_LOG2                      Log;
+	typedef UI::Texture_t* (*TEXTURES_GETORCREATEFROMFILE)    (const char* aIdentifier, const char* aFilename);
+	typedef UI::Texture_t* (*TEXTURES_GETORCREATEFROMRESOURCE)(const char* aIdentifier, unsigned aResourceID, HMODULE aModule);
+	typedef UI::Texture_t* (*TEXTURES_GETORCREATEFROMURL)     (const char* aIdentifier, const char* aRemote, const char* aEndpoint);
+	typedef UI::Texture_t* (*TEXTURES_GETORCREATEFROMMEMORY)  (const char* aIdentifier, void* aData, size_t aSize);
+	typedef void       (*TEXTURES_LOADFROMMEMORY)         (const char* aIdentifier, void* aData, size_t aSize, UI::TEXTURES_RECEIVECALLBACK aCallback);
 
-	/* Events */
-	EVENTS_RAISE                     RaiseEvent;
-	EVENTS_RAISENOTIFICATION         RaiseEventNotification;
-	EVENTS_SUBSCRIBE                 SubscribeEvent;
-	EVENTS_SUBSCRIBE                 UnsubscribeEvent;
+	typedef void (*LOGGER_LOG2)(Core::ELogLevel aLogLevel, const char* aChannel, const char* aStr);
 
-	/* WndProc */
-	WNDPROC_ADDREM                   RegisterWndProc;
-	WNDPROC_ADDREM                   DeregisterWndProc;
-	WNDPROC_SENDTOGAME               SendWndProcToGameOnly;
+	///----------------------------------------------------------------------------------------------------
+	/// AddonAPI2_t Struct
+	///----------------------------------------------------------------------------------------------------
+	struct AddonAPI2_t : AddonAPI_t
+	{
+		/* Renderer */
+		IDXGISwapChain*                  SwapChain;
+		ImGuiContext*                    ImguiContext;
+		void*                            ImguiMalloc;
+		void*                            ImguiFree;
+		GUI_ADDRENDER                    RegisterRender;
+		GUI_REMRENDER                    DeregisterRender;
 
-	/* InputBinds */
-	INPUTBINDS_REGISTERWITHSTRING    RegisterInputBindWithString;
-	INPUTBINDS_REGISTERWITHSTRUCT    RegisterInputBindWithStruct;
-	INPUTBINDS_DEREGISTER            DeregisterInputBind;
+		/* Paths */
+		IDX_GETGAMEDIR                   GetGameDirectory;
+		IDX_GETADDONDIR                  GetAddonDirectory;
+		IDX_GETCOMMONDIR                 GetCommonDirectory;
 
-	/* DataLink */
-	DATALINK_GETRESOURCE             GetResource;
-	DATALINK_SHARERESOURCE           ShareResource;
+		/* Minhook */
+		MINHOOK_CREATE                   CreateHook;
+		MINHOOK_REMOVE                   RemoveHook;
+		MINHOOK_ENABLE                   EnableHook;
+		MINHOOK_DISABLE                  DisableHook;
 
-	/* Textures */
-	TEXTURES_GET                     GetTexture;
-	TEXTURES_GETORCREATEFROMFILE     GetTextureOrCreateFromFile;
-	TEXTURES_GETORCREATEFROMRESOURCE GetTextureOrCreateFromResource;
-	TEXTURES_GETORCREATEFROMURL      GetTextureOrCreateFromURL;
-	TEXTURES_GETORCREATEFROMMEMORY   GetTextureOrCreateFromMemory;
-	TEXTURES_LOADFROMFILE            LoadTextureFromFile;
-	TEXTURES_LOADFROMRESOURCE        LoadTextureFromResource;
-	TEXTURES_LOADFROMURL             LoadTextureFromURL;
-	TEXTURES_LOADFROMMEMORY          LoadTextureFromMemory;
+		/* Logging */
+		LOGGER_LOG2                      Log;
 
-	/* Shortcuts */
-	QUICKACCESS_ADDSHORTCUT          AddShortcut;
-	QUICKACCESS_GENERIC              RemoveShortcut;
-	QUICKACCESS_GENERIC              PushNotification;
-	QUICKACCESS_ADDSIMPLE            AddSimpleShortcut;
-	QUICKACCESS_GENERIC              RemoveSimpleShortcut;
+		/* Events */
+		EVENTS_RAISE                     RaiseEvent;
+		EVENTS_RAISENOTIFICATION         RaiseEventNotification;
+		EVENTS_SUBSCRIBE                 SubscribeEvent;
+		EVENTS_SUBSCRIBE                 UnsubscribeEvent;
 
-	LOCALIZATION_TRANSLATE           Translate;
-	LOCALIZATION_TRANSLATETO         TranslateTo;
-};
+		/* WndProc */
+		WNDPROC_ADDREM                   RegisterWndProc;
+		WNDPROC_ADDREM                   DeregisterWndProc;
+		WNDPROC_SENDTOGAME               SendWndProcToGameOnly;
+
+		/* InputBinds */
+		INPUTBINDS_REGISTERWITHSTRING    RegisterInputBindWithString;
+		INPUTBINDS_REGISTERWITHSTRUCT    RegisterInputBindWithStruct;
+		INPUTBINDS_DEREGISTER            DeregisterInputBind;
+
+		/* DataLink */
+		DATALINK_GETRESOURCE             GetResource;
+		DATALINK_SHARERESOURCE           ShareResource;
+
+		/* Textures */
+		TEXTURES_GET                     GetTexture;
+		TEXTURES_GETORCREATEFROMFILE     GetTextureOrCreateFromFile;
+		TEXTURES_GETORCREATEFROMRESOURCE GetTextureOrCreateFromResource;
+		TEXTURES_GETORCREATEFROMURL      GetTextureOrCreateFromURL;
+		TEXTURES_GETORCREATEFROMMEMORY   GetTextureOrCreateFromMemory;
+		TEXTURES_LOADFROMFILE            LoadTextureFromFile;
+		TEXTURES_LOADFROMRESOURCE        LoadTextureFromResource;
+		TEXTURES_LOADFROMURL             LoadTextureFromURL;
+		TEXTURES_LOADFROMMEMORY          LoadTextureFromMemory;
+
+		/* Shortcuts */
+		QUICKACCESS_ADDSHORTCUT          AddShortcut;
+		QUICKACCESS_GENERIC              RemoveShortcut;
+		QUICKACCESS_GENERIC              PushNotification;
+		QUICKACCESS_ADDSIMPLE            AddSimpleShortcut;
+		QUICKACCESS_GENERIC              RemoveSimpleShortcut;
+
+		LOCALIZATION_TRANSLATE           Translate;
+		LOCALIZATION_TRANSLATETO         TranslateTo;
+	};
+}

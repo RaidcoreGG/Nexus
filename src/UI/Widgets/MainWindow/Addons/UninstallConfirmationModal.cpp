@@ -10,66 +10,69 @@
 
 #include "Host/GW2/Context.h"
 
-CUninstallConfirmationModal::CUninstallConfirmationModal()
+namespace Raidcore::UI
 {
-	this->SetID("UninstallConfirmationModal");
-	this->SetDisplayName(Lang::Addons::UninstallConfirm);
-}
-
-void CUninstallConfirmationModal::RenderContent()
-{
-	ImGui::Text(Lang::Common::AreYouSure.Text());
-
-	/* Accept */
-	if (ImGui::Button(Lang::Common::Accept.Text()))
+	CUninstallConfirmationModal::CUninstallConfirmationModal()
 	{
-		this->SetResult(EModalResult::OK);
+		this->SetID("UninstallConfirmationModal");
+		this->SetDisplayName(Lang::Addons::UninstallConfirm);
 	}
 
-	ImGui::SameLine();
-
-	/* Cancel */
-	if (ImGui::Button(Lang::Common::Cancel.Text()))
+	void CUninstallConfirmationModal::RenderContent()
 	{
-		this->SetResult(EModalResult::Cancel);
-	}
-}
+		ImGui::Text(Lang::Common::AreYouSure.Text());
 
-void CUninstallConfirmationModal::OnClosing()
-{
-	CContext*    ctx    = CContext::GetContext();
-	CLoader*     loader = ctx->GetLoader();
-
-	switch (this->GetResult())
-	{
-		case EModalResult::OK:
+		/* Accept */
+		if (ImGui::Button(Lang::Common::Accept.Text()))
 		{
-			// FIXME: loader->UninstallSafe(this->Path);
-			break;
+			this->SetResult(UI::EModalResult::OK);
 		}
-		case EModalResult::Cancel:
+
+		ImGui::SameLine();
+
+		/* Cancel */
+		if (ImGui::Button(Lang::Common::Cancel.Text()))
 		{
-			break;
+			this->SetResult(UI::EModalResult::Cancel);
 		}
 	}
 
-	/* Reset data. */
-	this->Name.clear();
-	this->Path.clear();
-}
+	void CUninstallConfirmationModal::OnClosing()
+	{
+		GW2::CContext*    ctx    = GW2::CContext::GetContext();
+		Engine::CLoader*     loader = ctx->GetLoader();
 
-void CUninstallConfirmationModal::SetTarget(std::string aName, std::filesystem::path aPath)
-{
-	this->Name = aName;
-	this->Path = aPath;
+		switch (this->GetResult())
+		{
+			case UI::EModalResult::OK:
+			{
+				// FIXME: loader->UninstallSafe(this->Path);
+				break;
+			}
+			case UI::EModalResult::Cancel:
+			{
+				break;
+			}
+		}
 
-	this->SetTitle();
+		/* Reset data. */
+		this->Name.clear();
+		this->Path.clear();
+	}
 
-	this->OpenModal();
-}
+	void CUninstallConfirmationModal::SetTarget(std::string aName, std::filesystem::path aPath)
+	{
+		this->Name = aName;
+		this->Path = aPath;
 
-void CUninstallConfirmationModal::SetTitle()
-{
-	/* Override the title before opening the modal. */
-	this->SetDisplayName(Lang::Addons::UninstallConfirm, this->Name);
+		this->SetTitle();
+
+		this->OpenModal();
+	}
+
+	void CUninstallConfirmationModal::SetTitle()
+	{
+		/* Override the title before opening the modal. */
+		this->SetDisplayName(Lang::Addons::UninstallConfirm, this->Name);
+	}
 }

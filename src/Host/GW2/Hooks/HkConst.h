@@ -8,4 +8,7 @@
 
 #pragma once
 
-constexpr const char* EV_WINDOW_RESIZED = "EV_WINDOW_RESIZED";
+namespace Raidcore::GW2::Hooks
+{
+	constexpr const char* EV_WINDOW_RESIZED = "EV_WINDOW_RESIZED";
+}

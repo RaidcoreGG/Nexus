@@ -11,81 +11,84 @@
 #include <assert.h>
 #include <shlobj.h>
 
-static HMODULE               s_Module = nullptr;
-static std::filesystem::path s_Paths[(int)EPath::COUNT];
-
-void CreateIndex(HMODULE aModule)
+namespace Raidcore::GW2
 {
-	assert(!s_Module);
+	static HMODULE               s_Module = nullptr;
+	static std::filesystem::path s_Paths[(int)EPath::COUNT];
 
-	/* Self DLL path. */
-	char module[MAX_PATH]{};
-	GetModuleFileNameA(aModule, module, MAX_PATH);
-	s_Paths[(int)EPath::NexusDLL] = module;
+	void CreateIndex(HMODULE aModule)
+	{
+		assert(!s_Module);
 
-	/* Get system directory. */
-	char system[MAX_PATH]{};
-	GetSystemDirectoryA(system, MAX_PATH);
-	s_Paths[(int)EPath::DIR_SYSTEM] = system;
+		/* Self DLL path. */
+		char module[MAX_PATH]{};
+		GetModuleFileNameA(aModule, module, MAX_PATH);
+		s_Paths[(int)EPath::NexusDLL] = module;
 
-	/* Get user documents directory. */
-	char documents[MAX_PATH]{};
-	SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, documents);
-	s_Paths[(int)EPath::DIR_DOCUMENTS] = documents;
+		/* Get system directory. */
+		char system[MAX_PATH]{};
+		GetSystemDirectoryA(system, MAX_PATH);
+		s_Paths[(int)EPath::DIR_SYSTEM] = system;
 
-	/* Get game relative directories. */
-	s_Paths[(int)EPath::DIR_GW2]               = s_Paths[(int)EPath::NexusDLL].parent_path();
-	s_Paths[(int)EPath::DIR_ADDONS]            = s_Paths[(int)EPath::DIR_GW2] / "addons";
-	s_Paths[(int)EPath::DIR_COMMON]            = s_Paths[(int)EPath::DIR_ADDONS] / "common";
-	s_Paths[(int)EPath::DIR_APICACHE_GW2]      = s_Paths[(int)EPath::DIR_COMMON] / "api.guildwars2.com";
-	s_Paths[(int)EPath::DIR_APICACHE_RAIDCORE] = s_Paths[(int)EPath::DIR_COMMON] / "api.raidcore.gg";
-	s_Paths[(int)EPath::DIR_APICACHE_GITHUB]   = s_Paths[(int)EPath::DIR_COMMON] / "api.github.com";
-	s_Paths[(int)EPath::DIR_NEXUS]             = s_Paths[(int)EPath::DIR_ADDONS] / "Nexus";
-	s_Paths[(int)EPath::DIR_TEMP]              = s_Paths[(int)EPath::DIR_NEXUS] / "Temp";
-	s_Paths[(int)EPath::DIR_FONTS]             = s_Paths[(int)EPath::DIR_NEXUS] / "Fonts";
-	s_Paths[(int)EPath::DIR_LOCALES]           = s_Paths[(int)EPath::DIR_NEXUS] / "Locales";
-	s_Paths[(int)EPath::DIR_STYLES]            = s_Paths[(int)EPath::DIR_NEXUS] / "Styles";
-	s_Paths[(int)EPath::DIR_TEXTURES]          = s_Paths[(int)EPath::DIR_NEXUS] / "Textures";
+		/* Get user documents directory. */
+		char documents[MAX_PATH]{};
+		SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, documents);
+		s_Paths[(int)EPath::DIR_DOCUMENTS] = documents;
 
-	/* Get document based directories. */
-	s_Paths[(int)EPath::DIR_DOCUMENTS_GW2]     = s_Paths[(int)EPath::DIR_DOCUMENTS] / "Guild Wars 2";
-	s_Paths[(int)EPath::DIR_GW2_INPUTBINDS]    = s_Paths[(int)EPath::DIR_DOCUMENTS_GW2] / "InputBinds";
+		/* Get game relative directories. */
+		s_Paths[(int)EPath::DIR_GW2]               = s_Paths[(int)EPath::NexusDLL].parent_path();
+		s_Paths[(int)EPath::DIR_ADDONS]            = s_Paths[(int)EPath::DIR_GW2] / "addons";
+		s_Paths[(int)EPath::DIR_COMMON]            = s_Paths[(int)EPath::DIR_ADDONS] / "common";
+		s_Paths[(int)EPath::DIR_APICACHE_GW2]      = s_Paths[(int)EPath::DIR_COMMON] / "api.guildwars2.com";
+		s_Paths[(int)EPath::DIR_APICACHE_RAIDCORE] = s_Paths[(int)EPath::DIR_COMMON] / "api.raidcore.gg";
+		s_Paths[(int)EPath::DIR_APICACHE_GITHUB]   = s_Paths[(int)EPath::DIR_COMMON] / "api.github.com";
+		s_Paths[(int)EPath::DIR_NEXUS]             = s_Paths[(int)EPath::DIR_ADDONS] / "Nexus";
+		s_Paths[(int)EPath::DIR_TEMP]              = s_Paths[(int)EPath::DIR_NEXUS] / "Temp";
+		s_Paths[(int)EPath::DIR_FONTS]             = s_Paths[(int)EPath::DIR_NEXUS] / "Fonts";
+		s_Paths[(int)EPath::DIR_LOCALES]           = s_Paths[(int)EPath::DIR_NEXUS] / "Locales";
+		s_Paths[(int)EPath::DIR_STYLES]            = s_Paths[(int)EPath::DIR_NEXUS] / "Styles";
+		s_Paths[(int)EPath::DIR_TEXTURES]          = s_Paths[(int)EPath::DIR_NEXUS] / "Textures";
 
-	/* Ensure directory tree. */
-	std::filesystem::create_directories(s_Paths[(int)EPath::DIR_ADDONS]);
-	std::filesystem::create_directories(s_Paths[(int)EPath::DIR_COMMON]);
-	std::filesystem::create_directories(s_Paths[(int)EPath::DIR_NEXUS]);
-	std::filesystem::create_directories(s_Paths[(int)EPath::DIR_TEMP]);
-	std::filesystem::create_directories(s_Paths[(int)EPath::DIR_FONTS]);
-	std::filesystem::create_directories(s_Paths[(int)EPath::DIR_LOCALES]);
-	std::filesystem::create_directories(s_Paths[(int)EPath::DIR_STYLES]);
-	std::filesystem::create_directories(s_Paths[(int)EPath::DIR_TEXTURES]);
+		/* Get document based directories. */
+		s_Paths[(int)EPath::DIR_DOCUMENTS_GW2]     = s_Paths[(int)EPath::DIR_DOCUMENTS] / "Guild Wars 2";
+		s_Paths[(int)EPath::DIR_GW2_INPUTBINDS]    = s_Paths[(int)EPath::DIR_DOCUMENTS_GW2] / "InputBinds";
 
-	/* Get files. */
-	s_Paths[(int)EPath::Log]                      = s_Paths[(int)EPath::DIR_NEXUS] / "Nexus.log";
-	s_Paths[(int)EPath::CrashLog]                 = s_Paths[(int)EPath::DIR_NEXUS] / "Crash.log";
-	s_Paths[(int)EPath::CrashStack]               = s_Paths[(int)EPath::DIR_NEXUS] / "CrashStack.log";
-	s_Paths[(int)EPath::InputBinds]               = s_Paths[(int)EPath::DIR_NEXUS] / "InputBinds.json";
-	s_Paths[(int)EPath::GameBinds]                = s_Paths[(int)EPath::DIR_NEXUS] / "GameBinds.xml";
-	s_Paths[(int)EPath::Settings]                 = s_Paths[(int)EPath::DIR_NEXUS] / "Settings.json";
-	s_Paths[(int)EPath::AddonConfigDefault]       = s_Paths[(int)EPath::DIR_NEXUS] / "AddonConfig.json";
-	s_Paths[(int)EPath::ArcdpsIntegration]        = s_Paths[(int)EPath::DIR_NEXUS] / "arcdps_integration64.dll";
-	s_Paths[(int)EPath::ThirdPartySoftwareReadme] = s_Paths[(int)EPath::DIR_NEXUS] / "THIRDPARTYSOFTWAREREADME.TXT";
-	s_Paths[(int)EPath::GlyphCache]               = s_Paths[(int)EPath::DIR_NEXUS] / "GlyphCache.txt";
+		/* Ensure directory tree. */
+		std::filesystem::create_directories(s_Paths[(int)EPath::DIR_ADDONS]);
+		std::filesystem::create_directories(s_Paths[(int)EPath::DIR_COMMON]);
+		std::filesystem::create_directories(s_Paths[(int)EPath::DIR_NEXUS]);
+		std::filesystem::create_directories(s_Paths[(int)EPath::DIR_TEMP]);
+		std::filesystem::create_directories(s_Paths[(int)EPath::DIR_FONTS]);
+		std::filesystem::create_directories(s_Paths[(int)EPath::DIR_LOCALES]);
+		std::filesystem::create_directories(s_Paths[(int)EPath::DIR_STYLES]);
+		std::filesystem::create_directories(s_Paths[(int)EPath::DIR_TEXTURES]);
 
-	/* DLL paths. */
-	s_Paths[(int)EPath::NexusDLL_Old]    = s_Paths[(int)EPath::NexusDLL].string() + ".old";
-	s_Paths[(int)EPath::NexusDLL_Update] = s_Paths[(int)EPath::NexusDLL].string() + ".update";
-	s_Paths[(int)EPath::D3D11]           = s_Paths[(int)EPath::DIR_SYSTEM] / "d3d11.dll";
-	s_Paths[(int)EPath::D3D11Chainload]  = s_Paths[(int)EPath::DIR_GW2] / "d3d11_chainload.dll";
+		/* Get files. */
+		s_Paths[(int)EPath::Log]                      = s_Paths[(int)EPath::DIR_NEXUS] / "Nexus.log";
+		s_Paths[(int)EPath::CrashLog]                 = s_Paths[(int)EPath::DIR_NEXUS] / "Crash.log";
+		s_Paths[(int)EPath::CrashStack]               = s_Paths[(int)EPath::DIR_NEXUS] / "CrashStack.log";
+		s_Paths[(int)EPath::InputBinds]               = s_Paths[(int)EPath::DIR_NEXUS] / "InputBinds.json";
+		s_Paths[(int)EPath::GameBinds]                = s_Paths[(int)EPath::DIR_NEXUS] / "GameBinds.xml";
+		s_Paths[(int)EPath::Settings]                 = s_Paths[(int)EPath::DIR_NEXUS] / "Settings.json";
+		s_Paths[(int)EPath::AddonConfigDefault]       = s_Paths[(int)EPath::DIR_NEXUS] / "AddonConfig.json";
+		s_Paths[(int)EPath::ArcdpsIntegration]        = s_Paths[(int)EPath::DIR_NEXUS] / "arcdps_integration64.dll";
+		s_Paths[(int)EPath::ThirdPartySoftwareReadme] = s_Paths[(int)EPath::DIR_NEXUS] / "THIRDPARTYSOFTWAREREADME.TXT";
+		s_Paths[(int)EPath::GlyphCache]               = s_Paths[(int)EPath::DIR_NEXUS] / "GlyphCache.txt";
 
-	/* Set the module. */
-	s_Module = aModule;
-}
+		/* DLL paths. */
+		s_Paths[(int)EPath::NexusDLL_Old]    = s_Paths[(int)EPath::NexusDLL].string() + ".old";
+		s_Paths[(int)EPath::NexusDLL_Update] = s_Paths[(int)EPath::NexusDLL].string() + ".update";
+		s_Paths[(int)EPath::D3D11]           = s_Paths[(int)EPath::DIR_SYSTEM] / "d3d11.dll";
+		s_Paths[(int)EPath::D3D11Chainload]  = s_Paths[(int)EPath::DIR_GW2] / "d3d11_chainload.dll";
 
-std::filesystem::path Index(EPath aIndex)
-{
-	assert(s_Module);
+		/* Set the module. */
+		s_Module = aModule;
+	}
 
-	return s_Paths[(int)aIndex];
+	std::filesystem::path Index(EPath aIndex)
+	{
+		assert(s_Module);
+
+		return s_Paths[(int)aIndex];
+	}
 }

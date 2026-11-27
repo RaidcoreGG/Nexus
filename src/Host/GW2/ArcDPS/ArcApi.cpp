@@ -13,166 +13,169 @@
 #include "Host/GW2/Index/Index.h"
 #include "Util/DLL.h"
 
-static void s_ReceiveExtension(ArcDPS::ExtensionDefRaw_t* aExtensionDef)
+namespace Raidcore::GW2::ArcDPS
 {
-	CContext::GetContext()->GetArcApi()->ReceiveExtension(aExtensionDef);
-}
-
-CArcApi::~CArcApi()
-{
-	this->Functions = {};
-
-	if (this->Module)
+	static void s_ReceiveExtension(ArcDPS::ExtensionDefRaw_t* aExtensionDef)
 	{
-		FreeLibrary(this->Module);
-	}
-}
-
-bool CArcApi::IsInitialized()
-{
-	return this->Module != nullptr;
-}
-
-void CArcApi::Initialize(HMODULE aArcdpsModule)
-{
-	if (!this->BuildFunctionTable(aArcdpsModule))
-	{
-		throw "Incompatible Module. Missing Functions.";
+		GW2::CContext::GetContext()->GetArcApi()->ReceiveExtension(aExtensionDef);
 	}
 
-	char path[MAX_PATH]{};
-	GetModuleFileNameA(aArcdpsModule, path, sizeof(path));
-
-	this->Module = LoadLibraryA(path);
-}
-
-bool CArcApi::TryDetect()
-{
-	if (this->IsInitialized())
+	CArcApi::~CArcApi()
 	{
-		return true;
-	}
+		this->Functions = {};
 
-	/* Based on whether Nexus is chainload or primary d3d11, return the other to check against it. */
-	std::filesystem::path d3d11 = Index(EPath::D3D11) == Index(EPath::NexusDLL) ? Index(EPath::D3D11Chainload) : Index(EPath::D3D11);
-	
-	if (std::filesystem::exists(d3d11))
-	{
-		HMODULE hModule = GetModuleHandleA(d3d11.string().c_str());
-
-		try
+		if (this->Module)
 		{
+			FreeLibrary(this->Module);
+		}
+	}
+
+	bool CArcApi::IsInitialized()
+	{
+		return this->Module != nullptr;
+	}
+
+	void CArcApi::Initialize(HMODULE aArcdpsModule)
+	{
+		if (!this->BuildFunctionTable(aArcdpsModule))
+		{
+			throw "Incompatible Module. Missing Functions.";
+		}
+
+		char path[MAX_PATH]{};
+		GetModuleFileNameA(aArcdpsModule, path, sizeof(path));
+
+		this->Module = LoadLibraryA(path);
+	}
+
+	bool CArcApi::TryDetect()
+	{
+		if (this->IsInitialized())
+		{
+			return true;
+		}
+
+		/* Based on whether Nexus is chainload or primary d3d11, return the other to check against it. */
+		std::filesystem::path d3d11 = GW2::Index(GW2::EPath::D3D11) == GW2::Index(GW2::EPath::NexusDLL) ? GW2::Index(GW2::EPath::D3D11Chainload) : GW2::Index(GW2::EPath::D3D11);
+
+		if (std::filesystem::exists(d3d11))
+		{
+			HMODULE hModule = GetModuleHandleA(d3d11.string().c_str());
+
+			try
+			{
+				if (hModule && this->BuildFunctionTable(hModule))
+				{
+					/* Increment refcount. */
+					this->Module = LoadLibraryA(d3d11.string().c_str());
+					return true;
+				}
+			}
+			catch (...) { /* nop: D3D11 might just simply be something else. */ }
+		}
+
+		std::filesystem::path arc_al = GW2::Index(GW2::EPath::DIR_ADDONS) / "arcdps/gw2addon_arcdps.dll";
+
+		if (std::filesystem::exists(arc_al))
+		{
+			HMODULE hModule = GetModuleHandleA(arc_al.string().c_str());
+
 			if (hModule && this->BuildFunctionTable(hModule))
 			{
 				/* Increment refcount. */
-				this->Module = LoadLibraryA(d3d11.string().c_str());
+				this->Module = LoadLibraryA(arc_al.string().c_str());
 				return true;
 			}
 		}
-		catch (...) { /* nop: D3D11 might just simply be something else. */ }
+
+		return false;
 	}
 
-	std::filesystem::path arc_al = Index(EPath::DIR_ADDONS) / "arcdps/gw2addon_arcdps.dll";
-
-	if (std::filesystem::exists(arc_al))
+	std::filesystem::path CArcApi::GetArcIniPath()
 	{
-		HMODULE hModule = GetModuleHandleA(arc_al.string().c_str());
+		if (this->IsInitialized()) { return std::filesystem::path(); }
 
-		if (hModule && this->BuildFunctionTable(hModule))
-		{
-			/* Increment refcount. */
-			this->Module = LoadLibraryA(arc_al.string().c_str());
-			return true;
-		}
+		std::filesystem::path path = this->Functions.GetArcIniPath();
+		return path;
 	}
 
-	return false;
-}
+	void CArcApi::LogToFile(char* aMessage)
+	{
+		if (this->IsInitialized()) { return; }
 
-std::filesystem::path CArcApi::GetArcIniPath()
-{
-	if (this->IsInitialized()) { return std::filesystem::path(); }
-	
-	std::filesystem::path path = this->Functions.GetArcIniPath();
-	return path;
-}
+		this->Functions.LogToFile(aMessage);
+	}
 
-void CArcApi::LogToFile(char* aMessage)
-{
-	if (this->IsInitialized()) { return; }
+	void CArcApi::LogToWindow(char* aMessage)
+	{
+		if (this->IsInitialized()) { return; }
 
-	this->Functions.LogToFile(aMessage);
-}
+		this->Functions.LogToWindow(aMessage);
+	}
 
-void CArcApi::LogToWindow(char* aMessage)
-{
-	if (this->IsInitialized()) { return; }
+	ArcDPS::UiFlags_t CArcApi::GetUIFlags()
+	{
+		if (this->IsInitialized()) { return ArcDPS::UiFlags_t(); }
 
-	this->Functions.LogToWindow(aMessage);
-}
+		return this->Functions.GetUIFlags();
+	}
 
-ArcDPS::UiFlags_t CArcApi::GetUIFlags()
-{
-	if (this->IsInitialized()) { return ArcDPS::UiFlags_t(); }
+	ArcDPS::Modifiers_t CArcApi::GetModifiers()
+	{
+		if (this->IsInitialized()) { return ArcDPS::Modifiers_t(); }
 
-	return this->Functions.GetUIFlags();
-}
+		return this->Functions.GetModifiers();
+	}
 
-ArcDPS::Modifiers_t CArcApi::GetModifiers()
-{
-	if (this->IsInitialized()) { return ArcDPS::Modifiers_t(); }
+	ArcDPS::EAddExtResult CArcApi::AddExtension(HMODULE aModule)
+	{
+		if (this->IsInitialized()) { return ArcDPS::EAddExtResult::NotInitialized; }
 
-	return this->Functions.GetModifiers();
-}
+		return this->Functions.AddExtension(aModule);
+	}
 
-ArcDPS::EAddExtResult CArcApi::AddExtension(HMODULE aModule)
-{
-	if (this->IsInitialized()) { return ArcDPS::EAddExtResult::NotInitialized; }
+	void CArcApi::FreeExtension(uint32_t aSignature)
+	{
+		if (this->IsInitialized()) { return; }
 
-	return this->Functions.AddExtension(aModule);
-}
+		this->Functions.FreeExtension(aSignature);
+	}
 
-void CArcApi::FreeExtension(uint32_t aSignature)
-{
-	if (this->IsInitialized()) { return; }
-
-	this->Functions.FreeExtension(aSignature);
-}
-
-void CArcApi::PollExtensions()
-{
-	if (this->IsInitialized()) { return; }
+	void CArcApi::PollExtensions()
+	{
+		if (this->IsInitialized()) { return; }
 
 
-	this->Functions.ListExtensions(s_ReceiveExtension);
-}
+		this->Functions.ListExtensions(s_ReceiveExtension);
+	}
 
-void CArcApi::ReceiveExtension(ArcDPS::ExtensionDefRaw_t* aExtensionDef)
-{
-	if (this->IsInitialized()) { return; }
+	void CArcApi::ReceiveExtension(ArcDPS::ExtensionDefRaw_t* aExtensionDef)
+	{
+		if (this->IsInitialized()) { return; }
 
-	throw "Not Implemented";
+		throw "Not Implemented";
 
-	/* They need to be added to the loader from here. */
-	/* If they are inside /addons, they are probably already tracked. */
-	/* If they are outside of /addons though, it's nice to track them. */
-}
+		/* They need to be added to the loader from here. */
+		/* If they are inside /addons, they are probably already tracked. */
+		/* If they are outside of /addons though, it's nice to track them. */
+	}
 
-bool CArcApi::BuildFunctionTable(HMODULE aArcdpsModule)
-{
-	FuncTable_t funcs{};
+	bool CArcApi::BuildFunctionTable(HMODULE aArcdpsModule)
+	{
+		FuncTable_t funcs{};
 
-	if (DLL::FindFunction(aArcdpsModule, &funcs.GetArcIniPath,  "e0")             == false) { return false; }
-	if (DLL::FindFunction(aArcdpsModule, &funcs.LogToFile,      "e3")             == false) { return false; }
-	if (DLL::FindFunction(aArcdpsModule, &funcs.LogToWindow,    "e8")             == false) { return false; }
-	if (DLL::FindFunction(aArcdpsModule, &funcs.GetUIFlags,     "e6")             == false) { return false; }
-	if (DLL::FindFunction(aArcdpsModule, &funcs.GetModifiers,   "e7")             == false) { return false; }
-	if (DLL::FindFunction(aArcdpsModule, &funcs.AddExtension,   "addextension2")  == false) { return false; }
-	if (DLL::FindFunction(aArcdpsModule, &funcs.FreeExtension,  "freeextension2") == false) { return false; }
-	if (DLL::FindFunction(aArcdpsModule, &funcs.ListExtensions, "listextension")  == false) { return false; }
+		if (DLL::FindFunction(aArcdpsModule, &funcs.GetArcIniPath,  "e0")             == false) { return false; }
+		if (DLL::FindFunction(aArcdpsModule, &funcs.LogToFile,      "e3")             == false) { return false; }
+		if (DLL::FindFunction(aArcdpsModule, &funcs.LogToWindow,    "e8")             == false) { return false; }
+		if (DLL::FindFunction(aArcdpsModule, &funcs.GetUIFlags,     "e6")             == false) { return false; }
+		if (DLL::FindFunction(aArcdpsModule, &funcs.GetModifiers,   "e7")             == false) { return false; }
+		if (DLL::FindFunction(aArcdpsModule, &funcs.AddExtension,   "addextension2")  == false) { return false; }
+		if (DLL::FindFunction(aArcdpsModule, &funcs.FreeExtension,  "freeextension2") == false) { return false; }
+		if (DLL::FindFunction(aArcdpsModule, &funcs.ListExtensions, "listextension")  == false) { return false; }
 
-	/* Store the built function table. */
-	this->Functions = funcs;
+		/* Store the built function table. */
+		this->Functions = funcs;
 
-	return true;
+		return true;
+	}
 }

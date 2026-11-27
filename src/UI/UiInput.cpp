@@ -15,223 +15,226 @@
 
 #include "Util/Inputs.h"
 
-CUiInput::CUiInput()
+namespace Raidcore::UI
 {
-}
-
-CUiInput::~CUiInput()
-{
-}
-
-UINT CUiInput::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	ImGuiIO& io = ImGui::GetIO();
-
-	Input::EModifiers activeModifiers = Input::EModifiers::None;
-	if (GetAsyncKeyState(VK_MENU))
+	CUiInput::CUiInput()
 	{
-		activeModifiers |= Input::EModifiers::Alt;
-	}
-	if (GetAsyncKeyState(VK_CONTROL))
-	{
-		activeModifiers |= Input::EModifiers::Ctrl;
-	}
-	if (GetAsyncKeyState(VK_SHIFT))
-	{
-		activeModifiers |= Input::EModifiers::Shift;
 	}
 
-	const Input::EModifiers requiredModifiers = this->RequiredModifiers.Get();
-	const bool              filterClicks      = this->FilterClicks.Get();
-
-	bool reqModsDown = (requiredModifiers & activeModifiers) == requiredModifiers;
-
-	switch (uMsg)
+	CUiInput::~CUiInput()
 	{
-		/* Don't relay mouse movement to ImGui, if the cursor is hidden. */
-		case WM_MOUSEMOVE:
+	}
+
+	UINT CUiInput::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+
+		Engine::Input::EModifiers activeModifiers = Engine::Input::EModifiers::None;
+		if (GetAsyncKeyState(VK_MENU))
 		{
-			if (!Inputs::IsCursorHidden())
-			{
-				io.MousePos = ImVec2(static_cast<float>(LOWORD(lParam)), static_cast<float>(HIWORD(lParam)));
-			}
-			break;
+			activeModifiers |= Engine::Input::EModifiers::Alt;
+		}
+		if (GetAsyncKeyState(VK_CONTROL))
+		{
+			activeModifiers |= Engine::Input::EModifiers::Ctrl;
+		}
+		if (GetAsyncKeyState(VK_SHIFT))
+		{
+			activeModifiers |= Engine::Input::EModifiers::Shift;
 		}
 
-		/* LMB and RMB. */
-		case WM_LBUTTONDBLCLK: [[fallthrough]];
-		case WM_LBUTTONDOWN:
+		const Engine::Input::EModifiers requiredModifiers = this->RequiredModifiers.Get();
+		const bool              filterClicks      = this->FilterClicks.Get();
+
+		bool reqModsDown = (requiredModifiers & activeModifiers) == requiredModifiers;
+
+		switch (uMsg)
 		{
-			if (io.WantCaptureMouse && !Inputs::IsCursorHidden())
+			/* Don't relay mouse movement to ImGui, if the cursor is hidden. */
+			case WM_MOUSEMOVE:
 			{
-				if (!filterClicks)
+				if (!Inputs::IsCursorHidden())
 				{
-					io.MouseDown[0] = true;
-					return 0;
+					io.MousePos = ImVec2(static_cast<float>(LOWORD(lParam)), static_cast<float>(HIWORD(lParam)));
 				}
-				else if (filterClicks && reqModsDown)
+				break;
+			}
+
+			/* LMB and RMB. */
+			case WM_LBUTTONDBLCLK: [[fallthrough]];
+			case WM_LBUTTONDOWN:
+			{
+				if (io.WantCaptureMouse && !Inputs::IsCursorHidden())
 				{
-					io.MouseDown[0] = true;
+					if (!filterClicks)
+					{
+						io.MouseDown[0] = true;
+						return 0;
+					}
+					else if (filterClicks && reqModsDown)
+					{
+						io.MouseDown[0] = true;
+						return 0;
+					}
+					break;
+				}
+				else //if (!io.WantCaptureMouse)
+				{
+					ImGui::ClearActiveID();
+				}
+				break;
+			}
+			case WM_RBUTTONDBLCLK: [[fallthrough]];
+			case WM_RBUTTONDOWN:
+			{
+				if (io.WantCaptureMouse && !Inputs::IsCursorHidden())
+				{
+					if (!filterClicks)
+					{
+						io.MouseDown[1] = true;
+						return 0;
+					}
+					else if (filterClicks && reqModsDown)
+					{
+						io.MouseDown[1] = true;
+						return 0;
+					}
+					break;
+				}
+				break;
+			}
+
+			/* Always pass through LMB and RMB releases. */
+			case WM_LBUTTONUP:
+			{
+				io.MouseDown[0] = false;
+				break;
+			}
+			case WM_RBUTTONUP:
+			{
+				io.MouseDown[1] = false;
+				break;
+			}
+
+			/* Scrollwheel only when ImGui wants to capture and the cursor isn't hidden. */
+			case WM_MOUSEWHEEL:
+			{
+				if (io.WantCaptureMouse && !Inputs::IsCursorHidden())
+				{
+					this->PushInput({
+						.Type = EInputType::MouseWheel,
+						.WheelY = static_cast<float>(GET_WHEEL_DELTA_WPARAM(wParam)) / static_cast<float>(WHEEL_DELTA)
+					});
 					return 0;
 				}
 				break;
 			}
-			else //if (!io.WantCaptureMouse)
+			case WM_MOUSEHWHEEL:
 			{
-				ImGui::ClearActiveID();
-			}
-			break;
-		}
-		case WM_RBUTTONDBLCLK: [[fallthrough]];
-		case WM_RBUTTONDOWN:
-		{
-			if (io.WantCaptureMouse && !Inputs::IsCursorHidden())
-			{
-				if (!filterClicks)
+				if (io.WantCaptureMouse && !Inputs::IsCursorHidden())
 				{
-					io.MouseDown[1] = true;
-					return 0;
-				}
-				else if (filterClicks && reqModsDown)
-				{
-					io.MouseDown[1] = true;
+					this->PushInput({
+						.Type = EInputType::MouseHWheel,
+						.WheelX = static_cast<float>(GET_WHEEL_DELTA_WPARAM(wParam)) / static_cast<float>(WHEEL_DELTA)
+					});
 					return 0;
 				}
 				break;
 			}
-			break;
-		}
 
-		/* Always pass through LMB and RMB releases. */
-		case WM_LBUTTONUP:
-		{
-			io.MouseDown[0] = false;
-			break;
-		}
-		case WM_RBUTTONUP:
-		{
-			io.MouseDown[1] = false;
-			break;
-		}
-
-		/* Scrollwheel only when ImGui wants to capture and the cursor isn't hidden. */
-		case WM_MOUSEWHEEL:
-		{
-			if (io.WantCaptureMouse && !Inputs::IsCursorHidden())
+			/* Keys. */
+			case WM_KEYDOWN: [[fallthrough]];
+			case WM_SYSKEYDOWN:
 			{
-				this->PushInput({
-					.Type = EInputType::MouseWheel,
-					.WheelY = static_cast<float>(GET_WHEEL_DELTA_WPARAM(wParam)) / static_cast<float>(WHEEL_DELTA)
-				});
-				return 0;
+				if (io.WantTextInput)
+				{
+					if (wParam < 256)
+					{
+						io.KeysDown[wParam] = true;
+					}
+					return 0;
+				}
+				break;
 			}
-			break;
-		}
-		case WM_MOUSEHWHEEL:
-		{
-			if (io.WantCaptureMouse && !Inputs::IsCursorHidden())
-			{
-				this->PushInput({
-					.Type = EInputType::MouseHWheel,
-					.WheelX = static_cast<float>(GET_WHEEL_DELTA_WPARAM(wParam)) / static_cast<float>(WHEEL_DELTA)
-				});
-				return 0;
-			}
-			break;
-		}
-
-		/* Keys. */
-		case WM_KEYDOWN: [[fallthrough]];
-		case WM_SYSKEYDOWN:
-		{
-			if (io.WantTextInput)
+			case WM_KEYUP: [[fallthrough]];
+			case WM_SYSKEYUP:
 			{
 				if (wParam < 256)
 				{
-					io.KeysDown[wParam] = true;
+					io.KeysDown[wParam] = false;
 				}
-				return 0;
+				break;
 			}
-			break;
-		}
-		case WM_KEYUP: [[fallthrough]];
-		case WM_SYSKEYUP:
-		{
-			if (wParam < 256)
-			{
-				io.KeysDown[wParam] = false;
-			}
-			break;
-		}
 
-		/* Text input. */
-		case WM_CHAR:
-		{
-			if (io.WantTextInput)
+			/* Text input. */
+			case WM_CHAR:
 			{
-				// You can also use ToAscii()+GetKeyboardState() to retrieve characters.
-				if (wParam > 0 && wParam < 0x10000)
+				if (io.WantTextInput)
 				{
-					this->PushInput({
-						.Type = EInputType::Char,
-						.Character = static_cast<uint32_t>(wParam)
-					});
+					// You can also use ToAscii()+GetKeyboardState() to retrieve characters.
+					if (wParam > 0 && wParam < 0x10000)
+					{
+						this->PushInput({
+							.Type = EInputType::Char,
+							.Character = static_cast<uint32_t>(wParam)
+						});
+					}
+					return 0;
 				}
-				return 0;
+				break;
 			}
-			break;
 		}
+
+		return uMsg;
 	}
 
-	return uMsg;
-}
-
-void CUiInput::FlushInput()
-{
-	InputEvent_t event;
-
-	while (this->PopInput(event))
+	void CUiInput::FlushInput()
 	{
-		switch (event.Type)
-		{
-			case EInputType::Char:
-				ImGui::GetIO().AddInputCharacter(event.Character);
-				break;
+		InputEvent_t event;
 
-			case EInputType::MouseWheel:
-				ImGui::GetIO().MouseWheel += event.WheelY;
-				break;
-			case EInputType::MouseHWheel:
-				ImGui::GetIO().MouseWheelH += event.WheelX;
-				break;
+		while (this->PopInput(event))
+		{
+			switch (event.Type)
+			{
+				case EInputType::Char:
+					ImGui::GetIO().AddInputCharacter(event.Character);
+					break;
+
+				case EInputType::MouseWheel:
+					ImGui::GetIO().MouseWheel += event.WheelY;
+					break;
+				case EInputType::MouseHWheel:
+					ImGui::GetIO().MouseWheelH += event.WheelX;
+					break;
+			}
 		}
 	}
-}
 
-bool CUiInput::PushInput(const InputEvent_t& aEvent)
-{
-	const uint32_t write = this->WriteIndex.load(std::memory_order::relaxed);
-	const uint32_t next = (write + 1) & RING_MASK;
+	bool CUiInput::PushInput(const InputEvent_t& aEvent)
+	{
+		const uint32_t write = this->WriteIndex.load(std::memory_order::relaxed);
+		const uint32_t next = (write + 1) & RING_MASK;
 
-	// Queue full.
-	if (next == this->ReadIndex.load(std::memory_order::acquire))
-		return false;
+		// Queue full.
+		if (next == this->ReadIndex.load(std::memory_order::acquire))
+			return false;
 
-	this->Ring[write] = aEvent;
+		this->Ring[write] = aEvent;
 
-	this->WriteIndex.store(next, std::memory_order::release);
-	return true;
-}
+		this->WriteIndex.store(next, std::memory_order::release);
+		return true;
+	}
 
-bool CUiInput::PopInput(InputEvent_t& aEvent)
-{
-	const uint32_t read = this->ReadIndex.load(std::memory_order::relaxed);
+	bool CUiInput::PopInput(InputEvent_t& aEvent)
+	{
+		const uint32_t read = this->ReadIndex.load(std::memory_order::relaxed);
 
-	if (read == this->WriteIndex.load(std::memory_order::acquire))
-		return false;
+		if (read == this->WriteIndex.load(std::memory_order::acquire))
+			return false;
 
-	aEvent = this->Ring[read];
+		aEvent = this->Ring[read];
 
-	this->ReadIndex.store((read + 1) & RING_MASK, std::memory_order::release);
-	return true;
+		this->ReadIndex.store((read + 1) & RING_MASK, std::memory_order::release);
+		return true;
+	}
 }
