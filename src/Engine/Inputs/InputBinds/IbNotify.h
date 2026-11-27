@@ -1,0 +1,42 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  IbNotify.h
+/// Description  :  Input bind update notification.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
+#pragma once
+
+#include "Engine/Notifier/Notifier.h"
+
+namespace Raidcore::Engine::Input
+{
+	///----------------------------------------------------------------------------------------------------
+	/// IInputBindUpdateNotifyHandler Interface
+	///----------------------------------------------------------------------------------------------------
+	class IInputBindUpdateNotifyHandler : public Engine::INotifyHandler<IInputBindUpdateNotifyHandler>
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// OnInputBindUpdateNotify:
+		/// 	Called after an input bind or game bind was set, registered or deleted.
+		///----------------------------------------------------------------------------------------------------
+		virtual void OnInputBindUpdateNotify() = 0;
+	};
+
+	///----------------------------------------------------------------------------------------------------
+	/// IInputBindUpdateNotifier Interface
+	///----------------------------------------------------------------------------------------------------
+	class IInputBindUpdateNotifier : public Engine::INotifier<IInputBindUpdateNotifyHandler>
+	{
+		protected:
+		void NotifyInputBindUpdate()
+		{
+			for (const auto& entry : this->Subscribers())
+			{
+				entry.Subscriber->OnInputBindUpdateNotify();
+			}
+		}
+	};
+}

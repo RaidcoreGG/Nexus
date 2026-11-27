@@ -1,0 +1,728 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  IbApi.cpp
+/// Description  :  Provides functions for InputBinds.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
+#include "IbApi.h"
+
+#include <filesystem>
+#include <fstream>
+#include <string>
+
+#pragma warning(push, 0)
+#include "nlohmann/json.hpp"
+#pragma warning(pop)
+using json = nlohmann::json;
+
+#include "Engine/Clockwork/Clockwork.h"
+
+#include "IbConst.h"
+#include "Util/Inputs.h"
+
+namespace Raidcore::Engine::Input
+{
+	CInputBindApi::CInputBindApi(Engine::CEventApi* aEventApi, std::filesystem::path aConfigPath) : Engine::IRefCleaner("InputBindApi"), Core::ILogChannel("InputBinds")
+	{
+		assert(aEventApi);
+
+		this->EventApi = aEventApi;
+
+		this->ConfigPath = aConfigPath;
+
+		this->Load();
+		this->Attach(WNDPROC_PRIO_INPUTBINDS);
+	}
+
+	CInputBindApi::~CInputBindApi()
+	{
+		this->Detach();
+	}
+
+	UINT CInputBindApi::OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam)
+	{
+		if (this->ProcessInput(uMsg, wParam, lParam))
+		{
+			return 0;
+		}
+
+		const Bind_t& capture = this->GetCaptureRef();
+
+		/* actual input processing */
+		switch (uMsg)
+		{
+			case WM_ACTIVATEAPP:
+			{
+				this->ReleaseAll();
+				break;
+			}
+
+			case WM_SYSKEYDOWN:
+			case WM_KEYDOWN:
+			{
+				if (wParam > 255) { break; }
+
+				KeystrokeMessageFlags keylp = LParamToKMF(lParam);
+
+				/* Do not listen to repeated keydowns. */
+				if (keylp.PreviousKeyState)
+				{
+					break;
+				}
+
+				/* Do not dispatch null binds. */
+				if (!capture.IsBound())
+				{
+					break;
+				}
+
+				/* if something was invoked, send zero to stop further processing */
+				if (this->Press(capture))
+				{
+					return 0;
+				}
+
+				break;
+			}
+
+			case WM_SYSKEYUP:
+			case WM_KEYUP:
+			{
+				if (wParam > 255) { break; }
+
+				/* Additionally send a modifier release, if it is one. */
+				if (wParam == VK_MENU || wParam == VK_CONTROL || wParam == VK_SHIFT)
+				{
+					this->Release((unsigned int)wParam);
+				}
+
+				/* Release binds matching the passed key. Standalone modifier binds as well. */
+				this->Release(EDevice::Keyboard, LParamToKMF(lParam).GetScanCode());
+
+				break;
+			}
+
+			case WM_MBUTTONDOWN:
+			case WM_XBUTTONDOWN:
+			{
+				/* if something was invoked, send zero to stop further processing */
+				if (this->Press(capture))
+				{
+					return 0;
+				}
+
+				break;
+			}
+			case WM_MBUTTONUP:
+			{
+				this->Release(EDevice::Mouse, (unsigned short)EMouseButtons::MMB);
+				break;
+			}
+			case WM_XBUTTONUP:
+			{
+				if (HIWORD(wParam) == XBUTTON1)
+				{
+					this->Release(EDevice::Mouse, (unsigned short)EMouseButtons::M4);
+				}
+				else if (HIWORD(wParam) == XBUTTON2)
+				{
+					this->Release(EDevice::Mouse, (unsigned short)EMouseButtons::M5);
+				}
+
+				break;
+			}
+		}
+
+		return uMsg;
+	}
+
+	void CInputBindApi::Register(const char* aIdentifier, EIbHandlerType aInputBindHandlerType, void* aInputBindHandler, const char* aInputBind)
+	{
+		this->Register(aIdentifier, aInputBindHandlerType, aInputBindHandler, IBFromString(aInputBind));
+	}
+
+	void CInputBindApi::Register(const char* aIdentifier, EIbHandlerType aInputBindHandlerType, void* aInputBindHandler, Bind_t aInputBind)
+	{
+		/* check if another identifier, already uses the Bind_t */
+		std::string usedBy = this->IsInUse(aInputBind);
+
+		/* another identifier uses the same combination */
+		if (!usedBy.empty() && usedBy != aIdentifier)
+		{
+			aInputBind = {};
+		}
+
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto it = this->Registry.find(aIdentifier);
+
+		/* check if this Bind_t is not already set */
+		if (it == Registry.end())
+		{
+			IbMapping_t mapping{};
+			mapping.Bind = aInputBind;
+			mapping.HandlerType = aInputBindHandlerType;
+			switch (aInputBindHandlerType)
+			{
+				case EIbHandlerType::DownAsync:
+				{
+					mapping.Handler_DownOnlyAsync = (IB_CALLBACK_V1)aInputBindHandler;
+					break;
+				}
+				case EIbHandlerType::DownReleaseAsync:
+				{
+					mapping.Handler_DownReleaseAsync = (IB_CALLBACK_V2)aInputBindHandler;
+					break;
+				}
+				case EIbHandlerType::DownRelease:
+				{
+					mapping.Handler_DownRelease = (IB_CALLBACK_V3)aInputBindHandler;
+					break;
+				}
+			}
+
+			/* Force handler type to none, if there's no handler. */
+			if (!aInputBindHandler)
+			{
+				mapping.HandlerType = EIbHandlerType::None;
+			}
+
+			this->Registry.emplace(aIdentifier, mapping);
+		}
+		else
+		{
+			it->second.HandlerType = aInputBindHandlerType;
+			switch (aInputBindHandlerType)
+			{
+				case EIbHandlerType::DownAsync:
+				{
+					it->second.Handler_DownOnlyAsync = (IB_CALLBACK_V1)aInputBindHandler;
+					break;
+				}
+				case EIbHandlerType::DownReleaseAsync:
+				{
+					it->second.Handler_DownReleaseAsync = (IB_CALLBACK_V2)aInputBindHandler;
+					break;
+				}
+				case EIbHandlerType::DownRelease:
+				{
+					it->second.Handler_DownRelease = (IB_CALLBACK_V3)aInputBindHandler;
+					break;
+				}
+			}
+
+			/* Force handler type to none, if there's no handler. */
+			if (!aInputBindHandler)
+			{
+				it->second.HandlerType = EIbHandlerType::None;
+			}
+		}
+
+		this->Save();
+
+		Clockwork::Run<void>(Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
+		{
+			this->NotifyInputBindUpdate();
+			this->EventApi->Raise("EV_INPUTBIND_UPDATED");
+		});
+	}
+
+	void CInputBindApi::Deregister(const char* aIdentifier)
+	{
+		std::string str = aIdentifier;
+
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto it = this->Registry.find(str);
+		if (it != this->Registry.end())
+		{
+			switch (it->second.HandlerType)
+			{
+				case EIbHandlerType::DownAsync:
+				{
+					it->second.Handler_DownOnlyAsync = nullptr;
+					break;
+				}
+				case EIbHandlerType::DownReleaseAsync:
+				{
+					it->second.Handler_DownReleaseAsync = nullptr;
+					break;
+				}
+				case EIbHandlerType::DownRelease:
+				{
+					it->second.Handler_DownRelease = nullptr;
+					break;
+				}
+			}
+
+			it->second.HandlerType = EIbHandlerType::None;
+		}
+
+		this->Save();
+	}
+
+	std::string CInputBindApi::IsInUse(const Bind_t& aInputBind)
+	{
+		if (aInputBind == Bind_t{}) { return ""; }
+
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [aInputBind](auto& entry)
+		{
+			return entry.second.Bind == aInputBind;
+		});
+
+		if (it != this->Registry.end())
+		{
+			/* return the identifier that's already using this combination */
+			return it->first;
+		}
+
+		return "";
+	}
+
+	bool CInputBindApi::HasHandler(const std::string& aIdentifier)
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto it = this->Registry.find(aIdentifier);
+
+		if (it != this->Registry.end())
+		{
+			switch (it->second.HandlerType)
+			{
+				case EIbHandlerType::DownAsync:
+				{
+					return it->second.Handler_DownOnlyAsync != nullptr;
+					break;
+				}
+				case EIbHandlerType::DownReleaseAsync:
+				{
+					return it->second.Handler_DownReleaseAsync != nullptr;
+					break;
+				}
+				case EIbHandlerType::DownRelease:
+				{
+					return it->second.Handler_DownRelease != nullptr;
+					break;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	const Bind_t* CInputBindApi::Get(const std::string& aIdentifier)
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto it = this->Registry.find(aIdentifier);
+
+		if (it != this->Registry.end())
+		{
+			return &it->second.Bind;
+		}
+
+		return nullptr;
+	}
+
+	void CInputBindApi::Set(std::string aIdentifier, Bind_t aInputBind)
+	{
+		/* check if another identifier, already uses the Bind_t */
+		std::string usedBy = this->IsInUse(aInputBind);
+
+		/* another identifier uses the same combination */
+		if (!usedBy.empty() && usedBy != aIdentifier)
+		{
+			return;
+		}
+
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto it = this->Registry.find(aIdentifier);
+
+		if (it != this->Registry.end())
+		{
+			it->second.Bind = aInputBind;
+		}
+		else
+		{
+			IbMapping_t mapping{};
+			mapping.Bind = aInputBind;
+			this->Registry.emplace(aIdentifier, mapping);
+		}
+
+		this->Save();
+
+		Clockwork::Run<void>(Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
+		{
+			this->NotifyInputBindUpdate();
+			this->EventApi->Raise("EV_INPUTBIND_UPDATED");
+		});
+	}
+
+	void CInputBindApi::SetPassthrough(std::string aIdentifier, bool aPassthrough)
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto it = this->Registry.find(aIdentifier);
+
+		if (it == this->Registry.end())
+		{
+			return;
+		}
+
+		it->second.Passthrough = aPassthrough;
+
+		this->Save();
+
+		Clockwork::Run<void>(Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
+		{
+			this->NotifyInputBindUpdate();
+			this->EventApi->Raise("EV_INPUTBIND_UPDATED");
+		});
+	}
+
+	bool CInputBindApi::Invoke(std::string aIdentifier, bool aIsRelease)
+	{
+		bool called = false;
+
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto it = this->Registry.find(aIdentifier);
+
+		if (it == this->Registry.end())
+		{
+			return false;
+		}
+
+		switch (it->second.HandlerType)
+		{
+			default:
+			case EIbHandlerType::None:
+			{
+				return false;
+			}
+			case EIbHandlerType::DownAsync:
+			{
+				if (!aIsRelease)
+				{
+					IB_CALLBACK_V1 handler = it->second.Handler_DownOnlyAsync;
+
+					Clockwork::Run<void>(Clockwork::ETaskPriority::Immediate, [aIdentifier, handler](Clockwork::CancellationToken aToken)
+					{
+						handler(aIdentifier.c_str());
+					});
+
+					return true;
+				}
+
+				return false;
+			}
+			case EIbHandlerType::DownReleaseAsync:
+			{
+				IB_CALLBACK_V2 handler = it->second.Handler_DownReleaseAsync;
+
+				Clockwork::Run<void>(Clockwork::ETaskPriority::Immediate, [aIdentifier, handler, aIsRelease](Clockwork::CancellationToken aToken)
+				{
+					handler(aIdentifier.c_str(), aIsRelease);
+				});
+
+				return true;
+			}
+			case EIbHandlerType::DownRelease:
+			{
+				IB_CALLBACK_V3 handler = it->second.Handler_DownRelease;
+
+				return handler(aIdentifier.c_str(), aIsRelease);
+			}
+		}
+	}
+
+	void CInputBindApi::Delete(std::string aIdentifier)
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		this->Registry.erase(aIdentifier);
+
+		Clockwork::Run<void>(Clockwork::ETaskPriority::Low, [this](Clockwork::CancellationToken aToken)
+		{
+			this->NotifyInputBindUpdate();
+			this->EventApi->Raise("EV_INPUTBIND_UPDATED");
+		});
+	}
+
+	uint32_t CInputBindApi::CleanupRefs(void* aStartAddress, void* aEndAddress)
+	{
+		uint32_t refCounter = 0;
+
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		for (auto& [identifier, mapping] : this->Registry)
+		{
+			switch (mapping.HandlerType)
+			{
+				case EIbHandlerType::DownAsync:
+				{
+					if (mapping.Handler_DownOnlyAsync >= aStartAddress && mapping.Handler_DownOnlyAsync <= aEndAddress)
+					{
+						mapping.Handler_DownOnlyAsync = nullptr;
+						mapping.HandlerType = EIbHandlerType::None;
+						refCounter++;
+					}
+					break;
+				}
+				case EIbHandlerType::DownReleaseAsync:
+				{
+					if (mapping.Handler_DownReleaseAsync >= aStartAddress && mapping.Handler_DownReleaseAsync <= aEndAddress)
+					{
+						mapping.Handler_DownReleaseAsync = nullptr;
+						mapping.HandlerType = EIbHandlerType::None;
+						refCounter++;
+					}
+					break;
+				}
+				case EIbHandlerType::DownRelease:
+				{
+					if (mapping.Handler_DownRelease >= aStartAddress && mapping.Handler_DownRelease <= aEndAddress)
+					{
+						mapping.Handler_DownRelease = nullptr;
+						mapping.HandlerType = EIbHandlerType::None;
+						refCounter++;
+					}
+					break;
+				}
+			}
+		}
+
+		return refCounter;
+	}
+
+	std::map<std::string, IbMapping_t> CInputBindApi::GetRegistry() const
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		return this->Registry;
+	}
+
+	void CInputBindApi::LoadSafe()
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+		this->Load();
+	}
+
+	void CInputBindApi::Load()
+	{
+		if (!std::filesystem::exists(this->ConfigPath)) { return; }
+
+		try
+		{
+			std::ifstream file(this->ConfigPath);
+
+			json inputBinds = json::parse(file);
+
+			for (json binding : inputBinds)
+			{
+				/* if bind is null, or neither key nor code are set -> invalid */
+				if (binding.is_null()) { continue; }
+				if (binding["Identifier"].is_null()) { continue; }
+				if (binding["Key"].is_null() && binding["Code"].is_null()) { continue; }
+
+				Bind_t ib{};
+				ib.Modifiers |= binding.value("Alt", false) ? EModifiers::Alt : EModifiers::None;
+				ib.Modifiers |= binding.value("Ctrl", false) ? EModifiers::Ctrl : EModifiers::None;
+				ib.Modifiers |= binding.value("Shift", false) ? EModifiers::Shift : EModifiers::None;
+				ib.Modifiers = binding.value("Modifiers", ib.Modifiers);
+				bool passthrough = binding.value("Passthrough", false);
+
+				/* code and either device or legacy type set -> inputbind */
+				if (!(binding["Type"].is_null() && binding["Device"].is_null()) && !binding["Code"].is_null())
+				{
+					if (!binding["Device"].is_null())
+					{
+						binding["Device"].get_to(ib.Device);
+					}
+					else if (!binding["Type"].is_null())
+					{
+						binding["Type"].get_to(ib.Device);
+					}
+					binding["Code"].get_to(ib.Code);
+				}
+				else if (!binding["Key"].is_null()) /* legacy inputbind */
+				{
+					ib.Device = EDevice::Keyboard;
+					binding["Key"].get_to(ib.Code);
+				}
+				else
+				{
+					/* Should be unreachable. */
+					continue;
+				}
+
+				if (ib.Code == 0)
+				{
+					ib.Device = EDevice::None;
+					ib.Modifiers = EModifiers::None;
+				}
+
+				std::string identifier = binding["Identifier"].get<std::string>();
+
+				auto it = this->Registry.find(identifier);
+
+				if (it != this->Registry.end())
+				{
+					it->second.Bind = ib;
+					it->second.Passthrough = passthrough;
+				}
+				else
+				{
+					IbMapping_t mapping{};
+					mapping.Bind = ib;
+					mapping.Passthrough = passthrough;
+					this->Registry.emplace(identifier, mapping);
+				}
+			}
+
+			file.close();
+		}
+		catch (json::parse_error& ex)
+		{
+			this->LogWarning("InputBinds.json could not be parsed. Error: %s", ex.what());
+		}
+	}
+
+	void CInputBindApi::SaveSafe()
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+		this->Save();
+	}
+
+	void CInputBindApi::Save()
+	{
+		json bindings = json::array();
+
+		for (auto& [id, ib] : this->Registry)
+		{
+			json binding =
+			{
+				{"Identifier",  id                                      },
+				{"Modifiers",   static_cast<uint16_t>(ib.Bind.Modifiers)},
+				{"Device",      ib.Bind.Device                          },
+				{"Code",        ib.Bind.Code                            },
+				{"Passthrough", ib.Passthrough                          }
+			};
+
+			/* override type */
+			if (!ib.Bind.Code)
+			{
+				binding["Device"] = EDevice::None;
+			}
+
+			bindings.push_back(binding);
+		}
+
+		std::ofstream file(this->ConfigPath);
+
+		if (file.is_open())
+		{
+			file << bindings.dump(1, '\t') << std::endl;
+			file.close();
+		}
+		else
+		{
+			this->LogWarning("Failed to open config file for writing: %s", this->ConfigPath.string().c_str());
+		}
+	}
+
+	bool CInputBindApi::Press(const Bind_t& aInputBind)
+	{
+		std::string identifier;
+		bool passthrough = false;
+
+		{
+			const std::lock_guard<std::mutex> lock(this->Mutex);
+
+			auto it = std::find_if(this->Registry.begin(), this->Registry.end(), [aInputBind](auto& entry)
+			{
+				return entry.second.Bind == aInputBind;
+			});
+
+			if (it == this->Registry.end())
+			{
+				return false;
+			}
+
+			identifier = it->first;
+			passthrough = it->second.Passthrough;
+		}
+
+		assert(this->HeldInputBinds.find(identifier) == this->HeldInputBinds.end());
+
+		/* track the actual bind/id combo */
+		this->HeldInputBinds.emplace(identifier, aInputBind);
+
+		bool invoked = this->Invoke(identifier);
+
+		/* if was invoked -> stop processing (unless it was bind with passthrough flag) */
+		if (invoked && passthrough == false)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	void CInputBindApi::Release(unsigned int aModifierVK)
+	{
+		for (auto it = this->HeldInputBinds.begin(); it != this->HeldInputBinds.end();)
+		{
+			if (aModifierVK == VK_SHIFT && ((it->second.Modifiers & EModifiers::Shift) == EModifiers::Shift))
+			{
+				this->Invoke(it->first, true);
+				it = this->HeldInputBinds.erase(it);
+			}
+			else if (aModifierVK == VK_CONTROL && ((it->second.Modifiers & EModifiers::Ctrl) == EModifiers::Ctrl))
+			{
+				this->Invoke(it->first, true);
+				it = this->HeldInputBinds.erase(it);
+			}
+			else if (aModifierVK == VK_MENU && ((it->second.Modifiers & EModifiers::Alt) == EModifiers::Alt))
+			{
+				this->Invoke(it->first, true);
+				it = this->HeldInputBinds.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+	}
+
+	void CInputBindApi::Release(EDevice aDevice, unsigned short aCode)
+	{
+		for (auto it = this->HeldInputBinds.begin(); it != this->HeldInputBinds.end();)
+		{
+			if (it->second.Device == aDevice && it->second.Code == aCode)
+			{
+				this->Invoke(it->first, true);
+				it = this->HeldInputBinds.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+	}
+
+	void CInputBindApi::ReleaseAll()
+	{
+		for (auto& bind : this->HeldInputBinds)
+		{
+			this->Invoke(bind.first, true);
+		}
+
+		this->HeldInputBinds.clear();
+	}
+}

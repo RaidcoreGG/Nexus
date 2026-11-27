@@ -1,0 +1,24 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  FnEntry.h
+/// Description  :  Function registry entry struct definition.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
+#pragma once
+
+#include <cstdint>
+
+namespace Raidcore::Engine
+{
+	///----------------------------------------------------------------------------------------------------
+	/// FuncEntry_t Struct
+	///----------------------------------------------------------------------------------------------------
+	struct FuncEntry_t
+	{
+		int32_t RefCount;
+		bool    ShouldDelete;
+		void*   Function;
+	};
+}

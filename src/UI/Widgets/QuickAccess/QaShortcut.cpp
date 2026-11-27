@@ -1,0 +1,375 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  QaShortcut.cpp
+/// Description  :  Contains the structs holding information about a shortcut.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
+#include "QaShortcut.h"
+
+#include <assert.h>
+
+#include "imgui/imgui.h"
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "imgui/imgui_internal.h"
+
+#include "Host/GW2/Addons/Addon.h"
+#include "Host/GW2/Context.h"
+#include "Engine/Inputs/InputBinds/IbConst.h"
+#include "res/Resources.h"
+#include "UI/UiContext.h"
+
+namespace Raidcore::UI
+{
+	CShortcutIcon::CShortcutIcon(
+		std::string aID,
+		std::string aIconID,
+		std::string aIconHoverID,
+		std::string aInputBindID,
+		std::string aTooltip
+	) : Engine::IRefCleaner("QuickAccess")
+	{
+		/* FIXME: See Render IsInvalid. */
+		GW2::CContext* ctx        = GW2::CContext::GetContext();
+		this->InputBindApi   = ctx->GetInputBindApi();
+		this->TextureService = ctx->GetTextureService();
+		this->Loader         = ctx->GetLoader();
+		this->DataLink       = ctx->GetDataLink();
+
+		this->NexusLink = static_cast<GW2::NexusLinkData_t*>(this->DataLink->GetResource(GW2::DL_NEXUS_LINK));
+
+		this->ID          = aID;
+		this->IconID      = aIconID;
+		this->IconHoverID = aIconHoverID;
+		this->InputBindID = aInputBindID;
+		this->TooltipText = aTooltip;
+	}
+
+	CShortcutIcon::~CShortcutIcon()
+	{
+	}
+
+	void CShortcutIcon::Invalidate()
+	{
+		this->IsValid = false;
+	}
+
+	bool CShortcutIcon::Render()
+	{
+		if (!this->IsActive())  { return false; }
+		if (this->IsSuppressed) { return false; }
+
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		if (!this->IsValid)
+		{
+			/* FIXME: Since QuickAccess is created within UiContext ctor, the first shorcut is also created within that ctor.
+			 * Thus deadlocking. Hence we move the UIctx init into here. */
+			GW2::CContext*   ctx   = GW2::CContext::GetContext();
+			UI::CUiContext* uictx = ctx->GetUIContext();
+			this->Language    = uictx->GetLocalization();
+
+			if (!this->InputBindID.empty())
+			{
+				const Engine::Input::Bind_t* ib = this->InputBindApi->Get(this->InputBindID);
+
+				if (ib != nullptr && ib->Device != Engine::Input::EDevice::None)
+				{
+					this->IBText = Engine::Input::IBToString(*ib, true);
+				}
+			}
+
+			this->IsValid = true;
+		}
+
+		if (!(this->Icon && this->IconHover))
+		{
+			/* Get requested textures. */
+			this->Icon      = this->TextureService->Get(this->IconID.c_str());
+			this->IconHover = this->TextureService->Get(this->IconHoverID.c_str());
+
+			return false;
+		}
+
+		ImGui::BeginGroup();
+
+		/* Push icon styles. */
+		ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.f, 0.f));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(1.f, 1.f) * this->NexusLink->Scaling);
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.f, 0.f, 0.f, 0.f));
+
+		ImVec2 baseSizeUnscaled   = ImVec2(32.f, 32.f); // Shortcut icon
+		ImVec2 notifySizeUnscaled = ImVec2(16.f, 16.f); // Notification icon
+		ImVec2 ctxSizeUnscaled    = ImVec2(12.f, 12.f); // Context menu available icon
+
+		ImVec2 iconPos   = ImGui::GetCursorPos();
+		ImVec2 notifyPos = iconPos + ((baseSizeUnscaled - notifySizeUnscaled) * this->NexusLink->Scaling);
+		ImVec2 ctxPos    = ImVec2(
+			iconPos.x + ((baseSizeUnscaled.x - ctxSizeUnscaled.x) / 2.f * this->NexusLink->Scaling),
+			iconPos.y + ((baseSizeUnscaled.y - (ctxSizeUnscaled.y / 2.f)) * this->NexusLink->Scaling)
+		);
+
+		bool iconActive = false;
+		Texture_t* icon = !this->IsHovering ? this->Icon : this->IconHover;
+		if (ImGui::ImageButton(icon->Resource, baseSizeUnscaled * this->NexusLink->Scaling))
+		{
+			this->PopNotifcation(QAKEY_GENERIC);
+			this->InputBindApi->Invoke(this->InputBindID);
+		}
+		iconActive = ImGui::IsItemHovered() || ImGui::IsItemClicked();
+
+		Texture_t* notificationIcon = this->GetNotificationTexture(static_cast<uint32_t>(this->Notifications.size()));
+		if (notificationIcon)
+		{
+			ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+			ImGui::SetCursorPos(notifyPos);
+			ImGui::Image(notificationIcon->Resource, notifySizeUnscaled * this->NexusLink->Scaling);
+			ImGui::PopItemFlag();
+		}
+
+		if (this->ContextItems.size() > 0)
+		{
+			/* ensure all textures */
+			if (!this->Textures[ETexIdx::HasContextMenu])
+			{
+				GW2::CContext* ctx = GW2::CContext::GetContext();
+				this->Textures[ETexIdx::HasContextMenu] = this->TextureService->GetOrCreate("ICON_CONTEXTMENU", Resources::IconContextMenuAvailable);
+			}
+			else
+			{
+				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+				ImGui::SetCursorPos(ctxPos);
+				ImGui::Image(this->Textures[ETexIdx::HasContextMenu]->Resource, ctxSizeUnscaled * this->NexusLink->Scaling);
+				ImGui::PopItemFlag();
+			}
+		}
+
+		/* Pop icon styles. */
+		ImGui::PopStyleColor(3);
+		ImGui::PopStyleVar(3);
+
+		ImGui::EndGroup();
+
+		this->IsHovering = iconActive;
+		if (ImGui::IsItemHovered() && !this->TooltipText.empty())
+		{
+			ImGui::BeginTooltip();
+			if (this->IBText.empty())
+			{
+				ImGui::Text(this->Language->Translate(this->TooltipText.c_str()));
+			}
+			else
+			{
+				ImGui::Text("%s [%s]", this->Language->Translate(this->TooltipText.c_str()), this->IBText.c_str());
+			}
+			if (this->ContextItems.size() > 0)
+			{
+				ImGui::TextDisabled(Lang::QuickAccess::RightClickHint.Text());
+			}
+			ImGui::EndTooltip();
+		}
+
+		bool ctxMenuActive = this->RenderContextMenu();
+
+		return iconActive || ctxMenuActive;
+	}
+
+	void CShortcutIcon::AddContextItem(std::string aIdentifier, ContextItem_t aContextItem)
+	{
+		assert(aContextItem.Callback);
+
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto it = this->ContextItems.find(aIdentifier);
+
+		if (it == this->ContextItems.end())
+		{
+			this->ContextItems.emplace(aIdentifier, aContextItem);
+		}
+	}
+
+	void CShortcutIcon::RemoveContextItem(std::string aIdentifier)
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+		this->ContextItems.erase(aIdentifier);
+	}
+
+	void CShortcutIcon::PushNotifcationSafe(std::string aKey)
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto notifIt = std::find(this->Notifications.begin(), this->Notifications.end(), aKey);
+
+		if (notifIt == this->Notifications.end())
+		{
+			this->Notifications.push_back(aKey);
+		}
+	}
+
+	void CShortcutIcon::PopNotifcationSafe(std::string aKey)
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+		this->PopNotifcation(aKey);
+	}
+
+	bool CShortcutIcon::IsActive() const
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		bool hasContextMenu = this->ContextItems.size() > 0;
+		bool hasClickHandler = this->InputBindApi->HasHandler(this->InputBindID);
+
+		/* Needs to have either a context menu or click handler. */
+		return hasContextMenu || hasClickHandler;
+	}
+
+	void CShortcutIcon::SetSuppression(bool aSuppress)
+	{
+		this->IsSuppressed = aSuppress;
+	}
+
+	std::vector<std::string> CShortcutIcon::GetNotificationKeys() const
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+		return this->Notifications;
+	}
+
+	std::map<std::string, ContextItem_t> CShortcutIcon::GetContextMenuItems() const
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+		return this->ContextItems;
+	}
+
+	uint32_t CShortcutIcon::CleanupRefs(void* aStartAddress, void* aEndAddress)
+	{
+		uint32_t refCounter = 0;
+
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		for (auto ctxItem = this->ContextItems.begin(); ctxItem != this->ContextItems.end();)
+		{
+			UI::GUI_RENDER callback = ctxItem->second.Callback;
+			if (callback >= aStartAddress && callback <= aEndAddress)
+			{
+				refCounter++;
+				ctxItem = this->ContextItems.erase(ctxItem);
+			}
+			else
+			{
+				ctxItem++;
+			}
+		}
+
+		return refCounter;
+	}
+
+	Texture_t* CShortcutIcon::GetNotificationTexture(uint32_t aAmount)
+	{
+		if (aAmount == 0) { return nullptr; }
+
+		Texture_t* icon = nullptr;
+
+		switch (aAmount)
+		{
+			case 1:  icon = this->Textures[ETexIdx::Notify1]; break;
+			case 2:  icon = this->Textures[ETexIdx::Notify2]; break;
+			case 3:  icon = this->Textures[ETexIdx::Notify3]; break;
+			case 4:  icon = this->Textures[ETexIdx::Notify4]; break;
+			case 5:  icon = this->Textures[ETexIdx::Notify5]; break;
+			case 6:  icon = this->Textures[ETexIdx::Notify6]; break;
+			case 7:  icon = this->Textures[ETexIdx::Notify7]; break;
+			case 8:  icon = this->Textures[ETexIdx::Notify8]; break;
+			case 9:  icon = this->Textures[ETexIdx::Notify9]; break;
+			default: icon = this->Textures[ETexIdx::NotifyX]; break;
+		}
+
+		if (!icon)
+		{
+			GW2::CContext* ctx = GW2::CContext::GetContext();
+
+			switch (aAmount)
+			{
+				case 1:  icon = this->Textures[ETexIdx::Notify1] = this->TextureService->GetOrCreate("QA_NOTIFY1", Resources::IconNotification1); break;
+				case 2:  icon = this->Textures[ETexIdx::Notify2] = this->TextureService->GetOrCreate("QA_NOTIFY2", Resources::IconNotification2); break;
+				case 3:  icon = this->Textures[ETexIdx::Notify3] = this->TextureService->GetOrCreate("QA_NOTIFY3", Resources::IconNotification3); break;
+				case 4:  icon = this->Textures[ETexIdx::Notify4] = this->TextureService->GetOrCreate("QA_NOTIFY4", Resources::IconNotification4); break;
+				case 5:  icon = this->Textures[ETexIdx::Notify5] = this->TextureService->GetOrCreate("QA_NOTIFY5", Resources::IconNotification5); break;
+				case 6:  icon = this->Textures[ETexIdx::Notify6] = this->TextureService->GetOrCreate("QA_NOTIFY6", Resources::IconNotification6); break;
+				case 7:  icon = this->Textures[ETexIdx::Notify7] = this->TextureService->GetOrCreate("QA_NOTIFY7", Resources::IconNotification7); break;
+				case 8:  icon = this->Textures[ETexIdx::Notify8] = this->TextureService->GetOrCreate("QA_NOTIFY8", Resources::IconNotification8); break;
+				case 9:  icon = this->Textures[ETexIdx::Notify9] = this->TextureService->GetOrCreate("QA_NOTIFY9", Resources::IconNotification9); break;
+				default: icon = this->Textures[ETexIdx::NotifyX] = this->TextureService->GetOrCreate("QA_NOTIFYX", Resources::IconNotificationX); break;
+			}
+		}
+
+		return icon;
+	}
+
+	bool CShortcutIcon::RenderContextMenu()
+	{
+		if (this->ContextItems.size() == 0)
+		{
+			return false;
+		}
+
+		static const char* ID_CONTEXTMENU = "QuickAccess::ContextMenu::";
+		std::string ctxMenuID = ID_CONTEXTMENU + this->ID;
+
+		bool drawingCtxMenu = false;
+
+		if (ImGui::BeginPopupContextItem(ctxMenuID.c_str()))
+		{
+			drawingCtxMenu = true;
+
+			/* Helpers to draw separators between callbacks. */
+			size_t amtItems = this->ContextItems.size();
+			size_t idx = 0;
+
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.f, 0.f)); /* Small checkboxes. */
+			for (auto& [identifier, contextitem] : this->ContextItems)
+			{
+				idx++;
+
+				if (contextitem.Callback)
+				{
+					Engine::IAddon* iaddon = this->Loader->GetOwner(contextitem.Callback);
+					GW2::CAddon* addon = dynamic_cast<GW2::CAddon*>(iaddon);
+
+					assert(addon);
+
+					/* Addon name header. */
+					ImGui::TextDisabled(addon->GetName().c_str());
+
+					/* Addon content callback. */
+					contextitem.Callback();
+
+					/* Separator between addons. */
+					if (idx != amtItems)
+					{
+						ImGui::Separator();
+					}
+				}
+			}
+			ImGui::PopStyleVar(1);
+
+			ImGui::EndPopup();
+		}
+		ImGui::OpenPopupOnItemClick(ctxMenuID.c_str(), 1);
+
+		return drawingCtxMenu;
+	}
+
+	void CShortcutIcon::PopNotifcation(std::string aKey)
+	{
+		auto notifIt = std::find(this->Notifications.begin(), this->Notifications.end(), aKey);
+
+		if (notifIt != this->Notifications.end())
+		{
+			this->Notifications.erase(notifIt);
+		}
+	}
+}

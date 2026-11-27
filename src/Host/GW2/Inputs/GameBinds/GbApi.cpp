@@ -1,0 +1,1198 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  GbApi.cpp
+/// Description  :  Provides functions for game InputBinds.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
+#include "GbApi.h"
+
+#include "pugixml/pugixml.hpp"
+
+#include "Engine/Clockwork/Clockwork.h"
+
+#include "Host/GW2/Context.h"
+#include "Util/Inputs.h"
+#include "GbConst.h"
+
+namespace Raidcore::GW2
+{
+	CGameBindsApi::CGameBindsApi(Engine::Input::CRawInputApi* aRawInputApi, Engine::CEventApi* aEventApi, UI::RenderContext_t* aRenderContext, std::filesystem::path aConfigPath) : Core::ILogChannel("GameBinds")
+	{
+		assert(aRawInputApi);
+		assert(aEventApi);
+		assert(aRenderContext);
+
+		this->RawInputApi = aRawInputApi;
+		this->EventApi = aEventApi;
+		this->RenderContext = aRenderContext;
+
+		this->ConfigPath = aConfigPath;
+
+		this->AddDefaultBinds();
+		this->Load(this->ConfigPath);
+
+		/* After the input binds, so they never see game only messages as regular input. */
+		this->INotifyHandler<Engine::Input::IWndProcNotifyHandler>::Attach(Engine::Input::WNDPROC_PRIO_GAMEBINDS);
+		this->INotifyHandler<IGameBindChangedNotifyHandler>::Attach();
+	}
+
+	CGameBindsApi::~CGameBindsApi()
+	{
+		this->INotifyHandler<IGameBindChangedNotifyHandler>::Detach();
+		this->INotifyHandler<Engine::Input::IWndProcNotifyHandler>::Detach();
+	}
+
+	void CGameBindsApi::OnGameBindChangedNotify(EGameBinds aGameBind, const Engine::Input::Bind_t& aInputBind, bool aIsPrimary)
+	{
+		this->Set(aGameBind, aInputBind, aIsPrimary, true);
+		this->NotifyInputBindUpdate();
+	}
+
+	UINT CGameBindsApi::OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam)
+	{
+		/* offset of 7997, if uMsg in that range it's a nexus game only message */
+		if (uMsg >= WM_PASSTHROUGH_FIRST && uMsg <= WM_PASSTHROUGH_LAST)
+		{
+			/* modify the uMsg code to the original code */
+			uMsg -= WM_PASSTHROUGH_FIRST;
+		}
+
+		return 1;
+	}
+
+	LRESULT CGameBindsApi::SendWndProcToGame(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		if (uMsg < WM_USER)
+		{
+			return PostMessageA(this->RenderContext->Window.Handle, uMsg + WM_PASSTHROUGH_FIRST, wParam, lParam);
+		}
+
+		return PostMessageA(this->RenderContext->Window.Handle, uMsg, wParam, lParam);
+	}
+
+	void CGameBindsApi::PressAsync(EGameBinds aGameBind)
+	{
+		Clockwork::Run<void>(Clockwork::ETaskPriority::Low, [this, aGameBind](Clockwork::CancellationToken aToken)
+		{
+			this->Press(aGameBind);
+		});
+	}
+
+	void CGameBindsApi::ReleaseAsync(EGameBinds aGameBind)
+	{
+		Clockwork::Run<void>(Clockwork::ETaskPriority::Low, [this, aGameBind](Clockwork::CancellationToken aToken)
+		{
+			this->Release(aGameBind);
+		});
+	}
+
+	void CGameBindsApi::InvokeAsync(EGameBinds aGameBind, int aDuration)
+	{
+		Clockwork::Run<void>(Clockwork::ETaskPriority::Low, [this, aGameBind, aDuration](Clockwork::CancellationToken aToken)
+		{
+			this->Press(aGameBind);
+			if (aDuration > 0)
+			{
+				Sleep(aDuration);
+			}
+			this->Release(aGameBind);
+		});
+	}
+
+	void CGameBindsApi::Press(EGameBinds aGameBind)
+	{
+		/* Migrate legacy bind that the game merged. */
+		if (aGameBind == EGameBinds::LEGACY_MoveSwimUp)
+		{
+			aGameBind = EGameBinds::MoveJump_SwimUp_FlyUp;
+		}
+
+		const MultiInputBind_t* bind = this->Get(aGameBind);
+
+		if (bind == nullptr)
+		{
+			return;
+		}
+
+		Engine::Input::Bind_t ib{};
+
+		if (bind->Primary.IsBound())
+		{
+			ib = bind->Primary;
+		}
+
+		if (!ib.IsBound())
+		{
+			ib = bind->Secondary;
+		}
+
+		if (!ib.IsBound())
+		{
+			return;
+		}
+
+		if ((ib.Modifiers & Engine::Input::EModifiers::Alt) == Engine::Input::EModifiers::Alt)
+		{
+			this->SendWndProcToGame(
+				0,
+				WM_SYSKEYDOWN,
+				VK_MENU,
+				GetKeyMessageLPARAM(VK_MENU, true, true)
+			);
+		}
+		else if ((ib.Modifiers & Engine::Input::EModifiers::Alt) != Engine::Input::EModifiers::Alt && GetAsyncKeyState(VK_MENU))
+		{
+			this->SendWndProcToGame(
+				0,
+				WM_SYSKEYUP,
+				VK_MENU,
+				GetKeyMessageLPARAM(VK_MENU, false, true)
+			);
+		}
+
+		if ((ib.Modifiers & Engine::Input::EModifiers::Ctrl) == Engine::Input::EModifiers::Ctrl)
+		{
+			this->SendWndProcToGame(
+				0,
+				WM_KEYDOWN,
+				VK_CONTROL,
+				GetKeyMessageLPARAM(VK_CONTROL, true, false)
+			);
+		}
+		else if ((ib.Modifiers & Engine::Input::EModifiers::Ctrl) != Engine::Input::EModifiers::Ctrl && GetAsyncKeyState(VK_CONTROL))
+		{
+			this->SendWndProcToGame(
+				0,
+				WM_KEYUP,
+				VK_CONTROL,
+				GetKeyMessageLPARAM(VK_CONTROL, false, false)
+			);
+		}
+
+		if ((ib.Modifiers & Engine::Input::EModifiers::Shift) == Engine::Input::EModifiers::Shift)
+		{
+			this->SendWndProcToGame(
+				0,
+				WM_KEYDOWN,
+				VK_SHIFT,
+				GetKeyMessageLPARAM(VK_SHIFT, true, false)
+			);
+		}
+		else if ((ib.Modifiers & Engine::Input::EModifiers::Shift) != Engine::Input::EModifiers::Shift && GetAsyncKeyState(VK_SHIFT))
+		{
+			this->SendWndProcToGame(
+				0,
+				WM_KEYUP,
+				VK_SHIFT,
+				GetKeyMessageLPARAM(VK_SHIFT, false, false)
+			);
+		}
+
+		if (ib.Device == Engine::Input::EDevice::Keyboard)
+		{
+			UINT vk = MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK_EX);
+			this->SendWndProcToGame(
+				0,
+				WM_KEYDOWN,
+				vk,
+				GetKeyMessageLPARAM_ScanCode(ib.Code, true, (ib.Modifiers & Engine::Input::EModifiers::Alt) == Engine::Input::EModifiers::Alt)
+			);
+		}
+		else if (ib.Device == Engine::Input::EDevice::Mouse)
+		{
+			/* get point for lparam */
+			POINT point{};
+			GetCursorPos(&point);
+
+			switch (static_cast<Engine::Input::EMouseButtons>(ib.Code))
+			{
+				case Engine::Input::EMouseButtons::LMB:
+				{
+					this->SendWndProcToGame(
+						0,
+						WM_LBUTTONDOWN,
+						GetMouseMessageWPARAM(MK_LBUTTON, (ib.Modifiers& Engine::Input::EModifiers::Ctrl) == Engine::Input::EModifiers::Ctrl, (ib.Modifiers& Engine::Input::EModifiers::Shift) == Engine::Input::EModifiers::Shift, true),
+						MAKELPARAM(point.x, point.y)
+					);
+					break;
+				}
+				case Engine::Input::EMouseButtons::RMB:
+				{
+					this->SendWndProcToGame(
+						0,
+						WM_RBUTTONDOWN,
+						GetMouseMessageWPARAM(MK_RBUTTON, (ib.Modifiers & Engine::Input::EModifiers::Ctrl) == Engine::Input::EModifiers::Ctrl, (ib.Modifiers & Engine::Input::EModifiers::Shift) == Engine::Input::EModifiers::Shift, true),
+						MAKELPARAM(point.x, point.y)
+					);
+					break;
+				}
+				case Engine::Input::EMouseButtons::MMB:
+				{
+					this->SendWndProcToGame(
+						0,
+						WM_MBUTTONDOWN,
+						GetMouseMessageWPARAM(MK_MBUTTON, (ib.Modifiers & Engine::Input::EModifiers::Ctrl) == Engine::Input::EModifiers::Ctrl, (ib.Modifiers & Engine::Input::EModifiers::Shift) == Engine::Input::EModifiers::Shift, true),
+						MAKELPARAM(point.x, point.y)
+					);
+					break;
+				}
+				case Engine::Input::EMouseButtons::M4:
+				{
+					this->SendWndProcToGame(
+						0,
+						WM_XBUTTONDOWN,
+						GetMouseMessageWPARAM(MK_XBUTTON1, (ib.Modifiers & Engine::Input::EModifiers::Ctrl) == Engine::Input::EModifiers::Ctrl, (ib.Modifiers & Engine::Input::EModifiers::Shift) == Engine::Input::EModifiers::Shift, true),
+						MAKELPARAM(point.x, point.y)
+					);
+					break;
+				}
+				case Engine::Input::EMouseButtons::M5:
+				{
+					this->SendWndProcToGame(
+						0,
+						WM_XBUTTONDOWN,
+						GetMouseMessageWPARAM(MK_XBUTTON2, (ib.Modifiers & Engine::Input::EModifiers::Ctrl) == Engine::Input::EModifiers::Ctrl, (ib.Modifiers & Engine::Input::EModifiers::Shift) == Engine::Input::EModifiers::Shift, true),
+						MAKELPARAM(point.x, point.y)
+					);
+					break;
+				}
+			}
+		}
+	}
+
+	void CGameBindsApi::Release(EGameBinds aGameBind)
+	{
+		/* Migrate legacy bind that the game merged. */
+		if (aGameBind == EGameBinds::LEGACY_MoveSwimUp)
+		{
+			aGameBind = EGameBinds::MoveJump_SwimUp_FlyUp;
+		}
+
+		const MultiInputBind_t* bind = this->Get(aGameBind);
+
+		if (bind == nullptr)
+		{
+			return;
+		}
+
+		Engine::Input::Bind_t ib{};
+
+		if (bind->Primary.IsBound())
+		{
+			ib = bind->Primary;
+		}
+
+		if (!ib.IsBound())
+		{
+			ib = bind->Secondary;
+		}
+
+		if (!ib.IsBound())
+		{
+			return;
+		}
+
+		if (ib.Device == Engine::Input::EDevice::Keyboard)
+		{
+			int vk = MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK_EX);
+			this->SendWndProcToGame(
+				0,
+				WM_KEYUP,
+				vk,
+				GetKeyMessageLPARAM_ScanCode(ib.Code, false, (ib.Modifiers & Engine::Input::EModifiers::Alt) == Engine::Input::EModifiers::Alt)
+			);
+		}
+		else if (ib.Device == Engine::Input::EDevice::Mouse)
+		{
+			/* get point for lparam */
+			POINT point{};
+			GetCursorPos(&point);
+
+			switch (static_cast<Engine::Input::EMouseButtons>(ib.Code))
+			{
+				case Engine::Input::EMouseButtons::LMB:
+				{
+					this->SendWndProcToGame(
+						0,
+						WM_LBUTTONUP,
+						GetMouseMessageWPARAM(MK_LBUTTON, (ib.Modifiers & Engine::Input::EModifiers::Ctrl) == Engine::Input::EModifiers::Ctrl, (ib.Modifiers & Engine::Input::EModifiers::Shift) == Engine::Input::EModifiers::Shift, false),
+						MAKELPARAM(point.x, point.y)
+					);
+					break;
+				}
+				case Engine::Input::EMouseButtons::RMB:
+				{
+					this->SendWndProcToGame(
+						0,
+						WM_RBUTTONUP,
+						GetMouseMessageWPARAM(MK_RBUTTON, (ib.Modifiers & Engine::Input::EModifiers::Ctrl) == Engine::Input::EModifiers::Ctrl, (ib.Modifiers & Engine::Input::EModifiers::Shift) == Engine::Input::EModifiers::Shift, false),
+						MAKELPARAM(point.x, point.y)
+					);
+					break;
+				}
+				case Engine::Input::EMouseButtons::MMB:
+				{
+					this->SendWndProcToGame(
+						0,
+						WM_MBUTTONUP,
+						GetMouseMessageWPARAM(MK_MBUTTON, (ib.Modifiers & Engine::Input::EModifiers::Ctrl) == Engine::Input::EModifiers::Ctrl, (ib.Modifiers & Engine::Input::EModifiers::Shift) == Engine::Input::EModifiers::Shift, false),
+						MAKELPARAM(point.x, point.y)
+					);
+					break;
+				}
+				case Engine::Input::EMouseButtons::M4:
+				{
+					this->SendWndProcToGame(
+						0,
+						WM_XBUTTONUP,
+						GetMouseMessageWPARAM(MK_XBUTTON1, (ib.Modifiers & Engine::Input::EModifiers::Ctrl) == Engine::Input::EModifiers::Ctrl, (ib.Modifiers & Engine::Input::EModifiers::Shift) == Engine::Input::EModifiers::Shift, false),
+						MAKELPARAM(point.x, point.y)
+					);
+					break;
+				}
+				case Engine::Input::EMouseButtons::M5:
+				{
+					this->SendWndProcToGame(
+						0,
+						WM_XBUTTONUP,
+						GetMouseMessageWPARAM(MK_XBUTTON2, (ib.Modifiers & Engine::Input::EModifiers::Ctrl) == Engine::Input::EModifiers::Ctrl, (ib.Modifiers & Engine::Input::EModifiers::Shift) == Engine::Input::EModifiers::Shift, false),
+						MAKELPARAM(point.x, point.y)
+					);
+					break;
+				}
+			}
+		}
+
+
+		this->RestoreModifiers();
+	}
+
+	void CGameBindsApi::RestoreModifiers()
+	{
+		if (GetAsyncKeyState(VK_MENU))
+		{
+			this->SendWndProcToGame(
+				0,
+				WM_SYSKEYDOWN,
+				VK_MENU,
+				GetKeyMessageLPARAM(VK_MENU, true, true)
+			);
+		}
+		else
+		{
+			this->SendWndProcToGame(
+				0,
+				WM_SYSKEYUP,
+				VK_MENU,
+				GetKeyMessageLPARAM(VK_MENU, false, true)
+			);
+		}
+
+		if (GetAsyncKeyState(VK_CONTROL))
+		{
+			this->SendWndProcToGame(
+				0,
+				WM_KEYDOWN,
+				VK_CONTROL,
+				GetKeyMessageLPARAM(VK_CONTROL, true, false)
+			);
+		}
+		else
+		{
+			this->SendWndProcToGame(
+				0,
+				WM_KEYUP,
+				VK_CONTROL,
+				GetKeyMessageLPARAM(VK_CONTROL, false, false)
+			);
+		}
+
+		if (GetAsyncKeyState(VK_SHIFT))
+		{
+			this->SendWndProcToGame(
+				0,
+				WM_KEYDOWN,
+				VK_SHIFT,
+				GetKeyMessageLPARAM(VK_SHIFT, true, false)
+			);
+		}
+		else
+		{
+			this->SendWndProcToGame(
+				0,
+				WM_KEYUP,
+				VK_SHIFT,
+				GetKeyMessageLPARAM(VK_SHIFT, false, false)
+			);
+		}
+	}
+
+	bool CGameBindsApi::IsBound(EGameBinds aGameBind)
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto it = this->Registry.find(aGameBind);
+
+		if (it == this->Registry.end())
+		{
+			return false;
+		}
+
+		return it->second.Primary.IsBound() || it->second.Secondary.IsBound();
+	}
+
+	const MultiInputBind_t* CGameBindsApi::Get(EGameBinds aGameBind)
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		auto it = this->Registry.find(aGameBind);
+
+		if (it != this->Registry.end())
+		{
+			return &it->second;
+		}
+
+		return nullptr;
+	}
+
+	void CGameBindsApi::Set(EGameBinds aGameBind, Engine::Input::Bind_t aInputBind, bool aIsPrimary, bool aIsRuntimeBind)
+	{
+		/* Remove legacy bind that the game removed. */
+		if (aGameBind == EGameBinds::LEGACY_MoveSwimUp)
+		{
+			return;
+		}
+
+		{
+			const std::lock_guard<std::mutex> lock(this->Mutex);
+
+			auto it = this->Registry.find(aGameBind);
+
+			if (it == this->Registry.end())
+			{
+				MultiInputBind_t bind{};
+				if (aIsPrimary)
+				{
+					bind.Primary = aInputBind;
+				}
+				else
+				{
+					bind.Secondary = aInputBind;
+				}
+				this->Registry.emplace(aGameBind, bind);
+			}
+			else
+			{
+				if (aIsPrimary)
+				{
+					it->second.Primary = aInputBind;
+				}
+				else
+				{
+					it->second.Secondary = aInputBind;
+				}
+			}
+		}
+
+		if (!aIsRuntimeBind)
+		{
+			Clockwork::Run<void>(Clockwork::ETaskPriority::Low, [this, aGameBind](Clockwork::CancellationToken aToken)
+			{
+				this->NotifyInputBindUpdate();
+				this->EventApi->Raise("EV_INPUTBIND_UPDATED");
+			});
+			this->Save();
+		}
+	}
+
+	std::unordered_map<EGameBinds, MultiInputBind_t> CGameBindsApi::GetRegistry() const
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		return this->Registry;
+	}
+
+	void CGameBindsApi::Load(std::filesystem::path aPath)
+	{
+		if (aPath.empty()) { aPath = this->ConfigPath; }
+		if (!std::filesystem::exists(aPath)) { return; }
+
+		pugi::xml_document doc;
+		pugi::xml_parse_result result = doc.load_file(aPath.string().c_str());
+
+		if (!result)
+		{
+			this->LogWarning("GameBinds.json could not be parsed. Error: %s", result.description());
+			return;
+		}
+
+		{
+			const std::lock_guard<std::mutex> lock(this->Mutex);
+			this->Registry.clear();
+		}
+
+		this->AddDefaultBinds();
+
+		{
+			const std::lock_guard<std::mutex> lock(this->Mutex);
+			pugi::xml_node root = doc.child("InputBindings");
+			for (pugi::xml_node action : root.children("action"))
+			{
+				if (!action.attribute("id")) { continue; }
+
+				try
+				{
+					EGameBinds id = (EGameBinds)strtoul(action.attribute("id").value(), nullptr, 10);
+					MultiInputBind_t bind{};
+
+					bool hasPrimary = false;
+					bool hasSecondary = false;
+
+					/* Primary Bind */
+					if (action.attribute("device"))
+					{
+						hasPrimary = true;
+
+						if (action.attribute("mod"))
+						{
+							bind.Primary.Modifiers = static_cast<Engine::Input::EModifiers>(strtoul(action.attribute("mod").value(), nullptr, 10));
+						}
+
+						std::string device = action.attribute("device").value();
+						if (device == "Keyboard")
+						{
+							bind.Primary.Device = Engine::Input::EDevice::Keyboard;
+							bind.Primary.Code = GameScanCodeToScanCode(static_cast<uint16_t>(strtoul(action.attribute("button").value(), nullptr, 10)));
+						}
+						else if (device == "Mouse")
+						{
+							bind.Primary.Device = Engine::Input::EDevice::Mouse;
+							std::string mousebtn = action.attribute("button").value();
+							if (mousebtn == "0") { bind.Primary.Code = static_cast<uint16_t>(Engine::Input::EMouseButtons::LMB); }
+							else if (mousebtn == "2") { bind.Primary.Code = static_cast<uint16_t>(Engine::Input::EMouseButtons::RMB); }
+							else if (mousebtn == "1") { bind.Primary.Code = static_cast<uint16_t>(Engine::Input::EMouseButtons::MMB); }
+							else if (mousebtn == "3") { bind.Primary.Code = static_cast<uint16_t>(Engine::Input::EMouseButtons::M4); }
+							else if (mousebtn == "4") { bind.Primary.Code = static_cast<uint16_t>(Engine::Input::EMouseButtons::M5); }
+						}
+						else if (device == "None")
+						{
+							/* Unbound. Unset mods as well. */
+							bind.Primary.Device = Engine::Input::EDevice::None;
+							bind.Primary.Modifiers = Engine::Input::EModifiers::None;
+						}
+					}
+
+					/* Secondary Bind */
+					if (action.attribute("device2"))
+					{
+						hasSecondary = true;
+
+						if (action.attribute("mod2"))
+						{
+							bind.Secondary.Modifiers = static_cast<Engine::Input::EModifiers>(strtoul(action.attribute("mod2").value(), nullptr, 10));
+						}
+
+						std::string device = action.attribute("device2").value();
+						if (device == "Keyboard")
+						{
+							bind.Secondary.Device = Engine::Input::EDevice::Keyboard;
+							bind.Secondary.Code = GameScanCodeToScanCode(static_cast<unsigned short>(strtoul(action.attribute("button2").value(), nullptr, 10)));
+						}
+						else if (device == "Mouse")
+						{
+							bind.Secondary.Device = Engine::Input::EDevice::Mouse;
+							std::string mousebtn = action.attribute("button2").value();
+							if (mousebtn == "0") { bind.Secondary.Code = static_cast<uint16_t>(Engine::Input::EMouseButtons::LMB); }
+							else if (mousebtn == "2") { bind.Secondary.Code = static_cast<uint16_t>(Engine::Input::EMouseButtons::RMB); }
+							else if (mousebtn == "1") { bind.Secondary.Code = static_cast<uint16_t>(Engine::Input::EMouseButtons::MMB); }
+							else if (mousebtn == "3") { bind.Secondary.Code = static_cast<uint16_t>(Engine::Input::EMouseButtons::M4); }
+							else if (mousebtn == "4") { bind.Secondary.Code = static_cast<uint16_t>(Engine::Input::EMouseButtons::M5); }
+						}
+						else if (device == "None")
+						{
+							/* Unbound. Unset mods as well. */
+							bind.Secondary.Device = Engine::Input::EDevice::None;
+							bind.Secondary.Modifiers = Engine::Input::EModifiers::None;
+						}
+					}
+
+					/* Store the bind. */
+					auto it = this->Registry.find(id);
+
+					if (it == this->Registry.end())
+					{
+						this->Registry.emplace(id, bind);
+					}
+					else
+					{
+						if (hasPrimary)
+						{
+							it->second.Primary = bind.Primary;
+						}
+
+						if (hasSecondary)
+						{
+							it->second.Secondary = bind.Secondary;
+						}
+					}
+				}
+				catch (...) {}
+			}
+		}
+
+		if (this->ConfigPath != aPath)
+		{
+			this->Save();
+		}
+	}
+
+	void CGameBindsApi::AddDefaultBinds()
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		// Movement
+		this->Registry.emplace(EGameBinds::MoveForward, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(87) },
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(31) }
+		});
+		this->Registry.emplace(EGameBinds::MoveBackward, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(83) },
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(28) }
+		});
+		this->Registry.emplace(EGameBinds::MoveLeft, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(65) },
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(29) }
+		});
+		this->Registry.emplace(EGameBinds::MoveRight, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(68) },
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(30) }
+		});
+		this->Registry.emplace(EGameBinds::MoveTurnLeft, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(81) }
+		});
+		this->Registry.emplace(EGameBinds::MoveTurnRight, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(69) }
+		});
+		this->Registry.emplace(EGameBinds::MoveDodge, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(86) }
+		});
+		this->Registry.emplace(EGameBinds::MoveAutoRun, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(82) },
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(11) }
+		});
+		this->Registry.emplace(EGameBinds::MoveWalk, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::MoveJump_SwimUp_FlyUp, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(21) }
+		});
+		this->Registry.emplace(EGameBinds::MoveSwimDown_FlyDown, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::MoveAboutFace, MultiInputBind_t{});
+
+		// Skills
+		this->Registry.emplace(EGameBinds::SkillWeaponSwap, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(17) }
+		});
+		this->Registry.emplace(EGameBinds::SkillWeapon1, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(49) }
+		});
+		this->Registry.emplace(EGameBinds::SkillWeapon2, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(50) }
+		});
+		this->Registry.emplace(EGameBinds::SkillWeapon3, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(51) }
+		});
+		this->Registry.emplace(EGameBinds::SkillWeapon4, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(52) }
+		});
+		this->Registry.emplace(EGameBinds::SkillWeapon5, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(53) }
+		});
+		this->Registry.emplace(EGameBinds::SkillHeal, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(54) }
+		});
+		this->Registry.emplace(EGameBinds::SkillUtility1, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(55) }
+		});
+		this->Registry.emplace(EGameBinds::SkillUtility2, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(56) }
+		});
+		this->Registry.emplace(EGameBinds::SkillUtility3, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(57) }
+		});
+		this->Registry.emplace(EGameBinds::SkillElite, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(48) }
+		});
+		this->Registry.emplace(EGameBinds::SkillProfession1, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(32) }
+		});
+		this->Registry.emplace(EGameBinds::SkillProfession2, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(33) }
+		});
+		this->Registry.emplace(EGameBinds::SkillProfession3, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(34) }
+		});
+		this->Registry.emplace(EGameBinds::SkillProfession4, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(35) }
+		});
+		this->Registry.emplace(EGameBinds::SkillProfession5, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(36) }
+		});
+		this->Registry.emplace(EGameBinds::SkillProfession6, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(37) }
+		});
+		this->Registry.emplace(EGameBinds::SkillProfession7, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(38) }
+		});
+		this->Registry.emplace(EGameBinds::SkillSpecialAction, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(78) }
+		});
+
+		// Targeting
+		this->Registry.emplace(EGameBinds::TargetAlert, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, true, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(84) }
+		});
+		this->Registry.emplace(EGameBinds::TargetCall, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, true, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(84) }
+		});
+		this->Registry.emplace(EGameBinds::TargetTake, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(84) }
+		});
+		this->Registry.emplace(EGameBinds::TargetCallLocal, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::TargetTakeLocal, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::TargetEnemyNearest, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::TargetEnemyNext, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(22) }
+		});
+		this->Registry.emplace(EGameBinds::TargetEnemyPrev, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, true, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(22) }
+		});
+		this->Registry.emplace(EGameBinds::TargetAllyNearest, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::TargetAllyNext, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::TargetAllyPrev, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::TargetLock, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::TargetSnapGroundTarget, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::TargetSnapGroundTargetToggle, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::TargetAutoTargetingDisable, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::TargetAutoTargetingToggle, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::TargetAllyTargetingMode, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::TargetAllyTargetingModeToggle, MultiInputBind_t{});
+
+		// UI Binds
+		this->Registry.emplace(EGameBinds::UiCommerce, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(79) }
+		}); // TradingPost
+		this->Registry.emplace(EGameBinds::UiContacts, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(89) }
+		});
+		this->Registry.emplace(EGameBinds::UiGuild, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(71) }
+		});
+		this->Registry.emplace(EGameBinds::UiHero, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(72) }
+		});
+		this->Registry.emplace(EGameBinds::UiInventory, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(73) }
+		});
+		this->Registry.emplace(EGameBinds::UiKennel, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(75) }
+		}); // Pets
+		this->Registry.emplace(EGameBinds::UiLogout, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(43) }
+		});
+		this->Registry.emplace(EGameBinds::UiMail, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::UiOptions, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(42) }
+		});
+		this->Registry.emplace(EGameBinds::UiParty, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(80) }
+		});
+		this->Registry.emplace(EGameBinds::UiPvp, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::UiPvpBuild, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::UiScoreboard, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(66) }
+		});
+		this->Registry.emplace(EGameBinds::UiSeasonalObjectivesShop, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, true, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(72) }
+		}); // Wizard's Vault
+		this->Registry.emplace(EGameBinds::UiInformation, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(7) }
+		});
+		this->Registry.emplace(EGameBinds::UiChatToggle, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(4) }
+		});
+		this->Registry.emplace(EGameBinds::UiChatCommand, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(15) }
+		});
+		this->Registry.emplace(EGameBinds::UiChatFocus, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(20) },
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(105) }
+		});
+		this->Registry.emplace(EGameBinds::UiChatReply, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(18) }
+		});
+		this->Registry.emplace(EGameBinds::UiToggle, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, true, true, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(72) }
+		});
+		this->Registry.emplace(EGameBinds::UiSquadBroadcastChatToggle, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, true, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(4) }
+		});
+		this->Registry.emplace(EGameBinds::UiSquadBroadcastChatCommand, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, true, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(15) }
+		});
+		this->Registry.emplace(EGameBinds::UiSquadBroadcastChatFocus, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, true, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(20) },
+			Engine::Input::Bind_t{ false, false, true, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(105) }
+		});
+
+		// Camera
+		this->Registry.emplace(EGameBinds::CameraFree, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::CameraZoomIn, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(27) }
+		});
+		this->Registry.emplace(EGameBinds::CameraZoomOut, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(26) }
+		});
+		this->Registry.emplace(EGameBinds::CameraReverse, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::CameraActionMode, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::CameraActionModeDisable, MultiInputBind_t{});
+
+		// Screenshots
+		this->Registry.emplace(EGameBinds::ScreenshotNormal, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(16) }
+		});
+		this->Registry.emplace(EGameBinds::ScreenshotStereoscopic, MultiInputBind_t{});
+
+		// Map
+		this->Registry.emplace(EGameBinds::MapToggle, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(77) }
+		});
+		this->Registry.emplace(EGameBinds::MapFocusPlayer, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(21) }
+		});
+		this->Registry.emplace(EGameBinds::MapFloorDown, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(26) }
+		});
+		this->Registry.emplace(EGameBinds::MapFloorUp, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(27) }
+		});
+		this->Registry.emplace(EGameBinds::MapZoomIn, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(91) },
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(8) }
+		});
+		this->Registry.emplace(EGameBinds::MapZoomOut, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(106) },
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(7) }
+		});
+
+		// Mounts
+		this->Registry.emplace(EGameBinds::SpumoniToggle, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(88) }
+		});
+		this->Registry.emplace(EGameBinds::SpumoniMovement, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(86) }
+		});
+		this->Registry.emplace(EGameBinds::SpumoniSecondaryMovement, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(67) }
+		});
+		this->Registry.emplace(EGameBinds::SpumoniMAM01, MultiInputBind_t{}); // Raptor
+		this->Registry.emplace(EGameBinds::SpumoniMAM02, MultiInputBind_t{}); // Springer
+		this->Registry.emplace(EGameBinds::SpumoniMAM03, MultiInputBind_t{}); // Skimmer
+		this->Registry.emplace(EGameBinds::SpumoniMAM04, MultiInputBind_t{}); // Jackal
+		this->Registry.emplace(EGameBinds::SpumoniMAM05, MultiInputBind_t{}); // Griffon
+		this->Registry.emplace(EGameBinds::SpumoniMAM06, MultiInputBind_t{}); // RollerBeetle
+		this->Registry.emplace(EGameBinds::SpumoniMAM07, MultiInputBind_t{}); // Warclaw
+		this->Registry.emplace(EGameBinds::SpumoniMAM08, MultiInputBind_t{}); // Skyscale
+		this->Registry.emplace(EGameBinds::SpumoniMAM09, MultiInputBind_t{}); // SiegeTurtle
+
+		// Spectator Binds
+		this->Registry.emplace(EGameBinds::SpectatorNearestFixed, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, true, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(22) }
+		});
+		this->Registry.emplace(EGameBinds::SpectatorNearestPlayer, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(22) }
+		});
+		this->Registry.emplace(EGameBinds::SpectatorPlayerRed1, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(49) }
+		});
+		this->Registry.emplace(EGameBinds::SpectatorPlayerRed2, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(50) }
+		});
+		this->Registry.emplace(EGameBinds::SpectatorPlayerRed3, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(51) }
+		});
+		this->Registry.emplace(EGameBinds::SpectatorPlayerRed4, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(52) }
+		});
+		this->Registry.emplace(EGameBinds::SpectatorPlayerRed5, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(53) }
+		});
+		this->Registry.emplace(EGameBinds::SpectatorPlayerBlue1, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(54) }
+		});
+		this->Registry.emplace(EGameBinds::SpectatorPlayerBlue2, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(55) }
+		});
+		this->Registry.emplace(EGameBinds::SpectatorPlayerBlue3, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(56) }
+		});
+		this->Registry.emplace(EGameBinds::SpectatorPlayerBlue4, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(57) }
+		});
+		this->Registry.emplace(EGameBinds::SpectatorPlayerBlue5, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(48) }
+		});
+		this->Registry.emplace(EGameBinds::SpectatorFreeCamera, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, true, true, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(70) }
+		});
+		this->Registry.emplace(EGameBinds::SpectatorFreeCameraMode, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(69) }
+		});
+		this->Registry.emplace(EGameBinds::SpectatorFreeMoveForward, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(87) }
+		});
+		this->Registry.emplace(EGameBinds::SpectatorFreeMoveBackward, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(83) }
+		});
+		this->Registry.emplace(EGameBinds::SpectatorFreeMoveLeft, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(65) }
+		});
+		this->Registry.emplace(EGameBinds::SpectatorFreeMoveRight, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(68) }
+		});
+		this->Registry.emplace(EGameBinds::SpectatorFreeMoveUp, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(21) }
+		});
+		this->Registry.emplace(EGameBinds::SpectatorFreeMoveDown, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(86) }
+		});
+
+		// Squad Markers
+		this->Registry.emplace(EGameBinds::SquadMarkerPlaceWorld1, MultiInputBind_t{
+			Engine::Input::Bind_t{ true, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(49) }
+		}); // Arrow
+		this->Registry.emplace(EGameBinds::SquadMarkerPlaceWorld2, MultiInputBind_t{
+			Engine::Input::Bind_t{ true, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(50) }
+		}); // Circle
+		this->Registry.emplace(EGameBinds::SquadMarkerPlaceWorld3, MultiInputBind_t{
+			Engine::Input::Bind_t{ true, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(51) }
+		}); // Heart
+		this->Registry.emplace(EGameBinds::SquadMarkerPlaceWorld4, MultiInputBind_t{
+			Engine::Input::Bind_t{ true, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(52) }
+		}); // Square
+		this->Registry.emplace(EGameBinds::SquadMarkerPlaceWorld5, MultiInputBind_t{
+			Engine::Input::Bind_t{ true, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(53) }
+		}); // Star
+		this->Registry.emplace(EGameBinds::SquadMarkerPlaceWorld6, MultiInputBind_t{
+			Engine::Input::Bind_t{ true, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(54) }
+		}); // Swirl
+		this->Registry.emplace(EGameBinds::SquadMarkerPlaceWorld7, MultiInputBind_t{
+			Engine::Input::Bind_t{ true, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(55) }
+		}); // Triangle
+		this->Registry.emplace(EGameBinds::SquadMarkerPlaceWorld8, MultiInputBind_t{
+			Engine::Input::Bind_t{ true, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(56) }
+		}); // Cross
+		this->Registry.emplace(EGameBinds::SquadMarkerClearAllWorld, MultiInputBind_t{
+			Engine::Input::Bind_t{ true, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(57) }
+		});
+		this->Registry.emplace(EGameBinds::SquadMarkerSetAgent1, MultiInputBind_t{
+			Engine::Input::Bind_t{ true, false, true, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(49) }
+		}); // Arrow
+		this->Registry.emplace(EGameBinds::SquadMarkerSetAgent2, MultiInputBind_t{
+			Engine::Input::Bind_t{ true, false, true, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(50) }
+		}); // Circle
+		this->Registry.emplace(EGameBinds::SquadMarkerSetAgent3, MultiInputBind_t{
+			Engine::Input::Bind_t{ true, false, true, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(51) }
+		}); // Heart
+		this->Registry.emplace(EGameBinds::SquadMarkerSetAgent4, MultiInputBind_t{
+			Engine::Input::Bind_t{ true, false, true, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(52) }
+		}); // Square
+		this->Registry.emplace(EGameBinds::SquadMarkerSetAgent5, MultiInputBind_t{
+			Engine::Input::Bind_t{ true, false, true, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(53) }
+		}); // Star
+		this->Registry.emplace(EGameBinds::SquadMarkerSetAgent6, MultiInputBind_t{
+			Engine::Input::Bind_t{ true, false, true, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(54) }
+		}); // Swirl
+		this->Registry.emplace(EGameBinds::SquadMarkerSetAgent7, MultiInputBind_t{
+			Engine::Input::Bind_t{ true, false, true, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(55) }
+		}); // Triangle
+		this->Registry.emplace(EGameBinds::SquadMarkerSetAgent8, MultiInputBind_t{
+			Engine::Input::Bind_t{ true, false, true, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(56) }
+		}); // Cross
+		this->Registry.emplace(EGameBinds::SquadMarkerClearAllAgent, MultiInputBind_t{
+			Engine::Input::Bind_t{ true, false, true, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(57) }
+		});
+
+		// Mastery Skills
+		this->Registry.emplace(EGameBinds::MasteryAccess, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(74) }
+		});
+		this->Registry.emplace(EGameBinds::MasteryAccess01, MultiInputBind_t{}); // Fishing
+		this->Registry.emplace(EGameBinds::MasteryAccess02, MultiInputBind_t{}); // Skiff
+		this->Registry.emplace(EGameBinds::MasteryAccess03, MultiInputBind_t{}); // Jade Bot Waypoint
+		this->Registry.emplace(EGameBinds::MasteryAccess04, MultiInputBind_t{}); // Rift Scan
+		this->Registry.emplace(EGameBinds::MasteryAccess05, MultiInputBind_t{}); // Skyscale
+		this->Registry.emplace(EGameBinds::MasteryAccess06, MultiInputBind_t{}); // Homestead Doorway
+
+		// Miscellaneous Binds
+		this->Registry.emplace(EGameBinds::MiscAoELoot, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::MiscInteract, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(70) }
+		});
+		this->Registry.emplace(EGameBinds::MiscShowEnemies, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(1) }
+		});
+		this->Registry.emplace(EGameBinds::MiscShowAllies, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(0) }
+		});
+		this->Registry.emplace(EGameBinds::MiscCombatStance, MultiInputBind_t{}); // Stow/Draw
+		this->Registry.emplace(EGameBinds::MiscToggleLanguage, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(110) }
+		});
+		this->Registry.emplace(EGameBinds::MiscTogglePetCombat, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::MiscToggleFullScreen, MultiInputBind_t{
+			Engine::Input::Bind_t{ true, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(20) }
+		});
+		this->Registry.emplace(EGameBinds::MiscToggleDecorationMode, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(76) }
+		}); // Decoration Mode
+
+		// Toys/Novelties
+		this->Registry.emplace(EGameBinds::ToyUseDefault, MultiInputBind_t{
+			Engine::Input::Bind_t{ false, false, false, Engine::Input::EDevice::Keyboard, GameScanCodeToScanCode(85) }
+		});
+		this->Registry.emplace(EGameBinds::ToyUseSlot1, MultiInputBind_t{}); // Chair
+		this->Registry.emplace(EGameBinds::ToyUseSlot2, MultiInputBind_t{}); // Instrument
+		this->Registry.emplace(EGameBinds::ToyUseSlot3, MultiInputBind_t{}); // Held Item
+		this->Registry.emplace(EGameBinds::ToyUseSlot4, MultiInputBind_t{}); // Toy
+		this->Registry.emplace(EGameBinds::ToyUseSlot5, MultiInputBind_t{}); // Tonic
+		//ToyUseSlot6 unused
+
+		// Build Templates
+		this->Registry.emplace(EGameBinds::Loadout1, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::Loadout2, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::Loadout3, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::Loadout4, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::Loadout5, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::Loadout6, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::Loadout7, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::Loadout8, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::Loadout9, MultiInputBind_t{});
+
+		// Equipment Templates
+		this->Registry.emplace(EGameBinds::GearLoadout1, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::GearLoadout2, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::GearLoadout3, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::GearLoadout4, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::GearLoadout5, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::GearLoadout6, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::GearLoadout7, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::GearLoadout8, MultiInputBind_t{});
+		this->Registry.emplace(EGameBinds::GearLoadout9, MultiInputBind_t{});
+	}
+
+	void CGameBindsApi::Save()
+	{
+		const std::lock_guard<std::mutex> lock(this->Mutex);
+
+		pugi::xml_document doc{};
+		pugi::xml_node root = doc.append_child("InputBindings");
+
+		for (auto& it : this->Registry)
+		{
+			const EGameBinds& id = it.first;
+			MultiInputBind_t& ib = it.second;
+
+			if (id == EGameBinds::LEGACY_MoveSwimUp) { continue; } /* Do not save legacy binds. */
+
+			pugi::xml_node action = root.append_child("action");
+			action.append_attribute("name") = NameFrom(id);                 // Purely descriptive
+			action.append_attribute("id")   = std::to_string((uint32_t)id); // Bind ID
+
+			switch (ib.Primary.Device)
+			{
+				default:
+					action.append_attribute("device") = "None";
+					break;
+				case Engine::Input::EDevice::Keyboard:
+					action.append_attribute("device") = "Keyboard";
+					action.append_attribute("button") = ScanCodeToGameScanCode(ib.Primary.Code); // US/Anet Scancode
+					break;
+				case Engine::Input::EDevice::Mouse:
+					action.append_attribute("device") = "Mouse";
+					switch (static_cast<Engine::Input::EMouseButtons>(ib.Primary.Code))
+					{
+						default:
+						case Engine::Input::EMouseButtons::None:
+							break;
+						case Engine::Input::EMouseButtons::LMB:
+							action.append_attribute("button") = "0";
+							break;
+						case Engine::Input::EMouseButtons::RMB:
+							action.append_attribute("button") = "2";
+							break;
+						case Engine::Input::EMouseButtons::MMB:
+							action.append_attribute("button") = "1";
+							break;
+						case Engine::Input::EMouseButtons::M4:
+							action.append_attribute("button") = "3";
+							break;
+						case Engine::Input::EMouseButtons::M5:
+							action.append_attribute("button") = "4";
+							break;
+					}
+					break;
+			}
+
+			if (ib.Primary.Modifiers != Engine::Input::EModifiers::None)
+			{
+				action.append_attribute("mod") = std::to_string(static_cast<uint16_t>(ib.Primary.Modifiers));
+			}
+
+			switch (ib.Secondary.Device)
+			{
+				default:
+					action.append_attribute("device2") = "None";
+					break;
+				case Engine::Input::EDevice::Keyboard:
+					action.append_attribute("device2") = "Keyboard";
+					action.append_attribute("button2") = ScanCodeToGameScanCode(ib.Secondary.Code); // US/Anet Scancode
+					break;
+				case Engine::Input::EDevice::Mouse:
+					action.append_attribute("device2") = "Mouse";
+					switch (static_cast<Engine::Input::EMouseButtons>(ib.Secondary.Code))
+					{
+						default:
+						case Engine::Input::EMouseButtons::None:
+							break;
+						case Engine::Input::EMouseButtons::LMB:
+							action.append_attribute("button2") = "0";
+							break;
+						case Engine::Input::EMouseButtons::RMB:
+							action.append_attribute("button2") = "2";
+							break;
+						case Engine::Input::EMouseButtons::MMB:
+							action.append_attribute("button2") = "1";
+							break;
+						case Engine::Input::EMouseButtons::M4:
+							action.append_attribute("button2") = "3";
+							break;
+						case Engine::Input::EMouseButtons::M5:
+							action.append_attribute("button2") = "4";
+							break;
+					}
+					break;
+			}
+
+			if (ib.Secondary.Modifiers != Engine::Input::EModifiers::None)
+			{
+				action.append_attribute("mod2") = std::to_string(static_cast<uint16_t>(ib.Secondary.Modifiers));
+			}
+		}
+
+		if (!doc.save_file(this->ConfigPath.string().c_str(), "\t"))
+		{
+			this->LogWarning("GameBinds.xml could not be saved.");
+		}
+	}
+}

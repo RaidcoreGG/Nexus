@@ -1,0 +1,81 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  HkNotify.h
+/// Description  :  Swap chain present and resize notifications.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
+#pragma once
+
+#include <cstdint>
+#include <dxgi.h>
+
+#include "Engine/Notifier/Notifier.h"
+
+namespace Raidcore::GW2::Hooks
+{
+	constexpr int32_t DXGIPRESENT_PRIO_WINDOW   = 0;
+	constexpr int32_t DXGIPRESENT_PRIO_TEXTURES = 200;
+	constexpr int32_t DXGIPRESENT_PRIO_UI       = 300;
+
+	constexpr int32_t DXGIRESIZE_PRIO_UI        = 100;
+	constexpr int32_t DXGIRESIZE_PRIO_SCALING   = 150;
+	constexpr int32_t DXGIRESIZE_PRIO_WINDOW    = 200;
+
+	///----------------------------------------------------------------------------------------------------
+	/// IDxgiPresentNotifyHandler Interface
+	///----------------------------------------------------------------------------------------------------
+	class IDxgiPresentNotifyHandler : public Engine::INotifyHandler<IDxgiPresentNotifyHandler>
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// OnDxgiPresentNotify:
+		/// 	Called every frame, before the game's present.
+		///----------------------------------------------------------------------------------------------------
+		virtual void OnDxgiPresentNotify(IDXGISwapChain* aSwapChain) = 0;
+	};
+
+	///----------------------------------------------------------------------------------------------------
+	/// IDxgiPresentNotifier Interface
+	///----------------------------------------------------------------------------------------------------
+	class IDxgiPresentNotifier : public Engine::INotifier<IDxgiPresentNotifyHandler>
+	{
+		protected:
+		void NotifyDxgiPresent(IDXGISwapChain* aSwapChain)
+		{
+			for (const auto& entry : this->Subscribers())
+			{
+				entry.Subscriber->OnDxgiPresentNotify(aSwapChain);
+			}
+		}
+	};
+
+	///----------------------------------------------------------------------------------------------------
+	/// IDxgiResizeNotifyHandler Interface
+	///----------------------------------------------------------------------------------------------------
+	class IDxgiResizeNotifyHandler : public Engine::INotifyHandler<IDxgiResizeNotifyHandler>
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// OnDxgiResizeNotify:
+		/// 	Called before the swap chain buffers are resized.
+		///----------------------------------------------------------------------------------------------------
+		virtual void OnDxgiResizeNotify(IDXGISwapChain* aSwapChain, UINT aWidth, UINT aHeight) = 0;
+	};
+
+	///----------------------------------------------------------------------------------------------------
+	/// IDxgiResizeNotifier Interface
+	///----------------------------------------------------------------------------------------------------
+	class IDxgiResizeNotifier : public Engine::INotifier<IDxgiResizeNotifyHandler>
+	{
+		protected:
+		void NotifyDxgiResize(IDXGISwapChain* aSwapChain, UINT aWidth, UINT aHeight)
+		{
+			for (const auto& entry : this->Subscribers())
+			{
+				entry.Subscriber->OnDxgiResizeNotify(aSwapChain, aWidth, aHeight);
+			}
+		}
+	};
+}

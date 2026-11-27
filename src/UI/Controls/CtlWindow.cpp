@@ -1,0 +1,32 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  CtlWindow.cpp
+/// Description  :  Contains the functionality for a window.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
+#include "CtlWindow.h"
+
+namespace Raidcore::UI
+{
+	const std::string& IWindow::GetName()
+	{
+		return this->Name;
+	}
+
+	const char* IWindow::GetDisplayName()
+	{
+		return this->DisplayName.Text();
+	}
+
+	void IWindow::Invalidate()
+	{
+		this->IsInvalid = true;
+	}
+
+	bool* IWindow::GetVisibleStatePtr()
+	{
+		return &this->IsVisible;
+	}
+}

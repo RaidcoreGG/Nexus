@@ -1,0 +1,1324 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  Addon.cpp
+/// Description  :  Addon implementation.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
+#include "Addon.h"
+
+#include <assert.h>
+#include <chrono>
+#include <psapi.h>
+#include <regex>
+#include <windows.h>
+
+#include "Host/GW2/Addons/API/ApiBuilder.h"
+#include "Host/GW2/Context.h"
+#include "Host/GW2/Index/Index.h"
+#include "Engine/Cleanup/RefCleanerContext.h"
+#include "Core/Platform/Windows/Exe/ExeExports.h"
+#include "Host/GW2/Build/BuildInfo.h"
+#include "Util/DLL.h"
+#include "Util/MD5.h"
+#include "Util/Paths.h"
+#include "Util/Strings.h"
+#include "Util/Time.h"
+#include "Util/URL.h"
+
+#define SCHEDULED_UPDATE_TIMEOUT                 3600
+#define SCHEDULED_UPDATE_TIMEOUT_VERSIONDISABLED 300
+
+namespace Raidcore::GW2
+{
+	CAddon::CAddon(std::filesystem::path aLocation) : Core::ILogChannel("Addon")
+	{
+		this->Location = aLocation;
+		this->MD5 = MD5Util::FromFile(aLocation);
+
+		GW2::CContext* ctx = GW2::CContext::GetContext();
+		this->Loader = ctx->GetLoader();
+		this->EventApi = ctx->GetEventApi();
+		this->ConfigMgr = ctx->GetCfgMgr();
+
+		/* Does the initial enumerate addon interfaces and raises a create event. */
+		this->QueuedActions.push(EAddonAction::Create);
+
+		this->IsRunning = true;
+		this->ProcessorThread = std::thread(&CAddon::ProcessActions, this);
+	}
+
+	CAddon::~CAddon()
+	{
+		/* Clear the entire queue. */
+		std::queue<EAddonAction> empty;
+		std::swap(this->QueuedActions, empty);
+
+		/* Unloads, exits the processor thread and raises a destroy event. */
+		this->QueuedActions.push(EAddonAction::Destroy);
+
+		/* Notify the processor thread. */
+		this->ConVar.notify_one();
+
+		if (this->ProcessorThread.joinable())
+		{
+			this->ProcessorThread.join();
+		}
+
+		if (this->NexusAddonDefV1)
+		{
+			delete this->NexusAddonDefV1;
+		}
+
+		if (this->ArcExtensionDef)
+		{
+			delete this->ArcExtensionDef;
+		}
+	}
+
+	uint32_t CAddon::GetSignature()
+	{
+		if (this->NexusAddonDefV1)
+		{
+			return this->NexusAddonDefV1->Signature;
+		}
+
+		if (this->ArcExtensionDef)
+		{
+			return this->ArcExtensionDef->Signature;
+		}
+
+		return 0;
+	}
+
+	void CAddon::Load()
+	{
+		if (!this->IsRunning) { return; }
+
+		std::lock_guard<std::mutex> lock(this->ProcessorMutex);
+		this->QueuedActions.push(EAddonAction::Load);
+		this->ConVar.notify_one();
+	}
+
+	void CAddon::Unload()
+	{
+		if (!this->IsRunning) { return; }
+
+		std::lock_guard<std::mutex> lock(this->ProcessorMutex);
+		this->QueuedActions.push(EAddonAction::Unload);
+		this->ConVar.notify_one();
+	}
+
+	void CAddon::Uninstall()
+	{
+		if (!this->IsRunning) { return; }
+
+		std::lock_guard<std::mutex> lock(this->ProcessorMutex);
+		this->QueuedActions.push(EAddonAction::Uninstall);
+		this->ConVar.notify_one();
+	}
+
+	void CAddon::CheckUpdate(bool aIsScheduled)
+	{
+		if (!this->IsRunning) { return; }
+
+		std::lock_guard<std::mutex> lock(this->ProcessorMutex);
+		this->QueuedActions.push(aIsScheduled ? EAddonAction::CheckUpdateScheduled : EAddonAction::CheckUpdate);
+		this->ConVar.notify_one();
+	}
+
+	void CAddon::Update()
+	{
+		if (!this->IsRunning) { return; }
+
+		std::lock_guard<std::mutex> lock(this->ProcessorMutex);
+		this->QueuedActions.push(EAddonAction::Update);
+		this->ConVar.notify_one();
+	}
+
+	void CAddon::ProcessActions()
+	{
+		while (this->IsRunning)
+		{
+			EAddonAction action = EAddonAction::None;
+
+			/* Scope, just to retrieve a queued action. */
+			{
+				std::unique_lock<std::mutex> lockThread(this->ProcessorMutex);
+				bool actionQueued = this->ConVar.wait_for(lockThread, std::chrono::seconds(300), [this] { return this->QueuedActions.size() > 0; });
+
+				if (!this->IsRunning) { return; }
+
+				/* actionQueued is true if an action was actually queued, otherwise 300s timeout ran out -> do a scheduled update check. */
+				if (actionQueued)
+				{
+					action = this->QueuedActions.front();
+					this->QueuedActions.pop();
+				}
+				else
+				{
+					action = EAddonAction::CheckUpdateScheduled;
+				}
+			}
+
+			this->Flags |= EAddonFlags::RunningAction;
+
+			switch (action)
+			{
+				case EAddonAction::Create:
+				{
+					this->LogTrace("CAddon::Create(): %s", this->Location.string().c_str());
+					this->EnumInterfaces();
+					this->CheckUpdate(/*scheduled=*/true);
+					this->NotifyAddonState(EAddonStateNotify::Created, this->GetSignature());
+					this->EventApi->Raise(0, EV_ADDON_CREATED);
+					break;
+				}
+				case EAddonAction::Destroy:
+				{
+					this->Flags |= EAddonFlags::Destroying;
+					this->LogTrace("CAddon::Destroy(): %s", this->Location.string().c_str());
+					this->UnloadInternal();
+					this->IsRunning = false; /* Just to be sure. */
+					this->NotifyAddonState(EAddonStateNotify::Destroyed, this->GetSignature());
+					this->EventApi->Raise(0, EV_ADDON_DESTROYED);
+					return; /* Return the thread entirely. */
+				}
+				case EAddonAction::EnumInterfaces:
+				{
+					this->EnumInterfaces();
+					break;
+				}
+				case EAddonAction::Load:
+				{
+					this->LoadInternal();
+					break;
+				}
+				case EAddonAction::Unload:
+				{
+					this->UnloadInternal();
+					break;
+				}
+				case EAddonAction::Uninstall:
+				{
+					this->UninstallInternal();
+					break;
+				}
+				case EAddonAction::CheckUpdate:
+				{
+					this->CheckUpdateInternal(/*scheduled=*/false);
+					break;
+				}
+				case EAddonAction::CheckUpdateScheduled:
+				{
+					this->CheckUpdateInternal(/*scheduled=*/true);
+					break;
+				}
+				case EAddonAction::Update:
+				{
+					this->UpdateInternal();
+					break;
+				}
+			}
+
+			this->Flags &= ~EAddonFlags::RunningAction;
+		}
+	}
+
+	void CAddon::LoadInternal()
+	{
+		this->LogTrace("CAddon::LoadInternal(%s)", this->Location.string().c_str());
+
+		if (this->IsLoaded())
+		{
+			this->LogDebug("Cannot load. Already loaded. (%s)", this->Location.string().c_str());
+			return;
+		}
+
+		if (this->IsStateLocked())
+		{
+			this->LogDebug("Cannot load. State is locked. (%s)", this->Location.string().c_str());
+			return;
+		}
+
+		Engine::MD5_t md5 = MD5Util::FromFile(this->Location);
+
+		/* If the file is different, than when it was created, refresh the interfaces. */
+		if (md5 != this->GetMD5())
+		{
+			this->EnumInterfaces();
+		}
+
+		/* Update MD5. */
+		this->MD5 = md5;
+
+		if (!this->HasInterface(EAddonInterfaces::Nexus))
+		{
+			this->LogDebug("Cannot load. No Nexus addon interface. (%s)", this->Location.string().c_str());
+			return;
+		}
+
+		HMODULE module = LoadLibraryA(this->Location.string().c_str());
+
+		if (!module)
+		{
+			DWORD lasterror = GetLastError();
+			const std::error_condition ecnd = std::system_category().default_error_condition(lasterror);
+			this->LogWarning(
+				"Cannot load. LoadLibrary(%s) failed: %s (%d)",
+				this->Location.string().c_str(),
+				ecnd.message().c_str(),
+				lasterror
+			);
+			this->State = Engine::EAddonState::NotLoaded;
+			return;
+		}
+
+		GETADDONDEF_V1 getAddonDef = nullptr;
+
+		if (!DLL::FindFunction(module, &getAddonDef, "GetAddonDef"))
+		{
+			this->LogDebug("Cannot load. Interface was set, but is not actually present. (%s)", this->Location.string().c_str());
+			this->ModuleInterfaces &= ~EAddonInterfaces::Nexus;
+			FreeLibrary(module);
+			this->State = Engine::EAddonState::NotLoaded;
+			return;
+		}
+
+		AddonDefV1_t* addondef = getAddonDef();
+
+		if (addondef == nullptr)
+		{
+			this->LogWarning("Cannot load. Addon definition was nullptr. (%s)", this->Location.string().c_str());
+			FreeLibrary(module);
+			this->State = Engine::EAddonState::NotLoaded;
+			this->Flags |= EAddonFlags::MissingReqs;
+			return;
+		}
+
+		/* If a def was already set, delete it. */
+		if (this->NexusAddonDefV1)
+		{
+			delete this->NexusAddonDefV1;
+		}
+
+		this->NexusAddonDefV1 = new AddonDefV1_t(*addondef);
+
+		if (!addondef->HasMinimumRequirements())
+		{
+			this->LogWarning("Cannot load. Addon definition does not fulfill minimum requirements. (%s)", this->Location.string().c_str());
+			FreeLibrary(module);
+			this->State = Engine::EAddonState::NotLoaded;
+			this->Flags |= EAddonFlags::MissingReqs;
+			return;
+		}
+
+		/* Unset requirements flag. */
+		this->Flags &= ~EAddonFlags::MissingReqs;
+
+		if (!this->Config)
+		{
+			this->Config = this->ConfigMgr->RegisterConfig(this->NexusAddonDefV1->Signature);
+		}
+
+		assert(this->Config);
+
+		if (this->IsDuplicate())
+		{
+			this->LogWarning("Canceled load. Addon is a duplicate. (%s)", this->Location.string().c_str());
+			FreeLibrary(module);
+			this->State = Engine::EAddonState::NotLoaded;
+			return;
+		}
+
+		if (!this->ShouldLoad())
+		{
+			/* Should load prints debug reasons, no need to also print here. */
+			FreeLibrary(module);
+			this->State = Engine::EAddonState::NotLoaded;
+			return;
+		}
+
+		AddonAPI_t* api = GW2::API::Get(this->NexusAddonDefV1->APIVersion);
+
+		if (api == nullptr && this->NexusAddonDefV1->APIVersion > 0)
+		{
+			this->LogWarning(
+				"Canceled load. Addon requested an API revision that doesn't exist (%u). (%s)",
+				this->NexusAddonDefV1->APIVersion,
+				this->Location.string().c_str()
+			);
+			FreeLibrary(module);
+			this->State = Engine::EAddonState::NotLoaded;
+			return;
+		}
+
+		if ((this->NexusAddonDefV1->Flags & EAddonDefFlags::DisableHotloading) == EAddonDefFlags::DisableHotloading
+			|| this->NexusAddonDefV1->Unload == nullptr)
+		{
+			this->Flags |= EAddonFlags::StateLocked;
+			this->Flags |= EAddonFlags::FileLocked;
+		}
+
+		this->Module = module;
+
+		MODULEINFO moduleInfo{};
+		GetModuleInformation(GetCurrentProcess(), this->Module, &moduleInfo, sizeof(moduleInfo));
+		this->ModuleSize = moduleInfo.SizeOfImage;
+
+		auto start_time = std::chrono::high_resolution_clock::now();
+		this->NexusAddonDefV1->Load(api);
+		auto end_time = std::chrono::high_resolution_clock::now();
+		auto time = end_time - start_time;
+
+		this->NotifyAddonState(EAddonStateNotify::Loaded, this->NexusAddonDefV1->Signature);
+		this->EventApi->Raise(EV_ADDON_LOADED, &this->NexusAddonDefV1->Signature);
+		this->EventApi->Raise(this->NexusAddonDefV1->Signature, GW2::EV_MUMBLE_IDENTITY_UPDATED, static_cast<void*>(GW2::CContext::GetContext()->GetMumbleReader()->GetMumbleIdentity()));
+
+		this->Config->LastGameBuild = GW2::GetGameBuild();
+		this->Config->LastName = this->NexusAddonDefV1->GetName();
+		this->State = Engine::EAddonState::Loaded;
+		this->ConfigMgr->SaveConfigs();
+
+		this->LogInfo(
+			"Loaded addon: %s\n"
+			"\tSignature: 0x%08X\n"
+			"\tAddress Space: %p - %p\n"
+			"\tAPI Version: %d\n"
+			"\tFlags: %u\n"
+			"\tDefFlags: %u\n"
+			"\tTook %u microseconds to load.",
+			this->Location.string().c_str(),
+			this->NexusAddonDefV1->Signature,
+			this->Module,
+			((PBYTE)this->Module) + this->ModuleSize,
+			this->NexusAddonDefV1->APIVersion,
+			this->Flags,
+			this->NexusAddonDefV1->Flags,
+			time / std::chrono::microseconds(1)
+		);
+	}
+
+	void CAddon::UnloadInternal()
+	{
+		this->LogTrace("CAddon::UnloadInternal(%s)", this->Location.string().c_str());
+
+		if (!this->IsLoaded())
+		{
+			this->LogDebug("Already unloaded. (%s)", this->Location.string().c_str());
+			return;
+		}
+
+		if (this->IsStateLocked() && !this->IsDestroying())
+		{
+			this->LogDebug("Cannot unload. State is locked. (%s)", this->Location.string().c_str());
+			return;
+		}
+
+		std::string strUnloadInfo;
+
+		if (this->NexusAddonDefV1->Unload)
+		{
+			auto start_time = std::chrono::high_resolution_clock::now();
+			this->NexusAddonDefV1->Unload();
+			auto end_time = std::chrono::high_resolution_clock::now();
+			auto time = end_time - start_time;
+
+			strUnloadInfo = std::format("Took {} microseconds to unload.", time / std::chrono::microseconds(1));
+		}
+		else
+		{
+			strUnloadInfo = "No unload routine defined.";
+		}
+
+		std::string refcleanup = Engine::CRefCleanerContext::Get()->CleanupRefs(this->Module, (PBYTE)this->Module + this->ModuleSize);
+
+		if (!refcleanup.empty())
+		{
+			this->LogWarning("(%s) %s", this->Location.string().c_str(), refcleanup.c_str());
+		}
+
+		if ((this->Flags & EAddonFlags::Destroying) != EAddonFlags::Destroying)
+		{
+			this->NotifyAddonState(EAddonStateNotify::Unloaded, this->NexusAddonDefV1->Signature);
+			this->EventApi->Raise(EV_ADDON_UNLOADED, &this->NexusAddonDefV1->Signature);
+		}
+
+		/* A state-locked addon is only unloaded on shutdown, so it can save its settings; its module stays mapped,
+		 * as it may still have threads running. */
+		if (!this->IsStateLocked())
+		{
+			FreeLibrary(this->Module);
+		}
+
+		this->Module = nullptr;
+		this->ModuleSize = 0;
+
+		this->State = Engine::EAddonState::NotLoaded;
+
+		this->LogInfo(
+			"Unloaded addon: %s\n\tSignature: 0x%08X\n\tFlags: %u\n\t%s",
+			this->Location.string().c_str(),
+			this->NexusAddonDefV1->Signature,
+			this->Flags,
+			strUnloadInfo.c_str()
+		);
+	}
+
+	std::string CAddon::GetName()
+	{
+		if (this->NexusAddonDefV1)
+		{
+			return this->NexusAddonDefV1->GetName();
+		}
+
+		if (this->ArcExtensionDef)
+		{
+			return this->ArcExtensionDef->Name;
+		}
+
+		if (!this->Location.empty())
+		{
+			return this->Location.filename().string();
+		}
+
+		return "";
+	}
+
+	std::string CAddon::GetAuthor()
+	{
+		if (this->NexusAddonDefV1)
+		{
+			return this->NexusAddonDefV1->GetAuthor();
+		}
+
+		return "";
+	}
+
+	std::string CAddon::GetDescription()
+	{
+		if (this->NexusAddonDefV1)
+		{
+			return this->NexusAddonDefV1->GetDescription();
+		}
+
+		return "";
+	}
+
+	std::string CAddon::GetVersion()
+	{
+		if (this->NexusAddonDefV1)
+		{
+			return this->NexusAddonDefV1->Version.string();
+		}
+
+		if (this->ArcExtensionDef)
+		{
+			return this->ArcExtensionDef->Build;
+		}
+
+		return "";
+	}
+
+	Config_t* CAddon::GetConfig()
+	{
+		return this->Config;
+	}
+
+	bool CAddon::HasInterface(EAddonInterfaces aInterface) const
+	{
+		return (bool)(this->ModuleInterfaces & aInterface);
+	}
+
+	bool CAddon::IsDuplicate()
+	{
+		return this->Loader->IsTrackedSafe(this->GetSignature(), this->GetBase());
+	}
+
+	bool CAddon::IsRunningAction() const
+	{
+		return (this->Flags & EAddonFlags::RunningAction) == EAddonFlags::RunningAction;
+	}
+
+	bool CAddon::IsDestroying() const
+	{
+		return (this->Flags & EAddonFlags::Destroying) == EAddonFlags::Destroying;
+	}
+
+	bool CAddon::IsFileLocked() const
+	{
+		return (this->Flags & EAddonFlags::FileLocked) == EAddonFlags::FileLocked;
+	}
+
+	bool CAddon::IsStateLocked() const
+	{
+		return (this->Flags & EAddonFlags::StateLocked) == EAddonFlags::StateLocked;
+	}
+
+	bool CAddon::IsMissingRequirements() const
+	{
+		return (this->Flags & EAddonFlags::MissingReqs) == EAddonFlags::MissingReqs;
+	}
+
+	bool CAddon::IsUninstalled() const
+	{
+		return (this->Flags & EAddonFlags::Uninstalled) == EAddonFlags::Uninstalled;
+	}
+
+	bool CAddon::IsUpdateAvailable() const
+	{
+		return (this->Flags & EAddonFlags::UpdateAvailable) == EAddonFlags::UpdateAvailable;
+	}
+
+	bool CAddon::IsVersionDisabled() const
+	{
+		if (!this->Config) { return false; }
+
+		/* Tiny optimization, to not calculate the entire MD5. */
+		if (this->Config->DisableVersion.empty())
+		{
+			return false;
+		}
+
+		return this->Config->DisableVersion == this->GetMD5().string();
+	}
+
+	bool CAddon::SupportsLoading() const
+	{
+		return this->HasInterface(EAddonInterfaces::Nexus);
+	}
+
+	bool CAddon::SupportsUpdates() const
+	{
+		return this->HasInterface(EAddonInterfaces::Nexus);
+	}
+
+	void CAddon::UninstallInternal()
+	{
+		this->LogTrace("CAddon::UninstallInternal(%s)", this->Location.string().c_str());
+
+		if (this->IsUninstalled())
+		{
+			this->LogDebug("Already uninstalled. (%s)", this->Location.string().c_str());
+			return;
+		}
+
+		/* If still loaded but state isn't locked, unload first. */
+		if (this->IsLoaded() && !this->IsStateLocked())
+		{
+			this->LogDebug("Still loaded but state isn't locked requeing with unload. (%s)", this->Location.string().c_str());
+
+			/* Queue unload. */
+			this->Unload();
+
+			/* Queue uninstall. */
+			this->Uninstall();
+
+			/* Cancel this uninstall procedure. */
+			return;
+		}
+
+		/* Set the flag. */
+		this->Flags |= EAddonFlags::Uninstalled;
+
+		/* If it's statelocked and still loaded, keep the config in memory, but remove from disk. */
+		if (this->IsLoaded() && this->IsStateLocked())
+		{
+			this->LogDebug(
+				"Addon is still loaded, config already removed: %s",
+				this->Location.string().c_str()
+			);
+
+			if (this->Config)
+			{
+				this->Config->Persist = false;
+
+				/* Already remove the config from disk. */
+				this->ConfigMgr->SaveConfigs();
+			}
+		}
+		else if (!this->IsLoaded())
+		{
+			this->ConfigMgr->DeleteConfig(this->GetSignature());
+		}
+		else
+		{
+			/* If we reach this, the addon is still loaded, but not state locked. However it should've been unloaded first based on this exact check prior.*/
+			assert(false && "Unreachable code.");
+		}
+
+		if (this->IsFileLocked())
+		{
+			this->LogWarning(
+				"Addon is still loaded, it will be uninstalled the next time the game is started: %s",
+				this->Location.string().c_str()
+			);
+
+			/* File is locked, try to move it into temp so it can be deleted next game start. */
+			try
+			{
+				std::filesystem::path targetLocation = Path::GetUnused(GW2::Index(GW2::EPath::DIR_TEMP) / this->Location.filename().string().append(".uninstall"));
+				std::filesystem::rename(this->Location, targetLocation);
+
+				this->LogDebug(
+					"Addon uninstall.\n\tOld Location: %s\n\tNew Location: %s",
+					this->Location.string().c_str(),
+					targetLocation.string().c_str()
+				);
+
+				this->Location = targetLocation;
+			}
+			catch (std::filesystem::filesystem_error fErr)
+			{
+				this->Flags |= EAddonFlags::FileLocked;
+				this->LogCritical(
+					"Error while trying to uninstall(move) locked addon: %s (%s)",
+					fErr.what(),
+					this->Location.string().c_str()
+				);
+			}
+		}
+		else
+		{
+			/* File is not locked, we try to remove it. */
+			try
+			{
+				this->LogInfo("Uninstalled addon: %s", this->Location.string().c_str());
+				std::filesystem::remove(this->Location);
+				this->Location.clear();
+				this->MD5.clear();
+			}
+			catch (std::filesystem::filesystem_error fErr)
+			{
+				this->Flags |= EAddonFlags::FileLocked;
+				this->LogWarning(
+					"Cannot remove addon from disk: %s (%s)",
+					fErr.what(),
+					this->Location.string().c_str()
+				);
+			}
+		}
+
+		this->Loader->NotifyChanges();
+	}
+
+	const EAddonInterfaces& CAddon::EnumInterfaces()
+	{
+		this->LogTrace("CAddon::EnumInterfaces(%s)", this->Location.string().c_str());
+
+		/* Reset interfaces. */
+		this->ModuleInterfaces = EAddonInterfaces::None;
+
+		if (this->Location.empty()) { return this->ModuleInterfaces; }
+
+		const Core::Windows::Exports_t exports = Core::Windows::ReadExports(this->Location);
+
+		if (exports.Architecture == Core::Windows::EArchitecture::None)
+		{
+			this->LogWarning("Cannot enumerate addon interfaces. Not a readable DLL. (%s)", this->Location.string().c_str());
+			return this->ModuleInterfaces;
+		}
+
+		if (exports.Architecture != Core::Windows::ARCH_CURRENT)
+		{
+			this->LogWarning("Cannot enumerate addon interfaces. DLL is built for a different architecture. (%s)", this->Location.string().c_str());
+			return this->ModuleInterfaces;
+		}
+
+		EAddonInterfaces interfaces = EAddonInterfaces::None;
+
+		/* Only Nexus addons are loaded here, the definition cannot be read without running the module. */
+		if (exports.Has("GetAddonDef") && this->ReadAddonDef())
+		{
+			interfaces |= EAddonInterfaces::Nexus;
+		}
+
+		if (exports.Has("get_init_addr") &&
+			exports.Has("get_release_addr"))
+		{
+			interfaces |= EAddonInterfaces::ArcDPS;
+		}
+
+		if (exports.Has("gw2addon_get_description") &&
+			exports.Has("gw2addon_load") &&
+			exports.Has("gw2addon_unload"))
+		{
+			interfaces |= EAddonInterfaces::UOAOM;
+		}
+
+		if (exports.Has("D3D11CreateDevice") &&
+			exports.Has("D3D11CreateDeviceAndSwapChain"))
+		{
+			if (!(exports.Has("D3D11CoreCreateDevice") &&
+				exports.Has("D3D11CoreCreateLayeredDevice") &&
+				exports.Has("D3D11CoreGetLayeredDeviceSize") &&
+				exports.Has("D3D11CoreRegisterLayers")))
+			{
+				this->LogDebug("Stub D3D11. (%s)", this->Location.string().c_str());
+			}
+
+			interfaces |= EAddonInterfaces::D3D11Proxy;
+		}
+
+		if (exports.Has("CreateDXGIFactory") &&
+			exports.Has("CreateDXGIFactory1") &&
+			exports.Has("CreateDXGIFactory2"))
+		{
+			if (!(exports.Has("DXGIGetDebugInterface1") &&
+				exports.Has("CompatValue") &&
+				exports.Has("CompatString")))
+			{
+				this->LogDebug("Stub DXGI. (%s)", this->Location.string().c_str());
+			}
+
+			interfaces |= EAddonInterfaces::DXGIProxy;
+		}
+
+		this->ModuleInterfaces = interfaces;
+
+		this->LogDebug("Interfaces: %u (%s)", this->ModuleInterfaces, this->Location.string().c_str());
+
+		return this->ModuleInterfaces;
+	}
+
+	bool CAddon::ReadAddonDef()
+	{
+		HMODULE module = LoadLibraryA(this->Location.string().c_str());
+
+		if (!module)
+		{
+			DWORD lasterror = GetLastError();
+			const std::error_condition ecnd = std::system_category().default_error_condition(lasterror);
+			this->LogWarning(
+				"Cannot read addon definition. LoadLibrary(%s) failed: %s (%d)",
+				this->Location.string().c_str(),
+				ecnd.message().c_str(),
+				lasterror
+			);
+			return false;
+		}
+
+		GETADDONDEF_V1 getAddonDef = nullptr;
+
+		bool found = DLL::FindFunction(module, &getAddonDef, "GetAddonDef");
+
+		if (found)
+		{
+			AddonDefV1_t* addondef = getAddonDef();
+
+			if (addondef)
+			{
+				if (this->NexusAddonDefV1)
+				{
+					delete this->NexusAddonDefV1;
+					this->NexusAddonDefV1 = nullptr;
+				}
+
+				this->NexusAddonDefV1 = new AddonDefV1_t(*addondef);
+			}
+		}
+
+		if (!FreeLibrary(module))
+		{
+			DWORD lasterror = GetLastError();
+			const std::error_condition ecnd = std::system_category().default_error_condition(lasterror);
+			this->LogWarning(
+				"Cannot free library after reading addon definition. FreeLibrary(%s) failed: %s (%d)",
+				this->Location.string().c_str(),
+				ecnd.message().c_str(),
+				lasterror
+			);
+		}
+
+		return found;
+	}
+
+	bool CAddon::ShouldLoad()
+	{
+		assert(this->Config);
+
+		bool result = true;
+
+		/* Check the last state as per user prefs. But also make sure no state set yet -> Autoload. */
+		if (!this->Config->LastLoadState && this->State == Engine::EAddonState::None)
+		{
+			this->LogDebug("Canceled load. Config->LastLoadState: false. (%s)", this->Location.string().c_str());
+			result = false;
+		}
+
+		/* If first launch only. */
+		if ((this->NexusAddonDefV1->Flags & EAddonDefFlags::LaunchOnly) == EAddonDefFlags::LaunchOnly)
+		{
+			/* First launch means, state wasn't set yet. */
+			if (this->State != Engine::EAddonState::None)
+			{
+				this->Flags |= EAddonFlags::StateLocked;
+				this->LogDebug("Canceled load. Only load on initial load. (%s)", this->Location.string().c_str());
+				result = false;
+			}
+		}
+
+		/* If this version is broken and was disabled. */
+		if (this->IsVersionDisabled())
+		{
+			this->LogDebug("Canceled load. This version is disabled. (%s)", this->Location.string().c_str());
+			result = false;
+		}
+
+		/* If this addon is volatile and the change difference is greater than 350. */
+		if (this->IsVolatileDisabled())
+		{
+			this->LogDebug(
+				"Canceled load. Volatile addon and gamebuild diff is %u. (%s)",
+				GW2::GetGameBuild() - this->Config->LastGameBuild,
+				this->Location.string().c_str()
+			);
+			this->NotifyAddonState(EAddonStateNotify::VolatileDisabled, this->NexusAddonDefV1->Signature);
+			this->EventApi->Raise(EV_VOLATILE_ADDON_DISABLED, &this->NexusAddonDefV1->Signature);
+			result = false;
+		}
+
+		return result;
+	}
+
+	bool CAddon::ShouldUpdate()
+	{
+		assert(this->Config);
+
+		switch (this->Config->UpdateMode)
+		{
+			default:
+			case EUpdateMode::None:       { return false; }
+			case EUpdateMode::Background: { return false; }
+			case EUpdateMode::Notify:     { return false; }
+			case EUpdateMode::Automatic:  { return true; }
+		}
+	}
+
+	bool CAddon::IsVolatileDisabled()
+	{
+		if (!this->NexusAddonDefV1)
+		{
+			return false;
+		}
+
+		if ((this->NexusAddonDefV1->Flags & EAddonDefFlags::IsVolatile) != EAddonDefFlags::IsVolatile)
+		{
+			return false;
+		}
+
+		if (this->Config->LastGameBuild != 0 && GW2::GetGameBuild() - this->Config->LastGameBuild > 350)
+		{
+			/* FIXME: move this elsewhere maybe? rather than the check */
+			if (this->Config->DisableVersion.empty() || this->Config->DisableVersion != this->GetMD5().string())
+			{
+				this->Config->DisableVersion = this->GetMD5().string();
+				this->ConfigMgr->SaveConfigs();
+			}
+			return true;
+		}
+
+		return false;
+	}
+
+	bool CAddon::SupportsPreReleases() const
+	{
+		if (this->NexusAddonDefV1)
+		{
+			switch (this->NexusAddonDefV1->Provider)
+			{
+				case EUpdateProvider::GitHub:
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	std::string CAddon::GetProjectPageURL() const
+	{
+		if (this->NexusAddonDefV1)
+		{
+			switch (this->NexusAddonDefV1->Provider)
+			{
+				case EUpdateProvider::GitHub:
+				{
+					return this->NexusAddonDefV1->UpdateLink;
+				}
+			}
+		}
+
+		return "";
+	}
+
+	void CAddon::CheckUpdateInternal(bool aIsScheduled)
+	{
+		this->LogTrace("CAddon::CheckUpdateInternal(%s, %s)", aIsScheduled ? "scheduled" : "manual", this->Location.string().c_str());
+
+		if (this->IsUpdateAvailable())
+		{
+			/* Already checked. */
+			return;
+		}
+
+		long long now = Time::GetTimestamp();
+
+		/* Automatic internal checks. */
+		if (aIsScheduled)
+		{
+			/// Scheduled checks only run, when 
+			/// - the last scheduled check was 30 minutes ago
+			/// - this version is disabled and the last check was over 5 minutes ago
+
+			bool doCheck = false;
+
+			int64_t deltaT = now - this->LastCheckedTimestamp;
+			assert(deltaT >= 0);
+
+			if (deltaT >= SCHEDULED_UPDATE_TIMEOUT)
+			{
+				this->LogTrace(
+					"Scheduled update check: DeltaT > %us. (%s)",
+					SCHEDULED_UPDATE_TIMEOUT,
+					this->Location.string().c_str()
+				);
+				doCheck = true;
+			}
+			else if (this->IsVersionDisabled() && (deltaT >= SCHEDULED_UPDATE_TIMEOUT_VERSIONDISABLED))
+			{
+				this->LogTrace(
+					"Scheduled update check: Version disabled. DeltaT > %us. (%s)",
+					SCHEDULED_UPDATE_TIMEOUT_VERSIONDISABLED,
+					this->Location.string().c_str()
+				);
+				doCheck = true;
+			}
+
+			if (!doCheck)
+			{
+				return;
+			}
+		}
+
+		if (!this->NexusAddonDefV1)
+		{
+			this->LogWarning("Canceled update check. No Nexus addon interface. (%s)", this->Location.string().c_str());
+			return;
+		}
+
+		switch (this->NexusAddonDefV1->Provider)
+		{
+			case EUpdateProvider::Raidcore:
+			{
+				this->LogWarning("Using unimplemented provider. (%s)", this->Location.string().c_str());
+				break;
+			}
+			case EUpdateProvider::GitHub:
+			{
+				this->CheckUpdateViaGitHub();
+				break;
+			}
+			case EUpdateProvider::Direct:
+			{
+				this->CheckUpdateViaDirect();
+				break;
+			}
+			case EUpdateProvider::Self:
+			{
+				this->LogTrace("Canceled update check. Provider is self. (%s)", this->Location.string().c_str());
+				break;
+			}
+		}
+
+		this->LastCheckedTimestamp = now;
+
+		if (this->IsUpdateAvailable() && this->ShouldUpdate())
+		{
+			this->Update();
+		}
+	}
+
+	void CAddon::CheckUpdateViaGitHub()
+	{
+		assert(!this->NexusAddonDefV1->GetUpdateLink().empty());
+
+		GW2::CContext* context = GW2::CContext::GetContext();
+
+		Engine::Networking::CHttpClient* client = context->GetHttpClient("https://api.github.com");
+
+		Engine::Networking::HttpResponse_t response = client->Get("/repos" + URL::GetEndpoint(this->NexusAddonDefV1->GetUpdateLink()) + "/releases");
+
+		Config_t* config = this->GetConfig();
+
+		if (!response.Success())
+		{
+			this->LogWarning(
+				"Update check failed: Couldn't fetch releases for \"%s\".\n\tError: %s",
+				this->NexusAddonDefV1->GetUpdateLink().c_str(),
+				response.Error.c_str()
+			);
+
+			return;
+		}
+
+		std::string targetUrl;
+		Core::Version_t targetVersion{};
+
+		for (json& release : response.ContentJSON())
+		{
+			/* sanity checks */
+			if (release["prerelease"].is_null()) { continue; }
+			if (release["tag_name"].is_null()) { continue; }
+			if (release["assets"].is_null()) { continue; }
+
+			/* if pre - releases are disabled, but it is one->skip */
+			if (!config->AllowPreReleases && release["prerelease"].get<bool>()) { continue; }
+
+			std::string tagName = release["tag_name"].get<std::string>();
+			Core::Version_t version{};
+
+			try
+			{
+				version = Core::Version_t(tagName);
+			}
+			catch (...)
+			{
+				continue;
+			}
+
+			/* skip, if this release we have is the same or older than the one we had found before */
+			if (version <= targetVersion) { continue; }
+
+			for (json& asset : release["assets"])
+			{
+				/* small sanity check */
+				if (asset["name"].is_null()) { continue; }
+				if (asset["browser_download_url"].is_null()) { continue; }
+
+				if (String::EndsWith(asset["name"].get<std::string>(), ".dll"))
+				{
+					targetUrl = asset["browser_download_url"].get<std::string>();
+					targetVersion = version;
+					break;
+				}
+			}
+		}
+
+		if (targetVersion > this->NexusAddonDefV1->Version)
+		{
+			this->UpdateRemote = targetUrl;
+			this->Flags |= EAddonFlags::UpdateAvailable;
+
+			this->LogTrace(
+				"Update available for \"%s\".\n\tLocal: %s\n\tRemote: %s",
+				this->Location.string().c_str(),
+				this->NexusAddonDefV1->Version.string().c_str(),
+				targetVersion.string().c_str()
+			);
+		}
+	}
+
+	void CAddon::CheckUpdateViaDirect()
+	{
+		assert(!this->NexusAddonDefV1->GetUpdateLink().empty());
+
+		GW2::CContext* context = GW2::CContext::GetContext();
+
+		Engine::Networking::CHttpClient* client = context->GetHttpClient(this->NexusAddonDefV1->GetUpdateLink());
+
+		Engine::Networking::HttpResponse_t response = client->Get(URL::GetEndpoint(this->NexusAddonDefV1->GetUpdateLink()) + ".md5");
+
+		if (!response.Success())
+		{
+			this->LogTrace(
+				"Update check failed: Couldn't get MD5 for \"%s\" from \"%s\".\n\tError: %s\nAttempting with .md5sum.",
+				this->Location.string().c_str(),
+				this->NexusAddonDefV1->GetUpdateLink().c_str(),
+				response.Error.c_str()
+			);
+
+			response = client->Get(URL::GetEndpoint(this->NexusAddonDefV1->GetUpdateLink()) + ".md5sum");
+		}
+
+		if (!response.Success())
+		{
+			this->LogWarning(
+				"Update check failed: Couldn't get MD5 for \"%s\" from \"%s\".\n\tError: %s",
+				this->Location.string().c_str(),
+				this->NexusAddonDefV1->GetUpdateLink().c_str(),
+				response.Error.c_str()
+			);
+
+			return;
+		}
+
+		assert(response.Content.length() >= MD5_LENGTH);
+
+		std::vector<uint8_t> vmd5;
+
+		/* Interpret pairs of hex string. */
+		for (size_t i = 0; i < response.Content.length(); i += 2)
+		{
+			if (vmd5.size() >= MD5_LENGTH)
+			{
+				break; // this is not md5, we got more bytes than 16 -> abort
+			}
+
+			std::string str{};
+			str += response.Content[i];
+			str += response.Content[i + 1];
+
+			unsigned char byte = (unsigned char)strtol(str.c_str(), NULL, 16);
+
+			vmd5.push_back(byte);
+		}
+
+		Engine::MD5_t md5 = vmd5;
+
+		if (md5 != this->GetMD5())
+		{
+			this->UpdateRemote = this->NexusAddonDefV1->UpdateLink;
+			this->Flags |= EAddonFlags::UpdateAvailable;
+
+			this->LogTrace(
+				"Update available for \"%s\".\n\tLocal: %s\n\tRemote: %s",
+				this->Location.string().c_str(),
+				this->GetMD5().string().c_str(),
+				md5.string().c_str()
+			);
+		}
+	}
+
+	void CAddon::UpdateInternal()
+	{
+		this->LogTrace("CAddon::UpdateInternal(%s)", this->Location.string().c_str());
+
+		if (!this->IsUpdateAvailable())
+		{
+			this->LogDebug("Can't update. No update available. (%s)", this->Location.string().c_str());
+			return;
+		}
+
+		assert(!this->UpdateLocal.empty() || !this->UpdateRemote.empty());
+
+		/* If the update is already locally available, just apply it. */
+		if (!this->UpdateLocal.empty())
+		{
+			if (!this->ApplyLocalUpdate())
+			{
+				return;
+			}
+		}
+		else if (!this->UpdateRemote.empty())
+		{
+			if (!this->DownloadUpdate())
+			{
+				return;
+			}
+		}
+
+		this->UpdateLocal.clear();
+		this->UpdateRemote.clear();
+		this->Flags &= ~EAddonFlags::UpdateAvailable;
+
+		this->LogInfo(
+			"Updated addon. (%s)",
+			this->Location.string().c_str()
+		);
+	}
+
+	bool CAddon::ApplyLocalUpdate()
+	{
+		assert(!this->UpdateLocal.empty());
+
+		/* <GW2>/addons/Nexus/Temp/<filename>_<random>.dll.old */
+		std::filesystem::path tmpOld = GW2::Index(GW2::EPath::DIR_TEMP) / (this->Location.stem().string() + std::format("_{:08X}", rand()) + ".dll.old");
+
+		/* Try renaming .dll to .dll.old. */
+		try
+		{
+			std::filesystem::rename(this->Location, tmpOld);
+		}
+		catch (std::filesystem::filesystem_error fErr)
+		{
+			this->LogWarning(
+				"Update failed: Couldn't move \"%s\" to \"%s\".",
+				this->Location.string().c_str(),
+				tmpOld.string().c_str()
+			);
+			return false;
+		}
+
+		/* Try renaming .dll.update to .dll. */
+		try
+		{
+			std::filesystem::rename(this->UpdateLocal, this->Location);
+		}
+		catch (std::filesystem::filesystem_error fErr)
+		{
+			this->LogWarning(
+				"Update failed: Couldn't move \"%s\" to \"%s\".",
+				this->UpdateLocal.string().c_str(),
+				this->Location.string().c_str()
+			);
+
+			/* Try reverting .dll.old to .dll. */
+			try
+			{
+				std::filesystem::rename(tmpOld, this->Location);
+			}
+			catch (std::filesystem::filesystem_error fErr)
+			{
+				this->LogWarning(
+					"Update failed: Couldn't move \"%s\" to \"%s\".",
+					tmpOld.string().c_str(),
+					this->Location.string().c_str()
+				);
+				return false;
+			}
+
+			return false;
+		}
+
+		return true;
+	}
+
+	bool CAddon::DownloadUpdate()
+	{
+		assert(!this->UpdateRemote.empty());
+
+		/* <GW2>/addons/Nexus/Temp/<filename>_<random>.dll */
+		std::filesystem::path tmpDownload = GW2::Index(GW2::EPath::DIR_TEMP) / (this->Location.stem().string() + std::format("_{:08X}", rand()) + ".dll");
+
+		GW2::CContext* context = GW2::CContext::GetContext();
+
+		Engine::Networking::CHttpClient* client = context->GetHttpClient(this->UpdateRemote);
+
+		Engine::Networking::HttpResponse_t response = client->Download(tmpDownload, URL::GetEndpoint(this->UpdateRemote));
+
+		if (!response.Success())
+		{
+			this->LogWarning(
+				"Update failed: Couldn't download \"%s\" to \"%s\".\n\tError: %s",
+				this->UpdateRemote.c_str(),
+				tmpDownload.string().c_str(),
+				response.Error.c_str()
+			);
+
+			return false;
+		}
+
+		this->UpdateLocal = tmpDownload;
+		this->UpdateRemote.clear();
+
+		if (!this->ApplyLocalUpdate())
+		{
+			return false;
+		}
+
+		return true;
+	}
+}

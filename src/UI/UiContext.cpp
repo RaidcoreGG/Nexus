@@ -1,0 +1,468 @@
+///----------------------------------------------------------------------------------------------------
+/// Copyright (c) Raidcore.GG - All rights reserved.
+///
+/// Name         :  UiContext.cpp
+/// Description  :  Contains the core functionality of the User Interface.
+/// Authors      :  K. Bieniek
+///----------------------------------------------------------------------------------------------------
+
+#include "UiContext.h"
+
+#include <filesystem>
+#include <fstream>
+#include <mutex>
+#include <shellscalingapi.h>
+#include <string_view>
+#include <vector>
+
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_dx11.h"
+#include "imgui/imgui_impl_win32.h"
+#include "imgui/imgui_internal.h"
+
+#include "Host/GW2/Addons/AddConst.h"
+#include "Host/GW2/Addons/Addon.h"
+#include "Host/GW2/Context.h"
+#include "Host/GW2/Index/Index.h"
+#include "Engine/Inputs/InputBinds/IbConst.h"
+#include "Host/GW2/Inputs/GameBinds/GbConst.h"
+#include "Host/GW2/Mumble/MblConst.h"
+#include "Host/GW2/Mumble/MblReader.h"
+#include "res/Resources.h"
+#include "Util/Base64.h"
+#include "Util/Inputs.h"
+#include "Util/Strings.h"
+#include "Util/Time.h"
+
+namespace Raidcore::UI
+{
+	/*static*/ void CUiContext::OnInputBindPressed(const char* aIdentifier)
+	{
+		GW2::CContext* ctx = GW2::CContext::GetContext();
+		CUiContext* uictx = ctx->GetUIContext();
+
+		if (aIdentifier == KB_TOGGLEHIDEUI)
+		{
+			uictx->IsVisible = !uictx->IsVisible;
+		}
+	}
+
+	CUiContext::CUiContext(
+		UI::RenderContext_t*      aRenderContext,
+		UI::CTextureLoader*       aTextureService,
+		Engine::CDataLinkApi*         aDataLink,
+		Engine::Input::CInputBindApi* aInputBindApi,
+		GW2::CMumbleReader*        aMumbleReader
+	)
+		: Engine::IRefCleaner("UiContext")
+		, Core::ILogChannel("UI Context")
+	{
+		this->RenderContext  = aRenderContext;
+		this->TextureService = aTextureService;
+		this->DataLink       = aDataLink;
+		this->InputBindApi   = aInputBindApi;
+		this->MumbleReader   = aMumbleReader;
+
+		ImGui::CreateContext();
+
+		this->Language       = new UI::CLocalization();
+		this->Alerts         = new UI::CAlerts(aDataLink);
+		this->MainWindow     = new UI::CMainWindow();
+		this->QuickAccess    = new UI::CQuickAccess(aDataLink, aInputBindApi, aTextureService, this->Language);
+
+		this->FontManager    = new UI::CFontManager();
+		this->EscapeClose    = new UI::CEscapeClosing();
+		this->Scaling        = new UI::CScaling(aRenderContext, aDataLink);
+		this->Input          = new CUiInput();
+
+		this->InputBindApi->Register(KB_TOGGLEHIDEUI, Engine::Input::EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "CTRL+H");
+		this->EscapeClose->Register("Nexus", this->MainWindow->GetVisibleStatePtr());
+
+		this->ApplyStyle();
+		this->LoadFonts();
+		this->INotifyHandler<Engine::Input::IWndProcNotifyHandler>::Attach(Engine::Input::WNDPROC_PRIO_UI);
+		this->INotifyHandler<GW2::Hooks::IDxgiPresentNotifyHandler>::Attach(GW2::Hooks::DXGIPRESENT_PRIO_UI);
+		this->INotifyHandler<GW2::Hooks::IDxgiResizeNotifyHandler>::Attach(GW2::Hooks::DXGIRESIZE_PRIO_UI);
+		this->INotifyHandler<GW2::IMumbleIdentityNotifyHandler>::Attach(GW2::MUMBLEIDENTITY_PRIO_UI);
+		this->INotifyHandler<IInputBindUpdateNotifyHandler>::Attach();
+		this->INotifyHandler<UI::IFontUpdateNotifyHandler>::Attach();
+	}
+
+	CUiContext::~CUiContext()
+	{
+		this->INotifyHandler<UI::IFontUpdateNotifyHandler>::Detach();
+		this->INotifyHandler<IInputBindUpdateNotifyHandler>::Detach();
+		this->INotifyHandler<GW2::IMumbleIdentityNotifyHandler>::Detach();
+		this->INotifyHandler<GW2::Hooks::IDxgiResizeNotifyHandler>::Detach();
+		this->INotifyHandler<GW2::Hooks::IDxgiPresentNotifyHandler>::Detach();
+		this->INotifyHandler<Engine::Input::IWndProcNotifyHandler>::Detach();
+
+		ImGui::DestroyContext();
+	}
+
+	void CUiContext::Initialize()
+	{
+		if (this->IsInitialized)
+		{
+			return;
+		}
+
+		if (!(this->RenderContext->Window.Handle && this->RenderContext->SwapChain))
+		{
+			this->LogCritical("CUiContext::Initialize() failed. A RenderContext component was nullptr.");
+			return;
+		}
+
+		/* Retrieve BackBuffer. */
+		ID3D11Texture2D* pBackBuffer{};
+		this->RenderContext->SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBackBuffer);
+
+		if (!pBackBuffer)
+		{
+			this->LogCritical("CUiContext::Initialize() failed. BackBuffer was nullptr.");
+			return;
+		}
+
+		ID3D11Device* bbDevice = nullptr;
+		pBackBuffer->GetDevice(&bbDevice);
+
+		/* Retrieve Device and DeviceContext from BackBuffer. */
+		if (this->RenderContext->Device == nullptr)
+		{
+			this->RenderContext->Device = bbDevice;
+			this->RenderContext->Device->GetImmediateContext(&this->RenderContext->DeviceContext);
+		}
+
+		HRESULT hr = bbDevice->CreateRenderTargetView(pBackBuffer, NULL, &this->RenderTargetView);
+		pBackBuffer->Release();
+
+		if (!this->RenderTargetView)
+		{
+			this->LogCritical("CUiContext::Initialize() failed. RenderTargetView could not be created.");
+			return;
+		}
+
+		this->Scaling->UpdateDPI(); // Update DPI, because the HWND is now available.
+
+		// Init imgui
+		ImGui_ImplWin32_Init(this->RenderContext->Window.Handle);
+		ImGui_ImplDX11_Init(this->RenderContext->Device, this->RenderContext->DeviceContext);
+		this->FontManager->CreateDeviceObjects(this->RenderContext->Device);
+		//ImGui::GetIO().ImeWindowHandle = Renderer::WindowHandle;
+
+		this->IsInitialized = true;
+	}
+
+	void CUiContext::Shutdown()
+	{
+		if (!this->IsInitialized)
+		{
+			return;
+		}
+
+		ImGui_ImplDX11_Shutdown();
+		ImGui_ImplWin32_Shutdown();
+
+		if (this->RenderTargetView)
+		{
+			this->RenderTargetView->Release();
+			this->RenderTargetView = 0;
+		}
+
+		this->IsInitialized = false;
+	}
+
+	void CUiContext::Render()
+	{
+		this->Initialize();
+
+		/* preload localization and font changes */
+		if (this->Language->Advance())
+		{
+			this->FontManager->SetTexts(this->Language->GetActiveTexts());
+			this->Invalidate();
+		}
+		UI::EFontsUpdate fontsUpdate = this->FontManager->Advance();
+		if (fontsUpdate != UI::EFontsUpdate::None)
+		{
+			if (fontsUpdate == UI::EFontsUpdate::DefaultAtlas)
+			{
+				this->Shutdown();
+			}
+			else if (this->IsInitialized)
+			{
+				this->FontManager->CreateDeviceObjects(this->RenderContext->Device);
+			}
+		}
+
+		if (this->IsInvalid)
+		{
+			this->UpdateDisplayInputBinds();
+			this->UpdateDisplayGameBinds();
+
+			//this->Alerts->Invalidate();
+			this->MainWindow->Invalidate();
+			this->QuickAccess->Invalidate();
+
+			this->IsInvalid = false;
+		}
+
+		const std::lock_guard<std::mutex> lock(this->RenderMutex);
+
+		/* pre-render callbacks */
+		for (GUI_RENDER callback : this->GetRenderCallbacks(ERenderType::PreRender))
+		{
+			callback();
+		}
+
+		if (this->IsInitialized && this->FontManager->IsReady())
+		{
+			this->Input->FlushInput();
+
+			/* new frame */
+			ImGui_ImplWin32_NewFrame();
+			ImGui_ImplDX11_NewFrame();
+			ImGui::NewFrame();
+
+			if (this->EulaAccepted.Get())
+			{
+				/* normal overlay */
+				if (this->IsVisible)
+				{
+					/* draw addons*/
+					for (GUI_RENDER callback : this->GetRenderCallbacks(ERenderType::Render))
+					{
+						callback();
+					}
+
+					/* draw nexus windows */
+					this->Alerts->Render();
+					this->MainWindow->Render();
+					this->QuickAccess->Render();
+				}
+			}
+			else
+			{
+				/* license agreement */
+				static UI::CLicenseAgreementModal s_Modal = {};
+				static bool s_Opened = [] {
+					s_Modal.OpenModal();
+					return true;
+				}();
+
+				if (s_Modal.Render())
+				{
+					if (this->EulaAccepted.Get())
+					{
+						/* activate main window for the first time */
+						this->MainWindow->Activate();
+					}
+					else
+					{
+						PostMessageA(this->RenderContext->Window.Handle, WM_CLOSE, 0, 0);
+					}
+				}
+			}
+
+			/* end frame */
+			ImGui::EndFrame();
+			ImGui::Render();
+			this->FontManager->CollectMissingGlyphs(ImGui::GetDrawData());
+			this->RenderContext->DeviceContext->OMSetRenderTargets(1, &this->RenderTargetView, NULL);
+			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+		}
+
+		/* post-render callbacks */
+		for (GUI_RENDER callback : this->GetRenderCallbacks(ERenderType::PostRender))
+		{
+			callback();
+		}
+	}
+
+	void CUiContext::Invalidate()
+	{
+		this->IsInvalid = true;
+	}
+
+	void CUiContext::OnDxgiPresentNotify(IDXGISwapChain* aSwapChain)
+	{
+		this->Render();
+	}
+
+	void CUiContext::OnDxgiResizeNotify(IDXGISwapChain* aSwapChain, UINT aWidth, UINT aHeight)
+	{
+		this->Shutdown();
+	}
+
+	void CUiContext::OnMumbleIdentityNotify(const Mumble::Identity& aIdentity)
+	{
+		this->ApplyFontScale();
+	}
+
+	void CUiContext::OnInputBindUpdateNotify()
+	{
+		this->Invalidate();
+	}
+
+	void CUiContext::OnFontUpdateNotify(const char* aIdentifier, ImFont* aFont)
+	{
+		std::string_view id = aIdentifier;
+
+		if (id == "FONT_DEFAULT")
+		{
+			ImGui::GetIO().FontDefault = aFont;
+			return;
+		}
+
+		GW2::NexusLinkData_t* nexusLink = static_cast<GW2::NexusLinkData_t*>(this->DataLink->GetResource(GW2::DL_NEXUS_LINK));
+
+		if (!nexusLink) { return; }
+
+		if (id == "MENOMONIA")          { nexusLink->Font    = aFont; }
+		else if (id == "MENOMONIA_BIG") { nexusLink->FontBig = aFont; }
+		else if (id == "FIRASANS")      { nexusLink->FontUI  = aFont; }
+	}
+
+	UINT CUiContext::OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam)
+	{
+		if (!this->IsInitialized)
+		{
+			return uMsg;
+		}
+
+		if (this->Input->WndProc(hWnd, uMsg, wParam, lParam) == 0)
+		{
+			return 0;
+		}
+
+		if (this->EscapeClose->WndProc(hWnd, uMsg, wParam, lParam) == 0)
+		{
+			return 0;
+		}
+
+		return uMsg;
+	}
+
+	UI::CLocalization* CUiContext::GetLocalization()
+	{
+		return this->Language;
+	}
+
+	UI::CAlerts* CUiContext::GetAlerts()
+	{
+		return this->Alerts;
+	}
+
+	UI::CQuickAccess* CUiContext::GetQuickAccess()
+	{
+		return this->QuickAccess;
+	}
+
+	UI::CFontManager* CUiContext::GetFontManager()
+	{
+		return this->FontManager;
+	}
+
+	UI::CMainWindow* CUiContext::GetMainWindow()
+	{
+		return this->MainWindow;
+	}
+
+	UI::CScaling* CUiContext::GetScaling()
+	{
+		return this->Scaling;
+	}
+
+	CUiInput* CUiContext::GetInput()
+	{
+		return this->Input;
+	}
+
+	UI::CEscapeClosing* CUiContext::GetEscapeClosingService()
+	{
+		return this->EscapeClose;
+	}
+
+	/* Per UI scale: Font, FontBig, FontUI. The user font merged into each has the same size. */
+	static constexpr float s_ScaleFontSizes[4][3] =
+	{
+		{ 16.0f, 22.0f, 15.0f }, /* Small */
+		{ 18.0f, 24.0f, 16.0f }, /* Normal */
+		{ 20.0f, 26.0f, 17.5f }, /* Large */
+		{ 22.0f, 28.0f, 19.5f }  /* Larger */
+	};
+
+	static size_t GetScaleIndex(Mumble::Identity* aIdentity)
+	{
+		if (!aIdentity) { return 1; }
+
+		switch (aIdentity->UISize)
+		{
+			case Mumble::EUIScale::Small:  { return 0; }
+			case Mumble::EUIScale::Large:  { return 2; }
+			case Mumble::EUIScale::Larger: { return 3; }
+			default:                       { return 1; }
+		}
+	}
+
+	void CUiContext::ApplyFontScale()
+	{
+		const float* sizes = s_ScaleFontSizes[GetScaleIndex(static_cast<Mumble::Identity*>(this->DataLink->GetResource(GW2::DL_MUMBLE_LINK_IDENTITY)))];
+
+		this->FontManager->ResizeFont("MENOMONIA",           sizes[0]);
+		this->FontManager->ResizeFont("MENOMONIA_MERGE",     sizes[0]);
+		this->FontManager->ResizeFont("MENOMONIA_BIG",       sizes[1]);
+		this->FontManager->ResizeFont("MENOMONIA_BIG_MERGE", sizes[1]);
+		this->FontManager->ResizeFont("FIRASANS",            sizes[2]);
+		this->FontManager->ResizeFont("FIRASANS_MERGE",      sizes[2]);
+	}
+
+	void CUiContext::LoadFonts()
+	{
+		std::filesystem::path fontPath{};
+
+		this->FontManager->SetGlyphCache(GW2::Index(GW2::EPath::GlyphCache));
+
+		/* None of the embedded fonts has CJK glyphs. System fonts are not redistributed and add nothing to the binary. */
+		wchar_t windowsDir[MAX_PATH]{};
+		if (GetWindowsDirectoryW(windowsDir, MAX_PATH))
+		{
+			std::filesystem::path systemFonts = std::filesystem::path(windowsDir) / "Fonts";
+			this->FontManager->AddFallbackFont(systemFonts / "msyh.ttc");   /* Microsoft YaHei: Chinese, kana */
+			this->FontManager->AddFallbackFont(systemFonts / "malgun.ttf"); /* Malgun Gothic: Hangul */
+		}
+
+		/* add user font */
+		bool hasUserFont = false;
+		float storedFontSz = this->FontManager->FontSize.Get();
+		storedFontSz = min(max(storedFontSz, 1.0f), 50.0f);
+
+		std::string fontFile = this->FontManager->UserFont.Get();
+		if (!fontFile.empty() && std::filesystem::exists(GW2::Index(GW2::EPath::DIR_FONTS) / fontFile))
+		{
+			fontPath = GW2::Index(GW2::EPath::DIR_FONTS) / fontFile;
+			this->FontManager->ReplaceFont("FONT_DEFAULT", storedFontSz, fontPath.string().c_str(), nullptr);
+			hasUserFont = true;
+		}
+
+		/* add default font for monospace */
+		this->FontManager->AddDefaultFont();
+
+		if (!hasUserFont)
+		{
+			this->FontManager->ResizeFont("FONT_DEFAULT", storedFontSz);
+		}
+
+		ImFontConfig config;
+		config.MergeMode = true;
+
+		const float* sizes = s_ScaleFontSizes[GetScaleIndex(static_cast<Mumble::Identity*>(this->DataLink->GetResource(GW2::DL_MUMBLE_LINK_IDENTITY)))];
+
+		this->FontManager->ReplaceFont("MENOMONIA", sizes[0], Resources::FontMenomonia, nullptr);
+		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_MERGE", sizes[0], fontPath.string().c_str(), &config); }
+		this->FontManager->ReplaceFont("MENOMONIA_BIG", sizes[1], Resources::FontMenomonia, nullptr);
+		if (!fontPath.empty()) { this->FontManager->ReplaceFont("MENOMONIA_BIG_MERGE", sizes[1], fontPath.string().c_str(), &config); }
+		this->FontManager->ReplaceFont("FIRASANS", sizes[2], Resources::FontFiraSans, nullptr);
+		if (!fontPath.empty()) { this->FontManager->ReplaceFont("FIRASANS_MERGE", sizes[2], fontPath.string().c_str(), &config); }
+	}
+}
