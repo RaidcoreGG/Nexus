@@ -57,12 +57,12 @@ void CUiBinds::UpdateDisplayInputBinds()
 
 	this->DisplayInputBinds.clear();
 
-	CContext* ctx = CContext::GetContext();
-	CInputBindApi* inputBindApi = ctx->GetInputBindApi();
-	CLoader* loader = ctx->GetLoader();
+	CContext*             ctx          = CContext::GetContext();
+	Input::CInputBindApi* inputBindApi = ctx->GetInputBindApi();
+	CLoader*              loader       = ctx->GetLoader();
 
 	/* copy of all InputBinds */
-	std::map<std::string, IbMapping_t> InputBindRegistry = inputBindApi->GetRegistry();
+	std::map<std::string, Input::IbMapping_t> InputBindRegistry = inputBindApi->GetRegistry();
 
 	/* acquire categories */
 	for (auto& [identifier, inputBind] : InputBindRegistry)
@@ -93,7 +93,7 @@ void CUiBinds::UpdateDisplayInputBinds()
 			cat.Name = owner;
 			cat.InputBinds[identifier] =
 			{
-				IBToString(inputBind.Bind, true),
+				Input::IBToString(inputBind.Bind, true),
 				inputBind
 			};
 			this->DisplayInputBinds.push_back(cat);
@@ -102,7 +102,7 @@ void CUiBinds::UpdateDisplayInputBinds()
 		{
 			it->InputBinds[identifier] =
 			{
-				IBToString(inputBind.Bind, true),
+				Input::IBToString(inputBind.Bind, true),
 				inputBind
 			};
 		}
@@ -150,9 +150,9 @@ void CUiBinds::UpdateDisplayGameBinds()
 			cat.GameInputBinds[identifier] =
 			{
 				NameFrom(identifier),
-				IBToString(inputBind.Primary, true),
+				Input::IBToString(inputBind.Primary, true),
 				inputBind.Primary,
-				IBToString(inputBind.Secondary, true),
+				Input::IBToString(inputBind.Secondary, true),
 				inputBind.Secondary
 			};
 			this->DisplayGameBinds.push_back(cat);
@@ -162,9 +162,9 @@ void CUiBinds::UpdateDisplayGameBinds()
 			it->GameInputBinds[identifier] =
 			{
 				NameFrom(identifier),
-				IBToString(inputBind.Primary, true),
+				Input::IBToString(inputBind.Primary, true),
 				inputBind.Primary,
-				IBToString(inputBind.Secondary, true),
+				Input::IBToString(inputBind.Secondary, true),
 				inputBind.Secondary
 			};
 		}

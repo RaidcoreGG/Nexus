@@ -10,14 +10,17 @@
 
 #include "IbEnum.h"
 
-///----------------------------------------------------------------------------------------------------
-/// InputBindV1_t Struct
-/// 	Old Keybind struct used for backwards compatibility within APIs.
-///----------------------------------------------------------------------------------------------------
-struct InputBindV1_t
+namespace Engine::Input
 {
-	unsigned short Key;
-	bool           Alt;
-	bool           Ctrl;
-	bool           Shift;
-};
+	///----------------------------------------------------------------------------------------------------
+	/// InputBindV1_t Struct
+	/// 	Old Keybind struct used for backwards compatibility within APIs.
+	///----------------------------------------------------------------------------------------------------
+	struct InputBindV1_t
+	{
+		unsigned short Key;
+		bool           Alt;
+		bool           Ctrl;
+		bool           Shift;
+	};
+}

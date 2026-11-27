@@ -47,25 +47,24 @@ static std::span<const uint8_t> ToSpan(void* aData, size_t aSize)
 
 namespace ADDONAPI
 {
-	static bool             s_IsInitialized = false;
+	static bool                  s_IsInitialized = false;
 
-	static CDataLinkApi*    s_DataLinkApi   = nullptr;
-	static CEventApi*       s_EventApi      = nullptr;
-	static CGameBindsApi*   s_GameBindsApi  = nullptr;
-	static CInputBindApi*   s_InputBindApi  = nullptr;
-	static CRawInputApi*    s_RawInputApi   = nullptr;
-	static CLocalization*   s_Localization  = nullptr;
-	static CTextureLoader*  s_TextureApi    = nullptr;
-	static CLoader*         s_Loader        = nullptr;
-	static RenderContext_t* s_RenderCtx     = nullptr;
-	static CArcApi*         s_ArcApi        = nullptr;
+	static CDataLinkApi*         s_DataLinkApi   = nullptr;
+	static CEventApi*            s_EventApi      = nullptr;
+	static CGameBindsApi*        s_GameBindsApi  = nullptr;
+	static Input::CInputBindApi* s_InputBindApi  = nullptr;
+	static CRawInputApi*         s_RawInputApi   = nullptr;
+	static CLocalization*        s_Localization  = nullptr;
+	static CTextureLoader*       s_TextureApi    = nullptr;
+	static CLoader*              s_Loader        = nullptr;
+	static RenderContext_t*      s_RenderCtx     = nullptr;
+	static CArcApi*              s_ArcApi        = nullptr;
 
-	static CUiContext*      s_UiContext     = nullptr;
-	static CFontManager*    s_FontManager   = nullptr;
-	static CAlerts*         s_Alerts        = nullptr;
-	static CQuickAccess*    s_QuickAccess   = nullptr;
-	static CEscapeClosing*  s_EscapeClosing = nullptr;
-
+	static CUiContext*           s_UiContext     = nullptr;
+	static CFontManager*         s_FontManager   = nullptr;
+	static CAlerts*              s_Alerts        = nullptr;
+	static CQuickAccess*         s_QuickAccess   = nullptr;
+	static CEscapeClosing*       s_EscapeClosing = nullptr;
 
 	namespace DataLink
 	{
@@ -225,28 +224,28 @@ namespace ADDONAPI
 
 	namespace InputBinds
 	{
-		void RegisterWithString(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, const char* aInputBind)
+		void RegisterWithString(const char* aIdentifier, Input::INPUTBINDS_PROCESS aInputBindHandler, const char* aInputBind)
 		{
 			assert(s_InputBindApi);
-			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownAsync, aInputBindHandler, aInputBind);
+			s_InputBindApi->Register(aIdentifier, Input::EIbHandlerType::DownAsync, aInputBindHandler, aInputBind);
 		}
 
-		void RegisterWithStruct(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, InputBindV1_t aInputBind)
+		void RegisterWithStruct(const char* aIdentifier, Input::INPUTBINDS_PROCESS aInputBindHandler, Input::InputBindV1_t aInputBind)
 		{
 			assert(s_InputBindApi);
-			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownAsync, aInputBindHandler, aInputBind);
+			s_InputBindApi->Register(aIdentifier, Input::EIbHandlerType::DownAsync, aInputBindHandler, aInputBind);
 		}
 
-		void RegisterWithString2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, const char* aInputBind)
+		void RegisterWithString2(const char* aIdentifier, Input::INPUTBINDS_PROCESS2 aInputBindHandler, const char* aInputBind)
 		{
 			assert(s_InputBindApi);
-			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownReleaseAsync, aInputBindHandler, aInputBind);
+			s_InputBindApi->Register(aIdentifier, Input::EIbHandlerType::DownReleaseAsync, aInputBindHandler, aInputBind);
 		}
 
-		void RegisterWithStruct2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, InputBindV1_t aInputBind)
+		void RegisterWithStruct2(const char* aIdentifier, Input::INPUTBINDS_PROCESS2 aInputBindHandler, Input::InputBindV1_t aInputBind)
 		{
 			assert(s_InputBindApi);
-			s_InputBindApi->Register(aIdentifier, EIbHandlerType::DownReleaseAsync, aInputBindHandler, aInputBind);
+			s_InputBindApi->Register(aIdentifier, Input::EIbHandlerType::DownReleaseAsync, aInputBindHandler, aInputBind);
 		}
 
 		void InvokeInputBind(const char* aIdentifier, bool aIsRelease)

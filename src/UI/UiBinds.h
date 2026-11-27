@@ -17,10 +17,12 @@
 #include "Engine/Inputs/InputBinds/IbMapping.h"
 #include "Host/GW2/Inputs/GameBinds/GbEnum.h"
 
+namespace Input = Engine::Input;
+
 struct InputBindPacked_t
 {
-	std::string KeysText{};
-	IbMapping_t Bind    {};
+	std::string        KeysText{};
+	Input::IbMapping_t Bind    {};
 };
 
 struct InputBindCategory_t
@@ -31,12 +33,12 @@ struct InputBindCategory_t
 
 struct GameInputBindPacked_t
 {
-	std::string Name     {};
-	std::string KeysText {};
-	InputBind_t Bind     {};
+	std::string        Name     {};
+	std::string        KeysText {};
+	Input::InputBind_t Bind     {};
 
-	std::string KeysText2{};
-	InputBind_t Bind2    {};
+	std::string        KeysText2{};
+	Input::InputBind_t Bind2    {};
 };
 
 struct GameInputBindCategory_t

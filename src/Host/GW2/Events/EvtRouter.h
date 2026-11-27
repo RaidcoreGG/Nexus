@@ -13,6 +13,8 @@
 #include "Host/GW2/Inputs/GameBinds/GbNotify.h"
 #include "UI/Services/Localization/LoclNotify.h"
 
+namespace Input = Engine::Input;
+
 constexpr const char* EV_UE_KB_CH       = "EV_UNOFFICIAL_EXTRAS_KEYBIND_CHANGED";
 constexpr const char* EV_UE_LANGUAGE_CH = "EV_UNOFFICIAL_EXTRAS_LANGUAGE_CHANGED";
 

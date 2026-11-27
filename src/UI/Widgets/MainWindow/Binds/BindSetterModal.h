@@ -15,6 +15,8 @@
 #include "Engine/Inputs/InputBinds/IbBindV2.h"
 #include "Host/GW2/Inputs/GameBinds/GbEnum.h"
 
+namespace Input = Engine::Input;
+
 ///----------------------------------------------------------------------------------------------------
 /// CBindSetterModal Class
 ///----------------------------------------------------------------------------------------------------
@@ -57,13 +59,13 @@ class CBindSetterModal : public virtual IModal
 	void SetTarget(EGameBinds aBindIdentifier, bool aIsPrimary = true);
 
 	private:
-	EBindEditType Type             = EBindEditType::None;
-	std::string   NexusBindID      = {};
-	EGameBinds    GameBindID       = (EGameBinds)0;
-	std::string   PreviousBindText = {};
+	EBindEditType      Type             = EBindEditType::None;
+	std::string        NexusBindID      = {};
+	EGameBinds         GameBindID       = (EGameBinds)0;
+	std::string        PreviousBindText = {};
 
-	InputBind_t   Capture          = {};
-	std::string   BindConflict     = {};
+	Input::InputBind_t Capture          = {};
+	std::string        BindConflict     = {};
 
 	///----------------------------------------------------------------------------------------------------
 	/// SetTitle:

@@ -134,9 +134,9 @@ CRawInputApi* CContext::GetRawInputApi()
 	return &s_RawInputApi;
 }
 
-CInputBindApi* CContext::GetInputBindApi()
+Input::CInputBindApi* CContext::GetInputBindApi()
 {
-	static CInputBindApi s_InputBindApi = CInputBindApi(
+	static Input::CInputBindApi s_InputBindApi = Input::CInputBindApi(
 		this->GetEventApi(),
 		Index(EPath::InputBinds)
 	);

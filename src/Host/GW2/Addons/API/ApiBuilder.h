@@ -20,6 +20,8 @@
 #include "UI/Textures/TxQueueEntry.h"
 #include "UI/UiRender.h"
 
+namespace Input = Engine::Input;
+
 ///----------------------------------------------------------------------------------------------------
 /// ADDONAPI Namespace
 ///----------------------------------------------------------------------------------------------------
@@ -167,25 +169,25 @@ namespace ADDONAPI
 		/// RegisterWithString:
 		/// 	[Revision 1] Addon API wrapper function for Register from string.
 		///----------------------------------------------------------------------------------------------------
-		void RegisterWithString(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, const char* aInputBind);
+		void RegisterWithString(const char* aIdentifier, Input::INPUTBINDS_PROCESS aInputBindHandler, const char* aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// RegisterWithStruct:
 		/// 	[Revision 1] Addon API wrapper function for Register from struct.
 		///----------------------------------------------------------------------------------------------------
-		void RegisterWithStruct(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, InputBindV1_t aInputBind);
+		void RegisterWithStruct(const char* aIdentifier, Input::INPUTBINDS_PROCESS aInputBindHandler, Input::InputBindV1_t aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// RegisterWithString:
 		/// 	[Revision 2] Addon API wrapper function for Register from string.
 		///----------------------------------------------------------------------------------------------------
-		void RegisterWithString2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, const char* aInputBind);
+		void RegisterWithString2(const char* aIdentifier, Input::INPUTBINDS_PROCESS2 aInputBindHandler, const char* aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// RegisterWithStruct:
 		/// 	[Revision 2] Addon API wrapper function for Register from struct.
 		///----------------------------------------------------------------------------------------------------
-		void RegisterWithStruct2(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, InputBindV1_t aInputBind);
+		void RegisterWithStruct2(const char* aIdentifier, Input::INPUTBINDS_PROCESS2 aInputBindHandler, Input::InputBindV1_t aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// InvokeInputBind:

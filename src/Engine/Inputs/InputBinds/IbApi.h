@@ -23,160 +23,167 @@
 #include "IbCapture.h"
 #include "IbMapping.h"
 
-
-///----------------------------------------------------------------------------------------------------
-/// CInputBindApi Class
-///----------------------------------------------------------------------------------------------------
-class CInputBindApi : public ILogChannel, public CInputBindCapture, public virtual IRefCleaner, public IWndProcNotifyHandler, public IInputBindUpdateNotifier
+namespace Engine::Input
 {
-	public:
 	///----------------------------------------------------------------------------------------------------
-	/// ctor
+	/// CInputBindApi Class
 	///----------------------------------------------------------------------------------------------------
-	CInputBindApi(CEventApi* aEventApi, std::filesystem::path aConfigPath);
+	class CInputBindApi
+		: public ILogChannel
+		, public CInputBindCapture
+		, public virtual IRefCleaner
+		, public IWndProcNotifyHandler
+		, public IInputBindUpdateNotifier
+	{
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		CInputBindApi(CEventApi* aEventApi, std::filesystem::path aConfigPath);
 
-	///----------------------------------------------------------------------------------------------------
-	/// dtor
-	///----------------------------------------------------------------------------------------------------
-	~CInputBindApi();
+		///----------------------------------------------------------------------------------------------------
+		/// dtor
+		///----------------------------------------------------------------------------------------------------
+		~CInputBindApi();
 
-	///----------------------------------------------------------------------------------------------------
-	/// OnWndProcNotify:
-	/// 	Returns 0 if a InputBind_t was invoked.
-	///----------------------------------------------------------------------------------------------------
-	UINT OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam) override;
+		///----------------------------------------------------------------------------------------------------
+		/// OnWndProcNotify:
+		/// 	Returns 0 if a InputBind_t was invoked.
+		///----------------------------------------------------------------------------------------------------
+		UINT OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam) override;
 
-	///----------------------------------------------------------------------------------------------------
-	/// Register:
-	/// 	Generates and registers a InputBind_t from the given string with the given identifier and handler,
-	/// 	if no bind was previously stored the given one will be used.
-	///----------------------------------------------------------------------------------------------------
-	void Register(const char* aIdentifier, EIbHandlerType aInputBindHandlerType, void* aInputBindHandler, const char* aInputBind);
+		///----------------------------------------------------------------------------------------------------
+		/// Register:
+		/// 	Generates and registers a InputBind_t from the given string with the given identifier and handler,
+		/// 	if no bind was previously stored the given one will be used.
+		///----------------------------------------------------------------------------------------------------
+		void Register(const char* aIdentifier, EIbHandlerType aInputBindHandlerType, void* aInputBindHandler, const char* aInputBind);
 
-	///----------------------------------------------------------------------------------------------------
-	/// Register:
-	/// 	Registers a InputBind_t from the given struct with the given identifier and handler,
-	/// 	if no bind was previously stored the given one will be used.
-	///----------------------------------------------------------------------------------------------------
-	void Register(const char* aIdentifier, EIbHandlerType aInputBindHandlerType, void* aInputBindHandler, InputBind_t aInputBind);
+		///----------------------------------------------------------------------------------------------------
+		/// Register:
+		/// 	Registers a InputBind_t from the given struct with the given identifier and handler,
+		/// 	if no bind was previously stored the given one will be used.
+		///----------------------------------------------------------------------------------------------------
+		void Register(const char* aIdentifier, EIbHandlerType aInputBindHandlerType, void* aInputBindHandler, InputBind_t aInputBind);
 
-	///----------------------------------------------------------------------------------------------------
-	/// Deregister:
-	/// 	Deregisters a InputBindHandler from an identifier.
-	///----------------------------------------------------------------------------------------------------
-	void Deregister(const char* aIdentifier);
+		///----------------------------------------------------------------------------------------------------
+		/// Deregister:
+		/// 	Deregisters a InputBindHandler from an identifier.
+		///----------------------------------------------------------------------------------------------------
+		void Deregister(const char* aIdentifier);
 
-	///----------------------------------------------------------------------------------------------------
-	/// IsInUse:
-	/// 	Returns an empty string if InputBind_t is unused or the identifier that uses this InputBind_t.
-	///----------------------------------------------------------------------------------------------------
-	std::string IsInUse(InputBind_t aInputBind);
-	
-	///----------------------------------------------------------------------------------------------------
-	/// HasHandler:
-	/// 	Returns true if the InputBind_t with the passed identifier has a handler registered.
-	///----------------------------------------------------------------------------------------------------
-	bool HasHandler(const std::string& aIdentifier);
+		///----------------------------------------------------------------------------------------------------
+		/// IsInUse:
+		/// 	Returns an empty string if InputBind_t is unused or the identifier that uses this InputBind_t.
+		///----------------------------------------------------------------------------------------------------
+		std::string IsInUse(const InputBind_t& aInputBind);
 
-	///----------------------------------------------------------------------------------------------------
-	/// Get:
-	/// 	Gets a InputBind.
-	/// 	Returns nullptr, if it doesn't exist.
-	///----------------------------------------------------------------------------------------------------
-	const InputBind_t* Get(const std::string& aIdentifier);
+		///----------------------------------------------------------------------------------------------------
+		/// HasHandler:
+		/// 	Returns true if the InputBind_t with the passed identifier has a handler registered.
+		///----------------------------------------------------------------------------------------------------
+		bool HasHandler(const std::string& aIdentifier);
 
-	///----------------------------------------------------------------------------------------------------
-	/// Set:
-	/// 	Sets a InputBind.
-	///----------------------------------------------------------------------------------------------------
-	void Set(std::string aIdentifier, InputBind_t aInputBind);
+		///----------------------------------------------------------------------------------------------------
+		/// Get:
+		/// 	Gets a InputBind.
+		/// 	Returns nullptr, if it doesn't exist.
+		///----------------------------------------------------------------------------------------------------
+		const InputBind_t* Get(const std::string& aIdentifier);
 
-	///----------------------------------------------------------------------------------------------------
-	/// SetPassthrough:
-	/// 	Sets the passthrough state of an InputBind_t.
-	///----------------------------------------------------------------------------------------------------
-	void SetPassthrough(std::string aIdentifier, bool aPassthrough);
+		///----------------------------------------------------------------------------------------------------
+		/// Set:
+		/// 	Sets a InputBind.
+		///----------------------------------------------------------------------------------------------------
+		void Set(std::string aIdentifier, InputBind_t aInputBind);
 
-	///----------------------------------------------------------------------------------------------------
-	/// Invoke:
-	/// 	Invokes the action on the corresponding InputBind_t handler.
-	/// 	Returns true if the InputBind_t was dispatched and processing should not continue.
-	///----------------------------------------------------------------------------------------------------
-	bool Invoke(std::string aIdentifier, bool aIsRelease = false);
+		///----------------------------------------------------------------------------------------------------
+		/// SetPassthrough:
+		/// 	Sets the passthrough state of an InputBind_t.
+		///----------------------------------------------------------------------------------------------------
+		void SetPassthrough(std::string aIdentifier, bool aPassthrough);
 
-	///----------------------------------------------------------------------------------------------------
-	/// Deletes:
-	/// 	Deletes a InputBind_t entirely.
-	///----------------------------------------------------------------------------------------------------
-	void Delete(std::string aIdentifier);
+		///----------------------------------------------------------------------------------------------------
+		/// Invoke:
+		/// 	Invokes the action on the corresponding InputBind_t handler.
+		/// 	Returns true if the InputBind_t was dispatched and processing should not continue.
+		///----------------------------------------------------------------------------------------------------
+		bool Invoke(std::string aIdentifier, bool aIsRelease = false);
 
-	///----------------------------------------------------------------------------------------------------
-	/// CleanupRefs:
-	/// 	Removes all InputBindHandlers that are within the provided address space.
-	///----------------------------------------------------------------------------------------------------
-	uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
+		///----------------------------------------------------------------------------------------------------
+		/// Deletes:
+		/// 	Deletes a InputBind_t entirely.
+		///----------------------------------------------------------------------------------------------------
+		void Delete(std::string aIdentifier);
 
-	///----------------------------------------------------------------------------------------------------
-	/// GetRegistry:
-	/// 	Returns a copy of the registry.
-	///----------------------------------------------------------------------------------------------------
-	std::map<std::string, IbMapping_t> GetRegistry() const;
+		///----------------------------------------------------------------------------------------------------
+		/// CleanupRefs:
+		/// 	Removes all InputBindHandlers that are within the provided address space.
+		///----------------------------------------------------------------------------------------------------
+		uint32_t CleanupRefs(void* aStartAddress, void* aEndAddress) override;
 
-	private:
-	CEventApi*                         EventApi = nullptr;
+		///----------------------------------------------------------------------------------------------------
+		/// GetRegistry:
+		/// 	Returns a copy of the registry.
+		///----------------------------------------------------------------------------------------------------
+		std::map<std::string, IbMapping_t> GetRegistry() const;
 
-	std::filesystem::path              ConfigPath;
+		private:
+		CEventApi* EventApi = nullptr;
 
-	mutable std::mutex                 Mutex;
-	std::map<std::string, IbMapping_t> Registry;
-	std::map<std::string, InputBind_t> HeldInputBinds;
+		std::filesystem::path              ConfigPath;
 
-	///----------------------------------------------------------------------------------------------------
-	/// LoadSafe:
-	/// 	Loads the InputBinds. Threadafe.
-	///----------------------------------------------------------------------------------------------------
-	void LoadSafe();
+		mutable std::mutex                 Mutex;
+		std::map<std::string, IbMapping_t> Registry;
+		std::map<std::string, InputBind_t> HeldInputBinds;
 
-	///----------------------------------------------------------------------------------------------------
-	/// Load:
-	/// 	Loads the InputBinds. Not threadsafe.
-	///----------------------------------------------------------------------------------------------------
-	void Load();
+		///----------------------------------------------------------------------------------------------------
+		/// LoadSafe:
+		/// 	Loads the InputBinds. Threadafe.
+		///----------------------------------------------------------------------------------------------------
+		void LoadSafe();
 
-	///----------------------------------------------------------------------------------------------------
-	/// SaveSafe:
-	/// 	Saves the InputBinds. Threadafe.
-	///----------------------------------------------------------------------------------------------------
-	void SaveSafe();
+		///----------------------------------------------------------------------------------------------------
+		/// Load:
+		/// 	Loads the InputBinds. Not threadsafe.
+		///----------------------------------------------------------------------------------------------------
+		void Load();
 
-	///----------------------------------------------------------------------------------------------------
-	/// Save:
-	/// 	Saves the InputBinds. Not threadsafe.
-	///----------------------------------------------------------------------------------------------------
-	void Save();
+		///----------------------------------------------------------------------------------------------------
+		/// SaveSafe:
+		/// 	Saves the InputBinds. Threadafe.
+		///----------------------------------------------------------------------------------------------------
+		void SaveSafe();
 
-	///----------------------------------------------------------------------------------------------------
-	/// Press:
-	/// 	Invokes an InputBind_t that matches the pressed inputs.
-	/// 	Returns true if a bind was found and invoked.
-	///----------------------------------------------------------------------------------------------------
-	bool Press(const InputBind_t& aInputBind);
+		///----------------------------------------------------------------------------------------------------
+		/// Save:
+		/// 	Saves the InputBinds. Not threadsafe.
+		///----------------------------------------------------------------------------------------------------
+		void Save();
 
-	///----------------------------------------------------------------------------------------------------
-	/// Release:
-	/// 	Releases all InputBinds matching the criteria and invokes a release.
-	///----------------------------------------------------------------------------------------------------
-	void Release(unsigned int aModifierVK);
+		///----------------------------------------------------------------------------------------------------
+		/// Press:
+		/// 	Invokes an InputBind_t that matches the pressed inputs.
+		/// 	Returns true if a bind was found and invoked.
+		///----------------------------------------------------------------------------------------------------
+		bool Press(const InputBind_t& aInputBind);
 
-	///----------------------------------------------------------------------------------------------------
-	/// Release:
-	/// 	Releases all InputBinds matching the criteria and invokes a release.
-	///----------------------------------------------------------------------------------------------------
-	void Release(EInputDevice aDevice, unsigned short aCode);
+		///----------------------------------------------------------------------------------------------------
+		/// Release:
+		/// 	Releases all InputBinds matching the criteria and invokes a release.
+		///----------------------------------------------------------------------------------------------------
+		void Release(unsigned int aModifierVK);
 
-	///----------------------------------------------------------------------------------------------------
-	/// ReleaseAll:
-	/// 	Releases all currently held InputBinds and invokes a release.
-	///----------------------------------------------------------------------------------------------------
-	void ReleaseAll();
-};
+		///----------------------------------------------------------------------------------------------------
+		/// Release:
+		/// 	Releases all InputBinds matching the criteria and invokes a release.
+		///----------------------------------------------------------------------------------------------------
+		void Release(EInputDevice aDevice, unsigned short aCode);
+
+		///----------------------------------------------------------------------------------------------------
+		/// ReleaseAll:
+		/// 	Releases all currently held InputBinds and invokes a release.
+		///----------------------------------------------------------------------------------------------------
+		void ReleaseAll();
+	};
+}

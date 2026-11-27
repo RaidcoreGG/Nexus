@@ -22,14 +22,16 @@
 #include "UI/Textures/TxQueueEntry.h"
 #include "UI/UiRender.h"
 
+namespace Input = Engine::Input;
+
 typedef void* (*DATALINK_GETRESOURCE)  (const char* aIdentifier);
 typedef void* (*DATALINK_SHARERESOURCE)(const char* aIdentifier, size_t aResourceSize);
 
 typedef void (*EVENTS_RAISE)    (const char* aIdentifier, void* aEventData);
 typedef void (*EVENTS_SUBSCRIBE)(const char* aIdentifier, EVENT_CONSUME aConsumeEventCallback);
 
-typedef void (*INPUTBINDS_REGISTERWITHSTRING)(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, const char* aInputBind);
-typedef void (*INPUTBINDS_REGISTERWITHSTRUCT)(const char* aIdentifier, INPUTBINDS_PROCESS aInputBindHandler, InputBindV1_t aInputBind);
+typedef void (*INPUTBINDS_REGISTERWITHSTRING)(const char* aIdentifier, Input::INPUTBINDS_PROCESS aInputBindHandler, const char* aInputBind);
+typedef void (*INPUTBINDS_REGISTERWITHSTRUCT)(const char* aIdentifier, Input::INPUTBINDS_PROCESS aInputBindHandler, Input::InputBindV1_t aInputBind);
 typedef void (*INPUTBINDS_DEREGISTER)        (const char* aIdentifier);
 
 typedef void (*WNDPROC_ADDREM)(WNDPROC_CALLBACK aWndProcCallback);

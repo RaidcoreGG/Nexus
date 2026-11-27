@@ -10,30 +10,33 @@
 
 #include "Engine/Notifier/Notifier.h"
 
-///----------------------------------------------------------------------------------------------------
-/// IInputBindUpdateNotifyHandler Interface
-///----------------------------------------------------------------------------------------------------
-class IInputBindUpdateNotifyHandler : public INotifyHandler<IInputBindUpdateNotifyHandler>
+namespace Engine::Input
 {
-	public:
 	///----------------------------------------------------------------------------------------------------
-	/// OnInputBindUpdateNotify:
-	/// 	Called after an input bind or game bind was set, registered or deleted.
+	/// IInputBindUpdateNotifyHandler Interface
 	///----------------------------------------------------------------------------------------------------
-	virtual void OnInputBindUpdateNotify() = 0;
-};
-
-///----------------------------------------------------------------------------------------------------
-/// IInputBindUpdateNotifier Interface
-///----------------------------------------------------------------------------------------------------
-class IInputBindUpdateNotifier : public INotifier<IInputBindUpdateNotifyHandler>
-{
-	protected:
-	void NotifyInputBindUpdate()
+	class IInputBindUpdateNotifyHandler : public INotifyHandler<IInputBindUpdateNotifyHandler>
 	{
-		for (const auto& entry : this->Subscribers())
+		public:
+		///----------------------------------------------------------------------------------------------------
+		/// OnInputBindUpdateNotify:
+		/// 	Called after an input bind or game bind was set, registered or deleted.
+		///----------------------------------------------------------------------------------------------------
+		virtual void OnInputBindUpdateNotify() = 0;
+	};
+
+	///----------------------------------------------------------------------------------------------------
+	/// IInputBindUpdateNotifier Interface
+	///----------------------------------------------------------------------------------------------------
+	class IInputBindUpdateNotifier : public INotifier<IInputBindUpdateNotifyHandler>
+	{
+		protected:
+		void NotifyInputBindUpdate()
 		{
-			entry.Subscriber->OnInputBindUpdateNotify();
+			for (const auto& entry : this->Subscribers())
+			{
+				entry.Subscriber->OnInputBindUpdateNotify();
+			}
 		}
-	}
-};
+	};
+}

@@ -33,6 +33,8 @@
 #include "UI/Textures/TxLoader.h"
 #include "UI/UiContext.h"
 
+namespace Input = Engine::Input;
+
 class CContext
 {
 	public:
@@ -69,7 +71,7 @@ class CContext
 
 	CRawInputApi* GetRawInputApi();
 
-	CInputBindApi* GetInputBindApi();
+	Input::CInputBindApi* GetInputBindApi();
 
 	CGameBindsApi* GetGameBindsApi();
 

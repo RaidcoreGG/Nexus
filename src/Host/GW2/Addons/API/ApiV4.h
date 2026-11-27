@@ -18,8 +18,10 @@
 #include "ApiV3.h"
 #include "UI/Services/Fonts/FontManager.h"
 
-typedef void (*INPUTBINDS_REGISTERWITHSTRING2)(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, const char* aInputBind);
-typedef void (*INPUTBINDS_REGISTERWITHSTRUCT2)(const char* aIdentifier, INPUTBINDS_PROCESS2 aInputBindHandler, InputBindV1_t aInputBind);
+namespace Input = Engine::Input;
+
+typedef void (*INPUTBINDS_REGISTERWITHSTRING2)(const char* aIdentifier, Input::INPUTBINDS_PROCESS2 aInputBindHandler, const char* aInputBind);
+typedef void (*INPUTBINDS_REGISTERWITHSTRUCT2)(const char* aIdentifier, Input::INPUTBINDS_PROCESS2 aInputBindHandler, Input::InputBindV1_t aInputBind);
 
 typedef void (*FONTS_GETRELEASE)     (const char* aIdentifier, FONTS_RECEIVECALLBACK aCallback);
 typedef void (*FONTS_ADDFROMFILE)    (const char* aIdentifier, float aFontSize, const char* aFilename, FONTS_RECEIVECALLBACK aCallback, ImFontConfig* aConfig);

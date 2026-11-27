@@ -21,11 +21,13 @@
 #define GW2_QUICKACCESS_ITEMS 10;
 
 CQuickAccess::CQuickAccess(
-	CDataLinkApi*   aDataLink,
-	CInputBindApi*  aInputBindApi,
-	CTextureLoader* aTextureService,
-	CLocalization*  aLocalization
-) : IRefCleaner("QuickAccess"), ILogChannel("Quick Access")
+	CDataLinkApi*          aDataLink,
+	Input::CInputBindApi*  aInputBindApi,
+	CTextureLoader*        aTextureService,
+	CLocalization*         aLocalization
+) 
+	: IRefCleaner("Quick Access")
+	, ILogChannel("Quick Access")
 {
 	this->InputBindApi   = aInputBindApi;
 	this->TextureService = aTextureService;

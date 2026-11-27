@@ -33,9 +33,9 @@ namespace UnofficialExtras
 		Key_t      Bind;
 	};
 
-	static InputBind_t ToInputBind(const Key_t& aKey)
+	static Input::InputBind_t ToInputBind(const Key_t& aKey)
 	{
-		InputBind_t ib{};
+		Input::InputBind_t ib{};
 
 		if (aKey.DeviceType != 1 && aKey.DeviceType != 2) { return ib; }
 
@@ -45,12 +45,12 @@ namespace UnofficialExtras
 
 		if (aKey.DeviceType == 2)
 		{
-			ib.Device = EInputDevice::Keyboard;
+			ib.Device = Input::EInputDevice::Keyboard;
 			ib.Code   = GameScanCodeToScanCode(aKey.Code);
 			return ib;
 		}
 
-		ib.Device = EInputDevice::Mouse;
+		ib.Device = Input::EInputDevice::Mouse;
 
 		switch (aKey.Code)
 		{

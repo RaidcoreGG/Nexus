@@ -71,8 +71,8 @@ void CMainWindow::OnAddonStateNotify(EAddonStateNotify aState, uint32_t aSignatu
 
 CMainWindow::CMainWindow()
 {
-	CContext*      ctx    = CContext::GetContext();
-	CInputBindApi* ibapi  = ctx->GetInputBindApi();
+	CContext*             ctx    = CContext::GetContext();
+	Input::CInputBindApi* ibapi  = ctx->GetInputBindApi();
 
 	CAddonsWindow*  addonsWnd  = new CAddonsWindow();
 	COptionsWindow* optionsWnd = new COptionsWindow();
@@ -89,11 +89,11 @@ CMainWindow::CMainWindow()
 	this->AddWindow(aboutWnd);
 
 	/* register InputBinds */
-	ibapi->Register(KB_MENU,    EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "CTRL+O");
-	ibapi->Register(KB_ADDONS,  EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
-	ibapi->Register(KB_OPTIONS, EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
-	ibapi->Register(KB_LOG,     EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
-	ibapi->Register(KB_DEBUG,   EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
+	ibapi->Register(KB_MENU,    Input::EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "CTRL+O");
+	ibapi->Register(KB_ADDONS,  Input::EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
+	ibapi->Register(KB_OPTIONS, Input::EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
+	ibapi->Register(KB_LOG,     Input::EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
+	ibapi->Register(KB_DEBUG,   Input::EIbHandlerType::DownAsync, CMainWindow::OnInputBind, "(null)");
 
 	if (s_MainWindow)
 	{

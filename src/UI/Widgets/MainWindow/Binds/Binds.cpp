@@ -195,7 +195,7 @@ void CBindsWindow::RenderInputBindsTable(std::unordered_map<std::string, InputBi
 			ImGui::TableSetColumnIndex(2);
 			if (ImGui::Checkbox(("##Passthrough_" + identifier).c_str(), &inputBind.Bind.Passthrough))
 			{
-				CInputBindApi* ibapi = ctx->GetInputBindApi();
+				Input::CInputBindApi* ibapi = ctx->GetInputBindApi();
 				ibapi->SetPassthrough(identifier, inputBind.Bind.Passthrough);
 			}
 			ImGui::TooltipGeneric(Lang::Binds::PassThrough.Text());
@@ -256,8 +256,8 @@ void CBindsWindow::DeleteStaleBind(const std::string& aIdentifier)
 {
 	if (aIdentifier.empty()) { return; }
 
-	CContext*      ctx          = CContext::GetContext();
-	CInputBindApi* inputBindApi = ctx->GetInputBindApi();
+	CContext*             ctx          = CContext::GetContext();
+	Input::CInputBindApi* inputBindApi = ctx->GetInputBindApi();
 
 	inputBindApi->Delete(aIdentifier);
 }

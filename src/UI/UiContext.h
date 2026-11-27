@@ -38,6 +38,8 @@
 #include "UiStyle.h"
 #include "Util/Inputs.h"
 
+namespace Input = Engine::Input;
+
 constexpr const char* KB_MENU            = "KB_MENU";
 constexpr const char* KB_ADDONS          = "KB_ADDONS";
 constexpr const char* KB_OPTIONS         = "KB_OPTIONS";
@@ -58,7 +60,7 @@ class CUiContext
 	, public IDxgiPresentNotifyHandler
 	, public IDxgiResizeNotifyHandler
 	, public IMumbleIdentityNotifyHandler
-	, public IInputBindUpdateNotifyHandler
+	, public Input::IInputBindUpdateNotifyHandler
 	, public IFontUpdateNotifyHandler
 {
 	public:
@@ -72,11 +74,11 @@ class CUiContext
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
 	CUiContext(
-		RenderContext_t* aRenderContext,
-		CTextureLoader*  aTextureService,
-		CDataLinkApi*    aDataLink,
-		CInputBindApi*   aInputBindApi,
-		CMumbleReader*   aMumbleReader
+		RenderContext_t*      aRenderContext,
+		CTextureLoader*       aTextureService,
+		CDataLinkApi*         aDataLink,
+		Input::CInputBindApi* aInputBindApi,
+		CMumbleReader*        aMumbleReader
 	);
 
 	///----------------------------------------------------------------------------------------------------
@@ -211,7 +213,7 @@ class CUiContext
 	CLocalization*          Language       = nullptr;
 	CTextureLoader*         TextureService = nullptr;
 	CDataLinkApi*           DataLink       = nullptr;
-	CInputBindApi*          InputBindApi   = nullptr;
+	Input::CInputBindApi*   InputBindApi   = nullptr;
 	CMumbleReader*          MumbleReader   = nullptr;
 
 	/* Rendering */

@@ -31,6 +31,8 @@
 #include "UI/Textures/TxLoader.h"
 #include "UI/UiRender.h"
 
+namespace Input = Engine::Input;
+
 constexpr const char* QA_MENU                    = "!Nexus";
 constexpr const char* ICON_NEXUS                 = "ICON_NEXUS";
 constexpr const char* ICON_NEXUS_HOVER           = "ICON_NEXUS_HOVER";
@@ -49,7 +51,7 @@ class CQuickAccess : public ILogChannel, public virtual IWindow, public virtual 
 	///----------------------------------------------------------------------------------------------------
 	/// ctor
 	///----------------------------------------------------------------------------------------------------
-	CQuickAccess(CDataLinkApi* aDataLink, CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization);
+	CQuickAccess(CDataLinkApi* aDataLink, Input::CInputBindApi* aInputBindApi, CTextureLoader* aTextureService, CLocalization* aLocalization);
 
 	///----------------------------------------------------------------------------------------------------
 	/// dtor
@@ -129,7 +131,7 @@ class CQuickAccess : public ILogChannel, public virtual IWindow, public virtual 
 	void OnAddonStateNotify(EAddonStateNotify aState, uint32_t aSignature) override;
 
 	private:
-	CInputBindApi*                        InputBindApi       {};
+	Input::CInputBindApi*                 InputBindApi       {};
 	CTextureLoader*                       TextureService     {};
 	CLocalization*                        Language           {};
 

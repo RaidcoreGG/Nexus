@@ -23,6 +23,8 @@
 #include "UI/Textures/TxTexture.h"
 #include "UI/UiRender.h"
 
+namespace Input = Engine::Input;
+
 ///----------------------------------------------------------------------------------------------------
 /// ContextItem_t Struct
 ///----------------------------------------------------------------------------------------------------
@@ -125,7 +127,7 @@ class CShortcutIcon : public virtual IRefCleaner
 	private:
 	std::string                          ID             = "";
 
-	CInputBindApi*                       InputBindApi   = nullptr;
+	Input::CInputBindApi*                InputBindApi   = nullptr;
 	CTextureLoader*                      TextureService = nullptr;
 	CLoader*                             Loader         = nullptr;
 	CDataLinkApi*                        DataLink       = nullptr;

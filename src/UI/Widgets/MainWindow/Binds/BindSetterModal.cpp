@@ -20,13 +20,13 @@ CBindSetterModal::CBindSetterModal()
 
 void CBindSetterModal::RenderContent()
 {
-	CContext*      ctx   = CContext::GetContext();
-	CInputBindApi* ibapi = ctx->GetInputBindApi();
+	CContext*             ctx   = CContext::GetContext();
+	Input::CInputBindApi* ibapi = ctx->GetInputBindApi();
 
 	this->Capture = ibapi->GetCapture();
 
 	/* Display current bind text, if no capture yet. */
-	if (this->Capture == InputBind_t{})
+	if (this->Capture == Input::InputBind_t{})
 	{
 		ImGui::Text(this->PreviousBindText.c_str());
 	}
@@ -70,20 +70,20 @@ void CBindSetterModal::RenderContent()
 
 void CBindSetterModal::OnOpening()
 {
-	CContext*      ctx   = CContext::GetContext();
-	CInputBindApi* ibapi = ctx->GetInputBindApi();
-	CGameBindsApi* gbapi = ctx->GetGameBindsApi();
+	CContext*             ctx   = CContext::GetContext();
+	Input::CInputBindApi* ibapi = ctx->GetInputBindApi();
+	CGameBindsApi*        gbapi = ctx->GetGameBindsApi();
 
 	/* Fetch display text. */
 	switch (this->Type)
 	{
 		case EBindEditType::Nexus:
 		{
-			const InputBind_t* ib = ibapi->Get(this->NexusBindID);
+			const Input::InputBind_t* ib = ibapi->Get(this->NexusBindID);
 
 			assert(ib != nullptr);
 
-			this->PreviousBindText = IBToString(*ib, true);
+			this->PreviousBindText = Input::IBToString(*ib, true);
 			break;
 		}
 		case EBindEditType::Game:
@@ -92,7 +92,7 @@ void CBindSetterModal::OnOpening()
 
 			assert(gb != nullptr);
 
-			this->PreviousBindText = IBToString(gb->Primary, true);
+			this->PreviousBindText = Input::IBToString(gb->Primary, true);
 			break;
 		}
 		case EBindEditType::Game2:
@@ -101,7 +101,7 @@ void CBindSetterModal::OnOpening()
 
 			assert(gb != nullptr);
 
-			this->PreviousBindText = IBToString(gb->Secondary, true);
+			this->PreviousBindText = Input::IBToString(gb->Secondary, true);
 			break;
 		}
 	}
@@ -111,9 +111,9 @@ void CBindSetterModal::OnOpening()
 
 void CBindSetterModal::OnClosing()
 {
-	CContext*      ctx   = CContext::GetContext();
-	CInputBindApi* ibapi = ctx->GetInputBindApi();
-	CGameBindsApi* gbapi = ctx->GetGameBindsApi();
+	CContext*             ctx   = CContext::GetContext();
+	Input::CInputBindApi* ibapi = ctx->GetInputBindApi();
+	CGameBindsApi*        gbapi = ctx->GetGameBindsApi();
 	ibapi->EndCapturing();
 
 	switch (this->GetResult())
@@ -128,7 +128,7 @@ void CBindSetterModal::OnClosing()
 					if (!this->BindConflict.empty())
 					{
 						/* unset the bind that's currently using this wombo combo */
-						ibapi->Set(this->BindConflict, InputBind_t{});
+						ibapi->Set(this->BindConflict, Input::InputBind_t{});
 					}
 
 					ibapi->Set(this->NexusBindID, this->Capture);
@@ -155,17 +155,17 @@ void CBindSetterModal::OnClosing()
 			{
 				case EBindEditType::Nexus:
 				{
-					ibapi->Set(this->NexusBindID, InputBind_t{});
+					ibapi->Set(this->NexusBindID, Input::InputBind_t{});
 					break;
 				}
 				case EBindEditType::Game:
 				{
-					gbapi->Set(this->GameBindID, InputBind_t{}, true, false);
+					gbapi->Set(this->GameBindID, Input::InputBind_t{}, true, false);
 					break;
 				}
 				case EBindEditType::Game2:
 				{
-					gbapi->Set(this->GameBindID, InputBind_t{}, false, false);
+					gbapi->Set(this->GameBindID, Input::InputBind_t{}, false, false);
 					break;
 				}
 			}

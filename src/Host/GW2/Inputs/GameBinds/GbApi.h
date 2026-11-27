@@ -22,6 +22,8 @@
 #include "Core/Logging/LogChannel.h"
 #include "UI/Renderer/RdrContext.h"
 
+namespace Input = Engine::Input;
+
 #define WM_PASSTHROUGH_FIRST WM_USER + 7997
 #define WM_PASSTHROUGH_LAST  WM_USER + 7997 + WM_USER - 1
 
@@ -30,8 +32,8 @@
 ///----------------------------------------------------------------------------------------------------
 struct MultiInputBind_t
 {
-	InputBind_t Primary;
-	InputBind_t Secondary;
+	Input::InputBind_t Primary;
+	Input::InputBind_t Secondary;
 };
 
 ///----------------------------------------------------------------------------------------------------
@@ -41,7 +43,7 @@ class CGameBindsApi
 	: public ILogChannel
 	, public IWndProcNotifyHandler
 	, public IGameBindChangedNotifyHandler
-	, public IInputBindUpdateNotifier
+	, public Input::IInputBindUpdateNotifier
 {
 	public:
 	///----------------------------------------------------------------------------------------------------
@@ -68,7 +70,7 @@ class CGameBindsApi
 	/// OnGameBindChangedNotify:
 	/// 	Applies a game bind changed in the game as a runtime bind and refreshes the UI.
 	///----------------------------------------------------------------------------------------------------
-	void OnGameBindChangedNotify(EGameBinds aGameBind, const InputBind_t& aInputBind, bool aIsPrimary) override;
+	void OnGameBindChangedNotify(EGameBinds aGameBind, const Input::InputBind_t& aInputBind, bool aIsPrimary) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// SendWndProcToGame:
@@ -130,7 +132,7 @@ class CGameBindsApi
 	/// Set:
 	/// 	Sets a game bind.
 	///----------------------------------------------------------------------------------------------------
-	void Set(EGameBinds aGameBind, InputBind_t aInputBind, bool aIsPrimary, bool aIsRuntimeBind);
+	void Set(EGameBinds aGameBind, Input::InputBind_t aInputBind, bool aIsPrimary, bool aIsRuntimeBind);
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetRegistry:

@@ -46,12 +46,14 @@
 }
 
 CUiContext::CUiContext(
-	RenderContext_t* aRenderContext,
-	CTextureLoader*  aTextureService,
-	CDataLinkApi*    aDataLink,
-	CInputBindApi*   aInputBindApi,
-	CMumbleReader*   aMumbleReader
-) : IRefCleaner("UiContext"), ILogChannel("UI Context")
+	RenderContext_t*      aRenderContext,
+	CTextureLoader*       aTextureService,
+	CDataLinkApi*         aDataLink,
+	Input::CInputBindApi* aInputBindApi,
+	CMumbleReader*        aMumbleReader
+)
+	: IRefCleaner("UiContext")
+	, ILogChannel("UI Context")
 {
 	this->RenderContext  = aRenderContext;
 	this->TextureService = aTextureService;
@@ -71,7 +73,7 @@ CUiContext::CUiContext(
 	this->Scaling        = new CScaling(aRenderContext, aDataLink);
 	this->Input          = new CUiInput();
 
-	this->InputBindApi->Register(KB_TOGGLEHIDEUI, EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "CTRL+H");
+	this->InputBindApi->Register(KB_TOGGLEHIDEUI, Input::EIbHandlerType::DownAsync, CUiContext::OnInputBindPressed, "CTRL+H");
 	this->EscapeClose->Register("Nexus", this->MainWindow->GetVisibleStatePtr());
 	
 	this->ApplyStyle();
