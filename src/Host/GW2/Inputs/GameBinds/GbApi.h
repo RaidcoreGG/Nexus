@@ -15,7 +15,7 @@
 #include "GbEnum.h"
 
 #include "Engine/Events/EvtApi.h"
-#include "Engine/Inputs/InputBinds/IbBindV2.h"
+#include "Engine/Inputs/InputBinds/IbBind.h"
 #include "Engine/Inputs/InputBinds/IbNotify.h"
 #include "GbNotify.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
@@ -32,8 +32,8 @@ namespace Input = Engine::Input;
 ///----------------------------------------------------------------------------------------------------
 struct MultiInputBind_t
 {
-	Input::InputBind_t Primary;
-	Input::InputBind_t Secondary;
+	Input::Bind_t Primary;
+	Input::Bind_t Secondary;
 };
 
 ///----------------------------------------------------------------------------------------------------
@@ -70,7 +70,7 @@ class CGameBindsApi
 	/// OnGameBindChangedNotify:
 	/// 	Applies a game bind changed in the game as a runtime bind and refreshes the UI.
 	///----------------------------------------------------------------------------------------------------
-	void OnGameBindChangedNotify(EGameBinds aGameBind, const Input::InputBind_t& aInputBind, bool aIsPrimary) override;
+	void OnGameBindChangedNotify(EGameBinds aGameBind, const Input::Bind_t& aInputBind, bool aIsPrimary) override;
 
 	///----------------------------------------------------------------------------------------------------
 	/// SendWndProcToGame:
@@ -117,7 +117,7 @@ class CGameBindsApi
 
 	///----------------------------------------------------------------------------------------------------
 	/// IsBound:
-	/// 	Returns whether a game bind has a InputBind_t set or not.
+	/// 	Returns whether a game bind has a Bind_t set or not.
 	///----------------------------------------------------------------------------------------------------
 	bool IsBound(EGameBinds aGameBind);
 
@@ -132,7 +132,7 @@ class CGameBindsApi
 	/// Set:
 	/// 	Sets a game bind.
 	///----------------------------------------------------------------------------------------------------
-	void Set(EGameBinds aGameBind, Input::InputBind_t aInputBind, bool aIsPrimary, bool aIsRuntimeBind);
+	void Set(EGameBinds aGameBind, Input::Bind_t aInputBind, bool aIsPrimary, bool aIsRuntimeBind);
 
 	///----------------------------------------------------------------------------------------------------
 	/// GetRegistry:

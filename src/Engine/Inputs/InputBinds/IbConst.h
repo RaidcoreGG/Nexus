@@ -10,19 +10,19 @@
 
 #include <string>
 
-#include "IbBindV2.h"
+#include "IbBind.h"
 
 namespace Engine::Input
 {
 	///----------------------------------------------------------------------------------------------------
 	/// IBFromString:
-	/// 	Helper function to create a InputBind_t from a string.
+	/// 	Helper function to create a Bind_t from a string.
 	///----------------------------------------------------------------------------------------------------
-	InputBind_t IBFromString(std::string aInputBind);
+	Bind_t IBFromString(std::string aInputBind);
 
 	///----------------------------------------------------------------------------------------------------
 	/// IBToString:
-	/// 	Helper function to get the display string of a InputBind_t.
+	/// 	Helper function to get the display string of a Bind_t.
 	///----------------------------------------------------------------------------------------------------
-	std::string IBToString(const InputBind_t& aKebyind, bool aPadded = false);
+	std::string IBToString(const Bind_t& aKebyind, bool aPadded = false);
 }

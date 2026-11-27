@@ -12,7 +12,7 @@
 
 #include "UI/Controls/CtlModal.h"
 #include "UI/UiBinds.h"
-#include "Engine/Inputs/InputBinds/IbBindV2.h"
+#include "Engine/Inputs/InputBinds/IbBind.h"
 #include "Host/GW2/Inputs/GameBinds/GbEnum.h"
 
 namespace Input = Engine::Input;
@@ -64,7 +64,7 @@ class CBindSetterModal : public virtual IModal
 	EGameBinds         GameBindID       = (EGameBinds)0;
 	std::string        PreviousBindText = {};
 
-	Input::InputBind_t Capture          = {};
+	Input::Bind_t Capture          = {};
 	std::string        BindConflict     = {};
 
 	///----------------------------------------------------------------------------------------------------

@@ -12,7 +12,7 @@
 #include <iterator>
 
 #include "Host/GW2/Inputs/GameBinds/GbConst.h"
-#include "Util/Inputs.h"
+#include "Engine/Inputs/InputBinds/IbEnum.h"
 
 /* The event callbacks carry no context. */
 static CEventRouter* s_EventRouter{};
@@ -33,32 +33,30 @@ namespace UnofficialExtras
 		Key_t      Bind;
 	};
 
-	static Input::InputBind_t ToInputBind(const Key_t& aKey)
+	static Input::Bind_t ToInputBind(const Key_t& aKey)
 	{
-		Input::InputBind_t ib{};
+		Input::Bind_t ib{};
 
 		if (aKey.DeviceType != 1 && aKey.DeviceType != 2) { return ib; }
 
-		ib.Alt   = aKey.Modifiers & 0b0100;
-		ib.Ctrl  = aKey.Modifiers & 0b0010;
-		ib.Shift = aKey.Modifiers & 0b0001;
+		ib.Modifiers = static_cast<Input::EModifiers>(aKey.Modifiers);
 
 		if (aKey.DeviceType == 2)
 		{
-			ib.Device = Input::EInputDevice::Keyboard;
+			ib.Device = Input::EDevice::Keyboard;
 			ib.Code   = GameScanCodeToScanCode(aKey.Code);
 			return ib;
 		}
 
-		ib.Device = Input::EInputDevice::Mouse;
+		ib.Device = Input::EDevice::Mouse;
 
 		switch (aKey.Code)
 		{
-			case 0: { ib.Code = (unsigned short)EMouseButtons::LMB; break; }
-			case 1: { ib.Code = (unsigned short)EMouseButtons::MMB; break; }
-			case 2: { ib.Code = (unsigned short)EMouseButtons::RMB; break; }
-			case 3: { ib.Code = (unsigned short)EMouseButtons::M4;  break; }
-			case 4: { ib.Code = (unsigned short)EMouseButtons::M5;  break; }
+			case 0: { ib.Code = static_cast<uint16_t>(Input::EMouseButtons::LMB); break; }
+			case 1: { ib.Code = static_cast<uint16_t>(Input::EMouseButtons::MMB); break; }
+			case 2: { ib.Code = static_cast<uint16_t>(Input::EMouseButtons::RMB); break; }
+			case 3: { ib.Code = static_cast<uint16_t>(Input::EMouseButtons::M4);  break; }
+			case 4: { ib.Code = static_cast<uint16_t>(Input::EMouseButtons::M5);  break; }
 		}
 
 		return ib;

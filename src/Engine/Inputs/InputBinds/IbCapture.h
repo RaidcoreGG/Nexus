@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "IbBindV2.h"
+#include "IbBind.h"
 
 #include <windows.h>
 
@@ -22,7 +22,7 @@ namespace Engine::Input
 		public:
 		///----------------------------------------------------------------------------------------------------
 		/// StartCapturing:
-		/// 	Starts capturing the held InputBind_t.
+		/// 	Starts capturing the held Bind_t.
 		/// 	The bind is continuously captured.
 		/// 	Calling this function merely signals to stop further processing the inputs.
 		///----------------------------------------------------------------------------------------------------
@@ -30,15 +30,15 @@ namespace Engine::Input
 
 		///----------------------------------------------------------------------------------------------------
 		/// EndCapturing:
-		/// 	Ends capturing the held InputBind_t.
+		/// 	Ends capturing the held Bind_t.
 		///----------------------------------------------------------------------------------------------------
 		void EndCapturing();
 
 		///----------------------------------------------------------------------------------------------------
 		/// GetCapture:
-		/// 	Gets which InputBind_t is currently held.
+		/// 	Gets which Bind_t is currently held.
 		///----------------------------------------------------------------------------------------------------
-		InputBind_t GetCapture() const;
+		Bind_t GetCapture() const;
 
 		protected:
 		///----------------------------------------------------------------------------------------------------
@@ -49,17 +49,15 @@ namespace Engine::Input
 
 		///----------------------------------------------------------------------------------------------------
 		/// GetCaptureRef:
-		/// 	Gets which InputBind_t is currently held.
+		/// 	Gets which Bind_t is currently held.
 		/// 	Not threadsafe. Only use during WndProc.
 		///----------------------------------------------------------------------------------------------------
-		const InputBind_t& GetCaptureRef() const;
+		const Bind_t& GetCaptureRef() const;
 
 		private:
-		bool        IsCapturing = false;
-		InputBind_t Capture = {};
+		bool       IsCapturing{ false };
+		Bind_t     Capture{};
 
-		bool        IsAltHeld = false;
-		bool        IsCtrlHeld = false;
-		bool        IsShiftHeld = false;
+		EModifiers ModifiersHeld{ EModifiers::None };
 	};
 }

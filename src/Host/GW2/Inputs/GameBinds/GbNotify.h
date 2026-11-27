@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "Engine/Inputs/InputBinds/IbBindV2.h"
+#include "Engine/Inputs/InputBinds/IbBind.h"
 #include "Engine/Notifier/Notifier.h"
 #include "GbEnum.h"
 
@@ -24,7 +24,7 @@ class IGameBindChangedNotifyHandler : public INotifyHandler<IGameBindChangedNoti
 	/// OnGameBindChangedNotify:
 	/// 	An external source reports that a game bind was changed in the game.
 	///----------------------------------------------------------------------------------------------------
-	virtual void OnGameBindChangedNotify(EGameBinds aGameBind, const Input::InputBind_t& aInputBind, bool aIsPrimary) = 0;
+	virtual void OnGameBindChangedNotify(EGameBinds aGameBind, const Input::Bind_t& aInputBind, bool aIsPrimary) = 0;
 };
 
 ///----------------------------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ class IGameBindChangedNotifyHandler : public INotifyHandler<IGameBindChangedNoti
 class IGameBindChangedNotifier : public INotifier<IGameBindChangedNotifyHandler>
 {
 	protected:
-	void NotifyGameBindChanged(EGameBinds aGameBind, const Input::InputBind_t& aInputBind, bool aIsPrimary)
+	void NotifyGameBindChanged(EGameBinds aGameBind, const Input::Bind_t& aInputBind, bool aIsPrimary)
 	{
 		for (const auto& entry : this->Subscribers())
 		{

@@ -16,9 +16,9 @@
 
 namespace Engine::Input
 {
-	InputBind_t IBFromString(std::string aInputBind)
+	Bind_t IBFromString(std::string aInputBind)
 	{
-		InputBind_t ib{};
+		Bind_t ib{};
 
 		if (String::ToLower(aInputBind) == "(null)") { return ib; }
 
@@ -34,46 +34,46 @@ namespace Engine::Input
 
 			if (token == "ALT")
 			{
-				ib.Alt = true;
+				ib.Modifiers |= EModifiers::Alt;
 			}
 			else if (token == "CTRL")
 			{
-				ib.Ctrl = true;
+				ib.Modifiers |= EModifiers::Ctrl;
 			}
 			else if (token == "SHIFT")
 			{
-				ib.Shift = true;
+				ib.Modifiers |= EModifiers::Shift;
 			}
 		}
 
 		if (aInputBind == "LMB")
 		{
-			ib.Device = EInputDevice::Mouse;
+			ib.Device = EDevice::Mouse;
 			ib.Code = (unsigned short)EMouseButtons::LMB;
 		}
 		else if (aInputBind == "RMB")
 		{
-			ib.Device = EInputDevice::Mouse;
+			ib.Device = EDevice::Mouse;
 			ib.Code = (unsigned short)EMouseButtons::RMB;
 		}
 		else if (aInputBind == "MMB")
 		{
-			ib.Device = EInputDevice::Mouse;
+			ib.Device = EDevice::Mouse;
 			ib.Code = (unsigned short)EMouseButtons::MMB;
 		}
 		else if (aInputBind == "M4")
 		{
-			ib.Device = EInputDevice::Mouse;
+			ib.Device = EDevice::Mouse;
 			ib.Code = (unsigned short)EMouseButtons::M4;
 		}
 		else if (aInputBind == "M5")
 		{
-			ib.Device = EInputDevice::Mouse;
+			ib.Device = EDevice::Mouse;
 			ib.Code = (unsigned short)EMouseButtons::M5;
 		}
 		else
 		{
-			ib.Device = EInputDevice::Keyboard;
+			ib.Device = EDevice::Keyboard;
 
 			static std::unordered_map<std::string, unsigned short> s_ScancodeLUT;
 			static bool s_IsLUTBuilt = []
@@ -114,15 +114,13 @@ namespace Engine::Input
 		return ib;
 	}
 
-	std::string IBToString(const InputBind_t& aInputBind, bool aPadded)
+	std::string IBToString(const Bind_t& aInputBind, bool aPadded)
 	{
-		if (aInputBind.Device == EInputDevice::None) { return "(null)"; }
-		if (aInputBind.Device == EInputDevice::Mouse && aInputBind.Code == 0) { return "(null)"; }
-		if (aInputBind.Device == EInputDevice::Keyboard
+		if (aInputBind.Device == EDevice::None) { return "(null)"; }
+		if (aInputBind.Device == EDevice::Mouse && aInputBind.Code == 0) { return "(null)"; }
+		if (aInputBind.Device == EDevice::Keyboard
 			&& !aInputBind.Code
-			&& !aInputBind.Alt
-			&& !aInputBind.Ctrl
-			&& !aInputBind.Shift)
+			&& aInputBind.Modifiers == EModifiers::None)
 		{
 			return "(null)";
 		}
@@ -130,33 +128,33 @@ namespace Engine::Input
 		char buff[100]{};
 		std::string str;
 
-		if (aInputBind.Alt)
+		if ((aInputBind.Modifiers & EModifiers::Alt) == EModifiers::Alt)
 		{
 			GetKeyNameTextA(MapVirtualKeyA(VK_MENU, MAPVK_VK_TO_VSC) << 16, buff, 100);
 			str.append(buff);
 			str.append(aPadded ? " + " : "+");
 		}
 
-		if (aInputBind.Ctrl)
+		if ((aInputBind.Modifiers & EModifiers::Ctrl) == EModifiers::Ctrl)
 		{
 			GetKeyNameTextA(MapVirtualKeyA(VK_CONTROL, MAPVK_VK_TO_VSC) << 16, buff, 100);
 			str.append(buff);
 			str.append(aPadded ? " + " : "+");
 		}
 
-		if (aInputBind.Shift)
+		if ((aInputBind.Modifiers & EModifiers::Shift) == EModifiers::Shift)
 		{
 			GetKeyNameTextA(MapVirtualKeyA(VK_SHIFT, MAPVK_VK_TO_VSC) << 16, buff, 100);
 			str.append(buff);
 			str.append(aPadded ? " + " : "+");
 		}
 
-		if (aInputBind.Device == EInputDevice::Keyboard)
+		if (aInputBind.Device == EDevice::Keyboard)
 		{
 			GetKeyNameTextA(static_cast<LONG>(GetKeyMessageLPARAM_ScanCode(aInputBind.Code, false, false)), buff, 100);
 			str.append(buff);
 		}
-		else if (aInputBind.Device == EInputDevice::Mouse)
+		else if (aInputBind.Device == EDevice::Mouse)
 		{
 			switch ((EMouseButtons)aInputBind.Code)
 			{

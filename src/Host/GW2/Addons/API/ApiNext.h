@@ -11,8 +11,8 @@
 #include "ApiV6.h"
 #include "UI/Widgets/Alerts/AlEnum.h"
 
-typedef void (*INPUTBINDS_REGISTERWITHSTRING3)(const char* aIdentifier, INPUTBINDS_PROCESS3 aInputBindHandler, const char* aInputBind);
-typedef void (*INPUTBINDS_REGISTERWITHSTRUCT3)(const char* aIdentifier, INPUTBINDS_PROCESS3 aInputBindHandler, InputBindV1_t aInputBind);
+typedef void (*INPUTBINDS_REGISTERWITHSTRING3)(const char* aIdentifier, IB_CALLBACK_V3 aInputBindHandler, const char* aInputBind);
+typedef void (*INPUTBINDS_REGISTERWITHSTRUCT3)(const char* aIdentifier, IB_CALLBACK_V3 aInputBindHandler, InputBindV1_t aInputBind);
 typedef bool (*INPUTBINDS_INVOKE2)            (const char* aIdentifier, bool aIsRelease);
 
 typedef Texture_t* (*TEXTURES_GETORCREATEFROMURL2)(const char* aIdentifier, const char* aURL);

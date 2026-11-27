@@ -10,10 +10,12 @@
 
 #include <atomic>
 #include <cstdint>
+#include <windows.h>
 
 #include "Core/Preferences/PrefSetting.h"
-#include <windows.h>
-#include "Util/Inputs.h"
+#include "Engine/Inputs/InputBinds/IbEnum.h"
+
+namespace Input = Engine::Input;
 
 ///----------------------------------------------------------------------------------------------------
 /// CUiInput Class
@@ -61,8 +63,8 @@ class CUiInput
 	///----------------------------------------------------------------------------------------------------
 	void FlushInput();
 
-	CSetting<EModifiers> RequiredModifiers{ "UI_Modifiers", EModifiers::None };
-	CSetting<bool>       FilterClicks     { "UI_ClickingRequiresModifiers", false };
+	CSetting<Input::EModifiers> RequiredModifiers{ "UI_Modifiers", Input::EModifiers::None };
+	CSetting<bool>              FilterClicks     { "UI_ClickingRequiresModifiers", false };
 
 	private:
 

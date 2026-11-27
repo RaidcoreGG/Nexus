@@ -21,7 +21,7 @@ namespace Engine::Input
 		}
 
 		/* Reset the previously captured bind. */
-		this->Capture = InputBind_t{};
+		this->Capture = Bind_t{};
 
 		/* Set the state. */
 		this->IsCapturing = true;
@@ -33,7 +33,7 @@ namespace Engine::Input
 		this->IsCapturing = false;
 	}
 
-	InputBind_t CInputBindCapture::GetCapture() const
+	Bind_t CInputBindCapture::GetCapture() const
 	{
 		return this->Capture;
 	}
@@ -48,12 +48,8 @@ namespace Engine::Input
 		{
 			case WM_ACTIVATEAPP:
 			{
-				this->IsAltHeld = false;
-				this->IsCtrlHeld = false;
-				this->IsShiftHeld = false;
-				this->Capture.Alt = false;
-				this->Capture.Ctrl = false;
-				this->Capture.Shift = false;
+				this->ModifiersHeld = EModifiers::None;
+				this->Capture.Modifiers = EModifiers::None;
 				return false;
 			}
 
@@ -65,19 +61,19 @@ namespace Engine::Input
 					case VK_MENU:
 					{
 						isModifier = true;
-						this->IsAltHeld = true;
+						this->ModifiersHeld |= EModifiers::Alt;
 						break;
 					}
 					case VK_CONTROL:
 					{
 						isModifier = true;
-						this->IsCtrlHeld = true;
+						this->ModifiersHeld = EModifiers::Ctrl;
 						break;
 					}
 					case VK_SHIFT:
 					{
 						isModifier = true;
-						this->IsShiftHeld = true;
+						this->ModifiersHeld = EModifiers::Shift;
 						break;
 					}
 				}
@@ -92,17 +88,17 @@ namespace Engine::Input
 				{
 					case VK_MENU:
 					{
-						this->IsAltHeld = false;
+						this->ModifiersHeld &= ~EModifiers::Alt;
 						break;
 					}
 					case VK_CONTROL:
 					{
-						this->IsCtrlHeld = false;
+						this->ModifiersHeld &= EModifiers::Ctrl;
 						break;
 					}
 					case VK_SHIFT:
 					{
-						this->IsShiftHeld = false;
+						this->ModifiersHeld &= EModifiers::Shift;
 						break;
 					}
 				}
@@ -131,19 +127,15 @@ namespace Engine::Input
 				/* If it's a modifier, ignore all other set modifiers, to allow for the last pressed one to be a standalone bind. */
 				if (isModifier)
 				{
-					this->Capture.Alt = false;
-					this->Capture.Ctrl = false;
-					this->Capture.Shift = false;
+					this->Capture.Modifiers = EModifiers::None;
 				}
 				else
 				{
-					this->Capture.Alt = this->IsAltHeld;
-					this->Capture.Ctrl = this->IsCtrlHeld;
-					this->Capture.Shift = this->IsShiftHeld;
+					this->Capture.Modifiers = this->ModifiersHeld;
 				}
 
 				/* Key button -> Key bind */
-				this->Capture.Device = EInputDevice::Keyboard;
+				this->Capture.Device = EDevice::Keyboard;
 				this->Capture.Code = keylp.GetScanCode();
 
 				/* Signal to not process further, if capturing. */
@@ -152,12 +144,10 @@ namespace Engine::Input
 
 			case WM_MBUTTONDOWN:
 			{
-				this->Capture.Alt = this->IsAltHeld;
-				this->Capture.Ctrl = this->IsCtrlHeld;
-				this->Capture.Shift = this->IsShiftHeld;
+				this->Capture.Modifiers = this->ModifiersHeld;
 
 				/* Mouse button -> Mouse bind */
-				this->Capture.Device = EInputDevice::Mouse;
+				this->Capture.Device = EDevice::Mouse;
 
 				this->Capture.Code = (unsigned short)EMouseButtons::MMB;
 
@@ -166,12 +156,10 @@ namespace Engine::Input
 			}
 			case WM_XBUTTONDOWN:
 			{
-				this->Capture.Alt = this->IsAltHeld;
-				this->Capture.Ctrl = this->IsCtrlHeld;
-				this->Capture.Shift = this->IsShiftHeld;
+				this->Capture.Modifiers = this->ModifiersHeld;
 
 				/* Mouse button -> Mouse bind */
-				this->Capture.Device = EInputDevice::Mouse;
+				this->Capture.Device = EDevice::Mouse;
 
 				if (HIWORD(wParam) == XBUTTON1)
 				{
@@ -191,7 +179,7 @@ namespace Engine::Input
 		return false;
 	}
 
-	const InputBind_t& CInputBindCapture::GetCaptureRef() const
+	const Bind_t& CInputBindCapture::GetCaptureRef() const
 	{
 		return this->Capture;
 	}

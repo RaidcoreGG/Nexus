@@ -9,18 +9,54 @@
 #pragma once
 
 #include "IbEnum.h"
+#include "IbBind.h"
 
 namespace Engine::Input
 {
 	///----------------------------------------------------------------------------------------------------
-	/// InputBindV1_t Struct
-	/// 	Old Keybind struct used for backwards compatibility within APIs.
+	/// Bind_t Struct
 	///----------------------------------------------------------------------------------------------------
-	struct InputBindV1_t
+	struct Bind_t
 	{
-		unsigned short Key;
-		bool           Alt;
-		bool           Ctrl;
-		bool           Shift;
+		EModifiers Modifiers;
+		EDevice    Device;
+		uint16_t   Code;
+
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		Bind_t() = default;
+
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		Bind_t(EModifiers aModifiers, EDevice aDevice, uint16_t aCode)
+			: Modifiers{ aModifiers }
+			, Device{ aDevice }
+			, Code{ aCode }
+		{}
+
+
+		///----------------------------------------------------------------------------------------------------
+		/// ctor
+		///----------------------------------------------------------------------------------------------------
+		Bind_t(bool aAlt, bool aCtrl, bool aShift, EDevice aDevice, uint16_t aCode)
+			: Modifiers {
+				(aAlt ? EModifiers::Alt : EModifiers::None)
+				| (aCtrl ? EModifiers::Ctrl : EModifiers::None)
+				| (aShift ? EModifiers::Shift : EModifiers::None)
+			}
+			, Device{ aDevice }
+			, Code  { aCode   }
+		{}
+
+		///----------------------------------------------------------------------------------------------------
+		/// IsBound:
+		/// 	Returns true if this input bind has any values set.
+		///----------------------------------------------------------------------------------------------------
+		bool IsBound() const;
 	};
+
+	bool operator==(const Bind_t& lhs, const Bind_t& rhs);
+	bool operator!=(const Bind_t& lhs, const Bind_t& rhs);
 }

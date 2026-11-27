@@ -224,28 +224,50 @@ namespace ADDONAPI
 
 	namespace InputBinds
 	{
-		void RegisterWithString(const char* aIdentifier, Input::INPUTBINDS_PROCESS aInputBindHandler, const char* aInputBind)
+		void RegisterWithString(const char* aIdentifier, Input::IB_CALLBACK_V1 aInputBindHandler, const char* aInputBind)
 		{
 			assert(s_InputBindApi);
 			s_InputBindApi->Register(aIdentifier, Input::EIbHandlerType::DownAsync, aInputBindHandler, aInputBind);
 		}
 
-		void RegisterWithStruct(const char* aIdentifier, Input::INPUTBINDS_PROCESS aInputBindHandler, Input::InputBindV1_t aInputBind)
+		void RegisterWithStruct(const char* aIdentifier, Input::IB_CALLBACK_V1 aInputBindHandler, InputBindV1_t aInputBind)
 		{
 			assert(s_InputBindApi);
-			s_InputBindApi->Register(aIdentifier, Input::EIbHandlerType::DownAsync, aInputBindHandler, aInputBind);
+			s_InputBindApi->Register(
+				aIdentifier,
+				Input::EIbHandlerType::DownAsync,
+				aInputBindHandler,
+				Input::Bind_t{
+					aInputBind.Alt,
+					aInputBind.Ctrl,
+					aInputBind.Shift,
+					Input::EDevice::Keyboard,
+					aInputBind.Key
+				}
+			);
 		}
 
-		void RegisterWithString2(const char* aIdentifier, Input::INPUTBINDS_PROCESS2 aInputBindHandler, const char* aInputBind)
+		void RegisterWithString2(const char* aIdentifier, Input::IB_CALLBACK_V2 aInputBindHandler, const char* aInputBind)
 		{
 			assert(s_InputBindApi);
 			s_InputBindApi->Register(aIdentifier, Input::EIbHandlerType::DownReleaseAsync, aInputBindHandler, aInputBind);
 		}
 
-		void RegisterWithStruct2(const char* aIdentifier, Input::INPUTBINDS_PROCESS2 aInputBindHandler, Input::InputBindV1_t aInputBind)
+		void RegisterWithStruct2(const char* aIdentifier, Input::IB_CALLBACK_V2 aInputBindHandler, InputBindV1_t aInputBind)
 		{
 			assert(s_InputBindApi);
-			s_InputBindApi->Register(aIdentifier, Input::EIbHandlerType::DownReleaseAsync, aInputBindHandler, aInputBind);
+			s_InputBindApi->Register(
+				aIdentifier,
+				Input::EIbHandlerType::DownReleaseAsync,
+				aInputBindHandler,
+				Input::Bind_t{
+					aInputBind.Alt,
+					aInputBind.Ctrl,
+					aInputBind.Shift,
+					Input::EDevice::Keyboard,
+					aInputBind.Key
+				}
+			);
 		}
 
 		void InvokeInputBind(const char* aIdentifier, bool aIsRelease)

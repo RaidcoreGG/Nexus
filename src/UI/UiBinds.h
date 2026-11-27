@@ -13,7 +13,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "Engine/Inputs/InputBinds/IbBindV2.h"
+#include "Engine/Inputs/InputBinds/IbBind.h"
 #include "Engine/Inputs/InputBinds/IbMapping.h"
 #include "Host/GW2/Inputs/GameBinds/GbEnum.h"
 
@@ -35,10 +35,10 @@ struct GameInputBindPacked_t
 {
 	std::string        Name     {};
 	std::string        KeysText {};
-	Input::InputBind_t Bind     {};
+	Input::Bind_t Bind     {};
 
 	std::string        KeysText2{};
-	Input::InputBind_t Bind2    {};
+	Input::Bind_t Bind2    {};
 };
 
 struct GameInputBindCategory_t

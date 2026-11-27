@@ -19,7 +19,7 @@
 #include "Engine/Events/EvtApi.h"
 #include "IbNotify.h"
 #include "Core/Logging/LogChannel.h"
-#include "IbBindV2.h"
+#include "IbBind.h"
 #include "IbCapture.h"
 #include "IbMapping.h"
 
@@ -48,23 +48,23 @@ namespace Engine::Input
 
 		///----------------------------------------------------------------------------------------------------
 		/// OnWndProcNotify:
-		/// 	Returns 0 if a InputBind_t was invoked.
+		/// 	Returns 0 if a Bind_t was invoked.
 		///----------------------------------------------------------------------------------------------------
 		UINT OnWndProcNotify(HWND& hWnd, UINT& uMsg, WPARAM& wParam, LPARAM& lParam) override;
 
 		///----------------------------------------------------------------------------------------------------
 		/// Register:
-		/// 	Generates and registers a InputBind_t from the given string with the given identifier and handler,
+		/// 	Generates and registers a Bind_t from the given string with the given identifier and handler,
 		/// 	if no bind was previously stored the given one will be used.
 		///----------------------------------------------------------------------------------------------------
 		void Register(const char* aIdentifier, EIbHandlerType aInputBindHandlerType, void* aInputBindHandler, const char* aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Register:
-		/// 	Registers a InputBind_t from the given struct with the given identifier and handler,
+		/// 	Registers a Bind_t from the given struct with the given identifier and handler,
 		/// 	if no bind was previously stored the given one will be used.
 		///----------------------------------------------------------------------------------------------------
-		void Register(const char* aIdentifier, EIbHandlerType aInputBindHandlerType, void* aInputBindHandler, InputBind_t aInputBind);
+		void Register(const char* aIdentifier, EIbHandlerType aInputBindHandlerType, void* aInputBindHandler, Bind_t aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Deregister:
@@ -74,13 +74,13 @@ namespace Engine::Input
 
 		///----------------------------------------------------------------------------------------------------
 		/// IsInUse:
-		/// 	Returns an empty string if InputBind_t is unused or the identifier that uses this InputBind_t.
+		/// 	Returns an empty string if Bind_t is unused or the identifier that uses this Bind_t.
 		///----------------------------------------------------------------------------------------------------
-		std::string IsInUse(const InputBind_t& aInputBind);
+		std::string IsInUse(const Bind_t& aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// HasHandler:
-		/// 	Returns true if the InputBind_t with the passed identifier has a handler registered.
+		/// 	Returns true if the Bind_t with the passed identifier has a handler registered.
 		///----------------------------------------------------------------------------------------------------
 		bool HasHandler(const std::string& aIdentifier);
 
@@ -89,30 +89,30 @@ namespace Engine::Input
 		/// 	Gets a InputBind.
 		/// 	Returns nullptr, if it doesn't exist.
 		///----------------------------------------------------------------------------------------------------
-		const InputBind_t* Get(const std::string& aIdentifier);
+		const Bind_t* Get(const std::string& aIdentifier);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Set:
 		/// 	Sets a InputBind.
 		///----------------------------------------------------------------------------------------------------
-		void Set(std::string aIdentifier, InputBind_t aInputBind);
+		void Set(std::string aIdentifier, Bind_t aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// SetPassthrough:
-		/// 	Sets the passthrough state of an InputBind_t.
+		/// 	Sets the passthrough state of an Bind_t.
 		///----------------------------------------------------------------------------------------------------
 		void SetPassthrough(std::string aIdentifier, bool aPassthrough);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Invoke:
-		/// 	Invokes the action on the corresponding InputBind_t handler.
-		/// 	Returns true if the InputBind_t was dispatched and processing should not continue.
+		/// 	Invokes the action on the corresponding Bind_t handler.
+		/// 	Returns true if the Bind_t was dispatched and processing should not continue.
 		///----------------------------------------------------------------------------------------------------
 		bool Invoke(std::string aIdentifier, bool aIsRelease = false);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Deletes:
-		/// 	Deletes a InputBind_t entirely.
+		/// 	Deletes a Bind_t entirely.
 		///----------------------------------------------------------------------------------------------------
 		void Delete(std::string aIdentifier);
 
@@ -135,7 +135,7 @@ namespace Engine::Input
 
 		mutable std::mutex                 Mutex;
 		std::map<std::string, IbMapping_t> Registry;
-		std::map<std::string, InputBind_t> HeldInputBinds;
+		std::map<std::string, Bind_t> HeldInputBinds;
 
 		///----------------------------------------------------------------------------------------------------
 		/// LoadSafe:
@@ -163,10 +163,10 @@ namespace Engine::Input
 
 		///----------------------------------------------------------------------------------------------------
 		/// Press:
-		/// 	Invokes an InputBind_t that matches the pressed inputs.
+		/// 	Invokes an Bind_t that matches the pressed inputs.
 		/// 	Returns true if a bind was found and invoked.
 		///----------------------------------------------------------------------------------------------------
-		bool Press(const InputBind_t& aInputBind);
+		bool Press(const Bind_t& aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// Release:
@@ -178,7 +178,7 @@ namespace Engine::Input
 		/// Release:
 		/// 	Releases all InputBinds matching the criteria and invokes a release.
 		///----------------------------------------------------------------------------------------------------
-		void Release(EInputDevice aDevice, unsigned short aCode);
+		void Release(EDevice aDevice, unsigned short aCode);
 
 		///----------------------------------------------------------------------------------------------------
 		/// ReleaseAll:

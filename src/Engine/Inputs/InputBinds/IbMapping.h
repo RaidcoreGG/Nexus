@@ -2,39 +2,39 @@
 /// Copyright (c) Raidcore.GG - All rights reserved.
 ///
 /// Name         :  IbMapping.h
-/// Description  :  Mapped InputBind_t struct definition.
+/// Description  :  Mapped Bind_t struct definition.
 /// Authors      :  K. Bieniek
 ///----------------------------------------------------------------------------------------------------
 
 #pragma once
 
-#include "IbBindV2.h"
+#include "IbBind.h"
 #include "IbEnum.h"
 
 namespace Engine::Input
 {
 	/* Input Handler Down Only */
-	typedef void (*INPUTBINDS_PROCESS) (const char* aIdentifier);
+	typedef void (*IB_CALLBACK_V1)(const char* aIdentifier);
 
 	/* Input Handler Down and Release */
-	typedef void (*INPUTBINDS_PROCESS2)(const char* aIdentifier, bool aIsRelease);
+	typedef void (*IB_CALLBACK_V2)(const char* aIdentifier, bool aIsRelease);
 
 	/* Input Handler Down and Release also return whether input should not be processed further. */
-	typedef bool (*INPUTBINDS_PROCESS3)(const char* aIdentifier, bool aIsRelease);
+	typedef bool (*IB_CALLBACK_V3)(const char* aIdentifier, bool aIsRelease);
 
 	///----------------------------------------------------------------------------------------------------
 	/// IbMapping_t Struct
 	///----------------------------------------------------------------------------------------------------
 	struct IbMapping_t
 	{
-		InputBind_t    Bind = {};
+		Bind_t    Bind = {};
 		bool           Passthrough = false;
 		EIbHandlerType HandlerType = EIbHandlerType::None;
 		union
 		{
-			INPUTBINDS_PROCESS  Handler_DownOnlyAsync;
-			INPUTBINDS_PROCESS2 Handler_DownReleaseAsync;
-			INPUTBINDS_PROCESS3 Handler_DownRelease = nullptr;
+			IB_CALLBACK_V1 Handler_DownOnlyAsync;
+			IB_CALLBACK_V2 Handler_DownReleaseAsync;
+			IB_CALLBACK_V3 Handler_DownRelease = nullptr;
 		};
 	};
 }

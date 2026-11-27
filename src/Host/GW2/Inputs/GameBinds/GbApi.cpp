@@ -43,7 +43,7 @@ CGameBindsApi::~CGameBindsApi()
 	this->INotifyHandler<IWndProcNotifyHandler>::Detach();
 }
 
-void CGameBindsApi::OnGameBindChangedNotify(EGameBinds aGameBind, const Input::InputBind_t& aInputBind, bool aIsPrimary)
+void CGameBindsApi::OnGameBindChangedNotify(EGameBinds aGameBind, const Input::Bind_t& aInputBind, bool aIsPrimary)
 {
 	this->Set(aGameBind, aInputBind, aIsPrimary, true);
 	this->NotifyInputBindUpdate();
@@ -115,7 +115,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 		return;
 	}
 
-	Input::InputBind_t ib{};
+	Input::Bind_t ib{};
 
 	if (bind->Primary.IsBound())
 	{
@@ -132,7 +132,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 		return;
 	}
 
-	if (ib.Alt)
+	if ((ib.Modifiers & Input::EModifiers::Alt) == Input::EModifiers::Alt)
 	{
 		this->SendWndProcToGame(
 			0,
@@ -141,7 +141,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 			GetKeyMessageLPARAM(VK_MENU, true, true)
 		);
 	}
-	else if (!ib.Alt && GetAsyncKeyState(VK_MENU))
+	else if ((ib.Modifiers & Input::EModifiers::Alt) != Input::EModifiers::Alt && GetAsyncKeyState(VK_MENU))
 	{
 		this->SendWndProcToGame(
 			0,
@@ -151,7 +151,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 		);
 	}
 
-	if (ib.Ctrl)
+	if ((ib.Modifiers & Input::EModifiers::Ctrl) == Input::EModifiers::Ctrl)
 	{
 		this->SendWndProcToGame(
 			0,
@@ -160,7 +160,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 			GetKeyMessageLPARAM(VK_CONTROL, true, false)
 		);
 	}
-	else if (!ib.Ctrl && GetAsyncKeyState(VK_CONTROL))
+	else if ((ib.Modifiers & Input::EModifiers::Ctrl) != Input::EModifiers::Ctrl && GetAsyncKeyState(VK_CONTROL))
 	{
 		this->SendWndProcToGame(
 			0,
@@ -170,7 +170,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 		);
 	}
 
-	if (ib.Shift)
+	if ((ib.Modifiers & Input::EModifiers::Shift) == Input::EModifiers::Shift)
 	{
 		this->SendWndProcToGame(
 			0,
@@ -179,7 +179,7 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 			GetKeyMessageLPARAM(VK_SHIFT, true, false)
 		);
 	}
-	else if (!ib.Shift && GetAsyncKeyState(VK_SHIFT))
+	else if ((ib.Modifiers & Input::EModifiers::Shift) != Input::EModifiers::Shift && GetAsyncKeyState(VK_SHIFT))
 	{
 		this->SendWndProcToGame(
 			0,
@@ -189,70 +189,70 @@ void CGameBindsApi::Press(EGameBinds aGameBind)
 		);
 	}
 
-	if (ib.Device == Input::EInputDevice::Keyboard)
+	if (ib.Device == Input::EDevice::Keyboard)
 	{
 		UINT vk = MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK_EX);
 		this->SendWndProcToGame(
 			0,
 			WM_KEYDOWN,
 			vk,
-			GetKeyMessageLPARAM_ScanCode(ib.Code, true, ib.Alt)
+			GetKeyMessageLPARAM_ScanCode(ib.Code, true, (ib.Modifiers & Input::EModifiers::Alt) == Input::EModifiers::Alt)
 		);
 	}
-	else if (ib.Device == Input::EInputDevice::Mouse)
+	else if (ib.Device == Input::EDevice::Mouse)
 	{
 		/* get point for lparam */
 		POINT point{};
 		GetCursorPos(&point);
 
-		switch ((EMouseButtons)ib.Code)
+		switch (static_cast<Input::EMouseButtons>(ib.Code))
 		{
-			case EMouseButtons::LMB:
+			case Input::EMouseButtons::LMB:
 			{
 				this->SendWndProcToGame(
 					0,
 					WM_LBUTTONDOWN,
-					GetMouseMessageWPARAM(EMouseButtons::LMB, ib.Ctrl, ib.Shift, true),
+					GetMouseMessageWPARAM(MK_LBUTTON, (ib.Modifiers& Input::EModifiers::Ctrl) == Input::EModifiers::Ctrl, (ib.Modifiers& Input::EModifiers::Shift) == Input::EModifiers::Shift, true),
 					MAKELPARAM(point.x, point.y)
 				);
 				break;
 			}
-			case EMouseButtons::RMB:
+			case Input::EMouseButtons::RMB:
 			{
 				this->SendWndProcToGame(
 					0,
 					WM_RBUTTONDOWN,
-					GetMouseMessageWPARAM(EMouseButtons::RMB, ib.Ctrl, ib.Shift, true),
+					GetMouseMessageWPARAM(MK_RBUTTON, (ib.Modifiers & Input::EModifiers::Ctrl) == Input::EModifiers::Ctrl, (ib.Modifiers & Input::EModifiers::Shift) == Input::EModifiers::Shift, true),
 					MAKELPARAM(point.x, point.y)
 				);
 				break;
 			}
-			case EMouseButtons::MMB:
+			case Input::EMouseButtons::MMB:
 			{
 				this->SendWndProcToGame(
 					0,
 					WM_MBUTTONDOWN,
-					GetMouseMessageWPARAM(EMouseButtons::MMB, ib.Ctrl, ib.Shift, true),
+					GetMouseMessageWPARAM(MK_MBUTTON, (ib.Modifiers & Input::EModifiers::Ctrl) == Input::EModifiers::Ctrl, (ib.Modifiers & Input::EModifiers::Shift) == Input::EModifiers::Shift, true),
 					MAKELPARAM(point.x, point.y)
 				);
 				break;
 			}
-			case EMouseButtons::M4:
+			case Input::EMouseButtons::M4:
 			{
 				this->SendWndProcToGame(
 					0,
 					WM_XBUTTONDOWN,
-					GetMouseMessageWPARAM(EMouseButtons::M4, ib.Ctrl, ib.Shift, true),
+					GetMouseMessageWPARAM(MK_XBUTTON1, (ib.Modifiers & Input::EModifiers::Ctrl) == Input::EModifiers::Ctrl, (ib.Modifiers & Input::EModifiers::Shift) == Input::EModifiers::Shift, true),
 					MAKELPARAM(point.x, point.y)
 				);
 				break;
 			}
-			case EMouseButtons::M5:
+			case Input::EMouseButtons::M5:
 			{
 				this->SendWndProcToGame(
 					0,
 					WM_XBUTTONDOWN,
-					GetMouseMessageWPARAM(EMouseButtons::M5, ib.Ctrl, ib.Shift, true),
+					GetMouseMessageWPARAM(MK_XBUTTON2, (ib.Modifiers & Input::EModifiers::Ctrl) == Input::EModifiers::Ctrl, (ib.Modifiers & Input::EModifiers::Shift) == Input::EModifiers::Shift, true),
 					MAKELPARAM(point.x, point.y)
 				);
 				break;
@@ -276,7 +276,7 @@ void CGameBindsApi::Release(EGameBinds aGameBind)
 		return;
 	}
 
-	Input::InputBind_t ib{};
+	Input::Bind_t ib{};
 
 	if (bind->Primary.IsBound())
 	{
@@ -293,70 +293,70 @@ void CGameBindsApi::Release(EGameBinds aGameBind)
 		return;
 	}
 
-	if (ib.Device == Input::EInputDevice::Keyboard)
+	if (ib.Device == Input::EDevice::Keyboard)
 	{
 		int vk = MapVirtualKeyA(ib.Code, MAPVK_VSC_TO_VK_EX);
 		this->SendWndProcToGame(
 			0,
 			WM_KEYUP,
 			vk,
-			GetKeyMessageLPARAM_ScanCode(ib.Code, false, ib.Alt)
+			GetKeyMessageLPARAM_ScanCode(ib.Code, false, (ib.Modifiers & Input::EModifiers::Alt) == Input::EModifiers::Alt)
 		);
 	}
-	else if (ib.Device == Input::EInputDevice::Mouse)
+	else if (ib.Device == Input::EDevice::Mouse)
 	{
 		/* get point for lparam */
 		POINT point{};
 		GetCursorPos(&point);
 
-		switch ((EMouseButtons)ib.Code)
+		switch (static_cast<Input::EMouseButtons>(ib.Code))
 		{
-			case EMouseButtons::LMB:
+			case Input::EMouseButtons::LMB:
 			{
 				this->SendWndProcToGame(
 					0,
 					WM_LBUTTONUP,
-					GetMouseMessageWPARAM(EMouseButtons::LMB, ib.Ctrl, ib.Shift, false),
+					GetMouseMessageWPARAM(MK_LBUTTON, (ib.Modifiers & Input::EModifiers::Ctrl) == Input::EModifiers::Ctrl, (ib.Modifiers & Input::EModifiers::Shift) == Input::EModifiers::Shift, false),
 					MAKELPARAM(point.x, point.y)
 				);
 				break;
 			}
-			case EMouseButtons::RMB:
+			case Input::EMouseButtons::RMB:
 			{
 				this->SendWndProcToGame(
 					0,
 					WM_RBUTTONUP,
-					GetMouseMessageWPARAM(EMouseButtons::RMB, ib.Ctrl, ib.Shift, false),
+					GetMouseMessageWPARAM(MK_RBUTTON, (ib.Modifiers & Input::EModifiers::Ctrl) == Input::EModifiers::Ctrl, (ib.Modifiers & Input::EModifiers::Shift) == Input::EModifiers::Shift, false),
 					MAKELPARAM(point.x, point.y)
 				);
 				break;
 			}
-			case EMouseButtons::MMB:
+			case Input::EMouseButtons::MMB:
 			{
 				this->SendWndProcToGame(
 					0,
 					WM_MBUTTONUP,
-					GetMouseMessageWPARAM(EMouseButtons::MMB, ib.Ctrl, ib.Shift, false),
+					GetMouseMessageWPARAM(MK_MBUTTON, (ib.Modifiers & Input::EModifiers::Ctrl) == Input::EModifiers::Ctrl, (ib.Modifiers & Input::EModifiers::Shift) == Input::EModifiers::Shift, false),
 					MAKELPARAM(point.x, point.y)
 				);
 				break;
 			}
-			case EMouseButtons::M4:
+			case Input::EMouseButtons::M4:
 			{
 				this->SendWndProcToGame(
 					0,
 					WM_XBUTTONUP,
-					GetMouseMessageWPARAM(EMouseButtons::M4, ib.Ctrl, ib.Shift, false),
+					GetMouseMessageWPARAM(MK_XBUTTON1, (ib.Modifiers & Input::EModifiers::Ctrl) == Input::EModifiers::Ctrl, (ib.Modifiers & Input::EModifiers::Shift) == Input::EModifiers::Shift, false),
 					MAKELPARAM(point.x, point.y)
 				);
 				break;
 			}
-			case EMouseButtons::M5:
+			case Input::EMouseButtons::M5:
 			{
 				this->SendWndProcToGame(
 					0,
 					WM_XBUTTONUP,
-					GetMouseMessageWPARAM(EMouseButtons::M5, ib.Ctrl, ib.Shift, false),
+					GetMouseMessageWPARAM(MK_XBUTTON2, (ib.Modifiers & Input::EModifiers::Ctrl) == Input::EModifiers::Ctrl, (ib.Modifiers & Input::EModifiers::Shift) == Input::EModifiers::Shift, false),
 					MAKELPARAM(point.x, point.y)
 				);
 				break;
@@ -456,7 +456,7 @@ const MultiInputBind_t* CGameBindsApi::Get(EGameBinds aGameBind)
 	return nullptr;
 }
 
-void CGameBindsApi::Set(EGameBinds aGameBind, Input::InputBind_t aInputBind, bool aIsPrimary, bool aIsRuntimeBind)
+void CGameBindsApi::Set(EGameBinds aGameBind, Input::Bind_t aInputBind, bool aIsPrimary, bool aIsRuntimeBind)
 {
 	/* Remove legacy bind that the game removed. */
 	if (aGameBind == EGameBinds::LEGACY_MoveSwimUp)
@@ -556,35 +556,30 @@ void CGameBindsApi::Load(std::filesystem::path aPath)
 
 					if (action.attribute("mod"))
 					{
-						int mods = strtoul(action.attribute("mod").value(), nullptr, 10);
-						bind.Primary.Alt = mods & 0b0100;
-						bind.Primary.Ctrl = mods & 0b0010;
-						bind.Primary.Shift = mods & 0b0001;
+						bind.Primary.Modifiers = static_cast<Input::EModifiers>(strtoul(action.attribute("mod").value(), nullptr, 10));
 					}
 
 					std::string device = action.attribute("device").value();
 					if (device == "Keyboard")
 					{
-						bind.Primary.Device = Input::EInputDevice::Keyboard;
-						bind.Primary.Code = GameScanCodeToScanCode(static_cast<unsigned short>(strtoul(action.attribute("button").value(), nullptr, 10)));
+						bind.Primary.Device = Input::EDevice::Keyboard;
+						bind.Primary.Code = GameScanCodeToScanCode(static_cast<uint16_t>(strtoul(action.attribute("button").value(), nullptr, 10)));
 					}
 					else if (device == "Mouse")
 					{
-						bind.Primary.Device = Input::EInputDevice::Mouse;
+						bind.Primary.Device = Input::EDevice::Mouse;
 						std::string mousebtn = action.attribute("button").value();
-						if (mousebtn == "0") { bind.Primary.Code = (unsigned short)EMouseButtons::LMB; }
-						else if (mousebtn == "2") { bind.Primary.Code = (unsigned short)EMouseButtons::RMB; }
-						else if (mousebtn == "1") { bind.Primary.Code = (unsigned short)EMouseButtons::MMB; }
-						else if (mousebtn == "3") { bind.Primary.Code = (unsigned short)EMouseButtons::M4; }
-						else if (mousebtn == "4") { bind.Primary.Code = (unsigned short)EMouseButtons::M5; }
+						if (mousebtn == "0") { bind.Primary.Code = static_cast<uint16_t>(Input::EMouseButtons::LMB); }
+						else if (mousebtn == "2") { bind.Primary.Code = static_cast<uint16_t>(Input::EMouseButtons::RMB); }
+						else if (mousebtn == "1") { bind.Primary.Code = static_cast<uint16_t>(Input::EMouseButtons::MMB); }
+						else if (mousebtn == "3") { bind.Primary.Code = static_cast<uint16_t>(Input::EMouseButtons::M4); }
+						else if (mousebtn == "4") { bind.Primary.Code = static_cast<uint16_t>(Input::EMouseButtons::M5); }
 					}
 					else if (device == "None")
 					{
 						/* Unbound. Unset mods as well. */
-						bind.Primary.Device = Input::EInputDevice::None;
-						bind.Primary.Alt = false;
-						bind.Primary.Ctrl = false;
-						bind.Primary.Shift = false;
+						bind.Primary.Device = Input::EDevice::None;
+						bind.Primary.Modifiers = Input::EModifiers::None;
 					}
 				}
 
@@ -595,35 +590,30 @@ void CGameBindsApi::Load(std::filesystem::path aPath)
 
 					if (action.attribute("mod2"))
 					{
-						int mods = strtoul(action.attribute("mod2").value(), nullptr, 10);
-						bind.Secondary.Alt = mods & 0b0100;
-						bind.Secondary.Ctrl = mods & 0b0010;
-						bind.Secondary.Shift = mods & 0b0001;
+						bind.Secondary.Modifiers = static_cast<Input::EModifiers>(strtoul(action.attribute("mod2").value(), nullptr, 10));
 					}
 
 					std::string device = action.attribute("device2").value();
 					if (device == "Keyboard")
 					{
-						bind.Secondary.Device = Input::EInputDevice::Keyboard;
+						bind.Secondary.Device = Input::EDevice::Keyboard;
 						bind.Secondary.Code = GameScanCodeToScanCode(static_cast<unsigned short>(strtoul(action.attribute("button2").value(), nullptr, 10)));
 					}
 					else if (device == "Mouse")
 					{
-						bind.Secondary.Device = Input::EInputDevice::Mouse;
+						bind.Secondary.Device = Input::EDevice::Mouse;
 						std::string mousebtn = action.attribute("button2").value();
-						if (mousebtn == "0") { bind.Secondary.Code = (unsigned short)EMouseButtons::LMB; }
-						else if (mousebtn == "2") { bind.Secondary.Code = (unsigned short)EMouseButtons::RMB; }
-						else if (mousebtn == "1") { bind.Secondary.Code = (unsigned short)EMouseButtons::MMB; }
-						else if (mousebtn == "3") { bind.Secondary.Code = (unsigned short)EMouseButtons::M4; }
-						else if (mousebtn == "4") { bind.Secondary.Code = (unsigned short)EMouseButtons::M5; }
+						if (mousebtn == "0") { bind.Secondary.Code = static_cast<uint16_t>(Input::EMouseButtons::LMB); }
+						else if (mousebtn == "2") { bind.Secondary.Code = static_cast<uint16_t>(Input::EMouseButtons::RMB); }
+						else if (mousebtn == "1") { bind.Secondary.Code = static_cast<uint16_t>(Input::EMouseButtons::MMB); }
+						else if (mousebtn == "3") { bind.Secondary.Code = static_cast<uint16_t>(Input::EMouseButtons::M4); }
+						else if (mousebtn == "4") { bind.Secondary.Code = static_cast<uint16_t>(Input::EMouseButtons::M5); }
 					}
 					else if (device == "None")
 					{
 						/* Unbound. Unset mods as well. */
-						bind.Secondary.Device = Input::EInputDevice::None;
-						bind.Secondary.Alt = false;
-						bind.Secondary.Ctrl = false;
-						bind.Secondary.Shift = false;
+						bind.Secondary.Device = Input::EDevice::None;
+						bind.Secondary.Modifiers = Input::EModifiers::None;
 					}
 				}
 
@@ -663,118 +653,118 @@ void CGameBindsApi::AddDefaultBinds()
 
 	// Movement
 	this->Registry.emplace(EGameBinds::MoveForward, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(87) },
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(31) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(87) },
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(31) }
 	});
 	this->Registry.emplace(EGameBinds::MoveBackward, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(83) },
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(28) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(83) },
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(28) }
 	});
 	this->Registry.emplace(EGameBinds::MoveLeft, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(65) },
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(29) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(65) },
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(29) }
 	});
 	this->Registry.emplace(EGameBinds::MoveRight, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(68) },
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(30) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(68) },
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(30) }
 	});
 	this->Registry.emplace(EGameBinds::MoveTurnLeft, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(81) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(81) }
 	});
 	this->Registry.emplace(EGameBinds::MoveTurnRight, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(69) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(69) }
 	});
 	this->Registry.emplace(EGameBinds::MoveDodge, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(86) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(86) }
 	});
 	this->Registry.emplace(EGameBinds::MoveAutoRun, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(82) },
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(11) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(82) },
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(11) }
 	});
 	this->Registry.emplace(EGameBinds::MoveWalk, MultiInputBind_t{});
 	this->Registry.emplace(EGameBinds::MoveJump_SwimUp_FlyUp, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(21) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(21) }
 	});
 	this->Registry.emplace(EGameBinds::MoveSwimDown_FlyDown, MultiInputBind_t{});
 	this->Registry.emplace(EGameBinds::MoveAboutFace, MultiInputBind_t{});
 
 	// Skills
 	this->Registry.emplace(EGameBinds::SkillWeaponSwap, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(17) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(17) }
 	});
 	this->Registry.emplace(EGameBinds::SkillWeapon1, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(49) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(49) }
 	});
 	this->Registry.emplace(EGameBinds::SkillWeapon2, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(50) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(50) }
 	});
 	this->Registry.emplace(EGameBinds::SkillWeapon3, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(51) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(51) }
 	});
 	this->Registry.emplace(EGameBinds::SkillWeapon4, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(52) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(52) }
 	});
 	this->Registry.emplace(EGameBinds::SkillWeapon5, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(53) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(53) }
 	});
 	this->Registry.emplace(EGameBinds::SkillHeal, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(54) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(54) }
 	});
 	this->Registry.emplace(EGameBinds::SkillUtility1, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(55) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(55) }
 	});
 	this->Registry.emplace(EGameBinds::SkillUtility2, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(56) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(56) }
 	});
 	this->Registry.emplace(EGameBinds::SkillUtility3, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(57) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(57) }
 	});
 	this->Registry.emplace(EGameBinds::SkillElite, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(48) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(48) }
 	});
 	this->Registry.emplace(EGameBinds::SkillProfession1, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(32) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(32) }
 	});
 	this->Registry.emplace(EGameBinds::SkillProfession2, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(33) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(33) }
 	});
 	this->Registry.emplace(EGameBinds::SkillProfession3, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(34) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(34) }
 	});
 	this->Registry.emplace(EGameBinds::SkillProfession4, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(35) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(35) }
 	});
 	this->Registry.emplace(EGameBinds::SkillProfession5, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(36) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(36) }
 	});
 	this->Registry.emplace(EGameBinds::SkillProfession6, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(37) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(37) }
 	});
 	this->Registry.emplace(EGameBinds::SkillProfession7, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(38) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(38) }
 	});
 	this->Registry.emplace(EGameBinds::SkillSpecialAction, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(78) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(78) }
 	});
 
 	// Targeting
 	this->Registry.emplace(EGameBinds::TargetAlert, MultiInputBind_t{
-		Input::InputBind_t{ false, false, true, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(84) }
+		Input::Bind_t{ false, false, true, Input::EDevice::Keyboard, GameScanCodeToScanCode(84) }
 	});
 	this->Registry.emplace(EGameBinds::TargetCall, MultiInputBind_t{
-		Input::InputBind_t{ false, true, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(84) }
+		Input::Bind_t{ false, true, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(84) }
 	});
 	this->Registry.emplace(EGameBinds::TargetTake, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(84) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(84) }
 	});
 	this->Registry.emplace(EGameBinds::TargetCallLocal, MultiInputBind_t{});
 	this->Registry.emplace(EGameBinds::TargetTakeLocal, MultiInputBind_t{});
 	this->Registry.emplace(EGameBinds::TargetEnemyNearest, MultiInputBind_t{});
 	this->Registry.emplace(EGameBinds::TargetEnemyNext, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(22) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(22) }
 	});
 	this->Registry.emplace(EGameBinds::TargetEnemyPrev, MultiInputBind_t{
-		Input::InputBind_t{ false, false, true, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(22) }
+		Input::Bind_t{ false, false, true, Input::EDevice::Keyboard, GameScanCodeToScanCode(22) }
 	});
 	this->Registry.emplace(EGameBinds::TargetAllyNearest, MultiInputBind_t{});
 	this->Registry.emplace(EGameBinds::TargetAllyNext, MultiInputBind_t{});
@@ -789,78 +779,78 @@ void CGameBindsApi::AddDefaultBinds()
 
 	// UI Binds
 	this->Registry.emplace(EGameBinds::UiCommerce, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(79) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(79) }
 	}); // TradingPost
 	this->Registry.emplace(EGameBinds::UiContacts, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(89) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(89) }
 	});
 	this->Registry.emplace(EGameBinds::UiGuild, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(71) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(71) }
 	});
 	this->Registry.emplace(EGameBinds::UiHero, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(72) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(72) }
 	});
 	this->Registry.emplace(EGameBinds::UiInventory, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(73) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(73) }
 	});
 	this->Registry.emplace(EGameBinds::UiKennel, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(75) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(75) }
 	}); // Pets
 	this->Registry.emplace(EGameBinds::UiLogout, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(43) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(43) }
 	});
 	this->Registry.emplace(EGameBinds::UiMail, MultiInputBind_t{});
 	this->Registry.emplace(EGameBinds::UiOptions, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(42) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(42) }
 	});
 	this->Registry.emplace(EGameBinds::UiParty, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(80) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(80) }
 	});
 	this->Registry.emplace(EGameBinds::UiPvp, MultiInputBind_t{});
 	this->Registry.emplace(EGameBinds::UiPvpBuild, MultiInputBind_t{});
 	this->Registry.emplace(EGameBinds::UiScoreboard, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(66) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(66) }
 	});
 	this->Registry.emplace(EGameBinds::UiSeasonalObjectivesShop, MultiInputBind_t{
-		Input::InputBind_t{ false, false, true, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(72) }
+		Input::Bind_t{ false, false, true, Input::EDevice::Keyboard, GameScanCodeToScanCode(72) }
 	}); // Wizard's Vault
 	this->Registry.emplace(EGameBinds::UiInformation, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(7) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(7) }
 	});
 	this->Registry.emplace(EGameBinds::UiChatToggle, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(4) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(4) }
 	});
 	this->Registry.emplace(EGameBinds::UiChatCommand, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(15) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(15) }
 	});
 	this->Registry.emplace(EGameBinds::UiChatFocus, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(20) },
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(105) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(20) },
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(105) }
 	});
 	this->Registry.emplace(EGameBinds::UiChatReply, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(18) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(18) }
 	});
 	this->Registry.emplace(EGameBinds::UiToggle, MultiInputBind_t{
-		Input::InputBind_t{ false, true, true, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(72) }
+		Input::Bind_t{ false, true, true, Input::EDevice::Keyboard, GameScanCodeToScanCode(72) }
 	});
 	this->Registry.emplace(EGameBinds::UiSquadBroadcastChatToggle, MultiInputBind_t{
-		Input::InputBind_t{ false, false, true, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(4) }
+		Input::Bind_t{ false, false, true, Input::EDevice::Keyboard, GameScanCodeToScanCode(4) }
 	});
 	this->Registry.emplace(EGameBinds::UiSquadBroadcastChatCommand, MultiInputBind_t{
-		Input::InputBind_t{ false, false, true, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(15) }
+		Input::Bind_t{ false, false, true, Input::EDevice::Keyboard, GameScanCodeToScanCode(15) }
 	});
 	this->Registry.emplace(EGameBinds::UiSquadBroadcastChatFocus, MultiInputBind_t{
-		Input::InputBind_t{ false, false, true, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(20) },
-		Input::InputBind_t{ false, false, true, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(105) }
+		Input::Bind_t{ false, false, true, Input::EDevice::Keyboard, GameScanCodeToScanCode(20) },
+		Input::Bind_t{ false, false, true, Input::EDevice::Keyboard, GameScanCodeToScanCode(105) }
 	});
 
 	// Camera
 	this->Registry.emplace(EGameBinds::CameraFree, MultiInputBind_t{});
 	this->Registry.emplace(EGameBinds::CameraZoomIn, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(27) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(27) }
 	});
 	this->Registry.emplace(EGameBinds::CameraZoomOut, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(26) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(26) }
 	});
 	this->Registry.emplace(EGameBinds::CameraReverse, MultiInputBind_t{});
 	this->Registry.emplace(EGameBinds::CameraActionMode, MultiInputBind_t{});
@@ -868,41 +858,41 @@ void CGameBindsApi::AddDefaultBinds()
 
 	// Screenshots
 	this->Registry.emplace(EGameBinds::ScreenshotNormal, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(16) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(16) }
 	});
 	this->Registry.emplace(EGameBinds::ScreenshotStereoscopic, MultiInputBind_t{});
 
 	// Map
 	this->Registry.emplace(EGameBinds::MapToggle, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(77) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(77) }
 	});
 	this->Registry.emplace(EGameBinds::MapFocusPlayer, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(21) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(21) }
 	});
 	this->Registry.emplace(EGameBinds::MapFloorDown, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(26) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(26) }
 	});
 	this->Registry.emplace(EGameBinds::MapFloorUp, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(27) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(27) }
 	});
 	this->Registry.emplace(EGameBinds::MapZoomIn, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(91) },
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(8) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(91) },
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(8) }
 	});
 	this->Registry.emplace(EGameBinds::MapZoomOut, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(106) },
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(7) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(106) },
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(7) }
 	});
 
 	// Mounts
 	this->Registry.emplace(EGameBinds::SpumoniToggle, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(88) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(88) }
 	});
 	this->Registry.emplace(EGameBinds::SpumoniMovement, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(86) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(86) }
 	});
 	this->Registry.emplace(EGameBinds::SpumoniSecondaryMovement, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(67) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(67) }
 	});
 	this->Registry.emplace(EGameBinds::SpumoniMAM01, MultiInputBind_t{}); // Raptor
 	this->Registry.emplace(EGameBinds::SpumoniMAM02, MultiInputBind_t{}); // Springer
@@ -916,125 +906,125 @@ void CGameBindsApi::AddDefaultBinds()
 
 	// Spectator Binds
 	this->Registry.emplace(EGameBinds::SpectatorNearestFixed, MultiInputBind_t{
-		Input::InputBind_t{ false, false, true, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(22) }
+		Input::Bind_t{ false, false, true, Input::EDevice::Keyboard, GameScanCodeToScanCode(22) }
 	});
 	this->Registry.emplace(EGameBinds::SpectatorNearestPlayer, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(22) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(22) }
 	});
 	this->Registry.emplace(EGameBinds::SpectatorPlayerRed1, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(49) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(49) }
 	});
 	this->Registry.emplace(EGameBinds::SpectatorPlayerRed2, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(50) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(50) }
 	});
 	this->Registry.emplace(EGameBinds::SpectatorPlayerRed3, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(51) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(51) }
 	});
 	this->Registry.emplace(EGameBinds::SpectatorPlayerRed4, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(52) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(52) }
 	});
 	this->Registry.emplace(EGameBinds::SpectatorPlayerRed5, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(53) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(53) }
 	});
 	this->Registry.emplace(EGameBinds::SpectatorPlayerBlue1, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(54) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(54) }
 	});
 	this->Registry.emplace(EGameBinds::SpectatorPlayerBlue2, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(55) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(55) }
 	});
 	this->Registry.emplace(EGameBinds::SpectatorPlayerBlue3, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(56) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(56) }
 	});
 	this->Registry.emplace(EGameBinds::SpectatorPlayerBlue4, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(57) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(57) }
 	});
 	this->Registry.emplace(EGameBinds::SpectatorPlayerBlue5, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(48) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(48) }
 	});
 	this->Registry.emplace(EGameBinds::SpectatorFreeCamera, MultiInputBind_t{
-		Input::InputBind_t{ false, true, true, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(70) }
+		Input::Bind_t{ false, true, true, Input::EDevice::Keyboard, GameScanCodeToScanCode(70) }
 	});
 	this->Registry.emplace(EGameBinds::SpectatorFreeCameraMode, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(69) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(69) }
 	});
 	this->Registry.emplace(EGameBinds::SpectatorFreeMoveForward, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(87) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(87) }
 	});
 	this->Registry.emplace(EGameBinds::SpectatorFreeMoveBackward, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(83) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(83) }
 	});
 	this->Registry.emplace(EGameBinds::SpectatorFreeMoveLeft, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(65) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(65) }
 	});
 	this->Registry.emplace(EGameBinds::SpectatorFreeMoveRight, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(68) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(68) }
 	});
 	this->Registry.emplace(EGameBinds::SpectatorFreeMoveUp, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(21) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(21) }
 	});
 	this->Registry.emplace(EGameBinds::SpectatorFreeMoveDown, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(86) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(86) }
 	});
 
 	// Squad Markers
 	this->Registry.emplace(EGameBinds::SquadMarkerPlaceWorld1, MultiInputBind_t{
-		Input::InputBind_t{ true, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(49) }
+		Input::Bind_t{ true, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(49) }
 	}); // Arrow
 	this->Registry.emplace(EGameBinds::SquadMarkerPlaceWorld2, MultiInputBind_t{
-		Input::InputBind_t{ true, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(50) }
+		Input::Bind_t{ true, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(50) }
 	}); // Circle
 	this->Registry.emplace(EGameBinds::SquadMarkerPlaceWorld3, MultiInputBind_t{
-		Input::InputBind_t{ true, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(51) }
+		Input::Bind_t{ true, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(51) }
 	}); // Heart
 	this->Registry.emplace(EGameBinds::SquadMarkerPlaceWorld4, MultiInputBind_t{
-		Input::InputBind_t{ true, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(52) }
+		Input::Bind_t{ true, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(52) }
 	}); // Square
 	this->Registry.emplace(EGameBinds::SquadMarkerPlaceWorld5, MultiInputBind_t{
-		Input::InputBind_t{ true, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(53) }
+		Input::Bind_t{ true, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(53) }
 	}); // Star
 	this->Registry.emplace(EGameBinds::SquadMarkerPlaceWorld6, MultiInputBind_t{
-		Input::InputBind_t{ true, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(54) }
+		Input::Bind_t{ true, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(54) }
 	}); // Swirl
 	this->Registry.emplace(EGameBinds::SquadMarkerPlaceWorld7, MultiInputBind_t{
-		Input::InputBind_t{ true, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(55) }
+		Input::Bind_t{ true, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(55) }
 	}); // Triangle
 	this->Registry.emplace(EGameBinds::SquadMarkerPlaceWorld8, MultiInputBind_t{
-		Input::InputBind_t{ true, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(56) }
+		Input::Bind_t{ true, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(56) }
 	}); // Cross
 	this->Registry.emplace(EGameBinds::SquadMarkerClearAllWorld, MultiInputBind_t{
-		Input::InputBind_t{ true, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(57) }
+		Input::Bind_t{ true, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(57) }
 	});
 	this->Registry.emplace(EGameBinds::SquadMarkerSetAgent1, MultiInputBind_t{
-		Input::InputBind_t{ true, false, true, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(49) }
+		Input::Bind_t{ true, false, true, Input::EDevice::Keyboard, GameScanCodeToScanCode(49) }
 	}); // Arrow
 	this->Registry.emplace(EGameBinds::SquadMarkerSetAgent2, MultiInputBind_t{
-		Input::InputBind_t{ true, false, true, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(50) }
+		Input::Bind_t{ true, false, true, Input::EDevice::Keyboard, GameScanCodeToScanCode(50) }
 	}); // Circle
 	this->Registry.emplace(EGameBinds::SquadMarkerSetAgent3, MultiInputBind_t{
-		Input::InputBind_t{ true, false, true, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(51) }
+		Input::Bind_t{ true, false, true, Input::EDevice::Keyboard, GameScanCodeToScanCode(51) }
 	}); // Heart
 	this->Registry.emplace(EGameBinds::SquadMarkerSetAgent4, MultiInputBind_t{
-		Input::InputBind_t{ true, false, true, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(52) }
+		Input::Bind_t{ true, false, true, Input::EDevice::Keyboard, GameScanCodeToScanCode(52) }
 	}); // Square
 	this->Registry.emplace(EGameBinds::SquadMarkerSetAgent5, MultiInputBind_t{
-		Input::InputBind_t{ true, false, true, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(53) }
+		Input::Bind_t{ true, false, true, Input::EDevice::Keyboard, GameScanCodeToScanCode(53) }
 	}); // Star
 	this->Registry.emplace(EGameBinds::SquadMarkerSetAgent6, MultiInputBind_t{
-		Input::InputBind_t{ true, false, true, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(54) }
+		Input::Bind_t{ true, false, true, Input::EDevice::Keyboard, GameScanCodeToScanCode(54) }
 	}); // Swirl
 	this->Registry.emplace(EGameBinds::SquadMarkerSetAgent7, MultiInputBind_t{
-		Input::InputBind_t{ true, false, true, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(55) }
+		Input::Bind_t{ true, false, true, Input::EDevice::Keyboard, GameScanCodeToScanCode(55) }
 	}); // Triangle
 	this->Registry.emplace(EGameBinds::SquadMarkerSetAgent8, MultiInputBind_t{
-		Input::InputBind_t{ true, false, true, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(56) }
+		Input::Bind_t{ true, false, true, Input::EDevice::Keyboard, GameScanCodeToScanCode(56) }
 	}); // Cross
 	this->Registry.emplace(EGameBinds::SquadMarkerClearAllAgent, MultiInputBind_t{
-		Input::InputBind_t{ true, false, true, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(57) }
+		Input::Bind_t{ true, false, true, Input::EDevice::Keyboard, GameScanCodeToScanCode(57) }
 	});
 
 	// Mastery Skills
 	this->Registry.emplace(EGameBinds::MasteryAccess, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(74) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(74) }
 	});
 	this->Registry.emplace(EGameBinds::MasteryAccess01, MultiInputBind_t{}); // Fishing
 	this->Registry.emplace(EGameBinds::MasteryAccess02, MultiInputBind_t{}); // Skiff
@@ -1046,29 +1036,29 @@ void CGameBindsApi::AddDefaultBinds()
 	// Miscellaneous Binds
 	this->Registry.emplace(EGameBinds::MiscAoELoot, MultiInputBind_t{});
 	this->Registry.emplace(EGameBinds::MiscInteract, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(70) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(70) }
 	});
 	this->Registry.emplace(EGameBinds::MiscShowEnemies, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(1) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(1) }
 	});
 	this->Registry.emplace(EGameBinds::MiscShowAllies, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(0) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(0) }
 	});
 	this->Registry.emplace(EGameBinds::MiscCombatStance, MultiInputBind_t{}); // Stow/Draw
 	this->Registry.emplace(EGameBinds::MiscToggleLanguage, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(110) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(110) }
 	});
 	this->Registry.emplace(EGameBinds::MiscTogglePetCombat, MultiInputBind_t{});
 	this->Registry.emplace(EGameBinds::MiscToggleFullScreen, MultiInputBind_t{
-		Input::InputBind_t{ true, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(20) }
+		Input::Bind_t{ true, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(20) }
 	});
 	this->Registry.emplace(EGameBinds::MiscToggleDecorationMode, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(76) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(76) }
 	}); // Decoration Mode
 
 	// Toys/Novelties
 	this->Registry.emplace(EGameBinds::ToyUseDefault, MultiInputBind_t{
-		Input::InputBind_t{ false, false, false, Input::EInputDevice::Keyboard, GameScanCodeToScanCode(85) }
+		Input::Bind_t{ false, false, false, Input::EDevice::Keyboard, GameScanCodeToScanCode(85) }
 	});
 	this->Registry.emplace(EGameBinds::ToyUseSlot1, MultiInputBind_t{}); // Chair
 	this->Registry.emplace(EGameBinds::ToyUseSlot2, MultiInputBind_t{}); // Instrument
@@ -1123,44 +1113,39 @@ void CGameBindsApi::Save()
 			default:
 				action.append_attribute("device") = "None";
 				break;
-			case Input::EInputDevice::Keyboard:
+			case Input::EDevice::Keyboard:
 				action.append_attribute("device") = "Keyboard";
 				action.append_attribute("button") = ScanCodeToGameScanCode(ib.Primary.Code); // US/Anet Scancode
 				break;
-			case Input::EInputDevice::Mouse:
+			case Input::EDevice::Mouse:
 				action.append_attribute("device") = "Mouse";
-				switch ((EMouseButtons)ib.Primary.Code)
+				switch (static_cast<Input::EMouseButtons>(ib.Primary.Code))
 				{
 					default:
-					case EMouseButtons::None:
+					case Input::EMouseButtons::None:
 						break;
-					case EMouseButtons::LMB:
+					case Input::EMouseButtons::LMB:
 						action.append_attribute("button") = "0";
 						break;
-					case EMouseButtons::RMB:
+					case Input::EMouseButtons::RMB:
 						action.append_attribute("button") = "2";
 						break;
-					case EMouseButtons::MMB:
+					case Input::EMouseButtons::MMB:
 						action.append_attribute("button") = "1";
 						break;
-					case EMouseButtons::M4:
+					case Input::EMouseButtons::M4:
 						action.append_attribute("button") = "3";
 						break;
-					case EMouseButtons::M5:
+					case Input::EMouseButtons::M5:
 						action.append_attribute("button") = "4";
 						break;
 				}
 				break;
 		}
 
-		int mods = 0;
-		mods += ib.Primary.Shift ? 1 : 0;
-		mods += ib.Primary.Ctrl ? 2 : 0;
-		mods += ib.Primary.Alt ? 4 : 0;
-
-		if (mods)
+		if (ib.Primary.Modifiers != Input::EModifiers::None)
 		{
-			action.append_attribute("mod") = std::to_string(mods); // Modifiers
+			action.append_attribute("mod") = std::to_string(static_cast<uint16_t>(ib.Primary.Modifiers));
 		}
 
 		switch (ib.Secondary.Device)
@@ -1168,44 +1153,39 @@ void CGameBindsApi::Save()
 			default:
 				action.append_attribute("device2") = "None";
 				break;
-			case Input::EInputDevice::Keyboard:
+			case Input::EDevice::Keyboard:
 				action.append_attribute("device2") = "Keyboard";
 				action.append_attribute("button2") = ScanCodeToGameScanCode(ib.Secondary.Code); // US/Anet Scancode
 				break;
-			case Input::EInputDevice::Mouse:
+			case Input::EDevice::Mouse:
 				action.append_attribute("device2") = "Mouse";
-				switch ((EMouseButtons)ib.Secondary.Code)
+				switch (static_cast<Input::EMouseButtons>(ib.Secondary.Code))
 				{
 					default:
-					case EMouseButtons::None:
+					case Input::EMouseButtons::None:
 						break;
-					case EMouseButtons::LMB:
+					case Input::EMouseButtons::LMB:
 						action.append_attribute("button2") = "0";
 						break;
-					case EMouseButtons::RMB:
+					case Input::EMouseButtons::RMB:
 						action.append_attribute("button2") = "2";
 						break;
-					case EMouseButtons::MMB:
+					case Input::EMouseButtons::MMB:
 						action.append_attribute("button2") = "1";
 						break;
-					case EMouseButtons::M4:
+					case Input::EMouseButtons::M4:
 						action.append_attribute("button2") = "3";
 						break;
-					case EMouseButtons::M5:
+					case Input::EMouseButtons::M5:
 						action.append_attribute("button2") = "4";
 						break;
 				}
 				break;
 		}
 
-		int mods2 = 0;
-		mods2 += ib.Secondary.Shift ? 1 : 0;
-		mods2 += ib.Secondary.Ctrl ? 2 : 0;
-		mods2 += ib.Secondary.Alt ? 4 : 0;
-
-		if (mods2)
+		if (ib.Secondary.Modifiers != Input::EModifiers::None)
 		{
-			action.append_attribute("mod2") = std::to_string(mods2); // Modifiers
+			action.append_attribute("mod2") = std::to_string(static_cast<uint16_t>(ib.Secondary.Modifiers));
 		}
 	}
 

@@ -49,7 +49,7 @@ namespace Engine::Input
 			return 0;
 		}
 
-		const InputBind_t& capture = this->GetCaptureRef();
+		const Bind_t& capture = this->GetCaptureRef();
 
 		/* actual input processing */
 		switch (uMsg)
@@ -100,7 +100,7 @@ namespace Engine::Input
 				}
 
 				/* Release binds matching the passed key. Standalone modifier binds as well. */
-				this->Release(EInputDevice::Keyboard, LParamToKMF(lParam).GetScanCode());
+				this->Release(EDevice::Keyboard, LParamToKMF(lParam).GetScanCode());
 
 				break;
 			}
@@ -118,18 +118,18 @@ namespace Engine::Input
 			}
 			case WM_MBUTTONUP:
 			{
-				this->Release(EInputDevice::Mouse, (unsigned short)EMouseButtons::MMB);
+				this->Release(EDevice::Mouse, (unsigned short)EMouseButtons::MMB);
 				break;
 			}
 			case WM_XBUTTONUP:
 			{
 				if (HIWORD(wParam) == XBUTTON1)
 				{
-					this->Release(EInputDevice::Mouse, (unsigned short)EMouseButtons::M4);
+					this->Release(EDevice::Mouse, (unsigned short)EMouseButtons::M4);
 				}
 				else if (HIWORD(wParam) == XBUTTON2)
 				{
-					this->Release(EInputDevice::Mouse, (unsigned short)EMouseButtons::M5);
+					this->Release(EDevice::Mouse, (unsigned short)EMouseButtons::M5);
 				}
 
 				break;
@@ -144,9 +144,9 @@ namespace Engine::Input
 		this->Register(aIdentifier, aInputBindHandlerType, aInputBindHandler, IBFromString(aInputBind));
 	}
 
-	void CInputBindApi::Register(const char* aIdentifier, EIbHandlerType aInputBindHandlerType, void* aInputBindHandler, InputBind_t aInputBind)
+	void CInputBindApi::Register(const char* aIdentifier, EIbHandlerType aInputBindHandlerType, void* aInputBindHandler, Bind_t aInputBind)
 	{
-		/* check if another identifier, already uses the InputBind_t */
+		/* check if another identifier, already uses the Bind_t */
 		std::string usedBy = this->IsInUse(aInputBind);
 
 		/* another identifier uses the same combination */
@@ -159,7 +159,7 @@ namespace Engine::Input
 
 		auto it = this->Registry.find(aIdentifier);
 
-		/* check if this InputBind_t is not already set */
+		/* check if this Bind_t is not already set */
 		if (it == Registry.end())
 		{
 			IbMapping_t mapping{};
@@ -169,17 +169,17 @@ namespace Engine::Input
 			{
 				case EIbHandlerType::DownAsync:
 				{
-					mapping.Handler_DownOnlyAsync = (INPUTBINDS_PROCESS)aInputBindHandler;
+					mapping.Handler_DownOnlyAsync = (IB_CALLBACK_V1)aInputBindHandler;
 					break;
 				}
 				case EIbHandlerType::DownReleaseAsync:
 				{
-					mapping.Handler_DownReleaseAsync = (INPUTBINDS_PROCESS2)aInputBindHandler;
+					mapping.Handler_DownReleaseAsync = (IB_CALLBACK_V2)aInputBindHandler;
 					break;
 				}
 				case EIbHandlerType::DownRelease:
 				{
-					mapping.Handler_DownRelease = (INPUTBINDS_PROCESS3)aInputBindHandler;
+					mapping.Handler_DownRelease = (IB_CALLBACK_V3)aInputBindHandler;
 					break;
 				}
 			}
@@ -199,17 +199,17 @@ namespace Engine::Input
 			{
 				case EIbHandlerType::DownAsync:
 				{
-					it->second.Handler_DownOnlyAsync = (INPUTBINDS_PROCESS)aInputBindHandler;
+					it->second.Handler_DownOnlyAsync = (IB_CALLBACK_V1)aInputBindHandler;
 					break;
 				}
 				case EIbHandlerType::DownReleaseAsync:
 				{
-					it->second.Handler_DownReleaseAsync = (INPUTBINDS_PROCESS2)aInputBindHandler;
+					it->second.Handler_DownReleaseAsync = (IB_CALLBACK_V2)aInputBindHandler;
 					break;
 				}
 				case EIbHandlerType::DownRelease:
 				{
-					it->second.Handler_DownRelease = (INPUTBINDS_PROCESS3)aInputBindHandler;
+					it->second.Handler_DownRelease = (IB_CALLBACK_V3)aInputBindHandler;
 					break;
 				}
 			}
@@ -264,9 +264,9 @@ namespace Engine::Input
 		this->Save();
 	}
 
-	std::string CInputBindApi::IsInUse(const InputBind_t& aInputBind)
+	std::string CInputBindApi::IsInUse(const Bind_t& aInputBind)
 	{
-		if (aInputBind == InputBind_t{}) { return ""; }
+		if (aInputBind == Bind_t{}) { return ""; }
 
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -315,7 +315,7 @@ namespace Engine::Input
 		return false;
 	}
 
-	const InputBind_t* CInputBindApi::Get(const std::string& aIdentifier)
+	const Bind_t* CInputBindApi::Get(const std::string& aIdentifier)
 	{
 		const std::lock_guard<std::mutex> lock(this->Mutex);
 
@@ -329,9 +329,9 @@ namespace Engine::Input
 		return nullptr;
 	}
 
-	void CInputBindApi::Set(std::string aIdentifier, InputBind_t aInputBind)
+	void CInputBindApi::Set(std::string aIdentifier, Bind_t aInputBind)
 	{
-		/* check if another identifier, already uses the InputBind_t */
+		/* check if another identifier, already uses the Bind_t */
 		std::string usedBy = this->IsInUse(aInputBind);
 
 		/* another identifier uses the same combination */
@@ -410,7 +410,7 @@ namespace Engine::Input
 			{
 				if (!aIsRelease)
 				{
-					INPUTBINDS_PROCESS handler = it->second.Handler_DownOnlyAsync;
+					IB_CALLBACK_V1 handler = it->second.Handler_DownOnlyAsync;
 
 					Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Immediate, [aIdentifier, handler](Clockwork::CancellationToken aToken)
 					{
@@ -424,7 +424,7 @@ namespace Engine::Input
 			}
 			case EIbHandlerType::DownReleaseAsync:
 			{
-				INPUTBINDS_PROCESS2 handler = it->second.Handler_DownReleaseAsync;
+				IB_CALLBACK_V2 handler = it->second.Handler_DownReleaseAsync;
 
 				Clockwork::Run<void>(Raidcore::Clockwork::ETaskPriority::Immediate, [aIdentifier, handler, aIsRelease](Clockwork::CancellationToken aToken)
 				{
@@ -435,7 +435,7 @@ namespace Engine::Input
 			}
 			case EIbHandlerType::DownRelease:
 			{
-				INPUTBINDS_PROCESS3 handler = it->second.Handler_DownRelease;
+				IB_CALLBACK_V3 handler = it->second.Handler_DownRelease;
 
 				return handler(aIdentifier.c_str(), aIsRelease);
 			}
@@ -531,10 +531,11 @@ namespace Engine::Input
 				if (binding["Identifier"].is_null()) { continue; }
 				if (binding["Key"].is_null() && binding["Code"].is_null()) { continue; }
 
-				InputBind_t ib{};
-				ib.Alt = binding.value("Alt", false);
-				ib.Ctrl = binding.value("Ctrl", false);
-				ib.Shift = binding.value("Shift", false);
+				Bind_t ib{};
+				ib.Modifiers |= binding.value("Alt", false) ? EModifiers::Alt : EModifiers::None;
+				ib.Modifiers |= binding.value("Ctrl", false) ? EModifiers::Ctrl : EModifiers::None;
+				ib.Modifiers |= binding.value("Shift", false) ? EModifiers::Shift : EModifiers::None;
+				ib.Modifiers = binding.value("Modifiers", EModifiers::None);
 				bool passthrough = binding.value("Passthrough", false);
 
 				/* neither code nor type null -> inputbind */
@@ -545,7 +546,7 @@ namespace Engine::Input
 				}
 				else if (!binding["Key"].is_null()) /* legacy inputbind */
 				{
-					ib.Device = EInputDevice::Keyboard;
+					ib.Device = EDevice::Keyboard;
 					binding["Key"].get_to(ib.Code);
 				}
 				else
@@ -556,10 +557,8 @@ namespace Engine::Input
 
 				if (ib.Code == 0)
 				{
-					ib.Device = EInputDevice::None;
-					ib.Alt = false;
-					ib.Ctrl = false;
-					ib.Shift = false;
+					ib.Device = EDevice::None;
+					ib.Modifiers = EModifiers::None;
 				}
 
 				std::string identifier = binding["Identifier"].get<std::string>();
@@ -602,19 +601,17 @@ namespace Engine::Input
 		{
 			json binding =
 			{
-				{"Identifier",  id                 },
-				{"Alt",         ib.Bind.Alt        },
-				{"Ctrl",        ib.Bind.Ctrl       },
-				{"Shift",       ib.Bind.Shift      },
-				{"Type",        ib.Bind.Device     },
-				{"Code",        ib.Bind.Code       },
-				{"Passthrough", ib.Passthrough     }
+				{"Identifier",  id                                      },
+				{"Modifiers",   static_cast<uint16_t>(ib.Bind.Modifiers)},
+				{"Type",        ib.Bind.Device                          },
+				{"Code",        ib.Bind.Code                            },
+				{"Passthrough", ib.Passthrough                          }
 			};
 
 			/* override type */
 			if (!ib.Bind.Code)
 			{
-				binding["Type"] = EInputDevice::None;
+				binding["Type"] = EDevice::None;
 			}
 
 			bindings.push_back(binding);
@@ -633,7 +630,7 @@ namespace Engine::Input
 		}
 	}
 
-	bool CInputBindApi::Press(const InputBind_t& aInputBind)
+	bool CInputBindApi::Press(const Bind_t& aInputBind)
 	{
 		std::string identifier;
 		bool passthrough = false;
@@ -675,17 +672,17 @@ namespace Engine::Input
 	{
 		for (auto it = this->HeldInputBinds.begin(); it != this->HeldInputBinds.end();)
 		{
-			if (aModifierVK == VK_SHIFT && it->second.Shift)
+			if (aModifierVK == VK_SHIFT && ((it->second.Modifiers & EModifiers::Shift) == EModifiers::Shift))
 			{
 				this->Invoke(it->first, true);
 				it = this->HeldInputBinds.erase(it);
 			}
-			else if (aModifierVK == VK_CONTROL && it->second.Ctrl)
+			else if (aModifierVK == VK_CONTROL && ((it->second.Modifiers & EModifiers::Ctrl) == EModifiers::Ctrl))
 			{
 				this->Invoke(it->first, true);
 				it = this->HeldInputBinds.erase(it);
 			}
-			else if (aModifierVK == VK_MENU && it->second.Alt)
+			else if (aModifierVK == VK_MENU && ((it->second.Modifiers & EModifiers::Alt) == EModifiers::Alt))
 			{
 				this->Invoke(it->first, true);
 				it = this->HeldInputBinds.erase(it);
@@ -697,7 +694,7 @@ namespace Engine::Input
 		}
 	}
 
-	void CInputBindApi::Release(EInputDevice aDevice, unsigned short aCode)
+	void CInputBindApi::Release(EDevice aDevice, unsigned short aCode)
 	{
 		for (auto it = this->HeldInputBinds.begin(); it != this->HeldInputBinds.end();)
 		{

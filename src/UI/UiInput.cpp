@@ -13,6 +13,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 
+#include "Util/Inputs.h"
 
 CUiInput::CUiInput()
 {
@@ -26,22 +27,22 @@ UINT CUiInput::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	ImGuiIO& io = ImGui::GetIO();
 
-	EModifiers activeModifiers = EModifiers::None;
+	Input::EModifiers activeModifiers = Input::EModifiers::None;
 	if (GetAsyncKeyState(VK_MENU))
 	{
-		activeModifiers |= EModifiers::Alt;
+		activeModifiers |= Input::EModifiers::Alt;
 	}
 	if (GetAsyncKeyState(VK_CONTROL))
 	{
-		activeModifiers |= EModifiers::Ctrl;
+		activeModifiers |= Input::EModifiers::Ctrl;
 	}
 	if (GetAsyncKeyState(VK_SHIFT))
 	{
-		activeModifiers |= EModifiers::Shift;
+		activeModifiers |= Input::EModifiers::Shift;
 	}
 
-	const EModifiers requiredModifiers = this->RequiredModifiers.Get();
-	const bool       filterClicks      = this->FilterClicks.Get();
+	const Input::EModifiers requiredModifiers = this->RequiredModifiers.Get();
+	const bool              filterClicks      = this->FilterClicks.Get();
 
 	bool reqModsDown = (requiredModifiers & activeModifiers) == requiredModifiers;
 

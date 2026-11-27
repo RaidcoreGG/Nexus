@@ -13,13 +13,15 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_extensions.h"
 
+#include "Engine/Inputs/InputBinds/IbEnum.h"
 #include "Host/GW2/Context.h"
 #include "Host/GW2/Index/Index.h"
 #include "res/Resources.h"
 #include "UI/Widgets/QuickAccess/QaConst.h"
 #include "Util/Base64.h"
-#include "Util/Inputs.h"
 #include "Util/Time.h"
+
+namespace Input = Engine::Input;
 
 COptionsWindow::COptionsWindow()
 {
@@ -127,51 +129,51 @@ void COptionsWindow::TabGeneral()
 
 				if (clickingRequiresMods)
 				{
-					EModifiers mods = uiInput->RequiredModifiers.Get();
+					Input::EModifiers mods = uiInput->RequiredModifiers.Get();
 
 					ImGui::BeginGroup();
 					ImGui::Indent();
 					ImGui::Text(Lang::Options::Modifiers.Text());
-					bool modAlt = (mods & EModifiers::Alt) == EModifiers::Alt;
+					bool modAlt = (mods & Input::EModifiers::Alt) == Input::EModifiers::Alt;
 					if (ImGui::Checkbox(Lang::Options::ModifierAlt.Text(), &modAlt))
 					{
 						if (modAlt)
 						{
-							mods |= EModifiers::Alt;
+							mods |= Input::EModifiers::Alt;
 						}
 						else
 						{
-							mods &= ~EModifiers::Alt;
+							mods &= ~Input::EModifiers::Alt;
 						}
 						uiInput->RequiredModifiers.Set(mods);
 						CContext::GetContext()->GetUIContext()->Invalidate();
 					}
 					ImGui::SameLine();
-					bool modCtrl = (mods & EModifiers::Ctrl) == EModifiers::Ctrl;
+					bool modCtrl = (mods & Input::EModifiers::Ctrl) == Input::EModifiers::Ctrl;
 					if (ImGui::Checkbox(Lang::Options::ModifierCtrl.Text(), &modCtrl))
 					{
 						if (modCtrl)
 						{
-							mods |= EModifiers::Ctrl;
+							mods |= Input::EModifiers::Ctrl;
 						}
 						else
 						{
-							mods &= ~EModifiers::Ctrl;
+							mods &= ~Input::EModifiers::Ctrl;
 						}
 						uiInput->RequiredModifiers.Set(mods);
 						CContext::GetContext()->GetUIContext()->Invalidate();
 					}
 					ImGui::SameLine();
-					bool modShift = (mods & EModifiers::Shift) == EModifiers::Shift;
+					bool modShift = (mods & Input::EModifiers::Shift) == Input::EModifiers::Shift;
 					if (ImGui::Checkbox(Lang::Options::ModifierShift.Text(), &modShift))
 					{
 						if (modShift)
 						{
-							mods |= EModifiers::Shift;
+							mods |= Input::EModifiers::Shift;
 						}
 						else
 						{
-							mods &= ~EModifiers::Shift;
+							mods &= ~Input::EModifiers::Shift;
 						}
 						uiInput->RequiredModifiers.Set(mods);
 						CContext::GetContext()->GetUIContext()->Invalidate();

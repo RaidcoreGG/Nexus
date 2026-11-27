@@ -9,18 +9,47 @@
 #pragma once
 
 #include <cstdint>
+#include <windows.h>
 
 namespace Engine::Input
 {
 	///----------------------------------------------------------------------------------------------------
-	/// EInputDevice Enumeration
+	/// EDevice Enumeration
 	///----------------------------------------------------------------------------------------------------
-	enum class EInputDevice : uint32_t
+	enum class EDevice : uint16_t
 	{
 		None,
 		Keyboard,
 		Mouse
 	};
+
+	///----------------------------------------------------------------------------------------------------
+	/// EMouseButtons Enumeration
+	///----------------------------------------------------------------------------------------------------
+	enum class EMouseButtons : uint16_t
+	{
+		None,
+		LMB,
+		RMB,
+		MMB,
+		M4,
+		M5
+	};
+
+	///----------------------------------------------------------------------------------------------------
+	/// EModifiers Enumeration
+	///----------------------------------------------------------------------------------------------------
+	enum class EModifiers : uint16_t
+	{
+		None  = 0,
+		Shift = 1 << 0,
+		Ctrl  = 1 << 1,
+		Alt   = 1 << 2
+	};
+
+#ifdef DEFINE_ENUM_FLAG_OPERATORS
+	DEFINE_ENUM_FLAG_OPERATORS(EModifiers);
+#endif
 
 	///----------------------------------------------------------------------------------------------------
 	/// EIbHandlerType Enumeration

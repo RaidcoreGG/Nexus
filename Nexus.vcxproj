@@ -56,7 +56,7 @@
     <ClCompile Include="thirdparty\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui_tables.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\Engine\Inputs\InputBinds\IbBindV2.cpp" />
+    <ClCompile Include="src\Engine\Inputs\InputBinds\IbBind.cpp" />
     <ClCompile Include="src\Engine\Inputs\InputBinds\IbApi.cpp" />
     <ClCompile Include="src\Core\Logging\LogWriter.cpp" />
     <ClCompile Include="src\Core\Logging\LogBase.cpp" />
@@ -177,7 +177,6 @@
     <ClInclude Include="src\Host\GW2\Inputs\GameBinds\GbConst.h" />
     <ClInclude Include="src\Host\GW2\Inputs\GameBinds\GbApi.h" />
     <ClInclude Include="src\Host\GW2\Inputs\GameBinds\GbNotify.h" />
-    <ClInclude Include="src\Engine\Inputs\InputBinds\IbBind.h" />
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbCapture.h" />
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbConst.h" />
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbEnum.h" />
@@ -223,7 +222,7 @@
     <ClInclude Include="thirdparty\imgui\imstb_rectpack.h" />
     <ClInclude Include="thirdparty\imgui\imstb_textedit.h" />
     <ClInclude Include="thirdparty\imgui\imstb_truetype.h" />
-    <ClInclude Include="src\Engine\Inputs\InputBinds\IbBindV2.h" />
+    <ClInclude Include="src\Engine\Inputs\InputBinds\IbBind.h" />
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbApi.h" />
     <ClInclude Include="src\Engine\Inputs\InputBinds\IbNotify.h" />
     <ClInclude Include="src\Host\GW2\Addons\API\NexusLink.h" />

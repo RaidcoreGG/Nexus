@@ -11,6 +11,7 @@
 #include <windows.h>
 
 #include "ApiBase.h"
+#include "ApiV1.h"
 #include "Engine/Events/EvtSubscriber.h"
 #include "Engine/Inputs/InputBinds/IbMapping.h"
 #include "Engine/Inputs/RawInput/RiApi.h"
@@ -131,7 +132,7 @@ namespace ADDONAPI
 
 		///----------------------------------------------------------------------------------------------------
 		/// IsBound:
-		/// 	Returns whether a game bind has a InputBind_t set or not.
+		/// 	Returns whether a game bind has a Bind_t set or not.
 		///----------------------------------------------------------------------------------------------------
 		bool IsBound(EGameBinds aGameBind);
 	}
@@ -169,25 +170,25 @@ namespace ADDONAPI
 		/// RegisterWithString:
 		/// 	[Revision 1] Addon API wrapper function for Register from string.
 		///----------------------------------------------------------------------------------------------------
-		void RegisterWithString(const char* aIdentifier, Input::INPUTBINDS_PROCESS aInputBindHandler, const char* aInputBind);
+		void RegisterWithString(const char* aIdentifier, Input::IB_CALLBACK_V1 aInputBindHandler, const char* aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// RegisterWithStruct:
 		/// 	[Revision 1] Addon API wrapper function for Register from struct.
 		///----------------------------------------------------------------------------------------------------
-		void RegisterWithStruct(const char* aIdentifier, Input::INPUTBINDS_PROCESS aInputBindHandler, Input::InputBindV1_t aInputBind);
+		void RegisterWithStruct(const char* aIdentifier, Input::IB_CALLBACK_V1 aInputBindHandler, InputBindV1_t aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// RegisterWithString:
 		/// 	[Revision 2] Addon API wrapper function for Register from string.
 		///----------------------------------------------------------------------------------------------------
-		void RegisterWithString2(const char* aIdentifier, Input::INPUTBINDS_PROCESS2 aInputBindHandler, const char* aInputBind);
+		void RegisterWithString2(const char* aIdentifier, Input::IB_CALLBACK_V2 aInputBindHandler, const char* aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// RegisterWithStruct:
 		/// 	[Revision 2] Addon API wrapper function for Register from struct.
 		///----------------------------------------------------------------------------------------------------
-		void RegisterWithStruct2(const char* aIdentifier, Input::INPUTBINDS_PROCESS2 aInputBindHandler, Input::InputBindV1_t aInputBind);
+		void RegisterWithStruct2(const char* aIdentifier, Input::IB_CALLBACK_V2 aInputBindHandler, InputBindV1_t aInputBind);
 
 		///----------------------------------------------------------------------------------------------------
 		/// InvokeInputBind:
